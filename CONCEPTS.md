@@ -1,4 +1,4 @@
-This document gives an overview of the access/authorization concepts used in go-iam, including:
+This document gives an overview of the concepts used in go-iam, including:
 
 * Accounts
 * Identity

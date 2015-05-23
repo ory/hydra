@@ -1,0 +1,100 @@
+This document gives an overview of the access/authorization concepts used in go-iam, including:
+
+* Accounts
+* Identity
+* Groups
+* Permissions
+* Policies
+
+# Account
+
+A **account** (also known as user) has long living credentials.
+
+*Example:* Bob registeres a new **account** at www.example.com, providing a unique email address and a password (:= credentials).
+
+The account entity:
+
+```json
+{
+  "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  "email": "foo@bar",
+  "password": "hashed-password"
+}
+```
+
+# Identity (work in progress)
+
+A account is an identity, but an identity is not neccessarily a account/user. An identity might also be
+a service.
+
+*Example (incomplete!):* Bob is allowed to create articles (*allow* `POST /articles`),
+but is not allowed to changes categories of articles (*disallow* `PUT /categories/example-category/example-article`).  
+However, when creating an article, he is allowed to additionally choose a category for it.
+In this case, the article service delegates (when `POST /articles` allowed, allow `PUT /categories/example-category/example-article`) the permission to choose
+a category for
+
+# Groups
+
+Accounts can be grouped together, forming a **group** of users. All users of agroup
+share the same permissions. Groups are the R(ole) in RBAC (Role Based Access Control).
+Accounts can be part of a unlimited amount of groups.
+
+# Permissions
+
+Permissions allow (or disallow) an account, identity or group some type of access (action) to one or more resources.
+
+* Example (User-based): Bob has permission to create and modify all articles.
+* Example (Resource-based): The article `example-article` can be modified by Bob, Susan and all members of group `example-group`
+
+The permission entity:
+
+```json
+{
+  "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  "effect": "Allow",
+  "action": ["iam:*AccessKey*"],
+  "resource": "rn:content:articles.83299f22-5958-469b-9cd4-5d0e25c5a7bb"
+}
+```
+
+```json
+{
+  "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  "effect": "Allow",
+  "action": ["iam:*AccessKey*"],
+  "resources": [
+    "rn:content:articles.44efef16-12bc-4752-a0c5-2e768622e46b",
+    "rn:content:articles.363bab48-82f1-4b99-ba69-b1cf0e18345e",
+    "rn:content:articles.fb33c4e1-2f16-4701-94d1-ee4198968ab4"
+  ]
+}
+```
+
+* `"effect"` (MUST): Can be `"Allow"` or `"Deny"`
+* `"action"` (MUST): Is arbitrary. It is recommened to use a layout like `an:<service>:<action>` (an short for *action name*).
+Each key should match `[a-zA-Z0-9\-\.]+`, while, `.` may be used for nesting and `*` for wildcards:
+`an:content:article.create` or `an:content:article.modify-timestamp` or `an:content:article.*`
+* `"resource"` (OPTIONAL): Is arbitrary. It is recommened to use a layout like `rn:<service>:<resource-uri>` (rn short for *resource name*).
+Each key should match `[a-zA-Z0-9\-\.\*]+`, while `.` replaces `/` and `*` is used for wildcards:
+`rn:content:articles.83299f22-5958-469b-9cd4-5d0e25c5a7bb` or `rn:content:articles:*`
+* `"resources"` (OPTIONAL): A collection of resources.
+
+# Policies
+
+A policy is a document that provides a formal statement of on or more permissions. Policies are versioned, so you can quickly
+recover a previous state.
+
+The policy entity:
+
+```json
+{
+  "id": "bf4f5b8d-3df7-4369-b432-88e685462394"
+  "statements": [
+    {
+      "Effect": "Allow",
+      "Action": ["iam:*AccessKey*"],
+      "Resource": "arn:aws:iam::ACCOUNT-ID-WITHOUT-HYPHENS:user/division_abc/subdivision_xyz/Bob"
+    }
+  ]
+}
+```

@@ -61,7 +61,7 @@ The permission entity:
 ```json
 {
   "effect": "Allow",
-  "action": ["an:content:article.create"],
+  "action": ["an:content:article:create"],
   "resources": [
     "rn:content:articles:44efef16-12bc-4752-a0c5-2e768622e46b",
     "rn:content:articles:363bab48-82f1-4b99-ba69-b1cf0e18345e",
@@ -92,12 +92,12 @@ The policy entity:
   "statements": [
     {
       "effect": "Allow",
-      "action": ["an:content:article.*"],
+      "action": ["an:content:article:*"],
       "resources": ["rn:content:articles:83299f22-5958-469b-9cd4-5d0e25c5a7bb"]
     },
     {
       "effect": "Allow",
-      "action": ["an:content:article.modify"],
+      "action": ["an:content:article:modify"],
       "resources": [
         "rn:content:articles:44efef16-12bc-4752-a0c5-2e768622e46b",
         "rn:content:articles:363bab48-82f1-4b99-ba69-b1cf0e18345e",

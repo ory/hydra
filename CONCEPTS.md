@@ -63,9 +63,9 @@ The permission entity:
   "effect": "Allow",
   "action": ["an:content:article.create"],
   "resources": [
-    "rn:content:articles.44efef16-12bc-4752-a0c5-2e768622e46b",
-    "rn:content:articles.363bab48-82f1-4b99-ba69-b1cf0e18345e",
-    "rn:content:articles.fb33c4e1-2f16-4701-94d1-ee4198968ab4"
+    "rn:content:articles:44efef16-12bc-4752-a0c5-2e768622e46b",
+    "rn:content:articles:363bab48-82f1-4b99-ba69-b1cf0e18345e",
+    "rn:content:articles:fb33c4e1-2f16-4701-94d1-ee4198968ab4"
   ]
 }
 ```

@@ -72,12 +72,12 @@ The permission entity:
 
 * `"effect"` (MUST): Can be `"Allow"` or `"Deny"`
 * `"action"` (MUST): Is arbitrary. It is recommened to use a layout like `an:<service>:<action>` (an short for *action name*).  
-Each key should match `[a-zA-Z0-9\-\.]+`, while, `.` may be used for nesting and `*` for wildcards:
-`an:content:article.create` or `an:content:article.modify-timestamp` or `an:content:article.*`
+Each key should match `[a-zA-Z0-9\-\:\*]+`, while, `:` may be used for nesting and `*` for wildcards:
+`an:content:article:create` or `an:content:article:modify-timestamp` or `an:content:article:*`
 * `"resource"` (OPTIONAL): A collection of arbitrary resource names.  
 It is recommened to use a layout like `rn:<service>:<resource-uri>` (rn short for *resource name*).
-Each key should match `[a-zA-Z0-9\-\.\*]+`, while `.` replaces `/` and `*` is used for wildcards:
-`rn:content:articles.83299f22-5958-469b-9cd4-5d0e25c5a7bb` or `rn:content:articles:*`
+Each key should match `[a-zA-Z0-9\-\:\*]+`, while, `.` may be used for nesting (replacing the `/` in URIs) and `*` is used for wildcards:
+`rn:content:articles:83299f22-5958-469b-9cd4-5d0e25c5a7bb` or `rn:content:articles:*`
 
 # Policies
 
@@ -93,15 +93,15 @@ The policy entity:
     {
       "effect": "Allow",
       "action": ["an:content:article.*"],
-      "resource": "rn:content:articles.83299f22-5958-469b-9cd4-5d0e25c5a7bb"
+      "resources": ["rn:content:articles:83299f22-5958-469b-9cd4-5d0e25c5a7bb"]
     },
     {
       "effect": "Allow",
-      "action": ["an:content:article.create"],
+      "action": ["an:content:article.modify"],
       "resources": [
-        "rn:content:articles.44efef16-12bc-4752-a0c5-2e768622e46b",
-        "rn:content:articles.363bab48-82f1-4b99-ba69-b1cf0e18345e",
-        "rn:content:articles.fb33c4e1-2f16-4701-94d1-ee4198968ab4"
+        "rn:content:articles:44efef16-12bc-4752-a0c5-2e768622e46b",
+        "rn:content:articles:363bab48-82f1-4b99-ba69-b1cf0e18345e",
+        "rn:content:articles:fb33c4e1-2f16-4701-94d1-ee4198968ab4"
       ]
     }
   ]

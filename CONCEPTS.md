@@ -70,11 +70,11 @@ The permission entity:
 }
 ```
 
-* `"effect"` (MUST): Can be `"Allow"` or `"Deny"`
-* `"action"` (MUST): Is arbitrary. It is recommened to use a layout like `an:<service>:<action>` (an short for *action name*).  
+* `"effect"`: Can be `"Allow"` or `"Deny"`
+* `"action"`: Is arbitrary. It is recommened to use a layout like `an:<service>:<action>` (an short for *action name*).  
 Each key should match `[a-zA-Z0-9\-\:\*]+`, while, `:` may be used for nesting and `*` for wildcards:
 `an:content:article:create` or `an:content:article:modify-timestamp` or `an:content:article:*`
-* `"resource"` (OPTIONAL): A collection of arbitrary resource names.  
+* `"resource"`: A collection of arbitrary resource names.  
 It is recommened to use a layout like `rn:<service>:<resource-uri>` (rn short for *resource name*).
 Each key should match `[a-zA-Z0-9\-\:\*]+`, while, `.` may be used for nesting (replacing the `/` in URIs) and `*` is used for wildcards:
 `rn:content:articles:83299f22-5958-469b-9cd4-5d0e25c5a7bb` or `rn:content:articles:*`

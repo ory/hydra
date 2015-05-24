@@ -1,11 +1,11 @@
 This document gives an overview of the concepts used in go-iam, including:
 
 * Identities
-  * Accounts
+  * Account
   * Client
-* Groups
-* Permissions
-* Policies
+* Group
+* Permission
+* Policy
 
 # Identities
 
@@ -44,7 +44,7 @@ The identity entity:
 }
 ```
 
-# Groups
+# Group
 
 Accounts can be grouped together, forming a **group** of users. All users of ag roup
 share the same policies. Groups are the R(ole) in RBAC (Role Based Access Control).
@@ -60,7 +60,7 @@ The group entity:
 }
 ```
 
-# Permissions
+# Permission
 
 Permissions allow (or disallow) an account, identity or group some type of access (action) to one or more resources.
 
@@ -90,7 +90,7 @@ It is recommened to use a layout like `rn:<service>:<resource-uri>` (rn short fo
 Each key should match `[a-zA-Z0-9\-\:\*]+`, while, `.` may be used for nesting (replacing the `/` in URIs) and `*` is used for wildcards:
 `rn:content:articles:83299f22-5958-469b-9cd4-5d0e25c5a7bb` or `rn:content:articles:*`
 
-# Policies
+# Policy
 
 A policy is a document that provides a formal statement of on or more permissions. Policies are versioned, so you can quickly recover a previous state.
 

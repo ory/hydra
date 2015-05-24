@@ -1,12 +1,17 @@
 This document gives an overview of the concepts used in go-iam, including:
 
-* Accounts
-* Identity
+* Identities
+  * Accounts
+  * Client
 * Groups
 * Permissions
 * Policies
 
-# Account
+# Identities
+
+An identity is either a account (or user) or an OAuth2 client.
+
+## Account
 
 A **account** (also known as user) has long living credentials.
 
@@ -22,13 +27,22 @@ The account entity:
 }
 ```
 
-# Identity (work in progress)
+## Client
 
-A account is an identity, but an identity is not neccessarily a account/user. An identity can be a service or a client.
+A client is an OAuth2 client. It can be an external app or a service.
 
 *Example:* Company c created a mobile app which uses OAuth2 for authentication. The OAuth2 client credentials can be used to allow or disallow access to e.g. user data..
 
 *Example:* The printing service needs to read an article from the content service. To do so, the printing service authenticates via OAuth2 client credentials grant and is allowed or disallowed access by the article service.
+
+The identity entity:
+
+```json
+{
+  "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  "secret": "cleartext-password"
+}
+```
 
 # Groups
 

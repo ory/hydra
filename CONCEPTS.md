@@ -24,14 +24,11 @@ The account entity:
 
 # Identity (work in progress)
 
-A account is an identity, but an identity is not neccessarily a account/user. An identity might also be
-a service.
+A account is an identity, but an identity is not neccessarily a account/user. An identity can be a service or a client.
 
-*Example (incomplete!):* Bob is allowed to create articles (*allow* `POST /articles`),
-but is not allowed to changes categories of articles (*disallow* `PUT /categories/example-category/example-article`).  
-However, when creating an article, he is allowed to additionally choose a category for it.
-In this case, the article service delegates (when `POST /articles` allowed, allow `PUT /categories/example-category/example-article`) the permission to choose
-a category for
+*Example:* Company c created a mobile app which uses OAuth2 for authentication. The OAuth2 client credentials can be used to allow or disallow access to e.g. user data..
+
+*Example:* The printing service needs to read an article from the content service. To do so, the printing service authenticates via OAuth2 client credentials grant and is allowed or disallowed access by the article service.
 
 # Groups
 

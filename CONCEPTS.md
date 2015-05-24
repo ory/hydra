@@ -9,7 +9,7 @@ This document gives an overview of the concepts used in go-iam, including:
 
 # Identities
 
-An identity is either a account (or user) or an OAuth2 client.
+An identity is either a account or an OAuth2 client.
 
 ## Account
 

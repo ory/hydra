@@ -29,7 +29,7 @@ The account entity:
 
 ## Client
 
-A client is an OAuth2 client. It can be an external app or a service.
+A client is an OAuth2 client. It can be an app or a service.
 
 *Example:* Company c created a mobile app which uses OAuth2 for authentication. The OAuth2 client credentials can be used to allow or disallow access to e.g. user data..
 

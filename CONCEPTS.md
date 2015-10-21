@@ -90,6 +90,8 @@ It is recommened to use a layout like `rn:<service>:<resource-uri>` (rn short fo
 Each key should match `[a-zA-Z0-9\-\:\*]+`, while, `.` may be used for nesting (replacing the `/` in URIs) and `*` is used for wildcards:
 `rn:content:articles:83299f22-5958-469b-9cd4-5d0e25c5a7bb` or `rn:content:articles:*`
 
+Use the user id in the resource name to identify the resource owner: `rn:${user}:shares:*`
+
 # Policy
 
 A policy is a document that provides a formal statement of on or more permissions. Policies are versioned, so you can quickly recover a previous state.

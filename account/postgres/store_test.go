@@ -1,54 +1,46 @@
 package postgres
 
 import (
-	"fmt"
-	"log"
-	"os"
-	"testing"
-	"time"
-
 	"database/sql"
-	_ "github.com/lib/pq"
 	"github.com/ory-am/dockertest"
 	"github.com/ory-am/hydra/hash"
 	"github.com/stretchr/testify/assert"
+	"log"
+	"os"
 	"reflect"
+	"testing"
+	"time"
 )
 
 var db *sql.DB
 var store *Store
 
 func TestMain(m *testing.M) {
-	c, ip, port, err := dockertest.SetupPostgreSQLContainer(time.Second * 5)
+	var err error
+	var c dockertest.ContainerID
+	c, db, err = dockertest.OpenPostgreSQLContainerConnection(15, time.Second)
 	if err != nil {
-		log.Fatalf("Could not set up PostgreSQL container: %v", err)
+		log.Fatalf("Could not connect to database: %s", err)
 	}
 	defer c.KillRemove()
 
-	url := fmt.Sprintf("postgres://%s:%s@%s:%d/postgres?sslmode=disable", dockertest.PostgresUsername, dockertest.PostgresPassword, ip, port)
-	db, err = sql.Open("postgres", url)
-	if err != nil {
-		log.Fatalf("Could not set up PostgreSQL container: %v", err)
-	}
-
-	if err = db.Ping(); err != nil {
-		log.Fatalf("Could not ping database: %v", err)
+	if err := db.Ping(); err != nil {
+		log.Fatalf("Could not ping: %s", err)
 	}
 
 	store = New(&hash.BCrypt{10}, db)
-	if err = store.CreateSchemas(); err != nil {
+	if err := store.CreateSchemas(); err != nil {
 		log.Fatalf("Could not set up schemas: %v", err)
 	}
-
 	os.Exit(m.Run())
 }
 
 func TestCreateAndGetCases(t *testing.T) {
 	type tc struct {
-		data []string
-        extra string
-		pass bool
-		find bool
+		data  []string
+		extra string
+		pass  bool
+		find  bool
 	}
 	cases := []tc{
 		tc{[]string{"1", "1@bar", "secret"}, `{"foo": "bar"}`, true, true},

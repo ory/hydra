@@ -7,9 +7,6 @@ type BCrypt struct {
 }
 
 func (b *BCrypt) Hash(data string) (string, error) {
-	if b.WorkFactor == 0 {
-		b.WorkFactor = 12
-	}
 	s, err := bcrypt.GenerateFromPassword([]byte(data), b.WorkFactor)
 	return string(s), err
 }

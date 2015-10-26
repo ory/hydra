@@ -3,6 +3,7 @@ package jwt
 import (
 	"errors"
 	"fmt"
+	"github.com/RangelReale/osin"
 	"github.com/dgrijalva/jwt-go"
 	"io"
 	"io/ioutil"
@@ -115,22 +116,49 @@ func (j *JWT) SignToken(claims map[string]interface{}, header map[string]interfa
 		return "", errors.New("You may not override the typ header key.")
 	}
 
-	c := func(a, b map[string]interface{}) map[string]interface{} {
-		for k, w := range b {
-			if _, ok := a[k]; !ok {
-				continue
-			}
-			a[k] = w
-		}
-		return a
-	}
-
 	token := jwt.New(jwt.SigningMethodRS256)
 	token.Claims = claims
-	token.Header = c(token.Header, header)
+	token.Header = merge(token.Header, header)
 	ecdsaKey, err := jwt.ParseRSAPrivateKeyFromPEM(j.privateKey)
 	if err != nil {
 		return "", err
 	}
 	return token.SignedString(ecdsaKey)
+}
+
+func merge(a, b map[string]interface{}) map[string]interface{} {
+	for k, w := range b {
+		if _, ok := a[k]; !ok {
+			continue
+		}
+		a[k] = w
+	}
+	return a
+}
+
+type Map struct {
+	Data map[string]interface{}
+}
+
+func (j *JWT) GenerateAccessToken(data *osin.AccessData, generateRefresh bool) (accessToken string, refreshToken string, err error) {
+	claims := map[string]interface{}{"cid": data.Client.GetId(), "exp": data.ExpireAt().Unix()}
+	extra, ok := data.UserData.(*Map)
+	if !ok {
+		extra = &Map{Data: map[string]interface{}{}}
+	}
+
+	claims = merge(claims, extra.Data)
+	accessToken, err = j.SignToken(claims, map[string]interface{}{})
+	if err != nil {
+		return "", "", err
+	} else if !generateRefresh {
+		return
+	}
+
+	claims = merge(map[string]interface{}{"at": accessToken}, claims)
+	refreshToken, err = j.SignToken(claims, map[string]interface{}{})
+	if err != nil {
+		return "", "", err
+	}
+	return
 }

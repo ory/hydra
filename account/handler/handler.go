@@ -25,9 +25,6 @@ func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hydcon.ContextHandle
 	r.Handle("/users", &hydcon.ContextAdapter{Ctx: context.Background(), Handler: h.Create(extractor)}).Methods("POST")
 	r.Handle("/users/{id}", &hydcon.ContextAdapter{Ctx: context.Background(), Handler: h.Get(extractor)}).Methods("GET")
 	r.Handle("/users/{id}", &hydcon.ContextAdapter{Ctx: context.Background(), Handler: h.Delete(extractor)}).Methods("DELETE")
-
-	//r.Handle("/login", &hydcon.ContextAdapter{Ctx: context.Background(), Handler: h.Login(extractor)}).Methods("GET")
-	//r.Handle("/logout", &hydcon.ContextAdapter{Ctx: context.Background(), Handler: h.Logout(extractor)}).Methods("GET")
 }
 
 func (h *Handler) Create(extractor func(h hydcon.ContextHandler) hydcon.ContextHandler) hydcon.ContextHandler {

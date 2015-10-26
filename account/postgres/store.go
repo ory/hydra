@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"errors"
 	"github.com/ory-am/hydra/account"
 	"github.com/ory-am/hydra/hash"
 	"log"
@@ -13,6 +14,8 @@ const accountSchema = `CREATE TABLE account (
 	password     text NOT NULL,
 	data		 json
 )`
+
+var ErrNotFound = errors.New("Not found")
 
 type Store struct {
 	hasher hash.Hasher
@@ -103,7 +106,7 @@ func (s *Store) Delete(id string) (err error) {
 func (s *Store) Authenticate(email, password string) (account.Account, error) {
 	var a account.DefaultAccount
 	// Query account
-	row := s.db.QueryRow("SELECT id, email, password, data FROM account WHERE email=$1 LIMIT 1", email)
+	row := s.db.QueryRow("SELECT id, email, password, data FROM account WHERE email=$1", email)
 
 	// Hydrate struct with data
 	if err := row.Scan(&a.ID, &a.Email, &a.Password, &a.Data); err != nil {

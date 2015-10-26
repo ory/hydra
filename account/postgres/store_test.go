@@ -136,6 +136,8 @@ func TestAuthenticate(t *testing.T) {
 	assert.NotNil(t, err)
 	_, err = store.Authenticate("doesnotexist@foo", "secret")
 	assert.NotNil(t, err)
+	_, err = store.Authenticate("", "")
+	assert.NotNil(t, err)
 
 	result, err := store.Authenticate("5@bar", "secret")
 	assert.Nil(t, err)

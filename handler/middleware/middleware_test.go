@@ -81,7 +81,7 @@ var cases = []test{
 		&jwt.Token{Valid: true},
 		[]policy.Policy{},
 		"", "",
-		true, false,
+		false, false,
 	},
 	test{
 		&account.DefaultAccount{ID: "max"},

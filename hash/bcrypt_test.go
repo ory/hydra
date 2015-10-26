@@ -8,7 +8,7 @@ import (
 
 func TestHash(t *testing.T) {
 	h := &BCrypt{
-		WorkFactor: 12,
+		WorkFactor: 10,
 	}
 	password := "foo"
 	hash, err := h.Hash(password)
@@ -19,7 +19,7 @@ func TestHash(t *testing.T) {
 
 func TestCompareEquals(t *testing.T) {
 	h := &BCrypt{
-		WorkFactor: 12,
+		WorkFactor: 10,
 	}
 	password := "foo"
 	hash, err := h.Hash(password)
@@ -31,7 +31,7 @@ func TestCompareEquals(t *testing.T) {
 
 func TestCompareDifferent(t *testing.T) {
 	h := &BCrypt{
-		WorkFactor: 12,
+		WorkFactor: 10,
 	}
 	password := "foo"
 	hash, err := h.Hash(password)

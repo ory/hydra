@@ -44,16 +44,18 @@ func (s *Store) Create(id, email, password, data string) (account.Account, error
 		return nil, err
 	}
 
-	return &Account{id, email, password, data}, nil
+	return &account.DefaultAccount{id, email, password, data}, nil
 }
 
 func (s *Store) Get(id string) (account.Account, error) {
-	var a Account
+	var a account.DefaultAccount
 	// Query account
 	row := s.db.QueryRow("SELECT id, email, password, data FROM account WHERE id=$1 LIMIT 1", id)
 
 	// Hydrate struct with data
-	if err := row.Scan(&a.ID, &a.Email, &a.Password, &a.Data); err != nil {
+	if err := row.Scan(&a.ID, &a.Email, &a.Password, &a.Data); err == sql.ErrNoRows {
+		return nil, account.ErrNotFound
+	} else if err != nil {
 		return nil, err
 	}
 	return &a, nil
@@ -76,7 +78,7 @@ func (s *Store) UpdatePassword(id, oldPassword, newPassword string) (account.Acc
 		return nil, err
 	}
 
-	return &Account{acc.GetID(), acc.GetEmail(), newPassword, acc.GetData()}, nil
+	return &account.DefaultAccount{acc.GetID(), acc.GetEmail(), newPassword, acc.GetData()}, nil
 }
 
 func (s *Store) UpdateEmail(id, email, password string) (account.Account, error) {
@@ -90,7 +92,7 @@ func (s *Store) UpdateEmail(id, email, password string) (account.Account, error)
 		return nil, err
 	}
 
-	return &Account{acc.GetID(), email, acc.GetEmail(), acc.GetData()}, nil
+	return &account.DefaultAccount{acc.GetID(), email, acc.GetEmail(), acc.GetData()}, nil
 }
 
 func (s *Store) Delete(id string) (err error) {
@@ -99,7 +101,7 @@ func (s *Store) Delete(id string) (err error) {
 }
 
 func (s *Store) Authenticate(email, password string) (account.Account, error) {
-	var a Account
+	var a account.DefaultAccount
 	// Query account
 	row := s.db.QueryRow("SELECT id, email, password, data FROM account WHERE email=$1 LIMIT 1", email)
 

@@ -1,4 +1,4 @@
-package postgres
+package account
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -12,7 +12,7 @@ var cases = [][]string{
 
 func TestAccountCases(t *testing.T) {
 	for _, c := range cases {
-		a := &Account{c[0], c[1], c[2], `{"foo": "bar"}`}
+		a := &DefaultAccount{c[0], c[1], c[2], `{"foo": "bar"}`}
 		assert.Equal(t, c[0], a.GetID())
 		assert.Equal(t, c[1], a.GetEmail())
 		assert.Equal(t, c[2], a.GetPassword())

@@ -121,6 +121,10 @@ func (s *Store) Authenticate(email, password string) (account.Account, error) {
 	return &a, nil
 }
 
+func (s *Store) FindByProvider(provider, subject string) (account.Account, error) {
+	return nil, errors.New("Not implemented")
+}
+
 func (s *Store) UpdateData(id string, data string) (account.Account, error) {
 	// Execute SQL statement
 	if _, err := s.db.Exec("UPDATE account SET (data) = ($2) WHERE id=$1", id, data); err != nil {

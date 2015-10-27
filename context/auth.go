@@ -2,8 +2,8 @@ package context
 
 import (
 	"fmt"
+	"github.com/RangelReale/osin"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/ory-am/hydra/account"
 	hjwt "github.com/ory-am/hydra/jwt"
 	"github.com/ory-am/ladon/policy"
 	"golang.org/x/net/context"
@@ -15,51 +15,43 @@ const (
 	authKey key = 0
 )
 
-func NewContextFromAuthorization(ctx context.Context, req *http.Request, j *hjwt.JWT, s account.Storage, p policy.Storer) context.Context {
-	authorization := req.Header.Get("Authorization")
-	if len(authorization) <= len("Bearer ") {
-		log.Printf("Authorization header has no Bearer: %v", req.Header)
-		return NewContextFromAuthValues(ctx, nil, nil, nil)
-	} else if authorization[:len("Bearer ")] != "Bearer " {
-		log.Printf("Authorization header has no Bearer: %v", req.Header)
+func NewContextFromAuthorization(ctx context.Context, req *http.Request, j *hjwt.JWT, p policy.Storer) context.Context {
+	bearer := osin.CheckBearerAuth(req)
+	if bearer == nil {
+		log.Printf("No bearer given: %v %v", bearer, req.Header)
 		return NewContextFromAuthValues(ctx, nil, nil, nil)
 	}
 
-	data := authorization[len("Bearer "):]
-	t, err := j.VerifyToken([]byte(data))
+	t, err := j.VerifyToken([]byte(bearer.Code))
 	if err != nil {
-		log.Printf("%s token validation errored: %v", authorization, err)
+		log.Printf("%s token validation errored: %v", bearer, err)
 		return NewContextFromAuthValues(ctx, nil, nil, nil)
 	} else if !t.Valid {
-		log.Printf("%s token invalid: %v", authorization, t.Valid)
+		log.Printf("%s token invalid: %v", bearer, t.Valid)
 		return NewContextFromAuthValues(ctx, nil, nil, nil)
 	}
 
-	idclaim, ok := t.Claims["subject"]
-	if !ok {
-		log.Printf("Claim subject not found: %v", t.Claims)
-		return NewContextFromAuthValues(ctx, nil, nil, nil)
-	}
-	id, ok := idclaim.(string)
-	if !ok {
-		log.Printf("Claim subject not found: %v", t.Claims)
+	claims := hjwt.ClaimsCarrier(t.Claims)
+	user := claims.Subject()
+	if user == "" {
+		log.Printf("Subject not claimed: %v", t.Claims)
 		return NewContextFromAuthValues(ctx, nil, nil, nil)
 	}
 
-	user, err := s.Get(id)
+	policies, err := p.FindPoliciesForSubject(user)
 	if err != nil {
 		log.Printf("Subject not found in store: %v %v", t.Claims, err)
 		return NewContextFromAuthValues(ctx, nil, nil, nil)
 	}
 
-	policies, err := p.FindPoliciesForSubject(id)
-	if err != nil {
-		log.Printf("Subject not found in store: %v %v", t.Claims, err)
-		return NewContextFromAuthValues(ctx, nil, nil, nil)
-	}
+	//	user, err := s.Get(id)
+	//	if err != nil {
+	//		log.Printf("Subject not found in store: %v %v", t.Claims, err)
+	//		return NewContextFromAuthValues(ctx, nil, nil, nil)
+	//	}
 
 	log.Printf("Authentication successfull: %v", t)
-	return NewContextFromAuthValues(ctx, user, t, policies)
+	return NewContextFromAuthValues(ctx, claims, t, policies)
 }
 
 func TokenFromContext(ctx context.Context) (*jwt.Token, error) {
@@ -70,16 +62,12 @@ func TokenFromContext(ctx context.Context) (*jwt.Token, error) {
 	return args.token, nil
 }
 
-func SubjectFromContext(ctx context.Context) (account.Account, error) {
+func SubjectFromContext(ctx context.Context) (string, error) {
 	args, ok := ctx.Value(authKey).(*authorization)
 	if !ok {
-		return nil, fmt.Errorf("Could not assert type for %v", ctx.Value(authKey))
+		return "", fmt.Errorf("Could not assert type for %v", ctx.Value(authKey))
 	}
-	u, ok := args.subject.(*account.DefaultAccount)
-	if !ok {
-		return nil, fmt.Errorf("Could not assert type for %v", ctx.Value(authKey))
-	}
-	return u, nil
+	return args.claims.Subject(), nil
 }
 
 func PoliciesFromContext(ctx context.Context) ([]policy.Policy, error) {
@@ -104,12 +92,16 @@ func IsAuthenticatedFromContext(ctx context.Context) bool {
 	return (b && a.token != nil && a.token.Valid)
 }
 
-func NewContextFromAuthValues(ctx context.Context, subject account.Account, token *jwt.Token, policies []policy.Policy) context.Context {
-	return context.WithValue(ctx, authKey, &authorization{subject, token, policies})
+func NewContextFromAuthValues(ctx context.Context, claims hjwt.ClaimsCarrier, token *jwt.Token, policies []policy.Policy) context.Context {
+	return context.WithValue(ctx, authKey, &authorization{
+		claims:   claims,
+		token:    token,
+		policies: policies,
+	})
 }
 
 type authorization struct {
-	subject  account.Account
+	claims   hjwt.ClaimsCarrier
 	token    *jwt.Token
 	policies []policy.Policy
 }

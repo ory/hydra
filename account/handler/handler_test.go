@@ -7,11 +7,11 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	"github.com/ory-am/dockertest"
-	"github.com/ory-am/hydra/account"
 	hydra "github.com/ory-am/hydra/account/postgres"
 	hcon "github.com/ory-am/hydra/context"
 	"github.com/ory-am/hydra/handler/middleware"
 	"github.com/ory-am/hydra/hash"
+	hjwt "github.com/ory-am/hydra/jwt"
 	"github.com/ory-am/ladon/policy"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
@@ -64,7 +64,7 @@ type payload struct {
 }
 
 type test struct {
-	subject      account.Account
+	subject      string
 	token        *jwt.Token
 	policies     []policy.Policy
 	createData   *payload
@@ -75,35 +75,35 @@ type test struct {
 
 var cases = []*test{
 	&test{
-		&account.DefaultAccount{},
+		"peter",
 		&jwt.Token{Valid: false},
 		[]policy.Policy{},
 		&payload{},
 		http.StatusUnauthorized, 0, 0,
 	},
 	&test{
-		&account.DefaultAccount{},
+		"peter",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{},
 		&payload{},
 		http.StatusForbidden, 0, 0,
 	},
 	&test{
-		&account.DefaultAccount{},
+		"peter",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{},
 		&payload{},
 		http.StatusForbidden, 0, 0,
 	},
 	&test{
-		&account.DefaultAccount{ID: "max"},
+		"max",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{},
 		&payload{},
 		http.StatusForbidden, 0, 0,
 	},
 	&test{
-		&account.DefaultAccount{ID: "max"},
+		"max",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{
 			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
@@ -112,7 +112,7 @@ var cases = []*test{
 		http.StatusForbidden, 0, 0,
 	},
 	&test{
-		&account.DefaultAccount{ID: "peter"},
+		"peter",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{
 			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
@@ -121,7 +121,7 @@ var cases = []*test{
 		http.StatusBadRequest, 0, 0,
 	},
 	&test{
-		&account.DefaultAccount{ID: "peter"},
+		"peter",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{
 			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
@@ -130,7 +130,7 @@ var cases = []*test{
 		http.StatusBadRequest, 0, 0,
 	},
 	&test{
-		&account.DefaultAccount{ID: "peter"},
+		"peter",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{
 			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
@@ -139,7 +139,7 @@ var cases = []*test{
 		http.StatusBadRequest, 0, 0,
 	},
 	&test{
-		&account.DefaultAccount{ID: "peter"},
+		"peter",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{
 			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
@@ -148,7 +148,7 @@ var cases = []*test{
 		http.StatusBadRequest, 0, 0,
 	},
 	&test{
-		&account.DefaultAccount{ID: "peter"},
+		"peter",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{
 			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
@@ -157,7 +157,7 @@ var cases = []*test{
 		http.StatusBadRequest, 0, 0,
 	},
 	&test{
-		&account.DefaultAccount{ID: "peter"},
+		"peter",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{
 			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
@@ -166,7 +166,7 @@ var cases = []*test{
 		http.StatusOK, http.StatusForbidden, http.StatusForbidden,
 	},
 	&test{
-		&account.DefaultAccount{ID: "peter"},
+		"peter",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{
 			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
@@ -176,7 +176,7 @@ var cases = []*test{
 		http.StatusOK, http.StatusOK, http.StatusForbidden,
 	},
 	&test{
-		&account.DefaultAccount{ID: "peter"},
+		"peter",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{
 			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
@@ -191,7 +191,8 @@ var cases = []*test{
 func mock(c *test) func(h hcon.ContextHandler) hcon.ContextHandler {
 	return func(h hcon.ContextHandler) hcon.ContextHandler {
 		return hcon.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
-			ctx = hcon.NewContextFromAuthValues(ctx, c.subject, c.token, c.policies)
+			claims := hjwt.NewClaimsCarrier(uuid.New(), "hydra", c.subject, "tests", time.Now(), time.Now())
+			ctx = hcon.NewContextFromAuthValues(ctx, claims, c.token, c.policies)
 			h.ServeHTTPContext(ctx, rw, req)
 		})
 	}

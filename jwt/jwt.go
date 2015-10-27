@@ -95,13 +95,18 @@ func (j *JWT) VerifyToken(tokenData []byte) (*jwt.Token, error) {
 		}
 		return jwt.ParseRSAPublicKeyFromPEM(j.publicKey)
 	})
-
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't parse token: %v", err)
+	} else if !token.Valid {
+		return nil, fmt.Errorf("Token is invalid")
 	}
 
-	if !token.Valid {
-		return nil, fmt.Errorf("Token is invalid")
+	claims := ClaimsCarrier(token.Claims)
+	if claims.AssertExpired() {
+		return nil, fmt.Errorf("Token expired: %v", claims.ExpiresAt())
+	}
+	if claims.AssertInFuture() {
+		return nil, fmt.Errorf("Token is not valid yet: %v", claims.ExpiresAt())
 	}
 	return token, nil
 }
@@ -128,7 +133,7 @@ func (j *JWT) SignToken(claims map[string]interface{}, header map[string]interfa
 
 func merge(a, b map[string]interface{}) map[string]interface{} {
 	for k, w := range b {
-		if _, ok := a[k]; !ok {
+		if _, ok := a[k]; ok {
 			continue
 		}
 		a[k] = w
@@ -136,28 +141,20 @@ func merge(a, b map[string]interface{}) map[string]interface{} {
 	return a
 }
 
-type Map struct {
-	Data map[string]interface{}
-}
-
 func (j *JWT) GenerateAccessToken(data *osin.AccessData, generateRefresh bool) (accessToken string, refreshToken string, err error) {
-	claims := map[string]interface{}{"cid": data.Client.GetId(), "exp": data.ExpireAt().Unix()}
-	extra, ok := data.UserData.(*Map)
+	claims, ok := data.UserData.(ClaimsCarrier)
 	if !ok {
-		extra = &Map{Data: map[string]interface{}{}}
+		return "", "", fmt.Errorf("Could not assert claims to ClaimsCarrier: %v", claims)
 	}
 
-	claims = merge(claims, extra.Data)
-	accessToken, err = j.SignToken(claims, map[string]interface{}{})
-	if err != nil {
+	claims["exp"] = data.ExpireAt()
+	if accessToken, err = j.SignToken(claims, map[string]interface{}{}); err != nil {
 		return "", "", err
 	} else if !generateRefresh {
 		return
 	}
 
-	claims = merge(map[string]interface{}{"at": accessToken}, claims)
-	refreshToken, err = j.SignToken(claims, map[string]interface{}{})
-	if err != nil {
+	if refreshToken, err = j.SignToken(claims, map[string]interface{}{}); err != nil {
 		return "", "", err
 	}
 	return

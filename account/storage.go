@@ -1,6 +1,5 @@
 package account
 
-
 type Storage interface {
 	Create(id, email, password string, data string) (Account, error)
 
@@ -15,4 +14,6 @@ type Storage interface {
 	UpdateData(id, data string) (Account, error)
 
 	Authenticate(email, password string) (Account, error)
+
+	FindByProvider(provider, subject string) (Account, error)
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/ory-am/hydra/handler/middleware"
 	"github.com/ory-am/hydra/hash"
 	"github.com/ory-am/ladon/policy"
+	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
@@ -38,7 +39,12 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		log.Fatalf("Could not connect to database: %s", err)
 	}
-	defer c.KillRemove()
+	defer func() {
+		err := c.KillRemove()
+		if err != nil {
+			panic(err.Error())
+		}
+	}()
 
 	s = hydra.New(&hash.BCrypt{10}, db)
 	if err := s.CreateSchemas(); err != nil {
@@ -51,10 +57,10 @@ func TestMain(m *testing.M) {
 }
 
 type payload struct {
-	ID       string `json:"id"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Data     string `json:"data"`
+	ID       string `json:"id,omitempty"`
+	Email    string `json:"email,omitempty"`
+	Password string `json:"password,omitempty"`
+	Data     string `json:"data,omitempty"`
 }
 
 type test struct {
@@ -111,7 +117,52 @@ var cases = []*test{
 		[]policy.Policy{
 			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
 		},
-		&payload{Email: "1@bar.com", Password: "secret", Data: "{}"},
+		&payload{Email: uuid.New() + "@foobar.com", Data: "{}"},
+		http.StatusBadRequest, 0, 0,
+	},
+	&test{
+		&account.DefaultAccount{ID: "peter"},
+		&jwt.Token{Valid: true},
+		[]policy.Policy{
+			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
+		},
+		&payload{Email: uuid.New() + "@foobar.com", Password: "123", Data: "{}"},
+		http.StatusBadRequest, 0, 0,
+	},
+	&test{
+		&account.DefaultAccount{ID: "peter"},
+		&jwt.Token{Valid: true},
+		[]policy.Policy{
+			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
+		},
+		&payload{Email: "notemail", Password: "secret", Data: "{}"},
+		http.StatusBadRequest, 0, 0,
+	},
+	&test{
+		&account.DefaultAccount{ID: "peter"},
+		&jwt.Token{Valid: true},
+		[]policy.Policy{
+			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
+		},
+		&payload{Email: uuid.New() + "@bar.com", Password: "", Data: "{}"},
+		http.StatusBadRequest, 0, 0,
+	},
+	&test{
+		&account.DefaultAccount{ID: "peter"},
+		&jwt.Token{Valid: true},
+		[]policy.Policy{
+			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
+		},
+		&payload{Email: uuid.New() + "@bar.com", Password: "secret", Data: "not json"},
+		http.StatusBadRequest, 0, 0,
+	},
+	&test{
+		&account.DefaultAccount{ID: "peter"},
+		&jwt.Token{Valid: true},
+		[]policy.Policy{
+			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
+		},
+		&payload{Email: uuid.New() + "@bar.com", Password: "secret", Data: "{}"},
 		http.StatusOK, http.StatusForbidden, http.StatusForbidden,
 	},
 	&test{
@@ -121,7 +172,7 @@ var cases = []*test{
 			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
 			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{".*"}, []string{"get"}},
 		},
-		&payload{Email: "2@bar.com", Password: "secret", Data: "{}"},
+		&payload{Email: uuid.New() + "@bar.com", Password: "secret", Data: "{}"},
 		http.StatusOK, http.StatusOK, http.StatusForbidden,
 	},
 	&test{
@@ -132,7 +183,7 @@ var cases = []*test{
 			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{".*"}, []string{"get"}},
 			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users/.*"}, []string{"delete"}},
 		},
-		&payload{Email: "3@bar.com", Password: "secret", Data: "{}"},
+		&payload{Email: uuid.New() + "@bar.com", Password: "secret", Data: "{}"},
 		http.StatusOK, http.StatusOK, http.StatusAccepted,
 	},
 }
@@ -153,9 +204,11 @@ func TestCreateGetDelete(t *testing.T) {
 		req := request(testCase)
 		res := httptest.NewRecorder()
 		router.ServeHTTP(res, req)
-		assert.Equal(t, code, res.Code, "Case %d, %s", k, name)
+		assert.Equal(t, code, res.Code, `Case %d, %s: %s`, k, name, res.Body.Bytes())
 		if http.StatusOK == res.Code || http.StatusAccepted == res.Code {
 			finish(testCase, res)
+		} else if res.Code == http.StatusNotFound {
+			log.Printf("404 case %d: %s", k, testCase.createData.ID)
 		}
 	}
 
@@ -170,7 +223,7 @@ func TestCreateGetDelete(t *testing.T) {
 		}, func(c *test, res *httptest.ResponseRecorder) {
 			code = res.Code
 			result := res.Body.Bytes()
-			log.Printf("POST ok /users: %s", result)
+			log.Printf("POST case %d /users: %s", k, result)
 			require.Nil(t, json.Unmarshal(result, &p))
 			assert.Equal(t, c.createData.Email, p.Email)
 			assert.Equal(t, c.createData.Data, p.Data)
@@ -187,7 +240,7 @@ func TestCreateGetDelete(t *testing.T) {
 		}, func(c *test, res *httptest.ResponseRecorder) {
 			code = res.Code
 			result := res.Body.Bytes()
-			log.Printf("GET ok /users/%s: %s", p.ID, result)
+			log.Printf("GET case %d /users/%s: %s", k, p.ID, result)
 			require.Nil(t, json.Unmarshal(result, &p))
 			assert.Equal(t, c.createData.Email, p.Email)
 			assert.Equal(t, c.createData.Data, p.Data)
@@ -203,7 +256,7 @@ func TestCreateGetDelete(t *testing.T) {
 			return req
 		}, func(c *test, res *httptest.ResponseRecorder) {
 			code = res.Code
-			log.Printf("DELETE ok /users/%s", p.ID)
+			log.Printf("DELETE case %d /users/%s", k, p.ID)
 		})
 
 		if code != http.StatusAccepted {

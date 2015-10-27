@@ -101,20 +101,10 @@ func PoliciesFromContext(ctx context.Context) ([]policy.Policy, error) {
 
 func IsAuthenticatedFromContext(ctx context.Context) bool {
 	a, b := ctx.Value(authKey).(*authorization)
-	return b && a.token.Valid
+	return (b && a.token != nil && a.token.Valid)
 }
 
 func NewContextFromAuthValues(ctx context.Context, subject account.Account, token *jwt.Token, policies []policy.Policy) context.Context {
-	if subject == nil {
-		subject = &account.DefaultAccount{}
-	}
-	if token == nil {
-		token = &jwt.Token{}
-	}
-	if policies == nil {
-		policies = []policy.Policy{}
-	}
-
 	return context.WithValue(ctx, authKey, &authorization{subject, token, policies})
 }
 

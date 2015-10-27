@@ -13,6 +13,10 @@ func TestLoadCertificate(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, c[1], string(out))
 	}
+	_, err := LoadCertificate("")
+	assert.NotNil(t, err)
+	_, err = LoadCertificate("foobar")
+	assert.NotNil(t, err)
 }
 
 func TestSignRejectsAlgAndTypHeader(t *testing.T) {
@@ -34,15 +38,33 @@ func TestSignAndVerify(t *testing.T) {
 		header  map[string]interface{}
 		claims  map[string]interface{}
 		valid   bool
+		signOk  bool
 	}
 
 	cases := []test{
+		test{
+			[]byte(""),
+			[]byte(TestCertificates[1][1]),
+			map[string]interface{}{"foo": "bar"},
+			map[string]interface{}{"nbf": time.Now().Add(time.Hour).Unix()},
+			false,
+			false,
+		},
+		test{
+			[]byte(TestCertificates[0][1]),
+			[]byte(""),
+			map[string]interface{}{"foo": "bar"},
+			map[string]interface{}{"nbf": time.Now().Add(time.Hour).Unix()},
+			false,
+			true,
+		},
 		test{
 			[]byte(TestCertificates[0][1]),
 			[]byte(TestCertificates[1][1]),
 			map[string]interface{}{"foo": "bar"},
 			map[string]interface{}{"nbf": time.Now().Add(time.Hour).Unix()},
 			false,
+			true,
 		},
 		test{
 			[]byte(TestCertificates[0][1]),
@@ -50,6 +72,7 @@ func TestSignAndVerify(t *testing.T) {
 			map[string]interface{}{"foo": "bar"},
 			map[string]interface{}{"exp": time.Now().Add(-time.Hour).Unix()},
 			false,
+			true,
 		},
 		test{
 			[]byte(TestCertificates[0][1]),
@@ -60,6 +83,7 @@ func TestSignAndVerify(t *testing.T) {
 				"exp": time.Now().Add(time.Hour).Unix(),
 			},
 			true,
+			true,
 		},
 		test{
 			[]byte(TestCertificates[0][1]),
@@ -69,6 +93,7 @@ func TestSignAndVerify(t *testing.T) {
 				"nbf": time.Now().Add(-time.Hour).Unix(),
 			},
 			true,
+			true,
 		},
 		test{
 			[]byte(TestCertificates[0][1]),
@@ -77,6 +102,7 @@ func TestSignAndVerify(t *testing.T) {
 			map[string]interface{}{
 				"exp": time.Now().Add(time.Hour).Unix(),
 			},
+			true,
 			true,
 		},
 		test{
@@ -85,19 +111,24 @@ func TestSignAndVerify(t *testing.T) {
 			map[string]interface{}{"foo": "bar"},
 			map[string]interface{}{},
 			true,
+			true,
 		},
 	}
 
 	for i, c := range cases {
 		j := New(c.private, c.public)
 		data, err := j.SignToken(c.claims, c.header)
-		require.Nil(t, err, "Case %d", i)
+		if c.signOk {
+			require.Nil(t, err, "Case %d", i)
+		} else {
+			require.NotNil(t, err, "Case %d", i)
+		}
 		tok, err := j.VerifyToken([]byte(data))
 		if c.valid {
-			require.Nil(t, err)
-			require.Equal(t, c.valid, tok.Valid)
+			require.Nil(t, err, "Case %d", i)
+			require.Equal(t, c.valid, tok.Valid, "Case %d", i)
 		} else {
-			require.NotNil(t, err)
+			require.NotNil(t, err, "Case %d", i)
 		}
 	}
 }

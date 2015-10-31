@@ -59,17 +59,15 @@ func TestSignRejectsAlgAndTypHeader(t *testing.T) {
 }
 
 func TestSignAndVerify(t *testing.T) {
-	type test struct {
+	for i, c := range []struct {
 		private []byte
 		public  []byte
 		header  map[string]interface{}
 		claims  map[string]interface{}
 		valid   bool
 		signOk  bool
-	}
-
-	cases := []test{
-		test{
+	}{
+		{
 			[]byte(""),
 			[]byte(TestCertificates[1][1]),
 			map[string]interface{}{"foo": "bar"},
@@ -77,7 +75,7 @@ func TestSignAndVerify(t *testing.T) {
 			false,
 			false,
 		},
-		test{
+		{
 			[]byte(TestCertificates[0][1]),
 			[]byte(""),
 			map[string]interface{}{"foo": "bar"},
@@ -85,7 +83,7 @@ func TestSignAndVerify(t *testing.T) {
 			false,
 			true,
 		},
-		test{
+		{
 			[]byte(TestCertificates[0][1]),
 			[]byte(TestCertificates[1][1]),
 			map[string]interface{}{"foo": "bar"},
@@ -93,7 +91,7 @@ func TestSignAndVerify(t *testing.T) {
 			false,
 			true,
 		},
-		test{
+		{
 			[]byte(TestCertificates[0][1]),
 			[]byte(TestCertificates[1][1]),
 			map[string]interface{}{"foo": "bar"},
@@ -101,7 +99,7 @@ func TestSignAndVerify(t *testing.T) {
 			false,
 			true,
 		},
-		test{
+		{
 			[]byte(TestCertificates[0][1]),
 			[]byte(TestCertificates[1][1]),
 			map[string]interface{}{"foo": "bar"},
@@ -113,7 +111,7 @@ func TestSignAndVerify(t *testing.T) {
 			true,
 			true,
 		},
-		test{
+		{
 			[]byte(TestCertificates[0][1]),
 			[]byte(TestCertificates[1][1]),
 			map[string]interface{}{"foo": "bar"},
@@ -123,7 +121,7 @@ func TestSignAndVerify(t *testing.T) {
 			false,
 			true,
 		},
-		test{
+		{
 			[]byte(TestCertificates[0][1]),
 			[]byte(TestCertificates[1][1]),
 			map[string]interface{}{"foo": "bar"},
@@ -133,7 +131,7 @@ func TestSignAndVerify(t *testing.T) {
 			true,
 			true,
 		},
-		test{
+		{
 			[]byte(TestCertificates[0][1]),
 			[]byte(TestCertificates[1][1]),
 			map[string]interface{}{"foo": "bar"},
@@ -141,9 +139,7 @@ func TestSignAndVerify(t *testing.T) {
 			false,
 			true,
 		},
-	}
-
-	for i, c := range cases {
+	} {
 		j := New(c.private, c.public)
 		data, err := j.SignToken(c.claims, c.header)
 		if c.signOk {

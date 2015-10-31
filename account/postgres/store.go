@@ -2,13 +2,13 @@ package postgres
 
 import (
 	"database/sql"
-	"errors"
+	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/account"
 	"github.com/ory-am/hydra/hash"
 	"log"
 )
 
-const accountSchema = `CREATE TABLE account (
+const accountSchema = `CREATE TABLE IF NOT EXISTS account (
 	id           text NOT NULL PRIMARY KEY,
 	email 		 text NOT NULL UNIQUE,
 	password     text NOT NULL,
@@ -119,10 +119,6 @@ func (s *Store) Authenticate(email, password string) (account.Account, error) {
 	}
 
 	return &a, nil
-}
-
-func (s *Store) FindByProvider(provider, subject string) (account.Account, error) {
-	return nil, errors.New("Not implemented")
 }
 
 func (s *Store) UpdateData(id string, data string) (account.Account, error) {

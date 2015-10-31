@@ -20,38 +20,38 @@ func NewClaimsCarrier(id, issuer, subject, audience string, notBefore, issuedAt 
 }
 
 func (c ClaimsCarrier) AssertExpired() bool {
-	return c.ExpiresAt().Before(time.Now())
+	return c.GetExpiresAt().Before(time.Now())
 }
 
 func (c ClaimsCarrier) AssertInFuture() bool {
-	return c.NotBefore().After(time.Now()) || c.IssuedAt().After(time.Now())
+	return c.GetNotBefore().After(time.Now()) || c.GetIssuedAt().After(time.Now())
 }
 
-func (c ClaimsCarrier) Subject() string {
+func (c ClaimsCarrier) GetSubject() string {
 	return c.getAsString("sub")
 }
 
-func (c ClaimsCarrier) ID() string {
+func (c ClaimsCarrier) GetID() string {
 	return c.getAsString("jid")
 }
 
-func (c ClaimsCarrier) IssuedAt() time.Time {
+func (c ClaimsCarrier) GetIssuedAt() time.Time {
 	return c.getAsTime("iat")
 }
 
-func (c ClaimsCarrier) NotBefore() time.Time {
+func (c ClaimsCarrier) GetNotBefore() time.Time {
 	return c.getAsTime("nbf")
 }
 
-func (c ClaimsCarrier) Audience() string {
+func (c ClaimsCarrier) GetAudience() string {
 	return c.getAsString("aud")
 }
 
-func (c ClaimsCarrier) ExpiresAt() time.Time {
+func (c ClaimsCarrier) GetExpiresAt() time.Time {
 	return c.getAsTime("exp")
 }
 
-func (c ClaimsCarrier) Issuer() string {
+func (c ClaimsCarrier) GetIssuer() string {
 	return c.getAsString("iss")
 }
 

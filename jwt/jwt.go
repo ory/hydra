@@ -1,10 +1,9 @@
 package jwt
 
 import (
-	"errors"
-	"fmt"
 	"github.com/RangelReale/osin"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/go-errors/errors"
 	"io"
 	"io/ioutil"
 	"os"
@@ -70,7 +69,7 @@ func New(privateKey, publicKey []byte) *JWT {
 // Helper func: Read certificate from specified file
 func LoadCertificate(path string) ([]byte, error) {
 	if path == "" {
-		return nil, fmt.Errorf("No path specified")
+		return nil, errors.Errorf("No path specified")
 	}
 
 	var rdr io.Reader
@@ -91,22 +90,22 @@ func (j *JWT) VerifyToken(tokenData []byte) (*jwt.Token, error) {
 	// Parse the token.  Load the key from command line option
 	token, err := jwt.Parse(string(tokenData), func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodRSA); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", t.Header["alg"])
+			return nil, errors.Errorf("Unexpected signing method: %v", t.Header["alg"])
 		}
 		return jwt.ParseRSAPublicKeyFromPEM(j.publicKey)
 	})
 	if err != nil {
-		return nil, fmt.Errorf("Couldn't parse token: %v", err)
+		return nil, errors.Errorf("Couldn't parse token: %v", err)
 	} else if !token.Valid {
-		return nil, fmt.Errorf("Token is invalid")
+		return nil, errors.Errorf("Token is invalid")
 	}
 
 	claims := ClaimsCarrier(token.Claims)
 	if claims.AssertExpired() {
-		return nil, fmt.Errorf("Token expired: %v", claims.ExpiresAt())
+		return nil, errors.Errorf("Token expired: %v", claims.GetExpiresAt())
 	}
 	if claims.AssertInFuture() {
-		return nil, fmt.Errorf("Token is not valid yet: %v", claims.ExpiresAt())
+		return nil, errors.Errorf("Token is not valid yet: %v", claims.GetExpiresAt())
 	}
 	return token, nil
 }
@@ -144,7 +143,7 @@ func merge(a, b map[string]interface{}) map[string]interface{} {
 func (j *JWT) GenerateAccessToken(data *osin.AccessData, generateRefresh bool) (accessToken string, refreshToken string, err error) {
 	claims, ok := data.UserData.(ClaimsCarrier)
 	if !ok {
-		return "", "", fmt.Errorf("Could not assert claims to ClaimsCarrier: %v", claims)
+		return "", "", errors.Errorf("Could not assert claims to ClaimsCarrier: %v", claims)
 	}
 
 	claims["exp"] = data.ExpireAt()

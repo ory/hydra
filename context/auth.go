@@ -1,9 +1,9 @@
 package context
 
 import (
-	"fmt"
 	"github.com/RangelReale/osin"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/go-errors/errors"
 	hjwt "github.com/ory-am/hydra/jwt"
 	"github.com/ory-am/ladon/policy"
 	"golang.org/x/net/context"
@@ -32,7 +32,7 @@ func NewContextFromAuthorization(ctx context.Context, req *http.Request, j *hjwt
 	}
 
 	claims := hjwt.ClaimsCarrier(t.Claims)
-	user := claims.Subject()
+	user := claims.GetSubject()
 	if user == "" {
 		log.Printf("Subject not claimed: %v", t.Claims)
 		return NewContextFromAuthValues(ctx, nil, nil, nil)
@@ -57,7 +57,7 @@ func NewContextFromAuthorization(ctx context.Context, req *http.Request, j *hjwt
 func TokenFromContext(ctx context.Context) (*jwt.Token, error) {
 	args, ok := ctx.Value(authKey).(*authorization)
 	if !ok {
-		return nil, fmt.Errorf("Could not assert type for %v", ctx.Value(authKey))
+		return nil, errors.Errorf("Could not assert type for %v", ctx.Value(authKey))
 	}
 	return args.token, nil
 }
@@ -65,22 +65,22 @@ func TokenFromContext(ctx context.Context) (*jwt.Token, error) {
 func SubjectFromContext(ctx context.Context) (string, error) {
 	args, ok := ctx.Value(authKey).(*authorization)
 	if !ok {
-		return "", fmt.Errorf("Could not assert type for %v", ctx.Value(authKey))
+		return "", errors.Errorf("Could not assert type for %v", ctx.Value(authKey))
 	}
-	return args.claims.Subject(), nil
+	return args.claims.GetSubject(), nil
 }
 
 func PoliciesFromContext(ctx context.Context) ([]policy.Policy, error) {
 	args, ok := ctx.Value(authKey).(*authorization)
 	if !ok {
-		return nil, fmt.Errorf("Could not assert array type for %s", ctx.Value(authKey))
+		return nil, errors.Errorf("Could not assert array type for %s", ctx.Value(authKey))
 	}
 
 	symbols := make([]policy.Policy, len(args.policies))
 	for i, arg := range args.policies {
 		symbols[i], ok = arg.(*policy.DefaultPolicy)
 		if !ok {
-			return nil, fmt.Errorf("Could not assert policy type for %s", ctx.Value(authKey))
+			return nil, errors.Errorf("Could not assert policy type for %s", ctx.Value(authKey))
 		}
 	}
 

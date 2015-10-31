@@ -9,9 +9,9 @@ import (
 	"github.com/ory-am/dockertest"
 	hydra "github.com/ory-am/hydra/account/postgres"
 	hcon "github.com/ory-am/hydra/context"
-	"github.com/ory-am/hydra/handler/middleware"
 	"github.com/ory-am/hydra/hash"
 	hjwt "github.com/ory-am/hydra/jwt"
+	"github.com/ory-am/hydra/middleware"
 	"github.com/ory-am/ladon/policy"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
@@ -209,7 +209,7 @@ func TestCreateGetDelete(t *testing.T) {
 		if http.StatusOK == res.Code || http.StatusAccepted == res.Code {
 			finish(testCase, res)
 		} else if res.Code == http.StatusNotFound {
-			log.Printf("404 case %d: %s", k, testCase.createData.ID)
+			t.Logf("404 case %d: %s", k, testCase.createData.ID)
 		}
 	}
 
@@ -224,7 +224,7 @@ func TestCreateGetDelete(t *testing.T) {
 		}, func(c *test, res *httptest.ResponseRecorder) {
 			code = res.Code
 			result := res.Body.Bytes()
-			log.Printf("POST case %d /users: %s", k, result)
+			t.Logf("POST case %d /users: %s", k, result)
 			require.Nil(t, json.Unmarshal(result, &p))
 			assert.Equal(t, c.createData.Email, p.Email)
 			assert.Equal(t, c.createData.Data, p.Data)
@@ -241,7 +241,7 @@ func TestCreateGetDelete(t *testing.T) {
 		}, func(c *test, res *httptest.ResponseRecorder) {
 			code = res.Code
 			result := res.Body.Bytes()
-			log.Printf("GET case %d /users/%s: %s", k, p.ID, result)
+			t.Logf("GET case %d /users/%s: %s", k, p.ID, result)
 			require.Nil(t, json.Unmarshal(result, &p))
 			assert.Equal(t, c.createData.Email, p.Email)
 			assert.Equal(t, c.createData.Data, p.Data)
@@ -257,7 +257,7 @@ func TestCreateGetDelete(t *testing.T) {
 			return req
 		}, func(c *test, res *httptest.ResponseRecorder) {
 			code = res.Code
-			log.Printf("DELETE case %d /users/%s", k, p.ID)
+			t.Logf("DELETE case %d /users/%s", k, p.ID)
 		})
 
 		if code != http.StatusAccepted {

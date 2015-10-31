@@ -1,93 +1,95 @@
 package dropbox
 
-//
-//import (
-//	"github.com/arekkas/flitt/provider"
-//	"github.com/arekkas/flitt/storage"
-//	"github.com/go-errors/errors"
-//	"github.com/ory-am/common/env"
-//	"github.com/stacktic/dropbox"
-//	"golang.org/x/oauth2"
-//	"log"
-//	"strconv"
-//)
-//
-//var (
-//	config = &oauth2.Config{
-//		ClientID:     env.Getenv("OAUTH_DROPBOX_CLIENT", ""),
-//		ClientSecret: env.Getenv("OAUTH_DROPBOX_SECRET", ""),
-//		RedirectURL:  env.Getenv("OAUTH_DROPBOX_CALLBACK", ""),
-//		Endpoint: oauth2.Endpoint{
-//			AuthURL:  "https://www.dropbox.com/1/oauth2/authorize",
-//			TokenURL: "https://www.dropbox.com/1/oauth2/token",
-//		},
-//	}
-//)
-//
-//type dropboxProvider struct {
-//	db    *dropbox.Dropbox
-//	store *storage.Storage
-//}
-//
-//func New(store *storage.Storage) provider.Provider {
-//	db := dropbox.NewDropbox()
-//	db.SetAppInfo(client, secret)
-//	db.SetRedirectURL(redirect)
-//	return &dropboxProvider{db, store}
-//}
-//
-//func (p *dropboxProvider) GetOAuthConfig() *oauth2.Config {
-//	return config
-//}
-//
-//func (p *dropboxProvider) Login(token string) (acc *storage.Account, err error) {
-//	if a, err := p.GetAccountInfo(token); err != nil {
-//		return acc, errors.Wrap(err, 0)
-//	} else {
-//		id := strconv.FormatInt(int64(a.UID), 10)
-//		if acc, err := p.store.FindAccountByProviderID("dropbox", id); err != nil {
-//			return acc, provider.ErrUnauthorized
-//		} else {
-//			return acc, nil
-//		}
-//	}
-//}
-//
-//func (p *dropboxProvider) ExchangeCodeForToken(code string) (*storage.AccountLink, error) {
-//	if t, err := p.store.FindLinkByCode("dropbox", code); err != nil {
-//		log.Printf("Info: Got error %s in ExchangeCodeForToken.", err.Error())
-//	} else {
-//		return t, nil
-//	}
-//
-//	if err := p.db.AuthCode(code); err != nil {
-//		return nil, errors.Wrap(err, 0)
-//	} else {
-//		token := p.db.AccessToken()
-//		if a, err := p.GetAccountInfo(token); err != nil {
-//			return nil, errors.Wrap(err, 0)
-//		} else if link, err := p.store.CreateLink("dropbox", code, token, strconv.FormatInt(int64(a.UID), 10)); err != nil {
-//			return nil, errors.Wrap(err, 0)
-//		} else {
-//			return link, nil
-//		}
-//	}
-//}
-//
-//func (p *dropboxProvider) LinkAccount(account *storage.Account, token string) error {
-//	if link, err := p.store.FindLinkByToken("dropbox", token); err != nil {
-//		return errors.Wrap(err, 0)
-//	} else if err := p.store.LinkAccount(account, link); err != nil {
-//		return errors.Wrap(err, 0)
-//	}
-//	return nil
-//}
-//
-//func (p *dropboxProvider) GetAccountInfo(token string) (*dropbox.Account, error) {
-//	p.db.SetAccessToken(token)
-//	if a, err := p.db.GetAccountInfo(); err != nil {
-//		return a, errors.Wrap(err, 1)
-//	} else {
-//		return a, nil
-//	}
-//}
+import (
+	"encoding/json"
+	"fmt"
+	"github.com/RangelReale/osin"
+	"github.com/go-errors/errors"
+	. "github.com/ory-am/hydra/oauth/provider"
+	"golang.org/x/net/context"
+	"golang.org/x/oauth2"
+	"io/ioutil"
+)
+
+type dropbox struct {
+	id    string
+	conf  *oauth2.Config
+	token *oauth2.Token
+	api   string
+}
+
+type Account struct {
+	ID          string                 `json:"account_id"`
+	Email       string                 `json:"email"`
+	Locale      string                 `json:"locale"`
+	ReferralURL string                 `json:"referral_link"`
+	IsPaired    bool                   `json:"is_paired"`
+	Type        map[string]interface{} `json:"account_type"`
+	Name        struct {
+		Given       string `json:"given_name,omitempty"`
+		Surname     string `json:"surname,omitempty"`
+		FamilyName  string `json:"familiar_name,omitempty"`
+		DisplayName string `json:"display_name,omitempty"`
+	} `json:"name"`
+}
+
+func New(id, client, secret, redirectURL string) *dropbox {
+	return &dropbox{
+		id:  id,
+		api: "https://api.dropbox.com/2",
+		conf: &oauth2.Config{
+			ClientID:     client,
+			ClientSecret: secret,
+			RedirectURL:  redirectURL,
+			Endpoint: oauth2.Endpoint{
+				AuthURL:  "https://www.dropbox.com/1/oauth2/authorize",
+				TokenURL: "https://www.dropbox.com/1/oauth2/token",
+			},
+		},
+	}
+}
+
+func (d *dropbox) GetAuthCodeURL(ar *osin.AuthorizeRequest) string {
+	return GetAuthCodeURL(*d.conf, ar, d.GetID())
+}
+
+func (d *dropbox) Exchange(code string) (Session, error) {
+	conf := *d.conf
+	ctx := context.Background()
+	token, err := conf.Exchange(ctx, code)
+	if err != nil {
+		return nil, err
+	}
+
+	if !token.Valid() {
+		return nil, errors.Errorf("Token is not valid: %v", token)
+	}
+
+	c := conf.Client(ctx, token)
+	rawurl := fmt.Sprintf("%s/%s?%s", d.api, "users/get_current_account", nil)
+	response, err := c.Get(rawurl)
+	if err != nil {
+		return nil, err
+	}
+
+	defer response.Body.Close()
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var acc Account
+	if err = json.Unmarshal(body, &acc); err != nil {
+		return nil, err
+	}
+
+	return &DefaultSession{
+		RemoteSubject: acc.ID,
+		Extra:         acc,
+		Token:         token,
+	}, nil
+}
+
+func (d *dropbox) GetID() string {
+	return d.id
+}

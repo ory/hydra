@@ -1,6 +1,6 @@
 package account
 
-import "errors"
+import "github.com/go-errors/errors"
 
 var ErrNotFound = errors.New("Not found")
 

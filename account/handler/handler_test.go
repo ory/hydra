@@ -106,7 +106,7 @@ var cases = []*test{
 		"max",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{
-			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
+			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:users"}, []string{"create"}},
 		},
 		&payload{},
 		http.StatusForbidden, 0, 0,
@@ -115,7 +115,7 @@ var cases = []*test{
 		"peter",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{
-			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
+			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:users"}, []string{"create"}},
 		},
 		&payload{Email: uuid.New() + "@foobar.com", Data: "{}"},
 		http.StatusBadRequest, 0, 0,
@@ -124,7 +124,7 @@ var cases = []*test{
 		"peter",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{
-			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
+			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:users"}, []string{"create"}},
 		},
 		&payload{Email: uuid.New() + "@foobar.com", Password: "123", Data: "{}"},
 		http.StatusBadRequest, 0, 0,
@@ -133,7 +133,7 @@ var cases = []*test{
 		"peter",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{
-			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
+			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:users"}, []string{"create"}},
 		},
 		&payload{Email: "notemail", Password: "secret", Data: "{}"},
 		http.StatusBadRequest, 0, 0,
@@ -142,7 +142,7 @@ var cases = []*test{
 		"peter",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{
-			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
+			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:users"}, []string{"create"}},
 		},
 		&payload{Email: uuid.New() + "@bar.com", Password: "", Data: "{}"},
 		http.StatusBadRequest, 0, 0,
@@ -151,7 +151,7 @@ var cases = []*test{
 		"peter",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{
-			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
+			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:users"}, []string{"create"}},
 		},
 		&payload{Email: uuid.New() + "@bar.com", Password: "secret", Data: "not json"},
 		http.StatusBadRequest, 0, 0,
@@ -160,7 +160,7 @@ var cases = []*test{
 		"peter",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{
-			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
+			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:users"}, []string{"create"}},
 		},
 		&payload{Email: uuid.New() + "@bar.com", Password: "secret", Data: "{}"},
 		http.StatusOK, http.StatusForbidden, http.StatusForbidden,
@@ -169,7 +169,7 @@ var cases = []*test{
 		"peter",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{
-			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
+			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:users"}, []string{"create"}},
 			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{".*"}, []string{"get"}},
 		},
 		&payload{Email: uuid.New() + "@bar.com", Password: "secret", Data: "{}"},
@@ -179,9 +179,9 @@ var cases = []*test{
 		"peter",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{
-			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users"}, []string{"create"}},
+			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:users"}, []string{"create"}},
 			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{".*"}, []string{"get"}},
-			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/users/.*"}, []string{"delete"}},
+			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:users:.*"}, []string{"delete"}},
 		},
 		&payload{Email: uuid.New() + "@bar.com", Password: "secret", Data: "{}"},
 		http.StatusOK, http.StatusOK, http.StatusAccepted,

@@ -2,7 +2,7 @@ package jwt
 
 import (
 	"encoding/json"
-	"log"
+	log "github.com/Sirupsen/logrus"
 	"time"
 )
 
@@ -58,7 +58,7 @@ func (c ClaimsCarrier) GetIssuer() string {
 func (c ClaimsCarrier) String() string {
 	result, err := json.Marshal(c)
 	if err != nil {
-		log.Printf("Could not marshal ClaimsCarrier %v: %s", c, err)
+		log.Warnf(`Could not marshal ClaimsCarrier "%v": "%v".`, c, err)
 		return ""
 	}
 	return string(result)
@@ -80,7 +80,7 @@ func (c ClaimsCarrier) getAsTime(key string) time.Time {
 			return r
 		} else if p, ok := s.(string); ok {
 			if err := ret.UnmarshalJSON([]byte(`"` + p + `"`)); err != nil {
-				log.Printf("Error unmarshalling time: %v", err)
+				log.Warnf(`Could not unmarshal time field: "%v".`, c, err)
 				return *ret
 			}
 			return *ret

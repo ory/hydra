@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/RangelReale/osin"
+	log "github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/gorilla/mux"
 	"github.com/ory-am/hydra/account"
@@ -14,7 +15,6 @@ import (
 	"github.com/ory-am/ladon/policy"
 	osinStore "github.com/ory-am/osin-storage/storage"
 	"github.com/pborman/uuid"
-	"log"
 	"net/http"
 	"time"
 )
@@ -69,18 +69,18 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request) {
 
 	bearer := osin.CheckBearerAuth(r)
 	if bearer == nil {
-		log.Println("No Bearer.")
+		log.WithField("introspect", "fail").Warn("No authorization header given.")
 		http.Error(w, "No bearer given.", http.StatusForbidden)
 		return
 	} else if bearer.Code == "" {
-		log.Println("Bearer empty.")
+		log.WithField("introspect", "fail").Warn("No authorization bearer is empty.")
 		http.Error(w, "No bearer token given.", http.StatusForbidden)
 		return
 	}
 
 	token, err := h.JWT.VerifyToken([]byte(bearer.Code))
 	if err != nil {
-		log.Println("Token invalid.")
+		log.WithField("introspect", "fail").Warn("Bearer token is invalid.")
 		http.Error(w, "Bearer token is not valid.", http.StatusForbidden)
 		return
 	}
@@ -100,19 +100,33 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request) {
 	result["active"] = false
 	claims := jwt.ClaimsCarrier(token.Claims)
 	if claims.GetExpiresAt().Before(time.Now()) {
-		log.Printf("Token expired: %v", claims)
+		log.WithField("introspect", "fail").Warnf("Token not valid before %s.", claims.GetNotBefore())
+		log.WithFields(log.Fields{
+			"introspect": "fail",
+			"expired_at": claims.GetExpiresAt(),
+		}).Warnf("Token expired.")
 		return
 	} else if claims.GetNotBefore().After(time.Now()) {
-		log.Printf("Token not valid yet: %v", claims)
+		log.WithField("introspect", "fail").Warnf("Token not valid before %s.", claims.GetNotBefore())
+		log.WithFields(log.Fields{
+			"introspect": "fail",
+			"not_before": claims.GetNotBefore(),
+		}).Warnf("Token not yet valid.")
 		return
 	} else if claims.GetIssuedAt().After(time.Now()) {
-		log.Printf("Token not issued yet: %v", claims)
+		log.WithFields(log.Fields{
+			"introspect": "fail",
+			"issued_at":  claims.GetIssuedAt(),
+		}).Warnf("Token issued in the future.")
 		return
 	} else if claims.GetAudience() != h.Audience {
-		log.Printf("Token has invalid audience: %v", claims)
+		log.WithFields(log.Fields{
+			"introspect": "fail",
+			"expted":     h.Audience,
+			"actual":     claims.GetAudience(),
+		}).Warn(`Token audience mismatch.`)
 		return
 	} else {
-		log.Println("Token is valid.")
 		result["active"] = true
 		return
 	}
@@ -177,7 +191,6 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 		h.server.FinishAccessRequest(resp, r, ar)
 	}
 	if resp.IsError {
-		log.Printf("Error in /oauth2/token: %s, %d, %s", resp.ErrorId, resp.ErrorStatusCode, resp.InternalError)
 		resp.StatusCode = http.StatusUnauthorized
 	}
 	osin.OutputJSON(resp, w, r)
@@ -230,7 +243,6 @@ func (h *Handler) AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if resp.IsError {
-		log.Printf("Error in /oauth2/auth: %s, %d, %s", resp.ErrorId, resp.ErrorStatusCode, resp.InternalError)
 		resp.StatusCode = http.StatusUnauthorized
 	}
 

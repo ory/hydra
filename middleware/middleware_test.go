@@ -94,12 +94,14 @@ var cases = []test{
 	},
 }
 
-func mockContext(h hcon.ContextHandler, c test) hcon.ContextHandler {
-	return hcon.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
-		claims := hjwt.NewClaimsCarrier(uuid.New(), "hydra", c.subject, "tests", time.Now(), time.Now())
-		ctx = hcon.NewContextFromAuthValues(ctx, claims, c.token, c.policies)
-		h.ServeHTTPContext(ctx, rw, req)
-	})
+func mockContext(c test) func(hcon.ContextHandler) hcon.ContextHandler {
+	return func(next hcon.ContextHandler) hcon.ContextHandler {
+		return hcon.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+			claims := hjwt.NewClaimsCarrier(uuid.New(), "hydra", c.subject, "tests", time.Now(), time.Now())
+			ctx = hcon.NewContextFromAuthValues(ctx, claims, c.token, c.policies)
+			next.ServeHTTPContext(ctx, rw, req)
+		})
+	}
 }
 
 func handler(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
@@ -110,17 +112,12 @@ func TestIsAuthenticated(t *testing.T) {
 	m := &Middleware{}
 
 	for k, c := range cases {
-		h := &hcon.ContextAdapter{
-			Ctx: context.Background(),
-			Handler: mockContext(
-				m.IsAuthenticated(
-					m.IsAuthorized(hcon.ContextHandlerFunc(handler),
-						c.resource,
-						c.permission,
-					),
-				), c,
-			),
-		}
+		h := hcon.NewContextAdapter(
+			context.Background(),
+			mockContext(c),
+			m.IsAuthenticated,
+			m.IsAuthorized(c.resource, c.permission),
+		).ThenFunc(hcon.ContextHandlerFunc(handler))
 
 		ts := httptest.NewServer(h)
 		defer ts.Close()

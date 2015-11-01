@@ -11,5 +11,7 @@ type Storage interface {
 	// Get an existing connection.
 	Get(id string) (Connection, error)
 
+	FindAllByLocalSubject(subject string) ([]Connection, error)
+
 	FindByRemoteSubject(provider, subject string) (Connection, error)
 }

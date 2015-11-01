@@ -1,12 +1,12 @@
 package middleware
 
 import (
+	log "github.com/Sirupsen/logrus"
 	hydcon "github.com/ory-am/hydra/context"
 	"github.com/ory-am/hydra/jwt"
 	ladonGuard "github.com/ory-am/ladon/guard"
 	"github.com/ory-am/ladon/policy"
 	"golang.org/x/net/context"
-	"log"
 	"net/http"
 )
 
@@ -33,26 +33,26 @@ func (m *Middleware) IsAuthorized(resource, permission string) func(hydcon.Conte
 		return hydcon.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			policies, err := hydcon.PoliciesFromContext(ctx)
 			if err != nil {
-				log.Printf("Unauthorized: Policy extraction failed: %s", err)
+				log.WithFields(log.Fields{"authorization": "forbidden"}).Warnf(`Policy extraction failed: "%s".`, err)
 				errorHandler(rw, req, http.StatusForbidden)
 				return
 			}
 
 			subject, err := hydcon.SubjectFromContext(ctx)
 			if err != nil {
-				log.Printf("Unauthorized: Subject extraction failed: %s", err)
+				log.WithFields(log.Fields{"authorization": "forbidden"}).Warnf(`Forbidden! Subject extraction failed: "%s".`, err)
 				errorHandler(rw, req, http.StatusForbidden)
 				return
 			}
 
 			ok, err := guard.IsGranted(resource, permission, subject, policies)
 			if err != nil || !ok {
-				log.Printf(`Unauthorized: Subject "%s" is not being granted access "%s" to resource "%s"`, subject, permission, resource)
+				log.WithFields(log.Fields{"authorization": "forbidden"}).Warnf(`Forbidden! Subject "%s" is not being granted access "%s" to resource "%s".`, subject, permission, resource)
 				errorHandler(rw, req, http.StatusForbidden)
 				return
 			}
 
-			log.Printf(`Authorized subject "%s"`, subject)
+			log.WithFields(log.Fields{"authorization": "success"}).Infof(`Allowed! Granting subject "%s" access "%s" to resource "%s".`, subject, permission, resource)
 			next.ServeHTTPContext(ctx, rw, req)
 		})
 	}
@@ -61,23 +61,23 @@ func (m *Middleware) IsAuthorized(resource, permission string) func(hydcon.Conte
 func (m *Middleware) IsAuthenticated(next hydcon.ContextHandler) hydcon.ContextHandler {
 	return hydcon.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 		if !hydcon.IsAuthenticatedFromContext(ctx) {
-			log.Printf("Not authenticated: %s", ctx)
+			log.WithFields(log.Fields{"authentication": "fail"}).Warn(`Not able to get authorization from context.`)
 			errorHandler(rw, req, http.StatusUnauthorized)
 			return
 		}
 
 		subject, err := hydcon.SubjectFromContext(ctx)
 		if err != nil {
-			log.Printf("Not authenticated: Subject extraction failed: %s", err)
+			log.WithFields(log.Fields{"authentication": "fail"}).Warnf("Subject extraction failed: %s", err)
 			errorHandler(rw, req, http.StatusUnauthorized)
 			return
 		} else if subject == "" {
-			log.Println("Unauthorized: No subject given.")
+			log.WithFields(log.Fields{"authentication": "fail"}).Warnf("No subject given.")
 			errorHandler(rw, req, http.StatusUnauthorized)
 			return
 		}
 
-		log.Printf(`Authenticated subject "%s"`, subject)
+		log.WithFields(log.Fields{"authentication": "success"}).Infof(`Authenticated subject "%s".`, subject)
 		next.ServeHTTPContext(ctx, rw, req)
 	})
 }

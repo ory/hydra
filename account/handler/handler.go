@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/mux"
 	. "github.com/ory-am/hydra/account"
@@ -26,7 +27,7 @@ func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hydcon.ContextHandle
 		context.Background(),
 		extractor,
 		h.m.IsAuthenticated,
-		h.m.IsAuthorized("/users", "create"),
+		h.m.IsAuthorized("rn:hydra:users", "create"),
 	).ThenFunc(h.Create),
 	).Methods("POST")
 
@@ -92,7 +93,7 @@ func (h *Handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Req
 		http.Error(rw, "No id given.", http.StatusBadRequest)
 		return
 	}
-	h.m.IsAuthorized("/users/"+id, "get")(hydcon.ContextHandlerFunc(
+	h.m.IsAuthorized(fmt.Sprintf("rn:hydra:users:%s", id), "get")(hydcon.ContextHandlerFunc(
 		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			user, err := h.s.Get(id)
 			if err == ErrNotFound {
@@ -121,7 +122,7 @@ func (h *Handler) Delete(ctx context.Context, rw http.ResponseWriter, req *http.
 		http.Error(rw, "No id given.", http.StatusBadRequest)
 		return
 	}
-	h.m.IsAuthorized("/users/"+id, "delete")(hydcon.ContextHandlerFunc(
+	h.m.IsAuthorized(fmt.Sprintf("rn:hydra:users:%s", id), "delete")(hydcon.ContextHandlerFunc(
 		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			if err := h.s.Delete(id); err != nil {
 				http.Error(rw, err.Error(), http.StatusInternalServerError)

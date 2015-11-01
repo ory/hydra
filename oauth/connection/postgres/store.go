@@ -2,8 +2,8 @@ package postgres
 
 import (
 	"database/sql"
+	log "github.com/Sirupsen/logrus"
 	. "github.com/ory-am/hydra/oauth/connection"
-	"log"
 )
 
 var schemata = []string{
@@ -27,7 +27,7 @@ func New(db *sql.DB) *Store {
 func (s *Store) CreateSchemas() error {
 	for _, schema := range schemata {
 		if _, err := s.db.Exec(schema); err != nil {
-			log.Printf("Error creating schema %s", schemata)
+			log.Warnf("Error creating schema %s: %s", schema, err)
 			return err
 		}
 	}

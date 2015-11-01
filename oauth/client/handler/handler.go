@@ -19,6 +19,13 @@ func NewHandler(s storage.Storage, m *middleware.Middleware) *Handler {
 }
 
 func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hydcon.ContextHandler) hydcon.ContextHandler) {
+	r.Handle("/users", hydcon.NewContextAdapter(
+		context.Background(),
+		extractor,
+		h.m.IsAuthenticated,
+		h.m.IsAuthorized("/clients", "create"),
+	).ThenFunc(h.Create),
+	).Methods("POST")
 }
 
 func (h *Handler) Create(ctx context.Context, rw http.ResponseWriter, req *http.Request) {

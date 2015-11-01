@@ -2,10 +2,10 @@ package postgres
 
 import (
 	"database/sql"
+	log "github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/account"
 	"github.com/ory-am/hydra/hash"
-	"log"
 )
 
 const accountSchema = `CREATE TABLE IF NOT EXISTS account (
@@ -28,7 +28,7 @@ func New(h hash.Hasher, db *sql.DB) *Store {
 
 func (s *Store) CreateSchemas() error {
 	if _, err := s.db.Exec(accountSchema); err != nil {
-		log.Printf("Error creating schema %s", accountSchema)
+		log.Warnf("Error creating schema %s: %s", accountSchema, err)
 		return err
 	}
 	return nil

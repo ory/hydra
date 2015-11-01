@@ -21,42 +21,44 @@ func New(policyStore policy.Storer, jwtService *jwt.JWT) *Middleware {
 
 var guard = &ladonGuard.Guard{}
 
-func (m *Middleware) ExtractAuthentication(h hydcon.ContextHandler) hydcon.ContextHandler {
+func (m *Middleware) ExtractAuthentication(next hydcon.ContextHandler) hydcon.ContextHandler {
 	return hydcon.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 		ctx = hydcon.NewContextFromAuthorization(ctx, req, m.jwtService, m.policyStore)
-		h.ServeHTTPContext(ctx, rw, req)
+		next.ServeHTTPContext(ctx, rw, req)
 	})
 }
 
-func (m *Middleware) IsAuthorized(h hydcon.ContextHandler, resource, permission string) hydcon.ContextHandler {
-	return hydcon.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
-		policies, err := hydcon.PoliciesFromContext(ctx)
-		if err != nil {
-			log.Printf("Unauthorized: Policy extraction failed: %s", err)
-			errorHandler(rw, req, http.StatusForbidden)
-			return
-		}
+func (m *Middleware) IsAuthorized(resource, permission string) func(hydcon.ContextHandler) hydcon.ContextHandler {
+	return func(next hydcon.ContextHandler) hydcon.ContextHandler {
+		return hydcon.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+			policies, err := hydcon.PoliciesFromContext(ctx)
+			if err != nil {
+				log.Printf("Unauthorized: Policy extraction failed: %s", err)
+				errorHandler(rw, req, http.StatusForbidden)
+				return
+			}
 
-		subject, err := hydcon.SubjectFromContext(ctx)
-		if err != nil {
-			log.Printf("Unauthorized: Subject extraction failed: %s", err)
-			errorHandler(rw, req, http.StatusForbidden)
-			return
-		}
+			subject, err := hydcon.SubjectFromContext(ctx)
+			if err != nil {
+				log.Printf("Unauthorized: Subject extraction failed: %s", err)
+				errorHandler(rw, req, http.StatusForbidden)
+				return
+			}
 
-		ok, err := guard.IsGranted(resource, permission, subject, policies)
-		if err != nil || !ok {
-			log.Printf(`Unauthorized: Subject "%s" is not being granted access "%s" to resource "%s"`, subject, permission, resource)
-			errorHandler(rw, req, http.StatusForbidden)
-			return
-		}
+			ok, err := guard.IsGranted(resource, permission, subject, policies)
+			if err != nil || !ok {
+				log.Printf(`Unauthorized: Subject "%s" is not being granted access "%s" to resource "%s"`, subject, permission, resource)
+				errorHandler(rw, req, http.StatusForbidden)
+				return
+			}
 
-		log.Printf(`Authorized subject "%s"`, subject)
-		h.ServeHTTPContext(ctx, rw, req)
-	})
+			log.Printf(`Authorized subject "%s"`, subject)
+			next.ServeHTTPContext(ctx, rw, req)
+		})
+	}
 }
 
-func (m *Middleware) IsAuthenticated(h hydcon.ContextHandler) hydcon.ContextHandler {
+func (m *Middleware) IsAuthenticated(next hydcon.ContextHandler) hydcon.ContextHandler {
 	return hydcon.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 		if !hydcon.IsAuthenticatedFromContext(ctx) {
 			log.Printf("Not authenticated: %s", ctx)
@@ -76,7 +78,7 @@ func (m *Middleware) IsAuthenticated(h hydcon.ContextHandler) hydcon.ContextHand
 		}
 
 		log.Printf(`Authenticated subject "%s"`, subject)
-		h.ServeHTTPContext(ctx, rw, req)
+		next.ServeHTTPContext(ctx, rw, req)
 	})
 }
 

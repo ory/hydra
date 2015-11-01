@@ -24,9 +24,9 @@ func handler(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 }
 
 func TestContextAdapter(t *testing.T) {
-	h := &ContextAdapter{
-		Ctx:     context.Background(),
-		Handler: middleware(ContextHandlerFunc(handler), t),
+	h := &contextAdapter{
+		ctx:   context.Background(),
+		final: middleware(ContextHandlerFunc(handler), t),
 	}
 
 	recorder := httptest.NewRecorder()

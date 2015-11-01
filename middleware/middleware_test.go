@@ -110,17 +110,12 @@ func TestIsAuthenticated(t *testing.T) {
 	m := &Middleware{}
 
 	for k, c := range cases {
-		h := &hcon.ContextAdapter{
-			Ctx: context.Background(),
-			Handler: mockContext(
-				m.IsAuthenticated(
-					m.IsAuthorized(hcon.ContextHandlerFunc(handler),
-						c.resource,
-						c.permission,
-					),
-				), c,
-			),
-		}
+		h := hcon.NewContextAdapter(
+			context.Background(),
+			mockContext,
+			m.IsAuthenticated,
+			m.IsAuthorized(c.resource, c.permission),
+		).ThenFunc(hcon.ContextHandlerFunc(handler))
 
 		ts := httptest.NewServer(h)
 		defer ts.Close()

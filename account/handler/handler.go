@@ -8,6 +8,7 @@ import (
 	. "github.com/ory-am/hydra/account"
 	hydcon "github.com/ory-am/hydra/context"
 	"github.com/ory-am/hydra/middleware"
+	. "github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
 	"net/http"
@@ -77,14 +78,7 @@ func (h *Handler) Create(ctx context.Context, rw http.ResponseWriter, req *http.
 		return
 	}
 
-	js, err := json.Marshal(user)
-	if err != nil {
-		http.Error(rw, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	rw.Header().Set("Content-Type", "application/json")
-	rw.Write(js)
+	WriteJSON(rw, user)
 }
 
 func (h *Handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
@@ -103,15 +97,7 @@ func (h *Handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Req
 				http.Error(rw, err.Error(), http.StatusInternalServerError)
 				return
 			}
-
-			js, err := json.Marshal(user)
-			if err != nil {
-				http.Error(rw, err.Error(), http.StatusInternalServerError)
-				return
-			}
-
-			rw.Header().Set("Content-Type", "application/json")
-			rw.Write(js)
+			WriteJSON(rw, user)
 		}),
 	).ServeHTTPContext(ctx, rw, req)
 }

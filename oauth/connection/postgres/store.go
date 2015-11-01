@@ -72,3 +72,23 @@ func (s *Store) FindByRemoteSubject(provider, subject string) (Connection, error
 	}
 	return &c, nil
 }
+
+func (s *Store) FindAllByLocalSubject(subject string) (cs []Connection, err error) {
+	rows, err := s.db.Query("SELECT id, provider, subject_local, subject_remote FROM oauth_link WHERE subject_local=$1", subject)
+	if err != nil {
+		return []Connection{}, err
+	}
+
+	defer rows.Close()
+	for rows.Next() {
+		var c DefaultConnection
+		if err := rows.Scan(&c.ID, &c.Provider, &c.LocalSubject, &c.RemoteSubject); err == sql.ErrNoRows {
+			return []Connection{}, ErrNotFound
+		} else if err != nil {
+			return []Connection{}, err
+		}
+		cs = append(cs, &c)
+	}
+
+	return cs, nil
+}

@@ -49,6 +49,10 @@ func TestCreateGetFindDelete(t *testing.T) {
 	require.Nil(t, err)
 	require.Equal(t, connection, c)
 
+	cs, err := store.FindAllByLocalSubject("peter")
+	require.Nil(t, err)
+	require.Equal(t, connection, cs[0])
+
 	require.Nil(t, store.Delete(connection.ID))
 	_, err = store.Get(connection.ID)
 	require.NotNil(t, err)

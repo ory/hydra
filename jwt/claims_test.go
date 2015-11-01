@@ -1,7 +1,6 @@
-package jwt_test
+package jwt
 
 import (
-	. "github.com/ory-am/hydra/jwt"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -26,5 +25,8 @@ func TestClaimsCarrier(t *testing.T) {
 		assert.Equal(t, c.audience, carrier.GetAudience(), "Case %d", k)
 		assert.Equal(t, c.notBefore, carrier.GetNotBefore(), "Case %d", k)
 		assert.Equal(t, c.issuedAt, carrier.GetIssuedAt(), "Case %d", k)
+		assert.Empty(t, carrier.getAsString("doesnotexist"), "Case %d", k)
+		assert.Equal(t, time.Time{}, carrier.getAsTime("doesnotexist"), "Case %d", k)
+		assert.NotEmpty(t, carrier.String(), "Case %d", k)
 	}
 }

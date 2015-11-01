@@ -58,6 +58,12 @@ func TestSignRejectsAlgAndTypHeader(t *testing.T) {
 	}
 }
 
+func TestVerifyPassesHeaderAlgInjection(t *testing.T) {
+	j := New([]byte(TestCertificates[0][1]), []byte(TestCertificates[1][1]))
+	_, err := j.VerifyToken([]byte("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.BZXqpeQKnhMtyln2NnoNTUoz_BmyNR-vPHmCxfEpnzCegPZJeCPQiFmn6k7hYhYeWFhH0NhH7-c22-bAf656Esy5qdcxCrwgYSyXAbGQ4C9YsinGcliXeQYcYgOmj8gS2K5Xbj4g9StOB7KywZ_QTJc6FVOqqcgikYVtVA6bMKRrYB4ZS6ZFPdWYTWZ-qOyEg6V7o6-IWmCpEZXlyBgyfAanQkTISMyYuJFPCnFhjnmBUyz0JrWE4gQutOk1-Yw2ikym4GQDrkxrKnnmC_lSJ5I1daxq09oMNj4WRsckktOU64Wuk0PRq_CEpSIA7uHE-Ecgn4ZvRgyLaR1B8S2pAw"))
+	assert.NotNil(t, err)
+}
+
 func TestSignAndVerify(t *testing.T) {
 	for i, c := range []struct {
 		private []byte

@@ -276,7 +276,7 @@ func TestIntrospect(t *testing.T) {
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 
-	config := *configs["working"]
+	config := configs["working"]
 	user := logins["working"]
 	clientConfig := clientcredentials.Config{
 		ClientID:     config.ClientID,
@@ -286,28 +286,71 @@ func TestIntrospect(t *testing.T) {
 	}
 	config.Endpoint = oauth2.Endpoint{AuthURL: ts.URL + "/oauth2/auth", TokenURL: ts.URL + "/oauth2/token"}
 
-	access, err := clientConfig.Token(oauth2.NoContext)
-	require.Nil(t, err)
-	verify, err := config.PasswordCredentialsToken(oauth2.NoContext, user.Username, user.Password)
-	require.Nil(t, err)
+	access, _ := clientConfig.Token(oauth2.NoContext)
+	verify, _ := config.PasswordCredentialsToken(oauth2.NoContext, user.Username, user.Password)
 
-	client := &http.Client{}
-	form := url.Values{}
-	form.Add("token", access.AccessToken)
+	for k, c := range []*struct {
+		accessToken string
+		code        int
+		pass        bool
+	}{
+		{"Bearer " + verify.AccessToken, http.StatusOK, true},
+		{"", http.StatusUnauthorized, false},
+		{"Bearer ", http.StatusUnauthorized, false},
+		{"Bearer invalid", http.StatusForbidden, false},
+		{"Bearer invalid", http.StatusForbidden, false},
+		{"Bearer invalid", http.StatusForbidden, false},
 
-	req, err := http.NewRequest("POST", ts.URL+"/oauth2/introspect", strings.NewReader(form.Encode()))
-	require.Nil(t, err)
+		//		 "exp": "2012-04-23T18:25:43.511Z"
+		{"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIyMDEyLTA0LTIzVDE4OjI1OjQzLjUxMVoifQ.YPCfgNDs-UT6vNqh6095cXiMe0jcA9HjHuLi6hK6YBPsEHwHFniFGXAYt1PpPabBHAz7lQQ8zZao6LrVXkfz7PLbeQZl3KY0SUb-Wb0eEDjX4naEdm20whrYMZQ36VcTMT-FsGk5MB-nIYKq3iX6FMhumV8StjpC0jrM14488lPwLXihC1uITQBNVFEyXV_emhfuyojWEcEq899oE_vVRd7pTOmIhU8dFEAonoLZyPTKzSfvqaurPeySA5ttA-TTMTxZNzGVxWV4cwYHlhTXfS57zoSF_EN_PULTqMepUe8RC9AFnwyvNAa5e4nxQG5yO6b7cUGa0vSCD5FPbNBh-w", http.StatusForbidden, false},
 
-	req.Header.Add("Authorization", "Bearer "+verify.AccessToken)
-	res, err := client.Do(req)
-	require.Nil(t, err)
+		//		{
+		//			"exp": "2099-04-23T18:25:43.511Z",
+		//			"nbf": "2099-04-23T18:25:43.511Z"
+		//		}
+		{"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIyMDk5LTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJuYmYiOiIyMDk5LTA0LTIzVDE4OjI1OjQzLjUxMVoifQ.hCuvBuiwEjjTbL8NMfEe6exDaRUeQIHodTNc5uBdY1lxmJWfFPh2zykuEvinqTprQe2CPRmL3Dk6jX3pcnigg7IjMX-EZueOnJc229gwjmJJiIGuUJOV3bLc-0xQ3cu6FCRc2NgOEh6Nq6Jh8G7ko4Du4gGrFsn97kbzAUYyns98T8442p0YXdQF-KVCc87fCkdr6OTsbfomy7jUDLCWptyJqREOoBll-nzyFWTxGHgoH_DmHft64SwvsvRafqZv9Q48bRzr857ps6OjEPncjRTriAsJa-p7aPKO2e7LXLKpopcaNwC09RNteAO4XPc2_M-IrYf6a02UzgSmOkIZUg", http.StatusForbidden, false},
 
-	body, err := ioutil.ReadAll(res.Body)
-	require.Nil(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode, "%v", body)
+		//		{
+		//			"exp": "2099-04-23T18:25:43.511Z",
+		//			"iat": "2000-04-23T18:25:43.511Z",
+		//			"nbf": "2099-04-23T18:25:43.511Z"
+		//		}
+		{"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIyMDk5LTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJpYXQiOiIyMDAwLTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJuYmYiOiIyMDk5LTA0LTIzVDE4OjI1OjQzLjUxMVoifQ.WtRurXoCy4kHPxnaL5ccPaeHIaDogXRFE6mqyF8nVTSsv6E7FaJg4IiYylxa44ty8GRMYn7c2CSyQefTVauqjJm8b0Rpu4biIeyCQRzwTZZzqZbc6irdWYsJu4DkwfAU0yP2EaLEtQOG3scnDpmtyCp7NvDAi8XlVeytOSHjqyJMWzqO_z5eU4e2Ap-3wkLo4P9_W1W3Tx_V0xQR2VaOXtVjEa_VS36rAMBy6WAvYQrYNlvBAA6OBfqg2uvKUfmEoE6MchkFxHFTSGBmI2boDfF2XGlyLn0di7gIBG-udXDv_zaVp4BtuswygTskV5d2i3pvLGP6UuJJhc7VVOAoPw", http.StatusForbidden, false},
 
-	var result map[string]interface{}
-	require.Nil(t, json.Unmarshal(body, &result))
-	assert.True(t, result["active"].(bool))
-	t.Logf("Got token: %s", body)
+		//		{
+		//			"exp": "2099-04-23T18:25:43.511Z",
+		//			"iat": "2000-04-23T18:25:43.511Z",
+		//			"nbf": "2000-04-23T18:25:43.511Z",
+		//			"aud": "wrong-audience"
+		//		}
+		{"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIyMDk5LTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJpYXQiOiIyMDAwLTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJuYmYiOiIyMDAwLTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJhdWQiOiJ3cm9uZy1hdWRpZW5jZSJ9.rF4JqVpawgHcg_H2hAAsEI2GUxzxCote4pUlruK9hLF-Dv-YSeEmMcFBhfxgsFuDCJotUCG6v8EhwI4u2wxGQHzLz70a-0AEZLQBccCfF_V4qAk8B7M5z2fO7xtEy8RkB2pZKCHbJ1f_6MSM_EyV6r4oiwedveBSsLKcjDhWE3_wExmtmtZaujJy53gR8Wh7BnUt6pl95_d7OMFjGEp1C_N0f3xd9SizIZ-qlIwHiX4xLHtvTZIjdmfyzXxPm_MK_aMOXmX0F6DQn5tgMzAggEdKSD6YdU8HM256zLQeddczrrDI5P3SASiBJ6MCUM4AzbvoFuFAilQi0WzpLpmlJw", http.StatusOK, false},
+
+		//		{
+		//			"exp": "2099-04-23T18:25:43.511Z",
+		//			"iat": "2000-04-23T18:25:43.511Z",
+		//			"nbf": "2000-04-23T18:25:43.511Z",
+		//			"aud": "tests"
+		//		}
+		{"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIyMDk5LTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJpYXQiOiIyMDAwLTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJuYmYiOiIyMDAwLTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJhdWQiOiJ0ZXN0cyJ9.NQZCoKU2qoC-_VFi-_8fQDzObeQrnld9wyaqF0jYHL_wqROn5VumCDVl1oxMN7g-L9wqo5U-xUXf1HS_Ae6CLDFlkbd6dI-h1_l7_ALn_L_GoxQsEo2lQUDQ-Q4eqlLabc764cTYFXd5EwcsZMHWs5ZFCeMOv3exfeTmg8E9e1FiyuTuKVjvMxL-ZCh113nzXEGFr6GRzqjL6VSnJPDX0Pv78R9tnL6CqWbCuDBlIPOccbpWLuWF0yKjV-OyvcWpjkLIVtAbrimi3A7cNUI_V3EJm9Y4tr8e6hv9zViPNbhycmqvOp-vur2k64PrzeMcbuj7TFRCJg2V3moPJF3NtQ", http.StatusOK, true},
+	} {
+
+		client := &http.Client{}
+		form := url.Values{}
+		form.Add("token", access.AccessToken)
+
+		req, _ := http.NewRequest("POST", ts.URL+"/oauth2/introspect", strings.NewReader(form.Encode()))
+		if c.accessToken != "" {
+			req.Header.Add("Authorization", c.accessToken)
+		}
+		res, _ := client.Do(req)
+		body, _ := ioutil.ReadAll(res.Body)
+		require.Equal(t, c.code, res.StatusCode, "Case %d: %s", k, body)
+		if res.StatusCode != http.StatusOK {
+			continue
+		}
+
+		var result map[string]interface{}
+		require.Nil(t, json.Unmarshal(body, &result))
+		assert.Equal(t, c.pass, result["active"].(bool), "Case %d", k)
+	}
 }

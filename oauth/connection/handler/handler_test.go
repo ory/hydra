@@ -104,6 +104,11 @@ var data = map[string]*DefaultConnection{
 		LocalSubject:  "steve",
 	},
 	"fail": &DefaultConnection{},
+	"fail-validation": &DefaultConnection{
+		Provider:      "",
+		RemoteSubject: "",
+		LocalSubject:  "",
+	},
 }
 
 func TestCreateGetDeleteGet(t *testing.T) {
@@ -112,6 +117,7 @@ func TestCreateGetDeleteGet(t *testing.T) {
 		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["fail"]}, createData: data["fail"], statusCreate: http.StatusForbidden},
 		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-create"]}, createData: data["ok-max"], statusCreate: http.StatusOK, statusGet: http.StatusForbidden},
 		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-create"]}, createData: data["fail"], statusCreate: http.StatusBadRequest},
+		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-create"]}, createData: data["fail-validation"], statusCreate: http.StatusBadRequest},
 		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-create"], policies["pass-get"]}, createData: data["ok-zac"], statusCreate: http.StatusOK, statusGet: http.StatusOK, statusDelete: http.StatusForbidden},
 		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-all"]}, createData: data["ok-steve"], statusCreate: http.StatusOK, statusGet: http.StatusOK, statusDelete: http.StatusAccepted, statusGetAfterDelete: http.StatusNotFound},
 	} {
@@ -146,6 +152,9 @@ func TestCreateGetDeleteGet(t *testing.T) {
 				return
 			}
 
+			resp, body, _ = request.Post(connectionsURL).Send(*c.createData).End()
+			require.Equal(t, http.StatusInternalServerError, resp.StatusCode, "case %d: %s", k, body)
+
 			resp, body, _ = request.Delete(fmt.Sprintf("%s/oauth2/connections/%s", ts.URL, conn.ID)).End()
 			require.Equal(t, c.statusDelete, resp.StatusCode, "case %d: %s", k, body)
 			if resp.StatusCode != http.StatusAccepted {
@@ -154,6 +163,9 @@ func TestCreateGetDeleteGet(t *testing.T) {
 
 			resp, body, _ = request.Get(fmt.Sprintf("%s/oauth2/connections/%s", ts.URL, conn.ID)).End()
 			require.Equal(t, c.statusGetAfterDelete, resp.StatusCode, "case %d: %s", k, body)
+
+			resp, body, _ = request.Delete(fmt.Sprintf("%s/oauth2/connections/%s", ts.URL, conn.ID)).End()
+			require.Equal(t, http.StatusNotFound, resp.StatusCode, "case %d: %s", k, body)
 		}()
 	}
 }

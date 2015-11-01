@@ -70,11 +70,11 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request) {
 	bearer := osin.CheckBearerAuth(r)
 	if bearer == nil {
 		log.WithField("introspect", "fail").Warn("No authorization header given.")
-		http.Error(w, "No bearer given.", http.StatusForbidden)
+		http.Error(w, "No bearer given.", http.StatusUnauthorized)
 		return
 	} else if bearer.Code == "" {
 		log.WithField("introspect", "fail").Warn("No authorization bearer is empty.")
-		http.Error(w, "No bearer token given.", http.StatusForbidden)
+		http.Error(w, "No bearer token given.", http.StatusUnauthorized)
 		return
 	}
 

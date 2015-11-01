@@ -3,8 +3,10 @@ package context
 import (
 	"database/sql"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/ory-am/dockertest"
-	"github.com/ory-am/hydra/jwt"
+	hjwt "github.com/ory-am/hydra/jwt"
+	"github.com/ory-am/ladon/policy"
 	ladon "github.com/ory-am/ladon/policy/postgres"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -47,32 +49,32 @@ func TestNewContextFromAuthorization(t *testing.T) {
 	}{
 		{
 			"1",
-			[]byte(jwt.TestCertificates[0][1]),
-			[]byte(jwt.TestCertificates[1][1]),
+			[]byte(hjwt.TestCertificates[0][1]),
+			[]byte(hjwt.TestCertificates[1][1]),
 			// {"foo": "bar"}
 			"Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJmb28iOiJiYXIifQ.FhkiHkoESI_cG3NPigFrxEk9Z60_oXrOT2vGm9Pn6RDgYNovYORQmmA0zs1AoAOf09ly2Nx2YAg6ABqAYga1AcMFkJljwxTT5fYphTuqpWdy4BELeSYJx5Ty2gmr8e7RonuUztrdD5WfPqLKMm1Ozp_T6zALpRmwTIW0QPnaBXaQD90FplAg46Iy1UlDKr-Eupy0i5SLch5Q-p2ZpaL_5fnTIUDlxC3pWhJTyx_71qDI-mAA_5lE_VdroOeflG56sSmDxopPEG3bFlSu1eowyBfxtu0_CuVd-M42RU75Zc4Gsj6uV77MBtbMrf4_7M_NUTSgoIF3fRqxrj0NzihIBg",
 			false,
 		},
 		{
 			"2",
-			[]byte(jwt.TestCertificates[0][1]),
-			[]byte(jwt.TestCertificates[1][1]),
+			[]byte(hjwt.TestCertificates[0][1]),
+			[]byte(hjwt.TestCertificates[1][1]),
 			// {"subject": "nonexistent"}
 			"Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWJqZWN0Ijoibm9uZXhpc3RlbnQifQ.jDUnvVMQHrhuIRUr8qAJ0g-ZKArdiJ21LAPDktmV56KFknX712Yxdder78YjEjxvGOvgtxLpCiay0cV5pvcWLuFW65Ys1P1SwdmdebtWfiGQwBy2Ggm3MrHjD_-r5JNAxFZjFZfZ1Fk-JlSZ97r8S7gYfDSAkxhpDmDy5Bm8e5_xsGDNp8dByuXop7QEtJb_igaa0APWa2ZOp3oTgxjD4CP6ZX6N5fGjtwjJWx5wHt7JaKXq8CRG8elm7LnNezYyJxeHECVctQGVv3HUjJxKf0l7wZXbG87BrG2M7otT8Py2sJP8X4wYL0DEsbErkEieV4D-KEBqpkvfXOrDGMFNRQ",
 			false,
 		},
 		{
 			"3",
-			[]byte(jwt.TestCertificates[0][1]),
-			[]byte(jwt.TestCertificates[1][1]),
+			[]byte(hjwt.TestCertificates[0][1]),
+			[]byte(hjwt.TestCertificates[1][1]),
 			// not a valid token
 			"Bearer eyJ0eXAaOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWJqZWN0IjoiMTMyIn0.WDC51GK5wIQPd00MqLjFy3AU3gNsvsCpWk5e8RObVxBqcYAdv-UwMfEUAFE6Y50C5pQ1t8_LHfxJYNfcW3fj_x5FXckdbqvpXHi-psxuDwk_rancpjZQegcutqYRH37_lnJ8lIq65ZgxnyYnQKGOMl3w7etK1gOvqEcP_eHn8HG0jeVk0SDZm82x0JXSk0lrVEEjWmWYtXEsLz0E4clNPUW37K9eyjYFKnyVCIPfmGwTlkDLjANsyu0P6kFiV28V1_XedtJXDI3MmG2SxSHogDhZJLb298JBwod0d6wTyygI9mUbX-C0PklTJTxIhSs7Pc6unNlWnbyL8Z4FJrdSEw",
 			false,
 		},
 		{
 			"4",
-			[]byte(jwt.TestCertificates[0][1]),
-			[]byte(jwt.TestCertificates[1][1]),
+			[]byte(hjwt.TestCertificates[0][1]),
+			[]byte(hjwt.TestCertificates[1][1]),
 			//		{
 			//			"exp": "2099-10-31T15:03:52.4620974+01:00",
 			//			"iat": "2014-10-31T13:03:52.4620974+01:00",
@@ -84,8 +86,8 @@ func TestNewContextFromAuthorization(t *testing.T) {
 		},
 		{
 			"5",
-			[]byte(jwt.TestCertificates[0][1]),
-			[]byte(jwt.TestCertificates[1][1]),
+			[]byte(hjwt.TestCertificates[0][1]),
+			[]byte(hjwt.TestCertificates[1][1]),
 			"",
 			false,
 		},
@@ -93,7 +95,7 @@ func TestNewContextFromAuthorization(t *testing.T) {
 		message := "ok"
 		ctx := context.Background()
 
-		j := jwt.New(c.privateKey, c.publicKey)
+		j := hjwt.New(c.privateKey, c.publicKey)
 
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx = NewContextFromAuthorization(ctx, r, j, ladonStore)
@@ -115,4 +117,33 @@ func TestNewContextFromAuthorization(t *testing.T) {
 		require.Nil(t, err)
 		assert.Equal(t, message+"\n", string(result))
 	}
+}
+
+func TestGetters(t *testing.T) {
+	assert.False(t, IsAuthenticatedFromContext(context.Background()))
+	_, err := PoliciesFromContext(context.Background())
+	assert.NotNil(t, err)
+	_, err = SubjectFromContext(context.Background())
+	assert.NotNil(t, err)
+	_, err = TokenFromContext(context.Background())
+	assert.NotNil(t, err)
+
+	ctx := context.Background()
+	claims := hjwt.ClaimsCarrier{"sub": "peter"}
+	token := &jwt.Token{Valid: true}
+	policies := []policy.Policy{}
+	ctx = NewContextFromAuthValues(ctx, claims, token, policies)
+
+	assert.True(t, IsAuthenticatedFromContext(ctx))
+	policiesContext, err := PoliciesFromContext(ctx)
+	assert.Nil(t, err)
+	assert.Equal(t, policies, policiesContext)
+
+	subjectContext, err := SubjectFromContext(ctx)
+	assert.Nil(t, err)
+	assert.Equal(t, claims.GetSubject(), subjectContext)
+
+	tokenContext, err := TokenFromContext(ctx)
+	assert.Nil(t, err)
+	assert.Equal(t, token, tokenContext)
 }

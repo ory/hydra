@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"code.google.com/p/go-uuid/uuid"
 	"encoding/json"
 	"fmt"
 	"github.com/asaskevich/govalidator"
@@ -10,6 +9,7 @@ import (
 	"github.com/ory-am/hydra/middleware"
 	. "github.com/ory-am/hydra/oauth/connection"
 	. "github.com/ory-am/hydra/pkg"
+	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
 	"net/http"
 )

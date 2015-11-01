@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"github.com/ory-am/hydra/account"
 	hydcon "github.com/ory-am/hydra/context"
 	"github.com/ory-am/hydra/jwt"
 	ladonGuard "github.com/ory-am/ladon/guard"
@@ -12,20 +11,19 @@ import (
 )
 
 type Middleware struct {
-	accountStore account.Storage
-	policyStore  policy.Storer
-	jwtService   *jwt.JWT
+	policyStore policy.Storer
+	jwtService  *jwt.JWT
 }
 
-func New(accountStore account.Storage, policyStore policy.Storer, jwtService *jwt.JWT) *Middleware {
-	return &Middleware{accountStore, policyStore, jwtService}
+func New(policyStore policy.Storer, jwtService *jwt.JWT) *Middleware {
+	return &Middleware{policyStore, jwtService}
 }
 
 var guard = &ladonGuard.Guard{}
 
 func (m *Middleware) ExtractAuthentication(h hydcon.ContextHandler) hydcon.ContextHandler {
 	return hydcon.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
-		ctx = hydcon.NewContextFromAuthorization(ctx, req, m.jwtService, m.accountStore, m.policyStore)
+		ctx = hydcon.NewContextFromAuthorization(ctx, req, m.jwtService, m.policyStore)
 		h.ServeHTTPContext(ctx, rw, req)
 	})
 }
@@ -46,14 +44,14 @@ func (m *Middleware) IsAuthorized(h hydcon.ContextHandler, resource, permission 
 			return
 		}
 
-		ok, err := guard.IsGranted(resource, permission, subject.GetID(), policies)
+		ok, err := guard.IsGranted(resource, permission, subject, policies)
 		if err != nil || !ok {
-			log.Printf(`Unauthorized: Subject "%s" is not being granted access "%s" to resource "%s"`, subject.GetID(), permission, resource)
+			log.Printf(`Unauthorized: Subject "%s" is not being granted access "%s" to resource "%s"`, subject, permission, resource)
 			errorHandler(rw, req, http.StatusForbidden)
 			return
 		}
 
-		log.Printf(`Authorized subject "%s"`, subject.GetID())
+		log.Printf(`Authorized subject "%s"`, subject)
 		h.ServeHTTPContext(ctx, rw, req)
 	})
 }
@@ -71,9 +69,13 @@ func (m *Middleware) IsAuthenticated(h hydcon.ContextHandler) hydcon.ContextHand
 			log.Printf("Not authenticated: Subject extraction failed: %s", err)
 			errorHandler(rw, req, http.StatusUnauthorized)
 			return
+		} else if subject == "" {
+			log.Println("Unauthorized: No subject given.")
+			errorHandler(rw, req, http.StatusUnauthorized)
+			return
 		}
 
-		log.Printf(`Authenticated subject "%s"`, subject.GetID())
+		log.Printf(`Authenticated subject "%s"`, subject)
 		h.ServeHTTPContext(ctx, rw, req)
 	})
 }

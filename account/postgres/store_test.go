@@ -36,19 +36,16 @@ func TestMain(m *testing.M) {
 }
 
 func TestCreateAndGetCases(t *testing.T) {
-	type tc struct {
+	for _, c := range []struct {
 		data  []string
 		extra string
 		pass  bool
 		find  bool
-	}
-	cases := []tc{
-		tc{[]string{"1", "1@bar", "secret"}, `{"foo": "bar"}`, true, true},
-		tc{[]string{"1", "1@foo", "secret"}, `{"foo": "bar"}`, false, true},
-		tc{[]string{"2", "1@bar", "secret"}, `{"foo": "bar"}`, false, false},
-	}
-
-	for _, c := range cases {
+	}{
+		{[]string{"1", "1@bar", "secret"}, `{"foo": "bar"}`, true, true},
+		{[]string{"1", "1@foo", "secret"}, `{"foo": "bar"}`, false, true},
+		{[]string{"2", "1@bar", "secret"}, `{"foo": "bar"}`, false, false},
+	} {
 		result, err := store.Create(c.data[0], c.data[1], c.data[2], c.extra)
 		if c.pass {
 			assert.Nil(t, err)

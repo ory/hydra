@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	. "github.com/ory-am/hydra/account"
 	hydcon "github.com/ory-am/hydra/context"
-	"github.com/ory-am/hydra/handler/middleware"
+	"github.com/ory-am/hydra/middleware"
 	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
 	"net/http"

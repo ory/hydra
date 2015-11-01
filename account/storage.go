@@ -1,6 +1,5 @@
 package account
 
-
 type Storage interface {
 	Create(id, email, password string, data string) (Account, error)
 

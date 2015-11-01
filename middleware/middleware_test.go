@@ -3,20 +3,22 @@ package middleware_test
 import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/ory-am/hydra/account"
 	hcon "github.com/ory-am/hydra/context"
-	. "github.com/ory-am/hydra/handler/middleware"
+	hjwt "github.com/ory-am/hydra/jwt"
+	. "github.com/ory-am/hydra/middleware"
 	"github.com/ory-am/ladon/policy"
+	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 )
 
 type test struct {
-	subject            account.Account
+	subject            string
 	token              *jwt.Token
 	policies           []policy.Policy
 	resource           string
@@ -27,21 +29,21 @@ type test struct {
 
 var cases = []test{
 	test{
-		&account.DefaultAccount{ID: "max"},
+		"max",
 		&jwt.Token{Valid: false},
 		[]policy.Policy{},
 		"", "",
 		false, false,
 	},
 	test{
-		&account.DefaultAccount{ID: "max"},
+		"max",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{},
 		"", "",
 		true, false,
 	},
 	test{
-		&account.DefaultAccount{ID: "peter"},
+		"peter",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{
 			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/articles/74251"}, []string{"create"}},
@@ -50,7 +52,7 @@ var cases = []test{
 		true, true,
 	},
 	test{
-		&account.DefaultAccount{ID: "peter"},
+		"peter",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{
 			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.DenyAccess, []string{"/articles/74251"}, []string{"create"}},
@@ -59,7 +61,7 @@ var cases = []test{
 		true, false,
 	},
 	test{
-		&account.DefaultAccount{ID: "max"},
+		"max",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{
 			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/articles/74251"}, []string{"create"}},
@@ -68,7 +70,7 @@ var cases = []test{
 		true, false,
 	},
 	test{
-		&account.DefaultAccount{ID: "max"},
+		"max",
 		nil,
 		[]policy.Policy{
 			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/articles/74251"}, []string{"create"}},
@@ -77,14 +79,14 @@ var cases = []test{
 		false, false,
 	},
 	test{
-		nil,
+		"",
 		&jwt.Token{Valid: true},
 		[]policy.Policy{},
 		"", "",
 		false, false,
 	},
 	test{
-		&account.DefaultAccount{ID: "max"},
+		"max",
 		&jwt.Token{Valid: true},
 		nil,
 		"", "",
@@ -94,7 +96,8 @@ var cases = []test{
 
 func mockContext(h hcon.ContextHandler, c test) hcon.ContextHandler {
 	return hcon.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
-		ctx = hcon.NewContextFromAuthValues(ctx, c.subject, c.token, c.policies)
+		claims := hjwt.NewClaimsCarrier(uuid.New(), "hydra", c.subject, "tests", time.Now(), time.Now())
+		ctx = hcon.NewContextFromAuthValues(ctx, claims, c.token, c.policies)
 		h.ServeHTTPContext(ctx, rw, req)
 	})
 }

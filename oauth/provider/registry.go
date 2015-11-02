@@ -13,16 +13,17 @@ type defaultRegistry struct {
 	providers map[string]Provider
 }
 
-func NewRegistry(providers map[string]Provider) Registry {
+func NewRegistry(providers []Provider) Registry {
 	r := &defaultRegistry{map[string]Provider{}}
-	for k, v := range providers {
-		r.add(k, v)
+	for _, v := range providers {
+		r.add(v)
 	}
+
 	return r
 }
 
-func (r *defaultRegistry) add(id string, provider Provider) {
-	id = strings.ToLower(id)
+func (r *defaultRegistry) add(provider Provider) {
+	id := strings.ToLower(provider.GetID())
 	r.providers[id] = provider
 }
 

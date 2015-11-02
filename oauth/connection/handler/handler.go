@@ -1,3 +1,8 @@
+// Package handler
+//
+// Defined permissions:
+// * permission("rn:hydra:oauth2:connections") actions("create", "get")
+// * permission("rn:hydra:oauth2:connections:%s", id) actions("get", "delete")
 package handler
 
 import (
@@ -14,9 +19,13 @@ import (
 	"net/http"
 )
 
-const permission = "rn:hydra:oauth2:subjects:%s:connections"
+var connectionsPermission = "rn:hydra:oauth2:connections"
 
-type handler struct {
+func permission(id string) string {
+	return fmt.Sprintf("rn:hydra:oauth2:connections:%s", id)
+}
+
+type Handler struct {
 	s Storage
 	m *middleware.Middleware
 }
@@ -25,22 +34,23 @@ type payload struct {
 	ID string `json:"id,omitempty" `
 }
 
-func NewHandler(s Storage, m *middleware.Middleware) *handler {
-	return &handler{s, m}
+func NewHandler(s Storage, m *middleware.Middleware) *Handler {
+	return &Handler{s, m}
 }
 
-func (h *handler) SetRoutes(r *mux.Router, extractor func(h hydcon.ContextHandler) hydcon.ContextHandler) {
-	r.Handle("/oauth2/subjects/{subject}/connections", hydcon.NewContextAdapter(
+func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hydcon.ContextHandler) hydcon.ContextHandler) {
+	r.Handle("/oauth2/connections", hydcon.NewContextAdapter(
 		context.Background(),
 		extractor,
 		h.m.IsAuthenticated,
-	).ThenFunc(h.Create)).Methods("POST")
+		h.m.IsAuthorized(connectionsPermission, "create", nil),
+	).ThenFunc(h.Create)).Queries("subject", "{subject}").Methods("POST")
 
-	r.Handle("/oauth2/subjects/{subject}/connections", hydcon.NewContextAdapter(
+	r.Handle("/oauth2/connections", hydcon.NewContextAdapter(
 		context.Background(),
 		extractor,
 		h.m.IsAuthenticated,
-	).ThenFunc(h.Find)).Methods("GET")
+	).ThenFunc(h.Find)).Queries("subject", "{subject}").Methods("GET")
 
 	r.Handle("/oauth2/connections/{id}", hydcon.NewContextAdapter(
 		context.Background(),
@@ -55,50 +65,47 @@ func (h *handler) SetRoutes(r *mux.Router, extractor func(h hydcon.ContextHandle
 	).ThenFunc(h.Delete)).Methods("DELETE")
 }
 
-func (h *handler) Create(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+func (h *Handler) Create(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 	subject, ok := mux.Vars(req)["subject"]
 	if !ok {
 		http.Error(rw, "No subject given.", http.StatusBadRequest)
 		return
 	}
 
-	h.m.IsAuthorized(fmt.Sprintf(permission, subject), "create")(hydcon.ContextHandlerFunc(
-		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
-			var conn DefaultConnection
-			decoder := json.NewDecoder(req.Body)
-			if err := decoder.Decode(&conn); err != nil {
-				http.Error(rw, "Could not decode request: "+err.Error(), http.StatusBadRequest)
-				return
-			}
+	var conn DefaultConnection
+	decoder := json.NewDecoder(req.Body)
+	if err := decoder.Decode(&conn); err != nil {
+		http.Error(rw, "Could not decode request: "+err.Error(), http.StatusBadRequest)
+		return
+	}
 
-			if v, err := govalidator.ValidateStruct(conn); !v {
-				if err != nil {
-					http.Error(rw, err.Error(), http.StatusBadRequest)
-					return
-				}
-				http.Error(rw, "Payload did not validate.", http.StatusBadRequest)
-				return
-			}
+	if v, err := govalidator.ValidateStruct(conn); !v {
+		if err != nil {
+			http.Error(rw, err.Error(), http.StatusBadRequest)
+			return
+		}
+		http.Error(rw, "Payload did not validate.", http.StatusBadRequest)
+		return
+	}
 
-			conn.ID = uuid.New()
-			if err := h.s.Create(&conn); err != nil {
-				http.Error(rw, err.Error(), http.StatusInternalServerError)
-				return
-			}
+	conn.ID = uuid.New()
+	conn.LocalSubject = subject
+	if err := h.s.Create(&conn); err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-			WriteJSON(rw, &conn)
-		},
-	)).ServeHTTPContext(ctx, rw, req)
+	WriteJSON(rw, &conn)
 }
 
-func (h *handler) Find(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+func (h *Handler) Find(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 	subject, ok := mux.Vars(req)["subject"]
 	if !ok {
 		http.Error(rw, "No id given.", http.StatusBadRequest)
 		return
 	}
 
-	h.m.IsAuthorized(fmt.Sprintf(permission, subject), "get")(hydcon.ContextHandlerFunc(
+	h.m.IsAuthorized(connectionsPermission, "get", middleware.Env(req).Owner(subject))(hydcon.ContextHandlerFunc(
 		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			conns, err := h.s.FindAllByLocalSubject(subject)
 			if err != nil {
@@ -110,7 +117,7 @@ func (h *handler) Find(ctx context.Context, rw http.ResponseWriter, req *http.Re
 	)).ServeHTTPContext(ctx, rw, req)
 }
 
-func (h *handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+func (h *Handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 	id, ok := mux.Vars(req)["id"]
 	if !ok {
 		http.Error(rw, "No id given.", http.StatusBadRequest)
@@ -123,14 +130,14 @@ func (h *handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Req
 		return
 	}
 
-	h.m.IsAuthorized(fmt.Sprintf(permission, conn.GetLocalSubject()), "get")(hydcon.ContextHandlerFunc(
+	h.m.IsAuthorized(permission(id), "get", middleware.Env(req).Owner(conn.GetLocalSubject()))(hydcon.ContextHandlerFunc(
 		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			WriteJSON(rw, conn)
 		},
 	)).ServeHTTPContext(ctx, rw, req)
 }
 
-func (h *handler) Delete(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+func (h *Handler) Delete(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 	id, ok := mux.Vars(req)["id"]
 	if !ok {
 		http.Error(rw, "No id given.", http.StatusBadRequest)
@@ -143,7 +150,7 @@ func (h *handler) Delete(ctx context.Context, rw http.ResponseWriter, req *http.
 		return
 	}
 
-	h.m.IsAuthorized(fmt.Sprintf(permission, conn.GetLocalSubject()), "delete")(hydcon.ContextHandlerFunc(
+	h.m.IsAuthorized(permission(id), "delete", middleware.Env(req).Owner(conn.GetLocalSubject()))(hydcon.ContextHandlerFunc(
 		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			if err := h.s.Delete(conn.GetID()); err != nil {
 				http.Error(rw, err.Error(), http.StatusInternalServerError)

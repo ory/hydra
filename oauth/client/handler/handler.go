@@ -16,9 +16,17 @@ import (
 	"net/http"
 )
 
-type handler struct {
+type Handler struct {
 	s storage.Storage
 	m *middleware.Middleware
+}
+
+func permission(id string) string {
+	return fmt.Sprintf("rn:hydra:clients:%s", id)
+}
+
+func NewHandler(s storage.Storage, m *middleware.Middleware) *Handler {
+	return &Handler{s, m}
 }
 
 type payload struct {
@@ -27,16 +35,12 @@ type payload struct {
 	RedirectURIs string `valid:"required", json:"redirectURIs"`
 }
 
-func NewHandler(s storage.Storage, m *middleware.Middleware) *handler {
-	return &handler{s, m}
-}
-
-func (h *handler) SetRoutes(r *mux.Router, extractor func(h hydcon.ContextHandler) hydcon.ContextHandler) {
+func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hydcon.ContextHandler) hydcon.ContextHandler) {
 	r.Handle("/clients", hydcon.NewContextAdapter(
 		context.Background(),
 		extractor,
 		h.m.IsAuthenticated,
-		h.m.IsAuthorized("rn:hydra:clients", "create"),
+		h.m.IsAuthorized("rn:hydra:clients", "create", nil),
 	).ThenFunc(h.Create)).Methods("POST")
 
 	r.Handle("/clients/{id}", hydcon.NewContextAdapter(
@@ -52,8 +56,7 @@ func (h *handler) SetRoutes(r *mux.Router, extractor func(h hydcon.ContextHandle
 	).ThenFunc(h.Delete)).Methods("DELETE")
 }
 
-func (h *handler) Create(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
-
+func (h *Handler) Create(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 	var p payload
 	decoder := json.NewDecoder(req.Body)
 	if err := decoder.Decode(&p); err != nil {
@@ -91,14 +94,14 @@ func (h *handler) Create(ctx context.Context, rw http.ResponseWriter, req *http.
 	WriteJSON(rw, client)
 }
 
-func (h *handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+func (h *Handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 	id, ok := mux.Vars(req)["id"]
 	if !ok {
 		http.Error(rw, "No id given.", http.StatusBadRequest)
 		return
 	}
 
-	h.m.IsAuthorized(fmt.Sprintf("rn:hydra:clients:%s", id), "get")(hydcon.ContextHandlerFunc(
+	h.m.IsAuthorized(permission(id), "get", nil)(hydcon.ContextHandlerFunc(
 		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			client, err := h.s.GetClient(id)
 			if err != nil {
@@ -110,14 +113,14 @@ func (h *handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Req
 	)).ServeHTTPContext(ctx, rw, req)
 }
 
-func (h *handler) Delete(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+func (h *Handler) Delete(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 	id, ok := mux.Vars(req)["id"]
 	if !ok {
 		http.Error(rw, "No id given.", http.StatusBadRequest)
 		return
 	}
 
-	h.m.IsAuthorized(fmt.Sprintf("rn:hydra:clients:%s", id), "delete")(hydcon.ContextHandlerFunc(
+	h.m.IsAuthorized(permission(id), "delete", nil)(hydcon.ContextHandlerFunc(
 		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			if err := h.s.RemoveClient(id); err != nil {
 				http.Error(rw, fmt.Sprintf("Could not retrieve client: %s", id), http.StatusInternalServerError)

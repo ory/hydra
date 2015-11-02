@@ -1,10 +1,8 @@
 package handler_test
 
 import (
-	"bytes"
 	"encoding/json"
 	"github.com/RangelReale/osin"
-	"github.com/go-errors/errors"
 	"github.com/gorilla/mux"
 	"github.com/ory-am/dockertest"
 	acpg "github.com/ory-am/hydra/account/postgres"
@@ -36,47 +34,6 @@ import (
 
 var handler *Handler
 
-type prov struct{}
-
-func (p *prov) GetAuthCodeURL(ar *osin.AuthorizeRequest) string {
-	redirect, _ := url.Parse("/oauth2/auth")
-	q := redirect.Query()
-	q.Set(provider.ProviderQueryParam, p.GetID())
-	q.Set(provider.RedirectQueryParam, ar.RedirectUri)
-	q.Set(provider.ClientQueryParam, ar.Client.GetId())
-	q.Set(provider.ScopeQueryParam, ar.Scope)
-	q.Set(provider.StateQueryParam, ar.State)
-	q.Set(provider.TypeQueryParam, string(ar.Type))
-	redirect.RawQuery = q.Encode()
-
-	var buf bytes.Buffer
-	buf.WriteString("/remote/oauth2/auth")
-	v := url.Values{
-		"response_type": {"code"},
-		"client_id":     {"someclient"},
-		"redirect_uri":  {redirect.String()},
-		"scope":         {""},
-		"state":         {ar.State},
-	}
-	buf.WriteByte('?')
-	buf.WriteString(v.Encode())
-	return buf.String()
-}
-
-func (p *prov) Exchange(code string) (provider.Session, error) {
-	if code != "code" {
-		return nil, errors.New("Code not 'code'")
-	}
-	return &provider.DefaultSession{
-		RemoteSubject: "remote-id",
-		Token:         &oauth2.Token{},
-	}, nil
-}
-
-func (p *prov) GetID() string {
-	return "MockProvider"
-}
-
 func TestMain(m *testing.M) {
 	c, db, err := dockertest.OpenPostgreSQLContainerConnection(15, time.Second)
 	if err != nil {
@@ -88,7 +45,7 @@ func TestMain(m *testing.M) {
 	policyStore := ppg.New(db)
 	osinStore := opg.New(db)
 	connectionStore := cpg.New(db)
-	registry := provider.NewRegistry(map[string]provider.Provider{"MockProvider": &prov{}})
+	registry := provider.NewRegistry([]provider.Provider{&prov{}})
 	j := jwt.New([]byte(jwt.TestCertificates[0][1]), []byte(jwt.TestCertificates[1][1]))
 
 	if err := connectionStore.CreateSchemas(); err != nil {
@@ -114,11 +71,20 @@ func TestMain(m *testing.M) {
 		Audience:    "tests",
 	}
 
+	pol := policy.DefaultPolicy{
+		ID: "3", Description: "",
+		Effect:      policy.AllowAccess,
+		Subjects:    []string{},
+		Permissions: []string{"authorize"},
+		Resources:   []string{"/oauth2/authorize"},
+		Conditions:  []policy.Condition{},
+	}
+
 	if err := osinStore.CreateClient(&osin.DefaultClient{"1", "secret", "/callback", ""}); err != nil {
 		log.Fatalf("Could create client: %s", err)
 	} else if _, err := accountStore.Create("2", "2@bar.com", "secret", "{}"); err != nil {
 		log.Fatalf("Could create account: %s", err)
-	} else if _, err := policyStore.Create("3", "", policy.AllowAccess, []string{}, []string{"authorize"}, []string{"/oauth2/authorize"}); err != nil {
+	} else if err := policyStore.Create(&pol); err != nil {
 		log.Fatalf("Could create client: %s", err)
 	} else if err := connectionStore.Create(&connection.DefaultConnection{
 		ID:            uuid.New(),
@@ -130,11 +96,6 @@ func TestMain(m *testing.M) {
 	}
 
 	os.Exit(m.Run())
-}
-
-type userAuth struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
 }
 
 var (
@@ -160,42 +121,22 @@ var (
 )
 
 func TestAuthCode(t *testing.T) {
+	var callbackURL *url.URL
 	router := mux.NewRouter()
 	ts := httptest.NewUnstartedServer(router)
 	callbackCalled := false
+
 	handler.SetRoutes(router)
-	router.HandleFunc("/remote/oauth2/auth", func(w http.ResponseWriter, r *http.Request) {
-		t.Logf("/remote/oauth2/auth got: %s", r.URL)
-
-		redirect, _ := url.QueryUnescape(r.URL.Query().Get("redirect_uri"))
-		parsed, _ := url.Parse(redirect)
-
-		q := parsed.Query()
-		q2 := url.Values{}
-		q2.Set("provider", q.Get(provider.ProviderQueryParam))
-		q2.Set("redirect_uri", q.Get(provider.RedirectQueryParam))
-		q2.Set("client_id", q.Get(provider.ClientQueryParam))
-		q2.Set("scope", q.Get(provider.ScopeQueryParam))
-		q2.Set("state", q.Get(provider.StateQueryParam))
-		q2.Set("response_type", q.Get(provider.TypeQueryParam))
-		q2.Set("access_code", "code")
-		parsed.RawQuery = q2.Encode()
-
-		t.Logf("Redirecting to: %s", ts.URL+parsed.String())
-		http.Redirect(w, r, ts.URL+parsed.String(), http.StatusFound)
-	})
+	router.HandleFunc("/remote/oauth2/auth", authHandlerMock(t, ts))
 	router.HandleFunc("/callback", func(w http.ResponseWriter, r *http.Request) {
-		t.Logf("/callback: %s", r.URL)
+		callbackURL = r.URL
 		callbackCalled = true
 	})
+
 	ts.Start()
 	defer ts.Close()
 
-	for _, c := range []struct {
-		config *oauth2.Config
-	}{
-		{configs["working"]},
-	} {
+	for _, c := range []struct{ config *oauth2.Config }{{configs["working"]}} {
 		config := *c.config
 		config.Endpoint = oauth2.Endpoint{AuthURL: ts.URL + "/oauth2/auth?provider=mockprovider", TokenURL: ts.URL + "/oauth2/token"}
 		authURL := config.AuthCodeURL("state")
@@ -206,6 +147,10 @@ func TestAuthCode(t *testing.T) {
 		defer resp.Body.Close()
 		require.True(t, callbackCalled)
 		callbackCalled = false
+
+		token, err := config.Exchange(oauth2.NoContext, callbackURL.Query().Get("code"))
+		require.Nil(t, err)
+		require.NotEmpty(t, token.AccessToken)
 	}
 }
 
@@ -301,6 +246,9 @@ func TestIntrospect(t *testing.T) {
 		{"Bearer invalid", http.StatusForbidden, false},
 		{"Bearer invalid", http.StatusForbidden, false},
 
+		//
+		{"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.e30.FvuwHdEjgGxPAyVUb-eqtiPl2gycU9WOHNzwpFKcpdN_QkXkBUxU3qFl3lLBaMzIuP_GjXLXcJZFhyQ2Ne3kfWuZSGLmob0Og8B4lAy7CA7iwpji2R3aUcwBwbJ41IJa__F8fMRz0dRDwhyrBKD-9y4TfV_-yZuzBZxq0UdjX6IdpzsdetphBSIZkPij5MY3thRwC-X_gXyIXi4-G2_CjRrV5lCGnPJrDbLqPCYqS71wK9NEsz_B8p5ENmwad8vZe4fEFR7XsqJrhPjbEVGeLpzSz0AOGp4G1iyvv1sdu4M3Y8KSSGYnZ8lXNGyi8QeUr374Y6XgJ5N5TVLWI2cMxg", http.StatusForbidden, false},
+
 		//		 "exp": "2012-04-23T18:25:43.511Z"
 		{"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIyMDEyLTA0LTIzVDE4OjI1OjQzLjUxMVoifQ.YPCfgNDs-UT6vNqh6095cXiMe0jcA9HjHuLi6hK6YBPsEHwHFniFGXAYt1PpPabBHAz7lQQ8zZao6LrVXkfz7PLbeQZl3KY0SUb-Wb0eEDjX4naEdm20whrYMZQ36VcTMT-FsGk5MB-nIYKq3iX6FMhumV8StjpC0jrM14488lPwLXihC1uITQBNVFEyXV_emhfuyojWEcEq899oE_vVRd7pTOmIhU8dFEAonoLZyPTKzSfvqaurPeySA5ttA-TTMTxZNzGVxWV4cwYHlhTXfS57zoSF_EN_PULTqMepUe8RC9AFnwyvNAa5e4nxQG5yO6b7cUGa0vSCD5FPbNBh-w", http.StatusForbidden, false},
 
@@ -324,6 +272,14 @@ func TestIntrospect(t *testing.T) {
 		//			"aud": "wrong-audience"
 		//		}
 		{"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIyMDk5LTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJpYXQiOiIyMDAwLTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJuYmYiOiIyMDAwLTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJhdWQiOiJ3cm9uZy1hdWRpZW5jZSJ9.rF4JqVpawgHcg_H2hAAsEI2GUxzxCote4pUlruK9hLF-Dv-YSeEmMcFBhfxgsFuDCJotUCG6v8EhwI4u2wxGQHzLz70a-0AEZLQBccCfF_V4qAk8B7M5z2fO7xtEy8RkB2pZKCHbJ1f_6MSM_EyV6r4oiwedveBSsLKcjDhWE3_wExmtmtZaujJy53gR8Wh7BnUt6pl95_d7OMFjGEp1C_N0f3xd9SizIZ-qlIwHiX4xLHtvTZIjdmfyzXxPm_MK_aMOXmX0F6DQn5tgMzAggEdKSD6YdU8HM256zLQeddczrrDI5P3SASiBJ6MCUM4AzbvoFuFAilQi0WzpLpmlJw", http.StatusOK, false},
+
+		//		{
+		//			"exp": "2099-04-23T18:25:43.511Z",
+		//			"iat": "2000-04-23T18:25:43.511Z",
+		//			"nbf": "2000-04-23T18:25:43.511Z",
+		//			"aud": "tests"
+		//		}
+		{"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIyMDk5LTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJpYXQiOiIyMDAwLTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJuYmYiOiIyMDAwLTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJhdWQiOiJ0ZXN0cyJ9.NQZCoKU2qoC-_VFi-_8fQDzObeQrnld9wyaqF0jYHL_wqROn5VumCDVl1oxMN7g-L9wqo5U-xUXf1HS_Ae6CLDFlkbd6dI-h1_l7_ALn_L_GoxQsEo2lQUDQ-Q4eqlLabc764cTYFXd5EwcsZMHWs5ZFCeMOv3exfeTmg8E9e1FiyuTuKVjvMxL-ZCh113nzXEGFr6GRzqjL6VSnJPDX0Pv78R9tnL6CqWbCuDBlIPOccbpWLuWF0yKjV-OyvcWpjkLIVtAbrimi3A7cNUI_V3EJm9Y4tr8e6hv9zViPNbhycmqvOp-vur2k64PrzeMcbuj7TFRCJg2V3moPJF3NtQ", http.StatusOK, true},
 
 		//		{
 		//			"exp": "2099-04-23T18:25:43.511Z",

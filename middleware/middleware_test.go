@@ -2,95 +2,134 @@ package middleware_test
 
 import (
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
-	hcon "github.com/ory-am/hydra/context"
-	hjwt "github.com/ory-am/hydra/jwt"
-	. "github.com/ory-am/hydra/middleware"
-	"github.com/ory-am/ladon/policy"
-	"github.com/pborman/uuid"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"golang.org/x/net/context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/pborman/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"golang.org/x/net/context"
+
+	hcon "github.com/ory-am/hydra/context"
+	hjwt "github.com/ory-am/hydra/jwt"
+	. "github.com/ory-am/hydra/middleware"
+	. "github.com/ory-am/ladon/policy"
 )
 
 type test struct {
-	subject            string
-	token              *jwt.Token
-	policies           []policy.Policy
-	resource           string
-	permission         string
-	passAuthentication bool
-	passAuthorization  bool
+	subject     string
+	token       *jwt.Token
+	policies    []Policy
+	resource    string
+	permission  string
+	owner       string
+	expectAuthN bool
+	expectAuthZ bool
 }
 
 var cases = []test{
-	test{
-		"max",
-		&jwt.Token{Valid: false},
-		[]policy.Policy{},
-		"", "",
-		false, false,
+	{
+		subject:  "max",
+		token:    &jwt.Token{Valid: false},
+		policies: []Policy{},
+		resource: "", permission: "",
+		expectAuthN: false, expectAuthZ: false,
 	},
-	test{
-		"max",
-		&jwt.Token{Valid: true},
-		[]policy.Policy{},
-		"", "",
-		true, false,
+	{
+		subject:  "max",
+		token:    &jwt.Token{Valid: true},
+		policies: []Policy{},
+		resource: "", permission: "",
+		expectAuthN: true, expectAuthZ: false,
 	},
-	test{
-		"peter",
-		&jwt.Token{Valid: true},
-		[]policy.Policy{
-			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/articles/74251"}, []string{"create"}},
+	{
+		subject: "peter",
+		token:   &jwt.Token{Valid: true},
+		policies: []Policy{
+			&DefaultPolicy{"", "", []string{"peter"}, AllowAccess, []string{"/articles/74251"}, []string{"create"}, nil},
 		},
-		"/articles/74251", "create",
-		true, true,
+		resource: "/articles/74251", permission: "create",
+		expectAuthN: true, expectAuthZ: true,
 	},
-	test{
-		"peter",
-		&jwt.Token{Valid: true},
-		[]policy.Policy{
-			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.DenyAccess, []string{"/articles/74251"}, []string{"create"}},
+	{
+		subject: "peter",
+		token:   &jwt.Token{Valid: true},
+		policies: []Policy{
+			&DefaultPolicy{"", "", []string{"peter"}, DenyAccess, []string{"/articles/74251"}, []string{"create"}, nil},
 		},
-		"/articles/74251", "create",
-		true, false,
+		resource: "/articles/74251", permission: "create",
+		expectAuthN: true, expectAuthZ: false,
 	},
-	test{
-		"max",
-		&jwt.Token{Valid: true},
-		[]policy.Policy{
-			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/articles/74251"}, []string{"create"}},
+	{
+		subject: "max",
+		token:   &jwt.Token{Valid: true},
+		policies: []Policy{
+			&DefaultPolicy{"", "", []string{"peter"}, AllowAccess, []string{"/articles/74251"}, []string{"create"}, nil},
 		},
-		"/articles/74251", "create",
-		true, false,
+		resource: "/articles/74251", permission: "create",
+		expectAuthN: true, expectAuthZ: false,
 	},
-	test{
-		"max",
-		nil,
-		[]policy.Policy{
-			&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"/articles/74251"}, []string{"create"}},
+	{
+		subject: "max",
+		token:   nil,
+		policies: []Policy{
+			&DefaultPolicy{"", "", []string{"peter"}, AllowAccess, []string{"/articles/74251"}, []string{"create"}, nil},
 		},
-		"/articles/74251", "create",
-		false, false,
+		resource: "/articles/74251", permission: "create",
+		expectAuthN: false, expectAuthZ: false,
 	},
-	test{
-		"",
-		&jwt.Token{Valid: true},
-		[]policy.Policy{},
-		"", "",
-		false, false,
+	{
+		subject: "max",
+		token:   &jwt.Token{Valid: true},
+		owner:   "max",
+		policies: []Policy{
+			&DefaultPolicy{"", "", []string{".*"}, AllowAccess, []string{"/articles/74251"}, []string{"get"}, []Condition{
+				&DefaultCondition{Operator: "SubjectIsOwner"},
+			}},
+		},
+		resource: "/articles/74251", permission: "get",
+		expectAuthN: true, expectAuthZ: true,
 	},
-	test{
-		"max",
-		&jwt.Token{Valid: true},
-		nil,
-		"", "",
-		true, false,
+	{
+		subject: "max",
+		token:   &jwt.Token{Valid: true},
+		owner:   "max",
+		policies: []Policy{
+			&DefaultPolicy{"", "", []string{".*"}, AllowAccess, []string{"/articles/74251"}, []string{"get"}, []Condition{
+				&DefaultCondition{Operator: "SubjectIsNotOwner"},
+			}},
+		},
+		resource: "/articles/74251", permission: "get",
+		expectAuthN: true, expectAuthZ: false,
+	},
+	{
+		subject: "max",
+		token:   &jwt.Token{Valid: true},
+		owner:   "max",
+		policies: []Policy{
+			&DefaultPolicy{"", "", []string{".*"}, AllowAccess, []string{"/articles/74251"}, []string{"get"}, []Condition{
+				&DefaultCondition{Operator: "ThisOperatorDoesNotExist"},
+			}},
+		},
+		resource: "/articles/74251", permission: "get",
+		expectAuthN: true, expectAuthZ: false,
+	},
+	{
+		subject:  "",
+		token:    &jwt.Token{Valid: true},
+		policies: []Policy{},
+		resource: "", permission: "",
+		expectAuthN: false, expectAuthZ: false,
+	},
+	{
+		subject:  "max",
+		token:    &jwt.Token{Valid: true},
+		policies: nil,
+		resource: "", permission: "",
+		expectAuthN: true, expectAuthZ: false,
 	},
 }
 
@@ -104,11 +143,17 @@ func mockContext(c test) func(hcon.ContextHandler) hcon.ContextHandler {
 	}
 }
 
-func handler(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
-	fmt.Fprintln(rw, "ok")
+func handler(m *Middleware, c test) func(context.Context, http.ResponseWriter, *http.Request) {
+	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+		m.IsAuthorized(c.resource, c.permission, Env(req).Owner(c.owner))(hcon.ContextHandlerFunc(
+			func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+				fmt.Fprintln(rw, "ok")
+			},
+		)).ServeHTTPContext(ctx, rw, req)
+	}
 }
 
-func TestIsAuthenticated(t *testing.T) {
+func TestMiddleware(t *testing.T) {
 	m := &Middleware{}
 
 	for k, c := range cases {
@@ -116,8 +161,7 @@ func TestIsAuthenticated(t *testing.T) {
 			context.Background(),
 			mockContext(c),
 			m.IsAuthenticated,
-			m.IsAuthorized(c.resource, c.permission),
-		).ThenFunc(hcon.ContextHandlerFunc(handler))
+		).ThenFunc(hcon.ContextHandlerFunc(handler(m, c)))
 
 		ts := httptest.NewServer(h)
 		defer ts.Close()
@@ -126,12 +170,12 @@ func TestIsAuthenticated(t *testing.T) {
 		require.Nil(t, err)
 		res.Body.Close()
 
-		if !c.passAuthentication {
-			assert.Equal(t, http.StatusUnauthorized, res.StatusCode, "Case %d", k)
-		} else if !c.passAuthorization {
-			assert.Equal(t, http.StatusForbidden, res.StatusCode, "Case %d", k)
+		if !c.expectAuthN {
+			assert.Equal(t, http.StatusUnauthorized, res.StatusCode, "Authentication failed case %d", k)
+		} else if !c.expectAuthZ {
+			assert.Equal(t, http.StatusForbidden, res.StatusCode, "Authorization failed case %d", k)
 		} else {
-			assert.Equal(t, http.StatusOK, res.StatusCode, "Case %d", k)
+			assert.Equal(t, http.StatusOK, res.StatusCode, "Case %d should be authorized but wasn't.", k)
 		}
 	}
 }

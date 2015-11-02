@@ -33,11 +33,7 @@ func TestMain(m *testing.M) {
 		log.Fatalf("Could not connect to database: %s", err)
 	}
 
-	defer func() {
-		if err := c.KillRemove(); err != nil {
-			panic(err.Error())
-		}
-	}()
+	defer c.KillRemove()
 
 	store = postgres.New(db)
 	mw = &middleware.Middleware{}
@@ -71,10 +67,10 @@ func mockAuthorization(c test) func(h hcon.ContextHandler) hcon.ContextHandler {
 }
 
 var policies = map[string]policy.Policy{
-	"pass-all":    &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:clients.*"}, []string{".*"}},
-	"pass-create": &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:clients"}, []string{"create"}},
-	"pass-get":    &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:clients:.*"}, []string{"get"}},
-	"pass-delete": &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:clients:.*"}, []string{"delete"}},
+	"pass-all":    &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:clients.*"}, []string{".*"}, nil},
+	"pass-create": &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:clients"}, []string{"create"}, nil},
+	"pass-get":    &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:clients:.*"}, []string{"get"}, nil},
+	"pass-delete": &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:clients:.*"}, []string{"delete"}, nil},
 	"fail":        &policy.DefaultPolicy{},
 }
 
@@ -87,7 +83,7 @@ func TestCreateGetDeleteGet(t *testing.T) {
 		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-all"]}, createData: payload{RedirectURIs: "redir"}, statusCreate: http.StatusOK, statusGet: http.StatusOK, statusDelete: http.StatusAccepted, statusGetAfterDelete: http.StatusNotFound},
 	} {
 		func() {
-			handler := &handler{s: store, m: mw}
+			handler := &Handler{s: store, m: mw}
 			router := mux.NewRouter()
 			handler.SetRoutes(router, mockAuthorization(c))
 			ts := httptest.NewServer(router)

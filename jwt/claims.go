@@ -23,8 +23,8 @@ func (c ClaimsCarrier) AssertExpired() bool {
 	return c.GetExpiresAt().Before(time.Now())
 }
 
-func (c ClaimsCarrier) AssertInFuture() bool {
-	return c.GetNotBefore().After(time.Now()) || c.GetIssuedAt().After(time.Now())
+func (c ClaimsCarrier) AssertNotYetValid() bool {
+	return c.GetNotBefore().After(time.Now())
 }
 
 func (c ClaimsCarrier) GetSubject() string {

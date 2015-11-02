@@ -5,8 +5,8 @@ import (
 	"net/http"
 )
 
-func WriteJSON(rw http.ResponseWriter, connection interface{}) {
-	js, err := json.Marshal(connection)
+func WriteJSON(rw http.ResponseWriter, data interface{}) {
+	js, err := json.Marshal(data)
 
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)

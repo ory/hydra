@@ -15,7 +15,7 @@ const (
 	authKey key = 0
 )
 
-func NewContextFromAuthorization(ctx context.Context, req *http.Request, j *hjwt.JWT, p policy.Storer) context.Context {
+func NewContextFromAuthorization(ctx context.Context, req *http.Request, j *hjwt.JWT, p policy.Storage) context.Context {
 	bearer := osin.CheckBearerAuth(req)
 	if bearer == nil {
 		log.Warn("No authorization bearer given.")

@@ -1,5 +1,7 @@
 # Hydra
 
+Please be aware that Hydra is not ready for production just yet and has not been tested on a production system. If time schedule holds, we will use it in production for an awesome business app that has yet to be revealed.
+
 [![Build Status](https://travis-ci.org/ory-am/hydra.svg)](https://travis-ci.org/ory-am/hydra)
 [![Coverage Status](https://coveralls.io/repos/ory-am/hydra/badge.svg?branch=master&service=github)](https://coveralls.io/github/ory-am/hydra?branch=master)
 

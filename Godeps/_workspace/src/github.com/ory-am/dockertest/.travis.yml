@@ -1,0 +1,15 @@
+sudo: required
+
+services:
+  - docker
+
+env:
+  - DOCKER_BIND_LOCALHOST=true
+
+language: go
+
+go:
+  - 1.5
+
+install:
+  - go get -t ./...

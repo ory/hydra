@@ -1,8 +1,8 @@
 package jwt
 
 import (
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/assert"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/require"
 	"testing"
 	"time"
 )

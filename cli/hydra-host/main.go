@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/codegangsta/cli"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/codegangsta/cli"
 	. "github.com/ory-am/hydra/cli/hydra-host/handler"
 	"os"
 )

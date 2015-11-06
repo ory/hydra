@@ -3,16 +3,16 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/arekkas/osin"
-	"github.com/asaskevich/govalidator"
-	"github.com/gorilla/mux"
-	"github.com/ory-am/common/rand/sequence"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/arekkas/osin"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/asaskevich/govalidator"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/gorilla/mux"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/rand/sequence"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/osin-storage/storage"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/net/context"
 	hydcon "github.com/ory-am/hydra/context"
 	"github.com/ory-am/hydra/middleware"
 	. "github.com/ory-am/hydra/pkg"
-	"github.com/ory-am/osin-storage/storage"
-	"github.com/pborman/uuid"
-	"golang.org/x/net/context"
 	"net/http"
 )
 

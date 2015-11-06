@@ -2,11 +2,11 @@ package postgres_test
 
 import (
 	"database/sql"
-	"github.com/ory-am/dockertest"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/dockertest"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/require"
 	. "github.com/ory-am/hydra/oauth/connection"
 	. "github.com/ory-am/hydra/oauth/connection/postgres"
-	"github.com/pborman/uuid"
-	"github.com/stretchr/testify/require"
 	"log"
 	"os"
 	"testing"

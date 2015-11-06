@@ -1,0 +1,140 @@
+{
+	"ImportPath": "github.com/ory-am/hydra",
+	"GoVersion": "go1.5.1",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "camlistore.org/pkg/netutil",
+			"Rev": "9e697d90674d381cf02d5d98ceafe33d77accb7e"
+		},
+		{
+			"ImportPath": "code.google.com/p/go-uuid/uuid",
+			"Comment": "null-15",
+			"Rev": "'35bc42037350f0078e3c974c6ea690f1926603ab'"
+		},
+		{
+			"ImportPath": "github.com/RangelReale/osin",
+			"Rev": "490411d9dd8e310e1ff66e8a7e39de820b5b9368"
+		},
+		{
+			"ImportPath": "github.com/Sirupsen/logrus",
+			"Comment": "v0.8.7-35-gfe6f2b0",
+			"Rev": "fe6f2b03125e4fcafb21406381010e363a072c80"
+		},
+		{
+			"ImportPath": "github.com/arekkas/osin",
+			"Rev": "49f08584215555f7dd16dacb39aa0e57c6c01cec"
+		},
+		{
+			"ImportPath": "github.com/asaskevich/govalidator",
+			"Comment": "v2-35-g0b1c675",
+			"Rev": "0b1c6756fe84d7fc34a1af0f6bc49bd25e40abcf"
+		},
+		{
+			"ImportPath": "github.com/codegangsta/cli",
+			"Comment": "1.2.0-163-g70e3fa5",
+			"Rev": "70e3fa51ebed95df8c0fbe1519c1c1f9bc16bb13"
+		},
+		{
+			"ImportPath": "github.com/dgrijalva/jwt-go",
+			"Comment": "v2.3.0-10-g9a00cd5",
+			"Rev": "9a00cd52d4fdc3c7712f517013a42183b5e459e7"
+		},
+		{
+			"ImportPath": "github.com/go-errors/errors",
+			"Rev": "a41850380601eeb43f4350f7d17c6bbd8944aaf8"
+		},
+		{
+			"ImportPath": "github.com/go-sql-driver/mysql",
+			"Comment": "v1.2-121-g69e3ed7",
+			"Rev": "69e3ed7607d7c139386480824801584c947c67cf"
+		},
+		{
+			"ImportPath": "github.com/gorilla/context",
+			"Rev": "1c83b3eabd45b6d76072b66b746c20815fb2872d"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Rev": "ad4d7a5882b961e07e2626045eb995c022ac6664"
+		},
+		{
+			"ImportPath": "github.com/howeyc/gopass",
+			"Rev": "10b54de414cc9693221d5ff2ae14fd2fbf1b0ac1"
+		},
+		{
+			"ImportPath": "github.com/lib/pq",
+			"Comment": "go1.0-cutoff-61-g83c4f41",
+			"Rev": "83c4f410d0aed80a0f44bac6a576a7f2435791f3"
+		},
+		{
+			"ImportPath": "github.com/ory-am/common/env",
+			"Rev": "5ec6289dbfc020403f9b2d1f19a71f4c4e0f24cd"
+		},
+		{
+			"ImportPath": "github.com/ory-am/common/rand/sequence",
+			"Rev": "5ec6289dbfc020403f9b2d1f19a71f4c4e0f24cd"
+		},
+		{
+			"ImportPath": "github.com/ory-am/dockertest",
+			"Rev": "a6cbdd50e71f0a52cb7af90ba9fe51c6dbdd7de9"
+		},
+		{
+			"ImportPath": "github.com/ory-am/ladon/guard",
+			"Rev": "a5a0589a8aea793a887125a5d505d347d2ddc29e"
+		},
+		{
+			"ImportPath": "github.com/ory-am/ladon/policy",
+			"Rev": "a5a0589a8aea793a887125a5d505d347d2ddc29e"
+		},
+		{
+			"ImportPath": "github.com/ory-am/osin-storage/storage",
+			"Rev": "791166c981bf6f1e4e146eff189d95c6c8527810"
+		},
+		{
+			"ImportPath": "github.com/parnurzeal/gorequest",
+			"Comment": "v0.2.11",
+			"Rev": "8fe8e16b3c50b6cc37399ee385b15f62a20bf584"
+		},
+		{
+			"ImportPath": "github.com/pborman/uuid",
+			"Rev": "cccd189d45f7ac3368a0d127efb7f4d08ae0b655"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/assert",
+			"Comment": "v1.0-71-g0d5a14c",
+			"Rev": "0d5a14c5a477957864f3b747d95255ad4e34bcc0"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/require",
+			"Comment": "v1.0-71-g0d5a14c",
+			"Rev": "0d5a14c5a477957864f3b747d95255ad4e34bcc0"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/bcrypt",
+			"Rev": "c8b9e6388ef638d5a8a9d865c634befdc46a6784"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/blowfish",
+			"Rev": "c8b9e6388ef638d5a8a9d865c634befdc46a6784"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "b4e17d61b15679caf2335da776c614169a1b4643"
+		},
+		{
+			"ImportPath": "golang.org/x/net/publicsuffix",
+			"Rev": "b4e17d61b15679caf2335da776c614169a1b4643"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2",
+			"Rev": "038cb4adce85ed41e285c2e7cc6221a92bfa44aa"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2",
+			"Comment": "r2015.10.05-1-g4d04138",
+			"Rev": "4d04138ffef2791c479c0c8bbffc30b34081b8d9"
+		}
+	]
+}

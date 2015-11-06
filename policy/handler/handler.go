@@ -8,18 +8,18 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/gorilla/mux"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/net/context"
 	hctx "github.com/ory-am/hydra/context"
 	"github.com/ory-am/hydra/middleware"
 	"github.com/ory-am/hydra/pkg"
-	"github.com/pborman/uuid"
-	"golang.org/x/net/context"
 	"net/http"
 
-	log "github.com/Sirupsen/logrus"
-	. "github.com/ory-am/ladon/guard"
-	"github.com/ory-am/ladon/guard/operator"
-	. "github.com/ory-am/ladon/policy"
+	log "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/Sirupsen/logrus"
+	. "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/guard"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/guard/operator"
+	. "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy"
 )
 
 type Handler struct {

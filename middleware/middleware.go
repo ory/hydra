@@ -1,12 +1,12 @@
 package middleware
 
 import (
-	log "github.com/Sirupsen/logrus"
+	log "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/Sirupsen/logrus"
+	ladonGuard "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/guard"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/net/context"
 	hydcon "github.com/ory-am/hydra/context"
 	"github.com/ory-am/hydra/jwt"
-	ladonGuard "github.com/ory-am/ladon/guard"
-	"github.com/ory-am/ladon/policy"
-	"golang.org/x/net/context"
 	"net/http"
 )
 

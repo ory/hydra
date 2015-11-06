@@ -2,7 +2,7 @@ package handler
 
 import (
 	"fmt"
-	"github.com/ory-am/common/env"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/env"
 	"github.com/ory-am/hydra/oauth/provider"
 	"github.com/ory-am/hydra/oauth/provider/dropbox"
 )

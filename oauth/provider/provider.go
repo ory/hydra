@@ -1,8 +1,8 @@
 package provider
 
 import (
-	"github.com/RangelReale/osin"
-	"golang.org/x/oauth2"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/RangelReale/osin"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/oauth2"
 	"net/url"
 )
 

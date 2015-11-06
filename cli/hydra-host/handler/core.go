@@ -1,8 +1,9 @@
 package handler
 
 import (
-	"github.com/codegangsta/cli"
-	"github.com/gorilla/mux"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/codegangsta/cli"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/gorilla/mux"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/guard"
 	accounts "github.com/ory-am/hydra/account/handler"
 	"github.com/ory-am/hydra/jwt"
 	"github.com/ory-am/hydra/middleware"
@@ -11,7 +12,6 @@ import (
 	oauth "github.com/ory-am/hydra/oauth/handler"
 	"github.com/ory-am/hydra/oauth/provider"
 	policies "github.com/ory-am/hydra/policy/handler"
-	"github.com/ory-am/ladon/guard"
 	"net/http"
 )
 

@@ -2,9 +2,9 @@ package handler
 
 import (
 	"fmt"
-	"github.com/codegangsta/cli"
-	"github.com/howeyc/gopass"
-	"github.com/pborman/uuid"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/codegangsta/cli"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/howeyc/gopass"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
 	"log"
 )
 

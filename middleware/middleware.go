@@ -1,21 +1,21 @@
 package middleware
 
 import (
-	log "github.com/Sirupsen/logrus"
+	log "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/Sirupsen/logrus"
+	ladonGuard "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/guard"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/net/context"
 	hydcon "github.com/ory-am/hydra/context"
 	"github.com/ory-am/hydra/jwt"
-	ladonGuard "github.com/ory-am/ladon/guard"
-	"github.com/ory-am/ladon/policy"
-	"golang.org/x/net/context"
 	"net/http"
 )
 
 type Middleware struct {
-	policyStore policy.Storer
+	policyStore policy.Storage
 	jwtService  *jwt.JWT
 }
 
-func New(policyStore policy.Storer, jwtService *jwt.JWT) *Middleware {
+func New(policyStore policy.Storage, jwtService *jwt.JWT) *Middleware {
 	return &Middleware{policyStore, jwtService}
 }
 
@@ -28,9 +28,13 @@ func (m *Middleware) ExtractAuthentication(next hydcon.ContextHandler) hydcon.Co
 	})
 }
 
-func (m *Middleware) IsAuthorized(resource, permission string) func(hydcon.ContextHandler) hydcon.ContextHandler {
+func (m *Middleware) IsAuthorized(resource, permission string, environment *env) func(hydcon.ContextHandler) hydcon.ContextHandler {
 	return func(next hydcon.ContextHandler) hydcon.ContextHandler {
 		return hydcon.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+			if environment == nil {
+				environment = Env(req)
+			}
+
 			policies, err := hydcon.PoliciesFromContext(ctx)
 			if err != nil {
 				log.WithFields(log.Fields{"authorization": "forbidden"}).Warnf(`Policy extraction failed: "%s".`, err)
@@ -45,7 +49,7 @@ func (m *Middleware) IsAuthorized(resource, permission string) func(hydcon.Conte
 				return
 			}
 
-			ok, err := guard.IsGranted(resource, permission, subject, policies)
+			ok, err := guard.IsGranted(resource, permission, subject, policies, environment.Ctx())
 			if err != nil || !ok {
 				log.WithFields(log.Fields{"authorization": "forbidden"}).Warnf(`Forbidden! Subject "%s" is not being granted access "%s" to resource "%s".`, subject, permission, resource)
 				errorHandler(rw, req, http.StatusForbidden)

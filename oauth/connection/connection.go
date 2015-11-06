@@ -1,7 +1,7 @@
 package connection
 
 import (
-	"github.com/go-errors/errors"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/go-errors/errors"
 )
 
 var ErrNotFound = errors.New("not found")

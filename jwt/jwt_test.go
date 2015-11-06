@@ -1,8 +1,8 @@
 package jwt
 
 import (
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/assert"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/require"
 	"testing"
 	"time"
 )
@@ -86,6 +86,14 @@ func TestSignAndVerify(t *testing.T) {
 			[]byte(""),
 			map[string]interface{}{"foo": "bar"},
 			map[string]interface{}{"nbf": time.Now().Add(time.Hour)},
+			false,
+			true,
+		},
+		{
+			[]byte(TestCertificates[0][1]),
+			[]byte(TestCertificates[1][1]),
+			map[string]interface{}{"foo": "bar"},
+			map[string]interface{}{"nbf": time.Now().Add(-time.Hour)},
 			false,
 			true,
 		},

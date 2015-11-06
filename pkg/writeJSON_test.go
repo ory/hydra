@@ -1,7 +1,7 @@
 package pkg
 
 import (
-	"github.com/stretchr/testify/assert"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
 )
@@ -29,9 +29,7 @@ func TestWriteJSON(t *testing.T) {
 	r := &rw{header: http.Header{}}
 	js := struct {
 		Foo string `json:"foo"`
-	}{
-		Foo: "bar",
-	}
+	}{"bar"}
 	WriteJSON(r, js)
 	assert.Equal(t, http.StatusOK, r.code)
 	assert.Equal(t, `{"foo":"bar"}`, string(r.written))

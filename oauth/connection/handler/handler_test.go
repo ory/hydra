@@ -3,20 +3,20 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/gorilla/mux"
-	"github.com/ory-am/dockertest"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/dgrijalva/jwt-go"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/gorilla/mux"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/dockertest"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/parnurzeal/gorequest"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/assert"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/require"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/net/context"
 	hcon "github.com/ory-am/hydra/context"
 	hjwt "github.com/ory-am/hydra/jwt"
 	"github.com/ory-am/hydra/middleware"
 	. "github.com/ory-am/hydra/oauth/connection"
 	"github.com/ory-am/hydra/oauth/connection/postgres"
-	"github.com/ory-am/ladon/policy"
-	"github.com/parnurzeal/gorequest"
-	"github.com/pborman/uuid"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"golang.org/x/net/context"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -35,12 +35,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		log.Fatalf("Could not connect to database: %s", err)
 	}
-
-	defer func() {
-		if err := c.KillRemove(); err != nil {
-			panic(err.Error())
-		}
-	}()
+	defer c.KillRemove()
 
 	store = postgres.New(db)
 	mw = &middleware.Middleware{}
@@ -75,10 +70,10 @@ func mockAuthorization(c test) func(h hcon.ContextHandler) hcon.ContextHandler {
 }
 
 var policies = map[string]policy.Policy{
-	"pass-all":    &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:oauth2:subjects:.*:connections"}, []string{".*"}},
-	"pass-create": &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:oauth2:subjects:.*:connections"}, []string{"create"}},
-	"pass-get":    &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:oauth2:subjects:.*:connections"}, []string{"get"}},
-	"pass-delete": &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:oauth2:subjects:.*:connections"}, []string{"delete"}},
+	"pass-all":    &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:oauth2:connections.*"}, []string{".*"}, nil},
+	"pass-create": &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:oauth2:connections.*"}, []string{"create"}, nil},
+	"pass-get":    &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:oauth2:connections.*"}, []string{"get"}, nil},
+	"pass-delete": &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:oauth2:connections.*"}, []string{"delete"}, nil},
 	"fail":        &policy.DefaultPolicy{},
 }
 
@@ -122,14 +117,14 @@ func TestCreateGetDeleteGet(t *testing.T) {
 		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-all"]}, createData: data["ok-steve"], statusCreate: http.StatusOK, statusGet: http.StatusOK, statusDelete: http.StatusAccepted, statusGetAfterDelete: http.StatusNotFound},
 	} {
 		func() {
-			handler := &handler{s: store, m: mw}
+			handler := &Handler{s: store, m: mw}
 			router := mux.NewRouter()
 			handler.SetRoutes(router, mockAuthorization(c))
 			ts := httptest.NewServer(router)
 			defer ts.Close()
 
 			request := gorequest.New()
-			connectionsURL := fmt.Sprintf("%s/oauth2/subjects/%s/connections", ts.URL, c.subject)
+			connectionsURL := fmt.Sprintf("%s/oauth2/connections?subject=%s", ts.URL, c.subject)
 
 			resp, body, _ := request.Post(connectionsURL).Send(*c.createData).End()
 			require.Equal(t, c.statusCreate, resp.StatusCode, "case %d: %s", k, body)

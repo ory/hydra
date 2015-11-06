@@ -1,7 +1,7 @@
 package context
 
 import (
-	"golang.org/x/net/context"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/net/context"
 	"net/http"
 )
 

@@ -1,13 +1,13 @@
 package context
 
 import (
-	"github.com/RangelReale/osin"
-	log "github.com/Sirupsen/logrus"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/go-errors/errors"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/RangelReale/osin"
+	log "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/Sirupsen/logrus"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/dgrijalva/jwt-go"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/go-errors/errors"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/net/context"
 	hjwt "github.com/ory-am/hydra/jwt"
-	"github.com/ory-am/ladon/policy"
-	"golang.org/x/net/context"
 	"net/http"
 )
 
@@ -15,7 +15,7 @@ const (
 	authKey key = 0
 )
 
-func NewContextFromAuthorization(ctx context.Context, req *http.Request, j *hjwt.JWT, p policy.Storer) context.Context {
+func NewContextFromAuthorization(ctx context.Context, req *http.Request, j *hjwt.JWT, p policy.Storage) context.Context {
 	bearer := osin.CheckBearerAuth(req)
 	if bearer == nil {
 		log.Warn("No authorization bearer given.")

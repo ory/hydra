@@ -1,7 +1,7 @@
 package provider
 
 import (
-	"golang.org/x/oauth2"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/oauth2"
 )
 
 type Session interface {

@@ -1,6 +1,6 @@
 package hash
 
-import "golang.org/x/crypto/bcrypt"
+import "github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/crypto/bcrypt"
 
 type BCrypt struct {
 	WorkFactor int

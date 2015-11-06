@@ -3,9 +3,9 @@ package provider_test
 import "testing"
 
 import (
-	"github.com/RangelReale/osin"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/RangelReale/osin"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/assert"
 	. "github.com/ory-am/hydra/oauth/provider"
-	"github.com/stretchr/testify/assert"
 )
 
 type provider struct{}
@@ -18,21 +18,14 @@ func (p *provider) Exchange(code string) (Session, error) {
 	return &DefaultSession{}, nil
 }
 func (p *provider) GetID() string {
-	return "mock"
+	return "fooBar"
 }
 
 func TestRegistry(t *testing.T) {
 	m := &provider{}
-	r := NewRegistry(map[string]Provider{
-		"foo":    m,
-		"fooBar": m,
-	})
+	r := NewRegistry([]Provider{m})
 
-	p, err := r.Find("foo")
-	assert.Nil(t, err)
-	assert.Equal(t, m, p)
-
-	p, err = r.Find("fooBar")
+	p, err := r.Find("fooBar")
 	assert.Nil(t, err)
 	assert.Equal(t, m, p)
 

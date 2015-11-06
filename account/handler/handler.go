@@ -1,16 +1,21 @@
+// Package handler
+//
+// Defined permissions:
+// * permission("rn:hydra:acccounts") actions("create")
+// * permission("rn:hydra:acccounts:%s", id) actions("get", "delete")
 package handler
 
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/asaskevich/govalidator"
-	"github.com/gorilla/mux"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/asaskevich/govalidator"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/gorilla/mux"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/net/context"
 	. "github.com/ory-am/hydra/account"
 	hydcon "github.com/ory-am/hydra/context"
 	"github.com/ory-am/hydra/middleware"
 	. "github.com/ory-am/hydra/pkg"
-	"github.com/pborman/uuid"
-	"golang.org/x/net/context"
 	"net/http"
 )
 
@@ -23,22 +28,26 @@ func NewHandler(s Storage, m *middleware.Middleware) *Handler {
 	return &Handler{s, m}
 }
 
+func permission(id string) string {
+	return fmt.Sprintf("rn:hydra:acccounts:%s", id)
+}
+
 func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hydcon.ContextHandler) hydcon.ContextHandler) {
-	r.Handle("/users", hydcon.NewContextAdapter(
+	r.Handle("/accounts", hydcon.NewContextAdapter(
 		context.Background(),
 		extractor,
 		h.m.IsAuthenticated,
-		h.m.IsAuthorized("rn:hydra:users", "create"),
+		h.m.IsAuthorized("rn:hydra:acccounts", "create", nil),
 	).ThenFunc(h.Create),
 	).Methods("POST")
 
-	r.Handle("/users/{id}", hydcon.NewContextAdapter(
+	r.Handle("/accounts/{id}", hydcon.NewContextAdapter(
 		context.Background(),
 		extractor,
 		h.m.IsAuthenticated,
 	).ThenFunc(h.Get)).Methods("GET")
 
-	r.Handle("/users/{id}", hydcon.NewContextAdapter(
+	r.Handle("/accounts/{id}", hydcon.NewContextAdapter(
 		context.Background(),
 		extractor,
 		h.m.IsAuthenticated,
@@ -87,7 +96,8 @@ func (h *Handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Req
 		http.Error(rw, "No id given.", http.StatusBadRequest)
 		return
 	}
-	h.m.IsAuthorized(fmt.Sprintf("rn:hydra:users:%s", id), "get")(hydcon.ContextHandlerFunc(
+
+	h.m.IsAuthorized(permission(id), "get", middleware.Env(req).Owner(id))(hydcon.ContextHandlerFunc(
 		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			user, err := h.s.Get(id)
 			if err == ErrNotFound {
@@ -108,7 +118,7 @@ func (h *Handler) Delete(ctx context.Context, rw http.ResponseWriter, req *http.
 		http.Error(rw, "No id given.", http.StatusBadRequest)
 		return
 	}
-	h.m.IsAuthorized(fmt.Sprintf("rn:hydra:users:%s", id), "delete")(hydcon.ContextHandlerFunc(
+	h.m.IsAuthorized(permission(id), "delete", middleware.Env(req).Owner(id))(hydcon.ContextHandlerFunc(
 		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			if err := h.s.Delete(id); err != nil {
 				http.Error(rw, err.Error(), http.StatusInternalServerError)

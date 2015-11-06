@@ -3,18 +3,19 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/RangelReale/osin"
-	log "github.com/Sirupsen/logrus"
-	"github.com/go-errors/errors"
-	"github.com/gorilla/mux"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/RangelReale/osin"
+	log "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/Sirupsen/logrus"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/go-errors/errors"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/gorilla/mux"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/guard"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy"
+	osinStore "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/osin-storage/storage"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
 	"github.com/ory-am/hydra/account"
 	"github.com/ory-am/hydra/jwt"
+	"github.com/ory-am/hydra/middleware"
 	"github.com/ory-am/hydra/oauth/connection"
 	"github.com/ory-am/hydra/oauth/provider"
-	"github.com/ory-am/ladon/guard"
-	"github.com/ory-am/ladon/policy"
-	osinStore "github.com/ory-am/osin-storage/storage"
-	"github.com/pborman/uuid"
 	"net/http"
 	"time"
 )
@@ -41,7 +42,7 @@ func DefaultConfig() *osin.ServerConfig {
 
 type Handler struct {
 	Accounts    account.Storage
-	Policies    policy.Storer
+	Policies    policy.Storage
 	Guard       guard.Guarder
 	Connections connection.Storage
 	Providers   provider.Registry
@@ -99,27 +100,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request) {
 
 	result["active"] = false
 	claims := jwt.ClaimsCarrier(token.Claims)
-	if claims.GetExpiresAt().Before(time.Now()) {
-		log.WithField("introspect", "fail").Warnf("Token not valid before %s.", claims.GetNotBefore())
-		log.WithFields(log.Fields{
-			"introspect": "fail",
-			"expired_at": claims.GetExpiresAt(),
-		}).Warnf("Token expired.")
-		return
-	} else if claims.GetNotBefore().After(time.Now()) {
-		log.WithField("introspect", "fail").Warnf("Token not valid before %s.", claims.GetNotBefore())
-		log.WithFields(log.Fields{
-			"introspect": "fail",
-			"not_before": claims.GetNotBefore(),
-		}).Warnf("Token not yet valid.")
-		return
-	} else if claims.GetIssuedAt().After(time.Now()) {
-		log.WithFields(log.Fields{
-			"introspect": "fail",
-			"issued_at":  claims.GetIssuedAt(),
-		}).Warnf("Token issued in the future.")
-		return
-	} else if claims.GetAudience() != h.Audience {
+	if claims.GetAudience() != h.Audience {
 		log.WithFields(log.Fields{
 			"introspect": "fail",
 			"expted":     h.Audience,
@@ -127,7 +108,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request) {
 		}).Warn(`Token audience mismatch.`)
 		return
 	} else {
-		result["active"] = true
+		result["active"] = token.Valid
 		return
 	}
 }
@@ -149,13 +130,18 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	if ar := h.server.HandleAccessRequest(resp, r); ar != nil {
 		switch ar.Type {
 		case osin.AUTHORIZATION_CODE:
-			// FIXME TODO sub needs to be set through access token.
-			data, ok := ar.UserData.(map[string]interface{})
+			data, ok := ar.UserData.(string)
 			if !ok {
-				http.Error(w, fmt.Sprintf("Could not assert UserData type: %v", ar.UserData), http.StatusInternalServerError)
+				http.Error(w, fmt.Sprintf("Could not assert UserData to string: %v", ar.UserData), http.StatusInternalServerError)
 				return
 			}
-			claims := jwt.ClaimsCarrier(data)
+
+			var claims jwt.ClaimsCarrier
+			if err := json.Unmarshal([]byte(data), &claims); err != nil {
+				http.Error(w, fmt.Sprintf("Could not unmarshal UserData: %v", ar.UserData), http.StatusInternalServerError)
+				return
+			}
+
 			ar.UserData = jwt.NewClaimsCarrier(uuid.New(), claims.GetSubject(), h.Issuer, h.Audience, time.Now(), time.Now())
 			ar.Authorized = true
 		case osin.REFRESH_TOKEN:
@@ -172,7 +158,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 			// TODO ... return
 			// TODO }
 
-			if user, err := h.authenticate(w, ar.Username, ar.Password); err == nil {
+			if user, err := h.authenticate(w, r, ar.Username, ar.Password); err == nil {
 				ar.UserData = jwt.NewClaimsCarrier(uuid.New(), user.GetID(), h.Issuer, h.Audience, time.Now(), time.Now())
 				ar.Authorized = true
 			}
@@ -249,7 +235,7 @@ func (h *Handler) AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 	osin.OutputJSON(resp, w, r)
 }
 
-func (h *Handler) authenticate(w http.ResponseWriter, email, password string) (account.Account, error) {
+func (h *Handler) authenticate(w http.ResponseWriter, r *http.Request, email, password string) (account.Account, error) {
 	acc, err := h.Accounts.Authenticate(email, password)
 	if err != nil {
 		http.Error(w, "Could not authenticate.", http.StatusUnauthorized)
@@ -262,7 +248,7 @@ func (h *Handler) authenticate(w http.ResponseWriter, email, password string) (a
 		return nil, err
 	}
 
-	if granted, err := h.Guard.IsGranted("/oauth2/authorize", "authorize", acc.GetID(), policies); !granted {
+	if granted, err := h.Guard.IsGranted("/oauth2/authorize", "authorize", acc.GetID(), policies, middleware.Env(r).Ctx()); !granted {
 		err = errors.Errorf(`Subject "%s" is not allowed to authorize.`, acc.GetID())
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return nil, err

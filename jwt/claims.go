@@ -2,7 +2,7 @@ package jwt
 
 import (
 	"encoding/json"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/Sirupsen/logrus"
 	"time"
 )
 
@@ -23,8 +23,8 @@ func (c ClaimsCarrier) AssertExpired() bool {
 	return c.GetExpiresAt().Before(time.Now())
 }
 
-func (c ClaimsCarrier) AssertInFuture() bool {
-	return c.GetNotBefore().After(time.Now()) || c.GetIssuedAt().After(time.Now())
+func (c ClaimsCarrier) AssertNotYetValid() bool {
+	return c.GetNotBefore().After(time.Now())
 }
 
 func (c ClaimsCarrier) GetSubject() string {

@@ -119,16 +119,58 @@ The CLI currently requires two environment variables:
 #### Usage
 
 ```
-Hydra Host.
+NAME:
+   hydra-host - Dragons guard your resources.
 
-Usage:
-  hydra-host client create [--as-superuser]
-  hydra-host user create <email> [--as-superuser] [--password=<password>]
-  hydra-host start
+USAGE:
+   hydra-host [global options] command [command options] [arguments...]
 
-Options:
-  -h --help  Show this screen.
-  --version  Show version.
+VERSION:
+   0.0.0
+
+COMMANDS:
+   client       client actions
+   user         user actions
+   start        start hydra-host
+   help, h      Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --help, -h           show help
+   --version, -v        print the version
+```
+
+### Start server
+
+```
+NAME:
+   hydra-host start - start hydra-host
+
+USAGE:
+   hydra-host start [arguments...]
+```
+
+### Create client
+
+```
+NAME:
+   D:\Local\Temp\go-build012713466\command-line-arguments\_obj\exe\main.exe client - client actions
+
+USAGE:
+   D:\Local\Temp\go-build012713466\command-line-arguments\_obj\exe\main.exe client [arguments...]
+```
+
+### Create user
+
+```
+NAME:
+   hydra-host user create - create a new user
+
+USAGE:
+   hydra-host user create [command options] <email>
+
+OPTIONS:
+   --password           the user's password
+   --as-superuser       grant superuser privileges to the user
 ```
 
 #### API

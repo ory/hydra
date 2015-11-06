@@ -38,6 +38,7 @@ func (c *User) Create(ctx *cli.Context) {
 		password = getPassword()
 	}
 
+	c.Ctx.Start()
 	user, err := c.Ctx.Accounts.Create(uuid.New(), email, password, "{}")
 	if err != nil {
 		log.Fatalf("%s", err)

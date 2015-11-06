@@ -26,6 +26,7 @@ func (c *Client) Create(ctx *cli.Context) {
 		UserData:    "",
 	}
 
+	c.Ctx.Start()
 	if err := c.Ctx.Osins.CreateClient(client); err != nil {
 		log.Fatalf("%s", err)
 	}

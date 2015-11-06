@@ -31,6 +31,8 @@ type Core struct {
 }
 
 func (c *Core) Start(ctx *cli.Context) {
+	c.Ctx.Start()
+
 	var private, public []byte
 	j := jwt.New(private, public)
 	m := middleware.New(c.Ctx.Policies, j)

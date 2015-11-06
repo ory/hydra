@@ -34,21 +34,19 @@ func (c *Context) Start() {
 		log.Fatal(err)
 	}
 
-	ctx := &Context{
-		DB:          db,
-		Accounts:    accounts.New(&hash.BCrypt{wf}, db),
-		Connections: connections.New(db),
-		Policies:    policies.New(db),
-		Osins:       osins.New(db),
-	}
+	c.DB = db
+	c.Accounts = accounts.New(&hash.BCrypt{wf}, db)
+	c.Connections = connections.New(db)
+	c.Policies = policies.New(db)
+	c.Osins = osins.New(db)
 
-	if err := ctx.Accounts.CreateSchemas(); err != nil {
+	if err := c.Accounts.CreateSchemas(); err != nil {
 		log.Fatal(err)
-	} else if err := ctx.Connections.CreateSchemas(); err != nil {
+	} else if err := c.Connections.CreateSchemas(); err != nil {
 		log.Fatal(err)
-	} else if err := ctx.Policies.CreateSchemas(); err != nil {
+	} else if err := c.Policies.CreateSchemas(); err != nil {
 		log.Fatal(err)
-	} else if err := ctx.Osins.CreateSchemas(); err != nil {
+	} else if err := c.Osins.CreateSchemas(); err != nil {
 		log.Fatal(err)
 	}
 }

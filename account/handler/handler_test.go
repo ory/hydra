@@ -5,18 +5,18 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	"github.com/ory-am/dockertest"
-	"github.com/ory-am/ladon/policy"
-	"github.com/parnurzeal/gorequest"
-	"github.com/pborman/uuid"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"golang.org/x/net/context"
 	"github.com/ory-am/hydra/account"
 	hydra "github.com/ory-am/hydra/account/postgres"
 	hcon "github.com/ory-am/hydra/context"
 	"github.com/ory-am/hydra/hash"
 	hjwt "github.com/ory-am/hydra/jwt"
 	"github.com/ory-am/hydra/middleware"
+	"github.com/ory-am/ladon/policy"
+	"github.com/parnurzeal/gorequest"
+	"github.com/pborman/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"golang.org/x/net/context"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -201,21 +201,21 @@ func TestCreateGetDelete(t *testing.T) {
 		resp, body, _ := request.Post(ts.URL + "/accounts").Send(c.payload).End()
 		require.Equal(t, c.expected.create, resp.StatusCode, "case %d: %s", k, body)
 		if resp.StatusCode != http.StatusOK {
-			return
+			continue
 		}
 		user := assertAccount(t, c, body)
 
 		resp, body, _ = request.Get(ts.URL + "/accounts/" + user.GetID()).End()
 		require.Equal(t, c.expected.get, resp.StatusCode, "case %d: %s", k, body)
 		if resp.StatusCode != http.StatusOK {
-			return
+			continue
 		}
 		user = assertAccount(t, c, body)
 
 		resp, body, _ = request.Delete(ts.URL + "/accounts/" + user.GetID()).End()
 		require.Equal(t, c.expected.delete, resp.StatusCode, "case %d: %s", k, body)
 		if resp.StatusCode != http.StatusAccepted {
-			return
+			continue
 		}
 
 		resp, body, _ = request.Get(ts.URL + "/accounts/" + user.GetID()).End()

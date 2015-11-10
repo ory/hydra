@@ -3,14 +3,14 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/RangelReale/osin"
-	log "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/Sirupsen/logrus"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/go-errors/errors"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/gorilla/mux"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/guard"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy"
-	osinStore "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/osin-storage/storage"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
+	"github.com/RangelReale/osin"
+	log "github.com/Sirupsen/logrus"
+	"github.com/go-errors/errors"
+	"github.com/gorilla/mux"
+	"github.com/ory-am/ladon/guard"
+	"github.com/ory-am/ladon/policy"
+	osinStore "github.com/ory-am/osin-storage/storage"
+	"github.com/pborman/uuid"
 	"github.com/ory-am/hydra/account"
 	"github.com/ory-am/hydra/jwt"
 	"github.com/ory-am/hydra/middleware"
@@ -18,6 +18,7 @@ import (
 	"github.com/ory-am/hydra/oauth/provider"
 	"net/http"
 	"time"
+"github.com/ory-am/common/rand/sequence"
 )
 
 func DefaultConfig() *osin.ServerConfig {
@@ -185,6 +186,11 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 	resp := h.server.NewResponse()
 	defer resp.Close()
+
+	// TODO Check if access_code is given
+	// TODO Check scope in store
+	// TODO If scope exists, inject scope data (redirect, id, ...) into r
+
 	if ar := h.server.HandleAuthorizeRequest(resp, r); ar != nil {
 		// For now, a provider must be given.
 		// TODO there should be a fallback provider which is a redirect to the login endpoint. This should be configurable by env var.
@@ -198,8 +204,17 @@ func (h *Handler) AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 		// This could be made configurable with `connection.GetCodeKeyName()`
 		code := r.URL.Query().Get("access_code")
 		if code == "" {
+			var state string
+			if seq, err := sequence.RuneSequence(10, sequence.AlphaNum); err != nil {
+				// Something else went wrong
+				http.Error(w, fmt.Sprintf("Could not create sequence: %s", err), http.StatusInternalServerError)
+				return
+			} else {
+				state = string(seq)
+			}
+
 			// If no code was given we have to initiate the provider's authorization workflow
-			url := provider.GetAuthCodeURL(ar)
+			url := provider.GetAuthCodeURL(state)
 			http.Redirect(w, r, url, http.StatusFound)
 			return
 		}

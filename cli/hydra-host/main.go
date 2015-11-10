@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/codegangsta/cli"
+	"github.com/codegangsta/cli"
 	. "github.com/ory-am/hydra/cli/hydra-host/handler"
 	"os"
 )
@@ -18,16 +18,28 @@ func main() {
 	app.Commands = []cli.Command{
 		{
 			Name:  "client",
-			Usage: "client actions",
+			Usage: "Client actions",
 			Subcommands: []cli.Command{
 				{
 					Name:   "create",
-					Usage:  "create a new client",
+					Usage:  `Create a new client.`,
 					Action: cl.Create,
 					Flags: []cli.Flag{
+						cli.StringFlag{
+							Name:  "i, id",
+							Usage: "Set client's id",
+						},
+						cli.StringFlag{
+							Name:  "s, secret",
+							Usage: "The client's secret",
+						},
+						cli.StringFlag{
+							Name:  "r, redirect-url",
+							Usage: `A list of allowed redirect URLs: https://foobar.com/callback|https://bazbar.com/cb|http://localhost:3000/authcb`,
+						},
 						cli.BoolFlag{
 							Name:  "as-superuser",
-							Usage: "grant superuser privileges to the client",
+							Usage: "Grant superuser privileges to the client",
 						},
 					},
 				},
@@ -35,21 +47,21 @@ func main() {
 		},
 		{
 			Name:  "user",
-			Usage: "user actions",
+			Usage: "User actions",
 			Subcommands: []cli.Command{
 				{
 					Name:      "create",
-					Usage:     "create a new user",
+					Usage:     "Create a new user",
 					ArgsUsage: "<email>",
 					Action:    u.Create,
 					Flags: []cli.Flag{
 						cli.StringFlag{
 							Name:  "password",
-							Usage: "the user's password",
+							Usage: "The user's password",
 						},
 						cli.BoolFlag{
 							Name:  "as-superuser",
-							Usage: "grant superuser privileges to the user",
+							Usage: "Grant superuser privileges to the user",
 						},
 					},
 				},

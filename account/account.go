@@ -1,6 +1,6 @@
 package account
 
-import "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/go-errors/errors"
+import "github.com/go-errors/errors"
 
 var ErrNotFound = errors.New("Not found")
 

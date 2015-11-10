@@ -2,9 +2,9 @@ package handler_test
 
 import (
 	"bytes"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/RangelReale/osin"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/go-errors/errors"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/oauth2"
+	"github.com/RangelReale/osin"
+	"github.com/go-errors/errors"
+	"golang.org/x/oauth2"
 	"github.com/ory-am/hydra/oauth/provider"
 	"net/http"
 	"net/http/httptest"

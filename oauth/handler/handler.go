@@ -189,10 +189,6 @@ func (h *Handler) AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 	resp := h.server.NewResponse()
 	defer resp.Close()
 
-	// TODO Check if access_code is given
-	// TODO Check scope in store
-	// TODO If scope exists, inject scope data (redirect, id, ...) into r
-	// This could be made configurable with `connection.GetCodeKeyName()`
 	code := r.Form.Get("code")
 	state := r.Form.Get("state")
 	if code != "" {

@@ -3,11 +3,10 @@ package dropbox
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/RangelReale/osin"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/go-errors/errors"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/net/context"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/oauth2"
+	"github.com/go-errors/errors"
 	. "github.com/ory-am/hydra/oauth/provider"
+	"golang.org/x/net/context"
+	"golang.org/x/oauth2"
 	"io/ioutil"
 )
 
@@ -49,8 +48,8 @@ func New(id, client, secret, redirectURL string) *dropbox {
 	}
 }
 
-func (d *dropbox) GetAuthCodeURL(ar *osin.AuthorizeRequest) string {
-	return GetAuthCodeURL(*d.conf, ar, d.GetID())
+func (d *dropbox) GetAuthCodeURL(state string) string {
+	return d.conf.AuthCodeURL(state)
 }
 
 func (d *dropbox) Exchange(code string) (Session, error) {

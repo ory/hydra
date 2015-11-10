@@ -70,11 +70,11 @@
 		},
 		{
 			"ImportPath": "github.com/ory-am/common/env",
-			"Rev": "5ec6289dbfc020403f9b2d1f19a71f4c4e0f24cd"
+			"Rev": "10b143bf7f58f81d7b997c0f1d9c032bfc53b25a"
 		},
 		{
 			"ImportPath": "github.com/ory-am/common/rand/sequence",
-			"Rev": "5ec6289dbfc020403f9b2d1f19a71f4c4e0f24cd"
+			"Rev": "10b143bf7f58f81d7b997c0f1d9c032bfc53b25a"
 		},
 		{
 			"ImportPath": "github.com/ory-am/dockertest",

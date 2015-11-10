@@ -1,21 +1,21 @@
 // Package handler
 //
 // Defined permissions:
-// * permission("rn:hydra:acccounts") actions("create")
-// * permission("rn:hydra:acccounts:%s", id) actions("get", "delete")
+// * permission("rn:hydra:accounts") actions("create")
+// * permission("rn:hydra:accounts:%s", id) actions("get", "delete")
 package handler
 
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/asaskevich/govalidator"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/gorilla/mux"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/net/context"
+	"github.com/asaskevich/govalidator"
+	"github.com/gorilla/mux"
 	. "github.com/ory-am/hydra/account"
 	hydcon "github.com/ory-am/hydra/context"
 	"github.com/ory-am/hydra/middleware"
 	. "github.com/ory-am/hydra/pkg"
+	"github.com/pborman/uuid"
+	"golang.org/x/net/context"
 	"net/http"
 )
 
@@ -29,7 +29,7 @@ func NewHandler(s Storage, m *middleware.Middleware) *Handler {
 }
 
 func permission(id string) string {
-	return fmt.Sprintf("rn:hydra:acccounts:%s", id)
+	return fmt.Sprintf("rn:hydra:accounts:%s", id)
 }
 
 func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hydcon.ContextHandler) hydcon.ContextHandler) {
@@ -37,7 +37,7 @@ func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hydcon.ContextHandle
 		context.Background(),
 		extractor,
 		h.m.IsAuthenticated,
-		h.m.IsAuthorized("rn:hydra:acccounts", "create", nil),
+		h.m.IsAuthorized("rn:hydra:accounts", "create", nil),
 	).ThenFunc(h.Create),
 	).Methods("POST")
 

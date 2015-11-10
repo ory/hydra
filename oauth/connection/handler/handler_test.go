@@ -3,15 +3,15 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/dgrijalva/jwt-go"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/gorilla/mux"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/dockertest"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/parnurzeal/gorequest"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/assert"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/require"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/net/context"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gorilla/mux"
+	"github.com/ory-am/dockertest"
+	"github.com/ory-am/ladon/policy"
+	"github.com/parnurzeal/gorequest"
+	"github.com/pborman/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"golang.org/x/net/context"
 	hcon "github.com/ory-am/hydra/context"
 	hjwt "github.com/ory-am/hydra/jwt"
 	"github.com/ory-am/hydra/middleware"
@@ -47,10 +47,10 @@ func TestMain(m *testing.M) {
 }
 
 type test struct {
-	subject    string
-	token      jwt.Token
-	policies   []policy.Policy
-	createData *DefaultConnection
+	subject              string
+	token                jwt.Token
+	policies             []policy.Policy
+	createData           *DefaultConnection
 
 	statusCreate         int
 	statusGet            int
@@ -116,51 +116,49 @@ func TestCreateGetDeleteGet(t *testing.T) {
 		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-create"], policies["pass-get"]}, createData: data["ok-zac"], statusCreate: http.StatusOK, statusGet: http.StatusOK, statusDelete: http.StatusForbidden},
 		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-all"]}, createData: data["ok-steve"], statusCreate: http.StatusOK, statusGet: http.StatusOK, statusDelete: http.StatusAccepted, statusGetAfterDelete: http.StatusNotFound},
 	} {
-		func() {
-			handler := &Handler{s: store, m: mw}
-			router := mux.NewRouter()
-			handler.SetRoutes(router, mockAuthorization(c))
-			ts := httptest.NewServer(router)
-			defer ts.Close()
+		handler := &Handler{s: store, m: mw}
+		router := mux.NewRouter()
+		handler.SetRoutes(router, mockAuthorization(c))
+		ts := httptest.NewServer(router)
+		defer ts.Close()
 
-			request := gorequest.New()
-			connectionsURL := fmt.Sprintf("%s/oauth2/connections?subject=%s", ts.URL, c.subject)
+		request := gorequest.New()
+		connectionsURL := fmt.Sprintf("%s/oauth2/connections?subject=%s", ts.URL, c.subject)
 
-			resp, body, _ := request.Post(connectionsURL).Send(*c.createData).End()
-			require.Equal(t, c.statusCreate, resp.StatusCode, "case %d: %s", k, body)
-			if resp.StatusCode != http.StatusOK {
-				return
-			}
+		resp, body, _ := request.Post(connectionsURL).Send(*c.createData).End()
+		require.Equal(t, c.statusCreate, resp.StatusCode, "case %d: %s", k, body)
+		if resp.StatusCode != http.StatusOK {
+			continue
+		}
 
-			var conn DefaultConnection
-			assert.Nil(t, json.Unmarshal([]byte(body), &conn))
+		var conn DefaultConnection
+		assert.Nil(t, json.Unmarshal([]byte(body), &conn))
 
-			resp, body, _ = request.Get(connectionsURL).End()
-			require.Equal(t, c.statusGet, resp.StatusCode, "case %d: %s", k, body)
-			if resp.StatusCode != http.StatusOK {
-				return
-			}
+		resp, body, _ = request.Get(connectionsURL).End()
+		require.Equal(t, c.statusGet, resp.StatusCode, "case %d: %s", k, body)
+		if resp.StatusCode != http.StatusOK {
+			continue
+		}
 
-			resp, body, _ = request.Get(fmt.Sprintf("%s/oauth2/connections/%s", ts.URL, conn.ID)).End()
-			require.Equal(t, c.statusGet, resp.StatusCode, "case %d: %s", k, body)
-			if resp.StatusCode != http.StatusOK {
-				return
-			}
+		resp, body, _ = request.Get(fmt.Sprintf("%s/oauth2/connections/%s", ts.URL, conn.ID)).End()
+		require.Equal(t, c.statusGet, resp.StatusCode, "case %d: %s", k, body)
+		if resp.StatusCode != http.StatusOK {
+			continue
+		}
 
-			resp, body, _ = request.Post(connectionsURL).Send(*c.createData).End()
-			require.Equal(t, http.StatusInternalServerError, resp.StatusCode, "case %d: %s", k, body)
+		resp, body, _ = request.Post(connectionsURL).Send(*c.createData).End()
+		require.Equal(t, http.StatusInternalServerError, resp.StatusCode, "case %d: %s", k, body)
 
-			resp, body, _ = request.Delete(fmt.Sprintf("%s/oauth2/connections/%s", ts.URL, conn.ID)).End()
-			require.Equal(t, c.statusDelete, resp.StatusCode, "case %d: %s", k, body)
-			if resp.StatusCode != http.StatusAccepted {
-				return
-			}
+		resp, body, _ = request.Delete(fmt.Sprintf("%s/oauth2/connections/%s", ts.URL, conn.ID)).End()
+		require.Equal(t, c.statusDelete, resp.StatusCode, "case %d: %s", k, body)
+		if resp.StatusCode != http.StatusAccepted {
+			continue
+		}
 
-			resp, body, _ = request.Get(fmt.Sprintf("%s/oauth2/connections/%s", ts.URL, conn.ID)).End()
-			require.Equal(t, c.statusGetAfterDelete, resp.StatusCode, "case %d: %s", k, body)
+		resp, body, _ = request.Get(fmt.Sprintf("%s/oauth2/connections/%s", ts.URL, conn.ID)).End()
+		require.Equal(t, c.statusGetAfterDelete, resp.StatusCode, "case %d: %s", k, body)
 
-			resp, body, _ = request.Delete(fmt.Sprintf("%s/oauth2/connections/%s", ts.URL, conn.ID)).End()
-			require.Equal(t, http.StatusNotFound, resp.StatusCode, "case %d: %s", k, body)
-		}()
+		resp, body, _ = request.Delete(fmt.Sprintf("%s/oauth2/connections/%s", ts.URL, conn.ID)).End()
+		require.Equal(t, http.StatusNotFound, resp.StatusCode, "case %d: %s", k, body)
 	}
 }

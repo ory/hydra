@@ -2,18 +2,9 @@ package handler_test
 
 import (
 	"encoding/json"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/RangelReale/osin"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/gorilla/mux"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/dockertest"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/guard"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy"
-	ppg "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy/postgres"
-	opg "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/osin-storage/storage/postgres"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/assert"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/require"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/oauth2"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/oauth2/clientcredentials"
+	"github.com/RangelReale/osin"
+	"github.com/gorilla/mux"
+	"github.com/ory-am/dockertest"
 	acpg "github.com/ory-am/hydra/account/postgres"
 	"github.com/ory-am/hydra/hash"
 	"github.com/ory-am/hydra/jwt"
@@ -21,6 +12,16 @@ import (
 	cpg "github.com/ory-am/hydra/oauth/connection/postgres"
 	. "github.com/ory-am/hydra/oauth/handler"
 	"github.com/ory-am/hydra/oauth/provider"
+	oapg "github.com/ory-am/hydra/oauth/provider/storage/postgres"
+	"github.com/ory-am/ladon/guard"
+	"github.com/ory-am/ladon/policy"
+	ppg "github.com/ory-am/ladon/policy/postgres"
+	opg "github.com/ory-am/osin-storage/storage/postgres"
+	"github.com/pborman/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/clientcredentials"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -45,6 +46,7 @@ func TestMain(m *testing.M) {
 	policyStore := ppg.New(db)
 	osinStore := opg.New(db)
 	connectionStore := cpg.New(db)
+	stateStore := oapg.New(db)
 	registry := provider.NewRegistry([]provider.Provider{&prov{}})
 	j := jwt.New([]byte(jwt.TestCertificates[0][1]), []byte(jwt.TestCertificates[1][1]))
 
@@ -56,6 +58,8 @@ func TestMain(m *testing.M) {
 		log.Fatalf("Could not set up schemas: %v", err)
 	} else if err := osinStore.CreateSchemas(); err != nil {
 		log.Fatalf("Could not set up schemas: %v", err)
+	} else if err := stateStore.CreateSchemas(); err != nil {
+		log.Fatalf("Could not set up schemas: %v", err)
 	}
 
 	handler = &Handler{
@@ -66,6 +70,7 @@ func TestMain(m *testing.M) {
 		Policies:    policyStore,
 		Guard:       new(guard.Guard),
 		Connections: connectionStore,
+		States:      stateStore,
 		Providers:   registry,
 		Issuer:      "hydra",
 		Audience:    "tests",
@@ -139,7 +144,7 @@ func TestAuthCode(t *testing.T) {
 	for _, c := range []struct{ config *oauth2.Config }{{configs["working"]}} {
 		config := *c.config
 		config.Endpoint = oauth2.Endpoint{AuthURL: ts.URL + "/oauth2/auth?provider=mockprovider", TokenURL: ts.URL + "/oauth2/token"}
-		authURL := config.AuthCodeURL("state")
+		authURL := config.AuthCodeURL(uuid.New())
 		t.Logf("Auth code URL: %s", authURL)
 
 		resp, err := http.Get(authURL)

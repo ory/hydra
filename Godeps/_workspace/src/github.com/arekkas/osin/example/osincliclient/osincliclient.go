@@ -6,9 +6,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/RangelReale/osin"
+	"github.com/RangelReale/osin/example"
 	"github.com/RangelReale/osincli"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/RangelReale/osin"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/RangelReale/osin/example"
 	"net/http"
 )
 

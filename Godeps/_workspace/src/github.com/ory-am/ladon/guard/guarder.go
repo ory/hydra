@@ -1,8 +1,8 @@
 package guard
 
 import (
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/guard/operator"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy"
+	"github.com/ory-am/ladon/guard/operator"
+	"github.com/ory-am/ladon/policy"
 )
 
 // Guarder is responsible for deciding if the subject s has permission p on resource r.

@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"strings"
 
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
+	"github.com/pborman/uuid"
 )
 
 // AuthorizeTokenGenDefault is the default authorization token generator

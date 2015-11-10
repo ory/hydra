@@ -1,46 +1,53 @@
 package sequence
 
 import (
-    "crypto/rand"
-    "io"
-    "math"
-    "math/big"
+	"crypto/rand"
+	"io"
+	"math"
+	"math/big"
 )
 
 var rander = rand.Reader // random function
 
+var AlphaNum = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+var Alpha = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+var AlphaLowerNum = []rune("abcdefghijklmnopqrstuvwxyz0123456789")
+var AlphaUpperNum = []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+var AlphaLower = []rune("abcdefghijklmnopqrstuvwxyz")
+var AlphaUpper = []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+var Numeric = []rune("0123456789")
+
 func RuneSequence(l int, allowedRunes []rune) (seq []rune, err error) {
-    c := big.NewInt(int64(len(allowedRunes)))
-    seq = make([]rune, l)
+	c := big.NewInt(int64(len(allowedRunes)))
+	seq = make([]rune, l)
 
+	for i := 0; i < l; i++ {
+		r, err := rand.Int(rander, c)
+		if err != nil {
+			return seq, err
+		}
+		rn := allowedRunes[r.Uint64()]
+		seq[i] = rn
+	}
 
-    for i := 0; i < l; i++ {
-        r, err := rand.Int(rander, c)
-        if err != nil {
-            return seq, err
-        }
-        rn := allowedRunes[r.Uint64()]
-        seq[i] = rn
-    }
-
-    return seq, nil
+	return seq, nil
 }
 
 // randomBits completely fills slice b with random data.
 func randomBits(b []byte) {
-    if _, err := io.ReadFull(rander, b); err != nil {
-        panic(err.Error()) // rand should never fail
-    }
+	if _, err := io.ReadFull(rander, b); err != nil {
+		panic(err.Error()) // rand should never fail
+	}
 }
 
 func runesCap(r []rune, l int) int64 {
-    rs := make(map[rune]bool)
-    p := float64(0)
-    for _, v := range r {
-        if _, ok := rs[v]; !ok {
-            p++
-        }
-    }
+	rs := make(map[rune]bool)
+	p := float64(0)
+	for _, v := range r {
+		if _, ok := rs[v]; !ok {
+			p++
+		}
+	}
 
-    return int64(math.Pow(p, float64(l)) - 1)
+	return int64(math.Pow(p, float64(l)) - 1)
 }

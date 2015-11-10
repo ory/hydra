@@ -18,7 +18,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/net/publicsuffix"
+	"golang.org/x/net/publicsuffix"
 )
 
 type Request *http.Request

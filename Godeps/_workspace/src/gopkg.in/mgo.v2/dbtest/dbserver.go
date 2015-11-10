@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ory-am/hydra/Godeps/_workspace/src/gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2"
 	"gopkg.in/tomb.v2"
 )
 

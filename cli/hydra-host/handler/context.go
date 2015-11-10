@@ -2,13 +2,13 @@ package handler
 
 import (
 	"database/sql"
-	policies "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy/postgres"
-	osins "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/osin-storage/storage/postgres"
+	policies "github.com/ory-am/ladon/policy/postgres"
+	osins "github.com/ory-am/osin-storage/storage/postgres"
 	accounts "github.com/ory-am/hydra/account/postgres"
 	connections "github.com/ory-am/hydra/oauth/connection/postgres"
 
-	log "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/Sirupsen/logrus"
-	_ "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/lib/pq"
+	log "github.com/Sirupsen/logrus"
+	_ "github.com/lib/pq"
 	"github.com/ory-am/hydra/hash"
 	"strconv"
 )

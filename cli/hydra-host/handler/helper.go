@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
+	"github.com/ory-am/ladon/policy"
+	"github.com/pborman/uuid"
 )
 
 func superUserPolicy(subject string) policy.Policy {

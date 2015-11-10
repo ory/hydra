@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	. "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy"
+	. "github.com/ory-am/ladon/policy"
 	"log"
 )
 

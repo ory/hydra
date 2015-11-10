@@ -1,7 +1,7 @@
 // Storage defines an interface, which all osin-storage implementations are going to support.
 package storage
 
-import "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/RangelReale/osin"
+import "github.com/RangelReale/osin"
 
 // Storage extends github.com/RangelReale/osin.Storage with create, update and delete methods for clients.
 type Storage interface {

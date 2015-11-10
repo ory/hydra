@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/lib/pq/oid"
+	"github.com/lib/pq/oid"
 )
 
 func binaryEncode(parameterStatus *parameterStatus, x interface{}) []byte {

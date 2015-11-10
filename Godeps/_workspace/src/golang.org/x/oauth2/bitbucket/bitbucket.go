@@ -6,7 +6,7 @@
 package bitbucket
 
 import (
-	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/oauth2"
+	"golang.org/x/oauth2"
 )
 
 // Endpoint is Bitbucket's OAuth 2.0 endpoint.

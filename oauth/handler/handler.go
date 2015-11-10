@@ -3,19 +3,20 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/RangelReale/osin"
-	log "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/Sirupsen/logrus"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/go-errors/errors"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/gorilla/mux"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/guard"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy"
-	osinStore "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/osin-storage/storage"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
+	"github.com/RangelReale/osin"
+	log "github.com/Sirupsen/logrus"
+	"github.com/go-errors/errors"
+	"github.com/gorilla/mux"
 	"github.com/ory-am/hydra/account"
 	"github.com/ory-am/hydra/jwt"
 	"github.com/ory-am/hydra/middleware"
 	"github.com/ory-am/hydra/oauth/connection"
 	"github.com/ory-am/hydra/oauth/provider"
+	"github.com/ory-am/hydra/oauth/provider/storage"
+	"github.com/ory-am/ladon/guard"
+	"github.com/ory-am/ladon/policy"
+	osinStore "github.com/ory-am/osin-storage/storage"
+	"github.com/pborman/uuid"
 	"net/http"
 	"time"
 )
@@ -45,6 +46,7 @@ type Handler struct {
 	Policies    policy.Storage
 	Guard       guard.Guarder
 	Connections connection.Storage
+	States      storage.Storage
 	Providers   provider.Registry
 	Issuer      string
 	Audience    string
@@ -183,23 +185,48 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
 	resp := h.server.NewResponse()
 	defer resp.Close()
+
+	code := r.Form.Get("code")
+	state := r.Form.Get("state")
+	if code != "" {
+		if stateData, err := h.States.GetStateData(state); err != nil {
+			// Something else went wrong
+			http.Error(w, fmt.Sprintf("Could not persist state data: %s", err), http.StatusInternalServerError)
+			return
+		} else {
+			r.Form = stateData.ToURLValues()
+		}
+	}
+
 	if ar := h.server.HandleAuthorizeRequest(resp, r); ar != nil {
 		// For now, a provider must be given.
 		// TODO there should be a fallback provider which is a redirect to the login endpoint. This should be configurable by env var.
 		// Let's see if this is a valid provider. If not, return an error.
-		provider, err := h.Providers.Find(r.URL.Query().Get("provider"))
+		provider, err := h.Providers.Find(r.Form.Get("provider"))
 		if err != nil {
 			http.Error(w, fmt.Sprintf(`Provider "%s" not known.`, err), http.StatusBadRequest)
 			return
 		}
 
-		// This could be made configurable with `connection.GetCodeKeyName()`
-		code := r.URL.Query().Get("access_code")
 		if code == "" {
+			stateData := new(storage.StateData)
+			if err := stateData.FromAuthorizeRequest(ar, provider.GetID()); err != nil {
+				// Something else went wrong
+				http.Error(w, fmt.Sprintf("Could not hydrate state data: %s", err), http.StatusInternalServerError)
+				return
+			}
+			stateData.ExpireInOneHour()
+			if err := h.States.SaveStateData(stateData); err != nil {
+				// Something else went wrong
+				http.Error(w, fmt.Sprintf("Could not persist state data: %s", err), http.StatusInternalServerError)
+				return
+			}
+
 			// If no code was given we have to initiate the provider's authorization workflow
-			url := provider.GetAuthCodeURL(ar)
+			url := provider.GetAuthCodeURL(stateData.ID)
 			http.Redirect(w, r, url, http.StatusFound)
 			return
 		}

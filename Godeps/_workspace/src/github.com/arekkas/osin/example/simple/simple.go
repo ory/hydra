@@ -5,11 +5,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/RangelReale/osin"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/RangelReale/osin/example"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/env"
+	"github.com/RangelReale/osin"
+	"github.com/RangelReale/osin/example"
 	"net/http"
 	"net/url"
+	"github.com/ory-am/common/env"
 )
 
 func main() {
@@ -124,5 +124,5 @@ func main() {
 	})
 
 	port := env.Getenv("PORT", "14000")
-	http.ListenAndServe(":"+port, nil)
+	http.ListenAndServe(":" + port, nil)
 }

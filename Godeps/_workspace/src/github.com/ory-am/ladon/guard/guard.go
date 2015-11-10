@@ -2,9 +2,9 @@ package guard
 
 import (
 	"fmt"
-	log "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/Sirupsen/logrus"
-	. "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/guard/operator"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy"
+	log "github.com/Sirupsen/logrus"
+	. "github.com/ory-am/ladon/guard/operator"
+	"github.com/ory-am/ladon/policy"
 	"regexp"
 	"strings"
 )

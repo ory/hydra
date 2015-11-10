@@ -2,7 +2,7 @@ package handler
 
 import (
 	"fmt"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/env"
+	"github.com/ory-am/common/env"
 	"github.com/ory-am/hydra/oauth/provider"
 	"github.com/ory-am/hydra/oauth/provider/dropbox"
 )
@@ -18,7 +18,7 @@ var (
 			"dropbox",
 			env.Getenv("DROPBOX_CLIENT", ""),
 			env.Getenv("DROPBOX_SECRET", ""),
-			env.Getenv("DROPBOX_CALLBACK", ""),
+			env.Getenv("DROPBOX_CALLBACK", "http://localhost:8080/oauth2/auth"),
 		),
 	}
 	bcryptWorkFactor = env.Getenv("BCRYPT_WORKFACTOR", "10")

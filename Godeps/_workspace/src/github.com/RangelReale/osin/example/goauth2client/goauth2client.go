@@ -7,8 +7,8 @@ package main
 import (
 	"code.google.com/p/goauth2/oauth"
 	"fmt"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/RangelReale/osin"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/RangelReale/osin/example"
+	"github.com/RangelReale/osin"
+	"github.com/RangelReale/osin/example"
 	"net/http"
 )
 

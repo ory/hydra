@@ -29,16 +29,16 @@ import (
 	"strings"
 	"time"
 
+	"camlistore.org/pkg/netutil"
 	"database/sql"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/camlistore.org/pkg/netutil"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/env"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/gopkg.in/mgo.v2"
+	"github.com/ory-am/common/env"
+	"github.com/pborman/uuid"
+	"gopkg.in/mgo.v2"
 	"math/rand"
 	"regexp"
 
-	_ "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/go-sql-driver/mysql"
-	_ "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/lib/pq"
+	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 )
 
 // Debug, if set, prevents any container from being removed.

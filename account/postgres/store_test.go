@@ -2,8 +2,8 @@ package postgres
 
 import (
 	"database/sql"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/dockertest"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/assert"
+	"github.com/ory-am/dockertest"
+	"github.com/stretchr/testify/assert"
 	"github.com/ory-am/hydra/hash"
 	"log"
 	"os"

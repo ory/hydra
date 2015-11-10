@@ -3,7 +3,7 @@ package example
 import (
 	"errors"
 	"fmt"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/RangelReale/osin"
+	"github.com/RangelReale/osin"
 )
 
 type TestStorage struct {

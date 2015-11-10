@@ -1,11 +1,10 @@
 package handler_test
 
 import (
-	"bytes"
-	"github.com/RangelReale/osin"
+	"fmt"
 	"github.com/go-errors/errors"
-	"golang.org/x/oauth2"
 	"github.com/ory-am/hydra/oauth/provider"
+	"golang.org/x/oauth2"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -19,29 +18,8 @@ type userAuth struct {
 	Password string `json:"password"`
 }
 
-func (p *prov) GetAuthCodeURL(ar *osin.AuthorizeRequest) string {
-	redirect, _ := url.Parse("/oauth2/auth")
-	q := redirect.Query()
-	q.Set(provider.ProviderQueryParam, p.GetID())
-	q.Set(provider.RedirectQueryParam, ar.RedirectUri)
-	q.Set(provider.ClientQueryParam, ar.Client.GetId())
-	q.Set(provider.ScopeQueryParam, ar.Scope)
-	q.Set(provider.StateQueryParam, ar.State)
-	q.Set(provider.TypeQueryParam, string(ar.Type))
-	redirect.RawQuery = q.Encode()
-
-	var buf bytes.Buffer
-	buf.WriteString("/remote/oauth2/auth")
-	v := url.Values{
-		"response_type": {"code"},
-		"client_id":     {"someclient"},
-		"redirect_uri":  {redirect.String()},
-		"scope":         {""},
-		"state":         {ar.State},
-	}
-	buf.WriteByte('?')
-	buf.WriteString(v.Encode())
-	return buf.String()
+func (p *prov) GetAuthCodeURL(state string) string {
+	return fmt.Sprintf("/remote/oauth2/auth?response_type=code&client_id=someclient&state=%s&redirect_uri=%s", state, `%2Foauth2%2Fauth`)
 }
 
 func (p *prov) Exchange(code string) (provider.Session, error) {
@@ -65,16 +43,10 @@ func authHandlerMock(t *testing.T, ts *httptest.Server) func(w http.ResponseWrit
 		redirect, _ := url.QueryUnescape(r.URL.Query().Get("redirect_uri"))
 		parsed, _ := url.Parse(redirect)
 
-		q := parsed.Query()
-		q2 := url.Values{}
-		q2.Set("provider", q.Get(provider.ProviderQueryParam))
-		q2.Set("redirect_uri", q.Get(provider.RedirectQueryParam))
-		q2.Set("client_id", q.Get(provider.ClientQueryParam))
-		q2.Set("scope", q.Get(provider.ScopeQueryParam))
-		q2.Set("state", q.Get(provider.StateQueryParam))
-		q2.Set("response_type", q.Get(provider.TypeQueryParam))
-		q2.Set("access_code", "code")
-		parsed.RawQuery = q2.Encode()
+		q := url.Values{}
+		q.Set("state", r.URL.Query().Get("state"))
+		q.Set("code", "code")
+		parsed.RawQuery = q.Encode()
 
 		t.Logf("Redirecting to: %s", ts.URL+parsed.String())
 		http.Redirect(w, r, ts.URL+parsed.String(), http.StatusFound)

@@ -2,10 +2,11 @@ package handler
 
 import (
 	"database/sql"
-	policies "github.com/ory-am/ladon/policy/postgres"
-	osins "github.com/ory-am/osin-storage/storage/postgres"
 	accounts "github.com/ory-am/hydra/account/postgres"
 	connections "github.com/ory-am/hydra/oauth/connection/postgres"
+	states "github.com/ory-am/hydra/oauth/provider/storage/postgres"
+	policies "github.com/ory-am/ladon/policy/postgres"
+	osins "github.com/ory-am/osin-storage/storage/postgres"
 
 	log "github.com/Sirupsen/logrus"
 	_ "github.com/lib/pq"
@@ -19,6 +20,7 @@ type Context struct {
 	Connections *connections.Store
 	Policies    *policies.Store
 	Osins       *osins.Storage
+	States      *states.Store
 }
 
 func (c *Context) Start() {
@@ -39,6 +41,7 @@ func (c *Context) Start() {
 	c.Connections = connections.New(db)
 	c.Policies = policies.New(db)
 	c.Osins = osins.New(db)
+	c.States = states.New(db)
 
 	if err := c.Accounts.CreateSchemas(); err != nil {
 		log.Fatal(err)
@@ -47,6 +50,8 @@ func (c *Context) Start() {
 	} else if err := c.Policies.CreateSchemas(); err != nil {
 		log.Fatal(err)
 	} else if err := c.Osins.CreateSchemas(); err != nil {
+		log.Fatal(err)
+	} else if err := c.States.CreateSchemas(); err != nil {
 		log.Fatal(err)
 	}
 }

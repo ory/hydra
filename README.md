@@ -153,10 +153,16 @@ USAGE:
 
 ```
 NAME:
-   D:\Local\Temp\go-build012713466\command-line-arguments\_obj\exe\main.exe client - client actions
+   hydra-host client create - Create a new client.
 
 USAGE:
-   D:\Local\Temp\go-build012713466\command-line-arguments\_obj\exe\main.exe client [arguments...]
+   hydra-host client create [command options] [arguments...]
+
+OPTIONS:
+   -i, --id             Set client's id
+   -s, --secret         The client's secret
+   -r, --redirect-url   A list of allowed redirect URLs: https://foobar.com/callback|https://bazbar.com/cb|http://localhost:3000/authcb
+   --as-superuser       Grant superuser privileges to the client
 ```
 
 ### Create user

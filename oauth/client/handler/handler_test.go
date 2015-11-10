@@ -45,10 +45,10 @@ func TestMain(m *testing.M) {
 }
 
 type test struct {
-	subject    string
-	token      jwt.Token
-	policies   []policy.Policy
-	createData payload
+	subject              string
+	token                jwt.Token
+	policies             []policy.Policy
+	createData           payload
 
 	statusGet            int
 	statusCreate         int
@@ -82,37 +82,35 @@ func TestCreateGetDeleteGet(t *testing.T) {
 		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-create"], policies["pass-get"]}, createData: payload{RedirectURIs: "redir"}, statusCreate: http.StatusOK, statusGet: http.StatusOK, statusDelete: http.StatusForbidden},
 		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-all"]}, createData: payload{RedirectURIs: "redir"}, statusCreate: http.StatusOK, statusGet: http.StatusOK, statusDelete: http.StatusAccepted, statusGetAfterDelete: http.StatusNotFound},
 	} {
-		func() {
-			handler := &Handler{s: store, m: mw}
-			router := mux.NewRouter()
-			handler.SetRoutes(router, mockAuthorization(c))
-			ts := httptest.NewServer(router)
-			defer ts.Close()
+		handler := &Handler{s: store, m: mw}
+		router := mux.NewRouter()
+		handler.SetRoutes(router, mockAuthorization(c))
+		ts := httptest.NewServer(router)
+		defer ts.Close()
 
-			request := gorequest.New()
-			resp, body, _ := request.Post(ts.URL + "/clients").Send(c.createData).End()
-			require.Equal(t, c.statusCreate, resp.StatusCode, "case %d: %s", k, body)
-			if resp.StatusCode != http.StatusOK {
-				return
-			}
+		request := gorequest.New()
+		resp, body, _ := request.Post(ts.URL + "/clients").Send(c.createData).End()
+		require.Equal(t, c.statusCreate, resp.StatusCode, "case %d: %s", k, body)
+		if resp.StatusCode != http.StatusOK {
+			continue
+		}
 
-			var client payload
-			json.Unmarshal([]byte(body), &client)
+		var client payload
+		json.Unmarshal([]byte(body), &client)
 
-			resp, body, _ = request.Get(ts.URL + "/clients/" + client.ID).End()
-			require.Equal(t, c.statusGet, resp.StatusCode, "case %d: %s", k, body)
-			if resp.StatusCode != http.StatusOK {
-				return
-			}
+		resp, body, _ = request.Get(ts.URL + "/clients/" + client.ID).End()
+		require.Equal(t, c.statusGet, resp.StatusCode, "case %d: %s", k, body)
+		if resp.StatusCode != http.StatusOK {
+			continue
+		}
 
-			resp, body, _ = request.Delete(ts.URL + "/clients/" + client.ID).End()
-			require.Equal(t, c.statusDelete, resp.StatusCode, "case %d: %s", k, body)
-			if resp.StatusCode != http.StatusAccepted {
-				return
-			}
+		resp, body, _ = request.Delete(ts.URL + "/clients/" + client.ID).End()
+		require.Equal(t, c.statusDelete, resp.StatusCode, "case %d: %s", k, body)
+		if resp.StatusCode != http.StatusAccepted {
+			continue
+		}
 
-			resp, body, _ = request.Get(ts.URL + "/clients/" + client.ID).End()
-			require.Equal(t, c.statusGetAfterDelete, resp.StatusCode, "case %d: %s", k, body)
-		}()
+		resp, body, _ = request.Get(ts.URL + "/clients/" + client.ID).End()
+		require.Equal(t, c.statusGetAfterDelete, resp.StatusCode, "case %d: %s", k, body)
 	}
 }

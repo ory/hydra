@@ -23,4 +23,8 @@ var (
 	}
 	bcryptWorkFactor = env.Getenv("BCRYPT_WORKFACTOR", "10")
 	databaseURL      = env.Getenv("DATABASE_URL", "")
+	locations        = map[string]string{
+		"signUp": env.Getenv("SIGNUP_URL", ""),
+		"signIn": env.Getenv("SIGNIN_URL", ""),
+	}
 )

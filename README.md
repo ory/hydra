@@ -82,13 +82,13 @@ do the following:
 
 ```
 > docker run --name hydra-postgres -e POSTGRES_PASSWORD=secret -p 5432:5432 -d postgres
-> export PG_URL=postgres://postgres:secret@localhost:5432/postgres?sslmode=disable
+> export DATABASE_URL=postgres://postgres:secret@localhost:5432/postgres?sslmode=disable
 ```
 
 *Warning: This uses the postgres database, which is reserved.
 For brevity the guide to creating a new database in Postgres has been skipped.*
 
-#### Run as executable
+### Run as executable
 
 ```
 > go install github.com/ory-am/hydra/cli/hydra-host
@@ -97,7 +97,7 @@ For brevity the guide to creating a new database in Postgres has been skipped.*
 
 *Note: For this to work, $GOPATH/bin [must be in your path](https://golang.org/doc/code.html#GOPATH)*
 
-#### Run from sourcecode
+### Run from sourcecode
 
 ```
 > go get -u github.com/ory-am/hydra
@@ -107,16 +107,22 @@ For brevity the guide to creating a new database in Postgres has been skipped.*
 > go run main.go start
 ```
 
-#### Environment
+### Environment
 
 The CLI currently requires two environment variables:
 
-| Variable | Description | Format | Default |
-| --- | --- | --- | --- |
-| DATABASE_URL | PostgreSQL Database URL | `postgres://user:password@host:port/database` | empty |
-| BCRYPT_WORKFACTOR | BCrypt Strength | number | `10` |
+| Variable          | Description               | Format                                        | Default   |
+| ----------------- | ------------------------- | --------------------------------------------- | --------- |
+| DATABASE_URL      | PostgreSQL Database URL   | `postgres://user:password@host:port/database` | empty     |
+| BCRYPT_WORKFACTOR | BCrypt Strength           | number                                        | `10`      |
+| SIGNUP_URL        | [Sign up URL](#sign-up)   | url                                           | empty     |
+| SIGNIN_URL        | [Sign in URL](#sign-in)   | url                                           | empty     |
+| DROPBOX_CLIENT    | Dropbox Client ID         | string                                        | empty     |
+| DROPBOX_SECRET    | Dropbox Client Secret     | string                                        | empty     |
+| DROPBOX_CALLBACK  | Dropbox Redirect URL      | url                                           | empty     |
 
-#### Usage
+
+### CLI Usage
 
 ```
 NAME:
@@ -139,7 +145,7 @@ GLOBAL OPTIONS:
    --version, -v        print the version
 ```
 
-### Start server
+#### Start server
 
 ```
 NAME:
@@ -149,7 +155,7 @@ USAGE:
    hydra-host start [arguments...]
 ```
 
-### Create client
+#### Create client
 
 ```
 NAME:
@@ -165,7 +171,7 @@ OPTIONS:
    --as-superuser       Grant superuser privileges to the client
 ```
 
-### Create user
+#### Create user
 
 ```
 NAME:
@@ -179,11 +185,44 @@ OPTIONS:
    --as-superuser       grant superuser privileges to the user
 ```
 
-#### API
+### API
 
 The API is loosely described at [apiary](http://docs.hydra6.apiary.io/#).
 
-## Core principles
+## Good to know
+
+This section covers information necessary for understanding how hydra works.
+
+### No templates
+
+Hydra never responds with HTML. There is no way to set up HTML templates for signing in, up or granting access.
+
+### Sign up
+
+Hydra offers capabilities to sign users up. First, a registered client has to acquire an access token through the OAuth2 Workflow.
+Second, the client sets up a user account through the `/accounts` endpoint.
+
+You can set up a environment variable called `SIGNUP_URL` for Hydra to redirect users to,
+when the user successfully authenticated via the OAuth2 Provider Workflow but has not an account in hydra yet.
+If you leave this variable empty, a 401 Unauthorized Error will be shown instead.
+
+### Sign in
+
+Hydra offers capabilities to sign users in. To do so, use the PASSWORD grant type.
+
+You can set up an environment variable called `SIGNIN_URL` for Hydra to redirect users to,
+when a client requests authorization through the `/oauth2/auth` endpoint but is not yet authenticated.
+
+**This feature is not implemented yet.**
+
+### Visually confirm authorization
+
+When a client is not allowed to bypass the authorization screen *("Do you want to grant app XYZ access to your private information?")*,
+he will be redirected to the value of the environment variable `AUTHORIZE_URL`.
+
+**This feature is not implemented yet.**
+
+### Principles
 
 * Authorization and authentication require verbose logging.
 * Logging should *never* include credentials, neither passwords, secrets nor tokens.

@@ -41,17 +41,19 @@ func (c *Core) Start(ctx *cli.Context) {
 	c.connectionHandler = connections.NewHandler(c.Ctx.Connections, m)
 	c.providers = provider.NewRegistry(providers)
 	c.oauthHandler = &oauth.Handler{
-		Accounts:    c.Ctx.Accounts,
-		Policies:    c.Ctx.Policies,
-		Guard:       c.guard,
-		Connections: c.Ctx.Connections,
-		Providers:   c.providers,
-		Issuer:      c.issuer,
-		Audience:    c.audience,
-		JWT:         j,
-		OAuthConfig: oauth.DefaultConfig(),
-		OAuthStore:  c.Ctx.Osins,
-		States:      c.Ctx.States,
+		Accounts:       c.Ctx.Accounts,
+		Policies:       c.Ctx.Policies,
+		Guard:          c.guard,
+		Connections:    c.Ctx.Connections,
+		Providers:      c.providers,
+		Issuer:         c.issuer,
+		Audience:       c.audience,
+		JWT:            j,
+		OAuthConfig:    oauth.DefaultConfig(),
+		OAuthStore:     c.Ctx.Osins,
+		States:         c.Ctx.States,
+		SignUpLocation: locations["signUp"],
+		SignInLocation: locations["signIn"],
 	}
 
 	extractor := m.ExtractAuthentication

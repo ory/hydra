@@ -18,6 +18,7 @@ import (
 	osinStore "github.com/ory-am/osin-storage/storage"
 	"github.com/pborman/uuid"
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -42,15 +43,17 @@ func DefaultConfig() *osin.ServerConfig {
 }
 
 type Handler struct {
-	Accounts    account.Storage
-	Policies    policy.Storage
-	Guard       guard.Guarder
-	Connections connection.Storage
-	States      storage.Storage
-	Providers   provider.Registry
-	Issuer      string
-	Audience    string
-	JWT         *jwt.JWT
+	Accounts       account.Storage
+	Policies       policy.Storage
+	Guard          guard.Guarder
+	Connections    connection.Storage
+	States         storage.Storage
+	Providers      provider.Registry
+	Issuer         string
+	Audience       string
+	JWT            *jwt.JWT
+	SignUpLocation string
+	SignInLocation string
 
 	OAuthConfig *osin.ServerConfig
 	OAuthStore  osinStore.Storage
@@ -232,21 +235,39 @@ func (h *Handler) AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Create a session by exchanging the code for the auth code
-		connection, err := provider.Exchange(code)
+		session, err := provider.Exchange(code)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Could not exchange access code: %s", err), http.StatusUnauthorized)
 			return
 		}
 
-		subject := connection.GetRemoteSubject()
+		subject := session.GetRemoteSubject()
 		user, err := h.Connections.FindByRemoteSubject(provider.GetID(), subject)
-		if err == account.ErrNotFound {
-			// The subject is not linked to any account.
-			http.Error(w, "Provided token is not linked to any existing account.", http.StatusUnauthorized)
+		if err == connection.ErrNotFound {
+			if h.SignUpLocation == "" {
+				// The subject is not linked to any account.
+				http.Error(w, "Provided token is not linked to any existing account.", http.StatusUnauthorized)
+				return
+			}
+
+			redirect, err := url.Parse(h.SignUpLocation)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("Could not parse redirect URL: %s", err), http.StatusInternalServerError)
+				return
+			}
+			query := redirect.Query()
+			query.Add("access_token", session.GetToken().AccessToken)
+			query.Add("refresh_token", session.GetToken().RefreshToken)
+			query.Add("token_type", session.GetToken().TokenType)
+			query.Add("provider", provider.GetID())
+			query.Add("remote_subject", session.GetRemoteSubject())
+			redirect.RawQuery = query.Encode()
+			log.Warnf(`No %s subject one is linked to %s. Redirecting to %s.`, provider.GetID(), subject, redirect.String())
+			http.Redirect(w, r, redirect.String(), http.StatusFound)
 			return
 		} else if err != nil {
 			// Something else went wrong
-			http.Error(w, fmt.Sprintf("Could assert subject claim: %s", err), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Could not assert subject claim: %s", err), http.StatusInternalServerError)
 			return
 		}
 

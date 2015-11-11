@@ -28,7 +28,7 @@ func (s *StateData) IsExpired() bool {
 }
 
 func (s *StateData) FromAuthorizeRequest(ar *osin.AuthorizeRequest, provider string) error {
-	if seq, err := sequence.RuneSequence(10, sequence.AlphaNum); err != nil {
+	if seq, err := sequence.RuneSequence(25, sequence.AlphaNum); err != nil {
 		return err
 	} else {
 		s.ID = string(seq)
@@ -54,5 +54,5 @@ func (s *StateData) ToURLValues() (v url.Values) {
 	v.Set("redirect_uri", s.RedirectURL)
 	v.Set("scope", s.Scope)
 	v.Set("provider", s.Provider)
-	return
+	return v
 }

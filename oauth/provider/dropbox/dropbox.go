@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"github.com/go-errors/errors"
 	. "github.com/ory-am/hydra/oauth/provider"
-	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"io/ioutil"
+	"net/http"
 )
 
 type dropbox struct {
@@ -42,7 +42,7 @@ func New(id, client, secret, redirectURL string) *dropbox {
 			RedirectURL:  redirectURL,
 			Endpoint: oauth2.Endpoint{
 				AuthURL:  "https://www.dropbox.com/1/oauth2/authorize",
-				TokenURL: "https://www.dropbox.com/1/oauth2/token",
+				TokenURL: "https://api.dropbox.com/1/oauth2/token",
 			},
 		},
 	}
@@ -54,8 +54,7 @@ func (d *dropbox) GetAuthCodeURL(state string) string {
 
 func (d *dropbox) Exchange(code string) (Session, error) {
 	conf := *d.conf
-	ctx := context.Background()
-	token, err := conf.Exchange(ctx, code)
+	token, err := conf.Exchange(oauth2.NoContext, code)
 	if err != nil {
 		return nil, err
 	}
@@ -64,9 +63,9 @@ func (d *dropbox) Exchange(code string) (Session, error) {
 		return nil, errors.Errorf("Token is not valid: %v", token)
 	}
 
-	c := conf.Client(ctx, token)
-	rawurl := fmt.Sprintf("%s/%s?%s", d.api, "users/get_current_account", nil)
-	response, err := c.Get(rawurl)
+	c := conf.Client(oauth2.NoContext, token)
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/%s", d.api, "users/get_current_account"), nil)
+	response, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}

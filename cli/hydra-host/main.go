@@ -4,10 +4,13 @@ import (
 	"github.com/codegangsta/cli"
 	. "github.com/ory-am/hydra/cli/hydra-host/handler"
 	"os"
+	//"github.com/ory-am/hydra/cli/hydra-host/templates"
+	//"fmt"
 )
 
 func main() {
 	app := cli.NewApp()
+	app.EnableBashCompletion = true
 	app.Name = "hydra-host"
 	app.Usage = `Dragons guard your resources.`
 
@@ -18,7 +21,7 @@ func main() {
 	app.Commands = []cli.Command{
 		{
 			Name:  "client",
-			Usage: "Client actions",
+			Usage: "Client actions.",
 			Subcommands: []cli.Command{
 				{
 					Name:   "create",
@@ -47,7 +50,7 @@ func main() {
 		},
 		{
 			Name:  "user",
-			Usage: "User actions",
+			Usage: "User actions.",
 			Subcommands: []cli.Command{
 				{
 					Name:      "create",
@@ -69,9 +72,39 @@ func main() {
 		},
 		{
 			Name:   "start",
-			Usage:  "start hydra-host",
+			Usage:  "Start the host service.",
 			Action: co.Start,
 		},
+		/*{
+			Name:  "policy",
+			Usage: "Policy actions.",
+			Subcommands: []cli.Command{
+				{
+					Name:   "grant",
+					ArgsUsage: "<template>",
+					Usage:  `Grant grants various policy templates to subjects.`,
+					Action: cl.Create,
+					Flags: []cli.Flag{
+						cli.StringFlag{
+							Name:  "s, subject",
+							Usage: "Set the subject's id.",
+						},
+						cli.BoolFlag{
+							Name:  "only-if-owner",
+							Usage: "Only allow access if it the subject is also the owner of the resource.",
+						},
+					},
+					BashComplete: func(c *cli.Context) {
+						if len(c.Args()) > 0 {
+							return
+						}
+						for _, t := range templates.Templates {
+							fmt.Println(t)
+						}
+					},
+				},
+			},
+		},*/
 	}
 	app.Run(os.Args)
 }

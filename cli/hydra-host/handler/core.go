@@ -12,6 +12,7 @@ import (
 	"github.com/ory-am/hydra/oauth/provider"
 	policies "github.com/ory-am/hydra/policy/handler"
 	"github.com/ory-am/ladon/guard"
+	"log"
 	"net/http"
 )
 
@@ -33,7 +34,16 @@ type Core struct {
 func (c *Core) Start(ctx *cli.Context) {
 	c.Ctx.Start()
 
-	var private, public []byte
+	private, err := jwt.LoadCertificate(jwtPrivateKeyPath)
+	if err != nil {
+		log.Fatalf("Could not load private key: %s", err)
+	}
+
+	public, err := jwt.LoadCertificate(jwtPublicKeyPath)
+	if err != nil {
+		log.Fatalf("Could not load public key: %s", err)
+	}
+
 	j := jwt.New(private, public)
 	m := middleware.New(c.Ctx.Policies, j)
 	c.accountHandler = accounts.NewHandler(c.Ctx.Accounts, m)

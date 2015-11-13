@@ -2,11 +2,11 @@ package middleware
 
 import (
 	log "github.com/Sirupsen/logrus"
+	hydcon "github.com/ory-am/hydra/context"
+	"github.com/ory-am/hydra/jwt"
 	ladonGuard "github.com/ory-am/ladon/guard"
 	"github.com/ory-am/ladon/policy"
 	"golang.org/x/net/context"
-	hydcon "github.com/ory-am/hydra/context"
-	"github.com/ory-am/hydra/jwt"
 	"net/http"
 )
 
@@ -37,26 +37,44 @@ func (m *Middleware) IsAuthorized(resource, permission string, environment *env)
 
 			policies, err := hydcon.PoliciesFromContext(ctx)
 			if err != nil {
-				log.WithFields(log.Fields{"authorization": "forbidden"}).Warnf(`Policy extraction failed: "%s".`, err)
+				log.WithFields(log.Fields{
+					"authorization": "forbidden",
+					"error":         err,
+				}).Warnf(`Policy extraction failed.`)
 				errorHandler(rw, req, http.StatusForbidden)
 				return
 			}
 
 			subject, err := hydcon.SubjectFromContext(ctx)
 			if err != nil {
-				log.WithFields(log.Fields{"authorization": "forbidden"}).Warnf(`Forbidden! Subject extraction failed: "%s".`, err)
+				log.WithFields(log.Fields{
+					"authorization": "forbidden",
+					"error":         err,
+				}).Warnf(`Subject extraction failed.`)
 				errorHandler(rw, req, http.StatusForbidden)
 				return
 			}
 
 			ok, err := guard.IsGranted(resource, permission, subject, policies, environment.Ctx())
 			if err != nil || !ok {
-				log.WithFields(log.Fields{"authorization": "forbidden"}).Warnf(`Forbidden! Subject "%s" is not being granted access "%s" to resource "%s".`, subject, permission, resource)
+				log.WithFields(log.Fields{
+					"authorization": "forbidden",
+					"error":         err,
+					"valid":         ok,
+					"subject":       subject,
+					"permission":    permission,
+					"resource":      resource,
+				}).Warnf(`Subject is not allowed perform this action on this resource.`)
 				errorHandler(rw, req, http.StatusForbidden)
 				return
 			}
 
-			log.WithFields(log.Fields{"authorization": "success"}).Infof(`Allowed! Granting subject "%s" access "%s" to resource "%s".`, subject, permission, resource)
+			log.WithFields(log.Fields{
+				"authorization": "success",
+				"subject":       subject,
+				"permission":    permission,
+				"resource":      resource,
+			}).Infof(`Access granted.`)
 			next.ServeHTTPContext(ctx, rw, req)
 		})
 	}

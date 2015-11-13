@@ -147,7 +147,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			ar.UserData = jwt.NewClaimsCarrier(uuid.New(), claims.GetSubject(), h.Issuer, h.Audience, time.Now(), time.Now())
+			ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, claims.GetSubject(), h.Audience, time.Now(), time.Now())
 			ar.Authorized = true
 		case osin.REFRESH_TOKEN:
 			data, ok := ar.UserData.(map[string]interface{})
@@ -156,7 +156,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			claims := jwt.ClaimsCarrier(data)
-			ar.UserData = jwt.NewClaimsCarrier(uuid.New(), claims.GetSubject(), h.Issuer, h.Audience, time.Now(), time.Now())
+			ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, claims.GetSubject(), h.Audience, time.Now(), time.Now())
 			ar.Authorized = true
 		case osin.PASSWORD:
 			// TODO if !ar.Client.isAllowedToAuthenticateUser
@@ -164,11 +164,11 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 			// TODO }
 
 			if user, err := h.authenticate(w, r, ar.Username, ar.Password); err == nil {
-				ar.UserData = jwt.NewClaimsCarrier(uuid.New(), user.GetID(), h.Issuer, h.Audience, time.Now(), time.Now())
+				ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, user.GetID(), h.Audience, time.Now(), time.Now())
 				ar.Authorized = true
 			}
 		case osin.CLIENT_CREDENTIALS:
-			ar.UserData = jwt.NewClaimsCarrier(uuid.New(), ar.Client.GetId(), h.Issuer, h.Audience, time.Now(), time.Now())
+			ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, ar.Client.GetId(), h.Audience, time.Now(), time.Now())
 			ar.Authorized = true
 
 			// TODO ASSERTION workflow http://leastprivilege.com/2013/12/23/advanced-oauth2-assertion-flow-why/
@@ -182,6 +182,12 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 		h.server.FinishAccessRequest(resp, r, ar)
 	}
 	if resp.IsError {
+		log.WithFields(log.Fields{
+			"code":    resp.StatusCode,
+			"id":      resp.ErrorId,
+			"message": resp.StatusText,
+			"trace":   resp.InternalError,
+		}).Warnf("Token request failed.")
 		resp.StatusCode = http.StatusUnauthorized
 	}
 	osin.OutputJSON(resp, w, r)
@@ -262,7 +268,11 @@ func (h *Handler) AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 			query.Add("provider", provider.GetID())
 			query.Add("remote_subject", session.GetRemoteSubject())
 			redirect.RawQuery = query.Encode()
-			log.Warnf(`No %s subject one is linked to %s. Redirecting to %s.`, provider.GetID(), subject, redirect.String())
+			log.WithFields(log.Fields{
+				"provider": provider.GetID(),
+				"subject":  subject,
+				"redirect": h.SignUpLocation,
+			}).Warnf(`Remote subject is not linked to any local subject. Redirecting to sign up page.`)
 			http.Redirect(w, r, redirect.String(), http.StatusFound)
 			return
 		} else if err != nil {

@@ -5,9 +5,9 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-errors/errors"
+	hjwt "github.com/ory-am/hydra/jwt"
 	"github.com/ory-am/ladon/policy"
 	"golang.org/x/net/context"
-	hjwt "github.com/ory-am/hydra/jwt"
 	"net/http"
 )
 
@@ -34,7 +34,7 @@ func NewContextFromAuthorization(ctx context.Context, req *http.Request, j *hjwt
 	claims := hjwt.ClaimsCarrier(t.Claims)
 	user := claims.GetSubject()
 	if user == "" {
-		log.Warnf(`sub claim may not be empty, to: "%v".`, t.Claims)
+		log.Warnf(`Sub claim may not be empty, to: "%v".`, t.Claims)
 		return NewContextFromAuthValues(ctx, nil, nil, nil)
 	}
 

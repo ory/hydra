@@ -14,6 +14,6 @@ func WriteJSON(rw http.ResponseWriter, data interface{}) {
 	}
 
 	rw.Header().Set("Content-Type", "application/json")
-	rw.Write(js)
 	rw.WriteHeader(http.StatusOK)
+	rw.Write(js)
 }

@@ -27,4 +27,6 @@ var (
 		"signUp": env.Getenv("SIGNUP_URL", ""),
 		"signIn": env.Getenv("SIGNIN_URL", ""),
 	}
+	jwtPrivateKeyPath = env.Getenv("JWT_PRIVATE_KEY_PATH", "../../example/cert/rs256-private.pem")
+	jwtPublicKeyPath  = env.Getenv("JWT_PUBLIC_KEY_PATH", "../../example/cert/rs256-public.pem")
 )

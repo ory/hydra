@@ -6,17 +6,17 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	"github.com/ory-am/dockertest"
+	hcon "github.com/ory-am/hydra/context"
+	hjwt "github.com/ory-am/hydra/jwt"
+	"github.com/ory-am/hydra/middleware"
+	. "github.com/ory-am/hydra/oauth/connection"
+	"github.com/ory-am/hydra/oauth/connection/postgres"
 	"github.com/ory-am/ladon/policy"
 	"github.com/parnurzeal/gorequest"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
-	hcon "github.com/ory-am/hydra/context"
-	hjwt "github.com/ory-am/hydra/jwt"
-	"github.com/ory-am/hydra/middleware"
-	. "github.com/ory-am/hydra/oauth/connection"
-	"github.com/ory-am/hydra/oauth/connection/postgres"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -40,17 +40,17 @@ func TestMain(m *testing.M) {
 	store = postgres.New(db)
 	mw = &middleware.Middleware{}
 	if err := store.CreateSchemas(); err != nil {
-		log.Fatalf("COuld not create schemas: %s", err)
+		log.Fatalf("Could not create schemas: %s", err)
 	}
 
 	os.Exit(m.Run())
 }
 
 type test struct {
-	subject              string
-	token                jwt.Token
-	policies             []policy.Policy
-	createData           *DefaultConnection
+	subject    string
+	token      jwt.Token
+	policies   []policy.Policy
+	createData *DefaultConnection
 
 	statusCreate         int
 	statusGet            int
@@ -123,7 +123,7 @@ func TestCreateGetDeleteGet(t *testing.T) {
 		defer ts.Close()
 
 		request := gorequest.New()
-		connectionsURL := fmt.Sprintf("%s/oauth2/connections?subject=%s", ts.URL, c.subject)
+		connectionsURL := fmt.Sprintf("%s/oauth2/connections", ts.URL)
 
 		resp, body, _ := request.Post(connectionsURL).Send(*c.createData).End()
 		require.Equal(t, c.statusCreate, resp.StatusCode, "case %d: %s", k, body)

@@ -38,8 +38,7 @@ func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hydcon.ContextHandle
 		extractor,
 		h.m.IsAuthenticated,
 		h.m.IsAuthorized("rn:hydra:accounts", "create", nil),
-	).ThenFunc(h.Create),
-	).Methods("POST")
+	).ThenFunc(h.Create)).Methods("POST")
 
 	r.Handle("/accounts/{id}", hydcon.NewContextAdapter(
 		context.Background(),

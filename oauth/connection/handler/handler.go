@@ -10,12 +10,12 @@ import (
 	"fmt"
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/mux"
-	"github.com/pborman/uuid"
-	"golang.org/x/net/context"
 	hydcon "github.com/ory-am/hydra/context"
 	"github.com/ory-am/hydra/middleware"
 	. "github.com/ory-am/hydra/oauth/connection"
 	. "github.com/ory-am/hydra/pkg"
+	"github.com/pborman/uuid"
+	"golang.org/x/net/context"
 	"net/http"
 )
 
@@ -44,7 +44,7 @@ func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hydcon.ContextHandle
 		extractor,
 		h.m.IsAuthenticated,
 		h.m.IsAuthorized(connectionsPermission, "create", nil),
-	).ThenFunc(h.Create)).Queries("subject", "{subject}").Methods("POST")
+	).ThenFunc(h.Create)).Methods("POST")
 
 	r.Handle("/oauth2/connections", hydcon.NewContextAdapter(
 		context.Background(),
@@ -66,12 +66,6 @@ func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hydcon.ContextHandle
 }
 
 func (h *Handler) Create(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
-	subject, ok := mux.Vars(req)["subject"]
-	if !ok {
-		http.Error(rw, "No subject given.", http.StatusBadRequest)
-		return
-	}
-
 	var conn DefaultConnection
 	decoder := json.NewDecoder(req.Body)
 	if err := decoder.Decode(&conn); err != nil {
@@ -89,7 +83,6 @@ func (h *Handler) Create(ctx context.Context, rw http.ResponseWriter, req *http.
 	}
 
 	conn.ID = uuid.New()
-	conn.LocalSubject = subject
 	if err := h.s.Create(&conn); err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return

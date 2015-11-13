@@ -30,7 +30,7 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	c, db, err := dockertest.OpenPostgreSQLContainerConnection(15, time.Second)
+	c, db, err := dockertest.OpenPostgreSQLContainerConnection(15, 5*time.Second)
 	if err != nil {
 		log.Fatalf("Could not connect to database: %s", err)
 	}

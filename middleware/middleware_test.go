@@ -13,10 +13,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
 
-	. "github.com/ory-am/ladon/policy"
 	hcon "github.com/ory-am/hydra/context"
 	hjwt "github.com/ory-am/hydra/jwt"
 	. "github.com/ory-am/hydra/middleware"
+	. "github.com/ory-am/ladon/policy"
 )
 
 type test struct {
@@ -86,7 +86,7 @@ var cases = []test{
 		token:   &jwt.Token{Valid: true},
 		owner:   "max",
 		policies: []Policy{
-			&DefaultPolicy{"", "", []string{".*"}, AllowAccess, []string{"/articles/74251"}, []string{"get"}, []Condition{
+			&DefaultPolicy{"", "", []string{"<.*>"}, AllowAccess, []string{"/articles/74251"}, []string{"get"}, []Condition{
 				&DefaultCondition{Operator: "SubjectIsOwner"},
 			}},
 		},
@@ -98,7 +98,7 @@ var cases = []test{
 		token:   &jwt.Token{Valid: true},
 		owner:   "max",
 		policies: []Policy{
-			&DefaultPolicy{"", "", []string{".*"}, AllowAccess, []string{"/articles/74251"}, []string{"get"}, []Condition{
+			&DefaultPolicy{"", "", []string{"<.*>"}, AllowAccess, []string{"/articles/74251"}, []string{"get"}, []Condition{
 				&DefaultCondition{Operator: "SubjectIsNotOwner"},
 			}},
 		},
@@ -110,7 +110,7 @@ var cases = []test{
 		token:   &jwt.Token{Valid: true},
 		owner:   "max",
 		policies: []Policy{
-			&DefaultPolicy{"", "", []string{".*"}, AllowAccess, []string{"/articles/74251"}, []string{"get"}, []Condition{
+			&DefaultPolicy{"", "", []string{"<.*>"}, AllowAccess, []string{"/articles/74251"}, []string{"get"}, []Condition{
 				&DefaultCondition{Operator: "ThisOperatorDoesNotExist"},
 			}},
 		},

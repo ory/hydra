@@ -70,10 +70,10 @@ func mockAuthorization(c test) func(h hcon.ContextHandler) hcon.ContextHandler {
 }
 
 var policies = map[string]policy.Policy{
-	"pass-all":    &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:oauth2:connections.*"}, []string{".*"}, nil},
-	"pass-create": &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:oauth2:connections.*"}, []string{"create"}, nil},
-	"pass-get":    &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:oauth2:connections.*"}, []string{"get"}, nil},
-	"pass-delete": &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:oauth2:connections.*"}, []string{"delete"}, nil},
+	"pass-all":    &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:oauth2:connections<.*>"}, []string{"<.*>"}, nil},
+	"pass-create": &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:oauth2:connections<.*>"}, []string{"create"}, nil},
+	"pass-get":    &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:oauth2:connections<.*>"}, []string{"get"}, nil},
+	"pass-delete": &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:oauth2:connections<.*>"}, []string{"delete"}, nil},
 	"fail":        &policy.DefaultPolicy{},
 }
 
@@ -134,7 +134,7 @@ func TestCreateGetDeleteGet(t *testing.T) {
 		var conn DefaultConnection
 		assert.Nil(t, json.Unmarshal([]byte(body), &conn))
 
-		resp, body, _ = request.Get(connectionsURL).End()
+		resp, body, _ = request.Get(connectionsURL + "?subject=" + c.subject).End()
 		require.Equal(t, c.statusGet, resp.StatusCode, "case %d: %s", k, body)
 		if resp.StatusCode != http.StatusOK {
 			continue

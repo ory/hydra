@@ -90,12 +90,12 @@ var policies = map[string][]policy.Policy{
 	"allow-create": {&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:accounts"}, []string{"create"}, nil}},
 	"allow-create-get": {
 		&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:accounts"}, []string{"create"}, nil},
-		&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{".*"}, []string{"get"}, nil},
+		&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"<.*>"}, []string{"get"}, nil},
 	},
 	"allow-all": {
 		&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:accounts"}, []string{"create"}, nil},
-		&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:accounts:.*"}, []string{"get"}, nil},
-		&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:accounts:.*"}, []string{"delete"}, nil},
+		&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:accounts:<.*>"}, []string{"get"}, nil},
+		&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:accounts:<.*>"}, []string{"delete"}, nil},
 	},
 	"empty": {},
 }

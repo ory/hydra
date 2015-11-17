@@ -8,7 +8,7 @@ import (
 	"github.com/ory-am/hydra/hash"
 )
 
-const accountSchema = `CREATE TABLE IF NOT EXISTS account (
+const accountSchema = `CREATE TABLE IF NOT EXISTS hydra_account (
 	id           text NOT NULL PRIMARY KEY,
 	email 		 text NOT NULL UNIQUE,
 	password     text NOT NULL,
@@ -42,7 +42,7 @@ func (s *Store) Create(id, email, password, data string) (account.Account, error
 	}
 
 	// Execute SQL statement
-	_, err = s.db.Exec("INSERT INTO account (id, email, password, data) VALUES ($1, $2, $3, $4)", id, email, password, data)
+	_, err = s.db.Exec("INSERT INTO hydra_account (id, email, password, data) VALUES ($1, $2, $3, $4)", id, email, password, data)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (s *Store) Create(id, email, password, data string) (account.Account, error
 func (s *Store) Get(id string) (account.Account, error) {
 	var a account.DefaultAccount
 	// Query account
-	row := s.db.QueryRow("SELECT id, email, password, data FROM account WHERE id=$1 LIMIT 1", id)
+	row := s.db.QueryRow("SELECT id, email, password, data FROM hydra_account WHERE id=$1 LIMIT 1", id)
 
 	// Hydrate struct with data
 	if err := row.Scan(&a.ID, &a.Email, &a.Password, &a.Data); err == sql.ErrNoRows {
@@ -77,7 +77,7 @@ func (s *Store) UpdatePassword(id, oldPassword, newPassword string) (account.Acc
 	}
 
 	// Execute SQL statement
-	if _, err = s.db.Exec("UPDATE account SET (password) = ($2) WHERE id=$1", id, newPassword); err != nil {
+	if _, err = s.db.Exec("UPDATE hydra_account SET (password) = ($2) WHERE id=$1", id, newPassword); err != nil {
 		return nil, err
 	}
 
@@ -91,7 +91,7 @@ func (s *Store) UpdateEmail(id, email, password string) (account.Account, error)
 	}
 
 	// Execute SQL statement
-	if _, err = s.db.Exec("UPDATE account SET (email) = ($2) WHERE id=$1", id, email); err != nil {
+	if _, err = s.db.Exec("UPDATE hydra_account SET (email) = ($2) WHERE id=$1", id, email); err != nil {
 		return nil, err
 	}
 
@@ -99,14 +99,14 @@ func (s *Store) UpdateEmail(id, email, password string) (account.Account, error)
 }
 
 func (s *Store) Delete(id string) (err error) {
-	_, err = s.db.Exec("DELETE FROM account WHERE id=$1", id)
+	_, err = s.db.Exec("DELETE FROM hydra_account WHERE id=$1", id)
 	return err
 }
 
 func (s *Store) Authenticate(email, password string) (account.Account, error) {
 	var a account.DefaultAccount
 	// Query account
-	row := s.db.QueryRow("SELECT id, email, password, data FROM account WHERE email=$1", email)
+	row := s.db.QueryRow("SELECT id, email, password, data FROM hydra_account WHERE email=$1", email)
 
 	// Hydrate struct with data
 	if err := row.Scan(&a.ID, &a.Email, &a.Password, &a.Data); err != nil {
@@ -123,7 +123,7 @@ func (s *Store) Authenticate(email, password string) (account.Account, error) {
 
 func (s *Store) UpdateData(id string, data string) (account.Account, error) {
 	// Execute SQL statement
-	if _, err := s.db.Exec("UPDATE account SET (data) = ($2) WHERE id=$1", id, data); err != nil {
+	if _, err := s.db.Exec("UPDATE hydra_account SET (data) = ($2) WHERE id=$1", id, data); err != nil {
 		return nil, err
 	}
 

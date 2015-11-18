@@ -6,26 +6,26 @@ import (
 	"github.com/arekkas/osin"
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/mux"
+	chd "github.com/ory-am/common/handler"
 	"github.com/ory-am/common/rand/sequence"
+	"github.com/ory-am/hydra/middleware"
+	. "github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/osin-storage/storage"
 	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
-	hydcon "github.com/ory-am/hydra/context"
-	"github.com/ory-am/hydra/middleware"
-	. "github.com/ory-am/hydra/pkg"
 	"net/http"
 )
 
 type Handler struct {
 	s storage.Storage
-	m *middleware.Middleware
+	m middleware.Middleware
 }
 
 func permission(id string) string {
 	return fmt.Sprintf("rn:hydra:clients:%s", id)
 }
 
-func NewHandler(s storage.Storage, m *middleware.Middleware) *Handler {
+func NewHandler(s storage.Storage, m middleware.Middleware) *Handler {
 	return &Handler{s, m}
 }
 
@@ -35,21 +35,21 @@ type payload struct {
 	RedirectURIs string `valid:"required", json:"redirectURIs"`
 }
 
-func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hydcon.ContextHandler) hydcon.ContextHandler) {
-	r.Handle("/clients", hydcon.NewContextAdapter(
+func (h *Handler) SetRoutes(r *mux.Router, extractor func(h chd.ContextHandler) chd.ContextHandler) {
+	r.Handle("/clients", chd.NewContextAdapter(
 		context.Background(),
 		extractor,
 		h.m.IsAuthenticated,
 		h.m.IsAuthorized("rn:hydra:clients", "create", nil),
 	).ThenFunc(h.Create)).Methods("POST")
 
-	r.Handle("/clients/{id}", hydcon.NewContextAdapter(
+	r.Handle("/clients/{id}", chd.NewContextAdapter(
 		context.Background(),
 		extractor,
 		h.m.IsAuthenticated,
 	).ThenFunc(h.Get)).Methods("GET")
 
-	r.Handle("/clients/{id}", hydcon.NewContextAdapter(
+	r.Handle("/clients/{id}", chd.NewContextAdapter(
 		context.Background(),
 		extractor,
 		h.m.IsAuthenticated,
@@ -101,7 +101,7 @@ func (h *Handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Req
 		return
 	}
 
-	h.m.IsAuthorized(permission(id), "get", nil)(hydcon.ContextHandlerFunc(
+	h.m.IsAuthorized(permission(id), "get", nil)(chd.ContextHandlerFunc(
 		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			client, err := h.s.GetClient(id)
 			if err != nil {
@@ -120,7 +120,7 @@ func (h *Handler) Delete(ctx context.Context, rw http.ResponseWriter, req *http.
 		return
 	}
 
-	h.m.IsAuthorized(permission(id), "delete", nil)(hydcon.ContextHandlerFunc(
+	h.m.IsAuthorized(permission(id), "delete", nil)(chd.ContextHandlerFunc(
 		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			if err := h.s.RemoveClient(id); err != nil {
 				http.Error(rw, fmt.Sprintf("Could not retrieve client: %s", id), http.StatusInternalServerError)

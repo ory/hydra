@@ -1,4 +1,4 @@
-package middleware_test
+package host_test
 
 import (
 	"fmt"
@@ -13,9 +13,11 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
 
-	hcon "github.com/ory-am/hydra/context"
+	chd "github.com/ory-am/common/handler"
+	mwroot "github.com/ory-am/hydra/middleware"
+	. "github.com/ory-am/hydra/middleware/host"
+	authcon "github.com/ory-am/hydra/context"
 	hjwt "github.com/ory-am/hydra/jwt"
-	. "github.com/ory-am/hydra/middleware"
 	. "github.com/ory-am/ladon/policy"
 )
 
@@ -133,11 +135,11 @@ var cases = []test{
 	},
 }
 
-func mockContext(c test) func(hcon.ContextHandler) hcon.ContextHandler {
-	return func(next hcon.ContextHandler) hcon.ContextHandler {
-		return hcon.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+func mockContext(c test) func(chd.ContextHandler) chd.ContextHandler {
+	return func(next chd.ContextHandler) chd.ContextHandler {
+		return chd.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			claims := hjwt.NewClaimsCarrier(uuid.New(), "hydra", c.subject, "tests", time.Now(), time.Now())
-			ctx = hcon.NewContextFromAuthValues(ctx, claims, c.token, c.policies)
+			ctx = authcon.NewContextFromAuthValues(ctx, claims, c.token, c.policies)
 			next.ServeHTTPContext(ctx, rw, req)
 		})
 	}
@@ -145,7 +147,7 @@ func mockContext(c test) func(hcon.ContextHandler) hcon.ContextHandler {
 
 func handler(m *Middleware, c test) func(context.Context, http.ResponseWriter, *http.Request) {
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
-		m.IsAuthorized(c.resource, c.permission, Env(req).Owner(c.owner))(hcon.ContextHandlerFunc(
+		m.IsAuthorized(c.resource, c.permission, mwroot.NewEnv(req).Owner(c.owner))(chd.ContextHandlerFunc(
 			func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 				fmt.Fprintln(rw, "ok")
 			},
@@ -157,11 +159,11 @@ func TestMiddleware(t *testing.T) {
 	m := &Middleware{}
 
 	for k, c := range cases {
-		h := hcon.NewContextAdapter(
+		h := chd.NewContextAdapter(
 			context.Background(),
 			mockContext(c),
 			m.IsAuthenticated,
-		).ThenFunc(hcon.ContextHandlerFunc(handler(m, c)))
+		).ThenFunc(chd.ContextHandlerFunc(handler(m, c)))
 
 		ts := httptest.NewServer(h)
 		defer ts.Close()

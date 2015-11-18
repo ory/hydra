@@ -105,23 +105,23 @@ func TestMain(m *testing.M) {
 
 var (
 	configs = map[string]*oauth2.Config{
-		"working": &oauth2.Config{
+		"working": {
 			ClientID: "1", ClientSecret: "secret", Scopes: []string{}, RedirectURL: "/callback",
 			Endpoint: oauth2.Endpoint{AuthURL: "/oauth2/auth", TokenURL: "/oauth2/token"},
 		},
-		"voidSecret": &oauth2.Config{
+		"voidSecret": {
 			ClientID: "1", ClientSecret: "wrongsecret", Scopes: []string{}, RedirectURL: "/callback",
 			Endpoint: oauth2.Endpoint{AuthURL: "/oauth2/auth", TokenURL: "/oauth2/token"},
 		},
-		"voidID": &oauth2.Config{
+		"voidID": {
 			ClientID: "notexistent", ClientSecret: "random", Scopes: []string{}, RedirectURL: "/callback",
 			Endpoint: oauth2.Endpoint{AuthURL: "/oauth2/auth", TokenURL: "/oauth2/token"},
 		},
 	}
 	logins = map[string]*userAuth{
-		"working":      &userAuth{"2@bar.com", "secret"},
-		"voidEmail":    &userAuth{"1@bar.com", "secret"},
-		"voidPassword": &userAuth{"1@bar.com", "public"},
+		"working":      {"2@bar.com", "secret"},
+		"voidEmail":    {"1@bar.com", "secret"},
+		"voidPassword": {"1@bar.com", "public"},
 	}
 )
 

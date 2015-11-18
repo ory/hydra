@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
-	hctx "github.com/ory-am/hydra/context"
+	hctx "github.com/ory-am/common/handler"
 	"github.com/ory-am/hydra/middleware"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
@@ -24,12 +24,12 @@ import (
 
 type Handler struct {
 	s Storage
-	m *middleware.Middleware
+	m middleware.Middleware
 	g Guarder
 }
 
 type payload struct {
-	Resource   string            `json:"string"`
+	Resource   string            `json:"resource"`
 	Subject    string            `json:"subject"`
 	Permission string            `json:"permission"`
 	Context    *operator.Context `json:"context"`
@@ -39,12 +39,12 @@ func permission(id string) string {
 	return fmt.Sprintf("rn:hydra:policies:%s", id)
 }
 
-func NewHandler(s Storage, m *middleware.Middleware, g Guarder) *Handler {
+func NewHandler(s Storage, m middleware.Middleware, g Guarder) *Handler {
 	return &Handler{s, m, g}
 }
 
 func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hctx.ContextHandler) hctx.ContextHandler) {
-	r.Handle("/granted", hctx.NewContextAdapter(
+	r.Handle("/guard/allowed", hctx.NewContextAdapter(
 		context.Background(),
 		extractor,
 		h.m.IsAuthenticated,

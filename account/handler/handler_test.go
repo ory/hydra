@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
+	chd "github.com/ory-am/common/handler"
 	"github.com/ory-am/dockertest"
 	"github.com/ory-am/hydra/account"
 	hydra "github.com/ory-am/hydra/account/postgres"
-	hcon "github.com/ory-am/hydra/context"
+	middleware "github.com/ory-am/hydra/middleware/host"
+	authcon "github.com/ory-am/hydra/context"
 	"github.com/ory-am/hydra/hash"
 	hjwt "github.com/ory-am/hydra/jwt"
-	"github.com/ory-am/hydra/middleware"
 	"github.com/ory-am/ladon/policy"
 	"github.com/parnurzeal/gorequest"
 	"github.com/pborman/uuid"
@@ -67,11 +68,11 @@ type test struct {
 	expected result
 }
 
-func mock(c test) func(h hcon.ContextHandler) hcon.ContextHandler {
-	return func(h hcon.ContextHandler) hcon.ContextHandler {
-		return hcon.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+func mock(c test) func(h chd.ContextHandler) chd.ContextHandler {
+	return func(h chd.ContextHandler) chd.ContextHandler {
+		return chd.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			claims := hjwt.NewClaimsCarrier(uuid.New(), "hydra", c.subject, "tests", time.Now(), time.Now())
-			ctx = hcon.NewContextFromAuthValues(ctx, claims, c.token, c.policies)
+			ctx = authcon.NewContextFromAuthValues(ctx, claims, c.token, c.policies)
 			h.ServeHTTPContext(ctx, rw, req)
 		})
 	}
@@ -102,30 +103,30 @@ var policies = map[string][]policy.Policy{
 
 func TestCreateGetDelete(t *testing.T) {
 	for k, c := range []test{
-		test{
+		{
 			subject: "peter", token: &jwt.Token{Valid: false},
 			expected: result{create: http.StatusUnauthorized, get: 0, delete: 0},
 		},
-		test{
+		{
 			subject: "peter", token: &jwt.Token{Valid: true}, policies: policies["empty"],
 			expected: result{create: http.StatusForbidden, get: 0, delete: 0},
 		},
-		test{
+		{
 			subject: "peter", token: &jwt.Token{Valid: true}, policies: policies["empty"],
 			expected: result{create: http.StatusForbidden, get: 0, delete: 0},
 		},
-		test{
+		{
 			subject: "max", token: &jwt.Token{Valid: true}, policies: policies["empty"],
 			expected: result{create: http.StatusForbidden, get: 0, delete: 0},
 		},
-		test{
+		{
 			subject: "max", token: &jwt.Token{Valid: true}, payload: payload{},
 			policies: policies["allow-create"],
 			expected: result{
 				create: http.StatusForbidden, get: 0, delete: 0,
 			},
 		},
-		test{
+		{
 			subject: "peter", token: &jwt.Token{Valid: true},
 			payload:  payload{Email: uuid.New() + "@foobar.com", Data: "{}"},
 			policies: policies["allow-create"],
@@ -133,7 +134,7 @@ func TestCreateGetDelete(t *testing.T) {
 				create: http.StatusBadRequest, get: 0, delete: 0,
 			},
 		},
-		test{
+		{
 			subject: "peter", token: &jwt.Token{Valid: true},
 			payload:  payload{Email: uuid.New() + "@foobar.com", Password: "123", Data: "{}"},
 			policies: policies["allow-create"],
@@ -141,7 +142,7 @@ func TestCreateGetDelete(t *testing.T) {
 				create: http.StatusBadRequest, get: 0, delete: 0,
 			},
 		},
-		test{
+		{
 			subject: "peter", token: &jwt.Token{Valid: true},
 			payload:  payload{Email: "notemail", Password: "secret", Data: "{}"},
 			policies: policies["allow-create"],
@@ -149,7 +150,7 @@ func TestCreateGetDelete(t *testing.T) {
 				create: http.StatusBadRequest, get: 0, delete: 0,
 			},
 		},
-		test{
+		{
 			subject: "peter", token: &jwt.Token{Valid: true},
 			payload:  payload{Email: uuid.New() + "@bar.com", Password: "", Data: "{}"},
 			policies: policies["allow-create"],
@@ -157,7 +158,7 @@ func TestCreateGetDelete(t *testing.T) {
 				create: http.StatusBadRequest, get: 0, delete: 0,
 			},
 		},
-		test{
+		{
 			subject: "peter", token: &jwt.Token{Valid: true},
 			payload:  payload{Email: uuid.New() + "@bar.com", Password: "secret", Data: "not json"},
 			policies: policies["allow-create"],
@@ -165,7 +166,7 @@ func TestCreateGetDelete(t *testing.T) {
 				create: http.StatusBadRequest, get: 0, delete: 0,
 			},
 		},
-		test{
+		{
 			subject: "peter", token: &jwt.Token{Valid: true},
 			payload:  payload{Email: uuid.New() + "@bar.com", Password: "secret", Data: "{}"},
 			policies: policies["allow-create"],
@@ -173,7 +174,7 @@ func TestCreateGetDelete(t *testing.T) {
 				create: http.StatusOK, get: http.StatusForbidden, delete: http.StatusForbidden,
 			},
 		},
-		test{
+		{
 			subject: "peter", token: &jwt.Token{Valid: true},
 			payload:  payload{Email: uuid.New() + "@bar.com", Password: "secret", Data: "{}"},
 			policies: policies["allow-create-get"],
@@ -181,7 +182,7 @@ func TestCreateGetDelete(t *testing.T) {
 				create: http.StatusOK, get: http.StatusOK, delete: http.StatusForbidden,
 			},
 		},
-		test{
+		{
 			subject: "peter", token: &jwt.Token{Valid: true},
 			payload:  payload{Email: uuid.New() + "@bar.com", Password: "secret", Data: "{}"},
 			policies: policies["allow-all"],

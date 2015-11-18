@@ -8,8 +8,8 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/gorilla/mux"
 	"github.com/ory-am/hydra/account"
+	middleware "github.com/ory-am/hydra/middleware/host"
 	"github.com/ory-am/hydra/jwt"
-	"github.com/ory-am/hydra/middleware"
 	"github.com/ory-am/hydra/oauth/connection"
 	"github.com/ory-am/hydra/oauth/provider"
 	"github.com/ory-am/hydra/oauth/provider/storage"
@@ -306,7 +306,7 @@ func (h *Handler) authenticate(w http.ResponseWriter, r *http.Request, email, pa
 		return nil, err
 	}
 
-	if granted, err := h.Guard.IsGranted("/oauth2/authorize", "authorize", acc.GetID(), policies, middleware.Env(r).Ctx()); !granted {
+	if granted, err := h.Guard.IsGranted("/oauth2/authorize", "authorize", acc.GetID(), policies, middleware.NewEnv(r).Ctx()); !granted {
 		err = errors.Errorf(`Subject "%s" is not allowed to authorize.`, acc.GetID())
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return nil, err

@@ -40,12 +40,12 @@ func (c *Client) Create(ctx *cli.Context) {
 		log.Fatalf("%s", err)
 	}
 
-	fmt.Printf(`Created client "%s" with secret "%s" and redirect url "%s".` + "\n", client.Id, client.Secret, client.RedirectUri)
+	fmt.Printf(`Created client "%s" with secret "%s" and redirect url "%s".`+"\n", client.Id, client.Secret, client.RedirectUri)
 
 	if ctx.Bool("as-superuser") {
 		if err := c.Ctx.Policies.Create(superUserPolicy(client.Id)); err != nil {
 			log.Fatalf("%s", err)
 		}
-		fmt.Printf(`Granted superuser privileges to client "%s".` + "\n", client.Id)
+		fmt.Printf(`Granted superuser privileges to client "%s".`+"\n", client.Id)
 	}
 }

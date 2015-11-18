@@ -1,9 +1,9 @@
 package provider_test
 
 import (
+	. "github.com/ory-am/hydra/oauth/provider"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2"
-	. "github.com/ory-am/hydra/oauth/provider"
 	"testing"
 )
 

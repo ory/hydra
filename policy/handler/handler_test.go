@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
+	chd "github.com/ory-am/common/handler"
 	"github.com/ory-am/dockertest"
-	hcon "github.com/ory-am/hydra/context"
+	middleware "github.com/ory-am/hydra/middleware/host"
+	authcon "github.com/ory-am/hydra/context"
 	hjwt "github.com/ory-am/hydra/jwt"
-	"github.com/ory-am/hydra/middleware"
 	"github.com/ory-am/ladon/guard"
 	"github.com/ory-am/ladon/guard/operator"
 	"github.com/ory-am/ladon/policy"
@@ -60,11 +61,11 @@ type test struct {
 	statusGetAfterDelete int
 }
 
-func mockAuthorization(c test) func(h hcon.ContextHandler) hcon.ContextHandler {
-	return func(h hcon.ContextHandler) hcon.ContextHandler {
-		return hcon.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+func mockAuthorization(c test) func(h chd.ContextHandler) chd.ContextHandler {
+	return func(h chd.ContextHandler) chd.ContextHandler {
+		return chd.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			claims := hjwt.NewClaimsCarrier(uuid.New(), "hydra", c.subject, "tests", time.Now(), time.Now())
-			ctx = hcon.NewContextFromAuthValues(ctx, claims, &c.token, c.policies)
+			ctx = authcon.NewContextFromAuthValues(ctx, claims, &c.token, c.policies)
 			h.ServeHTTPContext(ctx, rw, req)
 		})
 	}
@@ -79,7 +80,7 @@ var policies = map[string]policy.Policy{
 }
 
 var payloads = []policy.DefaultPolicy{
-	policy.DefaultPolicy{
+	{
 		"",
 		"description",
 		[]string{"max"},
@@ -88,7 +89,7 @@ var payloads = []policy.DefaultPolicy{
 		[]string{"<.*>"},
 		nil,
 	},
-	policy.DefaultPolicy{
+	{
 		"",
 		"Should allow peter all permissions on resource article",
 		[]string{"peter"},
@@ -117,7 +118,7 @@ func TestGrantedEndpoint(t *testing.T) {
 	require.Equal(t, 200, resp.StatusCode)
 
 	do := func(p payload, shouldAllow bool) {
-		resp, body, _ := request.Post(ts.URL + "/granted").Send(p).End()
+		resp, body, _ := request.Post(ts.URL + "/guard/allowed").Send(p).End()
 		require.Equal(t, 200, resp.StatusCode)
 
 		var isAllowed struct {
@@ -232,7 +233,7 @@ func TestCreateGetDeleteGet(t *testing.T) {
 }
 
 var allowedPayloads = map[string]payload{
-	"create-grant": payload{
+	"create-grant": {
 		Resource:   "rn:hydra:policies",
 		Subject:    "peter",
 		Permission: "create",

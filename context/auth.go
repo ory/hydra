@@ -5,6 +5,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-errors/errors"
+	. "github.com/ory-am/common/handler"
 	hjwt "github.com/ory-am/hydra/jwt"
 	"github.com/ory-am/ladon/policy"
 	"golang.org/x/net/context"
@@ -12,7 +13,7 @@ import (
 )
 
 const (
-	authKey key = 0
+	authKey Key = 0
 )
 
 func NewContextFromAuthorization(ctx context.Context, req *http.Request, j *hjwt.JWT, p policy.Storage) context.Context {
@@ -89,6 +90,10 @@ func PoliciesFromContext(ctx context.Context) ([]policy.Policy, error) {
 func IsAuthenticatedFromContext(ctx context.Context) bool {
 	a, b := ctx.Value(authKey).(*authorization)
 	return (b && a.token != nil && a.token.Valid)
+}
+
+func AuthContextIsSet(ctx context.Context) bool {
+	return ctx.Value(authKey) != nil
 }
 
 func NewContextFromAuthValues(ctx context.Context, claims hjwt.ClaimsCarrier, token *jwt.Token, policies []policy.Policy) context.Context {

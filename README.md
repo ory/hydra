@@ -10,6 +10,36 @@ Hydra is written in go and backed by PostgreSQL or any implementation of [accoun
 *Please be aware that Hydra is not ready for production just yet and has not been tested on a production system.
 If time schedule holds, we will use it in production in Q1 2016 for an awesome business app that has yet to be revealed.*
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [What is Hydra?](#what-is-hydra)
+- [Motivation](#motivation)
+- [Features](#features)
+- [Caveats](#caveats)
+- [HTTP RESTful API](#http-restful-api)
+- [Run hydra-host](#run-hydra-host)
+  - [Set up PostgreSQL locally](#set-up-postgresql-locally)
+  - [Run as executable](#run-as-executable)
+  - [Run from sourcecode](#run-from-sourcecode)
+  - [Available Environment Variables](#available-environment-variables)
+  - [CLI Usage](#cli-usage)
+    - [Start server](#start-server)
+    - [Create client](#create-client)
+    - [Create user](#create-user)
+- [Good to know](#good-to-know)
+  - [Everything is RESTful. No HTML. No Templates.](#everything-is-restful-no-html-no-templates)
+  - [Sign up workflow](#sign-up-workflow)
+  - [Sign in workflow](#sign-in-workflow)
+    - [Authenticate with Google, Dropbox, ...](#authenticate-with-google-dropbox-)
+    - [Authenticate with a hydra account](#authenticate-with-a-hydra-account)
+  - [Visually confirm authorization](#visually-confirm-authorization)
+  - [Principles](#principles)
+- [Attributions](#attributions)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## What is Hydra?
 
 Authentication, authorization and user account management are always lengthy to plan and implement. If you're building a micro service app
@@ -40,24 +70,17 @@ Hydra is a RESTful service providing you with things like:
 
 ## Caveats
 
-To make hydra suitable for every usecase we decided to exclude any sort of HTML templates. Hydra speaks only JSON. This obviously prevents Hydra from delivering a dedicated login and authorization ("Do you want to grant App Foobar access to all of your data?") page.
+To make hydra suitable for every use case we decided to exclude any sort of HTML templates.
+Hydra speaks only JSON. This obviously prevents Hydra from delivering a dedicated login and authorization page like
+"Do you want to grant App Foobar access to all of your data?" or "Please log into your account to procceed. <email field> <password field>".
 
-At this moment, the */oauth2/auth* endpoint only works, if a provider is given, for example:  
-```
-/oauth2/auth?provider=google&client_id=123&response_type=code&redirect_uri=/callback&state=randomstate
-```
+You'll find more information on this in the [Good to know](#good-to-know) section.
 
-A provider should be an OAuth2 */authorization* endpoint.
+## HTTP RESTful API
 
-To log in a user you have to use the [password grant type](https://aaronparecki.com/articles/2012/07/29/1/oauth2-simplified#others). At this moment, the password grant is allowed to *all clients*. This will be changed in the future.
+The API is described at [apiary](http://docs.hydra6.apiary.io/#). The API Documentation is still work in progress.
 
-We will provide an exemplary provider implementation in NodeJS which uses the password grant type to log users in and is easy to customize.
-
-The provider workflow is not standardized by any authority, has not yet been subject to a security audit and is therefore subject to change. Unfortunately most providers do not support SSO provider endpoints so we might have to rely on the OAuth2 provider workflow for a while.
-
-## hydra-host
-
-Hydra host is the server side of things.
+## Run hydra-host
 
 ### Set up PostgreSQL locally
 
@@ -107,7 +130,7 @@ For brevity the guide to creating a new database in Postgres has been skipped.*
 > go run main.go start
 ```
 
-### Environment
+### Available Environment Variables
 
 The CLI currently requires two environment variables:
 
@@ -185,19 +208,15 @@ OPTIONS:
    --as-superuser       grant superuser privileges to the user
 ```
 
-### API
-
-The API is loosely described at [apiary](http://docs.hydra6.apiary.io/#).
-
 ## Good to know
 
 This section covers information necessary for understanding how hydra works.
 
-### No templates
+### Everything is RESTful. No HTML. No Templates.
 
 Hydra never responds with HTML. There is no way to set up HTML templates for signing in, up or granting access.
 
-### Sign up
+### Sign up workflow
 
 Hydra offers capabilities to sign users up. First, a registered client has to acquire an access token through the OAuth2 Workflow.
 Second, the client sets up a user account through the `/accounts` endpoint.
@@ -206,14 +225,31 @@ You can set up a environment variable called `SIGNUP_URL` for Hydra to redirect 
 when the user successfully authenticated via the OAuth2 Provider Workflow but has not an account in hydra yet.
 If you leave this variable empty, a 401 Unauthorized Error will be shown instead.
 
-### Sign in
 
-Hydra offers capabilities to sign users in. To do so, use the PASSWORD grant type.
+### Sign in workflow
 
-You can set up an environment variable called `SIGNIN_URL` for Hydra to redirect users to,
+Hydra offers different methods to sign users in.
+
+#### Authenticate with Google, Dropbox, ...
+
+You can authenticate a user through any other OAuth2 provider, such as Google, Dropbox or Facebook. To do so, simply add
+a provider query parameter to the authentication url endpoint:
+```
+/oauth2/auth?provider=google&client_id=123&response_type=code&redirect_uri=/callback&state=randomstate
+```
+
+The provider workflow is not standardized by any authority, has not yet been subject to a security audit and is therefore subject to change.
+Unfortunately most providers do not support SSO provider endpoints so we might have to rely on the OAuth2 provider workflow for a while.
+
+We will soon document how you can add more providers (currently **only Dropbox is supported**).
+
+#### Authenticate with a hydra account
+
+There are multiple ways to authenticate a hydra account:
+* **Password grant type:** To do so, use the [OAuth2 PASSWORD grant type](http://oauthlib.readthedocs.org/en/latest/oauth2/grants/password.html).
+At this moment, the password grant is allowed to *all clients*. This will be changed in the future.
+* **Callback (not implemented yet):** You can set up an environment variable called `SIGNIN_URL` for Hydra to redirect users to,
 when a client requests authorization through the `/oauth2/auth` endpoint but is not yet authenticated.
-
-**This feature is not implemented yet.**
 
 ### Visually confirm authorization
 

@@ -11,7 +11,7 @@ import (
 )
 
 var TestCertificates = [][]string{
-	[]string{"../example/cert/rs256-private.pem",
+	{"../example/cert/rs256-private.pem",
 		`-----BEGIN RSA PRIVATE KEY-----
 MIIEowIBAAKCAQEA4f5wg5l2hKsTeNem/V41fGnJm6gOdrj8ym3rFkEU/wT8RDtn
 SgFEZOQpHEgQ7JL38xUfU0Y3g6aYw9QT0hJ7mCpz9Er5qLaMXJwZxzHzAahlfA0i
@@ -40,7 +40,7 @@ CKuHRG+AP579dncdUnOMvfXOtkdM4vk0+hWASBQzM9xzVcztCa+koAugjVaLS9A+
 9uQoqEeVNTckxx0S2bYevRy7hGQmUJTyQm3j1zEUR5jpdbL83Fbq
 -----END RSA PRIVATE KEY-----
 `},
-	[]string{"../example/cert/rs256-public.pem",
+	{"../example/cert/rs256-public.pem",
 		`-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4f5wg5l2hKsTeNem/V41
 fGnJm6gOdrj8ym3rFkEU/wT8RDtnSgFEZOQpHEgQ7JL38xUfU0Y3g6aYw9QT0hJ7

@@ -9,25 +9,25 @@ import (
 
 func TestMerge(t *testing.T) {
 	for k, c := range [][]map[string]interface{}{
-		[]map[string]interface{}{
-			map[string]interface{}{"foo": "bar"},
-			map[string]interface{}{"baz": "bar"},
-			map[string]interface{}{"foo": "bar", "baz": "bar"},
+		{
+			{"foo": "bar"},
+			{"baz": "bar"},
+			{"foo": "bar", "baz": "bar"},
 		},
-		[]map[string]interface{}{
-			map[string]interface{}{"foo": "bar"},
-			map[string]interface{}{"foo": "baz"},
-			map[string]interface{}{"foo": "bar"},
+		{
+			{"foo": "bar"},
+			{"foo": "baz"},
+			{"foo": "bar"},
 		},
-		[]map[string]interface{}{
-			map[string]interface{}{},
-			map[string]interface{}{"foo": "baz"},
-			map[string]interface{}{"foo": "baz"},
+		{
+			{},
+			{"foo": "baz"},
+			{"foo": "baz"},
 		},
-		[]map[string]interface{}{
-			map[string]interface{}{"foo": "bar"},
-			map[string]interface{}{"foo": "baz", "bar": "baz"},
-			map[string]interface{}{"foo": "bar", "bar": "baz"},
+		{
+			{"foo": "bar"},
+			{"foo": "baz", "bar": "baz"},
+			{"foo": "bar", "bar": "baz"},
 		},
 	} {
 		assert.EqualValues(t, c[2], merge(c[0], c[1]), "Case %d", k)
@@ -49,9 +49,9 @@ func TestLoadCertificate(t *testing.T) {
 func TestSignRejectsAlgAndTypHeader(t *testing.T) {
 	j := New([]byte(TestCertificates[0][1]), []byte(TestCertificates[1][1]))
 	for _, c := range []map[string]interface{}{
-		map[string]interface{}{"alg": "foo"},
-		map[string]interface{}{"typ": "foo"},
-		map[string]interface{}{"typ": "foo", "alg": "foo"},
+		{"alg": "foo"},
+		{"typ": "foo"},
+		{"typ": "foo", "alg": "foo"},
 	} {
 		_, err := j.SignToken(map[string]interface{}{}, c)
 		assert.NotNil(t, err)

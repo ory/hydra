@@ -1,28 +1,31 @@
 package handler_test
 
 import (
+	"bytes"
 	"encoding/json"
 	"github.com/RangelReale/osin"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
+	chd "github.com/ory-am/common/handler"
 	"github.com/ory-am/dockertest"
 	acpg "github.com/ory-am/hydra/account/postgres"
+	authcon "github.com/ory-am/hydra/context"
 	"github.com/ory-am/hydra/hash"
+	hjwt "github.com/ory-am/hydra/jwt"
 	"github.com/ory-am/hydra/middleware/host"
 	"github.com/ory-am/hydra/oauth/connection"
 	cpg "github.com/ory-am/hydra/oauth/connection/postgres"
 	. "github.com/ory-am/hydra/oauth/handler"
 	"github.com/ory-am/hydra/oauth/provider"
 	oapg "github.com/ory-am/hydra/oauth/provider/storage/postgres"
-	authcon "github.com/ory-am/hydra/context"
-	hjwt "github.com/ory-am/hydra/jwt"
 	"github.com/ory-am/ladon/guard"
 	"github.com/ory-am/ladon/policy"
 	ppg "github.com/ory-am/ladon/policy/postgres"
 	opg "github.com/ory-am/osin-storage/storage/postgres"
-	chd "github.com/ory-am/common/handler"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 	"io/ioutil"
@@ -31,11 +34,9 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
-	"strings"
+	"strconv"
 	"testing"
 	"time"
-	"golang.org/x/net/context"
-	"github.com/dgrijalva/jwt-go"
 )
 
 var handler *Handler
@@ -238,7 +239,7 @@ func TestClientGrantType(t *testing.T) {
 
 func TestIntrospect(t *testing.T) {
 	router := mux.NewRouter()
-	handler.SetRoutes(router, mockAuthorization("subject", &jwt.Token{Valid:true}))
+	handler.SetRoutes(router, mockAuthorization("subject", &jwt.Token{Valid: true}))
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 
@@ -260,48 +261,42 @@ func TestIntrospect(t *testing.T) {
 		code        int
 		pass        bool
 	}{
-		{"Bearer " + verify.AccessToken, http.StatusOK, true},
+		{verify.AccessToken, http.StatusOK, true},
+		{access.AccessToken, http.StatusOK, true},
 		{"", http.StatusOK, false},
-		{"Bearer ", http.StatusOK, false},
-		{"Bearer invalid", http.StatusOK, false},
-		{"Bearer invalid", http.StatusOK, false},
-		{"Bearer invalid", http.StatusOK, false},
-
+		{" ", http.StatusOK, false},
+		{"invalid", http.StatusOK, false},
 		//
-		{"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.e30.FvuwHdEjgGxPAyVUb-eqtiPl2gycU9WOHNzwpFKcpdN_QkXkBUxU3qFl3lLBaMzIuP_GjXLXcJZFhyQ2Ne3kfWuZSGLmob0Og8B4lAy7CA7iwpji2R3aUcwBwbJ41IJa__F8fMRz0dRDwhyrBKD-9y4TfV_-yZuzBZxq0UdjX6IdpzsdetphBSIZkPij5MY3thRwC-X_gXyIXi4-G2_CjRrV5lCGnPJrDbLqPCYqS71wK9NEsz_B8p5ENmwad8vZe4fEFR7XsqJrhPjbEVGeLpzSz0AOGp4G1iyvv1sdu4M3Y8KSSGYnZ8lXNGyi8QeUr374Y6XgJ5N5TVLWI2cMxg", http.StatusOK, false},
+		{"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.e30.FvuwHdEjgGxPAyVUb-eqtiPl2gycU9WOHNzwpFKcpdN_QkXkBUxU3qFl3lLBaMzIuP_GjXLXcJZFhyQ2Ne3kfWuZSGLmob0Og8B4lAy7CA7iwpji2R3aUcwBwbJ41IJa__F8fMRz0dRDwhyrBKD-9y4TfV_-yZuzBZxq0UdjX6IdpzsdetphBSIZkPij5MY3thRwC-X_gXyIXi4-G2_CjRrV5lCGnPJrDbLqPCYqS71wK9NEsz_B8p5ENmwad8vZe4fEFR7XsqJrhPjbEVGeLpzSz0AOGp4G1iyvv1sdu4M3Y8KSSGYnZ8lXNGyi8QeUr374Y6XgJ5N5TVLWI2cMxg", http.StatusOK, false},
 
 		//		 "exp": 12345
-		{"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjEyMzQ1fQ.0w2dienBCvgfbhLjmK04fFKqf2oFRMNoKS0A3zHBpU_yN22utC_gAvcFwKiMffebtHah7rgldnPqNZaNhfnEM1PxNFh46vXO5LNZDHt5sNZqeBtZ1Q7ORkZsAtIp97mtZMxufn0VBqJTRYxyDrEzH9Mo1OpXuPTzDP87n-p_Xdbpj5YccZU6TZ11eLs9NvuYu_A2HClKrGbCeaHFAGVWVaoSZ_TvjGqyBI-XoGzuCEBoj6NFTHxZpbNeKhVTTwXHv2sUn09gZ_ErmbPZKExV5sCLETktr4ABUXkNtw4xLW6g0EVzC9dRMKxUZO8kCmAJkKHUTinEDjpfX_n8CKRQVQ", http.StatusOK, false},
-
+		{"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjEyMzQ1fQ.0w2dienBCvgfbhLjmK04fFKqf2oFRMNoKS0A3zHBpU_yN22utC_gAvcFwKiMffebtHah7rgldnPqNZaNhfnEM1PxNFh46vXO5LNZDHt5sNZqeBtZ1Q7ORkZsAtIp97mtZMxufn0VBqJTRYxyDrEzH9Mo1OpXuPTzDP87n-p_Xdbpj5YccZU6TZ11eLs9NvuYu_A2HClKrGbCeaHFAGVWVaoSZ_TvjGqyBI-XoGzuCEBoj6NFTHxZpbNeKhVTTwXHv2sUn09gZ_ErmbPZKExV5sCLETktr4ABUXkNtw4xLW6g0EVzC9dRMKxUZO8kCmAJkKHUTinEDjpfX_n8CKRQVQ", http.StatusOK, false},
 		//		{
 		//			"exp": 1924975619,
 		//			"nbf": 1924975619
 		//		}
-		{"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MTkyNDk3NTYxOX0.P381fgXq75I1iFBFMA624LgKm-wyous9VV4aQHS2O9kDyCJUejK71-M5owaWkjDOkHFlE7Ju5yknasODNlYsuzB2ujos1xiCuHYjoqivvSPNwrxJMXKMXrtzzk045E_OH1EHd_d9KVmrnA5dd3NLqNdYAoUogrO4TistjpZOv-ABUesiKIOR6SopD2tUxHog4RmFFtBJOt4l9P2aGn4a6LBt5wvBz9wUKak7YzUKMZXsWus-x-RP41bulpsUPEfH4TtgQHOM-VQ5W-EORhH8PClBfUrPyp1H7bgXOjhvCdpf4dfJS59Wf3euq9TXT0axyJ5HErXy3yOwC0E2ggl2iQ", http.StatusOK, false},
-
+		{"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MTkyNDk3NTYxOX0.P381fgXq75I1iFBFMA624LgKm-wyous9VV4aQHS2O9kDyCJUejK71-M5owaWkjDOkHFlE7Ju5yknasODNlYsuzB2ujos1xiCuHYjoqivvSPNwrxJMXKMXrtzzk045E_OH1EHd_d9KVmrnA5dd3NLqNdYAoUogrO4TistjpZOv-ABUesiKIOR6SopD2tUxHog4RmFFtBJOt4l9P2aGn4a6LBt5wvBz9wUKak7YzUKMZXsWus-x-RP41bulpsUPEfH4TtgQHOM-VQ5W-EORhH8PClBfUrPyp1H7bgXOjhvCdpf4dfJS59Wf3euq9TXT0axyJ5HErXy3yOwC0E2ggl2iQ", http.StatusOK, false},
 		//		{
 		//			"exp": 1924975619,
 		//			"iat": 1924975619,
 		//			"nbf": 0
 		//		}
-		{"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MCwiaWF0IjoxOTI0OTc1NjE5fQ.qwUo8-e9tcg69pv9SJFpMXytJtAZlTJoVZh73bVtpkImZ0G5s_cbzPvccM_LmmHl5rFCpQuwWDSuHME2iyer6-gC2DILGQiXyJ5JhJdAKD4xtSFnV90zu84BF8L4JWqLeIEV13AHTpphfS0tOOOKL6sFYbo4LQVslfRYON28D3iOP-YAKJeorHsZgTNg-7VjPC8w_emDpVoNiWEyON2gHrucKiJlWQJVE_gxLf_n-F29UV1OBi-AjxccCrXMd0pzndZ7zg_7EbaUuOmLStfn2ORkoARaHaw55Sv2vbf_AV0MWsgqPaOlK6GTbfv3sYjB7K9eItWh9o8kDXNM4blqSw", http.StatusOK, false},
-
+		{"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MCwiaWF0IjoxOTI0OTc1NjE5fQ.qwUo8-e9tcg69pv9SJFpMXytJtAZlTJoVZh73bVtpkImZ0G5s_cbzPvccM_LmmHl5rFCpQuwWDSuHME2iyer6-gC2DILGQiXyJ5JhJdAKD4xtSFnV90zu84BF8L4JWqLeIEV13AHTpphfS0tOOOKL6sFYbo4LQVslfRYON28D3iOP-YAKJeorHsZgTNg-7VjPC8w_emDpVoNiWEyON2gHrucKiJlWQJVE_gxLf_n-F29UV1OBi-AjxccCrXMd0pzndZ7zg_7EbaUuOmLStfn2ORkoARaHaw55Sv2vbf_AV0MWsgqPaOlK6GTbfv3sYjB7K9eItWh9o8kDXNM4blqSw", http.StatusOK, false},
 		//		{
 		//			"exp": 1924975619,
 		//			"iat": 1924975619,
 		//			"nbf": 0
 		//			"aud": "wrong-audience"
 		//		}
-		{"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MCwiaWF0IjoxOTI0OTc1NjE5LCJhdWQiOiJ3cm9uZy1hdWRpZW5jZSJ9.ZDyeQYDEjUUUvrzD_7t-4OHc4KOv4r46soSNMURZCpktCBP0qEeVovjLRHILmMlTxb1ItiOoUs2y7O-WYOKz182evgs1dkfX3C8LrOlDD3IoimaHNK4jW-5pYM47NFnW52Y7jp802wOQ8_UwERr5iu0Mb5trQC3RPALE17ppkplQVbL54kxu4HaQsPd4A2Qe2uIPhr-x75BPQiiaqzdRWuDwJhmpYBwLvyxKIY4B-AHBk70H7lpitDRXNMJdunIrIhz-qpkO7_XiwaBzwHHmdl9uRMU-UNC0TyA0iM84R_y8YJsz8Xl3MXU7QVNARzo2GGbnm4T2aRv8E98aeBsNQw", http.StatusOK, false},
-
+		{"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MCwiaWF0IjoxOTI0OTc1NjE5LCJhdWQiOiJ3cm9uZy1hdWRpZW5jZSJ9.ZDyeQYDEjUUUvrzD_7t-4OHc4KOv4r46soSNMURZCpktCBP0qEeVovjLRHILmMlTxb1ItiOoUs2y7O-WYOKz182evgs1dkfX3C8LrOlDD3IoimaHNK4jW-5pYM47NFnW52Y7jp802wOQ8_UwERr5iu0Mb5trQC3RPALE17ppkplQVbL54kxu4HaQsPd4A2Qe2uIPhr-x75BPQiiaqzdRWuDwJhmpYBwLvyxKIY4B-AHBk70H7lpitDRXNMJdunIrIhz-qpkO7_XiwaBzwHHmdl9uRMU-UNC0TyA0iM84R_y8YJsz8Xl3MXU7QVNARzo2GGbnm4T2aRv8E98aeBsNQw", http.StatusOK, false},
 		//		{
 		//			"exp": 1924975619,
 		//			"iat": 1924975619,
 		//			"nbf": 0
-		//			"aud": "tests"
+		//			"sub": "max",
+		//			"aud": "wrong-audience"
 		//		}
-		{"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MCwiaWF0IjoxOTI0OTc1NjE5LCJhdWQiOiJ0ZXN0cyJ9.X2NE-eooOoYI7UOnGHTTEuKYoMrNoZIcwJPVeRg-dg4fKJjLUokzoReJ0h64vg9u3URfsXiaaFC7-RhDLZcy3LHWyAdEK4EwoqImdn5DBRFuOuiaEdo0Gd9B3qtHoMGfxcsqkrCtI6YQgQQ7HMsjx6VnHOnDRumu0Gz37WiBiWCOMgrBrXT5rI_djKO0yM8Wd_esA4z2jlGAc-ma31GHlvKSbFiTTnLBAx_oe5USHXIv9xFt9AIMi0vsGnt8JH4tzTGO0ju2eC5zUU8IhCwlEarfXMv2nphCn6Cy1SRumrZ32z_rFMwkiGMEB3mktRhpf6ZrklrDXcfqO2Y-ms_8KA", http.StatusOK, false},
-
+		{"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MCwiaWF0IjoxOTI0OTc1NjE5LCJhdWQiOiJ3cm9uZy1hdWRpZW5jZSIsInN1YiI6Im1heCJ9.OBKaAS6l7Ie-y5T6-r5Kk0MyLxxeoYJZ5MizZazAc1gon1J5yi0pCcwhP0a-cKUuJbuvgyw9PF1iutykRYy9cSd9ducEpL9PLhUAwIOOyQxp35udGPOOaf0hQAOBUzP--I6SqaIOZXAfWg6_HefRcYhqy8m-iagWLXZ7RT4sMrEVzHUq6fWM6f2HDid0CxCjH6OL5ScZebqUNVimCqZkaQ7Fn9TAnlcKnlDDOmZhfZEAOMNqlUvC7mLBbbhuiX0eUtdnchhXLjuLn67PcxYi7KpEFDKwGhN2eN0t73RWIpMz-YlU77HNTEvm-AzdG-BoqBgSrGnPUlU6Mdfhz7IeMA", http.StatusOK, false},
 		//		{
 		//			"exp": 1924975619,
 		//			"iat": 1924975619,
@@ -309,17 +304,16 @@ func TestIntrospect(t *testing.T) {
 		//			"aud": "tests",
 		//			"subject": "foo"
 		//		}
-		{"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MCwiaWF0IjoxOTI0OTc1NjE5LCJhdWQiOiJ0ZXN0cyIsInN1YmplY3QiOiJmb28ifQ.lvjLGnLO3mZSS63fomK-KH2mhLXjjg9b13opiN7jY4MrXE_DaR0Lum8a_RcqqSTXbpHxYSIPV9Ji7zM_X1bvBtsPpBE1PR3_PrdD5_uIDQ-UWPVzozxhOvuZzU7qHx3TFQClZ6tYIXYioTszz9zQHiE4hj1x6Z_shWPfczELGyD0HnEC3o_w7IFfYO_L0YDN_vkuqr6yS5kaPIsoCF_iHuhTzoBAEIpUENlxSpCPuxR9aMaJ-BQDInHoPc1h-VvkgOdR_iENQdOUePObw17ywdGkRk6C5kRHSxjca-ULGcDn36NZ54SEPolcGbjs3vVA1g0jQARKIcTVw6Uu7x0s6Q", http.StatusOK, true},
+		{"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MCwiaWF0IjoxOTI0OTc1NjE5LCJhdWQiOiJ0ZXN0cyIsInN1YmplY3QiOiJmb28ifQ.lvjLGnLO3mZSS63fomK-KH2mhLXjjg9b13opiN7jY4MrXE_DaR0Lum8a_RcqqSTXbpHxYSIPV9Ji7zM_X1bvBtsPpBE1PR3_PrdD5_uIDQ-UWPVzozxhOvuZzU7qHx3TFQClZ6tYIXYioTszz9zQHiE4hj1x6Z_shWPfczELGyD0HnEC3o_w7IFfYO_L0YDN_vkuqr6yS5kaPIsoCF_iHuhTzoBAEIpUENlxSpCPuxR9aMaJ-BQDInHoPc1h-VvkgOdR_iENQdOUePObw17ywdGkRk6C5kRHSxjca-ULGcDn36NZ54SEPolcGbjs3vVA1g0jQARKIcTVw6Uu7x0s6Q", http.StatusOK, true},
 	} {
+		data := url.Values{}
+		data.Set("token", c.accessToken)
 
 		client := &http.Client{}
-		form := url.Values{}
-		form.Add("token", access.AccessToken)
-
-		req, _ := http.NewRequest("POST", ts.URL + "/oauth2/introspect", strings.NewReader(form.Encode()))
-		if c.accessToken != "" {
-			req.Header.Add("Authorization", c.accessToken)
-		}
+		req, _ := http.NewRequest("POST", ts.URL + "/oauth2/introspect", bytes.NewBufferString(data.Encode()))
+		req.Header.Add("Authorization", access.Type() + " " + access.AccessToken)
+		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+		req.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 		res, _ := client.Do(req)
 		body, _ := ioutil.ReadAll(res.Body)
 		require.Equal(t, c.code, res.StatusCode, "Case %d: %s", k, body)
@@ -328,7 +322,7 @@ func TestIntrospect(t *testing.T) {
 		}
 
 		var result map[string]interface{}
-		require.Nil(t, json.Unmarshal(body, &result), "Case %d: %s", k, body)
-		assert.Equal(t, c.pass, result["active"].(bool), "Case %d", k)
+		require.Nil(t, json.Unmarshal(body, &result), "Case %d: %s %s", k, body)
+		assert.Equal(t, c.pass, result["active"].(bool), "Case %d %s", k, body)
 	}
 }

@@ -92,10 +92,6 @@ func IsAuthenticatedFromContext(ctx context.Context) bool {
 	return (b && a.token != nil && a.token.Valid)
 }
 
-func AuthContextIsSet(ctx context.Context) bool {
-	return ctx.Value(authKey) != nil
-}
-
 func NewContextFromAuthValues(ctx context.Context, claims hjwt.ClaimsCarrier, token *jwt.Token, policies []policy.Policy) context.Context {
 	return context.WithValue(ctx, authKey, &authorization{
 		claims:   claims,

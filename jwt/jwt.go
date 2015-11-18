@@ -148,7 +148,7 @@ func (j *JWT) GenerateAccessToken(data *osin.AccessData, generateRefresh bool) (
 		return "", "", errors.Errorf("Could not assert claims to ClaimsCarrier: %v", claims)
 	}
 
-	claims["exp"] = data.ExpireAt()
+	claims["exp"] = data.ExpireAt().Unix()
 	if accessToken, err = j.SignToken(claims, map[string]interface{}{}); err != nil {
 		return "", "", err
 	} else if !generateRefresh {

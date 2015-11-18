@@ -7,9 +7,9 @@ import (
 	"github.com/gorilla/mux"
 	chd "github.com/ory-am/common/handler"
 	"github.com/ory-am/dockertest"
-	middleware "github.com/ory-am/hydra/middleware/host"
 	authcon "github.com/ory-am/hydra/context"
 	hjwt "github.com/ory-am/hydra/jwt"
+	middleware "github.com/ory-am/hydra/middleware/host"
 	. "github.com/ory-am/hydra/oauth/connection"
 	"github.com/ory-am/hydra/oauth/connection/postgres"
 	"github.com/ory-am/ladon/policy"
@@ -63,7 +63,7 @@ type test struct {
 func mockAuthorization(c test) func(h chd.ContextHandler) chd.ContextHandler {
 	return func(h chd.ContextHandler) chd.ContextHandler {
 		return chd.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
-			claims := hjwt.NewClaimsCarrier(uuid.New(), "hydra", c.subject, "tests", time.Now(), time.Now())
+			claims := hjwt.NewClaimsCarrier(uuid.New(), "hydra", c.subject, "tests", time.Now().Add(time.Hour), time.Now(), time.Now())
 			ctx = authcon.NewContextFromAuthValues(ctx, claims, &c.token, c.policies)
 			h.ServeHTTPContext(ctx, rw, req)
 		})

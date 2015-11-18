@@ -1,6 +1,8 @@
 package http
 
-import . "github.com/ory-am/hydra/client"
+import (
+. "github.com/ory-am/hydra/client"
+)
 
 type client struct {
 	result bool

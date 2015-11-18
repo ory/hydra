@@ -3,9 +3,9 @@ package host
 import (
 	log "github.com/Sirupsen/logrus"
 	chd "github.com/ory-am/common/handler"
-	"github.com/ory-am/hydra/middleware"
 	authcon "github.com/ory-am/hydra/context"
 	"github.com/ory-am/hydra/jwt"
+	"github.com/ory-am/hydra/middleware"
 	ladonGuard "github.com/ory-am/ladon/guard"
 	"github.com/ory-am/ladon/policy"
 	"golang.org/x/net/context"
@@ -25,6 +25,7 @@ var guard = &ladonGuard.Guard{}
 
 func (m *Middleware) ExtractAuthentication(next chd.ContextHandler) chd.ContextHandler {
 	return chd.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+		ctx = authcon.NewContextFromAuthorization(ctx, req, m.jwtService, m.policyStore)
 		next.ServeHTTPContext(ctx, rw, req)
 	})
 }

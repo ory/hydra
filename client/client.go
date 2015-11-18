@@ -1,10 +1,12 @@
 package client
 
-import "github.com/ory-am/ladon/guard/operator"
+import (
+	"github.com/ory-am/ladon/guard/operator"
+)
 
 type AuthorizeRequest struct {
-	Resource   string `json:"string"`
-	Token      string
+	Resource   string            `json:"resource"`
+	Token      string            `json:"token"`
 	Permission string            `json:"permission"`
 	Context    *operator.Context `json:"context"`
 }

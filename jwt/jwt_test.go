@@ -77,7 +77,7 @@ func TestSignAndVerify(t *testing.T) {
 			[]byte(""),
 			[]byte(TestCertificates[1][1]),
 			map[string]interface{}{"foo": "bar"},
-			map[string]interface{}{"nbf": time.Now().Add(time.Hour)},
+			map[string]interface{}{"nbf": time.Now().Add(time.Hour).Unix()},
 			false,
 			false,
 		},
@@ -85,7 +85,7 @@ func TestSignAndVerify(t *testing.T) {
 			[]byte(TestCertificates[0][1]),
 			[]byte(""),
 			map[string]interface{}{"foo": "bar"},
-			map[string]interface{}{"nbf": time.Now().Add(time.Hour)},
+			map[string]interface{}{"nbf": time.Now().Add(time.Hour).Unix()},
 			false,
 			true,
 		},
@@ -93,7 +93,7 @@ func TestSignAndVerify(t *testing.T) {
 			[]byte(TestCertificates[0][1]),
 			[]byte(TestCertificates[1][1]),
 			map[string]interface{}{"foo": "bar"},
-			map[string]interface{}{"nbf": time.Now().Add(-time.Hour)},
+			map[string]interface{}{"nbf": time.Now().Add(-time.Hour).Unix()},
 			false,
 			true,
 		},
@@ -101,7 +101,7 @@ func TestSignAndVerify(t *testing.T) {
 			[]byte(TestCertificates[0][1]),
 			[]byte(TestCertificates[1][1]),
 			map[string]interface{}{"foo": "bar"},
-			map[string]interface{}{"nbf": time.Now().Add(time.Hour)},
+			map[string]interface{}{"nbf": time.Now().Add(time.Hour).Unix()},
 			false,
 			true,
 		},
@@ -109,7 +109,7 @@ func TestSignAndVerify(t *testing.T) {
 			[]byte(TestCertificates[0][1]),
 			[]byte(TestCertificates[1][1]),
 			map[string]interface{}{"foo": "bar"},
-			map[string]interface{}{"exp": time.Now().Add(-time.Hour)},
+			map[string]interface{}{"exp": time.Now().Add(-time.Hour).Unix()},
 			false,
 			true,
 		},
@@ -118,9 +118,9 @@ func TestSignAndVerify(t *testing.T) {
 			[]byte(TestCertificates[1][1]),
 			map[string]interface{}{"foo": "bar"},
 			map[string]interface{}{
-				"nbf": time.Now().Add(-time.Hour),
-				"iat": time.Now().Add(-time.Hour),
-				"exp": time.Now().Add(time.Hour),
+				"nbf": time.Now().Add(-time.Hour).Unix(),
+				"iat": time.Now().Add(-time.Hour).Unix(),
+				"exp": time.Now().Add(time.Hour).Unix(),
 			},
 			true,
 			true,
@@ -130,7 +130,7 @@ func TestSignAndVerify(t *testing.T) {
 			[]byte(TestCertificates[1][1]),
 			map[string]interface{}{"foo": "bar"},
 			map[string]interface{}{
-				"nbf": time.Now().Add(-time.Hour),
+				"nbf": time.Now().Add(-time.Hour).Unix(),
 			},
 			false,
 			true,
@@ -140,7 +140,7 @@ func TestSignAndVerify(t *testing.T) {
 			[]byte(TestCertificates[1][1]),
 			map[string]interface{}{"foo": "bar"},
 			map[string]interface{}{
-				"exp": time.Now().Add(time.Hour),
+				"exp": time.Now().Add(time.Hour).Unix(),
 			},
 			true,
 			true,
@@ -157,13 +157,13 @@ func TestSignAndVerify(t *testing.T) {
 		j := New(c.private, c.public)
 		data, err := j.SignToken(c.claims, c.header)
 		if c.signOk {
-			require.Nil(t, err, "Case %d", i)
+			require.Nil(t, err, "Case %d: %s", i, err)
 		} else {
 			require.NotNil(t, err, "Case %d", i)
 		}
 		tok, err := j.VerifyToken([]byte(data))
 		if c.valid {
-			require.Nil(t, err, "Case %d", i)
+			require.Nil(t, err, "Case %d: %s", i, err)
 			require.Equal(t, c.valid, tok.Valid, "Case %d", i)
 		} else {
 			require.NotNil(t, err, "Case %d", i)

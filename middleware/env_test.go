@@ -1,9 +1,9 @@
 package middleware
 
 import (
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestEnv(t *testing.T) {
@@ -15,9 +15,9 @@ func TestEnv(t *testing.T) {
 		owner         string
 		headers       map[string]string
 	}{
-		{"1234", "peter", "firefox", &http.Request{RemoteAddr:"1234"}, "peter", map[string]string{"user-Agent": "firefox"}},
-		{"1234", "peter", "", &http.Request{RemoteAddr:"4321"}, "peter", map[string]string{"x-FoRwarded-FoR": "1234"}},
-		{"1234", "peter", "firefox", &http.Request{RemoteAddr:"4321"}, "peter", map[string]string{"x-FoRwarded-FoR": "1234", "user-Agent": "firefox"}},
+		{"1234", "peter", "firefox", &http.Request{RemoteAddr: "1234"}, "peter", map[string]string{"user-Agent": "firefox"}},
+		{"1234", "peter", "", &http.Request{RemoteAddr: "4321"}, "peter", map[string]string{"x-FoRwarded-FoR": "1234"}},
+		{"1234", "peter", "firefox", &http.Request{RemoteAddr: "4321"}, "peter", map[string]string{"x-FoRwarded-FoR": "1234", "user-Agent": "firefox"}},
 	} {
 		h := http.Header{}
 		for y, x := range c.headers {

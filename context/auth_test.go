@@ -76,12 +76,13 @@ func TestNewContextFromAuthorization(t *testing.T) {
 			[]byte(hjwt.TestCertificates[0][1]),
 			[]byte(hjwt.TestCertificates[1][1]),
 			//		{
-			//			"exp": "2099-10-31T15:03:52.4620974+01:00",
-			//			"iat": "2014-10-31T13:03:52.4620974+01:00",
-			//			"nbf": "2014-10-31T13:03:52.4620974+01:00",
-			//			"sub": "132"
+			//			"exp": 1924975619,
+			//			"iat": 1924975619,
+			//			"nbf": 0
+			//			"aud": "tests",
+			//			"subject": "foo"
 			//		}
-			"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIyMDk5LTEwLTMxVDE1OjAzOjUyLjQ2MjA5NzQrMDE6MDAiLCJpYXQiOiIyMDE0LTEwLTMxVDEzOjAzOjUyLjQ2MjA5NzQrMDE6MDAiLCJuYmYiOiIyMDE0LTEwLTMxVDEzOjAzOjUyLjQ2MjA5NzQrMDE6MDAiLCJzdWIiOiIxMzIifQ.qnZr-msiG5GkVTDTyY3g26c5Edho36_E9CaANyCBVOrXWRfRPDMf7E2vrdZubO5tXlfKRgM_1avFQVWZhqrdrGBO8DiBa5OGX9IdAZaclqQFjg7vRSyIFllSs4zP4QREG4YL0qwiYGKS4SBcCS2LNfbaJfrKP_zUReXRAlWNdeFAw6zsGzlAtHQO_O0HnJCEB_wEBIkMIxdI2f-1yyTZJInyvY_wrFDkCkTfkmmW8EHzO2R44FXmaudxDCG1YAeN6WssAwgzBjR8WaQ2M_8VUYWN9TCDc3Fx58XWRTtWL_coDI9R6WtqaPkyr2_qn1Un3y3yLCGdVglRYnhJL1YCXA",
+			"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MCwiaWF0IjoxOTI0OTc1NjE5LCJhdWQiOiJ0ZXN0cyIsInN1YmplY3QiOiJmb28ifQ.lvjLGnLO3mZSS63fomK-KH2mhLXjjg9b13opiN7jY4MrXE_DaR0Lum8a_RcqqSTXbpHxYSIPV9Ji7zM_X1bvBtsPpBE1PR3_PrdD5_uIDQ-UWPVzozxhOvuZzU7qHx3TFQClZ6tYIXYioTszz9zQHiE4hj1x6Z_shWPfczELGyD0HnEC3o_w7IFfYO_L0YDN_vkuqr6yS5kaPIsoCF_iHuhTzoBAEIpUENlxSpCPuxR9aMaJ-BQDInHoPc1h-VvkgOdR_iENQdOUePObw17ywdGkRk6C5kRHSxjca-ULGcDn36NZ54SEPolcGbjs3vVA1g0jQARKIcTVw6Uu7x0s6Q",
 			true,
 		},
 		{

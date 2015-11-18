@@ -14,10 +14,10 @@ import (
 	"golang.org/x/net/context"
 
 	chd "github.com/ory-am/common/handler"
-	mwroot "github.com/ory-am/hydra/middleware"
-	. "github.com/ory-am/hydra/middleware/host"
 	authcon "github.com/ory-am/hydra/context"
 	hjwt "github.com/ory-am/hydra/jwt"
+	mwroot "github.com/ory-am/hydra/middleware"
+	. "github.com/ory-am/hydra/middleware/host"
 	. "github.com/ory-am/ladon/policy"
 )
 
@@ -138,7 +138,7 @@ var cases = []test{
 func mockContext(c test) func(chd.ContextHandler) chd.ContextHandler {
 	return func(next chd.ContextHandler) chd.ContextHandler {
 		return chd.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
-			claims := hjwt.NewClaimsCarrier(uuid.New(), "hydra", c.subject, "tests", time.Now(), time.Now())
+			claims := hjwt.NewClaimsCarrier(uuid.New(), "hydra", c.subject, "tests", time.Now().Add(time.Hour), time.Now(), time.Now())
 			ctx = authcon.NewContextFromAuthValues(ctx, claims, c.token, c.policies)
 			next.ServeHTTPContext(ctx, rw, req)
 		})

@@ -7,7 +7,7 @@ import (
 )
 
 var schemata = []string{
-	`CREATE TABLE IF NOT EXISTS hydra_hydra_oauth_link (
+	`CREATE TABLE IF NOT EXISTS hydra_oauth_link (
 	id       		text NOT NULL PRIMARY KEY,
 	provider		text NOT NULL,
     subject_local  	text NOT NULL,

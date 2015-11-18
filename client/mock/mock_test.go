@@ -2,7 +2,7 @@ package http
 
 import (
 	"github.com/stretchr/testify/assert"
-"testing"
+	"testing"
 )
 
 func TestClientAlwaysTrue(t *testing.T) {

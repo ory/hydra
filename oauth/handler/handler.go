@@ -7,9 +7,10 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/gorilla/mux"
+	hctx "github.com/ory-am/common/handler"
 	"github.com/ory-am/hydra/account"
-	middleware "github.com/ory-am/hydra/middleware/host"
 	"github.com/ory-am/hydra/jwt"
+	 "github.com/ory-am/hydra/middleware"
 	"github.com/ory-am/hydra/oauth/connection"
 	"github.com/ory-am/hydra/oauth/provider"
 	"github.com/ory-am/hydra/oauth/provider/storage"
@@ -17,6 +18,7 @@ import (
 	"github.com/ory-am/ladon/policy"
 	osinStore "github.com/ory-am/osin-storage/storage"
 	"github.com/pborman/uuid"
+	"golang.org/x/net/context"
 	"net/http"
 	"net/url"
 	"time"
@@ -54,40 +56,38 @@ type Handler struct {
 	JWT            *jwt.JWT
 	SignUpLocation string
 	SignInLocation string
+	Middleware     middleware.Middleware
 
 	OAuthConfig *osin.ServerConfig
 	OAuthStore  osinStore.Storage
 	server      *osin.Server
 }
 
-func (h *Handler) SetRoutes(r *mux.Router) {
+func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hctx.ContextHandler) hctx.ContextHandler) {
 	h.server = osin.NewServer(h.OAuthConfig, h.OAuthStore)
 	h.server.AccessTokenGen = h.JWT
 
+	r.Handle("/oauth2/introspect", hctx.NewContextAdapter(
+		context.Background(),
+		extractor,
+		h.Middleware.IsAuthenticated,
+	).ThenFunc(h.IntrospectHandler)).Methods("POST")
 	r.HandleFunc("/oauth2/auth", h.AuthorizeHandler)
 	r.HandleFunc("/oauth2/token", h.TokenHandler)
-	r.HandleFunc("/oauth2/info", h.InfoHandler)
-	r.HandleFunc("/oauth2/introspect", h.IntrospectHandler)
 }
 
-func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) IntrospectHandler(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-
-	bearer := osin.CheckBearerAuth(r)
-	if bearer == nil {
-		log.WithField("introspect", "fail").Warn("No authorization header given.")
-		http.Error(w, "No bearer given.", http.StatusUnauthorized)
-		return
-	} else if bearer.Code == "" {
-		log.WithField("introspect", "fail").Warn("No authorization bearer is empty.")
-		http.Error(w, "No bearer token given.", http.StatusUnauthorized)
+	if r.Form.Get("token") == "" {
+		log.WithField("introspect", "fail").Warn("No token given.")
+		http.Error(w, "No token given.", http.StatusOK)
 		return
 	}
 
-	token, err := h.JWT.VerifyToken([]byte(bearer.Code))
+	token, err := h.JWT.VerifyToken([]byte(r.Form.Get("token")))
 	if err != nil {
 		log.WithField("introspect", "fail").Warn("Bearer token is invalid.")
-		http.Error(w, "Bearer token is not valid.", http.StatusForbidden)
+		http.Error(w, "Bearer token is not valid.", http.StatusOK)
 		return
 	}
 
@@ -118,16 +118,6 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Handler) InfoHandler(w http.ResponseWriter, r *http.Request) {
-	resp := h.server.NewResponse()
-	defer resp.Close()
-
-	if ir := h.server.HandleInfoRequest(resp, r); ir != nil {
-		h.server.FinishInfoRequest(resp, r, ir)
-	}
-	osin.OutputJSON(resp, w, r)
-}
-
 func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	resp := h.server.NewResponse()
 	r.ParseForm()
@@ -147,7 +137,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, claims.GetSubject(), h.Audience, time.Now(), time.Now())
+			ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, claims.GetSubject(), h.Audience, time.Now().Add(time.Hour), time.Now(), time.Now())
 			ar.Authorized = true
 		case osin.REFRESH_TOKEN:
 			data, ok := ar.UserData.(map[string]interface{})
@@ -156,7 +146,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			claims := jwt.ClaimsCarrier(data)
-			ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, claims.GetSubject(), h.Audience, time.Now(), time.Now())
+			ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, claims.GetSubject(), h.Audience, time.Now().Add(time.Hour), time.Now(), time.Now())
 			ar.Authorized = true
 		case osin.PASSWORD:
 			// TODO if !ar.Client.isAllowedToAuthenticateUser
@@ -164,11 +154,11 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 			// TODO }
 
 			if user, err := h.authenticate(w, r, ar.Username, ar.Password); err == nil {
-				ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, user.GetID(), h.Audience, time.Now(), time.Now())
+				ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, user.GetID(), h.Audience, time.Now().Add(time.Hour), time.Now(), time.Now())
 				ar.Authorized = true
 			}
 		case osin.CLIENT_CREDENTIALS:
-			ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, ar.Client.GetId(), h.Audience, time.Now(), time.Now())
+			ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, ar.Client.GetId(), h.Audience, time.Now().Add(time.Hour), time.Now(), time.Now())
 			ar.Authorized = true
 
 			// TODO ASSERTION workflow http://leastprivilege.com/2013/12/23/advanced-oauth2-assertion-flow-why/
@@ -281,7 +271,7 @@ func (h *Handler) AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		ar.UserData = jwt.NewClaimsCarrier(uuid.New(), user.GetLocalSubject(), h.Issuer, h.Audience, time.Now(), time.Now())
+		ar.UserData = jwt.NewClaimsCarrier(uuid.New(), user.GetLocalSubject(), h.Issuer, h.Audience, time.Now().Add(time.Hour), time.Now(), time.Now())
 		ar.Authorized = true
 		h.server.FinishAuthorizeRequest(resp, r, ar)
 	}

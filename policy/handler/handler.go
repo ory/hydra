@@ -16,7 +16,9 @@ import (
 	"golang.org/x/net/context"
 	"net/http"
 
+	"errors"
 	log "github.com/Sirupsen/logrus"
+	"github.com/ory-am/hydra/jwt"
 	. "github.com/ory-am/ladon/guard"
 	"github.com/ory-am/ladon/guard/operator"
 	. "github.com/ory-am/ladon/policy"
@@ -26,11 +28,12 @@ type Handler struct {
 	s Storage
 	m middleware.Middleware
 	g Guarder
+	j *jwt.JWT
 }
 
 type payload struct {
 	Resource   string            `json:"resource"`
-	Subject    string            `json:"subject"`
+	Token      string            `json:"token"`
 	Permission string            `json:"permission"`
 	Context    *operator.Context `json:"context"`
 }
@@ -39,8 +42,8 @@ func permission(id string) string {
 	return fmt.Sprintf("rn:hydra:policies:%s", id)
 }
 
-func NewHandler(s Storage, m middleware.Middleware, g Guarder) *Handler {
-	return &Handler{s, m, g}
+func NewHandler(s Storage, m middleware.Middleware, g Guarder, j *jwt.JWT) *Handler {
+	return &Handler{s: s, m: m, g: g, j: j}
 }
 
 func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hctx.ContextHandler) hctx.ContextHandler) {
@@ -78,30 +81,62 @@ func (h *Handler) Granted(ctx context.Context, rw http.ResponseWriter, req *http
 		return
 	}
 
-	policies, err := h.s.FindPoliciesForSubject(p.Subject)
+	token, err := h.j.VerifyToken([]byte(p.Token))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error":      err.Error(),
 			"resource":   p.Resource,
 			"permission": p.Permission,
-			"subject":    p.Subject,
+			"subject":    "",
+			"context":    fmt.Sprintf("%s", p.Context),
+		}).Warn("Token not valid.")
+		pkg.WriteJSON(rw, struct {
+			Allowed bool   `json:"allowed"`
+			Error   string `json:"error"`
+		}{Allowed: false, Error: err.Error()})
+		return
+	}
+
+	subject, ok := token.Claims["sub"].(string)
+	if !ok {
+		err := errors.New("Bearer token is not valid.")
+		log.WithFields(log.Fields{
+			"error":      err.Error(),
+			"resource":   p.Resource,
+			"permission": p.Permission,
+			"subject":    "",
+			"context":    fmt.Sprintf("%s", p.Context),
+		}).Warn("Token does not claim a subject.")
+		pkg.WriteJSON(rw, struct {
+			Allowed bool   `json:"allowed"`
+			Error   string `json:"error"`
+		}{Allowed: false, Error: err.Error()})
+		return
+	}
+
+	policies, err := h.s.FindPoliciesForSubject(subject)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error":      err.Error(),
+			"resource":   p.Resource,
+			"permission": p.Permission,
+			"subject":    subject,
 			"context":    fmt.Sprintf("%s", p.Context),
 		}).Warn("Could not fetch policies from store.")
 		pkg.WriteJSON(rw, struct {
 			Allowed bool   `json:"allowed"`
 			Error   string `json:"error"`
 		}{Allowed: false, Error: err.Error()})
-		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	allowed, err := h.g.IsGranted(p.Resource, p.Permission, p.Subject, policies, p.Context)
+	allowed, err := h.g.IsGranted(p.Resource, p.Permission, subject, policies, p.Context)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error":      err.Error(),
 			"resource":   p.Resource,
 			"permission": p.Permission,
-			"subject":    p.Subject,
+			"subject":    subject,
 			"policies":   fmt.Sprintf("%s", policies),
 			"context":    fmt.Sprintf("%s", p.Context),
 		}).Warn("Granted check failed.")
@@ -109,18 +144,17 @@ func (h *Handler) Granted(ctx context.Context, rw http.ResponseWriter, req *http
 			Allowed bool   `json:"allowed"`
 			Error   string `json:"error"`
 		}{Allowed: false, Error: err.Error()})
-		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	log.WithFields(log.Fields{
 		"resource":   p.Resource,
 		"permission": p.Permission,
-		"subject":    p.Subject,
+		"subject":    subject,
 		"allowed":    allowed,
 		"policies":   fmt.Sprintf("%s", policies),
 		"context":    fmt.Sprintf("%s", p.Context),
-	}).Info("Valid granted request.")
+	}).Info("Got guard decision.")
 	pkg.WriteJSON(rw, struct {
 		Allowed bool `json:"allowed"`
 	}{Allowed: allowed})

@@ -103,12 +103,12 @@ func (j *JWT) VerifyToken(tokenData []byte) (*jwt.Token, error) {
 	claims := ClaimsCarrier(token.Claims)
 	if claims.AssertExpired() {
 		token.Valid = false
-		return token, errors.Errorf("Token expired: %v", claims.GetExpiresAt())
+		return token, errors.Errorf("Token expired at %v", claims.GetExpiresAt())
 	}
-	if claims.AssertNotYetValid() {
-		token.Valid = false
-		return token, errors.Errorf("Token is not valid yet: %v", claims.GetNotBefore())
-	}
+	//if claims.AssertNotYetValid() {
+	//	token.Valid = false
+	//	return token, errors.Errorf("Token validates in the future: %v", claims.GetNotBefore())
+	//}
 	return token, nil
 }
 

@@ -1,0 +1,33 @@
+{
+	"ImportPath": "github.com/ory-am/dockertest",
+	"GoVersion": "go1.5",
+	"Deps": [
+		{
+			"ImportPath": "camlistore.org/pkg/netutil",
+			"Rev": "e52149992aac24dd02248ffb1e166a08f27f0554"
+		},
+		{
+			"ImportPath": "github.com/go-sql-driver/mysql",
+			"Comment": "v1.2-119-g527bcd5",
+			"Rev": "527bcd55aab2e53314f1a150922560174b493034"
+		},
+		{
+			"ImportPath": "github.com/lib/pq",
+			"Comment": "go1.0-cutoff-58-g0dad96c",
+			"Rev": "0dad96c0b94f8dee039aa40467f767467392a0af"
+		},
+		{
+			"ImportPath": "github.com/pborman/uuid",
+			"Rev": "cccd189d45f7ac3368a0d127efb7f4d08ae0b655"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/assert",
+			"Rev": "dab07ac62d4905d3e48d17dc549c684ac3b7c15a"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2",
+			"Comment": "r2015.01.24",
+			"Rev": "c6a7dce14133ccac2dcac3793f1d6e2ef048503a"
+		}
+	]
+}

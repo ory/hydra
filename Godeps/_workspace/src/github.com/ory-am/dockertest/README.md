@@ -16,7 +16,7 @@ To avoid this, it is smarter to test these specific services against a real data
 
 Using Dockertest is straightforward and  simple. At present, Dockertest supports MongoDB, Postgres and MySQL containers out of the box. Feel free to extend this list by contributing to this project.
 
-**Note:** When using the Docker Toolbox (Windows / OSX), make sure that the VM ist started by running `docker-machine start default`.
+**Note:** When using the Docker Toolbox (Windows / OSX), make sure that the VM is started by running `docker-machine start default`.
 
 ### MongoDB Container
 

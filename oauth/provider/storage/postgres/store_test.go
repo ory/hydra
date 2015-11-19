@@ -37,7 +37,7 @@ func TestMain(m *testing.M) {
 
 func TestCreateAndGetCases(t *testing.T) {
 	var stateDataSet = map[string]storage.StateData{
-		"valid": storage.StateData{
+		"valid": {
 			ID:          uuid.New(),
 			ClientID:    uuid.New(),
 			RedirectURL: "http://localhost/",
@@ -47,7 +47,7 @@ func TestCreateAndGetCases(t *testing.T) {
 			Provider:    "facebook",
 			ExpiresAt:   time.Now().Add(time.Hour),
 		},
-		"invalid": storage.StateData{},
+		"invalid": {},
 	}
 
 	for k, c := range []struct {

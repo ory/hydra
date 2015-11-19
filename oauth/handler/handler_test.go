@@ -1,13 +1,18 @@
 package handler_test
 
 import (
+	"bytes"
 	"encoding/json"
 	"github.com/RangelReale/osin"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
+	chd "github.com/ory-am/common/handler"
 	"github.com/ory-am/dockertest"
 	acpg "github.com/ory-am/hydra/account/postgres"
+	authcon "github.com/ory-am/hydra/context"
 	"github.com/ory-am/hydra/hash"
-	"github.com/ory-am/hydra/jwt"
+	hjwt "github.com/ory-am/hydra/jwt"
+	"github.com/ory-am/hydra/middleware/host"
 	"github.com/ory-am/hydra/oauth/connection"
 	cpg "github.com/ory-am/hydra/oauth/connection/postgres"
 	. "github.com/ory-am/hydra/oauth/handler"
@@ -20,6 +25,7 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 	"io/ioutil"
@@ -28,7 +34,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
-	"strings"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -48,7 +54,7 @@ func TestMain(m *testing.M) {
 	connectionStore := cpg.New(db)
 	stateStore := oapg.New(db)
 	registry := provider.NewRegistry([]provider.Provider{&prov{}})
-	j := jwt.New([]byte(jwt.TestCertificates[0][1]), []byte(jwt.TestCertificates[1][1]))
+	j := hjwt.New([]byte(hjwt.TestCertificates[0][1]), []byte(hjwt.TestCertificates[1][1]))
 
 	if err := connectionStore.CreateSchemas(); err != nil {
 		log.Fatalf("Could not set up schemas: %v", err)
@@ -74,6 +80,7 @@ func TestMain(m *testing.M) {
 		Providers:   registry,
 		Issuer:      "hydra",
 		Audience:    "tests",
+		Middleware:  host.New(policyStore, j),
 	}
 
 	pol := policy.DefaultPolicy{
@@ -105,25 +112,35 @@ func TestMain(m *testing.M) {
 
 var (
 	configs = map[string]*oauth2.Config{
-		"working": &oauth2.Config{
+		"working": {
 			ClientID: "1", ClientSecret: "secret", Scopes: []string{}, RedirectURL: "/callback",
 			Endpoint: oauth2.Endpoint{AuthURL: "/oauth2/auth", TokenURL: "/oauth2/token"},
 		},
-		"voidSecret": &oauth2.Config{
+		"voidSecret": {
 			ClientID: "1", ClientSecret: "wrongsecret", Scopes: []string{}, RedirectURL: "/callback",
 			Endpoint: oauth2.Endpoint{AuthURL: "/oauth2/auth", TokenURL: "/oauth2/token"},
 		},
-		"voidID": &oauth2.Config{
+		"voidID": {
 			ClientID: "notexistent", ClientSecret: "random", Scopes: []string{}, RedirectURL: "/callback",
 			Endpoint: oauth2.Endpoint{AuthURL: "/oauth2/auth", TokenURL: "/oauth2/token"},
 		},
 	}
 	logins = map[string]*userAuth{
-		"working":      &userAuth{"2@bar.com", "secret"},
-		"voidEmail":    &userAuth{"1@bar.com", "secret"},
-		"voidPassword": &userAuth{"1@bar.com", "public"},
+		"working":      {"2@bar.com", "secret"},
+		"voidEmail":    {"1@bar.com", "secret"},
+		"voidPassword": {"1@bar.com", "public"},
 	}
 )
+
+func mockAuthorization(subject string, token *jwt.Token) func(h chd.ContextHandler) chd.ContextHandler {
+	return func(h chd.ContextHandler) chd.ContextHandler {
+		return chd.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+			claims := hjwt.NewClaimsCarrier(uuid.New(), "hydra", subject, "tests", time.Now().Add(time.Hour), time.Now(), time.Now())
+			ctx = authcon.NewContextFromAuthValues(ctx, claims, token, []policy.Policy{})
+			h.ServeHTTPContext(ctx, rw, req)
+		})
+	}
+}
 
 func TestAuthCode(t *testing.T) {
 	var callbackURL *url.URL
@@ -131,7 +148,7 @@ func TestAuthCode(t *testing.T) {
 	ts := httptest.NewUnstartedServer(router)
 	callbackCalled := false
 
-	handler.SetRoutes(router)
+	handler.SetRoutes(router, mockAuthorization("", new(jwt.Token)))
 	router.HandleFunc("/remote/oauth2/auth", authHandlerMock(t, ts))
 	router.HandleFunc("/callback", func(w http.ResponseWriter, r *http.Request) {
 		callbackURL = r.URL
@@ -161,7 +178,7 @@ func TestAuthCode(t *testing.T) {
 
 func TestPasswordGrantType(t *testing.T) {
 	router := mux.NewRouter()
-	handler.SetRoutes(router)
+	handler.SetRoutes(router, mockAuthorization("", new(jwt.Token)))
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 
@@ -191,7 +208,7 @@ func TestPasswordGrantType(t *testing.T) {
 
 func TestClientGrantType(t *testing.T) {
 	router := mux.NewRouter()
-	handler.SetRoutes(router)
+	handler.SetRoutes(router, mockAuthorization("", new(jwt.Token)))
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 
@@ -222,7 +239,7 @@ func TestClientGrantType(t *testing.T) {
 
 func TestIntrospect(t *testing.T) {
 	router := mux.NewRouter()
-	handler.SetRoutes(router)
+	handler.SetRoutes(router, mockAuthorization("subject", &jwt.Token{Valid: true}))
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 
@@ -244,65 +261,59 @@ func TestIntrospect(t *testing.T) {
 		code        int
 		pass        bool
 	}{
-		{"Bearer " + verify.AccessToken, http.StatusOK, true},
-		{"", http.StatusUnauthorized, false},
-		{"Bearer ", http.StatusUnauthorized, false},
-		{"Bearer invalid", http.StatusForbidden, false},
-		{"Bearer invalid", http.StatusForbidden, false},
-		{"Bearer invalid", http.StatusForbidden, false},
-
+		{verify.AccessToken, http.StatusOK, true},
+		{access.AccessToken, http.StatusOK, true},
+		{"", http.StatusOK, false},
+		{" ", http.StatusOK, false},
+		{"invalid", http.StatusOK, false},
 		//
-		{"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.e30.FvuwHdEjgGxPAyVUb-eqtiPl2gycU9WOHNzwpFKcpdN_QkXkBUxU3qFl3lLBaMzIuP_GjXLXcJZFhyQ2Ne3kfWuZSGLmob0Og8B4lAy7CA7iwpji2R3aUcwBwbJ41IJa__F8fMRz0dRDwhyrBKD-9y4TfV_-yZuzBZxq0UdjX6IdpzsdetphBSIZkPij5MY3thRwC-X_gXyIXi4-G2_CjRrV5lCGnPJrDbLqPCYqS71wK9NEsz_B8p5ENmwad8vZe4fEFR7XsqJrhPjbEVGeLpzSz0AOGp4G1iyvv1sdu4M3Y8KSSGYnZ8lXNGyi8QeUr374Y6XgJ5N5TVLWI2cMxg", http.StatusForbidden, false},
+		{"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.e30.FvuwHdEjgGxPAyVUb-eqtiPl2gycU9WOHNzwpFKcpdN_QkXkBUxU3qFl3lLBaMzIuP_GjXLXcJZFhyQ2Ne3kfWuZSGLmob0Og8B4lAy7CA7iwpji2R3aUcwBwbJ41IJa__F8fMRz0dRDwhyrBKD-9y4TfV_-yZuzBZxq0UdjX6IdpzsdetphBSIZkPij5MY3thRwC-X_gXyIXi4-G2_CjRrV5lCGnPJrDbLqPCYqS71wK9NEsz_B8p5ENmwad8vZe4fEFR7XsqJrhPjbEVGeLpzSz0AOGp4G1iyvv1sdu4M3Y8KSSGYnZ8lXNGyi8QeUr374Y6XgJ5N5TVLWI2cMxg", http.StatusOK, false},
 
-		//		 "exp": "2012-04-23T18:25:43.511Z"
-		{"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIyMDEyLTA0LTIzVDE4OjI1OjQzLjUxMVoifQ.YPCfgNDs-UT6vNqh6095cXiMe0jcA9HjHuLi6hK6YBPsEHwHFniFGXAYt1PpPabBHAz7lQQ8zZao6LrVXkfz7PLbeQZl3KY0SUb-Wb0eEDjX4naEdm20whrYMZQ36VcTMT-FsGk5MB-nIYKq3iX6FMhumV8StjpC0jrM14488lPwLXihC1uITQBNVFEyXV_emhfuyojWEcEq899oE_vVRd7pTOmIhU8dFEAonoLZyPTKzSfvqaurPeySA5ttA-TTMTxZNzGVxWV4cwYHlhTXfS57zoSF_EN_PULTqMepUe8RC9AFnwyvNAa5e4nxQG5yO6b7cUGa0vSCD5FPbNBh-w", http.StatusForbidden, false},
-
+		//		 "exp": 12345
+		{"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjEyMzQ1fQ.0w2dienBCvgfbhLjmK04fFKqf2oFRMNoKS0A3zHBpU_yN22utC_gAvcFwKiMffebtHah7rgldnPqNZaNhfnEM1PxNFh46vXO5LNZDHt5sNZqeBtZ1Q7ORkZsAtIp97mtZMxufn0VBqJTRYxyDrEzH9Mo1OpXuPTzDP87n-p_Xdbpj5YccZU6TZ11eLs9NvuYu_A2HClKrGbCeaHFAGVWVaoSZ_TvjGqyBI-XoGzuCEBoj6NFTHxZpbNeKhVTTwXHv2sUn09gZ_ErmbPZKExV5sCLETktr4ABUXkNtw4xLW6g0EVzC9dRMKxUZO8kCmAJkKHUTinEDjpfX_n8CKRQVQ", http.StatusOK, false},
 		//		{
-		//			"exp": "2099-04-23T18:25:43.511Z",
-		//			"nbf": "2099-04-23T18:25:43.511Z"
+		//			"exp": 1924975619,
+		//			"nbf": 1924975619
 		//		}
-		{"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIyMDk5LTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJuYmYiOiIyMDk5LTA0LTIzVDE4OjI1OjQzLjUxMVoifQ.hCuvBuiwEjjTbL8NMfEe6exDaRUeQIHodTNc5uBdY1lxmJWfFPh2zykuEvinqTprQe2CPRmL3Dk6jX3pcnigg7IjMX-EZueOnJc229gwjmJJiIGuUJOV3bLc-0xQ3cu6FCRc2NgOEh6Nq6Jh8G7ko4Du4gGrFsn97kbzAUYyns98T8442p0YXdQF-KVCc87fCkdr6OTsbfomy7jUDLCWptyJqREOoBll-nzyFWTxGHgoH_DmHft64SwvsvRafqZv9Q48bRzr857ps6OjEPncjRTriAsJa-p7aPKO2e7LXLKpopcaNwC09RNteAO4XPc2_M-IrYf6a02UzgSmOkIZUg", http.StatusForbidden, false},
-
+		{"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MTkyNDk3NTYxOX0.P381fgXq75I1iFBFMA624LgKm-wyous9VV4aQHS2O9kDyCJUejK71-M5owaWkjDOkHFlE7Ju5yknasODNlYsuzB2ujos1xiCuHYjoqivvSPNwrxJMXKMXrtzzk045E_OH1EHd_d9KVmrnA5dd3NLqNdYAoUogrO4TistjpZOv-ABUesiKIOR6SopD2tUxHog4RmFFtBJOt4l9P2aGn4a6LBt5wvBz9wUKak7YzUKMZXsWus-x-RP41bulpsUPEfH4TtgQHOM-VQ5W-EORhH8PClBfUrPyp1H7bgXOjhvCdpf4dfJS59Wf3euq9TXT0axyJ5HErXy3yOwC0E2ggl2iQ", http.StatusOK, false},
 		//		{
-		//			"exp": "2099-04-23T18:25:43.511Z",
-		//			"iat": "2000-04-23T18:25:43.511Z",
-		//			"nbf": "2099-04-23T18:25:43.511Z"
+		//			"exp": 1924975619,
+		//			"iat": 1924975619,
+		//			"nbf": 0
 		//		}
-		{"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIyMDk5LTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJpYXQiOiIyMDAwLTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJuYmYiOiIyMDk5LTA0LTIzVDE4OjI1OjQzLjUxMVoifQ.WtRurXoCy4kHPxnaL5ccPaeHIaDogXRFE6mqyF8nVTSsv6E7FaJg4IiYylxa44ty8GRMYn7c2CSyQefTVauqjJm8b0Rpu4biIeyCQRzwTZZzqZbc6irdWYsJu4DkwfAU0yP2EaLEtQOG3scnDpmtyCp7NvDAi8XlVeytOSHjqyJMWzqO_z5eU4e2Ap-3wkLo4P9_W1W3Tx_V0xQR2VaOXtVjEa_VS36rAMBy6WAvYQrYNlvBAA6OBfqg2uvKUfmEoE6MchkFxHFTSGBmI2boDfF2XGlyLn0di7gIBG-udXDv_zaVp4BtuswygTskV5d2i3pvLGP6UuJJhc7VVOAoPw", http.StatusForbidden, false},
-
+		{"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MCwiaWF0IjoxOTI0OTc1NjE5fQ.qwUo8-e9tcg69pv9SJFpMXytJtAZlTJoVZh73bVtpkImZ0G5s_cbzPvccM_LmmHl5rFCpQuwWDSuHME2iyer6-gC2DILGQiXyJ5JhJdAKD4xtSFnV90zu84BF8L4JWqLeIEV13AHTpphfS0tOOOKL6sFYbo4LQVslfRYON28D3iOP-YAKJeorHsZgTNg-7VjPC8w_emDpVoNiWEyON2gHrucKiJlWQJVE_gxLf_n-F29UV1OBi-AjxccCrXMd0pzndZ7zg_7EbaUuOmLStfn2ORkoARaHaw55Sv2vbf_AV0MWsgqPaOlK6GTbfv3sYjB7K9eItWh9o8kDXNM4blqSw", http.StatusOK, false},
 		//		{
-		//			"exp": "2099-04-23T18:25:43.511Z",
-		//			"iat": "2000-04-23T18:25:43.511Z",
-		//			"nbf": "2000-04-23T18:25:43.511Z",
+		//			"exp": 1924975619,
+		//			"iat": 1924975619,
+		//			"nbf": 0
 		//			"aud": "wrong-audience"
 		//		}
-		{"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIyMDk5LTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJpYXQiOiIyMDAwLTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJuYmYiOiIyMDAwLTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJhdWQiOiJ3cm9uZy1hdWRpZW5jZSJ9.rF4JqVpawgHcg_H2hAAsEI2GUxzxCote4pUlruK9hLF-Dv-YSeEmMcFBhfxgsFuDCJotUCG6v8EhwI4u2wxGQHzLz70a-0AEZLQBccCfF_V4qAk8B7M5z2fO7xtEy8RkB2pZKCHbJ1f_6MSM_EyV6r4oiwedveBSsLKcjDhWE3_wExmtmtZaujJy53gR8Wh7BnUt6pl95_d7OMFjGEp1C_N0f3xd9SizIZ-qlIwHiX4xLHtvTZIjdmfyzXxPm_MK_aMOXmX0F6DQn5tgMzAggEdKSD6YdU8HM256zLQeddczrrDI5P3SASiBJ6MCUM4AzbvoFuFAilQi0WzpLpmlJw", http.StatusOK, false},
-
+		{"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MCwiaWF0IjoxOTI0OTc1NjE5LCJhdWQiOiJ3cm9uZy1hdWRpZW5jZSJ9.ZDyeQYDEjUUUvrzD_7t-4OHc4KOv4r46soSNMURZCpktCBP0qEeVovjLRHILmMlTxb1ItiOoUs2y7O-WYOKz182evgs1dkfX3C8LrOlDD3IoimaHNK4jW-5pYM47NFnW52Y7jp802wOQ8_UwERr5iu0Mb5trQC3RPALE17ppkplQVbL54kxu4HaQsPd4A2Qe2uIPhr-x75BPQiiaqzdRWuDwJhmpYBwLvyxKIY4B-AHBk70H7lpitDRXNMJdunIrIhz-qpkO7_XiwaBzwHHmdl9uRMU-UNC0TyA0iM84R_y8YJsz8Xl3MXU7QVNARzo2GGbnm4T2aRv8E98aeBsNQw", http.StatusOK, false},
 		//		{
-		//			"exp": "2099-04-23T18:25:43.511Z",
-		//			"iat": "2000-04-23T18:25:43.511Z",
-		//			"nbf": "2000-04-23T18:25:43.511Z",
-		//			"aud": "tests"
+		//			"exp": 1924975619,
+		//			"iat": 1924975619,
+		//			"nbf": 0
+		//			"sub": "max",
+		//			"aud": "wrong-audience"
 		//		}
-		{"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIyMDk5LTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJpYXQiOiIyMDAwLTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJuYmYiOiIyMDAwLTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJhdWQiOiJ0ZXN0cyJ9.NQZCoKU2qoC-_VFi-_8fQDzObeQrnld9wyaqF0jYHL_wqROn5VumCDVl1oxMN7g-L9wqo5U-xUXf1HS_Ae6CLDFlkbd6dI-h1_l7_ALn_L_GoxQsEo2lQUDQ-Q4eqlLabc764cTYFXd5EwcsZMHWs5ZFCeMOv3exfeTmg8E9e1FiyuTuKVjvMxL-ZCh113nzXEGFr6GRzqjL6VSnJPDX0Pv78R9tnL6CqWbCuDBlIPOccbpWLuWF0yKjV-OyvcWpjkLIVtAbrimi3A7cNUI_V3EJm9Y4tr8e6hv9zViPNbhycmqvOp-vur2k64PrzeMcbuj7TFRCJg2V3moPJF3NtQ", http.StatusOK, true},
-
+		{"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MCwiaWF0IjoxOTI0OTc1NjE5LCJhdWQiOiJ3cm9uZy1hdWRpZW5jZSIsInN1YiI6Im1heCJ9.OBKaAS6l7Ie-y5T6-r5Kk0MyLxxeoYJZ5MizZazAc1gon1J5yi0pCcwhP0a-cKUuJbuvgyw9PF1iutykRYy9cSd9ducEpL9PLhUAwIOOyQxp35udGPOOaf0hQAOBUzP--I6SqaIOZXAfWg6_HefRcYhqy8m-iagWLXZ7RT4sMrEVzHUq6fWM6f2HDid0CxCjH6OL5ScZebqUNVimCqZkaQ7Fn9TAnlcKnlDDOmZhfZEAOMNqlUvC7mLBbbhuiX0eUtdnchhXLjuLn67PcxYi7KpEFDKwGhN2eN0t73RWIpMz-YlU77HNTEvm-AzdG-BoqBgSrGnPUlU6Mdfhz7IeMA", http.StatusOK, false},
 		//		{
-		//			"exp": "2099-04-23T18:25:43.511Z",
-		//			"iat": "2000-04-23T18:25:43.511Z",
-		//			"nbf": "2000-04-23T18:25:43.511Z",
-		//			"aud": "tests"
+		//			"exp": 1924975619,
+		//			"iat": 1924975619,
+		//			"nbf": 0
+		//			"aud": "tests",
+		//			"subject": "foo"
 		//		}
-		{"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIyMDk5LTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJpYXQiOiIyMDAwLTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJuYmYiOiIyMDAwLTA0LTIzVDE4OjI1OjQzLjUxMVoiLCJhdWQiOiJ0ZXN0cyJ9.NQZCoKU2qoC-_VFi-_8fQDzObeQrnld9wyaqF0jYHL_wqROn5VumCDVl1oxMN7g-L9wqo5U-xUXf1HS_Ae6CLDFlkbd6dI-h1_l7_ALn_L_GoxQsEo2lQUDQ-Q4eqlLabc764cTYFXd5EwcsZMHWs5ZFCeMOv3exfeTmg8E9e1FiyuTuKVjvMxL-ZCh113nzXEGFr6GRzqjL6VSnJPDX0Pv78R9tnL6CqWbCuDBlIPOccbpWLuWF0yKjV-OyvcWpjkLIVtAbrimi3A7cNUI_V3EJm9Y4tr8e6hv9zViPNbhycmqvOp-vur2k64PrzeMcbuj7TFRCJg2V3moPJF3NtQ", http.StatusOK, true},
+		{"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MCwiaWF0IjoxOTI0OTc1NjE5LCJhdWQiOiJ0ZXN0cyIsInN1YmplY3QiOiJmb28ifQ.lvjLGnLO3mZSS63fomK-KH2mhLXjjg9b13opiN7jY4MrXE_DaR0Lum8a_RcqqSTXbpHxYSIPV9Ji7zM_X1bvBtsPpBE1PR3_PrdD5_uIDQ-UWPVzozxhOvuZzU7qHx3TFQClZ6tYIXYioTszz9zQHiE4hj1x6Z_shWPfczELGyD0HnEC3o_w7IFfYO_L0YDN_vkuqr6yS5kaPIsoCF_iHuhTzoBAEIpUENlxSpCPuxR9aMaJ-BQDInHoPc1h-VvkgOdR_iENQdOUePObw17ywdGkRk6C5kRHSxjca-ULGcDn36NZ54SEPolcGbjs3vVA1g0jQARKIcTVw6Uu7x0s6Q", http.StatusOK, true},
 	} {
+		data := url.Values{}
+		data.Set("token", c.accessToken)
 
 		client := &http.Client{}
-		form := url.Values{}
-		form.Add("token", access.AccessToken)
-
-		req, _ := http.NewRequest("POST", ts.URL+"/oauth2/introspect", strings.NewReader(form.Encode()))
-		if c.accessToken != "" {
-			req.Header.Add("Authorization", c.accessToken)
-		}
+		req, _ := http.NewRequest("POST", ts.URL + "/oauth2/introspect", bytes.NewBufferString(data.Encode()))
+		req.Header.Add("Authorization", access.Type() + " " + access.AccessToken)
+		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+		req.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 		res, _ := client.Do(req)
 		body, _ := ioutil.ReadAll(res.Body)
 		require.Equal(t, c.code, res.StatusCode, "Case %d: %s", k, body)
@@ -311,7 +322,7 @@ func TestIntrospect(t *testing.T) {
 		}
 
 		var result map[string]interface{}
-		require.Nil(t, json.Unmarshal(body, &result))
-		assert.Equal(t, c.pass, result["active"].(bool), "Case %d", k)
+		require.Nil(t, json.Unmarshal(body, &result), "Case %d: %s %s", k, body)
+		assert.Equal(t, c.pass, result["active"].(bool), "Case %d %s", k, body)
 	}
 }

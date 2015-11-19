@@ -7,8 +7,8 @@ import (
 
 func TestAccountCases(t *testing.T) {
 	for _, c := range [][]string{
-		[]string{"1", "foo@bar", "secret"},
-		[]string{"2", "baz@foo", "top secret"},
+		{"1", "foo@bar", "secret"},
+		{"2", "baz@foo", "top secret"},
 	} {
 		a := &DefaultAccount{c[0], c[1], c[2], `{"foo": "bar"}`}
 		assert.Equal(t, c[0], a.GetID())

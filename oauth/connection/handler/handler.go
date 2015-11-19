@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/mux"
-	hydcon "github.com/ory-am/hydra/context"
+	hydcon "github.com/ory-am/common/handler"
 	"github.com/ory-am/hydra/middleware"
 	. "github.com/ory-am/hydra/oauth/connection"
 	. "github.com/ory-am/hydra/pkg"
@@ -27,14 +27,14 @@ func permission(id string) string {
 
 type Handler struct {
 	s Storage
-	m *middleware.Middleware
+	m middleware.Middleware
 }
 
 type payload struct {
 	ID string `json:"id,omitempty" `
 }
 
-func NewHandler(s Storage, m *middleware.Middleware) *Handler {
+func NewHandler(s Storage, m middleware.Middleware) *Handler {
 	return &Handler{s, m}
 }
 
@@ -98,7 +98,7 @@ func (h *Handler) Find(ctx context.Context, rw http.ResponseWriter, req *http.Re
 		return
 	}
 
-	h.m.IsAuthorized(connectionsPermission, "get", middleware.Env(req).Owner(subject))(hydcon.ContextHandlerFunc(
+	h.m.IsAuthorized(connectionsPermission, "get", middleware.NewEnv(req).Owner(subject))(hydcon.ContextHandlerFunc(
 		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			conns, err := h.s.FindAllByLocalSubject(subject)
 			if err != nil {
@@ -123,7 +123,7 @@ func (h *Handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Req
 		return
 	}
 
-	h.m.IsAuthorized(permission(id), "get", middleware.Env(req).Owner(conn.GetLocalSubject()))(hydcon.ContextHandlerFunc(
+	h.m.IsAuthorized(permission(id), "get", middleware.NewEnv(req).Owner(conn.GetLocalSubject()))(hydcon.ContextHandlerFunc(
 		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			WriteJSON(rw, conn)
 		},
@@ -143,7 +143,7 @@ func (h *Handler) Delete(ctx context.Context, rw http.ResponseWriter, req *http.
 		return
 	}
 
-	h.m.IsAuthorized(permission(id), "delete", middleware.Env(req).Owner(conn.GetLocalSubject()))(hydcon.ContextHandlerFunc(
+	h.m.IsAuthorized(permission(id), "delete", middleware.NewEnv(req).Owner(conn.GetLocalSubject()))(hydcon.ContextHandlerFunc(
 		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			if err := h.s.Delete(conn.GetID()); err != nil {
 				http.Error(rw, err.Error(), http.StatusInternalServerError)

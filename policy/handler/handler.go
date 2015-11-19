@@ -9,14 +9,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/pborman/uuid"
-	"golang.org/x/net/context"
-	hctx "github.com/ory-am/hydra/context"
+	hctx "github.com/ory-am/common/handler"
 	"github.com/ory-am/hydra/middleware"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/pborman/uuid"
+	"golang.org/x/net/context"
 	"net/http"
 
+	"errors"
 	log "github.com/Sirupsen/logrus"
+	"github.com/ory-am/hydra/jwt"
 	. "github.com/ory-am/ladon/guard"
 	"github.com/ory-am/ladon/guard/operator"
 	. "github.com/ory-am/ladon/policy"
@@ -24,20 +26,28 @@ import (
 
 type Handler struct {
 	s Storage
-	m *middleware.Middleware
+	m middleware.Middleware
 	g Guarder
+	j *jwt.JWT
+}
+
+type payload struct {
+	Resource   string            `json:"resource"`
+	Token      string            `json:"token"`
+	Permission string            `json:"permission"`
+	Context    *operator.Context `json:"context"`
 }
 
 func permission(id string) string {
 	return fmt.Sprintf("rn:hydra:policies:%s", id)
 }
 
-func NewHandler(s Storage, m *middleware.Middleware, g Guarder) *Handler {
-	return &Handler{s, m, g}
+func NewHandler(s Storage, m middleware.Middleware, g Guarder, j *jwt.JWT) *Handler {
+	return &Handler{s: s, m: m, g: g, j: j}
 }
 
 func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hctx.ContextHandler) hctx.ContextHandler) {
-	r.Handle("/allowed", hctx.NewContextAdapter(
+	r.Handle("/guard/allowed", hctx.NewContextAdapter(
 		context.Background(),
 		extractor,
 		h.m.IsAuthenticated,
@@ -49,12 +59,6 @@ func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hctx.ContextHandler)
 		h.m.IsAuthenticated,
 		h.m.IsAuthorized("rn:hydra:policies", "create", nil),
 	).ThenFunc(h.Create)).Methods("POST")
-
-	//	r.Handle("/policies", hctx.NewContextAdapter(
-	//		context.Background(),
-	//		extractor,
-	//		h.m.IsAuthenticated,
-	//	).ThenFunc(h.FindBySubject)).Query("subject").Methods("GET")
 
 	r.Handle("/policies/{id}", hctx.NewContextAdapter(
 		context.Background(),
@@ -70,45 +74,87 @@ func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hctx.ContextHandler)
 }
 
 func (h *Handler) Granted(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
-	var p struct {
-		Resource   string            `json:"string"`
-		Subject    string            `json:"subject"`
-		Permission string            `json:"permission"`
-		Context    *operator.Context `json:"context"`
-	}
+	var p payload
 	decoder := json.NewDecoder(req.Body)
 	if err := decoder.Decode(&p); err != nil {
 		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	policies, err := h.s.FindPoliciesForSubject(p.Subject)
+	token, err := h.j.VerifyToken([]byte(p.Token))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error":      err.Error(),
 			"resource":   p.Resource,
 			"permission": p.Permission,
-			"subject":    p.Subject,
+			"subject":    "",
 			"context":    fmt.Sprintf("%s", p.Context),
-		})
-		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		}).Warn("Token not valid.")
+		pkg.WriteJSON(rw, struct {
+			Allowed bool   `json:"allowed"`
+			Error   string `json:"error"`
+		}{Allowed: false, Error: err.Error()})
 		return
 	}
 
-	allowed, err := h.g.IsGranted(p.Resource, p.Permission, p.Subject, policies, p.Context)
+	subject, ok := token.Claims["sub"].(string)
+	if !ok {
+		err := errors.New("Bearer token is not valid.")
+		log.WithFields(log.Fields{
+			"error":      err.Error(),
+			"resource":   p.Resource,
+			"permission": p.Permission,
+			"subject":    "",
+			"context":    fmt.Sprintf("%s", p.Context),
+		}).Warn("Token does not claim a subject.")
+		pkg.WriteJSON(rw, struct {
+			Allowed bool   `json:"allowed"`
+			Error   string `json:"error"`
+		}{Allowed: false, Error: err.Error()})
+		return
+	}
+
+	policies, err := h.s.FindPoliciesForSubject(subject)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error":      err.Error(),
 			"resource":   p.Resource,
 			"permission": p.Permission,
-			"subject":    p.Subject,
+			"subject":    subject,
+			"context":    fmt.Sprintf("%s", p.Context),
+		}).Warn("Could not fetch policies from store.")
+		pkg.WriteJSON(rw, struct {
+			Allowed bool   `json:"allowed"`
+			Error   string `json:"error"`
+		}{Allowed: false, Error: err.Error()})
+		return
+	}
+
+	allowed, err := h.g.IsGranted(p.Resource, p.Permission, subject, policies, p.Context)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error":      err.Error(),
+			"resource":   p.Resource,
+			"permission": p.Permission,
+			"subject":    subject,
 			"policies":   fmt.Sprintf("%s", policies),
 			"context":    fmt.Sprintf("%s", p.Context),
-		})
-		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		}).Warn("Granted check failed.")
+		pkg.WriteJSON(rw, struct {
+			Allowed bool   `json:"allowed"`
+			Error   string `json:"error"`
+		}{Allowed: false, Error: err.Error()})
 		return
 	}
 
+	log.WithFields(log.Fields{
+		"resource":   p.Resource,
+		"permission": p.Permission,
+		"subject":    subject,
+		"allowed":    allowed,
+		"policies":   fmt.Sprintf("%s", policies),
+		"context":    fmt.Sprintf("%s", p.Context),
+	}).Info("Got guard decision.")
 	pkg.WriteJSON(rw, struct {
 		Allowed bool `json:"allowed"`
 	}{Allowed: allowed})
@@ -132,6 +178,7 @@ func (h *Handler) Create(ctx context.Context, rw http.ResponseWriter, req *http.
 }
 
 func (h *Handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+
 	id, ok := mux.Vars(req)["id"]
 	if !ok {
 		http.Error(rw, "No id given.", http.StatusBadRequest)
@@ -143,10 +190,11 @@ func (h *Handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Req
 			policy, err := h.s.Get(id)
 			if err != nil {
 				http.NotFound(rw, req)
+				return
 			}
 			pkg.WriteJSON(rw, policy)
 		},
-	))
+	)).ServeHTTPContext(ctx, rw, req)
 }
 
 func (h *Handler) Delete(ctx context.Context, rw http.ResponseWriter, req *http.Request) {

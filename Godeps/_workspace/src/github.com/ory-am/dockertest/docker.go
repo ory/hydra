@@ -29,13 +29,14 @@ import (
 	"strings"
 	"time"
 
-	"camlistore.org/pkg/netutil"
 	"database/sql"
+	"math/rand"
+	"regexp"
+
+	"camlistore.org/pkg/netutil"
 	"github.com/ory-am/common/env"
 	"github.com/pborman/uuid"
 	"gopkg.in/mgo.v2"
-	"math/rand"
-	"regexp"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
@@ -57,9 +58,9 @@ var bindDockerToLocalhost = env.Getenv("DOCKER_BIND_LOCALHOST", "")
 func runLongTest(image string) error {
 	DockerMachineAvailable = false
 	if haveDockerMachine() {
-		DockerMachineAvailable = startDockerMachine()
-		if !DockerMachineAvailable {
-			return errors.New("'docker-machine' available but command failed to execute")
+		DockerMachineAvailable = true
+		if !startDockerMachine() {
+			log.Printf(`Starting docker machine "%s" failed. This could be because the image is already running or because the image does not exist. Tests will fail if the image does not exist.`, DockerMachineName)
 		}
 	} else if !haveDocker() {
 		return errors.New("Neither 'docker' nor 'docker-machine' available on this system.")

@@ -7,7 +7,7 @@ import (
 	. "github.com/ory-am/hydra/oauth/provider/storage"
 )
 
-const accountSchema = `CREATE TABLE IF NOT EXISTS state_data (
+const accountSchema = `CREATE TABLE IF NOT EXISTS hydra_state_data (
 	id           text NOT NULL PRIMARY KEY,
 	client_id	 text NOT NULL,
 	redirect_uri text NOT NULL,
@@ -38,7 +38,7 @@ func (s *Store) CreateSchemas() error {
 
 func (s *Store) SaveStateData(sd *StateData) error {
 	// Execute SQL statement
-	_, err := s.db.Exec("INSERT INTO state_data (id, client_id, redirect_uri, scope, state, type, provider, expires_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)", sd.ID, sd.ClientID, sd.RedirectURL, sd.Scope, sd.State, sd.Type, sd.Provider, sd.ExpiresAt)
+	_, err := s.db.Exec("INSERT INTO hydra_state_data (id, client_id, redirect_uri, scope, state, type, provider, expires_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)", sd.ID, sd.ClientID, sd.RedirectURL, sd.Scope, sd.State, sd.Type, sd.Provider, sd.ExpiresAt)
 	if err != nil {
 		return err
 	}
@@ -47,7 +47,7 @@ func (s *Store) SaveStateData(sd *StateData) error {
 
 func (s *Store) GetStateData(id string) (*StateData, error) {
 	var sd StateData
-	row := s.db.QueryRow("SELECT id, client_id, redirect_uri, scope, state, type, provider, expires_at FROM state_data WHERE id=$1 LIMIT 1", id)
+	row := s.db.QueryRow("SELECT id, client_id, redirect_uri, scope, state, type, provider, expires_at FROM hydra_state_data WHERE id=$1 LIMIT 1", id)
 
 	if err := row.Scan(&sd.ID, &sd.ClientID, &sd.RedirectURL, &sd.Scope, &sd.State, &sd.Type, &sd.Provider, &sd.ExpiresAt); err == sql.ErrNoRows {
 		return nil, ErrNotFound

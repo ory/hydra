@@ -60,6 +60,16 @@ Open in your web browser:
 http://localhost:14000/authorize?response_type=code&client_id=1234&redirect_uri=http%3A%2F%2Flocalhost%3A14000%2Fappauth%2Fcode
 ````
 
+### Storage backends
+
+There is a mock available at [example/teststorage.go](/example/teststorage.go) which you can use as a guide for writing your own.  
+
+You might want to check out other implementations for common database management systems as well:
+
+* [PostgreSQL](https://github.com/ory-am/osin-storage)
+* [MongoDB](https://github.com/martint17r/osin-mongo-storage)
+* [RethinkDB](https://github.com/ahmet/osin-rethinkdb)
+
 ### License
 
 The code is licensed using "New BSD" license.

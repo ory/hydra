@@ -5,6 +5,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-errors/errors"
+	. "github.com/ory-am/common/handler"
 	hjwt "github.com/ory-am/hydra/jwt"
 	"github.com/ory-am/ladon/policy"
 	"golang.org/x/net/context"
@@ -12,7 +13,7 @@ import (
 )
 
 const (
-	authKey key = 0
+	authKey Key = 0
 )
 
 func NewContextFromAuthorization(ctx context.Context, req *http.Request, j *hjwt.JWT, p policy.Storage) context.Context {

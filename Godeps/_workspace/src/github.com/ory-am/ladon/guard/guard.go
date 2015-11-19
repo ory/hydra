@@ -1,11 +1,10 @@
 package guard
 
 import (
-	"fmt"
 	log "github.com/Sirupsen/logrus"
+	"github.com/ory-am/common/compiler"
 	. "github.com/ory-am/ladon/guard/operator"
 	"github.com/ory-am/ladon/policy"
-	"regexp"
 	"strings"
 )
 
@@ -41,11 +40,10 @@ func (g *Guard) GetOperator(name string) (Operator, bool) {
 }
 
 func (g *Guard) IsGranted(resource, permission, subject string, policies []policy.Policy, ctx *Context) (allowed bool, err error) {
-	allowed = false
 	// Iterate through all policies
 	for _, p := range policies {
 		// Does the resource match with one of the policies?
-		if rm, err := Matches(p.GetResources(), resource); err != nil {
+		if rm, err := Matches(p, p.GetResources(), resource); err != nil {
 			log.WithFields(log.Fields{
 				"resources": p.GetResources(),
 				"resource":  resource,
@@ -57,7 +55,7 @@ func (g *Guard) IsGranted(resource, permission, subject string, policies []polic
 		}
 
 		// Does the action match with one of the policies?
-		if pm, err := Matches(p.GetPermissions(), permission); err != nil {
+		if pm, err := Matches(p, p.GetPermissions(), permission); err != nil {
 			log.WithFields(log.Fields{
 				"permissions": p.GetPermissions(),
 				"permission":  permission,
@@ -69,7 +67,7 @@ func (g *Guard) IsGranted(resource, permission, subject string, policies []polic
 		}
 
 		// Does the subject match with one of the policies?
-		if sm, err := Matches(p.GetSubjects(), subject); err != nil {
+		if sm, err := Matches(p, p.GetSubjects(), subject); err != nil {
 			log.WithFields(log.Fields{
 				"subjects": p.GetSubjects(),
 				"subject":  subject,
@@ -119,12 +117,15 @@ func (g *Guard) PassesConditions(p policy.Policy, ctx *Context, permission, reso
 	return passes
 }
 
-func Matches(haystack []string, needle string) (bool, error) {
-	for _, h := range haystack {
-		matches, err := regexp.MatchString(fmt.Sprintf("^%s$", h), needle)
+func Matches(p policy.Policy, patterns []string, match string) (bool, error) {
+	for _, h := range patterns {
+		reg, err := compiler.CompileRegex(h, p.GetStartDelimiter(), p.GetEndDelimiter())
 		if err != nil {
 			return false, err
-		} else if matches {
+		}
+
+		matches := reg.MatchString(match)
+		if matches {
 			return true, nil
 		}
 	}

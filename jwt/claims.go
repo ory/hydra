@@ -8,14 +8,15 @@ import (
 
 type ClaimsCarrier map[string]interface{}
 
-func NewClaimsCarrier(id, issuer, subject, audience string, notBefore, issuedAt time.Time) ClaimsCarrier {
+func NewClaimsCarrier(id, issuer, subject, audience string, expiresAt, notBefore, issuedAt time.Time) ClaimsCarrier {
 	return ClaimsCarrier{
 		"sub": subject,
 		"jid": id,
-		"iat": issuedAt,
+		"iat": issuedAt.Unix(),
 		"iss": issuer,
-		"nbf": notBefore,
+		"nbf": notBefore.Unix(),
 		"aud": audience,
+		"exp": expiresAt.Unix(),
 	}
 }
 
@@ -78,12 +79,10 @@ func (c ClaimsCarrier) getAsTime(key string) time.Time {
 	if s, ok := c[key]; ok {
 		if r, ok := s.(time.Time); ok {
 			return r
-		} else if p, ok := s.(string); ok {
-			if err := ret.UnmarshalJSON([]byte(`"` + p + `"`)); err != nil {
-				log.Warnf(`Could not unmarshal time field: "%v".`, c, err)
-				return *ret
-			}
-			return *ret
+		} else if p, ok := s.(int64); ok {
+			return time.Unix(p, 0)
+		} else if p, ok := s.(float64); ok {
+			return time.Unix(int64(p), 0)
 		}
 	}
 	return *ret

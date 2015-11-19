@@ -4,16 +4,17 @@ import (
 	"encoding/json"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
+	chd "github.com/ory-am/common/handler"
 	"github.com/ory-am/dockertest"
+	authcon "github.com/ory-am/hydra/context"
+	hjwt "github.com/ory-am/hydra/jwt"
+	middleware "github.com/ory-am/hydra/middleware/host"
 	"github.com/ory-am/ladon/policy"
 	"github.com/ory-am/osin-storage/storage/postgres"
 	"github.com/parnurzeal/gorequest"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
-	hcon "github.com/ory-am/hydra/context"
-	hjwt "github.com/ory-am/hydra/jwt"
-	"github.com/ory-am/hydra/middleware"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -45,10 +46,10 @@ func TestMain(m *testing.M) {
 }
 
 type test struct {
-	subject              string
-	token                jwt.Token
-	policies             []policy.Policy
-	createData           payload
+	subject    string
+	token      jwt.Token
+	policies   []policy.Policy
+	createData payload
 
 	statusGet            int
 	statusCreate         int
@@ -56,21 +57,21 @@ type test struct {
 	statusGetAfterDelete int
 }
 
-func mockAuthorization(c test) func(h hcon.ContextHandler) hcon.ContextHandler {
-	return func(h hcon.ContextHandler) hcon.ContextHandler {
-		return hcon.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
-			claims := hjwt.NewClaimsCarrier(uuid.New(), "hydra", c.subject, "tests", time.Now(), time.Now())
-			ctx = hcon.NewContextFromAuthValues(ctx, claims, &c.token, c.policies)
+func mockAuthorization(c test) func(h chd.ContextHandler) chd.ContextHandler {
+	return func(h chd.ContextHandler) chd.ContextHandler {
+		return chd.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+			claims := hjwt.NewClaimsCarrier(uuid.New(), "hydra", c.subject, "tests", time.Now().Add(time.Hour), time.Now(), time.Now())
+			ctx = authcon.NewContextFromAuthValues(ctx, claims, &c.token, c.policies)
 			h.ServeHTTPContext(ctx, rw, req)
 		})
 	}
 }
 
 var policies = map[string]policy.Policy{
-	"pass-all":    &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:clients.*"}, []string{".*"}, nil},
+	"pass-all":    &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:clients<.*>"}, []string{"<.*>"}, nil},
 	"pass-create": &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:clients"}, []string{"create"}, nil},
-	"pass-get":    &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:clients:.*"}, []string{"get"}, nil},
-	"pass-delete": &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:clients:.*"}, []string{"delete"}, nil},
+	"pass-get":    &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:clients:<.*>"}, []string{"get"}, nil},
+	"pass-delete": &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:clients:<.*>"}, []string{"delete"}, nil},
 	"fail":        &policy.DefaultPolicy{},
 }
 

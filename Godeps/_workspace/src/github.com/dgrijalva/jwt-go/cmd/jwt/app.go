@@ -14,6 +14,7 @@ import (
 	"io/ioutil"
 	"os"
 	"regexp"
+	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -116,7 +117,14 @@ func verifyToken() error {
 
 	// Parse the token.  Load the key from command line option
 	token, err := jwt.Parse(string(tokData), func(t *jwt.Token) (interface{}, error) {
-		return loadData(*flagKey)
+		data, err := loadData(*flagKey)
+		if err != nil {
+			return nil, err
+		}
+		if isEs() {
+			return jwt.ParseECPublicKeyFromPEM(data)
+		}
+		return data, nil
 	})
 
 	// Print some debug data
@@ -161,7 +169,8 @@ func signToken() error {
 	}
 
 	// get the key
-	keyData, err := loadData(*flagKey)
+	var key interface{}
+	key, err = loadData(*flagKey)
 	if err != nil {
 		return fmt.Errorf("Couldn't read key: %v", err)
 	}
@@ -176,11 +185,26 @@ func signToken() error {
 	token := jwt.New(alg)
 	token.Claims = claims
 
-	if out, err := token.SignedString(keyData); err == nil {
+	if isEs() {
+		if k, ok := key.([]byte); !ok {
+			return fmt.Errorf("Couldn't convert key data to key")
+		} else {
+			key, err = jwt.ParseECPrivateKeyFromPEM(k)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	if out, err := token.SignedString(key); err == nil {
 		fmt.Println(out)
 	} else {
 		return fmt.Errorf("Error signing token: %v", err)
 	}
 
 	return nil
+}
+
+func isEs() bool {
+	return strings.HasPrefix(*flagAlg, "ES")
 }

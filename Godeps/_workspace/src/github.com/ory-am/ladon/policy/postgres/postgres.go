@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"github.com/ory-am/common/compiler"
 	. "github.com/ory-am/ladon/policy"
 	"log"
 )
@@ -18,19 +19,22 @@ var schemas = []string{
 		conditions 	 json DEFAULT '[]'
 	)`,
 	`CREATE TABLE IF NOT EXISTS ladon_policy_subject (
-    	urn text NOT NULL,
+    	compiled text NOT NULL,
+    	template text NOT NULL,
     	policy text NOT NULL REFERENCES ladon_policy (id) ON DELETE CASCADE,
-    	PRIMARY KEY (urn, policy)
+    	PRIMARY KEY (template, policy)
 	)`,
 	`CREATE TABLE IF NOT EXISTS ladon_policy_permission (
-    	urn text NOT NULL,
+    	compiled text NOT NULL,
+    	template text NOT NULL,
     	policy text NOT NULL REFERENCES ladon_policy (id) ON DELETE CASCADE,
-    	PRIMARY KEY (urn, policy)
+    	PRIMARY KEY (template, policy)
 	)`,
 	`CREATE TABLE IF NOT EXISTS ladon_policy_resource (
-    	urn text NOT NULL,
+    	compiled text NOT NULL,
+    	template text NOT NULL,
     	policy text NOT NULL REFERENCES ladon_policy (id) ON DELETE CASCADE,
-    	PRIMARY KEY (urn, policy)
+    	PRIMARY KEY (template, policy)
 	)`,
 }
 
@@ -66,11 +70,11 @@ func (s *Store) Create(policy Policy) (err error) {
 		return err
 	} else if _, err = tx.Exec("INSERT INTO ladon_policy (id, description, effect, conditions) VALUES ($1, $2, $3, $4)", policy.GetID(), policy.GetDescription(), policy.GetEffect(), conditions); err != nil {
 		return err
-	} else if err = createLink(tx, "ladon_policy_subject", policy.GetID(), policy.GetSubjects()); err != nil {
+	} else if err = createLink(tx, "ladon_policy_subject", policy, policy.GetSubjects()); err != nil {
 		return err
-	} else if err = createLink(tx, "ladon_policy_permission", policy.GetID(), policy.GetPermissions()); err != nil {
+	} else if err = createLink(tx, "ladon_policy_permission", policy, policy.GetPermissions()); err != nil {
 		return err
-	} else if err = createLink(tx, "ladon_policy_resource", policy.GetID(), policy.GetResources()); err != nil {
+	} else if err = createLink(tx, "ladon_policy_resource", policy, policy.GetResources()); err != nil {
 		return err
 	} else if err = tx.Commit(); err != nil {
 		if err := tx.Rollback(); err != nil {
@@ -139,7 +143,7 @@ func (s *Store) FindPoliciesForSubject(subject string) (policies []Policy, err e
 		return ids, nil
 	}
 
-	subjects, err := find("SELECT policy FROM ladon_policy_subject WHERE $1 ~* ('^' || urn || '$')", subject)
+	subjects, err := find("SELECT policy FROM ladon_policy_subject WHERE $1 ~* ('^' || compiled || '$')", subject)
 	if err != nil {
 		return policies, err
 	}
@@ -161,10 +165,11 @@ func (s *Store) FindPoliciesForSubject(subject string) (policies []Policy, err e
 
 func getLinked(db *sql.DB, table, policy string) ([]string, error) {
 	urns := []string{}
-	rows, err := db.Query(fmt.Sprintf("SELECT urn FROM %s WHERE policy=$1", table), policy)
+	rows, err := db.Query(fmt.Sprintf("SELECT template FROM %s WHERE policy=$1", table), policy)
 	if err != nil {
 		return urns, err
 	}
+
 	defer rows.Close()
 	for rows.Next() {
 		var urn string
@@ -176,12 +181,13 @@ func getLinked(db *sql.DB, table, policy string) ([]string, error) {
 	return urns, nil
 }
 
-func createLink(tx *sql.Tx, table, policy string, urns []string) error {
-	for _, urn := range urns {
+func createLink(tx *sql.Tx, table string, p Policy, templates []string) error {
+	for _, template := range templates {
+		reg, err := compiler.CompileRegex(template, p.GetStartDelimiter(), p.GetEndDelimiter())
+
 		// Execute SQL statement
-		query := fmt.Sprintf("INSERT INTO %s (policy, urn) VALUES ($1, $2)", table)
-		_, err := tx.Exec(query, policy, urn)
-		if err != nil {
+		query := fmt.Sprintf("INSERT INTO %s (policy, template, compiled) VALUES ($1, $2, $3)", table)
+		if _, err = tx.Exec(query, p.GetID(), template, reg.String()); err != nil {
 			if rb := tx.Rollback(); rb != nil {
 				return rb
 			}

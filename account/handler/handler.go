@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/mux"
+	chd "github.com/ory-am/common/handler"
 	. "github.com/ory-am/hydra/account"
-	hydcon "github.com/ory-am/hydra/context"
 	"github.com/ory-am/hydra/middleware"
 	. "github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
@@ -21,10 +21,10 @@ import (
 
 type Handler struct {
 	s Storage
-	m *middleware.Middleware
+	m middleware.Middleware
 }
 
-func NewHandler(s Storage, m *middleware.Middleware) *Handler {
+func NewHandler(s Storage, m middleware.Middleware) *Handler {
 	return &Handler{s, m}
 }
 
@@ -32,21 +32,21 @@ func permission(id string) string {
 	return fmt.Sprintf("rn:hydra:accounts:%s", id)
 }
 
-func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hydcon.ContextHandler) hydcon.ContextHandler) {
-	r.Handle("/accounts", hydcon.NewContextAdapter(
+func (h *Handler) SetRoutes(r *mux.Router, extractor func(h chd.ContextHandler) chd.ContextHandler) {
+	r.Handle("/accounts", chd.NewContextAdapter(
 		context.Background(),
 		extractor,
 		h.m.IsAuthenticated,
 		h.m.IsAuthorized("rn:hydra:accounts", "create", nil),
 	).ThenFunc(h.Create)).Methods("POST")
 
-	r.Handle("/accounts/{id}", hydcon.NewContextAdapter(
+	r.Handle("/accounts/{id}", chd.NewContextAdapter(
 		context.Background(),
 		extractor,
 		h.m.IsAuthenticated,
 	).ThenFunc(h.Get)).Methods("GET")
 
-	r.Handle("/accounts/{id}", hydcon.NewContextAdapter(
+	r.Handle("/accounts/{id}", chd.NewContextAdapter(
 		context.Background(),
 		extractor,
 		h.m.IsAuthenticated,
@@ -96,7 +96,7 @@ func (h *Handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Req
 		return
 	}
 
-	h.m.IsAuthorized(permission(id), "get", middleware.Env(req).Owner(id))(hydcon.ContextHandlerFunc(
+	h.m.IsAuthorized(permission(id), "get", middleware.NewEnv(req).Owner(id))(chd.ContextHandlerFunc(
 		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			user, err := h.s.Get(id)
 			if err == ErrNotFound {
@@ -117,7 +117,7 @@ func (h *Handler) Delete(ctx context.Context, rw http.ResponseWriter, req *http.
 		http.Error(rw, "No id given.", http.StatusBadRequest)
 		return
 	}
-	h.m.IsAuthorized(permission(id), "delete", middleware.Env(req).Owner(id))(hydcon.ContextHandlerFunc(
+	h.m.IsAuthorized(permission(id), "delete", middleware.NewEnv(req).Owner(id))(chd.ContextHandlerFunc(
 		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			if err := h.s.Delete(id); err != nil {
 				http.Error(rw, err.Error(), http.StatusInternalServerError)

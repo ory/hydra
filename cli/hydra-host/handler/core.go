@@ -5,7 +5,8 @@ import (
 	"github.com/gorilla/mux"
 	accounts "github.com/ory-am/hydra/account/handler"
 	"github.com/ory-am/hydra/jwt"
-	"github.com/ory-am/hydra/middleware"
+	"github.com/ory-am/hydra/middleware/host"
+	middleware "github.com/ory-am/hydra/middleware/host"
 	clients "github.com/ory-am/hydra/oauth/client/handler"
 	connections "github.com/ory-am/hydra/oauth/connection/handler"
 	oauth "github.com/ory-am/hydra/oauth/handler"
@@ -64,6 +65,7 @@ func (c *Core) Start(ctx *cli.Context) {
 		States:         c.Ctx.States,
 		SignUpLocation: locations["signUp"],
 		SignInLocation: locations["signIn"],
+		Middleware:     host.New(c.Ctx.Policies, j),
 	}
 
 	extractor := m.ExtractAuthentication
@@ -71,7 +73,7 @@ func (c *Core) Start(ctx *cli.Context) {
 	c.accountHandler.SetRoutes(router, extractor)
 	c.connectionHandler.SetRoutes(router, extractor)
 	c.clientHandler.SetRoutes(router, extractor)
-	c.oauthHandler.SetRoutes(router)
+	c.oauthHandler.SetRoutes(router, extractor)
 
 	http.Handle("/", router)
 	http.ListenAndServe(listenOn, nil)

@@ -1,5 +1,13 @@
 ## `jwt-go` Version History
 
+#### 2.4.0
+
+* Added new type, Parser, to allow for configuration of various parsing parameters
+	* You can now specify a list of valid signing methods.  Anything outside this set will be rejected.
+	* You can now opt to use the `json.Number` type instead of `float64` when parsing token JSON
+* Added support for [Travis CI](https://travis-ci.org/dgrijalva/jwt-go)
+* Fixed some bugs with ECDSA parsing
+
 #### 2.3.0
 
 * Added support for ECDSA signing methods

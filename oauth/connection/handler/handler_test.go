@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
+	chd "github.com/ory-am/common/handler"
 	"github.com/ory-am/dockertest"
-	hcon "github.com/ory-am/hydra/context"
+	authcon "github.com/ory-am/hydra/context"
 	hjwt "github.com/ory-am/hydra/jwt"
-	"github.com/ory-am/hydra/middleware"
+	middleware "github.com/ory-am/hydra/middleware/host"
 	. "github.com/ory-am/hydra/oauth/connection"
 	"github.com/ory-am/hydra/oauth/connection/postgres"
 	"github.com/ory-am/ladon/policy"
@@ -59,47 +60,47 @@ type test struct {
 	statusGetAfterDelete int
 }
 
-func mockAuthorization(c test) func(h hcon.ContextHandler) hcon.ContextHandler {
-	return func(h hcon.ContextHandler) hcon.ContextHandler {
-		return hcon.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
-			claims := hjwt.NewClaimsCarrier(uuid.New(), "hydra", c.subject, "tests", time.Now(), time.Now())
-			ctx = hcon.NewContextFromAuthValues(ctx, claims, &c.token, c.policies)
+func mockAuthorization(c test) func(h chd.ContextHandler) chd.ContextHandler {
+	return func(h chd.ContextHandler) chd.ContextHandler {
+		return chd.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+			claims := hjwt.NewClaimsCarrier(uuid.New(), "hydra", c.subject, "tests", time.Now().Add(time.Hour), time.Now(), time.Now())
+			ctx = authcon.NewContextFromAuthValues(ctx, claims, &c.token, c.policies)
 			h.ServeHTTPContext(ctx, rw, req)
 		})
 	}
 }
 
 var policies = map[string]policy.Policy{
-	"pass-all":    &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:oauth2:connections.*"}, []string{".*"}, nil},
-	"pass-create": &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:oauth2:connections.*"}, []string{"create"}, nil},
-	"pass-get":    &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:oauth2:connections.*"}, []string{"get"}, nil},
-	"pass-delete": &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:oauth2:connections.*"}, []string{"delete"}, nil},
+	"pass-all":    &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:oauth2:connections<.*>"}, []string{"<.*>"}, nil},
+	"pass-create": &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:oauth2:connections<.*>"}, []string{"create"}, nil},
+	"pass-get":    &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:oauth2:connections<.*>"}, []string{"get"}, nil},
+	"pass-delete": &policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:oauth2:connections<.*>"}, []string{"delete"}, nil},
 	"fail":        &policy.DefaultPolicy{},
 }
 
 var data = map[string]*DefaultConnection{
-	"ok": &DefaultConnection{
+	"ok": {
 		Provider:      "google",
 		RemoteSubject: "peter@gmail.com",
 		LocalSubject:  "peter",
 	},
-	"ok-max": &DefaultConnection{
+	"ok-max": {
 		Provider:      "google",
 		RemoteSubject: "max@gmail.com",
 		LocalSubject:  "max",
 	},
-	"ok-zac": &DefaultConnection{
+	"ok-zac": {
 		Provider:      "google",
 		RemoteSubject: "zac@gmail.com",
 		LocalSubject:  "zac",
 	},
-	"ok-steve": &DefaultConnection{
+	"ok-steve": {
 		Provider:      "google",
 		RemoteSubject: "steve@gmail.com",
 		LocalSubject:  "steve",
 	},
-	"fail": &DefaultConnection{},
-	"fail-validation": &DefaultConnection{
+	"fail": {},
+	"fail-validation": {
 		Provider:      "",
 		RemoteSubject: "",
 		LocalSubject:  "",
@@ -134,7 +135,7 @@ func TestCreateGetDeleteGet(t *testing.T) {
 		var conn DefaultConnection
 		assert.Nil(t, json.Unmarshal([]byte(body), &conn))
 
-		resp, body, _ = request.Get(connectionsURL).End()
+		resp, body, _ = request.Get(connectionsURL + "?subject=" + c.subject).End()
 		require.Equal(t, c.statusGet, resp.StatusCode, "case %d: %s", k, body)
 		if resp.StatusCode != http.StatusOK {
 			continue

@@ -11,7 +11,7 @@ import (
 )
 
 var TestCertificates = [][]string{
-	[]string{"../example/cert/rs256-private.pem",
+	{"../example/cert/rs256-private.pem",
 		`-----BEGIN RSA PRIVATE KEY-----
 MIIEowIBAAKCAQEA4f5wg5l2hKsTeNem/V41fGnJm6gOdrj8ym3rFkEU/wT8RDtn
 SgFEZOQpHEgQ7JL38xUfU0Y3g6aYw9QT0hJ7mCpz9Er5qLaMXJwZxzHzAahlfA0i
@@ -40,7 +40,7 @@ CKuHRG+AP579dncdUnOMvfXOtkdM4vk0+hWASBQzM9xzVcztCa+koAugjVaLS9A+
 9uQoqEeVNTckxx0S2bYevRy7hGQmUJTyQm3j1zEUR5jpdbL83Fbq
 -----END RSA PRIVATE KEY-----
 `},
-	[]string{"../example/cert/rs256-public.pem",
+	{"../example/cert/rs256-public.pem",
 		`-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4f5wg5l2hKsTeNem/V41
 fGnJm6gOdrj8ym3rFkEU/wT8RDtnSgFEZOQpHEgQ7JL38xUfU0Y3g6aYw9QT0hJ7
@@ -103,12 +103,12 @@ func (j *JWT) VerifyToken(tokenData []byte) (*jwt.Token, error) {
 	claims := ClaimsCarrier(token.Claims)
 	if claims.AssertExpired() {
 		token.Valid = false
-		return token, errors.Errorf("Token expired: %v", claims.GetExpiresAt())
+		return token, errors.Errorf("Token expired at %v", claims.GetExpiresAt())
 	}
-	if claims.AssertNotYetValid() {
-		token.Valid = false
-		return token, errors.Errorf("Token is not valid yet: %v", claims.GetNotBefore())
-	}
+	//if claims.AssertNotYetValid() {
+	//	token.Valid = false
+	//	return token, errors.Errorf("Token validates in the future: %v", claims.GetNotBefore())
+	//}
 	return token, nil
 }
 
@@ -148,7 +148,7 @@ func (j *JWT) GenerateAccessToken(data *osin.AccessData, generateRefresh bool) (
 		return "", "", errors.Errorf("Could not assert claims to ClaimsCarrier: %v", claims)
 	}
 
-	claims["exp"] = data.ExpireAt()
+	claims["exp"] = data.ExpireAt().Unix()
 	if accessToken, err = j.SignToken(claims, map[string]interface{}{}); err != nil {
 		return "", "", err
 	} else if !generateRefresh {

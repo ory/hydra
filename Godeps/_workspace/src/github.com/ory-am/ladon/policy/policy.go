@@ -25,6 +25,12 @@ type Policy interface {
 
 	// GetConditions returns the policies conditions.
 	GetConditions() []Condition
+
+	// GetStartDelimiter returns the delimiter which identifies the beginning of a regular expression
+	GetStartDelimiter() byte
+
+	// GetEndDelimiter returns the delimiter which identifies the end of a regular expression
+	GetEndDelimiter() byte
 }
 
 type DefaultPolicy struct {
@@ -67,4 +73,12 @@ func (p *DefaultPolicy) GetPermissions() []string {
 
 func (p *DefaultPolicy) GetConditions() []Condition {
 	return p.Conditions
+}
+
+func (p *DefaultPolicy) GetEndDelimiter() byte {
+	return '>'
+}
+
+func (p *DefaultPolicy) GetStartDelimiter() byte {
+	return '<'
 }

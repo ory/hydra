@@ -24,10 +24,6 @@ func TestMain(m *testing.M) {
 	}
 	defer c.KillRemove()
 
-	if err := db.Ping(); err != nil {
-		log.Fatalf("Could not ping: %s", err)
-	}
-
 	store = New(&hash.BCrypt{10}, db)
 	if err := store.CreateSchemas(); err != nil {
 		log.Fatalf("Could not set up schemas: %v", err)

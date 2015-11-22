@@ -12,8 +12,8 @@ import (
 	"net/http"
 )
 
-const (
-	authKey Key = 0
+var (
+	AuthKey Key = 0
 )
 
 func NewContextFromAuthorization(ctx context.Context, req *http.Request, j *hjwt.JWT, p policy.Storage) context.Context {
@@ -55,32 +55,32 @@ func NewContextFromAuthorization(ctx context.Context, req *http.Request, j *hjwt
 }
 
 func TokenFromContext(ctx context.Context) (*jwt.Token, error) {
-	args, ok := ctx.Value(authKey).(*authorization)
+	args, ok := ctx.Value(AuthKey).(*authorization)
 	if !ok {
-		return nil, errors.Errorf("Could not assert type for %v", ctx.Value(authKey))
+		return nil, errors.Errorf("Could not assert type for %v", ctx.Value(AuthKey))
 	}
 	return args.token, nil
 }
 
 func SubjectFromContext(ctx context.Context) (string, error) {
-	args, ok := ctx.Value(authKey).(*authorization)
+	args, ok := ctx.Value(AuthKey).(*authorization)
 	if !ok {
-		return "", errors.Errorf("Could not assert type for %v", ctx.Value(authKey))
+		return "", errors.Errorf("Could not assert type for %v", ctx.Value(AuthKey))
 	}
 	return args.claims.GetSubject(), nil
 }
 
 func PoliciesFromContext(ctx context.Context) ([]policy.Policy, error) {
-	args, ok := ctx.Value(authKey).(*authorization)
+	args, ok := ctx.Value(AuthKey).(*authorization)
 	if !ok {
-		return nil, errors.Errorf("Could not assert array type for %s", ctx.Value(authKey))
+		return nil, errors.Errorf("Could not assert array type for %s", ctx.Value(AuthKey))
 	}
 
 	symbols := make([]policy.Policy, len(args.policies))
 	for i, arg := range args.policies {
 		symbols[i], ok = arg.(*policy.DefaultPolicy)
 		if !ok {
-			return nil, errors.Errorf("Could not assert policy type for %s", ctx.Value(authKey))
+			return nil, errors.Errorf("Could not assert policy type for %s", ctx.Value(AuthKey))
 		}
 	}
 
@@ -88,12 +88,12 @@ func PoliciesFromContext(ctx context.Context) ([]policy.Policy, error) {
 }
 
 func IsAuthenticatedFromContext(ctx context.Context) bool {
-	a, b := ctx.Value(authKey).(*authorization)
+	a, b := ctx.Value(AuthKey).(*authorization)
 	return (b && a.token != nil && a.token.Valid)
 }
 
 func NewContextFromAuthValues(ctx context.Context, claims hjwt.ClaimsCarrier, token *jwt.Token, policies []policy.Policy) context.Context {
-	return context.WithValue(ctx, authKey, &authorization{
+	return context.WithValue(ctx, AuthKey, &authorization{
 		claims:   claims,
 		token:    token,
 		policies: policies,

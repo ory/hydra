@@ -1,7 +1,8 @@
 package http
 
 import (
-. "github.com/ory-am/hydra/client"
+	. "github.com/ory-am/hydra/client"
+	"net/http"
 )
 
 type client struct {
@@ -18,6 +19,10 @@ func NewAlwaysFalse() Client {
 	return &client{
 		result: false,
 	}
+}
+
+func (c *client) IsRequestAllowed(req *http.Request, resource, permission, owner string) (bool, error) {
+	return c.result, nil
 }
 
 func (c *client) IsAllowed(ar *AuthorizeRequest) (bool, error) {

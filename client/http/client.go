@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/RangelReale/osin"
 	. "github.com/ory-am/hydra/client"
+	"github.com/ory-am/hydra/middleware"
 	"github.com/parnurzeal/gorequest"
 	"golang.org/x/oauth2"
 	"net/http"
@@ -26,6 +28,16 @@ func New(endpoint string, token *oauth2.Token) Client {
 
 var isAllowed struct {
 	Allowed bool `json:"allowed"`
+}
+
+func (c *client) IsRequestAllowed(req *http.Request, resource, permission, owner string) (bool, error) {
+	var token *osin.BearerAuth
+	if token = osin.CheckBearerAuth(req); token == nil {
+		token = &osin.BearerAuth{}
+	}
+	env := middleware.NewEnv(req)
+	env.Owner(owner)
+	return c.IsAllowed(&AuthorizeRequest{Token: token.Code, Resource: resource, Permission: permission, Context: env.Ctx()})
 }
 
 func (c *client) IsAllowed(ar *AuthorizeRequest) (bool, error) {

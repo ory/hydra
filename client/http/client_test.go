@@ -13,6 +13,23 @@ import (
 	"testing"
 )
 
+func TestIsRequestAllowed(t *testing.T) {
+	router := mux.NewRouter()
+	router.HandleFunc("/guard/allowed", func(rw http.ResponseWriter, req *http.Request) {
+		assert.Equal(t, "Bearer foobar", req.Header.Get("Authorization"))
+		pkg.WriteJSON(rw, struct {
+			Allowed bool `json:"allowed"`
+		}{Allowed: true})
+	}).Methods("POST")
+	ts := httptest.NewServer(router)
+	defer ts.Close()
+
+	c := New(ts.URL, &oauth2.Token{TokenType: "bearer", AccessToken: "foobar"})
+	allowed, err := c.IsRequestAllowed(&http.Request{}, "", "", "")
+	assert.Nil(t, err)
+	assert.True(t, allowed)
+}
+
 func TestIsAllowed(t *testing.T) {
 	router := mux.NewRouter()
 	router.HandleFunc("/guard/allowed", func(rw http.ResponseWriter, req *http.Request) {

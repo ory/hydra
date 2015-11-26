@@ -8,9 +8,10 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/gorilla/mux"
 	hctx "github.com/ory-am/common/handler"
+	"github.com/ory-am/common/pkg"
 	"github.com/ory-am/hydra/account"
 	"github.com/ory-am/hydra/jwt"
-	 "github.com/ory-am/hydra/middleware"
+	"github.com/ory-am/hydra/middleware"
 	"github.com/ory-am/hydra/oauth/connection"
 	"github.com/ory-am/hydra/oauth/provider"
 	"github.com/ory-am/hydra/oauth/provider/storage"
@@ -22,7 +23,6 @@ import (
 	"net/http"
 	"net/url"
 	"time"
-	"github.com/ory-am/hydra/pkg"
 )
 
 func DefaultConfig() *osin.ServerConfig {
@@ -141,7 +141,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, claims.GetSubject(), h.Audience, time.Now().Add(time.Duration(ar.Expiration) * time.Second), time.Now(), time.Now())
+			ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, claims.GetSubject(), h.Audience, time.Now().Add(time.Duration(ar.Expiration)*time.Second), time.Now(), time.Now())
 			ar.Authorized = true
 		case osin.REFRESH_TOKEN:
 			data, ok := ar.UserData.(map[string]interface{})
@@ -150,7 +150,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			claims := jwt.ClaimsCarrier(data)
-			ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, claims.GetSubject(), h.Audience, time.Now().Add(time.Duration(ar.Expiration) * time.Second), time.Now(), time.Now())
+			ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, claims.GetSubject(), h.Audience, time.Now().Add(time.Duration(ar.Expiration)*time.Second), time.Now(), time.Now())
 			ar.Authorized = true
 		case osin.PASSWORD:
 			// TODO if !ar.Client.isAllowedToAuthenticateUser
@@ -158,11 +158,11 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 			// TODO }
 
 			if user, err := h.authenticate(w, r, ar.Username, ar.Password); err == nil {
-				ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, user.GetID(), h.Audience, time.Now().Add(time.Duration(ar.Expiration) * time.Second), time.Now(), time.Now())
+				ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, user.GetID(), h.Audience, time.Now().Add(time.Duration(ar.Expiration)*time.Second), time.Now(), time.Now())
 				ar.Authorized = true
 			}
 		case osin.CLIENT_CREDENTIALS:
-			ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, ar.Client.GetId(), h.Audience, time.Now().Add(time.Duration(ar.Expiration) * time.Second), time.Now(), time.Now())
+			ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, ar.Client.GetId(), h.Audience, time.Now().Add(time.Duration(ar.Expiration)*time.Second), time.Now(), time.Now())
 			ar.Authorized = true
 
 			// TODO ASSERTION workflow http://leastprivilege.com/2013/12/23/advanced-oauth2-assertion-flow-why/
@@ -275,7 +275,7 @@ func (h *Handler) AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		ar.UserData = jwt.NewClaimsCarrier(uuid.New(), user.GetLocalSubject(), h.Issuer, h.Audience, time.Now().Add(time.Duration(ar.Expiration) * time.Second), time.Now(), time.Now())
+		ar.UserData = jwt.NewClaimsCarrier(uuid.New(), user.GetLocalSubject(), h.Issuer, h.Audience, time.Now().Add(time.Duration(ar.Expiration)*time.Second), time.Now(), time.Now())
 		ar.Authorized = true
 		h.server.FinishAuthorizeRequest(resp, r, ar)
 	}

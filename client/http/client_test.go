@@ -3,9 +3,9 @@ package http_test
 import (
 	"github.com/RangelReale/osin"
 	"github.com/gorilla/mux"
+	"github.com/ory-am/common/pkg"
 	. "github.com/ory-am/hydra/client"
 	. "github.com/ory-am/hydra/client/http"
-	"github.com/ory-am/hydra/pkg"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2"
 	"net/http"

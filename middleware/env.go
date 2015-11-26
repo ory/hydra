@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"github.com/ory-am/common/pkg"
 	"github.com/ory-am/ladon/guard/operator"
 	"net/http"
 	"time"
@@ -23,11 +24,7 @@ func (e *Env) Ctx() *operator.Context {
 }
 
 func (e *Env) Req(req *http.Request) *Env {
-	ip := req.Header.Get("X-Forwarded-For")
-	if ip == "" {
-		ip = req.RemoteAddr
-	}
-	e.ctx.ClientIP = ip
+	e.ctx.ClientIP = pkg.GetIP(req)
 	e.ctx.UserAgent = req.Header.Get("User-Agent")
 	e.ctx.Timestamp = time.Now()
 	return e

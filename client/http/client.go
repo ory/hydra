@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/RangelReale/osin"
+	"github.com/go-errors/errors"
 	. "github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/middleware"
 	"github.com/parnurzeal/gorequest"
@@ -42,15 +43,19 @@ func (c *client) IsRequestAllowed(req *http.Request, resource, permission, owner
 
 func (c *client) IsAllowed(ar *AuthorizeRequest) (bool, error) {
 	request := gorequest.New()
-	resp, body, errors := request.Post(c.ep+"/guard/allowed").Set("Authorization", c.token.Type()+" "+c.token.AccessToken).Send(ar).End()
-	if len(errors) > 0 {
-		return false, fmt.Errorf("Got errors: %v", errors)
+	resp, body, errs := request.Post(c.ep+"/guard/allowed").Set("Authorization", c.token.Type()+" "+c.token.AccessToken).Send(ar).End()
+	if len(errs) > 0 {
+		return false, fmt.Errorf("Got errors: %v", errs)
 	} else if resp.StatusCode != http.StatusOK {
 		return false, fmt.Errorf("Got status code %s", resp.StatusCode)
 	}
 
 	if err := json.Unmarshal([]byte(body), &isAllowed); err != nil {
 		return false, err
+	}
+
+	if !isAllowed.Allowed {
+		return false, errors.New("Authroization denied.")
 	}
 	return isAllowed.Allowed, nil
 }
@@ -83,6 +88,10 @@ func (c *client) IsAuthenticated(token string) (bool, error) {
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&introspect); err != nil {
 		return false, err
+	}
+
+	if !introspect.Active {
+		return false, errors.New("Authentication denied.")
 	}
 	return introspect.Active, nil
 }

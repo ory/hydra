@@ -18,7 +18,7 @@ If time schedule holds, we will use it in production in Q1 2016 for an awesome b
 - [Motivation](#motivation)
 - [Features](#features)
 - [Caveats](#caveats)
-- [HTTP RESTful API](#http-restful-api)
+- [HTTP/2 RESTful API](#http2-restful-api)
 - [Run hydra-host](#run-hydra-host)
   - [Set up PostgreSQL locally](#set-up-postgresql-locally)
   - [Run as executable](#run-as-executable)
@@ -28,6 +28,8 @@ If time schedule holds, we will use it in production in Q1 2016 for an awesome b
     - [Start server](#start-server)
     - [Create client](#create-client)
     - [Create user](#create-user)
+    - [Create JWT RSA Key Pair](#create-jwt-rsa-key-pair)
+    - [Create a TLS certificate](#create-a-tls-certificate)
 - [Good to know](#good-to-know)
   - [Everything is RESTful. No HTML. No Templates.](#everything-is-restful-no-html-no-templates)
   - [Sign up workflow](#sign-up-workflow)
@@ -67,6 +69,8 @@ Hydra is a RESTful service providing you with things like:
   * Hydra uses self-contained Acccess Tokens as suggessted in [rfc6794#section-1.4](http://tools.ietf.org/html/rfc6749#section-1.4) by issuing JSON Web Tokens as specified at
    [https://tools.ietf.org/html/rfc7519](https://tools.ietf.org/html/rfc7519) with [RSASSA-PKCS1-v1_5 SHA-256](https://tools.ietf.org/html/rfc7519#section-8) hashing algorithm, Hydra reduces database roundtrips.
   * Hydra implements **OAuth2 Introspection** as specified in [rfc7662](https://tools.ietf.org/html/rfc7662)
+* Easy command line tools like `hydra-jwt` for generating jwt signing key pairs.
+* HTTP/2 with TLS.
 
 ## Caveats
 
@@ -76,7 +80,7 @@ Hydra speaks only JSON. This obviously prevents Hydra from delivering a dedicate
 
 You'll find more information on this in the [Good to know](#good-to-know) section.
 
-## HTTP RESTful API
+## HTTP/2 RESTful API
 
 The API is described at [apiary](http://docs.hydra6.apiary.io/#). The API Documentation is still work in progress.
 
@@ -134,16 +138,19 @@ For brevity the guide to creating a new database in Postgres has been skipped.*
 
 The CLI currently requires two environment variables:
 
-| Variable          | Description               | Format                                        | Default   |
-| ----------------- | ------------------------- | --------------------------------------------- | --------- |
-| DATABASE_URL      | PostgreSQL Database URL   | `postgres://user:password@host:port/database` | empty     |
-| BCRYPT_WORKFACTOR | BCrypt Strength           | number                                        | `10`      |
-| SIGNUP_URL        | [Sign up URL](#sign-up)   | url                                           | empty     |
-| SIGNIN_URL        | [Sign in URL](#sign-in)   | url                                           | empty     |
-| DROPBOX_CLIENT    | Dropbox Client ID         | string                                        | empty     |
-| DROPBOX_SECRET    | Dropbox Client Secret     | string                                        | empty     |
-| DROPBOX_CALLBACK  | Dropbox Redirect URL      | url                                           | empty     |
-
+| Variable             | Description               | Format                                        | Default   |
+| -------------------- | ------------------------- | --------------------------------------------- | --------- |
+| DATABASE_URL         | PostgreSQL Database URL   | `postgres://user:password@host:port/database` | empty     |
+| BCRYPT_WORKFACTOR    | BCrypt Strength           | number                                        | `10`      |
+| SIGNUP_URL           | [Sign up URL](#sign-up)   | url                                           | empty     |
+| SIGNIN_URL           | [Sign in URL](#sign-in)   | url                                           | empty     |
+| DROPBOX_CLIENT       | Dropbox Client ID         | string                                        | empty     |
+| DROPBOX_SECRET       | Dropbox Client Secret     | string                                        | empty     |
+| DROPBOX_CALLBACK     | Dropbox Redirect URL      | url                                           | empty     |
+| JWT_PUBLIC_KEY_PATH  | JWT Signing Public Key    | `./cert/rs256-public.pem` (local path)        | "../../example/cert/rs256-public.pem"  |
+| JWT_PRIVATE_KEY_PATH | JWT Signing Private Key   | `./cert/rs256-private.pem` (local path)       | "../../example/cert/rs256-private.pem" |
+| TLS_CERT_PATH        | TLS Certificate Path      | `./cert/cert.pem`                             | "../../example/cert/tls-cert.pem"      |
+| TLS_KEY_PATH         | TLS Key Path              | `./cert/key.pem`                              | "../../example/cert/tls-key.pem"       |
 
 ### CLI Usage
 
@@ -207,6 +214,38 @@ OPTIONS:
    --password           the user's password
    --as-superuser       grant superuser privileges to the user
 ```
+
+#### Create JWT RSA Key Pair
+
+To generate files *rs256-private.pem* and *rs256-public.pem* in the current directory, run:
+
+```
+$ hydra-jwt
+```
+
+These files can be used for environmental variables *JWT_PUBLIC_KEY_PATH* and *JWT_PRIVATE_KEY_PATH*
+
+#### Create a TLS certificate
+
+```
+hydra-tls
+
+  -ca
+        whether this cert should be its own Certificate Authority
+  -duration duration
+        Duration that certificate is valid for (default 8760h0m0s)
+  -ecdsa-curve string
+        ECDSA curve to use to generate a key. Valid values are P224, P256, P384, P521
+  -host string
+        Comma-separated hostnames and IPs to generate a certificate for
+  -rsa-bits int
+        Size of RSA key to generate. Ignored if --ecdsa-curve is set (default 2048)
+  -start-date string
+        Creation date formatted as Jan 1 15:04:05 2011
+```
+
+hydra-tls generates files *tls-key.pem* and *tls-cert.pem* in the current directory. These files can be used for
+environmental variables *TLS_CERT_PATH* and *TLS_KEY_PATH*
 
 ## Good to know
 

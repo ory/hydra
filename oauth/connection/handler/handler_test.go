@@ -111,11 +111,11 @@ func TestCreateGetDeleteGet(t *testing.T) {
 	for k, c := range []test{
 		{subject: "peter", token: jwt.Token{Valid: false}, policies: []policy.Policy{policies["fail"]}, createData: data["fail"], statusCreate: http.StatusUnauthorized},
 		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["fail"]}, createData: data["fail"], statusCreate: http.StatusForbidden},
-		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-create"]}, createData: data["ok-max"], statusCreate: http.StatusOK, statusGet: http.StatusForbidden},
+		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-create"]}, createData: data["ok-max"], statusCreate: http.StatusCreated, statusGet: http.StatusForbidden},
 		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-create"]}, createData: data["fail"], statusCreate: http.StatusBadRequest},
 		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-create"]}, createData: data["fail-validation"], statusCreate: http.StatusBadRequest},
-		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-create"], policies["pass-get"]}, createData: data["ok-zac"], statusCreate: http.StatusOK, statusGet: http.StatusOK, statusDelete: http.StatusForbidden},
-		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-all"]}, createData: data["ok-steve"], statusCreate: http.StatusOK, statusGet: http.StatusOK, statusDelete: http.StatusAccepted, statusGetAfterDelete: http.StatusNotFound},
+		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-create"], policies["pass-get"]}, createData: data["ok-zac"], statusCreate: http.StatusCreated, statusGet: http.StatusOK, statusDelete: http.StatusForbidden},
+		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-all"]}, createData: data["ok-steve"], statusCreate: http.StatusCreated, statusGet: http.StatusOK, statusDelete: http.StatusAccepted, statusGetAfterDelete: http.StatusNotFound},
 	} {
 		handler := &Handler{s: store, m: mw}
 		router := mux.NewRouter()
@@ -128,7 +128,7 @@ func TestCreateGetDeleteGet(t *testing.T) {
 
 		resp, body, _ := request.Post(connectionsURL).Send(*c.createData).End()
 		require.Equal(t, c.statusCreate, resp.StatusCode, "case %d: %s", k, body)
-		if resp.StatusCode != http.StatusOK {
+		if resp.StatusCode != http.StatusCreated {
 			continue
 		}
 

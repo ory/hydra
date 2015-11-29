@@ -1,6 +1,9 @@
 package hash
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"github.com/go-errors/errors"
+	"golang.org/x/crypto/bcrypt"
+)
 
 type BCrypt struct {
 	WorkFactor int
@@ -8,9 +11,15 @@ type BCrypt struct {
 
 func (b *BCrypt) Hash(data string) (string, error) {
 	s, err := bcrypt.GenerateFromPassword([]byte(data), b.WorkFactor)
-	return string(s), err
+	if err != nil {
+		return "", errors.New(err)
+	}
+	return string(s), nil
 }
 
 func (b *BCrypt) Compare(hash string, data string) error {
-	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(data))
+	if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(data)); err != nil {
+		return errors.New(err)
+	}
+	return nil
 }

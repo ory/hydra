@@ -1,11 +1,5 @@
 package connection
 
-import (
-	"github.com/go-errors/errors"
-)
-
-var ErrNotFound = errors.New("not found")
-
 // Connection connects an subject S with a token T issued by provider P
 type Connection interface {
 	// GetID returns the connection's unique identifier.

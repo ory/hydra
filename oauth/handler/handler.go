@@ -243,7 +243,7 @@ func (h *Handler) AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 
 		subject := session.GetRemoteSubject()
 		user, err := h.Connections.FindByRemoteSubject(provider.GetID(), subject)
-		if err == connection.ErrNotFound {
+		if err == pkg.ErrNotFound {
 			if h.SignUpLocation == "" {
 				// The subject is not linked to any account.
 				http.Error(w, "Provided token is not linked to any existing account.", http.StatusUnauthorized)

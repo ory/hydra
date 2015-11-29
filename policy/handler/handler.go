@@ -16,8 +16,8 @@ import (
 	"golang.org/x/net/context"
 	"net/http"
 
-	"errors"
 	log "github.com/Sirupsen/logrus"
+	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/jwt"
 	. "github.com/ory-am/ladon/guard"
 	"github.com/ory-am/ladon/guard/operator"
@@ -77,7 +77,7 @@ func (h *Handler) Granted(ctx context.Context, rw http.ResponseWriter, req *http
 	var p payload
 	decoder := json.NewDecoder(req.Body)
 	if err := decoder.Decode(&p); err != nil {
-		http.Error(rw, err.Error(), http.StatusBadRequest)
+		pkg.HttpError(rw, err, http.StatusBadRequest)
 		return
 	}
 
@@ -164,24 +164,23 @@ func (h *Handler) Create(ctx context.Context, rw http.ResponseWriter, req *http.
 	var p DefaultPolicy
 	decoder := json.NewDecoder(req.Body)
 	if err := decoder.Decode(&p); err != nil {
-		http.Error(rw, err.Error(), http.StatusBadRequest)
+		pkg.HttpError(rw, err, http.StatusBadRequest)
 		return
 	}
 
 	p.ID = uuid.New()
 	if err := h.s.Create(&p); err != nil {
-		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		pkg.HttpError(rw, err, http.StatusInternalServerError)
 		return
 	}
 
-	pkg.WriteJSON(rw, p)
+	pkg.WriteCreatedJSON(rw, "/policies/"+p.ID, p)
 }
 
 func (h *Handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
-
 	id, ok := mux.Vars(req)["id"]
 	if !ok {
-		http.Error(rw, "No id given.", http.StatusBadRequest)
+		pkg.HttpError(rw, errors.New("No id given."), http.StatusBadRequest)
 		return
 	}
 
@@ -189,7 +188,7 @@ func (h *Handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Req
 		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			policy, err := h.s.Get(id)
 			if err != nil {
-				http.NotFound(rw, req)
+				pkg.HttpErrorHandler(rw, err)
 				return
 			}
 			pkg.WriteJSON(rw, policy)
@@ -200,14 +199,14 @@ func (h *Handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Req
 func (h *Handler) Delete(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 	id, ok := mux.Vars(req)["id"]
 	if !ok {
-		http.Error(rw, "No id given.", http.StatusBadRequest)
+		pkg.HttpError(rw, errors.New("No id given."), http.StatusBadRequest)
 		return
 	}
 
 	h.m.IsAuthorized(permission(id), "delete", nil)(hctx.ContextHandlerFunc(
 		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			if err := h.s.Delete(id); err != nil {
-				http.Error(rw, fmt.Sprintf("Could not retrieve client: %s", id), http.StatusInternalServerError)
+				pkg.HttpError(rw, errors.Errorf("Could not retrieve client: %s", id), http.StatusInternalServerError)
 				return
 			}
 			rw.WriteHeader(http.StatusAccepted)

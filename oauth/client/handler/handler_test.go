@@ -79,9 +79,9 @@ func TestCreateGetDeleteGet(t *testing.T) {
 	for k, c := range []test{
 		{subject: "peter", token: jwt.Token{Valid: false}, policies: []policy.Policy{policies["fail"]}, createData: payload{RedirectURIs: "redir"}, statusCreate: http.StatusUnauthorized},
 		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["fail"]}, createData: payload{RedirectURIs: "redir"}, statusCreate: http.StatusForbidden},
-		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-create"]}, createData: payload{RedirectURIs: "redir"}, statusCreate: http.StatusOK, statusGet: http.StatusForbidden},
-		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-create"], policies["pass-get"]}, createData: payload{RedirectURIs: "redir"}, statusCreate: http.StatusOK, statusGet: http.StatusOK, statusDelete: http.StatusForbidden},
-		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-all"]}, createData: payload{RedirectURIs: "redir"}, statusCreate: http.StatusOK, statusGet: http.StatusOK, statusDelete: http.StatusAccepted, statusGetAfterDelete: http.StatusNotFound},
+		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-create"]}, createData: payload{RedirectURIs: "redir"}, statusCreate: http.StatusCreated, statusGet: http.StatusForbidden},
+		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-create"], policies["pass-get"]}, createData: payload{RedirectURIs: "redir"}, statusCreate: http.StatusCreated, statusGet: http.StatusOK, statusDelete: http.StatusForbidden},
+		{subject: "peter", token: jwt.Token{Valid: true}, policies: []policy.Policy{policies["pass-all"]}, createData: payload{RedirectURIs: "redir"}, statusCreate: http.StatusCreated, statusGet: http.StatusOK, statusDelete: http.StatusAccepted, statusGetAfterDelete: http.StatusNotFound},
 	} {
 		handler := &Handler{s: store, m: mw}
 		router := mux.NewRouter()
@@ -92,7 +92,7 @@ func TestCreateGetDeleteGet(t *testing.T) {
 		request := gorequest.New()
 		resp, body, _ := request.Post(ts.URL + "/clients").Send(c.createData).End()
 		require.Equal(t, c.statusCreate, resp.StatusCode, "case %d: %s", k, body)
-		if resp.StatusCode != http.StatusOK {
+		if resp.StatusCode != http.StatusCreated {
 			continue
 		}
 

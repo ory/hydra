@@ -1,9 +1,5 @@
 package account
 
-import "github.com/go-errors/errors"
-
-var ErrNotFound = errors.New("Not found")
-
 type Account interface {
 	GetID() string
 	GetPassword() string

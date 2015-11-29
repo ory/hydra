@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"github.com/ory-am/common/pkg"
 	"github.com/ory-am/dockertest"
 	"github.com/ory-am/hydra/oauth/provider/storage"
 	"github.com/pborman/uuid"
@@ -33,6 +34,11 @@ func TestMain(m *testing.M) {
 		log.Fatalf("Could not set up schemas: %v", err)
 	}
 	os.Exit(m.Run())
+}
+
+func TestGetNotFound(t *testing.T) {
+	_, err := store.GetStateData("asdf")
+	assert.Equal(t, pkg.ErrNotFound, err)
 }
 
 func TestCreateAndGetCases(t *testing.T) {

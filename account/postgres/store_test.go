@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"github.com/ory-am/common/pkg"
 	"github.com/ory-am/dockertest"
 	"github.com/ory-am/hydra/hash"
 	"github.com/stretchr/testify/assert"
@@ -29,6 +30,17 @@ func TestMain(m *testing.M) {
 		log.Fatalf("Could not set up schemas: %v", err)
 	}
 	os.Exit(m.Run())
+}
+
+func TestNotFound(t *testing.T) {
+	_, err := store.Get("asdf")
+	t.Log("Got error %s", err)
+	assert.NotNil(t, err)
+	assert.Equal(t, pkg.ErrNotFound, err)
+
+	_, err = store.UpdateData("asdf", "{}")
+	assert.NotNil(t, err)
+	assert.Equal(t, pkg.ErrNotFound, err)
 }
 
 func TestCreateAndGetCases(t *testing.T) {

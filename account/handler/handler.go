@@ -83,7 +83,7 @@ func (h *Handler) Create(ctx context.Context, rw http.ResponseWriter, req *http.
 
 	user, err := h.s.Create(uuid.New(), p.Email, p.Password, p.Data)
 	if err != nil {
-		HttpErrorHandler(rw, err)
+		WriteError(rw, err)
 		return
 	}
 
@@ -101,7 +101,7 @@ func (h *Handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Req
 		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			user, err := h.s.Get(id)
 			if err != nil {
-				HttpErrorHandler(rw, err)
+				WriteError(rw, err)
 				return
 			}
 			WriteJSON(rw, user)

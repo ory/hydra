@@ -188,7 +188,7 @@ func (h *Handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Req
 		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			policy, err := h.s.Get(id)
 			if err != nil {
-				pkg.HttpErrorHandler(rw, err)
+				pkg.WriteError(rw, err)
 				return
 			}
 			pkg.WriteJSON(rw, policy)

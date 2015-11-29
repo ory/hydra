@@ -120,7 +120,7 @@ func (h *Handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Req
 
 	conn, err := h.s.Get(id)
 	if err != nil {
-		HttpErrorHandler(rw, err)
+		WriteError(rw, err)
 		return
 	}
 

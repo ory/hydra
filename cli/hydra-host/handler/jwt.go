@@ -1,3 +1,5 @@
+package handler
+
 /*
  * Generates a private/public key pair in PEM format (not Certificate)
  *
@@ -7,7 +9,6 @@
  * The generated public key can be parsed as follows:
  * > openssl rsa -pubin -in pub.pem -text
  */
-package main
 
 import (
 	"crypto/rand"
@@ -15,11 +16,12 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"github.com/codegangsta/cli"
 	"io/ioutil"
 	"log"
 )
 
-func main() {
+func CreatePublicPrivatePEMFiles(ctx *cli.Context) {
 	// priv *rsa.PrivateKey;
 	// err error;
 	priv, err := rsa.GenerateKey(rand.Reader, 1024)
@@ -63,12 +65,12 @@ func main() {
 	}
 	pubPEM := string(pem.EncodeToMemory(&pubBlk))
 
-	err = ioutil.WriteFile("rs256-public.pem", []byte(pubPEM), 0644)
+	err = ioutil.WriteFile(ctx.String("public-file-path"), []byte(pubPEM), 0644)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
 
-	err = ioutil.WriteFile("rs256-private.pem", []byte(privPEM), 0644)
+	err = ioutil.WriteFile(ctx.String("private-file-path"), []byte(privPEM), 0644)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}

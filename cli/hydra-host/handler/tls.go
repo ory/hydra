@@ -1,3 +1,5 @@
+package handler
+
 // Copyright 2009 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
@@ -7,8 +9,6 @@
 // Generate a self-signed X.509 certificate for a TLS server. Outputs to
 // 'cert.pem' and 'key.pem' and will overwrite existing files.
 
-package main
-
 import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
@@ -17,23 +17,14 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
-	"flag"
 	"fmt"
+	"github.com/codegangsta/cli"
 	"log"
 	"math/big"
 	"net"
 	"os"
 	"strings"
 	"time"
-)
-
-var (
-	host       = flag.String("host", "", "Comma-separated hostnames and IPs to generate a certificate for")
-	validFrom  = flag.String("start-date", "", "Creation date formatted as Jan 1 15:04:05 2011")
-	validFor   = flag.Duration("duration", 365*24*time.Hour, "Duration that certificate is valid for")
-	isCA       = flag.Bool("ca", false, "whether this cert should be its own Certificate Authority")
-	rsaBits    = flag.Int("rsa-bits", 2048, "Size of RSA key to generate. Ignored if --ecdsa-curve is set")
-	ecdsaCurve = flag.String("ecdsa-curve", "", "ECDSA curve to use to generate a key. Valid values are P224, P256, P384, P521")
 )
 
 func publicKey(priv interface{}) interface{} {
@@ -63,18 +54,25 @@ func pemBlockForKey(priv interface{}) *pem.Block {
 	}
 }
 
-func main() {
-	flag.Parse()
+func CreateDummyTLSCert(ctx *cli.Context) {
+	var (
+		host       = ctx.String("host")
+		validFrom  = ctx.String("start-date")
+		validFor   = ctx.Duration("duration")
+		isCA       = ctx.Bool("ca")
+		rsaBits    = ctx.Int("rsa-bits")
+		ecdsaCurve = ctx.String("ecdsa-curve")
+	)
 
-	if len(*host) == 0 {
+	if len(host) == 0 {
 		log.Fatalf("Missing required --host parameter")
 	}
 
 	var priv interface{}
 	var err error
-	switch *ecdsaCurve {
+	switch ecdsaCurve {
 	case "":
-		priv, err = rsa.GenerateKey(rand.Reader, *rsaBits)
+		priv, err = rsa.GenerateKey(rand.Reader, rsaBits)
 	case "P224":
 		priv, err = ecdsa.GenerateKey(elliptic.P224(), rand.Reader)
 	case "P256":
@@ -84,7 +82,7 @@ func main() {
 	case "P521":
 		priv, err = ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
 	default:
-		fmt.Fprintf(os.Stderr, "Unrecognized elliptic curve: %q", *ecdsaCurve)
+		fmt.Fprintf(os.Stderr, "Unrecognized elliptic curve: %q", ecdsaCurve)
 		os.Exit(1)
 	}
 	if err != nil {
@@ -92,17 +90,17 @@ func main() {
 	}
 
 	var notBefore time.Time
-	if len(*validFrom) == 0 {
+	if len(validFrom) == 0 {
 		notBefore = time.Now()
 	} else {
-		notBefore, err = time.Parse("Jan 2 15:04:05 2006", *validFrom)
+		notBefore, err = time.Parse("Jan 2 15:04:05 2006", validFrom)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Failed to parse creation date: %s\n", err)
 			os.Exit(1)
 		}
 	}
 
-	notAfter := notBefore.Add(*validFor)
+	notAfter := notBefore.Add(validFor)
 
 	serialNumberLimit := new(big.Int).Lsh(big.NewInt(1), 128)
 	serialNumber, err := rand.Int(rand.Reader, serialNumberLimit)
@@ -123,7 +121,7 @@ func main() {
 		BasicConstraintsValid: true,
 	}
 
-	hosts := strings.Split(*host, ",")
+	hosts := strings.Split(host, ",")
 	for _, h := range hosts {
 		if ip := net.ParseIP(h); ip != nil {
 			template.IPAddresses = append(template.IPAddresses, ip)
@@ -132,7 +130,7 @@ func main() {
 		}
 	}
 
-	if *isCA {
+	if isCA {
 		template.IsCA = true
 		template.KeyUsage |= x509.KeyUsageCertSign
 	}
@@ -142,20 +140,21 @@ func main() {
 		log.Fatalf("Failed to create certificate: %s", err)
 	}
 
-	certOut, err := os.Create("tls-cert.pem")
+	certOut, err := os.Create(ctx.String("certificate-file-path"))
 	if err != nil {
 		log.Fatalf("failed to open cert.pem for writing: %s", err)
 	}
 	pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: derBytes})
 	certOut.Close()
-	log.Print("written cert.pem\n")
+	log.Printf("written %s\n", ctx.String("certificate-file-path"))
 
-	keyOut, err := os.OpenFile("tls-key.pem", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	keyOut, err := os.OpenFile(ctx.String("key-file-path"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		log.Print("failed to open key.pem for writing:", err)
 		return
 	}
 	pem.Encode(keyOut, pemBlockForKey(priv))
 	keyOut.Close()
-	log.Print("written key.pem\n")
+	log.Printf("written %s\n", ctx.String("key-file-path"))
+	log.Println("DO NOT use these files in production!\n")
 }

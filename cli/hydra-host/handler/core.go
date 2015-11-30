@@ -82,5 +82,5 @@ func (c *Core) Start(ctx *cli.Context) {
 		Addr: listenOn,
 	}
 	http2.ConfigureServer(srv, &http2.Server{})
-	log.Fatal(srv.ListenAndServeTLS("server.crt", "server.key"))
+	log.Fatal(srv.ListenAndServeTLS(tlsCertPath, tlsKeyPath))
 }

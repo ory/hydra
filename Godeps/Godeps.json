@@ -111,7 +111,7 @@
 		},
 		{
 			"ImportPath": "github.com/ory-am/osin-storage/storage",
-			"Rev": "f4321c88653c3cbdc03ba370f2465d07e1e239c1"
+			"Rev": "ade602d4619ba22b85d69e8dc5769682b48ad282"
 		},
 		{
 			"ImportPath": "github.com/parnurzeal/gorequest",

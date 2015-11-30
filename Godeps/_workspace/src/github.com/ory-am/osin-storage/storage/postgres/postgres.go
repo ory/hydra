@@ -7,6 +7,7 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/ory-am/common/pkg"
 	"log"
+	"fmt"
 )
 
 var schemas = []string{`CREATE TABLE IF NOT EXISTS client (
@@ -322,9 +323,11 @@ func assertToString(in interface{}) (string, error) {
 	var ok bool
 	var data string
 	if in == nil {
-		data = ""
-	} else if data, ok = in.(string); !ok {
-		return "", errors.Errorf(`Could not assert "%v" to string`, in)
+		return "", nil
+	} else if data, ok = in.(string); ok {
+		return data, nil
+	} else if str, ok := in.(fmt.Stringer); ok {
+		return str.String(), nil
 	}
-	return data, nil
+	return "", errors.Errorf(`Could not assert "%v" to string`, in)
 }

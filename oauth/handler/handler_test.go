@@ -253,8 +253,10 @@ func TestIntrospect(t *testing.T) {
 	}
 	config.Endpoint = oauth2.Endpoint{AuthURL: ts.URL + "/oauth2/auth", TokenURL: ts.URL + "/oauth2/token"}
 
-	access, _ := clientConfig.Token(oauth2.NoContext)
-	verify, _ := config.PasswordCredentialsToken(oauth2.NoContext, user.Username, user.Password)
+	access, err := clientConfig.Token(oauth2.NoContext)
+	require.Nil(t, err)
+	verify, err := config.PasswordCredentialsToken(oauth2.NoContext, user.Username, user.Password)
+	require.Nil(t, err)
 
 	for k, c := range []*struct {
 		accessToken string

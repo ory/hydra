@@ -7,6 +7,11 @@
 Hydra is a twelve factor authentication, authorization and account management service, ready for you to use in your micro service architecture.
 Hydra is written in go and backed by PostgreSQL or any implementation of [account/storage.go](account/storage.go).
 
+Hydra implements TLS, different OAuth2 IETF standards and supports HTTP/2. To make things as easy as possible, hydra
+comes with tools to generate TLS and RS256 PEM files, leaving you with almost zero trouble to set up.
+
+![Hydra implements HTTP/2 and TLS.](h2tls.png)
+
 *Please be aware that Hydra is not ready for production just yet and has not been tested on a production system.
 If time schedule holds, we will use it in production in Q1 2016 for an awesome business app that has yet to be revealed.*
 
@@ -156,7 +161,7 @@ The CLI currently requires two environment variables:
 
 ```
 NAME:
-   hydra-host - Dragons guard your resources.
+   hydra-host - Dragons guard your resources
 
 USAGE:
    hydra-host [global options] command [command options] [arguments...]
@@ -165,14 +170,18 @@ VERSION:
    0.0.0
 
 COMMANDS:
-   client       client actions
-   user         user actions
-   start        start hydra-host
+   client       Client actions
+   user         User actions
+   start        Start the host service
+   jwt          JWT actions
+   tls          JWT actions
    help, h      Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --help, -h           show help
-   --version, -v        print the version
+   --help, -h                   show help
+   --generate-bash-completion
+   --version, -v                print the version
+
 ```
 
 #### Start server
@@ -220,32 +229,42 @@ OPTIONS:
 To generate files *rs256-private.pem* and *rs256-public.pem* in the current directory, run:
 
 ```
-$ hydra-jwt
-```
+NAME:
+   hydra-host jwt create-keypair - Create a JWT PEM keypair.
 
-These files can be used for environmental variables *JWT_PUBLIC_KEY_PATH* and *JWT_PRIVATE_KEY_PATH*
+   You can use these files by providing the environment variables JWT_PRIVATE_KEY_PATH and JWT_PUBLIC_KEY_PATH
+
+USAGE:
+   hydra-host jwt create-keypair [command options] [arguments...]
+
+OPTIONS:
+   -i, --private-file-path "rs256-private.pem"  Where to save the private key PEM file
+   -u, --public-file-path "rs256-public.pem"    Where to save the private key PEM file
+
+```
 
 #### Create a TLS certificate
 
 ```
-hydra-tls
+NAME:
+   hydra-host tls create-dummy-certificate - Create a dummy TLS certificate and private key.
 
-  -ca
-        whether this cert should be its own Certificate Authority
-  -duration duration
-        Duration that certificate is valid for (default 8760h0m0s)
-  -ecdsa-curve string
-        ECDSA curve to use to generate a key. Valid values are P224, P256, P384, P521
-  -host string
-        Comma-separated hostnames and IPs to generate a certificate for
-  -rsa-bits int
-        Size of RSA key to generate. Ignored if --ecdsa-curve is set (default 2048)
-  -start-date string
-        Creation date formatted as Jan 1 15:04:05 2011
+   You can use these files (in development!) by providing the environment variables TLS_CERT_PATH and TLS_KEY_PATH
+
+USAGE:
+   hydra-host tls create-dummy-certificate [command options] [arguments...]
+
+OPTIONS:
+   -c, --certificate-file-path "tls-cert.pem"   Where to save the private key PEM file
+   -k, --key-file-path "tls-key.pem"            Where to save the private key PEM file
+   -u, --host                                   Comma-separated hostnames and IPs to generate a certificate for
+   --sd, --start-date                           Creation date formatted as Jan 1 15:04:05 2011
+   -d, --duration "8760h0m0s"                   Duration that certificate is valid for
+   --ca                                         whether this cert should be its own Certificate Authority
+   --rb, --rsa-bits "2048"                      Size of RSA key to generate. Ignored if --ecdsa-curve is set
+   --ec, --ecdsa-curve                          ECDSA curve to use to generate a key. Valid values are P224, P256, P384, P521
+
 ```
-
-hydra-tls generates files *tls-key.pem* and *tls-cert.pem* in the current directory. These files can be used for
-environmental variables *TLS_CERT_PATH* and *TLS_KEY_PATH*
 
 ## Good to know
 

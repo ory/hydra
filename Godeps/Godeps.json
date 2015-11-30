@@ -73,36 +73,45 @@
 			"Rev": "83c4f410d0aed80a0f44bac6a576a7f2435791f3"
 		},
 		{
+			"ImportPath": "github.com/oleiade/reflections",
+			"Comment": "0.1.2-2-g632977f",
+			"Rev": "632977f98cd34d217c4b57d0840ec188b3d3dcaf"
+		},
+		{
 			"ImportPath": "github.com/ory-am/common/compiler",
-			"Rev": "f077467c9b4623828426eb85405aa1fe890d8e7e"
+			"Rev": "d0a53a9deb5c1c150560f594c254e76498b76f3b"
 		},
 		{
 			"ImportPath": "github.com/ory-am/common/env",
-			"Rev": "f077467c9b4623828426eb85405aa1fe890d8e7e"
+			"Rev": "d0a53a9deb5c1c150560f594c254e76498b76f3b"
 		},
 		{
 			"ImportPath": "github.com/ory-am/common/handler",
-			"Rev": "f077467c9b4623828426eb85405aa1fe890d8e7e"
+			"Rev": "d0a53a9deb5c1c150560f594c254e76498b76f3b"
+		},
+		{
+			"ImportPath": "github.com/ory-am/common/pkg",
+			"Rev": "d0a53a9deb5c1c150560f594c254e76498b76f3b"
 		},
 		{
 			"ImportPath": "github.com/ory-am/common/rand/sequence",
-			"Rev": "f077467c9b4623828426eb85405aa1fe890d8e7e"
+			"Rev": "d0a53a9deb5c1c150560f594c254e76498b76f3b"
 		},
 		{
 			"ImportPath": "github.com/ory-am/dockertest",
-			"Rev": "db4064cf299058aa499c0b7d553aaf9acb082a34"
+			"Rev": "f5e788a373e417c8a6dd7b68c9e9cb559d1fc712"
 		},
 		{
 			"ImportPath": "github.com/ory-am/ladon/guard",
-			"Rev": "77220ecaec8f2d514d83ec40424e4976b1566d28"
+			"Rev": "fbcecbeec4d597b4bfbfe4c5cb2a76e5558dd1ba"
 		},
 		{
 			"ImportPath": "github.com/ory-am/ladon/policy",
-			"Rev": "77220ecaec8f2d514d83ec40424e4976b1566d28"
+			"Rev": "fbcecbeec4d597b4bfbfe4c5cb2a76e5558dd1ba"
 		},
 		{
 			"ImportPath": "github.com/ory-am/osin-storage/storage",
-			"Rev": "a66b27323a2a719b8eccbd81969c6bb4ea49ce35"
+			"Rev": "f4321c88653c3cbdc03ba370f2465d07e1e239c1"
 		},
 		{
 			"ImportPath": "github.com/parnurzeal/gorequest",
@@ -137,6 +146,10 @@
 		},
 		{
 			"ImportPath": "golang.org/x/net/context",
+			"Rev": "1d9fd3b8333e891c0e7353e1adcfe8a612573033"
+		},
+		{
+			"ImportPath": "golang.org/x/net/http2",
 			"Rev": "1d9fd3b8333e891c0e7353e1adcfe8a612573033"
 		},
 		{

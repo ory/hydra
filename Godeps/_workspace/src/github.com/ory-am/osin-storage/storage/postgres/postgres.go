@@ -1,52 +1,45 @@
-// Postgres is a osin storage implementation for postgres.
+// Package postgres is a osin storage implementation for postgres.
 package postgres
 
 import (
 	"database/sql"
-	"errors"
-	"fmt"
 	"github.com/RangelReale/osin"
+	"github.com/go-errors/errors"
+	"github.com/ory-am/common/pkg"
 	"log"
 )
 
 var schemas = []string{`CREATE TABLE IF NOT EXISTS client (
-	id           text NOT NULL,
+	id           text NOT NULL PRIMARY KEY,
 	secret 		 text NOT NULL,
-	redirect_uri text NOT NULL,
-	extra		 text NOT NULL,
-
-    CONSTRAINT client_pk PRIMARY KEY (id)
+	extra 		 text NOT NULL,
+	redirect_uri text NOT NULL
 )`, `CREATE TABLE IF NOT EXISTS authorize (
 	client       text NOT NULL,
-	code         text NOT NULL,
+	code         text NOT NULL PRIMARY KEY,
 	expires_in   int NOT NULL,
 	scope        text NOT NULL,
 	redirect_uri text NOT NULL,
 	state        text NOT NULL,
 	extra 		 text NOT NULL,
-	created_at   timestamp with time zone NOT NULL,
-
-    CONSTRAINT authorize_pk PRIMARY KEY (code)
+	created_at   timestamp with time zone NOT NULL
 )`, `CREATE TABLE IF NOT EXISTS access (
 	client        text NOT NULL,
 	authorize     text NOT NULL,
 	previous      text NOT NULL,
-	access_token  text NOT NULL,
+	access_token  text NOT NULL PRIMARY KEY,
 	refresh_token text NOT NULL,
 	expires_in    int NOT NULL,
 	scope         text NOT NULL,
 	redirect_uri  text NOT NULL,
 	extra 		  text NOT NULL,
-	created_at    timestamp with time zone NOT NULL,
-
-    CONSTRAINT access_pk PRIMARY KEY (access_token)
+	created_at    timestamp with time zone NOT NULL
 )`, `CREATE TABLE IF NOT EXISTS refresh (
-	token         text NOT NULL,
-	access        text NOT NULL,
-
-    CONSTRAINT refresh_pk PRIMARY KEY (token)
+	token         text NOT NULL PRIMARY KEY,
+	access        text NOT NULL
 )`}
 
+// Storage implements interface "github.com/RangelReale/osin".Storage and interface "github.com/ory-am/osin-storage".Storage
 type Storage struct {
 	db *sql.DB
 }
@@ -67,66 +60,103 @@ func (s *Storage) CreateSchemas() error {
 	return nil
 }
 
+// Clone the storage if needed. For example, using mgo, you can clone the session with session.Clone
+// to avoid concurrent access problems.
+// This is to avoid cloning the connection at each method access.
+// Can return itself if not a problem.
 func (s *Storage) Clone() osin.Storage {
 	return s
 }
 
-func (s *Storage) Close() {}
+// Close the resources the Storage potentially holds (using Clone for example)
+func (s *Storage) Close() {
+}
 
+// GetClient loads the client by id
 func (s *Storage) GetClient(id string) (osin.Client, error) {
-	row := s.db.QueryRow("SELECT id, secret, redirect_uri, extra FROM client WHERE id=$1 LIMIT 1", id)
+	row := s.db.QueryRow("SELECT id, secret, redirect_uri, extra FROM client WHERE id=$1", id)
 	var c osin.DefaultClient
 	var extra string
-	if err := row.Scan(&c.Id, &c.Secret, &c.RedirectUri, &extra); err != nil {
-		return nil, err
+
+	if err := row.Scan(&c.Id, &c.Secret, &c.RedirectUri, &extra); err == sql.ErrNoRows {
+		return nil, pkg.ErrNotFound
+	} else if err != nil {
+		return nil, errors.New(err)
 	}
 	c.UserData = extra
 	return &c, nil
 }
 
+// UpdateClient updates the client (identified by it's id) and replaces the values with the values of client.
 func (s *Storage) UpdateClient(c osin.Client) error {
-	userData, err := dataToString(c.GetUserData())
+	data, err := assertToString(c.GetUserData())
 	if err != nil {
 		return err
 	}
 
-	_, err = s.db.Exec("UPDATE client SET (secret, redirect_uri, extra) = ($2, $3, $4) WHERE id=$1", c.GetId(), c.GetSecret(), c.GetRedirectUri(), userData)
-	return err
+	if _, err := s.db.Exec("UPDATE client SET (secret, redirect_uri, extra) = ($2, $3, $4) WHERE id=$1", c.GetId(), c.GetSecret(), c.GetRedirectUri(), data); err != nil {
+		return errors.New(err)
+	}
+	return nil
 }
 
+// CreateClient stores the client in the database and returns an error, if something went wrong.
 func (s *Storage) CreateClient(c osin.Client) error {
-	userData, err := dataToString(c.GetUserData())
+	data, err := assertToString(c.GetUserData())
 	if err != nil {
 		return err
 	}
-	_, err = s.db.Exec("INSERT INTO client (id, secret, redirect_uri, extra) VALUES ($1, $2, $3, $4)", c.GetId(), c.GetSecret(), c.GetRedirectUri(), userData)
-	return err
+
+	if _, err := s.db.Exec("INSERT INTO client (id, secret, redirect_uri, extra) VALUES ($1, $2, $3, $4)", c.GetId(), c.GetSecret(), c.GetRedirectUri(), data); err != nil {
+		return errors.New(err)
+	}
+	return nil
 }
 
+// RemoveClient removes a client (identified by id) from the database. Returns an error if something went wrong.
 func (s *Storage) RemoveClient(id string) (err error) {
-	_, err = s.db.Exec("DELETE FROM client WHERE id=$1", id)
-	return err
+	if _, err = s.db.Exec("DELETE FROM client WHERE id=$1", id); err != nil {
+		return errors.New(err)
+	}
+	return nil
 }
 
+// SaveAuthorize saves authorize data.
 func (s *Storage) SaveAuthorize(data *osin.AuthorizeData) (err error) {
-	userData, err := dataToString(data.UserData)
+	extra, err := assertToString(data.UserData)
 	if err != nil {
 		return err
 	}
 
-	_, err = s.db.Exec("INSERT INTO authorize (client, code, expires_in, scope, redirect_uri, state, created_at, extra) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)", data.Client.GetId(), data.Code, data.ExpiresIn, data.Scope, data.RedirectUri, data.State, data.CreatedAt, userData)
-	return err
+	if _, err = s.db.Exec(
+		"INSERT INTO authorize (client, code, expires_in, scope, redirect_uri, state, created_at, extra) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+		data.Client.GetId(),
+		data.Code,
+		data.ExpiresIn,
+		data.Scope,
+		data.RedirectUri,
+		data.State,
+		data.CreatedAt,
+		extra,
+	); err != nil {
+		return errors.New(err)
+	}
+	return nil
 }
 
+// LoadAuthorize looks up AuthorizeData by a code.
+// Client information MUST be loaded together.
+// Optionally can return error if expired.
 func (s *Storage) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
 	var data osin.AuthorizeData
-	var userData string
+	var extra string
 	var cid string
-	row := s.db.QueryRow("SELECT client, code, expires_in, scope, redirect_uri, state, created_at, extra FROM authorize WHERE code=$1 LIMIT 1", code)
-	if err := row.Scan(&cid, &data.Code, &data.ExpiresIn, &data.Scope, &data.RedirectUri, &data.State, &data.CreatedAt, &userData); err != nil {
-		return nil, err
+	if err := s.db.QueryRow("SELECT client, code, expires_in, scope, redirect_uri, state, created_at, extra FROM authorize WHERE code=$1 LIMIT 1", code).Scan(&cid, &data.Code, &data.ExpiresIn, &data.Scope, &data.RedirectUri, &data.State, &data.CreatedAt, &extra); err == sql.ErrNoRows {
+		return nil, pkg.ErrNotFound
+	} else if err != nil {
+		return nil, errors.New(err)
 	}
-	data.UserData = userData
+	data.UserData = extra
 
 	c, err := s.GetClient(cid)
 	if err != nil {
@@ -137,21 +167,16 @@ func (s *Storage) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
 	return &data, nil
 }
 
+// RemoveAuthorize revokes or deletes the authorization code.
 func (s *Storage) RemoveAuthorize(code string) (err error) {
-	_, err = s.db.Exec("DELETE FROM authorize WHERE code=$1", code)
-	return err
-}
-
-func dataToString(data interface{}) (string, error) {
-	if res, ok := data.(string); ok {
-		return res, nil
-	} else if stringer, ok := data.(fmt.Stringer); ok {
-		return stringer.String(), nil
-	} else {
-		return "", fmt.Errorf("Could not assert to string: %v", data)
+	if _, err = s.db.Exec("DELETE FROM authorize WHERE code=$1", code); err != nil {
+		return errors.New(err)
 	}
+	return nil
 }
 
+// SaveAccess writes AccessData.
+// If RefreshToken is not blank, it must save in a way that can be loaded using LoadRefresh.
 func (s *Storage) SaveAccess(data *osin.AccessData) (err error) {
 	prev := ""
 	authorizeData := &osin.AuthorizeData{}
@@ -164,14 +189,14 @@ func (s *Storage) SaveAccess(data *osin.AccessData) (err error) {
 		authorizeData = data.AuthorizeData
 	}
 
-	userData, err := dataToString(data.UserData)
+	extra, err := assertToString(data.UserData)
 	if err != nil {
 		return err
 	}
 
 	tx, err := s.db.Begin()
 	if err != nil {
-		return err
+		return errors.New(err)
 	}
 
 	if data.RefreshToken != "" {
@@ -181,31 +206,51 @@ func (s *Storage) SaveAccess(data *osin.AccessData) (err error) {
 	}
 
 	if data.Client == nil {
-		return errors.New("data.Client must not be nil.")
+		return errors.New("data.Client must not be nil")
 	}
 
-	_, err = tx.Exec("INSERT INTO access (client, authorize, previous, access_token, refresh_token, expires_in, scope, redirect_uri, created_at, extra) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)", data.Client.GetId(), authorizeData.Code, prev, data.AccessToken, data.RefreshToken, data.ExpiresIn, data.Scope, data.RedirectUri, data.CreatedAt, userData)
+	_, err = tx.Exec("INSERT INTO access (client, authorize, previous, access_token, refresh_token, expires_in, scope, redirect_uri, created_at, extra) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)", data.Client.GetId(), authorizeData.Code, prev, data.AccessToken, data.RefreshToken, data.ExpiresIn, data.Scope, data.RedirectUri, data.CreatedAt, extra)
 	if err != nil {
 		if rbe := tx.Rollback(); rbe != nil {
-			return rbe
+			return errors.New(rbe)
 		}
-		return err
+		return errors.New(err)
 	}
 
 	if err = tx.Commit(); err != nil {
-		return err
+		return errors.New(err)
 	}
 
 	return nil
 }
 
+// LoadAccess retrieves access data by token. Client information MUST be loaded together.
+// AuthorizeData and AccessData DON'T NEED to be loaded if not easily available.
+// Optionally can return error if expired.
 func (s *Storage) LoadAccess(code string) (*osin.AccessData, error) {
-	var userData string
-	var cid, prevAccessToken, authorizeCode string
+	var extra, cid, prevAccessToken, authorizeCode string
 	var result osin.AccessData
-	row := s.db.QueryRow("SELECT client, authorize, previous, access_token, refresh_token, expires_in, scope, redirect_uri, created_at, extra FROM access WHERE access_token=$1 LIMIT 1", code)
-	err := row.Scan(&cid, &authorizeCode, &prevAccessToken, &result.AccessToken, &result.RefreshToken, &result.ExpiresIn, &result.Scope, &result.RedirectUri, &result.CreatedAt, &userData)
-	result.UserData = userData
+
+	if err := s.db.QueryRow(
+		"SELECT client, authorize, previous, access_token, refresh_token, expires_in, scope, redirect_uri, created_at, extra FROM access WHERE access_token=$1 LIMIT 1",
+		code,
+	).Scan(
+		&cid,
+		&authorizeCode,
+		&prevAccessToken,
+		&result.AccessToken,
+		&result.RefreshToken,
+		&result.ExpiresIn,
+		&result.Scope,
+		&result.RedirectUri,
+		&result.CreatedAt,
+		&extra,
+	); err == sql.ErrNoRows {
+		return nil, pkg.ErrNotFound
+	} else if err != nil {
+		return nil, errors.New(err)
+	}
+	result.UserData = extra
 
 	client, err := s.GetClient(cid)
 	if err != nil {
@@ -227,42 +272,59 @@ func (s *Storage) LoadAccess(code string) (*osin.AccessData, error) {
 		result.AccessData = prevAccess
 	}
 
-	return &result, err
+	return &result, nil
 }
 
+// RemoveAccess revokes or deletes an AccessData.
 func (s *Storage) RemoveAccess(code string) (err error) {
-	st, err := s.db.Prepare("DELETE FROM access WHERE access_token=$1")
+	_, err = s.db.Exec("DELETE FROM access WHERE access_token=$1", code)
 	if err != nil {
-		return
+		return errors.New(err)
 	}
-	_, err = st.Exec(code)
-	return err
+	return nil
+}
+
+// LoadRefresh retrieves refresh AccessData. Client information MUST be loaded together.
+// AuthorizeData and AccessData DON'T NEED to be loaded if not easily available.
+// Optionally can return error if expired.
+func (s *Storage) LoadRefresh(code string) (*osin.AccessData, error) {
+	row := s.db.QueryRow("SELECT access FROM refresh WHERE token=$1 LIMIT 1", code)
+	var access string
+	if err := row.Scan(&access); err == sql.ErrNoRows {
+		return nil, pkg.ErrNotFound
+	} else if err != nil {
+		return nil, errors.New(err)
+	}
+	return s.LoadAccess(access)
+}
+
+// RemoveRefresh revokes or deletes refresh AccessData.
+func (s *Storage) RemoveRefresh(code string) error {
+	_, err := s.db.Exec("DELETE FROM refresh WHERE token=$1", code)
+	if err != nil {
+		return errors.New(err)
+	}
+	return nil
 }
 
 func (s *Storage) saveRefresh(tx *sql.Tx, refresh, access string) (err error) {
 	_, err = tx.Exec("INSERT INTO refresh (token, access) VALUES ($1, $2)", refresh, access)
 	if err != nil {
 		if rbe := tx.Rollback(); rbe != nil {
-			return rbe
+			return errors.New(rbe)
 		}
+		return errors.New(err)
 	}
-	return err
+	return nil
 }
 
-func (s *Storage) LoadRefresh(code string) (*osin.AccessData, error) {
-	row := s.db.QueryRow("SELECT access FROM refresh WHERE token=$1 LIMIT 1", code)
-	var access string
-	if err := row.Scan(&access); err != nil {
-		return nil, err
+func assertToString(in interface{}) (string, error) {
+	var ok bool
+	var data string
+	if in == nil {
+		data = ""
+	} else if data, ok = in.(string); !ok {
+		return "", errors.Errorf(`Could not assert "%v" to string`, in)
 	}
-	return s.LoadAccess(access)
-}
-
-func (s *Storage) RemoveRefresh(code string) error {
-	st, err := s.db.Prepare("DELETE FROM refresh WHERE token=$1")
-	if err != nil {
-		return err
-	}
-	_, err = st.Exec(code)
-	return err
+	return data, nil
 }

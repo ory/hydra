@@ -4,7 +4,9 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"github.com/go-errors/errors"
 	"github.com/ory-am/common/compiler"
+	"github.com/ory-am/common/pkg"
 	. "github.com/ory-am/ladon/policy"
 	"log"
 )
@@ -89,13 +91,15 @@ func (s *Store) Create(policy Policy) (err error) {
 func (s *Store) Get(id string) (Policy, error) {
 	var p DefaultPolicy
 	var conditions []byte
-	if err := s.db.QueryRow("SELECT id, description, effect, conditions FROM ladon_policy WHERE id=$1", id).Scan(&p.ID, &p.Description, &p.Effect, &conditions); err != nil {
-		return nil, err
+	if err := s.db.QueryRow("SELECT id, description, effect, conditions FROM ladon_policy WHERE id=$1", id).Scan(&p.ID, &p.Description, &p.Effect, &conditions); err == sql.ErrNoRows {
+		return nil, pkg.ErrNotFound
+	} else if err != nil {
+		return nil, errors.New(err)
 	}
 
 	var cs []DefaultCondition
 	if err := json.Unmarshal(conditions, &cs); err != nil {
-		return nil, err
+		return nil, errors.New(err)
 	}
 
 	for _, v := range cs {
@@ -127,16 +131,18 @@ func (s *Store) Delete(id string) error {
 }
 
 func (s *Store) FindPoliciesForSubject(subject string) (policies []Policy, err error) {
-	find := func(sql string, args ...interface{}) (ids []string, err error) {
-		rows, err := s.db.Query(sql, args...)
-		if err != nil {
-			return nil, err
+	find := func(query string, args ...interface{}) (ids []string, err error) {
+		rows, err := s.db.Query(query, args...)
+		if err == sql.ErrNoRows {
+			return nil, pkg.ErrNotFound
+		} else if err != nil {
+			return nil, errors.New(err)
 		}
 		defer rows.Close()
 		for rows.Next() {
 			var urn string
 			if err = rows.Scan(&urn); err != nil {
-				return nil, err
+				return nil, errors.New(err)
 			}
 			ids = append(ids, urn)
 		}
@@ -166,15 +172,17 @@ func (s *Store) FindPoliciesForSubject(subject string) (policies []Policy, err e
 func getLinked(db *sql.DB, table, policy string) ([]string, error) {
 	urns := []string{}
 	rows, err := db.Query(fmt.Sprintf("SELECT template FROM %s WHERE policy=$1", table), policy)
-	if err != nil {
-		return urns, err
+	if err == sql.ErrNoRows {
+		return nil, pkg.ErrNotFound
+	} else if err != nil {
+		return nil, errors.New(err)
 	}
 
 	defer rows.Close()
 	for rows.Next() {
 		var urn string
 		if err = rows.Scan(&urn); err != nil {
-			return []string{}, err
+			return []string{}, errors.New(err)
 		}
 		urns = append(urns, urn)
 	}

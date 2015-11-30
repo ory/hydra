@@ -1,6 +1,6 @@
 # Dockertest
 
-[![Build Status](https://travis-ci.org/ory-am/dockertest.svg)](https://travis-ci.org/ory-am/dockertest)
+[![Build Status](https://travis-ci.org/ory-am/dockertest.svg)](https://travis-ci.org/ory-am/dockertest) [![Coverage Status](https://coveralls.io/repos/ory-am/dockertest/badge.svg?branch=master&service=github)](https://coveralls.io/github/ory-am/dockertest?branch=master)
 
 Use Docker to run your Go language integration tests against persistent data storage services like **MySQL, Postgres or MongoDB** on **Microsoft Windows, Mac OSX and Linux**! Dockertest uses [docker-machine](https://docs.docker.com/machine/) (aka [Docker Toolbox](https://www.docker.com/toolbox)) to spin up images on Windows and Mac OSX as well.
 
@@ -18,98 +18,42 @@ Using Dockertest is straightforward and  simple. At present, Dockertest supports
 
 **Note:** When using the Docker Toolbox (Windows / OSX), make sure that the VM is started by running `docker-machine start default`.
 
-### MongoDB Container
+### Start a container
 
 ```go
+package main
+
 import "github.com/ory-am/dockertest"
 import "gopkg.in/mgo.v2"
 import "time"
 
-func Foobar() {
-  // Start MongoDB Docker container. Wait 1 second for the image to load.
-  containerID, ip, port, err := dockertest.SetupMongoContainer()
-
-  if err != nil {
-    return err
-  }
-
-  // kill the container on deference
-  defer containerID.KillRemove()
-
-  url := fmt.Sprintf("%s:%d", ip, port)
-  sess, err := mgo.Dial(url)
-  if err != nil {
-    return err
-  }
-
-  defer sess.Close()
-  // ...
+func main() {
+	c, err := ConnectToMongoDB(15, time.Millisecond*500, func(url string) bool {
+		db, err := mgo.Dial(url)
+		if err != nil {
+			return false
+		}
+		defer db.Close()
+		return true
+	})
+	require.Nil(t, err)
+	defer c.KillRemove()
 }
 ```
 
-### MySQL Container
+You can start PostgreSQL and MySQL in a similar fashion with
 
-```go
-import "github.com/ory-am/dockertest"
-import "github.com/go-sql-driver/mysql"
-import "database/sql"
-import "time"
 
-func Foobar() {
-    // Wait 10 seconds for the image to load.
-    c, ip, port, err := dockertest.SetupMySQLContainer()
-    if err != nil {
-        return
-    }
-    defer c.KillRemove()
+## Write awesome tests
 
-    url := fmt.Sprintf("mysql://%s:%s@%s:%d/", dockertest.MySQLUsername, dockertest.MySQLPassword, ip, port)
-    db, err := sql.Open("mysql", url)
-    if err != nil {
-        return
-    }
-
-    defer db.Close()
-    // ...
-}
-```
-### Postgres Container
-
-```go
-import "github.com/ory-am/dockertest"
-import "github.com/lib/pq"
-import "database/sql"
-import "time"
-
-func Foobar() {
-    // Wait 10 seconds for the image to load.
-    c, ip, port, err := dockertest.SetupPostgreSQLContainer()
-    if err != nil {
-        return
-    }
-    defer c.KillRemove()
-
-    url := fmt.Sprintf("postgres://%s:%s@%s:%d/", dockertest.PostgresUsername, dockertest.PostgresPassword, ip, port)
-    db, err := sql.Open("postgres", url)
-    if err != nil {
-        return
-    }
-
-    defer db.Close()
-    // ...
-}
-```
-
-## Usage in tests
-
-It is a good idea to start up the container only once when running tests. To achieve this for example:
+It is a good idea to start up the container only once when running tests.
 
 ```go
 
 import (
 	"fmt"
 	"testing"
-    "log"
+   "log"
 	"os"
 
 	"database/sql"
@@ -120,27 +64,22 @@ import (
 var db *sql.DB
 
 func TestMain(m *testing.M) {
-	c, ip, port, err := dockertest.SetupPostgreSQLContainer()
-	if err != nil {
-		log.Fatalf("Could not set up PostgreSQL container: %v", err)
+	if c, err := dockertest.ConnectToPostgreSQL(15, time.Second, func(url string) bool {
+		var err error
+		db, err = sql.Open("postgres", url)
+		if err != nil {
+			return false
+		}
+		return db.Ping() == nil
+	}); err != nil {
+		log.Fatalf("Could not connect to database: %s", err)
 	}
 	defer c.KillRemove()
-
-	url := fmt.Sprintf("postgres://%s:%s@%s:%d/postgres?sslmode=disable", dockertest.PostgresUsername, dockertest.PostgresPassword, ip, port)
-	db, err = sql.Open("postgres", url)
-	if err != nil {
-		log.Fatalf("Could not set up PostgreSQL container: %v", err)
-	}
-
-	if err = db.Ping(); err != nil {
-		log.Fatalf("Could not ping database: %v", err)
-	}
-
 	os.Exit(m.Run())
 }
 
 func TestFunction(t *testing.T) {
-    // ...
+    // db.Exec(...
 }
 ```
 
@@ -159,7 +98,7 @@ services:
 # In Travis, we need to bind to 127.0.0.1 in order to get a working connection. This environment variable
 # tells dockertest to do that.
 env:
-  - DOCKER_BIND_LOCALHOST=true
+  - DOCKERTEST_BIND_LOCALHOST=true
 
 ```
 

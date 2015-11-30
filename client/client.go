@@ -2,6 +2,7 @@ package client
 
 import (
 	"github.com/ory-am/ladon/guard/operator"
+	"net/http"
 )
 
 type AuthorizeRequest struct {
@@ -13,5 +14,6 @@ type AuthorizeRequest struct {
 
 type Client interface {
 	IsAllowed(ar *AuthorizeRequest) (bool, error)
+	IsRequestAllowed(req *http.Request, resource, permission, owner string) (bool, error)
 	IsAuthenticated(token string) (bool, error)
 }

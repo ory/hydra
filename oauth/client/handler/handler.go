@@ -7,13 +7,15 @@ import (
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/mux"
 	chd "github.com/ory-am/common/handler"
+	. "github.com/ory-am/common/pkg"
 	"github.com/ory-am/common/rand/sequence"
 	"github.com/ory-am/hydra/middleware"
-	. "github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/osin-storage/storage"
 	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
 	"net/http"
+
+	"github.com/go-errors/errors"
 )
 
 type Handler struct {
@@ -60,22 +62,22 @@ func (h *Handler) Create(ctx context.Context, rw http.ResponseWriter, req *http.
 	var p payload
 	decoder := json.NewDecoder(req.Body)
 	if err := decoder.Decode(&p); err != nil {
-		http.Error(rw, err.Error(), http.StatusBadRequest)
+		HttpError(rw, err, http.StatusBadRequest)
 		return
 	}
 
 	if v, err := govalidator.ValidateStruct(p); !v {
 		if err != nil {
-			http.Error(rw, err.Error(), http.StatusBadRequest)
+			HttpError(rw, err, http.StatusBadRequest)
 			return
 		}
-		http.Error(rw, "Payload did not validate.", http.StatusBadRequest)
+		HttpError(rw, errors.New("Payload did not validate."), http.StatusBadRequest)
 		return
 	}
 
 	secret, err := sequence.RuneSequence(12, []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"))
 	if err != nil {
-		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		HttpError(rw, err, http.StatusInternalServerError)
 		return
 	}
 
@@ -87,17 +89,17 @@ func (h *Handler) Create(ctx context.Context, rw http.ResponseWriter, req *http.
 	}
 
 	if err := h.s.CreateClient(client); err != nil {
-		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		WriteError(rw, err)
 		return
 	}
 
-	WriteJSON(rw, client)
+	WriteCreatedJSON(rw, "/clients/"+client.Id, client)
 }
 
 func (h *Handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 	id, ok := mux.Vars(req)["id"]
 	if !ok {
-		http.Error(rw, "No id given.", http.StatusBadRequest)
+		HttpError(rw, errors.New("No id given."), http.StatusBadRequest)
 		return
 	}
 
@@ -105,7 +107,7 @@ func (h *Handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Req
 		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			client, err := h.s.GetClient(id)
 			if err != nil {
-				http.Error(rw, fmt.Sprintf("Could not retrieve client: %s", id), http.StatusNotFound)
+				WriteError(rw, err)
 				return
 			}
 			WriteJSON(rw, client)
@@ -116,14 +118,14 @@ func (h *Handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Req
 func (h *Handler) Delete(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 	id, ok := mux.Vars(req)["id"]
 	if !ok {
-		http.Error(rw, "No id given.", http.StatusBadRequest)
+		HttpError(rw, errors.New("No id given."), http.StatusBadRequest)
 		return
 	}
 
 	h.m.IsAuthorized(permission(id), "delete", nil)(chd.ContextHandlerFunc(
 		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 			if err := h.s.RemoveClient(id); err != nil {
-				http.Error(rw, fmt.Sprintf("Could not retrieve client: %s", id), http.StatusInternalServerError)
+				HttpError(rw, errors.Errorf("Could not retrieve client: %s", id), http.StatusInternalServerError)
 				return
 			}
 			rw.WriteHeader(http.StatusAccepted)

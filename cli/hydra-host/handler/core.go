@@ -14,6 +14,8 @@ import (
 	policies "github.com/ory-am/hydra/policy/handler"
 	"github.com/ory-am/ladon/guard"
 	"log"
+
+	"golang.org/x/net/http2"
 	"net/http"
 )
 
@@ -76,5 +78,9 @@ func (c *Core) Start(ctx *cli.Context) {
 	c.oauthHandler.SetRoutes(router, extractor)
 
 	http.Handle("/", router)
-	http.ListenAndServe(listenOn, nil)
+	srv := &http.Server{
+		Addr: listenOn,
+	}
+	http2.ConfigureServer(srv, &http2.Server{})
+	log.Fatal(srv.ListenAndServeTLS(tlsCertPath, tlsKeyPath))
 }

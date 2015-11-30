@@ -1,10 +1,10 @@
 package storage
 
 import (
+	"github.com/RangelReale/osin"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
-"github.com/RangelReale/osin"
 )
 
 func TestStateData(t *testing.T) {

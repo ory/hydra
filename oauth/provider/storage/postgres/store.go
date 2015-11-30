@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	log "github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
+	. "github.com/ory-am/common/pkg"
 	. "github.com/ory-am/hydra/oauth/provider/storage"
 )
 
@@ -18,8 +19,6 @@ const accountSchema = `CREATE TABLE IF NOT EXISTS hydra_state_data (
 	expires_at	 timestamp with time zone NOT NULL
 )`
 
-var ErrNotFound = errors.New("Not found")
-
 type Store struct {
 	db *sql.DB
 }
@@ -31,7 +30,7 @@ func New(db *sql.DB) *Store {
 func (s *Store) CreateSchemas() error {
 	if _, err := s.db.Exec(accountSchema); err != nil {
 		log.Warnf("Error creating schema %s: %s", accountSchema, err)
-		return err
+		return errors.New(err)
 	}
 	return nil
 }
@@ -40,7 +39,7 @@ func (s *Store) SaveStateData(sd *StateData) error {
 	// Execute SQL statement
 	_, err := s.db.Exec("INSERT INTO hydra_state_data (id, client_id, redirect_uri, scope, state, type, provider, expires_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)", sd.ID, sd.ClientID, sd.RedirectURL, sd.Scope, sd.State, sd.Type, sd.Provider, sd.ExpiresAt)
 	if err != nil {
-		return err
+		return errors.New(err)
 	}
 	return nil
 }
@@ -52,7 +51,7 @@ func (s *Store) GetStateData(id string) (*StateData, error) {
 	if err := row.Scan(&sd.ID, &sd.ClientID, &sd.RedirectURL, &sd.Scope, &sd.State, &sd.Type, &sd.Provider, &sd.ExpiresAt); err == sql.ErrNoRows {
 		return nil, ErrNotFound
 	} else if err != nil {
-		return nil, err
+		return nil, errors.New(err)
 	}
 	return &sd, nil
 }

@@ -1,12 +1,12 @@
 package jwt
 
 import (
+	"github.com/RangelReale/osin"
+	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
-"github.com/RangelReale/osin"
-"github.com/pborman/uuid"
 )
 
 func TestMerge(t *testing.T) {
@@ -72,7 +72,7 @@ func TestGenerateAccessToken(t *testing.T) {
 		[]byte(TestCertificates[1][1]),
 	)
 	at, rt, err := j.GenerateAccessToken(&osin.AccessData{
-		UserData: NewClaimsCarrier(uuid.New(), "hydra", "peter", "tests", time.Now().Add(60 * time.Second), time.Now(), time.Now()),
+		UserData: NewClaimsCarrier(uuid.New(), "hydra", "peter", "tests", time.Now().Add(60*time.Second), time.Now(), time.Now()),
 	}, true)
 	assert.Nil(t, err)
 	assert.NotEmpty(t, at)

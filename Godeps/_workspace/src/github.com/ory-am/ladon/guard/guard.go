@@ -5,11 +5,13 @@ import (
 	"github.com/ory-am/common/compiler"
 	. "github.com/ory-am/ladon/guard/operator"
 	"github.com/ory-am/ladon/policy"
+	"regexp"
 	"strings"
 )
 
 type Guard struct {
-	operators map[string]Operator
+	operators      map[string]Operator
+	disableLogging bool
 }
 
 func (g *Guard) SetOperators(ops map[string]Operator) {
@@ -44,11 +46,13 @@ func (g *Guard) IsGranted(resource, permission, subject string, policies []polic
 	for _, p := range policies {
 		// Does the resource match with one of the policies?
 		if rm, err := Matches(p, p.GetResources(), resource); err != nil {
-			log.WithFields(log.Fields{
-				"resources": p.GetResources(),
-				"resource":  resource,
-				"error":     err,
-			}).Warn("Could not match resources.")
+			if !g.disableLogging {
+				log.WithFields(log.Fields{
+					"resources": p.GetResources(),
+					"resource":  resource,
+					"error":     err,
+				}).Warn("Could not match resources.")
+			}
 			return false, err
 		} else if !rm {
 			continue
@@ -56,11 +60,13 @@ func (g *Guard) IsGranted(resource, permission, subject string, policies []polic
 
 		// Does the action match with one of the policies?
 		if pm, err := Matches(p, p.GetPermissions(), permission); err != nil {
-			log.WithFields(log.Fields{
-				"permissions": p.GetPermissions(),
-				"permission":  permission,
-				"error":       err,
-			}).Warn("Could not match permissions.")
+			if !g.disableLogging {
+				log.WithFields(log.Fields{
+					"permissions": p.GetPermissions(),
+					"permission":  permission,
+					"error":       err,
+				}).Warn("Could not match permissions.")
+			}
 			return false, err
 		} else if !pm {
 			continue
@@ -68,11 +74,13 @@ func (g *Guard) IsGranted(resource, permission, subject string, policies []polic
 
 		// Does the subject match with one of the policies?
 		if sm, err := Matches(p, p.GetSubjects(), subject); err != nil {
-			log.WithFields(log.Fields{
-				"subjects": p.GetSubjects(),
-				"subject":  subject,
-				"error":    err,
-			}).Warn("Could not match subjects.")
+			if !g.disableLogging {
+				log.WithFields(log.Fields{
+					"subjects": p.GetSubjects(),
+					"subject":  subject,
+					"error":    err,
+				}).Warn("Could not match subjects.")
+			}
 			return false, err
 		} else if !sm && len(p.GetSubjects()) > 0 {
 			// If no match exists, but the subjects are scoped, this policy is irrelevant
@@ -93,18 +101,21 @@ func (g *Guard) IsGranted(resource, permission, subject string, policies []polic
 }
 
 func (g *Guard) PassesConditions(p policy.Policy, ctx *Context, permission, resource, subject string) (passes bool) {
+	var extra map[string]interface{}
 	passes = len(p.GetConditions()) == 0
 	for _, condition := range p.GetConditions() {
 		op, ok := g.GetOperator(condition.GetOperator())
 		if !ok {
-			log.WithFields(log.Fields{
-				"subjects": p.GetSubjects(),
-				"subject":  subject,
-			}).Warn("Could not check conditions.")
+			if !g.disableLogging {
+				log.WithFields(log.Fields{
+					"subjects": p.GetSubjects(),
+					"subject":  subject,
+				}).Warn("Could not check conditions.")
+			}
 			return false
 		}
 
-		extra := condition.GetExtra()
+		extra = condition.GetExtra()
 		extra["permission"] = permission
 		extra["resource"] = resource
 		extra["subject"] = subject
@@ -118,13 +129,16 @@ func (g *Guard) PassesConditions(p policy.Policy, ctx *Context, permission, reso
 }
 
 func Matches(p policy.Policy, patterns []string, match string) (bool, error) {
+	var reg *regexp.Regexp
+	var err error
+	var matches bool
 	for _, h := range patterns {
-		reg, err := compiler.CompileRegex(h, p.GetStartDelimiter(), p.GetEndDelimiter())
+		reg, err = compiler.CompileRegex(h, p.GetStartDelimiter(), p.GetEndDelimiter())
 		if err != nil {
 			return false, err
 		}
 
-		matches := reg.MatchString(match)
+		matches = reg.MatchString(match)
 		if matches {
 			return true, nil
 		}

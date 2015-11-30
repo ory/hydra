@@ -7,6 +7,11 @@
 Hydra is a twelve factor authentication, authorization and account management service, ready for you to use in your micro service architecture.
 Hydra is written in go and backed by PostgreSQL or any implementation of [account/storage.go](account/storage.go).
 
+Hydra implements TLS, different OAuth2 IETF standards and supports HTTP/2. To make things as easy as possible, hydra
+comes with tools to generate TLS and RS256 PEM files, leaving you with almost zero trouble to set up.
+
+![Hydra implements HTTP/2 and TLS.](h2tls.png)
+
 *Please be aware that Hydra is not ready for production just yet and has not been tested on a production system.
 If time schedule holds, we will use it in production in Q1 2016 for an awesome business app that has yet to be revealed.*
 
@@ -18,7 +23,7 @@ If time schedule holds, we will use it in production in Q1 2016 for an awesome b
 - [Motivation](#motivation)
 - [Features](#features)
 - [Caveats](#caveats)
-- [HTTP RESTful API](#http-restful-api)
+- [HTTP/2 RESTful API](#http2-restful-api)
 - [Run hydra-host](#run-hydra-host)
   - [Set up PostgreSQL locally](#set-up-postgresql-locally)
   - [Run as executable](#run-as-executable)
@@ -28,6 +33,9 @@ If time schedule holds, we will use it in production in Q1 2016 for an awesome b
     - [Start server](#start-server)
     - [Create client](#create-client)
     - [Create user](#create-user)
+    - [Create JWT RSA Key Pair](#create-jwt-rsa-key-pair)
+    - [Create a TLS certificate](#create-a-tls-certificate)
+    - [Import policies](#import-policies)
 - [Good to know](#good-to-know)
   - [Everything is RESTful. No HTML. No Templates.](#everything-is-restful-no-html-no-templates)
   - [Sign up workflow](#sign-up-workflow)
@@ -67,6 +75,8 @@ Hydra is a RESTful service providing you with things like:
   * Hydra uses self-contained Acccess Tokens as suggessted in [rfc6794#section-1.4](http://tools.ietf.org/html/rfc6749#section-1.4) by issuing JSON Web Tokens as specified at
    [https://tools.ietf.org/html/rfc7519](https://tools.ietf.org/html/rfc7519) with [RSASSA-PKCS1-v1_5 SHA-256](https://tools.ietf.org/html/rfc7519#section-8) hashing algorithm, Hydra reduces database roundtrips.
   * Hydra implements **OAuth2 Introspection** as specified in [rfc7662](https://tools.ietf.org/html/rfc7662)
+* Easy command line tools like `hydra-jwt` for generating jwt signing key pairs.
+* HTTP/2 with TLS.
 
 ## Caveats
 
@@ -76,7 +86,7 @@ Hydra speaks only JSON. This obviously prevents Hydra from delivering a dedicate
 
 You'll find more information on this in the [Good to know](#good-to-know) section.
 
-## HTTP RESTful API
+## HTTP/2 RESTful API
 
 The API is described at [apiary](http://docs.hydra6.apiary.io/#). The API Documentation is still work in progress.
 
@@ -134,22 +144,25 @@ For brevity the guide to creating a new database in Postgres has been skipped.*
 
 The CLI currently requires two environment variables:
 
-| Variable          | Description               | Format                                        | Default   |
-| ----------------- | ------------------------- | --------------------------------------------- | --------- |
-| DATABASE_URL      | PostgreSQL Database URL   | `postgres://user:password@host:port/database` | empty     |
-| BCRYPT_WORKFACTOR | BCrypt Strength           | number                                        | `10`      |
-| SIGNUP_URL        | [Sign up URL](#sign-up)   | url                                           | empty     |
-| SIGNIN_URL        | [Sign in URL](#sign-in)   | url                                           | empty     |
-| DROPBOX_CLIENT    | Dropbox Client ID         | string                                        | empty     |
-| DROPBOX_SECRET    | Dropbox Client Secret     | string                                        | empty     |
-| DROPBOX_CALLBACK  | Dropbox Redirect URL      | url                                           | empty     |
-
+| Variable             | Description               | Format                                        | Default   |
+| -------------------- | ------------------------- | --------------------------------------------- | --------- |
+| DATABASE_URL         | PostgreSQL Database URL   | `postgres://user:password@host:port/database` | empty     |
+| BCRYPT_WORKFACTOR    | BCrypt Strength           | number                                        | `10`      |
+| SIGNUP_URL           | [Sign up URL](#sign-up)   | url                                           | empty     |
+| SIGNIN_URL           | [Sign in URL](#sign-in)   | url                                           | empty     |
+| DROPBOX_CLIENT       | Dropbox Client ID         | string                                        | empty     |
+| DROPBOX_SECRET       | Dropbox Client Secret     | string                                        | empty     |
+| DROPBOX_CALLBACK     | Dropbox Redirect URL      | url                                           | empty     |
+| JWT_PUBLIC_KEY_PATH  | JWT Signing Public Key    | `./cert/rs256-public.pem` (local path)        | "../../example/cert/rs256-public.pem"  |
+| JWT_PRIVATE_KEY_PATH | JWT Signing Private Key   | `./cert/rs256-private.pem` (local path)       | "../../example/cert/rs256-private.pem" |
+| TLS_CERT_PATH        | TLS Certificate Path      | `./cert/cert.pem`                             | "../../example/cert/tls-cert.pem"      |
+| TLS_KEY_PATH         | TLS Key Path              | `./cert/key.pem`                              | "../../example/cert/tls-key.pem"       |
 
 ### CLI Usage
 
 ```
 NAME:
-   hydra-host - Dragons guard your resources.
+   hydra-host - Dragons guard your resources
 
 USAGE:
    hydra-host [global options] command [command options] [arguments...]
@@ -158,14 +171,19 @@ VERSION:
    0.0.0
 
 COMMANDS:
-   client       client actions
-   user         user actions
-   start        start hydra-host
+   client       Client actions
+   user         User actions
+   start        Start the host service
+   jwt          JWT actions
+   tls          JWT actions
+   policy       Policy actions
    help, h      Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --help, -h           show help
-   --version, -v        print the version
+   --help, -h                   show help
+   --generate-bash-completion
+   --version, -v                print the version
+
 ```
 
 #### Start server
@@ -206,6 +224,99 @@ USAGE:
 OPTIONS:
    --password           the user's password
    --as-superuser       grant superuser privileges to the user
+```
+
+#### Create JWT RSA Key Pair
+
+To generate files *rs256-private.pem* and *rs256-public.pem* in the current directory, run:
+
+```
+NAME:
+   hydra-host jwt create-keypair - Create a JWT PEM keypair.
+
+   You can use these files by providing the environment variables JWT_PRIVATE_KEY_PATH and JWT_PUBLIC_KEY_PATH
+
+USAGE:
+   hydra-host jwt create-keypair [command options] [arguments...]
+
+OPTIONS:
+   -i, --private-file-path "rs256-private.pem"  Where to save the private key PEM file
+   -u, --public-file-path "rs256-public.pem"    Where to save the private key PEM file
+
+```
+
+#### Create a TLS certificate
+
+```
+NAME:
+   hydra-host tls create-dummy-certificate - Create a dummy TLS certificate and private key.
+
+   You can use these files (in development!) by providing the environment variables TLS_CERT_PATH and TLS_KEY_PATH
+
+USAGE:
+   hydra-host tls create-dummy-certificate [command options] [arguments...]
+
+OPTIONS:
+   -c, --certificate-file-path "tls-cert.pem"   Where to save the private key PEM file
+   -k, --key-file-path "tls-key.pem"            Where to save the private key PEM file
+   -u, --host                                   Comma-separated hostnames and IPs to generate a certificate for
+   --sd, --start-date                           Creation date formatted as Jan 1 15:04:05 2011
+   -d, --duration "8760h0m0s"                   Duration that certificate is valid for
+   --ca                                         whether this cert should be its own Certificate Authority
+   --rb, --rsa-bits "2048"                      Size of RSA key to generate. Ignored if --ecdsa-curve is set
+   --ec, --ecdsa-curve                          ECDSA curve to use to generate a key. Valid values are P224, P256, P384, P521
+
+```
+
+#### Import policies
+
+You can import policies from json files.
+
+```
+NAME:
+   hydra-host policy import - Import a json file which defines an array of policies
+
+USAGE:
+   hydra-host policy import <policies1.json> <policies2.json> <policies3.json>
+```
+
+Here's an exemplary *policies.json:*
+
+```json
+[
+  {
+    "description": "Allow editing and deleting of personal articles and all sub resources.",
+    "subject": ["{edit|delete}"],
+    "effect": "allow",
+    "resources": [
+      "urn:flitt.net:articles:{.*}"
+    ],
+    "permissions": [
+      "edit"
+    ],
+    "conditions": [
+      {
+        "op": "SubjectIsOwner"
+      }
+    ]
+  },
+  {
+    "description": "Allow creation of personal articles and all sub resources.",
+    "subject": ["create"],
+    "effect": "allow",
+    "resources": [
+      "urn:flitt.net:articles"
+    ],
+    "permissions": [
+      "edit"
+    ],
+    "conditions": [
+      {
+        "op": "SubjectIsOwner"
+      }
+    ]
+  }
+]
 ```
 
 ## Good to know

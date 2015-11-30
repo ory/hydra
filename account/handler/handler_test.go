@@ -171,7 +171,7 @@ func TestCreateGetDelete(t *testing.T) {
 			payload:  payload{Email: uuid.New() + "@bar.com", Password: "secret", Data: "{}"},
 			policies: policies["allow-create"],
 			expected: result{
-				create: http.StatusOK, get: http.StatusForbidden, delete: http.StatusForbidden,
+				create: http.StatusCreated, get: http.StatusForbidden, delete: http.StatusForbidden,
 			},
 		},
 		{
@@ -179,7 +179,7 @@ func TestCreateGetDelete(t *testing.T) {
 			payload:  payload{Email: uuid.New() + "@bar.com", Password: "secret", Data: "{}"},
 			policies: policies["allow-create-get"],
 			expected: result{
-				create: http.StatusOK, get: http.StatusOK, delete: http.StatusForbidden,
+				create: http.StatusCreated, get: http.StatusOK, delete: http.StatusForbidden,
 			},
 		},
 		{
@@ -187,7 +187,7 @@ func TestCreateGetDelete(t *testing.T) {
 			payload:  payload{Email: uuid.New() + "@bar.com", Password: "secret", Data: "{}"},
 			policies: policies["allow-all"],
 			expected: result{
-				create: http.StatusOK, get: http.StatusOK, delete: http.StatusAccepted,
+				create: http.StatusCreated, get: http.StatusOK, delete: http.StatusAccepted,
 			},
 		},
 	} {
@@ -201,7 +201,7 @@ func TestCreateGetDelete(t *testing.T) {
 		request := gorequest.New()
 		resp, body, _ := request.Post(ts.URL + "/accounts").Send(c.payload).End()
 		require.Equal(t, c.expected.create, resp.StatusCode, "case %d: %s", k, body)
-		if resp.StatusCode != http.StatusOK {
+		if resp.StatusCode != http.StatusCreated {
 			continue
 		}
 		user := assertAccount(t, c, body)

@@ -1,20 +1,24 @@
 {
 	"ImportPath": "github.com/ory-am/dockertest",
-	"GoVersion": "go1.5",
+	"GoVersion": "go1.5.1",
 	"Deps": [
 		{
 			"ImportPath": "camlistore.org/pkg/netutil",
-			"Rev": "e52149992aac24dd02248ffb1e166a08f27f0554"
+			"Rev": "9e697d90674d381cf02d5d98ceafe33d77accb7e"
 		},
 		{
 			"ImportPath": "github.com/go-sql-driver/mysql",
-			"Comment": "v1.2-119-g527bcd5",
-			"Rev": "527bcd55aab2e53314f1a150922560174b493034"
+			"Comment": "v1.2-121-g69e3ed7",
+			"Rev": "69e3ed7607d7c139386480824801584c947c67cf"
 		},
 		{
 			"ImportPath": "github.com/lib/pq",
-			"Comment": "go1.0-cutoff-58-g0dad96c",
-			"Rev": "0dad96c0b94f8dee039aa40467f767467392a0af"
+			"Comment": "go1.0-cutoff-61-g83c4f41",
+			"Rev": "83c4f410d0aed80a0f44bac6a576a7f2435791f3"
+		},
+		{
+			"ImportPath": "github.com/ory-am/common/env",
+			"Rev": "715ff940a95fbd6f057b19c4348632830ed2c80b"
 		},
 		{
 			"ImportPath": "github.com/pborman/uuid",
@@ -22,12 +26,18 @@
 		},
 		{
 			"ImportPath": "github.com/stretchr/testify/assert",
-			"Rev": "dab07ac62d4905d3e48d17dc549c684ac3b7c15a"
+			"Comment": "v1.0-71-g0d5a14c",
+			"Rev": "0d5a14c5a477957864f3b747d95255ad4e34bcc0"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/require",
+			"Comment": "v1.0-71-g0d5a14c",
+			"Rev": "0d5a14c5a477957864f3b747d95255ad4e34bcc0"
 		},
 		{
 			"ImportPath": "gopkg.in/mgo.v2",
-			"Comment": "r2015.01.24",
-			"Rev": "c6a7dce14133ccac2dcac3793f1d6e2ef048503a"
+			"Comment": "r2015.10.05-1-g4d04138",
+			"Rev": "4d04138ffef2791c479c0c8bbffc30b34081b8d9"
 		}
 	]
 }

@@ -1,3 +1,5 @@
+package dockertest
+
 /*
 Copyright 2014 The Camlistore Authors
 
@@ -14,11 +16,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/*
-Package dockertest contains helper functions for setting up and tearing down docker containers to aid in testing.
-*/
-package dockertest
-
 import (
 	"bytes"
 	"encoding/json"
@@ -33,25 +30,15 @@ import (
 	"math/rand"
 	"regexp"
 
-	"camlistore.org/pkg/netutil"
-	"github.com/ory-am/common/env"
 	"github.com/pborman/uuid"
 	"gopkg.in/mgo.v2"
 
+	// Import mysql driver
 	_ "github.com/go-sql-driver/mysql"
+
+	// Import postgres driver
 	_ "github.com/lib/pq"
 )
-
-// Debug, if set, prevents any container from being removed.
-var Debug bool
-
-// DockerMachineAvailable, if true, uses docker-machine to run docker commands (for running tests on Windows and Mac OS)
-var DockerMachineAvailable bool
-
-// DockerMachineName is the machine's name. You might want to use a dedicated machine for running your tests.
-var DockerMachineName string = "default"
-
-var bindDockerToLocalhost = env.Getenv("DOCKER_BIND_LOCALHOST", "")
 
 /// runLongTest checks all the conditions for running a docker container
 // based on image.
@@ -132,6 +119,7 @@ func run(args ...string) (containerID string, err error) {
 	return containerID, nil
 }
 
+// KillContainer runs docker kill on a container.
 func KillContainer(container string) error {
 	if container != "" {
 		return runDockerCommand("docker", "kill", container).Run()
@@ -173,54 +161,6 @@ func IP(containerID string) (string, error) {
 	return "", errors.New("could not find an IP. Not running?")
 }
 
-type ContainerID string
-
-func (c ContainerID) IP() (string, error) {
-	return IP(string(c))
-}
-
-func (c ContainerID) Kill() error {
-	return KillContainer(string(c))
-}
-
-// Remove runs "docker rm" on the container
-func (c ContainerID) Remove() error {
-	if Debug || c == "nil" {
-		return nil
-	}
-	return runDockerCommand("docker", "rm", "-v", string(c)).Run()
-}
-
-// KillRemove calls Kill on the container, and then Remove if there was
-// no error.
-func (c ContainerID) KillRemove() error {
-	if err := c.Kill(); err != nil {
-		return err
-	}
-	return c.Remove()
-}
-
-// lookup retrieves the ip address of the container, and tries to reach
-// before timeout the tcp address at this ip and given port.
-func (c ContainerID) lookup(port int, timeout time.Duration) (ip string, err error) {
-	if DockerMachineAvailable {
-		var out []byte
-		out, err = exec.Command("docker-machine", "ip", DockerMachineName).Output()
-		ip = strings.TrimSpace(string(out))
-	} else if bindDockerToLocalhost != "" {
-		ip = "127.0.0.1"
-	} else {
-		ip, err = c.IP()
-	}
-	if err != nil {
-		err = fmt.Errorf("error getting IP: %v", err)
-		return
-	}
-	addr := fmt.Sprintf("%s:%d", ip, port)
-	err = netutil.AwaitReachable(addr, timeout)
-	return
-}
-
 // setupContainer sets up a container, using the start function to run the given image.
 // It also looks up the IP address of the container, and tests this address with the given
 // port and timeout. It returns the container ID and its IP address, or makes the test
@@ -245,69 +185,9 @@ func setupContainer(image string, port int, timeout time.Duration, start func() 
 	return c, ip, nil
 }
 
-const (
-	mongoImage    = "mongo"
-	mysqlImage    = "mysql"
-	postgresImage = "postgres"
-
-	MySQLUsername = "root"
-	MySQLPassword = "root"
-
-	PostgresUsername = "postgres" // set up by the dockerfile of postgresImage
-	PostgresPassword = "docker"   // set up by the dockerfile of postgresImage
-)
-
 func randInt(min int, max int) int {
 	rand.Seed(time.Now().UTC().UnixNano())
 	return min + rand.Intn(max-min)
-}
-
-// SetupMongoContainer sets up a real MongoDB instance for testing purposes,
-// using a Docker container. It returns the container ID and its IP address,
-// or makes the test fail on error.
-func SetupMongoContainer() (c ContainerID, ip string, port int, err error) {
-	port = randInt(1024, 49150)
-	forward := fmt.Sprintf("%d:%d", port, 27017)
-	if bindDockerToLocalhost != "" {
-		forward = "127.0.0.1:" + forward
-	}
-	c, ip, err = setupContainer(mongoImage, port, 10*time.Second, func() (string, error) {
-		res, err := run("--name", uuid.New(), "-d", "-P", "-p", forward, mongoImage)
-		return res, err
-	})
-	return
-}
-
-// SetupMySQLContainer sets up a real MySQL instance for testing purposes,
-// using a Docker container. It returns the container ID and its IP address,
-// or makes the test fail on error.
-// Currently using https://index.docker.io/u/orchardup/mysql/
-func SetupMySQLContainer() (c ContainerID, ip string, port int, err error) {
-	port = randInt(1024, 49150)
-	forward := fmt.Sprintf("%d:%d", port, 3306)
-	if bindDockerToLocalhost != "" {
-		forward = "127.0.0.1:" + forward
-	}
-	c, ip, err = setupContainer(mysqlImage, port, 10*time.Second, func() (string, error) {
-		return run("-d", "-p", forward, "-e", fmt.Sprintf("MYSQL_ROOT_PASSWORD=%s", MySQLPassword), mysqlImage)
-	})
-	return
-}
-
-// SetupPostgreSQLContainer sets up a real PostgreSQL instance for testing purposes,
-// using a Docker container. It returns the container ID and its IP address,
-// or makes the test fail on error.
-// Currently using https://index.docker.io/u/nornagon/postgres
-func SetupPostgreSQLContainer() (c ContainerID, ip string, port int, err error) {
-	port = randInt(1024, 49150)
-	forward := fmt.Sprintf("%d:%d", port, 5432)
-	if bindDockerToLocalhost != "" {
-		forward = "127.0.0.1:" + forward
-	}
-	c, ip, err = setupContainer(postgresImage, port, 15*time.Second, func() (string, error) {
-		return run("-d", "-p", forward, "-e", fmt.Sprintf("POSTGRES_PASSWORD=%s", PostgresPassword), postgresImage)
-	})
-	return
 }
 
 type pinger interface {
@@ -334,6 +214,53 @@ func ping(db pinger, tries int, delay time.Duration) bool {
 	return false
 }
 
+// SetupMongoContainer sets up a real MongoDB instance for testing purposes,
+// using a Docker container. It returns the container ID and its IP address,
+// or makes the test fail on error.
+func SetupMongoContainer() (c ContainerID, ip string, port int, err error) {
+	port = randInt(1024, 49150)
+	forward := fmt.Sprintf("%d:%d", port, 27017)
+	if BindDockerToLocalhost != "" {
+		forward = "127.0.0.1:" + forward
+	}
+	c, ip, err = setupContainer(mongoImage, port, 10*time.Second, func() (string, error) {
+		res, err := run("--name", uuid.New(), "-d", "-P", "-p", forward, mongoImage)
+		return res, err
+	})
+	return
+}
+
+// SetupMySQLContainer sets up a real MySQL instance for testing purposes,
+// using a Docker container. It returns the container ID and its IP address,
+// or makes the test fail on error.
+func SetupMySQLContainer() (c ContainerID, ip string, port int, err error) {
+	port = randInt(1024, 49150)
+	forward := fmt.Sprintf("%d:%d", port, 3306)
+	if BindDockerToLocalhost != "" {
+		forward = "127.0.0.1:" + forward
+	}
+	c, ip, err = setupContainer(mysqlImage, port, 10*time.Second, func() (string, error) {
+		return run("-d", "-p", forward, "-e", fmt.Sprintf("MYSQL_ROOT_PASSWORD=%s", MySQLPassword), mysqlImage)
+	})
+	return
+}
+
+// SetupPostgreSQLContainer sets up a real PostgreSQL instance for testing purposes,
+// using a Docker container. It returns the container ID and its IP address,
+// or makes the test fail on error.
+func SetupPostgreSQLContainer() (c ContainerID, ip string, port int, err error) {
+	port = randInt(1024, 49150)
+	forward := fmt.Sprintf("%d:%d", port, 5432)
+	if BindDockerToLocalhost != "" {
+		forward = "127.0.0.1:" + forward
+	}
+	c, ip, err = setupContainer(postgresImage, port, 15*time.Second, func() (string, error) {
+		return run("-d", "-p", forward, "-e", fmt.Sprintf("POSTGRES_PASSWORD=%s", PostgresPassword), postgresImage)
+	})
+	return
+}
+
+// OpenPostgreSQLContainerConnection is supported for legacy reasons. Don't use it.
 func OpenPostgreSQLContainerConnection(tries int, delay time.Duration) (c ContainerID, db *sql.DB, err error) {
 	c, ip, port, err := SetupPostgreSQLContainer()
 	if err != nil {
@@ -356,6 +283,7 @@ func OpenPostgreSQLContainerConnection(tries int, delay time.Duration) (c Contai
 	return c, nil, errors.New("Could not set up PostgreSQL container.")
 }
 
+// OpenMongoDBContainerConnection is supported for legacy reasons. Don't use it.
 func OpenMongoDBContainerConnection(tries int, delay time.Duration) (c ContainerID, db *mgo.Session, err error) {
 	c, ip, port, err := SetupMongoContainer()
 	if err != nil {
@@ -378,12 +306,12 @@ func OpenMongoDBContainerConnection(tries int, delay time.Duration) (c Container
 	return c, nil, errors.New("Could not set up MongoDB container.")
 }
 
+// OpenMySQLContainerConnection is supported for legacy reasons. Don't use it.
 func OpenMySQLContainerConnection(tries int, delay time.Duration) (c ContainerID, db *sql.DB, err error) {
 	c, ip, port, err := SetupMySQLContainer()
 	if err != nil {
 		return c, nil, fmt.Errorf("Could not set up MySQL container: %v", err)
 	}
-	defer c.KillRemove()
 
 	for try := 0; try <= tries; try++ {
 		time.Sleep(delay)
@@ -399,4 +327,60 @@ func OpenMySQLContainerConnection(tries int, delay time.Duration) (c ContainerID
 		log.Printf("Try %d: Could not set up MySQL container: %v", try, err)
 	}
 	return c, nil, errors.New("Could not set up MySQL container.")
+}
+
+// ConnectToPostgreSQL starts a PostgreSQL image and passes the database url to the connector callback.
+func ConnectToPostgreSQL(tries int, delay time.Duration, connector func(url string) bool) (c ContainerID, err error) {
+	c, ip, port, err := SetupPostgreSQLContainer()
+	if err != nil {
+		return c, fmt.Errorf("Could not set up PostgreSQL container: %v", err)
+	}
+
+	for try := 0; try <= tries; try++ {
+		time.Sleep(delay)
+		url := fmt.Sprintf("postgres://%s:%s@%s:%d/postgres?sslmode=disable", PostgresUsername, PostgresPassword, ip, port)
+		if connector(url) {
+			return c, nil
+		}
+		log.Printf("Try %d failed. Retrying.", try)
+	}
+	return c, errors.New("Could not set up PostgreSQL container.")
+}
+
+// ConnectToMongoDB starts a MongoDB image and passes the database url to the connector callback.
+// The url will match the ip:port pattern (e.g. 123.123.123.123:4241)
+func ConnectToMongoDB(tries int, delay time.Duration, connector func(url string) bool) (c ContainerID, err error) {
+	c, ip, port, err := SetupMongoContainer()
+	if err != nil {
+		return c, fmt.Errorf("Could not set up MongoDB container: %v", err)
+	}
+
+	for try := 0; try <= tries; try++ {
+		time.Sleep(delay)
+		url := fmt.Sprintf("%s:%d", ip, port)
+		if connector(url) {
+			return c, nil
+		}
+		log.Printf("Try %d failed. Retrying.", try)
+	}
+	return c, errors.New("Could not set up MongoDB container.")
+}
+
+// ConnectToMySQL starts a MySQL image and passes the database url to the connector callback function.
+// The url will match the username:password@tcp(ip:port) pattern (e.g. `root:root@tcp(123.123.123.123:3131)`)
+func ConnectToMySQL(tries int, delay time.Duration, connector func(url string) bool) (c ContainerID, err error) {
+	c, ip, port, err := SetupMySQLContainer()
+	if err != nil {
+		return c, fmt.Errorf("Could not set up MySQL container: %v", err)
+	}
+
+	for try := 0; try <= tries; try++ {
+		time.Sleep(delay)
+		url := fmt.Sprintf("%s:%s@tcp(%s:%d)/mysql", MySQLUsername, MySQLPassword, ip, port)
+		if connector(url) {
+			return c, nil
+		}
+		log.Printf("Try %d failed. Retrying.", try)
+	}
+	return c, errors.New("Could not set up MySQL container.")
 }

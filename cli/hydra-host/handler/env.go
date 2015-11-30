@@ -11,7 +11,7 @@ var (
 	listenOn = fmt.Sprintf(
 		"%s:%s",
 		env.Getenv("HOST", ""),
-		env.Getenv("PORT", "8080"),
+		env.Getenv("PORT", "4443"),
 	)
 	providers = []provider.Provider{
 		dropbox.New(
@@ -29,4 +29,6 @@ var (
 	}
 	jwtPrivateKeyPath = env.Getenv("JWT_PRIVATE_KEY_PATH", "../../example/cert/rs256-private.pem")
 	jwtPublicKeyPath  = env.Getenv("JWT_PUBLIC_KEY_PATH", "../../example/cert/rs256-public.pem")
+	tlsKeyPath        = env.Getenv("TLS_KEY_PATH", "../../example/cert/tls-key.pem")
+	tlsCertPath       = env.Getenv("TLS_CERT_PATH", "../../example/cert/tls-cert.pem")
 )

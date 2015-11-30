@@ -2,10 +2,12 @@ package postgres_test
 
 import (
 	"database/sql"
+	"github.com/ory-am/common/pkg"
 	"github.com/ory-am/dockertest"
 	. "github.com/ory-am/hydra/oauth/connection"
 	. "github.com/ory-am/hydra/oauth/connection/postgres"
 	"github.com/pborman/uuid"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"log"
 	"os"
@@ -37,6 +39,11 @@ func TestMain(m *testing.M) {
 }
 
 var connection = &DefaultConnection{ID: uuid.New(), LocalSubject: "peter", RemoteSubject: "peterson", Provider: "google"}
+
+func TestNotFound(t *testing.T) {
+	_, err := store.Get("asdf")
+	assert.Equal(t, pkg.ErrNotFound, err)
+}
 
 func TestCreateGetFindDelete(t *testing.T) {
 	require.Nil(t, store.Create(connection))

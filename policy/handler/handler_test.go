@@ -50,14 +50,14 @@ func TestMain(m *testing.M) {
 }
 
 type test struct {
-	subject              string
-	token                jwt.Token
-	policies             []policy.Policy
-	createData           policy.DefaultPolicy
+	subject    string
+	token      jwt.Token
+	policies   []policy.Policy
+	createData policy.DefaultPolicy
 	//allowedPayload payload
 
-	statusCreate         int
-	statusGet            int
+	statusCreate int
+	statusGet    int
 	//expectsAllowed       bool
 	statusDelete         int
 	statusGetAfterDelete int
@@ -105,7 +105,7 @@ var payloads = []policy.DefaultPolicy{
 func TestGrantedEndpoint(t *testing.T) {
 	c := test{
 		subject:  "api-app",
-		token:    jwt.Token{Valid: true		},
+		token:    jwt.Token{Valid: true},
 		policies: []policy.Policy{policies["pass-all"]},
 	}
 
@@ -117,7 +117,7 @@ func TestGrantedEndpoint(t *testing.T) {
 
 	request := gorequest.New()
 	resp, _, _ := request.Post(ts.URL + "/policies").Send(payloads[1]).End()
-	require.Equal(t, 200, resp.StatusCode)
+	require.Equal(t, 201, resp.StatusCode)
 
 	num := 0
 	do := func(p payload, shouldAllow bool) {
@@ -134,7 +134,7 @@ func TestGrantedEndpoint(t *testing.T) {
 	}
 
 	do(payload{
-		Resource:   "article",
+		Resource: "article",
 		// sub: api-app
 		Token:      "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcGktYXBwIiwiZXhwIjoxOTI0OTc1NjE5fQ.jipsxS1s5xnyZ2K9EqL33y9B6dWuDB6gzgA3M0rLUS1bcOcSj9hVQMAxcl6Udezid057denHH6a5LrbcuGqwTi7bMlSCs_eWIoTQ5WKTvd0PxEMJGyjw9MUWStHJWna2Drp_vXhZGVvkUbXCRAkVO8KCkKWUB5-wNfoNh6ba-_c7zppcyIV7aRwSFJ5Eu2Gq_dwlNWmu-GB8hTbhHEcXTkBDjRsy6oITfpwGRkxvzmJmYXJKRUFsNlt8DJaWHguOszWGEjfJeOhooybnrUHiwgEwVuciHptI50UaQYDjvBQolLUrcnkf98bQXJsALoBYkaHFC87mVzv0ZR_ZPTzb2A",
 		Permission: "random",
@@ -144,7 +144,7 @@ func TestGrantedEndpoint(t *testing.T) {
 	}, false)
 
 	do(payload{
-		Resource:   "article",
+		Resource: "article",
 		// sub: peter
 		Token:      "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwZXRlciIsImV4cCI6MTkyNDk3NTYxOX0.GVn0YAQTFFoIa-fcsqQgq3pgWBAYNsbd9SqoXUPt7EK63zqiZ0yVqWgQCBEXU5NyT96Alg1Se6Pq6wzAC4ydof-MN3nQhcoNhx6QEHBGFDwwsHwMVyi-51S0NXzYXSV-gGrPoOloCkOSoyab-RWdMZ6LrgV5WQOW4WAfYL0nJ0I-WxlXcoKi-8MJ1GqScqC_E0v9cn4iNAT5e1tPMT49KdjOo_HYPQlJQjcJ724USdDWywPxZy5AmYxG5A2XeaY41Ly0O0HJ8Q56I2ukPMfXiTpnm5mnb9mRbK99HnvlAvtEKJ-Lf0w_BTurL_3ZmONKSYR0HHIMZC0hO9NJNNTS1Q",
 		Permission: "random",
@@ -154,7 +154,7 @@ func TestGrantedEndpoint(t *testing.T) {
 	}, true)
 
 	do(payload{
-		Resource:   "article",
+		Resource: "article",
 		// sub: peter
 		Token:      "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwZXRlciIsImV4cCI6MTkyNDk3NTYxOX0.GVn0YAQTFFoIa-fcsqQgq3pgWBAYNsbd9SqoXUPt7EK63zqiZ0yVqWgQCBEXU5NyT96Alg1Se6Pq6wzAC4ydof-MN3nQhcoNhx6QEHBGFDwwsHwMVyi-51S0NXzYXSV-gGrPoOloCkOSoyab-RWdMZ6LrgV5WQOW4WAfYL0nJ0I-WxlXcoKi-8MJ1GqScqC_E0v9cn4iNAT5e1tPMT49KdjOo_HYPQlJQjcJ724USdDWywPxZy5AmYxG5A2XeaY41Ly0O0HJ8Q56I2ukPMfXiTpnm5mnb9mRbK99HnvlAvtEKJ-Lf0w_BTurL_3ZmONKSYR0HHIMZC0hO9NJNNTS1Q",
 		Permission: "foobar",
@@ -164,7 +164,7 @@ func TestGrantedEndpoint(t *testing.T) {
 	}, true)
 
 	do(payload{
-		Resource:   "foobar",
+		Resource: "foobar",
 		// sub: peter
 		Token:      "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwZXRlciIsImV4cCI6MTkyNDk3NTYxOX0.GVn0YAQTFFoIa-fcsqQgq3pgWBAYNsbd9SqoXUPt7EK63zqiZ0yVqWgQCBEXU5NyT96Alg1Se6Pq6wzAC4ydof-MN3nQhcoNhx6QEHBGFDwwsHwMVyi-51S0NXzYXSV-gGrPoOloCkOSoyab-RWdMZ6LrgV5WQOW4WAfYL0nJ0I-WxlXcoKi-8MJ1GqScqC_E0v9cn4iNAT5e1tPMT49KdjOo_HYPQlJQjcJ724USdDWywPxZy5AmYxG5A2XeaY41Ly0O0HJ8Q56I2ukPMfXiTpnm5mnb9mRbK99HnvlAvtEKJ-Lf0w_BTurL_3ZmONKSYR0HHIMZC0hO9NJNNTS1Q",
 		Permission: "random",
@@ -174,7 +174,7 @@ func TestGrantedEndpoint(t *testing.T) {
 	}, false)
 
 	do(payload{
-		Resource:   "article",
+		Resource: "article",
 		// sub: foobar
 		Token:      "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmb29iYXIiLCJleHAiOjE5MjQ5NzU2MTl9.d4Z9sEB52LWysYXto_mlT41uaLgAETTQJS4iSXjBc7U1lzmT7vsaMpMVNVKhYCe_2ptx7uZcW4pDy8njjQMtFoesAmbUK-finVslYpqjQmyre9eqWURhIXgDu95w2hP9EoSfjXpyE8EUct3a5pkm6rje4C5y-16MrAQpuq3IZVYTPwdS6Gl33BG3Obw3sXheBGMcnmtcGtSQe6ekTqgF-NkVTe5bQPGL6DxGdRLbHOg_nky91JWs4lLO526KVTbDrwM7SVGex5w1rPcn2Qg8RUefbWF2x-KuoAGlTnStfN3tOgw6DW3Q-35fcGesyvy7DAP-Zy68vZ6W7h2rIy6wiQ",
 		Permission: "random",
@@ -202,19 +202,19 @@ func TestCreateGetDeleteGet(t *testing.T) {
 			subject: "api-app", token: jwt.Token{Valid: true},
 			policies:     []policy.Policy{policies["pass-create"]},
 			createData:   payloads[0],
-			statusCreate: http.StatusOK, statusGet: http.StatusForbidden,
+			statusCreate: http.StatusCreated, statusGet: http.StatusForbidden,
 		},
 		{
 			subject: "api-app", token: jwt.Token{Valid: true},
 			policies:     []policy.Policy{policies["pass-create"], policies["pass-get"]},
 			createData:   payloads[0],
-			statusCreate: http.StatusOK, statusGet: http.StatusOK, statusDelete: http.StatusForbidden,
+			statusCreate: http.StatusCreated, statusGet: http.StatusOK, statusDelete: http.StatusForbidden,
 		},
 		{
 			subject: "api-app", token: jwt.Token{Valid: true},
 			policies:     []policy.Policy{policies["pass-all"]},
 			createData:   payloads[0],
-			statusCreate: http.StatusOK, statusGet: http.StatusOK, statusDelete: http.StatusAccepted, statusGetAfterDelete: http.StatusNotFound,
+			statusCreate: http.StatusCreated, statusGet: http.StatusOK, statusDelete: http.StatusAccepted, statusGetAfterDelete: http.StatusNotFound,
 		},
 	} {
 		handler := &Handler{s: store, m: mw}
@@ -226,7 +226,7 @@ func TestCreateGetDeleteGet(t *testing.T) {
 		request := gorequest.New()
 		resp, body, _ := request.Post(ts.URL + "/policies").Send(c.createData).End()
 		require.Equal(t, c.statusCreate, resp.StatusCode, "case %d: %s", k, body)
-		if resp.StatusCode != http.StatusOK {
+		if resp.StatusCode != http.StatusCreated {
 			continue
 		}
 
@@ -253,7 +253,7 @@ func TestCreateGetDeleteGet(t *testing.T) {
 var allowedPayloads = map[string]payload{
 	"create-grant": {
 		Resource:   "rn:hydra:policies",
-		Token:    "some.token",
+		Token:      "some.token",
 		Permission: "create",
 	},
 }

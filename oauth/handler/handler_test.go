@@ -310,8 +310,8 @@ func TestIntrospect(t *testing.T) {
 		data.Set("token", c.accessToken)
 
 		client := &http.Client{}
-		req, _ := http.NewRequest("POST", ts.URL + "/oauth2/introspect", bytes.NewBufferString(data.Encode()))
-		req.Header.Add("Authorization", access.Type() + " " + access.AccessToken)
+		req, _ := http.NewRequest("POST", ts.URL+"/oauth2/introspect", bytes.NewBufferString(data.Encode()))
+		req.Header.Add("Authorization", access.Type()+" "+access.AccessToken)
 		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 		req.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 		res, _ := client.Do(req)

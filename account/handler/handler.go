@@ -58,7 +58,7 @@ func (h *Handler) Create(ctx context.Context, rw http.ResponseWriter, req *http.
 	type Payload struct {
 		Email    string `valid:"email,required" json:"email" `
 		Password string `valid:"length(6|254),required" json:"password"`
-		Data     string `valid:"optional,json", json:"data"`
+		Data     string `valid:"optional,json" json:"data"`
 	}
 
 	var p Payload

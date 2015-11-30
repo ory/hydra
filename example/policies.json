@@ -1,0 +1,34 @@
+[
+  {
+    "description": "Allow editing and deleting of personal articles and all sub resources.",
+    "subject": ["{edit|delete}"],
+    "effect": "allow",
+    "resources": [
+      "urn:flitt.net:articles:{.*}"
+    ],
+    "permissions": [
+      "edit"
+    ],
+    "conditions": [
+      {
+        "op": "SubjectIsOwner"
+      }
+    ]
+  },
+  {
+    "description": "Allow creation of personal articles and all sub resources.",
+    "subject": ["create"],
+    "effect": "allow",
+    "resources": [
+      "urn:flitt.net:articles"
+    ],
+    "permissions": [
+      "edit"
+    ],
+    "conditions": [
+      {
+        "op": "SubjectIsOwner"
+      }
+    ]
+  }
+]

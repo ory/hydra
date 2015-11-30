@@ -9,17 +9,13 @@ import (
 	"time"
 )
 
-func main() {
-	app := cli.NewApp()
-	app.EnableBashCompletion = true
-	app.Name = "hydra-host"
-	app.Usage = `Dragons guard your resources`
-
-	ctx := new(Context)
-	cl := &Client{Ctx: ctx}
-	u := &User{Ctx: ctx}
-	co := &Core{Ctx: ctx}
-	app.Commands = []cli.Command{
+var (
+	ctx      = new(Context)
+	cl       = &Client{Ctx: ctx}
+	u        = &User{Ctx: ctx}
+	co       = &Core{Ctx: ctx}
+	pl       = &Policy{Ctx: ctx}
+	Commands = []cli.Command{
 		{
 			Name:  "client",
 			Usage: "Client actions",
@@ -148,36 +144,28 @@ func main() {
 				},
 			},
 		},
-		/*{
+		{
 			Name:  "policy",
-			Usage: "Policy actions.",
+			Usage: "Policy actions",
 			Subcommands: []cli.Command{
 				{
-					Name:   "grant",
-					ArgsUsage: "<template>",
-					Usage:  `Grant grants various policy templates to subjects.`,
-					Action: cl.Create,
-					Flags: []cli.Flag{
-						cli.StringFlag{
-							Name:  "s, subject",
-							Usage: "Set the subject's id.",
-						},
-						cli.BoolFlag{
-							Name:  "only-if-owner",
-							Usage: "Only allow access if it the subject is also the owner of the resource.",
-						},
-					},
-					BashComplete: func(c *cli.Context) {
-						if len(c.Args()) > 0 {
-							return
-						}
-						for _, t := range templates.Templates {
-							fmt.Println(t)
-						}
-					},
+					Name:      "import",
+					ArgsUsage: "<policies1.json> <policies2.json> <policies3.json>",
+					Usage:     `Import a json file which defines an array of policies`,
+					Action:    pl.Import,
+					Flags:     []cli.Flag{},
 				},
 			},
-		},*/
+		},
 	}
+)
+
+func main() {
+	app := cli.NewApp()
+	app.EnableBashCompletion = true
+	app.Name = "hydra-host"
+	app.Usage = `Dragons guard your resources`
+
+	app.Commands = Commands
 	app.Run(os.Args)
 }

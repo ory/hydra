@@ -35,6 +35,7 @@ If time schedule holds, we will use it in production in Q1 2016 for an awesome b
     - [Create user](#create-user)
     - [Create JWT RSA Key Pair](#create-jwt-rsa-key-pair)
     - [Create a TLS certificate](#create-a-tls-certificate)
+    - [Import policies](#import-policies)
 - [Good to know](#good-to-know)
   - [Everything is RESTful. No HTML. No Templates.](#everything-is-restful-no-html-no-templates)
   - [Sign up workflow](#sign-up-workflow)
@@ -175,6 +176,7 @@ COMMANDS:
    start        Start the host service
    jwt          JWT actions
    tls          JWT actions
+   policy       Policy actions
    help, h      Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
@@ -264,6 +266,57 @@ OPTIONS:
    --rb, --rsa-bits "2048"                      Size of RSA key to generate. Ignored if --ecdsa-curve is set
    --ec, --ecdsa-curve                          ECDSA curve to use to generate a key. Valid values are P224, P256, P384, P521
 
+```
+
+#### Import policies
+
+You can import policies from json files.
+
+```
+NAME:
+   hydra-host policy import - Import a json file which defines an array of policies
+
+USAGE:
+   hydra-host policy import <policies1.json> <policies2.json> <policies3.json>
+```
+
+Here's an exemplary *policies.json:*
+
+```json
+[
+  {
+    "description": "Allow editing and deleting of personal articles and all sub resources.",
+    "subject": ["{edit|delete}"],
+    "effect": "allow",
+    "resources": [
+      "urn:flitt.net:articles:{.*}"
+    ],
+    "permissions": [
+      "edit"
+    ],
+    "conditions": [
+      {
+        "op": "SubjectIsOwner"
+      }
+    ]
+  },
+  {
+    "description": "Allow creation of personal articles and all sub resources.",
+    "subject": ["create"],
+    "effect": "allow",
+    "resources": [
+      "urn:flitt.net:articles"
+    ],
+    "permissions": [
+      "edit"
+    ],
+    "conditions": [
+      {
+        "op": "SubjectIsOwner"
+      }
+    ]
+  }
+]
 ```
 
 ## Good to know

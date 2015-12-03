@@ -31,11 +31,20 @@ type Handler struct {
 	j *jwt.JWT
 }
 
-type payload struct {
+type GrantedPayload struct {
 	Resource   string            `json:"resource"`
 	Token      string            `json:"token"`
 	Permission string            `json:"permission"`
 	Context    *operator.Context `json:"context"`
+}
+
+type CreatePolicyPayload struct {
+	Description string              `json:"description"`
+	Subjects    []string            `json:"subjects"`
+	Effect      string              `json:"effect"`
+	Resources   []string            `json:"resources"`
+	Permissions []string            `json:"permissions"`
+	Conditions  []*DefaultCondition `json:"conditions"`
 }
 
 func permission(id string) string {
@@ -74,7 +83,7 @@ func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hctx.ContextHandler)
 }
 
 func (h *Handler) Granted(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
-	var p payload
+	var p GrantedPayload
 	decoder := json.NewDecoder(req.Body)
 	if err := decoder.Decode(&p); err != nil {
 		pkg.HttpError(rw, err, http.StatusBadRequest)

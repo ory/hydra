@@ -83,22 +83,25 @@ var policies = map[string]policy.Policy{
 
 var payloads = []policy.DefaultPolicy{
 	{
-		"",
-		"description",
-		[]string{"max"},
-		policy.AllowAccess,
-		[]string{"resource"},
-		[]string{"<.*>"},
-		nil,
+		Description: "description",
+		Subjects:    []string{"max"},
+		Effect:      policy.AllowAccess,
+		Resources:   []string{"resource"},
+		Permissions: []string{"<.*>"},
+		Conditions:  nil,
 	},
 	{
-		"",
-		"Should allow peter all permissions on resource article",
-		[]string{"peter"},
-		policy.AllowAccess,
-		[]string{"article"},
-		[]string{"<.*>"},
-		nil,
+		Description: "Should allow peter all permissions on resource article",
+		Subjects:    []string{"peter"},
+		Effect:      policy.AllowAccess,
+		Resources:   []string{"article"},
+		Permissions: []string{"<.*>"},
+		Conditions: []policy.DefaultCondition{
+			{
+				Operator: "SubjectIsOwner",
+				Extra:    map[string]interface{}{"bar": "foo"},
+			},
+		},
 	},
 }
 
@@ -120,7 +123,7 @@ func TestGrantedEndpoint(t *testing.T) {
 	require.Equal(t, 201, resp.StatusCode)
 
 	num := 0
-	do := func(p payload, shouldAllow bool) {
+	do := func(p GrantedPayload, shouldAllow bool) {
 		resp, body, _ := request.Post(ts.URL + "/guard/allowed").Send(p).End()
 		require.Equal(t, 200, resp.StatusCode, "Case %d", num)
 
@@ -133,7 +136,7 @@ func TestGrantedEndpoint(t *testing.T) {
 		num++
 	}
 
-	do(payload{
+	do(GrantedPayload{
 		Resource: "article",
 		// sub: api-app
 		Token:      "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcGktYXBwIiwiZXhwIjoxOTI0OTc1NjE5fQ.jipsxS1s5xnyZ2K9EqL33y9B6dWuDB6gzgA3M0rLUS1bcOcSj9hVQMAxcl6Udezid057denHH6a5LrbcuGqwTi7bMlSCs_eWIoTQ5WKTvd0PxEMJGyjw9MUWStHJWna2Drp_vXhZGVvkUbXCRAkVO8KCkKWUB5-wNfoNh6ba-_c7zppcyIV7aRwSFJ5Eu2Gq_dwlNWmu-GB8hTbhHEcXTkBDjRsy6oITfpwGRkxvzmJmYXJKRUFsNlt8DJaWHguOszWGEjfJeOhooybnrUHiwgEwVuciHptI50UaQYDjvBQolLUrcnkf98bQXJsALoBYkaHFC87mVzv0ZR_ZPTzb2A",
@@ -143,7 +146,7 @@ func TestGrantedEndpoint(t *testing.T) {
 		},
 	}, false)
 
-	do(payload{
+	do(GrantedPayload{
 		Resource: "article",
 		// sub: peter
 		Token:      "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwZXRlciIsImV4cCI6MTkyNDk3NTYxOX0.GVn0YAQTFFoIa-fcsqQgq3pgWBAYNsbd9SqoXUPt7EK63zqiZ0yVqWgQCBEXU5NyT96Alg1Se6Pq6wzAC4ydof-MN3nQhcoNhx6QEHBGFDwwsHwMVyi-51S0NXzYXSV-gGrPoOloCkOSoyab-RWdMZ6LrgV5WQOW4WAfYL0nJ0I-WxlXcoKi-8MJ1GqScqC_E0v9cn4iNAT5e1tPMT49KdjOo_HYPQlJQjcJ724USdDWywPxZy5AmYxG5A2XeaY41Ly0O0HJ8Q56I2ukPMfXiTpnm5mnb9mRbK99HnvlAvtEKJ-Lf0w_BTurL_3ZmONKSYR0HHIMZC0hO9NJNNTS1Q",
@@ -153,7 +156,7 @@ func TestGrantedEndpoint(t *testing.T) {
 		},
 	}, true)
 
-	do(payload{
+	do(GrantedPayload{
 		Resource: "article",
 		// sub: peter
 		Token:      "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwZXRlciIsImV4cCI6MTkyNDk3NTYxOX0.GVn0YAQTFFoIa-fcsqQgq3pgWBAYNsbd9SqoXUPt7EK63zqiZ0yVqWgQCBEXU5NyT96Alg1Se6Pq6wzAC4ydof-MN3nQhcoNhx6QEHBGFDwwsHwMVyi-51S0NXzYXSV-gGrPoOloCkOSoyab-RWdMZ6LrgV5WQOW4WAfYL0nJ0I-WxlXcoKi-8MJ1GqScqC_E0v9cn4iNAT5e1tPMT49KdjOo_HYPQlJQjcJ724USdDWywPxZy5AmYxG5A2XeaY41Ly0O0HJ8Q56I2ukPMfXiTpnm5mnb9mRbK99HnvlAvtEKJ-Lf0w_BTurL_3ZmONKSYR0HHIMZC0hO9NJNNTS1Q",
@@ -163,7 +166,7 @@ func TestGrantedEndpoint(t *testing.T) {
 		},
 	}, true)
 
-	do(payload{
+	do(GrantedPayload{
 		Resource: "foobar",
 		// sub: peter
 		Token:      "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwZXRlciIsImV4cCI6MTkyNDk3NTYxOX0.GVn0YAQTFFoIa-fcsqQgq3pgWBAYNsbd9SqoXUPt7EK63zqiZ0yVqWgQCBEXU5NyT96Alg1Se6Pq6wzAC4ydof-MN3nQhcoNhx6QEHBGFDwwsHwMVyi-51S0NXzYXSV-gGrPoOloCkOSoyab-RWdMZ6LrgV5WQOW4WAfYL0nJ0I-WxlXcoKi-8MJ1GqScqC_E0v9cn4iNAT5e1tPMT49KdjOo_HYPQlJQjcJ724USdDWywPxZy5AmYxG5A2XeaY41Ly0O0HJ8Q56I2ukPMfXiTpnm5mnb9mRbK99HnvlAvtEKJ-Lf0w_BTurL_3ZmONKSYR0HHIMZC0hO9NJNNTS1Q",
@@ -173,7 +176,7 @@ func TestGrantedEndpoint(t *testing.T) {
 		},
 	}, false)
 
-	do(payload{
+	do(GrantedPayload{
 		Resource: "article",
 		// sub: foobar
 		Token:      "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmb29iYXIiLCJleHAiOjE5MjQ5NzU2MTl9.d4Z9sEB52LWysYXto_mlT41uaLgAETTQJS4iSXjBc7U1lzmT7vsaMpMVNVKhYCe_2ptx7uZcW4pDy8njjQMtFoesAmbUK-finVslYpqjQmyre9eqWURhIXgDu95w2hP9EoSfjXpyE8EUct3a5pkm6rje4C5y-16MrAQpuq3IZVYTPwdS6Gl33BG3Obw3sXheBGMcnmtcGtSQe6ekTqgF-NkVTe5bQPGL6DxGdRLbHOg_nky91JWs4lLO526KVTbDrwM7SVGex5w1rPcn2Qg8RUefbWF2x-KuoAGlTnStfN3tOgw6DW3Q-35fcGesyvy7DAP-Zy68vZ6W7h2rIy6wiQ",
@@ -250,7 +253,7 @@ func TestCreateGetDeleteGet(t *testing.T) {
 	}
 }
 
-var allowedPayloads = map[string]payload{
+var allowedPayloads = map[string]GrantedPayload{
 	"create-grant": {
 		Resource:   "rn:hydra:policies",
 		Token:      "some.token",

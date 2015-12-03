@@ -39,6 +39,8 @@ import (
 	"time"
 )
 
+var accID = uuid.New()
+var clientID = uuid.New()
 var handler *Handler
 
 func TestMain(m *testing.M) {
@@ -84,7 +86,7 @@ func TestMain(m *testing.M) {
 	}
 
 	pol := policy.DefaultPolicy{
-		ID: "3", Description: "",
+		ID: uuid.New(), Description: "",
 		Effect:      policy.AllowAccess,
 		Subjects:    []string{},
 		Permissions: []string{"authorize"},
@@ -92,16 +94,16 @@ func TestMain(m *testing.M) {
 		Conditions:  []policy.DefaultCondition{},
 	}
 
-	if err := osinStore.CreateClient(&osin.DefaultClient{"1", "secret", "/callback", ""}); err != nil {
+	if err := osinStore.CreateClient(&osin.DefaultClient{clientID, "secret", "/callback", ""}); err != nil {
 		log.Fatalf("Could create client: %s", err)
-	} else if _, err := accountStore.Create("2", "2@bar.com", "secret", "{}"); err != nil {
+	} else if _, err := accountStore.Create(accID, "2@bar.com", "secret", "{}"); err != nil {
 		log.Fatalf("Could create account: %s", err)
 	} else if err := policyStore.Create(&pol); err != nil {
 		log.Fatalf("Could create client: %s", err)
 	} else if err := connectionStore.Create(&connection.DefaultConnection{
 		ID:            uuid.New(),
 		Provider:      "MockProvider",
-		LocalSubject:  "2",
+		LocalSubject:  accID,
 		RemoteSubject: "remote-id",
 	}); err != nil {
 		log.Fatalf("Could create client: %s", err)
@@ -113,11 +115,11 @@ func TestMain(m *testing.M) {
 var (
 	configs = map[string]*oauth2.Config{
 		"working": {
-			ClientID: "1", ClientSecret: "secret", Scopes: []string{}, RedirectURL: "/callback",
+			ClientID: clientID, ClientSecret: "secret", Scopes: []string{}, RedirectURL: "/callback",
 			Endpoint: oauth2.Endpoint{AuthURL: "/oauth2/auth", TokenURL: "/oauth2/token"},
 		},
 		"voidSecret": {
-			ClientID: "1", ClientSecret: "wrongsecret", Scopes: []string{}, RedirectURL: "/callback",
+			ClientID: clientID, ClientSecret: "wrongsecret", Scopes: []string{}, RedirectURL: "/callback",
 			Endpoint: oauth2.Endpoint{AuthURL: "/oauth2/auth", TokenURL: "/oauth2/token"},
 		},
 		"voidID": {

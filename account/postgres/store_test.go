@@ -5,6 +5,7 @@ import (
 	"github.com/ory-am/common/pkg"
 	"github.com/ory-am/dockertest"
 	"github.com/ory-am/hydra/hash"
+	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"os"
@@ -44,15 +45,17 @@ func TestNotFound(t *testing.T) {
 }
 
 func TestCreateAndGetCases(t *testing.T) {
+	a := uuid.New()
+	b := uuid.New()
 	for _, c := range []struct {
 		data  []string
 		extra string
 		pass  bool
 		find  bool
 	}{
-		{[]string{"1", "1@bar", "secret"}, `{"foo": "bar"}`, true, true},
-		{[]string{"1", "1@foo", "secret"}, `{"foo": "bar"}`, false, true},
-		{[]string{"2", "1@bar", "secret"}, `{"foo": "bar"}`, false, false},
+		{[]string{a, "1@bar", "secret"}, `{"foo": "bar"}`, true, true},
+		{[]string{a, "1@foo", "secret"}, `{"foo": "bar"}`, false, true},
+		{[]string{b, "1@bar", "secret"}, `{"foo": "bar"}`, false, false},
 	} {
 		result, err := store.Create(c.data[0], c.data[1], c.data[2], c.extra)
 		if c.pass {
@@ -85,48 +88,51 @@ func TestCreateAndGetCases(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	_, err := store.Create("2", "2@bar", "secret", `{"foo": "bar"}`)
+	id := uuid.New()
+	_, err := store.Create(id, "2@bar", "secret", `{"foo": "bar"}`)
 	assert.Nil(t, err)
 
-	_, err = store.Get("2")
+	_, err = store.Get(id)
 	assert.Nil(t, err)
 
-	err = store.Delete("2")
+	err = store.Delete(id)
 	assert.Nil(t, err)
 
-	_, err = store.Get("2")
+	_, err = store.Get(id)
 	assert.NotNil(t, err)
 }
 
 func TestUpdateEmail(t *testing.T) {
-	_, err := store.Create("3", "3@bar", "secret", `{"foo": "bar"}`)
+	id := uuid.New()
+	_, err := store.Create(id, "3@bar", "secret", `{"foo": "bar"}`)
 	assert.Nil(t, err)
 
-	_, err = store.UpdateEmail("3", "3@foo", "wrong secret")
+	_, err = store.UpdateEmail(id, "3@foo", "wrong secret")
 	assert.NotNil(t, err)
 
-	_, err = store.UpdateEmail("3", "3@foo", "secret")
+	_, err = store.UpdateEmail(id, "3@foo", "secret")
 	assert.Nil(t, err)
 
-	r, err := store.Get("3")
+	r, err := store.Get(id)
 	assert.Nil(t, err)
 
-	assert.Equal(t, "3", r.GetID())
+	assert.Equal(t, id, r.GetID())
 	assert.Equal(t, "3@foo", r.GetEmail())
 	assert.NotEqual(t, "secret", r.GetPassword())
 }
 
 func TestUpdatePassword(t *testing.T) {
-	account, err := store.Create("4", "4@bar", "old secret", `{"foo": "bar"}`)
+	id := uuid.New()
+	account, err := store.Create(id, "4@bar", "old secret", `{"foo": "bar"}`)
 	assert.Nil(t, err)
 
-	_, err = store.UpdatePassword("4", "wrong old secret", "new secret")
+	_, err = store.UpdatePassword(id, "wrong old secret", "new secret")
 	assert.NotNil(t, err)
 
-	updatedAccount, err := store.UpdatePassword("4", "old secret", "new secret")
+	updatedAccount, err := store.UpdatePassword(id, "old secret", "new secret")
 	assert.Nil(t, err)
 
-	resultAccount, err := store.Get("4")
+	resultAccount, err := store.Get(id)
 	assert.Nil(t, err)
 
 	assert.Equal(t, updatedAccount.GetPassword(), resultAccount.GetPassword())
@@ -134,7 +140,7 @@ func TestUpdatePassword(t *testing.T) {
 }
 
 func TestAuthenticate(t *testing.T) {
-	account, err := store.Create("5", "5@bar", "secret", `{"foo": "bar"}`)
+	account, err := store.Create(uuid.New(), "5@bar", "secret", `{"foo": "bar"}`)
 	assert.Nil(t, err)
 
 	_, err = store.Authenticate("5@bar", "wrong secret")

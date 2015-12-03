@@ -1,10 +1,10 @@
 [
   {
     "description": "Allow editing and deleting of personal articles and all sub resources.",
-    "subject": ["{edit|delete}"],
+    "subject": ["<edit|delete>"],
     "effect": "allow",
     "resources": [
-      "urn:flitt.net:articles:{.*}"
+      "urn:content.api.example.com:articles:<.*>"
     ],
     "permissions": [
       "edit"
@@ -20,7 +20,7 @@
     "subject": ["create"],
     "effect": "allow",
     "resources": [
-      "urn:flitt.net:articles"
+      "urn:content.api.example.com:articles"
     ],
     "permissions": [
       "edit"

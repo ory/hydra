@@ -7,13 +7,14 @@ import (
 	"testing"
 
 	"bytes"
+	"database/sql"
+	_ "github.com/lib/pq"
 	"github.com/ory-am/common/env"
 	"github.com/ory-am/dockertest"
 	"io"
 	"log"
+	"path/filepath"
 	"time"
-	"database/sql"
-	_ "github.com/lib/pq"
 )
 
 var tmpDir = os.TempDir()
@@ -84,8 +85,8 @@ func TestRunCLITests(t *testing.T) {
 }
 
 func TestJWTGen(t *testing.T) {
-	priv := tmpDir + uuid.New()
-	pub := tmpDir + uuid.New()
+	priv := filepath.Join(tmpDir, uuid.New())
+	pub := filepath.Join(tmpDir, uuid.New())
 	os.Args = []string{"hydra-host", "jwt", "generate-keypair", "-s", priv, "-p", pub}
 	assert.Nil(t, NewApp().Run(os.Args))
 	assertAndRemoveFile(t, priv)
@@ -93,8 +94,8 @@ func TestJWTGen(t *testing.T) {
 }
 
 func TestTLSGen(t *testing.T) {
-	priv := tmpDir + uuid.New()
-	pub := tmpDir + uuid.New()
+	priv := filepath.Join(tmpDir, uuid.New())
+	pub := filepath.Join(tmpDir, uuid.New())
 	os.Args = []string{"hydra-host", "tls", "generate-dummy-certificate", "-c", priv, "-k", pub, "-u", "localhost", "--sd", "Jan 1 15:04:05 2011", "-d", "8760h0m0s", "--ca", "--rb", "4069", "--ec", "P521"}
 	assert.Nil(t, NewApp().Run(os.Args))
 	assertAndRemoveFile(t, priv)

@@ -13,8 +13,8 @@ import (
 	"github.com/ory-am/hydra/oauth/provider"
 	policies "github.com/ory-am/hydra/policy/handler"
 	"github.com/ory-am/ladon/guard"
-	"log"
 
+	"fmt"
 	"golang.org/x/net/http2"
 	"net/http"
 )
@@ -34,17 +34,17 @@ type Core struct {
 	audience string
 }
 
-func (c *Core) Start(ctx *cli.Context) {
+func (c *Core) Start(ctx *cli.Context) error {
 	c.Ctx.Start()
 
 	private, err := jwt.LoadCertificate(jwtPrivateKeyPath)
 	if err != nil {
-		log.Fatalf("Could not load private key: %s", err)
+		return fmt.Errorf("Could not load private key: %s", err)
 	}
 
 	public, err := jwt.LoadCertificate(jwtPublicKeyPath)
 	if err != nil {
-		log.Fatalf("Could not load public key: %s", err)
+		return fmt.Errorf("Could not load public key: %s", err)
 	}
 
 	j := jwt.New(private, public)
@@ -82,5 +82,9 @@ func (c *Core) Start(ctx *cli.Context) {
 		Addr: listenOn,
 	}
 	http2.ConfigureServer(srv, &http2.Server{})
-	log.Fatal(srv.ListenAndServeTLS(tlsCertPath, tlsKeyPath))
+	err = srv.ListenAndServeTLS(tlsCertPath, tlsKeyPath)
+	if err != nil {
+		return fmt.Errorf("Could not serve HTTP/2 server because %s", err)
+	}
+	return nil
 }

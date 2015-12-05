@@ -24,6 +24,7 @@ type Context struct {
 }
 
 func (c *Context) Start() {
+	getEnv()
 	db, err := sql.Open("postgres", databaseURL)
 	if err != nil {
 		log.Fatal(err)

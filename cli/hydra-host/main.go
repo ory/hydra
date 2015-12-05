@@ -6,13 +6,22 @@ import (
 	"os"
 	//"github.com/ory-am/hydra/cli/hydra-host/templates"
 	//"fmt"
+	"fmt"
 	"time"
 )
+
+func errorWrapper(f func(ctx *cli.Context) error) func(ctx *cli.Context) {
+	return func(ctx *cli.Context) {
+		if err := f(ctx); err != nil {
+			fmt.Fprintf(os.Stderr, "An error occurred: %s", err)
+		}
+	}
+}
 
 var (
 	ctx      = new(Context)
 	cl       = &Client{Ctx: ctx}
-	u        = &User{Ctx: ctx}
+	u        = &Account{Ctx: ctx}
 	co       = &Core{Ctx: ctx}
 	pl       = &Policy{Ctx: ctx}
 	Commands = []cli.Command{
@@ -23,7 +32,7 @@ var (
 				{
 					Name:   "create",
 					Usage:  `Create a new client`,
-					Action: cl.Create,
+					Action: errorWrapper(cl.Create),
 					Flags: []cli.Flag{
 						cli.StringFlag{
 							Name:  "i, id",
@@ -46,22 +55,22 @@ var (
 			},
 		},
 		{
-			Name:  "user",
-			Usage: "User actions",
+			Name:  "account",
+			Usage: "Account actions",
 			Subcommands: []cli.Command{
 				{
 					Name:      "create",
-					Usage:     "Create a new user",
+					Usage:     "Create a new account",
 					ArgsUsage: "<email>",
-					Action:    u.Create,
+					Action:    errorWrapper(u.Create),
 					Flags: []cli.Flag{
 						cli.StringFlag{
 							Name:  "password",
-							Usage: "The user's password",
+							Usage: "The account's password",
 						},
 						cli.BoolFlag{
 							Name:  "as-superuser",
-							Usage: "Grant superuser privileges to the user",
+							Usage: "Grant superuser privileges to the account",
 						},
 					},
 				},
@@ -70,24 +79,24 @@ var (
 		{
 			Name:   "start",
 			Usage:  "Start the host service",
-			Action: co.Start,
+			Action: errorWrapper(co.Start),
 		},
 		{
 			Name:  "jwt",
 			Usage: "JWT actions",
 			Subcommands: []cli.Command{
 				{
-					Name:   "create-keypair",
+					Name:   "generate-keypair",
 					Usage:  "Create a JWT PEM keypair.\n\n   You can use these files by providing the environment variables JWT_PRIVATE_KEY_PATH and JWT_PUBLIC_KEY_PATH",
-					Action: CreatePublicPrivatePEMFiles,
+					Action: errorWrapper(CreatePublicPrivatePEMFiles),
 					Flags: []cli.Flag{
 						cli.StringFlag{
-							Name:  "i, private-file-path",
+							Name:  "s, private-file-path",
 							Value: "rs256-private.pem",
 							Usage: "Where to save the private key PEM file",
 						},
 						cli.StringFlag{
-							Name:  "u, public-file-path",
+							Name:  "p, public-file-path",
 							Value: "rs256-public.pem",
 							Usage: "Where to save the private key PEM file",
 						},
@@ -97,12 +106,12 @@ var (
 		},
 		{
 			Name:  "tls",
-			Usage: "JWT actions",
+			Usage: "TLS actions",
 			Subcommands: []cli.Command{
 				{
-					Name:   "create-dummy-certificate",
+					Name:   "generate-dummy-certificate",
 					Usage:  "Create a dummy TLS certificate and private key.\n\n   You can use these files (in development!) by providing the environment variables TLS_CERT_PATH and TLS_KEY_PATH",
-					Action: CreateDummyTLSCert,
+					Action: errorWrapper(CreateDummyTLSCert),
 					Flags: []cli.Flag{
 						cli.StringFlag{
 							Name:  "c, certificate-file-path",
@@ -152,7 +161,7 @@ var (
 					Name:      "import",
 					ArgsUsage: "<policies1.json> <policies2.json> <policies3.json>",
 					Usage:     `Import a json file which defines an array of policies`,
-					Action:    pl.Import,
+					Action:    errorWrapper(pl.Import),
 					Flags:     []cli.Flag{},
 				},
 			},
@@ -161,11 +170,14 @@ var (
 )
 
 func main() {
+	NewApp().Run(os.Args)
+}
+
+func NewApp() *cli.App {
 	app := cli.NewApp()
 	app.EnableBashCompletion = true
 	app.Name = "hydra-host"
 	app.Usage = `Dragons guard your resources`
-
 	app.Commands = Commands
-	app.Run(os.Args)
+	return app
 }

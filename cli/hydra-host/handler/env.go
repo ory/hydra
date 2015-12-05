@@ -8,6 +8,12 @@ import (
 )
 
 var (
+	listenOn, bcryptWorkFactor, databaseURL, jwtPrivateKeyPath, jwtPublicKeyPath, tlsKeyPath, tlsCertPath string
+	providers                                                                                             []provider.Provider
+	locations                                                                                             map[string]string
+)
+
+func getEnv() {
 	listenOn = fmt.Sprintf(
 		"%s:%s",
 		env.Getenv("HOST", ""),
@@ -22,13 +28,13 @@ var (
 		),
 	}
 	bcryptWorkFactor = env.Getenv("BCRYPT_WORKFACTOR", "10")
-	databaseURL      = env.Getenv("DATABASE_URL", "")
-	locations        = map[string]string{
+	databaseURL = env.Getenv("DATABASE_URL", "")
+	locations = map[string]string{
 		"signUp": env.Getenv("SIGNUP_URL", ""),
 		"signIn": env.Getenv("SIGNIN_URL", ""),
 	}
 	jwtPrivateKeyPath = env.Getenv("JWT_PRIVATE_KEY_PATH", "../../example/cert/rs256-private.pem")
-	jwtPublicKeyPath  = env.Getenv("JWT_PUBLIC_KEY_PATH", "../../example/cert/rs256-public.pem")
-	tlsKeyPath        = env.Getenv("TLS_KEY_PATH", "../../example/cert/tls-key.pem")
-	tlsCertPath       = env.Getenv("TLS_CERT_PATH", "../../example/cert/tls-cert.pem")
-)
+	jwtPublicKeyPath = env.Getenv("JWT_PUBLIC_KEY_PATH", "../../example/cert/rs256-public.pem")
+	tlsKeyPath = env.Getenv("TLS_KEY_PATH", "../../example/cert/tls-key.pem")
+	tlsCertPath = env.Getenv("TLS_CERT_PATH", "../../example/cert/tls-cert.pem")
+}

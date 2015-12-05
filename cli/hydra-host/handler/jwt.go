@@ -18,20 +18,21 @@ import (
 	"fmt"
 	"github.com/codegangsta/cli"
 	"io/ioutil"
-	"log"
+	"os"
 )
 
-func CreatePublicPrivatePEMFiles(ctx *cli.Context) {
+func CreatePublicPrivatePEMFiles(ctx *cli.Context) error {
+	getEnv()
 	// priv *rsa.PrivateKey;
 	// err error;
 	priv, err := rsa.GenerateKey(rand.Reader, 1024)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return fmt.Errorf("Could not generate key because %s", err)
 	}
+
 	err = priv.Validate()
 	if err != nil {
-		fmt.Println("Validation failed.", err)
+		return fmt.Errorf("Validation failed because %s", err)
 	}
 
 	// Get der format. priv_der []byte
@@ -54,8 +55,7 @@ func CreatePublicPrivatePEMFiles(ctx *cli.Context) {
 	pub := priv.PublicKey
 	pubDer, err := x509.MarshalPKIXPublicKey(&pub)
 	if err != nil {
-		fmt.Println("Failed to get der format for PublicKey.", err)
-		return
+		return fmt.Errorf("Failed to get der format for PublicKey because %s", err)
 	}
 
 	pubBlk := pem.Block{
@@ -67,11 +67,15 @@ func CreatePublicPrivatePEMFiles(ctx *cli.Context) {
 
 	err = ioutil.WriteFile(ctx.String("public-file-path"), []byte(pubPEM), 0644)
 	if err != nil {
-		log.Fatalf("%v", err)
+		return fmt.Errorf("Could not write file because %s", err)
+		os.Exit(1)
 	}
+	fmt.Printf("Written public key to: %s\n", ctx.String("public-file-path"))
 
 	err = ioutil.WriteFile(ctx.String("private-file-path"), []byte(privPEM), 0644)
 	if err != nil {
-		log.Fatalf("%v", err)
+		return fmt.Errorf("Could not write file because %s", err)
 	}
+	fmt.Printf("Written private key to: %s\n", ctx.String("private-file-path"))
+	return nil
 }

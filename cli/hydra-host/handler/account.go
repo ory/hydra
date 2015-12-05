@@ -5,10 +5,9 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/howeyc/gopass"
 	"github.com/pborman/uuid"
-	"log"
 )
 
-type User struct {
+type Account struct {
 	Ctx *Context
 }
 
@@ -28,10 +27,10 @@ func getPassword() (password string) {
 	return
 }
 
-func (c *User) Create(ctx *cli.Context) {
+func (c *Account) Create(ctx *cli.Context) error {
 	email := ctx.Args().First()
 	if email == "" {
-		log.Fatalf("Please provide an email address.")
+		return fmt.Errorf("Please provide an email address.")
 	}
 	password := ctx.String("password")
 	if password == "" {
@@ -41,15 +40,15 @@ func (c *User) Create(ctx *cli.Context) {
 	c.Ctx.Start()
 	user, err := c.Ctx.Accounts.Create(uuid.New(), email, password, "{}")
 	if err != nil {
-		log.Fatalf("%s", err)
+		return fmt.Errorf("Could not create account because %s", err)
 	}
 
-	fmt.Printf(`Created user as "%s".`+"\n", user.GetID())
-
+	fmt.Printf(`Created account as "%s".`+"\n", user.GetID())
 	if ctx.Bool("as-superuser") {
 		if err := c.Ctx.Policies.Create(superUserPolicy(user.GetID())); err != nil {
-			log.Fatalf("%s", err)
+			return fmt.Errorf("Could not create policy for account because %s", err)
 		}
-		fmt.Printf(`Granted superuser privileges to user "%s".`+"\n", user.GetID())
+		fmt.Printf(`Granted superuser privileges to account "%s".`+"\n", user.GetID())
 	}
+	return nil
 }

@@ -19,7 +19,6 @@ import (
 	"encoding/pem"
 	"fmt"
 	"github.com/codegangsta/cli"
-	"log"
 	"math/big"
 	"net"
 	"os"
@@ -54,7 +53,8 @@ func pemBlockForKey(priv interface{}) *pem.Block {
 	}
 }
 
-func CreateDummyTLSCert(ctx *cli.Context) {
+func CreateDummyTLSCert(ctx *cli.Context) error {
+	getEnv()
 	var (
 		host       = ctx.String("host")
 		validFrom  = ctx.String("start-date")
@@ -65,7 +65,7 @@ func CreateDummyTLSCert(ctx *cli.Context) {
 	)
 
 	if len(host) == 0 {
-		log.Fatalf("Missing required --host parameter")
+		return fmt.Errorf("Missing required --host parameter")
 	}
 
 	var priv interface{}
@@ -82,11 +82,11 @@ func CreateDummyTLSCert(ctx *cli.Context) {
 	case "P521":
 		priv, err = ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
 	default:
-		fmt.Fprintf(os.Stderr, "Unrecognized elliptic curve: %q", ecdsaCurve)
+		return fmt.Errorf("Unrecognized elliptic curve: %q", ecdsaCurve)
 		os.Exit(1)
 	}
 	if err != nil {
-		log.Fatalf("failed to generate private key: %s", err)
+		return fmt.Errorf("failed to generate private key: %s", err)
 	}
 
 	var notBefore time.Time
@@ -95,8 +95,7 @@ func CreateDummyTLSCert(ctx *cli.Context) {
 	} else {
 		notBefore, err = time.Parse("Jan 2 15:04:05 2006", validFrom)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Failed to parse creation date: %s\n", err)
-			os.Exit(1)
+			return fmt.Errorf("Failed to parse creation date: %s\n", err)
 		}
 	}
 
@@ -105,7 +104,7 @@ func CreateDummyTLSCert(ctx *cli.Context) {
 	serialNumberLimit := new(big.Int).Lsh(big.NewInt(1), 128)
 	serialNumber, err := rand.Int(rand.Reader, serialNumberLimit)
 	if err != nil {
-		log.Fatalf("failed to generate serial number: %s", err)
+		return fmt.Errorf("failed to generate serial number: %s", err)
 	}
 
 	template := x509.Certificate{
@@ -137,24 +136,25 @@ func CreateDummyTLSCert(ctx *cli.Context) {
 
 	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, publicKey(priv), priv)
 	if err != nil {
-		log.Fatalf("Failed to create certificate: %s", err)
+		return fmt.Errorf("Failed to create certificate: %s", err)
 	}
 
 	certOut, err := os.Create(ctx.String("certificate-file-path"))
 	if err != nil {
-		log.Fatalf("failed to open cert.pem for writing: %s", err)
+		return fmt.Errorf("failed to open cert.pem for writing: %s", err)
 	}
 	pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: derBytes})
 	certOut.Close()
-	log.Printf("written %s\n", ctx.String("certificate-file-path"))
+	fmt.Printf("Written certificate to: %s\n", ctx.String("certificate-file-path"))
 
 	keyOut, err := os.OpenFile(ctx.String("key-file-path"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
-		log.Print("failed to open key.pem for writing:", err)
-		return
+		return fmt.Errorf("failed to open key.pem for writing:", err)
 	}
 	pem.Encode(keyOut, pemBlockForKey(priv))
 	keyOut.Close()
-	log.Printf("written %s\n", ctx.String("key-file-path"))
-	log.Println("DO NOT use these files in production!\n")
+	fmt.Printf("Written key to: %s\n", ctx.String("key-file-path"))
+	fmt.Println("DO NOT use these files in production!")
+
+	return nil
 }

@@ -232,16 +232,16 @@ To generate files *rs256-private.pem* and *rs256-public.pem* in the current dire
 
 ```
 NAME:
-   hydra-host jwt create-keypair - Create a JWT PEM keypair.
+   hydra-host jwt generate-keypair - Create a JWT PEM keypair.
 
    You can use these files by providing the environment variables JWT_PRIVATE_KEY_PATH and JWT_PUBLIC_KEY_PATH
 
 USAGE:
-   hydra-host jwt create-keypair [command options] [arguments...]
+   hydra-host jwt generate-keypair [command options] [arguments...]
 
 OPTIONS:
-   -i, --private-file-path "rs256-private.pem"  Where to save the private key PEM file
-   -u, --public-file-path "rs256-public.pem"    Where to save the private key PEM file
+   -s, --private-file-path "rs256-private.pem"  Where to save the private key PEM file
+   -p, --public-file-path "rs256-public.pem"    Where to save the private key PEM file
 
 ```
 
@@ -249,12 +249,12 @@ OPTIONS:
 
 ```
 NAME:
-   hydra-host tls create-dummy-certificate - Create a dummy TLS certificate and private key.
+   hydra-host tls generate-dummy-certificate - Create a dummy TLS certificate and private key.
 
    You can use these files (in development!) by providing the environment variables TLS_CERT_PATH and TLS_KEY_PATH
 
 USAGE:
-   hydra-host tls create-dummy-certificate [command options] [arguments...]
+   hydra-host tls generate-dummy-certificate [command options] [arguments...]
 
 OPTIONS:
    -c, --certificate-file-path "tls-cert.pem"   Where to save the private key PEM file

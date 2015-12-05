@@ -13,29 +13,29 @@ import (
 
 var schemas = []string{
 	`CREATE TABLE IF NOT EXISTS ladon_policy (
-		id           text NOT NULL PRIMARY KEY,
+		id           uuid NOT NULL PRIMARY KEY,
 		description  text DEFAULT '',
 		created_at   timestamp DEFAULT NOW(),
-		previous	 text NULL,
+		previous	 uuid NULL REFERENCES ladon_policy (id) ON DELETE CASCADE,
 		effect       text NOT NULL CHECK (effect='allow' OR effect='deny'),
 		conditions 	 json DEFAULT '[]'
 	)`,
 	`CREATE TABLE IF NOT EXISTS ladon_policy_subject (
     	compiled text NOT NULL,
     	template text NOT NULL,
-    	policy text NOT NULL REFERENCES ladon_policy (id) ON DELETE CASCADE,
+    	policy uuid NOT NULL REFERENCES ladon_policy (id) ON DELETE CASCADE,
     	PRIMARY KEY (template, policy)
 	)`,
 	`CREATE TABLE IF NOT EXISTS ladon_policy_permission (
     	compiled text NOT NULL,
     	template text NOT NULL,
-    	policy text NOT NULL REFERENCES ladon_policy (id) ON DELETE CASCADE,
+    	policy uuid NOT NULL REFERENCES ladon_policy (id) ON DELETE CASCADE,
     	PRIMARY KEY (template, policy)
 	)`,
 	`CREATE TABLE IF NOT EXISTS ladon_policy_resource (
     	compiled text NOT NULL,
     	template text NOT NULL,
-    	policy text NOT NULL REFERENCES ladon_policy (id) ON DELETE CASCADE,
+    	policy uuid NOT NULL REFERENCES ladon_policy (id) ON DELETE CASCADE,
     	PRIMARY KEY (template, policy)
 	)`,
 }
@@ -97,13 +97,8 @@ func (s *Store) Get(id string) (Policy, error) {
 		return nil, errors.New(err)
 	}
 
-	var cs []DefaultCondition
-	if err := json.Unmarshal(conditions, &cs); err != nil {
+	if err := json.Unmarshal(conditions, &p.Conditions); err != nil {
 		return nil, errors.New(err)
-	}
-
-	for _, v := range cs {
-		p.Conditions = append(p.Conditions, &v)
 	}
 
 	subjects, err := getLinked(s.db, "ladon_policy_subject", id)

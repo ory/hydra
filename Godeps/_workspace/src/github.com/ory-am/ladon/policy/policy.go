@@ -34,13 +34,13 @@ type Policy interface {
 }
 
 type DefaultPolicy struct {
-	ID          string      `json:"id"`
-	Description string      `json:"description"`
-	Subjects    []string    `json:"subjects"`
-	Effect      string      `json:"effect"`
-	Resources   []string    `json:"resources"`
-	Permissions []string    `json:"permissions"`
-	Conditions  []Condition `json:"conditions"`
+	ID          string             `json:"id"`
+	Description string             `json:"description"`
+	Subjects    []string           `json:"subjects"`
+	Effect      string             `json:"effect"`
+	Resources   []string           `json:"resources"`
+	Permissions []string           `json:"permissions"`
+	Conditions  []DefaultCondition `json:"conditions"`
 }
 
 func (p *DefaultPolicy) GetID() string {
@@ -72,7 +72,11 @@ func (p *DefaultPolicy) GetPermissions() []string {
 }
 
 func (p *DefaultPolicy) GetConditions() []Condition {
-	return p.Conditions
+	cons := make([]Condition, len(p.Conditions))
+	for k, v := range p.Conditions {
+		cons[k] = &v
+	}
+	return cons
 }
 
 func (p *DefaultPolicy) GetEndDelimiter() byte {

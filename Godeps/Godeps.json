@@ -103,11 +103,11 @@
 		},
 		{
 			"ImportPath": "github.com/ory-am/ladon/guard",
-			"Rev": "fbcecbeec4d597b4bfbfe4c5cb2a76e5558dd1ba"
+			"Rev": "394744a25a2b66eb662b8b5c56026d300042fc40"
 		},
 		{
 			"ImportPath": "github.com/ory-am/ladon/policy",
-			"Rev": "fbcecbeec4d597b4bfbfe4c5cb2a76e5558dd1ba"
+			"Rev": "394744a25a2b66eb662b8b5c56026d300042fc40"
 		},
 		{
 			"ImportPath": "github.com/ory-am/osin-storage/storage",

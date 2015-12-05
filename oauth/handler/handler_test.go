@@ -89,7 +89,7 @@ func TestMain(m *testing.M) {
 		Subjects:    []string{},
 		Permissions: []string{"authorize"},
 		Resources:   []string{"/oauth2/authorize"},
-		Conditions:  []policy.Condition{},
+		Conditions:  []policy.DefaultCondition{},
 	}
 
 	if err := osinStore.CreateClient(&osin.DefaultClient{"1", "secret", "/callback", ""}); err != nil {

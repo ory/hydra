@@ -88,8 +88,8 @@ var cases = []test{
 		token:   &jwt.Token{Valid: true},
 		owner:   "max",
 		policies: []Policy{
-			&DefaultPolicy{"", "", []string{"<.*>"}, AllowAccess, []string{"/articles/74251"}, []string{"get"}, []Condition{
-				&DefaultCondition{Operator: "SubjectIsOwner"},
+			&DefaultPolicy{"", "", []string{"<.*>"}, AllowAccess, []string{"/articles/74251"}, []string{"get"}, []DefaultCondition{
+				{Operator: "SubjectIsOwner"},
 			}},
 		},
 		resource: "/articles/74251", permission: "get",
@@ -100,8 +100,8 @@ var cases = []test{
 		token:   &jwt.Token{Valid: true},
 		owner:   "max",
 		policies: []Policy{
-			&DefaultPolicy{"", "", []string{"<.*>"}, AllowAccess, []string{"/articles/74251"}, []string{"get"}, []Condition{
-				&DefaultCondition{Operator: "SubjectIsNotOwner"},
+			&DefaultPolicy{"", "", []string{"<.*>"}, AllowAccess, []string{"/articles/74251"}, []string{"get"}, []DefaultCondition{
+				{Operator: "SubjectIsNotOwner"},
 			}},
 		},
 		resource: "/articles/74251", permission: "get",
@@ -112,8 +112,8 @@ var cases = []test{
 		token:   &jwt.Token{Valid: true},
 		owner:   "max",
 		policies: []Policy{
-			&DefaultPolicy{"", "", []string{"<.*>"}, AllowAccess, []string{"/articles/74251"}, []string{"get"}, []Condition{
-				&DefaultCondition{Operator: "ThisOperatorDoesNotExist"},
+			&DefaultPolicy{"", "", []string{"<.*>"}, AllowAccess, []string{"/articles/74251"}, []string{"get"}, []DefaultCondition{
+				{Operator: "ThisOperatorDoesNotExist"},
 			}},
 		},
 		resource: "/articles/74251", permission: "get",

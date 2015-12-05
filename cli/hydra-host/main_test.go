@@ -12,12 +12,24 @@ import (
 	"io"
 	"log"
 	"time"
+	"database/sql"
+	_ "github.com/lib/pq"
 )
 
 var tmpDir = os.TempDir()
 
 func TestMain(m *testing.M) {
 	if c, err := dockertest.ConnectToPostgreSQL(15, time.Second, func(url string) bool {
+		db, err := sql.Open("postgres", url)
+		if err != nil {
+			log.Printf("Could not connect to database because %s", err)
+			return false
+		} else if err := db.Ping(); err != nil {
+			log.Printf("Could not ping database because %s", err)
+			return false
+		}
+
+		// Database is now available, let's continue!
 		os.Setenv("DATABASE_URL", url)
 		if env.Getenv("DATABASE_URL", "") != url {
 			log.Fatalf("Could not set DATABASE_URL environment variable: %s != %s", env.Getenv("DATABASE_URL", ""), url)

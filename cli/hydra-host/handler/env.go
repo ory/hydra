@@ -10,9 +10,9 @@ import (
 )
 
 var (
-	listenOn, bcryptWorkFactor, databaseURL, jwtPrivateKeyPath, jwtPublicKeyPath, tlsKeyPath, tlsCertPath string
-	providers                                                                                             []provider.Provider
-	locations                                                                                             map[string]string
+	listenOn, forceHTTP, bcryptWorkFactor, databaseURL, jwtPrivateKeyPath, jwtPublicKeyPath, tlsKeyPath, tlsCertPath string
+	providers                                                                                                        []provider.Provider
+	locations                                                                                                        map[string]string
 )
 
 func getEnv() {
@@ -31,6 +31,7 @@ func getEnv() {
 	}
 	bcryptWorkFactor = env.Getenv("BCRYPT_WORKFACTOR", "10")
 	databaseURL = env.Getenv("DATABASE_URL", "")
+	forceHTTP = env.Getenv("DANGEROUSLY_FORCE_HTTP", "")
 	locations = map[string]string{
 		"signUp": env.Getenv("SIGNUP_URL", ""),
 		"signIn": env.Getenv("SIGNIN_URL", ""),

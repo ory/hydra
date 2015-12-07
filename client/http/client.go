@@ -2,7 +2,6 @@ package http
 
 import (
 	"bytes"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"github.com/RangelReale/osin"
@@ -20,29 +19,19 @@ var isAllowed struct {
 	Allowed bool `json:"allowed"`
 }
 
-type client struct {
-	ep               string
-	token            *oauth2.Token
-	skipVerification bool
+type HTTPClient struct {
+	ep          string
+	clientToken *oauth2.Token
 }
 
-func New(endpoint string, token *oauth2.Token) Client {
-	return &client{
-		ep:               endpoint,
-		token:            token,
-		skipVerification: true,
+func New(endpoint string, token *oauth2.Token) *HTTPClient {
+	return &HTTPClient{
+		ep:          endpoint,
+		clientToken: token,
 	}
 }
 
-func (c *client) SkipCertificateAuthorityCheck() {
-	c.skipVerification = true
-}
-
-func (c *client) CheckCertificateAuthority() {
-	c.skipVerification = false
-}
-
-func (c *client) IsRequestAllowed(req *http.Request, resource, permission, owner string) (bool, error) {
+func (c *HTTPClient) IsRequestAllowed(req *http.Request, resource, permission, owner string) (bool, error) {
 	var token *osin.BearerAuth
 	if token = osin.CheckBearerAuth(req); token == nil {
 		token = &osin.BearerAuth{}
@@ -52,14 +41,9 @@ func (c *client) IsRequestAllowed(req *http.Request, resource, permission, owner
 	return c.IsAllowed(&AuthorizeRequest{Token: token.Code, Resource: resource, Permission: permission, Context: env.Ctx()})
 }
 
-func (c *client) IsAllowed(ar *AuthorizeRequest) (bool, error) {
+func (c *HTTPClient) IsAllowed(ar *AuthorizeRequest) (bool, error) {
 	request := gorequest.New()
-	request.Client.Transport = &http.Transport{
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: c.skipVerification,
-		},
-	}
-	resp, body, errs := request.Post(c.ep+"/guard/allowed").Set("Authorization", c.token.Type()+" "+c.token.AccessToken).Send(ar).End()
+	resp, body, errs := request.Post(c.ep+"/guard/allowed").Set("Authorization", c.clientToken.Type()+" "+c.clientToken.AccessToken).Send(ar).End()
 	if len(errs) > 0 {
 		return false, fmt.Errorf("Got errors: %v", errs)
 	} else if resp.StatusCode != http.StatusOK {
@@ -76,23 +60,16 @@ func (c *client) IsAllowed(ar *AuthorizeRequest) (bool, error) {
 	return isAllowed.Allowed, nil
 }
 
-func (c *client) IsAuthenticated(token string) (bool, error) {
+func (c *HTTPClient) IsAuthenticated(token string) (bool, error) {
 	data := url.Values{}
-	client := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: c.skipVerification,
-			},
-		},
-	}
-
+	client := &http.Client{}
 	data.Set("token", token)
 	r, err := http.NewRequest("POST", c.ep+"/oauth2/introspect", bytes.NewBufferString(data.Encode()))
 	if err != nil {
 		return false, err
 	}
 
-	r.Header.Add("Authorization", c.token.Type()+" "+c.token.AccessToken)
+	r.Header.Add("Authorization", c.clientToken.Type()+" "+c.clientToken.AccessToken)
 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 	resp, err := client.Do(r)

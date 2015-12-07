@@ -77,6 +77,12 @@ func (c *Core) Start(ctx *cli.Context) error {
 	c.clientHandler.SetRoutes(router, extractor)
 	c.oauthHandler.SetRoutes(router, extractor)
 
+	if forceHTTP == "force" {
+		http.Handle("/", router)
+		http.ListenAndServe(listenOn, nil)
+		return nil
+	}
+
 	http.Handle("/", router)
 	srv := &http.Server{
 		Addr: listenOn,

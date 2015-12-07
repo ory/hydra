@@ -2,6 +2,7 @@ package http
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"github.com/RangelReale/osin"
@@ -15,20 +16,30 @@ import (
 	"strconv"
 )
 
+var isAllowed struct {
+	Allowed bool `json:"allowed"`
+}
+
 type client struct {
-	ep    string
-	token *oauth2.Token
+	ep               string
+	token            *oauth2.Token
+	skipVerification bool
 }
 
 func New(endpoint string, token *oauth2.Token) Client {
 	return &client{
-		ep:    endpoint,
-		token: token,
+		ep:               endpoint,
+		token:            token,
+		skipVerification: true,
 	}
 }
 
-var isAllowed struct {
-	Allowed bool `json:"allowed"`
+func (c *client) SkipCertificateAuthorityCheck() {
+	c.skipVerification = true
+}
+
+func (c *client) CheckCertificateAuthority() {
+	c.skipVerification = false
 }
 
 func (c *client) IsRequestAllowed(req *http.Request, resource, permission, owner string) (bool, error) {
@@ -43,6 +54,11 @@ func (c *client) IsRequestAllowed(req *http.Request, resource, permission, owner
 
 func (c *client) IsAllowed(ar *AuthorizeRequest) (bool, error) {
 	request := gorequest.New()
+	request.Client.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: c.skipVerification,
+		},
+	}
 	resp, body, errs := request.Post(c.ep+"/guard/allowed").Set("Authorization", c.token.Type()+" "+c.token.AccessToken).Send(ar).End()
 	if len(errs) > 0 {
 		return false, fmt.Errorf("Got errors: %v", errs)
@@ -62,23 +78,29 @@ func (c *client) IsAllowed(ar *AuthorizeRequest) (bool, error) {
 
 func (c *client) IsAuthenticated(token string) (bool, error) {
 	data := url.Values{}
-	data.Set("token", token)
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: c.skipVerification,
+			},
+		},
+	}
 
-	client := &http.Client{}
+	data.Set("token", token)
 	r, err := http.NewRequest("POST", c.ep+"/oauth2/introspect", bytes.NewBufferString(data.Encode()))
 	if err != nil {
 		return false, err
 	}
+
 	r.Header.Add("Authorization", c.token.Type()+" "+c.token.AccessToken)
 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
-
 	resp, err := client.Do(r)
 	if err != nil {
 		return false, err
 	}
-	defer resp.Body.Close()
 
+	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		return false, fmt.Errorf("Got status code %s", resp.StatusCode)
 	}
@@ -86,6 +108,7 @@ func (c *client) IsAuthenticated(token string) (bool, error) {
 	var introspect struct {
 		Active bool `json:"active"`
 	}
+
 	if err := json.NewDecoder(resp.Body).Decode(&introspect); err != nil {
 		return false, err
 	}

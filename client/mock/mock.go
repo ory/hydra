@@ -25,6 +25,10 @@ func NewAlwaysFalse() Client {
 	}
 }
 
+func (c *client) SkipCertificateAuthorityCheck() {}
+
+func (c *client) CheckCertificateAuthority() {}
+
 func (c *client) IsRequestAllowed(req *http.Request, resource, permission, owner string) (bool, error) {
 	return c.result, c.err
 }

@@ -78,6 +78,7 @@ func (c *Core) Start(ctx *cli.Context) error {
 	c.connectionHandler.SetRoutes(router, extractor)
 	c.clientHandler.SetRoutes(router, extractor)
 	c.oauthHandler.SetRoutes(router, extractor)
+	c.policyHandler.SetRoutes(router, extractor)
 
 	if forceHTTP == "force" {
 		http.Handle("/", router)

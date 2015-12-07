@@ -15,6 +15,12 @@ comes with tools to generate TLS and RS256 PEM files, leaving you with almost ze
 *Please be aware that Hydra is not ready for production just yet and has not been tested on a production system.
 If time schedule holds, we will use it in production in Q1 2016 for an awesome business app that has yet to be revealed.*
 
+Current status:
+
+- Development: 90% of principal components
+- HTTP API: 70% (in review)
+- Real world use: 10%
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**

@@ -5,6 +5,8 @@ import (
 	"github.com/ory-am/common/env"
 	"github.com/ory-am/hydra/oauth/provider"
 	"github.com/ory-am/hydra/oauth/provider/dropbox"
+	"os"
+	"path"
 )
 
 var (
@@ -33,8 +35,8 @@ func getEnv() {
 		"signUp": env.Getenv("SIGNUP_URL", ""),
 		"signIn": env.Getenv("SIGNIN_URL", ""),
 	}
-	jwtPrivateKeyPath = env.Getenv("JWT_PRIVATE_KEY_PATH", "../../example/cert/rs256-private.pem")
-	jwtPublicKeyPath = env.Getenv("JWT_PUBLIC_KEY_PATH", "../../example/cert/rs256-public.pem")
-	tlsKeyPath = env.Getenv("TLS_KEY_PATH", "../../example/cert/tls-key.pem")
-	tlsCertPath = env.Getenv("TLS_CERT_PATH", "../../example/cert/tls-cert.pem")
+	jwtPrivateKeyPath = env.Getenv("JWT_PRIVATE_KEY_PATH", path.Join(os.Getenv("GOPATH"), "src", "github.com", "ory-am", "hydra", "example", "cert", "rs256-private.pem"))
+	jwtPublicKeyPath = env.Getenv("JWT_PUBLIC_KEY_PATH", path.Join(os.Getenv("GOPATH"), "src", "github.com", "ory-am", "hydra", "example", "cert", "rs256-public.pem"))
+	tlsKeyPath = env.Getenv("TLS_KEY_PATH", path.Join(os.Getenv("GOPATH"), "src", "github.com", "ory-am", "hydra", "example", "cert", "tls-key.pem"))
+	tlsCertPath = env.Getenv("TLS_CERT_PATH", path.Join(os.Getenv("GOPATH"), "src", "github.com", "ory-am", "hydra", "example", "cert", "tls-cert.pem"))
 }

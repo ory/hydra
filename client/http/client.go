@@ -34,7 +34,9 @@ func New(endpoint string, token *oauth2.Token) *HTTPClient {
 func (c *HTTPClient) IsRequestAllowed(req *http.Request, resource, permission, owner string) (bool, error) {
 	var token *osin.BearerAuth
 	if token = osin.CheckBearerAuth(req); token == nil {
-		token = &osin.BearerAuth{}
+		return false, errors.New("No token given.")
+	} else if token.Code == "" {
+		return false, errors.New("No token given.")
 	}
 	env := middleware.NewEnv(req)
 	env.Owner(owner)
@@ -43,19 +45,19 @@ func (c *HTTPClient) IsRequestAllowed(req *http.Request, resource, permission, o
 
 func (c *HTTPClient) IsAllowed(ar *AuthorizeRequest) (bool, error) {
 	request := gorequest.New()
-	resp, body, errs := request.Post(c.ep+"/guard/allowed").Set("Authorization", c.clientToken.Type()+" "+c.clientToken.AccessToken).Send(ar).End()
+	resp, body, errs := request.Post(c.ep+"/guard/allowed").Set("Authorization", c.clientToken.Type()+" "+c.clientToken.AccessToken).Set("Content-Type", "application/json").Send(*ar).End()
 	if len(errs) > 0 {
-		return false, fmt.Errorf("Got errors: %v", errs)
+		return false, errors.Errorf("Got errors: %v", errs)
 	} else if resp.StatusCode != http.StatusOK {
-		return false, fmt.Errorf("Got status code %s", resp.StatusCode)
+		return false, errors.Errorf("Status code %d is not 200: %s", resp.StatusCode, body)
 	}
 
 	if err := json.Unmarshal([]byte(body), &isAllowed); err != nil {
-		return false, err
+		return false, errors.Errorf("Could not unmarshall body because %s", err.Error())
 	}
 
 	if !isAllowed.Allowed {
-		return false, errors.New("Authroization denied.")
+		return false, errors.New("Authroization denied")
 	}
 	return isAllowed.Allowed, nil
 }
@@ -79,7 +81,7 @@ func (c *HTTPClient) IsAuthenticated(token string) (bool, error) {
 
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return false, fmt.Errorf("Got status code %s", resp.StatusCode)
+		return false, fmt.Errorf("Status code %d is not 200", resp.StatusCode)
 	}
 
 	var introspect struct {
@@ -91,7 +93,7 @@ func (c *HTTPClient) IsAuthenticated(token string) (bool, error) {
 	}
 
 	if !introspect.Active {
-		return false, errors.New("Authentication denied.")
+		return false, errors.New("Authentication denied")
 	}
 	return introspect.Active, nil
 }

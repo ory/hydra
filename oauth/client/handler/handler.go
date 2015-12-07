@@ -3,7 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/arekkas/osin"
+	"github.com/RangelReale/osin"
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/mux"
 	chd "github.com/ory-am/common/handler"
@@ -34,7 +34,7 @@ func NewHandler(s storage.Storage, m middleware.Middleware) *Handler {
 type payload struct {
 	ID           string `json:"id,omitempty" `
 	Secret       string `json:"secret,omitempty"`
-	RedirectURIs string `valid:"required", json:"redirectURIs"`
+	RedirectURIs string `valid:"required" json:"redirectURIs"`
 }
 
 func (h *Handler) SetRoutes(r *mux.Router, extractor func(h chd.ContextHandler) chd.ContextHandler) {

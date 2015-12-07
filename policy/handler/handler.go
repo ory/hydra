@@ -86,7 +86,7 @@ func (h *Handler) Granted(ctx context.Context, rw http.ResponseWriter, req *http
 	var p GrantedPayload
 	decoder := json.NewDecoder(req.Body)
 	if err := decoder.Decode(&p); err != nil {
-		pkg.HttpError(rw, err, http.StatusBadRequest)
+		pkg.HttpError(rw, errors.New(err), http.StatusBadRequest)
 		return
 	}
 

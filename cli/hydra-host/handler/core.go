@@ -1,6 +1,7 @@
 package handler
 
 import (
+	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
 	"github.com/gorilla/mux"
 	accounts "github.com/ory-am/hydra/account/handler"
@@ -82,17 +83,17 @@ func (c *Core) Start(ctx *cli.Context) error {
 
 	if forceHTTP == "force" {
 		http.Handle("/", router)
-		http.ListenAndServe(listenOn, nil)
+		log.Warn("You're using HTTP without TLS encryption. This is dangerously unsafe and you should not do this.")
+		if err := http.ListenAndServe(listenOn, nil); err != nil {
+			return fmt.Errorf("Could not serve HTTP server because %s", err)
+		}
 		return nil
 	}
 
 	http.Handle("/", router)
-	srv := &http.Server{
-		Addr: listenOn,
-	}
+	srv := &http.Server{Addr: listenOn}
 	http2.ConfigureServer(srv, &http2.Server{})
-	err = srv.ListenAndServeTLS(tlsCertPath, tlsKeyPath)
-	if err != nil {
+	if err := srv.ListenAndServeTLS(tlsCertPath, tlsKeyPath); err != nil {
 		return fmt.Errorf("Could not serve HTTP/2 server because %s", err)
 	}
 	return nil

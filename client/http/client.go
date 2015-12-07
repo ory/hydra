@@ -2,6 +2,7 @@ package http
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"github.com/RangelReale/osin"
@@ -15,20 +16,40 @@ import (
 	"strconv"
 )
 
+var isAllowed struct {
+	Allowed bool `json:"allowed"`
+}
+
 type client struct {
-	ep    string
-	token *oauth2.Token
+	ep               string
+	token            *oauth2.Token
+	skipVerification bool
 }
 
 func New(endpoint string, token *oauth2.Token) Client {
 	return &client{
-		ep:    endpoint,
-		token: token,
+		ep:               endpoint,
+		token:            token,
+		skipVerification: true,
 	}
 }
 
-var isAllowed struct {
-	Allowed bool `json:"allowed"`
+func (c *client) newRequest() *gorequest.SuperAgent {
+	request := gorequest.New()
+	request.Client.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+	}
+	return request
+}
+
+func (c *client) SkipCertificateAuthorityCheck() {
+	c.skipVerification = true
+}
+
+func (c *client) CheckCertificateAuthority() {
+	c.skipVerification = false
 }
 
 func (c *client) IsRequestAllowed(req *http.Request, resource, permission, owner string) (bool, error) {
@@ -42,7 +63,7 @@ func (c *client) IsRequestAllowed(req *http.Request, resource, permission, owner
 }
 
 func (c *client) IsAllowed(ar *AuthorizeRequest) (bool, error) {
-	request := gorequest.New()
+	request := c.newRequest()
 	resp, body, errs := request.Post(c.ep+"/guard/allowed").Set("Authorization", c.token.Type()+" "+c.token.AccessToken).Send(ar).End()
 	if len(errs) > 0 {
 		return false, fmt.Errorf("Got errors: %v", errs)

@@ -13,6 +13,8 @@ type AuthorizeRequest struct {
 }
 
 type Client interface {
+	SkipCertificateAuthorityCheck()
+	CheckCertificateAuthority()
 	IsAllowed(ar *AuthorizeRequest) (bool, error)
 	IsRequestAllowed(req *http.Request, resource, permission, owner string) (bool, error)
 	IsAuthenticated(token string) (bool, error)

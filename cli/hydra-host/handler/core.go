@@ -49,10 +49,12 @@ func (c *Core) Start(ctx *cli.Context) error {
 
 	j := jwt.New(private, public)
 	m := middleware.New(c.Ctx.Policies, j)
+	c.guard = new(guard.Guard)
 	c.accountHandler = accounts.NewHandler(c.Ctx.Accounts, m)
 	c.clientHandler = clients.NewHandler(c.Ctx.Osins, m)
 	c.connectionHandler = connections.NewHandler(c.Ctx.Connections, m)
 	c.providers = provider.NewRegistry(providers)
+	c.policyHandler = policies.NewHandler(c.Ctx.Policies, m, c.guard, j)
 	c.oauthHandler = &oauth.Handler{
 		Accounts:       c.Ctx.Accounts,
 		Policies:       c.Ctx.Policies,

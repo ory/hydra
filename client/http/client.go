@@ -36,6 +36,7 @@ func New(endpoint, client, secret string) *HTTPClient {
 			ClientID:     client,
 			TokenURL:     pkg.JoinURL(endpoint, "oauth2/token"),
 		},
+		clientToken: &oauth2.Token{},
 	}
 }
 
@@ -85,6 +86,8 @@ func isValidAuthenticationRequest(c *HTTPClient, token string, retry bool) (bool
 		var err error
 		if c.clientToken, err = c.clientConfig.Token(oauth2.NoContext); err != nil {
 			return false, errors.New(err)
+		} else if c.clientToken == nil {
+			return false, errors.New("Access token could not be retrieved")
 		}
 		return isValidAuthenticationRequest(c, token, false)
 	} else if resp.StatusCode != http.StatusOK {
@@ -114,6 +117,8 @@ func isValidAuthorizeRequest(c *HTTPClient, ar *AuthorizeRequest, retry bool) (b
 		var err error
 		if c.clientToken, err = c.clientConfig.Token(oauth2.NoContext); err != nil {
 			return false, errors.New(err)
+		} else if c.clientToken == nil {
+			return false, errors.New("Access token could not be retrieved")
 		}
 		log.Printf("Wow, refresd token %s", c.clientToken.AccessToken)
 		return isValidAuthorizeRequest(c, ar, false)

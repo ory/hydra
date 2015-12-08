@@ -153,6 +153,8 @@ The CLI currently requires two environment variables:
 
 | Variable             | Description               | Format                                        | Default   |
 | -------------------- | ------------------------- | --------------------------------------------- | --------- |
+| PORT                 | Which port to listen on   | number                                        | 443       |
+| HOST                 | Which host to listen on   | ip or hostname                                | empty (all) |
 | DATABASE_URL         | PostgreSQL Database URL   | `postgres://user:password@host:port/database` | empty     |
 | BCRYPT_WORKFACTOR    | BCrypt Strength           | number                                        | `10`      |
 | SIGNUP_URL           | [Sign up URL](#sign-up)   | url                                           | empty     |

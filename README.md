@@ -100,7 +100,7 @@ The API is described at [apiary](http://docs.hydra6.apiary.io/#). The API Docume
 
 ### Set up PostgreSQL locally
 
-**On Windows and Max OS X**, download and install [docker-toolbox(https://www.docker.com/docker-toolbox). After starting the *Docker Quickstart Terminal*,
+**On Windows and Max OS X**, download and install [Docker Toolbox](https://www.docker.com/docker-toolbox). After starting the *Docker Quickstart Terminal*,
 do the following:
 
 ```
@@ -130,6 +130,7 @@ For brevity the guide to creating a new database in Postgres has been skipped.*
 ### Run as executable
 
 ```
+> go get -d -v github.com/ory-am/hydra/...
 > go install github.com/ory-am/hydra/cli/hydra-host
 > hydra-host start
 ```
@@ -139,7 +140,7 @@ For brevity the guide to creating a new database in Postgres has been skipped.*
 ### Run from sourcecode
 
 ```
-> go get -u github.com/ory-am/hydra
+> go get -d -v github.com/ory-am/hydra/...
 > # cd to project root, usually in $GOPATH/src/github.com/ory-am/hydra
 > cd cli
 > cd hydra-host
@@ -163,6 +164,7 @@ The CLI currently requires two environment variables:
 | JWT_PRIVATE_KEY_PATH | JWT Signing Private Key   | `./cert/rs256-private.pem` (local path)       | "../../example/cert/rs256-private.pem" |
 | TLS_CERT_PATH        | TLS Certificate Path      | `./cert/cert.pem`                             | "../../example/cert/tls-cert.pem"      |
 | TLS_KEY_PATH         | TLS Key Path              | `./cert/key.pem`                              | "../../example/cert/tls-key.pem"       |
+| DANGEROUSLY_FORCE_HTTP | Disable HTTPS           | `force`                                       | disabled  |
 
 ### CLI Usage
 

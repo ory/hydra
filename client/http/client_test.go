@@ -3,7 +3,6 @@ package http_test
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/RangelReale/osin"
 	"github.com/go-errors/errors"
 	"github.com/gorilla/mux"
 	"github.com/ory-am/common/pkg"
@@ -11,7 +10,6 @@ import (
 	. "github.com/ory-am/hydra/client/http"
 	"github.com/ory-am/hydra/policy/handler"
 	"github.com/ory-am/ladon/guard/operator"
-	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2"
 	"net/http"
@@ -26,7 +24,7 @@ func tokenHandler(rw http.ResponseWriter, req *http.Request) {
 		RefreshToken string `json:"refresh_token"`
 		ExpiresIn    int    `json:"expires_in"`
 	}{
-		AccessToken: uuid.New(),
+		AccessToken: "fetch-token-ok",
 		TokenType:   "Bearer",
 		ExpiresIn:   9600,
 	})
@@ -35,11 +33,15 @@ func tokenHandler(rw http.ResponseWriter, req *http.Request) {
 func TestIsRequestAllowed(t *testing.T) {
 	router := mux.NewRouter()
 	router.HandleFunc("/guard/allowed", func(rw http.ResponseWriter, req *http.Request) {
-		assert.Equal(t, "Bearer foobar", req.Header.Get("Authorization"))
+		if req.Header.Get("Authorization") != "Bearer fetch-token-ok" {
+			http.Error(rw, "", http.StatusUnauthorized)
+			return
+		}
 		pkg.WriteJSON(rw, struct {
 			Allowed bool `json:"allowed"`
 		}{Allowed: true})
 	}).Methods("POST")
+	router.HandleFunc("/oauth2/token", tokenHandler).Methods("POST")
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 
@@ -158,8 +160,12 @@ func TestIsAuthenticatedRetriesOnlyOnceWhenTokenIsExpired(t *testing.T) {
 
 func TestIsAllowed(t *testing.T) {
 	router := mux.NewRouter()
+	router.HandleFunc("/oauth2/token", tokenHandler).Methods("POST")
 	router.HandleFunc("/guard/allowed", func(rw http.ResponseWriter, req *http.Request) {
-		assert.Equal(t, "Bearer foobar", req.Header.Get("Authorization"))
+		if req.Header.Get("Authorization") != "Bearer fetch-token-ok" {
+			http.Error(rw, "", http.StatusUnauthorized)
+			return
+		}
 		var p handler.GrantedPayload
 		decoder := json.NewDecoder(req.Body)
 		if err := decoder.Decode(&p); err != nil {
@@ -180,7 +186,6 @@ func TestIsAllowed(t *testing.T) {
 	defer ts.Close()
 
 	c := New(ts.URL, "irrelevant", "irrelephant")
-	c.SetClientToken(&oauth2.Token{TokenType: "bearer", AccessToken: "foobar"})
 	allowed, err := c.IsAllowed(&AuthorizeRequest{Permission: "foo", Token: "bar", Resource: "res", Context: &operator.Context{Owner: "foo"}})
 	assert.Nil(t, err)
 	assert.True(t, allowed)
@@ -189,11 +194,13 @@ func TestIsAllowed(t *testing.T) {
 func TestIsAuthenticated(t *testing.T) {
 	router := mux.NewRouter()
 	called := false
+	router.HandleFunc("/oauth2/token", tokenHandler).Methods("POST")
 	router.HandleFunc("/oauth2/introspect", func(rw http.ResponseWriter, req *http.Request) {
+		if req.Header.Get("Authorization") != "Bearer fetch-token-ok" {
+			http.Error(rw, "", http.StatusUnauthorized)
+			return
+		}
 		req.ParseForm()
-		bearer := osin.CheckBearerAuth(req)
-		assert.NotNil(t, bearer)
-		assert.NotEmpty(t, bearer.Code)
 		assert.NotEmpty(t, req.Form.Get("token"))
 		pkg.WriteJSON(rw, struct {
 			Active bool `json:"active"`
@@ -204,7 +211,6 @@ func TestIsAuthenticated(t *testing.T) {
 	defer ts.Close()
 
 	c := New(ts.URL, "irrelevant", "irrelephant")
-	c.SetClientToken(&oauth2.Token{TokenType: "bearer", AccessToken: "client"})
 	active, err := c.IsAuthenticated("federated.token")
 	assert.Nil(t, err)
 	assert.True(t, active)

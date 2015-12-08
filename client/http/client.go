@@ -12,7 +12,6 @@ import (
 	"github.com/parnurzeal/gorequest"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -65,6 +64,17 @@ func (c *HTTPClient) IsAuthenticated(token string) (bool, error) {
 }
 
 func isValidAuthenticationRequest(c *HTTPClient, token string, retry bool) (bool, error) {
+	if c.clientToken == nil {
+		if ct, err := c.clientConfig.Token(oauth2.NoContext); err != nil {
+			return false, errors.New(err)
+		} else if ct == nil {
+			return false, errors.New("Access token could not be retrieved")
+		} else {
+			c.clientToken = ct
+		}
+		return isValidAuthenticationRequest(c, token, false)
+	}
+
 	data := url.Values{}
 	client := &http.Client{}
 	data.Set("token", token)
@@ -107,8 +117,17 @@ func isValidAuthenticationRequest(c *HTTPClient, token string, retry bool) (bool
 }
 
 func isValidAuthorizeRequest(c *HTTPClient, ar *AuthorizeRequest, retry bool) (bool, error) {
-	log.Println(c.clientConfig.TokenURL)
-	log.Printf("Getting", pkg.JoinURL(c.ep, "/guard/allowed"))
+	if c.clientToken == nil {
+		if ct, err := c.clientConfig.Token(oauth2.NoContext); err != nil {
+			return false, errors.New(err)
+		} else if ct == nil {
+			return false, errors.New("Access token could not be retrieved")
+		} else {
+			c.clientToken = ct
+		}
+		return isValidAuthorizeRequest(c, ar, false)
+	}
+
 	request := gorequest.New()
 	resp, body, errs := request.Post(pkg.JoinURL(c.ep, "/guard/allowed")).Set("Authorization", c.clientToken.Type()+" "+c.clientToken.AccessToken).Set("Content-Type", "application/json").Send(*ar).End()
 	if len(errs) > 0 {
@@ -120,7 +139,6 @@ func isValidAuthorizeRequest(c *HTTPClient, ar *AuthorizeRequest, retry bool) (b
 		} else if c.clientToken == nil {
 			return false, errors.New("Access token could not be retrieved")
 		}
-		log.Printf("Wow, refresd token %s", c.clientToken.AccessToken)
 		return isValidAuthorizeRequest(c, ar, false)
 	} else if resp.StatusCode != http.StatusOK {
 		return false, errors.Errorf("Status code %d is not 200: %s", resp.StatusCode, body)

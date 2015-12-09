@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"regexp"
+"github.com/pborman/uuid"
 )
 
 var TestCertificates = [][]string{
@@ -155,6 +156,7 @@ func (j *JWT) GenerateAccessToken(data *osin.AccessData, generateRefresh bool) (
 		return
 	}
 
+	claims["id"] = uuid.New()
 	if refreshToken, err = j.SignToken(claims, map[string]interface{}{}); err != nil {
 		return "", "", err
 	}

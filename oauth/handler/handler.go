@@ -124,34 +124,36 @@ func (h *Handler) IntrospectHandler(ctx context.Context, w http.ResponseWriter, 
 
 func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	resp := h.server.NewResponse()
-	r.ParseForm()
 	defer resp.Close()
+
 	if ar := h.server.HandleAccessRequest(resp, r); ar != nil {
 		switch ar.Type {
 		case osin.AUTHORIZATION_CODE:
 			data, ok := ar.UserData.(string)
 			if !ok {
-				http.Error(w, fmt.Sprintf("Could not assert UserData to string: %v", ar.UserData), http.StatusInternalServerError)
-				return
+				log.WithField("UserData", fmt.Sprintf("%v", ar.UserData)).Warn("Could not assert UserData to string")
+			} else {
+				var claims jwt.ClaimsCarrier
+				if err := json.Unmarshal([]byte(data), &claims); err != nil {
+					http.Error(w, fmt.Sprintf("Could not unmarshal UserData: %v", ar.UserData), http.StatusInternalServerError)
+				} else {
+					ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, claims.GetSubject(), h.Audience, time.Now().Add(time.Duration(ar.Expiration)*time.Second), time.Now(), time.Now())
+					ar.Authorized = true
+				}
 			}
-
-			var claims jwt.ClaimsCarrier
-			if err := json.Unmarshal([]byte(data), &claims); err != nil {
-				http.Error(w, fmt.Sprintf("Could not unmarshal UserData: %v", ar.UserData), http.StatusInternalServerError)
-				return
-			}
-
-			ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, claims.GetSubject(), h.Audience, time.Now().Add(time.Duration(ar.Expiration)*time.Second), time.Now(), time.Now())
-			ar.Authorized = true
 		case osin.REFRESH_TOKEN:
-			data, ok := ar.UserData.(map[string]interface{})
+			data, ok := ar.UserData.(string)
 			if !ok {
-				http.Error(w, fmt.Sprintf("Could not assert UserData type: %v", ar.UserData), http.StatusInternalServerError)
-				return
+				http.Error(w, fmt.Sprintf("Could not assert UserData to string: %v", ar.UserData), http.StatusInternalServerError)
+			} else {
+				var claims jwt.ClaimsCarrier
+				if err := json.Unmarshal([]byte(data), &claims); err != nil {
+					http.Error(w, fmt.Sprintf("Could not unmarshal UserData: %v", ar.UserData), http.StatusInternalServerError)
+				} else {
+					ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, claims.GetSubject(), claims.GetAudience(), time.Now().Add(time.Duration(ar.Expiration)*time.Second), time.Now(), time.Now())
+					ar.Authorized = true
+				}
 			}
-			claims := jwt.ClaimsCarrier(data)
-			ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, claims.GetSubject(), h.Audience, time.Now().Add(time.Duration(ar.Expiration)*time.Second), time.Now(), time.Now())
-			ar.Authorized = true
 		case osin.PASSWORD:
 			// TODO if !ar.Client.isAllowedToAuthenticateUser
 			// TODO ... return
@@ -180,7 +182,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 			"code":    resp.StatusCode,
 			"id":      resp.ErrorId,
 			"message": resp.StatusText,
-			"trace":   resp.InternalError,
+			"osinInternalError":   resp.InternalError,
 		}).Warnf("Token request failed.")
 		resp.StatusCode = http.StatusUnauthorized
 	}

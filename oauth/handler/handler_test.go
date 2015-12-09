@@ -37,6 +37,8 @@ import (
 	"strconv"
 	"testing"
 	"time"
+	"github.com/parnurzeal/gorequest"
+	"fmt"
 )
 
 var accID = uuid.New()
@@ -175,6 +177,8 @@ func TestAuthCode(t *testing.T) {
 		token, err := config.Exchange(oauth2.NoContext, callbackURL.Query().Get("code"))
 		require.Nil(t, err)
 		require.NotEmpty(t, token.AccessToken)
+		require.NotEmpty(t, token.RefreshToken)
+		testTokenRefresh(t, ts.URL, config.ClientID, config.ClientSecret, token.RefreshToken, true)
 	}
 }
 
@@ -199,12 +203,32 @@ func TestPasswordGrantType(t *testing.T) {
 	} {
 		config := *c.config
 		config.Endpoint = oauth2.Endpoint{AuthURL: ts.URL + "/oauth2/auth", TokenURL: ts.URL + "/oauth2/token"}
-		_, err := config.PasswordCredentialsToken(oauth2.NoContext, c.user.Username, c.user.Password)
+		token, err := config.PasswordCredentialsToken(oauth2.NoContext, c.user.Username, c.user.Password)
 		if c.pass {
-			assert.Nil(t, err, "Case %d", k)
+			require.Nil(t, err, "Case %d", k)
+			assert.NotEmpty(t, token.AccessToken, "Case %d", k)
+			assert.NotEmpty(t, token.RefreshToken, "Case %d", k)
+			testTokenRefresh(t, ts.URL, config.ClientID, config.ClientSecret, token.RefreshToken, true)
 		} else {
 			assert.NotNil(t, err, "Case %d", k)
 		}
+	}
+}
+
+func testTokenRefresh(t *testing.T, tsURL, clientID, clientSecret string, token string, retry bool) {
+	send := fmt.Sprintf("grant_type=refresh_token&refresh_token=%s", token)
+	resp, body, errs := gorequest.New().Post(tsURL + "/oauth2/token").Type("form").SetBasicAuth(clientID, clientSecret).SendString(send).End()
+	require.Len(t, errs, 0, "%s", errs)
+	require.Equal(t, resp.StatusCode, http.StatusOK, "Body: %s", body)
+	var refresh struct {
+		AccessToken  string `json:"access_token"`
+		RefreshToken string `json:"refresh_token"`
+	}
+	require.Nil(t, json.Unmarshal([]byte(body), &refresh))
+
+	if retry {
+		t.Log("Retrying token refresh")
+		testTokenRefresh(t, tsURL, clientID, clientSecret, refresh.RefreshToken, false)
 	}
 }
 
@@ -314,8 +338,8 @@ func TestIntrospect(t *testing.T) {
 		data.Set("token", c.accessToken)
 
 		client := &http.Client{}
-		req, _ := http.NewRequest("POST", ts.URL+"/oauth2/introspect", bytes.NewBufferString(data.Encode()))
-		req.Header.Add("Authorization", access.Type()+" "+access.AccessToken)
+		req, _ := http.NewRequest("POST", ts.URL + "/oauth2/introspect", bytes.NewBufferString(data.Encode()))
+		req.Header.Add("Authorization", access.Type() + " " + access.AccessToken)
 		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 		req.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 		res, _ := client.Do(req)

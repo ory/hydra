@@ -77,6 +77,7 @@ func TestGenerateAccessToken(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotEmpty(t, at)
 	assert.NotEmpty(t, rt)
+	assert.NotEqual(t, at, rt)
 }
 
 func TestSignAndVerify(t *testing.T) {

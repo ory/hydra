@@ -10,9 +10,9 @@ import (
 )
 
 var (
-	listenOn, forceHTTP, bcryptWorkFactor, databaseURL, jwtPrivateKeyPath, jwtPublicKeyPath, tlsKeyPath, tlsCertPath string
-	providers                                                                                                        []provider.Provider
-	locations                                                                                                        map[string]string
+	listenOn, forceHTTP, schema, bcryptWorkFactor, databaseURL, jwtPrivateKeyPath, jwtPublicKeyPath, tlsKeyPath, tlsCertPath string
+	providers                                                                                                                []provider.Provider
+	locations                                                                                                                map[string]string
 )
 
 func getEnv() {
@@ -21,17 +21,27 @@ func getEnv() {
 		env.Getenv("HOST", ""),
 		env.Getenv("PORT", "4443"),
 	)
+	forceHTTP = env.Getenv("DANGEROUSLY_FORCE_HTTP", "")
+	if forceHTTP == "force" {
+		schema = "http"
+	} else {
+		schema = "https"
+	}
+
 	providers = []provider.Provider{
 		dropbox.New(
 			"dropbox",
 			env.Getenv("DROPBOX_CLIENT", ""),
 			env.Getenv("DROPBOX_SECRET", ""),
-			env.Getenv("DROPBOX_CALLBACK", "http://localhost:8080/oauth2/auth"),
+			env.Getenv("DROPBOX_CALLBACK", fmt.Sprintf("%s://%s/oauth2/auth", schema, fmt.Sprintf(
+				"%s:%s",
+				env.Getenv("HOST", "127.0.0.1"),
+				env.Getenv("PORT", "4443"),
+			))),
 		),
 	}
 	bcryptWorkFactor = env.Getenv("BCRYPT_WORKFACTOR", "10")
 	databaseURL = env.Getenv("DATABASE_URL", "")
-	forceHTTP = env.Getenv("DANGEROUSLY_FORCE_HTTP", "")
 	locations = map[string]string{
 		"signUp": env.Getenv("SIGNUP_URL", ""),
 		"signIn": env.Getenv("SIGNIN_URL", ""),

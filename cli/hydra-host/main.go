@@ -13,7 +13,7 @@ import (
 func errorWrapper(f func(ctx *cli.Context) error) func(ctx *cli.Context) {
 	return func(ctx *cli.Context) {
 		if err := f(ctx); err != nil {
-			fmt.Fprintf(os.Stderr, "An error occurred: %s", err)
+			fmt.Fprintf(os.Stderr, "An error occurred: %s\n", err)
 		}
 	}
 }

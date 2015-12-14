@@ -35,7 +35,7 @@ func (c *Policy) Import(ctx *cli.Context) error {
 			if err := c.Ctx.Policies.Create(&pol); err != nil {
 				return fmt.Errorf(`Could not create policy: %s`, err)
 			}
-			fmt.Printf("Successfully created policy %s.", pol.ID)
+			fmt.Printf("Successfully created policy %s.\n", pol.ID)
 		}
 	}
 	return nil

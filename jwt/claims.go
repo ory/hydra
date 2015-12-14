@@ -8,6 +8,7 @@ import (
 
 type ClaimsCarrier map[string]interface{}
 
+// TODO NewClaimsCarrier should require a request object instead
 func NewClaimsCarrier(id, issuer, subject, audience string, expiresAt, notBefore, issuedAt time.Time) ClaimsCarrier {
 	return ClaimsCarrier{
 		"sub": subject,

@@ -6,14 +6,20 @@ import (
 
 type Session interface {
 	GetRemoteSubject() string
+	GetForcedLocalSubject() string
 	GetExtra() interface{}
 	GetToken() *oauth2.Token
 }
 
 type DefaultSession struct {
-	RemoteSubject string
-	Extra         interface{}
-	Token         *oauth2.Token
+	RemoteSubject     string
+	ForceLocalSubject string
+	Extra             interface{}
+	Token             *oauth2.Token
+}
+
+func (s *DefaultSession) GetForcedLocalSubject() string {
+	return s.ForceLocalSubject
 }
 
 func (s *DefaultSession) GetRemoteSubject() string {

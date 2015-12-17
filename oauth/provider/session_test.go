@@ -9,8 +9,9 @@ import (
 
 func TestDefaultSession(t *testing.T) {
 	token := &oauth2.Token{}
-	s := DefaultSession{RemoteSubject: "subject", Extra: "extra", Token: token}
+	s := DefaultSession{RemoteSubject: "subject", ForceLocalSubject: "subject", Extra: "extra", Token: token}
 	assert.Equal(t, "subject", s.GetRemoteSubject())
+	assert.Equal(t, "subject", s.GetForcedLocalSubject())
 	assert.Equal(t, "extra", s.GetExtra().(string))
 	assert.Equal(t, token, s.GetToken())
 }

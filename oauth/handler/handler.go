@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/RangelReale/osin"
 	log "github.com/Sirupsen/logrus"
-	"github.com/go-errors/errors"
 	"github.com/gorilla/mux"
 	hctx "github.com/ory-am/common/handler"
 	"github.com/ory-am/common/pkg"
@@ -57,6 +56,7 @@ type Handler struct {
 	JWT            *jwt.JWT
 	SignUpLocation string
 	SignInLocation string
+	HostURL        string
 	Middleware     middleware.Middleware
 
 	OAuthConfig *osin.ServerConfig
@@ -179,10 +179,10 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	if resp.IsError {
 		log.WithFields(log.Fields{
-			"code":    resp.StatusCode,
-			"id":      resp.ErrorId,
-			"message": resp.StatusText,
-			"osinInternalError":   resp.InternalError,
+			"code":              resp.StatusCode,
+			"id":                resp.ErrorId,
+			"message":           resp.StatusText,
+			"osinInternalError": resp.InternalError,
 		}).Warnf("Token request failed.")
 		resp.StatusCode = http.StatusUnauthorized
 	}
@@ -210,9 +210,14 @@ func (h *Handler) AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 		// For now, a provider must be given.
 		// TODO there should be a fallback provider which is a redirect to the login endpoint. This should be configurable by env var.
 		// Let's see if this is a valid provider. If not, return an error.
-		provider, err := h.Providers.Find(r.Form.Get("provider"))
+		providerName := r.Form.Get("provider")
+		if r.Form.Get("provider") == "" && h.SignInLocation != "" {
+			providerName = "login"
+		}
+
+		provider, err := h.Providers.Find(providerName)
 		if err != nil {
-			http.Error(w, fmt.Sprintf(`Provider "%s" not known.`, err), http.StatusBadRequest)
+			http.Error(w, fmt.Sprintf(`Provider "%s" not known and no sign in location provided.`, providerName), http.StatusBadRequest)
 			return
 		}
 
@@ -243,9 +248,15 @@ func (h *Handler) AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		subject := session.GetRemoteSubject()
-		user, err := h.Connections.FindByRemoteSubject(provider.GetID(), subject)
-		if err == pkg.ErrNotFound {
+		var conn connection.Connection
+		var acc account.Account
+		if session.GetForcedLocalSubject() != "" {
+			acc, err = h.Accounts.Get(session.GetForcedLocalSubject())
+		} else {
+			conn, err = h.Connections.FindByRemoteSubject(provider.GetID(), session.GetRemoteSubject())
+		}
+
+		if err == pkg.ErrNotFound && conn != nil {
 			// The subject is not linked to any account.
 
 			if h.SignUpLocation == "" {
@@ -260,6 +271,7 @@ func (h *Handler) AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			query := redirect.Query()
+			query.Add("redirect_uri", pkg.JoinURL(h.HostURL, "oauth2/authorize"))
 			query.Add("access_token", session.GetToken().AccessToken)
 			query.Add("refresh_token", session.GetToken().RefreshToken)
 			query.Add("token_type", session.GetToken().TokenType)
@@ -268,7 +280,7 @@ func (h *Handler) AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 			redirect.RawQuery = query.Encode()
 			log.WithFields(log.Fields{
 				"provider": provider.GetID(),
-				"subject":  subject,
+				"subject":  session.GetRemoteSubject(),
 				"redirect": h.SignUpLocation,
 			}).Warnf(`Remote subject is not linked to any local subject. Redirecting to sign up page.`)
 			http.Redirect(w, r, redirect.String(), http.StatusFound)
@@ -279,7 +291,14 @@ func (h *Handler) AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, user.GetLocalSubject(), h.Audience, time.Now().Add(time.Duration(ar.Expiration)*time.Second), time.Now(), time.Now())
+		var localSubject string
+		if conn != nil {
+			localSubject = conn.GetLocalSubject()
+		} else if acc != nil {
+			localSubject = acc.GetID()
+		}
+
+		ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, localSubject, h.Audience, time.Now().Add(time.Duration(ar.Expiration)*time.Second), time.Now(), time.Now())
 		ar.Authorized = true
 		h.server.FinishAuthorizeRequest(resp, r, ar)
 	}
@@ -298,20 +317,21 @@ func (h *Handler) authenticate(w http.ResponseWriter, r *http.Request, email, pa
 		return nil, err
 	}
 
-	policies, err := h.Policies.FindPoliciesForSubject(acc.GetID())
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Could not fetch policies: %s", err.Error()), http.StatusInternalServerError)
-		return nil, err
-	}
-
-	if granted, err := h.Guard.IsGranted("/oauth2/authorize", "authorize", acc.GetID(), policies, middleware.NewEnv(r).Ctx()); !granted {
-		err = errors.Errorf(`Subject "%s" is not allowed to authorize.`, acc.GetID())
-		http.Error(w, err.Error(), http.StatusUnauthorized)
-		return nil, err
-	} else if err != nil {
-		http.Error(w, fmt.Sprintf(`Authorization failed for Subject "%s": %s`, acc.GetID(), err.Error()), http.StatusInternalServerError)
-		return nil, err
-	}
+	// TODO there should be a login policy workflow
+	//	policies, err := h.Policies.FindPoliciesForSubject(acc.GetID())
+	//	if err != nil {
+	//		http.Error(w, fmt.Sprintf("Could not fetch policies: %s", err.Error()), http.StatusInternalServerError)
+	//		return nil, err
+	//	}
+	//
+	//	if granted, err := h.Guard.IsGranted("/oauth2/authorize", "authorize", acc.GetID(), policies, middleware.NewEnv(r).Ctx()); !granted {
+	//		err = errors.Errorf(`Subject "%s" is not allowed to authorize.`, acc.GetID())
+	//		http.Error(w, err.Error(), http.StatusUnauthorized)
+	//		return nil, err
+	//	} else if err != nil {
+	//		http.Error(w, fmt.Sprintf(`Authorization failed for Subject "%s": %s`, acc.GetID(), err.Error()), http.StatusInternalServerError)
+	//		return nil, err
+	//	}
 
 	return acc, nil
 }

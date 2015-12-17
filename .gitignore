@@ -2,3 +2,5 @@
 node_modules/
 *.iml
 *.exe
+.vagrant
+*.log

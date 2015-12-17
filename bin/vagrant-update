@@ -1,0 +1,32 @@
+#!/bin/bash
+
+sudo chown vagrant:vagrant -Rf /home/vagrant
+
+source /etc/environment
+
+echo "Killing previously running hydra-host instances"
+killall hydra-host
+
+# Hydra
+echo "Updating go dependencies..."
+
+## Update dependencies and recompile
+go get -d -u -v github.com/ory-am/hydra/...
+go install github.com/ory-am/hydra/cli/...
+
+## Run hydra
+echo "Start Hydra..."
+
+PORT=9000 \
+HOST_URL=https://localhost:9000 \
+SIGNUP_URL=http://localhost:3001/sign-up \
+SIGNIN_URL=http://localhost:3000/sign-in \
+hydra-host start >> /home/vagrant/go/src/github.com/ory-am/hydra/vagrant.hydra.log 2>&1 &
+
+echo "Hydra started!"
+
+echo "Starting sign up mock server..."
+
+hydra-signup &
+
+echo "Sign up mock server started!"

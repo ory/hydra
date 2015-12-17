@@ -4,11 +4,11 @@ import (
 	"github.com/RangelReale/osin"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-errors/errors"
+	"github.com/pborman/uuid"
 	"io"
 	"io/ioutil"
 	"os"
 	"regexp"
-"github.com/pborman/uuid"
 )
 
 var TestCertificates = [][]string{
@@ -156,6 +156,7 @@ func (j *JWT) GenerateAccessToken(data *osin.AccessData, generateRefresh bool) (
 		return
 	}
 
+	claims = ClaimsCarrier{}
 	claims["id"] = uuid.New()
 	if refreshToken, err = j.SignToken(claims, map[string]interface{}{}); err != nil {
 		return "", "", err

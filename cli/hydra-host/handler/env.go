@@ -3,16 +3,18 @@ package handler
 import (
 	"fmt"
 	"github.com/ory-am/common/env"
+	"github.com/ory-am/common/pkg"
 	"github.com/ory-am/hydra/oauth/provider"
 	"github.com/ory-am/hydra/oauth/provider/dropbox"
+	"github.com/ory-am/hydra/oauth/provider/signin"
 	"os"
 	"path"
 )
 
 var (
-	listenOn, forceHTTP, bcryptWorkFactor, databaseURL, jwtPrivateKeyPath, jwtPublicKeyPath, tlsKeyPath, tlsCertPath string
-	providers                                                                                                        []provider.Provider
-	locations                                                                                                        map[string]string
+	listenOn, forceHTTP, bcryptWorkFactor, databaseURL, jwtPrivateKeyPath, jwtPublicKeyPath, tlsKeyPath, tlsCertPath, hostURL string
+	providers                                                                                                                 []provider.Provider
+	locations                                                                                                                 map[string]string
 )
 
 func getEnv() {
@@ -21,17 +23,23 @@ func getEnv() {
 		env.Getenv("HOST", ""),
 		env.Getenv("PORT", "4443"),
 	)
+	hostURL = env.Getenv("HOST_URL", "https://localhost:4443")
+	forceHTTP = env.Getenv("DANGEROUSLY_FORCE_HTTP", "")
 	providers = []provider.Provider{
 		dropbox.New(
 			"dropbox",
 			env.Getenv("DROPBOX_CLIENT", ""),
 			env.Getenv("DROPBOX_SECRET", ""),
-			env.Getenv("DROPBOX_CALLBACK", "http://localhost:8080/oauth2/auth"),
+			pkg.JoinURL(hostURL, "/oauth2/auth"),
+		),
+		signin.New(
+			"login",
+			env.Getenv("SIGNIN_URL", ""),
+			pkg.JoinURL(hostURL, "/oauth2/auth"),
 		),
 	}
 	bcryptWorkFactor = env.Getenv("BCRYPT_WORKFACTOR", "10")
 	databaseURL = env.Getenv("DATABASE_URL", "")
-	forceHTTP = env.Getenv("DANGEROUSLY_FORCE_HTTP", "")
 	locations = map[string]string{
 		"signUp": env.Getenv("SIGNUP_URL", ""),
 		"signIn": env.Getenv("SIGNIN_URL", ""),

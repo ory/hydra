@@ -155,13 +155,13 @@ The CLI currently requires two environment variables:
 | -------------------- | ------------------------- | --------------------------------------------- | --------- |
 | PORT                 | Which port to listen on   | number                                        | 443       |
 | HOST                 | Which host to listen on   | ip or hostname                                | empty (all) |
+| HOST_URL             | Hydra's host URL          | url                                           | "https://localhost:4443" |
 | DATABASE_URL         | PostgreSQL Database URL   | `postgres://user:password@host:port/database` | empty     |
 | BCRYPT_WORKFACTOR    | BCrypt Strength           | number                                        | `10`      |
 | SIGNUP_URL           | [Sign up URL](#sign-up)   | url                                           | empty     |
 | SIGNIN_URL           | [Sign in URL](#sign-in)   | url                                           | empty     |
 | DROPBOX_CLIENT       | Dropbox Client ID         | string                                        | empty     |
 | DROPBOX_SECRET       | Dropbox Client Secret     | string                                        | empty     |
-| DROPBOX_CALLBACK     | Dropbox Redirect URL      | url                                           | empty     |
 | JWT_PUBLIC_KEY_PATH  | JWT Signing Public Key    | `./cert/rs256-public.pem` (local path)        | "../../example/cert/rs256-public.pem"  |
 | JWT_PRIVATE_KEY_PATH | JWT Signing Private Key   | `./cert/rs256-private.pem` (local path)       | "../../example/cert/rs256-private.pem" |
 | TLS_CERT_PATH        | TLS Certificate Path      | `./cert/cert.pem`                             | "../../example/cert/tls-cert.pem"      |

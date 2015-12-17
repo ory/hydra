@@ -1,0 +1,18 @@
+#!/bin/bash
+
+sudo chown vagrant:vagrant -Rf /home/vagrant
+
+echo "##########################################" 
+echo "##########################################" 
+echo "##########       BOOTING      ############" 
+echo "##########################################" 
+echo "##########################################" 
+
+# Load source file
+source /etc/environment
+
+# Docker
+## Start hydra postgres container and wait a little bit
+echo "Start docker containers..." 
+sudo docker start hydra-postgres
+sleep 5

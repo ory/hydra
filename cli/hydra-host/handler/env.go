@@ -23,8 +23,13 @@ func getEnv() {
 		env.Getenv("HOST", ""),
 		env.Getenv("PORT", "4443"),
 	)
-	hostURL = env.Getenv("HOST_URL", "https://localhost:4443")
 	forceHTTP = env.Getenv("DANGEROUSLY_FORCE_HTTP", "")
+	if forceHTTP == "force" {
+		schema = "http"
+	} else {
+		schema = "https"
+	}
+
 	providers = []provider.Provider{
 		dropbox.New(
 			"dropbox",

@@ -55,7 +55,7 @@ type result struct {
 
 type payload struct {
 	ID       string `json:"id,omitempty"`
-	Email    string `json:"email,omitempty"`
+	Username string `json:"username,omitempty"`
 	Password string `json:"password,omitempty"`
 	Data     string `json:"data,omitempty"`
 }
@@ -81,7 +81,7 @@ func mock(c test) func(h chd.ContextHandler) chd.ContextHandler {
 func assertAccount(t *testing.T, c test, data string) account.Account {
 	var acc account.DefaultAccount
 	require.Nil(t, json.Unmarshal([]byte(data), &acc))
-	assert.Equal(t, c.payload.Email, acc.Email)
+	assert.Equal(t, c.payload.Username, acc.Username)
 	assert.Equal(t, c.payload.Data, acc.Data)
 	assert.Empty(t, acc.Password)
 	return &acc
@@ -128,7 +128,7 @@ func TestCreateGetDelete(t *testing.T) {
 		},
 		{
 			subject: "peter", token: &jwt.Token{Valid: true},
-			payload:  payload{Email: uuid.New() + "@foobar.com", Data: "{}"},
+			payload:  payload{Username: uuid.New() + "@foobar.com", Data: "{}"},
 			policies: policies["allow-create"],
 			expected: result{
 				create: http.StatusBadRequest, get: 0, delete: 0,
@@ -136,7 +136,7 @@ func TestCreateGetDelete(t *testing.T) {
 		},
 		{
 			subject: "peter", token: &jwt.Token{Valid: true},
-			payload:  payload{Email: uuid.New() + "@foobar.com", Password: "123", Data: "{}"},
+			payload:  payload{Username: uuid.New() + "@foobar.com", Password: "123", Data: "{}"},
 			policies: policies["allow-create"],
 			expected: result{
 				create: http.StatusBadRequest, get: 0, delete: 0,
@@ -144,7 +144,7 @@ func TestCreateGetDelete(t *testing.T) {
 		},
 		{
 			subject: "peter", token: &jwt.Token{Valid: true},
-			payload:  payload{Email: "notemail", Password: "secret", Data: "{}"},
+			payload:  payload{Username: uuid.New() + "@bar.com", Password: "", Data: "{}"},
 			policies: policies["allow-create"],
 			expected: result{
 				create: http.StatusBadRequest, get: 0, delete: 0,
@@ -152,7 +152,7 @@ func TestCreateGetDelete(t *testing.T) {
 		},
 		{
 			subject: "peter", token: &jwt.Token{Valid: true},
-			payload:  payload{Email: uuid.New() + "@bar.com", Password: "", Data: "{}"},
+			payload:  payload{Username: uuid.New() + "@bar.com", Password: "secret", Data: "not json"},
 			policies: policies["allow-create"],
 			expected: result{
 				create: http.StatusBadRequest, get: 0, delete: 0,
@@ -160,15 +160,7 @@ func TestCreateGetDelete(t *testing.T) {
 		},
 		{
 			subject: "peter", token: &jwt.Token{Valid: true},
-			payload:  payload{Email: uuid.New() + "@bar.com", Password: "secret", Data: "not json"},
-			policies: policies["allow-create"],
-			expected: result{
-				create: http.StatusBadRequest, get: 0, delete: 0,
-			},
-		},
-		{
-			subject: "peter", token: &jwt.Token{Valid: true},
-			payload:  payload{Email: uuid.New() + "@bar.com", Password: "secret", Data: "{}"},
+			payload:  payload{Username: uuid.New() + "@bar.com", Password: "secret", Data: "{}"},
 			policies: policies["allow-create"],
 			expected: result{
 				create: http.StatusCreated, get: http.StatusForbidden, delete: http.StatusForbidden,
@@ -176,7 +168,7 @@ func TestCreateGetDelete(t *testing.T) {
 		},
 		{
 			subject: "peter", token: &jwt.Token{Valid: true},
-			payload:  payload{Email: uuid.New() + "@bar.com", Password: "secret", Data: "{}"},
+			payload:  payload{Username: uuid.New() + "@bar.com", Password: "secret", Data: "{}"},
 			policies: policies["allow-create-get"],
 			expected: result{
 				create: http.StatusCreated, get: http.StatusOK, delete: http.StatusForbidden,
@@ -184,7 +176,7 @@ func TestCreateGetDelete(t *testing.T) {
 		},
 		{
 			subject: "peter", token: &jwt.Token{Valid: true},
-			payload:  payload{Email: uuid.New() + "@bar.com", Password: "secret", Data: "{}"},
+			payload:  payload{Username: uuid.New() + "@bar.com", Password: "secret", Data: "{}"},
 			policies: policies["allow-all"],
 			expected: result{
 				create: http.StatusCreated, get: http.StatusOK, delete: http.StatusAccepted,

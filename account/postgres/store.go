@@ -11,7 +11,7 @@ import (
 
 const accountSchema = `CREATE TABLE IF NOT EXISTS hydra_account (
 	id           text NOT NULL PRIMARY KEY,
-	email 		 text NOT NULL UNIQUE,
+	username	 text NOT NULL UNIQUE,
 	password     text NOT NULL,
 	data		 json
 )`
@@ -33,7 +33,7 @@ func (s *Store) CreateSchemas() error {
 	return nil
 }
 
-func (s *Store) Create(id, email, password, data string) (account.Account, error) {
+func (s *Store) Create(id, username, password, data string) (account.Account, error) {
 	// Hash the password
 	password, err := s.hasher.Hash(password)
 	if err != nil {
@@ -41,21 +41,21 @@ func (s *Store) Create(id, email, password, data string) (account.Account, error
 	}
 
 	// Execute SQL statement
-	_, err = s.db.Exec("INSERT INTO hydra_account (id, email, password, data) VALUES ($1, $2, $3, $4)", id, email, password, data)
+	_, err = s.db.Exec("INSERT INTO hydra_account (id, username, password, data) VALUES ($1, $2, $3, $4)", id, username, password, data)
 	if err != nil {
 		return nil, errors.New(err)
 	}
 
-	return &account.DefaultAccount{id, email, password, data}, nil
+	return &account.DefaultAccount{id, username, password, data}, nil
 }
 
 func (s *Store) Get(id string) (account.Account, error) {
 	var a account.DefaultAccount
 	// Query account
-	row := s.db.QueryRow("SELECT id, email, password, data FROM hydra_account WHERE id=$1 LIMIT 1", id)
+	row := s.db.QueryRow("SELECT id, username, password, data FROM hydra_account WHERE id=$1 LIMIT 1", id)
 
 	// Hydrate struct with data
-	if err := row.Scan(&a.ID, &a.Email, &a.Password, &a.Data); err == sql.ErrNoRows {
+	if err := row.Scan(&a.ID, &a.Username, &a.Password, &a.Data); err == sql.ErrNoRows {
 		return nil, pkg.ErrNotFound
 	} else if err != nil {
 		return nil, errors.New(err)
@@ -80,21 +80,21 @@ func (s *Store) UpdatePassword(id, oldPassword, newPassword string) (account.Acc
 		return nil, errors.New(err)
 	}
 
-	return &account.DefaultAccount{acc.GetID(), acc.GetEmail(), newPassword, acc.GetData()}, nil
+	return &account.DefaultAccount{acc.GetID(), acc.GetUsername(), newPassword, acc.GetData()}, nil
 }
 
-func (s *Store) UpdateEmail(id, email, password string) (account.Account, error) {
+func (s *Store) UpdateUsername(id, username, password string) (account.Account, error) {
 	acc, err := s.authenticateWithIDAndPassword(id, password)
 	if err != nil {
 		return nil, err
 	}
 
 	// Execute SQL statement
-	if _, err = s.db.Exec("UPDATE hydra_account SET (email) = ($2) WHERE id=$1", id, email); err != nil {
+	if _, err = s.db.Exec("UPDATE hydra_account SET (username) = ($2) WHERE id=$1", id, username); err != nil {
 		return nil, errors.New(err)
 	}
 
-	return &account.DefaultAccount{acc.GetID(), email, acc.GetEmail(), acc.GetData()}, nil
+	return &account.DefaultAccount{acc.GetID(), username, acc.GetUsername(), acc.GetData()}, nil
 }
 
 func (s *Store) Delete(id string) (err error) {
@@ -104,13 +104,13 @@ func (s *Store) Delete(id string) (err error) {
 	return nil
 }
 
-func (s *Store) Authenticate(email, password string) (account.Account, error) {
+func (s *Store) Authenticate(username, password string) (account.Account, error) {
 	var a account.DefaultAccount
 	// Query account
-	row := s.db.QueryRow("SELECT id, email, password, data FROM hydra_account WHERE email=$1", email)
+	row := s.db.QueryRow("SELECT id, username, password, data FROM hydra_account WHERE username=$1", username)
 
 	// Hydrate struct with data
-	if err := row.Scan(&a.ID, &a.Email, &a.Password, &a.Data); err == sql.ErrNoRows {
+	if err := row.Scan(&a.ID, &a.Username, &a.Password, &a.Data); err == sql.ErrNoRows {
 		return nil, pkg.ErrNotFound
 	} else if err != nil {
 		return nil, err

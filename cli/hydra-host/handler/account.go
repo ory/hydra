@@ -28,9 +28,9 @@ func getPassword() (password string) {
 }
 
 func (c *Account) Create(ctx *cli.Context) error {
-	email := ctx.Args().First()
-	if email == "" {
-		return fmt.Errorf("Please provide an email address.")
+	username := ctx.Args().First()
+	if username == "" {
+		return fmt.Errorf("Please provide an username.")
 	}
 	password := ctx.String("password")
 	if password == "" {
@@ -38,7 +38,7 @@ func (c *Account) Create(ctx *cli.Context) error {
 	}
 
 	c.Ctx.Start()
-	user, err := c.Ctx.Accounts.Create(uuid.New(), email, password, "{}")
+	user, err := c.Ctx.Accounts.Create(uuid.New(), username, password, "{}")
 	if err != nil {
 		return fmt.Errorf("Could not create account because %s", err)
 	}

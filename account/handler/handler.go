@@ -56,7 +56,7 @@ func (h *Handler) SetRoutes(r *mux.Router, extractor func(h chd.ContextHandler) 
 
 func (h *Handler) Create(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 	type Payload struct {
-		Email    string `valid:"email,required" json:"email" `
+		Username string `valid:"required" json:"username" `
 		Password string `valid:"length(6|254),required" json:"password"`
 		Data     string `valid:"optional,json" json:"data"`
 	}
@@ -81,7 +81,7 @@ func (h *Handler) Create(ctx context.Context, rw http.ResponseWriter, req *http.
 		p.Data = "{}"
 	}
 
-	user, err := h.s.Create(uuid.New(), p.Email, p.Password, p.Data)
+	user, err := h.s.Create(uuid.New(), p.Username, p.Password, p.Data)
 	if err != nil {
 		WriteError(rw, err)
 		return

@@ -1,8 +1,8 @@
 package handler_test
 
 import (
-	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/RangelReale/osin"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
@@ -22,28 +22,51 @@ import (
 	"github.com/ory-am/ladon/policy"
 	ppg "github.com/ory-am/ladon/policy/postgres"
 	opg "github.com/ory-am/osin-storage/storage/postgres"
+	"github.com/parnurzeal/gorequest"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"os"
-	"strconv"
 	"testing"
 	"time"
-	"github.com/parnurzeal/gorequest"
-	"fmt"
 )
 
 var accID = uuid.New()
-var clientID = uuid.New()
+var clientID = "tests"
 var handler *Handler
+
+var (
+	configs = map[string]*oauth2.Config{
+		"working": {
+			ClientID: clientID, ClientSecret: "secret", Scopes: []string{}, RedirectURL: "/callback",
+			Endpoint: oauth2.Endpoint{AuthURL: "/oauth2/auth", TokenURL: "/oauth2/token"},
+		},
+		"working-2": {
+			ClientID: "working-client-2", ClientSecret: "secret", Scopes: []string{}, RedirectURL: "/callback",
+			Endpoint: oauth2.Endpoint{AuthURL: "/oauth2/auth", TokenURL: "/oauth2/token"},
+		},
+		"voidSecret": {
+			ClientID: clientID, ClientSecret: "wrongsecret", Scopes: []string{}, RedirectURL: "/callback",
+			Endpoint: oauth2.Endpoint{AuthURL: "/oauth2/auth", TokenURL: "/oauth2/token"},
+		},
+		"voidID": {
+			ClientID: "notexistent", ClientSecret: "random", Scopes: []string{}, RedirectURL: "/callback",
+			Endpoint: oauth2.Endpoint{AuthURL: "/oauth2/auth", TokenURL: "/oauth2/token"},
+		},
+	}
+	logins = map[string]*userAuth{
+		"working":      {"2@bar.com", "secret"},
+		"voidEmail":    {"1@bar.com", "secret"},
+		"voidPassword": {"1@bar.com", "public"},
+	}
+)
 
 func TestMain(m *testing.M) {
 	c, db, err := dockertest.OpenPostgreSQLContainerConnection(15, time.Second)
@@ -98,6 +121,8 @@ func TestMain(m *testing.M) {
 
 	if err := osinStore.CreateClient(&osin.DefaultClient{clientID, "secret", "/callback", ""}); err != nil {
 		log.Fatalf("Could create client: %s", err)
+	} else if err := osinStore.CreateClient(&osin.DefaultClient{"working-client-2", "secret", "/callback", ""}); err != nil {
+		log.Fatalf("Could create client: %s", err)
 	} else if _, err := accountStore.Create(accID, "2@bar.com", "secret", "{}"); err != nil {
 		log.Fatalf("Could create account: %s", err)
 	} else if err := policyStore.Create(&pol); err != nil {
@@ -113,28 +138,6 @@ func TestMain(m *testing.M) {
 
 	os.Exit(m.Run())
 }
-
-var (
-	configs = map[string]*oauth2.Config{
-		"working": {
-			ClientID: clientID, ClientSecret: "secret", Scopes: []string{}, RedirectURL: "/callback",
-			Endpoint: oauth2.Endpoint{AuthURL: "/oauth2/auth", TokenURL: "/oauth2/token"},
-		},
-		"voidSecret": {
-			ClientID: clientID, ClientSecret: "wrongsecret", Scopes: []string{}, RedirectURL: "/callback",
-			Endpoint: oauth2.Endpoint{AuthURL: "/oauth2/auth", TokenURL: "/oauth2/token"},
-		},
-		"voidID": {
-			ClientID: "notexistent", ClientSecret: "random", Scopes: []string{}, RedirectURL: "/callback",
-			Endpoint: oauth2.Endpoint{AuthURL: "/oauth2/auth", TokenURL: "/oauth2/token"},
-		},
-	}
-	logins = map[string]*userAuth{
-		"working":      {"2@bar.com", "secret"},
-		"voidEmail":    {"1@bar.com", "secret"},
-		"voidPassword": {"1@bar.com", "public"},
-	}
-)
 
 func mockAuthorization(subject string, token *jwt.Token) func(h chd.ContextHandler) chd.ContextHandler {
 	return func(h chd.ContextHandler) chd.ContextHandler {
@@ -217,7 +220,7 @@ func TestPasswordGrantType(t *testing.T) {
 
 func testTokenRefresh(t *testing.T, tsURL, clientID, clientSecret string, token string, retry bool) {
 	send := fmt.Sprintf("grant_type=refresh_token&refresh_token=%s", token)
-	resp, body, errs := gorequest.New().Post(tsURL + "/oauth2/token").Type("form").SetBasicAuth(clientID, clientSecret).SendString(send).End()
+	resp, body, errs := gorequest.New().Post(tsURL+"/oauth2/token").Type("form").SetBasicAuth(clientID, clientSecret).SendString(send).End()
 	require.Len(t, errs, 0, "%s", errs)
 	require.Equal(t, resp.StatusCode, http.StatusOK, "Body: %s", body)
 	var refresh struct {
@@ -334,23 +337,112 @@ func TestIntrospect(t *testing.T) {
 		//		}
 		{"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MCwiaWF0IjoxOTI0OTc1NjE5LCJhdWQiOiJ0ZXN0cyIsInN1YmplY3QiOiJmb28ifQ.lvjLGnLO3mZSS63fomK-KH2mhLXjjg9b13opiN7jY4MrXE_DaR0Lum8a_RcqqSTXbpHxYSIPV9Ji7zM_X1bvBtsPpBE1PR3_PrdD5_uIDQ-UWPVzozxhOvuZzU7qHx3TFQClZ6tYIXYioTszz9zQHiE4hj1x6Z_shWPfczELGyD0HnEC3o_w7IFfYO_L0YDN_vkuqr6yS5kaPIsoCF_iHuhTzoBAEIpUENlxSpCPuxR9aMaJ-BQDInHoPc1h-VvkgOdR_iENQdOUePObw17ywdGkRk6C5kRHSxjca-ULGcDn36NZ54SEPolcGbjs3vVA1g0jQARKIcTVw6Uu7x0s6Q", http.StatusOK, true},
 	} {
-		data := url.Values{}
-		data.Set("token", c.accessToken)
-
-		client := &http.Client{}
-		req, _ := http.NewRequest("POST", ts.URL + "/oauth2/introspect", bytes.NewBufferString(data.Encode()))
-		req.Header.Add("Authorization", access.Type() + " " + access.AccessToken)
-		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-		req.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
-		res, _ := client.Do(req)
-		body, _ := ioutil.ReadAll(res.Body)
-		require.Equal(t, c.code, res.StatusCode, "Case %d: %s", k, body)
-		if res.StatusCode != http.StatusOK {
+		data := url.Values{"token": []string{c.accessToken}}
+		resp, body, errs := gorequest.New().Post(ts.URL+"/oauth2/introspect").Type("form").SetBasicAuth(config.ClientID, config.ClientSecret).SendString(data.Encode()).End()
+		require.Len(t, errs, 0)
+		require.Equal(t, c.code, resp.StatusCode, "Case %d: %s", k, body)
+		if resp.StatusCode != http.StatusOK {
 			continue
 		}
 
 		var result map[string]interface{}
-		require.Nil(t, json.Unmarshal(body, &result), "Case %d: %s %s", k, body)
+		require.Nil(t, json.Unmarshal([]byte(body), &result), "Case %d: %s %s", k, body)
 		assert.Equal(t, c.pass, result["active"].(bool), "Case %d %s", k, body)
+	}
+}
+
+func TestRevoke(t *testing.T) {
+	router := mux.NewRouter()
+	handler.SetRoutes(router, mockAuthorization("", new(jwt.Token)))
+	ts := httptest.NewServer(router)
+	defer ts.Close()
+
+	config := configs["working"]
+	user := logins["working"]
+
+	config.Endpoint = oauth2.Endpoint{AuthURL: ts.URL + "/oauth2/auth", TokenURL: ts.URL + "/oauth2/token"}
+	tokens := []*oauth2.Token{}
+	for i := 1; i <= 2; i++ {
+		token, err := config.PasswordCredentialsToken(oauth2.NoContext, user.Username, user.Password)
+		require.Nil(t, err, "%s", err)
+		tokens = append(tokens, token)
+	}
+
+	config = configs["working-2"]
+	config.Endpoint = oauth2.Endpoint{AuthURL: ts.URL + "/oauth2/auth", TokenURL: ts.URL + "/oauth2/token"}
+	for i := 1; i <= 2; i++ {
+		token, err := config.PasswordCredentialsToken(oauth2.NoContext, user.Username, user.Password)
+		require.Nil(t, err, "%s", err)
+		tokens = append(tokens, token)
+	}
+
+	for k, c := range []*struct {
+		token            string
+		expectStatusCode int
+		clientID         string
+		clientSecret     string
+	}{
+		{
+			token:            tokens[0].AccessToken,
+			expectStatusCode: http.StatusOK,
+		},
+		{
+			token:            tokens[0].AccessToken,
+			expectStatusCode: http.StatusServiceUnavailable,
+		},
+		{
+			token:            tokens[0].RefreshToken,
+			expectStatusCode: http.StatusServiceUnavailable,
+		},
+		{
+			token:            tokens[1].RefreshToken,
+			expectStatusCode: http.StatusOK,
+		},
+		{
+			token:            tokens[1].RefreshToken,
+			expectStatusCode: http.StatusServiceUnavailable,
+		},
+		{
+			token:            tokens[1].AccessToken,
+			expectStatusCode: http.StatusServiceUnavailable,
+		},
+		{
+			token:            tokens[2].RefreshToken,
+			expectStatusCode: http.StatusServiceUnavailable,
+		},
+		{
+			token:            tokens[2].AccessToken,
+			expectStatusCode: http.StatusServiceUnavailable,
+		},
+		{
+			token:            tokens[2].AccessToken,
+			clientID:         " ",
+			clientSecret:     " ",
+			expectStatusCode: http.StatusServiceUnavailable,
+		},
+		{
+			token:            tokens[3].RefreshToken,
+			clientID:         configs["working-2"].ClientID,
+			clientSecret:     configs["working-2"].ClientSecret,
+			expectStatusCode: http.StatusOK,
+		},
+		{
+			token:            tokens[0].RefreshToken,
+			clientID:         "foo",
+			clientSecret:     "barbazfoobar",
+			expectStatusCode: http.StatusServiceUnavailable,
+		},
+	} {
+		if c.clientID == "" {
+			c.clientID = configs["working"].ClientID
+		}
+		if c.clientSecret == "" {
+			c.clientSecret = configs["working"].ClientSecret
+		}
+
+		url := url.Values{"token": []string{c.token}}
+		resp, body, errs := gorequest.New().Post(ts.URL+"/oauth2/revoke").Type("form").SetBasicAuth(c.clientID, c.clientSecret).SendString(url.Encode()).End()
+		require.Len(t, errs, 0, "%s", errs)
+		require.Equal(t, c.expectStatusCode, resp.StatusCode, "Case %d, Body: %s", k, body)
 	}
 }

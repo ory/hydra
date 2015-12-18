@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/RangelReale/osin"
 	log "github.com/Sirupsen/logrus"
@@ -18,7 +19,6 @@ import (
 	"github.com/ory-am/ladon/policy"
 	osinStore "github.com/ory-am/osin-storage/storage"
 	"github.com/pborman/uuid"
-	"golang.org/x/net/context"
 	"net/http"
 	"net/url"
 	"time"
@@ -68,16 +68,88 @@ func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hctx.ContextHandler)
 	h.server = osin.NewServer(h.OAuthConfig, h.OAuthStore)
 	h.server.AccessTokenGen = h.JWT
 
-	r.Handle("/oauth2/introspect", hctx.NewContextAdapter(
-		context.Background(),
-		extractor,
-		h.Middleware.IsAuthenticated,
-	).ThenFunc(h.IntrospectHandler)).Methods("POST")
+	r.HandleFunc("/oauth2/introspect", h.IntrospectHandler).Methods("POST")
+	r.HandleFunc("/oauth2/revoke", h.RevokeHandler).Methods("POST")
 	r.HandleFunc("/oauth2/auth", h.AuthorizeHandler)
 	r.HandleFunc("/oauth2/token", h.TokenHandler)
 }
 
-func (h *Handler) IntrospectHandler(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+func (h *Handler) RevokeHandler(w http.ResponseWriter, r *http.Request) {
+	auth, err := osin.CheckBasicAuth(r)
+	client, err := h.OAuthStore.GetClient(auth.Username)
+	if err != nil {
+		pkg.HttpError(w, errors.New("Unauthorized"), http.StatusServiceUnavailable)
+		return
+	}
+
+	r.ParseForm()
+	tokenToRevoke := r.Form.Get("token")
+	if tokenToRevoke == "" {
+		log.WithField("revokation", "fail").Warn("No token given.")
+		pkg.HttpError(w, errors.New("No token given"), http.StatusServiceUnavailable)
+		return
+	}
+
+	getClaims := func(ud interface{}) (jwt.ClaimsCarrier, error) {
+		data, ok := ud.(string)
+		var claims jwt.ClaimsCarrier
+		if !ok {
+			return nil, errors.New("Could not assert UserData to string")
+		}
+		if err := json.Unmarshal([]byte(data), &claims); err != nil {
+			return nil, errors.New("Could not unmarshal UserData")
+		}
+		return claims, nil
+	}
+
+	var ud interface{}
+	var revokeToken *osin.AccessData
+	if revokeToken, err = h.OAuthStore.LoadAccess(tokenToRevoke); err == pkg.ErrNotFound {
+		revokeToken, err = h.OAuthStore.LoadRefresh(tokenToRevoke)
+		if err != nil {
+			log.WithField("revokation", "fail").WithField("error", err).Warn("Could not fetch refresh token.")
+			pkg.HttpError(w, errors.New("Could not find token"), http.StatusServiceUnavailable)
+			return
+		}
+	} else if err != nil {
+		log.WithField("revokation", "fail").WithField("error", err).Warn("Could not fetch acccess token.")
+		pkg.HttpError(w, errors.New("Could not find token"), http.StatusServiceUnavailable)
+		return
+	}
+
+	ud = revokeToken.UserData
+	claims, err := getClaims(ud)
+	if err != nil {
+		log.WithField("error", err).Warn("Could not retrieve claims.")
+		pkg.HttpError(w, err, http.StatusServiceUnavailable)
+		return
+	}
+
+	if claims.GetAudience() != client.GetId() {
+		log.WithFields(log.Fields{
+			"claimAudience":  claims.GetAudience(),
+			"clientAudience": client.GetId(),
+		}).Warn("Suspicious activity detected. Audience mismatch.")
+		pkg.HttpError(w, errors.New("Forbidden"), http.StatusServiceUnavailable)
+		return
+	}
+
+	if err := h.OAuthStore.RemoveAccess(revokeToken.AccessToken); err != nil {
+		log.WithField("error", err).Warn("Could not revoke access token.")
+		pkg.HttpError(w, err, http.StatusServiceUnavailable)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request) {
+	auth, err := osin.CheckBasicAuth(r)
+	if _, err := h.OAuthStore.GetClient(auth.Username); err != nil {
+		pkg.HttpError(w, errors.New("Unauthorized"), http.StatusUnauthorized)
+		return
+	}
+
 	result := make(map[string]interface{})
 	result["active"] = false
 
@@ -137,7 +209,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 				if err := json.Unmarshal([]byte(data), &claims); err != nil {
 					http.Error(w, fmt.Sprintf("Could not unmarshal UserData: %v", ar.UserData), http.StatusInternalServerError)
 				} else {
-					ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, claims.GetSubject(), h.Audience, time.Now().Add(time.Duration(ar.Expiration)*time.Second), time.Now(), time.Now())
+					ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, claims.GetSubject(), ar.Client.GetId(), time.Now().Add(time.Duration(ar.Expiration)*time.Second), time.Now(), time.Now())
 					ar.Authorized = true
 				}
 			}
@@ -150,7 +222,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 				if err := json.Unmarshal([]byte(data), &claims); err != nil {
 					http.Error(w, fmt.Sprintf("Could not unmarshal UserData: %v", ar.UserData), http.StatusInternalServerError)
 				} else {
-					ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, claims.GetSubject(), claims.GetAudience(), time.Now().Add(time.Duration(ar.Expiration)*time.Second), time.Now(), time.Now())
+					ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, claims.GetSubject(), ar.Client.GetId(), time.Now().Add(time.Duration(ar.Expiration)*time.Second), time.Now(), time.Now())
 					ar.Authorized = true
 				}
 			}
@@ -160,11 +232,11 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 			// TODO }
 
 			if user, err := h.authenticate(w, r, ar.Username, ar.Password); err == nil {
-				ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, user.GetID(), h.Audience, time.Now().Add(time.Duration(ar.Expiration)*time.Second), time.Now(), time.Now())
+				ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, user.GetID(), ar.Client.GetId(), time.Now().Add(time.Duration(ar.Expiration)*time.Second), time.Now(), time.Now())
 				ar.Authorized = true
 			}
 		case osin.CLIENT_CREDENTIALS:
-			ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, ar.Client.GetId(), h.Audience, time.Now().Add(time.Duration(ar.Expiration)*time.Second), time.Now(), time.Now())
+			ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, ar.Client.GetId(), ar.Client.GetId(), time.Now().Add(time.Duration(ar.Expiration)*time.Second), time.Now(), time.Now())
 			ar.Authorized = true
 
 			// TODO ASSERTION workflow http://leastprivilege.com/2013/12/23/advanced-oauth2-assertion-flow-why/
@@ -298,7 +370,7 @@ func (h *Handler) AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 			localSubject = acc.GetID()
 		}
 
-		ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, localSubject, h.Audience, time.Now().Add(time.Duration(ar.Expiration)*time.Second), time.Now(), time.Now())
+		ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, localSubject, ar.Client.GetId(), time.Now().Add(time.Duration(ar.Expiration)*time.Second), time.Now(), time.Now())
 		ar.Authorized = true
 		h.server.FinishAuthorizeRequest(resp, r, ar)
 	}
@@ -310,8 +382,8 @@ func (h *Handler) AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 	osin.OutputJSON(resp, w, r)
 }
 
-func (h *Handler) authenticate(w http.ResponseWriter, r *http.Request, email, password string) (account.Account, error) {
-	acc, err := h.Accounts.Authenticate(email, password)
+func (h *Handler) authenticate(w http.ResponseWriter, r *http.Request, username, password string) (account.Account, error) {
+	acc, err := h.Accounts.Authenticate(username, password)
 	if err != nil {
 		http.Error(w, "Could not authenticate.", http.StatusUnauthorized)
 		return nil, err

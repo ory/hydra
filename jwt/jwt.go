@@ -158,6 +158,7 @@ func (j *JWT) GenerateAccessToken(data *osin.AccessData, generateRefresh bool) (
 
 	claims = ClaimsCarrier{}
 	claims["id"] = uuid.New()
+	claims["aud"] = claims.GetAudience()
 	if refreshToken, err = j.SignToken(claims, map[string]interface{}{}); err != nil {
 		return "", "", err
 	}

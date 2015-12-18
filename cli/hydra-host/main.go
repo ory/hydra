@@ -61,7 +61,7 @@ var (
 				{
 					Name:      "create",
 					Usage:     "Create a new account",
-					ArgsUsage: "<email>",
+					ArgsUsage: "<username>",
 					Action:    errorWrapper(u.Create),
 					Flags: []cli.Flag{
 						cli.StringFlag{

@@ -1,7 +1,7 @@
 package account
 
 type Storage interface {
-	Create(id, email, password string, data string) (Account, error)
+	Create(id, username, password string, data string) (Account, error)
 
 	Get(id string) (Account, error)
 
@@ -9,9 +9,9 @@ type Storage interface {
 
 	UpdatePassword(id, oldPassword, newPassword string) (Account, error)
 
-	UpdateEmail(id, password, email string) (Account, error)
+	UpdateUsername(id, password, username string) (Account, error)
 
 	UpdateData(id, data string) (Account, error)
 
-	Authenticate(email, password string) (Account, error)
+	Authenticate(username, password string) (Account, error)
 }

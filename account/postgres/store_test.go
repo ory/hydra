@@ -61,7 +61,7 @@ func TestCreateAndGetCases(t *testing.T) {
 		if c.pass {
 			assert.Nil(t, err)
 			assert.Equal(t, c.data[0], result.GetID())
-			assert.Equal(t, c.data[1], result.GetEmail())
+			assert.Equal(t, c.data[1], result.GetUsername())
 			assert.NotEqual(t, c.data[2], result.GetPassword())
 			assert.Equal(t, c.extra, result.GetData())
 
@@ -69,7 +69,7 @@ func TestCreateAndGetCases(t *testing.T) {
 			if c.find {
 				assert.Nil(t, err)
 				assert.Equal(t, c.data[0], result.GetID())
-				assert.Equal(t, c.data[1], result.GetEmail())
+				assert.Equal(t, c.data[1], result.GetUsername())
 				assert.NotEqual(t, c.data[2], result.GetPassword())
 				assert.Equal(t, c.extra, result.GetData())
 			} else {
@@ -102,22 +102,22 @@ func TestDelete(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-func TestUpdateEmail(t *testing.T) {
+func TestUpdateUsername(t *testing.T) {
 	id := uuid.New()
 	_, err := store.Create(id, "3@bar", "secret", `{"foo": "bar"}`)
 	assert.Nil(t, err)
 
-	_, err = store.UpdateEmail(id, "3@foo", "wrong secret")
+	_, err = store.UpdateUsername(id, "3@foo", "wrong secret")
 	assert.NotNil(t, err)
 
-	_, err = store.UpdateEmail(id, "3@foo", "secret")
+	_, err = store.UpdateUsername(id, "3@foo", "secret")
 	assert.Nil(t, err)
 
 	r, err := store.Get(id)
 	assert.Nil(t, err)
 
 	assert.Equal(t, id, r.GetID())
-	assert.Equal(t, "3@foo", r.GetEmail())
+	assert.Equal(t, "3@foo", r.GetUsername())
 	assert.NotEqual(t, "secret", r.GetPassword())
 }
 

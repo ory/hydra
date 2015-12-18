@@ -28,9 +28,10 @@ Current status:
 - [What is Hydra?](#what-is-hydra)
 - [Motivation](#motivation)
 - [Features](#features)
-- [Caveats](#caveats)
+- [What do you mean by *Hydra is backend*?](#what-do-you-mean-by-hydra-is-backend)
 - [HTTP/2 RESTful API](#http2-restful-api)
 - [Run hydra-host](#run-hydra-host)
+  - [With vagrant](#with-vagrant)
   - [Set up PostgreSQL locally](#set-up-postgresql-locally)
   - [Run as executable](#run-as-executable)
   - [Run from sourcecode](#run-from-sourcecode)
@@ -43,6 +44,7 @@ Current status:
     - [Create a TLS certificate](#create-a-tls-certificate)
     - [Import policies](#import-policies)
 - [Good to know](#good-to-know)
+  - [Policies](#policies)
   - [Everything is RESTful. No HTML. No Templates.](#everything-is-restful-no-html-no-templates)
   - [Sign up workflow](#sign-up-workflow)
   - [Sign in workflow](#sign-in-workflow)
@@ -61,42 +63,73 @@ in need of these three, you are in the right place.
 
 ## Motivation
 
-Many authentication, authorization and user management solutions exist. Some are outdated, some come with a crazy stack, some enforce patterns you might dislike and others like [auth0.com](http://auth0.com) or [oauth.io](http://oauth.io) cost good money if you're out to scale.
+Hydra was written because we at Ory needed a scalable 12factor OAuth2 consumer / provider with enterprise grade
+authorization and interoperability without a ton of dependencies or crazy features. While we where at it, we added
+Policy, Account and Client management and other cool features. Because we hate maintaining 5 different databases (or paying someone to maintain them)
+and dealing with crazy and unpredictable dependency trees, Hydra only requires Go and PostgreSQL (or any SQL speaking database).
 
-Hydra was written because we needed a scalable 12factor OAuth2 consumer and provider with enterprise grade authorization and interoperability without a ton of dependencies or crazy features. That is why hydra only depends on [Go](http://golang.org) and PostgreSQL. If you don't like PostgreSQL you can easily implement other databases and use them instead. 
-Hydra is completely RESTful and does not serve any template (check [caveats](#caveats) why this might affect you).
-
-Hydra is the open source alternative to proprietary authorization solutions in the age of microservices.
+Hydra is the open source alternative to proprietary authorization solutions in the age of micro services.
 
 *Use it, enjoy it and contribute!*
 
 ## Features
 
-Hydra is a RESTful service providing you with things like:
+Hydra's core features in a nutshell:
 
 * **Account Management**: Sign up, settings, password recovery
-* **Access Control / Policy Management** backed by [ladon](https://github.com/ory-am/ladon)
-* Hydra comes with a rich set of **OAuth2** features:
-  * Hydra implements OAuth2 as specified at [rfc6749](http://tools.ietf.org/html/rfc6749) and [draft-ietf-oauth-v2-10](http://tools.ietf.org/html/draft-ietf-oauth-v2-10).
+* **Access Control / Policy Decision Point / Policy Storage Point** backed by [Ladon](https://github.com/ory-am/ladon).
+* Rich set of **OAuth2** features:
+  * Hydra implements OAuth2 as specified at [rfc6749](http://tools.ietf.org/html/rfc6749) and [draft-ietf-oauth-v2-10](http://tools.ietf.org/html/draft-ietf-oauth-v2-10) using [osin](https://github.com/RangelReale/osin) and [osin-storage](https://github.com/ory-am/osin-storage)
   * Hydra uses self-contained Acccess Tokens as suggessted in [rfc6794#section-1.4](http://tools.ietf.org/html/rfc6749#section-1.4) by issuing JSON Web Tokens as specified at
-   [https://tools.ietf.org/html/rfc7519](https://tools.ietf.org/html/rfc7519) with [RSASSA-PKCS1-v1_5 SHA-256](https://tools.ietf.org/html/rfc7519#section-8) hashing algorithm, Hydra reduces database roundtrips.
-  * Hydra implements **OAuth2 Introspection** as specified in [rfc7662](https://tools.ietf.org/html/rfc7662)
-* Easy command line tools like `hydra-jwt` for generating jwt signing key pairs.
-* HTTP/2 with TLS.
+   [https://tools.ietf.org/html/rfc7519](https://tools.ietf.org/html/rfc7519) with [RSASSA-PKCS1-v1_5 SHA-256](https://tools.ietf.org/html/rfc7519#section-8) hashing algorithm.
+  * Hydra implements **OAuth2 Introspection** ([rfc7662](https://tools.ietf.org/html/rfc7662)) and **OAuth2 Revokation** ([rfc7009](https://tools.ietf.org/html/rfc7009)).
+  * Hydra is able to sign users up and in through OAuth2 providers like Dropbox, LinkedIn, Google, you name it.
+* Hydra does not speak HTML. We believe that the design decision to keep templates out of Hydra is a core feature. *Hydra is backend, not frontend.*
+* Easy command line tools like `hydra-host jwt` for generating jwt signing key pairs or `hydra-host client create`.
+* Hydra works both over HTTP (use only in development) and HTTP/2 with TLS (use in production).
+* Hydra is unit and integration tested. We use [dockertest](https://github.com/ory-am/dockertest)
 
-## Caveats
+## What do you mean by *Hydra is backend*?
 
-To make hydra suitable for every use case we decided to exclude any sort of HTML templates.
-Hydra speaks only JSON. This obviously prevents Hydra from delivering a dedicated login and authorization page like
-"Do you want to grant App Foobar access to all of your data?" or "Please log into your account to procceed. <email field> <password field>".
+Hydra does not offer a sign in, sign up or authorize HTML page. Instead, if such action is required, Hydra redirects the user
+to a predefined URL, for example `http://sign-up-app.yourservice.com/sign-up` or `http://sign-in-app.yourservice.com/sign-in`.
+Additionally, a user can authenticate through another OAuth2 Provider, for example Dropbox or Google.
 
-You'll find more information on this in the [Good to know](#good-to-know) section.
+Take a look at the example sign up/in endpoint implementations [hydra-signin](https://github.com/ory-am/hydra/blob/master/cli/hydra-signup/main.go)
+and [hydra-signup](https://github.com/ory-am/hydra/blob/master/cli/hydra-signup/main.go).
 
 ## HTTP/2 RESTful API
 
 The API is described at [apiary](http://docs.hydra6.apiary.io/#). The API Documentation is still work in progress.
 
 ## Run hydra-host
+
+### With vagrant
+
+You'll need [Vagrant](https://www.vagrantup.com/), [VirtualBox](https://www.virtualbox.org/) and [Git](https://git-scm.com/)
+installed on your system.
+
+```
+git clone https://github.com/ory-am/hydra.git
+cd hydra
+vagrant up
+# Get a cup of coffee
+```
+
+You should now have a running Hydra instance! Vagrant exposes ports 9000 (HTTPS - Hydra) and 9001 (Postgres) on your localhost.
+Open [https://localhost:9000/](https://localhost:9000/) to confirm that Hydra is running. You will probably have to add an exception for the
+HTTP certificate because it is self-signed, but after that you should see a 404 error indicating that Hydra is running!
+
+*hydra-host* offers different capabilities for managing your Hydra instance.
+Check the [this section](#cli-usage) if you want to find out more.
+
+You can also always access hydra-host through vagrant:
+
+```
+# Assuming, that your current working directory is /where/you/cloned/hydra
+vagrant ssh
+hydra-host help
+```
 
 ### Set up PostgreSQL locally
 
@@ -229,7 +262,7 @@ NAME:
    hydra-host user create - create a new user
 
 USAGE:
-   hydra-host user create [command options] <email>
+   hydra-host user create [command options] <username>
 
 OPTIONS:
    --password           the user's password
@@ -333,6 +366,59 @@ Here's an exemplary *policies.json:*
 
 This section covers information necessary for understanding how hydra works.
 
+### Policies
+
+Policies are something very powerful. I have to admit that I am a huge fan of how AWS handles policies and adopted their architecture for Hydra. Please find a more in depth documentation
+at the [Ladon GitHub Repository](https://github.com/ory-am/ladon).
+
+```
+{
+    // This should be a unique ID. This ID is required for database retrieval.
+    id: "68819e5a-738b-41ec-b03c-b58a1b19d043",
+
+    // A human readable description. Not required
+    description: "something humanly readable",
+
+    // Which identity does this policy affect?
+    // As you can see here, you can use regular expressions inside < >.
+    subjects: ["max", "peter", "<zac|ken>"],
+
+    // Should the policy allow or deny access?
+    effect: "allow",
+
+    // Which resources this policy affects.
+    // Again, you can put regular expressions in inside < >.
+    resources: ["urn:something:resource_a", "urn:something:resource_b", "urn:something:foo:<.+>"],
+
+    // Which permissions this policy affects. Supports RegExp
+    // Again, you can put regular expressions in inside < >.
+    permissions: ["<create|delete>", "get"],
+
+    // Under which conditions this policy is active.
+    conditions: [
+        // Currently, only an exemplary SubjectIsOwner condition is available.
+        {
+            "op": "SubjectIsOwner"
+        }
+    ]
+}
+```
+
+This is what a policy looks like. As you can see, we have various attributes:
+
+* A **Subject** could be an account or an client app
+* A **Resource** could be an online article or a file in a cloud drive
+* A **Permission** can also be referred to as "Action" ("create" something, "delete" something, ...)
+* A **Condition** can be an intelligent assertion *(e.g. is the Subject requesting access also the Resource Owner?)*. Right now, only the SubjectIsOwner Condition is defined. In the future, many more (e.g. IPAddressMatches or UserAgentMatches) will be added.
+* The **Effect**, which can only be **allow** or **deny** (deny *always* overrides).
+
+Hydra needs the following information to decide if a access request is allowed:
+* Resource: Which resource is affected
+* Permission: Which permission is requested
+* Token: What access token is trying to perform this action
+* Context: The context, for example the user ID.
+* Header `Authorization: Bearer <token>` with a valid access token, so this endpoint can't be scanned by malicious anonymous users.
+
 ### Everything is RESTful. No HTML. No Templates.
 
 Hydra never responds with HTML. There is no way to set up HTML templates for signing in, up or granting access.
@@ -345,7 +431,6 @@ Second, the client sets up a user account through the `/accounts` endpoint.
 You can set up a environment variable called `SIGNUP_URL` for Hydra to redirect users to,
 when the user successfully authenticated via the OAuth2 Provider Workflow but has not an account in hydra yet.
 If you leave this variable empty, a 401 Unauthorized Error will be shown instead.
-
 
 ### Sign in workflow
 
@@ -369,7 +454,7 @@ We will soon document how you can add more providers (currently **only Dropbox i
 There are multiple ways to authenticate a hydra account:
 * **Password grant type:** To do so, use the [OAuth2 PASSWORD grant type](http://oauthlib.readthedocs.org/en/latest/oauth2/grants/password.html).
 At this moment, the password grant is allowed to *all clients*. This will be changed in the future.
-* **Callback (not implemented yet):** You can set up an environment variable called `SIGNIN_URL` for Hydra to redirect users to,
+* **Callback:** You can set up an environment variable called `SIGNIN_URL` for Hydra to redirect users to,
 when a client requests authorization through the `/oauth2/auth` endpoint but is not yet authenticated.
 
 ### Visually confirm authorization

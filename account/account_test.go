@@ -1,19 +1,19 @@
 package account
 
 import (
+	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestAccountCases(t *testing.T) {
-	for _, c := range [][]string{
-		{"1", "foo@bar", "secret"},
-		{"2", "baz@foo", "top secret"},
+	for _, c := range []DefaultAccount{
+		{ID: uuid.New(), Username: "foo@bar", Password: "secret", Data: ""},
+		{ID: "2", Username: "baz@bar", Password: "top secret", Data: `{"foo": "bar"}`},
 	} {
-		a := &DefaultAccount{c[0], c[1], c[2], `{"foo": "bar"}`}
-		assert.Equal(t, c[0], a.GetID())
-		assert.Equal(t, c[1], a.GetUsername())
-		assert.Equal(t, c[2], a.GetPassword())
-		assert.Equal(t, `{"foo": "bar"}`, a.GetData())
+		assert.Equal(t, c.ID, c.GetID())
+		assert.Equal(t, c.Username, c.GetUsername())
+		assert.Equal(t, c.Password, c.GetPassword())
+		assert.Equal(t, c.Data, c.GetData())
 	}
 }

@@ -9,7 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"log"
 	"os"
-	"reflect"
+	//"reflect"
+	"github.com/ory-am/hydra/account"
 	"testing"
 	"time"
 )
@@ -34,13 +35,9 @@ func TestMain(m *testing.M) {
 }
 
 func TestNotFound(t *testing.T) {
-	_, err := store.Get("asdf")
-	t.Log("Got error %s", err)
-	assert.NotNil(t, err)
+	_, err := store.Get(uuid.New())
 	assert.Equal(t, pkg.ErrNotFound, err)
-
-	_, err = store.UpdateData("asdf", "{}")
-	assert.NotNil(t, err)
+	_, err = store.UpdateData(uuid.New(), account.UpdateDataRequest{Data: "{}"})
 	assert.Equal(t, pkg.ErrNotFound, err)
 }
 
@@ -48,110 +45,155 @@ func TestCreateAndGetCases(t *testing.T) {
 	a := uuid.New()
 	b := uuid.New()
 	for _, c := range []struct {
-		data  []string
-		extra string
-		pass  bool
-		find  bool
+		p    account.CreateAccountRequest
+		pass bool
+		find bool
 	}{
-		{[]string{a, "1@bar", "secret"}, `{"foo": "bar"}`, true, true},
-		{[]string{a, "1@foo", "secret"}, `{"foo": "bar"}`, false, true},
-		{[]string{b, "1@bar", "secret"}, `{"foo": "bar"}`, false, false},
+		{
+			p: account.CreateAccountRequest{
+				ID:       a,
+				Username: "1@bar",
+				Password: "secret",
+				Data:     `{"foo": "bar"}`,
+			},
+			pass: true, find: true,
+		},
+		{
+			p: account.CreateAccountRequest{
+				ID:       a,
+				Username: "1@bar",
+				Password: "secret",
+				Data:     `{"foo": "bar"}`,
+			},
+			pass: false, find: true,
+		},
+		{
+			p: account.CreateAccountRequest{
+				ID:       b,
+				Username: "1@bar",
+				Password: "secret",
+				Data:     `{"foo": "bar"}`,
+			},
+			pass: false, find: false,
+		},
+		{
+			p: account.CreateAccountRequest{
+				ID:       uuid.New(),
+				Username: uuid.New(),
+				Password: "secret",
+				Data:     "",
+			},
+			pass: true, find: true,
+		},
 	} {
-		result, err := store.Create(c.data[0], c.data[1], c.data[2], c.extra)
+		result, err := store.Create(c.p)
 		if c.pass {
 			assert.Nil(t, err)
-			assert.Equal(t, c.data[0], result.GetID())
-			assert.Equal(t, c.data[1], result.GetUsername())
-			assert.NotEqual(t, c.data[2], result.GetPassword())
-			assert.Equal(t, c.extra, result.GetData())
+			pkg.AssertObjectKeysEqual(t, c.p, result, "ID", "Username")
 
-			result, err = store.Get(c.data[0])
-			if c.find {
-				assert.Nil(t, err)
-				assert.Equal(t, c.data[0], result.GetID())
-				assert.Equal(t, c.data[1], result.GetUsername())
-				assert.NotEqual(t, c.data[2], result.GetPassword())
-				assert.Equal(t, c.extra, result.GetData())
-			} else {
-				assert.NotNil(t, err)
+			result, err = store.Get(c.p.ID)
+			assert.Equal(t, c.find, err == nil)
+			if !c.find {
+				continue
 			}
+			pkg.AssertObjectKeysEqual(t, c.p, result, "ID", "Username")
 		} else {
 			assert.NotNil(t, err)
-			_, err = store.Get(c.data[0])
-			if c.find {
-				assert.Nil(t, err)
-			} else {
-				assert.NotNil(t, err)
+
+			result, err = store.Get(c.p.ID)
+			assert.Equal(t, c.find, err == nil)
+			if !c.find {
+				continue
 			}
+			pkg.AssertObjectKeysEqual(t, c.p, result, "ID", "Username")
 		}
 	}
 }
 
 func TestDelete(t *testing.T) {
 	id := uuid.New()
-	_, err := store.Create(id, "2@bar", "secret", `{"foo": "bar"}`)
-	assert.Nil(t, err)
+	_, _ = store.Create(account.CreateAccountRequest{
+		ID:       id,
+		Username: uuid.New(),
+		Password: "secret",
+	})
 
-	_, err = store.Get(id)
+	_, err := store.Get(id)
 	assert.Nil(t, err)
-
-	err = store.Delete(id)
-	assert.Nil(t, err)
-
+	assert.Nil(t, store.Delete(id))
 	_, err = store.Get(id)
 	assert.NotNil(t, err)
 }
 
 func TestUpdateUsername(t *testing.T) {
 	id := uuid.New()
-	_, err := store.Create(id, "3@bar", "secret", `{"foo": "bar"}`)
-	assert.Nil(t, err)
+	_, _ = store.Create(account.CreateAccountRequest{
+		ID:       id,
+		Username: uuid.New(),
+		Password: "secret",
+	})
 
-	_, err = store.UpdateUsername(id, "3@foo", "wrong secret")
+	_, err := store.UpdateUsername(id, account.UpdateUsernameRequest{
+		Username: uuid.New(),
+		Password: "wrong secret",
+	})
 	assert.NotNil(t, err)
 
-	_, err = store.UpdateUsername(id, "3@foo", "secret")
+	r, err := store.UpdateUsername(id, account.UpdateUsernameRequest{
+		Username: "3@foo",
+		Password: "secret",
+	})
 	assert.Nil(t, err)
-
-	r, err := store.Get(id)
-	assert.Nil(t, err)
-
-	assert.Equal(t, id, r.GetID())
 	assert.Equal(t, "3@foo", r.GetUsername())
-	assert.NotEqual(t, "secret", r.GetPassword())
+
+	// Did it persist?
+	r, err = store.Get(id)
+	assert.Nil(t, err)
+	assert.Equal(t, "3@foo", r.GetUsername())
 }
 
 func TestUpdatePassword(t *testing.T) {
 	id := uuid.New()
-	account, err := store.Create(id, "4@bar", "old secret", `{"foo": "bar"}`)
-	assert.Nil(t, err)
+	ac, _ := store.Create(account.CreateAccountRequest{
+		ID:       id,
+		Username: uuid.New(),
+		Password: "secret",
+	})
 
-	_, err = store.UpdatePassword(id, "wrong old secret", "new secret")
+	_, err := store.UpdatePassword(id, account.UpdatePasswordRequest{
+		CurrentPassword: "wrong old secret",
+		NewPassword:     "new secret",
+	})
 	assert.NotNil(t, err)
 
-	updatedAccount, err := store.UpdatePassword(id, "old secret", "new secret")
+	updatedAccount, err := store.UpdatePassword(id, account.UpdatePasswordRequest{
+		CurrentPassword: "secret",
+		NewPassword:     "new secret",
+	})
 	assert.Nil(t, err)
 
 	resultAccount, err := store.Get(id)
 	assert.Nil(t, err)
 
 	assert.Equal(t, updatedAccount.GetPassword(), resultAccount.GetPassword())
-	assert.NotEqual(t, account.GetPassword(), resultAccount.GetPassword())
+	assert.NotEqual(t, ac.GetPassword(), resultAccount.GetPassword())
 }
 
 func TestAuthenticate(t *testing.T) {
-	account, err := store.Create(uuid.New(), "5@bar", "secret", `{"foo": "bar"}`)
-	assert.Nil(t, err)
+	acc, _ := store.Create(account.CreateAccountRequest{
+		ID:       uuid.New(),
+		Username: "5@bar",
+		Password: "secret",
+	})
 
-	_, err = store.Authenticate("5@bar", "wrong secret")
+	_, err := store.Authenticate("5@bar", "wrong secret")
 	assert.NotNil(t, err)
 	_, err = store.Authenticate("doesnotexist@foo", "secret")
 	assert.NotNil(t, err)
 	_, err = store.Authenticate("", "")
 	assert.NotNil(t, err)
-
 	result, err := store.Authenticate("5@bar", "secret")
 	assert.Nil(t, err)
 
-	assert.True(t, reflect.DeepEqual(account, result), "Results do not match: (%v) does not equal ($v)", &account, &result)
+	assert.Equal(t, acc, result)
 }

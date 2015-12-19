@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/codegangsta/cli"
 	"github.com/howeyc/gopass"
+	"github.com/ory-am/hydra/account"
 	"github.com/pborman/uuid"
 )
 
@@ -38,7 +39,12 @@ func (c *Account) Create(ctx *cli.Context) error {
 	}
 
 	c.Ctx.Start()
-	user, err := c.Ctx.Accounts.Create(uuid.New(), username, password, "{}")
+	user, err := c.Ctx.Accounts.Create(account.CreateAccountRequest{
+		ID:       uuid.New(),
+		Username: username,
+		Password: password,
+		Data:     "{}",
+	})
 	if err != nil {
 		return fmt.Errorf("Could not create account because %s", err)
 	}

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	chd "github.com/ory-am/common/handler"
@@ -95,8 +96,7 @@ var policies = map[string][]policy.Policy{
 	},
 	"allow-all": {
 		&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:accounts"}, []string{"create"}, nil},
-		&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:accounts:<.*>"}, []string{"get"}, nil},
-		&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:accounts:<.*>"}, []string{"delete"}, nil},
+		&policy.DefaultPolicy{"", "", []string{"peter"}, policy.AllowAccess, []string{"rn:hydra:accounts:<.*>"}, []string{"<.*>"}, nil},
 	},
 	"empty": {},
 }
@@ -129,14 +129,6 @@ func TestCreateGetDelete(t *testing.T) {
 		{
 			subject: "peter", token: &jwt.Token{Valid: true},
 			payload:  payload{Username: uuid.New() + "@foobar.com", Data: "{}"},
-			policies: policies["allow-create"],
-			expected: result{
-				create: http.StatusBadRequest, get: 0, delete: 0,
-			},
-		},
-		{
-			subject: "peter", token: &jwt.Token{Valid: true},
-			payload:  payload{Username: uuid.New() + "@foobar.com", Password: "123", Data: "{}"},
 			policies: policies["allow-create"],
 			expected: result{
 				create: http.StatusBadRequest, get: 0, delete: 0,
@@ -191,27 +183,113 @@ func TestCreateGetDelete(t *testing.T) {
 		t.Logf(ts.URL + "/accounts")
 
 		request := gorequest.New()
-		resp, body, _ := request.Post(ts.URL + "/accounts").Send(c.payload).End()
+		resp, body, errs := request.Post(ts.URL + "/accounts").Send(c.payload).End()
+		require.Len(t, errs, 0, "%s", errs)
 		require.Equal(t, c.expected.create, resp.StatusCode, "case %d: %s", k, body)
 		if resp.StatusCode != http.StatusCreated {
 			continue
 		}
 		user := assertAccount(t, c, body)
 
-		resp, body, _ = request.Get(ts.URL + "/accounts/" + user.GetID()).End()
+		resp, body, errs = request.Get(ts.URL + "/accounts/" + user.GetID()).End()
+		require.Len(t, errs, 0, "%s", errs)
 		require.Equal(t, c.expected.get, resp.StatusCode, "case %d: %s", k, body)
 		if resp.StatusCode != http.StatusOK {
 			continue
 		}
 		user = assertAccount(t, c, body)
 
-		resp, body, _ = request.Delete(ts.URL + "/accounts/" + user.GetID()).End()
+		resp, body, errs = request.Delete(ts.URL + "/accounts/" + user.GetID()).End()
+		require.Len(t, errs, 0, "%s", errs)
 		require.Equal(t, c.expected.delete, resp.StatusCode, "case %d: %s", k, body)
 		if resp.StatusCode != http.StatusAccepted {
 			continue
 		}
 
-		resp, body, _ = request.Get(ts.URL + "/accounts/" + user.GetID()).End()
+		resp, body, errs = request.Get(ts.URL + "/accounts/" + user.GetID()).End()
+		require.Len(t, errs, 0, "%s", errs)
 		require.Equal(t, http.StatusNotFound, resp.StatusCode, "case %d: %s", k, body)
 	}
+}
+
+func setUpAccountAndServer(t *testing.T) (*httptest.Server, account.DefaultAccount) {
+	router := mux.NewRouter()
+	hd.SetRoutes(router, mock(test{
+		subject:  "peter",
+		token:    &jwt.Token{Valid: true},
+		policies: policies["allow-all"],
+	}))
+	ts := httptest.NewServer(router)
+
+	var user account.DefaultAccount
+	request := gorequest.New()
+	resp, body, errs := request.Post(ts.URL + "/accounts").Send(account.CreateAccountRequest{
+		Username: uuid.New(),
+		Password: "secret",
+	}).End()
+	require.Len(t, errs, 0, "%s", errs)
+	require.Equal(t, http.StatusCreated, resp.StatusCode, "%s", body)
+	require.Nil(t, json.Unmarshal([]byte(body), &user))
+	return ts, user
+}
+
+func TestUpdatePassword(t *testing.T) {
+	ts, user := setUpAccountAndServer(t)
+	defer ts.Close()
+	request := gorequest.New()
+
+	resp, body, errs := request.Put(fmt.Sprintf("%s/accounts/%s/password", ts.URL, user.ID)).Send(account.UpdatePasswordRequest{
+		CurrentPassword: "wrong",
+		NewPassword:     "secret",
+	}).End()
+	require.Len(t, errs, 0, "%s", errs)
+	require.Equal(t, http.StatusBadRequest, resp.StatusCode, "%s", body)
+
+	resp, body, errs = request.Put(fmt.Sprintf("%s/accounts/%s/password", ts.URL, user.ID)).Send(account.UpdatePasswordRequest{
+		CurrentPassword: "secret",
+		NewPassword:     "new secret",
+	}).End()
+	require.Len(t, errs, 0, "%s", errs)
+	require.Equal(t, http.StatusOK, resp.StatusCode, "%s", body)
+}
+
+func TestUpdateUsername(t *testing.T) {
+	ts, user := setUpAccountAndServer(t)
+	defer ts.Close()
+	request := gorequest.New()
+
+	resp, body, errs := request.Put(fmt.Sprintf("%s/accounts/%s/username", ts.URL, user.ID)).Send(account.UpdateUsernameRequest{
+		Password: "wrong",
+		Username: "secret",
+	}).End()
+	require.Len(t, errs, 0, "%s", errs)
+	require.Equal(t, http.StatusBadRequest, resp.StatusCode, "%s", body)
+
+	resp, body, errs = request.Put(fmt.Sprintf("%s/accounts/%s/username", ts.URL, user.ID)).Send(account.UpdateUsernameRequest{
+		Password: "secret",
+		Username: "new-username",
+	}).End()
+	require.Len(t, errs, 0, "%s", errs)
+	require.Equal(t, http.StatusOK, resp.StatusCode, "%s", body)
+
+	assert.Nil(t, json.Unmarshal([]byte(body), &user))
+	assert.Equal(t, "new-username", user.Username)
+}
+
+func TestUpdateData(t *testing.T) {
+	updateData := `{"update": "data"}`
+	ts, user := setUpAccountAndServer(t)
+	defer ts.Close()
+	request := gorequest.New()
+
+	resp, body, errs := request.Put(fmt.Sprintf("%s/accounts/%s/data", ts.URL, user.ID)).Send(account.UpdateDataRequest{Data: "not json"}).End()
+	require.Len(t, errs, 0, "%s", errs)
+	require.Equal(t, http.StatusBadRequest, resp.StatusCode, "%s", body)
+
+	resp, body, errs = request.Put(fmt.Sprintf("%s/accounts/%s/data", ts.URL, user.ID)).Send(account.UpdateDataRequest{Data: updateData}).End()
+	require.Len(t, errs, 0, "%s", errs)
+	require.Equal(t, http.StatusOK, resp.StatusCode, "%s", body)
+
+	assert.Nil(t, json.Unmarshal([]byte(body), &user))
+	assert.Equal(t, updateData, user.Data)
 }

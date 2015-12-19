@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	chd "github.com/ory-am/common/handler"
 	"github.com/ory-am/dockertest"
+	"github.com/ory-am/hydra/account"
 	acpg "github.com/ory-am/hydra/account/postgres"
 	authcon "github.com/ory-am/hydra/context"
 	"github.com/ory-am/hydra/hash"
@@ -38,9 +39,11 @@ import (
 	"time"
 )
 
-var accID = uuid.New()
-var clientID = "tests"
-var handler *Handler
+var (
+	accID    = uuid.New()
+	clientID = "tests"
+	handler  *Handler
+)
 
 var (
 	configs = map[string]*oauth2.Config{
@@ -123,7 +126,12 @@ func TestMain(m *testing.M) {
 		log.Fatalf("Could create client: %s", err)
 	} else if err := osinStore.CreateClient(&osin.DefaultClient{"working-client-2", "secret", "/callback", ""}); err != nil {
 		log.Fatalf("Could create client: %s", err)
-	} else if _, err := accountStore.Create(accID, "2@bar.com", "secret", "{}"); err != nil {
+	} else if _, err := accountStore.Create(account.CreateAccountRequest{
+		ID:       accID,
+		Username: "2@bar.com",
+		Password: "secret",
+		Data:     "{}",
+	}); err != nil {
 		log.Fatalf("Could create account: %s", err)
 	} else if err := policyStore.Create(&pol); err != nil {
 		log.Fatalf("Could create client: %s", err)

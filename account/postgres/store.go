@@ -3,10 +3,12 @@ package postgres
 import (
 	"database/sql"
 	log "github.com/Sirupsen/logrus"
+	"github.com/asaskevich/govalidator"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/common/pkg"
 	"github.com/ory-am/hydra/account"
 	"github.com/ory-am/hydra/hash"
+	"github.com/pborman/uuid"
 )
 
 const accountSchema = `CREATE TABLE IF NOT EXISTS hydra_account (
@@ -33,20 +35,45 @@ func (s *Store) CreateSchemas() error {
 	return nil
 }
 
-func (s *Store) Create(id, username, password, data string) (account.Account, error) {
-	// Hash the password
-	password, err := s.hasher.Hash(password)
-	if err != nil {
+func validate(r interface{}) error {
+	if v, err := govalidator.ValidateStruct(r); !v {
+		return pkg.ErrInvalidPayload
+	} else if err != nil {
+		return pkg.ErrInvalidPayload
+	}
+	return nil
+}
+
+func (s *Store) Create(r account.CreateAccountRequest) (account.Account, error) {
+	var err error
+
+	if r.ID == "" {
+		r.ID = uuid.New()
+	}
+
+	if r.Data == "" {
+		r.Data = "{}"
+	}
+
+	if err := validate(r); err != nil {
 		return nil, err
 	}
 
-	// Execute SQL statement
-	_, err = s.db.Exec("INSERT INTO hydra_account (id, username, password, data) VALUES ($1, $2, $3, $4)", id, username, password, data)
-	if err != nil {
+	// Hash the password
+	if r.Password, err = s.hasher.Hash(r.Password); err != nil {
+		return nil, err
+	}
+
+	if _, err = s.db.Exec("INSERT INTO hydra_account (id, username, password, data) VALUES ($1, $2, $3, $4)", r.ID, r.Username, r.Password, r.Data); err != nil {
 		return nil, errors.New(err)
 	}
 
-	return &account.DefaultAccount{id, username, password, data}, nil
+	return &account.DefaultAccount{
+		ID:       r.ID,
+		Username: r.Username,
+		Password: r.Password,
+		Data:     r.Data,
+	}, nil
 }
 
 func (s *Store) Get(id string) (account.Account, error) {
@@ -63,38 +90,53 @@ func (s *Store) Get(id string) (account.Account, error) {
 	return &a, nil
 }
 
-func (s *Store) UpdatePassword(id, oldPassword, newPassword string) (account.Account, error) {
-	acc, err := s.authenticateWithIDAndPassword(id, oldPassword)
-	if err != nil {
+func (s *Store) UpdatePassword(id string, r account.UpdatePasswordRequest) (acc account.Account, err error) {
+	if err := validate(r); err != nil {
+		return nil, err
+	}
+
+	if acc, err = s.authenticateWithIDAndPassword(id, r.CurrentPassword); err != nil {
 		return nil, err
 	}
 
 	// Hash the new password
-	newPassword, err = s.hasher.Hash(newPassword)
+	r.NewPassword, err = s.hasher.Hash(r.NewPassword)
 	if err != nil {
 		return nil, err
 	}
 
-	// Execute SQL statement
-	if _, err = s.db.Exec("UPDATE hydra_account SET (password) = ($2) WHERE id=$1", id, newPassword); err != nil {
+	if _, err = s.db.Exec("UPDATE hydra_account SET (password) = ($2) WHERE id=$1", id, r.NewPassword); err != nil {
 		return nil, errors.New(err)
 	}
 
-	return &account.DefaultAccount{acc.GetID(), acc.GetUsername(), newPassword, acc.GetData()}, nil
+	return &account.DefaultAccount{
+		ID:       acc.GetID(),
+		Username: acc.GetUsername(),
+		Password: r.NewPassword,
+		Data:     acc.GetData(),
+	}, nil
 }
 
-func (s *Store) UpdateUsername(id, username, password string) (account.Account, error) {
-	acc, err := s.authenticateWithIDAndPassword(id, password)
-	if err != nil {
+func (s *Store) UpdateUsername(id string, r account.UpdateUsernameRequest) (acc account.Account, err error) {
+	if err := validate(r); err != nil {
+		return nil, err
+	}
+
+	if acc, err = s.authenticateWithIDAndPassword(id, r.Password); err != nil {
 		return nil, err
 	}
 
 	// Execute SQL statement
-	if _, err = s.db.Exec("UPDATE hydra_account SET (username) = ($2) WHERE id=$1", id, username); err != nil {
+	if _, err = s.db.Exec("UPDATE hydra_account SET (username) = ($2) WHERE id=$1", id, r.Username); err != nil {
 		return nil, errors.New(err)
 	}
 
-	return &account.DefaultAccount{acc.GetID(), username, acc.GetUsername(), acc.GetData()}, nil
+	return &account.DefaultAccount{
+		ID:       acc.GetID(),
+		Username: r.Username,
+		Password: acc.GetPassword(),
+		Data:     acc.GetData(),
+	}, nil
 }
 
 func (s *Store) Delete(id string) (err error) {
@@ -118,15 +160,19 @@ func (s *Store) Authenticate(username, password string) (account.Account, error)
 
 	// Compare the given password with the hashed password stored in the database
 	if err := s.hasher.Compare(a.Password, password); err != nil {
-		return nil, err
+		return nil, pkg.ErrInvalidPayload
 	}
 
 	return &a, nil
 }
 
-func (s *Store) UpdateData(id string, data string) (account.Account, error) {
+func (s *Store) UpdateData(id string, r account.UpdateDataRequest) (acc account.Account, err error) {
+	if err := validate(r); err != nil {
+		return nil, err
+	}
+
 	// Execute SQL statement
-	if _, err := s.db.Exec("UPDATE hydra_account SET (data) = ($2) WHERE id=$1", id, data); err != nil {
+	if _, err = s.db.Exec("UPDATE hydra_account SET (data) = ($2) WHERE id=$1", id, r.Data); err != nil {
 		return nil, errors.New(err)
 	}
 
@@ -142,7 +188,7 @@ func (s *Store) authenticateWithIDAndPassword(id, password string) (account.Acco
 
 	// Compare the given password with the hashed password stored in the database
 	if err := s.hasher.Compare(acc.GetPassword(), password); err != nil {
-		return nil, errors.New(err)
+		return nil, pkg.ErrInvalidPayload
 	}
 
 	return acc, nil

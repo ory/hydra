@@ -8,7 +8,6 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/asaskevich/govalidator"
 	"github.com/go-errors/errors"
 	"github.com/gorilla/mux"
 	chd "github.com/ory-am/common/handler"
@@ -39,58 +38,136 @@ func (h *Handler) SetRoutes(r *mux.Router, extractor func(h chd.ContextHandler) 
 		extractor,
 		h.m.IsAuthenticated,
 		h.m.IsAuthorized("rn:hydra:accounts", "create", nil),
-	).ThenFunc(h.Create)).Methods("POST")
+	).ThenFunc(h.create)).Methods("POST")
+
+	r.Handle("/accounts/{id}/password", chd.NewContextAdapter(
+		context.Background(),
+		extractor,
+		h.m.IsAuthenticated,
+	).ThenFunc(h.updatePassword)).Methods("PUT")
+
+	r.Handle("/accounts/{id}/data", chd.NewContextAdapter(
+		context.Background(),
+		extractor,
+		h.m.IsAuthenticated,
+	).ThenFunc(h.updateData)).Methods("PUT")
+
+	r.Handle("/accounts/{id}/username", chd.NewContextAdapter(
+		context.Background(),
+		extractor,
+		h.m.IsAuthenticated,
+	).ThenFunc(h.updateUsername)).Methods("PUT")
 
 	r.Handle("/accounts/{id}", chd.NewContextAdapter(
 		context.Background(),
 		extractor,
 		h.m.IsAuthenticated,
-	).ThenFunc(h.Get)).Methods("GET")
+	).ThenFunc(h.get)).Methods("GET")
 
 	r.Handle("/accounts/{id}", chd.NewContextAdapter(
 		context.Background(),
 		extractor,
 		h.m.IsAuthenticated,
-	).ThenFunc(h.Delete)).Methods("DELETE")
+	).ThenFunc(h.delete)).Methods("DELETE")
 }
 
-func (h *Handler) Create(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
-	type Payload struct {
-		Username string `valid:"required" json:"username" `
-		Password string `valid:"length(6|254),required" json:"password"`
-		Data     string `valid:"optional,json" json:"data"`
-	}
-
-	var p Payload
-	decoder := json.NewDecoder(req.Body)
-	if err := decoder.Decode(&p); err != nil {
+func (h *Handler) create(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+	var p CreateAccountRequest
+	if err := json.NewDecoder(req.Body).Decode(&p); err != nil {
 		HttpError(rw, err, http.StatusBadRequest)
 		return
 	}
 
-	if v, err := govalidator.ValidateStruct(p); !v {
-		if err != nil {
-			HttpError(rw, err, http.StatusBadRequest)
-			return
-		}
-		http.Error(rw, "Payload did not validate.", http.StatusBadRequest)
-		return
-	}
-
-	if p.Data == "" {
-		p.Data = "{}"
-	}
-
-	user, err := h.s.Create(uuid.New(), p.Username, p.Password, p.Data)
+	// Force ID override
+	p.ID = uuid.New()
+	user, err := h.s.Create(p)
 	if err != nil {
 		WriteError(rw, err)
 		return
 	}
 
-	WriteCreatedJSON(rw, "/accounts/"+user.GetID(), user)
+	WriteCreatedJSON(rw, fmt.Sprintf("/accounts/%s", user.GetID()), user)
 }
 
-func (h *Handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+func (h *Handler) updateUsername(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+	id, ok := mux.Vars(req)["id"]
+	if !ok {
+		HttpError(rw, errors.Errorf("No id given."), http.StatusBadRequest)
+		return
+	}
+
+	h.m.IsAuthorized(permission(id), "put:data", middleware.NewEnv(req).Owner(id))(chd.ContextHandlerFunc(
+		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+			var p UpdateUsernameRequest
+			if err := json.NewDecoder(req.Body).Decode(&p); err != nil {
+				HttpError(rw, err, http.StatusBadRequest)
+				return
+			}
+
+			user, err := h.s.UpdateUsername(id, p)
+			if err != nil {
+				WriteError(rw, err)
+				return
+			}
+
+			WriteJSON(rw, user)
+		}),
+	).ServeHTTPContext(ctx, rw, req)
+}
+
+func (h *Handler) updatePassword(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+	id, ok := mux.Vars(req)["id"]
+	if !ok {
+		HttpError(rw, errors.Errorf("No id given."), http.StatusBadRequest)
+		return
+	}
+
+	h.m.IsAuthorized(permission(id), "put:password", middleware.NewEnv(req).Owner(id))(chd.ContextHandlerFunc(
+		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+			var p UpdatePasswordRequest
+			if err := json.NewDecoder(req.Body).Decode(&p); err != nil {
+				HttpError(rw, err, http.StatusBadRequest)
+				return
+			}
+
+			user, err := h.s.UpdatePassword(id, p)
+			if err != nil {
+				WriteError(rw, err)
+				return
+			}
+
+			WriteJSON(rw, user)
+		}),
+	).ServeHTTPContext(ctx, rw, req)
+}
+
+func (h *Handler) updateData(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+	id, ok := mux.Vars(req)["id"]
+	if !ok {
+		HttpError(rw, errors.Errorf("No id given."), http.StatusBadRequest)
+		return
+	}
+
+	h.m.IsAuthorized(permission(id), "put:data", middleware.NewEnv(req).Owner(id))(chd.ContextHandlerFunc(
+		func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+			var p UpdateDataRequest
+			if err := json.NewDecoder(req.Body).Decode(&p); err != nil {
+				HttpError(rw, err, http.StatusBadRequest)
+				return
+			}
+
+			user, err := h.s.UpdateData(id, p)
+			if err != nil {
+				WriteError(rw, err)
+				return
+			}
+
+			WriteJSON(rw, user)
+		}),
+	).ServeHTTPContext(ctx, rw, req)
+}
+
+func (h *Handler) get(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 	id, ok := mux.Vars(req)["id"]
 	if !ok {
 		HttpError(rw, errors.Errorf("No id given."), http.StatusBadRequest)
@@ -104,12 +181,13 @@ func (h *Handler) Get(ctx context.Context, rw http.ResponseWriter, req *http.Req
 				WriteError(rw, err)
 				return
 			}
+
 			WriteJSON(rw, user)
 		}),
 	).ServeHTTPContext(ctx, rw, req)
 }
 
-func (h *Handler) Delete(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+func (h *Handler) delete(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 	id, ok := mux.Vars(req)["id"]
 	if !ok {
 		HttpError(rw, errors.Errorf("No id given."), http.StatusBadRequest)

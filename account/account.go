@@ -9,9 +9,9 @@ type Account interface {
 
 type DefaultAccount struct {
 	ID       string `json:"id"`
-	Username string `json:"username"`
+	Username string `json:"username" valid:"required"`
 	Password string `json:"-"`
-	Data     string `json:"data"`
+	Data     string `json:"data,omitempty" valid:"json"`
 }
 
 func (a *DefaultAccount) GetID() string {

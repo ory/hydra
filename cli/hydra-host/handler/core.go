@@ -16,6 +16,7 @@ import (
 	"github.com/ory-am/ladon/guard"
 
 	"fmt"
+	"github.com/ory-am/common/pkg"
 	"golang.org/x/net/http2"
 	"net/http"
 )
@@ -80,6 +81,15 @@ func (c *Core) Start(ctx *cli.Context) error {
 	c.clientHandler.SetRoutes(router, extractor)
 	c.oauthHandler.SetRoutes(router, extractor)
 	c.policyHandler.SetRoutes(router, extractor)
+
+	// TODO un-hack this, add database check, add error response
+	router.HandleFunc("/alive", func(w http.ResponseWriter, r *http.Request) {
+		pkg.WriteJSON(w, &struct {
+			Status string `json:"status"`
+		}{
+			Status: "alive",
+		})
+	})
 
 	if forceHTTP == "force" {
 		http.Handle("/", router)

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"github.com/RangelReale/osin"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	chd "github.com/ory-am/common/handler"
@@ -13,6 +14,7 @@ import (
 	"github.com/ory-am/ladon/guard/operator"
 	"github.com/ory-am/ladon/policy"
 	"github.com/ory-am/ladon/policy/postgres"
+	opg "github.com/ory-am/osin-storage/storage/postgres"
 	"github.com/parnurzeal/gorequest"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/require"
@@ -28,6 +30,7 @@ import (
 var (
 	mw    *middleware.Middleware
 	store *postgres.Store
+	o     *opg.Storage
 )
 
 var jwtService = hjwt.New([]byte(hjwt.TestCertificates[0][1]), []byte(hjwt.TestCertificates[1][1]))
@@ -42,8 +45,19 @@ func TestMain(m *testing.M) {
 
 	store = postgres.New(db)
 	mw = &middleware.Middleware{}
+	o = opg.New(db)
 	if err := store.CreateSchemas(); err != nil {
-		log.Fatalf("COuld not create schemas: %s", err)
+		log.Fatalf("Could not create schemas: %s", err)
+	}
+	if err := o.CreateSchemas(); err != nil {
+		log.Fatalf("Could not create schemas: %s", err)
+	}
+
+	if err := o.CreateClient(&osin.DefaultClient{
+		Id:     "app",
+		Secret: "secret",
+	}); err != nil {
+		log.Fatalf("Could not create app: %s", err)
 	}
 
 	os.Exit(m.Run())
@@ -112,7 +126,7 @@ func TestGrantedEndpoint(t *testing.T) {
 		policies: []policy.Policy{policies["pass-all"]},
 	}
 
-	handler := &Handler{s: store, m: mw, g: &guard.Guard{}, j: jwtService}
+	handler := &Handler{s: store, m: mw, g: &guard.Guard{}, j: jwtService, o: o}
 	router := mux.NewRouter()
 	handler.SetRoutes(router, mockAuthorization(c))
 	ts := httptest.NewServer(router)
@@ -123,13 +137,17 @@ func TestGrantedEndpoint(t *testing.T) {
 	require.Equal(t, 201, resp.StatusCode)
 
 	num := 0
-	do := func(p GrantedPayload, shouldAllow bool) {
-		resp, body, _ := request.Post(ts.URL + "/guard/allowed").Send(p).End()
-		require.Equal(t, 200, resp.StatusCode, "Case %d", num)
-
-		var isAllowed struct {
-			Allowed bool `json:"allowed"`
+	var isAllowed struct {
+		Allowed bool `json:"allowed"`
+	}
+	do := func(p GrantedPayload, username, password string, shouldAllow bool) {
+		resp, body, _ := request.Post(ts.URL+"/guard/allowed").SetBasicAuth(username, password).Send(p).End()
+		if username != "app" || password != "secret" {
+			require.Equal(t, 401, resp.StatusCode, "Case %d", num)
+			return
 		}
+
+		require.Equal(t, 200, resp.StatusCode, "Case %d", num)
 		json.Unmarshal([]byte(body), &isAllowed)
 		require.Equal(t, 200, resp.StatusCode, "Case %d", num)
 		require.Equal(t, shouldAllow, isAllowed.Allowed, "Case %d", num)
@@ -144,7 +162,7 @@ func TestGrantedEndpoint(t *testing.T) {
 		Context: &operator.Context{
 			Owner: "peter",
 		},
-	}, false)
+	}, "app", "secret", false)
 
 	do(GrantedPayload{
 		Resource: "article",
@@ -154,7 +172,7 @@ func TestGrantedEndpoint(t *testing.T) {
 		Context: &operator.Context{
 			Owner: "peter",
 		},
-	}, true)
+	}, "app", "secret", true)
 
 	do(GrantedPayload{
 		Resource: "article",
@@ -164,7 +182,27 @@ func TestGrantedEndpoint(t *testing.T) {
 		Context: &operator.Context{
 			Owner: "peter",
 		},
-	}, true)
+	}, "app", "secret", true)
+
+	do(GrantedPayload{
+		Resource: "article",
+		// sub: peter
+		Token:      "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwZXRlciIsImV4cCI6MTkyNDk3NTYxOX0.GVn0YAQTFFoIa-fcsqQgq3pgWBAYNsbd9SqoXUPt7EK63zqiZ0yVqWgQCBEXU5NyT96Alg1Se6Pq6wzAC4ydof-MN3nQhcoNhx6QEHBGFDwwsHwMVyi-51S0NXzYXSV-gGrPoOloCkOSoyab-RWdMZ6LrgV5WQOW4WAfYL0nJ0I-WxlXcoKi-8MJ1GqScqC_E0v9cn4iNAT5e1tPMT49KdjOo_HYPQlJQjcJ724USdDWywPxZy5AmYxG5A2XeaY41Ly0O0HJ8Q56I2ukPMfXiTpnm5mnb9mRbK99HnvlAvtEKJ-Lf0w_BTurL_3ZmONKSYR0HHIMZC0hO9NJNNTS1Q",
+		Permission: "foobar",
+		Context: &operator.Context{
+			Owner: "peter",
+		},
+	}, "foo", "secret", false)
+
+	do(GrantedPayload{
+		Resource: "article",
+		// sub: peter
+		Token:      "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwZXRlciIsImV4cCI6MTkyNDk3NTYxOX0.GVn0YAQTFFoIa-fcsqQgq3pgWBAYNsbd9SqoXUPt7EK63zqiZ0yVqWgQCBEXU5NyT96Alg1Se6Pq6wzAC4ydof-MN3nQhcoNhx6QEHBGFDwwsHwMVyi-51S0NXzYXSV-gGrPoOloCkOSoyab-RWdMZ6LrgV5WQOW4WAfYL0nJ0I-WxlXcoKi-8MJ1GqScqC_E0v9cn4iNAT5e1tPMT49KdjOo_HYPQlJQjcJ724USdDWywPxZy5AmYxG5A2XeaY41Ly0O0HJ8Q56I2ukPMfXiTpnm5mnb9mRbK99HnvlAvtEKJ-Lf0w_BTurL_3ZmONKSYR0HHIMZC0hO9NJNNTS1Q",
+		Permission: "foobar",
+		Context: &operator.Context{
+			Owner: "peter",
+		},
+	}, "app", "wrong-secret", false)
 
 	do(GrantedPayload{
 		Resource: "foobar",
@@ -174,7 +212,7 @@ func TestGrantedEndpoint(t *testing.T) {
 		Context: &operator.Context{
 			Owner: "peter",
 		},
-	}, false)
+	}, "app", "secret", false)
 
 	do(GrantedPayload{
 		Resource: "article",
@@ -184,7 +222,7 @@ func TestGrantedEndpoint(t *testing.T) {
 		Context: &operator.Context{
 			Owner: "peter",
 		},
-	}, false)
+	}, "app", "secret", false)
 }
 
 func TestCreateGetDeleteGet(t *testing.T) {

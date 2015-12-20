@@ -2,7 +2,6 @@ package http_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/go-errors/errors"
 	"github.com/gorilla/mux"
 	"github.com/ory-am/common/pkg"
@@ -33,8 +32,8 @@ func tokenHandler(rw http.ResponseWriter, req *http.Request) {
 func TestIsRequestAllowed(t *testing.T) {
 	router := mux.NewRouter()
 	router.HandleFunc("/guard/allowed", func(rw http.ResponseWriter, req *http.Request) {
-		if req.Header.Get("Authorization") != "Bearer fetch-token-ok" {
-			http.Error(rw, "", http.StatusUnauthorized)
+		if req.Header.Get("Authorization") != "Basic YXBwOmtleQ==" {
+			http.Error(rw, req.Header.Get("Authorization"), http.StatusUnauthorized)
 			return
 		}
 		pkg.WriteJSON(rw, struct {
@@ -45,125 +44,19 @@ func TestIsRequestAllowed(t *testing.T) {
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 
-	c := New(ts.URL, "irrelevant", "irrelephant")
+	c := New(ts.URL, "app", "key")
 	c.SetClientToken(&oauth2.Token{TokenType: "bearer", AccessToken: "foobar"})
 	allowed, err := c.IsRequestAllowed(&http.Request{Header: http.Header{"Authorization": []string{"Bearer token"}}}, "", "", "")
 	assert.Nil(t, err)
 	assert.True(t, allowed)
 }
 
-func TestIsAllowedRetriesOnlyOnceWhenTokenIsInvalid(t *testing.T) {
-	var count int
-	router := mux.NewRouter()
-	router.HandleFunc("/oauth2/token", tokenHandler).Methods("POST")
-	router.HandleFunc("/guard/allowed", func(rw http.ResponseWriter, req *http.Request) {
-		http.Error(rw, fmt.Sprintf("token invalid try ", count), http.StatusUnauthorized)
-		count++
-	}).Methods("POST")
-	ts := httptest.NewServer(router)
-	defer ts.Close()
-	c := New(ts.URL, "irrelevant", "irrelephant")
-	c.SetClientToken(&oauth2.Token{TokenType: "bearer", AccessToken: "foobar"})
-
-	allowed, err := c.IsAllowed(&AuthorizeRequest{
-		Permission: "foo",
-		Token:      "bar",
-		Resource:   "res",
-		Context: &operator.Context{
-			Owner: "foo",
-		},
-	})
-	assert.NotNil(t, err)
-	assert.False(t, allowed)
-	assert.Equal(t, 2, count)
-}
-
-func TestIsAllowedRetriesWhenTokenIsExpired(t *testing.T) {
-	var try int
-	router := mux.NewRouter()
-	router.HandleFunc("/guard/allowed", func(rw http.ResponseWriter, req *http.Request) {
-		try++
-		if try == 1 {
-			t.Logf("token invalid try ", try)
-			http.Error(rw, fmt.Sprintf("token invalid try ", try), http.StatusUnauthorized)
-			return
-		}
-
-		pkg.WriteJSON(rw, struct {
-			Allowed bool `json:"allowed"`
-		}{Allowed: true})
-	}).Methods("POST")
-	router.HandleFunc("/oauth2/token", tokenHandler).Methods("POST")
-	ts := httptest.NewServer(router)
-	defer ts.Close()
-
-	c := New(ts.URL, "irrelevant", "irrelephant")
-	c.SetClientToken(&oauth2.Token{TokenType: "bearer", AccessToken: "foobar"})
-
-	allowed, err := c.IsAllowed(&AuthorizeRequest{
-		Permission: "foo",
-		Token:      "bar",
-		Resource:   "res",
-		Context: &operator.Context{
-			Owner: "foo",
-		},
-	})
-	assert.Nil(t, err, "%s", err)
-	assert.True(t, allowed)
-	assert.Equal(t, 2, try)
-}
-
-func TestIsAuthenticatedRetriesWhenTokenIsExpired(t *testing.T) {
-	var try int
-	router := mux.NewRouter()
-	router.HandleFunc("/oauth2/introspect", func(rw http.ResponseWriter, req *http.Request) {
-		try++
-		if try == 1 {
-			http.Error(rw, fmt.Sprintf("token invalid try ", try), http.StatusUnauthorized)
-			return
-		}
-
-		pkg.WriteJSON(rw, struct {
-			Active bool `json:"active"`
-		}{Active: true})
-	}).Methods("POST")
-	router.HandleFunc("/oauth2/token", tokenHandler).Methods("POST")
-	ts := httptest.NewServer(router)
-	defer ts.Close()
-
-	c := New(ts.URL, "irrelevant", "irrelephant")
-	c.SetClientToken(&oauth2.Token{TokenType: "bearer", AccessToken: "client"})
-	active, err := c.IsAuthenticated("federated.token")
-	assert.Nil(t, err, "%s", err)
-	assert.True(t, active)
-	assert.Equal(t, 2, try)
-}
-
-func TestIsAuthenticatedRetriesOnlyOnceWhenTokenIsExpired(t *testing.T) {
-	var count int
-	router := mux.NewRouter()
-	router.HandleFunc("/oauth2/introspect", func(rw http.ResponseWriter, req *http.Request) {
-		count++
-		http.Error(rw, fmt.Sprintf("token invalid try ", count), http.StatusUnauthorized)
-	}).Methods("POST")
-	router.HandleFunc("/oauth2/token", tokenHandler).Methods("POST")
-	ts := httptest.NewServer(router)
-	defer ts.Close()
-
-	c := New(ts.URL, "irrelevant", "irrelephant")
-	c.SetClientToken(&oauth2.Token{TokenType: "bearer", AccessToken: "client"})
-	active, err := c.IsAuthenticated("federated.token")
-	assert.NotNil(t, err)
-	assert.False(t, active)
-	assert.Equal(t, 2, count)
-}
-
 func TestIsAllowed(t *testing.T) {
 	router := mux.NewRouter()
 	router.HandleFunc("/oauth2/token", tokenHandler).Methods("POST")
 	router.HandleFunc("/guard/allowed", func(rw http.ResponseWriter, req *http.Request) {
-		if req.Header.Get("Authorization") != "Bearer fetch-token-ok" {
-			http.Error(rw, "", http.StatusUnauthorized)
+		if req.Header.Get("Authorization") != "Basic YXBwOmtleQ==" {
+			http.Error(rw, req.Header.Get("Authorization"), http.StatusUnauthorized)
 			return
 		}
 		var p handler.GrantedPayload
@@ -185,9 +78,9 @@ func TestIsAllowed(t *testing.T) {
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 
-	c := New(ts.URL, "irrelevant", "irrelephant")
+	c := New(ts.URL, "app", "key")
 	allowed, err := c.IsAllowed(&AuthorizeRequest{Permission: "foo", Token: "bar", Resource: "res", Context: &operator.Context{Owner: "foo"}})
-	assert.Nil(t, err)
+	assert.Nil(t, err, "%s", err)
 	assert.True(t, allowed)
 }
 
@@ -196,8 +89,8 @@ func TestIsAuthenticated(t *testing.T) {
 	called := false
 	router.HandleFunc("/oauth2/token", tokenHandler).Methods("POST")
 	router.HandleFunc("/oauth2/introspect", func(rw http.ResponseWriter, req *http.Request) {
-		if req.Header.Get("Authorization") != "Bearer fetch-token-ok" {
-			http.Error(rw, "", http.StatusUnauthorized)
+		if req.Header.Get("Authorization") != "Basic YXBwOmtleQ==" {
+			http.Error(rw, req.Header.Get("Authorization"), http.StatusUnauthorized)
 			return
 		}
 		req.ParseForm()
@@ -210,9 +103,9 @@ func TestIsAuthenticated(t *testing.T) {
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 
-	c := New(ts.URL, "irrelevant", "irrelephant")
-	active, err := c.IsAuthenticated("federated.token")
-	assert.Nil(t, err)
+	c := New(ts.URL, "app", "key")
+	active, err := c.IsAuthenticated("some.token")
+	assert.Nil(t, err, "%s", err)
 	assert.True(t, active)
 	assert.True(t, called)
 }

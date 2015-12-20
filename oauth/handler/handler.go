@@ -2,10 +2,10 @@ package handler
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/RangelReale/osin"
 	log "github.com/Sirupsen/logrus"
+	"github.com/go-errors/errors"
 	"github.com/gorilla/mux"
 	hctx "github.com/ory-am/common/handler"
 	"github.com/ory-am/common/pkg"
@@ -77,7 +77,7 @@ func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hctx.ContextHandler)
 func (h *Handler) RevokeHandler(w http.ResponseWriter, r *http.Request) {
 	auth, err := osin.CheckBasicAuth(r)
 	if err != nil {
-		pkg.HttpError(w, errors.New("Unauthorized"), http.StatusServiceUnavailable)
+		pkg.HttpError(w, errors.New("Unauthorized"), http.StatusUnauthorized)
 		return
 	} else if auth == nil {
 		pkg.HttpError(w, errors.New("Unauthorized"), http.StatusUnauthorized)
@@ -86,7 +86,10 @@ func (h *Handler) RevokeHandler(w http.ResponseWriter, r *http.Request) {
 
 	client, err := h.OAuthStore.GetClient(auth.Username)
 	if err != nil {
-		pkg.HttpError(w, errors.New("Unauthorized"), http.StatusServiceUnavailable)
+		pkg.HttpError(w, errors.New("Unauthorized"), http.StatusUnauthorized)
+		return
+	} else if client.GetSecret() != auth.Password {
+		pkg.HttpError(w, errors.New("Unauthorized"), http.StatusUnauthorized)
 		return
 	}
 
@@ -161,6 +164,15 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	client, err := h.OAuthStore.GetClient(auth.Username)
+	if err != nil {
+		pkg.HttpError(w, errors.New("Unauthorized"), http.StatusUnauthorized)
+		return
+	} else if client.GetSecret() != auth.Password {
+		pkg.HttpError(w, errors.New("Unauthorized"), http.StatusUnauthorized)
+		return
+	}
+
 	result := make(map[string]interface{})
 	result["active"] = false
 
@@ -180,11 +192,11 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	claims := jwt.ClaimsCarrier(token.Claims)
-	if claims.GetAudience() != h.Audience {
+	if claims.GetAudience() != auth.Username {
 		log.WithFields(log.Fields{
-			"introspect": "fail",
-			"expted":     h.Audience,
-			"actual":     claims.GetAudience(),
+			"introspect":       "fail",
+			"actualAudience":   auth.Username,
+			"expectedAudience": claims.GetAudience(),
 		}).Warn(`Token audience mismatch.`)
 		pkg.WriteJSON(w, result)
 		return
@@ -193,8 +205,6 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request) {
 	if claims.GetSubject() == "" {
 		log.WithFields(log.Fields{
 			"introspect": "fail",
-			"expted":     h.Audience,
-			"actual":     claims.GetAudience(),
 		}).Warn(`Token claims no subject.`)
 		pkg.WriteJSON(w, result)
 		return

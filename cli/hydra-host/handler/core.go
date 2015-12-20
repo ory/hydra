@@ -56,7 +56,7 @@ func (c *Core) Start(ctx *cli.Context) error {
 	c.clientHandler = clients.NewHandler(c.Ctx.Osins, m)
 	c.connectionHandler = connections.NewHandler(c.Ctx.Connections, m)
 	c.providers = provider.NewRegistry(providers)
-	c.policyHandler = policies.NewHandler(c.Ctx.Policies, m, c.guard, j)
+	c.policyHandler = policies.NewHandler(c.Ctx.Policies, m, c.guard, j, c.Ctx.Osins)
 	c.oauthHandler = &oauth.Handler{
 		Accounts:       c.Ctx.Accounts,
 		Policies:       c.Ctx.Policies,

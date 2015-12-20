@@ -296,38 +296,92 @@ func TestIntrospect(t *testing.T) {
 	require.Nil(t, err)
 
 	for k, c := range []*struct {
-		accessToken string
-		code        int
-		pass        bool
+		accessToken  string
+		code         int
+		pass         bool
+		clientID     string
+		clientSecret string
 	}{
-		{verify.AccessToken, http.StatusOK, true},
-		{access.AccessToken, http.StatusOK, true},
-		{"", http.StatusOK, false},
-		{" ", http.StatusOK, false},
-		{"invalid", http.StatusOK, false},
+		{
+			accessToken:  verify.AccessToken,
+			code:         http.StatusUnauthorized,
+			pass:         false,
+			clientSecret: "not-working",
+		},
+		{
+			accessToken: verify.AccessToken,
+			code:        http.StatusUnauthorized,
+			pass:        false,
+			clientID:    "not-existing",
+		},
+		{
+			accessToken: verify.AccessToken,
+			code:        http.StatusOK,
+			pass:        true,
+		},
+		{
+			accessToken: access.AccessToken,
+			code:        http.StatusOK,
+			pass:        true,
+		},
+		{
+			accessToken: "",
+			code:        http.StatusOK,
+			pass:        false,
+		},
+		{
+			accessToken: " ",
+			code:        http.StatusOK,
+			pass:        false,
+		},
+		{
+			accessToken: "invalid",
+			code:        http.StatusOK,
+			pass:        false,
+		},
 		//
-		{"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.e30.FvuwHdEjgGxPAyVUb-eqtiPl2gycU9WOHNzwpFKcpdN_QkXkBUxU3qFl3lLBaMzIuP_GjXLXcJZFhyQ2Ne3kfWuZSGLmob0Og8B4lAy7CA7iwpji2R3aUcwBwbJ41IJa__F8fMRz0dRDwhyrBKD-9y4TfV_-yZuzBZxq0UdjX6IdpzsdetphBSIZkPij5MY3thRwC-X_gXyIXi4-G2_CjRrV5lCGnPJrDbLqPCYqS71wK9NEsz_B8p5ENmwad8vZe4fEFR7XsqJrhPjbEVGeLpzSz0AOGp4G1iyvv1sdu4M3Y8KSSGYnZ8lXNGyi8QeUr374Y6XgJ5N5TVLWI2cMxg", http.StatusOK, false},
+		{
+			accessToken: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.e30.FvuwHdEjgGxPAyVUb-eqtiPl2gycU9WOHNzwpFKcpdN_QkXkBUxU3qFl3lLBaMzIuP_GjXLXcJZFhyQ2Ne3kfWuZSGLmob0Og8B4lAy7CA7iwpji2R3aUcwBwbJ41IJa__F8fMRz0dRDwhyrBKD-9y4TfV_-yZuzBZxq0UdjX6IdpzsdetphBSIZkPij5MY3thRwC-X_gXyIXi4-G2_CjRrV5lCGnPJrDbLqPCYqS71wK9NEsz_B8p5ENmwad8vZe4fEFR7XsqJrhPjbEVGeLpzSz0AOGp4G1iyvv1sdu4M3Y8KSSGYnZ8lXNGyi8QeUr374Y6XgJ5N5TVLWI2cMxg",
+			code:        http.StatusOK,
+			pass:        false,
+		},
 
 		//		 "exp": 12345
-		{"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjEyMzQ1fQ.0w2dienBCvgfbhLjmK04fFKqf2oFRMNoKS0A3zHBpU_yN22utC_gAvcFwKiMffebtHah7rgldnPqNZaNhfnEM1PxNFh46vXO5LNZDHt5sNZqeBtZ1Q7ORkZsAtIp97mtZMxufn0VBqJTRYxyDrEzH9Mo1OpXuPTzDP87n-p_Xdbpj5YccZU6TZ11eLs9NvuYu_A2HClKrGbCeaHFAGVWVaoSZ_TvjGqyBI-XoGzuCEBoj6NFTHxZpbNeKhVTTwXHv2sUn09gZ_ErmbPZKExV5sCLETktr4ABUXkNtw4xLW6g0EVzC9dRMKxUZO8kCmAJkKHUTinEDjpfX_n8CKRQVQ", http.StatusOK, false},
+		{
+			accessToken: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjEyMzQ1fQ.0w2dienBCvgfbhLjmK04fFKqf2oFRMNoKS0A3zHBpU_yN22utC_gAvcFwKiMffebtHah7rgldnPqNZaNhfnEM1PxNFh46vXO5LNZDHt5sNZqeBtZ1Q7ORkZsAtIp97mtZMxufn0VBqJTRYxyDrEzH9Mo1OpXuPTzDP87n-p_Xdbpj5YccZU6TZ11eLs9NvuYu_A2HClKrGbCeaHFAGVWVaoSZ_TvjGqyBI-XoGzuCEBoj6NFTHxZpbNeKhVTTwXHv2sUn09gZ_ErmbPZKExV5sCLETktr4ABUXkNtw4xLW6g0EVzC9dRMKxUZO8kCmAJkKHUTinEDjpfX_n8CKRQVQ",
+			code:        http.StatusOK,
+			pass:        false,
+		},
 		//		{
 		//			"exp": 1924975619,
 		//			"nbf": 1924975619
 		//		}
-		{"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MTkyNDk3NTYxOX0.P381fgXq75I1iFBFMA624LgKm-wyous9VV4aQHS2O9kDyCJUejK71-M5owaWkjDOkHFlE7Ju5yknasODNlYsuzB2ujos1xiCuHYjoqivvSPNwrxJMXKMXrtzzk045E_OH1EHd_d9KVmrnA5dd3NLqNdYAoUogrO4TistjpZOv-ABUesiKIOR6SopD2tUxHog4RmFFtBJOt4l9P2aGn4a6LBt5wvBz9wUKak7YzUKMZXsWus-x-RP41bulpsUPEfH4TtgQHOM-VQ5W-EORhH8PClBfUrPyp1H7bgXOjhvCdpf4dfJS59Wf3euq9TXT0axyJ5HErXy3yOwC0E2ggl2iQ", http.StatusOK, false},
+		{
+			accessToken: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MTkyNDk3NTYxOX0.P381fgXq75I1iFBFMA624LgKm-wyous9VV4aQHS2O9kDyCJUejK71-M5owaWkjDOkHFlE7Ju5yknasODNlYsuzB2ujos1xiCuHYjoqivvSPNwrxJMXKMXrtzzk045E_OH1EHd_d9KVmrnA5dd3NLqNdYAoUogrO4TistjpZOv-ABUesiKIOR6SopD2tUxHog4RmFFtBJOt4l9P2aGn4a6LBt5wvBz9wUKak7YzUKMZXsWus-x-RP41bulpsUPEfH4TtgQHOM-VQ5W-EORhH8PClBfUrPyp1H7bgXOjhvCdpf4dfJS59Wf3euq9TXT0axyJ5HErXy3yOwC0E2ggl2iQ",
+			code:        http.StatusOK,
+			pass:        false,
+		},
 		//		{
 		//			"exp": 1924975619,
 		//			"iat": 1924975619,
 		//			"nbf": 0
 		//		}
-		{"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MCwiaWF0IjoxOTI0OTc1NjE5fQ.qwUo8-e9tcg69pv9SJFpMXytJtAZlTJoVZh73bVtpkImZ0G5s_cbzPvccM_LmmHl5rFCpQuwWDSuHME2iyer6-gC2DILGQiXyJ5JhJdAKD4xtSFnV90zu84BF8L4JWqLeIEV13AHTpphfS0tOOOKL6sFYbo4LQVslfRYON28D3iOP-YAKJeorHsZgTNg-7VjPC8w_emDpVoNiWEyON2gHrucKiJlWQJVE_gxLf_n-F29UV1OBi-AjxccCrXMd0pzndZ7zg_7EbaUuOmLStfn2ORkoARaHaw55Sv2vbf_AV0MWsgqPaOlK6GTbfv3sYjB7K9eItWh9o8kDXNM4blqSw", http.StatusOK, false},
+		{
+			accessToken: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MCwiaWF0IjoxOTI0OTc1NjE5fQ.qwUo8-e9tcg69pv9SJFpMXytJtAZlTJoVZh73bVtpkImZ0G5s_cbzPvccM_LmmHl5rFCpQuwWDSuHME2iyer6-gC2DILGQiXyJ5JhJdAKD4xtSFnV90zu84BF8L4JWqLeIEV13AHTpphfS0tOOOKL6sFYbo4LQVslfRYON28D3iOP-YAKJeorHsZgTNg-7VjPC8w_emDpVoNiWEyON2gHrucKiJlWQJVE_gxLf_n-F29UV1OBi-AjxccCrXMd0pzndZ7zg_7EbaUuOmLStfn2ORkoARaHaw55Sv2vbf_AV0MWsgqPaOlK6GTbfv3sYjB7K9eItWh9o8kDXNM4blqSw",
+			code:        http.StatusOK,
+			pass:        false,
+		},
 		//		{
 		//			"exp": 1924975619,
 		//			"iat": 1924975619,
 		//			"nbf": 0
 		//			"aud": "wrong-audience"
 		//		}
-		{"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MCwiaWF0IjoxOTI0OTc1NjE5LCJhdWQiOiJ3cm9uZy1hdWRpZW5jZSJ9.ZDyeQYDEjUUUvrzD_7t-4OHc4KOv4r46soSNMURZCpktCBP0qEeVovjLRHILmMlTxb1ItiOoUs2y7O-WYOKz182evgs1dkfX3C8LrOlDD3IoimaHNK4jW-5pYM47NFnW52Y7jp802wOQ8_UwERr5iu0Mb5trQC3RPALE17ppkplQVbL54kxu4HaQsPd4A2Qe2uIPhr-x75BPQiiaqzdRWuDwJhmpYBwLvyxKIY4B-AHBk70H7lpitDRXNMJdunIrIhz-qpkO7_XiwaBzwHHmdl9uRMU-UNC0TyA0iM84R_y8YJsz8Xl3MXU7QVNARzo2GGbnm4T2aRv8E98aeBsNQw", http.StatusOK, false},
+		{
+			accessToken: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MCwiaWF0IjoxOTI0OTc1NjE5LCJhdWQiOiJ3cm9uZy1hdWRpZW5jZSJ9.ZDyeQYDEjUUUvrzD_7t-4OHc4KOv4r46soSNMURZCpktCBP0qEeVovjLRHILmMlTxb1ItiOoUs2y7O-WYOKz182evgs1dkfX3C8LrOlDD3IoimaHNK4jW-5pYM47NFnW52Y7jp802wOQ8_UwERr5iu0Mb5trQC3RPALE17ppkplQVbL54kxu4HaQsPd4A2Qe2uIPhr-x75BPQiiaqzdRWuDwJhmpYBwLvyxKIY4B-AHBk70H7lpitDRXNMJdunIrIhz-qpkO7_XiwaBzwHHmdl9uRMU-UNC0TyA0iM84R_y8YJsz8Xl3MXU7QVNARzo2GGbnm4T2aRv8E98aeBsNQw",
+			code:        http.StatusOK,
+			pass:        false,
+		},
 		//		{
 		//			"exp": 1924975619,
 		//			"iat": 1924975619,
@@ -335,7 +389,11 @@ func TestIntrospect(t *testing.T) {
 		//			"sub": "max",
 		//			"aud": "wrong-audience"
 		//		}
-		{"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MCwiaWF0IjoxOTI0OTc1NjE5LCJhdWQiOiJ3cm9uZy1hdWRpZW5jZSIsInN1YiI6Im1heCJ9.OBKaAS6l7Ie-y5T6-r5Kk0MyLxxeoYJZ5MizZazAc1gon1J5yi0pCcwhP0a-cKUuJbuvgyw9PF1iutykRYy9cSd9ducEpL9PLhUAwIOOyQxp35udGPOOaf0hQAOBUzP--I6SqaIOZXAfWg6_HefRcYhqy8m-iagWLXZ7RT4sMrEVzHUq6fWM6f2HDid0CxCjH6OL5ScZebqUNVimCqZkaQ7Fn9TAnlcKnlDDOmZhfZEAOMNqlUvC7mLBbbhuiX0eUtdnchhXLjuLn67PcxYi7KpEFDKwGhN2eN0t73RWIpMz-YlU77HNTEvm-AzdG-BoqBgSrGnPUlU6Mdfhz7IeMA", http.StatusOK, false},
+		{
+			accessToken: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MCwiaWF0IjoxOTI0OTc1NjE5LCJhdWQiOiJ3cm9uZy1hdWRpZW5jZSIsInN1YiI6Im1heCJ9.OBKaAS6l7Ie-y5T6-r5Kk0MyLxxeoYJZ5MizZazAc1gon1J5yi0pCcwhP0a-cKUuJbuvgyw9PF1iutykRYy9cSd9ducEpL9PLhUAwIOOyQxp35udGPOOaf0hQAOBUzP--I6SqaIOZXAfWg6_HefRcYhqy8m-iagWLXZ7RT4sMrEVzHUq6fWM6f2HDid0CxCjH6OL5ScZebqUNVimCqZkaQ7Fn9TAnlcKnlDDOmZhfZEAOMNqlUvC7mLBbbhuiX0eUtdnchhXLjuLn67PcxYi7KpEFDKwGhN2eN0t73RWIpMz-YlU77HNTEvm-AzdG-BoqBgSrGnPUlU6Mdfhz7IeMA",
+			code:        http.StatusOK,
+			pass:        false,
+		},
 		//		{
 		//			"exp": 1924975619,
 		//			"iat": 1924975619,
@@ -343,10 +401,48 @@ func TestIntrospect(t *testing.T) {
 		//			"aud": "tests",
 		//			"subject": "foo"
 		//		}
-		{"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MCwiaWF0IjoxOTI0OTc1NjE5LCJhdWQiOiJ0ZXN0cyIsInN1YmplY3QiOiJmb28ifQ.lvjLGnLO3mZSS63fomK-KH2mhLXjjg9b13opiN7jY4MrXE_DaR0Lum8a_RcqqSTXbpHxYSIPV9Ji7zM_X1bvBtsPpBE1PR3_PrdD5_uIDQ-UWPVzozxhOvuZzU7qHx3TFQClZ6tYIXYioTszz9zQHiE4hj1x6Z_shWPfczELGyD0HnEC3o_w7IFfYO_L0YDN_vkuqr6yS5kaPIsoCF_iHuhTzoBAEIpUENlxSpCPuxR9aMaJ-BQDInHoPc1h-VvkgOdR_iENQdOUePObw17ywdGkRk6C5kRHSxjca-ULGcDn36NZ54SEPolcGbjs3vVA1g0jQARKIcTVw6Uu7x0s6Q", http.StatusOK, true},
+		{
+			accessToken:  "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MCwiaWF0IjoxOTI0OTc1NjE5LCJhdWQiOiJ0ZXN0cyIsInN1YmplY3QiOiJmb28ifQ.lvjLGnLO3mZSS63fomK-KH2mhLXjjg9b13opiN7jY4MrXE_DaR0Lum8a_RcqqSTXbpHxYSIPV9Ji7zM_X1bvBtsPpBE1PR3_PrdD5_uIDQ-UWPVzozxhOvuZzU7qHx3TFQClZ6tYIXYioTszz9zQHiE4hj1x6Z_shWPfczELGyD0HnEC3o_w7IFfYO_L0YDN_vkuqr6yS5kaPIsoCF_iHuhTzoBAEIpUENlxSpCPuxR9aMaJ-BQDInHoPc1h-VvkgOdR_iENQdOUePObw17ywdGkRk6C5kRHSxjca-ULGcDn36NZ54SEPolcGbjs3vVA1g0jQARKIcTVw6Uu7x0s6Q",
+			code:         http.StatusUnauthorized,
+			clientSecret: uuid.New(),
+			pass:         false,
+		},
+		//		{
+		//			"exp": 1924975619,
+		//			"iat": 1924975619,
+		//			"nbf": 0
+		//			"aud": "tests",
+		//			"subject": "foo"
+		//		}
+		{
+			accessToken:  "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MCwiaWF0IjoxOTI0OTc1NjE5LCJhdWQiOiJ0ZXN0cyIsInN1YmplY3QiOiJmb28ifQ.lvjLGnLO3mZSS63fomK-KH2mhLXjjg9b13opiN7jY4MrXE_DaR0Lum8a_RcqqSTXbpHxYSIPV9Ji7zM_X1bvBtsPpBE1PR3_PrdD5_uIDQ-UWPVzozxhOvuZzU7qHx3TFQClZ6tYIXYioTszz9zQHiE4hj1x6Z_shWPfczELGyD0HnEC3o_w7IFfYO_L0YDN_vkuqr6yS5kaPIsoCF_iHuhTzoBAEIpUENlxSpCPuxR9aMaJ-BQDInHoPc1h-VvkgOdR_iENQdOUePObw17ywdGkRk6C5kRHSxjca-ULGcDn36NZ54SEPolcGbjs3vVA1g0jQARKIcTVw6Uu7x0s6Q",
+			code:         http.StatusUnauthorized,
+			clientID:     uuid.New(),
+			clientSecret: uuid.New(),
+			pass:         false,
+		},
+		//		{
+		//			"exp": 1924975619,
+		//			"iat": 1924975619,
+		//			"nbf": 0
+		//			"aud": "tests",
+		//			"subject": "foo"
+		//		}
+		{
+			accessToken: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYXgiLCJleHAiOjE5MjQ5NzU2MTksIm5iZiI6MCwiaWF0IjoxOTI0OTc1NjE5LCJhdWQiOiJ0ZXN0cyIsInN1YmplY3QiOiJmb28ifQ.lvjLGnLO3mZSS63fomK-KH2mhLXjjg9b13opiN7jY4MrXE_DaR0Lum8a_RcqqSTXbpHxYSIPV9Ji7zM_X1bvBtsPpBE1PR3_PrdD5_uIDQ-UWPVzozxhOvuZzU7qHx3TFQClZ6tYIXYioTszz9zQHiE4hj1x6Z_shWPfczELGyD0HnEC3o_w7IFfYO_L0YDN_vkuqr6yS5kaPIsoCF_iHuhTzoBAEIpUENlxSpCPuxR9aMaJ-BQDInHoPc1h-VvkgOdR_iENQdOUePObw17ywdGkRk6C5kRHSxjca-ULGcDn36NZ54SEPolcGbjs3vVA1g0jQARKIcTVw6Uu7x0s6Q",
+			code:        http.StatusOK,
+			pass:        true,
+		},
 	} {
 		data := url.Values{"token": []string{c.accessToken}}
-		resp, body, errs := gorequest.New().Post(ts.URL+"/oauth2/introspect").Type("form").SetBasicAuth(config.ClientID, config.ClientSecret).SendString(data.Encode()).End()
+		if c.clientID == "" {
+			c.clientID = configs["working"].ClientID
+		}
+		if c.clientSecret == "" {
+			c.clientSecret = configs["working"].ClientSecret
+		}
+
+		resp, body, errs := gorequest.New().Post(ts.URL+"/oauth2/introspect").Type("form").SetBasicAuth(c.clientID, c.clientSecret).SendString(data.Encode()).End()
 		require.Len(t, errs, 0)
 		require.Equal(t, c.code, resp.StatusCode, "Case %d: %s", k, body)
 		if resp.StatusCode != http.StatusOK {
@@ -426,7 +522,7 @@ func TestRevoke(t *testing.T) {
 			token:            tokens[2].AccessToken,
 			clientID:         " ",
 			clientSecret:     " ",
-			expectStatusCode: http.StatusServiceUnavailable,
+			expectStatusCode: http.StatusUnauthorized,
 		},
 		{
 			token:            tokens[3].RefreshToken,
@@ -435,10 +531,16 @@ func TestRevoke(t *testing.T) {
 			expectStatusCode: http.StatusOK,
 		},
 		{
+			token:            tokens[3].RefreshToken,
+			clientID:         configs["working-2"].ClientID,
+			clientSecret:     "not working",
+			expectStatusCode: http.StatusUnauthorized,
+		},
+		{
 			token:            tokens[0].RefreshToken,
 			clientID:         "foo",
-			clientSecret:     "barbazfoobar",
-			expectStatusCode: http.StatusServiceUnavailable,
+			clientSecret:     "wrong secret",
+			expectStatusCode: http.StatusUnauthorized,
 		},
 	} {
 		if c.clientID == "" {

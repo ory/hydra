@@ -16,6 +16,7 @@ import (
 	"golang.org/x/net/context"
 	"net/http"
 
+	"github.com/RangelReale/osin"
 	log "github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/jwt"
@@ -27,6 +28,7 @@ import (
 type Handler struct {
 	s Storage
 	m middleware.Middleware
+	o osin.Storage
 	g Guarder
 	j *jwt.JWT
 }
@@ -51,15 +53,13 @@ func permission(id string) string {
 	return fmt.Sprintf("rn:hydra:policies:%s", id)
 }
 
-func NewHandler(s Storage, m middleware.Middleware, g Guarder, j *jwt.JWT) *Handler {
-	return &Handler{s: s, m: m, g: g, j: j}
+func NewHandler(s Storage, m middleware.Middleware, g Guarder, j *jwt.JWT, o osin.Storage) *Handler {
+	return &Handler{s: s, m: m, g: g, j: j, o: o}
 }
 
 func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hctx.ContextHandler) hctx.ContextHandler) {
 	r.Handle("/guard/allowed", hctx.NewContextAdapter(
 		context.Background(),
-		extractor,
-		h.m.IsAuthenticated,
 	).ThenFunc(h.Granted)).Methods("POST")
 
 	r.Handle("/policies", hctx.NewContextAdapter(
@@ -83,6 +83,24 @@ func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hctx.ContextHandler)
 }
 
 func (h *Handler) Granted(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
+	auth, err := osin.CheckBasicAuth(req)
+	if err != nil {
+		pkg.HttpError(rw, errors.New("Unauthorized"), http.StatusUnauthorized)
+		return
+	} else if auth == nil {
+		pkg.HttpError(rw, errors.New("Unauthorized"), http.StatusUnauthorized)
+		return
+	}
+
+	client, err := h.o.GetClient(auth.Username)
+	if err != nil {
+		pkg.HttpError(rw, errors.New("Unauthorized"), http.StatusUnauthorized)
+		return
+	} else if client.GetSecret() != auth.Password {
+		pkg.HttpError(rw, errors.New("Unauthorized"), http.StatusUnauthorized)
+		return
+	}
+
 	var p GrantedPayload
 	decoder := json.NewDecoder(req.Body)
 	if err := decoder.Decode(&p); err != nil {

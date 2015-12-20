@@ -1,7 +1,6 @@
 package http
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/RangelReale/osin"
@@ -14,7 +13,6 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 	"net/http"
 	"net/url"
-	"strconv"
 )
 
 var isAllowed struct {
@@ -64,33 +62,15 @@ func (c *HTTPClient) IsAuthenticated(token string) (bool, error) {
 }
 
 func isValidAuthenticationRequest(c *HTTPClient, token string, retry bool) (bool, error) {
-	if c.clientToken == nil {
-		if ct, err := c.clientConfig.Token(oauth2.NoContext); err != nil {
-			return false, errors.New(err)
-		} else if ct == nil {
-			return false, errors.New("Access token could not be retrieved")
-		} else {
-			c.clientToken = ct
-		}
-		return isValidAuthenticationRequest(c, token, false)
-	}
-
 	data := url.Values{}
-	client := &http.Client{}
 	data.Set("token", token)
-	r, err := http.NewRequest("POST", pkg.JoinURL(c.ep, "/oauth2/introspect"), bytes.NewBufferString(data.Encode()))
-	if err != nil {
-		return false, err
+	request := gorequest.New()
+	resp, body, errs := request.Post(pkg.JoinURL(c.ep, "/oauth2/introspect")).Type("form").SetBasicAuth(c.clientConfig.ClientID, c.clientConfig.ClientSecret).SendString(data.Encode()).End()
+	if len(errs) > 0 {
+		return false, errors.Errorf("Got errors: %v", errs)
+	} else if resp.StatusCode != http.StatusOK {
+		return false, errors.Errorf("Status code %d is not 200: %s", resp.StatusCode, body)
 	}
-
-	r.Header.Add("Authorization", c.clientToken.Type()+" "+c.clientToken.AccessToken)
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
-	resp, err := client.Do(r)
-	if err != nil {
-		return false, err
-	}
-	defer resp.Body.Close()
 
 	if retry && resp.StatusCode == http.StatusUnauthorized {
 		var err error
@@ -108,7 +88,7 @@ func isValidAuthenticationRequest(c *HTTPClient, token string, retry bool) (bool
 		Active bool `json:"active"`
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(&introspect); err != nil {
+	if err := json.Unmarshal([]byte(body), &introspect); err != nil {
 		return false, err
 	} else if !introspect.Active {
 		return false, errors.New("Authentication denied")
@@ -117,19 +97,8 @@ func isValidAuthenticationRequest(c *HTTPClient, token string, retry bool) (bool
 }
 
 func isValidAuthorizeRequest(c *HTTPClient, ar *AuthorizeRequest, retry bool) (bool, error) {
-	if c.clientToken == nil {
-		if ct, err := c.clientConfig.Token(oauth2.NoContext); err != nil {
-			return false, errors.New(err)
-		} else if ct == nil {
-			return false, errors.New("Access token could not be retrieved")
-		} else {
-			c.clientToken = ct
-		}
-		return isValidAuthorizeRequest(c, ar, false)
-	}
-
 	request := gorequest.New()
-	resp, body, errs := request.Post(pkg.JoinURL(c.ep, "/guard/allowed")).Set("Authorization", c.clientToken.Type()+" "+c.clientToken.AccessToken).Set("Content-Type", "application/json").Send(*ar).End()
+	resp, body, errs := request.Post(pkg.JoinURL(c.ep, "/guard/allowed")).SetBasicAuth(c.clientConfig.ClientID, c.clientConfig.ClientSecret).Set("Content-Type", "application/json").Send(*ar).End()
 	if len(errs) > 0 {
 		return false, errors.Errorf("Got errors: %v", errs)
 	} else if retry && resp.StatusCode == http.StatusUnauthorized {

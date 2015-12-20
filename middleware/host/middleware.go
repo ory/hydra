@@ -2,7 +2,9 @@ package host
 
 import (
 	log "github.com/Sirupsen/logrus"
+	"github.com/go-errors/errors"
 	chd "github.com/ory-am/common/handler"
+	"github.com/ory-am/common/pkg"
 	authcon "github.com/ory-am/hydra/context"
 	"github.com/ory-am/hydra/jwt"
 	"github.com/ory-am/hydra/middleware"
@@ -43,7 +45,7 @@ func (m *Middleware) IsAuthorized(resource, permission string, environment *midd
 					"authorization": "forbidden",
 					"error":         err,
 				}).Warnf(`Policy extraction failed.`)
-				errorHandler(rw, req, http.StatusForbidden)
+				pkg.HttpError(rw, errors.New("Forbidden"), http.StatusForbidden)
 				return
 			}
 
@@ -53,7 +55,7 @@ func (m *Middleware) IsAuthorized(resource, permission string, environment *midd
 					"authorization": "forbidden",
 					"error":         err,
 				}).Warnf(`Subject extraction failed.`)
-				errorHandler(rw, req, http.StatusForbidden)
+				pkg.HttpError(rw, errors.New("Forbidden"), http.StatusForbidden)
 				return
 			}
 
@@ -67,7 +69,7 @@ func (m *Middleware) IsAuthorized(resource, permission string, environment *midd
 					"permission":    permission,
 					"resource":      resource,
 				}).Warnf(`Subject is not allowed perform this action on this resource.`)
-				errorHandler(rw, req, http.StatusForbidden)
+				pkg.HttpError(rw, errors.New("Forbidden"), http.StatusForbidden)
 				return
 			}
 
@@ -86,26 +88,22 @@ func (m *Middleware) IsAuthenticated(next chd.ContextHandler) chd.ContextHandler
 	return chd.ContextHandlerFunc(func(ctx context.Context, rw http.ResponseWriter, req *http.Request) {
 		if !authcon.IsAuthenticatedFromContext(ctx) {
 			log.WithFields(log.Fields{"authentication": "fail"}).Warn(`Not able to get authorization from context.`)
-			errorHandler(rw, req, http.StatusUnauthorized)
+			pkg.HttpError(rw, errors.New("Unauthorized"), http.StatusUnauthorized)
 			return
 		}
 
 		subject, err := authcon.SubjectFromContext(ctx)
 		if err != nil {
 			log.WithFields(log.Fields{"authentication": "fail"}).Warnf("Subject extraction failed: %s", err)
-			errorHandler(rw, req, http.StatusUnauthorized)
+			pkg.HttpError(rw, errors.New("Unauthorized"), http.StatusUnauthorized)
 			return
 		} else if subject == "" {
 			log.WithFields(log.Fields{"authentication": "fail"}).Warnf("No subject given.")
-			errorHandler(rw, req, http.StatusUnauthorized)
+			pkg.HttpError(rw, errors.New("Unauthorized"), http.StatusUnauthorized)
 			return
 		}
 
 		log.WithFields(log.Fields{"authentication": "success"}).Infof(`Authenticated subject "%s".`, subject)
 		next.ServeHTTPContext(ctx, rw, req)
 	})
-}
-
-func errorHandler(w http.ResponseWriter, r *http.Request, status int) {
-	w.WriteHeader(status)
 }

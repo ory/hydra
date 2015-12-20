@@ -76,6 +76,14 @@ func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hctx.ContextHandler)
 
 func (h *Handler) RevokeHandler(w http.ResponseWriter, r *http.Request) {
 	auth, err := osin.CheckBasicAuth(r)
+	if err != nil {
+		pkg.HttpError(w, errors.New("Unauthorized"), http.StatusServiceUnavailable)
+		return
+	} else if auth == nil {
+		pkg.HttpError(w, errors.New("Unauthorized"), http.StatusUnauthorized)
+		return
+	}
+
 	client, err := h.OAuthStore.GetClient(auth.Username)
 	if err != nil {
 		pkg.HttpError(w, errors.New("Unauthorized"), http.StatusServiceUnavailable)
@@ -146,6 +154,9 @@ func (h *Handler) RevokeHandler(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request) {
 	auth, err := osin.CheckBasicAuth(r)
 	if _, err := h.OAuthStore.GetClient(auth.Username); err != nil {
+		pkg.HttpError(w, errors.New("Unauthorized"), http.StatusUnauthorized)
+		return
+	} else if auth == nil {
 		pkg.HttpError(w, errors.New("Unauthorized"), http.StatusUnauthorized)
 		return
 	}

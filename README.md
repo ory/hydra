@@ -4,16 +4,16 @@
 
 ![Hydra](hydra.png)
 
-Hydra is a twelve factor authentication, authorization and account management service, ready for you to use in your micro service architecture.
-Hydra is written in go and backed by PostgreSQL or any implementation of [account/storage.go](account/storage.go).
+Hydra is a twelve factor authentication, authorization and account management service, ready for you to use in your micro service architecture. Hydra is written in go and backed by PostgreSQL or any implementation of [account/storage.go](account/storage.go).
 
 Hydra implements TLS, different OAuth2 IETF standards and supports HTTP/2. To make things as easy as possible, hydra
 comes with tools to generate TLS and RS256 PEM files, leaving you with almost zero trouble to set up.
 
 ![Hydra implements HTTP/2 and TLS.](h2tls.png)
 
-*Please be aware that Hydra is not ready for production just yet and has not been tested on a production system.
-If time schedule holds, we will use it in production in Q1 2016 for an awesome business app that has yet to be revealed.*
+Please be aware that Hydra is not ready for production just yet and has not been tested on a production system.
+If time schedule holds, we will use it in production in Q1 2016 for an awesome business app that has yet to be revealed.
+This should however not discourage you from trying out or using Hydra. Most of the HTTP endpoints have reached a stable status and should not change in a major way until the first release (0.1).
 
 Current status:
 

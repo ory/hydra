@@ -260,9 +260,9 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 			ar.UserData = jwt.NewClaimsCarrier(uuid.New(), h.Issuer, ar.Client.GetId(), ar.Client.GetId(), time.Now().Add(time.Duration(ar.Expiration)*time.Second), time.Now(), time.Now())
 			ar.Authorized = true
 
-			// TODO ASSERTION workflow http://leastprivilege.com/2013/12/23/advanced-oauth2-assertion-flow-why/
-			// TODO Since assertions are only a draft for now and there is no need for SAML or similar this is postponed.
-			//case osin.ASSERTION:
+			// TODO #29 ASSERTION workflow http://leastprivilege.com/2013/12/23/advanced-oauth2-assertion-flow-why/
+			// Since assertions are only a draft for now and there is no need for SAML or similar this is postponed.
+			// case osin.ASSERTION:
 			//	if ar.AssertionType == "urn:hydra" && ar.Assertion == "osin.data" {
 			//		ar.Authorized = true
 			//	}

@@ -3,11 +3,12 @@ package signin
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	"github.com/go-errors/errors"
 	. "github.com/ory-am/hydra/oauth/provider"
 	"github.com/parnurzeal/gorequest"
 	"golang.org/x/oauth2"
-	"net/http"
 )
 
 type signin struct {
@@ -46,7 +47,7 @@ func (d *signin) Exchange(code string) (Session, error) {
 
 	var p payload
 	if err := json.Unmarshal([]byte(body), &p); err != nil {
-		return nil, errors.Errorf("Could not parse answer: %d", err)
+		return nil, errors.Errorf("Could not parse answer: %v", err)
 	}
 
 	if p.Subject == "" {

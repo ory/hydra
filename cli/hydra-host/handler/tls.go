@@ -18,12 +18,13 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"fmt"
-	"github.com/codegangsta/cli"
 	"math/big"
 	"net"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/codegangsta/cli"
 )
 
 func publicKey(priv interface{}) interface{} {
@@ -149,7 +150,7 @@ func CreateDummyTLSCert(ctx *cli.Context) error {
 
 	keyOut, err := os.OpenFile(ctx.String("key-file-path"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
-		return fmt.Errorf("failed to open key.pem for writing:", err)
+		return fmt.Errorf("failed to open key.pem for writing: %v", err)
 	}
 	pem.Encode(keyOut, pemBlockForKey(priv))
 	keyOut.Close()

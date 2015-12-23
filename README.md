@@ -215,7 +215,7 @@ VERSION:
 
 COMMANDS:
    client       Client actions
-   user         User actions
+   account      Account actions
    start        Start the host service
    jwt          JWT actions
    tls          JWT actions
@@ -255,14 +255,14 @@ OPTIONS:
    --as-superuser       Grant superuser privileges to the client
 ```
 
-#### Create user
+#### Create Account
 
 ```
 NAME:
-   hydra-host user create - create a new user
+   hydra-host account create - create a new account
 
 USAGE:
-   hydra-host user create [command options] <username>
+   hydra-host account create [command options] <username>
 
 OPTIONS:
    --password           the user's password

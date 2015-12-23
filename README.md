@@ -1,4 +1,4 @@
-# Hydra
+# Ory/Hydra
 
 [![Join the chat at https://gitter.im/ory-am/hydra](https://badges.gitter.im/ory-am/hydra.svg)](https://gitter.im/ory-am/hydra?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/ory-am/hydra.svg?branch=master)](https://travis-ci.org/ory-am/hydra)
@@ -19,9 +19,12 @@ This should however not discourage you from trying out or using Hydra. Most of t
 
 Current status:
 
-- Development: 90% of principal components
-- HTTP API: 70% (in review)
-- Real world use: 10%
+- Development: 95% of principal components
+- HTTP API: 80% (in review)
+- Real world use: 20%
+
+Hydra is being developed at [Ory](https://ory.am) because we need a lightweight and clean IAM solution for our customers.  
+Join our [mailinglist](http://eepurl.com/bKT3N9) to stay on top of new developments.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -65,12 +68,7 @@ in need of these three, you are in the right place.
 
 ## Motivation
 
-Hydra was written because we at Ory needed a scalable 12factor OAuth2 consumer / provider with enterprise grade
-authorization and interoperability without a ton of dependencies or crazy features. While we where at it, we added
-Policy, Account and Client management and other cool features. Because we hate maintaining 5 different databases (or paying someone to maintain them)
-and dealing with crazy and unpredictable dependency trees, Hydra only requires Go and PostgreSQL (or any SQL speaking database).
-
-Hydra is the open source alternative to proprietary authorization solutions in the age of micro services.
+We develop Hydra because Hydra we need a lightweight and clean IAM solution for our customers. We believe that security and simplicity come together. This is why Hydra only relies on Google's Go Language, PostgreSQL and a slim dependency tree. Hydra is the simple, open source alternative to proprietary authorization solutions suited best for your micro service eco system.
 
 *Use it, enjoy it and contribute!*
 

@@ -3,6 +3,10 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/url"
+	"time"
+
 	"github.com/RangelReale/osin"
 	log "github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
@@ -19,9 +23,6 @@ import (
 	"github.com/ory-am/ladon/policy"
 	osinStore "github.com/ory-am/osin-storage/storage"
 	"github.com/pborman/uuid"
-	"net/http"
-	"net/url"
-	"time"
 )
 
 func DefaultConfig() *osin.ServerConfig {
@@ -273,7 +274,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	if resp.IsError {
 		log.WithFields(log.Fields{
 			"code":              resp.StatusCode,
-			"id":                resp.ErrorId,
+			"id":                resp.ErrorStatusCode,
 			"message":           resp.StatusText,
 			"osinInternalError": resp.InternalError,
 		}).Warnf("Token request failed.")

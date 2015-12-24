@@ -1,9 +1,10 @@
 package main
 
 import (
+	"os"
+
 	"github.com/codegangsta/cli"
 	. "github.com/ory-am/hydra/cli/hydra-host/handler"
-	"os"
 	//"github.com/ory-am/hydra/cli/hydra-host/templates"
 	//"fmt"
 	"fmt"
@@ -59,10 +60,9 @@ var (
 			Usage: "Account actions",
 			Subcommands: []cli.Command{
 				{
-					Name:      "create",
-					Usage:     "Create a new account",
-					ArgsUsage: "<username>",
-					Action:    errorWrapper(u.Create),
+					Name:   "create",
+					Usage:  "Create a new account",
+					Action: errorWrapper(u.Create),
 					Flags: []cli.Flag{
 						cli.StringFlag{
 							Name:  "password",
@@ -158,11 +158,10 @@ var (
 			Usage: "Policy actions",
 			Subcommands: []cli.Command{
 				{
-					Name:      "import",
-					ArgsUsage: "<policies1.json> <policies2.json> <policies3.json>",
-					Usage:     `Import a json file which defines an array of policies`,
-					Action:    errorWrapper(pl.Import),
-					Flags:     []cli.Flag{},
+					Name:   "import",
+					Usage:  `Import a json file which defines an array of policies`,
+					Action: errorWrapper(pl.Import),
+					Flags:  []cli.Flag{},
 				},
 			},
 		},

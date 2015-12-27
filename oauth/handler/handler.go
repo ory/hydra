@@ -349,7 +349,7 @@ func (h *Handler) AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 			conn, err = h.Connections.FindByRemoteSubject(provider.GetID(), session.GetRemoteSubject())
 		}
 
-		if err == pkg.ErrNotFound && conn != nil {
+		if err == pkg.ErrNotFound {
 			// The subject is not linked to any account.
 
 			if h.SignUpLocation == "" {

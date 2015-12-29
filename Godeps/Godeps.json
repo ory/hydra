@@ -1,0 +1,181 @@
+{
+	"ImportPath": "github.com/ory-am/hydra",
+	"GoVersion": "go1.5",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "camlistore.org/pkg/netutil",
+			"Rev": "32e922ad3d39201a788d819aeb74f0e17d7e810b"
+		},
+		{
+			"ImportPath": "github.com/RangelReale/osin",
+			"Rev": "a2a531808b4a49f1345de4e19ec3aaadf5a2c4b3"
+		},
+		{
+			"ImportPath": "github.com/Sirupsen/logrus",
+			"Comment": "v0.8.7-49-gcdaedc6",
+			"Rev": "cdaedc68f2894175ac2b3221869685602c759e71"
+		},
+		{
+			"ImportPath": "github.com/araddon/gou",
+			"Rev": "cf9cf25f52be174c5878920a8021bd224cbe32c7"
+		},
+		{
+			"ImportPath": "github.com/asaskevich/govalidator",
+			"Comment": "v2-39-g266f2b0",
+			"Rev": "266f2b090fb4deb9618b5779539872ecac650be2"
+		},
+		{
+			"ImportPath": "github.com/bitly/go-hostpool",
+			"Rev": "d0e59c22a56e8dadfed24f74f452cea5a52722d2"
+		},
+		{
+			"ImportPath": "github.com/codegangsta/cli",
+			"Comment": "1.2.0-115-g616b730",
+			"Rev": "616b730509ef3f11384d159cc52545639103ea86"
+		},
+		{
+			"ImportPath": "github.com/dgrijalva/jwt-go",
+			"Comment": "v2.3.0-6-gf62f64e",
+			"Rev": "f62f64ea222e5e6d6d86421b5507b0862a3ebf7f"
+		},
+		{
+			"ImportPath": "github.com/go-errors/errors",
+			"Rev": "a41850380601eeb43f4350f7d17c6bbd8944aaf8"
+		},
+		{
+			"ImportPath": "github.com/go-sql-driver/mysql",
+			"Comment": "v1.2-108-g66b7d5c",
+			"Rev": "66b7d5c4956096efd4c945494d64ad73f1d9ec39"
+		},
+		{
+			"ImportPath": "github.com/gorilla/context",
+			"Rev": "1c83b3eabd45b6d76072b66b746c20815fb2872d"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Rev": "ee1815431e497d3850809578c93ab6705f1a19f7"
+		},
+		{
+			"ImportPath": "github.com/howeyc/gopass",
+			"Rev": "ae71a9cc54fddb61d946abe9191d05a24ac0e21b"
+		},
+		{
+			"ImportPath": "github.com/lib/pq",
+			"Comment": "go1.0-cutoff-51-ga8d8d01",
+			"Rev": "a8d8d01c4f91602f876bf5aa210274e8203a6b45"
+		},
+		{
+			"ImportPath": "github.com/mattbaird/elastigo/lib",
+			"Comment": "v1.0-179-g09363f9",
+			"Rev": "09363f92cd44e47b5034719cdef78da73190d847"
+		},
+		{
+			"ImportPath": "github.com/mediocregopher/radix.v2/redis",
+			"Rev": "91435107718b55ff544323a2b0f25fdd8475d283"
+		},
+		{
+			"ImportPath": "github.com/moul/http2curl",
+			"Rev": "1c29be06762e43e04dd954a01c66991104ce4374"
+		},
+		{
+			"ImportPath": "github.com/oleiade/reflections",
+			"Comment": "0.1.2-2-g632977f",
+			"Rev": "632977f98cd34d217c4b57d0840ec188b3d3dcaf"
+		},
+		{
+			"ImportPath": "github.com/ory-am/common/compiler",
+			"Rev": "bc007a48b53b9d66317c9f91f422e5cd0df2d909"
+		},
+		{
+			"ImportPath": "github.com/ory-am/common/env",
+			"Rev": "bc007a48b53b9d66317c9f91f422e5cd0df2d909"
+		},
+		{
+			"ImportPath": "github.com/ory-am/common/handler",
+			"Rev": "bc007a48b53b9d66317c9f91f422e5cd0df2d909"
+		},
+		{
+			"ImportPath": "github.com/ory-am/common/pkg",
+			"Rev": "bc007a48b53b9d66317c9f91f422e5cd0df2d909"
+		},
+		{
+			"ImportPath": "github.com/ory-am/common/rand/sequence",
+			"Rev": "bc007a48b53b9d66317c9f91f422e5cd0df2d909"
+		},
+		{
+			"ImportPath": "github.com/ory-am/dockertest",
+			"Rev": "a873c0b1858c76e411992b96f260dae1b76e2c09"
+		},
+		{
+			"ImportPath": "github.com/ory-am/ladon/guard",
+			"Rev": "62f32d97b748d99af1a18797462ac09253901f89"
+		},
+		{
+			"ImportPath": "github.com/ory-am/ladon/policy",
+			"Rev": "62f32d97b748d99af1a18797462ac09253901f89"
+		},
+		{
+			"ImportPath": "github.com/ory-am/osin-storage/storage",
+			"Rev": "3b2c85999821c67b5b34183603a4da5453052c8a"
+		},
+		{
+			"ImportPath": "github.com/parnurzeal/gorequest",
+			"Comment": "v0.2.13-7-g27bfb0d",
+			"Rev": "27bfb0dcbcc020d11b7839af416fb8dafc2ab01c"
+		},
+		{
+			"ImportPath": "github.com/pborman/uuid",
+			"Rev": "ca53cad383cad2479bbba7f7a1a05797ec1386e4"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/assert",
+			"Comment": "v1.0-51-gf3960ab",
+			"Rev": "f3960ab1f9664ecc4e27c78af27cc9063d745a43"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/require",
+			"Comment": "v1.0-51-gf3960ab",
+			"Rev": "f3960ab1f9664ecc4e27c78af27cc9063d745a43"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/bcrypt",
+			"Rev": "7b85b097bf7527677d54d3220065e966a0e3b613"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/blowfish",
+			"Rev": "7b85b097bf7527677d54d3220065e966a0e3b613"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/ssh/terminal",
+			"Rev": "7b85b097bf7527677d54d3220065e966a0e3b613"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "d5cd7348bfebdf7dbb6dbb18fa488525f9024293"
+		},
+		{
+			"ImportPath": "golang.org/x/net/http2",
+			"Rev": "d5cd7348bfebdf7dbb6dbb18fa488525f9024293"
+		},
+		{
+			"ImportPath": "golang.org/x/net/publicsuffix",
+			"Rev": "d5cd7348bfebdf7dbb6dbb18fa488525f9024293"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2",
+			"Rev": "397fe7649477ff2e8ced8fc0b2696f781e53745a"
+		},
+		{
+			"ImportPath": "golang.org/x/sys/unix",
+			"Rev": "833a04a10549a95dc34458c195cbad61bbb6cb4d"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2",
+			"Comment": "r2015.10.05-1-g4d04138",
+			"Rev": "4d04138ffef2791c479c0c8bbffc30b34081b8d9"
+		}
+	]
+}

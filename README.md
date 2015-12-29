@@ -48,6 +48,7 @@ Join our [mailinglist](http://eepurl.com/bKT3N9) to stay on top of new developme
     - [Create JWT RSA Key Pair](#create-jwt-rsa-key-pair)
     - [Create a TLS certificate](#create-a-tls-certificate)
     - [Import policies](#import-policies)
+- [Security considerations](#security-considerations)
 - [Good to know](#good-to-know)
   - [Policies](#policies)
   - [Everything is RESTful. No HTML. No Templates.](#everything-is-restful-no-html-no-templates)
@@ -361,6 +362,11 @@ Here's an exemplary *policies.json:*
   }
 ]
 ```
+
+## Security considerations
+
+[rfc6819](https://tools.ietf.org/html/rfc6819) provides good guidelines to keep your apps and environment secure. It is recommended to read:
+* [Section 5.3](https://tools.ietf.org/html/rfc6819#section-5.3) on client app security.
 
 ## Good to know
 

@@ -1,4 +1,4 @@
-package http
+package mock
 
 import (
 	"github.com/stretchr/testify/assert"

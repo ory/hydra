@@ -6,6 +6,7 @@ package mock
 import (
 	gomock "github.com/golang/mock/gomock"
 	handler "github.com/ory-am/common/handler"
+	. "github.com/ory-am/hydra/middleware"
 )
 
 // Mock of Middleware interface

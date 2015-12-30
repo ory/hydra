@@ -1,4 +1,4 @@
-package http
+package mock
 
 import (
 	"errors"

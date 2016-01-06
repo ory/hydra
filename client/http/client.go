@@ -65,7 +65,7 @@ func isValidAuthenticationRequest(c *HTTPClient, token string, retry bool) (bool
 	data := url.Values{}
 	data.Set("token", token)
 	request := gorequest.New()
-	resp, body, errs := request.Post(pkg.JoinURL(c.ep, "/oauth2/introspect")).Type("form").SetBasicAuth(c.clientConfig.ClientID, c.clientConfig.ClientSecret).SendString(data.Encode()).End()
+	resp, body, errs := request.Post(pkg.JoinURL(c.ep, "/oauth2/introspect")).Type("form").SetBasicAuth(c.clientConfig.ClientID, c.clientConfig.ClientSecret).Set("Connection", "close").SendString(data.Encode()).End()
 	if len(errs) > 0 {
 		return false, errors.Errorf("Got errors: %v", errs)
 	} else if resp.StatusCode != http.StatusOK {
@@ -98,7 +98,7 @@ func isValidAuthenticationRequest(c *HTTPClient, token string, retry bool) (bool
 
 func isValidAuthorizeRequest(c *HTTPClient, ar *AuthorizeRequest, retry bool) (bool, error) {
 	request := gorequest.New()
-	resp, body, errs := request.Post(pkg.JoinURL(c.ep, "/guard/allowed")).SetBasicAuth(c.clientConfig.ClientID, c.clientConfig.ClientSecret).Set("Content-Type", "application/json").Send(*ar).End()
+	resp, body, errs := request.Post(pkg.JoinURL(c.ep, "/guard/allowed")).SetBasicAuth(c.clientConfig.ClientID, c.clientConfig.ClientSecret).Set("Content-Type", "application/json").Set("Connection", "close").Send(*ar).End()
 	if len(errs) > 0 {
 		return false, errors.Errorf("Got errors: %v", errs)
 	} else if retry && resp.StatusCode == http.StatusUnauthorized {

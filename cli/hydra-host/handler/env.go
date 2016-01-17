@@ -6,6 +6,7 @@ import (
 	"github.com/ory-am/common/pkg"
 	"github.com/ory-am/hydra/oauth/provider"
 	"github.com/ory-am/hydra/oauth/provider/dropbox"
+	"github.com/ory-am/hydra/oauth/provider/google"
 	"github.com/ory-am/hydra/oauth/provider/signin"
 	"os"
 	"path"
@@ -33,6 +34,12 @@ func getEnv() {
 			"dropbox",
 			env.Getenv("DROPBOX_CLIENT", ""),
 			env.Getenv("DROPBOX_SECRET", ""),
+			pkg.JoinURL(hostURL, "/oauth2/auth"),
+		),
+		google.New(
+			"google",
+			env.Getenv("GOOGLE_CLIENT", ""),
+			env.Getenv("GOOGLE_SECRET", ""),
 			pkg.JoinURL(hostURL, "/oauth2/auth"),
 		),
 		signin.New(

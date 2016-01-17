@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/oauth/provider"
-	"golang.org/x/oauth2"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -18,17 +17,17 @@ type userAuth struct {
 	Password string `json:"password"`
 }
 
-func (p *prov) GetAuthCodeURL(state string) string {
+func (p *prov) GetAuthenticationURL(state string) string {
 	return fmt.Sprintf("/remote/oauth2/auth?response_type=code&client_id=someclient&state=%s&redirect_uri=%s", state, `%2Foauth2%2Fauth`)
 }
 
-func (p *prov) Exchange(code string) (provider.Session, error) {
+func (p *prov) FetchSession(code string) (provider.Session, error) {
 	if code != "code" {
 		return nil, errors.New("Code not 'code'")
 	}
 	return &provider.DefaultSession{
 		RemoteSubject: "remote-id",
-		Token:         &oauth2.Token{},
+		Extra:         map[string]interface{}{},
 	}, nil
 }
 

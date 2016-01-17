@@ -8,7 +8,6 @@ import (
 	"github.com/go-errors/errors"
 	. "github.com/ory-am/hydra/oauth/provider"
 	"github.com/parnurzeal/gorequest"
-	"golang.org/x/oauth2"
 )
 
 type signin struct {
@@ -29,12 +28,12 @@ func New(id, loginURL, redirectToURL string) *signin {
 	}
 }
 
-func (d *signin) GetAuthCodeURL(state string) string {
+func (d *signin) GetAuthenticationURL(state string) string {
 	// FIXME does not work if redirect contains query params
 	return fmt.Sprintf("%s?state=%s&redirect_uri=%s", d.login, state, d.redirectTo)
 }
 
-func (d *signin) Exchange(code string) (Session, error) {
+func (d *signin) FetchSession(code string) (Session, error) {
 	request := gorequest.New()
 
 	// FIXME does not work if redirect contains query params
@@ -56,8 +55,7 @@ func (d *signin) Exchange(code string) (Session, error) {
 
 	return &DefaultSession{
 		ForceLocalSubject: p.Subject,
-		Extra:             struct{}{},
-		Token:             &oauth2.Token{},
+		Extra:             map[string]interface{}{},
 	}, nil
 }
 

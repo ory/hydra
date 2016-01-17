@@ -1,21 +1,15 @@
 package provider
 
-import (
-	"golang.org/x/oauth2"
-)
-
 type Session interface {
 	GetRemoteSubject() string
 	GetForcedLocalSubject() string
-	GetExtra() interface{}
-	GetToken() *oauth2.Token
+	GetExtra() map[string]interface{}
 }
 
 type DefaultSession struct {
 	RemoteSubject     string
 	ForceLocalSubject string
-	Extra             interface{}
-	Token             *oauth2.Token
+	Extra             map[string]interface{}
 }
 
 func (s *DefaultSession) GetForcedLocalSubject() string {
@@ -26,10 +20,6 @@ func (s *DefaultSession) GetRemoteSubject() string {
 	return s.RemoteSubject
 }
 
-func (s *DefaultSession) GetExtra() interface{} {
+func (s *DefaultSession) GetExtra() map[string]interface{} {
 	return s.Extra
-}
-
-func (s *DefaultSession) GetToken() *oauth2.Token {
-	return s.Token
 }

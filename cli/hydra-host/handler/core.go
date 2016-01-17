@@ -16,9 +16,11 @@ import (
 	"github.com/ory-am/ladon/guard"
 
 	"fmt"
+	"github.com/RangelReale/osin"
 	"github.com/ory-am/common/pkg"
 	"golang.org/x/net/http2"
 	"net/http"
+	"strconv"
 )
 
 type Core struct {
@@ -36,6 +38,31 @@ type Core struct {
 	audience string
 }
 
+func osinConfig() (conf *osin.ServerConfig, err error) {
+	conf = osin.NewServerConfig()
+	lifetime, err := strconv.Atoi(accessTokenLifetime)
+	if err != nil {
+		return nil, err
+	}
+	conf.AccessExpiration = int32(lifetime)
+
+	conf.AllowedAuthorizeTypes = osin.AllowedAuthorizeType{
+		osin.CODE,
+		osin.TOKEN,
+	}
+	conf.AllowedAccessTypes = osin.AllowedAccessType{
+		osin.AUTHORIZATION_CODE,
+		osin.REFRESH_TOKEN,
+		osin.PASSWORD,
+		osin.CLIENT_CREDENTIALS,
+	}
+	conf.AllowGetAccessRequest = false
+	conf.AllowClientSecretInParams = false
+	conf.ErrorStatusCode = http.StatusInternalServerError
+	conf.RedirectUriSeparator = "|"
+	return conf, nil
+}
+
 func (c *Core) Start(ctx *cli.Context) error {
 	c.Ctx.Start()
 
@@ -47,6 +74,11 @@ func (c *Core) Start(ctx *cli.Context) error {
 	public, err := jwt.LoadCertificate(jwtPublicKeyPath)
 	if err != nil {
 		return fmt.Errorf("Could not load public key: %s", err)
+	}
+
+	osinConf, err := osinConfig()
+	if err != nil {
+		return fmt.Errorf("Could not configure server: %s", err)
 	}
 
 	j := jwt.New(private, public)
@@ -66,7 +98,7 @@ func (c *Core) Start(ctx *cli.Context) error {
 		Issuer:         c.issuer,
 		Audience:       c.audience,
 		JWT:            j,
-		OAuthConfig:    oauth.DefaultConfig(),
+		OAuthConfig:    osinConf,
 		OAuthStore:     c.Ctx.Osins,
 		States:         c.Ctx.States,
 		SignUpLocation: locations["signUp"],

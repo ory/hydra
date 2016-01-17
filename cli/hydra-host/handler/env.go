@@ -12,9 +12,11 @@ import (
 )
 
 var (
-	listenOn, forceHTTP, bcryptWorkFactor, databaseURL, jwtPrivateKeyPath, jwtPublicKeyPath, tlsKeyPath, tlsCertPath, hostURL string
-	providers                                                                                                                 []provider.Provider
-	locations                                                                                                                 map[string]string
+	listenOn, forceHTTP, bcryptWorkFactor, databaseURL string
+	jwtPrivateKeyPath, jwtPublicKeyPath, tlsKeyPath    string
+	accessTokenLifetime, tlsCertPath, hostURL          string
+	providers                                          []provider.Provider
+	locations                                          map[string]string
 )
 
 func getEnv() {
@@ -23,6 +25,7 @@ func getEnv() {
 		env.Getenv("HOST", ""),
 		env.Getenv("PORT", "4443"),
 	)
+	accessTokenLifetime = env.Getenv("OAUTH2_ACCESS_TOKEN_LIFETIME", "3600")
 	forceHTTP = env.Getenv("DANGEROUSLY_FORCE_HTTP", "")
 	hostURL = env.Getenv("HOST_URL", "https://localhost:4443")
 	providers = []provider.Provider{

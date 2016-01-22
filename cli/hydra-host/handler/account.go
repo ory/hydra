@@ -14,14 +14,24 @@ type Account struct {
 
 func getPassword() (password string) {
 	fmt.Println("Password: ")
-	password = string(gopass.GetPasswd())
-	if password == "" {
+	pwd, err := gopass.GetPasswd()
+	if err != nil {
+		fmt.Errorf("Error: %s", err)
+		return getPassword()
+	}
+	password = string(pwd);
+	if string(pwd) == "" {
 		fmt.Println("You did not provide a password. Please try again.")
 		return getPassword()
 	}
 
 	fmt.Println("Confirm password: ")
-	if password != string(gopass.GetPasswd()) {
+	confirm, err := gopass.GetPasswd()
+	if err != nil {
+		fmt.Errorf("Error: %s", err)
+		return getPassword()
+	}
+	if password != string(confirm) {
 		fmt.Println("Password and confirmation do not match. Please try again.")
 		return getPassword()
 	}

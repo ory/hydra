@@ -24,7 +24,7 @@ func TestNew(t *testing.T) {
 }
 
 func TestGetAuthCodeURL(t *testing.T) {
-	require.NotEmpty(t, mock.GetAuthCodeURL("state"))
+	require.NotEmpty(t, mock.GetAuthenticationURL("state"))
 }
 
 func TestExchangeCode(t *testing.T) {
@@ -36,7 +36,7 @@ func TestExchangeCode(t *testing.T) {
 	})
 	ts := httptest.NewServer(router)
 	mock.login = ts.URL + "/login"
-	ses, err := mock.Exchange(user)
+	ses, err := mock.FetchSession(user)
 	require.Nil(t, err)
 	assert.Equal(t, user, ses.GetForcedLocalSubject())
 }

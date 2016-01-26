@@ -1,4 +1,4 @@
-package dropbox
+package google
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-var mock = &dropbox{
+var mock = &google{
 	id: "123",
 	conf: &oauth2.Config{
 		ClientID:     "client",
@@ -44,11 +44,26 @@ func TestExchangeCode(t *testing.T) {
 	router := mux.NewRouter()
 	router.HandleFunc("/oauth2/token", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprintln(w, `{"access_token": "ABCDEFG", "token_type": "bearer", "uid": "12345"}`)
+		fmt.Fprintln(w, `{"access_token": "ABCDEFG", "token_type": "bearer", "uid": "12345", "id_token": "foobar"}`)
 	})
-	router.HandleFunc("/users/get_current_account", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/oauth2/v3/tokeninfo", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, r.URL.Query().Get("id_token"), "foobar")
 		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprintln(w, `{"account_id": "dbid:2qrw3etsdtr","name": {"given_name": "Peter","surname": "Peter","familiar_name": "Peter","display_name": "Peter"},"email": "peter@gmail.com","country": "DE","locale": "de","referral_link": "https://db.tt/w34setrdgxf","is_paired": false,"account_type": {".tag": "pro"}}`)
+		fmt.Fprintln(w, `{
+ "iss": "https://accounts.google.com",
+ "sub": "110169484474386276334",
+ "azp": "1008719970978-hb24n2dstb40o45d4feuo2ukqmcc6381.apps.googleusercontent.com",
+ "aud": "1008719970978-hb24n2dstb40o45d4feuo2ukqmcc6381.apps.googleusercontent.com",
+ "iat": "1433978353",
+ "exp": "1433981953",
+ "email": "testuser@gmail.com",
+ "email_verified": "true",
+ "name" : "Test User",
+ "picture": "https://lh4.googleusercontent.com/-kYgzyAWpZzJ/ABCDEFGHI/AAAJKLMNOP/tIXL9Ir44LE/s99-c/photo.jpg",
+ "given_name": "Test",
+ "family_name": "User",
+ "locale": "en"
+}`)
 	})
 	ts := httptest.NewServer(router)
 
@@ -59,6 +74,6 @@ func TestExchangeCode(t *testing.T) {
 	t.Logf("API URL: %s", mock.api)
 	code := "testcode"
 	ses, err := mock.FetchSession(code)
-	require.Nil(t, err)
-	assert.Equal(t, "dbid:2qrw3etsdtr", ses.GetRemoteSubject())
+	require.Nil(t, err, "%s", err)
+	assert.Equal(t, "110169484474386276334", ses.GetRemoteSubject())
 }

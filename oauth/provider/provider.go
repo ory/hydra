@@ -1,7 +1,7 @@
 package provider
 
 type Provider interface {
-	GetAuthCodeURL(state string) string
-	Exchange(code string) (Session, error)
+	GetAuthenticationURL(state string) string
+	FetchSession(code string) (Session, error)
 	GetID() string
 }

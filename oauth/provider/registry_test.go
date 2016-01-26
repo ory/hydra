@@ -9,11 +9,11 @@ import (
 
 type provider struct{}
 
-func (p *provider) GetAuthCodeURL(state string) string {
+func (p *provider) GetAuthenticationURL(state string) string {
 	return "auth"
 }
 
-func (p *provider) Exchange(code string) (Session, error) {
+func (p *provider) FetchSession(code string) (Session, error) {
 	return &DefaultSession{}, nil
 }
 func (p *provider) GetID() string {

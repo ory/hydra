@@ -1,4 +1,4 @@
-package dropbox
+package microsoft
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-var mock = &dropbox{
+var mock = &microsoft{
 	id: "123",
 	conf: &oauth2.Config{
 		ClientID:     "client",
@@ -46,22 +46,21 @@ func TestExchangeCode(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintln(w, `{"access_token": "ABCDEFG", "token_type": "bearer", "uid": "12345"}`)
 	})
-	router.HandleFunc("/users/get_current_account", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/v5.0/me", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintln(w, `{
-	"account_id": "dbid:foobar",
-	"name": {
-		"given_name": "foobar",
-		"surname": "foobar",
-		"familiar_name": "foobar",
-		"display_name": "foobar"
+	"emails": {
+		"account": "foo@bar.com",
+		"business": "",
+		"personal": "",
+		"preferred": "foo@bar.com"
 	},
-	"email": "peter@gmail.com",
-	"country": "DE",
-	"locale": "de",
-	"referral_link": "https://db.tt/foobar",
-	"is_paired": false,
-	"account_type": {".tag": "pro"}
+	"first_name": "Foo",
+	"gender": "",
+	"id": "foobarid",
+	"last_name": "Bar",
+	"locale": "en_US",
+	"name": "Foo Bar"
 }`)
 	})
 	ts := httptest.NewServer(router)
@@ -72,5 +71,5 @@ func TestExchangeCode(t *testing.T) {
 	code := "testcode"
 	ses, err := mock.FetchSession(code)
 	require.Nil(t, err)
-	assert.Equal(t, "dbid:foobar", ses.GetRemoteSubject())
+	assert.Equal(t, "foobarid", ses.GetRemoteSubject())
 }

@@ -40,29 +40,42 @@ func TestGetAuthCodeURL(t *testing.T) {
 }
 
 func TestExchangeCode(t *testing.T) {
-
 	router := mux.NewRouter()
 	router.HandleFunc("/oauth2/token", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintln(w, `{"access_token": "ABCDEFG", "token_type": "bearer", "uid": "12345", "id_token": "foobar"}`)
 	})
-	router.HandleFunc("/oauth2/v3/tokeninfo", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, r.URL.Query().Get("id_token"), "foobar")
+	router.HandleFunc("/plus/v1/people/me", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintln(w, `{
- "iss": "https://accounts.google.com",
- "sub": "110169484474386276334",
- "azp": "1008719970978-hb24n2dstb40o45d4feuo2ukqmcc6381.apps.googleusercontent.com",
- "aud": "1008719970978-hb24n2dstb40o45d4feuo2ukqmcc6381.apps.googleusercontent.com",
- "iat": "1433978353",
- "exp": "1433981953",
- "email": "testuser@gmail.com",
- "email_verified": "true",
- "name" : "Test User",
- "picture": "https://lh4.googleusercontent.com/-kYgzyAWpZzJ/ABCDEFGHI/AAAJKLMNOP/tIXL9Ir44LE/s99-c/photo.jpg",
- "given_name": "Test",
- "family_name": "User",
- "locale": "en"
+	"kind": "plus#person",
+	"etag": "\"foobar\"",
+	"gender": "male",
+	"emails": [
+		{
+		"value": "foobar@gmail.com",
+		"type": "account"
+		}
+	],
+	"objectType": "person",
+	"id": "foobarid",
+	"displayName": "foobar",
+	"name": {
+		"familyName": "foobar",
+		"givenName": "foobar"
+	},
+	"url": "https://plus.google.com/foobar",
+	"image": {
+		"url": "https://lh3.googleusercontent.com/foobar/photo.jpg?sz=50",
+		"isDefault": true
+	},
+	"isPlusUser": true,
+	"language": "de",
+	"ageRange": {
+		"min": 21
+	},
+	"circledByCount": 6,
+	"verified": false
 }`)
 	})
 	ts := httptest.NewServer(router)
@@ -70,10 +83,8 @@ func TestExchangeCode(t *testing.T) {
 	mock.api = ts.URL
 	mock.conf.Endpoint.TokenURL = ts.URL + mock.conf.Endpoint.TokenURL
 
-	t.Logf("Token URL: %s", mock.conf.Endpoint.TokenURL)
-	t.Logf("API URL: %s", mock.api)
 	code := "testcode"
 	ses, err := mock.FetchSession(code)
 	require.Nil(t, err, "%s", err)
-	assert.Equal(t, "110169484474386276334", ses.GetRemoteSubject())
+	assert.Equal(t, "foobarid", ses.GetRemoteSubject())
 }

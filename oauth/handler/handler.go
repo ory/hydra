@@ -313,7 +313,7 @@ func (h *Handler) AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 
 		provider, err := h.Providers.Find(providerName)
 		if err != nil {
-			http.Error(w, fmt.Sprintf(`Provider "%s" not known and no sign in location provided.`, providerName), http.StatusBadRequest)
+			http.Error(w, fmt.Sprintf(`Unknown provider "%s".`, providerName), http.StatusBadRequest)
 			return
 		}
 

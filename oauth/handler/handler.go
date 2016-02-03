@@ -3,6 +3,10 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/url"
+	"time"
+
 	"github.com/RangelReale/osin"
 	log "github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
@@ -19,9 +23,6 @@ import (
 	"github.com/ory-am/ladon/policy"
 	osinStore "github.com/ory-am/osin-storage/storage"
 	"github.com/pborman/uuid"
-	"net/http"
-	"net/url"
-	"time"
 )
 
 func DefaultConfig() *osin.ServerConfig {
@@ -297,7 +298,7 @@ func (h *Handler) AuthorizeHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if stateData.IsExpired() {
-			http.Error(w, fmt.Sprintf("This session expired.", err), http.StatusBadRequest)
+			http.Error(w, fmt.Sprintf("This session expired %v.", err), http.StatusBadRequest)
 		}
 		r.Form = stateData.ToURLValues()
 	}

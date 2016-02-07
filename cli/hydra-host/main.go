@@ -1,11 +1,11 @@
 package main
 
 import (
+	"os"
+
 	"github.com/codegangsta/cli"
 	. "github.com/ory-am/hydra/cli/hydra-host/handler"
-	"os"
 	//"github.com/ory-am/hydra/cli/hydra-host/templates"
-	//"fmt"
 	"fmt"
 	"time"
 )
@@ -19,11 +19,11 @@ func errorWrapper(f func(ctx *cli.Context) error) func(ctx *cli.Context) {
 }
 
 var (
-	ctx      = new(Context)
-	cl       = &Client{Ctx: ctx}
-	u        = &Account{Ctx: ctx}
-	co       = &Core{Ctx: ctx}
-	pl       = &Policy{Ctx: ctx}
+	ctx      = new(DefaultSystemContext)
+	cl       = &Client{Ctx: ctx.GetSystemContext()}
+	u        = &Account{Ctx: ctx.GetSystemContext()}
+	co       = &Core{Ctx: ctx.GetSystemContext()}
+	pl       = &Policy{Ctx: ctx.GetSystemContext()}
 	Commands = []cli.Command{
 		{
 			Name:  "client",

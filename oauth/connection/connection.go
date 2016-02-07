@@ -17,10 +17,10 @@ type Connection interface {
 
 // DefaultConnection is a default implementation of the Connection interface
 type DefaultConnection struct {
-	ID            string `json:"id,omitempty"`
-	Provider      string `json:"provider" valid:"required"`
-	LocalSubject  string `json:"localSubject" valid:"required"`
-	RemoteSubject string `json:"remoteSubject" valid:"required"`
+	ID            string `json:"id,omitempty" gorethink:"id"`
+	Provider      string `json:"provider" valid:"required" gorethink:"provider"`
+	LocalSubject  string `json:"localSubject" valid:"required" gorethink:"localsubject"`
+	RemoteSubject string `json:"remoteSubject" valid:"required" gorethink:"remotesubject"`
 }
 
 func (c *DefaultConnection) GetID() string {

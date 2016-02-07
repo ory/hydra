@@ -1,58 +1,76 @@
 package handler
 
 import (
-	"database/sql"
-	accounts "github.com/ory-am/hydra/account/postgres"
-	connections "github.com/ory-am/hydra/oauth/connection/postgres"
-	states "github.com/ory-am/hydra/oauth/provider/storage/postgres"
-	policies "github.com/ory-am/ladon/policy/postgres"
-	osins "github.com/ory-am/osin-storage/storage/postgres"
+	"log"
+	"sync"
 
-	log "github.com/Sirupsen/logrus"
-	_ "github.com/lib/pq"
-	"github.com/ory-am/hydra/hash"
-	"strconv"
+	"github.com/ory-am/hydra/account"
+	"github.com/ory-am/hydra/oauth/connection"
+	statesStorage "github.com/ory-am/hydra/oauth/provider/storage"
+	"github.com/ory-am/ladon/policy"
+	"github.com/ory-am/osin-storage/storage"
 )
 
-type Context struct {
-	DB          *sql.DB
-	Accounts    *accounts.Store
-	Connections *connections.Store
-	Policies    *policies.Store
-	Osins       *osins.Storage
-	States      *states.Store
+// DefaultSystemContext - This is the container for the context that we use
+// throughout Hydra
+type DefaultSystemContext struct {
+	Ctx Context
+	sync.Mutex
 }
 
-func (c *Context) Start() {
-	getEnv()
-	db, err := sql.Open("postgres", databaseURL)
-	if err != nil {
-		log.Fatal(err)
-	} else if err := db.Ping(); err != nil {
-		log.Fatal(err)
-	}
+// GetSystemContext - Fetches the system context by lazy-loading it
+func (d *DefaultSystemContext) GetSystemContext() Context {
 
-	wf, err := strconv.Atoi(bcryptWorkFactor)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// Lazy-load the system context (only done once!)
+	// Lock just in case we rewrite the instantiation in the future..
+	d.Lock()
+	if d.Ctx == nil {
+		// Load the environment variables
+		getEnv()
 
-	c.DB = db
-	c.Accounts = accounts.New(&hash.BCrypt{wf}, db)
-	c.Connections = connections.New(db)
-	c.Policies = policies.New(db)
-	c.Osins = osins.New(db)
-	c.States = states.New(db)
+		// This is done only once!
+		var ctx Context
+		var err error
 
-	if err := c.Accounts.CreateSchemas(); err != nil {
-		log.Fatal(err)
-	} else if err := c.Connections.CreateSchemas(); err != nil {
-		log.Fatal(err)
-	} else if err := c.Policies.CreateSchemas(); err != nil {
-		log.Fatal(err)
-	} else if err := c.Osins.CreateSchemas(); err != nil {
-		log.Fatal(err)
-	} else if err := c.States.CreateSchemas(); err != nil {
-		log.Fatal(err)
+		switch database {
+		case "postgres":
+			ctx, err = new(PostgresContext).Init()
+		case "rethinkdb":
+			ctx, err = new(RethinkContext).Init()
+		default:
+			log.Fatal("Please select a valid database technology!")
+		}
+
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		d.Ctx = ctx
 	}
+	d.Unlock()
+
+	return d.Ctx
+}
+
+// Context - Context is an interface we use in Hydra to utilize different storage
+// backends.
+type Context interface {
+
+	// Initializes the context and sets default values (if needed)
+	Init() (Context, error)
+
+	// Start - Starts the context (usually creats a connection pool to the DB and so forth)
+	Start() error
+
+	// Close - Closes connection to DB and other things that might have to be done on shutdown
+	Close()
+
+	GetAccounts() account.Storage
+
+	GetConnections() connection.Storage
+
+	GetPolicies() policy.Storage
+
+	GetOsins() storage.Storage
+
+	GetStates() statesStorage.Storage
 }

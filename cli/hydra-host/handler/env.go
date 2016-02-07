@@ -2,6 +2,9 @@ package handler
 
 import (
 	"fmt"
+	"os"
+	"path"
+
 	"github.com/ory-am/common/env"
 	"github.com/ory-am/common/pkg"
 	"github.com/ory-am/hydra/oauth/provider"
@@ -9,12 +12,11 @@ import (
 	"github.com/ory-am/hydra/oauth/provider/google"
 	"github.com/ory-am/hydra/oauth/provider/microsoft"
 	"github.com/ory-am/hydra/oauth/provider/signin"
-	"os"
-	"path"
 )
 
 var (
 	listenOn, forceHTTP, bcryptWorkFactor, databaseURL string
+	database                                           string
 	jwtPrivateKeyPath, jwtPublicKeyPath, tlsKeyPath    string
 	accessTokenLifetime, tlsCertPath, hostURL          string
 	providers                                          []provider.Provider
@@ -57,6 +59,7 @@ func getEnv() {
 	}
 	bcryptWorkFactor = env.Getenv("BCRYPT_WORKFACTOR", "10")
 	databaseURL = env.Getenv("DATABASE_URL", "")
+	database = env.Getenv("DATABASE", "postgres")
 	locations = map[string]string{
 		"signUp": env.Getenv("SIGNUP_URL", ""),
 		"signIn": env.Getenv("SIGNIN_URL", ""),

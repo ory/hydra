@@ -16,15 +16,16 @@ import (
 	"github.com/ory-am/ladon/guard"
 
 	"fmt"
+	"net/http"
+	"strconv"
+
 	"github.com/RangelReale/osin"
 	"github.com/ory-am/common/pkg"
 	"golang.org/x/net/http2"
-	"net/http"
-	"strconv"
 )
 
 type Core struct {
-	Ctx               *Context
+	Ctx               Context
 	accountHandler    *accounts.Handler
 	clientHandler     *clients.Handler
 	connectionHandler *connections.Handler
@@ -64,7 +65,10 @@ func osinConfig() (conf *osin.ServerConfig, err error) {
 }
 
 func (c *Core) Start(ctx *cli.Context) error {
-	c.Ctx.Start()
+	// Start the database backend
+	if err := c.Ctx.Start(); err != nil {
+		return fmt.Errorf("Could not start context: %s", err)
+	}
 
 	private, err := jwt.LoadCertificate(jwtPrivateKeyPath)
 	if err != nil {
@@ -82,28 +86,28 @@ func (c *Core) Start(ctx *cli.Context) error {
 	}
 
 	j := jwt.New(private, public)
-	m := middleware.New(c.Ctx.Policies, j)
+	m := middleware.New(c.Ctx.GetPolicies(), j)
 	c.guard = new(guard.Guard)
-	c.accountHandler = accounts.NewHandler(c.Ctx.Accounts, m)
-	c.clientHandler = clients.NewHandler(c.Ctx.Osins, m)
-	c.connectionHandler = connections.NewHandler(c.Ctx.Connections, m)
+	c.accountHandler = accounts.NewHandler(c.Ctx.GetAccounts(), m)
+	c.clientHandler = clients.NewHandler(c.Ctx.GetOsins(), m)
+	c.connectionHandler = connections.NewHandler(c.Ctx.GetConnections(), m)
 	c.providers = provider.NewRegistry(providers)
-	c.policyHandler = policies.NewHandler(c.Ctx.Policies, m, c.guard, j, c.Ctx.Osins)
+	c.policyHandler = policies.NewHandler(c.Ctx.GetPolicies(), m, c.guard, j, c.Ctx.GetOsins())
 	c.oauthHandler = &oauth.Handler{
-		Accounts:       c.Ctx.Accounts,
-		Policies:       c.Ctx.Policies,
+		Accounts:       c.Ctx.GetAccounts(),
+		Policies:       c.Ctx.GetPolicies(),
 		Guard:          c.guard,
-		Connections:    c.Ctx.Connections,
+		Connections:    c.Ctx.GetConnections(),
 		Providers:      c.providers,
 		Issuer:         c.issuer,
 		Audience:       c.audience,
 		JWT:            j,
 		OAuthConfig:    osinConf,
-		OAuthStore:     c.Ctx.Osins,
-		States:         c.Ctx.States,
+		OAuthStore:     c.Ctx.GetOsins(),
+		States:         c.Ctx.GetStates(),
 		SignUpLocation: locations["signUp"],
 		SignInLocation: locations["signIn"],
-		Middleware:     host.New(c.Ctx.Policies, j),
+		Middleware:     host.New(c.Ctx.GetPolicies(), j),
 	}
 
 	extractor := m.ExtractAuthentication
@@ -123,6 +127,8 @@ func (c *Core) Start(ctx *cli.Context) error {
 		})
 	})
 
+	log.Infoln("Hydra started")
+
 	if forceHTTP == "force" {
 		http.Handle("/", router)
 		log.Warn("You're using HTTP without TLS encryption. This is dangerously unsafe and you should not do this.")
@@ -138,5 +144,6 @@ func (c *Core) Start(ctx *cli.Context) error {
 	if err := srv.ListenAndServeTLS(tlsCertPath, tlsKeyPath); err != nil {
 		return fmt.Errorf("Could not serve HTTP/2 server because %s", err)
 	}
+
 	return nil
 }

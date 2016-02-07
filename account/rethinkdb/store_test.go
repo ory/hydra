@@ -1,54 +1,65 @@
-package postgres
+package rethinkdb
 
 import (
-	"database/sql"
 	"log"
 	"os"
+	"time"
 
+	"gopkg.in/ory-am/dockertest.v2"
+
+	rdb "github.com/dancannon/gorethink"
 	"github.com/ory-am/common/pkg"
 	"github.com/ory-am/hydra/hash"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/ory-am/dockertest.v2"
 	//"reflect"
 	"testing"
-	"time"
 
 	"github.com/ory-am/hydra/account"
 )
 
-var db *sql.DB
+var session *rdb.Session
 var store *Store
 
 func TestMain(m *testing.M) {
-	c, err := dockertest.ConnectToPostgreSQL(15, time.Second, func(url string) bool {
-		var err error
-		db, err = sql.Open("postgres", url)
+	c, err := dockertest.ConnectToRethinkDB(20, time.Second, func(url string) bool {
+		rdbSession, err := rdb.Connect(rdb.ConnectOpts{
+			Address:  url,
+			Database: "hydra"})
 		if err != nil {
 			return false
 		}
-		return db.Ping() == nil
+
+		_, err = rdb.DBCreate("hydra").RunWrite(rdbSession)
+		if err != nil {
+			return false
+		}
+
+		store = New(&hash.BCrypt{10}, rdbSession)
+
+		if err := store.CreateTables(); err != nil {
+			return false
+		}
+
+		session = rdbSession
+
+		return true
 	})
 
 	if err != nil {
 		log.Fatalf("Could not connect to database: %s", err)
 	}
 
-	store = New(&hash.BCrypt{10}, db)
-	if err = store.CreateSchemas(); err != nil {
-		log.Fatalf("Could not ping database: %v", err)
-	}
-
 	retCode := m.Run()
 
 	// force teardown
-	tearDown(c)
+	tearDown(session, c)
 
 	os.Exit(retCode)
 }
 
-func tearDown(c dockertest.ContainerID) {
-	db.Close()
+func tearDown(session *rdb.Session, c dockertest.ContainerID) {
+	defer session.Close()
 	c.KillRemove()
 }
 
@@ -72,7 +83,7 @@ func TestCreateAndGetCases(t *testing.T) {
 				ID:       a,
 				Username: "1@bar",
 				Password: "secret",
-				Data:     `{"foo": "bar"}`,
+				Data:     `{"foo": "bar1"}`,
 			},
 			pass: true, find: true,
 		},
@@ -81,7 +92,7 @@ func TestCreateAndGetCases(t *testing.T) {
 				ID:       a,
 				Username: "1@bar",
 				Password: "secret",
-				Data:     `{"foo": "bar"}`,
+				Data:     `{"foo": "bar2"}`,
 			},
 			pass: false, find: true,
 		},
@@ -90,7 +101,7 @@ func TestCreateAndGetCases(t *testing.T) {
 				ID:       b,
 				Username: "1@bar",
 				Password: "secret",
-				Data:     `{"foo": "bar"}`,
+				Data:     `{"foo": "bar3"}`,
 			},
 			pass: false, find: false,
 		},
@@ -116,7 +127,7 @@ func TestCreateAndGetCases(t *testing.T) {
 			}
 			pkg.AssertObjectKeysEqual(t, c.p, result, "ID", "Username")
 		} else {
-			assert.NotNil(t, err)
+			assert.Error(t, err)
 
 			result, err = store.Get(c.p.ID)
 			assert.Equal(t, c.find, err == nil)

@@ -6,7 +6,7 @@
 
 ![Hydra](hydra.png)
 
-Hydra is a twelve factor authentication, authorization and account management service, ready for you to use in your micro service architecture. Hydra is written in go and backed by PostgreSQL or any implementation of [account/storage.go](account/storage.go).
+Hydra is a twelve factor authentication, authorization and account management service, ready for you to use in your micro service architecture. Hydra is written in go and backed by PostgreSQL or RethinkDB (or any implementation of [account/storage.go](account/storage.go)).
 
 **Note:** Don't worry, Hydra development is not halted. We are simply working on a more secure OAuth2 framework to back Hydra. Check out the [fosite project](https://github.com/ory-am/fosite). We encourage contributions!
 
@@ -71,7 +71,7 @@ in need of these three, you are in the right place.
 
 ## Motivation
 
-We develop Hydra because Hydra we need a lightweight and clean IAM solution for our customers. We believe that security and simplicity come together. This is why Hydra only relies on Google's Go Language, PostgreSQL and a slim dependency tree. Hydra is the simple, open source alternative to proprietary authorization solutions suited best for your micro service eco system.
+We develop Hydra because Hydra we need a lightweight and clean IAM solution for our customers. We believe that security and simplicity come together. This is why Hydra only relies on Google's Go Language, PostgreSQL or RethinkDB and a slim dependency tree. Hydra is the simple, open source alternative to proprietary authorization solutions suited best for your micro service eco system.
 
 *Use it, enjoy it and contribute!*
 
@@ -192,7 +192,8 @@ The CLI currently requires two environment variables:
 | PORT                 | Which port to listen on   | number                                        | 443       |
 | HOST                 | Which host to listen on   | ip or hostname                                | empty (all) |
 | HOST_URL             | Hydra's host URL          | url                                           | "https://localhost:4443" |
-| DATABASE_URL         | PostgreSQL Database URL   | `postgres://user:password@host:port/database` | empty     |
+| DATABASE_URL         | Database URL   | e.g: `postgres://user:password@host:port/database` | empty     |
+| DATABASE             | Database Technology   | string e.g: `postgres` or `rethinkdb` | postgres     |
 | BCRYPT_WORKFACTOR    | BCrypt Strength           | number                                        | `10`      |
 | SIGNUP_URL           | [Sign up URL](#sign-up)   | url                                           | empty     |
 | SIGNIN_URL           | [Sign in URL](#sign-in)   | url                                           | empty     |

@@ -16,7 +16,6 @@ import (
 
 var (
 	listenOn, forceHTTP, bcryptWorkFactor, databaseURL string
-	database                                           string
 	jwtPrivateKeyPath, jwtPublicKeyPath, tlsKeyPath    string
 	accessTokenLifetime, tlsCertPath, hostURL          string
 	providers                                          []provider.Provider
@@ -59,7 +58,6 @@ func getEnv() {
 	}
 	bcryptWorkFactor = env.Getenv("BCRYPT_WORKFACTOR", "10")
 	databaseURL = env.Getenv("DATABASE_URL", "")
-	database = env.Getenv("DATABASE", "postgres")
 	locations = map[string]string{
 		"signUp": env.Getenv("SIGNUP_URL", ""),
 		"signIn": env.Getenv("SIGNIN_URL", ""),

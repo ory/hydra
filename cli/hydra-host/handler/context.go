@@ -2,6 +2,8 @@ package handler
 
 import (
 	"log"
+	"os"
+	"strings"
 	"sync"
 
 	"github.com/ory-am/hydra/account"
@@ -32,13 +34,16 @@ func (d *DefaultSystemContext) GetSystemContext() Context {
 		var ctx Context
 		var err error
 
-		switch database {
-		case "postgres":
-			ctx, err = new(PostgresContext).Init()
-		case "rethinkdb":
+		if strings.Contains(databaseURL, "rethinkdb://") {
+			// Strip unwanted "rethinkdb://"
+			databaseURL = strings.Replace(databaseURL, "rethinkdb://", "", 1)
+			os.Setenv("DATABASE_URL", databaseURL)
+			// Init the context
 			ctx, err = new(RethinkContext).Init()
-		default:
-			log.Fatal("Please select a valid database technology!")
+		} else {
+			// Fall back to postgres
+			// Init the context
+			ctx, err = new(PostgresContext).Init()
 		}
 
 		if err != nil {

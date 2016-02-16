@@ -185,7 +185,9 @@ For brevity the guide to creating a new database in Postgres has been skipped.*
 
 ### Available Environment Variables
 
-The CLI currently requires two environment variables:
+The CLI currently requires one environment variable: DATABASE_URL
+
+Make sure to prefix the url with the wanted database technology. e.g `rethinkdb:host:port` or `postgres://user:password@host:port/database`
 
 | Variable             | Description               | Format                                        | Default   |
 | -------------------- | ------------------------- | --------------------------------------------- | --------- |
@@ -193,7 +195,6 @@ The CLI currently requires two environment variables:
 | HOST                 | Which host to listen on   | ip or hostname                                | empty (all) |
 | HOST_URL             | Hydra's host URL          | url                                           | "https://localhost:4443" |
 | DATABASE_URL         | Database URL   | e.g: `postgres://user:password@host:port/database` | empty     |
-| DATABASE             | Database Technology   | string e.g: `postgres` or `rethinkdb` | postgres     |
 | BCRYPT_WORKFACTOR    | BCrypt Strength           | number                                        | `10`      |
 | SIGNUP_URL           | [Sign up URL](#sign-up)   | url                                           | empty     |
 | SIGNIN_URL           | [Sign in URL](#sign-in)   | url                                           | empty     |

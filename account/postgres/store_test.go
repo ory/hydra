@@ -36,7 +36,7 @@ func TestMain(m *testing.M) {
 
 	store = New(&hash.BCrypt{10}, db)
 	if err = store.CreateSchemas(); err != nil {
-		log.Fatalf("Could not ping database: %v", err)
+		log.Fatalf("Could not create the tables: %v", err)
 	}
 
 	retCode := m.Run()

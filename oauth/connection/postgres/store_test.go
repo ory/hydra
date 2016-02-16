@@ -35,7 +35,7 @@ func TestMain(m *testing.M) {
 
 	store = New(db)
 	if err = store.CreateSchemas(); err != nil {
-		log.Fatalf("Could not ping database: %v", err)
+		log.Fatalf("Could not create tables: %v", err)
 	}
 
 	retCode := m.Run()

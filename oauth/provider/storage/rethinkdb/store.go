@@ -1,8 +1,6 @@
 package rethinkdb
 
 import (
-	"fmt"
-
 	rdb "github.com/dancannon/gorethink"
 	"github.com/ory-am/hydra/oauth/provider/storage"
 
@@ -25,24 +23,25 @@ func (s *Store) CreateTables() error {
 	if err == nil && !exists {
 		_, err := rdb.TableCreate(storageStateTable).RunWrite(s.session)
 		if err != nil {
-			fmt.Println(err)
+			return errors.New(err)
 		}
 	}
 	return nil
 }
 
-// TableExists : check if table(s) exists in database
+// TableExists check if table(s) exists in database
 func (s *Store) tableExists(table string) (bool, error) {
 
 	res, err := rdb.TableList().Run(s.session)
 	if err != nil {
-		return false, err
+		return false, errors.New(err)
 	}
-	defer res.Close()
 
 	if res.IsNil() {
 		return false, nil
 	}
+
+	defer res.Close()
 
 	var tableDB string
 	for res.Next(&tableDB) {
@@ -69,18 +68,19 @@ func (s *Store) SaveStateData(sd *storage.StateData) error {
 func (s *Store) GetStateData(id string) (*storage.StateData, error) {
 	// Query state data
 	result, err := rdb.Table(storageStateTable).Get(id).Run(s.session)
-	defer result.Close()
 
 	if err != nil {
-		return nil, err
+		return nil, errors.New(err)
 	} else if result.IsNil() {
 		return nil, pkg.ErrNotFound
 	}
 
+	defer result.Close()
+
 	var sd storage.StateData
 	err = result.One(&sd)
 	if err != nil {
-		return nil, err
+		return nil, errors.New(err)
 	}
 
 	return &sd, nil

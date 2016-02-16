@@ -1,8 +1,6 @@
 package rethinkdb
 
 import (
-	"fmt"
-
 	rdb "github.com/dancannon/gorethink"
 	"github.com/mitchellh/mapstructure"
 
@@ -30,24 +28,25 @@ func (s *Store) CreateTables() error {
 	if err == nil && !exists {
 		_, err := rdb.TableCreate(accountsTable).RunWrite(s.session)
 		if err != nil {
-			fmt.Println(err)
+			return errors.New(err)
 		}
 	}
 	return nil
 }
 
-// TableExists : check if table(s) exists in database
+// TableExists check if table(s) exists in database
 func (s *Store) tableExists(table string) (bool, error) {
 
 	res, err := rdb.TableList().Run(s.session)
 	if err != nil {
-		return false, err
+		return false, errors.New(err)
 	}
-	defer res.Close()
 
 	if res.IsNil() {
 		return false, nil
 	}
+
+	defer res.Close()
 
 	var tableDB string
 	for res.Next(&tableDB) {
@@ -85,7 +84,7 @@ func (s *Store) Create(r account.CreateAccountRequest) (account.Account, error) 
 
 	// Hash the password
 	if r.Password, err = s.hasher.Hash(r.Password); err != nil {
-		return nil, err
+		return nil, errors.New(err)
 	}
 
 	// Make sure that username is unique
@@ -116,15 +115,18 @@ func (s *Store) Create(r account.CreateAccountRequest) (account.Account, error) 
 func (s *Store) Contains(field string, value string) (bool, error) {
 	res, err := rdb.Table(accountsTable).Field(field).Contains(value).Run(s.session)
 	if err != nil {
-		return false, err
+		return false, errors.New(err)
+	} else if res.IsNil() {
+		return false, pkg.ErrNotFound
 	}
+
 	defer res.Close()
 
 	var found bool
 	err = res.One(&found)
 
 	if err != nil {
-		return false, err
+		return false, errors.New(err)
 	}
 
 	return found, nil
@@ -136,7 +138,7 @@ func (s *Store) Get(id string) (account.Account, error) {
 	defer result.Close()
 
 	if err != nil {
-		return nil, err
+		return nil, errors.New(err)
 	} else if result.IsNil() {
 		return nil, pkg.ErrNotFound
 	}
@@ -144,7 +146,7 @@ func (s *Store) Get(id string) (account.Account, error) {
 	var a account.DefaultAccount
 	err = result.One(&a)
 	if err != nil {
-		return nil, err
+		return nil, errors.New(err)
 	}
 
 	return &a, nil
@@ -156,13 +158,13 @@ func (s *Store) UpdatePassword(id string, r account.UpdatePasswordRequest) (acc 
 	}
 
 	if acc, err = s.authenticateWithIDAndPassword(id, r.CurrentPassword); err != nil {
-		return nil, err
+		return nil, errors.New(err)
 	}
 
 	// Hash the new password
 	r.NewPassword, err = s.hasher.Hash(r.NewPassword)
 	if err != nil {
-		return nil, err
+		return nil, errors.New(err)
 	}
 
 	account := account.DefaultAccount{
@@ -185,7 +187,7 @@ func (s *Store) UpdateUsername(id string, r account.UpdateUsernameRequest) (acc 
 	}
 
 	if acc, err = s.authenticateWithIDAndPassword(id, r.Password); err != nil {
-		return nil, err
+		return nil, errors.New(err)
 	}
 
 	account := account.DefaultAccount{
@@ -205,7 +207,7 @@ func (s *Store) UpdateUsername(id string, r account.UpdateUsernameRequest) (acc 
 
 func (s *Store) Delete(id string) (err error) {
 	if _, err = rdb.Table(accountsTable).Get(id).Delete().RunWrite(s.session); err != nil {
-		return err
+		return errors.New(err)
 	}
 	return nil
 }
@@ -215,19 +217,19 @@ func (s *Store) Authenticate(username, password string) (account.Account, error)
 	// Query account
 	result, err := rdb.Table(accountsTable).Filter(rdb.Row.Field("username").Eq(username)).Run(s.session)
 	if err != nil {
-		return nil, err
+		return nil, errors.New(err)
 	}
 	defer result.Close()
 
 	var accountMap map[string]interface{}
 	err = result.One(&accountMap)
 	if err != nil {
-		return nil, err
+		return nil, errors.New(err)
 	}
 
 	err = mapstructure.Decode(accountMap, &a)
 	if err != nil {
-		return nil, err
+		return nil, errors.New(err)
 	}
 
 	// Compare the given password with the hashed password stored in the database

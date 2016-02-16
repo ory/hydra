@@ -1,8 +1,7 @@
 package rethinkdb
 
 import (
-	"errors"
-	"fmt"
+	"github.com/go-errors/errors"
 
 	rdb "github.com/dancannon/gorethink"
 	"github.com/mitchellh/mapstructure"
@@ -27,24 +26,25 @@ func (s *Store) CreateTables() error {
 	if err == nil && !exists {
 		_, err := rdb.TableCreate(connectionTable).RunWrite(s.session)
 		if err != nil {
-			fmt.Println(err)
+			return errors.New(err)
 		}
 	}
 	return nil
 }
 
-// TableExists : check if table(s) exists in database
+// TableExists check if table(s) exists in database
 func (s *Store) tableExists(table string) (bool, error) {
 
 	res, err := rdb.TableList().Run(s.session)
 	if err != nil {
-		return false, err
+		return false, errors.New(err)
 	}
-	defer res.Close()
 
 	if res.IsNil() {
 		return false, nil
 	}
+
+	defer res.Close()
 
 	var tableDB string
 	for res.Next(&tableDB) {
@@ -60,7 +60,9 @@ func (s *Store) Contains(matchFunction rdbFunction) (bool, error) {
 
 	res, err := rdb.Table(connectionTable).Contains(matchFunction).Run(s.session)
 	if err != nil {
-		return false, err
+		return false, errors.New(err)
+	} else if res.IsNil() {
+		return false, pkg.ErrNotFound
 	}
 	defer res.Close()
 
@@ -68,7 +70,7 @@ func (s *Store) Contains(matchFunction rdbFunction) (bool, error) {
 	err = res.One(&found)
 
 	if err != nil {
-		return false, err
+		return false, errors.New(err)
 	}
 
 	return found, nil
@@ -101,7 +103,7 @@ func (s *Store) Create(c cn.Connection) error {
 
 func (s *Store) Delete(id string) error {
 	if _, err := rdb.Table(connectionTable).Get(id).Delete().RunWrite(s.session); err != nil {
-		return err
+		return errors.New(err)
 	}
 	return nil
 }
@@ -120,7 +122,7 @@ func (s *Store) Get(id string) (cn.Connection, error) {
 	var c cn.DefaultConnection
 	err = result.One(&c)
 	if err != nil {
-		return nil, err
+		return nil, errors.New(err)
 	}
 
 	return &c, nil
@@ -135,7 +137,7 @@ func (s *Store) FindByRemoteSubject(provider, subject string) (cn.Connection, er
 	defer result.Close()
 
 	if err != nil {
-		return nil, err
+		return nil, errors.New(err)
 	} else if result.IsNil() {
 		return nil, pkg.ErrNotFound
 	}
@@ -143,14 +145,14 @@ func (s *Store) FindByRemoteSubject(provider, subject string) (cn.Connection, er
 	var connectionMap map[string]interface{}
 	err = result.One(&connectionMap)
 	if err != nil {
-		return nil, err
+		return nil, errors.New(err)
 	}
 
 	var c cn.DefaultConnection
 
 	err = mapstructure.Decode(connectionMap, &c)
 	if err != nil {
-		return nil, err
+		return nil, errors.New(err)
 	}
 
 	return &c, nil
@@ -164,7 +166,7 @@ func (s *Store) FindAllByLocalSubject(subject string) (cs []cn.Connection, err e
 	defer result.Close()
 
 	if err != nil {
-		return []cn.Connection{}, err
+		return []cn.Connection{}, errors.New(err)
 	} else if result.IsNil() {
 		return []cn.Connection{}, pkg.ErrNotFound
 	}
@@ -172,14 +174,14 @@ func (s *Store) FindAllByLocalSubject(subject string) (cs []cn.Connection, err e
 	var connectionMap []map[string]interface{}
 	err = result.All(&connectionMap)
 	if err != nil {
-		return []cn.Connection{}, err
+		return []cn.Connection{}, errors.New(err)
 	}
 
 	for _, data := range connectionMap {
 		var c cn.DefaultConnection
 		err = mapstructure.Decode(data, &c)
 		if err != nil {
-			return []cn.Connection{}, err
+			return []cn.Connection{}, errors.New(err)
 		}
 		cs = append(cs, &c)
 	}

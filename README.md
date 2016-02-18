@@ -187,7 +187,7 @@ For brevity the guide to creating a new database in Postgres has been skipped.*
 
 The CLI currently requires one environment variable: DATABASE_URL
 
-Make sure to prefix the url with the wanted database technology. e.g `rethinkdb:host:port` or `postgres://user:password@host:port/database`
+Make sure to prefix the url with the wanted database technology. e.g `rethinkdb://host:port` or `postgres://user:password@host:port/database`
 
 | Variable             | Description               | Format                                        | Default   |
 | -------------------- | ------------------------- | --------------------------------------------- | --------- |

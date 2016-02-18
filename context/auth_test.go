@@ -3,14 +3,6 @@ package context
 import (
 	"database/sql"
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/ory-am/dockertest"
-	hjwt "github.com/ory-am/hydra/jwt"
-	"github.com/ory-am/ladon/policy"
-	ladon "github.com/ory-am/ladon/policy/postgres"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"golang.org/x/net/context"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -18,6 +10,15 @@ import (
 	"os"
 	"testing"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
+	hjwt "github.com/ory-am/hydra/jwt"
+	"github.com/ory-am/ladon/policy"
+	ladon "github.com/ory-am/ladon/policy/postgres"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"golang.org/x/net/context"
+	"gopkg.in/ory-am/dockertest.v2"
 )
 
 var db *sql.DB
@@ -25,18 +26,35 @@ var ladonStore *ladon.Store
 
 func TestMain(m *testing.M) {
 	var err error
-	var c dockertest.ContainerID
-	c, db, err = dockertest.OpenPostgreSQLContainerConnection(15, time.Second)
+	c, err := dockertest.ConnectToPostgreSQL(15, time.Second, func(url string) bool {
+		var err error
+		db, err = sql.Open("postgres", url)
+		if err != nil {
+			return false
+		}
+		return db.Ping() == nil
+	})
+
 	if err != nil {
 		log.Fatalf("Could not connect to database: %s", err)
 	}
-	defer c.KillRemove()
 
 	ladonStore = ladon.New(db)
 	if err := ladonStore.CreateSchemas(); err != nil {
 		log.Fatalf("Could not set up schemas: %v", err)
 	}
-	os.Exit(m.Run())
+
+	retCode := m.Run()
+
+	// force teardown
+	tearDown(c)
+
+	os.Exit(retCode)
+}
+
+func tearDown(c dockertest.ContainerID) {
+	db.Close()
+	c.KillRemove()
 }
 
 func TestNewContextFromAuthorization(t *testing.T) {

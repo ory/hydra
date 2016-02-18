@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+
 	"github.com/codegangsta/cli"
 	"github.com/howeyc/gopass"
 	"github.com/ory-am/hydra/account"
@@ -9,7 +10,7 @@ import (
 )
 
 type Account struct {
-	Ctx *Context
+	Ctx Context
 }
 
 func getPassword() (password string) {
@@ -19,7 +20,7 @@ func getPassword() (password string) {
 		fmt.Errorf("Error: %s", err)
 		return getPassword()
 	}
-	password = string(pwd);
+	password = string(pwd)
 	if string(pwd) == "" {
 		fmt.Println("You did not provide a password. Please try again.")
 		return getPassword()
@@ -39,6 +40,11 @@ func getPassword() (password string) {
 }
 
 func (c *Account) Create(ctx *cli.Context) error {
+	// Start the database backend
+	if err := c.Ctx.Start(); err != nil {
+		return fmt.Errorf("Could not start context: %s", err)
+	}
+
 	username := ctx.Args().First()
 	if username == "" {
 		return fmt.Errorf("Please provide an username.")
@@ -48,8 +54,7 @@ func (c *Account) Create(ctx *cli.Context) error {
 		password = getPassword()
 	}
 
-	c.Ctx.Start()
-	user, err := c.Ctx.Accounts.Create(account.CreateAccountRequest{
+	user, err := c.Ctx.GetAccounts().Create(account.CreateAccountRequest{
 		ID:       uuid.New(),
 		Username: username,
 		Password: password,
@@ -61,7 +66,7 @@ func (c *Account) Create(ctx *cli.Context) error {
 
 	fmt.Printf(`Created account as "%s".`+"\n", user.GetID())
 	if ctx.Bool("as-superuser") {
-		if err := c.Ctx.Policies.Create(superUserPolicy(user.GetID())); err != nil {
+		if err := c.Ctx.GetPolicies().Create(superUserPolicy(user.GetID())); err != nil {
 			return fmt.Errorf("Could not create policy for account because %s", err)
 		}
 		fmt.Printf(`Granted superuser privileges to account "%s".`+"\n", user.GetID())

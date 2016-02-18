@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+
 	"github.com/RangelReale/osin"
 	"github.com/codegangsta/cli"
 	"github.com/ory-am/common/rand/sequence"
@@ -9,10 +10,15 @@ import (
 )
 
 type Client struct {
-	Ctx *Context
+	Ctx Context
 }
 
 func (c *Client) Create(ctx *cli.Context) error {
+	// Start the database backend
+	if err := c.Ctx.Start(); err != nil {
+		return fmt.Errorf("Could not start context: %s", err)
+	}
+
 	id := ctx.String("id")
 	if id == "" {
 		id = uuid.New()
@@ -34,14 +40,13 @@ func (c *Client) Create(ctx *cli.Context) error {
 		UserData:    "",
 	}
 
-	c.Ctx.Start()
-	if err := c.Ctx.Osins.CreateClient(client); err != nil {
+	if err := c.Ctx.GetOsins().CreateClient(client); err != nil {
 		return fmt.Errorf("Could not create client because %s", err)
 	}
 	fmt.Printf(`Created client "%s" with secret "%s" and redirect url "%s".`+"\n", client.Id, client.Secret, client.RedirectUri)
 
 	if ctx.Bool("as-superuser") {
-		if err := c.Ctx.Policies.Create(superUserPolicy(client.Id)); err != nil {
+		if err := c.Ctx.GetPolicies().Create(superUserPolicy(client.Id)); err != nil {
 			return fmt.Errorf("Could not create policy for client because %s", err)
 		}
 		fmt.Printf(`Granted superuser privileges to client "%s".`+"\n", client.Id)

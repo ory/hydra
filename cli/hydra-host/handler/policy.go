@@ -5,18 +5,23 @@ import (
 	"io/ioutil"
 
 	"fmt"
+
 	"github.com/codegangsta/cli"
 	"github.com/ory-am/ladon/policy"
 	"github.com/pborman/uuid"
 )
 
 type Policy struct {
-	Ctx *Context
+	Ctx Context
 }
 
 func (c *Policy) Import(ctx *cli.Context) error {
+	// Start the database backend
+	if err := c.Ctx.Start(); err != nil {
+		return fmt.Errorf("Could not start context: %s", err)
+	}
+
 	var policies []policy.DefaultPolicy
-	c.Ctx.Start()
 	for _, arg := range ctx.Args() {
 		data, err := ioutil.ReadFile(arg)
 		if err != nil {
@@ -32,7 +37,7 @@ func (c *Policy) Import(ctx *cli.Context) error {
 				pol.ID = uuid.New()
 			}
 
-			if err := c.Ctx.Policies.Create(&pol); err != nil {
+			if err := c.Ctx.GetPolicies().Create(&pol); err != nil {
 				return fmt.Errorf(`Could not create policy: %s`, err)
 			}
 			fmt.Printf("Successfully created policy %s.\n", pol.ID)

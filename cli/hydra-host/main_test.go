@@ -1,27 +1,32 @@
 package main
 
 import (
-	"github.com/pborman/uuid"
-	"github.com/stretchr/testify/assert"
+	"bytes"
+	"io"
 	"os"
 	"testing"
 
-	"bytes"
+	"github.com/pborman/uuid"
+	"github.com/stretchr/testify/assert"
+
 	"database/sql"
-	_ "github.com/lib/pq"
-	"github.com/ory-am/common/env"
-	"github.com/ory-am/dockertest"
-	"io"
 	"log"
 	"path/filepath"
 	"time"
+
+	_ "github.com/lib/pq"
+	"github.com/ory-am/common/env"
+	"gopkg.in/ory-am/dockertest.v2"
 )
 
 var tmpDir = os.TempDir()
 
+var db *sql.DB
+
 func TestMain(m *testing.M) {
-	if c, err := dockertest.ConnectToPostgreSQL(15, time.Second, func(url string) bool {
-		db, err := sql.Open("postgres", url)
+	c, err := dockertest.ConnectToPostgreSQL(15, time.Second, func(url string) bool {
+		var err error
+		db, err = sql.Open("postgres", url)
 		if err != nil {
 			log.Printf("Could not connect to database because %s", err)
 			return false
@@ -37,12 +42,23 @@ func TestMain(m *testing.M) {
 			return false
 		}
 		return true
-	}); err != nil {
+	})
+
+	if err != nil {
 		log.Fatalf("Could not connect to database: %s", err)
-	} else {
-		defer c.KillRemove()
 	}
-	os.Exit(m.Run())
+
+	retCode := m.Run()
+
+	// force teardown
+	tearDown(c)
+
+	os.Exit(retCode)
+}
+
+func tearDown(c dockertest.ContainerID) {
+	db.Close()
+	c.KillRemove()
 }
 
 func TestRunCLITests(t *testing.T) {
@@ -69,7 +85,6 @@ func TestRunCLITests(t *testing.T) {
 			outC <- buf.String()
 		}()
 
-		log.Println(env.Getenv("DATABASE_URL", ""))
 		os.Args = c.args
 		err := NewApp().Run(os.Args)
 		assert.Nil(t, err, "Case %d: %s", k, err)

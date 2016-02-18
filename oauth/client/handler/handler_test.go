@@ -1,11 +1,18 @@
 package handler
 
 import (
+	"database/sql"
 	"encoding/json"
+	"log"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"testing"
+	"time"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	chd "github.com/ory-am/common/handler"
-	"github.com/ory-am/dockertest"
 	authcon "github.com/ory-am/hydra/context"
 	hjwt "github.com/ory-am/hydra/jwt"
 	middleware "github.com/ory-am/hydra/middleware/host"
@@ -15,26 +22,28 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
-	"log"
-	"net/http"
-	"net/http/httptest"
-	"os"
-	"testing"
-	"time"
+	"gopkg.in/ory-am/dockertest.v2"
 )
 
 var (
 	mw    *middleware.Middleware
 	store *postgres.Storage
+	db    *sql.DB
 )
 
 func TestMain(m *testing.M) {
-	c, db, err := dockertest.OpenPostgreSQLContainerConnection(15, time.Second)
+	c, err := dockertest.ConnectToPostgreSQL(15, time.Second, func(url string) bool {
+		var err error
+		db, err = sql.Open("postgres", url)
+		if err != nil {
+			return false
+		}
+		return db.Ping() == nil
+	})
+
 	if err != nil {
 		log.Fatalf("Could not connect to database: %s", err)
 	}
-
-	defer c.KillRemove()
 
 	store = postgres.New(db)
 	mw = &middleware.Middleware{}
@@ -42,7 +51,17 @@ func TestMain(m *testing.M) {
 		log.Fatalf("COuld not create schemas: %s", err)
 	}
 
-	os.Exit(m.Run())
+	retCode := m.Run()
+
+	// force teardown
+	tearDown(c)
+
+	os.Exit(retCode)
+}
+
+func tearDown(c dockertest.ContainerID) {
+	db.Close()
+	c.KillRemove()
 }
 
 type test struct {

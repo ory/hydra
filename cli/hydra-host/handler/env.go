@@ -2,6 +2,9 @@ package handler
 
 import (
 	"fmt"
+	"os"
+	"path"
+
 	"github.com/ory-am/common/env"
 	"github.com/ory-am/common/pkg"
 	"github.com/ory-am/hydra/oauth/provider"
@@ -9,8 +12,6 @@ import (
 	"github.com/ory-am/hydra/oauth/provider/google"
 	"github.com/ory-am/hydra/oauth/provider/microsoft"
 	"github.com/ory-am/hydra/oauth/provider/signin"
-	"os"
-	"path"
 )
 
 var (

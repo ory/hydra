@@ -1,10 +1,11 @@
 package storage
 
 import (
-	"github.com/RangelReale/osin"
-	"github.com/ory-am/common/rand/sequence"
 	"net/url"
 	"time"
+
+	"github.com/RangelReale/osin"
+	"github.com/ory-am/common/rand/sequence"
 )
 
 type Storage interface {
@@ -13,14 +14,14 @@ type Storage interface {
 }
 
 type StateData struct {
-	ID          string
-	ClientID    string
-	RedirectURL string
-	Scope       string
-	State       string
-	Type        string
-	Provider    string
-	ExpiresAt   time.Time
+	ID          string    `gorethink:"id"`
+	ClientID    string    `gorethink:"clientId"`
+	RedirectURL string    `gorethink:"redirectURL"`
+	Scope       string    `gorethink:"scope"`
+	State       string    `gorethink:"state"`
+	Type        string    `gorethink:"type"`
+	Provider    string    `gorethink:"provider"`
+	ExpiresAt   time.Time `gorethink:"expiresAt"`
 }
 
 func (s *StateData) IsExpired() bool {

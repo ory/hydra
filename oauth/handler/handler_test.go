@@ -1,13 +1,21 @@
 package handler_test
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"os"
+	"testing"
+	"time"
+
 	"github.com/RangelReale/osin"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	chd "github.com/ory-am/common/handler"
-	"github.com/ory-am/dockertest"
 	"github.com/ory-am/hydra/account"
 	acpg "github.com/ory-am/hydra/account/postgres"
 	authcon "github.com/ory-am/hydra/context"
@@ -30,19 +38,14 @@ import (
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
-	"log"
-	"net/http"
-	"net/http/httptest"
-	"net/url"
-	"os"
-	"testing"
-	"time"
+	"gopkg.in/ory-am/dockertest.v2"
 )
 
 var (
 	accID    = uuid.New()
 	clientID = "tests"
 	handler  *Handler
+	db       *sql.DB
 )
 
 var (
@@ -72,11 +75,18 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	c, db, err := dockertest.OpenPostgreSQLContainerConnection(15, time.Second)
+	c, err := dockertest.ConnectToPostgreSQL(15, time.Second, func(url string) bool {
+		var err error
+		db, err = sql.Open("postgres", url)
+		if err != nil {
+			return false
+		}
+		return db.Ping() == nil
+	})
+
 	if err != nil {
 		log.Fatalf("Could not connect to database: %s", err)
 	}
-	defer c.KillRemove()
 
 	accountStore := acpg.New(&hash.BCrypt{10}, db)
 	policyStore := ppg.New(db)
@@ -144,7 +154,17 @@ func TestMain(m *testing.M) {
 		log.Fatalf("Could create client: %s", err)
 	}
 
-	os.Exit(m.Run())
+	retCode := m.Run()
+
+	// force teardown
+	tearDown(c)
+
+	os.Exit(retCode)
+}
+
+func tearDown(c dockertest.ContainerID) {
+	db.Close()
+	c.KillRemove()
 }
 
 func mockAuthorization(subject string, token *jwt.Token) func(h chd.ContextHandler) chd.ContextHandler {

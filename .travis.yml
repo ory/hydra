@@ -19,6 +19,7 @@ install:
   - go get golang.org/x/tools/cmd/cover
   - go get github.com/golang/lint/golint
   - go get github.com/pierrre/gotestcover
+  - go get -t $(go list ./... | grep -v /vendor/)
 
 script:
   # - go vet -x ./...

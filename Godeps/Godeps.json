@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/ory-am/hydra",
-	"GoVersion": "go1.5.3",
+	"GoVersion": "go1.6",
 	"Packages": [
 		"./..."
 	],

@@ -23,6 +23,7 @@ import (
 	"github.com/RangelReale/osin"
 	"github.com/ory-am/common/pkg"
 	"golang.org/x/net/http2"
+	"crypto/tls"
 )
 
 type Core struct {
@@ -71,12 +72,12 @@ func (c *Core) Start(ctx *cli.Context) error {
 		return fmt.Errorf("Could not start context: %s", err)
 	}
 
-	private, err := jwt.LoadCertificate(jwtPrivateKeyPath)
+	private, err := jwt.LoadCertificate(jwtPrivateKey)
 	if err != nil {
 		return fmt.Errorf("Could not load private key: %s", err)
 	}
 
-	public, err := jwt.LoadCertificate(jwtPublicKeyPath)
+	public, err := jwt.LoadCertificate(jwtPublicKey)
 	if err != nil {
 		return fmt.Errorf("Could not load public key: %s", err)
 	}
@@ -149,10 +150,24 @@ func (c *Core) Start(ctx *cli.Context) error {
 		return nil
 	}
 
+	var cert tls.Certificate
+	if cert, err = tls.LoadX509KeyPair(tlsCert, tlsKey); err != nil {
+		if cert, err = tls.X509KeyPair([]byte(tlsCert), []byte(tlsKey)); err != nil {
+			return fmt.Errorf("Could not load or parse TLS key pair because %s", err)
+		}
+	}
+	srv := &http.Server{
+		Addr: listenOn,
+		TLSConfig:      &tls.Config{
+			Certificates: []tls.Certificate{
+				cert,
+			},
+		},
+	}
+
 	http.Handle("/", router)
-	srv := &http.Server{Addr: listenOn}
 	http2.ConfigureServer(srv, &http2.Server{})
-	if err := srv.ListenAndServeTLS(tlsCertPath, tlsKeyPath); err != nil {
+	if err := srv.ListenAndServeTLS("", ""); err != nil {
 		return fmt.Errorf("Could not serve HTTP/2 server because %s", err)
 	}
 

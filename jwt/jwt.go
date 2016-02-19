@@ -71,6 +71,8 @@ func New(privateKey, publicKey []byte) *JWT {
 func LoadCertificate(path string) ([]byte, error) {
 	if path == "" {
 		return nil, errors.Errorf("No path specified")
+	} else if _, err := os.Stat(path); os.IsNotExist(err) {
+		return []byte(path), nil
 	}
 
 	var rdr io.Reader

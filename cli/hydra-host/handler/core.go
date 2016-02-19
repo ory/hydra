@@ -14,6 +14,7 @@ import (
 	oauth "github.com/ory-am/hydra/oauth/handler"
 	"github.com/ory-am/hydra/oauth/provider"
 	policies "github.com/ory-am/hydra/policy/handler"
+	gojwt "github.com/dgrijalva/jwt-go"
 
 	"fmt"
 	"net/http"
@@ -78,6 +79,16 @@ func (c *Core) Start(ctx *cli.Context) error {
 	public, err := jwt.LoadCertificate(jwtPublicKeyPath)
 	if err != nil {
 		return fmt.Errorf("Could not load public key: %s", err)
+	}
+
+	_, err = gojwt.ParseRSAPublicKeyFromPEM(public)
+	if err != nil {
+		return fmt.Errorf("Not a valid public key: %s", err)
+	}
+
+	_, err = gojwt.ParseRSAPrivateKeyFromPEM(private)
+	if err != nil {
+		return fmt.Errorf("Not a valid private key: %s", err)
 	}
 
 	osinConf, err := osinConfig()

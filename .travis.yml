@@ -1,15 +1,16 @@
-sudo: required
+go test sudo: required
 
 services:
   - docker
 
 env:
-  - DOCKER_BIND_LOCALHOST=true
+  - DOCKER_BIND_LOCALHOST=true GO15VENDOREXPERIMENT=1
 
 language: go
 
 go:
   - 1.5
+  - 1.6
 
 install:
   - go get golang.org/x/tools/cmd/vet
@@ -17,8 +18,9 @@ install:
   - go get github.com/mattn/goveralls
   - go get golang.org/x/tools/cmd/cover
   - go get github.com/golang/lint/golint
-  - go get -t ./...
+  - go get github.com/pierrre/gotestcover
 
 script:
   # - go vet -x ./...
-  - ./coverage --coveralls
+  - gotestcover -coverprofile="cover.out" -race -covermode="count" $(go list ./... | grep -v /vendor/)
+  - goveralls -coverprofile="cover.out"

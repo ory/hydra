@@ -6,8 +6,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/osin-storage/storage"
+	"github.com/ory-am/ladon/policy"
+	"github.com/ory-am/osin-storage/storage"
 	"github.com/ory-am/hydra/account"
 	"github.com/ory-am/hydra/oauth/connection"
 	statesStorage "github.com/ory-am/hydra/oauth/provider/storage"

@@ -3,10 +3,10 @@ package handler
 import (
 	"database/sql"
 
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy"
-	policies "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy/postgres"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/osin-storage/storage"
-	osins "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/osin-storage/storage/postgres"
+	"github.com/ory-am/ladon/policy"
+	policies "github.com/ory-am/ladon/policy/postgres"
+	"github.com/ory-am/osin-storage/storage"
+	osins "github.com/ory-am/osin-storage/storage/postgres"
 	"github.com/ory-am/hydra/account"
 	accounts "github.com/ory-am/hydra/account/postgres"
 	"github.com/ory-am/hydra/oauth/connection"
@@ -16,7 +16,7 @@ import (
 
 	"strconv"
 
-	_ "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/lib/pq"
+	_ "github.com/lib/pq"
 	"github.com/ory-am/hydra/hash"
 )
 

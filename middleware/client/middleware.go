@@ -2,10 +2,10 @@ package middleware
 
 import (
 	"errors"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/RangelReale/osin"
-	log "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/Sirupsen/logrus"
-	chd "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/handler"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/net/context"
+	"github.com/RangelReale/osin"
+	log "github.com/Sirupsen/logrus"
+	chd "github.com/ory-am/common/handler"
+	"golang.org/x/net/context"
 	. "github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/middleware"
 	"net/http"

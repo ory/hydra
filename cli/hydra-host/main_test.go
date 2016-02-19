@@ -6,17 +6,17 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/assert"
+	"github.com/pborman/uuid"
+	"github.com/stretchr/testify/assert"
 
 	"database/sql"
 	"log"
 	"path/filepath"
 	"time"
 
-	_ "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/lib/pq"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/env"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/gopkg.in/ory-am/dockertest.v2"
+	_ "github.com/lib/pq"
+	"github.com/ory-am/common/env"
+	"gopkg.in/ory-am/dockertest.v2"
 )
 
 var tmpDir = os.TempDir()

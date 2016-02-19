@@ -3,9 +3,9 @@ package google
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/go-errors/errors"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/oauth2"
-	gauth "github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/oauth2/google"
+	"github.com/go-errors/errors"
+	"golang.org/x/oauth2"
+	gauth "golang.org/x/oauth2/google"
 	. "github.com/ory-am/hydra/oauth/provider"
 	"net/http"
 )

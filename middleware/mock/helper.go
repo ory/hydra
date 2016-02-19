@@ -1,8 +1,8 @@
 package mock
 
 import (
-	chd "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/handler"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/net/context"
+	chd "github.com/ory-am/common/handler"
+	"golang.org/x/net/context"
 	"net/http"
 )
 

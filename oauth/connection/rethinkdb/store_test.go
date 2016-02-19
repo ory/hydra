@@ -6,14 +6,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory-am/hydra/Godeps/_workspace/src/gopkg.in/ory-am/dockertest.v2"
+	"gopkg.in/ory-am/dockertest.v2"
 
-	rdb "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/dancannon/gorethink"
+	rdb "github.com/dancannon/gorethink"
 
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/pkg"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/assert"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/require"
+	"github.com/ory-am/common/pkg"
+	"github.com/pborman/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	. "github.com/ory-am/hydra/oauth/connection"
 )
 

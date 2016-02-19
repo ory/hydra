@@ -7,11 +7,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/pkg"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/assert"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/require"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/gopkg.in/ory-am/dockertest.v2"
+	"github.com/ory-am/common/pkg"
+	"github.com/pborman/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"gopkg.in/ory-am/dockertest.v2"
 	. "github.com/ory-am/hydra/oauth/connection"
 	. "github.com/ory-am/hydra/oauth/connection/postgres"
 )

@@ -2,8 +2,8 @@ package postgres
 
 import (
 	"database/sql"
-	log "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/Sirupsen/logrus"
-	. "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/pkg"
+	log "github.com/Sirupsen/logrus"
+	. "github.com/ory-am/common/pkg"
 	. "github.com/ory-am/hydra/oauth/connection"
 )
 

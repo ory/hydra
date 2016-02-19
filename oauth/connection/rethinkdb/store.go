@@ -1,11 +1,11 @@
 package rethinkdb
 
 import (
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/go-errors/errors"
+	"github.com/go-errors/errors"
 
-	rdb "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/dancannon/gorethink"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/mitchellh/mapstructure"
-	pkg "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/pkg"
+	rdb "github.com/dancannon/gorethink"
+	"github.com/mitchellh/mapstructure"
+	pkg "github.com/ory-am/common/pkg"
 	cn "github.com/ory-am/hydra/oauth/connection"
 )
 

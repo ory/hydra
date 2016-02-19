@@ -2,10 +2,10 @@ package dropbox
 
 import (
 	"fmt"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/gorilla/mux"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/assert"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/require"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/oauth2"
+	"github.com/gorilla/mux"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"golang.org/x/oauth2"
 	"net/http"
 	"net/http/httptest"
 	"testing"

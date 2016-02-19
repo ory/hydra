@@ -2,11 +2,11 @@ package postgres
 
 import (
 	"database/sql"
-	log "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/Sirupsen/logrus"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/asaskevich/govalidator"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/go-errors/errors"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/pkg"
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
+	log "github.com/Sirupsen/logrus"
+	"github.com/asaskevich/govalidator"
+	"github.com/go-errors/errors"
+	"github.com/ory-am/common/pkg"
+	"github.com/pborman/uuid"
 	"github.com/ory-am/hydra/account"
 	"github.com/ory-am/hydra/hash"
 )

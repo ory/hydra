@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
 )

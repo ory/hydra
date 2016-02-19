@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/codegangsta/cli"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/codegangsta/cli"
 	. "github.com/ory-am/hydra/cli/hydra-host/handler"
 	//"github.com/ory-am/hydra/cli/hydra-host/templates"
 	"fmt"

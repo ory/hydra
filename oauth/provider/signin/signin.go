@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-errors/errors"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/go-errors/errors"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/parnurzeal/gorequest"
 	. "github.com/ory-am/hydra/oauth/provider"
-	"github.com/parnurzeal/gorequest"
 )
 
 type signin struct {

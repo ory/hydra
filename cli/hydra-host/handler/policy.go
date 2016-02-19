@@ -6,9 +6,9 @@ import (
 
 	"fmt"
 
-	"github.com/codegangsta/cli"
-	"github.com/ory-am/ladon/policy"
-	"github.com/pborman/uuid"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/codegangsta/cli"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
 )
 
 type Policy struct {

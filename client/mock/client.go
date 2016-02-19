@@ -4,7 +4,7 @@
 package mock
 
 import (
-	gomock "github.com/golang/mock/gomock"
+	gomock "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/golang/mock/gomock"
 	. "github.com/ory-am/hydra/client"
 	http "net/http"
 )

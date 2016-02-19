@@ -1,15 +1,15 @@
 package rethinkdb
 
 import (
-	rdb "github.com/dancannon/gorethink"
-	"github.com/mitchellh/mapstructure"
+	rdb "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/dancannon/gorethink"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/mitchellh/mapstructure"
 
-	"github.com/asaskevich/govalidator"
-	"github.com/go-errors/errors"
-	"github.com/ory-am/common/pkg"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/asaskevich/govalidator"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/go-errors/errors"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/pkg"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
 	"github.com/ory-am/hydra/account"
 	"github.com/ory-am/hydra/hash"
-	"github.com/pborman/uuid"
 )
 
 const accountsTable = "hydra_account"

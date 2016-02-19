@@ -7,18 +7,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
-	"github.com/pborman/uuid"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"golang.org/x/net/context"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/dgrijalva/jwt-go"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/assert"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/require"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/net/context"
 
-	chd "github.com/ory-am/common/handler"
+	chd "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/handler"
+	. "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy"
 	authcon "github.com/ory-am/hydra/context"
 	hjwt "github.com/ory-am/hydra/jwt"
 	mwroot "github.com/ory-am/hydra/middleware"
 	. "github.com/ory-am/hydra/middleware/host"
-	. "github.com/ory-am/ladon/policy"
 )
 
 type test struct {

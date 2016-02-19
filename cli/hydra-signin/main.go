@@ -3,8 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ory-am/common/env"
-	"github.com/pborman/uuid"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/env"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
 	"html/template"
 	"net/http"
 )

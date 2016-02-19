@@ -8,14 +8,14 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/go-errors/errors"
-	"github.com/gorilla/mux"
-	chd "github.com/ory-am/common/handler"
-	. "github.com/ory-am/common/pkg"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/go-errors/errors"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/gorilla/mux"
+	chd "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/handler"
+	. "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/pkg"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/net/context"
 	. "github.com/ory-am/hydra/account"
 	"github.com/ory-am/hydra/middleware"
-	"github.com/pborman/uuid"
-	"golang.org/x/net/context"
 	"net/http"
 )
 

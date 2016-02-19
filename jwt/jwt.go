@@ -1,10 +1,10 @@
 package jwt
 
 import (
-	"github.com/RangelReale/osin"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/go-errors/errors"
-	"github.com/pborman/uuid"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/RangelReale/osin"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/dgrijalva/jwt-go"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/go-errors/errors"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
 	"io"
 	"io/ioutil"
 	"os"

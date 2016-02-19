@@ -1,7 +1,7 @@
 package client
 
 import (
-	"github.com/ory-am/ladon/guard/operator"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/guard/operator"
 	"net/http"
 )
 

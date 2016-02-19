@@ -1,11 +1,11 @@
 package mock
 
 import (
-	"github.com/go-errors/errors"
-	"github.com/golang/mock/gomock"
-	"github.com/ory-am/common/handler"
-	"github.com/stretchr/testify/require"
-	"golang.org/x/net/context"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/go-errors/errors"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/golang/mock/gomock"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/handler"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/require"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/net/context"
 	"net/http"
 	"testing"
 )

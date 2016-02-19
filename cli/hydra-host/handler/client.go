@@ -3,10 +3,10 @@ package handler
 import (
 	"fmt"
 
-	"github.com/RangelReale/osin"
-	"github.com/codegangsta/cli"
-	"github.com/ory-am/common/rand/sequence"
-	"github.com/pborman/uuid"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/RangelReale/osin"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/codegangsta/cli"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/rand/sequence"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
 )
 
 type Client struct {

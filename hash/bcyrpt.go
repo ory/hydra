@@ -1,8 +1,8 @@
 package hash
 
 import (
-	"github.com/go-errors/errors"
-	"golang.org/x/crypto/bcrypt"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/go-errors/errors"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/crypto/bcrypt"
 )
 
 type BCrypt struct {

@@ -2,7 +2,7 @@ package handler_test
 
 import (
 	"fmt"
-	"github.com/go-errors/errors"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/go-errors/errors"
 	"github.com/ory-am/hydra/oauth/provider"
 	"net/http"
 	"net/http/httptest"

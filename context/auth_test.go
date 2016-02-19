@@ -11,14 +11,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/dgrijalva/jwt-go"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy"
+	ladon "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy/postgres"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/assert"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/require"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/net/context"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/gopkg.in/ory-am/dockertest.v2"
 	hjwt "github.com/ory-am/hydra/jwt"
-	"github.com/ory-am/ladon/policy"
-	ladon "github.com/ory-am/ladon/policy/postgres"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"golang.org/x/net/context"
-	"gopkg.in/ory-am/dockertest.v2"
 )
 
 var db *sql.DB

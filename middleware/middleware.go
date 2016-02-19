@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	chd "github.com/ory-am/common/handler"
+	chd "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/handler"
 )
 
 type Middleware interface {

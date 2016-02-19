@@ -1,16 +1,16 @@
 package host
 
 import (
-	log "github.com/Sirupsen/logrus"
-	"github.com/go-errors/errors"
-	chd "github.com/ory-am/common/handler"
-	"github.com/ory-am/common/pkg"
+	log "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/Sirupsen/logrus"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/go-errors/errors"
+	chd "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/handler"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/pkg"
+	ladonGuard "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/guard"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/net/context"
 	authcon "github.com/ory-am/hydra/context"
 	"github.com/ory-am/hydra/jwt"
 	"github.com/ory-am/hydra/middleware"
-	ladonGuard "github.com/ory-am/ladon/guard"
-	"github.com/ory-am/ladon/policy"
-	"golang.org/x/net/context"
 	"net/http"
 )
 

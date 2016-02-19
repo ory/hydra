@@ -4,8 +4,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/RangelReale/osin"
-	"github.com/ory-am/common/rand/sequence"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/RangelReale/osin"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/rand/sequence"
 )
 
 type Storage interface {

@@ -1,14 +1,14 @@
 package context
 
 import (
-	"github.com/RangelReale/osin"
-	log "github.com/Sirupsen/logrus"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/go-errors/errors"
-	. "github.com/ory-am/common/handler"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/RangelReale/osin"
+	log "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/Sirupsen/logrus"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/dgrijalva/jwt-go"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/go-errors/errors"
+	. "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/handler"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/golang.org/x/net/context"
 	hjwt "github.com/ory-am/hydra/jwt"
-	"github.com/ory-am/ladon/policy"
-	"golang.org/x/net/context"
 	"net/http"
 )
 

@@ -1,11 +1,11 @@
 package rethinkdb
 
 import (
-	rdb "github.com/dancannon/gorethink"
+	rdb "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/dancannon/gorethink"
 	"github.com/ory-am/hydra/oauth/provider/storage"
 
-	"github.com/go-errors/errors"
-	pkg "github.com/ory-am/common/pkg"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/go-errors/errors"
+	pkg "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/pkg"
 )
 
 const storageStateTable = "hydra_state_data"

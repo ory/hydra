@@ -5,8 +5,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/ory-am/common/env"
-	"github.com/ory-am/common/pkg"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/env"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/pkg"
 	"github.com/ory-am/hydra/oauth/provider"
 	"github.com/ory-am/hydra/oauth/provider/dropbox"
 	"github.com/ory-am/hydra/oauth/provider/google"

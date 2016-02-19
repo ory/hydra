@@ -1,9 +1,9 @@
 package connection_test
 
 import (
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/pborman/uuid"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/stretchr/testify/assert"
 	. "github.com/ory-am/hydra/oauth/connection"
-	"github.com/pborman/uuid"
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 

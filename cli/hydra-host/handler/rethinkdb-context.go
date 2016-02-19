@@ -1,18 +1,18 @@
 package handler
 
 import (
-	rethinkOsins "github.com/leetal/osin-rethinkdb/storage/rethinkdb"
+	rethinkOsins "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/leetal/osin-rethinkdb/storage/rethinkdb"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy"
+	policies "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/ladon/policy/rethinkdb"
+	"github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/osin-storage/storage"
 	"github.com/ory-am/hydra/account"
 	accounts "github.com/ory-am/hydra/account/rethinkdb"
 	"github.com/ory-am/hydra/oauth/connection"
 	connections "github.com/ory-am/hydra/oauth/connection/rethinkdb"
 	statesStorage "github.com/ory-am/hydra/oauth/provider/storage"
 	states "github.com/ory-am/hydra/oauth/provider/storage/rethinkdb"
-	"github.com/ory-am/ladon/policy"
-	policies "github.com/ory-am/ladon/policy/rethinkdb"
-	"github.com/ory-am/osin-storage/storage"
 
-	rdb "github.com/dancannon/gorethink"
+	rdb "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/dancannon/gorethink"
 
 	"strconv"
 

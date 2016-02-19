@@ -4,8 +4,8 @@
 package mock
 
 import (
-	gomock "github.com/golang/mock/gomock"
-	handler "github.com/ory-am/common/handler"
+	gomock "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/golang/mock/gomock"
+	handler "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/ory-am/common/handler"
 	. "github.com/ory-am/hydra/middleware"
 )
 

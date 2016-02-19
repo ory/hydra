@@ -2,7 +2,7 @@ package jwt
 
 import (
 	"encoding/json"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/ory-am/hydra/Godeps/_workspace/src/github.com/Sirupsen/logrus"
 	"time"
 )
 

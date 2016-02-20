@@ -6,11 +6,11 @@ import (
 	"github.com/RangelReale/osin"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/common/pkg"
+	. "github.com/ory-am/hydra/client"
+	"github.com/ory-am/hydra/middleware"
 	"github.com/parnurzeal/gorequest"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
-	. "github.com/ory-am/hydra/client"
-	"github.com/ory-am/hydra/middleware"
 	"net/http"
 	"net/url"
 )

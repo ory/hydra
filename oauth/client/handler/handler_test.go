@@ -13,6 +13,9 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	chd "github.com/ory-am/common/handler"
+	authcon "github.com/ory-am/hydra/context"
+	hjwt "github.com/ory-am/hydra/jwt"
+	middleware "github.com/ory-am/hydra/middleware/host"
 	"github.com/ory-am/ladon/policy"
 	"github.com/ory-am/osin-storage/storage/postgres"
 	"github.com/parnurzeal/gorequest"
@@ -20,9 +23,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
 	"gopkg.in/ory-am/dockertest.v2"
-	authcon "github.com/ory-am/hydra/context"
-	hjwt "github.com/ory-am/hydra/jwt"
-	middleware "github.com/ory-am/hydra/middleware/host"
 )
 
 var (

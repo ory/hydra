@@ -11,18 +11,18 @@ import (
 	"github.com/gorilla/mux"
 	hctx "github.com/ory-am/common/handler"
 	"github.com/ory-am/common/pkg"
+	"github.com/ory-am/hydra/middleware"
 	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
-	"github.com/ory-am/hydra/middleware"
 	"net/http"
 
 	"github.com/RangelReale/osin"
 	log "github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
+	"github.com/ory-am/hydra/jwt"
 	. "github.com/ory-am/ladon/guard"
 	"github.com/ory-am/ladon/guard/operator"
 	. "github.com/ory-am/ladon/policy"
-	"github.com/ory-am/hydra/jwt"
 )
 
 type Handler struct {

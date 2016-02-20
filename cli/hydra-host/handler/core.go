@@ -3,8 +3,8 @@ package handler
 import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
+	gojwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
-	"github.com/ory-am/ladon/guard"
 	accounts "github.com/ory-am/hydra/account/handler"
 	"github.com/ory-am/hydra/jwt"
 	"github.com/ory-am/hydra/middleware/host"
@@ -14,15 +14,15 @@ import (
 	oauth "github.com/ory-am/hydra/oauth/handler"
 	"github.com/ory-am/hydra/oauth/provider"
 	policies "github.com/ory-am/hydra/policy/handler"
-	gojwt "github.com/dgrijalva/jwt-go"
+	"github.com/ory-am/ladon/guard"
 
 	"fmt"
 	"net/http"
 	"strconv"
 
+	"crypto/tls"
 	"github.com/RangelReale/osin"
 	"github.com/ory-am/common/pkg"
-	"crypto/tls"
 )
 
 type Core struct {
@@ -155,7 +155,7 @@ func (c *Core) Start(ctx *cli.Context) error {
 	}
 	srv := &http.Server{
 		Addr: listenOn,
-		TLSConfig:      &tls.Config{
+		TLSConfig: &tls.Config{
 			Certificates: []tls.Certificate{
 				cert,
 			},

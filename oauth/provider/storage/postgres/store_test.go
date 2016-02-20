@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"github.com/ory-am/common/pkg"
+	"github.com/ory-am/hydra/oauth/provider/storage"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/ory-am/dockertest.v2"
-	"github.com/ory-am/hydra/oauth/provider/storage"
 )
 
 var db *sql.DB

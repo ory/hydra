@@ -16,8 +16,8 @@ import (
 
 var (
 	listenOn, forceHTTP, bcryptWorkFactor, databaseURL string
-	jwtPrivateKey, jwtPublicKey, tlsKey string
-	accessTokenLifetime, tlsCert, hostURL          string
+	jwtPrivateKey, jwtPublicKey, tlsKey                string
+	accessTokenLifetime, tlsCert, hostURL              string
 	providers                                          []provider.Provider
 	locations                                          map[string]string
 )

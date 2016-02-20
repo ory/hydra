@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/go-errors/errors"
-	"github.com/parnurzeal/gorequest"
 	. "github.com/ory-am/hydra/oauth/provider"
+	"github.com/parnurzeal/gorequest"
 )
 
 type signin struct {

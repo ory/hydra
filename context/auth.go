@@ -6,9 +6,9 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-errors/errors"
 	. "github.com/ory-am/common/handler"
+	hjwt "github.com/ory-am/hydra/jwt"
 	"github.com/ory-am/ladon/policy"
 	"golang.org/x/net/context"
-	hjwt "github.com/ory-am/hydra/jwt"
 	"net/http"
 )
 

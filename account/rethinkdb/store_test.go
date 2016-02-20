@@ -9,9 +9,9 @@ import (
 
 	rdb "github.com/dancannon/gorethink"
 	"github.com/ory-am/common/pkg"
+	"github.com/ory-am/hydra/hash"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
-	"github.com/ory-am/hydra/hash"
 	//"reflect"
 	"testing"
 

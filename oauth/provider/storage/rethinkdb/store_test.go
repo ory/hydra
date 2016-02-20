@@ -11,9 +11,9 @@ import (
 	rdb "github.com/dancannon/gorethink"
 
 	"github.com/ory-am/common/pkg"
+	"github.com/ory-am/hydra/oauth/provider/storage"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
-	"github.com/ory-am/hydra/oauth/provider/storage"
 )
 
 var session *rdb.Session

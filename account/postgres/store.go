@@ -6,9 +6,9 @@ import (
 	"github.com/asaskevich/govalidator"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/common/pkg"
-	"github.com/pborman/uuid"
 	"github.com/ory-am/hydra/account"
 	"github.com/ory-am/hydra/hash"
+	"github.com/pborman/uuid"
 )
 
 const accountSchema = `CREATE TABLE IF NOT EXISTS hydra_account (

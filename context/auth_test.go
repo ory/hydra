@@ -12,13 +12,13 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	hjwt "github.com/ory-am/hydra/jwt"
 	"github.com/ory-am/ladon/policy"
 	ladon "github.com/ory-am/ladon/policy/postgres"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
 	"gopkg.in/ory-am/dockertest.v2"
-	hjwt "github.com/ory-am/hydra/jwt"
 )
 
 var db *sql.DB

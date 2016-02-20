@@ -9,10 +9,10 @@ import (
 	chd "github.com/ory-am/common/handler"
 	. "github.com/ory-am/common/pkg"
 	"github.com/ory-am/common/rand/sequence"
+	"github.com/ory-am/hydra/middleware"
 	"github.com/ory-am/osin-storage/storage"
 	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
-	"github.com/ory-am/hydra/middleware"
 	"net/http"
 
 	"github.com/go-errors/errors"

@@ -6,10 +6,10 @@ import (
 	"os"
 
 	"github.com/ory-am/common/pkg"
+	"github.com/ory-am/hydra/hash"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/ory-am/dockertest.v2"
-	"github.com/ory-am/hydra/hash"
 	//"reflect"
 	"testing"
 	"time"

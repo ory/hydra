@@ -46,12 +46,13 @@ Join our [mailinglist](http://eepurl.com/bKT3N9) to stay on top of new developme
   - [CLI Usage](#cli-usage)
     - [Start server](#start-server)
     - [Create client](#create-client)
-    - [Create user](#create-user)
+    - [Create Account](#create-account)
     - [Create JWT RSA Key Pair](#create-jwt-rsa-key-pair)
     - [Create a TLS certificate](#create-a-tls-certificate)
     - [Import policies](#import-policies)
 - [Security considerations](#security-considerations)
 - [Good to know](#good-to-know)
+  - [Deploy with buildpacks (Heroku, Cloud Foundry, ...)](#deploy-with-buildpacks-heroku-cloud-foundry-)
   - [Policies](#policies)
   - [Everything is RESTful. No HTML. No Templates.](#everything-is-restful-no-html-no-templates)
   - [Sign up workflow](#sign-up-workflow)
@@ -200,10 +201,10 @@ Make sure to prefix the url with the wanted database technology. e.g `rethinkdb:
 | SIGNIN_URL           | [Sign in URL](#sign-in)   | url                                           | empty     |
 | DROPBOX_CLIENT       | Dropbox Client ID         | string                                        | empty     |
 | DROPBOX_SECRET       | Dropbox Client Secret     | string                                        | empty     |
-| JWT_PUBLIC_KEY_PATH  | JWT Signing Public Key    | `./cert/rs256-public.pem` (local path)        | "../../example/cert/rs256-public.pem"  |
-| JWT_PRIVATE_KEY_PATH | JWT Signing Private Key   | `./cert/rs256-private.pem` (local path)       | "../../example/cert/rs256-private.pem" |
-| TLS_CERT_PATH        | TLS Certificate Path      | `./cert/cert.pem`                             | "../../example/cert/tls-cert.pem"      |
-| TLS_KEY_PATH         | TLS Key Path              | `./cert/key.pem`                              | "../../example/cert/tls-key.pem"       |
+| JWT_PUBLIC_KEY       | JWT Signing Public Key    | The public key or a path to it.               | "../../example/cert/rs256-public.pem"  |
+| JWT_PRIVATE_KEY      | JWT Signing Private Key   | The private key or a path to it.              | "../../example/cert/rs256-private.pem" |
+| TLS_CERT             | TLS Certificate Path      | The TLS public certificate or a path to it.   | "../../example/cert/tls-cert.pem"      |
+| TLS_KEY              | TLS Key Path              | The TLS private key or a path to it.          | "../../example/cert/tls-key.pem"       |
 | DANGEROUSLY_FORCE_HTTP | Disable HTTPS           | `force`                                       | disabled  |
 
 ### CLI Usage
@@ -375,6 +376,16 @@ Here's an exemplary *policies.json:*
 ## Good to know
 
 This section covers information necessary for understanding how hydra works.
+
+### Deploy with buildpacks (Heroku, Cloud Foundry, ...)
+
+Hydra runs pretty much out of the box when using a Platform as a Service (PaaS).
+Here are however a few notes which might assist you in your task:
+* Heroku (and probably Cloud Foundry as well) *force* TLS termination, meaning that Hydra must be configured with `DANGEROUSLY_FORCE_HTTP=force`.
+* Using bash, you can easily add multi-line environment variables to Heroku using `heroku config:set JWT_PUBLIC_KEY="$(my-public-key.pem)"`.
+  This does not work on Windows!
+
+
 
 ### Policies
 

@@ -22,7 +22,6 @@ import (
 
 	"github.com/RangelReale/osin"
 	"github.com/ory-am/common/pkg"
-	"golang.org/x/net/http2"
 	"crypto/tls"
 )
 
@@ -82,13 +81,11 @@ func (c *Core) Start(ctx *cli.Context) error {
 		return fmt.Errorf("Could not load public key: %s", err)
 	}
 
-	_, err = gojwt.ParseRSAPublicKeyFromPEM(public)
-	if err != nil {
-		return fmt.Errorf("Not a valid public key: %s", err)
-	}
+	fmt.Printf("Key %s", public)
 
-	_, err = gojwt.ParseRSAPrivateKeyFromPEM(private)
-	if err != nil {
+	if _, err = gojwt.ParseRSAPublicKeyFromPEM(public); err != nil {
+		return fmt.Errorf("Not a valid public key: %s", err)
+	} else if _, err = gojwt.ParseRSAPrivateKeyFromPEM(private); err != nil {
 		return fmt.Errorf("Not a valid private key: %s", err)
 	}
 
@@ -139,7 +136,7 @@ func (c *Core) Start(ctx *cli.Context) error {
 		})
 	})
 
-	log.Infoln("Hydra started")
+	log.Infoln("Hydra initialized, starting listeners...")
 
 	if forceHTTP == "force" {
 		http.Handle("/", router)
@@ -166,7 +163,6 @@ func (c *Core) Start(ctx *cli.Context) error {
 	}
 
 	http.Handle("/", router)
-	http2.ConfigureServer(srv, &http2.Server{})
 	if err := srv.ListenAndServeTLS("", ""); err != nil {
 		return fmt.Errorf("Could not serve HTTP/2 server because %s", err)
 	}

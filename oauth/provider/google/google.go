@@ -59,7 +59,7 @@ func (d *google) FetchSession(code string) (Session, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, errors.Errorf("Could not fetch account data because %s", err)
+		return nil, errors.Errorf("Could not fetch account data because got status code %d", resp.StatusCode)
 	}
 
 	var profile map[string]interface{}

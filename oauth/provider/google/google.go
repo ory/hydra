@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-errors/errors"
+	. "github.com/ory-am/hydra/oauth/provider"
 	"golang.org/x/oauth2"
 	gauth "golang.org/x/oauth2/google"
-	. "github.com/ory-am/hydra/oauth/provider"
 	"net/http"
 )
 

@@ -14,11 +14,11 @@ import (
 	"golang.org/x/net/context"
 
 	chd "github.com/ory-am/common/handler"
-	. "github.com/ory-am/ladon/policy"
 	authcon "github.com/ory-am/hydra/context"
 	hjwt "github.com/ory-am/hydra/jwt"
 	mwroot "github.com/ory-am/hydra/middleware"
 	. "github.com/ory-am/hydra/middleware/host"
+	. "github.com/ory-am/ladon/policy"
 )
 
 type test struct {

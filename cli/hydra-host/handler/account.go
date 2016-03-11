@@ -5,8 +5,8 @@ import (
 
 	"github.com/codegangsta/cli"
 	"github.com/howeyc/gopass"
-	"github.com/pborman/uuid"
 	"github.com/ory-am/hydra/account"
+	"github.com/pborman/uuid"
 )
 
 type Account struct {

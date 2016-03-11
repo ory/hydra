@@ -44,8 +44,6 @@ func TestLoadCertificate(t *testing.T) {
 	}
 	_, err := LoadCertificate("")
 	assert.NotNil(t, err)
-	_, err = LoadCertificate("foobar")
-	assert.NotNil(t, err)
 }
 
 func TestSignRejectsAlgAndTypHeader(t *testing.T) {

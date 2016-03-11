@@ -13,10 +13,10 @@ import (
 	"github.com/gorilla/mux"
 	hydcon "github.com/ory-am/common/handler"
 	. "github.com/ory-am/common/pkg"
-	"github.com/pborman/uuid"
-	"golang.org/x/net/context"
 	"github.com/ory-am/hydra/middleware"
 	. "github.com/ory-am/hydra/oauth/connection"
+	"github.com/pborman/uuid"
+	"golang.org/x/net/context"
 	"net/http"
 )
 

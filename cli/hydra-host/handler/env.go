@@ -16,8 +16,8 @@ import (
 
 var (
 	listenOn, forceHTTP, bcryptWorkFactor, databaseURL string
-	jwtPrivateKeyPath, jwtPublicKeyPath, tlsKeyPath    string
-	accessTokenLifetime, tlsCertPath, hostURL          string
+	jwtPrivateKey, jwtPublicKey, tlsKey                string
+	accessTokenLifetime, tlsCert, hostURL              string
 	providers                                          []provider.Provider
 	locations                                          map[string]string
 )
@@ -62,8 +62,8 @@ func getEnv() {
 		"signUp": env.Getenv("SIGNUP_URL", ""),
 		"signIn": env.Getenv("SIGNIN_URL", ""),
 	}
-	jwtPrivateKeyPath = env.Getenv("JWT_PRIVATE_KEY_PATH", path.Join(os.Getenv("GOPATH"), "src", "github.com", "ory-am", "hydra", "example", "cert", "rs256-private.pem"))
-	jwtPublicKeyPath = env.Getenv("JWT_PUBLIC_KEY_PATH", path.Join(os.Getenv("GOPATH"), "src", "github.com", "ory-am", "hydra", "example", "cert", "rs256-public.pem"))
-	tlsKeyPath = env.Getenv("TLS_KEY_PATH", path.Join(os.Getenv("GOPATH"), "src", "github.com", "ory-am", "hydra", "example", "cert", "tls-key.pem"))
-	tlsCertPath = env.Getenv("TLS_CERT_PATH", path.Join(os.Getenv("GOPATH"), "src", "github.com", "ory-am", "hydra", "example", "cert", "tls-cert.pem"))
+	jwtPrivateKey = env.Getenv("JWT_PRIVATE_KEY", path.Join(os.Getenv("GOPATH"), "src", "github.com", "ory-am", "hydra", "example", "cert", "rs256-private.pem"))
+	jwtPublicKey = env.Getenv("JWT_PUBLIC_KEY", path.Join(os.Getenv("GOPATH"), "src", "github.com", "ory-am", "hydra", "example", "cert", "rs256-public.pem"))
+	tlsKey = env.Getenv("TLS_KEY", path.Join(os.Getenv("GOPATH"), "src", "github.com", "ory-am", "hydra", "example", "cert", "tls-key.pem"))
+	tlsCert = env.Getenv("TLS_CERT", path.Join(os.Getenv("GOPATH"), "src", "github.com", "ory-am", "hydra", "example", "cert", "tls-cert.pem"))
 }

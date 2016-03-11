@@ -3,8 +3,8 @@ package provider_test
 import "testing"
 
 import (
-	"github.com/stretchr/testify/assert"
 	. "github.com/ory-am/hydra/oauth/provider"
+	"github.com/stretchr/testify/assert"
 )
 
 type provider struct{}

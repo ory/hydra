@@ -1,8 +1,0 @@
-{
-  "name": "Hydra",
-  "keywords": [],
-  "image": "heroku/go:1.6",
-  "mount_dir": "src/github.com/ory-am/hydra",
-  "website": "http://github.com/ory-am/hydra",
-  "repository": "http://github.com/ory-am/hydra"
-}

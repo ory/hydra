@@ -3,8 +3,8 @@ package handler
 import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
+	gojwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
-	"github.com/ory-am/ladon/guard"
 	accounts "github.com/ory-am/hydra/account/handler"
 	"github.com/ory-am/hydra/jwt"
 	"github.com/ory-am/hydra/middleware/host"
@@ -14,14 +14,15 @@ import (
 	oauth "github.com/ory-am/hydra/oauth/handler"
 	"github.com/ory-am/hydra/oauth/provider"
 	policies "github.com/ory-am/hydra/policy/handler"
+	"github.com/ory-am/ladon/guard"
 
 	"fmt"
 	"net/http"
 	"strconv"
 
+	"crypto/tls"
 	"github.com/RangelReale/osin"
 	"github.com/ory-am/common/pkg"
-	"golang.org/x/net/http2"
 )
 
 type Core struct {
@@ -70,14 +71,22 @@ func (c *Core) Start(ctx *cli.Context) error {
 		return fmt.Errorf("Could not start context: %s", err)
 	}
 
-	private, err := jwt.LoadCertificate(jwtPrivateKeyPath)
+	private, err := jwt.LoadCertificate(jwtPrivateKey)
 	if err != nil {
 		return fmt.Errorf("Could not load private key: %s", err)
 	}
 
-	public, err := jwt.LoadCertificate(jwtPublicKeyPath)
+	public, err := jwt.LoadCertificate(jwtPublicKey)
 	if err != nil {
 		return fmt.Errorf("Could not load public key: %s", err)
+	}
+
+	fmt.Printf("Key %s", public)
+
+	if _, err = gojwt.ParseRSAPublicKeyFromPEM(public); err != nil {
+		return fmt.Errorf("Not a valid public key: %s", err)
+	} else if _, err = gojwt.ParseRSAPrivateKeyFromPEM(private); err != nil {
+		return fmt.Errorf("Not a valid private key: %s", err)
 	}
 
 	osinConf, err := osinConfig()
@@ -127,7 +136,7 @@ func (c *Core) Start(ctx *cli.Context) error {
 		})
 	})
 
-	log.Infoln("Hydra started")
+	log.Infoln("Hydra initialized, starting listeners...")
 
 	if forceHTTP == "force" {
 		http.Handle("/", router)
@@ -138,10 +147,23 @@ func (c *Core) Start(ctx *cli.Context) error {
 		return nil
 	}
 
+	var cert tls.Certificate
+	if cert, err = tls.LoadX509KeyPair(tlsCert, tlsKey); err != nil {
+		if cert, err = tls.X509KeyPair([]byte(tlsCert), []byte(tlsKey)); err != nil {
+			return fmt.Errorf("Could not load or parse TLS key pair because %s", err)
+		}
+	}
+	srv := &http.Server{
+		Addr: listenOn,
+		TLSConfig: &tls.Config{
+			Certificates: []tls.Certificate{
+				cert,
+			},
+		},
+	}
+
 	http.Handle("/", router)
-	srv := &http.Server{Addr: listenOn}
-	http2.ConfigureServer(srv, &http2.Server{})
-	if err := srv.ListenAndServeTLS(tlsCertPath, tlsKeyPath); err != nil {
+	if err := srv.ListenAndServeTLS("", ""); err != nil {
 		return fmt.Errorf("Could not serve HTTP/2 server because %s", err)
 	}
 

@@ -13,16 +13,16 @@ import (
 	"github.com/gorilla/mux"
 	hctx "github.com/ory-am/common/handler"
 	"github.com/ory-am/common/pkg"
-	"github.com/ory-am/ladon/guard"
-	"github.com/ory-am/ladon/policy"
-	osinStore "github.com/ory-am/osin-storage/storage"
-	"github.com/pborman/uuid"
 	"github.com/ory-am/hydra/account"
 	"github.com/ory-am/hydra/jwt"
 	"github.com/ory-am/hydra/middleware"
 	"github.com/ory-am/hydra/oauth/connection"
 	"github.com/ory-am/hydra/oauth/provider"
 	"github.com/ory-am/hydra/oauth/provider/storage"
+	"github.com/ory-am/ladon/guard"
+	"github.com/ory-am/ladon/policy"
+	osinStore "github.com/ory-am/osin-storage/storage"
+	"github.com/pborman/uuid"
 )
 
 func DefaultConfig() *osin.ServerConfig {

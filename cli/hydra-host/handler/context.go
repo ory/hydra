@@ -6,11 +6,11 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/ory-am/ladon/policy"
-	"github.com/ory-am/osin-storage/storage"
 	"github.com/ory-am/hydra/account"
 	"github.com/ory-am/hydra/oauth/connection"
 	statesStorage "github.com/ory-am/hydra/oauth/provider/storage"
+	"github.com/ory-am/ladon/policy"
+	"github.com/ory-am/osin-storage/storage"
 )
 
 // DefaultSystemContext - This is the container for the context that we use

@@ -12,7 +12,7 @@ import (
 	clients "github.com/ory-am/hydra/oauth/client/handler"
 	connections "github.com/ory-am/hydra/oauth/connection/handler"
 	oauth "github.com/ory-am/hydra/oauth/handler"
-	"github.com/ory-am/hydra/oauth/provider"
+	"github.com/ory-am/hydra/oauth/connector"
 	policies "github.com/ory-am/hydra/policy/handler"
 	"github.com/ory-am/ladon/guard"
 
@@ -33,11 +33,11 @@ type Core struct {
 	oauthHandler      *oauth.Handler
 	policyHandler     *policies.Handler
 
-	guard     guard.Guarder
-	providers provider.Registry
+	guard             guard.Guarder
+	providers         connector.Registry
 
-	issuer   string
-	audience string
+	issuer            string
+	audience          string
 }
 
 func osinConfig() (conf *osin.ServerConfig, err error) {
@@ -100,7 +100,7 @@ func (c *Core) Start(ctx *cli.Context) error {
 	c.accountHandler = accounts.NewHandler(c.Ctx.GetAccounts(), m)
 	c.clientHandler = clients.NewHandler(c.Ctx.GetOsins(), m)
 	c.connectionHandler = connections.NewHandler(c.Ctx.GetConnections(), m)
-	c.providers = provider.NewRegistry(providers)
+	c.providers = connector.NewRegistry(providers)
 	c.policyHandler = policies.NewHandler(c.Ctx.GetPolicies(), m, c.guard, j, c.Ctx.GetOsins())
 	c.oauthHandler = &oauth.Handler{
 		Accounts:       c.Ctx.GetAccounts(),

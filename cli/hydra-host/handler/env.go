@@ -7,18 +7,18 @@ import (
 
 	"github.com/ory-am/common/env"
 	"github.com/ory-am/common/pkg"
-	"github.com/ory-am/hydra/oauth/provider"
-	"github.com/ory-am/hydra/oauth/provider/dropbox"
-	"github.com/ory-am/hydra/oauth/provider/google"
-	"github.com/ory-am/hydra/oauth/provider/microsoft"
-	"github.com/ory-am/hydra/oauth/provider/signin"
+	"github.com/ory-am/hydra/oauth/connector"
+	"github.com/ory-am/hydra/oauth/connector/dropbox"
+	"github.com/ory-am/hydra/oauth/connector/google"
+	"github.com/ory-am/hydra/oauth/connector/microsoft"
+	"github.com/ory-am/hydra/oauth/connector/signin"
 )
 
 var (
 	listenOn, forceHTTP, bcryptWorkFactor, databaseURL string
 	jwtPrivateKey, jwtPublicKey, tlsKey                string
 	accessTokenLifetime, tlsCert, hostURL              string
-	providers                                          []provider.Provider
+	providers                                          []connector.Provider
 	locations                                          map[string]string
 )
 
@@ -31,7 +31,7 @@ func getEnv() {
 	accessTokenLifetime = env.Getenv("OAUTH2_ACCESS_TOKEN_LIFETIME", "3600")
 	forceHTTP = env.Getenv("DANGEROUSLY_FORCE_HTTP", "")
 	hostURL = env.Getenv("HOST_URL", "https://localhost:4443")
-	providers = []provider.Provider{
+	providers = []connector.Provider{
 		dropbox.New(
 			"dropbox",
 			env.Getenv("DROPBOX_CLIENT", ""),

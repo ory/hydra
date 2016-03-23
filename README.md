@@ -8,7 +8,7 @@
 
 Hydra is a twelve factor authentication, authorization and account management service, ready for you to use in your micro service architecture. Hydra is written in go and backed by PostgreSQL or RethinkDB (or any implementation of [account/storage.go](account/storage.go)).
 
-**Note:** Don't worry, Hydra development is not halted. We are simply working on a more secure OAuth2 framework to back Hydra. Check out the [fosite project](https://github.com/ory-am/fosite). We encourage contributions!
+**Important note:** We worked hard on building a secure OAuth2 and OpenID Connect framework called [Fosite](https://github.com/ory-am/fosite). Now, we are working hard on refactoring Hydra to use Fosite. It will take a considerable amount of refactoring and recoding, so please be aware that things will break.
 
 Hydra implements TLS, different OAuth2 IETF standards and supports HTTP/2. To make things as easy as possible, hydra
 comes with tools to generate TLS and RS256 PEM files, leaving you with almost zero trouble to set up.

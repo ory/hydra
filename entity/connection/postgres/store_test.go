@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/ory-am/common/pkg"
-	. "github.com/ory-am/hydra/oauth/connection"
-	. "github.com/ory-am/hydra/oauth/connection/postgres"
+	. "github.com/ory-am/hydra/endpoint/connection"
+	. "github.com/ory-am/hydra/endpoint/connection/postgres"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

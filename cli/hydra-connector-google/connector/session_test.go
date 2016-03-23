@@ -1,7 +1,7 @@
 package provider_test
 
 import (
-	. "github.com/ory-am/hydra/oauth/connector"
+	. "github.com/ory-am/hydra/endpoint/connector"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

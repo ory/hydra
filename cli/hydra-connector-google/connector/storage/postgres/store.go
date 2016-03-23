@@ -5,7 +5,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	. "github.com/ory-am/common/pkg"
-	. "github.com/ory-am/hydra/oauth/connector/storage"
+	. "github.com/ory-am/hydra/endpoint/connector/storage"
 )
 
 const accountSchema = `CREATE TABLE IF NOT EXISTS hydra_state_data (

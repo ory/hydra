@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/go-errors/errors"
-	. "github.com/ory-am/hydra/oauth/connector"
+	. "github.com/ory-am/hydra/endpoint/connector"
 	"github.com/parnurzeal/gorequest"
 )
 

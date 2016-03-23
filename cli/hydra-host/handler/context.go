@@ -7,8 +7,8 @@ import (
 	"sync"
 
 	"github.com/ory-am/hydra/account"
-	"github.com/ory-am/hydra/oauth/connection"
-	statesStorage "github.com/ory-am/hydra/oauth/connector/storage"
+	"github.com/ory-am/hydra/endpoint/connection"
+	statesStorage "github.com/ory-am/hydra/endpoint/connector/storage"
 	"github.com/ory-am/ladon/policy"
 	"github.com/ory-am/osin-storage/storage"
 )

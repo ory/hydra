@@ -6,7 +6,7 @@ import (
 	rdb "github.com/dancannon/gorethink"
 	"github.com/mitchellh/mapstructure"
 	pkg "github.com/ory-am/common/pkg"
-	cn "github.com/ory-am/hydra/endpoint/connection"
+	cn "github.com/ory-am/hydra/handler/connection"
 )
 
 const connectionTable = "hydra_oauth_link"

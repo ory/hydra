@@ -1,53 +1,64 @@
-package postgres_test
+package rethinkdb
 
 import (
-	"database/sql"
 	"log"
 	"os"
 	"testing"
 	"time"
 
+	"gopkg.in/ory-am/dockertest.v2"
+
+	rdb "github.com/dancannon/gorethink"
+
 	"github.com/ory-am/common/pkg"
-	. "github.com/ory-am/hydra/endpoint/connection"
-	. "github.com/ory-am/hydra/endpoint/connection/postgres"
+	. "github.com/ory-am/hydra/handler/connection"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/ory-am/dockertest.v2"
 )
 
+var session *rdb.Session
 var store *Store
-var db *sql.DB
 
 func TestMain(m *testing.M) {
-	c, err := dockertest.ConnectToPostgreSQL(15, time.Second, func(url string) bool {
-		var err error
-		db, err = sql.Open("postgres", url)
+	c, err := dockertest.ConnectToRethinkDB(20, time.Second, func(url string) bool {
+		rdbSession, err := rdb.Connect(rdb.ConnectOpts{
+			Address:  url,
+			Database: "hydra"})
 		if err != nil {
 			return false
 		}
-		return db.Ping() == nil
+
+		_, err = rdb.DBCreate("hydra").RunWrite(rdbSession)
+		if err != nil {
+			return false
+		}
+
+		store = New(rdbSession)
+
+		if err := store.CreateTables(); err != nil {
+			return false
+		}
+
+		session = rdbSession
+
+		return true
 	})
 
 	if err != nil {
 		log.Fatalf("Could not connect to database: %s", err)
 	}
 
-	store = New(db)
-	if err = store.CreateSchemas(); err != nil {
-		log.Fatalf("Could not create tables: %v", err)
-	}
-
 	retCode := m.Run()
 
 	// force teardown
-	tearDown(c)
+	tearDown(session, c)
 
 	os.Exit(retCode)
 }
 
-func tearDown(c dockertest.ContainerID) {
-	db.Close()
+func tearDown(session *rdb.Session, c dockertest.ContainerID) {
+	defer session.Close()
 	c.KillRemove()
 }
 

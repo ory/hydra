@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-errors/errors"
-	. "github.com/ory-am/hydra/endpoint/connector"
+	. "github.com/ory-am/hydra/handler/connector"
 	"golang.org/x/oauth2"
 	"net/http"
 )

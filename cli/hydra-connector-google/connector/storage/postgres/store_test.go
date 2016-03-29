@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/ory-am/common/pkg"
-	"github.com/ory-am/hydra/endpoint/connector/storage"
+	"github.com/ory-am/hydra/handler/connector/storage"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/ory-am/dockertest.v2"

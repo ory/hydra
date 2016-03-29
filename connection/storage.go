@@ -13,5 +13,5 @@ type Storage interface {
 
 	FindAllByLocalSubject(subject string) ([]Connection, error)
 
-	FindByRemoteSubject(provider, subject string) (Connection, error)
+	FindByRemoteSubject(connector, subject string) (Connection, error)
 }

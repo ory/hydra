@@ -1,7 +1,7 @@
 package connection_test
 
 import (
-	. "github.com/ory-am/hydra/endpoint/connection"
+	. "github.com/ory-am/hydra/handler/connection"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"testing"

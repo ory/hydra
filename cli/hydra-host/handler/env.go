@@ -7,11 +7,11 @@ import (
 
 	"github.com/ory-am/common/env"
 	"github.com/ory-am/common/pkg"
-	"github.com/ory-am/hydra/endpoint/connector"
-	"github.com/ory-am/hydra/endpoint/connector/dropbox"
-	"github.com/ory-am/hydra/endpoint/connector/google"
-	"github.com/ory-am/hydra/endpoint/connector/microsoft"
-	"github.com/ory-am/hydra/endpoint/connector/signin"
+	"github.com/ory-am/hydra/handler/connector"
+	"github.com/ory-am/hydra/handler/connector/dropbox"
+	"github.com/ory-am/hydra/handler/connector/google"
+	"github.com/ory-am/hydra/handler/connector/microsoft"
+	"github.com/ory-am/hydra/handler/connector/signin"
 )
 
 var (

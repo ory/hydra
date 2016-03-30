@@ -50,10 +50,10 @@ func (c *HTTPClient) IsRequestAllowed(req *http.Request, resource, permission, o
 	}
 	env := middleware.NewEnv(req)
 	env.Owner(owner)
-	return c.IsAllowed(&AuthorizeRequest{Token: token.Code, Resource: resource, Permission: permission, Context: env.Ctx()})
+	return c.IsAllowed(&Action{Token: token.Code, Resource: resource, Permission: permission, Context: env.Ctx()})
 }
 
-func (c *HTTPClient) IsAllowed(ar *AuthorizeRequest) (bool, error) {
+func (c *HTTPClient) IsAllowed(ar *Action) (bool, error) {
 	return isValidAuthorizeRequest(c, ar, true)
 }
 
@@ -96,7 +96,7 @@ func isValidAuthenticationRequest(c *HTTPClient, token string, retry bool) (bool
 	return introspect.Active, nil
 }
 
-func isValidAuthorizeRequest(c *HTTPClient, ar *AuthorizeRequest, retry bool) (bool, error) {
+func isValidAuthorizeRequest(c *HTTPClient, ar *Action, retry bool) (bool, error) {
 	request := gorequest.New()
 	resp, body, errs := request.Post(pkg.JoinURL(c.ep, "/guard/allowed")).SetBasicAuth(c.clientConfig.ClientID, c.clientConfig.ClientSecret).Set("Content-Type", "application/json").Set("Connection", "close").Send(*ar).End()
 	if len(errs) > 0 {

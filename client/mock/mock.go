@@ -29,7 +29,7 @@ func (c *client) IsRequestAllowed(req *http.Request, resource, permission, owner
 	return c.result, c.err
 }
 
-func (c *client) IsAllowed(ar *AuthorizeRequest) (bool, error) {
+func (c *client) IsAllowed(ar *Action) (bool, error) {
 	return c.result, c.err
 }
 

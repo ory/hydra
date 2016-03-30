@@ -5,15 +5,24 @@ import (
 	"net/http"
 )
 
-type AuthorizeRequest struct {
+type Action struct {
 	Resource   string            `json:"resource"`
-	Token      string            `json:"token"`
 	Permission string            `json:"permission"`
+	Scopes     []string `json:"scopes"`
 	Context    *operator.Context `json:"context"`
 }
 
+type Context struct {
+	Subject string
+	Scopes []string
+	Issuer string
+	Audience string
+}
+
 type Client interface {
-	IsAllowed(ar *AuthorizeRequest) (bool, error)
-	IsRequestAllowed(req *http.Request, resource, permission, owner string) (bool, error)
-	IsAuthenticated(token string) (bool, error)
+	TokenFromRequest(r http.Request) string
+
+	ActionAllowed(token string, action *Action) (*Context, error)
+
+	Authorized(token string, scopes ...string) (*Context, error)
 }

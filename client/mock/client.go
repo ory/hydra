@@ -30,7 +30,7 @@ func (_m *MockClient) EXPECT() *_MockClientRecorder {
 	return _m.recorder
 }
 
-func (_m *MockClient) IsAllowed(ar *AuthorizeRequest) (bool, error) {
+func (_m *MockClient) IsAllowed(ar *Action) (bool, error) {
 	ret := _m.ctrl.Call(_m, "IsAllowed", ar)
 	ret0, _ := ret[0].(bool)
 	ret1, _ := ret[1].(error)

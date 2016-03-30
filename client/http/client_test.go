@@ -79,7 +79,7 @@ func TestIsAllowed(t *testing.T) {
 	defer ts.Close()
 
 	c := New(ts.URL, "app", "key")
-	allowed, err := c.IsAllowed(&AuthorizeRequest{Permission: "foo", Token: "bar", Resource: "res", Context: &operator.Context{Owner: "foo"}})
+	allowed, err := c.IsAllowed(&Action{Permission: "foo", Token: "bar", Resource: "res", Context: &operator.Context{Owner: "foo"}})
 	assert.Nil(t, err, "%s", err)
 	assert.True(t, allowed)
 }

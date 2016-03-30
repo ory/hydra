@@ -7,7 +7,7 @@ import (
 
 func TestClientAlwaysTrue(t *testing.T) {
 	c := NewAlwaysTrue()
-	ok, err := c.IsAllowed(nil)
+	ok, err := c.IsActionAllowed(nil)
 	assert.True(t, ok)
 	assert.Nil(t, err)
 	ok, err = c.IsRequestAllowed(nil, "", "", "")
@@ -20,7 +20,7 @@ func TestClientAlwaysTrue(t *testing.T) {
 
 func TestClientAlwaysFalse(t *testing.T) {
 	c := NewAlwaysFalse()
-	ok, err := c.IsAllowed(nil)
+	ok, err := c.IsActionAllowed(nil)
 	assert.False(t, ok)
 	assert.NotNil(t, err)
 	ok, err = c.IsRequestAllowed(nil, "", "", "")

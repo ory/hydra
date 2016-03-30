@@ -20,9 +20,11 @@ type Context struct {
 }
 
 type Client interface {
-	TokenFromRequest(r http.Request) string
-
 	ActionAllowed(token string, action *Action) (*Context, error)
 
 	Authorized(token string, scopes ...string) (*Context, error)
+
+	HTTPAuthorized(r *http.Request, scopes ...string) (*Context, error)
+
+	HTTPActionAllowed(r *http.Request, scopes ...string) (*Context, error)
 }

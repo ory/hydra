@@ -1,4 +1,4 @@
-package http_test
+package warden_test
 
 import (
 	"encoding/json"

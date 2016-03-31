@@ -1,4 +1,4 @@
-package client
+package warden
 
 import (
 	"github.com/ory-am/ladon/guard/operator"
@@ -19,7 +19,7 @@ type Context struct {
 	Audience string
 }
 
-type Client interface {
+type Warden interface {
 	ActionAllowed(token string, action *Action) (*Context, error)
 
 	Authorized(token string, scopes ...string) (*Context, error)

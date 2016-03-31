@@ -1,4 +1,4 @@
-package http
+package warden
 
 import (
 	"encoding/json"
@@ -19,29 +19,17 @@ var isAllowed struct {
 	Allowed bool `json:"allowed"`
 }
 
-type HTTPClient struct {
+type HTTPWarden struct {
 	ep           string
 	clientToken  *oauth2.Token
 	clientConfig *clientcredentials.Config
 }
 
-func New(endpoint, client, secret string) *HTTPClient {
-	return &HTTPClient{
-		ep: endpoint,
-		clientConfig: &clientcredentials.Config{
-			ClientSecret: secret,
-			ClientID:     client,
-			TokenURL:     pkg.JoinURL(endpoint, "oauth2/token"),
-		},
-		clientToken: &oauth2.Token{},
-	}
-}
-
-func (c *HTTPClient) SetClientToken(token *oauth2.Token) {
+func (c *HTTPWarden) SetClientToken(token *oauth2.Token) {
 	c.clientToken = token
 }
 
-func (c *HTTPClient) IsRequestAllowed(req *http.Request, resource, permission, owner string) (bool, error) {
+func (c *HTTPWarden) IsRequestAllowed(req *http.Request, resource, permission, owner string) (bool, error) {
 	var token *osin.BearerAuth
 	if token = osin.CheckBearerAuth(req); token == nil {
 		return false, errors.New("No token given.")
@@ -53,15 +41,15 @@ func (c *HTTPClient) IsRequestAllowed(req *http.Request, resource, permission, o
 	return c.IsAllowed(&Action{Token: token.Code, Resource: resource, Permission: permission, Context: env.Ctx()})
 }
 
-func (c *HTTPClient) IsAllowed(ar *Action) (bool, error) {
+func (c *HTTPWarden) IsAllowed(ar *Action) (bool, error) {
 	return isValidAuthorizeRequest(c, ar, true)
 }
 
-func (c *HTTPClient) IsAuthenticated(token string) (bool, error) {
+func (c *HTTPWarden) IsAuthenticated(token string) (bool, error) {
 	return isValidAuthenticationRequest(c, token, true)
 }
 
-func isValidAuthenticationRequest(c *HTTPClient, token string, retry bool) (bool, error) {
+func isValidAuthenticationRequest(c *HTTPWarden, token string, retry bool) (bool, error) {
 	data := url.Values{}
 	data.Set("token", token)
 	request := gorequest.New()
@@ -96,7 +84,7 @@ func isValidAuthenticationRequest(c *HTTPClient, token string, retry bool) (bool
 	return introspect.Active, nil
 }
 
-func isValidAuthorizeRequest(c *HTTPClient, ar *Action, retry bool) (bool, error) {
+func isValidAuthorizeRequest(c *HTTPWarden, ar *Action, retry bool) (bool, error) {
 	request := gorequest.New()
 	resp, body, errs := request.Post(pkg.JoinURL(c.ep, "/guard/allowed")).SetBasicAuth(c.clientConfig.ClientID, c.clientConfig.ClientSecret).Set("Content-Type", "application/json").Set("Connection", "close").Send(*ar).End()
 	if len(errs) > 0 {

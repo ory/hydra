@@ -6,13 +6,12 @@ import (
 	"github.com/RangelReale/osin"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/common/pkg"
-	. "github.com/ory-am/hydra/client"
-	"github.com/ory-am/hydra/middleware"
 	"github.com/parnurzeal/gorequest"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 	"net/http"
 	"net/url"
+	"github.com/ory-am/hydra/handler"
 )
 
 var isAllowed struct {
@@ -20,10 +19,47 @@ var isAllowed struct {
 }
 
 type HTTPWarden struct {
-	ep           string
-	clientToken  *oauth2.Token
-	clientConfig *clientcredentials.Config
+	Client   *http.Client
+
+	Endpoint url.URL
 }
+
+func (w *HTTPWarden) SetClient(c *clientcredentials.Config) {
+	w.Client = c.Client(oauth2.NoContext)
+}
+
+func (w *HTTPWarden) ActionAllowed(token string, action *Action) (*Context, error) {
+	json.New
+	req, err := w.Client.Post(w.Endpoint.String(), "application/json", action)
+	if err != nil {
+		return nil, errors.New(err)
+	}
+
+	var decision handler.DecisionResponse
+	if err := json.NewDecoder(req).Decode(&decision); err != nil {
+		return nil, errors.New(err)
+	}
+
+	ctx := &Context{
+
+	}
+
+	return nil, nil
+}
+
+func (c *HTTPWarden) Authorized(token string, scopes ...string) (*Context, error) {
+
+}
+
+func (c *HTTPWarden) HTTPAuthorized(r *http.Request, scopes ...string) (*Context, error) {
+
+}
+
+func (c *HTTPWarden) HTTPActionAllowed(r *http.Request, scopes ...string) (*Context, error) {
+
+}
+
+
 
 func (c *HTTPWarden) SetClientToken(token *oauth2.Token) {
 	c.clientToken = token
@@ -53,7 +89,7 @@ func isValidAuthenticationRequest(c *HTTPWarden, token string, retry bool) (bool
 	data := url.Values{}
 	data.Set("token", token)
 	request := gorequest.New()
-	resp, body, errs := request.Post(pkg.JoinURL(c.ep, "/oauth2/introspect")).Type("form").SetBasicAuth(c.clientConfig.ClientID, c.clientConfig.ClientSecret).Set("Connection", "close").SendString(data.Encode()).End()
+	resp, body, errs := request.Post(pkg.JoinURL(c.ep, "/oauth2/introspect")).Type("form").SetBasicAuth(c.ClientConfig.ClientID, c.ClientConfig.ClientSecret).Set("Connection", "close").SendString(data.Encode()).End()
 	if len(errs) > 0 {
 		return false, errors.Errorf("Got errors: %v", errs)
 	} else if resp.StatusCode != http.StatusOK {
@@ -62,7 +98,7 @@ func isValidAuthenticationRequest(c *HTTPWarden, token string, retry bool) (bool
 
 	if retry && resp.StatusCode == http.StatusUnauthorized {
 		var err error
-		if c.clientToken, err = c.clientConfig.Token(oauth2.NoContext); err != nil {
+		if c.clientToken, err = c.ClientConfig.Token(oauth2.NoContext); err != nil {
 			return false, errors.New(err)
 		} else if c.clientToken == nil {
 			return false, errors.New("Access token could not be retrieved")
@@ -86,12 +122,12 @@ func isValidAuthenticationRequest(c *HTTPWarden, token string, retry bool) (bool
 
 func isValidAuthorizeRequest(c *HTTPWarden, ar *Action, retry bool) (bool, error) {
 	request := gorequest.New()
-	resp, body, errs := request.Post(pkg.JoinURL(c.ep, "/guard/allowed")).SetBasicAuth(c.clientConfig.ClientID, c.clientConfig.ClientSecret).Set("Content-Type", "application/json").Set("Connection", "close").Send(*ar).End()
+	resp, body, errs := request.Post(pkg.JoinURL(c.ep, "/guard/allowed")).SetBasicAuth(c.ClientConfig.ClientID, c.ClientConfig.ClientSecret).Set("Content-Type", "application/json").Set("Connection", "close").Send(*ar).End()
 	if len(errs) > 0 {
 		return false, errors.Errorf("Got errors: %v", errs)
 	} else if retry && resp.StatusCode == http.StatusUnauthorized {
 		var err error
-		if c.clientToken, err = c.clientConfig.Token(oauth2.NoContext); err != nil {
+		if c.clientToken, err = c.ClientConfig.Token(oauth2.NoContext); err != nil {
 			return false, errors.New(err)
 		} else if c.clientToken == nil {
 			return false, errors.New("Access token could not be retrieved")

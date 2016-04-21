@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+
 	log "github.com/Sirupsen/logrus"
 	. "github.com/ory-am/common/pkg"
 	. "github.com/ory-am/hydra/handler/connection"

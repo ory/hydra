@@ -3,6 +3,8 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	"github.com/RangelReale/osin"
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/mux"
@@ -13,7 +15,6 @@ import (
 	"github.com/ory-am/osin-storage/storage"
 	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
-	"net/http"
 
 	"github.com/go-errors/errors"
 )

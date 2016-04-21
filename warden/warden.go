@@ -1,23 +1,23 @@
 package warden
 
 import (
-	"github.com/ory-am/ladon/guard/operator"
 	"net/http"
+
 	"github.com/ory-am/ladon"
 )
 
 type Action struct {
-	Resource   string            `json:"resource"`
-	Permission string            `json:"permission"`
-	Scopes     []string `json:"scopes"`
+	Resource   string         `json:"resource"`
+	Permission string         `json:"permission"`
+	Scopes     []string       `json:"scopes"`
 	Context    *ladon.Context `json:"context"`
 }
 
 type Context struct {
-	Subject string `json:"subject"`
-	Scopes []string `json:"scopes"`
-	Issuer string `json:"issuer"`
-	Audience string `json:"audience"`
+	Subject  string   `json:"subject"`
+	Scopes   []string `json:"scopes"`
+	Issuer   string   `json:"issuer"`
+	Audience string   `json:"audience"`
 }
 
 type Warden interface {

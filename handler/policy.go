@@ -8,18 +8,20 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+
+	"github.com/RangelReale/osin"
+	log "github.com/Sirupsen/logrus"
+	"github.com/arekkas/flitt-api/vendor/github.com/ory-am/hydra/middleware"
+	"github.com/go-errors/errors"
 	"github.com/gorilla/mux"
 	hctx "github.com/ory-am/common/handler"
 	"github.com/ory-am/common/pkg"
-	"github.com/pborman/uuid"
-	"golang.org/x/net/context"
-	"net/http"
-	"github.com/RangelReale/osin"
-	log "github.com/Sirupsen/logrus"
-	"github.com/go-errors/errors"
 	. "github.com/ory-am/ladon/guard"
 	"github.com/ory-am/ladon/guard/operator"
 	. "github.com/ory-am/ladon/policy"
+	"github.com/pborman/uuid"
+	"golang.org/x/net/context"
 )
 
 type Handler struct {

@@ -2,6 +2,10 @@ package warden_test
 
 import (
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
 	"github.com/go-errors/errors"
 	"github.com/gorilla/mux"
 	"github.com/ory-am/common/pkg"
@@ -11,9 +15,6 @@ import (
 	"github.com/ory-am/ladon/guard/operator"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 )
 
 func tokenHandler(rw http.ResponseWriter, req *http.Request) {

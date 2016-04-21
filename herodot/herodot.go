@@ -2,8 +2,9 @@ package herodot
 
 import (
 	"net/http"
-	"golang.org/x/net/context"
+
 	"github.com/pborman/uuid"
+	"golang.org/x/net/context"
 )
 
 type key int

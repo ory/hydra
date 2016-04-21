@@ -8,16 +8,17 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	"github.com/asaskevich/govalidator"
 	"github.com/go-errors/errors"
 	"github.com/gorilla/mux"
 	hydcon "github.com/ory-am/common/handler"
 	. "github.com/ory-am/common/pkg"
-	"github.com/ory-am/hydra/middleware"
 	. "github.com/ory-am/hydra/handler/connection"
+	"github.com/ory-am/hydra/middleware"
 	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
-	"net/http"
 )
 
 var connectionsPermission = "rn:hydra:oauth2:connections"

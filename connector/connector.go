@@ -2,6 +2,7 @@ package connector
 
 import (
 	"net/url"
+
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
 )

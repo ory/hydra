@@ -1,18 +1,18 @@
 package herodot
 
 import (
-	"net/http"
 	"encoding/json"
-	"log"
-	"golang.org/x/net/context"
-	"github.com/pborman/uuid"
+	"net/http"
+
 	"github.com/Sirupsen/logrus"
+	"github.com/pborman/uuid"
+	"golang.org/x/net/context"
 )
 
 type jsonError struct {
 	RequestID string `json:"requestId"`
-	Error string `json:"error"`
-	Code int `json:"code"`
+	Error     string `json:"error"`
+	Code      int    `json:"code"`
 }
 
 type JSON struct {
@@ -41,7 +41,7 @@ func (h *JSON) WriteCode(ctx context.Context, w http.ResponseWriter, r *http.Req
 	return nil
 }
 
-func (h *JSON) WriteError(ctx context.Context, w http.ResponseWriter, r *http.Request, err error) error  {
+func (h *JSON) WriteError(ctx context.Context, w http.ResponseWriter, r *http.Request, err error) error {
 	if e, ok := err.(*Error); ok {
 		return h.WriteErrorCode(ctx, w, r, e, e.Code)
 	}
@@ -49,8 +49,7 @@ func (h *JSON) WriteError(ctx context.Context, w http.ResponseWriter, r *http.Re
 	return h.WriteErrorCode(ctx, w, r, err, http.StatusInternalServerError)
 }
 
-
-func (h *JSON) WriteErrorCode(ctx context.Context, w http.ResponseWriter, r *http.Request, err error, status int) error  {
+func (h *JSON) WriteErrorCode(ctx context.Context, w http.ResponseWriter, r *http.Request, err error, status int) error {
 	id, _ := ctx.Value(RequestIDKey).(string)
 	if id == "" {
 		id = uuid.New()
@@ -68,7 +67,7 @@ func (h *JSON) WriteErrorCode(ctx context.Context, w http.ResponseWriter, r *htt
 
 	return h.Write(ctx, w, r, &jsonError{
 		RequestID: id,
-		Error: err.Error(),
-		Code: status,
+		Error:     err.Error(),
+		Code:      status,
 	})
 }

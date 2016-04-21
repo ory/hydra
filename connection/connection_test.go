@@ -1,10 +1,11 @@
 package connection_test
 
 import (
+	"testing"
+
 	. "github.com/ory-am/hydra/handler/connection"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestConnection(t *testing.T) {

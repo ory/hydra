@@ -1,8 +1,9 @@
 package herodot
 
 import (
-	"github.com/go-errors/errors"
 	"net/http"
+
+	"github.com/go-errors/errors"
 )
 
 type Error struct {
@@ -13,18 +14,18 @@ type Error struct {
 var (
 	ErrNotFound = &Error{
 		Error: errors.New("Not found"),
-		Code: http.StatusNotFound,
+		Code:  http.StatusNotFound,
 	}
 	ErrUnauthorized = &Error{
 		Error: errors.New("Unauthorized"),
-		Code: http.StatusUnauthorized,
+		Code:  http.StatusUnauthorized,
 	}
 	ErrBadRequest = &Error{
 		Error: errors.New("Bad request"),
-		Code: http.StatusBadRequest,
+		Code:  http.StatusBadRequest,
 	}
 	ErrForbidden = &Error{
 		Error: errors.New("Forbidden"),
-		Code: http.StatusForbidden,
+		Code:  http.StatusForbidden,
 	}
 )

@@ -3,15 +3,17 @@ package warden
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/url"
+
 	"github.com/RangelReale/osin"
+	"github.com/arekkas/flitt-api/vendor/github.com/ory-am/hydra/middleware"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/common/pkg"
+	"github.com/ory-am/hydra/handler"
 	"github.com/parnurzeal/gorequest"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
-	"net/http"
-	"net/url"
-	"github.com/ory-am/hydra/handler"
 )
 
 var isAllowed struct {
@@ -19,7 +21,7 @@ var isAllowed struct {
 }
 
 type HTTPWarden struct {
-	Client   *http.Client
+	Client *http.Client
 
 	Endpoint url.URL
 }
@@ -40,9 +42,7 @@ func (w *HTTPWarden) ActionAllowed(token string, action *Action) (*Context, erro
 		return nil, errors.New(err)
 	}
 
-	ctx := &Context{
-
-	}
+	ctx := &Context{}
 
 	return nil, nil
 }
@@ -58,8 +58,6 @@ func (c *HTTPWarden) HTTPAuthorized(r *http.Request, scopes ...string) (*Context
 func (c *HTTPWarden) HTTPActionAllowed(r *http.Request, scopes ...string) (*Context, error) {
 
 }
-
-
 
 func (c *HTTPWarden) SetClientToken(token *oauth2.Token) {
 	c.clientToken = token

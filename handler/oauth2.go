@@ -1,27 +1,28 @@
 package handler
 
 import (
-	"github.com/ory-am/fosite"
-	"github.com/julienschmidt/httprouter"
 	"net/http"
-	"github.com/ory-am/hydra/pkg"
-	"github.com/go-errors/errors"
 	"net/url"
-	"github.com/ory-am/hydra/consent"
-	"github.com/ory-am/hydra/connector"
-	"github.com/ory-am/hydra/identity"
+
+	"github.com/go-errors/errors"
+	"github.com/julienschmidt/httprouter"
+	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/enigma/jwt"
+	"github.com/ory-am/hydra/connector"
+	"github.com/ory-am/hydra/consent"
+	"github.com/ory-am/hydra/identity"
+	"github.com/ory-am/hydra/pkg"
 )
 
 type OAuth2Handler struct {
 	fosite           fosite.OAuth2Provider
 	consentValidator consent.Validator
 	connectors       connector.ConnectorRegistry
-	identities identity.IdentityProviderRegistry
-	jwtGenerator jwt.Enigma
+	identities       identity.IdentityProviderRegistry
+	jwtGenerator     jwt.Enigma
 
-	SelfURL          *url.URL
-	ConsentURL       *url.URL
+	SelfURL         *url.URL
+	ConsentURL      *url.URL
 	ErrorHandlerURL *url.URL
 }
 
@@ -107,23 +108,23 @@ func (o *OAuth2Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ ht
 }
 
 func (o *OAuth2Handler) ConnectorCallbackHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	if err := r.ParseForm(); err != nil{
+	if err := r.ParseForm(); err != nil {
 		pkg.LogError(errors.New(err))
-		pkg.ForwardToErrorHandler(w,r,err,o.ErrorHandlerURL)
+		pkg.ForwardToErrorHandler(w, r, err, o.ErrorHandlerURL)
 		return
 	}
 
 	conor, err := o.connectors.GetConnector(p.ByName("connector"))
 	if err != nil {
 		pkg.LogError(errors.New(err))
-		pkg.ForwardToErrorHandler(w,r,err,o.ErrorHandlerURL)
+		pkg.ForwardToErrorHandler(w, r, err, o.ErrorHandlerURL)
 		return
 	}
 
 	authorizeRequest, err := conor.GetAuthorizeSession(r.Form)
 	if err != nil {
 		pkg.LogError(errors.New(err))
-		pkg.ForwardToErrorHandler(w,r,err,o.ErrorHandlerURL)
+		pkg.ForwardToErrorHandler(w, r, err, o.ErrorHandlerURL)
 		return
 	}
 

@@ -27,7 +27,10 @@ type OAuth2Handler struct {
 }
 
 func (h *OAuth2Handler) SetRoutes(r *httprouter.Router) {
+	r.POST("/oauth2/token", h.TokenHandler)
 
+	r.GET("/oauth2/auth", h.AuthHandler)
+	r.POST("/oauth2/auth", h.AuthHandler)
 }
 
 func (o *OAuth2Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -105,52 +108,6 @@ func (o *OAuth2Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ ht
 	}
 
 	o.fosite.WriteAuthorizeResponse(w, authorizeRequest, response)
-}
-
-func (o *OAuth2Handler) ConnectorCallbackHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	if err := r.ParseForm(); err != nil {
-		pkg.LogError(errors.New(err))
-		pkg.ForwardToErrorHandler(w, r, err, o.ErrorHandlerURL)
-		return
-	}
-
-	conor, err := o.connectors.GetConnector(p.ByName("connector"))
-	if err != nil {
-		pkg.LogError(errors.New(err))
-		pkg.ForwardToErrorHandler(w, r, err, o.ErrorHandlerURL)
-		return
-	}
-
-	authorizeRequest, err := conor.GetAuthorizeSession(r.Form)
-	if err != nil {
-		pkg.LogError(errors.New(err))
-		pkg.ForwardToErrorHandler(w, r, err, o.ErrorHandlerURL)
-		return
-	}
-
-	subject, err := conor.Exchange(r.Form)
-	if err != nil {
-		pkg.LogError(errors.New(err))
-		o.fosite.WriteAuthorizeError(w, authorizeRequest, errors.New(err))
-		return
-	}
-
-	if err := o.identities.IsIdentityAuthenticable(subject); err != nil {
-		pkg.LogError(errors.New(err))
-		o.fosite.WriteAuthorizeError(w, authorizeRequest, errors.New(err))
-		return
-	}
-
-	authenticationToken, _, err := o.jwtGenerator.Generate(&jwt.Claims{
-		Subject: subject,
-	}, &jwt.Header{})
-	if err != nil {
-		pkg.LogError(errors.New(err))
-		o.fosite.WriteAuthorizeError(w, authorizeRequest, errors.New(err))
-		return
-	}
-
-	o.redirectToConsent(authorizeRequest, authenticationToken)
 }
 
 func (o *OAuth2Handler) redirectToConsent(authorizeRequest fosite.AuthorizeRequester, authenticationToken string) error {

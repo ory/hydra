@@ -3,13 +3,13 @@ package connection_test
 import (
 	"testing"
 
-	. "github.com/ory-am/hydra/handler/connection"
+	"github.com/ory-am/hydra/connection"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestConnection(t *testing.T) {
-	c := &DefaultConnection{
+	c := &connection.DefaultConnection{
 		ID:            uuid.New(),
 		LocalSubject:  "peter",
 		RemoteSubject: "peter@gmail.com",

@@ -4,28 +4,24 @@ import (
 	"net/http"
 
 	"github.com/ory-am/ladon"
+	"time"
 )
 
-type Action struct {
-	Resource   string         `json:"resource"`
-	Permission string         `json:"permission"`
-	Scopes     []string       `json:"scopes"`
-	Context    *ladon.Context `json:"context"`
-}
-
 type Context struct {
-	Subject  string   `json:"subject"`
-	Scopes   []string `json:"scopes"`
-	Issuer   string   `json:"issuer"`
-	Audience string   `json:"audience"`
+	Subject       string   `json:"subject"`
+	GrantedScopes []string `json:"scopes"`
+	Issuer        string   `json:"issuer"`
+	Audience      string   `json:"audience"`
+	IssuedAt time.Time
+	ExpiresAt time.Time
 }
 
 type Warden interface {
-	ActionAllowed(token string, action *Action) (*Context, error)
+	ActionAllowed(token string, *ladon.Request) (*Context, error)
 
 	Authorized(token string, scopes ...string) (*Context, error)
 
 	HTTPAuthorized(r *http.Request, scopes ...string) (*Context, error)
 
-	HTTPActionAllowed(r *http.Request, scopes ...string) (*Context, error)
+	HTTPActionAllowed(r *http.Request, *ladon.Request, scopes ...string) (*Context, error)
 }

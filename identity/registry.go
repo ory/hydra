@@ -5,7 +5,7 @@ type IdentityProviderRegistry interface {
 
 	RemoveProvider(provider IdentityProvider)
 
-	Authenticate(id, password string) (Identity, error)
+	Authenticate(id, password, otp string) (*Identity, error)
 
-	IsIdentityAuthenticable(id string) error
+	GetIdentity(id string) (*Identity, error)
 }

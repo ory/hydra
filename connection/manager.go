@@ -1,7 +1,7 @@
 package connection
 
 // Storage defines an interface for storing connections.
-type Storage interface {
+type Manager interface {
 	// Create a new connection.
 	Create(c Connection) error
 

@@ -7,13 +7,14 @@ import (
 	"net/url"
 
 	"github.com/RangelReale/osin"
-	"github.com/arekkas/flitt-api/vendor/github.com/ory-am/hydra/middleware"
 	"github.com/go-errors/errors"
-	"github.com/ory-am/common/pkg"
+	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/hydra/handler"
 	"github.com/parnurzeal/gorequest"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
+	"github.com/ory-am/ladon"
+	"strings"
 )
 
 var isAllowed struct {
@@ -30,33 +31,48 @@ func (w *HTTPWarden) SetClient(c *clientcredentials.Config) {
 	w.Client = c.Client(oauth2.NoContext)
 }
 
-func (w *HTTPWarden) ActionAllowed(token string, action *Action) (*Context, error) {
-	json.New
-	req, err := w.Client.Post(w.Endpoint.String(), "application/json", action)
-	if err != nil {
-		return nil, errors.New(err)
+func (w *HTTPWarden) ActionAllowed(token string, *ladon.Request, scopes ...string) (*Context, error) {
+
+}
+
+func (w *HTTPWarden) Authorized(token string, scopes ...string) (*Context, error) {
+
+}
+
+func (w *HTTPWarden) HTTPAuthorized(r *http.Request, scopes ...string) (*Context, error) {
+	token := tokenFromRequest(r)
+	if token == "" {
+		return nil, errors.New(pkg.ErrUnauthorized)
 	}
 
-	var decision handler.DecisionResponse
-	if err := json.NewDecoder(req).Decode(&decision); err != nil {
-		return nil, errors.New(err)
+	return w.Authorized(r, scopes...)
+}
+
+func (w *HTTPWarden) HTTPActionAllowed(r *http.Request, a *ladon.Request, scopes ...string) (*Context, error) {
+	token := tokenFromRequest(r)
+	if token == "" {
+		return nil, errors.New(pkg.ErrUnauthorized)
 	}
 
-	ctx := &Context{}
-
-	return nil, nil
+	return w.ActionAllowed(r, a, scopes...)
 }
 
-func (c *HTTPWarden) Authorized(token string, scopes ...string) (*Context, error) {
+func tokenFromRequest(r *http.Request) string {
+	authHeader := r.Header.Get("Authorization")
+	authForm := r.Form.Get("code")
+	if authHeader == "" && authForm == "" {
+		return ""
+	}
 
-}
-
-func (c *HTTPWarden) HTTPAuthorized(r *http.Request, scopes ...string) (*Context, error) {
-
-}
-
-func (c *HTTPWarden) HTTPActionAllowed(r *http.Request, scopes ...string) (*Context, error) {
-
+	token := authForm
+	if authHeader != "" {
+		s := strings.SplitN(authHeader, " ", 2)
+		if (len(s) != 2 || s[0] != "Bearer") && token == "" {
+			return ""
+		}
+		token = s[1]
+	}
+	return token
 }
 
 func (c *HTTPWarden) SetClientToken(token *oauth2.Token) {

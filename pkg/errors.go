@@ -7,6 +7,12 @@ import (
 	"github.com/go-errors/errors"
 )
 
+var (
+	ErrNotFound = errors.New("Not found")
+	ErrUnauthorized = errors.New("Unauthorized")
+	ErrForbidden = errors.New("Forbidden")
+)
+
 func LogError(err *errors.Error) {
 
 }

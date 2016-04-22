@@ -41,30 +41,13 @@ func NewHandler(s Storage, m middleware.Middleware) *Handler {
 }
 
 func (h *Handler) SetRoutes(r *mux.Router, extractor func(h hydcon.ContextHandler) hydcon.ContextHandler) {
-	r.Handle("/oauth2/connections", hydcon.NewContextAdapter(
-		context.Background(),
-		extractor,
-		h.m.IsAuthenticated,
-		h.m.IsAuthorized(connectionsPermission, "create", nil),
-	).ThenFunc(h.Create)).Methods("POST")
+	r.Handle("/oauth2/connections", h.Create).Methods("POST")
 
-	r.Handle("/oauth2/connections", hydcon.NewContextAdapter(
-		context.Background(),
-		extractor,
-		h.m.IsAuthenticated,
-	).ThenFunc(h.Find)).Queries("subject", "{subject}").Methods("GET")
+	r.Handle("/oauth2/connections", h.Find).Queries("subject", "{subject}").Methods("GET")
 
-	r.Handle("/oauth2/connections/{id}", hydcon.NewContextAdapter(
-		context.Background(),
-		extractor,
-		h.m.IsAuthenticated,
-	).ThenFunc(h.Get)).Methods("GET")
+	r.Handle("/oauth2/connections/{id}", h.Get).Methods("GET")
 
-	r.Handle("/oauth2/connections/{id}", hydcon.NewContextAdapter(
-		context.Background(),
-		extractor,
-		h.m.IsAuthenticated,
-	).ThenFunc(h.Delete)).Methods("DELETE")
+	r.Handle("/oauth2/connections/{id}", h.Delete).Methods("DELETE")
 }
 
 func (h *Handler) Create(ctx context.Context, rw http.ResponseWriter, req *http.Request) {

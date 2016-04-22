@@ -1,5 +1,7 @@
 package identity
 
-type Identity interface {
-	GetID() string
+type Identity struct {
+	ID string `json:"id"`
+
+	TwoFactorAuthSecret string `json:"2fa"`
 }

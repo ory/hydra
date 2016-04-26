@@ -26,6 +26,6 @@ type DBAL struct {
 }
 
 type EndpointConfig struct {
-	ID string
+	ID  string
 	URL *url.URL
 }

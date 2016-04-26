@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	ErrNotFound = errors.New("Not found")
+	ErrNotFound     = errors.New("Not found")
 	ErrUnauthorized = errors.New("Unauthorized")
-	ErrForbidden = errors.New("Forbidden")
+	ErrForbidden    = errors.New("Forbidden")
 )
 
 func LogError(err *errors.Error) {

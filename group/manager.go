@@ -1,8 +1,8 @@
 package group
 
 type Group struct {
-	ID string `json:"id"`
-	Members []string `json:"members"`
+	ID       string   `json:"id"`
+	Members  []string `json:"members"`
 	Policies []string `json:"policies"`
 }
 
@@ -17,7 +17,7 @@ type Manager interface {
 
 	CreateGroup(group Group) error
 
-	AddGroupPolicy(policy, group string)	 error
+	AddGroupPolicy(policy, group string) error
 
 	RemoveGroupPolicy(policy, group string) error
 

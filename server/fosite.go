@@ -1,4 +1,4 @@
-package handler
+package server
 
 import (
 	"net/http"
@@ -8,16 +8,14 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/enigma/jwt"
-	"github.com/ory-am/hydra/connector"
-	"github.com/ory-am/hydra/consent"
 	"github.com/ory-am/hydra/identity"
+	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
 )
 
-type OAuth2Handler struct {
+type Handler struct {
 	fosite           fosite.OAuth2Provider
-	consentValidator consent.Validator
-	connectors       connector.ConnectorRegistry
+	consentValidator oauth2.ConsentValidator
 	identities       identity.IdentityProviderRegistry
 	jwtGenerator     jwt.Enigma
 
@@ -26,15 +24,15 @@ type OAuth2Handler struct {
 	ErrorHandlerURL *url.URL
 }
 
-func (h *OAuth2Handler) SetRoutes(r *httprouter.Router) {
+func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.POST("/oauth2/token", h.TokenHandler)
 
 	r.GET("/oauth2/auth", h.AuthHandler)
 	r.POST("/oauth2/auth", h.AuthHandler)
 }
 
-func (o *OAuth2Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var session consent.ConsentClaims
+func (o *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	var session oauth2.Session
 	var ctx = fosite.NewContext()
 
 	accessRequest, err := o.fosite.NewAccessRequest(ctx, r, &session)
@@ -54,9 +52,8 @@ func (o *OAuth2Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ h
 	o.fosite.WriteAccessResponse(w, accessRequest, accessResponse)
 }
 
-func (o *OAuth2Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (o *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = fosite.NewContext()
-
 	authorizeRequest, err := o.fosite.NewAuthorizeRequest(ctx, r)
 	if err != nil {
 		pkg.LogError(errors.New(err))
@@ -64,35 +61,15 @@ func (o *OAuth2Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ ht
 		return
 	}
 
-	// check if third party thingy
-	conor, err := o.connectors.GetConnector(authorizeRequest.GetRequestForm().Get("connector"))
-	if err == connector.ConnectorNotFound {
-		// nothing to do
-	} else if err != nil {
-		pkg.LogError(errors.New(err))
-		o.fosite.WriteAuthorizeError(w, authorizeRequest, errors.New(fosite.ErrServerError))
-		return
-	} else {
-		url, err := conor.PersistAuthorizeSession(authorizeRequest)
-		if err != nil {
-			pkg.LogError(errors.New(err))
-			o.fosite.WriteAuthorizeError(w, authorizeRequest, err)
-		}
-
-		http.Redirect(w, r, url.String(), http.StatusFound)
-		return
-	}
-
 	// A session_token will be available if the user was authenticated an gave consent
 	consentToken := authorizeRequest.GetRequestForm().Get("consent_token")
 	if consentToken == "" {
 		// otherwise redirect to log in endpoint
-		o.redirectToConsent(authorizeRequest, "")
+		o.redirectToConsent(w, r, authorizeRequest, "")
 	}
 
 	// decode consent_token claims
 	// verify anti-CSRF (inject state) and anti-replay token (expiry time, good value would be 10 seconds)
-
 	session, err := o.consentValidator.ValidateConsentToken(authorizeRequest, consentToken)
 	if err != nil {
 		o.fosite.WriteAuthorizeError(w, authorizeRequest, errors.New(fosite.ErrAccessDenied))
@@ -110,25 +87,27 @@ func (o *OAuth2Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ ht
 	o.fosite.WriteAuthorizeResponse(w, authorizeRequest, response)
 }
 
-func (o *OAuth2Handler) redirectToConsent(authorizeRequest fosite.AuthorizeRequester, authenticationToken string) error {
-	p, err := url.Parse(o.ConsentURL)
-	if err != nil {
-		return errors.New(err)
-	}
+func (o *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, authorizeRequest fosite.AuthorizeRequester, authenticationToken string) error {
+	var p *url.URL
+	*p = *o.ConsentURL
 
-	p.Query().Set("client_id", authorizeRequest.GetClient().GetID())
-	p.Query().Set("state", authorizeRequest.GetState())
+	q := p.Query()
+	q.Set("client_id", authorizeRequest.GetClient().GetID())
+	q.Set("state", authorizeRequest.GetState())
 	for _, scope := range authorizeRequest.GetScopes() {
-		p.Query().Add("scope", scope)
+		q.Add("scope", scope)
 	}
 
 	if authenticationToken != "" {
-		p.Query().Set("authentication_token", authenticationToken)
+		q.Set("authentication_token", authenticationToken)
 	}
 
 	var selfURL *url.URL
 	*selfURL = *o.SelfURL
 	selfURL.Path = "/auth"
-	p.Query().Set("redirect_uri", selfURL.String())
+
+	q.Set("redirect_uri", selfURL.String())
+	http.Redirect(w, r, p.String(), http.StatusFound)
+
 	return nil
 }

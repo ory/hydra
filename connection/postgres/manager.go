@@ -3,11 +3,10 @@ package postgres
 import (
 	"database/sql"
 
-
 	log "github.com/Sirupsen/logrus"
-	"github.com/ory-am/hydra/pkg"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/connection"
+	"github.com/ory-am/hydra/pkg"
 )
 
 var schemata = []string{
@@ -69,7 +68,7 @@ func (s *Manager) FindByRemoteSubject(provider, subject string) (connection.Conn
 	if err := row.Scan(&c.ID, &c.Provider, &c.LocalSubject, &c.RemoteSubject); err == sql.ErrNoRows {
 		return nil, errors.New(pkg.ErrNotFound)
 	} else if err != nil {
-		return nil,  errors.New(err)
+		return nil, errors.New(err)
 	}
 	return &c, nil
 }
@@ -77,7 +76,7 @@ func (s *Manager) FindByRemoteSubject(provider, subject string) (connection.Conn
 func (s *Manager) FindAllByLocalSubject(subject string) (cs []connection.Connection, err error) {
 	rows, err := s.DB.Query("SELECT id, provider, subject_local, subject_remote FROM hydra_oauth_link WHERE subject_local=$1", subject)
 	if err != nil {
-		return []connection.Connection{}, errors.New( err)
+		return []connection.Connection{}, errors.New(err)
 	}
 	defer rows.Close()
 
@@ -86,7 +85,7 @@ func (s *Manager) FindAllByLocalSubject(subject string) (cs []connection.Connect
 		if err := rows.Scan(&c.ID, &c.Provider, &c.LocalSubject, &c.RemoteSubject); err == sql.ErrNoRows {
 			return []connection.Connection{}, errors.New(pkg.ErrNotFound)
 		} else if err != nil {
-			return []connection.Connection{},  errors.New(err)
+			return []connection.Connection{}, errors.New(err)
 		}
 		cs = append(cs, &c)
 	}

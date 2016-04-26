@@ -8,20 +8,20 @@ import (
 	"time"
 
 	"github.com/ory-am/common/pkg"
+	"github.com/ory-am/hydra/connection"
+	"github.com/ory-am/hydra/connection/postgres"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/ory-am/dockertest.v2"
-	"github.com/ory-am/hydra/connection"
-	"github.com/ory-am/hydra/connection/postgres"
 )
 
 var connections = []connection.Connection{
 	&connection.DefaultConnection{
-		ID: uuid.New(),
-		LocalSubject: "peter",
+		ID:            uuid.New(),
+		LocalSubject:  "peter",
 		RemoteSubject: "peterson",
-		Provider: "google",
+		Provider:      "google",
 	},
 }
 
@@ -68,7 +68,7 @@ func setupPG() {
 func TestNotFound(t *testing.T) {
 	for _, store := range managers {
 		_, err := store.Get("asdf")
-		assert.Equal(t, pkg.ErrNotFound, err)
+		assert.EqualError(t, err, pkg.ErrNotFound.Error())
 	}
 }
 

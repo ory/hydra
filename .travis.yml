@@ -21,6 +21,6 @@ install:
   - go get -t $(go list ./... | grep -v /vendor/)
 
 script:
-  # - go vet -x ./...
+  - go vet -x $(go list ./... | grep -v /vendor/)
   - gotestcover -coverprofile="cover.out" -race -covermode="count" $(go list ./... | grep -v /vendor/)
   - goveralls -coverprofile="cover.out"

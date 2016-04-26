@@ -51,7 +51,6 @@ func (h *OAuth2Client) Create(w http.ResponseWriter, r *http.Request, _ httprout
 			"owner": c.Owner,
 		},
 	}, "hydra.oauth2.clients"); err != nil {
-		fmt.Printf("CREATE AODN %s\n", err.(*errors.Error).ErrorStack())
 		h.H.WriteError(ctx, w, r, err)
 		return
 	}

@@ -46,6 +46,8 @@ var ts *httptest.Server
 
 var tokens = pkg.Tokens(1)
 
+var httpClientManager *HTTPClientManager
+
 func init() {
 	ar := fosite.NewAccessRequest(&Session{Subject: "alice"})
 	ar.GrantedScopes = fosite.Arguments{"hydra.oauth2.clients"}
@@ -72,6 +74,22 @@ func init() {
 		}),
 		Endpoint: u,
 	}
+}
+
+func TestAuthenticateClient(t *testing.T) {
+	var mem = &MemoryClientManager{Clients: map[string]*OAuth2Client{}}
+	mem.CreateClient(&OAuth2Client{
+		ID:           "1234",
+		Secret:       []byte("secret"),
+		RedirectURIs: []string{"http://redirect"},
+	})
+
+	c, err := mem.Authenticate("1234", []byte("secret1"))
+	pkg.AssertError(t, true, err)
+
+	c, err = mem.Authenticate("1234", []byte("secret"))
+	pkg.AssertError(t, false, err)
+	assert.Equal(t, "1234", c.ID)
 }
 
 func TestCreateGetDeleteClient(t *testing.T) {

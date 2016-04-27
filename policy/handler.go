@@ -13,6 +13,13 @@ import (
 	"github.com/pborman/uuid"
 )
 
+const (
+	Endpoint = "/policies"
+	Scope = "hydra.policies.search"
+	PolicyResource = "rn:hydra:policies"
+	PoliciesResource = "rn:hydra:policies:%s"
+)
+
 type Handler struct {
 	Manager ladon.Manager
 	H       herodot.Herodot
@@ -20,10 +27,10 @@ type Handler struct {
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
-	r.POST("/policies", h.Create)
-	r.GET("/policies", h.Find)
-	r.GET("/policies/:id", h.Get)
-	r.DELETE("/policies/:id", h.Delete)
+	r.POST(Endpoint, h.Create)
+	r.GET(Endpoint, h.Find)
+	r.GET(Endpoint+"/:id", h.Get)
+	r.DELETE(Endpoint+"/:id", h.Delete)
 }
 
 func (h *Handler) Find(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -34,9 +41,9 @@ func (h *Handler) Find(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 	}
 
 	if _, err := h.W.HTTPActionAllowed(ctx, r, &ladon.Request{
-		Resource: "rn:hydra:policies",
+		Resource: PolicyResource,
 		Action:   "search",
-	}, "hydra.policies.search"); err != nil {
+	}, Scope); err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
 	}
@@ -54,9 +61,9 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	ctx := herodot.NewContext()
 
 	if _, err := h.W.HTTPActionAllowed(ctx, r, &ladon.Request{
-		Resource: "rn:hydra:policies",
+		Resource: PolicyResource,
 		Action:   "create",
-	}, "hydra.policies.create"); err != nil {
+	}, Scope); err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
 	}
@@ -79,9 +86,9 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	ctx := herodot.NewContext()
 
 	if _, err := h.W.HTTPActionAllowed(ctx, r, &ladon.Request{
-		Resource: fmt.Sprintf("rn:hydra:policies:%s", ps.ByName("id")),
+		Resource: fmt.Sprintf(PoliciesResource, ps.ByName("id")),
 		Action:   "get",
-	}, "hydra.policies.get"); err != nil {
+	}, Scope); err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
 	}
@@ -96,16 +103,17 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	ctx := herodot.NewContext()
+	id := ps.ByName("id")
 
 	if _, err := h.W.HTTPActionAllowed(ctx, r, &ladon.Request{
-		Resource: fmt.Sprintf("rn:hydra:policies:%s", ps.ByName("id")),
+		Resource: fmt.Sprintf(PoliciesResource, id),
 		Action:   "get",
-	}, "hydra.policies.delete"); err != nil {
+	}, Scope); err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
 	}
 
-	if err := h.Manager.Delete(ps.ByName("id")); err != nil {
+	if err := h.Manager.Delete(id); err != nil {
 		h.H.WriteError(ctx, w, r, errors.New("Could not delete client"))
 		return
 	}

@@ -15,7 +15,9 @@ type HTTPManager struct {
 
 // Create persists the policy.
 func (m *HTTPManager) Create(policy ladon.Policy) error {
-	if err := pkg.NewSuperAgent(m.Endpoint.String()).POST(policy); err != nil {
+	var r = pkg.NewSuperAgent(m.Endpoint.String())
+	r.Client = m.Client
+	if err := r.POST(policy); err != nil {
 		return nil
 	}
 
@@ -25,7 +27,9 @@ func (m *HTTPManager) Create(policy ladon.Policy) error {
 // Get retrieves a policy.
 func (m *HTTPManager) Get(id string) (ladon.Policy, error) {
 	var policy ladon.DefaultPolicy
-	if err := pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, id).String()).GET(&policy); err != nil {
+	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, id).String())
+	r.Client = m.Client
+	if err := r.GET(&policy); err != nil {
 		return nil, err
 	}
 
@@ -35,7 +39,9 @@ func (m *HTTPManager) Get(id string) (ladon.Policy, error) {
 
 // Delete removes a policy.
 func (m *HTTPManager) Delete(id string) error {
-	if err := pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, id).String()).DELETE(); err != nil {
+	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, id).String())
+	r.Client = m.Client
+	if err := r.DELETE(); err != nil {
 		return err
 	}
 	return nil
@@ -44,7 +50,9 @@ func (m *HTTPManager) Delete(id string) error {
 // Finds all policies associated with the subject.
 func (m *HTTPManager) FindPoliciesForSubject(subject string) (ladon.Policies, error) {
 	var policies []*ladon.DefaultPolicy
-	if err := pkg.NewSuperAgent(m.Endpoint.String() + "?subject=" + subject).GET(&policies); err != nil {
+	var r = pkg.NewSuperAgent(m.Endpoint.String() + "?subject=" + subject)
+	r.Client = m.Client
+	if err := r.GET(&policies); err != nil {
 		return nil, err
 	}
 

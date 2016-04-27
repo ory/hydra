@@ -14,24 +14,24 @@ import (
 )
 
 func RequireError(t *testing.T, expectError bool, err error, args ...interface{}) {
-	require.Equal(t, expectError, err != nil)
 	if err != nil && !expectError {
 		t.Logf("Unexpected error: %s\n", err.Error())
-		t.Logf("Args error: %v\n", args)
+		t.Logf("Arguments: %v\n", args)
 		if e, ok := err.(*errors.Error); !ok {
-			t.Logf("Stack trace: %s\n", e.ErrorStack())
+			t.Logf("Stack:\n%s\n", e.ErrorStack())
 		}
 		t.Logf("\n\n")
 	}
+	require.Equal(t, expectError, err != nil)
 }
 
 func AssertError(t *testing.T, expectError bool, err error, args ...interface{}) {
 	assert.Equal(t, expectError, err != nil)
 	if err != nil && !expectError {
 		t.Logf("Unexpected error: %s\n", err.Error())
-		t.Logf("Args error: %s\n", args)
+		t.Logf("Arguments: %s\n", args)
 		if e, ok := err.(*errors.Error); ok {
-			t.Logf("Stack trace: %s\n", e.ErrorStack())
+			t.Logf("Stack:\n%s\n", e.ErrorStack())
 		}
 		t.Logf("\n\n")
 	}

@@ -1,4 +1,4 @@
-package client
+package warden
 
 import (
 	"net/http"
@@ -8,7 +8,6 @@ import (
 	"github.com/ory-am/fosite/handler/core"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/oauth2"
-	. "github.com/ory-am/hydra/warden"
 	"github.com/ory-am/ladon"
 	"golang.org/x/net/context"
 )

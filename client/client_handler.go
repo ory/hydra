@@ -1,4 +1,4 @@
-package server
+package client
 
 import (
 	"encoding/json"
@@ -9,13 +9,12 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/common/rand/sequence"
 	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/ladon"
 )
 
-type OAuth2Client struct {
-	Manager oauth2.ClientManager
+type ClientHandler struct {
+	Manager ClientManager
 	H       herodot.Herodot
 	W       warden.Warden
 }
@@ -27,16 +26,17 @@ const (
 const (
 	ClientsResource = "rn:hydra:clients"
 	ClientResource  = "rn:hydra:clients:%s"
+	Scope = "hydra.clients"
 )
 
-func (h *OAuth2Client) SetRoutes(r *httprouter.Router) {
+func (h *ClientHandler) SetRoutes(r *httprouter.Router) {
 	r.POST(ClientsHandlerPath, h.Create)
 	r.GET(ClientsHandlerPath+"/:id", h.Get)
 	r.DELETE(ClientsHandlerPath+"/:id", h.Delete)
 }
 
-func (h *OAuth2Client) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var c oauth2.OAuth2Client
+func (h *ClientHandler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	var c Client
 	var ctx = herodot.NewContext()
 
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
@@ -50,7 +50,7 @@ func (h *OAuth2Client) Create(w http.ResponseWriter, r *http.Request, _ httprout
 		Context: ladon.Context{
 			"owner": c.Owner,
 		},
-	}, "hydra.oauth2.clients"); err != nil {
+	}, Scope); err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
 	}
@@ -70,14 +70,14 @@ func (h *OAuth2Client) Create(w http.ResponseWriter, r *http.Request, _ httprout
 	h.H.WriteCreated(ctx, w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
-func (h *OAuth2Client) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *ClientHandler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var ctx = herodot.NewContext()
 	var id = ps.ByName("id")
 
 	if _, err := h.W.HTTPActionAllowed(ctx, r, &ladon.Request{
 		Resource: fmt.Sprintf(ClientResource, id),
 		Action:   "get",
-	}, "hydra.oauth2.clients"); err != nil {
+	}, Scope); err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
 	}
@@ -91,14 +91,14 @@ func (h *OAuth2Client) Get(w http.ResponseWriter, r *http.Request, ps httprouter
 	h.H.Write(ctx, w, r, c)
 }
 
-func (h *OAuth2Client) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *ClientHandler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var ctx = herodot.NewContext()
 	var id = ps.ByName("id")
 
 	if _, err := h.W.HTTPActionAllowed(ctx, r, &ladon.Request{
 		Resource: fmt.Sprintf(ClientResource, id),
 		Action:   "delete",
-	}, "hydra.oauth2.clients"); err != nil {
+	}, Scope); err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
 	}

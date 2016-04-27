@@ -2,7 +2,6 @@ package warden
 
 import (
 	"net/http"
-
 	"time"
 
 	"github.com/ory-am/ladon"

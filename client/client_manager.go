@@ -1,4 +1,4 @@
-package oauth2
+package client
 
 import (
 	"github.com/ory-am/fosite"
@@ -7,13 +7,13 @@ import (
 type ClientManager interface {
 	ClientStorage
 
-	Authenticate(id string, secret []byte) (*OAuth2Client, error)
+	Authenticate(id string, secret []byte) (*Client, error)
 }
 
 type ClientStorage interface {
 	fosite.Storage
 
-	CreateClient(c *OAuth2Client) error
+	CreateClient(c *Client) error
 
 	DeleteClient(id string) error
 }

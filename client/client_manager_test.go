@@ -1,22 +1,22 @@
-package oauth2_test
+package client_test
 
 import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
 	"time"
+
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/fosite/client"
+	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/handler/core"
 	"github.com/ory-am/hydra/herodot"
+	. "github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/pkg"
-	"github.com/ory-am/hydra/server"
-	wcl "github.com/ory-am/hydra/warden/client"
+	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/ladon"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2"
-	"github.com/ory-am/fosite"
-	. "github.com/ory-am/hydra/oauth2"
+	ioa2 "github.com/ory-am/hydra/oauth2"
 )
 
 var clientManagers = map[string]ClientStorage{}
@@ -33,7 +33,7 @@ var ladonWarden = pkg.LadonWarden(map[string]ladon.Policy{
 	},
 })
 
-var warden = &wcl.LocalWarden{
+var localWarden = &warden.LocalWarden{
 	Warden: ladonWarden,
 	TokenValidator: &core.CoreValidator{
 		AccessTokenStrategy: pkg.HMACStrategy,
@@ -49,23 +49,23 @@ var tokens = pkg.Tokens(1)
 var httpClientManager *HTTPClientManager
 
 func init() {
-	ar := fosite.NewAccessRequest(&Session{Subject: "alice"})
-	ar.GrantedScopes = fosite.Arguments{"hydra.oauth2.clients"}
+	ar := fosite.NewAccessRequest(&ioa2.Session{Subject: "alice"})
+	ar.GrantedScopes = fosite.Arguments{Scope}
 	fositeStore.CreateAccessTokenSession(nil, tokens[0][0], ar)
 
-	clientManagers["memory"] = &MemoryClientManager{Clients: map[string]*OAuth2Client{}}
+	clientManagers["memory"] = &MemoryClientManager{Clients: map[string]*Client{}}
 
-	s := server.OAuth2Client{
-		Manager: &MemoryClientManager{Clients: map[string]*OAuth2Client{}},
+	s := &ClientHandler{
+		Manager: &MemoryClientManager{Clients: map[string]*Client{}},
 		H:       &herodot.JSON{},
-		W:       warden,
+		W:       localWarden,
 	}
 	r := httprouter.New()
 	s.SetRoutes(r)
 	ts = httptest.NewServer(r)
 	conf := &oauth2.Config{Scopes: []string{}, Endpoint: oauth2.Endpoint{}}
 
-	u, _ := url.Parse(ts.URL + "/clients")
+	u, _ := url.Parse(ts.URL + ClientsHandlerPath)
 	clientManagers["http"] = &HTTPClientManager{
 		Client: conf.Client(oauth2.NoContext, &oauth2.Token{
 			AccessToken: tokens[0][1],
@@ -77,8 +77,8 @@ func init() {
 }
 
 func TestAuthenticateClient(t *testing.T) {
-	var mem = &MemoryClientManager{Clients: map[string]*OAuth2Client{}}
-	mem.CreateClient(&OAuth2Client{
+	var mem = &MemoryClientManager{Clients: map[string]*Client{}}
+	mem.CreateClient(&Client{
 		ID:           "1234",
 		Secret:       []byte("secret"),
 		RedirectURIs: []string{"http://redirect"},
@@ -97,7 +97,7 @@ func TestCreateGetDeleteClient(t *testing.T) {
 		_, err := m.GetClient("4321")
 		pkg.AssertError(t, true, err, k)
 
-		c := &OAuth2Client{
+		c := &Client{
 			ID:           "1234",
 			Secret:       []byte("secret"),
 			RedirectURIs: []string{"http://redirect"},
@@ -122,7 +122,7 @@ func TestCreateGetDeleteClient(t *testing.T) {
 	}
 }
 
-func compare(t *testing.T, c client.Client, k string) {
+func compare(t *testing.T, c fosite.Client, k string) {
 	assert.Equal(t, c.GetID(), "1234", "%s", k)
 	assert.NotEmpty(t, c.GetHashedSecret(), "%s", k)
 	assert.Equal(t, c.GetRedirectURIs(), []string{"http://redirect"}, "%s", k)

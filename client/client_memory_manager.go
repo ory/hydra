@@ -1,19 +1,19 @@
-package oauth2
+package client
 
 import (
 	"bytes"
 
 	"github.com/go-errors/errors"
-	"github.com/ory-am/fosite/client"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
+	"github.com/ory-am/fosite"
 )
 
 type MemoryClientManager struct {
-	Clients map[string]*OAuth2Client
+	Clients map[string]*Client
 }
 
-func (m *MemoryClientManager) GetClient(id string) (client.Client, error) {
+func (m *MemoryClientManager) GetClient(id string) (fosite.Client, error) {
 	c, ok := m.Clients[id]
 	if !ok {
 		return nil, errors.New(pkg.ErrNotFound)
@@ -21,7 +21,7 @@ func (m *MemoryClientManager) GetClient(id string) (client.Client, error) {
 	return c, nil
 }
 
-func (m *MemoryClientManager) Authenticate(id string, secret []byte) (*OAuth2Client, error) {
+func (m *MemoryClientManager) Authenticate(id string, secret []byte) (*Client, error) {
 	c, ok := m.Clients[id]
 	if !ok {
 		return nil, errors.New(pkg.ErrNotFound)
@@ -34,7 +34,7 @@ func (m *MemoryClientManager) Authenticate(id string, secret []byte) (*OAuth2Cli
 	return c, nil
 }
 
-func (m *MemoryClientManager) CreateClient(c *OAuth2Client) error {
+func (m *MemoryClientManager) CreateClient(c *Client) error {
 	if c.ID == "" {
 		c.ID = uuid.New()
 	}

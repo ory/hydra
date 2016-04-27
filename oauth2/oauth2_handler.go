@@ -1,4 +1,4 @@
-package server
+package oauth2
 
 import (
 	"net/http"
@@ -9,13 +9,12 @@ import (
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/enigma/jwt"
 	"github.com/ory-am/hydra/identity"
-	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
 )
 
 type Handler struct {
 	fosite           fosite.OAuth2Provider
-	consentValidator oauth2.ConsentValidator
+	consentValidator ConsentStrategy
 	identities       identity.IdentityProviderRegistry
 	jwtGenerator     jwt.Enigma
 
@@ -32,7 +31,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 }
 
 func (o *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var session oauth2.Session
+	var session Session
 	var ctx = fosite.NewContext()
 
 	accessRequest, err := o.fosite.NewAccessRequest(ctx, r, &session)
@@ -70,7 +69,7 @@ func (o *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 
 	// decode consent_token claims
 	// verify anti-CSRF (inject state) and anti-replay token (expiry time, good value would be 10 seconds)
-	session, err := o.consentValidator.ValidateConsentToken(authorizeRequest, consentToken)
+	session, err := o.consentValidator.ValidateResponseToken(authorizeRequest, consentToken)
 	if err != nil {
 		o.fosite.WriteAuthorizeError(w, authorizeRequest, errors.New(fosite.ErrAccessDenied))
 		return

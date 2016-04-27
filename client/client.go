@@ -1,20 +1,20 @@
-package oauth2
+package client
 
-type OAuth2Client struct {
+type Client struct {
 	ID           string   `json:"id"`
 	Secret       []byte   `json:"secret"`
 	RedirectURIs []string `json:"redirectURIs"`
 	Owner        string   `json:"owner"`
 }
 
-func (c *OAuth2Client) GetID() string {
+func (c *Client) GetID() string {
 	return c.ID
 }
 
-func (c *OAuth2Client) GetRedirectURIs() []string {
+func (c *Client) GetRedirectURIs() []string {
 	return c.RedirectURIs
 }
 
-func (c *OAuth2Client) GetHashedSecret() []byte {
+func (c *Client) GetHashedSecret() []byte {
 	return c.Secret
 }

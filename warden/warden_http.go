@@ -1,4 +1,4 @@
-package client
+package warden
 
 import (
 	"bytes"
@@ -9,8 +9,6 @@ import (
 
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/pkg"
-	"github.com/ory-am/hydra/server"
-	. "github.com/ory-am/hydra/warden"
 	"github.com/ory-am/ladon"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
@@ -28,9 +26,9 @@ func (w *HTTPWarden) SetClient(c *clientcredentials.Config) {
 }
 
 func (w *HTTPWarden) ActionAllowed(ctx context.Context, token string, a *ladon.Request, scopes ...string) (*Context, error) {
-	return w.doRequest(server.AllowedHandlerPath, &server.WardenAccessRequest{
+	return w.doRequest(AllowedHandlerPath, &WardenAccessRequest{
 		Request: a,
-		WardenAuthorizedRequest: &server.WardenAuthorizedRequest{
+		WardenAuthorizedRequest: &WardenAuthorizedRequest{
 			InspectToken: token,
 			Scopes:       scopes,
 		},
@@ -38,7 +36,7 @@ func (w *HTTPWarden) ActionAllowed(ctx context.Context, token string, a *ladon.R
 }
 
 func (w *HTTPWarden) HTTPActionAllowed(ctx context.Context, r *http.Request, a *ladon.Request, scopes ...string) (*Context, error) {
-	token := server.TokenFromRequest(r)
+	token := TokenFromRequest(r)
 	if token == "" {
 		return nil, errors.New(pkg.ErrUnauthorized)
 	}
@@ -47,14 +45,14 @@ func (w *HTTPWarden) HTTPActionAllowed(ctx context.Context, r *http.Request, a *
 }
 
 func (w *HTTPWarden) Authorized(ctx context.Context, token string, scopes ...string) (*Context, error) {
-	return w.doRequest(server.AuthorizedHandlerPath, &server.WardenAuthorizedRequest{
+	return w.doRequest(AuthorizedHandlerPath, &WardenAuthorizedRequest{
 		InspectToken: token,
 		Scopes:       scopes,
 	})
 }
 
 func (w *HTTPWarden) HTTPAuthorized(ctx context.Context, r *http.Request, scopes ...string) (*Context, error) {
-	token := server.TokenFromRequest(r)
+	token := TokenFromRequest(r)
 	if token == "" {
 		return nil, errors.New(pkg.ErrUnauthorized)
 	}
@@ -68,16 +66,15 @@ func (w *HTTPWarden) doRequest(path string, request interface{}) (*Context, erro
 		return nil, errors.New(err)
 	}
 
-	var ep = &url.URL{}
+	var ep = new(url.URL)
 	*ep = *w.Endpoint
 	ep.Path = path
-
 	req, err := http.NewRequest("POST", ep.String(), bytes.NewBuffer(out))
 	if err != nil {
 		return nil, errors.New(err)
 	}
-	req.Header.Set("Content-Type", "application/json")
 
+	req.Header.Set("Content-Type", "application/json")
 	resp, err := w.Client.Do(req)
 	if err != nil {
 		return nil, errors.New(err)
@@ -89,12 +86,11 @@ func (w *HTTPWarden) doRequest(path string, request interface{}) (*Context, erro
 		if err != nil {
 			return nil, errors.New(err)
 		}
-		defer resp.Body.Close()
+
 		return nil, errors.Errorf("Got error (%d): %s", resp.StatusCode, all)
 	}
-	defer resp.Body.Close()
 
-	var epResp server.WardenResponse
+	var epResp WardenResponse
 	if err := json.NewDecoder(resp.Body).Decode(&epResp); err != nil {
 		return nil, errors.New(err)
 	}

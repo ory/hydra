@@ -1,4 +1,4 @@
-package client_test
+package warden_test
 
 import (
 	"log"
@@ -14,9 +14,7 @@ import (
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
-	"github.com/ory-am/hydra/server"
 	"github.com/ory-am/hydra/warden"
-	"github.com/ory-am/hydra/warden/client"
 	"github.com/ory-am/ladon"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
@@ -52,7 +50,7 @@ var fositeStore = pkg.FositeStore()
 var tokens = pkg.Tokens(2)
 
 func init() {
-	wardens["local"] = &client.LocalWarden{
+	wardens["local"] = &warden.LocalWarden{
 		Warden: ladonWarden,
 		TokenValidator: &core.CoreValidator{
 			AccessTokenStrategy: pkg.HMACStrategy,
@@ -62,7 +60,7 @@ func init() {
 	}
 
 	r := httprouter.New()
-	serv := &server.Warden{
+	serv := &warden.WardenHandler{
 		Ladon:  ladonWarden,
 		H:      &herodot.JSON{},
 		Warden: wardens["local"],
@@ -70,7 +68,7 @@ func init() {
 	serv.SetRoutes(r)
 	ts = httptest.NewServer(r)
 
-	url, err := url.Parse(ts.URL + server.AllowedHandlerPath)
+	url, err := url.Parse(ts.URL + warden.AllowedHandlerPath)
 	if err != nil {
 		log.Fatalf("%s", err)
 	}
@@ -87,7 +85,7 @@ func init() {
 		Scopes:   []string{},
 		Endpoint: coauth2.Endpoint{},
 	}
-	wardens["http"] = &client.HTTPWarden{
+	wardens["http"] = &warden.HTTPWarden{
 		Endpoint: url,
 		Client: conf.Client(coauth2.NoContext, &coauth2.Token{
 			AccessToken: tokens[1][1],

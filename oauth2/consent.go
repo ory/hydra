@@ -6,6 +6,7 @@ type Session struct {
 	Subject string `json:"sub"`
 }
 
-type ConsentValidator interface {
-	ValidateConsentToken(authorizeRequest fosite.AuthorizeRequester, token string) (claims *Session, err error)
+type ConsentStrategy interface {
+	ValidateResponseToken(authorizeRequest fosite.AuthorizeRequester, token string) (claims *Session, err error)
+	IssueRequestToken(authorizeRequest fosite.AuthorizeRequester) (token string, err error)
 }

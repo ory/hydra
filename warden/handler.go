@@ -1,4 +1,4 @@
-package server
+package warden
 
 import (
 	"encoding/json"
@@ -8,24 +8,23 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/ladon"
 	"golang.org/x/net/context"
 )
 
 const (
 	AuthorizedHandlerPath = "/warden/authorized"
-	AllowedHandlerPath    = "/warden/allowed"
+	AllowedHandlerPath = "/warden/allowed"
 )
 
-type Warden struct {
+type WardenHandler struct {
 	H      herodot.Herodot
-	Warden warden.Warden
+	Warden Warden
 	Ladon  ladon.Warden
 }
 
 type WardenResponse struct {
-	*warden.Context
+	*Context
 }
 
 type WardenAuthorizedRequest struct {
@@ -38,12 +37,12 @@ type WardenAccessRequest struct {
 	*WardenAuthorizedRequest
 }
 
-func (h *Warden) SetRoutes(r *httprouter.Router) {
+func (h *WardenHandler) SetRoutes(r *httprouter.Router) {
 	r.POST(AuthorizedHandlerPath, h.Authorized)
 	r.POST(AllowedHandlerPath, h.Allowed)
 }
 
-func (h *Warden) Authorized(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *WardenHandler) Authorized(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := herodot.NewContext()
 	clientCtx, err := h.authorizeClient(ctx, w, r, "an:hydra:warden:authorized")
 	if err != nil {
@@ -69,7 +68,7 @@ func (h *Warden) Authorized(w http.ResponseWriter, r *http.Request, _ httprouter
 
 }
 
-func (h *Warden) Allowed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *WardenHandler) Allowed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := herodot.NewContext()
 	clientCtx, err := h.authorizeClient(ctx, w, r, "an:hydra:warden:allowed")
 	if err != nil {
@@ -93,7 +92,7 @@ func (h *Warden) Allowed(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	h.H.Write(ctx, w, r, authContext)
 }
 
-func (h *Warden) authorizeClient(ctx context.Context, w http.ResponseWriter, r *http.Request, action string) (*warden.Context, error) {
+func (h *WardenHandler) authorizeClient(ctx context.Context, w http.ResponseWriter, r *http.Request, action string) (*Context, error) {
 	authctx, err := h.Warden.ActionAllowed(ctx, TokenFromRequest(r), &ladon.Request{
 		Action: action,
 	}, "hydra.warden")

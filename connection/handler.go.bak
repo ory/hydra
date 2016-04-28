@@ -3,7 +3,7 @@
 // Defined permissions:
 // * permission("rn:hydra:oauth2:connections") actions("create", "get")
 // * permission("rn:hydra:oauth2:connections:%s", id) actions("get", "delete")
-package handler
+package connection
 
 import (
 	"encoding/json"

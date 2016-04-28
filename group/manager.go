@@ -6,10 +6,10 @@ type Group struct {
 	Policies []string `json:"policies"`
 }
 
-type Groups map[string]Group
+type Groups map[string]*Group
 
 type Manager interface {
-	GetGroup(id string) (Groups, error)
+	GetGroup(id string) (Group, error)
 
 	JoinGroup(user, group string) error
 

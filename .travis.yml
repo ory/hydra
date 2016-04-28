@@ -16,9 +16,8 @@ install:
   - go get github.com/axw/gocov/gocov
   - go get github.com/mattn/goveralls
   - go get golang.org/x/tools/cmd/cover
-  - go get github.com/golang/lint/golint
   - go get github.com/pierrre/gotestcover
-  - go get -t $(go list ./... | grep -v /vendor/)
+  # - go get github.com/golang/lint/golint
 
 script:
   - go vet -x $(go list ./... | grep -v /vendor/)

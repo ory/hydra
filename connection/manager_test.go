@@ -30,39 +30,12 @@ var managers = map[string]connection.Manager{}
 var containers = []dockertest.ContainerID{}
 
 func TestMain(m *testing.M) {
-	setupPG()
-
 	retCode := m.Run()
 	for _, c := range containers {
 		c.KillRemove()
 	}
 
 	os.Exit(retCode)
-}
-
-func setupPG() {
-	var db *sql.DB
-	var err error
-
-	c, err := dockertest.ConnectToPostgreSQL(15, time.Second, func(url string) bool {
-		db, err = sql.Open("postgres", url)
-		if err != nil {
-			return false
-		}
-		return db.Ping() == nil
-	})
-	if err != nil {
-		log.Fatalf("Could not connect to database: %s", err)
-	}
-
-	containers = append(containers, c)
-
-	m := &postgres.Manager{DB: db}
-	if err = m.CreateSchemas(); err != nil {
-		log.Fatalf("Could not create tables: %v", err)
-	}
-
-	managers["postgres"] = m
 }
 
 func TestNotFound(t *testing.T) {

@@ -13,14 +13,11 @@ import (
 )
 
 type Handler struct {
-	fosite           fosite.OAuth2Provider
-	consentValidator ConsentStrategy
-	identities       identity.IdentityProviderRegistry
-	jwtGenerator     jwt.Enigma
+	OAuth2     fosite.OAuth2Provider
+	Consent    ConsentStrategy
 
-	SelfURL         *url.URL
-	ConsentURL      *url.URL
-	ErrorHandlerURL *url.URL
+	SelfURL    *url.URL
+	ConsentURL *url.URL
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
@@ -34,29 +31,30 @@ func (o *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprou
 	var session Session
 	var ctx = fosite.NewContext()
 
-	accessRequest, err := o.fosite.NewAccessRequest(ctx, r, &session)
+	accessRequest, err := o.OAuth2.NewAccessRequest(ctx, r, &session)
 	if err != nil {
 		pkg.LogError(errors.New(err))
-		o.fosite.WriteAccessError(w, accessRequest, err)
+		o.OAuth2.WriteAccessError(w, accessRequest, err)
 		return
 	}
 
-	accessResponse, err := o.fosite.NewAccessResponse(ctx, r, accessRequest)
+	accessResponse, err := o.OAuth2.NewAccessResponse(ctx, r, accessRequest)
 	if err != nil {
 		pkg.LogError(errors.New(err))
-		o.fosite.WriteAccessError(w, accessRequest, err)
+		o.OAuth2.WriteAccessError(w, accessRequest, err)
 		return
 	}
 
-	o.fosite.WriteAccessResponse(w, accessRequest, accessResponse)
+	o.OAuth2.WriteAccessResponse(w, accessRequest, accessResponse)
 }
 
 func (o *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = fosite.NewContext()
-	authorizeRequest, err := o.fosite.NewAuthorizeRequest(ctx, r)
+
+	authorizeRequest, err := o.OAuth2.NewAuthorizeRequest(ctx, r)
 	if err != nil {
 		pkg.LogError(errors.New(err))
-		o.fosite.WriteAuthorizeError(w, authorizeRequest, err)
+		o.writeAuthorizeError(w, authorizeRequest, err)
 		return
 	}
 
@@ -65,29 +63,31 @@ func (o *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	if consentToken == "" {
 		// otherwise redirect to log in endpoint
 		o.redirectToConsent(w, r, authorizeRequest, "")
+		return
 	}
 
 	// decode consent_token claims
 	// verify anti-CSRF (inject state) and anti-replay token (expiry time, good value would be 10 seconds)
-	session, err := o.consentValidator.ValidateResponseToken(authorizeRequest, consentToken)
+	session, err := o.Consent.ValidateResponseToken(authorizeRequest, consentToken)
 	if err != nil {
-		o.fosite.WriteAuthorizeError(w, authorizeRequest, errors.New(fosite.ErrAccessDenied))
+		pkg.LogError(errors.New(err))
+		o.writeAuthorizeError(w, authorizeRequest, errors.New(fosite.ErrAccessDenied))
 		return
 	}
 
 	// done
-	response, err := o.fosite.NewAuthorizeResponse(ctx, r, authorizeRequest, session)
+	response, err := o.OAuth2.NewAuthorizeResponse(ctx, r, authorizeRequest, session)
 	if err != nil {
 		pkg.LogError(errors.New(err))
-		o.fosite.WriteAuthorizeError(w, authorizeRequest, err)
+		o.writeAuthorizeError(w, authorizeRequest, err)
 		return
 	}
 
-	o.fosite.WriteAuthorizeResponse(w, authorizeRequest, response)
+	o.OAuth2.WriteAuthorizeResponse(w, authorizeRequest, response)
 }
 
 func (o *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, authorizeRequest fosite.AuthorizeRequester, authenticationToken string) error {
-	var p *url.URL
+	var p = new(url.URL)
 	*p = *o.ConsentURL
 
 	q := p.Query()
@@ -101,12 +101,31 @@ func (o *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, auth
 		q.Set("authentication_token", authenticationToken)
 	}
 
-	var selfURL *url.URL
+	var selfURL = new(url.URL)
 	*selfURL = *o.SelfURL
-	selfURL.Path = "/auth"
+	selfURL.Path = "/oauth2/auth"
 
 	q.Set("redirect_uri", selfURL.String())
 	http.Redirect(w, r, p.String(), http.StatusFound)
 
 	return nil
+}
+
+func (o *Handler) writeAuthorizeError(w http.ResponseWriter, ar fosite.AuthorizeRequester, err error) {
+	if !ar.IsRedirectURIValid() {
+		var rfcerr = fosite.ErrorToRFC6749Error(err)
+		var redirectURI = new(url.URL)
+		*redirectURI = *o.ConsentURL
+
+		query := redirectURI.Query()
+		query.Add("error", rfcerr.Name)
+		query.Add("error_description", rfcerr.Description)
+		redirectURI.RawQuery = query.Encode()
+
+		w.Header().Add("Location", redirectURI.String())
+		w.WriteHeader(http.StatusFound)
+		return
+	}
+
+	o.OAuth2.WriteAuthorizeError(w, ar, err)
 }

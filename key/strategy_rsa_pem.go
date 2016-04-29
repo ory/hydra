@@ -5,10 +5,11 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
+
 	"github.com/go-errors/errors"
 )
 
-type RSAPEMStrategy struct {}
+type RSAPEMStrategy struct{}
 
 func (s *RSAPEMStrategy) AsymmetricKey(id string) (*AsymmetricKey, error) {
 	priv, err := rsa.GenerateKey(rand.Reader, 1024)
@@ -17,7 +18,7 @@ func (s *RSAPEMStrategy) AsymmetricKey(id string) (*AsymmetricKey, error) {
 	}
 
 	if err = priv.Validate(); err != nil {
-		return  nil,errors.Errorf("Validation failed because %s", err)
+		return nil, errors.Errorf("Validation failed because %s", err)
 	}
 
 	privDer := x509.MarshalPKCS1PrivateKey(priv)
@@ -30,7 +31,7 @@ func (s *RSAPEMStrategy) AsymmetricKey(id string) (*AsymmetricKey, error) {
 	pub := priv.PublicKey
 	pubDer, err := x509.MarshalPKIXPublicKey(&pub)
 	if err != nil {
-		return  nil, errors.Errorf("Failed to get der format for PublicKey because %s", err)
+		return nil, errors.Errorf("Failed to get der format for PublicKey because %s", err)
 	}
 
 	pubBlk := pem.Block{
@@ -40,8 +41,8 @@ func (s *RSAPEMStrategy) AsymmetricKey(id string) (*AsymmetricKey, error) {
 	}
 
 	return &AsymmetricKey{
-		ID: id,
+		ID:      id,
 		Private: pem.EncodeToMemory(&privBlk),
-		Public: pem.EncodeToMemory(&pubBlk),
+		Public:  pem.EncodeToMemory(&pubBlk),
 	}, nil
 }

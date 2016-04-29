@@ -4,9 +4,9 @@ import (
 	"bytes"
 
 	"github.com/go-errors/errors"
+	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
-	"github.com/ory-am/fosite"
 )
 
 type MemoryClientManager struct {

@@ -29,7 +29,7 @@ func (m *HTTPClientManager) CreateClient(c *Client) error {
 	var r = pkg.NewSuperAgent(m.Endpoint.String())
 	r.Client = m.Client
 	if err := r.POST(c); err != nil {
-		return  nil
+		return nil
 	}
 
 	return nil

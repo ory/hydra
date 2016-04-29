@@ -1,15 +1,11 @@
 package connection_test
 
 import (
-	"database/sql"
-	"log"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/ory-am/common/pkg"
 	"github.com/ory-am/hydra/connection"
-	"github.com/ory-am/hydra/connection/postgres"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

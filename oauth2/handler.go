@@ -7,14 +7,12 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
-	"github.com/ory-am/fosite/enigma/jwt"
-	"github.com/ory-am/hydra/identity"
 	"github.com/ory-am/hydra/pkg"
 )
 
 type Handler struct {
-	OAuth2     fosite.OAuth2Provider
-	Consent    ConsentStrategy
+	OAuth2  fosite.OAuth2Provider
+	Consent ConsentStrategy
 
 	SelfURL    *url.URL
 	ConsentURL *url.URL
@@ -62,13 +60,13 @@ func (o *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	consentToken := authorizeRequest.GetRequestForm().Get("consent_token")
 	if consentToken == "" {
 		// otherwise redirect to log in endpoint
-		o.redirectToConsent(w, r, authorizeRequest, "")
+		o.redirectToConsent(w, r, authorizeRequest)
 		return
 	}
 
 	// decode consent_token claims
 	// verify anti-CSRF (inject state) and anti-replay token (expiry time, good value would be 10 seconds)
-	session, err := o.Consent.ValidateResponseToken(authorizeRequest, consentToken)
+	session, err := o.Consent.ValidateResponse(authorizeRequest, consentToken)
 	if err != nil {
 		pkg.LogError(errors.New(err))
 		o.writeAuthorizeError(w, authorizeRequest, errors.New(fosite.ErrAccessDenied))
@@ -86,28 +84,18 @@ func (o *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	o.OAuth2.WriteAuthorizeResponse(w, authorizeRequest, response)
 }
 
-func (o *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, authorizeRequest fosite.AuthorizeRequester, authenticationToken string) error {
+func (o *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, authorizeRequest fosite.AuthorizeRequester) error {
+	challenge, err := o.Consent.IssueChallenge(authorizeRequest, o.SelfURL.String())
+	if err != nil {
+		return err
+	}
+
 	var p = new(url.URL)
 	*p = *o.ConsentURL
-
 	q := p.Query()
-	q.Set("client_id", authorizeRequest.GetClient().GetID())
-	q.Set("state", authorizeRequest.GetState())
-	for _, scope := range authorizeRequest.GetScopes() {
-		q.Add("scope", scope)
-	}
-
-	if authenticationToken != "" {
-		q.Set("authentication_token", authenticationToken)
-	}
-
-	var selfURL = new(url.URL)
-	*selfURL = *o.SelfURL
-	selfURL.Path = "/oauth2/auth"
-
-	q.Set("redirect_uri", selfURL.String())
+	q.Set("challenge", challenge)
+	p.RawQuery = q.Encode()
 	http.Redirect(w, r, p.String(), http.StatusFound)
-
 	return nil
 }
 

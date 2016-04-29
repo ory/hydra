@@ -1,10 +1,11 @@
 package policy
 
 import (
-	"github.com/ory-am/ladon"
-	"net/url"
 	"net/http"
+	"net/url"
+
 	"github.com/ory-am/hydra/pkg"
+	"github.com/ory-am/ladon"
 )
 
 type HTTPManager struct {
@@ -56,11 +57,11 @@ func (m *HTTPManager) FindPoliciesForSubject(subject string) (ladon.Policies, er
 		return nil, err
 	}
 
-	return func (ps []*ladon.DefaultPolicy) (r ladon.Policies) {
+	return func(ps []*ladon.DefaultPolicy) (r ladon.Policies) {
 		r = make(ladon.Policies, len(ps))
 		for k, p := range ps {
 			r[k] = ladon.Policy(p)
 		}
 		return r
-	} (policies) , nil
+	}(policies), nil
 }

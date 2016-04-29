@@ -14,9 +14,9 @@ import (
 )
 
 const (
-	Endpoint = "/policies"
-	Scope = "hydra.policies.search"
-	PolicyResource = "rn:hydra:policies"
+	Endpoint         = "/policies"
+	Scope            = "hydra.policies.search"
+	PolicyResource   = "rn:hydra:policies"
 	PoliciesResource = "rn:hydra:policies:%s"
 )
 

@@ -1,22 +1,23 @@
 package policy
 
 import (
-	"github.com/ory-am/ladon"
-	"testing"
-	"github.com/julienschmidt/httprouter"
 	"net/http/httptest"
-	"github.com/ory-am/ladon/memory"
-	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/hydra/warden"
-	"github.com/ory-am/fosite/handler/core"
-	"github.com/ory-am/hydra/pkg"
 	"net/url"
+	"testing"
 	"time"
-	"golang.org/x/oauth2"
+
+	"github.com/julienschmidt/httprouter"
+	"github.com/ory-am/fosite"
+	"github.com/ory-am/fosite/handler/core"
+	"github.com/ory-am/hydra/herodot"
+	ioa2 "github.com/ory-am/hydra/oauth2"
+	"github.com/ory-am/hydra/pkg"
+	"github.com/ory-am/hydra/warden"
+	"github.com/ory-am/ladon"
+	"github.com/ory-am/ladon/memory"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
-	"github.com/ory-am/fosite"
-	ioa2 "github.com/ory-am/hydra/oauth2"
+	"golang.org/x/oauth2"
 )
 
 var managers = map[string]ladon.Manager{}
@@ -73,7 +74,7 @@ func init() {
 
 func TestManagers(t *testing.T) {
 	p := &ladon.DefaultPolicy{
-		ID: uuid.New(),
+		ID:       uuid.New(),
 		Subjects: []string{"peter", "max"},
 	}
 

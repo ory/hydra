@@ -16,7 +16,7 @@ type TOTP struct {
 }
 
 func (m *TOTP) Generate(subject string) error {
-	key, err := totp.Generate(&totp.GenerateOpts{
+	_, err := totp.Generate(totp.GenerateOpts{
 		// Name of the issuing Organization/Company.
 		Issuer: m.Issuer,
 		// Name of the User's Account (eg, email address)
@@ -27,4 +27,6 @@ func (m *TOTP) Generate(subject string) error {
 	if err != nil {
 		return errors.New(err)
 	}
+
+	return nil
 }

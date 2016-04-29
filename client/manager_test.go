@@ -9,14 +9,14 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/handler/core"
-	"github.com/ory-am/hydra/herodot"
 	. "github.com/ory-am/hydra/client"
+	"github.com/ory-am/hydra/herodot"
+	ioa2 "github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/ladon"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2"
-	ioa2 "github.com/ory-am/hydra/oauth2"
 )
 
 var clientManagers = map[string]ClientStorage{}

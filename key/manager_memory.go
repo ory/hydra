@@ -20,7 +20,7 @@ func (m *MemoryManager) CreateAsymmetricKey(id string) (*AsymmetricKey, error) {
 	return key, nil
 }
 
-func (m *MemoryManager) DeleteAsymmetricKey(id string) (error) {
+func (m *MemoryManager) DeleteAsymmetricKey(id string) error {
 	delete(m.AsymmetricKeys, id)
 	return nil
 }
@@ -45,7 +45,7 @@ func (m *MemoryManager) CreateSymmetricKey(id string) (*SymmetricKey, error) {
 
 }
 
-func (m *MemoryManager) DeleteSymmetricKey(id string) (error) {
+func (m *MemoryManager) DeleteSymmetricKey(id string) error {
 	delete(m.SymmetricKeys, id)
 	return nil
 }

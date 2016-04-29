@@ -10,20 +10,33 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"golang.org/x/oauth2"
 	"net/http"
+	"github.com/ory-am/hydra/key"
 )
 
 var store = pkg.FositeStore()
 
 var handler = &Handler{
 	OAuth2: &fosite.Fosite{
-		Store: &fosite.NewFosite(store),
+		Store: store,
 		MandatoryScope       :       "hydra",
-		AuthorizeEndpointHandlers  : &fosite.AuthorizeEndpointHandlers{},
-		TokenEndpointHandlers      : &fosite.TokenEndpointHandlers{},
-		AuthorizedRequestValidators: &fosite.AuthorizedRequestValidators{},
+		AuthorizeEndpointHandlers  : fosite.AuthorizeEndpointHandlers{},
+		TokenEndpointHandlers      : fosite.TokenEndpointHandlers{},
+		AuthorizedRequestValidators: fosite.AuthorizedRequestValidators{},
 		Hasher                 :     &hash.BCrypt{},
 	},
-	Consent  :  &ConsentStrategy{},
+	Consent  :  &DefaultConsentStrategy{
+		Issuer: "https://hydra.localhost",
+		KeyManager: &key.MemoryManager{
+			AsymmetricKeys: map[string]*key.AsymmetricKey{},
+			SymmetricKeys:  map[string]*key.SymmetricKey{},
+			Strategy: &key.DefaultKeyStrategy{
+				AsymmetricKeyStrategy: &key.RSAPEMStrategy{},
+				SymmetricKeyStrategy:  &key.SHAStrategy{},
+			},
+		},
+		PrivateKey: []byte{},
+		PublicKey: []byte{},
+	},
 }
 
 var r = httprouter.New()
@@ -51,7 +64,7 @@ func TestAuthCode(t *testing.T) {
 	c := oauth2.Config{
 		ClientID: "",
 		ClientSecret: "",
-		Endpoint: &oauth2.Endpoint{
+		Endpoint: oauth2.Endpoint{
 			AuthURL: ts.URL + "/oauth2/auth",
 			TokenURL:ts.URL + "/oauth2/token",
 		},
@@ -60,10 +73,10 @@ func TestAuthCode(t *testing.T) {
 	}
 
 	var token string
-	r.GET("/consent", func(http.ResponseWriter, *http.Request, _ httprouter.Params) {
+	r.GET("/consent", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	})
-	r.GET("/callback", func(http.ResponseWriter, *http.Request, _ httprouter.Params) {
+	r.GET("/callback", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	})
 

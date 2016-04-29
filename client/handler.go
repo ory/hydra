@@ -26,7 +26,7 @@ const (
 const (
 	ClientsResource = "rn:hydra:clients"
 	ClientResource  = "rn:hydra:clients:%s"
-	Scope = "hydra.clients"
+	Scope           = "hydra.clients"
 )
 
 func (h *ClientHandler) SetRoutes(r *httprouter.Router) {

@@ -14,7 +14,7 @@ import (
 
 const (
 	AuthorizedHandlerPath = "/warden/authorized"
-	AllowedHandlerPath = "/warden/allowed"
+	AllowedHandlerPath    = "/warden/allowed"
 )
 
 type WardenHandler struct {

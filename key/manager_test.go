@@ -1,8 +1,9 @@
 package key_test
 
 import (
-	"github.com/ory-am/hydra/key"
 	"testing"
+
+	"github.com/ory-am/hydra/key"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/stretchr/testify/assert"
 )
@@ -10,10 +11,10 @@ import (
 var managers = map[string]key.Manager{
 	"memory": &key.MemoryManager{
 		AsymmetricKeys: map[string]*key.AsymmetricKey{},
-		SymmetricKeys: map[string]*key.SymmetricKey{},
+		SymmetricKeys:  map[string]*key.SymmetricKey{},
 		Strategy: &key.DefaultKeyStrategy{
 			AsymmetricKeyStrategy: &key.RSAPEMStrategy{},
-			SymmetricKeyStrategy: &key.SHAStrategy{},
+			SymmetricKeyStrategy:  &key.SHAStrategy{},
 		},
 	},
 }

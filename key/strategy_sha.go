@@ -1,12 +1,13 @@
 package key
 
 import (
-	"github.com/ory-am/fosite/rand"
-	"github.com/go-errors/errors"
 	"crypto/sha512"
+
+	"github.com/go-errors/errors"
+	"github.com/ory-am/fosite/rand"
 )
 
-type SHAStrategy struct {}
+type SHAStrategy struct{}
 
 func (s *SHAStrategy) SymmetricKey(id string) (*SymmetricKey, error) {
 	key, err := rand.RandomBytes(32)
@@ -16,7 +17,7 @@ func (s *SHAStrategy) SymmetricKey(id string) (*SymmetricKey, error) {
 
 	hash := sha512.New()
 	return &SymmetricKey{
-		ID: id,
+		ID:  id,
 		Key: hash.Sum(key),
 	}, nil
 }

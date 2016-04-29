@@ -1,9 +1,10 @@
 package key
 
 import (
+	"testing"
+
 	"github.com/ory-am/hydra/pkg"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestSHAStrategy(t *testing.T) {

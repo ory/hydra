@@ -13,13 +13,15 @@ import (
 	"github.com/pborman/uuid"
 )
 
+const (
+	ConsentChallengeKey = "consentChallenge"
+	ConsentEndpointKey  = "consentEndpoint"
+)
+
 type DefaultConsentStrategy struct {
 	Issuer string
 
 	KeyManager key.Manager
-
-	PrivateKey []byte
-	PublicKey  []byte
 }
 
 func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, token string) (claims *Session, err error) {
@@ -28,7 +30,7 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 			return nil, errors.Errorf("Unexpected signing method: %v", t.Header["alg"])
 		}
 
-		pk, err := s.KeyManager.GetAsymmetricKey("consent")
+		pk, err := s.KeyManager.GetAsymmetricKey(ConsentEndpointKey)
 		if err != nil {
 			return nil, err
 		}
@@ -78,7 +80,12 @@ func (s *DefaultConsentStrategy) IssueChallenge(authorizeRequest fosite.Authoriz
 		"redir": redirectURL,
 	}
 
-	rsaKey, err := jwt.ParseRSAPrivateKeyFromPEM(s.PrivateKey)
+	key, err := s.KeyManager.GetAsymmetricKey(ConsentChallengeKey)
+	if err != nil {
+		return "", errors.New(err)
+	}
+
+	rsaKey, err := jwt.ParseRSAPrivateKeyFromPEM(key.Private)
 	if err != nil {
 		return "", errors.New(err)
 	}

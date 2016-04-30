@@ -62,11 +62,11 @@ func (h *JSON) WriteErrorCode(ctx context.Context, w http.ResponseWriter, r *htt
 	}
 
 	if e, ok := err.(*Error); ok {
-		h.Logger.WithError(e).WithField("request_id", id).WithField("status", code).WithField("stack", e.Err.ErrorStack())
+		h.Logger.WithError(e).WithField("request_id", id).WithField("status", code).WithField("stack", e.Err.ErrorStack()).Printf("Got error.")
 	} else if e, ok := err.(*errors.Error); ok {
-		h.Logger.WithError(e).WithField("request_id", id).WithField("status", code).WithField("stack", e.ErrorStack())
+		h.Logger.WithError(e).WithField("request_id", id).WithField("status", code).WithField("stack", e.ErrorStack()).Printf("Got error.")
 	} else {
-		h.Logger.WithError(err).WithField("request_id", id).WithField("status", code)
+		h.Logger.WithError(err).WithField("request_id", id).WithField("status", code).Printf("Got error.")
 	}
 
 	if code == 0 {

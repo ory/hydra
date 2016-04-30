@@ -17,7 +17,7 @@ func RequireError(t *testing.T, expectError bool, err error, args ...interface{}
 	if err != nil && !expectError {
 		t.Logf("Unexpected error: %s\n", err.Error())
 		t.Logf("Arguments: %v\n", args)
-		if e, ok := err.(*errors.Error); !ok {
+		if e, ok := err.(*errors.Error); ok {
 			t.Logf("Stack:\n%s\n", e.ErrorStack())
 		}
 		t.Logf("\n\n")

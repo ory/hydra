@@ -14,8 +14,8 @@ type Handler struct {
 	OAuth2  fosite.OAuth2Provider
 	Consent ConsentStrategy
 
-	SelfURL    *url.URL
-	ConsentURL *url.URL
+	SelfURL    url.URL
+	ConsentURL url.URL
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
@@ -51,16 +51,20 @@ func (o *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 
 	authorizeRequest, err := o.OAuth2.NewAuthorizeRequest(ctx, r)
 	if err != nil {
-		pkg.LogError(errors.New(err))
+		pkg.LogError(err)
 		o.writeAuthorizeError(w, authorizeRequest, err)
 		return
 	}
 
 	// A session_token will be available if the user was authenticated an gave consent
-	consentToken := authorizeRequest.GetRequestForm().Get("consent_token")
+	consentToken := authorizeRequest.GetRequestForm().Get("consent")
 	if consentToken == "" {
 		// otherwise redirect to log in endpoint
-		o.redirectToConsent(w, r, authorizeRequest)
+		if err := o.redirectToConsent(w, r, authorizeRequest); err != nil {
+			pkg.LogError(err)
+			o.writeAuthorizeError(w, authorizeRequest, err)
+			return
+		}
 		return
 	}
 
@@ -85,13 +89,12 @@ func (o *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 }
 
 func (o *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, authorizeRequest fosite.AuthorizeRequester) error {
-	challenge, err := o.Consent.IssueChallenge(authorizeRequest, o.SelfURL.String())
+	challenge, err := o.Consent.IssueChallenge(authorizeRequest, r.URL.String())
 	if err != nil {
 		return err
 	}
 
-	var p = new(url.URL)
-	*p = *o.ConsentURL
+	p := o.ConsentURL
 	q := p.Query()
 	q.Set("challenge", challenge)
 	p.RawQuery = q.Encode()
@@ -102,9 +105,8 @@ func (o *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, auth
 func (o *Handler) writeAuthorizeError(w http.ResponseWriter, ar fosite.AuthorizeRequester, err error) {
 	if !ar.IsRedirectURIValid() {
 		var rfcerr = fosite.ErrorToRFC6749Error(err)
-		var redirectURI = new(url.URL)
-		*redirectURI = *o.ConsentURL
 
+		redirectURI := o.ConsentURL
 		query := redirectURI.Query()
 		query.Add("error", rfcerr.Name)
 		query.Add("error_description", rfcerr.Description)

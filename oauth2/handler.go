@@ -14,13 +14,11 @@ type Handler struct {
 	OAuth2  fosite.OAuth2Provider
 	Consent ConsentStrategy
 
-	SelfURL    url.URL
 	ConsentURL url.URL
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.POST("/oauth2/token", h.TokenHandler)
-
 	r.GET("/oauth2/auth", h.AuthHandler)
 	r.POST("/oauth2/auth", h.AuthHandler)
 }

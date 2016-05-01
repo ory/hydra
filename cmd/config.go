@@ -7,7 +7,5 @@ type config struct {
 
 	SystemSecret string `mapstructure:"system_secret"`
 
-	SelfURL string `mapstructure:"self_url"`
-
-	ConsentURL string
+	ConsentURL string `mapstructure:"consent_url"`
 }

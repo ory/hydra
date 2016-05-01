@@ -1,28 +1,27 @@
-package oauth2
+package oauth2_test
 
 import (
-	"fmt"
-	"io/ioutil"
-	"net/http"
 	"net/http/httptest"
-	"net/url"
-	"testing"
 	"time"
+
+	"fmt"
+	"net/url"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/enigma/hmac"
-	ejwt "github.com/ory-am/fosite/enigma/jwt"
+	"github.com/ory-am/fosite/handler/core"
+	"github.com/ory-am/fosite/handler/core/client"
 	"github.com/ory-am/fosite/handler/core/explicit"
 	"github.com/ory-am/fosite/handler/core/strategy"
 	"github.com/ory-am/fosite/hash"
 	"github.com/ory-am/hydra/key"
+	. "github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
-	"github.com/pborman/uuid"
-	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/clientcredentials"
 )
 
 var store = pkg.FositeStore()
@@ -64,6 +63,13 @@ var handler = &Handler{
 		},
 		TokenEndpointHandlers: fosite.TokenEndpointHandlers{
 			authCodeHandler,
+			&client.ClientCredentialsGrantHandler{
+				HandleHelper: &core.HandleHelper{
+					AccessTokenStrategy: hmacStrategy,
+					AccessTokenStorage:  store,
+					AccessTokenLifespan: time.Hour,
+				},
+			},
 		},
 		AuthorizedRequestValidators: fosite.AuthorizedRequestValidators{},
 		Hasher: hasher,
@@ -74,40 +80,37 @@ var handler = &Handler{
 	},
 }
 
-var r = httprouter.New()
+var router = httprouter.New()
 
 var ts *httptest.Server
+
+var oauthConfig *oauth2.Config
+
+var oauthClientConfig *clientcredentials.Config
 
 func init() {
 	keyManager.CreateAsymmetricKey(ConsentChallengeKey)
 	keyManager.CreateAsymmetricKey(ConsentEndpointKey)
-	ts = httptest.NewServer(r)
+	ts = httptest.NewServer(router)
 
-	handler.SetRoutes(r)
+	handler.SetRoutes(router)
 	store.Clients["app"] = &fosite.DefaultClient{
 		ID:           "app",
 		Secret:       []byte("secret"),
 		RedirectURIs: []string{ts.URL + "/callback"},
 	}
 
-	s, _ := url.Parse(ts.URL)
-	handler.SelfURL = *s
-
 	c, _ := url.Parse(ts.URL + "/consent")
 	handler.ConsentURL = *c
 
-	h, _ := hasher.Hash( []byte("secret"))
-
+	h, _ := hasher.Hash([]byte("secret"))
 	store.Clients["app-client"] = &fosite.DefaultClient{
 		ID:           "app-client",
 		Secret:       h,
 		RedirectURIs: []string{ts.URL + "/callback"},
 	}
-}
 
-func TestAuthCode(t *testing.T) {
-	t.Log(ts.URL)
-	c := oauth2.Config{
+	oauthConfig = &oauth2.Config{
 		ClientID:     "app-client",
 		ClientSecret: "secret",
 		Endpoint: oauth2.Endpoint{
@@ -118,58 +121,15 @@ func TestAuthCode(t *testing.T) {
 		Scopes:      []string{"hydra"},
 	}
 
-	var code string
-	var validConsent bool
-	r.GET("/consent", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-		t.Logf("Consent request at %s", r.URL)
-		tok, err := jwt.Parse(r.URL.Query().Get("challenge"), func(tt *jwt.Token) (interface{}, error) {
-			if _, ok := tt.Method.(*jwt.SigningMethodRSA); !ok {
-				return nil, errors.Errorf("Unexpected signing method: %v", tt.Header["alg"])
-			}
-
-			pk, err := keyManager.GetAsymmetricKey(ConsentChallengeKey)
-			pkg.RequireError(t, false, err)
-			return jwt.ParseRSAPublicKeyFromPEM(pk.Public)
-		})
-		pkg.RequireError(t, false, err)
-		require.True(t, tok.Valid)
-		t.Logf("Consent request at %v", tok.Claims)
-
-		validConsent = true
-		consent, err := SignToken(map[string]interface{}{
-			"jti": uuid.New(),
-			"exp": time.Now().Add(time.Hour).Unix(),
-			"iat": time.Now().Unix(),
-			"aud": "app-client",
-		})
-		pkg.RequireError(t, false, err)
-		http.Redirect(w, r, ejwt.ToString(tok.Claims["redir"])+"&consent="+consent, http.StatusFound)
-	})
-
-	r.GET("/callback", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-		t.Logf("Callback request at %s", r.URL)
-
-		code = r.URL.Query().Get("code")
-		w.Write([]byte(r.URL.Query().Get("code")))
-	})
-
-	resp, err := http.Get(c.AuthCodeURL("some-foo-state"))
-	pkg.RequireError(t, false, err)
-	defer resp.Body.Close()
-
-	out, _ := ioutil.ReadAll(resp.Body)
-	t.Logf("Got response: %s", out)
-
-	require.True(t, validConsent)
-	require.NotEmpty(t, code)
-
-	ot, err := c.Exchange(oauth2.NoContext, code)
-	pkg.RequireError(t, false, err)
-
-	t.Logf("OAuth2 Token: %v", ot)
+	oauthClientConfig = &clientcredentials.Config{
+		ClientID:     "app-client",
+		ClientSecret: "secret",
+		TokenURL:     ts.URL + "/oauth2/token",
+		Scopes:       []string{"hydra"},
+	}
 }
 
-func SignToken(claims map[string]interface{}) (string, error) {
+func signConsentToken(claims map[string]interface{}) (string, error) {
 	token := jwt.New(jwt.SigningMethodRS256)
 	token.Claims = claims
 

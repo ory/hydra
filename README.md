@@ -6,10 +6,7 @@
 
 ![Hydra](hydra.png)
 
-![Hydra implements HTTP/2 and TLS.](h2tls.png)
-
-Hydra is being developed at [Ory](https://ory.am) because we need a lightweight and clean IAM solution for our customers.  
-Join our [mailinglist](http://eepurl.com/bKT3N9) to stay on top of new developments.
+Hydra is being developed at [Ory](https://ory.am). Join our [mailinglist](http://eepurl.com/bKT3N9) to stay on top of new developments.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -21,14 +18,15 @@ Join our [mailinglist](http://eepurl.com/bKT3N9) to stay on top of new developme
 
 ## What is Hydra?
 
-Authentication, authorization and user account management are always lengthy to plan and implement. If you're building a micro service app
-in need of these three, you are in the right place.
+1. Hydra is an OAuth2 and OpenID Connect provider with a few extras. The distributed in-memory design allows for heavy duty throughput.
+2. Hydra works with every Identity Provider, even with that deprecated php-3.0 authentication service your intern wrote.
+3. Hydra does not use any templates, it is up to you what your frontend should look like.
 
 ## Motivation
 
-We develop Hydra because Hydra we need a lightweight and clean IAM solution for our customers. We believe that security and simplicity come together. This is why Hydra only relies on Google's Go Language, PostgreSQL or RethinkDB and a slim dependency tree. Hydra is the simple, open source alternative to proprietary authorization solutions suited best for your micro service eco system.
+At first, there was the monolith. The monolith worked well with the customized joomla authentication module. Then, the web evolved into an elastic cloud that serves thousands of different user agents in every part of the world. Hydra is driven by the need for an easy scalable, in memory OAuth2 and OpenID Connect provider, that integrates with every Identity Provider you can imagine. 
 
-*Use it, enjoy it and contribute!*
+Hydra uses pub/sub to always have the latest data available in memory. Hydra scales effortlessly on every platform you can imagine, including Heroku, Cloud Foundry, Docker, Google Container Engine and many more.
 
 ## Installation
 
@@ -56,6 +54,7 @@ hydra connect
 
 ## Documentation
 
+Git Book link
 
 ### REST API
 
@@ -64,6 +63,20 @@ The REST API is documentet at [docs.hdyra.apiary.io](http://docs.hdyra.apiary.io
 ### CLI
 
 The CLI help is well documented. To see it, run `hydra -h` or `hydra [command] -h`.
+
+### Develop
+
+Unless you want to test Hydra against a database, developing with Hydra is as easy as
+
+```
+go get github.com/ory-am/hydra
+cd $GOPATH/src/github.com/ory-am/hydra
+git checkout -b develop
+
+go test ./... -race
+
+go run main.go
+```
 
 ## Frequently Asked Questions
 

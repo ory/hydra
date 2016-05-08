@@ -95,9 +95,9 @@ func init() {
 
 	handler.SetRoutes(router)
 	store.Clients["app"] = &fosite.DefaultClient{
-		ID:           "app",
-		Secret:       []byte("secret"),
-		RedirectURIs: []string{ts.URL + "/callback"},
+		ID:            "app",
+		Secret:        []byte("secret"),
+		RedirectURIs:  []string{ts.URL + "/callback"},
 		ResponseTypes: []string{"id_token", "code", "token"},
 		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
 	}
@@ -107,9 +107,9 @@ func init() {
 
 	h, _ := hasher.Hash([]byte("secret"))
 	store.Clients["app-client"] = &fosite.DefaultClient{
-		ID:           "app-client",
-		Secret:       h,
-		RedirectURIs: []string{ts.URL + "/callback"},
+		ID:            "app-client",
+		Secret:        h,
+		RedirectURIs:  []string{ts.URL + "/callback"},
 		ResponseTypes: []string{"id_token", "code", "token"},
 		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
 	}

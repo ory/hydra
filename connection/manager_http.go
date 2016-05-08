@@ -1,9 +1,10 @@
 package connection
 
 import (
-	"github.com/ory-am/hydra/pkg"
 	"net/http"
 	"net/url"
+
+	"github.com/ory-am/hydra/pkg"
 )
 
 type HTTPManager struct {

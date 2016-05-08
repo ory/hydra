@@ -44,3 +44,14 @@ func (m *HTTPManager) DeleteClient(id string) error {
 
 	return nil
 }
+
+func (m *HTTPManager) GetClients() (map[string]*fosite.DefaultClient, error) {
+	cs := make(map[string]*fosite.DefaultClient)
+	var r = pkg.NewSuperAgent(m.Endpoint.String())
+	r.Client = m.Client
+	if err := r.GET(&cs); err != nil {
+		return nil, err
+	}
+
+	return cs, nil
+}

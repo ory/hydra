@@ -47,3 +47,7 @@ func (m *MemoryManager) DeleteClient(id string) error {
 	delete(m.Clients, id)
 	return nil
 }
+
+func (m *MemoryManager) GetClients() (map[string]*fosite.DefaultClient, error) {
+	return m.Clients, nil
+}

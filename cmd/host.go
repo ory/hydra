@@ -1,16 +1,16 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
-	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/hydra/client"
-	"github.com/ory-am/ladon"
-	"github.com/ory-am/hydra/warden"
-	"github.com/ory-am/fosite/handler/core"
-	"net/http"
-	"github.com/julienschmidt/httprouter"
 	"fmt"
-	"log"
+	"net/http"
+
+	"github.com/julienschmidt/httprouter"
+	"github.com/ory-am/fosite/handler/core"
+	"github.com/ory-am/hydra/client"
+	"github.com/ory-am/hydra/herodot"
+	"github.com/ory-am/hydra/warden"
+	"github.com/ory-am/ladon"
+	"github.com/spf13/cobra"
 )
 
 // hostCmd represents the host command
@@ -42,7 +42,7 @@ func init() {
 }
 
 func runHostCmd(cmd *cobra.Command, args []string) {
-	var c config
+	var c = new(configuration)
 
 	fmt.Println("Connecting to backend...")
 	fositeStore := newFositeStore(c)
@@ -50,9 +50,18 @@ func runHostCmd(cmd *cobra.Command, args []string) {
 	ladonStore := newLadonStore(c)
 	fmt.Println("Successfully connected to ladon backend.")
 	clientStore := newClientStore(c)
-	fmt.Println("Successfully connected to client backends.")
+	fmt.Println("Successfully connected to client backend.")
 	hmacStrategy := newHmacStrategy(c)
+	keyManager := newKeyManager(c)
+	idStrategy := newIdStrategy(c, keyManager)
+	hahser := newHasher(c)
+	fosite := newFosite(c, hmacStrategy, idStrategy, fositeStore, hahser)
+	fositeHandler := newOAuth2Handler(c, fosite, keyManager)
 	fmt.Println("Successfully connected to all backends.")
+
+	if err := createAdminIfNotExists(clientStore, ladonStore); err != nil {
+		fatal("%s", err.Error())
+	}
 
 	ladonWarden := &ladon.Ladon{Manager: ladonStore}
 	localWarden := &warden.LocalWarden{
@@ -61,7 +70,7 @@ func runHostCmd(cmd *cobra.Command, args []string) {
 			AccessTokenStrategy: hmacStrategy,
 			AccessTokenStorage:  fositeStore,
 		},
-		Issuer: c.Iss(),
+		Issuer: c.GetIssuer(),
 	}
 
 	fmt.Println("Setting up routes...")
@@ -72,7 +81,8 @@ func runHostCmd(cmd *cobra.Command, args []string) {
 		W:       localWarden,
 	}
 	clientHandler.SetRoutes(router)
+	fositeHandler.SetRoutes(router)
 
-	fmt.Printf("Starting server on %s.\n", c.Addr())
-	log.Fatalf("Could not start server because %s.\n", http.ListenAndServe(c.Addr(), router))
+	fmt.Printf("Starting server on %s\n", c.GetAddress())
+	fatal("Could not start server because %s.\n", http.ListenAndServe(c.GetAddress(), router))
 }

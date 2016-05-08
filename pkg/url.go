@@ -5,7 +5,7 @@ import (
 	"path"
 )
 
-func CopyURL(u *url.URL) (*url.URL) {
+func CopyURL(u *url.URL) *url.URL {
 	a := new(url.URL)
 	*a = *u
 	return a

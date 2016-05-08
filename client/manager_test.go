@@ -113,6 +113,10 @@ func TestCreateGetDeleteClient(t *testing.T) {
 			compare(t, d, k)
 		}
 
+		ds, err := m.GetClients()
+		pkg.AssertError(t, false, err, k)
+		assert.Len(t, ds, 1)
+
 		err = m.DeleteClient("1234")
 		pkg.AssertError(t, false, err, k)
 

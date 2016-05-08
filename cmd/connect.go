@@ -17,31 +17,57 @@ package cmd
 import (
 	"fmt"
 
+	"bufio"
+	"log"
+	"os"
+	"strings"
+
 	"github.com/spf13/cobra"
 )
 
-// clientsCmd represents the clients command
-var clientsCmd = &cobra.Command{
-	Use:   "clients <command>",
-	Short: "Manage OAuth2 clients",
-	Long:  `Use this command to create, modify or delete OAuth2 clients.`,
+// connectCmd represents the connect command
+var connectCmd = &cobra.Command{
+	Use:   "connect",
+	Short: "Connect to a hydra cluster",
 	Run: func(cmd *cobra.Command, args []string) {
-		_ = authenticate()
-		fmt.Print(cmd.UsageString())
+		if u := input("Cluster URL: "); u != "" {
+			config.ClusterURL = u
+		}
+		if u := input("Client ID: "); u != "" {
+			config.ClientID = u
+		}
+		if u := input("Client Secret: "); u != "" {
+			config.ClientSecret = u
+		}
+
+		if err := config.Save(); err != nil {
+			log.Fatalf("Unable to save config file because %s.", err)
+		}
+		fmt.Println("Configuration stored.")
+
 	},
 }
 
+func input(message string) string {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print(message)
+	s, err := reader.ReadString('\n')
+	if err != nil {
+		fatal("Could not read user input because %s.", err)
+	}
+	return strings.TrimSpace(s)
+}
+
 func init() {
-	RootCmd.AddCommand(clientsCmd)
+	RootCmd.AddCommand(connectCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// clientsCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// connectCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// clientsCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
+	// connectCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

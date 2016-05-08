@@ -49,10 +49,12 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	if cfgFile != "" { // enable ability to specify config file via flag
+	if cfgFile != "" {
+		// enable ability to specify config file via flag
 		viper.SetConfigFile(cfgFile)
 	}
 
+	viper.SetConfigType("yaml")
 	viper.SetConfigName(".hydra") // name of config file (without extension)
 	viper.AddConfigPath("$HOME")  // adding home directory as first search path
 	viper.AutomaticEnv()          // read in environment variables that match
@@ -60,5 +62,12 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	} else {
+		fmt.Printf(`Config file not found becase "%s"`, err)
+		fmt.Println("")
+	}
+
+	if err := viper.Unmarshal(&config); err != nil {
+		fatal("Could not read config because %s.", err)
 	}
 }

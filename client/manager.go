@@ -16,4 +16,6 @@ type Storage interface {
 	CreateClient(c *fosite.DefaultClient) error
 
 	DeleteClient(id string) error
+
+	GetClients() (map[string]*fosite.DefaultClient, error)
 }

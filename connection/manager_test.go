@@ -4,6 +4,10 @@ import (
 	"os"
 	"testing"
 
+	"net/http/httptest"
+	"net/url"
+	"time"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/handler/core"
@@ -17,9 +21,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
 	"gopkg.in/ory-am/dockertest.v2"
-	"net/http/httptest"
-	"net/url"
-	"time"
 )
 
 var connections = []*Connection{

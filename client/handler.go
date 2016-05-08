@@ -8,10 +8,10 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/common/rand/sequence"
+	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/ladon"
-	"github.com/ory-am/fosite"
 )
 
 type Handler struct {
@@ -31,6 +31,7 @@ const (
 )
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
+	r.GET(ClientsHandlerPath, h.GetAll)
 	r.POST(ClientsHandlerPath, h.Create)
 	r.GET(ClientsHandlerPath+"/:id", h.Get)
 	r.DELETE(ClientsHandlerPath+"/:id", h.Delete)
@@ -71,20 +72,43 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	h.H.WriteCreated(ctx, w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
-func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var ctx = herodot.NewContext()
-	var id = ps.ByName("id")
 
 	if _, err := h.W.HTTPActionAllowed(ctx, r, &ladon.Request{
-		Resource: fmt.Sprintf(ClientResource, id),
+		Resource: ClientsResource,
 		Action:   "get",
 	}, Scope); err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
 	}
 
+	c, err := h.Manager.GetClients()
+	if err != nil {
+		h.H.WriteError(ctx, w, r, err)
+		return
+	}
+
+	h.H.Write(ctx, w, r, c)
+}
+
+func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	var ctx = herodot.NewContext()
+	var id = ps.ByName("id")
+
 	c, err := h.Manager.GetClient(id)
 	if err != nil {
+		h.H.WriteError(ctx, w, r, err)
+		return
+	}
+
+	if _, err := h.W.HTTPActionAllowed(ctx, r, &ladon.Request{
+		Resource: fmt.Sprintf(ClientResource, id),
+		Action:   "get",
+		Context: ladon.Context{
+			"owner": c.GetOwner(),
+		},
+	}, Scope); err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
 	}

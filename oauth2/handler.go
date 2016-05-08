@@ -29,14 +29,14 @@ func (o *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprou
 
 	accessRequest, err := o.OAuth2.NewAccessRequest(ctx, r, &session)
 	if err != nil {
-		pkg.LogError(errors.New(err))
+		pkg.LogError(err)
 		o.OAuth2.WriteAccessError(w, accessRequest, err)
 		return
 	}
 
 	accessResponse, err := o.OAuth2.NewAccessResponse(ctx, r, accessRequest)
 	if err != nil {
-		pkg.LogError(errors.New(err))
+		pkg.LogError(err)
 		o.OAuth2.WriteAccessError(w, accessRequest, err)
 		return
 	}
@@ -70,7 +70,7 @@ func (o *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	// verify anti-CSRF (inject state) and anti-replay token (expiry time, good value would be 10 seconds)
 	session, err := o.Consent.ValidateResponse(authorizeRequest, consentToken)
 	if err != nil {
-		pkg.LogError(errors.New(err))
+		pkg.LogError(err)
 		o.writeAuthorizeError(w, authorizeRequest, errors.New(fosite.ErrAccessDenied))
 		return
 	}
@@ -78,7 +78,7 @@ func (o *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	// done
 	response, err := o.OAuth2.NewAuthorizeResponse(ctx, r, authorizeRequest, session)
 	if err != nil {
-		pkg.LogError(errors.New(err))
+		pkg.LogError(err)
 		o.writeAuthorizeError(w, authorizeRequest, err)
 		return
 	}

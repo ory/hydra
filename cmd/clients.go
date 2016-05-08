@@ -15,8 +15,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
@@ -25,10 +23,6 @@ var clientsCmd = &cobra.Command{
 	Use:   "clients <command>",
 	Short: "Manage OAuth2 clients",
 	Long:  `Use this command to create, modify or delete OAuth2 clients.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		_ = authenticate()
-		fmt.Print(cmd.UsageString())
-	},
 }
 
 func init() {

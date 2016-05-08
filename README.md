@@ -30,47 +30,44 @@ We develop Hydra because Hydra we need a lightweight and clean IAM solution for 
 
 *Use it, enjoy it and contribute!*
 
-## Features
+## Installation
 
-## Run hydra-host
+**Host**
 
-### With vagrant
-
-You'll need [Vagrant](https://www.vagrantup.com/), [VirtualBox](https://www.virtualbox.org/) and [Git](https://git-scm.com/)
-installed on your system.
-
+Docker
 ```
-git clone https://github.com/ory-am/hydra.git
-cd hydra
-vagrant up
-# Get a cup of coffee
+docker run -d oryam/hydra
 ```
 
-You should now have a running Hydra instance! Vagrant exposes ports 9000 (HTTPS - Hydra) and 9001 (Postgres) on your localhost.
-Open [https://localhost:9000/](https://localhost:9000/) to confirm that Hydra is running. You will probably have to add an exception for the
-HTTP certificate because it is self-signed, but after that you should see a 404 error indicating that Hydra is running!
+With backend
 
-*hydra-host* offers different capabilities for managing your Hydra instance.
-Check the [this section](#cli-usage) if you want to find out more.
 
-You can also always access hydra-host through vagrant:
+**CLI Client**
 
+Install go
+
+Set up go path
+
+Set up go binarypath
 ```
-# Assuming, that your current working directory is /where/you/cloned/hydra
-vagrant ssh
-hydra-host help
+go install github.com/ory-am/hydra
+hydra connect
 ```
 
-## Security considerations
+## Documentation
 
-[rfc6819](https://tools.ietf.org/html/rfc6819) provides good guidelines to keep your apps and environment secure. It is recommended to read:
-* [Section 5.3](https://tools.ietf.org/html/rfc6819#section-5.3) on client app security.
 
-## Good to know
+### REST API
 
-This section covers information necessary for understanding how hydra works.
+The REST API is documentet at [docs.hdyra.apiary.io](http://docs.hdyra.apiary.io).
 
-### Deploy with buildpacks (Heroku, Cloud Foundry, ...)
+### CLI
+
+The CLI help is well documented. To see it, run `hydra -h` or `hydra [command] -h`.
+
+## Frequently Asked Questions
+
+### Deploy using buildpacks (Heroku, Cloud Foundry, ...)
 
 Hydra runs pretty much out of the box when using a Platform as a Service (PaaS).
 Here are however a few notes which might assist you in your task:

@@ -23,11 +23,12 @@ import (
 // createCmd represents the create command
 var createCmd = &cobra.Command{
 	Use:   "create",
-	Short: "Creates a new OAuth2 client",
+	Short: "Create a new OAuth2 client",
 	Long: `This command creates a new OAuth2 client. Always specify at least one redirect url.
 
 Please use the REST api to get access to all client fields.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		_ = authenticate()
 		fmt.Print(cmd.UsageString())
 	},
 }

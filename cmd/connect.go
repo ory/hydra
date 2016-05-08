@@ -28,7 +28,7 @@ import (
 // connectCmd represents the connect command
 var connectCmd = &cobra.Command{
 	Use:   "connect",
-	Short: "Connect to a hydra cluster",
+	Short: "Connect with a cluster",
 	Run: func(cmd *cobra.Command, args []string) {
 		if u := input("Cluster URL: "); u != "" {
 			config.ClusterURL = u

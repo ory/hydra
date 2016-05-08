@@ -16,13 +16,7 @@ import (
 // hostCmd represents the host command
 var hostCmd = &cobra.Command{
 	Use:   "host",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Start the hydra host service",
 	Run: runHostCmd,
 }
 
@@ -45,21 +39,18 @@ func runHostCmd(cmd *cobra.Command, args []string) {
 	var c = new(configuration)
 
 	fmt.Println("Connecting to backend...")
-	fositeStore := newFositeStore(c)
-	fmt.Println("Successfully connected to fosite backend.")
-	ladonStore := newLadonStore(c)
-	fmt.Println("Successfully connected to ladon backend.")
 	clientStore := newClientStore(c)
-	fmt.Println("Successfully connected to client backend.")
+	fositeStore := newFositeStore(c, clientStore)
+	ladonStore := newLadonStore(c)
 	hmacStrategy := newHmacStrategy(c)
 	keyManager := newKeyManager(c)
 	idStrategy := newIdStrategy(c, keyManager)
-	hahser := newHasher(c)
-	fosite := newFosite(c, hmacStrategy, idStrategy, fositeStore, hahser)
+	hasher := newHasher(c)
+	fosite := newFosite(c, hmacStrategy, idStrategy, fositeStore, hasher)
 	fositeHandler := newOAuth2Handler(c, fosite, keyManager)
 	fmt.Println("Successfully connected to all backends.")
 
-	if err := createAdminIfNotExists(clientStore, ladonStore); err != nil {
+	if err := createAdminIfNotExists(clientStore, ladonStore, hasher); err != nil {
 		fatal("%s", err.Error())
 	}
 

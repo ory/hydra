@@ -4,13 +4,13 @@ import (
 	"github.com/ory-am/fosite"
 )
 
-type ClientManager interface {
-	ClientStorage
+type Manager interface {
+	Storage
 
 	Authenticate(id string, secret []byte) (*Client, error)
 }
 
-type ClientStorage interface {
+type Storage interface {
 	fosite.Storage
 
 	CreateClient(c *Client) error

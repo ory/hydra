@@ -19,7 +19,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
-var clientManagers = map[string]ClientStorage{}
+var clientManagers = map[string]Storage{}
 
 var fositeStore = pkg.FositeStore()
 
@@ -46,17 +46,15 @@ var ts *httptest.Server
 
 var tokens = pkg.Tokens(1)
 
-var httpClientManager *HTTPClientManager
-
 func init() {
 	ar := fosite.NewAccessRequest(&ioa2.Session{Subject: "alice"})
 	ar.GrantedScopes = fosite.Arguments{Scope}
 	fositeStore.CreateAccessTokenSession(nil, tokens[0][0], ar)
 
-	clientManagers["memory"] = &MemoryClientManager{Clients: map[string]*Client{}}
+	clientManagers["memory"] = &MemoryManager{Clients: map[string]*Client{}}
 
-	s := &ClientHandler{
-		Manager: &MemoryClientManager{Clients: map[string]*Client{}},
+	s := &Handler{
+		Manager: &MemoryManager{Clients: map[string]*Client{}},
 		H:       &herodot.JSON{},
 		W:       localWarden,
 	}
@@ -66,7 +64,7 @@ func init() {
 	conf := &oauth2.Config{Scopes: []string{}, Endpoint: oauth2.Endpoint{}}
 
 	u, _ := url.Parse(ts.URL + ClientsHandlerPath)
-	clientManagers["http"] = &HTTPClientManager{
+	clientManagers["http"] = &HTTPManager{
 		Client: conf.Client(oauth2.NoContext, &oauth2.Token{
 			AccessToken: tokens[0][1],
 			Expiry:      time.Now().Add(time.Hour),
@@ -77,7 +75,7 @@ func init() {
 }
 
 func TestAuthenticateClient(t *testing.T) {
-	var mem = &MemoryClientManager{Clients: map[string]*Client{}}
+	var mem = &MemoryManager{Clients: map[string]*Client{}}
 	mem.CreateClient(&Client{
 		ID:           "1234",
 		Secret:       []byte("secret"),
@@ -98,9 +96,10 @@ func TestCreateGetDeleteClient(t *testing.T) {
 		pkg.AssertError(t, true, err, k)
 
 		c := &Client{
-			ID:           "1234",
-			Secret:       []byte("secret"),
-			RedirectURIs: []string{"http://redirect"},
+			ID:                "1234",
+			Secret:            []byte("secret"),
+			RedirectURIs:      []string{"http://redirect"},
+			TermsOfServiceURI: "foo",
 		}
 		err = m.CreateClient(c)
 		pkg.AssertError(t, false, err, k)

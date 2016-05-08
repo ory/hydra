@@ -7,8 +7,8 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
-	ejwt "github.com/ory-am/fosite/enigma/jwt"
 	"github.com/ory-am/fosite/handler/oidc/strategy"
+	ejwt "github.com/ory-am/fosite/token/jwt"
 	"github.com/ory-am/hydra/key"
 	"github.com/pborman/uuid"
 )
@@ -55,8 +55,8 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 	delete(t.Claims, "sub")
 	return &Session{
 		Subject: subject,
-		IDTokenSession: &strategy.IDTokenSession{
-			IDTokenClaims: &strategy.IDTokenClaims{
+		Session: &strategy.DefaultSession{
+			Claims: &ejwt.IDTokenClaims{
 				Audience:  a.GetClient().GetID(),
 				Subject:   subject,
 				Issuer:    s.Issuer,
@@ -64,7 +64,7 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 				ExpiresAt: time.Now(),
 				Extra:     t.Claims,
 			},
-			Header: &ejwt.Header{},
+			Headers: &ejwt.Headers{},
 		},
 	}, err
 

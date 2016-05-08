@@ -9,11 +9,11 @@ import (
 	"github.com/pborman/uuid"
 )
 
-type MemoryClientManager struct {
+type MemoryManager struct {
 	Clients map[string]*Client
 }
 
-func (m *MemoryClientManager) GetClient(id string) (fosite.Client, error) {
+func (m *MemoryManager) GetClient(id string) (fosite.Client, error) {
 	c, ok := m.Clients[id]
 	if !ok {
 		return nil, errors.New(pkg.ErrNotFound)
@@ -21,7 +21,7 @@ func (m *MemoryClientManager) GetClient(id string) (fosite.Client, error) {
 	return c, nil
 }
 
-func (m *MemoryClientManager) Authenticate(id string, secret []byte) (*Client, error) {
+func (m *MemoryManager) Authenticate(id string, secret []byte) (*Client, error) {
 	c, ok := m.Clients[id]
 	if !ok {
 		return nil, errors.New(pkg.ErrNotFound)
@@ -34,7 +34,7 @@ func (m *MemoryClientManager) Authenticate(id string, secret []byte) (*Client, e
 	return c, nil
 }
 
-func (m *MemoryClientManager) CreateClient(c *Client) error {
+func (m *MemoryManager) CreateClient(c *Client) error {
 	if c.ID == "" {
 		c.ID = uuid.New()
 	}
@@ -43,7 +43,7 @@ func (m *MemoryClientManager) CreateClient(c *Client) error {
 	return nil
 }
 
-func (m *MemoryClientManager) DeleteClient(id string) error {
+func (m *MemoryManager) DeleteClient(id string) error {
 	delete(m.Clients, id)
 	return nil
 }

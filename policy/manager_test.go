@@ -47,7 +47,7 @@ var tokens = pkg.Tokens(1)
 
 func init() {
 	ar := fosite.NewAccessRequest(&ioa2.Session{Subject: "alice"})
-	ar.GrantedScopes = fosite.Arguments{Scope}
+	ar.GrantedScopes = fosite.Arguments{scope}
 	fositeStore.CreateAccessTokenSession(nil, tokens[0][0], ar)
 
 	h := &Handler{
@@ -61,7 +61,7 @@ func init() {
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)
 	conf := &oauth2.Config{Scopes: []string{}, Endpoint: oauth2.Endpoint{}}
-	u, _ := url.Parse(ts.URL + Endpoint)
+	u, _ := url.Parse(ts.URL + endpoint)
 	managers["http"] = &HTTPManager{
 		Endpoint: u,
 		Client: conf.Client(oauth2.NoContext, &oauth2.Token{

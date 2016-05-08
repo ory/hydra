@@ -9,7 +9,7 @@ import (
 )
 
 func TestConnection(t *testing.T) {
-	c := &connection.DefaultConnection{
+	c := &connection.Connection{
 		ID:            uuid.New(),
 		LocalSubject:  "peter",
 		RemoteSubject: "peter@gmail.com",

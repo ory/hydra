@@ -8,13 +8,13 @@ import (
 	"github.com/ory-am/hydra/pkg"
 )
 
-type HTTPClientManager struct {
+type HTTPManager struct {
 	Client *http.Client
 
 	Endpoint *url.URL
 }
 
-func (m *HTTPClientManager) GetClient(id string) (fosite.Client, error) {
+func (m *HTTPManager) GetClient(id string) (fosite.Client, error) {
 	var c Client
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, id).String())
 	r.Client = m.Client
@@ -25,7 +25,7 @@ func (m *HTTPClientManager) GetClient(id string) (fosite.Client, error) {
 	return &c, nil
 }
 
-func (m *HTTPClientManager) CreateClient(c *Client) error {
+func (m *HTTPManager) CreateClient(c *Client) error {
 	var r = pkg.NewSuperAgent(m.Endpoint.String())
 	r.Client = m.Client
 	if err := r.POST(c); err != nil {
@@ -35,7 +35,7 @@ func (m *HTTPClientManager) CreateClient(c *Client) error {
 	return nil
 }
 
-func (m *HTTPClientManager) DeleteClient(id string) error {
+func (m *HTTPManager) DeleteClient(id string) error {
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, id).String())
 	r.Client = m.Client
 	if err := r.DELETE(); err != nil {

@@ -13,8 +13,8 @@ import (
 	"github.com/ory-am/ladon"
 )
 
-type ClientHandler struct {
-	Manager ClientManager
+type Handler struct {
+	Manager Manager
 	H       herodot.Herodot
 	W       warden.Warden
 }
@@ -29,13 +29,13 @@ const (
 	Scope           = "hydra.clients"
 )
 
-func (h *ClientHandler) SetRoutes(r *httprouter.Router) {
+func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.POST(ClientsHandlerPath, h.Create)
 	r.GET(ClientsHandlerPath+"/:id", h.Get)
 	r.DELETE(ClientsHandlerPath+"/:id", h.Delete)
 }
 
-func (h *ClientHandler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var c Client
 	var ctx = herodot.NewContext()
 
@@ -70,7 +70,7 @@ func (h *ClientHandler) Create(w http.ResponseWriter, r *http.Request, _ httprou
 	h.H.WriteCreated(ctx, w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
-func (h *ClientHandler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var ctx = herodot.NewContext()
 	var id = ps.ByName("id")
 
@@ -91,7 +91,7 @@ func (h *ClientHandler) Get(w http.ResponseWriter, r *http.Request, ps httproute
 	h.H.Write(ctx, w, r, c)
 }
 
-func (h *ClientHandler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var ctx = herodot.NewContext()
 	var id = ps.ByName("id")
 

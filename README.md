@@ -78,8 +78,6 @@ Here are however a few notes which might assist you in your task:
 * Using bash, you can easily add multi-line environment variables to Heroku using `heroku config:set JWT_PUBLIC_KEY="$(my-public-key.pem)"`.
   This does not work on Windows!
 
-
-
 ## Attributions
 
 * [Logo source](https://www.flickr.com/photos/pathfinderlinden/7161293044/)

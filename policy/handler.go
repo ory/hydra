@@ -14,10 +14,10 @@ import (
 )
 
 const (
-	Endpoint         = "/policies"
-	Scope            = "hydra.policies.search"
-	PolicyResource   = "rn:hydra:policies"
-	PoliciesResource = "rn:hydra:policies:%s"
+	endpoint         = "/policies"
+	scope            = "hydra.policies.search"
+	policyResource   = "rn:hydra:policies"
+	policiesResource = "rn:hydra:policies:%s"
 )
 
 type Handler struct {
@@ -27,10 +27,10 @@ type Handler struct {
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
-	r.POST(Endpoint, h.Create)
-	r.GET(Endpoint, h.Find)
-	r.GET(Endpoint+"/:id", h.Get)
-	r.DELETE(Endpoint+"/:id", h.Delete)
+	r.POST(endpoint, h.Create)
+	r.GET(endpoint, h.Find)
+	r.GET(endpoint+"/:id", h.Get)
+	r.DELETE(endpoint+"/:id", h.Delete)
 }
 
 func (h *Handler) Find(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -41,9 +41,9 @@ func (h *Handler) Find(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 	}
 
 	if _, err := h.W.HTTPActionAllowed(ctx, r, &ladon.Request{
-		Resource: PolicyResource,
+		Resource: policyResource,
 		Action:   "search",
-	}, Scope); err != nil {
+	}, scope); err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
 	}
@@ -61,9 +61,9 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	ctx := herodot.NewContext()
 
 	if _, err := h.W.HTTPActionAllowed(ctx, r, &ladon.Request{
-		Resource: PolicyResource,
+		Resource: policyResource,
 		Action:   "create",
-	}, Scope); err != nil {
+	}, scope); err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
 	}
@@ -86,9 +86,9 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	ctx := herodot.NewContext()
 
 	if _, err := h.W.HTTPActionAllowed(ctx, r, &ladon.Request{
-		Resource: fmt.Sprintf(PoliciesResource, ps.ByName("id")),
+		Resource: fmt.Sprintf(policiesResource, ps.ByName("id")),
 		Action:   "get",
-	}, Scope); err != nil {
+	}, scope); err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
 	}
@@ -106,9 +106,9 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	id := ps.ByName("id")
 
 	if _, err := h.W.HTTPActionAllowed(ctx, r, &ladon.Request{
-		Resource: fmt.Sprintf(PoliciesResource, id),
+		Resource: fmt.Sprintf(policiesResource, id),
 		Action:   "get",
-	}, Scope); err != nil {
+	}, scope); err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
 	}

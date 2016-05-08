@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	"github.com/go-errors/errors"
-	"github.com/ory-am/fosite/enigma/hmac"
 	"github.com/ory-am/fosite/fosite-example/store"
 	"github.com/ory-am/fosite/handler/core/strategy"
+	"github.com/ory-am/fosite/token/hmac"
 	"github.com/ory-am/ladon"
 	"github.com/ory-am/ladon/memory"
 	"github.com/stretchr/testify/assert"
@@ -58,7 +58,7 @@ func Tokens(length int) (res [][]string) {
 }
 
 var HMACStrategy = &strategy.HMACSHAStrategy{
-	Enigma: &hmac.Enigma{
+	Enigma: &hmac.HMACStrategy{
 		GlobalSecret: []byte("1234567890123456789012345678901234567890"),
 	},
 }

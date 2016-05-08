@@ -11,12 +11,12 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
-	"github.com/ory-am/fosite/enigma/hmac"
 	"github.com/ory-am/fosite/handler/core"
 	"github.com/ory-am/fosite/handler/core/client"
 	"github.com/ory-am/fosite/handler/core/explicit"
 	"github.com/ory-am/fosite/handler/core/strategy"
 	"github.com/ory-am/fosite/hash"
+	"github.com/ory-am/fosite/token/hmac"
 	"github.com/ory-am/hydra/key"
 	. "github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
@@ -38,7 +38,7 @@ var keyManager = &key.MemoryManager{
 }
 
 var hmacStrategy = &strategy.HMACSHAStrategy{
-	Enigma: &hmac.Enigma{
+	Enigma: &hmac.HMACStrategy{
 		GlobalSecret: []byte("some-super-cool-secret-that-nobody-knows"),
 	},
 }

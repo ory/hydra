@@ -9,7 +9,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
-	ejwt "github.com/ory-am/fosite/enigma/jwt"
+	ejwt "github.com/ory-am/fosite/token/jwt"
 	. "github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"

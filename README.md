@@ -42,6 +42,8 @@ With backend
 
 **CLI Client**
 
+https://gobuild.io/ory-am/hydra
+
 Install go
 
 Set up go path

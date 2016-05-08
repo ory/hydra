@@ -17,7 +17,7 @@ import (
 
 const (
 	connectionsResource = "rn:hydra:connections"
-	connectionResource  = "rn:hydra:connection:%s"
+	connectionResource  = "rn:hydra:connections:%s"
 	scope               = "hydra.connections"
 )
 
@@ -28,22 +28,24 @@ type Handler struct {
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
-	r.POST("/oauth2/connections", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		if r.URL.Query().Get("local") != "" {
+	r.GET("/connections", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+		if r.URL.Query().Get("local_subject") != "" {
 			h.FindLocal(w, r, ps)
 			return
 		}
 
-		if r.URL.Query().Get("remote") != "" && r.URL.Query().Get("provider") != "" {
+		if r.URL.Query().Get("remote_subject") != "" && r.URL.Query().Get("provider") != "" {
 			h.FindRemote(w, r, ps)
 			return
 		}
 
-		h.Get(w, r, ps)
+		var ctx = context.Background()
+		h.H.WriteErrorCode(ctx, w, r, http.StatusBadRequest, errors.New("Pass either [local_subject] or [remote_subject, provider] as query to this request"))
 	})
 
-	r.GET("/oauth2/connections/:id", h.Get)
-	r.DELETE("/oauth2/connections/:id", h.Delete)
+	r.POST("/connections", h.Create)
+	r.GET("/connections/:id", h.Get)
+	r.DELETE("/connections/:id", h.Delete)
 }
 
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -91,7 +93,7 @@ func (h *Handler) FindLocal(w http.ResponseWriter, r *http.Request, ps httproute
 		return
 	}
 
-	conns, err := h.Manager.FindAllByLocalSubject(r.URL.Query().Get("local"))
+	conns, err := h.Manager.FindAllByLocalSubject(r.URL.Query().Get("local_subject"))
 	if err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
@@ -111,7 +113,7 @@ func (h *Handler) FindRemote(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
-	conns, err := h.Manager.FindByRemoteSubject(r.URL.Query().Get("provider"), r.URL.Query().Get("local"))
+	conns, err := h.Manager.FindByRemoteSubject(r.URL.Query().Get("provider"), r.URL.Query().Get("remote_subject"))
 	if err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return

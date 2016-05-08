@@ -98,6 +98,8 @@ func init() {
 		ID:           "app",
 		Secret:       []byte("secret"),
 		RedirectURIs: []string{ts.URL + "/callback"},
+		ResponseTypes: []string{"id_token", "code", "token"},
+		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
 	}
 
 	c, _ := url.Parse(ts.URL + "/consent")
@@ -108,6 +110,8 @@ func init() {
 		ID:           "app-client",
 		Secret:       h,
 		RedirectURIs: []string{ts.URL + "/callback"},
+		ResponseTypes: []string{"id_token", "code", "token"},
+		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
 	}
 
 	oauthConfig = &oauth2.Config{

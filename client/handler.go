@@ -11,6 +11,7 @@ import (
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/ladon"
+	"github.com/ory-am/fosite"
 )
 
 type Handler struct {
@@ -36,7 +37,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 }
 
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var c Client
+	var c fosite.DefaultClient
 	var ctx = herodot.NewContext()
 
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {

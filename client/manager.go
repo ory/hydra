@@ -7,13 +7,13 @@ import (
 type Manager interface {
 	Storage
 
-	Authenticate(id string, secret []byte) (*Client, error)
+	Authenticate(id string, secret []byte) (*fosite.DefaultClient, error)
 }
 
 type Storage interface {
 	fosite.Storage
 
-	CreateClient(c *Client) error
+	CreateClient(c *fosite.DefaultClient) error
 
 	DeleteClient(id string) error
 }

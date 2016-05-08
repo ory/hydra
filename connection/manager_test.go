@@ -43,8 +43,8 @@ var ladonWarden = pkg.LadonWarden(map[string]ladon.Policy{
 	"1": &ladon.DefaultPolicy{
 		ID:        "1",
 		Subjects:  []string{"alice"},
-		Resources: []string{"rn:hydra:clients<.*>"},
-		Actions:   []string{"create", "get", "delete"},
+		Resources: []string{"rn:hydra:connections<.*>"},
+		Actions:   []string{"create", "get", "delete", "find"},
 		Effect:    ladon.AllowAccess,
 	},
 })
@@ -67,10 +67,8 @@ func init() {
 	ar.GrantedScopes = fosite.Arguments{scope}
 	fositeStore.CreateAccessTokenSession(nil, tokens[0][0], ar)
 
-	managers["memory"] = &MemoryManager{Connections: map[string]*Connection{}}
-
 	s := &Handler{
-		Manager: &MemoryManager{Clients: map[string]*Connection{}},
+		Manager: &MemoryManager{Connections: map[string]*Connection{}},
 		H:       &herodot.JSON{},
 		W:       localWarden,
 	}
@@ -79,7 +77,7 @@ func init() {
 	ts = httptest.NewServer(r)
 	conf := &oauth2.Config{Scopes: []string{}, Endpoint: oauth2.Endpoint{}}
 
-	u, _ := url.Parse(ts.URL + "/oauth2/connections/")
+	u, _ := url.Parse(ts.URL + "/connections")
 	managers["http"] = &HTTPManager{
 		Client: conf.Client(oauth2.NoContext, &oauth2.Token{
 			AccessToken: tokens[0][1],
@@ -99,34 +97,33 @@ func TestMain(m *testing.M) {
 	os.Exit(retCode)
 }
 
-func TestNotFound(t *testing.T) {
-	for _, store := range managers {
-		_, err := store.Get("asdf")
-		assert.EqualError(t, err, pkg.ErrNotFound.Error())
-	}
-}
-
 func TestCreateGetFindDelete(t *testing.T) {
 	for _, store := range managers {
 		for _, c := range connections {
-			require.Nil(t, store.Create(c))
+			_, err := store.Get("asdf")
+			pkg.RequireError(t, true, err)
+
+			err = store.Create(c)
+			pkg.RequireError(t, false, err)
 
 			res, err := store.Get(c.GetID())
-			require.Nil(t, err)
-			require.Equal(t, c, res)
-
-			res, err = store.FindByRemoteSubject("google", "peterson")
-			require.Nil(t, err)
+			pkg.RequireError(t, false, err)
 			require.Equal(t, c, res)
 
 			cs, err := store.FindAllByLocalSubject("peter")
-			require.Nil(t, err)
+			pkg.RequireError(t, false, err)
 			assert.Len(t, cs, 1)
 			require.Equal(t, c, cs[0])
 
-			require.Nil(t, store.Delete(c.GetID()))
+			res, err = store.FindByRemoteSubject("google", "peterson")
+			pkg.RequireError(t, false, err)
+			require.Equal(t, c, res)
+
+			err = store.Delete(c.GetID())
+			pkg.RequireError(t, false, err)
+
 			_, err = store.Get(c.GetID())
-			require.NotNil(t, err)
+			pkg.RequireError(t, true, err)
 		}
 	}
 }

@@ -51,10 +51,10 @@ func init() {
 	ar.GrantedScopes = fosite.Arguments{Scope}
 	fositeStore.CreateAccessTokenSession(nil, tokens[0][0], ar)
 
-	clientManagers["memory"] = &MemoryManager{Clients: map[string]*Client{}}
+	clientManagers["memory"] = &MemoryManager{Clients: map[string]*fosite.DefaultClient{}}
 
 	s := &Handler{
-		Manager: &MemoryManager{Clients: map[string]*Client{}},
+		Manager: &MemoryManager{Clients: map[string]*fosite.DefaultClient{}},
 		H:       &herodot.JSON{},
 		W:       localWarden,
 	}
@@ -75,8 +75,8 @@ func init() {
 }
 
 func TestAuthenticateClient(t *testing.T) {
-	var mem = &MemoryManager{Clients: map[string]*Client{}}
-	mem.CreateClient(&Client{
+	var mem = &MemoryManager{Clients: map[string]*fosite.DefaultClient{}}
+	mem.CreateClient(&fosite.DefaultClient{
 		ID:           "1234",
 		Secret:       []byte("secret"),
 		RedirectURIs: []string{"http://redirect"},
@@ -95,7 +95,7 @@ func TestCreateGetDeleteClient(t *testing.T) {
 		_, err := m.GetClient("4321")
 		pkg.AssertError(t, true, err, k)
 
-		c := &Client{
+		c := &fosite.DefaultClient{
 			ID:                "1234",
 			Secret:            []byte("secret"),
 			RedirectURIs:      []string{"http://redirect"},

@@ -10,7 +10,7 @@ import (
 )
 
 type MemoryManager struct {
-	Clients map[string]*Client
+	Clients map[string]*fosite.DefaultClient
 }
 
 func (m *MemoryManager) GetClient(id string) (fosite.Client, error) {
@@ -21,7 +21,7 @@ func (m *MemoryManager) GetClient(id string) (fosite.Client, error) {
 	return c, nil
 }
 
-func (m *MemoryManager) Authenticate(id string, secret []byte) (*Client, error) {
+func (m *MemoryManager) Authenticate(id string, secret []byte) (*fosite.DefaultClient, error) {
 	c, ok := m.Clients[id]
 	if !ok {
 		return nil, errors.New(pkg.ErrNotFound)
@@ -34,7 +34,7 @@ func (m *MemoryManager) Authenticate(id string, secret []byte) (*Client, error) 
 	return c, nil
 }
 
-func (m *MemoryManager) CreateClient(c *Client) error {
+func (m *MemoryManager) CreateClient(c *fosite.DefaultClient) error {
 	if c.ID == "" {
 		c.ID = uuid.New()
 	}

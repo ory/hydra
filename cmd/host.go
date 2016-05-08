@@ -2,6 +2,15 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/ory-am/hydra/herodot"
+	"github.com/ory-am/hydra/client"
+	"github.com/ory-am/ladon"
+	"github.com/ory-am/hydra/warden"
+	"github.com/ory-am/fosite/handler/core"
+	"net/http"
+	"github.com/julienschmidt/httprouter"
+	"fmt"
+	"log"
 )
 
 // hostCmd represents the host command
@@ -33,5 +42,37 @@ func init() {
 }
 
 func runHostCmd(cmd *cobra.Command, args []string) {
+	var c config
 
+	fmt.Println("Connecting to backend...")
+	fositeStore := newFositeStore(c)
+	fmt.Println("Successfully connected to fosite backend.")
+	ladonStore := newLadonStore(c)
+	fmt.Println("Successfully connected to ladon backend.")
+	clientStore := newClientStore(c)
+	fmt.Println("Successfully connected to client backends.")
+	hmacStrategy := newHmacStrategy(c)
+	fmt.Println("Successfully connected to all backends.")
+
+	ladonWarden := &ladon.Ladon{Manager: ladonStore}
+	localWarden := &warden.LocalWarden{
+		Warden: ladonWarden,
+		TokenValidator: &core.CoreValidator{
+			AccessTokenStrategy: hmacStrategy,
+			AccessTokenStorage:  fositeStore,
+		},
+		Issuer: c.Iss(),
+	}
+
+	fmt.Println("Setting up routes...")
+	router := httprouter.New()
+	clientHandler := &client.Handler{
+		Manager: clientStore,
+		H:       &herodot.JSON{},
+		W:       localWarden,
+	}
+	clientHandler.SetRoutes(router)
+
+	fmt.Printf("Starting server on %s.\n", c.Addr())
+	log.Fatalf("Could not start server because %s.\n", http.ListenAndServe(c.Addr(), router))
 }

@@ -15,7 +15,7 @@ func (m *HTTPManager) Create(connection *Connection) error {
 	var r = pkg.NewSuperAgent(m.Endpoint.String())
 	r.Client = m.Client
 	if err := r.POST(connection); err != nil {
-		return nil
+		return err
 	}
 
 	return nil
@@ -47,7 +47,7 @@ func (m *HTTPManager) FindAllByLocalSubject(subject string) ([]*Connection, erro
 	var u = pkg.CopyURL(m.Endpoint)
 	var q = u.Query()
 
-	q.Add("local", subject)
+	q.Add("local_subject", subject)
 	u.RawQuery = q.Encode()
 
 	var r = pkg.NewSuperAgent(u.String())
@@ -63,8 +63,7 @@ func (m *HTTPManager) FindByRemoteSubject(provider, subject string) (*Connection
 	var connection Connection
 	var u = pkg.CopyURL(m.Endpoint)
 	var q = u.Query()
-
-	q.Add("remote", subject)
+	q.Add("remote_subject", subject)
 	q.Add("provider", provider)
 	u.RawQuery = q.Encode()
 

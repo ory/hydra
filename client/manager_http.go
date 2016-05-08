@@ -15,7 +15,7 @@ type HTTPManager struct {
 }
 
 func (m *HTTPManager) GetClient(id string) (fosite.Client, error) {
-	var c Client
+	var c fosite.DefaultClient
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, id).String())
 	r.Client = m.Client
 	if err := r.GET(&c); err != nil {
@@ -25,7 +25,7 @@ func (m *HTTPManager) GetClient(id string) (fosite.Client, error) {
 	return &c, nil
 }
 
-func (m *HTTPManager) CreateClient(c *Client) error {
+func (m *HTTPManager) CreateClient(c *fosite.DefaultClient) error {
 	var r = pkg.NewSuperAgent(m.Endpoint.String())
 	r.Client = m.Client
 	if err := r.POST(c); err != nil {

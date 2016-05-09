@@ -18,9 +18,10 @@ Hydra is being developed at [Ory](https://ory.am). Join our [mailinglist](http:/
 
 ## What is Hydra?
 
-1. Hydra is an OAuth2 and OpenID Connect provider with a few extras. The distributed in-memory design allows for heavy duty throughput.
-2. Hydra works with every Identity Provider, even with that deprecated php-3.0 authentication service your intern wrote.
-3. Hydra does not use any templates, it is up to you what your frontend should look like.
+1. Hydra is an OAuth2 and OpenID Connect provider built for availability. The distributed in-memory architecture allows for heavy duty workloads.
+2. Hydra works with every Identity Provider. The deprecated php-3.0 authentication service your intern wrote? It works with that too, don't worry.
+3. Hydra does not use any templates, it is up to you what your front end should look like.
+4. Hydra comes with two factor authentication, key management, social log on, policy management and access control.
 
 ## Motivation
 
@@ -28,43 +29,55 @@ At first, there was the monolith. The monolith worked well with the customized j
 
 Hydra uses pub/sub to always have the latest data available in memory. Hydra scales effortlessly on every platform you can imagine, including Heroku, Cloud Foundry, Docker, Google Container Engine and many more.
 
-## Installation
+## First steps
 
-**Host**
+This section is a quickstart guide to working with Hydra. In-depth docs are available as well:
 
-Docker
+* The documentation is available on [GitBook](https://ory-am.gitbooks.io/hydra/content/).
+* The REST API documentation is available at [Apiary](http://docs.hdyra.apiary.io).
+
+### Installation
+
+**Starting the host** is easiest with docker. The host process handles HTTP requests and is backed by a database.
+Read how to install docker on [Linux](https://docs.docker.com/linux/), [OSX](https://docs.docker.com/mac/) or
+[Windows](https://docs.docker.com/windows/).
+
+The easiest way to start docker is without a database. Hydra will keep all changes in memory. But be aware! Restarting, scaling
+or stopping the container will make you **lose all data**.
+
 ```
-docker run -d oryam/hydra
+docker run oryam/hydra -p 4444:4444
+open http://$(docker-machine ip default):444
 ```
-
-With backend
-
 
 **CLI Client**
 
-https://gobuild.io/ory-am/hydra
+The CLI client is available at [gobuild.io](https://gobuild.io/ory-am/hydra) or through
+the [releases tab](https://github.com/ory-am/hydra/releases).
 
-Install go
+If you wish to compile the CLI yourself, you need to install and set up [Go](https://golang.org/) and add `$GOPATH/bin`
+to your `$PATH`.
 
-Set up go path
-
-Set up go binarypath
 ```
 go install github.com/ory-am/hydra
-hydra connect
+hydra
 ```
+
+### First steps
+
+
 
 ## Documentation
 
-Git Book link
+The documentation is available on [GitBook](https://ory-am.gitbooks.io/hydra/content/).
 
-### REST API
+### REST API Documentation
 
-The REST API is documentet at [docs.hdyra.apiary.io](http://docs.hdyra.apiary.io).
+The REST API is documented at [Apiary](http://docs.hdyra.apiary.io).
 
-### CLI
+### CLI Documentation
 
-The CLI help is well documented. To see it, run `hydra -h` or `hydra [command] -h`.
+The CLI help is verbose. To see it, run `hydra -h` or `hydra [command] -h`.
 
 ### Develop
 
@@ -74,9 +87,7 @@ Unless you want to test Hydra against a database, developing with Hydra is as ea
 go get github.com/ory-am/hydra
 cd $GOPATH/src/github.com/ory-am/hydra
 git checkout -b develop
-
 go test ./... -race
-
 go run main.go
 ```
 

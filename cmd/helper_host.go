@@ -118,7 +118,7 @@ func newHmacStrategy(c *configuration) *strategy.HMACSHAStrategy {
 
 }
 
-func createAdminIfNotExists(clientStore client.Manager, ladonStore ladon.Manager) error {
+func createAdminIfNotExists(clientStore client.Manager, ladonStore ladon.Manager, saveCredentials bool) error {
 	clients, err := clientStore.GetClients()
 	if err != nil {
 		return errors.Errorf("Could not retrieve initial clients list because %s", err.Error())

@@ -58,7 +58,10 @@ func init() {
 	}
 
 	s := &Handler{
-		Manager: &MemoryManager{Clients: map[string]*fosite.DefaultClient{}},
+		Manager: &MemoryManager{
+			Clients: map[string]*fosite.DefaultClient{},
+			Hasher: &hash.BCrypt{},
+		},
 		H:       &herodot.JSON{},
 		W:       localWarden,
 	}
@@ -79,7 +82,10 @@ func init() {
 }
 
 func TestAuthenticateClient(t *testing.T) {
-	var mem = &MemoryManager{Clients: map[string]*fosite.DefaultClient{}}
+	var mem = &MemoryManager{
+		Clients: map[string]*fosite.DefaultClient{},
+		Hasher: &hash.BCrypt{},
+	}
 	mem.CreateClient(&fosite.DefaultClient{
 		ID:           "1234",
 		Secret:       []byte("secret"),

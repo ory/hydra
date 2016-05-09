@@ -24,13 +24,22 @@ type configuration struct {
 
 	ConsentURL   string `mapstructure:"consent_url" yaml:"-"`
 
-	BackendURL   string `mapstructure:"backend_url" yaml:"-"`
-
-	ClusterURL   string `mapstructure:"endpoint_url" yaml:"endpoint_url"`
+	ClusterURL   string `mapstructure:"cluster_url" yaml:"cluster_url"`
 
 	ClientID     string `mapstructure:"client_id" yaml:"client_id"`
 
 	ClientSecret string `mapstructure:"client_secret" yaml:"client_secret"`
+}
+
+func (c *configuration) GetSystemSecret() []byte {
+	if len(c.SystemSecret) >= 8 {
+		return c.SystemSecret
+	}
+
+	fmt.Println("No global secret was set. Generating a random one...")
+	c.SystemSecret = generateSecret(32)
+	fmt.Printf("A global secret was generated:\n%s\n", c.SystemSecret)
+	return c.SystemSecret
 }
 
 func (c *configuration) GetAddress() string {

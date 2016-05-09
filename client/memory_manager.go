@@ -1,16 +1,16 @@
 package client
 
 import (
-	"bytes"
-
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
+	"github.com/ory-am/fosite/hash"
 )
 
 type MemoryManager struct {
 	Clients map[string]*fosite.DefaultClient
+	Hasher  hash.Hasher
 }
 
 func (m *MemoryManager) GetClient(id string) (fosite.Client, error) {
@@ -27,8 +27,8 @@ func (m *MemoryManager) Authenticate(id string, secret []byte) (*fosite.DefaultC
 		return nil, errors.New(pkg.ErrNotFound)
 	}
 
-	if bytes.Compare(c.GetHashedSecret(), secret) != 0 {
-		return nil, errors.New(pkg.ErrUnauthorized)
+	if err := m.Hasher.Compare(c.GetHashedSecret(), secret); err != nil {
+		return nil, errors.New(err)
 	}
 
 	return c, nil
@@ -38,6 +38,12 @@ func (m *MemoryManager) CreateClient(c *fosite.DefaultClient) error {
 	if c.ID == "" {
 		c.ID = uuid.New()
 	}
+
+	hash, err := m.Hasher.Hash(c.Secret)
+	if err != nil {
+		return errors.New(err)
+	}
+	c.Secret = hash
 
 	m.Clients[c.GetID()] = c
 	return nil

@@ -18,6 +18,9 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/ory-am/hydra/pkg"
+	"github.com/ory-am/fosite"
+	"github.com/ory-am/hydra/client"
 )
 
 // createCmd represents the create command
@@ -28,7 +31,14 @@ var createCmd = &cobra.Command{
 
 Please use the REST api to get access to all client fields.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		_ = authenticate()
+		agent := pkg.NewSuperAgent(pkg.JoinURLStrings(config.ClusterURL, client.ClientsHandlerPath))
+		agent.Client = authenticate()
+
+		c := &fosite.DefaultClient{}
+		if err := agent.POST(c); err != nil {
+			fatal("Could not create client because: %s.", err)
+		}
+
 		fmt.Print(cmd.UsageString())
 	},
 }

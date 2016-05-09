@@ -9,7 +9,7 @@ import (
 )
 
 type HTTPManager struct {
-	Client *http.Client
+	Client   *http.Client
 
 	Endpoint *url.URL
 }

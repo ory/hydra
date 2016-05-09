@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	ConsentChallengeKey = "consentChallenge"
-	ConsentEndpointKey  = "consentEndpoint"
+	ConsentChallengeKey = "consent.challenge"
+	ConsentEndpointKey  = "consent.endpoint"
 )
 
 type DefaultConsentStrategy struct {

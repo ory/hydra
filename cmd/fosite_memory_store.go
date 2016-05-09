@@ -7,7 +7,6 @@ import (
 	"github.com/ory-am/common/pkg"
 )
 
-
 type fositeMemoryStore struct {
 	client.Manager
 

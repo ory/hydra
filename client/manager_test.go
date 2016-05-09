@@ -17,6 +17,7 @@ import (
 	"github.com/ory-am/ladon"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2"
+	"github.com/ory-am/fosite/hash"
 )
 
 var clientManagers = map[string]Storage{}
@@ -51,7 +52,10 @@ func init() {
 	ar.GrantedScopes = fosite.Arguments{Scope}
 	fositeStore.CreateAccessTokenSession(nil, tokens[0][0], ar)
 
-	clientManagers["memory"] = &MemoryManager{Clients: map[string]*fosite.DefaultClient{}}
+	clientManagers["memory"] = &MemoryManager{
+		Clients: map[string]*fosite.DefaultClient{},
+		Hasher: &hash.BCrypt{},
+	}
 
 	s := &Handler{
 		Manager: &MemoryManager{Clients: map[string]*fosite.DefaultClient{}},

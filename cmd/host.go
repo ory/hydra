@@ -39,18 +39,18 @@ func runHostCmd(cmd *cobra.Command, args []string) {
 	var c = new(configuration)
 
 	fmt.Println("Connecting to backend...")
-	clientStore := newClientStore(c)
-	fositeStore := newFositeStore(c, clientStore)
+	hasher := newHasher(c)
+	keyManager := newKeyManager(c)
 	ladonStore := newLadonStore(c)
 	hmacStrategy := newHmacStrategy(c)
-	keyManager := newKeyManager(c)
+	clientStore := newClientStore(c, hasher)
+	fositeStore := newFositeStore(c, clientStore)
 	idStrategy := newIdStrategy(c, keyManager)
-	hasher := newHasher(c)
 	fosite := newFosite(c, hmacStrategy, idStrategy, fositeStore, hasher)
 	fositeHandler := newOAuth2Handler(c, fosite, keyManager)
 	fmt.Println("Successfully connected to all backends.")
 
-	if err := createAdminIfNotExists(clientStore, ladonStore, hasher); err != nil {
+	if err := createAdminIfNotExists(clientStore, ladonStore); err != nil {
 		fatal("%s", err.Error())
 	}
 

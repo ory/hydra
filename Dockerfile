@@ -1,4 +1,4 @@
-FROM golang:onbuild
+FROM golang:1.6-onbuild
 
 ENTRYPOINT /go/bin/hydra host
 

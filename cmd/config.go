@@ -14,19 +14,19 @@ import (
 var config = new(configuration)
 
 type configuration struct {
-	BindPort     int `mapstructure:"port" yaml:"-"`
+	BindPort int `mapstructure:"port" yaml:"-"`
 
-	BindHost     string `mapstructure:"host" yaml:"-"`
+	BindHost string `mapstructure:"host" yaml:"-"`
 
-	Issuer       string `mapstructure:"issuer" yaml:"-"`
+	Issuer string `mapstructure:"issuer" yaml:"-"`
 
 	SystemSecret []byte `mapstructure:"system_secret" yaml:"-"`
 
-	ConsentURL   string `mapstructure:"consent_url" yaml:"-"`
+	ConsentURL string `mapstructure:"consent_url" yaml:"-"`
 
-	ClusterURL   string `mapstructure:"cluster_url" yaml:"cluster_url"`
+	ClusterURL string `mapstructure:"cluster_url" yaml:"cluster_url"`
 
-	ClientID     string `mapstructure:"client_id" yaml:"client_id"`
+	ClientID string `mapstructure:"client_id" yaml:"client_id"`
 
 	ClientSecret string `mapstructure:"client_secret" yaml:"client_secret"`
 }

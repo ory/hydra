@@ -1,54 +1,32 @@
 package policy
 
 import (
-	"net/http/httptest"
-	"net/url"
-	"testing"
-	"time"
-
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
-	"github.com/ory-am/fosite/handler/core"
 	"github.com/ory-am/hydra/herodot"
-	ioa2 "github.com/ory-am/hydra/oauth2"
+	"github.com/ory-am/hydra/internal"
 	"github.com/ory-am/hydra/pkg"
-	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/ladon"
 	"github.com/ory-am/ladon/memory"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/oauth2"
+	"net/http/httptest"
+	"net/url"
+	"testing"
 )
 
 var managers = map[string]ladon.Manager{}
 
-var fositeStore = pkg.FositeStore()
-
-var ladonWarden = pkg.LadonWarden(map[string]ladon.Policy{
-	"1": &ladon.DefaultPolicy{
-		ID:        "1",
-		Subjects:  []string{"alice"},
-		Resources: []string{"rn:hydra:policies<.*>"},
-		Actions:   []string{"create", "get", "delete", "search"},
-		Effect:    ladon.AllowAccess,
-	},
-})
-
-var localWarden = &warden.LocalWarden{
-	Warden: ladonWarden,
-	TokenValidator: &core.CoreValidator{
-		AccessTokenStrategy: pkg.HMACStrategy,
-		AccessTokenStorage:  fositeStore,
-	},
-	Issuer: "tests",
-}
-
-var tokens = pkg.Tokens(1)
-
 func init() {
-	ar := fosite.NewAccessRequest(&ioa2.Session{Subject: "alice"})
-	ar.GrantedScopes = fosite.Arguments{scope}
-	fositeStore.CreateAccessTokenSession(nil, tokens[0][0], ar)
+	localWarden, httpClient := internal.NewFirewall("hydra", "alice", fosite.Arguments{scope},
+		&ladon.DefaultPolicy{
+			ID:        "1",
+			Subjects:  []string{"alice"},
+			Resources: []string{"rn:hydra:policies<.*>"},
+			Actions:   []string{"create", "get", "delete", "search"},
+			Effect:    ladon.AllowAccess,
+		},
+	)
 
 	h := &Handler{
 		Manager: &memory.Manager{
@@ -57,18 +35,15 @@ func init() {
 		W: localWarden,
 		H: new(herodot.JSON),
 	}
+
 	r := httprouter.New()
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)
-	conf := &oauth2.Config{Scopes: []string{}, Endpoint: oauth2.Endpoint{}}
+
 	u, _ := url.Parse(ts.URL + endpoint)
 	managers["http"] = &HTTPManager{
 		Endpoint: u,
-		Client: conf.Client(oauth2.NoContext, &oauth2.Token{
-			AccessToken: tokens[0][1],
-			Expiry:      time.Now().Add(time.Hour),
-			TokenType:   "bearer",
-		}),
+		Client:   httpClient,
 	}
 }
 

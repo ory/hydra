@@ -1,82 +1,54 @@
 package client_test
 
 import (
+	"github.com/julienschmidt/httprouter"
+	"github.com/ory-am/fosite"
+	"github.com/ory-am/fosite/hash"
+	. "github.com/ory-am/hydra/client"
+	"github.com/ory-am/hydra/herodot"
+	"github.com/ory-am/hydra/internal"
+	"github.com/ory-am/hydra/pkg"
+	"github.com/ory-am/ladon"
+	"github.com/stretchr/testify/assert"
 	"net/http/httptest"
 	"net/url"
 	"testing"
-	"time"
-
-	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/fosite"
-	"github.com/ory-am/fosite/handler/core"
-	. "github.com/ory-am/hydra/client"
-	"github.com/ory-am/hydra/herodot"
-	ioa2 "github.com/ory-am/hydra/oauth2"
-	"github.com/ory-am/hydra/pkg"
-	"github.com/ory-am/hydra/warden"
-	"github.com/ory-am/ladon"
-	"github.com/stretchr/testify/assert"
-	"golang.org/x/oauth2"
-	"github.com/ory-am/fosite/hash"
 )
 
 var clientManagers = map[string]Storage{}
 
-var fositeStore = pkg.FositeStore()
+var ts *httptest.Server
 
-var ladonWarden = pkg.LadonWarden(map[string]ladon.Policy{
-	"1": &ladon.DefaultPolicy{
+func init() {
+	clientManagers["memory"] = &MemoryManager{
+		Clients: map[string]*fosite.DefaultClient{},
+		Hasher:  &hash.BCrypt{},
+	}
+
+	localWarden, httpClient := internal.NewFirewall("foo", "alice", fosite.Arguments{Scope}, &ladon.DefaultPolicy{
 		ID:        "1",
 		Subjects:  []string{"alice"},
 		Resources: []string{"rn:hydra:clients<.*>"},
 		Actions:   []string{"create", "get", "delete"},
 		Effect:    ladon.AllowAccess,
-	},
-})
-
-var localWarden = &warden.LocalWarden{
-	Warden: ladonWarden,
-	TokenValidator: &core.CoreValidator{
-		AccessTokenStrategy: pkg.HMACStrategy,
-		AccessTokenStorage:  fositeStore,
-	},
-	Issuer: "tests",
-}
-
-var ts *httptest.Server
-
-var tokens = pkg.Tokens(1)
-
-func init() {
-	ar := fosite.NewAccessRequest(&ioa2.Session{Subject: "alice"})
-	ar.GrantedScopes = fosite.Arguments{Scope}
-	fositeStore.CreateAccessTokenSession(nil, tokens[0][0], ar)
-
-	clientManagers["memory"] = &MemoryManager{
-		Clients: map[string]*fosite.DefaultClient{},
-		Hasher: &hash.BCrypt{},
-	}
+	})
 
 	s := &Handler{
 		Manager: &MemoryManager{
 			Clients: map[string]*fosite.DefaultClient{},
-			Hasher: &hash.BCrypt{},
+			Hasher:  &hash.BCrypt{},
 		},
-		H:       &herodot.JSON{},
-		W:       localWarden,
+		H: &herodot.JSON{},
+		W: localWarden,
 	}
+
 	r := httprouter.New()
 	s.SetRoutes(r)
 	ts = httptest.NewServer(r)
-	conf := &oauth2.Config{Scopes: []string{}, Endpoint: oauth2.Endpoint{}}
 
 	u, _ := url.Parse(ts.URL + ClientsHandlerPath)
 	clientManagers["http"] = &HTTPManager{
-		Client: conf.Client(oauth2.NoContext, &oauth2.Token{
-			AccessToken: tokens[0][1],
-			Expiry:      time.Now().Add(time.Hour),
-			TokenType:   "bearer",
-		}),
+		Client:   httpClient,
 		Endpoint: u,
 	}
 }
@@ -84,7 +56,7 @@ func init() {
 func TestAuthenticateClient(t *testing.T) {
 	var mem = &MemoryManager{
 		Clients: map[string]*fosite.DefaultClient{},
-		Hasher: &hash.BCrypt{},
+		Hasher:  &hash.BCrypt{},
 	}
 	mem.CreateClient(&fosite.DefaultClient{
 		ID:           "1234",

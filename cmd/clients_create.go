@@ -17,10 +17,10 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/spf13/cobra"
-	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/client"
+	"github.com/ory-am/hydra/pkg"
+	"github.com/spf13/cobra"
 )
 
 // createCmd represents the create command

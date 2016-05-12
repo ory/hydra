@@ -15,9 +15,8 @@
 package cmd
 
 import (
-	"fmt"
-
 	"bufio"
+	"fmt"
 	"log"
 	"os"
 	"strings"

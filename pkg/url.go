@@ -3,6 +3,7 @@ package pkg
 import (
 	"net/url"
 	"path"
+
 	"github.com/ory-am/common/pkg"
 )
 
@@ -15,7 +16,6 @@ func CopyURL(u *url.URL) *url.URL {
 func JoinURLStrings(host string, args ...string) string {
 	return pkg.JoinURL(host, args...)
 }
-
 
 func JoinURL(u *url.URL, args ...string) (ep *url.URL) {
 	ep = CopyURL(u)

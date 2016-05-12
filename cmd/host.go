@@ -17,7 +17,7 @@ import (
 var hostCmd = &cobra.Command{
 	Use:   "host",
 	Short: "Start the hydra host service",
-	Run: runHostCmd,
+	Run:   runHostCmd,
 }
 
 func init() {
@@ -31,7 +31,7 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	hostCmd.Flags().Bool("-s", false, "If no admin exists, hydra creates a new one. Use this option to save the credentials to the hydra config file.")
+	hostCmd.Flags().BoolP("save-credentials", "s", false, "If no admin exists, hydra creates a new one. Use this option to save the credentials to the hydra config file.")
 }
 
 func runHostCmd(cmd *cobra.Command, args []string) {
@@ -49,7 +49,7 @@ func runHostCmd(cmd *cobra.Command, args []string) {
 	fositeHandler := newOAuth2Handler(c, fosite, keyManager)
 	fmt.Println("Successfully connected to all backends.")
 
-	save, _ := cmd.Flags().GetBool()
+	save, _ := cmd.Flags().GetBool("save-credentials")
 	if err := createAdminIfNotExists(clientStore, ladonStore, save); err != nil {
 		fatal("%s", err.Error())
 	}

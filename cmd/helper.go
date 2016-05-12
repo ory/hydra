@@ -3,11 +3,12 @@ package cmd
 import (
 	"fmt"
 	"os"
+
 	"github.com/ory-am/common/rand/sequence"
 )
 
 func fatal(message string, args ...interface{}) {
-	fmt.Printf(message + "\n", args...)
+	fmt.Printf(message+"\n", args...)
 	os.Exit(1)
 }
 

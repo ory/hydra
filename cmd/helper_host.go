@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/go-errors/errors"
 	"github.com/ory-am/common/rand/sequence"
 	"github.com/ory-am/fosite"
@@ -16,6 +17,7 @@ import (
 	"github.com/ory-am/fosite/token/hmac"
 	"github.com/ory-am/fosite/token/jwt"
 	"github.com/ory-am/hydra/client"
+	"github.com/ory-am/hydra/internal"
 	"github.com/ory-am/hydra/key"
 	"github.com/ory-am/ladon"
 	"github.com/ory-am/ladon/memory"
@@ -75,14 +77,13 @@ func newFositeStore(c *configuration, cl client.Manager) fositeStorer {
 	if c.ClusterURL == "" {
 	}
 
-	return &fositeMemoryStore{
-		Manager: cl,
-		AuthorizeCodes :make(map[string]fosite.Requester),
-		IDSessions    :make(map[string]fosite.Requester),
-		AccessTokens :make(map[string]fosite.Requester),
-		Implicit      :make(map[string]fosite.Requester),
-		RefreshTokens  :make(map[string]fosite.Requester),
-
+	return &internal.FositeMemoryStore{
+		Manager:        cl,
+		AuthorizeCodes: make(map[string]fosite.Requester),
+		IDSessions:     make(map[string]fosite.Requester),
+		AccessTokens:   make(map[string]fosite.Requester),
+		Implicit:       make(map[string]fosite.Requester),
+		RefreshTokens:  make(map[string]fosite.Requester),
 	}
 }
 
@@ -102,7 +103,7 @@ func newClientStore(c *configuration, hash hash.Hasher) client.Manager {
 
 	return &client.MemoryManager{
 		Clients: make(map[string]*fosite.DefaultClient),
-		Hasher: hash,
+		Hasher:  hash,
 	}
 }
 
@@ -122,9 +123,7 @@ func createAdminIfNotExists(clientStore client.Manager, ladonStore ladon.Manager
 	clients, err := clientStore.GetClients()
 	if err != nil {
 		return errors.Errorf("Could not retrieve initial clients list because %s", err.Error())
-	}
-
-	if len(clients) != 0 {
+	} else if len(clients) != 0 {
 		return nil
 	}
 
@@ -140,20 +139,24 @@ func createAdminIfNotExists(clientStore client.Manager, ladonStore ladon.Manager
 		Secret:        []byte(string(secret)),
 	}
 
-	err = clientStore.CreateClient(adminClient)
-	if err != nil {
+	if err = clientStore.CreateClient(adminClient); err != nil {
 		return errors.Errorf("Could not create initial admin because %s", err.Error())
 	}
 
-	err = ladonStore.Create(&ladon.DefaultPolicy{
+	if err = ladonStore.Create(&ladon.DefaultPolicy{
 		Description: "This is a policy created by hydra and issued to the first client. It grants all of hydra's administrative privileges to the client and enables the client_credentials response type.",
 		Subjects:    []string{adminClient.GetID()},
 		Effect:      ladon.AllowAccess,
 		Resources:   []string{"rn:hydra:<.*>"},
 		Actions:     []string{"<.*>"},
-	})
-	if err != nil {
+	}); err != nil {
 		return errors.Errorf("Could not create admin policy because %s", err.Error())
+	}
+
+	if saveCredentials {
+		config.ClientID = adminClient.ID
+		config.ClientSecret = string(secret)
+		config.Save()
 	}
 
 	fmt.Printf(`┬┴┬┴┬┴┬┴┬┴┬┴┤   ├┬┴┬┴┬┴┬┴┬┴┬┴┬┴

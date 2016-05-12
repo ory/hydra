@@ -26,15 +26,15 @@ const (
 
 const (
 	ClientsResource = "rn:hydra:clients"
-	ClientResource = "rn:hydra:clients:%s"
-	Scope = "hydra.clients"
+	ClientResource  = "rn:hydra:clients:%s"
+	Scope           = "hydra.clients"
 )
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET(ClientsHandlerPath, h.GetAll)
 	r.POST(ClientsHandlerPath, h.Create)
-	r.GET(ClientsHandlerPath + "/:id", h.Get)
-	r.DELETE(ClientsHandlerPath + "/:id", h.Delete)
+	r.GET(ClientsHandlerPath+"/:id", h.Get)
+	r.DELETE(ClientsHandlerPath+"/:id", h.Delete)
 }
 
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -69,7 +69,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 		return
 	}
 
-	h.H.WriteCreated(ctx, w, r, ClientsHandlerPath + "/" + c.GetID(), &c)
+	h.H.WriteCreated(ctx, w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
 func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -133,5 +133,5 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		return
 	}
 
-	w.WriteHeader(http.StatusAccepted)
+	w.WriteHeader(http.StatusNoContent)
 }

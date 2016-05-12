@@ -3,9 +3,9 @@ package client
 import (
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
+	"github.com/ory-am/fosite/hash"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
-	"github.com/ory-am/fosite/hash"
 )
 
 type MemoryManager struct {

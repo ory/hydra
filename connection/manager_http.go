@@ -15,11 +15,7 @@ type HTTPManager struct {
 func (m *HTTPManager) Create(connection *Connection) error {
 	var r = pkg.NewSuperAgent(m.Endpoint.String())
 	r.Client = m.Client
-	if err := r.POST(connection); err != nil {
-		return err
-	}
-
-	return nil
+	return r.POST(connection)
 }
 
 func (m *HTTPManager) Get(id string) (*Connection, error) {
@@ -31,16 +27,12 @@ func (m *HTTPManager) Get(id string) (*Connection, error) {
 	}
 
 	return &connection, nil
-
 }
 
 func (m *HTTPManager) Delete(id string) error {
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, id).String())
 	r.Client = m.Client
-	if err := r.DELETE(); err != nil {
-		return err
-	}
-	return nil
+	return r.DELETE()
 }
 
 func (m *HTTPManager) FindAllByLocalSubject(subject string) ([]*Connection, error) {

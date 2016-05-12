@@ -30,17 +30,7 @@ var createCmd = &cobra.Command{
 	Long: `This command creates a new OAuth2 client. Always specify at least one redirect url.
 
 Please use the REST api to get access to all client fields.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		agent := pkg.NewSuperAgent(pkg.JoinURLStrings(config.ClusterURL, client.ClientsHandlerPath))
-		agent.Client = authenticate()
-
-		c := &fosite.DefaultClient{}
-		if err := agent.POST(c); err != nil {
-			fatal("Could not create client because: %s.", err)
-		}
-
-		fmt.Print(cmd.UsageString())
-	},
+	Run: cmdHandler.Clients.CreateClient,
 }
 
 func init() {

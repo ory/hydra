@@ -50,6 +50,30 @@ func init() {
 	managers["http"] = &HTTPManager{Client: httpClient, Endpoint: u}
 }
 
+func TestManagerKey(t *testing.T) {
+	ks, _ := testGenerator.Generate("")
+	key := &ks.Key("public")[0]
+
+	for name, m := range managers {
+		_, err := m.GetKey("faz", "baz")
+		pkg.AssertError(t, true, err, name)
+
+		err = m.AddKey("faz", key)
+		pkg.AssertError(t, false, err, name)
+
+		got, err := m.GetKey("faz", "public")
+		pkg.AssertError(t, false, err, name)
+		assert.EqualValues(t, key, got, name)
+
+		err = m.DeleteKey("faz", "public")
+		pkg.AssertError(t, false, err, name)
+
+		_, err = m.GetKey("faz", "public")
+		pkg.AssertError(t, true, err, name)
+	}
+}
+
+
 func TestManagerKeySet(t *testing.T) {
 	ks, _ := testGenerator.Generate("")
 

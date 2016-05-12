@@ -30,16 +30,16 @@ var connectCmd = &cobra.Command{
 	Short: "Connect with a cluster",
 	Run: func(cmd *cobra.Command, args []string) {
 		if u := input("Cluster URL: "); u != "" {
-			config.ClusterURL = u
+			c.ClusterURL = u
 		}
 		if u := input("Client ID: "); u != "" {
-			config.ClientID = u
+			c.ClientID = u
 		}
 		if u := input("Client Secret: "); u != "" {
-			config.ClientSecret = u
+			c.ClientSecret = u
 		}
 
-		if err := config.Save(); err != nil {
+		if err := c.Save(); err != nil {
 			log.Fatalf("Unable to save config file because %s.", err)
 		}
 		fmt.Println("Configuration stored.")

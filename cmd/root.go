@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/ory-am/hydra/cmd/cli"
 )
 
 var cfgFile string
@@ -18,6 +19,8 @@ var RootCmd = &cobra.Command{
 	// has an action associated with it:
 	//	Run: func(cmd *cobra.Command, args []string) { },
 }
+
+var cmdHandler *cli.Handler
 
 // Execute adds all child commands to the root command sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
@@ -59,7 +62,9 @@ func initConfig() {
 		fmt.Println("")
 	}
 
-	if err := viper.Unmarshal(&config); err != nil {
+	if err := viper.Unmarshal(&c); err != nil {
 		fatal("Could not read config because %s.", err)
 	}
+
+	cmdHandler = cli.NewHandler(c)
 }

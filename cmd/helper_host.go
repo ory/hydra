@@ -154,9 +154,9 @@ func createAdminIfNotExists(clientStore client.Manager, ladonStore ladon.Manager
 	}
 
 	if saveCredentials {
-		config.ClientID = adminClient.ID
-		config.ClientSecret = string(secret)
-		config.Save()
+		c.ClientID = adminClient.ID
+		c.ClientSecret = string(secret)
+		c.Save()
 	}
 
 	fmt.Printf(`┬┴┬┴┬┴┬┴┬┴┬┴┤   ├┬┴┬┴┬┴┬┴┬┴┬┴┬┴

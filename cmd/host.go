@@ -11,6 +11,8 @@ import (
 	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/ladon"
 	"github.com/spf13/cobra"
+	"github.com/ory-am/hydra/pkg"
+	"github.com/ory-am/hydra/config"
 )
 
 // hostCmd represents the host command
@@ -19,6 +21,8 @@ var hostCmd = &cobra.Command{
 	Short: "Start the hydra host service",
 	Run:   runHostCmd,
 }
+
+var c config.Config
 
 func init() {
 	RootCmd.AddCommand(hostCmd)
@@ -35,6 +39,13 @@ func init() {
 }
 
 func runHostCmd(cmd *cobra.Command, args []string) {
+	router := httprouter.New()
+	cmdHandler.Clients = &client.Handler{}
+	cmdHandler.Listen(c, router)
+
+
+
+
 	var c = new(configuration)
 
 	fmt.Println("Connecting to backend...")

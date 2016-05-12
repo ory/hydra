@@ -1,4 +1,4 @@
-package cmd
+package config
 
 import (
 	"fmt"
@@ -9,11 +9,14 @@ import (
 	"time"
 
 	"gopkg.in/yaml.v2"
+	"net/http"
+	"golang.org/x/oauth2/clientcredentials"
+	"github.com/ory-am/hydra/pkg"
+	"golang.org/x/net/context"
+	"github.com/ory-am/fosite/hash"
 )
 
-var config = new(configuration)
-
-type configuration struct {
+type Config struct {
 	BindPort int `mapstructure:"port" yaml:"-"`
 
 	BindHost string `mapstructure:"host" yaml:"-"`
@@ -31,7 +34,31 @@ type configuration struct {
 	ClientSecret string `mapstructure:"client_secret" yaml:"client_secret"`
 }
 
-func (c *configuration) GetSystemSecret() []byte {
+func (c *Config) Context() *Context {
+	return &Context{
+		Connection: &MemoryConnection{},
+		Hasher: &hash.BCrypt{
+			WorkFactor: 11,
+		},
+	}
+}
+
+func (c *Config) OAuth2Client() *http.Client {
+	oauthConfig := clientcredentials.Config{
+		ClientID:     c.ClientID,
+		ClientSecret: c.ClientSecret,
+		TokenURL:     pkg.JoinURL(c.ClusterURL, "oauth2/token"),
+		Scopes:       []string{"core", "hydra"},
+	}
+
+	if _, err := oauthConfig.Token(context.Background()); err != nil {
+		return err
+	}
+
+	return oauthConfig.Client(context.Background())
+}
+
+func (c *Config) GetSystemSecret() []byte {
 	if len(c.SystemSecret) >= 8 {
 		return c.SystemSecret
 	}
@@ -42,25 +69,25 @@ func (c *configuration) GetSystemSecret() []byte {
 	return c.SystemSecret
 }
 
-func (c *configuration) GetAddress() string {
+func (c *Config) GetAddress() string {
 	if c.BindPort == 0 {
 		c.BindPort = 4444
 	}
 	return fmt.Sprintf("%s:%d", c.BindHost, c.BindPort)
 }
 
-func (c *configuration) GetIssuer() string {
+func (c *Config) GetIssuer() string {
 	if c.Issuer == "" {
 		c.Issuer = "hydra"
 	}
 	return c.Issuer
 }
 
-func (c *configuration) GetAccessTokenLifespan() time.Duration {
+func (c *Config) GetAccessTokenLifespan() time.Duration {
 	return time.Hour
 }
 
-func (c *configuration) Save() error {
+func (c *Config) Save() error {
 	out, err := yaml.Marshal(c)
 	if err != nil {
 		return err

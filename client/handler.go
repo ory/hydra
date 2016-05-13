@@ -12,7 +12,6 @@ import (
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/ladon"
-	"os"
 	"github.com/ory-am/hydra/config"
 )
 
@@ -39,22 +38,26 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.DELETE(ClientsHandlerPath+"/:id", h.Delete)
 }
 
-func (h *Handler) Listen(config *config.Config, router *httprouter.Router) {
-	ctx := config.Context()
+func NewHandler(c *config.Config, router *httprouter.Router) *Handler {
+	ctx := c.Context()
+
+	h := &Handler{}
 	h.H = &herodot.JSON{}
 	h.W = ctx.Warden
 	h.SetRoutes(router)
 
 	switch ctx.Connection.(type) {
 	case *config.MemoryConnection:
-		h.Manager = MemoryManager{
+		h.Manager = &MemoryManager{
 			Clients: map[string]*fosite.DefaultClient{},
 			Hasher:  ctx.Hasher,
 		}
+		break;
 	default:
-		fmt.Fprintf(os.Stderr, "Unknown connection type.")
-		os.Exit(0)
+		panic("Unknown connection type.")
 	}
+
+	return h
 }
 
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

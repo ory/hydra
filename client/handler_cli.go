@@ -9,15 +9,15 @@ import (
 )
 
 type CLIHandler struct {
-	Config config.Config
+	Config *config.Config
 	M      *HTTPManager
 }
 
 func NewCLIHandler(c *config.Config) *CLIHandler {
 	return &CLIHandler{
 		Config: c,
-		M: HTTPManager{
-			Endpoint: pkg.JoinURL(c.ClusterURL, "/clients"),
+		M: &HTTPManager{
+			Endpoint: c.Resolve("/clients"),
 		},
 	}
 }

@@ -8,6 +8,10 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/ory-am/hydra/herodot"
+	"github.com/ory-am/hydra/config"
+	"github.com/ory-am/hydra/internal"
+	"github.com/ory-am/hydra/client"
 )
 
 type Handler struct {

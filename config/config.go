@@ -14,6 +14,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/net/context"
 	"github.com/ory-am/fosite/hash"
+	"net/url"
 )
 
 type Config struct {
@@ -32,6 +33,10 @@ type Config struct {
 	ClientID string `mapstructure:"client_id" yaml:"client_id"`
 
 	ClientSecret string `mapstructure:"client_secret" yaml:"client_secret"`
+
+	cluster *url.URL
+
+	oauth2Client *http.Client
 }
 
 func (c *Config) Context() *Context {
@@ -43,19 +48,36 @@ func (c *Config) Context() *Context {
 	}
 }
 
+func (c *Config) Resolve(join ...string) *url.URL {
+	var err error
+	if c.cluster == nil {
+		c.cluster, err = url.Parse(c.ClusterURL)
+		pkg.Must(err, "Could not authenticate: %s", err)
+	}
+
+	if len(join) == 0 {
+		return c.cluster
+	}
+
+	return pkg.JoinURL(c.cluster, join...)
+}
+
 func (c *Config) OAuth2Client() *http.Client {
+	if c.oauth2Client != nil {
+		return c.oauth2Client
+	}
+
 	oauthConfig := clientcredentials.Config{
 		ClientID:     c.ClientID,
 		ClientSecret: c.ClientSecret,
-		TokenURL:     pkg.JoinURL(c.ClusterURL, "oauth2/token"),
+		TokenURL:     pkg.JoinURLStrings(c.ClusterURL, "/oauth2/token"),
 		Scopes:       []string{"core", "hydra"},
 	}
 
-	if _, err := oauthConfig.Token(context.Background()); err != nil {
-		return err
-	}
-
-	return oauthConfig.Client(context.Background())
+	_, err := oauthConfig.Token(context.Background())
+	pkg.Must(err, "Could not authenticate: %s", err)
+	c.oauth2Client = oauthConfig.Client(context.Background())
+	return c.oauth2Client
 }
 
 func (c *Config) GetSystemSecret() []byte {
@@ -64,7 +86,7 @@ func (c *Config) GetSystemSecret() []byte {
 	}
 
 	fmt.Println("No global secret was set. Generating a random one...")
-	c.SystemSecret = generateSecret(32)
+	//c.SystemSecret = generateSecret(32)
 	fmt.Printf("A global secret was generated:\n%s\n", c.SystemSecret)
 	return c.SystemSecret
 }
@@ -107,7 +129,8 @@ func getConfigPath() string {
 
 	p, err := filepath.Abs(path)
 	if err != nil {
-		fatal("Could not fetch configuration path because %s", err)
+		fmt.Fprintf(os.Stderr, "Could not fetch configuration path because %s", err)
+		os.Exit(1)
 	}
 	return filepath.Clean(p)
 }

@@ -9,5 +9,5 @@ func GenerateSecret(length int) ([]byte, error) {
 	if err != nil {
 		return []byte{}, err
 	}
-	return []byte(string(secret))
+	return []byte(string(secret)), nil
 }

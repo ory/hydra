@@ -6,7 +6,7 @@
 
 ![Hydra](hydra.png)
 
-Hydra is a twelve factor authentication, authorization and account management service, ready for you to use in your micro service architecture. Hydra is written in go and backed by PostgreSQL or RethinkDB (or any implementation of [account/storage.go](account/storage.go)).
+Hydra is a twelve factor micro service, authentication, authorization and account management app, ready for you to use in your micro service architecture. Hydra is written in go and backed by PostgreSQL or RethinkDB (or any implementation of [account/storage.go](account/storage.go)).
 
 **Important note:** We worked hard on building a secure OAuth2 and OpenID Connect framework called [Fosite](https://github.com/ory-am/fosite). Now, we are working hard on refactoring Hydra to use Fosite. It will take a considerable amount of refactoring and recoding, so please be aware that things will break.
 

@@ -1,1 +1,1 @@
-web: hydra-host start
+web: hydra host

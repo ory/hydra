@@ -6,3 +6,4 @@ node_modules/
 *.log
 *.stackdump
 .DS_Store
+vendor/

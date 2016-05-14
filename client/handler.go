@@ -47,11 +47,9 @@ func NewManager(c *config.Config) Manager {
 			Clients: map[string]*fosite.DefaultClient{},
 			Hasher:  ctx.Hasher,
 		}
-		break
 	default:
 		panic("Unknown connection type.")
 	}
-	return nil
 }
 
 func NewHandler(c *config.Config, router *httprouter.Router, manager Manager) *Handler {

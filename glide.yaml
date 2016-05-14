@@ -1,0 +1,46 @@
+package: github.com/ory-am/hydra
+import:
+- package: github.com/Sirupsen/logrus
+- package: github.com/asaskevich/govalidator
+- package: github.com/dgrijalva/jwt-go
+- package: github.com/go-errors/errors
+- package: github.com/julienschmidt/httprouter
+- package: github.com/ory-am/common
+  subpackages:
+  - pkg
+  - rand/sequence
+- package: github.com/ory-am/fosite
+  subpackages:
+  - fosite-example/store
+  - handler/core
+  - handler/core/client
+  - handler/core/explicit
+  - handler/core/implicit
+  - handler/core/refresh
+  - handler/core/strategy
+  - handler/oidc
+  - handler/oidc/explicit
+  - handler/oidc/hybrid
+  - handler/oidc/implicit
+  - handler/oidc/strategy
+  - hash
+  - token/hmac
+  - token/jwt
+- package: github.com/ory-am/ladon
+- package: github.com/pborman/uuid
+- package: github.com/spf13/cobra
+- package: github.com/spf13/viper
+- package: github.com/square/go-jose
+  subpackages:
+  - json
+- package: github.com/stretchr/testify
+  subpackages:
+  - assert
+  - require
+- package: golang.org/x/net
+  subpackages:
+  - context
+- package: golang.org/x/oauth2
+  subpackages:
+  - clientcredentials
+- package: gopkg.in/yaml.v2

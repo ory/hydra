@@ -7,10 +7,11 @@ import (
 
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
+	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/ladon"
 	"github.com/pborman/uuid"
+	"github.com/ory-am/hydra/config"
 )
 
 const (
@@ -23,7 +24,20 @@ const (
 type Handler struct {
 	Manager ladon.Manager
 	H       herodot.Herodot
-	W       warden.Warden
+	W       firewall.Firewall
+}
+
+func NewHandler(c *config.Config, router *httprouter.Router) *Handler {
+	ctx := c.Context()
+
+	h := &Handler{
+		H: &herodot.JSON{},
+		W: ctx.Warden,
+		Manager: ctx.LadonManager,
+	}
+	h.SetRoutes(router)
+
+	return h
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {

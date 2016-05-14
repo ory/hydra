@@ -1,16 +1,18 @@
-package jwk
+package jwk_test
 
 import (
+	"net/http/httptest"
+	"net/url"
+	"testing"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/internal"
+	. "github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
 	"github.com/stretchr/testify/assert"
-	"net/http/httptest"
-	"net/url"
-	"testing"
 )
 
 var managers = map[string]Manager{}
@@ -72,7 +74,6 @@ func TestManagerKey(t *testing.T) {
 		pkg.AssertError(t, true, err, name)
 	}
 }
-
 
 func TestManagerKeySet(t *testing.T) {
 	ks, _ := testGenerator.Generate("")

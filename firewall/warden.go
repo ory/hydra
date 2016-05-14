@@ -1,4 +1,4 @@
-package warden
+package firewall
 
 import (
 	"net/http"
@@ -17,7 +17,7 @@ type Context struct {
 	ExpiresAt     time.Time `json:"exp"`
 }
 
-type Warden interface {
+type Firewall interface {
 	Authorized(ctx context.Context, token string, scopes ...string) (*Context, error)
 	HTTPAuthorized(ctx context.Context, r *http.Request, scopes ...string) (*Context, error)
 

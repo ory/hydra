@@ -1,3 +1,3 @@
 package config
 
-type MemoryConnection struct {}
+type MemoryConnection struct{}

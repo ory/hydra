@@ -1,19 +1,13 @@
 package cmd
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/fosite/handler/core"
-	"github.com/ory-am/hydra/client"
-	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/hydra/warden"
-	"github.com/ory-am/ladon"
-	"github.com/spf13/cobra"
-	"github.com/ory-am/hydra/pkg"
-	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/cmd/server"
+	"github.com/ory-am/hydra/pkg"
+	"github.com/spf13/cobra"
+	"github.com/Sirupsen/logrus"
 )
 
 // hostCmd represents the host command
@@ -22,8 +16,6 @@ var hostCmd = &cobra.Command{
 	Short: "Start the hydra host service",
 	Run:   runHostCmd,
 }
-
-var c config.Config
 
 func init() {
 	RootCmd.AddCommand(hostCmd)
@@ -36,51 +28,21 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	hostCmd.Flags().BoolP("save-credentials", "s", false, "If no admin exists, hydra creates a new one. Use this option to save the credentials to the hydra config file.")
+	hostCmd.Flags().Bool("dangerous-auto-logon", false, "Stores the root credentials in ~/.hydra.yml. Do not use in production.")
 }
 
 func runHostCmd(cmd *cobra.Command, args []string) {
 	router := httprouter.New()
 	serverHandler := &server.Handler{}
-	serverHandler.Listen(c, router)
+	serverHandler.Start(c, router)
 
-	fmt.Println("Connecting to backend...")
-	hasher := newHasher(c)
-	keyManager := newKeyManager(c)
-	ladonStore := newLadonStore(c)
-	hmacStrategy := newHmacStrategy(c)
-	clientStore := newClientStore(c, hasher)
-	fositeStore := newFositeStore(c, clientStore)
-	idStrategy := newIdStrategy(c, keyManager)
-	fosite := newFosite(c, hmacStrategy, idStrategy, fositeStore, hasher)
-	fositeHandler := newOAuth2Handler(c, fosite, keyManager)
-	fmt.Println("Successfully connected to all backends.")
-
-	save, _ := cmd.Flags().GetBool("save-credentials")
-	if err := createAdminIfNotExists(clientStore, ladonStore, save); err != nil {
-		fatal("%s", err.Error())
+	if ok, _ := cmd.Flags().GetBool("dangerous-auto-logon"); ok {
+		logrus.Warnln("Do not use flag --dangerous-auto-logon in production.")
+		err :=c.Persist()
+		pkg.Must(err, "Could not write configuration file: ", err)
 	}
 
-	ladonWarden := &ladon.Ladon{Manager: ladonStore}
-	localWarden := &warden.LocalWarden{
-		Warden: ladonWarden,
-		TokenValidator: &core.CoreValidator{
-			AccessTokenStrategy: hmacStrategy,
-			AccessTokenStorage:  fositeStore,
-		},
-		Issuer: c.GetIssuer(),
-	}
-
-	fmt.Println("Setting up routes...")
-	router := httprouter.New()
-	clientHandler := &client.Handler{
-		Manager: clientStore,
-		H:       &herodot.JSON{},
-		W:       localWarden,
-	}
-	clientHandler.SetRoutes(router)
-	fositeHandler.SetRoutes(router)
-
-	fmt.Printf("Starting server on %s\n", c.GetAddress())
-	fatal("Could not start server because %s.\n", http.ListenAndServe(c.GetAddress(), router))
+	logrus.Infof("Starting server on %s", c.GetAddress())
+	err := http.ListenAndServe(c.GetAddress(), router)
+	pkg.Must(err, "Could not start server because %s.", err)
 }

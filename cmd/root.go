@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/ory-am/hydra/cmd/cli"
+	"github.com/ory-am/hydra/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/ory-am/hydra/cmd/cli"
 )
 
 var cfgFile string
+
+var c = new(config.Config)
 
 // This represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
@@ -20,7 +23,7 @@ var RootCmd = &cobra.Command{
 	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
-var cmdHandler *cli.Handler
+var cmdHandler = cli.NewHandler(c)
 
 // Execute adds all child commands to the root command sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
@@ -62,9 +65,7 @@ func initConfig() {
 		fmt.Println("")
 	}
 
-	if err := viper.Unmarshal(&c); err != nil {
+	if err := viper.Unmarshal(c); err != nil {
 		fatal("Could not read config because %s.", err)
 	}
-
-	cmdHandler = cli.NewHandler(c)
 }

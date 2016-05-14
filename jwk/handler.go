@@ -7,18 +7,38 @@ import (
 
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
+	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/ladon"
 	"github.com/square/go-jose"
 	"golang.org/x/net/context"
+	"github.com/ory-am/hydra/config"
 )
 
 type Handler struct {
 	Manager    Manager
 	Generators map[string]KeyGenerator
 	H          herodot.Herodot
-	W          warden.Warden
+	W          firewall.Firewall
+}
+
+func NewHandler(c *config.Config, router *httprouter.Router) *Handler {
+	ctx := c.Context()
+
+	h := &Handler{}
+	h.H = &herodot.JSON{}
+	h.W = ctx.Warden
+	h.SetRoutes(router)
+
+	switch ctx.Connection.(type) {
+	case *config.MemoryConnection:
+		h.Manager = &MemoryManager{}
+		break
+	default:
+		panic("Unknown connection type.")
+	}
+
+	return h
 }
 
 func (h *Handler) GetGenerators() map[string]KeyGenerator {

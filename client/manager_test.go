@@ -1,6 +1,10 @@
 package client_test
 
 import (
+	"net/http/httptest"
+	"net/url"
+	"testing"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/hash"
@@ -10,9 +14,6 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
 	"github.com/stretchr/testify/assert"
-	"net/http/httptest"
-	"net/url"
-	"testing"
 )
 
 var clientManagers = map[string]Storage{}

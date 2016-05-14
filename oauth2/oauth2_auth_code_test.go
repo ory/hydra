@@ -10,6 +10,7 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	ejwt "github.com/ory-am/fosite/token/jwt"
+	"github.com/ory-am/hydra/jwk"
 	. "github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
@@ -26,9 +27,9 @@ func TestAuthCode(t *testing.T) {
 				return nil, errors.Errorf("Unexpected signing method: %v", tt.Header["alg"])
 			}
 
-			pk, err := keyManager.GetAsymmetricKey(ConsentChallengeKey)
+			pk, err := keyManager.GetKey(ConsentChallengeKey, "public")
 			pkg.RequireError(t, false, err)
-			return jwt.ParseRSAPublicKeyFromPEM(pk.Public)
+			return jwk.MustRSAPublic(pk), nil
 		})
 		pkg.RequireError(t, false, err)
 		require.True(t, tok.Valid)

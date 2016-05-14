@@ -3,6 +3,9 @@ package connection
 import (
 	"testing"
 
+	"net/http/httptest"
+	"net/url"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/herodot"
@@ -12,8 +15,6 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"net/http/httptest"
-	"net/url"
 )
 
 var connections = []*Connection{

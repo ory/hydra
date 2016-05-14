@@ -2,10 +2,11 @@ package client
 
 import (
 	"github.com/ory-am/fosite"
-	"github.com/spf13/cobra"
 	"github.com/ory-am/hydra/config"
-	"github.com/pborman/uuid"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/pborman/uuid"
+	"github.com/spf13/cobra"
+	"fmt"
 )
 
 type CLIHandler struct {
@@ -16,27 +17,40 @@ type CLIHandler struct {
 func NewCLIHandler(c *config.Config) *CLIHandler {
 	return &CLIHandler{
 		Config: c,
-		M: &HTTPManager{
-			Endpoint: c.Resolve("/clients"),
-		},
+		M: &HTTPManager{},
 	}
 }
 
 func (h *CLIHandler) CreateClient(cmd *cobra.Command, args []string) {
+	h.M.Endpoint = h.Config.Resolve("/clients")
 	h.M.Client = h.Config.OAuth2Client()
 
 	secret, err := pkg.GenerateSecret(26)
 	pkg.Must(err, "Could not generate secret: %s", err)
 
-	err = h.M.CreateClient(&fosite.DefaultClient{
-		ID: uuid.New(),
+	client := &fosite.DefaultClient{
+		ID:     uuid.New(),
 		Secret: secret,
-	})
+	}
+	err = h.M.CreateClient(client)
 	pkg.Must(err, "Could not create client: %s", err)
+
+	fmt.Printf("Client ID: %s\n", client.ID)
+	fmt.Printf("Client Secret: %s\n", secret)
 }
 
 func (h *CLIHandler) DeleteClient(cmd *cobra.Command, args []string) {
+	h.M.Endpoint = h.Config.Resolve("/clients")
 	h.M.Client = h.Config.OAuth2Client()
-	err := h.M.DeleteClient(args[0])
-	pkg.Must(err, "Could not delete client: %s", err)
+	if len(args) == 0 {
+		fmt.Print(cmd.UsageString())
+		return
+	}
+
+	for _, c := range args{
+		err := h.M.DeleteClient(c)
+		pkg.Must(err, "Could not delete client: %s", err)
+	}
+
+	fmt.Println("Client(s) deleted.")
 }

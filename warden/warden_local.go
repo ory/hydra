@@ -6,17 +6,19 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/handler/core"
+	. "github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/ladon"
 	"golang.org/x/net/context"
+	"github.com/Sirupsen/logrus"
 )
 
 type LocalWarden struct {
 	Warden         ladon.Warden
 	TokenValidator *core.CoreValidator
 
-	Issuer string
+	Issuer         string
 }
 
 func (w *LocalWarden) actionAllowed(ctx context.Context, a *ladon.Request, scopes []string, oauthRequest fosite.AccessRequester, session *oauth2.Session) (*Context, error) {
@@ -34,6 +36,13 @@ func (w *LocalWarden) actionAllowed(ctx context.Context, a *ladon.Request, scope
 		return nil, err
 	}
 
+	logrus.WithFields(logrus.Fields{
+		"scopes": scopes,
+		"subject": a.Subject,
+		"client": oauthRequest.GetClient().GetID(),
+		"request": a,
+	}).Infof("Access granted")
+
 	return &Context{
 		Subject:       session.Subject,
 		GrantedScopes: oauthRequest.GetGrantedScopes(),
@@ -41,7 +50,6 @@ func (w *LocalWarden) actionAllowed(ctx context.Context, a *ladon.Request, scope
 		Audience:      oauthRequest.GetClient().GetID(),
 		IssuedAt:      oauthRequest.GetRequestedAt(),
 	}, nil
-
 }
 
 func (w *LocalWarden) ActionAllowed(ctx context.Context, token string, a *ladon.Request, scopes ...string) (*Context, error) {
@@ -78,6 +86,11 @@ func (w *LocalWarden) Authorized(ctx context.Context, token string, scopes ...st
 	}
 
 	session = oauthRequest.GetSession().(*oauth2.Session)
+	logrus.WithFields(logrus.Fields{
+		"scopes": scopes,
+		"subject": session.Subject,
+		"client": oauthRequest.GetClient().GetID(),
+	}).Infof("Access granted")
 	return &Context{
 		Subject:       session.Subject,
 		GrantedScopes: oauthRequest.GetGrantedScopes(),
@@ -100,6 +113,12 @@ func (w *LocalWarden) HTTPAuthorized(ctx context.Context, r *http.Request, scope
 	}
 
 	session = oauthRequest.GetSession().(*oauth2.Session)
+	logrus.WithFields(logrus.Fields{
+		"scopes": scopes,
+		"subject": session.Subject,
+		"client": oauthRequest.GetClient().GetID(),
+	}).Infof("Access granted")
+
 	return &Context{
 		Subject:       session.Subject,
 		GrantedScopes: oauthRequest.GetGrantedScopes(),

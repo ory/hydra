@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"time"
 
+	"crypto/rsa"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/handler/oidc/strategy"
 	ejwt "github.com/ory-am/fosite/token/jwt"
-	"github.com/ory-am/hydra/key"
+	"github.com/ory-am/hydra/jwk"
 	"github.com/pborman/uuid"
 )
 
@@ -21,7 +23,7 @@ const (
 type DefaultConsentStrategy struct {
 	Issuer string
 
-	KeyManager key.Manager
+	KeyManager jwk.Manager
 }
 
 func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, token string) (claims *Session, err error) {
@@ -30,11 +32,16 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 			return nil, errors.Errorf("Unexpected signing method: %v", t.Header["alg"])
 		}
 
-		pk, err := s.KeyManager.GetAsymmetricKey(ConsentEndpointKey)
+		pk, err := s.KeyManager.GetKey(ConsentEndpointKey, "public")
 		if err != nil {
 			return nil, err
 		}
-		return jwt.ParseRSAPublicKeyFromPEM(pk.Public)
+
+		rsaKey, ok := pk.Key.(*rsa.PublicKey)
+		if !ok {
+			return nil, errors.New("Could not convert to RSA Private Key")
+		}
+		return rsaKey, nil
 	})
 
 	if err != nil {
@@ -80,14 +87,14 @@ func (s *DefaultConsentStrategy) IssueChallenge(authorizeRequest fosite.Authoriz
 		"redir": redirectURL,
 	}
 
-	key, err := s.KeyManager.GetAsymmetricKey(ConsentChallengeKey)
+	key, err := s.KeyManager.GetKey(ConsentChallengeKey, "private")
 	if err != nil {
 		return "", errors.New(err)
 	}
 
-	rsaKey, err := jwt.ParseRSAPrivateKeyFromPEM(key.Private)
-	if err != nil {
-		return "", errors.New(err)
+	rsaKey, ok := key.Key.(*rsa.PrivateKey)
+	if !ok {
+		return "", errors.New("Could not convert to RSA Private Key")
 	}
 
 	var signature, encoded string

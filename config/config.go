@@ -8,51 +8,72 @@ import (
 	"runtime"
 	"time"
 
-	"gopkg.in/yaml.v2"
 	"net/http"
-	"golang.org/x/oauth2/clientcredentials"
+	"net/url"
+
+	"github.com/ory-am/fosite/hash"
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/net/context"
-	"github.com/ory-am/fosite/hash"
-	"net/url"
+	"golang.org/x/oauth2/clientcredentials"
+	"gopkg.in/yaml.v2"
+	"github.com/ory-am/ladon"
+	"github.com/Sirupsen/logrus"
+	"github.com/go-errors/errors"
+	"github.com/ory-am/fosite/handler/core/strategy"
+	"github.com/ory-am/fosite/token/hmac"
 )
 
 type Config struct {
-	BindPort int `mapstructure:"port" yaml:"-"`
+	BindPort     int `mapstructure:"port" yaml:"-"`
 
-	BindHost string `mapstructure:"host" yaml:"-"`
+	BindHost     string `mapstructure:"host" yaml:"-"`
 
-	Issuer string `mapstructure:"issuer" yaml:"-"`
+	Issuer       string `mapstructure:"issuer" yaml:"-"`
 
 	SystemSecret []byte `mapstructure:"system_secret" yaml:"-"`
 
-	ConsentURL string `mapstructure:"consent_url" yaml:"-"`
+	ConsentURL   string `mapstructure:"consent_url" yaml:"-"`
 
-	ClusterURL string `mapstructure:"cluster_url" yaml:"cluster_url"`
+	ClusterURL   string `mapstructure:"cluster_url" yaml:"cluster_url"`
 
-	ClientID string `mapstructure:"client_id" yaml:"client_id"`
+	ClientID     string `mapstructure:"client_id" yaml:"client_id"`
 
 	ClientSecret string `mapstructure:"client_secret" yaml:"client_secret"`
 
-	cluster *url.URL
+	cluster      *url.URL
 
 	oauth2Client *http.Client
+
+	context      *Context
 }
 
 func (c *Config) Context() *Context {
-	return &Context{
+	if c.context != nil {
+		return c.context
+	}
+
+	manager := ladon.NewMemoryManager()
+	c.context = &Context{
 		Connection: &MemoryConnection{},
 		Hasher: &hash.BCrypt{
 			WorkFactor: 11,
 		},
+		LadonManager: manager,
+		FositeStrategy: &strategy.HMACSHAStrategy{
+			Enigma: &hmac.HMACStrategy{
+				GlobalSecret: c.GetSystemSecret(),
+			},
+		},
 	}
+
+	return c.context
 }
 
 func (c *Config) Resolve(join ...string) *url.URL {
-	var err error
 	if c.cluster == nil {
-		c.cluster, err = url.Parse(c.ClusterURL)
-		pkg.Must(err, "Could not authenticate: %s", err)
+		cluster, err := url.Parse(c.ClusterURL)
+		c.cluster = cluster
+		pkg.Must(err, "Could not parse cluster url: %s", err)
 	}
 
 	if len(join) == 0 {
@@ -71,7 +92,11 @@ func (c *Config) OAuth2Client() *http.Client {
 		ClientID:     c.ClientID,
 		ClientSecret: c.ClientSecret,
 		TokenURL:     pkg.JoinURLStrings(c.ClusterURL, "/oauth2/token"),
-		Scopes:       []string{"core", "hydra"},
+		Scopes:       []string{
+			"core",
+			"hydra",
+			"hydra.clients",
+		},
 	}
 
 	_, err := oauthConfig.Token(context.Background())
@@ -85,9 +110,12 @@ func (c *Config) GetSystemSecret() []byte {
 		return c.SystemSecret
 	}
 
-	fmt.Println("No global secret was set. Generating a random one...")
-	//c.SystemSecret = generateSecret(32)
-	fmt.Printf("A global secret was generated:\n%s\n", c.SystemSecret)
+	var err error
+	c.SystemSecret, err = pkg.GenerateSecret(32)
+	pkg.Must(err, "Could not generate global secret: %s", err)
+	logrus.Warnln("No system secret specified.")
+	logrus.Warnf("Generated system secret: %s", c.SystemSecret)
+	logrus.Warnln("Do not auto-generate system secrets in production.")
 	return c.SystemSecret
 }
 
@@ -109,14 +137,14 @@ func (c *Config) GetAccessTokenLifespan() time.Duration {
 	return time.Hour
 }
 
-func (c *Config) Save() error {
+func (c *Config) Persist() error {
 	out, err := yaml.Marshal(c)
 	if err != nil {
-		return err
+		return errors.New(err)
 	}
 
 	if err := ioutil.WriteFile(getConfigPath(), out, 0700); err != nil {
-		return err
+		return errors.New(err)
 	}
 	return nil
 }
@@ -128,10 +156,7 @@ func getConfigPath() string {
 	}
 
 	p, err := filepath.Abs(path)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Could not fetch configuration path because %s", err)
-		os.Exit(1)
-	}
+	pkg.Must(err, "Could not fetch configuration path because %s", err)
 	return filepath.Clean(p)
 }
 

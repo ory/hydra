@@ -9,16 +9,16 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/common/rand/sequence"
 	"github.com/ory-am/fosite"
-	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/hydra/warden"
-	"github.com/ory-am/ladon"
 	"github.com/ory-am/hydra/config"
+	"github.com/ory-am/hydra/firewall"
+	"github.com/ory-am/hydra/herodot"
+	"github.com/ory-am/ladon"
 )
 
 type Handler struct {
 	Manager Manager
 	H       herodot.Herodot
-	W       warden.Warden
+	W       firewall.Firewall
 }
 
 const (
@@ -38,25 +38,30 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.DELETE(ClientsHandlerPath+"/:id", h.Delete)
 }
 
-func NewHandler(c *config.Config, router *httprouter.Router) *Handler {
+func NewManager(c *config.Config) Manager {
 	ctx := c.Context()
-
-	h := &Handler{}
-	h.H = &herodot.JSON{}
-	h.W = ctx.Warden
-	h.SetRoutes(router)
 
 	switch ctx.Connection.(type) {
 	case *config.MemoryConnection:
-		h.Manager = &MemoryManager{
+		return &MemoryManager{
 			Clients: map[string]*fosite.DefaultClient{},
 			Hasher:  ctx.Hasher,
 		}
-		break;
+		break
 	default:
 		panic("Unknown connection type.")
 	}
+	return nil
+}
 
+func NewHandler(c *config.Config, router *httprouter.Router, manager Manager) *Handler {
+	ctx := c.Context()
+	h := &Handler{
+		H:&herodot.JSON{},
+		W: ctx.Warden,Manager:manager,
+	}
+
+	h.SetRoutes(router)
 	return h
 }
 

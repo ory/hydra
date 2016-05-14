@@ -8,11 +8,12 @@ import (
 	"github.com/asaskevich/govalidator"
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
+	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/ladon"
 	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
+	"github.com/ory-am/hydra/config"
 )
 
 const (
@@ -24,7 +25,26 @@ const (
 type Handler struct {
 	Manager Manager
 	H       herodot.Herodot
-	W       warden.Warden
+	W       firewall.Firewall
+}
+
+func NewHandler(c *config.Config, router *httprouter.Router) *Handler {
+	ctx := c.Context()
+
+	h := &Handler{}
+	h.H = &herodot.JSON{}
+	h.W = ctx.Warden
+	h.SetRoutes(router)
+
+	switch ctx.Connection.(type) {
+	case *config.MemoryConnection:
+		h.Manager = NewMemoryManager()
+		break
+	default:
+		panic("Unknown connection type.")
+	}
+
+	return h
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {

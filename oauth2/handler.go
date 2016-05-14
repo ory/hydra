@@ -8,15 +8,11 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/pkg"
-	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/hydra/config"
-	"github.com/ory-am/hydra/internal"
-	"github.com/ory-am/hydra/client"
 )
 
 type Handler struct {
-	OAuth2  fosite.OAuth2Provider
-	Consent ConsentStrategy
+	OAuth2     fosite.OAuth2Provider
+	Consent    ConsentStrategy
 
 	ConsentURL url.URL
 }
@@ -36,6 +32,10 @@ func (o *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprou
 		pkg.LogError(err)
 		o.OAuth2.WriteAccessError(w, accessRequest, err)
 		return
+	}
+
+	if accessRequest.GetGrantTypes().Exact("client_credentials") {
+		session.Subject = accessRequest.GetClient().GetID()
 	}
 
 	accessResponse, err := o.OAuth2.NewAccessResponse(ctx, r, accessRequest)

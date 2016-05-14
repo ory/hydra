@@ -8,6 +8,7 @@ import (
 	"net/url"
 
 	"github.com/go-errors/errors"
+	. "github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
 	"golang.org/x/net/context"

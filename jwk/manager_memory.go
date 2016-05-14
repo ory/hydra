@@ -1,7 +1,6 @@
 package jwk
 
 import (
-	"fmt"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/square/go-jose"
@@ -21,7 +20,6 @@ func (m *MemoryManager) AddKeySet(set string, keys *jose.JsonWebKeySet) error {
 	for _, key := range keys.Keys {
 		m.Keys[set][key.KeyID] = key
 	}
-	fmt.Printf("%v\n", m.Keys)
 	return nil
 }
 
@@ -33,7 +31,7 @@ func (m *MemoryManager) GetKey(set, kid string) (*jose.JsonWebKey, error) {
 	}
 
 	k, found := m.Keys[set][kid]
-	if !found {
+	if !found || &k == nil {
 		return nil, errors.New(pkg.ErrNotFound)
 	}
 

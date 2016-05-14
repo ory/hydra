@@ -11,6 +11,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/handler/core"
+	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
@@ -23,7 +24,7 @@ import (
 
 var ts *httptest.Server
 
-var wardens = map[string]warden.Warden{}
+var wardens = map[string]firewall.Firewall{}
 
 var ladonWarden = pkg.LadonWarden(map[string]ladon.Policy{
 	"1": &ladon.DefaultPolicy{
@@ -102,7 +103,7 @@ func TestActionAllowed(t *testing.T) {
 			req       *ladon.Request
 			scopes    []string
 			expectErr bool
-			assert    func(*warden.Context)
+			assert    func(*firewall.Context)
 		}{
 			{
 				token:     "invalid",
@@ -166,7 +167,7 @@ func TestActionAllowed(t *testing.T) {
 				},
 				scopes:    []string{"core"},
 				expectErr: false,
-				assert: func(c *warden.Context) {
+				assert: func(c *firewall.Context) {
 					assert.Equal(t, "alice", c.Subject)
 					assert.Equal(t, "tests", c.Issuer)
 
@@ -196,7 +197,7 @@ func TestAuthorized(t *testing.T) {
 			token     string
 			scopes    []string
 			expectErr bool
-			assert    func(*warden.Context)
+			assert    func(*firewall.Context)
 		}{
 			{
 				token:     "invalid",
@@ -215,7 +216,7 @@ func TestAuthorized(t *testing.T) {
 				token:     tokens[0][1],
 				scopes:    []string{"core"},
 				expectErr: false,
-				assert: func(c *warden.Context) {
+				assert: func(c *firewall.Context) {
 					assert.Equal(t, "alice", c.Subject)
 					assert.Equal(t, "tests", c.Issuer)
 

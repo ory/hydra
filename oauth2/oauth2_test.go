@@ -17,7 +17,7 @@ import (
 	"github.com/ory-am/fosite/handler/core/strategy"
 	"github.com/ory-am/fosite/hash"
 	"github.com/ory-am/fosite/token/hmac"
-	"github.com/ory-am/hydra/key"
+	"github.com/ory-am/hydra/jwk"
 	. "github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/oauth2"
@@ -26,16 +26,9 @@ import (
 
 var store = pkg.FositeStore()
 
-var keyStrategy = &key.DefaultKeyStrategy{
-	AsymmetricKeyStrategy: &key.RSAPEMStrategy{},
-	SymmetricKeyStrategy:  &key.SHAStrategy{},
-}
+var keyManager = &jwk.MemoryManager{}
 
-var keyManager = &key.MemoryManager{
-	AsymmetricKeys: map[string]*key.AsymmetricKey{},
-	SymmetricKeys:  map[string]*key.SymmetricKey{},
-	Strategy:       keyStrategy,
-}
+var keyGenerator = &jwk.RS256Generator{}
 
 var hmacStrategy = &strategy.HMACSHAStrategy{
 	Enigma: &hmac.HMACStrategy{
@@ -89,8 +82,13 @@ var oauthConfig *oauth2.Config
 var oauthClientConfig *clientcredentials.Config
 
 func init() {
-	keyManager.CreateAsymmetricKey(ConsentChallengeKey)
-	keyManager.CreateAsymmetricKey(ConsentEndpointKey)
+	keys, err := keyGenerator.Generate("")
+	pkg.Must(err, "")
+	keyManager.AddKeySet(ConsentChallengeKey, keys)
+
+	keys, err = keyGenerator.Generate("")
+	pkg.Must(err, "")
+	keyManager.AddKeySet(ConsentEndpointKey, keys)
 	ts = httptest.NewServer(router)
 
 	handler.SetRoutes(router)
@@ -137,14 +135,13 @@ func signConsentToken(claims map[string]interface{}) (string, error) {
 	token := jwt.New(jwt.SigningMethodRS256)
 	token.Claims = claims
 
-	key, err := keyManager.GetAsymmetricKey(ConsentEndpointKey)
+	key, err := keyManager.GetKey(ConsentEndpointKey, "private")
 	if err != nil {
 		return "", errors.New(err)
 	}
-
-	rsaKey, err := jwt.ParseRSAPrivateKeyFromPEM(key.Private)
+	rsaKey, err := jwk.ToRSAPrivate(key)
 	if err != nil {
-		return "", errors.New(err)
+		return "", err
 	}
 
 	var signature, encoded string

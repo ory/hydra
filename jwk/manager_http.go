@@ -1,10 +1,11 @@
 package jwk
 
 import (
-	"github.com/ory-am/hydra/pkg"
-	"github.com/square/go-jose"
 	"net/http"
 	"net/url"
+
+	"github.com/ory-am/hydra/pkg"
+	"github.com/square/go-jose"
 )
 
 type HTTPManager struct {

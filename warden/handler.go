@@ -7,9 +7,11 @@ import (
 
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
+	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/ladon"
 	"golang.org/x/net/context"
+	"github.com/ory-am/hydra/config"
 )
 
 const (
@@ -19,12 +21,27 @@ const (
 
 type WardenHandler struct {
 	H      herodot.Herodot
-	Warden Warden
+	Warden firewall.Firewall
 	Ladon  ladon.Warden
 }
 
+func NewHandler(c *config.Config, router *httprouter.Router) *WardenHandler {
+	ctx := c.Context()
+
+	h := &WardenHandler{
+		H: &herodot.JSON{},
+		Warden: ctx.Warden,
+		Ladon: &ladon.Ladon{
+			Manager: ctx.LadonManager,
+		},
+	}
+	h.SetRoutes(router)
+
+	return h
+}
+
 type WardenResponse struct {
-	*Context
+	*firewall.Context
 }
 
 type WardenAuthorizedRequest struct {
@@ -92,7 +109,7 @@ func (h *WardenHandler) Allowed(w http.ResponseWriter, r *http.Request, _ httpro
 	h.H.Write(ctx, w, r, authContext)
 }
 
-func (h *WardenHandler) authorizeClient(ctx context.Context, w http.ResponseWriter, r *http.Request, action string) (*Context, error) {
+func (h *WardenHandler) authorizeClient(ctx context.Context, w http.ResponseWriter, r *http.Request, action string) (*firewall.Context, error) {
 	authctx, err := h.Warden.ActionAllowed(ctx, TokenFromRequest(r), &ladon.Request{
 		Action: action,
 	}, "hydra.warden")

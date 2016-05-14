@@ -39,6 +39,7 @@ Join our [mailinglist](http://eepurl.com/bKT3N9) to stay on top of new developme
 - [HTTP/2 RESTful API](#http2-restful-api)
 - [Run hydra-host](#run-hydra-host)
   - [With vagrant](#with-vagrant)
+  - [With docker](#with-docker)
   - [Set up PostgreSQL locally](#set-up-postgresql-locally)
   - [Run as executable](#run-as-executable)
   - [Run from sourcecode](#run-from-sourcecode)
@@ -134,6 +135,16 @@ You can also always access hydra-host through vagrant:
 vagrant ssh
 hydra-host help
 ```
+
+### With Docker
+
+You'll need [Docker](https://www.docker.com/) installed on your system.
+
+```
+docker run --name hydra-postgres -e POSTGRES_PASSWORD=secret -d postgres
+docker run -d --name hydra-host --link hydra-postgres:postgres -p 9000:9000 oryam/hydra
+```
+The hydra container is now running on the *public* port `9000`. This is probably for testing purpose only.
 
 ### Set up PostgreSQL locally
 

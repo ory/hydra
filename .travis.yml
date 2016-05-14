@@ -19,8 +19,22 @@ install:
   - go get github.com/golang/lint/golint
   - go get github.com/pierrre/gotestcover
   - go get -t $(go list ./... | grep -v /vendor/)
+  - git clone https://github.com/docker-library/official-images.git ~/official-images
 
 script:
   # - go vet -x ./...
   - gotestcover -coverprofile="cover.out" -race -covermode="count" $(go list ./... | grep -v /vendor/)
   - goveralls -coverprofile="cover.out"
+  # Test dockerfiles
+  - cd cli/hydra-host
+  - docker build -t "hydra-host" "."
+  - ~/official-images/test/run.sh "hydra-host"
+  - cd ../hydra-signin
+  - docker build -t "hydra-signin" "."
+  - ~/official-images/test/run.sh "hydra-signin"
+  - cd ../hydra-signup
+  - docker build -t "hydra-signup" "."
+  - ~/official-images/test/run.sh "hydra-sigup"
+
+after_script:
+  - docker images

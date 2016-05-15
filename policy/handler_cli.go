@@ -73,7 +73,26 @@ func (h *CLIHandler) CreatePolicy(cmd *cobra.Command, args []string) {
 }
 
 func (h *CLIHandler) AddResourceToPolicy(cmd *cobra.Command, args []string) {
-	fmt.Println("Not yet implemented.")
+	h.M.Endpoint = h.Config.Resolve("/policies")
+	h.M.Client = h.Config.OAuth2Client(cmd)
+
+	if len(args) < 2 {
+		fmt.Print(cmd.UsageString())
+		return
+	}
+
+	policy, err := h.M.Get(args[0])
+	pkg.Must(err, "Could not get policy: %s", err)
+
+	err = h.M.Delete(args[0])
+	pkg.Must(err, "Could not prepare policy for update: %s", err)
+
+	p := policy.(*ladon.DefaultPolicy)
+	p.Resources = append(p.Resources, args[1:]...)
+
+	err = h.M.Create(policy)
+	pkg.Must(err, "Could not update policy: %s", err)
+	fmt.Printf("Added resources to policy %s", p.ID)
 }
 
 func (h *CLIHandler) RemoveResourceFromPolicy(cmd *cobra.Command, args []string) {
@@ -81,7 +100,26 @@ func (h *CLIHandler) RemoveResourceFromPolicy(cmd *cobra.Command, args []string)
 }
 
 func (h *CLIHandler) AddSubjectToPolicy(cmd *cobra.Command, args []string) {
-	fmt.Println("Not yet implemented.")
+	h.M.Endpoint = h.Config.Resolve("/policies")
+	h.M.Client = h.Config.OAuth2Client(cmd)
+
+	if len(args) < 2 {
+		fmt.Print(cmd.UsageString())
+		return
+	}
+
+	policy, err := h.M.Get(args[0])
+	pkg.Must(err, "Could not get policy: %s", err)
+
+	err = h.M.Delete(args[0])
+	pkg.Must(err, "Could not prepare policy for update: %s", err)
+
+	p := policy.(*ladon.DefaultPolicy)
+	p.Subjects = append(p.Subjects, args[1:]...)
+
+	err = h.M.Create(policy)
+	pkg.Must(err, "Could not update policy: %s", err)
+	fmt.Printf("Added subjects to policy %s", p.ID)
 }
 
 func (h *CLIHandler) RemoveSubjectFromPolicy(cmd *cobra.Command, args []string) {
@@ -89,7 +127,26 @@ func (h *CLIHandler) RemoveSubjectFromPolicy(cmd *cobra.Command, args []string) 
 }
 
 func (h *CLIHandler) AddActionToPolicy(cmd *cobra.Command, args []string) {
-	fmt.Println("Not yet implemented.")
+	h.M.Endpoint = h.Config.Resolve("/policies")
+	h.M.Client = h.Config.OAuth2Client(cmd)
+
+	if len(args) < 2 {
+		fmt.Print(cmd.UsageString())
+		return
+	}
+
+	policy, err := h.M.Get(args[0])
+	pkg.Must(err, "Could not get policy: %s", err)
+
+	err = h.M.Delete(args[0])
+	pkg.Must(err, "Could not prepare policy for update: %s", err)
+
+	p := policy.(*ladon.DefaultPolicy)
+	p.Actions = append(p.Actions, args[1:]...)
+
+	err = h.M.Create(policy)
+	pkg.Must(err, "Could not update policy: %s", err)
+	fmt.Printf("Added actions to policy %s", p.ID)
 }
 
 func (h *CLIHandler) RemoveActionFromPolicy(cmd *cobra.Command, args []string) {

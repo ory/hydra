@@ -23,6 +23,7 @@ import (
 	"crypto/tls"
 	"github.com/spf13/viper"
 	"strconv"
+	"os"
 )
 
 type Config struct {
@@ -126,7 +127,7 @@ func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
 	}
 
 	ctx := context.Background()
-	if ok, _ := cmd.Flags().GetBool("skip-ca-check"); ok {
+	if ok, _ := cmd.Flags().GetBool("skip-tls-verify"); ok {
 		fmt.Println("Warning: Skipping TLS Certificate Verification.")
 		ctx = context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -134,7 +135,13 @@ func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
 	}
 
 	_, err := oauthConfig.Token(ctx)
-	pkg.Must(err, "Could not authenticate: %s", err)
+	if err != nil {
+		fmt.Printf("Could not authenticate, because: %s\n", err)
+		fmt.Println("Did you forget to log on? Run `hydra connect`.")
+		fmt.Println("Did you run Hydra without a valid TLS certificate? Make sure to use the `--skip-tls-verify` flag.")
+		fmt.Println("Did you know you can skip `hydra connect` when running `hydra host --dangerous-auto-logon`? DO NOT use this flag in production!")
+		os.Exit(1)
+	}
 	c.oauth2Client = oauthConfig.Client(ctx)
 	return c.oauth2Client
 }

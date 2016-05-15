@@ -4,7 +4,6 @@ import (
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/pkg"
-	"github.com/pborman/uuid"
 	"github.com/spf13/cobra"
 	"fmt"
 )
@@ -31,16 +30,18 @@ func (h *CLIHandler) CreateClient(cmd *cobra.Command, args []string) {
 	grantTypes, _ := cmd.Flags().GetStringSlice("grant-types")
 	allowedScopes, _ := cmd.Flags().GetStringSlice("allowed-scopes")
 	callbacks, _ := cmd.Flags().GetStringSlice("callbacks")
-	name, _ := cmd.Flags().GetStringSlice("name")
-	id, _ := cmd.Flags().GetStringSlice("id")
-	secret, _ := cmd.Flags().GetStringSlice("secret")
-	if secret == "" {
+	name, _ := cmd.Flags().GetString("name")
+	id, _ := cmd.Flags().GetString("id")
+	secretFlag, _ := cmd.Flags().GetString("secret")
+
+	secret := []byte(secretFlag)
+	if secretFlag == "" {
 		secret, err = pkg.GenerateSecret(26)
 		pkg.Must(err, "Could not generate secret: %s", err)
 	}
 
 	client := &fosite.DefaultClient{
-		ID:     uuid.New(),
+		ID:     id,
 		Secret: secret,
 		ResponseTypes: responseTypes,
 		GrantedScopes: allowedScopes,
@@ -63,7 +64,7 @@ func (h *CLIHandler) DeleteClient(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	for _, c := range args{
+	for _, c := range args {
 		err := h.M.DeleteClient(c)
 		pkg.Must(err, "Could not delete client: %s", err)
 	}

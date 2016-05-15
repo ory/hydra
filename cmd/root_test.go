@@ -33,7 +33,7 @@ func TestExecute(t *testing.T) {
 		{args:[]string{"policies", "get", "foobar"}        },
 		{args:[]string{"policies", "delete", "foobar"}        },
 	} {
-		c.args = append(c.args, []string{"--skip-ca-check", "--config", filepath.Join(os.TempDir(), "hydra.yml")}...)
+		c.args = append(c.args, []string{"--skip-tls-verify", "--config", filepath.Join(os.TempDir(), "hydra.yml")}...)
 
 		if c.timeout > 0 {
 			t.Logf("Running async command: %s", c.args)

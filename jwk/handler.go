@@ -37,10 +37,11 @@ func (h *Handler) GetGenerators() map[string]KeyGenerator {
 func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.POST("/keys/:set", h.Create)
 	r.PUT("/keys/:set", h.UpdateKeySet)
-	r.PUT("/keys/:set/:key", h.UpdateKey)
 	r.GET("/keys/:set", h.GetKeySet)
-	r.GET("/keys/:set/:key", h.GetKey)
 	r.DELETE("/keys/:set", h.DeleteKeySet)
+
+	r.PUT("/keys/:set/:key", h.UpdateKey)
+	r.GET("/keys/:set/:key", h.GetKey)
 	r.DELETE("/keys/:set/:key", h.DeleteKey)
 
 }
@@ -101,7 +102,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	var set = ps.ByName("set")
 
 	if _, err := h.W.HTTPActionAllowed(ctx, r, &ladon.Request{
-		Resource: "rn:hydra:keys",
+		Resource: "rn:hydra:keys:" + set,
 		Action:   "create",
 	}, "hydra.keys.create"); err != nil {
 		h.H.WriteError(ctx, w, r, err)

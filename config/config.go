@@ -21,6 +21,9 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite/handler/core/strategy"
 	"github.com/ory-am/fosite/token/hmac"
+	"github.com/spf13/cobra"
+	"golang.org/x/oauth2"
+	"crypto/tls"
 )
 
 type Config struct {
@@ -40,11 +43,36 @@ type Config struct {
 
 	ClientSecret string `mapstructure:"client_secret" yaml:"client_secret"`
 
+	ForceHTTP    bool `mapstructure:"foolishly_force_http" yaml:"-"`
+
 	cluster      *url.URL
 
 	oauth2Client *http.Client
 
 	context      *Context
+}
+
+func (c *Config) GetClusterURL() string {
+	if c.ClusterURL == "" {
+		bindHost := c.BindHost
+		if bindHost == "" {
+			bindHost = "localhost"
+		}
+
+		schema := "https"
+		if c.ForceHTTP {
+			schema = "http"
+		}
+
+		port := string(c.BindPort)
+		if c.BindPort == 0 {
+			port = "4444"
+		}
+
+		c.ClusterURL = schema + "://" + bindHost + ":" + port
+	}
+
+	return c.ClusterURL
 }
 
 func (c *Config) Context() *Context {
@@ -83,7 +111,7 @@ func (c *Config) Resolve(join ...string) *url.URL {
 	return pkg.JoinURL(c.cluster, join...)
 }
 
-func (c *Config) OAuth2Client() *http.Client {
+func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
 	if c.oauth2Client != nil {
 		return c.oauth2Client
 	}
@@ -99,9 +127,17 @@ func (c *Config) OAuth2Client() *http.Client {
 		},
 	}
 
-	_, err := oauthConfig.Token(context.Background())
+	ctx := context.Background()
+	if ok, _ := cmd.Flags().GetBool("skip-ca-check"); ok {
+		fmt.Println("Warning: Skipping TLS Certificate Verification.")
+		ctx = context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}})
+	}
+
+	_, err := oauthConfig.Token(ctx)
 	pkg.Must(err, "Could not authenticate: %s", err)
-	c.oauth2Client = oauthConfig.Client(context.Background())
+	c.oauth2Client = oauthConfig.Client(ctx)
 	return c.oauth2Client
 }
 

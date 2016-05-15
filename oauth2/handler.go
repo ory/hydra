@@ -10,6 +10,10 @@ import (
 	"github.com/ory-am/hydra/pkg"
 )
 
+const (
+	OpenIDConnectKeyName = "hydra.openid.connect"
+)
+
 type Handler struct {
 	OAuth2     fosite.OAuth2Provider
 	Consent    ConsentStrategy

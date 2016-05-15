@@ -15,6 +15,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/fosite/handler/core"
+	"github.com/ory-am/hydra/factory"
 )
 
 type Handler struct {
@@ -44,7 +45,7 @@ func (h *Handler) Start(c *config.Config, router *httprouter.Router) {
 
 	// Set up handlers
 	h.Clients = client.NewHandler(c, router, clientsManager)
-	h.Keys = jwk.NewHandler(c, router)
+	h.Keys = factory.NewJWKHandler(c, router)
 	h.Connections = connection.NewHandler(c, router)
 	h.Policy = policy.NewHandler(c, router)
 	h.OAuth2 = internal.NewOAuth2Handler(c, router, h.Keys.Manager)

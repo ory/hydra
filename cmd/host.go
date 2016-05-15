@@ -8,6 +8,13 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/spf13/cobra"
 	"github.com/Sirupsen/logrus"
+	"crypto/tls"
+	"github.com/ory-am/hydra/jwk"
+	"github.com/go-errors/errors"
+)
+
+const (
+	TLSKeyName = "hydra.tls"
 )
 
 // hostCmd represents the host command
@@ -38,11 +45,51 @@ func runHostCmd(cmd *cobra.Command, args []string) {
 
 	if ok, _ := cmd.Flags().GetBool("dangerous-auto-logon"); ok {
 		logrus.Warnln("Do not use flag --dangerous-auto-logon in production.")
-		err :=c.Persist()
+		err := c.Persist()
 		pkg.Must(err, "Could not write configuration file: ", err)
 	}
 
+	http.Handle("/", router)
+
+	srv := &http.Server{
+		Addr: c.GetAddress(),
+		TLSConfig: &tls.Config{
+			Certificates: []tls.Certificate{
+				getOrCreateTLSCertificate(),
+			},
+		},
+	}
+
 	logrus.Infof("Starting server on %s", c.GetAddress())
-	err := http.ListenAndServe(c.GetAddress(), router)
-	pkg.Must(err, "Could not start server because %s.", err)
+	err := srv.ListenAndServeTLS("", "")
+	pkg.Must(err, "Could not start server: %s %s.", err)
+}
+
+func getOrCreateTLSCertificate() tls.Certificate {
+	ctx := c.Context()
+	key, err := ctx.KeyManager.GetKey(TLSKeyName, "private")
+	if errors.Is(err, pkg.ErrNotFound) {
+		logrus.Warn("Key for TLS not found. Creating new one.")
+
+		generator := jwk.ECDSA521Generator{}
+		keys, err := generator.Generate("")
+		pkg.Must(err, "Could not generate key: %s", err)
+
+		err = ctx.KeyManager.AddKeySet(TLSKeyName, keys)
+		pkg.Must(err, "Could not persist key: %s", err)
+
+		key, err = ctx.KeyManager.GetKey(TLSKeyName, "private")
+		pkg.Must(err, "Could not retrieve persisted key: %s", err)
+		logrus.Warn("Temporary key created.")
+	} else {
+		pkg.Must(err, "Could not retrieve key: %s", err)
+	}
+
+	pemCert, pemKey, err := jwk.ToX509PEMKeyPair(key.Key)
+	pkg.Must(err, "Could not create X509 PEM Key Pair: %s", err)
+
+	cert, err := tls.X509KeyPair(pemCert, pemKey)
+	pkg.Must(err, "Could not create TLS Certificate: %s", err)
+
+	return cert
 }

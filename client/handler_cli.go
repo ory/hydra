@@ -23,7 +23,7 @@ func NewCLIHandler(c *config.Config) *CLIHandler {
 
 func (h *CLIHandler) CreateClient(cmd *cobra.Command, args []string) {
 	h.M.Endpoint = h.Config.Resolve("/clients")
-	h.M.Client = h.Config.OAuth2Client()
+	h.M.Client = h.Config.OAuth2Client(cmd)
 
 	secret, err := pkg.GenerateSecret(26)
 	pkg.Must(err, "Could not generate secret: %s", err)
@@ -41,7 +41,7 @@ func (h *CLIHandler) CreateClient(cmd *cobra.Command, args []string) {
 
 func (h *CLIHandler) DeleteClient(cmd *cobra.Command, args []string) {
 	h.M.Endpoint = h.Config.Resolve("/clients")
-	h.M.Client = h.Config.OAuth2Client()
+	h.M.Client = h.Config.OAuth2Client(cmd)
 	if len(args) == 0 {
 		fmt.Print(cmd.UsageString())
 		return

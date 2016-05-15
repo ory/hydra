@@ -53,13 +53,13 @@ func NewOAuth2Handler(c *config.Config, router *httprouter.Router, keys jwk.Mana
 	var ctx = c.Context()
 	var store = ctx.FositeStore
 
-	key, err := keys.GetKey("openid-connect", "private")
+	key, err := keys.GetKey(oauth2.OpenIDConnectKeyName, "private")
 	if errors.Is(err, pkg.ErrNotFound) {
 		logrus.Warnln("Could not find OpenID Connect singing keys. Generating a new keypair...")
 		k, err := new(jwk.RS256Generator).Generate("")
 		pkg.Must(err, "Could not generate signing key for OpenID Connect")
-		keys.AddKeySet("openid-connect", k)
-		key, err = keys.GetKey("openid-connect", "private")
+		keys.AddKeySet(oauth2.OpenIDConnectKeyName, k)
+		key, err = keys.GetKey(oauth2.OpenIDConnectKeyName, "private")
 		pkg.Must(err, "Could not fetch signing key for OpenID Connect")
 		logrus.Warnln("Keypair generated.")
 		logrus.Warnln("WARNING: Automated key creation causes low entropy. Replace the keys as soon as possible.")

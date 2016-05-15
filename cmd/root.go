@@ -42,6 +42,7 @@ func init() {
 	// will be global for your application.
 
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.hydra.yaml)")
+	RootCmd.PersistentFlags().Bool("skip-ca-check", false, "foolishly accept TLS certificates signed by unkown certificate authorities")
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
@@ -67,5 +68,9 @@ func initConfig() {
 
 	if err := viper.Unmarshal(c); err != nil {
 		fatal("Could not read config because %s.", err)
+	}
+
+	if c.ClusterURL == "" {
+		fmt.Printf("Pointing cluster at %s\n", c.GetClusterURL())
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/ory-am/ladon"
 	"github.com/ory-am/fosite/handler/core"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/ory-am/hydra/jwk"
 )
 
 type Context struct {
@@ -16,4 +17,5 @@ type Context struct {
 	LadonManager   ladon.Manager
 	FositeStrategy core.CoreStrategy
 	FositeStore    pkg.FositeStorer
+	KeyManager     *jwk.MemoryManager
 }

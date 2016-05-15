@@ -47,7 +47,7 @@ func (h *CLIHandler) DeletePolicy(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	h.M.Client = h.Config.OAuth2Client()
+	h.M.Client = h.Config.OAuth2Client(cmd)
 	for _, arg := range args {
 		err := h.M.Delete(arg)
 		pkg.Must(err, "Could not delete policy: %s", err)

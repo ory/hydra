@@ -21,7 +21,7 @@ func NewCLIHandler(c *config.Config) *CLIHandler {
 }
 
 func (h *CLIHandler) CreateConnection(cmd *cobra.Command, args []string) {
-	h.M.Client = h.Config.OAuth2Client()
+	h.M.Client = h.Config.OAuth2Client(cmd)
 	h.M.Endpoint = h.Config.Resolve("/connections")
 	if len(args) != 3{
 		fmt.Print(cmd.UsageString())
@@ -38,7 +38,7 @@ func (h *CLIHandler) CreateConnection(cmd *cobra.Command, args []string) {
 }
 
 func (h *CLIHandler) DeleteConnection(cmd *cobra.Command, args []string) {
-	h.M.Client = h.Config.OAuth2Client()
+	h.M.Client = h.Config.OAuth2Client(cmd)
 	h.M.Endpoint = h.Config.Resolve("/connections")
 	if len(args) == 0 {
 		fmt.Print(cmd.UsageString())

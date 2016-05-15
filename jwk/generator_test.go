@@ -19,6 +19,18 @@ func TestGenerator(t *testing.T) {
 				assert.Len(t, ks, 2)
 			},
 		},
+		{
+			g: &ECDSA521Generator{},
+			check: func(ks *jose.JsonWebKeySet) {
+				assert.Len(t, ks, 2)
+			},
+		},
+		{
+			g: &HS256Generator{},
+			check: func(ks *jose.JsonWebKeySet) {
+				assert.Len(t, ks, 1)
+			},
+		},
 	} {
 		keys, err := c.g.Generate("foo")
 		pkg.AssertError(t, false, err)

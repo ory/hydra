@@ -12,7 +12,6 @@ import (
 	"github.com/ory-am/ladon"
 	"github.com/square/go-jose"
 	"golang.org/x/net/context"
-	"github.com/ory-am/hydra/config"
 )
 
 type Handler struct {
@@ -22,29 +21,12 @@ type Handler struct {
 	W          firewall.Firewall
 }
 
-func NewHandler(c *config.Config, router *httprouter.Router) *Handler {
-	ctx := c.Context()
-
-	h := &Handler{}
-	h.H = &herodot.JSON{}
-	h.W = ctx.Warden
-	h.SetRoutes(router)
-
-	switch ctx.Connection.(type) {
-	case *config.MemoryConnection:
-		h.Manager = &MemoryManager{}
-		break
-	default:
-		panic("Unknown connection type.")
-	}
-
-	return h
-}
-
 func (h *Handler) GetGenerators() map[string]KeyGenerator {
 	if h.Generators == nil || len(h.Generators) == 0 {
 		h.Generators = map[string]KeyGenerator{
 			"RS256": &RS256Generator{},
+			"EC521": &ECDSA521Generator{},
+			"HS256": &HS256Generator{},
 		}
 	}
 	return h.Generators

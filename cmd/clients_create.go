@@ -11,7 +11,7 @@ var clientsCreateCmd = &cobra.Command{
 	Long: `This command creates a basic OAuth2 client. Always specify at least one redirect url.
 
 Example:
-  hydra clients create -n "my app" -c=["http://localhost/cb"] -g ["authorization_code"] -r ["code"]
+  hydra clients create -n "my app" -c=[http://localhost/cb] -g [authorization_code] -r [code] -a [core,foobar]
 `,
 	Run: cmdHandler.Clients.CreateClient,
 }
@@ -21,5 +21,6 @@ func init() {
 	clientsCreateCmd.Flags().StringSliceP("callbacks", "c", []string{}, "REQUIRED list of allowed callback URLs")
 	clientsCreateCmd.Flags().StringSliceP("grant-types", "g", []string{"authorization_code"}, "A list of allowed grant types")
 	clientsCreateCmd.Flags().StringSliceP("response-types", "r", []string{"code"}, "A list of allowed response types")
+	clientsCreateCmd.Flags().StringSliceP("allowed-scopes", "a", []string{"core"}, "A list of allowed scopes")
 	clientsCreateCmd.Flags().StringP("name", "n", "", "The client's name")
 }

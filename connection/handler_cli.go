@@ -34,7 +34,7 @@ func (h *CLIHandler) CreateConnection(cmd *cobra.Command, args []string) {
 		LocalSubject:  args[1],
 		RemoteSubject:  args[2],
 	})
-	pkg.Must(err, "Could not create client: %s", err)
+	pkg.Must(err, "Could not create connection: %s", err)
 }
 
 func (h *CLIHandler) DeleteConnection(cmd *cobra.Command, args []string) {
@@ -47,6 +47,7 @@ func (h *CLIHandler) DeleteConnection(cmd *cobra.Command, args []string) {
 
 	for _, arg := range args {
 		err := h.M.Delete(arg)
-		pkg.Must(err, "Could not delete client: %s", err)
+		pkg.Must(err, "Could not delete connection: %s", err)
+		fmt.Printf("Connection %s deleted.\n", arg)
 	}
 }

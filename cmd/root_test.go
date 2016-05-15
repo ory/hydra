@@ -8,6 +8,10 @@ import (
 	"path/filepath"
 )
 
+func init() {
+	c.BindPort = 13124
+}
+
 func TestExecute(t *testing.T) {
 	var osArgs = make([]string, len(os.Args))
 	copy(osArgs, os.Args)
@@ -20,21 +24,14 @@ func TestExecute(t *testing.T) {
 			args:[]string{"host"},
 			timeout: time.Second,
 		},
-		{
-			args:[]string{"clients", "create"},
-		},
-		{
-			args:[]string{"keys", "create", "foo", "-a", "RS256"},
-		},
-		{
-			args:[]string{"keys", "create", "foo", "-a", "ES521"},
-		},
-		{
-			args:[]string{"keys", "get", "foo"},
-		},
-		{
-			args:[]string{"keys", "delete", "foo"},
-		},
+		{args:[]string{"clients", "create"}                },
+		{args:[]string{"keys", "create", "foo", "-a", "RS256"}                },
+		{args:[]string{"keys", "create", "foo", "-a", "ES521"}                },
+		{args:[]string{"keys", "get", "foo"}                },
+		{args:[]string{"keys", "delete", "foo"}        },
+		{args:[]string{"policies", "create", "-i", "foobar", "-s" ,"peter", "max", "-r", "blog", "users", "-a", "post", "ban", "--allow"}        },
+		{args:[]string{"policies", "get", "foobar"}        },
+		{args:[]string{"policies", "delete", "foobar"}        },
 	} {
 		c.args = append(c.args, []string{"--skip-ca-check", "--config", filepath.Join(os.TempDir(), "hydra.yml")}...)
 

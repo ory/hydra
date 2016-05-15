@@ -22,15 +22,31 @@ func NewCLIHandler(c *config.Config) *CLIHandler {
 }
 
 func (h *CLIHandler) CreateClient(cmd *cobra.Command, args []string) {
+	var err error
+
 	h.M.Endpoint = h.Config.Resolve("/clients")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 
-	secret, err := pkg.GenerateSecret(26)
-	pkg.Must(err, "Could not generate secret: %s", err)
+	responseTypes, _ := cmd.Flags().GetStringSlice("response-types")
+	grantTypes, _ := cmd.Flags().GetStringSlice("grant-types")
+	allowedScopes, _ := cmd.Flags().GetStringSlice("allowed-scopes")
+	callbacks, _ := cmd.Flags().GetStringSlice("callbacks")
+	name, _ := cmd.Flags().GetStringSlice("name")
+	id, _ := cmd.Flags().GetStringSlice("id")
+	secret, _ := cmd.Flags().GetStringSlice("secret")
+	if secret == "" {
+		secret, err = pkg.GenerateSecret(26)
+		pkg.Must(err, "Could not generate secret: %s", err)
+	}
 
 	client := &fosite.DefaultClient{
 		ID:     uuid.New(),
 		Secret: secret,
+		ResponseTypes: responseTypes,
+		GrantedScopes: allowedScopes,
+		GrantTypes: grantTypes,
+		RedirectURIs: callbacks,
+		Name: name,
 	}
 	err = h.M.CreateClient(client)
 	pkg.Must(err, "Could not create client: %s", err)

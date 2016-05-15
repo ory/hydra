@@ -22,6 +22,7 @@ import (
 	"golang.org/x/oauth2"
 	"crypto/tls"
 	"github.com/spf13/viper"
+	"strconv"
 )
 
 type Config struct {
@@ -62,7 +63,7 @@ func (c *Config) GetClusterURL() string {
 			schema = "http"
 		}
 
-		port := string(c.BindPort)
+		port := strconv.Itoa(c.BindPort)
 		if c.BindPort == 0 {
 			port = "4444"
 		}

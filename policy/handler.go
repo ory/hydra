@@ -87,7 +87,9 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 		return
 	}
 
-	p.ID = uuid.New()
+	if p.ID == "" {
+		p.ID = uuid.New()
+	}
 	if err := h.Manager.Create(&p); err != nil {
 		h.H.WriteError(ctx, w, r, errors.New(err))
 		return

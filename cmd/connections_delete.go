@@ -8,7 +8,8 @@ import (
 var deleteCmd = &cobra.Command{
 	Use:   "delete <id> [<id>...]",
 	Short: "Remove a SSO connection",
-	Long: `Example:
+	Long: `
+Example:
   hydra connections delete 4adb79ab-f89d-4445-ab01-ff670e51cefa`,
 	Run: cmdHandler.Connections.DeleteConnection,
 }

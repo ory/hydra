@@ -58,12 +58,28 @@ The easiest way to start docker is without a database. Hydra will keep all chang
 or stopping the container will make you **lose all data**.
 
 ```
-docker run oryam/hydra -p 4444:4444
-open http://$(docker-machine ip default):444
+$ docker run -d -p 4444:4444 oryam/hydra --name my-hydra
+ec91228cb105db315553499c81918258f52cee9636ea2a4821bdb8226872f54b
 ```
 
-**CLI Client**
+**CLI Client (Docker)**
 
+If you are running docker locally, you can use the CLI by connecting to it:
+
+```
+$ docker exec -i -t <container> /bin/bash
+# e.g. docker exec -i -t ec /bin/bash
+
+root@ec91228cb105:/go/src/github.com/ory-am/hydra# hydra
+Hydra is a twelve factor OAuth2 and OpenID Connect provider
+
+Usage:
+  hydra [command]
+
+[...]
+```
+
+**CLI Client (Binary)**
 The CLI client is available at [gobuild.io](https://gobuild.io/ory-am/hydra) or through
 the [releases tab](https://github.com/ory-am/hydra/releases).
 

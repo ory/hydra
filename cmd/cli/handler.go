@@ -11,6 +11,7 @@ type Handler struct {
 	Clients     *client.CLIHandler
 	Connections *connection.CLIHandler
 	Policies    *policy.CLIHandler
+	Keys        *CLIHandler
 }
 
 func NewHandler(c *config.Config) *Handler {
@@ -18,5 +19,6 @@ func NewHandler(c *config.Config) *Handler {
 		Clients: client.NewCLIHandler(c),
 		Connections: connection.NewCLIHandler(c),
 		Policies: policy.NewCLIHandler(c),
+		Keys: newJWKCLIHandler(c),
 	}
 }

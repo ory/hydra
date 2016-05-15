@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/go-errors/errors"
+	"io/ioutil"
 )
 
 type SuperAgent struct {
@@ -20,7 +21,7 @@ func NewSuperAgent(rawurl string) *SuperAgent {
 	}
 }
 
-func (s *SuperAgent) DELETE() error {
+func (s *SuperAgent) Delete() error {
 	req, err := http.NewRequest("DELETE", s.URL, nil)
 	if err != nil {
 		return errors.New(err)
@@ -33,13 +34,14 @@ func (s *SuperAgent) DELETE() error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusNoContent {
-		return errors.Errorf("Expected status code %d, got %d", http.StatusNoContent, resp.StatusCode)
+		body, _ := ioutil.ReadAll(resp.Body)
+		return errors.Errorf("Expected status code %d, got %d.\n%s\n", http.StatusNoContent, resp.StatusCode, body)
 	}
 
 	return nil
 }
 
-func (s *SuperAgent) GET(o interface{}) error {
+func (s *SuperAgent) Get(o interface{}) error {
 	req, err := http.NewRequest("GET", s.URL, nil)
 	if err != nil {
 		return errors.New(err)
@@ -54,7 +56,8 @@ func (s *SuperAgent) GET(o interface{}) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return errors.Errorf("Expected status code %d, got %d", http.StatusOK, resp.StatusCode)
+		body, _ := ioutil.ReadAll(resp.Body)
+		return errors.Errorf("Expected status code %d, got %d.\n%s\n", http.StatusOK, resp.StatusCode, body)
 	} else if err := json.NewDecoder(resp.Body).Decode(o); err != nil {
 		return errors.New(err)
 	}
@@ -62,20 +65,24 @@ func (s *SuperAgent) GET(o interface{}) error {
 	return nil
 }
 
-func (s *SuperAgent) POST(o interface{}) error {
-	return s.send("POST", o)
+func (s *SuperAgent) Create(o interface{}) error {
+	return s.send("POST", o, o)
 }
 
-func (s *SuperAgent) PUT(o interface{}) error {
-	return s.send("PUT", o)
+func (s *SuperAgent) POST(in, out interface{}) error {
+	return s.send("POST", in, out)
 }
 
-func (s *SuperAgent) send(method string, o interface{}) error {
+func (s *SuperAgent) Update(o interface{}) error {
+	return s.send("PUT", o, o)
+}
+
+func (s *SuperAgent) send(method string, in interface{}, out interface{}) error {
 	if s.Client == nil {
 		s.Client = http.DefaultClient
 	}
 
-	data, err := json.Marshal(o)
+	data, err := json.Marshal(in)
 	if err != nil {
 		return errors.New(err)
 	}
@@ -97,10 +104,11 @@ func (s *SuperAgent) send(method string, o interface{}) error {
 		expectedStatus = http.StatusCreated
 	}
 	if resp.StatusCode != expectedStatus {
-		return errors.Errorf("Expected status code %d, got %d", expectedStatus, resp.StatusCode)
+		body, _ := ioutil.ReadAll(resp.Body)
+		return errors.Errorf("Expected status code %d, got %d.\n%s\n", expectedStatus, resp.StatusCode, body)
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(o); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(out); err != nil {
 		return errors.New(err)
 	}
 

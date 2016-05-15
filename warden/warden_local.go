@@ -22,13 +22,13 @@ type LocalWarden struct {
 }
 
 func (w *LocalWarden) actionAllowed(ctx context.Context, a *ladon.Request, scopes []string, oauthRequest fosite.AccessRequester, session *oauth2.Session) (*Context, error) {
-	if !matchScopes(oauthRequest.GetGrantedScopes(), scopes) {
-		return nil, errors.New(herodot.ErrForbidden)
-	}
-
 	session = oauthRequest.GetSession().(*oauth2.Session)
 	if a.Subject != "" && a.Subject != session.Subject {
 		return nil, errors.New("Subject mismatch " + a.Subject + " - " + session.Subject)
+	}
+
+	if !matchScopes(oauthRequest.GetGrantedScopes(), scopes, session, oauthRequest.GetClient()) {
+		return nil, errors.New(herodot.ErrForbidden)
 	}
 
 	a.Subject = session.Subject
@@ -39,7 +39,7 @@ func (w *LocalWarden) actionAllowed(ctx context.Context, a *ladon.Request, scope
 	logrus.WithFields(logrus.Fields{
 		"scopes": scopes,
 		"subject": a.Subject,
-		"client": oauthRequest.GetClient().GetID(),
+		"audience": oauthRequest.GetClient().GetID(),
 		"request": a,
 	}).Infof("Access granted")
 
@@ -81,16 +81,11 @@ func (w *LocalWarden) Authorized(ctx context.Context, token string, scopes ...st
 		return nil, err
 	}
 
-	if !matchScopes(oauthRequest.GetGrantedScopes(), scopes) {
+	session = oauthRequest.GetSession().(*oauth2.Session)
+	if !matchScopes(oauthRequest.GetGrantedScopes(), scopes, session, oauthRequest.Client) {
 		return nil, errors.New(herodot.ErrForbidden)
 	}
 
-	session = oauthRequest.GetSession().(*oauth2.Session)
-	logrus.WithFields(logrus.Fields{
-		"scopes": scopes,
-		"subject": session.Subject,
-		"client": oauthRequest.GetClient().GetID(),
-	}).Infof("Access granted")
 	return &Context{
 		Subject:       session.Subject,
 		GrantedScopes: oauthRequest.GetGrantedScopes(),
@@ -108,16 +103,10 @@ func (w *LocalWarden) HTTPAuthorized(ctx context.Context, r *http.Request, scope
 		return nil, err
 	}
 
-	if !matchScopes(oauthRequest.GetGrantedScopes(), scopes) {
+	session = oauthRequest.GetSession().(*oauth2.Session)
+	if !matchScopes(oauthRequest.GetGrantedScopes(), scopes, session, oauthRequest.Client) {
 		return nil, errors.New(herodot.ErrForbidden)
 	}
-
-	session = oauthRequest.GetSession().(*oauth2.Session)
-	logrus.WithFields(logrus.Fields{
-		"scopes": scopes,
-		"subject": session.Subject,
-		"client": oauthRequest.GetClient().GetID(),
-	}).Infof("Access granted")
 
 	return &Context{
 		Subject:       session.Subject,
@@ -128,7 +117,21 @@ func (w *LocalWarden) HTTPAuthorized(ctx context.Context, r *http.Request, scope
 	}, nil
 }
 
-func matchScopes(granted []string, requested []string) bool {
-	ga := fosite.Arguments(granted)
-	return ga.Has(requested...)
+func matchScopes(granted []string, requested []string, session *oauth2.Session, c fosite.Client) bool {
+	scopes := &fosite.DefaultScopes{Scopes: granted}
+	for _, r := range requested {
+		pass := scopes.Fulfill(r)
+		if !pass {
+			logrus.WithFields(logrus.Fields{
+				"reason": "scope mismatch",
+				"granted_scopes": granted,
+				"requested_scopes": requested,
+				"audience": c.GetID(),
+				"subject": session.Subject,
+			}).Infof("Authentication failed.")
+			return false
+		}
+	}
+
+	return true
 }

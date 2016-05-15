@@ -18,7 +18,7 @@ type HTTPManager struct {
 func (m *HTTPManager) Create(policy ladon.Policy) error {
 	var r = pkg.NewSuperAgent(m.Endpoint.String())
 	r.Client = m.Client
-	return r.POST(policy)
+	return r.Create(policy)
 }
 
 // Get retrieves a policy.
@@ -26,7 +26,7 @@ func (m *HTTPManager) Get(id string) (ladon.Policy, error) {
 	var policy ladon.DefaultPolicy
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, id).String())
 	r.Client = m.Client
-	if err := r.GET(&policy); err != nil {
+	if err := r.Get(&policy); err != nil {
 		return nil, err
 	}
 
@@ -38,7 +38,7 @@ func (m *HTTPManager) Get(id string) (ladon.Policy, error) {
 func (m *HTTPManager) Delete(id string) error {
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, id).String())
 	r.Client = m.Client
-	return r.DELETE()
+	return r.Delete()
 }
 
 // Finds all policies associated with the subject.
@@ -46,7 +46,7 @@ func (m *HTTPManager) FindPoliciesForSubject(subject string) (ladon.Policies, er
 	var policies []*ladon.DefaultPolicy
 	var r = pkg.NewSuperAgent(m.Endpoint.String() + "?subject=" + subject)
 	r.Client = m.Client
-	if err := r.GET(&policies); err != nil {
+	if err := r.Get(&policies); err != nil {
 		return nil, err
 	}
 

@@ -123,7 +123,6 @@ func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
 		Scopes:       []string{
 			"core",
 			"hydra",
-			"hydra.clients",
 		},
 	}
 

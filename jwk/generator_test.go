@@ -26,7 +26,9 @@ func TestGenerator(t *testing.T) {
 			},
 		},
 		{
-			g: &HS256Generator{},
+			g: &HS256Generator{
+				Length: 32,
+			},
 			check: func(ks *jose.JsonWebKeySet) {
 				assert.Len(t, ks, 1)
 			},

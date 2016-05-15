@@ -26,7 +26,9 @@ func (h *Handler) GetGenerators() map[string]KeyGenerator {
 		h.Generators = map[string]KeyGenerator{
 			"RS256": &RS256Generator{},
 			"EC521": &ECDSA521Generator{},
-			"HS256": &HS256Generator{},
+			"HS256": &HS256Generator{
+				Length: 32,
+			},
 		}
 	}
 	return h.Generators
@@ -59,7 +61,7 @@ func (h *Handler) DeleteKey(w http.ResponseWriter, r *http.Request, ps httproute
 
 	if _, err := h.W.HTTPActionAllowed(ctx, r, &ladon.Request{
 		Resource: "rn:hydra:keys:" + setName + ":" + keyName,
-		Action:   "get",
+		Action:   "delete",
 	}, "hydra.keys.delete"); err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return

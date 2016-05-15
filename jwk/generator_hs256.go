@@ -11,6 +11,10 @@ type HS256Generator struct {
 }
 
 func (g *HS256Generator) Generate(id string) (*jose.JsonWebKeySet, error) {
+	if g.Length < 12 {
+		g.Length = 12
+	}
+
 	key, err := sequence.RuneSequence(g.Length, []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.-;:_#+*!§$%&/()=?}][{<>"))
 	if err != nil {
 		return nil, errors.Errorf("Could not generate key because %s", err)

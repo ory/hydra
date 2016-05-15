@@ -1,11 +1,12 @@
 package client
 
 import (
+	"fmt"
+
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/spf13/cobra"
-	"fmt"
 )
 
 type CLIHandler struct {
@@ -16,7 +17,7 @@ type CLIHandler struct {
 func NewCLIHandler(c *config.Config) *CLIHandler {
 	return &CLIHandler{
 		Config: c,
-		M: &HTTPManager{},
+		M:      &HTTPManager{},
 	}
 }
 
@@ -41,13 +42,13 @@ func (h *CLIHandler) CreateClient(cmd *cobra.Command, args []string) {
 	}
 
 	client := &fosite.DefaultClient{
-		ID:     id,
-		Secret: secret,
+		ID:            id,
+		Secret:        secret,
 		ResponseTypes: responseTypes,
 		GrantedScopes: allowedScopes,
-		GrantTypes: grantTypes,
-		RedirectURIs: callbacks,
-		Name: name,
+		GrantTypes:    grantTypes,
+		RedirectURIs:  callbacks,
+		Name:          name,
 	}
 	err = h.M.CreateClient(client)
 	pkg.Must(err, "Could not create client: %s", err)

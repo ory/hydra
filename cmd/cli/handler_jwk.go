@@ -1,12 +1,13 @@
 package cli
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/ory-am/hydra/config"
+	"github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/spf13/cobra"
-	"fmt"
-	"encoding/json"
-	"github.com/ory-am/hydra/jwk"
 )
 
 type CLIHandler struct {
@@ -17,7 +18,7 @@ type CLIHandler struct {
 func newJWKCLIHandler(c *config.Config) *CLIHandler {
 	return &CLIHandler{
 		Config: c,
-		M: &jwk.HTTPManager{},
+		M:      &jwk.HTTPManager{},
 	}
 }
 

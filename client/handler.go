@@ -55,8 +55,8 @@ func NewManager(c *config.Config) Manager {
 func NewHandler(c *config.Config, router *httprouter.Router, manager Manager) *Handler {
 	ctx := c.Context()
 	h := &Handler{
-		H:&herodot.JSON{},
-		W: ctx.Warden,Manager:manager,
+		H: &herodot.JSON{},
+		W: ctx.Warden, Manager: manager,
 	}
 
 	h.SetRoutes(router)

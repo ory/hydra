@@ -14,7 +14,7 @@ The remote argument is the user's id from the SSO provider.
 
 Example:
   create google peter@foobar.com googleid:jd92joafj`,
-	Run:cmdHandler.Connections.CreateConnection,
+	Run: cmdHandler.Connections.CreateConnection,
 }
 
 func init() {

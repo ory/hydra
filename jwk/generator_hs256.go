@@ -2,8 +2,8 @@ package jwk
 
 import (
 	"github.com/go-errors/errors"
-	"github.com/square/go-jose"
 	"github.com/ory-am/common/rand/sequence"
+	"github.com/square/go-jose"
 )
 
 type HS256Generator struct {

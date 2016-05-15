@@ -1,15 +1,16 @@
 package jwk
 
 import (
-	"crypto/x509/pkix"
-	"crypto/x509"
-	"crypto/rsa"
 	"crypto/ecdsa"
-	"github.com/go-errors/errors"
-	"math/big"
 	"crypto/rand"
-	"time"
+	"crypto/rsa"
+	"crypto/x509"
+	"crypto/x509/pkix"
 	"encoding/pem"
+	"math/big"
+	"time"
+
+	"github.com/go-errors/errors"
 )
 
 func publicKey(priv interface{}) interface{} {
@@ -50,8 +51,8 @@ func ToX509PEMKeyPair(key interface{}) (cert []byte, private []byte, err error) 
 		Subject: pkix.Name{
 			Organization: []string{"Hydra"},
 		},
-		NotBefore: time.Now(),
-		NotAfter:  time.Now().Add(time.Hour * 24 * 7),
+		NotBefore:             time.Now(),
+		NotAfter:              time.Now().Add(time.Hour * 24 * 7),
 		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
@@ -69,5 +70,5 @@ func ToX509PEMKeyPair(key interface{}) (cert []byte, private []byte, err error) 
 	if err != nil {
 		return []byte{}, []byte{}, errors.Errorf("Failed to encode private key: %s", err)
 	}
-	return pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: der}),pem.EncodeToMemory(pemPrivate),  nil
+	return pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: der}), pem.EncodeToMemory(pemPrivate), nil
 }

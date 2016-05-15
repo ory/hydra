@@ -7,11 +7,11 @@ import (
 
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
+	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/ladon"
 	"golang.org/x/net/context"
-	"github.com/ory-am/hydra/config"
 )
 
 const (
@@ -29,7 +29,7 @@ func NewHandler(c *config.Config, router *httprouter.Router) *WardenHandler {
 	ctx := c.Context()
 
 	h := &WardenHandler{
-		H: &herodot.JSON{},
+		H:      &herodot.JSON{},
 		Warden: ctx.Warden,
 		Ladon: &ladon.Ladon{
 			Manager: ctx.LadonManager,

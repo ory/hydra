@@ -8,48 +8,49 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/ory-am/fosite/hash"
-	"github.com/ory-am/hydra/pkg"
-	"golang.org/x/net/context"
-	"golang.org/x/oauth2/clientcredentials"
-	"gopkg.in/yaml.v2"
-	"github.com/ory-am/ladon"
+	"crypto/tls"
+	"os"
+	"strconv"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite/handler/core/strategy"
+	"github.com/ory-am/fosite/hash"
 	"github.com/ory-am/fosite/token/hmac"
+	"github.com/ory-am/hydra/pkg"
+	"github.com/ory-am/ladon"
 	"github.com/spf13/cobra"
-	"golang.org/x/oauth2"
-	"crypto/tls"
 	"github.com/spf13/viper"
-	"strconv"
-	"os"
+	"golang.org/x/net/context"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/clientcredentials"
+	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
-	BindPort     int `mapstructure:"port" yaml:"-"`
+	BindPort int `mapstructure:"port" yaml:"-"`
 
-	BindHost     string `mapstructure:"host" yaml:"-"`
+	BindHost string `mapstructure:"host" yaml:"-"`
 
-	Issuer       string `mapstructure:"issuer" yaml:"-"`
+	Issuer string `mapstructure:"issuer" yaml:"-"`
 
 	SystemSecret []byte `mapstructure:"system_secret" yaml:"-"`
 
-	ConsentURL   string `mapstructure:"consent_url" yaml:"-"`
+	ConsentURL string `mapstructure:"consent_url" yaml:"-"`
 
-	ClusterURL   string `mapstructure:"cluster_url" yaml:"cluster_url"`
+	ClusterURL string `mapstructure:"cluster_url" yaml:"cluster_url"`
 
-	ClientID     string `mapstructure:"client_id" yaml:"client_id"`
+	ClientID string `mapstructure:"client_id" yaml:"client_id"`
 
 	ClientSecret string `mapstructure:"client_secret" yaml:"client_secret"`
 
-	ForceHTTP    bool `mapstructure:"foolishly_force_http" yaml:"-"`
+	ForceHTTP bool `mapstructure:"foolishly_force_http" yaml:"-"`
 
-	cluster      *url.URL
+	cluster *url.URL
 
 	oauth2Client *http.Client
 
-	context      *Context
+	context *Context
 }
 
 func (c *Config) GetClusterURL() string {
@@ -120,7 +121,7 @@ func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
 		ClientID:     c.ClientID,
 		ClientSecret: c.ClientSecret,
 		TokenURL:     pkg.JoinURLStrings(c.ClusterURL, "/oauth2/token"),
-		Scopes:       []string{
+		Scopes: []string{
 			"core",
 			"hydra",
 		},

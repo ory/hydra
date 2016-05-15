@@ -22,7 +22,7 @@ import (
 var keysDeleteCmd = &cobra.Command{
 	Use:   "delete <set>",
 	Short: "Delete a new JSON Web Key Set",
-	Run: cmdHandler.Keys.DeleteKeys,
+	Run:   cmdHandler.Keys.DeleteKeys,
 }
 
 func init() {

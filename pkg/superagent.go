@@ -5,8 +5,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/go-errors/errors"
 	"io/ioutil"
+
+	"github.com/go-errors/errors"
 )
 
 type SuperAgent struct {

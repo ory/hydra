@@ -1,5 +1,5 @@
 hash: 175acff756341dd7fa75a3e1e2e1a042a957a1b2482f017ae0bb38a2e8b9c625
-updated: 2016-05-15T14:07:53.8037328+02:00
+updated: 2016-05-15T16:21:58.2484748+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 37d5f827499d1c346df42f2ad7fcb7f453833a57
@@ -53,7 +53,7 @@ imports:
   - rand/sequence
   - compiler
 - name: github.com/ory-am/fosite
-  version: de85e2a7ebce57a804ae0beef42b1f1b9017914c
+  version: 13b7efae68b4f68171422b876e8df197b3453e42
   subpackages:
   - fosite-example/store
   - handler/core
@@ -102,7 +102,7 @@ imports:
   - assert
   - require
 - name: golang.org/x/crypto
-  version: 1e61df8d9ea476e2e1504cd9a32b40280c7c6c7e
+  version: b6789ab629056511030d652d851e7dc10c9e9c9e
   subpackages:
   - bcrypt
   - blowfish

@@ -3,6 +3,10 @@ package internal
 import (
 	"time"
 
+	"net/url"
+
+	"github.com/Sirupsen/logrus"
+	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/handler/core"
@@ -21,9 +25,6 @@ import (
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/oauth2"
-	"github.com/go-errors/errors"
-	"github.com/Sirupsen/logrus"
-	"net/url"
 	"github.com/ory-am/hydra/pkg"
 )
 
@@ -49,7 +50,7 @@ func InjectFositeStore(c *config.Config, clients client.Manager) {
 	ctx.FositeStore = store
 }
 
-func NewOAuth2Handler(c *config.Config, router *httprouter.Router, keys jwk.Manager) (*oauth2.Handler) {
+func NewOAuth2Handler(c *config.Config, router *httprouter.Router, keys jwk.Manager) *oauth2.Handler {
 	var ctx = c.Context()
 	var store = ctx.FositeStore
 
@@ -142,7 +143,7 @@ func NewOAuth2Handler(c *config.Config, router *httprouter.Router, keys jwk.Mana
 				&core.CoreValidator{
 					AccessTokenStrategy: ctx.FositeStrategy,
 					AccessTokenStorage:  store,
-			},
+				},
 			},
 			Hasher: &hash.BCrypt{},
 		},

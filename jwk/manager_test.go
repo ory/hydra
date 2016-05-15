@@ -86,7 +86,7 @@ func TestManagerKeySet(t *testing.T) {
 		pkg.AssertError(t, false, err, name)
 
 		got, err := m.GetKeySet("bar")
-		pkg.AssertError(t, false, err, name)
+		pkg.RequireError(t, false, err, name)
 		assert.Equal(t, ks.Key("public"), got.Key("public"), name)
 		assert.Equal(t, ks.Key("private"), got.Key("private"), name)
 

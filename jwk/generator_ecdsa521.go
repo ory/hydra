@@ -1,11 +1,12 @@
 package jwk
 
 import (
-	"crypto/rand"
-	"github.com/go-errors/errors"
-	"github.com/square/go-jose"
 	"crypto/ecdsa"
 	"crypto/elliptic"
+	"crypto/rand"
+
+	"github.com/go-errors/errors"
+	"github.com/square/go-jose"
 )
 
 type ECDSA521Generator struct{}

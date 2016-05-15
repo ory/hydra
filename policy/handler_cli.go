@@ -1,13 +1,14 @@
 package policy
 
 import (
-	"github.com/ory-am/hydra/config"
-	"github.com/spf13/cobra"
-	"github.com/ory-am/hydra/pkg"
 	"fmt"
 	"os"
-	"github.com/square/go-jose/json"
+
+	"github.com/ory-am/hydra/config"
+	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
+	"github.com/spf13/cobra"
+	"github.com/square/go-jose/json"
 )
 
 type CLIHandler struct {
@@ -18,7 +19,7 @@ type CLIHandler struct {
 func NewCLIHandler(c *config.Config) *CLIHandler {
 	return &CLIHandler{
 		Config: c,
-		M: &HTTPManager{},
+		M:      &HTTPManager{},
 	}
 }
 
@@ -59,12 +60,12 @@ func (h *CLIHandler) CreatePolicy(cmd *cobra.Command, args []string) {
 	}
 
 	policy := &ladon.DefaultPolicy{
-		ID: id,
+		ID:          id,
 		Description: description,
-		Subjects: subjects,
-		Resources: resources,
-		Actions: actions,
-		Effect: effect,
+		Subjects:    subjects,
+		Resources:   resources,
+		Actions:     actions,
+		Effect:      effect,
 	}
 	err := h.M.Create(policy)
 	pkg.Must(err, "Could not create policy: %s", err)
@@ -170,7 +171,6 @@ func (h *CLIHandler) GetPolicy(cmd *cobra.Command, args []string) {
 
 	fmt.Printf("%s\n", out)
 }
-
 
 func (h *CLIHandler) DeletePolicy(cmd *cobra.Command, args []string) {
 	h.M.Endpoint = h.Config.Resolve("/policies")

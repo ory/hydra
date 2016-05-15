@@ -1,11 +1,12 @@
 package connection
 
 import (
+	"fmt"
+
 	"github.com/ory-am/hydra/config"
-	"github.com/spf13/cobra"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
-	"fmt"
+	"github.com/spf13/cobra"
 )
 
 type CLIHandler struct {
@@ -16,23 +17,23 @@ type CLIHandler struct {
 func NewCLIHandler(c *config.Config) *CLIHandler {
 	return &CLIHandler{
 		Config: c,
-		M: &HTTPManager{		},
+		M:      &HTTPManager{},
 	}
 }
 
 func (h *CLIHandler) CreateConnection(cmd *cobra.Command, args []string) {
 	h.M.Client = h.Config.OAuth2Client(cmd)
 	h.M.Endpoint = h.Config.Resolve("/connections")
-	if len(args) != 3{
+	if len(args) != 3 {
 		fmt.Print(cmd.UsageString())
 		return
 	}
 
 	err := h.M.Create(&Connection{
-		ID: uuid.New(),
-		Provider:  args[0],
+		ID:            uuid.New(),
+		Provider:      args[0],
 		LocalSubject:  args[1],
-		RemoteSubject:  args[2],
+		RemoteSubject: args[2],
 	})
 	pkg.Must(err, "Could not create connection: %s", err)
 }

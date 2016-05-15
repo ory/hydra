@@ -2,8 +2,8 @@ package factory
 
 import (
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/config"
+	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/jwk"
 )
 

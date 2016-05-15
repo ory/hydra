@@ -8,7 +8,7 @@ import (
 var policiesDeleteCmd = &cobra.Command{
 	Use:   "delete <policy>",
 	Short: "Delete a policy",
-	Run: cmdHandler.Policies.DeletePolicy,
+	Run:   cmdHandler.Policies.DeletePolicy,
 }
 
 func init() {

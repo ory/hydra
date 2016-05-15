@@ -8,12 +8,12 @@ import (
 	"github.com/asaskevich/govalidator"
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
+	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/ladon"
 	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
-	"github.com/ory-am/hydra/config"
 )
 
 const (

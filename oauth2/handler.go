@@ -15,8 +15,8 @@ const (
 )
 
 type Handler struct {
-	OAuth2     fosite.OAuth2Provider
-	Consent    ConsentStrategy
+	OAuth2  fosite.OAuth2Provider
+	Consent ConsentStrategy
 
 	ConsentURL url.URL
 }

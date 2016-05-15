@@ -22,7 +22,7 @@ import (
 var keysGetCmd = &cobra.Command{
 	Use:   "get <set>",
 	Short: "Get a new JSON Web Key Set",
-	Run: cmdHandler.Keys.GetKeys,
+	Run:   cmdHandler.Keys.GetKeys,
 }
 
 func init() {

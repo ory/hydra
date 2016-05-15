@@ -15,7 +15,7 @@ type HTTPManager struct {
 
 func (m *HTTPManager) CreateKeys(set, algorithm string) (*jose.JsonWebKeySet, error) {
 	var c = struct {
-		Algorithm string `json:"alg"`
+		Algorithm string            `json:"alg"`
 		Keys      []jose.JsonWebKey `json:"keys"`
 	}{
 		Algorithm: algorithm,

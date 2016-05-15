@@ -3,14 +3,15 @@ package cmd
 import (
 	"net/http"
 
+	"crypto/tls"
+
+	"github.com/Sirupsen/logrus"
+	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/hydra/cmd/server"
+	"github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/spf13/cobra"
-	"github.com/Sirupsen/logrus"
-	"crypto/tls"
-	"github.com/ory-am/hydra/jwk"
-	"github.com/go-errors/errors"
 )
 
 const (

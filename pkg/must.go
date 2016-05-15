@@ -10,6 +10,6 @@ func Must(err error, message string, args ...interface{}) {
 		return
 	}
 
-	fmt.Fprintf(os.Stderr, message + "\n", args...)
+	fmt.Fprintf(os.Stderr, message+"\n", args...)
 	os.Exit(1)
 }

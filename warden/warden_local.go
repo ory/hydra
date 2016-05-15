@@ -3,6 +3,7 @@ package warden
 import (
 	"net/http"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/handler/core"
@@ -11,14 +12,13 @@ import (
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/ladon"
 	"golang.org/x/net/context"
-	"github.com/Sirupsen/logrus"
 )
 
 type LocalWarden struct {
 	Warden         ladon.Warden
 	TokenValidator *core.CoreValidator
 
-	Issuer         string
+	Issuer string
 }
 
 func (w *LocalWarden) actionAllowed(ctx context.Context, a *ladon.Request, scopes []string, oauthRequest fosite.AccessRequester, session *oauth2.Session) (*Context, error) {
@@ -37,10 +37,10 @@ func (w *LocalWarden) actionAllowed(ctx context.Context, a *ladon.Request, scope
 	}
 
 	logrus.WithFields(logrus.Fields{
-		"scopes": scopes,
-		"subject": a.Subject,
+		"scopes":   scopes,
+		"subject":  a.Subject,
 		"audience": oauthRequest.GetClient().GetID(),
-		"request": a,
+		"request":  a,
 	}).Infof("Access granted")
 
 	return &Context{
@@ -120,14 +120,13 @@ func (w *LocalWarden) HTTPAuthorized(ctx context.Context, r *http.Request, scope
 func matchScopes(granted []string, requested []string, session *oauth2.Session, c fosite.Client) bool {
 	scopes := &fosite.DefaultScopes{Scopes: granted}
 	for _, r := range requested {
-		pass := scopes.Fulfill(r)
-		if !pass {
+		if !scopes.Grant(r) {
 			logrus.WithFields(logrus.Fields{
-				"reason": "scope mismatch",
-				"granted_scopes": granted,
+				"reason":           "scope mismatch",
+				"granted_scopes":   granted,
 				"requested_scopes": requested,
-				"audience": c.GetID(),
-				"subject": session.Subject,
+				"audience":         c.GetID(),
+				"subject":          session.Subject,
 			}).Infof("Authentication failed.")
 			return false
 		}

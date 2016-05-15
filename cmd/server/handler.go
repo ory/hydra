@@ -1,21 +1,21 @@
 package server
 
 import (
+	"github.com/Sirupsen/logrus"
 	"github.com/julienschmidt/httprouter"
+	"github.com/ory-am/fosite"
+	"github.com/ory-am/fosite/handler/core"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
-	"github.com/ory-am/hydra/internal"
-	"github.com/ory-am/hydra/oauth2"
-	"github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/connection"
-	"github.com/ory-am/hydra/policy"
-	"github.com/ory-am/hydra/pkg"
-	"github.com/ory-am/fosite"
-	"github.com/ory-am/ladon"
-	"github.com/Sirupsen/logrus"
-	"github.com/ory-am/hydra/warden"
-	"github.com/ory-am/fosite/handler/core"
 	"github.com/ory-am/hydra/factory"
+	"github.com/ory-am/hydra/internal"
+	"github.com/ory-am/hydra/jwk"
+	"github.com/ory-am/hydra/oauth2"
+	"github.com/ory-am/hydra/pkg"
+	"github.com/ory-am/hydra/policy"
+	"github.com/ory-am/hydra/warden"
+	"github.com/ory-am/ladon"
 )
 
 type Handler struct {
@@ -38,7 +38,7 @@ func (h *Handler) Start(c *config.Config, router *httprouter.Router) {
 		},
 		TokenValidator: &core.CoreValidator{
 			AccessTokenStrategy: ctx.FositeStrategy,
-			AccessTokenStorage: ctx.FositeStore,
+			AccessTokenStorage:  ctx.FositeStore,
 		},
 		Issuer: c.Issuer,
 	}

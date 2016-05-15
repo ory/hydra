@@ -15,7 +15,7 @@ var connectCmd = &cobra.Command{
 	Use:   "connect",
 	Short: "Connect with a cluster",
 	Run: func(cmd *cobra.Command, args []string) {
-		if u := input("Cluster URL: "); u != "" {
+		if u := input("Cluster URL [" + c.ClusterURL + "]: "); u != "" {
 			c.ClusterURL = u
 		}
 		if u := input("Client ID: "); u != "" {

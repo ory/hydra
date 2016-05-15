@@ -1,11 +1,12 @@
 package cmd
 
 import (
-	"testing"
-	"github.com/stretchr/testify/assert"
 	"os"
-	"time"
 	"path/filepath"
+	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func init() {
@@ -21,17 +22,17 @@ func TestExecute(t *testing.T) {
 		timeout time.Duration
 	}{
 		{
-			args:[]string{"host"},
+			args:    []string{"host", "--dangerous-auto-logon"},
 			timeout: time.Second,
 		},
-		{args:[]string{"clients", "create"}                },
-		{args:[]string{"keys", "create", "foo", "-a", "RS256"}                },
-		{args:[]string{"keys", "create", "foo", "-a", "ES521"}                },
-		{args:[]string{"keys", "get", "foo"}                },
-		{args:[]string{"keys", "delete", "foo"}        },
-		{args:[]string{"policies", "create", "-i", "foobar", "-s" ,"peter", "max", "-r", "blog", "users", "-a", "post", "ban", "--allow"}        },
-		{args:[]string{"policies", "get", "foobar"}        },
-		{args:[]string{"policies", "delete", "foobar"}        },
+		{args: []string{"clients", "create"}},
+		{args: []string{"keys", "create", "foo", "-a", "RS256"}},
+		{args: []string{"keys", "create", "foo", "-a", "ES521"}},
+		{args: []string{"keys", "get", "foo"}},
+		{args: []string{"keys", "delete", "foo"}},
+		{args: []string{"policies", "create", "-i", "foobar", "-s", "peter", "max", "-r", "blog", "users", "-a", "post", "ban", "--allow"}},
+		{args: []string{"policies", "get", "foobar"}},
+		{args: []string{"policies", "delete", "foobar"}},
 	} {
 		c.args = append(c.args, []string{"--skip-tls-verify", "--config", filepath.Join(os.TempDir(), "hydra.yml")}...)
 

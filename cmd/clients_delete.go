@@ -22,7 +22,7 @@ import (
 var clientsDeleteCmd = &cobra.Command{
 	Use:   "delete <id> [<id>...]",
 	Short: "Delete an OAuth2 client",
-	Run: cmdHandler.Clients.DeleteClient,
+	Run:   cmdHandler.Clients.DeleteClient,
 }
 
 func init() {

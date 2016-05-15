@@ -8,7 +8,7 @@ import (
 var policiesGetCmd = &cobra.Command{
 	Use:   "get <policy>",
 	Short: "View a policy",
-	Run: cmdHandler.Policies.GetPolicy,
+	Run:   cmdHandler.Policies.GetPolicy,
 }
 
 func init() {

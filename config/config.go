@@ -3,9 +3,6 @@ package config
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
-	"path/filepath"
-	"runtime"
 	"time"
 
 	"net/http"
@@ -24,6 +21,7 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/oauth2"
 	"crypto/tls"
+	"github.com/spf13/viper"
 )
 
 type Config struct {
@@ -178,30 +176,8 @@ func (c *Config) Persist() error {
 		return errors.New(err)
 	}
 
-	if err := ioutil.WriteFile(getConfigPath(), out, 0700); err != nil {
+	if err := ioutil.WriteFile(viper.ConfigFileUsed(), out, 0700); err != nil {
 		return errors.New(err)
 	}
 	return nil
-}
-
-func getConfigPath() string {
-	path := getUserHome() + "/.hydra.yml"
-	if filepath.IsAbs(path) {
-		return filepath.Clean(path)
-	}
-
-	p, err := filepath.Abs(path)
-	pkg.Must(err, "Could not fetch configuration path because %s", err)
-	return filepath.Clean(p)
-}
-
-func getUserHome() string {
-	if runtime.GOOS == "windows" {
-		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-		if home == "" {
-			home = os.Getenv("USERPROFILE")
-		}
-		return home
-	}
-	return os.Getenv("HOME")
 }

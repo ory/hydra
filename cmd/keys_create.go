@@ -27,6 +27,6 @@ var keysCreateCmd = &cobra.Command{
 
 func init() {
 	keysCmd.AddCommand(keysCreateCmd)
-	keysCreateCmd.Flags().StringP("alg", "a", "", "REQUIRED name that identifies the algorithm intended for use with the key. Supports: RS256, EC512, HS256")
+	keysCreateCmd.Flags().StringP("alg", "a", "", "REQUIRED name that identifies the algorithm intended for use with the key. Supports: RS256, ES521, HS256")
 
 }

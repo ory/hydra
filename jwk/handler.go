@@ -25,7 +25,7 @@ func (h *Handler) GetGenerators() map[string]KeyGenerator {
 	if h.Generators == nil || len(h.Generators) == 0 {
 		h.Generators = map[string]KeyGenerator{
 			"RS256": &RS256Generator{},
-			"EC521": &ECDSA521Generator{},
+			"ES521": &ECDSA521Generator{},
 			"HS256": &HS256Generator{
 				Length: 32,
 			},

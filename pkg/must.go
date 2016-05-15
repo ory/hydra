@@ -11,5 +11,5 @@ func Must(err error, message string, args ...interface{}) {
 	}
 
 	fmt.Fprintf(os.Stderr, message + "\n", args...)
-	os.Exit(0)
+	os.Exit(1)
 }

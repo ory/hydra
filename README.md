@@ -97,6 +97,8 @@ There are two interesting flags used above:
 * **-d** runs the docker in daemon mode.
 * **-p** publishes port 4444.
 
+**TBD:** Provision with RethinkDB.
+
 Hydra can be managed with the hydra cli client. The client hast to log on before it is allowed to do anything.
 When hydra detects a new installation, a new temporary root client is created. The client credentials will be available
 from `docker logs`.

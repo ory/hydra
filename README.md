@@ -16,7 +16,7 @@ Hydra is being developed at [Ory](https://ory.am). Join our [mailinglist](http:/
 - [Motivation](#motivation)
 - [First steps](#first-steps)
   - [Installation](#installation)
-  - [First steps](#first-steps-1)
+  - [Run Hydra](#run-hydra)
 - [Documentation](#documentation)
   - [Guide](#guide)
   - [REST API Documentation](#rest-api-documentation)
@@ -78,7 +78,7 @@ go install github.com/ory-am/hydra
 hydra
 ```
 
-### First steps
+### Run Hydra
 
 Once you have [set up docker and installed the CLI](#installation) run:
 

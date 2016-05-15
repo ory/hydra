@@ -14,7 +14,7 @@ Hydra is being developed at [Ory](https://ory.am). Join our [mailinglist](http:/
 
 - [What is Hydra?](#what-is-hydra)
 - [Motivation](#motivation)
-- [First steps](#first-steps)
+- [Quickstart](#quickstart)
   - [Installation](#installation)
   - [Run Hydra](#run-hydra)
 - [Documentation](#documentation)
@@ -41,7 +41,7 @@ At first, there was the monolith. The monolith worked well with the customized j
 
 Hydra uses pub/sub to always have the latest data available in memory. Hydra scales effortlessly on every platform you can imagine, including Heroku, Cloud Foundry, Docker, Google Container Engine and many more.
 
-## First steps
+## Quickstart
 
 This section is a quickstart guide to working with Hydra. In-depth docs are available as well:
 

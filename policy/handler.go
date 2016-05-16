@@ -16,7 +16,7 @@ import (
 
 const (
 	endpoint         = "/policies"
-	scope            = "hydra.policies.search"
+	scope            = "hydra.policies"
 	policyResource   = "rn:hydra:policies"
 	policiesResource = "rn:hydra:policies:%s"
 )
@@ -56,7 +56,7 @@ func (h *Handler) Find(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 
 	if _, err := h.W.HTTPActionAllowed(ctx, r, &ladon.Request{
 		Resource: policyResource,
-		Action:   "search",
+		Action:   "find",
 	}, scope); err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return

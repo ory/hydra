@@ -23,7 +23,7 @@ func init() {
 			ID:        "1",
 			Subjects:  []string{"alice"},
 			Resources: []string{"rn:hydra:policies<.*>"},
-			Actions:   []string{"create", "get", "delete", "search"},
+			Actions:   []string{"create", "get", "delete", "find"},
 			Effect:    ladon.AllowAccess,
 		},
 	)

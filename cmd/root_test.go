@@ -23,7 +23,7 @@ func TestExecute(t *testing.T) {
 	}{
 		{
 			args:    []string{"host", "--dangerous-auto-logon"},
-			timeout: 10*time.Second,
+			timeout: 10 * time.Second,
 		},
 		{args: []string{"clients", "create"}},
 		{args: []string{"keys", "create", "foo", "-a", "RS256"}},
@@ -35,19 +35,16 @@ func TestExecute(t *testing.T) {
 		{args: []string{"policies", "delete", "foobar"}},
 	} {
 		c.args = append(c.args, []string{"--skip-tls-verify", "--config", filepath.Join(os.TempDir(), "hydra.yml")}...)
+		RootCmd.SetArgs(c.args)
 
+		t.Logf("Running command: %s", c.args)
 		if c.timeout > 0 {
-			t.Logf("Running async command: %s", c.args)
 			go func(args []string) {
-				RootCmd.SetArgs(args)
 				assert.Nil(t, RootCmd.Execute())
 			}(c.args)
 			time.Sleep(c.timeout)
-			continue
+		} else {
+			assert.Nil(t, RootCmd.Execute())
 		}
-		t.Logf("Running command %s", c.args)
-
-		RootCmd.SetArgs(c.args)
-		assert.Nil(t, RootCmd.Execute())
 	}
 }

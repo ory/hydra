@@ -1,8 +1,3 @@
-go test sudo: required
-
-services:
-  - docker
-
 env:
   - DOCKER_BIND_LOCALHOST=true GO15VENDOREXPERIMENT=1
 

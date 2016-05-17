@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.org/ory-am/hydra.svg?branch=master)](https://travis-ci.org/ory-am/hydra)
 [![Coverage Status](https://coveralls.io/repos/ory-am/hydra/badge.svg?branch=master&service=github)](https://coveralls.io/github/ory-am/hydra?branch=master)
 
-![Hydra](hydra.png)
+![Hydra](dist/logo.png)
 
 Hydra is being developed at [Ory](https://ory.am). Join our [mailinglist](http://eepurl.com/bKT3N9) to stay on top of new developments.
 
@@ -224,7 +224,3 @@ Here are however a few notes which might assist you in your task:
 * Heroku (and probably Cloud Foundry as well) *force* TLS termination, meaning that Hydra must be configured with `DANGEROUSLY_FORCE_HTTP=force`.
 * Using bash, you can easily add multi-line environment variables to Heroku using `heroku config:set JWT_PUBLIC_KEY="$(my-public-key.pem)"`.
   This does not work on Windows!
-
-## Attributions
-
-* [Logo source](https://www.flickr.com/photos/pathfinderlinden/7161293044/)

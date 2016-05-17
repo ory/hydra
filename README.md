@@ -62,24 +62,7 @@ $ docker run -d -p 4444:4444 oryam/hydra --name my-hydra
 ec91228cb105db315553499c81918258f52cee9636ea2a4821bdb8226872f54b
 ```
 
-**CLI Client (Docker)**
-
-If you are running docker locally, you can use the CLI by connecting to it:
-
-```
-$ docker exec -i -t <container> /bin/bash
-# e.g. docker exec -i -t ec /bin/bash
-
-root@ec91228cb105:/go/src/github.com/ory-am/hydra# hydra
-Hydra is a twelve factor OAuth2 and OpenID Connect provider
-
-Usage:
-  hydra [command]
-
-[...]
-```
-
-**CLI Client (Binary)**
+#### CLI Client
 The CLI client is available at [gobuild.io](https://gobuild.io/ory-am/hydra) or through
 the [releases tab](https://github.com/ory-am/hydra/releases).
 
@@ -94,64 +77,66 @@ go install github.com/ory-am/hydra
 hydra
 ```
 
-### Run Hydra
+#### CLI Client using Docker (not recommended)
 
-Once you have [set up docker and installed the CLI](#installation) run:
+You could also SSH into the hydra container for some easy testing:
 
 ```
-$ docker run -d -p 4444:4444 oryam/hydra --name my-hydra
-# You will receive a different container id.
-# You can concatenate most of the id and use the two to three letters.
-# In this case, that could be `ec9`.
-ec91228cb105db315553499c81918258f52cee9636ea2a4821bdb8226872f54b
+$ docker exec -i -t <hydra-container-id> /bin/bash
+# e.g. docker exec -i -t ec /bin/bash
+
+root@ec91228cb105:/go/src/github.com/ory-am/hydra# hydra
+Hydra is a twelve factor OAuth2 and OpenID Connect provider
+
+Usage:
+  hydra [command]
+
+[...]
+```
+
+### Run minimal installation
+
+Install the [CLI and Docker Toolbox](#installation). Make sure you install Docker Compose. On OSX and Windows,
+open the Docker Quickstart CLI. On Linux open any terminal.
+
+**Start docker on Windows, OSX**
+```
+$ DOCKER_IP=$(docker-machine ip default) docker-compose up
+```
+
+**Start Hydra on Linux**
+```
+$ DOCKER_IP=localhost docker-compose up
+Starting hydra_hydra
+Starting hydra_consent
+[...]
+mhydra   | mtime="2016-05-17T18:09:28Z" level=warning msg="Generated system secret: MnjFP5eLIr60h?hLI1h-!<4(TlWjAHX7"
+[...]
+mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="Temporary root client created."
+mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="client_id: d9227bd5-5d47-4557-957d-2fd3bee11035"
+mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="client_secret: ,IvxGt02uNjv1ur9"
+[...]
 ```
 
 You have now a running hydra docker container! It is not backed by any database and runs completely in memory. Rebooting
 or any other sort of disruption will purge all data.
 
-There are two interesting flags used above:
-* **-d** runs the docker in daemon mode.
-* **-p** publishes port 4444.
-
-**TBD:** Provision with RethinkDB.
+*TBD: Provision with RethinkDB.*
 
 Hydra can be managed with the hydra cli client. The client hast to log on before it is allowed to do anything.
-When hydra detects a new installation, a new temporary root client is created. The client credentials will be available
-from `docker logs`.
+When hydra detects a new installation, a new temporary root client is created. The client credentials are printed by
+`docker compose up`:
 
 ```
-$ docker logs ec9
-Pointing cluster at https://localhost:4444
-time="2016-05-15T14:56:34Z" level=warning msg="No system secret specified."
-time="2016-05-15T14:56:34Z" level=warning msg="Generated system secret: (.UL_&77zy8/v9<sUsWLKxLwuld?.82B"
-time="2016-05-15T14:56:34Z" level=warning msg="Do not auto-generate system secrets in production."
-time="2016-05-15T14:56:34Z" level=warning msg="Could not find OpenID Connect singing keys. Generating a new keypair..."
-time="2016-05-15T14:56:34Z" level=warning msg="Keypair generated."
-time="2016-05-15T14:56:34Z" level=warning msg="WARNING: Automated key creation causes low entropy. Replace the keys as soon as possible."
-time="2016-05-15T14:56:34Z" level=warning msg="No clients were found. Creating a temporary root client..."
-time="2016-05-15T14:56:34Z" level=warning msg="Temporary root client created."
-time="2016-05-15T14:56:34Z" level=warning msg="client_id: ad586b43-eb85-433c-8e46-8264bf0407b3"
-time="2016-05-15T14:56:34Z" level=warning msg="client_secret: -,ak$P_qLjijKa,5"
-time="2016-05-15T14:56:34Z" level=warning msg="The root client must be removed in production. The root's credentials could be accidentally logged."
-time="2016-05-15T14:56:34Z" level=warning msg="Key for TLS not found. Creating new one."
-time="2016-05-15T14:56:34Z" level=warning msg="Temporary key created."
-time="2016-05-15T14:56:34Z" level=info msg="Starting server on :4444"
+mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="client_id: d9227bd5-5d47-4557-957d-2fd3bee11035"
+mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="client_secret: ,IvxGt02uNjv1ur9"
 ```
-
-As you can see, various keys are being generated, when hydra is started against an empty database.
 
 The system secret is a global secret assigned to every hydra instance. It is used to encrypt data at rest. You can
 set the system secret through the `$SYSTEM_SECRET` environment variable. When no secret is set, hydra generates one:
 
 ```
 time="2016-05-15T14:56:34Z" level=warning msg="Generated system secret: (.UL_&77zy8/v9<sUsWLKxLwuld?.82B"
-```
-
-Our temporary root client was generated as well:
-
-```
-time="2016-05-15T14:56:34Z" level=warning msg="client_id: ad586b43-eb85-433c-8e46-8264bf0407b3"
-time="2016-05-15T14:56:34Z" level=warning msg="client_secret: -,ak$P_qLjijKa,5"
 ```
 
 **Important note:** Please be aware that logging passwords should never be done on a production server. Either prune
@@ -164,8 +149,8 @@ Now you know which credentials you need to use. Next, we log in.
 ```
 $ hydra connect
 Cluster URL: https://localhost:4444
-Client ID: ad586b43-eb85-433c-8e46-8264bf0407b3
-Client Secret: -,ak$P_qLjijKa,5
+Client ID: d9227bd5-5d47-4557-957d-2fd3bee11035
+Client Secret: ,IvxGt02uNjv1ur9
 Done.
 ```
 
@@ -181,7 +166,28 @@ Client Secret: Z2pJ0>Tp7.ggn>EE&rhnOzdt1
 **Important note:** Hydra is using self signed TLS certificates for HTTPS, if no certificate was provided. This should
 never be done in production. To skip the TLS verification step on the client, provide the `--skip-tls-verify` flag.
 
-Great! You installed hydra, connected the CLI and created a client. Your next stop should be the [Documentation](#documentation).
+Why not issue an access token for your client?
+
+```
+$ hydra token client --skip-tls-verify
+Warning: Skipping TLS Certificate Verification.
+JLbnRS9GQmzUBT4x7ESNw0kj2wc0ffbMwOv3QQZW4eI.qkP-IQXn6guoFew8TvaMFUD-SnAyT8GmWuqGi3wuWXg
+```
+
+Let's try this with the authorize code grant!
+
+```
+$ hydra token user --skip-tls-verify
+Warning: Skipping TLS Certificate Verification.
+If your browser does not open automatically, navigate to: https://192.168.99.100:4444/oauth2/auth?client_id=d9227bd5-5d47-4557-957d-2fd3bee11035&response_type=code&scope=core+hydra&state=sbnwdelqzxyedwtqinxnolbr&nonce=sffievieeesltbjkwxyhycyq
+Setting up callback listener on http://localhost:4445/callback
+Press ctrl + c on Linux / Windows or cmd + c on OSX to end the process.
+```
+
+![OAuth2 Flow](dist/oauth2-flow.gif)
+
+Great! You installed hydra, connected the CLI, created a client and completed two authentication flows!
+Your next stop should be the [Guide](#guide).
 
 ## Documentation
 

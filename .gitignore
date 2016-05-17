@@ -7,3 +7,4 @@ node_modules/
 *.stackdump
 .DS_Store
 vendor/
+.hydra.yml

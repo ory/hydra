@@ -1,0 +1,32 @@
+version: '2'
+
+services:
+
+  hydra:
+    build:
+      context: .
+      dockerfile: Dockerfile-dangerous
+    volumes:
+      - ./.docker-home:/root
+    expose:
+      - 4444
+    ports:
+      - "4444:4444"
+    environment:
+      - CONSENT_URL=http://${DOCKER_IP}:3000
+
+  consent:
+    environment:
+      - HYDRA_URL=https://hydra:4444
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+    image: oryam/hydra-idp-react
+    depends_on:
+      - hydra
+    links:
+      - hydra
+    volumes:
+      - ./.docker-home:/root
+    expose:
+      - 3000
+    ports:
+      - "3000:3000"

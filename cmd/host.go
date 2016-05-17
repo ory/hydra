@@ -47,7 +47,7 @@ func runHostCmd(cmd *cobra.Command, args []string) {
 	if ok, _ := cmd.Flags().GetBool("dangerous-auto-logon"); ok {
 		logrus.Warnln("Do not use flag --dangerous-auto-logon in production.")
 		err := c.Persist()
-		pkg.Must(err, "Could not write configuration file: ", err)
+		pkg.Must(err, "Could not write configuration file: %s", err)
 	}
 
 	http.Handle("/", router)
@@ -72,7 +72,7 @@ func getOrCreateTLSCertificate() tls.Certificate {
 	if errors.Is(err, pkg.ErrNotFound) {
 		logrus.Warn("Key for TLS not found. Creating new one.")
 
-		generator := jwk.ECDSA521Generator{}
+		generator := jwk.ECDSA256Generator{}
 		keys, err := generator.Generate("")
 		pkg.Must(err, "Could not generate key: %s", err)
 

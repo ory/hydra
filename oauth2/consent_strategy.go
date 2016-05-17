@@ -59,7 +59,6 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 	}
 
 	subject := ejwt.ToString(t.Claims["sub"])
-	delete(t.Claims, "sub")
 	return &Session{
 		Subject: subject,
 		Session: &strategy.DefaultSession{
@@ -83,7 +82,7 @@ func (s *DefaultConsentStrategy) IssueChallenge(authorizeRequest fosite.Authoriz
 		"nonce": uuid.New(),
 		"scp":   authorizeRequest.GetScopes(),
 		"aud":   authorizeRequest.GetClient().GetID(),
-		"exp":   time.Now().Add(time.Hour),
+		"exp":   time.Now().Add(time.Hour).Unix(),
 		"redir": redirectURL,
 	}
 

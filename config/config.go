@@ -25,24 +25,25 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 	"gopkg.in/yaml.v2"
+	"sync"
 )
 
 type Config struct {
-	BindPort int `mapstructure:"port" yaml:"-"`
+	BindPort int `mapstructure:"port" yaml:"port,omitempty"`
 
-	BindHost string `mapstructure:"host" yaml:"-"`
+	BindHost string `mapstructure:"host" yaml:"host,omitempty"`
 
-	Issuer string `mapstructure:"issuer" yaml:"-"`
+	Issuer string `mapstructure:"issuer" yaml:"issuer,omitempty"`
 
 	SystemSecret []byte `mapstructure:"system_secret" yaml:"-"`
 
-	ConsentURL string `mapstructure:"consent_url" yaml:"-"`
+	ConsentURL string `mapstructure:"consent_url" yaml:"consent_url,omitempty"`
 
-	ClusterURL string `mapstructure:"cluster_url" yaml:"cluster_url"`
+	ClusterURL string `mapstructure:"cluster_url" yaml:"cluster_url,omitempty"`
 
-	ClientID string `mapstructure:"client_id" yaml:"client_id"`
+	ClientID string `mapstructure:"client_id" yaml:"client_id,omitempty"`
 
-	ClientSecret string `mapstructure:"client_secret" yaml:"client_secret"`
+	ClientSecret string `mapstructure:"client_secret" yaml:"client_secret,omitempty"`
 
 	ForceHTTP bool `mapstructure:"foolishly_force_http" yaml:"-"`
 
@@ -51,9 +52,14 @@ type Config struct {
 	oauth2Client *http.Client
 
 	context *Context
+
+	sync.Mutex
 }
 
 func (c *Config) GetClusterURL() string {
+	c.Lock()
+	defer c.Unlock()
+
 	if c.ClusterURL == "" {
 		bindHost := c.BindHost
 		if bindHost == "" {
@@ -77,6 +83,10 @@ func (c *Config) GetClusterURL() string {
 }
 
 func (c *Config) Context() *Context {
+	secret := c.GetSystemSecret()
+	c.Lock()
+	defer c.Unlock()
+
 	if c.context != nil {
 		return c.context
 	}
@@ -90,7 +100,7 @@ func (c *Config) Context() *Context {
 		LadonManager: manager,
 		FositeStrategy: &strategy.HMACSHAStrategy{
 			Enigma: &hmac.HMACStrategy{
-				GlobalSecret: c.GetSystemSecret(),
+				GlobalSecret: secret,
 			},
 		},
 	}
@@ -99,6 +109,9 @@ func (c *Config) Context() *Context {
 }
 
 func (c *Config) Resolve(join ...string) *url.URL {
+	c.Lock()
+	defer c.Unlock()
+
 	if c.cluster == nil {
 		cluster, err := url.Parse(c.ClusterURL)
 		c.cluster = cluster
@@ -113,6 +126,9 @@ func (c *Config) Resolve(join ...string) *url.URL {
 }
 
 func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
+	c.Lock()
+	defer c.Unlock()
+
 	if c.oauth2Client != nil {
 		return c.oauth2Client
 	}
@@ -143,11 +159,15 @@ func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
 		fmt.Println("Did you know you can skip `hydra connect` when running `hydra host --dangerous-auto-logon`? DO NOT use this flag in production!")
 		os.Exit(1)
 	}
+
 	c.oauth2Client = oauthConfig.Client(ctx)
 	return c.oauth2Client
 }
 
 func (c *Config) GetSystemSecret() []byte {
+	c.Lock()
+	defer c.Unlock()
+
 	if len(c.SystemSecret) >= 8 {
 		return c.SystemSecret
 	}
@@ -162,6 +182,9 @@ func (c *Config) GetSystemSecret() []byte {
 }
 
 func (c *Config) GetAddress() string {
+	c.Lock()
+	defer c.Unlock()
+
 	if c.BindPort == 0 {
 		c.BindPort = 4444
 	}
@@ -169,6 +192,9 @@ func (c *Config) GetAddress() string {
 }
 
 func (c *Config) GetIssuer() string {
+	c.Lock()
+	defer c.Unlock()
+
 	if c.Issuer == "" {
 		c.Issuer = "hydra"
 	}
@@ -176,17 +202,24 @@ func (c *Config) GetIssuer() string {
 }
 
 func (c *Config) GetAccessTokenLifespan() time.Duration {
+	c.Lock()
+	defer c.Unlock()
+
 	return time.Hour
 }
 
 func (c *Config) Persist() error {
+	_ = c.GetIssuer()
+	_ = c.GetAddress()
+	_ = c.GetClusterURL()
+
 	out, err := yaml.Marshal(c)
 	if err != nil {
 		return errors.New(err)
 	}
 
 	if err := ioutil.WriteFile(viper.ConfigFileUsed(), out, 0700); err != nil {
-		return errors.New(err)
+		return errors.Errorf(`Could not write to "%s" because: %s`, viper.ConfigFileUsed(), err)
 	}
 	return nil
 }

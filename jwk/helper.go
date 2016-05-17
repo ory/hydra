@@ -50,6 +50,11 @@ func ToX509PEMKeyPair(key interface{}) (cert []byte, private []byte, err error) 
 		SerialNumber: serialNumber,
 		Subject: pkix.Name{
 			Organization: []string{"Hydra"},
+			CommonName:"Hydra",
+		},
+		Issuer: pkix.Name{
+			Organization: []string{"Hydra"},
+			CommonName:"Hydra",
 		},
 		NotBefore:             time.Now(),
 		NotAfter:              time.Now().Add(time.Hour * 24 * 7),

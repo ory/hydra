@@ -8,6 +8,10 @@ import (
 	"github.com/ory-am/hydra/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"strings"
+	"path/filepath"
+	"runtime"
+	"sync"
 )
 
 var cfgFile string
@@ -24,6 +28,7 @@ var RootCmd = &cobra.Command{
 }
 
 var cmdHandler = cli.NewHandler(c)
+var mutex = &sync.RWMutex{}
 
 // Execute adds all child commands to the root command sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
@@ -50,9 +55,15 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+	mutex.Lock()
 	if cfgFile != "" {
 		// enable ability to specify config file via flag
 		viper.SetConfigFile(cfgFile)
+	}
+
+	path := absPathify("$HOME")
+	if _, err := os.Stat(filepath.Join(path, ".hydra.yml")); err != nil {
+		_, _ = os.Create(filepath.Join(path, ".hydra.yml"))
 	}
 
 	viper.SetConfigType("yaml")
@@ -62,7 +73,7 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err != nil {
-		fmt.Printf(`Config file not found becase "%s"`, err)
+		fmt.Printf(`Config file not found because "%s"`, err)
 		fmt.Println("")
 	}
 
@@ -70,7 +81,52 @@ func initConfig() {
 		fatal("Could not read config because %s.", err)
 	}
 
+	if consentURL, ok := viper.Get("CONSENT_URL").(string); ok {
+		c.ConsentURL = consentURL
+	}
+
+	if clientID, ok := viper.Get("CLIENT_ID").(string); ok {
+		c.ClientID = clientID
+	}
+
+	if clientSecret, ok := viper.Get("CLIENT_SECRET").(string); ok {
+		c.ClientSecret = clientSecret
+	}
+
 	if c.ClusterURL == "" {
 		fmt.Printf("Pointing cluster at %s\n", c.GetClusterURL())
 	}
+	mutex.Unlock()
+}
+
+func absPathify(inPath string) string {
+	if strings.HasPrefix(inPath, "$HOME") {
+		inPath = userHomeDir() + inPath[5:]
+	}
+
+	if strings.HasPrefix(inPath, "$") {
+		end := strings.Index(inPath, string(os.PathSeparator))
+		inPath = os.Getenv(inPath[1:end]) + inPath[end:]
+	}
+
+	if filepath.IsAbs(inPath) {
+		return filepath.Clean(inPath)
+	}
+
+	p, err := filepath.Abs(inPath)
+	if err == nil {
+		return filepath.Clean(p)
+	}
+	return ""
+}
+
+func userHomeDir() string {
+	if runtime.GOOS == "windows" {
+		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+		if home == "" {
+			home = os.Getenv("USERPROFILE")
+		}
+		return home
+	}
+	return os.Getenv("HOME")
 }

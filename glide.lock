@@ -1,5 +1,5 @@
 hash: 175acff756341dd7fa75a3e1e2e1a042a957a1b2482f017ae0bb38a2e8b9c625
-updated: 2016-05-15T16:21:58.2484748+02:00
+updated: 2016-05-17T13:01:09.4936546+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 37d5f827499d1c346df42f2ad7fcb7f453833a57
@@ -101,6 +101,8 @@ imports:
   subpackages:
   - assert
   - require
+- name: github.com/toqueteos/webbrowser
+  version: 21fc9f95c83442fd164094666f7cb4f9fdd56cd6
 - name: golang.org/x/crypto
   version: b6789ab629056511030d652d851e7dc10c9e9c9e
   subpackages:
@@ -111,6 +113,7 @@ imports:
   version: ef00b378c73f107bf44d5c9b69875255ce89b79a
   subpackages:
   - context
+  - netutil
 - name: golang.org/x/oauth2
   version: e86e2718db89775a4604abc10a5d3a5672e7336e
   subpackages:
@@ -138,6 +141,8 @@ imports:
   - types
 - name: gopkg.in/fatih/pool.v2
   version: cba550ebf9bce999a02e963296d4bc7a486cb715
+- name: gopkg.in/tylerb/graceful.v1
+  version: 9a3d4236b03bb5d26f7951134d248f9d5510d599
 - name: gopkg.in/yaml.v2
   version: a83829b6f1293c91addabc89d0571c246397bbf4
 devImports: []

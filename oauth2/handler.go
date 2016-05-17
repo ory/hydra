@@ -95,7 +95,11 @@ func (o *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 }
 
 func (o *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, authorizeRequest fosite.AuthorizeRequester) error {
-	challenge, err := o.Consent.IssueChallenge(authorizeRequest, r.URL.String())
+	schema := "https"
+	if r.TLS == nil {
+		schema = "http"
+	}
+	challenge, err := o.Consent.IssueChallenge(authorizeRequest, schema + "://" + r.Host + r.URL.String())
 	if err != nil {
 		return err
 	}

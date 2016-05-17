@@ -1,4 +1,4 @@
-package internal
+package server
 
 import (
 	"time"
@@ -26,6 +26,7 @@ import (
 	"github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/ory-am/hydra/internal"
 )
 
 func InjectFositeStore(c *config.Config, clients client.Manager) {
@@ -34,7 +35,7 @@ func InjectFositeStore(c *config.Config, clients client.Manager) {
 
 	switch ctx.Connection.(type) {
 	case *config.MemoryConnection:
-		store = &FositeMemoryStore{
+		store = &internal.FositeMemoryStore{
 			Manager:        clients,
 			AuthorizeCodes: make(map[string]fosite.Requester),
 			IDSessions:     make(map[string]fosite.Requester),

@@ -8,7 +8,6 @@ import (
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/connection"
-	"github.com/ory-am/hydra/internal"
 	"github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
@@ -31,7 +30,7 @@ func (h *Handler) Start(c *config.Config, router *httprouter.Router) {
 
 	// Set up warden
 	clientsManager := client.NewManager(c)
-	internal.InjectFositeStore(c, clientsManager)
+	InjectFositeStore(c, clientsManager)
 	ctx.Warden = &warden.LocalWarden{
 		Warden: &ladon.Ladon{
 			Manager: ctx.LadonManager,
@@ -48,7 +47,7 @@ func (h *Handler) Start(c *config.Config, router *httprouter.Router) {
 	h.Keys = NewJWKHandler(c, router)
 	h.Connections = connection.NewHandler(c, router)
 	h.Policy = policy.NewHandler(c, router)
-	h.OAuth2 = internal.NewOAuth2Handler(c, router, h.Keys.Manager)
+	h.OAuth2 = NewOAuth2Handler(c, router, h.Keys.Manager)
 
 	// Create root account if new install
 	h.createRS256KeysIfNotExist(c, oauth2.ConsentEndpointKey, "private")

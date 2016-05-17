@@ -8,7 +8,6 @@ import (
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/connection"
-	"github.com/ory-am/hydra/factory"
 	"github.com/ory-am/hydra/internal"
 	"github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/oauth2"
@@ -46,7 +45,7 @@ func (h *Handler) Start(c *config.Config, router *httprouter.Router) {
 
 	// Set up handlers
 	h.Clients = client.NewHandler(c, router, clientsManager)
-	h.Keys = factory.NewJWKHandler(c, router)
+	h.Keys = NewJWKHandler(c, router)
 	h.Connections = connection.NewHandler(c, router)
 	h.Policy = policy.NewHandler(c, router)
 	h.OAuth2 = internal.NewOAuth2Handler(c, router, h.Keys.Manager)

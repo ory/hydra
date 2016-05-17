@@ -39,9 +39,9 @@ func TestExecute(t *testing.T) {
 
 		t.Logf("Running command: %s", c.args)
 		if c.timeout > 0 {
-			go func(args []string) {
+			go func() {
 				assert.Nil(t, RootCmd.Execute())
-			}(c.args)
+			}()
 			time.Sleep(c.timeout)
 		} else {
 			assert.Nil(t, RootCmd.Execute())

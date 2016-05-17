@@ -16,7 +16,9 @@ Hydra is being developed at [Ory](https://ory.am). Join our [mailinglist](http:/
 - [Motivation](#motivation)
 - [Quickstart](#quickstart)
   - [Installation](#installation)
-  - [Run Hydra](#run-hydra)
+    - [CLI Client](#cli-client)
+    - [CLI Client using Docker (not recommended)](#cli-client-using-docker-not-recommended)
+  - [Run minimal installation](#run-minimal-installation)
 - [Documentation](#documentation)
   - [Guide](#guide)
   - [REST API Documentation](#rest-api-documentation)
@@ -24,7 +26,6 @@ Hydra is being developed at [Ory](https://ory.am). Join our [mailinglist](http:/
   - [Develop](#develop)
 - [Frequently Asked Questions](#frequently-asked-questions)
   - [Deploy using buildpacks (Heroku, Cloud Foundry, ...)](#deploy-using-buildpacks-heroku-cloud-foundry-)
-- [Attributions](#attributions)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

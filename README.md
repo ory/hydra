@@ -94,6 +94,8 @@ Usage:
 
 ### Run the example
 
+![Run the example](dist/run-the-example.gif)
+
 Install the [CLI and Docker Toolbox](#installation). Make sure you install Docker Compose. On OSX and Windows,
 open the Docker Quickstart Terminal. On Linux open any terminal.
 

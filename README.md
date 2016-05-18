@@ -63,8 +63,7 @@ $ docker run -d -p 4444:4444 oryam/hydra --name my-hydra
 ec91228cb105db315553499c81918258f52cee9636ea2a4821bdb8226872f54b
 ```
 
-#### CLI Client
-The CLI client is available at [gobuild.io](https://gobuild.io/ory-am/hydra) or through
+**The CLI client** is available at [gobuild.io](https://gobuild.io/ory-am/hydra) or through
 the [releases tab](https://github.com/ory-am/hydra/releases).
 
 There is currently no installer which adds the client to your path automatically. You have to set up the path yourself.
@@ -78,9 +77,7 @@ go install github.com/ory-am/hydra
 hydra
 ```
 
-#### CLI Client using Docker (not recommended)
-
-You could also SSH into the hydra container for some easy testing:
+Alternatively, you can use the CLI in Docker (not recommended):
 
 ```
 $ docker exec -i -t <hydra-container-id> /bin/bash
@@ -95,18 +92,25 @@ Usage:
 [...]
 ```
 
-### Run minimal installation
+### Run the example
 
 Install the [CLI and Docker Toolbox](#installation). Make sure you install Docker Compose. On OSX and Windows,
-open the Docker Quickstart CLI. On Linux open any terminal.
+open the Docker Quickstart Terminal. On Linux open any terminal.
 
-**Start docker on Windows, OSX**
+**On OSX and Windows** using the Docker Quickstart Terminal.
 ```
+$ go get github.com/ory-am/hydra
+$ cd $GOPATH/src/github.com/ory-am/hydra
 $ DOCKER_IP=$(docker-machine ip default) docker-compose up
+Starting hydra_hydra
+Starting hydra_consent
+[...]
 ```
 
-**Start Hydra on Linux**
+**On Linux.**
 ```
+$ go get github.com/ory-am/hydra
+$ cd $GOPATH/src/github.com/ory-am/hydra
 $ DOCKER_IP=localhost docker-compose up
 Starting hydra_hydra
 Starting hydra_consent

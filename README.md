@@ -29,10 +29,11 @@ Hydra is being developed at [Ory](https://ory.am). Join our [mailinglist](http:/
 
 1. Hydra is an OAuth2 and OpenID Connect provider built for availability. The distributed in-memory architecture allows for heavy duty workloads.
 2. Hydra works with every Identity Provider. The deprecated php-3.0 authentication service your intern wrote? It works with that too, don't worry.
-   See for yourself: [React.js Identity Provider Example App](https://github.com/ory-am/hydra-idp-react).
+   See for yourself: **[React.js Identity Provider Example App](https://github.com/ory-am/hydra-idp-react).**
 3. Hydra does not use any templates, it is up to you what your front end should look like.
 4. Hydra is not *just* OAuth2. There are APIs for *two factor authentication, cryptographic key management,
    social log on, policy based access control and policy management*.
+5. Hydra is available at [Docker Hub](https://hub.docker.com/r/oryam/hydra/).
 
 ## Motivation
 
@@ -58,10 +59,10 @@ This section is a quickstart guide to working with Hydra. In-depth docs are avai
 
 **Starting the host** is easiest with docker. The host process handles HTTP requests and is backed by a database.
 Read how to install docker on [Linux](https://docs.docker.com/linux/), [OSX](https://docs.docker.com/mac/) or
-[Windows](https://docs.docker.com/windows/).
+[Windows](https://docs.docker.com/windows/). Hydra is available on [Docker Hub](https://hub.docker.com/r/oryam/hydra/).
 
 The easiest way to start docker is without a database. Hydra will keep all changes in memory. But be aware! Restarting, scaling
-or stopping the container will make you **lose all data**.
+or stopping the container will make you **lose all data**:
 
 ```
 $ docker run -d -p 4444:4444 oryam/hydra --name my-hydra

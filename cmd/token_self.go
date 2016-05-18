@@ -3,21 +3,21 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/spf13/cobra"
 	"crypto/tls"
-	"golang.org/x/oauth2/clientcredentials"
-	"github.com/ory-am/hydra/pkg"
-	"golang.org/x/oauth2"
 	"net/http"
-	"golang.org/x/net/context"
 
+	"github.com/ory-am/hydra/pkg"
+	"github.com/spf13/cobra"
+	"golang.org/x/net/context"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/clientcredentials"
 )
 
 // tokenSelfCmd represents the self command
 var tokenSelfCmd = &cobra.Command{
 	Use:   "client",
 	Short: "Generate an OAuth2 token the client grant type",
-	Long: "This command uses the CLI's credentials to create an access token.",
+	Long:  "This command uses the CLI's credentials to create an access token.",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		if ok, _ := cmd.Flags().GetBool("skip-tls-verify"); ok {

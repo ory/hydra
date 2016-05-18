@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/Sirupsen/logrus"
+	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/handler/core"
@@ -14,7 +15,6 @@ import (
 	"github.com/ory-am/hydra/policy"
 	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/ladon"
-	"github.com/go-errors/errors"
 )
 
 type Handler struct {

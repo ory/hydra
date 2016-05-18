@@ -1,9 +1,10 @@
 package connection
 
 import (
+	"sync"
+
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/pkg"
-	"sync"
 )
 
 type MemoryManager struct {

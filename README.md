@@ -29,14 +29,23 @@ Hydra is being developed at [Ory](https://ory.am). Join our [mailinglist](http:/
 
 1. Hydra is an OAuth2 and OpenID Connect provider built for availability. The distributed in-memory architecture allows for heavy duty workloads.
 2. Hydra works with every Identity Provider. The deprecated php-3.0 authentication service your intern wrote? It works with that too, don't worry.
+   See for yourself: [React.js Identity Provider Example App](https://github.com/ory-am/hydra-idp-react).
 3. Hydra does not use any templates, it is up to you what your front end should look like.
-4. Hydra comes with two factor authentication, key management, social log on, policy management and access control.
+4. Hydra is not *just* OAuth2. There are APIs for *two factor authentication, cryptographic key management,
+   social log on, policy based access control and policy management*.
 
 ## Motivation
 
-At first, there was the monolith. The monolith worked well with the customized joomla authentication module. Then, the web evolved into an elastic cloud that serves thousands of different user agents in every part of the world. Hydra is driven by the need for an easy scalable, in memory OAuth2 and OpenID Connect provider, that integrates with every Identity Provider you can imagine. 
+At first, there was the monolith. The monolith worked well with the bespoke authentication module.
+Then, the web evolved into an elastic cloud that serves thousands of different user agents
+in every part of the world. Hydra is driven by the need for a scalable in memory
+OAuth2 and OpenID Connect layer, that integrates with every Identity Provider you can imagine.
 
-Hydra uses pub/sub to always have the latest data available in memory. Hydra scales effortlessly on every platform you can imagine, including Heroku, Cloud Foundry, Docker, Google Container Engine and many more.
+1. Hydra uses pub/sub to always have the latest data available in memory.
+2. Hydra scales effortlessly on every platform you can imagine, including Heroku, Cloud Foundry, Docker,
+Google Container Engine and many more.
+3. Hydra uses cryptographic tokens for authenticate users and request their
+consent, no APIs required. This makes integrating with Hydra as easy and secure as it gets.
 
 ## Quickstart
 

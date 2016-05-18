@@ -17,8 +17,8 @@ import (
 
 const (
 	connectionsResource = "rn:hydra:connections"
-	connectionResource = "rn:hydra:connections:%s"
-	scope = "hydra.connections"
+	connectionResource  = "rn:hydra:connections:%s"
+	scope               = "hydra.connections"
 )
 
 type Handler struct {
@@ -79,7 +79,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		return
 	}
 
-	h.H.WriteCreated(ctx, w, r, "/oauth2/connections/" + conn.ID, &conn)
+	h.H.WriteCreated(ctx, w, r, "/oauth2/connections/"+conn.ID, &conn)
 }
 
 func (h *Handler) FindLocal(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

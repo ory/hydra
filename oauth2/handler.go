@@ -99,7 +99,7 @@ func (o *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, auth
 	if r.TLS == nil {
 		schema = "http"
 	}
-	challenge, err := o.Consent.IssueChallenge(authorizeRequest, schema + "://" + r.Host + r.URL.String())
+	challenge, err := o.Consent.IssueChallenge(authorizeRequest, schema+"://"+r.Host+r.URL.String())
 	if err != nil {
 		return err
 	}

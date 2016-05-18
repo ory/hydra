@@ -2,9 +2,9 @@ package server
 
 import (
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/connection"
+	"github.com/ory-am/hydra/herodot"
 )
 
 func newConnectionHandler(c *config.Config, router *httprouter.Router) *connection.Handler {

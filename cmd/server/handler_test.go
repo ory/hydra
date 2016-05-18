@@ -1,9 +1,10 @@
 package server
 
 import (
+	"testing"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/hydra/config"
-	"testing"
 )
 
 func TestStart(t *testing.T) {

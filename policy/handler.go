@@ -14,9 +14,9 @@ import (
 )
 
 const (
-	endpoint = "/policies"
-	scope = "hydra.policies"
-	policyResource = "rn:hydra:policies"
+	endpoint         = "/policies"
+	scope            = "hydra.policies"
+	policyResource   = "rn:hydra:policies"
 	policiesResource = "rn:hydra:policies:%s"
 )
 
@@ -29,8 +29,8 @@ type Handler struct {
 func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.POST(endpoint, h.Create)
 	r.GET(endpoint, h.Find)
-	r.GET(endpoint + "/:id", h.Get)
-	r.DELETE(endpoint + "/:id", h.Delete)
+	r.GET(endpoint+"/:id", h.Get)
+	r.DELETE(endpoint+"/:id", h.Delete)
 }
 
 func (h *Handler) Find(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -81,7 +81,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 		return
 	}
 
-	h.H.WriteCreated(ctx, w, r, "/policies/" + p.ID, p)
+	h.H.WriteCreated(ctx, w, r, "/policies/"+p.ID, p)
 }
 
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

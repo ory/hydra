@@ -4,14 +4,15 @@ import (
 	"fmt"
 	"os"
 
+	"path/filepath"
+	"runtime"
+	"strings"
+	"sync"
+
 	"github.com/ory-am/hydra/cmd/cli"
 	"github.com/ory-am/hydra/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"strings"
-	"path/filepath"
-	"runtime"
-	"sync"
 )
 
 var cfgFile string

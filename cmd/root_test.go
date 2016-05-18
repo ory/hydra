@@ -26,7 +26,7 @@ func TestExecute(t *testing.T) {
 			timeout: 10 * time.Second,
 		},
 		{
-			args:    []string{"token", "user",},
+			args:    []string{"token", "user"},
 			timeout: time.Second,
 		},
 		{args: []string{"clients", "create", "--id", "foobarbaz"}},

@@ -1,10 +1,11 @@
 package jwk
 
 import (
+	"sync"
+
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/square/go-jose"
-	"sync"
 )
 
 type MemoryManager struct {

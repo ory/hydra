@@ -1,18 +1,19 @@
 package cmd
 
 import (
-	"gopkg.in/tylerb/graceful.v1"
-	"github.com/spf13/cobra"
-	"fmt"
 	"crypto/tls"
-	"golang.org/x/net/context"
-	"golang.org/x/oauth2"
+	"fmt"
 	"net/http"
-	"github.com/ory-am/hydra/pkg"
+	"time"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/common/rand/sequence"
-	"time"
+	"github.com/ory-am/hydra/pkg"
+	"github.com/spf13/cobra"
 	"github.com/toqueteos/webbrowser"
+	"golang.org/x/net/context"
+	"golang.org/x/oauth2"
+	"gopkg.in/tylerb/graceful.v1"
 )
 
 // tokenUserCmd represents the token command
@@ -32,8 +33,8 @@ var tokenUserCmd = &cobra.Command{
 			ClientID:     c.ClientID,
 			ClientSecret: c.ClientSecret,
 			Endpoint: oauth2.Endpoint{
-				TokenURL:     pkg.JoinURLStrings(c.ClusterURL, "/oauth2/token"),
-				AuthURL:pkg.JoinURLStrings(c.ClusterURL, "/oauth2/auth"),
+				TokenURL: pkg.JoinURLStrings(c.ClusterURL, "/oauth2/token"),
+				AuthURL:  pkg.JoinURLStrings(c.ClusterURL, "/oauth2/auth"),
 			},
 			Scopes: []string{"core", "hydra"},
 		}

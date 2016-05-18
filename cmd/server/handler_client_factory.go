@@ -3,9 +3,9 @@ package server
 import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
+	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/hydra/client"
 )
 
 func newClientManager(c *config.Config) client.Manager {

@@ -23,10 +23,10 @@ import (
 	"github.com/ory-am/fosite/token/jwt"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
+	"github.com/ory-am/hydra/internal"
 	"github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
-	"github.com/ory-am/hydra/internal"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {

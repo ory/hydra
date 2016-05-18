@@ -12,6 +12,8 @@ import (
 	"os"
 	"strconv"
 
+	"sync"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite/handler/core/strategy"
@@ -25,7 +27,6 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 	"gopkg.in/yaml.v2"
-	"sync"
 )
 
 type Config struct {

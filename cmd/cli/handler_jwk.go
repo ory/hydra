@@ -25,6 +25,10 @@ func newJWKCLIHandler(c *config.Config) *CLIHandler {
 func (h *CLIHandler) CreateKeys(cmd *cobra.Command, args []string) {
 	h.M.Endpoint = h.Config.Resolve("/keys")
 	h.M.Client = h.Config.OAuth2Client(cmd)
+	if len(args) == 0 {
+		fmt.Println(cmd.UsageString())
+		return
+	}
 
 	alg, _ := cmd.Flags().GetString("alg")
 	keys, err := h.M.CreateKeys(args[0], alg)
@@ -39,6 +43,10 @@ func (h *CLIHandler) CreateKeys(cmd *cobra.Command, args []string) {
 func (h *CLIHandler) GetKeys(cmd *cobra.Command, args []string) {
 	h.M.Endpoint = h.Config.Resolve("/keys")
 	h.M.Client = h.Config.OAuth2Client(cmd)
+	if len(args) == 0 {
+		fmt.Println(cmd.UsageString())
+		return
+	}
 
 	keys, err := h.M.GetKeySet(args[0])
 	pkg.Must(err, "Could not generate keys: %s", err)
@@ -52,6 +60,10 @@ func (h *CLIHandler) GetKeys(cmd *cobra.Command, args []string) {
 func (h *CLIHandler) DeleteKeys(cmd *cobra.Command, args []string) {
 	h.M.Endpoint = h.Config.Resolve("/keys")
 	h.M.Client = h.Config.OAuth2Client(cmd)
+	if len(args) == 0 {
+		fmt.Println(cmd.UsageString())
+		return
+	}
 
 	err := h.M.DeleteKeySet(args[0])
 	pkg.Must(err, "Could not generate keys: %s", err)

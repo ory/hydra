@@ -26,6 +26,12 @@ func TestGenerator(t *testing.T) {
 			},
 		},
 		{
+			g: &ECDSA256Generator{},
+			check: func(ks *jose.JsonWebKeySet) {
+				assert.Len(t, ks, 2)
+			},
+		},
+		{
 			g: &HS256Generator{
 				Length: 32,
 			},

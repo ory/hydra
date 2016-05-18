@@ -33,7 +33,7 @@ func init() {
 		}, &ladon.DefaultPolicy{
 			ID:        "1",
 			Subjects:  []string{"alice"},
-			Resources: []string{"rn:hydra:keys<.*>"},
+			Resources: []string{"rn:hydra:keys:<faz|bar|foo><.*>"},
 			Actions:   []string{"create", "get", "delete", "update"},
 			Effect:    ladon.AllowAccess,
 		},
@@ -58,21 +58,24 @@ func TestManagerKey(t *testing.T) {
 
 	for name, m := range managers {
 		_, err := m.GetKey("faz", "baz")
-		pkg.AssertError(t, true, err, name)
+		pkg.AssertError(t, true, err, "%s", name)
 
 		err = m.AddKey("faz", key)
-		pkg.AssertError(t, false, err, name)
+		pkg.AssertError(t, false, err, "%s", name)
 
 		got, err := m.GetKey("faz", "public")
-		pkg.AssertError(t, false, err, name)
+		pkg.AssertError(t, false, err, "%s", name)
 		assert.EqualValues(t, key, got, name)
 
 		err = m.DeleteKey("faz", "public")
-		pkg.AssertError(t, false, err, name)
+		pkg.AssertError(t, false, err, "%s", name)
 
 		_, err = m.GetKey("faz", "public")
-		pkg.AssertError(t, true, err, name)
+		pkg.AssertError(t, true, err, "%s", name)
 	}
+
+	err := managers["http"].AddKey("nonono", key)
+	pkg.AssertError(t, true, err, "%s")
 }
 
 func TestManagerKeySet(t *testing.T) {
@@ -80,20 +83,23 @@ func TestManagerKeySet(t *testing.T) {
 
 	for name, m := range managers {
 		_, err := m.GetKeySet("foo")
-		pkg.AssertError(t, true, err, name)
+		pkg.AssertError(t, true, err, "%s", name)
 
 		err = m.AddKeySet("bar", ks)
-		pkg.AssertError(t, false, err, name)
+		pkg.AssertError(t, false, err, "%s", name)
 
 		got, err := m.GetKeySet("bar")
-		pkg.RequireError(t, false, err, name)
+		pkg.RequireError(t, false, err, "%s", name)
 		assert.Equal(t, ks.Key("public"), got.Key("public"), name)
 		assert.Equal(t, ks.Key("private"), got.Key("private"), name)
 
 		err = m.DeleteKeySet("bar")
-		pkg.AssertError(t, false, err, name)
+		pkg.AssertError(t, false, err, "%s", name)
 
 		_, err = m.GetKeySet("bar")
-		pkg.AssertError(t, true, err, name)
+		pkg.AssertError(t, true, err, "%s", name)
 	}
+
+	err := managers["http"].AddKeySet("nonono", ks)
+	pkg.AssertError(t, true, err, "%s")
 }

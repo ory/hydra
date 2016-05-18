@@ -16,6 +16,7 @@ func (m *MemoryManager) AddKey(set string, key *jose.JsonWebKey) error {
 	m.Lock()
 	defer m.Unlock()
 
+	m.alloc(set)
 	m.Keys[set][key.KeyID] = *key
 	return nil
 }
@@ -35,8 +36,7 @@ func (m *MemoryManager) GetKey(set, kid string) (*jose.JsonWebKey, error) {
 	m.Lock()
 	defer m.Unlock()
 
-	m.alloc(set)
-
+	m.alloc("")
 	if _, found := m.Keys[set]; !found {
 		return nil, errors.New(pkg.ErrNotFound)
 	}
@@ -53,6 +53,7 @@ func (m *MemoryManager) GetKeySet(set string) (*jose.JsonWebKeySet, error) {
 	m.Lock()
 	defer m.Unlock()
 
+	m.alloc("")
 	keys, found := m.Keys[set]
 	if !found {
 		return nil, errors.New(pkg.ErrNotFound)
@@ -89,7 +90,7 @@ func (m *MemoryManager) alloc(set string) {
 	if m.Keys == nil {
 		m.Keys = make(map[string]map[string]jose.JsonWebKey)
 	}
-	if m.Keys[set] == nil {
+	if set != "" && m.Keys[set] == nil {
 		m.Keys[set] = make(map[string]jose.JsonWebKey)
 	}
 }

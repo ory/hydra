@@ -7,7 +7,7 @@ import (
 	"github.com/ory-am/hydra/jwk"
 )
 
-func NewJWKHandler(c *config.Config, router *httprouter.Router) *jwk.Handler {
+func newJWKHandler(c *config.Config, router *httprouter.Router) *jwk.Handler {
 	ctx := c.Context()
 	h := &jwk.Handler{
 		H: &herodot.JSON{},

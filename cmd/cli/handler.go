@@ -1,24 +1,21 @@
 package cli
 
 import (
-	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
-	"github.com/ory-am/hydra/connection"
-	"github.com/ory-am/hydra/policy"
 )
 
 type Handler struct {
-	Clients     *client.CLIHandler
-	Connections *connection.CLIHandler
-	Policies    *policy.CLIHandler
-	Keys        *CLIHandler
+	Clients     *ClientHandler
+	Connections *ConnectionHandler
+	Policies    *PolicyHandler
+	Keys        *JWKHandler
 }
 
 func NewHandler(c *config.Config) *Handler {
 	return &Handler{
-		Clients:     client.NewCLIHandler(c),
-		Connections: connection.NewCLIHandler(c),
-		Policies:    policy.NewCLIHandler(c),
-		Keys:        newJWKCLIHandler(c),
+		Clients:     newClientHandler(c),
+		Connections: newConnectionHandler(c),
+		Policies:    newPolicHandler(c),
+		Keys:        newJWKHandler(c),
 	}
 }

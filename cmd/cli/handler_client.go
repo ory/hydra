@@ -1,4 +1,4 @@
-package client
+package cli
 
 import (
 	"fmt"
@@ -7,21 +7,22 @@ import (
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/spf13/cobra"
+	"github.com/ory-am/hydra/client"
 )
 
-type CLIHandler struct {
+type ClientHandler struct {
 	Config *config.Config
-	M      *HTTPManager
+	M      *client.HTTPManager
 }
 
-func NewCLIHandler(c *config.Config) *CLIHandler {
-	return &CLIHandler{
+func newClientHandler(c *config.Config) *ClientHandler {
+	return &ClientHandler{
 		Config: c,
-		M:      &HTTPManager{},
+		M:      &client.HTTPManager{},
 	}
 }
 
-func (h *CLIHandler) CreateClient(cmd *cobra.Command, args []string) {
+func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	var err error
 
 	h.M.Endpoint = h.Config.Resolve("/clients")
@@ -57,7 +58,7 @@ func (h *CLIHandler) CreateClient(cmd *cobra.Command, args []string) {
 	fmt.Printf("Client Secret: %s\n", secret)
 }
 
-func (h *CLIHandler) DeleteClient(cmd *cobra.Command, args []string) {
+func (h *ClientHandler) DeleteClient(cmd *cobra.Command, args []string) {
 	h.M.Endpoint = h.Config.Resolve("/clients")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 	if len(args) == 0 {

@@ -10,19 +10,19 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type CLIHandler struct {
+type JWKHandler struct {
 	Config *config.Config
 	M      *jwk.HTTPManager
 }
 
-func newJWKCLIHandler(c *config.Config) *CLIHandler {
-	return &CLIHandler{
+func newJWKHandler(c *config.Config) *JWKHandler {
+	return &JWKHandler{
 		Config: c,
 		M:      &jwk.HTTPManager{},
 	}
 }
 
-func (h *CLIHandler) CreateKeys(cmd *cobra.Command, args []string) {
+func (h *JWKHandler) CreateKeys(cmd *cobra.Command, args []string) {
 	h.M.Endpoint = h.Config.Resolve("/keys")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 	if len(args) == 0 {
@@ -40,7 +40,7 @@ func (h *CLIHandler) CreateKeys(cmd *cobra.Command, args []string) {
 	fmt.Printf("%s\n", out)
 }
 
-func (h *CLIHandler) GetKeys(cmd *cobra.Command, args []string) {
+func (h *JWKHandler) GetKeys(cmd *cobra.Command, args []string) {
 	h.M.Endpoint = h.Config.Resolve("/keys")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 	if len(args) == 0 {
@@ -57,7 +57,7 @@ func (h *CLIHandler) GetKeys(cmd *cobra.Command, args []string) {
 	fmt.Printf("%s\n", out)
 }
 
-func (h *CLIHandler) DeleteKeys(cmd *cobra.Command, args []string) {
+func (h *JWKHandler) DeleteKeys(cmd *cobra.Command, args []string) {
 	h.M.Endpoint = h.Config.Resolve("/keys")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 	if len(args) == 0 {

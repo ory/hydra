@@ -29,8 +29,8 @@ func (h *Handler) Start(c *config.Config, router *httprouter.Router) {
 	ctx := c.Context()
 
 	// Set up warden
-	clientsManager := client.NewManager(c)
-	InjectFositeStore(c, clientsManager)
+	clientsManager := newClientManager(c)
+	injectFositeStore(c, clientsManager)
 	ctx.Warden = &warden.LocalWarden{
 		Warden: &ladon.Ladon{
 			Manager: ctx.LadonManager,
@@ -43,11 +43,11 @@ func (h *Handler) Start(c *config.Config, router *httprouter.Router) {
 	}
 
 	// Set up handlers
-	h.Clients = client.NewHandler(c, router, clientsManager)
-	h.Keys = NewJWKHandler(c, router)
-	h.Connections = connection.NewHandler(c, router)
-	h.Policy = policy.NewHandler(c, router)
-	h.OAuth2 = NewOAuth2Handler(c, router, h.Keys.Manager)
+	h.Clients = newClientHandler(c, router, clientsManager)
+	h.Keys = newJWKHandler(c, router)
+	h.Connections = newConnectionHandler(c, router)
+	h.Policy = newPolicyHandler(c, router)
+	h.OAuth2 = newOAuth2Handler(c, router, h.Keys.Manager)
 
 	// Create root account if new install
 	h.createRS256KeysIfNotExist(c, oauth2.ConsentEndpointKey, "private")

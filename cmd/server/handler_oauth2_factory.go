@@ -29,7 +29,7 @@ import (
 	"github.com/ory-am/hydra/internal"
 )
 
-func InjectFositeStore(c *config.Config, clients client.Manager) {
+func injectFositeStore(c *config.Config, clients client.Manager) {
 	var ctx = c.Context()
 	var store pkg.FositeStorer
 
@@ -51,7 +51,7 @@ func InjectFositeStore(c *config.Config, clients client.Manager) {
 	ctx.FositeStore = store
 }
 
-func NewOAuth2Handler(c *config.Config, router *httprouter.Router, keys jwk.Manager) *oauth2.Handler {
+func newOAuth2Handler(c *config.Config, router *httprouter.Router, keys jwk.Manager) *oauth2.Handler {
 	var ctx = c.Context()
 	var store = ctx.FositeStore
 

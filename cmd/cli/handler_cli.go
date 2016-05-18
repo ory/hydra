@@ -1,4 +1,4 @@
-package policy
+package cli
 
 import (
 	"fmt"
@@ -9,21 +9,22 @@ import (
 	"github.com/ory-am/ladon"
 	"github.com/spf13/cobra"
 	"github.com/square/go-jose/json"
+	"github.com/ory-am/hydra/policy"
 )
 
-type CLIHandler struct {
+type PolicyHandler struct {
 	Config *config.Config
-	M      *HTTPManager
+	M      *policy.HTTPManager
 }
 
-func NewCLIHandler(c *config.Config) *CLIHandler {
-	return &CLIHandler{
+func newPolicHandler(c *config.Config) *PolicyHandler {
+	return &PolicyHandler{
 		Config: c,
-		M:      &HTTPManager{},
+		M:      &policy.HTTPManager{},
 	}
 }
 
-func (h *CLIHandler) CreatePolicy(cmd *cobra.Command, args []string) {
+func (h *PolicyHandler) CreatePolicy(cmd *cobra.Command, args []string) {
 	h.M.Endpoint = h.Config.Resolve("/policies")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 
@@ -73,7 +74,7 @@ func (h *CLIHandler) CreatePolicy(cmd *cobra.Command, args []string) {
 
 }
 
-func (h *CLIHandler) AddResourceToPolicy(cmd *cobra.Command, args []string) {
+func (h *PolicyHandler) AddResourceToPolicy(cmd *cobra.Command, args []string) {
 	h.M.Endpoint = h.Config.Resolve("/policies")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 
@@ -96,11 +97,11 @@ func (h *CLIHandler) AddResourceToPolicy(cmd *cobra.Command, args []string) {
 	fmt.Printf("Added resources to policy %s", p.ID)
 }
 
-func (h *CLIHandler) RemoveResourceFromPolicy(cmd *cobra.Command, args []string) {
+func (h *PolicyHandler) RemoveResourceFromPolicy(cmd *cobra.Command, args []string) {
 	fmt.Println("Not yet implemented.")
 }
 
-func (h *CLIHandler) AddSubjectToPolicy(cmd *cobra.Command, args []string) {
+func (h *PolicyHandler) AddSubjectToPolicy(cmd *cobra.Command, args []string) {
 	h.M.Endpoint = h.Config.Resolve("/policies")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 
@@ -123,11 +124,11 @@ func (h *CLIHandler) AddSubjectToPolicy(cmd *cobra.Command, args []string) {
 	fmt.Printf("Added subjects to policy %s", p.ID)
 }
 
-func (h *CLIHandler) RemoveSubjectFromPolicy(cmd *cobra.Command, args []string) {
+func (h *PolicyHandler) RemoveSubjectFromPolicy(cmd *cobra.Command, args []string) {
 	fmt.Println("Not yet implemented.")
 }
 
-func (h *CLIHandler) AddActionToPolicy(cmd *cobra.Command, args []string) {
+func (h *PolicyHandler) AddActionToPolicy(cmd *cobra.Command, args []string) {
 	h.M.Endpoint = h.Config.Resolve("/policies")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 
@@ -150,11 +151,11 @@ func (h *CLIHandler) AddActionToPolicy(cmd *cobra.Command, args []string) {
 	fmt.Printf("Added actions to policy %s", p.ID)
 }
 
-func (h *CLIHandler) RemoveActionFromPolicy(cmd *cobra.Command, args []string) {
+func (h *PolicyHandler) RemoveActionFromPolicy(cmd *cobra.Command, args []string) {
 	fmt.Println("Not yet implemented.")
 }
 
-func (h *CLIHandler) GetPolicy(cmd *cobra.Command, args []string) {
+func (h *PolicyHandler) GetPolicy(cmd *cobra.Command, args []string) {
 	h.M.Endpoint = h.Config.Resolve("/policies")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 
@@ -172,7 +173,7 @@ func (h *CLIHandler) GetPolicy(cmd *cobra.Command, args []string) {
 	fmt.Printf("%s\n", out)
 }
 
-func (h *CLIHandler) DeletePolicy(cmd *cobra.Command, args []string) {
+func (h *PolicyHandler) DeletePolicy(cmd *cobra.Command, args []string) {
 	h.M.Endpoint = h.Config.Resolve("/policies")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 

@@ -1,4 +1,4 @@
-package connection
+package cli
 
 import (
 	"fmt"
@@ -7,21 +7,22 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
 	"github.com/spf13/cobra"
+	"github.com/ory-am/hydra/connection"
 )
 
-type CLIHandler struct {
+type ConnectionHandler struct {
 	Config *config.Config
-	M      *HTTPManager
+	M      *connection.HTTPManager
 }
 
-func NewCLIHandler(c *config.Config) *CLIHandler {
-	return &CLIHandler{
+func newConnectionHandler(c *config.Config) *ConnectionHandler {
+	return &ConnectionHandler{
 		Config: c,
-		M:      &HTTPManager{},
+		M:      &connection.HTTPManager{},
 	}
 }
 
-func (h *CLIHandler) CreateConnection(cmd *cobra.Command, args []string) {
+func (h *ConnectionHandler) CreateConnection(cmd *cobra.Command, args []string) {
 	h.M.Client = h.Config.OAuth2Client(cmd)
 	h.M.Endpoint = h.Config.Resolve("/connections")
 	if len(args) != 3 {
@@ -29,7 +30,7 @@ func (h *CLIHandler) CreateConnection(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	err := h.M.Create(&Connection{
+	err := h.M.Create(&connection.Connection{
 		ID:            uuid.New(),
 		Provider:      args[0],
 		LocalSubject:  args[1],
@@ -38,7 +39,7 @@ func (h *CLIHandler) CreateConnection(cmd *cobra.Command, args []string) {
 	pkg.Must(err, "Could not create connection: %s", err)
 }
 
-func (h *CLIHandler) DeleteConnection(cmd *cobra.Command, args []string) {
+func (h *ConnectionHandler) DeleteConnection(cmd *cobra.Command, args []string) {
 	h.M.Client = h.Config.OAuth2Client(cmd)
 	h.M.Endpoint = h.Config.Resolve("/connections")
 	if len(args) == 0 {

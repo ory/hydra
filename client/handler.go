@@ -9,7 +9,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/common/rand/sequence"
 	"github.com/ory-am/fosite"
-	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/ladon"
@@ -27,40 +26,15 @@ const (
 
 const (
 	ClientsResource = "rn:hydra:clients"
-	ClientResource  = "rn:hydra:clients:%s"
-	Scope           = "hydra.clients"
+	ClientResource = "rn:hydra:clients:%s"
+	Scope = "hydra.clients"
 )
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET(ClientsHandlerPath, h.GetAll)
 	r.POST(ClientsHandlerPath, h.Create)
-	r.GET(ClientsHandlerPath+"/:id", h.Get)
-	r.DELETE(ClientsHandlerPath+"/:id", h.Delete)
-}
-
-func NewManager(c *config.Config) Manager {
-	ctx := c.Context()
-
-	switch ctx.Connection.(type) {
-	case *config.MemoryConnection:
-		return &MemoryManager{
-			Clients: map[string]*fosite.DefaultClient{},
-			Hasher:  ctx.Hasher,
-		}
-	default:
-		panic("Unknown connection type.")
-	}
-}
-
-func NewHandler(c *config.Config, router *httprouter.Router, manager Manager) *Handler {
-	ctx := c.Context()
-	h := &Handler{
-		H: &herodot.JSON{},
-		W: ctx.Warden, Manager: manager,
-	}
-
-	h.SetRoutes(router)
-	return h
+	r.GET(ClientsHandlerPath + "/:id", h.Get)
+	r.DELETE(ClientsHandlerPath + "/:id", h.Delete)
 }
 
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -95,7 +69,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 		return
 	}
 
-	h.H.WriteCreated(ctx, w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
+	h.H.WriteCreated(ctx, w, r, ClientsHandlerPath + "/" + c.GetID(), &c)
 }
 
 func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

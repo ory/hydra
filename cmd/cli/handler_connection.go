@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/ory-am/hydra/config"
+	"github.com/ory-am/hydra/connection"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
 	"github.com/spf13/cobra"
-	"github.com/ory-am/hydra/connection"
 )
 
 type ConnectionHandler struct {

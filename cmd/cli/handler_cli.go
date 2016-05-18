@@ -6,10 +6,10 @@ import (
 
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/ory-am/hydra/policy"
 	"github.com/ory-am/ladon"
 	"github.com/spf13/cobra"
 	"github.com/square/go-jose/json"
-	"github.com/ory-am/hydra/policy"
 )
 
 type PolicyHandler struct {

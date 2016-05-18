@@ -3,7 +3,7 @@
 [![Join the chat at https://gitter.im/ory-am/hydra](https://badges.gitter.im/ory-am/hydra.svg)](https://gitter.im/ory-am/hydra?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/ory-am/hydra.svg?branch=master)](https://travis-ci.org/ory-am/hydra)
 [![Coverage Status](https://coveralls.io/repos/ory-am/hydra/badge.svg?branch=master&service=github)](https://coveralls.io/github/ory-am/hydra?branch=master)
-
+[![Go Report Card](https://goreportcard.com/badge/github.com/ory-am/hydra)](https://goreportcard.com/report/github.com/ory-am/hydra)
 
 
 Hydra is being developed at [Ory](https://ory.am). Join our [mailinglist](http://eepurl.com/bKT3N9) to stay on top of new developments.
@@ -16,16 +16,12 @@ Hydra is being developed at [Ory](https://ory.am). Join our [mailinglist](http:/
 - [Motivation](#motivation)
 - [Quickstart](#quickstart)
   - [Installation](#installation)
-    - [CLI Client](#cli-client)
-    - [CLI Client using Docker (not recommended)](#cli-client-using-docker-not-recommended)
-  - [Run minimal installation](#run-minimal-installation)
+  - [Run the example](#run-the-example)
 - [Documentation](#documentation)
   - [Guide](#guide)
   - [REST API Documentation](#rest-api-documentation)
   - [CLI Documentation](#cli-documentation)
   - [Develop](#develop)
-- [Frequently Asked Questions](#frequently-asked-questions)
-  - [Deploy using buildpacks (Heroku, Cloud Foundry, ...)](#deploy-using-buildpacks-heroku-cloud-foundry-)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -212,7 +208,7 @@ The CLI help is verbose. To see it, run `hydra -h` or `hydra [command] -h`.
 
 ### Develop
 
-Unless you want to test Hydra against a database, developing with Hydra is as easy as
+Unless you want to test Hydra against a database, developing with Hydra is as easy as:
 
 ```
 go get github.com/ory-am/hydra
@@ -221,13 +217,3 @@ git checkout -b develop
 go test ./... -race
 go run main.go
 ```
-
-## Frequently Asked Questions
-
-### Deploy using buildpacks (Heroku, Cloud Foundry, ...)
-
-Hydra runs pretty much out of the box when using a Platform as a Service (PaaS).
-Here are however a few notes which might assist you in your task:
-* Heroku (and probably Cloud Foundry as well) *force* TLS termination, meaning that Hydra must be configured with `DANGEROUSLY_FORCE_HTTP=force`.
-* Using bash, you can easily add multi-line environment variables to Heroku using `heroku config:set JWT_PUBLIC_KEY="$(my-public-key.pem)"`.
-  This does not work on Windows!

@@ -1,8 +1,9 @@
 package cli
 
 import (
-	"github.com/ory-am/hydra/config"
 	"testing"
+
+	"github.com/ory-am/hydra/config"
 )
 
 func TestNewHandler(t *testing.T) {

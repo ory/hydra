@@ -14,6 +14,7 @@ install:
   - go install github.com/ory-am/hydra
 
 script:
-  - gotestcover -race -coverprofile="cover.out" -covermode=atomic $(go list ./... | grep -v /vendor/)
+  - go test -race $(go list ./... | grep -v /vendor | grep -v /cmd)
+  - gotestcover -coverprofile="cover.out" $(go list ./... | grep -v /vendor/)
   - goveralls -coverprofile="cover.out"
   - $GOPATH/bin/hydra

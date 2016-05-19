@@ -9,7 +9,6 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/fosite/hash"
 	"github.com/pborman/uuid"
-	"fmt"
 )
 
 type RethinkManager struct {
@@ -135,14 +134,11 @@ func (m *RethinkManager) Watch(ctx context.Context) error {
 			oldVal := update["old_val"]
 			m.Lock()
 			if newVal == nil && oldVal != nil {
-				fmt.Println("delete")
 				delete(m.Clients, oldVal.GetID())
 			} else if newVal != nil && oldVal != nil {
-				fmt.Println("update")
 				delete(m.Clients, oldVal.GetID())
 				m.Clients[newVal.GetID()] = newVal
 			} else {
-				fmt.Println("create")
 				m.Clients[newVal.GetID()] = newVal
 			}
 			m.Unlock()

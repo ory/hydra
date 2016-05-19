@@ -121,6 +121,33 @@ func TestAuthenticateClient(t *testing.T) {
 	assert.Equal(t, "1234", c.ID)
 }
 
+func BenchmarkRethinkGet(b *testing.B) {
+	b.StopTimer()
+
+	m := clientManagers["rethink"]
+	c := &fosite.DefaultClient{
+		ID:                "4321",
+		Secret:            []byte("secret"),
+		RedirectURIs:      []string{"http://redirect"},
+		TermsOfServiceURI: "foo",
+	}
+
+	var err error
+	err = m.CreateClient(c)
+	if err != nil {
+		b.Fatalf("%s", err)
+	}
+	time.Sleep(time.Second)
+
+	b.StartTimer()
+	for i := 0; i < b.N; i++ {
+		_, err = m.GetClient("4321")
+		if err != nil {
+			b.Fatalf("%s", err)
+		}
+	}
+}
+
 func TestCreateGetDeleteClient(t *testing.T) {
 	for k, m := range clientManagers {
 		_, err := m.GetClient("4321")

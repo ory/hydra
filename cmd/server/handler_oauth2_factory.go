@@ -51,17 +51,17 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 	ctx.FositeStore = store
 }
 
-func newOAuth2Handler(c *config.Config, router *httprouter.Router, keys jwk.Manager) *oauth2.Handler {
+func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manager) *oauth2.Handler {
 	var ctx = c.Context()
 	var store = ctx.FositeStore
 
-	key, err := keys.GetKey(oauth2.OpenIDConnectKeyName, "private")
+	keys, err := km.GetKey(oauth2.OpenIDConnectKeyName, "private")
 	if errors.Is(err, pkg.ErrNotFound) {
 		logrus.Warnln("Could not find OpenID Connect singing keys. Generating a new keypair...")
 		k, err := new(jwk.RS256Generator).Generate("")
 		pkg.Must(err, "Could not generate signing key for OpenID Connect")
-		keys.AddKeySet(oauth2.OpenIDConnectKeyName, k)
-		key, err = keys.GetKey(oauth2.OpenIDConnectKeyName, "private")
+		km.AddKeySet(oauth2.OpenIDConnectKeyName, k)
+		keys, err = km.GetKey(oauth2.OpenIDConnectKeyName, "private")
 		pkg.Must(err, "Could not fetch signing key for OpenID Connect")
 		logrus.Warnln("Keypair generated.")
 		logrus.Warnln("WARNING: Automated key creation causes low entropy. Replace the keys as soon as possible.")
@@ -69,7 +69,7 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, keys jwk.Mana
 		pkg.Must(err, "Could not fetch signing key for OpenID Connect")
 	}
 
-	rsaKey := jwk.MustRSAPrivate(key)
+	rsaKey := jwk.MustRSAPrivate(jwk.First(keys))
 
 	idStrategy := &os.DefaultStrategy{
 		RS256JWTStrategy: &jwt.RS256JWTStrategy{
@@ -150,7 +150,7 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, keys jwk.Mana
 		},
 		Consent: &oauth2.DefaultConsentStrategy{
 			Issuer:     c.Issuer,
-			KeyManager: keys,
+			KeyManager: km,
 		},
 		ConsentURL: *consentURL,
 	}

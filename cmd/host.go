@@ -68,25 +68,25 @@ func runHostCmd(cmd *cobra.Command, args []string) {
 
 func getOrCreateTLSCertificate() tls.Certificate {
 	ctx := c.Context()
-	key, err := ctx.KeyManager.GetKey(TLSKeyName, "private")
+	keys, err := ctx.KeyManager.GetKey(TLSKeyName, "private")
 	if errors.Is(err, pkg.ErrNotFound) {
 		logrus.Warn("Key for TLS not found. Creating new one.")
 
 		generator := jwk.ECDSA256Generator{}
-		keys, err := generator.Generate("")
+		set, err := generator.Generate("")
 		pkg.Must(err, "Could not generate key: %s", err)
 
-		err = ctx.KeyManager.AddKeySet(TLSKeyName, keys)
+		err = ctx.KeyManager.AddKeySet(TLSKeyName, set)
 		pkg.Must(err, "Could not persist key: %s", err)
 
-		key, err = ctx.KeyManager.GetKey(TLSKeyName, "private")
+		keys, err = ctx.KeyManager.GetKey(TLSKeyName, "private")
 		pkg.Must(err, "Could not retrieve persisted key: %s", err)
 		logrus.Warn("Temporary key created.")
 	} else {
 		pkg.Must(err, "Could not retrieve key: %s", err)
 	}
 
-	pemCert, pemKey, err := jwk.ToX509PEMKeyPair(key.Key)
+	pemCert, pemKey, err := jwk.ToX509PEMKeyPair(jwk.First(keys).Key)
 	pkg.Must(err, "Could not create X509 PEM Key Pair: %s", err)
 
 	cert, err := tls.X509KeyPair(pemCert, pemKey)

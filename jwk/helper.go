@@ -11,7 +11,12 @@ import (
 	"time"
 
 	"github.com/go-errors/errors"
+	"github.com/square/go-jose"
 )
+
+func First(keys []jose.JsonWebKey) *jose.JsonWebKey {
+	return &keys[0]
+}
 
 func publicKey(priv interface{}) interface{} {
 	switch k := priv.(type) {

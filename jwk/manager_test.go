@@ -54,13 +54,13 @@ func init() {
 
 func TestManagerKey(t *testing.T) {
 	ks, _ := testGenerator.Generate("")
-	key := &ks.Key("public")[0]
+	key := ks.Key("public")
 
 	for name, m := range managers {
 		_, err := m.GetKey("faz", "baz")
 		pkg.AssertError(t, true, err, "%s", name)
 
-		err = m.AddKey("faz", key)
+		err = m.AddKey("faz", First(key))
 		pkg.AssertError(t, false, err, "%s", name)
 
 		got, err := m.GetKey("faz", "public")
@@ -74,7 +74,7 @@ func TestManagerKey(t *testing.T) {
 		pkg.AssertError(t, true, err, "%s", name)
 	}
 
-	err := managers["http"].AddKey("nonono", key)
+	err := managers["http"].AddKey("nonono", First(key))
 	pkg.AssertError(t, true, err, "%s")
 }
 

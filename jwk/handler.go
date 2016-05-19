@@ -207,13 +207,13 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		return
 	}
 
-	key, err := h.Manager.GetKey(setName, keyName)
+	keys, err := h.Manager.GetKey(setName, keyName)
 	if err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
 	}
 
-	h.H.Write(ctx, w, r, key)
+	h.H.Write(ctx, w, r, keys)
 }
 
 func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

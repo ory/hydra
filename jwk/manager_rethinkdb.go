@@ -7,102 +7,69 @@ import (
 	r "github.com/dancannon/gorethink"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/square/go-jose"
+	"golang.org/x/net/context"
 )
 
 type RethinkManager struct {
-	Session     *r.Session
-	Table       r.Term
+	Session *r.Session
+	Table   r.Term
 
-	Keys map[string]map[string]jose.JsonWebKey
+	Keys    map[string]jose.JsonWebKeySet
 
 	sync.RWMutex
 }
 
 func (m *RethinkManager) AddKey(set string, key *jose.JsonWebKey) error {
-	m.Lock()
-	defer m.Unlock()
-
-	m.alloc(set)
-	m.Keys[set][key.KeyID] = *key
 	return nil
 }
 
 func (m *RethinkManager) AddKeySet(set string, keys *jose.JsonWebKeySet) error {
-	m.Lock()
-	defer m.Unlock()
-
-	m.alloc(set)
-	for _, key := range keys.Keys {
-		m.Keys[set][key.KeyID] = key
-	}
 	return nil
 }
 
-func (m *RethinkManager) GetKey(set, kid string) (*jose.JsonWebKey, error) {
+func (m *RethinkManager) GetKey(set, kid string) ([]jose.JsonWebKey, error) {
 	m.Lock()
 	defer m.Unlock()
 
-	m.alloc("")
-	if _, found := m.Keys[set]; !found {
+	m.alloc()
+	keys, found := m.Keys[set]
+	if !found {
 		return nil, errors.New(pkg.ErrNotFound)
 	}
 
-	k, found := m.Keys[set][kid]
-	if !found || &k == nil {
-		return nil, errors.New(pkg.ErrNotFound)
-	}
-
-	return &k, nil
+	return keys.Key(kid), nil
 }
 
 func (m *RethinkManager) GetKeySet(set string) (*jose.JsonWebKeySet, error) {
 	m.Lock()
 	defer m.Unlock()
 
-	m.alloc("")
+	m.alloc()
 	keys, found := m.Keys[set]
 	if !found {
 		return nil, errors.New(pkg.ErrNotFound)
 	}
 
-	ks := []jose.JsonWebKey{}
-	for _, key := range keys {
-		ks = append(ks, key)
-	}
-
-	return &jose.JsonWebKeySet{
-		Keys: ks,
-	}, nil
+	return &keys, nil
 }
 
 func (m *RethinkManager) DeleteKey(set, kid string) error {
-	m.Lock()
-	defer m.Unlock()
 
-	m.alloc(set)
-	delete(m.Keys[set], kid)
 	return nil
 }
 
 func (m *RethinkManager) DeleteKeySet(set string) error {
-	m.Lock()
-	defer m.Unlock()
-
-	delete(m.Keys, set)
 	return nil
 }
 
-func (m *RethinkManager) alloc(set string) {
+func (m *RethinkManager) alloc() {
 	if m.Keys == nil {
-		m.Keys = make(map[string]map[string]jose.JsonWebKey)
-	}
-	if set != "" && m.Keys[set] == nil {
-		m.Keys[set] = make(map[string]jose.JsonWebKey)
+		m.Keys = make(map[string]jose.JsonWebKeySet)
 	}
 }
 
 type rdbSchema struct {
-	ID string `gorethink:"id"`
+	ID  string `gorethink:"id"`
 	Key *jose.JsonWebKey `gorethink:"key"`
 }
 
@@ -123,29 +90,10 @@ func (m *RethinkManager) publishDelete(id string) error {
 }
 
 func (m *RethinkManager) Watch(ctx context.Context) error {
-	connections, err := m.Table.Changes().Run(m.Session)
+	_, err := m.Table.Changes().Run(m.Session)
 	if err != nil {
 		return errors.New(err)
 	}
-
-	go func() {
-		var update map[string]*Connection
-		defer connections.Close()
-		for connections.Next(&update) {
-			newVal := update["new_val"]
-			oldVal := update["old_val"]
-			m.Lock()
-			if newVal == nil && oldVal != nil {
-				delete(m.Connections, oldVal.GetID())
-			} else if newVal != nil && oldVal != nil {
-				delete(m.Connections, oldVal.GetID())
-				m.Connections[newVal.GetID()] = newVal
-			} else {
-				m.Connections[newVal.GetID()] = newVal
-			}
-			m.Unlock()
-		}
-	}()
 
 	return nil
 }

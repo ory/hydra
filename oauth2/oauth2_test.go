@@ -135,11 +135,11 @@ func signConsentToken(claims map[string]interface{}) (string, error) {
 	token := jwt.New(jwt.SigningMethodRS256)
 	token.Claims = claims
 
-	key, err := keyManager.GetKey(ConsentEndpointKey, "private")
+	keys, err := keyManager.GetKey(ConsentEndpointKey, "private")
 	if err != nil {
 		return "", errors.New(err)
 	}
-	rsaKey, err := jwk.ToRSAPrivate(key)
+	rsaKey, err := jwk.ToRSAPrivate(jwk.First(keys))
 	if err != nil {
 		return "", err
 	}

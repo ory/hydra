@@ -20,10 +20,16 @@ type RethinkManager struct {
 }
 
 func (m *RethinkManager) AddKey(set string, key *jose.JsonWebKey) error {
+	if err := m.publishAdd(set, []jose.JsonWebKey{*key}); err != nil {
+		return err
+	}
 	return nil
 }
 
 func (m *RethinkManager) AddKeySet(set string, keys *jose.JsonWebKeySet) error {
+	if err := m.publishAdd(set, keys.Keys); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -54,11 +60,11 @@ func (m *RethinkManager) GetKeySet(set string) (*jose.JsonWebKeySet, error) {
 }
 
 func (m *RethinkManager) DeleteKey(set, kid string) error {
-
 	return nil
 }
 
 func (m *RethinkManager) DeleteKeySet(set string) error {
+
 	return nil
 }
 
@@ -68,32 +74,69 @@ func (m *RethinkManager) alloc() {
 	}
 }
 
-type rdbSchema struct {
-	ID  string `gorethink:"id"`
-	Key *jose.JsonWebKey `gorethink:"key"`
+type rethinkSchema struct {
+	ID string `gorethink:"id"`
+	jose.JsonWebKeySet
 }
 
-func (m *RethinkManager) publishCreate(set string, key *jose.JsonWebKey) error {
-	keys := map[string]*jose.JsonWebKey{}
-	keys[set] = key
-	if err := m.Table.Exec(m.Session); err != nil {
+func (m *RethinkManager) publishAdd(set string, keys []jose.JsonWebKey) error {
+	if err := m.Table.Get(set).Exec(m.Session); err == r.ErrEmptyResult {
+		if m.Table.Get(set).Insert(&rethinkSchema{
+			ID: set,
+			JsonWebKeySet: jose.JsonWebKeySet{Keys:keys},
+		}).Exec(m.Session); err != nil {
+			return errors.New(err)
+		}
+		return nil
+	}
+
+	if err := m.Table.Get(set).Update(map[string]interface{}{
+		"keys": r.Row.Field([]interface{}{"keys"}).Default([]interface{}{}).Append([]interface{}{keys}...),
+	}).Exec(m.Session); err != nil {
+		return errors.New(err)
+	}
+	return nil
+}
+func (m *RethinkManager) publishDeleteAll(set string) error {
+	if err := m.Table.Get(set).Delete().Exec(m.Session); err != nil {
 		return errors.New(err)
 	}
 	return nil
 }
 
-func (m *RethinkManager) publishDelete(id string) error {
-	if err := m.Table.Get(id).Delete().Exec(m.Session); err != nil {
+func (m *RethinkManager) publishDelete(set string, keys []jose.JsonWebKey) error {
+	if err := m.Table.Get(set).Update(map[string]interface{}{
+		"keys": r.Row.Field([]interface{}{"keys"}).Merge(r.Row.Field("keys").Difference([]interface{}{keys}...)),
+	}).Exec(m.Session); err != nil {
 		return errors.New(err)
 	}
 	return nil
 }
 
 func (m *RethinkManager) Watch(ctx context.Context) error {
-	_, err := m.Table.Changes().Run(m.Session)
+	connections, err := m.Table.Changes().Run(m.Session)
 	if err != nil {
 		return errors.New(err)
 	}
+
+	go func() {
+		var update map[string]*rethinkSchema
+		defer connections.Close()
+		for connections.Next(&update) {
+			newVal := update["new_val"]
+			oldVal := update["old_val"]
+			m.Lock()
+			if newVal == nil && oldVal != nil {
+				delete(m.Keys, oldVal.ID)
+			} else if newVal != nil && oldVal != nil {
+				delete(m.Keys, oldVal.ID)
+				m.Keys[newVal.ID] = newVal.JsonWebKeySet
+			} else {
+				m.Keys[newVal.ID] = newVal.JsonWebKeySet
+			}
+			m.Unlock()
+		}
+	}()
 
 	return nil
 }

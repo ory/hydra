@@ -60,9 +60,10 @@ func init() {
 	}
 }
 
+var rethinkManager *RethinkManager
+
 func TestMain(m *testing.M) {
 	var session *r.Session
-	var rethinkManager *RethinkManager
 	var err error
 
 	c, err := dockertest.ConnectToRethinkDB(20, time.Second, func(url string) bool {
@@ -80,7 +81,10 @@ func TestMain(m *testing.M) {
 			Session: session,
 			Table: r.Table("hydra_clients"),
 			Clients:make(map[string]*fosite.DefaultClient),
-			Hasher: &hash.BCrypt{},
+			Hasher: &hash.BCrypt{
+				// Low workfactor reduces test time
+				WorkFactor: 4,
+			},
 		}
 		err := rethinkManager.Watch(context.Background())
 		if err != nil {
@@ -124,7 +128,7 @@ func TestAuthenticateClient(t *testing.T) {
 func BenchmarkRethinkGet(b *testing.B) {
 	b.StopTimer()
 
-	m := clientManagers["rethink"]
+	m := rethinkManager
 	c := &fosite.DefaultClient{
 		ID:                "4321",
 		Secret:            []byte("secret"),
@@ -141,10 +145,31 @@ func BenchmarkRethinkGet(b *testing.B) {
 
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		_, err = m.GetClient("4321")
-		if err != nil {
-			b.Fatalf("%s", err)
-		}
+		_, _ = m.GetClient("4321")
+	}
+}
+
+func BenchmarkRethinkAuthenticate(b *testing.B) {
+	b.StopTimer()
+
+	m := rethinkManager
+	c := &fosite.DefaultClient{
+		ID:                "432",
+		Secret:            []byte("secret"),
+		RedirectURIs:      []string{"http://redirect"},
+		TermsOfServiceURI: "foo",
+	}
+
+	var err error
+	err = m.CreateClient(c)
+	if err != nil {
+		b.Fatalf("%s", err)
+	}
+	time.Sleep(time.Second)
+
+	b.StartTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = m.Authenticate("432", []byte("secret"))
 	}
 }
 

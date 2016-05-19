@@ -49,9 +49,6 @@ func (m *RethinkManager) Authenticate(id string, secret []byte) (*fosite.Default
 }
 
 func (m *RethinkManager) CreateClient(c *fosite.DefaultClient) error {
-	m.Lock()
-	defer m.Unlock()
-
 	if c.ID == "" {
 		c.ID = uuid.New()
 	}
@@ -66,19 +63,14 @@ func (m *RethinkManager) CreateClient(c *fosite.DefaultClient) error {
 		return err
 	}
 
-	// m.Clients[c.GetID()] = c
 	return nil
 }
 
 func (m *RethinkManager) DeleteClient(id string) error {
-	m.Lock()
-	defer m.Unlock()
-
 	if err := m.publishDelete(id); err != nil {
 		return err
 	}
 
-	// delete(m.Clients, id)
 	return nil
 }
 

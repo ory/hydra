@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/julienschmidt/httprouter"
-	r "github.com/dancannon/gorethink"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/internal"
@@ -15,56 +14,10 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"time"
-	"os"
-	"gopkg.in/ory-am/dockertest.v2"
-	log "github.com/Sirupsen/logrus"
-	"golang.org/x/net/context"
 	"github.com/stretchr/testify/require"
 )
 
 var managers = map[string]ladon.Manager{}
-
-var rethinkManager *RethinkManager
-
-func TestMain(m *testing.M) {
-	var session *r.Session
-	var err error
-
-	c, err := dockertest.ConnectToRethinkDB(20, time.Second, func(url string) bool {
-		if session, err = r.Connect(r.ConnectOpts{Address:  url, Database: "hydra"}); err != nil {
-			return false
-		} else if _, err = r.DBCreate("hydra").RunWrite(session); err != nil {
-			log.Printf("Database exists: %s", err)
-			return false
-		} else if _, err = r.TableCreate("hydra_policies").RunWrite(session); err != nil {
-			log.Printf("Could not create table: %s", err)
-			return false
-		}
-
-		rethinkManager = &RethinkManager{
-			Session: session,
-			Table: r.Table("hydra_policies"),
-			Policies: make(map[string]ladon.Policy),
-		}
-
-		if err := rethinkManager.Watch(context.Background()); err != nil {
-			log.Printf("Could not watch: %s", err)
-			return false
-		}
-		return true
-	})
-	if session != nil {
-		defer session.Close()
-	}
-	if err != nil {
-		log.Fatalf("Could not connect to database: %s", err)
-	}
-	managers["rethink"] = rethinkManager
-
-	retCode := m.Run()
-	c.KillRemove()
-	os.Exit(retCode)
-}
 
 func init() {
 	localWarden, httpClient := internal.NewFirewall("hydra", "alice", fosite.Arguments{scope},

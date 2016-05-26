@@ -14,11 +14,10 @@ import (
 type RethinkManager struct {
 	Session *r.Session
 	Table   r.Term
+	sync.RWMutex
 
 	Clients map[string]*fosite.DefaultClient
 	Hasher  hash.Hasher
-
-	sync.RWMutex
 }
 
 func (m *RethinkManager) GetClient(id string) (fosite.Client, error) {

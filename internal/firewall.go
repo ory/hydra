@@ -32,15 +32,16 @@ func NewFirewall(issuer string, subject string, scopes fosite.Arguments, p ...la
 	conf := &oauth2.Config{Scopes: scopes, Endpoint: oauth2.Endpoint{}}
 
 	return &warden.LocalWarden{
-			Warden: ladonWarden,
-			TokenValidator: &core.CoreValidator{
-				AccessTokenStrategy: pkg.HMACStrategy,
-				AccessTokenStorage:  fositeStore,
-			},
-			Issuer: issuer,
-		}, conf.Client(oauth2.NoContext, &oauth2.Token{
-			AccessToken: tokens[0][1],
-			Expiry:      time.Now().Add(time.Hour),
-			TokenType:   "bearer",
-		})
+		Warden: ladonWarden,
+		TokenValidator: &core.CoreValidator{
+			AccessTokenStrategy: pkg.HMACStrategy,
+			AccessTokenStorage:  fositeStore,
+		},
+		Issuer: issuer,
+	},
+	conf.Client(oauth2.NoContext, &oauth2.Token{
+		AccessToken: tokens[0][1],
+		Expiry:      time.Now().Add(time.Hour),
+		TokenType:   "bearer",
+	})
 }

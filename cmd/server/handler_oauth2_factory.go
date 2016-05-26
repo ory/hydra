@@ -27,13 +27,15 @@ import (
 	"github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
+	"golang.org/x/net/context"
+	r "github.com/dancannon/gorethink"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {
 	var ctx = c.Context()
 	var store pkg.FositeStorer
 
-	switch ctx.Connection.(type) {
+	switch con := ctx.Connection.(type) {
 	case *config.MemoryConnection:
 		store = &internal.FositeMemoryStore{
 			Manager:        clients,
@@ -43,6 +45,30 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 			Implicit:       make(map[string]fosite.Requester),
 			RefreshTokens:  make(map[string]fosite.Requester),
 		}
+		break
+	case *config.RethinkDBConnection:
+		con.CreateTableIfNotExists("hydra_authorize_code")
+		con.CreateTableIfNotExists("hydra_id_sessions")
+		con.CreateTableIfNotExists("hydra_access_token")
+		con.CreateTableIfNotExists("hydra_implicit")
+		con.CreateTableIfNotExists("hydra_refresh_token")
+		m := &internal.FositeRehinkDBStore{
+			Session: con.GetSession(),
+			Manager: clients,
+			AuthorizeCodesTable: r.Table("hydra_authorize_code"),
+			IDSessionsTable: r.Table("hydra_id_sessions"),
+			AccessTokensTable: r.Table("hydra_access_token"),
+			ImplicitTable: r.Table("hydra_implicit"),
+			RefreshTokensTable: r.Table("hydra_refresh_token"),
+			AuthorizeCodes: make(map[string]*internal.RdbSchema),
+			IDSessions:     make(map[string]*internal.RdbSchema),
+			AccessTokens:   make(map[string]*internal.RdbSchema),
+			Implicit:       make(map[string]*internal.RdbSchema),
+			RefreshTokens:  make(map[string]*internal.RdbSchema),
+		}
+		m.ColdStart()
+		m.Watch(context.Background())
+		store = m
 		break
 	default:
 		panic("Unknown connection type.")

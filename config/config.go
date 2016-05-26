@@ -30,29 +30,31 @@ import (
 )
 
 type Config struct {
-	BindPort int `mapstructure:"port" yaml:"port,omitempty"`
+	BindPort     int `mapstructure:"port" yaml:"port,omitempty"`
 
-	BindHost string `mapstructure:"host" yaml:"host,omitempty"`
+	BindHost     string `mapstructure:"host" yaml:"host,omitempty"`
 
-	Issuer string `mapstructure:"issuer" yaml:"issuer,omitempty"`
+	Issuer       string `mapstructure:"issuer" yaml:"issuer,omitempty"`
 
 	SystemSecret []byte `mapstructure:"system_secret" yaml:"-"`
 
-	ConsentURL string `mapstructure:"consent_url" yaml:"consent_url,omitempty"`
+	DatabaseURL  string `mapstructure:"database_url" yaml:"database_url,omitempty"`
 
-	ClusterURL string `mapstructure:"cluster_url" yaml:"cluster_url,omitempty"`
+	ConsentURL   string `mapstructure:"consent_url" yaml:"consent_url,omitempty"`
 
-	ClientID string `mapstructure:"client_id" yaml:"client_id,omitempty"`
+	ClusterURL   string `mapstructure:"cluster_url" yaml:"cluster_url,omitempty"`
+
+	ClientID     string `mapstructure:"client_id" yaml:"client_id,omitempty"`
 
 	ClientSecret string `mapstructure:"client_secret" yaml:"client_secret,omitempty"`
 
-	ForceHTTP bool `mapstructure:"foolishly_force_http" yaml:"-"`
+	ForceHTTP    bool `mapstructure:"foolishly_force_http" yaml:"-"`
 
-	cluster *url.URL
+	cluster      *url.URL
 
 	oauth2Client *http.Client
 
-	context *Context
+	context      *Context
 
 	sync.Mutex
 }
@@ -92,9 +94,36 @@ func (c *Config) Context() *Context {
 		return c.context
 	}
 
-	manager := ladon.NewMemoryManager()
+	var connection interface{} = &MemoryConnection{}
+	if c.DatabaseURL != "" {
+		u, err := url.Parse(c.DatabaseURL)
+		if err != nil {
+			panic(errors.New(err))
+		}
+
+		switch u.Scheme {
+		case "rethinkdb":
+			connection = &RethinkDBConnection{URL: u}
+			break
+		}
+	}
+
+	var manager ladon.Manager
+	switch con := connection.(type) {
+	case *MemoryConnection:
+		manager = ladon.NewMemoryManager()
+	case *RethinkDBConnection:
+		con.CreateTableIfNotExists("hydra_policies")
+		m := &ladon.RethinkManager{Session: con.GetSession()}
+		m.ColdStart()
+		m.Watch(context.Background())
+		manager = m
+	default:
+		panic("Unknown connection type.")
+	}
+
 	c.context = &Context{
-		Connection: &MemoryConnection{},
+		Connection: connection,
 		Hasher: &hash.BCrypt{
 			WorkFactor: 11,
 		},

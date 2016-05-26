@@ -6,17 +6,24 @@ import (
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/herodot"
+	"golang.org/x/net/context"
 )
 
 func newClientManager(c *config.Config) client.Manager {
 	ctx := c.Context()
 
-	switch ctx.Connection.(type) {
+	switch con := ctx.Connection.(type) {
 	case *config.MemoryConnection:
 		return &client.MemoryManager{
 			Clients: map[string]*fosite.DefaultClient{},
 			Hasher:  ctx.Hasher,
 		}
+	case *config.RethinkDBConnection:
+		con.CreateTableIfNotExists("hydra_policies")
+		m := &client.RethinkManager{Session: con.GetSession()}
+		m.ColdStart()
+		m.Watch(context.Background())
+		return m
 	default:
 		panic("Unknown connection type.")
 	}

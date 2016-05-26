@@ -5,6 +5,8 @@ import (
 	"net/url"
 	"testing"
 
+	"time"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/herodot"
@@ -13,7 +15,6 @@ import (
 	"github.com/ory-am/ladon"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
-	"time"
 	"github.com/stretchr/testify/require"
 )
 

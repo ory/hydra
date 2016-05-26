@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"encoding/json"
+
 	r "github.com/dancannon/gorethink"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/pkg"
@@ -16,7 +17,7 @@ type RethinkManager struct {
 	Table   r.Term
 	sync.RWMutex
 
-	Keys    map[string]jose.JsonWebKeySet
+	Keys map[string]jose.JsonWebKeySet
 }
 
 func (m *RethinkManager) SetUpIndex() error {
@@ -103,8 +104,8 @@ func (m *RethinkManager) alloc() {
 }
 
 type rethinkSchema struct {
-	KID string `gorethink:"kid"`
-	Set string `gorethink:"set"`
+	KID string          `gorethink:"kid"`
+	Set string          `gorethink:"set"`
 	Key json.RawMessage `gorethink:"key"`
 }
 

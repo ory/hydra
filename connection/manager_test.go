@@ -6,6 +6,11 @@ import (
 	"net/http/httptest"
 	"net/url"
 
+	"log"
+	"os"
+	"time"
+
+	r "github.com/dancannon/gorethink"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/herodot"
@@ -15,12 +20,8 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	r "github.com/dancannon/gorethink"
-	"time"
-	"os"
-	"gopkg.in/ory-am/dockertest.v2"
-	"log"
 	"golang.org/x/net/context"
+	"gopkg.in/ory-am/dockertest.v2"
 )
 
 var connections = []*Connection{
@@ -73,7 +74,7 @@ func TestMain(m *testing.M) {
 	var err error
 
 	c, err := dockertest.ConnectToRethinkDB(20, time.Second, func(url string) bool {
-		if session, err = r.Connect(r.ConnectOpts{Address:  url, Database: "hydra"}); err != nil {
+		if session, err = r.Connect(r.ConnectOpts{Address: url, Database: "hydra"}); err != nil {
 			return false
 		} else if _, err = r.DBCreate("hydra").RunWrite(session); err != nil {
 			log.Printf("Database exists: %s", err)
@@ -84,9 +85,9 @@ func TestMain(m *testing.M) {
 		}
 
 		rethinkManager = &RethinkManager{
-			Session: session,
-			Table: r.Table("hydra_clients"),
-			Connections:make(map[string]*Connection),
+			Session:     session,
+			Table:       r.Table("hydra_clients"),
+			Connections: make(map[string]*Connection),
 		}
 		err := rethinkManager.Watch(context.Background())
 		if err != nil {
@@ -117,7 +118,7 @@ func BenchmarkRethinkGet(b *testing.B) {
 		LocalSubject:  "peter",
 		RemoteSubject: "peterson",
 		Provider:      "google",
-	}, )
+	})
 	if err != nil {
 		b.Fatalf("%s", err)
 	}

@@ -1,17 +1,18 @@
 package internal
 
 import (
-	"time"
-	"github.com/ory-am/fosite"
-	"os"
-	"github.com/ory-am/hydra/pkg"
-	c "github.com/ory-am/common/pkg"
-	"testing"
-	"gopkg.in/ory-am/dockertest.v2"
-	r "github.com/dancannon/gorethink"
-	"github.com/Sirupsen/logrus"
-	"golang.org/x/net/context"
 	"net/url"
+	"os"
+	"testing"
+	"time"
+
+	"github.com/Sirupsen/logrus"
+	r "github.com/dancannon/gorethink"
+	c "github.com/ory-am/common/pkg"
+	"github.com/ory-am/fosite"
+	"github.com/ory-am/hydra/pkg"
+	"golang.org/x/net/context"
+	"gopkg.in/ory-am/dockertest.v2"
 )
 
 var rethinkManager *FositeRehinkDBStore
@@ -34,7 +35,7 @@ func TestMain(m *testing.M) {
 	var err error
 
 	c, err := dockertest.ConnectToRethinkDB(20, time.Second, func(url string) bool {
-		if session, err = r.Connect(r.ConnectOpts{Address:  url, Database: "hydra"}); err != nil {
+		if session, err = r.Connect(r.ConnectOpts{Address: url, Database: "hydra"}); err != nil {
 			return false
 		} else if _, err = r.DBCreate("hydra").RunWrite(session); err != nil {
 			logrus.Printf("Database exists: %s", err)
@@ -57,17 +58,17 @@ func TestMain(m *testing.M) {
 		}
 
 		rethinkManager = &FositeRehinkDBStore{
-			Session: session,
+			Session:             session,
 			AuthorizeCodesTable: r.Table("hydra_authorize_code"),
-			IDSessionsTable: r.Table("hydra_id_sessions"),
-			AccessTokensTable: r.Table("hydra_access_token"),
-			ImplicitTable: r.Table("hydra_implicit"),
-			RefreshTokensTable: r.Table("hydra_refresh_token"),
-			AuthorizeCodes: make(map[string]*RdbSchema),
-			IDSessions:     make(map[string]*RdbSchema),
-			AccessTokens:   make(map[string]*RdbSchema),
-			Implicit:       make(map[string]*RdbSchema),
-			RefreshTokens:  make(map[string]*RdbSchema),
+			IDSessionsTable:     r.Table("hydra_id_sessions"),
+			AccessTokensTable:   r.Table("hydra_access_token"),
+			ImplicitTable:       r.Table("hydra_implicit"),
+			RefreshTokensTable:  r.Table("hydra_refresh_token"),
+			AuthorizeCodes:      make(map[string]*RdbSchema),
+			IDSessions:          make(map[string]*RdbSchema),
+			AccessTokens:        make(map[string]*RdbSchema),
+			Implicit:            make(map[string]*RdbSchema),
+			RefreshTokens:       make(map[string]*RdbSchema),
 		}
 		err := rethinkManager.Watch(context.Background())
 		if err != nil {
@@ -94,12 +95,12 @@ type testSession struct {
 }
 
 var defaultRequest = fosite.Request{
-	RequestedAt: time.Now().Round(time.Second),
-	Client: &fosite.DefaultClient{ID: "foobar"},
-	Scopes: fosite.Arguments{"fa", "ba"},
-	GrantedScopes : fosite.Arguments{"fa", "ba"},
-	Form          :url.Values{"foo": []string{"bar", "baz"}},
-	Session      :&testSession{Foo: "bar"},
+	RequestedAt:   time.Now().Round(time.Second),
+	Client:        &fosite.DefaultClient{ID: "foobar"},
+	Scopes:        fosite.Arguments{"fa", "ba"},
+	GrantedScopes: fosite.Arguments{"fa", "ba"},
+	Form:          url.Values{"foo": []string{"bar", "baz"}},
+	Session:       &testSession{Foo: "bar"},
 }
 
 func TestCreateGetDeleteAuthorizeCodes(t *testing.T) {
@@ -163,7 +164,7 @@ func TestCreateGetDeleteOpenIDConnectSession(t *testing.T) {
 
 		time.Sleep(time.Second)
 
-		res, err := m.GetOpenIDConnectSession(ctx, "4321",&fosite.Request{
+		res, err := m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{
 			Session: &testSession{},
 		})
 		pkg.RequireError(t, false, err, "%s", k)

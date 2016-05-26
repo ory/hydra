@@ -15,12 +15,13 @@ import (
 	"github.com/ory-am/ladon"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/square/go-jose"
-	"golang.org/x/net/context"
-	"gopkg.in/ory-am/dockertest.v2"
 	"log"
 	"os"
 	"time"
+
+	"github.com/square/go-jose"
+	"golang.org/x/net/context"
+	"gopkg.in/ory-am/dockertest.v2"
 )
 
 var managers = map[string]Manager{}

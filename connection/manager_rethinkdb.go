@@ -1,8 +1,9 @@
 package connection
 
 import (
-	r "github.com/dancannon/gorethink"
 	"sync"
+
+	r "github.com/dancannon/gorethink"
 
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/pkg"
@@ -10,8 +11,8 @@ import (
 )
 
 type RethinkManager struct {
-	Session     *r.Session
-	Table       r.Term
+	Session *r.Session
+	Table   r.Term
 
 	Connections map[string]*Connection
 

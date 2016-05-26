@@ -1,14 +1,15 @@
 package client
 
 import (
-	r "github.com/dancannon/gorethink"
 	"sync"
-	"github.com/ory-am/fosite"
+
+	r "github.com/dancannon/gorethink"
 	"github.com/go-errors/errors"
-	"golang.org/x/net/context"
-	"github.com/ory-am/hydra/pkg"
+	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/hash"
+	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
+	"golang.org/x/net/context"
 )
 
 type RethinkManager struct {

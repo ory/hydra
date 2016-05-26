@@ -1,9 +1,10 @@
 package config
 
 import (
-	r "github.com/dancannon/gorethink"
 	"net/url"
+
 	"github.com/Sirupsen/logrus"
+	r "github.com/dancannon/gorethink"
 )
 
 type MemoryConnection struct{}
@@ -21,7 +22,7 @@ func (c *RethinkDBConnection) GetSession() *r.Session {
 	var err error
 	password, _ := c.URL.User.Password()
 	if c.Session, err = r.Connect(r.ConnectOpts{
-		Address: c.URL.Host,
+		Address:  c.URL.Host,
 		Database: c.URL.Path,
 		Username: c.URL.User.Username(),
 		Password: password,

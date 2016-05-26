@@ -4,18 +4,19 @@ import (
 	"net/http"
 	"net/url"
 
+	"encoding/json"
+
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
-	"encoding/json"
 )
 
 type jsonPolicy struct {
-	ID          string     `json:"id" gorethink:"id"`
-	Description string     `json:"description" gorethink:"description"`
-	Subjects    []string   `json:"subjects" gorethink:"subjects"`
-	Effect      string     `json:"effect" gorethink:"effect"`
-	Resources   []string   `json:"resources" gorethink:"resources"`
-	Actions     []string   `json:"actions" gorethink:"actions"`
+	ID          string          `json:"id" gorethink:"id"`
+	Description string          `json:"description" gorethink:"description"`
+	Subjects    []string        `json:"subjects" gorethink:"subjects"`
+	Effect      string          `json:"effect" gorethink:"effect"`
+	Resources   []string        `json:"resources" gorethink:"resources"`
+	Actions     []string        `json:"actions" gorethink:"actions"`
 	Conditions  json.RawMessage `json:"conditions" gorethink:"conditions"`
 }
 
@@ -30,7 +31,7 @@ func (p *jsonPolicy) FromPolicy() {
 type HTTPManager struct {
 	Endpoint *url.URL
 
-	Client   *http.Client
+	Client *http.Client
 }
 
 // Create persists the policy.

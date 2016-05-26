@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/Sirupsen/logrus"
+	r "github.com/dancannon/gorethink"
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
@@ -28,7 +29,6 @@ import (
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/net/context"
-	r "github.com/dancannon/gorethink"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {
@@ -53,18 +53,18 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 		con.CreateTableIfNotExists("hydra_implicit")
 		con.CreateTableIfNotExists("hydra_refresh_token")
 		m := &internal.FositeRehinkDBStore{
-			Session: con.GetSession(),
-			Manager: clients,
+			Session:             con.GetSession(),
+			Manager:             clients,
 			AuthorizeCodesTable: r.Table("hydra_authorize_code"),
-			IDSessionsTable: r.Table("hydra_id_sessions"),
-			AccessTokensTable: r.Table("hydra_access_token"),
-			ImplicitTable: r.Table("hydra_implicit"),
-			RefreshTokensTable: r.Table("hydra_refresh_token"),
-			AuthorizeCodes: make(map[string]*internal.RdbSchema),
-			IDSessions:     make(map[string]*internal.RdbSchema),
-			AccessTokens:   make(map[string]*internal.RdbSchema),
-			Implicit:       make(map[string]*internal.RdbSchema),
-			RefreshTokens:  make(map[string]*internal.RdbSchema),
+			IDSessionsTable:     r.Table("hydra_id_sessions"),
+			AccessTokensTable:   r.Table("hydra_access_token"),
+			ImplicitTable:       r.Table("hydra_implicit"),
+			RefreshTokensTable:  r.Table("hydra_refresh_token"),
+			AuthorizeCodes:      make(map[string]*internal.RdbSchema),
+			IDSessions:          make(map[string]*internal.RdbSchema),
+			AccessTokens:        make(map[string]*internal.RdbSchema),
+			Implicit:            make(map[string]*internal.RdbSchema),
+			RefreshTokens:       make(map[string]*internal.RdbSchema),
 		}
 		m.ColdStart()
 		m.Watch(context.Background())

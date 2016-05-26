@@ -30,31 +30,31 @@ import (
 )
 
 type Config struct {
-	BindPort     int `mapstructure:"port" yaml:"port,omitempty"`
+	BindPort int `mapstructure:"port" yaml:"port,omitempty"`
 
-	BindHost     string `mapstructure:"host" yaml:"host,omitempty"`
+	BindHost string `mapstructure:"host" yaml:"host,omitempty"`
 
-	Issuer       string `mapstructure:"issuer" yaml:"issuer,omitempty"`
+	Issuer string `mapstructure:"issuer" yaml:"issuer,omitempty"`
 
 	SystemSecret []byte `mapstructure:"system_secret" yaml:"-"`
 
-	DatabaseURL  string `mapstructure:"database_url" yaml:"database_url,omitempty"`
+	DatabaseURL string `mapstructure:"database_url" yaml:"database_url,omitempty"`
 
-	ConsentURL   string `mapstructure:"consent_url" yaml:"consent_url,omitempty"`
+	ConsentURL string `mapstructure:"consent_url" yaml:"consent_url,omitempty"`
 
-	ClusterURL   string `mapstructure:"cluster_url" yaml:"cluster_url,omitempty"`
+	ClusterURL string `mapstructure:"cluster_url" yaml:"cluster_url,omitempty"`
 
-	ClientID     string `mapstructure:"client_id" yaml:"client_id,omitempty"`
+	ClientID string `mapstructure:"client_id" yaml:"client_id,omitempty"`
 
 	ClientSecret string `mapstructure:"client_secret" yaml:"client_secret,omitempty"`
 
-	ForceHTTP    bool `mapstructure:"foolishly_force_http" yaml:"-"`
+	ForceHTTP bool `mapstructure:"foolishly_force_http" yaml:"-"`
 
-	cluster      *url.URL
+	cluster *url.URL
 
 	oauth2Client *http.Client
 
-	context      *Context
+	context *Context
 
 	sync.Mutex
 }

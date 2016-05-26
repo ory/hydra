@@ -1,23 +1,24 @@
 package internal
 
 import (
-	"github.com/ory-am/fosite"
-	"github.com/ory-am/hydra/client"
-	r "github.com/dancannon/gorethink"
-	"golang.org/x/net/context"
-	"sync"
-	"github.com/go-errors/errors"
-	"github.com/ory-am/hydra/pkg"
-	"time"
-	"net/url"
 	"encoding/json"
 	"fmt"
+	"net/url"
+	"sync"
+	"time"
+
+	r "github.com/dancannon/gorethink"
+	"github.com/go-errors/errors"
+	"github.com/ory-am/fosite"
+	"github.com/ory-am/hydra/client"
+	"github.com/ory-am/hydra/pkg"
+	"golang.org/x/net/context"
 )
 
 type RDBItems map[string]*RdbSchema
 
 type FositeRehinkDBStore struct {
-	Session             *r.Session
+	Session *r.Session
 	sync.RWMutex
 
 	AuthorizeCodesTable r.Term
@@ -29,21 +30,21 @@ type FositeRehinkDBStore struct {
 
 	client.Manager
 
-	AuthorizeCodes      RDBItems
-	IDSessions          RDBItems
-	AccessTokens        RDBItems
-	Implicit            RDBItems
-	RefreshTokens       RDBItems
+	AuthorizeCodes RDBItems
+	IDSessions     RDBItems
+	AccessTokens   RDBItems
+	Implicit       RDBItems
+	RefreshTokens  RDBItems
 }
 
 type RdbSchema struct {
-	ID string `json:"id" gorethink:"id"`
-	RequestedAt   time.Time  `json:"requestedAt" gorethink:"requestedAt"`
-	Client        *fosite.DefaultClient  `json:"client" gorethink:"client"`
-	Scopes        fosite.Arguments  `json:"scopes" gorethink:"scopes"`
-	GrantedScopes fosite.Arguments  `json:"grantedScopes" gorethink:"grantedScopes"`
-	Form          url.Values  `json:"form" gorethink:"form"`
-	Session       json.RawMessage `json:"session" gorethink:"session"`
+	ID            string                `json:"id" gorethink:"id"`
+	RequestedAt   time.Time             `json:"requestedAt" gorethink:"requestedAt"`
+	Client        *fosite.DefaultClient `json:"client" gorethink:"client"`
+	Scopes        fosite.Arguments      `json:"scopes" gorethink:"scopes"`
+	GrantedScopes fosite.Arguments      `json:"grantedScopes" gorethink:"grantedScopes"`
+	Form          url.Values            `json:"form" gorethink:"form"`
+	Session       json.RawMessage       `json:"session" gorethink:"session"`
 }
 
 func requestFromRDB(s *RdbSchema, proto interface{}) (*fosite.Request, error) {
@@ -85,13 +86,13 @@ func (s *FositeRehinkDBStore) publishInsert(table r.Term, id string, requester f
 	}
 
 	if _, err := table.Insert(&RdbSchema{
-		ID: id,
-		RequestedAt: requester.GetRequestedAt(),
-		Client: requester.GetClient().(*fosite.DefaultClient),
-		Scopes: requester.GetScopes(),
+		ID:            id,
+		RequestedAt:   requester.GetRequestedAt(),
+		Client:        requester.GetClient().(*fosite.DefaultClient),
+		Scopes:        requester.GetScopes(),
 		GrantedScopes: requester.GetGrantedScopes(),
-		Form: requester.GetRequestForm(),
-		Session: sess,
+		Form:          requester.GetRequestForm(),
+		Session:       sess,
 	}).RunWrite(s.Session); err != nil {
 		return errors.New(err)
 	}
@@ -262,7 +263,7 @@ func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock sync.RWMu
 				pkg.LogError(errors.New(changes.Err()))
 			}
 
-			changes, err =table.Changes().Run(sess)
+			changes, err = table.Changes().Run(sess)
 			if err != nil {
 				pkg.LogError(errors.New(changes.Err()))
 			}

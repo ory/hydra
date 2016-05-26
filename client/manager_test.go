@@ -1,10 +1,15 @@
 package client_test
 
 import (
-	r "github.com/dancannon/gorethink"
 	"net/http/httptest"
 	"net/url"
 	"testing"
+
+	r "github.com/dancannon/gorethink"
+
+	"log"
+	"os"
+	"time"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
@@ -15,11 +20,8 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
 	"github.com/stretchr/testify/assert"
-	"time"
-	"os"
-	"gopkg.in/ory-am/dockertest.v2"
-	"log"
 	"golang.org/x/net/context"
+	"gopkg.in/ory-am/dockertest.v2"
 )
 
 var clientManagers = map[string]Storage{}
@@ -67,7 +69,7 @@ func TestMain(m *testing.M) {
 	var err error
 
 	c, err := dockertest.ConnectToRethinkDB(20, time.Second, func(url string) bool {
-		if session, err = r.Connect(r.ConnectOpts{Address:  url, Database: "hydra"}); err != nil {
+		if session, err = r.Connect(r.ConnectOpts{Address: url, Database: "hydra"}); err != nil {
 			return false
 		} else if _, err = r.DBCreate("hydra").RunWrite(session); err != nil {
 			log.Printf("Database exists: %s", err)
@@ -79,8 +81,8 @@ func TestMain(m *testing.M) {
 
 		rethinkManager = &RethinkManager{
 			Session: session,
-			Table: r.Table("hydra_clients"),
-			Clients:make(map[string]*fosite.DefaultClient),
+			Table:   r.Table("hydra_clients"),
+			Clients: make(map[string]*fosite.DefaultClient),
 			Hasher: &hash.BCrypt{
 				// Low workfactor reduces test time
 				WorkFactor: 4,

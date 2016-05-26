@@ -3,8 +3,10 @@ package jwk
 import (
 	"sync"
 
-	"github.com/go-errors/errors"
+	"encoding/json"
+	"fmt"
 	r "github.com/dancannon/gorethink"
+	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/square/go-jose"
 	"golang.org/x/net/context"
@@ -14,7 +16,7 @@ type RethinkManager struct {
 	Session *r.Session
 	Table   r.Term
 
-	Keys    map[string]jose.JsonWebKeySet
+	Keys map[string]jose.JsonWebKeySet
 
 	sync.RWMutex
 }
@@ -43,7 +45,11 @@ func (m *RethinkManager) GetKey(set, kid string) ([]jose.JsonWebKey, error) {
 		return nil, errors.New(pkg.ErrNotFound)
 	}
 
-	return keys.Key(kid), nil
+	result := keys.Key(kid)
+	if len(result) == 0 {
+		return nil, errors.New(pkg.ErrNotFound)
+	}
+	return result, nil
 }
 
 func (m *RethinkManager) GetKeySet(set string) (*jose.JsonWebKeySet, error) {
@@ -60,11 +66,21 @@ func (m *RethinkManager) GetKeySet(set string) (*jose.JsonWebKeySet, error) {
 }
 
 func (m *RethinkManager) DeleteKey(set, kid string) error {
+	keys, err := m.GetKey(set, kid)
+	if err != nil {
+		return errors.New(err)
+	}
+
+	if err := m.publishDelete(set, keys); err != nil {
+		return errors.New(err)
+	}
 	return nil
 }
 
 func (m *RethinkManager) DeleteKeySet(set string) error {
-
+	if err := m.publishDeleteAll(set); err != nil {
+		return errors.New(err)
+	}
 	return nil
 }
 
@@ -75,26 +91,38 @@ func (m *RethinkManager) alloc() {
 }
 
 type rethinkSchema struct {
-	ID string `gorethink:"id"`
-	jose.JsonWebKeySet
+	ID   string            `gorethink:"id"`
+	Keys []json.RawMessage `gorethink:"keys"`
 }
 
 func (m *RethinkManager) publishAdd(set string, keys []jose.JsonWebKey) error {
-	if err := m.Table.Get(set).Exec(m.Session); err == r.ErrEmptyResult {
-		if m.Table.Get(set).Insert(&rethinkSchema{
-			ID: set,
-			JsonWebKeySet: jose.JsonWebKeySet{Keys:keys},
-		}).Exec(m.Session); err != nil {
+	raws := make([]json.RawMessage, len(keys))
+	for k, key := range keys {
+		out, err := json.Marshal(key)
+		if err != nil {
+			return errors.New(err)
+		}
+		raws[k] = out
+	}
+
+	if _, err := m.GetKeySet(set); errors.Is(err, pkg.ErrNotFound) {
+		if _, err := m.Table.Insert(&rethinkSchema{
+			ID:   set,
+			Keys: raws,
+		}).RunWrite(m.Session); err != nil {
 			return errors.New(err)
 		}
 		return nil
-	}
-
-	if err := m.Table.Get(set).Update(map[string]interface{}{
-		"keys": r.Row.Field([]interface{}{"keys"}).Default([]interface{}{}).Append([]interface{}{keys}...),
-	}).Exec(m.Session); err != nil {
+	} else if err != nil {
 		return errors.New(err)
 	}
+
+	if _, err := m.Table.Get(set).Update(map[string]interface{}{
+		"keys": r.Row.Field("keys").Append([]interface{}{keys}...),
+	}).RunWrite(m.Session); err != nil {
+		return errors.New(err)
+	}
+
 	return nil
 }
 func (m *RethinkManager) publishDeleteAll(set string) error {
@@ -106,11 +134,27 @@ func (m *RethinkManager) publishDeleteAll(set string) error {
 
 func (m *RethinkManager) publishDelete(set string, keys []jose.JsonWebKey) error {
 	if err := m.Table.Get(set).Update(map[string]interface{}{
-		"keys": r.Row.Field([]interface{}{"keys"}).Merge(r.Row.Field("keys").Difference([]interface{}{keys}...)),
+		"keys": r.Row.Field("keys").SetDifference([]interface{}{keys}...),
 	}).Exec(m.Session); err != nil {
 		return errors.New(err)
 	}
 	return nil
+}
+
+func rawToKeys(raws []json.RawMessage) []jose.JsonWebKey {
+	fmt.Printf("%s", raws)
+
+	var keys = make([]jose.JsonWebKey, len(raws))
+	var key = new(jose.JsonWebKey)
+	for k, raw := range raws {
+		err := key.UnmarshalJSON(raw)
+		if err != nil {
+			panic(err.Error())
+		}
+		keys[k] = *key
+	}
+	return keys
+
 }
 
 func (m *RethinkManager) Watch(ctx context.Context) error {
@@ -126,13 +170,18 @@ func (m *RethinkManager) Watch(ctx context.Context) error {
 			newVal := update["new_val"]
 			oldVal := update["old_val"]
 			m.Lock()
+			fmt.Printf("\n\nGot new data: %v\n\n", update)
 			if newVal == nil && oldVal != nil {
 				delete(m.Keys, oldVal.ID)
 			} else if newVal != nil && oldVal != nil {
 				delete(m.Keys, oldVal.ID)
-				m.Keys[newVal.ID] = newVal.JsonWebKeySet
+				m.Keys[newVal.ID] = jose.JsonWebKeySet{
+					Keys: rawToKeys(newVal.Keys),
+				}
 			} else {
-				m.Keys[newVal.ID] = newVal.JsonWebKeySet
+				m.Keys[newVal.ID] = jose.JsonWebKeySet{
+					Keys: rawToKeys(newVal.Keys),
+				}
 			}
 			m.Unlock()
 		}

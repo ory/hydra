@@ -64,10 +64,29 @@ func (m *MemoryManager) GetKeySet(set string) (*jose.JsonWebKeySet, error) {
 }
 
 func (m *MemoryManager) DeleteKey(set, kid string) error {
+	keys, err := m.GetKeySet(set)
+	if err != nil {
+		return err
+	}
+
+	m.Lock()
+	var results []jose.JsonWebKey
+	for _, key := range keys.Keys {
+		if key.KeyID != kid {
+			results = append(results)
+		}
+	}
+	m.Keys[set].Keys = results
+	defer m.Unlock()
+
 	return nil
 }
 
 func (m *MemoryManager) DeleteKeySet(set string) error {
+	m.Lock()
+	defer m.Unlock()
+
+	delete(m.Keys, set)
 	return nil
 }
 

@@ -15,6 +15,9 @@ import (
 )
 
 func First(keys []jose.JsonWebKey) *jose.JsonWebKey {
+	if len(keys) == 0 {
+		return nil
+	}
 	return &keys[0]
 }
 

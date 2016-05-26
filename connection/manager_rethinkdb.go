@@ -69,7 +69,7 @@ func (m *RethinkManager) FindByRemoteSubject(provider, subject string) (*Connect
 	return nil, errors.New(pkg.ErrNotFound)
 }
 
-func (m *RethinkManager) fetch() error {
+func (m *RethinkManager) ColdStart() error {
 	m.Connections = map[string]*Connection{}
 	clients, err := m.Table.Run(m.Session)
 	if err != nil {
@@ -107,21 +107,32 @@ func (m *RethinkManager) Watch(ctx context.Context) error {
 	}
 
 	go func() {
-		var update map[string]*Connection
-		defer connections.Close()
-		for connections.Next(&update) {
-			newVal := update["new_val"]
-			oldVal := update["old_val"]
-			m.Lock()
-			if newVal == nil && oldVal != nil {
-				delete(m.Connections, oldVal.GetID())
-			} else if newVal != nil && oldVal != nil {
-				delete(m.Connections, oldVal.GetID())
-				m.Connections[newVal.GetID()] = newVal
-			} else {
-				m.Connections[newVal.GetID()] = newVal
+		for {
+			var update map[string]*Connection
+			for connections.Next(&update) {
+				newVal := update["new_val"]
+				oldVal := update["old_val"]
+				m.Lock()
+				if newVal == nil && oldVal != nil {
+					delete(m.Connections, oldVal.GetID())
+				} else if newVal != nil && oldVal != nil {
+					delete(m.Connections, oldVal.GetID())
+					m.Connections[newVal.GetID()] = newVal
+				} else {
+					m.Connections[newVal.GetID()] = newVal
+				}
+				m.Unlock()
+
+				connections.Close()
+				if connections.Err() != nil {
+					pkg.LogError(errors.New(connections.Err()))
+				}
+
+				connections, err = m.Table.Changes().Run(m.Session)
+				if err != nil {
+					pkg.LogError(errors.New(connections.Err()))
+				}
 			}
-			m.Unlock()
 		}
 	}()
 

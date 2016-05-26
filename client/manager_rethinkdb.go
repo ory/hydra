@@ -81,7 +81,7 @@ func (m *RethinkManager) GetClients() (map[string]*fosite.DefaultClient, error) 
 	return m.Clients, nil
 }
 
-func (m *RethinkManager) fetch() error {
+func (m *RethinkManager) ColdStart() error {
 	m.Clients = map[string]*fosite.DefaultClient{}
 	clients, err := m.Table.Run(m.Session)
 	if err != nil {
@@ -99,14 +99,14 @@ func (m *RethinkManager) fetch() error {
 }
 
 func (m *RethinkManager) publishCreate(client *fosite.DefaultClient) error {
-	if err := m.Table.Insert(client).Exec(m.Session); err != nil {
+	if _, err := m.Table.Insert(client).RunWrite(m.Session); err != nil {
 		return errors.New(err)
 	}
 	return nil
 }
 
 func (m *RethinkManager) publishDelete(id string) error {
-	if err := m.Table.Get(id).Delete().Exec(m.Session); err != nil {
+	if _, err := m.Table.Get(id).Delete().RunWrite(m.Session); err != nil {
 		return errors.New(err)
 	}
 	return nil
@@ -119,21 +119,32 @@ func (m *RethinkManager) Watch(ctx context.Context) error {
 	}
 
 	go func() {
-		var update map[string]*fosite.DefaultClient
-		defer clients.Close()
-		for clients.Next(&update) {
-			newVal := update["new_val"]
-			oldVal := update["old_val"]
-			m.Lock()
-			if newVal == nil && oldVal != nil {
-				delete(m.Clients, oldVal.GetID())
-			} else if newVal != nil && oldVal != nil {
-				delete(m.Clients, oldVal.GetID())
-				m.Clients[newVal.GetID()] = newVal
-			} else {
-				m.Clients[newVal.GetID()] = newVal
+		for {
+			var update map[string]*fosite.DefaultClient
+			for clients.Next(&update) {
+				newVal := update["new_val"]
+				oldVal := update["old_val"]
+				m.Lock()
+				if newVal == nil && oldVal != nil {
+					delete(m.Clients, oldVal.GetID())
+				} else if newVal != nil && oldVal != nil {
+					delete(m.Clients, oldVal.GetID())
+					m.Clients[newVal.GetID()] = newVal
+				} else {
+					m.Clients[newVal.GetID()] = newVal
+				}
+				m.Unlock()
+
+				clients.Close()
+				if clients.Err() != nil {
+					pkg.LogError(errors.New(clients.Err()))
+				}
+
+				clients, err = m.Table.Changes().Run(m.Session)
+				if err != nil {
+					pkg.LogError(errors.New(clients.Err()))
+				}
 			}
-			m.Unlock()
 		}
 	}()
 

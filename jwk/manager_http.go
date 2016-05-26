@@ -44,15 +44,15 @@ func (m *HTTPManager) AddKeySet(set string, keys *jose.JsonWebKeySet) error {
 	return r.Update(keys)
 }
 
-func (m *HTTPManager) GetKey(set, kid string) ([]jose.JsonWebKey, error) {
-	var c []jose.JsonWebKey
+func (m *HTTPManager) GetKey(set, kid string) (*jose.JsonWebKeySet, error) {
+	var c jose.JsonWebKeySet
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, set, kid).String())
 	r.Client = m.Client
 	if err := r.Get(&c); err != nil {
 		return nil, err
 	}
 
-	return c, nil
+	return &c, nil
 }
 
 func (m *HTTPManager) GetKeySet(set string) (*jose.JsonWebKeySet, error) {

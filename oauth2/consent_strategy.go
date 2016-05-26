@@ -37,7 +37,7 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 			return nil, err
 		}
 
-		rsaKey, ok := jwk.First(pk).Key.(*rsa.PublicKey)
+		rsaKey, ok := jwk.First(pk.Keys).Key.(*rsa.PublicKey)
 		if !ok {
 			return nil, errors.New("Could not convert to RSA Private Key")
 		}
@@ -86,12 +86,12 @@ func (s *DefaultConsentStrategy) IssueChallenge(authorizeRequest fosite.Authoriz
 		"redir": redirectURL,
 	}
 
-	key, err := s.KeyManager.GetKey(ConsentChallengeKey, "private")
+	ks, err := s.KeyManager.GetKey(ConsentChallengeKey, "private")
 	if err != nil {
 		return "", errors.New(err)
 	}
 
-	rsaKey, ok := jwk.First(key).Key.(*rsa.PrivateKey)
+	rsaKey, ok := jwk.First(ks.Keys).Key.(*rsa.PrivateKey)
 	if !ok {
 		return "", errors.New("Could not convert to RSA Private Key")
 	}

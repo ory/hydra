@@ -98,7 +98,6 @@ func (s *SuperAgent) send(method string, in interface{}, out interface{}) error 
 	if err != nil {
 		return errors.New(err)
 	}
-	defer resp.Body.Close()
 
 	expectedStatus := http.StatusOK
 	if method == "POST" {
@@ -106,11 +105,12 @@ func (s *SuperAgent) send(method string, in interface{}, out interface{}) error 
 	}
 	if resp.StatusCode != expectedStatus {
 		body, _ := ioutil.ReadAll(resp.Body)
-		return errors.Errorf("Expected status code %d, got %d.\n%s\n", expectedStatus, resp.StatusCode, body)
+		return errors.Errorf("Expected status code %d, got %d.\n%s", expectedStatus, resp.StatusCode, body)
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(out); err != nil {
-		return errors.New(err)
+		body, _ := ioutil.ReadAll(resp.Body)
+		return errors.Errorf("%s: %s", err, body)
 	}
 
 	return nil

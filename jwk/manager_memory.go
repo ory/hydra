@@ -32,7 +32,7 @@ func (m *MemoryManager) AddKeySet(set string, keys *jose.JsonWebKeySet) error {
 	return nil
 }
 
-func (m *MemoryManager) GetKey(set, kid string) ([]jose.JsonWebKey, error) {
+func (m *MemoryManager) GetKey(set, kid string) (*jose.JsonWebKeySet, error) {
 	m.Lock()
 	defer m.Unlock()
 
@@ -47,7 +47,9 @@ func (m *MemoryManager) GetKey(set, kid string) ([]jose.JsonWebKey, error) {
 		return nil, errors.New(pkg.ErrNotFound)
 	}
 
-	return result, nil
+	return &jose.JsonWebKeySet{
+		Keys: result,
+	}, nil
 }
 
 func (m *MemoryManager) GetKeySet(set string) (*jose.JsonWebKeySet, error) {

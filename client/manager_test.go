@@ -141,7 +141,7 @@ func BenchmarkRethinkGet(b *testing.B) {
 	if err != nil {
 		b.Fatalf("%s", err)
 	}
-	time.Sleep(time.Second)
+	time.Sleep(500 * time.Millisecond)
 
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
@@ -165,7 +165,7 @@ func BenchmarkRethinkAuthenticate(b *testing.B) {
 	if err != nil {
 		b.Fatalf("%s", err)
 	}
-	time.Sleep(time.Second)
+	time.Sleep(500 * time.Millisecond)
 
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
@@ -191,7 +191,7 @@ func TestCreateGetDeleteClient(t *testing.T) {
 		}
 
 		// RethinkDB delay
-		time.Sleep(time.Microsecond * 500)
+		time.Sleep(500 * time.Millisecond)
 
 		d, err := m.GetClient("1234")
 		pkg.AssertError(t, false, err, "%s", k)
@@ -207,7 +207,7 @@ func TestCreateGetDeleteClient(t *testing.T) {
 		pkg.AssertError(t, false, err, "%s", k)
 
 		// RethinkDB delay
-		time.Sleep(time.Microsecond * 500)
+		time.Sleep(500 * time.Millisecond)
 
 		_, err = m.GetClient("1234")
 		pkg.AssertError(t, true, err, "%s", k)

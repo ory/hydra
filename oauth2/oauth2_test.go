@@ -139,7 +139,7 @@ func signConsentToken(claims map[string]interface{}) (string, error) {
 	if err != nil {
 		return "", errors.New(err)
 	}
-	rsaKey, err := jwk.ToRSAPrivate(jwk.First(keys))
+	rsaKey, err := jwk.ToRSAPrivate(jwk.First(keys.Keys))
 	if err != nil {
 		return "", err
 	}

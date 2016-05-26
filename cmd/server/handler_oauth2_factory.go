@@ -69,7 +69,7 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 		pkg.Must(err, "Could not fetch signing key for OpenID Connect")
 	}
 
-	rsaKey := jwk.MustRSAPrivate(jwk.First(keys))
+	rsaKey := jwk.MustRSAPrivate(jwk.First(keys.Keys))
 
 	idStrategy := &os.DefaultStrategy{
 		RS256JWTStrategy: &jwt.RS256JWTStrategy{

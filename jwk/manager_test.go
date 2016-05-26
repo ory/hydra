@@ -113,7 +113,7 @@ func BenchmarkRethinkGet(b *testing.B) {
 	if err != nil {
 		b.Fatalf("%s", err)
 	}
-	time.Sleep(time.Second)
+	time.Sleep(time.Millisecond * 100)
 
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
@@ -135,27 +135,31 @@ func TestManagerKey(t *testing.T) {
 		err = m.AddKey("faz", First(priv))
 		pkg.AssertError(t, false, err, name)
 
-		time.Sleep(time.Millisecond * 500)
+		time.Sleep(time.Millisecond * 100)
+
+		got, err := m.GetKey("faz", "private")
+		pkg.RequireError(t, false, err, name)
+		assert.Equal(t, priv, got.Keys, "%s", name)
 
 		err = m.AddKey("faz", First(pub))
 		pkg.AssertError(t, false, err, name)
 
-		time.Sleep(time.Millisecond * 500)
+		time.Sleep(time.Millisecond * 100)
 
-		got, err := m.GetKey("faz", "private")
+		got, err = m.GetKey("faz", "private")
 		pkg.RequireError(t, false, err, name)
-		assert.Equal(t, priv, got, "%s", name)
+		assert.Equal(t, priv, got.Keys, "%s", name)
 
 		got, err = m.GetKey("faz", "public")
 		pkg.RequireError(t, false, err, name)
-		assert.Equal(t, pub, got, "%s", name)
+		assert.Equal(t, pub, got.Keys, "%s", name)
 
 		err = m.DeleteKey("faz", "public")
 		pkg.AssertError(t, false, err, name)
 
-		time.Sleep(time.Millisecond * 500)
+		time.Sleep(time.Millisecond * 100)
 
-		_, err = m.GetKey("faz", "public")
+		ks, err = m.GetKey("faz", "public")
 		pkg.AssertError(t, true, err, name)
 	}
 
@@ -173,7 +177,7 @@ func TestManagerKeySet(t *testing.T) {
 		err = m.AddKeySet("bar", ks)
 		pkg.AssertError(t, false, err, name)
 
-		time.Sleep(time.Millisecond * 500)
+		time.Sleep(time.Millisecond * 100)
 
 		got, err := m.GetKeySet("bar")
 		pkg.RequireError(t, false, err, name)
@@ -183,7 +187,7 @@ func TestManagerKeySet(t *testing.T) {
 		err = m.DeleteKeySet("bar")
 		pkg.AssertError(t, false, err, name)
 
-		time.Sleep(time.Millisecond * 500)
+		time.Sleep(time.Millisecond * 100)
 
 		_, err = m.GetKeySet("bar")
 		pkg.AssertError(t, true, err, name)

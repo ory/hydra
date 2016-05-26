@@ -121,7 +121,7 @@ func BenchmarkRethinkGet(b *testing.B) {
 	if err != nil {
 		b.Fatalf("%s", err)
 	}
-	time.Sleep(time.Second)
+	time.Sleep(500 * time.Millisecond)
 
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
@@ -138,7 +138,7 @@ func TestCreateGetFindDelete(t *testing.T) {
 			err = store.Create(c)
 			pkg.RequireError(t, false, err)
 
-			time.Sleep(time.Millisecond * 500)
+			time.Sleep(500 * time.Millisecond)
 
 			res, err := store.Get(c.GetID())
 			pkg.RequireError(t, false, err)
@@ -156,7 +156,7 @@ func TestCreateGetFindDelete(t *testing.T) {
 			err = store.Delete(c.GetID())
 			pkg.RequireError(t, false, err)
 
-			time.Sleep(time.Millisecond * 500)
+			time.Sleep(500 * time.Millisecond)
 
 			_, err = store.Get(c.GetID())
 			pkg.RequireError(t, true, err)

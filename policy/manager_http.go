@@ -6,12 +6,31 @@ import (
 
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
+	"encoding/json"
 )
+
+type jsonPolicy struct {
+	ID          string     `json:"id" gorethink:"id"`
+	Description string     `json:"description" gorethink:"description"`
+	Subjects    []string   `json:"subjects" gorethink:"subjects"`
+	Effect      string     `json:"effect" gorethink:"effect"`
+	Resources   []string   `json:"resources" gorethink:"resources"`
+	Actions     []string   `json:"actions" gorethink:"actions"`
+	Conditions  json.RawMessage `json:"conditions" gorethink:"conditions"`
+}
+
+func (p *jsonPolicy) ToPolicy() {
+
+}
+
+func (p *jsonPolicy) FromPolicy() {
+
+}
 
 type HTTPManager struct {
 	Endpoint *url.URL
 
-	Client *http.Client
+	Client   *http.Client
 }
 
 // Create persists the policy.
@@ -23,7 +42,9 @@ func (m *HTTPManager) Create(policy ladon.Policy) error {
 
 // Get retrieves a policy.
 func (m *HTTPManager) Get(id string) (ladon.Policy, error) {
-	var policy ladon.DefaultPolicy
+	var policy = ladon.DefaultPolicy{
+		Conditions: ladon.Conditions{},
+	}
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, id).String())
 	r.Client = m.Client
 	if err := r.Get(&policy); err != nil {
@@ -50,11 +71,9 @@ func (m *HTTPManager) FindPoliciesForSubject(subject string) (ladon.Policies, er
 		return nil, err
 	}
 
-	return func(ps []*ladon.DefaultPolicy) (r ladon.Policies) {
-		r = make(ladon.Policies, len(ps))
-		for k, p := range ps {
-			r[k] = ladon.Policy(p)
-		}
-		return r
-	}(policies), nil
+	ret := make(ladon.Policies, len(policies))
+	for k, p := range policies {
+		ret[k] = ladon.Policy(p)
+	}
+	return ret, nil
 }

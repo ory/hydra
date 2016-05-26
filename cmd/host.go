@@ -86,7 +86,7 @@ func getOrCreateTLSCertificate() tls.Certificate {
 		pkg.Must(err, "Could not retrieve key: %s", err)
 	}
 
-	pemCert, pemKey, err := jwk.ToX509PEMKeyPair(jwk.First(keys).Key)
+	pemCert, pemKey, err := jwk.ToX509PEMKeyPair(jwk.First(keys.Keys).Key)
 	pkg.Must(err, "Could not create X509 PEM Key Pair: %s", err)
 
 	cert, err := tls.X509KeyPair(pemCert, pemKey)

@@ -4,7 +4,6 @@ import (
 	"sync"
 
 	"encoding/json"
-	"fmt"
 	r "github.com/dancannon/gorethink"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/pkg"
@@ -15,10 +14,16 @@ import (
 type RethinkManager struct {
 	Session *r.Session
 	Table   r.Term
-
-	Keys map[string]jose.JsonWebKeySet
-
 	sync.RWMutex
+
+	Keys    map[string]jose.JsonWebKeySet
+}
+
+func (m *RethinkManager) SetUpIndex() error {
+	if _, err := m.Table.IndexWait("kid").Run(m.Session); err != nil {
+		return errors.New(err)
+	}
+	return nil
 }
 
 func (m *RethinkManager) AddKey(set string, key *jose.JsonWebKey) error {
@@ -35,7 +40,7 @@ func (m *RethinkManager) AddKeySet(set string, keys *jose.JsonWebKeySet) error {
 	return nil
 }
 
-func (m *RethinkManager) GetKey(set, kid string) ([]jose.JsonWebKey, error) {
+func (m *RethinkManager) GetKey(set, kid string) (*jose.JsonWebKeySet, error) {
 	m.Lock()
 	defer m.Unlock()
 
@@ -49,7 +54,10 @@ func (m *RethinkManager) GetKey(set, kid string) ([]jose.JsonWebKey, error) {
 	if len(result) == 0 {
 		return nil, errors.New(pkg.ErrNotFound)
 	}
-	return result, nil
+
+	return &jose.JsonWebKeySet{
+		Keys: result,
+	}, nil
 }
 
 func (m *RethinkManager) GetKeySet(set string) (*jose.JsonWebKeySet, error) {
@@ -62,6 +70,10 @@ func (m *RethinkManager) GetKeySet(set string) (*jose.JsonWebKeySet, error) {
 		return nil, errors.New(pkg.ErrNotFound)
 	}
 
+	if len(keys.Keys) == 0 {
+		return nil, errors.New(pkg.ErrNotFound)
+	}
+
 	return &keys, nil
 }
 
@@ -71,7 +83,7 @@ func (m *RethinkManager) DeleteKey(set, kid string) error {
 		return errors.New(err)
 	}
 
-	if err := m.publishDelete(set, keys); err != nil {
+	if err := m.publishDelete(set, keys.Keys); err != nil {
 		return errors.New(err)
 	}
 	return nil
@@ -91,8 +103,9 @@ func (m *RethinkManager) alloc() {
 }
 
 type rethinkSchema struct {
-	ID   string            `gorethink:"id"`
-	Keys []json.RawMessage `gorethink:"keys"`
+	KID string `gorethink:"kid"`
+	Set string `gorethink:"set"`
+	Key json.RawMessage `gorethink:"key"`
 }
 
 func (m *RethinkManager) publishAdd(set string, keys []jose.JsonWebKey) error {
@@ -105,56 +118,37 @@ func (m *RethinkManager) publishAdd(set string, keys []jose.JsonWebKey) error {
 		raws[k] = out
 	}
 
-	if _, err := m.GetKeySet(set); errors.Is(err, pkg.ErrNotFound) {
+	for k, raw := range raws {
 		if _, err := m.Table.Insert(&rethinkSchema{
-			ID:   set,
-			Keys: raws,
+			KID: keys[k].KeyID,
+			Set: set,
+			Key: raw,
 		}).RunWrite(m.Session); err != nil {
 			return errors.New(err)
 		}
-		return nil
-	} else if err != nil {
-		return errors.New(err)
-	}
-
-	if row, err := m.Table.Get(set).Update(map[string]interface{}{
-		"keys": r.Row.Field("keys").Append([]interface{}{keys}...),
-	}).RunWrite(m.Session); err != nil {
-		return errors.New(err)
-	} else {
-		fmt.Printf("\n\nrow: %v\n\n", row)
 	}
 
 	return nil
 }
 func (m *RethinkManager) publishDeleteAll(set string) error {
-	if err := m.Table.Get(set).Delete().Exec(m.Session); err != nil {
+	if err := m.Table.Filter(map[string]interface{}{
+		"set": set,
+	}).Delete().Exec(m.Session); err != nil {
 		return errors.New(err)
 	}
 	return nil
 }
 
 func (m *RethinkManager) publishDelete(set string, keys []jose.JsonWebKey) error {
-	if err := m.Table.Get(set).Update(map[string]interface{}{
-		"keys": r.Row.Field("keys").SetDifference([]interface{}{keys}...),
-	}).Exec(m.Session); err != nil {
-		return errors.New(err)
+	for _, key := range keys {
+		if _, err := m.Table.Filter(map[string]interface{}{
+			"kid": key.KeyID,
+			"set": set,
+		}).Delete().RunWrite(m.Session); err != nil {
+			return errors.New(err)
+		}
 	}
 	return nil
-}
-
-func rawToKeys(raws []json.RawMessage) []jose.JsonWebKey {
-	var keys = make([]jose.JsonWebKey, len(raws))
-	var key = new(jose.JsonWebKey)
-	for k, raw := range raws {
-		err := key.UnmarshalJSON(raw)
-		if err != nil {
-			panic(err.Error())
-		}
-		keys[k] = *key
-	}
-	return keys
-
 }
 
 func (m *RethinkManager) Watch(ctx context.Context) error {
@@ -164,30 +158,95 @@ func (m *RethinkManager) Watch(ctx context.Context) error {
 	}
 
 	go func() {
-		var update map[string]*rethinkSchema
-		defer connections.Close()
-		for connections.Next(&update) {
-			newVal := update["new_val"]
-			oldVal := update["old_val"]
-			m.Lock()
-			if newVal == nil && oldVal != nil {
-				fmt.Printf("\n\nGot delete: %v\n\n", update)
-				delete(m.Keys, oldVal.ID)
-			} else if newVal != nil && oldVal != nil {
-				fmt.Printf("\n\nGot update data: %v\n\n", update)
-				delete(m.Keys, oldVal.ID)
-				m.Keys[newVal.ID] = jose.JsonWebKeySet{
-					Keys: rawToKeys(newVal.Keys),
+		for {
+			var update map[string]*rethinkSchema
+			for connections.Next(&update) {
+				newVal := update["new_val"]
+				oldVal := update["old_val"]
+				m.Lock()
+				if newVal == nil && oldVal != nil {
+					m.watcherRemove(oldVal)
+
+				} else if newVal != nil && oldVal != nil {
+					m.watcherRemove(oldVal)
+					m.watcherInsert(newVal)
+				} else {
+					m.watcherInsert(newVal)
 				}
-			} else {
-				fmt.Printf("\n\nGot new data: %v\n\n", update)
-				m.Keys[newVal.ID] = jose.JsonWebKeySet{
-					Keys: rawToKeys(newVal.Keys),
-				}
+				m.Unlock()
 			}
-			m.Unlock()
+
+			connections.Close()
+			if connections.Err() != nil {
+				pkg.LogError(errors.New(connections.Err()))
+			}
+
+			connections, err = m.Table.Changes().Run(m.Session)
+			if err != nil {
+				pkg.LogError(errors.New(connections.Err()))
+			}
 		}
 	}()
 
 	return nil
+}
+
+func (m *RethinkManager) watcherInsert(val *rethinkSchema) {
+	var c jose.JsonWebKey
+	if err := json.Unmarshal(val.Key, &c); err != nil {
+		panic(err)
+	}
+
+	keys := m.Keys[val.Set]
+	keys.Keys = append(keys.Keys, c)
+	m.Keys[val.Set] = keys
+}
+
+func (m *RethinkManager) watcherRemove(val *rethinkSchema) {
+	keys, ok := m.Keys[val.Set]
+	if !ok {
+		return
+	}
+
+	keys.Keys = filter(keys.Keys, func(k jose.JsonWebKey) bool {
+		return k.KeyID != val.KID
+	})
+	m.Keys[val.Set] = keys
+}
+
+func (m *RethinkManager) ColdStart() error {
+	m.Keys = map[string]jose.JsonWebKeySet{}
+	clients, err := m.Table.Run(m.Session)
+	if err != nil {
+		return errors.New(err)
+	}
+
+	var raw *rethinkSchema
+	var key jose.JsonWebKey
+	m.Lock()
+	defer m.Unlock()
+	for clients.Next(&raw) {
+		if err := json.Unmarshal(raw.Key, &key); err != nil {
+			return errors.New(err)
+		}
+
+		keys, ok := m.Keys[raw.Set]
+		if !ok {
+			keys = jose.JsonWebKeySet{}
+		}
+		keys.Keys = append(keys.Keys, key)
+		m.Keys[raw.Set] = keys
+	}
+
+	return nil
+}
+
+func filter(vs []jose.JsonWebKey, f func(jose.JsonWebKey) bool) []jose.JsonWebKey {
+	vsf := make([]jose.JsonWebKey, 0)
+	for _, v := range vs {
+		if f(v) {
+			vsf = append(vsf, v)
+		}
+	}
+	return vsf
 }

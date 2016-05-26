@@ -7,7 +7,7 @@ type Manager interface {
 
 	AddKeySet(set string, keys *jose.JsonWebKeySet) error
 
-	GetKey(set, kid string) ([]jose.JsonWebKey, error)
+	GetKey(set, kid string) (*jose.JsonWebKeySet, error)
 
 	GetKeySet(set string) (*jose.JsonWebKeySet, error)
 

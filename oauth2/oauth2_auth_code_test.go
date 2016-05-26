@@ -29,7 +29,7 @@ func TestAuthCode(t *testing.T) {
 
 			pk, err := keyManager.GetKey(ConsentChallengeKey, "public")
 			pkg.RequireError(t, false, err)
-			return jwk.MustRSAPublic(jwk.First(pk)), nil
+			return jwk.MustRSAPublic(jwk.First(pk.Keys)), nil
 		})
 		pkg.RequireError(t, false, err)
 		require.True(t, tok.Valid)

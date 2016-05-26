@@ -117,10 +117,12 @@ func (m *RethinkManager) publishAdd(set string, keys []jose.JsonWebKey) error {
 		return errors.New(err)
 	}
 
-	if _, err := m.Table.Get(set).Update(map[string]interface{}{
+	if row, err := m.Table.Get(set).Update(map[string]interface{}{
 		"keys": r.Row.Field("keys").Append([]interface{}{keys}...),
 	}).RunWrite(m.Session); err != nil {
 		return errors.New(err)
+	} else {
+		fmt.Printf("\n\nrow: %v\n\n", row)
 	}
 
 	return nil
@@ -142,8 +144,6 @@ func (m *RethinkManager) publishDelete(set string, keys []jose.JsonWebKey) error
 }
 
 func rawToKeys(raws []json.RawMessage) []jose.JsonWebKey {
-	fmt.Printf("%s", raws)
-
 	var keys = make([]jose.JsonWebKey, len(raws))
 	var key = new(jose.JsonWebKey)
 	for k, raw := range raws {
@@ -170,15 +170,17 @@ func (m *RethinkManager) Watch(ctx context.Context) error {
 			newVal := update["new_val"]
 			oldVal := update["old_val"]
 			m.Lock()
-			fmt.Printf("\n\nGot new data: %v\n\n", update)
 			if newVal == nil && oldVal != nil {
+				fmt.Printf("\n\nGot delete: %v\n\n", update)
 				delete(m.Keys, oldVal.ID)
 			} else if newVal != nil && oldVal != nil {
+				fmt.Printf("\n\nGot update data: %v\n\n", update)
 				delete(m.Keys, oldVal.ID)
 				m.Keys[newVal.ID] = jose.JsonWebKeySet{
 					Keys: rawToKeys(newVal.Keys),
 				}
 			} else {
+				fmt.Printf("\n\nGot new data: %v\n\n", update)
 				m.Keys[newVal.ID] = jose.JsonWebKeySet{
 					Keys: rawToKeys(newVal.Keys),
 				}

@@ -70,7 +70,7 @@ func (c *RethinkDBConnection) CreateTableIfNotExists(table string) {
 			map[string]interface{}{"tables_created": 0},
 			r.TableCreate(table),
 		)
-	}).RunWrite(c.Session); err != nil {
+	}).RunWrite(c.GetSession()); err != nil {
 		logrus.Fatalf("Could not create table: %s", err)
 	}
 }

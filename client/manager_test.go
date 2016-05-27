@@ -19,6 +19,7 @@ import (
 	"github.com/ory-am/hydra/internal"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
+	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 	"gopkg.in/ory-am/dockertest.v2"
@@ -131,8 +132,9 @@ func BenchmarkRethinkGet(b *testing.B) {
 	b.StopTimer()
 
 	m := rethinkManager
+	id := uuid.New()
 	c := &fosite.DefaultClient{
-		ID:                "4321",
+		ID:                id,
 		Secret:            []byte("secret"),
 		RedirectURIs:      []string{"http://redirect"},
 		TermsOfServiceURI: "foo",
@@ -147,7 +149,7 @@ func BenchmarkRethinkGet(b *testing.B) {
 
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = m.GetClient("4321")
+		_, _ = m.GetClient(id)
 	}
 }
 

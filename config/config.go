@@ -38,7 +38,7 @@ type Config struct {
 
 	SystemSecret []byte `mapstructure:"system_secret" yaml:"-"`
 
-	DatabaseURL string `mapstructure:"database_url" yaml:"database_url,omitempty"`
+	DatabaseURL string `mapstructure:"DATABASE_URL" yaml:"database_url,omitempty"`
 
 	ConsentURL string `mapstructure:"consent_url" yaml:"consent_url,omitempty"`
 
@@ -98,26 +98,32 @@ func (c *Config) Context() *Context {
 	if c.DatabaseURL != "" {
 		u, err := url.Parse(c.DatabaseURL)
 		if err != nil {
-			panic(errors.New(err))
+			logrus.Fatalf("Could not parse DATABASE_URL: %s", err)
 		}
 
 		switch u.Scheme {
 		case "rethinkdb":
 			connection = &RethinkDBConnection{URL: u}
 			break
+		default:
+			logrus.Fatalf("Unkown DSN in DATABASE_URL: %s", c.DatabaseURL)
 		}
 	}
 
 	var manager ladon.Manager
 	switch con := connection.(type) {
 	case *MemoryConnection:
+		logrus.Printf("DATABASE_URL not set, connecting to ephermal in-memory database.")
 		manager = ladon.NewMemoryManager()
+		break
 	case *RethinkDBConnection:
+		logrus.Printf("DATABASE_URL set, connecting to RethinkDB.")
 		con.CreateTableIfNotExists("hydra_policies")
 		m := &ladon.RethinkManager{Session: con.GetSession()}
 		m.ColdStart()
 		m.Watch(context.Background())
 		manager = m
+		break
 	default:
 		panic("Unknown connection type.")
 	}

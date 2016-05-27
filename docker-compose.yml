@@ -10,10 +10,15 @@ services:
       - ./.docker-home:/root
     expose:
       - 4444
+    links:
+      - rethinkdb
     ports:
       - "4444:4444"
     environment:
       - CONSENT_URL=http://${DOCKER_IP}:3000
+      - DATABASE_URL=rethinkdb://rethink:28015/hydra
+    depends_on:
+      - rethinkdb
 
   consent:
     environment:
@@ -30,3 +35,14 @@ services:
       - 3000
     ports:
       - "3000:3000"
+
+  rethinkdb:
+      image: rethinkdb
+      expose:
+        - 28015
+        - 29015
+        - 8080
+      ports:
+          - "8080:8080"
+          - "28015:28015"
+          - "29015:29015"

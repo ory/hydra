@@ -227,3 +227,6 @@ git checkout -b develop
 go test ./... -race
 go run main.go
 ```
+
+
+docker run --name some-rethink -d -p 8080:8080 -p 28015:28015 rethinkdb

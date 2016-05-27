@@ -94,6 +94,10 @@ func initConfig() {
 		c.ClientSecret = clientSecret
 	}
 
+	if databaseURL, ok := viper.Get("DATABASE_URL").(string); ok {
+		c.DatabaseURL = databaseURL
+	}
+
 	if c.ClusterURL == "" {
 		fmt.Printf("Pointing cluster at %s\n", c.GetClusterURL())
 	}

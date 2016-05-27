@@ -2,7 +2,6 @@ package internal
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/url"
 	"sync"
 	"time"
@@ -18,7 +17,7 @@ import (
 type RDBItems map[string]*RdbSchema
 
 type FositeRehinkDBStore struct {
-	Session *r.Session
+	Session             *r.Session
 	sync.RWMutex
 
 	AuthorizeCodesTable r.Term
@@ -30,11 +29,11 @@ type FositeRehinkDBStore struct {
 
 	client.Manager
 
-	AuthorizeCodes RDBItems
-	IDSessions     RDBItems
-	AccessTokens   RDBItems
-	Implicit       RDBItems
-	RefreshTokens  RDBItems
+	AuthorizeCodes      RDBItems
+	IDSessions          RDBItems
+	AccessTokens        RDBItems
+	Implicit            RDBItems
+	RefreshTokens       RDBItems
 }
 
 type RdbSchema struct {
@@ -243,9 +242,6 @@ func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock sync.RWMu
 			for changes.Next(&update) {
 				newVal := update["new_val"]
 				oldVal := update["old_val"]
-
-				fmt.Printf("\nGot Update: %s", update)
-
 				lock.Lock()
 				if newVal == nil && oldVal != nil {
 					delete(items, oldVal.ID)

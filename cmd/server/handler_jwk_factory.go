@@ -6,6 +6,9 @@ import (
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/jwk"
 	"golang.org/x/net/context"
+	"github.com/square/go-jose"
+	"github.com/Sirupsen/logrus"
+	r "github.com/dancannon/gorethink"
 )
 
 func newJWKHandler(c *config.Config, router *httprouter.Router) *jwk.Handler {
@@ -19,18 +22,22 @@ func newJWKHandler(c *config.Config, router *httprouter.Router) *jwk.Handler {
 	switch con := ctx.Connection.(type) {
 	case *config.MemoryConnection:
 		ctx.KeyManager = &jwk.MemoryManager{}
-		h.Manager = ctx.KeyManager
 		break
 	case *config.RethinkDBConnection:
-		con.CreateTableIfNotExists("hydra_policies")
-		m := &jwk.RethinkManager{Session: con.GetSession()}
+		con.CreateTableIfNotExists("hydra_json_web_keys")
+		m := &jwk.RethinkManager{
+			Session: con.GetSession(),
+			Keys: map[string]jose.JsonWebKeySet{},
+			Table: r.Table("hydra_json_web_keys"),
+		}
 		m.ColdStart()
 		m.Watch(context.Background())
-		h.Manager = m
+		ctx.KeyManager = m
 		break
 	default:
-		panic("Unknown connection type.")
+		logrus.Fatalf("Unknown connection type.")
 	}
 
+	h.Manager = ctx.KeyManager
 	return h
 }

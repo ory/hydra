@@ -6,18 +6,20 @@ import (
 	"github.com/Sirupsen/logrus"
 	r "github.com/dancannon/gorethink"
 	"time"
+	"github.com/ory-am/hydra/pkg"
+	"github.com/go-errors/errors"
 )
 
 type MemoryConnection struct{}
 
 type RethinkDBConnection struct {
-	Session *r.Session
+	session *r.Session
 	URL     *url.URL
 }
 
 func (c *RethinkDBConnection) GetSession() *r.Session {
-	if c.Session != nil {
-		return c.Session
+	if c.session != nil {
+		return c.session
 	}
 
 	var err error
@@ -27,17 +29,15 @@ func (c *RethinkDBConnection) GetSession() *r.Session {
 		password, _ = c.URL.User.Password()
 		username = c.URL.User.Username()
 	}
-	for i := 0; i < 10; i++ {
+
+	if err := pkg.Retry(time.Second * 15, time.Minute * 2, func() error {
 		logrus.Infof("Connecting with RethinkDB: %s (%s) (%s)", c.URL.String(), c.URL.Host, database)
-		if c.Session, err = r.Connect(r.ConnectOpts{
+		if c.session, err = r.Connect(r.ConnectOpts{
 			Address:  c.URL.Host,
 			Username: username,
 			Password: password,
 		}); err != nil {
-			logrus.Warnf("Could not connect to RethinkDB: %s", err)
-			logrus.Warnf("Retrying in 5 seconds...")
-			time.Sleep(5 * time.Second)
-			continue
+			return errors.Errorf("Could not connect to RethinkDB: %s", err)
 		}
 
 		if _, err := r.DBList().Contains(database).Do(func(e r.Term) r.Term {
@@ -46,21 +46,18 @@ func (c *RethinkDBConnection) GetSession() *r.Session {
 				map[string]interface{}{"dbs_created": 0},
 				r.DBCreate(database),
 			)
-		}).RunWrite(c.Session); err != nil {
-			logrus.Fatalf("Could not create database: %s", err)
-			logrus.Warnf("Retrying in 5 seconds...")
-			time.Sleep(5 * time.Second)
-			continue
-		} else {
-			c.Session.Use(database)
-			logrus.Infof("Connected to RethinkDB!")
-			return c.Session
+		}).RunWrite(c.session); err != nil {
+			return errors.Errorf("Could not create database: %s", err)
 		}
 
+		c.session.Use(database)
+		logrus.Infof("Connected to RethinkDB!")
+		return nil
+	}); err != nil {
+		logrus.Fatalf("Could not connect to RethinkDB: %s", err)
 	}
 
-	logrus.Fatalf("Could not connect to RethinkDB: %s", err)
-	return nil
+	return c.session
 }
 
 func (c *RethinkDBConnection) CreateTableIfNotExists(table string) {

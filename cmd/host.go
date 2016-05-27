@@ -12,6 +12,7 @@ import (
 	"github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/spf13/cobra"
+	"time"
 )
 
 const (
@@ -43,6 +44,10 @@ func runHostCmd(cmd *cobra.Command, args []string) {
 	router := httprouter.New()
 	serverHandler := &server.Handler{}
 	serverHandler.Start(c, router)
+
+	logrus.Infof("Waiting for updates...")
+	time.Sleep(time.Second)
+	logrus.Infof("Done waiting.")
 
 	if ok, _ := cmd.Flags().GetBool("dangerous-auto-logon"); ok {
 		logrus.Warnln("Do not use flag --dangerous-auto-logon in production.")

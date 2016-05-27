@@ -42,11 +42,21 @@ Then, the web evolved into an elastic cloud that serves thousands of different u
 in every part of the world. Hydra is driven by the need for a scalable in memory
 OAuth2 and OpenID Connect layer, that integrates with every Identity Provider you can imagine.
 
-1. Hydra uses pub/sub to always have the latest data available in memory.
-2. Hydra scales effortlessly on every platform you can imagine, including Heroku, Cloud Foundry, Docker,
+1. **Real Time:** Hydra uses pub/sub to have the latest data available in memory.
+2. **Availability:** Hydra scales effortlessly on every platform you can imagine, including Heroku, Cloud Foundry, Docker,
 Google Container Engine and many more.
-3. Hydra uses cryptographic tokens for authenticate users and request their
+3. **Integration:** Hydra uses cryptographic tokens for authenticate users and request their
 consent, no APIs required. This makes integrating with Hydra as easy and secure as it gets.
+4. **Security:** Hydra leverages the security first OAuth2 framework **[Fosite](https://github.com/ory-am/fosite)**,
+encrypts important data at rest, and supports HTTP over TLS (https) out of the box.
+5. **Real Time Monitoring:** Real time monitoring is available through RethinkDB.
+6. **Admin Experience:** Hydra is easy to install and manage.
+
+### Real time monitoring
+
+Using RethinkDB, Hydra can be monitored in real time.
+
+![monitoring.gif](dist/monitoring.gif)
 
 ## Quickstart
 

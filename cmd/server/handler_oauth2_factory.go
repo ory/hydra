@@ -47,19 +47,19 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 		}
 		break
 	case *config.RethinkDBConnection:
-		con.CreateTableIfNotExists("hydra_authorize_code")
-		con.CreateTableIfNotExists("hydra_id_sessions")
-		con.CreateTableIfNotExists("hydra_access_token")
-		con.CreateTableIfNotExists("hydra_implicit")
-		con.CreateTableIfNotExists("hydra_refresh_token")
+		con.CreateTableIfNotExists("hydra_oauth2_authorize_code")
+		con.CreateTableIfNotExists("hydra_oauth2_id_sessions")
+		con.CreateTableIfNotExists("hydra_oauth2_access_token")
+		con.CreateTableIfNotExists("hydra_oauth2_implicit")
+		con.CreateTableIfNotExists("hydra_oauth2_refresh_token")
 		m := &internal.FositeRehinkDBStore{
 			Session:             con.GetSession(),
 			Manager:             clients,
-			AuthorizeCodesTable: r.Table("hydra_authorize_code"),
-			IDSessionsTable:     r.Table("hydra_id_sessions"),
-			AccessTokensTable:   r.Table("hydra_access_token"),
-			ImplicitTable:       r.Table("hydra_implicit"),
-			RefreshTokensTable:  r.Table("hydra_refresh_token"),
+			AuthorizeCodesTable: r.Table("hydra_oauth2_authorize_code"),
+			IDSessionsTable:     r.Table("hydra_oauth2_id_sessions"),
+			AccessTokensTable:   r.Table("hydra_oauth2_access_token"),
+			ImplicitTable:       r.Table("hydra_oauth2_implicit"),
+			RefreshTokensTable:  r.Table("hydra_oauth2_refresh_token"),
 			AuthorizeCodes:      make(map[string]*internal.RdbSchema),
 			IDSessions:          make(map[string]*internal.RdbSchema),
 			AccessTokens:        make(map[string]*internal.RdbSchema),
@@ -84,11 +84,9 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 	keys, err := km.GetKey(oauth2.OpenIDConnectKeyName, "private")
 	if errors.Is(err, pkg.ErrNotFound) {
 		logrus.Warnln("Could not find OpenID Connect singing keys. Generating a new keypair...")
-		k, err := new(jwk.RS256Generator).Generate("")
+		keys, err = new(jwk.RS256Generator).Generate("")
 		pkg.Must(err, "Could not generate signing key for OpenID Connect")
-		km.AddKeySet(oauth2.OpenIDConnectKeyName, k)
-		keys, err = km.GetKey(oauth2.OpenIDConnectKeyName, "private")
-		pkg.Must(err, "Could not fetch signing key for OpenID Connect")
+		km.AddKeySet(oauth2.OpenIDConnectKeyName, keys)
 		logrus.Warnln("Keypair generated.")
 		logrus.Warnln("WARNING: Automated key creation causes low entropy. Replace the keys as soon as possible.")
 	} else {

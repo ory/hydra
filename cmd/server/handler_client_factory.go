@@ -7,6 +7,7 @@ import (
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/herodot"
 	"golang.org/x/net/context"
+	r "github.com/dancannon/gorethink"
 )
 
 func newClientManager(c *config.Config) client.Manager {
@@ -19,8 +20,12 @@ func newClientManager(c *config.Config) client.Manager {
 			Hasher:  ctx.Hasher,
 		}
 	case *config.RethinkDBConnection:
-		con.CreateTableIfNotExists("hydra_policies")
-		m := &client.RethinkManager{Session: con.GetSession()}
+		con.CreateTableIfNotExists("hydra_clients")
+		m := &client.RethinkManager{
+			Session: con.GetSession(),
+			Table: r.Table("hydra_clients"),
+			Hasher:  ctx.Hasher,
+		}
 		m.ColdStart()
 		m.Watch(context.Background())
 		return m

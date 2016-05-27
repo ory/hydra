@@ -4,14 +4,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"time"
-
 	"net/http"
 	"net/url"
-
 	"crypto/tls"
 	"os"
 	"strconv"
-
 	"sync"
 
 	"github.com/Sirupsen/logrus"
@@ -26,6 +23,7 @@ import (
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
+	r "github.com/dancannon/gorethink"
 	"gopkg.in/yaml.v2"
 )
 
@@ -119,7 +117,8 @@ func (c *Config) Context() *Context {
 	case *RethinkDBConnection:
 		logrus.Printf("DATABASE_URL set, connecting to RethinkDB.")
 		con.CreateTableIfNotExists("hydra_policies")
-		m := &ladon.RethinkManager{Session: con.GetSession()}
+		m := &ladon.RethinkManager{Session: con.GetSession(),
+		Table: r.Table("hydra_policies")}
 		m.ColdStart()
 		m.Watch(context.Background())
 		manager = m

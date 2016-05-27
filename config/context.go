@@ -17,5 +17,5 @@ type Context struct {
 	LadonManager   ladon.Manager
 	FositeStrategy core.CoreStrategy
 	FositeStore    pkg.FositeStorer
-	KeyManager     *jwk.MemoryManager
+	KeyManager     jwk.Manager
 }

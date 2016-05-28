@@ -122,6 +122,28 @@ func BenchmarkRethinkGet(b *testing.B) {
 	}
 }
 
+func TestColdStartRethinkManager(t *testing.T) {
+	ks, _ := testGenerator.Generate("")
+	priv := ks.Key("private")
+
+	err := rethinkManager.AddKey("testcoldstart", First(priv))
+	assert.Nil(t, err)
+
+	time.Sleep(500 * time.Millisecond)
+	_, err = rethinkManager.GetKey("testcoldstart", "private")
+	assert.Nil(t, err)
+
+	rethinkManager.Keys = make(map[string]jose.JsonWebKeySet)
+	_, err = rethinkManager.GetKey("testcoldstart", "private")
+	assert.NotNil(t, err)
+
+	rethinkManager.ColdStart()
+	_, err = rethinkManager.GetKey("testcoldstart", "private")
+	assert.Nil(t, err)
+
+	rethinkManager.Keys = make(map[string]jose.JsonWebKeySet)
+}
+
 func TestManagerKey(t *testing.T) {
 	ks, _ := testGenerator.Generate("")
 	priv := ks.Key("private")
@@ -170,6 +192,7 @@ func TestManagerKey(t *testing.T) {
 
 func TestManagerKeySet(t *testing.T) {
 	ks, _ := testGenerator.Generate("")
+	ks.Key("private")
 
 	for name, m := range managers {
 		_, err := m.GetKeySet("foo")

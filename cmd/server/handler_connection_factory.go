@@ -6,6 +6,8 @@ import (
 	"github.com/ory-am/hydra/connection"
 	"github.com/ory-am/hydra/herodot"
 	"golang.org/x/net/context"
+	r "github.com/dancannon/gorethink"
+	"github.com/Sirupsen/logrus"
 )
 
 func newConnectionHandler(c *config.Config, router *httprouter.Router) *connection.Handler {
@@ -22,8 +24,13 @@ func newConnectionHandler(c *config.Config, router *httprouter.Router) *connecti
 		break
 	case *config.RethinkDBConnection:
 		con.CreateTableIfNotExists("hydra_policies")
-		m := &connection.RethinkManager{Session: con.GetSession()}
-		m.ColdStart()
+		m := &connection.RethinkManager{
+			Session: con.GetSession(),
+			Table: r.Table("hydra_policies"),
+		}
+		if err := m.ColdStart(); err != nil {
+			logrus.Fatalf("Could not fetch initial state: %s", err)
+		}
 		m.Watch(context.Background())
 		h.Manager = m
 		break

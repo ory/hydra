@@ -13,6 +13,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/net/context"
 	"gopkg.in/ory-am/dockertest.v2"
+	"github.com/pborman/uuid"
 )
 
 var rethinkManager *FositeRehinkDBStore
@@ -34,7 +35,7 @@ func TestMain(m *testing.M) {
 	var session *r.Session
 	var err error
 
-	c, err := dockertest.ConnectToRethinkDB(20, time.Second, func(url string) bool {
+	c, err := dockertest.ConnectToRethinkDB(20, time.Millisecond * 500, func(url string) bool {
 		if session, err = r.Connect(r.ConnectOpts{Address: url, Database: "hydra"}); err != nil {
 			return false
 		} else if _, err = r.DBCreate("hydra").RunWrite(session); err != nil {
@@ -70,11 +71,7 @@ func TestMain(m *testing.M) {
 			Implicit:            make(map[string]*RdbSchema),
 			RefreshTokens:       make(map[string]*RdbSchema),
 		}
-		err := rethinkManager.Watch(context.Background())
-		if err != nil {
-			logrus.Printf("Could not watch: %s", err)
-			return false
-		}
+		rethinkManager.Watch(context.Background())
 		return true
 	})
 	if session != nil {
@@ -103,6 +100,40 @@ var defaultRequest = fosite.Request{
 	Session:       &testSession{Foo: "bar"},
 }
 
+func TestColdStartRethinkManager(t *testing.T) {
+	ctx := context.Background()
+	m := rethinkManager
+	id := uuid.New()
+
+	err := m.CreateAuthorizeCodeSession(ctx, id, &defaultRequest)
+	pkg.AssertError(t, false, err)
+	err = m.CreateAccessTokenSession(ctx, id, &defaultRequest)
+	pkg.AssertError(t, false, err)
+
+	time.Sleep(time.Millisecond * 500)
+
+	_, err = m.GetAuthorizeCodeSession(ctx, id, &testSession{})
+	pkg.AssertError(t, false, err)
+	_, err = m.GetAccessTokenSession(ctx, id, &testSession{})
+	pkg.AssertError(t, false, err)
+
+	delete(rethinkManager.AuthorizeCodes, id)
+	delete(rethinkManager.AccessTokens, id)
+
+	_, err = m.GetAuthorizeCodeSession(ctx, id, &testSession{})
+	pkg.AssertError(t, true, err)
+	_, err = m.GetAccessTokenSession(ctx, id, &testSession{})
+	pkg.AssertError(t, true, err)
+
+	err = rethinkManager.ColdStart()
+	pkg.AssertError(t, false, err)
+
+	_, err = m.GetAuthorizeCodeSession(ctx, id, &testSession{})
+	pkg.AssertError(t, false, err)
+	_, err = m.GetAccessTokenSession(ctx, id, &testSession{})
+	pkg.AssertError(t, false, err)
+}
+
 func TestCreateGetDeleteAuthorizeCodes(t *testing.T) {
 	ctx := context.Background()
 	for k, m := range clientManagers {
@@ -112,7 +143,7 @@ func TestCreateGetDeleteAuthorizeCodes(t *testing.T) {
 		err = m.CreateAuthorizeCodeSession(ctx, "4321", &defaultRequest)
 		pkg.AssertError(t, false, err, "%s", k)
 
-		time.Sleep(time.Second)
+		time.Sleep(time.Millisecond * 500)
 
 		res, err := m.GetAuthorizeCodeSession(ctx, "4321", &testSession{})
 		pkg.RequireError(t, false, err, "%s", k)
@@ -121,7 +152,7 @@ func TestCreateGetDeleteAuthorizeCodes(t *testing.T) {
 		err = m.DeleteAuthorizeCodeSession(ctx, "4321")
 		pkg.AssertError(t, false, err, "%s", k)
 
-		time.Sleep(time.Second)
+		time.Sleep(time.Millisecond * 500)
 
 		_, err = m.GetAuthorizeCodeSession(ctx, "4321", &testSession{})
 		pkg.AssertError(t, true, err, "%s", k)
@@ -137,7 +168,7 @@ func TestCreateGetDeleteAccessTokenSession(t *testing.T) {
 		err = m.CreateAccessTokenSession(ctx, "4321", &defaultRequest)
 		pkg.AssertError(t, false, err, "%s", k)
 
-		time.Sleep(time.Second)
+		time.Sleep(time.Millisecond * 500)
 
 		res, err := m.GetAccessTokenSession(ctx, "4321", &testSession{})
 		pkg.RequireError(t, false, err, "%s", k)
@@ -146,7 +177,7 @@ func TestCreateGetDeleteAccessTokenSession(t *testing.T) {
 		err = m.DeleteAccessTokenSession(ctx, "4321")
 		pkg.AssertError(t, false, err, "%s", k)
 
-		time.Sleep(time.Second)
+		time.Sleep(time.Millisecond * 500)
 
 		_, err = m.GetAccessTokenSession(ctx, "4321", &testSession{})
 		pkg.AssertError(t, true, err, "%s", k)
@@ -162,7 +193,7 @@ func TestCreateGetDeleteOpenIDConnectSession(t *testing.T) {
 		err = m.CreateOpenIDConnectSession(ctx, "4321", &defaultRequest)
 		pkg.AssertError(t, false, err, "%s", k)
 
-		time.Sleep(time.Second)
+		time.Sleep(time.Millisecond * 500)
 
 		res, err := m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{
 			Session: &testSession{},
@@ -173,7 +204,7 @@ func TestCreateGetDeleteOpenIDConnectSession(t *testing.T) {
 		err = m.DeleteOpenIDConnectSession(ctx, "4321")
 		pkg.AssertError(t, false, err, "%s", k)
 
-		time.Sleep(time.Second)
+		time.Sleep(time.Millisecond * 500)
 
 		_, err = m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{})
 		pkg.AssertError(t, true, err, "%s", k)
@@ -188,7 +219,7 @@ func TestCreateGetDeleteRefreshTokenSession(t *testing.T) {
 		err = m.CreateRefreshTokenSession(ctx, "4321", &defaultRequest)
 		pkg.AssertError(t, false, err, "%s", k)
 
-		time.Sleep(time.Second)
+		time.Sleep(time.Millisecond * 500)
 
 		res, err := m.GetRefreshTokenSession(ctx, "4321", &testSession{})
 		pkg.RequireError(t, false, err, "%s", k)
@@ -197,7 +228,7 @@ func TestCreateGetDeleteRefreshTokenSession(t *testing.T) {
 		err = m.DeleteRefreshTokenSession(ctx, "4321")
 		pkg.AssertError(t, false, err, "%s", k)
 
-		time.Sleep(time.Second)
+		time.Sleep(time.Millisecond * 500)
 
 		_, err = m.GetRefreshTokenSession(ctx, "4321", &testSession{})
 		pkg.AssertError(t, true, err, "%s", k)

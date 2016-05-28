@@ -8,6 +8,7 @@ import (
 	"github.com/ory-am/hydra/herodot"
 	"golang.org/x/net/context"
 	r "github.com/dancannon/gorethink"
+	"github.com/Sirupsen/logrus"
 )
 
 func newClientManager(c *config.Config) client.Manager {
@@ -26,7 +27,9 @@ func newClientManager(c *config.Config) client.Manager {
 			Table: r.Table("hydra_clients"),
 			Hasher:  ctx.Hasher,
 		}
-		m.ColdStart()
+		if err := m.ColdStart(); err != nil {
+			logrus.Fatalf("Could not fetch initial state: %s", err)
+		}
 		m.Watch(context.Background())
 		return m
 	default:

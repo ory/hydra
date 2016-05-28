@@ -10,6 +10,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
+	"time"
 )
 
 type RethinkManager struct {
@@ -112,41 +113,36 @@ func (m *RethinkManager) publishDelete(id string) error {
 	return nil
 }
 
-func (m *RethinkManager) Watch(ctx context.Context) error {
-	clients, err := m.Table.Changes().Run(m.Session)
-	if err != nil {
-		return errors.New(err)
-	}
-
-	go func() {
-		for {
-			var update map[string]*fosite.DefaultClient
-			for clients.Next(&update) {
-				newVal := update["new_val"]
-				oldVal := update["old_val"]
-				m.Lock()
-				if newVal == nil && oldVal != nil {
-					delete(m.Clients, oldVal.GetID())
-				} else if newVal != nil && oldVal != nil {
-					delete(m.Clients, oldVal.GetID())
-					m.Clients[newVal.GetID()] = newVal
-				} else {
-					m.Clients[newVal.GetID()] = newVal
-				}
-				m.Unlock()
-
-				clients.Close()
-				if clients.Err() != nil {
-					pkg.LogError(errors.New(clients.Err()))
-				}
-
-				clients, err = m.Table.Changes().Run(m.Session)
-				if err != nil {
-					pkg.LogError(errors.New(clients.Err()))
-				}
-			}
+func (m *RethinkManager) Watch(ctx context.Context) {
+	go pkg.Retry(time.Second * 15, time.Minute, func() error {
+		clients, err := m.Table.Changes().Run(m.Session)
+		if err != nil {
+			return errors.New(err)
 		}
-	}()
+		defer clients.Close()
 
-	return nil
+		var update map[string]*fosite.DefaultClient
+		for clients.Next(&update) {
+			newVal := update["new_val"]
+			oldVal := update["old_val"]
+			m.Lock()
+			if newVal == nil && oldVal != nil {
+				delete(m.Clients, oldVal.GetID())
+			} else if newVal != nil && oldVal != nil {
+				delete(m.Clients, oldVal.GetID())
+				m.Clients[newVal.GetID()] = newVal
+			} else {
+				m.Clients[newVal.GetID()] = newVal
+			}
+			m.Unlock()
+		}
+
+
+		if clients.Err() != nil {
+			err = errors.New(clients.Err())
+			pkg.LogError(err)
+			return err
+		}
+		return nil
+	})
 }

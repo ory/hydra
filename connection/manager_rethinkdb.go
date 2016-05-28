@@ -8,11 +8,12 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/net/context"
+	"time"
 )
 
 type RethinkManager struct {
-	Session *r.Session
-	Table   r.Term
+	Session     *r.Session
+	Table       r.Term
 
 	Connections map[string]*Connection
 
@@ -101,41 +102,35 @@ func (m *RethinkManager) publishDelete(id string) error {
 	return nil
 }
 
-func (m *RethinkManager) Watch(ctx context.Context) error {
-	connections, err := m.Table.Changes().Run(m.Session)
-	if err != nil {
-		return errors.New(err)
-	}
-
-	go func() {
-		for {
-			var update map[string]*Connection
-			for connections.Next(&update) {
-				newVal := update["new_val"]
-				oldVal := update["old_val"]
-				m.Lock()
-				if newVal == nil && oldVal != nil {
-					delete(m.Connections, oldVal.GetID())
-				} else if newVal != nil && oldVal != nil {
-					delete(m.Connections, oldVal.GetID())
-					m.Connections[newVal.GetID()] = newVal
-				} else {
-					m.Connections[newVal.GetID()] = newVal
-				}
-				m.Unlock()
-
-				connections.Close()
-				if connections.Err() != nil {
-					pkg.LogError(errors.New(connections.Err()))
-				}
-
-				connections, err = m.Table.Changes().Run(m.Session)
-				if err != nil {
-					pkg.LogError(errors.New(connections.Err()))
-				}
-			}
+func (m *RethinkManager) Watch(ctx context.Context) {
+	go pkg.Retry(time.Second * 15, time.Minute, func() error {
+		connections, err := m.Table.Changes().Run(m.Session)
+		if err != nil {
+			return errors.New(err)
 		}
-	}()
+		defer connections.Close()
 
-	return nil
+		var update map[string]*Connection
+		for connections.Next(&update) {
+			newVal := update["new_val"]
+			oldVal := update["old_val"]
+			m.Lock()
+			if newVal == nil && oldVal != nil {
+				delete(m.Connections, oldVal.GetID())
+			} else if newVal != nil && oldVal != nil {
+				delete(m.Connections, oldVal.GetID())
+				m.Connections[newVal.GetID()] = newVal
+			} else {
+				m.Connections[newVal.GetID()] = newVal
+			}
+			m.Unlock()
+		}
+
+		if connections.Err() != nil {
+			err = errors.New(connections.Err())
+			pkg.LogError(err)
+			return err
+		}
+		return nil
+	})
 }

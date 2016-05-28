@@ -66,7 +66,9 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 			Implicit:            make(map[string]*internal.RdbSchema),
 			RefreshTokens:       make(map[string]*internal.RdbSchema),
 		}
-		m.ColdStart()
+		if err := m.ColdStart(); err != nil {
+			logrus.Fatalf("Could not fetch initial state: %s", err)
+		}
 		m.Watch(context.Background())
 		store = m
 		break

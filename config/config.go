@@ -28,31 +28,31 @@ import (
 )
 
 type Config struct {
-	BindPort int `mapstructure:"port" yaml:"port,omitempty"`
+	BindPort     int `mapstructure:"port" yaml:"port,omitempty"`
 
-	BindHost string `mapstructure:"host" yaml:"host,omitempty"`
+	BindHost     string `mapstructure:"host" yaml:"host,omitempty"`
 
-	Issuer string `mapstructure:"issuer" yaml:"issuer,omitempty"`
+	Issuer       string `mapstructure:"issuer" yaml:"issuer,omitempty"`
 
 	SystemSecret []byte `mapstructure:"system_secret" yaml:"-"`
 
-	DatabaseURL string `mapstructure:"DATABASE_URL" yaml:"database_url,omitempty"`
+	DatabaseURL  string `mapstructure:"database_url" yaml:"database_url,omitempty"`
 
-	ConsentURL string `mapstructure:"consent_url" yaml:"consent_url,omitempty"`
+	ConsentURL   string `mapstructure:"consent_url" yaml:"consent_url,omitempty"`
 
-	ClusterURL string `mapstructure:"cluster_url" yaml:"cluster_url,omitempty"`
+	ClusterURL   string `mapstructure:"cluster_url" yaml:"cluster_url,omitempty"`
 
-	ClientID string `mapstructure:"client_id" yaml:"client_id,omitempty"`
+	ClientID     string `mapstructure:"client_id" yaml:"client_id,omitempty"`
 
 	ClientSecret string `mapstructure:"client_secret" yaml:"client_secret,omitempty"`
 
-	ForceHTTP bool `mapstructure:"foolishly_force_http" yaml:"-"`
+	ForceHTTP    bool `mapstructure:"foolishly_force_http" yaml:"-"`
 
-	cluster *url.URL
+	cluster      *url.URL
 
 	oauth2Client *http.Client
 
-	context *Context
+	context      *Context
 
 	sync.Mutex
 }
@@ -117,10 +117,14 @@ func (c *Config) Context() *Context {
 	case *RethinkDBConnection:
 		logrus.Printf("DATABASE_URL set, connecting to RethinkDB.")
 		con.CreateTableIfNotExists("hydra_policies")
-		m := &ladon.RethinkManager{Session: con.GetSession(),
-		Table: r.Table("hydra_policies")}
-		m.ColdStart()
+		m := &ladon.RethinkManager{
+			Session: con.GetSession(),
+			Table: r.Table("hydra_policies"),
+		}
 		m.Watch(context.Background())
+		if err := m.ColdStart(); err != nil {
+			logrus.Fatalf("Could not fetch initial state: %s", err)
+		}
 		manager = m
 		break
 	default:
@@ -203,14 +207,15 @@ func (c *Config) GetSystemSecret() []byte {
 	c.Lock()
 	defer c.Unlock()
 
-	if len(c.SystemSecret) >= 8 {
+	if len(c.SystemSecret) >= 32 {
 		return c.SystemSecret
 	}
 
+	logrus.Warnf("Expected system secret to be at least %d characters long but only got %d characters.", 32, len(c.SystemSecret))
+	logrus.Warnln("Generating a random system secret...")
 	var err error
 	c.SystemSecret, err = pkg.GenerateSecret(32)
 	pkg.Must(err, "Could not generate global secret: %s", err)
-	logrus.Warnln("No system secret specified.")
 	logrus.Warnf("Generated system secret: %s", c.SystemSecret)
 	logrus.Warnln("Do not auto-generate system secrets in production.")
 	return c.SystemSecret

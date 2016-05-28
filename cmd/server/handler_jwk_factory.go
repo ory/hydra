@@ -30,7 +30,9 @@ func newJWKHandler(c *config.Config, router *httprouter.Router) *jwk.Handler {
 			Keys: map[string]jose.JsonWebKeySet{},
 			Table: r.Table("hydra_json_web_keys"),
 		}
-		m.ColdStart()
+		if err := m.ColdStart(); err != nil {
+			logrus.Fatalf("Could not fetch initial state: %s", err)
+		}
 		m.Watch(context.Background())
 		ctx.KeyManager = m
 		break

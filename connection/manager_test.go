@@ -89,11 +89,7 @@ func TestMain(m *testing.M) {
 			Table:       r.Table("hydra_clients"),
 			Connections: make(map[string]*Connection),
 		}
-		err := rethinkManager.Watch(context.Background())
-		if err != nil {
-			log.Printf("Could not watch: %s", err)
-			return false
-		}
+		rethinkManager.Watch(context.Background())
 		return true
 	})
 	if session != nil {

@@ -89,11 +89,7 @@ func TestMain(m *testing.M) {
 				WorkFactor: 4,
 			},
 		}
-		err := rethinkManager.Watch(context.Background())
-		if err != nil {
-			log.Printf("Could not watch: %s", err)
-			return false
-		}
+		rethinkManager.Watch(context.Background())
 		return true
 	})
 	if session != nil {
@@ -175,6 +171,29 @@ func BenchmarkRethinkAuthenticate(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_, _ = m.Authenticate("432", []byte("secret"))
 	}
+}
+
+func TestColdStartRethinkManager(t *testing.T) {
+	err := rethinkManager.CreateClient(&fosite.DefaultClient{
+		ID:                "2341234",
+		Secret:            []byte("secret"),
+		RedirectURIs:      []string{"http://redirect"},
+		TermsOfServiceURI: "foo",
+	})
+	assert.Nil(t, err)
+	time.Sleep(500 * time.Millisecond)
+	_, err = rethinkManager.GetClient("2341234")
+	assert.Nil(t, err)
+
+	rethinkManager.Clients = make(map[string]*fosite.DefaultClient)
+	_, err = rethinkManager.GetClient("2341234")
+	assert.NotNil(t, err)
+
+	rethinkManager.ColdStart()
+	_, err = rethinkManager.GetClient("2341234")
+	assert.Nil(t, err)
+
+	rethinkManager.Clients = make(map[string]*fosite.DefaultClient)
 }
 
 func TestCreateGetDeleteClient(t *testing.T) {

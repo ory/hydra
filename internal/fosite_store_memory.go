@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"github.com/ory-am/common/pkg"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/client"
 	"golang.org/x/net/context"
@@ -25,7 +24,7 @@ func (s *FositeMemoryStore) CreateOpenIDConnectSession(_ context.Context, author
 func (s *FositeMemoryStore) GetOpenIDConnectSession(_ context.Context, authorizeCode string, requester fosite.Requester) (fosite.Requester, error) {
 	cl, ok := s.IDSessions[authorizeCode]
 	if !ok {
-		return nil, pkg.ErrNotFound
+		return nil, fosite.ErrNotFound
 	}
 	return cl, nil
 }
@@ -43,7 +42,7 @@ func (s *FositeMemoryStore) CreateAuthorizeCodeSession(_ context.Context, code s
 func (s *FositeMemoryStore) GetAuthorizeCodeSession(_ context.Context, code string, _ interface{}) (fosite.Requester, error) {
 	rel, ok := s.AuthorizeCodes[code]
 	if !ok {
-		return nil, pkg.ErrNotFound
+		return nil, fosite.ErrNotFound
 	}
 	return rel, nil
 }
@@ -61,7 +60,7 @@ func (s *FositeMemoryStore) CreateAccessTokenSession(_ context.Context, signatur
 func (s *FositeMemoryStore) GetAccessTokenSession(_ context.Context, signature string, _ interface{}) (fosite.Requester, error) {
 	rel, ok := s.AccessTokens[signature]
 	if !ok {
-		return nil, pkg.ErrNotFound
+		return nil, fosite.ErrNotFound
 	}
 	return rel, nil
 }
@@ -79,7 +78,7 @@ func (s *FositeMemoryStore) CreateRefreshTokenSession(_ context.Context, signatu
 func (s *FositeMemoryStore) GetRefreshTokenSession(_ context.Context, signature string, _ interface{}) (fosite.Requester, error) {
 	rel, ok := s.RefreshTokens[signature]
 	if !ok {
-		return nil, pkg.ErrNotFound
+		return nil, fosite.ErrNotFound
 	}
 	return rel, nil
 }

@@ -109,13 +109,15 @@ Usage:
 Install the [CLI and Docker Toolbox](#installation). Make sure you install Docker Compose. On OSX and Windows,
 open the Docker Quickstart Terminal. On Linux open any terminal.
 
+We will use a dummy password as system secret: `SYSTEM_SECRET=passwordtutorialpasswordtutorial`. Use a very secure secret in production.
+
 **On OSX and Windows** using the Docker Quickstart Terminal.
 ```
 $ go get github.com/ory-am/hydra
 $ cd $GOPATH/src/github.com/ory-am/hydra
 $ DOCKER_IP=$(docker-machine ip default) docker-compose build
 [...]
-$ DOCKER_IP=$(docker-machine ip default) docker-compose up
+$ SYSTEM_SECRET=passwordtutorialpasswordtutorial DOCKER_IP=$(docker-machine ip default) docker-compose up
 Starting hydra_hydra
 Starting hydra_consent
 [...]
@@ -125,9 +127,9 @@ Starting hydra_consent
 ```
 $ go get github.com/ory-am/hydra
 $ cd $GOPATH/src/github.com/ory-am/hydra
-$ DOCKER_IP=localhost docker-compose build
+$ SYSTEM_SECRET=passwordtutorialpasswordtutorial DOCKER_IP=localhost docker-compose build
 [...]
-$ DOCKER_IP=localhost docker-compose up
+$ DOCKER_IP=tutorialpassword docker-compose up
 Starting hydra_hydra
 Starting hydra_consent
 [...]

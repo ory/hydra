@@ -61,7 +61,7 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 	subject := ejwt.ToString(t.Claims["sub"])
 	return &Session{
 		Subject: subject,
-		Session: &strategy.DefaultSession{
+		DefaultSession: &strategy.DefaultSession{
 			Claims: &ejwt.IDTokenClaims{
 				Audience:  a.GetClient().GetID(),
 				Subject:   subject,

@@ -19,6 +19,8 @@ func (g *RS256Generator) Generate(id string) (*jose.JsonWebKeySet, error) {
 		return nil, errors.Errorf("Validation failed because %s", err)
 	}
 
+	// jose does not support this...
+	key.Precomputed = rsa.PrecomputedValues{}
 	return &jose.JsonWebKeySet{
 		Keys: []jose.JsonWebKey{
 			jose.JsonWebKey{

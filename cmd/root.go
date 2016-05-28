@@ -90,6 +90,10 @@ func initConfig() {
 		c.ClientID = clientID
 	}
 
+	if systemSecret, ok := viper.Get("SYSTEM_SECRET").(string); ok {
+		c.SystemSecret = []byte(systemSecret)
+	}
+
 	if clientSecret, ok := viper.Get("CLIENT_SECRET").(string); ok {
 		c.ClientSecret = clientSecret
 	}

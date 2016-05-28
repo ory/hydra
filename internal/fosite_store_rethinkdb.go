@@ -49,6 +49,7 @@ type RdbSchema struct {
 func requestFromRDB(s *RdbSchema, proto interface{}) (*fosite.Request, error) {
 	if proto != nil {
 		if err := json.Unmarshal(s.Session, proto); err != nil {
+			pkg.LogError(errors.New(err))
 			return nil, errors.New(err)
 		}
 	}
@@ -81,6 +82,7 @@ func (m *FositeRehinkDBStore) ColdStart() error {
 func (s *FositeRehinkDBStore) publishInsert(table r.Term, id string, requester fosite.Requester) error {
 	sess, err := json.Marshal(requester.GetSession())
 	if err != nil {
+		pkg.LogError(errors.New(err))
 		return errors.New(err)
 	}
 
@@ -111,7 +113,7 @@ func (s *FositeRehinkDBStore) CreateOpenIDConnectSession(_ context.Context, auth
 func (s *FositeRehinkDBStore) GetOpenIDConnectSession(_ context.Context, authorizeCode string, requester fosite.Requester) (fosite.Requester, error) {
 	cl, ok := s.IDSessions[authorizeCode]
 	if !ok {
-		return nil, pkg.ErrNotFound
+		return nil, fosite.ErrNotFound
 	}
 	return requestFromRDB(cl, requester.GetSession())
 }
@@ -127,7 +129,7 @@ func (s *FositeRehinkDBStore) CreateAuthorizeCodeSession(_ context.Context, code
 func (s *FositeRehinkDBStore) GetAuthorizeCodeSession(_ context.Context, code string, sess interface{}) (fosite.Requester, error) {
 	rel, ok := s.AuthorizeCodes[code]
 	if !ok {
-		return nil, pkg.ErrNotFound
+		return nil, fosite.ErrNotFound
 	}
 
 	return requestFromRDB(rel, sess)
@@ -144,7 +146,7 @@ func (s *FositeRehinkDBStore) CreateAccessTokenSession(_ context.Context, signat
 func (s *FositeRehinkDBStore) GetAccessTokenSession(_ context.Context, signature string, sess interface{}) (fosite.Requester, error) {
 	rel, ok := s.AccessTokens[signature]
 	if !ok {
-		return nil, pkg.ErrNotFound
+		return nil, fosite.ErrNotFound
 	}
 
 	return requestFromRDB(rel, sess)
@@ -161,7 +163,7 @@ func (s *FositeRehinkDBStore) CreateRefreshTokenSession(_ context.Context, signa
 func (s *FositeRehinkDBStore) GetRefreshTokenSession(_ context.Context, signature string, sess interface{}) (fosite.Requester, error) {
 	rel, ok := s.RefreshTokens[signature]
 	if !ok {
-		return nil, pkg.ErrNotFound
+		return nil, fosite.ErrNotFound
 	}
 
 	return requestFromRDB(rel, sess)
@@ -199,23 +201,16 @@ func (s *FositeRehinkDBStore) PersistRefreshTokenGrantSession(ctx context.Contex
 	return nil
 }
 
-func (m *FositeRehinkDBStore) Watch(ctx context.Context) error {
-	if err := m.AccessTokens.watch(ctx, m.Session, m.RWMutex, m.AccessTokensTable); err != nil {
-		return err
-	} else if err := m.AuthorizeCodes.watch(ctx, m.Session, m.RWMutex, m.AuthorizeCodesTable); err != nil {
-		return err
-	} else if err := m.IDSessions.watch(ctx, m.Session, m.RWMutex, m.IDSessionsTable); err != nil {
-		return err
-	} else if err := m.Implicit.watch(ctx, m.Session, m.RWMutex, m.ImplicitTable); err != nil {
-		return err
-	} else if err := m.RefreshTokens.watch(ctx, m.Session, m.RWMutex, m.RefreshTokensTable); err != nil {
-		return err
-	}
-	return nil
+func (m *FositeRehinkDBStore) Watch(ctx context.Context) {
+	m.AccessTokens.watch(ctx, m.Session, m.RWMutex, m.AccessTokensTable)
+	m.AuthorizeCodes.watch(ctx, m.Session, m.RWMutex, m.AuthorizeCodesTable)
+	m.IDSessions.watch(ctx, m.Session, m.RWMutex, m.IDSessionsTable)
+	m.Implicit.watch(ctx, m.Session, m.RWMutex, m.ImplicitTable)
+	m.RefreshTokens.watch(ctx, m.Session, m.RWMutex, m.RefreshTokensTable)
 }
 
 func (items RDBItems) coldStart(sess *r.Session, lock sync.RWMutex, table r.Term) error {
-	clients, err := table.Run(sess)
+	rows, err := table.Run(sess)
 	if err != nil {
 		return errors.New(err)
 	}
@@ -223,48 +218,47 @@ func (items RDBItems) coldStart(sess *r.Session, lock sync.RWMutex, table r.Term
 	var item RdbSchema
 	lock.Lock()
 	defer lock.Unlock()
-	for clients.Next(&item) {
+	for rows.Next(&item) {
 		items[item.ID] = &item
 	}
 
+	if rows.Err() != nil {
+		return errors.New(rows.Err())
+	}
 	return nil
 }
 
-func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock sync.RWMutex, table r.Term) error {
-	changes, err := table.Changes().Run(sess)
-	if err != nil {
-		return errors.New(err)
-	}
-
-	go func() {
-		for {
-			var update = map[string]*RdbSchema{}
-			for changes.Next(&update) {
-				newVal := update["new_val"]
-				oldVal := update["old_val"]
-				lock.Lock()
-				if newVal == nil && oldVal != nil {
-					delete(items, oldVal.ID)
-				} else if newVal != nil && oldVal != nil {
-					delete(items, oldVal.ID)
-					items[newVal.ID] = newVal
-				} else {
-					items[newVal.ID] = newVal
-				}
-				lock.Unlock()
-			}
-
-			changes.Close()
-			if changes.Err() != nil {
-				pkg.LogError(errors.New(changes.Err()))
-			}
-
-			changes, err = table.Changes().Run(sess)
-			if err != nil {
-				pkg.LogError(errors.New(changes.Err()))
-			}
+func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock sync.RWMutex, table r.Term) {
+	go pkg.Retry(time.Second * 15, time.Minute, func() error {
+		changes, err := table.Changes().Run(sess)
+		if err != nil {
+			pkg.LogError(errors.New(err))
+			return errors.New(err)
 		}
-	}()
+		defer changes.Close()
 
-	return nil
+		var update = map[string]*RdbSchema{}
+		for changes.Next(&update) {
+			newVal := update["new_val"]
+			oldVal := update["old_val"]
+			lock.Lock()
+			if newVal == nil && oldVal != nil {
+				delete(items, oldVal.ID)
+			} else if newVal != nil && oldVal != nil {
+				delete(items, oldVal.ID)
+				items[newVal.ID] = newVal
+			} else {
+				items[newVal.ID] = newVal
+			}
+			lock.Unlock()
+		}
+
+		if changes.Err() != nil {
+			err = errors.New(changes.Err())
+			pkg.LogError(err)
+			return err
+		}
+
+		return nil
+	})
 }

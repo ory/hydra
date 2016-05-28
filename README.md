@@ -119,6 +119,8 @@ open the Docker Quickstart Terminal. On Linux open any terminal.
 ```
 $ go get github.com/ory-am/hydra
 $ cd $GOPATH/src/github.com/ory-am/hydra
+$ DOCKER_IP=$(docker-machine ip default) docker-compose build
+[...]
 $ DOCKER_IP=$(docker-machine ip default) docker-compose up
 Starting hydra_hydra
 Starting hydra_consent
@@ -129,6 +131,8 @@ Starting hydra_consent
 ```
 $ go get github.com/ory-am/hydra
 $ cd $GOPATH/src/github.com/ory-am/hydra
+$ DOCKER_IP=localhost docker-compose build
+[...]
 $ DOCKER_IP=localhost docker-compose up
 Starting hydra_hydra
 Starting hydra_consent
@@ -141,10 +145,7 @@ mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="client_secret: ,IvxGt
 [...]
 ```
 
-You have now a running hydra docker container! It is not backed by any database and runs completely in memory. Rebooting
-or any other sort of disruption will purge all data.
-
-*TBD: Provision with RethinkDB.*
+You have now a running hydra docker container! Additionally, a RethinkDB image was deployed and a consent app.
 
 Hydra can be managed with the hydra cli client. The client hast to log on before it is allowed to do anything.
 When hydra detects a new installation, a new temporary root client is created. The client credentials are printed by
@@ -238,5 +239,14 @@ go test ./... -race
 go run main.go
 ```
 
+If you want to run Hydra against RethinkDB, you can do so by using docker:
 
+```
 docker run --name some-rethink -d -p 8080:8080 -p 28015:28015 rethinkdb
+
+# Linux
+DATABASE_URL=rethinkdb://localhost:28015/hydra go run main.go
+
+# Docker Terminal
+DATABASE_URL=rethinkdb://$(docker-machine ip default):28015/hydra go run main.go
+```

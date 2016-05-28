@@ -17,12 +17,12 @@ func Retry(maxWait time.Duration, failAfter time.Duration, f func() error) (err 
 			return nil
 		}
 
-		if lastStart.Add(maxWait * 2).After(time.Now())	{
+		if lastStart.Add(maxWait * 2).Before(time.Now()) {
 			retryStart = time.Now()
 		}
 
 		logrus.Error(err)
-		logrus.Info("Retrying in %d seconds...", loopWait.Seconds())
+		logrus.Infof("Retrying in %f seconds...", loopWait.Seconds())
 		time.Sleep(loopWait)
 		loopWait = loopWait * loopWait
 		if loopWait > maxWait {

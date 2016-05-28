@@ -25,6 +25,6 @@ script:
   - goveralls -coverprofile="cover.out"
   - docker build -t hydra-travis-ci .
   - docker run -d hydra-travis-ci
-  - $GOPATH/bin/hydra host --dangerous-auto-logon
-  - sleep 1
+  - $GOPATH/bin/hydra host --dangerous-auto-logon &
+  - sleep 2
   - $GOPATH/bin/hydra token client --skip-tls-verify

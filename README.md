@@ -5,15 +5,13 @@
 [![Coverage Status](https://coveralls.io/repos/ory-am/hydra/badge.svg?branch=master&service=github)](https://coveralls.io/github/ory-am/hydra?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ory-am/hydra)](https://goreportcard.com/report/github.com/ory-am/hydra)
 
-
-Hydra is being developed at [Ory](https://ory.am). Join our [mailinglist](http://eepurl.com/bKT3N9) to stay on top of new developments.
+Hydra is being developed by german-based company [Ory](https://ory.am). Join our [mailinglist](http://eepurl.com/bKT3N9) to stay on top of new developments.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
 - [What is Hydra?](#what-is-hydra)
-- [Motivation](#motivation)
 - [Quickstart](#quickstart)
   - [Installation](#installation)
   - [Run the example](#run-the-example)
@@ -27,35 +25,28 @@ Hydra is being developed at [Ory](https://ory.am). Join our [mailinglist](http:/
 
 ## What is Hydra?
 
-1. Hydra is an OAuth2 and OpenID Connect provider built for availability. The distributed in-memory architecture allows for heavy duty workloads.
-2. Hydra works with every Identity Provider. The deprecated php-3.0 authentication service your intern wrote? It works with that too, don't worry.
-   See for yourself: **[React.js Identity Provider Example App](https://github.com/ory-am/hydra-idp-react).**
-3. Hydra does not use any templates, it is up to you what your front end should look like.
-4. Hydra is not *just* OAuth2. There are APIs for *two factor authentication, cryptographic key management,
-   social log on, policy based access control and policy management*.
-5. Hydra is available at [Docker Hub](https://hub.docker.com/r/oryam/hydra/).
-
-## Motivation
-
 At first, there was the monolith. The monolith worked well with the bespoke authentication module.
 Then, the web evolved into an elastic cloud that serves thousands of different user agents
-in every part of the world. Hydra is driven by the need for a scalable in memory
-OAuth2 and OpenID Connect layer, that integrates with every Identity Provider you can imagine.
+in every part of the world.
 
-1. **Real Time:** Hydra uses pub/sub to have the latest data available in memory.
-2. **Availability:** Hydra scales effortlessly on every platform you can imagine, including Heroku, Cloud Foundry, Docker,
+Hydra is driven by the need for a **scalable in memory
+OAuth2 and OpenID Connect** layer, that integrates with every Identity Provider you can imagine.
+
+Hydra is available through [Docker](https://hub.docker.com/r/oryam/hydra/).
+
+1. **Availability:** Hydra uses pub/sub to have the latest data available in memory. The in-memory architecture allows for heavy duty workloads.
+2. **Scalabilaty:** Hydra scales effortlessly on every platform you can imagine, including Heroku, Cloud Foundry, Docker,
 Google Container Engine and many more.
-3. **Integration:** Hydra uses cryptographic tokens for authenticate users and request their
-consent, no APIs required. This makes integrating with Hydra as easy and secure as it gets.
+3. **Integration:** Hydra uses cryptographic tokens for authenticate users and request their consent, no APIs required.
+Therefore, Hydra works with every Identity Provider. The deprecated php-3.0 authentication service your intern wrote? It works with that too, don't worry.
+We wrote an example with React to show you how this could look like: [React.js Identity Provider Example App](https://github.com/ory-am/hydra-idp-react).
 4. **Security:** Hydra leverages the security first OAuth2 framework **[Fosite](https://github.com/ory-am/fosite)**,
 encrypts important data at rest, and supports HTTP over TLS (https) out of the box.
-5. **Real Time Monitoring:** Real time monitoring is available through RethinkDB.
-6. **Admin Experience:** Hydra is easy to install and manage.
-
-### Real time monitoring
-
-Using RethinkDB, Hydra can be monitored in real time.
-
+5. **Ease of use:** Developers and Operators are human. Therefore, Hydra is easy to install and manage. Hydra does not care if you use React, Angular, or Cocoa for your user interface.
+To support you even further, there are APIs available for *cryptographic key management, social log on, policy based access control, policy management, and two factor authentication (tbd)*
+Hydra is packaged using [Docker](https://hub.docker.com/r/oryam/hydra/).
+6. **Open Source:** Hydra is licensed Apache Version 2.0
+7. **Real Time Monitoring:** Operation is a lot easier with real time monitoring. Because Hydra leverages RethinkDB, you get real time monitoring for free:
 ![monitoring.gif](dist/monitoring.gif)
 
 ## Quickstart

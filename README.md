@@ -12,6 +12,7 @@ Hydra is being developed by german-based company [Ory](https://ory.am). Join our
 **Table of Contents**
 
 - [What is Hydra?](#what-is-hydra)
+  - [Feature Overview](#feature-overview)
 - [Quickstart](#quickstart)
   - [Installation](#installation)
   - [Run the example](#run-the-example)
@@ -34,7 +35,7 @@ OAuth2 and OpenID Connect** layer, that integrates with every Identity Provider 
 
 Hydra is available through [Docker](https://hub.docker.com/r/oryam/hydra/).
 
-### Strengths
+### Feature Overview
 
 1. **Availability:** Hydra uses pub/sub to have the latest data available in memory. The in-memory architecture allows for heavy duty workloads.
 2. **Scalability:** Hydra scales effortlessly on every platform you can imagine, including Heroku, Cloud Foundry, Docker,

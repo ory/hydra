@@ -25,4 +25,4 @@ script:
   - goveralls -coverprofile="cover.out"
   - $GOPATH/bin/hydra
   - docker build -t hydra-travis-ci .
-  - ~/official-images/test/run.sh hydra-travis-ci
+  - docker run -d hydra-travis-ci

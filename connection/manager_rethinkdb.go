@@ -5,15 +5,16 @@ import (
 
 	r "github.com/dancannon/gorethink"
 
+	"time"
+
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/net/context"
-	"time"
 )
 
 type RethinkManager struct {
-	Session     *r.Session
-	Table       r.Term
+	Session *r.Session
+	Table   r.Term
 
 	Connections map[string]*Connection
 
@@ -103,7 +104,7 @@ func (m *RethinkManager) publishDelete(id string) error {
 }
 
 func (m *RethinkManager) Watch(ctx context.Context) {
-	go pkg.Retry(time.Second * 15, time.Minute, func() error {
+	go pkg.Retry(time.Second*15, time.Minute, func() error {
 		connections, err := m.Table.Changes().Run(m.Session)
 		if err != nil {
 			return errors.New(err)

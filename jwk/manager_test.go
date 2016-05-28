@@ -22,6 +22,7 @@ import (
 	"github.com/square/go-jose"
 	"golang.org/x/net/context"
 	"gopkg.in/ory-am/dockertest.v2"
+	"github.com/ory-am/fosite/rand"
 )
 
 var managers = map[string]Manager{}
@@ -78,13 +79,20 @@ func TestMain(m *testing.M) {
 			return false
 		}
 
+		key, err := rand.RandomBytes(32)
+		if err != nil {
+			log.Printf("Could not watch: %s", err)
+			return false
+		}
 		rethinkManager = &RethinkManager{
 			Keys:    map[string]jose.JsonWebKeySet{},
 			Session: session,
 			Table:   r.Table("hydra_keys"),
+			Cipher: &AEAD{
+				Key: key,
+			},
 		}
-		err := rethinkManager.Watch(context.Background())
-		if err != nil {
+		if err := rethinkManager.Watch(context.Background()); err != nil {
 			log.Printf("Could not watch: %s", err)
 			return false
 		}

@@ -1,14 +1,14 @@
 package server
 
 import (
+	"github.com/Sirupsen/logrus"
+	r "github.com/dancannon/gorethink"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/herodot"
 	"golang.org/x/net/context"
-	r "github.com/dancannon/gorethink"
-	"github.com/Sirupsen/logrus"
 )
 
 func newClientManager(c *config.Config) client.Manager {
@@ -24,7 +24,7 @@ func newClientManager(c *config.Config) client.Manager {
 		con.CreateTableIfNotExists("hydra_clients")
 		m := &client.RethinkManager{
 			Session: con.GetSession(),
-			Table: r.Table("hydra_clients"),
+			Table:   r.Table("hydra_clients"),
 			Hasher:  ctx.Hasher,
 		}
 		if err := m.ColdStart(); err != nil {

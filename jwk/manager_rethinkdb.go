@@ -17,6 +17,8 @@ type RethinkManager struct {
 	Table   r.Term
 	sync.RWMutex
 
+	Cipher *AEAD
+
 	Keys map[string]jose.JsonWebKeySet
 }
 
@@ -104,19 +106,23 @@ func (m *RethinkManager) alloc() {
 }
 
 type rethinkSchema struct {
-	KID string          `gorethink:"kid"`
-	Set string          `gorethink:"set"`
-	Key json.RawMessage `gorethink:"key"`
+	KID string `gorethink:"kid"`
+	Set string `gorethink:"set"`
+	Key string `gorethink:"key"`
 }
 
 func (m *RethinkManager) publishAdd(set string, keys []jose.JsonWebKey) error {
-	raws := make([]json.RawMessage, len(keys))
+	raws := make([]string, len(keys))
 	for k, key := range keys {
 		out, err := json.Marshal(key)
 		if err != nil {
 			return errors.New(err)
 		}
-		raws[k] = out
+		encrypted, err := m.Cipher.Encrypt(out)
+		if err != nil {
+			return errors.New(err)
+		}
+		raws[k] = encrypted
 	}
 
 	for k, raw := range raws {
@@ -167,7 +173,6 @@ func (m *RethinkManager) Watch(ctx context.Context) error {
 				m.Lock()
 				if newVal == nil && oldVal != nil {
 					m.watcherRemove(oldVal)
-
 				} else if newVal != nil && oldVal != nil {
 					m.watcherRemove(oldVal)
 					m.watcherInsert(newVal)
@@ -194,8 +199,15 @@ func (m *RethinkManager) Watch(ctx context.Context) error {
 
 func (m *RethinkManager) watcherInsert(val *rethinkSchema) {
 	var c jose.JsonWebKey
-	if err := json.Unmarshal(val.Key, &c); err != nil {
-		panic(err)
+	key, err := m.Cipher.Decrypt(val.Key)
+	if err != nil {
+		pkg.LogError(errors.New(err))
+		return
+	}
+
+	if err := json.Unmarshal(key, &c); err != nil {
+		pkg.LogError(errors.New(err))
+		return
 	}
 
 	keys := m.Keys[val.Set]
@@ -227,7 +239,12 @@ func (m *RethinkManager) ColdStart() error {
 	m.Lock()
 	defer m.Unlock()
 	for clients.Next(&raw) {
-		if err := json.Unmarshal(raw.Key, &key); err != nil {
+		pt, err := m.Cipher.Decrypt(raw.Key)
+		if err != nil {
+			return errors.New(err)
+		}
+
+		if err := json.Unmarshal(pt, &key); err != nil {
 			return errors.New(err)
 		}
 

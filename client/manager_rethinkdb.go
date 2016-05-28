@@ -3,6 +3,8 @@ package client
 import (
 	"sync"
 
+	"time"
+
 	r "github.com/dancannon/gorethink"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
@@ -10,7 +12,6 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
-	"time"
 )
 
 type RethinkManager struct {
@@ -114,7 +115,7 @@ func (m *RethinkManager) publishDelete(id string) error {
 }
 
 func (m *RethinkManager) Watch(ctx context.Context) {
-	go pkg.Retry(time.Second * 15, time.Minute, func() error {
+	go pkg.Retry(time.Second*15, time.Minute, func() error {
 		clients, err := m.Table.Changes().Run(m.Session)
 		if err != nil {
 			return errors.New(err)
@@ -136,7 +137,6 @@ func (m *RethinkManager) Watch(ctx context.Context) {
 			}
 			m.Unlock()
 		}
-
 
 		if clients.Err() != nil {
 			err = errors.New(clients.Err())

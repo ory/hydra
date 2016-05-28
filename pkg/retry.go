@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"time"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 )

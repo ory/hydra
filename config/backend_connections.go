@@ -3,11 +3,12 @@ package config
 import (
 	"net/url"
 
+	"time"
+
 	"github.com/Sirupsen/logrus"
 	r "github.com/dancannon/gorethink"
-	"time"
-	"github.com/ory-am/hydra/pkg"
 	"github.com/go-errors/errors"
+	"github.com/ory-am/hydra/pkg"
 )
 
 type MemoryConnection struct{}
@@ -30,7 +31,7 @@ func (c *RethinkDBConnection) GetSession() *r.Session {
 		username = c.URL.User.Username()
 	}
 
-	if err := pkg.Retry(time.Second * 15, time.Minute * 2, func() error {
+	if err := pkg.Retry(time.Second*15, time.Minute*2, func() error {
 		logrus.Infof("Connecting with RethinkDB: %s (%s) (%s)", c.URL.String(), c.URL.Host, database)
 		if c.session, err = r.Connect(r.ConnectOpts{
 			Address:  c.URL.Host,

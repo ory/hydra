@@ -1,17 +1,18 @@
 package config
 
 import (
+	"crypto/tls"
 	"fmt"
 	"io/ioutil"
-	"time"
 	"net/http"
 	"net/url"
-	"crypto/tls"
 	"os"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/Sirupsen/logrus"
+	r "github.com/dancannon/gorethink"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite/handler/core/strategy"
 	"github.com/ory-am/fosite/hash"
@@ -23,36 +24,35 @@ import (
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
-	r "github.com/dancannon/gorethink"
 	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
-	BindPort     int `mapstructure:"port" yaml:"port,omitempty"`
+	BindPort int `mapstructure:"port" yaml:"port,omitempty"`
 
-	BindHost     string `mapstructure:"host" yaml:"host,omitempty"`
+	BindHost string `mapstructure:"host" yaml:"host,omitempty"`
 
-	Issuer       string `mapstructure:"issuer" yaml:"issuer,omitempty"`
+	Issuer string `mapstructure:"issuer" yaml:"issuer,omitempty"`
 
 	SystemSecret []byte `mapstructure:"system_secret" yaml:"-"`
 
-	DatabaseURL  string `mapstructure:"database_url" yaml:"database_url,omitempty"`
+	DatabaseURL string `mapstructure:"database_url" yaml:"database_url,omitempty"`
 
-	ConsentURL   string `mapstructure:"consent_url" yaml:"consent_url,omitempty"`
+	ConsentURL string `mapstructure:"consent_url" yaml:"consent_url,omitempty"`
 
-	ClusterURL   string `mapstructure:"cluster_url" yaml:"cluster_url,omitempty"`
+	ClusterURL string `mapstructure:"cluster_url" yaml:"cluster_url,omitempty"`
 
-	ClientID     string `mapstructure:"client_id" yaml:"client_id,omitempty"`
+	ClientID string `mapstructure:"client_id" yaml:"client_id,omitempty"`
 
 	ClientSecret string `mapstructure:"client_secret" yaml:"client_secret,omitempty"`
 
-	ForceHTTP    bool `mapstructure:"foolishly_force_http" yaml:"-"`
+	ForceHTTP bool `mapstructure:"foolishly_force_http" yaml:"-"`
 
-	cluster      *url.URL
+	cluster *url.URL
 
 	oauth2Client *http.Client
 
-	context      *Context
+	context *Context
 
 	sync.Mutex
 }
@@ -119,7 +119,7 @@ func (c *Config) Context() *Context {
 		con.CreateTableIfNotExists("hydra_policies")
 		m := &ladon.RethinkManager{
 			Session: con.GetSession(),
-			Table: r.Table("hydra_policies"),
+			Table:   r.Table("hydra_policies"),
 		}
 		m.Watch(context.Background())
 		if err := m.ColdStart(); err != nil {

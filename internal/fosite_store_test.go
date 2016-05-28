@@ -11,9 +11,9 @@ import (
 	c "github.com/ory-am/common/pkg"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
 	"gopkg.in/ory-am/dockertest.v2"
-	"github.com/pborman/uuid"
 )
 
 var rethinkManager *FositeRehinkDBStore
@@ -35,7 +35,7 @@ func TestMain(m *testing.M) {
 	var session *r.Session
 	var err error
 
-	c, err := dockertest.ConnectToRethinkDB(20, time.Millisecond * 500, func(url string) bool {
+	c, err := dockertest.ConnectToRethinkDB(20, time.Millisecond*500, func(url string) bool {
 		if session, err = r.Connect(r.ConnectOpts{Address: url, Database: "hydra"}); err != nil {
 			return false
 		} else if _, err = r.DBCreate("hydra").RunWrite(session); err != nil {

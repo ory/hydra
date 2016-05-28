@@ -90,6 +90,7 @@ func TestMain(m *testing.M) {
 			Connections: make(map[string]*Connection),
 		}
 		rethinkManager.Watch(context.Background())
+		time.Sleep(500 * time.Millisecond)
 		return true
 	})
 	if session != nil {
@@ -118,7 +119,7 @@ func BenchmarkRethinkGet(b *testing.B) {
 	if err != nil {
 		b.Fatalf("%s", err)
 	}
-	time.Sleep(500 * time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
 
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
@@ -135,7 +136,7 @@ func TestCreateGetFindDelete(t *testing.T) {
 			err = store.Create(c)
 			pkg.RequireError(t, false, err)
 
-			time.Sleep(500 * time.Millisecond)
+			time.Sleep(100 * time.Millisecond)
 
 			res, err := store.Get(c.GetID())
 			pkg.RequireError(t, false, err)
@@ -153,7 +154,7 @@ func TestCreateGetFindDelete(t *testing.T) {
 			err = store.Delete(c.GetID())
 			pkg.RequireError(t, false, err)
 
-			time.Sleep(500 * time.Millisecond)
+			time.Sleep(100 * time.Millisecond)
 
 			_, err = store.Get(c.GetID())
 			pkg.RequireError(t, true, err)

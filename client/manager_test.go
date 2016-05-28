@@ -90,6 +90,7 @@ func TestMain(m *testing.M) {
 			},
 		}
 		rethinkManager.Watch(context.Background())
+		time.Sleep(100 * time.Millisecond)
 		return true
 	})
 	if session != nil {
@@ -141,7 +142,7 @@ func BenchmarkRethinkGet(b *testing.B) {
 	if err != nil {
 		b.Fatalf("%s", err)
 	}
-	time.Sleep(500 * time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
 
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
@@ -153,8 +154,9 @@ func BenchmarkRethinkAuthenticate(b *testing.B) {
 	b.StopTimer()
 
 	m := rethinkManager
+	id := uuid.New()
 	c := &fosite.DefaultClient{
-		ID:                "432",
+		ID:                id,
 		Secret:            []byte("secret"),
 		RedirectURIs:      []string{"http://redirect"},
 		TermsOfServiceURI: "foo",
@@ -165,11 +167,11 @@ func BenchmarkRethinkAuthenticate(b *testing.B) {
 	if err != nil {
 		b.Fatalf("%s", err)
 	}
-	time.Sleep(500 * time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
 
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = m.Authenticate("432", []byte("secret"))
+		_, _ = m.Authenticate(id, []byte("secret"))
 	}
 }
 
@@ -181,7 +183,7 @@ func TestColdStartRethinkManager(t *testing.T) {
 		TermsOfServiceURI: "foo",
 	})
 	assert.Nil(t, err)
-	time.Sleep(500 * time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
 	_, err = rethinkManager.GetClient("2341234")
 	assert.Nil(t, err)
 
@@ -230,7 +232,7 @@ func TestCreateGetDeleteClient(t *testing.T) {
 		pkg.AssertError(t, false, err, "%s", k)
 
 		// RethinkDB delay
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
 
 		_, err = m.GetClient("1234")
 		pkg.AssertError(t, true, err, "%s", k)

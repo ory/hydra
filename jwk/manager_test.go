@@ -92,10 +92,8 @@ func TestMain(m *testing.M) {
 				Key: key,
 			},
 		}
-		if err := rethinkManager.Watch(context.Background()); err != nil {
-			log.Printf("Could not watch: %s", err)
-			return false
-		}
+		rethinkManager.Watch(context.Background())
+		time.Sleep(100 * time.Millisecond)
 		return true
 	})
 	if session != nil {
@@ -137,7 +135,7 @@ func TestColdStartRethinkManager(t *testing.T) {
 	err := rethinkManager.AddKey("testcoldstart", First(priv))
 	assert.Nil(t, err)
 
-	time.Sleep(500 * time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
 	_, err = rethinkManager.GetKey("testcoldstart", "private")
 	assert.Nil(t, err)
 

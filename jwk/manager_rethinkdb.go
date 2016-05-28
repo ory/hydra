@@ -10,6 +10,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/square/go-jose"
 	"golang.org/x/net/context"
+	"time"
 )
 
 type RethinkManager struct {
@@ -17,9 +18,9 @@ type RethinkManager struct {
 	Table   r.Term
 	sync.RWMutex
 
-	Cipher *AEAD
+	Cipher  *AEAD
 
-	Keys map[string]jose.JsonWebKeySet
+	Keys    map[string]jose.JsonWebKeySet
 }
 
 func (m *RethinkManager) SetUpIndex() error {
@@ -158,43 +159,37 @@ func (m *RethinkManager) publishDelete(set string, keys []jose.JsonWebKey) error
 	return nil
 }
 
-func (m *RethinkManager) Watch(ctx context.Context) error {
-	connections, err := m.Table.Changes().Run(m.Session)
-	if err != nil {
-		return errors.New(err)
-	}
-
-	go func() {
-		for {
-			var update map[string]*rethinkSchema
-			for connections.Next(&update) {
-				newVal := update["new_val"]
-				oldVal := update["old_val"]
-				m.Lock()
-				if newVal == nil && oldVal != nil {
-					m.watcherRemove(oldVal)
-				} else if newVal != nil && oldVal != nil {
-					m.watcherRemove(oldVal)
-					m.watcherInsert(newVal)
-				} else {
-					m.watcherInsert(newVal)
-				}
-				m.Unlock()
-			}
-
-			connections.Close()
-			if connections.Err() != nil {
-				pkg.LogError(errors.New(connections.Err()))
-			}
-
-			connections, err = m.Table.Changes().Run(m.Session)
-			if err != nil {
-				pkg.LogError(errors.New(connections.Err()))
-			}
+func (m *RethinkManager) Watch(ctx context.Context) {
+	go pkg.Retry(time.Second * 15, time.Minute, func() error {
+		connections, err := m.Table.Changes().Run(m.Session)
+		if err != nil {
+			return errors.New(err)
 		}
-	}()
+		defer connections.Close()
 
-	return nil
+		var update map[string]*rethinkSchema
+		for connections.Next(&update) {
+			newVal := update["new_val"]
+			oldVal := update["old_val"]
+			m.Lock()
+			if newVal == nil && oldVal != nil {
+				m.watcherRemove(oldVal)
+			} else if newVal != nil && oldVal != nil {
+				m.watcherRemove(oldVal)
+				m.watcherInsert(newVal)
+			} else {
+				m.watcherInsert(newVal)
+			}
+			m.Unlock()
+		}
+
+		if connections.Err() != nil {
+			err = errors.New(connections.Err())
+			pkg.LogError(err)
+			return err
+		}
+		return nil
+	})
 }
 
 func (m *RethinkManager) watcherInsert(val *rethinkSchema) {

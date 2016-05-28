@@ -60,11 +60,11 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 			AccessTokensTable:   r.Table("hydra_oauth2_access_token"),
 			ImplicitTable:       r.Table("hydra_oauth2_implicit"),
 			RefreshTokensTable:  r.Table("hydra_oauth2_refresh_token"),
-			AuthorizeCodes:      make(map[string]*internal.RdbSchema),
-			IDSessions:          make(map[string]*internal.RdbSchema),
-			AccessTokens:        make(map[string]*internal.RdbSchema),
-			Implicit:            make(map[string]*internal.RdbSchema),
-			RefreshTokens:       make(map[string]*internal.RdbSchema),
+			AuthorizeCodes:      make(internal.RDBItems),
+			IDSessions:          make(internal.RDBItems),
+			AccessTokens:        make(internal.RDBItems),
+			Implicit:            make(internal.RDBItems),
+			RefreshTokens:       make(internal.RDBItems),
 		}
 		if err := m.ColdStart(); err != nil {
 			logrus.Fatalf("Could not fetch initial state: %s", err)

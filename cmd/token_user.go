@@ -46,7 +46,10 @@ var tokenUserCmd = &cobra.Command{
 		pkg.Must(err, "Could not generate random state: %s", err)
 
 		location := conf.AuthCodeURL(string(state)) + "&nonce=" + string(nonce)
-		webbrowser.Open(location)
+
+		if ok, _ := cmd.Flags().GetBool("no-open"); !ok {
+			webbrowser.Open(location)
+		}
 		fmt.Printf("If your browser does not open automatically, navigate to: %s\n", location)
 
 		fmt.Println("Setting up callback listener on http://localhost:4445/callback")
@@ -102,4 +105,5 @@ var tokenUserCmd = &cobra.Command{
 
 func init() {
 	tokenCmd.AddCommand(tokenUserCmd)
+	tokenUserCmd.Flags().Bool("no-open", false, "Do not open a browser window with the authorize url")
 }

@@ -23,10 +23,10 @@ func TestExecute(t *testing.T) {
 	}{
 		{
 			args:    []string{"host", "--dangerous-auto-logon"},
-			timeout: 10 * time.Second,
+			timeout: time.Second,
 		},
 		{
-			args:    []string{"token", "user"},
+			args:    []string{"token", "user", "--no-open"},
 			timeout: time.Second,
 		},
 		{args: []string{"clients", "create", "--id", "foobarbaz"}},

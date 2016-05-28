@@ -34,8 +34,10 @@ OAuth2 and OpenID Connect** layer, that integrates with every Identity Provider 
 
 Hydra is available through [Docker](https://hub.docker.com/r/oryam/hydra/).
 
+### Strengths
+
 1. **Availability:** Hydra uses pub/sub to have the latest data available in memory. The in-memory architecture allows for heavy duty workloads.
-2. **Scalabilaty:** Hydra scales effortlessly on every platform you can imagine, including Heroku, Cloud Foundry, Docker,
+2. **Scalability:** Hydra scales effortlessly on every platform you can imagine, including Heroku, Cloud Foundry, Docker,
 Google Container Engine and many more.
 3. **Integration:** Hydra uses cryptographic tokens for authenticate users and request their consent, no APIs required.
 Therefore, Hydra works with every Identity Provider. The deprecated php-3.0 authentication service your intern wrote? It works with that too, don't worry.

@@ -114,7 +114,7 @@ func (m *RethinkManager) publishDelete(id string) error {
 	return nil
 }
 
-func (m *RethinkManager) Watch(ctx context.Context) error {
+func (m *RethinkManager) Watch(ctx context.Context) {
 	go pkg.Retry(time.Second*15, time.Minute, func() error {
 		clients, err := m.Table.Changes().Run(m.Session)
 		if err != nil {

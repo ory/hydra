@@ -241,9 +241,10 @@ Unless you want to test Hydra against a database, developing with Hydra is as ea
 
 ```
 go get github.com/ory-am/hydra
+go get github.com/Masterminds/glide
 cd $GOPATH/src/github.com/ory-am/hydra
-git checkout -b develop
-go test ./... -race
+glide install
+go test ./...
 go run main.go
 ```
 

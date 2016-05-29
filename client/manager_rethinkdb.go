@@ -115,14 +115,11 @@ func (m *RethinkManager) publishDelete(id string) error {
 }
 
 func (m *RethinkManager) Watch(ctx context.Context) error {
-	var errCh = make(chan error)
 	go pkg.Retry(time.Second*15, time.Minute, func() error {
 		clients, err := m.Table.Changes().Run(m.Session)
 		if err != nil {
-			errCh <- errors.New(err)
 			return errors.New(err)
 		}
-		errCh <- err
 		defer clients.Close()
 
 		var update map[string]*fosite.DefaultClient
@@ -148,6 +145,4 @@ func (m *RethinkManager) Watch(ctx context.Context) error {
 		}
 		return nil
 	})
-
-	return <-errCh
 }

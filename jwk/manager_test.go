@@ -19,10 +19,10 @@ import (
 	"os"
 	"time"
 
+	"github.com/ory-am/fosite/rand"
 	"github.com/square/go-jose"
 	"golang.org/x/net/context"
 	"gopkg.in/ory-am/dockertest.v2"
-	"github.com/ory-am/fosite/rand"
 )
 
 var managers = map[string]Manager{}

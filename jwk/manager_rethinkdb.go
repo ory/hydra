@@ -18,9 +18,9 @@ type RethinkManager struct {
 	Table   r.Term
 	sync.RWMutex
 
-	Cipher  *AEAD
+	Cipher *AEAD
 
-	Keys    map[string]jose.JsonWebKeySet
+	Keys map[string]jose.JsonWebKeySet
 }
 
 func (m *RethinkManager) SetUpIndex() error {
@@ -160,7 +160,7 @@ func (m *RethinkManager) publishDelete(set string, keys []jose.JsonWebKey) error
 }
 
 func (m *RethinkManager) Watch(ctx context.Context) {
-	go pkg.Retry(time.Second * 15, time.Minute, func() error {
+	go pkg.Retry(time.Second*15, time.Minute, func() error {
 		connections, err := m.Table.Changes().Run(m.Session)
 		if err != nil {
 			return errors.New(err)

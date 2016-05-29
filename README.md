@@ -30,10 +30,10 @@ At first, there was the monolith. The monolith worked well with the bespoke auth
 Then, the web evolved into an elastic cloud that serves thousands of different user agents
 in every part of the world.
 
-Hydra is driven by the need for a **scalable in memory
-OAuth2 and OpenID Connect** layer, that integrates with every Identity Provider you can imagine.
+Hydra is driven by the need for a **scalable, low-latency, in memory
+Access Control, OAuth2, and OpenID Connect layer** that integrates with every identity provider you can imagine.
 
-Hydra is available through [Docker](https://hub.docker.com/r/oryam/hydra/).
+Hydra is available through [Docker](https://hub.docker.com/r/oryam/hydra/) and relies on RethinkDB for persistence. Database drivers are extensible, in case you want to use RabbitMQ, MySQL, MongoDB, or some other database instead.
 
 ### Feature Overview
 

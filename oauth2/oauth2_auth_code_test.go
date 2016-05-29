@@ -55,15 +55,12 @@ func TestAuthCode(t *testing.T) {
 	pkg.RequireError(t, false, err)
 	defer resp.Body.Close()
 
-	out, err := ioutil.ReadAll(resp.Body)
+	_, err = ioutil.ReadAll(resp.Body)
 	pkg.RequireError(t, false, err)
-	t.Logf("Got response: %s", out)
 
 	require.True(t, validConsent)
 	require.NotEmpty(t, code)
 
-	ot, err := oauthConfig.Exchange(oauth2.NoContext, code)
+	_, err = oauthConfig.Exchange(oauth2.NoContext, code)
 	pkg.RequireError(t, false, err)
-
-	t.Logf("OAuth2 Token: %v", ot)
 }

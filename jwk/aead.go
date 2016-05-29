@@ -1,13 +1,12 @@
 package jwk
 
 import (
-	"crypto/cipher"
-	"fmt"
 	"crypto/aes"
-	"encoding/base64"
-	"io"
+	"crypto/cipher"
 	"crypto/rand"
+	"encoding/base64"
 	"github.com/go-errors/errors"
+	"io"
 )
 
 type AEAD struct {
@@ -37,7 +36,7 @@ func (c *AEAD) Encrypt(plaintext []byte) (string, error) {
 	}
 
 	ciphertext := aesgcm.Seal(nil, nonce, plaintext, nil)
-	return  base64.URLEncoding.EncodeToString(append(ciphertext, nonce...)), nil
+	return base64.URLEncoding.EncodeToString(append(ciphertext, nonce...)), nil
 }
 
 func (c *AEAD) Decrypt(ciphertext string) ([]byte, error) {
@@ -66,6 +65,5 @@ func (c *AEAD) Decrypt(ciphertext string) ([]byte, error) {
 		return []byte{}, errors.New(err)
 	}
 
-	fmt.Printf("%s\n", string(plaintext))
 	return plaintext, nil
 }

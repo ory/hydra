@@ -20,7 +20,8 @@ install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images
 
 script:
-  - go test -race -bench=. $(go list ./... | grep -v /vendor | grep -v /cmd)
+  - go test -bench=.* -run=nothing $(go list ./... | grep -v /vendor)
+  - go test -race -bench=.* $(go list ./... | grep -v /vendor | grep -v /cmd)
   - gotestcover -coverprofile="cover.out" $(go list ./... | grep -v /vendor/)
   - goveralls -coverprofile="cover.out"
   - docker build -t hydra-travis-ci .

@@ -75,16 +75,21 @@ $ docker run -d -p 4444:4444 oryam/hydra --name my-hydra
 ec91228cb105db315553499c81918258f52cee9636ea2a4821bdb8226872f54b
 ```
 
-**The CLI client** is available at [gobuild.io](https://gobuild.io/ory-am/hydra) or through
-the [releases tab](https://github.com/ory-am/hydra/releases).
+**The CLI client is available at **[gobuild.io](https://gobuild.io/ory-am/hydra)**.
 
-There is currently no installer which adds the client to your path automatically. You have to set up the path yourself.
+There is currently no installer which adds the CLI to your path automatically. You have to set up the path yourself.
 If you do not understand what that means, ask on our [Gitter channel](https://gitter.im/ory-am/hydra).
 
 If you wish to compile the CLI yourself, you need to install and set up [Go](https://golang.org/) and add `$GOPATH/bin`
 to your `$PATH`. Here is a [comprehensive Go installation guide](https://github.com/ory-am/workshop-dbg#googles-go-language) with screenshots.
 
+To install the CLI from source, execute:
+
 ```
+go get github.com/ory-am/hydra
+go get github.com/Masterminds/glide
+cd $GOPATH/src/github.com/ory-am/hydra
+glide install
 go install github.com/ory-am/hydra
 hydra
 ```
@@ -93,7 +98,7 @@ Alternatively, you can use the CLI in Docker (not recommended):
 
 ```
 $ docker exec -i -t <hydra-container-id> /bin/bash
-# e.g. docker exec -i -t ec /bin/bash
+# e.g. docker exec -i -t ec12 /bin/bash
 
 root@ec91228cb105:/go/src/github.com/ory-am/hydra# hydra
 Hydra is a twelve factor OAuth2 and OpenID Connect provider

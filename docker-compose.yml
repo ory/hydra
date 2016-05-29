@@ -7,8 +7,7 @@ services:
       context: .
       dockerfile: Dockerfile-dangerous
     volumes:
-      - ./.docker-home:/root
-      - ./dist:/dist
+      - hydravolume:/root
     links:
       - rethinkdb:database
     ports:
@@ -26,8 +25,7 @@ services:
     links:
       - hydra
     volumes:
-      - ./.docker-home:/root
-      - ./dist:/dist
+      - hydravolume:/root
     ports:
       - "3000:3000"
 
@@ -37,3 +35,7 @@ services:
           - "8080:8080"
           - "28015:28015"
           - "29015:29015"
+
+volumes:
+  hydravolume:
+    driver: local

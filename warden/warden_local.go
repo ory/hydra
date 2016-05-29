@@ -12,13 +12,14 @@ import (
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/ladon"
 	"golang.org/x/net/context"
+	"github.com/ory-am/hydra/pkg"
 )
 
 type LocalWarden struct {
 	Warden         ladon.Warden
 	TokenValidator *core.CoreValidator
 
-	Issuer string
+	Issuer         string
 }
 
 func (w *LocalWarden) actionAllowed(ctx context.Context, a *ladon.Request, scopes []string, oauthRequest fosite.AccessRequester, session *oauth2.Session) (*Context, error) {
@@ -66,7 +67,9 @@ func (w *LocalWarden) HTTPActionAllowed(ctx context.Context, r *http.Request, a 
 	var session = new(oauth2.Session)
 	var oauthRequest = fosite.NewAccessRequest(session)
 
-	if err := w.TokenValidator.ValidateRequest(ctx, r, oauthRequest); err != nil {
+	if err := w.TokenValidator.ValidateRequest(ctx, r, oauthRequest); errors.Is(err, fosite.ErrUnknownRequest) {
+		return nil, pkg.ErrUnauthorized
+	} else if err != nil {
 		return nil, err
 	}
 
@@ -99,7 +102,9 @@ func (w *LocalWarden) HTTPAuthorized(ctx context.Context, r *http.Request, scope
 	var session = new(oauth2.Session)
 	var oauthRequest = fosite.NewAccessRequest(session)
 
-	if err := w.TokenValidator.ValidateRequest(ctx, r, oauthRequest); err != nil {
+	if err := w.TokenValidator.ValidateRequest(ctx, r, oauthRequest); errors.Is(err, fosite.ErrUnknownRequest) {
+		return nil, fosite.ErrRequestUnauthorized
+	} else if err != nil {
 		return nil, err
 	}
 

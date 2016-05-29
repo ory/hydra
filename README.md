@@ -40,8 +40,8 @@ Hydra is available through [Docker](https://hub.docker.com/r/oryam/hydra/).
 1. **Availability:** Hydra uses pub/sub to have the latest data available in memory. The in-memory architecture allows for heavy duty workloads.
 2. **Scalability:** Hydra scales effortlessly on every platform you can imagine, including Heroku, Cloud Foundry, Docker,
 Google Container Engine and many more.
-3. **Integration:** Hydra uses cryptographic tokens for authenticate users and request their consent, no APIs required.
-Therefore, Hydra works with every Identity Provider. The deprecated php-3.0 authentication service your intern wrote? It works with that too, don't worry.
+3. **Integration:** Hydra wraps your existing stack like a blanket and keeps it safe. Hydra uses cryptographic tokens for authenticate users and request their consent, no APIs required.
+The deprecated php-3.0 authentication service your intern wrote? It works with that too, don't worry.
 We wrote an example with React to show you how this could look like: [React.js Identity Provider Example App](https://github.com/ory-am/hydra-idp-react).
 4. **Security:** Hydra leverages the security first OAuth2 framework **[Fosite](https://github.com/ory-am/fosite)**,
 encrypts important data at rest, and supports HTTP over TLS (https) out of the box.
@@ -49,7 +49,9 @@ encrypts important data at rest, and supports HTTP over TLS (https) out of the b
 To support you even further, there are APIs available for *cryptographic key management, social log on, policy based access control, policy management, and two factor authentication (tbd)*
 Hydra is packaged using [Docker](https://hub.docker.com/r/oryam/hydra/).
 6. **Open Source:** Hydra is licensed Apache Version 2.0
-7. **Real Time Monitoring:** Operation is a lot easier with real time monitoring. Because Hydra leverages RethinkDB, you get real time monitoring for free:
+7. **Professional:** Hydra implements peer reviewed open standards published by [The Internet Engineering Task Force (IETF®)](https://www.ietf.org/) and the [OpenID Foundation](https://openid.net/)
+and under supervision of the [LMU Teaching and Research Unit Programming and Modelling Languages](http://www.en.pms.ifi.lmu.de). No funny business.
+8. **Real Time:** Operation is a lot easier with real time monitoring. Because Hydra leverages RethinkDB, you get real time monitoring for free:
 ![monitoring.gif](dist/monitoring.gif)
 
 ## Quickstart
@@ -116,10 +118,15 @@ We will use a dummy password as system secret: `SYSTEM_SECRET=passwordtutorialpa
 $ go get github.com/ory-am/hydra
 $ cd $GOPATH/src/github.com/ory-am/hydra
 $ DOCKER_IP=$(docker-machine ip default) docker-compose build
+WARNING: The SYSTEM_SECRET variable is not set. Defaulting to a blank string.
+rethinkdb uses an image, skipping
+Building hydra
 [...]
 $ SYSTEM_SECRET=passwordtutorialpasswordtutorial DOCKER_IP=$(docker-machine ip default) docker-compose up
-Starting hydra_hydra
-Starting hydra_consent
+Starting hydra_rethinkdb_1
+Recreating hydra_hydra_1
+Recreating hydra_consent_1
+Attaching to hydra_rethinkdb_1, hydra_hydra_1, hydra_consent_1
 [...]
 ```
 
@@ -127,11 +134,16 @@ Starting hydra_consent
 ```
 $ go get github.com/ory-am/hydra
 $ cd $GOPATH/src/github.com/ory-am/hydra
-$ SYSTEM_SECRET=passwordtutorialpasswordtutorial DOCKER_IP=localhost docker-compose build
+$ DOCKER_IP=localhost docker-compose build
+WARNING: The SYSTEM_SECRET variable is not set. Defaulting to a blank string.
+rethinkdb uses an image, skipping
+Building hydra
 [...]
-$ DOCKER_IP=tutorialpassword docker-compose up
-Starting hydra_hydra
-Starting hydra_consent
+$ SYSTEM_SECRET=passwordtutorialpasswordtutorial DOCKER_IP=tutorialpassword docker-compose up
+Starting hydra_rethinkdb_1
+Recreating hydra_hydra_1
+Recreating hydra_consent_1
+Attaching to hydra_rethinkdb_1, hydra_hydra_1, hydra_consent_1
 [...]
 mhydra   | mtime="2016-05-17T18:09:28Z" level=warning msg="Generated system secret: MnjFP5eLIr60h?hLI1h-!<4(TlWjAHX7"
 [...]

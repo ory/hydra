@@ -59,6 +59,10 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 	}
 
 	subject := ejwt.ToString(t.Claims["sub"])
+	for _, scope := range toStringSlice(t.Claims["scp"]) {
+		a.GrantScope(scope)
+	}
+
 	return &Session{
 		Subject: subject,
 		DefaultSession: &strategy.DefaultSession{
@@ -76,10 +80,18 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 
 }
 
+func toStringSlice(i interface{}) []string {
+	r, ok := i.([]string)
+	if !ok {
+		return []string{}
+	}
+	return r
+}
+
 func (s *DefaultConsentStrategy) IssueChallenge(authorizeRequest fosite.AuthorizeRequester, redirectURL string) (string, error) {
 	token := jwt.New(jwt.SigningMethodRS256)
 	token.Claims = map[string]interface{}{
-		"nonce": uuid.New(),
+		"jti":   uuid.New(),
 		"scp":   authorizeRequest.GetScopes(),
 		"aud":   authorizeRequest.GetClient().GetID(),
 		"exp":   time.Now().Add(time.Hour).Unix(),

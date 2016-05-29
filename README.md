@@ -1,495 +1,260 @@
-# Ory/Hydra
+# ![Ory/Hydra](dist/logo.png)
 
 [![Join the chat at https://gitter.im/ory-am/hydra](https://badges.gitter.im/ory-am/hydra.svg)](https://gitter.im/ory-am/hydra?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/ory-am/hydra.svg?branch=master)](https://travis-ci.org/ory-am/hydra)
 [![Coverage Status](https://coveralls.io/repos/ory-am/hydra/badge.svg?branch=master&service=github)](https://coveralls.io/github/ory-am/hydra?branch=master)
+[![Go Report Card](https://goreportcard.com/badge/github.com/ory-am/hydra)](https://goreportcard.com/report/github.com/ory-am/hydra)
 
-![Hydra](hydra.png)
-
-Hydra is a twelve factor micro service, authentication, authorization and account management app, ready for you to use in your micro service architecture. Hydra is written in go and backed by PostgreSQL or RethinkDB (or any implementation of [account/storage.go](account/storage.go)).
-
-**Important note:** We worked hard on building a secure OAuth2 and OpenID Connect framework called [Fosite](https://github.com/ory-am/fosite). Now, we are working hard on refactoring Hydra to use Fosite. It will take a considerable amount of refactoring and recoding, so please be aware that things will break.
-
-Hydra implements TLS, different OAuth2 IETF standards and supports HTTP/2. To make things as easy as possible, hydra
-comes with tools to generate TLS and RS256 PEM files, leaving you with almost zero trouble to set up.
-
-![Hydra implements HTTP/2 and TLS.](h2tls.png)
-
-Please be aware that Hydra is not ready for production just yet and has not been tested on a production system.
-If time schedule holds, we will use it in production in Q1 2016 for an awesome business app that has yet to be revealed.
-This should however not discourage you from trying out or using Hydra. Most of the HTTP endpoints have reached a stable status and should not change in a major way until the first release (0.1).
-
-Current status:
-
-- Development: 95% of principal components
-- HTTP API: 80% (in review)
-- Real world use: 20%
-
-Hydra is being developed at [Ory](https://ory.am) because we need a lightweight and clean IAM solution for our customers.  
-Join our [mailinglist](http://eepurl.com/bKT3N9) to stay on top of new developments.
+Hydra is being developed by german-based company [Ory](https://ory.am). Join our [mailinglist](http://eepurl.com/bKT3N9) to stay on top of new developments.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
 - [What is Hydra?](#what-is-hydra)
-- [Motivation](#motivation)
-- [Features](#features)
-- [What do you mean by *Hydra is backend*?](#what-do-you-mean-by-hydra-is-backend)
-- [HTTP/2 RESTful API](#http2-restful-api)
-- [Run hydra-host](#run-hydra-host)
-  - [With vagrant](#with-vagrant)
-  - [Set up PostgreSQL locally](#set-up-postgresql-locally)
-  - [Run as executable](#run-as-executable)
-  - [Run from sourcecode](#run-from-sourcecode)
-  - [Available Environment Variables](#available-environment-variables)
-  - [CLI Usage](#cli-usage)
-    - [Start server](#start-server)
-    - [Create client](#create-client)
-    - [Create Account](#create-account)
-    - [Create JWT RSA Key Pair](#create-jwt-rsa-key-pair)
-    - [Create a TLS certificate](#create-a-tls-certificate)
-    - [Import policies](#import-policies)
-- [Security considerations](#security-considerations)
-- [Good to know](#good-to-know)
-  - [Deploy with buildpacks (Heroku, Cloud Foundry, ...)](#deploy-with-buildpacks-heroku-cloud-foundry-)
-  - [Policies](#policies)
-  - [Everything is RESTful. No HTML. No Templates.](#everything-is-restful-no-html-no-templates)
-  - [Sign up workflow](#sign-up-workflow)
-  - [Sign in workflow](#sign-in-workflow)
-    - [Authenticate with Google, Dropbox, ...](#authenticate-with-google-dropbox-)
-    - [Authenticate with a hydra account](#authenticate-with-a-hydra-account)
-  - [Visually confirm authorization](#visually-confirm-authorization)
-  - [Principles](#principles)
-- [Attributions](#attributions)
+  - [Feature Overview](#feature-overview)
+- [Quickstart](#quickstart)
+  - [Installation](#installation)
+  - [Run the example](#run-the-example)
+- [Documentation](#documentation)
+  - [Guide](#guide)
+  - [REST API Documentation](#rest-api-documentation)
+  - [CLI Documentation](#cli-documentation)
+  - [Develop](#develop)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## What is Hydra?
 
-Authentication, authorization and user account management are always lengthy to plan and implement. If you're building a micro service app
-in need of these three, you are in the right place.
+At first, there was the monolith. The monolith worked well with the bespoke authentication module.
+Then, the web evolved into an elastic cloud that serves thousands of different user agents
+in every part of the world.
 
-## Motivation
+Hydra is driven by the need for a **scalable in memory
+OAuth2 and OpenID Connect** layer, that integrates with every Identity Provider you can imagine.
 
-We develop Hydra because Hydra we need a lightweight and clean IAM solution for our customers. We believe that security and simplicity come together. This is why Hydra only relies on Google's Go Language, PostgreSQL or RethinkDB and a slim dependency tree. Hydra is the simple, open source alternative to proprietary authorization solutions suited best for your micro service eco system.
+Hydra is available through [Docker](https://hub.docker.com/r/oryam/hydra/).
 
-*Use it, enjoy it and contribute!*
+### Feature Overview
 
-## Features
+1. **Availability:** Hydra uses pub/sub to have the latest data available in memory. The in-memory architecture allows for heavy duty workloads.
+2. **Scalability:** Hydra scales effortlessly on every platform you can imagine, including Heroku, Cloud Foundry, Docker,
+Google Container Engine and many more.
+3. **Integration:** Hydra wraps your existing stack like a blanket and keeps it safe. Hydra uses cryptographic tokens for authenticate users and request their consent, no APIs required.
+The deprecated php-3.0 authentication service your intern wrote? It works with that too, don't worry.
+We wrote an example with React to show you how this could look like: [React.js Identity Provider Example App](https://github.com/ory-am/hydra-idp-react).
+4. **Security:** Hydra leverages the security first OAuth2 framework **[Fosite](https://github.com/ory-am/fosite)**,
+encrypts important data at rest, and supports HTTP over TLS (https) out of the box.
+5. **Ease of use:** Developers and Operators are human. Therefore, Hydra is easy to install and manage. Hydra does not care if you use React, Angular, or Cocoa for your user interface.
+To support you even further, there are APIs available for *cryptographic key management, social log on, policy based access control, policy management, and two factor authentication (tbd)*
+Hydra is packaged using [Docker](https://hub.docker.com/r/oryam/hydra/).
+6. **Open Source:** Hydra is licensed Apache Version 2.0
+7. **Professional:** Hydra implements peer reviewed open standards published by [The Internet Engineering Task Force (IETF®)](https://www.ietf.org/) and the [OpenID Foundation](https://openid.net/)
+and under supervision of the [LMU Teaching and Research Unit Programming and Modelling Languages](http://www.en.pms.ifi.lmu.de). No funny business.
+8. **Real Time:** Operation is a lot easier with real time monitoring. Because Hydra leverages RethinkDB, you get real time monitoring for free:
+![monitoring.gif](dist/monitoring.gif)
 
-Hydra's core features in a nutshell:
+## Quickstart
 
-* **Account Management**: Sign up, settings, password recovery
-* **Access Control / Policy Decision Point / Policy Storage Point** backed by [Ladon](https://github.com/ory-am/ladon).
-* Rich set of **OAuth2** features:
-  * Hydra implements OAuth2 as specified at [rfc6749](http://tools.ietf.org/html/rfc6749) and [draft-ietf-oauth-v2-10](http://tools.ietf.org/html/draft-ietf-oauth-v2-10) using [osin](https://github.com/RangelReale/osin) and [osin-storage](https://github.com/ory-am/osin-storage)
-  * Hydra uses self-contained Acccess Tokens as suggessted in [rfc6794#section-1.4](http://tools.ietf.org/html/rfc6749#section-1.4) by issuing JSON Web Tokens as specified at
-   [https://tools.ietf.org/html/rfc7519](https://tools.ietf.org/html/rfc7519) with [RSASSA-PKCS1-v1_5 SHA-256](https://tools.ietf.org/html/rfc7519#section-8) hashing algorithm.
-  * Hydra implements **OAuth2 Introspection** ([rfc7662](https://tools.ietf.org/html/rfc7662)) and **OAuth2 Revokation** ([rfc7009](https://tools.ietf.org/html/rfc7009)).
-  * Hydra is able to sign users up and in through OAuth2 providers like Dropbox, LinkedIn, Google, you name it.
-* Hydra does not speak HTML. We believe that the design decision to keep templates out of Hydra is a core feature. *Hydra is backend, not frontend.*
-* Easy command line tools like `hydra-host jwt` for generating jwt signing key pairs or `hydra-host client create`.
-* Hydra works both over HTTP (use only in development) and HTTP/2 with TLS (use in production).
-* Hydra is unit and integration tested. We use [dockertest](https://github.com/ory-am/dockertest)
+This section is a quickstart guide to working with Hydra. In-depth docs are available as well:
 
-## What do you mean by *Hydra is backend*?
+* The documentation is available on [GitBook](https://ory-am.gitbooks.io/hydra/content/).
+* The REST API documentation is available at [Apiary](http://docs.hdyra.apiary.io).
 
-Hydra does not offer a sign in, sign up or authorize HTML page. Instead, if such action is required, Hydra redirects the user
-to a predefined URL, for example `http://sign-up-app.yourservice.com/sign-up` or `http://sign-in-app.yourservice.com/sign-in`.
-Additionally, a user can authenticate through another OAuth2 Provider, for example Dropbox or Google.
+### Installation
 
-Take a look at the example sign up/in endpoint implementations [hydra-signin](https://github.com/ory-am/hydra/blob/master/cli/hydra-signup/main.go)
-and [hydra-signup](https://github.com/ory-am/hydra/blob/master/cli/hydra-signup/main.go).
+**Starting the host** is easiest with docker. The host process handles HTTP requests and is backed by a database.
+Read how to install docker on [Linux](https://docs.docker.com/linux/), [OSX](https://docs.docker.com/mac/) or
+[Windows](https://docs.docker.com/windows/). Hydra is available on [Docker Hub](https://hub.docker.com/r/oryam/hydra/).
 
-## HTTP/2 RESTful API
-
-The API is described at [apiary](http://docs.hydra6.apiary.io/#). The API Documentation is still work in progress.
-
-## Run hydra-host
-
-### With vagrant
-
-You'll need [Vagrant](https://www.vagrantup.com/), [VirtualBox](https://www.virtualbox.org/) and [Git](https://git-scm.com/)
-installed on your system.
+The easiest way to start docker is without a database. Hydra will keep all changes in memory. But be aware! Restarting, scaling
+or stopping the container will make you **lose all data**:
 
 ```
-git clone https://github.com/ory-am/hydra.git
-cd hydra
-vagrant up
-# Get a cup of coffee
+$ docker run -d -p 4444:4444 oryam/hydra --name my-hydra
+ec91228cb105db315553499c81918258f52cee9636ea2a4821bdb8226872f54b
 ```
 
-You should now have a running Hydra instance! Vagrant exposes ports 9000 (HTTPS - Hydra) and 9001 (Postgres) on your localhost.
-Open [https://localhost:9000/](https://localhost:9000/) to confirm that Hydra is running. You will probably have to add an exception for the
-HTTP certificate because it is self-signed, but after that you should see a 404 error indicating that Hydra is running!
+**The CLI client** is available at [gobuild.io](https://gobuild.io/ory-am/hydra) or through
+the [releases tab](https://github.com/ory-am/hydra/releases).
 
-*hydra-host* offers different capabilities for managing your Hydra instance.
-Check the [this section](#cli-usage) if you want to find out more.
+There is currently no installer which adds the client to your path automatically. You have to set up the path yourself.
+If you do not understand what that means, ask on our [Gitter channel](https://gitter.im/ory-am/hydra).
 
-You can also always access hydra-host through vagrant:
-
-```
-# Assuming, that your current working directory is /where/you/cloned/hydra
-vagrant ssh
-hydra-host help
-```
-
-### Set up PostgreSQL locally
-
-**On Windows and Max OS X**, download and install [Docker Toolbox](https://www.docker.com/docker-toolbox). After starting the *Docker Quickstart Terminal*,
-do the following:
+If you wish to compile the CLI yourself, you need to install and set up [Go](https://golang.org/) and add `$GOPATH/bin`
+to your `$PATH`. Here is a [comprehensive Go installation guide](https://github.com/ory-am/workshop-dbg#googles-go-language) with screenshots.
 
 ```
-> docker-machine ssh default # if you're not already ssh'ed into it
-> docker run --name hydra-postgres -e POSTGRES_PASSWORD=secret -p 5432:5432 -d postgres
-> exit
-> docker-machine ip default
-# This should give you something like: 192.168.99.100
-
-> # On Windows
-> set DATABASE_URL=postgres://postgres:secret@{ip from above}:5432/postgres?sslmode=disable
-
-> # On Mac OSX
-> export DATABASE_URL=postgres://postgres:secret@{ip from above}:5432/postgres?sslmode=disable
+go install github.com/ory-am/hydra
+hydra
 ```
 
-**On Linux** download and install [Docker](https://www.docker.com/):
+Alternatively, you can use the CLI in Docker (not recommended):
 
 ```
-> docker run --name hydra-postgres -e POSTGRES_PASSWORD=secret -p 5432:5432 -d postgres
-> export DATABASE_URL=postgres://postgres:secret@localhost:5432/postgres?sslmode=disable
+$ docker exec -i -t <hydra-container-id> /bin/bash
+# e.g. docker exec -i -t ec /bin/bash
+
+root@ec91228cb105:/go/src/github.com/ory-am/hydra# hydra
+Hydra is a twelve factor OAuth2 and OpenID Connect provider
+
+Usage:
+  hydra [command]
+
+[...]
 ```
 
-*Warning: This uses the postgres database, which is reserved.
-For brevity the guide to creating a new database in Postgres has been skipped.*
+### Run the example
 
-### Run as executable
+![Run the example](dist/run-the-example.gif)
 
+Install the [CLI and Docker Toolbox](#installation). Make sure you install Docker Compose. On OSX and Windows,
+open the Docker Quickstart Terminal. On Linux open any terminal.
+
+We will use a dummy password as system secret: `SYSTEM_SECRET=passwordtutorialpasswordtutorial`. Use a very secure secret in production.
+
+**On OSX and Windows** using the Docker Quickstart Terminal.
 ```
-> go get -d -v github.com/ory-am/hydra/...
-> go install github.com/ory-am/hydra/cli/hydra-host
-> hydra-host start
-```
-
-*Note: For this to work, $GOPATH/bin [must be in your path](https://golang.org/doc/code.html#GOPATH)*
-
-### Run from sourcecode
-
-```
-> go get -d -v github.com/ory-am/hydra/...
-> # cd to project root, usually in $GOPATH/src/github.com/ory-am/hydra
-> cd cli
-> cd hydra-host
-> go run main.go start
-```
-
-### Available Environment Variables
-
-The CLI currently requires one environment variable: DATABASE_URL
-
-Make sure to prefix the url with the wanted database technology. e.g `rethinkdb://host:port` or `postgres://user:password@host:port/database`
-
-| Variable             | Description               | Format                                        | Default   |
-| -------------------- | ------------------------- | --------------------------------------------- | --------- |
-| PORT                 | Which port to listen on   | number                                        | 443       |
-| HOST                 | Which host to listen on   | ip or hostname                                | empty (all) |
-| HOST_URL             | Hydra's host URL          | url                                           | "https://localhost:4443" |
-| DATABASE_URL         | Database URL   | e.g: `postgres://user:password@host:port/database` | empty     |
-| BCRYPT_WORKFACTOR    | BCrypt Strength           | number                                        | `10`      |
-| SIGNUP_URL           | [Sign up URL](#sign-up)   | url                                           | empty     |
-| SIGNIN_URL           | [Sign in URL](#sign-in)   | url                                           | empty     |
-| DROPBOX_CLIENT       | Dropbox Client ID         | string                                        | empty     |
-| DROPBOX_SECRET       | Dropbox Client Secret     | string                                        | empty     |
-| JWT_PUBLIC_KEY       | JWT Signing Public Key    | The public key or a path to it.               | "../../example/cert/rs256-public.pem"  |
-| JWT_PRIVATE_KEY      | JWT Signing Private Key   | The private key or a path to it.              | "../../example/cert/rs256-private.pem" |
-| TLS_CERT             | TLS Certificate Path      | The TLS public certificate or a path to it.   | "../../example/cert/tls-cert.pem"      |
-| TLS_KEY              | TLS Key Path              | The TLS private key or a path to it.          | "../../example/cert/tls-key.pem"       |
-| DANGEROUSLY_FORCE_HTTP | Disable HTTPS           | `force`                                       | disabled  |
-
-### CLI Usage
-
-```
-NAME:
-   hydra-host - Dragons guard your resources
-
-USAGE:
-   hydra-host [global options] command [command options] [arguments...]
-
-VERSION:
-   0.0.0
-
-COMMANDS:
-   client       Client actions
-   account      Account actions
-   start        Start the host service
-   jwt          JWT actions
-   tls          JWT actions
-   policy       Policy actions
-   help, h      Shows a list of commands or help for one command
-
-GLOBAL OPTIONS:
-   --help, -h                   show help
-   --generate-bash-completion
-   --version, -v                print the version
-
+$ go get github.com/ory-am/hydra
+$ cd $GOPATH/src/github.com/ory-am/hydra
+$ DOCKER_IP=$(docker-machine ip default) docker-compose build
+WARNING: The SYSTEM_SECRET variable is not set. Defaulting to a blank string.
+rethinkdb uses an image, skipping
+Building hydra
+[...]
+$ SYSTEM_SECRET=passwordtutorialpasswordtutorial DOCKER_IP=$(docker-machine ip default) docker-compose up
+Starting hydra_rethinkdb_1
+Recreating hydra_hydra_1
+Recreating hydra_consent_1
+Attaching to hydra_rethinkdb_1, hydra_hydra_1, hydra_consent_1
+[...]
 ```
 
-#### Start server
-
+**On Linux.**
 ```
-NAME:
-   hydra-host start - start hydra-host
-
-USAGE:
-   hydra-host start [arguments...]
-```
-
-#### Create client
-
-```
-NAME:
-   hydra-host client create - Create a new client.
-
-USAGE:
-   hydra-host client create [command options] [arguments...]
-
-OPTIONS:
-   -i, --id             Set client's id
-   -s, --secret         The client's secret
-   -r, --redirect-url   A list of allowed redirect URLs: https://foobar.com/callback|https://bazbar.com/cb|http://localhost:3000/authcb
-   --as-superuser       Grant superuser privileges to the client
+$ go get github.com/ory-am/hydra
+$ cd $GOPATH/src/github.com/ory-am/hydra
+$ DOCKER_IP=localhost docker-compose build
+WARNING: The SYSTEM_SECRET variable is not set. Defaulting to a blank string.
+rethinkdb uses an image, skipping
+Building hydra
+[...]
+$ SYSTEM_SECRET=passwordtutorialpasswordtutorial DOCKER_IP=tutorialpassword docker-compose up
+Starting hydra_rethinkdb_1
+Recreating hydra_hydra_1
+Recreating hydra_consent_1
+Attaching to hydra_rethinkdb_1, hydra_hydra_1, hydra_consent_1
+[...]
+mhydra   | mtime="2016-05-17T18:09:28Z" level=warning msg="Generated system secret: MnjFP5eLIr60h?hLI1h-!<4(TlWjAHX7"
+[...]
+mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="Temporary root client created."
+mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="client_id: d9227bd5-5d47-4557-957d-2fd3bee11035"
+mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="client_secret: ,IvxGt02uNjv1ur9"
+[...]
 ```
 
-#### Create Account
+You have now a running hydra docker container! Additionally, a RethinkDB image was deployed and a consent app.
+
+Hydra can be managed with the hydra cli client. The client hast to log on before it is allowed to do anything.
+When hydra detects a new installation, a new temporary root client is created. The client credentials are printed by
+`docker compose up`:
 
 ```
-NAME:
-   hydra-host account create - create a new account
-
-USAGE:
-   hydra-host account create [command options] <username>
-
-OPTIONS:
-   --password           the user's password
-   --as-superuser       grant superuser privileges to the user
+mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="client_id: d9227bd5-5d47-4557-957d-2fd3bee11035"
+mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="client_secret: ,IvxGt02uNjv1ur9"
 ```
 
-#### Create JWT RSA Key Pair
-
-To generate files *rs256-private.pem* and *rs256-public.pem* in the current directory, run:
-
-```
-NAME:
-   hydra-host jwt generate-keypair - Create a JWT PEM keypair.
-
-   You can use these files by providing the environment variables JWT_PRIVATE_KEY_PATH and JWT_PUBLIC_KEY_PATH
-
-USAGE:
-   hydra-host jwt generate-keypair [command options] [arguments...]
-
-OPTIONS:
-   -s, --private-file-path "rs256-private.pem"  Where to save the private key PEM file
-   -p, --public-file-path "rs256-public.pem"    Where to save the private key PEM file
+The system secret is a global secret assigned to every hydra instance. It is used to encrypt data at rest. You can
+set the system secret through the `$SYSTEM_SECRET` environment variable. When no secret is set, hydra generates one:
 
 ```
-
-#### Create a TLS certificate
-
-```
-NAME:
-   hydra-host tls generate-dummy-certificate - Create a dummy TLS certificate and private key.
-
-   You can use these files (in development!) by providing the environment variables TLS_CERT_PATH and TLS_KEY_PATH
-
-USAGE:
-   hydra-host tls generate-dummy-certificate [command options] [arguments...]
-
-OPTIONS:
-   -c, --certificate-file-path "tls-cert.pem"   Where to save the private key PEM file
-   -k, --key-file-path "tls-key.pem"            Where to save the private key PEM file
-   -u, --host                                   Comma-separated hostnames and IPs to generate a certificate for
-   --sd, --start-date                           Creation date formatted as Jan 1 15:04:05 2011
-   -d, --duration "8760h0m0s"                   Duration that certificate is valid for
-   --ca                                         whether this cert should be its own Certificate Authority
-   --rb, --rsa-bits "2048"                      Size of RSA key to generate. Ignored if --ecdsa-curve is set
-   --ec, --ecdsa-curve                          ECDSA curve to use to generate a key. Valid values are P224, P256, P384, P521
-
+time="2016-05-15T14:56:34Z" level=warning msg="Generated system secret: (.UL_&77zy8/v9<sUsWLKxLwuld?.82B"
 ```
 
-#### Import policies
+**Important note:** Please be aware that logging passwords should never be done on a production server. Either prune
+the logs, set the required parameters, or replace the credentials with other ones.
 
-You can import policies from json files.
+Now you know which credentials you need to use. Next, we log in.
 
-```
-NAME:
-   hydra-host policy import - Import a json file which defines an array of policies
-
-USAGE:
-   hydra-host policy import <policies1.json> <policies2.json> <policies3.json>
-```
-
-Here's an exemplary *policies.json:*
-
-```json
-[
-  {
-    "description": "Allow editing and deleting of personal articles and all sub resources.",
-    "subject": ["{edit|delete}"],
-    "effect": "allow",
-    "resources": [
-      "urn:flitt.net:articles:{.*}"
-    ],
-    "permissions": [
-      "edit"
-    ],
-    "conditions": [
-      {
-        "op": "SubjectIsOwner"
-      }
-    ]
-  },
-  {
-    "description": "Allow creation of personal articles and all sub resources.",
-    "subject": ["create"],
-    "effect": "allow",
-    "resources": [
-      "urn:flitt.net:articles"
-    ],
-    "permissions": [
-      "edit"
-    ],
-    "conditions": [
-      {
-        "op": "SubjectIsOwner"
-      }
-    ]
-  }
-]
-```
-
-## Security considerations
-
-[rfc6819](https://tools.ietf.org/html/rfc6819) provides good guidelines to keep your apps and environment secure. It is recommended to read:
-* [Section 5.3](https://tools.ietf.org/html/rfc6819#section-5.3) on client app security.
-
-## Good to know
-
-This section covers information necessary for understanding how hydra works.
-
-### Deploy with buildpacks (Heroku, Cloud Foundry, ...)
-
-Hydra runs pretty much out of the box when using a Platform as a Service (PaaS).
-Here are however a few notes which might assist you in your task:
-* Heroku (and probably Cloud Foundry as well) *force* TLS termination, meaning that Hydra must be configured with `DANGEROUSLY_FORCE_HTTP=force`.
-* Using bash, you can easily add multi-line environment variables to Heroku using `heroku config:set JWT_PUBLIC_KEY="$(my-public-key.pem)"`.
-  This does not work on Windows!
-
-
-
-### Policies
-
-Policies are something very powerful. I have to admit that I am a huge fan of how AWS handles policies and adopted their architecture for Hydra. Please find a more in depth documentation
-at the [Ladon GitHub Repository](https://github.com/ory-am/ladon).
+**Note:** If you are using docker toolbox, please use the ip address provided by `docker-machine ip default` as cluster url host.
 
 ```
-{
-    // This should be a unique ID. This ID is required for database retrieval.
-    id: "68819e5a-738b-41ec-b03c-b58a1b19d043",
-
-    // A human readable description. Not required
-    description: "something humanly readable",
-
-    // Which identity does this policy affect?
-    // As you can see here, you can use regular expressions inside < >.
-    subjects: ["max", "peter", "<zac|ken>"],
-
-    // Should the policy allow or deny access?
-    effect: "allow",
-
-    // Which resources this policy affects.
-    // Again, you can put regular expressions in inside < >.
-    resources: ["urn:something:resource_a", "urn:something:resource_b", "urn:something:foo:<.+>"],
-
-    // Which permissions this policy affects. Supports RegExp
-    // Again, you can put regular expressions in inside < >.
-    permissions: ["<create|delete>", "get"],
-
-    // Under which conditions this policy is active.
-    conditions: [
-        // Currently, only an exemplary SubjectIsOwner condition is available.
-        {
-            "op": "SubjectIsOwner"
-        }
-    ]
-}
+$ hydra connect
+Cluster URL: https://localhost:4444
+Client ID: d9227bd5-5d47-4557-957d-2fd3bee11035
+Client Secret: ,IvxGt02uNjv1ur9
+Done.
 ```
 
-This is what a policy looks like. As you can see, we have various attributes:
+Great! You are now connected to Hydra and can start by creating a new client:
 
-* A **Subject** could be an account or an client app
-* A **Resource** could be an online article or a file in a cloud drive
-* A **Permission** can also be referred to as "Action" ("create" something, "delete" something, ...)
-* A **Condition** can be an intelligent assertion *(e.g. is the Subject requesting access also the Resource Owner?)*. Right now, only the SubjectIsOwner Condition is defined. In the future, many more (e.g. IPAddressMatches or UserAgentMatches) will be added.
-* The **Effect**, which can only be **allow** or **deny** (deny *always* overrides).
-
-Hydra needs the following information to decide if a access request is allowed:
-* Resource: Which resource is affected
-* Permission: Which permission is requested
-* Token: What access token is trying to perform this action
-* Context: The context, for example the user ID.
-* Header `Authorization: Bearer <token>` with a valid access token, so this endpoint can't be scanned by malicious anonymous users.
-
-### Everything is RESTful. No HTML. No Templates.
-
-Hydra never responds with HTML. There is no way to set up HTML templates for signing in, up or granting access.
-
-### Sign up workflow
-
-Hydra offers capabilities to sign users up. First, a registered client has to acquire an access token through the OAuth2 Workflow.
-Second, the client sets up a user account through the `/accounts` endpoint.
-
-You can set up a environment variable called `SIGNUP_URL` for Hydra to redirect users to,
-when the user successfully authenticated via the OAuth2 Provider Workflow but has not an account in hydra yet.
-If you leave this variable empty, a 401 Unauthorized Error will be shown instead.
-
-### Sign in workflow
-
-Hydra offers different methods to sign users in.
-
-#### Authenticate with Google, Dropbox, ...
-
-You can authenticate a user through any other OAuth2 provider, such as Google, Dropbox or Facebook. To do so, simply add
-a provider query parameter to the authentication url endpoint:
 ```
-/oauth2/auth?provider=google&client_id=123&response_type=code&redirect_uri=/callback&state=randomstate
+$ hydra clients create --skip-tls-verify
+Warning: Skipping TLS Certificate Verification.
+Client ID: c003830f-a090-4721-9463-92424270ce91
+Client Secret: Z2pJ0>Tp7.ggn>EE&rhnOzdt1
 ```
 
-The provider workflow is not standardized by any authority, has not yet been subject to a security audit and is therefore subject to change.
-Unfortunately most providers do not support SSO provider endpoints so we might have to rely on the OAuth2 provider workflow for a while.
+**Important note:** Hydra is using self signed TLS certificates for HTTPS, if no certificate was provided. This should
+never be done in production. To skip the TLS verification step on the client, provide the `--skip-tls-verify` flag.
 
-We will soon document how you can add more providers (currently **only Dropbox is supported**).
+Why not issue an access token for your client?
 
-#### Authenticate with a hydra account
+```
+$ hydra token client --skip-tls-verify
+Warning: Skipping TLS Certificate Verification.
+JLbnRS9GQmzUBT4x7ESNw0kj2wc0ffbMwOv3QQZW4eI.qkP-IQXn6guoFew8TvaMFUD-SnAyT8GmWuqGi3wuWXg
+```
 
-There are multiple ways to authenticate a hydra account:
-* **Password grant type:** To do so, use the [OAuth2 PASSWORD grant type](http://oauthlib.readthedocs.org/en/latest/oauth2/grants/password.html).
-At this moment, the password grant is allowed to *all clients*. This will be changed in the future.
-* **Callback:** You can set up an environment variable called `SIGNIN_URL` for Hydra to redirect users to,
-when a client requests authorization through the `/oauth2/auth` endpoint but is not yet authenticated.
+Let's try this with the authorize code grant!
 
-### Visually confirm authorization
+```
+$ hydra token user --skip-tls-verify
+Warning: Skipping TLS Certificate Verification.
+If your browser does not open automatically, navigate to: https://192.168.99.100:4444/oauth2/auth?client_id=d9227bd5-5d47-4557-957d-2fd3bee11035&response_type=code&scope=core+hydra&state=sbnwdelqzxyedwtqinxnolbr&nonce=sffievieeesltbjkwxyhycyq
+Setting up callback listener on http://localhost:4445/callback
+Press ctrl + c on Linux / Windows or cmd + c on OSX to end the process.
+```
 
-When a client is not allowed to bypass the authorization screen *("Do you want to grant app XYZ access to your private information?")*,
-he will be redirected to the value of the environment variable `AUTHORIZE_URL`.
+![OAuth2 Flow](dist/oauth2-flow.gif)
 
-**This feature is not implemented yet.**
+Great! You installed hydra, connected the CLI, created a client and completed two authentication flows!
+Your next stop should be the [Guide](#guide).
 
-### Principles
+## Documentation
 
-* Authorization and authentication require verbose logging.
-* Logging should *never* include credentials, neither passwords, secrets nor tokens.
+### Guide
 
-## Attributions
+The Guide is available on [GitBook](https://ory-am.gitbooks.io/hydra/content/).
 
-* [Logo source](https://www.flickr.com/photos/pathfinderlinden/7161293044/)
+### REST API Documentation
+
+The REST API is documented at [Apiary](http://docs.hdyra.apiary.io).
+
+### CLI Documentation
+
+The CLI help is verbose. To see it, run `hydra -h` or `hydra [command] -h`.
+
+### Develop
+
+Unless you want to test Hydra against a database, developing with Hydra is as easy as:
+
+```
+go get github.com/ory-am/hydra
+cd $GOPATH/src/github.com/ory-am/hydra
+git checkout -b develop
+go test ./... -race
+go run main.go
+```
+
+If you want to run Hydra against RethinkDB, you can do so by using docker:
+
+```
+docker run --name some-rethink -d -p 8080:8080 -p 28015:28015 rethinkdb
+
+# Linux
+DATABASE_URL=rethinkdb://localhost:28015/hydra go run main.go
+
+# Docker Terminal
+DATABASE_URL=rethinkdb://$(docker-machine ip default):28015/hydra go run main.go
+```

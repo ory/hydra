@@ -1,0 +1,41 @@
+version: '2'
+
+services:
+
+  hydra:
+    build:
+      context: .
+      dockerfile: Dockerfile-dangerous
+    volumes:
+      - hydravolume:/root
+    links:
+      - rethinkdb:database
+    ports:
+      - "4444:4444"
+    environment:
+      - SYSTEM_SECRET=${SYSTEM_SECRET}
+      - CONSENT_URL=http://${DOCKER_IP}:3000
+      - DATABASE_URL=rethinkdb://database:28015/hydra
+
+  consent:
+    environment:
+      - HYDRA_URL=https://hydra:4444
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+    image: oryam/hydra-idp-react
+    links:
+      - hydra
+    volumes:
+      - hydravolume:/root
+    ports:
+      - "3000:3000"
+
+  rethinkdb:
+      image: rethinkdb
+      ports:
+          - "8080:8080"
+          - "28015:28015"
+          - "29015:29015"
+
+volumes:
+  hydravolume:
+    driver: local

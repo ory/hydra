@@ -1,0 +1,149 @@
+hash: 175acff756341dd7fa75a3e1e2e1a042a957a1b2482f017ae0bb38a2e8b9c625
+updated: 2016-05-28T20:39:50.1307509+02:00
+imports:
+- name: github.com/asaskevich/govalidator
+  version: df81827fdd59d8b4fb93d8910b286ab7a3919520
+- name: github.com/BurntSushi/toml
+  version: f0aeabca5a127c4078abb8c8d64298b147264b55
+- name: github.com/cenkalti/backoff
+  version: a6030178a585d5972d4d33ce61f4a1fa40eaaed0
+- name: github.com/dancannon/gorethink
+  version: de072a9c0eff5bd52ef81fe45b6abeccde74bd13
+- name: github.com/davecgh/go-spew
+  version: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
+  subpackages:
+  - spew
+- name: github.com/dgrijalva/jwt-go
+  version: 40bd0f3b4891a9d7f121bfb7b8e8b0525625e262
+- name: github.com/fsnotify/fsnotify
+  version: 30411dbcefb7a1da7e84f75530ad3abe4011b4f8
+- name: github.com/go-errors/errors
+  version: a41850380601eeb43f4350f7d17c6bbd8944aaf8
+- name: github.com/golang/protobuf
+  version: 9e6977f30c91c78396e719e164e57f9287fff42c
+  subpackages:
+  - proto
+- name: github.com/hailocab/go-hostpool
+  version: e80d13ce29ede4452c43dea11e79b9bc8a15b478
+- name: github.com/hashicorp/hcl
+  version: 9a905a34e6280ce905da1a32344b25e81011197a
+  subpackages:
+  - hcl/ast
+  - hcl/parser
+  - hcl/token
+  - json/parser
+  - hcl/scanner
+  - hcl/strconv
+  - json/scanner
+  - json/token
+- name: github.com/inconshreveable/mousetrap
+  version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
+- name: github.com/julienschmidt/httprouter
+  version: 77366a47451a56bb3ba682481eed85b64fea14e8
+- name: github.com/magiconair/properties
+  version: c265cfa48dda6474e208715ca93e987829f572f8
+- name: github.com/mitchellh/mapstructure
+  version: d2dd0262208475919e1a362f675cfc0e7c10e905
+- name: github.com/oleiade/reflections
+  version: 632977f98cd34d217c4b57d0840ec188b3d3dcaf
+- name: github.com/ory-am/common
+  version: 930cc805232909c38f2e68310b1e21f71b056d59
+  subpackages:
+  - pkg
+  - rand/sequence
+  - compiler
+- name: github.com/ory-am/fosite
+  version: 4390c495a1794fc7cf26cbeb47969f92d19f0ecc
+  subpackages:
+  - fosite-example/store
+  - handler/core
+  - handler/core/client
+  - handler/core/explicit
+  - handler/core/implicit
+  - handler/core/refresh
+  - handler/core/strategy
+  - handler/oidc
+  - handler/oidc/explicit
+  - handler/oidc/hybrid
+  - handler/oidc/implicit
+  - handler/oidc/strategy
+  - hash
+  - token/hmac
+  - token/jwt
+  - rand
+- name: github.com/ory-am/ladon
+  version: cd1ecc60ad0cb807ff3c2b88b5a5cf306e699b40
+- name: github.com/pborman/uuid
+  version: c55201b036063326c5b1b89ccfe45a184973d073
+- name: github.com/pkg/profile
+  version: c78aac22bd43883fd2817833b982153dcac17b3b
+- name: github.com/pmezard/go-difflib
+  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
+  subpackages:
+  - difflib
+- name: github.com/Sirupsen/logrus
+  version: 6d9ae300aaf85d6acd2e5424081c7fcddb21dab8
+- name: github.com/spf13/cast
+  version: 27b586b42e29bec072fe7379259cc719e1289da6
+- name: github.com/spf13/cobra
+  version: f368244301305f414206f889b1735a54cfc8bde8
+- name: github.com/spf13/jwalterweatherman
+  version: 33c24e77fb80341fe7130ee7c594256ff08ccc46
+- name: github.com/spf13/pflag
+  version: cb88ea77998c3f024757528e3305022ab50b43be
+- name: github.com/spf13/viper
+  version: d8a428b8a30606e1d0b355d91edf282609ade1a6
+- name: github.com/square/go-jose
+  version: d2a847139a1442cada879cc05cc4080485b8d193
+  subpackages:
+  - json
+  - cipher
+- name: github.com/stretchr/testify
+  version: 8d64eb7173c7753d6419fd4a9caf057398611364
+  subpackages:
+  - assert
+  - require
+- name: github.com/toqueteos/webbrowser
+  version: 21fc9f95c83442fd164094666f7cb4f9fdd56cd6
+- name: golang.org/x/crypto
+  version: 5bcd134fee4dd1475da17714aac19c0aa0142e2f
+  subpackages:
+  - pbkdf2
+  - bcrypt
+  - blowfish
+- name: golang.org/x/net
+  version: 30db96677b74e24b967e23f911eb3364fc61a011
+  subpackages:
+  - context
+  - netutil
+- name: golang.org/x/oauth2
+  version: c406a4cc4ba462e5dc2f16225c5bd9488f9cbe10
+  subpackages:
+  - clientcredentials
+  - internal
+- name: golang.org/x/sys
+  version: d4feaf1a7e61e1d9e79e6c4e76c6349e9cab0a03
+  subpackages:
+  - unix
+- name: google.golang.org/appengine
+  version: 7f59a8c76b8594d06044bfe0bcbe475cb2020482
+  subpackages:
+  - urlfetch
+  - internal
+  - internal/urlfetch
+  - internal/base
+  - internal/datastore
+  - internal/remote_api
+- name: gopkg.in/dancannon/gorethink.v2
+  version: de072a9c0eff5bd52ef81fe45b6abeccde74bd13
+  subpackages:
+  - encoding
+  - ql2
+  - types
+- name: gopkg.in/fatih/pool.v2
+  version: cba550ebf9bce999a02e963296d4bc7a486cb715
+- name: gopkg.in/tylerb/graceful.v1
+  version: 9a3d4236b03bb5d26f7951134d248f9d5510d599
+- name: gopkg.in/yaml.v2
+  version: a83829b6f1293c91addabc89d0571c246397bbf4
+devImports: []

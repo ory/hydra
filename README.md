@@ -21,6 +21,7 @@ Hydra is being developed by german-based company [Ory](https://ory.am). Join our
   - [REST API Documentation](#rest-api-documentation)
   - [CLI Documentation](#cli-documentation)
   - [Develop](#develop)
+- [Hall of Fame](#hall-of-fame)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -264,3 +265,9 @@ DATABASE_URL=rethinkdb://localhost:28015/hydra go run main.go
 # Docker Terminal
 DATABASE_URL=rethinkdb://$(docker-machine ip default):28015/hydra go run main.go
 ```
+
+## Hall of Fame
+
+A list of extraordinary contributors and [bug hunters](https://github.com/ory-am/hydra/issues/84).
+
+* [Alexander Widerberg (leetal)](https://github.com/leetal) for implementing the prototype RethinkDB adapters.

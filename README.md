@@ -5,7 +5,10 @@
 [![Coverage Status](https://coveralls.io/repos/ory-am/hydra/badge.svg?branch=master&service=github)](https://coveralls.io/github/ory-am/hydra?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ory-am/hydra)](https://goreportcard.com/report/github.com/ory-am/hydra)
 
-Hydra is being developed by german-based company [Ory](https://ory.am). Join our [mailinglist](http://eepurl.com/bKT3N9) to stay on top of new developments. There is also a [Google Group](https://groups.google.com/forum/#!forum/ory-hydra/new) and a [Gitter Channel](https://gitter.im/ory-am/hydra).
+Hydra is being developed by german-based company [Ory](https://ory.am). Join our [mailinglist](http://eepurl.com/bKT3N9) to stay on top of new developments.
+There is also a [Google Group](https://groups.google.com/forum/#!forum/ory-hydra/new) and a [Gitter Channel](https://gitter.im/ory-am/hydra).
+
+Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://github.com/ory-am/fosite) and [Ladon](https://github.com/ory-am/ladon) for policy-based access control.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -76,7 +79,7 @@ $ docker run -d -p 4444:4444 oryam/hydra --name my-hydra
 ec91228cb105db315553499c81918258f52cee9636ea2a4821bdb8226872f54b
 ```
 
-**The CLI client is available at **[gobuild.io](https://gobuild.io/ory-am/hydra)**.
+**The CLI client is available at [gobuild.io](https://gobuild.io/ory-am/hydra)**.
 
 There is currently no installer which adds the CLI to your path automatically. You have to set up the path yourself.
 If you do not understand what that means, ask on our [Gitter channel](https://gitter.im/ory-am/hydra).

@@ -10,6 +10,8 @@ There is also a [Google Group](https://groups.google.com/forum/#!forum/ory-hydra
 
 Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://github.com/ory-am/fosite) and [Ladon](https://github.com/ory-am/ladon) for policy-based access control.
 
+:fire: Don't want to worry about security updates, backups, migration and scaling? Do you need enterprise support? Become an managed Hydra early adopter! [Contact us now](mailto:sales@ory.am) for more information. :fire:
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**

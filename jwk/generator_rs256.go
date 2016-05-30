@@ -23,11 +23,11 @@ func (g *RS256Generator) Generate(id string) (*jose.JsonWebKeySet, error) {
 	key.Precomputed = rsa.PrecomputedValues{}
 	return &jose.JsonWebKeySet{
 		Keys: []jose.JsonWebKey{
-			jose.JsonWebKey{
+			{
 				Key:   key,
 				KeyID: ider("private", id),
 			},
-			jose.JsonWebKey{
+			{
 				Key:   &key.PublicKey,
 				KeyID: ider("public", id),
 			},

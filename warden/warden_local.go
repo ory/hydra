@@ -10,16 +10,16 @@ import (
 	. "github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/oauth2"
+	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
 	"golang.org/x/net/context"
-	"github.com/ory-am/hydra/pkg"
 )
 
 type LocalWarden struct {
 	Warden         ladon.Warden
 	TokenValidator *core.CoreValidator
 
-	Issuer         string
+	Issuer string
 }
 
 func (w *LocalWarden) actionAllowed(ctx context.Context, a *ladon.Request, scopes []string, oauthRequest fosite.AccessRequester, session *oauth2.Session) (*Context, error) {

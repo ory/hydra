@@ -7,12 +7,12 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	r "github.com/dancannon/gorethink"
 	c "github.com/ory-am/common/pkg"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/ory-am/dockertest.v2"
 )
 

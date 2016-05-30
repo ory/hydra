@@ -5,7 +5,6 @@ import (
 	"net/url"
 	"testing"
 
-	r "github.com/dancannon/gorethink"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/herodot"
@@ -14,6 +13,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
 	"github.com/stretchr/testify/assert"
+	r "gopkg.in/dancannon/gorethink.v2"
 
 	"log"
 	"os"

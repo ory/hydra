@@ -10,7 +10,6 @@ import (
 	"os"
 	"time"
 
-	r "github.com/dancannon/gorethink"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/herodot"
@@ -21,6 +20,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/ory-am/dockertest.v2"
 )
 

@@ -2,13 +2,13 @@ package server
 
 import (
 	"github.com/Sirupsen/logrus"
-	r "github.com/dancannon/gorethink"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/herodot"
 	"golang.org/x/net/context"
+	r "gopkg.in/dancannon/gorethink.v2"
 )
 
 func newClientManager(c *config.Config) client.Manager {

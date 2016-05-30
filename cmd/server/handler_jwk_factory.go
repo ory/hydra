@@ -2,13 +2,13 @@ package server
 
 import (
 	"github.com/Sirupsen/logrus"
-	r "github.com/dancannon/gorethink"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/jwk"
 	"github.com/square/go-jose"
 	"golang.org/x/net/context"
+	r "gopkg.in/dancannon/gorethink.v2"
 )
 
 func newJWKHandler(c *config.Config, router *httprouter.Router) *jwk.Handler {

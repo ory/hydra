@@ -25,7 +25,7 @@ import (
 )
 
 var connections = []*Connection{
-	&Connection{
+	{
 		ID:            uuid.New(),
 		LocalSubject:  "peter",
 		RemoteSubject: "peterson",

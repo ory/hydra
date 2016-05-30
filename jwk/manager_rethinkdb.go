@@ -5,12 +5,13 @@ import (
 
 	"encoding/json"
 
+	"time"
+
 	r "github.com/dancannon/gorethink"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/square/go-jose"
 	"golang.org/x/net/context"
-	"time"
 )
 
 type RethinkManager struct {

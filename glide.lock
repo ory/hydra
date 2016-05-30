@@ -1,5 +1,5 @@
 hash: 175acff756341dd7fa75a3e1e2e1a042a957a1b2482f017ae0bb38a2e8b9c625
-updated: 2016-05-28T20:39:50.1307509+02:00
+updated: 2016-05-30T08:24:55.3209754+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: df81827fdd59d8b4fb93d8910b286ab7a3919520
@@ -53,7 +53,7 @@ imports:
   - rand/sequence
   - compiler
 - name: github.com/ory-am/fosite
-  version: 4390c495a1794fc7cf26cbeb47969f92d19f0ecc
+  version: c68a3e9bea4bb5a6550e55b2ce2beb59eb48782a
   subpackages:
   - fosite-example/store
   - handler/core
@@ -72,7 +72,7 @@ imports:
   - token/jwt
   - rand
 - name: github.com/ory-am/ladon
-  version: cd1ecc60ad0cb807ff3c2b88b5a5cf306e699b40
+  version: 18cf5f4ea461c4bc46530bbb0dd4f99bf06a0cfb
 - name: github.com/pborman/uuid
   version: c55201b036063326c5b1b89ccfe45a184973d073
 - name: github.com/pkg/profile
@@ -108,8 +108,8 @@ imports:
 - name: golang.org/x/crypto
   version: 5bcd134fee4dd1475da17714aac19c0aa0142e2f
   subpackages:
-  - pbkdf2
   - bcrypt
+  - pbkdf2
   - blowfish
 - name: golang.org/x/net
   version: 30db96677b74e24b967e23f911eb3364fc61a011

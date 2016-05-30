@@ -5,8 +5,9 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/base64"
-	"github.com/go-errors/errors"
 	"io"
+
+	"github.com/go-errors/errors"
 )
 
 type AEAD struct {

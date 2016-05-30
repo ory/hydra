@@ -42,7 +42,7 @@ Hydra is available through [Docker](https://hub.docker.com/r/oryam/hydra/) and r
 Google Container Engine and many more.
 3. **Integration:** Hydra wraps your existing stack like a blanket and keeps it safe. Hydra uses cryptographic tokens for authenticate users and request their consent, no APIs required.
 The deprecated php-3.0 authentication service your intern wrote? It works with that too, don't worry.
-We wrote an example with React to show you how this could look like: [React.js Identity Provider Example App](https://github.com/ory-am/hydra-idp-react).
+We wrote an example with React to show you what this could look like: [React.js Identity Provider Example App](https://github.com/ory-am/hydra-idp-react).
 4. **Security:** Hydra leverages the security first OAuth2 framework **[Fosite](https://github.com/ory-am/fosite)**,
 encrypts important data at rest, and supports HTTP over TLS (https) out of the box.
 5. **Ease of use:** Developers and Operators are human. Therefore, Hydra is easy to install and manage. Hydra does not care if you use React, Angular, or Cocoa for your user interface.

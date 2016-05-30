@@ -1,11 +1,12 @@
 package jwk
 
 import (
+	"testing"
+
 	"github.com/ory-am/fosite/rand"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestAEAD(t *testing.T) {

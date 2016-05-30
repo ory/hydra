@@ -2,12 +2,12 @@ package server
 
 import (
 	"github.com/Sirupsen/logrus"
-	r "github.com/dancannon/gorethink"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/connection"
 	"github.com/ory-am/hydra/herodot"
 	"golang.org/x/net/context"
+	r "gopkg.in/dancannon/gorethink.v2"
 )
 
 func newConnectionHandler(c *config.Config, router *httprouter.Router) *connection.Handler {

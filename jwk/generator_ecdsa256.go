@@ -19,11 +19,11 @@ func (g *ECDSA256Generator) Generate(id string) (*jose.JsonWebKeySet, error) {
 
 	return &jose.JsonWebKeySet{
 		Keys: []jose.JsonWebKey{
-			jose.JsonWebKey{
+			{
 				Key:   key,
 				KeyID: ider("private", id),
 			},
-			jose.JsonWebKey{
+			{
 				Key:   &key.PublicKey,
 				KeyID: ider("public", id),
 			},

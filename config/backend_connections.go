@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	r "github.com/dancannon/gorethink"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/pkg"
+	r "gopkg.in/dancannon/gorethink.v2"
 )
 
 type MemoryConnection struct{}

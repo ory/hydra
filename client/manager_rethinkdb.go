@@ -5,13 +5,13 @@ import (
 
 	"time"
 
-	r "github.com/dancannon/gorethink"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/hash"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
+	r "gopkg.in/dancannon/gorethink.v2"
 )
 
 type RethinkManager struct {

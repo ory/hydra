@@ -6,7 +6,6 @@ import (
 	"net/url"
 
 	"github.com/Sirupsen/logrus"
-	r "github.com/dancannon/gorethink"
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
@@ -29,6 +28,7 @@ import (
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/net/context"
+	r "gopkg.in/dancannon/gorethink.v2"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {

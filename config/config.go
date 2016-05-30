@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	r "github.com/dancannon/gorethink"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite/handler/core/strategy"
 	"github.com/ory-am/fosite/hash"
@@ -24,6 +23,7 @@ import (
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/yaml.v2"
 )
 

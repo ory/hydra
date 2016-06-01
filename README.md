@@ -21,7 +21,7 @@ Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://git
 
 - [What is Hydra?](#what-is-hydra)
   - [Feature Overview](#feature-overview)
-  - [When should I consider using Hydra?](#when-should-i-consider-using-hydra)
+  - [Can I use Hydra in my new or existing app?](#can-i-use-hydra-in-my-new-or-existing-app)
   - [Security](#security)
 - [Quickstart](#quickstart)
   - [Installation](#installation)

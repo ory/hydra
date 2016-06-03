@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	"crypto/sha256"
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite/handler/core/strategy"
@@ -25,7 +26,6 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/yaml.v2"
-	"crypto/sha256"
 )
 
 type Config struct {

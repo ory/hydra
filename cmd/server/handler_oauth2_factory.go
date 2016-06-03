@@ -85,7 +85,7 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 
 	keys, err := km.GetKey(oauth2.OpenIDConnectKeyName, "private")
 	if errors.Is(err, pkg.ErrNotFound) {
-		logrus.Warnln("Could not find OpenID Connect singing keys. Generating a new keypair...")
+		logrus.Warnln("Could not find OpenID Connect signing keys. Generating a new keypair...")
 		keys, err = new(jwk.RS256Generator).Generate("")
 		pkg.Must(err, "Could not generate signing key for OpenID Connect")
 		km.AddKeySet(oauth2.OpenIDConnectKeyName, keys)

@@ -12,6 +12,7 @@ import (
 	"github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 const (
@@ -37,6 +38,8 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	hostCmd.Flags().Bool("dangerous-auto-logon", false, "Stores the root credentials in ~/.hydra.yml. Do not use in production.")
+	hostCmd.Flags().String("tls-key-path", "", "Path to the key file for HTTP/2 over TLS.")
+	hostCmd.Flags().String("tls-cert-path", "", "Path to the certificate file for HTTP/2 over TLS.")
 }
 
 func runHostCmd(cmd *cobra.Command, args []string) {
@@ -66,7 +69,21 @@ func runHostCmd(cmd *cobra.Command, args []string) {
 	pkg.Must(err, "Could not start server: %s %s.", err)
 }
 
-func getOrCreateTLSCertificate() tls.Certificate {
+func loadCertificateFromFile(cmd *cobra.Command) {
+	keyPath := viper.Get("TLS_KEY_PATH")
+	certPath := viper.Get("TLS_CERT_PATH")
+	if kp, _ := cmd.Flags().GetString("tls-key-path"); kp != "" {
+		keyPath = kp
+	} else if cp, _ := cmd.Flags().GetString("tls-cert-path"); cp != "" {
+		certPath = cp
+	} else if keyPath == "" || certPath == "" {
+		return
+	}
+
+
+}
+
+func getOrCreateTLSCertificate(cmd *cobra.Command) tls.Certificate {
 	ctx := c.Context()
 	keys, err := ctx.KeyManager.GetKey(TLSKeyName, "private")
 	if errors.Is(err, pkg.ErrNotFound) {

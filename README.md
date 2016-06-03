@@ -230,7 +230,7 @@ WARNING: The SYSTEM_SECRET variable is not set. Defaulting to a blank string.
 rethinkdb uses an image, skipping
 Building hydra
 [...]
-$ SYSTEM_SECRET=passwordtutorialpasswordtutorial DOCKER_IP=$(docker-machine ip default) docker-compose up
+$ SYSTEM_SECRET=passwordtutorial DOCKER_IP=$(docker-machine ip default) docker-compose up
 Starting hydra_rethinkdb_1
 Recreating hydra_hydra_1
 Recreating hydra_consent_1
@@ -247,7 +247,7 @@ WARNING: The SYSTEM_SECRET variable is not set. Defaulting to a blank string.
 rethinkdb uses an image, skipping
 Building hydra
 [...]
-$ SYSTEM_SECRET=passwordtutorialpasswordtutorial DOCKER_IP=tutorialpassword docker-compose up
+$ SYSTEM_SECRET=passwordtutorial DOCKER_IP=localhost docker-compose up
 Starting hydra_rethinkdb_1
 Recreating hydra_hydra_1
 Recreating hydra_consent_1

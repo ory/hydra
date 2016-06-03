@@ -25,6 +25,7 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/yaml.v2"
+	"crypto/sha256"
 )
 
 type Config struct {
@@ -207,7 +208,9 @@ func (c *Config) GetSystemSecret() []byte {
 	c.Lock()
 	defer c.Unlock()
 
-	if len(c.SystemSecret) >= 32 {
+	if len(c.SystemSecret) >= 16 {
+		hash := sha256.Sum256(c.SystemSecret)
+		c.SystemSecret = hash[:]
 		return c.SystemSecret
 	}
 
@@ -218,6 +221,8 @@ func (c *Config) GetSystemSecret() []byte {
 	pkg.Must(err, "Could not generate global secret: %s", err)
 	logrus.Warnf("Generated system secret: %s", c.SystemSecret)
 	logrus.Warnln("Do not auto-generate system secrets in production.")
+	hash := sha256.Sum256(c.SystemSecret)
+	c.SystemSecret = hash[:]
 	return c.SystemSecret
 }
 

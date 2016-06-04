@@ -23,7 +23,7 @@ func TestExecute(t *testing.T) {
 	}{
 		{
 			args:    []string{"host", "--dangerous-auto-logon"},
-			timeout: time.Second,
+			timeout: time.Second * 10,
 		},
 		{
 			args:    []string{"token", "user", "--no-open"},

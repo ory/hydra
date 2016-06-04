@@ -14,7 +14,7 @@ Use the $FORCE_CLIENT_SECRET environment variable to force set a client secret.
 
 Example:
   hydra clients create -n "my app" -c=[http://localhost/cb] -g [authorization_code] -r [code] -a [core,foobar]
-  FORCE_CLIENT_SECRET=somesupersecretPassword create -n "my app" -c=[http://localhost/cb]
+  FORCE_CLIENT_SECRET=somesupersecretPassword hydra create -n "my app" -c=[http://localhost/cb]
 `,
 	Run: cmdHandler.Clients.CreateClient,
 }

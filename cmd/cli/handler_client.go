@@ -8,6 +8,7 @@ import (
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 type ClientHandler struct {
@@ -34,10 +35,9 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	callbacks, _ := cmd.Flags().GetStringSlice("callbacks")
 	name, _ := cmd.Flags().GetString("name")
 	id, _ := cmd.Flags().GetString("id")
-	secretFlag, _ := cmd.Flags().GetBool("secret")
 
-	secret := []byte(secretFlag)
-	if secretFlag == "" {
+	secret := []byte(viper.GetString("FORCE_CLIENT_SECRET"))
+	if len(viper.GetString("FORCE_CLIENT_SECRET")) == 0 {
 		secret, err = pkg.GenerateSecret(26)
 		pkg.Must(err, "Could not generate secret: %s", err)
 	}

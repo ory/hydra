@@ -13,6 +13,9 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"bytes"
+	"encoding/gob"
+	"github.com/square/go-jose"
 )
 
 const (
@@ -83,14 +86,15 @@ func loadCertificateFromFile(cmd *cobra.Command) {
 
 }
 
-func getOrCreateTLSCertificate(cmd *cobra.Command) tls.Certificate {
+func getOrCreateTLSCertificate() tls.Certificate {
 	ctx := c.Context()
 	keys, err := ctx.KeyManager.GetKey(TLSKeyName, "private")
 	if errors.Is(err, pkg.ErrNotFound) {
 		logrus.Warn("Key for TLS not found. Creating new one.")
 
 		generator := jwk.ECDSA256Generator{}
-		set, err := generator.Generate("")
+		var set *jose.JsonWebKeySet
+		set, err = generator.Generate("")
 		pkg.Must(err, "Could not generate key: %s", err)
 
 		err = ctx.KeyManager.AddKeySet(TLSKeyName, set)
@@ -99,15 +103,38 @@ func getOrCreateTLSCertificate(cmd *cobra.Command) tls.Certificate {
 		keys, err = ctx.KeyManager.GetKey(TLSKeyName, "private")
 		pkg.Must(err, "Could not retrieve persisted key: %s", err)
 		logrus.Warn("Temporary key created.")
-	} else {
-		pkg.Must(err, "Could not retrieve key: %s", err)
 	}
+	pkg.Must(err, "Could not retrieve key: %s", err)
 
-	pemCert, pemKey, err := jwk.ToX509PEMKeyPair(jwk.First(keys.Keys).Key)
-	pkg.Must(err, "Could not create X509 PEM Key Pair: %s", err)
+	var network bytes.Buffer
+	certificateJWK, err := ctx.KeyManager.GetKey(TLSKeyName, "certificate")
+	if errors.Is(err, pkg.ErrNotFound) {
+		pemCert, pemKey, err := jwk.ToX509PEMKeyPair(jwk.First(keys.Keys).Key)
+		pkg.Must(err, "Could not create X509 PEM Key Pair: %s", err)
 
-	cert, err := tls.X509KeyPair(pemCert, pemKey)
-	pkg.Must(err, "Could not create TLS Certificate: %s", err)
+		certificate, err := tls.X509KeyPair(pemCert, pemKey)
+		pkg.Must(err, "Could not create TLS Certificate: %s", err)
 
-	return cert
+		err = gob.NewEncoder(&network).Encode(certificate)
+		pkg.Must(err, "Could not create TLS Certificate: %s", err)
+
+		err = ctx.KeyManager.AddKey(TLSKeyName, jose.JsonWebKey{
+			KeyID: "certificate",
+			Key: network.Bytes(),
+		})
+		pkg.Must(err, "Could not persist certificate: %s", err)
+	} else if err == nil {
+		certificateBytes, ok := jwk.First(certificateJWK.Keys).Key.([]byte)
+		if !ok {
+			err =errors.New("Certificate type assertion failed")
+			pkg.Must(err, "Could decode certificate: %s", err)
+		}
+		network = bytes.NewBuffer(certificateBytes)
+	}
+	pkg.Must(err, "Could not retrieve certificate: %s", err)
+
+	var certificate tls.Certificate
+	err = gob.NewDecoder(network).Decode(&certificate)
+	pkg.Must(err, "Could not retrieve certificate: %s", err)
+	return &certificate
 }

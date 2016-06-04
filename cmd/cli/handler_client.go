@@ -34,7 +34,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	callbacks, _ := cmd.Flags().GetStringSlice("callbacks")
 	name, _ := cmd.Flags().GetString("name")
 	id, _ := cmd.Flags().GetString("id")
-	secretFlag, _ := cmd.Flags().GetString("secret")
+	secretFlag, _ := cmd.Flags().GetBool("secret")
 
 	secret := []byte(secretFlag)
 	if secretFlag == "" {

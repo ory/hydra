@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"net/http"
-
 	"crypto/tls"
 
 	"github.com/Sirupsen/logrus"
@@ -25,7 +24,25 @@ const (
 // hostCmd represents the host command
 var hostCmd = &cobra.Command{
 	Use:   "host",
-	Short: "Start the hydra host service",
+	Short: "Start the HTTP/2 host service",
+	Long: `Starts all HTTP/2 APIs and connects to a backend.
+
+This command supports the following environment variables:
+
+- DATABASE_URL: A URL to a persistent backend. Hydra supports various backends:
+  - None: If DATABASE_URL is empty, all data will be lost when the command is killed.
+  - RethinkDB: If DATABASE_URL is a DSN starting with rethinkdb://, RethinkDB will be used as storage backend.
+
+- SYSTEM_SECRET: A secret that is at least 16 characters long. If none is provided, one will be generated. They key
+	is used to encrypt sensitive data using AES-GCM (256 bit) and validate HMAC signatures.
+
+- HTTPS_TLS_CERT_PATH: The path to the TLS certificate (pem encoded).
+- HTTPS_TLS_KEY_PATH: The path to the TLS private key (pem encoded).
+- HTTPS_TLS_CERT: A pem encoded TLS certificate passed as string. Can be used instead of TLS_CERT_PATH.
+- HTTPS_TLS_KEY: A pem encoded TLS key passed as string. Can be used instead of TLS_KEY_PATH.
+
+- HYDRA_PROFILING: Set "HYDRA_PROFILING=1" to enable profiling.
+`,
 	Run:   runHostCmd,
 }
 
@@ -41,8 +58,8 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	hostCmd.Flags().Bool("dangerous-auto-logon", false, "Stores the root credentials in ~/.hydra.yml. Do not use in production.")
-	hostCmd.Flags().String("tls-key-path", "", "Path to the key file for HTTP/2 over TLS.")
-	hostCmd.Flags().String("tls-cert-path", "", "Path to the certificate file for HTTP/2 over TLS.")
+	hostCmd.Flags().String("https-tls-key-path", "", "Path to the key file for HTTP/2 over TLS (https). You can set HTTPS_TLS_KEY_PATH or HTTPS_TLS_KEY instead.")
+	hostCmd.Flags().String("https-tls-cert-path", "", "Path to the certificate file for HTTP/2 over TLS (https). You can set HTTPS_TLS_KEY_PATH or HTTPS_TLS_KEY instead.")
 }
 
 func runHostCmd(cmd *cobra.Command, args []string) {
@@ -62,7 +79,7 @@ func runHostCmd(cmd *cobra.Command, args []string) {
 		Addr: c.GetAddress(),
 		TLSConfig: &tls.Config{
 			Certificates: []tls.Certificate{
-				getOrCreateTLSCertificate(),
+				getOrCreateTLSCertificate(cmd),
 			},
 		},
 	}
@@ -72,21 +89,49 @@ func runHostCmd(cmd *cobra.Command, args []string) {
 	pkg.Must(err, "Could not start server: %s %s.", err)
 }
 
-func loadCertificateFromFile(cmd *cobra.Command) {
-	keyPath := viper.Get("TLS_KEY_PATH")
-	certPath := viper.Get("TLS_CERT_PATH")
-	if kp, _ := cmd.Flags().GetString("tls-key-path"); kp != "" {
+func loadCertificateFromFile(cmd *cobra.Command) *tls.Certificate {
+	keyPath := viper.GetString("HTTPS_TLS_KEY_PATH")
+	certPath := viper.GetString("HTTPS_TLS_CERT_PATH")
+	if kp, _ := cmd.Flags().GetString("https-tls-key-path"); kp != "" {
 		keyPath = kp
-	} else if cp, _ := cmd.Flags().GetString("tls-cert-path"); cp != "" {
+	} else if cp, _ := cmd.Flags().GetString("https-tls-cert-path"); cp != "" {
 		certPath = cp
 	} else if keyPath == "" || certPath == "" {
-		return
+		return nil
 	}
 
-
+	cert, err := tls.LoadX509KeyPair(certPath, keyPath)
+	if err != nil {
+		logrus.Warn("Could not load x509 key pair: %s", cert)
+		return nil
+	}
+	return &cert
 }
 
-func getOrCreateTLSCertificate() tls.Certificate {
+func loadCertificateFromEnv(cmd *cobra.Command) *tls.Certificate {
+	keyString := viper.GetString("HTTPS_TLS_KEY")
+	certString := viper.GetString("HTTPS_TLS_CERT")
+	if keyString == "" || certString == "" {
+		return nil
+	}
+
+	var cert tls.Certificate
+	var err error
+	if cert, err = tls.X509KeyPair([]byte(certString), []byte(keyString)); err != nil {
+		logrus.Warn("Could not parse x509 key pair from env: %s", cert)
+		return nil
+	}
+
+	return &cert
+}
+
+func getOrCreateTLSCertificate(cmd *cobra.Command) tls.Certificate {
+	if cert := loadCertificateFromFile(cmd); cert != nil {
+		return *cert
+	} else 	if cert := loadCertificateFromEnv(cmd); cert != nil {
+		return *cert
+	}
+
 	ctx := c.Context()
 	keys, err := ctx.KeyManager.GetKey(TLSKeyName, "private")
 	if errors.Is(err, pkg.ErrNotFound) {
@@ -118,7 +163,7 @@ func getOrCreateTLSCertificate() tls.Certificate {
 		err = gob.NewEncoder(&network).Encode(certificate)
 		pkg.Must(err, "Could not create TLS Certificate: %s", err)
 
-		err = ctx.KeyManager.AddKey(TLSKeyName, jose.JsonWebKey{
+		err = ctx.KeyManager.AddKey(TLSKeyName, &jose.JsonWebKey{
 			KeyID: "certificate",
 			Key: network.Bytes(),
 		})
@@ -129,12 +174,12 @@ func getOrCreateTLSCertificate() tls.Certificate {
 			err =errors.New("Certificate type assertion failed")
 			pkg.Must(err, "Could decode certificate: %s", err)
 		}
-		network = bytes.NewBuffer(certificateBytes)
+		network = *bytes.NewBuffer(certificateBytes)
 	}
 	pkg.Must(err, "Could not retrieve certificate: %s", err)
 
 	var certificate tls.Certificate
-	err = gob.NewDecoder(network).Decode(&certificate)
+	err = gob.NewDecoder(&network).Decode(&certificate)
 	pkg.Must(err, "Could not retrieve certificate: %s", err)
-	return &certificate
+	return certificate
 }

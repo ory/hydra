@@ -9,10 +9,16 @@ import (
 	"github.com/square/go-jose"
 )
 
-type RS256Generator struct{}
+type RS256Generator struct{
+	KeyLength int
+}
 
 func (g *RS256Generator) Generate(id string) (*jose.JsonWebKeySet, error) {
-	key, err := rsa.GenerateKey(rand.Reader, 1024)
+	if g.KeyLength < 4096 {
+		g.KeyLength = 4096
+	}
+
+	key, err := rsa.GenerateKey(rand.Reader, g.KeyLength)
 	if err != nil {
 		return nil, errors.Errorf("Could not generate key because %s", err)
 	} else if err = key.Validate(); err != nil {

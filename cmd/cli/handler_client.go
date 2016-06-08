@@ -3,14 +3,14 @@ package cli
 import (
 	"fmt"
 
+	"encoding/json"
+	"os"
+
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"os"
-	"encoding/json"
 )
 
 type ClientHandler struct {

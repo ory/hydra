@@ -56,11 +56,8 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	name, _ := cmd.Flags().GetString("name")
 	id, _ := cmd.Flags().GetString("id")
 
-	secret := []byte(viper.GetString("FORCE_CLIENT_SECRET"))
-	if len(viper.GetString("FORCE_CLIENT_SECRET")) == 0 {
-		secret, err = pkg.GenerateSecret(26)
-		pkg.Must(err, "Could not generate secret: %s", err)
-	}
+	secret, err := pkg.GenerateSecret(26)
+	pkg.Must(err, "Could not generate secret: %s", err)
 
 	client := &fosite.DefaultClient{
 		ID:            id,

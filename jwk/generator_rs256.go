@@ -9,7 +9,7 @@ import (
 	"github.com/square/go-jose"
 )
 
-type RS256Generator struct{
+type RS256Generator struct {
 	KeyLength int
 }
 

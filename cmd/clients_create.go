@@ -10,11 +10,8 @@ var clientsCreateCmd = &cobra.Command{
 	Short: "Create a new OAuth2 client",
 	Long: `This command creates a basic OAuth2 client. Always specify at least one redirect url.
 
-Use the $FORCE_CLIENT_SECRET environment variable to force set a client secret.
-
 Example:
   hydra clients create -n "my app" -c=[http://localhost/cb] -g [authorization_code] -r [code] -a [core,foobar]
-  FORCE_CLIENT_SECRET=somesupersecretPassword hydra create -n "my app" -c=[http://localhost/cb]
 `,
 	Run: cmdHandler.Clients.CreateClient,
 }

@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"crypto/sha256"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite/handler/core/strategy"

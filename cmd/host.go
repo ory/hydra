@@ -1,8 +1,11 @@
 package cmd
 
 import (
-	"net/http"
 	"crypto/tls"
+	"net/http"
+
+	"bytes"
+	"encoding/gob"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
@@ -12,8 +15,6 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"bytes"
-	"encoding/gob"
 	"github.com/square/go-jose"
 )
 
@@ -43,7 +44,7 @@ This command supports the following environment variables:
 
 - HYDRA_PROFILING: Set "HYDRA_PROFILING=1" to enable profiling.
 `,
-	Run:   runHostCmd,
+	Run: runHostCmd,
 }
 
 func init() {
@@ -163,7 +164,7 @@ func getOrCreateTLSCertificate(cmd *cobra.Command) tls.Certificate {
 
 		err = ctx.KeyManager.AddKey(TLSKeyName, &jose.JsonWebKey{
 			KeyID: "certificate",
-			Key: network.Bytes(),
+			Key:   network.Bytes(),
 		})
 		pkg.Must(err, "Could not persist certificate: %s", err)
 	} else if err == nil {

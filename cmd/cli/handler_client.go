@@ -9,6 +9,8 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"os"
+	"encoding/json"
 )
 
 type ClientHandler struct {
@@ -20,6 +22,24 @@ func newClientHandler(c *config.Config) *ClientHandler {
 	return &ClientHandler{
 		Config: c,
 		M:      &client.HTTPManager{},
+	}
+}
+
+func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
+	if len(args) == 0 {
+		fmt.Print(cmd.UsageString())
+		return
+	}
+
+	for _, path := range args {
+		reader, err := os.Open(path)
+		pkg.Must(err, "Could not open file %s: %s", path, err)
+		var client fosite.DefaultClient
+		err = json.NewDecoder(reader).Decode(&client)
+		pkg.Must(err, "Could not parse JSON: %s", err)
+		err = h.M.CreateClient(&client)
+		pkg.Must(err, "Could not create client: %s", err)
+		fmt.Printf("Imported client %s from %s.\n", client.ID, path)
 	}
 }
 

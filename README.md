@@ -373,6 +373,8 @@ DATABASE_URL=rethinkdb://$(docker-machine ip default):28015/hydra go run main.go
 
 ## FAQ
 
+
+
 ### How can I validate tokens?
 
 Please use the Warden API (API Docs, Guide).
@@ -395,6 +397,10 @@ Or by specifying the following flags:
 --https-tls-cert-path string   Path to the certificate file for HTTP/2 over TLS (https). You can set HTTPS_TLS_KEY_PATH or HTTPS_TLS_KEY instead.
 --https-tls-key-path string    Path to the key file for HTTP/2 over TLS (https). You can set HTTPS_TLS_KEY_PATH or HTTPS_TLS_KEY instead.
 ```
+
+### I want to disable HTTPS for testing
+
+You can do so by running `hydra host --force-dangerous-http`.
 
 ## Hall of Fame
 

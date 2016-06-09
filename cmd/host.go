@@ -58,6 +58,7 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
+	hostCmd.Flags().Bool("force-dangerous-http", false, "Disable HTTP/2 over TLS (HTTPS) and serve HTTP instead. Never use this in production.")
 	hostCmd.Flags().Bool("dangerous-auto-logon", false, "Stores the root credentials in ~/.hydra.yml. Do not use in production.")
 	hostCmd.Flags().String("https-tls-key-path", "", "Path to the key file for HTTP/2 over TLS (https). You can set HTTPS_TLS_KEY_PATH or HTTPS_TLS_KEY instead.")
 	hostCmd.Flags().String("https-tls-cert-path", "", "Path to the certificate file for HTTP/2 over TLS (https). You can set HTTPS_TLS_KEY_PATH or HTTPS_TLS_KEY instead.")
@@ -76,7 +77,7 @@ func runHostCmd(cmd *cobra.Command, args []string) {
 
 	http.Handle("/", router)
 
-	srv := &http.Server{
+	var srv = http.Server{
 		Addr: c.GetAddress(),
 		TLSConfig: &tls.Config{
 			Certificates: []tls.Certificate{
@@ -85,8 +86,14 @@ func runHostCmd(cmd *cobra.Command, args []string) {
 		},
 	}
 
+	var err error
 	logrus.Infof("Starting server on %s", c.GetAddress())
-	err := srv.ListenAndServeTLS("", "")
+	if ok, _ := cmd.Flags().GetBool("force-dangerous-http"); ok {
+		logrus.Warnln("HTTPS disabled. Never do this in production.")
+		err = srv.ListenAndServe()
+	} else {
+		err = srv.ListenAndServeTLS("", "")
+	}
 	pkg.Must(err, "Could not start server: %s %s.", err)
 }
 

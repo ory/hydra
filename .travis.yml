@@ -27,5 +27,5 @@ script:
   - docker build -t hydra-travis-ci .
   - docker run -d hydra-travis-ci
   - $GOPATH/bin/hydra host --dangerous-auto-logon &
-  - sleep 25
+  - while ! echo exit | nc localhost 4445; do sleep 1; done
   - $GOPATH/bin/hydra token client --skip-tls-verify

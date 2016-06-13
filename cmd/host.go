@@ -4,9 +4,6 @@ import (
 	"crypto/tls"
 	"net/http"
 
-	"bytes"
-	"encoding/gob"
-
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
@@ -16,6 +13,14 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/square/go-jose"
+	"crypto/x509"
+	"encoding/pem"
+	"math/big"
+	"crypto/x509/pkix"
+	"time"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/ecdsa"
 )
 
 const (
@@ -148,46 +153,88 @@ func getOrCreateTLSCertificate(cmd *cobra.Command) tls.Certificate {
 		keys, err = new(jwk.ECDSA256Generator).Generate("")
 		pkg.Must(err, "Could not generate key: %s", err)
 
+		cert, err := createSelfSignedCertificate(jwk.First(keys.Key("private")).Key)
+		pkg.Must(err, "Could not create X509 PEM Key Pair: %s", err)
+
+		private := jwk.First(keys.Key("private"))
+		private.Certificates = []*x509.Certificate{cert}
+		keys = &jose.JsonWebKeySet{
+			Keys: []jose.JsonWebKey{
+				*private,
+				*jwk.First(keys.Key("public")),
+			},
+		}
+
 		err = ctx.KeyManager.AddKeySet(TLSKeyName, keys)
 		pkg.Must(err, "Could not persist key: %s", err)
 	} else {
 		pkg.Must(err, "Could not retrieve key: %s", err)
 	}
 
-	var network bytes.Buffer
-	gob.Register(tls.Certificate{})
-	certificateJWK, err := ctx.KeyManager.GetKey(TLSKeyName, "certificate")
-	if errors.Is(err, pkg.ErrNotFound) {
-		pemCert, pemKey, err := jwk.ToX509PEMKeyPair(jwk.First(keys.Key("private")).Key)
-		pkg.Must(err, "Could not create X509 PEM Key Pair: %s", err)
-
-		certificate, err := tls.X509KeyPair(pemCert, pemKey)
-		pkg.Must(err, "Could not create TLS Certificate: %s", err)
-
-		certificate.PrivateKey = nil
-		certificate.Leaf = nil
-		err = gob.NewEncoder(&network).Encode(certificate)
-		pkg.Must(err, "Could not create TLS Certificate: %s", err)
-
-		err = ctx.KeyManager.AddKey(TLSKeyName, &jose.JsonWebKey{
-			KeyID: "certificate",
-			Key:   network.Bytes(),
-		})
-		pkg.Must(err, "Could not persist certificate: %s", err)
-	} else if err == nil {
-		certificateBytes, ok := jwk.First(certificateJWK.Keys).Key.([]byte)
-		if !ok {
-			err = errors.New("Certificate type assertion failed")
-			pkg.Must(err, "Could decode certificate: %s", err)
-		}
-		network = *bytes.NewBuffer(certificateBytes)
-	} else {
-		pkg.Must(err, "Could not retrieve certificate: %s", err)
+	private := jwk.First(keys.Key("private"))
+	block, err := jwk.PEMBlockForKey(private.Key)
+	if err != nil {
+		pkg.Must(err, "Could not encode key to PEM: %s", err)
 	}
 
-	var certificate tls.Certificate
-	err = gob.NewDecoder(&network).Decode(&certificate)
-	certificate.PrivateKey = jwk.First(keys.Key("private")).Key
-	pkg.Must(err, "Could not retrieve certificate: %s", err)
-	return certificate
+	if len(private.Certificates) == 0 {
+		logrus.Fatal("TLS certificate chain can not be empty")
+	}
+
+	pemCert := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: private.Certificates[0].Raw})
+	pemKey := pem.EncodeToMemory(block)
+	cert, err := tls.X509KeyPair(pemCert, pemKey)
+	pkg.Must(err, "Could not decode certificate: %s", err)
+
+	return cert
+}
+
+func createSelfSignedCertificate(key interface{}) (cert *x509.Certificate, err error) {
+	serialNumberLimit := new(big.Int).Lsh(big.NewInt(1), 128)
+	serialNumber, err := rand.Int(rand.Reader, serialNumberLimit)
+	if err != nil {
+		return cert, errors.Errorf("Failed to generate serial number: %s", err)
+	}
+
+	certificate := &x509.Certificate{
+		SerialNumber: serialNumber,
+		Subject: pkix.Name{
+			Organization: []string{"Hydra"},
+			CommonName:   "Hydra",
+		},
+		Issuer: pkix.Name{
+			Organization: []string{"Hydra"},
+			CommonName:   "Hydra",
+		},
+		NotBefore:             time.Now(),
+		NotAfter:              time.Now().Add(time.Hour * 24 * 7),
+		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		BasicConstraintsValid: true,
+	}
+
+	certificate.IsCA = true
+	certificate.KeyUsage |= x509.KeyUsageCertSign
+	certificate.DNSNames = append(certificate.DNSNames, "localhost")
+	der, err := x509.CreateCertificate(rand.Reader, certificate, certificate, publicKey(key), key)
+	if err != nil {
+		return cert, errors.Errorf("Failed to create certificate: %s", err)
+	}
+
+	cert, err = x509.ParseCertificate(der)
+	if err != nil {
+		return cert, errors.Errorf("Failed to encode private key: %s", err)
+	}
+	return cert, nil
+}
+
+func publicKey(key interface{}) interface{} {
+	switch k := key.(type) {
+	case *rsa.PrivateKey:
+		return &k.PublicKey
+	case *ecdsa.PrivateKey:
+		return &k.PublicKey
+	default:
+		return nil
+	}
 }

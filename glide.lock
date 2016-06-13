@@ -1,12 +1,12 @@
 hash: 175acff756341dd7fa75a3e1e2e1a042a957a1b2482f017ae0bb38a2e8b9c625
-updated: 2016-06-09T14:43:53.3467591+02:00
+updated: 2016-06-13T23:13:07.3775459+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: df81827fdd59d8b4fb93d8910b286ab7a3919520
 - name: github.com/BurntSushi/toml
   version: f0aeabca5a127c4078abb8c8d64298b147264b55
 - name: github.com/cenkalti/backoff
-  version: a6030178a585d5972d4d33ce61f4a1fa40eaaed0
+  version: cdf48bbc1eb78d1349cbda326a4a037f7ba565c6
 - name: github.com/davecgh/go-spew
   version: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
   subpackages:
@@ -88,11 +88,11 @@ imports:
 - name: github.com/spf13/jwalterweatherman
   version: 33c24e77fb80341fe7130ee7c594256ff08ccc46
 - name: github.com/spf13/pflag
-  version: cb88ea77998c3f024757528e3305022ab50b43be
+  version: 367864438f1b1a3c7db4da06a2f55b144e6784e0
 - name: github.com/spf13/viper
   version: c1ccc378a054ea8d4e38d8c67f6938d4760b53dd
 - name: github.com/square/go-jose
-  version: d2a847139a1442cada879cc05cc4080485b8d193
+  version: f7dab0d84e417e827829f248ef197af7d87c714c
   subpackages:
   - json
   - cipher
@@ -104,7 +104,7 @@ imports:
 - name: github.com/toqueteos/webbrowser
   version: 21fc9f95c83442fd164094666f7cb4f9fdd56cd6
 - name: golang.org/x/crypto
-  version: 77f4136a99ffb5ecdbdd0226bd5cb146cf56bc0e
+  version: f3241ce8505855877cc8a9717bd61a0f7c4ea83c
   subpackages:
   - bcrypt
   - pbkdf2
@@ -120,7 +120,7 @@ imports:
   - clientcredentials
   - internal
 - name: golang.org/x/sys
-  version: 076b546753157f758b316e59bcb51e6807c04057
+  version: 7f918dd405547ecb864d14a8ecbbfe205b5f930f
   subpackages:
   - unix
 - name: google.golang.org/appengine

@@ -57,12 +57,14 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 		return
 	}
 
-	secret, err := sequence.RuneSequence(12, []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-.,:;$%!&/()=?+*#<>"))
-	if err != nil {
-		h.H.WriteError(ctx, w, r, errors.New(err))
-		return
+	if len(c.Secret) < 6 {
+		secret, err := sequence.RuneSequence(12, []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-.,:;$%!&/()=?+*#<>"))
+		if err != nil {
+			h.H.WriteError(ctx, w, r, errors.New(err))
+			return
+		}
+		c.Secret = []byte(string(secret))
 	}
-	c.Secret = []byte(string(secret))
 
 	if err := h.Manager.CreateClient(&c); err != nil {
 		h.H.WriteError(ctx, w, r, err)

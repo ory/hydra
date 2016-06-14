@@ -97,7 +97,7 @@ string that contains information about the user, specifically the user's unique 
 and issues an OAuth2 access token and optionally a refresh or open id token.
 
 Every time a request containing an access token hits a resource server (todo24.com/lists/manage), you make a request to Hydra asking who the token's
-subject (the user who authorized the client to create a token on his behalf) is and weather or not the token is valid. You may optionally
+subject (the user who authorized the client to create a token on his behalf) is and whether the token is valid or not. You may optionally
 ask if the token has permission to perform a certain action.
 
 ## Security

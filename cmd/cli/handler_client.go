@@ -40,6 +40,10 @@ func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 		pkg.Must(err, "Could not parse JSON: %s", err)
 
 		err = h.M.CreateClient(&client)
+		if h.M.Dry {
+			fmt.Printf("%s\n", err)
+			continue
+		}
 		pkg.Must(err, "Could not create client: %s", err)
 		fmt.Printf("Imported client %s from %s.\n", client.ID, path)
 	}
@@ -72,6 +76,10 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		Name:          name,
 	}
 	err = h.M.CreateClient(client)
+	if h.M.Dry {
+		fmt.Printf("%s\n", err)
+		return
+	}
 	pkg.Must(err, "Could not create client: %s", err)
 
 	fmt.Printf("Client ID: %s\n", client.ID)
@@ -89,6 +97,10 @@ func (h *ClientHandler) DeleteClient(cmd *cobra.Command, args []string) {
 
 	for _, c := range args {
 		err := h.M.DeleteClient(c)
+		if h.M.Dry {
+			fmt.Printf("%s\n", err)
+			continue
+		}
 		pkg.Must(err, "Could not delete client: %s", err)
 	}
 

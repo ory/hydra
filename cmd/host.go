@@ -4,6 +4,15 @@ import (
 	"crypto/tls"
 	"net/http"
 
+	"crypto/ecdsa"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
+	"crypto/x509/pkix"
+	"encoding/pem"
+	"math/big"
+	"time"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
@@ -13,14 +22,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/square/go-jose"
-	"crypto/x509"
-	"encoding/pem"
-	"math/big"
-	"crypto/x509/pkix"
-	"time"
-	"crypto/rand"
-	"crypto/rsa"
-	"crypto/ecdsa"
 )
 
 const (

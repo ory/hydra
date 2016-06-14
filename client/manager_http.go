@@ -11,7 +11,7 @@ import (
 type HTTPManager struct {
 	Client   *http.Client
 	Endpoint *url.URL
-	Dry bool
+	Dry      bool
 }
 
 func (m *HTTPManager) GetClient(id string) (fosite.Client, error) {

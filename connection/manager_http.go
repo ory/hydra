@@ -10,7 +10,7 @@ import (
 type HTTPManager struct {
 	Endpoint *url.URL
 	Client   *http.Client
-	Dry bool
+	Dry      bool
 }
 
 func (m *HTTPManager) Create(connection *Connection) error {

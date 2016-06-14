@@ -5,6 +5,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
+
 	"github.com/go-errors/errors"
 	"github.com/square/go-jose"
 )

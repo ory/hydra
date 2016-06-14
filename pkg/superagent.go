@@ -15,14 +15,14 @@ import (
 type SuperAgent struct {
 	Client *http.Client
 	URL    string
-	Dry bool
+	Dry    bool
 }
 
 func NewSuperAgent(rawurl string) *SuperAgent {
 	return &SuperAgent{
 		URL:    rawurl,
 		Client: http.DefaultClient,
-		Dry: viper.GetBool("dry"),
+		Dry:    viper.GetBool("dry"),
 	}
 }
 

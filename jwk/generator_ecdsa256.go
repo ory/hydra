@@ -5,9 +5,10 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 
+	"crypto/x509"
+
 	"github.com/go-errors/errors"
 	"github.com/square/go-jose"
-	"crypto/x509"
 )
 
 type ECDSA256Generator struct{}
@@ -21,13 +22,13 @@ func (g *ECDSA256Generator) Generate(id string) (*jose.JsonWebKeySet, error) {
 	return &jose.JsonWebKeySet{
 		Keys: []jose.JsonWebKey{
 			{
-				Key:   key,
-				KeyID: ider("private", id),
+				Key:          key,
+				KeyID:        ider("private", id),
 				Certificates: []*x509.Certificate{},
 			},
 			{
-				Key:   &key.PublicKey,
-				KeyID: ider("public", id),
+				Key:          &key.PublicKey,
+				KeyID:        ider("public", id),
 				Certificates: []*x509.Certificate{},
 			},
 		},

@@ -1,10 +1,11 @@
 package jwk
 
 import (
+	"crypto/x509"
+
 	"github.com/go-errors/errors"
 	"github.com/ory-am/common/rand/sequence"
 	"github.com/square/go-jose"
-	"crypto/x509"
 )
 
 type HS256Generator struct {
@@ -28,8 +29,8 @@ func (g *HS256Generator) Generate(id string) (*jose.JsonWebKeySet, error) {
 	return &jose.JsonWebKeySet{
 		Keys: []jose.JsonWebKey{
 			{
-				Key:   []byte(string(key)),
-				KeyID: id,
+				Key:          []byte(string(key)),
+				KeyID:        id,
 				Certificates: []*x509.Certificate{},
 			},
 		},

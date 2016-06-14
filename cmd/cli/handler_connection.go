@@ -18,7 +18,7 @@ type ConnectionHandler struct {
 func newConnectionHandler(c *config.Config) *ConnectionHandler {
 	return &ConnectionHandler{
 		Config: c,
-		M:      &connection.HTTPManager{		},
+		M:      &connection.HTTPManager{},
 	}
 }
 
@@ -37,6 +37,10 @@ func (h *ConnectionHandler) CreateConnection(cmd *cobra.Command, args []string) 
 		LocalSubject:  args[1],
 		RemoteSubject: args[2],
 	})
+	if h.M.Dry {
+		fmt.Printf("%s\n", err)
+		return
+	}
 	pkg.Must(err, "Could not create connection: %s", err)
 }
 
@@ -51,6 +55,10 @@ func (h *ConnectionHandler) DeleteConnection(cmd *cobra.Command, args []string) 
 
 	for _, arg := range args {
 		err := h.M.Delete(arg)
+		if h.M.Dry {
+			fmt.Printf("%s\n", err)
+			continue
+		}
 		pkg.Must(err, "Could not delete connection: %s", err)
 		fmt.Printf("Connection %s deleted.\n", arg)
 	}

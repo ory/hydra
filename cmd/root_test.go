@@ -6,9 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
 	"fmt"
+
 	"github.com/pborman/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func init() {
@@ -21,12 +22,13 @@ func TestExecute(t *testing.T) {
 	copy(osArgs, os.Args)
 
 	for _, c := range []struct {
-		args    []string
-		timeout time.Duration
-		wait    func() bool
+		args      []string
+		timeout   time.Duration
+		wait      func() bool
+		expectErr bool
 	}{
 		{
-			args:    []string{"host", "--dangerous-auto-logon"},
+			args: []string{"host", "--dangerous-auto-logon"},
 			wait: func() bool {
 				_, err := os.Stat(path)
 				return err != nil
@@ -69,7 +71,8 @@ func TestExecute(t *testing.T) {
 		} else if c.timeout > 0 {
 			time.Sleep(c.timeout)
 		} else {
-			assert.Nil(t, RootCmd.Execute())
+
+			assert.Equal(t, c.expectErr, RootCmd.Execute() != nil)
 		}
 	}
 }

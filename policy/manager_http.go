@@ -30,8 +30,8 @@ func (p *jsonPolicy) FromPolicy() {
 
 type HTTPManager struct {
 	Endpoint *url.URL
-	Dry bool
-	Client *http.Client
+	Dry      bool
+	Client   *http.Client
 }
 
 // Create persists the policy.

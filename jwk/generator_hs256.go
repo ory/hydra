@@ -4,6 +4,7 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/ory-am/common/rand/sequence"
 	"github.com/square/go-jose"
+	"crypto/x509"
 )
 
 type HS256Generator struct {
@@ -29,6 +30,7 @@ func (g *HS256Generator) Generate(id string) (*jose.JsonWebKeySet, error) {
 			{
 				Key:   []byte(string(key)),
 				KeyID: id,
+				Certificates: []*x509.Certificate{},
 			},
 		},
 	}, nil

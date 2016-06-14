@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-errors/errors"
 	"github.com/square/go-jose"
+	"crypto/x509"
 )
 
 type ECDSA521Generator struct{}
@@ -22,10 +23,12 @@ func (g *ECDSA521Generator) Generate(id string) (*jose.JsonWebKeySet, error) {
 			{
 				Key:   key,
 				KeyID: ider("private", id),
+				Certificates: []*x509.Certificate{},
 			},
 			{
 				Key:   &key.PublicKey,
 				KeyID: ider("public", id),
+				Certificates: []*x509.Certificate{},
 			},
 		},
 	}, nil

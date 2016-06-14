@@ -1,5 +1,5 @@
 hash: 175acff756341dd7fa75a3e1e2e1a042a957a1b2482f017ae0bb38a2e8b9c625
-updated: 2016-06-13T23:13:07.3775459+02:00
+updated: 2016-06-14T11:06:19.0082149+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: df81827fdd59d8b4fb93d8910b286ab7a3919520
@@ -42,6 +42,8 @@ imports:
   version: c265cfa48dda6474e208715ca93e987829f572f8
 - name: github.com/mitchellh/mapstructure
   version: d2dd0262208475919e1a362f675cfc0e7c10e905
+- name: github.com/moul/http2curl
+  version: b1479103caacaa39319f75e7f57fc545287fca0d
 - name: github.com/oleiade/reflections
   version: 632977f98cd34d217c4b57d0840ec188b3d3dcaf
 - name: github.com/ory-am/common

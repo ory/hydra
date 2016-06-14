@@ -26,6 +26,7 @@ func newClientHandler(c *config.Config) *ClientHandler {
 }
 
 func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
+	h.M.Dry = *h.Config.Dry
 	if len(args) == 0 {
 		fmt.Print(cmd.UsageString())
 		return
@@ -37,6 +38,7 @@ func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 		var client fosite.DefaultClient
 		err = json.NewDecoder(reader).Decode(&client)
 		pkg.Must(err, "Could not parse JSON: %s", err)
+
 		err = h.M.CreateClient(&client)
 		pkg.Must(err, "Could not create client: %s", err)
 		fmt.Printf("Imported client %s from %s.\n", client.ID, path)
@@ -46,6 +48,7 @@ func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	var err error
 
+	h.M.Dry = *h.Config.Dry
 	h.M.Endpoint = h.Config.Resolve("/clients")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 
@@ -76,6 +79,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 }
 
 func (h *ClientHandler) DeleteClient(cmd *cobra.Command, args []string) {
+	h.M.Dry = *h.Config.Dry
 	h.M.Endpoint = h.Config.Resolve("/clients")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 	if len(args) == 0 {

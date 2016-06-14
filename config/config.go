@@ -50,6 +50,8 @@ type Config struct {
 
 	ForceHTTP bool `mapstructure:"foolishly_force_http" yaml:"-"`
 
+	Dry *bool `mapstructure:"-" yaml:"-"`
+
 	cluster *url.URL
 
 	oauth2Client *http.Client

@@ -18,11 +18,12 @@ type JWKHandler struct {
 func newJWKHandler(c *config.Config) *JWKHandler {
 	return &JWKHandler{
 		Config: c,
-		M:      &jwk.HTTPManager{},
+		M:      &jwk.HTTPManager{		},
 	}
 }
 
 func (h *JWKHandler) CreateKeys(cmd *cobra.Command, args []string) {
+	h.M.Dry = *h.Config.Dry
 	h.M.Endpoint = h.Config.Resolve("/keys")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 	if len(args) == 0 {
@@ -41,6 +42,7 @@ func (h *JWKHandler) CreateKeys(cmd *cobra.Command, args []string) {
 }
 
 func (h *JWKHandler) GetKeys(cmd *cobra.Command, args []string) {
+	h.M.Dry = *h.Config.Dry
 	h.M.Endpoint = h.Config.Resolve("/keys")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 	if len(args) == 0 {

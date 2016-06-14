@@ -30,7 +30,7 @@ func (p *jsonPolicy) FromPolicy() {
 
 type HTTPManager struct {
 	Endpoint *url.URL
-
+	Dry bool
 	Client *http.Client
 }
 
@@ -38,6 +38,7 @@ type HTTPManager struct {
 func (m *HTTPManager) Create(policy ladon.Policy) error {
 	var r = pkg.NewSuperAgent(m.Endpoint.String())
 	r.Client = m.Client
+	r.Dry = m.Dry
 	return r.Create(policy)
 }
 
@@ -48,6 +49,7 @@ func (m *HTTPManager) Get(id string) (ladon.Policy, error) {
 	}
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, id).String())
 	r.Client = m.Client
+	r.Dry = m.Dry
 	if err := r.Get(&policy); err != nil {
 		return nil, err
 	}
@@ -60,6 +62,7 @@ func (m *HTTPManager) Get(id string) (ladon.Policy, error) {
 func (m *HTTPManager) Delete(id string) error {
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, id).String())
 	r.Client = m.Client
+	r.Dry = m.Dry
 	return r.Delete()
 }
 
@@ -68,6 +71,7 @@ func (m *HTTPManager) FindPoliciesForSubject(subject string) (ladon.Policies, er
 	var policies []*ladon.DefaultPolicy
 	var r = pkg.NewSuperAgent(m.Endpoint.String() + "?subject=" + subject)
 	r.Client = m.Client
+	r.Dry = m.Dry
 	if err := r.Get(&policies); err != nil {
 		return nil, err
 	}

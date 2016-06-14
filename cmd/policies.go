@@ -11,5 +11,9 @@ var policiesCmd = &cobra.Command{
 }
 
 func init() {
+	var dry bool
+	c.Dry = &dry
+
 	RootCmd.AddCommand(policiesCmd)
+	policiesCmd.PersistentFlags().BoolVar(c.Dry, "dry", false, "do not execute the command but show the corresponding curl command instead")
 }

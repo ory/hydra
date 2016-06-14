@@ -8,24 +8,44 @@ import (
 	"io/ioutil"
 
 	"github.com/go-errors/errors"
+	"github.com/moul/http2curl"
+	"github.com/spf13/viper"
 )
 
 type SuperAgent struct {
 	Client *http.Client
 	URL    string
+	Dry    bool
 }
 
 func NewSuperAgent(rawurl string) *SuperAgent {
 	return &SuperAgent{
 		URL:    rawurl,
 		Client: http.DefaultClient,
+		Dry:    viper.GetBool("dry"),
 	}
+}
+
+func (s *SuperAgent) doDry(req *http.Request) error {
+	if s.Dry {
+		command, err := http2curl.GetCurlCommand(req)
+		if err != nil {
+			return errors.New(err)
+		}
+
+		return errors.Errorf("Because you are using the dry option, the request will not be executed. You can execute this command using: \n\n%s", command)
+	}
+	return nil
 }
 
 func (s *SuperAgent) Delete() error {
 	req, err := http.NewRequest("DELETE", s.URL, nil)
 	if err != nil {
 		return errors.New(err)
+	}
+
+	if err := s.doDry(req); err != nil {
+		return err
 	}
 
 	resp, err := s.Client.Do(req)
@@ -48,6 +68,10 @@ func (s *SuperAgent) Get(o interface{}) error {
 		return errors.New(err)
 	} else if o == nil {
 		return errors.New("Can not pass nil")
+	}
+
+	if err := s.doDry(req); err != nil {
+		return err
 	}
 
 	resp, err := s.Client.Do(req)
@@ -94,6 +118,10 @@ func (s *SuperAgent) send(method string, in interface{}, out interface{}) error 
 	}
 
 	req.Header.Set("Content-Type", "application/json")
+	if err := s.doDry(req); err != nil {
+		return err
+	}
+
 	resp, err := s.Client.Do(req)
 	if err != nil {
 		return errors.New(err)

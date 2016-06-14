@@ -3,6 +3,9 @@ package cli
 import (
 	"fmt"
 
+	"encoding/json"
+	"os"
+
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
@@ -22,9 +25,34 @@ func newClientHandler(c *config.Config) *ClientHandler {
 	}
 }
 
+func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
+	h.M.Dry = *h.Config.Dry
+	if len(args) == 0 {
+		fmt.Print(cmd.UsageString())
+		return
+	}
+
+	for _, path := range args {
+		reader, err := os.Open(path)
+		pkg.Must(err, "Could not open file %s: %s", path, err)
+		var client fosite.DefaultClient
+		err = json.NewDecoder(reader).Decode(&client)
+		pkg.Must(err, "Could not parse JSON: %s", err)
+
+		err = h.M.CreateClient(&client)
+		if h.M.Dry {
+			fmt.Printf("%s\n", err)
+			continue
+		}
+		pkg.Must(err, "Could not create client: %s", err)
+		fmt.Printf("Imported client %s from %s.\n", client.ID, path)
+	}
+}
+
 func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	var err error
 
+	h.M.Dry = *h.Config.Dry
 	h.M.Endpoint = h.Config.Resolve("/clients")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 
@@ -34,13 +62,9 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	callbacks, _ := cmd.Flags().GetStringSlice("callbacks")
 	name, _ := cmd.Flags().GetString("name")
 	id, _ := cmd.Flags().GetString("id")
-	secretFlag, _ := cmd.Flags().GetString("secret")
 
-	secret := []byte(secretFlag)
-	if secretFlag == "" {
-		secret, err = pkg.GenerateSecret(26)
-		pkg.Must(err, "Could not generate secret: %s", err)
-	}
+	secret, err := pkg.GenerateSecret(26)
+	pkg.Must(err, "Could not generate secret: %s", err)
 
 	client := &fosite.DefaultClient{
 		ID:            id,
@@ -52,6 +76,10 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		Name:          name,
 	}
 	err = h.M.CreateClient(client)
+	if h.M.Dry {
+		fmt.Printf("%s\n", err)
+		return
+	}
 	pkg.Must(err, "Could not create client: %s", err)
 
 	fmt.Printf("Client ID: %s\n", client.ID)
@@ -59,6 +87,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 }
 
 func (h *ClientHandler) DeleteClient(cmd *cobra.Command, args []string) {
+	h.M.Dry = *h.Config.Dry
 	h.M.Endpoint = h.Config.Resolve("/clients")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 	if len(args) == 0 {
@@ -68,6 +97,10 @@ func (h *ClientHandler) DeleteClient(cmd *cobra.Command, args []string) {
 
 	for _, c := range args {
 		err := h.M.DeleteClient(c)
+		if h.M.Dry {
+			fmt.Printf("%s\n", err)
+			continue
+		}
 		pkg.Must(err, "Could not delete client: %s", err)
 	}
 

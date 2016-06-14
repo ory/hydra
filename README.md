@@ -2,18 +2,21 @@
 
 [![Build Status](https://travis-ci.org/ory-am/hydra.svg?branch=master)](https://travis-ci.org/ory-am/hydra)
 [![Coverage Status](https://coveralls.io/repos/ory-am/hydra/badge.svg?branch=master&service=github)](https://coveralls.io/github/ory-am/hydra?branch=master)
+[![Code Climate](https://codeclimate.com/github/ory-am/hydra/badges/gpa.svg)](https://codeclimate.com/github/ory-am/hydra)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ory-am/hydra)](https://goreportcard.com/report/github.com/ory-am/hydra)
 
 [![Join the chat at https://gitter.im/ory-am/hydra](https://img.shields.io/badge/join-chat-00cc99.svg)](https://gitter.im/ory-am/hydra?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Join mailinglist](https://img.shields.io/badge/join-mailinglist-00cc99.svg)](https://groups.google.com/forum/#!forum/ory-hydra/new)
 [![Join newsletter](https://img.shields.io/badge/join-newsletter-00cc99.svg)](http://eepurl.com/bKT3N9)
+[![Follow newsletter](https://img.shields.io/badge/follow-twitter-00cc99.svg)](https://twitter.com/_aeneasr)
+[![Follow GitHub](https://img.shields.io/badge/follow-github-00cc99.svg)](https://github.com/arekkas)
 
-Hydra is being developed by german-based company [Ory](https://ory.am). Join our [newsletter](http://eepurl.com/bKT3N9) to stay on top of new developments.  
+Hydra is being developed by german-based company [Ory](https://ory.am). Join our [newsletter](http://eepurl.com/bKT3N9) to stay on top of new developments.
 We respond on [Google Groups](https://groups.google.com/forum/#!forum/ory-hydra/new) and [Gitter](https://gitter.im/ory-am/hydra). Our timezone is CET.
 
 Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://github.com/ory-am/fosite) and [Ladon](https://github.com/ory-am/ladon) for policy-based access control.
 
-:fire: Don't want to worry about security updates, backups, migration and scaling? Do you need enterprise support? Become an managed Hydra early adopter! [Contact us now](mailto:sales@ory.am) for more information. :fire:
+:fire: Don't want to worry about security updates, backups, migration and scaling? Do you need enterprise support? [Contact us now](mailto:sales@ory.am) and be a early adopter. :fire:
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -230,7 +233,7 @@ WARNING: The SYSTEM_SECRET variable is not set. Defaulting to a blank string.
 rethinkdb uses an image, skipping
 Building hydra
 [...]
-$ SYSTEM_SECRET=passwordtutorialpasswordtutorial DOCKER_IP=$(docker-machine ip default) docker-compose up
+$ SYSTEM_SECRET=passwordtutorial DOCKER_IP=$(docker-machine ip default) docker-compose up
 Starting hydra_rethinkdb_1
 Recreating hydra_hydra_1
 Recreating hydra_consent_1
@@ -247,7 +250,7 @@ WARNING: The SYSTEM_SECRET variable is not set. Defaulting to a blank string.
 rethinkdb uses an image, skipping
 Building hydra
 [...]
-$ SYSTEM_SECRET=passwordtutorialpasswordtutorial DOCKER_IP=tutorialpassword docker-compose up
+$ SYSTEM_SECRET=passwordtutorial DOCKER_IP=localhost docker-compose up
 Starting hydra_rethinkdb_1
 Recreating hydra_hydra_1
 Recreating hydra_consent_1
@@ -367,6 +370,37 @@ DATABASE_URL=rethinkdb://localhost:28015/hydra go run main.go
 # Docker Terminal
 DATABASE_URL=rethinkdb://$(docker-machine ip default):28015/hydra go run main.go
 ```
+
+## FAQ
+
+
+
+### How can I validate tokens?
+
+Please use the Warden API (API Docs, Guide).
+
+### How can I import TLS certificates?
+
+You can import TLS certificates when running `hydra host`. This can be done by setting the following environment variables:
+
+**Read from file**
+- `HTTPS_TLS_CERT_PATH`: The path to the TLS certificate (pem encoded).
+- `HTTPS_TLS_KEY_PATH`: The path to the TLS private key (pem encoded).
+
+**Embedded**
+- `HTTPS_TLS_CERT`: A pem encoded TLS certificate passed as string. Can be used instead of TLS_CERT_PATH.
+- `HTTPS_TLS_KEY`: A pem encoded TLS key passed as string. Can be used instead of TLS_KEY_PATH.
+
+Or by specifying the following flags:
+
+```
+--https-tls-cert-path string   Path to the certificate file for HTTP/2 over TLS (https). You can set HTTPS_TLS_KEY_PATH or HTTPS_TLS_KEY instead.
+--https-tls-key-path string    Path to the key file for HTTP/2 over TLS (https). You can set HTTPS_TLS_KEY_PATH or HTTPS_TLS_KEY instead.
+```
+
+### I want to disable HTTPS for testing
+
+You can do so by running `hydra host --force-dangerous-http`.
 
 ## Hall of Fame
 

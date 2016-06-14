@@ -5,14 +5,22 @@ import (
 	"crypto/rsa"
 	"fmt"
 
+	"crypto/x509"
+
 	"github.com/go-errors/errors"
 	"github.com/square/go-jose"
 )
 
-type RS256Generator struct{}
+type RS256Generator struct {
+	KeyLength int
+}
 
 func (g *RS256Generator) Generate(id string) (*jose.JsonWebKeySet, error) {
-	key, err := rsa.GenerateKey(rand.Reader, 1024)
+	if g.KeyLength < 4096 {
+		g.KeyLength = 4096
+	}
+
+	key, err := rsa.GenerateKey(rand.Reader, g.KeyLength)
 	if err != nil {
 		return nil, errors.Errorf("Could not generate key because %s", err)
 	} else if err = key.Validate(); err != nil {
@@ -24,12 +32,14 @@ func (g *RS256Generator) Generate(id string) (*jose.JsonWebKeySet, error) {
 	return &jose.JsonWebKeySet{
 		Keys: []jose.JsonWebKey{
 			{
-				Key:   key,
-				KeyID: ider("private", id),
+				Key:          key,
+				KeyID:        ider("private", id),
+				Certificates: []*x509.Certificate{},
 			},
 			{
-				Key:   &key.PublicKey,
-				KeyID: ider("public", id),
+				Key:          &key.PublicKey,
+				KeyID:        ider("public", id),
+				Certificates: []*x509.Certificate{},
 			},
 		},
 	}, nil

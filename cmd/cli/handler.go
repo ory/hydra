@@ -15,7 +15,7 @@ func NewHandler(c *config.Config) *Handler {
 	return &Handler{
 		Clients:     newClientHandler(c),
 		Connections: newConnectionHandler(c),
-		Policies:    newPolicHandler(c),
+		Policies:    newPolicyHandler(c),
 		Keys:        newJWKHandler(c),
 	}
 }

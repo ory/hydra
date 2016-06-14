@@ -10,11 +10,13 @@ import (
 type HTTPManager struct {
 	Endpoint *url.URL
 	Client   *http.Client
+	Dry      bool
 }
 
 func (m *HTTPManager) Create(connection *Connection) error {
 	var r = pkg.NewSuperAgent(m.Endpoint.String())
 	r.Client = m.Client
+	r.Dry = m.Dry
 	return r.Create(connection)
 }
 
@@ -22,6 +24,7 @@ func (m *HTTPManager) Get(id string) (*Connection, error) {
 	var connection Connection
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, id).String())
 	r.Client = m.Client
+	r.Dry = m.Dry
 	if err := r.Get(&connection); err != nil {
 		return nil, err
 	}
@@ -32,6 +35,7 @@ func (m *HTTPManager) Get(id string) (*Connection, error) {
 func (m *HTTPManager) Delete(id string) error {
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, id).String())
 	r.Client = m.Client
+	r.Dry = m.Dry
 	return r.Delete()
 }
 
@@ -45,6 +49,7 @@ func (m *HTTPManager) FindAllByLocalSubject(subject string) ([]*Connection, erro
 
 	var r = pkg.NewSuperAgent(u.String())
 	r.Client = m.Client
+	r.Dry = m.Dry
 	if err := r.Get(&connection); err != nil {
 		return nil, err
 	}
@@ -62,6 +67,7 @@ func (m *HTTPManager) FindByRemoteSubject(provider, subject string) (*Connection
 
 	var r = pkg.NewSuperAgent(u.String())
 	r.Client = m.Client
+	r.Dry = m.Dry
 	if err := r.Get(&connection); err != nil {
 		return nil, err
 	}

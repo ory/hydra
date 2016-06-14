@@ -23,6 +23,7 @@ func newJWKHandler(c *config.Config) *JWKHandler {
 }
 
 func (h *JWKHandler) CreateKeys(cmd *cobra.Command, args []string) {
+	h.M.Dry = *h.Config.Dry
 	h.M.Endpoint = h.Config.Resolve("/keys")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 	if len(args) == 0 {
@@ -32,6 +33,10 @@ func (h *JWKHandler) CreateKeys(cmd *cobra.Command, args []string) {
 
 	alg, _ := cmd.Flags().GetString("alg")
 	keys, err := h.M.CreateKeys(args[0], alg)
+	if h.M.Dry {
+		fmt.Printf("%s\n", err)
+		return
+	}
 	pkg.Must(err, "Could not generate keys: %s", err)
 
 	out, err := json.MarshalIndent(keys, "", "\t")
@@ -41,6 +46,7 @@ func (h *JWKHandler) CreateKeys(cmd *cobra.Command, args []string) {
 }
 
 func (h *JWKHandler) GetKeys(cmd *cobra.Command, args []string) {
+	h.M.Dry = *h.Config.Dry
 	h.M.Endpoint = h.Config.Resolve("/keys")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 	if len(args) == 0 {
@@ -49,6 +55,10 @@ func (h *JWKHandler) GetKeys(cmd *cobra.Command, args []string) {
 	}
 
 	keys, err := h.M.GetKeySet(args[0])
+	if h.M.Dry {
+		fmt.Printf("%s\n", err)
+		return
+	}
 	pkg.Must(err, "Could not generate keys: %s", err)
 
 	out, err := json.MarshalIndent(keys, "", "\t")
@@ -66,6 +76,10 @@ func (h *JWKHandler) DeleteKeys(cmd *cobra.Command, args []string) {
 	}
 
 	err := h.M.DeleteKeySet(args[0])
+	if h.M.Dry {
+		fmt.Printf("%s\n", err)
+		return
+	}
 	pkg.Must(err, "Could not generate keys: %s", err)
 	fmt.Println("Key set deleted.")
 }

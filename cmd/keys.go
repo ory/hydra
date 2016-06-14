@@ -25,7 +25,11 @@ var keysCmd = &cobra.Command{
 }
 
 func init() {
+	var dry bool
+	c.Dry = &dry
+
 	RootCmd.AddCommand(keysCmd)
+	keysCmd.PersistentFlags().BoolVar(c.Dry, "dry", false, "do not execute the command but show the corresponding curl command instead")
 
 	// Here you will define your flags and configuration settings.
 

@@ -16,6 +16,7 @@ services:
       - SYSTEM_SECRET=${SYSTEM_SECRET}
       - CONSENT_URL=http://${DOCKER_IP}:3000
       - DATABASE_URL=rethinkdb://database:28015/hydra
+    restart: unless-stopped
 
   consent:
     environment:
@@ -28,6 +29,7 @@ services:
       - hydravolume:/root
     ports:
       - "3000:3000"
+    restart: unless-stopped
 
   rethinkdb:
       image: rethinkdb

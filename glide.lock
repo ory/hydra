@@ -1,5 +1,5 @@
 hash: 175acff756341dd7fa75a3e1e2e1a042a957a1b2482f017ae0bb38a2e8b9c625
-updated: 2016-06-14T11:06:19.0082149+02:00
+updated: 2016-06-20T18:29:48.0257483+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: df81827fdd59d8b4fb93d8910b286ab7a3919520
@@ -12,19 +12,23 @@ imports:
   subpackages:
   - spew
 - name: github.com/dgrijalva/jwt-go
-  version: c04502f106d7c5b3fae17c5da49a1bbdd3006b3c
+  version: f0777076321ab64f6efc15a82d9d23b98539b943
 - name: github.com/fsnotify/fsnotify
   version: 30411dbcefb7a1da7e84f75530ad3abe4011b4f8
 - name: github.com/go-errors/errors
   version: a41850380601eeb43f4350f7d17c6bbd8944aaf8
+- name: github.com/golang/mock
+  version: bd3c8e81be01eef76d4b503f5e687d2d1354d2d9
+  subpackages:
+  - gomock
 - name: github.com/golang/protobuf
-  version: 8616e8ee5e20a1704615e6c8d7afcdac06087a67
+  version: 0c1f6d65b5a189c2250d10e71a5506f06f9fa0a0
   subpackages:
   - proto
 - name: github.com/hailocab/go-hostpool
   version: e80d13ce29ede4452c43dea11e79b9bc8a15b478
 - name: github.com/hashicorp/hcl
-  version: d7400db7143f8e869812e50a53acd6c8d92af3b8
+  version: aa7699b7b62c5f410f4cf7b58f3f9b17a71fb4ad
   subpackages:
   - hcl/ast
   - hcl/parser
@@ -53,7 +57,7 @@ imports:
   - rand/sequence
   - compiler
 - name: github.com/ory-am/fosite
-  version: 85a732db6a8846c8539811c78478fe3bfd5ea5da
+  version: 5876017d8202b4c6a42212a131e9baa47f52202f
   subpackages:
   - fosite-example/store
   - handler/core
@@ -86,7 +90,7 @@ imports:
 - name: github.com/spf13/cast
   version: 27b586b42e29bec072fe7379259cc719e1289da6
 - name: github.com/spf13/cobra
-  version: 1238ba19d24b0b9ceee2094e1cb31947d45c3e86
+  version: bc81c21bd0d8be5ba2d6630a505d79d4467566e7
 - name: github.com/spf13/jwalterweatherman
   version: 33c24e77fb80341fe7130ee7c594256ff08ccc46
 - name: github.com/spf13/pflag
@@ -99,7 +103,7 @@ imports:
   - json
   - cipher
 - name: github.com/stretchr/testify
-  version: 8d64eb7173c7753d6419fd4a9caf057398611364
+  version: d77da356e56a7428ad25149ca77381849a6a5232
   subpackages:
   - assert
   - require
@@ -112,7 +116,7 @@ imports:
   - pbkdf2
   - blowfish
 - name: golang.org/x/net
-  version: 3f122ce3dbbe488b7e6a8bdb26f41edec852a40b
+  version: 8bf2b39827dbadfd566c4fae7a8790d12be8b23c
   subpackages:
   - context
   - netutil
@@ -122,7 +126,7 @@ imports:
   - clientcredentials
   - internal
 - name: golang.org/x/sys
-  version: 7f918dd405547ecb864d14a8ecbbfe205b5f930f
+  version: 62bee037599929a6e9146f29d10dd5208c43507d
   subpackages:
   - unix
 - name: google.golang.org/appengine
@@ -140,6 +144,8 @@ imports:
   - encoding
   - ql2
   - types
+- name: gopkg.in/dgrijalva/jwt-go.v2
+  version: 268038b363c7a8d7306b8e35bf77a1fde4b0c402
 - name: gopkg.in/fatih/pool.v2
   version: cba550ebf9bce999a02e963296d4bc7a486cb715
 - name: gopkg.in/tylerb/graceful.v1

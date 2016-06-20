@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/dgrijalva/jwt-go"
+	"gopkg.in/dgrijalva/jwt-go.v2"
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"

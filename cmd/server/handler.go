@@ -23,6 +23,7 @@ type Handler struct {
 	Keys        *jwk.Handler
 	OAuth2      *oauth2.Handler
 	Policy      *policy.Handler
+	Warden      *warden.WardenHandler
 }
 
 func (h *Handler) Start(c *config.Config, router *httprouter.Router) {
@@ -48,6 +49,7 @@ func (h *Handler) Start(c *config.Config, router *httprouter.Router) {
 	h.Connections = newConnectionHandler(c, router)
 	h.Policy = newPolicyHandler(c, router)
 	h.OAuth2 = newOAuth2Handler(c, router, h.Keys.Manager)
+	h.Warden = warden.NewHandler(c, router)
 
 	// Create root account if new install
 	h.createRS256KeysIfNotExist(c, oauth2.ConsentEndpointKey, "private")

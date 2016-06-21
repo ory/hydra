@@ -6,7 +6,7 @@
     "resources": [
       "rn:hydra:keys:<[^:]+>:public"
     ],
-    "permissions": [
+    "actions": [
       "get"
     ]
   }

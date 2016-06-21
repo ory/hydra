@@ -6,7 +6,7 @@ import (
 
 	"crypto/rsa"
 
-	"github.com/dgrijalva/jwt-go"
+	"gopkg.in/dgrijalva/jwt-go.v2"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/handler/oidc/strategy"

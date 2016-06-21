@@ -1,12 +1,12 @@
 [
   {
     "description": "Explicitly deny everyone reading JSON Web Keys with Key ID *private*.",
-    "subject": ["<.*>"],
+    "subjects": ["<.*>"],
     "effect": "deny",
     "resources": [
       "rn:hydra:keys:<[^:]+>:private"
     ],
-    "permissions": [
+    "actions": [
       "get"
     ]
   }

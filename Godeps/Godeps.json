@@ -1,5 +1,26 @@
 {
 	"ImportPath": "github.com/ory-am/hydra",
 	"GoVersion": "go1.6",
-	"Deps": []
+	"Packages": [
+		"./oauth/provider/facebook"
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/go-errors/errors",
+			"Rev": "a41850380601eeb43f4350f7d17c6bbd8944aaf8"
+		},
+		{
+			"ImportPath": "github.com/huandu/facebook",
+			"Comment": "v1.6.0",
+			"Rev": "e7512237e5dc620be55f6bd9ab2d75e7ebbb914c"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "b6d7b1396ec874c3b00f6c84cd4301a17c56c8ed"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2",
+			"Rev": "188fb45fbef6ffd967b3a8abcfe176fd473361df"
+		}
+	]
 }

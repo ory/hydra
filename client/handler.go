@@ -65,12 +65,14 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 		}
 		c.Secret = []byte(string(secret))
 	}
+	secret := c.Secret
 
 	if err := h.Manager.CreateClient(&c); err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
 	}
 
+	c.Secret = secret
 	h.H.WriteCreated(ctx, w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
@@ -89,6 +91,11 @@ func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	if err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
+	}
+
+	for k, cc := range c {
+		cc.Secret = []byte{}
+		c[k] = cc
 	}
 
 	h.H.Write(ctx, w, r, c)
@@ -115,6 +122,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 		return
 	}
 
+	c.(*fosite.DefaultClient).Secret = []byte{}
 	h.H.Write(ctx, w, r, c)
 }
 

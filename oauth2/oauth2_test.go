@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/url"
 
-	"gopkg.in/dgrijalva/jwt-go.v2"
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
@@ -22,6 +21,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
+	"gopkg.in/dgrijalva/jwt-go.v2"
 )
 
 var store = pkg.FositeStore()

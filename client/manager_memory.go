@@ -11,7 +11,7 @@ import (
 )
 
 type MemoryManager struct {
-	Clients map[string]*fosite.DefaultClient
+	Clients map[string]fosite.DefaultClient
 	Hasher  hash.Hasher
 	sync.RWMutex
 }
@@ -24,7 +24,8 @@ func (m *MemoryManager) GetClient(id string) (fosite.Client, error) {
 	if !ok {
 		return nil, errors.New(pkg.ErrNotFound)
 	}
-	return c, nil
+
+	return &c, nil
 }
 
 func (m *MemoryManager) Authenticate(id string, secret []byte) (*fosite.DefaultClient, error) {
@@ -40,7 +41,7 @@ func (m *MemoryManager) Authenticate(id string, secret []byte) (*fosite.DefaultC
 		return nil, errors.New(err)
 	}
 
-	return c, nil
+	return &c, nil
 }
 
 func (m *MemoryManager) CreateClient(c *fosite.DefaultClient) error {
@@ -57,7 +58,7 @@ func (m *MemoryManager) CreateClient(c *fosite.DefaultClient) error {
 	}
 	c.Secret = hash
 
-	m.Clients[c.GetID()] = c
+	m.Clients[c.GetID()] = *c
 	return nil
 }
 
@@ -69,9 +70,13 @@ func (m *MemoryManager) DeleteClient(id string) error {
 	return nil
 }
 
-func (m *MemoryManager) GetClients() (map[string]*fosite.DefaultClient, error) {
+func (m *MemoryManager) GetClients() (clients map[string]*fosite.DefaultClient, err error) {
 	m.Lock()
 	defer m.Unlock()
+	clients = make(map[string]*fosite.DefaultClient)
+	for _, c := range m.Clients {
+		clients[c.ID] = &c
+	}
 
-	return m.Clients, nil
+	return clients, nil
 }

@@ -31,7 +31,7 @@ var ts *httptest.Server
 
 func init() {
 	clientManagers["memory"] = &MemoryManager{
-		Clients: map[string]*fosite.DefaultClient{},
+		Clients: map[string]fosite.DefaultClient{},
 		Hasher:  &hash.BCrypt{},
 	}
 
@@ -45,7 +45,7 @@ func init() {
 
 	s := &Handler{
 		Manager: &MemoryManager{
-			Clients: map[string]*fosite.DefaultClient{},
+			Clients: map[string]fosite.DefaultClient{},
 			Hasher:  &hash.BCrypt{},
 		},
 		H: &herodot.JSON{},
@@ -83,7 +83,7 @@ func TestMain(m *testing.M) {
 		rethinkManager = &RethinkManager{
 			Session: session,
 			Table:   r.Table("hydra_clients"),
-			Clients: make(map[string]*fosite.DefaultClient),
+			Clients: make(map[string]fosite.DefaultClient),
 			Hasher: &hash.BCrypt{
 				// Low workfactor reduces test time
 				WorkFactor: 4,
@@ -108,7 +108,7 @@ func TestMain(m *testing.M) {
 
 func TestAuthenticateClient(t *testing.T) {
 	var mem = &MemoryManager{
-		Clients: map[string]*fosite.DefaultClient{},
+		Clients: map[string]fosite.DefaultClient{},
 		Hasher:  &hash.BCrypt{},
 	}
 	mem.CreateClient(&fosite.DefaultClient{
@@ -187,7 +187,7 @@ func TestColdStartRethinkManager(t *testing.T) {
 	_, err = rethinkManager.GetClient("2341234")
 	assert.Nil(t, err)
 
-	rethinkManager.Clients = make(map[string]*fosite.DefaultClient)
+	rethinkManager.Clients = make(map[string]fosite.DefaultClient)
 	_, err = rethinkManager.GetClient("2341234")
 	assert.NotNil(t, err)
 
@@ -195,7 +195,7 @@ func TestColdStartRethinkManager(t *testing.T) {
 	_, err = rethinkManager.GetClient("2341234")
 	assert.Nil(t, err)
 
-	rethinkManager.Clients = make(map[string]*fosite.DefaultClient)
+	rethinkManager.Clients = make(map[string]fosite.DefaultClient)
 }
 
 func TestCreateGetDeleteClient(t *testing.T) {
@@ -241,6 +241,8 @@ func TestCreateGetDeleteClient(t *testing.T) {
 
 func compare(t *testing.T, c fosite.Client, k string) {
 	assert.Equal(t, c.GetID(), "1234", "%s", k)
-	assert.NotEmpty(t, c.GetHashedSecret(), "%s", k)
+	if k != "http" {
+		assert.NotEmpty(t, c.GetHashedSecret(), "%s", k)
+	}
 	assert.Equal(t, c.GetRedirectURIs(), []string{"http://redirect"}, "%s", k)
 }

@@ -17,7 +17,7 @@ func newClientManager(c *config.Config) client.Manager {
 	switch con := ctx.Connection.(type) {
 	case *config.MemoryConnection:
 		return &client.MemoryManager{
-			Clients: map[string]*fosite.DefaultClient{},
+			Clients: map[string]fosite.DefaultClient{},
 			Hasher:  ctx.Hasher,
 		}
 	case *config.RethinkDBConnection:

@@ -19,7 +19,7 @@ type RethinkManager struct {
 	Table   r.Term
 	sync.RWMutex
 
-	Clients map[string]*fosite.DefaultClient
+	Clients map[string]fosite.DefaultClient
 	Hasher  hash.Hasher
 }
 
@@ -31,7 +31,7 @@ func (m *RethinkManager) GetClient(id string) (fosite.Client, error) {
 	if !ok {
 		return nil, errors.New(pkg.ErrNotFound)
 	}
-	return c, nil
+	return &c, nil
 }
 
 func (m *RethinkManager) Authenticate(id string, secret []byte) (*fosite.DefaultClient, error) {
@@ -47,7 +47,7 @@ func (m *RethinkManager) Authenticate(id string, secret []byte) (*fosite.Default
 		return nil, errors.New(err)
 	}
 
-	return c, nil
+	return &c, nil
 }
 
 func (m *RethinkManager) CreateClient(c *fosite.DefaultClient) error {
@@ -76,15 +76,19 @@ func (m *RethinkManager) DeleteClient(id string) error {
 	return nil
 }
 
-func (m *RethinkManager) GetClients() (map[string]*fosite.DefaultClient, error) {
+func (m *RethinkManager) GetClients() (clients map[string]*fosite.DefaultClient, err error) {
 	m.Lock()
 	defer m.Unlock()
+	clients = make(map[string]*fosite.DefaultClient)
+	for _, c := range m.Clients {
+		clients[c.ID] = &c
+	}
 
-	return m.Clients, nil
+	return clients, nil
 }
 
 func (m *RethinkManager) ColdStart() error {
-	m.Clients = map[string]*fosite.DefaultClient{}
+	m.Clients = map[string]fosite.DefaultClient{}
 	clients, err := m.Table.Run(m.Session)
 	if err != nil {
 		return errors.New(err)
@@ -94,7 +98,7 @@ func (m *RethinkManager) ColdStart() error {
 	m.Lock()
 	defer m.Unlock()
 	for clients.Next(&client) {
-		m.Clients[client.ID] = &client
+		m.Clients[client.ID] = client
 	}
 
 	return nil
@@ -131,9 +135,9 @@ func (m *RethinkManager) Watch(ctx context.Context) {
 				delete(m.Clients, oldVal.GetID())
 			} else if newVal != nil && oldVal != nil {
 				delete(m.Clients, oldVal.GetID())
-				m.Clients[newVal.GetID()] = newVal
+				m.Clients[newVal.GetID()] = *newVal
 			} else {
-				m.Clients[newVal.GetID()] = newVal
+				m.Clients[newVal.GetID()] = *newVal
 			}
 			m.Unlock()
 		}

@@ -39,7 +39,7 @@ var tokenSelfCmd = &cobra.Command{
 
 		t, err := oauthConfig.Token(ctx)
 		pkg.Must(err, "Could not authenticate, because: %s\n", err)
-		fmt.Printf("%s", t.AccessToken)
+		fmt.Printf("%s\n", t.AccessToken)
 	},
 }
 

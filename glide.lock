@@ -1,5 +1,5 @@
 hash: 175acff756341dd7fa75a3e1e2e1a042a957a1b2482f017ae0bb38a2e8b9c625
-updated: 2016-06-20T18:29:48.0257483+02:00
+updated: 2016-06-23T14:29:39.727085824+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: df81827fdd59d8b4fb93d8910b286ab7a3919520
@@ -17,10 +17,6 @@ imports:
   version: 30411dbcefb7a1da7e84f75530ad3abe4011b4f8
 - name: github.com/go-errors/errors
   version: a41850380601eeb43f4350f7d17c6bbd8944aaf8
-- name: github.com/golang/mock
-  version: bd3c8e81be01eef76d4b503f5e687d2d1354d2d9
-  subpackages:
-  - gomock
 - name: github.com/golang/protobuf
   version: 0c1f6d65b5a189c2250d10e71a5506f06f9fa0a0
   subpackages:
@@ -28,7 +24,7 @@ imports:
 - name: github.com/hailocab/go-hostpool
   version: e80d13ce29ede4452c43dea11e79b9bc8a15b478
 - name: github.com/hashicorp/hcl
-  version: aa7699b7b62c5f410f4cf7b58f3f9b17a71fb4ad
+  version: 5b7dbf7eefffea49afb3c9655d6582c72fae5fd1
   subpackages:
   - hcl/ast
   - hcl/parser
@@ -90,7 +86,7 @@ imports:
 - name: github.com/spf13/cast
   version: 27b586b42e29bec072fe7379259cc719e1289da6
 - name: github.com/spf13/cobra
-  version: bc81c21bd0d8be5ba2d6630a505d79d4467566e7
+  version: 6a8bd97bdb1fc0d08a83459940498ea49d3e8c93
 - name: github.com/spf13/jwalterweatherman
   version: 33c24e77fb80341fe7130ee7c594256ff08ccc46
 - name: github.com/spf13/pflag
@@ -116,7 +112,7 @@ imports:
   - pbkdf2
   - blowfish
 - name: golang.org/x/net
-  version: 8bf2b39827dbadfd566c4fae7a8790d12be8b23c
+  version: bc3663df0ac92f928d419e31e0d2af22e683a5a2
   subpackages:
   - context
   - netutil
@@ -130,13 +126,14 @@ imports:
   subpackages:
   - unix
 - name: google.golang.org/appengine
-  version: 7f59a8c76b8594d06044bfe0bcbe475cb2020482
+  version: 267c27e7492265b84fc6719503b14a1e17975d79
   subpackages:
   - urlfetch
   - internal
   - internal/urlfetch
   - internal/base
   - internal/datastore
+  - internal/log
   - internal/remote_api
 - name: gopkg.in/dancannon/gorethink.v2
   version: de072a9c0eff5bd52ef81fe45b6abeccde74bd13
@@ -149,7 +146,7 @@ imports:
 - name: gopkg.in/fatih/pool.v2
   version: cba550ebf9bce999a02e963296d4bc7a486cb715
 - name: gopkg.in/tylerb/graceful.v1
-  version: 84177357ab104029f9237abcb52339a7b80760ef
+  version: ecde8c8f16df93a994dda8936c8f60f0c26c28ab
 - name: gopkg.in/yaml.v2
   version: a83829b6f1293c91addabc89d0571c246397bbf4
 devImports: []

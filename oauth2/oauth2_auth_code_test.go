@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"gopkg.in/dgrijalva/jwt-go.v2"
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	ejwt "github.com/ory-am/fosite/token/jwt"
@@ -16,6 +15,7 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
+	"gopkg.in/dgrijalva/jwt-go.v2"
 )
 
 func TestAuthCode(t *testing.T) {

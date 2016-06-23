@@ -55,14 +55,14 @@ func (d *facebook) FetchSession(code string) (Session, error) {
 		return nil, err
 	}
 
-	var acc map[string]interface{}
-	if err = res.Decode(&acc); err != nil {
-		return nil, err
-	}
-
 	return &DefaultSession{
 		RemoteSubject: fmt.Sprintf("%s", res.Get("id")),
-		Extra:         acc,
+		Extra:         map[string]interface{}{
+			"email": fmt.Sprintf("%s", res.Get("email")),
+			"id": fmt.Sprintf("%s", res.Get("id")),
+			"first_name": fmt.Sprintf("%s", res.Get("first_name")),
+			"last_name": fmt.Sprintf("%s", res.Get("last_name")),
+		},
 	}, nil
 }
 

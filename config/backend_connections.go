@@ -44,13 +44,7 @@ func (c *RethinkDBConnection) GetSession() *r.Session {
 			Password: password,
 		}
 
-		if cert := loadCertificate(); cert != nil {
-			roots := x509.NewCertPool()
-			roots.AppendCertsFromPEM(cert)
-			options.TLSConfig = &tls.Config{
-				RootCAs: roots,
-			}
-		}
+		importRethinkDBRootCA(&options)
 
 		if c.session, err = r.Connect(options); err != nil {
 			return errors.Errorf("Could not connect to RethinkDB: %s", err)
@@ -76,16 +70,17 @@ func (c *RethinkDBConnection) GetSession() *r.Session {
 	return c.session
 }
 
-// loadCertificate reads a certificate either from a file or from a string
-func loadCertificate() []byte {
+// importRethinkDBRootCA checks for the configuration values RETHINK_TLS_CERT_PATH
+// or RETHINK_TLS_CERT and adds the certificate to the connect options
+func importRethinkDBRootCA(opts *r.ConnectOpts) {
 	var cert []byte
 	certPath := viper.GetString("RETHINK_TLS_CERT_PATH")
 	if certPath != "" {
 		var err error
 		cert, err = ioutil.ReadFile(certPath)
 		if err != nil {
-			logrus.Debugf("Could not read rethinkdb certificate: %s", err)
-			return nil
+			logrus.Warningf("Could not read rethinkdb certificate: %s", err)
+			return
 		}
 	}
 
@@ -94,8 +89,14 @@ func loadCertificate() []byte {
 		cert = []byte(certString)
 	}
 
-	return cert
-
+	if cert != nil {
+		roots := x509.NewCertPool()
+		roots.AppendCertsFromPEM(cert)
+		opts.TLSConfig = &tls.Config{
+			RootCAs: roots,
+		}
+		logrus.Warnln("Loaded self-signed certificate for rethinkdb")
+	}
 }
 
 func (c *RethinkDBConnection) CreateTableIfNotExists(table string) {

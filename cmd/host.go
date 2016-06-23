@@ -45,8 +45,11 @@ This command supports the following environment variables:
 
 - HTTPS_TLS_CERT_PATH: The path to the TLS certificate (pem encoded).
 - HTTPS_TLS_KEY_PATH: The path to the TLS private key (pem encoded).
-- HTTPS_TLS_CERT: A pem encoded TLS certificate passed as string. Can be used instead of TLS_CERT_PATH.
-- HTTPS_TLS_KEY: A pem encoded TLS key passed as string. Can be used instead of TLS_KEY_PATH.
+- HTTPS_TLS_CERT: A pem encoded TLS certificate passed as string. Can be used instead of HTTPS_TLS_CERT_PATH.
+- HTTPS_TLS_KEY: A pem encoded TLS key passed as string. Can be used instead of HTTPS_TLS_KEY_PATH.
+
+- RETHINK_TLS_CERT_PATH: The path to the TLS certificate (pem encoded) used to connect to rethinkdb.
+- RETHINK_TLS_CERT: A pem encoded TLS certificate passed as string. Can be used instead of RETHINK_TLS_CERT_PATH.
 
 - HYDRA_PROFILING: Set "HYDRA_PROFILING=1" to enable profiling.
 `,
@@ -67,7 +70,8 @@ func init() {
 	hostCmd.Flags().Bool("force-dangerous-http", false, "Disable HTTP/2 over TLS (HTTPS) and serve HTTP instead. Never use this in production.")
 	hostCmd.Flags().Bool("dangerous-auto-logon", false, "Stores the root credentials in ~/.hydra.yml. Do not use in production.")
 	hostCmd.Flags().String("https-tls-key-path", "", "Path to the key file for HTTP/2 over TLS (https). You can set HTTPS_TLS_KEY_PATH or HTTPS_TLS_KEY instead.")
-	hostCmd.Flags().String("https-tls-cert-path", "", "Path to the certificate file for HTTP/2 over TLS (https). You can set HTTPS_TLS_KEY_PATH or HTTPS_TLS_KEY instead.")
+	hostCmd.Flags().String("https-tls-cert-path", "", "Path to the certificate file for HTTP/2 over TLS (https). You can set HTTPS_TLS_CERT_PATH or HTTPS_TLS_CERT instead.")
+	hostCmd.Flags().String("rethink-tls-cert-path", "", "Path to the certificate file to connect to rethinkdb over TLS (https). You can set RETHINK_TLS_CERT_PATH or RETHINK_TLS_CERT instead.")
 }
 
 func runHostCmd(cmd *cobra.Command, args []string) {

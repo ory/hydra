@@ -1,6 +1,9 @@
 package config
 
 import (
+	"crypto/tls"
+	"crypto/x509"
+	"io/ioutil"
 	"net/url"
 
 	"time"
@@ -8,6 +11,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/spf13/viper"
 	r "gopkg.in/dancannon/gorethink.v2"
 )
 
@@ -33,11 +37,22 @@ func (c *RethinkDBConnection) GetSession() *r.Session {
 
 	if err := pkg.Retry(time.Second*15, time.Minute*2, func() error {
 		logrus.Infof("Connecting with RethinkDB: %s (%s) (%s)", c.URL.String(), c.URL.Host, database)
-		if c.session, err = r.Connect(r.ConnectOpts{
+
+		options := r.ConnectOpts{
 			Address:  c.URL.Host,
 			Username: username,
 			Password: password,
-		}); err != nil {
+		}
+
+		if cert := loadCertificate(); cert != nil {
+			roots := x509.NewCertPool()
+			roots.AppendCertsFromPEM(cert)
+			options.TLSConfig = &tls.Config{
+				RootCAs: roots,
+			}
+		}
+
+		if c.session, err = r.Connect(options); err != nil {
 			return errors.Errorf("Could not connect to RethinkDB: %s", err)
 		}
 
@@ -59,6 +74,28 @@ func (c *RethinkDBConnection) GetSession() *r.Session {
 	}
 
 	return c.session
+}
+
+// loadCertificate reads a certificate either from a file or from a string
+func loadCertificate() []byte {
+	var cert []byte
+	certPath := viper.GetString("RETHINK_TLS_CERT_PATH")
+	if certPath != "" {
+		var err error
+		cert, err = ioutil.ReadFile(certPath)
+		if err != nil {
+			logrus.Debugf("Could not read rethinkdb certificate: %s", err)
+			return nil
+		}
+	}
+
+	certString := viper.GetString("RETHINK_TLS_CERT")
+	if certString != "" {
+		cert = []byte(certString)
+	}
+
+	return cert
+
 }
 
 func (c *RethinkDBConnection) CreateTableIfNotExists(table string) {

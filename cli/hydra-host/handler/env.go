@@ -12,6 +12,7 @@ import (
 	"github.com/ory-am/hydra/oauth/provider/google"
 	"github.com/ory-am/hydra/oauth/provider/microsoft"
 	"github.com/ory-am/hydra/oauth/provider/signin"
+	"github.com/ory-am/hydra/oauth/provider/facebook"
 )
 
 var (
@@ -48,6 +49,12 @@ func getEnv() {
 			"microsoft",
 			env.Getenv("MICROSOFT_CLIENT", ""),
 			env.Getenv("MICROSOFT_SECRET", ""),
+			pkg.JoinURL(hostURL, "/oauth2/auth"),
+		),
+		facebook.New(
+			"facebook",
+			env.Getenv("FACEBOOK_CLIENT", ""),
+			env.Getenv("FACEBOOK_SECRET", ""),
 			pkg.JoinURL(hostURL, "/oauth2/auth"),
 		),
 		signin.New(

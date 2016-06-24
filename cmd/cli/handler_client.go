@@ -1,12 +1,10 @@
 package cli
 
 import (
-	"fmt"
-
 	"encoding/json"
+	"fmt"
 	"os"
 
-	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/pkg"
@@ -35,7 +33,7 @@ func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 	for _, path := range args {
 		reader, err := os.Open(path)
 		pkg.Must(err, "Could not open file %s: %s", path, err)
-		var client fosite.DefaultClient
+		var client client.Client
 		err = json.NewDecoder(reader).Decode(&client)
 		pkg.Must(err, "Could not parse JSON: %s", err)
 
@@ -66,9 +64,9 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	secret, err := pkg.GenerateSecret(26)
 	pkg.Must(err, "Could not generate secret: %s", err)
 
-	client := &fosite.DefaultClient{
+	client := &client.Client{
 		ID:            id,
-		Secret:        secret,
+		Secret:        string(secret),
 		ResponseTypes: responseTypes,
 		GrantedScopes: allowedScopes,
 		GrantTypes:    grantTypes,

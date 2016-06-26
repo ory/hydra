@@ -1,5 +1,5 @@
 hash: 175acff756341dd7fa75a3e1e2e1a042a957a1b2482f017ae0bb38a2e8b9c625
-updated: 2016-06-23T14:29:39.727085824+02:00
+updated: 2016-06-26T13:19:40.0602745+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: df81827fdd59d8b4fb93d8910b286ab7a3919520
@@ -24,7 +24,7 @@ imports:
 - name: github.com/hailocab/go-hostpool
   version: e80d13ce29ede4452c43dea11e79b9bc8a15b478
 - name: github.com/hashicorp/hcl
-  version: 5b7dbf7eefffea49afb3c9655d6582c72fae5fd1
+  version: 61f5143284c041681f76a5b63efcb232aaa94737
   subpackages:
   - hcl/ast
   - hcl/parser
@@ -106,7 +106,7 @@ imports:
 - name: github.com/toqueteos/webbrowser
   version: 21fc9f95c83442fd164094666f7cb4f9fdd56cd6
 - name: golang.org/x/crypto
-  version: f3241ce8505855877cc8a9717bd61a0f7c4ea83c
+  version: 811831de4c4dd03a0b8737233af3b36852386373
   subpackages:
   - bcrypt
   - pbkdf2

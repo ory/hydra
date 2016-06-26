@@ -111,7 +111,8 @@ func (h *WardenHandler) Allowed(w http.ResponseWriter, r *http.Request, _ httpro
 
 func (h *WardenHandler) authorizeClient(ctx context.Context, w http.ResponseWriter, r *http.Request, action string) (*firewall.Context, error) {
 	authctx, err := h.Warden.ActionAllowed(ctx, TokenFromRequest(r), &ladon.Request{
-		Action: action,
+		Action:   action,
+		Resource: "rn:hydra:warden",
 	}, "hydra.warden")
 	if err != nil {
 		return nil, err

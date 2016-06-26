@@ -3,7 +3,6 @@ package server
 import (
 	"github.com/Sirupsen/logrus"
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/herodot"
@@ -17,7 +16,7 @@ func newClientManager(c *config.Config) client.Manager {
 	switch con := ctx.Connection.(type) {
 	case *config.MemoryConnection:
 		return &client.MemoryManager{
-			Clients: map[string]fosite.DefaultClient{},
+			Clients: map[string]client.Client{},
 			Hasher:  ctx.Hasher,
 		}
 	case *config.RethinkDBConnection:

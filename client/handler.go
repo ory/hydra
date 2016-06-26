@@ -8,7 +8,6 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/common/rand/sequence"
-	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/ladon"
@@ -38,7 +37,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 }
 
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var c fosite.DefaultClient
+	var c Client
 	var ctx = herodot.NewContext()
 
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
@@ -57,16 +56,18 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 		return
 	}
 
-	if len(c.Secret) < 6 {
+	if len(c.Secret) == 0 {
 		secret, err := sequence.RuneSequence(12, []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-.,:;$%!&/()=?+*#<>"))
 		if err != nil {
 			h.H.WriteError(ctx, w, r, errors.New(err))
 			return
 		}
-		c.Secret = []byte(string(secret))
+		c.Secret = string(secret)
+	} else if len(c.Secret) < 6 {
+		h.H.WriteError(ctx, w, r, errors.New("The client secret must be at least 6 characters long"))
 	}
-	secret := c.Secret
 
+	secret := c.Secret
 	if err := h.Manager.CreateClient(&c); err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
@@ -94,7 +95,7 @@ func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	}
 
 	for k, cc := range c {
-		cc.Secret = []byte{}
+		cc.Secret = ""
 		c[k] = cc
 	}
 
@@ -122,7 +123,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 		return
 	}
 
-	c.(*fosite.DefaultClient).Secret = []byte{}
+	c.(*Client).Secret = ""
 	h.H.Write(ctx, w, r, c)
 }
 

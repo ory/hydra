@@ -2,10 +2,8 @@ package client
 
 import (
 	"sync"
-
 	"time"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/hash"
@@ -32,7 +30,6 @@ func (m *RethinkManager) GetClient(id string) (fosite.Client, error) {
 	if !ok {
 		return nil, errors.New(pkg.ErrNotFound)
 	}
-	logrus.Printf("Returning client: %s\n%s\n", c, c.GetHashedSecret())
 	return &c, nil
 }
 

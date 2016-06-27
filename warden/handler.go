@@ -61,7 +61,7 @@ func (h *WardenHandler) SetRoutes(r *httprouter.Router) {
 
 func (h *WardenHandler) Authorized(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := herodot.NewContext()
-	clientCtx, err := h.authorizeClient(ctx, w, r, "an:hydra:warden:authorized")
+	clientCtx, err := h.authorizeClient(ctx, w, r)
 	if err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
@@ -87,7 +87,7 @@ func (h *WardenHandler) Authorized(w http.ResponseWriter, r *http.Request, _ htt
 
 func (h *WardenHandler) Allowed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := herodot.NewContext()
-	clientCtx, err := h.authorizeClient(ctx, w, r, "an:hydra:warden:allowed")
+	clientCtx, err := h.authorizeClient(ctx, w, r)
 	if err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
@@ -109,11 +109,8 @@ func (h *WardenHandler) Allowed(w http.ResponseWriter, r *http.Request, _ httpro
 	h.H.Write(ctx, w, r, authContext)
 }
 
-func (h *WardenHandler) authorizeClient(ctx context.Context, w http.ResponseWriter, r *http.Request, action string) (*firewall.Context, error) {
-	authctx, err := h.Warden.ActionAllowed(ctx, TokenFromRequest(r), &ladon.Request{
-		Action:   action,
-		Resource: "rn:hydra:warden",
-	}, "hydra.warden")
+func (h *WardenHandler) authorizeClient(ctx context.Context, w http.ResponseWriter, r *http.Request) (*firewall.Context, error) {
+	authctx, err := h.Warden.Authorized(ctx, TokenFromRequest(r), "core")
 	if err != nil {
 		return nil, err
 	}

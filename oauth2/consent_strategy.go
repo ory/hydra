@@ -71,7 +71,7 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 				Subject:   subject,
 				Issuer:    s.Issuer,
 				IssuedAt:  time.Now(),
-				ExpiresAt: time.Now(),
+				ExpiresAt: time.Now().Add(time.Hour),
 				Extra:     t.Claims,
 			},
 			Headers: &ejwt.Headers{},

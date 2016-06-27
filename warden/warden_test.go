@@ -38,10 +38,7 @@ var ladonWarden = pkg.LadonWarden(map[string]ladon.Policy{
 		ID:        "2",
 		Subjects:  []string{"siri"},
 		Resources: []string{"<.*>"},
-		Actions: []string{
-			"an:hydra:warden:allowed",
-			"an:hydra:warden:authorized",
-		},
+		Actions: []string{},
 		Effect: ladon.AllowAccess,
 	},
 })
@@ -79,7 +76,7 @@ func init() {
 	fositeStore.CreateAccessTokenSession(nil, tokens[0][0], ar)
 
 	ar = fosite.NewAccessRequest(&oauth2.Session{Subject: "siri"})
-	ar.GrantedScopes = fosite.Arguments{"hydra.warden"}
+	ar.GrantedScopes = fosite.Arguments{"core"}
 	fositeStore.CreateAccessTokenSession(nil, tokens[1][0], ar)
 
 	conf := &coauth2.Config{

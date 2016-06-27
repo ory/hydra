@@ -212,6 +212,7 @@ func TestCreateGetDeleteOpenIDConnectSession(t *testing.T) {
 		pkg.AssertError(t, true, err, "%s", k)
 	}
 }
+
 func TestCreateGetDeleteRefreshTokenSession(t *testing.T) {
 	ctx := context.Background()
 	for k, m := range clientManagers {

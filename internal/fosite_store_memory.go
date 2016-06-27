@@ -98,7 +98,13 @@ func (s *FositeMemoryStore) PersistAuthorizeCodeGrantSession(ctx context.Context
 		return err
 	} else if err := s.CreateAccessTokenSession(ctx, accessSignature, request); err != nil {
 		return err
-	} else if err := s.CreateRefreshTokenSession(ctx, refreshSignature, request); err != nil {
+	}
+
+	if refreshSignature == "" {
+		return nil
+	}
+
+	if err := s.CreateRefreshTokenSession(ctx, refreshSignature, request); err != nil {
 		return err
 	}
 

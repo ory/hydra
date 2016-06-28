@@ -45,7 +45,9 @@ var ladonWarden = pkg.LadonWarden(map[string]ladon.Policy{
 
 var fositeStore = pkg.FositeStore()
 
-var tokens = pkg.Tokens(2)
+var now = time.Now().Round(time.Second)
+
+var tokens = pkg.Tokens(3)
 
 func init() {
 	wardens["local"] = &warden.LocalWarden{
@@ -73,11 +75,19 @@ func init() {
 
 	ar := fosite.NewAccessRequest(&oauth2.Session{Subject: "alice"})
 	ar.GrantedScopes = fosite.Arguments{"core"}
+	ar.RequestedAt = now
 	fositeStore.CreateAccessTokenSession(nil, tokens[0][0], ar)
 
 	ar = fosite.NewAccessRequest(&oauth2.Session{Subject: "siri"})
 	ar.GrantedScopes = fosite.Arguments{"core"}
+	ar.RequestedAt = now
 	fositeStore.CreateAccessTokenSession(nil, tokens[1][0], ar)
+
+	ar = fosite.NewAccessRequest(&oauth2.Session{Subject: "siri"})
+	ar.GrantedScopes = fosite.Arguments{"core"}
+	ar.RequestedAt = time.Now().Add(-time.Hour * 24 * 31)
+	fositeStore.CreateAccessTokenSession(nil, tokens[2][0], ar)
+
 
 	conf := &coauth2.Config{
 		Scopes:   []string{},
@@ -216,8 +226,14 @@ func TestAuthorized(t *testing.T) {
 				assert: func(c *firewall.Context) {
 					assert.Equal(t, "alice", c.Subject)
 					assert.Equal(t, "tests", c.Issuer)
-
+					assert.Equal(t, now, c.ExpiresAt)
+					assert.Equal(t, now, c.IssuedAt)
 				},
+			},
+			{
+				token:     tokens[2][1],
+				scopes:    []string{"core"},
+				expectErr: true,
 			},
 		} {
 			ctx, err := w.Authorized(context.Background(), c.token, c.scopes...)

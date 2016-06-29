@@ -7,6 +7,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/herodot"
+	perr "github.com/pkg/errors"
 )
 
 var (
@@ -15,11 +16,17 @@ var (
 	ErrForbidden    = errors.New("Forbidden")
 )
 
+type stackTracer interface {
+	StackTrace() perr.StackTrace
+}
+
 func LogError(err error) {
 	if e, ok := err.(*herodot.Error); ok {
-		log.WithError(e).WithField("stack", e.Err.ErrorStack()).Printf("Got error.")
+		log.WithError(err).WithField("stack", e.Err.ErrorStack()).Printf("Got error.")
 	} else if e, ok := err.(*errors.Error); ok {
-		log.WithError(e).WithField("stack", e.ErrorStack()).Printf("Got error.")
+		log.WithError(err).WithField("stack", e.ErrorStack()).Printf("Got error.")
+	} else if e, ok := err.(stackTracer); ok {
+		log.WithError(err).WithField("stack", e.StackTrace()).Printf("Got error.")
 	} else {
 		log.WithError(err).Printf("Got error.")
 	}

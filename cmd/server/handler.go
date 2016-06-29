@@ -39,7 +39,8 @@ func (h *Handler) Start(c *config.Config, router *httprouter.Router) {
 			AccessTokenStrategy: ctx.FositeStrategy,
 			AccessTokenStorage:  ctx.FositeStore,
 		},
-		Issuer: c.Issuer,
+		Issuer:              c.Issuer,
+		AccessTokenLifespan: c.GetAccessTokenLifespan(),
 	}
 
 	// Set up handlers

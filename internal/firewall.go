@@ -25,7 +25,7 @@ func NewFirewall(issuer string, subject string, scopes fosite.Arguments, p ...la
 	}
 	ladonWarden := pkg.LadonWarden(ps)
 
-	ar := fosite.NewAccessRequest(&Session{Subject: subject})
+	ar := fosite.NewAccessRequest(NewSession(subject))
 	ar.GrantedScopes = scopes
 	fositeStore.CreateAccessTokenSession(nil, tokens[0][0], ar)
 
@@ -37,7 +37,8 @@ func NewFirewall(issuer string, subject string, scopes fosite.Arguments, p ...la
 				AccessTokenStrategy: pkg.HMACStrategy,
 				AccessTokenStorage:  fositeStore,
 			},
-			Issuer: issuer,
+			Issuer:              issuer,
+			AccessTokenLifespan: time.Hour,
 		},
 		conf.Client(oauth2.NoContext, &oauth2.Token{
 			AccessToken: tokens[0][1],

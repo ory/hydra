@@ -13,13 +13,15 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
 	"golang.org/x/net/context"
+	"time"
 )
 
 type LocalWarden struct {
-	Warden         ladon.Warden
-	TokenValidator *core.CoreValidator
+	Warden              ladon.Warden
+	TokenValidator      *core.CoreValidator
 
-	Issuer string
+	AccessTokenLifespan time.Duration
+	Issuer              string
 }
 
 func (w *LocalWarden) actionAllowed(ctx context.Context, a *ladon.Request, scopes []string, oauthRequest fosite.AccessRequester, session *oauth2.Session) (*Context, error) {
@@ -71,6 +73,7 @@ func (w *LocalWarden) actionAllowed(ctx context.Context, a *ladon.Request, scope
 		Issuer:        w.Issuer,
 		Audience:      oauthRequest.GetClient().GetID(),
 		IssuedAt:      oauthRequest.GetRequestedAt(),
+		ExpiresAt:     session.AccessTokenExpiresAt(oauthRequest.GetRequestedAt().Add(w.AccessTokenLifespan)),
 	}, nil
 }
 
@@ -142,6 +145,7 @@ func (w *LocalWarden) Authorized(ctx context.Context, token string, scopes ...st
 		Issuer:        w.Issuer,
 		Audience:      oauthRequest.GetClient().GetID(),
 		IssuedAt:      oauthRequest.GetRequestedAt(),
+		ExpiresAt:     session.AccessTokenExpiresAt(oauthRequest.GetRequestedAt().Add(w.AccessTokenLifespan)),
 	}, nil
 }
 
@@ -184,6 +188,7 @@ func (w *LocalWarden) HTTPAuthorized(ctx context.Context, r *http.Request, scope
 		Issuer:        w.Issuer,
 		Audience:      oauthRequest.GetClient().GetID(),
 		IssuedAt:      oauthRequest.GetRequestedAt(),
+		ExpiresAt:     session.AccessTokenExpiresAt(oauthRequest.GetRequestedAt().Add(w.AccessTokenLifespan)),
 	}, nil
 }
 

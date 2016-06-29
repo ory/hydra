@@ -1,8 +1,6 @@
 package server
 
 import (
-	"time"
-
 	"net/url"
 
 	"github.com/Sirupsen/logrus"
@@ -116,7 +114,7 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 		RefreshTokenStrategy:      ctx.FositeStrategy,
 		AuthorizeCodeStrategy:     ctx.FositeStrategy,
 		AuthorizeCodeGrantStorage: store,
-		AuthCodeLifespan:          time.Hour,
+		AuthCodeLifespan:          c.GetAuthCodeLifespan(),
 		AccessTokenLifespan:       c.GetAccessTokenLifespan(),
 	}
 

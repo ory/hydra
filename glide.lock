@@ -1,5 +1,5 @@
 hash: 175acff756341dd7fa75a3e1e2e1a042a957a1b2482f017ae0bb38a2e8b9c625
-updated: 2016-06-29T23:23:38.9322313+02:00
+updated: 2016-06-30T00:59:47.4902603+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: df81827fdd59d8b4fb93d8910b286ab7a3919520
@@ -17,10 +17,6 @@ imports:
   version: a8a77c9133d2d6fd8334f3260d06f60e8d80a5fb
 - name: github.com/go-errors/errors
   version: a41850380601eeb43f4350f7d17c6bbd8944aaf8
-- name: github.com/golang/mock
-  version: bd3c8e81be01eef76d4b503f5e687d2d1354d2d9
-  subpackages:
-  - gomock
 - name: github.com/golang/protobuf
   version: 3852dcfda249c2097355a6aabb199a28d97b30df
   subpackages:
@@ -57,7 +53,7 @@ imports:
   - rand/sequence
   - compiler
 - name: github.com/ory-am/fosite
-  version: af66918f0c91a451659fa2bf01d2c804e14799eb
+  version: 9d54b989c8d04c4d586e7810cce2e6d4f03d7c48
   subpackages:
   - fosite-example/store
   - handler/core
@@ -118,7 +114,7 @@ imports:
   - pbkdf2
   - blowfish
 - name: golang.org/x/net
-  version: ef2e00e88c5e0a3569f0bb9df697e9cbc6215fea
+  version: 8e573f4005aa312856df2ea97c32b9beac70dd89
   subpackages:
   - context
   - netutil

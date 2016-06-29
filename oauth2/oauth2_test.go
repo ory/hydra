@@ -84,6 +84,8 @@ var handler = &Handler{
 	Consent: &DefaultConsentStrategy{
 		Issuer:     "https://hydra.localhost",
 		KeyManager: keyManager,
+		DefaultChallengeLifespan: time.Hour,
+		DefaultIDTokenLifespan: time.Hour * 24,
 	},
 }
 

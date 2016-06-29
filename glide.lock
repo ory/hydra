@@ -1,5 +1,5 @@
 hash: 175acff756341dd7fa75a3e1e2e1a042a957a1b2482f017ae0bb38a2e8b9c625
-updated: 2016-06-29T19:23:32.0922052+02:00
+updated: 2016-06-29T23:23:38.9322313+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: df81827fdd59d8b4fb93d8910b286ab7a3919520
@@ -22,7 +22,7 @@ imports:
   subpackages:
   - gomock
 - name: github.com/golang/protobuf
-  version: b3e26a40c2321140ad7c7d031030d3c9e3cdecc7
+  version: 3852dcfda249c2097355a6aabb199a28d97b30df
   subpackages:
   - proto
 - name: github.com/hailocab/go-hostpool
@@ -57,7 +57,7 @@ imports:
   - rand/sequence
   - compiler
 - name: github.com/ory-am/fosite
-  version: e13435109928d11ae9eeb13f1e347043e8be0d53
+  version: af66918f0c91a451659fa2bf01d2c804e14799eb
   subpackages:
   - fosite-example/store
   - handler/core

@@ -3,6 +3,8 @@ package warden
 import (
 	"net/http"
 
+	"time"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
@@ -13,12 +15,11 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
 	"golang.org/x/net/context"
-	"time"
 )
 
 type LocalWarden struct {
-	Warden              ladon.Warden
-	TokenValidator      *core.CoreValidator
+	Warden         ladon.Warden
+	TokenValidator *core.CoreValidator
 
 	AccessTokenLifespan time.Duration
 	Issuer              string

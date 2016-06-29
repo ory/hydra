@@ -38,8 +38,8 @@ var ladonWarden = pkg.LadonWarden(map[string]ladon.Policy{
 		ID:        "2",
 		Subjects:  []string{"siri"},
 		Resources: []string{"<.*>"},
-		Actions: []string{},
-		Effect: ladon.AllowAccess,
+		Actions:   []string{},
+		Effect:    ladon.AllowAccess,
 	},
 })
 
@@ -56,7 +56,7 @@ func init() {
 			AccessTokenStrategy: pkg.HMACStrategy,
 			AccessTokenStorage:  fositeStore,
 		},
-		Issuer: "tests",
+		Issuer:              "tests",
 		AccessTokenLifespan: time.Hour,
 	}
 

@@ -48,6 +48,8 @@ var hmacStrategy = &strategy.HMACSHAStrategy{
 	Enigma: &hmac.HMACStrategy{
 		GlobalSecret: []byte("some-super-cool-secret-that-nobody-knows"),
 	},
+	AuthorizeCodeLifespan: time.Hour,
+	AccessTokenLifespan:   time.Hour,
 }
 
 var authCodeHandler = &explicit.AuthorizeExplicitGrantTypeHandler{
@@ -82,6 +84,8 @@ var handler = &Handler{
 	Consent: &DefaultConsentStrategy{
 		Issuer:     "https://hydra.localhost",
 		KeyManager: keyManager,
+		DefaultChallengeLifespan: time.Hour,
+		DefaultIDTokenLifespan: time.Hour * 24,
 	},
 }
 

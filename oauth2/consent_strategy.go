@@ -23,6 +23,8 @@ const (
 type DefaultConsentStrategy struct {
 	Issuer string
 
+	DefaultIDTokenLifespan time.Duration
+	DefaultChallengeLifespan time.Duration
 	KeyManager jwk.Manager
 }
 
@@ -59,7 +61,8 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 	}
 
 	subject := ejwt.ToString(t.Claims["sub"])
-	for _, scope := range toStringSlice(t.Claims["scp"]) {
+	scopes := toStringSlice(t.Claims["scp"])
+	for _, scope := range scopes {
 		a.GrantScope(scope)
 	}
 
@@ -71,7 +74,7 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 				Subject:   subject,
 				Issuer:    s.Issuer,
 				IssuedAt:  time.Now(),
-				ExpiresAt: time.Now().Add(time.Hour),
+				ExpiresAt: time.Now().Add(s.DefaultIDTokenLifespan),
 				Extra:     t.Claims,
 			},
 			Headers: &ejwt.Headers{},
@@ -81,11 +84,22 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 }
 
 func toStringSlice(i interface{}) []string {
-	r, ok := i.([]string)
-	if !ok {
+	if r, ok := i.([]string); ok {
+		return r
+	} else 	if r, ok := i.(fosite.Arguments); ok {
+		return r
+	} else 	if r, ok := i.([]interface{}); ok {
+		ret := make([]string, 0)
+		for _, y := range r {
+			s, ok := y.(string)
+			if ok {
+				ret = append(ret, s)
+			}
+		}
+		return ret
+	} else {
 		return []string{}
 	}
-	return r
 }
 
 func (s *DefaultConsentStrategy) IssueChallenge(authorizeRequest fosite.AuthorizeRequester, redirectURL string) (string, error) {
@@ -94,7 +108,7 @@ func (s *DefaultConsentStrategy) IssueChallenge(authorizeRequest fosite.Authoriz
 		"jti":   uuid.New(),
 		"scp":   authorizeRequest.GetScopes(),
 		"aud":   authorizeRequest.GetClient().GetID(),
-		"exp":   time.Now().Add(time.Hour).Unix(),
+		"exp":   time.Now().Add(s.DefaultChallengeLifespan).Unix(),
 		"redir": redirectURL,
 	}
 

@@ -38,14 +38,16 @@ var ladonWarden = pkg.LadonWarden(map[string]ladon.Policy{
 		ID:        "2",
 		Subjects:  []string{"siri"},
 		Resources: []string{"<.*>"},
-		Actions: []string{},
-		Effect: ladon.AllowAccess,
+		Actions:   []string{},
+		Effect:    ladon.AllowAccess,
 	},
 })
 
 var fositeStore = pkg.FositeStore()
 
-var tokens = pkg.Tokens(2)
+var now = time.Now().Round(time.Second)
+
+var tokens = pkg.Tokens(3)
 
 func init() {
 	wardens["local"] = &warden.LocalWarden{
@@ -54,7 +56,8 @@ func init() {
 			AccessTokenStrategy: pkg.HMACStrategy,
 			AccessTokenStorage:  fositeStore,
 		},
-		Issuer: "tests",
+		Issuer:              "tests",
+		AccessTokenLifespan: time.Hour,
 	}
 
 	r := httprouter.New()
@@ -71,13 +74,21 @@ func init() {
 		log.Fatalf("%s", err)
 	}
 
-	ar := fosite.NewAccessRequest(&oauth2.Session{Subject: "alice"})
+	ar := fosite.NewAccessRequest(oauth2.NewSession("alice"))
 	ar.GrantedScopes = fosite.Arguments{"core"}
+	ar.RequestedAt = now
 	fositeStore.CreateAccessTokenSession(nil, tokens[0][0], ar)
 
-	ar = fosite.NewAccessRequest(&oauth2.Session{Subject: "siri"})
-	ar.GrantedScopes = fosite.Arguments{"core"}
-	fositeStore.CreateAccessTokenSession(nil, tokens[1][0], ar)
+	ar2 := fosite.NewAccessRequest(oauth2.NewSession("siri"))
+	ar2.GrantedScopes = fosite.Arguments{"core"}
+	ar2.RequestedAt = now
+	fositeStore.CreateAccessTokenSession(nil, tokens[1][0], ar2)
+
+	ar3 := fosite.NewAccessRequest(oauth2.NewSession("siri"))
+	ar3.GrantedScopes = fosite.Arguments{"core"}
+	ar3.RequestedAt = now
+	ar3.Session.(*oauth2.Session).AccessTokenExpiry = time.Now().Add(-time.Hour)
+	fositeStore.CreateAccessTokenSession(nil, tokens[2][0], ar3)
 
 	conf := &coauth2.Config{
 		Scopes:   []string{},
@@ -167,12 +178,13 @@ func TestActionAllowed(t *testing.T) {
 				assert: func(c *firewall.Context) {
 					assert.Equal(t, "alice", c.Subject)
 					assert.Equal(t, "tests", c.Issuer)
-
+					assert.Equal(t, now.Add(time.Hour), c.ExpiresAt)
+					assert.Equal(t, now, c.IssuedAt)
 				},
 			},
 		} {
 			ctx, err := w.ActionAllowed(context.Background(), c.token, c.req, c.scopes...)
-			pkg.AssertError(t, c.expectErr, err, n, "ActionAllowed", k)
+			pkg.AssertError(t, c.expectErr, err, "ActionAllowed case", n, k)
 			if err == nil && c.assert != nil {
 				c.assert(ctx)
 			}
@@ -180,7 +192,7 @@ func TestActionAllowed(t *testing.T) {
 			httpreq := &http.Request{Header: http.Header{}}
 			httpreq.Header.Set("Authorization", "bearer "+c.token)
 			ctx, err = w.HTTPActionAllowed(context.Background(), httpreq, c.req, c.scopes...)
-			pkg.AssertError(t, c.expectErr, err, n, "HTTPActionAllowed", k)
+			pkg.AssertError(t, c.expectErr, err, "HTTPAuthorized case", n, k)
 			if err == nil && c.assert != nil {
 				c.assert(ctx)
 			}
@@ -210,18 +222,24 @@ func TestAuthorized(t *testing.T) {
 				expectErr: true,
 			},
 			{
-				token:     tokens[0][1],
+				token:     tokens[1][1],
 				scopes:    []string{"core"},
 				expectErr: false,
 				assert: func(c *firewall.Context) {
-					assert.Equal(t, "alice", c.Subject)
+					assert.Equal(t, "siri", c.Subject)
 					assert.Equal(t, "tests", c.Issuer)
-
+					assert.Equal(t, now.Add(time.Hour), c.ExpiresAt, "expires at", n)
+					assert.Equal(t, now, c.IssuedAt, "issued at", n)
 				},
+			},
+			{
+				token:     tokens[2][1],
+				scopes:    []string{"core"},
+				expectErr: true,
 			},
 		} {
 			ctx, err := w.Authorized(context.Background(), c.token, c.scopes...)
-			pkg.AssertError(t, c.expectErr, err, n, "ActionAllowed", k)
+			pkg.AssertError(t, c.expectErr, err, "ActionAllowed case", n, k)
 			if err == nil && c.assert != nil {
 				c.assert(ctx)
 			}
@@ -229,7 +247,7 @@ func TestAuthorized(t *testing.T) {
 			httpreq := &http.Request{Header: http.Header{}}
 			httpreq.Header.Set("Authorization", "bearer "+c.token)
 			ctx, err = w.HTTPAuthorized(context.Background(), httpreq, c.scopes...)
-			pkg.AssertError(t, c.expectErr, err, n, "HTTPActionAllowed", k)
+			pkg.AssertError(t, c.expectErr, err, "HTTPAuthorized case", n, k)
 			if err == nil && c.assert != nil {
 				c.assert(ctx)
 			}

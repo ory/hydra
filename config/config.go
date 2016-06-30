@@ -52,6 +52,9 @@ type Config struct {
 
 	Dry *bool `mapstructure:"-" yaml:"-"`
 
+	AccessTokenLifespan time.Duration
+	AuthCodeLifespan    time.Duration
+
 	cluster *url.URL
 
 	oauth2Client *http.Client
@@ -59,6 +62,20 @@ type Config struct {
 	context *Context
 
 	sync.Mutex
+}
+
+func (c *Config) GetAccessTokenLifespan() time.Duration {
+	if c.AuthCodeLifespan == 0 {
+		return time.Hour
+	}
+	return c.AccessTokenLifespan
+}
+
+func (c *Config) GetAuthCodeLifespan() time.Duration {
+	if c.AuthCodeLifespan == 0 {
+		return time.Minute * 10
+	}
+	return c.AuthCodeLifespan
 }
 
 func (c *Config) GetClusterURL() string {
@@ -145,6 +162,8 @@ func (c *Config) Context() *Context {
 			Enigma: &hmac.HMACStrategy{
 				GlobalSecret: secret,
 			},
+			AccessTokenLifespan:   c.GetAccessTokenLifespan(),
+			AuthorizeCodeLifespan: c.GetAuthCodeLifespan(),
 		},
 	}
 
@@ -247,13 +266,6 @@ func (c *Config) GetIssuer() string {
 		c.Issuer = "hydra"
 	}
 	return c.Issuer
-}
-
-func (c *Config) GetAccessTokenLifespan() time.Duration {
-	c.Lock()
-	defer c.Unlock()
-
-	return time.Hour
 }
 
 func (c *Config) Persist() error {

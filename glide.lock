@@ -1,11 +1,11 @@
 hash: 175acff756341dd7fa75a3e1e2e1a042a957a1b2482f017ae0bb38a2e8b9c625
-updated: 2016-06-26T13:19:40.0602745+02:00
+updated: 2016-06-30T00:59:47.4902603+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: df81827fdd59d8b4fb93d8910b286ab7a3919520
 - name: github.com/BurntSushi/toml
   version: f0aeabca5a127c4078abb8c8d64298b147264b55
-- name: github.com/cenkalti/backoff
+- name: github.com/cenk/backoff
   version: cdf48bbc1eb78d1349cbda326a4a037f7ba565c6
 - name: github.com/davecgh/go-spew
   version: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
@@ -14,11 +14,11 @@ imports:
 - name: github.com/dgrijalva/jwt-go
   version: f0777076321ab64f6efc15a82d9d23b98539b943
 - name: github.com/fsnotify/fsnotify
-  version: 30411dbcefb7a1da7e84f75530ad3abe4011b4f8
+  version: a8a77c9133d2d6fd8334f3260d06f60e8d80a5fb
 - name: github.com/go-errors/errors
   version: a41850380601eeb43f4350f7d17c6bbd8944aaf8
 - name: github.com/golang/protobuf
-  version: 0c1f6d65b5a189c2250d10e71a5506f06f9fa0a0
+  version: 3852dcfda249c2097355a6aabb199a28d97b30df
   subpackages:
   - proto
 - name: github.com/hailocab/go-hostpool
@@ -53,7 +53,7 @@ imports:
   - rand/sequence
   - compiler
 - name: github.com/ory-am/fosite
-  version: 5876017d8202b4c6a42212a131e9baa47f52202f
+  version: 9d54b989c8d04c4d586e7810cce2e6d4f03d7c48
   subpackages:
   - fosite-example/store
   - handler/core
@@ -75,6 +75,8 @@ imports:
   version: 63d3e27a44b7e60f0cfd8a38231ccbe13c74aee7
 - name: github.com/pborman/uuid
   version: c55201b036063326c5b1b89ccfe45a184973d073
+- name: github.com/pkg/errors
+  version: a2d6902c6d2a2f194eb3fb474981ab7867c81505
 - name: github.com/pkg/profile
   version: 8a808a6967b79da66deacfe508b26d398a69518f
 - name: github.com/pmezard/go-difflib
@@ -112,7 +114,7 @@ imports:
   - pbkdf2
   - blowfish
 - name: golang.org/x/net
-  version: bc3663df0ac92f928d419e31e0d2af22e683a5a2
+  version: 8e573f4005aa312856df2ea97c32b9beac70dd89
   subpackages:
   - context
   - netutil
@@ -136,7 +138,7 @@ imports:
   - internal/log
   - internal/remote_api
 - name: gopkg.in/dancannon/gorethink.v2
-  version: de072a9c0eff5bd52ef81fe45b6abeccde74bd13
+  version: 61cfdef59cb67a9bf9ab2311bd5eb69e132b6bf4
   subpackages:
   - encoding
   - ql2

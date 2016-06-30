@@ -1,4 +1,4 @@
-package hydra
+package sdk
 
 import (
 	"io/ioutil"
@@ -8,7 +8,7 @@ import (
 )
 
 func ClusterURL(urlStr string) option {
-	return func(c *Hydra) error {
+	return func(c *Client) error {
 		var err error
 		c.clusterURL, err = url.Parse(urlStr)
 		return err
@@ -16,7 +16,7 @@ func ClusterURL(urlStr string) option {
 }
 
 func FromYAML(file string) option {
-	return func(c *Hydra) error {
+	return func(c *Client) error {
 		var err error
 		var config = struct {
 			ClusterURL   string `yaml:"cluster_url"`
@@ -47,28 +47,28 @@ func FromYAML(file string) option {
 }
 
 func ClientID(id string) option {
-	return func(c *Hydra) error {
+	return func(c *Client) error {
 		c.clientID = id
 		return nil
 	}
 }
 
 func ClientSecret(secret string) option {
-	return func(c *Hydra) error {
+	return func(c *Client) error {
 		c.clientSecret = secret
 		return nil
 	}
 }
 
 func SkipSSL() option {
-	return func(c *Hydra) error {
+	return func(c *Client) error {
 		c.skipSSL = true
 		return nil
 	}
 }
 
 func Scopes(scopes ...string) option {
-	return func(c *Hydra) error {
+	return func(c *Client) error {
 		c.scopes = scopes
 		return nil
 	}

@@ -1,5 +1,5 @@
 // Wraps hydra HTTP Manager's
-package hydra
+package sdk
 
 import (
 	"crypto/tls"
@@ -19,7 +19,7 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 )
 
-type Hydra struct {
+type Client struct {
 	http         *http.Client
 	clusterURL   *url.URL
 	clientID     string
@@ -36,7 +36,7 @@ type Hydra struct {
 	Warden   *warden.HTTPWarden
 }
 
-type option func(*Hydra) error
+type option func(*Client) error
 
 // default options for hydra client
 var defaultOptions = []option{
@@ -47,8 +47,8 @@ var defaultOptions = []option{
 }
 
 // Connect instantiates a new client to communicate with Hydra
-func Connect(opts ...option) (*Hydra, error) {
-	c := &Hydra{}
+func Connect(opts ...option) (*Client, error) {
+	c := &Client{}
 
 	var err error
 	// apply default options
@@ -117,7 +117,7 @@ func Connect(opts ...option) (*Hydra, error) {
 	return c, nil
 }
 
-func (h *Hydra) authenticate() error {
+func (h *Client) authenticate() error {
 	ctx := context.WithValue(oauth2.NoContext, oauth2.HTTPClient, h.http)
 	_, err := h.credentials.Token(ctx)
 	if err != nil {

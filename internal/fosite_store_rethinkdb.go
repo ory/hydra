@@ -37,13 +37,13 @@ type FositeRehinkDBStore struct {
 }
 
 type RdbSchema struct {
-	ID            string                `json:"id" gorethink:"id"`
-	RequestedAt   time.Time             `json:"requestedAt" gorethink:"requestedAt"`
-	Client        *fosite.DefaultClient `json:"client" gorethink:"client"`
-	Scopes        fosite.Arguments      `json:"scopes" gorethink:"scopes"`
-	GrantedScopes fosite.Arguments      `json:"grantedScopes" gorethink:"grantedScopes"`
-	Form          url.Values            `json:"form" gorethink:"form"`
-	Session       json.RawMessage       `json:"session" gorethink:"session"`
+	ID            string           `json:"id" gorethink:"id"`
+	RequestedAt   time.Time        `json:"requestedAt" gorethink:"requestedAt"`
+	Client        *client.Client   `json:"client" gorethink:"client"`
+	Scopes        fosite.Arguments `json:"scopes" gorethink:"scopes"`
+	GrantedScopes fosite.Arguments `json:"grantedScopes" gorethink:"grantedScopes"`
+	Form          url.Values       `json:"form" gorethink:"form"`
+	Session       json.RawMessage  `json:"session" gorethink:"session"`
 }
 
 func requestFromRDB(s *RdbSchema, proto interface{}) (*fosite.Request, error) {
@@ -89,7 +89,7 @@ func (s *FositeRehinkDBStore) publishInsert(table r.Term, id string, requester f
 	if _, err := table.Insert(&RdbSchema{
 		ID:            id,
 		RequestedAt:   requester.GetRequestedAt(),
-		Client:        requester.GetClient().(*fosite.DefaultClient),
+		Client:        requester.GetClient().(*client.Client),
 		Scopes:        requester.GetScopes(),
 		GrantedScopes: requester.GetGrantedScopes(),
 		Form:          requester.GetRequestForm(),
@@ -182,7 +182,13 @@ func (s *FositeRehinkDBStore) PersistAuthorizeCodeGrantSession(ctx context.Conte
 		return err
 	} else if err := s.CreateAccessTokenSession(ctx, accessSignature, request); err != nil {
 		return err
-	} else if err := s.CreateRefreshTokenSession(ctx, refreshSignature, request); err != nil {
+	}
+
+	if refreshSignature == "" {
+		return nil
+	}
+
+	if err := s.CreateRefreshTokenSession(ctx, refreshSignature, request); err != nil {
 		return err
 	}
 

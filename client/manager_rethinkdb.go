@@ -2,7 +2,6 @@ package client
 
 import (
 	"sync"
-
 	"time"
 
 	"github.com/go-errors/errors"
@@ -19,7 +18,7 @@ type RethinkManager struct {
 	Table   r.Term
 	sync.RWMutex
 
-	Clients map[string]*fosite.DefaultClient
+	Clients map[string]Client
 	Hasher  hash.Hasher
 }
 
@@ -31,10 +30,10 @@ func (m *RethinkManager) GetClient(id string) (fosite.Client, error) {
 	if !ok {
 		return nil, errors.New(pkg.ErrNotFound)
 	}
-	return c, nil
+	return &c, nil
 }
 
-func (m *RethinkManager) Authenticate(id string, secret []byte) (*fosite.DefaultClient, error) {
+func (m *RethinkManager) Authenticate(id string, secret []byte) (*Client, error) {
 	m.Lock()
 	defer m.Unlock()
 
@@ -47,19 +46,19 @@ func (m *RethinkManager) Authenticate(id string, secret []byte) (*fosite.Default
 		return nil, errors.New(err)
 	}
 
-	return c, nil
+	return &c, nil
 }
 
-func (m *RethinkManager) CreateClient(c *fosite.DefaultClient) error {
+func (m *RethinkManager) CreateClient(c *Client) error {
 	if c.ID == "" {
 		c.ID = uuid.New()
 	}
 
-	hash, err := m.Hasher.Hash(c.Secret)
+	hash, err := m.Hasher.Hash([]byte(c.Secret))
 	if err != nil {
 		return errors.New(err)
 	}
-	c.Secret = hash
+	c.Secret = string(hash)
 
 	if err := m.publishCreate(c); err != nil {
 		return err
@@ -76,31 +75,35 @@ func (m *RethinkManager) DeleteClient(id string) error {
 	return nil
 }
 
-func (m *RethinkManager) GetClients() (map[string]*fosite.DefaultClient, error) {
+func (m *RethinkManager) GetClients() (clients map[string]*Client, err error) {
 	m.Lock()
 	defer m.Unlock()
+	clients = make(map[string]*Client)
+	for _, c := range m.Clients {
+		clients[c.ID] = &c
+	}
 
-	return m.Clients, nil
+	return clients, nil
 }
 
 func (m *RethinkManager) ColdStart() error {
-	m.Clients = map[string]*fosite.DefaultClient{}
+	m.Clients = map[string]Client{}
 	clients, err := m.Table.Run(m.Session)
 	if err != nil {
 		return errors.New(err)
 	}
 
-	var client fosite.DefaultClient
+	var client Client
 	m.Lock()
 	defer m.Unlock()
 	for clients.Next(&client) {
-		m.Clients[client.ID] = &client
+		m.Clients[client.ID] = client
 	}
 
 	return nil
 }
 
-func (m *RethinkManager) publishCreate(client *fosite.DefaultClient) error {
+func (m *RethinkManager) publishCreate(client *Client) error {
 	if _, err := m.Table.Insert(client).RunWrite(m.Session); err != nil {
 		return errors.New(err)
 	}
@@ -122,7 +125,7 @@ func (m *RethinkManager) Watch(ctx context.Context) {
 		}
 		defer clients.Close()
 
-		var update map[string]*fosite.DefaultClient
+		var update map[string]*Client
 		for clients.Next(&update) {
 			newVal := update["new_val"]
 			oldVal := update["old_val"]
@@ -131,9 +134,9 @@ func (m *RethinkManager) Watch(ctx context.Context) {
 				delete(m.Clients, oldVal.GetID())
 			} else if newVal != nil && oldVal != nil {
 				delete(m.Clients, oldVal.GetID())
-				m.Clients[newVal.GetID()] = newVal
+				m.Clients[newVal.GetID()] = *newVal
 			} else {
-				m.Clients[newVal.GetID()] = newVal
+				m.Clients[newVal.GetID()] = *newVal
 			}
 			m.Unlock()
 		}

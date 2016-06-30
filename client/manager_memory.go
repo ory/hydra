@@ -11,7 +11,7 @@ import (
 )
 
 type MemoryManager struct {
-	Clients map[string]*fosite.DefaultClient
+	Clients map[string]Client
 	Hasher  hash.Hasher
 	sync.RWMutex
 }
@@ -24,10 +24,10 @@ func (m *MemoryManager) GetClient(id string) (fosite.Client, error) {
 	if !ok {
 		return nil, errors.New(pkg.ErrNotFound)
 	}
-	return c, nil
+	return &c, nil
 }
 
-func (m *MemoryManager) Authenticate(id string, secret []byte) (*fosite.DefaultClient, error) {
+func (m *MemoryManager) Authenticate(id string, secret []byte) (*Client, error) {
 	m.Lock()
 	defer m.Unlock()
 
@@ -40,10 +40,10 @@ func (m *MemoryManager) Authenticate(id string, secret []byte) (*fosite.DefaultC
 		return nil, errors.New(err)
 	}
 
-	return c, nil
+	return &c, nil
 }
 
-func (m *MemoryManager) CreateClient(c *fosite.DefaultClient) error {
+func (m *MemoryManager) CreateClient(c *Client) error {
 	m.Lock()
 	defer m.Unlock()
 
@@ -51,13 +51,13 @@ func (m *MemoryManager) CreateClient(c *fosite.DefaultClient) error {
 		c.ID = uuid.New()
 	}
 
-	hash, err := m.Hasher.Hash(c.Secret)
+	hash, err := m.Hasher.Hash([]byte(c.Secret))
 	if err != nil {
 		return errors.New(err)
 	}
-	c.Secret = hash
+	c.Secret = string(hash)
 
-	m.Clients[c.GetID()] = c
+	m.Clients[c.GetID()] = *c
 	return nil
 }
 
@@ -69,9 +69,13 @@ func (m *MemoryManager) DeleteClient(id string) error {
 	return nil
 }
 
-func (m *MemoryManager) GetClients() (map[string]*fosite.DefaultClient, error) {
+func (m *MemoryManager) GetClients() (clients map[string]*Client, err error) {
 	m.Lock()
 	defer m.Unlock()
+	clients = make(map[string]*Client)
+	for _, c := range m.Clients {
+		clients[c.ID] = &c
+	}
 
-	return m.Clients, nil
+	return clients, nil
 }

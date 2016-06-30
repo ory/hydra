@@ -25,15 +25,36 @@ type LocalWarden struct {
 func (w *LocalWarden) actionAllowed(ctx context.Context, a *ladon.Request, scopes []string, oauthRequest fosite.AccessRequester, session *oauth2.Session) (*Context, error) {
 	session = oauthRequest.GetSession().(*oauth2.Session)
 	if a.Subject != "" && a.Subject != session.Subject {
+		logrus.WithFields(logrus.Fields{
+			"scopes":   scopes,
+			"subject":  a.Subject,
+			"audience": oauthRequest.GetClient().GetID(),
+			"request":  a,
+			"reason":   "subject mismatch",
+		}).Infof("Access denied")
 		return nil, errors.New("Subject mismatch " + a.Subject + " - " + session.Subject)
 	}
 
 	if !matchScopes(oauthRequest.GetGrantedScopes(), scopes, session, oauthRequest.GetClient()) {
+		logrus.WithFields(logrus.Fields{
+			"scopes":   scopes,
+			"subject":  a.Subject,
+			"audience": oauthRequest.GetClient().GetID(),
+			"request":  a,
+			"reason":   "scope mismatch",
+		}).Infof("Access denied")
 		return nil, errors.New(herodot.ErrForbidden)
 	}
 
 	a.Subject = session.Subject
 	if err := w.Warden.IsAllowed(a); err != nil {
+		logrus.WithFields(logrus.Fields{
+			"scopes":   scopes,
+			"subject":  a.Subject,
+			"audience": oauthRequest.GetClient().GetID(),
+			"request":  a,
+			"reason":   "policy effect is deny",
+		}).Infof("Access denied")
 		return nil, err
 	}
 
@@ -68,8 +89,22 @@ func (w *LocalWarden) HTTPActionAllowed(ctx context.Context, r *http.Request, a 
 	var oauthRequest = fosite.NewAccessRequest(session)
 
 	if err := w.TokenValidator.ValidateRequest(ctx, r, oauthRequest); errors.Is(err, fosite.ErrUnknownRequest) {
-		return nil, pkg.ErrUnauthorized
+		logrus.WithFields(logrus.Fields{
+			"scopes":   scopes,
+			"subject":  a.Subject,
+			"audience": oauthRequest.GetClient().GetID(),
+			"request":  a,
+			"reason":   "unknown request",
+		}).Infof("Access denied")
+		return nil, errors.New(pkg.ErrUnauthorized)
 	} else if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"scopes":   scopes,
+			"subject":  a.Subject,
+			"audience": oauthRequest.GetClient().GetID(),
+			"request":  a,
+			"reason":   "token validation failed",
+		}).Infof("Access denied")
 		return nil, err
 	}
 
@@ -81,11 +116,23 @@ func (w *LocalWarden) Authorized(ctx context.Context, token string, scopes ...st
 	var oauthRequest = fosite.NewAccessRequest(session)
 
 	if err := w.TokenValidator.ValidateToken(ctx, oauthRequest, token); err != nil {
+		logrus.WithFields(logrus.Fields{
+			"scopes":   scopes,
+			"subject":  session.Subject,
+			"audience": oauthRequest.GetClient().GetID(),
+			"reason":   "token validation failed",
+		}).Infof("Access denied")
 		return nil, err
 	}
 
 	session = oauthRequest.GetSession().(*oauth2.Session)
 	if !matchScopes(oauthRequest.GetGrantedScopes(), scopes, session, oauthRequest.Client) {
+		logrus.WithFields(logrus.Fields{
+			"scopes":   scopes,
+			"subject":  session,
+			"audience": oauthRequest.GetClient().GetID(),
+			"reason":   "scope mismatch",
+		}).Infof("Access denied")
 		return nil, errors.New(herodot.ErrForbidden)
 	}
 
@@ -103,13 +150,31 @@ func (w *LocalWarden) HTTPAuthorized(ctx context.Context, r *http.Request, scope
 	var oauthRequest = fosite.NewAccessRequest(session)
 
 	if err := w.TokenValidator.ValidateRequest(ctx, r, oauthRequest); errors.Is(err, fosite.ErrUnknownRequest) {
-		return nil, fosite.ErrRequestUnauthorized
+		logrus.WithFields(logrus.Fields{
+			"scopes":   scopes,
+			"subject":  session.Subject,
+			"audience": oauthRequest.GetClient().GetID(),
+			"reason":   "unknown request",
+		}).Infof("Access denied")
+		return nil, errors.New(pkg.ErrUnauthorized)
 	} else if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"scopes":   scopes,
+			"subject":  session.Subject,
+			"audience": oauthRequest.GetClient().GetID(),
+			"reason":   "token validation failed",
+		}).Infof("Access denied")
 		return nil, err
 	}
 
 	session = oauthRequest.GetSession().(*oauth2.Session)
 	if !matchScopes(oauthRequest.GetGrantedScopes(), scopes, session, oauthRequest.Client) {
+		logrus.WithFields(logrus.Fields{
+			"scopes":   scopes,
+			"subject":  session.Subject,
+			"audience": oauthRequest.GetClient().GetID(),
+			"reason":   "scope mismatch",
+		}).Infof("Access denied")
 		return nil, errors.New(herodot.ErrForbidden)
 	}
 

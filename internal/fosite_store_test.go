@@ -9,6 +9,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	c "github.com/ory-am/common/pkg"
 	"github.com/ory-am/fosite"
+	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
@@ -94,7 +95,7 @@ type testSession struct {
 
 var defaultRequest = fosite.Request{
 	RequestedAt:   time.Now().Round(time.Second),
-	Client:        &fosite.DefaultClient{ID: "foobar"},
+	Client:        &client.Client{ID: "foobar"},
 	Scopes:        fosite.Arguments{"fa", "ba"},
 	GrantedScopes: fosite.Arguments{"fa", "ba"},
 	Form:          url.Values{"foo": []string{"bar", "baz"}},
@@ -211,6 +212,7 @@ func TestCreateGetDeleteOpenIDConnectSession(t *testing.T) {
 		pkg.AssertError(t, true, err, "%s", k)
 	}
 }
+
 func TestCreateGetDeleteRefreshTokenSession(t *testing.T) {
 	ctx := context.Background()
 	for k, m := range clientManagers {

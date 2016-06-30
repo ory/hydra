@@ -6,13 +6,13 @@ import (
 
 	"crypto/rsa"
 
-	"gopkg.in/dgrijalva/jwt-go.v2"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/handler/oidc/strategy"
 	ejwt "github.com/ory-am/fosite/token/jwt"
 	"github.com/ory-am/hydra/jwk"
 	"github.com/pborman/uuid"
+	"gopkg.in/dgrijalva/jwt-go.v2"
 )
 
 const (
@@ -71,7 +71,7 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 				Subject:   subject,
 				Issuer:    s.Issuer,
 				IssuedAt:  time.Now(),
-				ExpiresAt: time.Now(),
+				ExpiresAt: time.Now().Add(time.Hour),
 				Extra:     t.Claims,
 			},
 			Headers: &ejwt.Headers{},

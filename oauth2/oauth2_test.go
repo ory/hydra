@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/url"
 
-	"gopkg.in/dgrijalva/jwt-go.v2"
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
@@ -17,14 +16,29 @@ import (
 	"github.com/ory-am/fosite/handler/core/strategy"
 	"github.com/ory-am/fosite/hash"
 	"github.com/ory-am/fosite/token/hmac"
+	hc "github.com/ory-am/hydra/client"
+	"github.com/ory-am/hydra/internal"
 	"github.com/ory-am/hydra/jwk"
 	. "github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
+	"gopkg.in/dgrijalva/jwt-go.v2"
 )
 
-var store = pkg.FositeStore()
+var hasher = &hash.BCrypt{}
+
+var store = &internal.FositeMemoryStore{
+	Manager: &hc.MemoryManager{
+		Clients: map[string]hc.Client{},
+		Hasher:  hasher,
+	},
+	AuthorizeCodes: make(map[string]fosite.Requester),
+	IDSessions:     make(map[string]fosite.Requester),
+	AccessTokens:   make(map[string]fosite.Requester),
+	Implicit:       make(map[string]fosite.Requester),
+	RefreshTokens:  make(map[string]fosite.Requester),
+}
 
 var keyManager = &jwk.MemoryManager{}
 
@@ -44,8 +58,6 @@ var authCodeHandler = &explicit.AuthorizeExplicitGrantTypeHandler{
 	AuthCodeLifespan:          time.Hour,
 	AccessTokenLifespan:       time.Hour,
 }
-
-var hasher = &hash.BCrypt{}
 
 var handler = &Handler{
 	OAuth2: &fosite.Fosite{
@@ -92,9 +104,9 @@ func init() {
 	ts = httptest.NewServer(router)
 
 	handler.SetRoutes(router)
-	store.Clients["app"] = &fosite.DefaultClient{
+	store.Manager.(*hc.MemoryManager).Clients["app"] = hc.Client{
 		ID:            "app",
-		Secret:        []byte("secret"),
+		Secret:        "secret",
 		RedirectURIs:  []string{ts.URL + "/callback"},
 		ResponseTypes: []string{"id_token", "code", "token"},
 		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
@@ -104,9 +116,9 @@ func init() {
 	handler.ConsentURL = *c
 
 	h, _ := hasher.Hash([]byte("secret"))
-	store.Clients["app-client"] = &fosite.DefaultClient{
+	store.Manager.(*hc.MemoryManager).Clients["app-client"] = hc.Client{
 		ID:            "app-client",
-		Secret:        h,
+		Secret:        string(h),
 		RedirectURIs:  []string{ts.URL + "/callback"},
 		ResponseTypes: []string{"id_token", "code", "token"},
 		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},

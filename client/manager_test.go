@@ -31,7 +31,7 @@ var ts *httptest.Server
 
 func init() {
 	clientManagers["memory"] = &MemoryManager{
-		Clients: map[string]*fosite.DefaultClient{},
+		Clients: map[string]Client{},
 		Hasher:  &hash.BCrypt{},
 	}
 
@@ -45,7 +45,7 @@ func init() {
 
 	s := &Handler{
 		Manager: &MemoryManager{
-			Clients: map[string]*fosite.DefaultClient{},
+			Clients: map[string]Client{},
 			Hasher:  &hash.BCrypt{},
 		},
 		H: &herodot.JSON{},
@@ -83,7 +83,7 @@ func TestMain(m *testing.M) {
 		rethinkManager = &RethinkManager{
 			Session: session,
 			Table:   r.Table("hydra_clients"),
-			Clients: make(map[string]*fosite.DefaultClient),
+			Clients: make(map[string]Client),
 			Hasher: &hash.BCrypt{
 				// Low workfactor reduces test time
 				WorkFactor: 4,
@@ -108,12 +108,12 @@ func TestMain(m *testing.M) {
 
 func TestAuthenticateClient(t *testing.T) {
 	var mem = &MemoryManager{
-		Clients: map[string]*fosite.DefaultClient{},
+		Clients: map[string]Client{},
 		Hasher:  &hash.BCrypt{},
 	}
-	mem.CreateClient(&fosite.DefaultClient{
+	mem.CreateClient(&Client{
 		ID:           "1234",
-		Secret:       []byte("secret"),
+		Secret:       "secret",
 		RedirectURIs: []string{"http://redirect"},
 	})
 
@@ -130,9 +130,9 @@ func BenchmarkRethinkGet(b *testing.B) {
 
 	m := rethinkManager
 	id := uuid.New()
-	c := &fosite.DefaultClient{
+	c := &Client{
 		ID:                id,
-		Secret:            []byte("secret"),
+		Secret:            "secret",
 		RedirectURIs:      []string{"http://redirect"},
 		TermsOfServiceURI: "foo",
 	}
@@ -155,9 +155,9 @@ func BenchmarkRethinkAuthenticate(b *testing.B) {
 
 	m := rethinkManager
 	id := uuid.New()
-	c := &fosite.DefaultClient{
+	c := &Client{
 		ID:                id,
-		Secret:            []byte("secret"),
+		Secret:            "secret",
 		RedirectURIs:      []string{"http://redirect"},
 		TermsOfServiceURI: "foo",
 	}
@@ -176,9 +176,9 @@ func BenchmarkRethinkAuthenticate(b *testing.B) {
 }
 
 func TestColdStartRethinkManager(t *testing.T) {
-	err := rethinkManager.CreateClient(&fosite.DefaultClient{
+	err := rethinkManager.CreateClient(&Client{
 		ID:                "2341234",
-		Secret:            []byte("secret"),
+		Secret:            "secret",
 		RedirectURIs:      []string{"http://redirect"},
 		TermsOfServiceURI: "foo",
 	})
@@ -187,7 +187,7 @@ func TestColdStartRethinkManager(t *testing.T) {
 	_, err = rethinkManager.GetClient("2341234")
 	assert.Nil(t, err)
 
-	rethinkManager.Clients = make(map[string]*fosite.DefaultClient)
+	rethinkManager.Clients = make(map[string]Client)
 	_, err = rethinkManager.GetClient("2341234")
 	assert.NotNil(t, err)
 
@@ -195,7 +195,7 @@ func TestColdStartRethinkManager(t *testing.T) {
 	_, err = rethinkManager.GetClient("2341234")
 	assert.Nil(t, err)
 
-	rethinkManager.Clients = make(map[string]*fosite.DefaultClient)
+	rethinkManager.Clients = make(map[string]Client)
 }
 
 func TestCreateGetDeleteClient(t *testing.T) {
@@ -203,9 +203,9 @@ func TestCreateGetDeleteClient(t *testing.T) {
 		_, err := m.GetClient("4321")
 		pkg.AssertError(t, true, err, "%s", k)
 
-		c := &fosite.DefaultClient{
+		c := &Client{
 			ID:                "1234",
-			Secret:            []byte("secret"),
+			Secret:            "secret",
 			RedirectURIs:      []string{"http://redirect"},
 			TermsOfServiceURI: "foo",
 		}
@@ -241,6 +241,8 @@ func TestCreateGetDeleteClient(t *testing.T) {
 
 func compare(t *testing.T, c fosite.Client, k string) {
 	assert.Equal(t, c.GetID(), "1234", "%s", k)
-	assert.NotEmpty(t, c.GetHashedSecret(), "%s", k)
+	if k != "http" {
+		assert.NotEmpty(t, c.GetHashedSecret(), "%s", k)
+	}
 	assert.Equal(t, c.GetRedirectURIs(), []string{"http://redirect"}, "%s", k)
 }

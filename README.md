@@ -402,6 +402,47 @@ Or by specifying the following flags:
 
 You can do so by running `hydra host --force-dangerous-http`.
 
+### How do I use it in my application?
+
+Hydra already comes with HTTP Managers. You could use directly by importing the following or use the thin wrapper created in `ory-am/hydra/sdk`
+
+**Manage OAuth Clients**
+`ory-am/hydra/client.HTTPManager`
+
+**Manage SSO Connections**
+`ory-am/hydra/connection.HTTPManager`
+
+**Manage Policies**
+`ory-am/hydra/policy.HTTPManager`
+
+**Manage JWK**
+`ory-am/hydra/jwk.HTTPManager`
+
+**Manage Warden Connections**
+`ory-am/hydra/warden.HTTPWarden`
+
+**To use SDK**
+
+1. Connect to Hydra.
+```
+client, err := sdk.Connect(
+    sdk.ClientID("client-id"), 
+    sdk.ClientSecret("client-secret"), 
+    sdk.ClustURL("https://localhost:4444"),
+)
+```
+2. Use the API
+
+**OAuth Client*s*: `client.Client`
+
+*SSO Connection*s*: `client.SSO`
+
+Policiess*: `client.Policy`
+
+**JWK**: `client.JWK`
+
+*Warden*: `client.Warden`
+
 ## Hall of Fame
 
 A list of extraordinary contributors and [bug hunters](https://github.com/ory-am/hydra/issues/84).

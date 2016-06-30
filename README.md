@@ -418,7 +418,7 @@ Hydra already comes with HTTP Managers. You could use directly by importing the 
 **Manage JWK**
 `ory-am/hydra/jwk.HTTPManager`
 
-**Manage Warden Connections**
+**Use Warden**
 `ory-am/hydra/warden.HTTPWarden`
 
 **To use SDK**

@@ -433,15 +433,15 @@ client, err := sdk.Connect(
 ```
 2. Use the API
 
-**OAuth Client*s*: `client.Client`
+**OAuth Clients**: `client.Client`
 
-*SSO Connection*s*: `client.SSO`
+**SSO Connections**: `client.SSO`
 
-Policiess*: `client.Policy`
+**Policiess**: `client.Policy`
 
 **JWK**: `client.JWK`
 
-*Warden*: `client.Warden`
+**Warden**: `client.Warden`
 
 ## Hall of Fame
 

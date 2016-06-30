@@ -28,6 +28,8 @@ Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://git
   - [Security](#security)
 - [Quickstart](#quickstart)
   - [Installation](#installation)
+    - [Server](#server)
+    - [Client](#client)
   - [Run the example](#run-the-example)
 - [Documentation](#documentation)
   - [Guide](#guide)
@@ -169,55 +171,24 @@ This section is a quickstart guide to working with Hydra. In-depth docs are avai
 
 ### Installation
 
+#### Server
+
 **Starting the host** is easiest with docker. The host process handles HTTP requests and is backed by a database.
 Read how to install docker on [Linux](https://docs.docker.com/linux/), [OSX](https://docs.docker.com/mac/) or
 [Windows](https://docs.docker.com/windows/). Hydra is available on [Docker Hub](https://hub.docker.com/r/oryam/hydra/).
 
-The easiest way to start docker is without a database. Hydra will keep all changes in memory. But be aware! Restarting, scaling
+##### Downloading an image form the Hub
+
+Hydra will keep all changes in memory. But be aware! Restarting, scaling
 or stopping the container will make you **lose all data**:
 
+To download and start the image:
 ```
 $ docker run -d -p 4444:4444 oryam/hydra --name my-hydra
 ec91228cb105db315553499c81918258f52cee9636ea2a4821bdb8226872f54b
 ```
 
-**The CLI client is available at [gobuild.io](https://gobuild.io/ory-am/hydra)**.
-
-There is currently no installer which adds the CLI to your path automatically. You have to set up the path yourself.
-If you do not understand what that means, ask on our [Gitter channel](https://gitter.im/ory-am/hydra).
-
-If you wish to compile the CLI yourself, you need to install and set up [Go](https://golang.org/) and add `$GOPATH/bin`
-to your `$PATH`. Here is a [comprehensive Go installation guide](https://github.com/ory-am/workshop-dbg#googles-go-language) with screenshots.
-
-To install the CLI from source, execute:
-
-```
-go get github.com/ory-am/hydra
-go get github.com/Masterminds/glide
-cd $GOPATH/src/github.com/ory-am/hydra
-glide install
-go install github.com/ory-am/hydra
-hydra
-```
-
-Alternatively, you can use the CLI in Docker (not recommended):
-
-```
-$ docker exec -i -t <hydra-container-id> /bin/bash
-# e.g. docker exec -i -t ec12 /bin/bash
-
-root@ec91228cb105:/go/src/github.com/ory-am/hydra# hydra
-Hydra is a twelve factor OAuth2 and OpenID Connect provider
-
-Usage:
-  hydra [command]
-
-[...]
-```
-
-### Run the example
-
-![Run the example](dist/run-the-example.gif)
+##### Build a docker image from the sources
 
 Install the [CLI and Docker Toolbox](#installation). Make sure you install Docker Compose. On OSX and Windows,
 open the Docker Quickstart Terminal. On Linux open any terminal.
@@ -263,12 +234,54 @@ mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="client_id: d9227bd5-5
 mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="client_secret: ,IvxGt02uNjv1ur9"
 [...]
 ```
+#### Client
+
+##### Using gopack
+
+**The CLI client is available at [gobuild.io](https://gobuild.io/ory-am/hydra)**.
+
+There is currently no installer which adds the CLI to your path automatically. You have to set up the path yourself.
+If you do not understand what that means, ask on our [Gitter channel](https://gitter.im/ory-am/hydra).
+
+##### Building from the sources
+
+If you wish to compile the CLI yourself, you need to install and set up [Go](https://golang.org/) and add `$GOPATH/bin`
+to your `$PATH`. Here is a [comprehensive Go installation guide](https://github.com/ory-am/workshop-dbg#googles-go-language) with screenshots.
+
+To install the CLI from source, execute:
+
+```
+go get github.com/ory-am/hydra
+go get github.com/Masterminds/glide
+cd $GOPATH/src/github.com/ory-am/hydra
+glide install
+go install github.com/ory-am/hydra
+hydra
+```
+##### From the Docker container (not recommended)
+
+```
+$ docker exec -i -t <hydra-container-id> /bin/bash
+# e.g. docker exec -i -t ec12 /bin/bash
+
+root@ec91228cb105:/go/src/github.com/ory-am/hydra# hydra
+Hydra is a twelve factor OAuth2 and OpenID Connect provider
+
+Usage:
+  hydra [command]
+
+[...]
+```
+
+### Run the example
+
+![Run the example](dist/run-the-example.gif)
 
 You have now a running hydra docker container! Additionally, a RethinkDB image was deployed and a consent app.
 
 Hydra can be managed with the hydra cli client. The client hast to log on before it is allowed to do anything.
-When hydra detects a new installation, a new temporary root client is created. The client credentials are printed by
-`docker compose up`:
+When hydra detects a new installation, a new temporary root client is created. The client credentials are printed in 
+the container logs.
 
 ```
 mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="client_id: d9227bd5-5d47-4557-957d-2fd3bee11035"

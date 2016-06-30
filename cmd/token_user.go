@@ -36,7 +36,7 @@ var tokenUserCmd = &cobra.Command{
 				TokenURL: pkg.JoinURLStrings(c.ClusterURL, "/oauth2/token"),
 				AuthURL:  pkg.JoinURLStrings(c.ClusterURL, "/oauth2/auth"),
 			},
-			Scopes: []string{"core", "hydra"},
+			Scopes: []string{"core", "hydra", "offline", "openid"},
 		}
 
 		state, err := sequence.RuneSequence(24, []rune("abcdefghijklmnopqrstuvwxyz"))

@@ -7,6 +7,9 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
+	csh "github.com/ory-am/fosite/handler/core/strategy"
+	"github.com/ory-am/fosite/handler/oidc/strategy"
+	"github.com/ory-am/fosite/token/jwt"
 	"github.com/ory-am/hydra/pkg"
 )
 
@@ -28,7 +31,13 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 }
 
 func (o *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var session Session
+	var session = Session{
+		DefaultSession: &strategy.DefaultSession{
+			Claims:      new(jwt.IDTokenClaims),
+			Headers:     new(jwt.Headers),
+			HMACSession: new(csh.HMACSession),
+		},
+	}
 	var ctx = fosite.NewContext()
 
 	accessRequest, err := o.OAuth2.NewAccessRequest(ctx, r, &session)

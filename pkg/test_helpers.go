@@ -3,6 +3,8 @@ package pkg
 import (
 	"testing"
 
+	"time"
+
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite/fosite-example/store"
 	"github.com/ory-am/fosite/handler/core/strategy"
@@ -21,11 +23,11 @@ func RequireError(t *testing.T, expectError bool, err error, args ...interface{}
 		}
 		t.Logf("\n\n")
 	}
-	require.Equal(t, expectError, err != nil)
+	require.Equal(t, expectError, err != nil, "%v", args)
 }
 
 func AssertError(t *testing.T, expectError bool, err error, args ...interface{}) {
-	assert.Equal(t, expectError, err != nil)
+	assert.Equal(t, expectError, err != nil, "%v", args)
 	if err != nil && !expectError {
 		t.Logf("Unexpected error: %s\n", err.Error())
 		t.Logf("Arguments: %s\n", args)
@@ -60,4 +62,6 @@ var HMACStrategy = &strategy.HMACSHAStrategy{
 	Enigma: &hmac.HMACStrategy{
 		GlobalSecret: []byte("1234567890123456789012345678901234567890"),
 	},
+	AccessTokenLifespan:   time.Hour,
+	AuthorizeCodeLifespan: time.Hour,
 }

@@ -1,8 +1,6 @@
 package server
 
 import (
-	"time"
-
 	"net/url"
 
 	"github.com/Sirupsen/logrus"
@@ -29,6 +27,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
+	"time"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {
@@ -116,7 +115,7 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 		RefreshTokenStrategy:      ctx.FositeStrategy,
 		AuthorizeCodeStrategy:     ctx.FositeStrategy,
 		AuthorizeCodeGrantStorage: store,
-		AuthCodeLifespan:          time.Hour,
+		AuthCodeLifespan:          c.GetAuthCodeLifespan(),
 		AccessTokenLifespan:       c.GetAccessTokenLifespan(),
 	}
 
@@ -177,6 +176,8 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 		Consent: &oauth2.DefaultConsentStrategy{
 			Issuer:     c.Issuer,
 			KeyManager: km,
+			DefaultChallengeLifespan: time.Hour,
+			DefaultIDTokenLifespan: time.Hour * 24,
 		},
 		ConsentURL: *consentURL,
 	}

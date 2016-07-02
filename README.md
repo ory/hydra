@@ -406,6 +406,8 @@ You can do so by running `hydra host --force-dangerous-http`.
 
 Hydra already comes with HTTP Managers. You could use directly by importing the following or use the thin wrapper created in `ory-am/hydra/sdk`
 
+#### Using HTTP Managers
+
 **Manage OAuth Clients**
 `ory-am/hydra/client.HTTPManager`
 
@@ -421,9 +423,9 @@ Hydra already comes with HTTP Managers. You could use directly by importing the 
 **Use Warden**
 `ory-am/hydra/warden.HTTPWarden`
 
-**To use SDK**
+#### Using SDK
 
-1. Connect to Hydra.
+**Connect to Hydra.**
 ```
 client, err := sdk.Connect(
     sdk.ClientID("client-id"), 
@@ -431,7 +433,7 @@ client, err := sdk.Connect(
     sdk.ClustURL("https://localhost:4444"),
 )
 ```
-2. Use the API
+**Use the API**
 
 **OAuth Clients**: `client.Client`
 

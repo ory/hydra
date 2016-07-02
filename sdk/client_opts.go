@@ -16,15 +16,17 @@ func ClusterURL(urlStr string) option {
 	}
 }
 
+type hydraConfig struct {
+	ClusterURL   string `yaml:"cluster_url"`
+	ClientID     string `yaml:"client_id"`
+	ClientSecret string `yaml:"client_secret"`
+}
+
 // FromYAML loads configurations from a YAML file
 func FromYAML(file string) option {
 	return func(c *Client) error {
 		var err error
-		var config = struct {
-			ClusterURL   string `yaml:"cluster_url"`
-			ClientID     string `yaml:"client_id"`
-			ClientSecret string `yaml:"client_secret"`
-		}{}
+		var config = hydraConfig{}
 
 		data, err := ioutil.ReadFile(file)
 		if err != nil {

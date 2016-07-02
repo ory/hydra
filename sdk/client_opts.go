@@ -7,6 +7,7 @@ import (
 	"gopkg.in/yaml.v1"
 )
 
+// ClusterURL sets Hydra service URL
 func ClusterURL(urlStr string) option {
 	return func(c *Client) error {
 		var err error
@@ -15,6 +16,7 @@ func ClusterURL(urlStr string) option {
 	}
 }
 
+// FromYAML loads configurations from a YAML file
 func FromYAML(file string) option {
 	return func(c *Client) error {
 		var err error
@@ -46,6 +48,7 @@ func FromYAML(file string) option {
 	}
 }
 
+// ClientID sets OAuth client ID
 func ClientID(id string) option {
 	return func(c *Client) error {
 		c.clientID = id
@@ -53,6 +56,7 @@ func ClientID(id string) option {
 	}
 }
 
+// ClientSecret sets OAuth client secret
 func ClientSecret(secret string) option {
 	return func(c *Client) error {
 		c.clientSecret = secret
@@ -60,6 +64,7 @@ func ClientSecret(secret string) option {
 	}
 }
 
+// SkipSSL skips TLS verification
 func SkipSSL() option {
 	return func(c *Client) error {
 		c.skipSSL = true
@@ -67,6 +72,7 @@ func SkipSSL() option {
 	}
 }
 
+// Scopes sets client scopes granted by Hydra
 func Scopes(scopes ...string) option {
 	return func(c *Client) error {
 		c.scopes = scopes

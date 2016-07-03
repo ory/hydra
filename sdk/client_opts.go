@@ -66,10 +66,10 @@ func ClientSecret(secret string) option {
 	}
 }
 
-// SkipSSL skips TLS verification
-func SkipSSL() option {
+// SkipTLSVerify skips TLS verification
+func SkipTLSVerify() option {
 	return func(c *Client) error {
-		c.skipSSL = true
+		c.skipTLSVerify = true
 		return nil
 	}
 }

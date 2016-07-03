@@ -40,10 +40,10 @@ func TestClientSecretOption(t *testing.T) {
 func TestSkipSSLOption(t *testing.T) {
 	c := &Client{}
 
-	err := SkipSSL()(c)
+	err := SkipTLSVerify()(c)
 
 	assert.Nil(t, err)
-	assert.Equal(t, true, c.skipSSL)
+	assert.Equal(t, true, c.skipTLSVerify)
 }
 
 func TestScopesOption(t *testing.T) {

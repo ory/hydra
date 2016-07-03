@@ -20,12 +20,12 @@ import (
 )
 
 type Client struct {
-	http         *http.Client
-	clusterURL   *url.URL
-	clientID     string
-	clientSecret string
-	skipSSL      bool
-	scopes       []string
+	http          *http.Client
+	clusterURL    *url.URL
+	clientID      string
+	clientSecret  string
+	skipTLSVerify bool
+	scopes        []string
 
 	credentials clientcredentials.Config
 
@@ -76,7 +76,7 @@ func Connect(opts ...option) (*Client, error) {
 
 	c.http = http.DefaultClient
 
-	if c.skipSSL {
+	if c.skipTLSVerify {
 		c.http = &http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},

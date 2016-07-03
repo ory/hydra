@@ -402,6 +402,136 @@ Or by specifying the following flags:
 
 You can do so by running `hydra host --force-dangerous-http`.
 
+### How do I use it in my application?
+
+Hydra already comes with HTTP Managers. You could use directly by importing the following or use the thin wrapper created in `ory-am/hydra/sdk`
+
+#### Using HTTP Managers
+
+**Manage OAuth Clients**
+`ory-am/hydra/client.HTTPManager`
+
+**Manage SSO Connections**
+`ory-am/hydra/connection.HTTPManager`
+
+**Manage Policies**
+`ory-am/hydra/policy.HTTPManager`
+
+**Manage JWK**
+`ory-am/hydra/jwk.HTTPManager`
+
+**Use Warden**
+`ory-am/hydra/warden.HTTPWarden`
+
+#### Using SDK
+
+**Connect to Hydra.**
+```
+client, err := sdk.Connect(
+    sdk.ClientID("client-id"), 
+    sdk.ClientSecret("client-secret"), 
+    sdk.ClustURL("https://localhost:4444"),
+)
+```
+**Use the API**
+
+**OAuth Clients**: `client.Client`
+
+```
+// To create a new OAuth2 client
+newClient, err := client.Client.CreateClient(&client.Client{
+    ID:                "deadbeef",
+	Secret:            "sup3rs3cret",
+	RedirectURIs:      []string{"http://yourapp/callback"},
+    // ...
+})
+
+// Retrieve newly created client
+newClient, err = client.Client.GetClient(newClient.ID)
+
+// To remove newly created client
+err = client.Client.DeleteClient(newClient.ID)
+
+// Retrieve list of all clients
+clients, err := client.Client.GetClients()
+```
+
+
+**SSO Connections**: `client.SSO`
+
+```
+// Create a new connection
+newSSOConn, err := client.SSO.Create(&connection.Connection{
+    Provider: "login.google.com",
+    LocalSubject: "bob",
+    RemoteSubject: "googleSubjectID",
+})
+
+// Retrieve newly created connection 
+ssoConn, err := client.SSO.Get(newSSOConn.ID)
+
+// Delete connection 
+ssoConn, err := client.SSO.Delete(newSSOConn.ID)
+
+// Find a connection by subject
+ssoConns, err := client.SSO.FindAllByLocalSubject("bob")
+ssoConns, err := client.SSO.FindByRemoteSubject("login.google.com", "googleSubjectID")
+```
+
+**Policiess**: `client.Policy`
+
+```
+// Create a new policy
+// allow user to view his/her own photos
+newPolicy, err := client.Policy.Create(ladon.DefaultPolicy{
+    ID: "1234", // ID is not required
+    Subjects: []string{"bob"},
+    Resources: []string{"urn:media:images"},
+    Actions: []string{"get", "find"},
+    Effect: ladon.AllowAccess,
+    Conditions: ladon.Conditions{
+        "owner": &ladon.EqualSubjectCondition{},
+    }
+})
+
+// Retrieve a stored policy
+policy, err := client.Policy.Get("1234")
+
+// Delete a policy
+err := client.Policy.Delete("1234")
+
+// Retrieve all policies for a subject
+policies, err := client.Policy.FindPoliciesForSubject("bob")
+```
+
+**JWK**: `client.JWK`
+
+```
+// Generate new key set
+keySet, err := client.JWK.CreateKeys("app-tls-keys", "HS256")
+
+// Retrieve key set
+keySet, err := client.JWK.GetKeySet("app-tls-keys")
+
+// Delete key set
+err := client.JWK.DeleteKeySet("app-tls-keys")
+```
+
+**Warden**: `client.Warden`
+
+```
+// Check if action is allowed
+client.Warden.HTTPActionAllowed(ctx, req, &ladon.Request{
+    Resource: "urn:media:images",
+    Action: "get",
+    Subject: "bob",
+}, "media.images")
+
+// Check if request is authorized
+client.Warden.HTTPAuthorized(ctx, req, "media.images")
+
+```
+
 ## Hall of Fame
 
 A list of extraordinary contributors and [bug hunters](https://github.com/ory-am/hydra/issues/84).

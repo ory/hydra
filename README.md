@@ -25,17 +25,28 @@ Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://git
 - [What is Hydra?](#what-is-hydra)
   - [Feature Overview](#feature-overview)
   - [Can I use Hydra in my new or existing app?](#can-i-use-hydra-in-my-new-or-existing-app)
-  - [Security](#security)
+- [Security](#security)
 - [Quickstart](#quickstart)
   - [Installation](#installation)
     - [Server](#server)
+      - [Downloading an image form the Hub](#downloading-an-image-form-the-hub)
+      - [Build a docker image from the sources](#build-a-docker-image-from-the-sources)
     - [Client](#client)
+      - [Using gopack](#using-gopack)
+      - [Building from the sources](#building-from-the-sources)
+      - [From the Docker container (not recommended)](#from-the-docker-container-not-recommended)
   - [Run the example](#run-the-example)
 - [Documentation](#documentation)
   - [Guide](#guide)
   - [REST API Documentation](#rest-api-documentation)
   - [CLI Documentation](#cli-documentation)
   - [Develop](#develop)
+- [FAQ](#faq)
+  - [I have troubles with the redirect URI.](#i-have-troubles-with-the-redirect-uri)
+  - [How can I validate tokens?](#how-can-i-validate-tokens)
+  - [How can I import TLS certificates?](#how-can-i-import-tls-certificates)
+  - [I want to disable HTTPS for testing](#i-want-to-disable-https-for-testing)
+  - [Is there a client library / SDK?](#is-there-a-client-library--sdk)
 - [Hall of Fame](#hall-of-fame)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -386,11 +397,15 @@ DATABASE_URL=rethinkdb://$(docker-machine ip default):28015/hydra go run main.go
 
 ## FAQ
 
+### I have troubles with the redirect URI.
 
+Hydra enforces https for all hosts except localhost. Also make sure that the path is an exact match. `http://localhost:123/`
+is not the same as `http://localhost:123`.
 
 ### How can I validate tokens?
 
-Please use the Warden API (API Docs, Guide).
+Please use the Warden API. There is a go client library available [here](https://github.com/ory-am/hydra/blob/master/warden/warden_http.go).
+The Warden API is documented [here](http://docs.hdyra.apiary.io/#reference/warden) and [here](https://ory-am.gitbooks.io/hydra/content/policy.html).
 
 ### How can I import TLS certificates?
 
@@ -415,44 +430,28 @@ Or by specifying the following flags:
 
 You can do so by running `hydra host --force-dangerous-http`.
 
-### How do I use it in my application?
+### Is there a client library / SDK?
 
-Hydra already comes with HTTP Managers. You could use directly by importing the following or use the thin wrapper created in `ory-am/hydra/sdk`
-
-#### Using HTTP Managers
-
-**Manage OAuth Clients**
-`ory-am/hydra/client.HTTPManager`
-
-**Manage SSO Connections**
-`ory-am/hydra/connection.HTTPManager`
-
-**Manage Policies**
-`ory-am/hydra/policy.HTTPManager`
-
-**Manage JWK**
-`ory-am/hydra/jwk.HTTPManager`
-
-**Use Warden**
-`ory-am/hydra/warden.HTTPWarden`
-
-#### Using SDK
+Yes, for Go! It is available through `github.com/ory-am/hydra/sdk`.
 
 **Connect to Hydra.**
 ```
-client, err := sdk.Connect(
-    sdk.ClientID("client-id"), 
-    sdk.ClientSecret("client-secret"), 
+import "github.com/ory-am/hydra/sdk"
+
+hydra, err := sdk.Connect(
+    sdk.ClientID("client-id"),
+    sdk.ClientSecret("client-secret"),
     sdk.ClustURL("https://localhost:4444"),
 )
 ```
-**Use the API**
 
-**OAuth Clients**: `client.Client`
+**Manage OAuth Clients**, uses [`ory-am/hydra/client.HTTPManager`](/client/manager_http.go)
 
 ```
+import "github.com/ory-am/hydra/client"
+
 // To create a new OAuth2 client
-newClient, err := client.Client.CreateClient(&client.Client{
+newClient, err := hydra.Client.CreateClient(&client.Client{
     ID:                "deadbeef",
 	Secret:            "sup3rs3cret",
 	RedirectURIs:      []string{"http://yourapp/callback"},
@@ -460,43 +459,46 @@ newClient, err := client.Client.CreateClient(&client.Client{
 })
 
 // Retrieve newly created client
-newClient, err = client.Client.GetClient(newClient.ID)
+newClient, err = hydra.Client.GetClient(newClient.ID)
 
 // To remove newly created client
-err = client.Client.DeleteClient(newClient.ID)
+err = hydra.Client.DeleteClient(newClient.ID)
 
 // Retrieve list of all clients
-clients, err := client.Client.GetClients()
+clients, err := hydra.Client.GetClients()
 ```
 
-
-**SSO Connections**: `client.SSO`
+**SSO Connections**, uses [`ory-am/hydra/connection.HTTPManager`](connection/manager_http.go)
 
 ```
+import "github.com/ory-am/hydra/connection"
+
 // Create a new connection
-newSSOConn, err := client.SSO.Create(&connection.Connection{
+newSSOConn, err := hydra.SSO.Create(&connection.Connection{
     Provider: "login.google.com",
     LocalSubject: "bob",
     RemoteSubject: "googleSubjectID",
 })
 
-// Retrieve newly created connection 
-ssoConn, err := client.SSO.Get(newSSOConn.ID)
+// Retrieve newly created connection
+ssoConn, err := hydra.SSO.Get(newSSOConn.ID)
 
-// Delete connection 
-ssoConn, err := client.SSO.Delete(newSSOConn.ID)
+// Delete connection
+ssoConn, err := hydra.SSO.Delete(newSSOConn.ID)
 
 // Find a connection by subject
-ssoConns, err := client.SSO.FindAllByLocalSubject("bob")
-ssoConns, err := client.SSO.FindByRemoteSubject("login.google.com", "googleSubjectID")
+ssoConns, err := hydra.SSO.FindAllByLocalSubject("bob")
+ssoConns, err := hydra.SSO.FindByRemoteSubject("login.google.com", "googleSubjectID")
 ```
 
-**Policiess**: `client.Policy`
+**Policiess**, uses [`ory-am/hydra/policy.HTTPManager`](policy/manager_http.go)
 
 ```
+import "github.com/ory-am/ladon"
+
 // Create a new policy
 // allow user to view his/her own photos
-newPolicy, err := client.Policy.Create(ladon.DefaultPolicy{
+newPolicy, err := hydra.Policy.Create(ladon.DefaultPolicy{
     ID: "1234", // ID is not required
     Subjects: []string{"bob"},
     Resources: []string{"urn:media:images"},
@@ -508,41 +510,43 @@ newPolicy, err := client.Policy.Create(ladon.DefaultPolicy{
 })
 
 // Retrieve a stored policy
-policy, err := client.Policy.Get("1234")
+policy, err := hydra.Policy.Get("1234")
 
 // Delete a policy
-err := client.Policy.Delete("1234")
+err := hydra.Policy.Delete("1234")
 
 // Retrieve all policies for a subject
-policies, err := client.Policy.FindPoliciesForSubject("bob")
+policies, err := hydra.Policy.FindPoliciesForSubject("bob")
 ```
 
-**JWK**: `client.JWK`
+**Manage JWK**, uses [`ory-am/hydra/jwk.HTTPManager`](jwk/manager_http.go)
+
 
 ```
 // Generate new key set
-keySet, err := client.JWK.CreateKeys("app-tls-keys", "HS256")
+keySet, err := hydra.JWK.CreateKeys("app-tls-keys", "HS256")
 
 // Retrieve key set
-keySet, err := client.JWK.GetKeySet("app-tls-keys")
+keySet, err := hydra.JWK.GetKeySet("app-tls-keys")
 
 // Delete key set
-err := client.JWK.DeleteKeySet("app-tls-keys")
+err := hydra.JWK.DeleteKeySet("app-tls-keys")
 ```
 
-**Warden**: `client.Warden`
+**Warden**, uses [`ory-am/hydra/warden.HTTPWarden`](warden/warden_http.go)
 
 ```
+import "github.com/ory-am/ladon"
+
 // Check if action is allowed
-client.Warden.HTTPActionAllowed(ctx, req, &ladon.Request{
+hydra.Warden.HTTPActionAllowed(ctx, req, &ladon.Request{
     Resource: "urn:media:images",
     Action: "get",
     Subject: "bob",
 }, "media.images")
 
 // Check if request is authorized
-client.Warden.HTTPAuthorized(ctx, req, "media.images")
-
+hydra.Warden.HTTPAuthorized(ctx, req, "media.images")
 ```
 
 ## Hall of Fame

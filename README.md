@@ -434,7 +434,7 @@ You can do so by running `hydra host --force-dangerous-http`.
 
 Yes, for Go! It is available through `github.com/ory-am/hydra/sdk`.
 
-**Connect to Hydra.**
+Connect the SDK to Hydra:
 ```
 import "github.com/ory-am/hydra/sdk"
 
@@ -445,7 +445,7 @@ hydra, err := sdk.Connect(
 )
 ```
 
-**Manage OAuth Clients**, uses [`ory-am/hydra/client.HTTPManager`](/client/manager_http.go)
+Manage OAuth Clients using [`ory-am/hydra/client.HTTPManager`](/client/manager_http.go):
 
 ```
 import "github.com/ory-am/hydra/client"
@@ -468,8 +468,7 @@ err = hydra.Client.DeleteClient(newClient.ID)
 clients, err := hydra.Client.GetClients()
 ```
 
-**SSO Connections**, uses [`ory-am/hydra/connection.HTTPManager`](connection/manager_http.go)
-
+Manage SSO Connections using [`ory-am/hydra/connection.HTTPManager`](connection/manager_http.go):
 ```
 import "github.com/ory-am/hydra/connection"
 
@@ -491,8 +490,7 @@ ssoConns, err := hydra.SSO.FindAllByLocalSubject("bob")
 ssoConns, err := hydra.SSO.FindByRemoteSubject("login.google.com", "googleSubjectID")
 ```
 
-**Policiess**, uses [`ory-am/hydra/policy.HTTPManager`](policy/manager_http.go)
-
+Manage policies using [`ory-am/hydra/policy.HTTPManager`](policy/manager_http.go):
 ```
 import "github.com/ory-am/ladon"
 
@@ -519,8 +517,7 @@ err := hydra.Policy.Delete("1234")
 policies, err := hydra.Policy.FindPoliciesForSubject("bob")
 ```
 
-**Manage JWK**, uses [`ory-am/hydra/jwk.HTTPManager`](jwk/manager_http.go)
-
+Manage JSON Web Keys using [`ory-am/hydra/jwk.HTTPManager`](jwk/manager_http.go):
 
 ```
 // Generate new key set
@@ -533,7 +530,7 @@ keySet, err := hydra.JWK.GetKeySet("app-tls-keys")
 err := hydra.JWK.DeleteKeySet("app-tls-keys")
 ```
 
-**Warden**, uses [`ory-am/hydra/warden.HTTPWarden`](warden/warden_http.go)
+Validate requests with the Warden, uses [`ory-am/hydra/warden.HTTPWarden`](warden/warden_http.go):
 
 ```
 import "github.com/ory-am/ladon"

@@ -435,7 +435,7 @@ You can do so by running `hydra host --force-dangerous-http`.
 Yes, for Go! It is available through `github.com/ory-am/hydra/sdk`.
 
 Connect the SDK to Hydra:
-```
+```go
 import "github.com/ory-am/hydra/sdk"
 
 hydra, err := sdk.Connect(
@@ -447,7 +447,7 @@ hydra, err := sdk.Connect(
 
 Manage OAuth Clients using [`ory-am/hydra/client.HTTPManager`](/client/manager_http.go):
 
-```
+```go
 import "github.com/ory-am/hydra/client"
 
 // To create a new OAuth2 client
@@ -469,7 +469,7 @@ clients, err := hydra.Client.GetClients()
 ```
 
 Manage SSO Connections using [`ory-am/hydra/connection.HTTPManager`](connection/manager_http.go):
-```
+```go
 import "github.com/ory-am/hydra/connection"
 
 // Create a new connection
@@ -491,7 +491,7 @@ ssoConns, err := hydra.SSO.FindByRemoteSubject("login.google.com", "googleSubjec
 ```
 
 Manage policies using [`ory-am/hydra/policy.HTTPManager`](policy/manager_http.go):
-```
+```go
 import "github.com/ory-am/ladon"
 
 // Create a new policy
@@ -519,7 +519,7 @@ policies, err := hydra.Policy.FindPoliciesForSubject("bob")
 
 Manage JSON Web Keys using [`ory-am/hydra/jwk.HTTPManager`](jwk/manager_http.go):
 
-```
+```go
 // Generate new key set
 keySet, err := hydra.JWK.CreateKeys("app-tls-keys", "HS256")
 
@@ -532,7 +532,7 @@ err := hydra.JWK.DeleteKeySet("app-tls-keys")
 
 Validate requests with the Warden, uses [`ory-am/hydra/warden.HTTPWarden`](warden/warden_http.go):
 
-```
+```go
 import "github.com/ory-am/ladon"
 
 // Check if action is allowed

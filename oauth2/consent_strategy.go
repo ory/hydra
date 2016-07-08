@@ -23,9 +23,9 @@ const (
 type DefaultConsentStrategy struct {
 	Issuer string
 
-	DefaultIDTokenLifespan time.Duration
+	DefaultIDTokenLifespan   time.Duration
 	DefaultChallengeLifespan time.Duration
-	KeyManager jwk.Manager
+	KeyManager               jwk.Manager
 }
 
 func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, token string) (claims *Session, err error) {
@@ -86,9 +86,9 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 func toStringSlice(i interface{}) []string {
 	if r, ok := i.([]string); ok {
 		return r
-	} else 	if r, ok := i.(fosite.Arguments); ok {
+	} else if r, ok := i.(fosite.Arguments); ok {
 		return r
-	} else 	if r, ok := i.([]interface{}); ok {
+	} else if r, ok := i.([]interface{}); ok {
 		ret := make([]string, 0)
 		for _, y := range r {
 			s, ok := y.(string)

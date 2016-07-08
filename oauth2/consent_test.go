@@ -2,8 +2,9 @@ package oauth2
 
 import (
 	"testing"
-	"github.com/stretchr/testify/assert"
+
 	"github.com/ory-am/fosite"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestToStringSlice(t *testing.T) {

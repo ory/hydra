@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"net/url"
 
-	"gopkg.in/yaml.v1"
+	"gopkg.in/yaml.v2"
 )
 
 // ClusterURL sets Hydra service URL

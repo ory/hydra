@@ -5,8 +5,9 @@ import (
 	"os"
 	"testing"
 
+	"gopkg.in/yaml.v2"
+
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/yaml.v1"
 )
 
 func TestClusterURLOption(t *testing.T) {

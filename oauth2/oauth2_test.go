@@ -82,10 +82,10 @@ var handler = &Handler{
 		Hasher: hasher,
 	},
 	Consent: &DefaultConsentStrategy{
-		Issuer:     "https://hydra.localhost",
-		KeyManager: keyManager,
+		Issuer:                   "https://hydra.localhost",
+		KeyManager:               keyManager,
 		DefaultChallengeLifespan: time.Hour,
-		DefaultIDTokenLifespan: time.Hour * 24,
+		DefaultIDTokenLifespan:   time.Hour * 24,
 	},
 }
 

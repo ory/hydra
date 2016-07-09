@@ -63,27 +63,27 @@ Access Control, OAuth2, and OpenID Connect layer** that integrates with every id
 Hydra is available through [Docker](https://hub.docker.com/r/oryam/hydra/) and relies on RethinkDB for persistence.
 Database drivers are extensible, in case you want to use RabbitMQ, MySQL, MongoDB, or some other database instead.
 
-Hydra is high performance. Check out this siege benchmark on a Macbook Pro Late 2013 running in a *Docker VirtualBox VM*
-and RethinkDB for persistence. The request is validating an access token. There is no cache involved.
-You could use a different access token for every request and still get the same benchmark results.
+Hydra is built for high throughput environments. Check out this siege benchmark on a Macbook Pro Late 2013, connected to RethinkDB validating a access tokens.
+
+*Note*: There is no cache involved. You could use a different access token for every request and still get the same benchmark results.
 
 ```
-# 150 concurrent connections
-$ siege -t1m -c=150 -b --content-type="application/json" --header="Authorization: bearer 0KMLf-1K8qjc5xtNER2atNgZU5S5PmIUgRtZP-Ple18.hLOVkyH4pVQMkcW5ToxLXW9gUlwZGrrIFMBNreyRtTs" 'https://192.168.99.100:4444/warden/authorized POST {"assertion": "as6wgQPPrQEZRdjGhU8waIc6dnw1DJ7693buXTOA2bQ.y2tVIcQd0tODx2vxONdoyBNb4uVfC26N14kOClakGLs"}' | grep '^[^HTTP]+'
+# 500 concurrent connections, 5 minutes stress test
+$ siege -t5m -c=500 -b --content-type="application/json" --header="Authorization: bearer 14Q28Y5PILTSKhByweAmQ1JddECMtp4j65yvlKs5Rhk.mqkREUzhqKexxGct5tA4UhJSnL8RYMpwMeFlEF-10OM" 'https://localhost:4444/warden/authorized POST {"assertion": "14Q28Y5PILTSKhByweAmQ1JddECMtp4j65yvlKs5Rhk.mqkREUzhqKexxGct5tA4UhJSnL8RYMpwMeFlEF-10OM"}' | grep '^[^HTTP]+'
 
 Lifting the server siege...
-Transactions:		       29222 hits
-Availability:		      100.00 %
-Elapsed time:		       59.31 secs
-Data transferred:	        6.10 MB
-Response time:		        0.00 secs
-Transaction rate:	      492.70 trans/sec
-Throughput:		        0.10 MB/sec
-Concurrency:		        0.97
-Successful transactions: 29222
-Failed transactions:	        0
-Longest transaction:	     6.74
-Shortest transaction:	  0.00
+Transactions:           155455 hits
+Availability:           100.00 %
+Elapsed time:           299.67 secs
+Data transferred:        32.47 MB
+Response time:	          0.00 secs
+Transaction rate:       518.75 trans/sec
+Throughput:               0.11 MB/sec
+Concurrency:  	           0.96
+Successful transactions: 155455
+Failed transactions:          0
+Longest transaction:       6.80
+Shortest transaction:      0.00
 ```
 
 ### Feature Overview

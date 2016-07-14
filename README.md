@@ -16,7 +16,7 @@ We respond on [Google Groups](https://groups.google.com/forum/#!forum/ory-hydra/
 
 Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://github.com/ory-am/fosite) and [Ladon](https://github.com/ory-am/ladon) for policy-based access control.
 
-:fire: Don't want to worry about security updates, backups, migration and scaling? Do you need enterprise support? [Contact us now](mailto:sales@ory.am) and be a early adopter. :fire:
+:fire: Don't want to worry about security updates, backups, migration and scaling? Do you need enterprise support? [Contact us now](mailto:sales@ory.am) and become an early adopter. :fire:
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -61,9 +61,9 @@ Hydra is driven by the need for a **scalable, low-latency, in memory
 Access Control, OAuth2, and OpenID Connect layer** that integrates with every identity provider you can imagine.
 
 Hydra is available through [Docker](https://hub.docker.com/r/oryam/hydra/) and relies on RethinkDB for persistence.
-Database drivers are extensible, in case you want to use RabbitMQ, MySQL, MongoDB, or some other database instead.
+Database drivers are extensible in case you want to use RabbitMQ, MySQL, MongoDB, or some other database instead.
 
-Hydra is built for high throughput environments. Check out this siege benchmark on a Macbook Pro Late 2013, connected to RethinkDB validating a access tokens.
+Hydra is built for high throughput environments. Check out the below siege benchmark on a Macbook Pro Late 2013, connected to RethinkDB validating access tokens.
 
 *Note*: There is no cache involved. You could use a different access token for every request and still get the same benchmark results.
 
@@ -91,15 +91,15 @@ Shortest transaction:      0.00
 1. **Availability:** Hydra uses pub/sub to have the latest data available in memory. The in-memory architecture allows for heavy duty workloads.
 2. **Scalability:** Hydra scales effortlessly on every platform you can imagine, including Heroku, Cloud Foundry, Docker,
 Google Container Engine and many more.
-3. **Integration:** Hydra wraps your existing stack like a blanket and keeps it safe. Hydra uses cryptographic tokens for authenticate users and request their consent, no APIs required.
+3. **Integration:** Hydra wraps your existing stack like a blanket and keeps it safe. Hydra uses cryptographic tokens to authenticate users and request their consent, no APIs required.
 The deprecated php-3.0 authentication service your intern wrote? It works with that too, don't worry.
 We wrote an example with React to show you what this could look like: [React.js Identity Provider Example App](https://github.com/ory-am/hydra-idp-react).
 4. **Security:** Hydra leverages the security first OAuth2 framework **[Fosite](https://github.com/ory-am/fosite)**,
 encrypts important data at rest, and supports HTTP over TLS (https) out of the box.
-5. **Ease of use:** Developers and Operators are human. Therefore, Hydra is easy to install and manage. Hydra does not care if you use React, Angular, or Cocoa for your user interface.
-To support you even further, there are APIs available for *cryptographic key management, social log on, policy based access control, policy management, and two factor authentication (tbd)*
+5. **Ease of use:** Developers and operators are human. Therefore, Hydra is easy to install and manage. Hydra does not care if you use React, Angular, or Cocoa for your user interface.
+To support you even further, there are APIs available for *cryptographic key management, social log on, policy based access control, policy management, and two factor authentication (tbd).*
 Hydra is packaged using [Docker](https://hub.docker.com/r/oryam/hydra/).
-6. **Open Source:** Hydra is licensed Apache Version 2.0
+6. **Open Source:** Hydra is licensed under Apache Version 2.0
 7. **Professional:** Hydra implements peer reviewed open standards published by [The Internet Engineering Task Force (IETF®)](https://www.ietf.org/) and the [OpenID Foundation](https://openid.net/)
 and under supervision of the [LMU Teaching and Research Unit Programming and Modelling Languages](http://www.en.pms.ifi.lmu.de). No funny business.
 8. **Real Time:** Operation is a lot easier with real time monitoring. Because Hydra leverages RethinkDB, you get real time monitoring for free:
@@ -112,32 +112,32 @@ a delegation protocol. It makes sense to use Hydra in new and existing projects.
 explains how one would use Hydra in a new one as well. So let's look at a use case!
 
 Let's assume we are running a ToDo List App (todo24.com). ToDo24 has a login endpoint (todo24.com/login).
-The login endpoint written in node and uses MongoDB to store user information (email + password + settings). Of course,
+The login endpoint is written in node and uses MongoDB to store user information (email + password + settings). Of course,
 todo24 has other services as well: list management (todo24.com/lists/manage: close, create, move), item management (todo24.com/lists/items/manage: mark solved, add), and so on.
-You are using cookies to see which user is doing the request.
+You are using cookies to see which user is performing the request.
 
-Now you decide to use OAuth2 on top of your current infrastructure. Reasons could be:
+Now you decide to use OAuth2 on top of your current infrastructure. There are many reasons to do this:
 * You want to open up your APIs to third-party developers. Their apps will be using OAuth2 Access Tokens to access a user's to do list.
 * You want a mobile client. Because you can not store secrets on devices (they can be reverse engineered and stolen), you use OAuth2 Access Tokens instead.
 * You have Cross Origin Requests. Making cookies work with Cross Origin Requests weakens or even disables important anti-CSRF measures.
 * You want to write an in-browser client. This is the same case as in a mobile client (you can't store secrets in a browser).
 
 These are only a couple of reasons to use OAuth2. You might decide to use OAuth2 as your single source of authorization, thus maintaining
-only one authorization protocol and being able to open up to third party devs in no-time. With OpenID Connect, you are able to delegate authentication as well as authorization!
+only one authorization protocol and being able to open up to third party devs in no time. With OpenID Connect, you are able to delegate authentication as well as authorization!
 
 Your decision is final. You want to use OAuth2 and you want Hydra to do the job. You install Hydra in your cluster using docker.
-Next, you set up some exemplary OAuth2 clients. Clients can act on their own, but most of the times they need to access to a user's todo lists.
+Next, you set up some exemplary OAuth2 clients. Clients can act on their own, but most of the time they need to access a user's todo lists.
 To do so, the client initiates an OAuth2 request. This is where [Hydra's authentication flow](https://ory-am.gitbooks.io/hydra/content/oauth2.html#authentication-flow) comes in to play.
-Before Hydra can issue an access token, we needs to know WHICH user is giving consent. To do so, Hydra redirects the user agent (e.g. browser, mobile device)
+Before Hydra can issue an access token, we need to know WHICH user is giving consent. To do so, Hydra redirects the user agent (e.g. browser, mobile device)
 to the login endpoint alongside with a challenge that contains an expiry time and other information. The login endpoint (todo24.com/login) authenticates the
 user as usual, e.g. by username & password, session cookie or other means. Upon successful authentication, the login endpoint asks for the user's consent:
-*"Do you want to grant MyCoolAnalyticsApp read & write access to all your todo lists? [Yes] [No]"*. Once the user clicked *Yes* and gave consent),
+*"Do you want to grant MyCoolAnalyticsApp read & write access to all your todo lists? [Yes] [No]"*. Once the user clicks *Yes* and gives consent,
 the login endpoint redirects back to hydra and appends something called a *consent token*. The consent token is a cryptographically signed
 string that contains information about the user, specifically the user's unique id. Hydra validates the signature's trustworthiness
-and issues an OAuth2 access token and optionally a refresh or open id token.
+and issues an OAuth2 access token and optionally a refresh or OpenID token.
 
 Every time a request containing an access token hits a resource server (todo24.com/lists/manage), you make a request to Hydra asking who the token's
-subject (the user who authorized the client to create a token on his behalf) is and whether the token is valid or not. You may optionally
+subject (the user who authorized the client to create a token on its behalf) is and whether the token is valid or not. You may optionally
 ask if the token has permission to perform a certain action.
 
 ## Security
@@ -168,7 +168,7 @@ best practices proposed by the IETF:
     * [Ensure Confidentiality of Requests](https://tools.ietf.org/html/rfc6819#section-5.1.1)
     * [Use of Asymmetric Cryptography](https://tools.ietf.org/html/rfc6819#section-5.1.4.1.5)
     * **Enforcing random states:** Without a random-looking state or OpenID Connect nonce the request will fail.
-    * **Advanced Token Validation:** Tokens are layouted as `<key>.<signature>` where `<signature>` is created using HMAC-SHA256
+    * **Advanced Token Validation:** Tokens are laid out as `<key>.<signature>` where `<signature>` is created using HMAC-SHA256
      and a global secret. This is what a token can look like: `/tgBeUhWlAT8tM8Bhmnx+Amf8rOYOUhrDi3pGzmjP7c=.BiV/Yhma+5moTP46anxMT6cWW8gz5R5vpC9RbpwSDdM=`
     * **Enforcing scopes:** By default, you always need to include the `core` scope or Hydra will not execute the request.
 * Hydra uses [Ladon](https://github.com/ory-am/ladon) for policy management and access control. Ladon's API is minimalistic
@@ -212,10 +212,10 @@ This section is a quickstart guide to working with Hydra. In-depth docs are avai
 Read how to install docker on [Linux](https://docs.docker.com/linux/), [OSX](https://docs.docker.com/mac/) or
 [Windows](https://docs.docker.com/windows/). Hydra is available on [Docker Hub](https://hub.docker.com/r/oryam/hydra/).
 
-##### Downloading an image form the Hub
+##### Downloading an image from the Hub
 
-Hydra will keep all changes in memory. But be aware! Restarting, scaling
-or stopping the container will make you **lose all data**:
+Hydra will keep all changes in memory. But be aware: Restarting, scaling
+or stopping the container will make you **lose all data**.
 
 To download and start the image:
 ```
@@ -223,14 +223,14 @@ $ docker run -d -p 4444:4444 oryam/hydra --name my-hydra
 ec91228cb105db315553499c81918258f52cee9636ea2a4821bdb8226872f54b
 ```
 
-##### Build a docker image from the sources
+##### Build a docker image from the source
 
 Install the [CLI and Docker Toolbox](#installation). Make sure you install Docker Compose. On OSX and Windows,
-open the Docker Quickstart Terminal. On Linux open any terminal.
+open the Docker Quickstart Terminal. On Linux, open any terminal.
 
-We will use a dummy password as system secret: `SYSTEM_SECRET=passwordtutorialpasswordtutorial`. Use a very secure secret in production.
+We will use a dummy password as the system secret: `SYSTEM_SECRET=passwordtutorialpasswordtutorial`. Use a very secure secret in production.
 
-**On OSX and Windows** using the Docker Quickstart Terminal.
+**On OSX and Windows** using the Docker Quickstart Terminal:
 ```
 $ go get github.com/ory-am/hydra
 $ cd $GOPATH/src/github.com/ory-am/hydra
@@ -247,7 +247,7 @@ Attaching to hydra_rethinkdb_1, hydra_hydra_1, hydra_consent_1
 [...]
 ```
 
-**On Linux.**
+**On Linux:**
 ```
 $ go get github.com/ory-am/hydra
 $ cd $GOPATH/src/github.com/ory-am/hydra
@@ -293,7 +293,7 @@ glide install
 go install github.com/ory-am/hydra
 hydra
 ```
-##### From the Docker container (not recommended)
+##### From the Docker container (not recommended):
 
 ```
 $ docker exec -i -t <hydra-container-id> /bin/bash
@@ -312,9 +312,9 @@ Usage:
 
 ![Run the example](dist/run-the-example.gif)
 
-You have now a running hydra docker container! Additionally, a RethinkDB image was deployed and a consent app.
+You now have a running hydra docker container! Additionally, a RethinkDB image was deployed as well as a consent app.
 
-Hydra can be managed with the hydra cli client. The client hast to log on before it is allowed to do anything.
+Hydra can be managed with the hydra CLI client. The client has to log on before it is allowed to do anything.
 When hydra detects a new installation, a new temporary root client is created. The client credentials are printed in 
 the container logs.
 
@@ -335,7 +335,7 @@ the logs, set the required parameters, or replace the credentials with other one
 
 Now you know which credentials you need to use. Next, we log in.
 
-**Note:** If you are using docker toolbox, please use the ip address provided by `docker-machine ip default` as cluster url host.
+**Note:** If you are using docker toolbox, please use the IP address provided by `docker-machine ip default` as the cluster URL host.
 
 ```
 $ hydra connect
@@ -354,7 +354,7 @@ Client ID: c003830f-a090-4721-9463-92424270ce91
 Client Secret: Z2pJ0>Tp7.ggn>EE&rhnOzdt1
 ```
 
-**Important note:** Hydra is using self signed TLS certificates for HTTPS, if no certificate was provided. This should
+**Important note:** if no certificate is provided, Hydra uses self-signed TLS certificates for HTTPS. This should
 never be done in production. To skip the TLS verification step on the client, provide the `--skip-tls-verify` flag.
 
 Why not issue an access token for your client?
@@ -421,9 +421,9 @@ DATABASE_URL=rethinkdb://$(docker-machine ip default):28015/hydra go run main.go
 
 ## FAQ
 
-### I have troubles with the redirect URI.
+### I'm having trouble with the redirect URI.
 
-Hydra enforces https for all hosts except localhost. Also make sure that the path is an exact match. `http://localhost:123/`
+Hydra enforces HTTPS for all hosts except localhost. Also make sure that the path is an exact match. `http://localhost:123/`
 is not the same as `http://localhost:123`.
 
 ### How can I validate tokens?
@@ -456,7 +456,7 @@ You can do so by running `hydra host --force-dangerous-http`.
 
 ### Is there a client library / SDK?
 
-Yes, for Go! It is available through `github.com/ory-am/hydra/sdk`.
+Yes, for Go! It is available at `github.com/ory-am/hydra/sdk`.
 
 Connect the SDK to Hydra:
 ```go
@@ -474,7 +474,7 @@ Manage OAuth Clients using [`ory-am/hydra/client.HTTPManager`](/client/manager_h
 ```go
 import "github.com/ory-am/hydra/client"
 
-// To create a new OAuth2 client
+// Create a new OAuth2 client
 newClient, err := hydra.Client.CreateClient(&client.Client{
     ID:                "deadbeef",
 	Secret:            "sup3rs3cret",
@@ -485,7 +485,7 @@ newClient, err := hydra.Client.CreateClient(&client.Client{
 // Retrieve newly created client
 newClient, err = hydra.Client.GetClient(newClient.ID)
 
-// To remove newly created client
+// Remove the newly created client
 err = hydra.Client.DeleteClient(newClient.ID)
 
 // Retrieve list of all clients

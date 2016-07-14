@@ -29,6 +29,7 @@ var tokenUserCmd = &cobra.Command{
 			}})
 		}
 
+		scopes, _ := cmd.Flags().GetStringSlice("scopes")
 		conf := oauth2.Config{
 			ClientID:     c.ClientID,
 			ClientSecret: c.ClientSecret,
@@ -36,7 +37,7 @@ var tokenUserCmd = &cobra.Command{
 				TokenURL: pkg.JoinURLStrings(c.ClusterURL, "/oauth2/token"),
 				AuthURL:  pkg.JoinURLStrings(c.ClusterURL, "/oauth2/auth"),
 			},
-			Scopes: []string{"core", "hydra", "offline", "openid"},
+			Scopes: scopes,
 		}
 
 		state, err := sequence.RuneSequence(24, []rune("abcdefghijklmnopqrstuvwxyz"))
@@ -106,4 +107,5 @@ var tokenUserCmd = &cobra.Command{
 func init() {
 	tokenCmd.AddCommand(tokenUserCmd)
 	tokenUserCmd.Flags().Bool("no-open", false, "Do not open a browser window with the authorize url")
+	tokenUserCmd.Flags().StringSlice("scopes", []string{"core", "hydra", "offline", "openid"}, "Ask for specific scopes")
 }

@@ -111,7 +111,8 @@ func Connect(opts ...option) (*Client, error) {
 	}
 
 	c.Warden = &warden.HTTPWarden{
-		Client: c.http,
+		Client:   c.http,
+		Endpoint: c.clusterURL,
 	}
 
 	return c, nil

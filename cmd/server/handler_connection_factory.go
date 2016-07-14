@@ -23,10 +23,10 @@ func newConnectionHandler(c *config.Config, router *httprouter.Router) *connecti
 		h.Manager = connection.NewMemoryManager()
 		break
 	case *config.RethinkDBConnection:
-		con.CreateTableIfNotExists("hydra_policies")
+		con.CreateTableIfNotExists("hydra_connections")
 		m := &connection.RethinkManager{
 			Session: con.GetSession(),
-			Table:   r.Table("hydra_policies"),
+			Table:   r.Table("hydra_connections"),
 		}
 		if err := m.ColdStart(); err != nil {
 			logrus.Fatalf("Could not fetch initial state: %s", err)

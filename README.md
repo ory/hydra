@@ -29,11 +29,11 @@ Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://git
 - [Quickstart](#quickstart)
   - [Installation](#installation)
     - [Server](#server)
-      - [Downloading an image form the Hub](#downloading-an-image-form-the-hub)
-      - [Build a docker image from the sources](#build-a-docker-image-from-the-sources)
+      - [Downloading an image from the Hub](#downloading-an-image-from-the-hub)
+      - [Build a docker image from the source](#build-a-docker-image-from-the-source)
     - [Client](#client)
       - [Using gopack](#using-gopack)
-      - [Building from the sources](#building-from-the-sources)
+      - [Building from the source](#building-from-the-source)
       - [From the Docker container (not recommended)](#from-the-docker-container-not-recommended)
   - [Run the example](#run-the-example)
 - [Documentation](#documentation)
@@ -42,7 +42,7 @@ Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://git
   - [CLI Documentation](#cli-documentation)
   - [Develop](#develop)
 - [FAQ](#faq)
-  - [I have troubles with the redirect URI.](#i-have-troubles-with-the-redirect-uri)
+  - [I'm having trouble with the redirect URI.](#im-having-trouble-with-the-redirect-uri)
   - [How can I validate tokens?](#how-can-i-validate-tokens)
   - [How can I import TLS certificates?](#how-can-i-import-tls-certificates)
   - [I want to disable HTTPS for testing](#i-want-to-disable-https-for-testing)
@@ -278,7 +278,7 @@ mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="client_secret: ,IvxGt
 There is currently no installer which adds the CLI to your path automatically. You have to set up the path yourself.
 If you do not understand what that means, ask on our [Gitter channel](https://gitter.im/ory-am/hydra).
 
-##### Building from the sources
+##### Building from the source
 
 If you wish to compile the CLI yourself, you need to install and set up [Go](https://golang.org/) and add `$GOPATH/bin`
 to your `$PATH`. Here is a [comprehensive Go installation guide](https://github.com/ory-am/workshop-dbg#googles-go-language) with screenshots.

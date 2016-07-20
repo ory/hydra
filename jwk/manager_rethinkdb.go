@@ -7,6 +7,7 @@ import (
 
 	"time"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/square/go-jose"
@@ -170,6 +171,7 @@ func (m *RethinkManager) Watch(ctx context.Context) {
 
 		var update map[string]*rethinkSchema
 		for connections.Next(&update) {
+			logrus.Debug("Received update from RethinkDB Cluster in JSON Web Key manager.")
 			newVal := update["new_val"]
 			oldVal := update["old_val"]
 			m.Lock()

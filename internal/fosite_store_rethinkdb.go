@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/client"
@@ -127,6 +128,9 @@ func (s *FositeRehinkDBStore) CreateAuthorizeCodeSession(_ context.Context, code
 }
 
 func (s *FositeRehinkDBStore) GetAuthorizeCodeSession(_ context.Context, code string, sess interface{}) (fosite.Requester, error) {
+	s.Lock()
+	defer s.Unlock()
+
 	rel, ok := s.AuthorizeCodes[code]
 	if !ok {
 		return nil, fosite.ErrNotFound
@@ -144,6 +148,9 @@ func (s *FositeRehinkDBStore) CreateAccessTokenSession(_ context.Context, signat
 }
 
 func (s *FositeRehinkDBStore) GetAccessTokenSession(_ context.Context, signature string, sess interface{}) (fosite.Requester, error) {
+	s.Lock()
+	defer s.Unlock()
+
 	rel, ok := s.AccessTokens[signature]
 	if !ok {
 		return nil, fosite.ErrNotFound
@@ -161,6 +168,9 @@ func (s *FositeRehinkDBStore) CreateRefreshTokenSession(_ context.Context, signa
 }
 
 func (s *FositeRehinkDBStore) GetRefreshTokenSession(_ context.Context, signature string, sess interface{}) (fosite.Requester, error) {
+	s.Lock()
+	defer s.Unlock()
+
 	rel, ok := s.RefreshTokens[signature]
 	if !ok {
 		return nil, fosite.ErrNotFound
@@ -246,6 +256,7 @@ func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock sync.RWMu
 
 		var update = map[string]*RdbSchema{}
 		for changes.Next(&update) {
+			logrus.Debugln("Received update from RethinkDB Cluster in OAuth2 manager.")
 			newVal := update["new_val"]
 			oldVal := update["old_val"]
 			lock.Lock()

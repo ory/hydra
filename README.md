@@ -34,7 +34,7 @@ Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://git
     - [Client](#client)
       - [Using gopack](#using-gopack)
       - [Building from the source](#building-from-the-source)
-      - [From the Docker container (not recommended)](#from-the-docker-container-not-recommended)
+      - [From the Docker container (not recommended):](#from-the-docker-container-not-recommended)
   - [Run the example](#run-the-example)
 - [Documentation](#documentation)
   - [Guide](#guide)
@@ -46,6 +46,8 @@ Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://git
   - [How can I validate tokens?](#how-can-i-validate-tokens)
   - [How can I import TLS certificates?](#how-can-i-import-tls-certificates)
   - [I want to disable HTTPS for testing](#i-want-to-disable-https-for-testing)
+  - [Can I set the log level to warn, error, debug, ...?](#can-i-set-the-log-level-to-warn-error-debug-)
+  - [I need to use a custom CA for RethinkDB](#i-need-to-use-a-custom-ca-for-rethinkdb)
   - [Is there a client library / SDK?](#is-there-a-client-library--sdk)
 - [Hall of Fame](#hall-of-fame)
 
@@ -453,6 +455,29 @@ Or by specifying the following flags:
 ### I want to disable HTTPS for testing
 
 You can do so by running `hydra host --force-dangerous-http`.
+
+### Can I set the log level to warn, error, debug, ...?
+
+Yes, you can do so by setting the environment variable `LOG_LEVEL=<level>`. There are various levels supported:
+
+* debug
+* warn
+* error
+* fatal
+* panic
+
+### I need to use a custom CA for RethinkDB
+
+You can do so by specifying environment variables:
+
+- `RETHINK_TLS_CERT_PATH`: The path to the TLS certificate (pem encoded) used to connect to rethinkdb.
+- `RETHINK_TLS_CERT`: A pem encoded TLS certificate passed as string. Can be used instead of `RETHINK_TLS_CERT_PATH`.
+
+or via command line flag:
+
+```
+--rethink-tls-cert-path string   Path to the certificate file to connect to rethinkdb over TLS (https). You can set RETHINK_TLS_CERT_PATH or RETHINK_TLS_CERT instead.
+```
 
 ### Is there a client library / SDK?
 

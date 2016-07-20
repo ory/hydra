@@ -7,6 +7,7 @@ import (
 
 	"time"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/net/context"
@@ -113,6 +114,7 @@ func (m *RethinkManager) Watch(ctx context.Context) {
 
 		var update map[string]*Connection
 		for connections.Next(&update) {
+			logrus.Debug("Received update in social connection manager.")
 			newVal := update["new_val"]
 			oldVal := update["old_val"]
 			m.Lock()

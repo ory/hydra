@@ -4,6 +4,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/hash"
@@ -127,6 +128,7 @@ func (m *RethinkManager) Watch(ctx context.Context) {
 
 		var update map[string]*Client
 		for clients.Next(&update) {
+			logrus.Debug("Received update from RethinkDB Cluster in OAuth2 client manager.")
 			newVal := update["new_val"]
 			oldVal := update["old_val"]
 			m.Lock()

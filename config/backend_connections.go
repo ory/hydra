@@ -29,6 +29,10 @@ func (c *RethinkDBConnection) GetSession() *r.Session {
 
 	var err error
 	var username, password string
+	if len(c.URL.Path) <= 1 {
+		logrus.Fatalf("Database hostname specified, but database name is missing.")
+	}
+
 	database := c.URL.Path[1:]
 	if c.URL.User != nil {
 		password, _ = c.URL.User.Password()
@@ -39,9 +43,10 @@ func (c *RethinkDBConnection) GetSession() *r.Session {
 		logrus.Infof("Connecting with RethinkDB: %s (%s) (%s)", c.URL.String(), c.URL.Host, database)
 
 		options := r.ConnectOpts{
-			Address:  c.URL.Host,
-			Username: username,
-			Password: password,
+			Address:         c.URL.Host,
+			Username:        username,
+			Password:        password,
+			KeepAlivePeriod: 10 * time.Second,
 		}
 
 		importRethinkDBRootCA(&options)

@@ -12,6 +12,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
+	"github.com/Sirupsen/logrus"
 )
 
 type RDBItems map[string]*RdbSchema
@@ -246,6 +247,7 @@ func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock sync.RWMu
 
 		var update = map[string]*RdbSchema{}
 		for changes.Next(&update) {
+			logrus.Debugln("Received update from RethinkDB Cluster in OAuth2 manager.")
 			newVal := update["new_val"]
 			oldVal := update["old_val"]
 			lock.Lock()

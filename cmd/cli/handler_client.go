@@ -25,6 +25,8 @@ func newClientHandler(c *config.Config) *ClientHandler {
 
 func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 	h.M.Dry = *h.Config.Dry
+	h.M.Endpoint = h.Config.Resolve("/clients")
+	h.M.Client = h.Config.OAuth2Client(cmd)
 	if len(args) == 0 {
 		fmt.Print(cmd.UsageString())
 		return

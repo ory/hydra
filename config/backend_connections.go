@@ -43,9 +43,9 @@ func (c *RethinkDBConnection) GetSession() *r.Session {
 		logrus.Infof("Connecting with RethinkDB: %s (%s) (%s)", c.URL.String(), c.URL.Host, database)
 
 		options := r.ConnectOpts{
-			Address:  c.URL.Host,
-			Username: username,
-			Password: password,
+			Address:         c.URL.Host,
+			Username:        username,
+			Password:        password,
 			KeepAlivePeriod: 10 * time.Second,
 		}
 

@@ -7,10 +7,10 @@ import (
 
 	"time"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/net/context"
-	"github.com/Sirupsen/logrus"
 )
 
 type RethinkManager struct {

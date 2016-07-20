@@ -4,6 +4,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/hash"
@@ -11,7 +12,6 @@ import (
 	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
-	"github.com/Sirupsen/logrus"
 )
 
 type RethinkManager struct {

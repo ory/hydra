@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/ory-am/hydra/cmd"
 	"github.com/pkg/profile"
-	"github.com/Sirupsen/logrus"
 )
 
 func main() {
@@ -13,22 +13,22 @@ func main() {
 		defer profile.Start().Stop()
 	}
 
-	switch (os.Getenv("LOG_LEVEL")) {
+	switch os.Getenv("LOG_LEVEL") {
 	case "debug":
 		logrus.SetLevel(logrus.DebugLevel)
-		break;
+		break
 	case "info":
 		logrus.SetLevel(logrus.InfoLevel)
-		break;
+		break
 	case "warn":
 		logrus.SetLevel(logrus.WarnLevel)
-		break;
+		break
 	case "fatal":
 		logrus.SetLevel(logrus.FatalLevel)
-		break;
+		break
 	case "panic":
 		logrus.SetLevel(logrus.PanicLevel)
-		break;
+		break
 	}
 
 	cmd.Execute()

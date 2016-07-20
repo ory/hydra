@@ -128,6 +128,9 @@ func (s *FositeRehinkDBStore) CreateAuthorizeCodeSession(_ context.Context, code
 }
 
 func (s *FositeRehinkDBStore) GetAuthorizeCodeSession(_ context.Context, code string, sess interface{}) (fosite.Requester, error) {
+	s.Lock()
+	defer s.Unlock()
+
 	rel, ok := s.AuthorizeCodes[code]
 	if !ok {
 		return nil, fosite.ErrNotFound
@@ -145,6 +148,9 @@ func (s *FositeRehinkDBStore) CreateAccessTokenSession(_ context.Context, signat
 }
 
 func (s *FositeRehinkDBStore) GetAccessTokenSession(_ context.Context, signature string, sess interface{}) (fosite.Requester, error) {
+	s.Lock()
+	defer s.Unlock()
+
 	rel, ok := s.AccessTokens[signature]
 	if !ok {
 		return nil, fosite.ErrNotFound
@@ -162,6 +168,9 @@ func (s *FositeRehinkDBStore) CreateRefreshTokenSession(_ context.Context, signa
 }
 
 func (s *FositeRehinkDBStore) GetRefreshTokenSession(_ context.Context, signature string, sess interface{}) (fosite.Requester, error) {
+	s.Lock()
+	defer s.Unlock()
+
 	rel, ok := s.RefreshTokens[signature]
 	if !ok {
 		return nil, fosite.ErrNotFound

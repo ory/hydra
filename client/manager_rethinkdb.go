@@ -76,12 +76,12 @@ func (m *RethinkManager) DeleteClient(id string) error {
 	return nil
 }
 
-func (m *RethinkManager) GetClients() (clients map[string]*Client, err error) {
+func (m *RethinkManager) GetClients() (clients map[string]Client, err error) {
 	m.Lock()
 	defer m.Unlock()
-	clients = make(map[string]*Client)
+	clients = make(map[string]Client)
 	for _, c := range m.Clients {
-		clients[c.ID] = &c
+		clients[c.ID] = c
 	}
 
 	return clients, nil

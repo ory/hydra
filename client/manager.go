@@ -17,5 +17,5 @@ type Storage interface {
 
 	DeleteClient(id string) error
 
-	GetClients() (map[string]*Client, error)
+	GetClients() (map[string]Client, error)
 }

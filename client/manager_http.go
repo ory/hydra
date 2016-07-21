@@ -40,8 +40,8 @@ func (m *HTTPManager) DeleteClient(id string) error {
 	return r.Delete()
 }
 
-func (m *HTTPManager) GetClients() (map[string]*Client, error) {
-	cs := make(map[string]*Client)
+func (m *HTTPManager) GetClients() (map[string]Client, error) {
+	cs := make(map[string]Client)
 	var r = pkg.NewSuperAgent(m.Endpoint.String())
 	r.Client = m.Client
 	r.Dry = m.Dry

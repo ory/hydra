@@ -39,8 +39,8 @@ func (m *HTTPManager) Delete(id string) error {
 	return r.Delete()
 }
 
-func (m *HTTPManager) FindAllByLocalSubject(subject string) ([]*Connection, error) {
-	var connection []*Connection
+func (m *HTTPManager) FindAllByLocalSubject(subject string) ([]Connection, error) {
+	var connection []Connection
 	var u = pkg.CopyURL(m.Endpoint)
 	var q = u.Query()
 

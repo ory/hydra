@@ -24,12 +24,18 @@ import (
 	"gopkg.in/ory-am/dockertest.v2"
 )
 
-var connections = []*Connection{
-	{
+var connections = map[string]*Connection{
+	"a": {
 		ID:            uuid.New(),
 		LocalSubject:  "peter",
 		RemoteSubject: "peterson",
 		Provider:      "google",
+	},
+	"b": {
+		ID:            uuid.New(),
+		LocalSubject:  "peter",
+		RemoteSubject: "dudeguy",
+		Provider:      "amazon",
 	},
 }
 
@@ -51,7 +57,7 @@ func init() {
 	)
 
 	s := &Handler{
-		Manager: &MemoryManager{Connections: map[string]*Connection{}},
+		Manager: &MemoryManager{Connections: map[string]Connection{}},
 		H:       &herodot.JSON{},
 		W:       localWarden,
 	}
@@ -87,7 +93,7 @@ func TestMain(m *testing.M) {
 		rethinkManager = &RethinkManager{
 			Session:     session,
 			Table:       r.Table("hydra_clients"),
-			Connections: make(map[string]*Connection),
+			Connections: make(map[string]Connection),
 		}
 		rethinkManager.Watch(context.Background())
 		time.Sleep(500 * time.Millisecond)
@@ -128,29 +134,33 @@ func BenchmarkRethinkGet(b *testing.B) {
 }
 
 func TestCreateGetFindDelete(t *testing.T) {
-	for _, store := range managers {
-		for _, c := range connections {
-			_, err := store.Get("asdf")
-			pkg.RequireError(t, true, err)
+	for m, store := range managers {
+		_, err := store.Get("asdf")
+		pkg.RequireError(t, true, err)
 
+		for _, c := range connections {
 			err = store.Create(c)
 			pkg.RequireError(t, false, err)
+		}
 
-			time.Sleep(100 * time.Millisecond)
+		time.Sleep(200 * time.Millisecond)
 
+		for _, c := range connections {
 			res, err := store.Get(c.GetID())
 			pkg.RequireError(t, false, err)
 			require.Equal(t, c, res)
 
 			cs, err := store.FindAllByLocalSubject("peter")
 			pkg.RequireError(t, false, err)
-			assert.Len(t, cs, 1)
-			require.Equal(t, c, cs[0])
+			assert.Len(t, cs, 2, "%s", m)
+			//require.NotEqual(t, cs[1], cs[0])
 
 			res, err = store.FindByRemoteSubject("google", "peterson")
-			pkg.RequireError(t, false, err)
-			require.Equal(t, c, res)
+			pkg.RequireError(t, false, err, m)
+			require.Equal(t, connections["a"], res)
+		}
 
+		for _, c := range connections {
 			err = store.Delete(c.GetID())
 			pkg.RequireError(t, false, err)
 

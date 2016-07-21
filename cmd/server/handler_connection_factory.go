@@ -27,6 +27,7 @@ func newConnectionHandler(c *config.Config, router *httprouter.Router) *connecti
 		m := &connection.RethinkManager{
 			Session: con.GetSession(),
 			Table:   r.Table("hydra_connections"),
+			Connections: make(map[string]connection.Connection),
 		}
 		if err := m.ColdStart(); err != nil {
 			logrus.Fatalf("Could not fetch initial state: %s", err)

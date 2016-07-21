@@ -215,6 +215,14 @@ func TestCreateGetDeleteClient(t *testing.T) {
 			compare(t, c, k)
 		}
 
+		err = m.CreateClient(&Client{
+			ID:                "2-1234",
+			Secret:            "secret",
+			RedirectURIs:      []string{"http://redirect"},
+			TermsOfServiceURI: "foo",
+		})
+		pkg.AssertError(t, false, err, "%s", k)
+
 		// RethinkDB delay
 		time.Sleep(500 * time.Millisecond)
 
@@ -226,7 +234,8 @@ func TestCreateGetDeleteClient(t *testing.T) {
 
 		ds, err := m.GetClients()
 		pkg.AssertError(t, false, err, "%s", k)
-		assert.Len(t, ds, 1)
+		assert.Len(t, ds, 2)
+		assert.NotEqual(t, ds["1234"].ID, ds["2-1234"].ID)
 
 		err = m.DeleteClient("1234")
 		pkg.AssertError(t, false, err, "%s", k)

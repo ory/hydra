@@ -1,5 +1,5 @@
 hash: 175acff756341dd7fa75a3e1e2e1a042a957a1b2482f017ae0bb38a2e8b9c625
-updated: 2016-07-24T23:41:10.088165+02:00
+updated: 2016-07-25T00:14:24.5719977+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 593d64559f7600f29581a3ee42177f5dbded27a9
@@ -53,7 +53,7 @@ imports:
   - rand/sequence
   - compiler
 - name: github.com/ory-am/fosite
-  version: 7eb85c6e4ae2bb4a67c2e6f6166824351cc17f1d
+  version: 89c60c9f2898345fd3d75044c8e41eacbf0d4fd5
   subpackages:
   - fosite-example/store
   - handler/core

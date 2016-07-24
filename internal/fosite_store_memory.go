@@ -6,7 +6,6 @@ import (
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/client"
 	"golang.org/x/net/context"
-	"sync"
 )
 
 type FositeMemoryStore struct {

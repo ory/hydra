@@ -1,5 +1,5 @@
 hash: 175acff756341dd7fa75a3e1e2e1a042a957a1b2482f017ae0bb38a2e8b9c625
-updated: 2016-07-24T16:54:50.0589572+02:00
+updated: 2016-07-24T23:41:10.088165+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 593d64559f7600f29581a3ee42177f5dbded27a9
@@ -39,7 +39,7 @@ imports:
 - name: github.com/julienschmidt/httprouter
   version: fb79d6a91d3e4a9ecb6d945b218d78fc0d9b1939
 - name: github.com/magiconair/properties
-  version: af14024f63beeb153d0048591b39c5788f21cc24
+  version: b3f6dd549956e8a61ea4a686a1c02a33d5bdda4b
 - name: github.com/mitchellh/mapstructure
   version: 21a35fb16463dfb7c8eee579c65d995d95e64d1e
 - name: github.com/moul/http2curl
@@ -53,7 +53,7 @@ imports:
   - rand/sequence
   - compiler
 - name: github.com/ory-am/fosite
-  version: 4d0a5450dd3b44e44f5169f90b3591566a6eef1d
+  version: 7eb85c6e4ae2bb4a67c2e6f6166824351cc17f1d
   subpackages:
   - fosite-example/store
   - handler/core

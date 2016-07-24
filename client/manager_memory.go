@@ -17,8 +17,8 @@ type MemoryManager struct {
 }
 
 func (m *MemoryManager) GetClient(id string) (fosite.Client, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.RLock()
+	defer m.RUnlock()
 
 	c, ok := m.Clients[id]
 	if !ok {
@@ -28,8 +28,8 @@ func (m *MemoryManager) GetClient(id string) (fosite.Client, error) {
 }
 
 func (m *MemoryManager) Authenticate(id string, secret []byte) (*Client, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.RLock()
+	defer m.RUnlock()
 
 	c, ok := m.Clients[id]
 	if !ok {
@@ -70,8 +70,8 @@ func (m *MemoryManager) DeleteClient(id string) error {
 }
 
 func (m *MemoryManager) GetClients() (clients map[string]Client, err error) {
-	m.Lock()
-	defer m.Unlock()
+	m.RLock()
+	defer m.RUnlock()
 	clients = make(map[string]Client)
 	for _, c := range m.Clients {
 		clients[c.ID] = c

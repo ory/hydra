@@ -112,6 +112,8 @@ func (s *FositeRehinkDBStore) CreateOpenIDConnectSession(_ context.Context, auth
 }
 
 func (s *FositeRehinkDBStore) GetOpenIDConnectSession(_ context.Context, authorizeCode string, requester fosite.Requester) (fosite.Requester, error) {
+	s.RLock()
+	defer s.RUnlock()
 	cl, ok := s.IDSessions[authorizeCode]
 	if !ok {
 		return nil, fosite.ErrNotFound
@@ -128,9 +130,8 @@ func (s *FositeRehinkDBStore) CreateAuthorizeCodeSession(_ context.Context, code
 }
 
 func (s *FositeRehinkDBStore) GetAuthorizeCodeSession(_ context.Context, code string, sess interface{}) (fosite.Requester, error) {
-	s.Lock()
-	defer s.Unlock()
-
+	s.RLock()
+	defer s.RUnlock()
 	rel, ok := s.AuthorizeCodes[code]
 	if !ok {
 		return nil, fosite.ErrNotFound
@@ -148,9 +149,8 @@ func (s *FositeRehinkDBStore) CreateAccessTokenSession(_ context.Context, signat
 }
 
 func (s *FositeRehinkDBStore) GetAccessTokenSession(_ context.Context, signature string, sess interface{}) (fosite.Requester, error) {
-	s.Lock()
-	defer s.Unlock()
-
+	s.RLock()
+	defer s.RUnlock()
 	rel, ok := s.AccessTokens[signature]
 	if !ok {
 		return nil, fosite.ErrNotFound
@@ -168,9 +168,8 @@ func (s *FositeRehinkDBStore) CreateRefreshTokenSession(_ context.Context, signa
 }
 
 func (s *FositeRehinkDBStore) GetRefreshTokenSession(_ context.Context, signature string, sess interface{}) (fosite.Requester, error) {
-	s.Lock()
-	defer s.Unlock()
-
+	s.RLock()
+	defer s.RUnlock()
 	rel, ok := s.RefreshTokens[signature]
 	if !ok {
 		return nil, fosite.ErrNotFound
@@ -218,7 +217,6 @@ func (s *FositeRehinkDBStore) PersistRefreshTokenGrantSession(ctx context.Contex
 }
 
 func (m *FositeRehinkDBStore) Watch(ctx context.Context) {
-	ctx.Done()
 	m.AccessTokens.watch(ctx, m.Session, m.RWMutex, m.AccessTokensTable)
 	m.AuthorizeCodes.watch(ctx, m.Session, m.RWMutex, m.AuthorizeCodesTable)
 	m.IDSessions.watch(ctx, m.Session, m.RWMutex, m.IDSessionsTable)

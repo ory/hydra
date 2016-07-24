@@ -8,13 +8,13 @@ import (
 )
 
 type MemoryManager struct {
-	Connections map[string]*Connection
+	Connections map[string]Connection
 	sync.RWMutex
 }
 
 func NewMemoryManager() *MemoryManager {
 	return &MemoryManager{
-		Connections: make(map[string]*Connection),
+		Connections: make(map[string]Connection),
 	}
 }
 
@@ -22,7 +22,7 @@ func (m *MemoryManager) Create(c *Connection) error {
 	m.Lock()
 	defer m.Unlock()
 
-	m.Connections[c.GetID()] = c
+	m.Connections[c.GetID()] = *c
 	return nil
 }
 
@@ -35,21 +35,21 @@ func (m *MemoryManager) Delete(id string) error {
 }
 
 func (m *MemoryManager) Get(id string) (*Connection, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.RLock()
+	defer m.RUnlock()
 
 	c, ok := m.Connections[id]
 	if !ok {
 		return nil, errors.New(pkg.ErrNotFound)
 	}
-	return c, nil
+	return &c, nil
 }
 
-func (m *MemoryManager) FindAllByLocalSubject(subject string) ([]*Connection, error) {
-	m.Lock()
-	defer m.Unlock()
+func (m *MemoryManager) FindAllByLocalSubject(subject string) ([]Connection, error) {
+	m.RLock()
+	defer m.RUnlock()
 
-	var cs []*Connection
+	var cs []Connection
 	for _, c := range m.Connections {
 		if c.GetLocalSubject() == subject {
 			cs = append(cs, c)
@@ -59,12 +59,12 @@ func (m *MemoryManager) FindAllByLocalSubject(subject string) ([]*Connection, er
 }
 
 func (m *MemoryManager) FindByRemoteSubject(provider, subject string) (*Connection, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.RLock()
+	defer m.RUnlock()
 
 	for _, c := range m.Connections {
 		if c.GetProvider() == provider && c.GetRemoteSubject() == subject {
-			return c, nil
+			return &c, nil
 		}
 	}
 	return nil, errors.New(pkg.ErrNotFound)

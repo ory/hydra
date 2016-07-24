@@ -17,7 +17,7 @@ type RethinkManager struct {
 	Session *r.Session
 	Table   r.Term
 
-	Connections map[string]*Connection
+	Connections map[string]Connection
 
 	sync.RWMutex
 }
@@ -38,21 +38,21 @@ func (m *RethinkManager) Delete(id string) error {
 }
 
 func (m *RethinkManager) Get(id string) (*Connection, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.RLock()
+	defer m.RUnlock()
 
 	c, ok := m.Connections[id]
 	if !ok {
 		return nil, errors.New(pkg.ErrNotFound)
 	}
-	return c, nil
+	return &c, nil
 }
 
-func (m *RethinkManager) FindAllByLocalSubject(subject string) ([]*Connection, error) {
-	m.Lock()
-	defer m.Unlock()
+func (m *RethinkManager) FindAllByLocalSubject(subject string) ([]Connection, error) {
+	m.RLock()
+	defer m.RUnlock()
 
-	var cs []*Connection
+	var cs []Connection
 	for _, c := range m.Connections {
 		if c.GetLocalSubject() == subject {
 			cs = append(cs, c)
@@ -62,19 +62,19 @@ func (m *RethinkManager) FindAllByLocalSubject(subject string) ([]*Connection, e
 }
 
 func (m *RethinkManager) FindByRemoteSubject(provider, subject string) (*Connection, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.RLock()
+	defer m.RUnlock()
 
 	for _, c := range m.Connections {
 		if c.GetProvider() == provider && c.GetRemoteSubject() == subject {
-			return c, nil
+			return &c, nil
 		}
 	}
 	return nil, errors.New(pkg.ErrNotFound)
 }
 
 func (m *RethinkManager) ColdStart() error {
-	m.Connections = map[string]*Connection{}
+	m.Connections = map[string]Connection{}
 	clients, err := m.Table.Run(m.Session)
 	if err != nil {
 		return errors.New(err)
@@ -84,7 +84,7 @@ func (m *RethinkManager) ColdStart() error {
 	m.Lock()
 	defer m.Unlock()
 	for clients.Next(&connection) {
-		m.Connections[connection.ID] = &connection
+		m.Connections[connection.ID] = connection
 	}
 
 	return nil
@@ -122,9 +122,9 @@ func (m *RethinkManager) Watch(ctx context.Context) {
 				delete(m.Connections, oldVal.GetID())
 			} else if newVal != nil && oldVal != nil {
 				delete(m.Connections, oldVal.GetID())
-				m.Connections[newVal.GetID()] = newVal
+				m.Connections[newVal.GetID()] = *newVal
 			} else {
-				m.Connections[newVal.GetID()] = newVal
+				m.Connections[newVal.GetID()] = *newVal
 			}
 			m.Unlock()
 		}

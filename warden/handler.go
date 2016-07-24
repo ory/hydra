@@ -82,7 +82,6 @@ func (h *WardenHandler) Authorized(w http.ResponseWriter, r *http.Request, _ htt
 
 	authContext.Audience = clientCtx.Subject
 	h.H.Write(ctx, w, r, authContext)
-
 }
 
 func (h *WardenHandler) Allowed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

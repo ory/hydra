@@ -1,32 +1,29 @@
 # ![Ory/Hydra](dist/logo.png)
 
-[![Build Status](https://travis-ci.org/ory-am/hydra.svg?branch=master)](https://travis-ci.org/ory-am/hydra)
-[![Coverage Status](https://coveralls.io/repos/ory-am/hydra/badge.svg?branch=master&service=github)](https://coveralls.io/github/ory-am/hydra?branch=master)
-[![Code Climate](https://codeclimate.com/github/ory-am/hydra/badges/gpa.svg)](https://codeclimate.com/github/ory-am/hydra)
-[![Go Report Card](https://goreportcard.com/badge/github.com/ory-am/hydra)](https://goreportcard.com/report/github.com/ory-am/hydra)
-
 [![Join the chat at https://gitter.im/ory-am/hydra](https://img.shields.io/badge/join-chat-00cc99.svg)](https://gitter.im/ory-am/hydra?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Join mailinglist](https://img.shields.io/badge/join-mailinglist-00cc99.svg)](https://groups.google.com/forum/#!forum/ory-hydra/new)
 [![Join newsletter](https://img.shields.io/badge/join-newsletter-00cc99.svg)](http://eepurl.com/bKT3N9)
 [![Follow newsletter](https://img.shields.io/badge/follow-twitter-00cc99.svg)](https://twitter.com/_aeneasr)
 [![Follow GitHub](https://img.shields.io/badge/follow-github-00cc99.svg)](https://github.com/arekkas)
 
+[![Build Status](https://travis-ci.org/ory-am/hydra.svg?branch=master)](https://travis-ci.org/ory-am/hydra)
+[![Coverage Status](https://coveralls.io/repos/ory-am/hydra/badge.svg?branch=master&service=github)](https://coveralls.io/github/ory-am/hydra?branch=master)
+[![Code Climate](https://codeclimate.com/github/ory-am/hydra/badges/gpa.svg)](https://codeclimate.com/github/ory-am/hydra)
+[![Go Report Card](https://goreportcard.com/badge/github.com/ory-am/hydra)](https://goreportcard.com/report/github.com/ory-am/hydra)
+
 Hydra is being developed by german-based company [Ory](https://ory.am). Join our [newsletter](http://eepurl.com/bKT3N9) to stay on top of new developments.
-We respond on [Google Groups](https://groups.google.com/forum/#!forum/ory-hydra/new) and [Gitter](https://gitter.im/ory-am/hydra). Our timezone is CET.
+We respond to basic support requests on [Google Groups](https://groups.google.com/forum/#!forum/ory-hydra/new) and [Gitter](https://gitter.im/ory-am/hydra).
+If you are looking for enterprise support, [contact us now](mailto:hello@ory.am).
 
 Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://github.com/ory-am/fosite) and [Ladon](https://github.com/ory-am/ladon) for policy-based access control.
-
-:fire: Don't want to worry about security updates, backups, migration and scaling? Do you need enterprise support? [Contact us now](mailto:sales@ory.am) and become an early adopter. :fire:
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
 - [What is Hydra?](#what-is-hydra)
-  - [Feature Overview](#feature-overview)
-  - [Can I use Hydra in my new or existing app?](#can-i-use-hydra-in-my-new-or-existing-app)
-- [Security](#security)
 - [Quickstart](#quickstart)
+- [Feature Overview](#feature-overview)
   - [Installation](#installation)
     - [Server](#server)
       - [Downloading an image from the Hub](#downloading-an-image-from-the-hub)
@@ -36,12 +33,14 @@ Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://git
       - [Building from the source](#building-from-the-source)
       - [From the Docker container (not recommended):](#from-the-docker-container-not-recommended)
   - [Run the example](#run-the-example)
+- [Security](#security)
 - [Documentation](#documentation)
   - [Guide](#guide)
   - [REST API Documentation](#rest-api-documentation)
   - [CLI Documentation](#cli-documentation)
   - [Develop](#develop)
 - [FAQ](#faq)
+  - [Can I use Hydra in my new or existing app?](#can-i-use-hydra-in-my-new-or-existing-app)
   - [I'm having trouble with the redirect URI.](#im-having-trouble-with-the-redirect-uri)
   - [How can I validate tokens?](#how-can-i-validate-tokens)
   - [How can I import TLS certificates?](#how-can-i-import-tls-certificates)
@@ -65,30 +64,37 @@ Access Control, OAuth2, and OpenID Connect layer** that integrates with every id
 Hydra is available through [Docker](https://hub.docker.com/r/oryam/hydra/) and relies on RethinkDB for persistence.
 Database drivers are extensible in case you want to use RabbitMQ, MySQL, MongoDB, or some other database instead.
 
-Hydra is built for high throughput environments. Check out the below siege benchmark on a Macbook Pro Late 2013, connected to RethinkDB validating access tokens.
-
-*Note*: There is no cache involved. You could use a different access token for every request and still get the same benchmark results.
+Hydra is built for high throughput environments. Check out the benchmark below running 10.000 simultaneous connections
+on different endpoints using a Macbook Pro Late 2013, connected to RethinkDB. There is no caching involved.
 
 ```
-# 500 concurrent connections, 5 minutes stress test
-$ siege -t5m -c=500 -b --content-type="application/json" --header="Authorization: bearer 14Q28Y5PILTSKhByweAmQ1JddECMtp4j65yvlKs5Rhk.mqkREUzhqKexxGct5tA4UhJSnL8RYMpwMeFlEF-10OM" 'https://localhost:4444/warden/authorized POST {"assertion": "14Q28Y5PILTSKhByweAmQ1JddECMtp4j65yvlKs5Rhk.mqkREUzhqKexxGct5tA4UhJSnL8RYMpwMeFlEF-10OM"}' | grep '^[^HTTP]+'
+# Validate access tokens
+$ gobench  -u "http://localhost:4444/warden/authorized" -c 10000 -t 100 -auth "bearer ..." -d "./warden-authorized.txt"
+Successful requests rate:            37508 hits/sec
+Read throughput:                  12077688 bytes/sec
+Write throughput:                 14646568 bytes/sec
 
-Lifting the server siege...
-Transactions:           155455 hits
-Availability:           100.00 %
-Elapsed time:           299.67 secs
-Data transferred:        32.47 MB
-Response time:	          0.00 secs
-Transaction rate:       518.75 trans/sec
-Throughput:               0.11 MB/sec
-Concurrency:  	           0.96
-Successful transactions: 155455
-Failed transactions:          0
-Longest transaction:       6.80
-Shortest transaction:      0.00
+# Validate access tokens and check policies
+$ gobench -u "http://localhost:4444/warden/allowed" -c 10000 -t 100 -auth "bearer ..." -d "./warden-allowed.txt"
+Successful requests rate:             4719 hits/sec
+Read throughput:                   1529742 bytes/sec
+Write throughput:                  2147564 bytes/sec
+
+# Retrieve a JSON Web Key Set
+$ gobench -u "http://localhost:4444/keys/hydra.tls" -c 10000 -t 5 -auth "bearer ..."
+Successful requests rate:             3674 hits/sec
+Read throughput:                   3678587 bytes/sec
+Write throughput:                   807390 bytes/sec
 ```
 
-### Feature Overview
+## Quickstart
+
+This section is a quickstart guide to working with Hydra. In-depth docs are available as well:
+
+* The documentation is available on [GitBook](https://ory-am.gitbooks.io/hydra/content/).
+* The REST API documentation is available at [Apiary](http://docs.hdyra.apiary.io).
+
+## Feature Overview
 
 1. **Availability:** Hydra uses pub/sub to have the latest data available in memory. The in-memory architecture allows for heavy duty workloads.
 2. **Scalability:** Hydra scales effortlessly on every platform you can imagine, including Heroku, Cloud Foundry, Docker,
@@ -104,107 +110,7 @@ Hydra is packaged using [Docker](https://hub.docker.com/r/oryam/hydra/).
 6. **Open Source:** Hydra is licensed under Apache Version 2.0
 7. **Professional:** Hydra implements peer reviewed open standards published by [The Internet Engineering Task Force (IETF®)](https://www.ietf.org/) and the [OpenID Foundation](https://openid.net/)
 and under supervision of the [LMU Teaching and Research Unit Programming and Modelling Languages](http://www.en.pms.ifi.lmu.de). No funny business.
-8. **Real Time:** Operation is a lot easier with real time monitoring. Because Hydra leverages RethinkDB, you get real time monitoring for free:
-![monitoring.gif](dist/monitoring.gif)
-
-### Can I use Hydra in my new or existing app?
-
-OAuth2 and OpenID Connect are tricky to understand. It is important to understand that OAuth2 is
-a delegation protocol. It makes sense to use Hydra in new and existing projects. A use case covering an existing project
-explains how one would use Hydra in a new one as well. So let's look at a use case!
-
-Let's assume we are running a ToDo List App (todo24.com). ToDo24 has a login endpoint (todo24.com/login).
-The login endpoint is written in node and uses MongoDB to store user information (email + password + settings). Of course,
-todo24 has other services as well: list management (todo24.com/lists/manage: close, create, move), item management (todo24.com/lists/items/manage: mark solved, add), and so on.
-You are using cookies to see which user is performing the request.
-
-Now you decide to use OAuth2 on top of your current infrastructure. There are many reasons to do this:
-* You want to open up your APIs to third-party developers. Their apps will be using OAuth2 Access Tokens to access a user's to do list.
-* You want a mobile client. Because you can not store secrets on devices (they can be reverse engineered and stolen), you use OAuth2 Access Tokens instead.
-* You have Cross Origin Requests. Making cookies work with Cross Origin Requests weakens or even disables important anti-CSRF measures.
-* You want to write an in-browser client. This is the same case as in a mobile client (you can't store secrets in a browser).
-
-These are only a couple of reasons to use OAuth2. You might decide to use OAuth2 as your single source of authorization, thus maintaining
-only one authorization protocol and being able to open up to third party devs in no time. With OpenID Connect, you are able to delegate authentication as well as authorization!
-
-Your decision is final. You want to use OAuth2 and you want Hydra to do the job. You install Hydra in your cluster using docker.
-Next, you set up some exemplary OAuth2 clients. Clients can act on their own, but most of the time they need to access a user's todo lists.
-To do so, the client initiates an OAuth2 request. This is where [Hydra's authentication flow](https://ory-am.gitbooks.io/hydra/content/oauth2.html#authentication-flow) comes in to play.
-Before Hydra can issue an access token, we need to know WHICH user is giving consent. To do so, Hydra redirects the user agent (e.g. browser, mobile device)
-to the login endpoint alongside with a challenge that contains an expiry time and other information. The login endpoint (todo24.com/login) authenticates the
-user as usual, e.g. by username & password, session cookie or other means. Upon successful authentication, the login endpoint asks for the user's consent:
-*"Do you want to grant MyCoolAnalyticsApp read & write access to all your todo lists? [Yes] [No]"*. Once the user clicks *Yes* and gives consent,
-the login endpoint redirects back to hydra and appends something called a *consent token*. The consent token is a cryptographically signed
-string that contains information about the user, specifically the user's unique id. Hydra validates the signature's trustworthiness
-and issues an OAuth2 access token and optionally a refresh or OpenID token.
-
-Every time a request containing an access token hits a resource server (todo24.com/lists/manage), you make a request to Hydra asking who the token's
-subject (the user who authorized the client to create a token on its behalf) is and whether the token is valid or not. You may optionally
-ask if the token has permission to perform a certain action.
-
-## Security
-
-*Why should I use Hydra? It's not that hard to implement two OAuth2 endpoints and there are numerous SDKs out there!*
-
-OAuth2 and OAuth2 related specifications are over 200 written pages. Implementing OAuth2 is easy, getting it right is hard.
-Even if you use a secure SDK (there are numerous SDKs not secure by design in the wild), messing up the implementation
-is a real threat - no matter how good you or your team is. To err is human.
-
-Let's take a look at security in Hydra:
-* Hydra uses [Fosite](https://github.com/ory-am/fosite#a-word-on-security), a secure-by-design OAuth2 SDK. Fosite implements
-best practices proposed by the IETF:
-    * [No Cleartext Storage of Credentials](https://tools.ietf.org/html/rfc6819#section-5.1.4.1.3)
-    * [Encryption of Credentials](https://tools.ietf.org/html/rfc6819#section-5.1.4.1.4)
-    * [Use Short Expiration Time](https://tools.ietf.org/html/rfc6819#section-5.1.5.3)
-    * [Limit Number of Usages or One-Time Usage](https://tools.ietf.org/html/rfc6819#section-5.1.5.4)
-    * [Bind Token to Client id](https://tools.ietf.org/html/rfc6819#section-5.1.5.8)
-    * [Automatic Revocation of Derived Tokens If Abuse Is Detected](https://tools.ietf.org/html/rfc6819#section-5.2.1.1)
-    * [Binding of Refresh Token to "client_id"](https://tools.ietf.org/html/rfc6819#section-5.2.2.2)
-    * [Refresh Token Rotation](https://tools.ietf.org/html/rfc6819#section-5.2.2.3)
-    * [Revocation of Refresh Tokens](https://tools.ietf.org/html/rfc6819#section-5.2.2.4)
-    * [Validate Pre-Registered "redirect_uri"](https://tools.ietf.org/html/rfc6819#section-5.2.3.5)
-    * [Binding of Authorization "code" to "client_id"](https://tools.ietf.org/html/rfc6819#section-5.2.4.4)
-    * [Binding of Authorization "code" to "redirect_uri"](https://tools.ietf.org/html/rfc6819#section-5.2.4.6)
-    * [Opaque access tokens](https://tools.ietf.org/html/rfc6749#section-1.4)
-    * [Opaque refresh tokens](https://tools.ietf.org/html/rfc6749#section-1.5)
-    * [Ensure Confidentiality of Requests](https://tools.ietf.org/html/rfc6819#section-5.1.1)
-    * [Use of Asymmetric Cryptography](https://tools.ietf.org/html/rfc6819#section-5.1.4.1.5)
-    * **Enforcing random states:** Without a random-looking state or OpenID Connect nonce the request will fail.
-    * **Advanced Token Validation:** Tokens are laid out as `<key>.<signature>` where `<signature>` is created using HMAC-SHA256
-     and a global secret. This is what a token can look like: `/tgBeUhWlAT8tM8Bhmnx+Amf8rOYOUhrDi3pGzmjP7c=.BiV/Yhma+5moTP46anxMT6cWW8gz5R5vpC9RbpwSDdM=`
-    * **Enforcing scopes:** By default, you always need to include the `core` scope or Hydra will not execute the request.
-* Hydra uses [Ladon](https://github.com/ory-am/ladon) for policy management and access control. Ladon's API is minimalistic
-and well tested.
-* Hydra encrypts symmetric and asymmetric keys at rest using AES-GCM 256bit.
-* Hydra does not store tokens, only their signatures. An attacker gaining database access is neither able to steal tokens nor
-to issue new ones.
-* Hydra has automated unit and integration tests.
-* Hydra does not use hacks. We would rather rewrite the whole thing instead of introducing a hack.
-* APIs are uniform, well documented and secured using the warden's access control infrastructure.
-* Hydra is open source and can be reviewed by anyone.
-* Hydra is designed by a [security enthusiast](https://github.com/arekkas), who has written and participated in numerous auth* projects.
-
-Additionally to the claims above, Hydra has received a lot of positive feedback. Let's see what the community is saying:
-
-> Nice! Lowering barriers to the use of technologies like these is important.
-
-[Pyxl101](https://news.ycombinator.com/item?id=11798641)
-
-> OAuth is a framework not a protocol. The security it provides can vary greatly between implementations.
-Fosite (which is what this is based on) is a very good implementation from a security perspective: https://github.com/ory-am/fosite#a-word-on-security
-
-[abritishguy](https://news.ycombinator.com/item?id=11800515)
-
-> [...] Thanks for releasing this by the way, looks really well engineered. [...]
-
-[olalonde](https://news.ycombinator.com/item?id=11798831)
-
-## Quickstart
-
-This section is a quickstart guide to working with Hydra. In-depth docs are available as well:
-
-* The documentation is available on [GitBook](https://ory-am.gitbooks.io/hydra/content/).
-* The REST API documentation is available at [Apiary](http://docs.hdyra.apiary.io).
+8.  <img src="dist/monitoring.gif" width="45%" align="right"> **Real Time:** Operation is a lot easier with real time monitoring. Because Hydra leverages RethinkDB, you get real time monitoring for free.
 
 ### Installation
 
@@ -312,7 +218,7 @@ Usage:
 
 ### Run the example
 
-![Run the example](dist/run-the-example.gif)
+<img alt="Running the example" align="right" width="50%" src="dist/run-the-example.gif">
 
 You now have a running hydra docker container! Additionally, a RethinkDB image was deployed as well as a consent app.
 
@@ -377,10 +283,67 @@ Setting up callback listener on http://localhost:4445/callback
 Press ctrl + c on Linux / Windows or cmd + c on OSX to end the process.
 ```
 
-![OAuth2 Flow](dist/oauth2-flow.gif)
+<img src="dist/oauth2-flow.gif" alt="OAuth2 Flow" align="left" width="50%">
 
 Great! You installed hydra, connected the CLI, created a client and completed two authentication flows!
 Your next stop should be the [Guide](#guide).
+
+## Security
+
+*Why should I use Hydra? It's not that hard to implement two OAuth2 endpoints and there are numerous SDKs out there!*
+
+OAuth2 and OAuth2 related specifications are over 200 written pages. Implementing OAuth2 is easy, getting it right is hard.
+Even if you use a secure SDK (there are numerous SDKs not secure by design in the wild), messing up the implementation
+is a real threat - no matter how good you or your team is. To err is human.
+
+Let's take a look at security in Hydra:
+* Hydra uses [Fosite](https://github.com/ory-am/fosite#a-word-on-security), a secure-by-design OAuth2 SDK. Fosite implements
+best practices proposed by the IETF:
+    * [No Cleartext Storage of Credentials](https://tools.ietf.org/html/rfc6819#section-5.1.4.1.3)
+    * [Encryption of Credentials](https://tools.ietf.org/html/rfc6819#section-5.1.4.1.4)
+    * [Use Short Expiration Time](https://tools.ietf.org/html/rfc6819#section-5.1.5.3)
+    * [Limit Number of Usages or One-Time Usage](https://tools.ietf.org/html/rfc6819#section-5.1.5.4)
+    * [Bind Token to Client id](https://tools.ietf.org/html/rfc6819#section-5.1.5.8)
+    * [Automatic Revocation of Derived Tokens If Abuse Is Detected](https://tools.ietf.org/html/rfc6819#section-5.2.1.1)
+    * [Binding of Refresh Token to "client_id"](https://tools.ietf.org/html/rfc6819#section-5.2.2.2)
+    * [Refresh Token Rotation](https://tools.ietf.org/html/rfc6819#section-5.2.2.3)
+    * [Revocation of Refresh Tokens](https://tools.ietf.org/html/rfc6819#section-5.2.2.4)
+    * [Validate Pre-Registered "redirect_uri"](https://tools.ietf.org/html/rfc6819#section-5.2.3.5)
+    * [Binding of Authorization "code" to "client_id"](https://tools.ietf.org/html/rfc6819#section-5.2.4.4)
+    * [Binding of Authorization "code" to "redirect_uri"](https://tools.ietf.org/html/rfc6819#section-5.2.4.6)
+    * [Opaque access tokens](https://tools.ietf.org/html/rfc6749#section-1.4)
+    * [Opaque refresh tokens](https://tools.ietf.org/html/rfc6749#section-1.5)
+    * [Ensure Confidentiality of Requests](https://tools.ietf.org/html/rfc6819#section-5.1.1)
+    * [Use of Asymmetric Cryptography](https://tools.ietf.org/html/rfc6819#section-5.1.4.1.5)
+    * **Enforcing random states:** Without a random-looking state or OpenID Connect nonce the request will fail.
+    * **Advanced Token Validation:** Tokens are laid out as `<key>.<signature>` where `<signature>` is created using HMAC-SHA256
+     and a global secret. This is what a token can look like: `/tgBeUhWlAT8tM8Bhmnx+Amf8rOYOUhrDi3pGzmjP7c=.BiV/Yhma+5moTP46anxMT6cWW8gz5R5vpC9RbpwSDdM=`
+    * **Enforcing scopes:** By default, you always need to include the `core` scope or Hydra will not execute the request.
+* Hydra uses [Ladon](https://github.com/ory-am/ladon) for policy management and access control. Ladon's API is minimalistic
+and well tested.
+* Hydra encrypts symmetric and asymmetric keys at rest using AES-GCM 256bit.
+* Hydra does not store tokens, only their signatures. An attacker gaining database access is neither able to steal tokens nor
+to issue new ones.
+* Hydra has automated unit and integration tests.
+* Hydra does not use hacks. We would rather rewrite the whole thing instead of introducing a hack.
+* APIs are uniform, well documented and secured using the warden's access control infrastructure.
+* Hydra is open source and can be reviewed by anyone.
+* Hydra is designed by a [security enthusiast](https://github.com/arekkas), who has written and participated in numerous auth* projects.
+
+Additionally to the claims above, Hydra has received a lot of positive feedback. Let's see what the community is saying:
+
+> Nice! Lowering barriers to the use of technologies like these is important.
+
+[Pyxl101](https://news.ycombinator.com/item?id=11798641)
+
+> OAuth is a framework not a protocol. The security it provides can vary greatly between implementations.
+Fosite (which is what this is based on) is a very good implementation from a security perspective: https://github.com/ory-am/fosite#a-word-on-security
+
+[abritishguy](https://news.ycombinator.com/item?id=11800515)
+
+> [...] Thanks for releasing this by the way, looks really well engineered. [...]
+
+[olalonde](https://news.ycombinator.com/item?id=11798831)
 
 ## Documentation
 
@@ -422,6 +385,41 @@ DATABASE_URL=rethinkdb://$(docker-machine ip default):28015/hydra go run main.go
 ```
 
 ## FAQ
+
+### Can I use Hydra in my new or existing app?
+
+OAuth2 and OpenID Connect are tricky to understand. It is important to understand that OAuth2 is
+a delegation protocol. It makes sense to use Hydra in new and existing projects. A use case covering an existing project
+explains how one would use Hydra in a new one as well. So let's look at a use case!
+
+Let's assume we are running a ToDo List App (todo24.com). ToDo24 has a login endpoint (todo24.com/login).
+The login endpoint is written in node and uses MongoDB to store user information (email + password + settings). Of course,
+todo24 has other services as well: list management (todo24.com/lists/manage: close, create, move), item management (todo24.com/lists/items/manage: mark solved, add), and so on.
+You are using cookies to see which user is performing the request.
+
+Now you decide to use OAuth2 on top of your current infrastructure. There are many reasons to do this:
+* You want to open up your APIs to third-party developers. Their apps will be using OAuth2 Access Tokens to access a user's to do list.
+* You want a mobile client. Because you can not store secrets on devices (they can be reverse engineered and stolen), you use OAuth2 Access Tokens instead.
+* You have Cross Origin Requests. Making cookies work with Cross Origin Requests weakens or even disables important anti-CSRF measures.
+* You want to write an in-browser client. This is the same case as in a mobile client (you can't store secrets in a browser).
+
+These are only a couple of reasons to use OAuth2. You might decide to use OAuth2 as your single source of authorization, thus maintaining
+only one authorization protocol and being able to open up to third party devs in no time. With OpenID Connect, you are able to delegate authentication as well as authorization!
+
+Your decision is final. You want to use OAuth2 and you want Hydra to do the job. You install Hydra in your cluster using docker.
+Next, you set up some exemplary OAuth2 clients. Clients can act on their own, but most of the time they need to access a user's todo lists.
+To do so, the client initiates an OAuth2 request. This is where [Hydra's authentication flow](https://ory-am.gitbooks.io/hydra/content/oauth2.html#authentication-flow) comes in to play.
+Before Hydra can issue an access token, we need to know WHICH user is giving consent. To do so, Hydra redirects the user agent (e.g. browser, mobile device)
+to the login endpoint alongside with a challenge that contains an expiry time and other information. The login endpoint (todo24.com/login) authenticates the
+user as usual, e.g. by username & password, session cookie or other means. Upon successful authentication, the login endpoint asks for the user's consent:
+*"Do you want to grant MyCoolAnalyticsApp read & write access to all your todo lists? [Yes] [No]"*. Once the user clicks *Yes* and gives consent,
+the login endpoint redirects back to hydra and appends something called a *consent token*. The consent token is a cryptographically signed
+string that contains information about the user, specifically the user's unique id. Hydra validates the signature's trustworthiness
+and issues an OAuth2 access token and optionally a refresh or OpenID token.
+
+Every time a request containing an access token hits a resource server (todo24.com/lists/manage), you make a request to Hydra asking who the token's
+subject (the user who authorized the client to create a token on its behalf) is and whether the token is valid or not. You may optionally
+ask if the token has permission to perform a certain action.
 
 ### I'm having trouble with the redirect URI.
 

@@ -47,8 +47,8 @@ func (m *RethinkManager) AddKeySet(set string, keys *jose.JsonWebKeySet) error {
 }
 
 func (m *RethinkManager) GetKey(set, kid string) (*jose.JsonWebKeySet, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.RLock()
+	defer m.RUnlock()
 
 	m.alloc()
 	keys, found := m.Keys[set]
@@ -67,8 +67,8 @@ func (m *RethinkManager) GetKey(set, kid string) (*jose.JsonWebKeySet, error) {
 }
 
 func (m *RethinkManager) GetKeySet(set string) (*jose.JsonWebKeySet, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.RLock()
+	defer m.RUnlock()
 
 	m.alloc()
 	keys, found := m.Keys[set]

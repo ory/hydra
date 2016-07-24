@@ -33,8 +33,8 @@ func (m *MemoryManager) AddKeySet(set string, keys *jose.JsonWebKeySet) error {
 }
 
 func (m *MemoryManager) GetKey(set, kid string) (*jose.JsonWebKeySet, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.RLock()
+	defer m.RUnlock()
 
 	m.alloc()
 	keys, found := m.Keys[set]
@@ -53,8 +53,8 @@ func (m *MemoryManager) GetKey(set, kid string) (*jose.JsonWebKeySet, error) {
 }
 
 func (m *MemoryManager) GetKeySet(set string) (*jose.JsonWebKeySet, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.RLock()
+	defer m.RUnlock()
 
 	m.alloc()
 	keys, found := m.Keys[set]

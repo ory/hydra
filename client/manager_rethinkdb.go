@@ -24,8 +24,8 @@ type RethinkManager struct {
 }
 
 func (m *RethinkManager) GetClient(id string) (fosite.Client, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.RLock()
+	defer m.RUnlock()
 
 	c, ok := m.Clients[id]
 	if !ok {
@@ -35,8 +35,8 @@ func (m *RethinkManager) GetClient(id string) (fosite.Client, error) {
 }
 
 func (m *RethinkManager) Authenticate(id string, secret []byte) (*Client, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.RLock()
+	defer m.RUnlock()
 
 	c, ok := m.Clients[id]
 	if !ok {
@@ -77,8 +77,8 @@ func (m *RethinkManager) DeleteClient(id string) error {
 }
 
 func (m *RethinkManager) GetClients() (clients map[string]Client, err error) {
-	m.Lock()
-	defer m.Unlock()
+	m.RLock()
+	defer m.RUnlock()
 	clients = make(map[string]Client)
 	for _, c := range m.Clients {
 		clients[c.ID] = c

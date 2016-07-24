@@ -38,8 +38,8 @@ func (m *RethinkManager) Delete(id string) error {
 }
 
 func (m *RethinkManager) Get(id string) (*Connection, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.RLock()
+	defer m.RUnlock()
 
 	c, ok := m.Connections[id]
 	if !ok {
@@ -49,8 +49,8 @@ func (m *RethinkManager) Get(id string) (*Connection, error) {
 }
 
 func (m *RethinkManager) FindAllByLocalSubject(subject string) ([]Connection, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.RLock()
+	defer m.RUnlock()
 
 	var cs []Connection
 	for _, c := range m.Connections {
@@ -62,8 +62,8 @@ func (m *RethinkManager) FindAllByLocalSubject(subject string) ([]Connection, er
 }
 
 func (m *RethinkManager) FindByRemoteSubject(provider, subject string) (*Connection, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.RLock()
+	defer m.RUnlock()
 
 	for _, c := range m.Connections {
 		if c.GetProvider() == provider && c.GetRemoteSubject() == subject {

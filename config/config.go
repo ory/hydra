@@ -38,11 +38,11 @@ type Config struct {
 
 	SystemSecret []byte `mapstructure:"system_secret" yaml:"-"`
 
-	DatabaseURL string `mapstructure:"database_url" yaml:"database_url,omitempty"`
+	DatabaseURL string `mapstructure:"database_url" yaml:"-"`
 
-	ConsentURL string `mapstructure:"consent_url" yaml:"consent_url,omitempty"`
+	ConsentURL string `mapstructure:"consent_url" yaml:"-"`
 
-	ClusterURL string `mapstructure:"cluster_url" yaml:"cluster_url,omitempty"`
+	ClusterURL string `mapstructure:"cluster_url" yaml:"-"`
 
 	ClientID string `mapstructure:"client_id" yaml:"client_id,omitempty"`
 
@@ -52,16 +52,16 @@ type Config struct {
 
 	Dry *bool `mapstructure:"-" yaml:"-"`
 
-	AccessTokenLifespan time.Duration
-	AuthCodeLifespan    time.Duration
+	AccessTokenLifespan time.Duration `yaml:"-"`
+	AuthCodeLifespan    time.Duration `yaml:"-"`
 
-	cluster *url.URL
+	cluster *url.URL `yaml:"-"`
 
-	oauth2Client *http.Client
+	oauth2Client *http.Client `yaml:"-"`
 
-	context *Context
+	context *Context `yaml:"-"`
 
-	sync.Mutex
+	sync.Mutex `yaml:"-"`
 }
 
 func (c *Config) GetAccessTokenLifespan() time.Duration {

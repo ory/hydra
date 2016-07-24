@@ -217,9 +217,6 @@ func (s *FositeRehinkDBStore) PersistRefreshTokenGrantSession(ctx context.Contex
 }
 
 func (m *FositeRehinkDBStore) Watch(ctx context.Context) {
-	m.Lock()
-	defer m.Unlock()
-	ctx.Done()
 	m.AccessTokens.watch(ctx, m.Session, m.RWMutex, m.AccessTokensTable)
 	m.AuthorizeCodes.watch(ctx, m.Session, m.RWMutex, m.AuthorizeCodesTable)
 	m.IDSessions.watch(ctx, m.Session, m.RWMutex, m.IDSessionsTable)

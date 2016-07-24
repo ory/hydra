@@ -13,6 +13,7 @@ import (
 	"github.com/square/go-jose"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
+	"fmt"
 )
 
 type RethinkManager struct {
@@ -239,7 +240,7 @@ func (m *RethinkManager) ColdStart() error {
 	for clients.Next(&raw) {
 		pt, err := m.Cipher.Decrypt(raw.Key)
 		if err != nil {
-			return errors.New(err)
+			return errors.New(fmt.Sprintf("Could not decrypt JSON Web Keys because: %s. This usually happens when a wrong system secret is being used", err.Error()))
 		}
 
 		if err := json.Unmarshal(pt, &key); err != nil {

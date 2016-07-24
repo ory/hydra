@@ -1,5 +1,5 @@
 hash: 175acff756341dd7fa75a3e1e2e1a042a957a1b2482f017ae0bb38a2e8b9c625
-updated: 2016-07-23T10:14:01.1957815+02:00
+updated: 2016-07-24T16:54:50.0589572+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 593d64559f7600f29581a3ee42177f5dbded27a9
@@ -72,11 +72,11 @@ imports:
   - token/jwt
   - rand
 - name: github.com/ory-am/ladon
-  version: 63d3e27a44b7e60f0cfd8a38231ccbe13c74aee7
+  version: 940d26e2cc46679ee472225e84ca353ff0fdb43e
 - name: github.com/pborman/uuid
   version: c55201b036063326c5b1b89ccfe45a184973d073
 - name: github.com/pkg/errors
-  version: cc5fbb72d9b1b5f664ff3c11ed7896ee23ad9276
+  version: 1d2e60385a13aaa66134984235061c2f9302520e
 - name: github.com/pkg/profile
   version: 7b053ad66e2a49baca9cc97b982dcea0e182bda4
 - name: github.com/pmezard/go-difflib

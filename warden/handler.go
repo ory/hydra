@@ -45,8 +45,8 @@ type WardenResponse struct {
 }
 
 type WardenAuthorizedRequest struct {
-	Scopes    []string `json:"scopes"`
-	Assertion string   `json:"assertion"`
+	Scopes []string `json:"scopes"`
+	Token  string   `json:"token"`
 }
 
 type WardenAccessRequest struct {
@@ -74,7 +74,7 @@ func (h *WardenHandler) Authorized(w http.ResponseWriter, r *http.Request, _ htt
 	}
 	defer r.Body.Close()
 
-	authContext, err := h.Warden.Authorized(ctx, ar.Assertion, ar.Scopes...)
+	authContext, err := h.Warden.Authorized(ctx, ar.Token, ar.Scopes...)
 	if err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
@@ -99,7 +99,7 @@ func (h *WardenHandler) Allowed(w http.ResponseWriter, r *http.Request, _ httpro
 		return
 	}
 
-	authContext, err := h.Warden.ActionAllowed(ctx, ar.Assertion, ar.Request, ar.Scopes...)
+	authContext, err := h.Warden.ActionAllowed(ctx, ar.Token, ar.Request, ar.Scopes...)
 	if err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return

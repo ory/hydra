@@ -30,7 +30,7 @@ func (w *HTTPWarden) ActionAllowed(ctx context.Context, token string, a *ladon.R
 	return w.doRequest(AllowedHandlerPath, &WardenAccessRequest{
 		Request: a,
 		WardenAuthorizedRequest: &WardenAuthorizedRequest{
-			Assertion: token,
+			Token: token,
 			Scopes:    scopes,
 		},
 	})
@@ -47,7 +47,7 @@ func (w *HTTPWarden) HTTPActionAllowed(ctx context.Context, r *http.Request, a *
 
 func (w *HTTPWarden) Authorized(ctx context.Context, token string, scopes ...string) (*Context, error) {
 	return w.doRequest(AuthorizedHandlerPath, &WardenAuthorizedRequest{
-		Assertion: token,
+		Token: token,
 		Scopes:    scopes,
 	})
 }

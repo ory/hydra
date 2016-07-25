@@ -22,8 +22,8 @@ Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://git
 **Table of Contents**
 
 - [What is Hydra?](#what-is-hydra)
-- [Quickstart](#quickstart)
 - [Feature Overview](#feature-overview)
+- [Quickstart](#quickstart)
   - [Installation](#installation)
     - [Server](#server)
       - [Downloading an image from the Hub](#downloading-an-image-from-the-hub)
@@ -88,13 +88,6 @@ Read throughput:                   3678587 bytes/sec
 Write throughput:                   807390 bytes/sec
 ```
 
-## Quickstart
-
-This section is a quickstart guide to working with Hydra. In-depth docs are available as well:
-
-* The documentation is available on [GitBook](https://ory-am.gitbooks.io/hydra/content/).
-* The REST API documentation is available at [Apiary](http://docs.hdyra.apiary.io).
-
 ## Feature Overview
 
 1. **Availability:** Hydra uses pub/sub to have the latest data available in memory. The in-memory architecture allows for heavy duty workloads.
@@ -112,6 +105,13 @@ Hydra is packaged using [Docker](https://hub.docker.com/r/oryam/hydra/).
 7. **Professional:** Hydra implements peer reviewed open standards published by [The Internet Engineering Task Force (IETF®)](https://www.ietf.org/) and the [OpenID Foundation](https://openid.net/)
 and under supervision of the [LMU Teaching and Research Unit Programming and Modelling Languages](http://www.en.pms.ifi.lmu.de). No funny business.
 8.  <img src="dist/monitoring.gif" width="45%" align="right"> **Real Time:** Operation is a lot easier with real time monitoring. Because Hydra leverages RethinkDB, you get real time monitoring for free.
+
+## Quickstart
+
+This section is a quickstart guide to working with Hydra. In-depth docs are available as well:
+
+* The documentation is available on [GitBook](https://ory-am.gitbooks.io/hydra/content/).
+* The REST API documentation is available at [Apiary](http://docs.hdyra.apiary.io).
 
 ### Installation
 

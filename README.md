@@ -45,6 +45,7 @@ Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://git
   - [I want to disable HTTPS for testing](#i-want-to-disable-https-for-testing)
   - [Can I set the log level to warn, error, debug, ...?](#can-i-set-the-log-level-to-warn-error-debug-)
   - [I need to use a custom CA for RethinkDB](#i-need-to-use-a-custom-ca-for-rethinkdb)
+  - [What will happen if an error occurs during an OAuth2 flow?](#what-will-happen-if-an-error-occurs-during-an-oauth2-flow)
   - [Is there a client library / SDK?](#is-there-a-client-library--sdk)
 - [Hall of Fame](#hall-of-fame)
 
@@ -457,6 +458,11 @@ or via command line flag:
 ```
 --rethink-tls-cert-path string   Path to the certificate file to connect to rethinkdb over TLS (https). You can set RETHINK_TLS_CERT_PATH or RETHINK_TLS_CERT instead.
 ```
+
+### What will happen if an error occurs during an OAuth2 flow?
+
+The user agent will either, according to spec, be redirected to the OAuth2 client who initiated the request, if possible. If not, the user agent will be redirected to the identity provider
+endpoint and an `error` and `error_description` query parameter will be appended to it's URL.
 
 ### Is there a client library / SDK?
 

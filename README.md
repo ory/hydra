@@ -60,28 +60,9 @@ Access Control, OAuth2, and OpenID Connect layer** that integrates with every id
 Hydra is available through [Docker](https://hub.docker.com/r/oryam/hydra/) and relies on RethinkDB for persistence.
 Database drivers are extensible in case you want to use RabbitMQ, MySQL, MongoDB, or some other database instead.
 
-Hydra is built for high throughput environments. Check out the benchmark below running 10.000 simultaneous connections
-on different endpoints using a Macbook Pro Late 2013, connected to RethinkDB. There is no caching involved.
-
-```
-# Validate access tokens
-$ gobench  -u "http://localhost:4444/warden/authorized" -c 10000 -t 100 -auth "bearer ..." -d "./warden-authorized.txt"
-Successful requests rate:            37508 hits/sec
-Read throughput:                  12077688 bytes/sec
-Write throughput:                 14646568 bytes/sec
-
-# Validate access tokens and check policies
-$ gobench -u "http://localhost:4444/warden/allowed" -c 10000 -t 100 -auth "bearer ..." -d "./warden-allowed.txt"
-Successful requests rate:             4719 hits/sec
-Read throughput:                   1529742 bytes/sec
-Write throughput:                  2147564 bytes/sec
-
-# Retrieve a JSON Web Key Set
-$ gobench -u "http://localhost:4444/keys/hydra.tls" -c 10000 -t 5 -auth "bearer ..."
-Successful requests rate:             3674 hits/sec
-Read throughput:                   3678587 bytes/sec
-Write throughput:                   807390 bytes/sec
-```
+Hydra is built for high throughput environments. Using 10.000 simultaneous connections on a Macbook Pro Late 2013,
+the OAuth2 token validation endpoint served on average **37500 requests / sec**. Other endpoints like the JSON Web Key endpoint
+serve up to 4700 requests / sec. Read [this issue](https://github.com/ory-am/hydra/issues/161) for information on reproducing these benchmarks yourself.
 
 ## Feature Overview
 

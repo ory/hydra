@@ -25,6 +25,7 @@ Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://git
 - [Feature Overview](#feature-overview)
 - [Quickstart](#quickstart)
   - [Installation](#installation)
+    - [Download binaries](#download-binaries)
     - [Using Docker](#using-docker)
     - [Building from source](#building-from-source)
   - [5 minutes tutorial: Run your very own OAuth2 environment](#5-minutes-tutorial-run-your-very-own-oauth2-environment)
@@ -94,6 +95,10 @@ This section is a quickstart guide to working with Hydra. In-depth docs are avai
 * The REST API documentation is available at [Apiary](http://docs.hdyra.apiary.io).
 
 ### Installation
+
+There are various ways of installing hydra on your system.
+
+#### Download binaries
 
 The client and server **binaries are downloadable at [releases](https://github.com/ory-am/hydra/releases)**.
 There is currently no installer available. You have to add the hydra binary to the PATH environment variable yourself or put

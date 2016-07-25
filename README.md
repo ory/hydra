@@ -26,10 +26,7 @@ Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://git
 - [Quickstart](#quickstart)
   - [Installation](#installation)
     - [Server](#server)
-      - [Downloading an image from the Hub](#downloading-an-image-from-the-hub)
-      - [Build a docker image from the source](#build-a-docker-image-from-the-source)
     - [Client](#client)
-      - [Using gopack](#using-gopack)
       - [Building from the source](#building-from-the-source)
       - [From the Docker container (not recommended):](#from-the-docker-container-not-recommended)
   - [Run the example](#run-the-example)
@@ -121,68 +118,17 @@ This section is a quickstart guide to working with Hydra. In-depth docs are avai
 Read how to install docker on [Linux](https://docs.docker.com/linux/), [OSX](https://docs.docker.com/mac/) or
 [Windows](https://docs.docker.com/windows/). Hydra is available on [Docker Hub](https://hub.docker.com/r/oryam/hydra/).
 
-##### Downloading an image from the Hub
+You can use Hydra without a database, but be aware that restarting, scaling
+or stopping the container will **lose all data**:
 
-Hydra will keep all changes in memory. But be aware: Restarting, scaling
-or stopping the container will make you **lose all data**.
-
-To download and start the image:
 ```
 $ docker run -d -p 4444:4444 oryam/hydra --name my-hydra
 ec91228cb105db315553499c81918258f52cee9636ea2a4821bdb8226872f54b
 ```
 
-##### Build a docker image from the source
-
-Install the [CLI and Docker Toolbox](#installation). Make sure you install Docker Compose. On OSX and Windows,
-open the Docker Quickstart Terminal. On Linux, open any terminal.
-
-We will use a dummy password as the system secret: `SYSTEM_SECRET=passwordtutorialpasswordtutorial`. Use a very secure secret in production.
-
-**On OSX and Windows** using the Docker Quickstart Terminal:
-```
-$ go get github.com/ory-am/hydra
-$ cd $GOPATH/src/github.com/ory-am/hydra
-$ DOCKER_IP=$(docker-machine ip default) docker-compose build
-WARNING: The SYSTEM_SECRET variable is not set. Defaulting to a blank string.
-rethinkdb uses an image, skipping
-Building hydra
-[...]
-$ SYSTEM_SECRET=passwordtutorial DOCKER_IP=$(docker-machine ip default) docker-compose up
-Starting hydra_rethinkdb_1
-Recreating hydra_hydra_1
-Recreating hydra_consent_1
-Attaching to hydra_rethinkdb_1, hydra_hydra_1, hydra_consent_1
-[...]
-```
-
-**On Linux:**
-```
-$ go get github.com/ory-am/hydra
-$ cd $GOPATH/src/github.com/ory-am/hydra
-$ DOCKER_IP=localhost docker-compose build
-WARNING: The SYSTEM_SECRET variable is not set. Defaulting to a blank string.
-rethinkdb uses an image, skipping
-Building hydra
-[...]
-$ SYSTEM_SECRET=passwordtutorial DOCKER_IP=localhost docker-compose up
-Starting hydra_rethinkdb_1
-Recreating hydra_hydra_1
-Recreating hydra_consent_1
-Attaching to hydra_rethinkdb_1, hydra_hydra_1, hydra_consent_1
-[...]
-mhydra   | mtime="2016-05-17T18:09:28Z" level=warning msg="Generated system secret: MnjFP5eLIr60h?hLI1h-!<4(TlWjAHX7"
-[...]
-mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="Temporary root client created."
-mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="client_id: d9227bd5-5d47-4557-957d-2fd3bee11035"
-mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="client_secret: ,IvxGt02uNjv1ur9"
-[...]
-```
 #### Client
 
-##### Using gopack
-
-**The CLI client is available at [gobuild.io](https://gobuild.io/ory-am/hydra)**.
+**The CLI client is available for download at [gobuild.io](https://gobuild.io/ory-am/hydra)**.
 
 There is currently no installer which adds the CLI to your path automatically. You have to set up the path yourself.
 If you do not understand what that means, ask on our [Gitter channel](https://gitter.im/ory-am/hydra).
@@ -190,7 +136,7 @@ If you do not understand what that means, ask on our [Gitter channel](https://gi
 ##### Building from the source
 
 If you wish to compile the CLI yourself, you need to install and set up [Go](https://golang.org/) and add `$GOPATH/bin`
-to your `$PATH`. Here is a [comprehensive Go installation guide](https://github.com/ory-am/workshop-dbg#googles-go-language) with screenshots.
+to your `$PATH`.
 
 To install the CLI from source, execute:
 
@@ -202,6 +148,7 @@ glide install
 go install github.com/ory-am/hydra
 hydra
 ```
+
 ##### From the Docker container (not recommended):
 
 ```
@@ -219,7 +166,41 @@ Usage:
 
 ### Run the example
 
-<img alt="Running the example" align="right" width="50%" src="dist/run-the-example.gif">
+<img alt="Running the example" align="right" width="35%" src="dist/run-the-example.gif">
+
+Install the [CLI and Docker Toolbox](#installation). Make sure you install Docker Compose. On OSX and Windows,
+open the Docker Quickstart Terminal. On Linux, open any terminal.
+
+We will use a dummy password as the system secret: `SYSTEM_SECRET=passwordtutorialpasswordtutorial`. Use a very secure secret in production.
+
+**On OSX and Windows** using the Docker Quickstart Terminal:
+```
+$ go get github.com/ory-am/hydra
+$ cd $GOPATH/src/github.com/ory-am/hydra
+$ docker-compose build
+Building hydra
+[...]
+$ SYSTEM_SECRET=passwordtutorial DOCKER_IP=$(docker-machine ip default) docker-compose up
+Starting hydra_hydra_1
+[...]
+```
+
+**On Linux:**
+```
+$ go get github.com/ory-am/hydra
+$ cd $GOPATH/src/github.com/ory-am/hydra
+$ docker-compose build
+Building hydra
+[...]
+$ SYSTEM_SECRET=passwordtutorial DOCKER_IP=localhost docker-compose up
+Starting hydra_rethinkdb_1
+[...]
+mhydra   | mtime="2016-05-17T18:09:28Z" level=warning msg="Generated system secret: MnjFP5eLIr60h?hLI1h-!<4(TlWjAHX7"
+[...]
+mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="client_id: d9227bd5-5d47-4557-957d-2fd3bee11035"
+mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="client_secret: ,IvxGt02uNjv1ur9"
+[...]
+```
 
 You now have a running hydra docker container! Additionally, a RethinkDB image was deployed as well as a consent app.
 
@@ -244,6 +225,8 @@ the logs, set the required parameters, or replace the credentials with other one
 
 Now you know which credentials you need to use. Next, we log in.
 
+<img src="dist/oauth2-flow.gif" alt="OAuth2 Flow" align="left" width="35%">
+
 **Note:** If you are using docker toolbox, please use the IP address provided by `docker-machine ip default` as the cluster URL host.
 
 ```
@@ -258,7 +241,6 @@ Great! You are now connected to Hydra and can start by creating a new client:
 
 ```
 $ hydra clients create --skip-tls-verify
-Warning: Skipping TLS Certificate Verification.
 Client ID: c003830f-a090-4721-9463-92424270ce91
 Client Secret: Z2pJ0>Tp7.ggn>EE&rhnOzdt1
 ```
@@ -270,7 +252,6 @@ Why not issue an access token for your client?
 
 ```
 $ hydra token client --skip-tls-verify
-Warning: Skipping TLS Certificate Verification.
 JLbnRS9GQmzUBT4x7ESNw0kj2wc0ffbMwOv3QQZW4eI.qkP-IQXn6guoFew8TvaMFUD-SnAyT8GmWuqGi3wuWXg
 ```
 
@@ -278,13 +259,10 @@ Let's try this with the authorize code grant!
 
 ```
 $ hydra token user --skip-tls-verify
-Warning: Skipping TLS Certificate Verification.
-If your browser does not open automatically, navigate to: https://192.168.99.100:4444/oauth2/auth?client_id=d9227bd5-5d47-4557-957d-2fd3bee11035&response_type=code&scope=core+hydra&state=sbnwdelqzxyedwtqinxnolbr&nonce=sffievieeesltbjkwxyhycyq
+If your browser does not open automatically, navigate to: https://192.168.99.100:4444/oauth2/...
 Setting up callback listener on http://localhost:4445/callback
 Press ctrl + c on Linux / Windows or cmd + c on OSX to end the process.
 ```
-
-<img src="dist/oauth2-flow.gif" alt="OAuth2 Flow" align="left" width="50%">
 
 Great! You installed hydra, connected the CLI, created a client and completed two authentication flows!
 Your next stop should be the [Guide](#guide).

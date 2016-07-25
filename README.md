@@ -95,7 +95,7 @@ This section is a quickstart guide to working with Hydra. In-depth docs are avai
 
 ### Installation
 
-The client and server binaries are available for download through the [releases tab](https://github.com/ory-am/hydra/releases).
+The client and server **binaries are downloadable at [releases](https://github.com/ory-am/hydra/releases)**.
 
 There is currently no installer available. You have to add the hydra binary to the PATH environment variable yourself or put
 the binary in a location that is already in your path (`/usr/bin`, ...).

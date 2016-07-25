@@ -37,6 +37,7 @@ Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://git
 - [FAQ](#faq)
   - [What is OAuth2 and what is OpenID Connect?](#what-is-oauth2-and-what-is-openid-connect)
   - [Can I use Hydra in my new or existing app?](#can-i-use-hydra-in-my-new-or-existing-app)
+  - [Should I use OAuth2 tokens for authentication?](#should-i-use-oauth2-tokens-for-authentication)
   - [I'm having trouble with the redirect URI.](#im-having-trouble-with-the-redirect-uri)
   - [How can I validate tokens?](#how-can-i-validate-tokens)
   - [How can I import TLS certificates?](#how-can-i-import-tls-certificates)
@@ -385,6 +386,16 @@ and issues an OAuth2 access token and optionally a refresh or OpenID token.
 Every time a request containing an access token hits a resource server (todo24.com/lists/manage), you make a request to Hydra asking who the token's
 subject (the user who authorized the client to create a token on its behalf) is and whether the token is valid or not. You may optionally
 ask if the token has permission to perform a certain action.
+
+### Should I use OAuth2 tokens for authentication?
+
+OAuth2 tokens are like money. It allows you to buy stuff, but the cashier does not really care if the money is
+yours or if you stole it, as long as it's valid money. Depending on what you understand as authentication, this is a yes and no answer:
+
+* **Yes:** You can use access tokens to find out which user ("subject") is performing an action in a resource provider (blog article service, shopping basket, ...).
+Coming back to the money example: *You*, the subject, receives a cappuccino from the vendor (resource provider) in exchange for money (access token).
+* **No:** Never use access tokens for logging people in, for example `http://myapp.com/login?access_token=...`.
+Coming back to the money example: The police officer ("authentication server") will not accept money ("access token") as a proof of identity ("it's really you"). Unless he is corrupt ("vulnerable"), of course.
 
 ### I'm having trouble with the redirect URI.
 

@@ -40,6 +40,7 @@ Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://git
   - [CLI Documentation](#cli-documentation)
   - [Develop](#develop)
 - [FAQ](#faq)
+  - [What is OAuth2 and what is OpenID Connect?](#what-is-oauth2-and-what-is-openid-connect)
   - [Can I use Hydra in my new or existing app?](#can-i-use-hydra-in-my-new-or-existing-app)
   - [I'm having trouble with the redirect URI.](#im-having-trouble-with-the-redirect-uri)
   - [How can I validate tokens?](#how-can-i-validate-tokens)
@@ -385,6 +386,11 @@ DATABASE_URL=rethinkdb://$(docker-machine ip default):28015/hydra go run main.go
 ```
 
 ## FAQ
+
+### What is OAuth2 and what is OpenID Connect?
+
+* For OAuth2 explanation, I recommend reading the [Dropbox OAuth2 Guide](https://www.dropbox.com/developers/reference/oauth-guide)
+* For OpenID, I recommend reading [OpenID Connect explained](http://connect2id.com/learn/openid-connect)
 
 ### Can I use Hydra in my new or existing app?
 

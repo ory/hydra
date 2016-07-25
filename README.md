@@ -115,7 +115,14 @@ This section is a quickstart guide to working with Hydra. In-depth docs are avai
 
 ### Installation
 
-#### Server
+The client and server binaries are available for download through the [releases tab](https://github.com/ory-am/hydra/releases).
+
+There is currently no installer available. You have to add the hydra binary to the PATH environment variable yourself or put
+the binary in a location that is already in your path (`/usr/bin`, ...).
+
+If you do not understand what that all of this means, ask in our [chat channel](https://gitter.im/ory-am/hydra). We are happy to help.
+
+#### Using Docker
 
 **Starting the host** is easiest with docker. The host process handles HTTP requests and is backed by a database.
 Read how to install docker on [Linux](https://docs.docker.com/linux/), [OSX](https://docs.docker.com/mac/) or
@@ -129,19 +136,23 @@ $ docker run -d -p 4444:4444 oryam/hydra --name my-hydra
 ec91228cb105db315553499c81918258f52cee9636ea2a4821bdb8226872f54b
 ```
 
-#### Client
+**Using the client command line interface:** You can ssh into the hydra container
+and execute the hydra command from there:
 
-**The CLI client is available for download at [gobuild.io](https://gobuild.io/ory-am/hydra)**.
+```
+$ docker exec -i -t <hydra-container-id> /bin/bash
+# e.g. docker exec -i -t ec91228 /bin/bash
 
-There is currently no installer which adds the CLI to your path automatically. You have to set up the path yourself.
-If you do not understand what that means, ask on our [Gitter channel](https://gitter.im/ory-am/hydra).
+root@ec91228cb105:/go/src/github.com/ory-am/hydra# hydra
+Hydra is a twelve factor OAuth2 and OpenID Connect provider
 
-##### Building from the source
+[...]
+```
 
-If you wish to compile the CLI yourself, you need to install and set up [Go](https://golang.org/) and add `$GOPATH/bin`
-to your `$PATH`.
+#### Building from source
 
-To install the CLI from source, execute:
+If you wish to compile hydra yourself, you need to install and set up [Go](https://golang.org/) and add `$GOPATH/bin`
+to your `$PATH`. To do so, run the following commands in a shell (bash, sh, cmd.exe, ...):
 
 ```
 go get github.com/ory-am/hydra
@@ -152,22 +163,12 @@ go install github.com/ory-am/hydra
 hydra
 ```
 
-##### From the Docker container (not recommended):
+### 5 minutes tutorial: Run your very own OAuth2 environment
 
-```
-$ docker exec -i -t <hydra-container-id> /bin/bash
-# e.g. docker exec -i -t ec12 /bin/bash
+In this example, you will set up Hydra, a RethinkDB instance and an exemplary identity provider written in React using docker compose.
+It will take you about 5 minutes to get complete this tutorial.
 
-root@ec91228cb105:/go/src/github.com/ory-am/hydra# hydra
-Hydra is a twelve factor OAuth2 and OpenID Connect provider
-
-Usage:
-  hydra [command]
-
-[...]
-```
-
-### Run the example
+<img src="dist/oauth2-flow.gif" alt="OAuth2 Flow">
 
 <img alt="Running the example" align="right" width="35%" src="dist/run-the-example.gif">
 
@@ -227,8 +228,6 @@ time="2016-05-15T14:56:34Z" level=warning msg="Generated system secret: (.UL_&77
 the logs, set the required parameters, or replace the credentials with other ones.
 
 Now you know which credentials you need to use. Next, we log in.
-
-<img src="dist/oauth2-flow.gif" alt="OAuth2 Flow" align="left" width="35%">
 
 **Note:** If you are using docker toolbox, please use the IP address provided by `docker-machine ip default` as the cluster URL host.
 

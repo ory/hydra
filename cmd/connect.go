@@ -15,13 +15,21 @@ var connectCmd = &cobra.Command{
 	Use:   "connect",
 	Short: "Connect with a cluster",
 	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("To keep the current value, press enter.")
+
 		if u := input("Cluster URL [" + c.ClusterURL + "]: "); u != "" {
 			c.ClusterURL = u
 		}
-		if u := input("Client ID: "); u != "" {
+		if u := input("Client ID [" + c.ClientID + "]: "); u != "" {
 			c.ClientID = u
 		}
-		if u := input("Client Secret: "); u != "" {
+
+		secret := "*********"
+		if c.ClientSecret == "" {
+			secret = "empty"
+		}
+
+		if u := input("Client Secret [" + secret + "]: "); u != "" {
 			c.ClientSecret = u
 		}
 

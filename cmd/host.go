@@ -43,6 +43,11 @@ This command supports the following environment variables:
 - SYSTEM_SECRET: A secret that is at least 16 characters long. If none is provided, one will be generated. They key
 	is used to encrypt sensitive data using AES-GCM (256 bit) and validate HMAC signatures.
 
+- FORCE_ROOT_CLIENT_CREDENTIALS: On first start up, Hydra generates a root client with random id and secret. Use
+	this environment variable in the form of "FORCE_ROOT_CLIENT_CREDENTIALS=id:secret" to set
+	the client id and secret yourself.
+
+
 - HTTPS_TLS_CERT_PATH: The path to the TLS certificate (pem encoded).
 - HTTPS_TLS_KEY_PATH: The path to the TLS private key (pem encoded).
 - HTTPS_TLS_CERT: A pem encoded TLS certificate passed as string. Can be used instead of HTTPS_TLS_CERT_PATH.

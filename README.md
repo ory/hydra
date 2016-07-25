@@ -39,7 +39,7 @@ Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://git
   - [What is OAuth2 and what is OpenID Connect?](#what-is-oauth2-and-what-is-openid-connect)
   - [Should I use OAuth2 tokens for authentication?](#should-i-use-oauth2-tokens-for-authentication)
   - [Can I use Hydra in my new or existing app?](#can-i-use-hydra-in-my-new-or-existing-app)
-  - [I'm having trouble with the redirect URI.](#im-having-trouble-with-the-redirect-uri)
+  - [I'm having trouble with the redirect URI](#im-having-trouble-with-the-redirect-uri)
   - [How can I validate tokens?](#how-can-i-validate-tokens)
   - [How can I import TLS certificates?](#how-can-i-import-tls-certificates)
   - [I want to disable HTTPS for testing](#i-want-to-disable-https-for-testing)
@@ -402,7 +402,7 @@ Every time a request containing an access token hits a resource server (todo24.c
 subject (the user who authorized the client to create a token on its behalf) is and whether the token is valid or not. You may optionally
 ask if the token has permission to perform a certain action.
 
-### I'm having trouble with the redirect URI.
+### I'm having trouble with the redirect URI
 
 Hydra enforces HTTPS for all hosts except localhost. Also make sure that the path is an exact match. `http://localhost:123/`
 is not the same as `http://localhost:123`.

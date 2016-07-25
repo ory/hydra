@@ -14,11 +14,12 @@ import (
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
+	"github.com/ory-am/hydra/pkg/helper"
 )
 
 type HTTPWarden struct {
-	Client *http.Client
-
+	Client   *http.Client
+	Dry      bool
 	Endpoint *url.URL
 }
 
@@ -61,6 +62,10 @@ func (w *HTTPWarden) HTTPAuthorized(ctx context.Context, r *http.Request, scopes
 	return w.Authorized(ctx, token, scopes...)
 }
 
+func (w *HTTPWarden) doDry(req *http.Request) error {
+	return helper.DoDryRequest(w.Dry, req)
+}
+
 func (w *HTTPWarden) doRequest(path string, request interface{}) (*Context, error) {
 	out, err := json.Marshal(request)
 	if err != nil {
@@ -76,6 +81,10 @@ func (w *HTTPWarden) doRequest(path string, request interface{}) (*Context, erro
 	}
 
 	req.Header.Set("Content-Type", "application/json")
+	if err := w.doDry(req); err != nil {
+		return nil, err
+	}
+
 	resp, err := w.Client.Do(req)
 	if err != nil {
 		return nil, errors.New(err)

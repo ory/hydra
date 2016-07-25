@@ -4,12 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
-
 	"io/ioutil"
 
 	"github.com/go-errors/errors"
-	"github.com/moul/http2curl"
-	"github.com/spf13/viper"
+	"github.com/ory-am/hydra/pkg/helper"
 )
 
 type SuperAgent struct {
@@ -22,20 +20,11 @@ func NewSuperAgent(rawurl string) *SuperAgent {
 	return &SuperAgent{
 		URL:    rawurl,
 		Client: http.DefaultClient,
-		Dry:    viper.GetBool("dry"),
 	}
 }
 
 func (s *SuperAgent) doDry(req *http.Request) error {
-	if s.Dry {
-		command, err := http2curl.GetCurlCommand(req)
-		if err != nil {
-			return errors.New(err)
-		}
-
-		return errors.Errorf("Because you are using the dry option, the request will not be executed. You can execute this command using: \n\n%s", command)
-	}
-	return nil
+	return helper.DoDryRequest(s.Dry, req)
 }
 
 func (s *SuperAgent) Delete() error {

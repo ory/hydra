@@ -26,12 +26,9 @@ var clientsCmd = &cobra.Command{
 }
 
 func init() {
-	var dry bool
-	c.Dry = &dry
-
 	RootCmd.AddCommand(clientsCmd)
+	clientsCmd.PersistentFlags().Bool("dry", false, "do not execute the command but show the corresponding curl command instead")
 
-	clientsCmd.PersistentFlags().BoolVar(c.Dry, "dry", false, "do not execute the command but show the corresponding curl command instead")
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
@@ -41,5 +38,4 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// clientsCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
 }

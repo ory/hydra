@@ -30,11 +30,19 @@ import (
 )
 
 type Config struct {
-	BindPort int `mapstructure:"port" yaml:"port,omitempty"`
+	// These are used by client commands
+	ClusterURL string `mapstructure:"cluster_url" yaml:"cluster_url"`
 
-	BindHost string `mapstructure:"host" yaml:"host,omitempty"`
+	ClientID string `mapstructure:"client_id" yaml:"client_id,omitempty"`
 
-	Issuer string `mapstructure:"issuer" yaml:"issuer,omitempty"`
+	ClientSecret string `mapstructure:"client_secret" yaml:"client_secret,omitempty"`
+
+	// These are used by the host command
+	BindPort int `mapstructure:"port" yaml:"-"`
+
+	BindHost string `mapstructure:"host" yaml:"-"`
+
+	Issuer string `mapstructure:"issuer" yaml:"-"`
 
 	SystemSecret []byte `mapstructure:"system_secret" yaml:"-"`
 
@@ -42,15 +50,9 @@ type Config struct {
 
 	ConsentURL string `mapstructure:"consent_url" yaml:"-"`
 
-	ClusterURL string `mapstructure:"cluster_url" yaml:"-"`
-
-	ClientID string `mapstructure:"client_id" yaml:"client_id,omitempty"`
-
-	ClientSecret string `mapstructure:"client_secret" yaml:"client_secret,omitempty"`
-
 	ForceHTTP bool `mapstructure:"foolishly_force_http" yaml:"-"`
 
-	Dry *bool `mapstructure:"-" yaml:"-"`
+	BCryptWorkFactor int `mapstructure:"bcrypt_work_factor" yaml:"-"`
 
 	AccessTokenLifespan time.Duration `yaml:"-"`
 	AuthCodeLifespan    time.Duration `yaml:"-"`
@@ -155,7 +157,7 @@ func (c *Config) Context() *Context {
 	c.context = &Context{
 		Connection: connection,
 		Hasher: &hash.BCrypt{
-			WorkFactor: 11,
+			WorkFactor: c.GetBCryptWorkFactor(),
 		},
 		LadonManager: manager,
 		FositeStrategy: &strategy.HMACSHAStrategy{
@@ -224,6 +226,14 @@ func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
 
 	c.oauth2Client = oauthConfig.Client(ctx)
 	return c.oauth2Client
+}
+
+func (c *Config) GetBCryptWorkFactor() int {
+	if c.BCryptWorkFactor > 0 {
+		return c.BCryptWorkFactor
+	}
+
+	return 10
 }
 
 func (c *Config) GetSystemSecret() []byte {

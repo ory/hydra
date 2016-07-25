@@ -24,6 +24,7 @@ func newWardenHandler(c *config.Config) *WardenHandler {
 }
 
 func (h *WardenHandler) IsAuthorized(cmd *cobra.Command, args []string) {
+	h.M.Dry, _ = cmd.Flags().GetBool("dry")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 	h.M.Endpoint = h.Config.Resolve("/connections")
 

@@ -23,7 +23,7 @@ func newConnectionHandler(c *config.Config) *ConnectionHandler {
 }
 
 func (h *ConnectionHandler) CreateConnection(cmd *cobra.Command, args []string) {
-	h.M.Dry = *h.Config.Dry
+	h.M.Dry, _ = cmd.Flags().GetBool("dry")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 	h.M.Endpoint = h.Config.Resolve("/connections")
 	if len(args) != 3 {
@@ -45,7 +45,7 @@ func (h *ConnectionHandler) CreateConnection(cmd *cobra.Command, args []string) 
 }
 
 func (h *ConnectionHandler) DeleteConnection(cmd *cobra.Command, args []string) {
-	h.M.Dry = *h.Config.Dry
+	h.M.Dry, _ = cmd.Flags().GetBool("dry")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 	h.M.Endpoint = h.Config.Resolve("/connections")
 	if len(args) == 0 {

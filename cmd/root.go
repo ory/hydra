@@ -80,7 +80,7 @@ func initConfig() {
 	}
 
 	if err := viper.Unmarshal(c); err != nil {
-		fatal("Could not read config because %s.", err)
+		fatal(fmt.Sprintf("Could not read config because %s.", err))
 	}
 
 	if consentURL, ok := viper.Get("CONSENT_URL").(string); ok {
@@ -104,7 +104,7 @@ func initConfig() {
 	}
 
 	if c.ClusterURL == "" {
-		fmt.Printf("Pointing cluster at %s\n", c.GetClusterURL())
+		_ = c.GetClusterURL()
 	}
 	mutex.Unlock()
 }

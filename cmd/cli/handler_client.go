@@ -24,7 +24,6 @@ func newClientHandler(c *config.Config) *ClientHandler {
 }
 
 func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
-	h.M.Dry = *h.Config.Dry
 	h.M.Endpoint = h.Config.Resolve("/clients")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 	if len(args) == 0 {
@@ -52,7 +51,7 @@ func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	var err error
 
-	h.M.Dry = *h.Config.Dry
+	h.M.Dry, _ = cmd.Flags().GetBool("dry")
 	h.M.Endpoint = h.Config.Resolve("/clients")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 
@@ -87,7 +86,6 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 }
 
 func (h *ClientHandler) DeleteClient(cmd *cobra.Command, args []string) {
-	h.M.Dry = *h.Config.Dry
 	h.M.Endpoint = h.Config.Resolve("/clients")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 	if len(args) == 0 {

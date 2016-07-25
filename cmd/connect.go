@@ -51,9 +51,5 @@ func input(message string) string {
 }
 
 func init() {
-	var dry bool
-	c.Dry = &dry
-
 	RootCmd.AddCommand(connectCmd)
-	connectCmd.PersistentFlags().BoolVar(c.Dry, "dry", false, "do not execute the command but show the corresponding curl command instead")
 }

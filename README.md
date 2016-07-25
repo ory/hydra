@@ -101,7 +101,8 @@ Hydra is packaged using [Docker](https://hub.docker.com/r/oryam/hydra/).
 6. **Open Source:** Hydra is licensed under Apache Version 2.0
 7. **Professional:** Hydra implements peer reviewed open standards published by [The Internet Engineering Task Force (IETF®)](https://www.ietf.org/) and the [OpenID Foundation](https://openid.net/)
 and under supervision of the [LMU Teaching and Research Unit Programming and Modelling Languages](http://www.en.pms.ifi.lmu.de). No funny business.
-8.  <img src="dist/monitoring.gif" width="25%" align="right"> **Real Time:** Operation is a lot easier with real time monitoring. Because Hydra leverages RethinkDB, you get real time monitoring for free.
+8.  <img src="dist/monitoring.gif" width="45%" align="right"> **Real Time:** Operation is a lot easier with real time. There are no caches,
+    no invalidation strategies and no magic - just simple, cloud native pub-sub. Hydra leverages RethinkDB, so check out their real time database monitoring too!
 
 <br clear="all">
 

@@ -46,6 +46,7 @@ Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://git
   - [Can I set the log level to warn, error, debug, ...?](#can-i-set-the-log-level-to-warn-error-debug-)
   - [I need to use a custom CA for RethinkDB](#i-need-to-use-a-custom-ca-for-rethinkdb)
   - [What will happen if an error occurs during an OAuth2 flow?](#what-will-happen-if-an-error-occurs-during-an-oauth2-flow)
+  - [Eventually consistent](#eventually-consistent)
   - [Is there a client library / SDK?](#is-there-a-client-library--sdk)
 - [Hall of Fame](#hall-of-fame)
 
@@ -463,6 +464,12 @@ or via command line flag:
 
 The user agent will either, according to spec, be redirected to the OAuth2 client who initiated the request, if possible. If not, the user agent will be redirected to the identity provider
 endpoint and an `error` and `error_description` query parameter will be appended to it's URL.
+
+### Eventually consistent
+
+Using hydra with RethinkDB implies eventual consistency on all endpoints, except `/oauth2/auth` and `/oauth2/token`.
+Eventual consistent data is usually not immediately available. This is dependent on the network latency between Hydra
+and RethinkDB.
 
 ### Is there a client library / SDK?
 

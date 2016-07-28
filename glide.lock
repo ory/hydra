@@ -1,5 +1,5 @@
 hash: 175acff756341dd7fa75a3e1e2e1a042a957a1b2482f017ae0bb38a2e8b9c625
-updated: 2016-07-25T00:14:24.5719977+02:00
+updated: 2016-07-28T15:38:15.8227513+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 593d64559f7600f29581a3ee42177f5dbded27a9
@@ -18,7 +18,7 @@ imports:
 - name: github.com/go-errors/errors
   version: a41850380601eeb43f4350f7d17c6bbd8944aaf8
 - name: github.com/golang/protobuf
-  version: 874264fbbb43f4d91e999fecb4b40143ed611400
+  version: c3cefd437628a0b7d31b34fe44b3a7a540e98527
   subpackages:
   - proto
 - name: github.com/hailocab/go-hostpool
@@ -40,6 +40,8 @@ imports:
   version: fb79d6a91d3e4a9ecb6d945b218d78fc0d9b1939
 - name: github.com/magiconair/properties
   version: b3f6dd549956e8a61ea4a686a1c02a33d5bdda4b
+- name: github.com/meatballhat/negroni-logrus
+  version: 7c570a907cfc69cdc004ad506c6f5e234815b936
 - name: github.com/mitchellh/mapstructure
   version: 21a35fb16463dfb7c8eee579c65d995d95e64d1e
 - name: github.com/moul/http2curl
@@ -106,15 +108,17 @@ imports:
   - assert
   - require
 - name: github.com/toqueteos/webbrowser
-  version: 21fc9f95c83442fd164094666f7cb4f9fdd56cd6
+  version: 0969d270fd0a4dbcff060e8d6a80c07c8f885a27
+- name: github.com/urfave/negroni
+  version: dc6b9d037e8dab60cbfc09c61d6932537829be8b
 - name: golang.org/x/crypto
-  version: 911fafb28f4ee7c7bd483539a6c96190bbbccc3f
+  version: bc89c496413265e715159bdc8478ee9a92fdc265
   subpackages:
   - bcrypt
   - pbkdf2
   - blowfish
 - name: golang.org/x/net
-  version: 4d38db76854b199960801a1734443fd02870d7e1
+  version: 6a513affb38dc9788b449d59ffed099b8de18fa0
   subpackages:
   - context
 - name: golang.org/x/oauth2

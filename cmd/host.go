@@ -22,6 +22,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/square/go-jose"
+	"github.com/urfave/negroni"
+	"github.com/meatballhat/negroni-logrus"
 )
 
 const (
@@ -73,6 +75,7 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	hostCmd.Flags().Bool("force-dangerous-http", false, "Disable HTTP/2 over TLS (HTTPS) and serve HTTP instead. Never use this in production.")
+	hostCmd.Flags().StringSlice("allow-tls-termination-from", []string{}, "Whitelist one or multiple CIDR ip address ranges and allow them to terminate TLS connections. This is common when using load balancers, proxies or other types of gateways. Be aware that the `X-Forwarded-Proto` header, indicating the original protocol, must be set. This header must never be set by anyone else except the proxy / load balancer / ...")
 	hostCmd.Flags().Bool("dangerous-auto-logon", false, "Stores the root credentials in ~/.hydra.yml. Do not use in production.")
 	hostCmd.Flags().String("https-tls-key-path", "", "Path to the key file for HTTP/2 over TLS (https). You can set HTTPS_TLS_KEY_PATH or HTTPS_TLS_KEY instead.")
 	hostCmd.Flags().String("https-tls-cert-path", "", "Path to the certificate file for HTTP/2 over TLS (https). You can set HTTPS_TLS_CERT_PATH or HTTPS_TLS_CERT instead.")
@@ -90,7 +93,10 @@ func runHostCmd(cmd *cobra.Command, args []string) {
 		pkg.Must(err, "Could not write configuration file: %s", err)
 	}
 
-	http.Handle("/", router)
+	n := negroni.New()
+	n.Use(negronilogrus.NewMiddleware())
+	n.UseHandler(router)
+	http.Handle("/", n)
 
 	var srv = http.Server{
 		Addr: c.GetAddress(),

@@ -58,7 +58,8 @@ This command supports the following environment variables:
 - RETHINK_TLS_CERT_PATH: The path to the TLS certificate (pem encoded) used to connect to rethinkdb.
 - RETHINK_TLS_CERT: A pem encoded TLS certificate passed as string. Can be used instead of RETHINK_TLS_CERT_PATH.
 
-- HYDRA_PROFILING: Set "HYDRA_PROFILING=1" to enable profiling.
+- HYDRA_PROFILING: Set "HYDRA_PROFILING=cpu" to enable cpu profiling and "HYDRA_PROFILING=memory" to enable memory profiling.
+	It is not possible to do both at the same time.
 `,
 	Run: runHostCmd,
 }

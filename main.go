@@ -9,8 +9,10 @@ import (
 )
 
 func main() {
-	if os.Getenv("HYDRA_PROFILING") == "1" {
-		defer profile.Start().Stop()
+	if os.Getenv("PROFILING") == "cpu" {
+		defer profile.Start(profile.CPUProfile).Stop()
+	} else if os.Getenv("PROFILING") == "memory" {
+		defer profile.Start(profile.MemProfile).Stop()
 	}
 
 	switch os.Getenv("LOG_LEVEL") {

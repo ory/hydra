@@ -14,7 +14,7 @@ type HTTPManager struct {
 	Dry      bool
 }
 
-func (m *HTTPManager) GetClient(id string) (fosite.Client, error) {
+func (m *HTTPManager) GetConcreteClient(id string) (*Client, error) {
 	var c Client
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, id).String())
 	r.Client = m.Client
@@ -24,6 +24,10 @@ func (m *HTTPManager) GetClient(id string) (fosite.Client, error) {
 	}
 
 	return &c, nil
+}
+
+func (m *HTTPManager) GetClient(id string) (fosite.Client, error) {
+	return m.GetConcreteClient(id)
 }
 
 func (m *HTTPManager) CreateClient(c *Client) error {

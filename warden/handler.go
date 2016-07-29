@@ -92,11 +92,15 @@ func (h *WardenHandler) Allowed(w http.ResponseWriter, r *http.Request, _ httpro
 		return
 	}
 
-	var ar WardenAccessRequest
+	var ar = WardenAccessRequest{
+		Request: new(ladon.Request),
+		WardenAuthorizedRequest: new(WardenAuthorizedRequest),
+	}
 	if err := json.NewDecoder(r.Body).Decode(&ar); err != nil {
 		h.H.WriteError(ctx, w, r, errors.New(err))
 		return
 	}
+	defer r.Body.Close()
 
 	authContext, err := h.Warden.ActionAllowed(ctx, ar.Token, ar.Request, ar.Scopes...)
 	if err != nil {

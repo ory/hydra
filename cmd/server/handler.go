@@ -65,7 +65,7 @@ func (h *Handler) createRS256KeysIfNotExist(c *config.Config, set, lookup string
 	generator := jwk.RS256Generator{}
 
 	if _, err := ctx.KeyManager.GetKey(set, lookup); errors.Is(err, pkg.ErrNotFound) {
-		logrus.Warnf("Key pair for signing %s is missing. Creating new one.", set)
+		logrus.Infof("Key pair for signing %s is missing. Creating new one.", set)
 
 		keys, err := generator.Generate("")
 		pkg.Must(err, "Could not generate %s key: %s", set, err)
@@ -127,8 +127,10 @@ func (h *Handler) createRootIfNewInstall(c *config.Config) {
 	c.ClientSecret = string(secret)
 	c.Unlock()
 
-	logrus.Warn("Temporary root client created.")
-	logrus.Warnf("client_id: %s", root.GetID())
-	logrus.Warnf("client_secret: %s", string(secret))
-	logrus.Warn("The root client must be removed in production. The root's credentials could be accidentally logged.")
+	logrus.Infoln("Temporary root client created.")
+	if forceRoot == "" {
+		logrus.Infoln("client_id: %s", root.GetID())
+		logrus.Infoln("client_secret: %s", string(secret))
+		logrus.Warn("WARNING: YOU MUST delete this client once in production, as credentials may have been leaked logfiles.")
+	}
 }

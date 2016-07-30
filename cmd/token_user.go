@@ -74,7 +74,7 @@ var tokenUserCmd = &cobra.Command{
 			}
 
 			if r.URL.Query().Get("state") != string(state) {
-				message := fmt.Sprintf("States do not match. Expected %s but got %s", string(state), r.URL.Query().Get("state"))
+				message := fmt.Sprintf("States do not match. Expected %s, got %s", string(state), r.URL.Query().Get("state"))
 				fmt.Println(message)
 
 				w.WriteHeader(http.StatusInternalServerError)

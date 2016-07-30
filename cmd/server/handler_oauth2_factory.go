@@ -3,8 +3,6 @@ package server
 import (
 	"net/url"
 
-	"time"
-
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
@@ -89,7 +87,7 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 		keys, err = new(jwk.RS256Generator).Generate("")
 		pkg.Must(err, "Could not generate signing key for OpenID Connect")
 		km.AddKeySet(oauth2.OpenIDConnectKeyName, keys)
-		logrus.Warnln("Keypair generated.")
+		logrus.Infoln("Keypair generated.")
 		logrus.Warnln("WARNING: Automated key creation causes low entropy. Replace the keys as soon as possible.")
 	} else {
 		pkg.Must(err, "Could not fetch signing key for OpenID Connect")
@@ -177,8 +175,8 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 		Consent: &oauth2.DefaultConsentStrategy{
 			Issuer:                   c.Issuer,
 			KeyManager:               km,
-			DefaultChallengeLifespan: time.Hour,
-			DefaultIDTokenLifespan:   time.Hour * 24,
+			DefaultChallengeLifespan: c.GetChallengeTokenLifespan(),
+			DefaultIDTokenLifespan:   c.GetIDTokenLifespan(),
 		},
 		ConsentURL: *consentURL,
 	}

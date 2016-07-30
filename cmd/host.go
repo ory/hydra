@@ -175,6 +175,8 @@ func runHostCmd(cmd *cobra.Command, args []string) {
 				getOrCreateTLSCertificate(cmd),
 			},
 		},
+		ReadTimeout: time.Second * 5,
+		WriteTimeout: time.Second * 10,
 	}
 
 	var err error

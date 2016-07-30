@@ -24,6 +24,8 @@ import (
 	"github.com/square/go-jose"
 	"github.com/urfave/negroni"
 	"github.com/meatballhat/negroni-logrus"
+	"github.com/ory-am/hydra/herodot"
+	"github.com/openshift/origin/Godeps/_workspace/src/github.com/docker/distribution/context"
 )
 
 const (
@@ -162,6 +164,7 @@ func runHostCmd(cmd *cobra.Command, args []string) {
 
 	n := negroni.New()
 	n.Use(negronilogrus.NewMiddleware())
+	n.UseFunc(rejectInsecureRequests)
 	n.UseHandler(router)
 	http.Handle("/", n)
 
@@ -183,6 +186,24 @@ func runHostCmd(cmd *cobra.Command, args []string) {
 		err = srv.ListenAndServeTLS("", "")
 	}
 	pkg.Must(err, "Could not start server: %s %s.", err)
+}
+
+func rejectInsecureRequests(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	if r.TLS != nil || c.ForceHTTP {
+		next.ServeHTTP(rw, r)
+		return
+	}
+
+	// todo cidr match
+
+	proto := r.Header.Get("X-Forwarded-Proto")
+	if proto == "https" {
+		next.ServeHTTP(rw, r)
+		return
+	}
+
+	h := new(herodot.JSON)
+	h.WriteErrorCode(context.Background(), rw, r, http.StatusBadGateway, errors.New("HTTPS connection required"))
 }
 
 func loadCertificateFromFile(cmd *cobra.Command) *tls.Certificate {

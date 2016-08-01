@@ -69,7 +69,7 @@ func init() {
 	serv.SetRoutes(r)
 	ts = httptest.NewServer(r)
 
-	url, err := url.Parse(ts.URL + warden.AllowedHandlerPath)
+	url, err := url.Parse(ts.URL + warden.TokenAllowedHandlerPath)
 	if err != nil {
 		log.Fatalf("%s", err)
 	}

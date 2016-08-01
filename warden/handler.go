@@ -15,8 +15,10 @@ import (
 )
 
 const (
-	AuthorizedHandlerPath = "/warden/authorized"
+	TokenValidHandlerPath = "/warden/token/valid"
+	TokenAllowedHandlerPath = "/warden/token/allowed"
 	AllowedHandlerPath    = "/warden/allowed"
+	IntrospectPath    = "/oauth2/introspect"
 )
 
 type WardenHandler struct {
@@ -55,11 +57,13 @@ type WardenAccessRequest struct {
 }
 
 func (h *WardenHandler) SetRoutes(r *httprouter.Router) {
-	r.POST(AuthorizedHandlerPath, h.Authorized)
-	r.POST(AllowedHandlerPath, h.Allowed)
+	r.POST(TokenValidHandlerPath, h.TokenValid)
+	r.POST(TokenAllowedHandlerPath, h.TokenAllowed)
+	r.POST(TokenAllowedHandlerPath, h.Allowed)
+	r.POST(IntrospectPath, h.Introspect)
 }
 
-func (h *WardenHandler) Authorized(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *WardenHandler) TokenValid(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := herodot.NewContext()
 	clientCtx, err := h.authorizeClient(ctx, w, r)
 	if err != nil {
@@ -85,6 +89,31 @@ func (h *WardenHandler) Authorized(w http.ResponseWriter, r *http.Request, _ htt
 }
 
 func (h *WardenHandler) Allowed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	ctx := herodot.NewContext()
+	clientCtx, err := h.authorizeClient(ctx, w, r)
+	if err != nil {
+		h.H.WriteError(ctx, w, r, err)
+		return
+	}
+
+	var ar = new(WardenAuthorizedRequest)
+	if err := json.NewDecoder(r.Body).Decode(&ar); err != nil {
+		h.H.WriteError(ctx, w, r, errors.New(err))
+		return
+	}
+	defer r.Body.Close()
+
+	authContext, err := h.Warden.ActionAllowed(ctx, ar.Token, ar.Request, ar.Scopes...)
+	if err != nil {
+		h.H.WriteError(ctx, w, r, err)
+		return
+	}
+
+	authContext.Audience = clientCtx.Subject
+	h.H.Write(ctx, w, r, authContext)
+}
+
+func (h *WardenHandler) TokenAllowed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := herodot.NewContext()
 	clientCtx, err := h.authorizeClient(ctx, w, r)
 	if err != nil {

@@ -28,7 +28,7 @@ func (w *HTTPWarden) SetClient(c *clientcredentials.Config) {
 }
 
 func (w *HTTPWarden) ActionAllowed(ctx context.Context, token string, a *ladon.Request, scopes ...string) (*Context, error) {
-	return w.doRequest(AllowedHandlerPath, &WardenAccessRequest{
+	return w.doRequest(TokenAllowedHandlerPath, &WardenAccessRequest{
 		Request: a,
 		WardenAuthorizedRequest: &WardenAuthorizedRequest{
 			Token: token,
@@ -47,7 +47,7 @@ func (w *HTTPWarden) HTTPActionAllowed(ctx context.Context, r *http.Request, a *
 }
 
 func (w *HTTPWarden) Authorized(ctx context.Context, token string, scopes ...string) (*Context, error) {
-	return w.doRequest(AuthorizedHandlerPath, &WardenAuthorizedRequest{
+	return w.doRequest(TokenValidHandlerPath, &WardenAuthorizedRequest{
 		Token: token,
 		Scopes:    scopes,
 	})

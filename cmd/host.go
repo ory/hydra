@@ -1,35 +1,8 @@
 package cmd
 
 import (
-	"crypto/tls"
-	"net/http"
-
-	"crypto/ecdsa"
-	"crypto/rand"
-	"crypto/rsa"
-	"crypto/x509"
-	"crypto/x509/pkix"
-	"encoding/pem"
-	"math/big"
-	"time"
-
-	"github.com/Sirupsen/logrus"
-	"github.com/go-errors/errors"
-	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/hydra/cmd/server"
-	"github.com/ory-am/hydra/jwk"
-	"github.com/ory-am/hydra/pkg"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"github.com/square/go-jose"
-	"github.com/urfave/negroni"
-	"github.com/meatballhat/negroni-logrus"
-	"github.com/ory-am/hydra/herodot"
-	"github.com/openshift/origin/Godeps/_workspace/src/github.com/docker/distribution/context"
-)
-
-const (
-	TLSKeyName = "hydra.tls"
+	"github.com/ory-am/hydra/cmd/server"
 )
 
 // hostCmd represents the host command
@@ -107,8 +80,9 @@ HTTPS CONTROLS
 
 - HTTPS_ALLOW_TERMINATION_FROM: Whitelist one or multiple CIDR address ranges and allow them to terminate TLS connections.
 	Be aware that the X-Forwarded-Proto header must be set and must never be modifiable by anyone but
-	your proxy / gateway / load balancer.
-	Example: HTTPS_ALLOW_TERMINATION_FROM=["127.0.0.1/16","192.168.178.0/16"]
+	your proxy / gateway / load balancer. Supports ipv4 and ipv6.
+	Hydra serves http instead of https when this option is set.
+	Example: HTTPS_ALLOW_TERMINATION_FROM=127.0.0.1/32,192.168.178.0/24,2620:0:2d0:200::7/32
 
 - HTTPS_TLS_CERT_PATH: The path to the TLS certificate (pem encoded).
 	Example: HTTPS_TLS_CERT_PATH=~/cert.pem
@@ -130,7 +104,7 @@ DEBUG CONTROLS
 	It is not possible to do both at the same time.
 	Example: HYDRA_PROFILING=cpu
 `,
-	Run: runHostCmd,
+	Run: server.RunHost(c),
 }
 
 func init() {
@@ -149,198 +123,4 @@ func init() {
 	hostCmd.Flags().String("https-tls-key-path", "", "Path to the key file for HTTP/2 over TLS (https). You can set HTTPS_TLS_KEY_PATH or HTTPS_TLS_KEY instead.")
 	hostCmd.Flags().String("https-tls-cert-path", "", "Path to the certificate file for HTTP/2 over TLS (https). You can set HTTPS_TLS_CERT_PATH or HTTPS_TLS_CERT instead.")
 	hostCmd.Flags().String("rethink-tls-cert-path", "", "Path to the certificate file to connect to rethinkdb over TLS (https). You can set RETHINK_TLS_CERT_PATH or RETHINK_TLS_CERT instead.")
-}
-
-func runHostCmd(cmd *cobra.Command, args []string) {
-	router := httprouter.New()
-	serverHandler := &server.Handler{}
-	serverHandler.Start(c, router)
-
-	if ok, _ := cmd.Flags().GetBool("dangerous-auto-logon"); ok {
-		logrus.Warnln("Do not use flag --dangerous-auto-logon in production.")
-		err := c.Persist()
-		pkg.Must(err, "Could not write configuration file: %s", err)
-	}
-
-	n := negroni.New()
-	n.Use(negronilogrus.NewMiddleware())
-	n.UseFunc(rejectInsecureRequests)
-	n.UseHandler(router)
-	http.Handle("/", n)
-
-	var srv = http.Server{
-		Addr: c.GetAddress(),
-		TLSConfig: &tls.Config{
-			Certificates: []tls.Certificate{
-				getOrCreateTLSCertificate(cmd),
-			},
-		},
-		ReadTimeout: time.Second * 5,
-		WriteTimeout: time.Second * 10,
-	}
-
-	var err error
-	logrus.Infof("Starting server on %s", c.GetAddress())
-	if ok, _ := cmd.Flags().GetBool("force-dangerous-http"); ok {
-		logrus.Warnln("HTTPS disabled. Never do this in production.")
-		err = srv.ListenAndServe()
-	} else {
-		err = srv.ListenAndServeTLS("", "")
-	}
-	pkg.Must(err, "Could not start server: %s %s.", err)
-}
-
-func rejectInsecureRequests(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	if r.TLS != nil || c.ForceHTTP {
-		next.ServeHTTP(rw, r)
-		return
-	}
-
-	// todo cidr match
-
-	proto := r.Header.Get("X-Forwarded-Proto")
-	if proto == "https" {
-		next.ServeHTTP(rw, r)
-		return
-	}
-
-	h := new(herodot.JSON)
-	h.WriteErrorCode(context.Background(), rw, r, http.StatusBadGateway, errors.New("HTTPS connection required"))
-}
-
-func loadCertificateFromFile(cmd *cobra.Command) *tls.Certificate {
-	keyPath := viper.GetString("HTTPS_TLS_KEY_PATH")
-	certPath := viper.GetString("HTTPS_TLS_CERT_PATH")
-	if kp, _ := cmd.Flags().GetString("https-tls-key-path"); kp != "" {
-		keyPath = kp
-	} else if cp, _ := cmd.Flags().GetString("https-tls-cert-path"); cp != "" {
-		certPath = cp
-	} else if keyPath == "" || certPath == "" {
-		return nil
-	}
-
-	cert, err := tls.LoadX509KeyPair(certPath, keyPath)
-	if err != nil {
-		logrus.Warn("Could not load x509 key pair: %s", cert)
-		return nil
-	}
-	return &cert
-}
-
-func loadCertificateFromEnv(cmd *cobra.Command) *tls.Certificate {
-	keyString := viper.GetString("HTTPS_TLS_KEY")
-	certString := viper.GetString("HTTPS_TLS_CERT")
-	if keyString == "" || certString == "" {
-		return nil
-	}
-
-	var cert tls.Certificate
-	var err error
-	if cert, err = tls.X509KeyPair([]byte(certString), []byte(keyString)); err != nil {
-		logrus.Warn("Could not parse x509 key pair from env: %s", cert)
-		return nil
-	}
-
-	return &cert
-}
-
-func getOrCreateTLSCertificate(cmd *cobra.Command) tls.Certificate {
-	if cert := loadCertificateFromFile(cmd); cert != nil {
-		return *cert
-	} else if cert := loadCertificateFromEnv(cmd); cert != nil {
-		return *cert
-	}
-
-	ctx := c.Context()
-	keys, err := ctx.KeyManager.GetKey(TLSKeyName, "private")
-	if errors.Is(err, pkg.ErrNotFound) {
-		logrus.Warn("No TLS Key / Certificate for HTTPS found. Generating self-signed certificate.")
-
-		keys, err = new(jwk.ECDSA256Generator).Generate("")
-		pkg.Must(err, "Could not generate key: %s", err)
-
-		cert, err := createSelfSignedCertificate(jwk.First(keys.Key("private")).Key)
-		pkg.Must(err, "Could not create X509 PEM Key Pair: %s", err)
-
-		private := jwk.First(keys.Key("private"))
-		private.Certificates = []*x509.Certificate{cert}
-		keys = &jose.JsonWebKeySet{
-			Keys: []jose.JsonWebKey{
-				*private,
-				*jwk.First(keys.Key("public")),
-			},
-		}
-
-		err = ctx.KeyManager.AddKeySet(TLSKeyName, keys)
-		pkg.Must(err, "Could not persist key: %s", err)
-	} else {
-		pkg.Must(err, "Could not retrieve key: %s", err)
-	}
-
-	private := jwk.First(keys.Key("private"))
-	block, err := jwk.PEMBlockForKey(private.Key)
-	if err != nil {
-		pkg.Must(err, "Could not encode key to PEM: %s", err)
-	}
-
-	if len(private.Certificates) == 0 {
-		logrus.Fatal("TLS certificate chain can not be empty")
-	}
-
-	pemCert := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: private.Certificates[0].Raw})
-	pemKey := pem.EncodeToMemory(block)
-	cert, err := tls.X509KeyPair(pemCert, pemKey)
-	pkg.Must(err, "Could not decode certificate: %s", err)
-
-	return cert
-}
-
-func createSelfSignedCertificate(key interface{}) (cert *x509.Certificate, err error) {
-	serialNumberLimit := new(big.Int).Lsh(big.NewInt(1), 128)
-	serialNumber, err := rand.Int(rand.Reader, serialNumberLimit)
-	if err != nil {
-		return cert, errors.Errorf("Failed to generate serial number: %s", err)
-	}
-
-	certificate := &x509.Certificate{
-		SerialNumber: serialNumber,
-		Subject: pkix.Name{
-			Organization: []string{"Hydra"},
-			CommonName:   "Hydra",
-		},
-		Issuer: pkix.Name{
-			Organization: []string{"Hydra"},
-			CommonName:   "Hydra",
-		},
-		NotBefore:             time.Now(),
-		NotAfter:              time.Now().Add(time.Hour * 24 * 7),
-		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-		BasicConstraintsValid: true,
-	}
-
-	certificate.IsCA = true
-	certificate.KeyUsage |= x509.KeyUsageCertSign
-	certificate.DNSNames = append(certificate.DNSNames, "localhost")
-	der, err := x509.CreateCertificate(rand.Reader, certificate, certificate, publicKey(key), key)
-	if err != nil {
-		return cert, errors.Errorf("Failed to create certificate: %s", err)
-	}
-
-	cert, err = x509.ParseCertificate(der)
-	if err != nil {
-		return cert, errors.Errorf("Failed to encode private key: %s", err)
-	}
-	return cert, nil
-}
-
-func publicKey(key interface{}) interface{} {
-	switch k := key.(type) {
-	case *rsa.PrivateKey:
-		return &k.PublicKey
-	case *ecdsa.PrivateKey:
-		return &k.PublicKey
-	default:
-		return nil
-	}
 }

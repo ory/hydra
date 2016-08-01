@@ -26,6 +26,8 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/yaml.v2"
+	"net"
+	"strings"
 )
 
 type Config struct {
@@ -41,6 +43,7 @@ type Config struct {
 	SystemSecret        string `mapstructure:"SYSTEM_SECRET" yaml:"-"`
 	DatabaseURL         string `mapstructure:"DATABASE_URL" yaml:"-"`
 	ConsentURL          string `mapstructure:"CONSENT_URL" yaml:"-"`
+	AllowTLSTermination string `mapstructure:"HTTPS_ALLOW_TERMINATION_FROM" yaml:"-"`
 	BCryptWorkFactor    int `mapstructure:"BCRYPT_COST" yaml:"-"`
 	AccessTokenLifespan string `mapstructure:"ACCESS_TOKEN_LIFESPAN" yaml:"-"`
 	AuthCodeLifespan    string `mapstructure:"AUTH_CODE_LIFESPAN" yaml:"-"`
@@ -52,6 +55,45 @@ type Config struct {
 	oauth2Client        *http.Client `yaml:"-"`
 	context             *Context `yaml:"-"`
 	sync.Mutex `yaml:"-"`
+}
+
+func matchesRange(r *http.Request, ranges []string) error {
+	ip, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		return errors.New(err)
+	}
+
+	for _, rn := range ranges {
+		_, cidr, err := net.ParseCIDR(rn)
+		if err != nil {
+			return errors.New(err)
+		}
+		addr := net.ParseIP(ip)
+		if cidr.Contains(addr) {
+			return nil
+		}
+	}
+	return errors.New("Remote address does not match any cidr ranges")
+}
+
+func (c *Config) DoesRequestSatisfyTermination(r *http.Request) error {
+	if c.AllowTLSTermination == "" {
+		return errors.New("TLS termination is not enabled")
+	}
+
+	ranges := strings.Split(c.AllowTLSTermination, ",")
+	if err := matchesRange(r, ranges); err != nil {
+		return err
+	}
+
+	proto := r.Header.Get("X-Forwarded-Proto")
+	if proto == "" {
+		return errors.New("X-Forwarded-Proto header is missing")
+	} else if proto != "https" {
+		return errors.Errorf("Expected X-Forwarded-Proto header to be https, got %s", proto)
+	}
+
+	return nil
 }
 
 func (c *Config) GetChallengeTokenLifespan() time.Duration {

@@ -75,6 +75,7 @@ func initConfig() {
 	viper.BindEnv("DATABASE_URL")
 	viper.BindEnv("SYSTEM_SECRET")
 	viper.BindEnv("CLIENT_SECRET")
+	viper.BindEnv("HTTPS_ALLOW_TERMINATION_FROM")
 
 	viper.BindEnv("CLUSTER_URL")
 	viper.SetDefault("CLUSTER_URL", "https://localhost:4444")

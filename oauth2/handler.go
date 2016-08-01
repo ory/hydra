@@ -18,8 +18,9 @@ const (
 )
 
 type Handler struct {
-	OAuth2  fosite.OAuth2Provider
-	Consent ConsentStrategy
+	OAuth2     fosite.OAuth2Provider
+	Consent    ConsentStrategy
+	ForcedHTTP bool
 
 	ConsentURL url.URL
 }
@@ -105,10 +106,11 @@ func (o *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 
 func (o *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, authorizeRequest fosite.AuthorizeRequester) error {
 	schema := "https"
-	if r.TLS == nil {
+	if o.ForcedHTTP {
 		schema = "http"
 	}
-	challenge, err := o.Consent.IssueChallenge(authorizeRequest, schema+"://"+r.Host+r.URL.String())
+
+	challenge, err := o.Consent.IssueChallenge(authorizeRequest, schema + "://" + r.Host + r.URL.String())
 	if err != nil {
 		return err
 	}

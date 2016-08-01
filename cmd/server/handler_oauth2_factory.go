@@ -134,6 +134,7 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 	pkg.Must(err, "Could not parse consent url.")
 
 	handler := &oauth2.Handler{
+		ForcedHTTP: c.ForceHTTP,
 		OAuth2: &fosite.Fosite{
 			Store:          store,
 			MandatoryScope: "core",

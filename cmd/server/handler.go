@@ -31,7 +31,8 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		serverHandler := &Handler{Config: c}
 		serverHandler.start(router)
 
-		if ok, _ := cmd.Flags().GetBool("dangerous-auto-logon"); ok {
+		// This is being set by --dangerous-auto-logon
+		if c.ForceHTTP {
 			logrus.Warnln("Do not use flag --dangerous-auto-logon in production.")
 			err := c.Persist()
 			pkg.Must(err, "Could not write configuration file: %s", err)

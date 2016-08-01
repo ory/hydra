@@ -27,6 +27,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
+	"fmt"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {
@@ -130,8 +131,19 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 		AccessTokenLifespan: c.GetAccessTokenLifespan(),
 	}
 
+	if c.ConsentURL == "" {
+		proto := "https"
+		if c.ForceHTTP {
+			proto = "http"
+		}
+		host := "localhost"
+		if c.BindHost != "" {
+			host = c.BindHost
+		}
+		c.ConsentURL = fmt.Sprintf("%s://%s:%d/oauth2/consent", proto, host, c.BindPort)
+	}
 	consentURL, err := url.Parse(c.ConsentURL)
-	pkg.Must(err, "Could not parse consent url.")
+	pkg.Must(err, "Could not parse consent url %s.", c.ConsentURL)
 
 	handler := &oauth2.Handler{
 		ForcedHTTP: c.ForceHTTP,

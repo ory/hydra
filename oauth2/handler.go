@@ -29,6 +29,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.POST("/oauth2/token", h.TokenHandler)
 	r.GET("/oauth2/auth", h.AuthHandler)
 	r.POST("/oauth2/auth", h.AuthHandler)
+	r.GET("/oauth2/consent", h.DefaultConsentHandler)
 }
 
 func (o *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

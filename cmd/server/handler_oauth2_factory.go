@@ -178,7 +178,7 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 					HandleHelper: oauth2HandleHelper,
 				},
 			},
-			AuthorizedRequestValidators: fosite.AuthorizedRequestValidators{
+			Validators: fosite.AuthorizedRequestValidators{
 				&core.CoreValidator{
 					AccessTokenStrategy: ctx.FositeStrategy,
 					AccessTokenStorage:  store,

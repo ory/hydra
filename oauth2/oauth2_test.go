@@ -78,7 +78,7 @@ var handler = &Handler{
 				},
 			},
 		},
-		AuthorizedRequestValidators: fosite.AuthorizedRequestValidators{},
+		Validators: fosite.AuthorizedRequestValidators{},
 		Hasher: hasher,
 	},
 	Consent: &DefaultConsentStrategy{

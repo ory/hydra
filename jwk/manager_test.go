@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/ory-am/dockertest"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/internal"
@@ -22,7 +23,6 @@ import (
 	"github.com/ory-am/fosite/rand"
 	"github.com/square/go-jose"
 	"golang.org/x/net/context"
-	"gopkg.in/ory-am/dockertest.v2"
 )
 
 var managers = map[string]Manager{}

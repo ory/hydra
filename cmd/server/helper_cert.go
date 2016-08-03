@@ -1,21 +1,22 @@
 package server
 
 import (
-	"encoding/pem"
+	"crypto/rand"
 	"crypto/tls"
-	"math/big"
+	"crypto/x509"
 	"crypto/x509/pkix"
+	"encoding/pem"
+	"math/big"
 	"time"
-	"github.com/spf13/viper"
-	"github.com/ory-am/hydra/jwk"
-	"github.com/spf13/cobra"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
-	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/hydra/config"
-	"crypto/x509"
+	"github.com/ory-am/hydra/jwk"
+	"github.com/ory-am/hydra/pkg"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/square/go-jose"
-	"crypto/rand"
 )
 
 const (

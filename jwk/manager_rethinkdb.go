@@ -7,13 +7,14 @@ import (
 
 	"time"
 
+	"fmt"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/square/go-jose"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
-	"fmt"
 )
 
 type RethinkManager struct {

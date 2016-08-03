@@ -52,7 +52,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	var conn Connection
 	var ctx = context.Background()
 
-	if _, err := h.W.HTTPActionAllowed(ctx, r, &ladon.Request{
+	if _, err := h.W.HTTPRequestAllowed(ctx, r, &ladon.Request{
 		Resource: connectionsResource,
 		Action:   "create",
 	}, scope); err != nil {
@@ -85,7 +85,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 func (h *Handler) FindLocal(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var ctx = context.Background()
 
-	if _, err := h.W.HTTPActionAllowed(ctx, r, &ladon.Request{
+	if _, err := h.W.HTTPRequestAllowed(ctx, r, &ladon.Request{
 		Resource: connectionsResource,
 		Action:   "find",
 	}, scope); err != nil {
@@ -105,7 +105,7 @@ func (h *Handler) FindLocal(w http.ResponseWriter, r *http.Request, ps httproute
 func (h *Handler) FindRemote(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var ctx = context.Background()
 
-	if _, err := h.W.HTTPActionAllowed(ctx, r, &ladon.Request{
+	if _, err := h.W.HTTPRequestAllowed(ctx, r, &ladon.Request{
 		Resource: connectionsResource,
 		Action:   "find",
 	}, scope); err != nil {
@@ -126,7 +126,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	var ctx = context.Background()
 	var id = ps.ByName("id")
 
-	if _, err := h.W.HTTPActionAllowed(ctx, r, &ladon.Request{
+	if _, err := h.W.HTTPRequestAllowed(ctx, r, &ladon.Request{
 		Resource: fmt.Sprintf(connectionResource, id),
 		Action:   "get",
 	}, scope); err != nil {
@@ -147,7 +147,7 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	var ctx = context.Background()
 	var id = ps.ByName("id")
 
-	if _, err := h.W.HTTPActionAllowed(ctx, r, &ladon.Request{
+	if _, err := h.W.HTTPRequestAllowed(ctx, r, &ladon.Request{
 		Resource: fmt.Sprintf(connectionResource, id),
 		Action:   "delete",
 	}, scope); err != nil {

@@ -3,8 +3,8 @@ package pkg
 import (
 	"bytes"
 	"encoding/json"
-	"net/http"
 	"io/ioutil"
+	"net/http"
 
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/pkg/helper"

@@ -1,9 +1,10 @@
 package oauth2
 
 import (
-	"github.com/julienschmidt/httprouter"
 	"net/http"
+
 	"github.com/Sirupsen/logrus"
+	"github.com/julienschmidt/httprouter"
 )
 
 func (o *Handler) DefaultConsentHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

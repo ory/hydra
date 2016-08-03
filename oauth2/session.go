@@ -9,6 +9,7 @@ import (
 type Session struct {
 	Subject                  string `json:"sub"`
 	*strategy.DefaultSession `json:"idToken"`
+	Extra                    map[string]interface{} `json:"extra"`
 }
 
 func NewSession(subject string) *Session {

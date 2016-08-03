@@ -3,6 +3,8 @@ package server
 import (
 	"net/url"
 
+	"fmt"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
@@ -27,7 +29,6 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
-	"fmt"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {

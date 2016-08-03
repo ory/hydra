@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/ory-am/dockertest"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/internal"
@@ -21,7 +22,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
-	"gopkg.in/ory-am/dockertest.v2"
 )
 
 var connections = map[string]*Connection{

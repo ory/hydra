@@ -11,20 +11,18 @@ import (
 	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/ladon"
-	"golang.org/x/net/context"
 )
 
 const (
-	TokenValidHandlerPath = "/warden/token/valid"
+	TokenValidHandlerPath   = "/warden/token/valid"
 	TokenAllowedHandlerPath = "/warden/token/allowed"
-	AllowedHandlerPath    = "/warden/allowed"
-	IntrospectPath    = "/oauth2/introspect"
+	AllowedHandlerPath      = "/warden/allowed"
+	IntrospectPath          = "/warden/introspect"
 )
 
 type WardenHandler struct {
 	H      herodot.Herodot
 	Warden firewall.Firewall
-	Ladon  ladon.Warden
 }
 
 func NewHandler(c *config.Config, router *httprouter.Router) *WardenHandler {
@@ -33,17 +31,10 @@ func NewHandler(c *config.Config, router *httprouter.Router) *WardenHandler {
 	h := &WardenHandler{
 		H:      &herodot.JSON{},
 		Warden: ctx.Warden,
-		Ladon: &ladon.Ladon{
-			Manager: ctx.LadonManager,
-		},
 	}
 	h.SetRoutes(router)
 
 	return h
-}
-
-type WardenResponse struct {
-	*firewall.Context
 }
 
 type WardenAuthorizedRequest struct {
@@ -56,16 +47,64 @@ type WardenAccessRequest struct {
 	*WardenAuthorizedRequest
 }
 
+var notAllowed = struct {
+	Allowed bool `json:"allowed"`
+}{Allowed: false}
+
+var invalid = struct {
+	Valid bool `json:"valid"`
+}{Valid: false}
+
+var inactive = struct {
+	Active bool `json:"active"`
+}{Active: false}
+
 func (h *WardenHandler) SetRoutes(r *httprouter.Router) {
 	r.POST(TokenValidHandlerPath, h.TokenValid)
 	r.POST(TokenAllowedHandlerPath, h.TokenAllowed)
-	r.POST(TokenAllowedHandlerPath, h.Allowed)
+	r.POST(AllowedHandlerPath, h.Allowed)
 	r.POST(IntrospectPath, h.Introspect)
+}
+
+func (h *WardenHandler) Introspect(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	ctx := herodot.NewContext()
+	clientCtx, err := h.Warden.InspectToken(ctx, TokenFromRequest(r), "core")
+	if err != nil {
+		h.H.WriteError(ctx, w, r, err)
+		return
+	}
+
+	var ar struct {
+		Token string `json:"token"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&ar); err != nil {
+		h.H.WriteError(ctx, w, r, err)
+		return
+	}
+	defer r.Body.Close()
+
+	authContext, err := h.Warden.InspectToken(ctx, ar.Token)
+	if err != nil {
+		h.H.Write(ctx, w, r, &inactive)
+		return
+	}
+
+	if clientCtx.Subject != authContext.Audience {
+		h.H.Write(ctx, w, r, &inactive)
+		return
+	}
+
+	res := inactive
+	res.Active = true
+	h.H.Write(ctx, w, r, &res)
 }
 
 func (h *WardenHandler) TokenValid(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := herodot.NewContext()
-	clientCtx, err := h.authorizeClient(ctx, w, r)
+	clientCtx, err := h.Warden.HTTPRequestAllowed(ctx, r, &ladon.Request{
+		Resource: "rn:hydra:warden:token:valid",
+		Action:   "decide",
+	}, "warden.token")
 	if err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
@@ -78,51 +117,62 @@ func (h *WardenHandler) TokenValid(w http.ResponseWriter, r *http.Request, _ htt
 	}
 	defer r.Body.Close()
 
-	authContext, err := h.Warden.Authorized(ctx, ar.Token, ar.Scopes...)
+	authContext, err := h.Warden.InspectToken(ctx, ar.Token, ar.Scopes...)
 	if err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.Write(ctx, w, r, &invalid)
 		return
 	}
 
 	authContext.Audience = clientCtx.Subject
-	h.H.Write(ctx, w, r, authContext)
+	h.H.Write(ctx, w, r, struct {
+		*firewall.Context
+		Valid bool `json:"valid"`
+	}{
+		Context: authContext,
+		Valid:   true,
+	})
 }
 
 func (h *WardenHandler) Allowed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := herodot.NewContext()
-	clientCtx, err := h.authorizeClient(ctx, w, r)
-	if err != nil {
+	if _, err := h.Warden.HTTPRequestAllowed(ctx, r, &ladon.Request{
+		Resource: "rn:hydra:warden:allowed",
+		Action:   "decide",
+	}, "warden.token"); err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
 	}
 
-	var ar = new(WardenAuthorizedRequest)
-	if err := json.NewDecoder(r.Body).Decode(&ar); err != nil {
+	var access = new(ladon.Request)
+	if err := json.NewDecoder(r.Body).Decode(&access); err != nil {
 		h.H.WriteError(ctx, w, r, errors.New(err))
 		return
 	}
 	defer r.Body.Close()
 
-	authContext, err := h.Warden.ActionAllowed(ctx, ar.Token, ar.Request, ar.Scopes...)
-	if err != nil {
-		h.H.WriteError(ctx, w, r, err)
+	if err := h.Warden.IsAllowed(ctx, access); err != nil {
+		h.H.Write(ctx, w, r, &notAllowed)
 		return
 	}
 
-	authContext.Audience = clientCtx.Subject
-	h.H.Write(ctx, w, r, authContext)
+	res := notAllowed
+	res.Allowed = true
+	h.H.Write(ctx, w, r, &res)
 }
 
 func (h *WardenHandler) TokenAllowed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := herodot.NewContext()
-	clientCtx, err := h.authorizeClient(ctx, w, r)
+	clientCtx, err := h.Warden.HTTPRequestAllowed(ctx, r, &ladon.Request{
+		Resource: "rn:hydra:warden:token:allowed",
+		Action:   "decide",
+	}, "warden.token")
 	if err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
 	}
 
 	var ar = WardenAccessRequest{
-		Request: new(ladon.Request),
+		Request:                 new(ladon.Request),
 		WardenAuthorizedRequest: new(WardenAuthorizedRequest),
 	}
 	if err := json.NewDecoder(r.Body).Decode(&ar); err != nil {
@@ -131,23 +181,20 @@ func (h *WardenHandler) TokenAllowed(w http.ResponseWriter, r *http.Request, _ h
 	}
 	defer r.Body.Close()
 
-	authContext, err := h.Warden.ActionAllowed(ctx, ar.Token, ar.Request, ar.Scopes...)
+	authContext, err := h.Warden.TokenAllowed(ctx, ar.Token, ar.Request, ar.Scopes...)
 	if err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.Write(ctx, w, r, &notAllowed)
 		return
 	}
 
 	authContext.Audience = clientCtx.Subject
-	h.H.Write(ctx, w, r, authContext)
-}
-
-func (h *WardenHandler) authorizeClient(ctx context.Context, w http.ResponseWriter, r *http.Request) (*firewall.Context, error) {
-	authctx, err := h.Warden.Authorized(ctx, TokenFromRequest(r), "core")
-	if err != nil {
-		return nil, err
-	}
-
-	return authctx, nil
+	h.H.Write(ctx, w, r, struct {
+		*firewall.Context
+		Allowed bool `json:"allowed"`
+	}{
+		Context: authContext,
+		Allowed: true,
+	})
 }
 
 func TokenFromRequest(r *http.Request) string {

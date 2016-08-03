@@ -577,7 +577,7 @@ Validate requests with the Warden, uses [`ory-am/hydra/warden.HTTPWarden`](warde
 import "github.com/ory-am/ladon"
 
 // Check if action is allowed
-hydra.Warden.HTTPActionAllowed(ctx, req, &ladon.Request{
+hydra.Warden.HTTPRequestAllowed(ctx, req, &ladon.Request{
     Resource: "urn:media:images",
     Action: "get",
     Subject: "bob",

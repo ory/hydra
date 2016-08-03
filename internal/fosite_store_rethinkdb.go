@@ -18,7 +18,7 @@ import (
 type RDBItems map[string]*RdbSchema
 
 type FositeRehinkDBStore struct {
-	Session             *r.Session
+	Session *r.Session
 	sync.RWMutex
 
 	AuthorizeCodesTable r.Term
@@ -30,11 +30,11 @@ type FositeRehinkDBStore struct {
 
 	client.Manager
 
-	AuthorizeCodes      RDBItems
-	IDSessions          RDBItems
-	AccessTokens        RDBItems
-	Implicit            RDBItems
-	RefreshTokens       RDBItems
+	AuthorizeCodes RDBItems
+	IDSessions     RDBItems
+	AccessTokens   RDBItems
+	Implicit       RDBItems
+	RefreshTokens  RDBItems
 }
 
 type RdbSchema struct {
@@ -286,7 +286,7 @@ func (items RDBItems) coldStart(sess *r.Session, lock sync.RWMutex, table r.Term
 }
 
 func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock sync.RWMutex, table r.Term) {
-	go pkg.Retry(time.Second * 15, time.Minute, func() error {
+	go pkg.Retry(time.Second*15, time.Minute, func() error {
 		changes, err := table.Changes().Run(sess)
 		if err != nil {
 			pkg.LogError(errors.New(err))

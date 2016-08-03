@@ -1,6 +1,7 @@
 package config
 
 import (
+	"crypto/sha256"
 	"crypto/tls"
 	"fmt"
 	"io/ioutil"
@@ -10,7 +11,8 @@ import (
 	"sync"
 	"time"
 
-	"crypto/sha256"
+	"net"
+	"strings"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
@@ -26,35 +28,33 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/yaml.v2"
-	"net"
-	"strings"
 )
 
 type Config struct {
 	// These are used by client commands
-	ClusterURL          string `mapstructure:"CLUSTER_URL" yaml:"cluster_url"`
-	ClientID            string `mapstructure:"CLIENT_ID" yaml:"client_id,omitempty"`
-	ClientSecret        string `mapstructure:"CLIENT_SECRET" yaml:"client_secret,omitempty"`
+	ClusterURL   string `mapstructure:"CLUSTER_URL" yaml:"cluster_url"`
+	ClientID     string `mapstructure:"CLIENT_ID" yaml:"client_id,omitempty"`
+	ClientSecret string `mapstructure:"CLIENT_SECRET" yaml:"client_secret,omitempty"`
 
 	// These are used by the host command
-	BindPort            int `mapstructure:"PORT" yaml:"-"`
-	BindHost            string `mapstructure:"HOST" yaml:"-"`
-	Issuer              string `mapstructure:"ISSUER" yaml:"-"`
-	SystemSecret        string `mapstructure:"SYSTEM_SECRET" yaml:"-"`
-	DatabaseURL         string `mapstructure:"DATABASE_URL" yaml:"-"`
-	ConsentURL          string `mapstructure:"CONSENT_URL" yaml:"-"`
-	AllowTLSTermination string `mapstructure:"HTTPS_ALLOW_TERMINATION_FROM" yaml:"-"`
-	BCryptWorkFactor    int `mapstructure:"BCRYPT_COST" yaml:"-"`
-	AccessTokenLifespan string `mapstructure:"ACCESS_TOKEN_LIFESPAN" yaml:"-"`
-	AuthCodeLifespan    string `mapstructure:"AUTH_CODE_LIFESPAN" yaml:"-"`
-	IDTokenLifespan     string `mapstructure:"ID_TOKEN_LIFESPAN" yaml:"-"`
-	ChallengeTokenLifespan   string `mapstructure:"CHALLENGE_TOKEN_LIFESPAN" yaml:"-"`
-	ForceHTTP           bool `yaml:"-"`
+	BindPort               int    `mapstructure:"PORT" yaml:"-"`
+	BindHost               string `mapstructure:"HOST" yaml:"-"`
+	Issuer                 string `mapstructure:"ISSUER" yaml:"-"`
+	SystemSecret           string `mapstructure:"SYSTEM_SECRET" yaml:"-"`
+	DatabaseURL            string `mapstructure:"DATABASE_URL" yaml:"-"`
+	ConsentURL             string `mapstructure:"CONSENT_URL" yaml:"-"`
+	AllowTLSTermination    string `mapstructure:"HTTPS_ALLOW_TERMINATION_FROM" yaml:"-"`
+	BCryptWorkFactor       int    `mapstructure:"BCRYPT_COST" yaml:"-"`
+	AccessTokenLifespan    string `mapstructure:"ACCESS_TOKEN_LIFESPAN" yaml:"-"`
+	AuthCodeLifespan       string `mapstructure:"AUTH_CODE_LIFESPAN" yaml:"-"`
+	IDTokenLifespan        string `mapstructure:"ID_TOKEN_LIFESPAN" yaml:"-"`
+	ChallengeTokenLifespan string `mapstructure:"CHALLENGE_TOKEN_LIFESPAN" yaml:"-"`
+	ForceHTTP              bool   `yaml:"-"`
 
-	cluster             *url.URL `yaml:"-"`
-	oauth2Client        *http.Client `yaml:"-"`
-	context             *Context `yaml:"-"`
-	sync.Mutex `yaml:"-"`
+	cluster      *url.URL     `yaml:"-"`
+	oauth2Client *http.Client `yaml:"-"`
+	context      *Context     `yaml:"-"`
+	sync.Mutex   `yaml:"-"`
 }
 
 func matchesRange(r *http.Request, ranges []string) error {

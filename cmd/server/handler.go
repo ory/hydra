@@ -1,25 +1,26 @@
 package server
 
 import (
+	"crypto/tls"
+	"net/http"
+	"time"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
+	"github.com/meatballhat/negroni-logrus"
 	"github.com/ory-am/fosite/handler/core"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/connection"
+	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/hydra/policy"
 	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/ladon"
-	"time"
-	"crypto/tls"
 	"github.com/urfave/negroni"
-	"github.com/meatballhat/negroni-logrus"
-	"github.com/ory-am/hydra/herodot"
-	"net/http"
 
 	"github.com/spf13/cobra"
 	"golang.org/x/net/context"
@@ -51,7 +52,7 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 					getOrCreateTLSCertificate(cmd, c),
 				},
 			},
-			ReadTimeout: time.Second * 5,
+			ReadTimeout:  time.Second * 5,
 			WriteTimeout: time.Second * 10,
 		}
 
@@ -60,7 +61,7 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		if ok, _ := cmd.Flags().GetBool("force-dangerous-http"); ok {
 			logrus.Warnln("HTTPS disabled. Never do this in production.")
 			err = srv.ListenAndServe()
-		} else if (c.AllowTLSTermination != "") {
+		} else if c.AllowTLSTermination != "" {
 			logrus.Infoln("TLS termination enabled, disabling https.")
 			err = srv.ListenAndServe()
 		} else {

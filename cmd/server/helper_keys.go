@@ -1,13 +1,14 @@
 package server
 
 import (
-	"github.com/ory-am/hydra/jwk"
-	"crypto/rsa"
 	"crypto/ecdsa"
-	"github.com/ory-am/hydra/pkg"
+	"crypto/rsa"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/config"
+	"github.com/ory-am/hydra/jwk"
+	"github.com/ory-am/hydra/pkg"
 )
 
 func (h *Handler) createRS256KeysIfNotExist(c *config.Config, set, lookup string) {

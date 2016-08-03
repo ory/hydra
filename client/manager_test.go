@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/ory-am/dockertest"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/hash"
 	. "github.com/ory-am/hydra/client"
@@ -22,7 +23,6 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
-	"gopkg.in/ory-am/dockertest.v2"
 )
 
 var clientManagers = map[string]Storage{}

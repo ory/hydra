@@ -8,13 +8,13 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	c "github.com/ory-am/common/pkg"
+	"github.com/ory-am/dockertest"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
-	"gopkg.in/ory-am/dockertest.v2"
 )
 
 var rethinkManager *FositeRehinkDBStore

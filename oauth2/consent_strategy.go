@@ -66,6 +66,15 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 		a.GrantScope(scope)
 	}
 
+	var idExt map[string]interface{}
+	var atExt map[string]interface{}
+	if ext, ok := t.Claims["id_ext"].(map[string]interface{}); ok {
+		idExt = ext
+	}
+	if ext, ok := t.Claims["id_ext"].(map[string]interface{}); ok {
+		atExt = ext
+	}
+
 	return &Session{
 		Subject: subject,
 		DefaultSession: &strategy.DefaultSession{
@@ -75,10 +84,11 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 				Issuer:    s.Issuer,
 				IssuedAt:  time.Now(),
 				ExpiresAt: time.Now().Add(s.DefaultIDTokenLifespan),
-				Extra:     t.Claims,
+				Extra:     idExt,
 			},
 			Headers: &ejwt.Headers{},
 		},
+		Extra: atExt,
 	}, err
 
 }

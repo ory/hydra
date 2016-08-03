@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+
 	"github.com/ory-am/hydra/cmd/cli"
 	"github.com/ory-am/hydra/config"
 	"github.com/spf13/cobra"

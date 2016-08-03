@@ -62,7 +62,6 @@ func init() {
 
 	r := httprouter.New()
 	serv := &warden.WardenHandler{
-		Ladon:  ladonWarden,
 		H:      &herodot.JSON{},
 		Warden: wardens["local"],
 	}
@@ -183,7 +182,7 @@ func TestActionAllowed(t *testing.T) {
 				},
 			},
 		} {
-			ctx, err := w.ActionAllowed(context.Background(), c.token, c.req, c.scopes...)
+			ctx, err := w.IsAllowed(context.Background(), c.token, c.req, c.scopes...)
 			pkg.AssertError(t, c.expectErr, err, "ActionAllowed case", n, k)
 			if err == nil && c.assert != nil {
 				c.assert(ctx)
@@ -191,7 +190,7 @@ func TestActionAllowed(t *testing.T) {
 
 			httpreq := &http.Request{Header: http.Header{}}
 			httpreq.Header.Set("Authorization", "bearer "+c.token)
-			ctx, err = w.HTTPActionAllowed(context.Background(), httpreq, c.req, c.scopes...)
+			ctx, err = w.HTTPRequestAllowed(context.Background(), httpreq, c.req, c.scopes...)
 			pkg.AssertError(t, c.expectErr, err, "HTTPAuthorized case", n, k)
 			if err == nil && c.assert != nil {
 				c.assert(ctx)
@@ -238,7 +237,7 @@ func TestAuthorized(t *testing.T) {
 				expectErr: true,
 			},
 		} {
-			ctx, err := w.Authorized(context.Background(), c.token, c.scopes...)
+			ctx, err := w.InspectToken(context.Background(), c.token, c.scopes...)
 			pkg.AssertError(t, c.expectErr, err, "ActionAllowed case", n, k)
 			if err == nil && c.assert != nil {
 				c.assert(ctx)
@@ -246,7 +245,7 @@ func TestAuthorized(t *testing.T) {
 
 			httpreq := &http.Request{Header: http.Header{}}
 			httpreq.Header.Set("Authorization", "bearer "+c.token)
-			ctx, err = w.HTTPAuthorized(context.Background(), httpreq, c.scopes...)
+			ctx, err = w.InspectTokenFromHTTP(context.Background(), httpreq, c.scopes...)
 			pkg.AssertError(t, c.expectErr, err, "HTTPAuthorized case", n, k)
 			if err == nil && c.assert != nil {
 				c.assert(ctx)

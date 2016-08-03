@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
 	"github.com/ory-am/hydra/cmd/server"
+	"github.com/spf13/cobra"
 )
 
 // hostCmd represents the host command

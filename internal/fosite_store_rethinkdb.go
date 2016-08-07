@@ -91,7 +91,7 @@ func (s *FositeRehinkDBStore) publishInsert(table r.Term, id string, requester f
 		ID:            id,
 		RequestedAt:   requester.GetRequestedAt(),
 		Client:        requester.GetClient().(*client.Client),
-		Scopes:        requester.GetScopes(),
+		Scopes:        requester.GetRequestedScopes(),
 		GrantedScopes: requester.GetGrantedScopes(),
 		Form:          requester.GetRequestForm(),
 		Session:       sess,

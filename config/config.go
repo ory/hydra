@@ -10,13 +10,11 @@ import (
 	"os"
 	"sync"
 	"time"
-
 	"net"
 	"strings"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
-	"github.com/ory-am/fosite/handler/core/strategy"
 	"github.com/ory-am/fosite/hash"
 	"github.com/ory-am/fosite/token/hmac"
 	"github.com/ory-am/hydra/pkg"
@@ -27,14 +25,15 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 	r "gopkg.in/dancannon/gorethink.v2"
+	foauth2 "github.com/ory-am/fosite/handler/oauth2"
 	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
 	// These are used by client commands
-	ClusterURL   string `mapstructure:"CLUSTER_URL" yaml:"cluster_url"`
-	ClientID     string `mapstructure:"CLIENT_ID" yaml:"client_id,omitempty"`
-	ClientSecret string `mapstructure:"CLIENT_SECRET" yaml:"client_secret,omitempty"`
+	ClusterURL             string `mapstructure:"CLUSTER_URL" yaml:"cluster_url"`
+	ClientID               string `mapstructure:"CLIENT_ID" yaml:"client_id,omitempty"`
+	ClientSecret           string `mapstructure:"CLIENT_SECRET" yaml:"client_secret,omitempty"`
 
 	// These are used by the host command
 	BindPort               int    `mapstructure:"PORT" yaml:"-"`
@@ -51,9 +50,9 @@ type Config struct {
 	ChallengeTokenLifespan string `mapstructure:"CHALLENGE_TOKEN_LIFESPAN" yaml:"-"`
 	ForceHTTP              bool   `yaml:"-"`
 
-	cluster      *url.URL     `yaml:"-"`
-	oauth2Client *http.Client `yaml:"-"`
-	context      *Context     `yaml:"-"`
+	cluster                *url.URL     `yaml:"-"`
+	oauth2Client           *http.Client `yaml:"-"`
+	context                *Context     `yaml:"-"`
 	sync.Mutex   `yaml:"-"`
 }
 
@@ -182,7 +181,7 @@ func (c *Config) Context() *Context {
 			WorkFactor: c.BCryptWorkFactor,
 		},
 		LadonManager: manager,
-		FositeStrategy: &strategy.HMACSHAStrategy{
+		FositeStrategy: &foauth2.HMACSHAStrategy{
 			Enigma: &hmac.HMACStrategy{
 				GlobalSecret: c.GetSystemSecret(),
 			},

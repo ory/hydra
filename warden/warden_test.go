@@ -2,7 +2,6 @@ package warden_test
 
 import (
 	"log"
-	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
@@ -10,7 +9,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
-	"github.com/ory-am/fosite/handler/core"
+	foauth2 "github.com/ory-am/fosite/handler/oauth2"
 	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/oauth2"
@@ -52,9 +51,14 @@ var tokens = pkg.Tokens(3)
 func init() {
 	wardens["local"] = &warden.LocalWarden{
 		Warden: ladonWarden,
-		TokenValidator: &core.CoreValidator{
-			AccessTokenStrategy: pkg.HMACStrategy,
-			AccessTokenStorage:  fositeStore,
+		OAuth2: &fosite.Fosite{
+			Store: fositeStore,
+			TokenValidators: fosite.TokenValidators{
+				&foauth2.CoreValidator{
+					CoreStrategy: pkg.HMACStrategy,
+					CoreStorage:  fositeStore,
+				},
+			},
 		},
 		Issuer:              "tests",
 		AccessTokenLifespan: time.Hour,
@@ -182,16 +186,8 @@ func TestActionAllowed(t *testing.T) {
 				},
 			},
 		} {
-			ctx, err := w.IsAllowed(context.Background(), c.token, c.req, c.scopes...)
+			ctx, err := w.TokenAllowed(context.Background(), c.token, c.req, c.scopes...)
 			pkg.AssertError(t, c.expectErr, err, "ActionAllowed case", n, k)
-			if err == nil && c.assert != nil {
-				c.assert(ctx)
-			}
-
-			httpreq := &http.Request{Header: http.Header{}}
-			httpreq.Header.Set("Authorization", "bearer "+c.token)
-			ctx, err = w.HTTPRequestAllowed(context.Background(), httpreq, c.req, c.scopes...)
-			pkg.AssertError(t, c.expectErr, err, "HTTPAuthorized case", n, k)
 			if err == nil && c.assert != nil {
 				c.assert(ctx)
 			}
@@ -239,14 +235,6 @@ func TestAuthorized(t *testing.T) {
 		} {
 			ctx, err := w.InspectToken(context.Background(), c.token, c.scopes...)
 			pkg.AssertError(t, c.expectErr, err, "ActionAllowed case", n, k)
-			if err == nil && c.assert != nil {
-				c.assert(ctx)
-			}
-
-			httpreq := &http.Request{Header: http.Header{}}
-			httpreq.Header.Set("Authorization", "bearer "+c.token)
-			ctx, err = w.InspectTokenFromHTTP(context.Background(), httpreq, c.scopes...)
-			pkg.AssertError(t, c.expectErr, err, "HTTPAuthorized case", n, k)
 			if err == nil && c.assert != nil {
 				c.assert(ctx)
 			}

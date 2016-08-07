@@ -23,16 +23,17 @@ type Firewall interface {
 	// a context if the token is valid and an error if not.
 	InspectToken(ctx context.Context, token string, scopes ...string) (*Context, error)
 
-	// InspectTokenFromHTTP uses the HTTP request to decide weather a token is valid or not. If not, an error
-	// is returned.
-	InspectTokenFromHTTP(ctx context.Context, r *http.Request, scopes ...string) (*Context, error)
-
 	// IsAllowed uses policies to return nil if the access request can be fulfilled or an error if not.
 	IsAllowed(ctx context.Context, accessRequest *ladon.Request) error
 
 	// TokenAllowed uses policies and a token to return a context and no error if the access request can be fulfilled or an error if not.
 	TokenAllowed(ctx context.Context, token string, accessRequest *ladon.Request, scopes ...string) (*Context, error)
 
-	// HTTPRequestAllowed uses policies and a http request to return a context and no error if the access request can be fulfilled or an error if not.
-	HTTPRequestAllowed(ctx context.Context, r *http.Request, accessRequest *ladon.Request, scopes ...string) (*Context, error)
+	TokenFromRequest(r *http.Request) string
+}
+
+type Introspector interface {
+	IntrospectToken(ctx context.Context, token string, scopes ...string) (*Context, error)
+
+	TokenFromRequest(r *http.Request) string
 }

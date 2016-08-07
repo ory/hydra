@@ -2,25 +2,12 @@ package server
 
 import (
 	"net/url"
-
 	"fmt"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
-	"github.com/ory-am/fosite/handler/core"
-	oc "github.com/ory-am/fosite/handler/core/client"
-	"github.com/ory-am/fosite/handler/core/explicit"
-	"github.com/ory-am/fosite/handler/core/implicit"
-	"github.com/ory-am/fosite/handler/core/refresh"
-	"github.com/ory-am/fosite/handler/oidc"
-	oe "github.com/ory-am/fosite/handler/oidc/explicit"
-	"github.com/ory-am/fosite/handler/oidc/hybrid"
-	oi "github.com/ory-am/fosite/handler/oidc/implicit"
-	os "github.com/ory-am/fosite/handler/oidc/strategy"
-	"github.com/ory-am/fosite/hash"
-	"github.com/ory-am/fosite/token/jwt"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/internal"
@@ -29,6 +16,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
+	"github.com/ory-am/fosite/compose"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {
@@ -79,7 +67,7 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 	ctx.FositeStore = store
 }
 
-func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manager) *oauth2.Handler {
+func newOAuth2Provider(c *config.Config, km jwk.Manager) fosite.OAuth2Provider {
 	var ctx = c.Context()
 	var store = ctx.FositeStore
 
@@ -96,42 +84,30 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 	}
 
 	rsaKey := jwk.MustRSAPrivate(jwk.First(keys.Keys))
-
-	idStrategy := &os.DefaultStrategy{
-		RS256JWTStrategy: &jwt.RS256JWTStrategy{
-			PrivateKey: rsaKey,
+	fc := &compose.Config{
+		AccessTokenLifespan: c.GetAccessTokenLifespan(),
+		AuthorizeCodeLifespan: c.GetAuthCodeLifespan(),
+		IDTokenLifespan: c.GetIDTokenLifespan(),
+		HashCost: c.BCryptWorkFactor,
+	}
+	return compose.Compose(
+		fc,
+		store,
+		&compose.CommonStrategy{
+			CoreStrategy: compose.NewOAuth2HMACStrategy(fc, c.GetSystemSecret()),
+			OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(rsaKey),
 		},
-	}
+		compose.OAuth2AuthorizeExplicitFactory,
+		compose.OAuth2AuthorizeImplicitFactory,
+		compose.OAuth2ClientCredentialsGrantFactory,
+		compose.OAuth2RefreshTokenGrantFactory,
+		compose.OpenIDConnectExplicit,
+		compose.OpenIDConnectHybrid,
+		compose.OpenIDConnectImplicit,
+	)
+}
 
-	oauth2HandleHelper := &core.HandleHelper{
-		AccessTokenStrategy: ctx.FositeStrategy,
-		AccessTokenStorage:  store,
-		AccessTokenLifespan: c.GetAccessTokenLifespan(),
-	}
-
-	oidcHelper := &oidc.IDTokenHandleHelper{IDTokenStrategy: idStrategy}
-
-	explicitHandler := &explicit.AuthorizeExplicitGrantTypeHandler{
-		AccessTokenStrategy:       ctx.FositeStrategy,
-		RefreshTokenStrategy:      ctx.FositeStrategy,
-		AuthorizeCodeStrategy:     ctx.FositeStrategy,
-		AuthorizeCodeGrantStorage: store,
-		AuthCodeLifespan:          c.GetAuthCodeLifespan(),
-		AccessTokenLifespan:       c.GetAccessTokenLifespan(),
-	}
-
-	// The OpenID Connect Authorize Code Flow.
-	oidcExplicit := &oe.OpenIDConnectExplicitHandler{
-		OpenIDConnectRequestStorage: store,
-		IDTokenHandleHelper:         oidcHelper,
-	}
-
-	implicitHandler := &implicit.AuthorizeImplicitGrantTypeHandler{
-		AccessTokenStrategy: ctx.FositeStrategy,
-		AccessTokenStorage:  store,
-		AccessTokenLifespan: c.GetAccessTokenLifespan(),
-	}
-
+func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manager, o fosite.OAuth2Provider) *oauth2.Handler {
 	if c.ConsentURL == "" {
 		proto := "https"
 		if c.ForceHTTP {
@@ -146,46 +122,10 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 	consentURL, err := url.Parse(c.ConsentURL)
 	pkg.Must(err, "Could not parse consent url %s.", c.ConsentURL)
 
+
 	handler := &oauth2.Handler{
 		ForcedHTTP: c.ForceHTTP,
-		OAuth2: &fosite.Fosite{
-			Store:          store,
-			MandatoryScope: "core",
-			AuthorizeEndpointHandlers: fosite.AuthorizeEndpointHandlers{
-				explicitHandler,
-				implicitHandler,
-				oidcExplicit,
-				&oi.OpenIDConnectImplicitHandler{
-					IDTokenHandleHelper:               oidcHelper,
-					AuthorizeImplicitGrantTypeHandler: implicitHandler,
-				},
-				&hybrid.OpenIDConnectHybridHandler{
-					IDTokenHandleHelper:               oidcHelper,
-					AuthorizeExplicitGrantTypeHandler: explicitHandler,
-					AuthorizeImplicitGrantTypeHandler: implicitHandler,
-				},
-			},
-			TokenEndpointHandlers: fosite.TokenEndpointHandlers{
-				explicitHandler,
-				oidcExplicit,
-				&refresh.RefreshTokenGrantHandler{
-					AccessTokenStrategy:      ctx.FositeStrategy,
-					RefreshTokenStrategy:     ctx.FositeStrategy,
-					RefreshTokenGrantStorage: store,
-					AccessTokenLifespan:      c.GetAccessTokenLifespan(),
-				},
-				&oc.ClientCredentialsGrantHandler{
-					HandleHelper: oauth2HandleHelper,
-				},
-			},
-			Validators: fosite.AuthorizedRequestValidators{
-				&core.CoreValidator{
-					AccessTokenStrategy: ctx.FositeStrategy,
-					AccessTokenStorage:  store,
-				},
-			},
-			Hasher: &hash.BCrypt{},
-		},
+		OAuth2: o,
 		Consent: &oauth2.DefaultConsentStrategy{
 			Issuer:                   c.Issuer,
 			KeyManager:               km,

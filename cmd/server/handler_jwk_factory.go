@@ -11,13 +11,8 @@ import (
 	r "gopkg.in/dancannon/gorethink.v2"
 )
 
-func newJWKHandler(c *config.Config, router *httprouter.Router) *jwk.Handler {
+func injectJWKManager(c *config.Config) {
 	ctx := c.Context()
-	h := &jwk.Handler{
-		H: &herodot.JSON{},
-		W: ctx.Warden,
-	}
-	h.SetRoutes(router)
 
 	switch con := ctx.Connection.(type) {
 	case *config.MemoryConnection:
@@ -42,7 +37,15 @@ func newJWKHandler(c *config.Config, router *httprouter.Router) *jwk.Handler {
 	default:
 		logrus.Fatalf("Unknown connection type.")
 	}
+}
 
-	h.Manager = ctx.KeyManager
+func newJWKHandler(c *config.Config, router *httprouter.Router) *jwk.Handler {
+	ctx := c.Context()
+	h := &jwk.Handler{
+		H: &herodot.JSON{},
+		W: ctx.Warden,
+		Manager: ctx.KeyManager,
+	}
+	h.SetRoutes(router)
 	return h
 }

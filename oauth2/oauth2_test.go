@@ -10,12 +10,7 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
-	"github.com/ory-am/fosite/handler/core"
-	"github.com/ory-am/fosite/handler/core/client"
-	"github.com/ory-am/fosite/handler/core/explicit"
-	"github.com/ory-am/fosite/handler/core/strategy"
 	"github.com/ory-am/fosite/hash"
-	"github.com/ory-am/fosite/token/hmac"
 	hc "github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/internal"
 	"github.com/ory-am/hydra/jwk"
@@ -24,6 +19,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 	"gopkg.in/dgrijalva/jwt-go.v2"
+	"github.com/ory-am/fosite/compose"
 )
 
 var hasher = &hash.BCrypt{}
@@ -41,46 +37,10 @@ var store = &internal.FositeMemoryStore{
 }
 
 var keyManager = &jwk.MemoryManager{}
-
 var keyGenerator = &jwk.RS256Generator{}
 
-var hmacStrategy = &strategy.HMACSHAStrategy{
-	Enigma: &hmac.HMACStrategy{
-		GlobalSecret: []byte("some-super-cool-secret-that-nobody-knows"),
-	},
-	AuthorizeCodeLifespan: time.Hour,
-	AccessTokenLifespan:   time.Hour,
-}
-
-var authCodeHandler = &explicit.AuthorizeExplicitGrantTypeHandler{
-	AccessTokenStrategy:       hmacStrategy,
-	RefreshTokenStrategy:      hmacStrategy,
-	AuthorizeCodeStrategy:     hmacStrategy,
-	AuthorizeCodeGrantStorage: store,
-	AuthCodeLifespan:          time.Hour,
-	AccessTokenLifespan:       time.Hour,
-}
-
 var handler = &Handler{
-	OAuth2: &fosite.Fosite{
-		Store:          store,
-		MandatoryScope: "hydra",
-		AuthorizeEndpointHandlers: fosite.AuthorizeEndpointHandlers{
-			authCodeHandler,
-		},
-		TokenEndpointHandlers: fosite.TokenEndpointHandlers{
-			authCodeHandler,
-			&client.ClientCredentialsGrantHandler{
-				HandleHelper: &core.HandleHelper{
-					AccessTokenStrategy: hmacStrategy,
-					AccessTokenStorage:  store,
-					AccessTokenLifespan: time.Hour,
-				},
-			},
-		},
-		Validators: fosite.AuthorizedRequestValidators{},
-		Hasher: hasher,
-	},
+	OAuth2: compose.ComposeAllEnabled(new(compose.Config), store, []byte("some super secret secret"), pkg.MustRSAKey()),
 	Consent: &DefaultConsentStrategy{
 		Issuer:                   "https://hydra.localhost",
 		KeyManager:               keyManager,
@@ -90,11 +50,8 @@ var handler = &Handler{
 }
 
 var router = httprouter.New()
-
 var ts *httptest.Server
-
 var oauthConfig *oauth2.Config
-
 var oauthClientConfig *clientcredentials.Config
 
 func init() {

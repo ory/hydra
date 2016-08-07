@@ -9,7 +9,6 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/meatballhat/negroni-logrus"
-	"github.com/ory-am/fosite/handler/core"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/connection"
@@ -85,17 +84,18 @@ func (h *Handler) start(router *httprouter.Router) {
 	c := h.Config
 	ctx := c.Context()
 
-	// Set up warden
+	// Set up dependencies
+	injectJWKManager(c)
 	clientsManager := newClientManager(c)
 	injectFositeStore(c, clientsManager)
+	oauth2Provider := newOAuth2Provider(c, h.Keys.Manager)
+
+	// set up warden
 	ctx.Warden = &warden.LocalWarden{
 		Warden: &ladon.Ladon{
 			Manager: ctx.LadonManager,
 		},
-		TokenValidator: &core.CoreValidator{
-			AccessTokenStrategy: ctx.FositeStrategy,
-			AccessTokenStorage:  ctx.FositeStore,
-		},
+		OAuth2: oauth2Provider,
 		Issuer:              c.Issuer,
 		AccessTokenLifespan: c.GetAccessTokenLifespan(),
 	}
@@ -105,7 +105,7 @@ func (h *Handler) start(router *httprouter.Router) {
 	h.Keys = newJWKHandler(c, router)
 	h.Connections = newConnectionHandler(c, router)
 	h.Policy = newPolicyHandler(c, router)
-	h.OAuth2 = newOAuth2Handler(c, router, h.Keys.Manager)
+	h.OAuth2 = newOAuth2Handler(c, router, ctx.KeyManager, oauth2Provider)
 	h.Warden = warden.NewHandler(c, router)
 
 	// Create root account if new install

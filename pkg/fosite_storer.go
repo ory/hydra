@@ -2,18 +2,15 @@ package pkg
 
 import (
 	"github.com/ory-am/fosite"
-	"github.com/ory-am/fosite/handler/core"
-	"github.com/ory-am/fosite/handler/core/explicit"
-	"github.com/ory-am/fosite/handler/core/implicit"
-	"github.com/ory-am/fosite/handler/core/refresh"
-	"github.com/ory-am/fosite/handler/oidc"
+	"github.com/ory-am/fosite/handler/oauth2"
+	"github.com/ory-am/fosite/handler/openid"
 )
 
 type FositeStorer interface {
-	core.AccessTokenStorage
+	oauth2.AccessTokenStorage
 	fosite.Storage
-	explicit.AuthorizeCodeGrantStorage
-	refresh.RefreshTokenGrantStorage
-	implicit.ImplicitGrantStorage
-	oidc.OpenIDConnectRequestStorage
+	oauth2.AuthorizeCodeGrantStorage
+	oauth2.RefreshTokenGrantStorage
+	oauth2.ImplicitGrantStorage
+	openid.OpenIDConnectRequestStorage
 }

@@ -8,13 +8,13 @@ import (
 	"net/url"
 
 	"github.com/go-errors/errors"
-	. "github.com/ory-am/hydra/firewall"
-	"github.com/ory-am/hydra/pkg"
+	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/pkg/helper"
 	"github.com/ory-am/ladon"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
+	"github.com/ory-am/fosite"
 )
 
 type HTTPWarden struct {
@@ -23,54 +23,38 @@ type HTTPWarden struct {
 	Endpoint *url.URL
 }
 
+func  (w *HTTPWarden) TokenFromRequest(r *http.Request) string {
+	return fosite.AccessTokenFromRequest(r)
+}
+
 func (w *HTTPWarden) SetClient(c *clientcredentials.Config) {
 	w.Client = c.Client(oauth2.NoContext)
 }
 
-func (w *HTTPWarden) IntrospectToken() {
-
+func (w *HTTPWarden) IntrospectToken(ctx context.Context, token string, a *ladon.Request, scopes ...string) (*firewall.Context, error) {
+	return nil, nil
 }
 
-func (w *HTTPWarden) ActionAllowed(ctx context.Context, token string, a *ladon.Request, scopes ...string) (*Context, error) {
-	return w.doRequest(TokenAllowedHandlerPath, &WardenAccessRequest{
-		Request: a,
-		WardenAuthorizedRequest: &WardenAuthorizedRequest{
-			Token:  token,
-			Scopes: scopes,
-		},
-	})
+func (w *HTTPWarden) TokenAllowed(ctx context.Context, token string, a *ladon.Request, scopes ...string) (*firewall.Context, error) {
+	return nil, nil
 }
 
-func (w *HTTPWarden) HTTPRequestAllowed(ctx context.Context, r *http.Request, a *ladon.Request, scopes ...string) (*Context, error) {
-	token := TokenFromRequest(r)
-	if token == "" {
-		return nil, errors.New(pkg.ErrUnauthorized)
-	}
-
-	return w.ActionAllowed(ctx, token, a, scopes...)
+func (w *HTTPWarden) IsAllowed(ctx context.Context, a *ladon.Request) error {
+	return nil
 }
 
-func (w *HTTPWarden) Authorized(ctx context.Context, token string, scopes ...string) (*Context, error) {
+func (w *HTTPWarden) InspectToken(ctx context.Context, token string, scopes ...string) (*firewall.Context, error) {
 	return w.doRequest(TokenValidHandlerPath, &WardenAuthorizedRequest{
 		Token:  token,
 		Scopes: scopes,
 	})
 }
 
-func (w *HTTPWarden) HTTPAuthorized(ctx context.Context, r *http.Request, scopes ...string) (*Context, error) {
-	token := TokenFromRequest(r)
-	if token == "" {
-		return nil, errors.New(pkg.ErrUnauthorized)
-	}
-
-	return w.Authorized(ctx, token, scopes...)
-}
-
 func (w *HTTPWarden) doDry(req *http.Request) error {
 	return helper.DoDryRequest(w.Dry, req)
 }
 
-func (w *HTTPWarden) doRequest(path string, request interface{}) (*Context, error) {
+func (w *HTTPWarden) doRequest(path string, request interface{}) (*firewall.Context, error) {
 	out, err := json.Marshal(request)
 	if err != nil {
 		return nil, errors.New(err)
@@ -105,7 +89,7 @@ func (w *HTTPWarden) doRequest(path string, request interface{}) (*Context, erro
 	}
 
 	var epResp = struct {
-		*Context
+		*firewall.Context
 		Valid   bool `json:"valid"`
 		Allowed bool `json:"allowed"`
 	}{}

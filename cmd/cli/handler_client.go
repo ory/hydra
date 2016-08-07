@@ -69,7 +69,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		ID:            id,
 		Secret:        string(secret),
 		ResponseTypes: responseTypes,
-		GrantedScopes: allowedScopes,
+		Scopes: allowedScopes,
 		GrantTypes:    grantTypes,
 		RedirectURIs:  callbacks,
 		Name:          name,

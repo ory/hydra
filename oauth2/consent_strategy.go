@@ -8,20 +8,20 @@ import (
 
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
-	"github.com/ory-am/fosite/handler/oidc/strategy"
 	ejwt "github.com/ory-am/fosite/token/jwt"
 	"github.com/ory-am/hydra/jwk"
 	"github.com/pborman/uuid"
 	"gopkg.in/dgrijalva/jwt-go.v2"
+	"github.com/ory-am/fosite/handler/openid"
 )
 
 const (
 	ConsentChallengeKey = "consent.challenge"
-	ConsentEndpointKey  = "consent.endpoint"
+	ConsentEndpointKey = "consent.endpoint"
 )
 
 type DefaultConsentStrategy struct {
-	Issuer string
+	Issuer                   string
 
 	DefaultIDTokenLifespan   time.Duration
 	DefaultChallengeLifespan time.Duration
@@ -77,7 +77,7 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 
 	return &Session{
 		Subject: subject,
-		DefaultSession: &strategy.DefaultSession{
+		DefaultSession: &openid.DefaultSession{
 			Claims: &ejwt.IDTokenClaims{
 				Audience:  a.GetClient().GetID(),
 				Subject:   subject,
@@ -116,7 +116,7 @@ func (s *DefaultConsentStrategy) IssueChallenge(authorizeRequest fosite.Authoriz
 	token := jwt.New(jwt.SigningMethodRS256)
 	token.Claims = map[string]interface{}{
 		"jti":   uuid.New(),
-		"scp":   authorizeRequest.GetScopes(),
+		"scp":   authorizeRequest.GetRequestedScopes(),
 		"aud":   authorizeRequest.GetClient().GetID(),
 		"exp":   time.Now().Add(s.DefaultChallengeLifespan).Unix(),
 		"redir": redirectURL,

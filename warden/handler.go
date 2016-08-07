@@ -101,7 +101,7 @@ func (h *WardenHandler) Introspect(w http.ResponseWriter, r *http.Request, _ htt
 
 func (h *WardenHandler) TokenValid(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := herodot.NewContext()
-	clientCtx, err := h.Warden.HTTPRequestAllowed(ctx, r, &ladon.Request{
+	clientCtx, err := h.Warden.TokenAllowed(ctx, h.Warden.TokenFromRequest(r), &ladon.Request{
 		Resource: "rn:hydra:warden:token:valid",
 		Action:   "decide",
 	}, "warden.token")
@@ -135,7 +135,7 @@ func (h *WardenHandler) TokenValid(w http.ResponseWriter, r *http.Request, _ htt
 
 func (h *WardenHandler) Allowed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := herodot.NewContext()
-	if _, err := h.Warden.HTTPRequestAllowed(ctx, r, &ladon.Request{
+	if _, err := h.Warden.TokenAllowed(ctx, h.Warden.TokenFromRequest(r), &ladon.Request{
 		Resource: "rn:hydra:warden:allowed",
 		Action:   "decide",
 	}, "warden.token"); err != nil {
@@ -162,7 +162,7 @@ func (h *WardenHandler) Allowed(w http.ResponseWriter, r *http.Request, _ httpro
 
 func (h *WardenHandler) TokenAllowed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := herodot.NewContext()
-	clientCtx, err := h.Warden.HTTPRequestAllowed(ctx, r, &ladon.Request{
+	clientCtx, err := h.Warden.TokenAllowed(ctx, h.Warden.TokenFromRequest(r), &ladon.Request{
 		Resource: "rn:hydra:warden:token:allowed",
 		Action:   "decide",
 	}, "warden.token")

@@ -16,7 +16,7 @@ type MemoryManager struct {
 	sync.RWMutex
 }
 
-func (m *MemoryManager) GetClient(id string) (fosite.Client, error) {
+func (m *MemoryManager) GetConcreteClient(id string) (*Client, error) {
 	m.RLock()
 	defer m.RUnlock()
 
@@ -25,6 +25,10 @@ func (m *MemoryManager) GetClient(id string) (fosite.Client, error) {
 		return nil, errors.New(pkg.ErrNotFound)
 	}
 	return &c, nil
+}
+
+func (m *MemoryManager) GetClient(id string) (fosite.Client, error) {
+	return m.GetConcreteClient(id)
 }
 
 func (m *MemoryManager) Authenticate(id string, secret []byte) (*Client, error) {

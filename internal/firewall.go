@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/ory-am/fosite"
-	"github.com/ory-am/fosite/handler/core"
+	foauth2 "github.com/ory-am/fosite/handler/oauth2"
 	"github.com/ory-am/hydra/firewall"
 	. "github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
@@ -32,17 +32,21 @@ func NewFirewall(issuer string, subject string, scopes fosite.Arguments, p ...la
 	conf := &oauth2.Config{Scopes: scopes, Endpoint: oauth2.Endpoint{}}
 
 	return &warden.LocalWarden{
-			Warden: ladonWarden,
-			TokenValidator: &core.CoreValidator{
-				AccessTokenStrategy: pkg.HMACStrategy,
-				AccessTokenStorage:  fositeStore,
+		Warden: ladonWarden,
+		OAuth2: &fosite.Fosite{
+			Store: fositeStore,
+			TokenValidators: fosite.TokenValidators{
+				&foauth2.CoreValidator{
+					CoreStrategy: pkg.HMACStrategy,
+					CoreStorage:  fositeStore,
+				},
 			},
-			Issuer:              issuer,
-			AccessTokenLifespan: time.Hour,
 		},
-		conf.Client(oauth2.NoContext, &oauth2.Token{
-			AccessToken: tokens[0][1],
-			Expiry:      time.Now().Add(time.Hour),
-			TokenType:   "bearer",
-		})
+		Issuer:              issuer,
+		AccessTokenLifespan: time.Hour,
+	}, conf.Client(oauth2.NoContext, &oauth2.Token{
+		AccessToken: tokens[0][1],
+		Expiry:      time.Now().Add(time.Hour),
+		TokenType:   "bearer",
+	})
 }

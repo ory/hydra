@@ -9,6 +9,8 @@ import (
 
 func TestStart(t *testing.T) {
 	router := httprouter.New()
-	h := &Handler{}
-	h.Start(&config.Config{}, router)
+	h := &Handler{
+		Config: &config.Config{},
+	}
+	h.start(router)
 }

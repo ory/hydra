@@ -19,6 +19,8 @@ type Context struct {
 }
 
 type Firewall interface {
+	Introspector
+
 	// InspectToken checks if the given token is valid and if the requested scopes are satisfied. Returns
 	// a context if the token is valid and an error if not.
 	InspectToken(ctx context.Context, token string, scopes ...string) (*Context, error)
@@ -32,8 +34,19 @@ type Firewall interface {
 	TokenFromRequest(r *http.Request) string
 }
 
-type Introspector interface {
-	IntrospectToken(ctx context.Context, token string, scopes ...string) (*Context, error)
+type Introspection struct {
+	Active    bool`string:"active"`
+	Scope     string`string:"scope,omitempty"`
+	ClientID  string`string:"client_id,omitempty"`
+	Subject   string`string:"sub,omitempty"`
+	ExpiresAt int64`string:"exp,omitempty"`
+	IssuedAt  int64 `string:"iat,omitempty"`
+	NotBefore int64 `string:"nbf,omitempty"`
+	Username int64 `string:"username,omitempty"`
+	Audience  string `string:"aud,omitempty"`
+	Issuer    string `string:"iss,omitempty"`
+}
 
-	TokenFromRequest(r *http.Request) string
+type Introspector interface {
+	IntrospectToken(ctx context.Context, token string) (*Introspection, error)
 }

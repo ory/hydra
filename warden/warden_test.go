@@ -55,8 +55,8 @@ func init() {
 			Store: fositeStore,
 			TokenValidators: fosite.TokenValidators{
 				&foauth2.CoreValidator{
-					CoreStrategy: pkg.HMACStrategy,
-					CoreStorage:  fositeStore,
+					CoreStrategy:  pkg.HMACStrategy,
+					CoreStorage:   fositeStore,
 					ScopeStrategy: fosite.HierarchicScopeStrategy,
 				},
 			},

@@ -1,20 +1,17 @@
 package warden
 
 import (
-	"bytes"
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 
 	"github.com/go-errors/errors"
+	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/firewall"
-	"github.com/ory-am/hydra/pkg/helper"
+	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
-	"github.com/ory-am/fosite"
 )
 
 type HTTPWarden struct {
@@ -23,7 +20,7 @@ type HTTPWarden struct {
 	Endpoint *url.URL
 }
 
-func  (w *HTTPWarden) TokenFromRequest(r *http.Request) string {
+func (w *HTTPWarden) TokenFromRequest(r *http.Request) string {
 	return fosite.AccessTokenFromRequest(r)
 }
 
@@ -31,81 +28,81 @@ func (w *HTTPWarden) SetClient(c *clientcredentials.Config) {
 	w.Client = c.Client(oauth2.NoContext)
 }
 
-func (w *HTTPWarden) IntrospectToken(ctx context.Context, token string, a *ladon.Request, scopes ...string) (*firewall.Context, error) {
-	return nil, nil
+func (w *HTTPWarden) IntrospectToken(ctx context.Context, token string) (*firewall.Introspection, error) {
+	var resp = new(firewall.Introspection)
+
+	var ep = *w.Endpoint
+	ep.Path = IntrospectPath
+	agent := &pkg.SuperAgent{URL: ep.String(), Client: w.Client}
+	if err := agent.POST(&struct {
+		Token string `json:"token"`
+	}{Token: token}, &resp); err != nil {
+		return nil, err
+	} else if !resp.Active {
+		return nil, errors.New("Token is not valid")
+	}
+
+	return resp, nil
 }
 
 func (w *HTTPWarden) TokenAllowed(ctx context.Context, token string, a *ladon.Request, scopes ...string) (*firewall.Context, error) {
-	return w.doRequest(TokenAllowedHandlerPath, &WardenAccessRequest{
+	var resp = struct {
+		*firewall.Context
+		Allowed bool `json:"allowed"`
+	}{}
+
+	var ep = *w.Endpoint
+	ep.Path = TokenAllowedHandlerPath
+	agent := &pkg.SuperAgent{URL: ep.String(), Client: w.Client}
+	if err := agent.POST(&WardenAccessRequest{
 		WardenAuthorizedRequest: &WardenAuthorizedRequest{
 			Token:  token,
 			Scopes: scopes,
 		},
 		Request: a,
-	})
+	}, &resp); err != nil {
+		return nil, err
+	} else if !resp.Allowed {
+		return nil, errors.New("Token is not valid")
+	}
+
+	return resp.Context, nil
 }
 
 func (w *HTTPWarden) IsAllowed(ctx context.Context, a *ladon.Request) error {
+	var allowed = struct {
+		Allowed bool `json:"allowed"`
+	}{}
+
+	var ep = *w.Endpoint
+	ep.Path = TokenAllowedHandlerPath
+	agent := &pkg.SuperAgent{URL: ep.String(), Client: w.Client}
+	if err := agent.POST(a, &allowed); err != nil {
+		return err
+	} else if !allowed.Allowed {
+		return errors.New("Token is not valid")
+	}
+
 	return nil
 }
 
 func (w *HTTPWarden) InspectToken(ctx context.Context, token string, scopes ...string) (*firewall.Context, error) {
-	return w.doRequest(TokenValidHandlerPath, &WardenAuthorizedRequest{
+	var resp = struct {
+		*firewall.Context
+		Valid bool `json:"valid"`
+	}{}
+
+	var ep = *w.Endpoint
+	ep.Path = TokenValidHandlerPath
+	agent := &pkg.SuperAgent{URL: ep.String(), Client: w.Client}
+	if err := agent.POST(&WardenAuthorizedRequest{
 		Token:  token,
 		Scopes: scopes,
-	})
-}
-
-func (w *HTTPWarden) doDry(req *http.Request) error {
-	return helper.DoDryRequest(w.Dry, req)
-}
-
-func (w *HTTPWarden) doRequest(path string, request interface{}) (*firewall.Context, error) {
-	out, err := json.Marshal(request)
-	if err != nil {
-		return nil, errors.New(err)
-	}
-
-	var ep = new(url.URL)
-	*ep = *w.Endpoint
-	ep.Path = path
-	req, err := http.NewRequest("POST", ep.String(), bytes.NewBuffer(out))
-	if err != nil {
-		return nil, errors.New(err)
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-	if err := w.doDry(req); err != nil {
+	}, &resp); err != nil {
 		return nil, err
+	} else if !resp.Valid {
+		return nil, errors.New("Token is not valid")
 	}
 
-	resp, err := w.Client.Do(req)
-	if err != nil {
-		return nil, errors.New(err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		all, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return nil, errors.New(err)
-		}
-
-		return nil, errors.Errorf("Got error (%d): %s", resp.StatusCode, all)
-	}
-
-	var epResp = struct {
-		*firewall.Context
-		Valid   bool `json:"valid"`
-		Allowed bool `json:"allowed"`
-	}{}
-	if err := json.NewDecoder(resp.Body).Decode(&epResp); err != nil {
-		return nil, errors.New(err)
-	}
-
-	if epResp.Valid || epResp.Allowed {
-		return epResp.Context, nil
-	}
-
-	return nil, errors.Errorf("Token subject has insufficient rights or invalid token")
+	return resp.Context, nil
 }

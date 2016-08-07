@@ -14,10 +14,10 @@ import (
 )
 
 const (
-	TokenValidHandlerPath   = "/warden/token/valid"
-	TokenAllowedHandlerPath = "/warden/token/allowed"
-	AllowedHandlerPath      = "/warden/allowed"
-	IntrospectPath          = "/warden/introspect"
+	TokenValidHandlerPath   = "/warden/protected/tokens/valid"
+	TokenAllowedHandlerPath = "/warden/protected/tokens/allowed"
+	AllowedHandlerPath      = "/warden/protected/allowed"
+	IntrospectPath          = "/warden/oauth2/introspect"
 )
 
 type WardenHandler struct {
@@ -83,13 +83,11 @@ func (h *WardenHandler) Introspect(w http.ResponseWriter, r *http.Request, _ htt
 	}
 	defer r.Body.Close()
 
-	authContext, err := h.Warden.InspectToken(ctx, ar.Token)
+	authContext, err := h.Warden.IntrospectToken(ctx, ar.Token)
 	if err != nil {
 		h.H.Write(ctx, w, r, &inactive)
 		return
-	}
-
-	if clientCtx.Subject != authContext.Audience {
+	} else if clientCtx.Subject != authContext.Audience {
 		h.H.Write(ctx, w, r, &inactive)
 		return
 	}

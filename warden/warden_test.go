@@ -82,16 +82,19 @@ func init() {
 	ar := fosite.NewAccessRequest(oauth2.NewSession("alice"))
 	ar.GrantedScopes = fosite.Arguments{"core"}
 	ar.RequestedAt = now
+	ar.Client = &fosite.DefaultClient{ID: "siri"}
 	fositeStore.CreateAccessTokenSession(nil, tokens[0][0], ar)
 
 	ar2 := fosite.NewAccessRequest(oauth2.NewSession("siri"))
 	ar2.GrantedScopes = fosite.Arguments{"core"}
 	ar2.RequestedAt = now
+	ar2.Client = &fosite.DefaultClient{ID: "siri"}
 	fositeStore.CreateAccessTokenSession(nil, tokens[1][0], ar2)
 
 	ar3 := fosite.NewAccessRequest(oauth2.NewSession("siri"))
 	ar3.GrantedScopes = fosite.Arguments{"core"}
 	ar3.RequestedAt = now
+	ar3.Client = &fosite.DefaultClient{ID: "doesnt-exist"}
 	ar3.Session.(*oauth2.Session).AccessTokenExpiry = time.Now().Add(-time.Hour)
 	fositeStore.CreateAccessTokenSession(nil, tokens[2][0], ar3)
 
@@ -178,6 +181,17 @@ func TestActionAllowed(t *testing.T) {
 					Action:   "create",
 					Context:  ladon.Context{},
 				},
+				scopes:    []string{"illegal"},
+				expectErr: true,
+			},
+			{
+				token: tokens[0][1],
+				req: &ladon.Request{
+					Subject:  "alice",
+					Resource: "matrix",
+					Action:   "create",
+					Context:  ladon.Context{},
+				},
 				scopes:    []string{"core"},
 				expectErr: false,
 				assert: func(c *firewall.Context) {
@@ -197,7 +211,86 @@ func TestActionAllowed(t *testing.T) {
 	}
 }
 
-func TestAuthorized(t *testing.T) {
+func TestIntrospect(t *testing.T) {
+	for n, w := range wardens {
+		for k, c := range []struct {
+			token     string
+			expectErr bool
+			assert    func(*firewall.Introspection)
+		}{
+			{
+				token:     "invalid",
+				expectErr: true,
+			},
+			{
+				token:     tokens[2][1],
+				expectErr: true,
+			},
+			{
+				token:     tokens[0][1],
+				expectErr: false,
+				assert: func(c *firewall.Introspection) {
+					assert.Equal(t, "alice", c.Subject)
+					assert.Equal(t, "tests", c.Issuer)
+					assert.Equal(t, now.Add(time.Hour).Unix(), c.ExpiresAt)
+					assert.Equal(t, now.Unix(), c.IssuedAt)
+				},
+			},
+		} {
+			ctx, err := w.IntrospectToken(context.Background(), c.token)
+			pkg.AssertError(t, c.expectErr, err, "TestIntrospect case", n, k)
+			if err == nil && c.assert != nil {
+				c.assert(ctx)
+			}
+		}
+	}
+}
+
+func TestAllowed(t *testing.T) {
+	for n, w := range wardens {
+		for k, c := range []struct {
+			req       *ladon.Request
+			expectErr bool
+			assert    func(*firewall.Context)
+		}{
+			{
+				req: &ladon.Request{
+					Subject:  "alice",
+					Resource: "other-thing",
+					Action:   "create",
+					Context:  ladon.Context{},
+				},
+				expectErr: true,
+			},
+			{
+				req: &ladon.Request{
+					Subject:  "alice",
+					Resource: "matrix",
+					Action:   "delete",
+					Context:  ladon.Context{},
+				},
+				expectErr: true,
+			},
+			{
+				req: &ladon.Request{
+					Subject:  "alice",
+					Resource: "matrix",
+					Action:   "create",
+					Context:  ladon.Context{},
+				},
+				expectErr: false,
+			},
+		} {
+			err := w.IsAllowed(context.Background(), c.req)
+			pkg.AssertError(t, c.expectErr, err, "TestAllowed case", n, k)
+			t.Logf("Passed test case %d\n", k)
+		}
+		t.Logf("Passed tests %s\n", n)
+	}
+
+}
+
+func TestTokenValid(t *testing.T) {
 	for n, w := range wardens {
 		for k, c := range []struct {
 			token     string
@@ -216,6 +309,11 @@ func TestAuthorized(t *testing.T) {
 			{
 				token:     tokens[0][1],
 				scopes:    []string{"foo"},
+				expectErr: true,
+			},
+			{
+				token:     tokens[1][1],
+				scopes:    []string{"illegal"},
 				expectErr: true,
 			},
 			{

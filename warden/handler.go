@@ -14,10 +14,10 @@ import (
 )
 
 const (
-	TokenValidHandlerPath   = "/warden/protected/tokens/valid"
+	TokenValidHandlerPath = "/warden/protected/tokens/valid"
 	TokenAllowedHandlerPath = "/warden/protected/tokens/allowed"
-	AllowedHandlerPath      = "/warden/protected/allowed"
-	IntrospectPath          = "/warden/oauth2/introspect"
+	AllowedHandlerPath = "/warden/protected/allowed"
+	IntrospectPath = "/warden/oauth2/introspect"
 )
 
 type WardenHandler struct {
@@ -83,18 +83,16 @@ func (h *WardenHandler) Introspect(w http.ResponseWriter, r *http.Request, _ htt
 	}
 	defer r.Body.Close()
 
-	authContext, err := h.Warden.IntrospectToken(ctx, ar.Token)
+	auth, err := h.Warden.IntrospectToken(ctx, ar.Token)
 	if err != nil {
 		h.H.Write(ctx, w, r, &inactive)
 		return
-	} else if clientCtx.Subject != authContext.Audience {
+	} else if clientCtx.Subject != auth.Audience {
 		h.H.Write(ctx, w, r, &inactive)
 		return
 	}
 
-	res := inactive
-	res.Active = true
-	h.H.Write(ctx, w, r, &res)
+	h.H.Write(ctx, w, r, auth)
 }
 
 func (h *WardenHandler) TokenValid(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -102,7 +100,7 @@ func (h *WardenHandler) TokenValid(w http.ResponseWriter, r *http.Request, _ htt
 	clientCtx, err := h.Warden.TokenAllowed(ctx, h.Warden.TokenFromRequest(r), &ladon.Request{
 		Resource: "rn:hydra:warden:token:valid",
 		Action:   "decide",
-	}, "warden.token")
+	}, "hydra.warden")
 	if err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
@@ -132,17 +130,17 @@ func (h *WardenHandler) TokenValid(w http.ResponseWriter, r *http.Request, _ htt
 }
 
 func (h *WardenHandler) Allowed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	ctx := herodot.NewContext()
+	var ctx = herodot.NewContext()
 	if _, err := h.Warden.TokenAllowed(ctx, h.Warden.TokenFromRequest(r), &ladon.Request{
 		Resource: "rn:hydra:warden:allowed",
 		Action:   "decide",
-	}, "warden.token"); err != nil {
+	}, "hydra.warden"); err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
 	}
 
 	var access = new(ladon.Request)
-	if err := json.NewDecoder(r.Body).Decode(&access); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(access); err != nil {
 		h.H.WriteError(ctx, w, r, errors.New(err))
 		return
 	}

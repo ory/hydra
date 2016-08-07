@@ -39,7 +39,7 @@ func (w *HTTPWarden) IntrospectToken(ctx context.Context, token string) (*firewa
 	}{Token: token}, &resp); err != nil {
 		return nil, err
 	} else if !resp.Active {
-		return nil, errors.New("Token is not valid")
+		return nil, errors.New("Token is malformed, expired or otherwise invalid")
 	}
 
 	return resp, nil
@@ -75,12 +75,12 @@ func (w *HTTPWarden) IsAllowed(ctx context.Context, a *ladon.Request) error {
 	}{}
 
 	var ep = *w.Endpoint
-	ep.Path = TokenAllowedHandlerPath
+	ep.Path = AllowedHandlerPath
 	agent := &pkg.SuperAgent{URL: ep.String(), Client: w.Client}
 	if err := agent.POST(a, &allowed); err != nil {
 		return err
 	} else if !allowed.Allowed {
-		return errors.New("Token is not valid")
+		return errors.New("Forbidden")
 	}
 
 	return nil

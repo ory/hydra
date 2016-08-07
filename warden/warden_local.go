@@ -17,8 +17,8 @@ import (
 )
 
 type LocalWarden struct {
-	Warden ladon.Warden
-	OAuth2 fosite.OAuth2Provider
+	Warden              ladon.Warden
+	OAuth2              fosite.OAuth2Provider
 
 	AccessTokenLifespan time.Duration
 	Issuer              string
@@ -32,17 +32,21 @@ func (w *LocalWarden) IntrospectToken(ctx context.Context, token string) (*firew
 	var session = new(oauth2.Session)
 	var auth, err = w.OAuth2.ValidateToken(ctx, token, fosite.AccessToken, session)
 	if err != nil {
+		logrus.WithError(err).Infof("Token introspection failed")
 		return &firewall.Introspection{
 			Active: false,
 		}, err
 	}
 
+	session = auth.GetSession().(*oauth2.Session)
 	return &firewall.Introspection{
 		Active:    true,
 		Subject:   session.Subject,
 		Audience:  auth.GetClient().GetID(),
 		Scope:     strings.Join(auth.GetGrantedScopes(), " "),
 		Issuer:    w.Issuer,
+		IssuedAt: auth.GetRequestedAt().Unix(),
+		NotBefore: auth.GetRequestedAt().Unix(),
 		ExpiresAt: session.AccessTokenExpiresAt(auth.GetRequestedAt().Add(w.AccessTokenLifespan)).Unix(),
 	}, nil
 }
@@ -53,7 +57,7 @@ func (w *LocalWarden) IsAllowed(ctx context.Context, a *ladon.Request) error {
 			"subject": a.Subject,
 			"request": a,
 			"reason":  "request denied by policies",
-		}).Infof("Access denied")
+		}).WithError(err).Infof("Access denied")
 		return err
 	}
 
@@ -68,7 +72,7 @@ func (w *LocalWarden) TokenAllowed(ctx context.Context, token string, a *ladon.R
 			"subject": a.Subject,
 			"request": a,
 			"reason":  "token could not be validated",
-		}).Infof("Access denied")
+		}).WithError(err).Infof("Access denied")
 		return nil, err
 	}
 
@@ -86,7 +90,7 @@ func (w *LocalWarden) InspectToken(ctx context.Context, token string, scopes ...
 			"subject":  session.Subject,
 			"audience": oauthRequest.GetClient().GetID(),
 			"reason":   "token validation failed",
-		}).Infof("Access denied")
+		}).WithError(err).Infof("Access denied")
 		return nil, err
 	}
 
@@ -96,14 +100,15 @@ func (w *LocalWarden) InspectToken(ctx context.Context, token string, scopes ...
 func (w *LocalWarden) allowed(ctx context.Context, a *ladon.Request, scopes []string, oauthRequest fosite.AccessRequester, session *oauth2.Session) (*firewall.Context, error) {
 	session = oauthRequest.GetSession().(*oauth2.Session)
 	if a.Subject != "" && a.Subject != session.Subject {
+		err := errors.Errorf("Expected subject to be %s but got %s", session.Subject, a.Subject)
 		logrus.WithFields(logrus.Fields{
 			"scopes":   scopes,
 			"subject":  a.Subject,
 			"audience": oauthRequest.GetClient().GetID(),
 			"request":  a,
 			"reason":   "subject mismatch",
-		}).Infof("Access denied")
-		return nil, errors.Errorf("Expected subject to be %s but got %s", session.Subject, a.Subject)
+		}).WithError(err).Infof("Access denied")
+		return nil, err
 	}
 
 	a.Subject = session.Subject
@@ -114,7 +119,7 @@ func (w *LocalWarden) allowed(ctx context.Context, a *ladon.Request, scopes []st
 			"audience": oauthRequest.GetClient().GetID(),
 			"request":  a,
 			"reason":   "policy effect is deny",
-		}).Infof("Access denied")
+		}).WithError(err).Infof("Access denied")
 		return nil, err
 	}
 

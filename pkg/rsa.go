@@ -1,8 +1,8 @@
 package pkg
 
 import (
-	"crypto/rsa"
 	"crypto/rand"
+	"crypto/rsa"
 )
 
 func MustRSAKey() *rsa.PrivateKey {
@@ -12,4 +12,3 @@ func MustRSAKey() *rsa.PrivateKey {
 	}
 	return key
 }
-

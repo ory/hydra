@@ -8,20 +8,20 @@ import (
 
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
+	"github.com/ory-am/fosite/handler/openid"
 	ejwt "github.com/ory-am/fosite/token/jwt"
 	"github.com/ory-am/hydra/jwk"
 	"github.com/pborman/uuid"
 	"gopkg.in/dgrijalva/jwt-go.v2"
-	"github.com/ory-am/fosite/handler/openid"
 )
 
 const (
 	ConsentChallengeKey = "consent.challenge"
-	ConsentEndpointKey = "consent.endpoint"
+	ConsentEndpointKey  = "consent.endpoint"
 )
 
 type DefaultConsentStrategy struct {
-	Issuer                   string
+	Issuer string
 
 	DefaultIDTokenLifespan   time.Duration
 	DefaultChallengeLifespan time.Duration

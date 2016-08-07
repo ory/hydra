@@ -10,6 +10,7 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
+	"github.com/ory-am/fosite/compose"
 	"github.com/ory-am/fosite/hash"
 	hc "github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/internal"
@@ -19,7 +20,6 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 	"gopkg.in/dgrijalva/jwt-go.v2"
-	"github.com/ory-am/fosite/compose"
 )
 
 var hasher = &hash.BCrypt{}
@@ -45,7 +45,7 @@ var handler = &Handler{
 		fc,
 		store,
 		&compose.CommonStrategy{
-			CoreStrategy: compose.NewOAuth2HMACStrategy(fc, []byte("some super secret secret")),
+			CoreStrategy:               compose.NewOAuth2HMACStrategy(fc, []byte("some super secret secret")),
 			OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(pkg.MustRSAKey()),
 		},
 		compose.OAuth2AuthorizeExplicitFactory,
@@ -87,7 +87,7 @@ func init() {
 		RedirectURIs:  []string{ts.URL + "/callback"},
 		ResponseTypes: []string{"id_token", "code", "token"},
 		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
-		Scopes: []string{"hydra"},
+		Scopes:        []string{"hydra"},
 	}
 
 	c, _ := url.Parse(ts.URL + "/consent")
@@ -100,7 +100,7 @@ func init() {
 		RedirectURIs:  []string{ts.URL + "/callback"},
 		ResponseTypes: []string{"id_token", "code", "token"},
 		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
-		Scopes: []string{"hydra"},
+		Scopes:        []string{"hydra"},
 	}
 
 	oauthConfig = &oauth2.Config{

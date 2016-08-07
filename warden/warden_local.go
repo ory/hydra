@@ -17,8 +17,8 @@ import (
 )
 
 type LocalWarden struct {
-	Warden              ladon.Warden
-	OAuth2              fosite.OAuth2Provider
+	Warden ladon.Warden
+	OAuth2 fosite.OAuth2Provider
 
 	AccessTokenLifespan time.Duration
 	Issuer              string
@@ -45,7 +45,7 @@ func (w *LocalWarden) IntrospectToken(ctx context.Context, token string) (*firew
 		Audience:  auth.GetClient().GetID(),
 		Scope:     strings.Join(auth.GetGrantedScopes(), " "),
 		Issuer:    w.Issuer,
-		IssuedAt: auth.GetRequestedAt().Unix(),
+		IssuedAt:  auth.GetRequestedAt().Unix(),
 		NotBefore: auth.GetRequestedAt().Unix(),
 		ExpiresAt: session.AccessTokenExpiresAt(auth.GetRequestedAt().Add(w.AccessTokenLifespan)).Unix(),
 	}, nil

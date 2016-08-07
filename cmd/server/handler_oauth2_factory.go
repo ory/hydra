@@ -1,13 +1,14 @@
 package server
 
 import (
-	"net/url"
 	"fmt"
+	"net/url"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
+	"github.com/ory-am/fosite/compose"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/internal"
@@ -16,7 +17,6 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
-	"github.com/ory-am/fosite/compose"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {
@@ -85,16 +85,16 @@ func newOAuth2Provider(c *config.Config, km jwk.Manager) fosite.OAuth2Provider {
 
 	rsaKey := jwk.MustRSAPrivate(jwk.First(keys.Keys))
 	fc := &compose.Config{
-		AccessTokenLifespan: c.GetAccessTokenLifespan(),
+		AccessTokenLifespan:   c.GetAccessTokenLifespan(),
 		AuthorizeCodeLifespan: c.GetAuthCodeLifespan(),
-		IDTokenLifespan: c.GetIDTokenLifespan(),
-		HashCost: c.BCryptWorkFactor,
+		IDTokenLifespan:       c.GetIDTokenLifespan(),
+		HashCost:              c.BCryptWorkFactor,
 	}
 	return compose.Compose(
 		fc,
 		store,
 		&compose.CommonStrategy{
-			CoreStrategy: compose.NewOAuth2HMACStrategy(fc, c.GetSystemSecret()),
+			CoreStrategy:               compose.NewOAuth2HMACStrategy(fc, c.GetSystemSecret()),
 			OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(rsaKey),
 		},
 		compose.OAuth2AuthorizeExplicitFactory,
@@ -122,10 +122,9 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 	consentURL, err := url.Parse(c.ConsentURL)
 	pkg.Must(err, "Could not parse consent url %s.", c.ConsentURL)
 
-
 	handler := &oauth2.Handler{
 		ForcedHTTP: c.ForceHTTP,
-		OAuth2: o,
+		OAuth2:     o,
 		Consent: &oauth2.DefaultConsentStrategy{
 			Issuer:                   c.Issuer,
 			KeyManager:               km,

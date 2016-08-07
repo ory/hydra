@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"fmt"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
@@ -19,10 +21,9 @@ import (
 	"github.com/ory-am/hydra/policy"
 	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/ladon"
-	"github.com/urfave/negroni"
 	"github.com/spf13/cobra"
+	"github.com/urfave/negroni"
 	"golang.org/x/net/context"
-	"fmt"
 )
 
 func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
@@ -43,7 +44,7 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		n.UseHandler(router)
 
 		var srv = http.Server{
-			Addr: c.GetAddress(),
+			Addr:    c.GetAddress(),
 			Handler: n,
 			TLSConfig: &tls.Config{
 				Certificates: []tls.Certificate{
@@ -96,7 +97,7 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 		Warden: &ladon.Ladon{
 			Manager: ctx.LadonManager,
 		},
-		OAuth2: oauth2Provider,
+		OAuth2:              oauth2Provider,
 		Issuer:              c.Issuer,
 		AccessTokenLifespan: c.GetAccessTokenLifespan(),
 	}

@@ -14,10 +14,10 @@ import (
 )
 
 const (
-	TokenValidHandlerPath = "/warden/protected/tokens/valid"
+	TokenValidHandlerPath   = "/warden/protected/tokens/valid"
 	TokenAllowedHandlerPath = "/warden/protected/tokens/allowed"
-	AllowedHandlerPath = "/warden/protected/allowed"
-	IntrospectPath = "/warden/oauth2/introspect"
+	AllowedHandlerPath      = "/warden/protected/allowed"
+	IntrospectPath          = "/warden/oauth2/introspect"
 )
 
 type WardenHandler struct {

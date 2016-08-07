@@ -42,8 +42,8 @@ func injectJWKManager(c *config.Config) {
 func newJWKHandler(c *config.Config, router *httprouter.Router) *jwk.Handler {
 	ctx := c.Context()
 	h := &jwk.Handler{
-		H: &herodot.JSON{},
-		W: ctx.Warden,
+		H:       &herodot.JSON{},
+		W:       ctx.Warden,
 		Manager: ctx.KeyManager,
 	}
 	h.SetRoutes(router)

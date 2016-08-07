@@ -6,11 +6,11 @@ import (
 
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite/fosite-example/pkg"
+	"github.com/ory-am/fosite/handler/oauth2"
 	"github.com/ory-am/fosite/token/hmac"
 	"github.com/ory-am/ladon"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/ory-am/fosite/handler/oauth2"
 )
 
 var HMACStrategy = &oauth2.HMACSHAStrategy{

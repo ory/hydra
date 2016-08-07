@@ -35,14 +35,14 @@ type Firewall interface {
 }
 
 type Introspection struct {
-	Active    bool`string:"active"`
-	Scope     string`string:"scope,omitempty"`
-	ClientID  string`string:"client_id,omitempty"`
-	Subject   string`string:"sub,omitempty"`
-	ExpiresAt int64`string:"exp,omitempty"`
-	IssuedAt  int64 `string:"iat,omitempty"`
-	NotBefore int64 `string:"nbf,omitempty"`
-	Username int64 `string:"username,omitempty"`
+	Active    bool   `string:"active"`
+	Scope     string `string:"scope,omitempty"`
+	ClientID  string `string:"client_id,omitempty"`
+	Subject   string `string:"sub,omitempty"`
+	ExpiresAt int64  `string:"exp,omitempty"`
+	IssuedAt  int64  `string:"iat,omitempty"`
+	NotBefore int64  `string:"nbf,omitempty"`
+	Username  int64  `string:"username,omitempty"`
 	Audience  string `string:"aud,omitempty"`
 	Issuer    string `string:"iss,omitempty"`
 }

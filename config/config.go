@@ -215,7 +215,6 @@ func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
 		ClientSecret: c.ClientSecret,
 		TokenURL:     pkg.JoinURLStrings(c.ClusterURL, "/oauth2/token"),
 		Scopes: []string{
-			"core",
 			"hydra",
 		},
 	}
@@ -231,9 +230,8 @@ func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
 	_, err := oauthConfig.Token(ctx)
 	if err != nil {
 		fmt.Printf("Could not authenticate, because: %s\n", err)
-		fmt.Println("Did you forget to log on? Run `hydra connect`.")
-		fmt.Println("Did you run Hydra without a valid TLS certificate? Make sure to use the `--skip-tls-verify` flag.")
-		fmt.Println("Did you know you can skip `hydra connect` when running `hydra host --dangerous-auto-logon`? DO NOT use this flag in production!")
+		fmt.Println("This can have multiple reasons, like a wrong cluster or wrong credentials. To resolve this, run `hydra connect`.")
+		fmt.Println("You can disable TLS verification using the `--skip-tls-verify` flag.")
 		os.Exit(1)
 	}
 

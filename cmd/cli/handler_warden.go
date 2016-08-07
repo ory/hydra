@@ -34,10 +34,6 @@ func (h *WardenHandler) IsAuthorized(cmd *cobra.Command, args []string) {
 	}
 
 	scopes, _ := cmd.Flags().GetStringSlice("scopes")
-	if len(scopes) == 0 {
-		scopes = []string{"core"}
-	}
-
 	res, err := h.M.InspectToken(context.Background(), args[0], scopes...)
 	pkg.Must(err, "Could not validate token: %s", err)
 

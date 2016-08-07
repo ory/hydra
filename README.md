@@ -435,7 +435,7 @@ Or by specifying the following flags:
 
 ### I want to disable HTTPS for testing
 
-You can do so by running `hydra host --force-dangerous-http`.
+You can do so by running `hydra host --dangerous-force-http`.
 
 ### Can I set the log level to warn, error, debug, ...?
 

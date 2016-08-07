@@ -12,5 +12,5 @@ func TestStart(t *testing.T) {
 	h := &Handler{
 		Config: &config.Config{},
 	}
-	h.start(router)
+	h.registerRoutes(router)
 }

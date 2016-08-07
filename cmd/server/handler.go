@@ -22,13 +22,14 @@ import (
 	"github.com/urfave/negroni"
 	"github.com/spf13/cobra"
 	"golang.org/x/net/context"
+	"fmt"
 )
 
 func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		router := httprouter.New()
 		serverHandler := &Handler{Config: c}
-		serverHandler.start(router)
+		serverHandler.registerRoutes(router)
 
 		if ok, _ := cmd.Flags().GetBool("dangerous-auto-logon"); ok {
 			logrus.Warnln("Do not use flag --dangerous-auto-logon in production.")
@@ -44,6 +45,7 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 
 		var srv = http.Server{
 			Addr: c.GetAddress(),
+			Handler: n,
 			TLSConfig: &tls.Config{
 				Certificates: []tls.Certificate{
 					getOrCreateTLSCertificate(cmd, c),
@@ -53,9 +55,11 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 			WriteTimeout: time.Second * 10,
 		}
 
+		fmt.Println("RUNNING")
+
 		var err error
 		logrus.Infof("Setting up http server on %s", c.GetAddress())
-		if ok, _ := cmd.Flags().GetBool("force-dangerous-http"); ok {
+		if ok, _ := cmd.Flags().GetBool("dangerous-force-http"); ok {
 			logrus.Warnln("HTTPS disabled. Never do this in production.")
 			err = srv.ListenAndServe()
 		} else if c.AllowTLSTermination != "" {
@@ -78,7 +82,7 @@ type Handler struct {
 	Config      *config.Config
 }
 
-func (h *Handler) start(router *httprouter.Router) {
+func (h *Handler) registerRoutes(router *httprouter.Router) {
 	c := h.Config
 	ctx := c.Context()
 

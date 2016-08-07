@@ -68,7 +68,7 @@ func (h *WardenHandler) SetRoutes(r *httprouter.Router) {
 
 func (h *WardenHandler) Introspect(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := herodot.NewContext()
-	clientCtx, err := h.Warden.InspectToken(ctx, TokenFromRequest(r), "core")
+	clientCtx, err := h.Warden.InspectToken(ctx, TokenFromRequest(r))
 	if err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return

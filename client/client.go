@@ -1,6 +1,9 @@
 package client
 
-import "github.com/ory-am/fosite"
+import (
+	"github.com/ory-am/fosite"
+	"strings"
+)
 
 type Client struct {
 	ID                string   `json:"id" gorethink:"id"`
@@ -9,7 +12,7 @@ type Client struct {
 	RedirectURIs      []string `json:"redirect_uris" gorethink:"redirect_uris"`
 	GrantTypes        []string `json:"grant_types" gorethink:"grant_types"`
 	ResponseTypes     []string `json:"response_types" gorethink:"response_types"`
-	Scopes            []string `json:"scopes" gorethink:"scopes"`
+	Scopes            string `json:"scopes" gorethink:"scopes"`
 	Owner             string   `json:"owner" gorethink:"owner"`
 	PolicyURI         string   `json:"policy_uri" gorethink:"policy_uri"`
 	TermsOfServiceURI string   `json:"tos_uri" gorethink:"tos_uri"`
@@ -31,7 +34,7 @@ func (c *Client) GetHashedSecret() []byte {
 }
 
 func (c *Client) GetScopes() fosite.Arguments {
-	return fosite.Arguments(c.Scopes)
+	return fosite.Arguments(strings.Split(c.Scopes, " "))
 }
 
 func (c *Client) GetGrantTypes() fosite.Arguments {

@@ -42,6 +42,11 @@ func (o *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprou
 
 	if accessRequest.GetGrantTypes().Exact("client_credentials") {
 		session.Subject = accessRequest.GetClient().GetID()
+		for _, scope := range accessRequest.GetRequestedScopes() {
+			if fosite.HierarchicScopeStrategy(accessRequest.GetClient().GetScopes(), scope) {
+				accessRequest.GrantScope(scope)
+			}
+		}
 	}
 
 	accessResponse, err := o.OAuth2.NewAccessResponse(ctx, r, accessRequest)

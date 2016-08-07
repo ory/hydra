@@ -87,7 +87,7 @@ func init() {
 		RedirectURIs:  []string{ts.URL + "/callback"},
 		ResponseTypes: []string{"id_token", "code", "token"},
 		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
-		Scopes:        []string{"hydra"},
+		Scopes:        "hydra",
 	}
 
 	c, _ := url.Parse(ts.URL + "/consent")
@@ -100,7 +100,7 @@ func init() {
 		RedirectURIs:  []string{ts.URL + "/callback"},
 		ResponseTypes: []string{"id_token", "code", "token"},
 		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
-		Scopes:        []string{"hydra"},
+		Scopes:        "hydra",
 	}
 
 	oauthConfig = &oauth2.Config{

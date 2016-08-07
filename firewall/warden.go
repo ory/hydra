@@ -35,16 +35,16 @@ type Firewall interface {
 }
 
 type Introspection struct {
-	Active    bool   `string:"active"`
-	Scope     string `string:"scope,omitempty"`
-	ClientID  string `string:"client_id,omitempty"`
-	Subject   string `string:"sub,omitempty"`
-	ExpiresAt int64  `string:"exp,omitempty"`
-	IssuedAt  int64  `string:"iat,omitempty"`
-	NotBefore int64  `string:"nbf,omitempty"`
-	Username  int64  `string:"username,omitempty"`
-	Audience  string `string:"aud,omitempty"`
-	Issuer    string `string:"iss,omitempty"`
+	Active    bool   `json:"active"`
+	Scope     string `json:"scope,omitempty"`
+	ClientID  string `json:"client_id,omitempty"`
+	Subject   string `json:"sub,omitempty"`
+	ExpiresAt int64  `json:"exp,omitempty"`
+	IssuedAt  int64  `json:"iat,omitempty"`
+	NotBefore int64  `json:"nbf,omitempty"`
+	Username  int64  `json:"username,omitempty"`
+	Audience  string `json:"aud,omitempty"`
+	Issuer    string `json:"iss,omitempty"`
 }
 
 type Introspector interface {

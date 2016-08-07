@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"fmt"
-
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
@@ -54,8 +52,6 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 			ReadTimeout:  time.Second * 5,
 			WriteTimeout: time.Second * 10,
 		}
-
-		fmt.Println("RUNNING")
 
 		var err error
 		logrus.Infof("Setting up http server on %s", c.GetAddress())

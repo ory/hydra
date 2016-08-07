@@ -30,9 +30,9 @@ import (
 
 type Config struct {
 	// These are used by client commands
-	ClusterURL   string `mapstructure:"CLUSTER_URL" yaml:"cluster_url"`
-	ClientID     string `mapstructure:"CLIENT_ID" yaml:"client_id,omitempty"`
-	ClientSecret string `mapstructure:"CLIENT_SECRET" yaml:"client_secret,omitempty"`
+	ClusterURL             string `mapstructure:"CLUSTER_URL" yaml:"cluster_url"`
+	ClientID               string `mapstructure:"CLIENT_ID" yaml:"client_id,omitempty"`
+	ClientSecret           string `mapstructure:"CLIENT_SECRET" yaml:"client_secret,omitempty"`
 
 	// These are used by the host command
 	BindPort               int    `mapstructure:"PORT" yaml:"-"`
@@ -49,9 +49,9 @@ type Config struct {
 	ChallengeTokenLifespan string `mapstructure:"CHALLENGE_TOKEN_LIFESPAN" yaml:"-"`
 	ForceHTTP              bool   `yaml:"-"`
 
-	cluster      *url.URL     `yaml:"-"`
-	oauth2Client *http.Client `yaml:"-"`
-	context      *Context     `yaml:"-"`
+	cluster                *url.URL     `yaml:"-"`
+	oauth2Client           *http.Client `yaml:"-"`
+	context                *Context     `yaml:"-"`
 }
 
 func matchesRange(r *http.Request, ranges []string) error {
@@ -214,9 +214,7 @@ func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
 		ClientID:     c.ClientID,
 		ClientSecret: c.ClientSecret,
 		TokenURL:     pkg.JoinURLStrings(c.ClusterURL, "/oauth2/token"),
-		Scopes: []string{
-			"hydra",
-		},
+		Scopes: []string{"hydra"},
 	}
 
 	ctx := context.Background()

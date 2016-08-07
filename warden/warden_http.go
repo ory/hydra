@@ -36,7 +36,13 @@ func (w *HTTPWarden) IntrospectToken(ctx context.Context, token string, a *ladon
 }
 
 func (w *HTTPWarden) TokenAllowed(ctx context.Context, token string, a *ladon.Request, scopes ...string) (*firewall.Context, error) {
-	return nil, nil
+	return w.doRequest(TokenAllowedHandlerPath, &WardenAccessRequest{
+		WardenAuthorizedRequest: &WardenAuthorizedRequest{
+			Token:  token,
+			Scopes: scopes,
+		},
+		Request: a,
+	})
 }
 
 func (w *HTTPWarden) IsAllowed(ctx context.Context, a *ladon.Request) error {

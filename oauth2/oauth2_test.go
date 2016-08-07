@@ -39,14 +39,30 @@ var store = &internal.FositeMemoryStore{
 var keyManager = &jwk.MemoryManager{}
 var keyGenerator = &jwk.RS256Generator{}
 
+var fc = &compose.Config{}
 var handler = &Handler{
-	OAuth2: compose.ComposeAllEnabled(new(compose.Config), store, []byte("some super secret secret"), pkg.MustRSAKey()),
+	OAuth2: compose.Compose(
+		fc,
+		store,
+		&compose.CommonStrategy{
+			CoreStrategy: compose.NewOAuth2HMACStrategy(fc, []byte("some super secret secret")),
+			OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(pkg.MustRSAKey()),
+		},
+		compose.OAuth2AuthorizeExplicitFactory,
+		compose.OAuth2AuthorizeImplicitFactory,
+		compose.OAuth2ClientCredentialsGrantFactory,
+		compose.OAuth2RefreshTokenGrantFactory,
+		compose.OpenIDConnectExplicit,
+		compose.OpenIDConnectHybrid,
+		compose.OpenIDConnectImplicit,
+	),
 	Consent: &DefaultConsentStrategy{
-		Issuer:                   "https://hydra.localhost",
+		Issuer:                   "http://hydra.localhost",
 		KeyManager:               keyManager,
 		DefaultChallengeLifespan: time.Hour,
 		DefaultIDTokenLifespan:   time.Hour * 24,
 	},
+	ForcedHTTP: true,
 }
 
 var router = httprouter.New()
@@ -71,6 +87,7 @@ func init() {
 		RedirectURIs:  []string{ts.URL + "/callback"},
 		ResponseTypes: []string{"id_token", "code", "token"},
 		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
+		Scopes: []string{"hydra"},
 	}
 
 	c, _ := url.Parse(ts.URL + "/consent")
@@ -83,6 +100,7 @@ func init() {
 		RedirectURIs:  []string{ts.URL + "/callback"},
 		ResponseTypes: []string{"id_token", "code", "token"},
 		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
+		Scopes: []string{"hydra"},
 	}
 
 	oauthConfig = &oauth2.Config{

@@ -29,15 +29,15 @@ var ladonWarden = pkg.LadonWarden(map[string]ladon.Policy{
 	"1": &ladon.DefaultPolicy{
 		ID:        "1",
 		Subjects:  []string{"alice"},
-		Resources: []string{"matrix"},
-		Actions:   []string{"create"},
+		Resources: []string{"matrix", "rn:hydra:token<.*>"},
+		Actions:   []string{"create", "decide"},
 		Effect:    ladon.AllowAccess,
 	},
 	"2": &ladon.DefaultPolicy{
 		ID:        "2",
 		Subjects:  []string{"siri"},
 		Resources: []string{"<.*>"},
-		Actions:   []string{},
+		Actions:   []string{"decide"},
 		Effect:    ladon.AllowAccess,
 	},
 })
@@ -57,8 +57,10 @@ func init() {
 				&foauth2.CoreValidator{
 					CoreStrategy: pkg.HMACStrategy,
 					CoreStorage:  fositeStore,
+					ScopeStrategy: fosite.HierarchicScopeStrategy,
 				},
 			},
+			ScopeStrategy: fosite.HierarchicScopeStrategy,
 		},
 		Issuer:              "tests",
 		AccessTokenLifespan: time.Hour,

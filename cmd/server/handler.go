@@ -20,7 +20,6 @@ import (
 	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/ladon"
 	"github.com/urfave/negroni"
-
 	"github.com/spf13/cobra"
 	"golang.org/x/net/context"
 )
@@ -31,8 +30,7 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		serverHandler := &Handler{Config: c}
 		serverHandler.start(router)
 
-		// This is being set by --dangerous-auto-logon
-		if c.ForceHTTP {
+		if ok, _ := cmd.Flags().GetBool("dangerous-auto-logon"); ok {
 			logrus.Warnln("Do not use flag --dangerous-auto-logon in production.")
 			err := c.Persist()
 			pkg.Must(err, "Could not write configuration file: %s", err)
@@ -88,7 +86,7 @@ func (h *Handler) start(router *httprouter.Router) {
 	injectJWKManager(c)
 	clientsManager := newClientManager(c)
 	injectFositeStore(c, clientsManager)
-	oauth2Provider := newOAuth2Provider(c, h.Keys.Manager)
+	oauth2Provider := newOAuth2Provider(c, ctx.KeyManager)
 
 	// set up warden
 	ctx.Warden = &warden.LocalWarden{

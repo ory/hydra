@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"sync"
 	"time"
 	"net"
 	"strings"
@@ -53,7 +52,6 @@ type Config struct {
 	cluster                *url.URL     `yaml:"-"`
 	oauth2Client           *http.Client `yaml:"-"`
 	context                *Context     `yaml:"-"`
-	sync.Mutex   `yaml:"-"`
 }
 
 func matchesRange(r *http.Request, ranges []string) error {

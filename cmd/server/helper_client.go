@@ -58,10 +58,8 @@ func (h *Handler) createRootIfNewInstall(c *config.Config) {
 	})
 	pkg.Must(err, "Could not create admin policy because %s", err)
 
-	c.Lock()
 	c.ClientID = root.ID
 	c.ClientSecret = string(secret)
-	c.Unlock()
 
 	logrus.Infoln("Temporary root client created.")
 	if forceRoot == "" {

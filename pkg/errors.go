@@ -1,9 +1,6 @@
 package pkg
 
 import (
-	"net/http"
-	"net/url"
-
 	log "github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/herodot"
@@ -11,9 +8,7 @@ import (
 )
 
 var (
-	ErrNotFound     = errors.New("Not found")
-	ErrUnauthorized = errors.New("Unauthorized")
-	ErrForbidden    = errors.New("Forbidden")
+	ErrNotFound = errors.New("Not found")
 )
 
 type stackTracer interface {
@@ -22,20 +17,12 @@ type stackTracer interface {
 
 func LogError(err error) {
 	if e, ok := err.(*herodot.Error); ok {
-		log.WithError(err).WithField("stack", e.Err.ErrorStack()).Printf("Got error.")
+		log.WithError(err).WithField("stack", e.Err.ErrorStack()).Infoln("An error occured")
 	} else if e, ok := err.(*errors.Error); ok {
-		log.WithError(err).WithField("stack", e.ErrorStack()).Printf("Got error.")
+		log.WithError(err).WithField("stack", e.ErrorStack()).Infoln("An error occurred")
 	} else if e, ok := err.(stackTracer); ok {
-		log.WithError(err).WithField("stack", e.StackTrace()).Printf("Got error.")
+		log.WithError(err).WithField("stack", e.StackTrace()).Infoln("An error occured")
 	} else {
-		log.WithError(err).Printf("Got error.")
+		log.WithError(err).Infoln("An error occured")
 	}
-}
-
-func ForwardToErrorHandler(w http.ResponseWriter, r *http.Request, err error, errorHandlerURL url.URL) {
-	q := errorHandlerURL.Query()
-	q.Set("error", err.Error())
-	errorHandlerURL.RawQuery = q.Encode()
-
-	http.Redirect(w, r, errorHandlerURL.String(), http.StatusFound)
 }

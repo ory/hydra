@@ -39,8 +39,10 @@ func NewFirewall(issuer string, subject string, scopes fosite.Arguments, p ...la
 				&foauth2.CoreValidator{
 					CoreStrategy: pkg.HMACStrategy,
 					CoreStorage:  fositeStore,
+					ScopeStrategy: fosite.HierarchicScopeStrategy,
 				},
 			},
+			ScopeStrategy: fosite.HierarchicScopeStrategy,
 		},
 		Issuer:              issuer,
 		AccessTokenLifespan: time.Hour,

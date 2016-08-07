@@ -65,8 +65,14 @@ func TestExecute(t *testing.T) {
 		}
 
 		if c.wait != nil {
+			var count = 0
 			for c.wait() {
-				time.Sleep(time.Millisecond * 500)
+				t.Logf("Config file has not been found yet, retrying attempt #%d...", count)
+				count++
+				if count > 10 {
+					t.FailNow()
+				}
+				time.Sleep(time.Second * 2)
 			}
 		} else if c.timeout > 0 {
 			time.Sleep(c.timeout)

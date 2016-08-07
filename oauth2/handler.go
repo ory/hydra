@@ -33,7 +33,7 @@ func (o *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprou
 	var session = NewSession("")
 	var ctx = fosite.NewContext()
 
-	accessRequest, err := o.OAuth2.NewAccessRequest(ctx, r, &session)
+	accessRequest, err := o.OAuth2.NewAccessRequest(ctx, r, session)
 	if err != nil {
 		pkg.LogError(err)
 		o.OAuth2.WriteAccessError(w, accessRequest, err)

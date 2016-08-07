@@ -39,6 +39,7 @@ func TestAuthCode(t *testing.T) {
 			"exp": time.Now().Add(time.Hour).Unix(),
 			"iat": time.Now().Unix(),
 			"aud": "app-client",
+			"scp": []string{"hydra"},
 		})
 		pkg.RequireError(t, false, err)
 

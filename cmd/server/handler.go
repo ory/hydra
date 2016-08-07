@@ -41,7 +41,6 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		n.Use(negronilogrus.NewMiddleware())
 		n.UseFunc(serverHandler.rejectInsecureRequests)
 		n.UseHandler(router)
-		http.Handle("/", n)
 
 		var srv = http.Server{
 			Addr: c.GetAddress(),

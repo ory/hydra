@@ -1,5 +1,5 @@
-hash: 392df8e322fab0decc8fcbc6284fc3048058567ab9f6997a44f8eda05b095e7e
-updated: 2016-08-08T10:51:20.1434275+02:00
+hash: 6d1998d025dae6f1566347973c33bbd9172837732be1b2df0400df1449de4dc0
+updated: 2016-08-08T11:19:01.3801044+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7664702784775e51966f0885f5cd27435916517b
@@ -7,16 +7,20 @@ imports:
   version: 99064174e013895bbd9b025c31100bd1d9b590ca
 - name: github.com/cenk/backoff
   version: cdf48bbc1eb78d1349cbda326a4a037f7ba565c6
+- name: github.com/dancannon/gorethink
+  version: 27d3045458910e2fc56025a0b52caaaa96414a26
 - name: github.com/davecgh/go-spew
   version: 2df174808ee097f90d259e432cc04442cf60be21
   subpackages:
   - spew
+- name: github.com/dgrijalva/jwt-go
+  version: 268038b363c7a8d7306b8e35bf77a1fde4b0c402
 - name: github.com/fsnotify/fsnotify
   version: a8a77c9133d2d6fd8334f3260d06f60e8d80a5fb
 - name: github.com/go-errors/errors
   version: a41850380601eeb43f4350f7d17c6bbd8944aaf8
 - name: github.com/golang/protobuf
-  version: 552c7b9542c194800fd493123b3798ef0a832032
+  version: c3cefd437628a0b7d31b34fe44b3a7a540e98527
   subpackages:
   - proto
 - name: github.com/hailocab/go-hostpool
@@ -56,7 +60,7 @@ imports:
   - pkg
   - rand/sequence
 - name: github.com/ory-am/fosite
-  version: 5f1851b088e9f087a7bd3e7beca4c3112418fcfc
+  version: be30574ee5f5f51cb22faf0a187231141f1c2f63
   subpackages:
   - compose
   - fosite-example/pkg
@@ -67,7 +71,7 @@ imports:
   - token/hmac
   - token/jwt
 - name: github.com/ory-am/ladon
-  version: 524db01e180eeb1fb048daaca22e562490b8ed85
+  version: 8319836a6390b366724fe2395513e3ed0d52689b
 - name: github.com/parnurzeal/gorequest
   version: e213a02fb0082d41e66996deeaab5ae96039d913
 - name: github.com/pborman/uuid
@@ -100,8 +104,9 @@ imports:
 - name: github.com/spf13/viper
   version: 346299ea79e446ebdddb834371ceba2e5926b732
 - name: github.com/square/go-jose
-  version: e3f973b66b91445ec816dd7411ad1b6495a5a2fc
+  version: f7dab0d84e417e827829f248ef197af7d87c714c
   subpackages:
+  - cipher
   - json
 - name: github.com/stretchr/testify
   version: f390dcf405f7b83c997eac1b06768bb9f44dec18
@@ -133,7 +138,7 @@ imports:
   - clientcredentials
   - internal
 - name: golang.org/x/sys
-  version: 50c6bc5e4292a1d4e65c6e9be5f53be28bcbe28e
+  version: a646d33e2ee3172a661fc09bca23bb4889a41bc8
   subpackages:
   - unix
 - name: golang.org/x/text
@@ -157,30 +162,27 @@ imports:
   - encoding
   - ql2
   - types
+- name: gopkg.in/dgrijalva/jwt-go.v2
+  version: 268038b363c7a8d7306b8e35bf77a1fde4b0c402
 - name: gopkg.in/fatih/pool.v2
-  version: cba550ebf9bce999a02e963296d4bc7a486cb715
-- name: gopkg.in/square/go-jose.v1
-  version: e3f973b66b91445ec816dd7411ad1b6495a5a2fc
-  subpackages:
-  - cipher
-  - json
+  version: 20a0a429c5f93de45c90f5f09ea297c25e0929b3
 - name: gopkg.in/tylerb/graceful.v1
   version: c838c13b2beeea4f4f54496da96a3a6ae567c37a
 - name: gopkg.in/yaml.v2
   version: e4d366fc3c7938e2958e662b4258c7a89e1f0e3e
 testImports:
 - name: camlistore.org
-  version: 364ed6be3e5223f2385fcf873dc8d20a88b4e66b
+  version: 41516af23d58b64efe7712e8be2d3f9fd94fb693
   subpackages:
   - pkg/netutil
 - name: github.com/go-sql-driver/mysql
-  version: 1421caf44f6464fd2ee8de694c7508ee13f92964
+  version: 0b58b37b664c21f3010e836f1b931e1d0b0b0685
 - name: github.com/gorilla/context
   version: aed02d124ae4a0e94fea4541c8effd05bf0c8296
 - name: github.com/gorilla/mux
   version: 0eeaf8392f5b04950925b8a69fe70f110fa7cbfc
 - name: github.com/lib/pq
-  version: 69552e54d2a9d4c6a2438926a774930f7bc398ec
+  version: 80f8150043c80fb52dee6bc863a709cdac7ec8f8
   subpackages:
   - oid
 - name: github.com/ory-am/dockertest

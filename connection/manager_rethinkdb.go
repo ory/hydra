@@ -3,7 +3,7 @@ package connection
 import (
 	"sync"
 
-	r "gopkg.in/dancannon/gorethink.v2"
+	r "github.com/dancannon/gorethink"
 
 	"time"
 

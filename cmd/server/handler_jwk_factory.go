@@ -8,7 +8,7 @@ import (
 	"github.com/ory-am/hydra/jwk"
 	"github.com/square/go-jose"
 	"golang.org/x/net/context"
-	r "gopkg.in/dancannon/gorethink.v2"
+	r "github.com/dancannon/gorethink"
 )
 
 func injectJWKManager(c *config.Config) {

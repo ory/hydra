@@ -14,7 +14,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
-	r "gopkg.in/dancannon/gorethink.v2"
+	r "github.com/dancannon/gorethink"
 )
 
 var rethinkManager *FositeRehinkDBStore

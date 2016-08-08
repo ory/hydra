@@ -14,7 +14,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
 	"github.com/stretchr/testify/assert"
-	r "gopkg.in/dancannon/gorethink.v2"
+	r "github.com/dancannon/gorethink"
 
 	"log"
 	"os"

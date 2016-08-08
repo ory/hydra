@@ -53,8 +53,8 @@ import:
   subpackages:
   - clientcredentials
 - package: gopkg.in/dancannon/gorethink.v2
-- package: gopkg.in/dgrijalva/jwt-go.v2
-  version: ~3.0.0
+- package: github.com/dgrijalva/jwt-go
+  version: ~2.7.0
 - package: gopkg.in/tylerb/graceful.v1
   version: ~1.2.11
 - package: gopkg.in/yaml.v2

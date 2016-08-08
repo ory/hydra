@@ -19,7 +19,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
-	"gopkg.in/dgrijalva/jwt-go.v2"
+	"github.com/dgrijalva/jwt-go"
 )
 
 var hasher = &hash.BCrypt{}

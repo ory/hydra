@@ -157,8 +157,6 @@ imports:
   - encoding
   - ql2
   - types
-- name: gopkg.in/dgrijalva/jwt-go.v2
-  version: d2709f9f1f31ebcda9651b03077758c1f3a0018c
 - name: gopkg.in/fatih/pool.v2
   version: cba550ebf9bce999a02e963296d4bc7a486cb715
 - name: gopkg.in/square/go-jose.v1

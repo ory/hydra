@@ -13,8 +13,9 @@ go:
   - 1.6
 
 install:
-  - go get github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/pierrre/gotestcover
+  - go get github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/pierrre/gotestcover github.com/Masterminds/glide
   - git clone https://github.com/docker-library/official-images.git ~/official-images
+  - glide install
   - go install github.com/ory-am/hydra
 
 script:

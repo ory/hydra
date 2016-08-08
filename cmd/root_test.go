@@ -31,6 +31,9 @@ func TestExecute(t *testing.T) {
 			args: []string{"host", "--dangerous-auto-logon"},
 			wait: func() bool {
 				_, err := os.Stat(path)
+				if err != nil {
+					t.Logf("Could not stat path %s because %s", path, err)
+				}
 				return err != nil
 			},
 		},
@@ -73,7 +76,7 @@ func TestExecute(t *testing.T) {
 				if count > 30 {
 					t.FailNow()
 				}
-				time.Sleep(time.Second * 2)
+				time.Sleep(time.Second * 4)
 			}
 		} else if c.timeout > 0 {
 			time.Sleep(c.timeout)

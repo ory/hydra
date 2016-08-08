@@ -12,6 +12,10 @@ import (
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
+	"bytes"
+	"io/ioutil"
+	"strconv"
+	"encoding/json"
 )
 
 type HTTPWarden struct {
@@ -30,13 +34,34 @@ func (w *HTTPWarden) SetClient(c *clientcredentials.Config) {
 
 func (w *HTTPWarden) IntrospectToken(ctx context.Context, token string) (*firewall.Introspection, error) {
 	var resp = new(firewall.Introspection)
-
 	var ep = *w.Endpoint
 	ep.Path = IntrospectPath
 	agent := &pkg.SuperAgent{URL: ep.String(), Client: w.Client}
+
+	data := url.Values{"token": []string{token}}
+	hreq, err := http.NewRequest("POST", ep.String(), bytes.NewBufferString(data.Encode()))
+	if err != nil {
+		return nil, errors.New(err)
+	}
+
+	hreq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	hreq.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
+	hres, err := w.Client.Do(hreq)
+	if err != nil {
+		return nil, errors.New(err)
+	}
+
+	if hres.StatusCode < 200 || hres.StatusCode >= 300 {
+		body, _ := ioutil.ReadAll(hres.Body)
+		return nil, errors.Errorf("Expected 2xx status code but got %d.\n%s", hres.StatusCode, body)
+	} else if err := json.NewDecoder(hres.Body).Decode(resp); err != nil {
+		body, _ := ioutil.ReadAll(hres.Body)
+		return nil, errors.Errorf("%s: %s", err, body)
+	}
+
 	if err := agent.POST(&struct {
 		Token string `json:"token"`
-	}{Token: token}, &resp); err != nil {
+	}{Token: token}, &hres); err != nil {
 		return nil, err
 	} else if !resp.Active {
 		return nil, errors.New("Token is malformed, expired or otherwise invalid")

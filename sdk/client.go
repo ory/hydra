@@ -1,4 +1,3 @@
-// Wraps hydra HTTP Manager's
 package sdk
 
 import (

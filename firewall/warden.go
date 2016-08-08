@@ -1,3 +1,4 @@
+// Package firewall defines an API for validating access requests.
 package firewall
 
 import (
@@ -8,6 +9,7 @@ import (
 	"golang.org/x/net/context"
 )
 
+// Context contains an access token's session data
 type Context struct {
 	Subject       string                 `json:"sub"`
 	GrantedScopes []string               `json:"scopes"`
@@ -18,6 +20,7 @@ type Context struct {
 	Extra         map[string]interface{} `json:"ext"`
 }
 
+// Firewall offers various validation strategies for access tokens.
 type Firewall interface {
 	Introspector
 
@@ -31,9 +34,11 @@ type Firewall interface {
 	// TokenAllowed uses policies and a token to return a context and no error if the access request can be fulfilled or an error if not.
 	TokenAllowed(ctx context.Context, token string, accessRequest *ladon.Request, scopes ...string) (*Context, error)
 
+	// TokenFromRequest returns an access token from the HTTP Authorization header.
 	TokenFromRequest(r *http.Request) string
 }
 
+// Introspection contains an access token's session data as specified by IETF RFC 7662.
 type Introspection struct {
 	Active    bool   `json:"active"`
 	Scope     string `json:"scope,omitempty"`
@@ -47,6 +52,7 @@ type Introspection struct {
 	Issuer    string `json:"iss,omitempty"`
 }
 
+// Introspector is capable of introspecting an access token according to IETF RFC 7662.
 type Introspector interface {
 	IntrospectToken(ctx context.Context, token string) (*Introspection, error)
 }

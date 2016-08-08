@@ -74,16 +74,12 @@ func (h *WardenHandler) Introspect(w http.ResponseWriter, r *http.Request, _ htt
 		return
 	}
 
-	var ar struct {
-		Token string `json:"token"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&ar); err != nil {
+	if err := r.ParseForm(); err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
 	}
-	defer r.Body.Close()
 
-	auth, err := h.Warden.IntrospectToken(ctx, ar.Token)
+	auth, err := h.Warden.IntrospectToken(ctx, r.PostForm.Get("token"))
 	if err != nil {
 		h.H.Write(ctx, w, r, &inactive)
 		return

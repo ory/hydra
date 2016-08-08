@@ -13,11 +13,9 @@ go:
   - 1.6
 
 install:
-  - go get github.com/axw/gocov/gocov github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/pierrre/gotestcover
-  # Workaround for travis
-  - go get -t -v ./...
-  - go install github.com/ory-am/hydra
+  - github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/pierrre/gotestcover
   - git clone https://github.com/docker-library/official-images.git ~/official-images
+  - go install github.com/ory-am/hydra
 
 script:
   - gotestcover -coverprofile="cover.out" $(go list ./... | grep -v /vendor/)

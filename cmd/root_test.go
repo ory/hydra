@@ -70,7 +70,7 @@ func TestExecute(t *testing.T) {
 			for c.wait() {
 				t.Logf("Config file has not been found yet, retrying attempt #%d...", count)
 				count++
-				if count > 10 {
+				if count > 30 {
 					t.FailNow()
 				}
 				time.Sleep(time.Second * 2)

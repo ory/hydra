@@ -1,5 +1,5 @@
 hash: 13f56b358e59f75d69d0fd22524c82ed61e1684ec304c636dd605eac9e448d82
-updated: 2016-08-09T09:44:49.91398683+02:00
+updated: 2016-08-09T09:48:14.034816609+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7664702784775e51966f0885f5cd27435916517b
@@ -58,7 +58,7 @@ imports:
   - compiler
   - env
 - name: github.com/ory-am/fosite
-  version: be30574ee5f5f51cb22faf0a187231141f1c2f63
+  version: 66b53a903c03950ac5180dc30c3f69e477344205
   subpackages:
   - compose
   - fosite-example/pkg
@@ -71,7 +71,7 @@ imports:
 - name: github.com/ory-am/ladon
   version: 67845728bf072d2b3f050cb415ece9a54ec6a546
 - name: github.com/parnurzeal/gorequest
-  version: e213a02fb0082d41e66996deeaab5ae96039d913
+  version: b64673b971a1742b8ba91f228f1c029632d4b686
 - name: github.com/pborman/uuid
   version: a97ce2ca70fa5a848076093f05e639a89ca34d06
 - name: github.com/pkg/errors
@@ -158,7 +158,7 @@ testImports:
 - name: github.com/go-sql-driver/mysql
   version: 0b58b37b664c21f3010e836f1b931e1d0b0b0685
 - name: github.com/gorilla/context
-  version: aed02d124ae4a0e94fea4541c8effd05bf0c8296
+  version: 1ea25387ff6f684839d82767c1733ff4d4d15d0a
 - name: github.com/gorilla/mux
   version: 0eeaf8392f5b04950925b8a69fe70f110fa7cbfc
 - name: github.com/lib/pq

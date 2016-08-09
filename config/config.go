@@ -269,6 +269,7 @@ func (c *Config) Persist() error {
 		return errors.New(err)
 	}
 
+	logrus.Infof("Persisting config in file %s", viper.ConfigFileUsed())
 	if err := ioutil.WriteFile(viper.ConfigFileUsed(), out, 0700); err != nil {
 		return errors.Errorf(`Could not write to "%s" because: %s`, viper.ConfigFileUsed(), err)
 	}

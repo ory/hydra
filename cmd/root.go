@@ -58,17 +58,17 @@ func initConfig() {
 	if cfgFile != "" {
 		// enable ability to specify config file via flag
 		viper.SetConfigFile(cfgFile)
-	}
+	} else {
+		path := absPathify("$HOME")
+		if _, err := os.Stat(filepath.Join(path, ".hydra.yml")); err != nil {
+			_, _ = os.Create(filepath.Join(path, ".hydra.yml"))
+		}
 
-	path := absPathify("$HOME")
-	if _, err := os.Stat(filepath.Join(path, ".hydra.yml")); err != nil {
-		_, _ = os.Create(filepath.Join(path, ".hydra.yml"))
+		viper.SetConfigType("yaml")
+		viper.SetConfigName(".hydra") // name of config file (without extension)
+		viper.AddConfigPath("$HOME")  // adding home directory as first search path
 	}
-
-	viper.SetConfigType("yaml")
-	viper.SetConfigName(".hydra") // name of config file (without extension)
-	viper.AddConfigPath("$HOME")  // adding home directory as first search path
-	viper.AutomaticEnv()          // read in environment variables that match
+	viper.AutomaticEnv() // read in environment variables that match
 
 	viper.BindEnv("HOST")
 	viper.BindEnv("CLIENT_ID")

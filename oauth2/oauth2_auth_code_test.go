@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	ejwt "github.com/ory-am/fosite/token/jwt"
@@ -15,7 +16,6 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
-	"gopkg.in/dgrijalva/jwt-go.v2"
 )
 
 func TestAuthCode(t *testing.T) {
@@ -39,6 +39,7 @@ func TestAuthCode(t *testing.T) {
 			"exp": time.Now().Add(time.Hour).Unix(),
 			"iat": time.Now().Unix(),
 			"aud": "app-client",
+			"scp": []string{"hydra"},
 		})
 		pkg.RequireError(t, false, err)
 

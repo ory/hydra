@@ -1,9 +1,10 @@
 package helper
 
 import (
-	"github.com/moul/http2curl"
 	"net/http"
+
 	"github.com/go-errors/errors"
+	"github.com/moul/http2curl"
 )
 
 func DoDryRequest(dry bool, req *http.Request) error {

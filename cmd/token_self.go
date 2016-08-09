@@ -32,7 +32,6 @@ var tokenSelfCmd = &cobra.Command{
 			ClientSecret: c.ClientSecret,
 			TokenURL:     pkg.JoinURLStrings(c.ClusterURL, "/oauth2/token"),
 			Scopes: []string{
-				"core",
 				"hydra",
 			},
 		}

@@ -7,9 +7,6 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
-	csh "github.com/ory-am/fosite/handler/core/strategy"
-	"github.com/ory-am/fosite/handler/oidc/strategy"
-	"github.com/ory-am/fosite/token/jwt"
 	"github.com/ory-am/hydra/pkg"
 )
 
@@ -18,8 +15,9 @@ const (
 )
 
 type Handler struct {
-	OAuth2  fosite.OAuth2Provider
-	Consent ConsentStrategy
+	OAuth2     fosite.OAuth2Provider
+	Consent    ConsentStrategy
+	ForcedHTTP bool
 
 	ConsentURL url.URL
 }
@@ -28,19 +26,14 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.POST("/oauth2/token", h.TokenHandler)
 	r.GET("/oauth2/auth", h.AuthHandler)
 	r.POST("/oauth2/auth", h.AuthHandler)
+	r.GET("/oauth2/consent", h.DefaultConsentHandler)
 }
 
 func (o *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var session = Session{
-		DefaultSession: &strategy.DefaultSession{
-			Claims:      new(jwt.IDTokenClaims),
-			Headers:     new(jwt.Headers),
-			HMACSession: new(csh.HMACSession),
-		},
-	}
+	var session = NewSession("")
 	var ctx = fosite.NewContext()
 
-	accessRequest, err := o.OAuth2.NewAccessRequest(ctx, r, &session)
+	accessRequest, err := o.OAuth2.NewAccessRequest(ctx, r, session)
 	if err != nil {
 		pkg.LogError(err)
 		o.OAuth2.WriteAccessError(w, accessRequest, err)
@@ -49,6 +42,11 @@ func (o *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprou
 
 	if accessRequest.GetGrantTypes().Exact("client_credentials") {
 		session.Subject = accessRequest.GetClient().GetID()
+		for _, scope := range accessRequest.GetRequestedScopes() {
+			if fosite.HierarchicScopeStrategy(accessRequest.GetClient().GetScopes(), scope) {
+				accessRequest.GrantScope(scope)
+			}
+		}
 	}
 
 	accessResponse, err := o.OAuth2.NewAccessResponse(ctx, r, accessRequest)
@@ -105,9 +103,10 @@ func (o *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 
 func (o *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, authorizeRequest fosite.AuthorizeRequester) error {
 	schema := "https"
-	if r.TLS == nil {
+	if o.ForcedHTTP {
 		schema = "http"
 	}
+
 	challenge, err := o.Consent.IssueChallenge(authorizeRequest, schema+"://"+r.Host+r.URL.String())
 	if err != nil {
 		return err

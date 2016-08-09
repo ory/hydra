@@ -45,7 +45,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 		return
 	}
 
-	if _, err := h.W.HTTPActionAllowed(ctx, r, &ladon.Request{
+	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &ladon.Request{
 		Resource: ClientsResource,
 		Action:   "create",
 		Context: ladon.Context{
@@ -80,7 +80,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var ctx = herodot.NewContext()
 
-	if _, err := h.W.HTTPActionAllowed(ctx, r, &ladon.Request{
+	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &ladon.Request{
 		Resource: ClientsResource,
 		Action:   "get",
 	}, Scope); err != nil {
@@ -106,13 +106,13 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	var ctx = herodot.NewContext()
 	var id = ps.ByName("id")
 
-	c, err := h.Manager.GetClient(id)
+	c, err := h.Manager.GetConcreteClient(id)
 	if err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
 	}
 
-	if _, err := h.W.HTTPActionAllowed(ctx, r, &ladon.Request{
+	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &ladon.Request{
 		Resource: fmt.Sprintf(ClientResource, id),
 		Action:   "get",
 		Context: ladon.Context{
@@ -123,7 +123,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 		return
 	}
 
-	c.(*Client).Secret = ""
+	c.Secret = ""
 	h.H.Write(ctx, w, r, c)
 }
 
@@ -131,7 +131,7 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	var ctx = herodot.NewContext()
 	var id = ps.ByName("id")
 
-	if _, err := h.W.HTTPActionAllowed(ctx, r, &ladon.Request{
+	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &ladon.Request{
 		Resource: fmt.Sprintf(ClientResource, id),
 		Action:   "delete",
 	}, Scope); err != nil {

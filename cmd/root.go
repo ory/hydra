@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-	"sync"
 
 	"github.com/ory-am/hydra/cmd/cli"
 	"github.com/ory-am/hydra/config"
@@ -22,14 +21,13 @@ var c = new(config.Config)
 // This represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "hydra",
-	Short: "Hydra is a twelve factor OAuth2 and OpenID Connect provider",
+	Short: "Hydra is a cloud native high throughput OAuth2 and OpenID Connect provider",
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
 var cmdHandler = cli.NewHandler(c)
-var mutex = &sync.RWMutex{}
 
 // Execute adds all child commands to the root command sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
@@ -57,21 +55,52 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	mutex.Lock()
 	if cfgFile != "" {
 		// enable ability to specify config file via flag
 		viper.SetConfigFile(cfgFile)
-	}
+	} else {
+		path := absPathify("$HOME")
+		if _, err := os.Stat(filepath.Join(path, ".hydra.yml")); err != nil {
+			_, _ = os.Create(filepath.Join(path, ".hydra.yml"))
+		}
 
-	path := absPathify("$HOME")
-	if _, err := os.Stat(filepath.Join(path, ".hydra.yml")); err != nil {
-		_, _ = os.Create(filepath.Join(path, ".hydra.yml"))
+		viper.SetConfigType("yaml")
+		viper.SetConfigName(".hydra") // name of config file (without extension)
+		viper.AddConfigPath("$HOME")  // adding home directory as first search path
 	}
+	viper.AutomaticEnv() // read in environment variables that match
 
-	viper.SetConfigType("yaml")
-	viper.SetConfigName(".hydra") // name of config file (without extension)
-	viper.AddConfigPath("$HOME")  // adding home directory as first search path
-	viper.AutomaticEnv()          // read in environment variables that match
+	viper.BindEnv("HOST")
+	viper.BindEnv("CLIENT_ID")
+	viper.BindEnv("CONSENT_URL")
+	viper.BindEnv("DATABASE_URL")
+	viper.BindEnv("SYSTEM_SECRET")
+	viper.BindEnv("CLIENT_SECRET")
+	viper.BindEnv("HTTPS_ALLOW_TERMINATION_FROM")
+
+	viper.BindEnv("CLUSTER_URL")
+	viper.SetDefault("CLUSTER_URL", "https://localhost:4444")
+
+	viper.BindEnv("PORT")
+	viper.SetDefault("PORT", 4444)
+
+	viper.BindEnv("ISSUER")
+	viper.SetDefault("ISSUER", "hydra.localhost")
+
+	viper.BindEnv("BCRYPT_COST")
+	viper.SetDefault("BCRYPT_COST", 10)
+
+	viper.BindEnv("ACCESS_TOKEN_LIFESPAN")
+	viper.SetDefault("ACCESS_TOKEN_LIFESPAN", "1h")
+
+	viper.BindEnv("ID_TOKEN_LIFESPAN")
+	viper.SetDefault("ID_TOKEN_LIFESPAN", "1h")
+
+	viper.BindEnv("AUTH_CODE_LIFESPAN")
+	viper.SetDefault("AUTH_CODE_LIFESPAN", "10m")
+
+	viper.BindEnv("CHALLENGE_TOKEN_LIFESPAN")
+	viper.SetDefault("CHALLENGE_TOKEN_LIFESPAN", "10m")
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err != nil {
@@ -82,31 +111,6 @@ func initConfig() {
 	if err := viper.Unmarshal(c); err != nil {
 		fatal(fmt.Sprintf("Could not read config because %s.", err))
 	}
-
-	if consentURL, ok := viper.Get("CONSENT_URL").(string); ok {
-		c.ConsentURL = consentURL
-	}
-
-	if clientID, ok := viper.Get("CLIENT_ID").(string); ok {
-		c.ClientID = clientID
-	}
-
-	if systemSecret, ok := viper.Get("SYSTEM_SECRET").(string); ok {
-		c.SystemSecret = []byte(systemSecret)
-	}
-
-	if clientSecret, ok := viper.Get("CLIENT_SECRET").(string); ok {
-		c.ClientSecret = clientSecret
-	}
-
-	if databaseURL, ok := viper.Get("DATABASE_URL").(string); ok {
-		c.DatabaseURL = databaseURL
-	}
-
-	if c.ClusterURL == "" {
-		_ = c.GetClusterURL()
-	}
-	mutex.Unlock()
 }
 
 func absPathify(inPath string) string {

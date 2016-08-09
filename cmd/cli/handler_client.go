@@ -9,6 +9,7 @@ import (
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/spf13/cobra"
+	"strings"
 )
 
 type ClientHandler struct {
@@ -69,7 +70,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		ID:            id,
 		Secret:        string(secret),
 		ResponseTypes: responseTypes,
-		GrantedScopes: allowedScopes,
+		Scopes:        strings.Join(allowedScopes, " "),
 		GrantTypes:    grantTypes,
 		RedirectURIs:  callbacks,
 		Name:          name,

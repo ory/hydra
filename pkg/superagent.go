@@ -3,8 +3,8 @@ package pkg
 import (
 	"bytes"
 	"encoding/json"
-	"net/http"
 	"io/ioutil"
+	"net/http"
 
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/pkg/helper"
@@ -116,16 +116,10 @@ func (s *SuperAgent) send(method string, in interface{}, out interface{}) error 
 		return errors.New(err)
 	}
 
-	expectedStatus := http.StatusOK
-	if method == "POST" {
-		expectedStatus = http.StatusCreated
-	}
-	if resp.StatusCode != expectedStatus {
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		body, _ := ioutil.ReadAll(resp.Body)
-		return errors.Errorf("Expected status code %d, got %d.\n%s", expectedStatus, resp.StatusCode, body)
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(out); err != nil {
+		return errors.Errorf("Expected 2xx status code but got %d.\n%s", resp.StatusCode, body)
+	} else if err := json.NewDecoder(resp.Body).Decode(out); err != nil {
 		body, _ := ioutil.ReadAll(resp.Body)
 		return errors.Errorf("%s: %s", err, body)
 	}

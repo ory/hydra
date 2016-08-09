@@ -1,4 +1,3 @@
-// Wraps hydra HTTP Manager's
 package sdk
 
 import (
@@ -43,7 +42,7 @@ var defaultOptions = []option{
 	ClusterURL(os.Getenv("HYDRA_CLUSTER_URL")),
 	ClientID(os.Getenv("HYDRA_CLIENT_ID")),
 	ClientSecret(os.Getenv("HYDRA_CLIENT_SECRET")),
-	Scopes("core", "hydra"),
+	Scopes("hydra"),
 }
 
 // Connect instantiates a new client to communicate with Hydra

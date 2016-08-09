@@ -11,9 +11,9 @@
 [![Code Climate](https://codeclimate.com/github/ory-am/hydra/badges/gpa.svg)](https://codeclimate.com/github/ory-am/hydra)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ory-am/hydra)](https://goreportcard.com/report/github.com/ory-am/hydra)
 
-Hydra is being developed by german-based company [Ory](https://ory.am). Join our [newsletter](http://eepurl.com/bKT3N9) to stay on top of new developments.
-We respond to basic support requests on [Google Groups](https://groups.google.com/forum/#!forum/ory-hydra/new) and [Gitter](https://gitter.im/ory-am/hydra).
-If you are looking for enterprise support, [contact us now](mailto:hello@ory.am).
+Hydra is being developed by german-based company [Ory](https://ory.am). Join our [newsletter](http://eepurl.com/bKT3N9) to stay on top of new developments. We respond to *basic support requests in our free time* on [Google Groups](https://groups.google.com/forum/#!forum/ory-hydra/new) and [Gitter](https://gitter.im/ory-am/hydra).
+
+If you are looking for 24/7 enterprise support or SLAs, [contact us now](mailto:hello@ory.am).
 
 Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://github.com/ory-am/fosite) and [Ladon](https://github.com/ory-am/ladon) for policy-based access control.
 
@@ -46,6 +46,7 @@ Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://git
   - [Can I set the log level to warn, error, debug, ...?](#can-i-set-the-log-level-to-warn-error-debug-)
   - [I need to use a custom CA for RethinkDB](#i-need-to-use-a-custom-ca-for-rethinkdb)
   - [What will happen if an error occurs during an OAuth2 flow?](#what-will-happen-if-an-error-occurs-during-an-oauth2-flow)
+  - [Eventually consistent](#eventually-consistent)
   - [Is there a client library / SDK?](#is-there-a-client-library--sdk)
 - [Hall of Fame](#hall-of-fame)
 
@@ -135,7 +136,7 @@ Hydra is a twelve factor OAuth2 and OpenID Connect provider
 
 #### Building from source
 
-If you wish to compile hydra yourself, you need to install and set up [Go](https://golang.org/) and add `$GOPATH/bin`
+If you wish to compile hydra yourself, you need to install and set up [Go 1.5+](https://golang.org/) and add `$GOPATH/bin`
 to your `$PATH`. To do so, run the following commands in a shell (bash, sh, cmd.exe, ...):
 
 ```
@@ -434,7 +435,7 @@ Or by specifying the following flags:
 
 ### I want to disable HTTPS for testing
 
-You can do so by running `hydra host --force-dangerous-http`.
+You can do so by running `hydra host --dangerous-force-http`.
 
 ### Can I set the log level to warn, error, debug, ...?
 
@@ -463,6 +464,12 @@ or via command line flag:
 
 The user agent will either, according to spec, be redirected to the OAuth2 client who initiated the request, if possible. If not, the user agent will be redirected to the identity provider
 endpoint and an `error` and `error_description` query parameter will be appended to it's URL.
+
+### Eventually consistent
+
+Using hydra with RethinkDB implies eventual consistency on all endpoints, except `/oauth2/auth` and `/oauth2/token`.
+Eventual consistent data is usually not immediately available. This is dependent on the network latency between Hydra
+and RethinkDB.
 
 ### Is there a client library / SDK?
 
@@ -570,7 +577,7 @@ Validate requests with the Warden, uses [`ory-am/hydra/warden.HTTPWarden`](warde
 import "github.com/ory-am/ladon"
 
 // Check if action is allowed
-hydra.Warden.HTTPActionAllowed(ctx, req, &ladon.Request{
+hydra.Warden.HTTPRequestAllowed(ctx, req, &ladon.Request{
     Resource: "urn:media:images",
     Action: "get",
     Subject: "bob",

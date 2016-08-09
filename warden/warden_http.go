@@ -1,20 +1,21 @@
 package warden
 
 import (
-	"bytes"
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 
 	"github.com/go-errors/errors"
-	. "github.com/ory-am/hydra/firewall"
+	"github.com/ory-am/fosite"
+	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
-	"github.com/ory-am/hydra/pkg/helper"
+	"bytes"
+	"io/ioutil"
+	"strconv"
+	"encoding/json"
 )
 
 type HTTPWarden struct {
@@ -23,87 +24,110 @@ type HTTPWarden struct {
 	Endpoint *url.URL
 }
 
+func (w *HTTPWarden) TokenFromRequest(r *http.Request) string {
+	return fosite.AccessTokenFromRequest(r)
+}
+
 func (w *HTTPWarden) SetClient(c *clientcredentials.Config) {
 	w.Client = c.Client(oauth2.NoContext)
 }
 
-func (w *HTTPWarden) ActionAllowed(ctx context.Context, token string, a *ladon.Request, scopes ...string) (*Context, error) {
-	return w.doRequest(AllowedHandlerPath, &WardenAccessRequest{
-		Request: a,
-		WardenAuthorizedRequest: &WardenAuthorizedRequest{
-			Token: token,
-			Scopes:    scopes,
-		},
-	})
-}
+func (w *HTTPWarden) IntrospectToken(ctx context.Context, token string) (*firewall.Introspection, error) {
+	var resp = new(firewall.Introspection)
+	var ep = *w.Endpoint
+	ep.Path = IntrospectPath
+	agent := &pkg.SuperAgent{URL: ep.String(), Client: w.Client}
 
-func (w *HTTPWarden) HTTPActionAllowed(ctx context.Context, r *http.Request, a *ladon.Request, scopes ...string) (*Context, error) {
-	token := TokenFromRequest(r)
-	if token == "" {
-		return nil, errors.New(pkg.ErrUnauthorized)
-	}
-
-	return w.ActionAllowed(ctx, token, a, scopes...)
-}
-
-func (w *HTTPWarden) Authorized(ctx context.Context, token string, scopes ...string) (*Context, error) {
-	return w.doRequest(AuthorizedHandlerPath, &WardenAuthorizedRequest{
-		Token: token,
-		Scopes:    scopes,
-	})
-}
-
-func (w *HTTPWarden) HTTPAuthorized(ctx context.Context, r *http.Request, scopes ...string) (*Context, error) {
-	token := TokenFromRequest(r)
-	if token == "" {
-		return nil, errors.New(pkg.ErrUnauthorized)
-	}
-
-	return w.Authorized(ctx, token, scopes...)
-}
-
-func (w *HTTPWarden) doDry(req *http.Request) error {
-	return helper.DoDryRequest(w.Dry, req)
-}
-
-func (w *HTTPWarden) doRequest(path string, request interface{}) (*Context, error) {
-	out, err := json.Marshal(request)
+	data := url.Values{"token": []string{token}}
+	hreq, err := http.NewRequest("POST", ep.String(), bytes.NewBufferString(data.Encode()))
 	if err != nil {
 		return nil, errors.New(err)
 	}
 
-	var ep = new(url.URL)
-	*ep = *w.Endpoint
-	ep.Path = path
-	req, err := http.NewRequest("POST", ep.String(), bytes.NewBuffer(out))
+	hreq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	hreq.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
+	hres, err := w.Client.Do(hreq)
 	if err != nil {
 		return nil, errors.New(err)
 	}
 
-	req.Header.Set("Content-Type", "application/json")
-	if err := w.doDry(req); err != nil {
+	if hres.StatusCode < 200 || hres.StatusCode >= 300 {
+		body, _ := ioutil.ReadAll(hres.Body)
+		return nil, errors.Errorf("Expected 2xx status code but got %d.\n%s", hres.StatusCode, body)
+	} else if err := json.NewDecoder(hres.Body).Decode(resp); err != nil {
+		body, _ := ioutil.ReadAll(hres.Body)
+		return nil, errors.Errorf("%s: %s", err, body)
+	}
+
+	if err := agent.POST(&struct {
+		Token string `json:"token"`
+	}{Token: token}, &hres); err != nil {
 		return nil, err
+	} else if !resp.Active {
+		return nil, errors.New("Token is malformed, expired or otherwise invalid")
 	}
 
-	resp, err := w.Client.Do(req)
-	if err != nil {
-		return nil, errors.New(err)
+	return resp, nil
+}
+
+func (w *HTTPWarden) TokenAllowed(ctx context.Context, token string, a *ladon.Request, scopes ...string) (*firewall.Context, error) {
+	var resp = struct {
+		*firewall.Context
+		Allowed bool `json:"allowed"`
+	}{}
+
+	var ep = *w.Endpoint
+	ep.Path = TokenAllowedHandlerPath
+	agent := &pkg.SuperAgent{URL: ep.String(), Client: w.Client}
+	if err := agent.POST(&WardenAccessRequest{
+		WardenAuthorizedRequest: &WardenAuthorizedRequest{
+			Token:  token,
+			Scopes: scopes,
+		},
+		Request: a,
+	}, &resp); err != nil {
+		return nil, err
+	} else if !resp.Allowed {
+		return nil, errors.New("Token is not valid")
 	}
-	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		all, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return nil, errors.New(err)
-		}
+	return resp.Context, nil
+}
 
-		return nil, errors.Errorf("Got error (%d): %s", resp.StatusCode, all)
+func (w *HTTPWarden) IsAllowed(ctx context.Context, a *ladon.Request) error {
+	var allowed = struct {
+		Allowed bool `json:"allowed"`
+	}{}
+
+	var ep = *w.Endpoint
+	ep.Path = AllowedHandlerPath
+	agent := &pkg.SuperAgent{URL: ep.String(), Client: w.Client}
+	if err := agent.POST(a, &allowed); err != nil {
+		return err
+	} else if !allowed.Allowed {
+		return errors.New("Forbidden")
 	}
 
-	var epResp WardenResponse
-	if err := json.NewDecoder(resp.Body).Decode(&epResp); err != nil {
-		return nil, errors.New(err)
+	return nil
+}
+
+func (w *HTTPWarden) InspectToken(ctx context.Context, token string, scopes ...string) (*firewall.Context, error) {
+	var resp = struct {
+		*firewall.Context
+		Valid bool `json:"valid"`
+	}{}
+
+	var ep = *w.Endpoint
+	ep.Path = TokenValidHandlerPath
+	agent := &pkg.SuperAgent{URL: ep.String(), Client: w.Client}
+	if err := agent.POST(&WardenAuthorizedRequest{
+		Token:  token,
+		Scopes: scopes,
+	}, &resp); err != nil {
+		return nil, err
+	} else if !resp.Valid {
+		return nil, errors.New("Token is not valid")
 	}
 
-	return epResp.Context, nil
+	return resp.Context, nil
 }

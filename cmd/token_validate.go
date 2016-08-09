@@ -13,6 +13,6 @@ var tokenValidatorCmd = &cobra.Command{
 
 func init() {
 	tokenCmd.AddCommand(tokenValidatorCmd)
-	tokenValidatorCmd.Flags().StringSlice("scopes", []string{"core"}, "Additionally check if scope was granted")
+	tokenValidatorCmd.Flags().StringSlice("scopes", []string{""}, "Additionally check if scope was granted")
 	tokenValidatorCmd.Flags().Bool("dry", false, "do not execute the command but show the corresponding curl command instead")
 }

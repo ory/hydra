@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"os"
 
+	"strings"
+
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/spf13/cobra"
-	"strings"
 )
 
 type ClientHandler struct {
@@ -70,7 +71,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		ID:            id,
 		Secret:        string(secret),
 		ResponseTypes: responseTypes,
-		Scopes:        strings.Join(allowedScopes, " "),
+		Scope:         strings.Join(allowedScopes, " "),
 		GrantTypes:    grantTypes,
 		RedirectURIs:  callbacks,
 		Name:          name,

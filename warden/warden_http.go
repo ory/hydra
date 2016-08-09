@@ -4,6 +4,11 @@ import (
 	"net/http"
 	"net/url"
 
+	"bytes"
+	"encoding/json"
+	"io/ioutil"
+	"strconv"
+
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/firewall"
@@ -12,10 +17,6 @@ import (
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
-	"bytes"
-	"io/ioutil"
-	"strconv"
-	"encoding/json"
 )
 
 type HTTPWarden struct {

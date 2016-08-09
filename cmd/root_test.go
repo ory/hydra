@@ -56,7 +56,7 @@ func TestExecute(t *testing.T) {
 		RootCmd.SetArgs(c.args)
 
 		t.Logf("Running command: %s", c.args)
-		if c.wait != nil || c.timeout > 0 {
+		if c.wait != nil {
 			go func() {
 				assert.Nil(t, RootCmd.Execute())
 			}()

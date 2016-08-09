@@ -8,13 +8,13 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	c "github.com/ory-am/common/pkg"
+	"github.com/ory-am/dockertest"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
-	"gopkg.in/ory-am/dockertest.v2"
 )
 
 var rethinkManager *FositeRehinkDBStore
@@ -112,8 +112,6 @@ func TestColdStartRethinkManager(t *testing.T) {
 	err = m.CreateAccessTokenSession(ctx, id, &defaultRequest)
 	pkg.AssertError(t, false, err)
 
-	time.Sleep(100 * time.Millisecond)
-
 	_, err = m.GetAuthorizeCodeSession(ctx, id, &testSession{})
 	pkg.AssertError(t, false, err)
 	_, err = m.GetAccessTokenSession(ctx, id, &testSession{})
@@ -145,8 +143,6 @@ func TestCreateGetDeleteAuthorizeCodes(t *testing.T) {
 		err = m.CreateAuthorizeCodeSession(ctx, "4321", &defaultRequest)
 		pkg.AssertError(t, false, err, "%s", k)
 
-		time.Sleep(100 * time.Millisecond)
-
 		res, err := m.GetAuthorizeCodeSession(ctx, "4321", &testSession{})
 		pkg.RequireError(t, false, err, "%s", k)
 		c.AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
@@ -170,8 +166,6 @@ func TestCreateGetDeleteAccessTokenSession(t *testing.T) {
 		err = m.CreateAccessTokenSession(ctx, "4321", &defaultRequest)
 		pkg.AssertError(t, false, err, "%s", k)
 
-		time.Sleep(100 * time.Millisecond)
-
 		res, err := m.GetAccessTokenSession(ctx, "4321", &testSession{})
 		pkg.RequireError(t, false, err, "%s", k)
 		c.AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
@@ -194,8 +188,6 @@ func TestCreateGetDeleteOpenIDConnectSession(t *testing.T) {
 
 		err = m.CreateOpenIDConnectSession(ctx, "4321", &defaultRequest)
 		pkg.AssertError(t, false, err, "%s", k)
-
-		time.Sleep(100 * time.Millisecond)
 
 		res, err := m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{
 			Session: &testSession{},
@@ -221,8 +213,6 @@ func TestCreateGetDeleteRefreshTokenSession(t *testing.T) {
 
 		err = m.CreateRefreshTokenSession(ctx, "4321", &defaultRequest)
 		pkg.AssertError(t, false, err, "%s", k)
-
-		time.Sleep(100 * time.Millisecond)
 
 		res, err := m.GetRefreshTokenSession(ctx, "4321", &testSession{})
 		pkg.RequireError(t, false, err, "%s", k)

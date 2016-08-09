@@ -9,6 +9,7 @@ import (
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/spf13/cobra"
+	"strings"
 )
 
 type ClientHandler struct {
@@ -24,7 +25,6 @@ func newClientHandler(c *config.Config) *ClientHandler {
 }
 
 func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
-	h.M.Dry = *h.Config.Dry
 	h.M.Endpoint = h.Config.Resolve("/clients")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 	if len(args) == 0 {
@@ -52,7 +52,7 @@ func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	var err error
 
-	h.M.Dry = *h.Config.Dry
+	h.M.Dry, _ = cmd.Flags().GetBool("dry")
 	h.M.Endpoint = h.Config.Resolve("/clients")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 
@@ -70,7 +70,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		ID:            id,
 		Secret:        string(secret),
 		ResponseTypes: responseTypes,
-		GrantedScopes: allowedScopes,
+		Scopes:        strings.Join(allowedScopes, " "),
 		GrantTypes:    grantTypes,
 		RedirectURIs:  callbacks,
 		Name:          name,
@@ -87,7 +87,6 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 }
 
 func (h *ClientHandler) DeleteClient(cmd *cobra.Command, args []string) {
-	h.M.Dry = *h.Config.Dry
 	h.M.Endpoint = h.Config.Resolve("/clients")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 	if len(args) == 0 {

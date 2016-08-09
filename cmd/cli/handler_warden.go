@@ -24,6 +24,7 @@ func newWardenHandler(c *config.Config) *WardenHandler {
 }
 
 func (h *WardenHandler) IsAuthorized(cmd *cobra.Command, args []string) {
+	h.M.Dry, _ = cmd.Flags().GetBool("dry")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 	h.M.Endpoint = h.Config.Resolve("/connections")
 
@@ -33,11 +34,7 @@ func (h *WardenHandler) IsAuthorized(cmd *cobra.Command, args []string) {
 	}
 
 	scopes, _ := cmd.Flags().GetStringSlice("scopes")
-	if len(scopes) == 0 {
-		scopes = []string{"core"}
-	}
-
-	res, err := h.M.Authorized(context.Background(), args[0], scopes...)
+	res, err := h.M.InspectToken(context.Background(), args[0], scopes...)
 	pkg.Must(err, "Could not validate token: %s", err)
 
 	out, err := json.MarshalIndent(res, "", "\t")

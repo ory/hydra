@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/ory-am/fosite/handler/core"
+	"github.com/ory-am/fosite/handler/oauth2"
 	"github.com/ory-am/fosite/hash"
 	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/jwk"
@@ -15,7 +15,7 @@ type Context struct {
 	Hasher         hash.Hasher
 	Warden         firewall.Firewall
 	LadonManager   ladon.Manager
-	FositeStrategy core.CoreStrategy
+	FositeStrategy oauth2.CoreStrategy
 	FositeStore    pkg.FositeStorer
 	KeyManager     jwk.Manager
 }

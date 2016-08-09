@@ -10,12 +10,8 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
-	"github.com/ory-am/fosite/handler/core"
-	"github.com/ory-am/fosite/handler/core/client"
-	"github.com/ory-am/fosite/handler/core/explicit"
-	"github.com/ory-am/fosite/handler/core/strategy"
+	"github.com/ory-am/fosite/compose"
 	"github.com/ory-am/fosite/hash"
-	"github.com/ory-am/fosite/token/hmac"
 	hc "github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/internal"
 	"github.com/ory-am/hydra/jwk"
@@ -23,7 +19,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
-	"gopkg.in/dgrijalva/jwt-go.v2"
+	"github.com/dgrijalva/jwt-go"
 )
 
 var hasher = &hash.BCrypt{}
@@ -41,60 +37,37 @@ var store = &internal.FositeMemoryStore{
 }
 
 var keyManager = &jwk.MemoryManager{}
-
 var keyGenerator = &jwk.RS256Generator{}
 
-var hmacStrategy = &strategy.HMACSHAStrategy{
-	Enigma: &hmac.HMACStrategy{
-		GlobalSecret: []byte("some-super-cool-secret-that-nobody-knows"),
-	},
-	AuthorizeCodeLifespan: time.Hour,
-	AccessTokenLifespan:   time.Hour,
-}
-
-var authCodeHandler = &explicit.AuthorizeExplicitGrantTypeHandler{
-	AccessTokenStrategy:       hmacStrategy,
-	RefreshTokenStrategy:      hmacStrategy,
-	AuthorizeCodeStrategy:     hmacStrategy,
-	AuthorizeCodeGrantStorage: store,
-	AuthCodeLifespan:          time.Hour,
-	AccessTokenLifespan:       time.Hour,
-}
-
+var fc = &compose.Config{}
 var handler = &Handler{
-	OAuth2: &fosite.Fosite{
-		Store:          store,
-		MandatoryScope: "hydra",
-		AuthorizeEndpointHandlers: fosite.AuthorizeEndpointHandlers{
-			authCodeHandler,
+	OAuth2: compose.Compose(
+		fc,
+		store,
+		&compose.CommonStrategy{
+			CoreStrategy:               compose.NewOAuth2HMACStrategy(fc, []byte("some super secret secret")),
+			OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(pkg.MustRSAKey()),
 		},
-		TokenEndpointHandlers: fosite.TokenEndpointHandlers{
-			authCodeHandler,
-			&client.ClientCredentialsGrantHandler{
-				HandleHelper: &core.HandleHelper{
-					AccessTokenStrategy: hmacStrategy,
-					AccessTokenStorage:  store,
-					AccessTokenLifespan: time.Hour,
-				},
-			},
-		},
-		AuthorizedRequestValidators: fosite.AuthorizedRequestValidators{},
-		Hasher: hasher,
-	},
+		compose.OAuth2AuthorizeExplicitFactory,
+		compose.OAuth2AuthorizeImplicitFactory,
+		compose.OAuth2ClientCredentialsGrantFactory,
+		compose.OAuth2RefreshTokenGrantFactory,
+		compose.OpenIDConnectExplicit,
+		compose.OpenIDConnectHybrid,
+		compose.OpenIDConnectImplicit,
+	),
 	Consent: &DefaultConsentStrategy{
-		Issuer:                   "https://hydra.localhost",
+		Issuer:                   "http://hydra.localhost",
 		KeyManager:               keyManager,
 		DefaultChallengeLifespan: time.Hour,
 		DefaultIDTokenLifespan:   time.Hour * 24,
 	},
+	ForcedHTTP: true,
 }
 
 var router = httprouter.New()
-
 var ts *httptest.Server
-
 var oauthConfig *oauth2.Config
-
 var oauthClientConfig *clientcredentials.Config
 
 func init() {
@@ -114,6 +87,7 @@ func init() {
 		RedirectURIs:  []string{ts.URL + "/callback"},
 		ResponseTypes: []string{"id_token", "code", "token"},
 		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
+		Scopes:        "hydra",
 	}
 
 	c, _ := url.Parse(ts.URL + "/consent")
@@ -126,6 +100,7 @@ func init() {
 		RedirectURIs:  []string{ts.URL + "/callback"},
 		ResponseTypes: []string{"id_token", "code", "token"},
 		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
+		Scopes:        "hydra",
 	}
 
 	oauthConfig = &oauth2.Config{

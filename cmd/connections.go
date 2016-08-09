@@ -13,9 +13,6 @@ Google, Twitter, or any other SSO provider.`,
 }
 
 func init() {
-	var dry bool
-	c.Dry = &dry
-
 	RootCmd.AddCommand(connectionsCmd)
-	connectionsCmd.PersistentFlags().BoolVar(c.Dry, "dry", false, "do not execute the command but show the corresponding curl command instead")
+	connectionsCmd.PersistentFlags().Bool("dry", false, "do not execute the command but show the corresponding curl command instead")
 }

@@ -2,17 +2,24 @@ package pkg
 
 import (
 	"testing"
-
 	"time"
 
 	"github.com/go-errors/errors"
-	"github.com/ory-am/fosite/fosite-example/store"
-	"github.com/ory-am/fosite/handler/core/strategy"
+	"github.com/ory-am/fosite/fosite-example/pkg"
+	"github.com/ory-am/fosite/handler/oauth2"
 	"github.com/ory-am/fosite/token/hmac"
 	"github.com/ory-am/ladon"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+var HMACStrategy = &oauth2.HMACSHAStrategy{
+	Enigma: &hmac.HMACStrategy{
+		GlobalSecret: []byte("1234567890123456789012345678901234567890"),
+	},
+	AccessTokenLifespan:   time.Hour,
+	AuthorizeCodeLifespan: time.Hour,
+}
 
 func RequireError(t *testing.T, expectError bool, err error, args ...interface{}) {
 	if err != nil && !expectError {
@@ -46,8 +53,8 @@ func LadonWarden(ps map[string]ladon.Policy) ladon.Warden {
 	}
 }
 
-func FositeStore() *store.Store {
-	return store.NewStore()
+func FositeStore() *pkg.Store {
+	return pkg.NewStore()
 }
 
 func Tokens(length int) (res [][]string) {
@@ -56,12 +63,4 @@ func Tokens(length int) (res [][]string) {
 		res = append(res, []string{sig, tok})
 	}
 	return res
-}
-
-var HMACStrategy = &strategy.HMACSHAStrategy{
-	Enigma: &hmac.HMACStrategy{
-		GlobalSecret: []byte("1234567890123456789012345678901234567890"),
-	},
-	AccessTokenLifespan:   time.Hour,
-	AuthorizeCodeLifespan: time.Hour,
 }

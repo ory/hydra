@@ -1,21 +1,20 @@
 package config
 
 import (
+	"crypto/sha256"
 	"crypto/tls"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
-	"strconv"
-	"sync"
+	"strings"
 	"time"
-
-	"crypto/sha256"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
-	"github.com/ory-am/fosite/handler/core/strategy"
+	foauth2 "github.com/ory-am/fosite/handler/oauth2"
 	"github.com/ory-am/fosite/hash"
 	"github.com/ory-am/fosite/token/hmac"
 	"github.com/ory-am/hydra/pkg"
@@ -30,85 +29,107 @@ import (
 )
 
 type Config struct {
-	BindPort int `mapstructure:"port" yaml:"port,omitempty"`
+	// These are used by client commands
+	ClusterURL   string `mapstructure:"CLUSTER_URL" yaml:"cluster_url"`
+	ClientID     string `mapstructure:"CLIENT_ID" yaml:"client_id,omitempty"`
+	ClientSecret string `mapstructure:"CLIENT_SECRET" yaml:"client_secret,omitempty"`
 
-	BindHost string `mapstructure:"host" yaml:"host,omitempty"`
+	// These are used by the host command
+	BindPort               int    `mapstructure:"PORT" yaml:"-"`
+	BindHost               string `mapstructure:"HOST" yaml:"-"`
+	Issuer                 string `mapstructure:"ISSUER" yaml:"-"`
+	SystemSecret           string `mapstructure:"SYSTEM_SECRET" yaml:"-"`
+	DatabaseURL            string `mapstructure:"DATABASE_URL" yaml:"-"`
+	ConsentURL             string `mapstructure:"CONSENT_URL" yaml:"-"`
+	AllowTLSTermination    string `mapstructure:"HTTPS_ALLOW_TERMINATION_FROM" yaml:"-"`
+	BCryptWorkFactor       int    `mapstructure:"BCRYPT_COST" yaml:"-"`
+	AccessTokenLifespan    string `mapstructure:"ACCESS_TOKEN_LIFESPAN" yaml:"-"`
+	AuthCodeLifespan       string `mapstructure:"AUTH_CODE_LIFESPAN" yaml:"-"`
+	IDTokenLifespan        string `mapstructure:"ID_TOKEN_LIFESPAN" yaml:"-"`
+	ChallengeTokenLifespan string `mapstructure:"CHALLENGE_TOKEN_LIFESPAN" yaml:"-"`
+	ForceHTTP              bool   `yaml:"-"`
 
-	Issuer string `mapstructure:"issuer" yaml:"issuer,omitempty"`
+	cluster      *url.URL     `yaml:"-"`
+	oauth2Client *http.Client `yaml:"-"`
+	context      *Context     `yaml:"-"`
+}
 
-	SystemSecret []byte `mapstructure:"system_secret" yaml:"-"`
+func matchesRange(r *http.Request, ranges []string) error {
+	ip, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		return errors.New(err)
+	}
 
-	DatabaseURL string `mapstructure:"database_url" yaml:"database_url,omitempty"`
+	for _, rn := range ranges {
+		_, cidr, err := net.ParseCIDR(rn)
+		if err != nil {
+			return errors.New(err)
+		}
+		addr := net.ParseIP(ip)
+		if cidr.Contains(addr) {
+			return nil
+		}
+	}
+	return errors.New("Remote address does not match any cidr ranges")
+}
 
-	ConsentURL string `mapstructure:"consent_url" yaml:"consent_url,omitempty"`
+func (c *Config) DoesRequestSatisfyTermination(r *http.Request) error {
+	if c.AllowTLSTermination == "" {
+		return errors.New("TLS termination is not enabled")
+	}
 
-	ClusterURL string `mapstructure:"cluster_url" yaml:"cluster_url,omitempty"`
+	ranges := strings.Split(c.AllowTLSTermination, ",")
+	if err := matchesRange(r, ranges); err != nil {
+		return err
+	}
 
-	ClientID string `mapstructure:"client_id" yaml:"client_id,omitempty"`
+	proto := r.Header.Get("X-Forwarded-Proto")
+	if proto == "" {
+		return errors.New("X-Forwarded-Proto header is missing")
+	} else if proto != "https" {
+		return errors.Errorf("Expected X-Forwarded-Proto header to be https, got %s", proto)
+	}
 
-	ClientSecret string `mapstructure:"client_secret" yaml:"client_secret,omitempty"`
+	return nil
+}
 
-	ForceHTTP bool `mapstructure:"foolishly_force_http" yaml:"-"`
-
-	Dry *bool `mapstructure:"-" yaml:"-"`
-
-	AccessTokenLifespan time.Duration
-	AuthCodeLifespan    time.Duration
-
-	cluster *url.URL
-
-	oauth2Client *http.Client
-
-	context *Context
-
-	sync.Mutex
+func (c *Config) GetChallengeTokenLifespan() time.Duration {
+	d, err := time.ParseDuration(c.ChallengeTokenLifespan)
+	if err != nil {
+		logrus.Warnf("Could not parse challenge token lifespan value (%s). Defaulting to 10m", c.AccessTokenLifespan)
+		return time.Minute * 10
+	}
+	return d
 }
 
 func (c *Config) GetAccessTokenLifespan() time.Duration {
-	if c.AuthCodeLifespan == 0 {
+	d, err := time.ParseDuration(c.AccessTokenLifespan)
+	if err != nil {
+		logrus.Warnf("Could not parse access token lifespan value (%s). Defaulting to 1h", c.AccessTokenLifespan)
 		return time.Hour
 	}
-	return c.AccessTokenLifespan
+	return d
 }
 
 func (c *Config) GetAuthCodeLifespan() time.Duration {
-	if c.AuthCodeLifespan == 0 {
+	d, err := time.ParseDuration(c.AuthCodeLifespan)
+	if err != nil {
+		logrus.Warnf("Could not parse auth code lifespan value (%s). Defaulting to 10m", c.AuthCodeLifespan)
 		return time.Minute * 10
 	}
-	return c.AuthCodeLifespan
+	return d
 }
 
-func (c *Config) GetClusterURL() string {
-	c.Lock()
-	defer c.Unlock()
-
-	if c.ClusterURL == "" {
-		bindHost := c.BindHost
-		if bindHost == "" {
-			bindHost = "localhost"
-		}
-
-		schema := "https"
-		if c.ForceHTTP {
-			schema = "http"
-		}
-
-		port := strconv.Itoa(c.BindPort)
-		if c.BindPort == 0 {
-			port = "4444"
-		}
-
-		c.ClusterURL = schema + "://" + bindHost + ":" + port
+func (c *Config) GetIDTokenLifespan() time.Duration {
+	d, err := time.ParseDuration(c.IDTokenLifespan)
+	if err != nil {
+		logrus.Warnf("Could not parse id token lifespan value (%s). Defaulting to 1h", c.IDTokenLifespan)
+		return time.Hour
 	}
-
-	return c.ClusterURL
+	return d
 }
 
 func (c *Config) Context() *Context {
-	secret := c.GetSystemSecret()
-	c.Lock()
-	defer c.Unlock()
-
 	if c.context != nil {
 		return c.context
 	}
@@ -155,12 +176,12 @@ func (c *Config) Context() *Context {
 	c.context = &Context{
 		Connection: connection,
 		Hasher: &hash.BCrypt{
-			WorkFactor: 11,
+			WorkFactor: c.BCryptWorkFactor,
 		},
 		LadonManager: manager,
-		FositeStrategy: &strategy.HMACSHAStrategy{
+		FositeStrategy: &foauth2.HMACSHAStrategy{
 			Enigma: &hmac.HMACStrategy{
-				GlobalSecret: secret,
+				GlobalSecret: c.GetSystemSecret(),
 			},
 			AccessTokenLifespan:   c.GetAccessTokenLifespan(),
 			AuthorizeCodeLifespan: c.GetAuthCodeLifespan(),
@@ -171,9 +192,6 @@ func (c *Config) Context() *Context {
 }
 
 func (c *Config) Resolve(join ...string) *url.URL {
-	c.Lock()
-	defer c.Unlock()
-
 	if c.cluster == nil {
 		cluster, err := url.Parse(c.ClusterURL)
 		c.cluster = cluster
@@ -188,9 +206,6 @@ func (c *Config) Resolve(join ...string) *url.URL {
 }
 
 func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
-	c.Lock()
-	defer c.Unlock()
-
 	if c.oauth2Client != nil {
 		return c.oauth2Client
 	}
@@ -199,10 +214,7 @@ func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
 		ClientID:     c.ClientID,
 		ClientSecret: c.ClientSecret,
 		TokenURL:     pkg.JoinURLStrings(c.ClusterURL, "/oauth2/token"),
-		Scopes: []string{
-			"core",
-			"hydra",
-		},
+		Scopes:       []string{"hydra"},
 	}
 
 	ctx := context.Background()
@@ -216,9 +228,8 @@ func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
 	_, err := oauthConfig.Token(ctx)
 	if err != nil {
 		fmt.Printf("Could not authenticate, because: %s\n", err)
-		fmt.Println("Did you forget to log on? Run `hydra connect`.")
-		fmt.Println("Did you run Hydra without a valid TLS certificate? Make sure to use the `--skip-tls-verify` flag.")
-		fmt.Println("Did you know you can skip `hydra connect` when running `hydra host --dangerous-auto-logon`? DO NOT use this flag in production!")
+		fmt.Println("This can have multiple reasons, like a wrong cluster or wrong credentials. To resolve this, run `hydra connect`.")
+		fmt.Println("You can disable TLS verification using the `--skip-tls-verify` flag.")
 		os.Exit(1)
 	}
 
@@ -227,59 +238,41 @@ func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
 }
 
 func (c *Config) GetSystemSecret() []byte {
-	c.Lock()
-	defer c.Unlock()
-
-	if len(c.SystemSecret) >= 16 {
-		hash := sha256.Sum256(c.SystemSecret)
-		c.SystemSecret = hash[:]
-		return c.SystemSecret
+	var secret = []byte(c.SystemSecret)
+	if len(secret) >= 16 {
+		hash := sha256.Sum256(secret)
+		secret = hash[:]
+		c.SystemSecret = string(secret)
+		return secret
 	}
 
-	logrus.Warnf("Expected system secret to be at least %d characters long but only got %d characters.", 32, len(c.SystemSecret))
-	logrus.Warnln("Generating a random system secret...")
+	logrus.Warnf("Expected system secret to be at least %d characters long, got %d characters.", 32, len(c.SystemSecret))
+	logrus.Infoln("Generating a random system secret...")
 	var err error
-	c.SystemSecret, err = pkg.GenerateSecret(32)
+	secret, err = pkg.GenerateSecret(32)
 	pkg.Must(err, "Could not generate global secret: %s", err)
-	logrus.Warnf("Generated system secret: %s", c.SystemSecret)
-	logrus.Warnln("Do not auto-generate system secrets in production.")
-	hash := sha256.Sum256(c.SystemSecret)
-	c.SystemSecret = hash[:]
-	return c.SystemSecret
+	logrus.Infof("Generated system secret: %s", secret)
+	hash := sha256.Sum256(secret)
+	secret = hash[:]
+	c.SystemSecret = string(secret)
+	logrus.Warnln("WARNING: DO NOT generate system secrets in production. The secret will be leaked to the logs.")
+	return secret
 }
 
 func (c *Config) GetAddress() string {
-	c.Lock()
-	defer c.Unlock()
-
-	if c.BindPort == 0 {
-		c.BindPort = 4444
-	}
 	return fmt.Sprintf("%s:%d", c.BindHost, c.BindPort)
 }
 
-func (c *Config) GetIssuer() string {
-	c.Lock()
-	defer c.Unlock()
-
-	if c.Issuer == "" {
-		c.Issuer = "hydra"
-	}
-	return c.Issuer
-}
-
 func (c *Config) Persist() error {
-	_ = c.GetIssuer()
-	_ = c.GetAddress()
-	_ = c.GetClusterURL()
-
 	out, err := yaml.Marshal(c)
 	if err != nil {
 		return errors.New(err)
 	}
 
+	logrus.Infof("Persisting config in file %s", viper.ConfigFileUsed())
 	if err := ioutil.WriteFile(viper.ConfigFileUsed(), out, 0700); err != nil {
 		return errors.Errorf(`Could not write to "%s" because: %s`, viper.ConfigFileUsed(), err)
 	}
+
 	return nil
 }

@@ -25,7 +25,7 @@ func newPolicyHandler(c *config.Config) *PolicyHandler {
 }
 
 func (h *PolicyHandler) CreatePolicy(cmd *cobra.Command, args []string) {
-	h.M.Dry = *h.Config.Dry
+	h.M.Dry, _ = cmd.Flags().GetBool("dry")
 	h.M.Endpoint = h.Config.Resolve("/policies")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 
@@ -80,7 +80,7 @@ func (h *PolicyHandler) CreatePolicy(cmd *cobra.Command, args []string) {
 }
 
 func (h *PolicyHandler) AddResourceToPolicy(cmd *cobra.Command, args []string) {
-	h.M.Dry = *h.Config.Dry
+	h.M.Dry, _ = cmd.Flags().GetBool("dry")
 	h.M.Endpoint = h.Config.Resolve("/policies")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 
@@ -112,12 +112,11 @@ func (h *PolicyHandler) AddResourceToPolicy(cmd *cobra.Command, args []string) {
 }
 
 func (h *PolicyHandler) RemoveResourceFromPolicy(cmd *cobra.Command, args []string) {
-	h.M.Dry = *h.Config.Dry
 	fmt.Println("Not yet implemented.")
 }
 
 func (h *PolicyHandler) AddSubjectToPolicy(cmd *cobra.Command, args []string) {
-	h.M.Dry = *h.Config.Dry
+	h.M.Dry, _ = cmd.Flags().GetBool("dry")
 	h.M.Endpoint = h.Config.Resolve("/policies")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 
@@ -149,12 +148,11 @@ func (h *PolicyHandler) AddSubjectToPolicy(cmd *cobra.Command, args []string) {
 }
 
 func (h *PolicyHandler) RemoveSubjectFromPolicy(cmd *cobra.Command, args []string) {
-	h.M.Dry = *h.Config.Dry
 	fmt.Println("Not yet implemented.")
 }
 
 func (h *PolicyHandler) AddActionToPolicy(cmd *cobra.Command, args []string) {
-	h.M.Dry = *h.Config.Dry
+	h.M.Dry, _ = cmd.Flags().GetBool("dry")
 	h.M.Endpoint = h.Config.Resolve("/policies")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 
@@ -186,12 +184,11 @@ func (h *PolicyHandler) AddActionToPolicy(cmd *cobra.Command, args []string) {
 }
 
 func (h *PolicyHandler) RemoveActionFromPolicy(cmd *cobra.Command, args []string) {
-	h.M.Dry = *h.Config.Dry
 	fmt.Println("Not yet implemented.")
 }
 
 func (h *PolicyHandler) GetPolicy(cmd *cobra.Command, args []string) {
-	h.M.Dry = *h.Config.Dry
+	h.M.Dry, _ = cmd.Flags().GetBool("dry")
 	h.M.Endpoint = h.Config.Resolve("/policies")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 
@@ -214,7 +211,7 @@ func (h *PolicyHandler) GetPolicy(cmd *cobra.Command, args []string) {
 }
 
 func (h *PolicyHandler) DeletePolicy(cmd *cobra.Command, args []string) {
-	h.M.Dry = *h.Config.Dry
+	h.M.Dry, _ = cmd.Flags().GetBool("dry")
 	h.M.Endpoint = h.Config.Resolve("/policies")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 

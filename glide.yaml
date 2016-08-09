@@ -1,46 +1,66 @@
 package: github.com/ory-am/hydra
 import:
 - package: github.com/Sirupsen/logrus
+  version: ~0.10.0
 - package: github.com/asaskevich/govalidator
-- package: github.com/dgrijalva/jwt-go
+  version: ~4.0.0
+- package: gopkg.in/dancannon/gorethink.v2
+  version: ~2.1.3
 - package: github.com/go-errors/errors
 - package: github.com/julienschmidt/httprouter
+  version: ~1.1.0
+- package: github.com/meatballhat/negroni-logrus
+- package: github.com/moul/http2curl
 - package: github.com/ory-am/common
   subpackages:
   - pkg
   - rand/sequence
 - package: github.com/ory-am/fosite
+  version: ~0.2.3
   subpackages:
-  - fosite-example/store
-  - handler/core
-  - handler/core/client
-  - handler/core/explicit
-  - handler/core/implicit
-  - handler/core/refresh
-  - handler/core/strategy
-  - handler/oidc
-  - handler/oidc/explicit
-  - handler/oidc/hybrid
-  - handler/oidc/implicit
-  - handler/oidc/strategy
+  - compose
+  - fosite-example/pkg
+  - handler/oauth2
+  - handler/openid
   - hash
   - token/hmac
   - token/jwt
 - package: github.com/ory-am/ladon
+  version: ~0.2.0
 - package: github.com/pborman/uuid
+  version: ~1.0.0
+- package: github.com/pkg/errors
+  version: ~0.7.0
+- package: github.com/pkg/profile
+  version: ~1.2.0
 - package: github.com/spf13/cobra
 - package: github.com/spf13/viper
 - package: github.com/square/go-jose
+  version: ~1.0.3
   subpackages:
   - json
 - package: github.com/stretchr/testify
+  version: ~1.1.3
   subpackages:
   - assert
   - require
+- package: github.com/toqueteos/webbrowser
+  version: ~1.0.0
+- package: github.com/urfave/negroni
+  version: ~0.2.0
 - package: golang.org/x/net
   subpackages:
   - context
 - package: golang.org/x/oauth2
   subpackages:
   - clientcredentials
+- package: github.com/dgrijalva/jwt-go
+  version: ~2.7.0
+- package: gopkg.in/tylerb/graceful.v1
+  version: ~1.2.11
 - package: gopkg.in/yaml.v2
+testImport:
+- package: github.com/gorilla/mux
+  version: ~1.1.0
+- package: github.com/ory-am/dockertest
+  version: ~2.2.2

@@ -23,7 +23,7 @@ type RethinkManager struct {
 	Hasher  hash.Hasher
 }
 
-func (m *RethinkManager) GetClient(id string) (fosite.Client, error) {
+func (m *RethinkManager) GetConcreteClient(id string) (*Client, error) {
 	m.RLock()
 	defer m.RUnlock()
 
@@ -32,6 +32,10 @@ func (m *RethinkManager) GetClient(id string) (fosite.Client, error) {
 		return nil, errors.New(pkg.ErrNotFound)
 	}
 	return &c, nil
+}
+
+func (m *RethinkManager) GetClient(id string) (fosite.Client, error) {
+	return m.GetConcreteClient(id)
 }
 
 func (m *RethinkManager) Authenticate(id string, secret []byte) (*Client, error) {

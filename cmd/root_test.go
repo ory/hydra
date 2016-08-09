@@ -1,12 +1,11 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
-
-	"fmt"
 
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
@@ -23,7 +22,6 @@ func TestExecute(t *testing.T) {
 
 	for _, c := range []struct {
 		args      []string
-		timeout   time.Duration
 		wait      func() bool
 		expectErr bool
 	}{
@@ -31,12 +29,11 @@ func TestExecute(t *testing.T) {
 			args: []string{"host", "--dangerous-auto-logon"},
 			wait: func() bool {
 				_, err := os.Stat(path)
+				if err != nil {
+					t.Logf("Could not stat path %s because %s", path, err)
+				}
 				return err != nil
 			},
-		},
-		{
-			args:    []string{"token", "user", "--no-open"},
-			timeout: time.Second,
 		},
 		{args: []string{"clients", "create", "--id", "foobarbaz"}},
 		{args: []string{"clients", "create", "--id", "foobarbaz", "--dry"}},
@@ -49,6 +46,7 @@ func TestExecute(t *testing.T) {
 		{args: []string{"connections", "create", "google", "localuser", "googleuser"}},
 		{args: []string{"connections", "create", "google", "localuser", "googleuser", "--dry"}},
 		{args: []string{"token", "client"}},
+		{args: []string{"policies", "create", "../dist/policies/noone-can-read-private-keys.json"}},
 		{args: []string{"policies", "create", "-i", "foobar", "-s", "peter", "max", "-r", "blog", "users", "-a", "post", "ban", "--allow"}},
 		{args: []string{"policies", "create", "-i", "foobar", "-s", "peter", "max", "-r", "blog", "users", "-a", "post", "ban", "--allow", "--dry"}},
 		{args: []string{"policies", "get", "foobar"}},
@@ -58,20 +56,23 @@ func TestExecute(t *testing.T) {
 		RootCmd.SetArgs(c.args)
 
 		t.Logf("Running command: %s", c.args)
-		if c.wait != nil || c.timeout > 0 {
+		if c.wait != nil {
 			go func() {
 				assert.Nil(t, RootCmd.Execute())
 			}()
 		}
 
 		if c.wait != nil {
+			var count = 0
 			for c.wait() {
-				time.Sleep(time.Millisecond * 500)
+				t.Logf("Config file has not been found yet, retrying attempt #%d...", count)
+				count++
+				if count > 30 {
+					t.FailNow()
+				}
+				time.Sleep(time.Second * 4)
 			}
-		} else if c.timeout > 0 {
-			time.Sleep(c.timeout)
 		} else {
-
 			assert.Equal(t, c.expectErr, RootCmd.Execute() != nil)
 		}
 	}

@@ -40,7 +40,7 @@ func (c *RethinkDBConnection) GetSession() *r.Session {
 	}
 
 	if err := pkg.Retry(time.Second*15, time.Minute*2, func() error {
-		logrus.Infof("Connecting with RethinkDB: %s (%s) (%s)", c.URL.String(), c.URL.Host, database)
+		logrus.Infof("Connecting with RethinkDB: %s@%s/%s", username, c.URL.Host, database)
 
 		options := r.ConnectOpts{
 			Address:         c.URL.Host,

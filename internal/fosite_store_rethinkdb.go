@@ -91,7 +91,7 @@ func (s *FositeRehinkDBStore) publishInsert(table r.Term, id string, requester f
 		ID:            id,
 		RequestedAt:   requester.GetRequestedAt(),
 		Client:        requester.GetClient().(*client.Client),
-		Scopes:        requester.GetScopes(),
+		Scopes:        requester.GetRequestedScopes(),
 		GrantedScopes: requester.GetGrantedScopes(),
 		Form:          requester.GetRequestForm(),
 		Session:       sess,
@@ -107,8 +107,38 @@ func (s *FositeRehinkDBStore) publishDelete(table r.Term, id string) error {
 	}
 	return nil
 }
+
+func waitFor(i RDBItems, id string) error {
+	c := make(chan bool)
+
+	go func() {
+		loopWait := time.Millisecond
+		_, ok := i[id]
+		for !ok {
+			time.Sleep(loopWait)
+			loopWait = loopWait * time.Duration(int64(2))
+			if loopWait > time.Second {
+				loopWait = time.Second
+			}
+			_, ok = i[id]
+		}
+
+		c <- true
+	}()
+
+	select {
+	case <-c:
+		return nil
+	case <-time.After(time.Minute / 2):
+		return errors.New("Timed out waiting for write confirmation")
+	}
+}
+
 func (s *FositeRehinkDBStore) CreateOpenIDConnectSession(_ context.Context, authorizeCode string, requester fosite.Requester) error {
-	return s.publishInsert(s.IDSessionsTable, authorizeCode, requester)
+	if err := s.publishInsert(s.IDSessionsTable, authorizeCode, requester); err != nil {
+		return err
+	}
+	return waitFor(s.IDSessions, authorizeCode)
 }
 
 func (s *FositeRehinkDBStore) GetOpenIDConnectSession(_ context.Context, authorizeCode string, requester fosite.Requester) (fosite.Requester, error) {
@@ -126,7 +156,10 @@ func (s *FositeRehinkDBStore) DeleteOpenIDConnectSession(_ context.Context, auth
 }
 
 func (s *FositeRehinkDBStore) CreateAuthorizeCodeSession(_ context.Context, code string, requester fosite.Requester) error {
-	return s.publishInsert(s.AuthorizeCodesTable, code, requester)
+	if err := s.publishInsert(s.AuthorizeCodesTable, code, requester); err != nil {
+		return err
+	}
+	return waitFor(s.AuthorizeCodes, code)
 }
 
 func (s *FositeRehinkDBStore) GetAuthorizeCodeSession(_ context.Context, code string, sess interface{}) (fosite.Requester, error) {
@@ -145,7 +178,10 @@ func (s *FositeRehinkDBStore) DeleteAuthorizeCodeSession(_ context.Context, code
 }
 
 func (s *FositeRehinkDBStore) CreateAccessTokenSession(_ context.Context, signature string, requester fosite.Requester) error {
-	return s.publishInsert(s.AccessTokensTable, signature, requester)
+	if err := s.publishInsert(s.AccessTokensTable, signature, requester); err != nil {
+		return err
+	}
+	return waitFor(s.AccessTokens, signature)
 }
 
 func (s *FositeRehinkDBStore) GetAccessTokenSession(_ context.Context, signature string, sess interface{}) (fosite.Requester, error) {
@@ -164,7 +200,10 @@ func (s *FositeRehinkDBStore) DeleteAccessTokenSession(_ context.Context, signat
 }
 
 func (s *FositeRehinkDBStore) CreateRefreshTokenSession(_ context.Context, signature string, requester fosite.Requester) error {
-	return s.publishInsert(s.RefreshTokensTable, signature, requester)
+	if err := s.publishInsert(s.RefreshTokensTable, signature, requester); err != nil {
+		return err
+	}
+	return waitFor(s.RefreshTokens, signature)
 }
 
 func (s *FositeRehinkDBStore) GetRefreshTokenSession(_ context.Context, signature string, sess interface{}) (fosite.Requester, error) {
@@ -183,7 +222,10 @@ func (s *FositeRehinkDBStore) DeleteRefreshTokenSession(_ context.Context, signa
 }
 
 func (s *FositeRehinkDBStore) CreateImplicitAccessTokenSession(_ context.Context, code string, req fosite.Requester) error {
-	return s.publishInsert(s.ImplicitTable, code, req)
+	if err := s.publishInsert(s.ImplicitTable, code, req); err != nil {
+		return err
+	}
+	return waitFor(s.Implicit, code)
 }
 
 func (s *FositeRehinkDBStore) PersistAuthorizeCodeGrantSession(ctx context.Context, authorizeCode, accessSignature, refreshSignature string, request fosite.Requester) error {

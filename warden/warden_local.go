@@ -5,48 +5,110 @@ import (
 
 	"time"
 
+	"strings"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
-	"github.com/ory-am/fosite/handler/core"
-	. "github.com/ory-am/hydra/firewall"
-	"github.com/ory-am/hydra/herodot"
+	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/oauth2"
-	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
 	"golang.org/x/net/context"
 )
 
 type LocalWarden struct {
-	Warden         ladon.Warden
-	TokenValidator *core.CoreValidator
+	Warden ladon.Warden
+	OAuth2 fosite.OAuth2Provider
 
 	AccessTokenLifespan time.Duration
 	Issuer              string
 }
 
-func (w *LocalWarden) actionAllowed(ctx context.Context, a *ladon.Request, scopes []string, oauthRequest fosite.AccessRequester, session *oauth2.Session) (*Context, error) {
+func (w *LocalWarden) TokenFromRequest(r *http.Request) string {
+	return fosite.AccessTokenFromRequest(r)
+}
+
+func (w *LocalWarden) IntrospectToken(ctx context.Context, token string) (*firewall.Introspection, error) {
+	var session = new(oauth2.Session)
+	var auth, err = w.OAuth2.ValidateToken(ctx, token, fosite.AccessToken, session)
+	if err != nil {
+		logrus.WithError(err).Infof("Token introspection failed")
+		return &firewall.Introspection{
+			Active: false,
+		}, err
+	}
+
+	session = auth.GetSession().(*oauth2.Session)
+	return &firewall.Introspection{
+		Active:    true,
+		Subject:   session.Subject,
+		Audience:  auth.GetClient().GetID(),
+		Scope:     strings.Join(auth.GetGrantedScopes(), " "),
+		Issuer:    w.Issuer,
+		IssuedAt:  auth.GetRequestedAt().Unix(),
+		NotBefore: auth.GetRequestedAt().Unix(),
+		ExpiresAt: session.AccessTokenExpiresAt(auth.GetRequestedAt().Add(w.AccessTokenLifespan)).Unix(),
+	}, nil
+}
+
+func (w *LocalWarden) IsAllowed(ctx context.Context, a *ladon.Request) error {
+	if err := w.Warden.IsAllowed(a); err != nil {
+		logrus.WithFields(logrus.Fields{
+			"subject": a.Subject,
+			"request": a,
+			"reason":  "request denied by policies",
+		}).WithError(err).Infof("Access denied")
+		return err
+	}
+
+	return nil
+}
+
+func (w *LocalWarden) TokenAllowed(ctx context.Context, token string, a *ladon.Request, scopes ...string) (*firewall.Context, error) {
+	var session = new(oauth2.Session)
+	var auth, err = w.OAuth2.ValidateToken(ctx, token, fosite.AccessToken, session, scopes...)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"subject": a.Subject,
+			"request": a,
+			"reason":  "token could not be validated",
+		}).WithError(err).Infof("Access denied")
+		return nil, err
+	}
+
+	return w.allowed(ctx, a, scopes, auth, session)
+}
+
+func (w *LocalWarden) InspectToken(ctx context.Context, token string, scopes ...string) (*firewall.Context, error) {
+	var session = new(oauth2.Session)
+	var oauthRequest = fosite.NewAccessRequest(session)
+
+	var auth, err = w.OAuth2.ValidateToken(ctx, token, fosite.AccessToken, session, scopes...)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"scopes":   scopes,
+			"subject":  session.Subject,
+			"audience": oauthRequest.GetClient().GetID(),
+			"reason":   "token validation failed",
+		}).WithError(err).Infof("Access denied")
+		return nil, err
+	}
+
+	return w.newContext(auth), nil
+}
+
+func (w *LocalWarden) allowed(ctx context.Context, a *ladon.Request, scopes []string, oauthRequest fosite.AccessRequester, session *oauth2.Session) (*firewall.Context, error) {
 	session = oauthRequest.GetSession().(*oauth2.Session)
 	if a.Subject != "" && a.Subject != session.Subject {
+		err := errors.Errorf("Expected subject to be %s but got %s", session.Subject, a.Subject)
 		logrus.WithFields(logrus.Fields{
 			"scopes":   scopes,
 			"subject":  a.Subject,
 			"audience": oauthRequest.GetClient().GetID(),
 			"request":  a,
 			"reason":   "subject mismatch",
-		}).Infof("Access denied")
-		return nil, errors.New("Subject mismatch " + a.Subject + " - " + session.Subject)
-	}
-
-	if !matchScopes(oauthRequest.GetGrantedScopes(), scopes, session, oauthRequest.GetClient()) {
-		logrus.WithFields(logrus.Fields{
-			"scopes":   scopes,
-			"subject":  a.Subject,
-			"audience": oauthRequest.GetClient().GetID(),
-			"request":  a,
-			"reason":   "scope mismatch",
-		}).Infof("Access denied")
-		return nil, errors.New(herodot.ErrForbidden)
+		}).WithError(err).Infof("Access denied")
+		return nil, err
 	}
 
 	a.Subject = session.Subject
@@ -57,156 +119,29 @@ func (w *LocalWarden) actionAllowed(ctx context.Context, a *ladon.Request, scope
 			"audience": oauthRequest.GetClient().GetID(),
 			"request":  a,
 			"reason":   "policy effect is deny",
-		}).Infof("Access denied")
+		}).WithError(err).Infof("Access denied")
 		return nil, err
+	}
+
+	return w.newContext(oauthRequest), nil
+}
+
+func (w *LocalWarden) newContext(oauthRequest fosite.AccessRequester) *firewall.Context {
+	session := oauthRequest.GetSession().(*oauth2.Session)
+	c := &firewall.Context{
+		Subject:       session.Subject,
+		GrantedScopes: oauthRequest.GetGrantedScopes(),
+		Issuer:        w.Issuer,
+		Audience:      oauthRequest.GetClient().GetID(),
+		IssuedAt:      oauthRequest.GetRequestedAt(),
+		ExpiresAt:     session.AccessTokenExpiresAt(oauthRequest.GetRequestedAt().Add(w.AccessTokenLifespan)),
+		Extra:         session.Extra,
 	}
 
 	logrus.WithFields(logrus.Fields{
-		"scopes":   scopes,
-		"subject":  a.Subject,
+		"subject":  c.Subject,
 		"audience": oauthRequest.GetClient().GetID(),
-		"request":  a,
 	}).Infof("Access granted")
 
-	return &Context{
-		Subject:       session.Subject,
-		GrantedScopes: oauthRequest.GetGrantedScopes(),
-		Issuer:        w.Issuer,
-		Audience:      oauthRequest.GetClient().GetID(),
-		IssuedAt:      oauthRequest.GetRequestedAt(),
-		ExpiresAt:     session.AccessTokenExpiresAt(oauthRequest.GetRequestedAt().Add(w.AccessTokenLifespan)),
-	}, nil
-}
-
-func (w *LocalWarden) ActionAllowed(ctx context.Context, token string, a *ladon.Request, scopes ...string) (*Context, error) {
-	var session = new(oauth2.Session)
-	var oauthRequest = fosite.NewAccessRequest(session)
-	if err := w.TokenValidator.ValidateToken(ctx, oauthRequest, token); err != nil {
-		return nil, err
-	}
-
-	return w.actionAllowed(ctx, a, scopes, oauthRequest, session)
-}
-
-func (w *LocalWarden) HTTPActionAllowed(ctx context.Context, r *http.Request, a *ladon.Request, scopes ...string) (*Context, error) {
-	var session = new(oauth2.Session)
-	var oauthRequest = fosite.NewAccessRequest(session)
-
-	if err := w.TokenValidator.ValidateRequest(ctx, r, oauthRequest); errors.Is(err, fosite.ErrUnknownRequest) {
-		logrus.WithFields(logrus.Fields{
-			"scopes":   scopes,
-			"subject":  a.Subject,
-			"audience": oauthRequest.GetClient().GetID(),
-			"request":  a,
-			"reason":   "unknown request",
-		}).Infof("Access denied")
-		return nil, errors.New(pkg.ErrUnauthorized)
-	} else if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"scopes":   scopes,
-			"subject":  a.Subject,
-			"audience": oauthRequest.GetClient().GetID(),
-			"request":  a,
-			"reason":   "token validation failed",
-		}).Infof("Access denied")
-		return nil, err
-	}
-
-	return w.actionAllowed(ctx, a, scopes, oauthRequest, session)
-}
-
-func (w *LocalWarden) Authorized(ctx context.Context, token string, scopes ...string) (*Context, error) {
-	var session = new(oauth2.Session)
-	var oauthRequest = fosite.NewAccessRequest(session)
-
-	if err := w.TokenValidator.ValidateToken(ctx, oauthRequest, token); err != nil {
-		logrus.WithFields(logrus.Fields{
-			"scopes":   scopes,
-			"subject":  session.Subject,
-			"audience": oauthRequest.GetClient().GetID(),
-			"reason":   "token validation failed",
-		}).Infof("Access denied")
-		return nil, err
-	}
-
-	session = oauthRequest.GetSession().(*oauth2.Session)
-	if !matchScopes(oauthRequest.GetGrantedScopes(), scopes, session, oauthRequest.Client) {
-		logrus.WithFields(logrus.Fields{
-			"scopes":   scopes,
-			"subject":  session,
-			"audience": oauthRequest.GetClient().GetID(),
-			"reason":   "scope mismatch",
-		}).Infof("Access denied")
-		return nil, errors.New(herodot.ErrForbidden)
-	}
-
-	return &Context{
-		Subject:       session.Subject,
-		GrantedScopes: oauthRequest.GetGrantedScopes(),
-		Issuer:        w.Issuer,
-		Audience:      oauthRequest.GetClient().GetID(),
-		IssuedAt:      oauthRequest.GetRequestedAt(),
-		ExpiresAt:     session.AccessTokenExpiresAt(oauthRequest.GetRequestedAt().Add(w.AccessTokenLifespan)),
-	}, nil
-}
-
-func (w *LocalWarden) HTTPAuthorized(ctx context.Context, r *http.Request, scopes ...string) (*Context, error) {
-	var session = new(oauth2.Session)
-	var oauthRequest = fosite.NewAccessRequest(session)
-
-	if err := w.TokenValidator.ValidateRequest(ctx, r, oauthRequest); errors.Is(err, fosite.ErrUnknownRequest) {
-		logrus.WithFields(logrus.Fields{
-			"scopes":   scopes,
-			"subject":  session.Subject,
-			"audience": oauthRequest.GetClient().GetID(),
-			"reason":   "unknown request",
-		}).Infof("Access denied")
-		return nil, errors.New(pkg.ErrUnauthorized)
-	} else if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"scopes":   scopes,
-			"subject":  session.Subject,
-			"audience": oauthRequest.GetClient().GetID(),
-			"reason":   "token validation failed",
-		}).Infof("Access denied")
-		return nil, err
-	}
-
-	session = oauthRequest.GetSession().(*oauth2.Session)
-	if !matchScopes(oauthRequest.GetGrantedScopes(), scopes, session, oauthRequest.Client) {
-		logrus.WithFields(logrus.Fields{
-			"scopes":   scopes,
-			"subject":  session.Subject,
-			"audience": oauthRequest.GetClient().GetID(),
-			"reason":   "scope mismatch",
-		}).Infof("Access denied")
-		return nil, errors.New(herodot.ErrForbidden)
-	}
-
-	return &Context{
-		Subject:       session.Subject,
-		GrantedScopes: oauthRequest.GetGrantedScopes(),
-		Issuer:        w.Issuer,
-		Audience:      oauthRequest.GetClient().GetID(),
-		IssuedAt:      oauthRequest.GetRequestedAt(),
-		ExpiresAt:     session.AccessTokenExpiresAt(oauthRequest.GetRequestedAt().Add(w.AccessTokenLifespan)),
-	}, nil
-}
-
-func matchScopes(granted []string, requested []string, session *oauth2.Session, c fosite.Client) bool {
-	scopes := &fosite.DefaultScopes{Scopes: granted}
-	for _, r := range requested {
-		if !scopes.Grant(r) {
-			logrus.WithFields(logrus.Fields{
-				"reason":           "scope mismatch",
-				"granted_scopes":   granted,
-				"requested_scopes": requested,
-				"audience":         c.GetID(),
-				"subject":          session.Subject,
-			}).Infof("Authentication failed.")
-			return false
-		}
-	}
-
-	return true
+	return c
 }

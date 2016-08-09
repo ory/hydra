@@ -6,13 +6,13 @@ import (
 
 	"crypto/rsa"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
-	"github.com/ory-am/fosite/handler/oidc/strategy"
+	"github.com/ory-am/fosite/handler/openid"
 	ejwt "github.com/ory-am/fosite/token/jwt"
 	"github.com/ory-am/hydra/jwk"
 	"github.com/pborman/uuid"
-	"gopkg.in/dgrijalva/jwt-go.v2"
 )
 
 const (
@@ -66,19 +66,29 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 		a.GrantScope(scope)
 	}
 
+	var idExt map[string]interface{}
+	var atExt map[string]interface{}
+	if ext, ok := t.Claims["id_ext"].(map[string]interface{}); ok {
+		idExt = ext
+	}
+	if ext, ok := t.Claims["id_ext"].(map[string]interface{}); ok {
+		atExt = ext
+	}
+
 	return &Session{
 		Subject: subject,
-		DefaultSession: &strategy.DefaultSession{
+		DefaultSession: &openid.DefaultSession{
 			Claims: &ejwt.IDTokenClaims{
 				Audience:  a.GetClient().GetID(),
 				Subject:   subject,
 				Issuer:    s.Issuer,
 				IssuedAt:  time.Now(),
 				ExpiresAt: time.Now().Add(s.DefaultIDTokenLifespan),
-				Extra:     t.Claims,
+				Extra:     idExt,
 			},
 			Headers: &ejwt.Headers{},
 		},
+		Extra: atExt,
 	}, err
 
 }
@@ -106,7 +116,7 @@ func (s *DefaultConsentStrategy) IssueChallenge(authorizeRequest fosite.Authoriz
 	token := jwt.New(jwt.SigningMethodRS256)
 	token.Claims = map[string]interface{}{
 		"jti":   uuid.New(),
-		"scp":   authorizeRequest.GetScopes(),
+		"scp":   authorizeRequest.GetRequestedScopes(),
 		"aud":   authorizeRequest.GetClient().GetID(),
 		"exp":   time.Now().Add(s.DefaultChallengeLifespan).Unix(),
 		"redir": redirectURL,

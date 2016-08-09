@@ -52,6 +52,7 @@ type Config struct {
 	cluster      *url.URL     `yaml:"-"`
 	oauth2Client *http.Client `yaml:"-"`
 	context      *Context     `yaml:"-"`
+	systemSecret []byte
 }
 
 func matchesRange(r *http.Request, ranges []string) error {
@@ -238,11 +239,15 @@ func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
 }
 
 func (c *Config) GetSystemSecret() []byte {
+	if len(c.systemSecret) > 0 {
+		return c.systemSecret
+	}
+
 	var secret = []byte(c.SystemSecret)
 	if len(secret) >= 16 {
 		hash := sha256.Sum256(secret)
 		secret = hash[:]
-		c.SystemSecret = string(secret)
+		c.systemSecret = secret
 		return secret
 	}
 
@@ -254,7 +259,7 @@ func (c *Config) GetSystemSecret() []byte {
 	logrus.Infof("Generated system secret: %s", secret)
 	hash := sha256.Sum256(secret)
 	secret = hash[:]
-	c.SystemSecret = string(secret)
+	c.systemSecret = secret
 	logrus.Warnln("WARNING: DO NOT generate system secrets in production. The secret will be leaked to the logs.")
 	return secret
 }

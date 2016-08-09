@@ -1,12 +1,11 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
-
-	"fmt"
 
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
@@ -23,7 +22,6 @@ func TestExecute(t *testing.T) {
 
 	for _, c := range []struct {
 		args      []string
-		timeout   time.Duration
 		wait      func() bool
 		expectErr bool
 	}{
@@ -40,10 +38,6 @@ func TestExecute(t *testing.T) {
 		{args: []string{"clients", "create", "--id", "foobarbaz"}},
 		{args: []string{"clients", "create", "--id", "foobarbaz", "--dry"}},
 		{args: []string{"clients", "delete", "foobarbaz"}},
-		{
-			args:    []string{"token", "user", "--no-open"},
-			timeout: time.Second,
-		},
 		{args: []string{"keys", "create", "foo", "-a", "RS256"}},
 		{args: []string{"keys", "create", "foo", "-a", "RS256", "--dry"}},
 		{args: []string{"keys", "create", "foo", "-a", "ES521"}},
@@ -78,10 +72,7 @@ func TestExecute(t *testing.T) {
 				}
 				time.Sleep(time.Second * 4)
 			}
-		} else if c.timeout > 0 {
-			time.Sleep(c.timeout)
 		} else {
-
 			assert.Equal(t, c.expectErr, RootCmd.Execute() != nil)
 		}
 	}

@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"testing"
 
-	r "github.com/dancannon/gorethink"
+	r "gopkg.in/dancannon/gorethink.v2"
 
 	"log"
 	"os"

@@ -12,7 +12,7 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/spf13/viper"
-	r "github.com/dancannon/gorethink"
+	r "gopkg.in/dancannon/gorethink.v2"
 )
 
 type MemoryConnection struct{}

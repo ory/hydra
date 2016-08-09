@@ -16,7 +16,7 @@ import (
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/net/context"
-	r "github.com/dancannon/gorethink"
+	r "gopkg.in/dancannon/gorethink.v2"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {

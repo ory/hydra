@@ -7,7 +7,7 @@ import (
 	"github.com/ory-am/hydra/connection"
 	"github.com/ory-am/hydra/herodot"
 	"golang.org/x/net/context"
-	r "github.com/dancannon/gorethink"
+	r "gopkg.in/dancannon/gorethink.v2"
 )
 
 func newConnectionHandler(c *config.Config, router *httprouter.Router) *connection.Handler {

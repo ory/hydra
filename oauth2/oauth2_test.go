@@ -1,12 +1,12 @@
 package oauth2_test
 
 import (
+	"fmt"
 	"net/http/httptest"
+	"net/url"
 	"time"
 
-	"fmt"
-	"net/url"
-
+	"github.com/dgrijalva/jwt-go"
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
@@ -19,7 +19,6 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
-	"github.com/dgrijalva/jwt-go"
 )
 
 var hasher = &hash.BCrypt{}
@@ -87,7 +86,7 @@ func init() {
 		RedirectURIs:  []string{ts.URL + "/callback"},
 		ResponseTypes: []string{"id_token", "code", "token"},
 		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
-		Scopes:        "hydra",
+		Scope:         "hydra",
 	}
 
 	c, _ := url.Parse(ts.URL + "/consent")
@@ -100,7 +99,7 @@ func init() {
 		RedirectURIs:  []string{ts.URL + "/callback"},
 		ResponseTypes: []string{"id_token", "code", "token"},
 		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
-		Scopes:        "hydra",
+		Scope:         "hydra",
 	}
 
 	oauthConfig = &oauth2.Config{

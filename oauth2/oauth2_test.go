@@ -1,14 +1,12 @@
 package oauth2_test
 
 import (
+	"fmt"
 	"net/http/httptest"
+	"net/url"
 	"time"
 
-	"gopkg.in/dgrijalva/jwt-go.v2"
-
-	"fmt"
-	"net/url"
-
+	"github.com/dgrijalva/jwt-go"
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"

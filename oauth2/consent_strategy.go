@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"gopkg.in/dgrijalva/jwt-go.v2"
-
 	"crypto/rsa"
+	"github.com/dgrijalva/jwt-go"
 
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"

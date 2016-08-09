@@ -6,8 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"gopkg.in/dgrijalva/jwt-go.v2"
-
+	"github.com/dgrijalva/jwt-go"
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	ejwt "github.com/ory-am/fosite/token/jwt"

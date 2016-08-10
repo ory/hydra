@@ -8,7 +8,7 @@
 //  	sdk.ClustURL("https://localhost:4444"),
 //  )
 //
-//  // Create a new OAuth2 client
+//  // You now have access to the various API endpoints of hydra, for example the oauth2 client endpoint:
 //  var newClient, err = hydra.Client.CreateClient(&client.Client{
 //  	ID:                "deadbeef",
 //  	Secret:            "sup3rs3cret",
@@ -18,10 +18,4 @@
 //
 //  // Retrieve newly created client
 //  var gotClient, err = hydra.Client.GetClient(newClient.ID)
-//
-//  // Remove the newly created client
-//  var err = hydra.Client.DeleteClient(newClient.ID)
-//
-//  // Retrieve list of all clients
-//  var clients, err = hydra.Client.GetClients()
 package sdk

@@ -11,6 +11,11 @@
 [![Code Climate](https://codeclimate.com/github/ory-am/hydra/badges/gpa.svg)](https://codeclimate.com/github/ory-am/hydra)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ory-am/hydra)](https://goreportcard.com/report/github.com/ory-am/hydra)
 
+
+[![Docs Guide](https://img.shields.io/badge/docs-overview-blue.svg)](https://ory-am.gitbooks.io/hydra/content/)
+[![HTTP API Documentation](https://img.shields.io/badge/docs-http%20api-blue.svg)](http://docs.hdyra.apiary.io/)
+[![Code Documentation](https://img.shields.io/badge/docs-godoc-blue.svg)](https://godoc.org/github.com/ory-am/hydra)
+
 Hydra is being developed by german-based company [Ory](https://ory.am). Join our [newsletter](http://eepurl.com/bKT3N9) to stay on top of new developments. We respond to *basic support requests in our free time* on [Google Groups](https://groups.google.com/forum/#!forum/ory-hydra/new) and [Gitter](https://gitter.im/ory-am/hydra).
 
 If you are looking for 24/7 enterprise support or SLAs, [contact us now](mailto:hello@ory.am).
@@ -537,7 +542,7 @@ import "github.com/ory-am/ladon"
 
 // Create a new policy
 // allow user to view his/her own photos
-newPolicy, err := hydra.Policy.Create(ladon.DefaultPolicy{
+newPolicy, err := hydra.Policy.Create(&ladon.DefaultPolicy{
     ID: "1234", // ID is not required
     Subjects: []string{"bob"},
     Resources: []string{"urn:media:images"},
@@ -576,12 +581,19 @@ Validate requests with the Warden, uses [`ory-am/hydra/warden.HTTPWarden`](warde
 ```go
 import "github.com/ory-am/ladon"
 
-// Check if action is allowed
-hydra.Warden.HTTPRequestAllowed(ctx, req, &ladon.Request{
-    Resource: "urn:media:images",
-    Action: "get",
-    Subject: "bob",
-}, "media.images")
+func anyHttpHandler(w http.ResponseWriter, r *http.Request) {
+    // Check if a token is valid and is allowed to operate given scopes
+    ctx, err := firewall.InspectToken(context.Background(), firewall.TokenFromRequest(r), "photos", "files")
+    fmt.Sprintf("%s", ctx.Subject)
+    
+    // Check if a token is valid and the token's subject fulfills the policy based access request.
+    ctx, err := firewall.TokenAllowed(context.Background(), "access-token", &ladon.Request{
+        Resource: "matrix",
+        Action:   "create",
+        Context:  ladon.Context{},
+    }, "photos", "files")
+    fmt.Sprintf("%s", ctx.Subject)
+}
 
 // Check if request is authorized
 hydra.Warden.HTTPAuthorized(ctx, req, "media.images")

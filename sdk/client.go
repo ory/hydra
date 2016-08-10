@@ -12,28 +12,10 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/hydra/policy"
 	"github.com/ory-am/hydra/warden"
-
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 )
-
-type Client struct {
-	http          *http.Client
-	clusterURL    *url.URL
-	clientID      string
-	clientSecret  string
-	skipTLSVerify bool
-	scopes        []string
-
-	credentials clientcredentials.Config
-
-	Client   *client.HTTPManager
-	SSO      *connection.HTTPManager
-	JWK      *jwk.HTTPManager
-	Policies *policy.HTTPManager
-	Warden   *warden.HTTPWarden
-}
 
 type option func(*Client) error
 
@@ -45,7 +27,33 @@ var defaultOptions = []option{
 	Scopes("hydra"),
 }
 
-// Connect instantiates a new client to communicate with Hydra
+// Client offers easy use of all HTTP clients.
+type Client struct {
+	// Client offers OAuth2 Client management capabilities.
+	Client   *client.HTTPManager
+
+	// SSO offers Social Login management capabilities.
+	SSO      *connection.HTTPManager
+
+	// JWK offers JSON Web Key management capabilities.
+	JWK      *jwk.HTTPManager
+
+	// Policies offers Access Policy management capabilities.
+	Policies *policy.HTTPManager
+
+	// Warden offers Access Token and Access Request validation strategies.
+	Warden   *warden.HTTPWarden
+
+	http          *http.Client
+	clusterURL    *url.URL
+	clientID      string
+	clientSecret  string
+	skipTLSVerify bool
+	scopes        []string
+	credentials clientcredentials.Config
+}
+
+// Connect instantiates a new client to communicate with Hydra.
 func Connect(opts ...option) (*Client, error) {
 	c := &Client{}
 

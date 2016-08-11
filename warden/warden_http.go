@@ -33,6 +33,9 @@ func (w *HTTPWarden) SetClient(c *clientcredentials.Config) {
 	w.Client = c.Client(oauth2.NoContext)
 }
 
+// IntrospectToken is capable of introspecting tokens according to https://tools.ietf.org/html/rfc7662
+//
+// The HTTP API is documented at http://docs.hdyra.apiary.io/#reference/oauth2/oauth2-token-introspection
 func (w *HTTPWarden) IntrospectToken(ctx context.Context, token string) (*firewall.Introspection, error) {
 	var resp = new(firewall.Introspection)
 	var ep = *w.Endpoint
@@ -71,6 +74,10 @@ func (w *HTTPWarden) IntrospectToken(ctx context.Context, token string) (*firewa
 	return resp, nil
 }
 
+// TokenAllowed checks if a token is valid and if the token owner is allowed to perform an action on a resource.
+// This endpoint requires a token, a scope, a resource name, an action name and a context.
+//
+// The HTTP API is documented at http://docs.hdyra.apiary.io/#reference/warden:-access-control-for-resource-providers/check-if-an-access-tokens-subject-is-allowed-to-do-something
 func (w *HTTPWarden) TokenAllowed(ctx context.Context, token string, a *ladon.Request, scopes ...string) (*firewall.Context, error) {
 	var resp = struct {
 		*firewall.Context
@@ -80,8 +87,8 @@ func (w *HTTPWarden) TokenAllowed(ctx context.Context, token string, a *ladon.Re
 	var ep = *w.Endpoint
 	ep.Path = TokenAllowedHandlerPath
 	agent := &pkg.SuperAgent{URL: ep.String(), Client: w.Client}
-	if err := agent.POST(&WardenAccessRequest{
-		WardenAuthorizedRequest: &WardenAuthorizedRequest{
+	if err := agent.POST(&wardenAccessRequest{
+		wardenAuthorizedRequest: &wardenAuthorizedRequest{
 			Token:  token,
 			Scopes: scopes,
 		},
@@ -95,6 +102,9 @@ func (w *HTTPWarden) TokenAllowed(ctx context.Context, token string, a *ladon.Re
 	return resp.Context, nil
 }
 
+// IsAllowed checks if an arbitrary subject is allowed to perform an action on a resource.
+//
+// The HTTP API is documented at http://docs.hdyra.apiary.io/#reference/warden:-access-control-for-resource-providers/check-if-a-subject-is-allowed-to-do-something
 func (w *HTTPWarden) IsAllowed(ctx context.Context, a *ladon.Request) error {
 	var allowed = struct {
 		Allowed bool `json:"allowed"`
@@ -112,6 +122,9 @@ func (w *HTTPWarden) IsAllowed(ctx context.Context, a *ladon.Request) error {
 	return nil
 }
 
+// InspectToken checks if an access token is valid. You must provide a token and a scope.
+//
+// The HTTP API is documented at http://docs.hdyra.apiary.io/#reference/warden:-access-control-for-resource-providers/check-if-an-access-token-is-valid
 func (w *HTTPWarden) InspectToken(ctx context.Context, token string, scopes ...string) (*firewall.Context, error) {
 	var resp = struct {
 		*firewall.Context
@@ -121,7 +134,7 @@ func (w *HTTPWarden) InspectToken(ctx context.Context, token string, scopes ...s
 	var ep = *w.Endpoint
 	ep.Path = TokenValidHandlerPath
 	agent := &pkg.SuperAgent{URL: ep.String(), Client: w.Client}
-	if err := agent.POST(&WardenAuthorizedRequest{
+	if err := agent.POST(&wardenAuthorizedRequest{
 		Token:  token,
 		Scopes: scopes,
 	}, &resp); err != nil {

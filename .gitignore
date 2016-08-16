@@ -9,3 +9,4 @@ node_modules/
 vendor/
 .hydra.yml
 cover.out
+output/

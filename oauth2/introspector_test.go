@@ -80,17 +80,20 @@ func init() {
 	ar.GrantedScopes = fosite.Arguments{"core"}
 	ar.RequestedAt = now
 	ar.Client = &fosite.DefaultClient{ID: "siri"}
+	ar.Session.(*oauth2.Session).Extra = map[string]interface{}{"foo": "bar"}
 	fositeStore.CreateAccessTokenSession(nil, tokens[0][0], ar)
 
 	ar2 := fosite.NewAccessRequest(oauth2.NewSession("siri"))
 	ar2.GrantedScopes = fosite.Arguments{"core"}
 	ar2.RequestedAt = now
+	ar2.Session.(*oauth2.Session).Extra = map[string]interface{}{"foo": "bar"}
 	ar2.Client = &fosite.DefaultClient{ID: "siri"}
 	fositeStore.CreateAccessTokenSession(nil, tokens[1][0], ar2)
 
 	ar3 := fosite.NewAccessRequest(oauth2.NewSession("siri"))
 	ar3.GrantedScopes = fosite.Arguments{"core"}
 	ar3.RequestedAt = now
+	ar2.Session.(*oauth2.Session).Extra = map[string]interface{}{"foo": "bar"}
 	ar3.Client = &fosite.DefaultClient{ID: "doesnt-exist"}
 	ar3.Session.(*oauth2.Session).AccessTokenExpiry = time.Now().Add(-time.Hour)
 	fositeStore.CreateAccessTokenSession(nil, tokens[2][0], ar3)
@@ -141,6 +144,7 @@ func TestIntrospect(t *testing.T) {
 					assert.Equal(t, "tests", c.Issuer)
 					assert.Equal(t, now.Add(time.Hour).Unix(), c.ExpiresAt, "expires at")
 					assert.Equal(t, now.Unix(), c.IssuedAt, "issued at")
+					assert.Equal(t, map[string]interface{}{"foo": "bar"}, c.Extra)
 				},
 			},
 		} {

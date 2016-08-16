@@ -40,5 +40,6 @@ func (w *LocalIntrospector) IntrospectToken(ctx context.Context, token string) (
 		IssuedAt:  auth.GetRequestedAt().Unix(),
 		NotBefore: auth.GetRequestedAt().Unix(),
 		ExpiresAt: session.AccessTokenExpiresAt(auth.GetRequestedAt().Add(w.AccessTokenLifespan)).Unix(),
+		Extra: session.Extra,
 	}, nil
 }

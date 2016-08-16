@@ -1,4 +1,4 @@
-# Social Login
+# Social Logon
 
 Social login, also known as social sign-in, is a form of single sign-on using existing login information from a social networking service such as Facebook, Twitter or Google+ to sign into a third party website instead of creating a new login account specifically for that website. It is designed to simplify logins for end users as well as provide more and more reliable demographic information to web developers. *[Source: Wikipedia](https://en.wikipedia.org/wiki/Social_login)*
 

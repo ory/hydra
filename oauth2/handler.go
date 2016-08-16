@@ -9,6 +9,7 @@ import (
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/ory-am/hydra/firewall"
 )
 
 const (
@@ -23,11 +24,15 @@ const (
 )
 
 type Handler struct {
-	OAuth2     fosite.OAuth2Provider
-	Consent    ConsentStrategy
-	ForcedHTTP bool
+	OAuth2       fosite.OAuth2Provider
+	Consent      ConsentStrategy
 
-	ConsentURL url.URL
+	Introspector Introspector
+	Firewall     firewall.Firewall
+	H      herodot.Herodot
+
+	ForcedHTTP   bool
+	ConsentURL   url.URL
 }
 
 func (this *Handler) SetRoutes(r *httprouter.Router) {
@@ -39,8 +44,10 @@ func (this *Handler) SetRoutes(r *httprouter.Router) {
 }
 
 func (this *Handler) Introspect(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	var inactive = map[string]bool{"active": false}
+
 	ctx := herodot.NewContext()
-	clientCtx, err := this.Warden.TokenValid(ctx, TokenFromRequest(r))
+	clientCtx, err := this.Firewall.TokenValid(ctx, this.Firewall.TokenFromRequest(r))
 	if err != nil {
 		this.H.WriteError(ctx, w, r, err)
 		return
@@ -51,7 +58,7 @@ func (this *Handler) Introspect(w http.ResponseWriter, r *http.Request, _ httpro
 		return
 	}
 
-	auth, err := this.Warden.IntrospectToken(ctx, r.PostForm.Get("token"))
+	auth, err := this.Introspector.IntrospectToken(ctx, r.PostForm.Get("token"))
 	if err != nil {
 		this.H.Write(ctx, w, r, &inactive)
 		return

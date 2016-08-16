@@ -4,11 +4,6 @@ import (
 	"net/http"
 	"net/url"
 
-	"bytes"
-	"encoding/json"
-	"io/ioutil"
-	"strconv"
-
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/firewall"
@@ -31,41 +26,6 @@ func (w *HTTPWarden) TokenFromRequest(r *http.Request) string {
 
 func (w *HTTPWarden) SetClient(c *clientcredentials.Config) {
 	w.Client = c.Client(oauth2.NoContext)
-}
-
-// IntrospectToken is capable of introspecting tokens according to https://tools.ietf.org/html/rfc7662
-//
-// The HTTP API is documented at http://docs.hdyra.apiary.io/#reference/oauth2/oauth2-token-introspection
-func (w *HTTPWarden) IntrospectToken(ctx context.Context, token string) (*firewall.Introspection, error) {
-	var resp = new(firewall.Introspection)
-	var ep = *w.Endpoint
-	ep.Path = IntrospectPath
-
-	data := url.Values{"token": []string{token}}
-	hreq, err := http.NewRequest("POST", ep.String(), bytes.NewBufferString(data.Encode()))
-	if err != nil {
-		return nil, errors.New(err)
-	}
-
-	hreq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	hreq.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
-	hres, err := w.Client.Do(hreq)
-	if err != nil {
-		return nil, errors.New(err)
-	}
-	defer hres.Body.Close()
-
-	if hres.StatusCode < 200 || hres.StatusCode >= 300 {
-		body, _ := ioutil.ReadAll(hres.Body)
-		return nil, errors.Errorf("Expected 2xx status code but got %d.\n%s", hres.StatusCode, body)
-	} else if err := json.NewDecoder(hres.Body).Decode(resp); err != nil {
-		body, _ := ioutil.ReadAll(hres.Body)
-		return nil, errors.Errorf("%s: %s", err, body)
-	} else if !resp.Active {
-		return nil, errors.New("Token is malformed, expired or otherwise invalid")
-	}
-
-	return resp, nil
 }
 
 // TokenAllowed checks if a token is valid and if the token owner is allowed to perform an action on a resource.

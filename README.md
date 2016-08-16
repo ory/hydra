@@ -16,9 +16,11 @@
 [![HTTP API Documentation](https://img.shields.io/badge/docs-http%20api-blue.svg)](http://docs.hdyra.apiary.io/)
 [![Code Documentation](https://img.shields.io/badge/docs-godoc-blue.svg)](https://godoc.org/github.com/ory-am/hydra)
 
-Hydra is being developed by german-based company [Ory](https://ory.am). Join our [newsletter](http://eepurl.com/bKT3N9) to stay on top of new developments. We respond to *basic support requests in our free time* on [Google Groups](https://groups.google.com/forum/#!forum/ory-hydra/new) and [Gitter](https://gitter.im/ory-am/hydra).
-
-If you are looking for 24/7 enterprise support or SLAs, [contact us now](mailto:hello@ory.am).
+Hydra is being developed by german-based company [Ory](https://ory.am).
+Join our [newsletter](http://eepurl.com/bKT3N9) to stay on top of new developments.
+We offer basic support requests on [Google Groups](https://groups.google.com/forum/#!forum/ory-hydra/new) and [Gitter](https://gitter.im/ory-am/hydra)
+as well as [consulting](https://ory.am/products/hydra/enterprise) around integrating Hydra into
+your particular environment and [24/7 support](https://ory.am/products/hydra/enterprise).
 
 Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://github.com/ory-am/fosite) and [Ladon](https://github.com/ory-am/ladon) for policy-based access control.
 

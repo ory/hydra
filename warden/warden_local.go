@@ -5,8 +5,6 @@ import (
 
 	"time"
 
-	"strings"
-
 	"github.com/Sirupsen/logrus"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
@@ -17,8 +15,8 @@ import (
 )
 
 type LocalWarden struct {
-	Warden ladon.Warden
-	OAuth2 fosite.OAuth2Provider
+	Warden              ladon.Warden
+	OAuth2              fosite.OAuth2Provider
 
 	AccessTokenLifespan time.Duration
 	Issuer              string
@@ -26,29 +24,6 @@ type LocalWarden struct {
 
 func (w *LocalWarden) TokenFromRequest(r *http.Request) string {
 	return fosite.AccessTokenFromRequest(r)
-}
-
-func (w *LocalWarden) IntrospectToken(ctx context.Context, token string) (*firewall.Introspection, error) {
-	var session = new(oauth2.Session)
-	var auth, err = w.OAuth2.ValidateToken(ctx, token, fosite.AccessToken, session)
-	if err != nil {
-		logrus.WithError(err).Infof("Token introspection failed")
-		return &firewall.Introspection{
-			Active: false,
-		}, err
-	}
-
-	session = auth.GetSession().(*oauth2.Session)
-	return &firewall.Introspection{
-		Active:    true,
-		Subject:   session.Subject,
-		Audience:  auth.GetClient().GetID(),
-		Scope:     strings.Join(auth.GetGrantedScopes(), " "),
-		Issuer:    w.Issuer,
-		IssuedAt:  auth.GetRequestedAt().Unix(),
-		NotBefore: auth.GetRequestedAt().Unix(),
-		ExpiresAt: session.AccessTokenExpiresAt(auth.GetRequestedAt().Add(w.AccessTokenLifespan)).Unix(),
-	}, nil
 }
 
 func (w *LocalWarden) IsAllowed(ctx context.Context, a *ladon.Request) error {

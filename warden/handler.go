@@ -42,10 +42,6 @@ var invalid = struct {
 	Valid bool `json:"valid"`
 }{Valid: false}
 
-var inactive = struct {
-	Active bool `json:"active"`
-}{Active: false}
-
 // WardenHandler is capable of handling HTTP request and validating access tokens and access requests.
 type WardenHandler struct {
 	H      herodot.Herodot

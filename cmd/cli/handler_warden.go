@@ -34,7 +34,7 @@ func (h *WardenHandler) IsAuthorized(cmd *cobra.Command, args []string) {
 	}
 
 	scopes, _ := cmd.Flags().GetStringSlice("scopes")
-	res, err := h.M.InspectToken(context.Background(), args[0], scopes...)
+	res, err := h.M.TokenValid(context.Background(), args[0], scopes...)
 	pkg.Must(err, "Could not validate token: %s", err)
 
 	out, err := json.MarshalIndent(res, "", "\t")

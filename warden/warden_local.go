@@ -79,7 +79,7 @@ func (w *LocalWarden) TokenAllowed(ctx context.Context, token string, a *ladon.R
 	return w.allowed(ctx, a, scopes, auth, session)
 }
 
-func (w *LocalWarden) InspectToken(ctx context.Context, token string, scopes ...string) (*firewall.Context, error) {
+func (w *LocalWarden) TokenValid(ctx context.Context, token string, scopes ...string) (*firewall.Context, error) {
 	var session = new(oauth2.Session)
 	var oauthRequest = fosite.NewAccessRequest(session)
 

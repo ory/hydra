@@ -583,7 +583,7 @@ import "github.com/ory-am/ladon"
 
 func anyHttpHandler(w http.ResponseWriter, r *http.Request) {
     // Check if a token is valid and is allowed to operate given scopes
-    ctx, err := firewall.InspectToken(context.Background(), firewall.TokenFromRequest(r), "photos", "files")
+    ctx, err := firewall.TokenValid(context.Background(), firewall.TokenFromRequest(r), "photos", "files")
     fmt.Sprintf("%s", ctx.Subject)
     
     // Check if a token is valid and the token's subject fulfills the policy based access request.

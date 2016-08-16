@@ -337,7 +337,7 @@ func TestTokenValid(t *testing.T) {
 				expectErr: true,
 			},
 		} {
-			ctx, err := w.InspectToken(context.Background(), c.token, c.scopes...)
+			ctx, err := w.TokenValid(context.Background(), c.token, c.scopes...)
 			pkg.AssertError(t, c.expectErr, err, "ActionAllowed case", n, k)
 			if err == nil && c.assert != nil {
 				c.assert(ctx)

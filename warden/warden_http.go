@@ -116,10 +116,10 @@ func (w *HTTPWarden) IsAllowed(ctx context.Context, a *ladon.Request) error {
 	return nil
 }
 
-// InspectToken checks if an access token is valid. You must provide a token and a scope.
+// TokenValid checks if an access token is valid. You must provide a token and a scope.
 //
 // The HTTP API is documented at http://docs.hdyra.apiary.io/#reference/warden:-access-control-for-resource-providers/check-if-an-access-token-is-valid
-func (w *HTTPWarden) InspectToken(ctx context.Context, token string, scopes ...string) (*firewall.Context, error) {
+func (w *HTTPWarden) TokenValid(ctx context.Context, token string, scopes ...string) (*firewall.Context, error) {
 	var resp = struct {
 		*firewall.Context
 		Valid bool `json:"valid"`

@@ -15,16 +15,13 @@ import (
 
 const (
 	// TokenValidHandlerPath points to the token validation endpoint.
-	TokenValidHandlerPath   = "/warden/token/valid"
+	TokenValidHandlerPath = "/warden/token/valid"
 
 	// TokenAllowedHandlerPath points to the token access request validation endpoint.
 	TokenAllowedHandlerPath = "/warden/token/allowed"
 
 	// AllowedHandlerPath points to the access request validation endpoint.
-	AllowedHandlerPath      = "/warden/allowed"
-
-	// IntrospectPath points to the OAuth2 introspection endpoint.
-	IntrospectPath          = "/oauth2/introspect"
+	AllowedHandlerPath = "/warden/allowed"
 )
 
 type wardenAuthorizedRequest struct {
@@ -71,32 +68,6 @@ func (h *WardenHandler) SetRoutes(r *httprouter.Router) {
 	r.POST(TokenValidHandlerPath, h.TokenValid)
 	r.POST(TokenAllowedHandlerPath, h.TokenAllowed)
 	r.POST(AllowedHandlerPath, h.Allowed)
-	r.POST(IntrospectPath, h.Introspect)
-}
-
-func (h *WardenHandler) Introspect(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	ctx := herodot.NewContext()
-	clientCtx, err := h.Warden.InspectToken(ctx, TokenFromRequest(r))
-	if err != nil {
-		h.H.WriteError(ctx, w, r, err)
-		return
-	}
-
-	if err := r.ParseForm(); err != nil {
-		h.H.WriteError(ctx, w, r, err)
-		return
-	}
-
-	auth, err := h.Warden.IntrospectToken(ctx, r.PostForm.Get("token"))
-	if err != nil {
-		h.H.Write(ctx, w, r, &inactive)
-		return
-	} else if clientCtx.Subject != auth.Audience {
-		h.H.Write(ctx, w, r, &inactive)
-		return
-	}
-
-	h.H.Write(ctx, w, r, auth)
 }
 
 func (h *WardenHandler) TokenValid(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -117,7 +88,7 @@ func (h *WardenHandler) TokenValid(w http.ResponseWriter, r *http.Request, _ htt
 	}
 	defer r.Body.Close()
 
-	authContext, err := h.Warden.InspectToken(ctx, ar.Token, ar.Scopes...)
+	authContext, err := h.Warden.TokenValid(ctx, ar.Token, ar.Scopes...)
 	if err != nil {
 		h.H.Write(ctx, w, r, &invalid)
 		return

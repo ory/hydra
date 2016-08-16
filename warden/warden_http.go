@@ -40,7 +40,6 @@ func (w *HTTPWarden) IntrospectToken(ctx context.Context, token string) (*firewa
 	var resp = new(firewall.Introspection)
 	var ep = *w.Endpoint
 	ep.Path = IntrospectPath
-	agent := &pkg.SuperAgent{URL: ep.String(), Client: w.Client}
 
 	data := url.Values{"token": []string{token}}
 	hreq, err := http.NewRequest("POST", ep.String(), bytes.NewBufferString(data.Encode()))
@@ -54,6 +53,7 @@ func (w *HTTPWarden) IntrospectToken(ctx context.Context, token string) (*firewa
 	if err != nil {
 		return nil, errors.New(err)
 	}
+	defer hres.Body.Close()
 
 	if hres.StatusCode < 200 || hres.StatusCode >= 300 {
 		body, _ := ioutil.ReadAll(hres.Body)
@@ -61,12 +61,6 @@ func (w *HTTPWarden) IntrospectToken(ctx context.Context, token string) (*firewa
 	} else if err := json.NewDecoder(hres.Body).Decode(resp); err != nil {
 		body, _ := ioutil.ReadAll(hres.Body)
 		return nil, errors.Errorf("%s: %s", err, body)
-	}
-
-	if err := agent.POST(&struct {
-		Token string `json:"token"`
-	}{Token: token}, &hres); err != nil {
-		return nil, err
 	} else if !resp.Active {
 		return nil, errors.New("Token is malformed, expired or otherwise invalid")
 	}

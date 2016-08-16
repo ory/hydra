@@ -227,6 +227,10 @@ func TestIntrospect(t *testing.T) {
 				expectErr: true,
 			},
 			{
+				token:     tokens[1][1],
+				expectErr: false,
+			},
+			{
 				token:     tokens[0][1],
 				expectErr: false,
 				assert: func(c *firewall.Introspection) {

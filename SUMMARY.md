@@ -1,6 +1,7 @@
 # Summary
 
 * [Introduction](docs/README.md)
+* [Introduction](docs/README.md)
 * [OAuth2 and OpenID Connect](docs/oauth2.md)
 * [JSON Web Keys](docs/jwk.md)
 * [Access Control](docs/policy.md)

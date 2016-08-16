@@ -4,4 +4,5 @@
 * OAuth2 and OpenID Connect
 * JSON Web Keys
 * Access Control
+* Social Logon
 

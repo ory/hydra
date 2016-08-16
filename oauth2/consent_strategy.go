@@ -71,7 +71,7 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 	if ext, ok := t.Claims["id_ext"].(map[string]interface{}); ok {
 		idExt = ext
 	}
-	if ext, ok := t.Claims["id_ext"].(map[string]interface{}); ok {
+	if ext, ok := t.Claims["at_ext"].(map[string]interface{}); ok {
 		atExt = ext
 	}
 

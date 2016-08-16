@@ -1,9 +1,3 @@
 {
-  "root": "docs/",
-  "structure": {
-    "readme": "docs/README.md",
-    "summary": "docs/SUMMARY.md",
-    "glossary": "docs/GLOSSARY.md",
-    "languages": "docs/LANGS.md"
-  }
+  "root": "./docs"
 }

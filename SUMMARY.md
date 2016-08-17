@@ -1,7 +1,5 @@
 # Summary
 
-This is an index file for the [guide](https://ory-am.gitbooks.io/hydra/content/).
-
 1. [Introduction](README.md)
 2. [OAuth2 and OpenID Connect](docs/oauth2.md)
 3. [JSON Web Keys](docs/jwk.md)

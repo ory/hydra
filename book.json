@@ -1,9 +1,5 @@
 {
     "root": "./docs/",
     "author": "Aeneas Rekkas",
-    "structure": {
-      "summary": "./docs/SUMMARY.md",
-      "readme": "./docs/README.md"
-    },
     "gitbook": ">=3.2.0"
 }

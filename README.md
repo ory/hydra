@@ -149,9 +149,9 @@ The **[tutorial](https://ory-am.gitbooks.io/hydra/content/demo.md)** teaches you
 a RethinkDB instance and an exemplary identity provider written in React using docker compose.
 It will take you about 5 minutes to get complete the **[tutorial](https://ory-am.gitbooks.io/hydra/content/demo.md)**.
 
-<img src="docs/dist/oauth2-flow.gif" alt="OAuth2 Flow">
+<img src="docs/dist/images/oauth2-flow.gif" alt="OAuth2 Flow">
 
-<img alt="Running the example" align="right" width="35%" src="docs/dist/run-the-example.gif">
+<img alt="Running the example" align="right" width="35%" src="docs/dist/images/run-the-example.gif">
 
 <br clear="all">
 

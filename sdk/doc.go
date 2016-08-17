@@ -2,10 +2,11 @@
 //
 //  import "github.com/ory-am/hydra/sdk"
 //  import "github.com/ory-am/hydra/client"
+//
 //  var hydra, err = sdk.Connect(
 // 	sdk.ClientID("client-id"),
 // 	sdk.ClientSecret("client-secret"),
-//  	sdk.ClustURL("https://localhost:4444"),
+//  	sdk.ClusterURL("https://localhost:4444"),
 //  )
 //
 //  // You now have access to the various API endpoints of hydra, for example the oauth2 client endpoint:

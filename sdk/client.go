@@ -30,19 +30,19 @@ var defaultOptions = []option{
 // Client offers easy use of all HTTP clients.
 type Client struct {
 	// Client offers OAuth2 Client management capabilities.
-	Client   *client.HTTPManager
+	Client *client.HTTPManager
 
 	// SSO offers Social Login management capabilities.
-	SSO      *connection.HTTPManager
+	SSO *connection.HTTPManager
 
 	// JWK offers JSON Web Key management capabilities.
-	JWK      *jwk.HTTPManager
+	JWK *jwk.HTTPManager
 
 	// Policies offers Access Policy management capabilities.
 	Policies *policy.HTTPManager
 
 	// Warden offers Access Token and Access Request validation strategies.
-	Warden   *warden.HTTPWarden
+	Warden *warden.HTTPWarden
 
 	http          *http.Client
 	clusterURL    *url.URL
@@ -50,10 +50,18 @@ type Client struct {
 	clientSecret  string
 	skipTLSVerify bool
 	scopes        []string
-	credentials clientcredentials.Config
+	credentials   clientcredentials.Config
 }
 
 // Connect instantiates a new client to communicate with Hydra.
+//
+//  import "github.com/ory-am/hydra/sdk"
+//
+//  var hydra, err = sdk.Connect(
+// 	sdk.ClientID("client-id"),
+// 	sdk.ClientSecret("client-secret"),
+//  	sdk.ClusterURL("https://localhost:4444"),
+//  )
 func Connect(opts ...option) (*Client, error) {
 	c := &Client{}
 
@@ -123,6 +131,26 @@ func Connect(opts ...option) (*Client, error) {
 	}
 
 	return c, nil
+}
+
+// OAuth2Config returns an oauth2 config instance which you can use to initiate various oauth2 flows.
+//
+//  config := client.OAuth2Config("https://mydomain.com/oauth2_callback", "photos", "contacts.read")
+//  redirectRequestTo := oauth2.AuthCodeURL()
+//
+//  // in callback handler...
+//  token, err := config.Exchange(oauth2.NoContext, authorizeCode)
+func (h *Client) OAuth2Config(redirectURL string, scopes ...string) *oauth2.Config {
+	return &oauth2.Config{
+		ClientSecret: h.clientSecret,
+		ClientID:     h.clientID,
+		Endpoint: oauth2.Endpoint{
+			TokenURL: pkg.JoinURL(h.clusterURL, "/oauth2/token").String(),
+			AuthURL:  pkg.JoinURL(h.clusterURL, "/oauth2/auth").String(),
+		},
+		Scopes:      scopes,
+		RedirectURL: redirectURL,
+	}
 }
 
 func (h *Client) authenticate() error {

@@ -7,15 +7,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// ClusterURL sets Hydra service URL
-func ClusterURL(urlStr string) option {
-	return func(c *Client) error {
-		var err error
-		c.clusterURL, err = url.Parse(urlStr)
-		return err
-	}
-}
-
 type hydraConfig struct {
 	ClusterURL   string `yaml:"cluster_url"`
 	ClientID     string `yaml:"client_id"`
@@ -50,7 +41,25 @@ func FromYAML(file string) option {
 	}
 }
 
-// ClientID sets OAuth client ID
+// ClusterURL sets Hydra service URL
+//
+//  var hydra, err = sdk.Connect(
+// 	sdk.ClientID("https://localhost:1234/"),
+//  )
+func ClusterURL(urlStr string) option {
+	return func(c *Client) error {
+		var err error
+		c.clusterURL, err = url.Parse(urlStr)
+		return err
+	}
+}
+
+
+// ClientID sets the OAuth2 Client ID.
+//
+//  var hydra, err = sdk.Connect(
+// 	sdk.ClientID("client-id"),
+//  )
 func ClientID(id string) option {
 	return func(c *Client) error {
 		c.clientID = id
@@ -58,7 +67,11 @@ func ClientID(id string) option {
 	}
 }
 
-// ClientSecret sets OAuth client secret
+// ClientSecret sets OAuth2 Client secret.
+//
+//  var hydra, err = sdk.Connect(
+// 	sdk.ClientSecret("client-secret"),
+//  )
 func ClientSecret(secret string) option {
 	return func(c *Client) error {
 		c.clientSecret = secret
@@ -66,7 +79,11 @@ func ClientSecret(secret string) option {
 	}
 }
 
-// SkipTLSVerify skips TLS verification
+// SkipTLSVerify skips TLS verification for HTTPS connections.
+//
+//  var hydra, err = sdk.Connect(
+// 	sdk.SkipTLSVerify(),
+//  )
 func SkipTLSVerify() option {
 	return func(c *Client) error {
 		c.skipTLSVerify = true
@@ -74,7 +91,11 @@ func SkipTLSVerify() option {
 	}
 }
 
-// Scopes sets client scopes granted by Hydra
+// Scopes is a list of scopes that are requested in the client credentials grant.
+//
+//  var hydra, err = sdk.Connect(
+//  	sdk.Scopes("foo", "bar"),
+//  )
 func Scopes(scopes ...string) option {
 	return func(c *Client) error {
 		c.scopes = scopes

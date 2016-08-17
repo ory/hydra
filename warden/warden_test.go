@@ -211,41 +211,6 @@ func TestActionAllowed(t *testing.T) {
 	}
 }
 
-func TestIntrospect(t *testing.T) {
-	for n, w := range wardens {
-		for k, c := range []struct {
-			token     string
-			expectErr bool
-			assert    func(*firewall.Introspection)
-		}{
-			{
-				token:     "invalid",
-				expectErr: true,
-			},
-			{
-				token:     tokens[2][1],
-				expectErr: true,
-			},
-			{
-				token:     tokens[0][1],
-				expectErr: false,
-				assert: func(c *firewall.Introspection) {
-					assert.Equal(t, "alice", c.Subject)
-					assert.Equal(t, "tests", c.Issuer)
-					assert.Equal(t, now.Add(time.Hour).Unix(), c.ExpiresAt)
-					assert.Equal(t, now.Unix(), c.IssuedAt)
-				},
-			},
-		} {
-			ctx, err := w.IntrospectToken(context.Background(), c.token)
-			pkg.AssertError(t, c.expectErr, err, "TestIntrospect case", n, k)
-			if err == nil && c.assert != nil {
-				c.assert(ctx)
-			}
-		}
-	}
-}
-
 func TestAllowed(t *testing.T) {
 	for n, w := range wardens {
 		for k, c := range []struct {
@@ -333,7 +298,7 @@ func TestTokenValid(t *testing.T) {
 				expectErr: true,
 			},
 		} {
-			ctx, err := w.InspectToken(context.Background(), c.token, c.scopes...)
+			ctx, err := w.TokenValid(context.Background(), c.token, c.scopes...)
 			pkg.AssertError(t, c.expectErr, err, "ActionAllowed case", n, k)
 			if err == nil && c.assert != nil {
 				c.assert(ctx)

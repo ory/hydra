@@ -27,36 +27,3 @@ Hydra is packaged using [Docker](https://hub.docker.com/r/oryam/hydra/).
 and under supervision of the [LMU Teaching and Research Unit Programming and Modelling Languages](http://www.en.pms.ifi.lmu.de). No funny business.
 8. **Real Time:** Operation is a lot easier with real time monitoring. Because Hydra leverages RethinkDB, you get real time monitoring for free.
 
-## *Where's my product demo?*
-
-It's on [GitHub](https://github.com/ory-am/hydra#run-the-example). Give it a try or enjoy the GIF.
-
-[Run the example](run-the-example.gif)
-
-## Availability
-
-Hydra uses pub/sub to have the latest data always available in memory. RethinkDB makes it possible to recover from failures and synchronize the cluster when something changes. Data is kept in memory for best performance results. The storage layer is abstracted and can be modified to use RabbitMQ or MySQL amongst others.
-
-The message broker keeps the data between all host process in synch. This results in effortless `hydra host` scaling on every platform you can imagine: Heroku, Cloud Foundry, Docker, Google Container Engine and many more.![](hydra-arch.png)
-
-Serving a uniform API reduces security risks. This is why all clients use REST and OAuth2 HTTP APIs. The Command Line Interface (CLI) `hydra`, responsible for managing the cluster, uses these as well.
-
-## Security
-
-There is no unbreakable system. But we're trying to make breaking in really hard:
-
-- Built in support for HTTP 2.0 over TLS.
-- [BCrypt](https://en.wikipedia.org/wiki/Bcrypt) hashes credentials.
-- The database never stores complete and valid tokens, only their signatures.
-- JWKs are encrypted at rest using AES256-GCM
-- Unit and integration tested.
-- It's written in Google Go.
-- It's Open Source.
-
-## Interoperability
-
-**In a nutshell:** We did not want to provide you with LDAP, Active Directory, ADFS, SAML-P, SharePoint Apps, ... integrations which probably won't work well anyway. Instead we decided to rely on cryptographic tokens (JSON Web Tokens) for authenticating users and getting their consent. This gives you all the freedom you need with very little effort. JSON Web Tokens are supported by all web programming languages and Hydra's [JSON Web Key API](jwk.html) offers a nice way to deal with certificates and keys.
-
-The Customer Journey looks the same:
-
-![OAuth2 WOrkflow](hydra authentication.gif)

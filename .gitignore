@@ -10,3 +10,4 @@ vendor/
 .hydra.yml
 cover.out
 output/
+_book/

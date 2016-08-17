@@ -62,7 +62,7 @@ func init() {
 	managers["http"] = &HTTPManager{Client: httpClient, Endpoint: u}
 }
 
-var rethinkManager *RethinkManager
+var rethinkManager = new(RethinkManager)
 
 func TestMain(m *testing.M) {
 	var session *r.Session
@@ -128,26 +128,31 @@ func BenchmarkRethinkGet(b *testing.B) {
 	}
 }
 
-func TestColdStartRethinkManager(t *testing.T) {
+func TestColdStart(t *testing.T) {
 	ks, _ := testGenerator.Generate("")
-	priv := ks.Key("private")
+	p1 := ks.Key("private")
 
-	err := rethinkManager.AddKey("testcoldstart", First(priv))
-	assert.Nil(t, err)
+	ks, _ = testGenerator.Generate("")
+	p2 := ks.Key("private")
 
-	time.Sleep(100 * time.Millisecond)
-	_, err = rethinkManager.GetKey("testcoldstart", "private")
-	assert.Nil(t, err)
+	pkg.AssertError(t, false, rethinkManager.AddKey("foo", First(p1)))
+	pkg.AssertError(t, false, rethinkManager.AddKey("bar", First(p2)))
 
+	time.Sleep(time.Second / 2)
+	rethinkManager.Lock()
 	rethinkManager.Keys = make(map[string]jose.JsonWebKeySet)
-	_, err = rethinkManager.GetKey("testcoldstart", "private")
-	assert.NotNil(t, err)
+	rethinkManager.Unlock()
+	pkg.AssertError(t, false, rethinkManager.ColdStart())
 
-	rethinkManager.ColdStart()
-	_, err = rethinkManager.GetKey("testcoldstart", "private")
-	assert.Nil(t, err)
+	c1, err := rethinkManager.GetKey("foo", "private")
+	pkg.AssertError(t, false, err)
+	c2, err := rethinkManager.GetKey("bar", "private")
+	pkg.AssertError(t, false, err)
 
+	assert.NotEqual(t, c1, c2)
+	rethinkManager.Lock()
 	rethinkManager.Keys = make(map[string]jose.JsonWebKeySet)
+	rethinkManager.Unlock()
 }
 
 func TestManagerKey(t *testing.T) {

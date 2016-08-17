@@ -15,6 +15,7 @@ import (
 	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
+	"github.com/stretchr/testify/assert"
 )
 
 var rethinkManager *FositeRehinkDBStore
@@ -109,6 +110,12 @@ func TestColdStartRethinkManager(t *testing.T) {
 
 	err := m.CreateAuthorizeCodeSession(ctx, id, &defaultRequest)
 	pkg.AssertError(t, false, err)
+	err = m.CreateAccessTokenSession(ctx, "12345", &fosite.Request{
+		RequestedAt:   time.Now().Round(time.Second),
+		Client:        &client.Client{ID: "baz"},
+	})
+	pkg.AssertError(t, false, err)
+
 	err = m.CreateAccessTokenSession(ctx, id, &defaultRequest)
 	pkg.AssertError(t, false, err)
 
@@ -119,6 +126,7 @@ func TestColdStartRethinkManager(t *testing.T) {
 
 	delete(rethinkManager.AuthorizeCodes, id)
 	delete(rethinkManager.AccessTokens, id)
+	delete(rethinkManager.AccessTokens, "12345")
 
 	_, err = m.GetAuthorizeCodeSession(ctx, id, &testSession{})
 	pkg.AssertError(t, true, err)
@@ -130,8 +138,12 @@ func TestColdStartRethinkManager(t *testing.T) {
 
 	_, err = m.GetAuthorizeCodeSession(ctx, id, &testSession{})
 	pkg.AssertError(t, false, err)
-	_, err = m.GetAccessTokenSession(ctx, id, &testSession{})
+
+	s1, err := m.GetAccessTokenSession(ctx, id, &testSession{})
 	pkg.AssertError(t, false, err)
+	s2, err := m.GetAccessTokenSession(ctx, "12345", &testSession{})
+	pkg.AssertError(t, false, err)
+	assert.NotEqual(t, s1, s2)
 }
 
 func TestCreateGetDeleteAuthorizeCodes(t *testing.T) {

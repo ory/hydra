@@ -66,15 +66,15 @@ func requestFromRDB(s *RdbSchema, proto interface{}) (*fosite.Request, error) {
 }
 
 func (m *FositeRehinkDBStore) ColdStart() error {
-	if err := m.AccessTokens.coldStart(m.Session, m.RWMutex, m.AccessTokensTable); err != nil {
+	if err := m.AccessTokens.coldStart(m.Session, &m.RWMutex, m.AccessTokensTable); err != nil {
 		return err
-	} else if err := m.AuthorizeCodes.coldStart(m.Session, m.RWMutex, m.AuthorizeCodesTable); err != nil {
+	} else if err := m.AuthorizeCodes.coldStart(m.Session, &m.RWMutex, m.AuthorizeCodesTable); err != nil {
 		return err
-	} else if err := m.IDSessions.coldStart(m.Session, m.RWMutex, m.IDSessionsTable); err != nil {
+	} else if err := m.IDSessions.coldStart(m.Session, &m.RWMutex, m.IDSessionsTable); err != nil {
 		return err
-	} else if err := m.Implicit.coldStart(m.Session, m.RWMutex, m.ImplicitTable); err != nil {
+	} else if err := m.Implicit.coldStart(m.Session, &m.RWMutex, m.ImplicitTable); err != nil {
 		return err
-	} else if err := m.RefreshTokens.coldStart(m.Session, m.RWMutex, m.RefreshTokensTable); err != nil {
+	} else if err := m.RefreshTokens.coldStart(m.Session, &m.RWMutex, m.RefreshTokensTable); err != nil {
 		return err
 	}
 	return nil
@@ -259,14 +259,14 @@ func (s *FositeRehinkDBStore) PersistRefreshTokenGrantSession(ctx context.Contex
 }
 
 func (m *FositeRehinkDBStore) Watch(ctx context.Context) {
-	m.AccessTokens.watch(ctx, m.Session, m.RWMutex, m.AccessTokensTable)
-	m.AuthorizeCodes.watch(ctx, m.Session, m.RWMutex, m.AuthorizeCodesTable)
-	m.IDSessions.watch(ctx, m.Session, m.RWMutex, m.IDSessionsTable)
-	m.Implicit.watch(ctx, m.Session, m.RWMutex, m.ImplicitTable)
-	m.RefreshTokens.watch(ctx, m.Session, m.RWMutex, m.RefreshTokensTable)
+	m.AccessTokens.watch(ctx, m.Session, &m.RWMutex, m.AccessTokensTable)
+	m.AuthorizeCodes.watch(ctx, m.Session, &m.RWMutex, m.AuthorizeCodesTable)
+	m.IDSessions.watch(ctx, m.Session, &m.RWMutex, m.IDSessionsTable)
+	m.Implicit.watch(ctx, m.Session, &m.RWMutex, m.ImplicitTable)
+	m.RefreshTokens.watch(ctx, m.Session, &m.RWMutex, m.RefreshTokensTable)
 }
 
-func (items RDBItems) coldStart(sess *r.Session, lock sync.RWMutex, table r.Term) error {
+func (items RDBItems) coldStart(sess *r.Session, lock *sync.RWMutex, table r.Term) error {
 	rows, err := table.Run(sess)
 	if err != nil {
 		return errors.New(err)
@@ -276,7 +276,8 @@ func (items RDBItems) coldStart(sess *r.Session, lock sync.RWMutex, table r.Term
 	lock.Lock()
 	defer lock.Unlock()
 	for rows.Next(&item) {
-		items[item.ID] = &item
+		var cp = item
+		items[item.ID] = &cp
 	}
 
 	if rows.Err() != nil {
@@ -285,7 +286,7 @@ func (items RDBItems) coldStart(sess *r.Session, lock sync.RWMutex, table r.Term
 	return nil
 }
 
-func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock sync.RWMutex, table r.Term) {
+func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock *sync.RWMutex, table r.Term) {
 	go pkg.Retry(time.Second*15, time.Minute, func() error {
 		changes, err := table.Changes().Run(sess)
 		if err != nil {

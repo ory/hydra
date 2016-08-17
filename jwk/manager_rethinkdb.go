@@ -176,7 +176,6 @@ func (m *RethinkManager) Watch(ctx context.Context) {
 			logrus.Debug("Received update from RethinkDB Cluster in JSON Web Key manager.")
 			newVal := update["new_val"]
 			oldVal := update["old_val"]
-			m.Lock()
 			if newVal == nil && oldVal != nil {
 				m.watcherRemove(oldVal)
 			} else if newVal != nil && oldVal != nil {
@@ -185,7 +184,6 @@ func (m *RethinkManager) Watch(ctx context.Context) {
 			} else {
 				m.watcherInsert(newVal)
 			}
-			m.Unlock()
 		}
 
 		if connections.Err() != nil {
@@ -210,6 +208,8 @@ func (m *RethinkManager) watcherInsert(val *rethinkSchema) {
 		return
 	}
 
+	m.Lock()
+	defer m.Unlock()
 	keys := m.Keys[val.Set]
 	keys.Keys = append(keys.Keys, c)
 	m.Keys[val.Set] = keys
@@ -221,6 +221,8 @@ func (m *RethinkManager) watcherRemove(val *rethinkSchema) {
 		return
 	}
 
+	m.Lock()
+	defer m.Unlock()
 	keys.Keys = filter(keys.Keys, func(k jose.JsonWebKey) bool {
 		return k.KeyID != val.KID
 	})

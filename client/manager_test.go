@@ -176,24 +176,20 @@ func BenchmarkRethinkAuthenticate(b *testing.B) {
 }
 
 func TestColdStartRethinkManager(t *testing.T) {
-	err := rethinkManager.CreateClient(&Client{
-		ID:                "2341234",
-		Secret:            "secret",
-		RedirectURIs:      []string{"http://redirect"},
-		TermsOfServiceURI: "foo",
-	})
-	assert.Nil(t, err)
-	time.Sleep(100 * time.Millisecond)
-	_, err = rethinkManager.GetClient("2341234")
-	assert.Nil(t, err)
+	assert.Nil(t, rethinkManager.CreateClient(&Client{ID:                "foo"        }))
+	assert.Nil(t, rethinkManager.CreateClient(&Client{ID:                "bar"        }))
 
+	time.Sleep(time.Second / 2)
 	rethinkManager.Clients = make(map[string]Client)
-	_, err = rethinkManager.GetClient("2341234")
-	assert.NotNil(t, err)
+	assert.Nil(t, rethinkManager.ColdStart())
 
-	rethinkManager.ColdStart()
-	_, err = rethinkManager.GetClient("2341234")
+	c1, err := rethinkManager.GetClient("foo")
 	assert.Nil(t, err)
+	c2, err := rethinkManager.GetClient("bar")
+	assert.Nil(t, err)
+
+	assert.NotEqual(t, c1, c2)
+	assert.Equal(t, "foo", c1.GetID())
 
 	rethinkManager.Clients = make(map[string]Client)
 }

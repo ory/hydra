@@ -133,6 +133,23 @@ func BenchmarkRethinkGet(b *testing.B) {
 	}
 }
 
+func TestColdStart(t *testing.T) {
+	pkg.AssertError(t, false, rethinkManager.Create(&Connection{ID: "foo"}))
+	pkg.AssertError(t, false, rethinkManager.Create(&Connection{ID: "bar"}))
+
+	time.Sleep(time.Second / 2)
+	rethinkManager.Connections = map[string]Connection{}
+	pkg.AssertError(t, false, rethinkManager.ColdStart())
+
+	c1, err := rethinkManager.Get("foo")
+	pkg.AssertError(t, false, err)
+	c2, err := rethinkManager.Get("bar")
+	pkg.AssertError(t, false, err)
+
+	assert.NotEqual(t, c1, c2)
+	assert.Equal(t, "foo", c1.ID)
+}
+
 func TestCreateGetFindDelete(t *testing.T) {
 	for m, store := range managers {
 		_, err := store.Get("asdf")

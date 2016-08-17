@@ -17,6 +17,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
+	"github.com/ory-am/hydra/herodot"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {
@@ -122,6 +123,7 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 	consentURL, err := url.Parse(c.ConsentURL)
 	pkg.Must(err, "Could not parse consent url %s.", c.ConsentURL)
 
+	ctx := c.Context()
 	handler := &oauth2.Handler{
 		ForcedHTTP: c.ForceHTTP,
 		OAuth2:     o,
@@ -132,6 +134,14 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 			DefaultIDTokenLifespan:   c.GetIDTokenLifespan(),
 		},
 		ConsentURL: *consentURL,
+		Introspector: &oauth2.LocalIntrospector{
+			OAuth2: o,
+			AccessTokenLifespan: c.GetAccessTokenLifespan(),
+			Issuer : c.Issuer,
+
+		},
+		Firewall:       ctx.Warden,
+		H:      &herodot.JSON{},
 	}
 
 	handler.SetRoutes(router)

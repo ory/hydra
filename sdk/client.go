@@ -11,6 +11,7 @@ import (
 	"github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/hydra/policy"
+	hoauth2 "github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/warden"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
@@ -43,6 +44,8 @@ type Client struct {
 
 	// Warden offers Access Token and Access Request validation strategies.
 	Warden *warden.HTTPWarden
+
+	Introspector *hoauth2.HTTPIntrospector
 
 	http          *http.Client
 	clusterURL    *url.URL
@@ -112,6 +115,11 @@ func Connect(opts ...option) (*Client, error) {
 
 	c.SSO = &connection.HTTPManager{
 		Endpoint: pkg.JoinURL(c.clusterURL, "/connections"),
+		Client:   c.http,
+	}
+
+	c.Introspector = &hoauth2.HTTPIntrospector{
+		Endpoint: pkg.JoinURL(c.clusterURL, hoauth2.IntrospectPath),
 		Client:   c.http,
 	}
 

@@ -1,7 +1,5 @@
 # Summary
 
-This is an index file for the [guide](https://ory-am.gitbooks.io/hydra/content/).
-
 * [Introduction](README.md)
   1. Architecture
   * Security

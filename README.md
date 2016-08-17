@@ -147,11 +147,9 @@ hydra
 
 The **[tutorial](https://ory-am.gitbooks.io/hydra/content/demo.md)** teaches you to set up Hydra,
 a RethinkDB instance and an exemplary identity provider written in React using docker compose.
-It will take you about 5 minutes to get complete the **[tutorial](https://ory-am.gitbooks.io/hydra/content/demo.md)**.
+It will take you about 5 minutes to get complete the **[tutorial](https://ory-am.gitbooks.io/hydra/content/demo.html)**.
 
 <img src="docs/dist/images/oauth2-flow.gif" alt="OAuth2 Flow">
-
-<img alt="Running the example" align="right" width="35%" src="docs/dist/images/run-the-example.gif">
 
 <br clear="all">
 
@@ -163,7 +161,7 @@ OAuth2 and OAuth2 related specifications are over 200 written pages. Implementin
 Even if you use a secure SDK (there are numerous SDKs not secure by design in the wild), messing up the implementation
 is a real threat - no matter how good you or your team is. To err is human.
 
-An in-depth list of security features is listed [in the security guide]().
+An in-depth list of security features is listed [in the security guide](https://ory-am.gitbooks.io/hydra/content/basics/security.html).
 
 ## Reception
 

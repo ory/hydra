@@ -276,7 +276,8 @@ func (items RDBItems) coldStart(sess *r.Session, lock sync.RWMutex, table r.Term
 	lock.Lock()
 	defer lock.Unlock()
 	for rows.Next(&item) {
-		items[item.ID] = &item
+		var cp = item
+		items[item.ID] = &cp
 	}
 
 	if rows.Err() != nil {

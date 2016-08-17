@@ -139,7 +139,9 @@ func TestColdStart(t *testing.T) {
 	pkg.AssertError(t, false, rethinkManager.AddKey("bar", First(p2)))
 
 	time.Sleep(time.Second / 2)
+	rethinkManager.Lock()
 	rethinkManager.Keys = make(map[string]jose.JsonWebKeySet)
+	rethinkManager.Unlock()
 	pkg.AssertError(t, false, rethinkManager.ColdStart())
 
 	c1, err := rethinkManager.GetKey("foo", "private")
@@ -148,7 +150,9 @@ func TestColdStart(t *testing.T) {
 	pkg.AssertError(t, false, err)
 
 	assert.NotEqual(t, c1, c2)
+	rethinkManager.Lock()
 	rethinkManager.Keys = make(map[string]jose.JsonWebKeySet)
+	rethinkManager.Unlock()
 }
 
 func TestManagerKey(t *testing.T) {

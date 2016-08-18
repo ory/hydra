@@ -37,6 +37,7 @@ var tokenUserCmd = &cobra.Command{
 				TokenURL: pkg.JoinURLStrings(c.ClusterURL, "/oauth2/token"),
 				AuthURL:  pkg.JoinURLStrings(c.ClusterURL, "/oauth2/auth"),
 			},
+			RedirectURL: "http://localhost:4445/callback",
 			Scopes: scopes,
 		}
 
@@ -58,7 +59,7 @@ var tokenUserCmd = &cobra.Command{
 
 		srv := &graceful.Server{
 			Timeout: 2 * time.Second,
-			Server:  &http.Server{Addr: "localhost:4445"},
+			Server:  &http.Server{Addr: ":4445"},
 		}
 		r := httprouter.New()
 		r.GET("/callback", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

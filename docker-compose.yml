@@ -12,6 +12,7 @@ services:
       - rethinkdb:database
     ports:
       - "4444:4444"
+      - "4445:4445"
     environment:
       - SYSTEM_SECRET=${SYSTEM_SECRET}
       - CONSENT_URL=http://${DOCKER_IP}:3000

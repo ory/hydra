@@ -56,12 +56,16 @@ in every part of the world.
 Hydra is driven by the need for a **scalable, low-latency, in memory
 Access Control, OAuth2, and OpenID Connect layer** that integrates with every identity provider you can imagine.
 
-Hydra is available through [Docker](https://hub.docker.com/r/oryam/hydra/) and relies on RethinkDB for persistence.
+* Hydra is built security first: architecture and work flows are designed to neutralize various common (OWASP TOP TEN) and uncommon attack vectors. [Learn more](https://ory-am.gitbooks.io/hydra/content/basics/security.html).
+* Hydra can manage all of your access control needs, such as policy based access control and access token validation. [Learn more](https://ory-am.gitbooks.io/hydra/content/access-control.html).
+* Hydra depends on an identity provider of your choosing, e.g. [authboss](https://github.com/go-authboss/authboss), and works with any identity provider that is able to read and issue JSON Web Tokens. [Learn more](https://ory-am.gitbooks.io/hydra/content/oauth2/consent.html).
+* Hydra has nano-second latency on high profile endpoints, overwhelmingly efficient memory and CPU consumption and scales effortlessly. [Learn more](https://ory-am.gitbooks.io/hydra/content/basics/architecture.html).
+* Hydra focuses on ease of use, integration, management and operation. [Get Hydra up and running in 5 Minutes](https://ory-am.gitbooks.io/hydra/content/demo.html).
+* Hydra helps you manage [Social Login Connections](https://ory-am.gitbooks.io/hydra/content/sso.html) as well as [JSON Web Keys](https://ory-am.gitbooks.io/hydra/content/jwk.html) and is planned to help you manage User Groups and Two Factor Authentication as well.
+* Hydra is available through [Docker](https://hub.docker.com/r/oryam/hydra/) and relies on RethinkDB for persistence.
 Database drivers are extensible in case you want to use RabbitMQ, MySQL, MongoDB, or some other database instead.
 
-Hydra is built for high throughput environments. Using 10.000 simultaneous connections on a Macbook Pro Late 2013,
-the OAuth2 token validation endpoint served on average **37500 requests / sec**. Other endpoints like the JSON Web Key endpoint
-serve up to 4700 requests / sec. Read [this issue](https://github.com/ory-am/hydra/issues/161) for information on reproducing these benchmarks yourself.
+Hydra is built for high volume environments and is capable of serving tens of thousands of simultaneous requests per second per instance. Read [this issue](https://github.com/ory-am/hydra/issues/161) for information on reproducing these benchmarks yourself.
 
 ## Feature Overview
 

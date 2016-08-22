@@ -1,6 +1,7 @@
 # Summary
 
 * [Introduction](README.md)
+* [What's it good for?](what-good.md)
 * [Basics](basics.md)
   * [Architecture](basics/architecture.md)
   * [Security](basics/security.md)

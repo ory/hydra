@@ -71,7 +71,7 @@ newPolicy, err := hydra.Policy.Create(&ladon.DefaultPolicy{
     Actions: []string{"get", "find"},
     Effect: ladon.AllowAccess,
     Conditions: ladon.Conditions{
-        "owner": &ladon.EqualSubjectCondition{},
+        "owner": &ladon.EqualsSubjectCondition{},
     },
 })
 

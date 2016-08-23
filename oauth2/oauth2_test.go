@@ -121,7 +121,7 @@ func init() {
 	}
 }
 
-func signConsentToken(claims map[string]interface{}) (string, error) {
+func signConsentToken(claims jwt.MapClaims) (string, error) {
 	token := jwt.New(jwt.SigningMethodRS256)
 	token.Claims = claims
 

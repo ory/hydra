@@ -34,6 +34,10 @@ func TestAuthCode(t *testing.T) {
 		pkg.RequireError(t, false, err)
 		require.True(t, tok.Valid)
 
+		jwtClaims, ok := tok.Claims.(jwt.MapClaims)
+		require.True(t, ok)
+		require.NotEmpty(t, jwtClaims)
+
 		consent, err := signConsentToken(map[string]interface{}{
 			"jti": uuid.New(),
 			"exp": time.Now().Add(time.Hour).Unix(),
@@ -43,7 +47,7 @@ func TestAuthCode(t *testing.T) {
 		})
 		pkg.RequireError(t, false, err)
 
-		http.Redirect(w, r, ejwt.ToString(tok.Claims["redir"])+"&consent="+consent, http.StatusFound)
+		http.Redirect(w, r, ejwt.ToString(jwtClaims["redir"])+"&consent="+consent, http.StatusFound)
 		validConsent = true
 	})
 

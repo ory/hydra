@@ -1,12 +1,12 @@
 package oauth2
 
 import (
-	"github.com/ory-am/fosite"
-	"time"
-	"strings"
-	"net/http"
-	"golang.org/x/net/context"
 	"github.com/Sirupsen/logrus"
+	"github.com/ory-am/fosite"
+	"golang.org/x/net/context"
+	"net/http"
+	"strings"
+	"time"
 )
 
 type LocalIntrospector struct {
@@ -40,6 +40,6 @@ func (w *LocalIntrospector) IntrospectToken(ctx context.Context, token string) (
 		IssuedAt:  auth.GetRequestedAt().Unix(),
 		NotBefore: auth.GetRequestedAt().Unix(),
 		ExpiresAt: session.AccessTokenExpiresAt(auth.GetRequestedAt().Add(w.AccessTokenLifespan)).Unix(),
-		Extra: session.Extra,
+		Extra:     session.Extra,
 	}, nil
 }

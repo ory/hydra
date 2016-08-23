@@ -11,13 +11,13 @@ import (
 	"github.com/ory-am/fosite/compose"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
+	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/internal"
 	"github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
-	"github.com/ory-am/hydra/herodot"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {
@@ -135,13 +135,12 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 		},
 		ConsentURL: *consentURL,
 		Introspector: &oauth2.LocalIntrospector{
-			OAuth2: o,
+			OAuth2:              o,
 			AccessTokenLifespan: c.GetAccessTokenLifespan(),
-			Issuer : c.Issuer,
-
+			Issuer:              c.Issuer,
 		},
-		Firewall:       ctx.Warden,
-		H:      &herodot.JSON{},
+		Firewall: ctx.Warden,
+		H:        &herodot.JSON{},
 	}
 
 	handler.SetRoutes(router)

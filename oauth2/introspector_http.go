@@ -1,17 +1,17 @@
 package oauth2
 
 import (
-	"net/url"
 	"bytes"
+	"encoding/json"
+	"github.com/go-errors/errors"
+	"github.com/ory-am/fosite"
+	"golang.org/x/net/context"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/clientcredentials"
 	"io/ioutil"
 	"net/http"
-	"golang.org/x/net/context"
+	"net/url"
 	"strconv"
-	"encoding/json"
-	"github.com/ory-am/fosite"
-	"golang.org/x/oauth2/clientcredentials"
-	"golang.org/x/oauth2"
-	"github.com/go-errors/errors"
 )
 
 type HTTPIntrospector struct {

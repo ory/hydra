@@ -3,11 +3,9 @@ package oauth2
 import (
 	"fmt"
 	"time"
-
 	"crypto/rsa"
 
 	"github.com/dgrijalva/jwt-go"
-
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/handler/openid"

@@ -13,9 +13,9 @@ import (
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
+	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
-	"github.com/stretchr/testify/assert"
 )
 
 var rethinkManager *FositeRehinkDBStore
@@ -111,8 +111,8 @@ func TestColdStartRethinkManager(t *testing.T) {
 	err := m.CreateAuthorizeCodeSession(ctx, id, &defaultRequest)
 	pkg.AssertError(t, false, err)
 	err = m.CreateAccessTokenSession(ctx, "12345", &fosite.Request{
-		RequestedAt:   time.Now().Round(time.Second),
-		Client:        &client.Client{ID: "baz"},
+		RequestedAt: time.Now().Round(time.Second),
+		Client:      &client.Client{ID: "baz"},
 	})
 	pkg.AssertError(t, false, err)
 

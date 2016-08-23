@@ -38,7 +38,7 @@ var tokenUserCmd = &cobra.Command{
 				AuthURL:  pkg.JoinURLStrings(c.ClusterURL, "/oauth2/auth"),
 			},
 			RedirectURL: "http://localhost:4445/callback",
-			Scopes: scopes,
+			Scopes:      scopes,
 		}
 
 		state, err := sequence.RuneSequence(24, []rune("abcdefghijklmnopqrstuvwxyz"))

@@ -18,7 +18,7 @@ import:
 - package: github.com/dgrijalva/jwt-go
   version: ~3.0.0
 - package: github.com/ory-am/fosite
-  version: 76ef7ea8f51735d63476cd91e1f9a9f367d544cb #should be changed to a sem-ver
+  version: ~0.3.0
   subpackages:
   - compose
   - fosite-example/pkg

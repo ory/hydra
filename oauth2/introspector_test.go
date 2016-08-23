@@ -1,29 +1,30 @@
 package oauth2_test
 
 import (
-	"testing"
-	"time"
-	"github.com/stretchr/testify/assert"
-	"golang.org/x/net/context"
-	"github.com/ory-am/hydra/pkg"
 	"net/http/httptest"
 	"net/url"
-	"github.com/ory-am/hydra/warden"
-	"github.com/ory-am/fosite"
-	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/hydra/herodot"
-	foauth2 "github.com/ory-am/fosite/handler/oauth2"
-	goauth2 "golang.org/x/oauth2"
+	"testing"
+	"time"
+
 	"github.com/Sirupsen/logrus"
+	"github.com/julienschmidt/httprouter"
+	"github.com/ory-am/fosite"
+	foauth2 "github.com/ory-am/fosite/handler/oauth2"
+	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/oauth2"
+	"github.com/ory-am/hydra/pkg"
+	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/ladon"
+	"github.com/stretchr/testify/assert"
+	"golang.org/x/net/context"
+	goauth2 "golang.org/x/oauth2"
 )
 
 var (
 	introspectors = make(map[string]oauth2.Introspector)
-	now = time.Now().Round(time.Second)
-	tokens = pkg.Tokens(3)
-	fositeStore = pkg.FositeStore()
+	now           = time.Now().Round(time.Second)
+	tokens        = pkg.Tokens(3)
+	fositeStore   = pkg.FositeStore()
 )
 
 var ladonWarden = pkg.LadonWarden(map[string]ladon.Policy{
@@ -48,7 +49,7 @@ var localWarden = &warden.LocalWarden{
 	OAuth2: &fosite.Fosite{
 		Store: fositeStore,
 		TokenValidators: fosite.TokenValidators{
-			&foauth2.CoreValidator{
+			0: &foauth2.CoreValidator{
 				CoreStrategy:  pkg.HMACStrategy,
 				CoreStorage:   fositeStore,
 				ScopeStrategy: fosite.HierarchicScopeStrategy,
@@ -62,36 +63,36 @@ var localWarden = &warden.LocalWarden{
 
 func init() {
 	introspectors["local"] = &oauth2.LocalIntrospector{
-		OAuth2: localWarden.OAuth2,
-		Issuer: "tests",
+		OAuth2:              localWarden.OAuth2,
+		Issuer:              "tests",
 		AccessTokenLifespan: time.Hour,
 	}
 
 	r := httprouter.New()
 	serv := &oauth2.Handler{
-		Firewall: localWarden,
-		H:      &herodot.JSON{},
+		Firewall:     localWarden,
+		H:            &herodot.JSON{},
 		Introspector: introspectors["local"],
 	}
 	serv.SetRoutes(r)
 	ts = httptest.NewServer(r)
 
 	ar := fosite.NewAccessRequest(oauth2.NewSession("alice"))
-	ar.GrantedScopes = fosite.Arguments{"core"}
+	ar.GrantedScopes = fosite.Arguments{0: "core"}
 	ar.RequestedAt = now
 	ar.Client = &fosite.DefaultClient{ID: "siri"}
 	ar.Session.(*oauth2.Session).Extra = map[string]interface{}{"foo": "bar"}
 	fositeStore.CreateAccessTokenSession(nil, tokens[0][0], ar)
 
 	ar2 := fosite.NewAccessRequest(oauth2.NewSession("siri"))
-	ar2.GrantedScopes = fosite.Arguments{"core"}
+	ar2.GrantedScopes = fosite.Arguments{0: "core"}
 	ar2.RequestedAt = now
 	ar2.Session.(*oauth2.Session).Extra = map[string]interface{}{"foo": "bar"}
 	ar2.Client = &fosite.DefaultClient{ID: "siri"}
 	fositeStore.CreateAccessTokenSession(nil, tokens[1][0], ar2)
 
 	ar3 := fosite.NewAccessRequest(oauth2.NewSession("siri"))
-	ar3.GrantedScopes = fosite.Arguments{"core"}
+	ar3.GrantedScopes = fosite.Arguments{0: "core"}
 	ar3.RequestedAt = now
 	ar2.Session.(*oauth2.Session).Extra = map[string]interface{}{"foo": "bar"}
 	ar3.Client = &fosite.DefaultClient{ID: "doesnt-exist"}

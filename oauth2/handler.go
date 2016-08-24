@@ -7,9 +7,9 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
+	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/pkg"
-	"github.com/ory-am/hydra/firewall"
 )
 
 const (
@@ -24,15 +24,15 @@ const (
 )
 
 type Handler struct {
-	OAuth2       fosite.OAuth2Provider
-	Consent      ConsentStrategy
+	OAuth2  fosite.OAuth2Provider
+	Consent ConsentStrategy
 
 	Introspector Introspector
 	Firewall     firewall.Firewall
-	H      herodot.Herodot
+	H            herodot.Herodot
 
-	ForcedHTTP   bool
-	ConsentURL   url.URL
+	ForcedHTTP bool
+	ConsentURL url.URL
 }
 
 func (this *Handler) SetRoutes(r *httprouter.Router) {

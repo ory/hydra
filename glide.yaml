@@ -15,8 +15,10 @@ import:
   subpackages:
   - pkg
   - rand/sequence
+- package: github.com/dgrijalva/jwt-go
+  version: ~3.0.0
 - package: github.com/ory-am/fosite
-  version: ~0.2.3
+  version: ~0.3.0
   subpackages:
   - compose
   - fosite-example/pkg
@@ -54,8 +56,6 @@ import:
 - package: golang.org/x/oauth2
   subpackages:
   - clientcredentials
-- package: github.com/dgrijalva/jwt-go
-  version: ~2.7.0
 - package: gopkg.in/tylerb/graceful.v1
   version: ~1.2.11
 - package: gopkg.in/yaml.v2

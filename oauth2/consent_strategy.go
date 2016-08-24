@@ -3,10 +3,9 @@ package oauth2
 import (
 	"fmt"
 	"time"
-
 	"crypto/rsa"
-	"github.com/dgrijalva/jwt-go"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/go-errors/errors"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/handler/openid"
@@ -46,32 +45,34 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 		return rsaKey, nil
 	})
 
-	if err != nil {
+	// make sure to use MapClaims since that is the default..
+	jwtClaims, ok := t.Claims.(jwt.MapClaims)
+	if err != nil || !ok {
 		return nil, errors.Errorf("Couldn't parse token: %v", err)
 	} else if !t.Valid {
 		return nil, errors.Errorf("Token is invalid")
 	}
 
-	if time.Now().After(ejwt.ToTime(t.Claims["exp"])) {
+	if time.Now().After(ejwt.ToTime(jwtClaims["exp"])) {
 		return nil, errors.Errorf("Token expired")
 	}
 
-	if ejwt.ToString(t.Claims["aud"]) != a.GetClient().GetID() {
+	if ejwt.ToString(jwtClaims["aud"]) != a.GetClient().GetID() {
 		return nil, errors.Errorf("Audience mismatch")
 	}
 
-	subject := ejwt.ToString(t.Claims["sub"])
-	scopes := toStringSlice(t.Claims["scp"])
+	subject := ejwt.ToString(jwtClaims["sub"])
+	scopes := toStringSlice(jwtClaims["scp"])
 	for _, scope := range scopes {
 		a.GrantScope(scope)
 	}
 
 	var idExt map[string]interface{}
 	var atExt map[string]interface{}
-	if ext, ok := t.Claims["id_ext"].(map[string]interface{}); ok {
+	if ext, ok := jwtClaims["id_ext"].(map[string]interface{}); ok {
 		idExt = ext
 	}
-	if ext, ok := t.Claims["at_ext"].(map[string]interface{}); ok {
+	if ext, ok := jwtClaims["at_ext"].(map[string]interface{}); ok {
 		atExt = ext
 	}
 
@@ -107,14 +108,13 @@ func toStringSlice(i interface{}) []string {
 			}
 		}
 		return ret
-	} else {
-		return []string{}
 	}
+	return []string{}
 }
 
 func (s *DefaultConsentStrategy) IssueChallenge(authorizeRequest fosite.AuthorizeRequester, redirectURL string) (string, error) {
 	token := jwt.New(jwt.SigningMethodRS256)
-	token.Claims = map[string]interface{}{
+	token.Claims = jwt.MapClaims{
 		"jti":   uuid.New(),
 		"scp":   authorizeRequest.GetRequestedScopes(),
 		"aud":   authorizeRequest.GetClient().GetID(),

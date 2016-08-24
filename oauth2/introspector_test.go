@@ -1,29 +1,30 @@
 package oauth2_test
 
 import (
-	"testing"
-	"time"
-	"github.com/stretchr/testify/assert"
-	"golang.org/x/net/context"
-	"github.com/ory-am/hydra/pkg"
 	"net/http/httptest"
 	"net/url"
-	"github.com/ory-am/hydra/warden"
-	"github.com/ory-am/fosite"
-	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/hydra/herodot"
-	foauth2 "github.com/ory-am/fosite/handler/oauth2"
-	goauth2 "golang.org/x/oauth2"
+	"testing"
+	"time"
+
 	"github.com/Sirupsen/logrus"
+	"github.com/julienschmidt/httprouter"
+	"github.com/ory-am/fosite"
+	foauth2 "github.com/ory-am/fosite/handler/oauth2"
+	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/oauth2"
+	"github.com/ory-am/hydra/pkg"
+	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/ladon"
+	"github.com/stretchr/testify/assert"
+	"golang.org/x/net/context"
+	goauth2 "golang.org/x/oauth2"
 )
 
 var (
 	introspectors = make(map[string]oauth2.Introspector)
-	now = time.Now().Round(time.Second)
-	tokens = pkg.Tokens(3)
-	fositeStore = pkg.FositeStore()
+	now           = time.Now().Round(time.Second)
+	tokens        = pkg.Tokens(3)
+	fositeStore   = pkg.FositeStore()
 )
 
 var ladonWarden = pkg.LadonWarden(map[string]ladon.Policy{
@@ -48,7 +49,7 @@ var localWarden = &warden.LocalWarden{
 	OAuth2: &fosite.Fosite{
 		Store: fositeStore,
 		TokenValidators: fosite.TokenValidators{
-			&foauth2.CoreValidator{
+			0: &foauth2.CoreValidator{
 				CoreStrategy:  pkg.HMACStrategy,
 				CoreStorage:   fositeStore,
 				ScopeStrategy: fosite.HierarchicScopeStrategy,
@@ -62,15 +63,15 @@ var localWarden = &warden.LocalWarden{
 
 func init() {
 	introspectors["local"] = &oauth2.LocalIntrospector{
-		OAuth2: localWarden.OAuth2,
-		Issuer: "tests",
+		OAuth2:              localWarden.OAuth2,
+		Issuer:              "tests",
 		AccessTokenLifespan: time.Hour,
 	}
 
 	r := httprouter.New()
 	serv := &oauth2.Handler{
-		Firewall: localWarden,
-		H:      &herodot.JSON{},
+		Firewall:     localWarden,
+		H:            &herodot.JSON{},
 		Introspector: introspectors["local"],
 	}
 	serv.SetRoutes(r)

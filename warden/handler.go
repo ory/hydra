@@ -132,7 +132,7 @@ func (h *WardenHandler) TokenAllowed(w http.ResponseWriter, r *http.Request, _ h
 	clientCtx, err := h.Warden.TokenAllowed(ctx, h.Warden.TokenFromRequest(r), &ladon.Request{
 		Resource: "rn:hydra:warden:token:allowed",
 		Action:   "decide",
-	}, "warden.token")
+	}, "hydra.warden")
 	if err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return

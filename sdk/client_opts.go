@@ -54,7 +54,6 @@ func ClusterURL(urlStr string) option {
 	}
 }
 
-
 // ClientID sets the OAuth2 Client ID.
 //
 //  var hydra, err = sdk.Connect(

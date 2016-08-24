@@ -15,8 +15,8 @@ import (
 )
 
 type LocalWarden struct {
-	Warden              ladon.Warden
-	OAuth2              fosite.OAuth2Provider
+	Warden ladon.Warden
+	OAuth2 fosite.OAuth2Provider
 
 	AccessTokenLifespan time.Duration
 	Issuer              string

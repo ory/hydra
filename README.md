@@ -45,6 +45,7 @@ Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://git
   - [HTTP API Documentation](#http-api-documentation)
   - [Command Line Documentation](#command-line-documentation)
   - [Develop](#develop)
+- [Third-party libraries and projects](#third-party-libraries-and-projects)
 - [Hall of Fame](#hall-of-fame)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -256,6 +257,10 @@ Run against RethinkDB using Docker:
 docker run --name some-rethink -d -p 8080:8080 -p 28015:28015 rethinkdb
 DATABASE_URL=rethinkdb://localhost:28015/hydra go run main.go host
 ```
+
+## Third-party libraries and projects
+
+* [Hydra middleware for Gin](https://github.com/janekolszak/gin-hydra)
 
 ## Hall of Fame
 

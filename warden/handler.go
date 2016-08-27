@@ -68,7 +68,7 @@ func (h *WardenHandler) SetRoutes(r *httprouter.Router) {
 
 func (h *WardenHandler) TokenValid(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := herodot.NewContext()
-	clientCtx, err := h.Warden.TokenAllowed(ctx, h.Warden.TokenFromRequest(r), &ladon.Request{
+	_, err := h.Warden.TokenAllowed(ctx, h.Warden.TokenFromRequest(r), &ladon.Request{
 		Resource: "rn:hydra:warden:token:valid",
 		Action:   "decide",
 	}, "hydra.warden")
@@ -90,7 +90,6 @@ func (h *WardenHandler) TokenValid(w http.ResponseWriter, r *http.Request, _ htt
 		return
 	}
 
-	authContext.Audience = clientCtx.Subject
 	h.H.Write(ctx, w, r, struct {
 		*firewall.Context
 		Valid bool `json:"valid"`
@@ -129,7 +128,7 @@ func (h *WardenHandler) Allowed(w http.ResponseWriter, r *http.Request, _ httpro
 
 func (h *WardenHandler) TokenAllowed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := herodot.NewContext()
-	clientCtx, err := h.Warden.TokenAllowed(ctx, h.Warden.TokenFromRequest(r), &ladon.Request{
+	_, err := h.Warden.TokenAllowed(ctx, h.Warden.TokenFromRequest(r), &ladon.Request{
 		Resource: "rn:hydra:warden:token:allowed",
 		Action:   "decide",
 	}, "hydra.warden")
@@ -154,7 +153,6 @@ func (h *WardenHandler) TokenAllowed(w http.ResponseWriter, r *http.Request, _ h
 		return
 	}
 
-	authContext.Audience = clientCtx.Subject
 	h.H.Write(ctx, w, r, struct {
 		*firewall.Context
 		Allowed bool `json:"allowed"`

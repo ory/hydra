@@ -88,7 +88,7 @@ func init() {
 	ar2 := fosite.NewAccessRequest(oauth2.NewSession("siri"))
 	ar2.GrantedScopes = fosite.Arguments{"core", "hydra.warden"}
 	ar2.RequestedAt = now
-	ar2.Client = &fosite.DefaultClient{ID: "siri"}
+	ar2.Client = &fosite.DefaultClient{ID: "bob"}
 	fositeStore.CreateAccessTokenSession(nil, tokens[1][0], ar2)
 
 	ar3 := fosite.NewAccessRequest(oauth2.NewSession("siri"))
@@ -195,6 +195,7 @@ func TestActionAllowed(t *testing.T) {
 				scopes:    []string{"core"},
 				expectErr: false,
 				assert: func(c *firewall.Context) {
+					assert.Equal(t, "siri", c.Audience)
 					assert.Equal(t, "alice", c.Subject)
 					assert.Equal(t, "tests", c.Issuer)
 					assert.Equal(t, now.Add(time.Hour), c.ExpiresAt)
@@ -286,6 +287,7 @@ func TestTokenValid(t *testing.T) {
 				scopes:    []string{"core"},
 				expectErr: false,
 				assert: func(c *firewall.Context) {
+					assert.Equal(t, "bob", c.Audience)
 					assert.Equal(t, "siri", c.Subject)
 					assert.Equal(t, "tests", c.Issuer)
 					assert.Equal(t, now.Add(time.Hour), c.ExpiresAt, "expires at", n)

@@ -39,16 +39,9 @@ after_success:
 
 deploy:
   provider: releases
-  api_key: $GITHUB_TOKEN
-  file:
-    - dist/hydra-darwin-386
-    - dist/hydra-darwin-amd64
-    - dist/hydra-freebsd-386
-    - dist/hydra-freebsd-amd64
-    - dist/hydra-linux-arm
-    - dist/hydra-netbsd-arm
-    - dist/hydra-openbsd-386
-    - dist/hydra-windows-amd64.exe
+  api_key: ${GITHUB_TOKEN}
+  file_glob: true
+  file: dist/*
   skip_cleanup: true
   on:
     tags: true

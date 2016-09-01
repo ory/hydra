@@ -39,9 +39,9 @@ after_success:
 
 deploy:
   provider: releases
-  api_key: ${GITHUB_TOKEN}
   file_glob: true
-  file: dist/*
+  api_key: $GITHUB_TOKEN
+  file: "dist/*"
   skip_cleanup: true
   on:
     tags: true

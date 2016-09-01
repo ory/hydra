@@ -14,7 +14,7 @@ go:
   - 1.7
 
 install:
-  - go get github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/pierrre/gotestcover github.com/Masterminds/glide
+  - go get github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/pierrre/gotestcover github.com/Masterminds/glide github.com/mitchellh/gox github.com/tcnksm/ghr
   - git clone https://github.com/docker-library/official-images.git ~/official-images
   - glide install
   - go install github.com/ory-am/hydra
@@ -29,3 +29,27 @@ script:
   - $GOPATH/bin/hydra host --dangerous-auto-logon &
   - while ! echo exit | nc localhost 4444; do sleep 1; done
   - $GOPATH/bin/hydra token client --skip-tls-verify
+
+after_success:
+  - gox -ldflags "-s \
+                  -X main.Version=`git describe --tags` \
+                  -X main.BuildTime=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` \
+                  -X main.GitHash=`git rev-parse HEAD`" -output "dist/{{.Dir}}-{{.OS}}-{{.Arch}}"
+  # - ghr --username arekkas --token $GITHUB_TOKEN --replace --prerelease --debug pre-release dist/
+
+deploy:
+  provider: releases
+  api_key: $GITHUB_TOKEN
+  file:
+    - dist/hydra-darwin-386
+    - dist/hydra-darwin-amd64
+    - dist/hydra-freebsd-386
+    - dist/hydra-freebsd-amd64
+    - dist/hydra-linux-arm
+    - dist/hydra-netbsd-arm
+    - dist/hydra-openbsd-386
+    - dist/hydra-windows-amd64.exe
+  skip_cleanup: true
+  on:
+    tags: true
+    go: 1.7

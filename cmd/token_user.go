@@ -97,6 +97,7 @@ var tokenUserCmd = &cobra.Command{
 
 			idt := token.Extra("id_token")
 			if idt != nil {
+				w.Write([]byte(fmt.Sprintf("ID Token: %s\n", idt)))
 				fmt.Printf("ID Token: %s\n", idt)
 			}
 		})

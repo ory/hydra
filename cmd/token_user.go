@@ -108,6 +108,6 @@ var tokenUserCmd = &cobra.Command{
 
 func init() {
 	tokenCmd.AddCommand(tokenUserCmd)
-	tokenUserCmd.Flags().Bool("no-open", false, "Do not open a browser window with the authorize url")
+	tokenUserCmd.Flags().Bool("no-open", false, "Do not open the browser window automatically")
 	tokenUserCmd.Flags().StringSlice("scopes", []string{"hydra", "offline", "openid"}, "Ask for specific scopes")
 }

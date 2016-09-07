@@ -30,30 +30,31 @@ var defaultOptions = []option{
 
 // Client offers easy use of all HTTP clients.
 type Client struct {
-	// Client offers OAuth2 Client management capabilities.
-	Client *client.HTTPManager
+	// Clients offers OAuth2 Client management capabilities.
+	Clients           *client.HTTPManager
 
-	// SSO offers Social Login management capabilities.
-	SSO *connection.HTTPManager
+	// SocialConnections offers Social Login management capabilities.
+	SocialConnections *connection.HTTPManager
 
-	// JWK offers JSON Web Key management capabilities.
-	JWK *jwk.HTTPManager
+	// JSONWebKeys offers JSON Web Key management capabilities.
+	JSONWebKeys       *jwk.HTTPManager
 
 	// Policies offers Access Policy management capabilities.
-	Policies *policy.HTTPManager
+	Policies          *policy.HTTPManager
 
-	// Warden offers Access Token and Access Request validation strategies.
-	Warden *warden.HTTPWarden
+	// Warden offers Access Token and Access Request validation strategies (for first-party resource servers).
+	Warden            *warden.HTTPWarden
 
-	Introspector *hoauth2.HTTPIntrospector
+	// Introspection offers Access Token and Access Request introspection strategies (according to RFC 7662).
+	Introspection     *hoauth2.HTTPIntrospector
 
-	http          *http.Client
-	clusterURL    *url.URL
-	clientID      string
-	clientSecret  string
-	skipTLSVerify bool
-	scopes        []string
-	credentials   clientcredentials.Config
+	http              *http.Client
+	clusterURL        *url.URL
+	clientID          string
+	clientSecret      string
+	skipTLSVerify     bool
+	scopes            []string
+	credentials       clientcredentials.Config
 }
 
 // Connect instantiates a new client to communicate with Hydra.
@@ -108,22 +109,22 @@ func Connect(opts ...option) (*Client, error) {
 	}
 
 	// initialize service endpoints
-	c.Client = &client.HTTPManager{
+	c.Clients = &client.HTTPManager{
 		Endpoint: pkg.JoinURL(c.clusterURL, "/clients"),
 		Client:   c.http,
 	}
 
-	c.SSO = &connection.HTTPManager{
+	c.SocialConnections = &connection.HTTPManager{
 		Endpoint: pkg.JoinURL(c.clusterURL, "/connections"),
 		Client:   c.http,
 	}
 
-	c.Introspector = &hoauth2.HTTPIntrospector{
+	c.Introspection = &hoauth2.HTTPIntrospector{
 		Endpoint: pkg.JoinURL(c.clusterURL, hoauth2.IntrospectPath),
 		Client:   c.http,
 	}
 
-	c.JWK = &jwk.HTTPManager{
+	c.JSONWebKeys = &jwk.HTTPManager{
 		Endpoint: pkg.JoinURL(c.clusterURL, "/keys"),
 		Client:   c.http,
 	}

@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	tlsKeyName = "hydra.tls"
+	tlsKeyName = "hydra.https-tls"
 )
 
 func loadCertificateFromFile(cmd *cobra.Command) *tls.Certificate {

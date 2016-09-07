@@ -15,8 +15,8 @@ import (
 )
 
 const (
-	ConsentChallengeKey = "consent.challenge"
-	ConsentEndpointKey  = "consent.endpoint"
+	ConsentChallengeKey = "hydra.consent.challenge"
+	ConsentEndpointKey  = "hydra.consent.response"
 )
 
 type DefaultConsentStrategy struct {

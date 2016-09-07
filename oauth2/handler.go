@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	OpenIDConnectKeyName = "hydra.openid.connect"
+	OpenIDConnectKeyName = "hydra.openid.id-token"
 
 	ConsentPath = "/oauth2/consent"
 	TokenPath   = "/oauth2/token"

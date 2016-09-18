@@ -11,3 +11,4 @@ vendor/
 cover.out
 output/
 _book/
+dist/

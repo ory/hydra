@@ -5,7 +5,7 @@ at using OAuth2 for your app, you already have user authentication anyways.
 
 In abstract, a consent flow looks like this:
 
-![](../dist/images/consent.png)
+![](../images/consent.png)
 
 1. A *client* application (app in browser in laptop) requests an access token from a resource owner: `https://hydra.myapp.com/oauth2/auth?client_id=c3b49cf0-88e4-4faa-9489-28d5b8957858&response_type=code&scope=core+hydra&state=vboeidlizlxrywkwlsgeggff&nonce=tedgziijemvninkuotcuuiof`.
 2. Hydra generates a consent challenge and forwards the *user agent* (browser in laptop) to the *consent endpoint*: `https://login.myapp.com/?challenge=eyJhbGciOiJSUzI1N...`.

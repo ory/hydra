@@ -146,7 +146,7 @@ func (s *FositeRehinkDBStore) GetOpenIDConnectSession(_ context.Context, authori
 	defer s.RUnlock()
 	cl, ok := s.IDSessions[authorizeCode]
 	if !ok {
-		return nil, fosite.ErrNotFound
+		return nil, errors.Wrap(fosite.ErrNotFound, "")
 	}
 	return requestFromRDB(cl, requester.GetSession())
 }
@@ -167,7 +167,7 @@ func (s *FositeRehinkDBStore) GetAuthorizeCodeSession(_ context.Context, code st
 	defer s.RUnlock()
 	rel, ok := s.AuthorizeCodes[code]
 	if !ok {
-		return nil, fosite.ErrNotFound
+		return nil, errors.Wrap(fosite.ErrNotFound, "")
 	}
 
 	return requestFromRDB(rel, sess)
@@ -189,7 +189,7 @@ func (s *FositeRehinkDBStore) GetAccessTokenSession(_ context.Context, signature
 	defer s.RUnlock()
 	rel, ok := s.AccessTokens[signature]
 	if !ok {
-		return nil, fosite.ErrNotFound
+		return nil, errors.Wrap(fosite.ErrNotFound, "")
 	}
 
 	return requestFromRDB(rel, sess)
@@ -211,7 +211,7 @@ func (s *FositeRehinkDBStore) GetRefreshTokenSession(_ context.Context, signatur
 	defer s.RUnlock()
 	rel, ok := s.RefreshTokens[signature]
 	if !ok {
-		return nil, fosite.ErrNotFound
+		return nil, errors.Wrap(fosite.ErrNotFound, "")
 	}
 
 	return requestFromRDB(rel, sess)

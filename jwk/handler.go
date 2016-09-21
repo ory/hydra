@@ -199,7 +199,13 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	var setName = ps.ByName("set")
 	var keyName = ps.ByName("key")
 
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &ladon.Request{
+	if err := h.W.IsAllowed(ctx, &ladon.Request{
+		Subject: "",
+		Resource: "rn:hydra:keys:" + setName + ":" + keyName,
+		Action:   "get",
+	}); err == nil {
+		// Allow unauthorized requests to access this resource if it is enabled by policies
+	} else if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &ladon.Request{
 		Resource: "rn:hydra:keys:" + setName + ":" + keyName,
 		Action:   "get",
 	}, "hydra.keys.get"); err != nil {

@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/julienschmidt/httprouter"
 	ejwt "github.com/ory-am/fosite/token/jwt"
 	"github.com/ory-am/hydra/jwk"

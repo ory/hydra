@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/ory-am/hydra/pkg/helper"
 )
 
@@ -30,7 +30,7 @@ func (s *SuperAgent) doDry(req *http.Request) error {
 func (s *SuperAgent) Delete() error {
 	req, err := http.NewRequest("DELETE", s.URL, nil)
 	if err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 
 	if err := s.doDry(req); err != nil {
@@ -39,7 +39,7 @@ func (s *SuperAgent) Delete() error {
 
 	resp, err := s.Client.Do(req)
 	if err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 	defer resp.Body.Close()
 
@@ -54,7 +54,7 @@ func (s *SuperAgent) Delete() error {
 func (s *SuperAgent) Get(o interface{}) error {
 	req, err := http.NewRequest("GET", s.URL, nil)
 	if err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	} else if o == nil {
 		return errors.New("Can not pass nil")
 	}
@@ -65,7 +65,7 @@ func (s *SuperAgent) Get(o interface{}) error {
 
 	resp, err := s.Client.Do(req)
 	if err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 	defer resp.Body.Close()
 
@@ -73,7 +73,7 @@ func (s *SuperAgent) Get(o interface{}) error {
 		body, _ := ioutil.ReadAll(resp.Body)
 		return errors.Errorf("Expected status code %d, got %d.\n%s\n", http.StatusOK, resp.StatusCode, body)
 	} else if err := json.NewDecoder(resp.Body).Decode(o); err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 
 	return nil
@@ -98,12 +98,12 @@ func (s *SuperAgent) send(method string, in interface{}, out interface{}) error 
 
 	data, err := json.Marshal(in)
 	if err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 
 	req, err := http.NewRequest(method, s.URL, bytes.NewReader(data))
 	if err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -113,7 +113,7 @@ func (s *SuperAgent) send(method string, in interface{}, out interface{}) error 
 
 	resp, err := s.Client.Do(req)
 	if err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {

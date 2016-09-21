@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/pkg"
@@ -68,7 +68,7 @@ func getOrCreateTLSCertificate(cmd *cobra.Command, c *config.Config) tls.Certifi
 
 	ctx := c.Context()
 	keys, err := ctx.KeyManager.GetKey(tlsKeyName, "private")
-	if errors.Is(err, pkg.ErrNotFound) {
+	if errors.Cause(err) == pkg.ErrNotFound {
 		logrus.Warn("No TLS Key / Certificate for HTTPS found. Generating self-signed certificate.")
 
 		keys, err = new(jwk.ECDSA256Generator).Generate("")

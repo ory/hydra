@@ -7,7 +7,7 @@ import (
 
 	"crypto/x509"
 
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/square/go-jose"
 )
 

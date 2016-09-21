@@ -3,7 +3,7 @@ package client
 import (
 	"sync"
 
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/hash"
 	"github.com/ory-am/hydra/pkg"
@@ -22,7 +22,7 @@ func (m *MemoryManager) GetConcreteClient(id string) (*Client, error) {
 
 	c, ok := m.Clients[id]
 	if !ok {
-		return nil, errors.New(pkg.ErrNotFound)
+		return nil, errors.Wrap(pkg.ErrNotFound, "")
 	}
 	return &c, nil
 }
@@ -37,11 +37,11 @@ func (m *MemoryManager) Authenticate(id string, secret []byte) (*Client, error) 
 
 	c, ok := m.Clients[id]
 	if !ok {
-		return nil, errors.New(pkg.ErrNotFound)
+		return nil, errors.Wrap(pkg.ErrNotFound, "")
 	}
 
 	if err := m.Hasher.Compare(c.GetHashedSecret(), secret); err != nil {
-		return nil, errors.New(err)
+		return nil, errors.Wrap(err, "")
 	}
 
 	return &c, nil
@@ -57,7 +57,7 @@ func (m *MemoryManager) CreateClient(c *Client) error {
 
 	hash, err := m.Hasher.Hash([]byte(c.Secret))
 	if err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 	c.Secret = string(hash)
 

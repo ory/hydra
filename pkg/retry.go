@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 )
 
 func Retry(maxWait time.Duration, failAfter time.Duration, f func() error) (err error) {

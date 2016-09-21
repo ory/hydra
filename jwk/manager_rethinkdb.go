@@ -10,7 +10,7 @@ import (
 	"fmt"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/square/go-jose"
 	"golang.org/x/net/context"
@@ -29,7 +29,7 @@ type RethinkManager struct {
 
 func (m *RethinkManager) SetUpIndex() error {
 	if _, err := m.Table.IndexWait("kid").Run(m.Session); err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 	return nil
 }
@@ -55,12 +55,12 @@ func (m *RethinkManager) GetKey(set, kid string) (*jose.JsonWebKeySet, error) {
 	m.alloc()
 	keys, found := m.Keys[set]
 	if !found {
-		return nil, errors.New(pkg.ErrNotFound)
+		return nil, errors.Wrap(pkg.ErrNotFound, "")
 	}
 
 	result := keys.Key(kid)
 	if len(result) == 0 {
-		return nil, errors.New(pkg.ErrNotFound)
+		return nil, errors.Wrap(pkg.ErrNotFound, "")
 	}
 
 	return &jose.JsonWebKeySet{
@@ -75,11 +75,11 @@ func (m *RethinkManager) GetKeySet(set string) (*jose.JsonWebKeySet, error) {
 	m.alloc()
 	keys, found := m.Keys[set]
 	if !found {
-		return nil, errors.New(pkg.ErrNotFound)
+		return nil, errors.Wrap(pkg.ErrNotFound, "")
 	}
 
 	if len(keys.Keys) == 0 {
-		return nil, errors.New(pkg.ErrNotFound)
+		return nil, errors.Wrap(pkg.ErrNotFound, "")
 	}
 
 	return &keys, nil
@@ -88,18 +88,18 @@ func (m *RethinkManager) GetKeySet(set string) (*jose.JsonWebKeySet, error) {
 func (m *RethinkManager) DeleteKey(set, kid string) error {
 	keys, err := m.GetKey(set, kid)
 	if err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 
 	if err := m.publishDelete(set, keys.Keys); err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 	return nil
 }
 
 func (m *RethinkManager) DeleteKeySet(set string) error {
 	if err := m.publishDeleteAll(set); err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 	return nil
 }
@@ -121,11 +121,11 @@ func (m *RethinkManager) publishAdd(set string, keys []jose.JsonWebKey) error {
 	for k, key := range keys {
 		out, err := json.Marshal(key)
 		if err != nil {
-			return errors.New(err)
+			return errors.Wrap(err, "")
 		}
 		encrypted, err := m.Cipher.Encrypt(out)
 		if err != nil {
-			return errors.New(err)
+			return errors.Wrap(err, "")
 		}
 		raws[k] = encrypted
 	}
@@ -136,7 +136,7 @@ func (m *RethinkManager) publishAdd(set string, keys []jose.JsonWebKey) error {
 			Set: set,
 			Key: raw,
 		}).RunWrite(m.Session); err != nil {
-			return errors.New(err)
+			return errors.Wrap(err, "")
 		}
 	}
 
@@ -146,7 +146,7 @@ func (m *RethinkManager) publishDeleteAll(set string) error {
 	if err := m.Table.Filter(map[string]interface{}{
 		"set": set,
 	}).Delete().Exec(m.Session); err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 	return nil
 }
@@ -157,7 +157,7 @@ func (m *RethinkManager) publishDelete(set string, keys []jose.JsonWebKey) error
 			"kid": key.KeyID,
 			"set": set,
 		}).Delete().RunWrite(m.Session); err != nil {
-			return errors.New(err)
+			return errors.Wrap(err, "")
 		}
 	}
 	return nil
@@ -167,7 +167,7 @@ func (m *RethinkManager) Watch(ctx context.Context) {
 	go pkg.Retry(time.Second*15, time.Minute, func() error {
 		connections, err := m.Table.Changes().Run(m.Session)
 		if err != nil {
-			return errors.New(err)
+			return errors.Wrap(err, "")
 		}
 		defer connections.Close()
 
@@ -187,7 +187,7 @@ func (m *RethinkManager) Watch(ctx context.Context) {
 		}
 
 		if connections.Err() != nil {
-			err = errors.New(connections.Err())
+			err = errors.Wrap(connections.Err(), "")
 			pkg.LogError(err)
 			return err
 		}
@@ -199,12 +199,12 @@ func (m *RethinkManager) watcherInsert(val *rethinkSchema) {
 	var c jose.JsonWebKey
 	key, err := m.Cipher.Decrypt(val.Key)
 	if err != nil {
-		pkg.LogError(errors.New(err))
+		pkg.LogError(errors.Wrap(err, ""))
 		return
 	}
 
 	if err := json.Unmarshal(key, &c); err != nil {
-		pkg.LogError(errors.New(err))
+		pkg.LogError(errors.Wrap(err, ""))
 		return
 	}
 
@@ -233,7 +233,7 @@ func (m *RethinkManager) ColdStart() error {
 	m.Keys = map[string]jose.JsonWebKeySet{}
 	clients, err := m.Table.Run(m.Session)
 	if err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 
 	var raw *rethinkSchema
@@ -247,7 +247,7 @@ func (m *RethinkManager) ColdStart() error {
 		}
 
 		if err := json.Unmarshal(pt, &key); err != nil {
-			return errors.New(err)
+			return errors.Wrap(err, "")
 		}
 
 		keys, ok := m.Keys[raw.Set]

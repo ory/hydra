@@ -2,11 +2,10 @@ package warden
 
 import (
 	"net/http"
-
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/oauth2"
@@ -31,7 +30,7 @@ func (w *LocalWarden) IsAllowed(ctx context.Context, a *ladon.Request) error {
 		logrus.WithFields(logrus.Fields{
 			"subject": a.Subject,
 			"request": a,
-			"reason":  "request denied by policies",
+			"reason":  "The policy decision point denied the request",
 		}).WithError(err).Infof("Access denied")
 		return err
 	}
@@ -46,12 +45,12 @@ func (w *LocalWarden) TokenAllowed(ctx context.Context, token string, a *ladon.R
 		logrus.WithFields(logrus.Fields{
 			"subject": a.Subject,
 			"request": a,
-			"reason":  "token could not be validated",
+			"reason":  "Token is expired, malformed or missing",
 		}).WithError(err).Infof("Access denied")
 		return nil, err
 	}
 
-	return w.allowed(ctx, a, scopes, auth, session)
+	return w.sessionAllowed(ctx, a, scopes, auth, session)
 }
 
 func (w *LocalWarden) TokenValid(ctx context.Context, token string, scopes ...string) (*firewall.Context, error) {
@@ -64,7 +63,7 @@ func (w *LocalWarden) TokenValid(ctx context.Context, token string, scopes ...st
 			"scopes":   scopes,
 			"subject":  session.Subject,
 			"audience": oauthRequest.GetClient().GetID(),
-			"reason":   "token validation failed",
+			"reason":  "Token is expired, malformed or missing",
 		}).WithError(err).Infof("Access denied")
 		return nil, err
 	}
@@ -72,7 +71,7 @@ func (w *LocalWarden) TokenValid(ctx context.Context, token string, scopes ...st
 	return w.newContext(auth), nil
 }
 
-func (w *LocalWarden) allowed(ctx context.Context, a *ladon.Request, scopes []string, oauthRequest fosite.AccessRequester, session *oauth2.Session) (*firewall.Context, error) {
+func (w *LocalWarden) sessionAllowed(ctx context.Context, a *ladon.Request, scopes []string, oauthRequest fosite.AccessRequester, session *oauth2.Session) (*firewall.Context, error) {
 	session = oauthRequest.GetSession().(*oauth2.Session)
 	if a.Subject != "" && a.Subject != session.Subject {
 		err := errors.Errorf("Expected subject to be %s but got %s", session.Subject, a.Subject)
@@ -81,7 +80,7 @@ func (w *LocalWarden) allowed(ctx context.Context, a *ladon.Request, scopes []st
 			"subject":  a.Subject,
 			"audience": oauthRequest.GetClient().GetID(),
 			"request":  a,
-			"reason":   "subject mismatch",
+			"reason":   "Request subject and token subject do not match",
 		}).WithError(err).Infof("Access denied")
 		return nil, err
 	}
@@ -93,7 +92,7 @@ func (w *LocalWarden) allowed(ctx context.Context, a *ladon.Request, scopes []st
 			"subject":  a.Subject,
 			"audience": oauthRequest.GetClient().GetID(),
 			"request":  a,
-			"reason":   "policy effect is deny",
+			"reason":  "The policy decision point denied the request",
 		}).WithError(err).Infof("Access denied")
 		return nil, err
 	}

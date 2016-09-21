@@ -2,9 +2,8 @@ package pkg
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/go-errors/errors"
-	"github.com/ory-am/hydra/herodot"
-	perr "github.com/pkg/errors"
+	"github.com/pkg/errors"
+	"reflect"
 )
 
 var (
@@ -12,17 +11,15 @@ var (
 )
 
 type stackTracer interface {
-	StackTrace() perr.StackTrace
+	StackTrace() errors.StackTrace
 }
 
 func LogError(err error) {
-	if e, ok := err.(*herodot.Error); ok {
-		log.WithError(err).WithField("stack", e.Err.ErrorStack()).Infoln("An error occured")
-	} else if e, ok := err.(*errors.Error); ok {
-		log.WithError(err).WithField("stack", e.ErrorStack()).Infoln("An error occurred")
-	} else if e, ok := err.(stackTracer); ok {
-		log.WithError(err).WithField("stack", e.StackTrace()).Infoln("An error occured")
+	if e, ok := errors.Cause(err).(stackTracer); ok {
+		log.WithError(err).Errorln("An error occurred")
+		log.Debugf("Stack trace: %+v", e.StackTrace())
 	} else {
-		log.WithError(err).Infoln("An error occured")
+		log.WithError(err).Errorln("An error occurred")
+		log.Debugf("Stack trace could not be recovered from error type %s", reflect.TypeOf(err))
 	}
 }

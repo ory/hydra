@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/firewall"
@@ -35,49 +35,49 @@ type Handler struct {
 	ConsentURL url.URL
 }
 
-func (this *Handler) SetRoutes(r *httprouter.Router) {
-	r.POST(TokenPath, this.TokenHandler)
-	r.GET(AuthPath, this.AuthHandler)
-	r.POST(AuthPath, this.AuthHandler)
-	r.GET(ConsentPath, this.DefaultConsentHandler)
-	r.POST(IntrospectPath, this.Introspect)
+func (h *Handler) SetRoutes(r *httprouter.Router) {
+	r.POST(TokenPath, h.TokenHandler)
+	r.GET(AuthPath, h.AuthHandler)
+	r.POST(AuthPath, h.AuthHandler)
+	r.GET(ConsentPath, h.DefaultConsentHandler)
+	r.POST(IntrospectPath, h.Introspect)
 }
 
-func (this *Handler) Introspect(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) Introspect(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var inactive = map[string]bool{"active": false}
 
 	ctx := herodot.NewContext()
-	clientCtx, err := this.Firewall.TokenValid(ctx, this.Firewall.TokenFromRequest(r))
+	clientCtx, err := h.Firewall.TokenValid(ctx, h.Firewall.TokenFromRequest(r))
 	if err != nil {
-		this.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(ctx, w, r, err)
 		return
 	}
 
 	if err := r.ParseForm(); err != nil {
-		this.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(ctx, w, r, err)
 		return
 	}
 
-	auth, err := this.Introspector.IntrospectToken(ctx, r.PostForm.Get("token"))
+	auth, err := h.Introspector.IntrospectToken(ctx, r.PostForm.Get("token"))
 	if err != nil {
-		this.H.Write(ctx, w, r, &inactive)
+		h.H.Write(ctx, w, r, &inactive)
 		return
 	} else if clientCtx.Subject != auth.Audience {
-		this.H.Write(ctx, w, r, &inactive)
+		h.H.Write(ctx, w, r, &inactive)
 		return
 	}
 
-	this.H.Write(ctx, w, r, auth)
+	h.H.Write(ctx, w, r, auth)
 }
 
-func (this *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var session = NewSession("")
 	var ctx = fosite.NewContext()
 
-	accessRequest, err := this.OAuth2.NewAccessRequest(ctx, r, session)
+	accessRequest, err := h.OAuth2.NewAccessRequest(ctx, r, session)
 	if err != nil {
 		pkg.LogError(err)
-		this.OAuth2.WriteAccessError(w, accessRequest, err)
+		h.OAuth2.WriteAccessError(w, accessRequest, err)
 		return
 	}
 
@@ -90,23 +90,23 @@ func (this *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ http
 		}
 	}
 
-	accessResponse, err := this.OAuth2.NewAccessResponse(ctx, r, accessRequest)
+	accessResponse, err := h.OAuth2.NewAccessResponse(ctx, r, accessRequest)
 	if err != nil {
 		pkg.LogError(err)
-		this.OAuth2.WriteAccessError(w, accessRequest, err)
+		h.OAuth2.WriteAccessError(w, accessRequest, err)
 		return
 	}
 
-	this.OAuth2.WriteAccessResponse(w, accessRequest, accessResponse)
+	h.OAuth2.WriteAccessResponse(w, accessRequest, accessResponse)
 }
 
-func (this *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = fosite.NewContext()
 
-	authorizeRequest, err := this.OAuth2.NewAuthorizeRequest(ctx, r)
+	authorizeRequest, err := h.OAuth2.NewAuthorizeRequest(ctx, r)
 	if err != nil {
 		pkg.LogError(err)
-		this.writeAuthorizeError(w, authorizeRequest, err)
+		h.writeAuthorizeError(w, authorizeRequest, err)
 		return
 	}
 
@@ -114,9 +114,9 @@ func (this *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httpr
 	consentToken := authorizeRequest.GetRequestForm().Get("consent")
 	if consentToken == "" {
 		// otherwise redirect to log in endpoint
-		if err := this.redirectToConsent(w, r, authorizeRequest); err != nil {
+		if err := h.redirectToConsent(w, r, authorizeRequest); err != nil {
 			pkg.LogError(err)
-			this.writeAuthorizeError(w, authorizeRequest, err)
+			h.writeAuthorizeError(w, authorizeRequest, err)
 			return
 		}
 		return
@@ -124,36 +124,36 @@ func (this *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httpr
 
 	// decode consent_token claims
 	// verify anti-CSRF (inject state) and anti-replay token (expiry time, good value would be 10 seconds)
-	session, err := this.Consent.ValidateResponse(authorizeRequest, consentToken)
+	session, err := h.Consent.ValidateResponse(authorizeRequest, consentToken)
 	if err != nil {
 		pkg.LogError(err)
-		this.writeAuthorizeError(w, authorizeRequest, errors.New(fosite.ErrAccessDenied))
+		h.writeAuthorizeError(w, authorizeRequest, errors.Wrap(fosite.ErrAccessDenied, ""))
 		return
 	}
 
 	// done
-	response, err := this.OAuth2.NewAuthorizeResponse(ctx, r, authorizeRequest, session)
+	response, err := h.OAuth2.NewAuthorizeResponse(ctx, r, authorizeRequest, session)
 	if err != nil {
 		pkg.LogError(err)
-		this.writeAuthorizeError(w, authorizeRequest, err)
+		h.writeAuthorizeError(w, authorizeRequest, err)
 		return
 	}
 
-	this.OAuth2.WriteAuthorizeResponse(w, authorizeRequest, response)
+	h.OAuth2.WriteAuthorizeResponse(w, authorizeRequest, response)
 }
 
-func (this *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, authorizeRequest fosite.AuthorizeRequester) error {
+func (h *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, authorizeRequest fosite.AuthorizeRequester) error {
 	schema := "https"
-	if this.ForcedHTTP {
+	if h.ForcedHTTP {
 		schema = "http"
 	}
 
-	challenge, err := this.Consent.IssueChallenge(authorizeRequest, schema+"://"+r.Host+r.URL.String())
+	challenge, err := h.Consent.IssueChallenge(authorizeRequest, schema+"://"+r.Host+r.URL.String())
 	if err != nil {
 		return err
 	}
 
-	p := this.ConsentURL
+	p := h.ConsentURL
 	q := p.Query()
 	q.Set("challenge", challenge)
 	p.RawQuery = q.Encode()
@@ -161,11 +161,11 @@ func (this *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, a
 	return nil
 }
 
-func (this *Handler) writeAuthorizeError(w http.ResponseWriter, ar fosite.AuthorizeRequester, err error) {
+func (h *Handler) writeAuthorizeError(w http.ResponseWriter, ar fosite.AuthorizeRequester, err error) {
 	if !ar.IsRedirectURIValid() {
 		var rfcerr = fosite.ErrorToRFC6749Error(err)
 
-		redirectURI := this.ConsentURL
+		redirectURI := h.ConsentURL
 		query := redirectURI.Query()
 		query.Add("error", rfcerr.Name)
 		query.Add("error_description", rfcerr.Description)
@@ -176,5 +176,5 @@ func (this *Handler) writeAuthorizeError(w http.ResponseWriter, ar fosite.Author
 		return
 	}
 
-	this.OAuth2.WriteAuthorizeError(w, ar, err)
+	h.OAuth2.WriteAuthorizeError(w, ar, err)
 }

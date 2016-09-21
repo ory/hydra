@@ -6,11 +6,20 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
+)
+
+var (
+	exampleError = &Error{
+		Name: "not-found",
+		OriginalError:  errors.New("Not found"),
+		StatusCode: http.StatusNotFound,
+		Description: "test",
+	}
 )
 
 func TestWriteError(t *testing.T) {
@@ -19,7 +28,7 @@ func TestWriteError(t *testing.T) {
 	h := JSON{}
 	r := mux.NewRouter()
 	r.HandleFunc("/do", func(w http.ResponseWriter, r *http.Request) {
-		h.WriteError(context.Background(), w, r, errors.New(ErrNotFound))
+		h.WriteError(context.Background(), w, r, errors.New(exampleError))
 	})
 	ts := httptest.NewServer(r)
 
@@ -28,8 +37,8 @@ func TestWriteError(t *testing.T) {
 
 	require.Nil(t, json.NewDecoder(resp.Body).Decode(&j))
 	assert.Equal(t, http.StatusNotFound, resp.StatusCode)
-	assert.Equal(t, j.Error, ErrNotFound.Error())
-	assert.Equal(t, j.Code, ErrNotFound.Code)
+	assert.Equal(t, j.Description, exampleError.Description)
+	assert.Equal(t, j.StatusCode, exampleError.StatusCode)
 	assert.NotEmpty(t, j.RequestID)
 }
 
@@ -39,7 +48,7 @@ func TestWriteErrorCode(t *testing.T) {
 	h := JSON{}
 	r := mux.NewRouter()
 	r.HandleFunc("/do", func(w http.ResponseWriter, r *http.Request) {
-		h.WriteErrorCode(context.Background(), w, r, http.StatusBadRequest, errors.New(ErrNotFound))
+		h.WriteErrorCode(context.Background(), w, r, http.StatusBadRequest, errors.New(exampleError))
 	})
 	ts := httptest.NewServer(r)
 
@@ -48,7 +57,7 @@ func TestWriteErrorCode(t *testing.T) {
 
 	require.Nil(t, json.NewDecoder(resp.Body).Decode(&j))
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-	assert.Equal(t, j.Error, ErrNotFound.Error())
+	assert.Equal(t, j.Description, exampleError.Description)
 	assert.NotEmpty(t, j.RequestID)
 }
 

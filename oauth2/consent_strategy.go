@@ -6,7 +6,7 @@ import (
 	"crypto/rsa"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/handler/openid"
 	ejwt "github.com/ory-am/fosite/token/jwt"
@@ -124,7 +124,7 @@ func (s *DefaultConsentStrategy) IssueChallenge(authorizeRequest fosite.Authoriz
 
 	ks, err := s.KeyManager.GetKey(ConsentChallengeKey, "private")
 	if err != nil {
-		return "", errors.New(err)
+		return "", errors.Wrap(err, "")
 	}
 
 	rsaKey, ok := jwk.First(ks.Keys).Key.(*rsa.PrivateKey)
@@ -134,9 +134,9 @@ func (s *DefaultConsentStrategy) IssueChallenge(authorizeRequest fosite.Authoriz
 
 	var signature, encoded string
 	if encoded, err = token.SigningString(); err != nil {
-		return "", errors.New(err)
+		return "", errors.Wrap(err, "")
 	} else if signature, err = token.Method.Sign(encoded, rsaKey); err != nil {
-		return "", errors.New(err)
+		return "", errors.Wrap(err, "")
 	}
 
 	return fmt.Sprintf("%s.%s", encoded, signature), nil

@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/hash"
 	"github.com/ory-am/hydra/pkg"
@@ -29,7 +29,7 @@ func (m *RethinkManager) GetConcreteClient(id string) (*Client, error) {
 
 	c, ok := m.Clients[id]
 	if !ok {
-		return nil, errors.New(pkg.ErrNotFound)
+		return nil, errors.Wrap(pkg.ErrNotFound, "")
 	}
 	return &c, nil
 }
@@ -44,11 +44,11 @@ func (m *RethinkManager) Authenticate(id string, secret []byte) (*Client, error)
 
 	c, ok := m.Clients[id]
 	if !ok {
-		return nil, errors.New(pkg.ErrNotFound)
+		return nil, errors.Wrap(pkg.ErrNotFound, "")
 	}
 
 	if err := m.Hasher.Compare(c.GetHashedSecret(), secret); err != nil {
-		return nil, errors.New(err)
+		return nil, errors.Wrap(err, "")
 	}
 
 	return &c, nil
@@ -61,7 +61,7 @@ func (m *RethinkManager) CreateClient(c *Client) error {
 
 	hash, err := m.Hasher.Hash([]byte(c.Secret))
 	if err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 	c.Secret = string(hash)
 
@@ -95,7 +95,7 @@ func (m *RethinkManager) ColdStart() error {
 	m.Clients = map[string]Client{}
 	clients, err := m.Table.Run(m.Session)
 	if err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 
 	var client Client
@@ -110,14 +110,14 @@ func (m *RethinkManager) ColdStart() error {
 
 func (m *RethinkManager) publishCreate(client *Client) error {
 	if _, err := m.Table.Insert(client).RunWrite(m.Session); err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 	return nil
 }
 
 func (m *RethinkManager) publishDelete(id string) error {
 	if _, err := m.Table.Get(id).Delete().RunWrite(m.Session); err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 	return nil
 }
@@ -126,7 +126,7 @@ func (m *RethinkManager) Watch(ctx context.Context) {
 	go pkg.Retry(time.Second*15, time.Minute, func() error {
 		clients, err := m.Table.Changes().Run(m.Session)
 		if err != nil {
-			return errors.New(err)
+			return errors.Wrap(err, "")
 		}
 		defer clients.Close()
 
@@ -148,7 +148,7 @@ func (m *RethinkManager) Watch(ctx context.Context) {
 		}
 
 		if clients.Err() != nil {
-			err = errors.New(clients.Err())
+			err = errors.Wrap(clients.Err(), "")
 			pkg.LogError(err)
 			return err
 		}

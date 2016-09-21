@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/pkg"
@@ -50,8 +50,8 @@ type RdbSchema struct {
 func requestFromRDB(s *RdbSchema, proto interface{}) (*fosite.Request, error) {
 	if proto != nil {
 		if err := json.Unmarshal(s.Session, proto); err != nil {
-			pkg.LogError(errors.New(err))
-			return nil, errors.New(err)
+			pkg.LogError(errors.Wrap(err, ""))
+			return nil, errors.Wrap(err, "")
 		}
 	}
 
@@ -83,8 +83,8 @@ func (m *FositeRehinkDBStore) ColdStart() error {
 func (s *FositeRehinkDBStore) publishInsert(table r.Term, id string, requester fosite.Requester) error {
 	sess, err := json.Marshal(requester.GetSession())
 	if err != nil {
-		pkg.LogError(errors.New(err))
-		return errors.New(err)
+		pkg.LogError(errors.Wrap(err, ""))
+		return errors.Wrap(err, "")
 	}
 
 	if _, err := table.Insert(&RdbSchema{
@@ -96,14 +96,14 @@ func (s *FositeRehinkDBStore) publishInsert(table r.Term, id string, requester f
 		Form:          requester.GetRequestForm(),
 		Session:       sess,
 	}).RunWrite(s.Session); err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 	return nil
 }
 
 func (s *FositeRehinkDBStore) publishDelete(table r.Term, id string) error {
 	if _, err := table.Get(id).Delete().RunWrite(s.Session); err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 	return nil
 }
@@ -269,7 +269,7 @@ func (m *FositeRehinkDBStore) Watch(ctx context.Context) {
 func (items RDBItems) coldStart(sess *r.Session, lock *sync.RWMutex, table r.Term) error {
 	rows, err := table.Run(sess)
 	if err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 
 	var item RdbSchema
@@ -281,7 +281,7 @@ func (items RDBItems) coldStart(sess *r.Session, lock *sync.RWMutex, table r.Ter
 	}
 
 	if rows.Err() != nil {
-		return errors.New(rows.Err())
+		return errors.Wrap(rows.Err(), "")
 	}
 	return nil
 }
@@ -290,8 +290,8 @@ func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock *sync.RWM
 	go pkg.Retry(time.Second*15, time.Minute, func() error {
 		changes, err := table.Changes().Run(sess)
 		if err != nil {
-			pkg.LogError(errors.New(err))
-			return errors.New(err)
+			pkg.LogError(errors.Wrap(err, ""))
+			return errors.Wrap(err, "")
 		}
 		defer changes.Close()
 
@@ -313,7 +313,7 @@ func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock *sync.RWM
 		}
 
 		if changes.Err() != nil {
-			err = errors.New(changes.Err())
+			err = errors.Wrap(changes.Err(), "")
 			pkg.LogError(err)
 			return err
 		}

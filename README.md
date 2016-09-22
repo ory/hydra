@@ -1,4 +1,4 @@
-# ![Ory/Hydra](docs/dist/images/logo.png)
+# ![Ory/Hydra](docs/images/logo.png)
 
 [![Join the chat at https://gitter.im/ory-am/hydra](https://img.shields.io/badge/join-chat-00cc99.svg)](https://gitter.im/ory-am/hydra?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Join mailinglist](https://img.shields.io/badge/join-mailinglist-00cc99.svg)](https://groups.google.com/forum/#!forum/ory-hydra/new)
@@ -118,7 +118,7 @@ Hydra is packaged using [Docker](https://hub.docker.com/r/oryam/hydra/).
 6. **Open Source:** Hydra is licensed under Apache Version 2.0
 7. **Professional:** Hydra implements peer reviewed open standards published by [The Internet Engineering Task Force (IETF®)](https://www.ietf.org/) and the [OpenID Foundation](https://openid.net/)
 and under supervision of the [LMU Teaching and Research Unit Programming and Modelling Languages](http://www.en.pms.ifi.lmu.de). No funny business.
-8.  <img src="docs/dist/images/monitoring.gif" width="45%" align="right"> **Real Time:** Operation is a lot easier with real time. There are no caches,
+8.  <img src="docs/images/monitoring.gif" width="45%" align="right"> **Real Time:** Operation is a lot easier with real time. There are no caches,
     no invalidation strategies and no magic - just simple, cloud native pub-sub. Hydra leverages RethinkDB, so check out their real time database monitoring too!
 
 <br clear="all">
@@ -188,7 +188,7 @@ The **[tutorial](https://ory-am.gitbooks.io/hydra/content/demo.html)** teaches y
 a RethinkDB instance and an exemplary identity provider written in React using docker compose.
 It will take you about 5 minutes to get complete the **[tutorial](https://ory-am.gitbooks.io/hydra/content/demo.html)**.
 
-<img src="docs/dist/images/oauth2-flow.gif" alt="OAuth2 Flow">
+<img src="docs/images/oauth2-flow.gif" alt="OAuth2 Flow">
 
 <br clear="all">
 

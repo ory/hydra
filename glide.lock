@@ -1,5 +1,5 @@
-hash: 97095e24cb4498df3f04c5e4f9073476a23c2a002d36649c32a9433db501efb2
-updated: 2016-08-23T14:07:40.9088748+02:00
+hash: f1931945f77f6461c6134be605c3def735f6c1e7fbabe54993f731591fa02d98
+updated: 2016-09-22T19:17:38.506625+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7664702784775e51966f0885f5cd27435916517b
@@ -34,6 +34,8 @@ imports:
   - json/parser
   - json/scanner
   - json/token
+- name: github.com/imdario/mergo
+  version: 50d4dbd4eb0e84778abe37cefef140271d96fade
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
 - name: github.com/julienschmidt/httprouter
@@ -58,7 +60,7 @@ imports:
   - pkg
   - rand/sequence
 - name: github.com/ory-am/fosite
-  version: 76ef7ea8f51735d63476cd91e1f9a9f367d544cb
+  version: aa1b8548678e5807399d35b5bcad4f62a83cf6e4
   subpackages:
   - compose
   - fosite-example/pkg
@@ -71,7 +73,7 @@ imports:
 - name: github.com/ory-am/ladon
   version: 67845728bf072d2b3f050cb415ece9a54ec6a546
 - name: github.com/parnurzeal/gorequest
-  version: b64673b971a1742b8ba91f228f1c029632d4b686
+  version: 2aea80ce763523ecc6452e61c3727ae9595a5809
 - name: github.com/pborman/uuid
   version: a97ce2ca70fa5a848076093f05e639a89ca34d06
 - name: github.com/pkg/errors
@@ -102,7 +104,7 @@ imports:
 - name: github.com/spf13/viper
   version: 654fc7bb54d0c138ef80405ff577391f79c0c32d
 - name: github.com/square/go-jose
-  version: a3927f83df1b1516f9e9dec71839c93e6bcf1db0
+  version: 139276ceb5afbf13e636c44e9382f0ca75c12ba3
   subpackages:
   - json
 - name: github.com/stretchr/testify
@@ -167,7 +169,7 @@ imports:
   - cipher
   - json
 - name: gopkg.in/tylerb/graceful.v1
-  version: 842f31108f8d3512ce3176d00bf1a32db1d5e3af
+  version: 50a48b6e73fcc75b45e22c05b79629a67c79e938
 - name: gopkg.in/yaml.v2
   version: e4d366fc3c7938e2958e662b4258c7a89e1f0e3e
 testImports:

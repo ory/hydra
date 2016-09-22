@@ -10,8 +10,8 @@ In abstract, a consent flow looks like this:
 1. A *client* application (app in browser in laptop) requests an access token from a resource owner: `https://hydra.myapp.com/oauth2/auth?client_id=c3b49cf0-88e4-4faa-9489-28d5b8957858&response_type=code&scope=core+hydra&state=vboeidlizlxrywkwlsgeggff&nonce=tedgziijemvninkuotcuuiof`.
 2. Hydra generates a consent challenge and forwards the *user agent* (browser in laptop) to the *consent endpoint*: `https://login.myapp.com/?challenge=eyJhbGciOiJSUzI1N...`.
 3. The *consent endpoint* verifies the resource owner's identity (e.g. cookie, username/password login form, ...). The consent challenge is then decoded and the information extracted. It is used to show the consent screen: `Do you want to grant _my cool app_ access to all your private data? [Yes] [No]`
-4. When consent is given, the *consent endpoint* generates a consent token and redirects the user agent (browser in laptop) back to hydra: `https://hydra.myapp.com/oauth2/auth?client_id=c3b49cf0-88e4-4faa-9489-28d5b8957858&response_type=code&scope=core+hydra&state=vboeidlizlxrywkwlsgeggff&nonce=tedgziijemvninkuotcuuiof&consent=eyJhbGciOiJSU...`.
-5. Hydra validates the consent token and issues the access token to the *user agent*.
+4. When consent is given, the *consent endpoint* generates a consent response token and redirects the user agent (browser in laptop) back to hydra: `https://hydra.myapp.com/oauth2/auth?client_id=c3b49cf0-88e4-4faa-9489-28d5b8957858&response_type=code&scope=core+hydra&state=vboeidlizlxrywkwlsgeggff&nonce=tedgziijemvninkuotcuuiof&consent=eyJhbGciOiJSU...`.
+5. Hydra validates the consent response token and issues the access token to the *user agent*.
 
 ## Detailed Example
 
@@ -48,11 +48,11 @@ The challenge claims are:
 * **exp:** The challenge's expiry date. Consent endpoints must not accept challenges that have expired.
 * **redir:** Where the consent endpoint should redirect the user agent to, once consent is given.
 
-Hydra signs the consent token with a key called consent.challenge.
+Hydra signs the consent response token with a key called `hydra.consent.challenge`.
 The public key can be looked up via the [Key Manager](https://ory-am.gitbooks.io/hydra/content/jwk.html):
 
 ```
-https://192.168.99.100:4444/keys/consent.challenge/public
+https://192.168.99.100:4444/keys/hydra.consent.challenge/public
 ```
 
 Next, the consent-app must check if the user is authenticated. This can be done by e.g. using a session cookie.
@@ -69,13 +69,13 @@ Upon user authentication, the consent-app must ask for the user's consent. This 
 > [Deny] - [Allow]
 
 If the user clicks *Allow*, the consent-app redirects him back to the *redir* claim value. The consent-app appends
-a signed consent token to the URL:
+a signed consent response token to the URL:
 
 ```
 https://192.168.99.100:4444/oauth2/auth?client_id=c3b49cf0-88e4-4faa-9489-28d5b8957858&response_type=code&scope=core+hydra&state=myhnxqmwzhteycweovblswwj&nonce=gmmsuvtsbtoeumeohesztshg&consent=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJjM2I0OWNmMC04OGU0LTRmYWEtOTQ4OS0yOGQ1Yjg5NTc4NTgiLCJleHAiOjE0NjQ1MTUwOTksInNjcCI6WyJjb3JlIiwiaHlkcmEiXSwic3ViIjoiam9obi5kb2VAbWUuY29tIiwiaWF0IjoxNDY0NTExNTE1fQ.tX5TKdP9hHCgPbqBzKIYMjJVwqOdxf5ACScmQ6t20Qteo8AYEfavGwq8KxRF1Oz_otcQDdZY--jcl1caom0yT2eTvj1d9E2Hs7eXmYuW_xF9pTpmDwJnrcOlONFKsNZN97n41qprzMrsX5ez0T5AcopGwpPMxKhwGDSXq9CQgQU
 ```
 
-The consent token is a RSA-SHA 256 (RS256) signed [JSON Web Token](https://tools.ietf.org/html/rfc7519)
+The consent response token is a RSA-SHA 256 (RS256) signed [JSON Web Token](https://tools.ietf.org/html/rfc7519)
 that contains the following claims:
 
 ```
@@ -104,6 +104,7 @@ The consent claims are:
 * **id_ext:** If set, pass this extra data to the id token *(optional)*
 * **at_ext:** If set, pass this extra data to the access token session. You can retrieve the data by using the warden endpoints *(optional)*.
 
-Hydra validates the consent token with consent-app's public key. The public key must be stored in the (https://ory-am.gitbooks.io/hydra/content/key_manager.html) at `https://localhost:4444/keys/consent.endpoint/public`
+Hydra validates the consent response token with consent-app's public key. The public key must be stored in the (https://ory-am.gitbooks.io/hydra/content/key_manager.html) at `https://localhost:4444/keys/hydra.consent.response/public`
 
-If you want, you can use the Key Manager to store and retrieve private keys as well. When Hydra boots for the first time, a private/public `consent.endpoint` keypair is created. You can that keypair to sign consent tokens. The private key is available at `https://localhost:4444/keys/asymmetric/consent.endpoint/private`.
+If you want, you can use the Key Manager to store and retrieve private keys as well. When Hydra boots for the first time, a private/public `hydra.consent.response` keypair is created.
+You can that keypair to sign consent response tokens. The private key is available at `https://localhost:4444/keys/asymmetric/hydra.consent.response/private`.

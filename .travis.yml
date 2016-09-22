@@ -31,8 +31,7 @@ script:
   - $GOPATH/bin/hydra token client --skip-tls-verify
 
 after_success:
-  - gox -ldflags "-X main.Version=`git describe --tags` -X main.BuildTime=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X main.GitHash=`git rev-parse HEAD`" -output "dist/{{.Dir}}-{{.OS}}-{{.Arch}}"
-  # - ghr --username arekkas --token $GITHUB_TOKEN --replace --prerelease --debug pre-release dist/
+  - gox -ldflags "-X github.com/ory-am/hydra/cmd.Version=`git describe --tags` -X github.com/ory-am/hydra/cmd.BuildTime=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory-am/hydra/cmd.GitHash=`git rev-parse HEAD`" -output "dist/{{.Dir}}-{{.OS}}-{{.Arch}}"
 
 deploy:
   provider: releases

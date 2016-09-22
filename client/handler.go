@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/common/rand/sequence"
 	"github.com/ory-am/hydra/firewall"
@@ -33,6 +33,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET(ClientsHandlerPath, h.GetAll)
 	r.POST(ClientsHandlerPath, h.Create)
 	r.GET(ClientsHandlerPath+"/:id", h.Get)
+	r.PUT(ClientsHandlerPath+"/:id", h.Update)
 	r.DELETE(ClientsHandlerPath+"/:id", h.Delete)
 }
 
@@ -41,7 +42,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	var ctx = herodot.NewContext()
 
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
-		h.H.WriteError(ctx, w, r, errors.New(err))
+		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
 		return
 	}
 
@@ -59,7 +60,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	if len(c.Secret) == 0 {
 		secret, err := sequence.RuneSequence(12, []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-.,:;$%!&/()=?+*#<>"))
 		if err != nil {
-			h.H.WriteError(ctx, w, r, errors.New(err))
+			h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
 			return
 		}
 		c.Secret = string(secret)
@@ -74,6 +75,39 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	}
 
 	c.Secret = secret
+	h.H.WriteCreated(ctx, w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
+}
+
+func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	var c Client
+	var ctx = herodot.NewContext()
+
+	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
+		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
+		return
+	}
+
+	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &ladon.Request{
+		Resource: ClientsResource,
+		Action:   "update",
+		Context: ladon.Context{
+			"owner": c.Owner,
+		},
+	}, Scope); err != nil {
+		h.H.WriteError(ctx, w, r, err)
+		return
+	}
+
+	if len(c.Secret) > 0 && len(c.Secret) < 6 {
+		h.H.WriteError(ctx, w, r, errors.New("The client secret must be at least 6 characters long"))
+	}
+
+	c.ID = ps.ByName("id")
+	if err := h.Manager.UpdateClient(&c); err != nil {
+		h.H.WriteError(ctx, w, r, err)
+		return
+	}
+
 	h.H.WriteCreated(ctx, w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 

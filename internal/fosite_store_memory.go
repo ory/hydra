@@ -6,6 +6,7 @@ import (
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/client"
 	"golang.org/x/net/context"
+	"github.com/pkg/errors"
 )
 
 type FositeMemoryStore struct {
@@ -32,7 +33,7 @@ func (s *FositeMemoryStore) GetOpenIDConnectSession(_ context.Context, authorize
 	defer s.RUnlock()
 	cl, ok := s.IDSessions[authorizeCode]
 	if !ok {
-		return nil, fosite.ErrNotFound
+		return nil, errors.Wrap(fosite.ErrNotFound, "")
 	}
 	return cl, nil
 }
@@ -56,7 +57,7 @@ func (s *FositeMemoryStore) GetAuthorizeCodeSession(_ context.Context, code stri
 	defer s.RUnlock()
 	rel, ok := s.AuthorizeCodes[code]
 	if !ok {
-		return nil, fosite.ErrNotFound
+		return nil, errors.Wrap(fosite.ErrNotFound, "")
 	}
 	return rel, nil
 }
@@ -80,7 +81,7 @@ func (s *FositeMemoryStore) GetAccessTokenSession(_ context.Context, signature s
 	defer s.RUnlock()
 	rel, ok := s.AccessTokens[signature]
 	if !ok {
-		return nil, fosite.ErrNotFound
+		return nil, errors.Wrap(fosite.ErrNotFound, "")
 	}
 	return rel, nil
 }
@@ -104,7 +105,7 @@ func (s *FositeMemoryStore) GetRefreshTokenSession(_ context.Context, signature 
 	defer s.RUnlock()
 	rel, ok := s.RefreshTokens[signature]
 	if !ok {
-		return nil, fosite.ErrNotFound
+		return nil, errors.Wrap(fosite.ErrNotFound, "")
 	}
 	return rel, nil
 }

@@ -6,7 +6,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/square/go-jose"
 )
 
@@ -24,7 +24,7 @@ func PEMBlockForKey(key interface{}) (*pem.Block, error) {
 	case *ecdsa.PrivateKey:
 		b, err := x509.MarshalECPrivateKey(k)
 		if err != nil {
-			return nil, errors.New(err)
+			return nil, errors.Wrap(err, "")
 		}
 		return &pem.Block{Type: "EC PRIVATE KEY", Bytes: b}, nil
 	default:

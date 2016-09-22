@@ -42,3 +42,20 @@ certificates and keeps them in a safe place. **When transporting private keys ov
 MUST encrypt ALL related traffic.**
 
 Please read the [API Documentation](http://docs.hdyra.apiary.io/#reference/json-web-keys-jwk) for API details.
+
+## What JWK sets exists by default?
+
+Hydra generates a couple of JSON Web Keys in order to operate correctly:
+
+* `http://localhost:4444/keys/hydra.openid.id-token`: A RSA public/private key pair for signing and validating OpenID Connect ID Tokens.
+  * `http://localhost:4444/keys/hydra.openid.id-token/public`: The public key which you can use to validate ID Tokens.
+  * `http://localhost:4444/keys/hydra.openid.id-token/private`: The private key used for signing ID Tokens.
+* `http://localhost:4444/keys/hydra.consent.challenge`: A RSA public/private key pair for signing and validating the consent challenge.
+  * `http://localhost:4444/keys/hydra.consent.challenge/public`: The public key which you can use to validate the consent challenge.
+  * `http://localhost:4444/keys/hydra.consent.challenge/private`: The private key used for signing the consent challenge.
+* `http://localhost:4444/keys/hydra.consent.response`: A RSA public/private key pair for signing and validating the consent response.
+  * `http://localhost:4444/keys/hydra.consent.response/public`: The public key which you can use to validate the consent response.
+  * `http://localhost:4444/keys/hydra.consent.response/private`: The private key used for signing the consent response.
+* `http://localhost:4444/keys/https-tls`: A RSA public/private key pair and a certificate for signing HTTP over TLS.
+
+You can read and update those keys using the [HTTP REST API](http://docs.hdyra.apiary.io/#reference/json-web-keys-jwk).

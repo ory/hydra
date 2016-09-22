@@ -32,3 +32,4 @@
   * [Why isn't the redirect url working?](faq/redirect-uri.md)
   * [How can I import a custom CA for RethinkDB?](faq/rethink-ca.md)
   * [How do I know if OAuth2 / Hydra is the right choice for me?](faq/when-use.md)
+  * [Operational considerations?](faq/operations.md)

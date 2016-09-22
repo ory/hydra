@@ -15,6 +15,8 @@ type Storage interface {
 
 	CreateClient(c *Client) error
 
+	UpdateClient(c *Client) error
+
 	DeleteClient(id string) error
 
 	GetClients() (map[string]Client, error)

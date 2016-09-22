@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"

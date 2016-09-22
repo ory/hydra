@@ -15,3 +15,7 @@ There are different work flows for OpenID Connect 1.0, we recommend checking out
 
 In a nutshell, add `openid` to the OAuth2 scope when making an OAuth2 Authorize Code request.
 You will receive an `id_token` alongside the `access_token` when making the code exchange.
+
+
+Hydra uses the [JSON Web Key Manager](https://ory-am.gitbooks.io/hydra/content/key_manager.html) to retrieve the
+key pair `hydra.openid.id-token` for signing ID tokens. You can use that endpoint to retrieve the public key for verification.

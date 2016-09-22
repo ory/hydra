@@ -30,6 +30,13 @@ func (m *HTTPManager) GetClient(id string) (fosite.Client, error) {
 	return m.GetConcreteClient(id)
 }
 
+func (m *HTTPManager) UpdateClient(c *Client) error {
+	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, c.ID).String())
+	r.Client = m.Client
+	r.Dry = m.Dry
+	return r.Update(c)
+}
+
 func (m *HTTPManager) CreateClient(c *Client) error {
 	var r = pkg.NewSuperAgent(m.Endpoint.String())
 	r.Client = m.Client

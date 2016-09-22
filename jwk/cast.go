@@ -3,7 +3,7 @@ package jwk
 import (
 	"crypto/rsa"
 
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/square/go-jose"
 )
 

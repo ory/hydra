@@ -7,7 +7,7 @@ import (
 	"encoding/base64"
 	"io"
 
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 )
 
 type AEAD struct {
@@ -23,17 +23,17 @@ func (c *AEAD) Encrypt(plaintext []byte) (string, error) {
 
 	block, err := aes.NewCipher(c.Key[:32])
 	if err != nil {
-		return "", errors.New(err)
+		return "", errors.Wrap(err, "")
 	}
 
 	nonce := make([]byte, 12)
 	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
-		return "", errors.New(err)
+		return "", errors.Wrap(err, "")
 	}
 
 	aesgcm, err := cipher.NewGCM(block)
 	if err != nil {
-		return "", errors.New(err)
+		return "", errors.Wrap(err, "")
 	}
 
 	ciphertext := aesgcm.Seal(nil, nonce, plaintext, nil)
@@ -47,23 +47,23 @@ func (c *AEAD) Decrypt(ciphertext string) ([]byte, error) {
 
 	raw, err := base64.URLEncoding.DecodeString(ciphertext)
 	if err != nil {
-		return []byte{}, errors.New(err)
+		return []byte{}, errors.Wrap(err, "")
 	}
 
 	n := len(raw)
 	block, err := aes.NewCipher(c.Key)
 	if err != nil {
-		return []byte{}, errors.New(err)
+		return []byte{}, errors.Wrap(err, "")
 	}
 
 	aesgcm, err := cipher.NewGCM(block)
 	if err != nil {
-		return []byte{}, errors.New(err)
+		return []byte{}, errors.Wrap(err, "")
 	}
 
 	plaintext, err := aesgcm.Open(nil, raw[n-12:n], raw[:n-12], nil)
 	if err != nil {
-		return []byte{}, errors.New(err)
+		return []byte{}, errors.Wrap(err, "")
 	}
 
 	return plaintext, nil

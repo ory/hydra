@@ -3,7 +3,7 @@ package oauth2
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/ory-am/fosite"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
@@ -39,14 +39,14 @@ func (this *HTTPIntrospector) IntrospectToken(ctx context.Context, token string)
 	data := url.Values{"token": []string{token}}
 	hreq, err := http.NewRequest("POST", ep.String(), bytes.NewBufferString(data.Encode()))
 	if err != nil {
-		return nil, errors.New(err)
+		return nil, errors.Wrap(err, "")
 	}
 
 	hreq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	hreq.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 	hres, err := this.Client.Do(hreq)
 	if err != nil {
-		return nil, errors.New(err)
+		return nil, errors.Wrap(err, "")
 	}
 	defer hres.Body.Close()
 

@@ -28,7 +28,7 @@ func TestWriteError(t *testing.T) {
 	h := JSON{}
 	r := mux.NewRouter()
 	r.HandleFunc("/do", func(w http.ResponseWriter, r *http.Request) {
-		h.WriteError(context.Background(), w, r, errors.New(exampleError))
+		h.WriteError(context.Background(), w, r, errors.Wrap(exampleError, ""))
 	})
 	ts := httptest.NewServer(r)
 
@@ -48,7 +48,7 @@ func TestWriteErrorCode(t *testing.T) {
 	h := JSON{}
 	r := mux.NewRouter()
 	r.HandleFunc("/do", func(w http.ResponseWriter, r *http.Request) {
-		h.WriteErrorCode(context.Background(), w, r, http.StatusBadRequest, errors.New(exampleError))
+		h.WriteErrorCode(context.Background(), w, r, http.StatusBadRequest, errors.Wrap(exampleError, ""))
 	})
 	ts := httptest.NewServer(r)
 

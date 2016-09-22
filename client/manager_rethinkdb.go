@@ -59,13 +59,36 @@ func (m *RethinkManager) CreateClient(c *Client) error {
 		c.ID = uuid.New()
 	}
 
-	hash, err := m.Hasher.Hash([]byte(c.Secret))
+	h, err := m.Hasher.Hash([]byte(c.Secret))
 	if err != nil {
 		return errors.Wrap(err, "")
 	}
-	c.Secret = string(hash)
+	c.Secret = string(h)
 
 	if err := m.publishCreate(c); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *RethinkManager) UpdateClient(c *Client) error {
+	o, err := m.GetClient(c.ID)
+	if err != nil {
+		return err
+	}
+
+	if c.Secret == "" {
+		c.Secret = string(o.GetHashedSecret())
+	} else {
+		h, err := m.Hasher.Hash([]byte(c.Secret))
+		if err != nil {
+			return errors.Wrap(err, "")
+		}
+		c.Secret = string(h)
+	}
+
+	if err := m.publishUpdate(c); err != nil {
 		return err
 	}
 
@@ -106,6 +129,13 @@ func (m *RethinkManager) ColdStart() error {
 	}
 
 	return nil
+}
+
+func (m *RethinkManager) publishUpdate(client *Client) error {
+	if err := m.publishDelete(client.ID); err != nil {
+		return err
+	}
+	return m.publishCreate(client)
 }
 
 func (m *RethinkManager) publishCreate(client *Client) error {

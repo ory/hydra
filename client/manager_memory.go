@@ -31,6 +31,26 @@ func (m *MemoryManager) GetClient(id string) (fosite.Client, error) {
 	return m.GetConcreteClient(id)
 }
 
+func (m *MemoryManager) UpdateClient(c *Client) error {
+	o, err := m.GetClient(c.ID)
+	if err != nil {
+		return err
+	}
+
+	if c.Secret == "" {
+		c.Secret = string(o.GetHashedSecret())
+	} else {
+		h, err := m.Hasher.Hash([]byte(c.Secret))
+		if err != nil {
+			return errors.Wrap(err, "")
+		}
+		c.Secret = string(h)
+	}
+
+	m.Clients[c.GetID()] = *c
+	return nil
+}
+
 func (m *MemoryManager) Authenticate(id string, secret []byte) (*Client, error) {
 	m.RLock()
 	defer m.RUnlock()

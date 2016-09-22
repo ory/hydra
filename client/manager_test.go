@@ -39,7 +39,7 @@ func init() {
 		ID:        "1",
 		Subjects:  []string{"alice"},
 		Resources: []string{"rn:hydra:clients<.*>"},
-		Actions:   []string{"create", "get", "delete"},
+		Actions:   []string{"create", "get", "delete", "update"},
 		Effect:    ladon.AllowAccess,
 	})
 
@@ -52,9 +52,9 @@ func init() {
 		W: localWarden,
 	}
 
-	r := httprouter.New()
-	s.SetRoutes(r)
-	ts = httptest.NewServer(r)
+	routing := httprouter.New()
+	s.SetRoutes(routing)
+	ts = httptest.NewServer(routing)
 
 	u, _ := url.Parse(ts.URL + ClientsHandlerPath)
 	clientManagers["http"] = &HTTPManager{
@@ -241,10 +241,13 @@ func TestCreateGetDeleteClient(t *testing.T) {
 		pkg.AssertError(t, false, err, "%s", k)
 		time.Sleep(100 * time.Millisecond)
 
-		nc, err := m.GetConcreteClient("1234")
-		assert.NotEqual(t, nc.GetHashedSecret(), d.GetHashedSecret())
-		assert.Equal(t, nc.TermsOfServiceURI, "bar")
-		assert.EqualValues(t, nc.GetRedirectURIs(), []string{"http://redirect"})
+		nc, err := m.GetConcreteClient("2-1234")
+		if k != "http" {
+			// http always returns an empty secret
+			assert.NotEqual(t, d.GetHashedSecret(), nc.GetHashedSecret(), "%s", k)
+		}
+		assert.Equal(t, "bar", nc.TermsOfServiceURI, "%s", k)
+		assert.EqualValues(t, []string{"http://redirect"}, nc.GetRedirectURIs(), "%s", k)
 
 		err = m.DeleteClient("1234")
 		pkg.AssertError(t, false, err, "%s", k)

@@ -8,6 +8,7 @@ import (
 	"github.com/ory-am/fosite/hash"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
+	"github.com/imdario/mergo"
 )
 
 type MemoryManager struct {
@@ -45,6 +46,9 @@ func (m *MemoryManager) UpdateClient(c *Client) error {
 			return errors.Wrap(err, "")
 		}
 		c.Secret = string(h)
+	}
+	if err := mergo.Merge(c, o); err != nil {
+		return errors.Wrap(err, "")
 	}
 
 	m.Clients[c.GetID()] = *c

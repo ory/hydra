@@ -50,7 +50,6 @@ type RdbSchema struct {
 func requestFromRDB(s *RdbSchema, proto interface{}) (*fosite.Request, error) {
 	if proto != nil {
 		if err := json.Unmarshal(s.Session, proto); err != nil {
-			pkg.LogError(errors.Wrap(err, ""))
 			return nil, errors.Wrap(err, "")
 		}
 	}
@@ -83,7 +82,6 @@ func (m *FositeRehinkDBStore) ColdStart() error {
 func (s *FositeRehinkDBStore) publishInsert(table r.Term, id string, requester fosite.Requester) error {
 	sess, err := json.Marshal(requester.GetSession())
 	if err != nil {
-		pkg.LogError(errors.Wrap(err, ""))
 		return errors.Wrap(err, "")
 	}
 
@@ -290,7 +288,6 @@ func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock *sync.RWM
 	go pkg.Retry(time.Second*15, time.Minute, func() error {
 		changes, err := table.Changes().Run(sess)
 		if err != nil {
-			pkg.LogError(errors.Wrap(err, ""))
 			return errors.Wrap(err, "")
 		}
 		defer changes.Close()
@@ -313,9 +310,7 @@ func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock *sync.RWM
 		}
 
 		if changes.Err() != nil {
-			err = errors.Wrap(changes.Err(), "")
-			pkg.LogError(err)
-			return err
+			return errors.Wrap(changes.Err(), "")
 		}
 
 		return nil

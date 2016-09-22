@@ -67,5 +67,5 @@ func TestAuthCode(t *testing.T) {
 	require.NotEmpty(t, code)
 
 	_, err = oauthConfig.Exchange(oauth2.NoContext, code)
-	pkg.RequireError(t, false, err)
+	pkg.RequireError(t, false, err, code)
 }

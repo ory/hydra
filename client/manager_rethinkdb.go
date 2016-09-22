@@ -12,6 +12,7 @@ import (
 	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
+	"github.com/imdario/mergo"
 )
 
 type RethinkManager struct {
@@ -86,6 +87,9 @@ func (m *RethinkManager) UpdateClient(c *Client) error {
 			return errors.Wrap(err, "")
 		}
 		c.Secret = string(h)
+	}
+	if err := mergo.Merge(c, o); err != nil {
+		return errors.Wrap(err, "")
 	}
 
 	if err := m.publishUpdate(c); err != nil {

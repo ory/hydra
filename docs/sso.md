@@ -12,18 +12,18 @@ but does not handle Social Login itself.
 
 The log in screen  
 
-![](dist/images/social-login-example.jpg)
+![](images/social-login-example.jpg)
 
 Logging in with Google Account  
-![](dist/images/google.png)
+![](images/google.png)
 
 User authorizes access  
-![](dist/images/google2.png)
+![](images/google2.png)
 
-![](dist/images/social-login-example.jpg)
+![](images/social-login-example.jpg)
 
 Login completed  
-![](dist/images/login-success-a.gif)
+![](images/login-success-a.gif)
 
 ## In The Background
 

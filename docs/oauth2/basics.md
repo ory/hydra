@@ -7,7 +7,7 @@ HTTP service, such as Facebook, GitHub, and Hydra. It works by delegating user a
 the user account, and authorizing third-party applications to access the user account. OAuth 2 provides authorization
 flows for web and desktop applications, and mobile devices.
 
-![](../dist/images/abstract_flow.png) 
+![](../images/abstract_flow.png) 
 
 Here is a more detailed explanation of the steps in the diagram:
 

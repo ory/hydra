@@ -7,7 +7,7 @@ The storage layer is abstracted and can be modified to use RabbitMQ or MySQL amo
 The message broker keeps the data between all host process in synch. This results in effortless `hydra host`
 scaling on every platform you can imagine: Heroku, Cloud Foundry, Docker, Google Container Engine and many more.
 
-![](../dist/images/hydra-arch.png)
+![](../images/hydra-arch.png)
 
 Serving a uniform API reduces security risks. This is why all clients use REST and OAuth2 HTTP APIs.
 The Command Line Interface (CLI) `hydra`, responsible for managing the cluster, uses these as well.

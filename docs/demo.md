@@ -2,9 +2,9 @@
 
 In this example, you will set up Hydra, a RethinkDB instance and an exemplary identity provider written in React using docker compose. It will take you about 5 minutes to get complete this tutorial.
 
-<img src="dist/images/oauth2-flow.gif" alt="OAuth2 Flow">
+<img src="images/oauth2-flow.gif" alt="OAuth2 Flow">
 
-<img alt="Running the example" align="right" width="35%" src="dist/images/run-the-example.gif">
+<img alt="Running the example" align="right" width="35%" src="images/run-the-example.gif">
 
 Install the [CLI and Docker](https://github.com/ory-am/hydra#installation). Make sure you install Docker Compose as well.
 

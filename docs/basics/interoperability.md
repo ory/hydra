@@ -6,4 +6,4 @@ integrations which probably won't work well anyway. Instead we decided to rely o
 very little effort. JSON Web Tokens are supported by all web programming languages and Hydra's
 [JSON Web Key API](jwk.html) offers a nice way to deal with certificates and keys. Your users won't notice the difference.
 
-![OAuth2 Workflow](../dist/images/hydra-authentication.gif)
+![OAuth2 Workflow](../images/hydra-authentication.gif)

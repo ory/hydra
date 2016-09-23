@@ -87,11 +87,17 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		return
 	}
 
+	o, err := h.Manager.GetConcreteClient(ps.ByName("id"))
+	if err != nil {
+		h.H.WriteError(ctx, w, r, err)
+		return
+	}
+
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &ladon.Request{
 		Resource: ClientsResource,
 		Action:   "update",
 		Context: ladon.Context{
-			"owner": c.Owner,
+			"owner": o.Owner,
 		},
 	}, Scope); err != nil {
 		h.H.WriteError(ctx, w, r, err)

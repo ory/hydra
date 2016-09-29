@@ -5,8 +5,8 @@ WORKDIR /go/src/github.com/ory-am/hydra
 
 RUN go get github.com/Masterminds/glide
 RUN glide install
-RUN go install github.com/ory-am/hydra --force-dangerous-http
+RUN go install github.com/ory-am/hydra
 
-ENTRYPOINT /go/bin/hydra host
+ENTRYPOINT /go/bin/hydra host --force-dangerous-http
 
 EXPOSE 4444

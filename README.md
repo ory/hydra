@@ -30,10 +30,13 @@ the access control SDK [Ladon](https://github.com/ory-am/ladon).
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [What is Hydra?](#what-is-hydra)
-  - [What is Hydra / OAuth2 not?](#what-is-hydra--oauth2-not)
-  - [When does Hydra / OAuth2 make sense?](#when-does-hydra--oauth2-make-sense)
-- [Feature Overview](#feature-overview)
+- [Abstract](#abstract)
+  - [What is OAuth 2.0?](#what-is-oauth-20)
+  - [OAuth 2.0 Example](#oauth-20-example)
+  - [What is OpenID Connect 1.0?](#what-is-openid-connect-10)
+  - [What is Hydra?](#what-is-hydra)
+    - [Top 5 Features](#top-5-features)
+    - [Limitations](#limitations)
 - [Quickstart](#quickstart)
   - [Installation](#installation)
     - [Download binaries](#download-binaries)
@@ -150,8 +153,8 @@ login, sending confirmation emails. This is what the *Identity Provider* is resp
 The communication between Hydra and the Identity Provider is called [*Consent Flow*](https://ory-am.gitbooks.io/hydra/content/oauth2/consent.html).
 2. If you are building a simple service for 50-100 registered users, OAuth2 and Hydra will be overkill.
 3. Hydra does not support the OAuth2 resource owner password credentials flow.
-4. Hydra has no user interface. You must manage OAuth2 Clients and other things using the RESTful endpoints.
-A user interface is scheduled to accompany the stable release.
+4. Hydra has no management frontend. You must manage OAuth2 Clients and other things using the RESTful endpoints or
+the command line interface. A management frontend is scheduled to accompany the stable release.
 
 ## Quickstart
 

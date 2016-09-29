@@ -1,4 +1,4 @@
-FROM golang:1.6
+FROM golang:1.7
 
 ADD . /go/src/github.com/ory-am/hydra
 WORKDIR /go/src/github.com/ory-am/hydra

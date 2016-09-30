@@ -100,9 +100,9 @@ HTTPS CONTROLS
 DEBUG CONTROLS
 ==============
 
-- HYDRA_PROFILING: Set "HYDRA_PROFILING=cpu" to enable cpu profiling and "HYDRA_PROFILING=memory" to enable memory profiling.
+- PROFILING: Set "PROFILING=cpu" to enable cpu profiling and "PROFILING=memory" to enable memory profiling.
 	It is not possible to do both at the same time.
-	Example: HYDRA_PROFILING=cpu
+	Example: PROFILING=cpu
 `,
 	Run: server.RunHost(c),
 }

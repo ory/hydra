@@ -66,13 +66,13 @@ OAUTH2 CONTROLS
 	Defaults to AUTH_CODE_LIFESPAN=10m
 
 - ID_TOKEN_LIFESPAN: Lifespan of OpenID Connect ID Tokens. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
-	Defaults to AUTH_CODE_LIFESPAN=1h
+	Defaults to ID_TOKEN_LIFESPAN=1h
 
 - ACCESS_TOKEN_LIFESPAN: Lifespan of OAuth2 access tokens. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
-	Defaults to AUTH_CODE_LIFESPAN=1h
+	Defaults to ACCESS_TOKEN_LIFESPAN=1h
 
 - CHALLENGE_TOKEN_LIFESPAN: Lifespan of OAuth2 consent tokens. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
-	Defaults to AUTH_CODE_LIFESPAN=10m
+	Defaults to CHALLENGE_TOKEN_LIFESPAN=10m
 
 
 HTTPS CONTROLS

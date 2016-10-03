@@ -1,5 +1,5 @@
 hash: f1931945f77f6461c6134be605c3def735f6c1e7fbabe54993f731591fa02d98
-updated: 2016-09-22T19:17:38.506625+02:00
+updated: 2016-10-03T11:23:49.9431729+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7664702784775e51966f0885f5cd27435916517b
@@ -8,7 +8,7 @@ imports:
 - name: github.com/cenk/backoff
   version: cdf48bbc1eb78d1349cbda326a4a037f7ba565c6
 - name: github.com/davecgh/go-spew
-  version: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
+  version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
   subpackages:
   - spew
 - name: github.com/dgrijalva/jwt-go
@@ -60,7 +60,7 @@ imports:
   - pkg
   - rand/sequence
 - name: github.com/ory-am/fosite
-  version: aa1b8548678e5807399d35b5bcad4f62a83cf6e4
+  version: e61a25f3e3d3f067141c3f6464ab4213f4e14d45
   subpackages:
   - compose
   - fosite-example/pkg
@@ -83,7 +83,7 @@ imports:
 - name: github.com/pkg/sftp
   version: a71e8f580e3b622ebff585309160b1cc549ef4d2
 - name: github.com/pmezard/go-difflib
-  version: 792786c7400a136282c1664665ae0a8db921c6c2
+  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
   subpackages:
   - difflib
 - name: github.com/Sirupsen/logrus
@@ -108,7 +108,7 @@ imports:
   subpackages:
   - json
 - name: github.com/stretchr/testify
-  version: f390dcf405f7b83c997eac1b06768bb9f44dec18
+  version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
   subpackages:
   - assert
   - require

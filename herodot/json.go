@@ -46,7 +46,7 @@ func (h *JSON) WriteCode(ctx context.Context, w http.ResponseWriter, r *http.Req
 
 func (h *JSON) WriteError(ctx context.Context, w http.ResponseWriter, r *http.Request, err error) {
 	e := ToError(err)
-	h.WriteErrorCode(ctx, w, r, e.StatusCode, e)
+	h.WriteErrorCode(ctx, w, r, e.StatusCode, err)
 	return
 }
 
@@ -59,9 +59,9 @@ func (h *JSON) WriteErrorCode(ctx context.Context, w http.ResponseWriter, r *htt
 		code = http.StatusInternalServerError
 	}
 
+	LogError(err, id, code)
 	je := ToError(err)
 	je.StatusCode = code
-	LogError(je, id, code)
 	h.WriteCode(ctx, w, r, je.StatusCode, &jsonError{
 		RequestID: id,
 		Error: ToError(err),

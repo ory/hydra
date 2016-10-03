@@ -54,7 +54,9 @@ func ToError(err error) *Error {
 
 func LogError(err error, id string, code int) {
 	logrus.WithError(err).WithField("request_id", id).WithField("status", code).Errorln("An error occurred")
-	if e, ok := errors.Cause(err).(stackTracer); ok {
+	if e, ok := err.(stackTracer); ok {
+		logrus.Debugf("Stack trace: %+v", e.StackTrace())
+	} else if e, ok := errors.Cause(err).(stackTracer); ok {
 		logrus.Debugf("Stack trace: %+v", e.StackTrace())
 	} else if e, ok := err.(*Error); ok {
 		LogError(e.OriginalError, id, code)

@@ -107,8 +107,8 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 	h.Warden = warden.NewHandler(c, router)
 
 	// Create root account if new install
-	h.createRS256KeysIfNotExist(c, oauth2.ConsentEndpointKey, "private")
-	h.createRS256KeysIfNotExist(c, oauth2.ConsentChallengeKey, "private")
+	createRS256KeysIfNotExist(c, oauth2.ConsentEndpointKey, "private", "sig")
+	createRS256KeysIfNotExist(c, oauth2.ConsentChallengeKey, "private", "sig")
 
 	h.createRootIfNewInstall(c)
 }

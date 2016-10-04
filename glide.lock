@@ -1,5 +1,5 @@
-hash: f1931945f77f6461c6134be605c3def735f6c1e7fbabe54993f731591fa02d98
-updated: 2016-10-03T11:23:49.9431729+02:00
+hash: 2f23b784141880669e3365fddaf8ac6b91b67b3826a499b4e98020ae07687825
+updated: 2016-10-04T19:04:18.5578588+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7664702784775e51966f0885f5cd27435916517b
@@ -60,7 +60,7 @@ imports:
   - pkg
   - rand/sequence
 - name: github.com/ory-am/fosite
-  version: e61a25f3e3d3f067141c3f6464ab4213f4e14d45
+  version: 8ffa0bc825179bbffbd3a548219062846f9b0250
   subpackages:
   - compose
   - fosite-example/pkg

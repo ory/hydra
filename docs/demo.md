@@ -13,10 +13,7 @@ We will use a dummy password as the system secret: `SYSTEM_SECRET=passwordtutori
 ```
 $ go get github.com/ory-am/hydra
 $ cd $GOPATH/src/github.com/ory-am/hydra
-$ docker-compose build
-Building hydra
-[...]
-$ SYSTEM_SECRET=passwordtutorial DOCKER_IP=localhost docker-compose up
+$ SYSTEM_SECRET=passwordtutorial DOCKER_IP=localhost docker-compose up --build
 Starting hydra_rethinkdb_1
 [...]
 mhydra   | mtime="2016-05-17T18:09:28Z" level=warning msg="Generated system secret: MnjFP5eLIr60h?hLI1h-!<4(TlWjAHX7"

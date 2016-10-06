@@ -3,7 +3,7 @@ package connection
 import (
 	"sync"
 
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/ory-am/hydra/pkg"
 )
 
@@ -40,7 +40,7 @@ func (m *MemoryManager) Get(id string) (*Connection, error) {
 
 	c, ok := m.Connections[id]
 	if !ok {
-		return nil, errors.New(pkg.ErrNotFound)
+		return nil, errors.Wrap(pkg.ErrNotFound, "")
 	}
 	return &c, nil
 }
@@ -67,5 +67,5 @@ func (m *MemoryManager) FindByRemoteSubject(provider, subject string) (*Connecti
 			return &c, nil
 		}
 	}
-	return nil, errors.New(pkg.ErrNotFound)
+	return nil, errors.Wrap(pkg.ErrNotFound, "")
 }

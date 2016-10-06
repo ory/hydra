@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
@@ -50,7 +50,7 @@ func (h *Handler) Find(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 
 	policies, err := h.Manager.FindPoliciesForSubject(subject)
 	if err != nil {
-		h.H.WriteError(ctx, w, r, errors.New(err))
+		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
 		return
 	}
 	h.H.Write(ctx, w, r, policies)
@@ -71,7 +71,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&p); err != nil {
-		h.H.WriteError(ctx, w, r, errors.New(err))
+		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
 		return
 	}
 
@@ -80,7 +80,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	}
 
 	if err := h.Manager.Create(&p); err != nil {
-		h.H.WriteError(ctx, w, r, errors.New(err))
+		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
 		return
 	}
 	h.H.WriteCreated(ctx, w, r, "/policies/"+p.ID, &p)
@@ -99,7 +99,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 
 	policy, err := h.Manager.Get(ps.ByName("id"))
 	if err != nil {
-		h.H.WriteError(ctx, w, r, errors.New(err))
+		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
 		return
 	}
 	h.H.Write(ctx, w, r, policy)

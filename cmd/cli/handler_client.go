@@ -46,7 +46,7 @@ func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 			continue
 		}
 		pkg.Must(err, "Could not create client: %s", err)
-		fmt.Printf("Imported client %s from %s.\n", client.ID, path)
+		fmt.Printf("Imported client %s:%s from %s.\n", client.ID, client.Secret, path)
 	}
 }
 

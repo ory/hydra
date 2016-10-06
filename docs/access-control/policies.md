@@ -59,36 +59,39 @@ Policies are JSON documents managed via the [Policy API](http://docs.hdyra.apiar
 
 ### Let everyone read public JWKs
 
+This example let's everyone, including anonymous users, read public keys. Anonymous users have no special ID and are
+simply empty subject strings in Hydra.
+
 ```
-[
-  {
-    "description": "Allow everyone including anonymous users to read JSON Web Keys having Key ID *public*.",
-    "subject": ["<.*>"],
-    "effect": "allow",
-    "resources": [
-      "rn:hydra:keys:<[^:]+>:public"
-    ],
-    "permissions": [
-      "get"
-    ]
-  }
-]
+{
+  "description": "Allow everyone including anonymous users to read JSON Web Keys having Key ID *public*.",
+  "subjects": [
+    "<.*>"
+  ],
+  "effect": "allow",
+  "resources": [
+    "rn:hydra:keys:<[^:]+>:public"
+  ],
+  "actions": [
+    "get"
+  ]
+}
 ```
 
 ### Deny anyone from reading private JWKs
 
 ```
-[
-  {
-    "description": "Explicitly deny everyone reading JSON Web Keys with Key ID *private*.",
-    "subject": ["<.*>"],
-    "effect": "allow",
-    "resources": [
-      "rn:hydra:keys:<[^:]+>:private"
-    ],
-    "permissions": [
-      "get"
-    ]
-  }
-]
+{
+  "description": "Explicitly deny everyone reading JSON Web Keys with Key ID *private*.",
+  "subjects": [
+    "<.*>"
+  ],
+  "effect": "deny",
+  "resources": [
+    "rn:hydra:keys:<[^:]+>:private"
+  ],
+  "actions": [
+    "get"
+  ]
+}
 ```

@@ -23,6 +23,7 @@ import (
 	"github.com/ory-am/fosite/rand"
 	"github.com/square/go-jose"
 	"golang.org/x/net/context"
+	"net/http"
 )
 
 var managers = map[string]Manager{}
@@ -30,6 +31,7 @@ var managers = map[string]Manager{}
 var testGenerator = &RS256Generator{}
 
 var ts *httptest.Server
+var httpManager *HTTPManager
 
 func init() {
 	localWarden, httpClient := internal.NewFirewall(
@@ -43,23 +45,30 @@ func init() {
 		}, &ladon.DefaultPolicy{
 			ID:        "1",
 			Subjects:  []string{"alice"},
-			Resources: []string{"rn:hydra:keys:<faz|bar|foo><.*>"},
+			Resources: []string{"rn:hydra:keys:<faz|bar|foo|anonymous><.*>"},
 			Actions:   []string{"create", "get", "delete", "update"},
+			Effect:    ladon.AllowAccess,
+		}, &ladon.DefaultPolicy{
+			ID:        "2",
+			Subjects:  []string{"alice", ""},
+			Resources: []string{"rn:hydra:keys:anonymous<.*>"},
+			Actions:   []string{"get"},
 			Effect:    ladon.AllowAccess,
 		},
 	)
 
-	r := httprouter.New()
+	router := httprouter.New()
 	h := Handler{
 		Manager: &MemoryManager{},
 		W:       localWarden,
 		H:       &herodot.JSON{},
 	}
-	h.SetRoutes(r)
-	ts := httptest.NewServer(r)
+	h.SetRoutes(router)
+	ts := httptest.NewServer(router)
 	u, _ := url.Parse(ts.URL + "/keys")
 	managers["memory"] = &MemoryManager{}
-	managers["http"] = &HTTPManager{Client: httpClient, Endpoint: u}
+	httpManager = &HTTPManager{Client: httpClient, Endpoint: u}
+	managers["http"] = httpManager
 }
 
 var rethinkManager = new(RethinkManager)
@@ -153,6 +162,27 @@ func TestColdStart(t *testing.T) {
 	rethinkManager.Lock()
 	rethinkManager.Keys = make(map[string]jose.JsonWebKeySet)
 	rethinkManager.Unlock()
+}
+
+func TestHTTPManagerPublicKeyGet(t *testing.T) {
+	anonymous := &HTTPManager{Endpoint: httpManager.Endpoint, Client: http.DefaultClient}
+	ks, _ := testGenerator.Generate("")
+	priv := ks.Key("private")
+
+	name := "http"
+	m := httpManager
+
+	_, err := m.GetKey("anonymous", "baz")
+	pkg.AssertError(t, true, err, name)
+
+	err = m.AddKey("anonymous", First(priv))
+	pkg.AssertError(t, false, err, name)
+
+	time.Sleep(time.Millisecond * 100)
+
+	got, err := anonymous.GetKey("anonymous", "private")
+	pkg.RequireError(t, false, err, name)
+	assert.Equal(t, priv, got.Keys, "%s", name)
 }
 
 func TestManagerKey(t *testing.T) {

@@ -4,16 +4,15 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/Sirupsen/logrus"
-	"github.com/go-errors/errors"
 	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
+	"github.com/Sirupsen/logrus"
 )
 
 type jsonError struct {
 	RequestID string `json:"request"`
-	Error     string `json:"error"`
-	Code      int    `json:"code"`
+	Message string `json:"message"`
+	*Error
 }
 
 type JSON struct {
@@ -47,7 +46,7 @@ func (h *JSON) WriteCode(ctx context.Context, w http.ResponseWriter, r *http.Req
 
 func (h *JSON) WriteError(ctx context.Context, w http.ResponseWriter, r *http.Request, err error) {
 	e := ToError(err)
-	h.WriteErrorCode(ctx, w, r, e.Code, e)
+	h.WriteErrorCode(ctx, w, r, e.StatusCode, err)
 	return
 }
 
@@ -56,26 +55,16 @@ func (h *JSON) WriteErrorCode(ctx context.Context, w http.ResponseWriter, r *htt
 	if id == "" {
 		id = uuid.New()
 	}
-
-	if h.Logger == nil {
-		h.Logger = logrus.New()
-	}
-
-	if e, ok := err.(*Error); ok {
-		h.Logger.WithError(e).WithField("request_id", id).WithField("status", code).WithField("stack", e.Err.ErrorStack()).Printf("Got error.")
-	} else if e, ok := err.(*errors.Error); ok {
-		h.Logger.WithError(e).WithField("request_id", id).WithField("status", code).WithField("stack", e.ErrorStack()).Printf("Got error.")
-	} else {
-		h.Logger.WithError(err).WithField("request_id", id).WithField("status", code).Printf("Got error.")
-	}
-
 	if code == 0 {
 		code = http.StatusInternalServerError
 	}
 
-	h.WriteCode(ctx, w, r, code, &jsonError{
+	LogError(err, id, code)
+	je := ToError(err)
+	je.StatusCode = code
+	h.WriteCode(ctx, w, r, je.StatusCode, &jsonError{
 		RequestID: id,
-		Error:     err.Error(),
-		Code:      code,
+		Error: ToError(err),
+		Message: err.Error(),
 	})
 }

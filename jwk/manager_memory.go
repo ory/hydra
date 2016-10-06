@@ -3,7 +3,7 @@ package jwk
 import (
 	"sync"
 
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/square/go-jose"
 )
@@ -39,12 +39,12 @@ func (m *MemoryManager) GetKey(set, kid string) (*jose.JsonWebKeySet, error) {
 	m.alloc()
 	keys, found := m.Keys[set]
 	if !found {
-		return nil, errors.New(pkg.ErrNotFound)
+		return nil, errors.Wrap(pkg.ErrNotFound, "")
 	}
 
 	result := keys.Key(kid)
 	if len(result) == 0 {
-		return nil, errors.New(pkg.ErrNotFound)
+		return nil, errors.Wrap(pkg.ErrNotFound, "")
 	}
 
 	return &jose.JsonWebKeySet{
@@ -59,7 +59,7 @@ func (m *MemoryManager) GetKeySet(set string) (*jose.JsonWebKeySet, error) {
 	m.alloc()
 	keys, found := m.Keys[set]
 	if !found {
-		return nil, errors.New(pkg.ErrNotFound)
+		return nil, errors.Wrap(pkg.ErrNotFound, "")
 	}
 
 	return keys, nil

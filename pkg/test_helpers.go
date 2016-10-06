@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/ory-am/fosite/fosite-example/pkg"
 	"github.com/ory-am/fosite/handler/oauth2"
 	"github.com/ory-am/fosite/token/hmac"
@@ -25,8 +25,8 @@ func RequireError(t *testing.T, expectError bool, err error, args ...interface{}
 	if err != nil && !expectError {
 		t.Logf("Unexpected error: %s\n", err.Error())
 		t.Logf("Arguments: %v\n", args)
-		if e, ok := err.(*errors.Error); ok {
-			t.Logf("Stack:\n%s\n", e.ErrorStack())
+		if e, ok := errors.Cause(err).(stackTracer); ok {
+			t.Logf("Stack:\n%+v\n", e.StackTrace())
 		}
 		t.Logf("\n\n")
 	}
@@ -38,8 +38,8 @@ func AssertError(t *testing.T, expectError bool, err error, args ...interface{})
 	if err != nil && !expectError {
 		t.Logf("Unexpected error: %s\n", err.Error())
 		t.Logf("Arguments: %s\n", args)
-		if e, ok := err.(*errors.Error); ok {
-			t.Logf("Stack:\n%s\n", e.ErrorStack())
+		if e, ok := errors.Cause(err).(stackTracer); ok {
+			t.Logf("Stack:\n%+v\n", e.StackTrace())
 		}
 		t.Logf("\n\n")
 	}

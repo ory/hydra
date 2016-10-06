@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/compose"
@@ -127,7 +127,7 @@ func signConsentToken(claims jwt.MapClaims) (string, error) {
 
 	keys, err := keyManager.GetKey(ConsentEndpointKey, "private")
 	if err != nil {
-		return "", errors.New(err)
+		return "", errors.Wrap(err, "")
 	}
 	rsaKey, err := jwk.ToRSAPrivate(jwk.First(keys.Keys))
 	if err != nil {
@@ -136,9 +136,9 @@ func signConsentToken(claims jwt.MapClaims) (string, error) {
 
 	var signature, encoded string
 	if encoded, err = token.SigningString(); err != nil {
-		return "", errors.New(err)
+		return "", errors.Wrap(err, "")
 	} else if signature, err = token.Method.Sign(encoded, rsaKey); err != nil {
-		return "", errors.New(err)
+		return "", errors.Wrap(err, "")
 	}
 
 	return fmt.Sprintf("%s.%s", encoded, signature), nil

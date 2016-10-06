@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/firewall"
@@ -111,7 +111,7 @@ func (h *WardenHandler) Allowed(w http.ResponseWriter, r *http.Request, _ httpro
 
 	var access = new(ladon.Request)
 	if err := json.NewDecoder(r.Body).Decode(access); err != nil {
-		h.H.WriteError(ctx, w, r, errors.New(err))
+		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
 		return
 	}
 	defer r.Body.Close()
@@ -142,7 +142,7 @@ func (h *WardenHandler) TokenAllowed(w http.ResponseWriter, r *http.Request, _ h
 		wardenAuthorizedRequest: new(wardenAuthorizedRequest),
 	}
 	if err := json.NewDecoder(r.Body).Decode(&ar); err != nil {
-		h.H.WriteError(ctx, w, r, errors.New(err))
+		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
 		return
 	}
 	defer r.Body.Close()

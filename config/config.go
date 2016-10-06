@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	foauth2 "github.com/ory-am/fosite/handler/oauth2"
 	"github.com/ory-am/fosite/hash"
 	"github.com/ory-am/fosite/token/hmac"
@@ -58,13 +58,13 @@ type Config struct {
 func matchesRange(r *http.Request, ranges []string) error {
 	ip, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 
 	for _, rn := range ranges {
 		_, cidr, err := net.ParseCIDR(rn)
 		if err != nil {
-			return errors.New(err)
+			return errors.Wrap(err, "")
 		}
 		addr := net.ParseIP(ip)
 		if cidr.Contains(addr) {
@@ -271,7 +271,7 @@ func (c *Config) GetAddress() string {
 func (c *Config) Persist() error {
 	out, err := yaml.Marshal(c)
 	if err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 
 	logrus.Infof("Persisting config in file %s", viper.ConfigFileUsed())

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
@@ -110,7 +110,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&keyRequest); err != nil {
-		h.H.WriteError(ctx, w, r, errors.New(err))
+		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
 	}
 
 	generator, found := h.GetGenerators()[keyRequest.Algorithm]
@@ -148,14 +148,14 @@ func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&requests); err != nil {
-		h.H.WriteError(ctx, w, r, errors.New(err))
+		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
 		return
 	}
 
 	for _, request := range requests.Keys {
 		key := &jose.JsonWebKey{}
 		if err := key.UnmarshalJSON(request); err != nil {
-			h.H.WriteError(ctx, w, r, errors.New(err))
+			h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
 		}
 		keySet.Keys = append(keySet.Keys, *key)
 	}
@@ -174,7 +174,7 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 	var set = ps.ByName("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&key); err != nil {
-		h.H.WriteError(ctx, w, r, errors.New(err))
+		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
 		return
 	}
 
@@ -199,7 +199,13 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	var setName = ps.ByName("set")
 	var keyName = ps.ByName("key")
 
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &ladon.Request{
+	if err := h.W.IsAllowed(ctx, &ladon.Request{
+		Subject: "",
+		Resource: "rn:hydra:keys:" + setName + ":" + keyName,
+		Action:   "get",
+	}); err == nil {
+		// Allow unauthorized requests to access this resource if it is enabled by policies
+	} else if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &ladon.Request{
 		Resource: "rn:hydra:keys:" + setName + ":" + keyName,
 		Action:   "get",
 	}, "hydra.keys.get"); err != nil {

@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/net/context"
 )
@@ -43,7 +43,7 @@ func (m *RethinkManager) Get(id string) (*Connection, error) {
 
 	c, ok := m.Connections[id]
 	if !ok {
-		return nil, errors.New(pkg.ErrNotFound)
+		return nil, errors.Wrap(pkg.ErrNotFound, "")
 	}
 	return &c, nil
 }
@@ -70,14 +70,14 @@ func (m *RethinkManager) FindByRemoteSubject(provider, subject string) (*Connect
 			return &c, nil
 		}
 	}
-	return nil, errors.New(pkg.ErrNotFound)
+	return nil, errors.Wrap(pkg.ErrNotFound, "")
 }
 
 func (m *RethinkManager) ColdStart() error {
 	m.Connections = map[string]Connection{}
 	clients, err := m.Table.Run(m.Session)
 	if err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 
 	var connection Connection
@@ -92,14 +92,14 @@ func (m *RethinkManager) ColdStart() error {
 
 func (m *RethinkManager) publishCreate(c *Connection) error {
 	if err := m.Table.Insert(c).Exec(m.Session); err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 	return nil
 }
 
 func (m *RethinkManager) publishDelete(id string) error {
 	if err := m.Table.Get(id).Delete().Exec(m.Session); err != nil {
-		return errors.New(err)
+		return errors.Wrap(err, "")
 	}
 	return nil
 }
@@ -108,7 +108,7 @@ func (m *RethinkManager) Watch(ctx context.Context) {
 	go pkg.Retry(time.Second*15, time.Minute, func() error {
 		connections, err := m.Table.Changes().Run(m.Session)
 		if err != nil {
-			return errors.New(err)
+			return errors.Wrap(err, "")
 		}
 		defer connections.Close()
 
@@ -130,7 +130,7 @@ func (m *RethinkManager) Watch(ctx context.Context) {
 		}
 
 		if connections.Err() != nil {
-			err = errors.New(connections.Err())
+			err = errors.Wrap(connections.Err(), "")
 			pkg.LogError(err)
 			return err
 		}

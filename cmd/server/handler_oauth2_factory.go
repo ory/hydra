@@ -5,7 +5,7 @@ import (
 	"net/url"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/compose"
@@ -72,10 +72,12 @@ func newOAuth2Provider(c *config.Config, km jwk.Manager) fosite.OAuth2Provider {
 	var ctx = c.Context()
 	var store = ctx.FositeStore
 
+	createRS256KeysIfNotExist(c, oauth2.OpenIDConnectKeyName, "private", "sig")
 	keys, err := km.GetKey(oauth2.OpenIDConnectKeyName, "private")
-	if errors.Is(err, pkg.ErrNotFound) {
+	if errors.Cause(err) == pkg.ErrNotFound {
 		logrus.Warnln("Could not find OpenID Connect signing keys. Generating a new keypair...")
 		keys, err = new(jwk.RS256Generator).Generate("")
+
 		pkg.Must(err, "Could not generate signing key for OpenID Connect")
 		km.AddKeySet(oauth2.OpenIDConnectKeyName, keys)
 		logrus.Infoln("Keypair generated.")

@@ -33,8 +33,6 @@ script:
 after_success:
   if  [ "${TRAVIS_TAG}" != "" ] && [ "${TRAVIS_GO_VERSION}" == "1.7" ]; then
     - gox -ldflags "-X github.com/ory-am/hydra/cmd.Version=`git describe --tags` -X github.com/ory-am/hydra/cmd.BuildTime=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory-am/hydra/cmd.GitHash=`git rev-parse HEAD`" -output "dist/{{.Dir}}-{{.OS}}-{{.Arch}}"
-  else
-    - echo TRAVIS_TAG is not set, and go version is not 1.7. Skipping gox build
   fi
 
 deploy:

@@ -161,7 +161,7 @@ func (h *PolicyHandler) AddActionToPolicy(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	policy, err := h.M.Get(args[0])
+	p, err := h.M.Get(args[0])
 	pkg.Must(err, "Could not get policy: %s", err)
 
 	err = h.M.Delete(args[0])
@@ -171,16 +171,16 @@ func (h *PolicyHandler) AddActionToPolicy(cmd *cobra.Command, args []string) {
 		pkg.Must(err, "Could not prepare policy for update: %s", err)
 	}
 
-	p := policy.(*ladon.DefaultPolicy)
-	p.Actions = append(p.Actions, args[1:]...)
+	encp := p.(*ladon.DefaultPolicy)
+	encp.Actions = append(encp.Actions, args[1:]...)
 
-	err = h.M.Create(policy)
+	err = h.M.Create(p)
 	if h.M.Dry {
 		fmt.Printf("%s\n", err)
 		return
 	}
 	pkg.Must(err, "Could not update policy: %s", err)
-	fmt.Printf("Added actions to policy %s", p.ID)
+	fmt.Printf("Added actions to policy %s", encp.ID)
 }
 
 func (h *PolicyHandler) RemoveActionFromPolicy(cmd *cobra.Command, args []string) {
@@ -197,15 +197,15 @@ func (h *PolicyHandler) GetPolicy(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	policy, err := h.M.Get(args[0])
+	p, err := h.M.Get(args[0])
 	if h.M.Dry {
 		fmt.Printf("%s\n", err)
 		return
 	}
-	pkg.Must(err, "Could not delete policy: %s", err)
-
-	out, err := json.MarshalIndent(policy, "", "\t")
 	pkg.Must(err, "Could not retrieve policy: %s", err)
+
+	out, err := json.MarshalIndent(p, "", "\t")
+	pkg.Must(err, "Could not convert policy to JSON: %s", err)
 
 	fmt.Printf("%s\n", out)
 }

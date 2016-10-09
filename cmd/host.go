@@ -45,8 +45,8 @@ CORE CONTROLS
 - PORT: The port hydra should listen on.
 	Defaults to PORT=4444
 
-- HOST: The port hydra should listen on.
-	Example: PORT=localhost
+- HOST: The host interface hydra should listen on. Leave empty to listen on all interfaces.
+	Example: HOST=localhost
 
 - BCRYPT_COST: Set the bcrypt hashing cost. This is a trade off between
 	security and performance. Range is 4 =< x =< 31.

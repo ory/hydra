@@ -6,11 +6,11 @@ import (
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
-	"github.com/pkg/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/pborman/uuid"
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 )
 

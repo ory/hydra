@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/pborman/uuid"
 	"golang.org/x/net/context"
-	"github.com/Sirupsen/logrus"
 )
 
 type jsonError struct {
 	RequestID string `json:"request"`
-	Message string `json:"message"`
+	Message   string `json:"message"`
 	*Error
 }
 
@@ -64,7 +64,7 @@ func (h *JSON) WriteErrorCode(ctx context.Context, w http.ResponseWriter, r *htt
 	je.StatusCode = code
 	h.WriteCode(ctx, w, r, je.StatusCode, &jsonError{
 		RequestID: id,
-		Error: ToError(err),
-		Message: err.Error(),
+		Error:     ToError(err),
+		Message:   err.Error(),
 	})
 }

@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/pkg/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
+	"github.com/pkg/errors"
 	"github.com/square/go-jose"
 	"golang.org/x/net/context"
 )
@@ -199,7 +199,7 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	var keyName = ps.ByName("key")
 
 	if err := h.W.IsAllowed(ctx, &firewall.AccessRequest{
-		Subject: "",
+		Subject:  "",
 		Resource: "rn:hydra:keys:" + setName + ":" + keyName,
 		Action:   "get",
 	}); err == nil {

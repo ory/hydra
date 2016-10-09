@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/pkg/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/meatballhat/negroni-logrus"
 	"github.com/ory-am/hydra/client"
@@ -19,6 +18,7 @@ import (
 	"github.com/ory-am/hydra/policy"
 	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/ladon"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/urfave/negroni"
 	"golang.org/x/net/context"

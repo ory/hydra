@@ -4,12 +4,12 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/pkg/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/pkg/errors"
 	"strings"
 )
 

@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/pkg/errors"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"

@@ -3,8 +3,8 @@ package connection
 import (
 	"sync"
 
-	"github.com/pkg/errors"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/pkg/errors"
 )
 
 type MemoryManager struct {

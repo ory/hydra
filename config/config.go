@@ -13,12 +13,12 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/pkg/errors"
 	foauth2 "github.com/ory-am/fosite/handler/oauth2"
 	"github.com/ory-am/fosite/hash"
 	"github.com/ory-am/fosite/token/hmac"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"golang.org/x/net/context"

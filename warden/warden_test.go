@@ -128,14 +128,14 @@ func TestActionAllowed(t *testing.T) {
 				expectErr: true,
 			},
 			{
-				token: tokens[0][1],
-				req: &firewall.TokenAccessRequest{				},
+				token:     tokens[0][1],
+				req:       &firewall.TokenAccessRequest{},
 				scopes:    []string{"core"},
 				expectErr: true,
 			},
 			{
-				token: tokens[0][1],
-				req: &firewall.TokenAccessRequest{				},
+				token:     tokens[0][1],
+				req:       &firewall.TokenAccessRequest{},
 				scopes:    []string{"foo"},
 				expectErr: true,
 			},

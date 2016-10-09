@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/pkg/errors"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	r "gopkg.in/dancannon/gorethink.v2"
 )

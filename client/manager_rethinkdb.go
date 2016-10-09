@@ -5,14 +5,14 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/pkg/errors"
+	"github.com/imdario/mergo"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/hash"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
-	"github.com/imdario/mergo"
 )
 
 type RethinkManager struct {

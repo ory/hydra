@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"github.com/ory-am/hydra/config"
+	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/spf13/cobra"
 	"golang.org/x/net/context"
-	"github.com/ory-am/hydra/oauth2"
 )
 
 type WardenHandler struct {

@@ -3,8 +3,8 @@ package helper
 import (
 	"net/http"
 
-	"github.com/pkg/errors"
 	"github.com/moul/http2curl"
+	"github.com/pkg/errors"
 )
 
 func DoDryRequest(dry bool, req *http.Request) error {

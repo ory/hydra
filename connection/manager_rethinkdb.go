@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/pkg/errors"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 )
 

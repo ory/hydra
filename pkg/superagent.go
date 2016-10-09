@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/pkg/errors"
 	"github.com/ory-am/hydra/pkg/helper"
+	"github.com/pkg/errors"
 )
 
 type SuperAgent struct {

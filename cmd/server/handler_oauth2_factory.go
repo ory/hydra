@@ -5,7 +5,6 @@ import (
 	"net/url"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/pkg/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/compose"
@@ -16,6 +15,7 @@ import (
 	"github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
 )

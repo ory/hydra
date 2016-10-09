@@ -5,10 +5,10 @@ import (
 	"crypto/rsa"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/pkg/errors"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/pkg/errors"
 )
 
 func createRS256KeysIfNotExist(c *config.Config, set, kid, use string) {

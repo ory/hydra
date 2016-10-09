@@ -13,8 +13,8 @@ import (
 )
 
 type LocalWarden struct {
-	Warden              ladon.Warden
-	OAuth2              fosite.OAuth2Provider
+	Warden ladon.Warden
+	OAuth2 fosite.OAuth2Provider
 
 	AccessTokenLifespan time.Duration
 	Issuer              string
@@ -27,9 +27,9 @@ func (w *LocalWarden) TokenFromRequest(r *http.Request) string {
 func (w *LocalWarden) IsAllowed(ctx context.Context, a *firewall.AccessRequest) error {
 	if err := w.Warden.IsAllowed(&ladon.Request{
 		Resource: a.Resource,
-		Action: a.Action,
-		Subject: a.Subject,
-		Context: a.Context,
+		Action:   a.Action,
+		Subject:  a.Subject,
+		Context:  a.Context,
 	}); err != nil {
 		logrus.WithFields(logrus.Fields{
 			"subject": a.Subject,
@@ -62,16 +62,16 @@ func (w *LocalWarden) sessionAllowed(ctx context.Context, a *firewall.TokenAcces
 
 	if err := w.Warden.IsAllowed(&ladon.Request{
 		Resource: a.Resource,
-		Action: a.Action,
-		Subject: session.Subject,
-		Context: a.Context,
+		Action:   a.Action,
+		Subject:  session.Subject,
+		Context:  a.Context,
 	}); err != nil {
 		logrus.WithFields(logrus.Fields{
 			"scopes":   scopes,
 			"subject":  session.Subject,
 			"audience": oauthRequest.GetClient().GetID(),
 			"request":  a,
-			"reason":  "The policy decision point denied the request",
+			"reason":   "The policy decision point denied the request",
 		}).WithError(err).Infof("Access denied")
 		return nil, err
 	}

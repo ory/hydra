@@ -31,30 +31,30 @@ var defaultOptions = []option{
 // Client offers easy use of all HTTP clients.
 type Client struct {
 	// Clients offers OAuth2 Client management capabilities.
-	Clients           *client.HTTPManager
+	Clients *client.HTTPManager
 
 	// SocialConnections offers Social Login management capabilities.
 	SocialConnections *connection.HTTPManager
 
 	// JSONWebKeys offers JSON Web Key management capabilities.
-	JSONWebKeys       *jwk.HTTPManager
+	JSONWebKeys *jwk.HTTPManager
 
 	// Policies offers Access Policy management capabilities.
-	Policies          *policy.HTTPManager
+	Policies *policy.HTTPManager
 
 	// Warden offers Access Token and Access Request validation strategies (for first-party resource servers).
-	Warden            *warden.HTTPWarden
+	Warden *warden.HTTPWarden
 
 	// Introspection offers Access Token and Access Request introspection strategies (according to RFC 7662).
-	Introspection     *hoauth2.HTTPIntrospector
+	Introspection *hoauth2.HTTPIntrospector
 
-	http              *http.Client
-	clusterURL        *url.URL
-	clientID          string
-	clientSecret      string
-	skipTLSVerify     bool
-	scopes            []string
-	credentials       clientcredentials.Config
+	http          *http.Client
+	clusterURL    *url.URL
+	clientID      string
+	clientSecret  string
+	skipTLSVerify bool
+	scopes        []string
+	credentials   clientcredentials.Config
 }
 
 // Connect instantiates a new client to communicate with Hydra.

@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/pkg/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/ladon"
 	"github.com/pborman/uuid"
+	"github.com/pkg/errors"
 )
 
 const (

@@ -1,17 +1,17 @@
 package oauth2
 
 import (
+	"crypto/rsa"
 	"fmt"
 	"time"
-	"crypto/rsa"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/pkg/errors"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/handler/openid"
 	ejwt "github.com/ory-am/fosite/token/jwt"
 	"github.com/ory-am/hydra/jwk"
 	"github.com/pborman/uuid"
+	"github.com/pkg/errors"
 )
 
 const (

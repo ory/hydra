@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/pkg/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -100,7 +100,7 @@ func (h *WardenHandler) TokenAllowed(w http.ResponseWriter, r *http.Request, _ h
 	}
 
 	var ar = wardenAccessRequest{
-		TokenAccessRequest:                 new(firewall.TokenAccessRequest),
+		TokenAccessRequest:      new(firewall.TokenAccessRequest),
 		wardenAuthorizedRequest: new(wardenAuthorizedRequest),
 	}
 	if err := json.NewDecoder(r.Body).Decode(&ar); err != nil {

@@ -10,6 +10,7 @@ import (
 	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/pkg"
+	"strings"
 )
 
 const (
@@ -47,8 +48,7 @@ func (h *Handler) Introspect(w http.ResponseWriter, r *http.Request, _ httproute
 	var inactive = map[string]bool{"active": false}
 
 	ctx := herodot.NewContext()
-	clientCtx, err := h.Firewall.TokenValid(ctx, h.Firewall.TokenFromRequest(r))
-	if err != nil {
+	if _, err := h.Introspector.IntrospectToken(ctx, h.Firewall.TokenFromRequest(r)); err != nil {
 		h.H.WriteError(ctx, w, r, err)
 		return
 	}
@@ -58,11 +58,8 @@ func (h *Handler) Introspect(w http.ResponseWriter, r *http.Request, _ httproute
 		return
 	}
 
-	auth, err := h.Introspector.IntrospectToken(ctx, r.PostForm.Get("token"))
+	auth, err := h.Introspector.IntrospectToken(ctx, r.PostForm.Get("token"), strings.Split(r.PostForm.Get("scope"), " ")...)
 	if err != nil {
-		h.H.Write(ctx, w, r, &inactive)
-		return
-	} else if clientCtx.Subject != auth.Audience {
 		h.H.Write(ctx, w, r, &inactive)
 		return
 	}

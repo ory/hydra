@@ -20,9 +20,9 @@ func (w *LocalIntrospector) TokenFromRequest(r *http.Request) string {
 	return fosite.AccessTokenFromRequest(r)
 }
 
-func (w *LocalIntrospector) IntrospectToken(ctx context.Context, token string) (*Introspection, error) {
+func (w *LocalIntrospector) IntrospectToken(ctx context.Context, token string, scopes ...string) (*Introspection, error) {
 	var session = new(Session)
-	var auth, err = w.OAuth2.ValidateToken(ctx, token, fosite.AccessToken, session)
+	var auth, err = w.OAuth2.ValidateToken(ctx, token, fosite.AccessToken, session, scopes...)
 	if err != nil {
 		logrus.WithError(err).Infof("Token introspection failed")
 		return &Introspection{

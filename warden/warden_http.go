@@ -8,7 +8,6 @@ import (
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/pkg"
-	"github.com/ory-am/ladon"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
@@ -32,7 +31,7 @@ func (w *HTTPWarden) SetClient(c *clientcredentials.Config) {
 // This endpoint requires a token, a scope, a resource name, an action name and a context.
 //
 // The HTTP API is documented at http://docs.hdyra.apiary.io/#reference/warden:-access-control-for-resource-providers/check-if-an-access-tokens-subject-is-allowed-to-do-something
-func (w *HTTPWarden) TokenAllowed(ctx context.Context, token string, a *ladon.Request, scopes ...string) (*firewall.Context, error) {
+func (w *HTTPWarden) TokenAllowed(ctx context.Context, token string, a *firewall.TokenAccessRequest, scopes ...string) (*firewall.Context, error) {
 	var resp = struct {
 		*firewall.Context
 		Allowed bool `json:"allowed"`
@@ -46,7 +45,7 @@ func (w *HTTPWarden) TokenAllowed(ctx context.Context, token string, a *ladon.Re
 			Token:  token,
 			Scopes: scopes,
 		},
-		Request: a,
+		TokenAccessRequest: a,
 	}, &resp); err != nil {
 		return nil, err
 	} else if !resp.Allowed {
@@ -59,7 +58,7 @@ func (w *HTTPWarden) TokenAllowed(ctx context.Context, token string, a *ladon.Re
 // IsAllowed checks if an arbitrary subject is allowed to perform an action on a resource.
 //
 // The HTTP API is documented at http://docs.hdyra.apiary.io/#reference/warden:-access-control-for-resource-providers/check-if-a-subject-is-allowed-to-do-something
-func (w *HTTPWarden) IsAllowed(ctx context.Context, a *ladon.Request) error {
+func (w *HTTPWarden) IsAllowed(ctx context.Context, a *firewall.AccessRequest) error {
 	var allowed = struct {
 		Allowed bool `json:"allowed"`
 	}{}
@@ -74,28 +73,4 @@ func (w *HTTPWarden) IsAllowed(ctx context.Context, a *ladon.Request) error {
 	}
 
 	return nil
-}
-
-// TokenValid checks if an access token is valid. You must provide a token and a scope.
-//
-// The HTTP API is documented at http://docs.hdyra.apiary.io/#reference/warden:-access-control-for-resource-providers/check-if-an-access-token-is-valid
-func (w *HTTPWarden) TokenValid(ctx context.Context, token string, scopes ...string) (*firewall.Context, error) {
-	var resp = struct {
-		*firewall.Context
-		Valid bool `json:"valid"`
-	}{}
-
-	var ep = *w.Endpoint
-	ep.Path = TokenValidHandlerPath
-	agent := &pkg.SuperAgent{URL: ep.String(), Client: w.Client}
-	if err := agent.POST(&wardenAuthorizedRequest{
-		Token:  token,
-		Scopes: scopes,
-	}, &resp); err != nil {
-		return nil, err
-	} else if !resp.Valid {
-		return nil, errors.New("Token is not valid")
-	}
-
-	return resp.Context, nil
 }

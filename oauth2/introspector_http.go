@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
 type HTTPIntrospector struct {
@@ -31,12 +32,12 @@ func (this *HTTPIntrospector) SetClient(c *clientcredentials.Config) {
 // IntrospectToken is capable of introspecting tokens according to https://tools.ietf.org/html/rfc7662
 //
 // The HTTP API is documented at http://docs.hdyra.apiary.io/#reference/oauth2/oauth2-token-introspection
-func (this *HTTPIntrospector) IntrospectToken(ctx context.Context, token string) (*Introspection, error) {
+func (this *HTTPIntrospector) IntrospectToken(ctx context.Context, token string, scopes ...string) (*Introspection, error) {
 	var resp = new(Introspection)
 	var ep = *this.Endpoint
 	ep.Path = IntrospectPath
 
-	data := url.Values{"token": []string{token}}
+	data := url.Values{"token": []string{token}, "scope": []string{strings.Join(scopes, " ")}}
 	hreq, err := http.NewRequest("POST", ep.String(), bytes.NewBufferString(data.Encode()))
 	if err != nil {
 		return nil, errors.Wrap(err, "")

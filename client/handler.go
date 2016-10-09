@@ -46,10 +46,10 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 		return
 	}
 
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &ladon.Request{
+	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: ClientsResource,
 		Action:   "create",
-		Context: ladon.Context{
+		Context: map[string]interface{}{
 			"owner": c.Owner,
 		},
 	}, Scope); err != nil {
@@ -93,7 +93,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		return
 	}
 
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &ladon.Request{
+	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: ClientsResource,
 		Action:   "update",
 		Context: ladon.Context{
@@ -120,7 +120,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var ctx = herodot.NewContext()
 
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &ladon.Request{
+	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: ClientsResource,
 		Action:   "get",
 	}, Scope); err != nil {
@@ -152,7 +152,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 		return
 	}
 
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &ladon.Request{
+	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: fmt.Sprintf(ClientResource, id),
 		Action:   "get",
 		Context: ladon.Context{
@@ -171,7 +171,7 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	var ctx = herodot.NewContext()
 	var id = ps.ByName("id")
 
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &ladon.Request{
+	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: fmt.Sprintf(ClientResource, id),
 		Action:   "delete",
 	}, Scope); err != nil {

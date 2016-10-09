@@ -40,7 +40,7 @@ func (h *Handler) Find(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 		h.H.WriteErrorCode(ctx, w, r, http.StatusBadRequest, errors.New("Missing query parameter subject"))
 	}
 
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &ladon.Request{
+	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: policyResource,
 		Action:   "find",
 	}, scope); err != nil {
@@ -62,7 +62,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	}
 	ctx := herodot.NewContext()
 
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &ladon.Request{
+	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: policyResource,
 		Action:   "create",
 	}, scope); err != nil {
@@ -89,7 +89,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	ctx := herodot.NewContext()
 
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &ladon.Request{
+	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: fmt.Sprintf(policiesResource, ps.ByName("id")),
 		Action:   "get",
 	}, scope); err != nil {
@@ -109,7 +109,7 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	ctx := herodot.NewContext()
 	id := ps.ByName("id")
 
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &ladon.Request{
+	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: fmt.Sprintf(policiesResource, id),
 		Action:   "get",
 	}, scope); err != nil {

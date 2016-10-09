@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/ory-am/ladon"
 	"golang.org/x/net/context"
 )
 
@@ -34,18 +33,37 @@ type Context struct {
 	Extra map[string]interface{} `json:"ext"`
 }
 
+// AccessRequest is the warden's request object.
+type AccessRequest struct {
+	// Resource is the resource that access is requested to.
+	Resource string `json:"resource"`
+
+	// Action is the action that is requested on the resource.
+	Action string `json:"action"`
+
+	// Subejct is the subject that is requesting access.
+	Subject string `json:"subject"`
+
+	// Context is the request's environmental context.
+	Context map[string]interface{} `json:"context"`
+}
+
+type TokenAccessRequest struct {
+	// Resource is the resource that access is requested to.
+	Resource string `json:"resource"`
+
+	// Action is the action that is requested on the resource.
+	Action string `json:"action"`
+
+	// Context is the request's environmental context.
+	Context map[string]interface{} `json:"context"`
+}
+
 // Firewall offers various validation strategies for access tokens.
 type Firewall interface {
-	// TokenValid checks if the given token is valid and if the requested scopes are satisfied. Returns
-	// a context if the token is valid and an error if not.
-	//
-	//  ctx, err := firewall.TokenValid(context.Background(), "access-token", "photos", "files")
-	//  fmt.Sprintf("%s", ctx.Subject)
-	TokenValid(ctx context.Context, token string, scopes ...string) (*Context, error)
-
 	// IsAllowed uses policies to return nil if the access request can be fulfilled or an error if not.
 	//
-	//  ctx, err := firewall.IsAllowed(context.Background(), &ladon.Request{
+	//  ctx, err := firewall.IsAllowed(context.Background(), &AccessRequest{
 	//    Subject:  "alice",
 	//    Resource: "matrix",
 	//    Action:   "create",
@@ -53,18 +71,18 @@ type Firewall interface {
 	//  }, "photos", "files")
 	//
 	//  fmt.Sprintf("%s", ctx.Subject)
-	IsAllowed(ctx context.Context, accessRequest *ladon.Request) error
+	IsAllowed(ctx context.Context, accessRequest *AccessRequest) error
 
 	// TokenAllowed uses policies and a token to return a context and no error if the access request can be fulfilled or an error if not.
 	//
-	//  ctx, err := firewall.TokenAllowed(context.Background(), "access-token", &ladon.Request{
+	//  ctx, err := firewall.TokenAllowed(context.Background(), "access-token", &TokenAccessRequest{
 	//    Resource: "matrix",
 	//    Action:   "create",
 	//    Context:  ladon.Context{},
 	//  }, "photos", "files")
 	//
 	//  fmt.Sprintf("%s", ctx.Subject)
-	TokenAllowed(ctx context.Context, token string, accessRequest *ladon.Request, scopes ...string) (*Context, error)
+	TokenAllowed(ctx context.Context, token string, accessRequest *TokenAccessRequest, scopes ...string) (*Context, error)
 
 	// TokenFromRequest returns an access token from the HTTP Authorization header.
 	//

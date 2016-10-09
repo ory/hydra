@@ -116,45 +116,32 @@ func TestActionAllowed(t *testing.T) {
 	for n, w := range wardens {
 		for k, c := range []struct {
 			token     string
-			req       *ladon.Request
+			req       *firewall.TokenAccessRequest
 			scopes    []string
 			expectErr bool
 			assert    func(*firewall.Context)
 		}{
 			{
 				token:     "invalid",
-				req:       &ladon.Request{},
-				scopes:    []string{},
-				expectErr: true,
-			},
-			{
-				token: "invalid",
-				req: &ladon.Request{
-					Subject: "mallet",
-				},
+				req:       &firewall.TokenAccessRequest{},
 				scopes:    []string{},
 				expectErr: true,
 			},
 			{
 				token: tokens[0][1],
-				req: &ladon.Request{
-					Subject: "mallet",
-				},
+				req: &firewall.TokenAccessRequest{				},
 				scopes:    []string{"core"},
 				expectErr: true,
 			},
 			{
 				token: tokens[0][1],
-				req: &ladon.Request{
-					Subject: "alice",
-				},
+				req: &firewall.TokenAccessRequest{				},
 				scopes:    []string{"foo"},
 				expectErr: true,
 			},
 			{
 				token: tokens[0][1],
-				req: &ladon.Request{
-					Subject:  "alice",
+				req: &firewall.TokenAccessRequest{
 					Resource: "matrix",
 					Action:   "create",
 					Context:  ladon.Context{},
@@ -164,8 +151,7 @@ func TestActionAllowed(t *testing.T) {
 			},
 			{
 				token: tokens[0][1],
-				req: &ladon.Request{
-					Subject:  "alice",
+				req: &firewall.TokenAccessRequest{
 					Resource: "matrix",
 					Action:   "delete",
 					Context:  ladon.Context{},
@@ -175,8 +161,7 @@ func TestActionAllowed(t *testing.T) {
 			},
 			{
 				token: tokens[0][1],
-				req: &ladon.Request{
-					Subject:  "alice",
+				req: &firewall.TokenAccessRequest{
 					Resource: "matrix",
 					Action:   "create",
 					Context:  ladon.Context{},
@@ -186,8 +171,7 @@ func TestActionAllowed(t *testing.T) {
 			},
 			{
 				token: tokens[0][1],
-				req: &ladon.Request{
-					Subject:  "alice",
+				req: &firewall.TokenAccessRequest{
 					Resource: "matrix",
 					Action:   "create",
 					Context:  ladon.Context{},
@@ -215,12 +199,12 @@ func TestActionAllowed(t *testing.T) {
 func TestAllowed(t *testing.T) {
 	for n, w := range wardens {
 		for k, c := range []struct {
-			req       *ladon.Request
+			req       *firewall.AccessRequest
 			expectErr bool
 			assert    func(*firewall.Context)
 		}{
 			{
-				req: &ladon.Request{
+				req: &firewall.AccessRequest{
 					Subject:  "alice",
 					Resource: "other-thing",
 					Action:   "create",
@@ -229,7 +213,7 @@ func TestAllowed(t *testing.T) {
 				expectErr: true,
 			},
 			{
-				req: &ladon.Request{
+				req: &firewall.AccessRequest{
 					Subject:  "alice",
 					Resource: "matrix",
 					Action:   "delete",
@@ -238,7 +222,7 @@ func TestAllowed(t *testing.T) {
 				expectErr: true,
 			},
 			{
-				req: &ladon.Request{
+				req: &firewall.AccessRequest{
 					Subject:  "alice",
 					Resource: "matrix",
 					Action:   "create",
@@ -254,57 +238,4 @@ func TestAllowed(t *testing.T) {
 		t.Logf("Passed tests %s\n", n)
 	}
 
-}
-
-func TestTokenValid(t *testing.T) {
-	for n, w := range wardens {
-		for k, c := range []struct {
-			token     string
-			scopes    []string
-			expectErr bool
-			assert    func(*firewall.Context)
-		}{
-			{
-				token:     "invalid",
-				expectErr: true,
-			},
-			{
-				token:     "invalid",
-				expectErr: true,
-			},
-			{
-				token:     tokens[0][1],
-				scopes:    []string{"foo"},
-				expectErr: true,
-			},
-			{
-				token:     tokens[1][1],
-				scopes:    []string{"illegal"},
-				expectErr: true,
-			},
-			{
-				token:     tokens[1][1],
-				scopes:    []string{"core"},
-				expectErr: false,
-				assert: func(c *firewall.Context) {
-					assert.Equal(t, "bob", c.Audience)
-					assert.Equal(t, "siri", c.Subject)
-					assert.Equal(t, "tests", c.Issuer)
-					assert.Equal(t, now.Add(time.Hour), c.ExpiresAt, "expires at", n)
-					assert.Equal(t, now, c.IssuedAt, "issued at", n)
-				},
-			},
-			{
-				token:     tokens[2][1],
-				scopes:    []string{"core"},
-				expectErr: true,
-			},
-		} {
-			ctx, err := w.TokenValid(context.Background(), c.token, c.scopes...)
-			pkg.AssertError(t, c.expectErr, err, "ActionAllowed case", n, k)
-			if err == nil && c.assert != nil {
-				c.assert(ctx)
-			}
-		}
-	}
 }

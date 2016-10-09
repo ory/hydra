@@ -67,5 +67,5 @@ type Introspector interface {
 	//    ctx, err := introspector.IntrospectToken(context.Background(), introspector.TokenFromRequest(r), "photos", "files")
 	//    fmt.Sprintf("%s", ctx.Subject)
 	//  }
-	IntrospectToken(ctx context.Context, token string) (*Introspection, error)
+	IntrospectToken(ctx context.Context, token string, scopes ...string) (*Introspection, error)
 }

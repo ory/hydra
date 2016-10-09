@@ -110,7 +110,7 @@ func anyHttpHandler(w http.ResponseWriter, r *http.Request) {
     fmt.Sprintf("%s", ctx.Subject)
     
     // Check if a token is valid and the token's subject fulfills the policy based access request.
-    ctx, err := hydra.Warden.TokenAllowed(context.Background(), "access-token", &ladon.Request{
+    ctx, err := hydra.Warden.TokenAllowed(context.Background(), "access-token", &firewall.TokenAccessRequest{
         Resource: "matrix",
         Action:   "create",
         Context:  ladon.Context{},

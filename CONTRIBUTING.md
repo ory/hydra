@@ -1,5 +1,21 @@
 # Contribution Guide
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Introduction](#introduction)
+- [Contributing Code](#contributing-code)
+- [Code Style](#code-style)
+- [Developer’s Certificate of Origin](#developer%E2%80%99s-certificate-of-origin)
+- [Pull request procedure](#pull-request-procedure)
+- [Communication](#communication)
+- [Conduct](#conduct)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## Introduction
+
 We welcome and encourage community contributions to Hydra.
 
 Since the project is still unstable, there are specific priorities for development. Pull requests that do not address these priorities will not be accepted until Hydra is production ready.

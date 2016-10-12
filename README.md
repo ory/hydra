@@ -16,22 +16,27 @@
 [![HTTP API Documentation](https://img.shields.io/badge/docs-http%20api-blue.svg)](http://docs.hdyra.apiary.io/)
 [![Code Documentation](https://img.shields.io/badge/docs-godoc-blue.svg)](https://godoc.org/github.com/ory-am/hydra)
 
-Hydra is being developed by german-based company [Ory](https://ory.am).
-Join our [newsletter](http://eepurl.com/bKT3N9) to stay on top of new developments.
-We offer basic support requests on [Google Groups](https://groups.google.com/forum/#!forum/ory-hydra/new) and [Gitter](https://gitter.im/ory-am/hydra)
-as well as [consulting](mailto:hi@ory.am) around integrating Hydra into
-your particular environment and [premium support](mailto:hi@ory.am).
+Hydra is a runnable server implementation of the OAuth2 2.0 authorization framework and the OpenID Connect Core 1.0.
 
-Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://github.com/ory-am/fosite) and [Ladon](https://github.com/ory-am/ladon) for policy-based access control.
+Hydra is being developed by german-based company [ORY](https://ory.am).
+Join our [newsletter](http://eepurl.com/bKT3N9) to stay on top of new developments.
+We answer basic support requests on [Google Groups](https://groups.google.com/forum/#!forum/ory-hydra/new) and [Gitter](https://gitter.im/ory-am/hydra)
+and offer [premium services](http://www.ory.am/products/hydra) around Hydra.
+
+Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://github.com/ory-am/fosite) and
+the access control SDK [Ladon](https://github.com/ory-am/ladon).
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [What is Hydra?](#what-is-hydra)
-  - [What is Hydra / OAuth2 not?](#what-is-hydra--oauth2-not)
-  - [When does Hydra / OAuth2 make sense?](#when-does-hydra--oauth2-make-sense)
-- [Feature Overview](#feature-overview)
+- [Abstract](#abstract)
+  - [What is OAuth 2.0?](#what-is-oauth-20)
+  - [OAuth 2.0 Example](#oauth-20-example)
+  - [What is OpenID Connect 1.0?](#what-is-openid-connect-10)
+  - [What is Hydra?](#what-is-hydra)
+    - [Top 5 Features](#top-5-features)
+    - [Limitations](#limitations)
 - [Quickstart](#quickstart)
   - [Installation](#installation)
     - [Download binaries](#download-binaries)
@@ -50,78 +55,106 @@ Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://git
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## What is Hydra?
+## Abstract
 
-At first, there was the monolith. The monolith worked well with the bespoke authentication module.
-Then, the web evolved into an elastic cloud that serves thousands of different user agents
-in every part of the world.
+This section is geared towards giving you some ideas of what OAuth 2.0 and OpenID Connect 1.0 are for and how Hydra fits
+in this picture.
 
-Hydra is driven by the need for a **scalable, low-latency, in memory
-Access Control, OAuth2, and OpenID Connect layer** that integrates with every identity provider you can imagine.
+### What is OAuth 2.0?
 
-* Hydra is built security first: architecture and work flows are designed to neutralize various common (OWASP TOP TEN) and uncommon attack vectors. [Learn more](https://ory-am.gitbooks.io/hydra/content/basics/security.html).
-* Hydra can manage all of your access control needs, such as policy based access control and access token validation. [Learn more](https://ory-am.gitbooks.io/hydra/content/access-control.html).
-* Hydra depends on an identity provider of your choosing, e.g. [authboss](https://github.com/go-authboss/authboss), and works with any identity provider that is able to read and issue JSON Web Tokens. [Learn more](https://ory-am.gitbooks.io/hydra/content/oauth2/consent.html).
-* Hydra has nano-second latency on high profile endpoints, overwhelmingly efficient memory and CPU consumption and scales effortlessly. [Learn more](https://ory-am.gitbooks.io/hydra/content/basics/architecture.html).
-* Hydra focuses on ease of use, integration, management and operation. [Get Hydra up and running in 5 Minutes](https://ory-am.gitbooks.io/hydra/content/demo.html).
-* Hydra helps you manage [Social Login Connections](https://ory-am.gitbooks.io/hydra/content/sso.html) as well as [JSON Web Keys](https://ory-am.gitbooks.io/hydra/content/jwk.html) and is planned to help you manage User Groups and Two Factor Authentication as well.
-* Hydra is available through [Docker](https://hub.docker.com/r/oryam/hydra/) and relies on RethinkDB for persistence.
-Database drivers are extensible in case you want to use RabbitMQ, MySQL, MongoDB, or some other database instead.
+The OAuth 2.0 authorization framework enables a third-party
+application to obtain limited access to an HTTP service, either on
+behalf of a resource owner by orchestrating an approval interaction
+between the resource owner and the HTTP service, or by allowing the
+third-party application to obtain access on its own behalf.
 
-Hydra is built for high volume environments and is capable of serving tens of thousands of simultaneous requests per second per instance. Read [this issue](https://github.com/ory-am/hydra/issues/161) for information on reproducing these benchmarks yourself.
+In the traditional client-server authentication model, the client
+requests an access-restricted resource (protected resource) on the
+server by authenticating with the server using the resource owner's
+credentials. In order to provide third-party applications access to
+restricted resources, the resource owner shares its credentials with
+the third party. This creates several problems and limitations.
 
-### What is Hydra / OAuth2 not?
+OAuth addresses these issues by introducing an authorization layer
+and separating the role of the client from that of the resource
+owner.  In OAuth, the client requests access to resources controlled
+by the resource owner and hosted by the resource server, and is
+issued a different set of credentials than those of the resource
+owner.
 
-I am new to all of this. When should I reconsider if using OAuth2 / Hydra is the right choice for me?
+Instead of using the resource owner's credentials to access protected
+resources, the client obtains an access token -- a string denoting a
+specific scope, lifetime, and other access attributes.  Access tokens
+are issued to third-party clients by an authorization server with the
+approval of the resource owner.  The client uses the access token to
+access the protected resources hosted by the resource server.
+
+### OAuth 2.0 Example
+
+An end-user (resource owner) can grant a printing
+service (client) access to her protected photos stored at a photo-
+sharing service (resource server), without sharing her username and
+password with the printing service.  Instead, she authenticates
+directly with a server trusted by the photo-sharing service
+(authorization server), which issues the printing service delegation-
+specific credentials (access token).
+
+Source: [IETF RFC 6749](https://tools.ietf.org/html/rfc6749)
+
+### What is OpenID Connect 1.0?
+
+OpenID Connect 1.0 is a simple identity layer on top of the OAuth 2.0 protocol.
+It enables Clients to verify the identity of the End-User based on the authentication performed
+by an Authorization Server, as well as to obtain basic profile information about the End-User in
+an interoperable and REST-like manner.
+
+As background, the OAuth 2.0 Authorization Framework and OAuth 2.0 Bearer Token
+Usage specifications provide a general framework for third-party
+applications to obtain and use limited access to HTTP resources.
+They define mechanisms to obtain and use Access Tokens to access resources
+but do not define standard methods to provide identity information.
+Notably, without profiling OAuth 2.0, it is incapable of providing information
+about the authentication of an End-User.
+
+OpenID Connect implements authentication as an extension to the OAuth 2.0 authorization process.
+
+Source [OpenID Connect Core 1.0](openid.net/specs/openid-connect-core-1_0.html)
+
+### What is Hydra?
+
+Hydra is a server implementation of the OAuth 2.0 authorization framework and the OpenID Connect Core 1.0. Existing OAuth2
+implementations usually ship as libraries or SDKs such as [node-oauth2-server](https://github.com/oauthjs/node-oauth2-server)
+or [fosite](https://github.com/ory-am/fosite/issues), or as fully featured identity solutions with user
+management and user interfaces, such as [Dex](https://github.com/coreos/dex).
+
+Implementing and using OAuth2 without understanding the whole specification is challenging and prone to errors, even when
+SDKs are being used. The primary goal of Hydra is to make OAuth 2.0 and OpenID Connect 1.0 better accessible.
+
+Hydra implements the flows described in OAuth2 and OpenID Connect 1.0 without forcing you to use a "Hydra User Management"
+or some template engine or a predefined front-end. Instead it relies on HTTP redirection and cryptographic methods
+to verify user consent allowing you to use Hydra with any authentication endpoint, be it [authboss](https://github.com/go-authboss/authboss),
+[auth0.com](https://auth0.com/) or your proprietary PHP authentication.
+
+#### Top 5 Features
+
+1. Hydra ships as a single binary for all popular platforms including Linux, OSX and Windows, without any additional
+dependencies (think NodeJS or .NET). For further simplicity, Hydra is available as a [Docker Image](https://hub.docker.com/r/oryam/hydra/).
+2. Hydra is built security first: architecture and work flows are designed to neutralize various common (OWASP TOP TEN)
+and uncommon attack vectors. [Learn more](https://ory-am.gitbooks.io/hydra/content/basics/security.html).
+3. Hydra has a low memory and CPU footprint, short boot-up times and keeps data in-memory to serve request reliable and with ultra low-latency. [Read more](https://github.com/ory-am/hydra/issues/161)
+4. Hydra comes with sophisticated access control. [Learn more](https://ory-am.gitbooks.io/hydra/content/access-control.html).
+5. Hydra scales effortlessly up and down on every platform you can imagine, including Heroku, Cloud Foundry, Docker,
+Google Container Engine and many more.
+
+#### Limitations
 
 1. Hydra is not something that manages user accounts. Hydra does not offer user registration, password reset, user
-login, sending confirmation emails. This is what the *Identity Provider* ("login endpoint") is responsible for.
+login, sending confirmation emails. This is what the *Identity Provider* is responsible for.
 The communication between Hydra and the Identity Provider is called [*Consent Flow*](https://ory-am.gitbooks.io/hydra/content/oauth2/consent.html).
-[Auth0.com](https://auth0.com) is an Identity Provider. We might implement this feature at some point and if, it is going to be a different product.
-2. If you think running an OAuth2 Provider can solve your user authentication ("log a user in"), Hydra is probably not for you. OAuth2 is a delegation protocol:
-
-  > The OAuth 2.0 authorization framework enables a third-party application *[think: a dropbox app that manages your dropbox photos]*
-  to obtain limited access to an HTTP service, either on behalf of *[do you allow "amazing photo app" to access all your photos?]*
-  a resource owner *[user]* by orchestrating an approval interaction *[consent flow]* between the resource owner and the
-  HTTP service, or by allowing the third-party application *[OAuth2 Client App]* to obtain access on its own behalf.
-  - **[IETF](https://tools.ietf.org/html/rfc6749)**
-3. If you are building a simple service for 50-100 registered users, OAuth2 and Hydra will be overkill.
-4. Hydra does not support the OAuth2 resource owner password credentials flow.
-5. Hydra has no user interface. You must manage OAuth2 Clients and other things using the RESTful endpoints.
-A user interface is scheduled to accompany the stable release.
-
-### When does Hydra / OAuth2 make sense?
-
-1. If you want third-party developers to access your APIs, Hydra is the perfect fit. This is what an OAuth2 Provider does.
-2. If you want to become a Identity Provider, like Google, Facebook or Microsoft, OpenID Connect and thus Hydra is a perfect fit.
-3. Running an OAuth2 Provider works great with browser, mobile and wearable apps, as you can avoid storing user
-credentials on the device, phone or wearable and revoke access tokens, and thus access privileges, at any time. Adding
-OAuth2 complexity to your environment when you never plan to do (1),
-might not be worth it. Our advice: write a pros/cons list.
-4. If you have a lot of services and want to limit automated access (think: cronjobs) for those services,
-OAuth2 might make sense for you. Example: The comment service is not allowed to read user passwords when fetching
-the latest user profile updates.
-
-## Feature Overview
-
-1. **Availability:** Hydra uses pub/sub to have the latest data available in memory. The in-memory architecture allows for heavy duty workloads.
-2. **Scalability:** Hydra scales effortlessly on every platform you can imagine, including Heroku, Cloud Foundry, Docker,
-Google Container Engine and many more.
-3. **Integration:** Hydra wraps your existing stack like a blanket and keeps it safe. Hydra uses cryptographic tokens to authenticate users and request their consent, no APIs required.
-The deprecated php-3.0 authentication service your intern wrote? It works with that too, don't worry.
-We wrote an example with React to show you what this could look like: [React.js Identity Provider Example App](https://github.com/ory-am/hydra-idp-react).
-4. **Security:** Hydra leverages the security first OAuth2 framework **[Fosite](https://github.com/ory-am/fosite)**,
-encrypts important data at rest, and supports HTTP over TLS (https) out of the box.
-5. **Ease of use:** Developers and operators are human. Therefore, Hydra is easy to install and manage. Hydra does not care if you use React, Angular, or Cocoa for your user interface.
-To support you even further, there are APIs available for *cryptographic key management, social log on, policy based access control, policy management, and two factor authentication (tbd).*
-Hydra is packaged using [Docker](https://hub.docker.com/r/oryam/hydra/).
-6. **Open Source:** Hydra is licensed under Apache Version 2.0
-7. **Professional:** Hydra implements peer reviewed open standards published by [The Internet Engineering Task Force (IETF®)](https://www.ietf.org/) and the [OpenID Foundation](https://openid.net/)
-and under supervision of the [LMU Teaching and Research Unit Programming and Modelling Languages](http://www.en.pms.ifi.lmu.de). No funny business.
-8.  <img src="docs/images/monitoring.gif" width="45%" align="right"> **Real Time:** Operation is a lot easier with real time. There are no caches,
-    no invalidation strategies and no magic - just simple, cloud native pub-sub. Hydra leverages RethinkDB, so check out their real time database monitoring too!
-
-<br clear="all">
+2. If you are building a simple service for 50-100 registered users, OAuth2 and Hydra will be overkill.
+3. Hydra does not support the OAuth2 resource owner password credentials flow.
+4. Hydra has no management frontend. You must manage OAuth2 Clients and other things using the RESTful endpoints or
+the command line interface. A management frontend is scheduled to accompany the stable release.
 
 ## Quickstart
 

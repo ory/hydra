@@ -18,6 +18,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 	goauth2 "golang.org/x/oauth2"
+	"fmt"
 )
 
 var (
@@ -119,7 +120,7 @@ func init() {
 }
 
 func TestIntrospect(t *testing.T) {
-	for _, w := range introspectors {
+	for k, w := range introspectors {
 		for _, c := range []struct {
 			token     string
 			expectErr bool
@@ -149,11 +150,13 @@ func TestIntrospect(t *testing.T) {
 				},
 			},
 		} {
-			ctx, err := w.IntrospectToken(context.Background(), c.token)
-			pkg.AssertError(t, c.expectErr, err)
-			if err == nil && c.assert != nil {
-				c.assert(ctx)
-			}
+			t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
+				ctx, err := w.IntrospectToken(context.Background(), c.token)
+				pkg.AssertError(t, c.expectErr, err)
+				if err == nil && c.assert != nil {
+					c.assert(ctx)
+				}
+			})
 		}
 	}
 }

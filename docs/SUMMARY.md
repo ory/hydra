@@ -17,9 +17,9 @@
     * [The Warden](access-control.md)
 * [Client Libraries](sdk.md)
   * [Hydra SDK for Go](sdk/go.md)
-* Developing and contributing to Hydra (TBD)
-  * Architecture and Design (TBD)
-  * Running Tests (TBD)
+<!-- * Developing and contributing to Hydra (TBD) -->
+<!--   * Architecture and Design (TBD) -->
+<!--   * Running Tests (TBD) -->
 * [FAQ](faq.md)
   * [Where is the HTTP API Documentation?](faq/http-api.md)
   * [How can I disable HTTPS for testing?](faq/disable-https.md)

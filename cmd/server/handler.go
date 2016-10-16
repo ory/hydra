@@ -106,6 +106,10 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 	h.OAuth2 = newOAuth2Handler(c, router, ctx.KeyManager, oauth2Provider)
 	h.Warden = warden.NewHandler(c, router)
 
+	router.GET("/health", func(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		rw.WriteHeader(http.StatusNoContent)
+	})
+
 	// Create root account if new install
 	createRS256KeysIfNotExist(c, oauth2.ConsentEndpointKey, "private", "sig")
 	createRS256KeysIfNotExist(c, oauth2.ConsentChallengeKey, "private", "sig")

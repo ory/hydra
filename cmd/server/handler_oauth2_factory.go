@@ -11,7 +11,6 @@ import (
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/hydra/internal"
 	"github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
@@ -26,7 +25,7 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 
 	switch con := ctx.Connection.(type) {
 	case *config.MemoryConnection:
-		store = &internal.FositeMemoryStore{
+		store = &oauth2.FositeMemoryStore{
 			Manager:        clients,
 			AuthorizeCodes: make(map[string]fosite.Requester),
 			IDSessions:     make(map[string]fosite.Requester),
@@ -41,7 +40,7 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 		con.CreateTableIfNotExists("hydra_oauth2_access_token")
 		con.CreateTableIfNotExists("hydra_oauth2_implicit")
 		con.CreateTableIfNotExists("hydra_oauth2_refresh_token")
-		m := &internal.FositeRehinkDBStore{
+		m := &oauth2.FositeRehinkDBStore{
 			Session:             con.GetSession(),
 			Manager:             clients,
 			AuthorizeCodesTable: r.Table("hydra_oauth2_authorize_code"),
@@ -49,11 +48,11 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 			AccessTokensTable:   r.Table("hydra_oauth2_access_token"),
 			ImplicitTable:       r.Table("hydra_oauth2_implicit"),
 			RefreshTokensTable:  r.Table("hydra_oauth2_refresh_token"),
-			AuthorizeCodes:      make(internal.RDBItems),
-			IDSessions:          make(internal.RDBItems),
-			AccessTokens:        make(internal.RDBItems),
-			Implicit:            make(internal.RDBItems),
-			RefreshTokens:       make(internal.RDBItems),
+			AuthorizeCodes:      make(oauth2.RDBItems),
+			IDSessions:          make(oauth2.RDBItems),
+			AccessTokens:        make(oauth2.RDBItems),
+			Implicit:            make(oauth2.RDBItems),
+			RefreshTokens:       make(oauth2.RDBItems),
 		}
 		if err := m.ColdStart(); err != nil {
 			logrus.Fatalf("Could not fetch initial state: %s", err)
@@ -107,6 +106,7 @@ func newOAuth2Provider(c *config.Config, km jwk.Manager) fosite.OAuth2Provider {
 		compose.OpenIDConnectExplicit,
 		compose.OpenIDConnectHybrid,
 		compose.OpenIDConnectImplicit,
+		compose.OAuth2TokenRevocationFactory,
 	)
 }
 
@@ -136,11 +136,6 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 			DefaultIDTokenLifespan:   c.GetIDTokenLifespan(),
 		},
 		ConsentURL: *consentURL,
-		Introspector: &oauth2.LocalIntrospector{
-			OAuth2:              o,
-			AccessTokenLifespan: c.GetAccessTokenLifespan(),
-			Issuer:              c.Issuer,
-		},
 		Firewall: ctx.Warden,
 		H:        &herodot.JSON{},
 	}

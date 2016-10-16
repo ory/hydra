@@ -19,13 +19,14 @@ import (
 	"golang.org/x/net/context"
 	goauth2 "golang.org/x/oauth2"
 	"fmt"
+	"github.com/ory-am/fosite/compose"
 )
 
 var (
 	introspectors = make(map[string]oauth2.Introspector)
-	now           = time.Now().Round(time.Second)
-	tokens        = pkg.Tokens(3)
-	fositeStore   = pkg.FositeStore()
+	now = time.Now().Round(time.Second)
+	tokens = pkg.Tokens(3)
+	fositeStore = pkg.FositeStore()
 )
 
 var ladonWarden = pkg.LadonWarden(map[string]ladon.Policy{
@@ -49,7 +50,7 @@ var localWarden = &warden.LocalWarden{
 	Warden: ladonWarden,
 	OAuth2: &fosite.Fosite{
 		Store: fositeStore,
-		TokenValidators: fosite.TokenValidators{
+		TokenIntrospectionHandlers: fosite.TokenIntrospectionHandlers{
 			0: &foauth2.CoreValidator{
 				CoreStrategy:  pkg.HMACStrategy,
 				CoreStorage:   fositeStore,
@@ -63,17 +64,19 @@ var localWarden = &warden.LocalWarden{
 }
 
 func init() {
-	introspectors["local"] = &oauth2.LocalIntrospector{
-		OAuth2:              localWarden.OAuth2,
-		Issuer:              "tests",
-		AccessTokenLifespan: time.Hour,
-	}
-
 	r := httprouter.New()
 	serv := &oauth2.Handler{
+		OAuth2: compose.Compose(
+			fc,
+			fositeStore,
+			&compose.CommonStrategy{
+				CoreStrategy:               compose.NewOAuth2HMACStrategy(fc, []byte("some super secret secret")),
+				OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(pkg.MustRSAKey()),
+			},
+			compose.OAuth2AuthorizeExplicitFactory,
+		),
 		Firewall:     localWarden,
 		H:            &herodot.JSON{},
-		Introspector: introspectors["local"],
 	}
 	serv.SetRoutes(r)
 	ts = httptest.NewServer(r)
@@ -136,6 +139,10 @@ func TestIntrospect(t *testing.T) {
 			},
 			{
 				token:     tokens[1][1],
+				expectErr: true,
+			},
+			{
+				token:     tokens[0][1],
 				expectErr: false,
 			},
 			{

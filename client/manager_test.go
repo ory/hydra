@@ -14,7 +14,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/dockertest"
 	"github.com/ory-am/fosite"
-	"github.com/ory-am/fosite/hash"
 	. "github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/internal"
@@ -32,7 +31,7 @@ var ts *httptest.Server
 func init() {
 	clientManagers["memory"] = &MemoryManager{
 		Clients: map[string]Client{},
-		Hasher:  &hash.BCrypt{},
+		Hasher:  &fosite.BCrypt{},
 	}
 
 	localWarden, httpClient := internal.NewFirewall("foo", "alice", fosite.Arguments{Scope}, &ladon.DefaultPolicy{
@@ -46,7 +45,7 @@ func init() {
 	s := &Handler{
 		Manager: &MemoryManager{
 			Clients: map[string]Client{},
-			Hasher:  &hash.BCrypt{},
+			Hasher:  &fosite.BCrypt{},
 		},
 		H: &herodot.JSON{},
 		W: localWarden,
@@ -84,7 +83,7 @@ func TestMain(m *testing.M) {
 			Session: session,
 			Table:   r.Table("hydra_clients"),
 			Clients: make(map[string]Client),
-			Hasher: &hash.BCrypt{
+			Hasher: &fosite.BCrypt{
 				// Low workfactor reduces test time
 				WorkFactor: 4,
 			},
@@ -109,7 +108,7 @@ func TestMain(m *testing.M) {
 func TestAuthenticateClient(t *testing.T) {
 	var mem = &MemoryManager{
 		Clients: map[string]Client{},
-		Hasher:  &hash.BCrypt{},
+		Hasher:  &fosite.BCrypt{},
 	}
 	mem.CreateClient(&Client{
 		ID:           "1234",

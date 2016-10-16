@@ -10,9 +10,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/compose"
-	"github.com/ory-am/fosite/hash"
 	hc "github.com/ory-am/hydra/client"
-	"github.com/ory-am/hydra/internal"
 	"github.com/ory-am/hydra/jwk"
 	. "github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
@@ -21,9 +19,9 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 )
 
-var hasher = &hash.BCrypt{}
+var hasher = &fosite.BCrypt{}
 
-var store = &internal.FositeMemoryStore{
+var store = &FositeMemoryStore{
 	Manager: &hc.MemoryManager{
 		Clients: map[string]hc.Client{},
 		Hasher:  hasher,

@@ -1,4 +1,4 @@
-package internal
+package oauth2
 
 import (
 	"net/url"
@@ -37,7 +37,7 @@ func TestMain(m *testing.M) {
 	var session *r.Session
 	var err error
 
-	c, err := dockertest.ConnectToRethinkDB(20, time.Millisecond*500, func(url string) bool {
+	c, err := dockertest.ConnectToRethinkDB(20, time.Millisecond * 500, func(url string) bool {
 		if session, err = r.Connect(r.ConnectOpts{Address: url, Database: "hydra"}); err != nil {
 			return false
 		} else if _, err = r.DBCreate("hydra").RunWrite(session); err != nil {

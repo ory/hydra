@@ -10,27 +10,26 @@ import (
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pkg/errors"
-	"strings"
 )
 
 const (
 	OpenIDConnectKeyName = "hydra.openid.id-token"
 
 	ConsentPath = "/oauth2/consent"
-	TokenPath   = "/oauth2/token"
-	AuthPath    = "/oauth2/auth"
+	TokenPath = "/oauth2/token"
+	AuthPath = "/oauth2/auth"
 
 	// IntrospectPath points to the OAuth2 introspection endpoint.
 	IntrospectPath = "/oauth2/introspect"
+	RevocationPath = "/oauth2/revoke"
 )
 
 type Handler struct {
-	OAuth2  fosite.OAuth2Provider
-	Consent ConsentStrategy
+	OAuth2     fosite.OAuth2Provider
+	Consent    ConsentStrategy
 
-	Introspector Introspector
-	Firewall     firewall.Firewall
-	H            herodot.Herodot
+	Firewall   firewall.Firewall
+	H          herodot.Herodot
 
 	ForcedHTTP bool
 	ConsentURL url.URL
@@ -41,30 +40,32 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET(AuthPath, h.AuthHandler)
 	r.POST(AuthPath, h.AuthHandler)
 	r.GET(ConsentPath, h.DefaultConsentHandler)
-	r.POST(IntrospectPath, h.Introspect)
+	r.POST(IntrospectPath, h.IntrospectHandler)
+	r.POST(RevocationPath, h.RevocationHandler)
 }
 
-func (h *Handler) Introspect(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var inactive = map[string]bool{"active": false}
+func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	var ctx = fosite.NewContext()
 
-	ctx := herodot.NewContext()
-	if _, err := h.Introspector.IntrospectToken(ctx, h.Firewall.TokenFromRequest(r)); err != nil {
-		h.H.WriteError(ctx, w, r, err)
-		return
-	}
-
-	if err := r.ParseForm(); err != nil {
-		h.H.WriteError(ctx, w, r, err)
-		return
-	}
-
-	auth, err := h.Introspector.IntrospectToken(ctx, r.PostForm.Get("token"), strings.Split(r.PostForm.Get("scope"), " ")...)
+	err := h.OAuth2.NewRevocationRequest(ctx, r)
 	if err != nil {
-		h.H.Write(ctx, w, r, &inactive)
+		pkg.LogError(err)
+	}
+
+	h.OAuth2.WriteRevocationResponse(w, err)
+}
+
+func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	var session = NewSession("")
+	var ctx = fosite.NewContext()
+	resp, err := h.OAuth2.NewIntrospectionRequest(ctx, r, session)
+	if err != nil {
+		pkg.LogError(err)
+		h.OAuth2.WriteIntrospectionError(w, err)
 		return
 	}
 
-	h.H.Write(ctx, w, r, auth)
+	h.OAuth2.WriteIntrospectionResponse(w, resp)
 }
 
 func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -145,7 +146,7 @@ func (h *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, auth
 		schema = "http"
 	}
 
-	challenge, err := h.Consent.IssueChallenge(authorizeRequest, schema+"://"+r.Host+r.URL.String())
+	challenge, err := h.Consent.IssueChallenge(authorizeRequest, schema + "://" + r.Host + r.URL.String())
 	if err != nil {
 		return err
 	}

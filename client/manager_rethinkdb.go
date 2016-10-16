@@ -7,7 +7,6 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/imdario/mergo"
 	"github.com/ory-am/fosite"
-	"github.com/ory-am/fosite/hash"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
@@ -21,7 +20,7 @@ type RethinkManager struct {
 	sync.RWMutex
 
 	Clients map[string]Client
-	Hasher  hash.Hasher
+	Hasher  fosite.Hasher
 }
 
 func (m *RethinkManager) GetConcreteClient(id string) (*Client, error) {
@@ -157,7 +156,7 @@ func (m *RethinkManager) publishDelete(id string) error {
 }
 
 func (m *RethinkManager) Watch(ctx context.Context) {
-	go pkg.Retry(time.Second*15, time.Minute, func() error {
+	go pkg.Retry(time.Second * 15, time.Minute, func() error {
 		clients, err := m.Table.Changes().Run(m.Session)
 		if err != nil {
 			return errors.Wrap(err, "")

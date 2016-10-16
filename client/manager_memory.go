@@ -5,7 +5,6 @@ import (
 
 	"github.com/imdario/mergo"
 	"github.com/ory-am/fosite"
-	"github.com/ory-am/fosite/hash"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
@@ -13,7 +12,7 @@ import (
 
 type MemoryManager struct {
 	Clients map[string]Client
-	Hasher  hash.Hasher
+	Hasher  fosite.Hasher
 	sync.RWMutex
 }
 

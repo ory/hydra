@@ -16,11 +16,11 @@ import (
 
 const (
 	ConsentChallengeKey = "hydra.consent.challenge"
-	ConsentEndpointKey  = "hydra.consent.response"
+	ConsentEndpointKey = "hydra.consent.response"
 )
 
 type DefaultConsentStrategy struct {
-	Issuer string
+	Issuer                   string
 
 	DefaultIDTokenLifespan   time.Duration
 	DefaultChallengeLifespan time.Duration

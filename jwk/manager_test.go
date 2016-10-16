@@ -20,10 +20,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/ory-am/fosite/rand"
 	"github.com/square/go-jose"
 	"golang.org/x/net/context"
 	"net/http"
+	"io"
+	"github.com/pkg/errors"
+	"crypto/rand"
 )
 
 var managers = map[string]Manager{}
@@ -73,6 +75,15 @@ func init() {
 
 var rethinkManager = new(RethinkManager)
 
+func randomBytes(n int) ([]byte, error) {
+	bytes := make([]byte, n)
+	if _, err := io.ReadFull(rand.Reader, bytes); err != nil {
+		return []byte{}, errors.Wrap(err, "")
+	}
+	return bytes, nil
+}
+
+
 func TestMain(m *testing.M) {
 	var session *r.Session
 	var err error
@@ -88,7 +99,7 @@ func TestMain(m *testing.M) {
 			return false
 		}
 
-		key, err := rand.RandomBytes(32)
+		key, err := randomBytes(32)
 		if err != nil {
 			log.Printf("Could not watch: %s", err)
 			return false

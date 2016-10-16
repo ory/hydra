@@ -1,4 +1,4 @@
-package internal
+package oauth2
 
 import (
 	"sync"
@@ -151,5 +151,37 @@ func (s *FositeMemoryStore) PersistRefreshTokenGrantSession(ctx context.Context,
 		return err
 	}
 
+	return nil
+}
+
+func (s *FositeMemoryStore) RevokeRefreshToken(ctx context.Context, id string) error {
+	var found bool
+	for sig, token := range s.RefreshTokens {
+		if token.GetID() == id {
+			if err := s.DeleteRefreshTokenSession(ctx, sig); err != nil {
+				return err
+			}
+			found = true
+		}
+	}
+	if (!found) {
+		return errors.New("Not found")
+	}
+	return nil
+}
+
+func (s *FositeMemoryStore) RevokeAccessToken(ctx context.Context, id string) error {
+	var found bool
+	for sig, token := range s.AccessTokens {
+		if token.GetID() == id {
+			if err := s.DeleteAccessTokenSession(ctx, sig); err != nil {
+				return err
+			}
+			found = true
+		}
+	}
+	if (!found) {
+		return errors.New("Not found")
+	}
 	return nil
 }

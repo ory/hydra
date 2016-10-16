@@ -7,10 +7,10 @@ import (
 )
 
 type Session struct {
-	Subject                string `json:"sub"`
+	Subject string `json:"sub"`
 	*openid.DefaultSession `json:"idToken"`
 	*oauth2.HMACSession    `json:"session"`
-	Extra                  map[string]interface{} `json:"extra"`
+	Extra   map[string]interface{} `json:"extra"`
 }
 
 func NewSession(subject string) *Session {

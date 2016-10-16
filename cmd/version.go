@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	Version   = "dev-master"
+	Version = "dev-master"
 	BuildTime = time.Now().String()
-	GitHash   = "undefined"
+	GitHash = "undefined"
 )
 
 // versionCmd represents the version command

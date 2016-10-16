@@ -14,7 +14,6 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	foauth2 "github.com/ory-am/fosite/handler/oauth2"
-	"github.com/ory-am/fosite/hash"
 	"github.com/ory-am/fosite/token/hmac"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
@@ -26,6 +25,7 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/yaml.v2"
+	"github.com/ory-am/fosite"
 )
 
 type Config struct {
@@ -176,7 +176,7 @@ func (c *Config) Context() *Context {
 
 	c.context = &Context{
 		Connection: connection,
-		Hasher: &hash.BCrypt{
+		Hasher: &fosite.BCrypt{
 			WorkFactor: c.BCryptWorkFactor,
 		},
 		LadonManager: manager,

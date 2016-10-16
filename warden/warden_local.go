@@ -44,7 +44,7 @@ func (w *LocalWarden) IsAllowed(ctx context.Context, a *firewall.AccessRequest) 
 
 func (w *LocalWarden) TokenAllowed(ctx context.Context, token string, a *firewall.TokenAccessRequest, scopes ...string) (*firewall.Context, error) {
 	var session = new(oauth2.Session)
-	var auth, err = w.OAuth2.ValidateToken(ctx, token, fosite.AccessToken, session, scopes...)
+	var auth, err = w.OAuth2.IntrospectToken(ctx, token, fosite.AccessToken, session, scopes...)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"subject": session.Subject,

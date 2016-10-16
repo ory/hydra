@@ -3,14 +3,25 @@ package jwk
 import (
 	"testing"
 
-	"github.com/ory-am/fosite/rand"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/pkg/errors"
+	"crypto/rand"
+	"io"
 )
 
+// RandomBytes returns n random bytes by reading from crypto/rand.Reader
+func randomBytes(n int) ([]byte, error) {
+	bytes := make([]byte, n)
+	if _, err := io.ReadFull(rand.Reader, bytes); err != nil {
+		return []byte{}, errors.Wrap(err, "")
+	}
+	return bytes, nil
+}
+
 func TestAEAD(t *testing.T) {
-	key, err := rand.RandomBytes(32)
+	key, err := randomBytes(32)
 	pkg.AssertError(t, false, err)
 
 	a := &AEAD{

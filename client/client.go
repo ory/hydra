@@ -20,6 +20,7 @@ type Client struct {
 	ClientURI         string   `json:"client_uri" gorethink:"client_uri"`
 	LogoURI           string   `json:"logo_uri" gorethink:"logo_uri"`
 	Contacts          []string `json:"contacts" gorethink:"contacts"`
+	Public            bool `json:"public" gorethink:"public"`
 }
 
 func (c *Client) GetID() string {
@@ -64,4 +65,8 @@ func (c *Client) GetResponseTypes() fosite.Arguments {
 
 func (c *Client) GetOwner() string {
 	return c.Owner
+}
+
+func (c *Client) IsPublic() bool {
+	return c.Public
 }

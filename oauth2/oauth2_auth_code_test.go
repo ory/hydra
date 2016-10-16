@@ -47,7 +47,7 @@ func TestAuthCode(t *testing.T) {
 		})
 		pkg.RequireError(t, false, err)
 
-		http.Redirect(w, r, ejwt.ToString(jwtClaims["redir"])+"&consent="+consent, http.StatusFound)
+		http.Redirect(w, r, ejwt.ToString(jwtClaims["redir"]) + "&consent=" + consent, http.StatusFound)
 		validConsent = true
 	})
 

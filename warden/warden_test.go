@@ -53,7 +53,7 @@ func init() {
 		Warden: ladonWarden,
 		OAuth2: &fosite.Fosite{
 			Store: fositeStore,
-			TokenValidators: fosite.TokenValidators{
+			TokenIntrospectionHandlers: fosite.TokenIntrospectionHandlers{
 				&foauth2.CoreValidator{
 					CoreStrategy:  pkg.HMACStrategy,
 					CoreStorage:   fositeStore,

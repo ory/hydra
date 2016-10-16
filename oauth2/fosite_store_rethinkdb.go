@@ -1,4 +1,4 @@
-package internal
+package oauth2
 
 import (
 	"encoding/json"
@@ -18,7 +18,7 @@ import (
 type RDBItems map[string]*RdbSchema
 
 type FositeRehinkDBStore struct {
-	Session *r.Session
+	Session             *r.Session
 	sync.RWMutex
 
 	AuthorizeCodesTable r.Term
@@ -30,15 +30,16 @@ type FositeRehinkDBStore struct {
 
 	client.Manager
 
-	AuthorizeCodes RDBItems
-	IDSessions     RDBItems
-	AccessTokens   RDBItems
-	Implicit       RDBItems
-	RefreshTokens  RDBItems
+	AuthorizeCodes      RDBItems
+	IDSessions          RDBItems
+	AccessTokens        RDBItems
+	Implicit            RDBItems
+	RefreshTokens       RDBItems
 }
 
 type RdbSchema struct {
 	ID            string           `json:"id" gorethink:"id"`
+	RequestID string `json:"requestId" gorethink:"requestId"`
 	RequestedAt   time.Time        `json:"requestedAt" gorethink:"requestedAt"`
 	Client        *client.Client   `json:"client" gorethink:"client"`
 	Scopes        fosite.Arguments `json:"scopes" gorethink:"scopes"`
@@ -55,6 +56,7 @@ func requestFromRDB(s *RdbSchema, proto interface{}) (*fosite.Request, error) {
 	}
 
 	d := new(fosite.Request)
+	d.ID = s.RequestID
 	d.RequestedAt = s.RequestedAt
 	d.Client = s.Client
 	d.Scopes = s.Scopes
@@ -87,6 +89,7 @@ func (s *FositeRehinkDBStore) publishInsert(table r.Term, id string, requester f
 
 	if _, err := table.Insert(&RdbSchema{
 		ID:            id,
+		RequestID: requester.GetID(),
 		RequestedAt:   requester.GetRequestedAt(),
 		Client:        requester.GetClient().(*client.Client),
 		Scopes:        requester.GetRequestedScopes(),
@@ -285,7 +288,7 @@ func (items RDBItems) coldStart(sess *r.Session, lock *sync.RWMutex, table r.Ter
 }
 
 func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock *sync.RWMutex, table r.Term) {
-	go pkg.Retry(time.Second*15, time.Minute, func() error {
+	go pkg.Retry(time.Second * 15, time.Minute, func() error {
 		changes, err := table.Changes().Run(sess)
 		if err != nil {
 			return errors.Wrap(err, "")
@@ -315,4 +318,37 @@ func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock *sync.RWM
 
 		return nil
 	})
+}
+
+
+func (s *FositeRehinkDBStore) RevokeRefreshToken(ctx context.Context, id string) error {
+	var found bool
+	for sig, token := range s.RefreshTokens {
+		if token.RequestID == id {
+			if err := s.DeleteRefreshTokenSession(ctx, sig); err != nil {
+				return err
+			}
+			found = true
+		}
+	}
+	if (!found) {
+		return errors.New("Not found")
+	}
+	return nil
+}
+
+func (s *FositeRehinkDBStore) RevokeAccessToken(ctx context.Context, id string) error {
+	var found bool
+	for sig, token := range s.AccessTokens {
+		if token.RequestID == id {
+			if err := s.DeleteAccessTokenSession(ctx, sig); err != nil {
+				return err
+			}
+			found = true
+		}
+	}
+	if (!found) {
+		return errors.New("Not found")
+	}
+	return nil
 }

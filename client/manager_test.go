@@ -11,6 +11,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/dockertest"
 	"github.com/ory-am/fosite"
@@ -21,6 +22,7 @@ import (
 	"github.com/ory-am/ladon"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
 )
 
@@ -63,8 +65,77 @@ func init() {
 }
 
 var rethinkManager *RethinkManager
+var containers = []dockertest.ContainerID{}
 
 func TestMain(m *testing.M) {
+	defer func() {
+		for _, c := range containers {
+			c.KillRemove()
+		}
+	}()
+
+	connectPG()
+	connectToRethinkDB()
+	connectMySQL()
+
+	retCode := m.Run()
+	os.Exit(retCode)
+}
+func connectMySQL() {
+	var db *sqlx.DB
+	c, err := dockertest.ConnectToMySQL(15, time.Second, func(url string) bool {
+		var err error
+		db, err = sqlx.Open("mysql", url)
+		if err != nil {
+			log.Printf("Got error in mysql connector: %s", err)
+			return false
+		}
+		return db.Ping() == nil
+	})
+
+	if err != nil {
+		log.Fatalf("Could not connect to database: %s", err)
+	}
+
+	containers = append(containers, c)
+	s := &SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}
+
+	if err = s.CreateSchemas(); err != nil {
+		log.Fatalf("Could not create postgres schema: %v", err)
+	}
+
+	clientManagers["mysql"] = s
+	containers = append(containers, c)
+}
+
+func connectPG() {
+	var db *sqlx.DB
+	c, err := dockertest.ConnectToPostgreSQL(15, time.Second, func(url string) bool {
+		var err error
+		db, err = sqlx.Open("postgres", url)
+		if err != nil {
+			log.Printf("Got error in postgres connector: %s", err)
+			return false
+		}
+		return db.Ping() == nil
+	})
+
+	if err != nil {
+		log.Fatalf("Could not connect to database: %s", err)
+	}
+
+	containers = append(containers, c)
+	s := &SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}
+
+	if err = s.CreateSchemas(); err != nil {
+		log.Fatalf("Could not create postgres schema: %v", err)
+	}
+
+	clientManagers["postgres"] = s
+	containers = append(containers, c)
+}
+
+func connectToRethinkDB() {
 	var session *r.Session
 	var err error
 
@@ -92,17 +163,13 @@ func TestMain(m *testing.M) {
 		time.Sleep(100 * time.Millisecond)
 		return true
 	})
-	if session != nil {
-		defer session.Close()
-	}
+
 	if err != nil {
 		log.Fatalf("Could not connect to database: %s", err)
 	}
-	clientManagers["rethink"] = rethinkManager
 
-	retCode := m.Run()
-	c.KillRemove()
-	os.Exit(retCode)
+	containers = append(containers, c)
+	clientManagers["rethink"] = rethinkManager
 }
 
 func TestAuthenticateClient(t *testing.T) {
@@ -180,12 +247,12 @@ func TestColdStartRethinkManager(t *testing.T) {
 
 	time.Sleep(time.Second / 2)
 	rethinkManager.Clients = make(map[string]Client)
-	assert.Nil(t, rethinkManager.ColdStart())
+	require.Nil(t, rethinkManager.ColdStart())
 
 	c1, err := rethinkManager.GetClient("foo")
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	c2, err := rethinkManager.GetClient("bar")
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	assert.NotEqual(t, c1, c2)
 	assert.Equal(t, "foo", c1.GetID())

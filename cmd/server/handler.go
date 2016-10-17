@@ -10,7 +10,6 @@ import (
 	"github.com/meatballhat/negroni-logrus"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
-	"github.com/ory-am/hydra/connection"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/oauth2"
@@ -70,7 +69,6 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 
 type Handler struct {
 	Clients     *client.Handler
-	Connections *connection.Handler
 	Keys        *jwk.Handler
 	OAuth2      *oauth2.Handler
 	Policy      *policy.Handler
@@ -101,7 +99,6 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 	// Set up handlers
 	h.Clients = newClientHandler(c, router, clientsManager)
 	h.Keys = newJWKHandler(c, router)
-	h.Connections = newConnectionHandler(c, router)
 	h.Policy = newPolicyHandler(c, router)
 	h.OAuth2 = newOAuth2Handler(c, router, ctx.KeyManager, oauth2Provider)
 	h.Warden = warden.NewHandler(c, router)

@@ -43,8 +43,6 @@ func TestExecute(t *testing.T) {
 		{args: []string{"keys", "create", "foo", "-a", "HS256"}},
 		{args: []string{"keys", "get", "foo"}},
 		{args: []string{"keys", "delete", "foo"}},
-		{args: []string{"connections", "create", "google", "localuser", "googleuser"}},
-		{args: []string{"connections", "create", "google", "localuser", "googleuser", "--dry"}},
 		{args: []string{"token", "client"}},
 		{args: []string{"policies", "create", "../dist/policies/noone-can-read-private-keys.json"}},
 		{args: []string{"policies", "create", "-i", "foobar", "-s", "peter", "max", "-r", "blog", "users", "-a", "post", "ban", "--allow"}},

@@ -6,7 +6,6 @@ import (
 
 type Handler struct {
 	Clients     *ClientHandler
-	Connections *ConnectionHandler
 	Policies    *PolicyHandler
 	Keys        *JWKHandler
 	Warden      *WardenHandler
@@ -15,7 +14,6 @@ type Handler struct {
 func NewHandler(c *config.Config) *Handler {
 	return &Handler{
 		Clients:     newClientHandler(c),
-		Connections: newConnectionHandler(c),
 		Policies:    newPolicyHandler(c),
 		Keys:        newJWKHandler(c),
 		Warden:      newWardenHandler(c),

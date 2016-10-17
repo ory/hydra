@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/ory-am/hydra/client"
-	"github.com/ory-am/hydra/connection"
 	"github.com/ory-am/hydra/jwk"
 	hoauth2 "github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
@@ -32,9 +31,6 @@ var defaultOptions = []option{
 type Client struct {
 	// Clients offers OAuth2 Client management capabilities.
 	Clients *client.HTTPManager
-
-	// SocialConnections offers Social Login management capabilities.
-	SocialConnections *connection.HTTPManager
 
 	// JSONWebKeys offers JSON Web Key management capabilities.
 	JSONWebKeys *jwk.HTTPManager
@@ -111,11 +107,6 @@ func Connect(opts ...option) (*Client, error) {
 	// initialize service endpoints
 	c.Clients = &client.HTTPManager{
 		Endpoint: pkg.JoinURL(c.clusterURL, "/clients"),
-		Client:   c.http,
-	}
-
-	c.SocialConnections = &connection.HTTPManager{
-		Endpoint: pkg.JoinURL(c.clusterURL, "/connections"),
 		Client:   c.http,
 	}
 

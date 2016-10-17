@@ -20,12 +20,12 @@ import (
 	"os"
 	"time"
 
+	"crypto/rand"
+	"github.com/pkg/errors"
 	"github.com/square/go-jose"
 	"golang.org/x/net/context"
-	"net/http"
 	"io"
-	"github.com/pkg/errors"
-	"crypto/rand"
+	"net/http"
 )
 
 var managers = map[string]Manager{}
@@ -82,7 +82,6 @@ func randomBytes(n int) ([]byte, error) {
 	}
 	return bytes, nil
 }
-
 
 func TestMain(m *testing.M) {
 	var session *r.Session

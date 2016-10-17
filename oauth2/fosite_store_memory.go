@@ -52,7 +52,7 @@ func (s *FositeMemoryStore) CreateAuthorizeCodeSession(_ context.Context, code s
 	return nil
 }
 
-func (s *FositeMemoryStore) GetAuthorizeCodeSession(_ context.Context, code string, _ interface{}) (fosite.Requester, error) {
+func (s *FositeMemoryStore) GetAuthorizeCodeSession(_ context.Context, code string, _ fosite.Session) (fosite.Requester, error) {
 	s.RLock()
 	defer s.RUnlock()
 	rel, ok := s.AuthorizeCodes[code]
@@ -76,7 +76,7 @@ func (s *FositeMemoryStore) CreateAccessTokenSession(_ context.Context, signatur
 	return nil
 }
 
-func (s *FositeMemoryStore) GetAccessTokenSession(_ context.Context, signature string, _ interface{}) (fosite.Requester, error) {
+func (s *FositeMemoryStore) GetAccessTokenSession(_ context.Context, signature string, _ fosite.Session) (fosite.Requester, error) {
 	s.RLock()
 	defer s.RUnlock()
 	rel, ok := s.AccessTokens[signature]
@@ -100,7 +100,7 @@ func (s *FositeMemoryStore) CreateRefreshTokenSession(_ context.Context, signatu
 	return nil
 }
 
-func (s *FositeMemoryStore) GetRefreshTokenSession(_ context.Context, signature string, _ interface{}) (fosite.Requester, error) {
+func (s *FositeMemoryStore) GetRefreshTokenSession(_ context.Context, signature string, _ fosite.Session) (fosite.Requester, error) {
 	s.RLock()
 	defer s.RUnlock()
 	rel, ok := s.RefreshTokens[signature]
@@ -164,7 +164,7 @@ func (s *FositeMemoryStore) RevokeRefreshToken(ctx context.Context, id string) e
 			found = true
 		}
 	}
-	if (!found) {
+	if !found {
 		return errors.New("Not found")
 	}
 	return nil
@@ -180,7 +180,7 @@ func (s *FositeMemoryStore) RevokeAccessToken(ctx context.Context, id string) er
 			found = true
 		}
 	}
-	if (!found) {
+	if !found {
 		return errors.New("Not found")
 	}
 	return nil

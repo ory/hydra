@@ -20,7 +20,7 @@ type Client struct {
 	ClientURI         string   `json:"client_uri" gorethink:"client_uri"`
 	LogoURI           string   `json:"logo_uri" gorethink:"logo_uri"`
 	Contacts          []string `json:"contacts" gorethink:"contacts"`
-	Public            bool `json:"public" gorethink:"public"`
+	Public            bool     `json:"public" gorethink:"public"`
 }
 
 func (c *Client) GetID() string {

@@ -103,10 +103,11 @@ func newOAuth2Provider(c *config.Config, km jwk.Manager) fosite.OAuth2Provider {
 		compose.OAuth2AuthorizeImplicitFactory,
 		compose.OAuth2ClientCredentialsGrantFactory,
 		compose.OAuth2RefreshTokenGrantFactory,
-		compose.OpenIDConnectExplicit,
-		compose.OpenIDConnectHybrid,
-		compose.OpenIDConnectImplicit,
+		compose.OpenIDConnectExplicitFactory,
+		compose.OpenIDConnectHybridFactory,
+		compose.OpenIDConnectImplicitFactory,
 		compose.OAuth2TokenRevocationFactory,
+		compose.OAuth2TokenIntrospectionFactory,
 	)
 }
 
@@ -136,8 +137,8 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 			DefaultIDTokenLifespan:   c.GetIDTokenLifespan(),
 		},
 		ConsentURL: *consentURL,
-		Firewall: ctx.Warden,
-		H:        &herodot.JSON{},
+		Firewall:   ctx.Warden,
+		H:          &herodot.JSON{},
 	}
 
 	handler.SetRoutes(router)

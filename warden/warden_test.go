@@ -83,19 +83,21 @@ func init() {
 	ar.GrantedScopes = fosite.Arguments{"core", "hydra.warden"}
 	ar.RequestedAt = now
 	ar.Client = &fosite.DefaultClient{ID: "siri"}
+	ar.Session.SetExpiresAt(fosite.AccessToken, time.Now().Add(time.Hour).Round(time.Second))
 	fositeStore.CreateAccessTokenSession(nil, tokens[0][0], ar)
 
 	ar2 := fosite.NewAccessRequest(oauth2.NewSession("siri"))
 	ar2.GrantedScopes = fosite.Arguments{"core", "hydra.warden"}
 	ar2.RequestedAt = now
 	ar2.Client = &fosite.DefaultClient{ID: "bob"}
+	ar2.Session.SetExpiresAt(fosite.AccessToken, time.Now().Add(time.Hour).Round(time.Second))
 	fositeStore.CreateAccessTokenSession(nil, tokens[1][0], ar2)
 
 	ar3 := fosite.NewAccessRequest(oauth2.NewSession("siri"))
 	ar3.GrantedScopes = fosite.Arguments{"core", "hydra.warden"}
 	ar3.RequestedAt = now
 	ar3.Client = &fosite.DefaultClient{ID: "doesnt-exist"}
-	ar3.Session.(*oauth2.Session).AccessTokenExpiry = time.Now().Add(-time.Hour)
+	ar3.Session.SetExpiresAt(fosite.AccessToken, time.Now().Add(-time.Hour).Round(time.Second))
 	fositeStore.CreateAccessTokenSession(nil, tokens[2][0], ar3)
 
 	conf := &coauth2.Config{

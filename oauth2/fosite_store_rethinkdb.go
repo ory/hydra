@@ -18,7 +18,7 @@ import (
 type RDBItems map[string]*RdbSchema
 
 type FositeRehinkDBStore struct {
-	Session             *r.Session
+	Session *r.Session
 	sync.RWMutex
 
 	AuthorizeCodesTable r.Term
@@ -30,16 +30,16 @@ type FositeRehinkDBStore struct {
 
 	client.Manager
 
-	AuthorizeCodes      RDBItems
-	IDSessions          RDBItems
-	AccessTokens        RDBItems
-	Implicit            RDBItems
-	RefreshTokens       RDBItems
+	AuthorizeCodes RDBItems
+	IDSessions     RDBItems
+	AccessTokens   RDBItems
+	Implicit       RDBItems
+	RefreshTokens  RDBItems
 }
 
 type RdbSchema struct {
 	ID            string           `json:"id" gorethink:"id"`
-	RequestID string `json:"requestId" gorethink:"requestId"`
+	RequestID     string           `json:"requestId" gorethink:"requestId"`
 	RequestedAt   time.Time        `json:"requestedAt" gorethink:"requestedAt"`
 	Client        *client.Client   `json:"client" gorethink:"client"`
 	Scopes        fosite.Arguments `json:"scopes" gorethink:"scopes"`
@@ -48,7 +48,7 @@ type RdbSchema struct {
 	Session       json.RawMessage  `json:"session" gorethink:"session"`
 }
 
-func requestFromRDB(s *RdbSchema, proto interface{}) (*fosite.Request, error) {
+func requestFromRDB(s *RdbSchema, proto fosite.Session) (*fosite.Request, error) {
 	if proto != nil {
 		if err := json.Unmarshal(s.Session, proto); err != nil {
 			return nil, errors.Wrap(err, "")
@@ -89,7 +89,7 @@ func (s *FositeRehinkDBStore) publishInsert(table r.Term, id string, requester f
 
 	if _, err := table.Insert(&RdbSchema{
 		ID:            id,
-		RequestID: requester.GetID(),
+		RequestID:     requester.GetID(),
 		RequestedAt:   requester.GetRequestedAt(),
 		Client:        requester.GetClient().(*client.Client),
 		Scopes:        requester.GetRequestedScopes(),
@@ -163,7 +163,7 @@ func (s *FositeRehinkDBStore) CreateAuthorizeCodeSession(_ context.Context, code
 	return waitFor(s.AuthorizeCodes, code)
 }
 
-func (s *FositeRehinkDBStore) GetAuthorizeCodeSession(_ context.Context, code string, sess interface{}) (fosite.Requester, error) {
+func (s *FositeRehinkDBStore) GetAuthorizeCodeSession(_ context.Context, code string, sess fosite.Session) (fosite.Requester, error) {
 	s.RLock()
 	defer s.RUnlock()
 	rel, ok := s.AuthorizeCodes[code]
@@ -185,7 +185,7 @@ func (s *FositeRehinkDBStore) CreateAccessTokenSession(_ context.Context, signat
 	return waitFor(s.AccessTokens, signature)
 }
 
-func (s *FositeRehinkDBStore) GetAccessTokenSession(_ context.Context, signature string, sess interface{}) (fosite.Requester, error) {
+func (s *FositeRehinkDBStore) GetAccessTokenSession(_ context.Context, signature string, sess fosite.Session) (fosite.Requester, error) {
 	s.RLock()
 	defer s.RUnlock()
 	rel, ok := s.AccessTokens[signature]
@@ -207,7 +207,7 @@ func (s *FositeRehinkDBStore) CreateRefreshTokenSession(_ context.Context, signa
 	return waitFor(s.RefreshTokens, signature)
 }
 
-func (s *FositeRehinkDBStore) GetRefreshTokenSession(_ context.Context, signature string, sess interface{}) (fosite.Requester, error) {
+func (s *FositeRehinkDBStore) GetRefreshTokenSession(_ context.Context, signature string, sess fosite.Session) (fosite.Requester, error) {
 	s.RLock()
 	defer s.RUnlock()
 	rel, ok := s.RefreshTokens[signature]
@@ -288,7 +288,7 @@ func (items RDBItems) coldStart(sess *r.Session, lock *sync.RWMutex, table r.Ter
 }
 
 func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock *sync.RWMutex, table r.Term) {
-	go pkg.Retry(time.Second * 15, time.Minute, func() error {
+	go pkg.Retry(time.Second*15, time.Minute, func() error {
 		changes, err := table.Changes().Run(sess)
 		if err != nil {
 			return errors.Wrap(err, "")
@@ -320,7 +320,6 @@ func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock *sync.RWM
 	})
 }
 
-
 func (s *FositeRehinkDBStore) RevokeRefreshToken(ctx context.Context, id string) error {
 	var found bool
 	for sig, token := range s.RefreshTokens {
@@ -331,7 +330,7 @@ func (s *FositeRehinkDBStore) RevokeRefreshToken(ctx context.Context, id string)
 			found = true
 		}
 	}
-	if (!found) {
+	if !found {
 		return errors.New("Not found")
 	}
 	return nil
@@ -347,7 +346,7 @@ func (s *FositeRehinkDBStore) RevokeAccessToken(ctx context.Context, id string) 
 			found = true
 		}
 	}
-	if (!found) {
+	if !found {
 		return errors.New("Not found")
 	}
 	return nil

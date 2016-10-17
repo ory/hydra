@@ -3,6 +3,7 @@ package oauth2
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/ory-am/fosite"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
@@ -33,7 +34,9 @@ func (this *HTTPIntrospector) SetClient(c *clientcredentials.Config) {
 //
 // The HTTP API is documented at http://docs.hdyra.apiary.io/#reference/oauth2/oauth2-token-introspection
 func (this *HTTPIntrospector) IntrospectToken(ctx context.Context, token string, scopes ...string) (*Introspection, error) {
-	var resp = new(Introspection)
+	var resp = &Introspection{
+		Extra: make(map[string]interface{}),
+	}
 	var ep = *this.Endpoint
 	ep.Path = IntrospectPath
 
@@ -51,15 +54,14 @@ func (this *HTTPIntrospector) IntrospectToken(ctx context.Context, token string,
 	}
 	defer hres.Body.Close()
 
+	body, _ := ioutil.ReadAll(hres.Body)
 	if hres.StatusCode < 200 || hres.StatusCode >= 300 {
-		body, _ := ioutil.ReadAll(hres.Body)
 		return nil, errors.Errorf("Expected 2xx status code but got %d.\n%s", hres.StatusCode, body)
-	} else if err := json.NewDecoder(hres.Body).Decode(resp); err != nil {
-		body, _ := ioutil.ReadAll(hres.Body)
+	} else if err := json.Unmarshal(body, resp); err != nil {
 		return nil, errors.Errorf("%s: %s", err, body)
 	} else if !resp.Active {
 		return nil, errors.New("Token is malformed, expired or otherwise invalid")
 	}
-
+	fmt.Printf("%s\n\n", body)
 	return resp, nil
 }

@@ -16,11 +16,11 @@ import (
 
 const (
 	ConsentChallengeKey = "hydra.consent.challenge"
-	ConsentEndpointKey = "hydra.consent.response"
+	ConsentEndpointKey  = "hydra.consent.response"
 )
 
 type DefaultConsentStrategy struct {
-	Issuer                   string
+	Issuer string
 
 	DefaultIDTokenLifespan   time.Duration
 	DefaultChallengeLifespan time.Duration
@@ -77,7 +77,6 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 	}
 
 	return &Session{
-		Subject: subject,
 		DefaultSession: &openid.DefaultSession{
 			Claims: &ejwt.IDTokenClaims{
 				Audience:  a.GetClient().GetID(),
@@ -88,6 +87,7 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 				Extra:     idExt,
 			},
 			Headers: &ejwt.Headers{},
+			Subject: subject,
 		},
 		Extra: atExt,
 	}, err

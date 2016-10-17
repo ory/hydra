@@ -4,20 +4,22 @@ import (
 	"net/http"
 	"net/url"
 
+	"encoding/json"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pkg/errors"
+	"strings"
 )
 
 const (
 	OpenIDConnectKeyName = "hydra.openid.id-token"
 
 	ConsentPath = "/oauth2/consent"
-	TokenPath = "/oauth2/token"
-	AuthPath = "/oauth2/auth"
+	TokenPath   = "/oauth2/token"
+	AuthPath    = "/oauth2/auth"
 
 	// IntrospectPath points to the OAuth2 introspection endpoint.
 	IntrospectPath = "/oauth2/introspect"
@@ -25,11 +27,11 @@ const (
 )
 
 type Handler struct {
-	OAuth2     fosite.OAuth2Provider
-	Consent    ConsentStrategy
+	OAuth2  fosite.OAuth2Provider
+	Consent ConsentStrategy
 
-	Firewall   firewall.Firewall
-	H          herodot.Herodot
+	Firewall firewall.Firewall
+	H        herodot.Herodot
 
 	ForcedHTTP bool
 	ConsentURL url.URL
@@ -65,7 +67,21 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		return
 	}
 
-	h.OAuth2.WriteIntrospectionResponse(w, resp)
+	if !resp.IsActive() {
+		_ = json.NewEncoder(w).Encode(&Introspection{Active: false})
+		return
+	}
+
+	_ = json.NewEncoder(w).Encode(&Introspection{
+		Active:    true,
+		ClientID:  resp.GetAccessRequester().GetClient().GetID(),
+		Scope:     strings.Join(resp.GetAccessRequester().GetGrantedScopes(), " "),
+		ExpiresAt: resp.GetAccessRequester().GetSession().GetExpiresAt(fosite.AccessToken).Unix(),
+		IssuedAt:  resp.GetAccessRequester().GetRequestedAt().Unix(),
+		Subject:   resp.GetAccessRequester().GetSession().GetSubject(),
+		Username:  resp.GetAccessRequester().GetSession().GetUsername(),
+		Extra:     resp.GetAccessRequester().GetSession().(*Session).Extra,
+	})
 }
 
 func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -146,7 +162,7 @@ func (h *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, auth
 		schema = "http"
 	}
 
-	challenge, err := h.Consent.IssueChallenge(authorizeRequest, schema + "://" + r.Host + r.URL.String())
+	challenge, err := h.Consent.IssueChallenge(authorizeRequest, schema+"://"+r.Host+r.URL.String())
 	if err != nil {
 		return err
 	}

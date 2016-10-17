@@ -3,11 +3,11 @@ package jwk
 import (
 	"testing"
 
+	"crypto/rand"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
-	"github.com/stretchr/testify/assert"
 	"github.com/pkg/errors"
-	"crypto/rand"
+	"github.com/stretchr/testify/assert"
 	"io"
 )
 

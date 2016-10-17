@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/ory-am/fosite"
 	foauth2 "github.com/ory-am/fosite/handler/oauth2"
 	"github.com/ory-am/fosite/token/hmac"
 	"github.com/ory-am/hydra/pkg"
@@ -25,7 +26,6 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/yaml.v2"
-	"github.com/ory-am/fosite"
 )
 
 type Config struct {

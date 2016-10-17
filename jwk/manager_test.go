@@ -26,6 +26,7 @@ import (
 	"golang.org/x/net/context"
 	"io"
 	"net/http"
+	"github.com/jmoiron/sqlx"
 )
 
 var managers = map[string]Manager{}
@@ -83,7 +84,52 @@ func randomBytes(n int) ([]byte, error) {
 	return bytes, nil
 }
 
+var encryptionKey, _ = randomBytes(32)
+
+var containers = []dockertest.ContainerID{}
+
 func TestMain(m *testing.M) {
+	defer func() {
+		for _, c := range containers {
+			c.KillRemove()
+		}
+	}()
+
+	connectToMySQL()
+	connectToRethinkDB()
+	connectToPG()
+
+	os.Exit(m.Run())
+}
+
+func connectToPG() {
+	var db *sqlx.DB
+	c, err := dockertest.ConnectToPostgreSQL(15, time.Second, func(url string) bool {
+		var err error
+		db, err = sqlx.Open("postgres", url)
+		if err != nil {
+			log.Printf("Got error in postgres connector: %s", err)
+			return false
+		}
+		return db.Ping() == nil
+	})
+
+	if err != nil {
+		log.Fatalf("Could not connect to database: %s", err)
+	}
+
+	containers = append(containers, c)
+	s := &SQLManager{DB: db,		Cipher: &AEAD{			Key: encryptionKey		}}
+
+	if err = s.CreateSchemas(); err != nil {
+		log.Fatalf("Could not create postgres schema: %v", err)
+	}
+
+	managers["postgres"] = s
+	containers = append(containers, c)
+}
+
+func connectToRethinkDB() {
 	var session *r.Session
 	var err error
 
@@ -98,34 +144,51 @@ func TestMain(m *testing.M) {
 			return false
 		}
 
-		key, err := randomBytes(32)
-		if err != nil {
-			log.Printf("Could not watch: %s", err)
-			return false
-		}
 		rethinkManager = &RethinkManager{
 			Keys:    map[string]jose.JsonWebKeySet{},
 			Session: session,
 			Table:   r.Table("hydra_keys"),
 			Cipher: &AEAD{
-				Key: key,
+				Key: encryptionKey,
 			},
 		}
 		rethinkManager.Watch(context.Background())
 		time.Sleep(100 * time.Millisecond)
 		return true
 	})
-	if session != nil {
-		defer session.Close()
-	}
 	if err != nil {
 		log.Fatalf("Could not connect to database: %s", err)
 	}
-	managers["rethink"] = rethinkManager
 
-	retCode := m.Run()
-	c.KillRemove()
-	os.Exit(retCode)
+	containers = append(containers, c)
+	managers["rethink"] = rethinkManager
+}
+
+func connectToMySQL() {
+	var db *sqlx.DB
+	c, err := dockertest.ConnectToMySQL(15, time.Second, func(url string) bool {
+		var err error
+		db, err = sqlx.Open("mysql", url)
+		if err != nil {
+			log.Printf("Got error in mysql connector: %s", err)
+			return false
+		}
+		return db.Ping() == nil
+	})
+
+	if err != nil {
+		log.Fatalf("Could not connect to database: %s", err)
+	}
+
+	containers = append(containers, c)
+	s := &SQLManager{DB: db,		Cipher: &AEAD{			Key: encryptionKey		}}
+
+	if err = s.CreateSchemas(); err != nil {
+		log.Fatalf("Could not create postgres schema: %v", err)
+	}
+
+	managers["mysql"] = s
+	containers = append(containers, c)
 }
 
 func BenchmarkRethinkGet(b *testing.B) {

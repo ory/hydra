@@ -1,18 +1,31 @@
 package client
 
 import (
-	"encoding/json"
+	"fmt"
 	"github.com/imdario/mergo"
 	"github.com/jmoiron/sqlx"
 	"github.com/ory-am/fosite"
 	"github.com/pkg/errors"
+	"strings"
 )
 
 var sqlSchema = []string{
 	`CREATE TABLE IF NOT EXISTS hydra_client (
-	id      varchar(255) NOT NULL PRIMARY KEY,
-	version int NOT NULL DEFAULT 0,
-	client  json NOT NULL)`,
+	id      	varchar(255) NOT NULL PRIMARY KEY,
+	client_name  	text NOT NULL,
+	client_secret  	text NOT NULL,
+	redirect_uris  	text NOT NULL,
+	grant_types  	text NOT NULL,
+	response_types  text NOT NULL,
+	scope  		text NOT NULL,
+	owner  		text NOT NULL,
+	policy_uri  	text NOT NULL,
+	tos_uri  	text NOT NULL,
+	client_uri  	text NOT NULL,
+	logo_uri  	text NOT NULL,
+	contacts  	text NOT NULL,
+	public  	boolean NOT NULL
+)`,
 }
 
 type SQLManager struct {
@@ -21,12 +34,75 @@ type SQLManager struct {
 }
 
 type sqlData struct {
-	ID      string `db:"id"`
-	Version int    `db:"version"`
-	Client  []byte `db:"client"`
+	ID                string `db:"id"`
+	Name              string `db:"client_name"`
+	Secret            string `db:"client_secret"`
+	RedirectURIs      string `db:"redirect_uris"`
+	GrantTypes        string `db:"grant_types"`
+	ResponseTypes     string `db:"response_types"`
+	Scope             string `db:"scope"`
+	Owner             string `db:"owner"`
+	PolicyURI         string `db:"policy_uri"`
+	TermsOfServiceURI string `db:"tos_uri"`
+	ClientURI         string `db:"client_uri"`
+	LogoURI           string `db:"logo_uri"`
+	Contacts          string `db:"contacts"`
+	Public            bool   `db:"public"`
 }
 
-// CreateSchemas creates ladon_policy tables
+var sqlParams = []string{
+	"id",
+	"client_name",
+	"client_secret",
+	"redirect_uris",
+	"grant_types",
+	"response_types",
+	"scope",
+	"owner",
+	"policy_uri",
+	"tos_uri",
+	"client_uri",
+	"logo_uri",
+	"contacts",
+	"public",
+}
+
+func sqlDataFromClient(d *Client) *sqlData {
+	return &sqlData{
+		ID:                d.ID,
+		Secret:            d.Secret,
+		RedirectURIs:      strings.Join(d.RedirectURIs, "|"),
+		GrantTypes:        strings.Join(d.GrantTypes, "|"),
+		ResponseTypes:     strings.Join(d.ResponseTypes, "|"),
+		Scope:             d.Scope,
+		Owner:             d.Owner,
+		PolicyURI:         d.PolicyURI,
+		TermsOfServiceURI: d.TermsOfServiceURI,
+		ClientURI:         d.ClientURI,
+		LogoURI:           d.LogoURI,
+		Contacts:          strings.Join(d.Contacts, "|"),
+		Public:            d.Public,
+	}
+}
+
+func (d *sqlData) ToClient() *Client {
+	return &Client{
+		ID:                d.ID,
+		Secret:            d.Secret,
+		RedirectURIs:      strings.Split(d.RedirectURIs, "|"),
+		GrantTypes:        strings.Split(d.GrantTypes, "|"),
+		ResponseTypes:     strings.Split(d.ResponseTypes, "|"),
+		Scope:             d.Scope,
+		Owner:             d.Owner,
+		PolicyURI:         d.PolicyURI,
+		TermsOfServiceURI: d.TermsOfServiceURI,
+		ClientURI:         d.ClientURI,
+		LogoURI:           d.LogoURI,
+		Contacts:          strings.Split(d.Contacts, "|"),
+		Public:            d.Public,
+	}
+}
+
 func (s *SQLManager) CreateSchemas() error {
 	for _, query := range sqlSchema {
 		if _, err := s.DB.Exec(query); err != nil {
@@ -38,14 +114,11 @@ func (s *SQLManager) CreateSchemas() error {
 
 func (m *SQLManager) GetConcreteClient(id string) (*Client, error) {
 	var d sqlData
-	var c Client
 	if err := m.DB.Get(&d, m.DB.Rebind("SELECT * FROM hydra_client WHERE id=?"), id); err != nil {
-		return nil, errors.Wrap(err, "")
-	} else if err := json.Unmarshal(d.Client, &c); err != nil {
 		return nil, errors.Wrap(err, "")
 	}
 
-	return &c, nil
+	return d.ToClient(), nil
 }
 
 func (m *SQLManager) GetClient(id string) (fosite.Client, error) {
@@ -71,15 +144,13 @@ func (m *SQLManager) UpdateClient(c *Client) error {
 		return errors.Wrap(err, "")
 	}
 
-	b, err := json.Marshal(c)
-	if err != nil {
-		return errors.Wrap(err, "")
+	s := sqlDataFromClient(c)
+	var query []string
+	for _, param := range sqlParams {
+		query = append(query, fmt.Sprintf("%s=:%s", param, param))
 	}
 
-	if _, err := m.DB.NamedExec(`UPDATE hydra_client SET id=:id, client=:client WHERE id=:id`, &sqlData{
-		ID:     c.ID,
-		Client: b,
-	}); err != nil {
+	if _, err := m.DB.NamedExec(fmt.Sprintf(`UPDATE hydra_client SET %s WHERE id=:id`, strings.Join(query, ", ")), s); err != nil {
 		return errors.Wrap(err, "")
 	}
 	return nil
@@ -99,16 +170,12 @@ func (m *SQLManager) Authenticate(id string, secret []byte) (*Client, error) {
 }
 
 func (m *SQLManager) CreateClient(c *Client) error {
-	b, err := json.Marshal(c)
-	if err != nil {
-		return errors.Wrap(err, "")
-	}
-
-	if _, err := m.DB.NamedExec(`INSERT INTO hydra_client (id, client, version) VALUES (:id, :client, :version)`, &sqlData{
-		ID:      c.ID,
-		Client:  b,
-		Version: 0,
-	}); err != nil {
+	data := sqlDataFromClient(c)
+	if _, err := m.DB.NamedExec(fmt.Sprintf(
+		"INSERT INTO hydra_client (%s) VALUES (%s)",
+		strings.Join(sqlParams, ", "),
+		":"+strings.Join(sqlParams, ", :"),
+	), data); err != nil {
 		return errors.Wrap(err, "")
 	}
 	return nil
@@ -130,11 +197,7 @@ func (m *SQLManager) GetClients() (clients map[string]Client, err error) {
 	}
 
 	for _, k := range d {
-		var c Client
-		if err := json.Unmarshal(k.Client, &c); err != nil {
-			return nil, errors.Wrap(err, "")
-		}
-		clients[k.ID] = c
+		clients[k.ID] = *k.ToClient()
 	}
 	return clients, nil
 }

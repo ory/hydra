@@ -74,14 +74,14 @@ func TestMain(m *testing.M) {
 		}
 	}()
 
-	connectPG()
+	connectToPG()
 	connectToRethinkDB()
-	connectMySQL()
+	connectToMySQL()
 
-	retCode := m.Run()
-	os.Exit(retCode)
+	os.Exit(m.Run())
 }
-func connectMySQL() {
+
+func connectToMySQL() {
 	var db *sqlx.DB
 	c, err := dockertest.ConnectToMySQL(15, time.Second, func(url string) bool {
 		var err error
@@ -108,7 +108,7 @@ func connectMySQL() {
 	containers = append(containers, c)
 }
 
-func connectPG() {
+func connectToPG() {
 	var db *sqlx.DB
 	c, err := dockertest.ConnectToPostgreSQL(15, time.Second, func(url string) bool {
 		var err error

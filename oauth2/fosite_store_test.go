@@ -16,11 +16,18 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
+	"github.com/jmoiron/sqlx"
+	"fmt"
+	"github.com/stretchr/testify/require"
 )
 
 var rethinkManager *FositeRehinkDBStore
-
+var containers = []dockertest.ContainerID{}
 var clientManagers = map[string]pkg.FositeStorer{}
+var clientManager = &client.MemoryManager{
+	Clients: map[string]client.Client{"foobar": client.Client{ID: "foobar"}},
+	Hasher:  &fosite.BCrypt{},
+}
 
 func init() {
 	clientManagers["memory"] = &FositeMemoryStore{
@@ -30,14 +37,86 @@ func init() {
 		Implicit:       make(map[string]fosite.Requester),
 		RefreshTokens:  make(map[string]fosite.Requester),
 	}
-
 }
 
 func TestMain(m *testing.M) {
+	defer func() {
+		for _, c := range containers {
+			c.KillRemove()
+		}
+	}()
+	connectToMySQL()
+	connectToPG()
+	connectToRethink()
+	os.Exit(m.Run())
+}
+
+func connectToMySQL() {
+	var db *sqlx.DB
+	cn, err := dockertest.ConnectToMySQL(15, time.Second, func(url string) bool {
+		var err error
+		db, err = sqlx.Open("mysql", url)
+		if err != nil {
+			logrus.Printf("Got error in mysql connector: %s", err)
+			return false
+		}
+		return db.Ping() == nil
+	})
+
+	if err != nil {
+		logrus.Fatalf("Could not connect to database: %s", err)
+	}
+
+	containers = append(containers, cn)
+	s := &FositeSQLStore{
+		DB: db,
+		Manager: clientManager,
+	}
+
+	if err = s.CreateSchemas(); err != nil {
+		logrus.Fatalf("Could not create postgres schema: %v", err)
+	}
+
+	clientManagers["mysql"] = s
+	containers = append(containers, cn)
+}
+
+
+func connectToPG() {
+	var db *sqlx.DB
+	cn, err := dockertest.ConnectToPostgreSQL(15, time.Second, func(url string) bool {
+		var err error
+		db, err = sqlx.Open("postgres", url)
+		if err != nil {
+			logrus.Printf("Got error in postgres connector: %s", err)
+			return false
+		}
+		return db.Ping() == nil
+	})
+
+	if err != nil {
+		logrus.Fatalf("Could not connect to database: %s", err)
+	}
+
+	containers = append(containers, cn)
+	s := &FositeSQLStore{
+		DB: db,
+		Manager: clientManager,
+	}
+
+	if err = s.CreateSchemas(); err != nil {
+		logrus.Fatalf("Could not create postgres schema: %v", err)
+	}
+
+	clientManagers["postgres"] = s
+	containers = append(containers, cn)
+}
+
+func connectToRethink() {
 	var session *r.Session
 	var err error
 
-	c, err := dockertest.ConnectToRethinkDB(20, time.Millisecond*500, func(url string) bool {
+	cn, err := dockertest.ConnectToRethinkDB(20, time.Millisecond * 500, func(url string) bool {
 		if session, err = r.Connect(r.ConnectOpts{Address: url, Database: "hydra"}); err != nil {
 			return false
 		} else if _, err = r.DBCreate("hydra").RunWrite(session); err != nil {
@@ -77,17 +156,12 @@ func TestMain(m *testing.M) {
 		time.Sleep(500 * time.Millisecond)
 		return true
 	})
-	if session != nil {
-		defer session.Close()
-	}
+
 	if err != nil {
 		logrus.Fatalf("Could not connect to database: %s", err)
 	}
 	clientManagers["rethink"] = rethinkManager
-
-	retCode := m.Run()
-	c.KillRemove()
-	os.Exit(retCode)
+	containers = append(containers, cn)
 }
 
 var defaultRequest = fosite.Request{
@@ -145,93 +219,99 @@ func TestColdStartRethinkManager(t *testing.T) {
 func TestCreateGetDeleteAuthorizeCodes(t *testing.T) {
 	ctx := context.Background()
 	for k, m := range clientManagers {
-		_, err := m.GetAuthorizeCodeSession(ctx, "4321", &fosite.DefaultSession{})
-		pkg.AssertError(t, true, err, "%s", k)
+		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
+			_, err := m.GetAuthorizeCodeSession(ctx, "4321", &fosite.DefaultSession{})
+			assert.NotNil(t, err)
 
-		err = m.CreateAuthorizeCodeSession(ctx, "4321", &defaultRequest)
-		pkg.AssertError(t, false, err, "%s", k)
+			err = m.CreateAuthorizeCodeSession(ctx, "4321", &defaultRequest)
+			require.Nil(t, err)
 
-		res, err := m.GetAuthorizeCodeSession(ctx, "4321", &fosite.DefaultSession{})
-		pkg.RequireError(t, false, err, "%s", k)
-		c.AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
+			res, err := m.GetAuthorizeCodeSession(ctx, "4321", &fosite.DefaultSession{})
+			require.Nil(t, err)
+			c.AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
 
-		err = m.DeleteAuthorizeCodeSession(ctx, "4321")
-		pkg.AssertError(t, false, err, "%s", k)
+			err = m.DeleteAuthorizeCodeSession(ctx, "4321")
+			require.Nil(t, err)
 
-		time.Sleep(100 * time.Millisecond)
+			time.Sleep(100 * time.Millisecond)
 
-		_, err = m.GetAuthorizeCodeSession(ctx, "4321", &fosite.DefaultSession{})
-		pkg.AssertError(t, true, err, "%s", k)
+			_, err = m.GetAuthorizeCodeSession(ctx, "4321", &fosite.DefaultSession{})
+			assert.NotNil(t, err)
+		})
 	}
 }
 
 func TestCreateGetDeleteAccessTokenSession(t *testing.T) {
 	ctx := context.Background()
 	for k, m := range clientManagers {
-		_, err := m.GetAccessTokenSession(ctx, "4321", &fosite.DefaultSession{})
-		pkg.AssertError(t, true, err, "%s", k)
+		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
+			_, err := m.GetAccessTokenSession(ctx, "4321", &fosite.DefaultSession{})
+			assert.NotNil(t, err)
 
-		err = m.CreateAccessTokenSession(ctx, "4321", &defaultRequest)
-		pkg.AssertError(t, false, err, "%s", k)
+			err = m.CreateAccessTokenSession(ctx, "4321", &defaultRequest)
+			require.Nil(t, err)
 
-		res, err := m.GetAccessTokenSession(ctx, "4321", &fosite.DefaultSession{})
-		pkg.RequireError(t, false, err, "%s", k)
-		c.AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
+			res, err := m.GetAccessTokenSession(ctx, "4321", &fosite.DefaultSession{})
+			require.Nil(t, err)
+			c.AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
 
-		err = m.DeleteAccessTokenSession(ctx, "4321")
-		pkg.AssertError(t, false, err, "%s", k)
+			err = m.DeleteAccessTokenSession(ctx, "4321")
+			require.Nil(t, err)
 
-		time.Sleep(100 * time.Millisecond)
+			time.Sleep(100 * time.Millisecond)
 
-		_, err = m.GetAccessTokenSession(ctx, "4321", &fosite.DefaultSession{})
-		pkg.AssertError(t, true, err, "%s", k)
+			_, err = m.GetAccessTokenSession(ctx, "4321", &fosite.DefaultSession{})
+			assert.NotNil(t, err)
+		})
 	}
 }
 
 func TestCreateGetDeleteOpenIDConnectSession(t *testing.T) {
 	ctx := context.Background()
 	for k, m := range clientManagers {
-		_, err := m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{})
-		pkg.AssertError(t, true, err, "%s", k)
+		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
+			_, err := m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{})
+			assert.NotNil(t, err)
 
-		err = m.CreateOpenIDConnectSession(ctx, "4321", &defaultRequest)
-		pkg.AssertError(t, false, err, "%s", k)
+			err = m.CreateOpenIDConnectSession(ctx, "4321", &defaultRequest)
+			require.Nil(t, err)
 
-		res, err := m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{
-			Session: &fosite.DefaultSession{},
+			res, err := m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{Session: &fosite.DefaultSession{}                        })
+			require.Nil(t, err)
+			c.AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
+
+			err = m.DeleteOpenIDConnectSession(ctx, "4321")
+			require.Nil(t, err)
+
+			time.Sleep(100 * time.Millisecond)
+
+			_, err = m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{})
+			assert.NotNil(t, err)
 		})
-		pkg.RequireError(t, false, err, "%s", k)
-		c.AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
-
-		err = m.DeleteOpenIDConnectSession(ctx, "4321")
-		pkg.AssertError(t, false, err, "%s", k)
-
-		time.Sleep(100 * time.Millisecond)
-
-		_, err = m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{})
-		pkg.AssertError(t, true, err, "%s", k)
 	}
 }
 
 func TestCreateGetDeleteRefreshTokenSession(t *testing.T) {
 	ctx := context.Background()
 	for k, m := range clientManagers {
-		_, err := m.GetRefreshTokenSession(ctx, "4321", &fosite.DefaultSession{})
-		pkg.AssertError(t, true, err, "%s", k)
+		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
+			_, err := m.GetRefreshTokenSession(ctx, "4321", &fosite.DefaultSession{})
+			assert.NotNil(t, err)
 
-		err = m.CreateRefreshTokenSession(ctx, "4321", &defaultRequest)
-		pkg.AssertError(t, false, err, "%s", k)
+			err = m.CreateRefreshTokenSession(ctx, "4321", &defaultRequest)
+			require.Nil(t, err)
 
-		res, err := m.GetRefreshTokenSession(ctx, "4321", &fosite.DefaultSession{})
-		pkg.RequireError(t, false, err, "%s", k)
-		c.AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
+			res, err := m.GetRefreshTokenSession(ctx, "4321", &fosite.DefaultSession{})
+			require.Nil(t, err)
+			c.AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
 
-		err = m.DeleteRefreshTokenSession(ctx, "4321")
-		pkg.AssertError(t, false, err, "%s", k)
+			err = m.DeleteRefreshTokenSession(ctx, "4321")
+			require.Nil(t, err)
 
-		time.Sleep(100 * time.Millisecond)
+			time.Sleep(100 * time.Millisecond)
 
-		_, err = m.GetRefreshTokenSession(ctx, "4321", &fosite.DefaultSession{})
-		pkg.AssertError(t, true, err, "%s", k)
+			_, err = m.GetRefreshTokenSession(ctx, "4321", &fosite.DefaultSession{})
+			assert.NotNil(t, err)
+		})
 	}
 }

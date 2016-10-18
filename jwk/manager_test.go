@@ -27,6 +27,7 @@ import (
 	"io"
 	"net/http"
 	"github.com/jmoiron/sqlx"
+	"fmt"
 )
 
 var managers = map[string]Manager{}
@@ -264,40 +265,40 @@ func TestManagerKey(t *testing.T) {
 	pub := ks.Key("public")
 
 	for name, m := range managers {
-		t.Logf("Running test %s", name)
+		t.Run(fmt.Sprintf("case=%s", name), func(t *testing.T) {
+			_, err := m.GetKey("faz", "baz")
+			assert.NotNil(t, err)
 
-		_, err := m.GetKey("faz", "baz")
-		pkg.AssertError(t, true, err, name)
+			err = m.AddKey("faz", First(priv))
+			assert.Nil(t, err)
 
-		err = m.AddKey("faz", First(priv))
-		pkg.AssertError(t, false, err, name)
+			time.Sleep(time.Millisecond * 100)
 
-		time.Sleep(time.Millisecond * 100)
+			got, err := m.GetKey("faz", "private")
+			assert.Nil(t, err)
+			assert.Equal(t, priv, got.Keys, "%s", name)
 
-		got, err := m.GetKey("faz", "private")
-		pkg.RequireError(t, false, err, name)
-		assert.Equal(t, priv, got.Keys, "%s", name)
+			err = m.AddKey("faz", First(pub))
+			assert.Nil(t, err)
 
-		err = m.AddKey("faz", First(pub))
-		pkg.AssertError(t, false, err, name)
+			time.Sleep(time.Millisecond * 100)
 
-		time.Sleep(time.Millisecond * 100)
+			got, err = m.GetKey("faz", "private")
+			assert.Nil(t, err)
+			assert.Equal(t, priv, got.Keys, "%s", name)
 
-		got, err = m.GetKey("faz", "private")
-		pkg.RequireError(t, false, err, name)
-		assert.Equal(t, priv, got.Keys, "%s", name)
+			got, err = m.GetKey("faz", "public")
+			assert.Nil(t, err)
+			assert.Equal(t, pub, got.Keys, "%s", name)
 
-		got, err = m.GetKey("faz", "public")
-		pkg.RequireError(t, false, err, name)
-		assert.Equal(t, pub, got.Keys, "%s", name)
+			err = m.DeleteKey("faz", "public")
+			assert.Nil(t, err)
 
-		err = m.DeleteKey("faz", "public")
-		pkg.AssertError(t, false, err, name)
+			time.Sleep(time.Millisecond * 100)
 
-		time.Sleep(time.Millisecond * 100)
-
-		ks, err = m.GetKey("faz", "public")
-		pkg.AssertError(t, true, err, name)
+			ks, err = m.GetKey("faz", "public")
+			assert.NotNil(t, err)
+		})
 	}
 
 	err := managers["http"].AddKey("nonono", First(priv))
@@ -309,26 +310,28 @@ func TestManagerKeySet(t *testing.T) {
 	ks.Key("private")
 
 	for name, m := range managers {
-		_, err := m.GetKeySet("foo")
-		pkg.AssertError(t, true, err, name)
+		t.Run(fmt.Sprintf("case=%s", name), func(t *testing.T) {
+			_, err := m.GetKeySet("foo")
+			pkg.AssertError(t, true, err, name)
 
-		err = m.AddKeySet("bar", ks)
-		pkg.AssertError(t, false, err, name)
+			err = m.AddKeySet("bar", ks)
+			assert.Nil(t, err)
 
-		time.Sleep(time.Millisecond * 100)
+			time.Sleep(time.Millisecond * 100)
 
-		got, err := m.GetKeySet("bar")
-		pkg.RequireError(t, false, err, name)
-		assert.Equal(t, ks.Key("public"), got.Key("public"), name)
-		assert.Equal(t, ks.Key("private"), got.Key("private"), name)
+			got, err := m.GetKeySet("bar")
+			assert.Nil(t, err)
+			assert.Equal(t, ks.Key("public"), got.Key("public"), name)
+			assert.Equal(t, ks.Key("private"), got.Key("private"), name)
 
-		err = m.DeleteKeySet("bar")
-		pkg.AssertError(t, false, err, name)
+			err = m.DeleteKeySet("bar")
+			assert.Nil(t, err)
 
-		time.Sleep(time.Millisecond * 100)
+			time.Sleep(time.Millisecond * 100)
 
-		_, err = m.GetKeySet("bar")
-		pkg.AssertError(t, true, err, name)
+			_, err = m.GetKeySet("bar")
+			assert.NotNil(t, err)
+		})
 	}
 
 	err := managers["http"].AddKeySet("nonono", ks)

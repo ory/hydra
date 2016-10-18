@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
+	"fmt"
 )
 
 var clientManagers = map[string]Storage{}
@@ -262,67 +263,71 @@ func TestColdStartRethinkManager(t *testing.T) {
 
 func TestCreateGetDeleteClient(t *testing.T) {
 	for k, m := range clientManagers {
-		_, err := m.GetClient("4321")
-		pkg.AssertError(t, true, err, "%s", k)
+		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
+			_, err := m.GetClient("4321")
+			assert.NotNil(t, err)
 
-		c := &Client{
-			ID:                "1234",
-			Secret:            "secret",
-			RedirectURIs:      []string{"http://redirect"},
-			TermsOfServiceURI: "foo",
-		}
-		err = m.CreateClient(c)
-		pkg.AssertError(t, false, err, "%s", k)
-		if err == nil {
-			compare(t, c, k)
-		}
+			c := &Client{
+				ID:                "1234",
+				Secret:            "secret",
+				RedirectURIs:      []string{"http://redirect"},
+				TermsOfServiceURI: "foo",
+			}
+			err = m.CreateClient(c)
+			assert.Nil(t, err)
+			if err == nil {
+				compare(t, c, k)
+			}
 
-		err = m.CreateClient(&Client{
-			ID:                "2-1234",
-			Secret:            "secret",
-			RedirectURIs:      []string{"http://redirect"},
-			TermsOfServiceURI: "foo",
+			err = m.CreateClient(&Client{
+				ID:                "2-1234",
+				Secret:            "secret",
+				RedirectURIs:      []string{"http://redirect"},
+				TermsOfServiceURI: "foo",
+			})
+			assert.Nil(t, err)
+
+			// RethinkDB delay
+			time.Sleep(100 * time.Millisecond)
+
+			d, err := m.GetClient("1234")
+			assert.Nil(t, err)
+			if err == nil {
+				compare(t, d, k)
+			}
+
+			ds, err := m.GetClients()
+			assert.Nil(t, err)
+			assert.Len(t, ds, 2)
+			assert.NotEqual(t, ds["1234"].ID, ds["2-1234"].ID)
+
+			err = m.UpdateClient(&Client{
+				ID:                "2-1234",
+				Secret:            "secret-new",
+				TermsOfServiceURI: "bar",
+			})
+			assert.Nil(t, err)
+			time.Sleep(100 * time.Millisecond)
+
+			nc, err := m.GetConcreteClient("2-1234")
+			assert.Nil(t, err)
+
+			if k != "http" {
+				// http always returns an empty secret
+				assert.NotEqual(t, d.GetHashedSecret(), nc.GetHashedSecret(), "%s", k)
+			}
+			assert.Equal(t, "bar", nc.TermsOfServiceURI, "%s", k)
+			assert.EqualValues(t, []string{"http://redirect"}, nc.GetRedirectURIs(), "%s", k)
+
+			err = m.DeleteClient("1234")
+			assert.Nil(t, err)
+
+			// RethinkDB delay
+			time.Sleep(100 * time.Millisecond)
+
+			_, err = m.GetClient("1234")
+			assert.NotNil(t, err)
 		})
-		pkg.AssertError(t, false, err, "%s", k)
-
-		// RethinkDB delay
-		time.Sleep(100 * time.Millisecond)
-
-		d, err := m.GetClient("1234")
-		pkg.AssertError(t, false, err, "%s", k)
-		if err == nil {
-			compare(t, d, k)
-		}
-
-		ds, err := m.GetClients()
-		pkg.AssertError(t, false, err, "%s", k)
-		assert.Len(t, ds, 2)
-		assert.NotEqual(t, ds["1234"].ID, ds["2-1234"].ID)
-
-		err = m.UpdateClient(&Client{
-			ID:                "2-1234",
-			Secret:            "secret-new",
-			TermsOfServiceURI: "bar",
-		})
-		pkg.AssertError(t, false, err, "%s", k)
-		time.Sleep(100 * time.Millisecond)
-
-		nc, err := m.GetConcreteClient("2-1234")
-		if k != "http" {
-			// http always returns an empty secret
-			assert.NotEqual(t, d.GetHashedSecret(), nc.GetHashedSecret(), "%s", k)
-		}
-		assert.Equal(t, "bar", nc.TermsOfServiceURI, "%s", k)
-		assert.EqualValues(t, []string{"http://redirect"}, nc.GetRedirectURIs(), "%s", k)
-
-		err = m.DeleteClient("1234")
-		pkg.AssertError(t, false, err, "%s", k)
-
-		// RethinkDB delay
-		time.Sleep(100 * time.Millisecond)
-
-		_, err = m.GetClient("1234")
-		pkg.AssertError(t, true, err, "%s", k)
 	}
 }
 

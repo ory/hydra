@@ -24,7 +24,6 @@ type FositeRehinkDBStore struct {
 	AuthorizeCodesTable r.Term
 	IDSessionsTable     r.Term
 	AccessTokensTable   r.Term
-	ImplicitTable       r.Term
 	RefreshTokensTable  r.Term
 	ClientsTable        r.Term
 
@@ -33,7 +32,6 @@ type FositeRehinkDBStore struct {
 	AuthorizeCodes RDBItems
 	IDSessions     RDBItems
 	AccessTokens   RDBItems
-	Implicit       RDBItems
 	RefreshTokens  RDBItems
 }
 
@@ -72,8 +70,6 @@ func (m *FositeRehinkDBStore) ColdStart() error {
 	} else if err := m.AuthorizeCodes.coldStart(m.Session, &m.RWMutex, m.AuthorizeCodesTable); err != nil {
 		return err
 	} else if err := m.IDSessions.coldStart(m.Session, &m.RWMutex, m.IDSessionsTable); err != nil {
-		return err
-	} else if err := m.Implicit.coldStart(m.Session, &m.RWMutex, m.ImplicitTable); err != nil {
 		return err
 	} else if err := m.RefreshTokens.coldStart(m.Session, &m.RWMutex, m.RefreshTokensTable); err != nil {
 		return err
@@ -222,11 +218,8 @@ func (s *FositeRehinkDBStore) DeleteRefreshTokenSession(_ context.Context, signa
 	return s.publishDelete(s.RefreshTokensTable, signature)
 }
 
-func (s *FositeRehinkDBStore) CreateImplicitAccessTokenSession(_ context.Context, code string, req fosite.Requester) error {
-	if err := s.publishInsert(s.ImplicitTable, code, req); err != nil {
-		return err
-	}
-	return waitFor(s.Implicit, code)
+func (s *FositeRehinkDBStore) CreateImplicitAccessTokenSession(ctx context.Context, code string, req fosite.Requester) error {
+	return s.CreateAccessTokenSession(ctx, code, req)
 }
 
 func (s *FositeRehinkDBStore) PersistAuthorizeCodeGrantSession(ctx context.Context, authorizeCode, accessSignature, refreshSignature string, request fosite.Requester) error {
@@ -263,7 +256,6 @@ func (m *FositeRehinkDBStore) Watch(ctx context.Context) {
 	m.AccessTokens.watch(ctx, m.Session, &m.RWMutex, m.AccessTokensTable)
 	m.AuthorizeCodes.watch(ctx, m.Session, &m.RWMutex, m.AuthorizeCodesTable)
 	m.IDSessions.watch(ctx, m.Session, &m.RWMutex, m.IDSessionsTable)
-	m.Implicit.watch(ctx, m.Session, &m.RWMutex, m.ImplicitTable)
 	m.RefreshTokens.watch(ctx, m.Session, &m.RWMutex, m.RefreshTokensTable)
 }
 

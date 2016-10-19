@@ -1,5 +1,5 @@
 hash: bb1f4f767e2f1c555b227267ab7d5e1c1e3d5c78fa741fd78ec2af270fc85aea
-updated: 2016-10-17T15:20:56.6477387+02:00
+updated: 2016-10-19T10:46:31.1754357+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
@@ -36,6 +36,10 @@ imports:
   version: 50d4dbd4eb0e84778abe37cefef140271d96fade
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
+- name: github.com/jmoiron/sqlx
+  version: 05b81a7d5d38058e42148dc01f17daf4acba4640
+  subpackages:
+  - reflectx
 - name: github.com/julienschmidt/httprouter
   version: 8c199fb6259ffc1af525cc3ad52ee60ba8359669
 - name: github.com/kr/fs

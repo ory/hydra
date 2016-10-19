@@ -30,7 +30,6 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 			AuthorizeCodes: make(map[string]fosite.Requester),
 			IDSessions:     make(map[string]fosite.Requester),
 			AccessTokens:   make(map[string]fosite.Requester),
-			Implicit:       make(map[string]fosite.Requester),
 			RefreshTokens:  make(map[string]fosite.Requester),
 		}
 		break
@@ -46,12 +45,10 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 			AuthorizeCodesTable: r.Table("hydra_oauth2_authorize_code"),
 			IDSessionsTable:     r.Table("hydra_oauth2_id_sessions"),
 			AccessTokensTable:   r.Table("hydra_oauth2_access_token"),
-			ImplicitTable:       r.Table("hydra_oauth2_implicit"),
 			RefreshTokensTable:  r.Table("hydra_oauth2_refresh_token"),
 			AuthorizeCodes:      make(oauth2.RDBItems),
 			IDSessions:          make(oauth2.RDBItems),
 			AccessTokens:        make(oauth2.RDBItems),
-			Implicit:            make(oauth2.RDBItems),
 			RefreshTokens:       make(oauth2.RDBItems),
 		}
 		if err := m.ColdStart(); err != nil {

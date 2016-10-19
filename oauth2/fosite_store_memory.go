@@ -15,7 +15,6 @@ type FositeMemoryStore struct {
 	AuthorizeCodes map[string]fosite.Requester
 	IDSessions     map[string]fosite.Requester
 	AccessTokens   map[string]fosite.Requester
-	Implicit       map[string]fosite.Requester
 	RefreshTokens  map[string]fosite.Requester
 
 	sync.RWMutex
@@ -117,11 +116,8 @@ func (s *FositeMemoryStore) DeleteRefreshTokenSession(_ context.Context, signatu
 	return nil
 }
 
-func (s *FositeMemoryStore) CreateImplicitAccessTokenSession(_ context.Context, code string, req fosite.Requester) error {
-	s.Lock()
-	defer s.Unlock()
-	s.Implicit[code] = req
-	return nil
+func (s *FositeMemoryStore) CreateImplicitAccessTokenSession(ctx context.Context, code string, req fosite.Requester) error {
+	return s.CreateAccessTokenSession(ctx, code, req)
 }
 
 func (s *FositeMemoryStore) PersistAuthorizeCodeGrantSession(ctx context.Context, authorizeCode, accessSignature, refreshSignature string, request fosite.Requester) error {

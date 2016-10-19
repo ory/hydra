@@ -34,7 +34,6 @@ func init() {
 		AuthorizeCodes: make(map[string]fosite.Requester),
 		IDSessions:     make(map[string]fosite.Requester),
 		AccessTokens:   make(map[string]fosite.Requester),
-		Implicit:       make(map[string]fosite.Requester),
 		RefreshTokens:  make(map[string]fosite.Requester),
 	}
 }
@@ -131,9 +130,6 @@ func connectToRethink() {
 		} else if _, err = r.TableCreate("hydra_access_token").RunWrite(session); err != nil {
 			logrus.Printf("Could not create table: %s", err)
 			return false
-		} else if _, err = r.TableCreate("hydra_implicit").RunWrite(session); err != nil {
-			logrus.Printf("Could not create table: %s", err)
-			return false
 		} else if _, err = r.TableCreate("hydra_refresh_token").RunWrite(session); err != nil {
 			logrus.Printf("Could not create table: %s", err)
 			return false
@@ -144,12 +140,10 @@ func connectToRethink() {
 			AuthorizeCodesTable: r.Table("hydra_authorize_code"),
 			IDSessionsTable:     r.Table("hydra_id_sessions"),
 			AccessTokensTable:   r.Table("hydra_access_token"),
-			ImplicitTable:       r.Table("hydra_implicit"),
 			RefreshTokensTable:  r.Table("hydra_refresh_token"),
 			AuthorizeCodes:      make(RDBItems),
 			IDSessions:          make(RDBItems),
 			AccessTokens:        make(RDBItems),
-			Implicit:            make(RDBItems),
 			RefreshTokens:       make(RDBItems),
 		}
 		rethinkManager.Watch(context.Background())
@@ -216,6 +210,31 @@ func TestColdStartRethinkManager(t *testing.T) {
 	assert.NotEqual(t, s1, s2)
 }
 
+func TestCreateImplicitAccessTokenSession(t *testing.T) {
+	ctx := context.Background()
+	for k, m := range clientManagers {
+		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
+
+			_, err := m.GetAccessTokenSession(ctx, "implicit-4321", &fosite.DefaultSession{})
+			assert.NotNil(t, err)
+
+			err = m.CreateImplicitAccessTokenSession(ctx, "implicit-4321", &defaultRequest)
+			assert.Nil(t, err)
+
+			res, err := m.GetAccessTokenSession(ctx, "implicit-4321", &fosite.DefaultSession{})
+			require.Nil(t, err)
+			c.AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
+
+			err = m.DeleteAccessTokenSession(ctx, "implicit-4321")
+			assert.Nil(t, err)
+
+			time.Sleep(100 * time.Millisecond)
+
+			_, err = m.GetAccessTokenSession(ctx, "implicit-4321", &fosite.DefaultSession{})
+			assert.NotNil(t, err)
+		})
+	}
+}
 func TestCreateGetDeleteAuthorizeCodes(t *testing.T) {
 	ctx := context.Background()
 	for k, m := range clientManagers {

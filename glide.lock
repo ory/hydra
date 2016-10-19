@@ -1,5 +1,5 @@
-hash: bb1f4f767e2f1c555b227267ab7d5e1c1e3d5c78fa741fd78ec2af270fc85aea
-updated: 2016-10-19T10:46:31.1754357+02:00
+hash: 8ebcd249ace2beef3574d5ed915f311325e852ded81da361477de8edf23aa05c
+updated: 2016-10-19T11:29:43.997168+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
@@ -187,4 +187,4 @@ testImports:
   subpackages:
   - oid
 - name: github.com/ory-am/dockertest
-  version: 1b35e25f4895dff0155ac7b67f69f9aa3a275a76
+  version: edb9d9444e6868c1b1e279098b628e7b8e6f0714

@@ -35,29 +35,6 @@ var err = hydra.Client.DeleteClient(newClient.ID)
 var clients, err = hydra.Client.GetClients()
 ```
 
-Manage SSO Connections using [`ory-am/hydra/connection.HTTPManager`](connection/manager_http.go):
-```go
-import "github.com/ory-am/hydra/connection"
-
-// Create a new connection
-var sso = connection.Connection{
-    Provider: "login.google.com",
-    LocalSubject: "bob",
-    RemoteSubject: "googleSubjectID",
-}
-var err = hydra.SSO.Create(&sso)
-
-// Retrieve newly created connection
-var result, err := hydra.SSO.Get(sso.ID)
-
-// Delete connection
-var err = hydra.SSO.Delete(sso.ID)
-
-// Find a connection by subject
-var ssoConns, err = hydra.SSO.FindAllByLocalSubject("bob")
-var ssoConns, err = hydra.SSO.FindByRemoteSubject("login.google.com", "googleSubjectID")
-```
-
 Manage policies using [`ory-am/hydra/policy.HTTPManager`](policy/manager_http.go):
 ```go
 import "github.com/ory-am/ladon"

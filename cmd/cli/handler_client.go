@@ -63,11 +63,12 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	callbacks, _ := cmd.Flags().GetStringSlice("callbacks")
 	name, _ := cmd.Flags().GetString("name")
 	id, _ := cmd.Flags().GetString("id")
+	public, _ := cmd.Flags().GetBool("is-public")
 
 	secret, err := pkg.GenerateSecret(26)
 	pkg.Must(err, "Could not generate secret: %s", err)
 
-	client := &client.Client{
+	cc := &client.Client{
 		ID:            id,
 		Secret:        string(secret),
 		ResponseTypes: responseTypes,
@@ -75,15 +76,16 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		GrantTypes:    grantTypes,
 		RedirectURIs:  callbacks,
 		Name:          name,
+		Public: public,
 	}
-	err = h.M.CreateClient(client)
+	err = h.M.CreateClient(cc)
 	if h.M.Dry {
 		fmt.Printf("%s\n", err)
 		return
 	}
 	pkg.Must(err, "Could not create client: %s", err)
 
-	fmt.Printf("Client ID: %s\n", client.ID)
+	fmt.Printf("Client ID: %s\n", cc.ID)
 	fmt.Printf("Client Secret: %s\n", secret)
 }
 

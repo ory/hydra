@@ -56,14 +56,23 @@ and can answer access requests that look like:
 }
 ```
 
-### HTTP Examples (tbd)
+In this case, the access request will be allowed, because:
+
+1. `users:peter` matches `"subjects": ["users:<[peter|ken]>", "users:maria", "groups:admins"]`, as would `users:ken`, `users:maria` and `group:admins`.
+2. `delete` matches `"actions" : ["delete", "<[create|update]>"]` as would `update` and `create`
+3. `resource:articles:ladon-introduction` matches `"resources": ["resources:articles:<.*>", "resources:printer"],`
+4. `"remoteIP": "192.168.0.5"` matches the [`CIDRCondition`](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
+condition that was configured for the field `remoteIP`.
+
+### HTTP Examples
 
 ```
 > curl \
       -X POST \
       -H "Content-Type: application/json" \
+      -H "Authorization: bearer oauth2-access-token" \
       -d@- \
-      "https://my-ladon-implementation.localhost/policies" <<EOF
+      "https://hydra/policies" <<EOF
         {
           "description": "One policy to rule them all.",
           "subjects": ["users:<[peter|ken]>", "users:maria", "groups:admins"],
@@ -91,8 +100,9 @@ Then we test if "peter" (ip: "192.168.0.5") is allowed to "delete" the "ladon-in
 > curl \
       -X POST \
       -H "Content-Type: application/json" \
+      -H "Authorization: bearer oauth2-access-token" \
       -d@- \
-      "https://my-ladon-implementation.localhost/warden" <<EOF
+      "https://my-ladon-implementation.localhost/warden/allowed" <<EOF
         {
           "subject": "users:peter",
           "action" : "delete",
@@ -136,4 +146,4 @@ In both cases, you would use on of the warden endpoints.
 The Warden is usually called from your own services ("resource providers"), not from third parties. Hydra prevents
 third parties from having access to these endpoints per default, but you can change that with custom policies.
 
-The Warden endpoints are documented [here](http://docs.hdyra.apiary.io/#reference/warden:-access-control-for-resource-providers).
+The Warden endpoints are documented [here](http://docs.hdyra.apiary.io/#reference/warden:-access-control).

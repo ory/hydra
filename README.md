@@ -126,7 +126,7 @@ hydra
 ### 5 minutes tutorial: Run your very own OAuth2 environment
 
 The **[tutorial](https://ory-am.gitbooks.io/hydra/content/demo.html)** teaches you to set up Hydra,
-a RethinkDB instance and an exemplary identity provider written in React using docker compose.
+a Posgres instance and an exemplary identity provider written in React using docker compose.
 It will take you about 5 minutes to get complete the **[tutorial](https://ory-am.gitbooks.io/hydra/content/demo.html)**.
 
 <img src="docs/images/oauth2-flow.gif" alt="OAuth2 Flow">

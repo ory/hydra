@@ -1,6 +1,6 @@
 ### 5 Minute Tutorial
 
-In this example, you will set up Hydra, a RethinkDB instance and an exemplary identity provider written in React using docker compose. It will take you about 5 minutes to get complete this tutorial.
+In this example, you will set up Hydra, a Postgres instance and an exemplary identity provider written in React using docker compose. It will take you about 5 minutes to get complete this tutorial.
 
 <img src="images/oauth2-flow.gif" alt="OAuth2 Flow">
 
@@ -14,7 +14,6 @@ We will use a dummy password as the system secret: `SYSTEM_SECRET=passwordtutori
 $ go get github.com/ory-am/hydra
 $ cd $GOPATH/src/github.com/ory-am/hydra
 $ SYSTEM_SECRET=passwordtutorial DOCKER_IP=localhost docker-compose up --build
-Starting hydra_rethinkdb_1
 [...]
 mhydra   | mtime="2016-05-17T18:09:28Z" level=warning msg="Generated system secret: MnjFP5eLIr60h?hLI1h-!<4(TlWjAHX7"
 [...]
@@ -23,7 +22,7 @@ mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="client_secret: ,IvxGt
 [...]
 ```
 
-You now have a running hydra docker container! Additionally, a RethinkDB image was deployed as well as a consent app.
+You now have a running hydra docker container! Additionally, a Postgres image was deployed as well as a consent app.
 
 Hydra can be managed using the Hydra Command Line Interface (CLI) client. This client has to log on before it is allowed to do anything. When Hydra host process detects a new installation, a new temporary root client is created and its credentials are printed to the container logs.
 

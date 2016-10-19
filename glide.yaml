@@ -63,4 +63,4 @@ testImport:
 - package: github.com/gorilla/mux
   version: ~1.1.0
 - package: github.com/ory-am/dockertest
-  version: ~2.2.2
+  version: ~2.2.3

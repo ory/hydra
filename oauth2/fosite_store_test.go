@@ -334,3 +334,34 @@ func TestCreateGetDeleteRefreshTokenSession(t *testing.T) {
 		})
 	}
 }
+
+func TestRevokeRefreshToken(t *testing.T) {
+	ctx := context.Background()
+	id := uuid.New()
+	for k, m := range clientManagers {
+		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
+			_, err := m.GetRefreshTokenSession(ctx, "1111", &fosite.DefaultSession{})
+			assert.NotNil(t, err)
+
+			err = m.CreateRefreshTokenSession(ctx, "1111", &fosite.Request{ID: id, Client: &client.Client{ID: "foobar"},RequestedAt: time.Now().Round(time.Second)})
+			require.Nil(t, err)
+
+			err = m.CreateRefreshTokenSession(ctx, "1122", &fosite.Request{ID: id, Client: &client.Client{ID: "foobar"},RequestedAt: time.Now().Round(time.Second)})
+			require.Nil(t, err)
+
+			_, err = m.GetRefreshTokenSession(ctx, "1111", &fosite.DefaultSession{})
+			require.Nil(t, err)
+
+			err = m.RevokeRefreshToken(ctx, id)
+			require.Nil(t, err)
+
+			time.Sleep(100 * time.Millisecond)
+
+			_, err = m.GetRefreshTokenSession(ctx, "1111", &fosite.DefaultSession{})
+			assert.NotNil(t, err)
+
+			_, err = m.GetRefreshTokenSession(ctx, "1122", &fosite.DefaultSession{})
+			assert.NotNil(t, err)
+		})
+	}
+}

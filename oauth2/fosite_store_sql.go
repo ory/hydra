@@ -2,15 +2,15 @@ package oauth2
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/jmoiron/sqlx"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/client"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
+	"net/url"
 	"strings"
 	"time"
-	"fmt"
-	"github.com/jmoiron/sqlx"
-	"net/url"
 )
 
 type FositeSQLStore struct {
@@ -32,10 +32,10 @@ func sqlTemplate(table string) string {
 }
 
 const (
-	sqlTableOpenID = "oidc"
-	sqlTableAccess = "access"
+	sqlTableOpenID  = "oidc"
+	sqlTableAccess  = "access"
 	sqlTableRefresh = "refresh"
-	sqlTableCode = "code"
+	sqlTableCode    = "code"
 )
 
 var sqlSchema = []string{
@@ -57,14 +57,14 @@ var sqlParams = []string{
 }
 
 type sqlData struct {
-	Signature     string           `db:"signature"`
-	Request       string           `db:"request_id"`
-	RequestedAt   time.Time        `db:"requested_at"`
-	Client        string           `db:"client_id"`
-	Scopes        string `db:"scope"`
-	GrantedScopes string `db:"granted_scope"`
-	Form          string           `db:"form_data"`
-	Session       []byte           `db:"session_data"`
+	Signature     string    `db:"signature"`
+	Request       string    `db:"request_id"`
+	RequestedAt   time.Time `db:"requested_at"`
+	Client        string    `db:"client_id"`
+	Scopes        string    `db:"scope"`
+	GrantedScopes string    `db:"granted_scope"`
+	Form          string    `db:"form_data"`
+	Session       []byte    `db:"session_data"`
 }
 
 func sqlSchemaFromRequest(signature string, r fosite.Requester) (*sqlData, error) {
@@ -74,7 +74,7 @@ func sqlSchemaFromRequest(signature string, r fosite.Requester) (*sqlData, error
 	}
 
 	return &sqlData{
-		Request:            r.GetID(),
+		Request:       r.GetID(),
 		Signature:     signature,
 		RequestedAt:   r.GetRequestedAt(),
 		Client:        r.GetClient().GetID(),
@@ -103,13 +103,13 @@ func (s *sqlData) ToRequest(session fosite.Session, cm client.Manager) (*fosite.
 	}
 
 	return &fosite.Request{
-		ID: s.Request,
-		RequestedAt: s.RequestedAt,
-		Client: c,
-		Scopes      : fosite.Arguments(strings.Split(s.Scopes, "|")),
-		GrantedScopes      : fosite.Arguments(strings.Split(s.GrantedScopes, "|")),
-		Form:val,
-		Session       :session,
+		ID:            s.Request,
+		RequestedAt:   s.RequestedAt,
+		Client:        c,
+		Scopes:        fosite.Arguments(strings.Split(s.Scopes, "|")),
+		GrantedScopes: fosite.Arguments(strings.Split(s.GrantedScopes, "|")),
+		Form:          val,
+		Session:       session,
 	}, nil
 }
 
@@ -140,7 +140,7 @@ func (s *FositeSQLStore) findSessionBySignature(signature string, session fosite
 	return d.ToRequest(session, s.Manager)
 }
 
-func (s *FositeSQLStore) deleteSession(signature string, table string) (error) {
+func (s *FositeSQLStore) deleteSession(signature string, table string) error {
 	if _, err := s.DB.Exec(s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE signature=?", table)), signature); err != nil {
 		return errors.Wrap(err, "")
 	}
@@ -246,7 +246,7 @@ func (s *FositeSQLStore) RevokeAccessToken(ctx context.Context, id string) error
 	return s.revokeSession(id, sqlTableAccess)
 }
 
-func (s *FositeSQLStore) revokeSession(id string, table string) (error) {
+func (s *FositeSQLStore) revokeSession(id string, table string) error {
 	if _, err := s.DB.Exec(s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE request_id=?", table)), id); err != nil {
 		return errors.Wrap(err, "")
 	}

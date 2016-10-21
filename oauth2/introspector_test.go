@@ -11,13 +11,10 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/compose"
-	foauth2 "github.com/ory-am/fosite/handler/oauth2"
 	"github.com/ory-am/fosite/storage"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
-	"github.com/ory-am/hydra/warden"
-	"github.com/ory-am/ladon"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 	goauth2 "golang.org/x/oauth2"
@@ -25,46 +22,16 @@ import (
 
 var (
 	introspectors = make(map[string]oauth2.Introspector)
-	now           = time.Now().Round(time.Second)
-	tokens        = pkg.Tokens(3)
-	fositeStore   = storage.NewExampleStore()
+	now = time.Now().Round(time.Second)
+	tokens = pkg.Tokens(3)
+	fositeStore = storage.NewExampleStore()
 )
 
-var ladonWarden = pkg.LadonWarden(map[string]ladon.Policy{
-	"1": &ladon.DefaultPolicy{
-		ID:        "1",
-		Subjects:  []string{"alice"},
-		Resources: []string{"matrix", "rn:hydra:token<.*>"},
-		Actions:   []string{"create", "decide"},
-		Effect:    ladon.AllowAccess,
-	},
-	"2": &ladon.DefaultPolicy{
-		ID:        "2",
-		Subjects:  []string{"siri"},
-		Resources: []string{"<.*>"},
-		Actions:   []string{"decide"},
-		Effect:    ladon.AllowAccess,
-	},
-})
-
-var localWarden = &warden.LocalWarden{
-	Warden: ladonWarden,
-	OAuth2: &fosite.Fosite{
-		Store: fositeStore,
-		TokenIntrospectionHandlers: fosite.TokenIntrospectionHandlers{
-			0: &foauth2.CoreValidator{
-				CoreStrategy:  pkg.HMACStrategy,
-				CoreStorage:   fositeStore,
-				ScopeStrategy: fosite.HierarchicScopeStrategy,
-			},
-		},
-		ScopeStrategy: fosite.HierarchicScopeStrategy,
-	},
-	Issuer:              "tests",
-	AccessTokenLifespan: time.Hour,
-}
-
 func init() {
+	introspectors = make(map[string]oauth2.Introspector)
+	now = time.Now().Round(time.Second)
+	tokens = pkg.Tokens(3)
+	fositeStore = storage.NewExampleStore()
 	r := httprouter.New()
 	serv := &oauth2.Handler{
 		OAuth2: compose.Compose(
@@ -77,7 +44,6 @@ func init() {
 			compose.OAuth2AuthorizeExplicitFactory,
 			compose.OAuth2TokenIntrospectionFactory,
 		),
-		Firewall: localWarden,
 		H:        &herodot.JSON{},
 	}
 	serv.SetRoutes(r)

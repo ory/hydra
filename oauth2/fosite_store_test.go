@@ -6,7 +6,9 @@ import (
 	"testing"
 	"time"
 
+	"fmt"
 	"github.com/Sirupsen/logrus"
+	"github.com/jmoiron/sqlx"
 	c "github.com/ory-am/common/pkg"
 	"github.com/ory-am/dockertest"
 	"github.com/ory-am/fosite"
@@ -14,18 +16,16 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
-	"github.com/jmoiron/sqlx"
-	"fmt"
-	"github.com/stretchr/testify/require"
 )
 
 var rethinkManager *FositeRehinkDBStore
 var containers = []dockertest.ContainerID{}
 var clientManagers = map[string]pkg.FositeStorer{}
 var clientManager = &client.MemoryManager{
-	Clients: map[string]client.Client{"foobar": client.Client{ID: "foobar"}},
+	Clients: map[string]client.Client{"foobar": {ID: "foobar"}},
 	Hasher:  &fosite.BCrypt{},
 }
 
@@ -68,7 +68,7 @@ func connectToMySQL() {
 
 	containers = append(containers, cn)
 	s := &FositeSQLStore{
-		DB: db,
+		DB:      db,
 		Manager: clientManager,
 	}
 
@@ -79,7 +79,6 @@ func connectToMySQL() {
 	clientManagers["mysql"] = s
 	containers = append(containers, cn)
 }
-
 
 func connectToPG() {
 	var db *sqlx.DB
@@ -99,7 +98,7 @@ func connectToPG() {
 
 	containers = append(containers, cn)
 	s := &FositeSQLStore{
-		DB: db,
+		DB:      db,
 		Manager: clientManager,
 	}
 
@@ -115,7 +114,7 @@ func connectToRethink() {
 	var session *r.Session
 	var err error
 
-	cn, err := dockertest.ConnectToRethinkDB(20, time.Millisecond * 500, func(url string) bool {
+	cn, err := dockertest.ConnectToRethinkDB(20, time.Millisecond*500, func(url string) bool {
 		if session, err = r.Connect(r.ConnectOpts{Address: url, Database: "hydra"}); err != nil {
 			return false
 		} else if _, err = r.DBCreate("hydra").RunWrite(session); err != nil {
@@ -295,7 +294,7 @@ func TestCreateGetDeleteOpenIDConnectSession(t *testing.T) {
 			err = m.CreateOpenIDConnectSession(ctx, "4321", &defaultRequest)
 			require.Nil(t, err)
 
-			res, err := m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{Session: &fosite.DefaultSession{}                        })
+			res, err := m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{Session: &fosite.DefaultSession{}})
 			require.Nil(t, err)
 			c.AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
 
@@ -343,10 +342,10 @@ func TestRevokeRefreshToken(t *testing.T) {
 			_, err := m.GetRefreshTokenSession(ctx, "1111", &fosite.DefaultSession{})
 			assert.NotNil(t, err)
 
-			err = m.CreateRefreshTokenSession(ctx, "1111", &fosite.Request{ID: id, Client: &client.Client{ID: "foobar"},RequestedAt: time.Now().Round(time.Second)})
+			err = m.CreateRefreshTokenSession(ctx, "1111", &fosite.Request{ID: id, Client: &client.Client{ID: "foobar"}, RequestedAt: time.Now().Round(time.Second)})
 			require.Nil(t, err)
 
-			err = m.CreateRefreshTokenSession(ctx, "1122", &fosite.Request{ID: id, Client: &client.Client{ID: "foobar"},RequestedAt: time.Now().Round(time.Second)})
+			err = m.CreateRefreshTokenSession(ctx, "1122", &fosite.Request{ID: id, Client: &client.Client{ID: "foobar"}, RequestedAt: time.Now().Round(time.Second)})
 			require.Nil(t, err)
 
 			_, err = m.GetRefreshTokenSession(ctx, "1111", &fosite.DefaultSession{})

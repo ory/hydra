@@ -115,7 +115,7 @@ func Connect(opts ...option) (*Client, error) {
 
 	c.Revocator = &hoauth2.HTTPRecovator{
 		Endpoint: pkg.JoinURL(c.clusterURL, hoauth2.RevocationPath),
-		Client:   c.http,
+		Config: &c.credentials,
 	}
 
 	c.Introspection = &hoauth2.HTTPIntrospector{

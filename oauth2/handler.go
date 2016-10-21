@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
-	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pkg/errors"
@@ -30,7 +29,6 @@ type Handler struct {
 	OAuth2  fosite.OAuth2Provider
 	Consent ConsentStrategy
 
-	Firewall firewall.Firewall
 	H        herodot.Herodot
 
 	ForcedHTTP bool

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
-	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 	"io/ioutil"
 	"net/http"
@@ -13,16 +12,12 @@ import (
 )
 
 type HTTPRecovator struct {
-	Client   *http.Client
+	Config   *clientcredentials.Config
 	Dry      bool
 	Endpoint *url.URL
 }
 
-func (r *HTTPRecovator) SetClient(c *clientcredentials.Config) {
-	r.Client = c.Client(oauth2.NoContext)
-}
-
-func (r *HTTPRecovator) RevokeToken(ctx context.Context, token string) (error) {
+func (r *HTTPRecovator) RevokeToken(ctx context.Context, token string) error {
 	var ep = *r.Endpoint
 	ep.Path = RevocationPath
 
@@ -34,7 +29,8 @@ func (r *HTTPRecovator) RevokeToken(ctx context.Context, token string) (error) {
 
 	hreq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	hreq.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
-	hres, err := r.Client.Do(hreq)
+	hreq.SetBasicAuth(r.Config.ClientID, r.Config.ClientSecret)
+	hres, err := http.DefaultClient.Do(hreq)
 	if err != nil {
 		return errors.Wrap(err, "")
 	}

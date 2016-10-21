@@ -3,7 +3,6 @@ package oauth2
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"github.com/ory-am/fosite"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
@@ -22,22 +21,22 @@ type HTTPIntrospector struct {
 	Endpoint *url.URL
 }
 
-func (this *HTTPIntrospector) TokenFromRequest(r *http.Request) string {
+func (i *HTTPIntrospector) TokenFromRequest(r *http.Request) string {
 	return fosite.AccessTokenFromRequest(r)
 }
 
-func (this *HTTPIntrospector) SetClient(c *clientcredentials.Config) {
-	this.Client = c.Client(oauth2.NoContext)
+func (i *HTTPIntrospector) SetClient(c *clientcredentials.Config) {
+	i.Client = c.Client(oauth2.NoContext)
 }
 
 // IntrospectToken is capable of introspecting tokens according to https://tools.ietf.org/html/rfc7662
 //
 // The HTTP API is documented at http://docs.hdyra.apiary.io/#reference/oauth2/oauth2-token-introspection
-func (this *HTTPIntrospector) IntrospectToken(ctx context.Context, token string, scopes ...string) (*Introspection, error) {
+func (i *HTTPIntrospector) IntrospectToken(ctx context.Context, token string, scopes ...string) (*Introspection, error) {
 	var resp = &Introspection{
 		Extra: make(map[string]interface{}),
 	}
-	var ep = *this.Endpoint
+	var ep = *i.Endpoint
 	ep.Path = IntrospectPath
 
 	data := url.Values{"token": []string{token}, "scope": []string{strings.Join(scopes, " ")}}
@@ -48,7 +47,7 @@ func (this *HTTPIntrospector) IntrospectToken(ctx context.Context, token string,
 
 	hreq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	hreq.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
-	hres, err := this.Client.Do(hreq)
+	hres, err := i.Client.Do(hreq)
 	if err != nil {
 		return nil, errors.Wrap(err, "")
 	}
@@ -62,6 +61,5 @@ func (this *HTTPIntrospector) IntrospectToken(ctx context.Context, token string,
 	} else if !resp.Active {
 		return nil, errors.New("Token is malformed, expired or otherwise invalid")
 	}
-	fmt.Printf("%s\n\n", body)
 	return resp, nil
 }

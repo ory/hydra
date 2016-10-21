@@ -21,7 +21,7 @@ type FositeSQLStore struct {
 func sqlTemplate(table string) string {
 	return fmt.Sprintf(`CREATE TABLE IF NOT EXISTS hydra_oauth2_%s (
 	signature      	varchar(255) NOT NULL PRIMARY KEY,
-	request_id  	varchar(255) NOT NULL UNIQUE,
+	request_id  	varchar(255) NOT NULL,
 	requested_at  	timestamp NOT NULL DEFAULT now(),
 	client_id  	text NOT NULL,
 	scope  		text NOT NULL,

@@ -101,3 +101,10 @@ Perform Token Introspection as specified in [IETF RFC 7662](https://tools.ietf.o
 ```go
 var ctx, err = hydra.Introspector.IntrospectToken(context.Background(), "access-token")
 ```
+
+
+Perform Token Revocation as specified in [IETF RFC 7009](https://tools.ietf.org/html/rfc7009):
+
+```go
+var ctx, err = hydra.Revocator.RevokeToken(context.Background(), "access-token")
+```

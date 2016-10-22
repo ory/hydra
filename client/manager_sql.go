@@ -7,6 +7,8 @@ import (
 	"github.com/ory-am/fosite"
 	"github.com/pkg/errors"
 	"strings"
+	"database/sql"
+	"github.com/ory-am/hydra/pkg"
 )
 
 var sqlSchema = []string{
@@ -114,7 +116,9 @@ func (s *SQLManager) CreateSchemas() error {
 
 func (m *SQLManager) GetConcreteClient(id string) (*Client, error) {
 	var d sqlData
-	if err := m.DB.Get(&d, m.DB.Rebind("SELECT * FROM hydra_client WHERE id=?"), id); err != nil {
+	if err := m.DB.Get(&d, m.DB.Rebind("SELECT * FROM hydra_client WHERE id=?"), id); err == sql.ErrNoRows {
+		return nil, errors.Wrap(pkg.ErrNotFound, "")
+	} else if  err != nil {
 		return nil, errors.Wrap(err, "")
 	}
 
@@ -170,6 +174,12 @@ func (m *SQLManager) Authenticate(id string, secret []byte) (*Client, error) {
 }
 
 func (m *SQLManager) CreateClient(c *Client) error {
+	h, err := m.Hasher.Hash([]byte(c.Secret))
+	if err != nil {
+		return errors.Wrap(err, "")
+	}
+	c.Secret = string(h)
+
 	data := sqlDataFromClient(c)
 	if _, err := m.DB.NamedExec(fmt.Sprintf(
 		"INSERT INTO hydra_client (%s) VALUES (%s)",

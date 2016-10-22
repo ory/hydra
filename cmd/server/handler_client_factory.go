@@ -19,6 +19,13 @@ func newClientManager(c *config.Config) client.Manager {
 			Clients: map[string]client.Client{},
 			Hasher:  ctx.Hasher,
 		}
+	case *config.SQLConnection:
+		m := &client.SQLManager{
+			DB: con.GetDatabase(),
+			Hasher:  ctx.Hasher,
+		}
+		m.CreateSchemas()
+		return m
 	case *config.RethinkDBConnection:
 		con.CreateTableIfNotExists("hydra_clients")
 		m := &client.RethinkManager{

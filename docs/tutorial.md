@@ -60,25 +60,22 @@ Done.
 Great! You are now connected to Hydra and can start by creating a new client:
 
 ```
-$ hydra clients create --skip-tls-verify
+$ hydra clients create
 Client ID: c003830f-a090-4721-9463-92424270ce91
 Client Secret: Z2pJ0>Tp7.ggn>EE&rhnOzdt1
 ```
 
-**Important note:** if no certificate is provided, Hydra uses self-signed TLS certificates for HTTPS. This should
-never be done in production. To skip the TLS verification step on the client, provide the `--skip-tls-verify` flag. The tutorial is using self-signed TLS certificates and you must use the `--skip-tls-verify` tag everywhere.
-
 Now, let us issue an access token for your OAuth2 client!
 
 ```
-$ hydra token client --skip-tls-verify
+$ hydra token client
 JLbnRS9GQmzUBT4x7ESNw0kj2wc0ffbMwOv3QQZW4eI.qkP-IQXn6guoFew8TvaMFUD-SnAyT8GmWuqGi3wuWXg
 ```
 
 Let's try this with the authorize code grant!
 
 ```
-$ hydra token user --skip-tls-verify
+$ hydra token user
 If your browser does not open automatically, navigate to: https://192.168.99.100:4444/oauth2/...
 Setting up callback listener on http://localhost:4445/callback
 Press ctrl + c on Linux / Windows or cmd + c on OSX to end the process.

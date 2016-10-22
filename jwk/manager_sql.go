@@ -5,6 +5,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/square/go-jose"
 	"github.com/jmoiron/sqlx"
+	"database/sql"
+	"github.com/ory-am/hydra/pkg"
 )
 
 type SQLManager struct {
@@ -95,7 +97,9 @@ func (m *SQLManager) AddKeySet(set string, keys *jose.JsonWebKeySet) error {
 
 func (m *SQLManager) GetKey(set, kid string) (*jose.JsonWebKeySet, error) {
 	var d sqlData
-	if err := m.DB.Get(&d, m.DB.Rebind("SELECT * FROM hydra_jwk WHERE sid=? AND kid=?"), set, kid); err != nil {
+	if err := m.DB.Get(&d, m.DB.Rebind("SELECT * FROM hydra_jwk WHERE sid=? AND kid=?"), set, kid); err == sql.ErrNoRows {
+		return nil, errors.Wrap(pkg.ErrNotFound, "")
+	} else if err != nil {
 		return nil, errors.Wrap(err, "")
 	}
 
@@ -116,12 +120,14 @@ func (m *SQLManager) GetKey(set, kid string) (*jose.JsonWebKeySet, error) {
 
 func (m *SQLManager) GetKeySet(set string) (*jose.JsonWebKeySet, error) {
 	var ds []sqlData
-	if err := m.DB.Select(&ds, m.DB.Rebind("SELECT * FROM hydra_jwk WHERE sid=?"), set); err != nil {
+	if err := m.DB.Select(&ds, m.DB.Rebind("SELECT * FROM hydra_jwk WHERE sid=?"), set); err == sql.ErrNoRows {
+		return nil, errors.Wrap(pkg.ErrNotFound, "")
+	} else if  err != nil {
 		return nil, errors.Wrap(err, "")
 	}
 
 	if len(ds) == 0 {
-		return nil, errors.Errorf("Key set %s not found", set)
+		return nil, errors.Wrap(pkg.ErrNotFound, "")
 	}
 
 	keys := &jose.JsonWebKeySet{Keys: []jose.JsonWebKey{}        }

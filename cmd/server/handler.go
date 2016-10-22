@@ -21,6 +21,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/urfave/negroni"
 	"golang.org/x/net/context"
+	"fmt"
 )
 
 func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
@@ -28,6 +29,19 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		router := httprouter.New()
 		serverHandler := &Handler{Config: c}
 		serverHandler.registerRoutes(router)
+		c.ForceHTTP, _ = cmd.Flags().GetBool("dangerous-force-http")
+
+		if c.ClusterURL == "" {
+			proto := "https"
+			if c.ForceHTTP {
+				proto = "http"
+			}
+			host := "localhost"
+			if c.BindHost != "" {
+				host = c.BindHost
+			}
+			c.ClusterURL = fmt.Sprintf("%s://%s:%d", proto, host, c.BindPort)
+		}
 
 		if ok, _ := cmd.Flags().GetBool("dangerous-auto-logon"); ok {
 			logrus.Warnln("Do not use flag --dangerous-auto-logon in production.")
@@ -54,7 +68,7 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 
 		var err error
 		logrus.Infof("Setting up http server on %s", c.GetAddress())
-		if ok, _ := cmd.Flags().GetBool("dangerous-force-http"); ok {
+		if c.ForceHTTP {
 			logrus.Warnln("HTTPS disabled. Never do this in production.")
 			err = srv.ListenAndServe()
 		} else if c.AllowTLSTermination != "" {

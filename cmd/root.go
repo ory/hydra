@@ -30,6 +30,7 @@ var RootCmd = &cobra.Command{
 var cmdHandler = cli.NewHandler(c)
 
 // Execute adds all child commands to the root command sets flags appropriately.
+// Execute adds all child commands to the root command sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := RootCmd.Execute(); err != nil {
@@ -71,15 +72,28 @@ func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 
 	viper.BindEnv("HOST")
+	viper.SetDefault("HOST", "")
+
 	viper.BindEnv("CLIENT_ID")
+	viper.SetDefault("CLIENT_ID", "")
+
 	viper.BindEnv("CONSENT_URL")
+	viper.SetDefault("CONSENT_URL", "")
+
 	viper.BindEnv("DATABASE_URL")
+	viper.SetDefault("DATABASE_URL", "")
+
 	viper.BindEnv("SYSTEM_SECRET")
+	viper.SetDefault("SYSTEM_SECRET", "")
+
 	viper.BindEnv("CLIENT_SECRET")
+	viper.SetDefault("CLIENT_SECRET", "")
+
 	viper.BindEnv("HTTPS_ALLOW_TERMINATION_FROM")
+	viper.SetDefault("HTTPS_ALLOW_TERMINATION_FROM", "")
 
 	viper.BindEnv("CLUSTER_URL")
-	viper.SetDefault("CLUSTER_URL", "https://localhost:4444")
+	viper.SetDefault("CLUSTER_URL", "")
 
 	viper.BindEnv("PORT")
 	viper.SetDefault("PORT", 4444)

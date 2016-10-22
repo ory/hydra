@@ -33,6 +33,14 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 			RefreshTokens:  make(map[string]fosite.Requester),
 		}
 		break
+	case *config.SQLConnection:
+		m := &oauth2.FositeSQLStore{
+			DB: con.GetDatabase(),
+			Manager:        clients,
+		}
+		m.CreateSchemas()
+		store = m
+		break
 	case *config.RethinkDBConnection:
 		con.CreateTableIfNotExists("hydra_oauth2_authorize_code")
 		con.CreateTableIfNotExists("hydra_oauth2_id_sessions")

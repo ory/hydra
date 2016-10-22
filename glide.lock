@@ -1,5 +1,5 @@
-hash: 8ebcd249ace2beef3574d5ed915f311325e852ded81da361477de8edf23aa05c
-updated: 2016-10-19T11:29:43.997168+02:00
+hash: 18b2d7631e4e950d4e18b6ec76906081980e532850d32c19e414259b8293fe9a
+updated: 2016-10-21T22:08:32.7305955+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
@@ -15,6 +15,8 @@ imports:
   version: bd2828f9f176e52d7222e565abb2d338d3f3c103
 - name: github.com/go-errors/errors
   version: a41850380601eeb43f4350f7d17c6bbd8944aaf8
+- name: github.com/go-sql-driver/mysql
+  version: 0b58b37b664c21f3010e836f1b931e1d0b0b0685
 - name: github.com/golang/protobuf
   version: c3cefd437628a0b7d31b34fe44b3a7a540e98527
   subpackages:
@@ -44,6 +46,10 @@ imports:
   version: 8c199fb6259ffc1af525cc3ad52ee60ba8359669
 - name: github.com/kr/fs
   version: 2788f0dbd16903de03cb8186e5c7d97b69ad387b
+- name: github.com/lib/pq
+  version: ae8357db35d721c58dcdc911318b55bef6b1b001
+  subpackages:
+  - oid
 - name: github.com/magiconair/properties
   version: 0723e352fa358f9322c938cc2dadda874e9151a9
 - name: github.com/meatballhat/negroni-logrus
@@ -73,7 +79,7 @@ imports:
   - token/hmac
   - token/jwt
 - name: github.com/ory-am/ladon
-  version: 67845728bf072d2b3f050cb415ece9a54ec6a546
+  version: 8aa1680e30ebfb60b497dcb578621ad9f8e43694
 - name: github.com/pborman/uuid
   version: a97ce2ca70fa5a848076093f05e639a89ca34d06
 - name: github.com/pelletier/go-buffruneio
@@ -176,15 +182,9 @@ imports:
 - name: gopkg.in/yaml.v2
   version: a5b47d31c556af34a302ce5d659e6fea44d90de0
 testImports:
-- name: github.com/go-sql-driver/mysql
-  version: 0b58b37b664c21f3010e836f1b931e1d0b0b0685
 - name: github.com/gorilla/context
   version: 1ea25387ff6f684839d82767c1733ff4d4d15d0a
 - name: github.com/gorilla/mux
   version: 0eeaf8392f5b04950925b8a69fe70f110fa7cbfc
-- name: github.com/lib/pq
-  version: ae8357db35d721c58dcdc911318b55bef6b1b001
-  subpackages:
-  - oid
 - name: github.com/ory-am/dockertest
   version: edb9d9444e6868c1b1e279098b628e7b8e6f0714

@@ -174,6 +174,10 @@ func (m *SQLManager) Authenticate(id string, secret []byte) (*Client, error) {
 }
 
 func (m *SQLManager) CreateClient(c *Client) error {
+	if c.ID == "" {
+		c.ID = uuid.New()
+	}
+
 	h, err := m.Hasher.Hash([]byte(c.Secret))
 	if err != nil {
 		return errors.Wrap(err, "")

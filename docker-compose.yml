@@ -8,10 +8,13 @@ services:
       dockerfile: Dockerfile-demo
     links:
       - postgres:database
+    volumes:
+      - hydravolume:/root
     ports:
       - "4444:4444"
       - "4445:4445"
     environment:
+      - LOG_LEVEL=${LOG_LEVEL}
       - SYSTEM_SECRET=${SYSTEM_SECRET}
       - CONSENT_URL=http://${DOCKER_IP}:3000
       - DATABASE_URL=postgres://postgres:postgres@database:5432/postgres?sslmode=disable
@@ -36,3 +39,7 @@ services:
     environment:
       - POSTGRES_USER = postgres
       - POSTGRES_PASSWORD = postgres
+
+volumes:
+  hydravolume:
+    driver: local

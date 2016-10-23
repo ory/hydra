@@ -79,7 +79,7 @@ imports:
   - token/hmac
   - token/jwt
 - name: github.com/ory-am/ladon
-  version: 8aa1680e30ebfb60b497dcb578621ad9f8e43694
+  version: e877152062165a6855d97bbde868572b07a03be4
 - name: github.com/pborman/uuid
   version: a97ce2ca70fa5a848076093f05e639a89ca34d06
 - name: github.com/pelletier/go-buffruneio

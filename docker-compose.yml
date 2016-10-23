@@ -7,7 +7,8 @@ services:
       context: .
       dockerfile: Dockerfile-demo
     links:
-      - postgres:database
+      - postgresd:postgresd
+      - mysqld:mysqld
     volumes:
       - hydravolume:/root
     ports:
@@ -17,7 +18,9 @@ services:
       - LOG_LEVEL=${LOG_LEVEL}
       - SYSTEM_SECRET=${SYSTEM_SECRET}
       - CONSENT_URL=http://${DOCKER_IP}:3000
-      - DATABASE_URL=postgres://postgres:postgres@database:5432/postgres?sslmode=disable
+      - DATABASE_URL=postgres://postgres:secret@postgresd:5432/postgres?sslmode=disable
+#     Uncomment the following line to use mysql instead.
+#      - DATABASE_URL=mysql://root:secret@tcp(mysqld:3306)/mysql?parseTime=true
       - FORCE_ROOT_CLIENT_CREDENTIALS=admin:demo-password
     restart: unless-stopped
 
@@ -34,11 +37,16 @@ services:
       - "3000:3000"
     restart: unless-stopped
 
-  postgres:
-    image: postgres
+  postgresd:
+    image: postgres:9.6
     environment:
-      - POSTGRES_USER = postgres
-      - POSTGRES_PASSWORD = postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secret
+
+  mysqld:
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
 
 volumes:
   hydravolume:

@@ -16,6 +16,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	_ "github.com/go-sql-driver/mysql"
+	"strings"
 )
 
 type MemoryConnection struct{}
@@ -33,8 +34,12 @@ func (c *SQLConnection) GetDatabase() *sqlx.DB {
 	var err error
 	if err = pkg.Retry(time.Second*15, time.Minute*2, func() error {
 		logrus.Infof("Connecting with %s", c.URL.String())
+		u := c.URL.String()
+		if c.URL.Scheme == "mysql" {
+			u = strings.Replace(u, "mysql://", "", -1)
+		}
 
-		if c.db, err = sqlx.Open(c.URL.Scheme, c.URL.String()); err != nil {
+		if c.db, err = sqlx.Open(c.URL.Scheme, u); err != nil {
 			return errors.Errorf("Could not connect to SQL: %s", err)
 		} else if err := c.db.Ping(); err != nil {
 			return errors.Errorf("Could not connect to SQL: %s", err)

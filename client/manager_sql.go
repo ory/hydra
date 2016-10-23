@@ -9,6 +9,7 @@ import (
 	"strings"
 	"database/sql"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/pborman/uuid"
 )
 
 var sqlSchema = []string{

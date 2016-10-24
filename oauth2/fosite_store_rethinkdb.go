@@ -105,19 +105,23 @@ func (s *FositeRehinkDBStore) publishDelete(table r.Term, id string) error {
 	return nil
 }
 
-func waitFor(i RDBItems, id string) error {
+func (s *FositeRehinkDBStore)  waitFor(i RDBItems, id string) error {
 	c := make(chan bool)
 
 	go func() {
 		loopWait := time.Millisecond
+		s.RLock()
 		_, ok := i[id]
+		s.RUnlock()
 		for !ok {
 			time.Sleep(loopWait)
 			loopWait = loopWait * time.Duration(int64(2))
 			if loopWait > time.Second {
 				loopWait = time.Second
 			}
+			s.RLock()
 			_, ok = i[id]
+			s.RUnlock()
 		}
 
 		c <- true
@@ -135,7 +139,7 @@ func (s *FositeRehinkDBStore) CreateOpenIDConnectSession(_ context.Context, auth
 	if err := s.publishInsert(s.IDSessionsTable, authorizeCode, requester); err != nil {
 		return err
 	}
-	return waitFor(s.IDSessions, authorizeCode)
+	return s.waitFor(s.IDSessions, authorizeCode)
 }
 
 func (s *FositeRehinkDBStore) GetOpenIDConnectSession(_ context.Context, authorizeCode string, requester fosite.Requester) (fosite.Requester, error) {
@@ -156,7 +160,7 @@ func (s *FositeRehinkDBStore) CreateAuthorizeCodeSession(_ context.Context, code
 	if err := s.publishInsert(s.AuthorizeCodesTable, code, requester); err != nil {
 		return err
 	}
-	return waitFor(s.AuthorizeCodes, code)
+	return s.waitFor(s.AuthorizeCodes, code)
 }
 
 func (s *FositeRehinkDBStore) GetAuthorizeCodeSession(_ context.Context, code string, sess fosite.Session) (fosite.Requester, error) {
@@ -178,7 +182,7 @@ func (s *FositeRehinkDBStore) CreateAccessTokenSession(_ context.Context, signat
 	if err := s.publishInsert(s.AccessTokensTable, signature, requester); err != nil {
 		return err
 	}
-	return waitFor(s.AccessTokens, signature)
+	return s.waitFor(s.AccessTokens, signature)
 }
 
 func (s *FositeRehinkDBStore) GetAccessTokenSession(_ context.Context, signature string, sess fosite.Session) (fosite.Requester, error) {
@@ -200,7 +204,7 @@ func (s *FositeRehinkDBStore) CreateRefreshTokenSession(_ context.Context, signa
 	if err := s.publishInsert(s.RefreshTokensTable, signature, requester); err != nil {
 		return err
 	}
-	return waitFor(s.RefreshTokens, signature)
+	return s.waitFor(s.RefreshTokens, signature)
 }
 
 func (s *FositeRehinkDBStore) GetRefreshTokenSession(_ context.Context, signature string, sess fosite.Session) (fosite.Requester, error) {

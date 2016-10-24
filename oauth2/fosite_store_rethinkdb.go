@@ -282,9 +282,8 @@ func (items RDBItems) coldStart(sess *r.Session, lock *sync.RWMutex, table r.Ter
 func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock *sync.RWMutex, table r.Term) {
 	go pkg.Retry(time.Second*15, time.Minute, func() error {
 		lock.Lock()
-		defer lock.Unlock()
-
 		changes, err := table.Changes().Run(sess)
+		lock.Unlock()
 		if err != nil {
 			return errors.Wrap(err, "")
 		}
@@ -292,6 +291,7 @@ func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock *sync.RWM
 
 		var update = map[string]*RdbSchema{}
 		for changes.Next(&update) {
+			lock.Lock()
 			logrus.Debugln("Received update from RethinkDB Cluster in OAuth2 manager.")
 			newVal := update["new_val"]
 			oldVal := update["old_val"]
@@ -303,6 +303,7 @@ func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock *sync.RWM
 			} else {
 				items[newVal.ID] = newVal
 			}
+			lock.Unlock()
 		}
 
 		if changes.Err() != nil {

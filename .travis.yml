@@ -19,10 +19,10 @@ install:
 
 script:
   - |-
-    echo 'mode: atomic' > coverage.txt && go list ./... | grep -v /vendor | xargs -n1 -I{} sh -c 'go test -covermode=atomic -coverprofile=coverage.tmp {} && tail -n +2 coverage.tmp >> coverage.txt' && rm coverage.tmp
+    touch ./coverage.tmp && echo 'mode: atomic' > coverage.txt && go list ./... | grep -v /vendor | xargs -n1 -I{} sh -c 'go test -covermode=atomic -coverprofile=coverage.tmp {} && tail -n +2 coverage.tmp >> coverage.txt' && rm coverage.tmp
   - go test -race $(go list ./... | grep -v /vendor | grep -v /cmd)
   - go test -v -bench=.* -run=none $(glide novendor)
-  - goveralls -coverprofile="cover.out"
+  - goveralls -coverprofile="coverage.txt"
   - docker build -t hydra-travis-ci .
   - docker run -d hydra-travis-ci
   - $GOPATH/bin/hydra host --dangerous-auto-logon &

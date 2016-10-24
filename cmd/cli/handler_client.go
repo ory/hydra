@@ -76,7 +76,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		GrantTypes:    grantTypes,
 		RedirectURIs:  callbacks,
 		Name:          name,
-		Public: public,
+		Public:        public,
 	}
 	err = h.M.CreateClient(cc)
 	if h.M.Dry {

@@ -1,12 +1,12 @@
 package jwk
 
 import (
+	"database/sql"
 	"encoding/json"
+	"github.com/jmoiron/sqlx"
+	"github.com/ory-am/hydra/pkg"
 	"github.com/pkg/errors"
 	"github.com/square/go-jose"
-	"github.com/jmoiron/sqlx"
-	"database/sql"
-	"github.com/ory-am/hydra/pkg"
 )
 
 type SQLManager struct {
@@ -52,10 +52,10 @@ func (m *SQLManager) AddKey(set string, key *jose.JsonWebKey) error {
 	}
 
 	if _, err = m.DB.NamedExec(`INSERT INTO hydra_jwk (sid, kid, version, keydata) VALUES (:sid, :kid, :version, :keydata)`, &sqlData{
-		Set: set,
-		KID: key.KeyID,
+		Set:     set,
+		KID:     key.KeyID,
 		Version: 0,
-		Key: encrypted,
+		Key:     encrypted,
 	}); err != nil {
 		return errors.Wrap(err, "")
 	}
@@ -80,10 +80,10 @@ func (m *SQLManager) AddKeySet(set string, keys *jose.JsonWebKeySet) error {
 		}
 
 		if _, err = tx.NamedExec(`INSERT INTO hydra_jwk (sid, kid, version, keydata) VALUES (:sid, :kid, :version, :keydata)`, &sqlData{
-			Set: set,
-			KID: key.KeyID,
+			Set:     set,
+			KID:     key.KeyID,
 			Version: 0,
-			Key: encrypted,
+			Key:     encrypted,
 		}); err != nil {
 			return errors.Wrap(err, "")
 		}
@@ -122,7 +122,7 @@ func (m *SQLManager) GetKeySet(set string) (*jose.JsonWebKeySet, error) {
 	var ds []sqlData
 	if err := m.DB.Select(&ds, m.DB.Rebind("SELECT * FROM hydra_jwk WHERE sid=?"), set); err == sql.ErrNoRows {
 		return nil, errors.Wrap(pkg.ErrNotFound, "")
-	} else if  err != nil {
+	} else if err != nil {
 		return nil, errors.Wrap(err, "")
 	}
 
@@ -130,7 +130,7 @@ func (m *SQLManager) GetKeySet(set string) (*jose.JsonWebKeySet, error) {
 		return nil, errors.Wrap(pkg.ErrNotFound, "")
 	}
 
-	keys := &jose.JsonWebKeySet{Keys: []jose.JsonWebKey{}        }
+	keys := &jose.JsonWebKeySet{Keys: []jose.JsonWebKey{}}
 	for _, d := range ds {
 		key, err := m.Cipher.Decrypt(d.Key)
 		if err != nil {

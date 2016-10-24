@@ -11,6 +11,7 @@ import (
 	"os"
 	"time"
 
+	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/dockertest"
@@ -24,7 +25,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
-	"fmt"
 )
 
 var clientManagers = map[string]Storage{}
@@ -180,7 +180,7 @@ func TestClientAutoGenerateKey(t *testing.T) {
 				RedirectURIs:      []string{"http://redirect"},
 				TermsOfServiceURI: "foo",
 			}
-			assert.Nil(t,  m.CreateClient(c))
+			assert.Nil(t, m.CreateClient(c))
 			assert.NotEmpty(t, c.ID)
 			assert.Nil(t, m.DeleteClient(c.ID))
 		})

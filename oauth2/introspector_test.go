@@ -22,9 +22,9 @@ import (
 
 var (
 	introspectors = make(map[string]oauth2.Introspector)
-	now = time.Now().Round(time.Second)
-	tokens = pkg.Tokens(3)
-	fositeStore = storage.NewExampleStore()
+	now           = time.Now().Round(time.Second)
+	tokens        = pkg.Tokens(3)
+	fositeStore   = storage.NewExampleStore()
 )
 
 func init() {
@@ -44,7 +44,7 @@ func init() {
 			compose.OAuth2AuthorizeExplicitFactory,
 			compose.OAuth2TokenIntrospectionFactory,
 		),
-		H:        &herodot.JSON{},
+		H: &herodot.JSON{},
 	}
 	serv.SetRoutes(r)
 	ts = httptest.NewServer(r)

@@ -1,15 +1,15 @@
 package client
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/imdario/mergo"
 	"github.com/jmoiron/sqlx"
 	"github.com/ory-am/fosite"
-	"github.com/pkg/errors"
-	"strings"
-	"database/sql"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
+	"github.com/pkg/errors"
+	"strings"
 )
 
 var sqlSchema = []string{
@@ -119,7 +119,7 @@ func (m *SQLManager) GetConcreteClient(id string) (*Client, error) {
 	var d sqlData
 	if err := m.DB.Get(&d, m.DB.Rebind("SELECT * FROM hydra_client WHERE id=?"), id); err == sql.ErrNoRows {
 		return nil, errors.Wrap(pkg.ErrNotFound, "")
-	} else if  err != nil {
+	} else if err != nil {
 		return nil, errors.Wrap(err, "")
 	}
 

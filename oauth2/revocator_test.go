@@ -11,18 +11,18 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/compose"
+	"github.com/ory-am/fosite/storage"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
 	"golang.org/x/net/context"
-	"github.com/ory-am/fosite/storage"
 	"golang.org/x/oauth2/clientcredentials"
 )
 
 var (
-	revocators = make(map[string]oauth2.Revocator)
-	nowRecovator = time.Now().Round(time.Second)
-	tokensRecovator = pkg.Tokens(3)
+	revocators           = make(map[string]oauth2.Revocator)
+	nowRecovator         = time.Now().Round(time.Second)
+	tokensRecovator      = pkg.Tokens(3)
 	fositeStoreRecovator = storage.NewExampleStore()
 )
 
@@ -40,7 +40,7 @@ func init() {
 			compose.OAuth2TokenIntrospectionFactory,
 			compose.OAuth2TokenRevocationFactory,
 		),
-		H:        &herodot.JSON{},
+		H: &herodot.JSON{},
 	}
 	serv.SetRoutes(r)
 	ts = httptest.NewServer(r)
@@ -76,8 +76,8 @@ func init() {
 	revocators["http"] = &oauth2.HTTPRecovator{
 		Endpoint: ep,
 		Config: &clientcredentials.Config{
-			ClientID: "my-client",
-			ClientSecret:"foobar",
+			ClientID:     "my-client",
+			ClientSecret: "foobar",
 		},
 	}
 }

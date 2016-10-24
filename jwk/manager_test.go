@@ -21,13 +21,13 @@ import (
 	"time"
 
 	"crypto/rand"
+	"fmt"
+	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"github.com/square/go-jose"
 	"golang.org/x/net/context"
 	"io"
 	"net/http"
-	"github.com/jmoiron/sqlx"
-	"fmt"
 )
 
 var managers = map[string]Manager{}
@@ -120,7 +120,7 @@ func connectToPG() {
 	}
 
 	containers = append(containers, c)
-	s := &SQLManager{DB: db,		Cipher: &AEAD{			Key: encryptionKey		}}
+	s := &SQLManager{DB: db, Cipher: &AEAD{Key: encryptionKey}}
 
 	if err = s.CreateSchemas(); err != nil {
 		log.Fatalf("Could not create postgres schema: %v", err)
@@ -182,7 +182,7 @@ func connectToMySQL() {
 	}
 
 	containers = append(containers, c)
-	s := &SQLManager{DB: db,		Cipher: &AEAD{			Key: encryptionKey		}}
+	s := &SQLManager{DB: db, Cipher: &AEAD{Key: encryptionKey}}
 
 	if err = s.CreateSchemas(); err != nil {
 		log.Fatalf("Could not create postgres schema: %v", err)

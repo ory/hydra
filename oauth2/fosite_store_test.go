@@ -67,17 +67,12 @@ func connectToMySQL() {
 	}
 
 	containers = append(containers, cn)
-	s := &FositeSQLStore{
-		DB:      db,
-		Manager: clientManager,
-	}
-
+	s := &FositeSQLStore{DB: db, Manager: clientManager}
 	if err = s.CreateSchemas(); err != nil {
 		logrus.Fatalf("Could not create postgres schema: %v", err)
 	}
 
 	clientManagers["mysql"] = s
-	containers = append(containers, cn)
 }
 
 func connectToPG() {
@@ -97,17 +92,12 @@ func connectToPG() {
 	}
 
 	containers = append(containers, cn)
-	s := &FositeSQLStore{
-		DB:      db,
-		Manager: clientManager,
-	}
-
+	s := &FositeSQLStore{DB: db, Manager: clientManager}
 	if err = s.CreateSchemas(); err != nil {
 		logrus.Fatalf("Could not create postgres schema: %v", err)
 	}
 
 	clientManagers["postgres"] = s
-	containers = append(containers, cn)
 }
 
 func connectToRethink() {

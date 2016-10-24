@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"fmt"
 	"github.com/Sirupsen/logrus"
 	"github.com/julienschmidt/httprouter"
 	"github.com/meatballhat/negroni-logrus"
@@ -21,7 +22,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/urfave/negroni"
 	"golang.org/x/net/context"
-	"fmt"
 )
 
 func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
@@ -82,12 +82,12 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 }
 
 type Handler struct {
-	Clients     *client.Handler
-	Keys        *jwk.Handler
-	OAuth2      *oauth2.Handler
-	Policy      *policy.Handler
-	Warden      *warden.WardenHandler
-	Config      *config.Config
+	Clients *client.Handler
+	Keys    *jwk.Handler
+	OAuth2  *oauth2.Handler
+	Policy  *policy.Handler
+	Warden  *warden.WardenHandler
+	Config  *config.Config
 }
 
 func (h *Handler) registerRoutes(router *httprouter.Router) {

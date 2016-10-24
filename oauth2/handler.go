@@ -29,7 +29,7 @@ type Handler struct {
 	OAuth2  fosite.OAuth2Provider
 	Consent ConsentStrategy
 
-	H        herodot.Herodot
+	H herodot.Herodot
 
 	ForcedHTTP bool
 	ConsentURL url.URL

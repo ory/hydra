@@ -1,6 +1,7 @@
 package oauth2
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"github.com/jmoiron/sqlx"
@@ -11,7 +12,6 @@ import (
 	"net/url"
 	"strings"
 	"time"
-	"database/sql"
 )
 
 type FositeSQLStore struct {

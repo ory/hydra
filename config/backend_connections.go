@@ -9,20 +9,20 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	r "gopkg.in/dancannon/gorethink.v2"
-	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
-	_ "github.com/go-sql-driver/mysql"
 	"strings"
 )
 
 type MemoryConnection struct{}
 
 type SQLConnection struct {
-	db *sqlx.DB
+	db  *sqlx.DB
 	URL *url.URL
 }
 

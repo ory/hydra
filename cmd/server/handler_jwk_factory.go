@@ -19,7 +19,7 @@ func injectJWKManager(c *config.Config) {
 		ctx.KeyManager = &jwk.MemoryManager{}
 		break
 	case *config.SQLConnection:
-		 m := &jwk.SQLManager{
+		m := &jwk.SQLManager{
 			DB: con.GetDatabase(),
 			Cipher: &jwk.AEAD{
 				Key: c.GetSystemSecret(),

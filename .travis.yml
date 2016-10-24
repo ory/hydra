@@ -18,7 +18,8 @@ install:
   - go install github.com/ory-am/hydra
 
 script:
-  - echo \'mode: atomic\' > coverage.txt && go list ./... | grep -v /vendor | xargs -n1 -I{} sh -c \'go test -covermode=atomic -coverprofile=coverage.tmp {} && tail -n +2 coverage.tmp >> coverage.txt\' && rm coverage.tmp
+  - |-
+    echo 'mode: atomic' > coverage.txt && go list ./... | grep -v /vendor | xargs -n1 -I{} sh -c 'go test -covermode=atomic -coverprofile=coverage.tmp {} && tail -n +2 coverage.tmp >> coverage.txt' && rm coverage.tmp
   - go test -race $(go list ./... | grep -v /vendor | grep -v /cmd)
   - go test -v -bench=.* -run=none $(glide novendor)
   - goveralls -coverprofile="cover.out"

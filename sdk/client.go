@@ -33,19 +33,19 @@ type Client struct {
 	Clients *client.HTTPManager
 
 	// JSONWebKeys offers JSON Web Key management capabilities.
-	JSONWebKeys   *jwk.HTTPManager
+	JSONWebKeys *jwk.HTTPManager
 
 	// Policies offers Access Policy management capabilities.
-	Policies      *policy.HTTPManager
+	Policies *policy.HTTPManager
 
 	// Warden offers Access Token and Access Request validation strategies (for first-party resource servers).
-	Warden        *warden.HTTPWarden
+	Warden *warden.HTTPWarden
 
 	// Introspection offers Access Token and Access Request introspection strategies (according to RFC 7662).
 	Introspection *hoauth2.HTTPIntrospector
 
 	// Revocation offers OAuth2 Token Revocation.
-	Revocator     *hoauth2.HTTPRecovator
+	Revocator *hoauth2.HTTPRecovator
 
 	http          *http.Client
 	clusterURL    *url.URL
@@ -115,7 +115,7 @@ func Connect(opts ...option) (*Client, error) {
 
 	c.Revocator = &hoauth2.HTTPRecovator{
 		Endpoint: pkg.JoinURL(c.clusterURL, hoauth2.RevocationPath),
-		Config: &c.credentials,
+		Config:   &c.credentials,
 	}
 
 	c.Introspection = &hoauth2.HTTPIntrospector{

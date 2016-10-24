@@ -35,8 +35,8 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 		break
 	case *config.SQLConnection:
 		m := &oauth2.FositeSQLStore{
-			DB: con.GetDatabase(),
-			Manager:        clients,
+			DB:      con.GetDatabase(),
+			Manager: clients,
 		}
 		m.CreateSchemas()
 		store = m

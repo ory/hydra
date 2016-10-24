@@ -21,8 +21,8 @@ func newClientManager(c *config.Config) client.Manager {
 		}
 	case *config.SQLConnection:
 		m := &client.SQLManager{
-			DB: con.GetDatabase(),
-			Hasher:  ctx.Hasher,
+			DB:     con.GetDatabase(),
+			Hasher: ctx.Hasher,
 		}
 		m.CreateSchemas()
 		return m

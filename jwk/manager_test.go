@@ -9,7 +9,7 @@ import (
 	"github.com/ory-am/dockertest"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/hydra/internal"
+	"github.com/ory-am/hydra/compose"
 	. "github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
@@ -38,7 +38,7 @@ var ts *httptest.Server
 var httpManager *HTTPManager
 
 func init() {
-	localWarden, httpClient := internal.NewFirewall(
+	localWarden, httpClient := compose.NewFirewall(
 		"tests",
 		"alice",
 		fosite.Arguments{

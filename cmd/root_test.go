@@ -45,10 +45,15 @@ func TestExecute(t *testing.T) {
 		{args: []string{"keys", "get", "foo"}},
 		{args: []string{"keys", "delete", "foo"}},
 		{args: []string{"token", "client"}},
+		{args: []string{"token", "user", "--no-open"}, wait: func() bool {
+			time.Sleep(time.Millisecond * 10)
+			return false
+		}},
 		{args: []string{"policies", "create", "-i", "foobar", "-s", "peter", "max", "-r", "blog", "users", "-a", "post", "ban", "--allow"}},
 		{args: []string{"policies", "create", "-i", "foobar", "-s", "peter", "max", "-r", "blog", "users", "-a", "post", "ban", "--allow", "--dry"}},
 		{args: []string{"policies", "get", "foobar"}},
 		{args: []string{"policies", "delete", "foobar"}},
+		{args: []string{"version"}},
 	} {
 		c.args = append(c.args, []string{"--skip-tls-verify", "--config", path}...)
 		RootCmd.SetArgs(c.args)

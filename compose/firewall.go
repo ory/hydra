@@ -1,4 +1,4 @@
-package internal
+package compose
 
 import (
 	"net/http"

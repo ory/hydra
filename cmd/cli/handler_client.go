@@ -36,17 +36,17 @@ func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 	for _, path := range args {
 		reader, err := os.Open(path)
 		pkg.Must(err, "Could not open file %s: %s", path, err)
-		var client client.Client
-		err = json.NewDecoder(reader).Decode(&client)
+		var c client.Client
+		err = json.NewDecoder(reader).Decode(&c)
 		pkg.Must(err, "Could not parse JSON: %s", err)
 
-		err = h.M.CreateClient(&client)
+		err = h.M.CreateClient(&c)
 		if h.M.Dry {
 			fmt.Printf("%s\n", err)
 			continue
 		}
 		pkg.Must(err, "Could not create client: %s", err)
-		fmt.Printf("Imported client %s:%s from %s.\n", client.ID, client.Secret, path)
+		fmt.Printf("Imported client %s:%s from %s.\n", c.ID, c.Secret, path)
 	}
 }
 

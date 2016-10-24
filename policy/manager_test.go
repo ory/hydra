@@ -10,7 +10,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/hydra/internal"
+	"github.com/ory-am/hydra/compose"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
 	"github.com/pborman/uuid"
@@ -21,7 +21,7 @@ import (
 var managers = map[string]ladon.Manager{}
 
 func init() {
-	localWarden, httpClient := internal.NewFirewall("hydra", "alice", fosite.Arguments{scope},
+	localWarden, httpClient := compose.NewFirewall("hydra", "alice", fosite.Arguments{scope},
 		&ladon.DefaultPolicy{
 			ID:        "1",
 			Subjects:  []string{"alice"},

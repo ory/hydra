@@ -18,7 +18,7 @@ import (
 	"github.com/ory-am/fosite"
 	. "github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/hydra/internal"
+	"github.com/ory-am/hydra/compose"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
 	"github.com/pborman/uuid"
@@ -37,7 +37,7 @@ func init() {
 		Hasher:  &fosite.BCrypt{},
 	}
 
-	localWarden, httpClient := internal.NewFirewall("foo", "alice", fosite.Arguments{Scope}, &ladon.DefaultPolicy{
+	localWarden, httpClient := compose.NewFirewall("foo", "alice", fosite.Arguments{Scope}, &ladon.DefaultPolicy{
 		ID:        "1",
 		Subjects:  []string{"alice"},
 		Resources: []string{"rn:hydra:clients<.*>"},

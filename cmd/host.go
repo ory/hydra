@@ -23,7 +23,18 @@ CORE CONTROLS
 
 - DATABASE_URL: A URL to a persistent backend. Hydra supports various backends:
   - None: If DATABASE_URL is empty, all data will be lost when the command is killed.
-  - RethinkDB: If DATABASE_URL is a DSN starting with rethinkdb://, RethinkDB will be used as storage backend.
+  - Postgres: If DATABASE_URL is a DSN starting with postgres:// PostgreSQL will be used as storage backend.
+	Example: DATABASE_URL=rethinkdb://user:password@host:123/database
+
+	If PostgreSQL is not serving TLS, append ?sslmode=disable to the url:
+	DATABASE_URL=rethinkdb://user:password@host:123/database?sslmode=disable
+
+  - MySQL: If DATABASE_URL is a DSN starting with mysql:// MySQL will be used as storage backend.
+	Example: DATABASE_URL=mysql://user:password@tcp(host:123)/database?parseTime=true
+
+	Be aware that the ?parseTime=true parameter is mandatory, or timestamps will not work.
+
+  - RethinkDB: If DATABASE_URL is a DSN starting with rethinkdb:// RethinkDB will be used as storage backend.
 	Example: DATABASE_URL=rethinkdb://user:password@host:123/database
 
 	Additionally, these controls are available when using RethinkDB:

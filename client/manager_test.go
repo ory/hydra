@@ -172,6 +172,20 @@ func connectToRethinkDB() {
 	containers = append(containers, c)
 	clientManagers["rethink"] = rethinkManager
 }
+func TestClientAutoGenerateKey(t *testing.T) {
+	for k, m := range clientManagers {
+		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
+			c := &Client{
+				Secret:            "secret",
+				RedirectURIs:      []string{"http://redirect"},
+				TermsOfServiceURI: "foo",
+			}
+			assert.Nil(t,  m.CreateClient(c))
+			assert.NotEmpty(t, c.ID)
+			assert.Nil(t, m.DeleteClient(c.ID))
+		})
+	}
+}
 
 func TestAuthenticateClient(t *testing.T) {
 	var mem = &MemoryManager{

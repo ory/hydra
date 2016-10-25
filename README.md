@@ -16,6 +16,8 @@
 [![HTTP API Documentation](https://img.shields.io/badge/docs-http%20api-blue.svg)](http://docs.hdyra.apiary.io/)
 [![Code Documentation](https://img.shields.io/badge/docs-godoc-blue.svg)](https://godoc.org/github.com/ory-am/hydra)
 
+[![Code Documentation](https://img.shields.io/badge/support-patreon-green.svg)](https://patreon.com/user?u=4298803)
+
 Hydra is a runnable server implementation of the OAuth2 2.0 authorization framework and the OpenID Connect Core 1.0.
 
 Hydra is being developed by german-based company [ORY](https://ory.am).

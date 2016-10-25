@@ -1,8 +1,8 @@
 package sdk
 
 import (
-	"testing"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestConnect(t *testing.T) {

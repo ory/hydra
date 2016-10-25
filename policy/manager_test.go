@@ -9,8 +9,8 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
-	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/compose"
+	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
 	"github.com/pborman/uuid"

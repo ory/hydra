@@ -1,16 +1,16 @@
 package client
 
 import (
-	"testing"
 	"github.com/ory-am/fosite"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestClient(t *testing.T) {
 	c := &Client{
-		ID: "foo",
+		ID:           "foo",
 		RedirectURIs: []string{"foo"},
-		Scope: "foo bar",
+		Scope:        "foo bar",
 	}
 
 	assert.EqualValues(t, c.RedirectURIs, c.GetRedirectURIs())

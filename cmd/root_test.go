@@ -59,7 +59,7 @@ func TestExecute(t *testing.T) {
 		{args: []string{"policies", "policies", "actions", "delete", "update|create"}},
 		{args: []string{"policies", "policies", "resources", "add", "printer"}},
 		{args: []string{"policies", "policies", "resources", "delete", "printer"}},
-		{args: []string{"policies", "policies", "subjects", "add",  "foobar", "ken", "tracy"}},
+		{args: []string{"policies", "policies", "subjects", "add", "foobar", "ken", "tracy"}},
 		{args: []string{"policies", "policies", "subjects", "delete", "foobar", "ken", "tracy"}},
 		{args: []string{"policies", "get", "foobar"}},
 		{args: []string{"policies", "delete", "foobar"}},

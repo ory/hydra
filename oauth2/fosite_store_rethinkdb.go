@@ -105,7 +105,7 @@ func (s *FositeRehinkDBStore) publishDelete(table r.Term, id string) error {
 	return nil
 }
 
-func (s *FositeRehinkDBStore)  waitFor(i RDBItems, id string) error {
+func (s *FositeRehinkDBStore) waitFor(i RDBItems, id string) error {
 	c := make(chan bool)
 
 	go func() {

@@ -33,11 +33,11 @@ the access control SDK [Ladon](https://github.com/ory-am/ladon).
 
 - [What is Hydra?](#what-is-hydra)
 - [Quickstart](#quickstart)
+  - [5 minutes tutorial: Run your very own OAuth2 environment](#5-minutes-tutorial-run-your-very-own-oauth2-environment)
   - [Installation](#installation)
     - [Download binaries](#download-binaries)
     - [Using Docker](#using-docker)
     - [Building from source](#building-from-source)
-  - [5 minutes tutorial: Run your very own OAuth2 environment](#5-minutes-tutorial-run-your-very-own-oauth2-environment)
 - [Security](#security)
 - [Reception](#reception)
 - [Documentation](#documentation)
@@ -70,6 +70,16 @@ This section is a quickstart guide to working with Hydra. In-depth docs are avai
 
 * The documentation is available on [GitBook](https://ory-am.gitbooks.io/hydra/content/).
 * The REST API documentation is available at [Apiary](http://docs.hdyra.apiary.io).
+
+### 5 minutes tutorial: Run your very own OAuth2 environment
+
+The **[tutorial](https://ory-am.gitbooks.io/hydra/content/demo.html)** teaches you to set up Hydra,
+a Posgres instance and an exemplary identity provider written in React using docker compose.
+It will take you about 5 minutes to get complete the **[tutorial](https://ory-am.gitbooks.io/hydra/content/demo.html)**.
+
+<img src="docs/images/oauth2-flow.gif" alt="OAuth2 Flow">
+
+<br clear="all">
 
 ### Installation
 
@@ -122,16 +132,6 @@ glide install
 go install github.com/ory-am/hydra
 hydra
 ```
-
-### 5 minutes tutorial: Run your very own OAuth2 environment
-
-The **[tutorial](https://ory-am.gitbooks.io/hydra/content/demo.html)** teaches you to set up Hydra,
-a Posgres instance and an exemplary identity provider written in React using docker compose.
-It will take you about 5 minutes to get complete the **[tutorial](https://ory-am.gitbooks.io/hydra/content/demo.html)**.
-
-<img src="docs/images/oauth2-flow.gif" alt="OAuth2 Flow">
-
-<br clear="all">
 
 ## Security
 

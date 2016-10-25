@@ -11,6 +11,8 @@ language: go
 go:
   - 1.7
 
+go_import_path: github.com/ory-am/hydra
+
 install:
   - go get github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/Masterminds/glide github.com/mitchellh/gox
   - git clone https://github.com/docker-library/official-images.git ~/official-images

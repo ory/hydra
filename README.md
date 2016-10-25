@@ -73,9 +73,9 @@ This section is a quickstart guide to working with Hydra. In-depth docs are avai
 
 ### 5 minutes tutorial: Run your very own OAuth2 environment
 
-The **[tutorial](https://ory-am.gitbooks.io/hydra/content/demo.html)** teaches you to set up Hydra,
-a Posgres instance and an exemplary identity provider written in React using docker compose.
-It will take you about 5 minutes to get complete the **[tutorial](https://ory-am.gitbooks.io/hydra/content/demo.html)**.
+The **[tutorial](https://ory-am.gitbooks.io/hydra/content/tutorial.html)** teaches you to set up Hydra,
+a Postgres instance and an exemplary identity provider written in React using docker compose.
+It will take you about 5 minutes to complete the **[tutorial](https://ory-am.gitbooks.io/hydra/content/tutorial.html)**.
 
 <img src="docs/images/oauth2-flow.gif" alt="OAuth2 Flow">
 

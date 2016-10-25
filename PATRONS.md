@@ -8,6 +8,6 @@ and secure Open Source Software, and we need your help to achieve that!
 
 Support ORY's Open Source Software on [patreon](https://patreon.com/user?u=4298803)!
 
-## Patreons
+## Patrons
 
 [Be the first!](https://patreon.com/user?u=4298803)

@@ -7,23 +7,21 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/pkg/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/compose"
-	"github.com/ory-am/fosite/hash"
 	hc "github.com/ory-am/hydra/client"
-	"github.com/ory-am/hydra/internal"
 	"github.com/ory-am/hydra/jwk"
 	. "github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 )
 
-var hasher = &hash.BCrypt{}
+var hasher = &fosite.BCrypt{}
 
-var store = &internal.FositeMemoryStore{
+var store = &FositeMemoryStore{
 	Manager: &hc.MemoryManager{
 		Clients: map[string]hc.Client{},
 		Hasher:  hasher,
@@ -31,7 +29,6 @@ var store = &internal.FositeMemoryStore{
 	AuthorizeCodes: make(map[string]fosite.Requester),
 	IDSessions:     make(map[string]fosite.Requester),
 	AccessTokens:   make(map[string]fosite.Requester),
-	Implicit:       make(map[string]fosite.Requester),
 	RefreshTokens:  make(map[string]fosite.Requester),
 }
 
@@ -51,9 +48,11 @@ var handler = &Handler{
 		compose.OAuth2AuthorizeImplicitFactory,
 		compose.OAuth2ClientCredentialsGrantFactory,
 		compose.OAuth2RefreshTokenGrantFactory,
-		compose.OpenIDConnectExplicit,
-		compose.OpenIDConnectHybrid,
-		compose.OpenIDConnectImplicit,
+		compose.OpenIDConnectExplicitFactory,
+		compose.OpenIDConnectHybridFactory,
+		compose.OpenIDConnectImplicitFactory,
+		compose.OAuth2TokenRevocationFactory,
+		compose.OAuth2TokenIntrospectionFactory,
 	),
 	Consent: &DefaultConsentStrategy{
 		Issuer:                   "http://hydra.localhost",

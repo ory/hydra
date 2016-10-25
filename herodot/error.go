@@ -3,16 +3,16 @@ package herodot
 import (
 	"net/http"
 
+	"fmt"
+	"github.com/Sirupsen/logrus"
 	"github.com/ory-am/fosite"
 	"github.com/pkg/errors"
 	"reflect"
-	"github.com/Sirupsen/logrus"
-	"fmt"
 )
 
 type Error struct {
-	OriginalError error `json:"-"`
-	StatusCode    int `json:"code"`
+	OriginalError error  `json:"-"`
+	StatusCode    int    `json:"code"`
 	Description   string `json:"description,omitempty"`
 	Name          string `json:"name"`
 }
@@ -38,17 +38,17 @@ func ToError(err error) *Error {
 	} else if rfcErr := fosite.ErrorToRFC6749Error(err); rfcErr.Name != fosite.UnknownErrorName {
 		return &Error{
 			OriginalError: err,
-			StatusCode: rfcErr.StatusCode,
-			Description: rfcErr.Description,
-			Name: rfcErr.Name,
+			StatusCode:    rfcErr.StatusCode,
+			Description:   rfcErr.Description,
+			Name:          rfcErr.Name,
 		}
 	}
 
 	return &Error{
 		OriginalError: err,
-		Description: fmt.Sprintf("Could not unwrap error of type %s", reflect.TypeOf(err)),
-		Name: "internal-error",
-		StatusCode: http.StatusInternalServerError,
+		Description:   fmt.Sprintf("Could not unwrap error of type %s", reflect.TypeOf(err)),
+		Name:          "internal-error",
+		StatusCode:    http.StatusInternalServerError,
 	}
 }
 

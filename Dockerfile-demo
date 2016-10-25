@@ -7,6 +7,6 @@ RUN go get github.com/Masterminds/glide
 RUN glide install
 RUN go install github.com/ory-am/hydra
 
-ENTRYPOINT /go/bin/hydra host --dangerous-auto-logon
+ENTRYPOINT /go/bin/hydra host --dangerous-auto-logon --dangerous-force-http
 
 EXPOSE 4444

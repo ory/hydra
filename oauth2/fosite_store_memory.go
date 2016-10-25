@@ -1,12 +1,12 @@
-package internal
+package oauth2
 
 import (
 	"sync"
 
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/client"
-	"golang.org/x/net/context"
 	"github.com/pkg/errors"
+	"golang.org/x/net/context"
 )
 
 type FositeMemoryStore struct {
@@ -15,7 +15,6 @@ type FositeMemoryStore struct {
 	AuthorizeCodes map[string]fosite.Requester
 	IDSessions     map[string]fosite.Requester
 	AccessTokens   map[string]fosite.Requester
-	Implicit       map[string]fosite.Requester
 	RefreshTokens  map[string]fosite.Requester
 
 	sync.RWMutex
@@ -52,7 +51,7 @@ func (s *FositeMemoryStore) CreateAuthorizeCodeSession(_ context.Context, code s
 	return nil
 }
 
-func (s *FositeMemoryStore) GetAuthorizeCodeSession(_ context.Context, code string, _ interface{}) (fosite.Requester, error) {
+func (s *FositeMemoryStore) GetAuthorizeCodeSession(_ context.Context, code string, _ fosite.Session) (fosite.Requester, error) {
 	s.RLock()
 	defer s.RUnlock()
 	rel, ok := s.AuthorizeCodes[code]
@@ -76,7 +75,7 @@ func (s *FositeMemoryStore) CreateAccessTokenSession(_ context.Context, signatur
 	return nil
 }
 
-func (s *FositeMemoryStore) GetAccessTokenSession(_ context.Context, signature string, _ interface{}) (fosite.Requester, error) {
+func (s *FositeMemoryStore) GetAccessTokenSession(_ context.Context, signature string, _ fosite.Session) (fosite.Requester, error) {
 	s.RLock()
 	defer s.RUnlock()
 	rel, ok := s.AccessTokens[signature]
@@ -100,7 +99,7 @@ func (s *FositeMemoryStore) CreateRefreshTokenSession(_ context.Context, signatu
 	return nil
 }
 
-func (s *FositeMemoryStore) GetRefreshTokenSession(_ context.Context, signature string, _ interface{}) (fosite.Requester, error) {
+func (s *FositeMemoryStore) GetRefreshTokenSession(_ context.Context, signature string, _ fosite.Session) (fosite.Requester, error) {
 	s.RLock()
 	defer s.RUnlock()
 	rel, ok := s.RefreshTokens[signature]
@@ -117,11 +116,8 @@ func (s *FositeMemoryStore) DeleteRefreshTokenSession(_ context.Context, signatu
 	return nil
 }
 
-func (s *FositeMemoryStore) CreateImplicitAccessTokenSession(_ context.Context, code string, req fosite.Requester) error {
-	s.Lock()
-	defer s.Unlock()
-	s.Implicit[code] = req
-	return nil
+func (s *FositeMemoryStore) CreateImplicitAccessTokenSession(ctx context.Context, code string, req fosite.Requester) error {
+	return s.CreateAccessTokenSession(ctx, code, req)
 }
 
 func (s *FositeMemoryStore) PersistAuthorizeCodeGrantSession(ctx context.Context, authorizeCode, accessSignature, refreshSignature string, request fosite.Requester) error {
@@ -151,5 +147,37 @@ func (s *FositeMemoryStore) PersistRefreshTokenGrantSession(ctx context.Context,
 		return err
 	}
 
+	return nil
+}
+
+func (s *FositeMemoryStore) RevokeRefreshToken(ctx context.Context, id string) error {
+	var found bool
+	for sig, token := range s.RefreshTokens {
+		if token.GetID() == id {
+			if err := s.DeleteRefreshTokenSession(ctx, sig); err != nil {
+				return err
+			}
+			found = true
+		}
+	}
+	if !found {
+		return errors.New("Not found")
+	}
+	return nil
+}
+
+func (s *FositeMemoryStore) RevokeAccessToken(ctx context.Context, id string) error {
+	var found bool
+	for sig, token := range s.AccessTokens {
+		if token.GetID() == id {
+			if err := s.DeleteAccessTokenSession(ctx, sig); err != nil {
+				return err
+			}
+			found = true
+		}
+	}
+	if !found {
+		return errors.New("Not found")
+	}
 	return nil
 }

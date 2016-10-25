@@ -1,4 +1,4 @@
-package internal
+package oauth2
 
 import (
 	"encoding/json"
@@ -7,10 +7,10 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/pkg/errors"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
 )
@@ -24,7 +24,6 @@ type FositeRehinkDBStore struct {
 	AuthorizeCodesTable r.Term
 	IDSessionsTable     r.Term
 	AccessTokensTable   r.Term
-	ImplicitTable       r.Term
 	RefreshTokensTable  r.Term
 	ClientsTable        r.Term
 
@@ -33,12 +32,12 @@ type FositeRehinkDBStore struct {
 	AuthorizeCodes RDBItems
 	IDSessions     RDBItems
 	AccessTokens   RDBItems
-	Implicit       RDBItems
 	RefreshTokens  RDBItems
 }
 
 type RdbSchema struct {
 	ID            string           `json:"id" gorethink:"id"`
+	RequestID     string           `json:"requestId" gorethink:"requestId"`
 	RequestedAt   time.Time        `json:"requestedAt" gorethink:"requestedAt"`
 	Client        *client.Client   `json:"client" gorethink:"client"`
 	Scopes        fosite.Arguments `json:"scopes" gorethink:"scopes"`
@@ -47,7 +46,7 @@ type RdbSchema struct {
 	Session       json.RawMessage  `json:"session" gorethink:"session"`
 }
 
-func requestFromRDB(s *RdbSchema, proto interface{}) (*fosite.Request, error) {
+func requestFromRDB(s *RdbSchema, proto fosite.Session) (*fosite.Request, error) {
 	if proto != nil {
 		if err := json.Unmarshal(s.Session, proto); err != nil {
 			return nil, errors.Wrap(err, "")
@@ -55,6 +54,7 @@ func requestFromRDB(s *RdbSchema, proto interface{}) (*fosite.Request, error) {
 	}
 
 	d := new(fosite.Request)
+	d.ID = s.RequestID
 	d.RequestedAt = s.RequestedAt
 	d.Client = s.Client
 	d.Scopes = s.Scopes
@@ -71,8 +71,6 @@ func (m *FositeRehinkDBStore) ColdStart() error {
 		return err
 	} else if err := m.IDSessions.coldStart(m.Session, &m.RWMutex, m.IDSessionsTable); err != nil {
 		return err
-	} else if err := m.Implicit.coldStart(m.Session, &m.RWMutex, m.ImplicitTable); err != nil {
-		return err
 	} else if err := m.RefreshTokens.coldStart(m.Session, &m.RWMutex, m.RefreshTokensTable); err != nil {
 		return err
 	}
@@ -87,6 +85,7 @@ func (s *FositeRehinkDBStore) publishInsert(table r.Term, id string, requester f
 
 	if _, err := table.Insert(&RdbSchema{
 		ID:            id,
+		RequestID:     requester.GetID(),
 		RequestedAt:   requester.GetRequestedAt(),
 		Client:        requester.GetClient().(*client.Client),
 		Scopes:        requester.GetRequestedScopes(),
@@ -106,19 +105,23 @@ func (s *FositeRehinkDBStore) publishDelete(table r.Term, id string) error {
 	return nil
 }
 
-func waitFor(i RDBItems, id string) error {
+func (s *FositeRehinkDBStore) waitFor(i RDBItems, id string) error {
 	c := make(chan bool)
 
 	go func() {
 		loopWait := time.Millisecond
+		s.RLock()
 		_, ok := i[id]
+		s.RUnlock()
 		for !ok {
 			time.Sleep(loopWait)
 			loopWait = loopWait * time.Duration(int64(2))
 			if loopWait > time.Second {
 				loopWait = time.Second
 			}
+			s.RLock()
 			_, ok = i[id]
+			s.RUnlock()
 		}
 
 		c <- true
@@ -136,7 +139,7 @@ func (s *FositeRehinkDBStore) CreateOpenIDConnectSession(_ context.Context, auth
 	if err := s.publishInsert(s.IDSessionsTable, authorizeCode, requester); err != nil {
 		return err
 	}
-	return waitFor(s.IDSessions, authorizeCode)
+	return s.waitFor(s.IDSessions, authorizeCode)
 }
 
 func (s *FositeRehinkDBStore) GetOpenIDConnectSession(_ context.Context, authorizeCode string, requester fosite.Requester) (fosite.Requester, error) {
@@ -157,10 +160,10 @@ func (s *FositeRehinkDBStore) CreateAuthorizeCodeSession(_ context.Context, code
 	if err := s.publishInsert(s.AuthorizeCodesTable, code, requester); err != nil {
 		return err
 	}
-	return waitFor(s.AuthorizeCodes, code)
+	return s.waitFor(s.AuthorizeCodes, code)
 }
 
-func (s *FositeRehinkDBStore) GetAuthorizeCodeSession(_ context.Context, code string, sess interface{}) (fosite.Requester, error) {
+func (s *FositeRehinkDBStore) GetAuthorizeCodeSession(_ context.Context, code string, sess fosite.Session) (fosite.Requester, error) {
 	s.RLock()
 	defer s.RUnlock()
 	rel, ok := s.AuthorizeCodes[code]
@@ -179,10 +182,10 @@ func (s *FositeRehinkDBStore) CreateAccessTokenSession(_ context.Context, signat
 	if err := s.publishInsert(s.AccessTokensTable, signature, requester); err != nil {
 		return err
 	}
-	return waitFor(s.AccessTokens, signature)
+	return s.waitFor(s.AccessTokens, signature)
 }
 
-func (s *FositeRehinkDBStore) GetAccessTokenSession(_ context.Context, signature string, sess interface{}) (fosite.Requester, error) {
+func (s *FositeRehinkDBStore) GetAccessTokenSession(_ context.Context, signature string, sess fosite.Session) (fosite.Requester, error) {
 	s.RLock()
 	defer s.RUnlock()
 	rel, ok := s.AccessTokens[signature]
@@ -201,10 +204,10 @@ func (s *FositeRehinkDBStore) CreateRefreshTokenSession(_ context.Context, signa
 	if err := s.publishInsert(s.RefreshTokensTable, signature, requester); err != nil {
 		return err
 	}
-	return waitFor(s.RefreshTokens, signature)
+	return s.waitFor(s.RefreshTokens, signature)
 }
 
-func (s *FositeRehinkDBStore) GetRefreshTokenSession(_ context.Context, signature string, sess interface{}) (fosite.Requester, error) {
+func (s *FositeRehinkDBStore) GetRefreshTokenSession(_ context.Context, signature string, sess fosite.Session) (fosite.Requester, error) {
 	s.RLock()
 	defer s.RUnlock()
 	rel, ok := s.RefreshTokens[signature]
@@ -219,11 +222,8 @@ func (s *FositeRehinkDBStore) DeleteRefreshTokenSession(_ context.Context, signa
 	return s.publishDelete(s.RefreshTokensTable, signature)
 }
 
-func (s *FositeRehinkDBStore) CreateImplicitAccessTokenSession(_ context.Context, code string, req fosite.Requester) error {
-	if err := s.publishInsert(s.ImplicitTable, code, req); err != nil {
-		return err
-	}
-	return waitFor(s.Implicit, code)
+func (s *FositeRehinkDBStore) CreateImplicitAccessTokenSession(ctx context.Context, code string, req fosite.Requester) error {
+	return s.CreateAccessTokenSession(ctx, code, req)
 }
 
 func (s *FositeRehinkDBStore) PersistAuthorizeCodeGrantSession(ctx context.Context, authorizeCode, accessSignature, refreshSignature string, request fosite.Requester) error {
@@ -260,7 +260,6 @@ func (m *FositeRehinkDBStore) Watch(ctx context.Context) {
 	m.AccessTokens.watch(ctx, m.Session, &m.RWMutex, m.AccessTokensTable)
 	m.AuthorizeCodes.watch(ctx, m.Session, &m.RWMutex, m.AuthorizeCodesTable)
 	m.IDSessions.watch(ctx, m.Session, &m.RWMutex, m.IDSessionsTable)
-	m.Implicit.watch(ctx, m.Session, &m.RWMutex, m.ImplicitTable)
 	m.RefreshTokens.watch(ctx, m.Session, &m.RWMutex, m.RefreshTokensTable)
 }
 
@@ -286,7 +285,9 @@ func (items RDBItems) coldStart(sess *r.Session, lock *sync.RWMutex, table r.Ter
 
 func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock *sync.RWMutex, table r.Term) {
 	go pkg.Retry(time.Second*15, time.Minute, func() error {
+		lock.Lock()
 		changes, err := table.Changes().Run(sess)
+		lock.Unlock()
 		if err != nil {
 			return errors.Wrap(err, "")
 		}
@@ -294,10 +295,10 @@ func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock *sync.RWM
 
 		var update = map[string]*RdbSchema{}
 		for changes.Next(&update) {
+			lock.Lock()
 			logrus.Debugln("Received update from RethinkDB Cluster in OAuth2 manager.")
 			newVal := update["new_val"]
 			oldVal := update["old_val"]
-			lock.Lock()
 			if newVal == nil && oldVal != nil {
 				delete(items, oldVal.ID)
 			} else if newVal != nil && oldVal != nil {
@@ -315,4 +316,36 @@ func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock *sync.RWM
 
 		return nil
 	})
+}
+
+func (s *FositeRehinkDBStore) RevokeRefreshToken(ctx context.Context, id string) error {
+	var found bool
+	for sig, token := range s.RefreshTokens {
+		if token.RequestID == id {
+			if err := s.DeleteRefreshTokenSession(ctx, sig); err != nil {
+				return err
+			}
+			found = true
+		}
+	}
+	if !found {
+		return errors.New("Not found")
+	}
+	return nil
+}
+
+func (s *FositeRehinkDBStore) RevokeAccessToken(ctx context.Context, id string) error {
+	var found bool
+	for sig, token := range s.AccessTokens {
+		if token.RequestID == id {
+			if err := s.DeleteAccessTokenSession(ctx, sig); err != nil {
+				return err
+			}
+			found = true
+		}
+	}
+	if !found {
+		return errors.New("Not found")
+	}
+	return nil
 }

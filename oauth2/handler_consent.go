@@ -17,7 +17,7 @@ func (o *Handler) DefaultConsentHandler(w http.ResponseWriter, r *http.Request, 
 </head>
 <body>
 <p>
-	It looks like you forgot to set the consent endpoint url, which can be set using the <code>CONSENT_ENDPOINT</code>
+	It looks like you forgot to set the consent endpoint url, which can be set using the <code>CONSENT_URL</code>
 	environment variable.
 </p>
 <p>

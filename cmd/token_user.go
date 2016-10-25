@@ -52,10 +52,10 @@ var tokenUserCmd = &cobra.Command{
 		if ok, _ := cmd.Flags().GetBool("no-open"); !ok {
 			webbrowser.Open(location)
 		}
-		fmt.Printf("If your browser does not open automatically, navigate to: %s\n", location)
 
 		fmt.Println("Setting up callback listener on http://localhost:4445/callback")
 		fmt.Println("Press ctrl + c on Linux / Windows or cmd + c on OSX to end the process.")
+		fmt.Printf("If your browser does not open automatically, navigate to:\n\n\t%s\n\n", location)
 
 		srv := &graceful.Server{
 			Timeout: 2 * time.Second,
@@ -87,19 +87,24 @@ var tokenUserCmd = &cobra.Command{
 			token, err := conf.Exchange(ctx, code)
 			pkg.Must(err, "Could not exchange code for token: %s", err)
 
-			fmt.Printf("Access Token: %s\n", token.AccessToken)
-			fmt.Printf("Refresh Token: %s\n", token.RefreshToken)
-			fmt.Printf("Expires in: %s\n", token.Expiry)
+			fmt.Printf("Access Token:\n\t%s\n", token.AccessToken)
+			fmt.Printf("Refresh Token:\n\t%s\n\n", token.RefreshToken)
+			fmt.Printf("Expires in:\n\t%s\n\n", token.Expiry)
 
-			w.Write([]byte(fmt.Sprintf("Access Token: %s\n", token.AccessToken)))
-			w.Write([]byte(fmt.Sprintf("Refresh Token: %s\n", token.RefreshToken)))
-			w.Write([]byte(fmt.Sprintf("Expires in: %s\n", token.Expiry)))
+			w.Write([]byte(fmt.Sprintf(`
+<html><head></head><body>
+<ul>
+	<li>Access Token: <code>%s</code></li>
+	<li>Refresh Token: <code>%s</code></li>
+	<li>Expires in: <code>%s</code></li>
+`, token.AccessToken, token.RefreshToken, token.Expiry)))
 
 			idt := token.Extra("id_token")
 			if idt != nil {
-				w.Write([]byte(fmt.Sprintf("ID Token: %s\n", idt)))
-				fmt.Printf("ID Token: %s\n", idt)
+				w.Write([]byte(fmt.Sprintf(`<li>ID Token: <code>%s</code></li>`, idt)))
+				fmt.Printf("ID Token:\n\t%s\n\n", idt)
 			}
+			w.Write([]byte("</ul></body></html>"))
 		})
 		srv.Server.Handler = r
 		srv.ListenAndServe()

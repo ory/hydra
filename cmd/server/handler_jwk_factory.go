@@ -18,6 +18,16 @@ func injectJWKManager(c *config.Config) {
 	case *config.MemoryConnection:
 		ctx.KeyManager = &jwk.MemoryManager{}
 		break
+	case *config.SQLConnection:
+		m := &jwk.SQLManager{
+			DB: con.GetDatabase(),
+			Cipher: &jwk.AEAD{
+				Key: c.GetSystemSecret(),
+			},
+		}
+		m.CreateSchemas()
+		ctx.KeyManager = m
+		break
 	case *config.RethinkDBConnection:
 		con.CreateTableIfNotExists("hydra_json_web_keys")
 		m := &jwk.RethinkManager{

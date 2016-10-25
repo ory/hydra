@@ -45,7 +45,7 @@ type Introspection struct {
 
 	// Username is a human-readable identifier for the resource owner who
 	// authorized this token.
-	Username int64 `json:"username,omitempty"`
+	Username string `json:"username,omitempty"`
 
 	// Audience is a service-specific string identifier or list of string
 	// identifiers representing the intended audience for this token.
@@ -67,5 +67,5 @@ type Introspector interface {
 	//    ctx, err := introspector.IntrospectToken(context.Background(), introspector.TokenFromRequest(r), "photos", "files")
 	//    fmt.Sprintf("%s", ctx.Subject)
 	//  }
-	IntrospectToken(ctx context.Context, token string) (*Introspection, error)
+	IntrospectToken(ctx context.Context, token string, scopes ...string) (*Introspection, error)
 }

@@ -5,13 +5,12 @@ import (
 	"net/http"
 	"time"
 
+	"fmt"
 	"github.com/Sirupsen/logrus"
-	"github.com/pkg/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/meatballhat/negroni-logrus"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
-	"github.com/ory-am/hydra/connection"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/oauth2"
@@ -19,6 +18,7 @@ import (
 	"github.com/ory-am/hydra/policy"
 	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/ladon"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/urfave/negroni"
 	"golang.org/x/net/context"
@@ -29,6 +29,19 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		router := httprouter.New()
 		serverHandler := &Handler{Config: c}
 		serverHandler.registerRoutes(router)
+		c.ForceHTTP, _ = cmd.Flags().GetBool("dangerous-force-http")
+
+		if c.ClusterURL == "" {
+			proto := "https"
+			if c.ForceHTTP {
+				proto = "http"
+			}
+			host := "localhost"
+			if c.BindHost != "" {
+				host = c.BindHost
+			}
+			c.ClusterURL = fmt.Sprintf("%s://%s:%d", proto, host, c.BindPort)
+		}
 
 		if ok, _ := cmd.Flags().GetBool("dangerous-auto-logon"); ok {
 			logrus.Warnln("Do not use flag --dangerous-auto-logon in production.")
@@ -55,7 +68,7 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 
 		var err error
 		logrus.Infof("Setting up http server on %s", c.GetAddress())
-		if ok, _ := cmd.Flags().GetBool("dangerous-force-http"); ok {
+		if c.ForceHTTP {
 			logrus.Warnln("HTTPS disabled. Never do this in production.")
 			err = srv.ListenAndServe()
 		} else if c.AllowTLSTermination != "" {
@@ -69,13 +82,12 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 }
 
 type Handler struct {
-	Clients     *client.Handler
-	Connections *connection.Handler
-	Keys        *jwk.Handler
-	OAuth2      *oauth2.Handler
-	Policy      *policy.Handler
-	Warden      *warden.WardenHandler
-	Config      *config.Config
+	Clients *client.Handler
+	Keys    *jwk.Handler
+	OAuth2  *oauth2.Handler
+	Policy  *policy.Handler
+	Warden  *warden.WardenHandler
+	Config  *config.Config
 }
 
 func (h *Handler) registerRoutes(router *httprouter.Router) {
@@ -101,10 +113,13 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 	// Set up handlers
 	h.Clients = newClientHandler(c, router, clientsManager)
 	h.Keys = newJWKHandler(c, router)
-	h.Connections = newConnectionHandler(c, router)
 	h.Policy = newPolicyHandler(c, router)
 	h.OAuth2 = newOAuth2Handler(c, router, ctx.KeyManager, oauth2Provider)
 	h.Warden = warden.NewHandler(c, router)
+
+	router.GET("/health", func(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		rw.WriteHeader(http.StatusNoContent)
+	})
 
 	// Create root account if new install
 	createRS256KeysIfNotExist(c, oauth2.ConsentEndpointKey, "private", "sig")

@@ -13,12 +13,12 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/pkg/errors"
+	"github.com/ory-am/fosite"
 	foauth2 "github.com/ory-am/fosite/handler/oauth2"
-	"github.com/ory-am/fosite/hash"
 	"github.com/ory-am/fosite/token/hmac"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"golang.org/x/net/context"
@@ -146,8 +146,13 @@ func (c *Config) Context() *Context {
 		case "rethinkdb":
 			connection = &RethinkDBConnection{URL: u}
 			break
+		case "postgres":
+			fallthrough
+		case "mysql":
+			connection = &SQLConnection{URL: u}
+			break
 		default:
-			logrus.Fatalf("Unkown DSN in DATABASE_URL: %s", c.DatabaseURL)
+			logrus.Fatalf("Unkown DSN %s in DATABASE_URL: %s", u.Scheme, c.DatabaseURL)
 		}
 	}
 
@@ -156,6 +161,11 @@ func (c *Config) Context() *Context {
 	case *MemoryConnection:
 		logrus.Printf("DATABASE_URL not set, connecting to ephermal in-memory database.")
 		manager = ladon.NewMemoryManager()
+		break
+	case *SQLConnection:
+		m := ladon.NewSQLManager(con.GetDatabase(), nil)
+		m.CreateSchemas()
+		manager = m
 		break
 	case *RethinkDBConnection:
 		logrus.Printf("DATABASE_URL set, connecting to RethinkDB.")
@@ -176,7 +186,7 @@ func (c *Config) Context() *Context {
 
 	c.context = &Context{
 		Connection: connection,
-		Hasher: &hash.BCrypt{
+		Hasher: &fosite.BCrypt{
 			WorkFactor: c.BCryptWorkFactor,
 		},
 		LadonManager: manager,

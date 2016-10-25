@@ -35,29 +35,6 @@ var err = hydra.Client.DeleteClient(newClient.ID)
 var clients, err = hydra.Client.GetClients()
 ```
 
-Manage SSO Connections using [`ory-am/hydra/connection.HTTPManager`](connection/manager_http.go):
-```go
-import "github.com/ory-am/hydra/connection"
-
-// Create a new connection
-var sso = connection.Connection{
-    Provider: "login.google.com",
-    LocalSubject: "bob",
-    RemoteSubject: "googleSubjectID",
-}
-var err = hydra.SSO.Create(&sso)
-
-// Retrieve newly created connection
-var result, err := hydra.SSO.Get(sso.ID)
-
-// Delete connection
-var err = hydra.SSO.Delete(sso.ID)
-
-// Find a connection by subject
-var ssoConns, err = hydra.SSO.FindAllByLocalSubject("bob")
-var ssoConns, err = hydra.SSO.FindByRemoteSubject("login.google.com", "googleSubjectID")
-```
-
 Manage policies using [`ory-am/hydra/policy.HTTPManager`](policy/manager_http.go):
 ```go
 import "github.com/ory-am/ladon"
@@ -110,7 +87,7 @@ func anyHttpHandler(w http.ResponseWriter, r *http.Request) {
     fmt.Sprintf("%s", ctx.Subject)
     
     // Check if a token is valid and the token's subject fulfills the policy based access request.
-    ctx, err := hydra.Warden.TokenAllowed(context.Background(), "access-token", &ladon.Request{
+    ctx, err := hydra.Warden.TokenAllowed(context.Background(), "access-token", &firewall.TokenAccessRequest{
         Resource: "matrix",
         Action:   "create",
         Context:  ladon.Context{},
@@ -123,4 +100,11 @@ Perform Token Introspection as specified in [IETF RFC 7662](https://tools.ietf.o
 
 ```go
 var ctx, err = hydra.Introspector.IntrospectToken(context.Background(), "access-token")
+```
+
+
+Perform Token Revocation as specified in [IETF RFC 7009](https://tools.ietf.org/html/rfc7009):
+
+```go
+var ctx, err = hydra.Revocator.RevokeToken(context.Background(), "access-token")
 ```

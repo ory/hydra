@@ -64,86 +64,12 @@ In this case, the access request will be allowed:
 4. `"remoteIP": "192.168.0.5"` matches the [`CIDRCondition`](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
 condition that was configured for the field `remoteIP`.
 
-### HTTP Examples
+## Access Control Decisions: The Warden
 
-```
-> curl \
-      -X POST \
-      -H "Content-Type: application/json" \
-      -H "Authorization: bearer oauth2-access-token" \
-      -d@- \
-      "https://hydra/policies" <<EOF
-        {
-          "description": "One policy to rule them all.",
-          "subjects": ["users:<[peter|ken]>", "users:maria", "groups:admins"],
-          "actions" : ["delete", "<[create|update]>"],
-          "effect": "allow",
-          "resources": [
-            "resources:articles:<.*>",
-            "resources:printer"
-          ],
-          "conditions": {
-            "remoteIP": {
-                "type": "CIDRCondition",
-                "options": {
-                    "cidr": "192.168.0.1/16"
-                }
-            }
-          }
-        }
-  EOF
-```
+The warden is a HTTP API allowing you to perform these access requests.
+The warden knows two endpoints:
 
-Then we test if "peter" (ip: "192.168.0.5") is allowed to "delete" the "ladon-introduction" article:
+* `/warden/allowed`: Check if a subject is allowed to do something.
+* `/warden/token/allowed`: Check if the subject of a token is allowed to do something.
 
-```
-> curl \
-      -X POST \
-      -H "Content-Type: application/json" \
-      -H "Authorization: bearer oauth2-access-token" \
-      -d@- \
-      "https://my-ladon-implementation.localhost/warden/allowed" <<EOF
-        {
-          "subject": "users:peter",
-          "action" : "delete",
-          "resource": "resource:articles:ladon-introduction",
-          "context": {
-            "remoteIP": "192.168.0.5"
-          }
-        }
-  EOF
-
-{
-    "allowed": true
-}
-```
-
-## Access Control Endpoint: The Warden
-
-Hydra offers various access control methods. Resource providers (e.g. photo/user/asset/balance/... service) use
-
-1. **Warden Token Validation** to validate access tokens
-2. **Warden Access Control with Access Tokens** to validate access tokens and decide
-if the token's subject is allowed to perform the request
-3. **Warden Access Control without Access Tokens** to decide if any subject is allowed
-to perform a request
-
-whereas third party apps (think of a facebook app) use
-
-1. **OAuth2 Token Introspection** to validate access tokens.
-
-There are two common ways to solve access control in a distributed environment (e.g. microservices).
-
-1. Your services are behind a gateway (e.g. access control, rate limiting, and load balancer) 
-that does the access control for them. This is known as a "trusted network/subnet".
-2. Clients (e.g. Browser) talk to your services
-directly. The services are responsible for checking access privileges themselves.
-
-In both cases, you would use on of the warden endpoints.
-
-## Warden
-
-The Warden is usually called from your own services ("resource providers"), not from third parties. Hydra prevents
-third parties from having access to these endpoints per default, but you can change that with custom policies.
-
-The Warden endpoints are documented [here](http://docs.hdyra.apiary.io/#reference/warden:-access-control).
+Both endpoints use policies to compute the result and are documented in the [HTTP API Documentation](http://docs.hdyra.apiary.io/#reference/warden:-access-control).

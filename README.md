@@ -19,7 +19,6 @@
 
 Hydra is a runnable server implementation of the OAuth2 2.0 authorization framework and the OpenID Connect Core 1.0.
 
-Hydra is being developed by german-based company [ORY](https://ory.am).
 Join our [newsletter](http://eepurl.com/bKT3N9) to stay on top of new developments.
 We answer basic support requests on [Google Groups](https://groups.google.com/forum/#!forum/ory-hydra/new) and [Gitter](https://gitter.im/ory-am/hydra)
 and offer [premium services](http://www.ory.am/products/hydra) around Hydra.

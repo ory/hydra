@@ -65,6 +65,6 @@ func (h *Handler) createRootIfNewInstall(c *config.Config) {
 	if forceRoot == "" {
 		logrus.Infof("client_id: %s", root.GetID())
 		logrus.Infof("client_secret: %s", string(secret))
-		logrus.Warn("WARNING: YOU MUST delete this client once in production, as credentials may have been leaked logfiles.")
+		logrus.Warn("WARNING: YOU MUST delete this client once in production, as credentials may have been leaked in your logfiles.")
 	}
 }

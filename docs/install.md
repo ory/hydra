@@ -81,7 +81,7 @@ Available Commands:
 ...
 ```
 
-## Configuring and Running Hydra
+## Configuring Hydra
 
 Running the default Hydra environment is as easy as:
  
@@ -90,9 +90,7 @@ $ hydra host
 time="2016-10-13T10:04:01+02:00" level=info msg="DATABASE_URL not set, connecting to ephermal in-memory database."
 time="2016-10-13T10:04:01+02:00" level=warning msg="Expected system secret to be at least 32 characters long, got 0 characters."
 time="2016-10-13T10:04:01+02:00" level=info msg="Generating a random system secret..."
-time="2016-10-13T10:04:01+02:00" level=info msg="Generated system secret: gbaMR?mYdTB-g/$YhRXjmX!,h08.t07/"
-time="2016-10-13T10:04:01+02:00" level=warning msg="WARNING: DO NOT generate system secrets in production. The secret will be leaked to the logs."
-...
+[...]
 ```
 
 Hydra relies on a third party for storing data, such as Postgres or MySQL (officially supported) and RethinkDB
@@ -116,101 +114,7 @@ CORE CONTROLS
 =============
 
 - DATABASE_URL: A URL to a persistent backend. Hydra supports various backends:
-  - None: If DATABASE_URL is empty, all data will be lost when the command is killed.
-  - RethinkDB: If DATABASE_URL is a DSN starting with rethinkdb://, RethinkDB will be used as storage backend.
-        Example: DATABASE_URL=rethinkdb://user:password@host:123/database
-
-        Additionally, these controls are available when using RethinkDB:
-        - RETHINK_TLS_CERT_PATH: The path to the TLS certificate (pem encoded) used to connect to rethinkdb.
-                Example: RETHINK_TLS_CERT_PATH=~/rethink.pem
-
-        - RETHINK_TLS_CERT: A pem encoded TLS certificate passed as string. Can be used instead of RETHINK_TLS_CERT_PATH.
-                Example: RETHINK_TLS_CERT_PATH="-----BEGIN CERTIFICATE-----\nMIIDZTCCAk2gAwIBAgIEV5xOtDANBgkqhkiG9w0BAQ0FADA0MTIwMAYDVQQDDClP..."
-
-- SYSTEM_SECRET: A secret that is at least 16 characters long. If none is provided, one will be generated. They key
-        is used to encrypt sensitive data using AES-GCM (256 bit) and validate HMAC signatures.
-        Example: SYSTEM_SECRET=jf89-jgklAS9gk3rkAF90dfsk
-
-- FORCE_ROOT_CLIENT_CREDENTIALS: On first start up, Hydra generates a root client with random id and secret. Use
-        this environment variable in the form of "FORCE_ROOT_CLIENT_CREDENTIALS=id:secret" to set
-        the client id and secret yourself.
-        Example: FORCE_ROOT_CLIENT_CREDENTIALS=admin:kf0AKfm12fas3F-.f
-
-- PORT: The port hydra should listen on.
-        Defaults to PORT=4444
-
-- HOST: The port hydra should listen on.
-        Example: PORT=localhost
-
-- BCRYPT_COST: Set the bcrypt hashing cost. This is a trade off between
-        security and performance. Range is 4 =< x =< 31.
-        Defaults to BCRYPT_COST=10
-
-
-OAUTH2 CONTROLS
-===============
-
-- CONSENT_URL: The uri of the consent endpoint.
-        Example: CONSENT_URL=https://id.myapp.com/consent
-
-- ISSUER: The issuer is used for identification in all OAuth2 tokens.
-        Defaults to ISSUER=hydra.localhost
-
-- AUTH_CODE_LIFESPAN: Lifespan of OAuth2 authorize codes. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
-        Defaults to AUTH_CODE_LIFESPAN=10m
-
-- ID_TOKEN_LIFESPAN: Lifespan of OpenID Connect ID Tokens. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
-        Defaults to ID_TOKEN_LIFESPAN=1h
-
-- ACCESS_TOKEN_LIFESPAN: Lifespan of OAuth2 access tokens. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
-        Defaults to ACCESS_TOKEN_LIFESPAN=1h
-
-- CHALLENGE_TOKEN_LIFESPAN: Lifespan of OAuth2 consent tokens. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
-        Defaults to CHALLENGE_TOKEN_LIFESPAN=10m
-
-
-HTTPS CONTROLS
-==============
-
-- HTTPS_ALLOW_TERMINATION_FROM: Whitelist one or multiple CIDR address ranges and allow them to terminate TLS connections.
-        Be aware that the X-Forwarded-Proto header must be set and must never be modifiable by anyone but
-        your proxy / gateway / load balancer. Supports ipv4 and ipv6.
-        Hydra serves http instead of https when this option is set.
-        Example: HTTPS_ALLOW_TERMINATION_FROM=127.0.0.1/32,192.168.178.0/24,2620:0:2d0:200::7/32
-
-- HTTPS_TLS_CERT_PATH: The path to the TLS certificate (pem encoded).
-        Example: HTTPS_TLS_CERT_PATH=~/cert.pem
-
-- HTTPS_TLS_KEY_PATH: The path to the TLS private key (pem encoded).
-        Example: HTTPS_TLS_KEY_PATH=~/key.pem
-
-- HTTPS_TLS_CERT: A pem encoded TLS certificate passed as string. Can be used instead of HTTPS_TLS_CERT_PATH.
-        Example: HTTPS_TLS_CERT="-----BEGIN CERTIFICATE-----\nMIIDZTCCAk2gAwIBAgIEV5xOtDANBgkqhkiG9w0BAQ0FADA0MTIwMAYDVQQDDClP..."
-
-- HTTPS_TLS_KEY: A pem encoded TLS key passed as string. Can be used instead of HTTPS_TLS_KEY_PATH.
-        Example: HTTPS_TLS_KEY="-----BEGIN ENCRYPTED PRIVATE KEY-----\nMIIFDjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDg..."
-
-
-DEBUG CONTROLS
-==============
-
-- PROFILING: Set "PROFILING=cpu" to enable cpu profiling and "PROFILING=memory" to enable memory profiling.
-        It is not possible to do both at the same time.
-        Example: PROFILING=cpu
-
-Usage:
-  hydra host [flags]
-
-Flags:
-      --dangerous-auto-logon           Stores the root credentials in ~/.hydra.yml. Do not use in production.
-      --dangerous-force-http           Disable HTTP/2 over TLS (HTTPS) and serve HTTP instead. Never use this in production.
-      --https-tls-cert-path string     Path to the certificate file for HTTP/2 over TLS (https). You can set HTTPS_TLS_CERT_PATH or HTTPS_TLS_CERT instead.
-      --https-tls-key-path string      Path to the key file for HTTP/2 over TLS (https). You can set HTTPS_TLS_KEY_PATH or HTTPS_TLS_KEY instead.
-      --rethink-tls-cert-path string   Path to the certificate file to connect to rethinkdb over TLS (https). You can set RETHINK_TLS_CERT_PATH or RETHINK_TLS_CERT instead.
-
-Global Flags:
-      --config string     config file (default is $HOME/.hydra.yaml)
-      --skip-tls-verify   foolishly accept TLS certificates signed by unkown certificate authorities
+[...]
 ```
 
 It is quite common to run hydra with the following options:
@@ -228,3 +132,73 @@ will write the administrator's credentials directly to `~/.hydra.yml`, no `hydra
 ```
 $ hydra host --dangerous-auto-logon --dangerous-force-http
 ```
+
+## Running Hydra
+
+On first run, Hydra initializes various settings:
+
+```
+$ hydra host
+[...]
+mtime="2016-05-17T18:09:28Z" level=warning msg="Generated system secret: MnjFP5eLIr60h?hLI1h-!<4(TlWjAHX7"
+[...]
+time="2016-10-25T09:58:54+02:00" level=info msg="Key pair for signing hydra.openid.id-token is missing. Creating new one."
+time="2016-10-25T09:58:56+02:00" level=info msg="Key pair for signing hydra.consent.response is missing. Creating new one."
+time="2016-10-25T09:59:02+02:00" level=info msg="Key pair for signing hydra.consent.challenge is missing. Creating new one."
+[...]
+time="2016-10-25T09:59:04+02:00" level=warning msg="No clients were found. Creating a temporary root client..."
+mtime="2016-05-17T18:09:29Z" level=warning msg="client_id: d9227bd5-5d47-4557-957d-2fd3bee11035"
+mtime="2016-05-17T18:09:29Z" level=warning msg="client_secret: ,IvxGt02uNjv1ur9"
+[...]
+time="2016-10-25T09:59:04+02:00" level=warning msg="No TLS Key / Certificate for HTTPS found. Generating self-signed certificate."
+```
+
+1. If no system secret was given, a random one is generated
+2. Cryptographic keys for JWT signing are being generated
+3. If the OAuth 2.0 Client database table is empty, a new root client with random credentials is created. Root clients
+have access to all APIs, OAuth 2.0 flows and are allowed to do everything. If the `FORCE_ROOT_CLIENT_CREDENTIALS` environment
+is set, those credentials will be used instead.
+4. A self signed certificate for serving HTTP over TLS is created.
+
+Hydra can be managed using the Hydra Command Line Interface (CLI) client. This client has to log on before it is
+allowed to do anything. When Hydra host process detects a new installation, a new temporary root client is
+created and its credentials are printed to the container logs.
+
+```
+mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="client_id: d9227bd5-5d47-4557-957d-2fd3bee11035"
+mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="client_secret: ,IvxGt02uNjv1ur9"
+```
+
+The system secret is a global secret assigned to every hydra instance. It is used to encrypt data at rest. You can
+set the system secret through the `SYSTEM_SECRET` environment variable. When no secret is set, hydra generates one:
+
+```
+time="2016-05-15T14:56:34Z" level=warning msg="Generated system secret: (.UL_&77zy8/v9<sUsWLKxLwuld?.82B"
+```
+
+If you are using the Hydra CLI locally or on a different host, you need to use the credentials from above to log in.
+
+```
+$ hydra connect
+Cluster URL: https://localhost:4444
+Client ID: d9227bd5-5d47-4557-957d-2fd3bee11035
+Client Secret: ,IvxGt02uNjv1ur9
+Done.
+```
+
+Great! You are now connected to Hydra and can start by creating a new client:
+
+```
+$ hydra clients create
+Client ID: c003830f-a090-4721-9463-92424270ce91
+Client Secret: Z2pJ0>Tp7.ggn>EE&rhnOzdt1
+```
+
+Now, let us issue an access token for your OAuth2 client!
+
+```
+$ hydra token client
+JLbnRS9GQmzUBT4x7ESNw0kj2wc0ffbMwOv3QQZW4eI.qkP-IQXn6guoFew8TvaMFUD-SnAyT8GmWuqGi3wuWXg
+```
+
+Great! You installed hydra, connected the CLI, created a client and completed two authentication flows!

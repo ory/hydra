@@ -5,7 +5,10 @@
   * [Introduction to Hydra](README.md#introduction-to-hydra)
   * [OAuth2 Case Study](README.md#oauth-20-case-study)
 * [5 Minute Tutorial](tutorial.md)
-* [Installing, Configuring and Running Hydra](install.md)
+* [Using Hydra](install.md)
+  * [Installing Hydra](install.md#installing-hydra)
+  * [Configuring Hydra](install.md#configuring-hydra)
+  * [Running Hydra](install.md#running-hydra)
 * Understanding Hydra
   * [OAuth2 & OpenID Connect](oauth2.md)
     * [Overview](oauth2.md#overview)
@@ -13,13 +16,13 @@
     * [Validating Tokens: OAuth2 Token Introspection](oauth2.md#oauth2-token-introspection)
   * [JSON Web Keys](jwk.md)
   * [Access Control Policies](access-control.md)
-    * [Introduction](access-control.md)
-    * [The Warden](access-control.md)
+    * [Introduction](access-control.md#introduction-to-access-control-policies)
+    * [The Warden](access-control.md#warden)
 * [Client Libraries](sdk.md)
   * [Hydra SDK for Go](sdk/go.md)
-<!-- * Developing and contributing to Hydra (TBD) -->
-<!--   * Architecture and Design (TBD) -->
-<!--   * Running Tests (TBD) -->
+* [Contribute](contribute.md)
+  * [Architecture and Design](contribute.md)
+  * [Running Tests](contribute.md)
 * [FAQ](faq.md)
   * [Where is the HTTP API Documentation?](faq/http-api.md)
   * [How can I disable HTTPS for testing?](faq/disable-https.md)

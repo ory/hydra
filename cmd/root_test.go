@@ -35,7 +35,7 @@ func TestExecute(t *testing.T) {
 				return err != nil
 			},
 		},
-		{args: []string{"token", "connect"}, wait: func() bool {
+		{args: []string{"connect"}, wait: func() bool {
 			time.Sleep(time.Millisecond * 10)
 			return false
 		}},
@@ -55,12 +55,12 @@ func TestExecute(t *testing.T) {
 		}},
 		{args: []string{"policies", "create", "-i", "foobar", "-s", "peter", "max", "-r", "blog", "users", "-a", "post", "ban", "--allow"}},
 		{args: []string{"policies", "create", "-i", "foobar", "-s", "peter", "max", "-r", "blog", "users", "-a", "post", "ban", "--allow", "--dry"}},
-		{args: []string{"policies", "policies", "actions", "add", "update|create"}},
-		{args: []string{"policies", "policies", "actions", "delete", "update|create"}},
-		{args: []string{"policies", "policies", "resources", "add", "printer"}},
-		{args: []string{"policies", "policies", "resources", "delete", "printer"}},
-		{args: []string{"policies", "policies", "subjects", "add", "foobar", "ken", "tracy"}},
-		{args: []string{"policies", "policies", "subjects", "delete", "foobar", "ken", "tracy"}},
+		{args: []string{"policies", "actions", "add", "update|create"}},
+		{args: []string{"policies", "actions", "delete", "update|create"}},
+		{args: []string{"policies", "resources", "add", "printer"}},
+		{args: []string{"policies", "resources", "delete", "printer"}},
+		{args: []string{"policies", "subjects", "add", "foobar", "ken", "tracy"}},
+		{args: []string{"policies", "subjects", "delete", "foobar", "ken", "tracy"}},
 		{args: []string{"policies", "get", "foobar"}},
 		{args: []string{"policies", "delete", "foobar"}},
 		{args: []string{"version"}},

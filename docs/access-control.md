@@ -2,8 +2,7 @@
 
 Besides OAuth2 Token Introspection, Hydra offers Access Control Policies using
 the [Ladon](https://github.com/ory-am/ladon) framework. Access Control Policies are used by Hydra internally and exposed
-via various HTTP APIs. It is important to understand how policies work so you can set up Hydra with the best possible configuration.
-Apart form that, you do not need to use either Access Control Policies nor the Warden in your application.
+via various HTTP APIs.
 
 ## Introduction to Access Control Policies
 
@@ -20,7 +19,8 @@ Hydra's Access Control is able to answer the question:
     request date, the resource owner name, the department ken is working in or any other information you want to pass along.
     (optional)
 
-To decide what the answer is, Hydra uses policy documents which can be represented as JSON
+To decide what the answer is, Hydra uses policy documents which can be represented as JSON. Values `actions`, `subjects`
+and `resources` can use regular expressions by encapsulating the expression in `<>`, for example `<.*>`.
 
 ```json
 {
@@ -43,7 +43,7 @@ To decide what the answer is, Hydra uses policy documents which can be represent
 }
 ```
 
-and can answer access requests that look like:
+Now, Hydra is able to answer access requests like the following one:
 
 ```json
 {
@@ -56,7 +56,7 @@ and can answer access requests that look like:
 }
 ```
 
-In this case, the access request will be allowed, because:
+In this case, the access request will be allowed:
 
 1. `users:peter` matches `"subjects": ["users:<[peter|ken]>", "users:maria", "groups:admins"]`, as would `users:ken`, `users:maria` and `group:admins`.
 2. `delete` matches `"actions" : ["delete", "<[create|update]>"]` as would `update` and `create`

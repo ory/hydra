@@ -12,7 +12,7 @@ Let us begin with the first part, understanding what OAuth2 and OpenID Connect a
 ## Introduction to OAuth 2.0 and OpenID Connect
 
 This section will give you some ideas of what OAuth 2.0 and OpenID Connect 1.0 are for. If you
-already know what OAuth2 and OpenID Connect are and how they works, you can skip to the next [Section].
+already know what OAuth2 and OpenID Connect are and how they works, you can skip to the next [Section](#introduction-to-hydra).
 This section will not explain how the various flows of OAuth2 work and how they look like. We strongly recommend
 to read the following articles:
 
@@ -110,8 +110,7 @@ or [fosite](https://github.com/ory-am/fosite/issues), or as fully featured ident
 management and user interfaces, such as [Dex](https://github.com/coreos/dex) or [Okta](https://www.okta.com/).
 
 Implementing and using OAuth2 without understanding the whole specification is challenging and prone to errors, even when
-SDKs are being used. The primary goal of Hydra is to make OAuth 2.0 and OpenID Connect 1.0 less painful to set up and better
-accessible.
+SDKs are being used. The primary goal of Hydra is to make OAuth 2.0 and OpenID Connect 1.0 less painful to set up and easier to use.
 
 Hydra implements the flows described in OAuth2 and OpenID Connect 1.0 without forcing you to use a "Hydra User Management"
 or some template engine or a predefined front-end. Instead it relies on HTTP redirection and cryptographic methods

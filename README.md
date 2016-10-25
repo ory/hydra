@@ -45,7 +45,6 @@ the access control SDK [Ladon](https://github.com/ory-am/ladon).
   - [Command Line Documentation](#command-line-documentation)
   - [Develop](#develop)
 - [Third-party libraries and projects](#third-party-libraries-and-projects)
-- [Hall of Fame](#hall-of-fame)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -202,10 +201,3 @@ DATABASE_URL=rethinkdb://localhost:28015/hydra go run main.go host
 ## Third-party libraries and projects
 
 * [Hydra middleware for Gin](https://github.com/janekolszak/gin-hydra)
-
-## Hall of Fame
-
-A list of extraordinary contributors and [bug hunters](https://github.com/ory-am/hydra/issues/84).
-
-* [Alexander Widerberg (leetal)](https://github.com/leetal) for implementing the prototype RethinkDB adapters.
-* The active Community on Gitter.

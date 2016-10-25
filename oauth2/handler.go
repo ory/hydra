@@ -79,6 +79,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		Subject:   resp.GetAccessRequester().GetSession().GetSubject(),
 		Username:  resp.GetAccessRequester().GetSession().GetUsername(),
 		Extra:     resp.GetAccessRequester().GetSession().(*Session).Extra,
+		Audience:  resp.GetAccessRequester().GetClient().GetID(),
 	})
 }
 

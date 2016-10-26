@@ -25,7 +25,9 @@ func injectJWKManager(c *config.Config) {
 				Key: c.GetSystemSecret(),
 			},
 		}
-		m.CreateSchemas()
+		if err := m.CreateSchemas(); err != nil {
+			logrus.Fatalf("Could not create jwk schema: %s", err)
+		}
 		ctx.KeyManager = m
 		break
 	case *config.RethinkDBConnection:

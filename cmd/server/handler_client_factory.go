@@ -24,7 +24,9 @@ func newClientManager(c *config.Config) client.Manager {
 			DB:     con.GetDatabase(),
 			Hasher: ctx.Hasher,
 		}
-		m.CreateSchemas()
+		if err := m.CreateSchemas(); err != nil {
+			logrus.Fatalf("Could not create client schema: %s", err)
+		}
 		return m
 	case *config.RethinkDBConnection:
 		con.CreateTableIfNotExists("hydra_clients")

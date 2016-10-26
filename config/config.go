@@ -164,7 +164,9 @@ func (c *Config) Context() *Context {
 		break
 	case *SQLConnection:
 		m := ladon.NewSQLManager(con.GetDatabase(), nil)
-		m.CreateSchemas()
+		if err := m.CreateSchemas(); err != nil {
+			logrus.Fatalf("Could not create policy schema: %s", err)
+		}
 		manager = m
 		break
 	case *RethinkDBConnection:

@@ -1,3 +1,19 @@
+<h1 align="center" style="margin-bottom: 8px">
+    <img alt="Hydra - cloud native access control" src="images/logo-essential.png">
+</h1>
+
+<h4 style="margin: 0 20% 1.275em" align="center">
+Hydra is a runnable server implementation of the <a href="https://tools.ietf.org/html/rfc6749">OAuth 2.0 authorization framework</a>
+and the <a href="http://openid.net/specs/openid-connect-core-1_0.html">OpenID Connect Core 1.0</a>.
+</h4>
+
+This is the user guide, you might be looking for the [GitHub Repository](http://github.com/ory-am/hydra), the
+[HTTP REST API Documentation](http://docs.hdyra.apiary.io/) or
+the [Language-Level API Documentation](https://godoc.org/github.com/ory-am/hydra) instead.
+
+<hr>
+
+
 # Introduction
 
 Welcome to the Hydra documentation. This documentation will

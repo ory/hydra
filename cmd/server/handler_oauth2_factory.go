@@ -38,7 +38,9 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 			DB:      con.GetDatabase(),
 			Manager: clients,
 		}
-		m.CreateSchemas()
+		if err := m.CreateSchemas(); err != nil {
+			logrus.Fatalf("Could not create oauth2 schema: %s", err)
+		}
 		store = m
 		break
 	case *config.RethinkDBConnection:

@@ -10,4 +10,4 @@ Support ORY's Open Source Software on [patreon](https://patreon.com/user?u=42988
 
 ## Patrons
 
-[Be the first!](https://patreon.com/user?u=4298803)
+1. Wayne Robinson @waynerobinson

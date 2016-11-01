@@ -3,10 +3,16 @@ package server
 import (
 	"crypto/tls"
 	"net/http"
+	"os"
+	"strconv"
 	"time"
 
+	"gopkg.in/airbrake/gobrake.v2"
+
 	"fmt"
+
 	"github.com/Sirupsen/logrus"
+	"github.com/jingweno/negroni-gorelic"
 	"github.com/julienschmidt/httprouter"
 	"github.com/meatballhat/negroni-logrus"
 	"github.com/ory-am/hydra/client"
@@ -23,6 +29,8 @@ import (
 	"github.com/urfave/negroni"
 	"golang.org/x/net/context"
 )
+
+var airbrake *gobrake.Notifier
 
 func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
@@ -48,8 +56,11 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 			err := c.Persist()
 			pkg.Must(err, "Could not write configuration file: %s", err)
 		}
+		verbose, _ := cmd.Flags().GetBool("new-relic-verbose")
 
 		n := negroni.New()
+		useAirbrakeMiddleware(n)
+		useNewRelicMiddleware(n, verbose)
 		n.Use(negronilogrus.NewMiddleware())
 		n.UseFunc(serverHandler.rejectInsecureRequests)
 		n.UseHandler(router)
@@ -79,6 +90,48 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		}
 		pkg.Must(err, "Could not start server: %s %s.", err)
 	}
+}
+
+//Get NewRelic license and app name from environment variables
+func useNewRelicMiddleware(n *negroni.Negroni, verbose bool) {
+	newRelicLicense := os.Getenv("NEW_RELIC_LICENSE_KEY")
+	newRelicApp := os.Getenv("NEW_RELIC_APP_NAME")
+	if newRelicLicense != "" && newRelicApp != "" {
+		n.Use(negronigorelic.New(newRelicLicense, newRelicApp, verbose))
+		logrus.Info("New Relic enabled!")
+	} else {
+		logrus.Info("New Relic disabled - configs not found")
+	}
+}
+
+//Get Airbrake ID and key from environment variables
+func useAirbrakeMiddleware(n *negroni.Negroni) {
+	airbrakeProjectKey := os.Getenv("AIRBRAKE_PROJECT_KEY")
+	if os.Getenv("AIRBRAKE_PROJECT_ID") == "" || airbrakeProjectKey == "" {
+		logrus.Info("Airbrake disabled - configs not found")
+		return
+	}
+	airbrakeProjectID, err := strconv.ParseInt(os.Getenv("AIRBRAKE_PROJECT_ID"), 10, 64)
+	if err != nil {
+		logrus.Errorf("Airbrake disabled - error parsing airbrake project ID: %v", err)
+		return
+	}
+	airbrake = gobrake.NewNotifier(airbrakeProjectID, airbrakeProjectKey)
+	n.Use(&airbrakeMW{})
+	logrus.Info("Airbrake enabled!")
+}
+
+type airbrakeMW struct {
+}
+
+func (air *airbrakeMW) ServeHTTP(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	defer func() {
+		if err := recover(); err != nil && airbrake != nil {
+			defer airbrake.Flush()
+			airbrake.Notify(err, r)
+		}
+	}()
+	next(rw, r)
 }
 
 type Handler struct {

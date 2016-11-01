@@ -1,10 +1,15 @@
 package server
 
 import (
+	"bytes"
+	"os"
 	"testing"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/hydra/config"
+	"github.com/stretchr/testify/assert"
+	"github.com/urfave/negroni"
 )
 
 func TestStart(t *testing.T) {
@@ -13,4 +18,76 @@ func TestStart(t *testing.T) {
 		Config: &config.Config{},
 	}
 	h.registerRoutes(router)
+}
+
+func TestMiddleware(t *testing.T) {
+	nrKey := os.Getenv("NEW_RELIC_LICENSE_KEY")
+	nrName := os.Getenv("NEW_RELIC_APP_NAME")
+	airID := os.Getenv("AIRBRAKE_PROJECT_ID")
+	airKey := os.Getenv("AIRBRAKE_PROJECT_KEY")
+
+	t.Run("NewRelic1", testUseNewRelicMiddleware)
+	t.Run("NewRelic2", testUseNewRelicMiddlewareWithoutValues)
+	t.Run("Airbrake1", testUseAirbrakeMiddleware)
+	t.Run("Airbrake2", testUseAirbrakeMiddlewareWithoutValues)
+	t.Run("Airbrake3", testUseAirbrakeMiddlewareWithoutProperID)
+
+	os.Setenv("NEW_RELIC_LICENSE_KEY", nrKey)
+	os.Setenv("NEW_RELIC_APP_NAME", nrName)
+	os.Setenv("AIRBRAKE_PROJECT_ID", airID)
+	os.Setenv("AIRBRAKE_PROJECT_KEY", airKey)
+	logrus.SetOutput(os.Stderr)
+}
+
+func testUseNewRelicMiddleware(t *testing.T) {
+	os.Setenv("NEW_RELIC_LICENSE_KEY", "1")
+	os.Setenv("NEW_RELIC_APP_NAME", "1")
+	var buffer bytes.Buffer
+	logrus.SetOutput(&buffer)
+	n := negroni.New()
+
+	useNewRelicMiddleware(n, false)
+	assert.Contains(t, string(buffer.Bytes()), "New Relic enabled!")
+}
+
+func testUseNewRelicMiddlewareWithoutValues(t *testing.T) {
+	os.Setenv("NEW_RELIC_LICENSE_KEY", "")
+	var buffer bytes.Buffer
+	logrus.SetOutput(&buffer)
+	n := negroni.New()
+
+	useNewRelicMiddleware(n, false)
+	assert.Contains(t, string(buffer.Bytes()), "New Relic disabled - configs not found")
+}
+
+func testUseAirbrakeMiddleware(t *testing.T) {
+	os.Setenv("AIRBRAKE_PROJECT_ID", "1")
+	os.Setenv("AIRBRAKE_PROJECT_KEY", "1")
+	var buffer bytes.Buffer
+	logrus.SetOutput(&buffer)
+	n := negroni.New()
+
+	useAirbrakeMiddleware(n)
+	assert.Contains(t, string(buffer.Bytes()), "Airbrake enabled!")
+}
+
+func testUseAirbrakeMiddlewareWithoutValues(t *testing.T) {
+	os.Setenv("AIRBRAKE_PROJECT_ID", "")
+	var buffer bytes.Buffer
+	logrus.SetOutput(&buffer)
+	n := negroni.New()
+
+	useAirbrakeMiddleware(n)
+	assert.Contains(t, string(buffer.Bytes()), "Airbrake disabled - configs not found")
+}
+
+func testUseAirbrakeMiddlewareWithoutProperID(t *testing.T) {
+	os.Setenv("AIRBRAKE_PROJECT_ID", "not a number")
+	os.Setenv("AIRBRAKE_PROJECT_KEY", "1")
+	var buffer bytes.Buffer
+	logrus.SetOutput(&buffer)
+	n := negroni.New()
+
+	useAirbrakeMiddleware(n)
+	assert.Contains(t, string(buffer.Bytes()), "Airbrake disabled - error parsing airbrake project ID")
 }

@@ -283,6 +283,7 @@ func TestCreateGetDeleteClient(t *testing.T) {
 
 			c := &Client{
 				ID:                "1234",
+				Name:              "name",
 				Secret:            "secret",
 				RedirectURIs:      []string{"http://redirect"},
 				TermsOfServiceURI: "foo",
@@ -295,6 +296,7 @@ func TestCreateGetDeleteClient(t *testing.T) {
 
 			err = m.CreateClient(&Client{
 				ID:                "2-1234",
+				Name:              "name",
 				Secret:            "secret",
 				RedirectURIs:      []string{"http://redirect"},
 				TermsOfServiceURI: "foo",
@@ -317,6 +319,7 @@ func TestCreateGetDeleteClient(t *testing.T) {
 
 			err = m.UpdateClient(&Client{
 				ID:                "2-1234",
+				Name:              "name-new",
 				Secret:            "secret-new",
 				TermsOfServiceURI: "bar",
 			})
@@ -331,6 +334,7 @@ func TestCreateGetDeleteClient(t *testing.T) {
 				assert.NotEqual(t, d.GetHashedSecret(), nc.GetHashedSecret(), "%s", k)
 			}
 			assert.Equal(t, "bar", nc.TermsOfServiceURI, "%s", k)
+			assert.Equal(t, "name-new", nc.Name, "%s", k)
 			assert.EqualValues(t, []string{"http://redirect"}, nc.GetRedirectURIs(), "%s", k)
 
 			err = m.DeleteClient("1234")

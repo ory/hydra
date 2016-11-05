@@ -73,6 +73,7 @@ var sqlParams = []string{
 func sqlDataFromClient(d *Client) *sqlData {
 	return &sqlData{
 		ID:                d.ID,
+		Name:              d.Name,
 		Secret:            d.Secret,
 		RedirectURIs:      strings.Join(d.RedirectURIs, "|"),
 		GrantTypes:        strings.Join(d.GrantTypes, "|"),
@@ -91,6 +92,7 @@ func sqlDataFromClient(d *Client) *sqlData {
 func (d *sqlData) ToClient() *Client {
 	return &Client{
 		ID:                d.ID,
+		Name:              d.Name,
 		Secret:            d.Secret,
 		RedirectURIs:      strings.Split(d.RedirectURIs, "|"),
 		GrantTypes:        strings.Split(d.GrantTypes, "|"),

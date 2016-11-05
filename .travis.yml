@@ -9,21 +9,22 @@ env:
 language: go
 
 go:
-  - 1.5
-  - 1.6
   - 1.7
 
+go_import_path: github.com/ory-am/hydra
+
 install:
-  - go get github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/pierrre/gotestcover github.com/Masterminds/glide github.com/mitchellh/gox github.com/tcnksm/ghr
+  - go get github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/Masterminds/glide github.com/mitchellh/gox
   - git clone https://github.com/docker-library/official-images.git ~/official-images
   - glide install
   - go install github.com/ory-am/hydra
 
 script:
-  - gotestcover -coverprofile="cover.out" $(glide novendor)
+  - |-
+    touch ./coverage.tmp && echo 'mode: atomic' > coverage.txt && go list ./... | grep -v /vendor | xargs -n1 -I{} sh -c 'go test -covermode=atomic -coverprofile=coverage.tmp -coverpkg $(go list ./... | grep -v /vendor | tr "\n" ",") {} && tail -n +2 coverage.tmp >> coverage.txt' && rm coverage.tmp
+  - goveralls -coverprofile="coverage.txt"
   - go test -race $(go list ./... | grep -v /vendor | grep -v /cmd)
   - go test -v -bench=.* -run=none $(glide novendor)
-  - goveralls -coverprofile="cover.out"
   - docker build -t hydra-travis-ci .
   - docker run -d hydra-travis-ci
   - $GOPATH/bin/hydra host --dangerous-auto-logon &
@@ -31,7 +32,8 @@ script:
   - $GOPATH/bin/hydra token client --skip-tls-verify
 
 after_success:
-  - gox -ldflags "-X github.com/ory-am/hydra/cmd.Version=`git describe --tags` -X github.com/ory-am/hydra/cmd.BuildTime=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory-am/hydra/cmd.GitHash=`git rev-parse HEAD`" -output "dist/{{.Dir}}-{{.OS}}-{{.Arch}}"
+  - |-
+    [ "${TRAVIS_TAG}" != "" ] && [ "${TRAVIS_GO_VERSION}" == "1.7" ] && gox -ldflags "-X github.com/ory-am/hydra/cmd.Version=`git describe --tags` -X github.com/ory-am/hydra/cmd.BuildTime=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory-am/hydra/cmd.GitHash=`git rev-parse HEAD`" -output "dist/{{.Dir}}-{{.OS}}-{{.Arch}}"
 
 deploy:
   provider: releases

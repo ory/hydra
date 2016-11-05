@@ -5,17 +5,16 @@ import (
 	"net/url"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/pkg/errors"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/compose"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/hydra/internal"
 	"github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
 )
@@ -26,14 +25,23 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 
 	switch con := ctx.Connection.(type) {
 	case *config.MemoryConnection:
-		store = &internal.FositeMemoryStore{
+		store = &oauth2.FositeMemoryStore{
 			Manager:        clients,
 			AuthorizeCodes: make(map[string]fosite.Requester),
 			IDSessions:     make(map[string]fosite.Requester),
 			AccessTokens:   make(map[string]fosite.Requester),
-			Implicit:       make(map[string]fosite.Requester),
 			RefreshTokens:  make(map[string]fosite.Requester),
 		}
+		break
+	case *config.SQLConnection:
+		m := &oauth2.FositeSQLStore{
+			DB:      con.GetDatabase(),
+			Manager: clients,
+		}
+		if err := m.CreateSchemas(); err != nil {
+			logrus.Fatalf("Could not create oauth2 schema: %s", err)
+		}
+		store = m
 		break
 	case *config.RethinkDBConnection:
 		con.CreateTableIfNotExists("hydra_oauth2_authorize_code")
@@ -41,19 +49,17 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 		con.CreateTableIfNotExists("hydra_oauth2_access_token")
 		con.CreateTableIfNotExists("hydra_oauth2_implicit")
 		con.CreateTableIfNotExists("hydra_oauth2_refresh_token")
-		m := &internal.FositeRehinkDBStore{
+		m := &oauth2.FositeRehinkDBStore{
 			Session:             con.GetSession(),
 			Manager:             clients,
 			AuthorizeCodesTable: r.Table("hydra_oauth2_authorize_code"),
 			IDSessionsTable:     r.Table("hydra_oauth2_id_sessions"),
 			AccessTokensTable:   r.Table("hydra_oauth2_access_token"),
-			ImplicitTable:       r.Table("hydra_oauth2_implicit"),
 			RefreshTokensTable:  r.Table("hydra_oauth2_refresh_token"),
-			AuthorizeCodes:      make(internal.RDBItems),
-			IDSessions:          make(internal.RDBItems),
-			AccessTokens:        make(internal.RDBItems),
-			Implicit:            make(internal.RDBItems),
-			RefreshTokens:       make(internal.RDBItems),
+			AuthorizeCodes:      make(oauth2.RDBItems),
+			IDSessions:          make(oauth2.RDBItems),
+			AccessTokens:        make(oauth2.RDBItems),
+			RefreshTokens:       make(oauth2.RDBItems),
 		}
 		if err := m.ColdStart(); err != nil {
 			logrus.Fatalf("Could not fetch initial state: %s", err)
@@ -104,9 +110,11 @@ func newOAuth2Provider(c *config.Config, km jwk.Manager) fosite.OAuth2Provider {
 		compose.OAuth2AuthorizeImplicitFactory,
 		compose.OAuth2ClientCredentialsGrantFactory,
 		compose.OAuth2RefreshTokenGrantFactory,
-		compose.OpenIDConnectExplicit,
-		compose.OpenIDConnectHybrid,
-		compose.OpenIDConnectImplicit,
+		compose.OpenIDConnectExplicitFactory,
+		compose.OpenIDConnectHybridFactory,
+		compose.OpenIDConnectImplicitFactory,
+		compose.OAuth2TokenRevocationFactory,
+		compose.OAuth2TokenIntrospectionFactory,
 	)
 }
 
@@ -125,7 +133,6 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 	consentURL, err := url.Parse(c.ConsentURL)
 	pkg.Must(err, "Could not parse consent url %s.", c.ConsentURL)
 
-	ctx := c.Context()
 	handler := &oauth2.Handler{
 		ForcedHTTP: c.ForceHTTP,
 		OAuth2:     o,
@@ -136,13 +143,7 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 			DefaultIDTokenLifespan:   c.GetIDTokenLifespan(),
 		},
 		ConsentURL: *consentURL,
-		Introspector: &oauth2.LocalIntrospector{
-			OAuth2:              o,
-			AccessTokenLifespan: c.GetAccessTokenLifespan(),
-			Issuer:              c.Issuer,
-		},
-		Firewall: ctx.Warden,
-		H:        &herodot.JSON{},
+		H:          &herodot.JSON{},
 	}
 
 	handler.SetRoutes(router)

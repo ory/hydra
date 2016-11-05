@@ -11,17 +11,19 @@ import (
 	"os"
 	"time"
 
+	"fmt"
+	"github.com/jmoiron/sqlx"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/dockertest"
 	"github.com/ory-am/fosite"
-	"github.com/ory-am/fosite/hash"
 	. "github.com/ory-am/hydra/client"
+	"github.com/ory-am/hydra/compose"
 	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/hydra/internal"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
 )
 
@@ -32,10 +34,10 @@ var ts *httptest.Server
 func init() {
 	clientManagers["memory"] = &MemoryManager{
 		Clients: map[string]Client{},
-		Hasher:  &hash.BCrypt{},
+		Hasher:  &fosite.BCrypt{},
 	}
 
-	localWarden, httpClient := internal.NewFirewall("foo", "alice", fosite.Arguments{Scope}, &ladon.DefaultPolicy{
+	localWarden, httpClient := compose.NewFirewall("foo", "alice", fosite.Arguments{Scope}, &ladon.DefaultPolicy{
 		ID:        "1",
 		Subjects:  []string{"alice"},
 		Resources: []string{"rn:hydra:clients<.*>"},
@@ -46,7 +48,7 @@ func init() {
 	s := &Handler{
 		Manager: &MemoryManager{
 			Clients: map[string]Client{},
-			Hasher:  &hash.BCrypt{},
+			Hasher:  &fosite.BCrypt{},
 		},
 		H: &herodot.JSON{},
 		W: localWarden,
@@ -64,8 +66,77 @@ func init() {
 }
 
 var rethinkManager *RethinkManager
+var containers = []dockertest.ContainerID{}
 
 func TestMain(m *testing.M) {
+	defer func() {
+		for _, c := range containers {
+			c.KillRemove()
+		}
+	}()
+
+	connectToPG()
+	connectToRethinkDB()
+	connectToMySQL()
+
+	os.Exit(m.Run())
+}
+
+func connectToMySQL() {
+	var db *sqlx.DB
+	c, err := dockertest.ConnectToMySQL(15, time.Second, func(url string) bool {
+		var err error
+		db, err = sqlx.Open("mysql", url)
+		if err != nil {
+			log.Printf("Got error in mysql connector: %s", err)
+			return false
+		}
+		return db.Ping() == nil
+	})
+
+	if err != nil {
+		log.Fatalf("Could not connect to database: %s", err)
+	}
+
+	containers = append(containers, c)
+	s := &SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}
+
+	if err = s.CreateSchemas(); err != nil {
+		log.Fatalf("Could not create postgres schema: %v", err)
+	}
+
+	clientManagers["mysql"] = s
+	containers = append(containers, c)
+}
+
+func connectToPG() {
+	var db *sqlx.DB
+	c, err := dockertest.ConnectToPostgreSQL(15, time.Second, func(url string) bool {
+		var err error
+		db, err = sqlx.Open("postgres", url)
+		if err != nil {
+			log.Printf("Got error in postgres connector: %s", err)
+			return false
+		}
+		return db.Ping() == nil
+	})
+
+	if err != nil {
+		log.Fatalf("Could not connect to database: %s", err)
+	}
+
+	containers = append(containers, c)
+	s := &SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}
+
+	if err = s.CreateSchemas(); err != nil {
+		log.Fatalf("Could not create postgres schema: %v", err)
+	}
+
+	clientManagers["postgres"] = s
+	containers = append(containers, c)
+}
+
+func connectToRethinkDB() {
 	var session *r.Session
 	var err error
 
@@ -84,7 +155,7 @@ func TestMain(m *testing.M) {
 			Session: session,
 			Table:   r.Table("hydra_clients"),
 			Clients: make(map[string]Client),
-			Hasher: &hash.BCrypt{
+			Hasher: &fosite.BCrypt{
 				// Low workfactor reduces test time
 				WorkFactor: 4,
 			},
@@ -93,23 +164,33 @@ func TestMain(m *testing.M) {
 		time.Sleep(100 * time.Millisecond)
 		return true
 	})
-	if session != nil {
-		defer session.Close()
-	}
+
 	if err != nil {
 		log.Fatalf("Could not connect to database: %s", err)
 	}
-	clientManagers["rethink"] = rethinkManager
 
-	retCode := m.Run()
-	c.KillRemove()
-	os.Exit(retCode)
+	containers = append(containers, c)
+	clientManagers["rethink"] = rethinkManager
+}
+func TestClientAutoGenerateKey(t *testing.T) {
+	for k, m := range clientManagers {
+		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
+			c := &Client{
+				Secret:            "secret",
+				RedirectURIs:      []string{"http://redirect"},
+				TermsOfServiceURI: "foo",
+			}
+			assert.Nil(t, m.CreateClient(c))
+			assert.NotEmpty(t, c.ID)
+			assert.Nil(t, m.DeleteClient(c.ID))
+		})
+	}
 }
 
 func TestAuthenticateClient(t *testing.T) {
 	var mem = &MemoryManager{
 		Clients: map[string]Client{},
-		Hasher:  &hash.BCrypt{},
+		Hasher:  &fosite.BCrypt{},
 	}
 	mem.CreateClient(&Client{
 		ID:           "1234",
@@ -181,12 +262,12 @@ func TestColdStartRethinkManager(t *testing.T) {
 
 	time.Sleep(time.Second / 2)
 	rethinkManager.Clients = make(map[string]Client)
-	assert.Nil(t, rethinkManager.ColdStart())
+	require.Nil(t, rethinkManager.ColdStart())
 
 	c1, err := rethinkManager.GetClient("foo")
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	c2, err := rethinkManager.GetClient("bar")
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	assert.NotEqual(t, c1, c2)
 	assert.Equal(t, "foo", c1.GetID())
@@ -196,67 +277,75 @@ func TestColdStartRethinkManager(t *testing.T) {
 
 func TestCreateGetDeleteClient(t *testing.T) {
 	for k, m := range clientManagers {
-		_, err := m.GetClient("4321")
-		pkg.AssertError(t, true, err, "%s", k)
+		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
+			_, err := m.GetClient("4321")
+			assert.NotNil(t, err)
 
-		c := &Client{
-			ID:                "1234",
-			Secret:            "secret",
-			RedirectURIs:      []string{"http://redirect"},
-			TermsOfServiceURI: "foo",
-		}
-		err = m.CreateClient(c)
-		pkg.AssertError(t, false, err, "%s", k)
-		if err == nil {
-			compare(t, c, k)
-		}
+			c := &Client{
+				ID:                "1234",
+				Name:              "name",
+				Secret:            "secret",
+				RedirectURIs:      []string{"http://redirect"},
+				TermsOfServiceURI: "foo",
+			}
+			err = m.CreateClient(c)
+			assert.Nil(t, err)
+			if err == nil {
+				compare(t, c, k)
+			}
 
-		err = m.CreateClient(&Client{
-			ID:                "2-1234",
-			Secret:            "secret",
-			RedirectURIs:      []string{"http://redirect"},
-			TermsOfServiceURI: "foo",
+			err = m.CreateClient(&Client{
+				ID:                "2-1234",
+				Name:              "name",
+				Secret:            "secret",
+				RedirectURIs:      []string{"http://redirect"},
+				TermsOfServiceURI: "foo",
+			})
+			assert.Nil(t, err)
+
+			// RethinkDB delay
+			time.Sleep(100 * time.Millisecond)
+
+			d, err := m.GetClient("1234")
+			assert.Nil(t, err)
+			if err == nil {
+				compare(t, d, k)
+			}
+
+			ds, err := m.GetClients()
+			assert.Nil(t, err)
+			assert.Len(t, ds, 2)
+			assert.NotEqual(t, ds["1234"].ID, ds["2-1234"].ID)
+
+			err = m.UpdateClient(&Client{
+				ID:                "2-1234",
+				Name:              "name-new",
+				Secret:            "secret-new",
+				TermsOfServiceURI: "bar",
+			})
+			assert.Nil(t, err)
+			time.Sleep(100 * time.Millisecond)
+
+			nc, err := m.GetConcreteClient("2-1234")
+			assert.Nil(t, err)
+
+			if k != "http" {
+				// http always returns an empty secret
+				assert.NotEqual(t, d.GetHashedSecret(), nc.GetHashedSecret(), "%s", k)
+			}
+			assert.Equal(t, "bar", nc.TermsOfServiceURI, "%s", k)
+			assert.Equal(t, "name-new", nc.Name, "%s", k)
+			assert.EqualValues(t, []string{"http://redirect"}, nc.GetRedirectURIs(), "%s", k)
+
+			err = m.DeleteClient("1234")
+			assert.Nil(t, err)
+
+			// RethinkDB delay
+			time.Sleep(100 * time.Millisecond)
+
+			_, err = m.GetClient("1234")
+			assert.NotNil(t, err)
 		})
-		pkg.AssertError(t, false, err, "%s", k)
-
-		// RethinkDB delay
-		time.Sleep(100 * time.Millisecond)
-
-		d, err := m.GetClient("1234")
-		pkg.AssertError(t, false, err, "%s", k)
-		if err == nil {
-			compare(t, d, k)
-		}
-
-		ds, err := m.GetClients()
-		pkg.AssertError(t, false, err, "%s", k)
-		assert.Len(t, ds, 2)
-		assert.NotEqual(t, ds["1234"].ID, ds["2-1234"].ID)
-
-		err = m.UpdateClient(&Client{
-			ID:                "2-1234",
-			Secret:            "secret-new",
-			TermsOfServiceURI: "bar",
-		})
-		pkg.AssertError(t, false, err, "%s", k)
-		time.Sleep(100 * time.Millisecond)
-
-		nc, err := m.GetConcreteClient("2-1234")
-		if k != "http" {
-			// http always returns an empty secret
-			assert.NotEqual(t, d.GetHashedSecret(), nc.GetHashedSecret(), "%s", k)
-		}
-		assert.Equal(t, "bar", nc.TermsOfServiceURI, "%s", k)
-		assert.EqualValues(t, []string{"http://redirect"}, nc.GetRedirectURIs(), "%s", k)
-
-		err = m.DeleteClient("1234")
-		pkg.AssertError(t, false, err, "%s", k)
-
-		// RethinkDB delay
-		time.Sleep(100 * time.Millisecond)
-
-		_, err = m.GetClient("1234")
-		pkg.AssertError(t, true, err, "%s", k)
 	}
 }
 

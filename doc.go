@@ -1,9 +1,8 @@
-// Package hydra is an api-only cloud native OAuth2 and OpenID Connect provider that integrates with existing authentication mechanisms:
+// Package hydra is a server implementation of the OAuth 2.0 authorization framework and the OpenID Connect Core 1.0. Existing OAuth2 implementations usually ship as libraries or SDKs such as node-oauth2-server or fosite, or as fully featured identity solutions with user management and user interfaces, such as Dex.
 //
-// At first, there was the monolith. The monolith worked well with the bespoke authentication module. Then, the web evolved into an elastic cloud that serves thousands of different user agents in every part of the world.
-// Hydra is driven by the need for a scalable, low-latency, in memory Access Control, OAuth2, and OpenID Connect layer that integrates with every identity provider you can imagine.
-// Hydra is available through Docker and relies on RethinkDB for persistence. Database drivers are extensible in case you want to use RabbitMQ, MySQL, MongoDB, or some other database instead.
-// Hydra is built for high throughput environments. Check out the below siege benchmark on a Macbook Pro Late 2013, connected to RethinkDB validating access tokens.
+// Implementing and using OAuth2 without understanding the whole specification is challenging and prone to errors, even when SDKs are being used. The primary goal of Hydra is to make OAuth 2.0 and OpenID Connect 1.0 better accessible.
+//
+// Hydra implements the flows described in OAuth2 and OpenID Connect 1.0 without forcing you to use a "Hydra User Management" or some template engine or a predefined front-end. Instead it relies on HTTP redirection and cryptographic methods to verify user consent allowing you to use Hydra with any authentication endpoint, be it authboss, auth0.com or your proprietary PHP authentication.
 //
 // The official repository is located at https://github.com/ory-am/hydra
 package main

@@ -3,7 +3,7 @@ import:
 - package: github.com/Sirupsen/logrus
   version: ~0.10.0
 - package: github.com/asaskevich/govalidator
-  version: ~4.0.0
+  version: ~5.0.0
 - package: gopkg.in/dancannon/gorethink.v2
   version: ~2.1.3
 - package: github.com/go-errors/errors
@@ -18,7 +18,7 @@ import:
 - package: github.com/dgrijalva/jwt-go
   version: ~3.0.0
 - package: github.com/ory-am/fosite
-  version: ~0.3.5
+  version: ~0.5.0
   subpackages:
   - compose
   - fosite-example/pkg
@@ -28,17 +28,17 @@ import:
   - token/hmac
   - token/jwt
 - package: github.com/ory-am/ladon
-  version: ~0.2.0
+  version: ~0.3.3
 - package: github.com/pborman/uuid
   version: ~1.0.0
 - package: github.com/pkg/errors
-  version: ~0.7.0
+  version: ~0.8.0
 - package: github.com/pkg/profile
   version: ~1.2.0
 - package: github.com/spf13/cobra
 - package: github.com/spf13/viper
 - package: github.com/square/go-jose
-  version: ~1.0.3
+  version: ~1.1.0
   subpackages:
   - json
 - package: github.com/stretchr/testify
@@ -63,4 +63,4 @@ testImport:
 - package: github.com/gorilla/mux
   version: ~1.1.0
 - package: github.com/ory-am/dockertest
-  version: ~2.2.2
+  version: ~2.2.3

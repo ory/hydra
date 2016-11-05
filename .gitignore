@@ -12,3 +12,4 @@ cover.out
 output/
 _book/
 dist/
+coverage.*

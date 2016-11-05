@@ -8,8 +8,8 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/dockertest"
 	"github.com/ory-am/fosite"
+	"github.com/ory-am/hydra/compose"
 	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/hydra/internal"
 	. "github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
@@ -20,9 +20,13 @@ import (
 	"os"
 	"time"
 
-	"github.com/ory-am/fosite/rand"
+	"crypto/rand"
+	"fmt"
+	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
 	"github.com/square/go-jose"
 	"golang.org/x/net/context"
+	"io"
 	"net/http"
 )
 
@@ -34,7 +38,7 @@ var ts *httptest.Server
 var httpManager *HTTPManager
 
 func init() {
-	localWarden, httpClient := internal.NewFirewall(
+	localWarden, httpClient := compose.NewFirewall(
 		"tests",
 		"alice",
 		fosite.Arguments{
@@ -73,7 +77,60 @@ func init() {
 
 var rethinkManager = new(RethinkManager)
 
+func randomBytes(n int) ([]byte, error) {
+	bytes := make([]byte, n)
+	if _, err := io.ReadFull(rand.Reader, bytes); err != nil {
+		return []byte{}, errors.Wrap(err, "")
+	}
+	return bytes, nil
+}
+
+var encryptionKey, _ = randomBytes(32)
+
+var containers = []dockertest.ContainerID{}
+
 func TestMain(m *testing.M) {
+	defer func() {
+		for _, c := range containers {
+			c.KillRemove()
+		}
+	}()
+
+	connectToMySQL()
+	connectToRethinkDB()
+	connectToPG()
+
+	os.Exit(m.Run())
+}
+
+func connectToPG() {
+	var db *sqlx.DB
+	c, err := dockertest.ConnectToPostgreSQL(15, time.Second, func(url string) bool {
+		var err error
+		db, err = sqlx.Open("postgres", url)
+		if err != nil {
+			log.Printf("Got error in postgres connector: %s", err)
+			return false
+		}
+		return db.Ping() == nil
+	})
+
+	if err != nil {
+		log.Fatalf("Could not connect to database: %s", err)
+	}
+
+	containers = append(containers, c)
+	s := &SQLManager{DB: db, Cipher: &AEAD{Key: encryptionKey}}
+
+	if err = s.CreateSchemas(); err != nil {
+		log.Fatalf("Could not create postgres schema: %v", err)
+	}
+
+	managers["postgres"] = s
+	containers = append(containers, c)
+}
+
+func connectToRethinkDB() {
 	var session *r.Session
 	var err error
 
@@ -88,34 +145,51 @@ func TestMain(m *testing.M) {
 			return false
 		}
 
-		key, err := rand.RandomBytes(32)
-		if err != nil {
-			log.Printf("Could not watch: %s", err)
-			return false
-		}
 		rethinkManager = &RethinkManager{
 			Keys:    map[string]jose.JsonWebKeySet{},
 			Session: session,
 			Table:   r.Table("hydra_keys"),
 			Cipher: &AEAD{
-				Key: key,
+				Key: encryptionKey,
 			},
 		}
 		rethinkManager.Watch(context.Background())
 		time.Sleep(100 * time.Millisecond)
 		return true
 	})
-	if session != nil {
-		defer session.Close()
-	}
 	if err != nil {
 		log.Fatalf("Could not connect to database: %s", err)
 	}
-	managers["rethink"] = rethinkManager
 
-	retCode := m.Run()
-	c.KillRemove()
-	os.Exit(retCode)
+	containers = append(containers, c)
+	managers["rethink"] = rethinkManager
+}
+
+func connectToMySQL() {
+	var db *sqlx.DB
+	c, err := dockertest.ConnectToMySQL(15, time.Second, func(url string) bool {
+		var err error
+		db, err = sqlx.Open("mysql", url)
+		if err != nil {
+			log.Printf("Got error in mysql connector: %s", err)
+			return false
+		}
+		return db.Ping() == nil
+	})
+
+	if err != nil {
+		log.Fatalf("Could not connect to database: %s", err)
+	}
+
+	containers = append(containers, c)
+	s := &SQLManager{DB: db, Cipher: &AEAD{Key: encryptionKey}}
+
+	if err = s.CreateSchemas(); err != nil {
+		log.Fatalf("Could not create postgres schema: %v", err)
+	}
+
+	managers["mysql"] = s
+	containers = append(containers, c)
 }
 
 func BenchmarkRethinkGet(b *testing.B) {
@@ -191,40 +265,40 @@ func TestManagerKey(t *testing.T) {
 	pub := ks.Key("public")
 
 	for name, m := range managers {
-		t.Logf("Running test %s", name)
+		t.Run(fmt.Sprintf("case=%s", name), func(t *testing.T) {
+			_, err := m.GetKey("faz", "baz")
+			assert.NotNil(t, err)
 
-		_, err := m.GetKey("faz", "baz")
-		pkg.AssertError(t, true, err, name)
+			err = m.AddKey("faz", First(priv))
+			assert.Nil(t, err)
 
-		err = m.AddKey("faz", First(priv))
-		pkg.AssertError(t, false, err, name)
+			time.Sleep(time.Millisecond * 100)
 
-		time.Sleep(time.Millisecond * 100)
+			got, err := m.GetKey("faz", "private")
+			assert.Nil(t, err)
+			assert.Equal(t, priv, got.Keys, "%s", name)
 
-		got, err := m.GetKey("faz", "private")
-		pkg.RequireError(t, false, err, name)
-		assert.Equal(t, priv, got.Keys, "%s", name)
+			err = m.AddKey("faz", First(pub))
+			assert.Nil(t, err)
 
-		err = m.AddKey("faz", First(pub))
-		pkg.AssertError(t, false, err, name)
+			time.Sleep(time.Millisecond * 100)
 
-		time.Sleep(time.Millisecond * 100)
+			got, err = m.GetKey("faz", "private")
+			assert.Nil(t, err)
+			assert.Equal(t, priv, got.Keys, "%s", name)
 
-		got, err = m.GetKey("faz", "private")
-		pkg.RequireError(t, false, err, name)
-		assert.Equal(t, priv, got.Keys, "%s", name)
+			got, err = m.GetKey("faz", "public")
+			assert.Nil(t, err)
+			assert.Equal(t, pub, got.Keys, "%s", name)
 
-		got, err = m.GetKey("faz", "public")
-		pkg.RequireError(t, false, err, name)
-		assert.Equal(t, pub, got.Keys, "%s", name)
+			err = m.DeleteKey("faz", "public")
+			assert.Nil(t, err)
 
-		err = m.DeleteKey("faz", "public")
-		pkg.AssertError(t, false, err, name)
+			time.Sleep(time.Millisecond * 100)
 
-		time.Sleep(time.Millisecond * 100)
-
-		ks, err = m.GetKey("faz", "public")
-		pkg.AssertError(t, true, err, name)
+			ks, err = m.GetKey("faz", "public")
+			assert.NotNil(t, err)
+		})
 	}
 
 	err := managers["http"].AddKey("nonono", First(priv))
@@ -236,26 +310,28 @@ func TestManagerKeySet(t *testing.T) {
 	ks.Key("private")
 
 	for name, m := range managers {
-		_, err := m.GetKeySet("foo")
-		pkg.AssertError(t, true, err, name)
+		t.Run(fmt.Sprintf("case=%s", name), func(t *testing.T) {
+			_, err := m.GetKeySet("foo")
+			pkg.AssertError(t, true, err, name)
 
-		err = m.AddKeySet("bar", ks)
-		pkg.AssertError(t, false, err, name)
+			err = m.AddKeySet("bar", ks)
+			assert.Nil(t, err)
 
-		time.Sleep(time.Millisecond * 100)
+			time.Sleep(time.Millisecond * 100)
 
-		got, err := m.GetKeySet("bar")
-		pkg.RequireError(t, false, err, name)
-		assert.Equal(t, ks.Key("public"), got.Key("public"), name)
-		assert.Equal(t, ks.Key("private"), got.Key("private"), name)
+			got, err := m.GetKeySet("bar")
+			assert.Nil(t, err)
+			assert.Equal(t, ks.Key("public"), got.Key("public"), name)
+			assert.Equal(t, ks.Key("private"), got.Key("private"), name)
 
-		err = m.DeleteKeySet("bar")
-		pkg.AssertError(t, false, err, name)
+			err = m.DeleteKeySet("bar")
+			assert.Nil(t, err)
 
-		time.Sleep(time.Millisecond * 100)
+			time.Sleep(time.Millisecond * 100)
 
-		_, err = m.GetKeySet("bar")
-		pkg.AssertError(t, true, err, name)
+			_, err = m.GetKeySet("bar")
+			assert.NotNil(t, err)
+		})
 	}
 
 	err := managers["http"].AddKeySet("nonono", ks)

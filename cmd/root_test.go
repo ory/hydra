@@ -36,21 +36,27 @@ func TestExecute(t *testing.T) {
 			},
 		},
 		{args: []string{"clients", "create", "--id", "foobarbaz"}},
-		{args: []string{"clients", "create", "--id", "foobarbaz", "--dry"}},
+		{args: []string{"clients", "create", "--id", "public-foo", "--is-public"}},
 		{args: []string{"clients", "delete", "foobarbaz"}},
 		{args: []string{"keys", "create", "foo", "-a", "HS256"}},
-		{args: []string{"keys", "create", "foo", "-a", "HS256", "--dry"}},
 		{args: []string{"keys", "create", "foo", "-a", "HS256"}},
 		{args: []string{"keys", "get", "foo"}},
 		{args: []string{"keys", "delete", "foo"}},
-		{args: []string{"connections", "create", "google", "localuser", "googleuser"}},
-		{args: []string{"connections", "create", "google", "localuser", "googleuser", "--dry"}},
 		{args: []string{"token", "client"}},
-		{args: []string{"policies", "create", "../dist/policies/noone-can-read-private-keys.json"}},
+		{args: []string{"token", "user", "--no-open"}, wait: func() bool {
+			time.Sleep(time.Millisecond * 10)
+			return false
+		}},
 		{args: []string{"policies", "create", "-i", "foobar", "-s", "peter", "max", "-r", "blog", "users", "-a", "post", "ban", "--allow"}},
-		{args: []string{"policies", "create", "-i", "foobar", "-s", "peter", "max", "-r", "blog", "users", "-a", "post", "ban", "--allow", "--dry"}},
+		{args: []string{"policies", "actions", "add", "foobar", "update|create"}},
+		{args: []string{"policies", "actions", "delete", "foobar", "update|create"}},
+		{args: []string{"policies", "resources", "add", "foobar", "printer"}},
+		{args: []string{"policies", "resources", "delete", "foobar", "printer"}},
+		{args: []string{"policies", "subjects", "add", "foobar", "ken", "tracy"}},
+		{args: []string{"policies", "subjects", "delete", "foobar", "ken", "tracy"}},
 		{args: []string{"policies", "get", "foobar"}},
 		{args: []string{"policies", "delete", "foobar"}},
+		{args: []string{"version"}},
 	} {
 		c.args = append(c.args, []string{"--skip-tls-verify", "--config", path}...)
 		RootCmd.SetArgs(c.args)

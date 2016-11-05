@@ -4,11 +4,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pkg/errors"
-	"github.com/ory-am/fosite/fosite-example/pkg"
 	"github.com/ory-am/fosite/handler/oauth2"
+	"github.com/ory-am/fosite/storage"
 	"github.com/ory-am/fosite/token/hmac"
 	"github.com/ory-am/ladon"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -53,8 +53,8 @@ func LadonWarden(ps map[string]ladon.Policy) ladon.Warden {
 	}
 }
 
-func FositeStore() *pkg.Store {
-	return pkg.NewStore()
+func FositeStore() *storage.MemoryStore {
+	return storage.NewMemoryStore()
 }
 
 func Tokens(length int) (res [][]string) {

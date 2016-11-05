@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/pkg/errors"
 	"github.com/gorilla/mux"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
@@ -15,10 +15,10 @@ import (
 
 var (
 	exampleError = &Error{
-		Name: "not-found",
-		OriginalError:  errors.New("Not found"),
-		StatusCode: http.StatusNotFound,
-		Description: "test",
+		Name:          "not-found",
+		OriginalError: errors.New("Not found"),
+		StatusCode:    http.StatusNotFound,
+		Description:   "test",
 	}
 )
 

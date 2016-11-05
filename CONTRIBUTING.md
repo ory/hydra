@@ -1,5 +1,22 @@
 # Contribution Guide
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Introduction](#introduction)
+- [Contributing Code](#contributing-code)
+- [Disclosing vulnerabilities](#disclosing-vulnerabilities)
+- [Code Style](#code-style)
+- [Developer’s Certificate of Origin](#developer%E2%80%99s-certificate-of-origin)
+- [Pull request procedure](#pull-request-procedure)
+- [Communication](#communication)
+- [Conduct](#conduct)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## Introduction
+
 We welcome and encourage community contributions to Hydra.
 
 Since the project is still unstable, there are specific priorities for development. Pull requests that do not address these priorities will not be accepted until Hydra is production ready.
@@ -20,6 +37,10 @@ All contributions are made via pull request. Note that **all patches from all co
 At least one review from a maintainer is required for all patches (even patches from maintainers).
 
 Reviewers should leave a "LGTM" comment once they are satisfied with the patch. If the patch was submitted by a maintainer with write access, the pull request should be merged by the submitter after review.
+
+## Disclosing vulnerabilities
+
+Please disclose vulnerabilities exclusively to [hi@ory.am](mailto:hi@ory.am). Do not use GitHub issues.
 
 ## Code Style
 

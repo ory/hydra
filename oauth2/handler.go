@@ -4,12 +4,13 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/pkg/errors"
+	"encoding/json"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
-	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/pkg/errors"
+	"strings"
 )
 
 const (
@@ -21,15 +22,14 @@ const (
 
 	// IntrospectPath points to the OAuth2 introspection endpoint.
 	IntrospectPath = "/oauth2/introspect"
+	RevocationPath = "/oauth2/revoke"
 )
 
 type Handler struct {
 	OAuth2  fosite.OAuth2Provider
 	Consent ConsentStrategy
 
-	Introspector Introspector
-	Firewall     firewall.Firewall
-	H            herodot.Herodot
+	H herodot.Herodot
 
 	ForcedHTTP bool
 	ConsentURL url.URL
@@ -40,34 +40,47 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET(AuthPath, h.AuthHandler)
 	r.POST(AuthPath, h.AuthHandler)
 	r.GET(ConsentPath, h.DefaultConsentHandler)
-	r.POST(IntrospectPath, h.Introspect)
+	r.POST(IntrospectPath, h.IntrospectHandler)
+	r.POST(RevocationPath, h.RevocationHandler)
 }
 
-func (h *Handler) Introspect(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var inactive = map[string]bool{"active": false}
+func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	var ctx = fosite.NewContext()
 
-	ctx := herodot.NewContext()
-	clientCtx, err := h.Firewall.TokenValid(ctx, h.Firewall.TokenFromRequest(r))
+	err := h.OAuth2.NewRevocationRequest(ctx, r)
 	if err != nil {
-		h.H.WriteError(ctx, w, r, err)
-		return
+		pkg.LogError(err)
 	}
 
-	if err := r.ParseForm(); err != nil {
-		h.H.WriteError(ctx, w, r, err)
-		return
-	}
+	h.OAuth2.WriteRevocationResponse(w, err)
+}
 
-	auth, err := h.Introspector.IntrospectToken(ctx, r.PostForm.Get("token"))
+func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	var session = NewSession("")
+	var ctx = fosite.NewContext()
+	resp, err := h.OAuth2.NewIntrospectionRequest(ctx, r, session)
 	if err != nil {
-		h.H.Write(ctx, w, r, &inactive)
-		return
-	} else if clientCtx.Subject != auth.Audience {
-		h.H.Write(ctx, w, r, &inactive)
+		pkg.LogError(err)
+		h.OAuth2.WriteIntrospectionError(w, err)
 		return
 	}
 
-	h.H.Write(ctx, w, r, auth)
+	if !resp.IsActive() {
+		_ = json.NewEncoder(w).Encode(&Introspection{Active: false})
+		return
+	}
+
+	_ = json.NewEncoder(w).Encode(&Introspection{
+		Active:    true,
+		ClientID:  resp.GetAccessRequester().GetClient().GetID(),
+		Scope:     strings.Join(resp.GetAccessRequester().GetGrantedScopes(), " "),
+		ExpiresAt: resp.GetAccessRequester().GetSession().GetExpiresAt(fosite.AccessToken).Unix(),
+		IssuedAt:  resp.GetAccessRequester().GetRequestedAt().Unix(),
+		Subject:   resp.GetAccessRequester().GetSession().GetSubject(),
+		Username:  resp.GetAccessRequester().GetSession().GetUsername(),
+		Extra:     resp.GetAccessRequester().GetSession().(*Session).Extra,
+		Audience:  resp.GetAccessRequester().GetClient().GetID(),
+	})
 }
 
 func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

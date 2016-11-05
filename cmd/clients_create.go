@@ -23,5 +23,6 @@ func init() {
 	clientsCreateCmd.Flags().StringSliceP("grant-types", "g", []string{"authorization_code"}, "A list of allowed grant types")
 	clientsCreateCmd.Flags().StringSliceP("response-types", "r", []string{"code"}, "A list of allowed response types")
 	clientsCreateCmd.Flags().StringSliceP("allowed-scopes", "a", []string{""}, "A list of allowed scopes")
+	clientsCreateCmd.Flags().Bool("is-public", false, "Use this flag to create a public client")
 	clientsCreateCmd.Flags().StringP("name", "n", "", "The client's name")
 }

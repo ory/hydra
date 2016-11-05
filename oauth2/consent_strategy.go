@@ -1,17 +1,17 @@
 package oauth2
 
 import (
+	"crypto/rsa"
 	"fmt"
 	"time"
-	"crypto/rsa"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/pkg/errors"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/handler/openid"
 	ejwt "github.com/ory-am/fosite/token/jwt"
 	"github.com/ory-am/hydra/jwk"
 	"github.com/pborman/uuid"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -77,7 +77,6 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 	}
 
 	return &Session{
-		Subject: subject,
 		DefaultSession: &openid.DefaultSession{
 			Claims: &ejwt.IDTokenClaims{
 				Audience:  a.GetClient().GetID(),
@@ -88,6 +87,7 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 				Extra:     idExt,
 			},
 			Headers: &ejwt.Headers{},
+			Subject: subject,
 		},
 		Extra: atExt,
 	}, err

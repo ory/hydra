@@ -1,4 +1,4 @@
-package internal
+package compose
 
 import (
 	"net/http"
@@ -35,7 +35,7 @@ func NewFirewall(issuer string, subject string, scopes fosite.Arguments, p ...la
 			Warden: ladonWarden,
 			OAuth2: &fosite.Fosite{
 				Store: fositeStore,
-				TokenValidators: fosite.TokenValidators{
+				TokenIntrospectionHandlers: fosite.TokenIntrospectionHandlers{
 					&foauth2.CoreValidator{
 						CoreStrategy:  pkg.HMACStrategy,
 						CoreStorage:   fositeStore,

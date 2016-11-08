@@ -64,3 +64,4 @@ testImport:
   version: ~1.1.0
 - package: github.com/ory-am/dockertest
   version: ~2.2.3
+- package: github.com/jingweno/negroni-gorelic

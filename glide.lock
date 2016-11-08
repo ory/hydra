@@ -1,5 +1,5 @@
-hash: 18b2d7631e4e950d4e18b6ec76906081980e532850d32c19e414259b8293fe9a
-updated: 2016-10-21T22:08:32.7305955+02:00
+hash: 186d7c84ea297302c787ad77a266e997515e7cb18d01728b27839779078a2a9c
+updated: 2016-10-31T12:44:38.456200179-07:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
@@ -38,6 +38,8 @@ imports:
   version: 50d4dbd4eb0e84778abe37cefef140271d96fade
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
+- name: github.com/jingweno/negroni-gorelic
+  version: 0547cdd62f4b911984d435279bd46b4d1a580823
 - name: github.com/jmoiron/sqlx
   version: 05b81a7d5d38058e42148dc01f17daf4acba4640
   subpackages:
@@ -126,6 +128,12 @@ imports:
   version: 21fc9f95c83442fd164094666f7cb4f9fdd56cd6
 - name: github.com/urfave/negroni
   version: fde5e16d32adc7ad637e9cd9ad21d4ebc6192535
+- name: github.com/yvasiyarov/go-metrics
+  version: c25f46c4b94079672242ec48a545e7ca9ebe3aec
+- name: github.com/yvasiyarov/gorelic
+  version: ae09aa139a2b7f638e2412baceaceebd41eff115
+- name: github.com/yvasiyarov/newrelic_platform_go
+  version: 9c099fbc30e90de5bb5c5f94aa5fd08f2daeaacd
 - name: golang.org/x/crypto
   version: e0d166c33c321d0ff863f459a5882096e334f508
   subpackages:
@@ -164,6 +172,8 @@ imports:
   - internal/remote_api
   - internal/urlfetch
   - urlfetch
+- name: gopkg.in/airbrake/gobrake.v2
+  version: 5d77bd50d083834501349f8be70197b26963674d
 - name: gopkg.in/dancannon/gorethink.v2
   version: 27d3045458910e2fc56025a0b52caaaa96414a26
   subpackages:
@@ -186,5 +196,7 @@ testImports:
   version: 1ea25387ff6f684839d82767c1733ff4d4d15d0a
 - name: github.com/gorilla/mux
   version: 0eeaf8392f5b04950925b8a69fe70f110fa7cbfc
+- name: github.com/jingweno/negroni-gorelic
+  version: 0547cdd62f4b911984d435279bd46b4d1a580823
 - name: github.com/ory-am/dockertest
   version: edb9d9444e6868c1b1e279098b628e7b8e6f0714

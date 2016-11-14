@@ -17,7 +17,7 @@
 [![HTTP API Documentation](https://img.shields.io/badge/docs-http%20api-blue.svg)](http://docs.hdyra.apiary.io/)
 [![Code Documentation](https://img.shields.io/badge/docs-godoc-blue.svg)](https://godoc.org/github.com/ory-am/hydra)
 
-Hydra is a runnable server implementation of the OAuth2 2.0 authorization framework and the OpenID Connect Core 1.0.
+Hydra is a runnable server implementation of the OAuth 2.0 authorization framework and the OpenID Connect Core 1.0. Hydra acts as a middle-man infrastructure between your existing application and any OAuth 2.0 / OpenID Connect clients that consume your APIs.
 
 Join our [newsletter](http://eepurl.com/bKT3N9) to stay on top of new developments.
 We answer basic support requests on [Google Groups](https://groups.google.com/forum/#!forum/ory-hydra/new) and [Gitter](https://gitter.im/ory-am/hydra)

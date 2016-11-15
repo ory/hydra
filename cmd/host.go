@@ -134,5 +134,5 @@ func init() {
 	hostCmd.Flags().String("https-tls-key-path", "", "Path to the key file for HTTP/2 over TLS (https). You can set HTTPS_TLS_KEY_PATH or HTTPS_TLS_KEY instead.")
 	hostCmd.Flags().String("https-tls-cert-path", "", "Path to the certificate file for HTTP/2 over TLS (https). You can set HTTPS_TLS_CERT_PATH or HTTPS_TLS_CERT instead.")
 	hostCmd.Flags().String("rethink-tls-cert-path", "", "Path to the certificate file to connect to rethinkdb over TLS (https). You can set RETHINK_TLS_CERT_PATH or RETHINK_TLS_CERT instead.")
-	hostCmd.Flags().Bool("new-relic-verbose", false, "Send verbose data to NewRelic")
+	hostCmd.Flags().Bool("new-relic-verbose", false, "Print verbose NewRelic info to log")
 }

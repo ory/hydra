@@ -87,10 +87,12 @@ func sqlSchemaFromRequest(signature string, r fosite.Requester) (*sqlData, error
 }
 
 func (s *sqlData) ToRequest(session fosite.Session, cm client.Manager) (*fosite.Request, error) {
-	if session != nil {
-		if err := json.Unmarshal(s.Session, session); err != nil {
-			return nil, errors.Wrap(err, "")
-		}
+	if session == nil {
+		return nil, errors.New("Session undefined")
+	}
+
+	if err := json.Unmarshal(s.Session, session); err != nil {
+		return nil, errors.Wrap(err, "")
 	}
 
 	c, err := cm.GetClient(s.Client)
@@ -103,7 +105,7 @@ func (s *sqlData) ToRequest(session fosite.Session, cm client.Manager) (*fosite.
 		return nil, errors.Wrap(err, "")
 	}
 
-	return &fosite.Request{
+	r := &fosite.Request{
 		ID:            s.Request,
 		RequestedAt:   s.RequestedAt,
 		Client:        c,
@@ -111,7 +113,9 @@ func (s *sqlData) ToRequest(session fosite.Session, cm client.Manager) (*fosite.
 		GrantedScopes: fosite.Arguments(strings.Split(s.GrantedScopes, "|")),
 		Form:          val,
 		Session:       session,
-	}, nil
+	}
+
+	return r, nil
 }
 
 func (s *FositeSQLStore) createSession(signature string, requester fosite.Requester, table string) error {

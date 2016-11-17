@@ -144,6 +144,7 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 		},
 		ConsentURL: *consentURL,
 		H:          &herodot.JSON{},
+		AccessTokenLifespan:c.GetAccessTokenLifespan(),
 	}
 
 	handler.SetRoutes(router)

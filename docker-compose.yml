@@ -22,6 +22,9 @@ services:
 #     Uncomment the following line to use mysql instead.
 #      - DATABASE_URL=mysql://root:secret@tcp(mysqld:3306)/mysql?parseTime=true
       - FORCE_ROOT_CLIENT_CREDENTIALS=admin:demo-password
+      - ACCESS_TOKEN_LIFESPAN=${ACCESS_TOKEN_LIFESPAN}
+      - ID_TOKEN_LIFESPAN=${ID_TOKEN_LIFESPAN}
+      - AUTHORIZE_CODE_LIFESPAN=${AUTHORIZE_CODE_LIFESPAN}
     restart: unless-stopped
 
   consent:
@@ -39,6 +42,8 @@ services:
 
   postgresd:
     image: postgres:9.6
+    ports:
+      - "5432:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=secret

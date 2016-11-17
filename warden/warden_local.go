@@ -81,13 +81,18 @@ func (w *LocalWarden) sessionAllowed(ctx context.Context, a *firewall.TokenAcces
 
 func (w *LocalWarden) newContext(oauthRequest fosite.AccessRequester) *firewall.Context {
 	session := oauthRequest.GetSession().(*oauth2.Session)
+
+	exp := oauthRequest.GetSession().GetExpiresAt(fosite.AccessToken)
+	if exp.IsZero() {
+		exp = oauthRequest.GetRequestedAt().Add(w.AccessTokenLifespan)
+	}
 	c := &firewall.Context{
 		Subject:       session.Subject,
 		GrantedScopes: oauthRequest.GetGrantedScopes(),
 		Issuer:        w.Issuer,
 		Audience:      oauthRequest.GetClient().GetID(),
 		IssuedAt:      oauthRequest.GetRequestedAt(),
-		ExpiresAt:     session.GetExpiresAt(fosite.AccessToken),
+		ExpiresAt:     exp,
 		Extra:         session.Extra,
 	}
 

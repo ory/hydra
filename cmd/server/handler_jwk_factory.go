@@ -46,6 +46,15 @@ func injectJWKManager(c *config.Config) {
 		m.Watch(context.Background())
 		ctx.KeyManager = m
 		break
+	case *config.RedisConnection:
+		m := &jwk.RedisManager{
+			DB: con.RedisSession(),
+			Cipher: &jwk.AEAD{
+				c.GetSystemSecret(),
+			},
+		}
+		ctx.KeyManager = m
+		break
 	default:
 		logrus.Fatalf("Unknown connection type.")
 	}

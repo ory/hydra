@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/url"
 
+	"strconv"
 	"time"
 
 	"github.com/Sirupsen/logrus"
@@ -16,6 +17,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	r "gopkg.in/dancannon/gorethink.v2"
+	"gopkg.in/redis.v5"
 	"strings"
 )
 
@@ -151,4 +153,47 @@ func (c *RethinkDBConnection) CreateTableIfNotExists(table string) {
 	}).RunWrite(c.GetSession()); err != nil {
 		logrus.Fatalf("Could not create table: %s", err)
 	}
+}
+
+type RedisConnection struct {
+	db  *redis.Client
+	URL *url.URL
+}
+
+func (c *RedisConnection) RedisSession() *redis.Client {
+	if c.db != nil {
+		return c.db
+	}
+
+	var password string
+	var database int
+	var err error
+
+	if len(c.URL.Path) <= 1 {
+		logrus.Infof("Defaulting database to 0.")
+		database = 0
+	} else {
+		database, err = strconv.Atoi(c.URL.Path[1:])
+		if err != nil {
+			logrus.Fatalf("Database must be an integer.")
+		}
+	}
+
+	if c.URL.User != nil {
+		if p, exists := c.URL.User.Password(); exists {
+			password = p
+		} else {
+			// No username, so first value is taken as password
+			password = c.URL.User.Username()
+		}
+	}
+
+	options := &redis.Options{
+		Addr:     c.URL.Host,
+		Password: password,
+		DB:       database,
+	}
+
+	c.db = redis.NewClient(options)
+	return c.db
 }

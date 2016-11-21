@@ -1,5 +1,5 @@
-hash: 0187ab27e5d927f43a0faca5d90fa8f1d3c52d5361cef95355a257c966401645
-updated: 2016-11-17T16:40:00.870214549+01:00
+hash: 31e7231d66f3fcaccd3201aa0f2064072713bb3059048c8a62713eb9c63e1981
+updated: 2016-11-22T09:42:53.651264823Z
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
@@ -79,7 +79,7 @@ imports:
   - token/hmac
   - token/jwt
 - name: github.com/ory-am/ladon
-  version: 26796832b64dc1d8c8a0b69f5969fd6794a6b6f1
+  version: 3938d6100f13f2bebdb1228eb39de1a3373d9b25
 - name: github.com/pborman/uuid
   version: a97ce2ca70fa5a848076093f05e639a89ca34d06
 - name: github.com/pelletier/go-buffruneio

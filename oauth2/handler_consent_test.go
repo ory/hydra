@@ -1,11 +1,11 @@
 package oauth2
 
 import (
-	"net/http/httptest"
-	"net/http"
-	"io/ioutil"
 	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 )
 

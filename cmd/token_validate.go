@@ -7,7 +7,7 @@ import (
 // validateCmd represents the validate command
 var tokenValidatorCmd = &cobra.Command{
 	Use:   "validate <token>",
-	Short: "Check if an access token is valid.",
+	Short: "Check if an access token is valid",
 	Run:   cmdHandler.Warden.IsAuthorized,
 }
 

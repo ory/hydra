@@ -42,6 +42,7 @@ func TestExecute(t *testing.T) {
 		{args: []string{"keys", "create", "foo", "-a", "HS256"}},
 		{args: []string{"keys", "get", "foo"}},
 		{args: []string{"keys", "delete", "foo"}},
+		{args: []string{"token", "revoke", "foo"}},
 		{args: []string{"token", "client"}},
 		{args: []string{"token", "user", "--no-open"}, wait: func() bool {
 			time.Sleep(time.Millisecond * 10)

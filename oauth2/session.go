@@ -1,11 +1,11 @@
 package oauth2
 
 import (
-	"github.com/ory-am/fosite/handler/openid"
-	"github.com/ory-am/fosite/token/jwt"
-	"github.com/ory-am/fosite"
 	"bytes"
 	"encoding/gob"
+	"github.com/ory-am/fosite"
+	"github.com/ory-am/fosite/handler/openid"
+	"github.com/ory-am/fosite/token/jwt"
 )
 
 type Session struct {

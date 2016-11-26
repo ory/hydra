@@ -45,7 +45,7 @@ CORE CONTROLS
 		Example: RETHINK_TLS_CERT_PATH="-----BEGIN CERTIFICATE-----\nMIIDZTCCAk2gAwIBAgIEV5xOtDANBgkqhkiG9w0BAQ0FADA0MTIwMAYDVQQDDClP..."
 
   - Redis: If DATABASE_URL is a DNS starting with redis:// Redis will be used as a storage backend.
-		Example: DATABASE_URL=redis://x:password@host:123/0
+		Example: DATABASE_URL=redis://x:password@host:6379/0
 
 - SYSTEM_SECRET: A secret that is at least 16 characters long. If none is provided, one will be generated. They key
 	is used to encrypt sensitive data using AES-GCM (256 bit) and validate HMAC signatures.

@@ -251,10 +251,12 @@ func (s *FositeRedisStore) RevokeRefreshToken(ctx context.Context, id string) er
 	pipe := s.DB.Pipeline()
 	defer pipe.Close()
 
-	iter := s.DB.SScan(s.redisKey(redisRefresh, id), 0, "", 0).Iterator()
+	refreshSet := s.redisKey(redisRefresh, id)
+	iter := s.DB.SScan(refreshSet, 0, "", 0).Iterator()
 	for iter.Next() {
 		sig := iter.Val()
 		pipe.HDel(redisRefresh, sig)
+		pipe.SRem(refreshSet, sig)
 	}
 	if err := iter.Err(); err != nil {
 		return err
@@ -268,10 +270,12 @@ func (s *FositeRedisStore) RevokeAccessToken(ctx context.Context, id string) err
 	pipe := s.DB.Pipeline()
 	defer pipe.Close()
 
-	iter := s.DB.SScan(s.redisKey(redisAccess, id), 0, "", 0).Iterator()
+	accessSet := s.redisKey(redisAccess, id)
+	iter := s.DB.SScan(accessSet, 0, "", 0).Iterator()
 	for iter.Next() {
 		sig := iter.Val()
 		pipe.HDel(redisAccess, sig)
+		pipe.SRem(accessSet, sig)
 	}
 	if err := iter.Err(); err != nil {
 		return err

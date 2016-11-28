@@ -1,5 +1,5 @@
-hash: 0187ab27e5d927f43a0faca5d90fa8f1d3c52d5361cef95355a257c966401645
-updated: 2016-11-17T16:40:00.870214549+01:00
+hash: 31e7231d66f3fcaccd3201aa0f2064072713bb3059048c8a62713eb9c63e1981
+updated: 2016-11-22T09:42:53.651264823Z
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
@@ -79,7 +79,7 @@ imports:
   - token/hmac
   - token/jwt
 - name: github.com/ory-am/ladon
-  version: 26796832b64dc1d8c8a0b69f5969fd6794a6b6f1
+  version: 3938d6100f13f2bebdb1228eb39de1a3373d9b25
 - name: github.com/pborman/uuid
   version: a97ce2ca70fa5a848076093f05e639a89ca34d06
 - name: github.com/pelletier/go-buffruneio
@@ -164,6 +164,8 @@ imports:
   - internal/remote_api
   - internal/urlfetch
   - urlfetch
+- name: gopkg.in/bsm/ratelimit.v1
+  version: db14e161995a5177acef654cb0dd785e8ee8bc22
 - name: gopkg.in/dancannon/gorethink.v2
   version: 27d3045458910e2fc56025a0b52caaaa96414a26
   subpackages:
@@ -172,6 +174,14 @@ imports:
   - types
 - name: gopkg.in/fatih/pool.v2
   version: 20a0a429c5f93de45c90f5f09ea297c25e0929b3
+- name: gopkg.in/redis.v5
+  version: b6bfe529a846fbb9a58c832ce71c61b6fde12c15
+  subpackages:
+  - internal
+  - internal/consistenthash
+  - internal/hashtag
+  - internal/pool
+  - internal/proto
 - name: gopkg.in/square/go-jose.v1
   version: aa2e30fdd1fe9dd3394119af66451ae790d50e0d
   subpackages:

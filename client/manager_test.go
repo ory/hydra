@@ -25,6 +25,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
+	"gopkg.in/redis.v5"
 )
 
 var clientManagers = map[string]Storage{}
@@ -78,6 +79,7 @@ func TestMain(m *testing.M) {
 	connectToPG()
 	connectToRethinkDB()
 	connectToMySQL()
+	connectToRedis()
 
 	os.Exit(m.Run())
 }
@@ -172,6 +174,28 @@ func connectToRethinkDB() {
 	containers = append(containers, c)
 	clientManagers["rethink"] = rethinkManager
 }
+
+func connectToRedis() {
+	var db *redis.Client
+	c, err := dockertest.ConnectToRedis(15, time.Second, func(url string) bool {
+		db = redis.NewClient(&redis.Options{
+			Addr: url,
+		})
+
+		return db.Ping().Err() == nil
+	})
+
+	if err != nil {
+		log.Fatalf("Could not connect to database: %s", err)
+	}
+
+	containers = append(containers, c)
+	clientManagers["redis"] = &RedisManager{
+		DB:     db,
+		Hasher: &fosite.BCrypt{WorkFactor: 4},
+	}
+}
+
 func TestClientAutoGenerateKey(t *testing.T) {
 	for k, m := range clientManagers {
 		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {

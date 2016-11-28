@@ -28,7 +28,7 @@ import:
   - token/hmac
   - token/jwt
 - package: github.com/ory-am/ladon
-  version: ~0.3.3
+  version: ~0.3.4
 - package: github.com/pborman/uuid
   version: ~1.0.0
 - package: github.com/pkg/errors
@@ -59,6 +59,7 @@ import:
 - package: gopkg.in/tylerb/graceful.v1
   version: ~1.2.11
 - package: gopkg.in/yaml.v2
+- package: gopkg.in/redis.v5
 testImport:
 - package: github.com/gorilla/mux
   version: ~1.1.0

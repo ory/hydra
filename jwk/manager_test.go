@@ -15,6 +15,7 @@ import (
 	"github.com/ory-am/ladon"
 	"github.com/stretchr/testify/assert"
 	r "gopkg.in/dancannon/gorethink.v2"
+	"gopkg.in/redis.v5"
 
 	"log"
 	"os"
@@ -99,6 +100,7 @@ func TestMain(m *testing.M) {
 	connectToMySQL()
 	connectToRethinkDB()
 	connectToPG()
+	connectToRedis()
 
 	os.Exit(m.Run())
 }
@@ -190,6 +192,27 @@ func connectToMySQL() {
 
 	managers["mysql"] = s
 	containers = append(containers, c)
+}
+
+func connectToRedis() {
+	var db *redis.Client
+	c, err := dockertest.ConnectToRedis(15, time.Second, func(url string) bool {
+		db = redis.NewClient(&redis.Options{
+			Addr: url,
+		})
+
+		return db.Ping().Err() == nil
+	})
+
+	if err != nil {
+		log.Fatalf("Could not connect to database: %s", err)
+	}
+
+	containers = append(containers, c)
+	managers["redis"] = &RedisManager{
+		DB:     db,
+		Cipher: &AEAD{Key: encryptionKey},
+	}
 }
 
 func BenchmarkRethinkGet(b *testing.B) {

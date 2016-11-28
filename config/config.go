@@ -151,6 +151,9 @@ func (c *Config) Context() *Context {
 		case "mysql":
 			connection = &SQLConnection{URL: u}
 			break
+		case "redis":
+			connection = &RedisConnection{URL: u}
+			break
 		default:
 			logrus.Fatalf("Unkown DSN %s in DATABASE_URL: %s", u.Scheme, c.DatabaseURL)
 		}
@@ -180,6 +183,10 @@ func (c *Config) Context() *Context {
 		if err := m.ColdStart(); err != nil {
 			logrus.Fatalf("Could not fetch initial state: %s", err)
 		}
+		manager = m
+		break
+	case *RedisConnection:
+		m := ladon.NewRedisManager(con.RedisSession(), "")
 		manager = m
 		break
 	default:

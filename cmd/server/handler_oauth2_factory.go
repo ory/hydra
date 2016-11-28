@@ -67,6 +67,13 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 		m.Watch(context.Background())
 		store = m
 		break
+	case *config.RedisConnection:
+		m := &oauth2.FositeRedisStore{
+			DB:      con.RedisSession(),
+			Manager: clients,
+		}
+		store = m
+		break
 	default:
 		panic("Unknown connection type.")
 	}

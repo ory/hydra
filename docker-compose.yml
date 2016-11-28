@@ -8,7 +8,10 @@ services:
       dockerfile: Dockerfile-demo
     links:
       - postgresd:postgresd
-      - mysqld:mysqld
+#     Uncomment the following line to use mysql instead.
+#      - mysqld:mysqld
+#     Uncomment the following line to use redis instead.
+#      - redisd:redisd
     volumes:
       - hydravolume:/root
     ports:
@@ -21,6 +24,8 @@ services:
       - DATABASE_URL=postgres://postgres:secret@postgresd:5432/postgres?sslmode=disable
 #     Uncomment the following line to use mysql instead.
 #      - DATABASE_URL=mysql://root:secret@tcp(mysqld:3306)/mysql?parseTime=true
+#     Uncomment the following line to use redis instead.
+#      - DATABASE_URL=redis://redisd:6379/0
       - FORCE_ROOT_CLIENT_CREDENTIALS=admin:demo-password
       - ACCESS_TOKEN_LIFESPAN=${ACCESS_TOKEN_LIFESPAN}
       - ID_TOKEN_LIFESPAN=${ID_TOKEN_LIFESPAN}
@@ -48,10 +53,15 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=secret
 
-  mysqld:
-    image: mysql:5.7
-    environment:
-      - MYSQL_ROOT_PASSWORD=secret
+#  Uncomment the following section to use mysql instead.
+#  mysqld:
+#    image: mysql:5.7
+#    environment:
+#      - MYSQL_ROOT_PASSWORD=secret
+
+#  Uncomment the following section to use redis instead.
+#  redisd:
+#    image: redis:3.2
 
 volumes:
   hydravolume:

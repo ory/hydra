@@ -19,6 +19,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
+	"gopkg.in/redis.v5"
 )
 
 var rethinkManager *FositeRehinkDBStore
@@ -47,6 +48,7 @@ func TestMain(m *testing.M) {
 	connectToMySQL()
 	connectToPG()
 	connectToRethink()
+	connectToRedis()
 	os.Exit(m.Run())
 }
 
@@ -145,6 +147,23 @@ func connectToRethink() {
 	}
 	clientManagers["rethink"] = rethinkManager
 	containers = append(containers, cn)
+}
+
+func connectToRedis() {
+	var db *redis.Client
+	cn, err := dockertest.ConnectToRedis(15, time.Second, func(url string) bool {
+		db = redis.NewClient(&redis.Options{
+			Addr: url,
+		})
+		return db.Ping().Err() == nil
+	})
+
+	if err != nil {
+		logrus.Fatalf("Could not connect to database: %s", err)
+	}
+
+	containers = append(containers, cn)
+	clientManagers["redis"] = &FositeRedisStore{DB: db}
 }
 
 var defaultRequest = fosite.Request{

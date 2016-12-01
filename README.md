@@ -104,7 +104,7 @@ You can use Hydra without a database, but be aware that restarting, scaling
 or stopping the container will **lose all data**:
 
 ```
-$ docker run -d -p 4444:4444 oryam/hydra --name my-hydra
+$ docker run -d --name my-hydra -p 4444:4444 oryam/hydra
 ec91228cb105db315553499c81918258f52cee9636ea2a4821bdb8226872f54b
 ```
 

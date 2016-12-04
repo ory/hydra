@@ -1,28 +1,70 @@
-hash: 6ee46895482118271a6a0a58bc0610d19d1fda014c13b639c087a52537c0862c
-updated: 2016-12-04T12:14:35.6006649+01:00
+hash: 64bc316247516b4eb5cd35a51e86465debd56ef934afb4f7de4e10df37ad7f8b
+updated: 2016-12-04T17:48:53.9976381+01:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
+- name: github.com/Azure/go-ansiterm
+  version: fa152c58bc15761d0200cb75fe958b89a9d4888e
+  subpackages:
+  - winterm
 - name: github.com/cenk/backoff
-  version: b02f2bbce11d7ea6b97f282ef1771b0fe2f65ef3
+  version: 32cd0c5b3aef12c76ed64aaf678f6c79736be7dc
 - name: github.com/davecgh/go-spew
   version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
   subpackages:
   - spew
 - name: github.com/dgrijalva/jwt-go
   version: d2709f9f1f31ebcda9651b03077758c1f3a0018c
+- name: github.com/docker/docker
+  version: 1f9b3ef9e9c74c2905780ac5347d018646a20022
+  subpackages:
+  - api/types
+  - api/types/blkiodev
+  - api/types/container
+  - api/types/filters
+  - api/types/mount
+  - api/types/network
+  - api/types/registry
+  - api/types/strslice
+  - api/types/swarm
+  - api/types/versions
+  - opts
+  - pkg/archive
+  - pkg/fileutils
+  - pkg/homedir
+  - pkg/idtools
+  - pkg/ioutils
+  - pkg/jsonlog
+  - pkg/jsonmessage
+  - pkg/longpath
+  - pkg/pools
+  - pkg/promise
+  - pkg/stdcopy
+  - pkg/system
+  - pkg/term
+  - pkg/term/windows
+- name: github.com/docker/go-connections
+  version: 4ccf312bf1d35e5dbda654e57a9be4c3f3cd0366
+  subpackages:
+  - nat
+- name: github.com/docker/go-units
+  version: e30f1e79f3cd72542f2026ceec18d3bd67ab859c
 - name: github.com/fsnotify/fsnotify
   version: fd9ec7deca8bf46ecd2a795baaacf2b3a9be1197
+- name: github.com/fsouza/go-dockerclient
+  version: 0d9f8ca94548b03557f0eba59b4289c7e8512c4a
 - name: github.com/go-errors/errors
   version: a41850380601eeb43f4350f7d17c6bbd8944aaf8
 - name: github.com/go-sql-driver/mysql
-  version: 0b58b37b664c21f3010e836f1b931e1d0b0b0685
+  version: a0583e0143b1624142adab07e0e97fe106d99561
 - name: github.com/golang/protobuf
   version: 8ee79997227bf9b34611aee7946ae64735e6fd93
   subpackages:
   - proto
 - name: github.com/hailocab/go-hostpool
   version: e80d13ce29ede4452c43dea11e79b9bc8a15b478
+- name: github.com/hashicorp/go-cleanhttp
+  version: ad28ea4487f05916463e2423a55166280e8254b5
 - name: github.com/hashicorp/hcl
   version: 7cb7455c285ca3bf3362aa4ba6a06a6d6f5c3ba0
   subpackages:
@@ -35,7 +77,7 @@ imports:
   - json/scanner
   - json/token
 - name: github.com/imdario/mergo
-  version: 50d4dbd4eb0e84778abe37cefef140271d96fade
+  version: 3e95a51e0639b4cf372f2ccf74c86749d747fbdc
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
 - name: github.com/jmoiron/sqlx
@@ -52,27 +94,33 @@ imports:
   version: 9c47895dc1ce54302908ab8a43385d1f5df2c11c
 - name: github.com/meatballhat/negroni-logrus
   version: 7c570a907cfc69cdc004ad506c6f5e234815b936
+- name: github.com/Microsoft/go-winio
+  version: 24a3e3d3fc7451805e09d11e11e95d9a0a4f205e
 - name: github.com/mitchellh/mapstructure
   version: f3009df150dadf309fdee4a54ed65c124afad715
 - name: github.com/moul/http2curl
   version: 4e24498b31dba4683efb9d35c1c8a91e2eda28c8
 - name: github.com/oleiade/reflections
   version: ec27669d960a245738b87ffa688dac28fa288c33
+- name: github.com/opencontainers/runc
+  version: 4271a8b5aec07d69f128df5474dea064d4694832
+  subpackages:
+  - libcontainer/system
+  - libcontainer/user
 - name: github.com/ory-am/common
   version: 8d96b678f9a0e5d6717f53df04e0b78bd66a2ed0
   subpackages:
   - compiler
-  - env
   - pkg
   - rand/sequence
+- name: github.com/ory-am/dockertest
+  version: 8445a82f8da6067ffecbb06e3f9fa2857f3bf9df
 - name: github.com/ory-am/fosite
   version: 366b4c1a06369b2cecaf6f71b720273e686d520d
   subpackages:
   - compose
-  - fosite-example/pkg
   - handler/oauth2
   - handler/openid
-  - hash
   - storage
   - token/hmac
   - token/jwt
@@ -131,6 +179,7 @@ imports:
   version: 4971afdc2f162e82d185353533d3cf16188a9f4e
   subpackages:
   - context
+  - context/ctxhttp
 - name: golang.org/x/oauth2
   version: d5040cddfc0da40b408c9a1da4728662435176a9
   subpackages:
@@ -140,6 +189,7 @@ imports:
   version: 30237cf4eefd639b184d1f2cb77a581ea0be8947
   subpackages:
   - unix
+  - windows
 - name: golang.org/x/text
   version: b01949dc0793a9af5e4cb3fce4d42999e76e8ca1
   subpackages:
@@ -165,6 +215,8 @@ imports:
   - types
 - name: gopkg.in/fatih/pool.v2
   version: 20a0a429c5f93de45c90f5f09ea297c25e0929b3
+- name: gopkg.in/ory-am/dockertest.v3
+  version: 8445a82f8da6067ffecbb06e3f9fa2857f3bf9df
 - name: gopkg.in/redis.v5
   version: 854c88a72c8bb9c09936145aef886b7697d6b995
   subpackages:
@@ -187,5 +239,3 @@ testImports:
   version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
 - name: github.com/gorilla/mux
   version: 0eeaf8392f5b04950925b8a69fe70f110fa7cbfc
-- name: github.com/ory-am/dockertest
-  version: edb9d9444e6868c1b1e279098b628e7b8e6f0714

@@ -63,7 +63,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 
 	var ctx = fosite.NewContext()
 	resp, err := h.OAuth2.NewIntrospectionRequest(ctx, r, session)
-	if resp != nil {
+	if err != nil {
 		pkg.LogError(err)
 		h.OAuth2.WriteIntrospectionError(w, err)
 		return
@@ -73,7 +73,9 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 	if exp.IsZero() {
 		exp = resp.GetAccessRequester().GetRequestedAt().Add(h.AccessTokenLifespan)
 	}
-	_ = json.NewEncoder(w).Encode(&Introspection{
+
+	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+	err = json.NewEncoder(w).Encode(&Introspection{
 		Active:    true,
 		ClientID:  resp.GetAccessRequester().GetClient().GetID(),
 		Scope:     strings.Join(resp.GetAccessRequester().GetGrantedScopes(), " "),
@@ -84,6 +86,9 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		Extra:     resp.GetAccessRequester().GetSession().(*Session).Extra,
 		Audience:  resp.GetAccessRequester().GetClient().GetID(),
 	})
+	if err != nil {
+		pkg.LogError(err)
+	}
 }
 
 func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

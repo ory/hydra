@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/Sirupsen/logrus"
 )
 
 // connectCmd represents the connect command
@@ -35,6 +36,7 @@ var connectCmd = &cobra.Command{
 		}
 
 		if u, _ := cmd.Flags().GetString("secret"); u != "" {
+			logrus.Warn("You should not provide secrets using command line flags. The secret might leak to bash history and similar systems.")
 			c.ClientSecret = u
 		} else if u := input("Client Secret [" + secret + "]: "); u != "" {
 			c.ClientSecret = u
@@ -58,7 +60,7 @@ func input(message string) string {
 
 func init() {
 	RootCmd.AddCommand(connectCmd)
-	connectCmd.Flags().String("url", "", "The cluster URL.")
-	connectCmd.Flags().String("id", "", "The client id.")
-	connectCmd.Flags().String("secret", "", "The client secret. Be aware that the secret will be leaked to bash history and ~/.hydra.yml")
+	connectCmd.Flags().String("url", "", "The cluster URL")
+	connectCmd.Flags().String("id", "", "The client id")
+	connectCmd.Flags().String("secret", "", "The client secret")
 }

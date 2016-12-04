@@ -63,14 +63,9 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 
 	var ctx = fosite.NewContext()
 	resp, err := h.OAuth2.NewIntrospectionRequest(ctx, r, session)
-	if err != nil {
+	if resp != nil {
 		pkg.LogError(err)
 		h.OAuth2.WriteIntrospectionError(w, err)
-		return
-	}
-
-	if !resp.IsActive() {
-		_ = json.NewEncoder(w).Encode(&Introspection{Active: false})
 		return
 	}
 

@@ -55,11 +55,11 @@ func (i *HTTPIntrospector) IntrospectToken(ctx context.Context, token string, sc
 
 	body, _ := ioutil.ReadAll(hres.Body)
 	if hres.StatusCode < 200 || hres.StatusCode >= 300 {
-		return nil, errors.Errorf("Expected 2xx status code but got %d.\n%s", hres.StatusCode, body)
+		return nil, errors.Errorf("Expected 2xx status code but got %d.\n%s", hres.StatusCode, string(body))
 	} else if err := json.Unmarshal(body, resp); err != nil {
-		return nil, errors.Errorf("%s: %s", err, body)
+		return nil, errors.Errorf("Could not unmarshal body because %s, body %s", err, string(body))
 	} else if !resp.Active {
-		return nil, errors.New("Token is malformed, expired or otherwise invalid")
+		return nil, errors.Wrap(fosite.ErrInactiveToken, "")
 	}
 	return resp, nil
 }

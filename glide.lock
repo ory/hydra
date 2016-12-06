@@ -1,5 +1,5 @@
-hash: 64bc316247516b4eb5cd35a51e86465debd56ef934afb4f7de4e10df37ad7f8b
-updated: 2016-12-04T17:48:53.9976381+01:00
+hash: 159225730af7e46fb4f9a3982a11de6b159004d5b5425853b18e10f2a6603dbb
+updated: 2016-12-06T13:43:16.3131878+01:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
@@ -8,7 +8,7 @@ imports:
   subpackages:
   - winterm
 - name: github.com/cenk/backoff
-  version: 32cd0c5b3aef12c76ed64aaf678f6c79736be7dc
+  version: b02f2bbce11d7ea6b97f282ef1771b0fe2f65ef3
 - name: github.com/davecgh/go-spew
   version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
   subpackages:
@@ -16,7 +16,7 @@ imports:
 - name: github.com/dgrijalva/jwt-go
   version: d2709f9f1f31ebcda9651b03077758c1f3a0018c
 - name: github.com/docker/docker
-  version: 1f9b3ef9e9c74c2905780ac5347d018646a20022
+  version: 4d92237de1b34c8bf99e549db27b83fd087cd765
   subpackages:
   - api/types
   - api/types/blkiodev
@@ -52,7 +52,7 @@ imports:
 - name: github.com/fsnotify/fsnotify
   version: fd9ec7deca8bf46ecd2a795baaacf2b3a9be1197
 - name: github.com/fsouza/go-dockerclient
-  version: 0d9f8ca94548b03557f0eba59b4289c7e8512c4a
+  version: 4611598e6e6615762544f0805acd59dfede5c9a2
 - name: github.com/go-errors/errors
   version: a41850380601eeb43f4350f7d17c6bbd8944aaf8
 - name: github.com/go-sql-driver/mysql
@@ -116,7 +116,7 @@ imports:
 - name: github.com/ory-am/dockertest
   version: 8445a82f8da6067ffecbb06e3f9fa2857f3bf9df
 - name: github.com/ory-am/fosite
-  version: 366b4c1a06369b2cecaf6f71b720273e686d520d
+  version: 0151f1e17dda1c81185d00b388c83b25b7c5f72c
   subpackages:
   - compose
   - handler/oauth2
@@ -216,7 +216,7 @@ imports:
 - name: gopkg.in/fatih/pool.v2
   version: 20a0a429c5f93de45c90f5f09ea297c25e0929b3
 - name: gopkg.in/ory-am/dockertest.v3
-  version: 8445a82f8da6067ffecbb06e3f9fa2857f3bf9df
+  version: e4828e807797a7641fcd457716870dfc2f9e82ff
 - name: gopkg.in/redis.v5
   version: 854c88a72c8bb9c09936145aef886b7697d6b995
   subpackages:

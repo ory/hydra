@@ -87,7 +87,7 @@ type Firewall interface {
 	// TokenFromRequest returns an access token from the HTTP Authorization header.
 	//
 	//  func anyHttpHandler(w http.ResponseWriter, r *http.Request) {
-	//    ctx, err := firewall.TokenValid(context.Background(), firewall.TokenFromRequest(r), "photos", "files")
+	//    ctx, err := firewall.TokenAllowed(context.Background(), firewall.TokenFromRequest(r), "photos", "files")
 	//    fmt.Sprintf("%s", ctx.Subject)
 	//  }
 	TokenFromRequest(r *http.Request) string

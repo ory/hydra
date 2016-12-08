@@ -176,7 +176,7 @@ at `https://localhost:4444/keys/hydra.consent.response/public`
 
 If you want, you can use the Key Manager to store and retrieve private keys as well. When Hydra boots for the first time,
 a private/public `hydra.consent.response` keypair is created.
-You can that keypair to sign consent response tokens. The private key is available at
+You can use that keypair to sign consent response tokens. The private key is available at
 `https://localhost:4444/keys/asymmetric/hydra.consent.response/private`.
 
 ### Error Handling during Consent App Flow

@@ -11,6 +11,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pkg/errors"
 	"strings"
+	"time"
 )
 
 const (
@@ -33,6 +34,8 @@ type Handler struct {
 
 	ForcedHTTP bool
 	ConsentURL url.URL
+
+	AccessTokenLifespan time.Duration
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
@@ -57,6 +60,7 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ ht
 
 func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var session = NewSession("")
+
 	var ctx = fosite.NewContext()
 	resp, err := h.OAuth2.NewIntrospectionRequest(ctx, r, session)
 	if err != nil {
@@ -65,22 +69,26 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		return
 	}
 
-	if !resp.IsActive() {
-		_ = json.NewEncoder(w).Encode(&Introspection{Active: false})
-		return
+	exp := resp.GetAccessRequester().GetSession().GetExpiresAt(fosite.AccessToken)
+	if exp.IsZero() {
+		exp = resp.GetAccessRequester().GetRequestedAt().Add(h.AccessTokenLifespan)
 	}
 
-	_ = json.NewEncoder(w).Encode(&Introspection{
+	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+	err = json.NewEncoder(w).Encode(&Introspection{
 		Active:    true,
 		ClientID:  resp.GetAccessRequester().GetClient().GetID(),
 		Scope:     strings.Join(resp.GetAccessRequester().GetGrantedScopes(), " "),
-		ExpiresAt: resp.GetAccessRequester().GetSession().GetExpiresAt(fosite.AccessToken).Unix(),
+		ExpiresAt: exp.Unix(),
 		IssuedAt:  resp.GetAccessRequester().GetRequestedAt().Unix(),
 		Subject:   resp.GetAccessRequester().GetSession().GetSubject(),
 		Username:  resp.GetAccessRequester().GetSession().GetUsername(),
 		Extra:     resp.GetAccessRequester().GetSession().(*Session).Extra,
 		Audience:  resp.GetAccessRequester().GetClient().GetID(),
 	})
+	if err != nil {
+		pkg.LogError(err)
+	}
 }
 
 func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

@@ -67,6 +67,13 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 		m.Watch(context.Background())
 		store = m
 		break
+	case *config.RedisConnection:
+		m := &oauth2.FositeRedisStore{
+			DB:      con.RedisSession(),
+			Manager: clients,
+		}
+		store = m
+		break
 	default:
 		panic("Unknown connection type.")
 	}
@@ -142,8 +149,9 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 			DefaultChallengeLifespan: c.GetChallengeTokenLifespan(),
 			DefaultIDTokenLifespan:   c.GetIDTokenLifespan(),
 		},
-		ConsentURL: *consentURL,
-		H:          &herodot.JSON{},
+		ConsentURL:          *consentURL,
+		H:                   &herodot.JSON{},
+		AccessTokenLifespan: c.GetAccessTokenLifespan(),
 	}
 
 	handler.SetRoutes(router)

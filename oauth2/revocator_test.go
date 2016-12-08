@@ -15,6 +15,7 @@ import (
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/clientcredentials"
 )
@@ -87,6 +88,7 @@ func TestRevoke(t *testing.T) {
 		for _, c := range []struct {
 			token     string
 			expectErr bool
+			assert    func(*testing.T)
 		}{
 			{
 				token:     "invalid",
@@ -95,6 +97,9 @@ func TestRevoke(t *testing.T) {
 			{
 				token:     tokensRecovator[0][1],
 				expectErr: false,
+				assert: func(t *testing.T) {
+					assert.Len(t, fositeStoreRecovator.AccessTokens, 2)
+				},
 			},
 			{
 				token:     tokensRecovator[0][1],
@@ -103,15 +108,24 @@ func TestRevoke(t *testing.T) {
 			{
 				token:     tokensRecovator[2][1],
 				expectErr: false,
+				assert: func(t *testing.T) {
+					assert.Len(t, fositeStoreRecovator.AccessTokens, 1)
+				},
 			},
 			{
 				token:     tokensRecovator[1][1],
 				expectErr: false,
+				assert: func(t *testing.T) {
+					assert.Len(t, fositeStoreRecovator.AccessTokens, 0)
+				},
 			},
 		} {
 			t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
 				err := w.RevokeToken(context.Background(), c.token)
 				pkg.AssertError(t, c.expectErr, err)
+				if c.assert != nil {
+					c.assert(t)
+				}
 			})
 		}
 	}

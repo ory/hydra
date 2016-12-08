@@ -8,9 +8,7 @@ import (
 
 	"fmt"
 	"github.com/Sirupsen/logrus"
-	"github.com/jmoiron/sqlx"
 	c "github.com/ory-am/common/pkg"
-	"github.com/ory-am/dockertest"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/pkg"
@@ -19,10 +17,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
+	"github.com/ory-am/hydra/integration"
 )
 
 var rethinkManager *FositeRehinkDBStore
-var containers = []dockertest.ContainerID{}
 var clientManagers = map[string]pkg.FositeStorer{}
 var clientManager = &client.MemoryManager{
 	Clients: map[string]client.Client{"foobar": {ID: "foobar"}},
@@ -39,112 +37,57 @@ func init() {
 }
 
 func TestMain(m *testing.M) {
-	defer func() {
-		for _, c := range containers {
-			c.KillRemove()
-		}
-	}()
-	connectToMySQL()
 	connectToPG()
-	connectToRethink()
-	os.Exit(m.Run())
-}
+	connectToRethinkDB()
+	connectToMySQL()
+	connectToRedis()
 
-func connectToMySQL() {
-	var db *sqlx.DB
-	cn, err := dockertest.ConnectToMySQL(15, time.Second, func(url string) bool {
-		var err error
-		db, err = sqlx.Open("mysql", url)
-		if err != nil {
-			logrus.Printf("Got error in mysql connector: %s", err)
-			return false
-		}
-		return db.Ping() == nil
-	})
-
-	if err != nil {
-		logrus.Fatalf("Could not connect to database: %s", err)
-	}
-
-	containers = append(containers, cn)
-	s := &FositeSQLStore{DB: db, Manager: clientManager}
-	if err = s.CreateSchemas(); err != nil {
-		logrus.Fatalf("Could not create postgres schema: %v", err)
-	}
-
-	clientManagers["mysql"] = s
+	s := m.Run()
+	integration.KillAll()
+	os.Exit(s)
 }
 
 func connectToPG() {
-	var db *sqlx.DB
-	cn, err := dockertest.ConnectToPostgreSQL(15, time.Second, func(url string) bool {
-		var err error
-		db, err = sqlx.Open("postgres", url)
-		if err != nil {
-			logrus.Printf("Got error in postgres connector: %s", err)
-			return false
-		}
-		return db.Ping() == nil
-	})
-
-	if err != nil {
-		logrus.Fatalf("Could not connect to database: %s", err)
-	}
-
-	containers = append(containers, cn)
+	var db = integration.ConnectToPostgres()
 	s := &FositeSQLStore{DB: db, Manager: clientManager}
-	if err = s.CreateSchemas(); err != nil {
+	if err := s.CreateSchemas(); err != nil {
 		logrus.Fatalf("Could not create postgres schema: %v", err)
 	}
 
 	clientManagers["postgres"] = s
 }
 
-func connectToRethink() {
-	var session *r.Session
-	var err error
+func connectToRethinkDB() {
+	var session = integration.ConnectToRethinkDB("hydra", "hydra_authorize_code", "hydra_id_sessions", "hydra_access_token", "hydra_refresh_token")
 
-	cn, err := dockertest.ConnectToRethinkDB(20, time.Millisecond*500, func(url string) bool {
-		if session, err = r.Connect(r.ConnectOpts{Address: url, Database: "hydra"}); err != nil {
-			return false
-		} else if _, err = r.DBCreate("hydra").RunWrite(session); err != nil {
-			logrus.Printf("Database exists: %s", err)
-			return false
-		} else if _, err = r.TableCreate("hydra_authorize_code").RunWrite(session); err != nil {
-			logrus.Printf("Could not create table: %s", err)
-			return false
-		} else if _, err = r.TableCreate("hydra_id_sessions").RunWrite(session); err != nil {
-			logrus.Printf("Could not create table: %s", err)
-			return false
-		} else if _, err = r.TableCreate("hydra_access_token").RunWrite(session); err != nil {
-			logrus.Printf("Could not create table: %s", err)
-			return false
-		} else if _, err = r.TableCreate("hydra_refresh_token").RunWrite(session); err != nil {
-			logrus.Printf("Could not create table: %s", err)
-			return false
-		}
-
-		rethinkManager = &FositeRehinkDBStore{
-			Session:             session,
-			AuthorizeCodesTable: r.Table("hydra_authorize_code"),
-			IDSessionsTable:     r.Table("hydra_id_sessions"),
-			AccessTokensTable:   r.Table("hydra_access_token"),
-			RefreshTokensTable:  r.Table("hydra_refresh_token"),
-			AuthorizeCodes:      make(RDBItems),
-			IDSessions:          make(RDBItems),
-			AccessTokens:        make(RDBItems),
-			RefreshTokens:       make(RDBItems),
-		}
-		rethinkManager.Watch(context.Background())
-		time.Sleep(500 * time.Millisecond)
-		return true
-	})
-
-	if err != nil {
-		logrus.Fatalf("Could not connect to database: %s", err)
+	rethinkManager = &FositeRehinkDBStore{
+		Session:             session,
+		AuthorizeCodesTable: r.Table("hydra_authorize_code"),
+		IDSessionsTable:     r.Table("hydra_id_sessions"),
+		AccessTokensTable:   r.Table("hydra_access_token"),
+		RefreshTokensTable:  r.Table("hydra_refresh_token"),
+		AuthorizeCodes:      make(RDBItems),
+		IDSessions:          make(RDBItems),
+		AccessTokens:        make(RDBItems),
+		RefreshTokens:       make(RDBItems),
 	}
+	rethinkManager.Watch(context.Background())
 	clientManagers["rethink"] = rethinkManager
-	containers = append(containers, cn)
+}
+
+func connectToMySQL() {
+	var db = integration.ConnectToMySQL()
+	s := &FositeSQLStore{DB: db, Manager: clientManager}
+	if err := s.CreateSchemas(); err != nil {
+		logrus.Fatalf("Could not create postgres schema: %v", err)
+	}
+
+	clientManagers["mysql"] = s
+}
+
+func connectToRedis() {
+	var db = integration.ConnectToRedis()
+	clientManagers["redis"] = &FositeRedisStore{DB: db}
 }
 
 var defaultRequest = fosite.Request{

@@ -75,6 +75,19 @@ var keySet, err = hydra.JWK.GetKeySet("app-tls-keys")
 var err = hydra.JWK.DeleteKeySet("app-tls-keys")
 ```
 
+Validate access token, uses [`ory-am/hydra/warden.HTTPWarden`](warden/warden_http.go):
+
+```go
+import "golang.org/x/net/context"
+import "github.com/ory-am/hydra/firewall"
+
+func anyHttpHandler(w http.ResponseWriter, r *http.Request) {    
+    // Check if a token is valid and the token's subject fulfills the policy based access request.
+    ctx, err := hydra.Introspection.IntrospectToken(context.Background(), "access-token", "photos", "files")
+    fmt.Sprintf("%s", ctx.Subject)
+}
+```
+
 Validate requests with the Warden, uses [`ory-am/hydra/warden.HTTPWarden`](warden/warden_http.go):
 
 ```go
@@ -82,16 +95,22 @@ import "golang.org/x/net/context"
 import "github.com/ory-am/hydra/firewall"
 
 func anyHttpHandler(w http.ResponseWriter, r *http.Request) {
-    // Check if a token is valid and is allowed to operate given scopes
-    ctx, err := hydra.Warden.TokenValid(context.Background(), firewall.TokenFromRequest(r), "photos", "files")
-    fmt.Sprintf("%s", ctx.Subject)
-    
     // Check if a token is valid and the token's subject fulfills the policy based access request.
     ctx, err := hydra.Warden.TokenAllowed(context.Background(), "access-token", &firewall.TokenAccessRequest{
         Resource: "matrix",
         Action:   "create",
         Context:  ladon.Context{},
     }, "photos", "files")
+    fmt.Sprintf("%s", ctx.Subject)
+    
+    // Do the same thing but without a token    
+    ctx, err := hydra.Warden.IsAllowed(context.Background(), &firewall.AccessRequest{
+        // Because no token is defined, we need to specify the subject manually
+        Subject: "peter",
+        Resource: "matrix",
+        Action:   "create",
+        Context:  ladon.Context{},
+    })
     fmt.Sprintf("%s", ctx.Subject)
 }
 ```

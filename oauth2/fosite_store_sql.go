@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"github.com/Sirupsen/logrus"
 	"github.com/jmoiron/sqlx"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/client"
@@ -69,6 +70,10 @@ type sqlData struct {
 }
 
 func sqlSchemaFromRequest(signature string, r fosite.Requester) (*sqlData, error) {
+	if r.GetSession() == nil {
+		logrus.Debugf("Got an empty session in sqlSchemaFromRequest")
+	}
+
 	session, err := json.Marshal(r.GetSession())
 	if err != nil {
 		return nil, errors.Wrap(err, "")
@@ -86,11 +91,13 @@ func sqlSchemaFromRequest(signature string, r fosite.Requester) (*sqlData, error
 	}, nil
 }
 
-func (s *sqlData) ToRequest(session fosite.Session, cm client.Manager) (*fosite.Request, error) {
+func (s *sqlData) toRequest(session fosite.Session, cm client.Manager) (*fosite.Request, error) {
 	if session != nil {
 		if err := json.Unmarshal(s.Session, session); err != nil {
 			return nil, errors.Wrap(err, "")
 		}
+	} else {
+		logrus.Debugf("Got an empty session in toRequest")
 	}
 
 	c, err := cm.GetClient(s.Client)
@@ -103,7 +110,7 @@ func (s *sqlData) ToRequest(session fosite.Session, cm client.Manager) (*fosite.
 		return nil, errors.Wrap(err, "")
 	}
 
-	return &fosite.Request{
+	r := &fosite.Request{
 		ID:            s.Request,
 		RequestedAt:   s.RequestedAt,
 		Client:        c,
@@ -111,7 +118,9 @@ func (s *sqlData) ToRequest(session fosite.Session, cm client.Manager) (*fosite.
 		GrantedScopes: fosite.Arguments(strings.Split(s.GrantedScopes, "|")),
 		Form:          val,
 		Session:       session,
-	}, nil
+	}
+
+	return r, nil
 }
 
 func (s *FositeSQLStore) createSession(signature string, requester fosite.Requester, table string) error {
@@ -140,7 +149,7 @@ func (s *FositeSQLStore) findSessionBySignature(signature string, session fosite
 		return nil, errors.Wrap(err, "")
 	}
 
-	return d.ToRequest(session, s.Manager)
+	return d.toRequest(session, s.Manager)
 }
 
 func (s *FositeSQLStore) deleteSession(signature string, table string) error {

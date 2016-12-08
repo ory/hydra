@@ -40,6 +40,12 @@ func newClientManager(c *config.Config) client.Manager {
 		}
 		m.Watch(context.Background())
 		return m
+	case *config.RedisConnection:
+		m := &client.RedisManager{
+			DB:     con.RedisSession(),
+			Hasher: ctx.Hasher,
+		}
+		return m
 	default:
 		panic("Unknown connection type.")
 	}

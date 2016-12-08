@@ -4,19 +4,16 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
-
 	r "gopkg.in/dancannon/gorethink.v2"
-
 	"log"
 	"os"
 	"time"
 
 	"fmt"
-	"github.com/jmoiron/sqlx"
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/dockertest"
 	"github.com/ory-am/fosite"
 	. "github.com/ory-am/hydra/client"
+	_ "github.com/lib/pq"
 	"github.com/ory-am/hydra/compose"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/pkg"
@@ -25,6 +22,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
+	"gopkg.in/ory-am/dockertest.v3"
+	"github.com/ory-am/hydra/integration"
 )
 
 var clientManagers = map[string]Storage{}
@@ -65,113 +64,66 @@ func init() {
 	}
 }
 
+var resources []*dockertest.Resource
+var pool *dockertest.Pool
 var rethinkManager *RethinkManager
-var containers = []dockertest.ContainerID{}
 
 func TestMain(m *testing.M) {
-	defer func() {
-		for _, c := range containers {
-			c.KillRemove()
-		}
-	}()
-
 	connectToPG()
 	connectToRethinkDB()
 	connectToMySQL()
+	connectToRedis()
 
-	os.Exit(m.Run())
+	s := m.Run()
+	integration.KillAll()
+	os.Exit(s)
 }
 
 func connectToMySQL() {
-	var db *sqlx.DB
-	c, err := dockertest.ConnectToMySQL(15, time.Second, func(url string) bool {
-		var err error
-		db, err = sqlx.Open("mysql", url)
-		if err != nil {
-			log.Printf("Got error in mysql connector: %s", err)
-			return false
-		}
-		return db.Ping() == nil
-	})
-
-	if err != nil {
-		log.Fatalf("Could not connect to database: %s", err)
-	}
-
-	containers = append(containers, c)
+	var db = integration.ConnectToMySQL()
 	s := &SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}
-
-	if err = s.CreateSchemas(); err != nil {
+	if err := s.CreateSchemas(); err != nil {
 		log.Fatalf("Could not create postgres schema: %v", err)
 	}
 
 	clientManagers["mysql"] = s
-	containers = append(containers, c)
 }
 
 func connectToPG() {
-	var db *sqlx.DB
-	c, err := dockertest.ConnectToPostgreSQL(15, time.Second, func(url string) bool {
-		var err error
-		db, err = sqlx.Open("postgres", url)
-		if err != nil {
-			log.Printf("Got error in postgres connector: %s", err)
-			return false
-		}
-		return db.Ping() == nil
-	})
-
-	if err != nil {
-		log.Fatalf("Could not connect to database: %s", err)
-	}
-
-	containers = append(containers, c)
+	var db = integration.ConnectToPostgres()
 	s := &SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}
 
-	if err = s.CreateSchemas(); err != nil {
+	if err := s.CreateSchemas(); err != nil {
 		log.Fatalf("Could not create postgres schema: %v", err)
 	}
 
 	clientManagers["postgres"] = s
-	containers = append(containers, c)
 }
 
 func connectToRethinkDB() {
-	var session *r.Session
-	var err error
-
-	c, err := dockertest.ConnectToRethinkDB(20, time.Second, func(url string) bool {
-		if session, err = r.Connect(r.ConnectOpts{Address: url, Database: "hydra"}); err != nil {
-			return false
-		} else if _, err = r.DBCreate("hydra").RunWrite(session); err != nil {
-			log.Printf("Database exists: %s", err)
-			return false
-		} else if _, err = r.TableCreate("hydra_clients").RunWrite(session); err != nil {
-			log.Printf("Could not create table: %s", err)
-			return false
-		}
-
-		rethinkManager = &RethinkManager{
-			Session: session,
-			Table:   r.Table("hydra_clients"),
-			Clients: make(map[string]Client),
-			Hasher: &fosite.BCrypt{
-				// Low workfactor reduces test time
-				WorkFactor: 4,
-			},
-		}
-		rethinkManager.Watch(context.Background())
-		time.Sleep(100 * time.Millisecond)
-		return true
-	})
-
-	if err != nil {
-		log.Fatalf("Could not connect to database: %s", err)
+	var session = integration.ConnectToRethinkDB("hydra", "hydra_clients")
+	rethinkManager = &RethinkManager{
+		Session: session,
+		Table:   r.Table("hydra_clients"),
+		Clients: make(map[string]Client),
+		Hasher: &fosite.BCrypt{
+			// Low workfactor reduces test time
+			WorkFactor: 4,
+		},
 	}
 
-	containers = append(containers, c)
+	rethinkManager.Watch(context.Background())
 	clientManagers["rethink"] = rethinkManager
 }
+
+func connectToRedis() {
+	var db = integration.ConnectToRedis()
+	clientManagers["redis"] = &RedisManager{
+		DB:     db,
+		Hasher: &fosite.BCrypt{WorkFactor: 4},
+	}
+}
+
 func TestClientAutoGenerateKey(t *testing.T) {
 	for k, m := range clientManagers {
 		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {

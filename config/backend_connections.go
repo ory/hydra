@@ -35,7 +35,7 @@ func (c *SQLConnection) GetDatabase() *sqlx.DB {
 
 	var err error
 	if err = pkg.Retry(time.Second*15, time.Minute*2, func() error {
-		logrus.Infof("Connecting with %s", c.URL.String())
+		logrus.Infof("Connecting with %s", c.URL.Scheme+"://*:*@"+c.URL.Host+c.URL.Path+"?"+c.URL.RawQuery)
 		u := c.URL.String()
 		if c.URL.Scheme == "mysql" {
 			u = strings.Replace(u, "mysql://", "", -1)

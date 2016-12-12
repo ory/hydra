@@ -25,6 +25,9 @@ func main() {
 	case "warn":
 		logrus.SetLevel(logrus.WarnLevel)
 		break
+	case "error":
+		logrus.SetLevel(logrus.ErrorLevel)
+		break
 	case "fatal":
 		logrus.SetLevel(logrus.FatalLevel)
 		break

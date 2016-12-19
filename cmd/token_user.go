@@ -30,14 +30,29 @@ var tokenUserCmd = &cobra.Command{
 		}
 
 		scopes, _ := cmd.Flags().GetStringSlice("scopes")
+		clientId, _ := cmd.Flags().GetString("id")
+		clientSecret, _ := cmd.Flags().GetString("secret")
+		redirectUrl, _ := cmd.Flags().GetString("redirect")
+		cluster, _ := cmd.Flags().GetString("cluster")
+
+		if clientId == "" {
+			clientId = c.ClientID
+		}
+		if clientSecret == "" {
+			clientSecret = c.ClientSecret
+		}
+		if cluster == "" {
+			cluster = c.ClusterURL
+		}
+
 		conf := oauth2.Config{
-			ClientID:     c.ClientID,
-			ClientSecret: c.ClientSecret,
+			ClientID:     clientId,
+			ClientSecret: clientSecret,
 			Endpoint: oauth2.Endpoint{
-				TokenURL: pkg.JoinURLStrings(c.ClusterURL, "/oauth2/token"),
-				AuthURL:  pkg.JoinURLStrings(c.ClusterURL, "/oauth2/auth"),
+				TokenURL: pkg.JoinURLStrings(cluster, "/oauth2/token"),
+				AuthURL:  pkg.JoinURLStrings(cluster, "/oauth2/auth"),
 			},
-			RedirectURL: "http://localhost:4445/callback",
+			RedirectURL: redirectUrl,
 			Scopes:      scopes,
 		}
 
@@ -114,5 +129,9 @@ var tokenUserCmd = &cobra.Command{
 func init() {
 	tokenCmd.AddCommand(tokenUserCmd)
 	tokenUserCmd.Flags().Bool("no-open", false, "Do not open the browser window automatically")
-	tokenUserCmd.Flags().StringSlice("scopes", []string{"hydra", "offline", "openid"}, "Ask for specific scopes")
+	tokenUserCmd.Flags().StringSlice("scopes", []string{"hydra", "offline", "openid"}, "Force scopes")
+	tokenUserCmd.Flags().String("id", "", "Force a client id, defaults to value from config file")
+	tokenUserCmd.Flags().String("secret", "", "Force a client secret, defaults to value from config file")
+	tokenUserCmd.Flags().String("redirect", "http://localhost:4445/callback", "Force a redirect url")
+	tokenUserCmd.Flags().String("cluster", c.ClusterURL, "Force a cluster url, defaults to value from config file")
 }

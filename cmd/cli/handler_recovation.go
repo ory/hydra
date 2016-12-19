@@ -2,13 +2,13 @@ package cli
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/spf13/cobra"
 	"golang.org/x/oauth2/clientcredentials"
-	"crypto/tls"
 	"net/http"
 )
 

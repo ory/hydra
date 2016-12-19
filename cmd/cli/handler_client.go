@@ -7,11 +7,11 @@ import (
 
 	"strings"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/spf13/cobra"
-	"github.com/Sirupsen/logrus"
 )
 
 type ClientHandler struct {

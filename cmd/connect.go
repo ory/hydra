@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/spf13/cobra"
 	"github.com/Sirupsen/logrus"
+	"github.com/spf13/cobra"
 )
 
 // connectCmd represents the connect command

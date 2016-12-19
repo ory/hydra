@@ -15,7 +15,7 @@ type HTTPRecovator struct {
 	Config   *clientcredentials.Config
 	Dry      bool
 	Endpoint *url.URL
-	Client *http.Client
+	Client   *http.Client
 }
 
 func (r *HTTPRecovator) RevokeToken(ctx context.Context, token string) error {

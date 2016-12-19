@@ -1,21 +1,22 @@
 package client_test
 
 import (
-	"net/http/httptest"
-	"net/url"
-	"testing"
 	r "gopkg.in/dancannon/gorethink.v2"
 	"log"
+	"net/http/httptest"
+	"net/url"
 	"os"
+	"testing"
 	"time"
 
 	"fmt"
 	"github.com/julienschmidt/httprouter"
+	_ "github.com/lib/pq"
 	"github.com/ory-am/fosite"
 	. "github.com/ory-am/hydra/client"
-	_ "github.com/lib/pq"
 	"github.com/ory-am/hydra/compose"
 	"github.com/ory-am/hydra/herodot"
+	"github.com/ory-am/hydra/integration"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
 	"github.com/pborman/uuid"
@@ -23,7 +24,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
 	"gopkg.in/ory-am/dockertest.v3"
-	"github.com/ory-am/hydra/integration"
 )
 
 var clientManagers = map[string]Storage{}

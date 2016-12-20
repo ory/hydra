@@ -9,15 +9,15 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
-	"strings"
 	"github.com/rubenv/sql-migrate"
+	"strings"
 )
 
 var migrations = &migrate.MemoryMigrationSource{
 	Migrations: []*migrate.Migration{
-		&migrate.Migration{
-			Id:   "1",
-			Up:   []string{`CREATE TABLE IF NOT EXISTS hydra_client (
+		{
+			Id: "1",
+			Up: []string{`CREATE TABLE IF NOT EXISTS hydra_client (
 	id      	varchar(255) NOT NULL PRIMARY KEY,
 	client_name  	text NOT NULL,
 	client_secret  	text NOT NULL,
@@ -199,7 +199,7 @@ func (m *SQLManager) CreateClient(c *Client) error {
 	if _, err := m.DB.NamedExec(fmt.Sprintf(
 		"INSERT INTO hydra_client (%s) VALUES (%s)",
 		strings.Join(sqlParams, ", "),
-		":" + strings.Join(sqlParams, ", :"),
+		":"+strings.Join(sqlParams, ", :"),
 	), data); err != nil {
 		return errors.Wrap(err, "")
 	}

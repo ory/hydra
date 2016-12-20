@@ -9,11 +9,11 @@ import (
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/client"
 	"github.com/pkg/errors"
+	"github.com/rubenv/sql-migrate"
 	"golang.org/x/net/context"
 	"net/url"
 	"strings"
 	"time"
-	"github.com/rubenv/sql-migrate"
 )
 
 type FositeSQLStore struct {
@@ -35,17 +35,17 @@ func sqlTemplate(table string) string {
 }
 
 const (
-	sqlTableOpenID = "oidc"
-	sqlTableAccess = "access"
+	sqlTableOpenID  = "oidc"
+	sqlTableAccess  = "access"
 	sqlTableRefresh = "refresh"
-	sqlTableCode = "code"
+	sqlTableCode    = "code"
 )
 
 var migrations = &migrate.MemoryMigrationSource{
 	Migrations: []*migrate.Migration{
-		&migrate.Migration{
-			Id:   "1",
-			Up:   []string{
+		{
+			Id: "1",
+			Up: []string{
 				sqlTemplate(sqlTableAccess),
 				sqlTemplate(sqlTableRefresh),
 				sqlTemplate(sqlTableCode),
@@ -147,7 +147,7 @@ func (s *FositeSQLStore) createSession(signature string, requester fosite.Reques
 		"INSERT INTO hydra_oauth2_%s (%s) VALUES (%s)",
 		table,
 		strings.Join(sqlParams, ", "),
-		":" + strings.Join(sqlParams, ", :"),
+		":"+strings.Join(sqlParams, ", :"),
 	)
 	if _, err := s.DB.NamedExec(query, data); err != nil {
 		return errors.Wrap(err, "")

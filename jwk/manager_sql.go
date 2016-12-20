@@ -6,8 +6,8 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pkg/errors"
-	"github.com/square/go-jose"
 	"github.com/rubenv/sql-migrate"
+	"github.com/square/go-jose"
 )
 
 type SQLManager struct {
@@ -17,9 +17,9 @@ type SQLManager struct {
 
 var migrations = &migrate.MemoryMigrationSource{
 	Migrations: []*migrate.Migration{
-		&migrate.Migration{
-			Id:   "1",
-			Up:   []string{
+		{
+			Id: "1",
+			Up: []string{
 				`CREATE TABLE IF NOT EXISTS hydra_jwk (
 	sid     varchar(255) NOT NULL,
 	kid 	varchar(255) NOT NULL,

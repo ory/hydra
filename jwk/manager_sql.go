@@ -7,6 +7,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pkg/errors"
 	"github.com/square/go-jose"
+	"github.com/rubenv/sql-migrate"
 )
 
 type SQLManager struct {
@@ -14,14 +15,24 @@ type SQLManager struct {
 	Cipher *AEAD
 }
 
-var sqlSchema = []string{
-	`CREATE TABLE IF NOT EXISTS hydra_jwk (
+var migrations = &migrate.MemoryMigrationSource{
+	Migrations: []*migrate.Migration{
+		&migrate.Migration{
+			Id:   "1",
+			Up:   []string{
+				`CREATE TABLE IF NOT EXISTS hydra_jwk (
 	sid     varchar(255) NOT NULL,
 	kid 	varchar(255) NOT NULL,
 	version int NOT NULL DEFAULT 0,
 	keydata text NOT NULL,
 	PRIMARY KEY (sid, kid)
 )`,
+			},
+			Down: []string{
+				"DROP TABLE hydra_jwk",
+			},
+		},
+	},
 }
 
 type sqlData struct {
@@ -32,10 +43,9 @@ type sqlData struct {
 }
 
 func (s *SQLManager) CreateSchemas() error {
-	for _, query := range sqlSchema {
-		if _, err := s.DB.Exec(query); err != nil {
-			return errors.Wrapf(err, "Could not create schema:\n%s", query)
-		}
+	n, err := migrate.Exec(s.DB.DB, s.DB.DriverName(), migrations, migrate.Up)
+	if err != nil {
+		return errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
 	}
 	return nil
 }

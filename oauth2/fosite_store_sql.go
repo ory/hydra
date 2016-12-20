@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"strings"
 	"time"
+	"github.com/rubenv/sql-migrate"
 )
 
 type FositeSQLStore struct {
@@ -34,17 +35,30 @@ func sqlTemplate(table string) string {
 }
 
 const (
-	sqlTableOpenID  = "oidc"
-	sqlTableAccess  = "access"
+	sqlTableOpenID = "oidc"
+	sqlTableAccess = "access"
 	sqlTableRefresh = "refresh"
-	sqlTableCode    = "code"
+	sqlTableCode = "code"
 )
 
-var sqlSchema = []string{
-	sqlTemplate(sqlTableAccess),
-	sqlTemplate(sqlTableRefresh),
-	sqlTemplate(sqlTableCode),
-	sqlTemplate(sqlTableOpenID),
+var migrations = &migrate.MemoryMigrationSource{
+	Migrations: []*migrate.Migration{
+		&migrate.Migration{
+			Id:   "1",
+			Up:   []string{
+				sqlTemplate(sqlTableAccess),
+				sqlTemplate(sqlTableRefresh),
+				sqlTemplate(sqlTableCode),
+				sqlTemplate(sqlTableOpenID),
+			},
+			Down: []string{
+				fmt.Sprintf("DROP TABLE %s", sqlTableAccess),
+				fmt.Sprintf("DROP TABLE %s", sqlTableRefresh),
+				fmt.Sprintf("DROP TABLE %s", sqlTableCode),
+				fmt.Sprintf("DROP TABLE %s", sqlTableOpenID),
+			},
+		},
+	},
 }
 
 var sqlParams = []string{
@@ -133,7 +147,7 @@ func (s *FositeSQLStore) createSession(signature string, requester fosite.Reques
 		"INSERT INTO hydra_oauth2_%s (%s) VALUES (%s)",
 		table,
 		strings.Join(sqlParams, ", "),
-		":"+strings.Join(sqlParams, ", :"),
+		":" + strings.Join(sqlParams, ", :"),
 	)
 	if _, err := s.DB.NamedExec(query, data); err != nil {
 		return errors.Wrap(err, "")
@@ -160,10 +174,9 @@ func (s *FositeSQLStore) deleteSession(signature string, table string) error {
 }
 
 func (s *FositeSQLStore) CreateSchemas() error {
-	for _, query := range sqlSchema {
-		if _, err := s.DB.Exec(query); err != nil {
-			return errors.Wrapf(err, "Could not create schema:\n%s", query)
-		}
+	n, err := migrate.Exec(s.DB.DB, s.DB.DriverName(), migrations, migrate.Up)
+	if err != nil {
+		return errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
 	}
 	return nil
 }

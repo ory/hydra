@@ -10,10 +10,14 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"strings"
+	"github.com/rubenv/sql-migrate"
 )
 
-var sqlSchema = []string{
-	`CREATE TABLE IF NOT EXISTS hydra_client (
+var migrations = &migrate.MemoryMigrationSource{
+	Migrations: []*migrate.Migration{
+		&migrate.Migration{
+			Id:   "1",
+			Up:   []string{`CREATE TABLE IF NOT EXISTS hydra_client (
 	id      	varchar(255) NOT NULL PRIMARY KEY,
 	client_name  	text NOT NULL,
 	client_secret  	text NOT NULL,
@@ -28,7 +32,12 @@ var sqlSchema = []string{
 	logo_uri  	text NOT NULL,
 	contacts  	text NOT NULL,
 	public  	boolean NOT NULL
-)`,
+)`},
+			Down: []string{
+				"DROP TABLE hydra_client",
+			},
+		},
+	},
 }
 
 type SQLManager struct {
@@ -109,10 +118,9 @@ func (d *sqlData) ToClient() *Client {
 }
 
 func (s *SQLManager) CreateSchemas() error {
-	for _, query := range sqlSchema {
-		if _, err := s.DB.Exec(query); err != nil {
-			return errors.Wrapf(err, "Could not create schema:\n%s", query)
-		}
+	n, err := migrate.Exec(s.DB.DB, s.DB.DriverName(), migrations, migrate.Up)
+	if err != nil {
+		return errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
 	}
 	return nil
 }
@@ -191,7 +199,7 @@ func (m *SQLManager) CreateClient(c *Client) error {
 	if _, err := m.DB.NamedExec(fmt.Sprintf(
 		"INSERT INTO hydra_client (%s) VALUES (%s)",
 		strings.Join(sqlParams, ", "),
-		":"+strings.Join(sqlParams, ", :"),
+		":" + strings.Join(sqlParams, ", :"),
 	), data); err != nil {
 		return errors.Wrap(err, "")
 	}

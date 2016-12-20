@@ -23,7 +23,7 @@ func NewSuperAgent(rawurl string) *SuperAgent {
 	}
 }
 
-func (s *SuperAgent) doDry(req *http.Request) error {
+func (s *SuperAgent) DoDry(req *http.Request) error {
 	return helper.DoDryRequest(s.Dry, req)
 }
 
@@ -33,7 +33,7 @@ func (s *SuperAgent) Delete() error {
 		return errors.Wrap(err, "")
 	}
 
-	if err := s.doDry(req); err != nil {
+	if err := s.DoDry(req); err != nil {
 		return err
 	}
 
@@ -59,7 +59,7 @@ func (s *SuperAgent) Get(o interface{}) error {
 		return errors.New("Can not pass nil")
 	}
 
-	if err := s.doDry(req); err != nil {
+	if err := s.DoDry(req); err != nil {
 		return err
 	}
 
@@ -107,13 +107,17 @@ func (s *SuperAgent) send(method string, in interface{}, out interface{}) error 
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	if err := s.doDry(req); err != nil {
+	if err := s.DoDry(req); err != nil {
 		return err
 	}
 
 	resp, err := s.Client.Do(req)
 	if err != nil {
 		return errors.Wrap(err, "")
+	}
+
+	if resp.StatusCode == http.StatusNoContent {
+		return nil
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {

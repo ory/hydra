@@ -20,14 +20,6 @@ type jsonPolicy struct {
 	Conditions  json.RawMessage `json:"conditions" gorethink:"conditions"`
 }
 
-func (p *jsonPolicy) ToPolicy() {
-
-}
-
-func (p *jsonPolicy) FromPolicy() {
-
-}
-
 type HTTPManager struct {
 	Endpoint *url.URL
 	Dry      bool

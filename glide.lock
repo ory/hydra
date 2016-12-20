@@ -1,5 +1,5 @@
-hash: 1a17797a9bbc18dfc735685fd1ea4d54b28c4c09818304ff5740321a31a08fd7
-updated: 2016-12-06T14:10:05.2696103+01:00
+hash: c4d335aa904fa4a9cf2d946347975da7e0dea355aaded6d660d20688b47e2c34
+updated: 2016-12-20T13:21:33.1423094+01:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
@@ -8,7 +8,7 @@ imports:
   subpackages:
   - winterm
 - name: github.com/cenk/backoff
-  version: b02f2bbce11d7ea6b97f282ef1771b0fe2f65ef3
+  version: 32cd0c5b3aef12c76ed64aaf678f6c79736be7dc
 - name: github.com/davecgh/go-spew
   version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
   subpackages:
@@ -16,7 +16,7 @@ imports:
 - name: github.com/dgrijalva/jwt-go
   version: d2709f9f1f31ebcda9651b03077758c1f3a0018c
 - name: github.com/docker/docker
-  version: 4d92237de1b34c8bf99e549db27b83fd087cd765
+  version: 88862e707affccf9c46347361689b2ffef39dc5c
   subpackages:
   - api/types
   - api/types/blkiodev
@@ -81,7 +81,7 @@ imports:
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
 - name: github.com/jmoiron/sqlx
-  version: f71d5ee01769df469d115332106ef504ded071dc
+  version: f9b4c7a65e3ad108b5052f4c72fa96e2c2cb5955
   subpackages:
   - reflectx
 - name: github.com/julienschmidt/httprouter
@@ -116,7 +116,7 @@ imports:
 - name: github.com/ory-am/dockertest
   version: 8445a82f8da6067ffecbb06e3f9fa2857f3bf9df
 - name: github.com/ory-am/fosite
-  version: a2080a30c04abf6a9b3f7dee63026cb5816f8bbd
+  version: 95caa96835a1254ba3f8f4a21e635fe6da34f0fe
   subpackages:
   - compose
   - handler/oauth2
@@ -218,7 +218,7 @@ imports:
 - name: gopkg.in/ory-am/dockertest.v3
   version: e4828e807797a7641fcd457716870dfc2f9e82ff
 - name: gopkg.in/redis.v5
-  version: 854c88a72c8bb9c09936145aef886b7697d6b995
+  version: c6acf2ed159b22defbd9f077686cff03eba1e9b3
   subpackages:
   - internal
   - internal/consistenthash

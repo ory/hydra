@@ -19,7 +19,7 @@ import:
   - pkg
   - rand/sequence
 - package: github.com/ory-am/fosite
-  version: ^0.6.7
+  version: ^0.6.8
   subpackages:
   - compose
   - handler/oauth2

@@ -1,5 +1,5 @@
 hash: 2f2c25ea662452afe08b83c66af3d2899bf5c88e156ab7892197a5f0ab19cc0d
-updated: 2016-12-20T23:01:51.8552622+01:00
+updated: 2016-12-23T16:51:27.958743127+01:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
@@ -61,6 +61,16 @@ imports:
   version: 8ee79997227bf9b34611aee7946ae64735e6fd93
   subpackages:
   - proto
+- name: github.com/gopherjs/gopherjs
+  version: db2cfff3878815d744fb4a4bd07cba0596eaf2a5
+  subpackages:
+  - js
+- name: github.com/gorilla/context
+  version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
+- name: github.com/gorilla/securecookie
+  version: fa5329f913702981df43dcb2a380bac429c810b5
+- name: github.com/gorilla/sessions
+  version: 52389059572b4736b2b7d899b0242ecc449c8779
 - name: github.com/hailocab/go-hostpool
   version: e80d13ce29ede4452c43dea11e79b9bc8a15b478
 - name: github.com/hashicorp/go-cleanhttp
@@ -203,12 +213,14 @@ imports:
   version: ca59ef35f409df61fa4a5f8290ff289b37eccfb8
   subpackages:
   - internal
+  - internal/app_identity
   - internal/base
   - internal/datastore
   - internal/log
+  - internal/modules
   - internal/remote_api
-  - internal/urlfetch
-  - urlfetch
+- name: google.golang.org/appengine/urlfetch
+  version: 08a149cfaee099e6ce4be01c0113a78c85ee1dee
 - name: gopkg.in/dancannon/gorethink.v2
   version: 27d3045458910e2fc56025a0b52caaaa96414a26
   subpackages:
@@ -222,7 +234,7 @@ imports:
 - name: gopkg.in/ory-am/dockertest.v3
   version: e4828e807797a7641fcd457716870dfc2f9e82ff
 - name: gopkg.in/redis.v5
-  version: 5e76db680467ebce5495cc2159a9289a6851d773
+  version: b7bae3a78050e2e7ec2130a05cde296a9ff2e9c0
   subpackages:
   - internal
   - internal/consistenthash
@@ -239,7 +251,5 @@ imports:
 - name: gopkg.in/yaml.v2
   version: a5b47d31c556af34a302ce5d659e6fea44d90de0
 testImports:
-- name: github.com/gorilla/context
-  version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
 - name: github.com/gorilla/mux
   version: 0eeaf8392f5b04950925b8a69fe70f110fa7cbfc

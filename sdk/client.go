@@ -49,7 +49,7 @@ type Client struct {
 	Revocator *hoauth2.HTTPRecovator
 
 	// Groups offers warden group management capabilities.
-	Groups group.HTTPManager
+	Groups *group.HTTPManager
 
 	http          *http.Client
 	clusterURL    *url.URL

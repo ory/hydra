@@ -12,6 +12,7 @@ import (
 	"github.com/ory-am/hydra/jwk"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
+	"github.com/gorilla/sessions"
 )
 
 const (
@@ -27,7 +28,7 @@ type DefaultConsentStrategy struct {
 	KeyManager               jwk.Manager
 }
 
-func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, token string) (claims *Session, err error) {
+func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, token string, session *sessions.Session) (claims *Session, err error) {
 	t, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, errors.Errorf("Unexpected signing method: %v", t.Header["alg"])
@@ -52,6 +53,15 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 	} else if !t.Valid {
 		return nil, errors.Errorf("Token is invalid")
 	}
+
+	if j, ok := session.Values["consent_jti"]; !ok {
+		return nil, errors.Errorf("Session cookie is missing anti-replay token")
+	} else if js, ok := j.(string); !ok {
+		return nil, errors.Errorf("Session cookie anti-replay value is not a string")
+	} else if js != ejwt.ToString(jwtClaims["jti"]) {
+		return nil, errors.Errorf("Session cookie anti-replay value does not match value from consent response")
+	}
+	delete(session.Values, "jti")
 
 	if time.Now().After(ejwt.ToTime(jwtClaims["exp"])) {
 		return nil, errors.Errorf("Token expired")
@@ -112,16 +122,18 @@ func toStringSlice(i interface{}) []string {
 	return []string{}
 }
 
-func (s *DefaultConsentStrategy) IssueChallenge(authorizeRequest fosite.AuthorizeRequester, redirectURL string) (string, error) {
+func (s *DefaultConsentStrategy) IssueChallenge(authorizeRequest fosite.AuthorizeRequester, redirectURL string, session *sessions.Session) (string, error) {
 	token := jwt.New(jwt.SigningMethodRS256)
+	jti := uuid.New()
 	token.Claims = jwt.MapClaims{
-		"jti":   uuid.New(),
+		"jti":   jti,
 		"scp":   authorizeRequest.GetRequestedScopes(),
 		"aud":   authorizeRequest.GetClient().GetID(),
 		"exp":   time.Now().Add(s.DefaultChallengeLifespan).Unix(),
 		"redir": redirectURL,
 	}
 
+	session.Values["consent_jti"] = jti
 	ks, err := s.KeyManager.GetKey(ConsentChallengeKey, "private")
 	if err != nil {
 		return "", errors.Wrap(err, "")

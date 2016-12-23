@@ -57,6 +57,11 @@ func TestExecute(t *testing.T) {
 		{args: []string{"policies", "subjects", "delete", "foobar", "ken", "tracy"}},
 		{args: []string{"policies", "get", "foobar"}},
 		{args: []string{"policies", "delete", "foobar"}},
+		{args: []string{"groups", "create", "my-group"}},
+		{args: []string{"groups", "members", "add", "my-group", "peter"}},
+		{args: []string{"groups", "find", "peter"}},
+		{args: []string{"groups", "members", "remove", "my-group", "peter"}},
+		{args: []string{"groups", "delete", "my-group"}},
 		{args: []string{"version"}},
 	} {
 		c.args = append(c.args, []string{"--skip-tls-verify", "--config", path}...)

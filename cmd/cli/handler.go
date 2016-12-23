@@ -10,6 +10,7 @@ type Handler struct {
 	Keys       *JWKHandler
 	Warden     *WardenHandler
 	Revocation *RevocationHandler
+	Groups     *GroupHandler
 }
 
 func NewHandler(c *config.Config) *Handler {
@@ -19,5 +20,6 @@ func NewHandler(c *config.Config) *Handler {
 		Keys:       newJWKHandler(c),
 		Warden:     newWardenHandler(c),
 		Revocation: newRevocationHandler(c),
+		Groups:     newGroupHandler(c),
 	}
 }

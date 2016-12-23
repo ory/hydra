@@ -17,6 +17,7 @@ import (
 	foauth2 "github.com/ory-am/fosite/handler/oauth2"
 	"github.com/ory-am/fosite/token/hmac"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/ory-am/hydra/warden/group"
 	"github.com/ory-am/ladon"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -159,11 +160,13 @@ func (c *Config) Context() *Context {
 		}
 	}
 
+	var groupManager group.Manager
 	var manager ladon.Manager
 	switch con := connection.(type) {
 	case *MemoryConnection:
 		logrus.Printf("DATABASE_URL not set, connecting to ephermal in-memory database.")
 		manager = ladon.NewMemoryManager()
+		groupManager = group.NewMemoryManager()
 		break
 	case *SQLConnection:
 		m := ladon.NewSQLManager(con.GetDatabase(), nil)
@@ -171,6 +174,13 @@ func (c *Config) Context() *Context {
 			logrus.Fatalf("Could not create policy schema: %s", err)
 		}
 		manager = m
+
+		gm := &group.SQLManager{DB: con.GetDatabase()}
+		if err := gm.CreateSchemas(); err != nil {
+			logrus.Fatalf("Could not create group schema: %s", err)
+		}
+		groupManager = gm
+
 		break
 	case *RethinkDBConnection:
 		logrus.Printf("DATABASE_URL set, connecting to RethinkDB.")
@@ -179,15 +189,20 @@ func (c *Config) Context() *Context {
 			Session: con.GetSession(),
 			Table:   r.Table("hydra_policies"),
 		}
-		m.Watch(context.Background())
 		if err := m.ColdStart(); err != nil {
 			logrus.Fatalf("Could not fetch initial state: %s", err)
 		}
+		m.Watch(context.Background())
 		manager = m
+
+		logrus.Warn("Group management not supported for RethinkDB, falling back to in-memory storage for groups")
+		groupManager = group.NewMemoryManager()
 		break
 	case *RedisConnection:
-		m := ladon.NewRedisManager(con.RedisSession(), "")
-		manager = m
+		manager = ladon.NewRedisManager(con.RedisSession(), "")
+
+		logrus.Warn("Group management not supported for Redis, falling back to in-memory storage for groups")
+		groupManager = group.NewMemoryManager()
 		break
 	default:
 		panic("Unknown connection type.")
@@ -206,6 +221,7 @@ func (c *Config) Context() *Context {
 			AccessTokenLifespan:   c.GetAccessTokenLifespan(),
 			AuthorizeCodeLifespan: c.GetAuthCodeLifespan(),
 		},
+		GroupManager: groupManager,
 	}
 
 	return c.context

@@ -17,6 +17,7 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
+	"github.com/gorilla/sessions"
 )
 
 var hasher = &fosite.BCrypt{}
@@ -60,6 +61,7 @@ var handler = &Handler{
 		DefaultChallengeLifespan: time.Hour,
 		DefaultIDTokenLifespan:   time.Hour * 24,
 	},
+	CookieStore: sessions.NewCookieStore([]byte("foo-secret")),
 	ForcedHTTP: true,
 }
 

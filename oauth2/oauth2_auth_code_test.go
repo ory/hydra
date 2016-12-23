@@ -12,10 +12,10 @@ import (
 	"github.com/ory-am/hydra/jwk"
 	. "github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
-	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
+	"net/http/cookiejar"
 )
 
 func TestAuthCode(t *testing.T) {
@@ -39,7 +39,7 @@ func TestAuthCode(t *testing.T) {
 		require.NotEmpty(t, jwtClaims)
 
 		consent, err := signConsentToken(map[string]interface{}{
-			"jti": uuid.New(),
+			"jti": jwtClaims["jti"],
 			"exp": time.Now().Add(time.Hour).Unix(),
 			"iat": time.Now().Unix(),
 			"aud": "app-client",
@@ -56,7 +56,11 @@ func TestAuthCode(t *testing.T) {
 		w.Write([]byte(r.URL.Query().Get("code")))
 	})
 
-	resp, err := http.Get(oauthConfig.AuthCodeURL("some-foo-state"))
+	cookieJar, _ := cookiejar.New(nil)
+	req, err := http.NewRequest("GET", oauthConfig.AuthCodeURL("some-foo-state"), nil)
+	pkg.RequireError(t, false, err)
+
+	resp, err := (&http.Client{Jar: cookieJar}).Do(req)
 	pkg.RequireError(t, false, err)
 	defer resp.Body.Close()
 

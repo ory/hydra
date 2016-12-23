@@ -12,30 +12,35 @@ import (
 	"github.com/pkg/errors"
 	"strings"
 	"time"
+	"github.com/gorilla/sessions"
+	"github.com/Sirupsen/logrus"
 )
 
 const (
 	OpenIDConnectKeyName = "hydra.openid.id-token"
 
 	ConsentPath = "/oauth2/consent"
-	TokenPath   = "/oauth2/token"
-	AuthPath    = "/oauth2/auth"
+	TokenPath = "/oauth2/token"
+	AuthPath = "/oauth2/auth"
 
 	// IntrospectPath points to the OAuth2 introspection endpoint.
 	IntrospectPath = "/oauth2/introspect"
 	RevocationPath = "/oauth2/revoke"
+
+	consentCookieName = "consent_session"
 )
 
 type Handler struct {
-	OAuth2  fosite.OAuth2Provider
-	Consent ConsentStrategy
+	OAuth2              fosite.OAuth2Provider
+	Consent             ConsentStrategy
 
-	H herodot.Herodot
+	H                   herodot.Herodot
 
-	ForcedHTTP bool
-	ConsentURL url.URL
+	ForcedHTTP          bool
+	ConsentURL          url.URL
 
 	AccessTokenLifespan time.Duration
+	CookieStore         sessions.Store
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
@@ -124,6 +129,8 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprou
 func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = fosite.NewContext()
 
+	logrus.Infof("Got headers: %v+", r.Header)
+
 	authorizeRequest, err := h.OAuth2.NewAuthorizeRequest(ctx, r)
 	if err != nil {
 		pkg.LogError(err)
@@ -143,12 +150,25 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		return
 	}
 
+	cookie, err := h.CookieStore.Get(r, consentCookieName)
+	if err != nil {
+		pkg.LogError(err)
+		h.writeAuthorizeError(w, authorizeRequest, errors.Wrapf(fosite.ErrServerError, "Could not open session: %s", err))
+		return
+	}
+
 	// decode consent_token claims
 	// verify anti-CSRF (inject state) and anti-replay token (expiry time, good value would be 10 seconds)
-	session, err := h.Consent.ValidateResponse(authorizeRequest, consentToken)
+	session, err := h.Consent.ValidateResponse(authorizeRequest, consentToken, cookie)
 	if err != nil {
 		pkg.LogError(err)
 		h.writeAuthorizeError(w, authorizeRequest, errors.Wrap(fosite.ErrAccessDenied, ""))
+		return
+	}
+
+	if err := cookie.Save(r, w); err != nil {
+		pkg.LogError(err)
+		h.writeAuthorizeError(w, authorizeRequest, errors.Wrapf(fosite.ErrServerError, "Could not store session cookie: %s", err))
 		return
 	}
 
@@ -169,7 +189,12 @@ func (h *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, auth
 		schema = "http"
 	}
 
-	challenge, err := h.Consent.IssueChallenge(authorizeRequest, schema+"://"+r.Host+r.URL.String())
+	cookie, err := h.CookieStore.Get(r, consentCookieName)
+	if err != nil {
+		return err
+	}
+
+	challenge, err := h.Consent.IssueChallenge(authorizeRequest, schema + "://" + r.Host + r.URL.String(), cookie)
 	if err != nil {
 		return err
 	}
@@ -178,6 +203,11 @@ func (h *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, auth
 	q := p.Query()
 	q.Set("challenge", challenge)
 	p.RawQuery = q.Encode()
+
+	if err := cookie.Save(r, w); err != nil {
+		return err
+	}
+
 	http.Redirect(w, r, p.String(), http.StatusFound)
 	return nil
 }

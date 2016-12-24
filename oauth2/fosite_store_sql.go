@@ -174,6 +174,7 @@ func (s *FositeSQLStore) deleteSession(signature string, table string) error {
 }
 
 func (s *FositeSQLStore) CreateSchemas() error {
+	migrate.SetTable("hydra_oauth2_migration")
 	n, err := migrate.Exec(s.DB.DB, s.DB.DriverName(), migrations, migrate.Up)
 	if err != nil {
 		return errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)

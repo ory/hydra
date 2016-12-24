@@ -6,13 +6,13 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gorilla/sessions"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/handler/openid"
 	ejwt "github.com/ory-am/fosite/token/jwt"
 	"github.com/ory-am/hydra/jwk"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
-	"github.com/gorilla/sessions"
 )
 
 const (

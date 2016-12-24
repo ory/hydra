@@ -51,6 +51,10 @@ CORE CONTROLS
 	is used to encrypt sensitive data using AES-GCM (256 bit) and validate HMAC signatures.
 	Example: SYSTEM_SECRET=jf89-jgklAS9gk3rkAF90dfsk
 
+- COOKIE_SECRET: A secret that is used to encrypt cookie sessions. Defaults to SYSTEM_SECRET. It is recommended to use
+	a separate secret in production.
+	Example: COOKIE_SECRET=fjah8uFhgjSiuf-AS
+
 - FORCE_ROOT_CLIENT_CREDENTIALS: On first start up, Hydra generates a root client with random id and secret. Use
 	this environment variable in the form of "FORCE_ROOT_CLIENT_CREDENTIALS=id:secret" to set
 	the client id and secret yourself.

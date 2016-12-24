@@ -5,6 +5,8 @@ import (
 	"net/url"
 
 	"encoding/json"
+	"github.com/Sirupsen/logrus"
+	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/herodot"
@@ -12,16 +14,14 @@ import (
 	"github.com/pkg/errors"
 	"strings"
 	"time"
-	"github.com/gorilla/sessions"
-	"github.com/Sirupsen/logrus"
 )
 
 const (
 	OpenIDConnectKeyName = "hydra.openid.id-token"
 
 	ConsentPath = "/oauth2/consent"
-	TokenPath = "/oauth2/token"
-	AuthPath = "/oauth2/auth"
+	TokenPath   = "/oauth2/token"
+	AuthPath    = "/oauth2/auth"
 
 	// IntrospectPath points to the OAuth2 introspection endpoint.
 	IntrospectPath = "/oauth2/introspect"
@@ -31,13 +31,13 @@ const (
 )
 
 type Handler struct {
-	OAuth2              fosite.OAuth2Provider
-	Consent             ConsentStrategy
+	OAuth2  fosite.OAuth2Provider
+	Consent ConsentStrategy
 
-	H                   herodot.Herodot
+	H herodot.Herodot
 
-	ForcedHTTP          bool
-	ConsentURL          url.URL
+	ForcedHTTP bool
+	ConsentURL url.URL
 
 	AccessTokenLifespan time.Duration
 	CookieStore         sessions.Store
@@ -194,7 +194,7 @@ func (h *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, auth
 		return err
 	}
 
-	challenge, err := h.Consent.IssueChallenge(authorizeRequest, schema + "://" + r.Host + r.URL.String(), cookie)
+	challenge, err := h.Consent.IssueChallenge(authorizeRequest, schema+"://"+r.Host+r.URL.String(), cookie)
 	if err != nil {
 		return err
 	}

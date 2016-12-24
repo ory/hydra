@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/compose"
@@ -17,7 +18,6 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
-	"github.com/gorilla/sessions"
 )
 
 var hasher = &fosite.BCrypt{}
@@ -62,7 +62,7 @@ var handler = &Handler{
 		DefaultIDTokenLifespan:   time.Hour * 24,
 	},
 	CookieStore: sessions.NewCookieStore([]byte("foo-secret")),
-	ForcedHTTP: true,
+	ForcedHTTP:  true,
 }
 
 var router = httprouter.New()

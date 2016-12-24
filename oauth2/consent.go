@@ -1,8 +1,8 @@
 package oauth2
 
 import (
-	"github.com/ory-am/fosite"
 	"github.com/gorilla/sessions"
+	"github.com/ory-am/fosite"
 )
 
 type ConsentStrategy interface {

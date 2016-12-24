@@ -3,6 +3,7 @@ package jwk
 import (
 	"database/sql"
 	"encoding/json"
+	"github.com/Sirupsen/logrus"
 	"github.com/jmoiron/sqlx"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pkg/errors"
@@ -43,10 +44,12 @@ type sqlData struct {
 }
 
 func (s *SQLManager) CreateSchemas() error {
+	migrate.SetTable("hydra_jwk_migration")
 	n, err := migrate.Exec(s.DB.DB, s.DB.DriverName(), migrations, migrate.Up)
 	if err != nil {
 		return errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
 	}
+	logrus.Infof("Applied %d migrations %s!", n, s.DB.DriverName())
 	return nil
 }
 

@@ -33,7 +33,7 @@ services:
       - LOG_LEVEL=${LOG_LEVEL}
       - SYSTEM_SECRET=${SYSTEM_SECRET}
       - CONSENT_URL=http://${DOCKER_IP}:3000
-      - DATABASE_URL=postgres://postgres:secret@postgresd:5432/postgres?sslmode=disable
+      - DATABASE_URL=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable
 #     Uncomment the following line to use mysql instead.
 #      - DATABASE_URL=mysql://root:secret@tcp(mysqld:3306)/mysql?parseTime=true
 #     Uncomment the following line to use redis instead.
@@ -62,8 +62,9 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=postgres
+      - POSTGRES_USER=hydra
       - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=hydra
 
 #  Uncomment the following section to use mysql instead.
 #  mysqld:

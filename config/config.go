@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/ory-am/common/env"
 	"github.com/ory-am/fosite"
 	foauth2 "github.com/ory-am/fosite/handler/oauth2"
 	"github.com/ory-am/fosite/token/hmac"
@@ -20,6 +21,7 @@ import (
 	"github.com/ory-am/hydra/warden/group"
 	"github.com/ory-am/ladon"
 	"github.com/pkg/errors"
+	"github.com/rubenv/sql-migrate"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"golang.org/x/net/context"
@@ -170,6 +172,7 @@ func (c *Config) Context() *Context {
 		break
 	case *SQLConnection:
 		m := ladon.NewSQLManager(con.GetDatabase(), nil)
+		migrate.SetTable("hydra_policy_migration")
 		if err := m.CreateSchemas(); err != nil {
 			logrus.Fatalf("Could not create policy schema: %s", err)
 		}
@@ -271,6 +274,10 @@ func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
 
 	c.oauth2Client = oauthConfig.Client(ctx)
 	return c.oauth2Client
+}
+
+func (c *Config) GetCookieSecret() []byte {
+	return []byte(env.Getenv("COOKIE_SECRET", string(c.GetSystemSecret())))
 }
 
 func (c *Config) GetSystemSecret() []byte {

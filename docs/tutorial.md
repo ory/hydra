@@ -6,14 +6,14 @@ In this example, you will set up Hydra, a Postgres instance and an exemplary ide
 
 <img alt="Running the example" align="right" width="35%" src="images/run-the-example.gif">
 
-Install the [CLI and Docker](https://github.com/ory-am/hydra#installation). Make sure you install Docker Compose as well.
+Install [Docker and Docker Compose](https://github.com/ory-am/hydra#installation) and either clone the Hydra git repository,
+download [this zip file](https://github.com/ory-am/hydra/archive/master.zip) or use `go get github.com/ory-am/hydra` if you have Go installed on you system.
 
-We will use a dummy password as the system secret: `SYSTEM_SECRET=passwordtutorialpasswordtutorial`.
-Use a very secure secret in production.
+We will use a dummy password as the system secret: `SYSTEM_SECRET=passwordtutorialpasswordtutorial`. Use a very secure secret in production. 
 
 ```
-$ go get github.com/ory-am/hydra
-$ cd $GOPATH/src/github.com/ory-am/hydra
+$ git clone https://github.com/ory-am/hydra.git
+$ cd hydra
 $ SYSTEM_SECRET=passwordtutorial DOCKER_IP=localhost docker-compose up --build
 Starting hydra_mysqld_1
 Starting hydra_postgresd_1

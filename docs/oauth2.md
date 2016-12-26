@@ -64,7 +64,7 @@ app (sometimes referred to as *consent endpoint*). Once the consent app authenti
 the user back to Hydra, passing along a JSON Web Token including information for Hydra to process. In abstract,
 the consent flow looks like this:
 
-![](../images/consent.png)
+![Consent Flow](/images/consent.png)
 
 1. A *client* application (app in browser in laptop) requests an access token from a resource owner:
 `https://hydra.myapp.com/oauth2/auth?client_id=c3b49cf0-88e4-4faa-9489-28d5b8957858&response_type=code&scope=core+hydra&state=vboeidlizlxrywkwlsgeggff&nonce=tedgziijemvninkuotcuuiof`.

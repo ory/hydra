@@ -1,5 +1,5 @@
-hash: 2f2c25ea662452afe08b83c66af3d2899bf5c88e156ab7892197a5f0ab19cc0d
-updated: 2016-12-23T16:51:27.958743127+01:00
+hash: 0b3ab6f0447d2d4ad9e8134744e216ea6747a0e78610726043e3648e5a74a9e4
+updated: 2016-12-26T22:42:26.550804597+01:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
@@ -61,10 +61,6 @@ imports:
   version: 8ee79997227bf9b34611aee7946ae64735e6fd93
   subpackages:
   - proto
-- name: github.com/gopherjs/gopherjs
-  version: db2cfff3878815d744fb4a4bd07cba0596eaf2a5
-  subpackages:
-  - js
 - name: github.com/gorilla/context
   version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
 - name: github.com/gorilla/securecookie
@@ -121,6 +117,7 @@ imports:
   version: 8d96b678f9a0e5d6717f53df04e0b78bd66a2ed0
   subpackages:
   - compiler
+  - env
   - pkg
   - rand/sequence
 - name: github.com/ory-am/dockertest
@@ -155,7 +152,7 @@ imports:
   subpackages:
   - sqlparse
 - name: github.com/Sirupsen/logrus
-  version: 4b6ea7319e214d98c938f12692336f7ca9348d6b
+  version: d26492970760ca5d33129d2d799e34be5c4782eb
 - name: github.com/spf13/afero
   version: 06b7e5f50606ecd49148a01a6008942d9b669217
   subpackages:
@@ -213,14 +210,12 @@ imports:
   version: ca59ef35f409df61fa4a5f8290ff289b37eccfb8
   subpackages:
   - internal
-  - internal/app_identity
   - internal/base
   - internal/datastore
   - internal/log
-  - internal/modules
   - internal/remote_api
-- name: google.golang.org/appengine/urlfetch
-  version: 08a149cfaee099e6ce4be01c0113a78c85ee1dee
+  - internal/urlfetch
+  - urlfetch
 - name: gopkg.in/dancannon/gorethink.v2
   version: 27d3045458910e2fc56025a0b52caaaa96414a26
   subpackages:

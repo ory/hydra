@@ -69,7 +69,7 @@ func (w *HTTPWarden) IsAllowed(ctx context.Context, a *firewall.AccessRequest) e
 	if err := agent.POST(a, &allowed); err != nil {
 		return err
 	} else if !allowed.Allowed {
-		return errors.New("Forbidden")
+		return errors.Wrap(fosite.ErrRequestForbidden, "")
 	}
 
 	return nil

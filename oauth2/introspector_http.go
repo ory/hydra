@@ -55,6 +55,12 @@ func (i *HTTPIntrospector) IntrospectToken(ctx context.Context, token string, sc
 
 	body, _ := ioutil.ReadAll(hres.Body)
 	if hres.StatusCode < 200 || hres.StatusCode >= 300 {
+		if hres.StatusCode == http.StatusUnauthorized {
+			return nil, errors.Wrapf(fosite.ErrRequestUnauthorized, "Got status code %d: %s", hres.StatusCode, string(body))
+		} else if hres.StatusCode == http.StatusForbidden {
+			return nil, errors.Wrapf(fosite.ErrRequestUnauthorized, "Got status code %d: %s", hres.StatusCode, string(body))
+		}
+
 		return nil, errors.Errorf("Expected 2xx status code but got %d.\n%s", hres.StatusCode, string(body))
 	} else if err := json.Unmarshal(body, resp); err != nil {
 		return nil, errors.Errorf("Could not unmarshal body because %s, body %s", err, string(body))

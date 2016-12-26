@@ -1,15 +1,14 @@
 FROM golang:1.7
 
 RUN go get github.com/Masterminds/glide
-
 WORKDIR /go/src/github.com/ory-am/hydra
 
-ADD ./glide.yaml /go/src/github.com/ory-am/hydra/glide.yaml
-ADD ./glide.lock /go/src/github.com/ory-am/hydra/glide.lock
+ADD ./glide.yaml ./glide.yaml
+ADD ./glide.lock ./glide.lock
 RUN glide install
 
-ADD . /go/src/github.com/ory-am/hydra
-RUN go install github.com/ory-am/hydra
+ADD . .
+RUN go install .
 
 ENTRYPOINT /go/bin/hydra host --dangerous-auto-logon --dangerous-force-http
 

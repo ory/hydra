@@ -30,7 +30,7 @@ var ladonWarden = pkg.LadonWarden(map[string]ladon.Policy{
 	"1": &ladon.DefaultPolicy{
 		ID:        "1",
 		Subjects:  []string{"alice", "group1"},
-		Resources: []string{"matrix", "rn:hydra:token<.*>"},
+		Resources: []string{"matrix", "forbidden_matrix", "rn:hydra:token<.*>"},
 		Actions:   []string{"create", "decide"},
 		Effect:    ladon.AllowAccess,
 	},
@@ -40,6 +40,13 @@ var ladonWarden = pkg.LadonWarden(map[string]ladon.Policy{
 		Resources: []string{"<.*>"},
 		Actions:   []string{"decide"},
 		Effect:    ladon.AllowAccess,
+	},
+	"3": &ladon.DefaultPolicy{
+		ID:        "3",
+		Subjects:  []string{"group1"},
+		Resources: []string{"forbidden_matrix", "rn:hydra:token<.*>"},
+		Actions:   []string{"create", "decide"},
+		Effect:    ladon.DenyAccess,
 	},
 })
 
@@ -203,6 +210,16 @@ func TestActionAllowed(t *testing.T) {
 					assert.Equal(t, now.Add(time.Hour), c.ExpiresAt)
 					assert.Equal(t, now, c.IssuedAt)
 				},
+			},
+			{
+				token: tokens[3][1],
+				req: &firewall.TokenAccessRequest{
+					Resource: "forbidden_matrix",
+					Action:   "create",
+					Context:  ladon.Context{},
+				},
+				scopes:    []string{"core"},
+				expectErr: true,
 			},
 			{
 				token: tokens[3][1],

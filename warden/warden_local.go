@@ -11,6 +11,7 @@ import (
 	"github.com/ory-am/hydra/warden/group"
 	"github.com/ory-am/ladon"
 	"golang.org/x/net/context"
+	"github.com/pkg/errors"
 )
 
 type LocalWarden struct {
@@ -27,7 +28,7 @@ func (w *LocalWarden) TokenFromRequest(r *http.Request) string {
 }
 
 func (w *LocalWarden) IsAllowed(ctx context.Context, a *firewall.AccessRequest) error {
-	if err := w.Warden.IsAllowed(&ladon.Request{
+	if err := w.isAllowed(ctx, &ladon.Request{
 		Resource: a.Resource,
 		Action:   a.Action,
 		Subject:  a.Subject,
@@ -41,6 +42,11 @@ func (w *LocalWarden) IsAllowed(ctx context.Context, a *firewall.AccessRequest) 
 		return err
 	}
 
+	logrus.WithFields(logrus.Fields{
+		"subject": a.Subject,
+		"request": a,
+		"reason":  "The policy decision point allowed the request",
+	}).Infof("Access allowed")
 	return nil
 }
 
@@ -55,83 +61,88 @@ func (w *LocalWarden) TokenAllowed(ctx context.Context, token string, a *firewal
 	}
 
 	session := auth.GetSession()
-	c, err := w.sessionAllowed(ctx, a, scopes, auth, session.GetSubject())
-	if err != nil {
-		orig := err
-		// If the subject is not allowed, check if a group he belongs to, is.
-		groups, err := w.Groups.FindGroupNames(session.GetSubject())
-		if err != nil {
-			return nil, err
-		} else if len(groups) == 0 {
-			return nil, orig
-		}
-
-		logrus.WithFields(logrus.Fields{
-			"subject": session.GetSubject(),
-			"request": a,
-			"groups":  groups,
-			"reason":  "Subject is not allowed to perform action on resource, trying groups",
-		}).WithError(err).Infof("Access denied")
-		for _, group := range groups {
-			// If one of the groups allows access, allow access.
-			if c, err := w.sessionAllowed(ctx, a, scopes, auth, group); err == nil {
-				logrus.WithFields(logrus.Fields{
-					"subject":  c.Subject,
-					"group":    group,
-					"audience": auth.GetClient().GetID(),
-				}).Infof("Access granted, because subject is member of authorized group")
-				return c, nil
-			}
-
-			// We don't really care about errors here
-		}
-		return c, orig
-	}
-
-	return c, err
-}
-
-func (w *LocalWarden) sessionAllowed(ctx context.Context, a *firewall.TokenAccessRequest, scopes []string, oauthRequest fosite.AccessRequester, subject string) (*firewall.Context, error) {
-	if err := w.Warden.IsAllowed(&ladon.Request{
+	if err := w.isAllowed(ctx, &ladon.Request{
 		Resource: a.Resource,
 		Action:   a.Action,
-		Subject:  subject,
+		Subject:  session.GetSubject(),
 		Context:  a.Context,
 	}); err != nil {
 		logrus.WithFields(logrus.Fields{
 			"scopes":   scopes,
-			"subject":  subject,
-			"audience": oauthRequest.GetClient().GetID(),
+			"subject":  session.GetSubject(),
+			"audience": auth.GetClient().GetID(),
 			"request":  a,
 			"reason":   "The policy decision point denied the request",
 		}).WithError(err).Infof("Access denied")
 		return nil, err
 	}
 
-	return w.newContext(oauthRequest), nil
+	c := w.newContext(auth)
+	logrus.WithFields(logrus.Fields{
+		"subject":  c.Subject,
+		"audience": auth.GetClient().GetID(),
+		"request": auth,
+		"result": c,
+	}).Infof("Access granted")
+
+	return c, nil
 }
 
-func (w *LocalWarden) newContext(oauthRequest fosite.AccessRequester) *firewall.Context {
-	session := oauthRequest.GetSession().(*oauth2.Session)
-
-	exp := oauthRequest.GetSession().GetExpiresAt(fosite.AccessToken)
-	if exp.IsZero() {
-		exp = oauthRequest.GetRequestedAt().Add(w.AccessTokenLifespan)
+func (w *LocalWarden) isAllowed(ctx context.Context, a *ladon.Request) error {
+	groups, err := w.Groups.FindGroupNames(a.Subject)
+	if err != nil {
+		return err
 	}
+
+	errs := make([]error, len(groups) + 1)
+	errs[0] = w.Warden.IsAllowed(&ladon.Request{
+		Resource: a.Resource,
+		Action:   a.Action,
+		Subject:  a.Subject,
+		Context:  a.Context,
+	})
+
+	for k, group := range groups {
+		errs[k+1] = w.Warden.IsAllowed(&ladon.Request{
+			Resource: a.Resource,
+			Action:   a.Action,
+			Subject:  group,
+			Context:  a.Context,
+		})
+	}
+
+	for _, err := range errs {
+		if errors.Cause(err) == ladon.ErrRequestForcefullyDenied {
+			return err
+		}
+	}
+
+	for _, err := range errs {
+		if err == nil {
+			return nil
+		}
+	}
+
+	return errors.WithStack(ladon.ErrRequestDenied)
+}
+
+func (w *LocalWarden) newContext(auth fosite.AccessRequester) *firewall.Context {
+	session := auth.GetSession().(*oauth2.Session)
+
+	exp := auth.GetSession().GetExpiresAt(fosite.AccessToken)
+	if exp.IsZero() {
+		exp = auth.GetRequestedAt().Add(w.AccessTokenLifespan)
+	}
+
 	c := &firewall.Context{
 		Subject:       session.Subject,
-		GrantedScopes: oauthRequest.GetGrantedScopes(),
+		GrantedScopes: auth.GetGrantedScopes(),
 		Issuer:        w.Issuer,
-		Audience:      oauthRequest.GetClient().GetID(),
-		IssuedAt:      oauthRequest.GetRequestedAt(),
+		Audience:      auth.GetClient().GetID(),
+		IssuedAt:      auth.GetRequestedAt(),
 		ExpiresAt:     exp,
 		Extra:         session.Extra,
 	}
-
-	logrus.WithFields(logrus.Fields{
-		"subject":  c.Subject,
-		"audience": oauthRequest.GetClient().GetID(),
-	}).Infof("Access granted")
 
 	return c
 }

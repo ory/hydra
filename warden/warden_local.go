@@ -102,18 +102,18 @@ func (w *LocalWarden) isAllowed(ctx context.Context, a *ladon.Request) error {
 		Context:  a.Context,
 	})
 
-	for k, group := range groups {
+	for k, g := range groups {
 		errs[k+1] = w.Warden.IsAllowed(&ladon.Request{
 			Resource: a.Resource,
 			Action:   a.Action,
-			Subject:  group,
+			Subject:  g,
 			Context:  a.Context,
 		})
 	}
 
 	for _, err := range errs {
 		if errors.Cause(err) == ladon.ErrRequestForcefullyDenied {
-			return err
+			return errors.Wrap(fosite.ErrRequestForbidden, err.Error())
 		}
 	}
 
@@ -123,7 +123,7 @@ func (w *LocalWarden) isAllowed(ctx context.Context, a *ladon.Request) error {
 		}
 	}
 
-	return errors.WithStack(ladon.ErrRequestDenied)
+	return errors.Wrap(fosite.ErrRequestForbidden, ladon.ErrRequestDenied.Error())
 }
 
 func (w *LocalWarden) newContext(auth fosite.AccessRequester) *firewall.Context {

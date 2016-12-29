@@ -12,6 +12,7 @@ import (
 	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/ladon"
 	"golang.org/x/oauth2"
+	"github.com/ory-am/hydra/warden/group"
 )
 
 func NewFirewall(issuer string, subject string, scopes fosite.Arguments, p ...ladon.Policy) (firewall.Firewall, *http.Client) {
@@ -32,23 +33,24 @@ func NewFirewall(issuer string, subject string, scopes fosite.Arguments, p ...la
 	conf := &oauth2.Config{Scopes: scopes, Endpoint: oauth2.Endpoint{}}
 
 	return &warden.LocalWarden{
-			Warden: ladonWarden,
-			OAuth2: &fosite.Fosite{
-				Store: fositeStore,
-				TokenIntrospectionHandlers: fosite.TokenIntrospectionHandlers{
-					&foauth2.CoreValidator{
-						CoreStrategy:  pkg.HMACStrategy,
-						CoreStorage:   fositeStore,
-						ScopeStrategy: fosite.HierarchicScopeStrategy,
-					},
+		Warden: ladonWarden,
+		OAuth2: &fosite.Fosite{
+			Store: fositeStore,
+			TokenIntrospectionHandlers: fosite.TokenIntrospectionHandlers{
+				&foauth2.CoreValidator{
+					CoreStrategy:  pkg.HMACStrategy,
+					CoreStorage:   fositeStore,
+					ScopeStrategy: fosite.HierarchicScopeStrategy,
 				},
-				ScopeStrategy: fosite.HierarchicScopeStrategy,
 			},
-			Issuer:              issuer,
-			AccessTokenLifespan: time.Hour,
-		}, conf.Client(oauth2.NoContext, &oauth2.Token{
-			AccessToken: tokens[0][1],
-			Expiry:      time.Now().Add(time.Hour),
-			TokenType:   "bearer",
-		})
+			ScopeStrategy: fosite.HierarchicScopeStrategy,
+		},
+		Issuer:              issuer,
+		AccessTokenLifespan: time.Hour,
+		Groups: group.NewMemoryManager(),
+	}, conf.Client(oauth2.NoContext, &oauth2.Token{
+		AccessToken: tokens[0][1],
+		Expiry:      time.Now().Add(time.Hour),
+		TokenType:   "bearer",
+	})
 }

@@ -109,7 +109,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&keyRequest); err != nil {
-		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
+		h.H.WriteError(ctx, w, r, errors.WithStack(err))
 	}
 
 	generator, found := h.GetGenerators()[keyRequest.Algorithm]
@@ -147,14 +147,14 @@ func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&requests); err != nil {
-		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
+		h.H.WriteError(ctx, w, r, errors.WithStack(err))
 		return
 	}
 
 	for _, request := range requests.Keys {
 		key := &jose.JsonWebKey{}
 		if err := key.UnmarshalJSON(request); err != nil {
-			h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
+			h.H.WriteError(ctx, w, r, errors.WithStack(err))
 		}
 		keySet.Keys = append(keySet.Keys, *key)
 	}
@@ -173,7 +173,7 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 	var set = ps.ByName("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&key); err != nil {
-		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
+		h.H.WriteError(ctx, w, r, errors.WithStack(err))
 		return
 	}
 

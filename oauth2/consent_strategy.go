@@ -136,7 +136,7 @@ func (s *DefaultConsentStrategy) IssueChallenge(authorizeRequest fosite.Authoriz
 	session.Values["consent_jti"] = jti
 	ks, err := s.KeyManager.GetKey(ConsentChallengeKey, "private")
 	if err != nil {
-		return "", errors.Wrap(err, "")
+		return "", errors.WithStack(err)
 	}
 
 	rsaKey, ok := jwk.First(ks.Keys).Key.(*rsa.PrivateKey)
@@ -146,9 +146,9 @@ func (s *DefaultConsentStrategy) IssueChallenge(authorizeRequest fosite.Authoriz
 
 	var signature, encoded string
 	if encoded, err = token.SigningString(); err != nil {
-		return "", errors.Wrap(err, "")
+		return "", errors.WithStack(err)
 	} else if signature, err = token.Method.Sign(encoded, rsaKey); err != nil {
-		return "", errors.Wrap(err, "")
+		return "", errors.WithStack(err)
 	}
 
 	return fmt.Sprintf("%s.%s", encoded, signature), nil

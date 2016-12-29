@@ -44,7 +44,7 @@ const (
 func redisCreateTokenSession(pipe *redis.Pipeline, req fosite.Requester, key, setKey, signature string) error {
 	payload, err := json.Marshal(req)
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	pipe.HSet(key, signature, string(payload))
@@ -69,7 +69,7 @@ func (s *FositeRedisStore) hGet(hash, key string, proto fosite.Session) (*fosite
 
 	if proto != nil {
 		if err := json.Unmarshal(schema.Session, proto); err != nil {
-			return nil, errors.Wrap(err, "")
+			return nil, errors.WithStack(err)
 		}
 	}
 
@@ -87,11 +87,11 @@ func (s *FositeRedisStore) hGet(hash, key string, proto fosite.Session) (*fosite
 func (s *FositeRedisStore) hSet(hash, key string, requester fosite.Requester) error {
 	payload, err := json.Marshal(requester)
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	if err := s.DB.HSet(hash, key, string(payload)).Err(); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	return nil
@@ -106,7 +106,7 @@ func (s *FositeRedisStore) GetOpenIDConnectSession(_ context.Context, authorizeC
 	if err == redis.Nil {
 		return nil, errors.Wrap(fosite.ErrNotFound, "")
 	} else if err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 
 	return session, nil
@@ -125,7 +125,7 @@ func (s *FositeRedisStore) GetAuthorizeCodeSession(_ context.Context, code strin
 	if err == redis.Nil {
 		return nil, errors.Wrap(fosite.ErrNotFound, "")
 	} else if err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 
 	return session, nil
@@ -152,7 +152,7 @@ func (s *FositeRedisStore) GetAccessTokenSession(_ context.Context, signature st
 	if err == redis.Nil {
 		return nil, errors.Wrap(fosite.ErrNotFound, "")
 	} else if err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 
 	return session, nil
@@ -163,7 +163,7 @@ func (s *FositeRedisStore) DeleteAccessTokenSession(_ context.Context, signature
 	if err == redis.Nil {
 		return nil
 	} else if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	pipe := s.DB.Pipeline()
@@ -200,7 +200,7 @@ func (s *FositeRedisStore) DeleteRefreshTokenSession(_ context.Context, signatur
 	if err == redis.Nil {
 		return nil
 	} else if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	pipe := s.DB.Pipeline()

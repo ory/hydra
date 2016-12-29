@@ -58,12 +58,12 @@ func (m *HTTPManager) RemoveGroupMembers(group string, members []string) error {
 	r.Dry = m.Dry
 	send, err := json.Marshal(&membersRequest{Members: members})
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	req, err := http.NewRequest("DELETE", r.URL, bytes.NewReader(send))
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	if err := r.DoDry(req); err != nil {
@@ -72,7 +72,7 @@ func (m *HTTPManager) RemoveGroupMembers(group string, members []string) error {
 
 	resp, err := r.Client.Do(req)
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	defer resp.Body.Close()
 

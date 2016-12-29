@@ -128,7 +128,7 @@ func signConsentToken(claims jwt.MapClaims) (string, error) {
 
 	keys, err := keyManager.GetKey(ConsentEndpointKey, "private")
 	if err != nil {
-		return "", errors.Wrap(err, "")
+		return "", errors.WithStack(err)
 	}
 	rsaKey, err := jwk.ToRSAPrivate(jwk.First(keys.Keys))
 	if err != nil {
@@ -137,9 +137,9 @@ func signConsentToken(claims jwt.MapClaims) (string, error) {
 
 	var signature, encoded string
 	if encoded, err = token.SigningString(); err != nil {
-		return "", errors.Wrap(err, "")
+		return "", errors.WithStack(err)
 	} else if signature, err = token.Method.Sign(encoded, rsaKey); err != nil {
-		return "", errors.Wrap(err, "")
+		return "", errors.WithStack(err)
 	}
 
 	return fmt.Sprintf("%s.%s", encoded, signature), nil

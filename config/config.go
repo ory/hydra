@@ -61,13 +61,13 @@ type Config struct {
 func matchesRange(r *http.Request, ranges []string) error {
 	ip, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	for _, rn := range ranges {
 		_, cidr, err := net.ParseCIDR(rn)
 		if err != nil {
-			return errors.Wrap(err, "")
+			return errors.WithStack(err)
 		}
 		addr := net.ParseIP(ip)
 		if cidr.Contains(addr) {
@@ -313,7 +313,7 @@ func (c *Config) GetAddress() string {
 func (c *Config) Persist() error {
 	out, err := yaml.Marshal(c)
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	logrus.Infof("Persisting config in file %s", viper.ConfigFileUsed())

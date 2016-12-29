@@ -48,7 +48,7 @@ func (m *RethinkManager) Authenticate(id string, secret []byte) (*Client, error)
 	}
 
 	if err := m.Hasher.Compare(c.GetHashedSecret(), secret); err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 
 	return &c, nil
@@ -61,7 +61,7 @@ func (m *RethinkManager) CreateClient(c *Client) error {
 
 	h, err := m.Hasher.Hash([]byte(c.Secret))
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	c.Secret = string(h)
 
@@ -83,12 +83,12 @@ func (m *RethinkManager) UpdateClient(c *Client) error {
 	} else {
 		h, err := m.Hasher.Hash([]byte(c.Secret))
 		if err != nil {
-			return errors.Wrap(err, "")
+			return errors.WithStack(err)
 		}
 		c.Secret = string(h)
 	}
 	if err := mergo.Merge(c, o); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	if err := m.publishUpdate(c); err != nil {
@@ -121,7 +121,7 @@ func (m *RethinkManager) ColdStart() error {
 	m.Clients = map[string]Client{}
 	clients, err := m.Table.Run(m.Session)
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	var client Client
@@ -143,14 +143,14 @@ func (m *RethinkManager) publishUpdate(client *Client) error {
 
 func (m *RethinkManager) publishCreate(client *Client) error {
 	if _, err := m.Table.Insert(client).RunWrite(m.Session); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	return nil
 }
 
 func (m *RethinkManager) publishDelete(id string) error {
 	if _, err := m.Table.Get(id).Delete().RunWrite(m.Session); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	return nil
 }
@@ -159,7 +159,7 @@ func (m *RethinkManager) Watch(ctx context.Context) {
 	go pkg.Retry(time.Second*15, time.Minute, func() error {
 		clients, err := m.Table.Changes().Run(m.Session)
 		if err != nil {
-			return errors.Wrap(err, "")
+			return errors.WithStack(err)
 		}
 		defer clients.Close()
 

@@ -42,12 +42,12 @@ func (m *MemoryManager) UpdateClient(c *Client) error {
 	} else {
 		h, err := m.Hasher.Hash([]byte(c.Secret))
 		if err != nil {
-			return errors.Wrap(err, "")
+			return errors.WithStack(err)
 		}
 		c.Secret = string(h)
 	}
 	if err := mergo.Merge(c, o); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	m.Clients[c.GetID()] = *c
@@ -64,7 +64,7 @@ func (m *MemoryManager) Authenticate(id string, secret []byte) (*Client, error) 
 	}
 
 	if err := m.Hasher.Compare(c.GetHashedSecret(), secret); err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 
 	return &c, nil
@@ -80,7 +80,7 @@ func (m *MemoryManager) CreateClient(c *Client) error {
 
 	hash, err := m.Hasher.Hash([]byte(c.Secret))
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	c.Secret = string(hash)
 

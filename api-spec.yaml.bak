@@ -16,174 +16,78 @@ basePath: /
 produces:
   - application/json
 paths:
-  /products:
+  /clients:
     get:
-      summary: Product Types
-      description: |
-        The Products endpoint returns information about the *Uber* products
-        offered at a given location. The response includes the display name
-        and other details about each product, and lists the products in the
-        proper display order.
-      parameters:
-        - name: latitude
-          in: query
-          description: Latitude component of location.
-          required: true
-          type: number
-          format: double
-        - name: longitude
-          in: query
-          description: Longitude component of location.
-          required: true
-          type: number
-          format: double
-      tags:
-        - Products
+      description: "Get all OAuth2 Clients."
       responses:
         200:
-          description: An array of products
+          description: "List of OAuth2 Clients."
           schema:
             type: array
             items:
-              $ref: '#/definitions/Product'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-  /estimates/price:
-    get:
-      summary: Price Estimates
-      description: |
-        The Price Estimates endpoint returns an estimated price range
-        for each product offered at a given location. The price estimate is
-        provided as a formatted string with the full price range and the localized
-        currency symbol.<br><br>The response also includes low and high estimates,
-        and the [ISO 4217](http://en.wikipedia.org/wiki/ISO_4217) currency code for
-        situations requiring currency conversion. When surge is active for a particular
-        product, its surge_multiplier will be greater than 1, but the price estimate
-        already factors in this multiplier.
-      parameters:
-        - name: start_latitude
-          in: query
-          description: Latitude component of start location.
-          required: true
-          type: number
-          format: double
-        - name: start_longitude
-          in: query
-          description: Longitude component of start location.
-          required: true
-          type: number
-          format: double
-        - name: end_latitude
-          in: query
-          description: Latitude component of end location.
-          required: true
-          type: number
-          format: double
-        - name: end_longitude
-          in: query
-          description: Longitude component of end location.
-          required: true
-          type: number
-          format: double
-      tags:
-        - Estimates
+              $ref: "#/definitions/OAuth2 Client"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+    post:
+      description: "Create a OAuth2 Client."
       responses:
         200:
-          description: An array of price estimates by product
+          description: "The created OAuth2 Client."
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/PriceEstimate'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-  /estimates/time:
+            $ref: "#/definitions/OAuth2 Client"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+  /clients/{id}:
+    parameters:
+      - name: "id"
+        in: path
+        description: "The unique ID of the OAuth2 Client."
+        required: true
+        type: string
     get:
-      summary: Time Estimates
-      description: The Time Estimates endpoint returns ETAs for all products offered at a given location, with the responses expressed as integers in seconds. We recommend that this endpoint be called every minute to provide the most accurate, up-to-date ETAs.
-      parameters:
-        - name: start_latitude
-          in: query
-          description: Latitude component of start location.
-          required: true
-          type: number
-          format: double
-        - name: start_longitude
-          in: query
-          description: Longitude component of start location.
-          required: true
-          type: number
-          format: double
-        - name: customer_uuid
-          in: query
-          type: string
-          format: uuid
-          description: Unique customer identifier to be used for experience customization.
-        - name: product_id
-          in: query
-          type: string
-          description: Unique identifier representing a specific product for a given latitude & longitude.
-      tags:
-        - Estimates
+      description: "Get an OAuth2 Client."
       responses:
         200:
-          description: An array of products
+          description: OK
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/Product'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-  /me:
-    get:
-      summary: User Profile
-      description: The User Profile endpoint returns information about the Uber user that has authorized with the application.
-      tags:
-        - User
+            $ref: "#/definitions/OAuth2 Client"
+        404:
+          description: "Not found"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+    put:
+      description: "Update an OAuth2 Client."
       responses:
         200:
-          description: Profile information for a user
+          description: OK
           schema:
-            $ref: '#/definitions/Profile'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-  /history:
-    get:
-      summary: User Activity
-      description: The User Activity endpoint returns data about a user's lifetime activity with Uber. The response will include pickup locations and times, dropoff locations and times, the distance of past requests, and information about which products were requested.<br><br>The history array in the response will have a maximum length based on the limit parameter. The response value count may exceed limit, therefore subsequent API requests may be necessary.
-      parameters:
-        - name: offset
-          in: query
-          type: integer
-          format: int32
-          description: Offset the list of returned results by this amount. Default is zero.
-        - name: limit
-          in: query
-          type: integer
-          format: int32
-          description: Number of items to retrieve. Default is 5, maximum is 100.
-      tags:
-        - User
+            $ref: "#/definitions/OAuth2 Client"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+    delete:
+      description: Delete an OAuth2 Client.
       responses:
-        200:
-          description: History information for the given user
+        204:
+          description: OK
           schema:
-            $ref: '#/definitions/Activities'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
+            $ref: "#/definitions/OAuth2 Client"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+
+
 definitions:
   "OAuth2 Client":
     type: object
-
     properties:
       id:
         type: string
@@ -208,34 +112,45 @@ definitions:
 
           * `authorization_code`: The authorization code grant type defined in OAuth 2.0, Section 4.1.
           * `implicit`: The implicit grant type defined in OAuth 2.0, Section 4.2.
-          *  `client_credentials`: The client credentials grant type defined in OAuth 2.0, Section 4.4.
-          *  `refresh_token`: The refresh token grant type defined in OAuth 2.0, Section 6.
+          * `client_credentials`: The client credentials grant type defined in OAuth 2.0, Section 4.4.
+          * `refresh_token`: The refresh token grant type defined in OAuth 2.0, Section 6.
+      response_types:
+        type: array
+        items:
+          type: string
+        description: >
+          Array of the OAuth 2.0 response type strings that the client can use at the authorization endpoint. These response types are defined as follows:
 
+          * `code`: The authorization code response type defined in OAuth 2.0, Section 4.1.
+          * `token`: The implicit response type defined in OAuth 2.0, Section 4.2.
       scope:
         type: array
-        description: A list of scopes the client will be allowed to request.
-      owner:
-  		  type: string
-  		  description: asdf
+        items:
+          type: string
+        description: "An array of scopes that the client will be allowed to used."
       policy_uri:
-  		  type: string
-  		  description: asdf
+        type: string
+        description: "URL string that points to a human-readable privacy policy document that describes how the deployment organization collects, uses, retains, and discloses personal data."
       tos_uri:
-  		  type: string
-  		  description: asdf
-  		client_uri:
-  		  type: string
-  		  description: asdf
-  		logo_uri:
-  		  type: string
-  		  description: asdf
-  		contacts:
-  		  type: array
-  		  description: asdf
-  		public:
-  		  type: bool
-  		  description: asdf
-
+        type: string
+        description: "URL string that points to a human-readable terms of service document for the client that describes a contractual relationship between the end-user and the client that the end-user accepts when authorizing the client."
+      client_uri:
+        type: string
+        description: "URL string of a web page providing information about the client. If present, the server SHOULD display this URL to the end-user in a clickable fashion."
+      logo_uri:
+        type: string
+        description: URL string that references a logo for the client. If present, the server SHOULD display this image to the end-user during approval.
+      contacts:
+        type: array
+        items:
+          type: string
+        description: Array of strings representing ways to contact people responsible for this client, typically email addresses
+      public:
+        type: boolean
+        description: Set public to true to disable the client secret and allow the client to perform certain OAuth2 flows without a secret. If public is true, the client will not be able to perform the client_credentials grant.
+      owner:
+        type: string
+        description: An arbitrary string that identifies the owner. For example, this could be the owner's user id.
 
   "JSON Web Key Set":
     type: object
@@ -243,102 +158,3 @@ definitions:
     type: object
   "Access Control Policy":
     type: object
-
-
-
-
-  Product:
-    type: object
-    properties:
-      product_id:
-        type: string
-        description: Unique identifier representing a specific product for a given latitude & longitude. For example, uberX in San Francisco will have a different product_id than uberX in Los Angeles.
-      description:
-        type: string
-        description: Description of product.
-      display_name:
-        type: string
-        description: Display name of product.
-      capacity:
-        type: string
-        description: Capacity of product. For example, 4 people.
-      image:
-        type: string
-        description: Image URL representing the product.
-  PriceEstimate:
-    type: object
-    properties:
-      product_id:
-        type: string
-        description: Unique identifier representing a specific product for a given latitude & longitude. For example, uberX in San Francisco will have a different product_id than uberX in Los Angeles
-      currency_code:
-        type: string
-        description: "[ISO 4217](http://en.wikipedia.org/wiki/ISO_4217) currency code."
-      display_name:
-        type: string
-        description: Display name of product.
-      estimate:
-        type: string
-        description: Formatted string of estimate in local currency of the start location. Estimate could be a range, a single number (flat rate) or "Metered" for TAXI.
-      low_estimate:
-        type: number
-        description: Lower bound of the estimated price.
-      high_estimate:
-        type: number
-        description: Upper bound of the estimated price.
-      surge_multiplier:
-        type: number
-        description: Expected surge multiplier. Surge is active if surge_multiplier is greater than 1. Price estimate already factors in the surge multiplier.
-  Profile:
-    type: object
-    properties:
-      first_name:
-        type: string
-        description: First name of the Uber user.
-      last_name:
-        type: string
-        description: Last name of the Uber user.
-      email:
-        type: string
-        description: Email address of the Uber user
-      picture:
-        type: string
-        description: Image URL of the Uber user.
-      promo_code:
-        type: string
-        description: Promo code of the Uber user.
-  Activity:
-    type: object
-    properties:
-      uuid:
-        type: string
-        description: Unique identifier for the activity
-  Activities:
-    type: object
-    properties:
-      offset:
-        type: integer
-        format: int32
-        description: Position in pagination.
-      limit:
-        type: integer
-        format: int32
-        description: Number of items to retrieve (100 max).
-      count:
-        type: integer
-        format: int32
-        description: Total number of items available.
-      history:
-        type: array
-        items:
-          $ref: '#/definitions/Activity'
-  Error:
-    type: object
-    properties:
-      code:
-        type: integer
-        format: int32
-      message:
-        type: string
-      fields:
-        type: string

@@ -14,9 +14,9 @@ import (
 )
 
 const (
-	endpoint         = "/policies"
-	scope            = "hydra.policies"
-	policyResource   = "rn:hydra:policies"
+	endpoint = "/policies"
+	scope = "hydra.policies"
+	policyResource = "rn:hydra:policies"
 	policiesResource = "rn:hydra:policies:%s"
 )
 
@@ -29,8 +29,8 @@ type Handler struct {
 func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.POST(endpoint, h.Create)
 	r.GET(endpoint, h.Find)
-	r.GET(endpoint+"/:id", h.Get)
-	r.DELETE(endpoint+"/:id", h.Delete)
+	r.GET(endpoint + "/:id", h.Get)
+	r.DELETE(endpoint + "/:id", h.Delete)
 }
 
 func (h *Handler) Find(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -50,7 +50,7 @@ func (h *Handler) Find(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 
 	policies, err := h.Manager.FindPoliciesForSubject(subject)
 	if err != nil {
-		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
+		h.H.WriteError(ctx, w, r, errors.WithStack(err))
 		return
 	}
 	h.H.Write(ctx, w, r, policies)
@@ -71,7 +71,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&p); err != nil {
-		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
+		h.H.WriteError(ctx, w, r, errors.WithStack(err))
 		return
 	}
 
@@ -80,10 +80,10 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	}
 
 	if err := h.Manager.Create(&p); err != nil {
-		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
+		h.H.WriteError(ctx, w, r, errors.WithStack(err))
 		return
 	}
-	h.H.WriteCreated(ctx, w, r, "/policies/"+p.ID, &p)
+	h.H.WriteCreated(ctx, w, r, "/policies/" + p.ID, &p)
 }
 
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -99,7 +99,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 
 	policy, err := h.Manager.Get(ps.ByName("id"))
 	if err != nil {
-		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
+		h.H.WriteError(ctx, w, r, errors.WithStack(err))
 		return
 	}
 	h.H.Write(ctx, w, r, policy)

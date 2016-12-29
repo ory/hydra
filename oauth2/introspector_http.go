@@ -42,14 +42,14 @@ func (i *HTTPIntrospector) IntrospectToken(ctx context.Context, token string, sc
 	data := url.Values{"token": []string{token}, "scope": []string{strings.Join(scopes, " ")}}
 	hreq, err := http.NewRequest("POST", ep.String(), bytes.NewBufferString(data.Encode()))
 	if err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 
 	hreq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	hreq.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 	hres, err := i.Client.Do(hreq)
 	if err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 	defer hres.Body.Close()
 

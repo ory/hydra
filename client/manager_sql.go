@@ -130,7 +130,7 @@ func (m *SQLManager) GetConcreteClient(id string) (*Client, error) {
 	if err := m.DB.Get(&d, m.DB.Rebind("SELECT * FROM hydra_client WHERE id=?"), id); err == sql.ErrNoRows {
 		return nil, errors.Wrap(pkg.ErrNotFound, "")
 	} else if err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 
 	return d.ToClient(), nil
@@ -151,12 +151,12 @@ func (m *SQLManager) UpdateClient(c *Client) error {
 	} else {
 		h, err := m.Hasher.Hash([]byte(c.Secret))
 		if err != nil {
-			return errors.Wrap(err, "")
+			return errors.WithStack(err)
 		}
 		c.Secret = string(h)
 	}
 	if err := mergo.Merge(c, o); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	s := sqlDataFromClient(c)
@@ -166,7 +166,7 @@ func (m *SQLManager) UpdateClient(c *Client) error {
 	}
 
 	if _, err := m.DB.NamedExec(fmt.Sprintf(`UPDATE hydra_client SET %s WHERE id=:id`, strings.Join(query, ", ")), s); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	return nil
 }
@@ -174,11 +174,11 @@ func (m *SQLManager) UpdateClient(c *Client) error {
 func (m *SQLManager) Authenticate(id string, secret []byte) (*Client, error) {
 	c, err := m.GetConcreteClient(id)
 	if err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 
 	if err := m.Hasher.Compare(c.GetHashedSecret(), secret); err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 
 	return c, nil
@@ -191,7 +191,7 @@ func (m *SQLManager) CreateClient(c *Client) error {
 
 	h, err := m.Hasher.Hash([]byte(c.Secret))
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	c.Secret = string(h)
 
@@ -201,14 +201,14 @@ func (m *SQLManager) CreateClient(c *Client) error {
 		strings.Join(sqlParams, ", "),
 		":"+strings.Join(sqlParams, ", :"),
 	), data); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	return nil
 }
 
 func (m *SQLManager) DeleteClient(id string) error {
 	if _, err := m.DB.Exec(m.DB.Rebind(`DELETE FROM hydra_client WHERE id=?`), id); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	return nil
 }
@@ -218,7 +218,7 @@ func (m *SQLManager) GetClients() (clients map[string]Client, err error) {
 	clients = make(map[string]Client)
 
 	if err := m.DB.Select(&d, "SELECT * FROM hydra_client"); err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 
 	for _, k := range d {

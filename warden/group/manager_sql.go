@@ -46,7 +46,7 @@ func (m *SQLManager) CreateGroup(g *Group) error {
 	}
 
 	if _, err := m.DB.Exec(m.DB.Rebind("INSERT INTO hydra_warden_group (id) VALUES (?)"), g.ID); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	return m.AddGroupMembers(g.ID, g.Members)
@@ -55,12 +55,12 @@ func (m *SQLManager) CreateGroup(g *Group) error {
 func (m *SQLManager) GetGroup(id string) (*Group, error) {
 	var found string
 	if err := m.DB.Get(&found, m.DB.Rebind("SELECT id from hydra_warden_group WHERE id = ?"), id); err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 
 	var q []string
 	if err := m.DB.Select(&q, m.DB.Rebind("SELECT member from hydra_warden_group_member WHERE group_id = ?"), found); err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 
 	return &Group{
@@ -71,7 +71,7 @@ func (m *SQLManager) GetGroup(id string) (*Group, error) {
 
 func (m *SQLManager) DeleteGroup(id string) error {
 	if _, err := m.DB.Exec(m.DB.Rebind("DELETE FROM hydra_warden_group WHERE id=?"), id); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	return nil
 }
@@ -83,7 +83,7 @@ func (m *SQLManager) AddGroupMembers(group string, subjects []string) error {
 	}
 	for _, subject := range subjects {
 		if _, err := tx.Exec(m.DB.Rebind("INSERT INTO hydra_warden_group_member (group_id, member) VALUES (?, ?)"), group, subject); err != nil {
-			return errors.Wrap(err, "")
+			return errors.WithStack(err)
 		}
 	}
 
@@ -100,7 +100,7 @@ func (m *SQLManager) RemoveGroupMembers(group string, subjects []string) error {
 	}
 	for _, subject := range subjects {
 		if _, err := m.DB.Exec(m.DB.Rebind("DELETE FROM hydra_warden_group_member WHERE member=? AND group_id=?"), subject, group); err != nil {
-			return errors.Wrap(err, "")
+			return errors.WithStack(err)
 		}
 	}
 
@@ -113,7 +113,7 @@ func (m *SQLManager) RemoveGroupMembers(group string, subjects []string) error {
 func (m *SQLManager) FindGroupNames(subject string) ([]string, error) {
 	var q []string
 	if err := m.DB.Select(&q, m.DB.Rebind("SELECT group_id from hydra_warden_group_member WHERE member = ? GROUP BY group_id"), subject); err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 
 	return q, nil

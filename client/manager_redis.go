@@ -28,12 +28,12 @@ func (m *RedisManager) GetConcreteClient(id string) (*Client, error) {
 	if err == redis.Nil {
 		return nil, errors.Wrap(pkg.ErrNotFound, "")
 	} else if err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 
 	var d Client
 	if err := json.Unmarshal(resp, &d); err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 
 	return &d, nil
@@ -54,21 +54,21 @@ func (m *RedisManager) UpdateClient(c *Client) error {
 	} else {
 		h, err := m.Hasher.Hash([]byte(c.Secret))
 		if err != nil {
-			return errors.Wrap(err, "")
+			return errors.WithStack(err)
 		}
 		c.Secret = string(h)
 	}
 	if err := mergo.Merge(c, o); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	s, err := json.Marshal(c)
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	if err := m.DB.HSet(m.redisClientKey(), c.ID, string(s)).Err(); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	return nil
@@ -77,11 +77,11 @@ func (m *RedisManager) UpdateClient(c *Client) error {
 func (m *RedisManager) Authenticate(id string, secret []byte) (*Client, error) {
 	c, err := m.GetConcreteClient(id)
 	if err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 
 	if err := m.Hasher.Compare(c.GetHashedSecret(), secret); err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 
 	return c, nil
@@ -94,24 +94,24 @@ func (m *RedisManager) CreateClient(c *Client) error {
 
 	hash, err := m.Hasher.Hash([]byte(c.Secret))
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	c.Secret = string(hash)
 
 	s, err := json.Marshal(c)
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	if err := m.DB.HSetNX(m.redisClientKey(), c.ID, string(s)).Err(); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	return nil
 }
 
 func (m *RedisManager) DeleteClient(id string) error {
 	if _, err := m.DB.HDel(m.redisClientKey(), id).Result(); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	return nil
@@ -130,7 +130,7 @@ func (m *RedisManager) GetClients() (map[string]Client, error) {
 
 		var d Client
 		if err := json.Unmarshal([]byte(resp), &d); err != nil {
-			return nil, errors.Wrap(err, "")
+			return nil, errors.WithStack(err)
 		}
 
 		clients[d.ID] = d

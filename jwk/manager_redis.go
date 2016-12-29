@@ -28,7 +28,7 @@ func (m *RedisManager) addKey(set string, key *jose.JsonWebKey, pipe *redis.Pipe
 
 	encrypted, err := m.Cipher.Encrypt(payload)
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	pipe.HSet(m.redisJWKKey(set), key.KeyID, encrypted)
@@ -41,11 +41,11 @@ func (m *RedisManager) AddKey(set string, key *jose.JsonWebKey) error {
 	defer pipe.Close()
 
 	if err := m.addKey(set, key, pipe); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	if _, err := pipe.Exec(); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	return nil
@@ -57,12 +57,12 @@ func (m *RedisManager) AddKeySet(set string, keys *jose.JsonWebKeySet) error {
 
 	for _, key := range keys.Keys {
 		if err := m.addKey(set, &key, pipe); err != nil {
-			return errors.Wrap(err, "")
+			return errors.WithStack(err)
 		}
 	}
 
 	if _, err := pipe.Exec(); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	return nil
@@ -107,7 +107,7 @@ func (m *RedisManager) GetKey(set, kid string) (*jose.JsonWebKeySet, error) {
 	if err == redis.Nil {
 		return nil, errors.Wrap(pkg.ErrNotFound, "")
 	} else if err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 
 	jwk, err := m.Cipher.Decrypt(encryptedJWK)
@@ -117,7 +117,7 @@ func (m *RedisManager) GetKey(set, kid string) (*jose.JsonWebKeySet, error) {
 
 	var key jose.JsonWebKey
 	if err := json.Unmarshal(jwk, &key); err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 
 	return &jose.JsonWebKeySet{
@@ -128,7 +128,7 @@ func (m *RedisManager) GetKey(set, kid string) (*jose.JsonWebKeySet, error) {
 func (m *RedisManager) GetKeySet(set string) (*jose.JsonWebKeySet, error) {
 	keys, err := m.getKeySet(set)
 	if err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 
 	return keys, nil

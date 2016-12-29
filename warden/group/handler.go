@@ -66,7 +66,7 @@ func (h *Handler) CreateGroup(w http.ResponseWriter, r *http.Request, _ httprout
 	var ctx = herodot.NewContext()
 
 	if err := json.NewDecoder(r.Body).Decode(&g); err != nil {
-		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
+		h.H.WriteError(ctx, w, r, errors.WithStack(err))
 		return
 	}
 
@@ -133,7 +133,7 @@ func (h *Handler) AddGroupMembers(w http.ResponseWriter, r *http.Request, ps htt
 
 	var m membersRequest
 	if err := json.NewDecoder(r.Body).Decode(&m); err != nil {
-		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
+		h.H.WriteError(ctx, w, r, errors.WithStack(err))
 		return
 	}
 
@@ -159,7 +159,7 @@ func (h *Handler) RemoveGroupMembers(w http.ResponseWriter, r *http.Request, ps 
 
 	var m membersRequest
 	if err := json.NewDecoder(r.Body).Decode(&m); err != nil {
-		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
+		h.H.WriteError(ctx, w, r, errors.WithStack(err))
 		return
 	}
 

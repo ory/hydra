@@ -25,7 +25,7 @@ func (r *HTTPRecovator) RevokeToken(ctx context.Context, token string) error {
 	data := url.Values{"token": []string{token}}
 	hreq, err := http.NewRequest("POST", ep.String(), bytes.NewBufferString(data.Encode()))
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	hreq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
@@ -36,7 +36,7 @@ func (r *HTTPRecovator) RevokeToken(ctx context.Context, token string) error {
 	}
 	hres, err := r.Client.Do(hreq)
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	defer hres.Body.Close()
 

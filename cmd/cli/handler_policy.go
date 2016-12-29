@@ -34,12 +34,12 @@ func (h *PolicyHandler) CreatePolicy(cmd *cobra.Command, args []string) {
 		for _, path := range files {
 			reader, err := os.Open(path)
 			pkg.Must(err, "Could not open file %s: %s", path, err)
-			var policy ladon.DefaultPolicy
-			err = json.NewDecoder(reader).Decode(&policy)
+			var p ladon.DefaultPolicy
+			err = json.NewDecoder(reader).Decode(&p)
 			pkg.Must(err, "Could not parse JSON: %s", err)
-			err = h.M.Create(&policy)
+			err = h.M.Create(&p)
 			pkg.Must(err, "Could not create policy: %s", err)
-			fmt.Printf("Imported policy %s from %s.\n", policy.ID, path)
+			fmt.Printf("Imported policy %s from %s.\n", p.ID, path)
 		}
 		return
 	}
@@ -61,7 +61,7 @@ func (h *PolicyHandler) CreatePolicy(cmd *cobra.Command, args []string) {
 		effect = ladon.AllowAccess
 	}
 
-	policy := &ladon.DefaultPolicy{
+	p := &ladon.DefaultPolicy{
 		ID:          id,
 		Description: description,
 		Subjects:    subjects,
@@ -69,13 +69,13 @@ func (h *PolicyHandler) CreatePolicy(cmd *cobra.Command, args []string) {
 		Actions:     actions,
 		Effect:      effect,
 	}
-	err := h.M.Create(policy)
+	err := h.M.Create(p)
 	if h.M.Dry {
 		fmt.Printf("%s\n", err)
 		return
 	}
 	pkg.Must(err, "Could not create policy: %s", err)
-	fmt.Printf("Created policy %s.\n", policy.ID)
+	fmt.Printf("Created policy %s.\n", p.ID)
 
 }
 
@@ -89,20 +89,13 @@ func (h *PolicyHandler) AddResourceToPolicy(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	policy, err := h.M.Get(args[0])
+	pp, err := h.M.Get(args[0])
 	pkg.Must(err, "Could not get policy: %s", err)
 
-	err = h.M.Delete(args[0])
-	if h.M.Dry {
-		fmt.Printf("%s\n", err)
-	} else {
-		pkg.Must(err, "Could not prepare policy for update: %s", err)
-	}
-
-	p := policy.(*ladon.DefaultPolicy)
+	p := pp.(*ladon.DefaultPolicy)
 	p.Resources = append(p.Resources, args[1:]...)
 
-	err = h.M.Create(policy)
+	err = h.M.Update(p)
 	if h.M.Dry {
 		fmt.Printf("%s\n", err)
 		return
@@ -112,7 +105,40 @@ func (h *PolicyHandler) AddResourceToPolicy(cmd *cobra.Command, args []string) {
 }
 
 func (h *PolicyHandler) RemoveResourceFromPolicy(cmd *cobra.Command, args []string) {
-	fmt.Println("Not yet implemented.")
+	h.M.Dry, _ = cmd.Flags().GetBool("dry")
+	h.M.Endpoint = h.Config.Resolve("/policies")
+	h.M.Client = h.Config.OAuth2Client(cmd)
+
+	if len(args) < 2 {
+		fmt.Print(cmd.UsageString())
+		return
+	}
+
+	pp, err := h.M.Get(args[0])
+	pkg.Must(err, "Could not get policy: %s", err)
+
+	p := pp.(*ladon.DefaultPolicy)
+	resources := []string{}
+	for _, r := range p.Resources {
+		var filter bool
+		for _, a := range args[1:] {
+			if r == a {
+				filter = true
+			}
+		}
+		if !filter {
+			resources = append(resources, r)
+		}
+	}
+	p.Resources = resources
+
+	err = h.M.Update(p)
+	if h.M.Dry {
+		fmt.Printf("%s\n", err)
+		return
+	}
+	pkg.Must(err, "Could not update policy: %s", err)
+	fmt.Printf("Added resources to policy %s", p.ID)
 }
 
 func (h *PolicyHandler) AddSubjectToPolicy(cmd *cobra.Command, args []string) {
@@ -125,20 +151,17 @@ func (h *PolicyHandler) AddSubjectToPolicy(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	policy, err := h.M.Get(args[0])
+	pp, err := h.M.Get(args[0])
 	if h.M.Dry {
 		fmt.Printf("%s\n", err)
 	} else {
 		pkg.Must(err, "Could not get policy: %s", err)
 	}
 
-	err = h.M.Delete(args[0])
-	pkg.Must(err, "Could not prepare policy for update: %s", err)
-
-	p := policy.(*ladon.DefaultPolicy)
+	p := pp.(*ladon.DefaultPolicy)
 	p.Subjects = append(p.Subjects, args[1:]...)
 
-	err = h.M.Create(policy)
+	err = h.M.Update(p)
 	if h.M.Dry {
 		fmt.Printf("%s\n", err)
 		return
@@ -148,7 +171,40 @@ func (h *PolicyHandler) AddSubjectToPolicy(cmd *cobra.Command, args []string) {
 }
 
 func (h *PolicyHandler) RemoveSubjectFromPolicy(cmd *cobra.Command, args []string) {
-	fmt.Println("Not yet implemented.")
+	h.M.Dry, _ = cmd.Flags().GetBool("dry")
+	h.M.Endpoint = h.Config.Resolve("/policies")
+	h.M.Client = h.Config.OAuth2Client(cmd)
+
+	if len(args) < 2 {
+		fmt.Print(cmd.UsageString())
+		return
+	}
+
+	pp, err := h.M.Get(args[0])
+	pkg.Must(err, "Could not get policy: %s", err)
+
+	p := pp.(*ladon.DefaultPolicy)
+	subjects := []string{}
+	for _, r := range p.Subjects {
+		var filter bool
+		for _, a := range args[1:] {
+			if r == a {
+				filter = true
+			}
+		}
+		if !filter {
+			subjects = append(subjects, r)
+		}
+	}
+	p.Subjects = subjects
+
+	err = h.M.Update(p)
+	if h.M.Dry {
+		fmt.Printf("%s\n", err)
+		return
+	}
+	pkg.Must(err, "Could not update policy: %s", err)
+	fmt.Printf("Added resources to policy %s", p.ID)
 }
 
 func (h *PolicyHandler) AddActionToPolicy(cmd *cobra.Command, args []string) {
@@ -161,18 +217,11 @@ func (h *PolicyHandler) AddActionToPolicy(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	p, err := h.M.Get(args[0])
+	pp, err := h.M.Get(args[0])
 	pkg.Must(err, "Could not get policy: %s", err)
 
-	err = h.M.Delete(args[0])
-	if h.M.Dry {
-		fmt.Printf("%s\n", err)
-	} else {
-		pkg.Must(err, "Could not prepare policy for update: %s", err)
-	}
-
-	encp := p.(*ladon.DefaultPolicy)
-	encp.Actions = append(encp.Actions, args[1:]...)
+	p := pp.(*ladon.DefaultPolicy)
+	p.Actions = append(p.Actions, args[1:]...)
 
 	err = h.M.Create(p)
 	if h.M.Dry {
@@ -180,11 +229,44 @@ func (h *PolicyHandler) AddActionToPolicy(cmd *cobra.Command, args []string) {
 		return
 	}
 	pkg.Must(err, "Could not update policy: %s", err)
-	fmt.Printf("Added actions to policy %s", encp.ID)
+	fmt.Printf("Added actions to policy %s", p.ID)
 }
 
 func (h *PolicyHandler) RemoveActionFromPolicy(cmd *cobra.Command, args []string) {
-	fmt.Println("Not yet implemented.")
+	h.M.Dry, _ = cmd.Flags().GetBool("dry")
+	h.M.Endpoint = h.Config.Resolve("/policies")
+	h.M.Client = h.Config.OAuth2Client(cmd)
+
+	if len(args) < 2 {
+		fmt.Print(cmd.UsageString())
+		return
+	}
+
+	pp, err := h.M.Get(args[0])
+	pkg.Must(err, "Could not get policy: %s", err)
+
+	p := pp.(*ladon.DefaultPolicy)
+	actions := []string{}
+	for _, r := range p.Actions {
+		var filter bool
+		for _, a := range args[1:] {
+			if r == a {
+				filter = true
+			}
+		}
+		if !filter {
+			actions = append(actions, r)
+		}
+	}
+	p.Actions = actions
+
+	err = h.M.Update(p)
+	if h.M.Dry {
+		fmt.Printf("%s\n", err)
+		return
+	}
+	pkg.Must(err, "Could not update policy: %s", err)
+	fmt.Printf("Added resources to policy %s", p.ID)
 }
 
 func (h *PolicyHandler) GetPolicy(cmd *cobra.Command, args []string) {

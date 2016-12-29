@@ -34,6 +34,14 @@ func (m *HTTPManager) Create(policy ladon.Policy) error {
 	return r.Create(policy)
 }
 
+// Update the policy.
+func (m *HTTPManager) Update(policy ladon.Policy) error {
+	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, policy.GetID()).String())
+	r.Client = m.Client
+	r.Dry = m.Dry
+	return r.Update(policy)
+}
+
 // Get retrieves a policy.
 func (m *HTTPManager) Get(id string) (ladon.Policy, error) {
 	var policy = ladon.DefaultPolicy{
@@ -47,7 +55,6 @@ func (m *HTTPManager) Get(id string) (ladon.Policy, error) {
 	}
 
 	return &policy, nil
-
 }
 
 // Delete removes a policy.

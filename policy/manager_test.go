@@ -18,7 +18,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var managers = map[string]ladon.Manager{}
+var managers = map[string]Manager{}
 
 func init() {
 	localWarden, httpClient := compose.NewFirewall("hydra", "alice", fosite.Arguments{scope},
@@ -26,7 +26,7 @@ func init() {
 			ID:        "1",
 			Subjects:  []string{"alice"},
 			Resources: []string{"rn:hydra:policies<.*>"},
-			Actions:   []string{"create", "get", "delete", "find"},
+			Actions:   []string{"create", "get", "delete", "find", "update"},
 			Effect:    ladon.AllowAccess,
 		},
 	)
@@ -85,6 +85,15 @@ func TestManagers(t *testing.T) {
 		ps, err = m.FindPoliciesForSubject("stan")
 		pkg.AssertError(t, false, err, k)
 		assert.Len(t, ps, 0, "%s", k)
+
+		p.Subjects = []string{"stan"}
+		err = m.Update(p)
+		pkg.AssertError(t, false, err, k)
+
+		ps, err = m.FindPoliciesForSubject("stan")
+		pkg.RequireError(t, false, err, k)
+		require.Len(t, ps, 1, "%s", k)
+		assert.Equal(t, p, ps[0], "%s", k)
 
 		pkg.AssertError(t, false, m.Delete(p.ID), k)
 

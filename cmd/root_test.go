@@ -48,13 +48,13 @@ func TestExecute(t *testing.T) {
 			time.Sleep(time.Millisecond * 10)
 			return false
 		}},
-		{args: []string{"policies", "create", "-i", "foobar", "-s", "peter", "max", "-r", "blog", "users", "-a", "post", "ban", "--allow"}},
+		{args: []string{"policies", "create", "-i", "foobar", "-s", "peter,max", "-r", "blog,users", "-a", "post,ban", "--allow"}},
 		{args: []string{"policies", "actions", "add", "foobar", "update|create"}},
-		{args: []string{"policies", "actions", "delete", "foobar", "update|create"}},
+		{args: []string{"policies", "actions", "remove", "foobar", "update|create"}},
 		{args: []string{"policies", "resources", "add", "foobar", "printer"}},
-		{args: []string{"policies", "resources", "delete", "foobar", "printer"}},
+		{args: []string{"policies", "resources", "remove", "foobar", "printer"}},
 		{args: []string{"policies", "subjects", "add", "foobar", "ken", "tracy"}},
-		{args: []string{"policies", "subjects", "delete", "foobar", "ken", "tracy"}},
+		{args: []string{"policies", "subjects", "remove", "foobar", "ken", "tracy"}},
 		{args: []string{"policies", "get", "foobar"}},
 		{args: []string{"policies", "delete", "foobar"}},
 		{args: []string{"groups", "create", "my-group"}},
@@ -67,25 +67,26 @@ func TestExecute(t *testing.T) {
 		c.args = append(c.args, []string{"--skip-tls-verify", "--config", path}...)
 		RootCmd.SetArgs(c.args)
 
-		t.Logf("Running command: %s", c.args)
-		if c.wait != nil {
-			go func() {
-				assert.Nil(t, RootCmd.Execute())
-			}()
-		}
-
-		if c.wait != nil {
-			var count = 0
-			for c.wait() {
-				t.Logf("Config file has not been found yet, retrying attempt #%d...", count)
-				count++
-				if count > 30 {
-					t.FailNow()
-				}
-				time.Sleep(time.Second * 4)
+		t.Run(fmt.Sprintf("command=%v", c.args), func (t *testing.T) {
+			if c.wait != nil {
+				go func() {
+					assert.Nil(t, RootCmd.Execute())
+				}()
 			}
-		} else {
-			assert.Equal(t, c.expectErr, RootCmd.Execute() != nil)
-		}
+
+			if c.wait != nil {
+				var count = 0
+				for c.wait() {
+					t.Logf("Config file has not been found yet, retrying attempt #%d...", count)
+					count++
+					if count > 30 {
+						t.FailNow()
+					}
+					time.Sleep(time.Second * 4)
+				}
+			} else {
+				assert.Equal(t, c.expectErr, RootCmd.Execute() != nil)
+			}
+		})
 	}
 }

@@ -16,11 +16,80 @@ basePath: /
 produces:
   - application/json
 paths:
-  /users:
+  /clients:
     get:
       responses:
-        "200":
-          description:  Describe the 200 response in more detail
+        200:
+          description: "List of OAuth2 Clients."
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/OAuth2 Client"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+    post:
+      responses:
+        200:
+          description: "Successful creation of an OAuth2 Client."
+          schema:
+            $ref: "#/definitions/OAuth2 Client"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+  /clients/{id}:
+    parameters:
+      - name: "id"
+        in: path
+        description: "The unique ID of the OAuth2 Client."
+        required: true
+        type: string
+    get:
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/OAuth2 Client"
+        404:
+          description: "OAuth2 Client could not be found."
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+    post:
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/OAuth2 Client"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+    put:
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/OAuth2 Client"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+    delete:
+      responses:
+        204:
+          description: OAuth2 Client deleted
+          schema:
+            $ref: "#/definitions/OAuth2 Client"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+
+
 definitions:
   "OAuth2 Client":
     type: object

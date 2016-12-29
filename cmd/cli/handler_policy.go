@@ -138,7 +138,7 @@ func (h *PolicyHandler) RemoveResourceFromPolicy(cmd *cobra.Command, args []stri
 		return
 	}
 	pkg.Must(err, "Could not update policy: %s", err)
-	fmt.Printf("Added resources to policy %s", p.ID)
+	fmt.Printf("Removed resources from policy %s", p.ID)
 }
 
 func (h *PolicyHandler) AddSubjectToPolicy(cmd *cobra.Command, args []string) {
@@ -204,7 +204,7 @@ func (h *PolicyHandler) RemoveSubjectFromPolicy(cmd *cobra.Command, args []strin
 		return
 	}
 	pkg.Must(err, "Could not update policy: %s", err)
-	fmt.Printf("Added resources to policy %s", p.ID)
+	fmt.Printf("Removed subjects from policy %s", p.ID)
 }
 
 func (h *PolicyHandler) AddActionToPolicy(cmd *cobra.Command, args []string) {
@@ -223,7 +223,7 @@ func (h *PolicyHandler) AddActionToPolicy(cmd *cobra.Command, args []string) {
 	p := pp.(*ladon.DefaultPolicy)
 	p.Actions = append(p.Actions, args[1:]...)
 
-	err = h.M.Create(p)
+	err = h.M.Update(p)
 	if h.M.Dry {
 		fmt.Printf("%s\n", err)
 		return
@@ -266,7 +266,7 @@ func (h *PolicyHandler) RemoveActionFromPolicy(cmd *cobra.Command, args []string
 		return
 	}
 	pkg.Must(err, "Could not update policy: %s", err)
-	fmt.Printf("Added resources to policy %s", p.ID)
+	fmt.Printf("Removed actions from policy %s", p.ID)
 }
 
 func (h *PolicyHandler) GetPolicy(cmd *cobra.Command, args []string) {

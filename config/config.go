@@ -178,6 +178,7 @@ func (c *Config) Context() *Context {
 		}
 		manager = m
 
+		migrate.SetTable("hydra_groups_migration")
 		gm := &group.SQLManager{DB: con.GetDatabase()}
 		if err := gm.CreateSchemas(); err != nil {
 			logrus.Fatalf("Could not create group schema: %s", err)

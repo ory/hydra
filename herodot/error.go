@@ -3,7 +3,6 @@ package herodot
 import (
 	"net/http"
 
-	"fmt"
 	"github.com/Sirupsen/logrus"
 	"github.com/ory-am/fosite"
 	"github.com/pkg/errors"
@@ -44,9 +43,10 @@ func ToError(err error) *Error {
 		}
 	}
 
+
+
 	return &Error{
 		OriginalError: err,
-		Description:   fmt.Sprintf("Could not unwrap error of type %s", reflect.TypeOf(err)),
 		Name:          "internal-error",
 		StatusCode:    http.StatusInternalServerError,
 	}

@@ -23,23 +23,23 @@ func NewSuperAgent(rawurl string) *SuperAgent {
 	}
 }
 
-func (s *SuperAgent) doDry(req *http.Request) error {
+func (s *SuperAgent) DoDry(req *http.Request) error {
 	return helper.DoDryRequest(s.Dry, req)
 }
 
 func (s *SuperAgent) Delete() error {
 	req, err := http.NewRequest("DELETE", s.URL, nil)
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
-	if err := s.doDry(req); err != nil {
+	if err := s.DoDry(req); err != nil {
 		return err
 	}
 
 	resp, err := s.Client.Do(req)
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	defer resp.Body.Close()
 
@@ -54,18 +54,18 @@ func (s *SuperAgent) Delete() error {
 func (s *SuperAgent) Get(o interface{}) error {
 	req, err := http.NewRequest("GET", s.URL, nil)
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	} else if o == nil {
 		return errors.New("Can not pass nil")
 	}
 
-	if err := s.doDry(req); err != nil {
+	if err := s.DoDry(req); err != nil {
 		return err
 	}
 
 	resp, err := s.Client.Do(req)
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	defer resp.Body.Close()
 
@@ -73,7 +73,7 @@ func (s *SuperAgent) Get(o interface{}) error {
 		body, _ := ioutil.ReadAll(resp.Body)
 		return errors.Errorf("Expected status code %d, got %d.\n%s\n", http.StatusOK, resp.StatusCode, body)
 	} else if err := json.NewDecoder(resp.Body).Decode(o); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	return nil
@@ -98,22 +98,26 @@ func (s *SuperAgent) send(method string, in interface{}, out interface{}) error 
 
 	data, err := json.Marshal(in)
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	req, err := http.NewRequest(method, s.URL, bytes.NewReader(data))
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	if err := s.doDry(req); err != nil {
+	if err := s.DoDry(req); err != nil {
 		return err
 	}
 
 	resp, err := s.Client.Do(req)
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
+	}
+
+	if resp.StatusCode == http.StatusNoContent {
+		return nil
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {

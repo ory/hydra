@@ -54,10 +54,17 @@ You can manage *OAuth 2.0 clients* using the cli or the HTTP REST API.
 
 ## Consent App Flow
 
-Hydra does not include user authentication and things like lost password, user registration or user activation.
-The consent app flow is used to let Hydra identify who resource owner is. In abstract, the consent flow looks like this:
+Hydra does not include user authentication and things like lost password, user registration or user activation. This is the
+responsibility of the so called *consent app*. In the consent app, you usually want to authenticate the user (e.g. log in
+form) and then ask for the user's consent (e.g. "do you really want to grant superapp access to your photos?"). It
+is not uncommon to extend your existing authentication endpoint with a consent screen.
+ 
+When Hydra receives an OAuth 2.0 request that requires user authorization, Hydra redirects the user to the consent
+app (sometimes referred to as *consent endpoint*). Once the consent app authenticated the user and asked for his consent, it must redirect
+the user back to Hydra, passing along a JSON Web Token including information for Hydra to process. In abstract,
+the consent flow looks like this:
 
-![](../images/consent.png)
+![Consent Flow](/images/consent.png)
 
 1. A *client* application (app in browser in laptop) requests an access token from a resource owner:
 `https://hydra.myapp.com/oauth2/auth?client_id=c3b49cf0-88e4-4faa-9489-28d5b8957858&response_type=code&scope=core+hydra&state=vboeidlizlxrywkwlsgeggff&nonce=tedgziijemvninkuotcuuiof`.
@@ -89,9 +96,7 @@ The consent challenge is a signed RSA-SHA 256 (RS256) [JSON Web Token](https://t
 the following claims:
 
 
-```
-eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJjM2I0OWNmMC04OGU0LTRmYWEtOTQ4OS0yOGQ1Yjg5NTc4NTgiLCJleHAiOjE0NjQ1MTUwOTksImp0aSI6IjY0YzRmNzllLWUwMTYtNDViOC04YzBlLWQ5NmM2NzFjMWU4YSIsInJlZGlyIjoiaHR0cHM6Ly8xOTIuMTY4Ljk5LjEwMDo0NDQ0L29hdXRoMi9hdXRoP2NsaWVudF9pZD1jM2I0OWNmMC04OGU0LTRmYWEtOTQ4OS0yOGQ1Yjg5NTc4NThcdTAwMjZyZXNwb25zZV90eXBlPWNvZGVcdTAwMjZzY29wZT1jb3JlK2h5ZHJhXHUwMDI2c3RhdGU9bXlobnhxbXd6aHRleWN3ZW92Ymxzd3dqXHUwMDI2bm9uY2U9Z21tc3V2dHNidG9ldW1lb2hlc3p0c2hnIiwic2NwIjpbImNvcmUiLCJoeWRyYSJdfQ.v4K1-AuT5Uwu1DRNvdf7SwjjPT8KO97thRYa3pDWzjBLyjkCNvgp0P5V0oA3XqRutoFpYx4AtQyz0bY7n3XcPE7ZQ2nBWTBnZ04GzWbxcJNFhBvgc_jiQBECebdxN29kgxHoU0frtVDcz6Uur468nBa9D_BDBpN-KgEBsI5Hjhc
-
+```json
 {
   "aud": "c3b49cf0-88e4-4faa-9489-28d5b8957858",
   "exp": 1464515099,
@@ -141,10 +146,9 @@ https://192.168.99.100:4444/oauth2/auth?client_id=c3b49cf0-88e4-4faa-9489-28d5b8
 The consent response token is a RSA-SHA 256 (RS256) signed [JSON Web Token](https://tools.ietf.org/html/rfc7519)
 that contains the following claims:
 
-```
-eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJjM2I0OWNmMC04OGU0LTRmYWEtOTQ4OS0yOGQ1Yjg5NTc4NTgiLCJleHAiOjE0NjQ1MTUwOTksInNjcCI6WyJjb3JlIiwiaHlkcmEiXSwic3ViIjoiam9obi5kb2VAbWUuY29tIiwiaWF0IjoxNDY0NTExNTE1fQ.tX5TKdP9hHCgPbqBzKIYMjJVwqOdxf5ACScmQ6t20Qteo8AYEfavGwq8KxRF1Oz_otcQDdZY--jcl1caom0yT2eTvj1d9E2Hs7eXmYuW_xF9pTpmDwJnrcOlONFKsNZN97n41qprzMrsX5ez0T5AcopGwpPMxKhwGDSXq9CQgQU
-
+```json
 {
+  "jti": "64c4f79e-e016-45b8-8c0e-d96c671c1e8a",
   "aud": "c3b49cf0-88e4-4faa-9489-28d5b8957858",
   "exp": 1464515099,
   "scp": [
@@ -152,6 +156,7 @@ eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJjM2I0OWNmMC04OGU0LTRmYWEtOTQ4OS0
     "hydra"
   ],
   "sub": "john.doe@me.com",
+  "uname": "John Doe",
   "iat": 1464511515,
   "id_ext": { "foo": "bar" },
   "at_ext": { "baz": true }
@@ -159,12 +164,14 @@ eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJjM2I0OWNmMC04OGU0LTRmYWEtOTQ4OS0
 ```
 
 The consent claims are:
-* **jti:** A unique id.
-* **scp:** The scopes the user opted in to *grant* access to, e.g. only `["blog.readall"]`.
+* **jti:** Include the `jti` value from the consent challenge here.
+* **scp:** The scopes the user opted in to *grant* access to, e.g. `["blog.readall"]`.
+* **sub:** Include the subject's unique id here.
 * **aud:** The client id that initiated the OAuth2 request. You can fetch
 client data using the [OAuth2 Client API](http://docs.hdyra.apiary.io/#reference/oauth2/manage-the-oauth2-client-collection).
-* **exp:** The expiry date of this token. Use very short lifespans (< 5 min).
+* **exp:** The expiry date of this token. Use very short lifespans (< 10 min).
 * **iat:** The tokens issuance time.
+* **uname:** You can set an arbitrary, non-unique username which will be echoed in the token introspection. *(optional)*
 * **id_ext:** If set, pass this extra data to the id token. This data is not available at OAuth2 Token Introspection
  nor at the warden endpoints. *(optional)*
 * **at_ext:** If set, pass this extra data to the access token session. You can retrieve the data

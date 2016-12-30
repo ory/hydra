@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/compose"
@@ -60,7 +61,8 @@ var handler = &Handler{
 		DefaultChallengeLifespan: time.Hour,
 		DefaultIDTokenLifespan:   time.Hour * 24,
 	},
-	ForcedHTTP: true,
+	CookieStore: sessions.NewCookieStore([]byte("foo-secret")),
+	ForcedHTTP:  true,
 }
 
 var router = httprouter.New()
@@ -126,7 +128,7 @@ func signConsentToken(claims jwt.MapClaims) (string, error) {
 
 	keys, err := keyManager.GetKey(ConsentEndpointKey, "private")
 	if err != nil {
-		return "", errors.Wrap(err, "")
+		return "", errors.WithStack(err)
 	}
 	rsaKey, err := jwk.ToRSAPrivate(jwk.First(keys.Keys))
 	if err != nil {
@@ -135,9 +137,9 @@ func signConsentToken(claims jwt.MapClaims) (string, error) {
 
 	var signature, encoded string
 	if encoded, err = token.SigningString(); err != nil {
-		return "", errors.Wrap(err, "")
+		return "", errors.WithStack(err)
 	} else if signature, err = token.Method.Sign(encoded, rsaKey); err != nil {
-		return "", errors.Wrap(err, "")
+		return "", errors.WithStack(err)
 	}
 
 	return fmt.Sprintf("%s.%s", encoded, signature), nil

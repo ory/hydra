@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	_ "github.com/go-sql-driver/mysql"
 	"gopkg.in/ory-am/dockertest.v3"
 	"gopkg.in/redis.v5"
 )

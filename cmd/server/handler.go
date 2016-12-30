@@ -23,6 +23,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/hydra/policy"
 	"github.com/ory-am/hydra/warden"
+	"github.com/ory-am/hydra/warden/group"
 	"github.com/ory-am/ladon"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -139,6 +140,7 @@ type Handler struct {
 	Keys    *jwk.Handler
 	OAuth2  *oauth2.Handler
 	Policy  *policy.Handler
+	Groups  *group.Handler
 	Warden  *warden.WardenHandler
 	Config  *config.Config
 }
@@ -161,6 +163,7 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 		OAuth2:              oauth2Provider,
 		Issuer:              c.Issuer,
 		AccessTokenLifespan: c.GetAccessTokenLifespan(),
+		Groups:              ctx.GroupManager,
 	}
 
 	// Set up handlers
@@ -169,6 +172,12 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 	h.Policy = newPolicyHandler(c, router)
 	h.OAuth2 = newOAuth2Handler(c, router, ctx.KeyManager, oauth2Provider)
 	h.Warden = warden.NewHandler(c, router)
+	h.Groups = &group.Handler{
+		H:       &herodot.JSON{},
+		W:       ctx.Warden,
+		Manager: ctx.GroupManager,
+	}
+	h.Groups.SetRoutes(router)
 
 	router.GET("/health", func(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		rw.WriteHeader(http.StatusNoContent)

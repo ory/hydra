@@ -73,7 +73,7 @@ func (h *WardenHandler) Allowed(w http.ResponseWriter, r *http.Request, _ httpro
 
 	var access = new(firewall.AccessRequest)
 	if err := json.NewDecoder(r.Body).Decode(access); err != nil {
-		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
+		h.H.WriteError(ctx, w, r, errors.WithStack(err))
 		return
 	}
 	defer r.Body.Close()
@@ -104,7 +104,7 @@ func (h *WardenHandler) TokenAllowed(w http.ResponseWriter, r *http.Request, _ h
 		wardenAuthorizedRequest: new(wardenAuthorizedRequest),
 	}
 	if err := json.NewDecoder(r.Body).Decode(&ar); err != nil {
-		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
+		h.H.WriteError(ctx, w, r, errors.WithStack(err))
 		return
 	}
 	defer r.Body.Close()

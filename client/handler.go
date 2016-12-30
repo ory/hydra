@@ -42,7 +42,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	var ctx = herodot.NewContext()
 
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
-		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
+		h.H.WriteError(ctx, w, r, errors.WithStack(err))
 		return
 	}
 
@@ -60,7 +60,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	if len(c.Secret) == 0 {
 		secret, err := sequence.RuneSequence(12, []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-.,:;$%!&/()=?+*#<>"))
 		if err != nil {
-			h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
+			h.H.WriteError(ctx, w, r, errors.WithStack(err))
 			return
 		}
 		c.Secret = string(secret)
@@ -83,7 +83,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	var ctx = herodot.NewContext()
 
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
-		h.H.WriteError(ctx, w, r, errors.Wrap(err, ""))
+		h.H.WriteError(ctx, w, r, errors.WithStack(err))
 		return
 	}
 

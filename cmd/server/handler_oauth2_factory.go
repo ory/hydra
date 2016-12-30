@@ -5,6 +5,7 @@ import (
 	"net/url"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/compose"
@@ -137,6 +138,7 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 		}
 		c.ConsentURL = fmt.Sprintf("%s://%s:%d/oauth2/consent", proto, host, c.BindPort)
 	}
+
 	consentURL, err := url.Parse(c.ConsentURL)
 	pkg.Must(err, "Could not parse consent url %s.", c.ConsentURL)
 
@@ -152,6 +154,7 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 		ConsentURL:          *consentURL,
 		H:                   &herodot.JSON{},
 		AccessTokenLifespan: c.GetAccessTokenLifespan(),
+		CookieStore:         sessions.NewCookieStore(c.GetCookieSecret()),
 	}
 
 	handler.SetRoutes(router)

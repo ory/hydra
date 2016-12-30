@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gorilla/sessions"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/handler/openid"
 	ejwt "github.com/ory-am/fosite/token/jwt"
@@ -27,7 +28,7 @@ type DefaultConsentStrategy struct {
 	KeyManager               jwk.Manager
 }
 
-func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, token string) (claims *Session, err error) {
+func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, token string, session *sessions.Session) (claims *Session, err error) {
 	t, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, errors.Errorf("Unexpected signing method: %v", t.Header["alg"])
@@ -52,6 +53,15 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 	} else if !t.Valid {
 		return nil, errors.Errorf("Token is invalid")
 	}
+
+	if j, ok := session.Values["consent_jti"]; !ok {
+		return nil, errors.Errorf("Session cookie is missing anti-replay token")
+	} else if js, ok := j.(string); !ok {
+		return nil, errors.Errorf("Session cookie anti-replay value is not a string")
+	} else if js != ejwt.ToString(jwtClaims["jti"]) {
+		return nil, errors.Errorf("Session cookie anti-replay value does not match value from consent response")
+	}
+	delete(session.Values, "jti")
 
 	if time.Now().After(ejwt.ToTime(jwtClaims["exp"])) {
 		return nil, errors.Errorf("Token expired")
@@ -112,19 +122,21 @@ func toStringSlice(i interface{}) []string {
 	return []string{}
 }
 
-func (s *DefaultConsentStrategy) IssueChallenge(authorizeRequest fosite.AuthorizeRequester, redirectURL string) (string, error) {
+func (s *DefaultConsentStrategy) IssueChallenge(authorizeRequest fosite.AuthorizeRequester, redirectURL string, session *sessions.Session) (string, error) {
 	token := jwt.New(jwt.SigningMethodRS256)
+	jti := uuid.New()
 	token.Claims = jwt.MapClaims{
-		"jti":   uuid.New(),
+		"jti":   jti,
 		"scp":   authorizeRequest.GetRequestedScopes(),
 		"aud":   authorizeRequest.GetClient().GetID(),
 		"exp":   time.Now().Add(s.DefaultChallengeLifespan).Unix(),
 		"redir": redirectURL,
 	}
 
+	session.Values["consent_jti"] = jti
 	ks, err := s.KeyManager.GetKey(ConsentChallengeKey, "private")
 	if err != nil {
-		return "", errors.Wrap(err, "")
+		return "", errors.WithStack(err)
 	}
 
 	rsaKey, ok := jwk.First(ks.Keys).Key.(*rsa.PrivateKey)
@@ -134,9 +146,9 @@ func (s *DefaultConsentStrategy) IssueChallenge(authorizeRequest fosite.Authoriz
 
 	var signature, encoded string
 	if encoded, err = token.SigningString(); err != nil {
-		return "", errors.Wrap(err, "")
+		return "", errors.WithStack(err)
 	} else if signature, err = token.Method.Sign(encoded, rsaKey); err != nil {
-		return "", errors.Wrap(err, "")
+		return "", errors.WithStack(err)
 	}
 
 	return fmt.Sprintf("%s.%s", encoded, signature), nil

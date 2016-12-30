@@ -6,6 +6,7 @@ import (
 	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/ory-am/hydra/warden/group"
 	"github.com/ory-am/ladon"
 )
 
@@ -18,4 +19,5 @@ type Context struct {
 	FositeStrategy oauth2.CoreStrategy
 	FositeStore    pkg.FositeStorer
 	KeyManager     jwk.Manager
+	GroupManager   group.Manager
 }

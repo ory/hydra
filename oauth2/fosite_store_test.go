@@ -11,13 +11,13 @@ import (
 	c "github.com/ory-am/common/pkg"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/client"
+	"github.com/ory-am/hydra/integration"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
 	r "gopkg.in/dancannon/gorethink.v2"
-	"github.com/ory-am/hydra/integration"
 )
 
 var rethinkManager *FositeRehinkDBStore

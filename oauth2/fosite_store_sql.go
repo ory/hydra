@@ -9,6 +9,7 @@ import (
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/client"
 	"github.com/pkg/errors"
+	"github.com/rubenv/sql-migrate"
 	"golang.org/x/net/context"
 	"net/url"
 	"strings"
@@ -40,11 +41,24 @@ const (
 	sqlTableCode    = "code"
 )
 
-var sqlSchema = []string{
-	sqlTemplate(sqlTableAccess),
-	sqlTemplate(sqlTableRefresh),
-	sqlTemplate(sqlTableCode),
-	sqlTemplate(sqlTableOpenID),
+var migrations = &migrate.MemoryMigrationSource{
+	Migrations: []*migrate.Migration{
+		{
+			Id: "1",
+			Up: []string{
+				sqlTemplate(sqlTableAccess),
+				sqlTemplate(sqlTableRefresh),
+				sqlTemplate(sqlTableCode),
+				sqlTemplate(sqlTableOpenID),
+			},
+			Down: []string{
+				fmt.Sprintf("DROP TABLE %s", sqlTableAccess),
+				fmt.Sprintf("DROP TABLE %s", sqlTableRefresh),
+				fmt.Sprintf("DROP TABLE %s", sqlTableCode),
+				fmt.Sprintf("DROP TABLE %s", sqlTableOpenID),
+			},
+		},
+	},
 }
 
 var sqlParams = []string{
@@ -76,7 +90,7 @@ func sqlSchemaFromRequest(signature string, r fosite.Requester) (*sqlData, error
 
 	session, err := json.Marshal(r.GetSession())
 	if err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 
 	return &sqlData{
@@ -94,7 +108,7 @@ func sqlSchemaFromRequest(signature string, r fosite.Requester) (*sqlData, error
 func (s *sqlData) toRequest(session fosite.Session, cm client.Manager) (*fosite.Request, error) {
 	if session != nil {
 		if err := json.Unmarshal(s.Session, session); err != nil {
-			return nil, errors.Wrap(err, "")
+			return nil, errors.WithStack(err)
 		}
 	} else {
 		logrus.Debugf("Got an empty session in toRequest")
@@ -107,7 +121,7 @@ func (s *sqlData) toRequest(session fosite.Session, cm client.Manager) (*fosite.
 
 	val, err := url.ParseQuery(s.Form)
 	if err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 
 	r := &fosite.Request{
@@ -136,7 +150,7 @@ func (s *FositeSQLStore) createSession(signature string, requester fosite.Reques
 		":"+strings.Join(sqlParams, ", :"),
 	)
 	if _, err := s.DB.NamedExec(query, data); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	return nil
 }
@@ -146,7 +160,7 @@ func (s *FositeSQLStore) findSessionBySignature(signature string, session fosite
 	if err := s.DB.Get(&d, s.DB.Rebind(fmt.Sprintf("SELECT * FROM hydra_oauth2_%s WHERE signature=?", table)), signature); err == sql.ErrNoRows {
 		return nil, errors.Wrap(fosite.ErrNotFound, "")
 	} else if err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 
 	return d.toRequest(session, s.Manager)
@@ -154,16 +168,16 @@ func (s *FositeSQLStore) findSessionBySignature(signature string, session fosite
 
 func (s *FositeSQLStore) deleteSession(signature string, table string) error {
 	if _, err := s.DB.Exec(s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE signature=?", table)), signature); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	return nil
 }
 
 func (s *FositeSQLStore) CreateSchemas() error {
-	for _, query := range sqlSchema {
-		if _, err := s.DB.Exec(query); err != nil {
-			return errors.Wrapf(err, "Could not create schema:\n%s", query)
-		}
+	migrate.SetTable("hydra_oauth2_migration")
+	n, err := migrate.Exec(s.DB.DB, s.DB.DriverName(), migrations, migrate.Up)
+	if err != nil {
+		return errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
 	}
 	return nil
 }
@@ -262,7 +276,7 @@ func (s *FositeSQLStore) revokeSession(id string, table string) error {
 	if _, err := s.DB.Exec(s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE request_id=?", table)), id); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
 	} else if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	return nil
 }

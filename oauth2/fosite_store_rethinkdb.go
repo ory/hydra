@@ -49,7 +49,7 @@ type RdbSchema struct {
 func requestFromRDB(s *RdbSchema, proto fosite.Session) (*fosite.Request, error) {
 	if proto != nil {
 		if err := json.Unmarshal(s.Session, proto); err != nil {
-			return nil, errors.Wrap(err, "")
+			return nil, errors.WithStack(err)
 		}
 	}
 
@@ -80,7 +80,7 @@ func (m *FositeRehinkDBStore) ColdStart() error {
 func (s *FositeRehinkDBStore) publishInsert(table r.Term, id string, requester fosite.Requester) error {
 	sess, err := json.Marshal(requester.GetSession())
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	if _, err := table.Insert(&RdbSchema{
@@ -93,14 +93,14 @@ func (s *FositeRehinkDBStore) publishInsert(table r.Term, id string, requester f
 		Form:          requester.GetRequestForm(),
 		Session:       sess,
 	}).RunWrite(s.Session); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	return nil
 }
 
 func (s *FositeRehinkDBStore) publishDelete(table r.Term, id string) error {
 	if _, err := table.Get(id).Delete().RunWrite(s.Session); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	return nil
 }
@@ -266,7 +266,7 @@ func (m *FositeRehinkDBStore) Watch(ctx context.Context) {
 func (items RDBItems) coldStart(sess *r.Session, lock *sync.RWMutex, table r.Term) error {
 	rows, err := table.Run(sess)
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	var item RdbSchema
@@ -289,7 +289,7 @@ func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock *sync.RWM
 		changes, err := table.Changes().Run(sess)
 		lock.Unlock()
 		if err != nil {
-			return errors.Wrap(err, "")
+			return errors.WithStack(err)
 		}
 		defer changes.Close()
 

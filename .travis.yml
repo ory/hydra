@@ -27,7 +27,7 @@ script:
   - go test -v -bench=.* -run=none $(glide novendor)
   - docker build -t hydra-travis-ci .
   - docker run -d hydra-travis-ci
-  - hydra host --dangerous-auto-logon --dangrous-force-http &
+  - hydra host --dangerous-auto-logon --dangerous-force-http &
   - while ! echo exit | nc localhost 4444; do sleep 1; done
   - ./run-e2e-test-suite.sh
 

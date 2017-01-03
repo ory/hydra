@@ -50,7 +50,7 @@ func injectJWKManager(c *config.Config) {
 		m := &jwk.RedisManager{
 			DB: con.RedisSession(),
 			Cipher: &jwk.AEAD{
-				c.GetSystemSecret(),
+				Key: c.GetSystemSecret(),
 			},
 		}
 		ctx.KeyManager = m

@@ -5,7 +5,6 @@ import (
 	"net/url"
 
 	"encoding/json"
-	"github.com/Sirupsen/logrus"
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
@@ -128,8 +127,6 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprou
 
 func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = fosite.NewContext()
-
-	logrus.Infof("Got headers: %v+", r.Header)
 
 	authorizeRequest, err := h.OAuth2.NewAuthorizeRequest(ctx, r)
 	if err != nil {

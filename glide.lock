@@ -1,5 +1,5 @@
 hash: 98b2f78147176495913695cc5c049d0a217128f24274ead046052c6d72a9bef5
-updated: 2016-12-29T23:52:24.0902073+01:00
+updated: 2017-01-02T15:44:52.2847279+01:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
@@ -44,7 +44,7 @@ imports:
   - pkg/term
   - pkg/term/windows
 - name: github.com/docker/go-connections
-  version: 4ccf312bf1d35e5dbda654e57a9be4c3f3cd0366
+  version: eb315e36415380e7c2fdee175262560ff42359da
   subpackages:
   - nat
 - name: github.com/docker/go-units
@@ -95,7 +95,7 @@ imports:
 - name: github.com/julienschmidt/httprouter
   version: 8c199fb6259ffc1af525cc3ad52ee60ba8359669
 - name: github.com/lib/pq
-  version: 5bf161122cd640c2a5a2c1d7fa49ea9befff31dd
+  version: 22cb3e4c487ce6242e2b03369219e5631eed1221
   subpackages:
   - oid
 - name: github.com/magiconair/properties
@@ -111,7 +111,7 @@ imports:
 - name: github.com/oleiade/reflections
   version: 2b6ec3da648e3e834dc41bad8d9ed7f2dc6a9496
 - name: github.com/opencontainers/runc
-  version: f376b8033d2caae5207de9be1ee4d4a695886af1
+  version: db25629d4630459929ba08ea663dccf562b8ff70
   subpackages:
   - libcontainer/system
   - libcontainer/user
@@ -125,7 +125,7 @@ imports:
 - name: github.com/ory-am/dockertest
   version: 8445a82f8da6067ffecbb06e3f9fa2857f3bf9df
 - name: github.com/ory-am/fosite
-  version: b489cc95b87d74785c5e9b8ea5eb48e975559f63
+  version: c740b703399e7a1479dac9f261baec4b341f6cff
   subpackages:
   - compose
   - handler/oauth2
@@ -195,7 +195,7 @@ imports:
   - blowfish
   - pbkdf2
 - name: golang.org/x/net
-  version: 45e771701b814666a7eb299e6c7a57d0b1799e91
+  version: 8fd7f25955530b92e73e9e1932a41b522b22ccd9
   subpackages:
   - context
   - context/ctxhttp
@@ -210,7 +210,7 @@ imports:
   - unix
   - windows
 - name: golang.org/x/text
-  version: a49bea13b776691cb1b49873e5d8df96ec74831a
+  version: fd889fe3a20f4878f5f47672fd3ca5b86db005e2
   subpackages:
   - transform
   - unicode/norm
@@ -241,7 +241,7 @@ imports:
 - name: gopkg.in/ory-am/dockertest.v3
   version: e4828e807797a7641fcd457716870dfc2f9e82ff
 - name: gopkg.in/redis.v5
-  version: b7bae3a78050e2e7ec2130a05cde296a9ff2e9c0
+  version: 8fcba2ea878201b70c5a63dd416141d4ddbc601a
   subpackages:
   - internal
   - internal/consistenthash

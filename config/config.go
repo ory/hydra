@@ -21,7 +21,6 @@ import (
 	"github.com/ory-am/hydra/warden/group"
 	"github.com/ory-am/ladon"
 	"github.com/pkg/errors"
-	"github.com/rubenv/sql-migrate"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"golang.org/x/net/context"
@@ -172,13 +171,11 @@ func (c *Config) Context() *Context {
 		break
 	case *SQLConnection:
 		m := ladon.NewSQLManager(con.GetDatabase(), nil)
-		migrate.SetTable("hydra_policy_migration")
 		if err := m.CreateSchemas(); err != nil {
 			logrus.Fatalf("Could not create policy schema: %s", err)
 		}
 		manager = m
 
-		migrate.SetTable("hydra_groups_migration")
 		gm := &group.SQLManager{DB: con.GetDatabase()}
 		if err := gm.CreateSchemas(); err != nil {
 			logrus.Fatalf("Could not create group schema: %s", err)

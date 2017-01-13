@@ -77,10 +77,10 @@ func (c *SQLConnection) GetDatabase() *sqlx.DB {
 	}
 
 	maxConnLifetime := time.Duration(0)
-	if v := c.URL.Query().Get("max_idle_conns"); v != "" {
-		s, err := time.ParseDuration(maxConnLifetime)
+	if v := c.URL.Query().Get("max_conn_lifetime"); v != "" {
+		s, err := time.ParseDuration(v)
 		if err != nil {
-			logrus.Warnf("max_idle_conns value %s could not be parsed to int: %s", v, err)
+			logrus.Warnf("max_conn_lifetime value %s could not be parsed to int: %s", v, err)
 		} else {
 			maxConnLifetime = s
 		}

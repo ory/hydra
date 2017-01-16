@@ -24,7 +24,7 @@ type redisSchema struct {
 	RequestedAt   time.Time        `json:"requestedAt"`
 	Client        *client.Client   `json:"client"`
 	Scopes        fosite.Arguments `json:"scopes"`
-	GrantedScopes fosite.Arguments `json:"grantedScopes""`
+	GrantedScopes fosite.Arguments `json:"grantedScopes"`
 	Form          url.Values       `json:"form"`
 	Session       json.RawMessage  `json:"session"`
 }

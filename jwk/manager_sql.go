@@ -84,11 +84,17 @@ func (m *SQLManager) AddKeySet(set string, keys *jose.JsonWebKeySet) error {
 	for _, key := range keys.Keys {
 		out, err := json.Marshal(key)
 		if err != nil {
+			if re := tx.Rollback(); re != nil {
+				return errors.Wrap(err, re.Error())
+			}
 			return errors.WithStack(err)
 		}
 
 		encrypted, err := m.Cipher.Encrypt(out)
 		if err != nil {
+			if re := tx.Rollback(); re != nil {
+				return errors.Wrap(err, re.Error())
+			}
 			return errors.WithStack(err)
 		}
 
@@ -98,11 +104,17 @@ func (m *SQLManager) AddKeySet(set string, keys *jose.JsonWebKeySet) error {
 			Version: 0,
 			Key:     encrypted,
 		}); err != nil {
+			if re := tx.Rollback(); re != nil {
+				return errors.Wrap(err, re.Error())
+			}
 			return errors.WithStack(err)
 		}
 	}
 
 	if err := tx.Commit(); err != nil {
+		if re := tx.Rollback(); re != nil {
+			return errors.Wrap(err, re.Error())
+		}
 		return errors.WithStack(err)
 	}
 	return nil

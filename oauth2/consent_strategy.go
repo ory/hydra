@@ -45,6 +45,9 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 		}
 		return rsaKey, nil
 	})
+	if err != nil {
+		return nil, errors.Wrap(err, "The consent response is not a valid JSON Web Token")
+	}
 
 	// make sure to use MapClaims since that is the default..
 	jwtClaims, ok := t.Claims.(jwt.MapClaims)

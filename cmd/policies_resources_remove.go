@@ -4,9 +4,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// policyResourcesDeleteCmd represents the remove command
-var policyResourcesDeleteCmd = &cobra.Command{
-	Use:   "delete <policy> <resource> [<resource>...]",
+// policyResourcesRemoveCmd represents the remove command
+var policyResourcesRemoveCmd = &cobra.Command{
+	Use:   "remove <policy> <resource> [<resource>...]",
 	Short: "Remove resources from the regex matching list",
 	Long: `You can use regular expressions in your matches. Encapsulate them in < >.
 
@@ -16,5 +16,5 @@ Example:
 }
 
 func init() {
-	policiesResourcesCmd.AddCommand(policyResourcesDeleteCmd)
+	policiesResourcesCmd.AddCommand(policyResourcesRemoveCmd)
 }

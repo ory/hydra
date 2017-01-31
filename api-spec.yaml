@@ -1,0 +1,165 @@
+# this is an example of the Uber API
+# as a demonstration of an API spec in YAML
+swagger: '2.0'
+info:
+  title: Hydra API
+  description: >
+    An open source OAuth2 and OpenID Connect server for new and existing infrastructures. Visit [**Hydra on GitHub**](https://github.com/ory-am/hydra) or read the [**guide**](https://ory-am.gitbooks.io/hydra/content/index.html).
+
+  version: "0.7.0"
+# array of all schemes that your API supports
+schemes:
+  - https
+  - http
+# will be prefixed to all paths
+basePath: /
+produces:
+  - application/json
+paths:
+  /clients:
+    get:
+      responses:
+        200:
+          description: "List of OAuth2 Clients."
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/OAuth2 Client"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+    post:
+      responses:
+        200:
+          description: "Successful creation of an OAuth2 Client."
+          schema:
+            $ref: "#/definitions/OAuth2 Client"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+  /clients/{id}:
+    parameters:
+      - name: "id"
+        in: path
+        description: "The unique ID of the OAuth2 Client."
+        required: true
+        type: string
+    get:
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/OAuth2 Client"
+        404:
+          description: "OAuth2 Client could not be found."
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+    post:
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/OAuth2 Client"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+    put:
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/OAuth2 Client"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+    delete:
+      responses:
+        204:
+          description: OAuth2 Client deleted
+          schema:
+            $ref: "#/definitions/OAuth2 Client"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+
+
+definitions:
+  "OAuth2 Client":
+    type: object
+    properties:
+      id:
+        type: string
+        description: A unique identitfier which is generated randomly if no id is provided.
+      client_name:
+        type: string
+        description: Human-readable string name of the client to be presented to the end-user during authorization.
+      client_secret:
+        type: string
+        description: "The secret to authenticate the client with. If no secret is provided, a random one will be generated and returned once in the client creation response. If a secret is provided it will never be included in the response. There is no way to recover a lost secret."
+      redirect_uris:
+        type: array
+        items:
+          type: string
+        description: "Array of redirection URI strings for use in redirect-based flows such as the authorization code and implicit flows. As required by Section 2 of OAuth 2.0 [RFC6749], clients using flows with redirection MUST register their redirection URI value."
+      grant_types:
+        type: array
+        items:
+          type: string
+        description: >
+          Array of OAuth 2.0 grant type strings that the client can use at the token endpoint. These grant types are defined as follows:
+
+          * `authorization_code`: The authorization code grant type defined in OAuth 2.0, Section 4.1.
+          * `implicit`: The implicit grant type defined in OAuth 2.0, Section 4.2.
+          * `client_credentials`: The client credentials grant type defined in OAuth 2.0, Section 4.4.
+          * `refresh_token`: The refresh token grant type defined in OAuth 2.0, Section 6.
+      response_types:
+        type: array
+        items:
+          type: string
+        description: >
+          Array of the OAuth 2.0 response type strings that the client can use at the authorization endpoint. These response types are defined as follows:
+
+          * `code`: The authorization code response type defined in OAuth 2.0, Section 4.1.
+          * `token`: The implicit response type defined in OAuth 2.0, Section 4.2.
+      scope:
+        type: array
+        items:
+          type: string
+        description: "An array of scopes that the client will be allowed to used."
+      policy_uri:
+        type: string
+        description: "URL string that points to a human-readable privacy policy document that describes how the deployment organization collects, uses, retains, and discloses personal data."
+      tos_uri:
+        type: string
+        description: "URL string that points to a human-readable terms of service document for the client that describes a contractual relationship between the end-user and the client that the end-user accepts when authorizing the client."
+      client_uri:
+        type: string
+        description: "URL string of a web page providing information about the client. If present, the server SHOULD display this URL to the end-user in a clickable fashion."
+      logo_uri:
+        type: string
+        description: URL string that references a logo for the client. If present, the server SHOULD display this image to the end-user during approval.
+      contacts:
+        type: array
+        items:
+          type: string
+        description: Array of strings representing ways to contact people responsible for this client, typically email addresses
+      public:
+        type: boolean
+        description: Set public to true to disable the client secret and allow the client to perform certain OAuth2 flows without a secret. If public is true, the client will not be able to perform the client_credentials grant.
+      owner:
+        type: string
+        description: An arbitrary string that identifies the owner. For example, this could be the owner's user id.
+
+  "JSON Web Key Set":
+    type: object
+  "JSON Web Key":
+    type: object
+  "Access Control Policy":
+    type: object

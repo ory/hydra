@@ -18,7 +18,7 @@ In this minimalistic example, we will use Hydra without a database. Bee aware th
 or stopping the container will **lose all the data**.
 
 ```
-$ docker run -d -p 4444:4444 oryam/hydra --name my-hydra
+$ docker run -d --name my-hydra -p 4444:4444 oryam/hydra
 ec91228cb105db315553499c81918258f52cee9636ea2a4821bdb8226872f54b
 ```
 

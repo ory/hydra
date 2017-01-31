@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -18,16 +19,26 @@ var connectCmd = &cobra.Command{
 		secret := "*********"
 		fmt.Println("To keep the current value, press enter.")
 
-		if u := input("Cluster URL [" + c.ClusterURL + "]: "); u != "" {
+		if u, _ := cmd.Flags().GetString("url"); u != "" {
+			c.ClusterURL = u
+		} else if u := input("Cluster URL [" + c.ClusterURL + "]: "); u != "" {
 			c.ClusterURL = u
 		}
-		if u := input("Client ID [" + c.ClientID + "]: "); u != "" {
+
+		if u, _ := cmd.Flags().GetString("id"); u != "" {
+			c.ClientID = u
+		} else if u := input("Client ID [" + c.ClientID + "]: "); u != "" {
 			c.ClientID = u
 		}
+
 		if c.ClientSecret == "" {
 			secret = "empty"
 		}
-		if u := input("Client Secret [" + secret + "]: "); u != "" {
+
+		if u, _ := cmd.Flags().GetString("secret"); u != "" {
+			logrus.Warn("You should not provide secrets using command line flags. The secret might leak to bash history and similar systems.")
+			c.ClientSecret = u
+		} else if u := input("Client Secret [" + secret + "]: "); u != "" {
 			c.ClientSecret = u
 		}
 		if err := c.Persist(); err != nil {
@@ -49,4 +60,7 @@ func input(message string) string {
 
 func init() {
 	RootCmd.AddCommand(connectCmd)
+	connectCmd.Flags().String("url", "", "The cluster URL")
+	connectCmd.Flags().String("id", "", "The client id")
+	connectCmd.Flags().String("secret", "", "The client secret")
 }

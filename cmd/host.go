@@ -44,9 +44,16 @@ CORE CONTROLS
 	- RETHINK_TLS_CERT: A pem encoded TLS certificate passed as string. Can be used instead of RETHINK_TLS_CERT_PATH.
 		Example: RETHINK_TLS_CERT_PATH="-----BEGIN CERTIFICATE-----\nMIIDZTCCAk2gAwIBAgIEV5xOtDANBgkqhkiG9w0BAQ0FADA0MTIwMAYDVQQDDClP..."
 
+  - Redis: If DATABASE_URL is a DNS starting with redis:// Redis will be used as a storage backend.
+		Example: DATABASE_URL=redis://x:password@host:6379/0
+
 - SYSTEM_SECRET: A secret that is at least 16 characters long. If none is provided, one will be generated. They key
 	is used to encrypt sensitive data using AES-GCM (256 bit) and validate HMAC signatures.
 	Example: SYSTEM_SECRET=jf89-jgklAS9gk3rkAF90dfsk
+
+- COOKIE_SECRET: A secret that is used to encrypt cookie sessions. Defaults to SYSTEM_SECRET. It is recommended to use
+	a separate secret in production.
+	Example: COOKIE_SECRET=fjah8uFhgjSiuf-AS
 
 - FORCE_ROOT_CLIENT_CREDENTIALS: On first start up, Hydra generates a root client with random id and secret. Use
 	this environment variable in the form of "FORCE_ROOT_CLIENT_CREDENTIALS=id:secret" to set

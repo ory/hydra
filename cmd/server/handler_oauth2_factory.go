@@ -5,6 +5,7 @@ import (
 	"net/url"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/compose"
@@ -65,6 +66,13 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 			logrus.Fatalf("Could not fetch initial state: %s", err)
 		}
 		m.Watch(context.Background())
+		store = m
+		break
+	case *config.RedisConnection:
+		m := &oauth2.FositeRedisStore{
+			DB:      con.RedisSession(),
+			Manager: clients,
+		}
 		store = m
 		break
 	default:
@@ -130,6 +138,7 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 		}
 		c.ConsentURL = fmt.Sprintf("%s://%s:%d/oauth2/consent", proto, host, c.BindPort)
 	}
+
 	consentURL, err := url.Parse(c.ConsentURL)
 	pkg.Must(err, "Could not parse consent url %s.", c.ConsentURL)
 
@@ -142,8 +151,10 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 			DefaultChallengeLifespan: c.GetChallengeTokenLifespan(),
 			DefaultIDTokenLifespan:   c.GetIDTokenLifespan(),
 		},
-		ConsentURL: *consentURL,
-		H:          &herodot.JSON{},
+		ConsentURL:          *consentURL,
+		H:                   &herodot.JSON{},
+		AccessTokenLifespan: c.GetAccessTokenLifespan(),
+		CookieStore:         sessions.NewCookieStore(c.GetCookieSecret()),
 	}
 
 	handler.SetRoutes(router)

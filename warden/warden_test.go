@@ -15,6 +15,7 @@ import (
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/hydra/warden"
+	"github.com/ory-am/hydra/warden/group"
 	"github.com/ory-am/ladon"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
@@ -28,8 +29,8 @@ var wardens = map[string]firewall.Firewall{}
 var ladonWarden = pkg.LadonWarden(map[string]ladon.Policy{
 	"1": &ladon.DefaultPolicy{
 		ID:        "1",
-		Subjects:  []string{"alice"},
-		Resources: []string{"matrix", "rn:hydra:token<.*>"},
+		Subjects:  []string{"alice", "group1"},
+		Resources: []string{"matrix", "forbidden_matrix", "rn:hydra:token<.*>"},
 		Actions:   []string{"create", "decide"},
 		Effect:    ladon.AllowAccess,
 	},
@@ -40,13 +41,20 @@ var ladonWarden = pkg.LadonWarden(map[string]ladon.Policy{
 		Actions:   []string{"decide"},
 		Effect:    ladon.AllowAccess,
 	},
+	"3": &ladon.DefaultPolicy{
+		ID:        "3",
+		Subjects:  []string{"group1"},
+		Resources: []string{"forbidden_matrix", "rn:hydra:token<.*>"},
+		Actions:   []string{"create", "decide"},
+		Effect:    ladon.DenyAccess,
+	},
 })
 
 var fositeStore = pkg.FositeStore()
 
 var now = time.Now().Round(time.Second)
 
-var tokens = pkg.Tokens(3)
+var tokens = pkg.Tokens(4)
 
 func init() {
 	wardens["local"] = &warden.LocalWarden{
@@ -61,6 +69,14 @@ func init() {
 				},
 			},
 			ScopeStrategy: fosite.HierarchicScopeStrategy,
+		},
+		Groups: &group.MemoryManager{
+			Groups: map[string]group.Group{
+				"group1": {
+					ID:      "group1",
+					Members: []string{"ken"},
+				},
+			},
 		},
 		Issuer:              "tests",
 		AccessTokenLifespan: time.Hour,
@@ -99,6 +115,13 @@ func init() {
 	ar3.Client = &fosite.DefaultClient{ID: "doesnt-exist"}
 	ar3.Session.SetExpiresAt(fosite.AccessToken, time.Now().Add(-time.Hour).Round(time.Second))
 	fositeStore.CreateAccessTokenSession(nil, tokens[2][0], ar3)
+
+	ar4 := fosite.NewAccessRequest(oauth2.NewSession("ken"))
+	ar4.GrantedScopes = fosite.Arguments{"core", "hydra.warden"}
+	ar4.RequestedAt = now
+	ar4.Client = &fosite.DefaultClient{ID: "siri"}
+	ar4.Session.SetExpiresAt(fosite.AccessToken, time.Now().Add(time.Hour).Round(time.Second))
+	fositeStore.CreateAccessTokenSession(nil, tokens[3][0], ar4)
 
 	conf := &coauth2.Config{
 		Scopes:   []string{},
@@ -183,6 +206,33 @@ func TestActionAllowed(t *testing.T) {
 				assert: func(c *firewall.Context) {
 					assert.Equal(t, "siri", c.Audience)
 					assert.Equal(t, "alice", c.Subject)
+					assert.Equal(t, "tests", c.Issuer)
+					assert.Equal(t, now.Add(time.Hour), c.ExpiresAt)
+					assert.Equal(t, now, c.IssuedAt)
+				},
+			},
+			{
+				token: tokens[3][1],
+				req: &firewall.TokenAccessRequest{
+					Resource: "forbidden_matrix",
+					Action:   "create",
+					Context:  ladon.Context{},
+				},
+				scopes:    []string{"core"},
+				expectErr: true,
+			},
+			{
+				token: tokens[3][1],
+				req: &firewall.TokenAccessRequest{
+					Resource: "matrix",
+					Action:   "create",
+					Context:  ladon.Context{},
+				},
+				scopes:    []string{"core"},
+				expectErr: false,
+				assert: func(c *firewall.Context) {
+					assert.Equal(t, "siri", c.Audience)
+					assert.Equal(t, "ken", c.Subject)
 					assert.Equal(t, "tests", c.Issuer)
 					assert.Equal(t, now.Add(time.Hour), c.ExpiresAt)
 					assert.Equal(t, now, c.IssuedAt)

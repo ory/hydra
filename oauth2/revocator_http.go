@@ -15,6 +15,7 @@ type HTTPRecovator struct {
 	Config   *clientcredentials.Config
 	Dry      bool
 	Endpoint *url.URL
+	Client   *http.Client
 }
 
 func (r *HTTPRecovator) RevokeToken(ctx context.Context, token string) error {
@@ -24,15 +25,18 @@ func (r *HTTPRecovator) RevokeToken(ctx context.Context, token string) error {
 	data := url.Values{"token": []string{token}}
 	hreq, err := http.NewRequest("POST", ep.String(), bytes.NewBufferString(data.Encode()))
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	hreq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	hreq.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 	hreq.SetBasicAuth(r.Config.ClientID, r.Config.ClientSecret)
-	hres, err := http.DefaultClient.Do(hreq)
+	if r.Client == nil {
+		r.Client = http.DefaultClient
+	}
+	hres, err := r.Client.Do(hreq)
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	defer hres.Body.Close()
 

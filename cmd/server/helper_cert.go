@@ -17,6 +17,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/square/go-jose"
+	"strings"
 )
 
 const (
@@ -49,10 +50,13 @@ func loadCertificateFromEnv() *tls.Certificate {
 		return nil
 	}
 
+	keyString = strings.Replace(keyString, "\\n", "\n", -1)
+	certString = strings.Replace(certString, "\\n", "\n", -1)
+
 	var cert tls.Certificate
 	var err error
 	if cert, err = tls.X509KeyPair([]byte(certString), []byte(keyString)); err != nil {
-		logrus.Warn("Could not parse x509 key pair from env: %s", cert)
+		logrus.Warningf("Could not parse x509 key pair from env: %s", cert)
 		return nil
 	}
 
@@ -61,8 +65,10 @@ func loadCertificateFromEnv() *tls.Certificate {
 
 func getOrCreateTLSCertificate(cmd *cobra.Command, c *config.Config) tls.Certificate {
 	if cert := loadCertificateFromFile(cmd); cert != nil {
+		logrus.Info("Loaded tls certificate from file")
 		return *cert
 	} else if cert := loadCertificateFromEnv(); cert != nil {
+		logrus.Info("Loaded certificate from environment variable")
 		return *cert
 	}
 

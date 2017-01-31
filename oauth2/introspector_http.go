@@ -42,24 +42,30 @@ func (i *HTTPIntrospector) IntrospectToken(ctx context.Context, token string, sc
 	data := url.Values{"token": []string{token}, "scope": []string{strings.Join(scopes, " ")}}
 	hreq, err := http.NewRequest("POST", ep.String(), bytes.NewBufferString(data.Encode()))
 	if err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 
 	hreq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	hreq.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 	hres, err := i.Client.Do(hreq)
 	if err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.WithStack(err)
 	}
 	defer hres.Body.Close()
 
 	body, _ := ioutil.ReadAll(hres.Body)
 	if hres.StatusCode < 200 || hres.StatusCode >= 300 {
-		return nil, errors.Errorf("Expected 2xx status code but got %d.\n%s", hres.StatusCode, body)
+		if hres.StatusCode == http.StatusUnauthorized {
+			return nil, errors.Wrapf(fosite.ErrRequestUnauthorized, "Got status code %d: %s", hres.StatusCode, string(body))
+		} else if hres.StatusCode == http.StatusForbidden {
+			return nil, errors.Wrapf(fosite.ErrRequestUnauthorized, "Got status code %d: %s", hres.StatusCode, string(body))
+		}
+
+		return nil, errors.Errorf("Expected 2xx status code but got %d.\n%s", hres.StatusCode, string(body))
 	} else if err := json.Unmarshal(body, resp); err != nil {
-		return nil, errors.Errorf("%s: %s", err, body)
+		return nil, errors.Errorf("Could not unmarshal body because %s, body %s", err, string(body))
 	} else if !resp.Active {
-		return nil, errors.New("Token is malformed, expired or otherwise invalid")
+		return nil, errors.Wrap(fosite.ErrInactiveToken, "")
 	}
 	return resp, nil
 }

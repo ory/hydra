@@ -13,11 +13,13 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/ory-am/hydra)](https://goreportcard.com/report/github.com/ory-am/hydra)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/364/badge)](https://bestpractices.coreinfrastructure.org/projects/364)
 
+---
+
 [![Docs Guide](https://img.shields.io/badge/docs-guide-blue.svg)](https://ory-am.gitbooks.io/hydra/content/)
 [![HTTP API Documentation](https://img.shields.io/badge/docs-http%20api-blue.svg)](http://docs.hdyra.apiary.io/)
 [![Code Documentation](https://img.shields.io/badge/docs-godoc-blue.svg)](https://godoc.org/github.com/ory-am/hydra)
 
-Hydra is a runnable server implementation of the OAuth2 2.0 authorization framework and the OpenID Connect Core 1.0.
+Hydra is a runnable server implementation of the OAuth 2.0 authorization framework and the OpenID Connect Core 1.0. Hydra acts as a middle-man infrastructure between your existing application and any OAuth 2.0 / OpenID Connect clients that consume your APIs.
 
 Join our [newsletter](http://eepurl.com/bKT3N9) to stay on top of new developments.
 We answer basic support requests on [Google Groups](https://groups.google.com/forum/#!forum/ory-hydra/new) and [Gitter](https://gitter.im/ory-am/hydra)
@@ -101,7 +103,7 @@ You can use Hydra without a database, but be aware that restarting, scaling
 or stopping the container will **lose all data**:
 
 ```
-$ docker run -d -p 4444:4444 oryam/hydra --name my-hydra
+$ docker run -d --name my-hydra -p 4444:4444 oryam/hydra
 ec91228cb105db315553499c81918258f52cee9636ea2a4821bdb8226872f54b
 ```
 

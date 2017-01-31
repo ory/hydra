@@ -5,29 +5,26 @@ import (
 	"net/url"
 	"testing"
 
+	"crypto/rand"
+	"fmt"
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/dockertest"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/compose"
 	"github.com/ory-am/hydra/herodot"
+	"github.com/ory-am/hydra/integration"
 	. "github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
-	"github.com/stretchr/testify/assert"
-	r "gopkg.in/dancannon/gorethink.v2"
-
-	"log"
-	"os"
-	"time"
-
-	"crypto/rand"
-	"fmt"
-	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"github.com/square/go-jose"
+	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"io"
+	"log"
 	"net/http"
+	"os"
+	"time"
 )
 
 var managers = map[string]Manager{}
@@ -80,116 +77,65 @@ var rethinkManager = new(RethinkManager)
 func randomBytes(n int) ([]byte, error) {
 	bytes := make([]byte, n)
 	if _, err := io.ReadFull(rand.Reader, bytes); err != nil {
-		return []byte{}, errors.Wrap(err, "")
+		return []byte{}, errors.WithStack(err)
 	}
 	return bytes, nil
 }
 
 var encryptionKey, _ = randomBytes(32)
 
-var containers = []dockertest.ContainerID{}
-
 func TestMain(m *testing.M) {
-	defer func() {
-		for _, c := range containers {
-			c.KillRemove()
-		}
-	}()
-
-	connectToMySQL()
-	connectToRethinkDB()
 	connectToPG()
+	connectToRethinkDB()
+	connectToMySQL()
+	connectToRedis()
 
-	os.Exit(m.Run())
+	s := m.Run()
+	integration.KillAll()
+	os.Exit(s)
 }
 
 func connectToPG() {
-	var db *sqlx.DB
-	c, err := dockertest.ConnectToPostgreSQL(15, time.Second, func(url string) bool {
-		var err error
-		db, err = sqlx.Open("postgres", url)
-		if err != nil {
-			log.Printf("Got error in postgres connector: %s", err)
-			return false
-		}
-		return db.Ping() == nil
-	})
-
-	if err != nil {
-		log.Fatalf("Could not connect to database: %s", err)
-	}
-
-	containers = append(containers, c)
+	var db = integration.ConnectToPostgres()
 	s := &SQLManager{DB: db, Cipher: &AEAD{Key: encryptionKey}}
-
-	if err = s.CreateSchemas(); err != nil {
+	if err := s.CreateSchemas(); err != nil {
 		log.Fatalf("Could not create postgres schema: %v", err)
 	}
 
 	managers["postgres"] = s
-	containers = append(containers, c)
 }
 
 func connectToRethinkDB() {
-	var session *r.Session
-	var err error
-
-	c, err := dockertest.ConnectToRethinkDB(20, time.Second, func(url string) bool {
-		if session, err = r.Connect(r.ConnectOpts{Address: url, Database: "hydra"}); err != nil {
-			return false
-		} else if _, err = r.DBCreate("hydra").RunWrite(session); err != nil {
-			log.Printf("Database exists: %s", err)
-			return false
-		} else if _, err = r.TableCreate("hydra_keys").RunWrite(session); err != nil {
-			log.Printf("Could not create table: %s", err)
-			return false
-		}
-
-		rethinkManager = &RethinkManager{
-			Keys:    map[string]jose.JsonWebKeySet{},
-			Session: session,
-			Table:   r.Table("hydra_keys"),
-			Cipher: &AEAD{
-				Key: encryptionKey,
-			},
-		}
-		rethinkManager.Watch(context.Background())
-		time.Sleep(100 * time.Millisecond)
-		return true
-	})
-	if err != nil {
-		log.Fatalf("Could not connect to database: %s", err)
+	var session = integration.ConnectToRethinkDB("hydra", "hydra_keys")
+	rethinkManager = &RethinkManager{
+		Keys:    map[string]jose.JsonWebKeySet{},
+		Session: session,
+		Table:   r.Table("hydra_keys"),
+		Cipher: &AEAD{
+			Key: encryptionKey,
+		},
 	}
-
-	containers = append(containers, c)
+	rethinkManager.Watch(context.Background())
 	managers["rethink"] = rethinkManager
 }
 
 func connectToMySQL() {
-	var db *sqlx.DB
-	c, err := dockertest.ConnectToMySQL(15, time.Second, func(url string) bool {
-		var err error
-		db, err = sqlx.Open("mysql", url)
-		if err != nil {
-			log.Printf("Got error in mysql connector: %s", err)
-			return false
-		}
-		return db.Ping() == nil
-	})
-
-	if err != nil {
-		log.Fatalf("Could not connect to database: %s", err)
-	}
-
-	containers = append(containers, c)
+	var db = integration.ConnectToMySQL()
 	s := &SQLManager{DB: db, Cipher: &AEAD{Key: encryptionKey}}
 
-	if err = s.CreateSchemas(); err != nil {
+	if err := s.CreateSchemas(); err != nil {
 		log.Fatalf("Could not create postgres schema: %v", err)
 	}
 
 	managers["mysql"] = s
-	containers = append(containers, c)
+}
+
+func connectToRedis() {
+	var db = integration.ConnectToRedis()
+	managers["redis"] = &RedisManager{
+		DB:     db,
+		Cipher: &AEAD{Key: encryptionKey},
+	}
 }
 
 func BenchmarkRethinkGet(b *testing.B) {

@@ -29,7 +29,7 @@ type RethinkManager struct {
 
 func (m *RethinkManager) SetUpIndex() error {
 	if _, err := m.Table.IndexWait("kid").Run(m.Session); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	return nil
 }
@@ -88,18 +88,18 @@ func (m *RethinkManager) GetKeySet(set string) (*jose.JsonWebKeySet, error) {
 func (m *RethinkManager) DeleteKey(set, kid string) error {
 	keys, err := m.GetKey(set, kid)
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	if err := m.publishDelete(set, keys.Keys); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	return nil
 }
 
 func (m *RethinkManager) DeleteKeySet(set string) error {
 	if err := m.publishDeleteAll(set); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	return nil
 }
@@ -121,11 +121,11 @@ func (m *RethinkManager) publishAdd(set string, keys []jose.JsonWebKey) error {
 	for k, key := range keys {
 		out, err := json.Marshal(key)
 		if err != nil {
-			return errors.Wrap(err, "")
+			return errors.WithStack(err)
 		}
 		encrypted, err := m.Cipher.Encrypt(out)
 		if err != nil {
-			return errors.Wrap(err, "")
+			return errors.WithStack(err)
 		}
 		raws[k] = encrypted
 	}
@@ -136,7 +136,7 @@ func (m *RethinkManager) publishAdd(set string, keys []jose.JsonWebKey) error {
 			Set: set,
 			Key: raw,
 		}).RunWrite(m.Session); err != nil {
-			return errors.Wrap(err, "")
+			return errors.WithStack(err)
 		}
 	}
 
@@ -146,7 +146,7 @@ func (m *RethinkManager) publishDeleteAll(set string) error {
 	if err := m.Table.Filter(map[string]interface{}{
 		"set": set,
 	}).Delete().Exec(m.Session); err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 	return nil
 }
@@ -157,7 +157,7 @@ func (m *RethinkManager) publishDelete(set string, keys []jose.JsonWebKey) error
 			"kid": key.KeyID,
 			"set": set,
 		}).Delete().RunWrite(m.Session); err != nil {
-			return errors.Wrap(err, "")
+			return errors.WithStack(err)
 		}
 	}
 	return nil
@@ -167,7 +167,7 @@ func (m *RethinkManager) Watch(ctx context.Context) {
 	go pkg.Retry(time.Second*15, time.Minute, func() error {
 		connections, err := m.Table.Changes().Run(m.Session)
 		if err != nil {
-			return errors.Wrap(err, "")
+			return errors.WithStack(err)
 		}
 		defer connections.Close()
 
@@ -199,12 +199,12 @@ func (m *RethinkManager) watcherInsert(val *rethinkSchema) {
 	var c jose.JsonWebKey
 	key, err := m.Cipher.Decrypt(val.Key)
 	if err != nil {
-		pkg.LogError(errors.Wrap(err, ""))
+		pkg.LogError(errors.WithStack(err))
 		return
 	}
 
 	if err := json.Unmarshal(key, &c); err != nil {
-		pkg.LogError(errors.Wrap(err, ""))
+		pkg.LogError(errors.WithStack(err))
 		return
 	}
 
@@ -233,7 +233,7 @@ func (m *RethinkManager) ColdStart() error {
 	m.Keys = map[string]jose.JsonWebKeySet{}
 	clients, err := m.Table.Run(m.Session)
 	if err != nil {
-		return errors.Wrap(err, "")
+		return errors.WithStack(err)
 	}
 
 	var raw *rethinkSchema
@@ -247,7 +247,7 @@ func (m *RethinkManager) ColdStart() error {
 		}
 
 		if err := json.Unmarshal(pt, &key); err != nil {
-			return errors.Wrap(err, "")
+			return errors.WithStack(err)
 		}
 
 		keys, ok := m.Keys[raw.Set]

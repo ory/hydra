@@ -12,6 +12,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/hydra/policy"
 	"github.com/ory-am/hydra/warden"
+	"github.com/ory-am/hydra/warden/group"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
@@ -46,6 +47,9 @@ type Client struct {
 
 	// Revocation offers OAuth2 Token Revocation.
 	Revocator *hoauth2.HTTPRecovator
+
+	// Groups offers warden group management capabilities.
+	Groups *group.HTTPManager
 
 	http          *http.Client
 	clusterURL    *url.URL
@@ -136,6 +140,11 @@ func Connect(opts ...option) (*Client, error) {
 	c.Warden = &warden.HTTPWarden{
 		Client:   c.http,
 		Endpoint: c.clusterURL,
+	}
+
+	c.Groups = &group.HTTPManager{
+		Endpoint: pkg.JoinURL(c.clusterURL, "/warden/groups"),
+		Client:   c.http,
 	}
 
 	return c, nil

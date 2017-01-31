@@ -5,12 +5,14 @@ import (
 	"net/url"
 
 	"encoding/json"
+	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pkg/errors"
 	"strings"
+	"time"
 )
 
 const (
@@ -23,6 +25,8 @@ const (
 	// IntrospectPath points to the OAuth2 introspection endpoint.
 	IntrospectPath = "/oauth2/introspect"
 	RevocationPath = "/oauth2/revoke"
+
+	consentCookieName = "consent_session"
 )
 
 type Handler struct {
@@ -33,6 +37,9 @@ type Handler struct {
 
 	ForcedHTTP bool
 	ConsentURL url.URL
+
+	AccessTokenLifespan time.Duration
+	CookieStore         sessions.Store
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
@@ -57,6 +64,7 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ ht
 
 func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var session = NewSession("")
+
 	var ctx = fosite.NewContext()
 	resp, err := h.OAuth2.NewIntrospectionRequest(ctx, r, session)
 	if err != nil {
@@ -65,22 +73,26 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		return
 	}
 
-	if !resp.IsActive() {
-		_ = json.NewEncoder(w).Encode(&Introspection{Active: false})
-		return
+	exp := resp.GetAccessRequester().GetSession().GetExpiresAt(fosite.AccessToken)
+	if exp.IsZero() {
+		exp = resp.GetAccessRequester().GetRequestedAt().Add(h.AccessTokenLifespan)
 	}
 
-	_ = json.NewEncoder(w).Encode(&Introspection{
+	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+	err = json.NewEncoder(w).Encode(&Introspection{
 		Active:    true,
 		ClientID:  resp.GetAccessRequester().GetClient().GetID(),
 		Scope:     strings.Join(resp.GetAccessRequester().GetGrantedScopes(), " "),
-		ExpiresAt: resp.GetAccessRequester().GetSession().GetExpiresAt(fosite.AccessToken).Unix(),
+		ExpiresAt: exp.Unix(),
 		IssuedAt:  resp.GetAccessRequester().GetRequestedAt().Unix(),
 		Subject:   resp.GetAccessRequester().GetSession().GetSubject(),
 		Username:  resp.GetAccessRequester().GetSession().GetUsername(),
 		Extra:     resp.GetAccessRequester().GetSession().(*Session).Extra,
 		Audience:  resp.GetAccessRequester().GetClient().GetID(),
 	})
+	if err != nil {
+		pkg.LogError(err)
+	}
 }
 
 func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -135,12 +147,25 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		return
 	}
 
+	cookie, err := h.CookieStore.Get(r, consentCookieName)
+	if err != nil {
+		pkg.LogError(err)
+		h.writeAuthorizeError(w, authorizeRequest, errors.Wrapf(fosite.ErrServerError, "Could not open session: %s", err))
+		return
+	}
+
 	// decode consent_token claims
 	// verify anti-CSRF (inject state) and anti-replay token (expiry time, good value would be 10 seconds)
-	session, err := h.Consent.ValidateResponse(authorizeRequest, consentToken)
+	session, err := h.Consent.ValidateResponse(authorizeRequest, consentToken, cookie)
 	if err != nil {
 		pkg.LogError(err)
 		h.writeAuthorizeError(w, authorizeRequest, errors.Wrap(fosite.ErrAccessDenied, ""))
+		return
+	}
+
+	if err := cookie.Save(r, w); err != nil {
+		pkg.LogError(err)
+		h.writeAuthorizeError(w, authorizeRequest, errors.Wrapf(fosite.ErrServerError, "Could not store session cookie: %s", err))
 		return
 	}
 
@@ -161,7 +186,12 @@ func (h *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, auth
 		schema = "http"
 	}
 
-	challenge, err := h.Consent.IssueChallenge(authorizeRequest, schema+"://"+r.Host+r.URL.String())
+	cookie, err := h.CookieStore.Get(r, consentCookieName)
+	if err != nil {
+		return err
+	}
+
+	challenge, err := h.Consent.IssueChallenge(authorizeRequest, schema+"://"+r.Host+r.URL.String(), cookie)
 	if err != nil {
 		return err
 	}
@@ -170,6 +200,11 @@ func (h *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, auth
 	q := p.Query()
 	q.Set("challenge", challenge)
 	p.RawQuery = q.Encode()
+
+	if err := cookie.Save(r, w); err != nil {
+		return err
+	}
+
 	http.Redirect(w, r, p.String(), http.StatusFound)
 	return nil
 }

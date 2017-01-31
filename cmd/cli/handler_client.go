@@ -7,6 +7,7 @@ import (
 
 	"strings"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/pkg"
@@ -62,15 +63,22 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	allowedScopes, _ := cmd.Flags().GetStringSlice("allowed-scopes")
 	callbacks, _ := cmd.Flags().GetStringSlice("callbacks")
 	name, _ := cmd.Flags().GetString("name")
+	secret, _ := cmd.Flags().GetString("secret")
 	id, _ := cmd.Flags().GetString("id")
 	public, _ := cmd.Flags().GetBool("is-public")
 
-	secret, err := pkg.GenerateSecret(26)
-	pkg.Must(err, "Could not generate secret: %s", err)
+	if secret == "" {
+		var secretb []byte
+		secretb, err = pkg.GenerateSecret(26)
+		pkg.Must(err, "Could not generate secret: %s", err)
+		secret = string(secretb)
+	} else {
+		logrus.Warn("You should not provide secrets using command line flags. The secret might leak to bash history and similar systems.")
+	}
 
 	cc := &client.Client{
 		ID:            id,
-		Secret:        string(secret),
+		Secret:        secret,
 		ResponseTypes: responseTypes,
 		Scope:         strings.Join(allowedScopes, " "),
 		GrantTypes:    grantTypes,

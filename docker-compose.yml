@@ -50,7 +50,7 @@ services:
       - HYDRA_CLIENT_ID=admin
       - HYDRA_CLIENT_SECRET=demo-password
       - NODE_TLS_REJECT_UNAUTHORIZED=0
-    image: oryam/hydra-idp-react
+    image: oryam/hydra-idp-react:0.1.0
     links:
       - hydra
     ports:

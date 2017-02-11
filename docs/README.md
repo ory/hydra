@@ -135,7 +135,7 @@ to verify user consent allowing you to use Hydra with any authentication endpoin
 Hydra incorporates best practices in the area of the web service technology:
 
 1. Hydra ships as a single binary for all popular platforms including Linux, OSX and Windows, without any additional
-dependencies. For further simplicity, Hydra is available as a [Docker Image](https://hub.docker.com/r/oryam/hydra/).
+dependencies. For further simplicity, Hydra is available as a [Docker Image](https://hub.docker.com/r/oryd/hydra/).
 2. Hydra is built security first: architecture and work flows are designed to neutralize various common (OWASP TOP TEN)
 and uncommon attack vectors. [Learn more](https://ory-am.gitbooks.io/hydra/content/basics/security.html).
 3. Hydra has a low CPU and memory footprint, short start up times and a CLI with developers in mind.

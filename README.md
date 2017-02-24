@@ -116,7 +116,7 @@ and execute the hydra command from there:
 $ docker exec -i -t <hydra-container-id> /bin/bash
 # e.g. docker exec -i -t ec91228 /bin/bash
 
-root@ec91228cb105:/go/src/github.com/ory/hydra# hydra
+root@ec91228cb105:/go/src/github.com/ory-am/hydra# hydra
 Hydra is a twelve factor OAuth2 and OpenID Connect provider
 
 [...]
@@ -128,13 +128,16 @@ If you wish to compile hydra yourself, you need to install and set up [Go 1.5+](
 to your `$PATH`. To do so, run the following commands in a shell (bash, sh, cmd.exe, ...):
 
 ```
-go get github.com/ory/hydra
+go get github.com/ory-am/hydra
 go get github.com/Masterminds/glide
-cd $GOPATH/src/github.com/ory/hydra
+cd $GOPATH/src/github.com/ory-am/hydra
 glide install
-go install github.com/ory/hydra
+go install github.com/ory-am/hydra
 hydra
 ```
+
+**Note:** We changed organization name from `ory-am` to `ory`. In order to keep backwards compatibility, we did not
+rename Go packages.
 
 ## Security
 

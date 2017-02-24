@@ -22,7 +22,7 @@
 Hydra is a runnable server implementation of the OAuth 2.0 authorization framework and the OpenID Connect Core 1.0. Hydra acts as a middle-man infrastructure between your existing application and any OAuth 2.0 / OpenID Connect clients that consume your APIs.
 
 Join our [newsletter](http://eepurl.com/bKT3N9) to stay on top of new developments.
-We answer basic support requests on [Google Groups](https://groups.google.com/forum/#!forum/ory-hydra/new) and [Gitter](https://gitter.im/ory/hydra)
+We answer basic support requests on [Google Groups](https://groups.google.com/forum/#!forum/ory-hydra/new) and [Gitter](https://gitter.im/ory-am/hydra)
 and offer [premium services](http://www.ory.am/products/hydra) around Hydra.
 
 Hydra uses the security first OAuth2 and OpenID Connect SDK [Fosite](https://github.com/ory/fosite) and
@@ -91,7 +91,7 @@ There are various ways of installing hydra on your system.
 The client and server **binaries are downloadable at [releases](https://github.com/ory/hydra/releases)**.
 There is currently no installer available. You have to add the hydra binary to the PATH environment variable yourself or put
 the binary in a location that is already in your path (`/usr/bin`, ...). 
-If you do not understand what that all of this means, ask in our [chat channel](https://gitter.im/ory/hydra). We are happy to help.
+If you do not understand what that all of this means, ask in our [chat channel](https://gitter.im/ory-am/hydra). We are happy to help.
 
 #### Using Docker
 

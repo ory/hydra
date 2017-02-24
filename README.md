@@ -19,7 +19,15 @@
 [![HTTP API Documentation](https://img.shields.io/badge/docs-http%20api-blue.svg)](http://docs.hdyra.apiary.io/)
 [![Code Documentation](https://img.shields.io/badge/docs-godoc-blue.svg)](https://godoc.org/github.com/ory/hydra)
 
-Hydra is a runnable server implementation of the OAuth 2.0 authorization framework and the OpenID Connect Core 1.0. Hydra acts as a middle-man infrastructure between your existing application and any OAuth 2.0 / OpenID Connect clients that consume your APIs.
+Hydra is a runnable server implementation of the OAuth 2.0 authorization framework and the OpenID Connect Core 1.0.
+
+Hydra is different from [keycloak](https://github.com/keycloak/keycloak), [coreos/dex](https://github.com/coreos/dex),
+[IdentityServer3](http://identityserver.io/), and others because those projects usually solve the whole authentication,
+authorization, user and profile management stack. While they usually integrate with LDAP or other common standards,
+they will not always be able to cover 100% of what you need. Hydra however externalises
+the concern of authentication to the *consent app* and works with 2fa, retina scan, touch id, or your 5 years
+old, legacy, PHP login app. Hydra acts as a middle-man infrastructure between your existing application and
+any OAuth 2.0 / OpenID Connect clients that consume your APIs.
 
 Join our [newsletter](http://eepurl.com/bKT3N9) to stay on top of new developments.
 We answer basic support requests on [Google Groups](https://groups.google.com/forum/#!forum/ory-hydra/new) and [Gitter](https://gitter.im/ory-am/hydra)
@@ -46,7 +54,10 @@ the access control SDK [Ladon](https://github.com/ory/ladon).
   - [HTTP API Documentation](#http-api-documentation)
   - [Command Line Documentation](#command-line-documentation)
   - [Develop](#develop)
-- [Third-party libraries and projects](#third-party-libraries-and-projects)
+- [Hydra Ecosystem](#hydra-ecosystem)
+  - [Libraries](#libraries)
+  - [Articles](#articles)
+- [Testimonials](#testimonials)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -205,6 +216,23 @@ docker run --name some-rethink -d -p 8080:8080 -p 28015:28015 rethinkdb
 DATABASE_URL=rethinkdb://localhost:28015/hydra go run main.go host
 ```
 
-## Third-party libraries and projects
+## Hydra Ecosystem
+
+This is a list of useful links for working with Hydra:
+
+### Libraries
 
 * [Hydra middleware for Gin](https://github.com/janekolszak/gin-hydra)
+* [Exemplary consent app](https://github.com/ory-am/hydra-idp-react/)
+* [Hydra NodeJS SDK](https://github.com/ory-am/hydra-js)
+* [Identity Provider SDK for Go](https://github.com/janekolszak/idp)
+
+### Articles
+
+* [Creating an oauth2 custom lamda authorizer for use with Amazons (AWS) API Gateway using Hydra](https://blogs.edwardwilde.com/2017/01/12/creating-an-oauth2-custom-lamda-authorizer-for-use-with-amazons-aws-api-gateway-using-hydra/)
+* Warning, Hydra has changed a lot since this article: [Hydra: Run your own Identity and Access Management service in <5 Minutes](https://blog.gopheracademy.com/advent-2015/hydra-auth/)
+
+## Testimonials
+
+Ping @arekkas on gitter if you want your project / company listed here. The testimonial is optional,
+but we would really appreciate it.

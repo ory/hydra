@@ -19,6 +19,7 @@ import (
 	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/redis.v5"
 	"strings"
+	"runtime"
 )
 
 type MemoryConnection struct{}
@@ -53,7 +54,52 @@ func (c *SQLConnection) GetDatabase() *sqlx.DB {
 		logrus.Fatalf("Could not connect to SQL: %s", err)
 	}
 
+
+
+	maxConns := maxParallelism() * 2
+	if v := c.URL.Query().Get("max_conns"); v != "" {
+		s, err := strconv.ParseInt(v, 10, 64)
+		if err != nil {
+			logrus.Warnf("max_conns value %s could not be parsed to int: %s", v, err)
+		} else {
+			maxConns = int(s)
+		}
+	}
+
+	maxIdleConns := maxParallelism()
+	if v := c.URL.Query().Get("max_idle_conns"); v != "" {
+		s, err := strconv.ParseInt(v, 10, 64)
+		if err != nil {
+			logrus.Warnf("max_idle_conns value %s could not be parsed to int: %s", v, err)
+		} else {
+			maxIdleConns = int(s)
+		}
+	}
+
+	maxConnLifetime := time.Duration(0)
+	if v := c.URL.Query().Get("max_conn_lifetime"); v != "" {
+		s, err := time.ParseDuration(v)
+		if err != nil {
+			logrus.Warnf("max_conn_lifetime value %s could not be parsed to int: %s", v, err)
+		} else {
+			maxConnLifetime = s
+		}
+	}
+
+	c.db.SetMaxOpenConns(maxConns)
+	c.db.SetMaxIdleConns(maxIdleConns)
+	c.db.SetConnMaxLifetime(maxConnLifetime)
+
 	return c.db
+}
+
+func maxParallelism() int {
+	maxProcs := runtime.GOMAXPROCS(0)
+	numCPU := runtime.NumCPU()
+	if maxProcs < numCPU {
+		return maxProcs
+	}
+	return numCPU
 }
 
 type RethinkDBConnection struct {

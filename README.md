@@ -46,7 +46,7 @@ the access control SDK [Ladon](https://github.com/ory/ladon).
   - [HTTP API Documentation](#http-api-documentation)
   - [Command Line Documentation](#command-line-documentation)
   - [Develop](#develop)
-- [Third-party libraries and projects](#third-party-libraries-and-projects)
+- [Libraries and third-party projects](#libraries-and-third-party-projects)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -205,6 +205,12 @@ docker run --name some-rethink -d -p 8080:8080 -p 28015:28015 rethinkdb
 DATABASE_URL=rethinkdb://localhost:28015/hydra go run main.go host
 ```
 
-## Third-party libraries and projects
+## Libraries and third-party projects
 
+Official:
+* [Consent App SDK For NodeJS](https://github.com/ory/hydra-js)
+* [Exemplary Consent App with Express and NodeJS](https://github.com/ory/hydra-consent-app-express)
+
+Community:
+* [Consent App SDK for Go](https://github.com/janekolszak/idp)
 * [Hydra middleware for Gin](https://github.com/janekolszak/gin-hydra)

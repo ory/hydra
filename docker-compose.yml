@@ -32,7 +32,7 @@ services:
     environment:
       - LOG_LEVEL=${LOG_LEVEL}
       - SYSTEM_SECRET=${SYSTEM_SECRET}
-      - CONSENT_URL=http://${DOCKER_IP}:3000
+      - CONSENT_URL=http://${DOCKER_IP}:3000/consent
       - DATABASE_URL=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable
 #     Uncomment the following line to use mysql instead.
 #      - DATABASE_URL=mysql://root:secret@tcp(mysqld:3306)/mysql?parseTime=true
@@ -50,7 +50,7 @@ services:
       - HYDRA_CLIENT_ID=admin
       - HYDRA_CLIENT_SECRET=demo-password
       - NODE_TLS_REJECT_UNAUTHORIZED=0
-    image: oryd/hydra-idp-react:0.1.1
+    image: oryd/hydra-consent-app-express:v0.1.3
     links:
       - hydra
     ports:

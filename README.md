@@ -26,10 +26,7 @@ you build a bridge between Hydra and your authentication infrastructure.
 Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to.
 
 Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working
-on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose.
-
-**Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works. Please familiarize yourself
-with OAuth 2.0 first.**
+on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. **Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.**
 
 ---
 

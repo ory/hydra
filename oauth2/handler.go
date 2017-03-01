@@ -186,10 +186,8 @@ func (h *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, auth
 		schema = "http"
 	}
 
-	cookie, err := h.CookieStore.Get(r, consentCookieName)
-	if err != nil {
-		return err
-	}
+	// Error can be ignored because a session will always be returned
+	cookie, _ := h.CookieStore.Get(r, consentCookieName)
 
 	challenge, err := h.Consent.IssueChallenge(authorizeRequest, schema+"://"+r.Host+r.URL.String(), cookie)
 	if err != nil {

@@ -1,4 +1,6 @@
-go test sudo: required
+sudo: required
+
+go_import_path: github.com/ory-am/hydra
 
 services:
   - docker

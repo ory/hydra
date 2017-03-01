@@ -54,15 +54,14 @@ func (h *GroupHandler) DeleteGroup(cmd *cobra.Command, args []string) {
 	h.M.Endpoint = h.Config.Resolve("/warden/groups")
 	h.M.Client = h.Config.OAuth2Client(cmd)
 
-	cc := &group.Group{ID: args[0]}
-	err = h.M.CreateGroup(cc)
+	err = h.M.DeleteGroup(args[0])
 	if h.M.Dry {
 		fmt.Printf("%s\n", err)
 		return
 	}
 
 	pkg.Must(err, "Could not create group: %s", err)
-	fmt.Printf("Group %s deleted.\n", cc.ID)
+	fmt.Printf("Group %s deleted.\n", args[0])
 }
 
 func (h *GroupHandler) AddMembers(cmd *cobra.Command, args []string) {

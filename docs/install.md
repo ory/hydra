@@ -12,15 +12,17 @@ You can install Hydra using multiple methods.
 Installing, configuring and running Hydra is easiest with docker. The host process
 handles HTTP requests and is backed by a database.
 Read how to install docker on [Linux](https://docs.docker.com/linux/), [OSX](https://docs.docker.com/mac/) or
-[Windows](https://docs.docker.com/windows/). Hydra is available on [Docker Hub](https://hub.docker.com/r/oryam/hydra/).
+[Windows](https://docs.docker.com/windows/). Hydra is available on [Docker Hub](https://hub.docker.com/r/oryd/hydra/).
 
 In this minimalistic example, we will use Hydra without a database. Bee aware that restarting, scaling
 or stopping the container will **lose all the data**.
 
 ```
-$ docker run -d --name my-hydra -p 4444:4444 oryam/hydra
+$ docker run -d --name my-hydra -p 4444:4444 oryd/hydra
 ec91228cb105db315553499c81918258f52cee9636ea2a4821bdb8226872f54b
 ```
+
+*Note: We had to create a new docker hub repository. Tags prior to 0.7.5 are available [here](https://hub.docker.com/r/ory-am/hydra/).*
 
 Now, you should be able to open [https://localhost:4444](https://localhost:4444). If asked, accept the self signed
 certificate in your browser.

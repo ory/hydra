@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/ory-am/common/env"
 	"github.com/ory-am/fosite"
 	foauth2 "github.com/ory-am/fosite/handler/oauth2"
 	"github.com/ory-am/fosite/token/hmac"
@@ -49,6 +48,7 @@ type Config struct {
 	AuthCodeLifespan       string `mapstructure:"AUTH_CODE_LIFESPAN" yaml:"-"`
 	IDTokenLifespan        string `mapstructure:"ID_TOKEN_LIFESPAN" yaml:"-"`
 	ChallengeTokenLifespan string `mapstructure:"CHALLENGE_TOKEN_LIFESPAN" yaml:"-"`
+	CookieSecret 	       string `mapstructure:"COOKIE_SECRET" yaml:"-"`
 	ForceHTTP              bool   `yaml:"-"`
 
 	cluster      *url.URL     `yaml:"-"`
@@ -275,7 +275,10 @@ func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
 }
 
 func (c *Config) GetCookieSecret() []byte {
-	return []byte(env.Getenv("COOKIE_SECRET", string(c.GetSystemSecret())))
+	if c.CookieSecret != "" {
+		return []byte(c.CookieSecret)
+	}
+	return c.GetSystemSecret()
 }
 
 func (c *Config) GetSystemSecret() []byte {

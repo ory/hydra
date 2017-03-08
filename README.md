@@ -52,10 +52,11 @@ the access control SDK [Ladon](https://github.com/ory/ladon).
 - [Reception](#reception)
 - [Documentation](#documentation)
   - [Guide](#guide)
-  - [HTTP API Documentation](#http-api-documentation)
-  - [Command Line Documentation](#command-line-documentation)
+  - [HTTP API documentation](#http-api-documentation)
+  - [Command line documentation](#command-line-documentation)
   - [Develop](#develop)
 - [Libraries and third-party projects](#libraries-and-third-party-projects)
+- [Blog posts & articles](#blog-posts-&-articles)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -181,11 +182,11 @@ Fosite (which is what this is based on) is a very good implementation from a sec
 
 The Guide is available on [GitBook](https://ory.gitbooks.io/hydra/content/).
 
-### HTTP API Documentation
+### HTTP API documentation
 
 The HTTP API is documented at [Apiary](http://docs.hdyra.apiary.io).
 
-### Command Line Documentation
+### Command line documentation
 
 Run `hydra -h` or `hydra help`.
 
@@ -223,3 +224,8 @@ Official:
 Community:
 * [Consent App SDK for Go](https://github.com/janekolszak/idp)
 * [Hydra middleware for Gin](https://github.com/janekolszak/gin-hydra)
+
+## Blog posts & articles
+
+* [Creating an oauth2 custom lamda authorizer for use with Amazons (AWS) API Gateway using Hydra](https://blogs.edwardwilde.com/2017/01/12/creating-an-oauth2-custom-lamda-authorizer-for-use-with-amazons-aws-api-gateway-using-hydra/)
+* Warning, Hydra has changed almost everything since writing this article: [Hydra: Run your own Identity and Access Management service in <5 Minutes](https://blog.gopheracademy.com/advent-2015/hydra-auth/)

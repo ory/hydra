@@ -7,7 +7,7 @@ import (
 	"github.com/ory-am/fosite/handler/oauth2"
 	"github.com/ory-am/fosite/storage"
 	"github.com/ory-am/fosite/token/hmac"
-	"github.com/ory-am/ladon"
+	"github.com/Bridg/ladon"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

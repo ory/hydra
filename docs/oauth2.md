@@ -82,6 +82,7 @@ agent (browser in laptop) back to hydra:
 ```
 POST https://hydra.myapp.com/oauth2/token
 Authorization: Basic BASE64_ID_SECRET_PAIR
+Content-Type: application/x-www-form-urlencoded
 client_id=CLIENT_ID&client_secret=CLIENT_SECRET&code=aaabbbcccddd&redirect_uri=https://example.com/callback&grant_type=authorization_code
 ``` 
 
@@ -90,6 +91,7 @@ client_id=CLIENT_ID&client_secret=CLIENT_SECRET&code=aaabbbcccddd&redirect_uri=h
 ```
 POST https://hydra.myapp.com/oauth2/token
 Authorization: Basic BASE64_ID_SECRET_PAIR
+Content-Type: application/x-www-form-urlencoded
 client_id=CLIENT_ID&client_secret=CLIENT_SECRET&refresh_token=REFRESH_TOKEN&redirect_uri=https://example.com/callback&grant_type=refresh_token
 ``` 
 

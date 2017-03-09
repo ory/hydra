@@ -67,15 +67,31 @@ the consent flow looks like this:
 ![Consent Flow](/images/consent.png)
 
 1. A *client* application (app in browser in laptop) requests an access token from a resource owner:
-`https://hydra.myapp.com/oauth2/auth?client_id=c3b49cf0-88e4-4faa-9489-28d5b8957858&response_type=code&scope=core+hydra&state=vboeidlizlxrywkwlsgeggff&nonce=tedgziijemvninkuotcuuiof`.
+`GET https://hydra.myapp.com/oauth2/auth?client_id=c3b49cf0-88e4-4faa-9489-28d5b8957858&response_type=code&scope=core+hydra&state=vboeidlizlxrywkwlsgeggff&nonce=tedgziijemvninkuotcuuiof`.
 2. Hydra generates a consent challenge and forwards the *user agent* (browser in laptop) to the *consent endpoint*:
-`https://login.myapp.com/?challenge=eyJhbGciOiJSUzI1N...`.
+`GET https://login.myapp.com/?challenge=eyJhbGciOiJSUzI1N...`.
 3. The *consent endpoint* verifies the resource owner's identity (e.g. cookie, username/password login form, ...).
 The consent challenge is then decoded and the information extracted. It is used to show the consent screen: `Do you want to grant _my cool app_ access to all your private data? [Yes] [No]`
 4. When consent is given, the *consent endpoint* generates a consent response token and redirects the user
 agent (browser in laptop) back to hydra:
-`https://hydra.myapp.com/oauth2/auth?client_id=c3b49cf0-88e4-4faa-9489-28d5b8957858&response_type=code&scope=core+hydra&state=vboeidlizlxrywkwlsgeggff&nonce=tedgziijemvninkuotcuuiof&consent=eyJhbGciOiJSU...`.
-5. Hydra validates the consent response token and issues the access token to the *user agent*.
+`GET https://hydra.myapp.com/oauth2/auth?client_id=c3b49cf0-88e4-4faa-9489-28d5b8957858&response_type=code&scope=core+hydra&state=vboeidlizlxrywkwlsgeggff&nonce=tedgziijemvninkuotcuuiof&consent=eyJhbGciOiJSU...`.
+5. Hydra validates the consent response token and issues the auth code to the *user agent*. The *user agent* is then redirected to the *client* application at the registered callback uri with the auth code as a parameter:
+`GET https://example.com/callback?code=aaabbbcccddd`
+6. The *client* application pairs this auth code with their client id and client secret, and requests an access token (and optionally the refresh token) from Hydra. This request must contain an Authorization header, which contains a Base64'd id/secret pairing (`client-id:client-secret`), sent as Basic authentication:
+
+```
+POST https://hydra.myapp.com/oauth2/token
+Authorization: Basic BASE64_ID_SECRET_PAIR
+client_id=CLIENT_ID&client_secret=CLIENT_SECRET&code=aaabbbcccddd&redirect_uri=https://example.com/callback&grant_type=authorization_code
+``` 
+
+*Note:* if your *client* application needs to exchange a refresh token for a new access token, this request should alter the `grant_type` and `code` parameters:
+
+```
+POST https://hydra.myapp.com/oauth2/token
+Authorization: Basic BASE64_ID_SECRET_PAIR
+client_id=CLIENT_ID&client_secret=CLIENT_SECRET&refresh_token=REFRESH_TOKEN&redirect_uri=https://example.com/callback&grant_type=refresh_token
+``` 
 
 ### Consent App Flow Example
 

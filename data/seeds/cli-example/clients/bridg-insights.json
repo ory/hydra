@@ -1,0 +1,27 @@
+{
+  "id": "bridg-insights",
+  "client_name": "Bridg Insights",
+  "client_secret": "bridg-insights",
+  "owner": "eng@bridg.com",
+  "scope": "offline openid bridg",
+  "public": true,
+  "redirect_uris": [
+    "https://insights-app.bridg.com/oauth2/callback",
+    "https://insights-app.towerbridg.com/oauth2/callback",
+    "http://insights-app.localbridg.com:3037/oauth2/callback"
+  ],
+  "grant_types": [
+    "implicit"
+  ],
+  "response_types": [
+    "id_token",
+    "token"
+  ],
+  "policy_uri": "",
+  "tos_uri": "",
+  "client_uri": "https://insights-app.bridg.com/oauth2/callback",
+  "logo_uri": "",
+  "contacts": [
+    "eng@bridg.com"
+  ]
+}

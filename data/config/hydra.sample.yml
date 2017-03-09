@@ -1,0 +1,3 @@
+cluster_url: http://192.168.99.100:4444
+client_id: bridg-superclient
+client_secret: bridg-superclient

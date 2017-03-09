@@ -1,0 +1,17 @@
+{
+  "description": "Allow Bridg admins full access to a set of Bridg's resources.",
+  "subjects": [
+    "bridg-admin"
+  ],
+  "effect": "allow",
+  "resources": [
+    "rn:bridg:<(accounts|brands|sites)(:.+)?>",
+    "rn:bridg:<(roles|users|authenticate)(:.+)?>",
+    "rn:bridg:<(audiences|campaigns)(:.+)?>",
+    "rn:bridg:<(snapshots|snapshot-fb-exports|snapshot-fb-export-facebook-accounts)(:.+)?>",
+    "rn:bridg:<(analytics|integration)(:.+)?>"
+  ],
+  "actions": [
+    "<.*>"
+  ]
+}

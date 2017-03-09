@@ -1,0 +1,13 @@
+{
+  "description": "Grant Bridg admin users GET/POST access to account elastic search count and query resources.",
+  "subjects": [
+    "bridg-admin"
+  ],
+  "effect": "allow",
+  "resources": [
+    "rn:bridg:search:<[0-9A-z_-]+:[A-z_-]+:(_search|_count)>"
+  ],
+  "actions": [
+    "create", "read"
+  ]
+}

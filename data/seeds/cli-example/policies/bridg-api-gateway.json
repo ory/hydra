@@ -1,0 +1,14 @@
+{
+  "description": "Give bridg's api gateway access to Hydra's warden token allowed resource.",
+  "subjects": [
+    "bridg-api-gateway"
+  ],
+  "effect": "allow",
+  "resources": [
+    "rn:hydra:warden:token:allowed"
+  ],
+  "actions": [
+    "decide"
+  ],
+  "conditions": {}
+}

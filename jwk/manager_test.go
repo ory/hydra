@@ -14,7 +14,7 @@ import (
 	"github.com/ory-am/hydra/integration"
 	. "github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/pkg"
-	"github.com/Bridg/ladon"
+	"github.com/ory-am/ladon"
 	"github.com/pkg/errors"
 	"github.com/square/go-jose"
 	"github.com/stretchr/testify/assert"

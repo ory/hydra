@@ -6,10 +6,10 @@ node_modules/
 *.log
 *.stackdump
 .DS_Store
-vendor/
 .hydra.yml
 cover.out
 output/
 _book/
 dist/
 coverage.*
+.env

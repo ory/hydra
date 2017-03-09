@@ -1,0 +1,15 @@
+{
+  "description": "Give bridg's login provider access to Hydra's JWKs and Bridg's users and authentication.",
+  "subjects": [
+    "bridg-login<.*>"
+  ],
+  "effect": "allow",
+  "resources": [
+    "rn:hydra:keys:<.*>",
+    "rn:bridg:<(users|authenticate).*>"
+  ],
+  "actions": [
+    "get", "create", "read"
+  ],
+  "conditions": {}
+}

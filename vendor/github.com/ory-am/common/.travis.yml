@@ -1,0 +1,12 @@
+language: go
+
+go:
+    - 1.7
+
+install:
+  - go get github.com/mattn/goveralls golang.org/x/tools/cmd/cover
+  - curl https://glide.sh/get | sh
+  - glide install
+
+script:
+  - go test $(glide novendor)

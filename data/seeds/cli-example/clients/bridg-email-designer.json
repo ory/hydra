@@ -1,0 +1,28 @@
+{
+  "id": "bridg-email-designer",
+  "client_name": "Bridg Email Designer",
+  "client_secret": "bridg-email-designer",
+  "owner": "eng@bridg.com",
+  "scope": "offline openid bridg",
+  "public": true,
+  "redirect_uris": [
+    "https://emaildesigner.bridg.com/oauth2/callback",
+    "https://emaildesigner.towerbridg.com/oauth2/callback",
+    "http://emaildesigner.localbridg.com:3030/oauth2/callback"
+  ],
+  "grant_types": [
+    "implicit"
+  ],
+  "response_types": [
+    "id_token",
+    "token"
+  ],
+  "policy_uri": "",
+  "tos_uri": "",
+  "client_uri": "https://emaildesigner.bridg.com/oauth2/callback",
+  "logo_uri": "",
+  "contacts": [
+    "eng@bridg.com",
+    "lokesh@bridg.com"
+  ]
+}

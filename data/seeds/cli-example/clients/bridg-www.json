@@ -1,0 +1,28 @@
+{
+  "id": "bridg-www",
+  "client_name": "Bridg WWW",
+  "client_secret": "bridg-www",
+  "owner": "eng@bridg.com",
+  "scope": "offline openid bridg",
+  "public": true,
+  "redirect_uris": [
+    "https://app2.bridg.com/oauth2/callback",
+    "https://app.towerbridg.com/oauth2/callback",
+    "http://app.localbridg.com:3030/oauth2/callback"
+  ],
+  "grant_types": [
+    "implicit"
+  ],
+  "response_types": [
+    "id_token",
+    "token"
+  ],
+  "policy_uri": "",
+  "tos_uri": "",
+  "client_uri": "https://app2.bridg.com/oauth2/callback",
+  "logo_uri": "",
+  "contacts": [
+    "eng@bridg.com",
+    "sameer@bridg.com"
+  ]
+}

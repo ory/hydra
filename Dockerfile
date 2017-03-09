@@ -11,6 +11,6 @@ RUN glide install --skip-test -v
 ADD . .
 RUN go install .
 
-ENTRYPOINT /go/bin/hydra host --dangerous-force-http
+ENTRYPOINT /go/bin/hydra host
 
 EXPOSE 4444

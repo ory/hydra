@@ -1,0 +1,25 @@
+machine:
+  services:
+    - docker
+  environment:
+    CONVOX_APP:
+    CONVOX_HOST:
+    CONVOX_PASSWORD:
+    CONVOX_RACK:
+    DOCKER_REPOSITORY: bridg/hydra-1
+
+dependencies:
+  post:
+    - curl -Ls https://install.convox.com/linux.zip > convox.zip
+    - sudo unzip convox.zip -d /usr/local/bin
+
+test:
+  override:
+    - echo "All things must pass."
+
+deployment:
+
+  deploy-towerbridg:
+    branch: master
+    commands:
+      - convox deploy -f convox.yml --app "$CONVOX_APP" --rack "$CONVOX_RACK" --description "$CIRCLE_BUILD_URL" --wait --id

@@ -1,0 +1,18 @@
+version: '2'
+
+services:
+
+  # HTTP API providing OAuth2/IODC security services.
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile-http
+    environment:
+      - CONSENT_URL
+      - DATABASE_URL
+      - LOG_LEVEL
+      - SYSTEM_SECRET
+    ports:
+      - 4444
+    restart: unless-stopped
+

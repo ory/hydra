@@ -8,7 +8,7 @@ import (
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/pkg"
-	"github.com/Bridg/ladon"
+	"github.com/ory-am/ladon"
 )
 
 func (h *Handler) createRootIfNewInstall(c *config.Config) {

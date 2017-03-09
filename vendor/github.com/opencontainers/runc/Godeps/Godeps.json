@@ -1,0 +1,87 @@
+{
+	"ImportPath": "github.com/opencontainers/runc",
+	"GoVersion": "go1.5.3",
+	"GodepVersion": "v75",
+	"Deps": [
+		{
+			"ImportPath": "github.com/Sirupsen/logrus",
+			"Comment": "v0.7.3-2-g26709e2",
+			"Rev": "26709e2714106fb8ad40b773b711ebce25b78914"
+		},
+		{
+			"ImportPath": "github.com/urfave/cli",
+			"Comment": "v1.18.0-67-gd53eb99",
+			"Rev": "d53eb991652b1d438abdd34ce4bfa3ef1539108e"
+		},
+		{
+			"ImportPath": "github.com/coreos/go-systemd/activation",
+			"Comment": "v14",
+			"Rev": "48702e0da86bd25e76cfef347e2adeb434a0d0a6"
+		},
+		{
+			"ImportPath": "github.com/coreos/go-systemd/dbus",
+			"Comment": "v14",
+			"Rev": "48702e0da86bd25e76cfef347e2adeb434a0d0a6"
+		},
+		{
+			"ImportPath": "github.com/coreos/go-systemd/util",
+			"Comment": "v14",
+			"Rev": "48702e0da86bd25e76cfef347e2adeb434a0d0a6"
+		},
+		{
+			"ImportPath": "github.com/docker/docker/pkg/mount",
+			"Comment": "v1.4.1-4831-g0f5c9d3",
+			"Rev": "0f5c9d301b9b1cca66b3ea0f9dec3b5317d3686d"
+		},
+		{
+			"ImportPath": "github.com/docker/docker/pkg/symlink",
+			"Comment": "v1.4.1-4831-g0f5c9d3",
+			"Rev": "0f5c9d301b9b1cca66b3ea0f9dec3b5317d3686d"
+		},
+		{
+			"ImportPath": "github.com/docker/docker/pkg/term",
+			"Comment": "v1.4.1-4831-g0f5c9d3",
+			"Rev": "0f5c9d301b9b1cca66b3ea0f9dec3b5317d3686d"
+		},
+		{
+			"ImportPath": "github.com/docker/go-units",
+			"Comment": "v0.1.0",
+			"Rev": "9b001659dd36225e356b4467c465d732e745f53d"
+		},
+		{
+			"ImportPath": "github.com/godbus/dbus",
+			"Comment": "v3",
+			"Rev": "c7fdd8b5cd55e87b4e1f4e372cdb1db61dd6c66f"
+		},
+		{
+			"ImportPath": "github.com/golang/protobuf/proto",
+			"Rev": "f7137ae6b19afbfd61a94b746fda3b3fe0491874"
+		},
+		{
+			"ImportPath": "github.com/opencontainers/runtime-spec/specs-go",
+			"Comment": "v1.0.0-rc3",
+			"Rev": "794ca7ac88234607f9d2c76da8a6e9bbbade8cb9"
+		},
+		{
+			"ImportPath": "github.com/seccomp/libseccomp-golang",
+			"Rev": "32f571b70023028bd57d9288c20efbcb237f3ce0"
+		},
+		{
+			"ImportPath": "github.com/syndtr/gocapability/capability",
+			"Rev": "e7cb7fa329f456b3855136a2642b197bad7366ba"
+		},
+		{
+			"ImportPath": "github.com/vishvananda/netlink",
+			"Rev": "1e2e08e8a2dcdacaae3f14ac44c5cfa31361f270"
+		},
+		{
+			"ImportPath": "github.com/mrunalp/fileutils",
+			"Rev": "ed869b029674c0e9ce4c0dfa781405c2d9946d08"
+		},
+		{
+			"ImportPath": "github.com/coreos/pkg/dlopen",
+			"Comment": "v3",
+			"Rev": "3ac0863d7acf3bc44daf49afef8919af12f704ef"
+		}
+	]
+}

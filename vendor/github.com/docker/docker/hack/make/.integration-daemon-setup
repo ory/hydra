@@ -1,0 +1,7 @@
+#!/bin/bash
+set -e
+
+bundle .detect-daemon-osarch
+if [ $DOCKER_ENGINE_GOOS != "windows" ]; then
+	bundle .ensure-emptyfs
+fi

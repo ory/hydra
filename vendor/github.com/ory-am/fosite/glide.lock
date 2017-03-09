@@ -1,0 +1,84 @@
+hash: 765b5e035d3037868b068d86ba286c974ce9d29b38ba4a69194bac62d32898cf
+updated: 2016-10-16T18:44:47.5114091+02:00
+imports:
+- name: github.com/asaskevich/govalidator
+  version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
+- name: github.com/dgrijalva/jwt-go
+  version: d2709f9f1f31ebcda9651b03077758c1f3a0018c
+- name: github.com/golang/mock
+  version: bd3c8e81be01eef76d4b503f5e687d2d1354d2d9
+  subpackages:
+  - gomock
+- name: github.com/pborman/uuid
+  version: a97ce2ca70fa5a848076093f05e639a89ca34d06
+- name: github.com/pkg/errors
+  version: 645ef00459ed84a119197bfb8d8205042c6df63d
+- name: github.com/square/go-jose
+  version: aa2e30fdd1fe9dd3394119af66451ae790d50e0d
+  subpackages:
+  - json
+- name: golang.org/x/crypto
+  version: e0d166c33c321d0ff863f459a5882096e334f508
+  subpackages:
+  - bcrypt
+  - blowfish
+- name: golang.org/x/net
+  version: 075e191f18186a8ff2becaf64478e30f4545cdad
+  subpackages:
+  - context
+  - publicsuffix
+testImports:
+- name: github.com/davecgh/go-spew
+  version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
+  subpackages:
+  - spew
+- name: github.com/go-errors/errors
+  version: a41850380601eeb43f4350f7d17c6bbd8944aaf8
+- name: github.com/golang/protobuf
+  version: c3cefd437628a0b7d31b34fe44b3a7a540e98527
+  subpackages:
+  - proto
+- name: github.com/gorilla/context
+  version: 1ea25387ff6f684839d82767c1733ff4d4d15d0a
+- name: github.com/gorilla/mux
+  version: 0eeaf8392f5b04950925b8a69fe70f110fa7cbfc
+- name: github.com/moul/http2curl
+  version: b1479103caacaa39319f75e7f57fc545287fca0d
+- name: github.com/oleiade/reflections
+  version: ec27669d960a245738b87ffa688dac28fa288c33
+- name: github.com/ory-am/common
+  version: d93c852f2d09c219fd058756caf67bbdf8cf4be4
+  subpackages:
+  - pkg
+- name: github.com/parnurzeal/gorequest
+  version: b64673b971a1742b8ba91f228f1c029632d4b686
+- name: github.com/pmezard/go-difflib
+  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
+  subpackages:
+  - difflib
+- name: github.com/Sirupsen/logrus
+  version: 4b6ea7319e214d98c938f12692336f7ca9348d6b
+- name: github.com/stretchr/testify
+  version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
+  subpackages:
+  - assert
+  - require
+- name: golang.org/x/oauth2
+  version: 04e1573abc896e70388bd387a69753c378d46466
+  subpackages:
+  - clientcredentials
+  - internal
+- name: golang.org/x/sys
+  version: a646d33e2ee3172a661fc09bca23bb4889a41bc8
+  subpackages:
+  - unix
+- name: google.golang.org/appengine
+  version: b4728023490a62e70ba739ff62aa65ffcca84210
+  subpackages:
+  - internal
+  - internal/base
+  - internal/datastore
+  - internal/log
+  - internal/remote_api
+  - internal/urlfetch
+  - urlfetch

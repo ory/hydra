@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+hydra clients import \
+  clients/bridg-admin.json \
+  clients/bridg-api-gateway.json \
+  clients/bridg-login.json \
+  clients/bridg-superclient.json \
+  clients/bridg-www.json

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Called by Bridg2 citizen lifecycle hooks.
+
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# copy necessary .env conf, sample conf should be sufficient
+cp "$dir/../.env.sample" "$dir/../.env"
+
+# copy necessary hydra conf, sample conf should be sufficient
+cat "$dir/../data/config/hydra.sample.yml" > "$dir/../data/config/.hydra.yml"

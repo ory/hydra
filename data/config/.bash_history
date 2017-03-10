@@ -20,3 +20,5 @@ ls
 cat vendor/github.com/Bridg/ladon/glide.yaml 
 cat glide.yaml 
 glide up
+cat vendor/github.com/Bridg/ladon/condition_context_key_values_equal.go 
+cat vendor/github.com/Bridg/ladon/condition_context_key_values_equal.go 

@@ -1,6 +1,0 @@
-vendor/pkg
-/runc
-contrib/cmd/recvtty/recvtty
-Godeps/_workspace/src/github.com/opencontainers/runc
-man/man8
-release

@@ -13,3 +13,4 @@ _book/
 dist/
 coverage.*
 .env
+vendor/

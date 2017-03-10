@@ -1,0 +1,22 @@
+{
+  "id": "bridg-iam",
+  "client_name": "Bridg Identity Management",
+  "client_secret": "bridg-iam",
+  "owner": "eng@bridg.com",
+  "scope": "hydra bridg",
+  "public": false,
+  "redirect_uris": [],
+  "grant_types": [
+    "client_credentials"
+  ],
+  "response_types": [],
+  "policy_uri": "",
+  "tos_uri": "",
+  "client_uri": "https://api2.bridg.com/",
+  "logo_uri": "",
+  "contacts": [
+    "eng@bridg.com",
+    "eric@bridg.com",
+    "ticean@bridg.com"
+  ]
+}

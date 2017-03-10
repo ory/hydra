@@ -1,8 +1,7 @@
 {
   "description": "Deny account admins CUD access to specific account resources.",
   "subjects": [
-    "account-admin",
-    "brand-admin"
+    "<(account|brand)-admin>"
   ],
   "effect": "deny",
   "resources": [

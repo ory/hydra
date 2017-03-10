@@ -1,0 +1,15 @@
+{
+  "description": "Deny account admins CUD access to specific account resources.",
+  "subjects": [
+    "account-admin",
+    "brand-admin"
+  ],
+  "effect": "deny",
+  "resources": [
+    "rn:bridg:accounts:<[A-z0-9_-]+(:brands(:[A-z0-9_-]+)?)?>",
+    "rn:bridg:roles:499165f9-0e78-42d8-ba72-feb8ee96655d:users:<[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}>"
+  ],
+  "actions": [
+    "create", "update", "delete"
+  ]
+}

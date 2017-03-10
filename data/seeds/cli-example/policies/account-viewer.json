@@ -1,0 +1,22 @@
+{
+  "description": "Allow account users full read access to Bridg's account resources.",
+  "subjects": [
+    "account-viewer"
+  ],
+  "effect": "allow",
+  "resources": [
+    "rn:bridg:accounts:<[A-z0-9_-]+(:.+)?>"
+  ],
+  "actions": [
+    "read"
+  ],
+  "conditions": {
+    "account-ids": {
+      "type": "ContextKeyValuesEqualCondition",
+      "options": {
+        "key1": "user-account-id",
+        "key2": "resource-account-id"
+      }
+    }
+  }
+}

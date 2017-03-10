@@ -1,0 +1,13 @@
+{
+  "description": "Give bridg's identity management access to Hydra's warden group resources.",
+  "subjects": [
+    "bridg-iam"
+  ],
+  "effect": "allow",
+  "resources": [
+    "rn:hydra:warden:clients<.*>"
+  ],
+  "actions": [
+    "get", "create", "delete", "add.member", "remove.member"
+  ]
+}

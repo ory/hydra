@@ -1,8 +1,7 @@
 {
   "description": "Grant account users GET/POST access to their elastic search count and query resources.",
   "subjects": [
-    "account-<(admin|viewer)>",
-    "brand-<(admin|viewer)>"
+    "<(account|brand)-(admin|viewer)>"
   ],
   "effect": "allow",
   "resources": [

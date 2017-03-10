@@ -1,0 +1,26 @@
+{
+  "description": "Allow account admins full access to Bridg's account resources.",
+  "subjects": [
+    "account-admin"
+  ],
+  "effect": "allow",
+  "resources": [
+    "rn:bridg:accounts:<[A-z0-9_-]+(:.+)?>",
+    "rn:bridg:roles:<[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:users:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}>"
+  ],
+  "actions": [
+    "create",
+    "read",
+    "update",
+    "delete"
+  ],
+  "conditions": {
+    "account-ids": {
+      "type": "ContextKeyValuesEqualCondition",
+      "options": {
+        "key1": "user-account-id",
+        "key2": "resource-account-id"
+      }
+    }
+  }
+}

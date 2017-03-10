@@ -1,0 +1,29 @@
+{
+  "description": "Allow brand users full read access to Bridg's brand resources.",
+  "subjects": [
+    "brand-viewer"
+  ],
+  "effect": "allow",
+  "resources": [
+    "rn:bridg:accounts:<[A-z0-9_-]+:brands(:.+)?>"
+  ],
+  "actions": [
+    "read"
+  ],
+  "conditions": {
+    "account-ids": {
+      "type": "ContextKeyValuesEqualCondition",
+      "options": {
+        "key1": "user-account-id",
+        "key2": "resource-account-id"
+      }
+    },
+    "brand-ids": {
+      "type": "ContextKeyValuesEqualCondition",
+      "options": {
+        "key1": "user-brand-id",
+        "key2": "resource-brand-id"
+      }
+    }
+  }
+}

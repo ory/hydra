@@ -2,3 +2,4 @@
 .vagrant/
 docs/
 dist/
+vendor/

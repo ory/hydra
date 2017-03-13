@@ -8,6 +8,7 @@ docker-compose run --rm --no-deps --entrypoint \
      data/clients/bridg-admin.json
      data/clients/bridg-analytics.json
      data/clients/bridg-api-gateway.json
+     data/clients/bridg-iam.json
      data/clients/bridg-insights.json
      data/clients/bridg-login.json
      data/clients/bridg-www.json" \
@@ -35,6 +36,6 @@ docker-compose run --rm --no-deps --entrypoint \
 
 echo "Running hydra policy seeding."
 docker-compose run --rm --no-deps --entrypoint \
-  "/go/bin/hydra policies create -f data/policies/bridg-admin.json,data/policies/bridg-admin-search.json,data/policies/bridg-analytics.json,data/policies/bridg-api-gateway.json,data/policies/bridg-login.json,data/policies/metrics-viewer.json" \
+  "/go/bin/hydra policies create -f data/policies/bridg-admin.json,data/policies/bridg-admin-search.json,data/policies/bridg-analytics.json,data/policies/bridg-api-gateway.json,data/policies/bridg-iam.json,data/policies/bridg-login.json,data/policies/metrics-viewer.json" \
   web
 

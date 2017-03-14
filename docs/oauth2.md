@@ -83,16 +83,15 @@ agent (browser in laptop) back to hydra:
 POST https://hydra.myapp.com/oauth2/token
 Authorization: Basic BASE64_ID_SECRET_PAIR
 Content-Type: application/x-www-form-urlencoded
-client_id=CLIENT_ID&client_secret=CLIENT_SECRET&code=aaabbbcccddd&redirect_uri=https://example.com/callback&grant_type=authorization_code
+code=aaabbbcccddd&redirect_uri=https://example.com/callback&grant_type=authorization_code
 ``` 
-
-*Note:* if your *client* application needs to exchange a refresh token for a new access token, this request should alter the `grant_type` and `code` parameters:
+7. If your *client* application needs to exchange a refresh token for a new access token, this request looks similar to the auth code exchange, with the `grant_type` parameter altered, and the `code` parameter replaced with `refresh_token`:
 
 ```
 POST https://hydra.myapp.com/oauth2/token
 Authorization: Basic BASE64_ID_SECRET_PAIR
 Content-Type: application/x-www-form-urlencoded
-client_id=CLIENT_ID&client_secret=CLIENT_SECRET&refresh_token=REFRESH_TOKEN&redirect_uri=https://example.com/callback&grant_type=refresh_token
+refresh_token=REFRESH_TOKEN&redirect_uri=https://example.com/callback&grant_type=refresh_token
 ``` 
 
 ### Consent App Flow Example

@@ -46,8 +46,6 @@ import:
   subpackages:
   - assert
   - require
-- package: github.com/docker/docker
-  version: ~v1.13.0-rc2
 - package: github.com/toqueteos/webbrowser
   version: ^1.0.0
 - package: github.com/urfave/negroni
@@ -60,8 +58,6 @@ import:
   - clientcredentials
 - package: gopkg.in/dancannon/gorethink.v2
   version: ~3.0.0
-- package: github.com/ory-am/dockertest
-  version: v3.0.3
 - package: gopkg.in/redis.v5
   version: ^5.1.2
 - package: gopkg.in/tylerb/graceful.v1
@@ -70,3 +66,7 @@ import:
 testImport:
 - package: github.com/gorilla/mux
   version: ^1.1.0
+- package: github.com/ory-am/dockertest
+  version: v3.0.3
+- package: github.com/docker/docker
+  version: ~v1.13.0-rc2

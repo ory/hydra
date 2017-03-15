@@ -1,5 +1,5 @@
-hash: 1bf4f67c1123a3703e85cd0a7c801bbcf41b9f12c7a155edfdbc5eac228af080
-updated: 2017-02-24T10:33:46.3321695+01:00
+hash: 9fba49e55487f47cfd776774f0255ed9f35e486596628e18e186e70c4abb6d6e
+updated: 2017-03-15T18:48:18.5196769+01:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
@@ -121,8 +121,6 @@ imports:
   - compiler
   - pkg
   - rand/sequence
-- name: github.com/ory-am/dockertest
-  version: 8445a82f8da6067ffecbb06e3f9fa2857f3bf9df
 - name: github.com/ory-am/fosite
   version: 9b33931ee14ae0768ea46a423d569330a85b482e
   subpackages:
@@ -153,7 +151,7 @@ imports:
   subpackages:
   - sqlparse
 - name: github.com/Sirupsen/logrus
-  version: c078b1e43f58d563c74cebe63c85789e76ddb627
+  version: ba1b36c82c5e05c4f912a88eab0dcd91a171688f
 - name: github.com/spf13/afero
   version: 9be650865eab0c12963d8753212f4f9c66cdcf12
   subpackages:
@@ -251,3 +249,5 @@ imports:
 testImports:
 - name: github.com/gorilla/mux
   version: 392c28fe23e1c45ddba891b0320b3b5df220beea
+- name: github.com/ory-am/dockertest
+  version: 8445a82f8da6067ffecbb06e3f9fa2857f3bf9df

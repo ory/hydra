@@ -15,12 +15,8 @@
     "delete"
   ],
   "conditions": {
-    "account-ids": {
-      "type": "ContextKeyValuesEqualCondition",
-      "options": {
-        "key1": "user-account-id",
-        "key2": "resource-account-id"
-      }
+    "entity-ids": {
+      "type": "StringPairsEqualCondition"
     }
   }
 }

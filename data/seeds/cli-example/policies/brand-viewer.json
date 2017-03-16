@@ -11,19 +11,8 @@
     "read"
   ],
   "conditions": {
-    "account-ids": {
-      "type": "ContextKeyValuesEqualCondition",
-      "options": {
-        "key1": "user-account-id",
-        "key2": "resource-account-id"
-      }
-    },
-    "brand-ids": {
-      "type": "ContextKeyValuesEqualCondition",
-      "options": {
-        "key1": "user-brand-id",
-        "key2": "resource-brand-id"
-      }
+    "entity-ids": {
+      "type": "StringPairsEqualCondition"
     }
   }
 }

@@ -8,6 +8,8 @@ ADD ./glide.lock ./glide.lock
 RUN glide install --skip-test -v
 
 ADD . .
+RUN rm ./condition_string_pairs_equal.go
+ADD ./condition_string_pairs_equal.go ./vendor/github.com/ory-am/ladon/condition_string_pairs_equal.go
 RUN go install .
 
 ENTRYPOINT /go/bin/hydra host --dangerous-force-http

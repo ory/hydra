@@ -18,7 +18,7 @@ import (
 	"github.com/ory-am/fosite/token/hmac"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/hydra/warden/group"
-	"github.com/Bridg/ladon"
+	"github.com/ory-am/ladon"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

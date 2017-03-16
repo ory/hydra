@@ -5,13 +5,13 @@
   ],
   "effect": "allow",
   "resources": [
-    "rn:bridg:accounts:<[A-z0-9_-]+(:.+)?>"
+    "rn:bridg:<(accounts|users):[A-z0-9_-]+(:.+)?>"
   ],
   "actions": [
     "read"
   ],
   "conditions": {
-    "entity-ids": {
+    "account-ids": {
       "type": "StringPairsEqualCondition"
     }
   }

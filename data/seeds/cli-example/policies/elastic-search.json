@@ -11,7 +11,7 @@
     "create", "read"
   ],
   "conditions": {
-    "entity-ids": {
+    "account-ids": {
       "type": "StringPairsEqualCondition"
     }
   }

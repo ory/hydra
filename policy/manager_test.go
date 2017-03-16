@@ -12,7 +12,7 @@ import (
 	"github.com/ory-am/hydra/compose"
 	"github.com/ory-am/hydra/herodot"
 	"github.com/ory-am/hydra/pkg"
-	"github.com/Bridg/ladon"
+	"github.com/ory-am/ladon"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

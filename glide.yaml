@@ -27,7 +27,7 @@ import:
   - storage
   - token/hmac
   - token/jwt
-- package: github.com/Bridg/ladon
+- package: github.com/ory-am/ladon
 - package: github.com/pborman/uuid
   version: ^1.0.0
 - package: github.com/pkg/errors

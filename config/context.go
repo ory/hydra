@@ -7,7 +7,7 @@ import (
 	"github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/hydra/warden/group"
-	"github.com/Bridg/ladon"
+	"github.com/ory-am/ladon"
 )
 
 type Context struct {

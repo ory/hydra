@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 
 	"github.com/ory-am/hydra/pkg"
-	"github.com/Bridg/ladon"
+	"github.com/ory-am/ladon"
 )
 
 type jsonPolicy struct {

@@ -5,7 +5,7 @@
   ],
   "effect": "allow",
   "resources": [
-    "rn:bridg:accounts:<[A-z0-9_-]+(:.+)?>",
+    "rn:bridg:<(accounts|users):[A-z0-9_-]+(:.+)?>",
     "rn:bridg:roles:<[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:users:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}>"
   ],
   "actions": [
@@ -15,7 +15,7 @@
     "delete"
   ],
   "conditions": {
-    "entity-ids": {
+    "account-ids": {
       "type": "StringPairsEqualCondition"
     }
   }

@@ -27,15 +27,15 @@ docker-compose run --rm --no-deps --entrypoint \
     40f15f9e-d7c3-47dc-9843-6ff0c8c6e58d" \
   web
 docker-compose run --rm --no-deps --entrypoint \
-  "/go/bin/hydra groups create bridg-account-admin" \
+  "/go/bin/hydra groups create account-admin" \
   web
 docker-compose run --rm --no-deps --entrypoint \
-  "/go/bin/hydra groups members add bridg-account-admin
+  "/go/bin/hydra groups members add account-admin
     4dfadb9f-8f73-4b21-b166-90bac7fac555" \
   web
 
 echo "Running hydra policy seeding."
 docker-compose run --rm --no-deps --entrypoint \
-  "/go/bin/hydra policies create -f data/policies/bridg-admin.json,data/policies/bridg-admin-search.json,data/policies/bridg-analytics.json,data/policies/bridg-api-gateway.json,data/policies/bridg-iam.json,data/policies/bridg-login.json,data/policies/metrics-viewer.json" \
+  "/go/bin/hydra policies create -f data/policies/account-admin.json,data/policies/bridg-admin.json,data/policies/bridg-admin-search.json,data/policies/bridg-analytics.json,data/policies/bridg-api-gateway.json,data/policies/bridg-iam.json,data/policies/bridg-login.json,data/policies/metrics-viewer.json" \
   web
 

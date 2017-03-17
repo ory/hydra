@@ -5,8 +5,7 @@
   ],
   "effect": "allow",
   "resources": [
-    "rn:bridg:<(accounts:[0-9A-z_-]+:brands:[0-9A-z_-]+:)?analytics(:.+)?>",
-    "rn:bridg:<(accounts:[0-9A-z_-]+:brands:[0-9A-z_-]+:)?campaigns(:.+)?>",
+    "rn:bridg:<(accounts:[0-9A-z_-]+:brands:[0-9A-z_-]+:)?(analytics|campaigns)(:.+)?>",
     "rn:bridg:<accounts:[0-9A-z_-]+:brands:[0-9A-z_-]+>"
   ],
   "actions": [

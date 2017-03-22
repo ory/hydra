@@ -26,7 +26,7 @@ func TestMiddleware(t *testing.T) {
 	airID := os.Getenv("AIRBRAKE_PROJECT_ID")
 	airKey := os.Getenv("AIRBRAKE_PROJECT_KEY")
 
-	t.Run("NewRelic1", testUseNewRelicMiddleware)
+	t.Run("NewRelic1", testUseNewRelicMiddlewareWithWrongValues)
 	t.Run("NewRelic2", testUseNewRelicMiddlewareWithoutValues)
 	t.Run("Airbrake1", testUseAirbrakeMiddleware)
 	t.Run("Airbrake2", testUseAirbrakeMiddlewareWithoutValues)
@@ -39,15 +39,15 @@ func TestMiddleware(t *testing.T) {
 	logrus.SetOutput(os.Stderr)
 }
 
-func testUseNewRelicMiddleware(t *testing.T) {
+func testUseNewRelicMiddlewareWithWrongValues(t *testing.T) {
 	os.Setenv("NEW_RELIC_LICENSE_KEY", "1")
 	os.Setenv("NEW_RELIC_APP_NAME", "1")
 	var buffer bytes.Buffer
 	logrus.SetOutput(&buffer)
 	n := negroni.New()
 
-	useNewRelicMiddleware(n, false)
-	assert.Contains(t, string(buffer.Bytes()), "New Relic enabled!")
+	useNewRelicMiddleware(n)
+	assert.Contains(t, string(buffer.Bytes()), "Error creating New Relic app: license length is not 40")
 }
 
 func testUseNewRelicMiddlewareWithoutValues(t *testing.T) {
@@ -56,7 +56,7 @@ func testUseNewRelicMiddlewareWithoutValues(t *testing.T) {
 	logrus.SetOutput(&buffer)
 	n := negroni.New()
 
-	useNewRelicMiddleware(n, false)
+	useNewRelicMiddleware(n)
 	assert.Contains(t, string(buffer.Bytes()), "New Relic disabled - configs not found")
 }
 

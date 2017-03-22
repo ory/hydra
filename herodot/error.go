@@ -43,8 +43,6 @@ func ToError(err error) *Error {
 		}
 	}
 
-
-
 	return &Error{
 		OriginalError: err,
 		Name:          "internal-error",

@@ -10,8 +10,8 @@ import (
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/warden/group"
 	"github.com/ory-am/ladon"
-	"golang.org/x/net/context"
 	"github.com/pkg/errors"
+	"golang.org/x/net/context"
 )
 
 type LocalWarden struct {
@@ -81,8 +81,8 @@ func (w *LocalWarden) TokenAllowed(ctx context.Context, token string, a *firewal
 	logrus.WithFields(logrus.Fields{
 		"subject":  c.Subject,
 		"audience": auth.GetClient().GetID(),
-		"request": auth,
-		"result": c,
+		"request":  auth,
+		"result":   c,
 	}).Infof("Access granted")
 
 	return c, nil
@@ -94,7 +94,7 @@ func (w *LocalWarden) isAllowed(ctx context.Context, a *ladon.Request) error {
 		return err
 	}
 
-	errs := make([]error, len(groups) + 1)
+	errs := make([]error, len(groups)+1)
 	errs[0] = w.Warden.IsAllowed(&ladon.Request{
 		Resource: a.Resource,
 		Action:   a.Action,

@@ -1,15 +1,15 @@
 package integration
 
 import (
-	"testing"
-	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/fosite"
-	"github.com/stretchr/testify/require"
-	"github.com/ory-am/hydra/policy"
+	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/oauth2"
-	"github.com/ory-am/ladon"
+	"github.com/ory-am/hydra/policy"
 	"github.com/ory-am/hydra/warden/group"
+	"github.com/ory-am/ladon"
+	"github.com/stretchr/testify/require"
+	"testing"
 )
 
 func TestSQLSchema(t *testing.T) {
@@ -20,10 +20,10 @@ func TestSQLSchema(t *testing.T) {
 	r.ID = "foo"
 	db := ConnectToMySQL()
 
-	cm := &client.SQLManager{DB: db, Hasher:  &fosite.BCrypt{}}
+	cm := &client.SQLManager{DB: db, Hasher: &fosite.BCrypt{}}
 	gm := group.SQLManager{DB: db}
 	jm := jwk.SQLManager{DB: db, Cipher: &jwk.AEAD{Key: []byte("11111111111111111111111111111111")}}
-	om := oauth2.FositeSQLStore{Manager: cm, DB: db        }
+	om := oauth2.FositeSQLStore{Manager: cm, DB: db}
 	pm, err := policy.NewSQLManager(db)
 	require.Nil(t, err)
 
@@ -37,7 +37,7 @@ func TestSQLSchema(t *testing.T) {
 	require.Nil(t, cm.CreateClient(&client.Client{ID: "foo"}))
 	require.Nil(t, om.CreateAccessTokenSession(nil, "asdfasdf", r))
 	require.Nil(t, gm.CreateGroup(&group.Group{
-		ID: "asdfas",
+		ID:      "asdfas",
 		Members: []string{"asdf"},
 	}))
 }

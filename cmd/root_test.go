@@ -67,7 +67,7 @@ func TestExecute(t *testing.T) {
 		c.args = append(c.args, []string{"--skip-tls-verify", "--config", path}...)
 		RootCmd.SetArgs(c.args)
 
-		t.Run(fmt.Sprintf("command=%v", c.args), func (t *testing.T) {
+		t.Run(fmt.Sprintf("command=%v", c.args), func(t *testing.T) {
 			if c.wait != nil {
 				go func() {
 					assert.Nil(t, RootCmd.Execute())

@@ -11,26 +11,50 @@ import (
 	"time"
 )
 
+// Consent is a helper for singing and verifying consent challenges. For an exemplary reference implementation, check
+// https://github.com/ory/hydra-consent-app-go
 type Consent struct {
 	KeyManager jwk.Manager
 }
 
+// ResponseRequest is being used by the consent response singing helper.
 type ResponseRequest struct {
+	// Challenge is the original consent challenge.
 	Challenge        string
+
+	// Subject will be the sub claim of the access token. Usually this is a resource owner (user).
 	Subject          string
+
+	// Scopes are the scopes the resource owner granted to the application requesting the access token.
 	Scopes           []string
+
+	// AccessTokenExtra is arbitrary data that will be available when performing token introspection or warden requests.
 	AccessTokenExtra interface{}
+
+	// IDTokenExtra is arbitrary data that will included as a claim in the ID Token, if requested.
 	IDTokenExtra     interface{}
 }
 
+// ChallengeClaims are the decoded claims of a consent challenge.
 type ChallengeClaims struct {
+	// RequestedScopes are the scopes the application requested. Each scope should be explicitly granted by
+	// the user.
 	RequestedScopes []string `json:"scp"`
+
+	// The ID of the application that initiated the OAuth2 flow.
 	Audience        string   `json:"aud"`
+
+	// RedirectURL is the url where the consent app will send the user after the consent flow has been completed.
 	RedirectURL     string   `json:"redir"`
+
+	// ExpiresAt is a unix timestamp of the expiry time.
 	ExpiresAt       float64  `json:"exp"`
+
+	// ID is the tokens' ID which will be automatically echoed in the consent response.
 	ID              string   `json:"jti"`
 }
 
+// Valid tests if the challenge's claims are valid.
 func (c *ChallengeClaims) Valid() error {
 	if time.Now().After(ejwt.ToTime(c.ExpiresAt)) {
 		return errors.Errorf("Consent challenge expired")
@@ -38,6 +62,8 @@ func (c *ChallengeClaims) Valid() error {
 	return nil
 }
 
+// VerifyChallenge verifies a consent challenge and either returns the challenge's claims if it is valid, or an
+// error if it is not.
 func (c *Consent) VerifyChallenge(challenge string) (*ChallengeClaims, error) {
 	var claims ChallengeClaims
 	t, err := jwt.ParseWithClaims(challenge, &claims, func(t *jwt.Token) (interface{}, error) {
@@ -69,6 +95,7 @@ func (c *Consent) VerifyChallenge(challenge string) (*ChallengeClaims, error) {
 	return &claims, err
 }
 
+// GenerateResponse generates a consent response and returns the consent response token, or an error if it is invalid.
 func (c *Consent) GenerateResponse(r *ResponseRequest) (string, error) {
 	challenge, err := c.VerifyChallenge(r.Challenge)
 	if err != nil {

@@ -1,5 +1,5 @@
-hash: 1bf4f67c1123a3703e85cd0a7c801bbcf41b9f12c7a155edfdbc5eac228af080
-updated: 2017-01-22T15:06:40.5257399+01:00
+hash: 0dfdd706ec526743dc61fe6baddd8b332b52fc5b2ea1874f89aeaea1a91f4a35
+updated: 2017-03-22T11:05:16.774326265+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
@@ -8,7 +8,9 @@ imports:
   subpackages:
   - winterm
 - name: github.com/cenk/backoff
-  version: b02f2bbce11d7ea6b97f282ef1771b0fe2f65ef3
+  version: 32cd0c5b3aef12c76ed64aaf678f6c79736be7dc
+- name: github.com/cenkalti/backoff
+  version: 3db60c813733fce657c114634171689bbf1f8dee
 - name: github.com/davecgh/go-spew
   version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
   subpackages:
@@ -16,7 +18,7 @@ imports:
 - name: github.com/dgrijalva/jwt-go
   version: d2709f9f1f31ebcda9651b03077758c1f3a0018c
 - name: github.com/docker/docker
-  version: 49bf474f9ed7ce7143a59d1964ff7b7fd9b52178
+  version: 092cba3727bb9b4a2f0e922cd6c0f93ea270e363
   subpackages:
   - api/types
   - api/types/blkiodev
@@ -86,8 +88,6 @@ imports:
   version: 3e95a51e0639b4cf372f2ccf74c86749d747fbdc
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
-- name: github.com/jingweno/negroni-gorelic
-  version: 0547cdd62f4b911984d435279bd46b4d1a580823
 - name: github.com/jmoiron/sqlx
   version: f980a91bdc37abef88269b8f122d7de6352102f5
   subpackages:
@@ -108,6 +108,15 @@ imports:
   version: ed105d635dfa9ea7133f7c79f1eb36203fc3a156
 - name: github.com/moul/http2curl
   version: 4e24498b31dba4683efb9d35c1c8a91e2eda28c8
+- name: github.com/newrelic/go-agent
+  version: 7c6c920d222b18632f03b12c3b594df816eab6d0
+  subpackages:
+  - _integrations/nrlogrus
+  - internal
+  - internal/jsonx
+  - internal/logger
+  - internal/sysinfo
+  - internal/utilization
 - name: github.com/oleiade/reflections
   version: 2b6ec3da648e3e834dc41bad8d9ed7f2dc6a9496
 - name: github.com/opencontainers/runc
@@ -125,7 +134,7 @@ imports:
 - name: github.com/ory-am/dockertest
   version: 8445a82f8da6067ffecbb06e3f9fa2857f3bf9df
 - name: github.com/ory-am/fosite
-  version: 7b94f470bede7cf5e94d11e05aa3364d0db75fe2
+  version: 9b33931ee14ae0768ea46a423d569330a85b482e
   subpackages:
   - compose
   - handler/oauth2
@@ -134,7 +143,7 @@ imports:
   - token/hmac
   - token/jwt
 - name: github.com/ory-am/ladon
-  version: 511d561a9a22e6f1c9eda4859673721c56375a23
+  version: ef4a3e7a29dc84bb3fabb23142e350fbb5bfdd42
 - name: github.com/pborman/uuid
   version: a97ce2ca70fa5a848076093f05e639a89ca34d06
 - name: github.com/pelletier/go-buffruneio
@@ -154,7 +163,7 @@ imports:
   subpackages:
   - sqlparse
 - name: github.com/Sirupsen/logrus
-  version: d26492970760ca5d33129d2d799e34be5c4782eb
+  version: ba1b36c82c5e05c4f912a88eab0dcd91a171688f
 - name: github.com/spf13/afero
   version: 72b31426848c6ef12a7a8e216708cb0d1530f074
   subpackages:
@@ -182,12 +191,6 @@ imports:
   version: 21fc9f95c83442fd164094666f7cb4f9fdd56cd6
 - name: github.com/urfave/negroni
   version: fde5e16d32adc7ad637e9cd9ad21d4ebc6192535
-- name: github.com/yvasiyarov/go-metrics
-  version: c25f46c4b94079672242ec48a545e7ca9ebe3aec
-- name: github.com/yvasiyarov/gorelic
-  version: ae09aa139a2b7f638e2412baceaceebd41eff115
-- name: github.com/yvasiyarov/newrelic_platform_go
-  version: 9c099fbc30e90de5bb5c5f94aa5fd08f2daeaacd
 - name: golang.org/x/crypto
   version: b8a2a83acfe6e6770b75de42d5ff4c67596675c0
   subpackages:
@@ -227,11 +230,11 @@ imports:
 - name: gopkg.in/airbrake/gobrake.v2
   version: 5d77bd50d083834501349f8be70197b26963674d
 - name: gopkg.in/dancannon/gorethink.v2
-  version: 417badecf1ab14d0d6e38ad82397da2a59e2f6ca
+  version: 610fcc04c971a9fa42f1b6625c7c52b5bb472c51
 - name: gopkg.in/fatih/pool.v2
   version: 6e328e67893eb46323ad06f0e92cb9536babbabc
-- name: gopkg.in/gorethink/gorethink.v2
-  version: 016a1d3b4d15951ab2e39bd3596718ba94d298ba
+- name: gopkg.in/gorethink/gorethink.v3
+  version: 610fcc04c971a9fa42f1b6625c7c52b5bb472c51
   subpackages:
   - encoding
   - ql2
@@ -254,11 +257,9 @@ imports:
   - cipher
   - json
 - name: gopkg.in/tylerb/graceful.v1
-  version: 0e9129e9c6d47da90dc0c188b26bd7bb1dab53cd
+  version: 4654dfbb6ad53cb5e27f37d99b02e16c1872fbbb
 - name: gopkg.in/yaml.v2
   version: a5b47d31c556af34a302ce5d659e6fea44d90de0
-- name: github.com/jingweno/negroni-gorelic
-  version: 0547cdd62f4b911984d435279bd46b4d1a580823
 testImports:
 - name: github.com/gorilla/mux
   version: 392c28fe23e1c45ddba891b0320b3b5df220beea

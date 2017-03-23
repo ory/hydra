@@ -12,7 +12,8 @@ import (
 	"fmt"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/jingweno/negroni-gorelic"
+	"github.com/newrelic/go-agent"
+	"github.com/newrelic/go-agent/_integrations/nrlogrus"
 	"github.com/julienschmidt/httprouter"
 	"github.com/meatballhat/negroni-logrus"
 	"github.com/ory-am/hydra/client"
@@ -57,15 +58,13 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 			err := c.Persist()
 			pkg.Must(err, "Could not write configuration file: %s", err)
 		}
-		verbose, _ := cmd.Flags().GetBool("new-relic-verbose")
 
 		n := negroni.New()
 		useAirbrakeMiddleware(n)
-		useNewRelicMiddleware(n, verbose)
+		useNewRelicMiddleware(n)
 		n.Use(negronilogrus.NewMiddleware())
 		n.UseFunc(serverHandler.rejectInsecureRequests)
 		n.UseHandler(router)
-
 		var srv = http.Server{
 			Addr:    c.GetAddress(),
 			Handler: n,
@@ -93,13 +92,29 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 	}
 }
 
-//Get NewRelic license and app name from environment variables
-func useNewRelicMiddleware(n *negroni.Negroni, verbose bool) {
-	newRelicLicense := os.Getenv("NEW_RELIC_LICENSE_KEY")
+func useNewRelicMiddleware(n *negroni.Negroni) {
+	//Get NewRelic license and app name from environment variables
 	newRelicApp := os.Getenv("NEW_RELIC_APP_NAME")
+	newRelicLicense := os.Getenv("NEW_RELIC_LICENSE_KEY")
+
+	// create newrelic app here
 	if newRelicLicense != "" && newRelicApp != "" {
-		n.Use(negronigorelic.New(newRelicLicense, newRelicApp, verbose))
-		logrus.Info("New Relic enabled!")
+		newrelicConfig := newrelic.NewConfig(newRelicApp, newRelicLicense)
+		newrelicConfig.Logger = nrlogrus.StandardLogger()
+		app, err := newrelic.NewApplication(newrelicConfig)
+		if err == nil {
+			newRelicHandler := negroni.HandlerFunc(func(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+				txn := app.StartTransaction(r.URL.EscapedPath(), rw, r)
+				defer txn.End()
+
+				next(rw, r)
+			})
+			n.Use(newRelicHandler)
+
+			logrus.Info("New Relic enabled!")
+		}	else {
+			logrus.Errorf("Error creating New Relic app: %v", err)
+		}
 	} else {
 		logrus.Info("New Relic disabled - configs not found")
 	}

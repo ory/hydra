@@ -68,7 +68,7 @@ import:
   version: ^1.2.13
 - package: gopkg.in/yaml.v2
 - package: gopkg.in/airbrake/gobrake.v2
-- package: github.com/jingweno/negroni-gorelic
+- package: github.com/newrelic/go-agent
 testImport:
 - package: github.com/gorilla/mux
   version: ^1.1.0

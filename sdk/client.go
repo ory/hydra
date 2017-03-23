@@ -51,7 +51,7 @@ type Client struct {
 	// Groups offers warden group management capabilities.
 	Groups *group.HTTPManager
 
-	// Consent offers
+	// Consent helps you verify consent challenges and sign consent responses.
 	Consent *Consent
 
 	http          *http.Client

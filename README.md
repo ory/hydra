@@ -219,6 +219,7 @@ DATABASE_URL=rethinkdb://localhost:28015/hydra go run main.go host
 
 Official:
 * [Consent App SDK For NodeJS](https://github.com/ory/hydra-js)
+* [Consent App Example written in Go](https://github.com/ory/hydra-consent-app-go)
 * [Exemplary Consent App with Express and NodeJS](https://github.com/ory/hydra-consent-app-express)
 
 Community:

@@ -36,13 +36,13 @@ func TestConsentHelper(t *testing.T) {
 
 	ar := fosite.NewAuthorizeRequest()
 	ar.Client = &fosite.DefaultClient{ID: "foobarclient"}
-	challenge, err := s.IssueChallenge(ar, "/lightyear", &sessions.Session{Values: map[interface{}]interface{}{}})
+	challenge, err := s.IssueChallenge(ar, "http://hydra/oauth2/auth?client_id=foobarclient", &sessions.Session{Values: map[interface{}]interface{}{}})
 	require.Nil(t, err)
 
 	claims, err := c.VerifyChallenge(challenge)
 	require.Nil(t, err)
 	assert.Equal(t, claims.Audience, "foobarclient")
-	assert.Equal(t, claims.RedirectURL, "/lightyear")
+	assert.Equal(t, claims.RedirectURL, "http://hydra/oauth2/auth?client_id=foobarclient")
 	assert.NotEmpty(t, claims.ID)
 
 	resp, err := c.GenerateResponse(&ResponseRequest{
@@ -53,7 +53,7 @@ func TestConsentHelper(t *testing.T) {
 	require.Nil(t, err)
 
 	var dec map[string]interface{}
-	result, err := base64.RawURLEncoding.DecodeString(strings.Split(resp, ".")[1])
+	result, err := base64.RawURLEncoding.DecodeString(strings.Split(strings.Replace(resp, "http://hydra/oauth2/auth?client_id=foobarclient&consent=", "", -1), ".")[1])
 	require.Nil(t, err)
 
 	require.Nil(t, json.Unmarshal(result, &dec))

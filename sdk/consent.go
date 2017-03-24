@@ -64,6 +64,12 @@ func (c *ChallengeClaims) Valid() error {
 
 // VerifyChallenge verifies a consent challenge and either returns the challenge's claims if it is valid, or an
 // error if it is not.
+//
+//  claims, err := c.VerifyChallenge(challenge)
+//  if err != nil {
+//    // The challenge is invalid, or the signing key could not be retrieved
+//  }
+//  // ...
 func (c *Consent) VerifyChallenge(challenge string) (*ChallengeClaims, error) {
 	var claims ChallengeClaims
 	t, err := jwt.ParseWithClaims(challenge, &claims, func(t *jwt.Token) (interface{}, error) {
@@ -95,7 +101,24 @@ func (c *Consent) VerifyChallenge(challenge string) (*ChallengeClaims, error) {
 	return &claims, err
 }
 
+// DenyConsent can be used to indicate that the user denied consent. Returns a redirect url or an error
+// if the challenge is invalid.
+//
+//  redirectUrl, _ := c.DenyConsent(challenge)
+//  http.Redirect(w, r, redirectUrl, http.StatusFound)
+func (c *Consent) DenyConsent(challenge string) (string, error) {
+	claims, err := c.VerifyChallenge(challenge)
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%s&consent=denied", claims.RedirectURL), nil
+}
+
 // GenerateResponse generates a consent response and returns the consent response token, or an error if it is invalid.
+//
+//  redirectUrl, _ := c.GenerateResponse(challenge)
+//  http.Redirect(w, r, redirectUrl, http.StatusFound)
 func (c *Consent) GenerateResponse(r *ResponseRequest) (string, error) {
 	challenge, err := c.VerifyChallenge(r.Challenge)
 	if err != nil {
@@ -130,5 +153,5 @@ func (c *Consent) GenerateResponse(r *ResponseRequest) (string, error) {
 		return "", errors.WithStack(err)
 	}
 
-	return fmt.Sprintf("%s.%s", encoded, signature), nil
+	return fmt.Sprintf("%s&consent=%s.%s", challenge.RedirectURL, encoded, signature), nil
 }

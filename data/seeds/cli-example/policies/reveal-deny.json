@@ -1,0 +1,15 @@
+{
+  "id": "reveal_deny",
+  "description": "Deny access to reveal jobs unless bridg-admin.",
+  "subjects": [
+    "<!bridg-admin>"
+  ],
+  "effect": "deny",
+  "resources": [
+    "rn:bridg:accounts:<[a-zA-Z0-9_-]+:brands:[a-zA-Z0-9_-]+:reveal-jobs(:(latest|[0-9]+))?>",
+    "rn:bridg:reveal-jobs<(:.+)?>"
+  ],
+  "actions": [
+    "create", "read", "update", "delete"
+  ]
+}

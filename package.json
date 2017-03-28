@@ -1,0 +1,21 @@
+{
+  "name": "hydra-policy-test-suite",
+  "version": "1.0.0",
+  "description": "Bridg 2.0 Hydra Policy Tests",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --reporter spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bridg/hydra-1.git"
+  },
+  "author": "Bridg",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {},
+  "optionalDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0",
+    "request": "^2.81.0"
+  }
+}

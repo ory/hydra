@@ -1,0 +1,13 @@
+# Docker Compose file for use with CircleCI tests.
+
+version: '2'
+
+services:
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile-policy-test
+    env_file: .env.test
+    volumes:
+      - ./test:/app/test

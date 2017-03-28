@@ -1,0 +1,13 @@
+FROM node:6.9
+MAINTAINER Bridg
+
+RUN mkdir /app
+WORKDIR /app
+
+ADD package.json /app/package.json
+RUN npm install --silent
+ENV PATH /app/node_modules/.bin:$PATH
+
+ADD ./test /app/test
+
+ENTRYPOINT ["npm", "run", "test"]

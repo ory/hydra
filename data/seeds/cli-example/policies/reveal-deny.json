@@ -2,7 +2,7 @@
   "id": "reveal_deny",
   "description": "Deny access to reveal jobs unless bridg-admin.",
   "subjects": [
-    "<!bridg-admin>"
+    "<(account|brand)-(admin|viewer)>"
   ],
   "effect": "deny",
   "resources": [

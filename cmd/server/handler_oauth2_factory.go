@@ -50,7 +50,7 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 		con.CreateTableIfNotExists("hydra_oauth2_access_token")
 		con.CreateTableIfNotExists("hydra_oauth2_implicit")
 		con.CreateTableIfNotExists("hydra_oauth2_refresh_token")
-		m := &oauth2.FositeRehinkDBStore{
+		m := &oauth2.FositeRethinkDBStore{
 			Session:             con.GetSession(),
 			Manager:             clients,
 			AuthorizeCodesTable: r.Table("hydra_oauth2_authorize_code"),

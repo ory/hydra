@@ -1,4 +1,5 @@
 {
+  "id": "bridg_iam",
   "description": "Give bridg's identity management access to Hydra's warden group resources.",
   "subjects": [
     "bridg-iam"

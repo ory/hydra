@@ -1,4 +1,5 @@
 {
+  "id": "user_owner",
   "description": "Allow Bridg users read and update access to their own user resources.",
   "subjects": [
     "<[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}>"

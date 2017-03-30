@@ -1,4 +1,5 @@
 {
+  "id": "elastic_search",
   "description": "Grant account users GET/POST access to their elastic search count and query resources.",
   "subjects": [
     "<(account|brand)-(admin|viewer)>"

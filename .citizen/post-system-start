@@ -38,6 +38,7 @@ echo "Running hydra policy seeding."
 docker-compose run --rm --no-deps --entrypoint \
   "/go/bin/hydra policies create -f data/policies/account-admin.json &&
    /go/bin/hydra policies create -f data/policies/account-admin-deny.json &&
+   /go/bin/hydra policies create -f data/policies/account-viewer.json &&
    /go/bin/hydra policies create -f data/policies/bridg-admin.json &&
    /go/bin/hydra policies create -f data/policies/bridg-admin-search.json &&
    /go/bin/hydra policies create -f data/policies/bridg-analytics.json &&

@@ -1,4 +1,5 @@
 {
+  "id": "account_viewer",
   "description": "Allow account users full read access to Bridg's account resources.",
   "subjects": [
     "account-viewer"

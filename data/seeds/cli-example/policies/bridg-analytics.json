@@ -1,4 +1,5 @@
 {
+  "id": "bridg_analytics",
   "description": "Give bridg's analytics client access to Bridg's analytics and campaigns resources.",
   "subjects": [
     "bridg-analytics"

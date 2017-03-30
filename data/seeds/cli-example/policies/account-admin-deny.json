@@ -1,4 +1,5 @@
 {
+  "id": "account_admin_deny",
   "description": "Deny account admins CUD access to specific account resources.",
   "subjects": [
     "<(account|brand)-admin>"

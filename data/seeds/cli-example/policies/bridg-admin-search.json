@@ -1,4 +1,5 @@
 {
+  "id": "bridg_admin_search",
   "description": "Grant Bridg admin users GET/POST access to account elastic search count and query resources.",
   "subjects": [
     "bridg-admin"

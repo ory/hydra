@@ -1,4 +1,5 @@
 {
+  "id": "brand_viewer",
   "description": "Allow brand users full read access to Bridg's brand resources.",
   "subjects": [
     "brand-viewer"

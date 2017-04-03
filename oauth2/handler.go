@@ -64,6 +64,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ htt
 		"issuer": h.Issuer,
 		"authorization_endpoint": AuthPath,
 		"token_endpoint": TokenPath,
+		"subject_types_supported": []string{"pairwise", "public"},
 		"jwks_uri": "to be done" + OpenIDConnectKeyName,
 		"id_token_signing_alg_values_supported": []string{"RS256"},
 		"response_types_supported": []string{"code", "code id_token", "id_token", "token id_token", "token"},

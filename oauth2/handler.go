@@ -13,14 +13,18 @@ import (
 	"github.com/pkg/errors"
 	"strings"
 	"time"
+	"golang.org/x/net/context"
+	"github.com/ory-am/common/path"
 )
 
 const (
 	OpenIDConnectKeyName = "hydra.openid.id-token"
 
 	ConsentPath = "/oauth2/consent"
-	TokenPath   = "/oauth2/token"
-	AuthPath    = "/oauth2/auth"
+	TokenPath = "/oauth2/token"
+	AuthPath = "/oauth2/auth"
+
+	WellKnownPath = "/.well-known/openid-configuration"
 
 	// IntrospectPath points to the OAuth2 introspection endpoint.
 	IntrospectPath = "/oauth2/introspect"
@@ -30,16 +34,19 @@ const (
 )
 
 type Handler struct {
-	OAuth2  fosite.OAuth2Provider
-	Consent ConsentStrategy
+	OAuth2              fosite.OAuth2Provider
+	Consent             ConsentStrategy
 
-	H herodot.Herodot
+	H                   herodot.Herodot
 
-	ForcedHTTP bool
-	ConsentURL url.URL
+	ForcedHTTP          bool
+	ConsentURL          url.URL
 
 	AccessTokenLifespan time.Duration
 	CookieStore         sessions.Store
+
+	Issuer string
+	BaseURL string
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
@@ -49,6 +56,18 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET(ConsentPath, h.DefaultConsentHandler)
 	r.POST(IntrospectPath, h.IntrospectHandler)
 	r.POST(RevocationPath, h.RevocationHandler)
+	r.POST(WellKnownPath, h.WellKnownHandler)
+}
+
+func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	h.H.Write(context.Background(), w, r, map[string]interface{}{
+		"issuer": h.Issuer,
+		"authorization_endpoint": AuthPath,
+		"token_endpoint": TokenPath,
+		"jwks_uri": "to be done" + OpenIDConnectKeyName,
+		"id_token_signing_alg_values_supported": []string{"RS256"},
+		"response_types_supported": []string{"code", "code id_token", "id_token", "token id_token", "token"},
+	})
 }
 
 func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -189,7 +208,7 @@ func (h *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, auth
 	// Error can be ignored because a session will always be returned
 	cookie, _ := h.CookieStore.Get(r, consentCookieName)
 
-	challenge, err := h.Consent.IssueChallenge(authorizeRequest, schema+"://"+r.Host+r.URL.String(), cookie)
+	challenge, err := h.Consent.IssueChallenge(authorizeRequest, schema + "://" + r.Host + r.URL.String(), cookie)
 	if err != nil {
 		return err
 	}

@@ -1,0 +1,15 @@
+{
+  "id": "elastic_search_deny",
+  "description": "Deny Bridg users PUT/DELETE access to elastic search count and query resources.",
+  "subjects": [
+    "bridg-admin",
+    "<(account|brand)-(admin|viewer)>"
+  ],
+  "effect": "deny",
+  "resources": [
+    "rn:bridg:<accounts:[0-9A-z_-]+:(brands:[0-9A-z_-]+:)?search.*>"
+  ],
+  "actions": [
+    "update", "delete"
+  ]
+}

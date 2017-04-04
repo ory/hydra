@@ -16,7 +16,7 @@ Or, more *generalized:* **Who** is **able** to do **what** on **something** with
 * **Something (Resource)**: An arbitrary unique resource name, for example "something", "resources:articles:1234" or some uniform resource name like "urn:isbn:3827370191".
 * **Context (Context)**: The current context which may environment information like the IP Address, request date, the resource owner name, the department ken is working in and anything you like.
 
-Policies are JSON documents managed via the [Policy API](http://docs.hdyra.apiary.io/#reference/policies).
+Policies are JSON documents managed via the [Policy API](http://docs.hydra13.apiary.io/#reference/policies).
 
 ```
 {

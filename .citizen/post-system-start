@@ -46,6 +46,7 @@ docker-compose run --rm --no-deps --entrypoint \
    /go/bin/hydra policies create -f data/policies/bridg-iam.json &&
    /go/bin/hydra policies create -f data/policies/bridg-login.json &&
    /go/bin/hydra policies create -f data/policies/elastic-search.json &&
+   /go/bin/hydra policies create -f data/policies/elastic-search-deny.json &&
    /go/bin/hydra policies create -f data/policies/metrics-viewer.json &&
    /go/bin/hydra policies create -f data/policies/reveal-deny.json" \
   web

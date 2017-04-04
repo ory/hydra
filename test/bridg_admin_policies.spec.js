@@ -49,6 +49,22 @@ describe('The "bridg-admin" role', () => {
         testWardenResponse('read', 'rn:bridg:accounts:act_2:brands', true, done);
       });
 
+      it('is allowed access to "/act_1/search/customer-profile/_search"', (done) => {
+        testWardenResponse('read', 'rn:bridg:accounts:act_1:search:customer-profile:_search', true, done);
+      });
+
+      it('is allowed access to "/act_1/search/customer-profile/_count"', (done) => {
+        testWardenResponse('read', 'rn:bridg:accounts:act_1:search:customer-profile:_count', true, done);
+      });
+
+      it('is allowed access to "/act_2/search/customer-profile/_search"', (done) => {
+        testWardenResponse('read', 'rn:bridg:accounts:act_2:search:customer-profile:_search', true, done);
+      });
+
+      it('is allowed access to "/act_2/search/customer-profile/_count"', (done) => {
+        testWardenResponse('read', 'rn:bridg:accounts:act_2:search:customer-profile:_count', true, done);
+      });
+
       it('is allowed access to "/act_1/sites"', (done) => {
         testWardenResponse('read', 'rn:bridg:accounts:act_1:sites', true, done);
       });
@@ -203,6 +219,22 @@ describe('The "bridg-admin" role', () => {
 
       it('is allowed access to "/brd_2/reveal-jobs/latest/artifact"', (done) => {
         testWardenResponse('read', 'rn:bridg:accounts:act_2:brands:brd_2:reveal-jobs:latest:artifact', true, done);
+      });
+
+      it('is allowed access to "/brd_1/search/customer-profile/_search"', (done) => {
+        testWardenResponse('read', 'rn:bridg:accounts:act_1:brands:brd_1:search:customer-profile:_search', true, done);
+      });
+
+      it('is allowed access to "/brd_1/search/customer-profile/_count"', (done) => {
+        testWardenResponse('read', 'rn:bridg:accounts:act_1:brands:brd_1:search:customer-profile:_count', true, done);
+      });
+
+      it('is allowed access to "/brd_2/search/customer-profile/_search"', (done) => {
+        testWardenResponse('read', 'rn:bridg:accounts:act_2:brands:brd_2:search:customer-profile:_search', true, done);
+      });
+
+      it('is allowed access to "/brd_2/search/customer-profile/_count"', (done) => {
+        testWardenResponse('read', 'rn:bridg:accounts:act_2:brands:brd_2:search:customer-profile:_count', true, done);
       });
 
       it('is allowed access to "/brd_1/sites"', (done) => {
@@ -433,6 +465,22 @@ describe('The "bridg-admin" role', () => {
         testWardenResponse('create', 'rn:bridg:accounts:act_2:brands', true, done);
       });
 
+      it('is allowed access to "/act_1/search/customer-profile/_search"', (done) => {
+        testWardenResponse('create', 'rn:bridg:accounts:act_1:search:customer-profile:_search', true, done);
+      });
+
+      it('is allowed access to "/act_1/search/customer-profile/_count"', (done) => {
+        testWardenResponse('create', 'rn:bridg:accounts:act_1:search:customer-profile:_count', true, done);
+      });
+
+      it('is allowed access to "/act_2/search/customer-profile/_search"', (done) => {
+        testWardenResponse('create', 'rn:bridg:accounts:act_2:search:customer-profile:_search', true, done);
+      });
+
+      it('is allowed access to "/act_2/search/customer-profile/_count"', (done) => {
+        testWardenResponse('create', 'rn:bridg:accounts:act_2:search:customer-profile:_count', true, done);
+      });
+
       it('is allowed access to "/act_1/users/usr_1"', (done) => {
         testWardenResponse('create', 'rn:bridg:accounts:act_1:users:usr_1', true, done);
       });
@@ -477,6 +525,22 @@ describe('The "bridg-admin" role', () => {
 
       it('is allowed access to "/brd_2/audiences/aud_2/snapshots', (done) => {
         testWardenResponse('create', 'rn:bridg:accounts:act_2:brands:brd_2:audiences:aud_2:snapshots', true, done);
+      });
+
+      it('is allowed access to "/brd_1/search/customer-profile/_search"', (done) => {
+        testWardenResponse('create', 'rn:bridg:accounts:act_1:brands:brd_1:search:customer-profile:_search', true, done);
+      });
+
+      it('is allowed access to "/brd_1/search/customer-profile/_count"', (done) => {
+        testWardenResponse('create', 'rn:bridg:accounts:act_1:brands:brd_1:search:customer-profile:_count', true, done);
+      });
+
+      it('is allowed access to "/brd_2/search/customer-profile/_search"', (done) => {
+        testWardenResponse('create', 'rn:bridg:accounts:act_2:brands:brd_2:search:customer-profile:_search', true, done);
+      });
+
+      it('is allowed access to "/brd_2/search/customer-profile/_count"', (done) => {
+        testWardenResponse('create', 'rn:bridg:accounts:act_2:brands:brd_2:search:customer-profile:_count', true, done);
       });
 
       it('is allowed access to "/brd_1/snapshot-fb-export-facebook-account"', (done) => {
@@ -696,6 +760,22 @@ describe('The "bridg-admin" role', () => {
       it('is allowed access to "/act_2/actions/edit-user"', (done) => {
         testWardenResponse('update', 'rn:bridg:accounts:act_2:actions:edit-user', true, done);
       });
+
+      it('is NOT allowed access to "/act_1/search/customer-profile/_search"', (done) => {
+        testWardenResponse('update', 'rn:bridg:accounts:act_1:search:customer-profile:_search', false, done);
+      });
+
+      it('is NOT allowed access to "/act_1/search/customer-profile/_count"', (done) => {
+        testWardenResponse('update', 'rn:bridg:accounts:act_1:search:customer-profile:_count', false, done);
+      });
+
+      it('is NOT allowed access to "/act_2/search/customer-profile/_search"', (done) => {
+        testWardenResponse('update', 'rn:bridg:accounts:act_2:search:customer-profile:_search', false, done);
+      });
+
+      it('is NOT allowed access to "/act_2/search/customer-profile/_count"', (done) => {
+        testWardenResponse('update', 'rn:bridg:accounts:act_2:search:customer-profile:_count', false, done);
+      });
     });
 
     describe('context "/brands" (brd_1: act_1, brd_2: act_2)', () => {
@@ -721,6 +801,22 @@ describe('The "bridg-admin" role', () => {
 
       it('is allowed access to "/brd_2/audiences/aud_2/snapshot-fb-exports/exp_2"', (done) => {
         testWardenResponse('update', 'rn:bridg:accounts:act_2:brands:brd_2:audiences:aud_2:snapshot-fb-exports:exp_2', true, done);
+      });
+
+      it('is NOT allowed access to "/brd_1/search/customer-profile/_search"', (done) => {
+        testWardenResponse('update', 'rn:bridg:accounts:act_1:brands:brd_1:search:customer-profile:_search', false, done);
+      });
+
+      it('is NOT allowed access to "/brd_1/search/customer-profile/_count"', (done) => {
+        testWardenResponse('update', 'rn:bridg:accounts:act_1:brands:brd_1:search:customer-profile:_count', false, done);
+      });
+
+      it('is NOT allowed access to "/brd_2/search/customer-profile/_search"', (done) => {
+        testWardenResponse('update', 'rn:bridg:accounts:act_2:brands:brd_2:search:customer-profile:_search', false, done);
+      });
+
+      it('is NOT allowed access to "/brd_2/search/customer-profile/_count"', (done) => {
+        testWardenResponse('update', 'rn:bridg:accounts:act_2:brands:brd_2:search:customer-profile:_count', false, done);
       });
     });
 
@@ -793,12 +889,46 @@ describe('The "bridg-admin" role', () => {
         testWardenResponse('delete', 'rn:bridg:accounts:act_2:actions:remove-user', true, done);
       });
 
+      it('is NOT allowed access to "/act_1/search/customer-profile/_search"', (done) => {
+        testWardenResponse('delete', 'rn:bridg:accounts:act_1:search:customer-profile:_search', false, done);
+      });
+
+      it('is NOT allowed access to "/act_1/search/customer-profile/_count"', (done) => {
+        testWardenResponse('delete', 'rn:bridg:accounts:act_1:search:customer-profile:_count', false, done);
+      });
+
+      it('is NOT allowed access to "/act_2/search/customer-profile/_search"', (done) => {
+        testWardenResponse('delete', 'rn:bridg:accounts:act_2:search:customer-profile:_search', false, done);
+      });
+
+      it('is NOT allowed access to "/act_2/search/customer-profile/_count"', (done) => {
+        testWardenResponse('delete', 'rn:bridg:accounts:act_2:search:customer-profile:_count', false, done);
+      });
+
       it('is allowed access to "/act_1/users/usr_1"', (done) => {
         testWardenResponse('delete', 'rn:bridg:accounts:act_1:users:usr_1', true, done);
       });
 
       it('is allowed access to "/act_2/users/usr_2"', (done) => {
         testWardenResponse('delete', 'rn:bridg:accounts:act_2:users:usr_2', true, done);
+      });
+    });
+
+    describe('context "/brands"', () => {
+      it('is NOT allowed access to "/brd_1/search/customer-profile/_search"', (done) => {
+        testWardenResponse('delete', 'rn:bridg:accounts:act_1:brands:brd_1:search:customer-profile:_search', false, done);
+      });
+
+      it('is NOT allowed access to "/brd_1/search/customer-profile/_count"', (done) => {
+        testWardenResponse('delete', 'rn:bridg:accounts:act_1:brands:brd_1:search:customer-profile:_count', false, done);
+      });
+
+      it('is NOT allowed access to "/brd_2/search/customer-profile/_search"', (done) => {
+        testWardenResponse('delete', 'rn:bridg:accounts:act_2:brands:brd_2:search:customer-profile:_search', false, done);
+      });
+
+      it('is NOT allowed access to "/brd_2/search/customer-profile/_count"', (done) => {
+        testWardenResponse('delete', 'rn:bridg:accounts:act_2:brands:brd_2:search:customer-profile:_count', false, done);
       });
     });
 

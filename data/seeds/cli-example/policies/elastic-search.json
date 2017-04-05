@@ -6,7 +6,8 @@
   ],
   "effect": "allow",
   "resources": [
-    "rn:bridg:search:<[A-z0-9_-]+:[A-z_-]+:(_search|_count)>"
+    "rn:bridg:search:<[A-z0-9_-]+:[A-z_-]+:(_search|_count)>",
+    "rn:bridg:accounts:<[A-z0-9_-]+:(brands:[A-z0-9_-]+:)?search:[A-z_-]+:(_search|_count)>"
   ],
   "actions": [
     "create", "read"

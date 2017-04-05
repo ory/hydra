@@ -80,7 +80,7 @@ to verify user consent allowing you to use Hydra with any authentication endpoin
 This section is a quickstart guide to working with Hydra. In-depth docs are available as well:
 
 * The documentation is available on [GitBook](https://ory.gitbooks.io/hydra/content/).
-* The REST API documentation is available at [Apiary](http://docs.hdyra.apiary.io).
+* The REST API documentation is available at [Apiary](http://docs.hydra13.apiary.io/).
 
 ### 5 minutes tutorial: Run your very own OAuth2 environment
 
@@ -184,7 +184,7 @@ The Guide is available on [GitBook](https://ory.gitbooks.io/hydra/content/).
 
 ### HTTP API documentation
 
-The HTTP API is documented at [Apiary](http://docs.hdyra.apiary.io).
+The HTTP API is documented at [Apiary](http://docs.hydra13.apiary.io/).
 
 ### Command line documentation
 

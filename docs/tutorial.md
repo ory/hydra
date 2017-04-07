@@ -26,7 +26,7 @@ You now have a running hydra docker container! Additionally, a Postgres image wa
 Next, let us manage the host process. You can use the Hydra CLI by ssh'ing to the docker container:
 
 ```
-$ docker exec -i -t hydra_hydra_1 /bin/bash
+$ docker exec -i -t hydra_hydra_1 /bin/sh
 root@b4403bb4147f:/go/src/github.com/ory-am/hydra#
 ```
 

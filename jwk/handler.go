@@ -13,6 +13,12 @@ import (
 	"github.com/square/go-jose"
 )
 
+const (
+	OpenIDConnectKeyName    = "hydra.openid.id-token"
+	ConsentChallengeKeyName = "hydra.consent.challenge"
+	ConsentResponseKeyName  = "hydra.consent.response"
+)
+
 type Handler struct {
 	Manager    Manager
 	Generators map[string]KeyGenerator
@@ -35,6 +41,9 @@ func (h *Handler) GetGenerators() map[string]KeyGenerator {
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET("/keys/:set/:key", h.GetKey)
+	r.GET("/.well-known/jwks.json", h.WellKnown)
+	r.POST("/keys/:set", h.Create)
+	r.PUT("/keys/:set", h.UpdateKeySet)
 	r.GET("/keys/:set", h.GetKeySet)
 
 	r.POST("/keys/:set", h.Create)
@@ -60,6 +69,72 @@ type createRequest struct {
 
 type joseWebKeySetRequest struct {
 	Keys []json.RawMessage `json:"keys"`
+}
+
+// swagger:route GET /.well-knwon/jwks.json public JWKS
+//
+// Public JWKs
+//
+// Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
+//
+// The subject making the request needs to be assigned to a policy containing:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:keys:hydra.openid.id-token:public"],
+//    "actions": ["GET"],
+//    "effect": "allow"
+//  }
+//  ```
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2: hydra.keys.get
+//
+//     Responses:
+//       200: jwkSet
+//       401: genericError
+//       403: genericError
+//       500: genericError
+func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	var ctx = context.Background()
+	setNames := []string{ConsentChallengeKeyName, OpenIDConnectKeyName, ConsentResponseKeyName}
+	keyArr := make([]jose.JsonWebKey, 3)
+
+	for i, set := range setNames {
+		if err := h.W.IsAllowed(ctx, &firewall.AccessRequest{
+			Subject:  "",
+			Resource: "rn:hydra:keys:" + set + ":" + "public",
+			Action:   "get",
+		}); err == nil {
+			// Allow unauthorized requests to access this resource if it is enabled by policies
+		} else if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
+			Resource: "rn:hydra:keys:" + set + ":" + "public",
+			Action:   "get",
+		}, "hydra.keys.get"); err != nil {
+			h.H.WriteError(w, r, err)
+			return
+		}
+
+		keys, err := h.Manager.GetKey(set, "public")
+		if err != nil {
+			h.H.WriteError(w, r, err)
+			return
+		}
+		keyArr[i] = keys.Keys[0]
+	}
+	keySet := jose.JsonWebKeySet{
+		Keys: keyArr,
+	}
+
+	h.H.Write(w, r, keySet)
 }
 
 // swagger:route GET /keys/{set}/{kid} jwks getJwkSetKey

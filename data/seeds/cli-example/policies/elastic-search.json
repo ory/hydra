@@ -1,0 +1,20 @@
+{
+  "id": "elastic_search",
+  "description": "Grant account users GET/POST access to their elastic search count and query resources.",
+  "subjects": [
+    "<(account|brand)-(admin|viewer)>"
+  ],
+  "effect": "allow",
+  "resources": [
+    "rn:bridg:search:<[A-z0-9_-]+:[A-z_-]+:(_search|_count)>",
+    "rn:bridg:accounts:<[A-z0-9_-]+:(brands:[A-z0-9_-]+:)?search:([A-z_-]+)?:(_search|_count)>"
+  ],
+  "actions": [
+    "create", "read"
+  ],
+  "conditions": {
+    "account-ids": {
+      "type": "StringPairsEqualCondition"
+    }
+  }
+}

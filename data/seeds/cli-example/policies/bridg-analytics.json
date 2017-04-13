@@ -1,0 +1,16 @@
+{
+  "id": "bridg_analytics",
+  "description": "Give bridg's analytics client access to Bridg's analytics and campaigns resources.",
+  "subjects": [
+    "bridg-analytics"
+  ],
+  "effect": "allow",
+  "resources": [
+    "rn:bridg:<(accounts:[0-9A-z_-]+:brands:[0-9A-z_-]+:)?(analytics|campaigns)(:.+)?>",
+    "rn:bridg:<accounts:[0-9A-z_-]+:brands:[0-9A-z_-]+>"
+  ],
+  "actions": [
+    "create", "read", "update", "delete"
+  ],
+  "conditions": {}
+}

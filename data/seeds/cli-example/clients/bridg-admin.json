@@ -1,0 +1,27 @@
+{
+  "id": "bridg-admin",
+  "client_name": "Bridg Admin",
+  "client_secret": "bridg-admin",
+  "owner": "eng@bridg.com",
+  "public": true,
+  "scope": "hydra openid offline bridg",
+  "redirect_uris": [
+    "https://admin.bridg.com/oauth2/callback",
+    "https://admin.towerbridg.com/oauth2/callback",
+    "http://admin.localbridg.com:3001/oauth2/callback"
+  ],
+  "grant_types": [
+    "implicit"
+  ],
+  "response_types": [
+    "id_token",
+    "token"
+  ],
+  "policy_uri": "",
+  "tos_uri": "",
+  "client_uri": "https://app.bridg.com/",
+  "logo_uri": "",
+  "contacts": [
+    "eng@bridg.com"
+  ]
+}

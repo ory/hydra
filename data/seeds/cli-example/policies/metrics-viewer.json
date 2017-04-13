@@ -1,0 +1,14 @@
+{
+  "id": "metrics_veiwer",
+  "description": "Grants access to query metrics data. The metrics service authorizes queryies internally, using the X-Auth-* headers passed by the API gateway. For this reason, these endpoints aren't account/brand scoped. Note: Queries require a POST, so write permission is specified here even though it is a read operation.",
+  "subjects": [
+    "<(account|brand)-(admin|viewer)>"
+  ],
+  "effect": "allow",
+  "resources": [
+    "rn:bridg:metrics:query"
+  ],
+  "actions": [
+    "create"
+  ]
+}

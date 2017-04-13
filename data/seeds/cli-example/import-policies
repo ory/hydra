@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+hydra policies create \
+  -f 'policies/bridg-api-gateway.json' \
+  -f 'policies/bridg-login.json'

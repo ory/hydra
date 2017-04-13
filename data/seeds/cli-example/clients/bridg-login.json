@@ -1,0 +1,33 @@
+{
+  "id": "bridg-login",
+  "client_name": "Bridg Login",
+  "client_secret": "bridg-login",
+  "owner": "eng@bridg.com",
+  "scope": "hydra offline openid bridg",
+  "public": false,
+  "redirect_uris": [
+    "https://login.bridg.com/callback",
+    "https://login.towerbridg.com/callback",
+    "http://login.localbridg.com:3010/callback",
+    "https://login.localbridg.com:3010/callback"
+  ],
+  "grant_types": [
+    "authorization_code",
+    "client_credentials",
+    "implicit",
+    "refresh_token"
+  ],
+  "response_types": [
+    "code",
+    "id_token",
+    "token"
+  ],
+  "policy_uri": "",
+  "tos_uri": "",
+  "client_uri": "https://login.bridg.com/",
+  "logo_uri": "",
+  "contacts": [
+    "eng@bridg.com",
+    "eric@bridg.com"
+  ]
+}

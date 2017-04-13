@@ -1,0 +1,32 @@
+{
+  "id": "bridg-superclient",
+  "client_name": "Bridg Super Client",
+  "client_secret": "bridg-superclient",
+  "owner": "eng@bridg.com",
+  "scope": "hydra offline openid bridg",
+  "public": false,
+  "redirect_uris": [
+    "http://localhost:4445/callback"
+  ],
+  "grant_types": [
+    "authorization_code",
+    "client_credentials",
+    "implicit",
+    "refresh_token",
+    "password"
+  ],
+  "response_types": [
+    "code",
+    "id_token",
+    "token"
+  ],
+  "policy_uri": "",
+  "tos_uri": "",
+  "client_uri": "",
+  "logo_uri": "",
+  "contacts": [
+    "eng@bridg.com",
+    "eric@bridg.com",
+    "ticean@bridg.com"
+  ]
+}

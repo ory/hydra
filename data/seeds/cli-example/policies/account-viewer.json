@@ -1,0 +1,19 @@
+{
+  "id": "account_viewer",
+  "description": "Allow account users full read access to Bridg's account resources.",
+  "subjects": [
+    "account-viewer"
+  ],
+  "effect": "allow",
+  "resources": [
+    "rn:bridg:<(accounts|users):[A-z0-9_-]+(:.+)?>"
+  ],
+  "actions": [
+    "read"
+  ],
+  "conditions": {
+    "account-ids": {
+      "type": "StringPairsEqualCondition"
+    }
+  }
+}

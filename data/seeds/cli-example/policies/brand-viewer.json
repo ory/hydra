@@ -1,0 +1,22 @@
+{
+  "id": "brand_viewer",
+  "description": "Allow brand users full read access to Bridg's brand resources.",
+  "subjects": [
+    "brand-viewer"
+  ],
+  "effect": "allow",
+  "resources": [
+    "rn:bridg:accounts:<[A-z0-9_-]+:brands(:.+)?>"
+  ],
+  "actions": [
+    "read"
+  ],
+  "conditions": {
+    "account-ids": {
+      "type": "StringPairsEqualCondition"
+    },
+    "brand-ids": {
+      "type": "StringPairsEqualCondition"
+    }
+  }
+}

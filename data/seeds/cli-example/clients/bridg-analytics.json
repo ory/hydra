@@ -1,0 +1,21 @@
+{
+  "id": "bridg-analytics",
+  "client_name": "Bridg Analytics",
+  "client_secret": "bridg-analytics",
+  "owner": "eng@bridg.com",
+  "redirect_uris": [],
+  "grant_types": [
+    "client_credentials"
+  ],
+  "response_types": [],
+  "scope": "bridg",
+  "owner": "eng@bridg.com",
+  "policy_uri": "",
+  "tos_uri": "",
+  "client_uri": "",
+  "logo_uri": "",
+  "contacts": [
+    "eng@bridg.com"
+  ],
+  "public": false
+}

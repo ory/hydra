@@ -1,0 +1,25 @@
+{
+  "id": "brand_admin",
+  "description": "Allow brand admins full access to Bridg's brand resources.",
+  "subjects": [
+    "brand-admin"
+  ],
+  "effect": "allow",
+  "resources": [
+    "rn:bridg:accounts:<[A-z0-9_-]+:brands(:.+)?>"
+  ],
+  "actions": [
+    "create",
+    "read",
+    "update",
+    "delete"
+  ],
+  "conditions": {
+    "account-ids": {
+      "type": "StringPairsEqualCondition"
+    },
+    "brand-ids": {
+      "type": "StringPairsEqualCondition"
+    }
+  }
+}

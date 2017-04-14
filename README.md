@@ -88,7 +88,7 @@ there are numerous demands, such as
 * management user interfaces.
 * ... and a wide range of narrow use cases specific to each business demands.
 
-Gain access to more features and our security experts through our yearly licensed enterprise edition of Hydra. **[Contact us now](mailto:hi@ory.am) for more details.**
+Gain access to more features and our security experts with our new enterprise edition of Hydra. **[Contact us now](mailto:hi@ory.am) for more details.**
 
 ## Quickstart
 

@@ -1,5 +1,5 @@
-hash: 392a6868a591cdd45ea1edc5454cd85f46357bdb02c765af64cdeab7c3531f70
-updated: 2017-04-14T11:48:54.5981025+02:00
+hash: 26dc5b3174bda540fc13d9559300387ce0a6c31228f4d687243504cb961459fb
+updated: 2017-04-14T17:39:19.4443314+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
@@ -237,14 +237,6 @@ imports:
   version: c87af80f3cc5036b55b83d77171e156791085e2e
 - name: gopkg.in/ory-am/dockertest.v3
   version: e4828e807797a7641fcd457716870dfc2f9e82ff
-- name: gopkg.in/redis.v5
-  version: a16aeec10ff407b1e7be6dd35797ccf5426ef0f0
-  subpackages:
-  - internal
-  - internal/consistenthash
-  - internal/hashtag
-  - internal/pool
-  - internal/proto
 - name: gopkg.in/square/go-jose.v1
   version: aa2e30fdd1fe9dd3394119af66451ae790d50e0d
   subpackages:

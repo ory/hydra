@@ -10,7 +10,7 @@ import (
 	"github.com/ory-am/hydra/client"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
-	"gopkg.in/redis.v5"
+	"github.com/go-redis/redis"
 )
 
 type FositeRedisStore struct {

@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/gorethink/gorethink.v3"
 )
 
 var cert1 = `-----BEGIN CERTIFICATE-----

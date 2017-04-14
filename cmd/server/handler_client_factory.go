@@ -7,7 +7,7 @@ import (
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/herodot"
 	"golang.org/x/net/context"
-	r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/gorethink/gorethink.v3"
 )
 
 func newClientManager(c *config.Config) client.Manager {

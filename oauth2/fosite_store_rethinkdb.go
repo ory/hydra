@@ -12,7 +12,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
-	r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/gorethink/gorethink.v3"
 )
 
 type RDBItems map[string]*RdbSchema

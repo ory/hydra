@@ -15,6 +15,7 @@ import:
 - package: github.com/meatballhat/negroni-logrus
 - package: github.com/moul/http2curl
 - package: github.com/ory-am/common
+  version: ~0.4.0
   subpackages:
   - pkg
   - rand/sequence
@@ -28,7 +29,7 @@ import:
   - token/hmac
   - token/jwt
 - package: github.com/ory-am/ladon
-  version: ^0.4.2
+  version: ^0.5.0
 - package: github.com/pborman/uuid
   version: ^1.0.0
 - package: github.com/pkg/errors

@@ -1,5 +1,5 @@
-hash: 9fba49e55487f47cfd776774f0255ed9f35e486596628e18e186e70c4abb6d6e
-updated: 2017-03-15T18:48:18.5196769+01:00
+hash: 392a6868a591cdd45ea1edc5454cd85f46357bdb02c765af64cdeab7c3531f70
+updated: 2017-04-14T11:34:42.7807596+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
@@ -57,6 +57,14 @@ imports:
   version: 54fbd1ff920ca5fd5ec53068d513c14c3a25bba9
 - name: github.com/go-errors/errors
   version: 8fa88b06e5974e97fbf9899a7f86a344bfd1f105
+- name: github.com/go-redis/redis
+  version: 62ecc61210cb7dd8ca9aebb8bebbc849c358383b
+  subpackages:
+  - internal
+  - internal/consistenthash
+  - internal/hashtag
+  - internal/pool
+  - internal/proto
 - name: github.com/go-sql-driver/mysql
   version: a0583e0143b1624142adab07e0e97fe106d99561
 - name: github.com/golang/protobuf
@@ -116,13 +124,13 @@ imports:
   - libcontainer/system
   - libcontainer/user
 - name: github.com/ory-am/common
-  version: eaf2f2a2e18295ffc4e89d07a9556903d22b4e79
+  version: b6357395e30805e2ad1f6d8fb759fa2b7146d8da
   subpackages:
   - compiler
   - pkg
   - rand/sequence
 - name: github.com/ory-am/fosite
-  version: 9b33931ee14ae0768ea46a423d569330a85b482e
+  version: ad395bf323137e30ce12d40646a9229a42695863
   subpackages:
   - compose
   - handler/oauth2
@@ -131,7 +139,7 @@ imports:
   - token/hmac
   - token/jwt
 - name: github.com/ory-am/ladon
-  version: 0f3e57d0f4a3d5c45cf4f087c4d987b1981f78a2
+  version: c7c7754c7b466db0a7d18c53254672c78aeea664
 - name: github.com/pborman/uuid
   version: a97ce2ca70fa5a848076093f05e639a89ca34d06
 - name: github.com/pelletier/go-buffruneio
@@ -230,7 +238,7 @@ imports:
 - name: gopkg.in/ory-am/dockertest.v3
   version: e4828e807797a7641fcd457716870dfc2f9e82ff
 - name: gopkg.in/redis.v5
-  version: 8fcba2ea878201b70c5a63dd416141d4ddbc601a
+  version: a16aeec10ff407b1e7be6dd35797ccf5426ef0f0
   subpackages:
   - internal
   - internal/consistenthash

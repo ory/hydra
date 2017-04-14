@@ -1,0 +1,13 @@
+{
+  "description": "Allow everyone including anonymous users to read JSON Web Keys having Key ID *public*.",
+  "subjects": [
+    "<.*>"
+  ],
+  "effect": "allow",
+  "resources": [
+    "rn:hydra:keys:<[^:]+>:public"
+  ],
+  "actions": [
+    "get"
+  ]
+}

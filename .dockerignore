@@ -1,0 +1,5 @@
+vendor/
+.idea/
+.vagrant/
+docs/
+dist/

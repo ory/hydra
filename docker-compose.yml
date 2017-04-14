@@ -1,0 +1,81 @@
+###########################################################################
+#######             FOR DEMONSTRATION PURPOSES ONLY                 #######
+###########################################################################
+#                                                                         #
+# If you have not yet read the tutorial, do so now:                       #
+#  https://ory-am.gitbooks.io/hydra/content/tutorial.html                 #
+#                                                                         #
+# This set up is only for demonstration purposes. The login               #
+# endpoint can only be used if you follow the steps in the tutorial.      #
+#                                                                         #
+###########################################################################
+
+version: '2'
+
+services:
+
+  hydra:
+    build:
+      context: .
+      dockerfile: Dockerfile-demo
+    links:
+      - postgresd:postgresd
+#     Uncomment the following line to use mysql instead.
+#      - mysqld:mysqld
+#     Uncomment the following line to use redis instead.
+#      - redisd:redisd
+    volumes:
+      - hydravolume:/root
+    ports:
+      - "4444:4444"
+      - "4445:4445"
+    environment:
+      - LOG_LEVEL=${LOG_LEVEL}
+      - SYSTEM_SECRET=${SYSTEM_SECRET}
+      - CONSENT_URL=http://${DOCKER_IP}:3000/consent
+      - DATABASE_URL=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable
+#     Uncomment the following line to use mysql instead.
+#      - DATABASE_URL=mysql://root:secret@tcp(mysqld:3306)/mysql?parseTime=true
+#     Uncomment the following line to use redis instead.
+#      - DATABASE_URL=redis://redisd:6379/0
+      - FORCE_ROOT_CLIENT_CREDENTIALS=admin:demo-password
+      - ACCESS_TOKEN_LIFESPAN=${ACCESS_TOKEN_LIFESPAN}
+      - ID_TOKEN_LIFESPAN=${ID_TOKEN_LIFESPAN}
+      - AUTHORIZE_CODE_LIFESPAN=${AUTHORIZE_CODE_LIFESPAN}
+    restart: unless-stopped
+
+  consent:
+    environment:
+      - HYDRA_URL=http://hydra:4444
+      - HYDRA_CLIENT_ID=admin
+      - HYDRA_CLIENT_SECRET=demo-password
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+    image: oryd/hydra-consent-app-express:v0.1.3
+    links:
+      - hydra
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+  postgresd:
+    image: postgres:9.6
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=hydra
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=hydra
+
+#  Uncomment the following section to use mysql instead.
+#  mysqld:
+#    image: mysql:5.7
+#    environment:
+#      - MYSQL_ROOT_PASSWORD=secret
+
+#  Uncomment the following section to use redis instead.
+#  redisd:
+#    image: redis:3.2
+
+volumes:
+  hydravolume:
+    driver: local

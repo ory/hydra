@@ -1,0 +1,5 @@
+{
+    "root": "./docs",
+    "author": "Aeneas Rekkas",
+    "gitbook": ">=3.2.0"
+}

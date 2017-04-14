@@ -42,6 +42,7 @@ the access control SDK [Ladon](https://github.com/ory/ladon).
 **Table of Contents**
 
 - [What is Hydra?](#what-is-hydra)
+- [Enterprise Edition](#enterprise-edition)
 - [Quickstart](#quickstart)
   - [5 minutes tutorial: Run your very own OAuth2 environment](#5-minutes-tutorial-run-your-very-own-oauth2-environment)
   - [Installation](#installation)
@@ -74,6 +75,14 @@ Hydra implements the flows described in OAuth2 and OpenID Connect 1.0 without fo
 or some template engine or a predefined front-end. Instead it relies on HTTP redirection and cryptographic methods
 to verify user consent allowing you to use Hydra with any authentication endpoint, be it [authboss](https://github.com/go-authboss/authboss),
 [auth0.com](https://auth0.com/) or your proprietary PHP authentication.
+
+## Enterprise Edition
+
+Hydra is available as an Apache 2.0-licensed Open Source technology. In enterprise environments however,
+there are numerous demands, ranging from consulting to auditing to certification to enterprise integration to technical
+support and a wide range narrow use cases. To address those issues, we are launching an enterprise edition of Hydra.
+
+**[Contact us now](mailto:hi@ory.am) for more details.**
 
 ## Quickstart
 

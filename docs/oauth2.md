@@ -173,7 +173,6 @@ that contains the following claims:
     "hydra"
   ],
   "sub": "john.doe@me.com",
-  "uname": "John Doe",
   "iat": 1464511515,
   "id_ext": { "foo": "bar" },
   "at_ext": { "baz": true }
@@ -188,7 +187,6 @@ The consent claims are:
 client data using the [OAuth2 Client API](http://docs.hydra13.apiary.io/#reference/oauth2/manage-the-oauth2-client-collection).
 * **exp:** The expiry date of this token. Use very short lifespans (< 10 min).
 * **iat:** The tokens issuance time.
-* **uname:** You can set an arbitrary, non-unique username which will be echoed in the token introspection. *(optional)*
 * **id_ext:** If set, pass this extra data to the id token. This data is not available at OAuth2 Token Introspection
  nor at the warden endpoints. *(optional)*
 * **at_ext:** If set, pass this extra data to the access token session. You can retrieve the data

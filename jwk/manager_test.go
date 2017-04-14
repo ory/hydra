@@ -19,7 +19,7 @@ import (
 	"github.com/square/go-jose"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
-	r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/gorethink/gorethink.v3"
 	"io"
 	"log"
 	"net/http"

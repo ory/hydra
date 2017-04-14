@@ -1,7 +1,7 @@
 package client_test
 
 import (
-	r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/gorethink/gorethink.v3"
 	"log"
 	"net/http/httptest"
 	"net/url"

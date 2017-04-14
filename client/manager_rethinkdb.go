@@ -11,7 +11,7 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
-	r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/gorethink/gorethink.v3"
 )
 
 type RethinkManager struct {

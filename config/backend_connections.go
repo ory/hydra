@@ -16,7 +16,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
-	r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/gorethink/gorethink.v3"
 	"gopkg.in/redis.v5"
 	"strings"
 )

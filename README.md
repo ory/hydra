@@ -79,10 +79,16 @@ to verify user consent allowing you to use Hydra with any authentication endpoin
 ## Enterprise Edition
 
 Hydra is available as an Apache 2.0-licensed Open Source technology. In enterprise environments however,
-there are numerous demands, ranging from consulting to auditing to certification to enterprise integration to technical
-support and a wide range narrow use cases. To address those issues, we are launching an enterprise edition of Hydra.
+there are numerous demands, such as
 
-**[Contact us now](mailto:hi@ory.am) for more details.**
+* OAuth 2.0 and OpenID Connect consulting.
+* security auditing and certification.
+* auditable log trails.
+* guaranteed performance metrics, such as throughput per second.
+* management user interfaces.
+* ... and a wide range of narrow use cases specific to each business demands.
+
+Gain access to more features and our security experts through our yearly licensed enterprise edition of Hydra. **[Contact us now](mailto:hi@ory.am) for more details.**
 
 ## Quickstart
 

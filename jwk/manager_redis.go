@@ -7,7 +7,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pkg/errors"
 	"github.com/square/go-jose"
-	"gopkg.in/redis.v5"
+	"github.com/go-redis/redis"
 )
 
 type RedisManager struct {

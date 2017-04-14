@@ -10,7 +10,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"gopkg.in/ory-am/dockertest.v3"
-	"gopkg.in/redis.v5"
+	"github.com/go-redis/redis"
 )
 
 var resources []*dockertest.Resource

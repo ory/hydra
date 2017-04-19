@@ -27,6 +27,10 @@ func (c *Client) GetID() string {
 	return c.ID
 }
 
+func (c *Client) GetName() string {
+	return c.Name
+}
+
 func (c *Client) GetRedirectURIs() []string {
 	return c.RedirectURIs
 }

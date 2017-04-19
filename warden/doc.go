@@ -4,7 +4,7 @@
 //
 // - https://ory-am.gitbooks.io/hydra/content/policy.html
 //
-// - http://docs.hdyra.apiary.io/#reference/warden:-access-control-for-resource-providers
+// - http://docs.hydra13.apiary.io/#reference/warden:-access-control-for-resource-providers
 //
 // Contains source files:
 //

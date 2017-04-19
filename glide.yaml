@@ -15,6 +15,7 @@ import:
 - package: github.com/meatballhat/negroni-logrus
 - package: github.com/moul/http2curl
 - package: github.com/ory-am/common
+  version: ~0.4.0
   subpackages:
   - pkg
   - rand/sequence
@@ -28,7 +29,7 @@ import:
   - token/hmac
   - token/jwt
 - package: github.com/ory-am/ladon
-  version: ^0.4.2
+  version: ^0.5.0
 - package: github.com/pborman/uuid
   version: ^1.0.0
 - package: github.com/pkg/errors
@@ -46,8 +47,6 @@ import:
   subpackages:
   - assert
   - require
-- package: github.com/docker/docker
-  version: ~v1.13.0-rc2
 - package: github.com/toqueteos/webbrowser
   version: ^1.0.0
 - package: github.com/urfave/negroni
@@ -60,13 +59,15 @@ import:
   - clientcredentials
 - package: gopkg.in/dancannon/gorethink.v2
   version: ~3.0.0
-- package: github.com/ory-am/dockertest
-  version: v3.0.3
-- package: gopkg.in/redis.v5
-  version: ^5.1.2
+- package: github.com/go-redis/redis
+  version: ^6.1.3
 - package: gopkg.in/tylerb/graceful.v1
   version: ^1.2.13
 - package: gopkg.in/yaml.v2
 testImport:
 - package: github.com/gorilla/mux
   version: ^1.1.0
+- package: github.com/ory-am/dockertest
+  version: v3.0.3
+- package: github.com/docker/docker
+  version: ~v1.13.0-rc2

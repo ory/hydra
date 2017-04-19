@@ -1,8 +1,8 @@
 package policy
 
 import (
-	"github.com/ory-am/ladon"
 	"github.com/jmoiron/sqlx"
+	"github.com/ory-am/ladon"
 	"github.com/rubenv/sql-migrate"
 )
 

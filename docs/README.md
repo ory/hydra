@@ -8,7 +8,7 @@ and the <a href="http://openid.net/specs/openid-connect-core-1_0.html">OpenID Co
 </h4>
 
 This is the user guide, you might be looking for the [GitHub Repository](http://github.com/ory-am/hydra), the
-[HTTP REST API Documentation](http://docs.hdyra.apiary.io/) or
+[HTTP REST API Documentation](http://docs.hydra13.apiary.io/) or
 the [Language-Level API Documentation](https://godoc.org/github.com/ory-am/hydra) instead.
 
 <hr>

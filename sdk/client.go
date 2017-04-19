@@ -51,6 +51,9 @@ type Client struct {
 	// Groups offers warden group management capabilities.
 	Groups *group.HTTPManager
 
+	// Consent helps you verify consent challenges and sign consent responses.
+	Consent *Consent
+
 	http          *http.Client
 	clusterURL    *url.URL
 	clientID      string
@@ -145,6 +148,10 @@ func Connect(opts ...option) (*Client, error) {
 	c.Groups = &group.HTTPManager{
 		Endpoint: pkg.JoinURL(c.clusterURL, "/warden/groups"),
 		Client:   c.http,
+	}
+
+	c.Consent = &Consent{
+		KeyManager: c.JSONWebKeys,
 	}
 
 	return c, nil

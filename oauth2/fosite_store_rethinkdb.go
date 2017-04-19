@@ -12,12 +12,12 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
-	r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/gorethink/gorethink.v3"
 )
 
 type RDBItems map[string]*RdbSchema
 
-type FositeRehinkDBStore struct {
+type FositeRethinkDBStore struct {
 	Session *r.Session
 	sync.RWMutex
 
@@ -64,7 +64,7 @@ func requestFromRDB(s *RdbSchema, proto fosite.Session) (*fosite.Request, error)
 	return d, nil
 }
 
-func (m *FositeRehinkDBStore) ColdStart() error {
+func (m *FositeRethinkDBStore) ColdStart() error {
 	if err := m.AccessTokens.coldStart(m.Session, &m.RWMutex, m.AccessTokensTable); err != nil {
 		return err
 	} else if err := m.AuthorizeCodes.coldStart(m.Session, &m.RWMutex, m.AuthorizeCodesTable); err != nil {
@@ -77,7 +77,7 @@ func (m *FositeRehinkDBStore) ColdStart() error {
 	return nil
 }
 
-func (s *FositeRehinkDBStore) publishInsert(table r.Term, id string, requester fosite.Requester) error {
+func (s *FositeRethinkDBStore) publishInsert(table r.Term, id string, requester fosite.Requester) error {
 	sess, err := json.Marshal(requester.GetSession())
 	if err != nil {
 		return errors.WithStack(err)
@@ -98,14 +98,14 @@ func (s *FositeRehinkDBStore) publishInsert(table r.Term, id string, requester f
 	return nil
 }
 
-func (s *FositeRehinkDBStore) publishDelete(table r.Term, id string) error {
+func (s *FositeRethinkDBStore) publishDelete(table r.Term, id string) error {
 	if _, err := table.Get(id).Delete().RunWrite(s.Session); err != nil {
 		return errors.WithStack(err)
 	}
 	return nil
 }
 
-func (s *FositeRehinkDBStore) waitFor(i RDBItems, id string) error {
+func (s *FositeRethinkDBStore) waitFor(i RDBItems, id string) error {
 	c := make(chan bool)
 
 	go func() {
@@ -135,14 +135,14 @@ func (s *FositeRehinkDBStore) waitFor(i RDBItems, id string) error {
 	}
 }
 
-func (s *FositeRehinkDBStore) CreateOpenIDConnectSession(_ context.Context, authorizeCode string, requester fosite.Requester) error {
+func (s *FositeRethinkDBStore) CreateOpenIDConnectSession(_ context.Context, authorizeCode string, requester fosite.Requester) error {
 	if err := s.publishInsert(s.IDSessionsTable, authorizeCode, requester); err != nil {
 		return err
 	}
 	return s.waitFor(s.IDSessions, authorizeCode)
 }
 
-func (s *FositeRehinkDBStore) GetOpenIDConnectSession(_ context.Context, authorizeCode string, requester fosite.Requester) (fosite.Requester, error) {
+func (s *FositeRethinkDBStore) GetOpenIDConnectSession(_ context.Context, authorizeCode string, requester fosite.Requester) (fosite.Requester, error) {
 	s.RLock()
 	defer s.RUnlock()
 	cl, ok := s.IDSessions[authorizeCode]
@@ -152,18 +152,18 @@ func (s *FositeRehinkDBStore) GetOpenIDConnectSession(_ context.Context, authori
 	return requestFromRDB(cl, requester.GetSession())
 }
 
-func (s *FositeRehinkDBStore) DeleteOpenIDConnectSession(_ context.Context, authorizeCode string) error {
+func (s *FositeRethinkDBStore) DeleteOpenIDConnectSession(_ context.Context, authorizeCode string) error {
 	return s.publishDelete(s.IDSessionsTable, authorizeCode)
 }
 
-func (s *FositeRehinkDBStore) CreateAuthorizeCodeSession(_ context.Context, code string, requester fosite.Requester) error {
+func (s *FositeRethinkDBStore) CreateAuthorizeCodeSession(_ context.Context, code string, requester fosite.Requester) error {
 	if err := s.publishInsert(s.AuthorizeCodesTable, code, requester); err != nil {
 		return err
 	}
 	return s.waitFor(s.AuthorizeCodes, code)
 }
 
-func (s *FositeRehinkDBStore) GetAuthorizeCodeSession(_ context.Context, code string, sess fosite.Session) (fosite.Requester, error) {
+func (s *FositeRethinkDBStore) GetAuthorizeCodeSession(_ context.Context, code string, sess fosite.Session) (fosite.Requester, error) {
 	s.RLock()
 	defer s.RUnlock()
 	rel, ok := s.AuthorizeCodes[code]
@@ -174,18 +174,18 @@ func (s *FositeRehinkDBStore) GetAuthorizeCodeSession(_ context.Context, code st
 	return requestFromRDB(rel, sess)
 }
 
-func (s *FositeRehinkDBStore) DeleteAuthorizeCodeSession(_ context.Context, code string) error {
+func (s *FositeRethinkDBStore) DeleteAuthorizeCodeSession(_ context.Context, code string) error {
 	return s.publishDelete(s.AuthorizeCodesTable, code)
 }
 
-func (s *FositeRehinkDBStore) CreateAccessTokenSession(_ context.Context, signature string, requester fosite.Requester) error {
+func (s *FositeRethinkDBStore) CreateAccessTokenSession(_ context.Context, signature string, requester fosite.Requester) error {
 	if err := s.publishInsert(s.AccessTokensTable, signature, requester); err != nil {
 		return err
 	}
 	return s.waitFor(s.AccessTokens, signature)
 }
 
-func (s *FositeRehinkDBStore) GetAccessTokenSession(_ context.Context, signature string, sess fosite.Session) (fosite.Requester, error) {
+func (s *FositeRethinkDBStore) GetAccessTokenSession(_ context.Context, signature string, sess fosite.Session) (fosite.Requester, error) {
 	s.RLock()
 	defer s.RUnlock()
 	rel, ok := s.AccessTokens[signature]
@@ -196,18 +196,18 @@ func (s *FositeRehinkDBStore) GetAccessTokenSession(_ context.Context, signature
 	return requestFromRDB(rel, sess)
 }
 
-func (s *FositeRehinkDBStore) DeleteAccessTokenSession(_ context.Context, signature string) error {
+func (s *FositeRethinkDBStore) DeleteAccessTokenSession(_ context.Context, signature string) error {
 	return s.publishDelete(s.AccessTokensTable, signature)
 }
 
-func (s *FositeRehinkDBStore) CreateRefreshTokenSession(_ context.Context, signature string, requester fosite.Requester) error {
+func (s *FositeRethinkDBStore) CreateRefreshTokenSession(_ context.Context, signature string, requester fosite.Requester) error {
 	if err := s.publishInsert(s.RefreshTokensTable, signature, requester); err != nil {
 		return err
 	}
 	return s.waitFor(s.RefreshTokens, signature)
 }
 
-func (s *FositeRehinkDBStore) GetRefreshTokenSession(_ context.Context, signature string, sess fosite.Session) (fosite.Requester, error) {
+func (s *FositeRethinkDBStore) GetRefreshTokenSession(_ context.Context, signature string, sess fosite.Session) (fosite.Requester, error) {
 	s.RLock()
 	defer s.RUnlock()
 	rel, ok := s.RefreshTokens[signature]
@@ -218,15 +218,15 @@ func (s *FositeRehinkDBStore) GetRefreshTokenSession(_ context.Context, signatur
 	return requestFromRDB(rel, sess)
 }
 
-func (s *FositeRehinkDBStore) DeleteRefreshTokenSession(_ context.Context, signature string) error {
+func (s *FositeRethinkDBStore) DeleteRefreshTokenSession(_ context.Context, signature string) error {
 	return s.publishDelete(s.RefreshTokensTable, signature)
 }
 
-func (s *FositeRehinkDBStore) CreateImplicitAccessTokenSession(ctx context.Context, code string, req fosite.Requester) error {
+func (s *FositeRethinkDBStore) CreateImplicitAccessTokenSession(ctx context.Context, code string, req fosite.Requester) error {
 	return s.CreateAccessTokenSession(ctx, code, req)
 }
 
-func (s *FositeRehinkDBStore) PersistAuthorizeCodeGrantSession(ctx context.Context, authorizeCode, accessSignature, refreshSignature string, request fosite.Requester) error {
+func (s *FositeRethinkDBStore) PersistAuthorizeCodeGrantSession(ctx context.Context, authorizeCode, accessSignature, refreshSignature string, request fosite.Requester) error {
 	if err := s.DeleteAuthorizeCodeSession(ctx, authorizeCode); err != nil {
 		return err
 	} else if err := s.CreateAccessTokenSession(ctx, accessSignature, request); err != nil {
@@ -244,7 +244,7 @@ func (s *FositeRehinkDBStore) PersistAuthorizeCodeGrantSession(ctx context.Conte
 	return nil
 }
 
-func (s *FositeRehinkDBStore) PersistRefreshTokenGrantSession(ctx context.Context, originalRefreshSignature, accessSignature, refreshSignature string, request fosite.Requester) error {
+func (s *FositeRethinkDBStore) PersistRefreshTokenGrantSession(ctx context.Context, originalRefreshSignature, accessSignature, refreshSignature string, request fosite.Requester) error {
 	if err := s.DeleteRefreshTokenSession(ctx, originalRefreshSignature); err != nil {
 		return err
 	} else if err := s.CreateAccessTokenSession(ctx, accessSignature, request); err != nil {
@@ -256,7 +256,7 @@ func (s *FositeRehinkDBStore) PersistRefreshTokenGrantSession(ctx context.Contex
 	return nil
 }
 
-func (m *FositeRehinkDBStore) Watch(ctx context.Context) {
+func (m *FositeRethinkDBStore) Watch(ctx context.Context) {
 	m.AccessTokens.watch(ctx, m.Session, &m.RWMutex, m.AccessTokensTable)
 	m.AuthorizeCodes.watch(ctx, m.Session, &m.RWMutex, m.AuthorizeCodesTable)
 	m.IDSessions.watch(ctx, m.Session, &m.RWMutex, m.IDSessionsTable)
@@ -318,7 +318,7 @@ func (items RDBItems) watch(ctx context.Context, sess *r.Session, lock *sync.RWM
 	})
 }
 
-func (s *FositeRehinkDBStore) RevokeRefreshToken(ctx context.Context, id string) error {
+func (s *FositeRethinkDBStore) RevokeRefreshToken(ctx context.Context, id string) error {
 	var found bool
 	for sig, token := range s.RefreshTokens {
 		if token.RequestID == id {
@@ -334,7 +334,7 @@ func (s *FositeRehinkDBStore) RevokeRefreshToken(ctx context.Context, id string)
 	return nil
 }
 
-func (s *FositeRehinkDBStore) RevokeAccessToken(ctx context.Context, id string) error {
+func (s *FositeRethinkDBStore) RevokeAccessToken(ctx context.Context, id string) error {
 	var found bool
 	for sig, token := range s.AccessTokens {
 		if token.RequestID == id {

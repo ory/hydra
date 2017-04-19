@@ -1,5 +1,5 @@
-hash: 1bf4f67c1123a3703e85cd0a7c801bbcf41b9f12c7a155edfdbc5eac228af080
-updated: 2017-02-24T10:33:46.3321695+01:00
+hash: 26dc5b3174bda540fc13d9559300387ce0a6c31228f4d687243504cb961459fb
+updated: 2017-04-14T17:39:19.4443314+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
@@ -57,6 +57,14 @@ imports:
   version: 54fbd1ff920ca5fd5ec53068d513c14c3a25bba9
 - name: github.com/go-errors/errors
   version: 8fa88b06e5974e97fbf9899a7f86a344bfd1f105
+- name: github.com/go-redis/redis
+  version: 62ecc61210cb7dd8ca9aebb8bebbc849c358383b
+  subpackages:
+  - internal
+  - internal/consistenthash
+  - internal/hashtag
+  - internal/pool
+  - internal/proto
 - name: github.com/go-sql-driver/mysql
   version: a0583e0143b1624142adab07e0e97fe106d99561
 - name: github.com/golang/protobuf
@@ -116,15 +124,13 @@ imports:
   - libcontainer/system
   - libcontainer/user
 - name: github.com/ory-am/common
-  version: eaf2f2a2e18295ffc4e89d07a9556903d22b4e79
+  version: b6357395e30805e2ad1f6d8fb759fa2b7146d8da
   subpackages:
   - compiler
   - pkg
   - rand/sequence
-- name: github.com/ory-am/dockertest
-  version: 8445a82f8da6067ffecbb06e3f9fa2857f3bf9df
 - name: github.com/ory-am/fosite
-  version: 9b33931ee14ae0768ea46a423d569330a85b482e
+  version: ad395bf323137e30ce12d40646a9229a42695863
   subpackages:
   - compose
   - handler/oauth2
@@ -133,7 +139,7 @@ imports:
   - token/hmac
   - token/jwt
 - name: github.com/ory-am/ladon
-  version: 511d561a9a22e6f1c9eda4859673721c56375a23
+  version: c7c7754c7b466db0a7d18c53254672c78aeea664
 - name: github.com/pborman/uuid
   version: a97ce2ca70fa5a848076093f05e639a89ca34d06
 - name: github.com/pelletier/go-buffruneio
@@ -153,7 +159,7 @@ imports:
   subpackages:
   - sqlparse
 - name: github.com/Sirupsen/logrus
-  version: c078b1e43f58d563c74cebe63c85789e76ddb627
+  version: ba1b36c82c5e05c4f912a88eab0dcd91a171688f
 - name: github.com/spf13/afero
   version: 9be650865eab0c12963d8753212f4f9c66cdcf12
   subpackages:
@@ -231,14 +237,6 @@ imports:
   version: c87af80f3cc5036b55b83d77171e156791085e2e
 - name: gopkg.in/ory-am/dockertest.v3
   version: e4828e807797a7641fcd457716870dfc2f9e82ff
-- name: gopkg.in/redis.v5
-  version: 8fcba2ea878201b70c5a63dd416141d4ddbc601a
-  subpackages:
-  - internal
-  - internal/consistenthash
-  - internal/hashtag
-  - internal/pool
-  - internal/proto
 - name: gopkg.in/square/go-jose.v1
   version: aa2e30fdd1fe9dd3394119af66451ae790d50e0d
   subpackages:
@@ -251,3 +249,5 @@ imports:
 testImports:
 - name: github.com/gorilla/mux
   version: 392c28fe23e1c45ddba891b0320b3b5df220beea
+- name: github.com/ory-am/dockertest
+  version: 8445a82f8da6067ffecbb06e3f9fa2857f3bf9df

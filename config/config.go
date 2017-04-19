@@ -25,7 +25,7 @@ import (
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
-	r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/gorethink/gorethink.v3"
 	"gopkg.in/yaml.v2"
 )
 
@@ -48,7 +48,7 @@ type Config struct {
 	AuthCodeLifespan       string `mapstructure:"AUTH_CODE_LIFESPAN" yaml:"-"`
 	IDTokenLifespan        string `mapstructure:"ID_TOKEN_LIFESPAN" yaml:"-"`
 	ChallengeTokenLifespan string `mapstructure:"CHALLENGE_TOKEN_LIFESPAN" yaml:"-"`
-	CookieSecret 	       string `mapstructure:"COOKIE_SECRET" yaml:"-"`
+	CookieSecret           string `mapstructure:"COOKIE_SECRET" yaml:"-"`
 	ForceHTTP              bool   `yaml:"-"`
 
 	cluster      *url.URL     `yaml:"-"`

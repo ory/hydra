@@ -17,10 +17,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
-	r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/gorethink/gorethink.v3"
 )
 
-var rethinkManager *FositeRehinkDBStore
+var rethinkManager *FositeRethinkDBStore
 var clientManagers = map[string]pkg.FositeStorer{}
 var clientManager = &client.MemoryManager{
 	Clients: map[string]client.Client{"foobar": {ID: "foobar"}},
@@ -60,7 +60,7 @@ func connectToPG() {
 func connectToRethinkDB() {
 	var session = integration.ConnectToRethinkDB("hydra", "hydra_authorize_code", "hydra_id_sessions", "hydra_access_token", "hydra_refresh_token")
 
-	rethinkManager = &FositeRehinkDBStore{
+	rethinkManager = &FositeRethinkDBStore{
 		Session:             session,
 		AuthorizeCodesTable: r.Table("hydra_authorize_code"),
 		IDSessionsTable:     r.Table("hydra_id_sessions"),

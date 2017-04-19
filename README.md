@@ -16,7 +16,7 @@
 ---
 
 [![Docs Guide](https://img.shields.io/badge/docs-guide-blue.svg)](https://ory.gitbooks.io/hydra/content/)
-[![HTTP API Documentation](https://img.shields.io/badge/docs-http%20api-blue.svg)](http://docs.hdyra.apiary.io/)
+[![HTTP API Documentation](https://img.shields.io/badge/docs-http%20api-blue.svg)](http://docs.hydra13.apiary.io/)
 [![Code Documentation](https://img.shields.io/badge/docs-godoc-blue.svg)](https://godoc.org/github.com/ory/hydra)
 
 Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with
@@ -42,6 +42,7 @@ the access control SDK [Ladon](https://github.com/ory/ladon).
 **Table of Contents**
 
 - [What is Hydra?](#what-is-hydra)
+- [Enterprise Edition](#enterprise-edition)
 - [Quickstart](#quickstart)
   - [5 minutes tutorial: Run your very own OAuth2 environment](#5-minutes-tutorial-run-your-very-own-oauth2-environment)
   - [Installation](#installation)
@@ -75,12 +76,26 @@ or some template engine or a predefined front-end. Instead it relies on HTTP red
 to verify user consent allowing you to use Hydra with any authentication endpoint, be it [authboss](https://github.com/go-authboss/authboss),
 [auth0.com](https://auth0.com/) or your proprietary PHP authentication.
 
+## Enterprise Edition
+
+Hydra is available as an Apache 2.0-licensed Open Source technology. In enterprise environments however,
+there are numerous demands, such as
+
+* OAuth 2.0 and OpenID Connect consulting.
+* security auditing and certification.
+* auditable log trails.
+* guaranteed performance metrics, such as throughput per second.
+* management user interfaces.
+* ... and a wide range of narrow use cases specific to each business demands.
+
+Gain access to more features and our security experts with our new enterprise edition of Hydra. **[Contact us now](mailto:hi@ory.am) for more details.**
+
 ## Quickstart
 
 This section is a quickstart guide to working with Hydra. In-depth docs are available as well:
 
 * The documentation is available on [GitBook](https://ory.gitbooks.io/hydra/content/).
-* The REST API documentation is available at [Apiary](http://docs.hdyra.apiary.io).
+* The REST API documentation is available at [Apiary](http://docs.hydra13.apiary.io/).
 
 ### 5 minutes tutorial: Run your very own OAuth2 environment
 
@@ -184,7 +199,7 @@ The Guide is available on [GitBook](https://ory.gitbooks.io/hydra/content/).
 
 ### HTTP API documentation
 
-The HTTP API is documented at [Apiary](http://docs.hdyra.apiary.io).
+The HTTP API is documented at [Apiary](http://docs.hydra13.apiary.io/).
 
 ### Command line documentation
 
@@ -195,9 +210,9 @@ Run `hydra -h` or `hydra help`.
 Developing with Hydra is as easy as:
 
 ```
-go get github.com/ory/hydra
+go get github.com/ory-am/hydra
 go get github.com/Masterminds/glide
-cd $GOPATH/src/github.com/ory/hydra
+cd $GOPATH/src/github.com/ory-am/hydra
 glide install
 go test $(glide novendor)
 ```
@@ -219,6 +234,7 @@ DATABASE_URL=rethinkdb://localhost:28015/hydra go run main.go host
 
 Official:
 * [Consent App SDK For NodeJS](https://github.com/ory/hydra-js)
+* [Consent App Example written in Go](https://github.com/ory/hydra-consent-app-go)
 * [Exemplary Consent App with Express and NodeJS](https://github.com/ory/hydra-consent-app-express)
 
 Community:

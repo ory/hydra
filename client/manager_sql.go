@@ -227,17 +227,3 @@ func (m *SQLManager) GetClients() (clients map[string]Client, err error) {
 	}
 	return clients, nil
 }
-
-func (m *SQLManager) GetClientsByOwner(owner string) (clients map[string]Client, err error) {
-	var d = []sqlData{}
-	clients = make(map[string]Client)
-
-	if err := m.DB.Get(&d, m.DB.Rebind("SELECT * FROM hydra_client WHERE owner=?"), owner); err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	for _, k := range d {
-		clients[k.ID] = *k.ToClient()
-	}
-	return clients, nil
-}

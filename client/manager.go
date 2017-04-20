@@ -21,5 +21,7 @@ type Storage interface {
 
 	GetClients() (map[string]Client, error)
 
+  GetClientsByOwner(owner string) (map[string]Client, error)
+
 	GetConcreteClient(id string) (*Client, error)
 }

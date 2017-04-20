@@ -117,6 +117,31 @@ func (m *RedisManager) DeleteClient(id string) error {
 	return nil
 }
 
+func (m *RedisManager) GetClientsByOwner(owner string) (map[string]Client, error) {
+	clients := make(map[string]Client)
+
+	iter := m.DB.HScan(m.redisClientKey(), 0, "", 0).Iterator()
+	for iter.Next() {
+		if !iter.Next() {
+			break
+		}
+
+		resp := iter.Val()
+
+		var d Client
+		if err := json.Unmarshal([]byte(resp), &d); err != nil {
+			return nil, errors.WithStack(err)
+		}
+
+		clients[d.ID] = d
+	}
+	if err := iter.Err(); err != nil {
+		return nil, err
+	}
+
+	return clients, nil
+}
+
 func (m *RedisManager) GetClients() (map[string]Client, error) {
 	clients := make(map[string]Client)
 

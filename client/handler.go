@@ -30,7 +30,7 @@ const (
 )
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
-	r.GET(ClientsHandlerPath, h.GetAll)
+	r.GET(ClientsHandlerPath, h.GetBy)
 	r.POST(ClientsHandlerPath, h.Create)
 	r.GET(ClientsHandlerPath+"/:id", h.Get)
 	r.PUT(ClientsHandlerPath+"/:id", h.Update)
@@ -115,6 +115,51 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	}
 
 	h.H.WriteCreated(ctx, w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
+}
+func (h *Handler) GetBy(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	var ctx = herodot.NewContext()
+
+
+	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
+		Resource: ClientsResource,
+		Action:   "get",
+	}, Scope); err != nil {
+		h.H.WriteError(ctx, w, r, err)
+		return
+	}
+	parameters := r.URL.Query()
+	owner := parameters.Get("owner")
+  fmt.Println("owner string : ", owner)
+	if len(owner) > 0 {
+    c, err := h.Manager.GetClientsByOwner(owner)
+    if err != nil {
+  		h.H.WriteError(ctx, w, r, err)
+  		return
+  	}
+
+  	for k, cc := range c {
+  		cc.Secret = ""
+  		c[k] = cc
+  	}
+
+  	h.H.Write(ctx, w, r, c)
+
+    return
+	}
+
+  c, err := h.Manager.GetClients()
+
+	if err != nil {
+		h.H.WriteError(ctx, w, r, err)
+		return
+	}
+
+	for k, cc := range c {
+		cc.Secret = ""
+		c[k] = cc
+	}
+
+	h.H.Write(ctx, w, r, c)
 }
 
 func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

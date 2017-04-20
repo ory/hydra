@@ -95,7 +95,16 @@ func (m *MemoryManager) DeleteClient(id string) error {
 	delete(m.Clients, id)
 	return nil
 }
+func (m *MemoryManager) GetClientsByOwner(owner string) (clients map[string]Client, err error) {
+	m.RLock()
+	defer m.RUnlock()
+	clients = make(map[string]Client)
+	for _, c := range m.Clients {
+		clients[c.ID] = c
+	}
 
+	return clients, nil
+}
 func (m *MemoryManager) GetClients() (clients map[string]Client, err error) {
 	m.RLock()
 	defer m.RUnlock()

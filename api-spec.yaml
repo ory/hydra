@@ -103,7 +103,7 @@ paths:
     get:
       responses:
         200:
-          description: "OIDC discovery endpoint"
+          description: "Public JWKs"
           schema:
             $ref: "#/definitions/JSON Web Key Set"
         401:

@@ -56,6 +56,7 @@ the access control SDK [Ladon](https://github.com/ory/ladon).
   - [HTTP API documentation](#http-api-documentation)
   - [Command line documentation](#command-line-documentation)
   - [Develop](#develop)
+- [Sponsors](#sponsors)
 - [Libraries and third-party projects](#libraries-and-third-party-projects)
 - [Blog posts & articles](#blog-posts-&-articles)
 
@@ -223,6 +224,10 @@ Run against RethinkDB using Docker:
 docker run --name some-rethink -d -p 8080:8080 -p 28015:28015 rethinkdb
 DATABASE_URL=rethinkdb://localhost:28015/hydra go run main.go host
 ```
+
+## Sponsors
+
+<img src="./docs/images/auth0-svg.svg" />
 
 ## Libraries and third-party projects
 

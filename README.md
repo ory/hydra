@@ -227,7 +227,7 @@ DATABASE_URL=rethinkdb://localhost:28015/hydra go run main.go host
 
 ## Sponsors
 
-<img src="docs/images/sponsors/auth0.png" align="left" width="30%" alt="Auth0.com"> We are proud to have [Auth0.com](https://auth0.com) as a **gold sponsor** for Hydra. Auth0 solves the most complex identity use cases with an extensible and easy to integrate platform that secures billions of logins every year. At ORY, we use Auth0 in conjunction with Hydra for various internal projects.
+<img src="docs/images/sponsors/auth0.png" align="left" width="30%" alt="Auth0.com"> We are proud to have [Auth0](https://auth0.com) as a **gold sponsor** for Hydra. [Auth0](https://auth0.com) solves the most complex identity use cases with an extensible and easy to integrate platform that secures billions of logins every year. At ORY, we use [Auth0](https://auth0.com) in conjunction with Hydra for various internal projects.
 
 ## Libraries and third-party projects
 

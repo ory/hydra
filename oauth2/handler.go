@@ -45,7 +45,7 @@ type Handler struct {
 
 	AccessTokenLifespan time.Duration
 	CookieStore         sessions.Store
-
+	
 	L logrus.FieldLogger
 
 	Issuer string

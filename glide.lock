@@ -1,5 +1,5 @@
-hash: 26dc5b3174bda540fc13d9559300387ce0a6c31228f4d687243504cb961459fb
-updated: 2017-04-14T17:39:19.4443314+02:00
+hash: ca657afefc30677dab78602d6539ba818ce23341bca2a0fc48e0eb8ba8328ada
+updated: 2017-04-28T11:30:38.6721732+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
@@ -18,7 +18,7 @@ imports:
 - name: github.com/dgrijalva/jwt-go
   version: d2709f9f1f31ebcda9651b03077758c1f3a0018c
 - name: github.com/docker/docker
-  version: 092cba3727bb9b4a2f0e922cd6c0f93ea270e363
+  version: 4845c567eb35d68f35b0b1713a09b0c8d47fe67e
   subpackages:
   - api/types
   - api/types/blkiodev
@@ -46,7 +46,7 @@ imports:
   - pkg/term
   - pkg/term/windows
 - name: github.com/docker/go-connections
-  version: 1b14b2d192e2f91cdc2bc6bf9aee0b0e116eed42
+  version: e15c02316c12de00874640cd76311849de2aeed5
   subpackages:
   - nat
 - name: github.com/docker/go-units
@@ -54,11 +54,11 @@ imports:
 - name: github.com/fsnotify/fsnotify
   version: a904159b9206978bb6d53fcc7a769e5cd726c737
 - name: github.com/fsouza/go-dockerclient
-  version: 54fbd1ff920ca5fd5ec53068d513c14c3a25bba9
+  version: 3a676990e9e9a61616a9c546222dce396df6e5fb
 - name: github.com/go-errors/errors
   version: 8fa88b06e5974e97fbf9899a7f86a344bfd1f105
 - name: github.com/go-redis/redis
-  version: 62ecc61210cb7dd8ca9aebb8bebbc849c358383b
+  version: 5d95eaece6a4a3b68e07419504b6f415f74e90bb
   subpackages:
   - internal
   - internal/consistenthash
@@ -76,7 +76,7 @@ imports:
 - name: github.com/gorilla/securecookie
   version: fa5329f913702981df43dcb2a380bac429c810b5
 - name: github.com/gorilla/sessions
-  version: 697f2d505ac4cbd7f453d5fc285582e2e48259e7
+  version: ca9ada44574153444b00d3fd9c8559e4cc95f896
 - name: github.com/hailocab/go-hostpool
   version: e80d13ce29ede4452c43dea11e79b9bc8a15b478
 - name: github.com/hashicorp/go-cleanhttp
@@ -111,15 +111,17 @@ imports:
 - name: github.com/meatballhat/negroni-logrus
   version: 7c570a907cfc69cdc004ad506c6f5e234815b936
 - name: github.com/Microsoft/go-winio
-  version: fff283ad5116362ca252298cfc9b95828956d85d
+  version: f3b1913901892ada21d52d0cffe1d4c7080d36b7
 - name: github.com/mitchellh/mapstructure
   version: db1efb556f84b25a0a13a04aad883943538ad2e0
 - name: github.com/moul/http2curl
   version: 4e24498b31dba4683efb9d35c1c8a91e2eda28c8
+- name: github.com/Nvveen/Gotty
+  version: cd527374f1e5bff4938207604a14f2e38a9cf512
 - name: github.com/oleiade/reflections
   version: 2b6ec3da648e3e834dc41bad8d9ed7f2dc6a9496
 - name: github.com/opencontainers/runc
-  version: 02141ce862d87ae7c0194880720e266111ac8b96
+  version: c8452121d5e22f5bb67cb06acfe64c2af1cd7643
   subpackages:
   - libcontainer/system
   - libcontainer/user
@@ -175,7 +177,7 @@ imports:
 - name: github.com/spf13/viper
   version: 7538d73b4eb9511d85a9f1dfef202eeb8ac260f4
 - name: github.com/square/go-jose
-  version: aa2e30fdd1fe9dd3394119af66451ae790d50e0d
+  version: d5683d954d08cd430460c651e2a2fff4f3b39f86
   subpackages:
   - json
 - name: github.com/stretchr/testify
@@ -223,12 +225,10 @@ imports:
   - internal/remote_api
   - internal/urlfetch
   - urlfetch
-- name: gopkg.in/dancannon/gorethink.v2
-  version: 610fcc04c971a9fa42f1b6625c7c52b5bb472c51
 - name: gopkg.in/fatih/pool.v2
   version: 6e328e67893eb46323ad06f0e92cb9536babbabc
 - name: gopkg.in/gorethink/gorethink.v3
-  version: 610fcc04c971a9fa42f1b6625c7c52b5bb472c51
+  version: 7ab832f7b65573104a555d84a27992ae9ea1f659
   subpackages:
   - encoding
   - ql2
@@ -236,9 +236,9 @@ imports:
 - name: gopkg.in/gorp.v1
   version: c87af80f3cc5036b55b83d77171e156791085e2e
 - name: gopkg.in/ory-am/dockertest.v3
-  version: e4828e807797a7641fcd457716870dfc2f9e82ff
-- name: gopkg.in/square/go-jose.v1
-  version: aa2e30fdd1fe9dd3394119af66451ae790d50e0d
+  version: 9d0647ae761f96a6738c5afb49688d22979b21ff
+- name: gopkg.in/square/go-jose.v2
+  version: d5683d954d08cd430460c651e2a2fff4f3b39f86
   subpackages:
   - cipher
   - json
@@ -249,5 +249,3 @@ imports:
 testImports:
 - name: github.com/gorilla/mux
   version: 392c28fe23e1c45ddba891b0320b3b5df220beea
-- name: github.com/ory-am/dockertest
-  version: 8445a82f8da6067ffecbb06e3f9fa2857f3bf9df

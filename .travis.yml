@@ -20,6 +20,8 @@ install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images
   - glide install
   - go install github.com/ory-am/hydra
+  - glide update
+  - go install github.com/ory-am/hydra
 
 script:
   - |-

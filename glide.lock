@@ -1,5 +1,5 @@
-hash: ca657afefc30677dab78602d6539ba818ce23341bca2a0fc48e0eb8ba8328ada
-updated: 2017-04-28T11:30:38.6721732+02:00
+hash: 44e83a477f30bfbf44470bbfde0a144565ff5dc7035f1291a27a0a60978434c6
+updated: 2017-04-28T11:37:13.7529993+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
@@ -177,7 +177,7 @@ imports:
 - name: github.com/spf13/viper
   version: 7538d73b4eb9511d85a9f1dfef202eeb8ac260f4
 - name: github.com/square/go-jose
-  version: d5683d954d08cd430460c651e2a2fff4f3b39f86
+  version: aa2e30fdd1fe9dd3394119af66451ae790d50e0d
   subpackages:
   - json
 - name: github.com/stretchr/testify
@@ -237,8 +237,8 @@ imports:
   version: c87af80f3cc5036b55b83d77171e156791085e2e
 - name: gopkg.in/ory-am/dockertest.v3
   version: 9d0647ae761f96a6738c5afb49688d22979b21ff
-- name: gopkg.in/square/go-jose.v2
-  version: d5683d954d08cd430460c651e2a2fff4f3b39f86
+- name: gopkg.in/square/go-jose.v1
+  version: aa2e30fdd1fe9dd3394119af66451ae790d50e0d
   subpackages:
   - cipher
   - json

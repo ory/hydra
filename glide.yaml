@@ -43,8 +43,10 @@ import:
 - package: github.com/rubenv/sql-migrate
 - package: github.com/spf13/cobra
 - package: github.com/spf13/viper
+- package: gopkg.in/square/go-jose.v1
+  version: v1.1.0
 - package: github.com/square/go-jose
-  version: v2.1.0
+  version: v1.1.0
   subpackages:
   - json
 - package: github.com/stretchr/testify

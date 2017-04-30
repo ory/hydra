@@ -62,9 +62,19 @@ func (h *JSON) WriteErrorCode(ctx context.Context, w http.ResponseWriter, r *htt
 	LogError(err, id, code)
 	je := ToError(err)
 	je.StatusCode = code
-	h.WriteCode(ctx, w, r, je.StatusCode, &jsonError{
+	js, err := json.Marshal(&jsonError{
 		RequestID: id,
 		Error:     ToError(err),
 		Message:   err.Error(),
 	})
+	if err != nil {
+		LogError(err, id, http.StatusInternalServerError)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	w.Write(js)
 }

@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	OpenIDConnectKeyName    = "hydra.openid.id-token"
+	IDTokenKeyName    = "hydra.openid.id-token"
 	ConsentChallengeKeyName = "hydra.consent.challenge"
 	ConsentResponseKeyName  = "hydra.consent.response"
 )
@@ -104,32 +104,34 @@ type joseWebKeySetRequest struct {
 //       403: genericError
 //       500: genericError
 func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	fmt.Println("in well known")
 	var ctx = context.Background()
-	setNames := []string{ConsentChallengeKeyName, OpenIDConnectKeyName, ConsentResponseKeyName}
+	setNames := []string{ConsentChallengeKeyName, IDTokenKeyName, ConsentResponseKeyName}
 	keyArr := make([]jose.JsonWebKey, 3)
-
+	fmt.Println("getting keys")
 	for i, set := range setNames {
 		if err := h.W.IsAllowed(ctx, &firewall.AccessRequest{
 			Subject:  "",
-			Resource: "rn:hydra:keys:" + set + ":" + "public",
+			Resource: "rn:hydra:keys:" + set + ":" + "public:" + set,
 			Action:   "get",
 		}); err == nil {
 			// Allow unauthorized requests to access this resource if it is enabled by policies
 		} else if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-			Resource: "rn:hydra:keys:" + set + ":" + "public",
+			Resource: "rn:hydra:keys:" + set + ":" + "public:" + set,
 			Action:   "get",
 		}, "hydra.keys.get"); err != nil {
 			h.H.WriteError(w, r, err)
 			return
 		}
 
-		keys, err := h.Manager.GetKey(set, "public")
+		keys, err := h.Manager.GetKey(set, "public:" + set)
 		if err != nil {
 			h.H.WriteError(w, r, err)
 			return
 		}
 		keyArr[i] = keys.Keys[0]
 	}
+	fmt.Println("got keys")
 	keySet := jose.JsonWebKeySet{
 		Keys: keyArr,
 	}

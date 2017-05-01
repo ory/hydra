@@ -17,7 +17,7 @@ func createRS256KeysIfNotExist(c *config.Config, set, kid, use string) {
 	if _, err := ctx.KeyManager.GetKey(set, kid); errors.Cause(err) == pkg.ErrNotFound {
 		c.GetLogger().Infof("Key pair for signing %s is missing. Creating new one.", set)
 
-		keys, err := generator.Generate("")
+		keys, err := generator.Generate(set)
 		pkg.Must(err, "Could not generate %s key: %s", set, err)
 
 		for i, k := range keys.Keys {

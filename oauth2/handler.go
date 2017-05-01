@@ -8,7 +8,6 @@ import (
 	"github.com/Sirupsen/logrus"
 	"strings"
 	"time"
-
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
@@ -49,6 +48,16 @@ type Handler struct {
 	L logrus.FieldLogger
 
 	Issuer string
+}
+
+type WellKnown struct {
+	Issuer        string   `json:"issuer"`
+	AuthURL       string   `json:"authorization_endpoint"`
+	TokenURL      string   `json:"token_endpoint"`
+	SubjectTypes  []string `json:"subject_types_supported"`
+	JWKsURL       string   `json:"jwks_uri"`
+	SigningAlgs   []string `json:"id_token_signing_alg_values_supported"`
+	ResponseTypes []string `json:"response_types_supported"`
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {

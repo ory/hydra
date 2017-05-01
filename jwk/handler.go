@@ -104,11 +104,9 @@ type joseWebKeySetRequest struct {
 //       403: genericError
 //       500: genericError
 func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	fmt.Println("in well known")
 	var ctx = context.Background()
 	setNames := []string{ConsentChallengeKeyName, IDTokenKeyName, ConsentResponseKeyName}
 	keyArr := make([]jose.JsonWebKey, 3)
-	fmt.Println("getting keys")
 	for i, set := range setNames {
 		if err := h.W.IsAllowed(ctx, &firewall.AccessRequest{
 			Subject:  "",
@@ -131,7 +129,6 @@ func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request, ps httproute
 		}
 		keyArr[i] = keys.Keys[0]
 	}
-	fmt.Println("got keys")
 	keySet := jose.JsonWebKeySet{
 		Keys: keyArr,
 	}

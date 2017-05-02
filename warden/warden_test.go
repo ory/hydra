@@ -16,7 +16,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/hydra/warden/group"
-	"github.com/ory-am/ladon"
+	"github.com/ory/ladon"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 	coauth2 "golang.org/x/oauth2"

@@ -1,7 +1,7 @@
 # Access Control Policies
 
-Hydra uses the Access Control Library [Ladon](https://github.com/ory-am/ladon).
-For a deep dive, it is a good idea to read the [Ladon Docs](https://github.com/ory-am/ladon#ladon).
+Hydra uses the Access Control Library [Ladon](https://github.com/ory/ladon).
+For a deep dive, it is a good idea to read the [Ladon Docs](https://github.com/ory/ladon#ladon).
 
 In Hydra, policy based access control is when you decide if:
 

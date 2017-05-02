@@ -7,7 +7,7 @@ import (
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/policy"
 	"github.com/ory-am/hydra/warden/group"
-	"github.com/ory-am/ladon"
+	"github.com/ory/ladon"
 	"github.com/stretchr/testify/require"
 	"testing"
 )

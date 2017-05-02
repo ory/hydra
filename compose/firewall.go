@@ -11,7 +11,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/hydra/warden/group"
-	"github.com/ory-am/ladon"
+	"github.com/ory/ladon"
 	"golang.org/x/oauth2"
 )
 

@@ -9,7 +9,7 @@ import (
 	"github.com/ory-am/common/rand/sequence"
 	"github.com/ory-am/hydra/firewall"
 	"github.com/ory/herodot"
-	"github.com/ory-am/ladon"
+	"github.com/ory/ladon"
 	"github.com/pkg/errors"
 )
 

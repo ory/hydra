@@ -1,7 +1,7 @@
 # Access Control Policies
 
 Besides OAuth2 Token Introspection, Hydra offers Access Control Policies using
-the [Ladon](https://github.com/ory-am/ladon) framework. Access Control Policies are used by Hydra internally and exposed
+the [Ladon](https://github.com/ory/ladon) framework. Access Control Policies are used by Hydra internally and exposed
 via various HTTP APIs.
 
 ## Introduction to Access Control Policies

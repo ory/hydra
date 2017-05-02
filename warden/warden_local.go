@@ -9,7 +9,7 @@ import (
 	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/warden/group"
-	"github.com/ory-am/ladon"
+	"github.com/ory/ladon"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 )

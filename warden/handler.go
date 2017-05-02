@@ -8,7 +8,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/firewall"
-	"github.com/ory-am/hydra/herodot"
+	"github.com/ory/herodot"
 	"github.com/pkg/errors"
 )
 
@@ -40,7 +40,7 @@ var invalid = struct {
 
 // WardenHandler is capable of handling HTTP request and validating access tokens and access requests.
 type WardenHandler struct {
-	H      herodot.Herodot
+	H      herodot.Writer
 	Warden firewall.Firewall
 }
 
@@ -48,7 +48,7 @@ func NewHandler(c *config.Config, router *httprouter.Router) *WardenHandler {
 	ctx := c.Context()
 
 	h := &WardenHandler{
-		H:      &herodot.JSON{},
+		H:       herodot.NewJSONWriter(c.Context().Logger),
 		Warden: ctx.Warden,
 	}
 	h.SetRoutes(router)
@@ -62,7 +62,7 @@ func (h *WardenHandler) SetRoutes(r *httprouter.Router) {
 }
 
 func (h *WardenHandler) Allowed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var ctx = herodot.NewContext()
+	var ctx = r.Context()
 	if _, err := h.Warden.TokenAllowed(ctx, h.Warden.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: "rn:hydra:warden:allowed",
 		Action:   "decide",
@@ -89,7 +89,7 @@ func (h *WardenHandler) Allowed(w http.ResponseWriter, r *http.Request, _ httpro
 }
 
 func (h *WardenHandler) TokenAllowed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	ctx := herodot.NewContext()
+	ctx := r.Context()
 	_, err := h.Warden.TokenAllowed(ctx, h.Warden.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: "rn:hydra:warden:token:allowed",
 		Action:   "decide",

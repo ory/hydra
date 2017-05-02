@@ -11,7 +11,7 @@ import (
 	"github.com/ory-am/fosite"
 	foauth2 "github.com/ory-am/fosite/handler/oauth2"
 	"github.com/ory-am/hydra/firewall"
-	"github.com/ory-am/hydra/herodot"
+	"github.com/ory/herodot"
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/hydra/warden"
@@ -84,7 +84,7 @@ func init() {
 
 	r := httprouter.New()
 	serv := &warden.WardenHandler{
-		H:      &herodot.JSON{},
+		H:       herodot.NewJSONWriter(nil),
 		Warden: wardens["local"],
 	}
 	serv.SetRoutes(r)

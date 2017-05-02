@@ -12,7 +12,7 @@ import (
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/compose"
 	"github.com/ory-am/fosite/storage"
-	"github.com/ory-am/hydra/herodot"
+	"github.com/ory/herodot"
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/stretchr/testify/assert"
@@ -41,7 +41,7 @@ func init() {
 			compose.OAuth2TokenIntrospectionFactory,
 			compose.OAuth2TokenRevocationFactory,
 		),
-		H: &herodot.JSON{},
+		H:  herodot.NewJSONWriter(nil),
 	}
 	serv.SetRoutes(r)
 	ts = httptest.NewServer(r)

@@ -8,6 +8,7 @@ import (
 	"github.com/ory-am/fosite/storage"
 	"github.com/ory-am/fosite/token/hmac"
 	"github.com/ory/ladon"
+	"github.com/ory/ladon/manager/memory"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -47,7 +48,7 @@ func AssertError(t *testing.T, expectError bool, err error, args ...interface{})
 
 func LadonWarden(ps map[string]ladon.Policy) ladon.Warden {
 	return &ladon.Ladon{
-		Manager: &ladon.MemoryManager{
+		Manager: &memory.MemoryManager{
 			Policies: ps,
 		},
 	}

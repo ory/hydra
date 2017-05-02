@@ -166,22 +166,18 @@ func (c *Config) Context() *Context {
 
 	var connection interface{} = &MemoryConnection{}
 	if c.DatabaseURL != "" {
+		logrus.Fatalf(`DATABASE_URL is not set, use "export DATABASE_URL=memory" for an in memory storage or the documented database adapters.`)
+	} else if c.DatabaseURL != "memory" {
 		u, err := url.Parse(c.DatabaseURL)
 		if err != nil {
 			logrus.Fatalf("Could not parse DATABASE_URL: %s", err)
 		}
 
 		switch u.Scheme {
-		case "rethinkdb":
-			connection = &RethinkDBConnection{URL: u}
-			break
 		case "postgres":
 			fallthrough
 		case "mysql":
 			connection = &SQLConnection{URL: u}
-			break
-		case "redis":
-			connection = &RedisConnection{URL: u}
 			break
 		default:
 			logrus.Fatalf("Unkown DSN %s in DATABASE_URL: %s", u.Scheme, c.DatabaseURL)

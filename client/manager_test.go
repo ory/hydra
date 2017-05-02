@@ -8,7 +8,6 @@ import (
 	"os"
 	"testing"
 	"time"
-
 	"fmt"
 	"github.com/julienschmidt/httprouter"
 	_ "github.com/lib/pq"
@@ -66,13 +65,10 @@ func init() {
 
 var resources []*dockertest.Resource
 var pool *dockertest.Pool
-var rethinkManager *RethinkManager
 
 func TestMain(m *testing.M) {
 	connectToPG()
-	connectToRethinkDB()
 	connectToMySQL()
-	connectToRedis()
 
 	s := m.Run()
 	integration.KillAll()
@@ -98,30 +94,6 @@ func connectToPG() {
 	}
 
 	clientManagers["postgres"] = s
-}
-
-func connectToRethinkDB() {
-	var session = integration.ConnectToRethinkDB("hydra", "hydra_clients")
-	rethinkManager = &RethinkManager{
-		Session: session,
-		Table:   r.Table("hydra_clients"),
-		Clients: make(map[string]Client),
-		Hasher: &fosite.BCrypt{
-			// Low workfactor reduces test time
-			WorkFactor: 4,
-		},
-	}
-
-	rethinkManager.Watch(context.Background())
-	clientManagers["rethink"] = rethinkManager
-}
-
-func connectToRedis() {
-	var db = integration.ConnectToRedis()
-	clientManagers["redis"] = &RedisManager{
-		DB:     db,
-		Hasher: &fosite.BCrypt{WorkFactor: 4},
-	}
 }
 
 func TestClientAutoGenerateKey(t *testing.T) {
@@ -156,75 +128,6 @@ func TestAuthenticateClient(t *testing.T) {
 	c, err = mem.Authenticate("1234", []byte("secret"))
 	pkg.AssertError(t, false, err)
 	assert.Equal(t, "1234", c.ID)
-}
-
-func BenchmarkRethinkGet(b *testing.B) {
-	b.StopTimer()
-
-	m := rethinkManager
-	id := uuid.New()
-	c := &Client{
-		ID:                id,
-		Secret:            "secret",
-		RedirectURIs:      []string{"http://redirect"},
-		TermsOfServiceURI: "foo",
-	}
-
-	var err error
-	err = m.CreateClient(c)
-	if err != nil {
-		b.Fatalf("%s", err)
-	}
-	time.Sleep(100 * time.Millisecond)
-
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
-		_, _ = m.GetClient(id)
-	}
-}
-
-func BenchmarkRethinkAuthenticate(b *testing.B) {
-	b.StopTimer()
-
-	m := rethinkManager
-	id := uuid.New()
-	c := &Client{
-		ID:                id,
-		Secret:            "secret",
-		RedirectURIs:      []string{"http://redirect"},
-		TermsOfServiceURI: "foo",
-	}
-
-	var err error
-	err = m.CreateClient(c)
-	if err != nil {
-		b.Fatalf("%s", err)
-	}
-	time.Sleep(100 * time.Millisecond)
-
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
-		_, _ = m.Authenticate(id, []byte("secret"))
-	}
-}
-
-func TestColdStartRethinkManager(t *testing.T) {
-	assert.Nil(t, rethinkManager.CreateClient(&Client{ID: "foo"}))
-	assert.Nil(t, rethinkManager.CreateClient(&Client{ID: "bar"}))
-
-	time.Sleep(time.Second / 2)
-	rethinkManager.Clients = make(map[string]Client)
-	require.Nil(t, rethinkManager.ColdStart())
-
-	c1, err := rethinkManager.GetClient("foo")
-	require.Nil(t, err)
-	c2, err := rethinkManager.GetClient("bar")
-	require.Nil(t, err)
-
-	assert.NotEqual(t, c1, c2)
-	assert.Equal(t, "foo", c1.GetID())
-
-	rethinkManager.Clients = make(map[string]Client)
 }
 
 func TestCreateGetDeleteClient(t *testing.T) {

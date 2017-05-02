@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
-	"github.com/ory-am/hydra/herodot"
+	"github.com/ory/herodot"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pkg/errors"
 	"strings"
@@ -33,7 +33,7 @@ type Handler struct {
 	OAuth2  fosite.OAuth2Provider
 	Consent ConsentStrategy
 
-	H herodot.Herodot
+	H herodot.Writer
 
 	ForcedHTTP bool
 	ConsentURL url.URL

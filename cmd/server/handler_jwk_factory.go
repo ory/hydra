@@ -4,7 +4,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/hydra/config"
-	"github.com/ory-am/hydra/herodot"
+	"github.com/ory/herodot"
 	"github.com/ory-am/hydra/jwk"
 	"github.com/square/go-jose"
 	"golang.org/x/net/context"
@@ -63,7 +63,7 @@ func injectJWKManager(c *config.Config) {
 func newJWKHandler(c *config.Config, router *httprouter.Router) *jwk.Handler {
 	ctx := c.Context()
 	h := &jwk.Handler{
-		H:       &herodot.JSON{},
+		H:        herodot.NewJSONWriter(c.Context().Logger),
 		W:       ctx.Warden,
 		Manager: ctx.KeyManager,
 	}

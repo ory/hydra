@@ -12,7 +12,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/compose"
-	"github.com/ory-am/hydra/herodot"
+	"github.com/ory/herodot"
 	"github.com/ory-am/hydra/integration"
 	. "github.com/ory-am/hydra/warden/group"
 	"github.com/ory-am/ladon"
@@ -40,7 +40,7 @@ func init() {
 		Manager: &MemoryManager{
 			Groups: map[string]Group{},
 		},
-		H: &herodot.JSON{},
+		H: herodot.NewJSONWriter(nil),
 		W: localWarden,
 	}
 

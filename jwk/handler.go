@@ -7,7 +7,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/hydra/firewall"
-	"github.com/ory-am/hydra/herodot"
+	"github.com/ory/herodot"
 	"github.com/pkg/errors"
 	"github.com/square/go-jose"
 	"golang.org/x/net/context"
@@ -16,7 +16,7 @@ import (
 type Handler struct {
 	Manager    Manager
 	Generators map[string]KeyGenerator
-	H          herodot.Herodot
+	H          herodot.Writer
 	W          firewall.Firewall
 }
 

@@ -15,7 +15,7 @@ import (
 	"github.com/ory-am/fosite"
 	. "github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/compose"
-	"github.com/ory-am/hydra/herodot"
+	"github.com/ory/herodot"
 	"github.com/ory-am/hydra/integration"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/ladon"
@@ -49,7 +49,7 @@ func init() {
 			Clients: map[string]Client{},
 			Hasher:  &fosite.BCrypt{},
 		},
-		H: &herodot.JSON{},
+		H: herodot.NewJSONWriter(nil),
 		W: localWarden,
 	}
 

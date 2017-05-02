@@ -13,9 +13,10 @@ import (
 	"github.com/ory-am/hydra/warden/group"
 	"github.com/ory/ladon"
 	"golang.org/x/oauth2"
+	"github.com/Sirupsen/logrus"
 )
 
-func NewFirewall(issuer string, subject string, scopes fosite.Arguments, p ...ladon.Policy) (firewall.Firewall, *http.Client) {
+func NewMockFirewall(issuer string, subject string, scopes fosite.Arguments, p ...ladon.Policy) (firewall.Firewall, *http.Client) {
 	tokens := pkg.Tokens(1)
 
 	fositeStore := pkg.FositeStore()
@@ -48,6 +49,7 @@ func NewFirewall(issuer string, subject string, scopes fosite.Arguments, p ...la
 			Issuer:              issuer,
 			AccessTokenLifespan: time.Hour,
 			Groups:              group.NewMemoryManager(),
+			L: logrus.New(),
 		}, conf.Client(oauth2.NoContext, &oauth2.Token{
 			AccessToken: tokens[0][1],
 			Expiry:      time.Now().Add(time.Hour),

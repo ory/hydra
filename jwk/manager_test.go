@@ -31,7 +31,7 @@ var ts *httptest.Server
 var httpManager *HTTPManager
 
 func init() {
-	localWarden, httpClient := compose.NewFirewall(
+	localWarden, httpClient := compose.NewMockFirewall(
 		"tests",
 		"alice",
 		fosite.Arguments{

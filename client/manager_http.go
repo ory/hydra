@@ -6,6 +6,7 @@ import (
 
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/pkg"
+	"github.com/pkg/errors"
 )
 
 type HTTPManager struct {
@@ -20,7 +21,7 @@ func (m *HTTPManager) GetConcreteClient(id string) (*Client, error) {
 	r.Client = m.Client
 	r.Dry = m.Dry
 	if err := r.Get(&c); err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	return &c, nil
@@ -57,7 +58,7 @@ func (m *HTTPManager) GetClients() (map[string]Client, error) {
 	r.Client = m.Client
 	r.Dry = m.Dry
 	if err := r.Get(&cs); err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	return cs, nil

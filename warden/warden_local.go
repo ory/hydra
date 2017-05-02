@@ -3,7 +3,6 @@ package warden
 import (
 	"net/http"
 	"time"
-
 	"github.com/Sirupsen/logrus"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/firewall"
@@ -21,6 +20,7 @@ type LocalWarden struct {
 
 	AccessTokenLifespan time.Duration
 	Issuer              string
+	L   logrus.FieldLogger
 }
 
 func (w *LocalWarden) TokenFromRequest(r *http.Request) string {
@@ -34,7 +34,7 @@ func (w *LocalWarden) IsAllowed(ctx context.Context, a *firewall.AccessRequest) 
 		Subject:  a.Subject,
 		Context:  a.Context,
 	}); err != nil {
-		logrus.WithFields(logrus.Fields{
+		w.L.WithFields(logrus.Fields{
 			"subject": a.Subject,
 			"request": a,
 			"reason":  "The policy decision point denied the request",
@@ -42,7 +42,7 @@ func (w *LocalWarden) IsAllowed(ctx context.Context, a *firewall.AccessRequest) 
 		return err
 	}
 
-	logrus.WithFields(logrus.Fields{
+	w.L.WithFields(logrus.Fields{
 		"subject": a.Subject,
 		"request": a,
 		"reason":  "The policy decision point allowed the request",
@@ -53,7 +53,7 @@ func (w *LocalWarden) IsAllowed(ctx context.Context, a *firewall.AccessRequest) 
 func (w *LocalWarden) TokenAllowed(ctx context.Context, token string, a *firewall.TokenAccessRequest, scopes ...string) (*firewall.Context, error) {
 	var auth, err = w.OAuth2.IntrospectToken(ctx, token, fosite.AccessToken, oauth2.NewSession(""), scopes...)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
+		w.L.WithFields(logrus.Fields{
 			"request": a,
 			"reason":  "Token is expired, malformed or missing",
 		}).WithError(err).Infof("Access denied")
@@ -67,7 +67,7 @@ func (w *LocalWarden) TokenAllowed(ctx context.Context, token string, a *firewal
 		Subject:  session.GetSubject(),
 		Context:  a.Context,
 	}); err != nil {
-		logrus.WithFields(logrus.Fields{
+		w.L.WithFields(logrus.Fields{
 			"scopes":   scopes,
 			"subject":  session.GetSubject(),
 			"audience": auth.GetClient().GetID(),
@@ -78,7 +78,7 @@ func (w *LocalWarden) TokenAllowed(ctx context.Context, token string, a *firewal
 	}
 
 	c := w.newContext(auth)
-	logrus.WithFields(logrus.Fields{
+	w.L.WithFields(logrus.Fields{
 		"subject":  c.Subject,
 		"audience": auth.GetClient().GetID(),
 		"request":  auth,

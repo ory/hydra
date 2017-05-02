@@ -11,7 +11,6 @@ import (
 	"os"
 	"strings"
 	"time"
-
 	"github.com/Sirupsen/logrus"
 	"github.com/ory-am/fosite"
 	foauth2 "github.com/ory-am/fosite/handler/oauth2"
@@ -176,7 +175,10 @@ func (c *Config) Context() *Context {
 		case "postgres":
 			fallthrough
 		case "mysql":
-			connection = &SQLConnection{URL: u}
+			connection = &SQLConnection{
+				URL: u,
+				L: c.GetLogger(),
+			}
 			break
 		default:
 			logrus.Fatalf(`Unkown DSN "%s" in DATABASE_URL: %s`, u.Scheme, c.DatabaseURL)
@@ -198,7 +200,9 @@ func (c *Config) Context() *Context {
 		}
 		manager = m
 
-		gm := &group.SQLManager{DB: con.GetDatabase()}
+		gm := &group.SQLManager{
+			DB: con.GetDatabase(),
+		}
 		if err := gm.CreateSchemas(); err != nil {
 			logrus.Fatalf("Could not create group schema: %s", err)
 		}

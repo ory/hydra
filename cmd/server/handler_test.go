@@ -10,7 +10,9 @@ import (
 func TestStart(t *testing.T) {
 	router := httprouter.New()
 	h := &Handler{
-		Config: &config.Config{},
+		Config: &config.Config{
+			DatabaseURL: "memory",
+		},
 	}
 	h.registerRoutes(router)
 }

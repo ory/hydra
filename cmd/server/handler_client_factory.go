@@ -1,7 +1,6 @@
 package server
 
 import (
-	"github.com/Sirupsen/logrus"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
@@ -23,7 +22,7 @@ func newClientManager(c *config.Config) client.Manager {
 			Hasher: ctx.Hasher,
 		}
 		if err := m.CreateSchemas(); err != nil {
-			logrus.Fatalf("Could not create client schema: %s", err)
+			c.GetLogger().Fatalf("Could not create client schema: %s", err)
 		}
 		return m
 	default:

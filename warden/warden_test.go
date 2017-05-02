@@ -20,6 +20,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"context"
 	coauth2 "golang.org/x/oauth2"
+	"github.com/Sirupsen/logrus"
 )
 
 var ts *httptest.Server
@@ -59,6 +60,7 @@ var tokens = pkg.Tokens(4)
 func init() {
 	wardens["local"] = &warden.LocalWarden{
 		Warden: ladonWarden,
+		L: logrus.New(),
 		OAuth2: &fosite.Fosite{
 			Store: fositeStore,
 			TokenIntrospectionHandlers: fosite.TokenIntrospectionHandlers{

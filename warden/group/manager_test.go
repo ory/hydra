@@ -15,7 +15,7 @@ import (
 	"github.com/ory/herodot"
 	"github.com/ory-am/hydra/integration"
 	. "github.com/ory-am/hydra/warden/group"
-	"github.com/ory-am/ladon"
+	"github.com/ory/ladon"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

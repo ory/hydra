@@ -3,11 +3,10 @@ package policy
 import (
 	"net/http"
 	"net/url"
-
 	"encoding/json"
 
 	"github.com/ory-am/hydra/pkg"
-	"github.com/ory-am/ladon"
+	"github.com/ory/ladon"
 )
 
 type jsonPolicy struct {

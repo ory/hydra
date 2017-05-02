@@ -42,7 +42,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	var ctx = r.Context()
 
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
-		h.H.WriteError(ctx, w, r, errors.WithStack(err))
+		h.H.WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
@@ -53,29 +53,29 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 			"owner": c.Owner,
 		},
 	}, Scope); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
 	if len(c.Secret) == 0 {
 		secret, err := sequence.RuneSequence(12, []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-.,:;$%!&/()=?+*#<>"))
 		if err != nil {
-			h.H.WriteError(ctx, w, r, errors.WithStack(err))
+			h.H.WriteError(w, r, errors.WithStack(err))
 			return
 		}
 		c.Secret = string(secret)
 	} else if len(c.Secret) < 6 {
-		h.H.WriteError(ctx, w, r, errors.New("The client secret must be at least 6 characters long"))
+		h.H.WriteError(w, r, errors.New("The client secret must be at least 6 characters long"))
 	}
 
 	secret := c.Secret
 	if err := h.Manager.CreateClient(&c); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
 	c.Secret = secret
-	h.H.WriteCreated(ctx, w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
+	h.H.WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
 func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -83,13 +83,13 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	var ctx = r.Context()
 
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
-		h.H.WriteError(ctx, w, r, errors.WithStack(err))
+		h.H.WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
 	o, err := h.Manager.GetConcreteClient(ps.ByName("id"))
 	if err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
@@ -100,21 +100,21 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 			"owner": o.Owner,
 		},
 	}, Scope); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
 	if len(c.Secret) > 0 && len(c.Secret) < 6 {
-		h.H.WriteError(ctx, w, r, errors.New("The client secret must be at least 6 characters long"))
+		h.H.WriteError(w, r, errors.New("The client secret must be at least 6 characters long"))
 	}
 
 	c.ID = ps.ByName("id")
 	if err := h.Manager.UpdateClient(&c); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
-	h.H.WriteCreated(ctx, w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
+	h.H.WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
 func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -124,13 +124,13 @@ func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		Resource: ClientsResource,
 		Action:   "get",
 	}, Scope); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
 	c, err := h.Manager.GetClients()
 	if err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
@@ -139,7 +139,7 @@ func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		c[k] = cc
 	}
 
-	h.H.Write(ctx, w, r, c)
+	h.H.Write(w, r, c)
 }
 
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -148,7 +148,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 
 	c, err := h.Manager.GetConcreteClient(id)
 	if err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
@@ -159,12 +159,12 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 			"owner": c.GetOwner(),
 		},
 	}, Scope); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
 	c.Secret = ""
-	h.H.Write(ctx, w, r, c)
+	h.H.Write(w, r, c)
 }
 
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -175,12 +175,12 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		Resource: fmt.Sprintf(ClientResource, id),
 		Action:   "delete",
 	}, Scope); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
 	if err := h.Manager.DeleteClient(id); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 

@@ -67,25 +67,25 @@ func (h *WardenHandler) Allowed(w http.ResponseWriter, r *http.Request, _ httpro
 		Resource: "rn:hydra:warden:allowed",
 		Action:   "decide",
 	}, "hydra.warden"); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
 	var access = new(firewall.AccessRequest)
 	if err := json.NewDecoder(r.Body).Decode(access); err != nil {
-		h.H.WriteError(ctx, w, r, errors.WithStack(err))
+		h.H.WriteError(w, r, errors.WithStack(err))
 		return
 	}
 	defer r.Body.Close()
 
 	if err := h.Warden.IsAllowed(ctx, access); err != nil {
-		h.H.Write(ctx, w, r, &notAllowed)
+		h.H.Write(w, r, &notAllowed)
 		return
 	}
 
 	res := notAllowed
 	res.Allowed = true
-	h.H.Write(ctx, w, r, &res)
+	h.H.Write(w, r, &res)
 }
 
 func (h *WardenHandler) TokenAllowed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -95,7 +95,7 @@ func (h *WardenHandler) TokenAllowed(w http.ResponseWriter, r *http.Request, _ h
 		Action:   "decide",
 	}, "hydra.warden")
 	if err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
@@ -104,18 +104,18 @@ func (h *WardenHandler) TokenAllowed(w http.ResponseWriter, r *http.Request, _ h
 		wardenAuthorizedRequest: new(wardenAuthorizedRequest),
 	}
 	if err := json.NewDecoder(r.Body).Decode(&ar); err != nil {
-		h.H.WriteError(ctx, w, r, errors.WithStack(err))
+		h.H.WriteError(w, r, errors.WithStack(err))
 		return
 	}
 	defer r.Body.Close()
 
 	authContext, err := h.Warden.TokenAllowed(ctx, ar.Token, ar.TokenAccessRequest, ar.Scopes...)
 	if err != nil {
-		h.H.Write(ctx, w, r, &notAllowed)
+		h.H.Write(w, r, &notAllowed)
 		return
 	}
 
-	h.H.Write(ctx, w, r, struct {
+	h.H.Write(w, r, struct {
 		*firewall.Context
 		Allowed bool `json:"allowed"`
 	}{

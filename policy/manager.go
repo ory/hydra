@@ -3,6 +3,7 @@ package policy
 import (
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/ladon"
+	"github.com/ory/ladon/manager/sql"
 	"github.com/rubenv/sql-migrate"
 )
 
@@ -25,7 +26,7 @@ type Manager interface {
 }
 
 func NewSQLManager(db *sqlx.DB) (ladon.Manager, error) {
-	m := ladon.NewSQLManager(db, nil)
+	m := sql.NewSQLManager(db, nil)
 	migrate.SetTable("hydra_policy_migration")
 	if err := m.CreateSchemas(); err != nil {
 		return nil, err

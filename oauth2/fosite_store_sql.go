@@ -10,7 +10,7 @@ import (
 	"github.com/ory-am/hydra/client"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
-	"golang.org/x/net/context"
+	"context"
 	"net/url"
 	"strings"
 	"time"

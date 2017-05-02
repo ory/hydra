@@ -7,6 +7,7 @@ import (
 
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory/ladon"
+	"github.com/pkg/errors"
 )
 
 type jsonPolicy struct {
@@ -39,6 +40,11 @@ func (m *HTTPManager) Update(policy ladon.Policy) error {
 	r.Client = m.Client
 	r.Dry = m.Dry
 	return r.Update(policy)
+}
+
+// Get retrieves a policy.
+func (m *HTTPManager) GetAll(offset, limit int64) (ladon.Policies, error) {
+	return nil, errors.New("asdf")
 }
 
 // Get retrieves a policy.

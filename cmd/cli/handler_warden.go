@@ -8,7 +8,7 @@ import (
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/spf13/cobra"
-	"golang.org/x/net/context"
+	"context"
 )
 
 type WardenHandler struct {

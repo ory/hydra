@@ -18,7 +18,7 @@ import (
 	"github.com/ory-am/hydra/warden/group"
 	"github.com/ory/ladon"
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/net/context"
+	"context"
 	coauth2 "golang.org/x/oauth2"
 )
 

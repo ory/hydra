@@ -16,7 +16,7 @@ import (
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pkg/errors"
-	"golang.org/x/net/context"
+	"context"
 	r "gopkg.in/gorethink/gorethink.v3"
 )
 
@@ -152,7 +152,7 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 			DefaultIDTokenLifespan:   c.GetIDTokenLifespan(),
 		},
 		ConsentURL:          *consentURL,
-		H:                   herodot.NewJSONWriter(c.Context().Logger),
+		H:                   herodot.NewJSONWriter(c.GetLogger()),
 		AccessTokenLifespan: c.GetAccessTokenLifespan(),
 		CookieStore:         sessions.NewCookieStore(c.GetCookieSecret()),
 	}

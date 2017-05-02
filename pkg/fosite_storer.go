@@ -4,7 +4,7 @@ import (
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/fosite/handler/oauth2"
 	"github.com/ory-am/fosite/handler/openid"
-	"golang.org/x/net/context"
+	"context"
 )
 
 type FositeStorer interface {

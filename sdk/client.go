@@ -13,7 +13,7 @@ import (
 	"github.com/ory-am/hydra/policy"
 	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/hydra/warden/group"
-	"golang.org/x/net/context"
+	"context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 )

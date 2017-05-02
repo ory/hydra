@@ -13,6 +13,7 @@ import (
 	"github.com/pkg/errors"
 	"strings"
 	"time"
+	"github.com/Sirupsen/logrus"
 )
 
 const (
@@ -40,6 +41,8 @@ type Handler struct {
 
 	AccessTokenLifespan time.Duration
 	CookieStore         sessions.Store
+
+	L logrus.FieldLogger
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
@@ -56,7 +59,7 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ ht
 
 	err := h.OAuth2.NewRevocationRequest(ctx, r)
 	if err != nil {
-		pkg.LogError(err)
+		pkg.LogError(err, h.L)
 	}
 
 	h.OAuth2.WriteRevocationResponse(w, err)
@@ -68,7 +71,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 	var ctx = fosite.NewContext()
 	resp, err := h.OAuth2.NewIntrospectionRequest(ctx, r, session)
 	if err != nil {
-		pkg.LogError(err)
+		pkg.LogError(err, h.L)
 		h.OAuth2.WriteIntrospectionError(w, err)
 		return
 	}
@@ -91,7 +94,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		Audience:  resp.GetAccessRequester().GetClient().GetID(),
 	})
 	if err != nil {
-		pkg.LogError(err)
+		pkg.LogError(err, h.L)
 	}
 }
 
@@ -101,7 +104,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprou
 
 	accessRequest, err := h.OAuth2.NewAccessRequest(ctx, r, session)
 	if err != nil {
-		pkg.LogError(err)
+		pkg.LogError(err, h.L)
 		h.OAuth2.WriteAccessError(w, accessRequest, err)
 		return
 	}
@@ -117,7 +120,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprou
 
 	accessResponse, err := h.OAuth2.NewAccessResponse(ctx, r, accessRequest)
 	if err != nil {
-		pkg.LogError(err)
+		pkg.LogError(err, h.L)
 		h.OAuth2.WriteAccessError(w, accessRequest, err)
 		return
 	}
@@ -130,7 +133,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 
 	authorizeRequest, err := h.OAuth2.NewAuthorizeRequest(ctx, r)
 	if err != nil {
-		pkg.LogError(err)
+		pkg.LogError(err, h.L)
 		h.writeAuthorizeError(w, authorizeRequest, err)
 		return
 	}
@@ -140,7 +143,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	if consentToken == "" {
 		// otherwise redirect to log in endpoint
 		if err := h.redirectToConsent(w, r, authorizeRequest); err != nil {
-			pkg.LogError(err)
+			pkg.LogError(err, h.L)
 			h.writeAuthorizeError(w, authorizeRequest, err)
 			return
 		}
@@ -149,7 +152,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 
 	cookie, err := h.CookieStore.Get(r, consentCookieName)
 	if err != nil {
-		pkg.LogError(err)
+		pkg.LogError(err, h.L)
 		h.writeAuthorizeError(w, authorizeRequest, errors.Wrapf(fosite.ErrServerError, "Could not open session: %s", err))
 		return
 	}
@@ -158,13 +161,13 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	// verify anti-CSRF (inject state) and anti-replay token (expiry time, good value would be 10 seconds)
 	session, err := h.Consent.ValidateResponse(authorizeRequest, consentToken, cookie)
 	if err != nil {
-		pkg.LogError(err)
+		pkg.LogError(err, h.L)
 		h.writeAuthorizeError(w, authorizeRequest, errors.Wrap(fosite.ErrAccessDenied, ""))
 		return
 	}
 
 	if err := cookie.Save(r, w); err != nil {
-		pkg.LogError(err)
+		pkg.LogError(err, h.L)
 		h.writeAuthorizeError(w, authorizeRequest, errors.Wrapf(fosite.ErrServerError, "Could not store session cookie: %s", err))
 		return
 	}
@@ -172,7 +175,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	// done
 	response, err := h.OAuth2.NewAuthorizeResponse(ctx, r, authorizeRequest, session)
 	if err != nil {
-		pkg.LogError(err)
+		pkg.LogError(err, h.L)
 		h.writeAuthorizeError(w, authorizeRequest, err)
 		return
 	}

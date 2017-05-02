@@ -10,6 +10,7 @@ import (
 	"github.com/ory/ladon"
 	"github.com/stretchr/testify/require"
 	"testing"
+	"github.com/Sirupsen/logrus"
 )
 
 func TestSQLSchema(t *testing.T) {
@@ -23,7 +24,7 @@ func TestSQLSchema(t *testing.T) {
 	cm := &client.SQLManager{DB: db, Hasher: &fosite.BCrypt{}}
 	gm := group.SQLManager{DB: db}
 	jm := jwk.SQLManager{DB: db, Cipher: &jwk.AEAD{Key: []byte("11111111111111111111111111111111")}}
-	om := oauth2.FositeSQLStore{Manager: cm, DB: db}
+	om := oauth2.FositeSQLStore{Manager: cm, DB: db, L: logrus.New()}
 	pm, err := policy.NewSQLManager(db)
 	require.Nil(t, err)
 

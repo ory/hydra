@@ -4,10 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-
 	"strings"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory-am/hydra/pkg"
@@ -73,7 +71,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		pkg.Must(err, "Could not generate secret: %s", err)
 		secret = string(secretb)
 	} else {
-		logrus.Warn("You should not provide secrets using command line flags. The secret might leak to bash history and similar systems.")
+		fmt.Println("You should not provide secrets using command line flags. The secret might leak to bash history and similar systems.")
 	}
 
 	cc := &client.Client{

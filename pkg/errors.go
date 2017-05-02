@@ -14,7 +14,7 @@ type stackTracer interface {
 	StackTrace() errors.StackTrace
 }
 
-func LogError(err error) {
+func LogError(err error, logger log.FieldLogger) {
 	if e, ok := errors.Cause(err).(stackTracer); ok {
 		log.WithError(err).Errorln("An error occurred")
 		log.Debugf("Stack trace: %+v", e.StackTrace())

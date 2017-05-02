@@ -19,6 +19,7 @@ type MemoryConnection struct{}
 type SQLConnection struct {
 	db  *sqlx.DB
 	URL *url.URL
+	L   logrus.FieldLogger
 }
 
 func (c *SQLConnection) GetDatabase() *sqlx.DB {
@@ -27,8 +28,8 @@ func (c *SQLConnection) GetDatabase() *sqlx.DB {
 	}
 
 	var err error
-	if err = pkg.Retry(time.Second*15, time.Minute*2, func() error {
-		logrus.Infof("Connecting with %s", c.URL.Scheme+"://*:*@"+c.URL.Host+c.URL.Path+"?"+c.URL.RawQuery)
+	if err = pkg.Retry(c.L, time.Second*15, time.Minute*2, func() error {
+		c.L.Infof("Connecting with %s", c.URL.Scheme+"://*:*@"+c.URL.Host+c.URL.Path+"?"+c.URL.RawQuery)
 		u := c.URL.String()
 		if c.URL.Scheme == "mysql" {
 			u = strings.Replace(u, "mysql://", "", -1)
@@ -40,17 +41,17 @@ func (c *SQLConnection) GetDatabase() *sqlx.DB {
 			return errors.Errorf("Could not connect to SQL: %s", err)
 		}
 
-		logrus.Infof("Connected to SQL!")
+		c.L.Infof("Connected to SQL!")
 		return nil
 	}); err != nil {
-		logrus.Fatalf("Could not connect to SQL: %s", err)
+		c.L.Fatalf("Could not connect to SQL: %s", err)
 	}
 
 	maxConns := maxParallelism() * 2
 	if v := c.URL.Query().Get("max_conns"); v != "" {
 		s, err := strconv.ParseInt(v, 10, 64)
 		if err != nil {
-			logrus.Warnf("max_conns value %s could not be parsed to int: %s", v, err)
+			c.L.Warnf("max_conns value %s could not be parsed to int: %s", v, err)
 		} else {
 			maxConns = int(s)
 		}
@@ -60,7 +61,7 @@ func (c *SQLConnection) GetDatabase() *sqlx.DB {
 	if v := c.URL.Query().Get("max_idle_conns"); v != "" {
 		s, err := strconv.ParseInt(v, 10, 64)
 		if err != nil {
-			logrus.Warnf("max_idle_conns value %s could not be parsed to int: %s", v, err)
+			c.L.Warnf("max_idle_conns value %s could not be parsed to int: %s", v, err)
 		} else {
 			maxIdleConns = int(s)
 		}
@@ -70,7 +71,7 @@ func (c *SQLConnection) GetDatabase() *sqlx.DB {
 	if v := c.URL.Query().Get("max_conn_lifetime"); v != "" {
 		s, err := time.ParseDuration(v)
 		if err != nil {
-			logrus.Warnf("max_conn_lifetime value %s could not be parsed to int: %s", v, err)
+			c.L.Warnf("max_conn_lifetime value %s could not be parsed to int: %s", v, err)
 		} else {
 			maxConnLifetime = s
 		}

@@ -21,7 +21,7 @@ import (
 var managers = map[string]Manager{}
 
 func init() {
-	localWarden, httpClient := compose.NewFirewall("hydra", "alice", fosite.Arguments{scope},
+	localWarden, httpClient := compose.NewMockFirewall("hydra", "alice", fosite.Arguments{scope},
 		&ladon.DefaultPolicy{
 			ID:        "1",
 			Subjects:  []string{"alice"},

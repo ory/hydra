@@ -144,7 +144,7 @@ func (m *SQLManager) GetClient(id string) (fosite.Client, error) {
 func (m *SQLManager) UpdateClient(c *Client) error {
 	o, err := m.GetClient(c.ID)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	if c.Secret == "" {

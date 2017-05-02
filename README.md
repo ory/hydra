@@ -56,6 +56,7 @@ the access control SDK [Ladon](https://github.com/ory/ladon).
   - [HTTP API documentation](#http-api-documentation)
   - [Command line documentation](#command-line-documentation)
   - [Develop](#develop)
+- [Sponsors](#sponsors)
 - [Libraries and third-party projects](#libraries-and-third-party-projects)
 - [Blog posts & articles](#blog-posts-&-articles)
 
@@ -229,6 +230,10 @@ Run against RethinkDB using Docker:
 docker run --name some-rethink -d -p 8080:8080 -p 28015:28015 rethinkdb
 DATABASE_URL=rethinkdb://localhost:28015/hydra go run main.go host
 ```
+
+## Sponsors
+
+<img src="docs/images/sponsors/auth0.png" align="left" width="30%" alt="Auth0.com"> We are proud to have [Auth0](https://auth0.com) as a **gold sponsor** for Hydra. [Auth0](https://auth0.com) solves the most complex identity use cases with an extensible and easy to integrate platform that secures billions of logins every year. At ORY, we use [Auth0](https://auth0.com) in conjunction with Hydra for various internal projects.
 
 ## Libraries and third-party projects
 

@@ -7,7 +7,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/hydra/firewall"
-	"github.com/ory-am/hydra/herodot"
+	"github.com/ory/herodot"
 	"github.com/pkg/errors"
 )
 
@@ -17,7 +17,7 @@ type membersRequest struct {
 
 type Handler struct {
 	Manager Manager
-	H       herodot.Herodot
+	H       herodot.Writer
 	W       firewall.Firewall
 }
 
@@ -41,7 +41,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 }
 
 func (h *Handler) FindGroupNames(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var ctx = herodot.NewContext()
+	var ctx = r.Context()
 	var member = r.URL.Query().Get("member")
 
 	g, err := h.Manager.FindGroupNames(member)
@@ -63,7 +63,7 @@ func (h *Handler) FindGroupNames(w http.ResponseWriter, r *http.Request, _ httpr
 
 func (h *Handler) CreateGroup(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var g Group
-	var ctx = herodot.NewContext()
+	var ctx = r.Context()
 
 	if err := json.NewDecoder(r.Body).Decode(&g); err != nil {
 		h.H.WriteError(ctx, w, r, errors.WithStack(err))
@@ -87,7 +87,7 @@ func (h *Handler) CreateGroup(w http.ResponseWriter, r *http.Request, _ httprout
 }
 
 func (h *Handler) GetGroup(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var ctx = herodot.NewContext()
+	var ctx = r.Context()
 	var id = ps.ByName("id")
 
 	g, err := h.Manager.GetGroup(id)
@@ -108,7 +108,7 @@ func (h *Handler) GetGroup(w http.ResponseWriter, r *http.Request, ps httprouter
 }
 
 func (h *Handler) DeleteGroup(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var ctx = herodot.NewContext()
+	var ctx = r.Context()
 	var id = ps.ByName("id")
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
@@ -128,7 +128,7 @@ func (h *Handler) DeleteGroup(w http.ResponseWriter, r *http.Request, ps httprou
 }
 
 func (h *Handler) AddGroupMembers(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var ctx = herodot.NewContext()
+	var ctx = r.Context()
 	var id = ps.ByName("id")
 
 	var m membersRequest
@@ -154,7 +154,7 @@ func (h *Handler) AddGroupMembers(w http.ResponseWriter, r *http.Request, ps htt
 }
 
 func (h *Handler) RemoveGroupMembers(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var ctx = herodot.NewContext()
+	var ctx = r.Context()
 	var id = ps.ByName("id")
 
 	var m membersRequest

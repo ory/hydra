@@ -10,7 +10,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
 	"github.com/ory-am/hydra/compose"
-	"github.com/ory-am/hydra/herodot"
+	"github.com/ory/herodot"
 	"github.com/ory-am/hydra/integration"
 	. "github.com/ory-am/hydra/jwk"
 	"github.com/ory-am/hydra/pkg"
@@ -62,7 +62,7 @@ func init() {
 	h := Handler{
 		Manager: &MemoryManager{},
 		W:       localWarden,
-		H:       &herodot.JSON{},
+		H:       herodot.NewJSONWriter(nil),
 	}
 	h.SetRoutes(router)
 	ts := httptest.NewServer(router)

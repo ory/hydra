@@ -8,14 +8,14 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/common/rand/sequence"
 	"github.com/ory-am/hydra/firewall"
-	"github.com/ory-am/hydra/herodot"
+	"github.com/ory/herodot"
 	"github.com/ory-am/ladon"
 	"github.com/pkg/errors"
 )
 
 type Handler struct {
 	Manager Manager
-	H       herodot.Herodot
+	H       herodot.Writer
 	W       firewall.Firewall
 }
 
@@ -39,7 +39,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var c Client
-	var ctx = herodot.NewContext()
+	var ctx = r.Context()
 
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
 		h.H.WriteError(ctx, w, r, errors.WithStack(err))
@@ -80,7 +80,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 
 func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var c Client
-	var ctx = herodot.NewContext()
+	var ctx = r.Context()
 
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
 		h.H.WriteError(ctx, w, r, errors.WithStack(err))
@@ -118,7 +118,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 }
 
 func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var ctx = herodot.NewContext()
+	var ctx = r.Context()
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: ClientsResource,
@@ -143,7 +143,7 @@ func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request, ps httprouter.P
 }
 
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var ctx = herodot.NewContext()
+	var ctx = r.Context()
 	var id = ps.ByName("id")
 
 	c, err := h.Manager.GetConcreteClient(id)
@@ -168,7 +168,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 }
 
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var ctx = herodot.NewContext()
+	var ctx = r.Context()
 	var id = ps.ByName("id")
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{

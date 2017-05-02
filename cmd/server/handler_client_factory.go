@@ -5,7 +5,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
-	"github.com/ory-am/hydra/herodot"
+	"github.com/ory/herodot"
 	"golang.org/x/net/context"
 	r "gopkg.in/gorethink/gorethink.v3"
 )
@@ -54,7 +54,7 @@ func newClientManager(c *config.Config) client.Manager {
 func newClientHandler(c *config.Config, router *httprouter.Router, manager client.Manager) *client.Handler {
 	ctx := c.Context()
 	h := &client.Handler{
-		H: &herodot.JSON{},
+		H: herodot.NewJSONWriter(c.Context().Logger),
 		W: ctx.Warden, Manager: manager,
 	}
 

@@ -157,7 +157,7 @@ func (h *Handler) rejectInsecureRequests(rw http.ResponseWriter, r *http.Request
 		logrus.WithError(err).Warnln("Could not serve http connection")
 	}
 
-	h.H.WriteErrorCode(context.Background(), rw, r, http.StatusBadGateway, errors.New("Can not serve request over insecure http"))
+	h.H.WriteErrorCode(rw, r, http.StatusBadGateway, errors.New("Can not serve request over insecure http"))
 }
 
 func newLogger() *logrus.Logger {

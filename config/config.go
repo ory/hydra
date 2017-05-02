@@ -165,7 +165,7 @@ func (c *Config) Context() *Context {
 	}
 
 	var connection interface{} = &MemoryConnection{}
-	if c.DatabaseURL != "" {
+	if c.DatabaseURL == "" {
 		logrus.Fatalf(`DATABASE_URL is not set, use "export DATABASE_URL=memory" for an in memory storage or the documented database adapters.`)
 	} else if c.DatabaseURL != "memory" {
 		u, err := url.Parse(c.DatabaseURL)
@@ -180,7 +180,7 @@ func (c *Config) Context() *Context {
 			connection = &SQLConnection{URL: u}
 			break
 		default:
-			logrus.Fatalf("Unkown DSN %s in DATABASE_URL: %s", u.Scheme, c.DatabaseURL)
+			logrus.Fatalf(`Unkown DSN "%s" in DATABASE_URL: %s`, u.Scheme, c.DatabaseURL)
 		}
 	}
 

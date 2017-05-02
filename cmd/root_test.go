@@ -18,6 +18,7 @@ func init() {
 func TestExecute(t *testing.T) {
 	var osArgs = make([]string, len(os.Args))
 	var path = filepath.Join(os.TempDir(), fmt.Sprintf("hydra-%s.yml", uuid.New()))
+	os.Setenv("DATABASE_URL", "memory")
 	copy(osArgs, os.Args)
 
 	for _, c := range []struct {

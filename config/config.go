@@ -52,12 +52,11 @@ type Config struct {
 	CookieSecret           string `mapstructure:"COOKIE_SECRET" yaml:"-"`
 	ForceHTTP              bool   `yaml:"-"`
 
-	Logger *logrus.Logger
-
-	cluster      *url.URL     `yaml:"-"`
-	oauth2Client *http.Client `yaml:"-"`
-	context      *Context     `yaml:"-"`
-	systemSecret []byte
+	logger                 *logrus.Logger  `yaml:"-"`
+	cluster                *url.URL     `yaml:"-"`
+	oauth2Client           *http.Client `yaml:"-"`
+	context                *Context     `yaml:"-"`
+	systemSecret           []byte
 }
 
 func matchesRange(r *http.Request, ranges []string) error {
@@ -96,11 +95,11 @@ func newLogger() *logrus.Logger {
 }
 
 func (c *Config) GetLogger() *logrus.Logger {
-	if c.Logger == nil {
-		c.Logger = newLogger()
+	if c.logger == nil {
+		c.logger = newLogger()
 	}
 
-	return c.Logger
+	return c.logger
 }
 
 func (c *Config) DoesRequestSatisfyTermination(r *http.Request) error {

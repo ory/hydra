@@ -24,6 +24,7 @@
   * [Architecture and Design](contribute.md)
   * [Running Tests](contribute.md)
 * [FAQ](faq.md)
+  * [How can I control SQL connection limits?](faq/sql.md)
   * [Where is the HTTP API Documentation?](faq/http-api.md)
   * [How can I disable HTTPS for testing?](faq/disable-https.md)
   * [How can I import TLS certificates?](faq/https-tls-import.md)

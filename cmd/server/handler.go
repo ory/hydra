@@ -22,18 +22,14 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/urfave/negroni"
-	"golang.org/x/net/context"
-	"os"
 )
 
 func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
-		logger := newLogger
-
 		router := httprouter.New()
 		serverHandler := &Handler{
 			Config: c,
-			H: herodot.NewJSONWriter(logger),
+			H: herodot.NewJSONWriter(c.GetLogger()),
 		}
 		serverHandler.registerRoutes(router)
 		c.ForceHTTP, _ = cmd.Flags().GetBool("dangerous-force-http")
@@ -57,7 +53,7 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		}
 
 		n := negroni.New()
-		n.Use(negronilogrus.NewMiddleware())
+		n.Use(negronilogrus.NewMiddlewareFromLogger(c.GetLogger(), c.Issuer))
 		n.UseFunc(serverHandler.rejectInsecureRequests)
 		n.UseHandler(router)
 
@@ -127,7 +123,7 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 	h.OAuth2 = newOAuth2Handler(c, router, ctx.KeyManager, oauth2Provider)
 	h.Warden = warden.NewHandler(c, router)
 	h.Groups = &group.Handler{
-		H:       herodot.NewJSONWriter(ctx.Logger),
+		H:       herodot.NewJSONWriter(c.GetLogger()),
 		W:       ctx.Warden,
 		Manager: ctx.GroupManager,
 	}
@@ -158,20 +154,4 @@ func (h *Handler) rejectInsecureRequests(rw http.ResponseWriter, r *http.Request
 	}
 
 	h.H.WriteErrorCode(rw, r, http.StatusBadGateway, errors.New("Can not serve request over insecure http"))
-}
-
-func newLogger() *logrus.Logger {
-	var (
-		err    error
-		logger = logrus.New()
-	)
-
-	logger.Formatter = new(logrus.JSONFormatter)
-	logger.Level, err = logrus.ParseLevel(os.Getenv("LOG_LEVEL"))
-	if err != nil {
-		logger.Errorf("Couldn't parse log level: %s", os.Getenv("LOG_LEVEL"))
-		logger.Level = logrus.InfoLevel
-	}
-
-	return logger
 }

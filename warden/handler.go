@@ -48,7 +48,7 @@ func NewHandler(c *config.Config, router *httprouter.Router) *WardenHandler {
 	ctx := c.Context()
 
 	h := &WardenHandler{
-		H:       herodot.NewJSONWriter(c.Context().Logger),
+		H:       herodot.NewJSONWriter(c.GetLogger()),
 		Warden: ctx.Warden,
 	}
 	h.SetRoutes(router)

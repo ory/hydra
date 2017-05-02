@@ -18,7 +18,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/square/go-jose"
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/net/context"
+	"context"
 	r "gopkg.in/gorethink/gorethink.v3"
 	"io"
 	"log"

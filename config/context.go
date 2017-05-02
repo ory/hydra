@@ -8,13 +8,10 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/hydra/warden/group"
 	"github.com/ory/ladon"
-	"github.com/Sirupsen/logrus"
 )
 
 type Context struct {
 	Connection interface{}
-
-	Logger logrus.FieldLogger
 
 	Hasher         fosite.Hasher
 	Warden         firewall.Firewall

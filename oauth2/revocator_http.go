@@ -3,7 +3,7 @@ package oauth2
 import (
 	"bytes"
 	"github.com/pkg/errors"
-	"golang.org/x/net/context"
+	"context"
 	"golang.org/x/oauth2/clientcredentials"
 	"io/ioutil"
 	"net/http"

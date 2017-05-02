@@ -7,7 +7,7 @@ import (
 	"github.com/ory/herodot"
 	"github.com/ory-am/hydra/jwk"
 	"github.com/square/go-jose"
-	"golang.org/x/net/context"
+	"context"
 	r "gopkg.in/gorethink/gorethink.v3"
 )
 
@@ -63,7 +63,7 @@ func injectJWKManager(c *config.Config) {
 func newJWKHandler(c *config.Config, router *httprouter.Router) *jwk.Handler {
 	ctx := c.Context()
 	h := &jwk.Handler{
-		H:        herodot.NewJSONWriter(c.Context().Logger),
+		H:        herodot.NewJSONWriter(c.GetLogger()),
 		W:       ctx.Warden,
 		Manager: ctx.KeyManager,
 	}

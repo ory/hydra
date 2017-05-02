@@ -1,6 +1,6 @@
 package oauth2
 
-import "golang.org/x/net/context"
+import "context"
 
 // Introspection contains an access token's session data as specified by IETF RFC 7662, see:
 // https://tools.ietf.org/html/rfc7662

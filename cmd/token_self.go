@@ -8,7 +8,7 @@ import (
 
 	"github.com/ory-am/hydra/pkg"
 	"github.com/spf13/cobra"
-	"golang.org/x/net/context"
+	"context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 )

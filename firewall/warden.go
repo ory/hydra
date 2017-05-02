@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"golang.org/x/net/context"
+	"context"
 )
 
 // Context contains an access token's session data

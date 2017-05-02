@@ -22,7 +22,7 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/context"
+	"context"
 	"gopkg.in/ory-am/dockertest.v3"
 )
 

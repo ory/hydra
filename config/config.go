@@ -24,7 +24,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"golang.org/x/net/context"
+	"context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 	"gopkg.in/yaml.v2"
@@ -52,6 +52,8 @@ type Config struct {
 	CookieSecret           string `mapstructure:"COOKIE_SECRET" yaml:"-"`
 	ForceHTTP              bool   `yaml:"-"`
 
+	Logger *logrus.Logger
+
 	cluster      *url.URL     `yaml:"-"`
 	oauth2Client *http.Client `yaml:"-"`
 	context      *Context     `yaml:"-"`
@@ -75,6 +77,30 @@ func matchesRange(r *http.Request, ranges []string) error {
 		}
 	}
 	return errors.New("Remote address does not match any cidr ranges")
+}
+
+func newLogger() *logrus.Logger {
+	var (
+		err    error
+		logger = logrus.New()
+	)
+
+	logger.Formatter = new(logrus.JSONFormatter)
+	logger.Level, err = logrus.ParseLevel(os.Getenv("LOG_LEVEL"))
+	if err != nil {
+		logger.Errorf("Couldn't parse log level: %s", os.Getenv("LOG_LEVEL"))
+		logger.Level = logrus.InfoLevel
+	}
+
+	return logger
+}
+
+func (c *Config) GetLogger() *logrus.Logger {
+	if c.Logger == nil {
+		c.Logger = newLogger()
+	}
+
+	return c.Logger
 }
 
 func (c *Config) DoesRequestSatisfyTermination(r *http.Request) error {

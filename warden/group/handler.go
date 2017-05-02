@@ -46,7 +46,7 @@ func (h *Handler) FindGroupNames(w http.ResponseWriter, r *http.Request, _ httpr
 
 	g, err := h.Manager.FindGroupNames(member)
 	if err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
@@ -54,11 +54,11 @@ func (h *Handler) FindGroupNames(w http.ResponseWriter, r *http.Request, _ httpr
 		Resource: fmt.Sprintf(GroupResource, member),
 		Action:   "get",
 	}, Scope); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
-	h.H.Write(ctx, w, r, g)
+	h.H.Write(w, r, g)
 }
 
 func (h *Handler) CreateGroup(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -66,7 +66,7 @@ func (h *Handler) CreateGroup(w http.ResponseWriter, r *http.Request, _ httprout
 	var ctx = r.Context()
 
 	if err := json.NewDecoder(r.Body).Decode(&g); err != nil {
-		h.H.WriteError(ctx, w, r, errors.WithStack(err))
+		h.H.WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
@@ -74,16 +74,16 @@ func (h *Handler) CreateGroup(w http.ResponseWriter, r *http.Request, _ httprout
 		Resource: GroupsResource,
 		Action:   "create",
 	}, Scope); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
 	if err := h.Manager.CreateGroup(&g); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
-	h.H.WriteCreated(ctx, w, r, GroupsHandlerPath+"/"+g.ID, &g)
+	h.H.WriteCreated(w, r, GroupsHandlerPath+"/"+g.ID, &g)
 }
 
 func (h *Handler) GetGroup(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -92,7 +92,7 @@ func (h *Handler) GetGroup(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	g, err := h.Manager.GetGroup(id)
 	if err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
@@ -100,11 +100,11 @@ func (h *Handler) GetGroup(w http.ResponseWriter, r *http.Request, ps httprouter
 		Resource: fmt.Sprintf(GroupResource, id),
 		Action:   "get",
 	}, Scope); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
-	h.H.Write(ctx, w, r, g)
+	h.H.Write(w, r, g)
 }
 
 func (h *Handler) DeleteGroup(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -115,12 +115,12 @@ func (h *Handler) DeleteGroup(w http.ResponseWriter, r *http.Request, ps httprou
 		Resource: fmt.Sprintf(GroupResource, id),
 		Action:   "delete",
 	}, Scope); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
 	if err := h.Manager.DeleteGroup(id); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
@@ -133,7 +133,7 @@ func (h *Handler) AddGroupMembers(w http.ResponseWriter, r *http.Request, ps htt
 
 	var m membersRequest
 	if err := json.NewDecoder(r.Body).Decode(&m); err != nil {
-		h.H.WriteError(ctx, w, r, errors.WithStack(err))
+		h.H.WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
@@ -141,12 +141,12 @@ func (h *Handler) AddGroupMembers(w http.ResponseWriter, r *http.Request, ps htt
 		Resource: fmt.Sprintf(GroupResource, id),
 		Action:   "add.member",
 	}, Scope); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
 	if err := h.Manager.AddGroupMembers(id, m.Members); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
@@ -159,7 +159,7 @@ func (h *Handler) RemoveGroupMembers(w http.ResponseWriter, r *http.Request, ps 
 
 	var m membersRequest
 	if err := json.NewDecoder(r.Body).Decode(&m); err != nil {
-		h.H.WriteError(ctx, w, r, errors.WithStack(err))
+		h.H.WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
@@ -167,12 +167,12 @@ func (h *Handler) RemoveGroupMembers(w http.ResponseWriter, r *http.Request, ps 
 		Resource: fmt.Sprintf(GroupResource, id),
 		Action:   "remove.member",
 	}, Scope); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
 	if err := h.Manager.RemoveGroupMembers(id, m.Members); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 

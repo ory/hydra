@@ -63,12 +63,12 @@ func (h *Handler) DeleteKey(w http.ResponseWriter, r *http.Request, ps httproute
 		Resource: "rn:hydra:keys:" + setName + ":" + keyName,
 		Action:   "delete",
 	}, "hydra.keys.delete"); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
 	if err := h.Manager.DeleteKey(setName, keyName); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
@@ -83,12 +83,12 @@ func (h *Handler) DeleteKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 		Resource: "rn:hydra:keys:" + setName,
 		Action:   "delete",
 	}, "hydra.keys.delete"); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
 	if err := h.Manager.DeleteKeySet(setName); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
@@ -104,32 +104,32 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		Resource: "rn:hydra:keys:" + set,
 		Action:   "create",
 	}, "hydra.keys.create"); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&keyRequest); err != nil {
-		h.H.WriteError(ctx, w, r, errors.WithStack(err))
+		h.H.WriteError(w, r, errors.WithStack(err))
 	}
 
 	generator, found := h.GetGenerators()[keyRequest.Algorithm]
 	if !found {
-		h.H.WriteErrorCode(ctx, w, r, http.StatusBadRequest, errors.Errorf("Generator %s unknown", keyRequest.Algorithm))
+		h.H.WriteErrorCode(w, r, http.StatusBadRequest, errors.Errorf("Generator %s unknown", keyRequest.Algorithm))
 		return
 	}
 
 	keys, err := generator.Generate(keyRequest.KeyID)
 	if err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
 	if err := h.Manager.AddKeySet(set, keys); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
-	h.H.WriteCreated(ctx, w, r, fmt.Sprintf("%s://%s/keys/%s", r.URL.Scheme, r.URL.Host, set), keys)
+	h.H.WriteCreated(w, r, fmt.Sprintf("%s://%s/keys/%s", r.URL.Scheme, r.URL.Host, set), keys)
 }
 
 func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -142,29 +142,29 @@ func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 		Resource: "rn:hydra:keys:" + set,
 		Action:   "update",
 	}, "hydra.keys.update"); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&requests); err != nil {
-		h.H.WriteError(ctx, w, r, errors.WithStack(err))
+		h.H.WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
 	for _, request := range requests.Keys {
 		key := &jose.JsonWebKey{}
 		if err := key.UnmarshalJSON(request); err != nil {
-			h.H.WriteError(ctx, w, r, errors.WithStack(err))
+			h.H.WriteError(w, r, errors.WithStack(err))
 		}
 		keySet.Keys = append(keySet.Keys, *key)
 	}
 
 	if err := h.Manager.AddKeySet(set, keySet); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
-	h.H.Write(ctx, w, r, keySet)
+	h.H.Write(w, r, keySet)
 }
 
 func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -173,7 +173,7 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 	var set = ps.ByName("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&key); err != nil {
-		h.H.WriteError(ctx, w, r, errors.WithStack(err))
+		h.H.WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
@@ -181,16 +181,16 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 		Resource: "rn:hydra:keys:" + set + ":" + key.KeyID,
 		Action:   "update",
 	}, "hydra.keys.update"); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
 	if err := h.Manager.AddKey(set, &key); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
-	h.H.Write(ctx, w, r, key)
+	h.H.Write(w, r, key)
 }
 
 func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -208,17 +208,17 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		Resource: "rn:hydra:keys:" + setName + ":" + keyName,
 		Action:   "get",
 	}, "hydra.keys.get"); err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
 	keys, err := h.Manager.GetKey(setName, keyName)
 	if err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
-	h.H.Write(ctx, w, r, keys)
+	h.H.Write(w, r, keys)
 }
 
 func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -227,7 +227,7 @@ func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httproute
 
 	keys, err := h.Manager.GetKeySet(setName)
 	if err != nil {
-		h.H.WriteError(ctx, w, r, err)
+		h.H.WriteError(w, r, err)
 		return
 	}
 
@@ -236,10 +236,10 @@ func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httproute
 			Resource: "rn:hydra:keys:" + setName + ":" + key.KeyID,
 			Action:   "get",
 		}, "hydra.keys.get"); err != nil {
-			h.H.WriteError(ctx, w, r, err)
+			h.H.WriteError(w, r, err)
 			return
 		}
 	}
 
-	h.H.Write(ctx, w, r, keys)
+	h.H.Write(w, r, keys)
 }

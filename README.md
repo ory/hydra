@@ -218,17 +218,10 @@ glide install
 go test $(glide novendor)
 ```
 
-If you want to run a Hydra instance, there are two possibilities:
+Then run it without Database:
 
-Run without Database:
 ```
 go run main.go host
-```
- 
-Run against RethinkDB using Docker:
-```
-docker run --name some-rethink -d -p 8080:8080 -p 28015:28015 rethinkdb
-DATABASE_URL=rethinkdb://localhost:28015/hydra go run main.go host
 ```
 
 ## Sponsors

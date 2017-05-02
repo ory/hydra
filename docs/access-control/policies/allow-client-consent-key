@@ -5,9 +5,9 @@
   ],
   "effect": "allow",
   "resources": [
-    "rn:hydra:keys:hydra.consent.response:private",
-    "rn:hydra:keys:hydra.consent.response:public",
-    "rn:hydra:keys:hydra.consent.challenge:public"
+    "rn:hydra:keys:hydra.consent.response:private:hydra.consent.response",
+    "rn:hydra:keys:hydra.consent.response:public:hydra.consent.respons",
+    "rn:hydra:keys:hydra.consent.challenge:public:hydra.consent.challenge"
   ],
   "actions": [
     "get"

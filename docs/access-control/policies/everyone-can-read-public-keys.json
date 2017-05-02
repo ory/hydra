@@ -5,7 +5,7 @@
   ],
   "effect": "allow",
   "resources": [
-    "rn:hydra:keys:<[^:]+>:public"
+    "rn:hydra:keys:<[^:]+>:public:<[^:]+>"
   ],
   "actions": [
     "get"

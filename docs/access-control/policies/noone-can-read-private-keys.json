@@ -5,7 +5,7 @@
   ],
   "effect": "deny",
   "resources": [
-    "rn:hydra:keys:<[^:]+>:private"
+    "rn:hydra:keys:<[^:]+>:private:<[^:]+>"
   ],
   "actions": [
     "get"

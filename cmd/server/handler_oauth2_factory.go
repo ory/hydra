@@ -3,7 +3,6 @@ package server
 import (
 	"fmt"
 	"net/url"
-
 	"github.com/Sirupsen/logrus"
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
@@ -16,8 +15,6 @@ import (
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pkg/errors"
-	"context"
-	r "gopkg.in/gorethink/gorethink.v3"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {
@@ -41,37 +38,6 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 		}
 		if err := m.CreateSchemas(); err != nil {
 			logrus.Fatalf("Could not create oauth2 schema: %s", err)
-		}
-		store = m
-		break
-	case *config.RethinkDBConnection:
-		con.CreateTableIfNotExists("hydra_oauth2_authorize_code")
-		con.CreateTableIfNotExists("hydra_oauth2_id_sessions")
-		con.CreateTableIfNotExists("hydra_oauth2_access_token")
-		con.CreateTableIfNotExists("hydra_oauth2_implicit")
-		con.CreateTableIfNotExists("hydra_oauth2_refresh_token")
-		m := &oauth2.FositeRethinkDBStore{
-			Session:             con.GetSession(),
-			Manager:             clients,
-			AuthorizeCodesTable: r.Table("hydra_oauth2_authorize_code"),
-			IDSessionsTable:     r.Table("hydra_oauth2_id_sessions"),
-			AccessTokensTable:   r.Table("hydra_oauth2_access_token"),
-			RefreshTokensTable:  r.Table("hydra_oauth2_refresh_token"),
-			AuthorizeCodes:      make(oauth2.RDBItems),
-			IDSessions:          make(oauth2.RDBItems),
-			AccessTokens:        make(oauth2.RDBItems),
-			RefreshTokens:       make(oauth2.RDBItems),
-		}
-		if err := m.ColdStart(); err != nil {
-			logrus.Fatalf("Could not fetch initial state: %s", err)
-		}
-		m.Watch(context.Background())
-		store = m
-		break
-	case *config.RedisConnection:
-		m := &oauth2.FositeRedisStore{
-			DB:      con.RedisSession(),
-			Manager: clients,
 		}
 		store = m
 		break

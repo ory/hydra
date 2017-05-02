@@ -19,13 +19,14 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory-am/hydra/warden/group"
 	"github.com/ory/ladon"
+	lmem "github.com/ory/ladon/manager/memory"
+	lsql "github.com/ory/ladon/manager/sql"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
-	r "gopkg.in/gorethink/gorethink.v3"
 	"gopkg.in/yaml.v2"
 )
 
@@ -166,11 +167,11 @@ func (c *Config) Context() *Context {
 	switch con := connection.(type) {
 	case *MemoryConnection:
 		logrus.Printf("DATABASE_URL not set, connecting to ephermal in-memory database.")
-		manager = ladon.NewMemoryManager()
+		manager = lmem.NewMemoryManager()
 		groupManager = group.NewMemoryManager()
 		break
 	case *SQLConnection:
-		m := ladon.NewSQLManager(con.GetDatabase(), nil)
+		m := lsql.NewSQLManager(con.GetDatabase(), nil)
 		if err := m.CreateSchemas(); err != nil {
 			logrus.Fatalf("Could not create policy schema: %s", err)
 		}
@@ -182,28 +183,6 @@ func (c *Config) Context() *Context {
 		}
 		groupManager = gm
 
-		break
-	case *RethinkDBConnection:
-		logrus.Printf("DATABASE_URL set, connecting to RethinkDB.")
-		con.CreateTableIfNotExists("hydra_policies")
-		m := &ladon.RethinkManager{
-			Session: con.GetSession(),
-			Table:   r.Table("hydra_policies"),
-		}
-		if err := m.ColdStart(); err != nil {
-			logrus.Fatalf("Could not fetch initial state: %s", err)
-		}
-		m.Watch(context.Background())
-		manager = m
-
-		logrus.Warn("Group management not supported for RethinkDB, falling back to in-memory storage for groups")
-		groupManager = group.NewMemoryManager()
-		break
-	case *RedisConnection:
-		manager = ladon.NewRedisManager(con.RedisSession(), "")
-
-		logrus.Warn("Group management not supported for Redis, falling back to in-memory storage for groups")
-		groupManager = group.NewMemoryManager()
 		break
 	default:
 		panic("Unknown connection type.")

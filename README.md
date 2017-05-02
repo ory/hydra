@@ -218,10 +218,10 @@ glide install
 go test $(glide novendor)
 ```
 
-Then run it without Database:
+Then run it with in-memory database:
 
 ```
-go run main.go host
+DATABASE_URL=memory go run main.go host
 ```
 
 ## Sponsors

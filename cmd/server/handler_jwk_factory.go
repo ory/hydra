@@ -6,9 +6,6 @@ import (
 	"github.com/ory-am/hydra/config"
 	"github.com/ory/herodot"
 	"github.com/ory-am/hydra/jwk"
-	"github.com/square/go-jose"
-	"context"
-	r "gopkg.in/gorethink/gorethink.v3"
 )
 
 func injectJWKManager(c *config.Config) {
@@ -27,31 +24,6 @@ func injectJWKManager(c *config.Config) {
 		}
 		if err := m.CreateSchemas(); err != nil {
 			logrus.Fatalf("Could not create jwk schema: %s", err)
-		}
-		ctx.KeyManager = m
-		break
-	case *config.RethinkDBConnection:
-		con.CreateTableIfNotExists("hydra_json_web_keys")
-		m := &jwk.RethinkManager{
-			Session: con.GetSession(),
-			Keys:    map[string]jose.JsonWebKeySet{},
-			Table:   r.Table("hydra_json_web_keys"),
-			Cipher: &jwk.AEAD{
-				Key: c.GetSystemSecret(),
-			},
-		}
-		if err := m.ColdStart(); err != nil {
-			logrus.Fatalf("Could not fetch initial state: %s", err)
-		}
-		m.Watch(context.Background())
-		ctx.KeyManager = m
-		break
-	case *config.RedisConnection:
-		m := &jwk.RedisManager{
-			DB: con.RedisSession(),
-			Cipher: &jwk.AEAD{
-				Key: c.GetSystemSecret(),
-			},
 		}
 		ctx.KeyManager = m
 		break

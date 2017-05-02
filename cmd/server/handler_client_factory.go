@@ -6,8 +6,6 @@ import (
 	"github.com/ory-am/hydra/client"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory/herodot"
-	"context"
-	r "gopkg.in/gorethink/gorethink.v3"
 )
 
 func newClientManager(c *config.Config) client.Manager {
@@ -26,24 +24,6 @@ func newClientManager(c *config.Config) client.Manager {
 		}
 		if err := m.CreateSchemas(); err != nil {
 			logrus.Fatalf("Could not create client schema: %s", err)
-		}
-		return m
-	case *config.RethinkDBConnection:
-		con.CreateTableIfNotExists("hydra_clients")
-		m := &client.RethinkManager{
-			Session: con.GetSession(),
-			Table:   r.Table("hydra_clients"),
-			Hasher:  ctx.Hasher,
-		}
-		if err := m.ColdStart(); err != nil {
-			logrus.Fatalf("Could not fetch initial state: %s", err)
-		}
-		m.Watch(context.Background())
-		return m
-	case *config.RedisConnection:
-		m := &client.RedisManager{
-			DB:     con.RedisSession(),
-			Hasher: ctx.Hasher,
 		}
 		return m
 	default:

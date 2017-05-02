@@ -1,7 +1,6 @@
 package server
 
 import (
-	"github.com/Sirupsen/logrus"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/hydra/config"
 	"github.com/ory/herodot"
@@ -23,12 +22,12 @@ func injectJWKManager(c *config.Config) {
 			},
 		}
 		if err := m.CreateSchemas(); err != nil {
-			logrus.Fatalf("Could not create jwk schema: %s", err)
+			c.GetLogger().Fatalf("Could not create jwk schema: %s", err)
 		}
 		ctx.KeyManager = m
 		break
 	default:
-		logrus.Fatalf("Unknown connection type.")
+		c.GetLogger().Fatalf("Unknown connection type.")
 	}
 }
 

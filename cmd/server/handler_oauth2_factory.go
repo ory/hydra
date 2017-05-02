@@ -3,7 +3,6 @@ package server
 import (
 	"fmt"
 	"net/url"
-	"github.com/Sirupsen/logrus"
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/fosite"
@@ -35,9 +34,10 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 		m := &oauth2.FositeSQLStore{
 			DB:      con.GetDatabase(),
 			Manager: clients,
+			L: c.GetLogger(),
 		}
 		if err := m.CreateSchemas(); err != nil {
-			logrus.Fatalf("Could not create oauth2 schema: %s", err)
+			c.GetLogger().Fatalf("Could not create oauth2 schema: %s", err)
 		}
 		store = m
 		break
@@ -55,13 +55,13 @@ func newOAuth2Provider(c *config.Config, km jwk.Manager) fosite.OAuth2Provider {
 	createRS256KeysIfNotExist(c, oauth2.OpenIDConnectKeyName, "private", "sig")
 	keys, err := km.GetKey(oauth2.OpenIDConnectKeyName, "private")
 	if errors.Cause(err) == pkg.ErrNotFound {
-		logrus.Warnln("Could not find OpenID Connect signing keys. Generating a new keypair...")
+		c.GetLogger().Warnln("Could not find OpenID Connect signing keys. Generating a new keypair...")
 		keys, err = new(jwk.RS256Generator).Generate("")
 
 		pkg.Must(err, "Could not generate signing key for OpenID Connect")
 		km.AddKeySet(oauth2.OpenIDConnectKeyName, keys)
-		logrus.Infoln("Keypair generated.")
-		logrus.Warnln("WARNING: Automated key creation causes low entropy. Replace the keys as soon as possible.")
+		c.GetLogger().Infoln("Keypair generated.")
+		c.GetLogger().Warnln("WARNING: Automated key creation causes low entropy. Replace the keys as soon as possible.")
 	} else {
 		pkg.Must(err, "Could not fetch signing key for OpenID Connect")
 	}

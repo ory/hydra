@@ -19,6 +19,7 @@ import (
 type FositeSQLStore struct {
 	client.Manager
 	DB *sqlx.DB
+	L logrus.FieldLogger
 }
 
 func sqlTemplate(table string) string {
@@ -83,9 +84,9 @@ type sqlData struct {
 	Session       []byte    `db:"session_data"`
 }
 
-func sqlSchemaFromRequest(signature string, r fosite.Requester) (*sqlData, error) {
+func sqlSchemaFromRequest(signature string, r fosite.Requester, logger logrus.FieldLogger) (*sqlData, error) {
 	if r.GetSession() == nil {
-		logrus.Debugf("Got an empty session in sqlSchemaFromRequest")
+		logger.Debugf("Got an empty session in sqlSchemaFromRequest")
 	}
 
 	session, err := json.Marshal(r.GetSession())
@@ -105,13 +106,13 @@ func sqlSchemaFromRequest(signature string, r fosite.Requester) (*sqlData, error
 	}, nil
 }
 
-func (s *sqlData) toRequest(session fosite.Session, cm client.Manager) (*fosite.Request, error) {
+func (s *sqlData) toRequest(session fosite.Session, cm client.Manager, logger logrus.FieldLogger) (*fosite.Request, error) {
 	if session != nil {
 		if err := json.Unmarshal(s.Session, session); err != nil {
 			return nil, errors.WithStack(err)
 		}
 	} else {
-		logrus.Debugf("Got an empty session in toRequest")
+		logger.Debugf("Got an empty session in toRequest")
 	}
 
 	c, err := cm.GetClient(s.Client)
@@ -138,7 +139,7 @@ func (s *sqlData) toRequest(session fosite.Session, cm client.Manager) (*fosite.
 }
 
 func (s *FositeSQLStore) createSession(signature string, requester fosite.Requester, table string) error {
-	data, err := sqlSchemaFromRequest(signature, requester)
+	data, err := sqlSchemaFromRequest(signature, requester, s.L)
 	if err != nil {
 		return err
 	}
@@ -163,7 +164,7 @@ func (s *FositeSQLStore) findSessionBySignature(signature string, session fosite
 		return nil, errors.WithStack(err)
 	}
 
-	return d.toRequest(session, s.Manager)
+	return d.toRequest(session, s.Manager, s.L)
 }
 
 func (s *FositeSQLStore) deleteSession(signature string, table string) error {

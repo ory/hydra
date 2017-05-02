@@ -2,13 +2,11 @@ package oauth2
 
 import (
 	"net/http"
-
-	"github.com/Sirupsen/logrus"
 	"github.com/julienschmidt/httprouter"
 )
 
 func (o *Handler) DefaultConsentHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	logrus.Warnln("It looks like no consent endpoint was set. All OAuth2 flows except client credentials will fail.")
+	o.L.Warnln("It looks like no consent endpoint was set. All OAuth2 flows except client credentials will fail.")
 
 	w.Write([]byte(`
 <html>

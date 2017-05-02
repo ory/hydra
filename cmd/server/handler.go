@@ -4,9 +4,7 @@ import (
 	"crypto/tls"
 	"net/http"
 	"time"
-
 	"fmt"
-	"github.com/Sirupsen/logrus"
 	"github.com/julienschmidt/httprouter"
 	"github.com/meatballhat/negroni-logrus"
 	"github.com/ory-am/hydra/client"
@@ -27,9 +25,10 @@ import (
 func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		router := httprouter.New()
+		logger := c.GetLogger()
 		serverHandler := &Handler{
 			Config: c,
-			H: herodot.NewJSONWriter(c.GetLogger()),
+			H: herodot.NewJSONWriter(logger),
 		}
 		serverHandler.registerRoutes(router)
 		c.ForceHTTP, _ = cmd.Flags().GetBool("dangerous-force-http")
@@ -47,13 +46,13 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		}
 
 		if ok, _ := cmd.Flags().GetBool("dangerous-auto-logon"); ok {
-			logrus.Warnln("Do not use flag --dangerous-auto-logon in production.")
+			logger.Warnln("Do not use flag --dangerous-auto-logon in production.")
 			err := c.Persist()
 			pkg.Must(err, "Could not write configuration file: %s", err)
 		}
 
 		n := negroni.New()
-		n.Use(negronilogrus.NewMiddlewareFromLogger(c.GetLogger(), c.Issuer))
+		n.Use(negronilogrus.NewMiddlewareFromLogger(logger, c.Issuer))
 		n.UseFunc(serverHandler.rejectInsecureRequests)
 		n.UseHandler(router)
 
@@ -70,12 +69,12 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		}
 
 		var err error
-		logrus.Infof("Setting up http server on %s", c.GetAddress())
+		logger.Infof("Setting up http server on %s", c.GetAddress())
 		if c.ForceHTTP {
-			logrus.Warnln("HTTPS disabled. Never do this in production.")
+			logger.Warnln("HTTPS disabled. Never do this in production.")
 			err = srv.ListenAndServe()
 		} else if c.AllowTLSTermination != "" {
-			logrus.Infoln("TLS termination enabled, disabling https.")
+			logger.Infoln("TLS termination enabled, disabling https.")
 			err = srv.ListenAndServe()
 		} else {
 			err = srv.ListenAndServeTLS("", "")
@@ -114,6 +113,7 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 		Issuer:              c.Issuer,
 		AccessTokenLifespan: c.GetAccessTokenLifespan(),
 		Groups:              ctx.GroupManager,
+		L: c.GetLogger(),
 	}
 
 	// Set up handlers
@@ -150,7 +150,7 @@ func (h *Handler) rejectInsecureRequests(rw http.ResponseWriter, r *http.Request
 		next.ServeHTTP(rw, r)
 		return
 	} else {
-		logrus.WithError(err).Warnln("Could not serve http connection")
+		h.Config.GetLogger().WithError(err).Warnln("Could not serve http connection")
 	}
 
 	h.H.WriteErrorCode(rw, r, http.StatusBadGateway, errors.New("Can not serve request over insecure http"))

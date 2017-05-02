@@ -5,7 +5,6 @@ import (
 	"os"
 	"testing"
 	"time"
-
 	"fmt"
 	"github.com/Sirupsen/logrus"
 	c "github.com/ory-am/common/pkg"
@@ -17,10 +16,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"context"
-	r "gopkg.in/gorethink/gorethink.v3"
 )
 
-var rethinkManager *FositeRethinkDBStore
 var clientManagers = map[string]pkg.FositeStorer{}
 var clientManager = &client.MemoryManager{
 	Clients: map[string]client.Client{"foobar": {ID: "foobar"}},
@@ -38,9 +35,7 @@ func init() {
 
 func TestMain(m *testing.M) {
 	connectToPG()
-	connectToRethinkDB()
 	connectToMySQL()
-	connectToRedis()
 
 	s := m.Run()
 	integration.KillAll()
@@ -57,24 +52,6 @@ func connectToPG() {
 	clientManagers["postgres"] = s
 }
 
-func connectToRethinkDB() {
-	var session = integration.ConnectToRethinkDB("hydra", "hydra_authorize_code", "hydra_id_sessions", "hydra_access_token", "hydra_refresh_token")
-
-	rethinkManager = &FositeRethinkDBStore{
-		Session:             session,
-		AuthorizeCodesTable: r.Table("hydra_authorize_code"),
-		IDSessionsTable:     r.Table("hydra_id_sessions"),
-		AccessTokensTable:   r.Table("hydra_access_token"),
-		RefreshTokensTable:  r.Table("hydra_refresh_token"),
-		AuthorizeCodes:      make(RDBItems),
-		IDSessions:          make(RDBItems),
-		AccessTokens:        make(RDBItems),
-		RefreshTokens:       make(RDBItems),
-	}
-	rethinkManager.Watch(context.Background())
-	clientManagers["rethink"] = rethinkManager
-}
-
 func connectToMySQL() {
 	var db = integration.ConnectToMySQL()
 	s := &FositeSQLStore{DB: db, Manager: clientManager}
@@ -85,11 +62,6 @@ func connectToMySQL() {
 	clientManagers["mysql"] = s
 }
 
-func connectToRedis() {
-	var db = integration.ConnectToRedis()
-	clientManagers["redis"] = &FositeRedisStore{DB: db}
-}
-
 var defaultRequest = fosite.Request{
 	RequestedAt:   time.Now().Round(time.Second),
 	Client:        &client.Client{ID: "foobar"},
@@ -97,49 +69,6 @@ var defaultRequest = fosite.Request{
 	GrantedScopes: fosite.Arguments{"fa", "ba"},
 	Form:          url.Values{"foo": []string{"bar", "baz"}},
 	Session:       &fosite.DefaultSession{Subject: "bar"},
-}
-
-func TestColdStartRethinkManager(t *testing.T) {
-	ctx := context.Background()
-	m := rethinkManager
-	id := uuid.New()
-
-	err := m.CreateAuthorizeCodeSession(ctx, id, &defaultRequest)
-	pkg.AssertError(t, false, err)
-	err = m.CreateAccessTokenSession(ctx, "12345", &fosite.Request{
-		RequestedAt: time.Now().Round(time.Second),
-		Client:      &client.Client{ID: "baz"},
-	})
-	pkg.AssertError(t, false, err)
-
-	err = m.CreateAccessTokenSession(ctx, id, &defaultRequest)
-	pkg.AssertError(t, false, err)
-
-	_, err = m.GetAuthorizeCodeSession(ctx, id, &fosite.DefaultSession{})
-	pkg.AssertError(t, false, err)
-	_, err = m.GetAccessTokenSession(ctx, id, &fosite.DefaultSession{})
-	pkg.AssertError(t, false, err)
-
-	delete(rethinkManager.AuthorizeCodes, id)
-	delete(rethinkManager.AccessTokens, id)
-	delete(rethinkManager.AccessTokens, "12345")
-
-	_, err = m.GetAuthorizeCodeSession(ctx, id, &fosite.DefaultSession{})
-	pkg.AssertError(t, true, err)
-	_, err = m.GetAccessTokenSession(ctx, id, &fosite.DefaultSession{})
-	pkg.AssertError(t, true, err)
-
-	err = rethinkManager.ColdStart()
-	pkg.AssertError(t, false, err)
-
-	_, err = m.GetAuthorizeCodeSession(ctx, id, &fosite.DefaultSession{})
-	pkg.AssertError(t, false, err)
-
-	s1, err := m.GetAccessTokenSession(ctx, id, &fosite.DefaultSession{})
-	pkg.AssertError(t, false, err)
-	s2, err := m.GetAccessTokenSession(ctx, "12345", &fosite.DefaultSession{})
-	pkg.AssertError(t, false, err)
-	assert.NotEqual(t, s1, s2)
 }
 
 func TestCreateImplicitAccessTokenSession(t *testing.T) {

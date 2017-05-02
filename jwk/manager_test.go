@@ -4,7 +4,6 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
-
 	"crypto/rand"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
@@ -16,10 +15,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/ory/ladon"
 	"github.com/pkg/errors"
-	"github.com/square/go-jose"
 	"github.com/stretchr/testify/assert"
-	"context"
-	r "gopkg.in/gorethink/gorethink.v3"
 	"io"
 	"log"
 	"net/http"
@@ -72,8 +68,6 @@ func init() {
 	managers["http"] = httpManager
 }
 
-var rethinkManager = new(RethinkManager)
-
 func randomBytes(n int) ([]byte, error) {
 	bytes := make([]byte, n)
 	if _, err := io.ReadFull(rand.Reader, bytes); err != nil {
@@ -86,9 +80,7 @@ var encryptionKey, _ = randomBytes(32)
 
 func TestMain(m *testing.M) {
 	connectToPG()
-	connectToRethinkDB()
 	connectToMySQL()
-	connectToRedis()
 
 	s := m.Run()
 	integration.KillAll()
@@ -105,20 +97,6 @@ func connectToPG() {
 	managers["postgres"] = s
 }
 
-func connectToRethinkDB() {
-	var session = integration.ConnectToRethinkDB("hydra", "hydra_keys")
-	rethinkManager = &RethinkManager{
-		Keys:    map[string]jose.JsonWebKeySet{},
-		Session: session,
-		Table:   r.Table("hydra_keys"),
-		Cipher: &AEAD{
-			Key: encryptionKey,
-		},
-	}
-	rethinkManager.Watch(context.Background())
-	managers["rethink"] = rethinkManager
-}
-
 func connectToMySQL() {
 	var db = integration.ConnectToMySQL()
 	s := &SQLManager{DB: db, Cipher: &AEAD{Key: encryptionKey}}
@@ -128,60 +106,6 @@ func connectToMySQL() {
 	}
 
 	managers["mysql"] = s
-}
-
-func connectToRedis() {
-	var db = integration.ConnectToRedis()
-	managers["redis"] = &RedisManager{
-		DB:     db,
-		Cipher: &AEAD{Key: encryptionKey},
-	}
-}
-
-func BenchmarkRethinkGet(b *testing.B) {
-	b.StopTimer()
-
-	m := rethinkManager
-
-	var err error
-	ks, _ := testGenerator.Generate("")
-	err = m.AddKeySet("newfoobar", ks)
-	if err != nil {
-		b.Fatalf("%s", err)
-	}
-	time.Sleep(time.Millisecond * 100)
-
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
-		_, _ = m.GetKey("newfoobar", "public")
-	}
-}
-
-func TestColdStart(t *testing.T) {
-	ks, _ := testGenerator.Generate("")
-	p1 := ks.Key("private")
-
-	ks, _ = testGenerator.Generate("")
-	p2 := ks.Key("private")
-
-	pkg.AssertError(t, false, rethinkManager.AddKey("foo", First(p1)))
-	pkg.AssertError(t, false, rethinkManager.AddKey("bar", First(p2)))
-
-	time.Sleep(time.Second / 2)
-	rethinkManager.Lock()
-	rethinkManager.Keys = make(map[string]jose.JsonWebKeySet)
-	rethinkManager.Unlock()
-	pkg.AssertError(t, false, rethinkManager.ColdStart())
-
-	c1, err := rethinkManager.GetKey("foo", "private")
-	pkg.AssertError(t, false, err)
-	c2, err := rethinkManager.GetKey("bar", "private")
-	pkg.AssertError(t, false, err)
-
-	assert.NotEqual(t, c1, c2)
-	rethinkManager.Lock()
-	rethinkManager.Keys = make(map[string]jose.JsonWebKeySet)
-	rethinkManager.Unlock()
 }
 
 func TestHTTPManagerPublicKeyGet(t *testing.T) {

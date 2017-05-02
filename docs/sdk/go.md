@@ -37,7 +37,7 @@ var clients, err = hydra.Client.GetClients()
 
 Manage policies using [`ory-am/hydra/policy.HTTPManager`](policy/manager_http.go):
 ```go
-import "github.com/ory-am/ladon"
+import "github.com/ory/ladon"
 
 // Create a new policy
 // allow user to view his/her own photos

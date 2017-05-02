@@ -7,10 +7,11 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/hydra/firewall"
-	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/ladon"
+	"github.com/ory/herodot"
+	"github.com/ory/ladon"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
+	"strconv"
 )
 
 const (
@@ -22,7 +23,7 @@ const (
 
 type Handler struct {
 	Manager ladon.Manager
-	H       herodot.Herodot
+	H       herodot.Writer
 	W       firewall.Firewall
 }
 
@@ -35,12 +36,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 }
 
 func (h *Handler) Find(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var subject = r.URL.Query().Get("subject")
-	var ctx = herodot.NewContext()
-	if subject == "" {
-		h.H.WriteErrorCode(ctx, w, r, http.StatusBadRequest, errors.New("Missing query parameter subject"))
-	}
-
+	var ctx = r.Context()
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: policyResource,
 		Action:   "find",
@@ -49,7 +45,29 @@ func (h *Handler) Find(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 		return
 	}
 
-	policies, err := h.Manager.FindPoliciesForSubject(subject)
+	val := r.URL.Query().Get("offset")
+	if val == "" {
+		val = "0"
+	}
+
+	offset, err := strconv.ParseInt(val, 10, 64)
+	if err != nil {
+		h.H.WriteError(ctx, w, r, errors.WithStack(err))
+		return
+	}
+
+	val = r.URL.Query().Get("limit")
+	if val == "" {
+		val = "500"
+	}
+
+	limit, err := strconv.ParseInt(val, 10, 64)
+	if err != nil {
+		h.H.WriteError(ctx, w, r, errors.WithStack(err))
+		return
+	}
+
+	policies, err := h.Manager.GetAll(offset, limit)
 	if err != nil {
 		h.H.WriteError(ctx, w, r, errors.WithStack(err))
 		return
@@ -61,7 +79,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	var p = ladon.DefaultPolicy{
 		Conditions: ladon.Conditions{},
 	}
-	ctx := herodot.NewContext()
+	ctx := r.Context()
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: policyResource,
@@ -88,7 +106,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 }
 
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	ctx := herodot.NewContext()
+	ctx := r.Context()
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: fmt.Sprintf(policiesResource, ps.ByName("id")),
@@ -107,7 +125,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 }
 
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	ctx := herodot.NewContext()
+	ctx := r.Context()
 	id := ps.ByName("id")
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
@@ -129,7 +147,7 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 	var p = ladon.DefaultPolicy{Conditions: ladon.Conditions{}}
-	var ctx = herodot.NewContext()
+	var ctx = r.Context()
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: fmt.Sprintf(policiesResource, id),

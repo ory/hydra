@@ -29,7 +29,7 @@ best practices proposed by the IETF:
      and a global secret. This is what a token can look like: `/tgBeUhWlAT8tM8Bhmnx+Amf8rOYOUhrDi3pGzmjP7c=.BiV/Yhma+5moTP46anxMT6cWW8gz5R5vpC9RbpwSDdM=`
 * **Enforcing scopes:** By default, you always need to include the `core` scope or Hydra will not execute the request.
 
-Hydra uses [Ladon](https://github.com/ory-am/ladon) for policy management and access control. Ladon's API is minimalistic
+Hydra uses [Ladon](https://github.com/ory/ladon) for policy management and access control. Ladon's API is minimalistic
 and well tested.
 
 Hydra encrypts symmetric and asymmetric keys at rest using AES-GCM 256bit.

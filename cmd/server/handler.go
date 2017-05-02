@@ -18,7 +18,7 @@ import (
 	"github.com/ory-am/hydra/policy"
 	"github.com/ory-am/hydra/warden"
 	"github.com/ory-am/hydra/warden/group"
-	"github.com/ory-am/ladon"
+	"github.com/ory/ladon"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/urfave/negroni"

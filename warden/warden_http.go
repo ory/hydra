@@ -8,7 +8,7 @@ import (
 	"github.com/ory-am/hydra/firewall"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/pkg/errors"
-	"golang.org/x/net/context"
+	"context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 )

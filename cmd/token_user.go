@@ -11,7 +11,7 @@ import (
 	"github.com/ory-am/hydra/pkg"
 	"github.com/spf13/cobra"
 	"github.com/toqueteos/webbrowser"
-	"golang.org/x/net/context"
+	"context"
 	"golang.org/x/oauth2"
 	"gopkg.in/tylerb/graceful.v1"
 )

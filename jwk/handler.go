@@ -10,7 +10,7 @@ import (
 	"github.com/ory/herodot"
 	"github.com/pkg/errors"
 	"github.com/square/go-jose"
-	"golang.org/x/net/context"
+	"context"
 )
 
 type Handler struct {

@@ -11,7 +11,7 @@ import (
 	"github.com/ory-am/hydra/warden/group"
 	"github.com/ory/ladon"
 	"github.com/pkg/errors"
-	"golang.org/x/net/context"
+	"context"
 )
 
 type LocalWarden struct {

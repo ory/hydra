@@ -88,7 +88,7 @@ func ConnectToRethinkDB(database string, tables ...string) *r.Session {
 		log.Fatalf("Could not connect to docker: %s", err)
 	}
 
-	resource, err := pool.Run("rethinkdb", "2.3", []string{""})
+	resource, err := pool.Run("rethinkdb", "2.3", []string{})
 	if err != nil {
 		log.Fatalf("Could not start resource: %s", err)
 	}

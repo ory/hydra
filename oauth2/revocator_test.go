@@ -16,7 +16,7 @@ import (
 	"github.com/ory-am/hydra/oauth2"
 	"github.com/ory-am/hydra/pkg"
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/net/context"
+	"context"
 	"golang.org/x/oauth2/clientcredentials"
 )
 

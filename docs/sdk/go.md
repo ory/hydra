@@ -78,7 +78,7 @@ var err = hydra.JWK.DeleteKeySet("app-tls-keys")
 Validate access token, uses [`ory-am/hydra/warden.HTTPWarden`](warden/warden_http.go):
 
 ```go
-import "golang.org/x/net/context"
+import "context"
 import "github.com/ory-am/hydra/firewall"
 
 func anyHttpHandler(w http.ResponseWriter, r *http.Request) {    
@@ -91,7 +91,7 @@ func anyHttpHandler(w http.ResponseWriter, r *http.Request) {
 Validate requests with the Warden, uses [`ory-am/hydra/warden.HTTPWarden`](warden/warden_http.go):
 
 ```go
-import "golang.org/x/net/context"
+import "context"
 import "github.com/ory-am/hydra/firewall"
 
 func anyHttpHandler(w http.ResponseWriter, r *http.Request) {

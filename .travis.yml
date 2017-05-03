@@ -15,6 +15,9 @@ go:
 
 go_import_path: github.com/ory-am/hydra
 
+before_install:
+  - sudo apt-get install curl
+
 install:
   - go get github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/Masterminds/glide github.com/mitchellh/gox
   - git clone https://github.com/docker-library/official-images.git ~/official-images
@@ -31,9 +34,16 @@ script:
   - go test -v -bench=.* -run=none $(glide novendor)
   - docker build -t hydra-travis-ci .
   - docker run -d hydra-travis-ci
-  - $GOPATH/bin/hydra host --dangerous-auto-logon &
+  - hydra host --dangerous-auto-logon --dangerous-force-http &
   - while ! echo exit | nc localhost 4444; do sleep 1; done
-  - $GOPATH/bin/hydra token client --skip-tls-verify
+# Test clients
+  - hydra clients create --id foobar
+  - hydra clients delete foobar
+# Test token on arbitrary endpoints
+  - |-
+    curl --header "Authorization: bearer $(hydra token client)" http://localhost:4444/clients
+# Test token validation
+  - hydra token validate $(hydra token client)
 
 after_success:
   - |-
@@ -47,4 +57,4 @@ deploy:
   skip_cleanup: true
   on:
     tags: true
-    go: 1.7
+    go: 1.8

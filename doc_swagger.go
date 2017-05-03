@@ -1,26 +1,20 @@
 package main
 
-// A genericError is the error format of Hydra's RESTful APIs.
+// The standard error format
 // swagger:response genericError
 type genericError struct {
 	// in: body
-	body struct {
-		     // code
-		     code    int                      `json:"code,omitempty"`
+	Body struct {
+		     Code    int                      `json:"code,omitempty"`
 
-		     // status
-		     status  string                   `json:"status,omitempty"`
-		     // request
-		     request string                   `json:"request,omitempty"`
+		     Status  string                   `json:"status,omitempty"`
 
-		     // reason
-		     reason  string                   `json:"reason,omitempty"`
+		     Request string                   `json:"request,omitempty"`
 
-		     // details
-		     details []map[string]interface{} `json:"details,omitempty"`
+		     Reason  string                   `json:"reason,omitempty"`
 
+		     Details []map[string]interface{} `json:"details,omitempty"`
 
-		     // message
-		     message string                   `json:"message"`
+		     Message string                   `json:"message"`
 	     }
 }

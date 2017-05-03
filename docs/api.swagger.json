@@ -19,7 +19,7 @@
       "email": "hi@ory.am"
     },
     "license": {
-      "name": "MIT",
+      "name": "Apache 2.0",
       "url": "https://github.com/ory/hydra/blob/master/LICENSE"
     },
     "version": "Latest"
@@ -28,6 +28,7 @@
   "paths": {
     "/clients": {
       "get": {
+        "description": "Never returns a client's secret.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -42,7 +43,7 @@
           "oauth2",
           "clients"
         ],
-        "summary": "Fetches OAuth 2.0 Clients, never returns a client's secret.",
+        "summary": "Lists OAuth 2.0 Clients",
         "operationId": "listOAuthClients",
         "security": [
           {
@@ -66,165 +67,8 @@
           }
         }
       },
-      "put": {
-        "description": "Updates an OAuth 2.0 Client. Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This\nendpoint should be well protected and only called by code you trust.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "oauth2",
-          "clients"
-        ],
-        "operationId": "updateOAuthClient",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.clients"
-            ]
-          }
-        ],
-        "parameters": [
-          {
-            "type": "string",
-            "x-go-name": "ID",
-            "description": "ID is the id for this client.",
-            "name": "id",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "x-go-name": "Name",
-            "description": "Name is the human-readable string name of the client to be presented to the\nend-user during authorization.",
-            "name": "client_name",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "x-go-name": "Secret",
-            "description": "Secret is the client's secret. The secret will be included in the create request as cleartext, and then\nnever again. The secret is stored using BCrypt so it is impossible to recover it. Tell your users\nthat they need to write the secret down as it will not be made available again.",
-            "name": "client_secret",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "x-go-name": "RedirectURIs",
-            "description": "RedirectURIs is an array of allowed redirect urls for the client, for example: http://mydomain/oauth/callback .",
-            "name": "redirect_uris",
-            "in": "query"
-          },
-          {
-            "pattern": "client_credentials|authorize_code|implicit|refresh_token",
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "x-go-name": "GrantTypes",
-            "description": "GrantTypes is an array of grant types the client is allowed to use.",
-            "name": "grant_types",
-            "in": "query"
-          },
-          {
-            "pattern": "id_token|code|token",
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "x-go-name": "ResponseTypes",
-            "description": "ResponseTypes is an array of the OAuth 2.0 response type strings that the client can\nuse at the authorization endpoint.",
-            "name": "response_types",
-            "in": "query"
-          },
-          {
-            "pattern": "([a-zA-Z0-9\\.]+\\s)+",
-            "type": "string",
-            "x-go-name": "Scope",
-            "description": "Scope is a string containing a space-separated list of scope values (as\ndescribed in Section 3.3 of OAuth 2.0 [RFC6749]) that the client\ncan use when requesting access tokens.",
-            "name": "scope",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "x-go-name": "Owner",
-            "description": "Owner is a string identifying the owner of the OAuth 2.0 Client.",
-            "name": "owner",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "x-go-name": "PolicyURI",
-            "description": "PolicyURI is a URL string that points to a human-readable privacy policy document\nthat describes how the deployment organization collects, uses,\nretains, and discloses personal data.",
-            "name": "policy_uri",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "x-go-name": "TermsOfServiceURI",
-            "description": "TermsOfServiceURI is a URL string that points to a human-readable terms of service\ndocument for the client that describes a contractual relationship\nbetween the end-user and the client that the end-user accepts when\nauthorizing the client.",
-            "name": "tos_uri",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "x-go-name": "ClientURI",
-            "description": "ClientURI is an URL string of a web page providing information about the client.\nIf present, the server SHOULD display this URL to the end-user in\na clickable fashion.",
-            "name": "client_uri",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "x-go-name": "LogoURI",
-            "description": "LogoURI is an URL string that references a logo for the client.",
-            "name": "logo_uri",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "x-go-name": "Contacts",
-            "description": "Contacts is a array of strings representing ways to contact people responsible\nfor this client, typically email addresses.",
-            "name": "contacts",
-            "in": "query"
-          },
-          {
-            "type": "boolean",
-            "x-go-name": "Public",
-            "description": "Public is a boolean that identifies this client as public, meaning that it\ndoes not have a secret. It will disable the client_credentials grant type for this client if set.",
-            "name": "public",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "oauthClient",
-            "schema": {
-              "$ref": "#/definitions/oauthClient"
-            }
-          },
-          "401": {
-            "$ref": "#/responses/genericError"
-          },
-          "403": {
-            "$ref": "#/responses/genericError"
-          },
-          "500": {
-            "$ref": "#/responses/genericError"
-          }
-        }
-      },
       "post": {
-        "description": "Updates an OAuth 2.0 Client. Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This\nendpoint should be well protected and only called by code you trust.",
+        "description": "Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This\nendpoint should be well protected and only called by code you trust.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -239,6 +83,7 @@
           "oauth2",
           "clients"
         ],
+        "summary": "Creates an OAuth 2.0 Client",
         "operationId": "createOAuthClient",
         "security": [
           {
@@ -249,117 +94,12 @@
         ],
         "parameters": [
           {
-            "type": "string",
-            "x-go-name": "ID",
-            "description": "ID is the id for this client.",
-            "name": "id",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "x-go-name": "Name",
-            "description": "Name is the human-readable string name of the client to be presented to the\nend-user during authorization.",
-            "name": "client_name",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "x-go-name": "Secret",
-            "description": "Secret is the client's secret. The secret will be included in the create request as cleartext, and then\nnever again. The secret is stored using BCrypt so it is impossible to recover it. Tell your users\nthat they need to write the secret down as it will not be made available again.",
-            "name": "client_secret",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "x-go-name": "RedirectURIs",
-            "description": "RedirectURIs is an array of allowed redirect urls for the client, for example: http://mydomain/oauth/callback .",
-            "name": "redirect_uris",
-            "in": "query"
-          },
-          {
-            "pattern": "client_credentials|authorize_code|implicit|refresh_token",
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "x-go-name": "GrantTypes",
-            "description": "GrantTypes is an array of grant types the client is allowed to use.",
-            "name": "grant_types",
-            "in": "query"
-          },
-          {
-            "pattern": "id_token|code|token",
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "x-go-name": "ResponseTypes",
-            "description": "ResponseTypes is an array of the OAuth 2.0 response type strings that the client can\nuse at the authorization endpoint.",
-            "name": "response_types",
-            "in": "query"
-          },
-          {
-            "pattern": "([a-zA-Z0-9\\.]+\\s)+",
-            "type": "string",
-            "x-go-name": "Scope",
-            "description": "Scope is a string containing a space-separated list of scope values (as\ndescribed in Section 3.3 of OAuth 2.0 [RFC6749]) that the client\ncan use when requesting access tokens.",
-            "name": "scope",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "x-go-name": "Owner",
-            "description": "Owner is a string identifying the owner of the OAuth 2.0 Client.",
-            "name": "owner",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "x-go-name": "PolicyURI",
-            "description": "PolicyURI is a URL string that points to a human-readable privacy policy document\nthat describes how the deployment organization collects, uses,\nretains, and discloses personal data.",
-            "name": "policy_uri",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "x-go-name": "TermsOfServiceURI",
-            "description": "TermsOfServiceURI is a URL string that points to a human-readable terms of service\ndocument for the client that describes a contractual relationship\nbetween the end-user and the client that the end-user accepts when\nauthorizing the client.",
-            "name": "tos_uri",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "x-go-name": "ClientURI",
-            "description": "ClientURI is an URL string of a web page providing information about the client.\nIf present, the server SHOULD display this URL to the end-user in\na clickable fashion.",
-            "name": "client_uri",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "x-go-name": "LogoURI",
-            "description": "LogoURI is an URL string that references a logo for the client.",
-            "name": "logo_uri",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "x-go-name": "Contacts",
-            "description": "Contacts is a array of strings representing ways to contact people responsible\nfor this client, typically email addresses.",
-            "name": "contacts",
-            "in": "query"
-          },
-          {
-            "type": "boolean",
-            "x-go-name": "Public",
-            "description": "Public is a boolean that identifies this client as public, meaning that it\ndoes not have a secret. It will disable the client_credentials grant type for this client if set.",
-            "name": "public",
-            "in": "query"
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/oauthClient"
+            }
           }
         ],
         "responses": {
@@ -383,6 +123,7 @@
     },
     "/clients/{id}": {
       "get": {
+        "description": "Never returns the client's secret.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients:\u003csome-id\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients:\u003csome-id\u003e \"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -397,7 +138,7 @@
           "oauth2",
           "clients"
         ],
-        "summary": "Fetches an OAuth 2.0 Client. Never returns the client's secret.",
+        "summary": "Fetches an OAuth 2.0 Client.",
         "operationId": "getOAuthClient",
         "security": [
           {
@@ -435,7 +176,8 @@
           }
         }
       },
-      "delete": {
+      "put": {
+        "description": "Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This\nendpoint should be well protected and only called by code you trust.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -450,7 +192,67 @@
           "oauth2",
           "clients"
         ],
-        "summary": "Deletes an OAuth 2.0 Client.",
+        "summary": "Updates an OAuth 2.0 Client",
+        "operationId": "updateOAuthClient",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.clients"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/oauthClient"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "oauthClient",
+            "schema": {
+              "$ref": "#/definitions/oauthClient"
+            }
+          },
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      },
+      "delete": {
+        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients:\u003csome-id\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients:\u003csome-id\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "oauth2",
+          "clients"
+        ],
+        "summary": "Deletes an OAuth 2.0 Client",
         "operationId": "deleteOAuthClient",
         "security": [
           {
@@ -482,9 +284,572 @@
           }
         }
       }
+    },
+    "/keys/{set}": {
+      "get": {
+        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "jwk"
+        ],
+        "summary": "Retrieves a JSON Web Key Set matching the set",
+        "operationId": "getJwkSet",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.keys.get"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "Set",
+            "description": "The set",
+            "name": "set",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "jwkSet",
+            "schema": {
+              "$ref": "#/definitions/jwkSet"
+            }
+          },
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      },
+      "put": {
+        "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "jwk"
+        ],
+        "summary": "Updates a JSON Web Key Set",
+        "operationId": "updateJwkSet",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.keys.update"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "Set",
+            "description": "The set",
+            "name": "set",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/jwkSet"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "jwkSet",
+            "schema": {
+              "$ref": "#/definitions/jwkSet"
+            }
+          },
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      },
+      "post": {
+        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "jwk"
+        ],
+        "summary": "Generate a new JSON Web Key",
+        "operationId": "createJwkKey",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.keys.create"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "Set",
+            "description": "The set",
+            "name": "set",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/createRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "jwkSet",
+            "schema": {
+              "$ref": "#/definitions/jwkSet"
+            }
+          },
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      },
+      "delete": {
+        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "jwk"
+        ],
+        "summary": "Delete a JSON Web Key",
+        "operationId": "deleteJwkSet",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.keys.delete"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "Set",
+            "description": "The set",
+            "name": "set",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
+    "/keys/{set}/{kid}": {
+      "get": {
+        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "jwk"
+        ],
+        "summary": "Retrieves a JSON Web Key Set matching the set and the kid",
+        "operationId": "getJwkSetKey",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.keys.get"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "KID",
+            "description": "The kid of the desired key",
+            "name": "kid",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "Set",
+            "description": "The set",
+            "name": "set",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "jwkSet",
+            "schema": {
+              "$ref": "#/definitions/jwkSet"
+            }
+          },
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      },
+      "put": {
+        "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "jwk"
+        ],
+        "summary": "Updates a JSON Web Key",
+        "operationId": "updateJwkKey",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.keys.update"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "KID",
+            "description": "The kid of the desired key",
+            "name": "kid",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "Set",
+            "description": "The set",
+            "name": "set",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/jwkSet"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "jwkSet",
+            "schema": {
+              "$ref": "#/definitions/jwkSet"
+            }
+          },
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      },
+      "delete": {
+        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "jwk"
+        ],
+        "summary": "Delete a JSON Web Key",
+        "operationId": "deleteJwkKey",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.keys.delete"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "KID",
+            "description": "The kid of the desired key",
+            "name": "kid",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "Set",
+            "description": "The set",
+            "name": "set",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
     }
   },
   "definitions": {
+    "createRequest": {
+      "type": "object",
+      "required": [
+        "alg",
+        "kid"
+      ],
+      "properties": {
+        "alg": {
+          "description": "The algorithm to be used for creating the key. Supports \"RS256\", \"ES521\" and \"HS256\"",
+          "type": "string",
+          "x-go-name": "Algorithm"
+        },
+        "kid": {
+          "description": "The kid of the key to be created",
+          "type": "string",
+          "x-go-name": "KeyID"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/jwk"
+    },
+    "jwk": {
+      "type": "object",
+      "properties": {
+        "alg": {
+          "description": "The \"alg\" (algorithm) parameter identifies the algorithm intended for\nuse with the key.  The values used should either be registered in the\nIANA \"JSON Web Signature and Encryption Algorithms\" registry\nestablished by [JWA] or be a value that contains a Collision-\nResistant Name.",
+          "type": "string",
+          "x-go-name": "Alg"
+        },
+        "crv": {
+          "type": "string",
+          "x-go-name": "Crv"
+        },
+        "d": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint8"
+          },
+          "x-go-name": "D"
+        },
+        "dp": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint8"
+          },
+          "x-go-name": "Dp"
+        },
+        "dq": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint8"
+          },
+          "x-go-name": "Dq"
+        },
+        "e": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint8"
+          },
+          "x-go-name": "E"
+        },
+        "k": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint8"
+          },
+          "x-go-name": "K"
+        },
+        "kid": {
+          "description": "The \"kid\" (key ID) parameter is used to match a specific key.  This\nis used, for instance, to choose among a set of keys within a JWK Set\nduring key rollover.  The structure of the \"kid\" value is\nunspecified.  When \"kid\" values are used within a JWK Set, different\nkeys within the JWK Set SHOULD use distinct \"kid\" values.  (One\nexample in which different keys might use the same \"kid\" value is if\nthey have different \"kty\" (key type) values but are considered to be\nequivalent alternatives by the application using them.)  The \"kid\"\nvalue is a case-sensitive string.",
+          "type": "string",
+          "x-go-name": "Kid"
+        },
+        "kty": {
+          "description": "The \"kty\" (key type) parameter identifies the cryptographic algorithm\nfamily used with the key, such as \"RSA\" or \"EC\". \"kty\" values should\neither be registered in the IANA \"JSON Web Key Types\" registry\nestablished by [JWA] or be a value that contains a Collision-\nResistant Name.  The \"kty\" value is a case-sensitive string.",
+          "type": "string",
+          "x-go-name": "Kty"
+        },
+        "n": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint8"
+          },
+          "x-go-name": "N"
+        },
+        "p": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint8"
+          },
+          "x-go-name": "P"
+        },
+        "q": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint8"
+          },
+          "x-go-name": "Q"
+        },
+        "qi": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint8"
+          },
+          "x-go-name": "Qi"
+        },
+        "use": {
+          "description": "The \"use\" (public key use) parameter identifies the intended use of\nthe public key. The \"use\" parameter is employed to indicate whether\na public key is used for encrypting data or verifying the signature\non data. Values are commonly \"sig\" (signature) or \"enc\" (encryption).",
+          "type": "string",
+          "x-go-name": "Use"
+        },
+        "x": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint8"
+          },
+          "x-go-name": "X"
+        },
+        "x5c": {
+          "description": "The \"x5c\" (X.509 certificate chain) parameter contains a chain of one\nor more PKIX certificates [RFC5280].  The certificate chain is\nrepresented as a JSON array of certificate value strings.  Each\nstring in the array is a base64-encoded (Section 4 of [RFC4648] --\nnot base64url-encoded) DER [ITU.X690.1994] PKIX certificate value.\nThe PKIX certificate containing the key value MUST be the first\ncertificate.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "X5c"
+        },
+        "y": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint8"
+          },
+          "x-go-name": "Y"
+        }
+      },
+      "x-go-name": "swaggerJSONWebKey",
+      "x-go-package": "github.com/ory/hydra/jwk"
+    },
+    "jwkSet": {
+      "type": "object",
+      "properties": {
+        "keys": {
+          "description": "The value of the \"keys\" parameter is an array of JWK values.  By\ndefault, the order of the JWK values within the array does not imply\nan order of preference among them, although applications of JWK Sets\ncan choose to assign a meaning to the order for their purposes, if\ndesired.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/jwk"
+          },
+          "x-go-name": "Keys"
+        }
+      },
+      "x-go-name": "swaggerJSONWebKeySet",
+      "x-go-package": "github.com/ory/hydra/jwk"
+    },
     "oauthClient": {
       "type": "object",
       "title": "Client represents an OAuth 2.0 Client.",
@@ -577,6 +942,97 @@
       },
       "x-go-name": "Client",
       "x-go-package": "github.com/ory/hydra/client"
+    },
+    "swaggerJwkCreateKey": {
+      "type": "object",
+      "required": [
+        "set"
+      ],
+      "properties": {
+        "Body": {
+          "$ref": "#/definitions/createRequest"
+        },
+        "set": {
+          "description": "The set\nin: path",
+          "type": "string",
+          "x-go-name": "Set"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/jwk"
+    },
+    "swaggerJwkSetKeyQuery": {
+      "type": "object",
+      "required": [
+        "kid",
+        "set"
+      ],
+      "properties": {
+        "kid": {
+          "description": "The kid of the desired key\nin: path",
+          "type": "string",
+          "x-go-name": "KID"
+        },
+        "set": {
+          "description": "The set\nin: path",
+          "type": "string",
+          "x-go-name": "Set"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/jwk"
+    },
+    "swaggerJwkSetQuery": {
+      "type": "object",
+      "required": [
+        "set"
+      ],
+      "properties": {
+        "set": {
+          "description": "The set\nin: path",
+          "type": "string",
+          "x-go-name": "Set"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/jwk"
+    },
+    "swaggerJwkUpdateKey": {
+      "type": "object",
+      "required": [
+        "kid",
+        "set"
+      ],
+      "properties": {
+        "Body": {
+          "$ref": "#/definitions/jwkSet"
+        },
+        "kid": {
+          "description": "The kid of the desired key\nin: path",
+          "type": "string",
+          "x-go-name": "KID"
+        },
+        "set": {
+          "description": "The set\nin: path",
+          "type": "string",
+          "x-go-name": "Set"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/jwk"
+    },
+    "swaggerJwkUpdateSet": {
+      "type": "object",
+      "required": [
+        "set"
+      ],
+      "properties": {
+        "Body": {
+          "$ref": "#/definitions/jwkSet"
+        },
+        "set": {
+          "description": "The set\nin: path",
+          "type": "string",
+          "x-go-name": "Set"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/jwk"
     }
   },
   "responses": {
@@ -590,7 +1046,43 @@
       }
     },
     "genericError": {
-      "description": "A genericError is the error format of Hydra's RESTful APIs."
+      "description": "The standard error format",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Code"
+          },
+          "details": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object"
+              }
+            },
+            "x-go-name": "Details"
+          },
+          "message": {
+            "type": "string",
+            "x-go-name": "Message"
+          },
+          "reason": {
+            "type": "string",
+            "x-go-name": "Reason"
+          },
+          "request": {
+            "type": "string",
+            "x-go-name": "Request"
+          },
+          "status": {
+            "type": "string",
+            "x-go-name": "Status"
+          }
+        }
+      }
     }
   },
   "securityDefinitions": {

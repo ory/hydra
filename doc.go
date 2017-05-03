@@ -13,7 +13,7 @@
 //     Host:
 //     BasePath: /
 //     Version: Latest
-//     License: MIT https://github.com/ory/hydra/blob/master/LICENSE
+//     License: Apache 2.0 https://github.com/ory/hydra/blob/master/LICENSE
 //     Contact: ORY <hi@ory.am> https://www.ory.am
 //
 //     Consumes:

@@ -3,7 +3,6 @@ package integration
 import (
 	"log"
 	"time"
-
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
@@ -16,7 +15,9 @@ var pool *dockertest.Pool
 
 func KillAll() {
 	for _, resource := range resources {
-		pool.Purge(resource)
+		if err := pool.Purge(resource); err != nil {
+			log.Printf("Got an error while trying to purge resource: %s", err)
+		}
 	}
 	resources = []*dockertest.Resource{}
 }
@@ -25,7 +26,7 @@ func ConnectToMySQL() *sqlx.DB {
 	var db *sqlx.DB
 	var err error
 	pool, err = dockertest.NewPool("")
-	pool.MaxWait = time.Minute * 2
+	pool.MaxWait = time.Minute * 5
 	if err != nil {
 		log.Fatalf("Could not connect to docker: %s", err)
 	}
@@ -43,6 +44,7 @@ func ConnectToMySQL() *sqlx.DB {
 		}
 		return db.Ping()
 	}); err != nil {
+		pool.Purge(resource)
 		log.Fatalf("Could not connect to docker: %s", err)
 	}
 
@@ -71,6 +73,7 @@ func ConnectToPostgres() *sqlx.DB {
 		}
 		return db.Ping()
 	}); err != nil {
+		pool.Purge(resource)
 		log.Fatalf("Could not connect to docker: %s", err)
 	}
 

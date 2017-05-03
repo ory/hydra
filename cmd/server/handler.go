@@ -3,7 +3,6 @@ package server
 import (
 	"crypto/tls"
 	"net/http"
-	"time"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"github.com/meatballhat/negroni-logrus"
@@ -20,6 +19,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/urfave/negroni"
+	"github.com/ory/graceful"
 )
 
 func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
@@ -56,30 +56,28 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		n.UseFunc(serverHandler.rejectInsecureRequests)
 		n.UseHandler(router)
 
-		var srv = http.Server{
-			Addr:    c.GetAddress(),
+		var srv = graceful.PatchHTTPServerWithCloudflareConfig(&http.Server{
+			Addr:c.GetAddress(),
 			Handler: n,
 			TLSConfig: &tls.Config{
-				Certificates: []tls.Certificate{
-					getOrCreateTLSCertificate(cmd, c),
-				},
+				Certificates:  []tls.Certificate{getOrCreateTLSCertificate(cmd, c)},
 			},
-			ReadTimeout:  time.Second * 5,
-			WriteTimeout: time.Second * 10,
-		}
+		})
 
-		var err error
-		logger.Infof("Setting up http server on %s", c.GetAddress())
-		if c.ForceHTTP {
-			logger.Warnln("HTTPS disabled. Never do this in production.")
-			err = srv.ListenAndServe()
-		} else if c.AllowTLSTermination != "" {
-			logger.Infoln("TLS termination enabled, disabling https.")
-			err = srv.ListenAndServe()
-		} else {
-			err = srv.ListenAndServeTLS("", "")
-		}
-		pkg.Must(err, "Could not start server: %s %s.", err)
+		pkg.Must(srv.Graceful(func() {
+			var err error
+			logger.Infof("Setting up http server on %s", c.GetAddress())
+			if c.ForceHTTP {
+				logger.Warnln("HTTPS disabled. Never do this in production.")
+				err = srv.ListenAndServe()
+			} else if c.AllowTLSTermination != "" {
+				logger.Infoln("TLS termination enabled, disabling https.")
+				err = srv.ListenAndServe()
+			} else {
+				err = srv.ListenAndServeTLS("", "")
+			}
+			pkg.Must(err, "Could not start server: %s %s.", err)
+		}), "Could not gracefully run server")
 	}
 }
 
@@ -91,7 +89,7 @@ type Handler struct {
 	Groups  *group.Handler
 	Warden  *warden.WardenHandler
 	Config  *config.Config
-	H herodot.Writer
+	H       herodot.Writer
 }
 
 func (h *Handler) registerRoutes(router *httprouter.Router) {

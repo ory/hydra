@@ -37,17 +37,33 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.DELETE(ClientsHandlerPath + "/:id", h.Delete)
 }
 
-// swagger:parameters createOAuthClient updateOAuthClient
-type createClientPayload struct {
-	// in: body
-	// required: true
-	Client
-}
-
 // swagger:route POST /clients oauth2 clients createOAuthClient
 //
-// Updates an OAuth 2.0 Client. Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This
+// Creates an OAuth 2.0 Client
+//
+// Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This
 // endpoint should be well protected and only called by code you trust.
+//
+// The subject making the request needs to be assigned to a policy containing:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:clients"],
+//    "actions": ["create"],
+//    "effect": "allow"
+//  }
+//  ```
+//
+//  Additionally, the context key "owner" is set to the owner of the client, allowing policies such as:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:clients"],
+//    "actions": ["create"],
+//    "effect": "allow",
+//    "conditions": { "owner": { "type": "EqualsSubjectCondition" } }
+//  }
+//  ```
 //
 //     Consumes:
 //     - application/json
@@ -106,10 +122,33 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	h.H.WriteCreated(w, r, ClientsHandlerPath + "/" + c.GetID(), &c)
 }
 
-// swagger:route PUT /clients oauth2 clients updateOAuthClient
+// swagger:route PUT /clients/{id} oauth2 clients updateOAuthClient
 //
-// Updates an OAuth 2.0 Client. Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This
+// Updates an OAuth 2.0 Client
+//
+// Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This
 // endpoint should be well protected and only called by code you trust.
+//
+// The subject making the request needs to be assigned to a policy containing:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:clients"],
+//    "actions": ["update"],
+//    "effect": "allow"
+//  }
+//  ```
+//
+//  Additionally, the context key "owner" is set to the owner of the client, allowing policies such as:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:clients"],
+//    "actions": ["update"],
+//    "effect": "allow",
+//    "conditions": { "owner": { "type": "EqualsSubjectCondition" } }
+//  }
+//  ```
 //
 //     Consumes:
 //     - application/json
@@ -166,16 +205,21 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	h.H.WriteCreated(w, r, ClientsHandlerPath + "/" + c.GetID(), &c)
 }
 
-// A list of clients.
-// swagger:response clientsList
-type listClientsResult struct {
-	// in: body
-	Clients []Client
-}
-
 // swagger:route GET /clients oauth2 clients listOAuthClients
 //
-// Fetches OAuth 2.0 Clients, never returns a client's secret.
+// Lists OAuth 2.0 Clients
+//
+// Never returns a client's secret.
+//
+// The subject making the request needs to be assigned to a policy containing:
+//
+// ```
+// {
+//   "resources": ["rn:hydra:clients"],
+//   "actions": ["get"],
+//   "effect": "allow"
+// }
+// ```
 //
 //     Consumes:
 //     - application/json
@@ -218,18 +262,32 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	h.H.Write(w, r, c)
 }
 
-// swagger:parameters getOAuthClient deleteOAuthClient
-type queryClientPayload struct {
-	// The id of the OAuth 2.0 Client.
-	//
-	// unique: true
-	// in: path
-	ID string `json:"id"`
-}
-
 // swagger:route GET /clients/{id} oauth2 clients getOAuthClient
 //
-// Fetches an OAuth 2.0 Client. Never returns the client's secret.
+// Fetches an OAuth 2.0 Client.
+//
+// Never returns the client's secret.
+//
+// The subject making the request needs to be assigned to a policy containing:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:clients:<some-id>"],
+//    "actions": ["get"],
+//    "effect": "allow"
+//  }
+//  ```
+//
+//  Additionally, the context key "owner" is set to the owner of the client, allowing policies such as:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:clients:<some-id> "],
+//    "actions": ["get"],
+//    "effect": "allow",
+//    "conditions": { "owner": { "type": "EqualsSubjectCondition" } }
+//  }
+//  ```
 //
 //     Consumes:
 //     - application/json
@@ -274,7 +332,28 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 
 // swagger:route DELETE /clients/{id} oauth2 clients deleteOAuthClient
 //
-// Deletes an OAuth 2.0 Client.
+// Deletes an OAuth 2.0 Client
+//
+// The subject making the request needs to be assigned to a policy containing:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:clients:<some-id>"],
+//    "actions": ["delete"],
+//    "effect": "allow"
+//  }
+//  ```
+//
+//  Additionally, the context key "owner" is set to the owner of the client, allowing policies such as:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:clients:<some-id>"],
+//    "actions": ["delete"],
+//    "effect": "allow",
+//    "conditions": { "owner": { "type": "EqualsSubjectCondition" } }
+//  }
+//  ```
 //
 //     Consumes:
 //     - application/json
@@ -296,9 +375,18 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	var ctx = r.Context()
 	var id = ps.ByName("id")
 
+	c, err := h.Manager.GetConcreteClient(id)
+	if err != nil {
+		h.H.WriteError(w, r, err)
+		return
+	}
+
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: fmt.Sprintf(ClientResource, id),
 		Action:   "delete",
+		Context: ladon.Context{
+			"owner": c.GetOwner(),
+		},
 	}, Scope); err != nil {
 		h.H.WriteError(w, r, err)
 		return

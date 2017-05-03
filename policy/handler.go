@@ -30,17 +30,17 @@ type Handler struct {
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.POST(endpoint, h.Create)
-	r.GET(endpoint, h.Find)
+	r.GET(endpoint, h.List)
 	r.GET(endpoint+"/:id", h.Get)
 	r.PUT(endpoint+"/:id", h.Update)
 	r.DELETE(endpoint+"/:id", h.Delete)
 }
 
-func (h *Handler) Find(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) List(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = r.Context()
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: policyResource,
-		Action:   "find",
+		Action:   "list",
 	}, scope); err != nil {
 		h.H.WriteError(w, r, err)
 		return

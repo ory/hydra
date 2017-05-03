@@ -49,6 +49,8 @@ type Config struct {
 	IDTokenLifespan        string `mapstructure:"ID_TOKEN_LIFESPAN" yaml:"-"`
 	ChallengeTokenLifespan string `mapstructure:"CHALLENGE_TOKEN_LIFESPAN" yaml:"-"`
 	CookieSecret           string `mapstructure:"COOKIE_SECRET" yaml:"-"`
+	LogLevel           string `mapstructure:"LOG_LEVEL" yaml:"-"`
+	LogFormat string `mapstructure:"LOG_FORMAT" yaml:"-"`
 	ForceHTTP              bool   `yaml:"-"`
 
 	logger                 *logrus.Logger  `yaml:"-"`
@@ -77,16 +79,19 @@ func matchesRange(r *http.Request, ranges []string) error {
 	return errors.New("Remote address does not match any cidr ranges")
 }
 
-func newLogger() *logrus.Logger {
+func newLogger(c *Config) *logrus.Logger {
 	var (
 		err    error
 		logger = logrus.New()
 	)
 
-	logger.Formatter = new(logrus.JSONFormatter)
-	logger.Level, err = logrus.ParseLevel(os.Getenv("LOG_LEVEL"))
+	if c.LogFormat == "json" {
+		logger.Formatter = new(logrus.JSONFormatter)
+	}
+
+	logger.Level, err = logrus.ParseLevel(c.LogLevel)
 	if err != nil {
-		logger.Errorf("Couldn't parse log level: %s", os.Getenv("LOG_LEVEL"))
+		logger.Errorf("Couldn't parse log level: %s", c.LogLevel)
 		logger.Level = logrus.InfoLevel
 	}
 
@@ -95,7 +100,7 @@ func newLogger() *logrus.Logger {
 
 func (c *Config) GetLogger() *logrus.Logger {
 	if c.logger == nil {
-		c.logger = newLogger()
+		c.logger = newLogger(c)
 	}
 
 	return c.logger

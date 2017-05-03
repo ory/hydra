@@ -116,6 +116,12 @@ func initConfig() {
 	viper.BindEnv("CHALLENGE_TOKEN_LIFESPAN")
 	viper.SetDefault("CHALLENGE_TOKEN_LIFESPAN", "10m")
 
+	viper.BindEnv("LOG_LEVEL")
+	viper.SetDefault("LOG_LEVEL", "info")
+
+	viper.BindEnv("LOG_FORMAT")
+	viper.SetDefault("LOG_FORMAT", "")
+
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err != nil {
 		fmt.Printf(`Config file not found because "%s"`, err)

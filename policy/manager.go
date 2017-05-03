@@ -5,6 +5,7 @@ import (
 	"github.com/ory/ladon"
 	"github.com/ory/ladon/manager/sql"
 	"github.com/rubenv/sql-migrate"
+	"github.com/pkg/errors"
 )
 
 // Manager is responsible for managing and persisting policies.
@@ -19,7 +20,7 @@ type Manager interface {
 	Delete(id string) error
 
 	// GetAll retrieves all policies.
-	GetAll(offset, limit int64) (ladon.Policies, error)
+	GetAll(limit, offset int64) (ladon.Policies, error)
 
 	// Update a policy.
 	Update(policy ladon.Policy) error
@@ -29,7 +30,7 @@ func NewSQLManager(db *sqlx.DB) (ladon.Manager, error) {
 	m := sql.NewSQLManager(db, nil)
 	migrate.SetTable("hydra_policy_migration")
 	if err := m.CreateSchemas(); err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 	return m, nil
 }

@@ -3,13 +3,14 @@ package server
 import (
 	"fmt"
 	"net/url"
+
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
+	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
-	"github.com/ory/herodot"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
@@ -34,7 +35,7 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 		m := &oauth2.FositeSQLStore{
 			DB:      con.GetDatabase(),
 			Manager: clients,
-			L: c.GetLogger(),
+			L:       c.GetLogger(),
 		}
 		if err := m.CreateSchemas(); err != nil {
 			c.GetLogger().Fatalf("Could not create oauth2 schema: %s", err)

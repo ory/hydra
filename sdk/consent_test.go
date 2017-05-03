@@ -3,6 +3,10 @@ package sdk
 import (
 	"encoding/base64"
 	"encoding/json"
+	"strings"
+	"testing"
+	"time"
+
 	"github.com/gorilla/sessions"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/jwk"
@@ -10,9 +14,6 @@ import (
 	"github.com/square/go-jose"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"strings"
-	"testing"
-	"time"
 )
 
 func genKey() *jose.JsonWebKeySet {

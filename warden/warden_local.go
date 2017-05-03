@@ -1,8 +1,10 @@
 package warden
 
 import (
+	"context"
 	"net/http"
 	"time"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/firewall"
@@ -10,7 +12,6 @@ import (
 	"github.com/ory/hydra/warden/group"
 	"github.com/ory/ladon"
 	"github.com/pkg/errors"
-	"context"
 )
 
 type LocalWarden struct {
@@ -20,7 +21,7 @@ type LocalWarden struct {
 
 	AccessTokenLifespan time.Duration
 	Issuer              string
-	L   logrus.FieldLogger
+	L                   logrus.FieldLogger
 }
 
 func (w *LocalWarden) TokenFromRequest(r *http.Request) string {

@@ -4,11 +4,12 @@ import (
 	"testing"
 
 	"crypto/rand"
+	"io"
+
 	"github.com/ory/hydra/pkg"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
-	"io"
 )
 
 // RandomBytes returns n random bytes by reading from crypto/rand.Reader

@@ -8,11 +8,12 @@ import (
 	"testing"
 
 	"fmt"
+
 	"github.com/julienschmidt/httprouter"
 	_ "github.com/lib/pq"
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/compose"
 	"github.com/ory/herodot"
+	"github.com/ory/hydra/compose"
 	"github.com/ory/hydra/integration"
 	. "github.com/ory/hydra/warden/group"
 	"github.com/ory/ladon"

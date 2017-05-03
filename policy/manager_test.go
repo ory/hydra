@@ -9,11 +9,11 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/compose"
 	"github.com/ory/herodot"
+	"github.com/ory/hydra/compose"
 	"github.com/ory/hydra/pkg"
-	memory "github.com/ory/ladon/manager/memory"
 	"github.com/ory/ladon"
+	memory "github.com/ory/ladon/manager/memory"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 )
@@ -36,7 +36,7 @@ func init() {
 			Policies: map[string]ladon.Policy{},
 		},
 		W: localWarden,
-		H:  herodot.NewJSONWriter(nil),
+		H: herodot.NewJSONWriter(nil),
 	}
 
 	r := httprouter.New()

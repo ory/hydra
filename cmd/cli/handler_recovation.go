@@ -4,12 +4,13 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"net/http"
+
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	"github.com/spf13/cobra"
 	"golang.org/x/oauth2/clientcredentials"
-	"net/http"
 )
 
 type RevocationHandler struct {

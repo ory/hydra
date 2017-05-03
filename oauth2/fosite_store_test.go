@@ -1,11 +1,13 @@
 package oauth2
 
 import (
+	"context"
+	"fmt"
 	"net/url"
 	"os"
 	"testing"
 	"time"
-	"fmt"
+
 	"github.com/Sirupsen/logrus"
 	c "github.com/ory-am/common/pkg"
 	"github.com/ory/fosite"
@@ -15,7 +17,6 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"context"
 )
 
 var clientManagers = map[string]pkg.FositeStorer{}

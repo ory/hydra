@@ -3,6 +3,7 @@ package oauth2
 import (
 	"bytes"
 	"encoding/gob"
+
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"

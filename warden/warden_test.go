@@ -7,20 +7,21 @@ import (
 	"testing"
 	"time"
 
+	"context"
+
+	"github.com/Sirupsen/logrus"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/hydra/firewall"
 	"github.com/ory/herodot"
+	"github.com/ory/hydra/firewall"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/warden"
 	"github.com/ory/hydra/warden/group"
 	"github.com/ory/ladon"
 	"github.com/stretchr/testify/assert"
-	"context"
 	coauth2 "golang.org/x/oauth2"
-	"github.com/Sirupsen/logrus"
 )
 
 var ts *httptest.Server
@@ -60,7 +61,7 @@ var tokens = pkg.Tokens(4)
 func init() {
 	wardens["local"] = &warden.LocalWarden{
 		Warden: ladonWarden,
-		L: logrus.New(),
+		L:      logrus.New(),
 		OAuth2: &fosite.Fosite{
 			Store: fositeStore,
 			TokenIntrospectionHandlers: fosite.TokenIntrospectionHandlers{
@@ -86,7 +87,7 @@ func init() {
 
 	r := httprouter.New()
 	serv := &warden.WardenHandler{
-		H:       herodot.NewJSONWriter(nil),
+		H:      herodot.NewJSONWriter(nil),
 		Warden: wardens["local"],
 	}
 	serv.SetRoutes(r)

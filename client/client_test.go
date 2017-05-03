@@ -1,9 +1,10 @@
 package client
 
 import (
+	"testing"
+
 	"github.com/ory/fosite"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestClient(t *testing.T) {

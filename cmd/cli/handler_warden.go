@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"context"
+
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	"github.com/spf13/cobra"
-	"context"
 )
 
 type WardenHandler struct {

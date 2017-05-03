@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/ory/herodot"
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/firewall"
-	"github.com/ory/herodot"
 	"github.com/pkg/errors"
 )
 
@@ -48,7 +48,7 @@ func NewHandler(c *config.Config, router *httprouter.Router) *WardenHandler {
 	ctx := c.Context()
 
 	h := &WardenHandler{
-		H:       herodot.NewJSONWriter(c.GetLogger()),
+		H:      herodot.NewJSONWriter(c.GetLogger()),
 		Warden: ctx.Warden,
 	}
 	h.SetRoutes(router)

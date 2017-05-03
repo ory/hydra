@@ -5,15 +5,16 @@ import (
 	"net/url"
 
 	"encoding/json"
+	"strings"
+	"time"
+
+	"github.com/Sirupsen/logrus"
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
-	"strings"
-	"time"
-	"github.com/Sirupsen/logrus"
 )
 
 const (

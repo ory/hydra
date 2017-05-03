@@ -1,13 +1,14 @@
 package oauth2
 
 import (
-	"github.com/julienschmidt/httprouter"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
 	"github.com/Sirupsen/logrus"
+	"github.com/julienschmidt/httprouter"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestHandlerConsent(t *testing.T) {

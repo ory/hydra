@@ -7,10 +7,13 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"github.com/Sirupsen/logrus"
 )
 
 func TestHandlerConsent(t *testing.T) {
-	h := new(Handler)
+	h := &Handler{
+		L: logrus.New(),
+	}
 	r := httprouter.New()
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)

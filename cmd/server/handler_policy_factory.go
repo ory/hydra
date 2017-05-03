@@ -2,9 +2,9 @@ package server
 
 import (
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/hydra/config"
+	"github.com/ory/hydra/config"
 	"github.com/ory/herodot"
-	"github.com/ory-am/hydra/policy"
+	"github.com/ory/hydra/policy"
 )
 
 func newPolicyHandler(c *config.Config, router *httprouter.Router) *policy.Handler {

@@ -6,7 +6,7 @@ import (
 
 	"bytes"
 	"encoding/json"
-	"github.com/ory-am/hydra/pkg"
+	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
 	"io/ioutil"
 )

@@ -6,7 +6,7 @@ import (
 	"crypto/tls"
 	"net/http"
 
-	"github.com/ory-am/hydra/pkg"
+	"github.com/ory/hydra/pkg"
 	"github.com/spf13/cobra"
 	"context"
 	"golang.org/x/oauth2"

@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/fosite"
-	"github.com/ory-am/hydra/compose"
+	"github.com/ory/fosite"
+	"github.com/ory/hydra/compose"
 	"github.com/ory/herodot"
-	"github.com/ory-am/hydra/pkg"
+	"github.com/ory/hydra/pkg"
 	memory "github.com/ory/ladon/manager/memory"
 	"github.com/ory/ladon"
 	"github.com/pborman/uuid"

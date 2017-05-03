@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/hydra/config"
+	"github.com/ory/hydra/config"
 )
 
 func TestStart(t *testing.T) {

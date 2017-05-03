@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory-am/fosite/handler/oauth2"
-	"github.com/ory-am/fosite/storage"
-	"github.com/ory-am/fosite/token/hmac"
+	"github.com/ory/fosite/handler/oauth2"
+	"github.com/ory/fosite/storage"
+	"github.com/ory/fosite/token/hmac"
 	"github.com/ory/ladon"
 	"github.com/ory/ladon/manager/memory"
 	"github.com/pkg/errors"

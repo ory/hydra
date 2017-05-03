@@ -121,7 +121,7 @@ There are different work flows for OpenID Connect 1.0, we recommend checking out
 
 Hydra is a server implementation of the OAuth 2.0 authorization framework and the OpenID Connect Core 1.0. Existing OAuth2
 implementations usually ship as libraries or SDKs such as [node-oauth2-server](https://github.com/oauthjs/node-oauth2-server)
-or [fosite](https://github.com/ory-am/fosite/issues), or as fully featured identity solutions with user
+or [fosite](https://github.com/ory/fosite/issues), or as fully featured identity solutions with user
 management and user interfaces, such as [Dex](https://github.com/coreos/dex) or [Okta](https://www.okta.com/).
 
 Implementing and using OAuth2 without understanding the whole specification is challenging and prone to errors, even when

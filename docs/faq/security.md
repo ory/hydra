@@ -6,7 +6,7 @@ OAuth2 and OAuth2 related specifications are over 200 written pages. Implementin
 Even if you use a secure SDK (there are numerous SDKs not secure by design in the wild), messing up the implementation
 is a real threat - no matter how good you or your team is. To err is human. Now, let us take a look at security in Hydra.
 
-Hydra uses [Fosite](https://github.com/ory-am/fosite#a-word-on-security), a secure-by-design OAuth2 SDK. Fosite implements
+Hydra uses [Fosite](https://github.com/ory/fosite#a-word-on-security), a secure-by-design OAuth2 SDK. Fosite implements
 best practices proposed by the IETF:  
 * [No Cleartext Storage of Credentials](https://tools.ietf.org/html/rfc6819#section-5.1.4.1.3)
 * [Encryption of Credentials](https://tools.ietf.org/html/rfc6819#section-5.1.4.1.4)

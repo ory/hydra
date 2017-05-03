@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"github.com/ory-am/hydra/config"
+	"github.com/ory/hydra/config"
 )
 
 type Handler struct {

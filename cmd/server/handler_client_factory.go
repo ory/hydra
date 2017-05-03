@@ -2,8 +2,8 @@ package server
 
 import (
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/hydra/client"
-	"github.com/ory-am/hydra/config"
+	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/config"
 	"github.com/ory/herodot"
 )
 

@@ -2,7 +2,7 @@ FROM golang:1.8-alpine
 
 RUN apk add --no-cache git
 RUN go get github.com/Masterminds/glide
-WORKDIR /go/src/github.com/ory-am/hydra
+WORKDIR /go/src/github.com/ory/hydra
 
 ADD ./glide.yaml ./glide.yaml
 ADD ./glide.lock ./glide.lock

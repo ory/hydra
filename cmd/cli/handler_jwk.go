@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/ory-am/hydra/config"
-	"github.com/ory-am/hydra/jwk"
-	"github.com/ory-am/hydra/pkg"
+	"github.com/ory/hydra/config"
+	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/pkg"
 	"github.com/spf13/cobra"
 )
 

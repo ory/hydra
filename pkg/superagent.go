@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/ory-am/hydra/pkg/helper"
+	"github.com/ory/hydra/pkg/helper"
 	"github.com/pkg/errors"
 )
 

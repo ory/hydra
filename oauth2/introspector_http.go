@@ -3,7 +3,7 @@ package oauth2
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/ory-am/fosite"
+	"github.com/ory/fosite"
 	"github.com/pkg/errors"
 	"context"
 	"golang.org/x/oauth2"

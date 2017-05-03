@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/hydra/firewall"
+	"github.com/ory/hydra/firewall"
 	"github.com/ory/herodot"
 	"github.com/ory/ladon"
 	"github.com/pborman/uuid"

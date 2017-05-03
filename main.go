@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/ory-am/hydra/cmd"
+	"github.com/ory/hydra/cmd"
 	"github.com/pkg/profile"
 )
 

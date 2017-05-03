@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/hydra/config"
-	"github.com/ory-am/hydra/firewall"
+	"github.com/ory/hydra/config"
+	"github.com/ory/hydra/firewall"
 	"github.com/ory/herodot"
 	"github.com/pkg/errors"
 )

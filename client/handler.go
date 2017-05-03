@@ -25,18 +25,46 @@ const (
 
 const (
 	ClientsResource = "rn:hydra:clients"
-	ClientResource  = "rn:hydra:clients:%s"
-	Scope           = "hydra.clients"
+	ClientResource = "rn:hydra:clients:%s"
+	Scope = "hydra.clients"
 )
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET(ClientsHandlerPath, h.GetAll)
 	r.POST(ClientsHandlerPath, h.Create)
-	r.GET(ClientsHandlerPath+"/:id", h.Get)
-	r.PUT(ClientsHandlerPath+"/:id", h.Update)
-	r.DELETE(ClientsHandlerPath+"/:id", h.Delete)
+	r.GET(ClientsHandlerPath + "/:id", h.Get)
+	r.PUT(ClientsHandlerPath + "/:id", h.Update)
+	r.DELETE(ClientsHandlerPath + "/:id", h.Delete)
 }
 
+// swagger:parameters createOAuthClient updateOAuthClient
+type createClientPayload struct {
+	// in: body
+	// required: true
+	Client
+}
+
+// swagger:route POST /clients oauth2 clients createOAuthClient
+//
+// Updates an OAuth 2.0 Client. Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This
+// endpoint should be well protected and only called by code you trust.
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2: hydra.clients
+//
+//     Responses:
+//       200: oauthClient
+//       401: genericError
+//       403: genericError
+//       500: genericError
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var c Client
 	var ctx = r.Context()
@@ -75,9 +103,30 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	}
 
 	c.Secret = secret
-	h.H.WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
+	h.H.WriteCreated(w, r, ClientsHandlerPath + "/" + c.GetID(), &c)
 }
 
+// swagger:route PUT /clients oauth2 clients updateOAuthClient
+//
+// Updates an OAuth 2.0 Client. Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This
+// endpoint should be well protected and only called by code you trust.
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2: hydra.clients
+//
+//     Responses:
+//       200: oauthClient
+//       401: genericError
+//       403: genericError
+//       500: genericError
 func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var c Client
 	var ctx = r.Context()
@@ -114,7 +163,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		return
 	}
 
-	h.H.WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
+	h.H.WriteCreated(w, r, ClientsHandlerPath + "/" + c.GetID(), &c)
 }
 
 func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -142,6 +191,35 @@ func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	h.H.Write(w, r, c)
 }
 
+// swagger:parameters getOAuthClient deleteOAuthClient
+type queryClientPayload struct {
+	// The id of the OAuth 2.0 Client.
+	//
+	// unique: true
+	// in: path
+	ID string `json:"id"`
+}
+
+// swagger:route GET /clients/{id} oauth2 clients getOAuthClient
+//
+// Fetches an OAuth 2.0 Client. Never returns the client's secret.
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2: hydra.clients
+//
+//     Responses:
+//       200: oauthClient
+//       401: genericError
+//       403: genericError
+//       500: genericError
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var ctx = r.Context()
 	var id = ps.ByName("id")
@@ -167,6 +245,26 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	h.H.Write(w, r, c)
 }
 
+// swagger:route DELETE /clients/{id} oauth2 clients deleteOAuthClient
+//
+// Deletes an OAuth 2.0 Client.
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2: hydra.clients
+//
+//     Responses:
+//       204
+//       401: genericError
+//       403: genericError
+//       500: genericError
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var ctx = r.Context()
 	var id = ps.ByName("id")

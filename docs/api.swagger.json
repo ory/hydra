@@ -1,0 +1,558 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "is a server implementation of the OAuth 2.0 authorization framework and the OpenID Connect Core 1.0.\nExisting OAuth2 implementations usually ship as libraries or SDKs such as node-oauth2-server or fosite, or as fully featured identity solutions with user management and user interfaces, such as Dex.\n\nImplementing and using OAuth2 without understanding the whole specification is challenging and prone to errors, even when SDKs are being used. The primary goal of Hydra is to make OAuth 2.0 and OpenID Connect 1.0 better accessible.\n\nHydra implements the flows described in OAuth2 and OpenID Connect 1.0 without forcing you to use a \"Hydra User Management\" or some template engine or a predefined front-end. Instead it relies on HTTP redirection and cryptographic methods to verify user consent allowing you to use Hydra with any authentication endpoint, be it authboss, auth0.com or your proprietary PHP authentication.\n\nThe official repository is located at https://github.com/ory-am/hydra",
+    "title": "Hydra OAuth2 \u0026 OpenID Connect Server",
+    "contact": {
+      "name": "ORY",
+      "url": "https://www.ory.am",
+      "email": "hi@ory.am"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://github.com/ory/hydra/blob/master/LICENSE"
+    },
+    "version": "Latest"
+  },
+  "basePath": "/",
+  "paths": {
+    "/clients": {
+      "put": {
+        "description": "Updates an OAuth 2.0 Client. Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This\nendpoint should be well protected and only called by code you trust.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "oauth2",
+          "clients"
+        ],
+        "operationId": "updateOAuthClient",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.clients"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "description": "ID is the id for this client.",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "Name",
+            "description": "Name is the human-readable string name of the client to be presented to the\nend-user during authorization.",
+            "name": "client_name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "Secret",
+            "description": "Secret is the client's secret. The secret will be included in the create request as cleartext, and then\nnever again. The secret is stored using BCrypt so it is impossible to recover it. Tell your users\nthat they need to write the secret down as it will not be made available again.",
+            "name": "client_secret",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "x-go-name": "RedirectURIs",
+            "description": "RedirectURIs is an array of allowed redirect urls for the client, for example: http://mydomain/oauth/callback .",
+            "name": "redirect_uris",
+            "in": "query"
+          },
+          {
+            "pattern": "client_credentials|authorize_code|implicit|refresh_token",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "x-go-name": "GrantTypes",
+            "description": "GrantTypes is an array of grant types the client is allowed to use.",
+            "name": "grant_types",
+            "in": "query"
+          },
+          {
+            "pattern": "id_token|code|token",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "x-go-name": "ResponseTypes",
+            "description": "ResponseTypes is an array of the OAuth 2.0 response type strings that the client can\nuse at the authorization endpoint.",
+            "name": "response_types",
+            "in": "query"
+          },
+          {
+            "pattern": "([a-zA-Z0-9\\.]+\\s)+",
+            "type": "string",
+            "x-go-name": "Scope",
+            "description": "Scope is a string containing a space-separated list of scope values (as\ndescribed in Section 3.3 of OAuth 2.0 [RFC6749]) that the client\ncan use when requesting access tokens.",
+            "name": "scope",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "Owner",
+            "description": "Owner is a string identifying the owner of the OAuth 2.0 Client.",
+            "name": "owner",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "PolicyURI",
+            "description": "PolicyURI is a URL string that points to a human-readable privacy policy document\nthat describes how the deployment organization collects, uses,\nretains, and discloses personal data.",
+            "name": "policy_uri",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "TermsOfServiceURI",
+            "description": "TermsOfServiceURI is a URL string that points to a human-readable terms of service\ndocument for the client that describes a contractual relationship\nbetween the end-user and the client that the end-user accepts when\nauthorizing the client.",
+            "name": "tos_uri",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientURI",
+            "description": "ClientURI is an URL string of a web page providing information about the client.\nIf present, the server SHOULD display this URL to the end-user in\na clickable fashion.",
+            "name": "client_uri",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "LogoURI",
+            "description": "LogoURI is an URL string that references a logo for the client.",
+            "name": "logo_uri",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "x-go-name": "Contacts",
+            "description": "Contacts is a array of strings representing ways to contact people responsible\nfor this client, typically email addresses.",
+            "name": "contacts",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "x-go-name": "Public",
+            "description": "Public is a boolean that identifies this client as public, meaning that it\ndoes not have a secret. It will disable the client_credentials grant type for this client if set.",
+            "name": "public",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "oauthClient",
+            "schema": {
+              "$ref": "#/definitions/oauthClient"
+            }
+          },
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      },
+      "post": {
+        "description": "Updates an OAuth 2.0 Client. Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This\nendpoint should be well protected and only called by code you trust.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "oauth2",
+          "clients"
+        ],
+        "operationId": "createOAuthClient",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.clients"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "description": "ID is the id for this client.",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "Name",
+            "description": "Name is the human-readable string name of the client to be presented to the\nend-user during authorization.",
+            "name": "client_name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "Secret",
+            "description": "Secret is the client's secret. The secret will be included in the create request as cleartext, and then\nnever again. The secret is stored using BCrypt so it is impossible to recover it. Tell your users\nthat they need to write the secret down as it will not be made available again.",
+            "name": "client_secret",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "x-go-name": "RedirectURIs",
+            "description": "RedirectURIs is an array of allowed redirect urls for the client, for example: http://mydomain/oauth/callback .",
+            "name": "redirect_uris",
+            "in": "query"
+          },
+          {
+            "pattern": "client_credentials|authorize_code|implicit|refresh_token",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "x-go-name": "GrantTypes",
+            "description": "GrantTypes is an array of grant types the client is allowed to use.",
+            "name": "grant_types",
+            "in": "query"
+          },
+          {
+            "pattern": "id_token|code|token",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "x-go-name": "ResponseTypes",
+            "description": "ResponseTypes is an array of the OAuth 2.0 response type strings that the client can\nuse at the authorization endpoint.",
+            "name": "response_types",
+            "in": "query"
+          },
+          {
+            "pattern": "([a-zA-Z0-9\\.]+\\s)+",
+            "type": "string",
+            "x-go-name": "Scope",
+            "description": "Scope is a string containing a space-separated list of scope values (as\ndescribed in Section 3.3 of OAuth 2.0 [RFC6749]) that the client\ncan use when requesting access tokens.",
+            "name": "scope",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "Owner",
+            "description": "Owner is a string identifying the owner of the OAuth 2.0 Client.",
+            "name": "owner",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "PolicyURI",
+            "description": "PolicyURI is a URL string that points to a human-readable privacy policy document\nthat describes how the deployment organization collects, uses,\nretains, and discloses personal data.",
+            "name": "policy_uri",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "TermsOfServiceURI",
+            "description": "TermsOfServiceURI is a URL string that points to a human-readable terms of service\ndocument for the client that describes a contractual relationship\nbetween the end-user and the client that the end-user accepts when\nauthorizing the client.",
+            "name": "tos_uri",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientURI",
+            "description": "ClientURI is an URL string of a web page providing information about the client.\nIf present, the server SHOULD display this URL to the end-user in\na clickable fashion.",
+            "name": "client_uri",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "LogoURI",
+            "description": "LogoURI is an URL string that references a logo for the client.",
+            "name": "logo_uri",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "x-go-name": "Contacts",
+            "description": "Contacts is a array of strings representing ways to contact people responsible\nfor this client, typically email addresses.",
+            "name": "contacts",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "x-go-name": "Public",
+            "description": "Public is a boolean that identifies this client as public, meaning that it\ndoes not have a secret. It will disable the client_credentials grant type for this client if set.",
+            "name": "public",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "oauthClient",
+            "schema": {
+              "$ref": "#/definitions/oauthClient"
+            }
+          },
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
+    "/clients/{id}": {
+      "get": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "oauth2",
+          "clients"
+        ],
+        "summary": "Fetches an OAuth 2.0 Client. Never returns the client's secret.",
+        "operationId": "getOAuthClient",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.clients"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "uniqueItems": true,
+            "type": "string",
+            "x-go-name": "ID",
+            "description": "The id of the OAuth 2.0 Client.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "oauthClient",
+            "schema": {
+              "$ref": "#/definitions/oauthClient"
+            }
+          },
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      },
+      "delete": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "oauth2",
+          "clients"
+        ],
+        "summary": "Deletes an OAuth 2.0 Client.",
+        "operationId": "deleteOAuthClient",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.clients"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "uniqueItems": true,
+            "type": "string",
+            "x-go-name": "ID",
+            "description": "The id of the OAuth 2.0 Client.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "oauthClient": {
+      "type": "object",
+      "title": "Client represents an OAuth 2.0 Client.",
+      "properties": {
+        "client_name": {
+          "description": "Name is the human-readable string name of the client to be presented to the\nend-user during authorization.",
+          "type": "string",
+          "x-go-name": "Name"
+        },
+        "client_secret": {
+          "description": "Secret is the client's secret. The secret will be included in the create request as cleartext, and then\nnever again. The secret is stored using BCrypt so it is impossible to recover it. Tell your users\nthat they need to write the secret down as it will not be made available again.",
+          "type": "string",
+          "x-go-name": "Secret"
+        },
+        "client_uri": {
+          "description": "ClientURI is an URL string of a web page providing information about the client.\nIf present, the server SHOULD display this URL to the end-user in\na clickable fashion.",
+          "type": "string",
+          "x-go-name": "ClientURI"
+        },
+        "contacts": {
+          "description": "Contacts is a array of strings representing ways to contact people responsible\nfor this client, typically email addresses.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "Contacts"
+        },
+        "grant_types": {
+          "description": "GrantTypes is an array of grant types the client is allowed to use.",
+          "type": "array",
+          "pattern": "client_credentials|authorize_code|implicit|refresh_token",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "GrantTypes"
+        },
+        "id": {
+          "description": "ID is the id for this client.",
+          "type": "string",
+          "x-go-name": "ID"
+        },
+        "logo_uri": {
+          "description": "LogoURI is an URL string that references a logo for the client.",
+          "type": "string",
+          "x-go-name": "LogoURI"
+        },
+        "owner": {
+          "description": "Owner is a string identifying the owner of the OAuth 2.0 Client.",
+          "type": "string",
+          "x-go-name": "Owner"
+        },
+        "policy_uri": {
+          "description": "PolicyURI is a URL string that points to a human-readable privacy policy document\nthat describes how the deployment organization collects, uses,\nretains, and discloses personal data.",
+          "type": "string",
+          "x-go-name": "PolicyURI"
+        },
+        "public": {
+          "description": "Public is a boolean that identifies this client as public, meaning that it\ndoes not have a secret. It will disable the client_credentials grant type for this client if set.",
+          "type": "boolean",
+          "x-go-name": "Public"
+        },
+        "redirect_uris": {
+          "description": "RedirectURIs is an array of allowed redirect urls for the client, for example: http://mydomain/oauth/callback .",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "RedirectURIs"
+        },
+        "response_types": {
+          "description": "ResponseTypes is an array of the OAuth 2.0 response type strings that the client can\nuse at the authorization endpoint.",
+          "type": "array",
+          "pattern": "id_token|code|token",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "ResponseTypes"
+        },
+        "scope": {
+          "description": "Scope is a string containing a space-separated list of scope values (as\ndescribed in Section 3.3 of OAuth 2.0 [RFC6749]) that the client\ncan use when requesting access tokens.",
+          "type": "string",
+          "pattern": "([a-zA-Z0-9\\.]+\\s)+",
+          "x-go-name": "Scope"
+        },
+        "tos_uri": {
+          "description": "TermsOfServiceURI is a URL string that points to a human-readable terms of service\ndocument for the client that describes a contractual relationship\nbetween the end-user and the client that the end-user accepts when\nauthorizing the client.",
+          "type": "string",
+          "x-go-name": "TermsOfServiceURI"
+        }
+      },
+      "x-go-name": "Client",
+      "x-go-package": "github.com/ory/hydra/client"
+    }
+  },
+  "responses": {
+    "genericError": {
+      "description": "A genericError is the error format of Hydra's RESTful APIs."
+    }
+  },
+  "securityDefinitions": {
+    "oauth2": {
+      "type": "oauth2",
+      "in": "header",
+      "flow": "accessCode",
+      "authorizationUrl": "/oauth2/auth",
+      "tokenUrl": "/oauth2/token"
+    }
+  },
+  "x-request-id": "string"
+}

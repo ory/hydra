@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/ory-am/hydra/cmd/server"
+	"github.com/ory/hydra/cmd/server"
 	"github.com/spf13/cobra"
 )
 

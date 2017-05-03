@@ -4,9 +4,9 @@ import (
 	"crypto/rsa"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	ejwt "github.com/ory-am/fosite/token/jwt"
-	"github.com/ory-am/hydra/jwk"
-	"github.com/ory-am/hydra/oauth2"
+	ejwt "github.com/ory/fosite/token/jwt"
+	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/oauth2"
 	"github.com/pkg/errors"
 	"time"
 )

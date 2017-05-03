@@ -3,7 +3,7 @@ package jwk
 import (
 	"testing"
 
-	"github.com/ory-am/hydra/pkg"
+	"github.com/ory/hydra/pkg"
 	"github.com/square/go-jose"
 	"github.com/stretchr/testify/assert"
 )

@@ -4,7 +4,7 @@ swagger: '2.0'
 info:
   title: Hydra API
   description: >
-    An open source OAuth2 and OpenID Connect server for new and existing infrastructures. Visit [**Hydra on GitHub**](https://github.com/ory-am/hydra) or read the [**guide**](https://ory-am.gitbooks.io/hydra/content/index.html).
+    An open source OAuth2 and OpenID Connect server for new and existing infrastructures. Visit [**Hydra on GitHub**](https://github.com/ory/hydra) or read the [**guide**](https://ory-am.gitbooks.io/hydra/content/index.html).
 
   version: "0.7.0"
 # array of all schemes that your API supports

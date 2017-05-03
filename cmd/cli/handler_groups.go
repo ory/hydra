@@ -3,9 +3,9 @@ package cli
 import (
 	"fmt"
 
-	"github.com/ory-am/hydra/config"
-	"github.com/ory-am/hydra/pkg"
-	"github.com/ory-am/hydra/warden/group"
+	"github.com/ory/hydra/config"
+	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/warden/group"
 	"github.com/spf13/cobra"
 )
 

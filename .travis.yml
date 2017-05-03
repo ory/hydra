@@ -1,6 +1,6 @@
 sudo: required
 
-go_import_path: github.com/ory-am/hydra
+go_import_path: github.com/ory/hydra
 
 services:
   - docker
@@ -13,8 +13,6 @@ language: go
 go:
   - 1.8
 
-go_import_path: github.com/ory-am/hydra
-
 before_install:
   - sudo apt-get install curl
 
@@ -22,9 +20,9 @@ install:
   - go get github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/Masterminds/glide github.com/mitchellh/gox
   - git clone https://github.com/docker-library/official-images.git ~/official-images
   - glide install
-  - go install github.com/ory-am/hydra
+  - go install github.com/ory/hydra
   - glide update
-  - go install github.com/ory-am/hydra
+  - go install github.com/ory/hydra
 
 script:
   - |-
@@ -47,7 +45,7 @@ script:
 
 after_success:
   - |-
-    [ "${TRAVIS_TAG}" != "" ] && [ "${TRAVIS_GO_VERSION}" == "1.7" ] && gox -ldflags "-X github.com/ory-am/hydra/cmd.Version=`git describe --tags` -X github.com/ory-am/hydra/cmd.BuildTime=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory-am/hydra/cmd.GitHash=`git rev-parse HEAD`" -output "dist/{{.Dir}}-{{.OS}}-{{.Arch}}"
+    [ "${TRAVIS_TAG}" != "" ] && [ "${TRAVIS_GO_VERSION}" == "1.7" ] && gox -ldflags "-X github.com/ory/hydra/cmd.Version=`git describe --tags` -X github.com/ory/hydra/cmd.BuildTime=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory/hydra/cmd.GitHash=`git rev-parse HEAD`" -output "dist/{{.Dir}}-{{.OS}}-{{.Arch}}"
 
 deploy:
   provider: releases

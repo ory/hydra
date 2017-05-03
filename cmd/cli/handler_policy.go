@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ory-am/hydra/config"
-	"github.com/ory-am/hydra/pkg"
-	"github.com/ory-am/hydra/policy"
+	"github.com/ory/hydra/config"
+	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/policy"
 	"github.com/ory/ladon"
 	"github.com/spf13/cobra"
 	"github.com/square/go-jose/json"

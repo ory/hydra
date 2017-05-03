@@ -3,7 +3,7 @@ package oauth2_test
 import (
 	"testing"
 
-	"github.com/ory-am/hydra/pkg"
+	"github.com/ory/hydra/pkg"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2"
 )

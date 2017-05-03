@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"encoding/json"
 
-	"github.com/ory-am/hydra/pkg"
+	"github.com/ory/hydra/pkg"
 	"github.com/ory/ladon"
 	"github.com/pkg/errors"
 )

@@ -1,12 +1,12 @@
 package integration
 
 import (
-	"github.com/ory-am/fosite"
-	"github.com/ory-am/hydra/client"
-	"github.com/ory-am/hydra/jwk"
-	"github.com/ory-am/hydra/oauth2"
-	"github.com/ory-am/hydra/policy"
-	"github.com/ory-am/hydra/warden/group"
+	"github.com/ory/fosite"
+	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/policy"
+	"github.com/ory/hydra/warden/group"
 	"github.com/ory/ladon"
 	"github.com/stretchr/testify/require"
 	"testing"

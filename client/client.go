@@ -3,7 +3,7 @@ package client
 import (
 	"strings"
 
-	"github.com/ory-am/fosite"
+	"github.com/ory/fosite"
 )
 
 type Client struct {

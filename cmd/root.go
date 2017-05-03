@@ -8,8 +8,8 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/ory-am/hydra/cmd/cli"
-	"github.com/ory-am/hydra/config"
+	"github.com/ory/hydra/cmd/cli"
+	"github.com/ory/hydra/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

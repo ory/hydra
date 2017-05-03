@@ -2,16 +2,17 @@ package config
 
 import (
 	"net/url"
+	"runtime"
+	"strconv"
+	"strings"
 	"time"
+
 	"github.com/Sirupsen/logrus"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
-	"strings"
-	"runtime"
-	"strconv"
 )
 
 type MemoryConnection struct{}

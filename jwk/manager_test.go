@@ -1,26 +1,27 @@
 package jwk_test
 
 import (
-	"net/http/httptest"
-	"net/url"
-	"testing"
 	"crypto/rand"
 	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"os"
+	"testing"
+	"time"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/compose"
 	"github.com/ory/herodot"
+	"github.com/ory/hydra/compose"
 	"github.com/ory/hydra/integration"
 	. "github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/ladon"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
-	"io"
-	"log"
-	"net/http"
-	"os"
-	"time"
 )
 
 var managers = map[string]Manager{}

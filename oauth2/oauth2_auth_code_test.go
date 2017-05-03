@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"net/http/cookiejar"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
 	ejwt "github.com/ory/fosite/token/jwt"
@@ -15,7 +17,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
-	"net/http/cookiejar"
 )
 
 func TestAuthCode(t *testing.T) {

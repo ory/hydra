@@ -6,6 +6,8 @@ import (
 	"net/url"
 	"os"
 
+	"context"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/jwk"
 	hoauth2 "github.com/ory/hydra/oauth2"
@@ -13,7 +15,6 @@ import (
 	"github.com/ory/hydra/policy"
 	"github.com/ory/hydra/warden"
 	"github.com/ory/hydra/warden/group"
-	"context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 )

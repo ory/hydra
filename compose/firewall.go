@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/hydra/firewall"
@@ -13,7 +14,6 @@ import (
 	"github.com/ory/hydra/warden/group"
 	"github.com/ory/ladon"
 	"golang.org/x/oauth2"
-	"github.com/Sirupsen/logrus"
 )
 
 func NewMockFirewall(issuer string, subject string, scopes fosite.Arguments, p ...ladon.Policy) (firewall.Firewall, *http.Client) {
@@ -49,7 +49,7 @@ func NewMockFirewall(issuer string, subject string, scopes fosite.Arguments, p .
 			Issuer:              issuer,
 			AccessTokenLifespan: time.Hour,
 			Groups:              group.NewMemoryManager(),
-			L: logrus.New(),
+			L:                   logrus.New(),
 		}, conf.Client(oauth2.NoContext, &oauth2.Token{
 			AccessToken: tokens[0][1],
 			Expiry:      time.Now().Add(time.Hour),

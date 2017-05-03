@@ -7,7 +7,9 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"math/big"
+	"strings"
 	"time"
+
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/pkg"
@@ -15,7 +17,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/square/go-jose"
-	"strings"
 )
 
 const (

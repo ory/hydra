@@ -6,9 +6,10 @@ import (
 
 	"bytes"
 	"encoding/json"
+	"io/ioutil"
+
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
-	"io/ioutil"
 )
 
 type HTTPManager struct {

@@ -6,7 +6,9 @@ import (
 	"testing"
 	"time"
 
+	"context"
 	"fmt"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
@@ -16,7 +18,6 @@ import (
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	"github.com/stretchr/testify/assert"
-	"context"
 	"golang.org/x/oauth2/clientcredentials"
 )
 
@@ -41,7 +42,7 @@ func init() {
 			compose.OAuth2TokenIntrospectionFactory,
 			compose.OAuth2TokenRevocationFactory,
 		),
-		H:  herodot.NewJSONWriter(nil),
+		H: herodot.NewJSONWriter(nil),
 	}
 	serv.SetRoutes(r)
 	ts = httptest.NewServer(r)

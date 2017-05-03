@@ -1,9 +1,10 @@
 package pkg
 
 import (
+	"reflect"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/pkg/errors"
-	"reflect"
 )
 
 var (

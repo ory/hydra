@@ -3,12 +3,13 @@ package sdk
 import (
 	"crypto/rsa"
 	"fmt"
+	"time"
+
 	"github.com/dgrijalva/jwt-go"
 	ejwt "github.com/ory/fosite/token/jwt"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/pkg/errors"
-	"time"
 )
 
 // Consent is a helper for singing and verifying consent challenges. For an exemplary reference implementation, check
@@ -20,19 +21,19 @@ type Consent struct {
 // ResponseRequest is being used by the consent response singing helper.
 type ResponseRequest struct {
 	// Challenge is the original consent challenge.
-	Challenge        string
+	Challenge string
 
 	// Subject will be the sub claim of the access token. Usually this is a resource owner (user).
-	Subject          string
+	Subject string
 
 	// Scopes are the scopes the resource owner granted to the application requesting the access token.
-	Scopes           []string
+	Scopes []string
 
 	// AccessTokenExtra is arbitrary data that will be available when performing token introspection or warden requests.
 	AccessTokenExtra interface{}
 
 	// IDTokenExtra is arbitrary data that will included as a claim in the ID Token, if requested.
-	IDTokenExtra     interface{}
+	IDTokenExtra interface{}
 }
 
 // ChallengeClaims are the decoded claims of a consent challenge.
@@ -42,16 +43,16 @@ type ChallengeClaims struct {
 	RequestedScopes []string `json:"scp"`
 
 	// The ID of the application that initiated the OAuth2 flow.
-	Audience        string   `json:"aud"`
+	Audience string `json:"aud"`
 
 	// RedirectURL is the url where the consent app will send the user after the consent flow has been completed.
-	RedirectURL     string   `json:"redir"`
+	RedirectURL string `json:"redir"`
 
 	// ExpiresAt is a unix timestamp of the expiry time.
-	ExpiresAt       float64  `json:"exp"`
+	ExpiresAt float64 `json:"exp"`
 
 	// ID is the tokens' ID which will be automatically echoed in the consent response.
-	ID              string   `json:"jti"`
+	ID string `json:"jti"`
 }
 
 // Valid tests if the challenge's claims are valid.

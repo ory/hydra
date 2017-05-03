@@ -2,6 +2,7 @@ package oauth2
 
 import (
 	"net/http"
+
 	"github.com/julienschmidt/httprouter"
 )
 

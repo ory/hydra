@@ -1,19 +1,20 @@
 package client_test
 
 import (
+	"fmt"
 	"log"
 	"net/http/httptest"
 	"net/url"
 	"os"
 	"testing"
 	"time"
-	"fmt"
+
 	"github.com/julienschmidt/httprouter"
 	_ "github.com/lib/pq"
 	"github.com/ory/fosite"
+	"github.com/ory/herodot"
 	. "github.com/ory/hydra/client"
 	"github.com/ory/hydra/compose"
-	"github.com/ory/herodot"
 	"github.com/ory/hydra/integration"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/ladon"

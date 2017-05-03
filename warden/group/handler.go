@@ -26,8 +26,8 @@ const (
 )
 
 const (
-	GroupsResource = "rn:hydra:warden:clients"
-	GroupResource  = "rn:hydra:warden:clients:%s"
+	GroupsResource = "rn:hydra:warden:groups"
+	GroupResource  = "rn:hydra:warden:groups:%s"
 	Scope          = "hydra.warden.groups"
 )
 

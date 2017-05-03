@@ -30,7 +30,7 @@ const (
 )
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
-	r.GET(ClientsHandlerPath, h.GetAll)
+	r.GET(ClientsHandlerPath, h.List)
 	r.POST(ClientsHandlerPath, h.Create)
 	r.GET(ClientsHandlerPath + "/:id", h.Get)
 	r.PUT(ClientsHandlerPath + "/:id", h.Update)
@@ -166,7 +166,34 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	h.H.WriteCreated(w, r, ClientsHandlerPath + "/" + c.GetID(), &c)
 }
 
-func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+// A list of clients.
+// swagger:response clientsList
+type listClientsResult struct {
+	// in: body
+	Clients []Client
+}
+
+// swagger:route GET /clients oauth2 clients listOAuthClients
+//
+// Fetches OAuth 2.0 Clients, never returns a client's secret.
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2: hydra.clients
+//
+//     Responses:
+//       200: clientsList
+//       401: genericError
+//       403: genericError
+//       500: genericError
+func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var ctx = r.Context()
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{

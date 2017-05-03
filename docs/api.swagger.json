@@ -27,6 +27,45 @@
   "basePath": "/",
   "paths": {
     "/clients": {
+      "get": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "oauth2",
+          "clients"
+        ],
+        "summary": "Fetches OAuth 2.0 Clients, never returns a client's secret.",
+        "operationId": "listOAuthClients",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.clients"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/clientsList"
+          },
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      },
       "put": {
         "description": "Updates an OAuth 2.0 Client. Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This\nendpoint should be well protected and only called by code you trust.",
         "consumes": [
@@ -541,6 +580,15 @@
     }
   },
   "responses": {
+    "clientsList": {
+      "description": "A list of clients.",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/oauthClient"
+        }
+      }
+    },
     "genericError": {
       "description": "A genericError is the error format of Hydra's RESTful APIs."
     }

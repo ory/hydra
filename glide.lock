@@ -132,7 +132,7 @@ imports:
   - pkg
   - rand/sequence
 - name: github.com/ory-am/fosite
-  version: ad395bf323137e30ce12d40646a9229a42695863
+  version: 6f13d58533573ec847dca6e5cfa1d4338aef95b1
   subpackages:
   - compose
   - handler/oauth2

@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
-
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/ladon"
+	"fmt"
 	"github.com/pkg/errors"
 )
 
@@ -43,8 +43,20 @@ func (m *HTTPManager) Update(policy ladon.Policy) error {
 }
 
 // Get retrieves a policy.
-func (m *HTTPManager) GetAll(offset, limit int64) (ladon.Policies, error) {
-	return nil, errors.New("asdf")
+func (m *HTTPManager) GetAll(limit, offset int64) (ladon.Policies, error) {
+	var policies []*ladon.DefaultPolicy
+	var r = pkg.NewSuperAgent(m.Endpoint.String() + fmt.Sprintf("?limit=%d&offset=%d", limit, offset))
+	r.Client = m.Client
+	r.Dry = m.Dry
+	if err := r.Get(&policies); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	ret := make(ladon.Policies, len(policies))
+	for k, p := range policies {
+		ret[k] = ladon.Policy(p)
+	}
+	return ret, nil
 }
 
 // Get retrieves a policy.
@@ -56,7 +68,7 @@ func (m *HTTPManager) Get(id string) (ladon.Policy, error) {
 	r.Client = m.Client
 	r.Dry = m.Dry
 	if err := r.Get(&policy); err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	return &policy, nil
@@ -77,7 +89,7 @@ func (m *HTTPManager) FindPoliciesForSubject(subject string) (ladon.Policies, er
 	r.Client = m.Client
 	r.Dry = m.Dry
 	if err := r.Get(&policies); err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	ret := make(ladon.Policies, len(policies))

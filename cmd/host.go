@@ -70,6 +70,12 @@ CORE CONTROLS
 	security and performance. Range is 4 =< x =< 31.
 	Defaults to BCRYPT_COST=10
 
+- LOG_LEVEL: Set the log level, supports "panic", "fatal", "error", "warn", "info" and "debug". Defaults to "info".
+	Example: LOG_LEVEL=panic
+
+- LOG_FORMAT: Leave empty for text based log format, or set to "json" for JSON formatting.
+	Example: LOG_FORMAT="json"
+
 
 OAUTH2 CONTROLS
 ===============

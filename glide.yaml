@@ -49,11 +49,6 @@ import:
   version: v1.1.0
   subpackages:
   - json
-- package: github.com/stretchr/testify
-  version: v1.1.4
-  subpackages:
-  - assert
-  - require
 - package: github.com/toqueteos/webbrowser
   version: v1.0
 - package: github.com/urfave/negroni
@@ -66,11 +61,16 @@ import:
   - clientcredentials
 - package: gopkg.in/gorethink/gorethink.v3
   version: v3.0.2
-- package: gopkg.in/ory-am/dockertest.v3
-  version: v3.0.7
 - package: gopkg.in/tylerb/graceful.v1
   version: v1.2.15
 - package: gopkg.in/yaml.v2
 testImport:
 - package: github.com/gorilla/mux
   version: v1.3.0
+- package: gopkg.in/ory-am/dockertest.v3
+  version: v3.0.7
+- package: github.com/stretchr/testify
+  version: v1.1.4
+  subpackages:
+  - assert
+  - require

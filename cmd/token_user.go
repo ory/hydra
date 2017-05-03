@@ -6,12 +6,13 @@ import (
 	"net/http"
 	"time"
 
+	"context"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/common/rand/sequence"
 	"github.com/ory/hydra/pkg"
 	"github.com/spf13/cobra"
 	"github.com/toqueteos/webbrowser"
-	"context"
 	"golang.org/x/oauth2"
 	"gopkg.in/tylerb/graceful.v1"
 )

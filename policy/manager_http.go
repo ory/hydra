@@ -1,9 +1,9 @@
 package policy
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/url"
-	"encoding/json"
 
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/ladon"

@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"net/http"
 
+	"context"
+
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory/hydra/firewall"
 	"github.com/ory/herodot"
+	"github.com/ory/hydra/firewall"
 	"github.com/pkg/errors"
 	"github.com/square/go-jose"
-	"context"
 )
 
 type Handler struct {

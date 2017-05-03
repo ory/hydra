@@ -3,10 +3,11 @@ package oauth2
 import (
 	"sync"
 
+	"context"
+
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/pkg/errors"
-	"context"
 )
 
 type FositeMemoryStore struct {

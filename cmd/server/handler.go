@@ -2,13 +2,15 @@ package server
 
 import (
 	"crypto/tls"
-	"net/http"
 	"fmt"
+	"net/http"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/meatballhat/negroni-logrus"
+	"github.com/ory/graceful"
+	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
-	"github.com/ory/herodot"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
@@ -19,7 +21,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/urfave/negroni"
-	"github.com/ory/graceful"
 )
 
 func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
@@ -28,7 +29,7 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		logger := c.GetLogger()
 		serverHandler := &Handler{
 			Config: c,
-			H: herodot.NewJSONWriter(logger),
+			H:      herodot.NewJSONWriter(logger),
 		}
 		serverHandler.registerRoutes(router)
 		c.ForceHTTP, _ = cmd.Flags().GetBool("dangerous-force-http")
@@ -57,10 +58,10 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		n.UseHandler(router)
 
 		var srv = graceful.PatchHTTPServerWithCloudflareConfig(&http.Server{
-			Addr:c.GetAddress(),
+			Addr:    c.GetAddress(),
 			Handler: n,
 			TLSConfig: &tls.Config{
-				Certificates:  []tls.Certificate{getOrCreateTLSCertificate(cmd, c)},
+				Certificates: []tls.Certificate{getOrCreateTLSCertificate(cmd, c)},
 			},
 		})
 
@@ -111,7 +112,7 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 		Issuer:              c.Issuer,
 		AccessTokenLifespan: c.GetAccessTokenLifespan(),
 		Groups:              ctx.GroupManager,
-		L: c.GetLogger(),
+		L:                   c.GetLogger(),
 	}
 
 	// Set up handlers

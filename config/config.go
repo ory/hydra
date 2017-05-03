@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"crypto/sha256"
 	"crypto/tls"
 	"fmt"
@@ -11,6 +12,7 @@ import (
 	"os"
 	"strings"
 	"time"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
@@ -23,7 +25,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 	"gopkg.in/yaml.v2"
@@ -49,15 +50,15 @@ type Config struct {
 	IDTokenLifespan        string `mapstructure:"ID_TOKEN_LIFESPAN" yaml:"-"`
 	ChallengeTokenLifespan string `mapstructure:"CHALLENGE_TOKEN_LIFESPAN" yaml:"-"`
 	CookieSecret           string `mapstructure:"COOKIE_SECRET" yaml:"-"`
-	LogLevel           string `mapstructure:"LOG_LEVEL" yaml:"-"`
-	LogFormat string `mapstructure:"LOG_FORMAT" yaml:"-"`
+	LogLevel               string `mapstructure:"LOG_LEVEL" yaml:"-"`
+	LogFormat              string `mapstructure:"LOG_FORMAT" yaml:"-"`
 	ForceHTTP              bool   `yaml:"-"`
 
-	logger                 *logrus.Logger  `yaml:"-"`
-	cluster                *url.URL     `yaml:"-"`
-	oauth2Client           *http.Client `yaml:"-"`
-	context                *Context     `yaml:"-"`
-	systemSecret           []byte
+	logger       *logrus.Logger `yaml:"-"`
+	cluster      *url.URL       `yaml:"-"`
+	oauth2Client *http.Client   `yaml:"-"`
+	context      *Context       `yaml:"-"`
+	systemSecret []byte
 }
 
 func matchesRange(r *http.Request, ranges []string) error {
@@ -182,7 +183,7 @@ func (c *Config) Context() *Context {
 		case "mysql":
 			connection = &SQLConnection{
 				URL: u,
-				L: c.GetLogger(),
+				L:   c.GetLogger(),
 			}
 			break
 		default:

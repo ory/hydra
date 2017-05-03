@@ -7,8 +7,8 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/common/rand/sequence"
-	"github.com/ory/hydra/firewall"
 	"github.com/ory/herodot"
+	"github.com/ory/hydra/firewall"
 	"github.com/ory/ladon"
 	"github.com/pkg/errors"
 )

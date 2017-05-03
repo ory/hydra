@@ -1,6 +1,9 @@
 package integration
 
 import (
+	"testing"
+
+	"github.com/Sirupsen/logrus"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/jwk"
@@ -9,8 +12,6 @@ import (
 	"github.com/ory/hydra/warden/group"
 	"github.com/ory/ladon"
 	"github.com/stretchr/testify/require"
-	"testing"
-	"github.com/Sirupsen/logrus"
 )
 
 func TestSQLSchema(t *testing.T) {

@@ -15,35 +15,79 @@
 package cmd
 
 import (
-	"fmt"
+	"log"
+	"net/url"
+	"strings"
+	"time"
 
+	"github.com/Sirupsen/logrus"
+	"github.com/jmoiron/sqlx"
+	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/warden/group"
+	ladon "github.com/ory/ladon/manager/sql"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
 // sqlCmd represents the sql command
 var sqlCmd = &cobra.Command{
-	Use:   "migrate sql",
-	Short: "Migrate SQL schemas to the most recent version",
-	Long: `BEFORE RUNNING THIS COMMAND CREATE A BACK UP OF YOUR DATABASE
-
-`,
+	Use:   "migrate sql <database-url>",
+	Short: "Create and migrate SQL schemas to work with this version",
+	Long: `WARNING: Before running this command on an existing database, create a back up!`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// TODO: Work your own magic here
-		fmt.Println("sql called")
+		var db *sqlx.DB
+		var logger = logrus.New()
+
+		u, err := url.Parse(args[0])
+		if err != nil {
+			log.Fatalf("Could not parse DATABASE_URL: %s", err)
+		}
+
+		if err := pkg.Retry(logger, time.Second*15, time.Minute*2, func() error {
+			if u.Scheme == "mysql" {
+				args[0] = strings.Replace(args[0], "mysql://", "", -1)
+			}
+
+			if db, err = sqlx.Open(u.Scheme, u); err != nil {
+				return errors.Errorf("Could not connect to SQL: %s", err)
+			} else if err := db.Ping(); err != nil {
+				return errors.Errorf("Could not connect to SQL: %s", err)
+			}
+
+			return nil
+		}); err != nil {
+			log.Fatalf("Could not connect to SQL: %s", err)
+		}
+
+		if err := (&client.SQLManager{DB: db}).CreateSchemas(); err != nil {
+			c.GetLogger().Fatalf("Could not create client schema: %s", err)
+		}
+
+		if err := (&oauth2.FositeSQLStore{DB: db}).CreateSchemas(); err != nil {
+			c.GetLogger().Fatalf("Could not create oauth2 schema: %s", err)
+		}
+
+		if err := (&jwk.SQLManager{DB: db}).CreateSchemas(); err != nil {
+			c.GetLogger().Fatalf("Could not create jwk schema: %s", err)
+		}
+
+		if err := (&oauth2.FositeSQLStore{DB: db}).CreateSchemas(); err != nil {
+			c.GetLogger().Fatalf("Could not create oauth2 schema: %s", err)
+		}
+
+		if err := ladon.NewSQLManager(db, nil).CreateSchemas(); err != nil {
+			logrus.Fatalf("Could not create policy schema: %s", err)
+		}
+
+		if err := (&group.SQLManager{DB: db}).CreateSchemas(); err != nil {
+			logrus.Fatalf("Could not create group schema: %s", err)
+		}
 	},
 }
 
 func init() {
 	migrateCmd.AddCommand(sqlCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// sqlCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// sqlCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
 }

@@ -25,16 +25,16 @@ const (
 
 const (
 	ClientsResource = "rn:hydra:clients"
-	ClientResource = "rn:hydra:clients:%s"
-	Scope = "hydra.clients"
+	ClientResource  = "rn:hydra:clients:%s"
+	Scope           = "hydra.clients"
 )
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET(ClientsHandlerPath, h.List)
 	r.POST(ClientsHandlerPath, h.Create)
-	r.GET(ClientsHandlerPath + "/:id", h.Get)
-	r.PUT(ClientsHandlerPath + "/:id", h.Update)
-	r.DELETE(ClientsHandlerPath + "/:id", h.Delete)
+	r.GET(ClientsHandlerPath+"/:id", h.Get)
+	r.PUT(ClientsHandlerPath+"/:id", h.Update)
+	r.DELETE(ClientsHandlerPath+"/:id", h.Delete)
 }
 
 // swagger:route POST /clients oauth2 clients createOAuthClient
@@ -119,7 +119,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	}
 
 	c.Secret = secret
-	h.H.WriteCreated(w, r, ClientsHandlerPath + "/" + c.GetID(), &c)
+	h.H.WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
 // swagger:route PUT /clients/{id} oauth2 clients updateOAuthClient
@@ -202,7 +202,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		return
 	}
 
-	h.H.WriteCreated(w, r, ClientsHandlerPath + "/" + c.GetID(), &c)
+	h.H.WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
 // swagger:route GET /clients oauth2 clients listOAuthClients

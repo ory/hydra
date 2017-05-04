@@ -65,7 +65,7 @@ func TestManagers(t *testing.T) {
 	}
 
 	for k, m := range managers {
-		t.Run("manager=" + k, func(t *testing.T) {
+		t.Run("manager="+k, func(t *testing.T) {
 			_, err := m.Get(p.ID)
 			require.Error(t, err)
 			require.NoError(t, m.Create(p))

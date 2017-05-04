@@ -1,6 +1,5 @@
 package jwk
 
-
 // swagger:parameters getJwkSetKey deleteJwkKey
 type swaggerJwkSetKeyQuery struct {
 	// The kid of the desired key
@@ -76,14 +75,14 @@ type swaggerJSONWebKey struct {
 	// the public key. The "use" parameter is employed to indicate whether
 	// a public key is used for encrypting data or verifying the signature
 	// on data. Values are commonly "sig" (signature) or "enc" (encryption).
-	Use string      `json:"use,omitempty"`
+	Use string `json:"use,omitempty"`
 
 	// The "kty" (key type) parameter identifies the cryptographic algorithm
 	// family used with the key, such as "RSA" or "EC". "kty" values should
 	// either be registered in the IANA "JSON Web Key Types" registry
 	// established by [JWA] or be a value that contains a Collision-
 	// Resistant Name.  The "kty" value is a case-sensitive string.
-	Kty string      `json:"kty,omitempty"`
+	Kty string `json:"kty,omitempty"`
 
 	// The "kid" (key ID) parameter is used to match a specific key.  This
 	// is used, for instance, to choose among a set of keys within a JWK Set
@@ -94,16 +93,16 @@ type swaggerJSONWebKey struct {
 	// they have different "kty" (key type) values but are considered to be
 	// equivalent alternatives by the application using them.)  The "kid"
 	// value is a case-sensitive string.
-	Kid string      `json:"kid,omitempty"`
+	Kid string `json:"kid,omitempty"`
 
-	Crv string      `json:"crv,omitempty"`
+	Crv string `json:"crv,omitempty"`
 
 	//  The "alg" (algorithm) parameter identifies the algorithm intended for
 	// use with the key.  The values used should either be registered in the
 	// IANA "JSON Web Signature and Encryption Algorithms" registry
 	// established by [JWA] or be a value that contains a Collision-
 	// Resistant Name.
-	Alg string      `json:"alg,omitempty"`
+	Alg string `json:"alg,omitempty"`
 
 	// The "x5c" (X.509 certificate chain) parameter contains a chain of one
 	// or more PKIX certificates [RFC5280].  The certificate chain is
@@ -114,16 +113,16 @@ type swaggerJSONWebKey struct {
 	// certificate.
 	X5c []string `json:"x5c,omitempty"`
 
-	K   []byte `json:"k,omitempty"`
-	X   []byte `json:"x,omitempty"`
-	Y   []byte `json:"y,omitempty"`
-	N   []byte `json:"n,omitempty"`
-	E   []byte `json:"e,omitempty"`
+	K []byte `json:"k,omitempty"`
+	X []byte `json:"x,omitempty"`
+	Y []byte `json:"y,omitempty"`
+	N []byte `json:"n,omitempty"`
+	E []byte `json:"e,omitempty"`
 
-	D   []byte `json:"d,omitempty"`
-	P   []byte `json:"p,omitempty"`
-	Q   []byte `json:"q,omitempty"`
-	Dp  []byte `json:"dp,omitempty"`
-	Dq  []byte `json:"dq,omitempty"`
-	Qi  []byte `json:"qi,omitempty"`
+	D  []byte `json:"d,omitempty"`
+	P  []byte `json:"p,omitempty"`
+	Q  []byte `json:"q,omitempty"`
+	Dp []byte `json:"dp,omitempty"`
+	Dq []byte `json:"dq,omitempty"`
+	Qi []byte `json:"qi,omitempty"`
 }

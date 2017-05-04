@@ -24,9 +24,9 @@ import "github.com/ory/hydra/firewall"
 type swaggerWardenAllowedResponse struct {
 	// in: body
 	Body struct {
-		     // Allowed is true if the request is allowed or false otherwise
-		     Allowed bool `json:"allowed"`
-	     }
+		// Allowed is true if the request is allowed or false otherwise
+		Allowed bool `json:"allowed"`
+	}
 }
 
 // swagger:parameters wardenAllowed
@@ -46,9 +46,9 @@ type swaggerWardenTokenAllowedParameters struct {
 type swaggerWardenTokenAllowedResponse struct {
 	// in: body
 	Body struct {
-		     *firewall.Context
+		*firewall.Context
 
-		     // Allowed is true if the request is allowed or false otherwise
-		     Allowed bool `json:"allowed"`
-	     }
+		// Allowed is true if the request is allowed or false otherwise
+		Allowed bool `json:"allowed"`
+	}
 }

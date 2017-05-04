@@ -22,7 +22,7 @@ type swaggerListPolicyParameters struct {
 
 	// The maximum amount of policies returned.
 	// in: query
-	Limit  int `json:"limit"`
+	Limit int `json:"limit"`
 }
 
 // swagger:parameters getPolicy deletePolicy
@@ -58,25 +58,25 @@ type swaggerListPolicyResponse struct {
 // swagger:model policy
 type swaggerPolicy struct {
 	// ID of the policy.
-	ID          string     `json:"id" gorethink:"id"`
+	ID string `json:"id" gorethink:"id"`
 
 	// Description of the policy.
-	Description string     `json:"description" gorethink:"description"`
+	Description string `json:"description" gorethink:"description"`
 
 	// Subjects impacted by the policy.
-	Subjects    []string   `json:"subjects" gorethink:"subjects"`
+	Subjects []string `json:"subjects" gorethink:"subjects"`
 	// Effect of the policy
-	Effect      string     `json:"effect" gorethink:"effect"`
+	Effect string `json:"effect" gorethink:"effect"`
 
 	// Resources impacted by the policy.
-	Resources   []string   `json:"resources" gorethink:"resources"`
+	Resources []string `json:"resources" gorethink:"resources"`
 
 	// Actions impacted by the policy.
-	Actions     []string   `json:"actions" gorethink:"actions"`
+	Actions []string `json:"actions" gorethink:"actions"`
 
 	// Conditions under which the policy is active.
-	Conditions  map[string]struct {
-		Type    string `json:"type"`
+	Conditions map[string]struct {
+		Type    string      `json:"type"`
 		Options interface{} `json:"options"`
 	}
 }

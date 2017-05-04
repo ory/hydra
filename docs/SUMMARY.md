@@ -25,6 +25,8 @@
   * [Architecture and Design](contribute.md)
   * [Running Tests](contribute.md)
 * [FAQ](faq.md)
+  * [How to deal with mobile apps?](faq/mobile.md)
+  * [Why is the Resource Owner Password Credentials grant not supported?](faq/ropc.md)
   * [How can I control SQL connection limits?](faq/sql.md)
   * [Where is the HTTP API Documentation?](faq/http-api.md)
   * [How can I disable HTTPS for testing?](faq/disable-https.md)

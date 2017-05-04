@@ -105,8 +105,17 @@ func (m *RethinkManager) DeleteClient(id string) error {
 
 	return nil
 }
-
 func (m *RethinkManager) GetClients() (clients map[string]Client, err error) {
+	m.RLock()
+	defer m.RUnlock()
+	clients = make(map[string]Client)
+	for _, c := range m.Clients {
+		clients[c.ID] = c
+	}
+
+	return clients, nil
+}
+func (m *RethinkManager) GetClientsByOwner(owner string) (clients map[string]Client, err error) {
 	m.RLock()
 	defer m.RUnlock()
 	clients = make(map[string]Client)

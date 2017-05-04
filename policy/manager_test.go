@@ -77,7 +77,7 @@ func TestManagers(t *testing.T) {
 			p.Subjects = []string{"stan"}
 			require.NoError(t, m.Update(p))
 
-			pols, err := m.GetAll(10, 0)
+			pols, err := m.List(10, 0)
 			require.NoError(t, err)
 			assert.Len(t, pols, 1)
 

@@ -83,9 +83,13 @@ func ClientSecret(secret string) option {
 //  var hydra, err = sdk.Connect(
 // 	sdk.SkipTLSVerify(),
 //  )
-func SkipTLSVerify() option {
+func SkipTLSVerify(val ...bool) option {
 	return func(c *Client) error {
-		c.skipTLSVerify = true
+		if len(val) > 0 {
+			c.skipTLSVerify = val[0]
+		} else {
+			c.skipTLSVerify = true
+		}
 		return nil
 	}
 }

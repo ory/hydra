@@ -24,6 +24,9 @@
 * [Contribute](contribute.md)
   * [Architecture and Design](contribute.md)
   * [Running Tests](contribute.md)
+* Tutorials
+  * [5 Minute Tutorial](tutorials/5minutes.md)
+  * [Secure the consent app](tutorials/consentapp.md)
 * [FAQ](faq.md)
   * [How to deal with mobile apps?](faq/mobile.md)
   * [Why is the Resource Owner Password Credentials grant not supported?](faq/ropc.md)

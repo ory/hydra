@@ -187,7 +187,7 @@ func (c *Config) Context() *Context {
 			}
 			break
 		default:
-			logrus.Fatalf(`Unkown DSN "%s" in DATABASE_URL: %s`, u.Scheme, c.DatabaseURL)
+			logrus.Fatalf(`Unknown DSN "%s" in DATABASE_URL: %s`, u.Scheme, c.DatabaseURL)
 		}
 	}
 

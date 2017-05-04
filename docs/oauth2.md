@@ -207,7 +207,7 @@ Hydra follows the OAuth 2.0 error response specifications. Some errors however m
 In the case of such an error, the user agent will be redirected to the consent app
 endpoint and an `error` and `error_description` query parameter will be appended to the URL.
 
-# OAuth2 Token Introspection
+## OAuth2 Token Introspection
 
 OAuth2 Token Introspection is an [IETF](https://tools.ietf.org/html/rfc7662) standard.
 It defines a method for a protected resource to query
@@ -219,3 +219,13 @@ to the protected resource.
 
 The Token Introspection endpoint is documented in the
 [API Docs](http://docs.hydra13.apiary.io/#reference/oauth2/oauth2-token-introspection).
+
+## OAuth2 Scopes
+
+Hydra supports some scopes out of the box:
+
+* `hydra`: All endpoints that require access control also require a scope prefixed with `hydra.`, for example `hydra.clients`.
+* `offline`: Include this scope if you wish to receive a refresh token
+* `openid`: Include this scope if you wish to perform an OpenID Connect request.
+
+In Hydra, granting scope `foo` also grant's scopes `foo.bar`, `foo.baz`, `foo.bar.baz`, and all other scopes prefixed with `foo.`.

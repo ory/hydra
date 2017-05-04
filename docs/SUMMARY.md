@@ -14,6 +14,7 @@
     * [Overview](oauth2.md#overview)
     * [Confirming User Consent: Consent App Flow](oauth2.md#consent-app-flow)
     * [Validating Tokens: OAuth2 Token Introspection](oauth2.md#oauth2-token-introspection)
+    * [OAuth2 Scopes](oauth2.md#oauth2-scopes)
   * [JSON Web Keys](jwk.md)
   * [Access Control Policies](access-control.md)
     * [Introduction](access-control.md#introduction-to-access-control-policies)

@@ -42,6 +42,7 @@ the access control SDK [Ladon](https://github.com/ory/ladon).
 **Table of Contents**
 
 - [What is Hydra?](#what-is-hydra)
+- [Who is using it?](#who-is-using-it)
 - [Enterprise Edition](#enterprise-edition)
 - [Quickstart](#quickstart)
   - [5 minutes tutorial: Run your very own OAuth2 environment](#5-minutes-tutorial-run-your-very-own-oauth2-environment)
@@ -76,6 +77,16 @@ Hydra implements the flows described in OAuth2 and OpenID Connect 1.0 without fo
 or some template engine or a predefined front-end. Instead it relies on HTTP redirection and cryptographic methods
 to verify user consent allowing you to use Hydra with any authentication endpoint, be it [authboss](https://github.com/go-authboss/authboss),
 [auth0.com](https://auth0.com/) or your proprietary PHP authentication.
+
+## Who is using it?
+
+This is a curated list of Hydra adopters.
+
+<img src="https://www.arduino.cc/en/uploads/Trademark/ArduinoCommunityLogo.png" align="left" width="30%" alt="arduino.cc"> 
+Arduino is an open-source electronics platform based on easy-to-use hardware and software. It's intended
+for anyone making interactive projects. Hydra secures Arduino's developer platform.
+
+<br>
 
 ## Enterprise Edition
 

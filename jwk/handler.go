@@ -63,7 +63,7 @@ type joseWebKeySetRequest struct {
 	Keys []json.RawMessage `json:"keys"`
 }
 
-// swagger:route GET /keys/{set}/{kid} jwk getJwkSetKey
+// swagger:route GET /keys/{set}/{kid} jwks getJwkSetKey
 //
 // Retrieves a JSON Web Key Set matching the set and the kid
 //
@@ -121,7 +121,7 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	h.H.Write(w, r, keys)
 }
 
-// swagger:route GET /keys/{set} jwk getJwkSet
+// swagger:route GET /keys/{set} jwks getJwkSet
 //
 // Retrieves a JSON Web Key Set matching the set
 //
@@ -174,7 +174,7 @@ func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httproute
 	h.H.Write(w, r, keys)
 }
 
-// swagger:route POST /keys/{set} jwk createJwkKey
+// swagger:route POST /keys/{set} jwks createJwkKey
 //
 // Generate a new JSON Web Key
 //
@@ -241,7 +241,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	h.H.WriteCreated(w, r, fmt.Sprintf("%s://%s/keys/%s", r.URL.Scheme, r.URL.Host, set), keys)
 }
 
-// swagger:route PUT /keys/{set} jwk updateJwkSet
+// swagger:route PUT /keys/{set} jwks updateJwkSet
 //
 // Updates a JSON Web Key Set
 //
@@ -308,7 +308,7 @@ func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 	h.H.Write(w, r, keySet)
 }
 
-// swagger:route PUT /keys/{set}/{kid} jwk updateJwkKey
+// swagger:route PUT /keys/{set}/{kid} jwks updateJwkKey
 //
 // Updates a JSON Web Key
 //
@@ -367,7 +367,7 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 }
 
 
-// swagger:route DELETE /keys/{set} jwk deleteJwkSet
+// swagger:route DELETE /keys/{set} jwks deleteJwkSet
 //
 // Delete a JSON Web Key
 //
@@ -417,7 +417,7 @@ func (h *Handler) DeleteKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route DELETE /keys/{set}/{kid} jwk deleteJwkKey
+// swagger:route DELETE /keys/{set}/{kid} jwks deleteJwkKey
 //
 // Delete a JSON Web Key
 //

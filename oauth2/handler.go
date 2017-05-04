@@ -55,6 +55,27 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.POST(RevocationPath, h.RevocationHandler)
 }
 
+// swagger:route POST /oauth2/revoke oauth2 revokeOAuthToken
+//
+// Revoke an OAuth2 access token
+//
+// For more information, please refer to https://tools.ietf.org/html/rfc7009
+//
+//     Consumes:
+//     - application/x-www-form-urlencoded
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2:
+//
+//     Responses:
+//       200:
+//       401: genericError
+//       500: genericError
 func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = fosite.NewContext()
 
@@ -66,6 +87,27 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ ht
 	h.OAuth2.WriteRevocationResponse(w, err)
 }
 
+// swagger:route POST /oauth2/introspect oauth2 introspectOAuthToken
+//
+// Introspect an OAuth2 access token
+//
+// For more information, please refer to https://tools.ietf.org/html/rfc7662
+//
+//     Consumes:
+//     - application/x-www-form-urlencoded
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2:
+//
+//     Responses:
+//       200: introspectOAuthTokenResponse
+//       401: genericError
+//       500: genericError
 func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var session = NewSession("")
 
@@ -99,6 +141,27 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 	}
 }
 
+// swagger:route POST /oauth2/token oauth2 oauthToken
+//
+// The OAuth 2.0 Token endpoint
+//
+// For more information, please refer to https://tools.ietf.org/html/rfc6749#section-4
+//
+//     Consumes:
+//     - application/x-www-form-urlencoded
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       basic:
+//
+//     Responses:
+//       200: oauthTokenResponse
+//       401: genericError
+//       500: genericError
 func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var session = NewSession("")
 	var ctx = fosite.NewContext()
@@ -129,6 +192,21 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprou
 	h.OAuth2.WriteAccessResponse(w, accessRequest, accessResponse)
 }
 
+// swagger:route GET /oauth2/auth oauth2 oauthAuth
+//
+// The OAuth 2.0 Auth endpoint
+//
+// For more information, please refer to https://tools.ietf.org/html/rfc6749#section-4
+//
+//     Consumes:
+//     - application/x-www-form-urlencoded
+//
+//     Schemes: http, https
+//
+//     Responses:
+//       302:
+//       401: genericError
+//       500: genericError
 func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = fosite.NewContext()
 

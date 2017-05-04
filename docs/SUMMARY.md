@@ -28,6 +28,7 @@
     - [RS256](security.md#rs256)
     - [HMAC-SHA256](security.md#hmac-sha256)
     - [BCrypt](security.md#bcrypt)
+  - [Access Control](security.md##how-does-access-control-work-with-hydra)
 * [Client Libraries](sdk.md)
   * [Hydra SDK for Go](sdk/go.md)
 * [Contribute](contribute.md)

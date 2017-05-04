@@ -16,3 +16,39 @@
 //
 // - warden_test.go: Functional tests all of the above.
 package warden
+
+import "github.com/ory/hydra/firewall"
+
+// The allowed response
+// swagger:response wardenAllowedResponse
+type swaggerWardenAllowedResponse struct {
+	// in: body
+	Body struct {
+		     // Allowed is true if the request is allowed or false otherwise
+		     Allowed bool `json:"allowed"`
+	     }
+}
+
+// swagger:parameters wardenAllowed
+type swaggerWardenAllowedParameters struct {
+	// in: body
+	Body firewall.AccessRequest
+}
+
+// swagger:parameters wardenTokenAllowed
+type swaggerWardenTokenAllowedParameters struct {
+	// in: body
+	Body wardenAccessRequest
+}
+
+// The token allowed response
+// swagger:response wardenTokenAllowedResponse
+type swaggerWardenTokenAllowedResponse struct {
+	// in: body
+	Body struct {
+		     *firewall.Context
+
+		     // Allowed is true if the request is allowed or false otherwise
+		     Allowed bool `json:"allowed"`
+	     }
+}

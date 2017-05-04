@@ -1,6 +1,7 @@
 {
   "consumes": [
-    "application/json"
+    "application/json",
+    "application/x-www-form-urlencoded"
   ],
   "produces": [
     "application/json"
@@ -299,7 +300,7 @@
           "https"
         ],
         "tags": [
-          "jwk"
+          "jwks"
         ],
         "summary": "Retrieves a JSON Web Key Set matching the set",
         "operationId": "getJwkSet",
@@ -351,7 +352,7 @@
           "https"
         ],
         "tags": [
-          "jwk"
+          "jwks"
         ],
         "summary": "Updates a JSON Web Key Set",
         "operationId": "updateJwkSet",
@@ -410,7 +411,7 @@
           "https"
         ],
         "tags": [
-          "jwk"
+          "jwks"
         ],
         "summary": "Generate a new JSON Web Key",
         "operationId": "createJwkKey",
@@ -469,7 +470,7 @@
           "https"
         ],
         "tags": [
-          "jwk"
+          "jwks"
         ],
         "summary": "Delete a JSON Web Key",
         "operationId": "deleteJwkSet",
@@ -517,7 +518,7 @@
           "https"
         ],
         "tags": [
-          "jwk"
+          "jwks"
         ],
         "summary": "Retrieves a JSON Web Key Set matching the set and the kid",
         "operationId": "getJwkSetKey",
@@ -577,7 +578,7 @@
           "https"
         ],
         "tags": [
-          "jwk"
+          "jwks"
         ],
         "summary": "Updates a JSON Web Key",
         "operationId": "updateJwkKey",
@@ -644,7 +645,7 @@
           "https"
         ],
         "tags": [
-          "jwk"
+          "jwks"
         ],
         "summary": "Delete a JSON Web Key",
         "operationId": "deleteJwkKey",
@@ -685,9 +686,947 @@
           }
         }
       }
+    },
+    "/oauth2/auth": {
+      "get": {
+        "description": "For more information, please refer to https://tools.ietf.org/html/rfc6749#section-4",
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "oauth2"
+        ],
+        "summary": "The OAuth 2.0 Auth endpoint",
+        "operationId": "oauthAuth",
+        "responses": {
+          "302": {},
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
+    "/oauth2/introspect": {
+      "post": {
+        "description": "For more information, please refer to https://tools.ietf.org/html/rfc7662",
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "oauth2"
+        ],
+        "summary": "Introspect an OAuth2 access token",
+        "operationId": "introspectOAuthToken",
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/introspectOAuthTokenResponse"
+          },
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
+    "/oauth2/revoke": {
+      "post": {
+        "description": "For more information, please refer to https://tools.ietf.org/html/rfc7009",
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "oauth2"
+        ],
+        "summary": "Revoke an OAuth2 access token",
+        "operationId": "revokeOAuthToken",
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "access_token": {
+                  "type": "string",
+                  "x-go-name": "AccessToken"
+                },
+                "refresh_token": {
+                  "type": "string",
+                  "x-go-name": "RefreshToken"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {},
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
+    "/oauth2/token": {
+      "post": {
+        "description": "For more information, please refer to https://tools.ietf.org/html/rfc6749#section-4",
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "oauth2"
+        ],
+        "summary": "The OAuth 2.0 Token endpoint",
+        "operationId": "oauthToken",
+        "security": [
+          {
+            "basic": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/oauthTokenResponse"
+          },
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
+    "/policies": {
+      "get": {
+        "description": "Visit https://github.com/ory/ladon#usage for more information on policy usage.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies\"],\n\"actions\": [\"list\"],\n\"effect\": \"allow\"\n}\n```",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "policies"
+        ],
+        "summary": "List access control policies",
+        "operationId": "listPolicies",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.policies"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Offset",
+            "description": "The offset from where to start looking.",
+            "name": "offset",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Limit",
+            "description": "The maximum amount of policies returned.",
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/listPolicyResponse"
+          },
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      },
+      "post": {
+        "description": "Visit https://github.com/ory/ladon#usage for more information on policy usage.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "policies"
+        ],
+        "summary": "Create an access control policy",
+        "operationId": "createPolicy",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.policies"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/policy"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "policy",
+            "schema": {
+              "$ref": "#/definitions/policy"
+            }
+          },
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
+    "/policies/{id}": {
+      "get": {
+        "description": "Visit https://github.com/ory/ladon#usage for more information on policy usage.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies:\u003cid\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "policies"
+        ],
+        "summary": "Get an access control policy",
+        "operationId": "getPolicy",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.policies"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "ID",
+            "description": "The id of the policy.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "policy",
+            "schema": {
+              "$ref": "#/definitions/policy"
+            }
+          },
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      },
+      "put": {
+        "description": "Visit https://github.com/ory/ladon#usage for more information on policy usage.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "policies"
+        ],
+        "summary": "Update an access control policy",
+        "operationId": "updatePolicy",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.policies"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "ID",
+            "description": "The id of the policy.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/policy"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "policy",
+            "schema": {
+              "$ref": "#/definitions/policy"
+            }
+          },
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      },
+      "delete": {
+        "description": "Visit https://github.com/ory/ladon#usage for more information on policy usage.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies:\u003cid\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "policies"
+        ],
+        "summary": "Delete an access control policy",
+        "operationId": "deletePolicy",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.policies"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "ID",
+            "description": "The id of the policy.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
+    "/warden/allowed": {
+      "post": {
+        "description": "Checks if an arbitrary subject is allowed to perform an action on a resource. This endpoint requires a subject,\na resource name, an action name and a context.If the subject is not allowed to perform the action on the resource,\nthis endpoint returns a 200 response with `{ \"allowed\": false} }`.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:allowed\"],\n\"actions\": [\"decide\"],\n\"effect\": \"allow\"\n}\n```",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "warden"
+        ],
+        "summary": "Check if a subject is allowed to do something",
+        "operationId": "wardenAllowed",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.warden"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/allowedRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/wardenAllowedResponse"
+          },
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
+    "/warden/groups": {
+      "get": {
+        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups:\u003cmember\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "warden",
+          "groups"
+        ],
+        "summary": "Find group IDs by member",
+        "operationId": "findGroupsByMember",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.groups"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Member",
+            "description": "The id of the member to look up.",
+            "name": "member",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/findGroupsByMemberResponse"
+          },
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      },
+      "post": {
+        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "warden",
+          "groups"
+        ],
+        "summary": "Create a group",
+        "operationId": "createGroup",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.groups"
+            ]
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/groupResponse"
+          },
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
+    "/warden/groups/{id}": {
+      "get": {
+        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups:\u003cid\u003e\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "warden",
+          "groups"
+        ],
+        "summary": "Get a group by id",
+        "operationId": "getGroup",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.groups"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "ID",
+            "description": "The id of the group to look up.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/groupResponse"
+          },
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      },
+      "post": {
+        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups:\u003cid\u003e\"],\n\"actions\": [\"members.add\"],\n\"effect\": \"allow\"\n}\n```",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "warden",
+          "groups"
+        ],
+        "summary": "Add members to a group",
+        "operationId": "addMembersToGroup",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.groups"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "ID",
+            "description": "The id of the group to modify.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/membersRequest"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      },
+      "delete": {
+        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups:\u003cid\u003e\"],\n\"actions\": [\"members.remove\"],\n\"effect\": \"allow\"\n}\n```",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "warden",
+          "groups"
+        ],
+        "summary": "Remove members from a group",
+        "operationId": "removeMembersFromGroup",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.groups"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "ID",
+            "description": "The id of the group to modify.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/membersRequest"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
+    "/warden/token/allowed": {
+      "post": {
+        "description": "Checks if a token is valid and if the token owner is allowed to perform an action on a resource.\nThis endpoint requires a token, a scope, a resource name, an action name and a context.\n\nIf a token is expired/invalid, has not been granted the requested scope or the subject is not allowed to\nperform the action on the resource, this endpoint returns a 200 response with `{ \"allowed\": false} }`.\n\nExtra data set through the `at_ext` claim in the consent response will be included in the response.\nThe `id_ext` claim will never be returned by this endpoint.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:token:allowed\"],\n\"actions\": [\"decide\"],\n\"effect\": \"allow\"\n}\n```",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "warden"
+        ],
+        "summary": "Check if the subject of a token is allowed to do something",
+        "operationId": "wardenTokenAllowed",
+        "security": [
+          {
+            "oauth2": [
+              "hydra.warden"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/wardenAccessRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/wardenTokenAllowedResponse"
+          },
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
     }
   },
   "definitions": {
+    "Context": {
+      "description": "Context contains an access token's session data",
+      "type": "object",
+      "properties": {
+        "aud": {
+          "description": "Audience is who the token was issued for. This is an OAuth2 app usually.",
+          "type": "string",
+          "x-go-name": "Audience"
+        },
+        "exp": {
+          "description": "ExpiresAt is the expiry timestamp.",
+          "x-go-name": "ExpiresAt"
+        },
+        "ext": {
+          "description": "Extra represents arbitrary session data.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "x-go-name": "Extra"
+        },
+        "iat": {
+          "description": "IssuedAt is the token creation time stamp.",
+          "x-go-name": "IssuedAt"
+        },
+        "iss": {
+          "description": "Issuer is the id of the issuer, typically an hydra instance.",
+          "type": "string",
+          "x-go-name": "Issuer"
+        },
+        "scopes": {
+          "description": "GrantedScopes is a list of scopes that the subject authorized when asked for consent.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "GrantedScopes"
+        },
+        "sub": {
+          "description": "Subject is the identity that authorized issuing the token, for example a user or an OAuth2 app.\nThis is usually a uuid but you can choose a urn or some other id too.",
+          "type": "string",
+          "x-go-name": "Subject"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/firewall"
+    },
+    "Firewall": {
+      "type": "object",
+      "title": "Firewall offers various validation strategies for access tokens.",
+      "x-go-package": "github.com/ory/hydra/firewall"
+    },
+    "Headers": {
+      "description": "Headers is the jwt headers",
+      "type": "object",
+      "properties": {
+        "Extra": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        }
+      },
+      "x-go-package": "github.com/ory/fosite/token/jwt"
+    },
+    "IDTokenClaims": {
+      "description": "IDTokenClaims represent the claims used in open id connect requests",
+      "type": "object",
+      "properties": {
+        "AccessTokenHash": {
+          "type": "string"
+        },
+        "Audience": {
+          "type": "string"
+        },
+        "AuthTime": {},
+        "CodeHash": {
+          "type": "string"
+        },
+        "ExpiresAt": {},
+        "Extra": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "IssuedAt": {},
+        "Issuer": {
+          "type": "string"
+        },
+        "Nonce": {
+          "type": "string"
+        },
+        "Subject": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/ory/fosite/token/jwt"
+    },
+    "Manager": {
+      "type": "object",
+      "x-go-package": "github.com/ory/hydra/warden/group"
+    },
+    "Session": {
+      "type": "object",
+      "properties": {
+        "Claims": {
+          "$ref": "#/definitions/IDTokenClaims"
+        },
+        "ExpiresAt": {},
+        "Headers": {
+          "$ref": "#/definitions/Headers"
+        },
+        "Subject": {
+          "type": "string"
+        },
+        "Username": {
+          "type": "string"
+        },
+        "extra": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "x-go-name": "Extra"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/oauth2"
+    },
+    "allowedRequest": {
+      "type": "object",
+      "title": "AccessRequest is the warden's request object.",
+      "properties": {
+        "action": {
+          "description": "Action is the action that is requested on the resource.",
+          "type": "string",
+          "x-go-name": "Action"
+        },
+        "context": {
+          "description": "Context is the request's environmental context.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "x-go-name": "Context"
+        },
+        "resource": {
+          "description": "Resource is the resource that access is requested to.",
+          "type": "string",
+          "x-go-name": "Resource"
+        },
+        "subject": {
+          "description": "Subejct is the subject that is requesting access.",
+          "type": "string",
+          "x-go-name": "Subject"
+        }
+      },
+      "x-go-name": "AccessRequest",
+      "x-go-package": "github.com/ory/hydra/firewall"
+    },
     "createRequest": {
       "type": "object",
       "required": [
@@ -707,6 +1646,27 @@
         }
       },
       "x-go-package": "github.com/ory/hydra/jwk"
+    },
+    "group": {
+      "description": "Group represents a warden group",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "ID is the groups id.",
+          "type": "string",
+          "x-go-name": "ID"
+        },
+        "members": {
+          "description": "Members is who belongs to the group.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "Members"
+        }
+      },
+      "x-go-name": "Group",
+      "x-go-package": "github.com/ory/hydra/warden/group"
     },
     "jwk": {
       "type": "object",
@@ -850,6 +1810,19 @@
       "x-go-name": "swaggerJSONWebKeySet",
       "x-go-package": "github.com/ory/hydra/jwk"
     },
+    "membersRequest": {
+      "type": "object",
+      "properties": {
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "Members"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/warden/group"
+    },
     "oauthClient": {
       "type": "object",
       "title": "Client represents an OAuth 2.0 Client.",
@@ -943,6 +1916,90 @@
       "x-go-name": "Client",
       "x-go-package": "github.com/ory/hydra/client"
     },
+    "policy": {
+      "type": "object",
+      "properties": {
+        "Conditions": {
+          "description": "Conditions under which the policy is active.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "options": {
+                "type": "object",
+                "x-go-name": "Options"
+              },
+              "type": {
+                "type": "string",
+                "x-go-name": "Type"
+              }
+            }
+          }
+        },
+        "actions": {
+          "description": "Actions impacted by the policy.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "Actions"
+        },
+        "description": {
+          "description": "Description of the policy.",
+          "type": "string",
+          "x-go-name": "Description"
+        },
+        "effect": {
+          "description": "Effect of the policy",
+          "type": "string",
+          "x-go-name": "Effect"
+        },
+        "id": {
+          "description": "ID of the policy.",
+          "type": "string",
+          "x-go-name": "ID"
+        },
+        "resources": {
+          "description": "Resources impacted by the policy.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "Resources"
+        },
+        "subjects": {
+          "description": "Subjects impacted by the policy.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "Subjects"
+        }
+      },
+      "x-go-name": "swaggerPolicy",
+      "x-go-package": "github.com/ory/hydra/policy"
+    },
+    "swaggerCreatePolicyParameters": {
+      "type": "object",
+      "properties": {
+        "Body": {
+          "$ref": "#/definitions/policy"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/policy"
+    },
+    "swaggerGetPolicyParameters": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The id of the policy.\nin: path",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "ID"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/policy"
+    },
     "swaggerJwkCreateKey": {
       "type": "object",
       "required": [
@@ -1033,6 +2090,109 @@
         }
       },
       "x-go-package": "github.com/ory/hydra/jwk"
+    },
+    "swaggerListPolicyParameters": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "The maximum amount of policies returned.\nin: query",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Limit"
+        },
+        "offset": {
+          "description": "The offset from where to start looking.\nin: query",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Offset"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/policy"
+    },
+    "swaggerListPolicyResponse": {
+      "description": "A policy",
+      "type": "object",
+      "properties": {
+        "Body": {
+          "$ref": "#/definitions/policy"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/policy"
+    },
+    "swaggerUpdatePolicyParameters": {
+      "type": "object",
+      "properties": {
+        "Body": {
+          "$ref": "#/definitions/policy"
+        },
+        "id": {
+          "description": "The id of the policy.\nin: path",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "ID"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/policy"
+    },
+    "tokenAllowedRequest": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "description": "Action is the action that is requested on the resource.",
+          "type": "string",
+          "x-go-name": "Action"
+        },
+        "context": {
+          "description": "Context is the request's environmental context.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "x-go-name": "Context"
+        },
+        "resource": {
+          "description": "Resource is the resource that access is requested to.",
+          "type": "string",
+          "x-go-name": "Resource"
+        }
+      },
+      "x-go-name": "TokenAccessRequest",
+      "x-go-package": "github.com/ory/hydra/firewall"
+    },
+    "wardenAccessRequest": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "description": "Action is the action that is requested on the resource.",
+          "type": "string",
+          "x-go-name": "Action"
+        },
+        "context": {
+          "description": "Context is the request's environmental context.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "x-go-name": "Context"
+        },
+        "resource": {
+          "description": "Resource is the resource that access is requested to.",
+          "type": "string",
+          "x-go-name": "Resource"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "Scopes"
+        },
+        "token": {
+          "type": "string",
+          "x-go-name": "Token"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/warden"
     }
   },
   "responses": {
@@ -1042,6 +2202,15 @@
         "type": "array",
         "items": {
           "$ref": "#/definitions/oauthClient"
+        }
+      }
+    },
+    "findGroupsByMemberResponse": {
+      "description": "A list of groups the member is belonging to",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "string"
         }
       }
     },
@@ -1080,6 +2249,172 @@
           "status": {
             "type": "string",
             "x-go-name": "Status"
+          }
+        }
+      }
+    },
+    "groupResponse": {
+      "description": "A group",
+      "schema": {
+        "$ref": "#/definitions/group"
+      }
+    },
+    "introspectOAuthTokenResponse": {
+      "description": "The token introspection response",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "active": {
+            "description": "Boolean indicator of whether or not the presented token\nis currently active.  The specifics of a token's \"active\" state\nwill vary depending on the implementation of the authorization\nserver and the information it keeps about its tokens, but a \"true\"\nvalue return for the \"active\" property will generally indicate\nthat a given token has been issued by this authorization server,\nhas not been revoked by the resource owner, and is within its\ngiven time window of validity (e.g., after its issuance time and\nbefore its expiration time).",
+            "type": "boolean",
+            "x-go-name": "Active"
+          },
+          "client_id": {
+            "description": "Client identifier for the OAuth 2.0 client that\nrequested this token.",
+            "type": "string",
+            "x-go-name": "ClientID"
+          },
+          "exp": {
+            "description": "Integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token will expire",
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "ExpiresAt"
+          },
+          "iat": {
+            "description": "Integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token was\noriginally issued",
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "IssuedAt"
+          },
+          "scope": {
+            "description": "A JSON string containing a space-separated list of\nscopes associated with this token",
+            "type": "string",
+            "x-go-name": "Scope"
+          },
+          "sess": {
+            "$ref": "#/definitions/Session"
+          },
+          "sub": {
+            "description": "Subject of the token, as defined in JWT [RFC7519].\nUsually a machine-readable identifier of the resource owner who\nauthorized this token.",
+            "type": "string",
+            "x-go-name": "Subject"
+          },
+          "username": {
+            "description": "Human-readable identifier for the resource owner who\nauthorized this token. Currently not supported by Hydra.",
+            "type": "string",
+            "x-go-name": "Username"
+          }
+        }
+      }
+    },
+    "listPolicyResponse": {
+      "description": "A policy",
+      "schema": {
+        "$ref": "#/definitions/policy"
+      }
+    },
+    "oauthTokenResponse": {
+      "description": "The token response",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "description": "The access token issued by the authorization server.",
+            "type": "string",
+            "x-go-name": "AccessToken"
+          },
+          "expires_in": {
+            "description": "The lifetime in seconds of the access token.  For\nexample, the value \"3600\" denotes that the access token will\nexpire in one hour from the time the response was generated.",
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "ExpiresIn"
+          },
+          "id_token": {
+            "description": "To retrieve a refresh token request the id_token scope.",
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "IDToken"
+          },
+          "refresh_token": {
+            "description": "The refresh token, which can be used to obtain new\naccess tokens. To retrieve it add the scope \"offline\" to your access token request.",
+            "type": "string",
+            "x-go-name": "RefreshToken"
+          },
+          "scope": {
+            "description": "The scope of the access token",
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Scope"
+          },
+          "token_type": {
+            "description": "The type of the token issued",
+            "type": "string",
+            "x-go-name": "TokenType"
+          }
+        }
+      }
+    },
+    "wardenAllowedResponse": {
+      "description": "The allowed response",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "allowed": {
+            "description": "Allowed is true if the request is allowed or false otherwise",
+            "type": "boolean",
+            "x-go-name": "Allowed"
+          }
+        }
+      }
+    },
+    "wardenTokenAllowedResponse": {
+      "description": "The token allowed response",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "allowed": {
+            "description": "Allowed is true if the request is allowed or false otherwise",
+            "type": "boolean",
+            "x-go-name": "Allowed"
+          },
+          "aud": {
+            "description": "Audience is who the token was issued for. This is an OAuth2 app usually.",
+            "type": "string",
+            "x-go-name": "Audience"
+          },
+          "exp": {
+            "description": "ExpiresAt is the expiry timestamp.",
+            "x-go-name": "ExpiresAt"
+          },
+          "ext": {
+            "description": "Extra represents arbitrary session data.",
+            "type": "object",
+            "additionalProperties": {
+              "type": "object"
+            },
+            "x-go-name": "Extra"
+          },
+          "iat": {
+            "description": "IssuedAt is the token creation time stamp.",
+            "x-go-name": "IssuedAt"
+          },
+          "iss": {
+            "description": "Issuer is the id of the issuer, typically an hydra instance.",
+            "type": "string",
+            "x-go-name": "Issuer"
+          },
+          "scopes": {
+            "description": "GrantedScopes is a list of scopes that the subject authorized when asked for consent.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "x-go-name": "GrantedScopes"
+          },
+          "sub": {
+            "description": "Subject is the identity that authorized issuing the token, for example a user or an OAuth2 app.\nThis is usually a uuid but you can choose a urn or some other id too.",
+            "type": "string",
+            "x-go-name": "Subject"
           }
         }
       }

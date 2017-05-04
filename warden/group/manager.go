@@ -1,7 +1,13 @@
 package group
 
+// Group represents a warden group
+//
+// swagger:model group
 type Group struct {
+	// ID is the groups id.
 	ID      string   `json:"id"`
+
+	// Members is who belongs to the group.
 	Members []string `json:"members"`
 }
 

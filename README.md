@@ -26,7 +26,22 @@ you build a bridge between Hydra and your authentication infrastructure.
 Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to.
 
 Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working
-on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. **Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.**
+on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose.
+**Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.**
+
+Hydra implements Open Standards set by IETF:
+
+* [The OAuth 2.0 Authorization Framework](https://tools.ietf.org/html/rfc6749)
+* [OAuth 2.0 Threat Model and Security Considerations](https://tools.ietf.org/html/rfc6819)
+* [OAuth 2.0 Token Revocation](https://tools.ietf.org/html/rfc7009)
+* [OAuth 2.0 Token Introspection](https://tools.ietf.org/html/rfc7662)
+* [OAuth 2.0 Dynamic Client Registration Protocol](https://tools.ietf.org/html/rfc7591)
+* [OAuth 2.0 Dynamic Client Registration Management Protocol](https://tools.ietf.org/html/rfc7592)
+
+and the OpenID Foundation:
+
+* [OpenID Connect Core 1.0](http://openid.net/specs/openid-connect-core-1_0.html)
+* [OpenID Connect Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0.html)
 
 ---
 

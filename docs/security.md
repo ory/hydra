@@ -30,7 +30,7 @@ the IETF, specifically:
 Additionally these safeguards are implemented:
 
 - Advanced Token Validation: Tokens are layouted as &lt;key&gt;.&lt;signature&gt; where &lt;signature&gt;
-is created using HMAC-SHA256 using a global secret. 
+is created using HMAC-SHA256 using a global secret.
 
 ### Advanced Token Validation (Datastore Security)
 
@@ -41,19 +41,6 @@ access tokens, or refresh tokens.
 
 Because HMAC-SHA256 is used, the System Secret is required to create valid key-signature pairs, rendering an attacker
 unable to inject new codes or tokens into a compromised datastore.
-
-### Access Control Policies
-
-Access Control Policies are a way of authorizing requests. Alternatives are Role Based Access
-Control, Access Control Lists, Discretionary Access Control, and others.
-
-Access Control Policies are provided by the Ladon SDK and while Access Control Policies are not standardized,
-we analyzed various popular Access Control Policy Mechanisms such as AWS IAM or Google IAM and
-modeled Ladon after those.
-
-The Ladon SDK has seen adoption across various Go projects, yields good test coverage and includes a magnitude
-of test cases for the vital parts of the library. The API has not seen any breaking changes or security
-issues since its inception.
 
 ## Cryptography
 
@@ -104,3 +91,33 @@ and PBKDF2: [https://security.stackexchange.com/questions/4781/do-any-security-e
 
 Be aware that BCrypt causes very high CPU loads, depending on the Workload Factor. We
 strongly advise reducing the number of requests that use Basic Authorization.
+
+## How does Access Control work with Hydra?
+
+Hydra supports two concepts of authorization. One is called Token Introspection which is a standard
+by the IETF ( [https://tools.ietf.org/html/rfc7662](https://tools.ietf.org/html/rfc7662) ). It is primarily
+targeted at third-party services and is usually used by a programmatic API. It can be used by first-party
+services too. The sole purpose of this endpoint is to check whether an access token is valid or not.
+
+The second endpoint is called the Warden. The Warden is a powerful endpoint primarily targeted at
+internal services. It embeds Ladon and exposes it via an HTTP API. Ladon is a popular Access Control
+library for Go ( [https://github.com/ory/ladon](https://github.com/ory/ladon) ) that uses policies similar
+to AWS IAM. Requests can be checked for authorization either based on an access tokens, or by specifying the subject.
+  
+The Ladon documentation is located at [https://github.com/ory/ladon/blob/master/README.md](https://github.com/ory/ladon/blob/master/README.md)
+and further explanation can be given upon request. Within Hydra, Ladon is used to protect various resources, like
+the JWK API. An example policy for reading public/private keys from the JWK API can be found
+[here](https://github.com/ory/hydra/blob/master/docs/access-control/policies/allow-client-consent-key).
+
+### Access Control Policies
+
+Access Control Policies are a way of authorizing requests. Alternatives are Role Based Access
+Control, Access Control Lists, Discretionary Access Control, and others.
+
+Access Control Policies are provided by the Ladon SDK and while Access Control Policies are not standardized,
+we analyzed various popular Access Control Policy Mechanisms such as AWS IAM or Google IAM and
+modeled Ladon after those.
+
+The Ladon SDK has seen adoption across various Go projects, yields good test coverage and includes a magnitude
+of test cases for the vital parts of the library. The API has not seen any breaking changes or security
+issues since its inception.

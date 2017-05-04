@@ -43,7 +43,7 @@ func (m *HTTPManager) Update(policy ladon.Policy) error {
 }
 
 // Get retrieves a policy.
-func (m *HTTPManager) GetAll(limit, offset int64) (ladon.Policies, error) {
+func (m *HTTPManager) List(limit, offset int64) (ladon.Policies, error) {
 	var policies []*ladon.DefaultPolicy
 	var r = pkg.NewSuperAgent(m.Endpoint.String() + fmt.Sprintf("?limit=%d&offset=%d", limit, offset))
 	r.Client = m.Client

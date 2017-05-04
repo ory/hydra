@@ -19,8 +19,8 @@ type Manager interface {
 	// Delete removes a policy.
 	Delete(id string) error
 
-	// GetAll retrieves all policies.
-	GetAll(limit, offset int64) (ladon.Policies, error)
+	// List policies.
+	List(limit, offset int64) (ladon.Policies, error)
 
 	// Update a policy.
 	Update(policy ladon.Policy) error

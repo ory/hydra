@@ -2,11 +2,12 @@ package policy
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
+
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/ladon"
-	"fmt"
 	"github.com/pkg/errors"
 )
 

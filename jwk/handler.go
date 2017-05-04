@@ -56,7 +56,7 @@ type createRequest struct {
 	// The kid of the key to be created
 	// required: true
 	// in: body
-	KeyID     string `json:"kid"`
+	KeyID string `json:"kid"`
 }
 
 type joseWebKeySetRequest struct {
@@ -365,7 +365,6 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 
 	h.H.Write(w, r, key)
 }
-
 
 // swagger:route DELETE /keys/{set} jwks deleteJwkSet
 //

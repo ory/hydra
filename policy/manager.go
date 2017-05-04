@@ -4,8 +4,8 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/ladon"
 	"github.com/ory/ladon/manager/sql"
-	"github.com/rubenv/sql-migrate"
 	"github.com/pkg/errors"
+	"github.com/rubenv/sql-migrate"
 )
 
 // Manager is responsible for managing and persisting policies.

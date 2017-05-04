@@ -50,7 +50,7 @@ services:
       - HYDRA_CLIENT_ID=admin
       - HYDRA_CLIENT_SECRET=demo-password
       - NODE_TLS_REJECT_UNAUTHORIZED=0
-    image: oryd/hydra-consent-app-express:v0.1.3
+    image: oryd/hydra-consent-app-express:v0.1.4
     links:
       - hydra
     ports:

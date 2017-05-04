@@ -1,6 +1,6 @@
 # Installing, Configuring and Running Hydra
 
-Before starting with this section, please check out the [tutorial](./demo.md). It will teach you the most important flows
+Before starting with this section, please check out the [tutorial](./tutorials/5minutes.md). It will teach you the most important flows
 and settings for Hydra.
 
 ## Installing Hydra
@@ -44,7 +44,7 @@ Hydra is a twelve factor OAuth2 and OpenID Connect provider
 
 The client and server **binaries are downloadable at the [releases tab](https://github.com/ory-am/hydra/releases)**.
 There is currently no installer available. You have to add the hydra binary to the PATH environment variable yourself or put
-the binary in a location that is already in your path (`/usr/bin`, ...). 
+the binary in a location that is already in your path (`/usr/bin`, ...).
 If you do not understand what that all of this means, ask in our [chat channel](https://gitter.im/ory-am/hydra). We are happy to help.
 
 Once installed, you should be able to run:
@@ -86,7 +86,7 @@ Available Commands:
 ## Configuring Hydra
 
 Running the default Hydra environment is as easy as:
- 
+
 ```
 $ hydra host
 time="2016-10-13T10:04:01+02:00" level=info msg="DATABASE_URL not set, connecting to ephermal in-memory database."

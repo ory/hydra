@@ -36,6 +36,38 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.DELETE(endpoint+"/:id", h.Delete)
 }
 
+// swagger:route GET /policies policies listPolicies
+//
+// List access control policies
+//
+// Visit https://github.com/ory/ladon#usage for more information on policy usage.
+//
+// The subject making the request needs to be assigned to a policy containing:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:policies"],
+//    "actions": ["list"],
+//    "effect": "allow"
+//  }
+//  ```
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2: hydra.policies
+//
+//     Responses:
+//       200: listPolicyResponse
+//       401: genericError
+//       403: genericError
+//       500: genericError
 func (h *Handler) List(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = r.Context()
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
@@ -76,6 +108,38 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 	h.H.Write(w, r, policies)
 }
 
+// swagger:route POST /policies policies createPolicy
+//
+// Create an access control policy
+//
+// Visit https://github.com/ory/ladon#usage for more information on policy usage.
+//
+// The subject making the request needs to be assigned to a policy containing:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:policies"],
+//    "actions": ["create"],
+//    "effect": "allow"
+//  }
+//  ```
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2: hydra.policies
+//
+//     Responses:
+//       201: policy
+//       401: genericError
+//       403: genericError
+//       500: genericError
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var p = ladon.DefaultPolicy{
 		Conditions: ladon.Conditions{},
@@ -106,6 +170,38 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	h.H.WriteCreated(w, r, "/policies/"+p.ID, &p)
 }
 
+// swagger:route GET /policies/{id} policies getPolicy
+//
+// Get an access control policy
+//
+// Visit https://github.com/ory/ladon#usage for more information on policy usage.
+//
+// The subject making the request needs to be assigned to a policy containing:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:policies:<id>"],
+//    "actions": ["get"],
+//    "effect": "allow"
+//  }
+//  ```
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2: hydra.policies
+//
+//     Responses:
+//       200: policy
+//       401: genericError
+//       403: genericError
+//       500: genericError
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	ctx := r.Context()
 
@@ -125,6 +221,38 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	h.H.Write(w, r, policy)
 }
 
+// swagger:route DELETE /policies/{id} policies deletePolicy
+//
+// Delete an access control policy
+//
+// Visit https://github.com/ory/ladon#usage for more information on policy usage.
+//
+// The subject making the request needs to be assigned to a policy containing:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:policies:<id>"],
+//    "actions": ["delete"],
+//    "effect": "allow"
+//  }
+//  ```
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2: hydra.policies
+//
+//     Responses:
+//       204
+//       401: genericError
+//       403: genericError
+//       500: genericError
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	ctx := r.Context()
 	id := ps.ByName("id")
@@ -145,6 +273,38 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// swagger:route PUT /policies/{id} policies updatePolicy
+//
+// Update an access control policy
+//
+// Visit https://github.com/ory/ladon#usage for more information on policy usage.
+//
+// The subject making the request needs to be assigned to a policy containing:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:policies"],
+//    "actions": ["update"],
+//    "effect": "allow"
+//  }
+//  ```
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2: hydra.policies
+//
+//     Responses:
+//       200: policy
+//       401: genericError
+//       403: genericError
+//       500: genericError
 func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 	var p = ladon.DefaultPolicy{Conditions: ladon.Conditions{}}

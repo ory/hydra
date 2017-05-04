@@ -40,6 +40,36 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.DELETE(GroupsHandlerPath+"/:id/members", h.RemoveGroupMembers)
 }
 
+// swagger:route GET /warden/groups warden groups findGroupsByMember
+//
+// Find group IDs by member
+//
+// The subject making the request needs to be assigned to a policy containing:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:warden:groups:<member>"],
+//    "actions": ["get"],
+//    "effect": "allow"
+//  }
+//  ```
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2: hydra.groups
+//
+//     Responses:
+//       200: findGroupsByMemberResponse
+//       401: genericError
+//       403: genericError
+//       500: genericError
 func (h *Handler) FindGroupNames(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = r.Context()
 	var member = r.URL.Query().Get("member")
@@ -61,6 +91,36 @@ func (h *Handler) FindGroupNames(w http.ResponseWriter, r *http.Request, _ httpr
 	h.H.Write(w, r, g)
 }
 
+// swagger:route POST /warden/groups warden groups createGroup
+//
+// Create a group
+//
+// The subject making the request needs to be assigned to a policy containing:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:warden:groups"],
+//    "actions": ["create"],
+//    "effect": "allow"
+//  }
+//  ```
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2: hydra.groups
+//
+//     Responses:
+//       201: groupResponse
+//       401: genericError
+//       403: genericError
+//       500: genericError
 func (h *Handler) CreateGroup(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var g Group
 	var ctx = r.Context()
@@ -86,6 +146,36 @@ func (h *Handler) CreateGroup(w http.ResponseWriter, r *http.Request, _ httprout
 	h.H.WriteCreated(w, r, GroupsHandlerPath+"/"+g.ID, &g)
 }
 
+// swagger:route GET /warden/groups/{id} warden groups getGroup
+//
+// Get a group by id
+//
+// The subject making the request needs to be assigned to a policy containing:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:warden:groups:<id>"],
+//    "actions": ["create"],
+//    "effect": "allow"
+//  }
+//  ```
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2: hydra.groups
+//
+//     Responses:
+//       201: groupResponse
+//       401: genericError
+//       403: genericError
+//       500: genericError
 func (h *Handler) GetGroup(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var ctx = r.Context()
 	var id = ps.ByName("id")
@@ -107,6 +197,36 @@ func (h *Handler) GetGroup(w http.ResponseWriter, r *http.Request, ps httprouter
 	h.H.Write(w, r, g)
 }
 
+// swagger:route DELETE /warden/groups/{id} warden groups deleteGroup
+//
+// Delete a group by id
+//
+// The subject making the request needs to be assigned to a policy containing:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:warden:groups:<id>"],
+//    "actions": ["delete"],
+//    "effect": "allow"
+//  }
+//  ```
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2: hydra.groups
+//
+//     Responses:
+//       204
+//       401: genericError
+//       403: genericError
+//       500: genericError
 func (h *Handler) DeleteGroup(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var ctx = r.Context()
 	var id = ps.ByName("id")
@@ -127,6 +247,36 @@ func (h *Handler) DeleteGroup(w http.ResponseWriter, r *http.Request, ps httprou
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// swagger:route POST /warden/groups/{id} warden groups addMembersToGroup
+//
+// Add members to a group
+//
+// The subject making the request needs to be assigned to a policy containing:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:warden:groups:<id>"],
+//    "actions": ["members.add"],
+//    "effect": "allow"
+//  }
+//  ```
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2: hydra.groups
+//
+//     Responses:
+//       204
+//       401: genericError
+//       403: genericError
+//       500: genericError
 func (h *Handler) AddGroupMembers(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var ctx = r.Context()
 	var id = ps.ByName("id")
@@ -139,7 +289,7 @@ func (h *Handler) AddGroupMembers(w http.ResponseWriter, r *http.Request, ps htt
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: fmt.Sprintf(GroupResource, id),
-		Action:   "add.member",
+		Action:   "members.add",
 	}, Scope); err != nil {
 		h.H.WriteError(w, r, err)
 		return
@@ -153,6 +303,36 @@ func (h *Handler) AddGroupMembers(w http.ResponseWriter, r *http.Request, ps htt
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// swagger:route DELETE /warden/groups/{id} warden groups removeMembersFromGroup
+//
+// Remove members from a group
+//
+// The subject making the request needs to be assigned to a policy containing:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:warden:groups:<id>"],
+//    "actions": ["members.remove"],
+//    "effect": "allow"
+//  }
+//  ```
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2: hydra.groups
+//
+//     Responses:
+//       204
+//       401: genericError
+//       403: genericError
+//       500: genericError
 func (h *Handler) RemoveGroupMembers(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var ctx = r.Context()
 	var id = ps.ByName("id")
@@ -165,7 +345,7 @@ func (h *Handler) RemoveGroupMembers(w http.ResponseWriter, r *http.Request, ps 
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: fmt.Sprintf(GroupResource, id),
-		Action:   "remove.member",
+		Action:   "members.remove",
 	}, Scope); err != nil {
 		h.H.WriteError(w, r, err)
 		return

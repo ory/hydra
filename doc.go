@@ -18,6 +18,7 @@
 //
 //     Consumes:
 //     - application/json
+//     - application/x-www-form-urlencoded
 //
 //     Produces:
 //     - application/json

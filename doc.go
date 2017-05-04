@@ -1,13 +1,12 @@
 // Package main Hydra OAuth2 & OpenID Connect Server
 //
-// is a server implementation of the OAuth 2.0 authorization framework and the OpenID Connect Core 1.0.
-// Existing OAuth2 implementations usually ship as libraries or SDKs such as node-oauth2-server or fosite, or as fully featured identity solutions with user management and user interfaces, such as Dex.
+// Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/
 //
-// Implementing and using OAuth2 without understanding the whole specification is challenging and prone to errors, even when SDKs are being used. The primary goal of Hydra is to make OAuth 2.0 and OpenID Connect 1.0 better accessible.
+// Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure.
+// Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to.
+// Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.
 //
-// Hydra implements the flows described in OAuth2 and OpenID Connect 1.0 without forcing you to use a "Hydra User Management" or some template engine or a predefined front-end. Instead it relies on HTTP redirection and cryptographic methods to verify user consent allowing you to use Hydra with any authentication endpoint, be it authboss, auth0.com or your proprietary PHP authentication.
-//
-// The official repository is located at https://github.com/ory-am/hydra
+// The official repository is located at https://github.com/ory/hydra
 //
 //     Schemes: http, https
 //     Host:

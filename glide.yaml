@@ -1,30 +1,28 @@
-package: github.com/ory-am/hydra
+package: github.com/ory/hydra
 import:
 - package: github.com/Sirupsen/logrus
   version: v0.11.5
 - package: github.com/dgrijalva/jwt-go
   version: v3.0.0
-- package: github.com/go-redis/redis
-  version: v6.2.5
 - package: github.com/go-sql-driver/mysql
-  version: v1.3
+  version: v1.3.0
 - package: github.com/gorilla/sessions
-  version: v1.1
+  version: v1.1.0
 - package: github.com/imdario/mergo
   version: 0.2.2
 - package: github.com/jmoiron/sqlx
 - package: github.com/julienschmidt/httprouter
-  version: v1.1
+  version: v1.1.0
 - package: github.com/lib/pq
 - package: github.com/meatballhat/negroni-logrus
 - package: github.com/moul/http2curl
 - package: github.com/ory-am/common
-  version: v0.4.0
+  version: ^0.4.0
   subpackages:
   - pkg
   - rand/sequence
 - package: github.com/ory/fosite
-  version: v0.6.18
+  version: ^0.7.0
   subpackages:
   - compose
   - handler/oauth2
@@ -32,45 +30,43 @@ import:
   - storage
   - token/hmac
   - token/jwt
+- package: github.com/ory/graceful
+  version: ^0.0.1
+- package: github.com/ory/herodot
+  version: ^0.0.3
 - package: github.com/ory/ladon
-  version: v0.6.0
+  version: ^0.6.1
+  subpackages:
+  - manager/memory
+  - manager/sql
 - package: github.com/pborman/uuid
-  version: v1.0
+  version: ~1.0.0
 - package: github.com/pkg/errors
-  version: v0.8.0
+  version: ~0.8.0
 - package: github.com/pkg/profile
-  version: v1.2.0
+  version: ~1.2.0
 - package: github.com/rubenv/sql-migrate
 - package: github.com/spf13/cobra
 - package: github.com/spf13/viper
-- package: gopkg.in/square/go-jose.v1
-  version: v1.1.0
 - package: github.com/square/go-jose
-  version: v1.1.0
+  version: ^1.1.0
   subpackages:
   - json
-- package: github.com/stretchr/testify
-  version: v1.1.4
-  subpackages:
-  - assert
-  - require
 - package: github.com/toqueteos/webbrowser
-  version: v1.0
+  version: ~1.0.0
 - package: github.com/urfave/negroni
-  version: v0.2.0
-- package: golang.org/x/net
-  subpackages:
-  - context
+  version: ~0.2.0
 - package: golang.org/x/oauth2
   subpackages:
   - clientcredentials
-- package: gopkg.in/gorethink/gorethink.v3
-  version: v3.0.2
-- package: gopkg.in/ory-am/dockertest.v3
-  version: v3.0.7
 - package: gopkg.in/tylerb/graceful.v1
-  version: v1.2.15
+  version: ~1.2.15
 - package: gopkg.in/yaml.v2
-testImport:
-- package: github.com/gorilla/mux
-  version: v1.3.0
+testImports:
+- package: gopkg.in/ory-am/dockertest.v3
+  version: ~3.0.7
+- package: github.com/stretchr/testify
+  version: ~1.1.4
+  subpackages:
+  - assert
+  - require

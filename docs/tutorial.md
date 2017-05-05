@@ -1,4 +1,4 @@
-### 5 Minute Tutorial
+# 5 Minute Tutorial
 
 In this example, you will set up Hydra, a Postgres instance and an exemplary identity provider written in React using docker compose. It will take you about 5 minutes to get complete this tutorial.
 

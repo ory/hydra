@@ -17,14 +17,10 @@ func newClientManager(c *config.Config) client.Manager {
 			Hasher:  ctx.Hasher,
 		}
 	case *config.SQLConnection:
-		m := &client.SQLManager{
+		return &client.SQLManager{
 			DB:     con.GetDatabase(),
 			Hasher: ctx.Hasher,
 		}
-		if err := m.CreateSchemas(); err != nil {
-			c.GetLogger().Fatalf("Could not create client schema: %s", err)
-		}
-		return m
 	default:
 		panic("Unknown connection type.")
 	}

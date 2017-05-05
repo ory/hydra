@@ -46,7 +46,7 @@ func TestMain(m *testing.M) {
 func connectToPG() {
 	var db = integration.ConnectToPostgres()
 	s := &FositeSQLStore{DB: db, Manager: clientManager, L: logrus.New()}
-	if err := s.CreateSchemas(); err != nil {
+	if _, err := s.CreateSchemas(); err != nil {
 		logrus.Fatalf("Could not create postgres schema: %v", err)
 	}
 
@@ -56,7 +56,7 @@ func connectToPG() {
 func connectToMySQL() {
 	var db = integration.ConnectToMySQL()
 	s := &FositeSQLStore{DB: db, Manager: clientManager, L: logrus.New()}
-	if err := s.CreateSchemas(); err != nil {
+	if _, err := s.CreateSchemas(); err != nil {
 		logrus.Fatalf("Could not create postgres schema: %v", err)
 	}
 

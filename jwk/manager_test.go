@@ -91,7 +91,7 @@ func TestMain(m *testing.M) {
 func connectToPG() {
 	var db = integration.ConnectToPostgres()
 	s := &SQLManager{DB: db, Cipher: &AEAD{Key: encryptionKey}}
-	if err := s.CreateSchemas(); err != nil {
+	if _, err := s.CreateSchemas(); err != nil {
 		log.Fatalf("Could not create postgres schema: %v", err)
 	}
 
@@ -102,7 +102,7 @@ func connectToMySQL() {
 	var db = integration.ConnectToMySQL()
 	s := &SQLManager{DB: db, Cipher: &AEAD{Key: encryptionKey}}
 
-	if err := s.CreateSchemas(); err != nil {
+	if _, err := s.CreateSchemas(); err != nil {
 		log.Fatalf("Could not create postgres schema: %v", err)
 	}
 

@@ -200,20 +200,10 @@ func (c *Config) Context() *Context {
 		groupManager = group.NewMemoryManager()
 		break
 	case *SQLConnection:
-		m := lsql.NewSQLManager(con.GetDatabase(), nil)
-		if err := m.CreateSchemas(); err != nil {
-			logrus.Fatalf("Could not create policy schema: %s", err)
-		}
-		manager = m
-
-		gm := &group.SQLManager{
+		manager = lsql.NewSQLManager(con.GetDatabase(), nil)
+		groupManager = &group.SQLManager{
 			DB: con.GetDatabase(),
 		}
-		if err := gm.CreateSchemas(); err != nil {
-			logrus.Fatalf("Could not create group schema: %s", err)
-		}
-		groupManager = gm
-
 		break
 	default:
 		panic("Unknown connection type.")

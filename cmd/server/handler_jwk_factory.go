@@ -15,16 +15,12 @@ func injectJWKManager(c *config.Config) {
 		ctx.KeyManager = &jwk.MemoryManager{}
 		break
 	case *config.SQLConnection:
-		m := &jwk.SQLManager{
+		ctx.KeyManager = &jwk.SQLManager{
 			DB: con.GetDatabase(),
 			Cipher: &jwk.AEAD{
 				Key: c.GetSystemSecret(),
 			},
 		}
-		if err := m.CreateSchemas(); err != nil {
-			c.GetLogger().Fatalf("Could not create jwk schema: %s", err)
-		}
-		ctx.KeyManager = m
 		break
 	default:
 		c.GetLogger().Fatalf("Unknown connection type.")

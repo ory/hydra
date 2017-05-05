@@ -10,6 +10,8 @@ RUN glide install --skip-test -v
 ADD . .
 RUN go install .
 
+RUN /go/bin/hydra migrate sql
+
 ENTRYPOINT /go/bin/hydra host --dangerous-auto-logon --dangerous-force-http
 
 EXPOSE 4444

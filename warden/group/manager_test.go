@@ -33,7 +33,7 @@ func init() {
 		ID:        "1",
 		Subjects:  []string{"alice"},
 		Resources: []string{"rn:hydra:warden<.*>"},
-		Actions:   []string{"create", "get", "delete", "update", "add.member", "remove.member"},
+		Actions:   []string{"create", "get", "delete", "update", "members.add", "members.remove"},
 		Effect:    ladon.AllowAccess,
 	})
 
@@ -68,7 +68,7 @@ func TestMain(m *testing.M) {
 func connectToMySQL() {
 	var db = integration.ConnectToMySQL()
 	s := &SQLManager{DB: db}
-	if err := s.CreateSchemas(); err != nil {
+	if _, err := s.CreateSchemas(); err != nil {
 		log.Fatalf("Could not create postgres schema: %v", err)
 	}
 
@@ -79,7 +79,7 @@ func connectToPG() {
 	var db = integration.ConnectToPostgres()
 	s := &SQLManager{DB: db}
 
-	if err := s.CreateSchemas(); err != nil {
+	if _, err := s.CreateSchemas(); err != nil {
 		log.Fatalf("Could not create postgres schema: %v", err)
 	}
 

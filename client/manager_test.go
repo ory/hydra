@@ -75,7 +75,7 @@ func TestMain(m *testing.M) {
 func connectToMySQL() {
 	var db = integration.ConnectToMySQL()
 	s := &SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}
-	if err := s.CreateSchemas(); err != nil {
+	if _, err := s.CreateSchemas(); err != nil {
 		log.Fatalf("Could not create postgres schema: %v", err)
 	}
 
@@ -86,7 +86,7 @@ func connectToPG() {
 	var db = integration.ConnectToPostgres()
 	s := &SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}
 
-	if err := s.CreateSchemas(); err != nil {
+	if _, err := s.CreateSchemas(); err != nil {
 		log.Fatalf("Could not create postgres schema: %v", err)
 	}
 

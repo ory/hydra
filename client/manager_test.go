@@ -308,3 +308,34 @@ func compare(t *testing.T, c fosite.Client, k string) {
 	}
 	assert.Equal(t, c.GetRedirectURIs(), []string{"http://redirect"}, "%s", k)
 }
+
+func TestClientCreateWithoutConsentURI(t *testing.T) {
+	for k, m := range clientManagers {
+		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
+			c := &Client{
+				Secret:            "secret",
+				RedirectURIs:      []string{"http://redirect"},
+				TermsOfServiceURI: "foo",
+			}
+			assert.Nil(t, m.CreateClient(c))
+			assert.Empty(t, c.ConsentURI)
+			assert.Nil(t, m.DeleteClient(c.ID))
+		})
+	}
+}
+
+func TestClientCreateWithConsentURI(t *testing.T) {
+	for k, m := range clientManagers {
+		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
+			c := &Client{
+				Secret:            "secret",
+				RedirectURIs:      []string{"http://redirect"},
+				TermsOfServiceURI: "foo",
+				ConsentURI:        "http://consent",
+			}
+			assert.Nil(t, m.CreateClient(c))
+			assert.Empty(t, c.ConsentURI)
+			assert.Nil(t, m.DeleteClient(c.ID))
+		})
+	}
+}

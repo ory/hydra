@@ -37,6 +37,12 @@ var migrations = &migrate.MemoryMigrationSource{
 				"DROP TABLE hydra_client",
 			},
 		},
+
+		{
+			Id:   "2",
+			Up:   []string{`ALTER TABLE hydra_client ADD COLUMN IF NOT EXISTS consent_uri text NOT NULL`},
+			Down: []string{"ALTER TABLE hydra_client DROP COLUMN IF EXISTS consent_uri"},
+		},
 	},
 }
 
@@ -60,6 +66,7 @@ type sqlData struct {
 	LogoURI           string `db:"logo_uri"`
 	Contacts          string `db:"contacts"`
 	Public            bool   `db:"public"`
+	ConsentURI        string `db:"consent_uri"`
 }
 
 var sqlParams = []string{
@@ -77,6 +84,7 @@ var sqlParams = []string{
 	"logo_uri",
 	"contacts",
 	"public",
+	"consent_uri",
 }
 
 func sqlDataFromClient(d *Client) *sqlData {
@@ -95,6 +103,7 @@ func sqlDataFromClient(d *Client) *sqlData {
 		LogoURI:           d.LogoURI,
 		Contacts:          strings.Join(d.Contacts, "|"),
 		Public:            d.Public,
+		ConsentURI:        d.ConsentURI,
 	}
 }
 
@@ -114,6 +123,7 @@ func (d *sqlData) ToClient() *Client {
 		LogoURI:           d.LogoURI,
 		Contacts:          strings.Split(d.Contacts, "|"),
 		Public:            d.Public,
+		ConsentURI:        d.ConsentURI,
 	}
 }
 

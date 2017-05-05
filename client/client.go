@@ -21,6 +21,7 @@ type Client struct {
 	LogoURI           string   `json:"logo_uri" gorethink:"logo_uri"`
 	Contacts          []string `json:"contacts" gorethink:"contacts"`
 	Public            bool     `json:"public" gorethink:"public"`
+	ConsentURI        string   `json:"consent_uri" gorethink:"consent_uri"`
 }
 
 func (c *Client) GetID() string {
@@ -69,4 +70,8 @@ func (c *Client) GetOwner() string {
 
 func (c *Client) IsPublic() bool {
 	return c.Public
+}
+
+func (c *Client) GetConsentURI() string {
+	return c.ConsentURI
 }

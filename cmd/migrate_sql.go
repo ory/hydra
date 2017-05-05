@@ -16,7 +16,7 @@ This decreases risk of failure and decreases time required.
 
 Before running this command on an existing database, create a back up!
 `,
-	Run:cmdHandler.Migration.MigrateSQL,
+	Run: cmdHandler.Migration.MigrateSQL,
 }
 
 func init() {

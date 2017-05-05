@@ -3,14 +3,15 @@ package cli
 import (
 	"testing"
 
+	"os"
+
+	"github.com/jmoiron/sqlx"
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/integration"
-	"github.com/jmoiron/sqlx"
-	"os"
-	"github.com/stretchr/testify/assert"
-	lsql "github.com/ory/ladon/manager/sql"
 	"github.com/ory/ladon"
+	lsql "github.com/ory/ladon/manager/sql"
 	"github.com/pborman/uuid"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 

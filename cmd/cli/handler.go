@@ -11,7 +11,7 @@ type Handler struct {
 	Warden     *WardenHandler
 	Revocation *RevocationHandler
 	Groups     *GroupHandler
-	Migration *MigrateHandler
+	Migration  *MigrateHandler
 }
 
 func NewHandler(c *config.Config) *Handler {
@@ -22,6 +22,6 @@ func NewHandler(c *config.Config) *Handler {
 		Warden:     newWardenHandler(c),
 		Revocation: newRevocationHandler(c),
 		Groups:     newGroupHandler(c),
-		Migration: newMigrateHandler(c),
+		Migration:  newMigrateHandler(c),
 	}
 }

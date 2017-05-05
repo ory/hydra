@@ -3,20 +3,21 @@ package cli
 import (
 	"fmt"
 
-	"github.com/spf13/cobra"
-	"strings"
-	"github.com/jmoiron/sqlx"
-	ladon "github.com/ory/ladon/manager/sql"
 	"net/url"
-	"github.com/ory/hydra/pkg"
+	"os"
+	"strings"
 	"time"
-	"github.com/pkg/errors"
+
+	"github.com/jmoiron/sqlx"
+	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/warden/group"
-	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/oauth2"
-	"os"
+	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/warden/group"
+	ladon "github.com/ory/ladon/manager/sql"
+	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
 )
 
 type MigrateHandler struct {
@@ -27,7 +28,7 @@ type MigrateHandler struct {
 func newMigrateHandler(c *config.Config) *MigrateHandler {
 	return &MigrateHandler{
 		c: c,
-		M:      &jwk.HTTPManager{},
+		M: &jwk.HTTPManager{},
 	}
 }
 
@@ -43,7 +44,7 @@ func (h *MigrateHandler) connectToSql(dsn string) (*sqlx.DB, error) {
 		return nil, errors.Errorf("Could not parse DATABASE_URL: %s", err)
 	}
 
-	if err := pkg.Retry(h.c.GetLogger(), time.Second * 15, time.Minute * 2, func() error {
+	if err := pkg.Retry(h.c.GetLogger(), time.Second*15, time.Minute*2, func() error {
 		if u.Scheme == "mysql" {
 			dsn = strings.Replace(dsn, "mysql://", "", -1)
 		}
@@ -96,7 +97,7 @@ func (h *MigrateHandler) runMigrateLadon050To060(db *sqlx.DB) error {
 
 	fmt.Println("Moving policies to new schema")
 	mm := ladon.SQLManagerMigrateFromMajor0Minor6ToMajor0Minor7{
-		DB:db,
+		DB:         db,
 		SQLManager: m,
 	}
 	if err := mm.Migrate(); err != nil {
@@ -140,8 +141,8 @@ func (h *MigrateHandler) runMigrateSQL(db *sqlx.DB) error {
 	for k, m := range map[string]schemaCreator{
 		"client": &client.SQLManager{DB: db},
 		"oauth2": &oauth2.FositeSQLStore{DB: db},
-		"jwk": &jwk.SQLManager{DB: db},
-		"group": &group.SQLManager{DB: db},
+		"jwk":    &jwk.SQLManager{DB: db},
+		"group":  &group.SQLManager{DB: db},
 	} {
 		fmt.Printf("Applying `%s` SQL migrations...\n", k)
 		if num, err := m.CreateSchemas(); err != nil {

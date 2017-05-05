@@ -196,11 +196,10 @@ rename Go packages.
 
 *Why should I use Hydra? It's not that hard to implement two OAuth2 endpoints and there are numerous SDKs out there!*
 
-OAuth2 and OAuth2 related specifications are over 200 written pages. Implementing OAuth2 is easy, getting it right is hard.
-Even if you use a secure SDK (there are numerous SDKs not secure by design in the wild), messing up the implementation
-is a real threat - no matter how good you or your team is. To err is human.
-
-An in-depth list of security features is listed [in the security guide](https://ory.gitbooks.io/hydra/content/faq/security.html).
+OAuth2 and OAuth2 related specifications are over 400 written pages. Implementing OAuth2 is easy, getting it right is hard.
+Hydra is trusted by companies all around the world, has a vibrant community and faces millions of requests in production
+each day. Of course, we also compiled a security guide with more details on cryptography and security concepts.
+Read [the security guide now](https://ory.gitbooks.io/hydra/content/security.html).
 
 ## Reception
 

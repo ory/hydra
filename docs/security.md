@@ -29,7 +29,7 @@ the IETF, specifically:
 
 Additionally these safeguards are implemented:
 
-- Advanced Token Validation: Tokens are layouted as &lt;key&gt;.&lt;signature&gt; where &lt;signature&gt;
+- Advanced Token Validation: Tokens are laid out as &lt;key&gt;.&lt;signature&gt; where &lt;signature&gt;
 is created using HMAC-SHA256 using a global secret.
 
 ### Advanced Token Validation (Datastore Security)

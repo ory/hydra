@@ -1,5 +1,5 @@
-hash: 6485ca2305564cf48336b508475435cb88bbab4a96582f98193d596c6713453b
-updated: 2017-05-04T10:51:44.1917037+02:00
+hash: dc90cc2783e5156f7d33f4f483d9bdb907ce0f00939f1c17ebed9e776f66dc12
+updated: 2017-05-05T12:37:03.9043304+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
@@ -113,7 +113,7 @@ imports:
 - name: github.com/oleiade/reflections
   version: 2b6ec3da648e3e834dc41bad8d9ed7f2dc6a9496
 - name: github.com/opencontainers/runc
-  version: 992a5be178a62e026f4069f443c6164912adbf09
+  version: 7ffea268d316ada3a3215a44f1308a0d37d27c9d
   subpackages:
   - libcontainer/system
   - libcontainer/user
@@ -137,7 +137,7 @@ imports:
 - name: github.com/ory/herodot
   version: ef15ccfb8c16051feca9ec289286732f8d288fec
 - name: github.com/ory/ladon
-  version: 0103ce11f3ea355a8f6ca366ba762d53295148c7
+  version: c0fffe8de3b7d8e42633fbbe034e5d1f439c72bf
   subpackages:
   - manager/memory
   - manager/sql

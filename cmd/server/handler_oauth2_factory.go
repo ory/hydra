@@ -97,7 +97,7 @@ func newOAuth2Provider(c *config.Config, km jwk.Manager) fosite.OAuth2Provider {
 		logrus.Infoln("Keypair generated.")
 		logrus.Warnln("WARNING: Automated key creation causes low entropy. Replace the keys as soon as possible.")
 	} else {
-		pkg.Must(err, "Could not fetch signing key for OpenID Connect")
+		pkg.Must(err, "Could not fetch signing key for OpenID Connect because \"%s\" - did you forget to set the SYSTEM_SECRET?", err.Error())
 	}
 
 	rsaKey := jwk.MustRSAPrivate(jwk.First(keys.Keys))

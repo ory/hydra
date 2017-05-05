@@ -175,13 +175,13 @@ func (s *FositeSQLStore) deleteSession(signature string, table string) error {
 	return nil
 }
 
-func (s *FositeSQLStore) CreateSchemas() error {
+func (s *FositeSQLStore) CreateSchemas() (int,error) {
 	migrate.SetTable("hydra_oauth2_migration")
 	n, err := migrate.Exec(s.DB.DB, s.DB.DriverName(), migrations, migrate.Up)
 	if err != nil {
-		return errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
+		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
 	}
-	return nil
+	return n, nil
 }
 
 func (s *FositeSQLStore) CreateOpenIDConnectSession(_ context.Context, signature string, requester fosite.Requester) error {

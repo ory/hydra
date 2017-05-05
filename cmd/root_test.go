@@ -63,6 +63,8 @@ func TestExecute(t *testing.T) {
 		{args: []string{"groups", "find", "peter"}},
 		{args: []string{"groups", "members", "remove", "my-group", "peter"}},
 		{args: []string{"groups", "delete", "my-group"}},
+		{args: []string{"help", "migrate", "sql"}},
+		{args: []string{"help", "migrate", "ladon", "0.6.0"}},
 		{args: []string{"version"}},
 	} {
 		c.args = append(c.args, []string{"--skip-tls-verify", "--config", path}...)
@@ -86,7 +88,12 @@ func TestExecute(t *testing.T) {
 					time.Sleep(time.Second * 4)
 				}
 			} else {
-				assert.Equal(t, c.expectErr, RootCmd.Execute() != nil)
+				err := RootCmd.Execute()
+				if  c.expectErr {
+					assert.Error(t, err)
+				} else {
+					assert.NoError(t, err)
+				}
 			}
 		})
 	}

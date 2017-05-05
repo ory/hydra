@@ -12,10 +12,14 @@ below 0.7.0**.
 
 To upgrade the database schemas, please run the following commands in exactly this order
 
+```sh
+$ hydra help migrate sql
+$ hydra help migrate ladon
 ```
-$ export DATABSE_URL=mysql://...
-$ hydra migrate sql
-$ hydra migrate ladon-0.6.0-to-0.7.0
+
+```sh
+$ hydra migrate sql mysql://...
+$ hydra migrate ladon 0.6.0 mysql://...
 ```
 
 ### Breaking changes

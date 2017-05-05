@@ -32,15 +32,11 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 		}
 		break
 	case *config.SQLConnection:
-		m := &oauth2.FositeSQLStore{
+		store = &oauth2.FositeSQLStore{
 			DB:      con.GetDatabase(),
 			Manager: clients,
 			L:       c.GetLogger(),
 		}
-		if err := m.CreateSchemas(); err != nil {
-			c.GetLogger().Fatalf("Could not create oauth2 schema: %s", err)
-		}
-		store = m
 		break
 	default:
 		panic("Unknown connection type.")

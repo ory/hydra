@@ -31,14 +31,13 @@ type SQLManager struct {
 	DB *sqlx.DB
 }
 
-func (s *SQLManager) CreateSchemas() error {
+func (s *SQLManager) CreateSchemas() (int, error) {
 	migrate.SetTable("hydra_groups_migration")
 	n, err := migrate.Exec(s.DB.DB, s.DB.DriverName(), migrations, migrate.Up)
 	if err != nil {
-		return errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
+		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
 	}
-
-	return nil
+	return n, nil
 }
 
 func (m *SQLManager) CreateGroup(g *Group) error {

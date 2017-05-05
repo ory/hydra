@@ -27,8 +27,8 @@ ec91228cb105db315553499c81918258f52cee9636ea2a4821bdb8226872f54b
 Now, you should be able to open [https://localhost:4444](https://localhost:4444). If asked, accept the self signed
 certificate in your browser.
 
-**Using the client command line interface** can be achieved by ssh'ing into the hydra container
-and execute the hydra command from there:
+**Using the client command line interface** can be achieved by ssh'ing into the Hydra container
+and execute the `hydra` command from there:
 
 ```
 $ docker exec -i -t <container-id> /bin/bash
@@ -43,7 +43,7 @@ Hydra is a twelve factor OAuth2 and OpenID Connect provider
 ### Download Binaries
 
 The client and server **binaries are downloadable at the [releases tab](https://github.com/ory-am/hydra/releases)**.
-There is currently no installer available. You have to add the hydra binary to the PATH environment variable yourself or put
+There is currently no installer available. You have to add the Hydra binary to the PATH environment variable yourself or put
 the binary in a location that is already in your path (`/usr/bin`, ...). 
 If you do not understand what that all of this means, ask in our [chat channel](https://gitter.im/ory-am/hydra). We are happy to help.
 
@@ -63,7 +63,7 @@ Available Commands:
 
 ### Build from source
 
-If you wish to compile hydra yourself, you need to install and set up [Go 1.5+](https://golang.org/) and add `$GOPATH/bin`
+If you wish to compile Hydra yourself, you need to install and set up [Go 1.5+](https://golang.org/) and add `$GOPATH/bin`
 to your `$PATH`. To do so, run the following commands in a shell (bash, sh, cmd.exe, ...):
 
 ```
@@ -119,15 +119,35 @@ CORE CONTROLS
 [...]
 ```
 
-It is quite common to run hydra with the following options:
+## Running Hydra with SQL
+
+To run Hydra against a SQL database, you first need to set the database url:
 
 ```
 $ export DATABASE_URL=postgres://foo:bar@localhost/hydra
+```
+
+Next it is important to set a system secret. If you don't set it, Hydra will generate one for you. If you restart
+Hydra without the generated system secret set, Hydra will fail to boot.
+
+```
 $ export SYSTEM_SECRET=some-very-random-secret-$§123
+```
+
+Next we need to create the Hydra schemas:
+
+```
+$ hydra help migrate sql
+$ hydra migrate sql postgres://foo:bar@localhost/hydra
+```
+
+And finally start Hydra:
+
+```
 $ hydra host
 ```
 
-If you want to check out hydra locally, we recommend setting these options to ease things up. ` --dangerous-auto-logon`
+If you want to check out Hydra locally, we recommend setting these options to ease things up. ` --dangerous-auto-logon`
 will write the administrator's credentials directly to `~/.hydra.yml`, no `hydra connect` required. The section option
 `--dangerous-force-http` disables https and serves Hydra over http instead:
 
@@ -155,10 +175,10 @@ mtime="2016-05-17T18:09:29Z" level=warning msg="client_secret: ,IvxGt02uNjv1ur9"
 time="2016-10-25T09:59:04+02:00" level=warning msg="No TLS Key / Certificate for HTTPS found. Generating self-signed certificate."
 ```
 
-1. If no system secret was given, a random one is generated
-2. Cryptographic keys for JWT signing are being generated
+1. If no system secret was given, a random one is generated. Note this down, otherwise you won't be able to restart Hydra.
+2. Cryptographic keys for JWT signing are being generated.
 3. If the OAuth 2.0 Client database table is empty, a new root client with random credentials is created. Root clients
-have access to all APIs, OAuth 2.0 flows and are allowed to do everything. If the `FORCE_ROOT_CLIENT_CREDENTIALS` environment
+have access to all APIs, OAuth 2.0 flows and are allowed to do everything. If the `FORCE_ROOT_CLIENT_CREDENTIALS` environment.
 is set, those credentials will be used instead.
 4. A self signed certificate for serving HTTP over TLS is created.
 
@@ -171,8 +191,8 @@ mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="client_id: d9227bd5-5
 mhydra   | mtime="2016-05-17T18:09:29Z" level=warning msg="client_secret: ,IvxGt02uNjv1ur9"
 ```
 
-The system secret is a global secret assigned to every hydra instance. It is used to encrypt data at rest. You can
-set the system secret through the `SYSTEM_SECRET` environment variable. When no secret is set, hydra generates one:
+The system secret is a global secret assigned to every Hydra instance. It is used to encrypt data at rest. You can
+set the system secret through the `SYSTEM_SECRET` environment variable. When no secret is set, Hydra generates one:
 
 ```
 time="2016-05-15T14:56:34Z" level=warning msg="Generated system secret: (.UL_&77zy8/v9<sUsWLKxLwuld?.82B"
@@ -203,4 +223,4 @@ $ hydra token client
 JLbnRS9GQmzUBT4x7ESNw0kj2wc0ffbMwOv3QQZW4eI.qkP-IQXn6guoFew8TvaMFUD-SnAyT8GmWuqGi3wuWXg
 ```
 
-Great! You installed hydra, connected the CLI, created a client and completed two authentication flows!
+Great! You installed Hydra, connected the CLI, created a client and completed two authentication flows!

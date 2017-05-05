@@ -89,7 +89,7 @@ func TestExecute(t *testing.T) {
 				}
 			} else {
 				err := RootCmd.Execute()
-				if  c.expectErr {
+				if c.expectErr {
 					assert.Error(t, err)
 				} else {
 					assert.NoError(t, err)

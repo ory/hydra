@@ -175,7 +175,7 @@ func (s *FositeSQLStore) deleteSession(signature string, table string) error {
 	return nil
 }
 
-func (s *FositeSQLStore) CreateSchemas() (int,error) {
+func (s *FositeSQLStore) CreateSchemas() (int, error) {
 	migrate.SetTable("hydra_oauth2_migration")
 	n, err := migrate.Exec(s.DB.DB, s.DB.DriverName(), migrations, migrate.Up)
 	if err != nil {

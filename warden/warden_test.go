@@ -210,8 +210,8 @@ func TestActionAllowed(t *testing.T) {
 					assert.Equal(t, "siri", c.Audience)
 					assert.Equal(t, "alice", c.Subject)
 					assert.Equal(t, "tests", c.Issuer)
-					assert.Equal(t, now.Add(time.Hour), c.ExpiresAt)
-					assert.Equal(t, now, c.IssuedAt)
+					assert.Equal(t, now.Add(time.Hour).Unix(), c.ExpiresAt.Unix())
+					assert.Equal(t, now.Unix(), c.IssuedAt.Unix())
 				},
 			},
 			{
@@ -237,8 +237,8 @@ func TestActionAllowed(t *testing.T) {
 					assert.Equal(t, "siri", c.Audience)
 					assert.Equal(t, "ken", c.Subject)
 					assert.Equal(t, "tests", c.Issuer)
-					assert.Equal(t, now.Add(time.Hour), c.ExpiresAt)
-					assert.Equal(t, now, c.IssuedAt)
+					assert.Equal(t, now.Add(time.Hour).Unix(), c.ExpiresAt.Unix())
+					assert.Equal(t, now.Unix(), c.IssuedAt.Unix())
 				},
 			},
 		} {

@@ -57,7 +57,7 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		n.UseFunc(serverHandler.rejectInsecureRequests)
 		n.UseHandler(router)
 
-		var srv = graceful.PatchHTTPServerWithCloudflareConfig(&http.Server{
+		var srv = graceful.WithDefaults(&http.Server{
 			Addr:    c.GetAddress(),
 			Handler: n,
 			TLSConfig: &tls.Config{
@@ -65,7 +65,7 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 			},
 		})
 
-		pkg.Must(srv.Graceful(func() {
+		pkg.Must(graceful.Graceful(func() error {
 			var err error
 			logger.Infof("Setting up http server on %s", c.GetAddress())
 			if c.ForceHTTP {
@@ -77,8 +77,9 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 			} else {
 				err = srv.ListenAndServeTLS("", "")
 			}
-			pkg.Must(err, "Could not start server: %s %s.", err)
-		}), "Could not gracefully run server")
+
+			return err
+		}, srv.Shutdown), "Could not gracefully run server")
 	}
 }
 

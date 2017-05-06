@@ -2,7 +2,6 @@ package cli
 
 import (
 	"fmt"
-
 	"net/url"
 	"os"
 	"strings"

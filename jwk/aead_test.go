@@ -1,10 +1,9 @@
 package jwk
 
 import (
-	"testing"
-
 	"crypto/rand"
 	"io"
+	"testing"
 
 	"github.com/ory/hydra/pkg"
 	"github.com/pborman/uuid"

@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-
 	"path/filepath"
 	"runtime"
 	"strings"

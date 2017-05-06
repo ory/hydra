@@ -1,10 +1,9 @@
 package cli
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-
-	"context"
 
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/oauth2"

@@ -6,8 +6,7 @@ services:
   - docker
 
 env:
-  - DOCKER_BIND_LOCALHOST=true GO15VENDOREXPERIMENT=1
-  - DATABASE_URL=memory
+  - DOCKER_BIND_LOCALHOST=true DATABASE_URL=memory
 
 language: go
 
@@ -33,7 +32,7 @@ script:
   - go test -v -bench=.* -run=none $(glide novendor)
   - docker build -t hydra-travis-ci .
   - docker run -d hydra-travis-ci
-  - hydra host --dangerous-auto-logon --dangerous-force-http &
+  - DATABASE_URL=memory hydra host --dangerous-auto-logon --dangerous-force-http &
   - while ! echo exit | nc localhost 4444; do sleep 1; done
 # Test clients
   - hydra clients create --id foobar

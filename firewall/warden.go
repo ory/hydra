@@ -2,10 +2,9 @@
 package firewall
 
 import (
+	"context"
 	"net/http"
 	"time"
-
-	"context"
 )
 
 // Context contains an access token's session data

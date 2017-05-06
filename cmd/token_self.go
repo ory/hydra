@@ -1,12 +1,10 @@
 package cmd
 
 import (
-	"fmt"
-
-	"crypto/tls"
-	"net/http"
-
 	"context"
+	"crypto/tls"
+	"fmt"
+	"net/http"
 
 	"github.com/ory/hydra/pkg"
 	"github.com/spf13/cobra"

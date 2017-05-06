@@ -1,11 +1,10 @@
 package jwk
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
-
-	"context"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"

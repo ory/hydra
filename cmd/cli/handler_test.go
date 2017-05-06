@@ -1,9 +1,8 @@
 package cli
 
 import (
-	"testing"
-
 	"os"
+	"testing"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/hydra/config"

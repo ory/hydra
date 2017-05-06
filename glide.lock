@@ -1,5 +1,5 @@
-hash: 83a4b08e9dd18805464b9c9e829ad42456ae916f55c73084e301acc9c099b4df
-updated: 2017-05-06T19:09:01.7921177+02:00
+hash: 180266dd8afac71d963d6ecf843141b083b55447ac7192ed79b6f671d6971894
+updated: 2017-05-06T21:20:19.0626831+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
@@ -133,7 +133,7 @@ imports:
   - token/hmac
   - token/jwt
 - name: github.com/ory/graceful
-  version: cadd585347a7059d25cf67fdebe9495492ef8e2f
+  version: 3d30c83329259f53a904d428b38d8cb8fba7bd77
 - name: github.com/ory/herodot
   version: ef15ccfb8c16051feca9ec289286732f8d288fec
 - name: github.com/ory/ladon
@@ -232,8 +232,6 @@ imports:
   subpackages:
   - cipher
   - json
-- name: gopkg.in/tylerb/graceful.v1
-  version: 4654dfbb6ad53cb5e27f37d99b02e16c1872fbbb
 - name: gopkg.in/yaml.v2
   version: a3f3340b5840cee44f372bddb5880fcbc419b46a
 testImports: []

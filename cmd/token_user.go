@@ -1,12 +1,11 @@
 package cmd
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"net/http"
 	"time"
-
-	"context"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory-am/common/rand/sequence"
@@ -14,7 +13,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/toqueteos/webbrowser"
 	"golang.org/x/oauth2"
-	"gopkg.in/tylerb/graceful.v1"
 )
 
 // tokenUserCmd represents the token command
@@ -73,14 +71,9 @@ var tokenUserCmd = &cobra.Command{
 		fmt.Println("Press ctrl + c on Linux / Windows or cmd + c on OSX to end the process.")
 		fmt.Printf("If your browser does not open automatically, navigate to:\n\n\t%s\n\n", location)
 
-		srv := &graceful.Server{
-			Timeout: 2 * time.Second,
-			Server:  &http.Server{Addr: ":4445"},
-		}
 		r := httprouter.New()
+		server := &http.Server{Addr: ":4445", Handler: r}
 		r.GET("/callback", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-			defer srv.Stop(time.Second)
-
 			if r.URL.Query().Get("error") != "" {
 				message := fmt.Sprintf("Got error: %s", r.URL.Query().Get("error_description"))
 				fmt.Println(message)
@@ -121,9 +114,14 @@ var tokenUserCmd = &cobra.Command{
 				fmt.Printf("ID Token:\n\t%s\n\n", idt)
 			}
 			w.Write([]byte("</ul></body></html>"))
+
+			go func() {
+				time.Sleep(time.Second * 1)
+				ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
+				server.Shutdown(ctx)
+			}()
 		})
-		srv.Server.Handler = r
-		srv.ListenAndServe()
+		server.ListenAndServe()
 	},
 }
 

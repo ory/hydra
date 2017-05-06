@@ -59,8 +59,6 @@ import:
 - package: golang.org/x/oauth2
   subpackages:
   - clientcredentials
-- package: gopkg.in/tylerb/graceful.v1
-  version: ~1.2.15
 - package: gopkg.in/yaml.v2
 testImports:
 - package: gopkg.in/ory-am/dockertest.v3

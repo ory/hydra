@@ -22,7 +22,9 @@ CORE CONTROLS
 =============
 
 - DATABASE_URL: A URL to a persistent backend. Hydra supports various backends:
-  - None: If DATABASE_URL is empty, all data will be lost when the command is killed.
+  - Memory: If DATABASE_URL is "memory", data will be written to memory and is lost when you restart this instance.
+  	Example: DATABASE_URL=memory
+
   - Postgres: If DATABASE_URL is a DSN starting with postgres:// PostgreSQL will be used as storage backend.
 	Example: DATABASE_URL=postgres://user:password@host:123/database
 
@@ -33,19 +35,6 @@ CORE CONTROLS
 	Example: DATABASE_URL=mysql://user:password@tcp(host:123)/database?parseTime=true
 
 	Be aware that the ?parseTime=true parameter is mandatory, or timestamps will not work.
-
-  - RethinkDB: If DATABASE_URL is a DSN starting with rethinkdb:// RethinkDB will be used as storage backend.
-	Example: DATABASE_URL=rethinkdb://user:password@host:123/database
-
-	Additionally, these controls are available when using RethinkDB:
-	- RETHINK_TLS_CERT_PATH: The path to the TLS certificate (pem encoded) used to connect to rethinkdb.
-		Example: RETHINK_TLS_CERT_PATH=~/rethink.pem
-
-	- RETHINK_TLS_CERT: A pem encoded TLS certificate passed as string. Can be used instead of RETHINK_TLS_CERT_PATH.
-		Example: RETHINK_TLS_CERT_PATH="-----BEGIN CERTIFICATE-----\nMIIDZTCCAk2gAwIBAgIEV5xOtDANBgkqhkiG9w0BAQ0FADA0MTIwMAYDVQQDDClP..."
-
-  - Redis: If DATABASE_URL is a DNS starting with redis:// Redis will be used as a storage backend.
-		Example: DATABASE_URL=redis://x:password@host:6379/0
 
 - SYSTEM_SECRET: A secret that is at least 16 characters long. If none is provided, one will be generated. They key
 	is used to encrypt sensitive data using AES-GCM (256 bit) and validate HMAC signatures.
@@ -146,5 +135,4 @@ func init() {
 	hostCmd.Flags().Bool("dangerous-auto-logon", false, "Stores the root credentials in ~/.hydra.yml. Do not use in production.")
 	hostCmd.Flags().String("https-tls-key-path", "", "Path to the key file for HTTP/2 over TLS (https). You can set HTTPS_TLS_KEY_PATH or HTTPS_TLS_KEY instead.")
 	hostCmd.Flags().String("https-tls-cert-path", "", "Path to the certificate file for HTTP/2 over TLS (https). You can set HTTPS_TLS_CERT_PATH or HTTPS_TLS_CERT instead.")
-	hostCmd.Flags().String("rethink-tls-cert-path", "", "Path to the certificate file to connect to rethinkdb over TLS (https). You can set RETHINK_TLS_CERT_PATH or RETHINK_TLS_CERT instead.")
 }

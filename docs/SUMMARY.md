@@ -47,6 +47,5 @@
   * [Should I use OAuth2 tokens for authentication?](faq/oauth2-auth.md)
   * [What will happen if an error occurs during an OAuth2 flow?](faq/oauth2-error.md)
   * [Why isn't the redirect url working?](faq/redirect-uri.md)
-  * [How can I import a custom CA for RethinkDB?](faq/rethink-ca.md)
   * [How do I know if OAuth2 / Hydra is the right choice for me?](faq/when-use.md)
   * [Operational considerations](faq/operations.md)

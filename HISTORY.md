@@ -7,7 +7,7 @@ This list makes you aware of (breaking) changes.
 This PR improves some performance bottlenecks, offers more control over Hydra, moves to Go 1.8,
 and moves the REST documentation to swagger.
 
-**Before applying this backend, please make a back up of your database. Do not upgrade directly from versions
+**Before applying this update, please make a back up of your database. Do not upgrade directly from versions
 below 0.7.0**.
 
 To upgrade the database schemas, please run the following commands in exactly this order
@@ -41,7 +41,7 @@ To reflect the GitHub organization rename, Hydra was moved from `https://github.
 
 #### SDK
 
-The method `FindPoliciesForSubject` of the policy SDK was removed and is now `List`. The HTTP endpoint `GET /policies`
+The method `FindPoliciesForSubject` of the policy SDK was removed. Instead, `List` was added. The HTTP endpoint `GET /policies`
 no longer allows to query by subject.
 
 #### JWK

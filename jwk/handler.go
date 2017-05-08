@@ -105,35 +105,27 @@ type joseWebKeySetRequest struct {
 //       500: genericError
 func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var ctx = context.Background()
-	setNames := []string{ConsentChallengeKeyName, IDTokenKeyName, ConsentResponseKeyName}
-	keyArr := make([]jose.JsonWebKey, 3)
-	for i, set := range setNames {
-		if err := h.W.IsAllowed(ctx, &firewall.AccessRequest{
-			Subject:  "",
-			Resource: "rn:hydra:keys:" + set + ":" + "public:" + set,
-			Action:   "get",
-		}); err == nil {
-			// Allow unauthorized requests to access this resource if it is enabled by policies
-		} else if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-			Resource: "rn:hydra:keys:" + set + ":" + "public:" + set,
-			Action:   "get",
-		}, "hydra.keys.get"); err != nil {
-			h.H.WriteError(w, r, err)
-			return
-		}
-
-		keys, err := h.Manager.GetKey(set, "public:" + set)
-		if err != nil {
-			h.H.WriteError(w, r, err)
-			return
-		}
-		keyArr[i] = keys.Keys[0]
-	}
-	keySet := jose.JsonWebKeySet{
-		Keys: keyArr,
+	if err := h.W.IsAllowed(ctx, &firewall.AccessRequest{
+		Subject:  "",
+		Resource: "rn:hydra:keys:" + IDTokenKeyName + ":public",
+		Action:   "get",
+	}); err == nil {
+		// Allow unauthorized requests to access this resource if it is enabled by policies
+	} else if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
+		Resource: "rn:hydra:keys:" + IDTokenKeyName + ":public",
+		Action:   "get",
+	}, "hydra.keys.get"); err != nil {
+		h.H.WriteError(w, r, err)
+		return
 	}
 
-	h.H.Write(w, r, keySet)
+	keys, err := h.Manager.GetKey(IDTokenKeyName, "public")
+	if err != nil {
+		h.H.WriteError(w, r, err)
+		return
+	}
+
+	h.H.Write(w, r, keys)
 }
 
 // swagger:route GET /keys/{set}/{kid} jwks getJwkSetKey

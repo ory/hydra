@@ -70,7 +70,7 @@ simply empty subject strings in Hydra.
   ],
   "effect": "allow",
   "resources": [
-    "rn:hydra:keys:<[^:]+>:public:<[^:]+>"
+    "rn:hydra:keys:<[^:]+>:public"
   ],
   "actions": [
     "get"
@@ -88,7 +88,7 @@ simply empty subject strings in Hydra.
   ],
   "effect": "deny",
   "resources": [
-    "rn:hydra:keys:<[^:]+>:private:<[^:]+>"
+    "rn:hydra:keys:<[^:]+>:private"
   ],
   "actions": [
     "get"

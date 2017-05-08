@@ -17,7 +17,7 @@ import (
 
 
 var testServer *httptest.Server
-var IDKS, CCKS, CRKS *jose.JsonWebKeySet
+var IDKS *jose.JsonWebKeySet
 
 func init() {
 	localWarden, _ := compose.NewFirewall(
@@ -31,15 +31,13 @@ func init() {
 		}, &ladon.DefaultPolicy{
 			ID:        "1",
 			Subjects:  []string{"<.*>"},
-			Resources: []string{"rn:hydra:keys:<[^:]+>:public:<[^:]+>"},
+			Resources: []string{"rn:hydra:keys:<[^:]+>:public"},
 			Actions:   []string{"get"},
 			Effect:    ladon.AllowAccess,
 		},
 	)
 	router := httprouter.New()
 	IDKS, _ = testGenerator.Generate(IDTokenKeyName)
-	CCKS, _ = testGenerator.Generate(ConsentChallengeKeyName)
-	CRKS, _ = testGenerator.Generate(ConsentResponseKeyName)
 
 	h := Handler{
 		Manager: &MemoryManager{},
@@ -47,8 +45,6 @@ func init() {
 		H:       &herodot.JSON{},
 	}
 	h.Manager.AddKeySet(IDTokenKeyName, IDKS)
-	h.Manager.AddKeySet(ConsentChallengeKeyName, CCKS)
-	h.Manager.AddKeySet(ConsentResponseKeyName, CRKS)
 	h.SetRoutes(router)
 	testServer = httptest.NewServer(router)
 }
@@ -69,16 +65,11 @@ func TestHandlerWellKnown(t *testing.T) {
 	if err != nil {
 		t.Errorf("problem decoding well known response: %v", err)
 	}
-	sets := map[string]*jose.JsonWebKeySet{
-		ConsentChallengeKeyName: CCKS,
-		IDTokenKeyName: IDKS,
-		ConsentResponseKeyName: CRKS,
+
+	resp := known.Key("public")
+	if resp == nil {
+		t.Errorf("could not find key public",)
 	}
-	for k, v := range sets {
-		resp := known.Key("public:" + k)
-		if resp == nil {
-			t.Errorf("could not find key public: %v", k)
-		}
-		assert.DeepEqual(t, resp, v.Key("public:" + k))
-	}
+	assert.DeepEqual(t, resp, IDKS.Key("public"))
+
 }

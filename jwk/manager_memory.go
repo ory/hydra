@@ -6,6 +6,7 @@ import (
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
 	"github.com/square/go-jose"
+	"strings"
 )
 
 type MemoryManager struct {
@@ -37,6 +38,7 @@ func (m *MemoryManager) GetKey(set, kid string) (*jose.JsonWebKeySet, error) {
 	defer m.RUnlock()
 
 	m.alloc()
+
 	keys, found := m.Keys[set]
 	if !found {
 		return nil, errors.Wrap(pkg.ErrNotFound, "")

@@ -115,13 +115,11 @@ func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request, ps httproute
 		return
 	}
 
-	fmt.Printf("getting keys!!!!!!!\n")
 	keys, err := h.Manager.GetKey(IDTokenKeyName, "public")
 	if err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}
-	fmt.Printf("writing: %+v \n", keys)
 
 	h.H.Write(w, r, keys)
 }

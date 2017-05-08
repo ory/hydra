@@ -1,5 +1,5 @@
 hash: 180266dd8afac71d963d6ecf843141b083b55447ac7192ed79b6f671d6971894
-updated: 2017-05-08T08:40:03.273394644-06:00
+updated: 2017-05-08T14:00:32.998481215-06:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
@@ -194,7 +194,6 @@ imports:
   subpackages:
   - bcrypt
   - blowfish
-  - pbkdf2
 - name: golang.org/x/net
   version: dd2d9a67c97da0afa00d5726e28086007a0acce5
   subpackages:
@@ -236,51 +235,4 @@ imports:
   - json
 - name: gopkg.in/yaml.v2
   version: a3f3340b5840cee44f372bddb5880fcbc419b46a
-testImports:
-- name: github.com/cenkalti/backoff
-  version: b02f2bbce11d7ea6b97f282ef1771b0fe2f65ef3
-- name: github.com/hailocab/go-hostpool
-  version: e80d13ce29ede4452c43dea11e79b9bc8a15b478
-- name: github.com/ory-am/fosite
-  version: 575dd791f9f11cd8e5471178b1ec3a7638653cae
-  subpackages:
-  - compose
-  - handler/oauth2
-  - handler/openid
-  - storage
-  - token/hmac
-  - token/jwt
-- name: github.com/ory-am/hydra
-  version: 93bb521963ab05557553de6a5b0b34f7a1b8def4
-  subpackages:
-  - client
-  - compose
-  - config
-  - firewall
-  - herodot
-  - jwk
-  - oauth2
-  - pkg
-  - pkg/helper
-  - warden
-  - warden/group
-- name: github.com/ory-am/ladon
-  version: c0fffe8de3b7d8e42633fbbe034e5d1f439c72bf
-- name: gopkg.in/dancannon/gorethink.v2
-  version: 7ab832f7b65573104a555d84a27992ae9ea1f659
-- name: gopkg.in/fatih/pool.v2
-  version: 6e328e67893eb46323ad06f0e92cb9536babbabc
-- name: gopkg.in/gorethink/gorethink.v3
-  version: 7ab832f7b65573104a555d84a27992ae9ea1f659
-  subpackages:
-  - encoding
-  - ql2
-  - types
-- name: gopkg.in/redis.v5
-  version: a16aeec10ff407b1e7be6dd35797ccf5426ef0f0
-  subpackages:
-  - internal
-  - internal/consistenthash
-  - internal/hashtag
-  - internal/pool
-  - internal/proto
+testImports: []

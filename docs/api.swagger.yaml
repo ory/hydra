@@ -27,6 +27,70 @@ info:
   version: Latest
 basePath: /
 paths:
+  /.well-known/jwks.json:
+    get:
+      description: |-
+        Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
+
+        The subject making the request needs to be assigned to a policy containing:
+
+        ```
+        {
+        "resources": ["rn:hydra:keys:hydra.openid.id-token:public"],
+        "actions": ["GET"],
+        "effect": "allow"
+        }
+        ```
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      schemes:
+        - http
+        - https
+      tags:
+        - jwk
+      summary: Public JWKs
+      operationId: WellKnown
+      security:
+        - oauth2:
+            - hydra.keys.get
+      responses:
+        '200':
+          description: jwkSet
+          schema:
+            $ref: '#/definitions/jwkSet'
+        '401':
+          $ref: '#/responses/genericError'
+        '403':
+          $ref: '#/responses/genericError'
+        '500':
+          $ref: '#/responses/genericError'
+  /.well-known/openid-configuration:
+    get:
+      description: 'For more information, please refer to https://openid.net/specs/openid-connect-discovery-1_0.html'
+      consumes:
+        - application/x-www-form-urlencoded
+      produces:
+        - application/json
+      schemes:
+        - http
+        - https
+      tags:
+        - oauth2
+      summary: Server well known configuration
+      operationId: WellKnownHandler
+      security:
+        - oauth2: []
+      responses:
+        '200':
+          description: WellKnown
+          schema:
+            $ref: '#/definitions/WellKnown'
+        '401':
+          $ref: '#/responses/genericError'
+        '500':
+          $ref: '#/responses/genericError'
   /clients:
     get:
       description: |-
@@ -169,7 +233,6 @@ paths:
           description: The id of the OAuth 2.0 Client.
           name: id
           in: path
-          required: true
       responses:
         '200':
           description: oauthClient
@@ -287,7 +350,6 @@ paths:
           description: The id of the OAuth 2.0 Client.
           name: id
           in: path
-          required: true
       responses:
         '401':
           $ref: '#/responses/genericError'
@@ -637,9 +699,7 @@ paths:
       summary: The OAuth 2.0 Auth endpoint
       operationId: oauthAuth
       responses:
-        '302': {
-          description: "found"
-        }
+        '302': {}
         '401':
           $ref: '#/responses/genericError'
         '500':
@@ -697,8 +757,7 @@ paths:
                 type: string
                 x-go-name: RefreshToken
       responses:
-        '200':
-          description: "ok"
+        '200': {}
         '401':
           $ref: '#/responses/genericError'
         '500':
@@ -854,7 +913,6 @@ paths:
           description: The id of the policy.
           name: id
           in: path
-          required: true
       responses:
         '200':
           description: policy
@@ -900,7 +958,6 @@ paths:
           description: The id of the policy.
           name: id
           in: path
-          required: true
         - name: Body
           in: body
           schema:
@@ -950,7 +1007,6 @@ paths:
           description: The id of the policy.
           name: id
           in: path
-          required: true
       responses:
         '401':
           $ref: '#/responses/genericError'
@@ -1114,7 +1170,6 @@ paths:
           description: The id of the group to look up.
           name: id
           in: path
-          required: true
       responses:
         '201':
           $ref: '#/responses/groupResponse'
@@ -1157,7 +1212,6 @@ paths:
           description: The id of the group to modify.
           name: id
           in: path
-          required: true
         - name: Body
           in: body
           schema:
@@ -1202,7 +1256,6 @@ paths:
           description: The id of the group to modify.
           name: id
           in: path
-          required: true
         - name: Body
           in: body
           schema:
@@ -1264,6 +1317,9 @@ paths:
         '500':
           $ref: '#/responses/genericError'
 definitions:
+  ConsentStrategy:
+    type: object
+    x-go-package: github.com/ory/hydra/oauth2
   Context:
     description: Context contains an access token's session data
     type: object
@@ -1301,10 +1357,44 @@ definitions:
         type: string
         x-go-name: Subject
     x-go-package: github.com/ory/hydra/firewall
+  Duration:
+    description: |-
+      A Duration represents the elapsed time between two instants
+      as an int64 nanosecond count. The representation limits the
+      largest representable duration to approximately 290 years.
+    type: integer
+    format: int64
+    x-go-package: time
+  FieldLogger:
+    description: The FieldLogger interface generalizes the Entry and Logger types
+    type: object
+    x-go-package: github.com/ory/hydra/vendor/github.com/Sirupsen/logrus
   Firewall:
     type: object
     title: Firewall offers various validation strategies for access tokens.
     x-go-package: github.com/ory/hydra/firewall
+  Handler:
+    type: object
+    properties:
+      AccessTokenLifespan:
+        $ref: '#/definitions/Duration'
+      Consent:
+        $ref: '#/definitions/ConsentStrategy'
+      ConsentURL:
+        $ref: '#/definitions/URL'
+      CookieStore:
+        $ref: '#/definitions/Store'
+      ForcedHTTP:
+        type: boolean
+      H:
+        $ref: '#/definitions/Writer'
+      Issuer:
+        type: string
+      L:
+        $ref: '#/definitions/FieldLogger'
+      OAuth2:
+        $ref: '#/definitions/OAuth2Provider'
+    x-go-package: github.com/ory/hydra/oauth2
   Headers:
     description: Headers is the jwt headers
     type: object
@@ -1313,7 +1403,7 @@ definitions:
         type: object
         additionalProperties:
           type: object
-    x-go-package: github.com/ory/fosite/token/jwt
+    x-go-package: github.com/ory/hydra/vendor/github.com/ory/fosite/token/jwt
   IDTokenClaims:
     description: IDTokenClaims represent the claims used in open id connect requests
     type: object
@@ -1337,10 +1427,15 @@ definitions:
         type: string
       Subject:
         type: string
-    x-go-package: github.com/ory/fosite/token/jwt
+    x-go-package: github.com/ory/hydra/vendor/github.com/ory/fosite/token/jwt
   Manager:
     type: object
     x-go-package: github.com/ory/hydra/warden/group
+  OAuth2Provider:
+    description: Check fosite.Fosite for an implementation of this interface.
+    type: object
+    title: OAuth2Provider is an interface that enables you to write OAuth2 handlers with only a few lines of code.
+    x-go-package: github.com/ory/hydra/vendor/github.com/ory/fosite
   Session:
     type: object
     properties:
@@ -1359,6 +1454,100 @@ definitions:
           type: object
         x-go-name: Extra
     x-go-package: github.com/ory/hydra/oauth2
+  Store:
+    description: See CookieStore and FilesystemStore for examples.
+    type: object
+    title: Store is an interface for custom session stores.
+    x-go-package: github.com/ory/hydra/vendor/github.com/gorilla/sessions
+  URL:
+    description: |-
+      scheme://[userinfo@]host/path[?query][#fragment]
+
+      URLs that do not start with a slash after the scheme are interpreted as:
+
+      scheme:opaque[?query][#fragment]
+
+      Note that the Path field is stored in decoded form: /%47%6f%2f becomes /Go/.
+      A consequence is that it is impossible to tell which slashes in the Path were
+      slashes in the raw URL and which were %2f. This distinction is rarely important,
+      but when it is, code must not use Path directly.
+
+      Go 1.5 introduced the RawPath field to hold the encoded form of Path.
+      The Parse function sets both Path and RawPath in the URL it returns,
+      and URL's String method uses RawPath if it is a valid encoding of Path,
+      by calling the EscapedPath method.
+
+      In earlier versions of Go, the more indirect workarounds were that an
+      HTTP server could consult req.RequestURI and an HTTP client could
+      construct a URL struct directly and set the Opaque field instead of Path.
+      These still work as well.
+    type: object
+    title: |-
+      A URL represents a parsed URL (technically, a URI reference).
+      The general form represented is:
+    properties:
+      ForceQuery:
+        type: boolean
+      Fragment:
+        type: string
+      Host:
+        type: string
+      Opaque:
+        type: string
+      Path:
+        type: string
+      RawPath:
+        type: string
+      RawQuery:
+        type: string
+      Scheme:
+        type: string
+      User:
+        $ref: '#/definitions/Userinfo'
+    x-go-package: net/url
+  Userinfo:
+    description: |-
+      The Userinfo type is an immutable encapsulation of username and
+      password details for a URL. An existing Userinfo value is guaranteed
+      to have a username set (potentially empty, as allowed by RFC 2396),
+      and optionally a password.
+    type: object
+    x-go-package: net/url
+  WellKnown:
+    type: object
+    properties:
+      authorization_endpoint:
+        type: string
+        x-go-name: AuthURL
+      id_token_signing_alg_values_supported:
+        type: array
+        items:
+          type: string
+        x-go-name: SigningAlgs
+      issuer:
+        type: string
+        x-go-name: Issuer
+      jwks_uri:
+        type: string
+        x-go-name: JWKsURL
+      response_types_supported:
+        type: array
+        items:
+          type: string
+        x-go-name: ResponseTypes
+      subject_types_supported:
+        type: array
+        items:
+          type: string
+        x-go-name: SubjectTypes
+      token_endpoint:
+        type: string
+        x-go-name: TokenURL
+    x-go-package: github.com/ory/hydra/oauth2
+  Writer:
+    description: Writer is a helper to write arbitrary data to a ResponseWriter
+    type: object
+    x-go-package: github.com/ory/hydra/vendor/github.com/ory/herodot
   allowedRequest:
     type: object
     title: AccessRequest is the warden's request object.
@@ -1713,6 +1902,7 @@ definitions:
     type: object
     properties:
       Body:
+        description: 'in: body'
         $ref: '#/definitions/policy'
     x-go-package: github.com/ory/hydra/policy
   swaggerGetPolicyParameters:
@@ -1732,6 +1922,7 @@ definitions:
       - set
     properties:
       Body:
+        description: 'in: body'
         $ref: '#/definitions/createRequest'
       set:
         description: |-
@@ -1778,6 +1969,7 @@ definitions:
       - set
     properties:
       Body:
+        description: 'in: body'
         $ref: '#/definitions/jwkSet'
       kid:
         description: |-
@@ -1798,6 +1990,7 @@ definitions:
       - set
     properties:
       Body:
+        description: 'in: body'
         $ref: '#/definitions/jwkSet'
       set:
         description: |-
@@ -1829,12 +2022,14 @@ definitions:
     type: object
     properties:
       Body:
+        description: 'in: body'
         $ref: '#/definitions/policy'
     x-go-package: github.com/ory/hydra/policy
   swaggerUpdatePolicyParameters:
     type: object
     properties:
       Body:
+        description: 'in: body'
         $ref: '#/definitions/policy'
       id:
         description: |-
@@ -1980,6 +2175,8 @@ responses:
           type: string
           x-go-name: Scope
         sess:
+          description: Extra session information set using the at_ext key in the consent response.
+          x-go-name: Session
           $ref: '#/definitions/Session'
         sub:
           description: |-

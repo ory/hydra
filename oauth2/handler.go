@@ -24,7 +24,6 @@ const (
 	AuthPath    = "/oauth2/auth"
 
 	WellKnownPath = "/.well-known/openid-configuration"
-	JWKPath       = "/.well-known/jwks.json"
 
 	// IntrospectPath points to the OAuth2 introspection endpoint.
 	IntrospectPath = "/oauth2/introspect"

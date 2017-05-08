@@ -1263,6 +1263,28 @@ paths:
           $ref: '#/responses/genericError'
         '500':
           $ref: '#/responses/genericError'
+  /.well-known/openid-configuration:
+    get:
+      responses:
+        200:
+          description: "OIDC discovery endpoint"
+          schema:
+            $ref: "#/definitions/wellknownConfiguration"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+  /.well-known/jwks.json:
+    get:
+      responses:
+        200:
+          description: "Public JWKs"
+          schema:
+            $ref: "#/definitions/jwkSet"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
 definitions:
   Context:
     description: Context contains an access token's session data
@@ -2085,6 +2107,48 @@ responses:
             This is usually a uuid but you can choose a urn or some other id too.
           type: string
           x-go-name: Subject
+  wellknownConfiguration":
+    type: object
+    properties:
+  		issuer:
+        type: string
+        description: Public URL of auth server
+  		authorization_endpoint:
+        type: string
+        description: Public URL for OAuth authorization
+  		token_endpoint:
+        type: string
+        description: Public URL of OAuth tokens
+  		subject_types_supported:
+        type: array
+        items:
+          type: string
+          enum:
+            - "pairwise"
+            - "public"
+        description: Subject types that are supported
+  		jwks_uri:
+        type: string
+        description: Public URL of public JWK keys
+  		id_token_signing_alg_values_supported:
+        type: array
+        items:
+          type: string
+          enum:
+            - "RS256"
+            - "HS256"
+            - "ES256"
+        description: Supported JWK signing algorithms
+  		response_types_supported:
+        type: array
+        items:
+          type: string
+          enum:
+            - "code"
+            - "code id_token"
+            - "id_token"
+            - "token id_token"
+            - "token"
 securityDefinitions:
   oauth2:
     type: oauth2

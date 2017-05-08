@@ -15,8 +15,6 @@ import (
 
 const (
 	IDTokenKeyName    = "hydra.openid.id-token"
-	ConsentChallengeKeyName = "hydra.consent.challenge"
-	ConsentResponseKeyName  = "hydra.consent.response"
 )
 
 type Handler struct {
@@ -71,7 +69,7 @@ type joseWebKeySetRequest struct {
 	Keys []json.RawMessage `json:"keys"`
 }
 
-// swagger:route GET /.well-knwon/jwks.json public JWKS
+// swagger:route GET /.well-knwon/jwks.json jwk WellKnown
 //
 // Public JWKs
 //

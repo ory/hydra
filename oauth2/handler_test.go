@@ -8,12 +8,12 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
 	"encoding/json"
-	"github.com/ory-am/hydra/herodot"
+	"github.com/ory/herodot"
 )
 
 func TestHandlerWellKnown(t *testing.T) {
 	h := &Handler{
-		H:                   &herodot.JSON{},
+		H:                   herodot.NewJSONWriter(nil),
 		Issuer:              "http://hydra.localhost",
 	}
 

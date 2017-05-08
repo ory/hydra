@@ -24,6 +24,7 @@ const (
 	AuthPath    = "/oauth2/auth"
 
 	WellKnownPath = "/.well-known/openid-configuration"
+	JWKPath = "/.well-known/jwks.json"
 
 	// IntrospectPath points to the OAuth2 introspection endpoint.
 	IntrospectPath = "/oauth2/introspect"
@@ -49,6 +50,7 @@ type Handler struct {
 	Issuer string
 }
 
+// swagger:model WellKnown
 type WellKnown struct {
 	Issuer        string   `json:"issuer"`
 	AuthURL       string   `json:"authorization_endpoint"`
@@ -69,7 +71,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET(WellKnownPath, h.WellKnownHandler)
 }
 
-// swagger:route GET /.well-known/openid-configuration oauth2 wellKnownHandler
+// swagger:route GET /.well-known/openid-configuration oauth2 WellKnownHandler
 //
 // Server well known configuration
 //
@@ -87,19 +89,20 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //       oauth2:
 //
 //     Responses:
-//       200:
+//       200: WellKnown
 //       401: genericError
 //       500: genericError
 func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	h.H.Write( w, r, map[string]interface{}{
-		"issuer": h.Issuer,
-		"authorization_endpoint": AuthPath,
-		"token_endpoint": TokenPath,
-		"subject_types_supported": []string{"pairwise", "public"},
-		"jwks_uri": "to be done" + OpenIDConnectKeyName,
-		"id_token_signing_alg_values_supported": []string{"RS256"},
-		"response_types_supported":              []string{"code", "code id_token", "id_token", "token id_token", "token"},
-	})
+	wellKnown := WellKnown{
+		Issuer:        h.Issuer,
+		AuthURL:       h.Issuer + AuthPath,
+		TokenURL:      h.Issuer + TokenPath,
+		SubjectTypes:  []string{"pairwise", "public"},
+		JWKsURL:       h.Issuer + JWKPath,
+		SigningAlgs:   []string{"RS256"},
+		ResponseTypes: []string{"code", "code id_token", "id_token", "token id_token", "token"},
+	}
+	h.H.Write( w, r, wellKnown)
 }
 
 // swagger:route POST /oauth2/revoke oauth2 revokeOAuthToken

@@ -1263,28 +1263,6 @@ paths:
           $ref: '#/responses/genericError'
         '500':
           $ref: '#/responses/genericError'
-  /.well-known/openid-configuration:
-    get:
-      responses:
-        200:
-          description: "OIDC discovery endpoint"
-          schema:
-            $ref: "#/definitions/wellknownConfiguration"
-        401:
-          description: "Unauthorized"
-        403:
-          description: "Forbidden"
-  /.well-known/jwks.json:
-    get:
-      responses:
-        200:
-          description: "Public JWKs"
-          schema:
-            $ref: "#/definitions/jwkSet"
-        401:
-          description: "Unauthorized"
-        403:
-          description: "Forbidden"
 definitions:
   Context:
     description: Context contains an access token's session data

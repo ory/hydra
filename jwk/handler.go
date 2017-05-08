@@ -38,10 +38,8 @@ func (h *Handler) GetGenerators() map[string]KeyGenerator {
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
-	r.GET("/keys/:set/:key", h.GetKey)
 	r.GET("/.well-known/jwks.json", h.WellKnown)
-	r.POST("/keys/:set", h.Create)
-	r.PUT("/keys/:set", h.UpdateKeySet)
+	r.GET("/keys/:set/:key", h.GetKey)
 	r.GET("/keys/:set", h.GetKeySet)
 
 	r.POST("/keys/:set", h.Create)
@@ -69,7 +67,7 @@ type joseWebKeySetRequest struct {
 	Keys []json.RawMessage `json:"keys"`
 }
 
-// swagger:route GET /.well-knwon/jwks.json jwk WellKnown
+// swagger:route GET /.well-known/jwks.json jwk WellKnown
 //
 // Public JWKs
 //
@@ -117,11 +115,13 @@ func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request, ps httproute
 		return
 	}
 
+	fmt.Printf("getting keys!!!!!!!\n")
 	keys, err := h.Manager.GetKey(IDTokenKeyName, "public")
 	if err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}
+	fmt.Printf("writing: %+v \n", keys)
 
 	h.H.Write(w, r, keys)
 }

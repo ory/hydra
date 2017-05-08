@@ -3,12 +3,12 @@ package jwk_test
 import (
 	"net/http/httptest"
 	"testing"
-	. "github.com/ory-am/hydra/jwk"
+	. "github.com/ory/hydra/jwk"
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/fosite"
-	"github.com/ory-am/hydra/compose"
-	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/ladon"
+	"github.com/ory/fosite"
+	"github.com/ory/hydra/compose"
+	"github.com/ory/herodot"
+	"github.com/ory/ladon"
 	"net/http"
 	"encoding/json"
 	"github.com/square/go-jose"
@@ -20,7 +20,7 @@ var testServer *httptest.Server
 var IDKS *jose.JsonWebKeySet
 
 func init() {
-	localWarden, _ := compose.NewFirewall(
+	localWarden, _ := compose.NewMockFirewall(
 		"tests",
 		"alice",
 		fosite.Arguments{
@@ -37,12 +37,12 @@ func init() {
 		},
 	)
 	router := httprouter.New()
-	IDKS, _ = testGenerator.Generate(IDTokenKeyName)
+	IDKS, _ = testGenerator.Generate("")
 
 	h := Handler{
 		Manager: &MemoryManager{},
 		W:       localWarden,
-		H:       &herodot.JSON{},
+		H:       herodot.NewJSONWriter(nil),
 	}
 	h.Manager.AddKeySet(IDTokenKeyName, IDKS)
 	h.SetRoutes(router)

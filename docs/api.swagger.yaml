@@ -2107,7 +2107,7 @@ responses:
             This is usually a uuid but you can choose a urn or some other id too.
           type: string
           x-go-name: Subject
-  wellknownConfiguration":
+  wellknownConfiguration:
     type: object
     properties:
   		issuer:

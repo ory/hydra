@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	IDTokenKeyName    = "hydra.openid.id-token"
+	IDTokenKeyName = "hydra.openid.id-token"
 )
 
 type Handler struct {
@@ -67,7 +67,7 @@ type joseWebKeySetRequest struct {
 	Keys []json.RawMessage `json:"keys"`
 }
 
-// swagger:route GET /.well-known/jwks.json jwk WellKnown
+// swagger:route GET /.well-known/jwks.json jwks oauth2 openid-connect WellKnown
 //
 // Public JWKs
 //

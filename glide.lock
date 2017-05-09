@@ -1,5 +1,5 @@
 hash: 180266dd8afac71d963d6ecf843141b083b55447ac7192ed79b6f671d6971894
-updated: 2017-05-08T14:00:32.998481215-06:00
+updated: 2017-05-09T09:19:03.382809034-06:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
@@ -43,7 +43,6 @@ imports:
   - pkg/system
   - pkg/term
   - pkg/term/windows
-  - pkg/testutil/assert
 - name: github.com/docker/go-connections
   version: e15c02316c12de00874640cd76311849de2aeed5
   subpackages:

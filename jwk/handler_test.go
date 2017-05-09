@@ -1,20 +1,21 @@
 package jwk_test
 
 import (
+	"encoding/json"
+	"net/http"
 	"net/http/httptest"
 	"testing"
-	. "github.com/ory/hydra/jwk"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/compose"
 	"github.com/ory/herodot"
+	"github.com/ory/hydra/compose"
+	. "github.com/ory/hydra/jwk"
 	"github.com/ory/ladon"
-	"net/http"
-	"encoding/json"
 	"github.com/square/go-jose"
-	"github.com/docker/docker/pkg/testutil/assert"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
-
 
 var testServer *httptest.Server
 var IDKS *jose.JsonWebKeySet
@@ -49,27 +50,18 @@ func init() {
 	testServer = httptest.NewServer(router)
 }
 
-
-
 func TestHandlerWellKnown(t *testing.T) {
 
 	JWKPath := "/.well-known/jwks.json"
 	res, err := http.Get(testServer.URL + JWKPath)
-	if err != nil {
-		t.Errorf("problem in http request: %v", err)
-	}
+	require.NoError(t, err, "problem in http request")
 	defer res.Body.Close()
 
 	var known jose.JsonWebKeySet
 	err = json.NewDecoder(res.Body).Decode(&known)
-	if err != nil {
-		t.Errorf("problem decoding well known response: %v", err)
-	}
+	require.NoError(t, err, "problem in decoding response")
 
 	resp := known.Key("public")
-	if resp == nil {
-		t.Errorf("could not find key public",)
-	}
-	assert.DeepEqual(t, resp, IDKS.Key("public"))
-
+	require.NotNil(t, resp, "Could not find key public")
+	assert.Equal(t, resp, IDKS.Key("public"))
 }

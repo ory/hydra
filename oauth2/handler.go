@@ -250,6 +250,9 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		h.writeAuthorizeError(w, authorizeRequest, errors.Wrapf(fosite.ErrServerError, "Could not store session cookie: %s", err))
 		return
 	}
+	
+	// add key id to header
+	session.Headers.Add("kid", "public")
 
 	// done
 	response, err := h.OAuth2.NewAuthorizeResponse(ctx, r, authorizeRequest, session)

@@ -8,6 +8,7 @@ import (
 
 	"context"
 	"fmt"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"

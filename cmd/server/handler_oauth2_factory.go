@@ -15,6 +15,7 @@ import (
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
+	"os"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {
@@ -59,8 +60,9 @@ func newOAuth2Provider(c *config.Config, km jwk.Manager) fosite.OAuth2Provider {
 		km.AddKeySet(oauth2.OpenIDConnectKeyName, keys)
 		c.GetLogger().Infoln("Keypair generated.")
 		c.GetLogger().Warnln("WARNING: Automated key creation causes low entropy. Replace the keys as soon as possible.")
-	} else {
-		pkg.Must(err, "Could not fetch signing key for OpenID Connect - did you forget to set the SYSTEM_SECRET?")
+	} else if err != nil {
+		fmt.Fprintf(os.Stderr, `Could not fetch signing key for OpenID Connect - did you forget to run "hydra migrate sql" or forget to set the SYSTEM_SECRET? Got error: %s` + "\n", err.Error())
+		os.Exit(1)
 	}
 
 	rsaKey := jwk.MustRSAPrivate(jwk.First(keys.Keys))

@@ -27,6 +27,73 @@ info:
   version: Latest
 basePath: /
 paths:
+  /.well-known/jwks.json:
+    get:
+      description: |-
+        Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
+
+        The subject making the request needs to be assigned to a policy containing:
+
+        ```
+        {
+        "resources": ["rn:hydra:keys:hydra.openid.id-token:public"],
+        "actions": ["GET"],
+        "effect": "allow"
+        }
+        ```
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      schemes:
+        - http
+        - https
+      tags:
+        - jwks
+        - oauth2
+        - openid-connect
+      summary: Public JWKs
+      operationId: WellKnown
+      security:
+        - oauth2:
+            - hydra.keys.get
+      responses:
+        '200':
+          description: jwkSet
+          schema:
+            $ref: '#/definitions/jwkSet'
+        '401':
+          $ref: '#/responses/genericError'
+        '403':
+          $ref: '#/responses/genericError'
+        '500':
+          $ref: '#/responses/genericError'
+  /.well-known/openid-configuration:
+    get:
+      description: 'For more information, please refer to https://openid.net/specs/openid-connect-discovery-1_0.html'
+      consumes:
+        - application/x-www-form-urlencoded
+      produces:
+        - application/json
+      schemes:
+        - http
+        - https
+      tags:
+        - oauth2
+        - openid-connect
+      summary: Server well known configuration
+      operationId: WellKnownHandler
+      security:
+        - oauth2: []
+      responses:
+        '200':
+          description: WellKnown
+          schema:
+            $ref: '#/definitions/WellKnown'
+        '401':
+          $ref: '#/responses/genericError'
+        '500':
+          $ref: '#/responses/genericError'
   /clients:
     get:
       description: |-
@@ -637,9 +704,8 @@ paths:
       summary: The OAuth 2.0 Auth endpoint
       operationId: oauthAuth
       responses:
-        '302': {
+        '302':
           description: "found"
-        }
         '401':
           $ref: '#/responses/genericError'
         '500':
@@ -1264,6 +1330,9 @@ paths:
         '500':
           $ref: '#/responses/genericError'
 definitions:
+  ConsentStrategy:
+    type: object
+    x-go-package: github.com/ory/hydra/oauth2
   Context:
     description: Context contains an access token's session data
     type: object
@@ -1301,10 +1370,44 @@ definitions:
         type: string
         x-go-name: Subject
     x-go-package: github.com/ory/hydra/firewall
+  Duration:
+    description: |-
+      A Duration represents the elapsed time between two instants
+      as an int64 nanosecond count. The representation limits the
+      largest representable duration to approximately 290 years.
+    type: integer
+    format: int64
+    x-go-package: time
+  FieldLogger:
+    description: The FieldLogger interface generalizes the Entry and Logger types
+    type: object
+    x-go-package: github.com/ory/hydra/vendor/github.com/Sirupsen/logrus
   Firewall:
     type: object
     title: Firewall offers various validation strategies for access tokens.
     x-go-package: github.com/ory/hydra/firewall
+  Handler:
+    type: object
+    properties:
+      AccessTokenLifespan:
+        $ref: '#/definitions/Duration'
+      Consent:
+        $ref: '#/definitions/ConsentStrategy'
+      ConsentURL:
+        $ref: '#/definitions/URL'
+      CookieStore:
+        $ref: '#/definitions/Store'
+      ForcedHTTP:
+        type: boolean
+      H:
+        $ref: '#/definitions/Writer'
+      Issuer:
+        type: string
+      L:
+        $ref: '#/definitions/FieldLogger'
+      OAuth2:
+        $ref: '#/definitions/OAuth2Provider'
+    x-go-package: github.com/ory/hydra/oauth2
   Headers:
     description: Headers is the jwt headers
     type: object
@@ -1341,6 +1444,11 @@ definitions:
   Manager:
     type: object
     x-go-package: github.com/ory/hydra/warden/group
+  OAuth2Provider:
+    description: Check fosite.Fosite for an implementation of this interface.
+    type: object
+    title: OAuth2Provider is an interface that enables you to write OAuth2 handlers with only a few lines of code.
+    x-go-package: github.com/ory/hydra/vendor/github.com/ory/fosite
   Session:
     type: object
     properties:
@@ -1359,6 +1467,133 @@ definitions:
           type: object
         x-go-name: Extra
     x-go-package: github.com/ory/hydra/oauth2
+  Store:
+    description: See CookieStore and FilesystemStore for examples.
+    type: object
+    title: Store is an interface for custom session stores.
+    x-go-package: github.com/ory/hydra/vendor/github.com/gorilla/sessions
+  URL:
+    description: |-
+      scheme://[userinfo@]host/path[?query][#fragment]
+
+      URLs that do not start with a slash after the scheme are interpreted as:
+
+      scheme:opaque[?query][#fragment]
+
+      Note that the Path field is stored in decoded form: /%47%6f%2f becomes /Go/.
+      A consequence is that it is impossible to tell which slashes in the Path were
+      slashes in the raw URL and which were %2f. This distinction is rarely important,
+      but when it is, code must not use Path directly.
+
+      Go 1.5 introduced the RawPath field to hold the encoded form of Path.
+      The Parse function sets both Path and RawPath in the URL it returns,
+      and URL's String method uses RawPath if it is a valid encoding of Path,
+      by calling the EscapedPath method.
+
+      In earlier versions of Go, the more indirect workarounds were that an
+      HTTP server could consult req.RequestURI and an HTTP client could
+      construct a URL struct directly and set the Opaque field instead of Path.
+      These still work as well.
+    type: object
+    title: |-
+      A URL represents a parsed URL (technically, a URI reference).
+      The general form represented is:
+    properties:
+      ForceQuery:
+        type: boolean
+      Fragment:
+        type: string
+      Host:
+        type: string
+      Opaque:
+        type: string
+      Path:
+        type: string
+      RawPath:
+        type: string
+      RawQuery:
+        type: string
+      Scheme:
+        type: string
+      User:
+        $ref: '#/definitions/Userinfo'
+    x-go-package: net/url
+  Userinfo:
+    description: |-
+      The Userinfo type is an immutable encapsulation of username and
+      password details for a URL. An existing Userinfo value is guaranteed
+      to have a username set (potentially empty, as allowed by RFC 2396),
+      and optionally a password.
+    type: object
+    x-go-package: net/url
+  WellKnown:
+    type: object
+    required:
+      - issuer
+      - authorization_endpoint
+      - token_endpoint
+      - jwks_uri
+      - subject_types_supported
+      - id_token_signing_alg_values_supported
+      - response_types_supported
+    properties:
+      authorization_endpoint:
+        description: URL of the OP's OAuth 2.0 Authorization Endpoint
+        type: string
+        x-go-name: AuthURL
+      id_token_signing_alg_values_supported:
+        description: |-
+          JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token
+          to encode the Claims in a JWT [JWT]. The algorithm RS256 MUST be included. The value none MAY be supported,
+          but MUST NOT be used unless the Response Type used returns no ID Token from the Authorization Endpoint
+          (such as when using the Authorization Code Flow).
+        type: array
+        items:
+          type: string
+        x-go-name: SigningAlgs
+      issuer:
+        description: |-
+          URL using the https scheme with no query or fragment component that the OP asserts as its Issuer Identifier.
+          If Issuer discovery is supported , this value MUST be identical to the issuer value returned
+          by WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this Issuer.
+        type: string
+        x-go-name: Issuer
+      jwks_uri:
+        description: |-
+          URL of the OP's JSON Web Key Set [JWK] document. This contains the signing key(s) the RP uses to validate
+          signatures from the OP. The JWK Set MAY also contain the Server's encryption key(s), which are used by RPs
+          to encrypt requests to the Server. When both signing and encryption keys are made available, a use (Key Use)
+          parameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key's intended usage.
+          Although some algorithms allow the same key to be used for both signatures and encryption, doing so is
+          NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of
+          keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate.
+        type: string
+        x-go-name: JWKsURI
+      response_types_supported:
+        description: |-
+          JSON array containing a list of the OAuth 2.0 response_type values that this OP supports. Dynamic OpenID
+          Providers MUST support the code, id_token, and the token id_token Response Type values.
+        type: array
+        items:
+          type: string
+        x-go-name: ResponseTypes
+      subject_types_supported:
+        description: |-
+          JSON array containing a list of the Subject Identifier types that this OP supports. Valid types include
+          pairwise and public.
+        type: array
+        items:
+          type: string
+        x-go-name: SubjectTypes
+      token_endpoint:
+        description: URL of the OP's OAuth 2.0 Token Endpoint
+        type: string
+        x-go-name: TokenURL
+    x-go-package: github.com/ory/hydra/oauth2
+  Writer:
+    description: Writer is a helper to write arbitrary data to a ResponseWriter
+    type: object
+    x-go-package: github.com/ory/hydra/vendor/github.com/ory/herodot
   allowedRequest:
     type: object
     title: AccessRequest is the warden's request object.
@@ -2088,6 +2323,7 @@ responses:
 securityDefinitions:
   oauth2:
     type: oauth2
+    in: header
     flow: accessCode
     authorizationUrl: /oauth2/auth
     tokenUrl: /oauth2/token
@@ -2101,5 +2337,4 @@ securityDefinitions:
       hydra.keys.delete: "A scope required to delete JSON Web Keys"
       hydra.keys.update: "A scope required to get JSON Web Keys"
       offline: "A scope required when requesting refresh tokens"
-      
 x-request-id: string

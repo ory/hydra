@@ -127,6 +127,9 @@ func initConfig() {
 		fmt.Println("")
 	}
 
+	iss := viper.Get("ISSUER")
+	viper.Set("ISSUER", strings.TrimSuffix(iss.(string), "/"))
+
 	if err := viper.Unmarshal(c); err != nil {
 		fatal(fmt.Sprintf("Could not read config because %s.", err))
 	}

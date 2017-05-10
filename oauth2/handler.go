@@ -1,10 +1,10 @@
 package oauth2
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/url"
 
-	"encoding/json"
 	"strings"
 	"time"
 
@@ -23,6 +23,9 @@ const (
 	ConsentPath = "/oauth2/consent"
 	TokenPath   = "/oauth2/token"
 	AuthPath    = "/oauth2/auth"
+
+	WellKnownPath = "/.well-known/openid-configuration"
+	JWKPath       = "/.well-known/jwks.json"
 
 	// IntrospectPath points to the OAuth2 introspection endpoint.
 	IntrospectPath = "/oauth2/introspect"
@@ -44,6 +47,59 @@ type Handler struct {
 	CookieStore         sessions.Store
 
 	L logrus.FieldLogger
+
+	Issuer string
+}
+
+// swagger:model WellKnown
+type WellKnown struct {
+	// URL using the https scheme with no query or fragment component that the OP asserts as its Issuer Identifier.
+	// If Issuer discovery is supported , this value MUST be identical to the issuer value returned
+	// by WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this Issuer.
+	//
+	// required: true
+	Issuer        string   `json:"issuer"`
+
+	// URL of the OP's OAuth 2.0 Authorization Endpoint
+	//
+	// required: true
+	AuthURL       string   `json:"authorization_endpoint"`
+
+	// URL of the OP's OAuth 2.0 Token Endpoint
+	//
+	// required: true
+	TokenURL      string   `json:"token_endpoint"`
+
+	// URL of the OP's JSON Web Key Set [JWK] document. This contains the signing key(s) the RP uses to validate
+	// signatures from the OP. The JWK Set MAY also contain the Server's encryption key(s), which are used by RPs
+	// to encrypt requests to the Server. When both signing and encryption keys are made available, a use (Key Use)
+	// parameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key's intended usage.
+	// Although some algorithms allow the same key to be used for both signatures and encryption, doing so is
+	// NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of
+	// keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate.
+	//
+	// required: true
+	JWKsURI       string   `json:"jwks_uri"`
+
+	// JSON array containing a list of the Subject Identifier types that this OP supports. Valid types include
+	// pairwise and public.
+	//
+	// required: true
+	SubjectTypes  []string `json:"subject_types_supported"`
+
+	// JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token
+	// to encode the Claims in a JWT [JWT]. The algorithm RS256 MUST be included. The value none MAY be supported,
+	// but MUST NOT be used unless the Response Type used returns no ID Token from the Authorization Endpoint
+	// (such as when using the Authorization Code Flow).
+	//
+	// required: true
+	SigningAlgs   []string `json:"id_token_signing_alg_values_supported"`
+
+	// JSON array containing a list of the OAuth 2.0 response_type values that this OP supports. Dynamic OpenID
+	// Providers MUST support the code, id_token, and the token id_token Response Type values.
+	//
+	// required: true
+	ResponseTypes []string `json:"response_types_supported"`
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
@@ -53,6 +109,41 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET(ConsentPath, h.DefaultConsentHandler)
 	r.POST(IntrospectPath, h.IntrospectHandler)
 	r.POST(RevocationPath, h.RevocationHandler)
+	r.GET(WellKnownPath, h.WellKnownHandler)
+}
+
+// swagger:route GET /.well-known/openid-configuration oauth2 openid-connect WellKnownHandler
+//
+// Server well known configuration
+//
+// For more information, please refer to https://openid.net/specs/openid-connect-discovery-1_0.html
+//
+//     Consumes:
+//     - application/x-www-form-urlencoded
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2:
+//
+//     Responses:
+//       200: WellKnown
+//       401: genericError
+//       500: genericError
+func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	wellKnown := WellKnown{
+		Issuer:        h.Issuer,
+		AuthURL:       h.Issuer + AuthPath,
+		TokenURL:      h.Issuer + TokenPath,
+		JWKsURI:       h.Issuer + JWKPath,
+		SubjectTypes:  []string{"pairwise", "public"},
+		SigningAlgs:   []string{"RS256"},
+		ResponseTypes: []string{"code", "code id_token", "id_token", "token id_token", "token"},
+	}
+	h.H.Write(w, r, wellKnown)
 }
 
 // swagger:route POST /oauth2/revoke oauth2 revokeOAuthToken

@@ -89,6 +89,11 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 		atExt = ext
 	}
 
+	// add key id to session headers
+	extHeader := map[string]interface{}{
+		"kid": "public",
+	}
+
 	return &Session{
 		DefaultSession: &openid.DefaultSession{
 			Claims: &ejwt.IDTokenClaims{
@@ -99,7 +104,7 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 				ExpiresAt: time.Now().Add(s.DefaultIDTokenLifespan),
 				Extra:     idExt,
 			},
-			Headers: &ejwt.Headers{},
+			Headers: &ejwt.Headers{extHeader},
 			Subject: subject,
 		},
 		Extra: atExt,

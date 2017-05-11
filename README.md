@@ -1,4 +1,4 @@
-# ![Ory/Hydra](docs/images/logo.png)
+![Ory/Hydra](docs/images/logo.png)
 
 [![Join the chat at https://gitter.im/ory-am/hydra](https://img.shields.io/badge/join-chat-00cc99.svg)](https://gitter.im/ory-am/hydra?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Join newsletter](https://img.shields.io/badge/join-newsletter-00cc99.svg)](http://eepurl.com/bKT3N9)
@@ -11,8 +11,6 @@
 [![Code Climate](https://codeclimate.com/github/ory/hydra/badges/gpa.svg)](https://codeclimate.com/github/ory/hydra)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ory/hydra)](https://goreportcard.com/report/github.com/ory/hydra)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/364/badge)](https://bestpractices.coreinfrastructure.org/projects/364)
-
----
 
 [![Docs Guide](https://img.shields.io/badge/docs-guide-blue.svg)](https://ory.gitbooks.io/hydra/content/)
 [![HTTP API Documentation](https://img.shields.io/badge/docs-http%20api-blue.svg)](http://docs.hydra13.apiary.io/)

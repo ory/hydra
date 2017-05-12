@@ -100,7 +100,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 		return
 	}
 
-	policies, err := h.Manager.GetAll(offset, limit)
+	policies, err := h.Manager.GetAll(limit, offset)
 	if err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
 		return

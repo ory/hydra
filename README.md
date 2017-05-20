@@ -43,7 +43,7 @@ community on [Gitter](https://gitter.im/ory-am/hydra). For advanced use cases, c
 - [Sponsors & Adopters](#sponsors-&-adopters)
   - [Sponsors](#sponsors)
   - [Adopters](#adopters)
-- [Enterprise Edition](#enterprise-edition)
+- [ORY Hydra for Enterprise](#ory-hydra-for-enterprise)
 - [Quickstart](#quickstart)
   - [5 minutes tutorial: Run your very own OAuth2 environment](#5-minutes-tutorial-run-your-very-own-oauth2-environment)
   - [Installation](#installation)
@@ -119,7 +119,7 @@ for anyone making interactive projects. ORY Hydra secures Arduino's developer pl
 
 <br clear="all"/>
 
-## Enterprise Edition
+## ORY Hydra for Enterprise
 
 ORY Hydra is available as an Apache 2.0-licensed Open Source technology. In enterprise environments however,
 there are numerous demands, such as
@@ -131,7 +131,7 @@ there are numerous demands, such as
 * management user interfaces.
 * ... and a wide range of narrow use cases specific to each business demands.
 
-Gain access to more features and our security experts with our new enterprise edition of ORY Hydra. **[Contact us now](mailto:hi@ory.am) for more details.**
+Gain access to more features and our security experts with ORY Hydra for Enterprise! [Request details now!](https://docs.google.com/forms/d/e/1FAIpQLSf53GJwQxzIatTSEM7sXhpkWRh6kddKxzNfNAQ9GsLNEfuFRA/viewform)
 
 ## Quickstart
 

@@ -30,6 +30,7 @@
     - [BCrypt](security.md#bcrypt)
   - [Access Control](security.md##how-does-access-control-work-with-hydra)
 * How-Tos
+  * [Running Hydra in production](how-to/production.md)
   * [Secure the consent app](how-to/consent-app.md)
 * [Client Libraries](sdk.md)
   * [Hydra SDK for Go](sdk/go.md)

@@ -1,6 +1,6 @@
 # History
 
-This list makes you aware of (breaking) changes.
+This list makes you aware of (breaking) changes. For patch notes, please check the [releases tab](https://github.com/ory/hydra/releases).
 
 ## 0.8.0
 

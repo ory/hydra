@@ -23,14 +23,29 @@ type SQLConnection struct {
 	L   logrus.FieldLogger
 }
 
+func cleanURLQuery(c *url.URL) *url.URL {
+	cleanurl := new(url.URL)
+	*cleanurl = *c
+
+	q := cleanurl.Query()
+	q.Del("max_conns")
+	q.Del("max_idle_conns")
+	q.Del("max_conn_lifetime")
+
+	cleanurl.RawQuery = q.Encode()
+	return cleanurl
+}
+
 func (c *SQLConnection) GetDatabase() *sqlx.DB {
 	if c.db != nil {
 		return c.db
 	}
 
 	var err error
+	clean := cleanURLQuery(c.URL)
+
 	if err = pkg.Retry(c.L, time.Second*15, time.Minute*2, func() error {
-		c.L.Infof("Connecting with %s", c.URL.Scheme+"://*:*@"+c.URL.Host+c.URL.Path+"?"+c.URL.RawQuery)
+		c.L.Infof("Connecting with %s", c.URL.Scheme+"://*:*@"+c.URL.Host+c.URL.Path+"?"+clean.RawQuery)
 		u := c.URL.String()
 		if c.URL.Scheme == "mysql" {
 			u = strings.Replace(u, "mysql://", "", -1)

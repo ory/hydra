@@ -47,8 +47,8 @@ Giving the `hydra.keys.get` scope is not enough. Hydra's warden needs an explici
     "effect": "allow" ,
     "id": "consent_keys" ,
     "resources": [
-        "rn:hydra:hydra.consent.challenge:public"
-        "rn:hydra:hydra.consent.response:private"
+        "rn:hydra:keys:hydra.consent.challenge:public"
+        "rn:hydra:keys:hydra.consent.response:private"
     ] ,
     "subjects": [
         "YOURCONSENTID"

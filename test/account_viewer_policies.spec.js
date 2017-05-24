@@ -107,6 +107,16 @@ describe('The "account-viewer" role (act_1 member)', () => {
       });
     });
 
+    describe('context "/audience-export-groups"', () => {
+      it('is NOT allowed access to "/"', (done) => {
+        testWardenResponse('read', 'rn:bridg:audience-export-groups', null, false, done);
+      });
+
+      it('is NOT allowed access to "/aeg_1"', (done) => {
+        testWardenResponse('read', 'rn:bridg:audience-export-groups:aeg_1', null, false, done);
+      });
+    });
+
     describe('context "/brands" (brd_1: act_1, brd_2: act_2)', () => {
       it('is NOT allowed access to "/"', (done) => {
         testWardenResponse('read', 'rn:bridg:accounts', null, false, done);
@@ -174,6 +184,22 @@ describe('The "account-viewer" role (act_1 member)', () => {
 
       it('is NOT allowed access to "/brd_2/audiences/aud_2/snapshot-fb-exports/exp_2"', (done) => {
         testWardenResponse('read', 'rn:bridg:accounts:act_2:brands:brd_2:audiences:aud_2:snapshot-fb-exports:exp_2', c2, false, done);
+      });
+
+      it('is allowed access to "/brd_1/audience-export-groups"', (done) => {
+        testWardenResponse('read', 'rn:bridg:accounts:act_1:brands:brd_1:audience-export-groups', c1, true, done);
+      });
+
+      it('is NOT allowed access to "/brd_2/audience-export-groups"', (done) => {
+        testWardenResponse('read', 'rn:bridg:accounts:act_2:brands:brd_2:audience-export-groups', c2, false, done);
+      });
+
+      it('is allowed access to "/brd_1/audience-export-groups/aeg_1"', (done) => {
+        testWardenResponse('read', 'rn:bridg:accounts:act_1:brands:brd_1:audience-export-groups:aeg_1', c1, true, done);
+      });
+
+      it('is NOT allowed access to "/brd_2/audience-export-groups/aeg_2"', (done) => {
+        testWardenResponse('read', 'rn:bridg:accounts:act_2:brands:brd_2:audience-export-groupss:aud_2', c2, false, done);
       });
 
       it('is allowed access to "/brd_1/client-configuration"', (done) => {
@@ -530,6 +556,14 @@ describe('The "account-viewer" role (act_1 member)', () => {
         testWardenResponse('create', 'rn:bridg:accounts:act_2:brands:brd_2:audiences:aud_2:snapshots', c2, false, done);
       });
 
+      it('is NOT allowed access to "/brd_1/audience-export-groups"', (done) => {
+        testWardenResponse('create', 'rn:bridg:accounts:act_1:brands:brd_1:audiences-export-groups', c1, false, done);
+      });
+
+      it('is NOT allowed access to "/brd_2/audience-export-groups', (done) => {
+        testWardenResponse('create', 'rn:bridg:accounts:act_2:brands:brd_2:audiences-export-groups', c2, false, done);
+      });
+
       it('is allowed access to "/brd_1/search/customer-profile/_search"', (done) => {
         testWardenResponse('create', 'rn:bridg:accounts:act_1:brands:brd_1:search:customer-profile:_search', c1, true, done);
       });
@@ -804,6 +838,14 @@ describe('The "account-viewer" role (act_1 member)', () => {
 
       it('is NOT allowed access to "/brd_2/audiences/aud_2/snapshot-fb-exports/exp_2"', (done) => {
         testWardenResponse('update', 'rn:bridg:accounts:act_2:brands:brd_2:audiences:aud_2:snapshot-fb-exports:exp_2', c2, false, done);
+      });
+
+      it('is NOT allowed access to "/brd_1/audience-export-groups/aeg_1"', (done) => {
+        testWardenResponse('update', 'rn:bridg:accounts:act_1:brands:brd_1:audience-export-groups:aeg_1', c1, false, done);
+      });
+
+      it('is NOT allowed access to "/brd_2/audience-export-groups/aeg_2"', (done) => {
+        testWardenResponse('update', 'rn:bridg:accounts:act_2:brands:brd_2:audience-export-groups:aeg_2', c2, false, done);
       });
 
       it('is NOT allowed access to "/brd_1/search/customer-profile/_search"', (done) => {

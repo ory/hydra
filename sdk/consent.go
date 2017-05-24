@@ -90,7 +90,7 @@ func (c *Consent) VerifyChallenge(challenge string) (*ChallengeClaims, error) {
 		return rsaKey, nil
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "The consent chalnge is not a valid JSON Web Token")
+		return nil, errors.Wrap(err, "The consent challenge is not a valid JSON Web Token")
 	}
 
 	if !t.Valid {

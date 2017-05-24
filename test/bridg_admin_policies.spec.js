@@ -104,6 +104,12 @@ describe('The "bridg-admin" role', () => {
       });
     });
 
+    describe('context "/audience-export-groups"', () => {
+      it('is allowed access to "/"', (done) => {
+        testWardenResponse('read', 'rn:bridg:audience-export-groups', true, done);
+      });
+    });
+
     describe('context "/brands" (brd_1: act_1, brd_2: act_2)', () => {
       it('is allowed access to "/"', (done) => {
         testWardenResponse('read', 'rn:bridg:brands', true, done);
@@ -171,6 +177,22 @@ describe('The "bridg-admin" role', () => {
 
       it('is allowed access to "/brd_2/audiences/aud_2/snapshot-fb-exports/exp_2"', (done) => {
         testWardenResponse('read', 'rn:bridg:accounts:act_2:brands:brd_2:audiences:aud_2:snapshot-fb-exports:exp_2', true, done);
+      });
+
+      it('is allowed access to "/brd_1/audience-export-groups"', (done) => {
+        testWardenResponse('read', 'rn:bridg:accounts:act_1:brands:brd_1:audience-export-groups', true, done);
+      });
+
+      it('is allowed access to "/brd_2/audience-export-groups"', (done) => {
+        testWardenResponse('read', 'rn:bridg:accounts:act_2:brands:brd_2:audience-export-groups', true, done);
+      });
+
+      it('is allowed access to "/brd_1/audience-export-groups/aeg_1"', (done) => {
+        testWardenResponse('read', 'rn:bridg:accounts:act_1:brands:brd_1:audience-export-groups:aeg_1', true, done);
+      });
+
+      it('is allowed access to "/brd_2/audience-export-groups/aeg_2"', (done) => {
+        testWardenResponse('read', 'rn:bridg:accounts:act_2:brands:brd_2:audience-export-groups:aeg_2', true, done);
       });
 
       it('is allowed access to "/brd_1/client-configuration"', (done) => {
@@ -527,6 +549,14 @@ describe('The "bridg-admin" role', () => {
         testWardenResponse('create', 'rn:bridg:accounts:act_2:brands:brd_2:audiences:aud_2:snapshots', true, done);
       });
 
+      it('is allowed access to "/brd_1/audience-export-groups"', (done) => {
+        testWardenResponse('create', 'rn:bridg:accounts:act_1:brands:brd_1:audience-export-groups', true, done);
+      });
+
+      it('is allowed access to "/brd_2/audience-export-groups', (done) => {
+        testWardenResponse('create', 'rn:bridg:accounts:act_2:brands:brd_2:audience-export-groups', true, done);
+      });
+
       it('is allowed access to "/brd_1/search/customer-profile/_search"', (done) => {
         testWardenResponse('create', 'rn:bridg:accounts:act_1:brands:brd_1:search:customer-profile:_search', true, done);
       });
@@ -801,6 +831,14 @@ describe('The "bridg-admin" role', () => {
 
       it('is allowed access to "/brd_2/audiences/aud_2/snapshot-fb-exports/exp_2"', (done) => {
         testWardenResponse('update', 'rn:bridg:accounts:act_2:brands:brd_2:audiences:aud_2:snapshot-fb-exports:exp_2', true, done);
+      });
+
+      it('is allowed access to "/brd_1/audience-export-groups/aeg_1"', (done) => {
+        testWardenResponse('update', 'rn:bridg:accounts:act_1:brands:brd_1:audience-export-groups:aeg_1', true, done);
+      });
+
+      it('is allowed access to "/brd_2/audience-export-groups/aeg_2"', (done) => {
+        testWardenResponse('update', 'rn:bridg:accounts:act_2:brands:brd_2:audience-export-groups:aeg_2', true, done);
       });
 
       it('is NOT allowed access to "/brd_1/search/customer-profile/_search"', (done) => {

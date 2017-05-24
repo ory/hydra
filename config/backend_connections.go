@@ -46,12 +46,12 @@ func (c *SQLConnection) GetDatabase() *sqlx.DB {
 
 	if err = pkg.Retry(c.L, time.Second*15, time.Minute*2, func() error {
 		c.L.Infof("Connecting with %s", c.URL.Scheme+"://*:*@"+c.URL.Host+c.URL.Path+"?"+clean.RawQuery)
-		u := c.URL.String()
-		if c.URL.Scheme == "mysql" {
+		u := clean.String()
+		if clean.Scheme == "mysql" {
 			u = strings.Replace(u, "mysql://", "", -1)
 		}
 
-		if c.db, err = sqlx.Open(c.URL.Scheme, u); err != nil {
+		if c.db, err = sqlx.Open(clean.Scheme, u); err != nil {
 			return errors.Errorf("Could not connect to SQL: %s", err)
 		} else if err := c.db.Ping(); err != nil {
 			return errors.Errorf("Could not connect to SQL: %s", err)

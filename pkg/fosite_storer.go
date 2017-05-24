@@ -13,7 +13,6 @@ type FositeStorer interface {
 	fosite.Storage
 	oauth2.AuthorizeCodeGrantStorage
 	oauth2.RefreshTokenGrantStorage
-	oauth2.ImplicitGrantStorage
 	openid.OpenIDConnectRequestStorage
 
 	RevokeRefreshToken(ctx context.Context, requestID string) error

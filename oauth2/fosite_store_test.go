@@ -72,31 +72,6 @@ var defaultRequest = fosite.Request{
 	Session:       &fosite.DefaultSession{Subject: "bar"},
 }
 
-func TestCreateImplicitAccessTokenSession(t *testing.T) {
-	ctx := context.Background()
-	for k, m := range clientManagers {
-		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
-
-			_, err := m.GetAccessTokenSession(ctx, "implicit-4321", &fosite.DefaultSession{})
-			assert.NotNil(t, err)
-
-			err = m.CreateImplicitAccessTokenSession(ctx, "implicit-4321", &defaultRequest)
-			assert.Nil(t, err)
-
-			res, err := m.GetAccessTokenSession(ctx, "implicit-4321", &fosite.DefaultSession{})
-			require.Nil(t, err)
-			c.AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
-
-			err = m.DeleteAccessTokenSession(ctx, "implicit-4321")
-			assert.Nil(t, err)
-
-			time.Sleep(100 * time.Millisecond)
-
-			_, err = m.GetAccessTokenSession(ctx, "implicit-4321", &fosite.DefaultSession{})
-			assert.NotNil(t, err)
-		})
-	}
-}
 func TestCreateGetDeleteAuthorizeCodes(t *testing.T) {
 	ctx := context.Background()
 	for k, m := range clientManagers {

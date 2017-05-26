@@ -196,7 +196,7 @@ If you wish to compile ORY Hydra yourself, you need to install and set up [Go 1.
 to your `$PATH`. To do so, run the following commands in a shell (bash, sh, cmd.exe, ...):
 
 ```
-go get github.com/ory/hydra
+go get -d github.com/ory/hydra
 go get github.com/Masterminds/glide
 cd $GOPATH/src/github.com/ory/hydra
 glide install
@@ -235,7 +235,7 @@ Run `hydra -h` or `hydra help`.
 Developing with ORY Hydra is as easy as:
 
 ```
-go get github.com/ory/hydra
+go get -d github.com/ory/hydra
 go get github.com/Masterminds/glide
 cd $GOPATH/src/github.com/ory/hydra
 glide install

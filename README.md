@@ -235,7 +235,7 @@ Run `hydra -h` or `hydra help`.
 Developing with ORY Hydra is as easy as:
 
 ```
-go get github.com/ory/hydra
+go get -d github.com/ory/hydra
 go get github.com/Masterminds/glide
 cd $GOPATH/src/github.com/ory/hydra
 glide install

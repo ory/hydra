@@ -80,9 +80,6 @@ func TestCreateImplicitAccessTokenSession(t *testing.T) {
 			_, err := m.GetAccessTokenSession(ctx, "implicit-4321", &fosite.DefaultSession{})
 			assert.NotNil(t, err)
 
-			err = m.CreateImplicitAccessTokenSession(ctx, "implicit-4321", &defaultRequest)
-			assert.Nil(t, err)
-
 			res, err := m.GetAccessTokenSession(ctx, "implicit-4321", &fosite.DefaultSession{})
 			require.Nil(t, err)
 			c.AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")

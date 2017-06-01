@@ -171,7 +171,7 @@ You can use ORY Hydra without a database, but be aware that restarting, scaling
 or stopping the container will **lose all data**:
 
 ```
-$ docker run -d --name my-hydra -p 4444:4444 oryd/hydra
+$ docker run -e "DATABASE_URL=memory" -d --name my-hydra -p 4444:4444 oryd/hydra
 ec91228cb105db315553499c81918258f52cee9636ea2a4821bdb8226872f54b
 ```
 
@@ -196,7 +196,7 @@ If you wish to compile ORY Hydra yourself, you need to install and set up [Go 1.
 to your `$PATH`. To do so, run the following commands in a shell (bash, sh, cmd.exe, ...):
 
 ```
-go get -d github.com/ory/hydra
+go get -d -u github.com/ory/hydra
 go get github.com/Masterminds/glide
 cd $GOPATH/src/github.com/ory/hydra
 glide install
@@ -235,7 +235,7 @@ Run `hydra -h` or `hydra help`.
 Developing with ORY Hydra is as easy as:
 
 ```
-go get -d github.com/ory/hydra
+go get -d -u github.com/ory/hydra
 go get github.com/Masterminds/glide
 cd $GOPATH/src/github.com/ory/hydra
 glide install

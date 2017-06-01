@@ -704,7 +704,8 @@ paths:
       summary: The OAuth 2.0 Auth endpoint
       operationId: oauthAuth
       responses:
-        '302': {}
+        '302':
+          description: "found"
         '401':
           $ref: '#/responses/genericError'
         '500':
@@ -762,7 +763,8 @@ paths:
                 type: string
                 x-go-name: RefreshToken
       responses:
-        '200': {}
+        '200':
+          description: "ok"
         '401':
           $ref: '#/responses/genericError'
         '500':
@@ -1448,7 +1450,7 @@ definitions:
         type: object
         additionalProperties:
           type: object
-    x-go-package: github.com/ory/hydra/vendor/github.com/ory/fosite/token/jwt
+    x-go-package: github.com/ory/fosite/token/jwt
   IDTokenClaims:
     description: IDTokenClaims represent the claims used in open id connect requests
     type: object
@@ -1472,7 +1474,7 @@ definitions:
         type: string
       Subject:
         type: string
-    x-go-package: github.com/ory/hydra/vendor/github.com/ory/fosite/token/jwt
+    x-go-package: github.com/ory/fosite/token/jwt
   Manager:
     type: object
     x-go-package: github.com/ory/hydra/warden/group

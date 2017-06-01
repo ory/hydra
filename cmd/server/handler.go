@@ -21,6 +21,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/urfave/negroni"
+	"github.com/gorilla/context"
 )
 
 func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
@@ -59,7 +60,7 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 
 		var srv = graceful.WithDefaults(&http.Server{
 			Addr:    c.GetAddress(),
-			Handler: n,
+			Handler: context.ClearHandler(n),
 			TLSConfig: &tls.Config{
 				Certificates: []tls.Certificate{getOrCreateTLSCertificate(cmd, c)},
 			},

@@ -247,7 +247,7 @@ func (h *Handler) DeleteGroup(w http.ResponseWriter, r *http.Request, ps httprou
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route POST /warden/groups/{id} warden groups addMembersToGroup
+// swagger:route POST /warden/groups/{id}/members warden groups addMembersToGroup
 //
 // Add members to a group
 //
@@ -303,7 +303,7 @@ func (h *Handler) AddGroupMembers(w http.ResponseWriter, r *http.Request, ps htt
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route DELETE /warden/groups/{id} warden groups removeMembersFromGroup
+// swagger:route DELETE /warden/groups/{id}/members warden groups removeMembersFromGroup
 //
 // Remove members from a group
 //

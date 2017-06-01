@@ -704,8 +704,7 @@ paths:
       summary: The OAuth 2.0 Auth endpoint
       operationId: oauthAuth
       responses:
-        '302':
-          description: "found"
+        '302': {}
         '401':
           $ref: '#/responses/genericError'
         '500':
@@ -763,8 +762,7 @@ paths:
                 type: string
                 x-go-name: RefreshToken
       responses:
-        '200':
-          description: "ok"
+        '200': {}
         '401':
           $ref: '#/responses/genericError'
         '500':
@@ -1190,6 +1188,40 @@ paths:
           $ref: '#/responses/genericError'
         '500':
           $ref: '#/responses/genericError'
+    delete:
+      description: |-
+        The subject making the request needs to be assigned to a policy containing:
+
+        ```
+        {
+        "resources": ["rn:hydra:warden:groups:<id>"],
+        "actions": ["delete"],
+        "effect": "allow"
+        }
+        ```
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      schemes:
+        - http
+        - https
+      tags:
+        - warden
+        - groups
+      summary: Delete a group by id
+      operationId: deleteGroup
+      security:
+        - oauth2:
+            - hydra.groups
+      responses:
+        '401':
+          $ref: '#/responses/genericError'
+        '403':
+          $ref: '#/responses/genericError'
+        '500':
+          $ref: '#/responses/genericError'
+  '/warden/groups/{id}/members':
     post:
       description: |-
         The subject making the request needs to be assigned to a policy containing:
@@ -1416,7 +1448,7 @@ definitions:
         type: object
         additionalProperties:
           type: object
-    x-go-package: github.com/ory/fosite/token/jwt
+    x-go-package: github.com/ory/hydra/vendor/github.com/ory/fosite/token/jwt
   IDTokenClaims:
     description: IDTokenClaims represent the claims used in open id connect requests
     type: object
@@ -1440,7 +1472,7 @@ definitions:
         type: string
       Subject:
         type: string
-    x-go-package: github.com/ory/fosite/token/jwt
+    x-go-package: github.com/ory/hydra/vendor/github.com/ory/fosite/token/jwt
   Manager:
     type: object
     x-go-package: github.com/ory/hydra/warden/group
@@ -2327,14 +2359,4 @@ securityDefinitions:
     flow: accessCode
     authorizationUrl: /oauth2/auth
     tokenUrl: /oauth2/token
-    scopes:
-      hydra.clients: "A scope required to manage OAuth 2.0 Clients"
-      hydra.policies: "A scope required to manage access control policies"
-      hydra.groups: "A scope required to manage warden groups"
-      hydra.warden: "A scope required to make access control inquiries"
-      hydra.keys.get: "A scope required to fetch JSON Web Keys"
-      hydra.keys.create: "A scope required to create JSON Web Keys"
-      hydra.keys.delete: "A scope required to delete JSON Web Keys"
-      hydra.keys.update: "A scope required to get JSON Web Keys"
-      offline: "A scope required when requesting refresh tokens"
 x-request-id: string

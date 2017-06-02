@@ -9,7 +9,7 @@ import (
 
 	"context"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"

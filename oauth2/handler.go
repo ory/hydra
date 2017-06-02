@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"

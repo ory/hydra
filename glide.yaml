@@ -1,6 +1,6 @@
 package: github.com/ory/hydra
 import:
-- package: github.com/Sirupsen/logrus
+- package: github.com/sirupsen/logrus
   version: ^0.11.5
 - package: github.com/dgrijalva/jwt-go
   version: ~3.0.0

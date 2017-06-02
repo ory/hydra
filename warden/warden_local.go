@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/firewall"
 	"github.com/ory/hydra/oauth2"

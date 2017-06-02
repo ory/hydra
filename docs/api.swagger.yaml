@@ -1190,6 +1190,40 @@ paths:
           $ref: '#/responses/genericError'
         '500':
           $ref: '#/responses/genericError'
+    delete:
+      description: |-
+        The subject making the request needs to be assigned to a policy containing:
+
+        ```
+        {
+        "resources": ["rn:hydra:warden:groups:<id>"],
+        "actions": ["delete"],
+        "effect": "allow"
+        }
+        ```
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      schemes:
+        - http
+        - https
+      tags:
+        - warden
+        - groups
+      summary: Delete a group by id
+      operationId: deleteGroup
+      security:
+        - oauth2:
+            - hydra.groups
+      responses:
+        '401':
+          $ref: '#/responses/genericError'
+        '403':
+          $ref: '#/responses/genericError'
+        '500':
+          $ref: '#/responses/genericError'
+  '/warden/groups/{id}/members':
     post:
       description: |-
         The subject making the request needs to be assigned to a policy containing:

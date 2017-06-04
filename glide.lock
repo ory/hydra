@@ -1,5 +1,5 @@
-hash: 180266dd8afac71d963d6ecf843141b083b55447ac7192ed79b6f671d6971894
-updated: 2017-05-09T09:19:03.382809034-06:00
+hash: b25ab89a0eda2186bb945eec456b0f8423797a33f77d970fb458cc6009b0f003
+updated: 2017-06-04T13:33:01.4689657+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
@@ -124,7 +124,7 @@ imports:
   - pkg
   - rand/sequence
 - name: github.com/ory/fosite
-  version: 575dd791f9f11cd8e5471178b1ec3a7638653cae
+  version: 852cf82344c2d78863508eaa0fca32f468cd7fab
   subpackages:
   - compose
   - handler/oauth2
@@ -137,7 +137,7 @@ imports:
 - name: github.com/ory/herodot
   version: ef15ccfb8c16051feca9ec289286732f8d288fec
 - name: github.com/ory/ladon
-  version: c0fffe8de3b7d8e42633fbbe034e5d1f439c72bf
+  version: 24fe723368e1f47534219523c0580948cc7b873e
   subpackages:
   - manager/memory
   - manager/sql
@@ -150,7 +150,7 @@ imports:
 - name: github.com/pkg/errors
   version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/pkg/profile
-  version: 1c16f117a3ab788fdf0e334e623b8bccf5679866
+  version: 5b67d428864e92711fcbd2f8629456121a56d91f
 - name: github.com/pmezard/go-difflib
   version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
   subpackages:
@@ -234,4 +234,12 @@ imports:
   - json
 - name: gopkg.in/yaml.v2
   version: a3f3340b5840cee44f372bddb5880fcbc419b46a
-testImports: []
+testImports:
+- name: github.com/bmizerany/assert
+  version: b7ed37b82869576c289d7d97fb2bbd8b64a0cb28
+- name: github.com/kr/pretty
+  version: cfb55aafdaf3ec08f0db22699ab822c50091b1c4
+- name: github.com/kr/text
+  version: 7cafcd837844e784b526369c9bce262804aebc60
+- name: github.com/ory/dockertest
+  version: 9d0647ae761f96a6738c5afb49688d22979b21ff

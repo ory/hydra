@@ -116,7 +116,7 @@ func (s *sqlData) toRequest(session fosite.Session, cm client.Manager, logger lo
 		logger.Debugf("Got an empty session in toRequest")
 	}
 
-	c, err := cm.GetClient(s.Client)
+	c, err := cm.GetClient(context.Background(), s.Client)
 	if err != nil {
 		return nil, err
 	}

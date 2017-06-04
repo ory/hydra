@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"strings"
+	"context"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/fosite"
@@ -137,12 +138,12 @@ func (m *SQLManager) GetConcreteClient(id string) (*Client, error) {
 	return d.ToClient(), nil
 }
 
-func (m *SQLManager) GetClient(id string) (fosite.Client, error) {
+func (m *SQLManager) GetClient(_ context.Context, id string) (fosite.Client, error) {
 	return m.GetConcreteClient(id)
 }
 
 func (m *SQLManager) UpdateClient(c *Client) error {
-	o, err := m.GetClient(c.ID)
+	o, err := m.GetClient(context.Background(), c.ID)
 	if err != nil {
 		return errors.WithStack(err)
 	}

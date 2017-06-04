@@ -130,7 +130,7 @@ func TestAuthenticateClient(t *testing.T) {
 func TestCreateGetDeleteClient(t *testing.T) {
 	for k, m := range clientManagers {
 		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
-			_, err := m.GetClient("4321")
+			_, err := m.GetClient(nil, "4321")
 			assert.NotNil(t, err)
 
 			c := &Client{
@@ -158,7 +158,7 @@ func TestCreateGetDeleteClient(t *testing.T) {
 			// RethinkDB delay
 			time.Sleep(100 * time.Millisecond)
 
-			d, err := m.GetClient("1234")
+			d, err := m.GetClient(nil, "1234")
 			assert.Nil(t, err)
 			if err == nil {
 				compare(t, d, k)
@@ -196,7 +196,7 @@ func TestCreateGetDeleteClient(t *testing.T) {
 			// RethinkDB delay
 			time.Sleep(100 * time.Millisecond)
 
-			_, err = m.GetClient("1234")
+			_, err = m.GetClient(nil, "1234")
 			assert.NotNil(t, err)
 		})
 	}

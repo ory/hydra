@@ -58,17 +58,17 @@ type WellKnown struct {
 	// by WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this Issuer.
 	//
 	// required: true
-	Issuer        string   `json:"issuer"`
+	Issuer string `json:"issuer"`
 
 	// URL of the OP's OAuth 2.0 Authorization Endpoint
 	//
 	// required: true
-	AuthURL       string   `json:"authorization_endpoint"`
+	AuthURL string `json:"authorization_endpoint"`
 
 	// URL of the OP's OAuth 2.0 Token Endpoint
 	//
 	// required: true
-	TokenURL      string   `json:"token_endpoint"`
+	TokenURL string `json:"token_endpoint"`
 
 	// URL of the OP's JSON Web Key Set [JWK] document. This contains the signing key(s) the RP uses to validate
 	// signatures from the OP. The JWK Set MAY also contain the Server's encryption key(s), which are used by RPs
@@ -79,13 +79,13 @@ type WellKnown struct {
 	// keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate.
 	//
 	// required: true
-	JWKsURI       string   `json:"jwks_uri"`
+	JWKsURI string `json:"jwks_uri"`
 
 	// JSON array containing a list of the Subject Identifier types that this OP supports. Valid types include
 	// pairwise and public.
 	//
 	// required: true
-	SubjectTypes  []string `json:"subject_types_supported"`
+	SubjectTypes []string `json:"subject_types_supported"`
 
 	// JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token
 	// to encode the Claims in a JWT [JWT]. The algorithm RS256 MUST be included. The value none MAY be supported,
@@ -93,7 +93,7 @@ type WellKnown struct {
 	// (such as when using the Authorization Code Flow).
 	//
 	// required: true
-	SigningAlgs   []string `json:"id_token_signing_alg_values_supported"`
+	SigningAlgs []string `json:"id_token_signing_alg_values_supported"`
 
 	// JSON array containing a list of the OAuth 2.0 response_type values that this OP supports. Dynamic OpenID
 	// Providers MUST support the code, id_token, and the token id_token Response Type values.
@@ -273,7 +273,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprou
 		}
 	}
 
-	accessResponse, err := h.OAuth2.NewAccessResponse(ctx, r, accessRequest)
+	accessResponse, err := h.OAuth2.NewAccessResponse(ctx, accessRequest)
 	if err != nil {
 		pkg.LogError(err, h.L)
 		h.OAuth2.WriteAccessError(w, accessRequest, err)
@@ -343,7 +343,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	}
 
 	// done
-	response, err := h.OAuth2.NewAuthorizeResponse(ctx, r, authorizeRequest, session)
+	response, err := h.OAuth2.NewAuthorizeResponse(ctx, authorizeRequest, session)
 	if err != nil {
 		pkg.LogError(err, h.L)
 		h.writeAuthorizeError(w, authorizeRequest, err)

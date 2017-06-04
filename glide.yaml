@@ -22,7 +22,7 @@ import:
   - pkg
   - rand/sequence
 - package: github.com/ory/fosite
-  version: ~0.7.0
+  version: ~0.9.0
   subpackages:
   - compose
   - handler/oauth2
@@ -35,7 +35,7 @@ import:
 - package: github.com/ory/herodot
   version: ~0.0.3
 - package: github.com/ory/ladon
-  version: ~0.7.0
+  version: ~0.7.2
   subpackages:
   - manager/memory
   - manager/sql

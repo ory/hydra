@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gorilla/context"
 	"github.com/julienschmidt/httprouter"
 	"github.com/meatballhat/negroni-logrus"
 	"github.com/ory/graceful"
@@ -21,7 +22,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/urfave/negroni"
-	"github.com/gorilla/context"
 )
 
 func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {

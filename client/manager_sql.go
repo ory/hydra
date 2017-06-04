@@ -12,7 +12,6 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
-	"context"
 )
 
 var migrations = &migrate.MemoryMigrationSource{

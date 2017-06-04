@@ -12,6 +12,7 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
+	"context"
 )
 
 var migrations = &migrate.MemoryMigrationSource{
@@ -138,12 +139,12 @@ func (m *SQLManager) GetConcreteClient(id string) (*Client, error) {
 	return d.ToClient(), nil
 }
 
-func (m *SQLManager) GetClient(id string) (fosite.Client, error) {
+func (m *SQLManager) GetClient(_ context.Context, id string) (fosite.Client, error) {
 	return m.GetConcreteClient(id)
 }
 
 func (m *SQLManager) UpdateClient(c *Client) error {
-	o, err := m.GetClient(c.ID)
+	o, err := m.GetClient(context.Background(), c.ID)
 	if err != nil {
 		return errors.WithStack(err)
 	}

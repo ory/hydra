@@ -273,7 +273,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprou
 		}
 	}
 
-	accessResponse, err := h.OAuth2.NewAccessResponse(ctx, r, accessRequest)
+	accessResponse, err := h.OAuth2.NewAccessResponse(ctx, accessRequest)
 	if err != nil {
 		pkg.LogError(err, h.L)
 		h.OAuth2.WriteAccessError(w, accessRequest, err)
@@ -343,7 +343,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	}
 
 	// done
-	response, err := h.OAuth2.NewAuthorizeResponse(ctx, r, authorizeRequest, session)
+	response, err := h.OAuth2.NewAuthorizeResponse(ctx, authorizeRequest, session)
 	if err != nil {
 		pkg.LogError(err, h.L)
 		h.writeAuthorizeError(w, authorizeRequest, err)

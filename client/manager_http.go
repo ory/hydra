@@ -7,6 +7,7 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
+	"context"
 )
 
 type HTTPManager struct {
@@ -27,7 +28,7 @@ func (m *HTTPManager) GetConcreteClient(id string) (*Client, error) {
 	return &c, nil
 }
 
-func (m *HTTPManager) GetClient(id string) (fosite.Client, error) {
+func (m *HTTPManager) GetClient(_ context.Context, id string) (fosite.Client, error) {
 	return m.GetConcreteClient(id)
 }
 

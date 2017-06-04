@@ -8,6 +8,7 @@ import (
 	"github.com/ory/hydra/pkg"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
+	"context"
 )
 
 type MemoryManager struct {
@@ -27,12 +28,12 @@ func (m *MemoryManager) GetConcreteClient(id string) (*Client, error) {
 	return &c, nil
 }
 
-func (m *MemoryManager) GetClient(id string) (fosite.Client, error) {
+func (m *MemoryManager) GetClient(_ context.Context, id string) (fosite.Client, error) {
 	return m.GetConcreteClient(id)
 }
 
 func (m *MemoryManager) UpdateClient(c *Client) error {
-	o, err := m.GetClient(c.ID)
+	o, err := m.GetClient(context.Background(), c.ID)
 	if err != nil {
 		return err
 	}

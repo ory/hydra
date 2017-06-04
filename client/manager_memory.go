@@ -10,7 +10,6 @@ import (
 	"github.com/ory/hydra/pkg"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
-	"context"
 )
 
 type MemoryManager struct {

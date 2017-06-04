@@ -4,10 +4,11 @@ import (
 	"net/http"
 	"net/url"
 
+	"context"
+
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
-	"context"
 )
 
 type HTTPManager struct {

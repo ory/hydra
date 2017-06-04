@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"context"
+
 	"github.com/imdario/mergo"
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/fosite"
@@ -12,7 +14,6 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
-	"context"
 )
 
 var migrations = &migrate.MemoryMigrationSource{

@@ -3,12 +3,13 @@ package client
 import (
 	"sync"
 
+	"context"
+
 	"github.com/imdario/mergo"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/pkg"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
-	"context"
 )
 
 type MemoryManager struct {

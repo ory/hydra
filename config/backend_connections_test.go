@@ -2,17 +2,18 @@ package config
 
 import (
 	"fmt"
-	"github.com/Sirupsen/logrus"
-	"github.com/bmizerany/assert"
-	"github.com/jmoiron/sqlx"
-	"github.com/ory/dockertest"
-	"github.com/stretchr/testify/require"
 	"log"
 	"net/url"
 	"os"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/Sirupsen/logrus"
+	"github.com/bmizerany/assert"
+	"github.com/jmoiron/sqlx"
+	"github.com/ory/dockertest"
+	"github.com/stretchr/testify/require"
 )
 
 var (

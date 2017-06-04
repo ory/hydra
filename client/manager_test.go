@@ -173,6 +173,7 @@ func TestCreateGetDeleteClient(t *testing.T) {
 				ID:                "2-1234",
 				Name:              "name-new",
 				Secret:            "secret-new",
+				RedirectURIs:      []string{"http://redirect/new"},
 				TermsOfServiceURI: "bar",
 			})
 			assert.Nil(t, err)
@@ -187,7 +188,7 @@ func TestCreateGetDeleteClient(t *testing.T) {
 			}
 			assert.Equal(t, "bar", nc.TermsOfServiceURI, "%s", k)
 			assert.Equal(t, "name-new", nc.Name, "%s", k)
-			assert.EqualValues(t, []string{"http://redirect"}, nc.GetRedirectURIs(), "%s", k)
+			assert.EqualValues(t, []string{"http://redirect/new"}, nc.GetRedirectURIs(), "%s", k)
 
 			err = m.DeleteClient("1234")
 			assert.Nil(t, err)

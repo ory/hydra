@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/imdario/mergo"
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/pkg"
@@ -156,9 +155,6 @@ func (m *SQLManager) UpdateClient(c *Client) error {
 			return errors.WithStack(err)
 		}
 		c.Secret = string(h)
-	}
-	if err := mergo.Merge(c, o); err != nil {
-		return errors.WithStack(err)
 	}
 
 	s := sqlDataFromClient(c)

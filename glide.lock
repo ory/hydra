@@ -1,5 +1,5 @@
-hash: b25ab89a0eda2186bb945eec456b0f8423797a33f77d970fb458cc6009b0f003
-updated: 2017-06-04T13:33:01.4689657+02:00
+hash: fcec67f4e49388639a833ff6aa2b41d394dc464163054a06c324ed9582bd40e0
+updated: 2017-06-04T17:49:29.5649666+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7b3beb6df3c42abd3509abfc3bcacc0fbfb7c877
@@ -62,7 +62,7 @@ imports:
   subpackages:
   - proto
 - name: github.com/gorilla/context
-  version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
+  version: 1ea25387ff6f684839d82767c1733ff4d4d15d0a
 - name: github.com/gorilla/securecookie
   version: fa5329f913702981df43dcb2a380bac429c810b5
 - name: github.com/gorilla/sessions
@@ -122,7 +122,8 @@ imports:
   subpackages:
   - compiler
   - pkg
-  - rand/sequence
+- name: github.com/ory/dockertest
+  version: 9d0647ae761f96a6738c5afb49688d22979b21ff
 - name: github.com/ory/fosite
   version: 852cf82344c2d78863508eaa0fca32f468cd7fab
   subpackages:
@@ -225,8 +226,6 @@ imports:
   - urlfetch
 - name: gopkg.in/gorp.v1
   version: c87af80f3cc5036b55b83d77171e156791085e2e
-- name: gopkg.in/ory-am/dockertest.v3
-  version: 9d0647ae761f96a6738c5afb49688d22979b21ff
 - name: gopkg.in/square/go-jose.v1
   version: aa2e30fdd1fe9dd3394119af66451ae790d50e0d
   subpackages:
@@ -241,5 +240,3 @@ testImports:
   version: cfb55aafdaf3ec08f0db22699ab822c50091b1c4
 - name: github.com/kr/text
   version: 7cafcd837844e784b526369c9bce262804aebc60
-- name: github.com/ory/dockertest
-  version: 9d0647ae761f96a6738c5afb49688d22979b21ff

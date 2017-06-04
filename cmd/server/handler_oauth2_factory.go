@@ -79,6 +79,7 @@ func newOAuth2Provider(c *config.Config, km jwk.Manager) fosite.OAuth2Provider {
 			CoreStrategy:               compose.NewOAuth2HMACStrategy(fc, c.GetSystemSecret()),
 			OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(rsaKey),
 		},
+		nil,
 		compose.OAuth2AuthorizeExplicitFactory,
 		compose.OAuth2AuthorizeImplicitFactory,
 		compose.OAuth2ClientCredentialsGrantFactory,

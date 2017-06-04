@@ -8,7 +8,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"gopkg.in/ory-am/dockertest.v3"
+	"github.com/ory/dockertest"
 )
 
 var resources []*dockertest.Resource

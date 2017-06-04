@@ -1,6 +1,6 @@
 package pkg
 
-import "github.com/ory-am/common/rand/sequence"
+import "github.com/ory/hydra/rand/sequence"
 
 var secretCharSet = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-.,!$%&/()=?><")
 

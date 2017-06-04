@@ -19,7 +19,7 @@ import (
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/ladon"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/ory-am/dockertest.v3"
+	"github.com/ory/dockertest"
 )
 
 var clientManagers = map[string]Storage{}

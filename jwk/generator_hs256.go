@@ -3,7 +3,7 @@ package jwk
 import (
 	"crypto/x509"
 
-	"github.com/ory-am/common/rand/sequence"
+	"github.com/ory/hydra/rand/sequence"
 	"github.com/pkg/errors"
 	"github.com/square/go-jose"
 )

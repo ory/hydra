@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	c "github.com/ory-am/common/pkg"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/integration"
@@ -84,7 +83,7 @@ func TestCreateGetDeleteAuthorizeCodes(t *testing.T) {
 
 			res, err := m.GetAuthorizeCodeSession(ctx, "4321", &fosite.DefaultSession{})
 			require.Nil(t, err)
-			c.AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
+			AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
 
 			err = m.DeleteAuthorizeCodeSession(ctx, "4321")
 			require.Nil(t, err)
@@ -109,7 +108,7 @@ func TestCreateGetDeleteAccessTokenSession(t *testing.T) {
 
 			res, err := m.GetAccessTokenSession(ctx, "4321", &fosite.DefaultSession{})
 			require.Nil(t, err)
-			c.AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
+			AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
 
 			err = m.DeleteAccessTokenSession(ctx, "4321")
 			require.Nil(t, err)
@@ -134,7 +133,7 @@ func TestCreateGetDeleteOpenIDConnectSession(t *testing.T) {
 
 			res, err := m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{Session: &fosite.DefaultSession{}})
 			require.Nil(t, err)
-			c.AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
+			AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
 
 			err = m.DeleteOpenIDConnectSession(ctx, "4321")
 			require.Nil(t, err)
@@ -159,7 +158,7 @@ func TestCreateGetDeleteRefreshTokenSession(t *testing.T) {
 
 			res, err := m.GetRefreshTokenSession(ctx, "4321", &fosite.DefaultSession{})
 			require.Nil(t, err)
-			c.AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
+			AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
 
 			err = m.DeleteRefreshTokenSession(ctx, "4321")
 			require.Nil(t, err)

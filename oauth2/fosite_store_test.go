@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	c "github.com/ory-am/common/pkg"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"

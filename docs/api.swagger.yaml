@@ -1415,7 +1415,7 @@ definitions:
   FieldLogger:
     description: The FieldLogger interface generalizes the Entry and Logger types
     type: object
-    x-go-package: github.com/ory/hydra/vendor/github.com/Sirupsen/logrus
+    x-go-package: github.com/ory/hydra/vendor/github.com/sirupsen/logrus
   Firewall:
     type: object
     title: Firewall offers various validation strategies for access tokens.

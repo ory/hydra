@@ -159,7 +159,7 @@ imports:
   version: f64b6080c334adaf843209164107439e92bb170b
   subpackages:
   - sqlparse
-- name: github.com/Sirupsen/logrus
+- name: github.com/sirupsen/logrus
   version: ba1b36c82c5e05c4f912a88eab0dcd91a171688f
 - name: github.com/spf13/afero
   version: 9be650865eab0c12963d8753212f4f9c66cdcf12

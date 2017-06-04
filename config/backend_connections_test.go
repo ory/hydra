@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/bmizerany/assert"
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/dockertest"

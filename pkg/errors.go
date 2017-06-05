@@ -5,11 +5,24 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/pkg/errors"
+	"net/http"
 )
 
 var (
-	ErrNotFound = errors.New("Not found")
+	ErrNotFound = &RichError{
+		Status: http.StatusNotFound,
+		error:  errors.New("Not found"),
+	}
 )
+
+type RichError struct {
+	Status int
+	error
+}
+
+func (e *RichError) StatusCode() int {
+	return e.Status
+}
 
 type stackTracer interface {
 	StackTrace() errors.StackTrace

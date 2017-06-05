@@ -28,16 +28,6 @@
 //         authorizationUrl: /oauth2/auth
 //         tokenUrl: /oauth2/token
 //         flow: accessCode
-//     Extensions:
-//     ---
-//     x-request-id: string
-//     x-forwarded-proto: string
-//     ---
-//
-// swagger:meta
-package main
-
-
 //         scopes:
 //           hydra.clients: "A scope required to manage OAuth 2.0 Clients"
 //           hydra.policies: "A scope required to manage access control policies"
@@ -50,3 +40,11 @@ package main
 //           offline: "A scope required when requesting refresh tokens"
 //           openid: "Request an OpenID Connect ID Token"
 //
+//     Extensions:
+//     ---
+//     x-request-id: string
+//     x-forwarded-proto: string
+//     ---
+//
+// swagger:meta
+package main

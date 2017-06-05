@@ -81,13 +81,20 @@ func (m *SQLManager) AddGroupMembers(group string, subjects []string) error {
 	if err != nil {
 		return errors.Wrap(err, "Could not begin transaction")
 	}
+
 	for _, subject := range subjects {
 		if _, err := tx.Exec(m.DB.Rebind("INSERT INTO hydra_warden_group_member (group_id, member) VALUES (?, ?)"), group, subject); err != nil {
+			if err := tx.Rollback(); err != nil {
+				return errors.WithStack(err)
+			}
 			return errors.WithStack(err)
 		}
 	}
 
 	if err := tx.Commit(); err != nil {
+		if err := tx.Rollback(); err != nil {
+			return errors.WithStack(err)
+		}
 		return errors.Wrap(err, "Could not commit transaction")
 	}
 	return nil
@@ -100,11 +107,17 @@ func (m *SQLManager) RemoveGroupMembers(group string, subjects []string) error {
 	}
 	for _, subject := range subjects {
 		if _, err := m.DB.Exec(m.DB.Rebind("DELETE FROM hydra_warden_group_member WHERE member=? AND group_id=?"), subject, group); err != nil {
+			if err := tx.Rollback(); err != nil {
+				return errors.WithStack(err)
+			}
 			return errors.WithStack(err)
 		}
 	}
 
 	if err := tx.Commit(); err != nil {
+		if err := tx.Rollback(); err != nil {
+			return errors.WithStack(err)
+		}
 		return errors.Wrap(err, "Could not commit transaction")
 	}
 	return nil

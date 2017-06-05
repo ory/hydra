@@ -226,6 +226,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		Username:  resp.GetAccessRequester().GetSession().GetUsername(),
 		Extra:     resp.GetAccessRequester().GetSession().(*Session).Extra,
 		Audience:  resp.GetAccessRequester().GetClient().GetID(),
+		Issuer:    h.Issuer,
 	})
 	if err != nil {
 		pkg.LogError(err, h.L)

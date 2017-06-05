@@ -27,13 +27,26 @@
 //         type: oauth2
 //         authorizationUrl: /oauth2/auth
 //         tokenUrl: /oauth2/token
-//         in: header
 //         flow: accessCode
-//
 //     Extensions:
 //     ---
 //     x-request-id: string
+//     x-forwarded-proto: string
 //     ---
 //
 // swagger:meta
 package main
+
+
+//         scopes:
+//           hydra.clients: "A scope required to manage OAuth 2.0 Clients"
+//           hydra.policies: "A scope required to manage access control policies"
+//           hydra.groups: "A scope required to manage warden groups"
+//           hydra.warden: "A scope required to make access control inquiries"
+//           hydra.keys.get: "A scope required to fetch JSON Web Keys"
+//           hydra.keys.create: "A scope required to create JSON Web Keys"
+//           hydra.keys.delete: "A scope required to delete JSON Web Keys"
+//           hydra.keys.update: "A scope required to get JSON Web Keys"
+//           offline: "A scope required when requesting refresh tokens"
+//           openid: "Request an OpenID Connect ID Token"
+//

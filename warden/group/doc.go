@@ -15,7 +15,7 @@ type swaggerFindGroupsByMemberParameters struct {
 	Member int `json:"member"`
 }
 
-// swagger:parameters getGroup
+// swagger:parameters getGroup deleteGroup
 type swaggerGetGroupParameters struct {
 	// The id of the group to look up.
 	// in: path

@@ -164,7 +164,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ htt
 //       oauth2:
 //
 //     Responses:
-//       200:
+//       200: emptyResponse
 //       401: genericError
 //       500: genericError
 func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -295,7 +295,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprou
 //     Schemes: http, https
 //
 //     Responses:
-//       302:
+//       302: emptyResponse
 //       401: genericError
 //       500: genericError
 func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

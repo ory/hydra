@@ -453,7 +453,7 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 //       oauth2: hydra.keys.delete
 //
 //     Responses:
-//       204
+//       204: emptyResponse
 //       401: genericError
 //       403: genericError
 //       500: genericError
@@ -503,7 +503,7 @@ func (h *Handler) DeleteKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 //       oauth2: hydra.keys.delete
 //
 //     Responses:
-//       204
+//       204: emptyResponse
 //       401: genericError
 //       403: genericError
 //       500: genericError

@@ -12,4 +12,6 @@ var tokenCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(tokenCmd)
+	tokenCmd.PersistentFlags().Bool("dry", false, "do not execute the command but show the corresponding curl command instead")
+	tokenCmd.PersistentFlags().Bool("fake-tls-termination", false, `fake tls termination by adding "X-Forwarded-Proto: https"" to http headers`)
 }

@@ -11,13 +11,23 @@ import (
 
 type GroupHandler struct {
 	Config *config.Config
-	M      *group.HTTPManager
+}
+
+func (h *GroupHandler) newGroupManager(cmd *cobra.Command) *group.HTTPManager {
+	dry, _ := cmd.Flags().GetBool("dry")
+	term, _ := cmd.Flags().GetBool("fake-tls-termination")
+
+	return &group.HTTPManager{
+		Dry:                dry,
+		Endpoint:           h.Config.Resolve("/warden/groups"),
+		Client:             h.Config.OAuth2Client(cmd),
+		FakeTLSTermination: term,
+	}
 }
 
 func newGroupHandler(c *config.Config) *GroupHandler {
 	return &GroupHandler{
 		Config: c,
-		M:      &group.HTTPManager{},
 	}
 }
 
@@ -26,15 +36,12 @@ func (h *GroupHandler) CreateGroup(cmd *cobra.Command, args []string) {
 		fmt.Print(cmd.UsageString())
 		return
 	}
+	m := h.newGroupManager(cmd)
 
 	var err error
-	h.M.Dry, _ = cmd.Flags().GetBool("dry")
-	h.M.Endpoint = h.Config.Resolve("/warden/groups")
-	h.M.Client = h.Config.OAuth2Client(cmd)
-
 	cc := &group.Group{ID: args[0]}
-	err = h.M.CreateGroup(cc)
-	if h.M.Dry {
+	err = m.CreateGroup(cc)
+	if m.Dry {
 		fmt.Printf("%s\n", err)
 		return
 	}
@@ -48,14 +55,11 @@ func (h *GroupHandler) DeleteGroup(cmd *cobra.Command, args []string) {
 		fmt.Print(cmd.UsageString())
 		return
 	}
+	m := h.newGroupManager(cmd)
 
 	var err error
-	h.M.Dry, _ = cmd.Flags().GetBool("dry")
-	h.M.Endpoint = h.Config.Resolve("/warden/groups")
-	h.M.Client = h.Config.OAuth2Client(cmd)
-
-	err = h.M.DeleteGroup(args[0])
-	if h.M.Dry {
+	err = m.DeleteGroup(args[0])
+	if m.Dry {
 		fmt.Printf("%s\n", err)
 		return
 	}
@@ -69,14 +73,11 @@ func (h *GroupHandler) AddMembers(cmd *cobra.Command, args []string) {
 		fmt.Print(cmd.UsageString())
 		return
 	}
+	m := h.newGroupManager(cmd)
 
 	var err error
-	h.M.Dry, _ = cmd.Flags().GetBool("dry")
-	h.M.Endpoint = h.Config.Resolve("/warden/groups")
-	h.M.Client = h.Config.OAuth2Client(cmd)
-
-	err = h.M.AddGroupMembers(args[0], args[1:])
-	if h.M.Dry {
+	err = m.AddGroupMembers(args[0], args[1:])
+	if m.Dry {
 		fmt.Printf("%s\n", err)
 		return
 	}
@@ -90,14 +91,11 @@ func (h *GroupHandler) RemoveMembers(cmd *cobra.Command, args []string) {
 		fmt.Print(cmd.UsageString())
 		return
 	}
+	m := h.newGroupManager(cmd)
 
 	var err error
-	h.M.Dry, _ = cmd.Flags().GetBool("dry")
-	h.M.Endpoint = h.Config.Resolve("/warden/groups")
-	h.M.Client = h.Config.OAuth2Client(cmd)
-
-	err = h.M.RemoveGroupMembers(args[0], args[1:])
-	if h.M.Dry {
+	err = m.RemoveGroupMembers(args[0], args[1:])
+	if m.Dry {
 		fmt.Printf("%s\n", err)
 		return
 	}
@@ -111,13 +109,9 @@ func (h *GroupHandler) FindGroups(cmd *cobra.Command, args []string) {
 		fmt.Print(cmd.UsageString())
 		return
 	}
-
-	h.M.Dry, _ = cmd.Flags().GetBool("dry")
-	h.M.Endpoint = h.Config.Resolve("/warden/groups")
-	h.M.Client = h.Config.OAuth2Client(cmd)
-
-	gn, err := h.M.FindGroupNames(args[0])
-	if h.M.Dry {
+	m := h.newGroupManager(cmd)
+	gn, err := m.FindGroupNames(args[0])
+	if m.Dry {
 		fmt.Printf("%s\n", err)
 		return
 	}

@@ -14,21 +14,28 @@ import (
 
 type PolicyHandler struct {
 	Config *config.Config
-	M      *policy.HTTPManager
+}
+
+func (h *PolicyHandler) newJwkManager(cmd *cobra.Command) *policy.HTTPManager {
+	dry, _ := cmd.Flags().GetBool("dry")
+	term, _ := cmd.Flags().GetBool("fake-tls-termination")
+
+	return &policy.HTTPManager{
+		Dry:                dry,
+		Endpoint:           h.Config.Resolve("/policies"),
+		Client:             h.Config.OAuth2Client(cmd),
+		FakeTLSTermination: term,
+	}
 }
 
 func newPolicyHandler(c *config.Config) *PolicyHandler {
 	return &PolicyHandler{
 		Config: c,
-		M:      &policy.HTTPManager{},
 	}
 }
 
 func (h *PolicyHandler) CreatePolicy(cmd *cobra.Command, args []string) {
-	h.M.Dry, _ = cmd.Flags().GetBool("dry")
-	h.M.Endpoint = h.Config.Resolve("/policies")
-	h.M.Client = h.Config.OAuth2Client(cmd)
-
+	m := h.newJwkManager(cmd)
 	files, _ := cmd.Flags().GetStringSlice("files")
 	if len(files) > 0 {
 		for _, path := range files {
@@ -37,7 +44,7 @@ func (h *PolicyHandler) CreatePolicy(cmd *cobra.Command, args []string) {
 			var p ladon.DefaultPolicy
 			err = json.NewDecoder(reader).Decode(&p)
 			pkg.Must(err, "Could not parse JSON: %s", err)
-			err = h.M.Create(&p)
+			err = m.Create(&p)
 			pkg.Must(err, "Could not create policy: %s", err)
 			fmt.Printf("Imported policy %s from %s.\n", p.ID, path)
 		}
@@ -69,8 +76,8 @@ func (h *PolicyHandler) CreatePolicy(cmd *cobra.Command, args []string) {
 		Actions:     actions,
 		Effect:      effect,
 	}
-	err := h.M.Create(p)
-	if h.M.Dry {
+	err := m.Create(p)
+	if m.Dry {
 		fmt.Printf("%s\n", err)
 		return
 	}
@@ -80,23 +87,20 @@ func (h *PolicyHandler) CreatePolicy(cmd *cobra.Command, args []string) {
 }
 
 func (h *PolicyHandler) AddResourceToPolicy(cmd *cobra.Command, args []string) {
-	h.M.Dry, _ = cmd.Flags().GetBool("dry")
-	h.M.Endpoint = h.Config.Resolve("/policies")
-	h.M.Client = h.Config.OAuth2Client(cmd)
-
+	m := h.newJwkManager(cmd)
 	if len(args) < 2 {
 		fmt.Print(cmd.UsageString())
 		return
 	}
 
-	pp, err := h.M.Get(args[0])
+	pp, err := m.Get(args[0])
 	pkg.Must(err, "Could not get policy: %s", err)
 
 	p := pp.(*ladon.DefaultPolicy)
 	p.Resources = append(p.Resources, args[1:]...)
 
-	err = h.M.Update(p)
-	if h.M.Dry {
+	err = m.Update(p)
+	if m.Dry {
 		fmt.Printf("%s\n", err)
 		return
 	}
@@ -105,16 +109,13 @@ func (h *PolicyHandler) AddResourceToPolicy(cmd *cobra.Command, args []string) {
 }
 
 func (h *PolicyHandler) RemoveResourceFromPolicy(cmd *cobra.Command, args []string) {
-	h.M.Dry, _ = cmd.Flags().GetBool("dry")
-	h.M.Endpoint = h.Config.Resolve("/policies")
-	h.M.Client = h.Config.OAuth2Client(cmd)
-
+	m := h.newJwkManager(cmd)
 	if len(args) < 2 {
 		fmt.Print(cmd.UsageString())
 		return
 	}
 
-	pp, err := h.M.Get(args[0])
+	pp, err := m.Get(args[0])
 	pkg.Must(err, "Could not get policy: %s", err)
 
 	p := pp.(*ladon.DefaultPolicy)
@@ -132,8 +133,8 @@ func (h *PolicyHandler) RemoveResourceFromPolicy(cmd *cobra.Command, args []stri
 	}
 	p.Resources = resources
 
-	err = h.M.Update(p)
-	if h.M.Dry {
+	err = m.Update(p)
+	if m.Dry {
 		fmt.Printf("%s\n", err)
 		return
 	}
@@ -142,17 +143,14 @@ func (h *PolicyHandler) RemoveResourceFromPolicy(cmd *cobra.Command, args []stri
 }
 
 func (h *PolicyHandler) AddSubjectToPolicy(cmd *cobra.Command, args []string) {
-	h.M.Dry, _ = cmd.Flags().GetBool("dry")
-	h.M.Endpoint = h.Config.Resolve("/policies")
-	h.M.Client = h.Config.OAuth2Client(cmd)
-
+	m := h.newJwkManager(cmd)
 	if len(args) < 2 {
 		fmt.Print(cmd.UsageString())
 		return
 	}
 
-	pp, err := h.M.Get(args[0])
-	if h.M.Dry {
+	pp, err := m.Get(args[0])
+	if m.Dry {
 		fmt.Printf("%s\n", err)
 	} else {
 		pkg.Must(err, "Could not get policy: %s", err)
@@ -161,8 +159,8 @@ func (h *PolicyHandler) AddSubjectToPolicy(cmd *cobra.Command, args []string) {
 	p := pp.(*ladon.DefaultPolicy)
 	p.Subjects = append(p.Subjects, args[1:]...)
 
-	err = h.M.Update(p)
-	if h.M.Dry {
+	err = m.Update(p)
+	if m.Dry {
 		fmt.Printf("%s\n", err)
 		return
 	}
@@ -171,16 +169,13 @@ func (h *PolicyHandler) AddSubjectToPolicy(cmd *cobra.Command, args []string) {
 }
 
 func (h *PolicyHandler) RemoveSubjectFromPolicy(cmd *cobra.Command, args []string) {
-	h.M.Dry, _ = cmd.Flags().GetBool("dry")
-	h.M.Endpoint = h.Config.Resolve("/policies")
-	h.M.Client = h.Config.OAuth2Client(cmd)
-
+	m := h.newJwkManager(cmd)
 	if len(args) < 2 {
 		fmt.Print(cmd.UsageString())
 		return
 	}
 
-	pp, err := h.M.Get(args[0])
+	pp, err := m.Get(args[0])
 	pkg.Must(err, "Could not get policy: %s", err)
 
 	p := pp.(*ladon.DefaultPolicy)
@@ -198,8 +193,8 @@ func (h *PolicyHandler) RemoveSubjectFromPolicy(cmd *cobra.Command, args []strin
 	}
 	p.Subjects = subjects
 
-	err = h.M.Update(p)
-	if h.M.Dry {
+	err = m.Update(p)
+	if m.Dry {
 		fmt.Printf("%s\n", err)
 		return
 	}
@@ -208,23 +203,20 @@ func (h *PolicyHandler) RemoveSubjectFromPolicy(cmd *cobra.Command, args []strin
 }
 
 func (h *PolicyHandler) AddActionToPolicy(cmd *cobra.Command, args []string) {
-	h.M.Dry, _ = cmd.Flags().GetBool("dry")
-	h.M.Endpoint = h.Config.Resolve("/policies")
-	h.M.Client = h.Config.OAuth2Client(cmd)
-
+	m := h.newJwkManager(cmd)
 	if len(args) < 2 {
 		fmt.Print(cmd.UsageString())
 		return
 	}
 
-	pp, err := h.M.Get(args[0])
+	pp, err := m.Get(args[0])
 	pkg.Must(err, "Could not get policy: %s", err)
 
 	p := pp.(*ladon.DefaultPolicy)
 	p.Actions = append(p.Actions, args[1:]...)
 
-	err = h.M.Update(p)
-	if h.M.Dry {
+	err = m.Update(p)
+	if m.Dry {
 		fmt.Printf("%s\n", err)
 		return
 	}
@@ -233,16 +225,13 @@ func (h *PolicyHandler) AddActionToPolicy(cmd *cobra.Command, args []string) {
 }
 
 func (h *PolicyHandler) RemoveActionFromPolicy(cmd *cobra.Command, args []string) {
-	h.M.Dry, _ = cmd.Flags().GetBool("dry")
-	h.M.Endpoint = h.Config.Resolve("/policies")
-	h.M.Client = h.Config.OAuth2Client(cmd)
-
+	m := h.newJwkManager(cmd)
 	if len(args) < 2 {
 		fmt.Print(cmd.UsageString())
 		return
 	}
 
-	pp, err := h.M.Get(args[0])
+	pp, err := m.Get(args[0])
 	pkg.Must(err, "Could not get policy: %s", err)
 
 	p := pp.(*ladon.DefaultPolicy)
@@ -260,8 +249,8 @@ func (h *PolicyHandler) RemoveActionFromPolicy(cmd *cobra.Command, args []string
 	}
 	p.Actions = actions
 
-	err = h.M.Update(p)
-	if h.M.Dry {
+	err = m.Update(p)
+	if m.Dry {
 		fmt.Printf("%s\n", err)
 		return
 	}
@@ -270,17 +259,14 @@ func (h *PolicyHandler) RemoveActionFromPolicy(cmd *cobra.Command, args []string
 }
 
 func (h *PolicyHandler) GetPolicy(cmd *cobra.Command, args []string) {
-	h.M.Dry, _ = cmd.Flags().GetBool("dry")
-	h.M.Endpoint = h.Config.Resolve("/policies")
-	h.M.Client = h.Config.OAuth2Client(cmd)
-
+	m := h.newJwkManager(cmd)
 	if len(args) == 0 {
 		fmt.Print(cmd.UsageString())
 		return
 	}
 
-	p, err := h.M.Get(args[0])
-	if h.M.Dry {
+	p, err := m.Get(args[0])
+	if m.Dry {
 		fmt.Printf("%s\n", err)
 		return
 	}
@@ -293,18 +279,15 @@ func (h *PolicyHandler) GetPolicy(cmd *cobra.Command, args []string) {
 }
 
 func (h *PolicyHandler) DeletePolicy(cmd *cobra.Command, args []string) {
-	h.M.Dry, _ = cmd.Flags().GetBool("dry")
-	h.M.Endpoint = h.Config.Resolve("/policies")
-	h.M.Client = h.Config.OAuth2Client(cmd)
-
+	m := h.newJwkManager(cmd)
 	if len(args) == 0 {
 		fmt.Print(cmd.UsageString())
 		return
 	}
 
 	for _, arg := range args {
-		err := h.M.Delete(arg)
-		if h.M.Dry {
+		err := m.Delete(arg)
+		if m.Dry {
 			fmt.Printf("%s\n", err)
 			continue
 		}

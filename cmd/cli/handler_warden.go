@@ -13,20 +13,19 @@ import (
 
 type WardenHandler struct {
 	Config *config.Config
-	M      *oauth2.HTTPIntrospector
 }
 
 func newWardenHandler(c *config.Config) *WardenHandler {
 	return &WardenHandler{
 		Config: c,
-		M:      &oauth2.HTTPIntrospector{},
 	}
 }
 
 func (h *WardenHandler) IsAuthorized(cmd *cobra.Command, args []string) {
-	h.M.Dry, _ = cmd.Flags().GetBool("dry")
-	h.M.Client = h.Config.OAuth2Client(cmd)
-	h.M.Endpoint = h.Config.Resolve("/connections")
+	m := &oauth2.HTTPIntrospector{
+		Endpoint:           h.Config.Resolve("/oauth2/introspect"),
+		Client:             h.Config.OAuth2Client(cmd),
+	}
 
 	if len(args) != 1 {
 		fmt.Print(cmd.UsageString())
@@ -34,7 +33,7 @@ func (h *WardenHandler) IsAuthorized(cmd *cobra.Command, args []string) {
 	}
 
 	scopes, _ := cmd.Flags().GetStringSlice("scopes")
-	res, err := h.M.IntrospectToken(context.Background(), args[0], scopes...)
+	res, err := m.IntrospectToken(context.Background(), args[0], scopes...)
 	pkg.Must(err, "Could not validate token: %s", err)
 
 	out, err := json.MarshalIndent(res, "", "\t")

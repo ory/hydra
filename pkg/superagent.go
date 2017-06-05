@@ -14,6 +14,7 @@ type SuperAgent struct {
 	Client *http.Client
 	URL    string
 	Dry    bool
+	FakeTLSTermination bool
 }
 
 func NewSuperAgent(rawurl string) *SuperAgent {
@@ -31,6 +32,10 @@ func (s *SuperAgent) Delete() error {
 	req, err := http.NewRequest("DELETE", s.URL, nil)
 	if err != nil {
 		return errors.WithStack(err)
+	}
+
+	if s.FakeTLSTermination {
+		req.Header.Set("X-Forwarded-Proto", "https")
 	}
 
 	if err := s.DoDry(req); err != nil {
@@ -57,6 +62,10 @@ func (s *SuperAgent) Get(o interface{}) error {
 		return errors.WithStack(err)
 	} else if o == nil {
 		return errors.New("Can not pass nil")
+	}
+
+	if s.FakeTLSTermination {
+		req.Header.Set("X-Forwarded-Proto", "https")
 	}
 
 	if err := s.DoDry(req); err != nil {
@@ -104,6 +113,10 @@ func (s *SuperAgent) send(method string, in interface{}, out interface{}) error 
 	req, err := http.NewRequest(method, s.URL, bytes.NewReader(data))
 	if err != nil {
 		return errors.WithStack(err)
+	}
+
+	if s.FakeTLSTermination {
+		req.Header.Set("X-Forwarded-Proto", "https")
 	}
 
 	req.Header.Set("Content-Type", "application/json")

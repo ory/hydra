@@ -9,7 +9,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"os"
+	//"os"
 	"strings"
 	"time"
 
@@ -28,6 +28,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 	"gopkg.in/yaml.v2"
+	"os"
 )
 
 type Config struct {
@@ -77,7 +78,7 @@ func matchesRange(r *http.Request, ranges []string) error {
 			return nil
 		}
 	}
-	return errors.New("Remote address does not match any cidr ranges")
+	return errors.Errorf("Remote address %s does not match cidr ranges %v", ip, ranges)
 }
 
 func newLogger(c *Config) *logrus.Logger {
@@ -242,6 +243,19 @@ func (c *Config) Resolve(join ...string) *url.URL {
 	return pkg.JoinURL(c.cluster, join...)
 }
 
+type transporter struct {
+	*http.Transport
+	FakeTLSTermination bool
+}
+
+func (t *transporter) RoundTrip(req *http.Request) (*http.Response, error) {
+	if t.FakeTLSTermination {
+		req.Header.Set("X-Forwarded-Proto", "https")
+	}
+
+	return t.Transport.RoundTrip(req)
+}
+
 func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
 	if c.oauth2Client != nil {
 		return c.oauth2Client
@@ -254,23 +268,34 @@ func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
 		Scopes:       []string{"hydra"},
 	}
 
-	ctx := context.Background()
+	fakeTlsTermination, _ := cmd.Flags().GetBool("fake-tls-termination")
+	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{
+		Transport: &transporter{
+			FakeTLSTermination: fakeTlsTermination,
+			Transport: &http.Transport{},
+		},
+	})
+
 	if ok, _ := cmd.Flags().GetBool("skip-tls-verify"); ok {
 		fmt.Println("Warning: Skipping TLS Certificate Verification.")
-		ctx = context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}})
+		ctx = context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{
+			Transport: &transporter{
+				FakeTLSTermination: fakeTlsTermination,
+				Transport: &http.Transport{
+					TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+				},
+			},
+		})
 	}
 
-	_, err := oauthConfig.Token(ctx)
-	if err != nil {
+	c.oauth2Client = oauthConfig.Client(ctx)
+	if _, err := c.oauth2Client.Get(c.ClusterURL); err != nil {
 		fmt.Printf("Could not authenticate, because: %s\n", err)
 		fmt.Println("This can have multiple reasons, like a wrong cluster or wrong credentials. To resolve this, run `hydra connect`.")
 		fmt.Println("You can disable TLS verification using the `--skip-tls-verify` flag.")
 		os.Exit(1)
 	}
 
-	c.oauth2Client = oauthConfig.Client(ctx)
 	return c.oauth2Client
 }
 

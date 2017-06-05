@@ -18,7 +18,6 @@ import (
 
 type HTTPIntrospector struct {
 	Client   *http.Client
-	Dry      bool
 	Endpoint *url.URL
 }
 

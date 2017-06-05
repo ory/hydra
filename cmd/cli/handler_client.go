@@ -14,19 +14,29 @@ import (
 
 type ClientHandler struct {
 	Config *config.Config
-	M      *client.HTTPManager
 }
 
 func newClientHandler(c *config.Config) *ClientHandler {
 	return &ClientHandler{
 		Config: c,
-		M:      &client.HTTPManager{},
+	}
+}
+
+func (h *ClientHandler) newClientManager(cmd *cobra.Command) *client.HTTPManager {
+	dry, _ := cmd.Flags().GetBool("dry")
+	term, _ := cmd.Flags().GetBool("fake-tls-termination")
+
+	return &client.HTTPManager{
+		Dry:                dry,
+		Endpoint:           h.Config.Resolve("/clients"),
+		Client:             h.Config.OAuth2Client(cmd),
+		FakeTLSTermination: term,
 	}
 }
 
 func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
-	h.M.Endpoint = h.Config.Resolve("/clients")
-	h.M.Client = h.Config.OAuth2Client(cmd)
+	m := h.newClientManager(cmd)
+
 	if len(args) == 0 {
 		fmt.Print(cmd.UsageString())
 		return
@@ -39,8 +49,8 @@ func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 		err = json.NewDecoder(reader).Decode(&c)
 		pkg.Must(err, "Could not parse JSON: %s", err)
 
-		err = h.M.CreateClient(&c)
-		if h.M.Dry {
+		err = m.CreateClient(&c)
+		if m.Dry {
 			fmt.Printf("%s\n", err)
 			continue
 		}
@@ -51,11 +61,7 @@ func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 
 func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	var err error
-
-	h.M.Dry, _ = cmd.Flags().GetBool("dry")
-	h.M.Endpoint = h.Config.Resolve("/clients")
-	h.M.Client = h.Config.OAuth2Client(cmd)
-
+	m := h.newClientManager(cmd)
 	responseTypes, _ := cmd.Flags().GetStringSlice("response-types")
 	grantTypes, _ := cmd.Flags().GetStringSlice("grant-types")
 	allowedScopes, _ := cmd.Flags().GetStringSlice("allowed-scopes")
@@ -84,8 +90,8 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		Name:          name,
 		Public:        public,
 	}
-	err = h.M.CreateClient(cc)
-	if h.M.Dry {
+	err = m.CreateClient(cc)
+	if m.Dry {
 		fmt.Printf("%s\n", err)
 		return
 	}
@@ -96,16 +102,16 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 }
 
 func (h *ClientHandler) DeleteClient(cmd *cobra.Command, args []string) {
-	h.M.Endpoint = h.Config.Resolve("/clients")
-	h.M.Client = h.Config.OAuth2Client(cmd)
+	m := h.newClientManager(cmd)
+
 	if len(args) == 0 {
 		fmt.Print(cmd.UsageString())
 		return
 	}
 
 	for _, c := range args {
-		err := h.M.DeleteClient(c)
-		if h.M.Dry {
+		err := m.DeleteClient(c)
+		if m.Dry {
 			fmt.Printf("%s\n", err)
 			continue
 		}

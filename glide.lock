@@ -1,5 +1,5 @@
-hash: 6cc7011c10fa0c6b9b20426394ccb9d3ec27f4ae4cb149febba923b257fd2f26
-updated: 2017-06-05T11:37:44.2814442+02:00
+hash: 1d84fb23d22654948517496171be9524e037f98aebe07cf694b82208fa3811d1
+updated: 2017-06-05T11:49:37.9547953+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 4918b99a7cb949bb295f3c7bbaf24b577d806e35
@@ -125,7 +125,7 @@ imports:
 - name: github.com/ory/dockertest
   version: 9d0647ae761f96a6738c5afb49688d22979b21ff
 - name: github.com/ory/fosite
-  version: 9abdfd04261f472f34c9d6a545ccaa2d491c4f06
+  version: d26aa4a76fda898677f333c38242a9049e448e1a
   subpackages:
   - compose
   - handler/oauth2
@@ -177,7 +177,7 @@ imports:
 - name: github.com/spf13/viper
   version: 7538d73b4eb9511d85a9f1dfef202eeb8ac260f4
 - name: github.com/square/go-jose
-  version: af13e1fbc7ac2df7f7eab54e5177104d546d0e9c
+  version: aa2e30fdd1fe9dd3394119af66451ae790d50e0d
   subpackages:
   - json
 - name: github.com/stretchr/testify
@@ -226,8 +226,8 @@ imports:
   - urlfetch
 - name: gopkg.in/gorp.v1
   version: c87af80f3cc5036b55b83d77171e156791085e2e
-- name: gopkg.in/square/go-jose.v2
-  version: af13e1fbc7ac2df7f7eab54e5177104d546d0e9c
+- name: gopkg.in/square/go-jose.v1
+  version: aa2e30fdd1fe9dd3394119af66451ae790d50e0d
   subpackages:
   - cipher
   - json

@@ -189,6 +189,7 @@ func TestCreateGetDeleteClient(t *testing.T) {
 			assert.Equal(t, "bar", nc.TermsOfServiceURI, "%s", k)
 			assert.Equal(t, "name-new", nc.Name, "%s", k)
 			assert.EqualValues(t, []string{"http://redirect/new"}, nc.GetRedirectURIs(), "%s", k)
+			assert.Zero(t, len(nc.Contacts))
 
 			err = m.DeleteClient("1234")
 			assert.Nil(t, err)

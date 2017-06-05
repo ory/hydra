@@ -318,6 +318,16 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 			return
 		}
 		return
+	} else if consentToken == "denied" {
+		err := errors.New("The resource owner denied consent for this request")
+		h.writeAuthorizeError(w, authorizeRequest, &fosite.RFC6749Error{
+			Name:        "Resource owner denied consent",
+			Description: err.Error(),
+			Debug:       err.Error(),
+			Hint:        "Token validation failed.",
+			Code:        http.StatusUnauthorized,
+		})
+		return
 	}
 
 	cookie, err := h.CookieStore.Get(r, consentCookieName)

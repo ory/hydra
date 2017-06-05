@@ -92,7 +92,10 @@ POST https://hydra.myapp.com/oauth2/token
 Authorization: Basic BASE64_ID_SECRET_PAIR
 Content-Type: application/x-www-form-urlencoded
 refresh_token=REFRESH_TOKEN&redirect_uri=https://example.com/callback&grant_type=refresh_token
-``` 
+```
+
+If the resource owner denies the consent step, redirect to Hydra and append `&consent=denied`, for example:
+`GET https://hydra.myapp.com/oauth2/auth?client_id=c3b49cf0-88e4-4faa-9489-28d5b8957858&response_type=code&scope=core+hydra&state=vboeidlizlxrywkwlsgeggff&nonce=tedgziijemvninkuotcuuiof&consent=denied`.
 
 ### Consent App Flow Example
 

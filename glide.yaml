@@ -21,7 +21,7 @@ import:
 - package: github.com/oleiade/reflections
   version: 1.0.0
 - package: github.com/ory/fosite
-  version: 0.9.0
+  version: 0.9.2
   subpackages:
   - compose
   - handler/oauth2
@@ -48,7 +48,7 @@ import:
 - package: github.com/spf13/cobra
 - package: github.com/spf13/viper
 - package: github.com/square/go-jose
-  version: 1.1.0
+  version: 2.1.1
   subpackages:
   - json
 - package: github.com/stretchr/testify

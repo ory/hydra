@@ -47,6 +47,7 @@ func init() {
 			compose.OAuth2TokenIntrospectionFactory,
 		),
 		H: herodot.NewJSONWriter(nil),
+		Issuer: "foobariss",
 	}
 	serv.SetRoutes(r)
 	ts = httptest.NewServer(r)
@@ -125,6 +126,7 @@ func TestIntrospect(t *testing.T) {
 					//assert.Equal(t, "tests", c.Issuer)
 					assert.Equal(t, now.Add(time.Hour).Unix(), c.ExpiresAt, "expires at")
 					assert.Equal(t, now.Unix(), c.IssuedAt, "issued at")
+					assert.Equal(t, "foobariss", c.Issuer, "issuer")
 					assert.Equal(t, map[string]interface{}{"foo": "bar"}, c.Extra)
 				},
 			},

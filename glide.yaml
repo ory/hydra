@@ -21,7 +21,7 @@ import:
 - package: github.com/oleiade/reflections
   version: 1.0.0
 - package: github.com/ory/fosite
-  version: 0.9.3
+  version: 0.9.4
   subpackages:
   - compose
   - handler/oauth2

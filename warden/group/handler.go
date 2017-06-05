@@ -223,7 +223,7 @@ func (h *Handler) GetGroup(w http.ResponseWriter, r *http.Request, ps httprouter
 //       oauth2: hydra.groups
 //
 //     Responses:
-//       204
+//       204: emptyResponse
 //       401: genericError
 //       403: genericError
 //       500: genericError
@@ -273,7 +273,7 @@ func (h *Handler) DeleteGroup(w http.ResponseWriter, r *http.Request, ps httprou
 //       oauth2: hydra.groups
 //
 //     Responses:
-//       204
+//       204: emptyResponse
 //       401: genericError
 //       403: genericError
 //       500: genericError
@@ -329,7 +329,7 @@ func (h *Handler) AddGroupMembers(w http.ResponseWriter, r *http.Request, ps htt
 //       oauth2: hydra.groups
 //
 //     Responses:
-//       204
+//       204: emptyResponse
 //       401: genericError
 //       403: genericError
 //       500: genericError

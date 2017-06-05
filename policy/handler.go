@@ -249,7 +249,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 //       oauth2: hydra.policies
 //
 //     Responses:
-//       204
+//       204: emptyResponse
 //       401: genericError
 //       403: genericError
 //       500: genericError

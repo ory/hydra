@@ -129,10 +129,7 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 		Manager: ctx.GroupManager,
 	}
 	h.Groups.SetRoutes(router)
-
-	router.GET("/health", func(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-		rw.WriteHeader(http.StatusNoContent)
-	})
+	_ = newHealthHandler(c, router)
 
 	// Create root account if new install
 	createRS256KeysIfNotExist(c, oauth2.ConsentEndpointKey, "private", "sig")

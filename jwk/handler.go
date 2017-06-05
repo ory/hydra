@@ -101,18 +101,20 @@ type joseWebKeySetRequest struct {
 //       500: genericError
 func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var ctx = context.Background()
-	if err := h.W.IsAllowed(ctx, &firewall.AccessRequest{
-		Subject:  "",
-		Resource: "rn:hydra:keys:" + IDTokenKeyName + ":public",
-		Action:   "get",
-	}); err == nil {
-		// Allow unauthorized requests to access this resource if it is enabled by policies
-	} else if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
+	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: "rn:hydra:keys:" + IDTokenKeyName + ":public",
 		Action:   "get",
 	}, "hydra.keys.get"); err != nil {
-		h.H.WriteError(w, r, err)
-		return
+		if err := h.W.IsAllowed(ctx, &firewall.AccessRequest{
+			Subject:  "",
+			Resource: "rn:hydra:keys:" + IDTokenKeyName + ":public",
+			Action:   "get",
+		}); err != nil {
+			h.H.WriteError(w, r, err)
+			return
+		} else {
+			// Allow unauthorized requests to access this resource if it is enabled by policies
+		}
 	}
 
 	keys, err := h.Manager.GetKey(IDTokenKeyName, "public")
@@ -159,18 +161,20 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	var setName = ps.ByName("set")
 	var keyName = ps.ByName("key")
 
-	if err := h.W.IsAllowed(ctx, &firewall.AccessRequest{
-		Subject:  "",
-		Resource: "rn:hydra:keys:" + setName + ":" + keyName,
-		Action:   "get",
-	}); err == nil {
-		// Allow unauthorized requests to access this resource if it is enabled by policies
-	} else if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
+	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: "rn:hydra:keys:" + setName + ":" + keyName,
 		Action:   "get",
 	}, "hydra.keys.get"); err != nil {
-		h.H.WriteError(w, r, err)
-		return
+		if err := h.W.IsAllowed(ctx, &firewall.AccessRequest{
+			Subject:  "",
+			Resource: "rn:hydra:keys:" + setName + ":" + keyName,
+			Action:   "get",
+		}); err != nil {
+			h.H.WriteError(w, r, err)
+			return
+		} else {
+			// Allow unauthorized requests to access this resource if it is enabled by policies
+		}
 	}
 
 	keys, err := h.Manager.GetKey(setName, keyName)

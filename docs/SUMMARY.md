@@ -38,6 +38,7 @@
   * [Architecture and Design](contribute.md)
   * [Running Tests](contribute.md)
 * [FAQ](faq.md)
+  * [How should I run migrations?](faq/migrations.md)
   * [How to deal with mobile apps?](faq/mobile.md)
   * [Why is the Resource Owner Password Credentials grant not supported?](faq/ropc.md)
   * [How can I control SQL connection limits?](faq/sql.md)

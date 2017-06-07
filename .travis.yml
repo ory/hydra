@@ -40,7 +40,6 @@ script:
   - |
     go list ./cmd/... | xargs -n1 -I{} sh -c 'go test -covermode=atomic -coverprofile=coverage.tmp -coverpkg $(go list ./... | grep -v /vendor | tr "\n" ",") {} && tail -n +2 coverage.tmp >> coverage.txt || exit 255' && rm coverage.tmp
   - goveralls -coverprofile="coverage.txt"
-  - go test -race $(go list ./... | grep -v /vendor | grep -v /cmd)
   - docker build -t hydra-travis-ci -f Dockerfile-without-telemetry .
   - docker run -d hydra-travis-ci
   - DATABASE_URL=memory hydra host --dangerous-auto-logon --dangerous-force-http --disable-telemetry &

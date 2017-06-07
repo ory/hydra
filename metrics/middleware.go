@@ -51,6 +51,7 @@ func (sw *MetricsManager) UpdateUpTime() {
 }
 
 func (sw *MetricsManager) RegisterSegment(version, hash, buildTime string) {
+	time.Sleep(time.Minute * 15)
 	pkg.Retry(sw.Logger, time.Minute, time.Hour/2, func() error {
 		return sw.Segment.Identify(&analytics.Identify{
 			AnonymousId: sw.ID,
@@ -72,6 +73,7 @@ func (sw *MetricsManager) RegisterSegment(version, hash, buildTime string) {
 
 func (sw *MetricsManager) TickSegment() {
 	for {
+		time.Sleep(time.Minute * 15)
 		if err := sw.Segment.Track(&analytics.Track{
 			Event:       "Telemetry",
 			AnonymousId: sw.ID,
@@ -84,7 +86,6 @@ func (sw *MetricsManager) TickSegment() {
 		}); err != nil {
 			logrus.WithError(err).Debugf("Could not commit anonymized telemetry data")
 		}
-		time.Sleep(time.Minute * 15)
 	}
 }
 

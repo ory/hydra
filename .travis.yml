@@ -6,6 +6,7 @@ cache:
   directories:
     - $GOPATH/src
     - $GOPATH/pkg
+    - ./vendor/
 
 services:
   - docker

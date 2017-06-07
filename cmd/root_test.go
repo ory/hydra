@@ -85,7 +85,7 @@ func TestExecute(t *testing.T) {
 					if count > 30 {
 						t.FailNow()
 					}
-					time.Sleep(time.Second / 2)
+					time.Sleep(time.Second * 2)
 				}
 			} else {
 				err := RootCmd.Execute()

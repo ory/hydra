@@ -82,7 +82,7 @@ func (sw *MetricsManager) TickKeepAlive() {
 		if err := sw.Segment.Track(&analytics.Track{
 			Event:       "keep-alive",
 			AnonymousId: sw.ID,
-			Properties:  map[string]interface{}{"nonInteraction": 1},
+			Properties:  map[string]interface{}{},
 			Context:     map[string]interface{}{"ip": "0.0.0.0"},
 		}); err != nil {
 			logrus.WithError(err).Debugf("Could not commit anonymized telemetry data")

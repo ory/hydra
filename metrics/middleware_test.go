@@ -43,6 +43,7 @@ func TestMiddleware(t *testing.T) {
 			require.NoError(t, err)
 			res.Body.Close()
 
+			mw.RLock()
 			require.Equal(t, http.StatusOK, res.StatusCode)
 			assert.EqualValues(t, i, mw.Snapshot.Requests)
 			assert.EqualValues(t, i, mw.Snapshot.Requests)
@@ -53,6 +54,7 @@ func TestMiddleware(t *testing.T) {
 
 			assert.EqualValues(t, i, mw.Snapshot.Methods["GET"].Requests)
 			assert.EqualValues(t, i, mw.Snapshot.Methods["GET"].Responses)
+			mw.RUnlock()
 		})
 	}
 

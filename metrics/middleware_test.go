@@ -45,18 +45,20 @@ func TestMiddleware(t *testing.T) {
 
 			mw.RLock()
 			require.Equal(t, http.StatusOK, res.StatusCode)
-			assert.EqualValues(t, i, mw.Snapshot.Requests)
-			assert.EqualValues(t, i, mw.Snapshot.Requests)
-			assert.EqualValues(t, i, mw.Snapshot.Responses)
-
-			assert.EqualValues(t, 0, mw.Snapshot.Status[http.StatusOK].Requests)
-			assert.EqualValues(t, i, mw.Snapshot.Status[http.StatusOK].Responses)
-
-			assert.EqualValues(t, i, mw.Snapshot.Methods["GET"].Requests)
-			assert.EqualValues(t, i, mw.Snapshot.Methods["GET"].Responses)
 			mw.RUnlock()
 		})
 	}
+
+	i := 100
+	assert.EqualValues(t, i, mw.Snapshot.Requests)
+	assert.EqualValues(t, i, mw.Snapshot.Requests)
+	assert.EqualValues(t, i, mw.Snapshot.Responses)
+
+	assert.EqualValues(t, 0, mw.Snapshot.Status[http.StatusOK].Requests)
+	assert.EqualValues(t, i, mw.Snapshot.Status[http.StatusOK].Responses)
+
+	assert.EqualValues(t, i, mw.Snapshot.Methods["GET"].Requests)
+	assert.EqualValues(t, i, mw.Snapshot.Methods["GET"].Responses)
 
 	res, err := http.Get(s.URL + "/oauth2/introspect/1231")
 	require.NoError(t, err)

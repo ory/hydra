@@ -67,4 +67,3 @@ import:
 testImport:
 - package: github.com/bmizerany/assert
 - package: github.com/ory/dockertest
-  version: ~3.0.7

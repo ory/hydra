@@ -78,7 +78,15 @@ func (sw *MetricsManager) TickSegment() {
 			Event:       "Telemetry",
 			AnonymousId: sw.ID,
 			Properties: map[string]interface{}{
-				"metrics": sw,
+				"upTime": sw.UpTime,
+				"requests": sw.Requests,
+				"responses": sw.Responses,
+				"paths": sw.Paths,
+				"methods": sw.Methods,
+				"sizes": sw.Sizes,
+				"status": sw.Status,
+				"latencies": sw.Latencies,
+				"raw": sw,
 			},
 			Context: map[string]interface{}{
 				"ip": "0.0.0.0",

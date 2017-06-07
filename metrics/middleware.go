@@ -50,9 +50,14 @@ func (sw *MetricsManager) UpdateUpTime() {
 
 }
 
+const (
+	defaultWait   = time.Minute * 15
+	keepAliveWait = time.Minute * 5
+)
+
 func (sw *MetricsManager) RegisterSegment(version, hash, buildTime string) {
-	time.Sleep(time.Minute * 15)
-	pkg.Retry(sw.Logger, time.Minute, time.Hour/2, func() error {
+	time.Sleep(defaultWait)
+	pkg.Retry(sw.Logger, time.Minute*2, defaultWait, func() error {
 		return sw.Segment.Identify(&analytics.Identify{
 			AnonymousId: sw.ID,
 			Traits: map[string]interface{}{
@@ -71,22 +76,37 @@ func (sw *MetricsManager) RegisterSegment(version, hash, buildTime string) {
 	})
 }
 
-func (sw *MetricsManager) TickSegment() {
+func (sw *MetricsManager) TickKeepAlive() {
+	time.Sleep(defaultWait)
 	for {
-		time.Sleep(time.Minute * 15)
 		if err := sw.Segment.Track(&analytics.Track{
-			Event:       "Telemetry",
+			Event:       "keep-alive",
+			AnonymousId: sw.ID,
+			Properties:  map[string]interface{}{"nonInteraction": 1},
+			Context:     map[string]interface{}{"ip": "0.0.0.0"},
+		}); err != nil {
+			logrus.WithError(err).Debugf("Could not commit anonymized telemetry data")
+		}
+		time.Sleep(keepAliveWait)
+	}
+}
+
+func (sw *MetricsManager) CommitTelemetry() {
+	for {
+		time.Sleep(defaultWait)
+		if err := sw.Segment.Track(&analytics.Track{
+			Event:       "telemetry",
 			AnonymousId: sw.ID,
 			Properties: map[string]interface{}{
-				"upTime": sw.UpTime,
-				"requests": sw.Requests,
+				"upTime":    sw.UpTime,
+				"requests":  sw.Requests,
 				"responses": sw.Responses,
-				"paths": sw.Paths,
-				"methods": sw.Methods,
-				"sizes": sw.Sizes,
-				"status": sw.Status,
+				"paths":     sw.Paths,
+				"methods":   sw.Methods,
+				"sizes":     sw.Sizes,
+				"status":    sw.Status,
 				"latencies": sw.Latencies,
-				"raw": sw,
+				"raw":       sw,
 			},
 			Context: map[string]interface{}{
 				"ip": "0.0.0.0",

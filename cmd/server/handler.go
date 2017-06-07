@@ -60,7 +60,8 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		metrics := c.GetMetrics()
 		if ok, _ := cmd.Flags().GetBool("disable-telemetry"); !ok && os.Getenv("DISABLE_TELEMETRY") != "1" {
 			go metrics.RegisterSegment(c.BuildVersion, c.BuildHash, c.BuildTime)
-			go metrics.TickSegment()
+			go metrics.CommitTelemetry()
+			go metrics.TickKeepAlive()
 			n.Use(metrics)
 		}
 

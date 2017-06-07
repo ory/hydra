@@ -1,30 +1,35 @@
 # Telemetry
 
 Our goal is to have the most reliable and fastest OAuth2 and OpenID Connect server. To achieve this goal,
-we meter endpoint performance and send a **summarized, anonymized** telemetry report ("anonymous usage statistics") to our servers. This helps us
-identify how changes impact performance and stability of ORY Hydra.
+ORY Hydra collects metrics on endpoint performance and sends a **fully anonymized** telemetry report
+("anonymous usage statistics") to our servers. This data helps us understand how changes impact performance
+and stability of ORY Hydra and identify potential issues.
 
-We are fully transparent on this issue. The source code of the telemetry package is completely open source
-and located [here](https://github.com/ory/hydra/tree/master/metrics). It is possible to [turn this feature off](#disabling-telemetry), but
-we kindly ask you to keep it enabled.
+ORY is a company registered in Germany, and we are very aware and sensible of and to privacy laws. Thus, we are fully
+transparent on what data we transmit why and how. The source code of the telemetry package is completely open source
+and located [here](https://github.com/ory/hydra/tree/master/metrics). If you do not wish to help us improving ORY Hydra
+by sharing telemetry data, it is possible to [turn this feature off](#disabling-telemetry).
 
-**We are unable to link telemetry data to ip addresses.** The host's ip address is fully anonymized and never available to
-us. We collect but a few metrics, including latency, uptime, overall responses and information on the host such as number of
-CPUs. We do not collect user data, we do not collect data from the database. We filter all data out of request URLs and group
-them together by feature. For example:
+To protect your privacy, we filter out any data that could identify you, or your users. We are taking the following
+measures to protect your privacy:
 
-* `GET /clients/1235` becomes `GET /clients`
-* `GET /oauth2/token?param=1` becomes `GET /oauth2/token`
-* `POST /clients` strips out all post data and becomes `POST /clients`
+1. We only transmit information on how often endpoints are requested, how fast they respond and what http status code
+was sent.
+2. We filter out any query parameters, headers, response and request bodies and path parameters. A full list of transmitted
+URL paths is listed in section [Request telemetry](#request-telemetry). For example:
+  * `GET /clients/1235` becomes `GET /clients`
+  * `GET /oauth2/token?param=1` becomes `GET /oauth2/token`
+  * `POST /clients` strips out all post data and becomes `POST /clients`
+4. **We are unable to see or store the IP address of your host**, as the
+[IP is set to `0.0.0.0`](https://github.com/ory/hydra/tree/master/metrics/middleware.go) when transmitting data to Segment.
+5. We do not transmit any environment information from the host, except the operating system id (windows, linux, osx),
+the target architecture (amd64, darwin, ...), and the number of CPUs available on the host.
 
 ## Identification
 
-The ORY Hydra instance is identified using an unique identifier which is set every time ORY Hydra starts. The identifier
-is Universally Unique Identifier (V4) and is crypto-random. Identification is triggered when the instance has been
-running for more than 15 minutes.
-
-**We never identify, or share the ip address of the host.** The ip address is anonymized to `0.0.0.0` and is not available
-to us.
+The running instance is identified using an unique identifier which is set every time ORY Hydra starts. The identifier
+is a Universally Unique Identifier (V4) and is thus a cryptographically safe random string. Identification is triggered
+when the instance has been running for more than 15 minutes.
 
 We collect the following system metrics:
 
@@ -62,7 +67,7 @@ the endpoints:
 "/",
 ```
 
-Additionally, the following data is shared:
+Additionally, the following data is submitted to us:
 
 * Total number of requests, responses, response latencies and response sizes.
 * Total number of requests, responses, response latencies and response sizes per HTTP method.
@@ -70,6 +75,16 @@ Additionally, the following data is shared:
 * Total number of requests, responses, response latencies and response sizes per anonymized API endpoint.
 
 A raw data example can be found [here](https://github.com/ory/hydra/tree/master/docs/metrics/telemetry-example.json).
+
+## Keep alive
+
+A keep-alive containing no information except the instance id is sent every 5 minutes.
+
+## Data processing
+
+Once the data was transmitted to [Segment.com](http://segment.com/) it is then fed to an AWS S3 bucket and stored
+there for later analysis. At the moment, we are working on a python / numpy toolchain to help us analyze the data
+we get.
 
 ## Disabling telemetry
 

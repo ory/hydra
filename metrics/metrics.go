@@ -31,12 +31,12 @@ func (h *HTTPMetrics) AddMethodRequest(method string) {
 }
 
 func (h *Metrics) AddLatency(latency time.Duration) {
-	if latency > time.Second * 5 {
+	if latency > time.Second*5 {
 		latency = time.Second * 5
 	}
 
 	// milliseconds / 10
-	h.Latencies[int64(latency / 10)]++
+	h.Latencies[int64(latency/10)]++
 }
 
 func (h *HTTPMetrics) SizeMetrics(size int) *Metrics {

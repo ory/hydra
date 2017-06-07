@@ -57,7 +57,7 @@ const (
 
 func (sw *MetricsManager) RegisterSegment(version, hash, buildTime string) {
 	time.Sleep(defaultWait)
-	pkg.Retry(sw.Logger, time.Minute*2, defaultWait, func() error {
+	if err := pkg.Retry(sw.Logger, time.Minute*2, defaultWait, func() error {
 		return sw.Segment.Identify(&analytics.Identify{
 			AnonymousId: sw.ID,
 			Traits: map[string]interface{}{
@@ -73,7 +73,10 @@ func (sw *MetricsManager) RegisterSegment(version, hash, buildTime string) {
 				"ip": "0.0.0.0",
 			},
 		})
-	})
+	}); err != nil {
+		sw.Logger.WithError(err).Debug("Could not commit anonymized environment information")
+	}
+	sw.Logger.Debug("Transmitted anonymized environment information")
 }
 
 func (sw *MetricsManager) TickKeepAlive() {
@@ -85,8 +88,9 @@ func (sw *MetricsManager) TickKeepAlive() {
 			Properties:  map[string]interface{}{},
 			Context:     map[string]interface{}{"ip": "0.0.0.0"},
 		}); err != nil {
-			logrus.WithError(err).Debugf("Could not commit anonymized telemetry data")
+			sw.Logger.WithError(err).Debug("Could not send telemetry keep alive")
 		}
+		sw.Logger.Debug("Transmitted telemetry heartbeat (keep-alive)")
 		time.Sleep(keepAliveWait)
 	}
 }
@@ -112,8 +116,9 @@ func (sw *MetricsManager) CommitTelemetry() {
 				"ip": "0.0.0.0",
 			},
 		}); err != nil {
-			logrus.WithError(err).Debugf("Could not commit anonymized telemetry data")
+			sw.Logger.WithError(err).Debug("Could not commit anonymized telemetry data")
 		}
+		sw.Logger.Debug("Telemetry data transmitted")
 	}
 }
 

@@ -27,7 +27,7 @@ func TestExecute(t *testing.T) {
 		expectErr bool
 	}{
 		{
-			args: []string{"host", "--dangerous-auto-logon"},
+			args: []string{"host", "--dangerous-auto-logon", "--disable-telemetry"},
 			wait: func() bool {
 				_, err := os.Stat(path)
 				if err != nil {

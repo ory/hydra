@@ -45,10 +45,6 @@ func TestExecute(t *testing.T) {
 		{args: []string{"keys", "delete", "foo"}},
 		{args: []string{"token", "revoke", "foo"}},
 		{args: []string{"token", "client"}},
-		{args: []string{"token", "user", "--no-open"}, wait: func() bool {
-			time.Sleep(time.Millisecond * 10)
-			return false
-		}},
 		{args: []string{"policies", "create", "-i", "foobar", "-s", "peter,max", "-r", "blog,users", "-a", "post,ban", "--allow"}},
 		{args: []string{"policies", "actions", "add", "foobar", "update|create"}},
 		{args: []string{"policies", "actions", "remove", "foobar", "update|create"}},
@@ -66,6 +62,10 @@ func TestExecute(t *testing.T) {
 		{args: []string{"help", "migrate", "sql"}},
 		{args: []string{"help", "migrate", "ladon", "0.6.0"}},
 		{args: []string{"version"}},
+		{args: []string{"token", "user", "--no-open"}, wait: func() bool {
+			time.Sleep(time.Millisecond * 10)
+			return false
+		}},
 	} {
 		c.args = append(c.args, []string{"--skip-tls-verify", "--config", path}...)
 		RootCmd.SetArgs(c.args)
@@ -85,7 +85,7 @@ func TestExecute(t *testing.T) {
 					if count > 30 {
 						t.FailNow()
 					}
-					time.Sleep(time.Second * 4)
+					time.Sleep(time.Second / 2)
 				}
 			} else {
 				err := RootCmd.Execute()

@@ -62,7 +62,7 @@ A raw data example can be found [here](https://github.com/ory/hydra/tree/master/
 
 ## Disabling telemetry
 
-You can disable telemetry with `hydra host --disable-telemetry`, using the [oryd/hydra-no-telemetry]() docker image, by
+You can disable telemetry with `hydra host --disable-telemetry`, using the [oryd/hydra:{tag}-without-telemetry](https://hub.docker.com/r/oryd/hydra/tags/) docker image, by
 setting ` export DISABLE_TELEMETRY=1`, or `DISABLE_TELEMETRY=1 hydra host`.
 
 Please be aware that disabling telemetry also disables metrics on the `/health` endpoint.

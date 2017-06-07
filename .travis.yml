@@ -2,6 +2,11 @@ sudo: required
 
 go_import_path: github.com/ory/hydra
 
+cache:
+  directories:
+    - $GOPATH/src
+    - $GOPATH/pkg
+
 services:
   - docker
 

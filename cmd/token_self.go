@@ -1,4 +1,4 @@
- package cmd
+package cmd
 
 import (
 	"context"
@@ -12,18 +12,18 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 )
 
- type transporter struct {
-	 *http.Transport
-	 FakeTLSTermination bool
- }
+type transporter struct {
+	*http.Transport
+	FakeTLSTermination bool
+}
 
- func (t *transporter) RoundTrip(req *http.Request) (*http.Response, error) {
-	 if t.FakeTLSTermination {
-		 req.Header.Set("X-Forwarded-Proto", "https")
-	 }
+func (t *transporter) RoundTrip(req *http.Request) (*http.Response, error) {
+	if t.FakeTLSTermination {
+		req.Header.Set("X-Forwarded-Proto", "https")
+	}
 
-	 return t.Transport.RoundTrip(req)
- }
+	return t.Transport.RoundTrip(req)
+}
 
 // tokenSelfCmd represents the self command
 var tokenSelfCmd = &cobra.Command{
@@ -35,7 +35,7 @@ var tokenSelfCmd = &cobra.Command{
 		ctx := context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{
 			Transport: &transporter{
 				FakeTLSTermination: fakeTlsTermination,
-				Transport: &http.Transport{},
+				Transport:          &http.Transport{},
 			},
 		})
 

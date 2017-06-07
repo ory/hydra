@@ -1,14 +1,15 @@
 package main
 
 import (
-	"github.com/ory/hydra/sdk"
-	"log"
-	"github.com/julienschmidt/httprouter"
-	"net/http"
-	"fmt"
-	"os"
 	"context"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+
+	"github.com/julienschmidt/httprouter"
 	"github.com/ory/hydra/firewall"
+	"github.com/ory/hydra/sdk"
 )
 
 var h *sdk.Client

@@ -13,10 +13,10 @@ import (
 )
 
 type HTTPManager struct {
-	Client   *http.Client
-	Endpoint *url.URL
+	Client             *http.Client
+	Endpoint           *url.URL
 	FakeTLSTermination bool
-	Dry      bool
+	Dry                bool
 }
 
 func (m *HTTPManager) CreateGroup(g *Group) error {

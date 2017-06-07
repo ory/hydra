@@ -3,7 +3,6 @@ package pkg
 import (
 	"net/url"
 	"path"
-
 )
 
 func CopyURL(u *url.URL) *url.URL {

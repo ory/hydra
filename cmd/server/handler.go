@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"os"
+
 	"github.com/gorilla/context"
 	"github.com/julienschmidt/httprouter"
 	"github.com/meatballhat/negroni-logrus"
@@ -54,6 +56,15 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		}
 
 		n := negroni.New()
+
+		metrics := c.GetMetrics()
+		if ok, _ := cmd.Flags().GetBool("disable-telemetry"); !ok && os.Getenv("DISABLE_TELEMETRY") != "1" {
+			go metrics.RegisterSegment(c.BuildVersion, c.BuildHash, c.BuildTime)
+			go metrics.CommitTelemetry()
+			go metrics.TickKeepAlive()
+			n.Use(metrics)
+		}
+
 		n.Use(negronilogrus.NewMiddlewareFromLogger(logger, c.Issuer))
 		n.UseFunc(serverHandler.rejectInsecureRequests)
 		n.UseHandler(router)

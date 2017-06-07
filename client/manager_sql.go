@@ -1,10 +1,10 @@
 package client
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"strings"
-	"context"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/fosite"

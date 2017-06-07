@@ -2,6 +2,12 @@ sudo: required
 
 go_import_path: github.com/ory/hydra
 
+cache:
+  directories:
+    - $GOPATH/src
+    - $GOPATH/pkg
+    - ./vendor/
+
 services:
   - docker
 
@@ -25,14 +31,18 @@ install:
   - go install github.com/ory/hydra
 
 script:
-  - |-
-    touch ./coverage.tmp && echo 'mode: atomic' > coverage.txt && go list ./... | grep -v /vendor | xargs -n1 -I{} sh -c 'go test -covermode=atomic -coverprofile=coverage.tmp -coverpkg $(go list ./... | grep -v /vendor | tr "\n" ",") {} && tail -n +2 coverage.tmp >> coverage.txt' && rm coverage.tmp
+  - touch ./coverage.tmp
+  - |
+    echo 'mode: atomic' > coverage.txt
+  - |
+    go list ./... | grep -v /cmd | grep -v /vendor | xargs -n1 -I{} sh -c 'go test -race -covermode=atomic -coverprofile=coverage.tmp -coverpkg $(go list ./... | grep -v /vendor | tr "\n" ",") {} && tail -n +2 coverage.tmp >> coverage.txt || exit 255' && rm coverage.tmp
+  - touch ./coverage.tmp
+  - |
+    go list ./cmd/... | xargs -n1 -I{} sh -c 'go test -covermode=atomic -coverprofile=coverage.tmp -coverpkg $(go list ./... | grep -v /vendor | tr "\n" ",") {} && tail -n +2 coverage.tmp >> coverage.txt || exit 255' && rm coverage.tmp
   - goveralls -coverprofile="coverage.txt"
-  - go test -race $(go list ./... | grep -v /vendor | grep -v /cmd)
-  - go test -v -bench=.* -run=none $(glide novendor)
-  - docker build -t hydra-travis-ci .
+  - docker build -t hydra-travis-ci -f Dockerfile-without-telemetry .
   - docker run -d hydra-travis-ci
-  - DATABASE_URL=memory hydra host --dangerous-auto-logon --dangerous-force-http &
+  - DATABASE_URL=memory hydra host --dangerous-auto-logon --dangerous-force-http --disable-telemetry &
   - while ! echo exit | nc localhost 4444; do sleep 1; done
 # Test clients
   - hydra clients create --id foobar

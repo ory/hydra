@@ -27,7 +27,7 @@ func TestExecute(t *testing.T) {
 		expectErr bool
 	}{
 		{
-			args: []string{"host", "--dangerous-auto-logon"},
+			args: []string{"host", "--dangerous-auto-logon", "--disable-telemetry"},
 			wait: func() bool {
 				_, err := os.Stat(path)
 				if err != nil {
@@ -45,10 +45,6 @@ func TestExecute(t *testing.T) {
 		{args: []string{"keys", "delete", "foo"}},
 		{args: []string{"token", "revoke", "foo"}},
 		{args: []string{"token", "client"}},
-		{args: []string{"token", "user", "--no-open"}, wait: func() bool {
-			time.Sleep(time.Millisecond * 10)
-			return false
-		}},
 		{args: []string{"policies", "create", "-i", "foobar", "-s", "peter,max", "-r", "blog,users", "-a", "post,ban", "--allow"}},
 		{args: []string{"policies", "actions", "add", "foobar", "update|create"}},
 		{args: []string{"policies", "actions", "remove", "foobar", "update|create"}},
@@ -66,6 +62,10 @@ func TestExecute(t *testing.T) {
 		{args: []string{"help", "migrate", "sql"}},
 		{args: []string{"help", "migrate", "ladon", "0.6.0"}},
 		{args: []string{"version"}},
+		{args: []string{"token", "user", "--no-open"}, wait: func() bool {
+			time.Sleep(time.Millisecond * 10)
+			return false
+		}},
 	} {
 		c.args = append(c.args, []string{"--skip-tls-verify", "--config", path}...)
 		RootCmd.SetArgs(c.args)
@@ -82,10 +82,10 @@ func TestExecute(t *testing.T) {
 				for c.wait() {
 					t.Logf("Config file has not been found yet, retrying attempt #%d...", count)
 					count++
-					if count > 30 {
+					if count > 200 {
 						t.FailNow()
 					}
-					time.Sleep(time.Second * 4)
+					time.Sleep(time.Second * 2)
 				}
 			} else {
 				err := RootCmd.Execute()

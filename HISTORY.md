@@ -2,6 +2,11 @@
 
 This list makes you aware of (breaking) changes. For patch notes, please check the [releases tab](https://github.com/ory/hydra/releases).
 
+## 0.9.0
+
+This version adds performance metrics to `/health` and sends anonymous usage statistics to our servers, [click here](https://ory.gitbooks.io/hydra/content/telemetry.html) for more
+details on this feature and how to disable it.
+
 ## 0.8.0
 
 This PR improves some performance bottlenecks, offers more control over Hydra, moves to Go 1.8,

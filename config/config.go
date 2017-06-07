@@ -13,10 +13,13 @@ import (
 	"strings"
 	"time"
 
+	"os"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/token/hmac"
+	"github.com/ory/hydra/metrics"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/warden/group"
 	"github.com/ory/ladon"
@@ -28,7 +31,6 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 	"gopkg.in/yaml.v2"
-	"os"
 )
 
 type Config struct {
@@ -55,10 +57,14 @@ type Config struct {
 	LogFormat              string `mapstructure:"LOG_FORMAT" yaml:"-"`
 	ForceHTTP              bool   `yaml:"-"`
 
-	logger       *logrus.Logger `yaml:"-"`
-	cluster      *url.URL       `yaml:"-"`
-	oauth2Client *http.Client   `yaml:"-"`
-	context      *Context       `yaml:"-"`
+	BuildVersion string                  `yaml:"-"`
+	BuildHash    string                  `yaml:"-"`
+	BuildTime    string                  `yaml:"-"`
+	logger       *logrus.Logger          `yaml:"-"`
+	metrics      *metrics.MetricsManager `yaml:"-"`
+	cluster      *url.URL                `yaml:"-"`
+	oauth2Client *http.Client            `yaml:"-"`
+	context      *Context                `yaml:"-"`
 	systemSecret []byte
 }
 
@@ -106,6 +112,14 @@ func (c *Config) GetLogger() *logrus.Logger {
 	}
 
 	return c.logger
+}
+
+func (c *Config) GetMetrics() *metrics.MetricsManager {
+	if c.metrics == nil {
+		c.metrics = metrics.NewMetricsManager(c.GetLogger())
+	}
+
+	return c.metrics
 }
 
 func (c *Config) DoesRequestSatisfyTermination(r *http.Request) error {
@@ -196,7 +210,7 @@ func (c *Config) Context() *Context {
 	var manager ladon.Manager
 	switch con := connection.(type) {
 	case *MemoryConnection:
-		logrus.Printf("DATABASE_URL not set, connecting to ephermal in-memory database.")
+		logrus.Printf("DATABASE_URL set to memory, connecting to ephermal in-memory database.")
 		manager = lmem.NewMemoryManager()
 		groupManager = group.NewMemoryManager()
 		break
@@ -272,7 +286,7 @@ func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
 	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{
 		Transport: &transporter{
 			FakeTLSTermination: fakeTlsTermination,
-			Transport: &http.Transport{},
+			Transport:          &http.Transport{},
 		},
 	})
 

@@ -1,5 +1,5 @@
 hash: cb9b6e68f8d0ca4e84d125445f16012045c95d9d98cba90bc60e5d3b16f1431f
-updated: 2017-06-06T14:16:06.7866738+02:00
+updated: 2017-06-07T14:36:03.7786468+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 4918b99a7cb949bb295f3c7bbaf24b577d806e35
@@ -86,6 +86,8 @@ imports:
   version: 3e95a51e0639b4cf372f2ccf74c86749d747fbdc
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
+- name: github.com/jehiah/go-strftime
+  version: 834e15c05a45371503440cc195bbd05c9a0968d9
 - name: github.com/jmoiron/sqlx
   version: f4076845477b10ac2453a16377a8383467aafe72
   subpackages:
@@ -154,6 +156,10 @@ imports:
   version: f64b6080c334adaf843209164107439e92bb170b
   subpackages:
   - sqlparse
+- name: github.com/segmentio/analytics-go
+  version: bdb0aeca8a993b292b85c9ec17b5ce0ff81848c8
+- name: github.com/segmentio/backo-go
+  version: 204274ad699c0983a70203a566887f17a717fef4
 - name: github.com/Sirupsen/logrus
   version: ba1b36c82c5e05c4f912a88eab0dcd91a171688f
 - name: github.com/spf13/afero
@@ -183,6 +189,8 @@ imports:
   version: 21fc9f95c83442fd164094666f7cb4f9fdd56cd6
 - name: github.com/urfave/negroni
   version: fde5e16d32adc7ad637e9cd9ad21d4ebc6192535
+- name: github.com/xtgo/uuid
+  version: a0b114877d4caeffbd7f87e3757c17fce570fea7
 - name: golang.org/x/crypto
   version: 453249f01cfeb54c3d549ddb75ff152ca243f9d8
   subpackages:

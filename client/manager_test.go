@@ -11,6 +11,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	_ "github.com/lib/pq"
+	"github.com/ory/dockertest"
 	"github.com/ory/fosite"
 	"github.com/ory/herodot"
 	. "github.com/ory/hydra/client"
@@ -19,7 +20,6 @@ import (
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/ladon"
 	"github.com/stretchr/testify/assert"
-	"github.com/ory/dockertest"
 )
 
 var clientManagers = map[string]Storage{}

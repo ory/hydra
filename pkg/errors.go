@@ -3,9 +3,10 @@ package pkg
 import (
 	"reflect"
 
+	"net/http"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/pkg/errors"
-	"net/http"
 )
 
 var (

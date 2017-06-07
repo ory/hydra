@@ -51,6 +51,7 @@ community on [Gitter](https://gitter.im/ory-am/hydra). For advanced use cases, c
     - [Using Docker](#using-docker)
     - [Building from source](#building-from-source)
 - [Security](#security)
+- [Telemetry](#telemetry)
 - [Documentation](#documentation)
   - [Guide](#guide)
   - [HTTP API documentation](#http-api-documentation)
@@ -217,6 +218,11 @@ OAuth2 and OAuth2 related specifications are over 400 written pages. Implementin
 ORY Hydra is trusted by companies all around the world, has a vibrant community and faces millions of requests in production
 each day. Of course, we also compiled a security guide with more details on cryptography and security concepts.
 Read [the security guide now](https://ory.gitbooks.io/hydra/content/security.html).
+
+## Telemetry
+
+ORY Hydra collects summarized, anonymized telemetry which can optionally be turned off. Click [here](https://ory.gitbooks.io/hydra/content/telemetry.html)
+to learn more.
 
 ## Documentation
 

@@ -3,15 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"time"
-
 	"github.com/spf13/cobra"
-)
-
-var (
-	Version   = "dev-master"
-	BuildTime = time.Now().String()
-	GitHash   = "undefined"
 )
 
 // versionCmd represents the version command

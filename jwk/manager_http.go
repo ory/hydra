@@ -9,10 +9,10 @@ import (
 )
 
 type HTTPManager struct {
-	Client   *http.Client
-	Endpoint *url.URL
-	Dry      bool
-	FakeTLSTermination      bool
+	Client             *http.Client
+	Endpoint           *url.URL
+	Dry                bool
+	FakeTLSTermination bool
 }
 
 func (m *HTTPManager) CreateKeys(set, algorithm string) (*jose.JsonWebKeySet, error) {

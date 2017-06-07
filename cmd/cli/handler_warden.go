@@ -23,8 +23,8 @@ func newWardenHandler(c *config.Config) *WardenHandler {
 
 func (h *WardenHandler) IsAuthorized(cmd *cobra.Command, args []string) {
 	m := &oauth2.HTTPIntrospector{
-		Endpoint:           h.Config.Resolve("/oauth2/introspect"),
-		Client:             h.Config.OAuth2Client(cmd),
+		Endpoint: h.Config.Resolve("/oauth2/introspect"),
+		Client:   h.Config.OAuth2Client(cmd),
 	}
 
 	if len(args) != 1 {

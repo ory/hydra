@@ -12,9 +12,9 @@ import (
 )
 
 type HTTPManager struct {
-	Client   *http.Client
-	Endpoint *url.URL
-	Dry      bool
+	Client             *http.Client
+	Endpoint           *url.URL
+	Dry                bool
 	FakeTLSTermination bool
 }
 

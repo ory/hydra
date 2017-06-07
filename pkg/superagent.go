@@ -11,9 +11,9 @@ import (
 )
 
 type SuperAgent struct {
-	Client *http.Client
-	URL    string
-	Dry    bool
+	Client             *http.Client
+	URL                string
+	Dry                bool
 	FakeTLSTermination bool
 }
 

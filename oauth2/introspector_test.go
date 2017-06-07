@@ -46,7 +46,7 @@ func init() {
 			compose.OAuth2AuthorizeExplicitFactory,
 			compose.OAuth2TokenIntrospectionFactory,
 		),
-		H: herodot.NewJSONWriter(nil),
+		H:      herodot.NewJSONWriter(nil),
 		Issuer: "foobariss",
 	}
 	serv.SetRoutes(r)

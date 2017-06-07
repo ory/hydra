@@ -22,10 +22,10 @@ type jsonPolicy struct {
 }
 
 type HTTPManager struct {
-	Endpoint *url.URL
-	Dry      bool
-	FakeTLSTermination      bool
-	Client   *http.Client
+	Endpoint           *url.URL
+	Dry                bool
+	FakeTLSTermination bool
+	Client             *http.Client
 }
 
 // Create persists the policy.

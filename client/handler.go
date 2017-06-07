@@ -6,9 +6,9 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory/hydra/rand/sequence"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/firewall"
+	"github.com/ory/hydra/rand/sequence"
 	"github.com/ory/ladon"
 	"github.com/pkg/errors"
 )

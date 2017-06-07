@@ -1,12 +1,16 @@
 package health
 
 import (
-	"github.com/julienschmidt/httprouter"
 	"net/http"
+
+	"github.com/julienschmidt/httprouter"
+	"github.com/ory/herodot"
+	"github.com/ory/hydra/metrics"
 )
 
 type Handler struct {
-
+	Metrics *metrics.MetricsManager
+	H       *herodot.JSONWriter
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
@@ -21,5 +25,9 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //       204: emptyResponse
 //       500: genericError
 func (h *Handler) Health(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	rw.WriteHeader(http.StatusNoContent)
+	h.Metrics.UpdateUpTime()
+
+	h.Metrics.RLock()
+	defer h.Metrics.RUnlock()
+	h.H.Write(rw, r, h.Metrics)
 }

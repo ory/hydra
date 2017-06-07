@@ -7,6 +7,8 @@ import (
 	"runtime"
 	"strings"
 
+	"time"
+
 	"github.com/ory/hydra/cmd/cli"
 	"github.com/ory/hydra/config"
 	"github.com/spf13/cobra"
@@ -14,6 +16,12 @@ import (
 )
 
 var cfgFile string
+
+var (
+	Version   = "dev-master"
+	BuildTime = time.Now().String()
+	GitHash   = "undefined"
+)
 
 var c = new(config.Config)
 
@@ -32,6 +40,10 @@ var cmdHandler = cli.NewHandler(c)
 // Execute adds all child commands to the root command sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
+	c.BuildTime = BuildTime
+	c.BuildVersion = Version
+	c.BuildHash = GitHash
+
 	if err := RootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(-1)

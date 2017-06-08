@@ -2,6 +2,16 @@
 
 This file keeps track of questions and discussions from Gitter
 
+## Insufficient Entropy
+
+> Hey there , I am getting this error when I try request an access token "The request used a security parameter (e.g., anti-replay, anti-csrf) with insufficient entropy (minimum of 8 characters)"
+
+> Kareem Diaa @kimooz Jun 07 16:41  
+Hey there , I am getting this error when I try request an access token "The request used a security parameter (e.g., anti-replay, anti-csrf) with insufficient entropy (minimum of 8 characters)"
+
+> Aeneas @arekkas Jun 07 16:41  
+@kimooz make sure state and nonce are set in your auth code url (http://hydra/oauth2/auth?client_id=...&nonce=THIS_NEEDS_TO_BE_SET&state=THIS_ALSO_NEEDS_TO_BE_SET
+
 ## I get compile errors!
 
 > I would try deleting the vendor dir and glide’s files and try glide init again or clear Glide’s global cache.

@@ -39,7 +39,7 @@ func TestExecute(t *testing.T) {
 				return err != nil
 			},
 		},
-		{args: []string{"connect", "--url", "https://127.0.0.1:4444/", "--id", "admin", "--secret", "pw"}},
+		{args: []string{"connect", "--id", "admin", "--secret", "pw", "--url", "https://127.0.0.1:4444/"}},
 		{args: []string{"clients", "create", "--id", "foobarbaz"}},
 		{args: []string{"clients", "create", "--id", "public-foo", "--is-public"}},
 		{args: []string{"clients", "delete", "foobarbaz"}},

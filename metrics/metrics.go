@@ -1,6 +1,10 @@
 package metrics
 
-import "time"
+import (
+	"time"
+	"sync"
+	"runtime"
+)
 
 type Metrics struct {
 	Requests  uint64        `json:"requests,omitempty"`
@@ -31,12 +35,7 @@ func (h *HTTPMetrics) AddMethodRequest(method string) {
 }
 
 func (h *Metrics) AddLatency(latency time.Duration) {
-	if latency > time.Second*5 {
-		latency = time.Second * 5
-	}
-
-	// milliseconds / 10
-	h.Latencies[int64(latency/10)]++
+	h.Latencies[int64(latency)]++
 }
 
 func (h *HTTPMetrics) SizeMetrics(size int) *Metrics {
@@ -89,15 +88,70 @@ type PathMetrics struct {
 }
 
 type Snapshot struct {
+	sync.RWMutex
 	*Metrics
 	*HTTPMetrics
 	Paths map[string]*PathMetrics `json:"paths"`
+	ID           string `json:"id"`
+	UpTime       int64  `json:"uptime"`
+	start        time.Time          `json:"-"`
+	MemorySnapshot *MemorySnapshot `json:"memory"`
+}
+
+type MemorySnapshot struct {
+	Alloc uint64 `json:"alloc"`
+	TotalAlloc uint64 `json:"totalAlloc"`
+	Sys uint64 `json:"sys"`
+	Lookups uint64 `json:"lookups"`
+	Mallocs uint64 `json:"mallocs"`
+	Frees uint64 `json:"frees"`
+	HeapAlloc uint64 `json:"heapAlloc"`
+	HeapSys uint64 `json:"heapSys"`
+	HeapIdle uint64 `json:"heapIdle"`
+	HeapInuse uint64 `json:"heapInuse"`
+	HeapReleased uint64 `json:"heapReleased"`
+	HeapObjects uint64 `json:"heapObjects"`
+	NumGC uint32 `json:"numGC"`
 }
 
 func newMetrics() *Metrics {
 	return &Metrics{
 		Latencies: map[int64]int{},
 	}
+}
+
+func (sw *Snapshot) GetUpTime() int64 {
+	sw.Update()
+	sw.RLock()
+	defer sw.RUnlock()
+	return sw.UpTime
+}
+
+func (sw *Snapshot) Update()  {
+	sw.Lock()
+	defer sw.Unlock()
+
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
+
+	// sw.MemorySnapshot = &(MemorySnapshot(m))
+	sw.MemorySnapshot = &MemorySnapshot{
+		Alloc: m.Alloc,
+		TotalAlloc: m.TotalAlloc,
+		Sys: m.Sys,
+		Lookups: m.Lookups,
+		Mallocs: m.Mallocs,
+		Frees: m.Frees,
+		HeapAlloc: m.HeapAlloc,
+		HeapSys: m.HeapSys,
+		HeapIdle: m.HeapIdle,
+		HeapInuse: m.HeapInuse,
+		HeapReleased: m.HeapReleased,
+		HeapObjects: m.HeapObjects,
+		NumGC: m.NumGC,
+	}
+	sw.UpTime = int64(time.Now().Sub(sw.start) / time.Second)
+
 }
 
 func (s *Snapshot) Path(path string) *PathMetrics {

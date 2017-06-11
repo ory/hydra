@@ -16,12 +16,9 @@ import (
 
 type MetricsManager struct {
 	sync.RWMutex `json:"-"`
-	ID           string `json:"id"`
-	UpTime       int64  `json:"uptime"`
 	*Snapshot
 	Segment      *analytics.Client  `json:"-"`
 	Logger       logrus.FieldLogger `json:"-"`
-	start        time.Time          `json:"-"`
 	buildVersion string
 	buildHash    string
 	buildTime    string
@@ -31,23 +28,17 @@ func NewMetricsManager(l logrus.FieldLogger) *MetricsManager {
 	l.Info("Setting up telemetry - for more information please visit https://ory.gitbooks.io/hydra/content/telemetry.html")
 	mm := &MetricsManager{
 		Snapshot: &Snapshot{
+			MemorySnapshot: &MemorySnapshot{},
+			ID:      uuid.New(),
 			Metrics:     newMetrics(),
 			HTTPMetrics: newHttpMetrics(),
 			Paths:       map[string]*PathMetrics{},
+			start:   time.Now(),
 		},
-		ID:      uuid.New(),
 		Segment: analytics.New("JYilhx5zP8wrzfykUinXrSUbo5cRA3aA"),
 		Logger:  l,
-		start:   time.Now(),
 	}
 	return mm
-}
-
-func (sw *MetricsManager) UpdateUpTime() {
-	sw.Lock()
-	defer sw.Unlock()
-	sw.UpTime = int64(time.Now().Sub(sw.start) / time.Second)
-
 }
 
 const (

@@ -18,6 +18,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/health"
+	"encoding/json"
 )
 
 func TestMiddleware(t *testing.T) {
@@ -54,6 +55,10 @@ func TestMiddleware(t *testing.T) {
 	assert.EqualValues(t, i, mw.Snapshot.Requests)
 	assert.EqualValues(t, i, mw.Snapshot.Responses)
 
+	mw.Snapshot.Update()
+	assert.True(t, mw.Snapshot.UpTime > 0)
+	assert.True(t, mw.Snapshot.GetUpTime() > 0)
+
 	assert.EqualValues(t, 0, mw.Snapshot.Status[http.StatusOK].Requests)
 	assert.EqualValues(t, i, mw.Snapshot.Status[http.StatusOK].Responses)
 
@@ -66,8 +71,11 @@ func TestMiddleware(t *testing.T) {
 
 	assert.EqualValues(t, 1, mw.Snapshot.Path("/oauth2/introspect").Requests)
 
-	mw.UpdateUpTime()
+	mw.Update()
 	assert.NotEqual(t, 0, mw.UpTime)
+
+	out, _ := json.MarshalIndent(mw, "\t", "  ")
+	t.Logf("%s", out)
 }
 
 func TestRacyMiddleware(t *testing.T) {

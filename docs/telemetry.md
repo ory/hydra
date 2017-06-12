@@ -73,6 +73,7 @@ Additionally, the following data is submitted to us:
 * Total number of requests, responses, response latencies and response sizes per HTTP method.
 * Total number of requests, responses, response latencies and response sizes per anonymized API endpoint and HTTP method.
 * Total number of requests, responses, response latencies and response sizes per anonymized API endpoint.
+* Memory statistics such as heap allocations, gc cycles, and other.
 
 A raw data example can be found [here](https://github.com/ory/hydra/tree/master/docs/metrics/telemetry-example.json).
 

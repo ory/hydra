@@ -112,6 +112,8 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 		c.ConsentURL = fmt.Sprintf("%s://%s:%d/oauth2/consent", proto, host, c.BindPort)
 	}
 
+	var ctx = c.Context()
+
 	consentURL, err := url.Parse(c.ConsentURL)
 	pkg.Must(err, "Could not parse consent url %s.", c.ConsentURL)
 
@@ -124,6 +126,7 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 			DefaultChallengeLifespan: c.GetChallengeTokenLifespan(),
 			DefaultIDTokenLifespan:   c.GetIDTokenLifespan(),
 		},
+		Cleanser:            ctx.FositeStore,
 		ConsentURL:          *consentURL,
 		H:                   herodot.NewJSONWriter(c.GetLogger()),
 		AccessTokenLifespan: c.GetAccessTokenLifespan(),

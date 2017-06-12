@@ -23,4 +23,6 @@ type FositeStorer interface {
 	// is an access token, the server MAY revoke the respective refresh
 	// token as well.
 	RevokeAccessToken(ctx context.Context, requestID string) error
+
+	CleanseTokens(ctx context.Context) error
 }

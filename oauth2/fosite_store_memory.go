@@ -1,6 +1,7 @@
 package oauth2
 
 import (
+	"log"
 	"sync"
 
 	"context"
@@ -176,6 +177,17 @@ func (s *FositeMemoryStore) RevokeAccessToken(ctx context.Context, id string) er
 			}
 			found = true
 		}
+	}
+	if !found {
+		return errors.New("Not found")
+	}
+	return nil
+}
+
+func (s *FositeMemoryStore) CleanseTokens(ctx context.Context) error {
+	var found bool
+	for sig, token := range s.AccessTokens {
+		log.Println(sig, token)
 	}
 	if !found {
 		return errors.New("Not found")

@@ -31,6 +31,7 @@ const (
 	// IntrospectPath points to the OAuth2 introspection endpoint.
 	IntrospectPath = "/oauth2/introspect"
 	RevocationPath = "/oauth2/revoke"
+	CleansePath    = "/oauth2/cleanse"
 
 	consentCookieName = "consent_session"
 )
@@ -38,6 +39,8 @@ const (
 type Handler struct {
 	OAuth2  fosite.OAuth2Provider
 	Consent ConsentStrategy
+
+	Cleanser Cleanser
 
 	H herodot.Writer
 
@@ -110,6 +113,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET(ConsentPath, h.DefaultConsentHandler)
 	r.POST(IntrospectPath, h.IntrospectHandler)
 	r.POST(RevocationPath, h.RevocationHandler)
+	r.POST(CleansePath, h.CleanseHandler)
 	r.GET(WellKnownPath, h.WellKnownHandler)
 }
 
@@ -177,6 +181,33 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ ht
 	}
 
 	h.OAuth2.WriteRevocationResponse(w, err)
+}
+
+// swagger:route POST /oauth2/cleanse oauth2 cleanseOAuthToken
+//
+// Remove expired tokens from the database
+//
+// Usually used to avoid the database from growing too much with stuff that's
+// no longer used
+//
+//     Consumes:
+//     - application/x-www-form-urlencoded
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2:
+//
+//     Responses:
+//       200:
+//       401: genericError
+//       500: genericError
+func (h *Handler) CleanseHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	var ctx = fosite.NewContext()
+	h.Cleanser.CleanseTokens(ctx)
 }
 
 // swagger:route POST /oauth2/introspect oauth2 introspectOAuthToken

@@ -29,11 +29,11 @@ func NewMetricsManager(l logrus.FieldLogger) *MetricsManager {
 	mm := &MetricsManager{
 		Snapshot: &Snapshot{
 			MemorySnapshot: &MemorySnapshot{},
-			ID:      uuid.New(),
-			Metrics:     newMetrics(),
-			HTTPMetrics: newHttpMetrics(),
-			Paths:       map[string]*PathMetrics{},
-			start:   time.Now(),
+			ID:             uuid.New(),
+			Metrics:        newMetrics(),
+			HTTPMetrics:    newHttpMetrics(),
+			Paths:          map[string]*PathMetrics{},
+			start:          time.Now(),
 		},
 		Segment: analytics.New("JYilhx5zP8wrzfykUinXrSUbo5cRA3aA"),
 		Logger:  l,
@@ -89,6 +89,7 @@ func (sw *MetricsManager) TickKeepAlive() {
 func (sw *MetricsManager) CommitTelemetry() {
 	for {
 		time.Sleep(defaultWait)
+		sw.Update()
 		if err := sw.Segment.Track(&analytics.Track{
 			Event:       "telemetry",
 			AnonymousId: sw.ID,
@@ -102,6 +103,7 @@ func (sw *MetricsManager) CommitTelemetry() {
 				"status":    sw.Status,
 				"latencies": sw.Latencies,
 				"raw":       sw,
+				"memory":    sw.MemorySnapshot,
 			},
 			Context: map[string]interface{}{
 				"ip": "0.0.0.0",

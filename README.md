@@ -41,9 +41,10 @@ community on [Gitter](https://gitter.im/ory-am/hydra). For advanced use cases, c
 - [What is ORY Hydra?](#what-is-ory-hydra)
   - [ORY Hydra implements open standards](#ory-hydra-implements-open-standards)
 - [Sponsors & Adopters](#sponsors-&-adopters)
+  - [Sponsorship](#sponsorship)
+  - [Engineer membership](#engineer-membership)
   - [Sponsors](#sponsors)
   - [Adopters](#adopters)
-  - [Engineer membership](#engineer-membership)
 - [ORY Hydra for Enterprise](#ory-hydra-for-enterprise)
 - [Quickstart](#quickstart)
   - [5 minutes tutorial: Run your very own OAuth2 environment](#5-minutes-tutorial-run-your-very-own-oauth2-environment)
@@ -98,18 +99,35 @@ and the OpenID Foundation:
 
 ## Sponsors & Adopters
 
-This is a cureated list of Hydra sponsors and adopters. If you want to be on this list, [contact us](mailto:hi@ory.am).
+ORY Hydra is open source with a permissive license. We are a dedicated, young but also experienced team of developers
+in the area of cloud computing and internet security. Please support our mission for a safer web and become a sponsor, buy an
+engineer membership, or [tell us](mailto:hi@ory.am) why and how you are using ORY Hydra.
 
-### Sponsors
+### Sponsorship
 
 **[Become a ORY Hydra sponsor now](https://www.patreon.com/bePatron?c=581435&rid=1746199)** and help keep the project
 open source, free, and maintained. Additionally, sponsors unlock
 
-* exclusive access to private community.
-* featured logo & link in the readme and on the website.
+* Access to ORY's private community.
+* Featured logo & link in the readme and on the website.
 * placement in release announcements.
 
 Sponsorship starts at 600$ per month. We accept smaller contributions as well, but without the benefits listed above.
+
+### Engineer membership
+
+**[Get your engineer membership now](https://www.patreon.com/bePatron?c=581435&rid=1746211)**, gain priorization,
+and 1-1 support from our talented ORY Hydra engineers. Also included:
+
+* Private technical support from ORY Hydra engineers.
+* Access to ORY's to private community.
+* Prioritize bugs that are important to you.
+* Influence the feature roadmap.
+* As long as your membership is active, we guarantee maintenance of ORY Hydra.
+
+Engineer membership is 900$ per month.
+
+### Sponsors
 
 <img src="docs/images/sponsors/auth0.png" align="left" width="30%" alt="Auth0.com" />
 
@@ -121,7 +139,8 @@ every year. At ORY, we use [Auth0](https://auth0.com) in conjunction with ORY Hy
 
 ### Adopters
 
-ORY Hydra is battle-tested in production systems. This is a curated list of ORY Hydra adopters.
+ORY Hydra is battle-tested in production systems. This is a curated list of ORY Hydra adopters. [Tell us](mailto:hi@ory.am) if
+you think that your company should be listed here.
 
 <img src="https://www.arduino.cc/en/uploads/Trademark/ArduinoCommunityLogo.png" align="left" width="30%" alt="arduino.cc"/> 
 
@@ -129,19 +148,6 @@ ORY Hydra is battle-tested in production systems. This is a curated list of ORY 
 for anyone making interactive projects. ORY Hydra secures Arduino's developer platform.</p>
 
 <br clear="all"/>
-
-### Engineer membership
-
-**[Get your engineering membership now](https://www.patreon.com/bePatron?c=581435&rid=1746211)** and gain priorization,
-and 1-1 support from our talented ORY Hydra engineers. Additionally,
-
-* you get private technical support from ORY Hydra engineers.
-* you gain exclusive access to private community.
-* you unlock the ability to prioritize bugs.
-* you are able to influence the feature roadmap.
-* as long as your membership is active, we guarantee maintenance of ORY Hydra.
-
-Engineer membership is 900$ per month.
 
 ## ORY Hydra for Enterprise
 

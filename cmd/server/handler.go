@@ -77,7 +77,7 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 			},
 		})
 
-		pkg.Must(graceful.Graceful(func() error {
+		err := graceful.Graceful(func() error {
 			var err error
 			logger.Infof("Setting up http server on %s", c.GetAddress())
 			if c.ForceHTTP {
@@ -91,7 +91,8 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 			}
 
 			return err
-		}, srv.Shutdown), "Could not gracefully run server")
+		}, srv.Shutdown)
+		logger.WithError(err).Fatal("Could not gracefully run server")
 	}
 }
 

@@ -34,9 +34,6 @@ func init() {
 }
 
 func TestMain(m *testing.M) {
-	connectToPG()
-	connectToMySQL()
-
 	s := m.Run()
 	integration.KillAll()
 	os.Exit(s)
@@ -69,6 +66,12 @@ var defaultRequest = fosite.Request{
 	GrantedScopes: fosite.Arguments{"fa", "ba"},
 	Form:          url.Values{"foo": []string{"bar", "baz"}},
 	Session:       &fosite.DefaultSession{Subject: "bar"},
+}
+
+// This needs to be the first test!!
+func TestConnectToStores(t *testing.T) {
+	connectToPG()
+	connectToMySQL()
 }
 
 func TestCreateGetDeleteAuthorizeCodes(t *testing.T) {

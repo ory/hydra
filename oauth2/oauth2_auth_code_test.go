@@ -17,6 +17,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
+	"github.com/stretchr/testify/assert"
+	"net/url"
+	"strings"
 )
 
 func TestAuthCode(t *testing.T) {
@@ -44,7 +47,7 @@ func TestAuthCode(t *testing.T) {
 			"exp": time.Now().Add(time.Hour).Unix(),
 			"iat": time.Now().Unix(),
 			"aud": "app-client",
-			"scp": []string{"hydra"},
+			"scp": []string{"hydra", "offline"},
 		})
 		pkg.RequireError(t, false, err)
 
@@ -71,6 +74,27 @@ func TestAuthCode(t *testing.T) {
 	require.True(t, validConsent)
 	require.NotEmpty(t, code)
 
-	_, err = oauthConfig.Exchange(oauth2.NoContext, code)
+	token, err := oauthConfig.Exchange(oauth2.NoContext, code)
 	pkg.RequireError(t, false, err, code)
+
+	time.Sleep(time.Second * 5)
+
+	res, err := testRefresh(t, token)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+}
+
+func testRefresh(t *testing.T, token *oauth2.Token) (*http.Response, error) {
+	// refresh
+	assert.False(t, token.Valid())
+	req, err := http.NewRequest("POST", oauthClientConfig.TokenURL, strings.NewReader(url.Values{
+		"grant_type":    []string{"refresh_token"},
+		"refresh_token": []string{token.RefreshToken},
+	}.Encode()))
+	require.NoError(t, err)
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth(oauthClientConfig.ClientID, oauthClientConfig.ClientSecret)
+
+	return http.DefaultClient.Do(req)
 }

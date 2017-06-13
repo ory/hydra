@@ -36,7 +36,10 @@ var store = &FositeMemoryStore{
 var keyManager = &jwk.MemoryManager{}
 var keyGenerator = &jwk.RS256Generator{}
 
-var fc = &compose.Config{}
+var fc = &compose.Config{
+	AccessTokenLifespan: time.Second,
+}
+
 var handler = &Handler{
 	OAuth2: compose.Compose(
 		fc,
@@ -82,9 +85,10 @@ func init() {
 	ts = httptest.NewServer(router)
 
 	handler.SetRoutes(router)
+	h, _ := hasher.Hash([]byte("secret"))
 	store.Manager.(*hc.MemoryManager).Clients["app"] = hc.Client{
 		ID:            "app",
-		Secret:        "secret",
+		Secret:        string(h),
 		RedirectURIs:  []string{ts.URL + "/callback"},
 		ResponseTypes: []string{"id_token", "code", "token"},
 		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
@@ -94,7 +98,6 @@ func init() {
 	c, _ := url.Parse(ts.URL + "/consent")
 	handler.ConsentURL = *c
 
-	h, _ := hasher.Hash([]byte("secret"))
 	store.Manager.(*hc.MemoryManager).Clients["app-client"] = hc.Client{
 		ID:            "app-client",
 		Secret:        string(h),

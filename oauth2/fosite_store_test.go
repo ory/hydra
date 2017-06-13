@@ -59,15 +59,6 @@ func connectToMySQL() {
 	clientManagers["mysql"] = s
 }
 
-var defaultRequest = fosite.Request{
-	RequestedAt:   time.Now().Round(time.Second),
-	Client:        &client.Client{ID: "foobar"},
-	Scopes:        fosite.Arguments{"fa", "ba"},
-	GrantedScopes: fosite.Arguments{"fa", "ba"},
-	Form:          url.Values{"foo": []string{"bar", "baz"}},
-	Session:       &fosite.DefaultSession{Subject: "bar"},
-}
-
 // This needs to be the first test!!
 func TestConnectToStores(t *testing.T) {
 	connectToPG()
@@ -75,52 +66,14 @@ func TestConnectToStores(t *testing.T) {
 }
 
 func TestCreateGetDeleteAuthorizeCodes(t *testing.T) {
-	ctx := context.Background()
 	for k, m := range clientManagers {
-		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
-			_, err := m.GetAuthorizeCodeSession(ctx, "4321", &fosite.DefaultSession{})
-			assert.NotNil(t, err)
-
-			err = m.CreateAuthorizeCodeSession(ctx, "4321", &defaultRequest)
-			require.Nil(t, err)
-
-			res, err := m.GetAuthorizeCodeSession(ctx, "4321", &fosite.DefaultSession{})
-			require.Nil(t, err)
-			AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
-
-			err = m.DeleteAuthorizeCodeSession(ctx, "4321")
-			require.Nil(t, err)
-
-			time.Sleep(100 * time.Millisecond)
-
-			_, err = m.GetAuthorizeCodeSession(ctx, "4321", &fosite.DefaultSession{})
-			assert.NotNil(t, err)
-		})
+		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeleteAuthorizeCodes(m))
 	}
 }
 
 func TestCreateGetDeleteAccessTokenSession(t *testing.T) {
-	ctx := context.Background()
 	for k, m := range clientManagers {
-		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
-			_, err := m.GetAccessTokenSession(ctx, "4321", &fosite.DefaultSession{})
-			assert.NotNil(t, err)
-
-			err = m.CreateAccessTokenSession(ctx, "4321", &defaultRequest)
-			require.Nil(t, err)
-
-			res, err := m.GetAccessTokenSession(ctx, "4321", &fosite.DefaultSession{})
-			require.Nil(t, err)
-			AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
-
-			err = m.DeleteAccessTokenSession(ctx, "4321")
-			require.Nil(t, err)
-
-			time.Sleep(100 * time.Millisecond)
-
-			_, err = m.GetAccessTokenSession(ctx, "4321", &fosite.DefaultSession{})
-			assert.NotNil(t, err)
-		})
+		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeleteAccessTokenSession(m))
 	}
 }
 

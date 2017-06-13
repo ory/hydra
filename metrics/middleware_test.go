@@ -15,10 +15,11 @@ import (
 	"math/rand"
 	"time"
 
+	"encoding/json"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/health"
-	"encoding/json"
 )
 
 func TestMiddleware(t *testing.T) {

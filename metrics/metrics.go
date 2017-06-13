@@ -1,9 +1,9 @@
 package metrics
 
 import (
-	"time"
-	"sync"
 	"runtime"
+	"sync"
+	"time"
 )
 
 type Metrics struct {
@@ -91,27 +91,27 @@ type Snapshot struct {
 	sync.RWMutex
 	*Metrics
 	*HTTPMetrics
-	Paths map[string]*PathMetrics `json:"paths"`
-	ID           string `json:"id"`
-	UpTime       int64  `json:"uptime"`
-	start        time.Time          `json:"-"`
-	MemorySnapshot *MemorySnapshot `json:"memory"`
+	Paths          map[string]*PathMetrics `json:"paths"`
+	ID             string                  `json:"id"`
+	UpTime         int64                   `json:"uptime"`
+	start          time.Time               `json:"-"`
+	MemorySnapshot *MemorySnapshot         `json:"memory"`
 }
 
 type MemorySnapshot struct {
-	Alloc uint64 `json:"alloc"`
-	TotalAlloc uint64 `json:"totalAlloc"`
-	Sys uint64 `json:"sys"`
-	Lookups uint64 `json:"lookups"`
-	Mallocs uint64 `json:"mallocs"`
-	Frees uint64 `json:"frees"`
-	HeapAlloc uint64 `json:"heapAlloc"`
-	HeapSys uint64 `json:"heapSys"`
-	HeapIdle uint64 `json:"heapIdle"`
-	HeapInuse uint64 `json:"heapInuse"`
+	Alloc        uint64 `json:"alloc"`
+	TotalAlloc   uint64 `json:"totalAlloc"`
+	Sys          uint64 `json:"sys"`
+	Lookups      uint64 `json:"lookups"`
+	Mallocs      uint64 `json:"mallocs"`
+	Frees        uint64 `json:"frees"`
+	HeapAlloc    uint64 `json:"heapAlloc"`
+	HeapSys      uint64 `json:"heapSys"`
+	HeapIdle     uint64 `json:"heapIdle"`
+	HeapInuse    uint64 `json:"heapInuse"`
 	HeapReleased uint64 `json:"heapReleased"`
-	HeapObjects uint64 `json:"heapObjects"`
-	NumGC uint32 `json:"numGC"`
+	HeapObjects  uint64 `json:"heapObjects"`
+	NumGC        uint32 `json:"numGC"`
 }
 
 func newMetrics() *Metrics {
@@ -127,7 +127,7 @@ func (sw *Snapshot) GetUpTime() int64 {
 	return sw.UpTime
 }
 
-func (sw *Snapshot) Update()  {
+func (sw *Snapshot) Update() {
 	sw.Lock()
 	defer sw.Unlock()
 
@@ -136,19 +136,19 @@ func (sw *Snapshot) Update()  {
 
 	// sw.MemorySnapshot = &(MemorySnapshot(m))
 	sw.MemorySnapshot = &MemorySnapshot{
-		Alloc: m.Alloc,
-		TotalAlloc: m.TotalAlloc,
-		Sys: m.Sys,
-		Lookups: m.Lookups,
-		Mallocs: m.Mallocs,
-		Frees: m.Frees,
-		HeapAlloc: m.HeapAlloc,
-		HeapSys: m.HeapSys,
-		HeapIdle: m.HeapIdle,
-		HeapInuse: m.HeapInuse,
+		Alloc:        m.Alloc,
+		TotalAlloc:   m.TotalAlloc,
+		Sys:          m.Sys,
+		Lookups:      m.Lookups,
+		Mallocs:      m.Mallocs,
+		Frees:        m.Frees,
+		HeapAlloc:    m.HeapAlloc,
+		HeapSys:      m.HeapSys,
+		HeapIdle:     m.HeapIdle,
+		HeapInuse:    m.HeapInuse,
 		HeapReleased: m.HeapReleased,
-		HeapObjects: m.HeapObjects,
-		NumGC: m.NumGC,
+		HeapObjects:  m.HeapObjects,
+		NumGC:        m.NumGC,
 	}
 	sw.UpTime = int64(time.Now().Sub(sw.start) / time.Second)
 

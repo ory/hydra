@@ -3,7 +3,6 @@ package oauth2
 import (
 	"context"
 	"fmt"
-	"net/url"
 	"os"
 	"testing"
 	"time"

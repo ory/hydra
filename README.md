@@ -43,6 +43,7 @@ community on [Gitter](https://gitter.im/ory-am/hydra). For advanced use cases, c
 - [Sponsors & Adopters](#sponsors-&-adopters)
   - [Sponsors](#sponsors)
   - [Adopters](#adopters)
+  - [Engineer membership](#engineer-membership)
 - [ORY Hydra for Enterprise](#ory-hydra-for-enterprise)
 - [Quickstart](#quickstart)
   - [5 minutes tutorial: Run your very own OAuth2 environment](#5-minutes-tutorial-run-your-very-own-oauth2-environment)
@@ -101,6 +102,15 @@ This is a cureated list of Hydra sponsors and adopters. If you want to be on thi
 
 ### Sponsors
 
+**[Become a ORY Hydra sponsor now](https://www.patreon.com/bePatron?c=581435&rid=1746199)** and help keep the project
+open source, free, and maintained. Additionally, sponsors unlock
+
+* exclusive access to private community.
+* featured logo & link in the readme and on the website.
+* placement in release announcements.
+
+Sponsorship starts at 600$ per month. We accept smaller contributions as well, but without the benefits listed above.
+
 <img src="docs/images/sponsors/auth0.png" align="left" width="30%" alt="Auth0.com" />
 
 We are proud to have [Auth0](https://auth0.com) as a **gold sponsor** for ORY Hydra. [Auth0](https://auth0.com) solves
@@ -119,6 +129,19 @@ ORY Hydra is battle-tested in production systems. This is a curated list of ORY 
 for anyone making interactive projects. ORY Hydra secures Arduino's developer platform.</p>
 
 <br clear="all"/>
+
+### Engineer membership
+
+**[Get your engineering membership now](https://www.patreon.com/bePatron?c=581435&rid=1746211)** and gain priorization,
+and 1-1 support from our talented ORY Hydra engineers. Additionally,
+
+* you get private technical support from ORY Hydra engineers.
+* you gain exclusive access to private community.
+* you unlock the ability to prioritize bugs.
+* you are able to influence the feature roadmap.
+* as long as your membership is active, we guarantee maintenance of ORY Hydra.
+
+Engineer membership is 900$ per month.
 
 ## ORY Hydra for Enterprise
 

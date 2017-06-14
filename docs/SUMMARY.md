@@ -53,6 +53,7 @@
   - [How can I disable HTTPS for testing?](faq.md#how-can-i-disable-https-for-testing)
   - [MySQL gives `unsupported Scan, storing driver.Value type []uint8 into type *time.Time`](faq.md#mysql-gives-unsupported-scan-storing-drivervalue-type-uint8-into-type-timetime)
   - [Insufficient Entropy](faq.md#insufficient-entropy)
+  - [The docker image exists immediately](faq.md#the-docker-image-exists-immediately)
   - [I get compile errors!](faq.md#i-get-compile-errors)
   - [Is JWT supported?](faq.md#is-jwt-supported)
   - [Refreshing tokens](faq.md#refreshing-tokens)

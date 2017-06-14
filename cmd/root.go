@@ -91,6 +91,9 @@ func initConfig() {
 	viper.BindEnv("CONSENT_URL")
 	viper.SetDefault("CONSENT_URL", "")
 
+	viper.BindEnv("DATABASE_PLUGIN")
+	viper.SetDefault("DATABASE_PLUGIN", "")
+
 	viper.BindEnv("DATABASE_URL")
 	viper.SetDefault("DATABASE_URL", "")
 

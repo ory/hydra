@@ -8,6 +8,7 @@ docker-compose run --rm --no-deps --entrypoint \
      data/clients/bridg-admin.json
      data/clients/bridg-analytics.json
      data/clients/bridg-api-gateway.json
+     data/clients/bridg-audience-export-group.json
      data/clients/bridg-iam.json
      data/clients/bridg-insights.json
      data/clients/bridg-login.json
@@ -43,6 +44,7 @@ docker-compose run --rm --no-deps --entrypoint \
    /go/bin/hydra policies create -f data/policies/bridg-admin-search.json &&
    /go/bin/hydra policies create -f data/policies/bridg-analytics.json &&
    /go/bin/hydra policies create -f data/policies/bridg-api-gateway.json &&
+   /go/bin/hydra policies create -f data/policies/bridg-audience-export-group.json &&
    /go/bin/hydra policies create -f data/policies/bridg-iam.json &&
    /go/bin/hydra policies create -f data/policies/bridg-login.json &&
    /go/bin/hydra policies create -f data/policies/elastic-search.json &&

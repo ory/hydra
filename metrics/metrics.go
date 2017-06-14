@@ -127,10 +127,7 @@ func (sw *Snapshot) GetUpTime() int64 {
 	return sw.UpTime
 }
 
-func (sw *Snapshot) Update() {
-	sw.Lock()
-	defer sw.Unlock()
-
+func (sw *Snapshot) Update()  {
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
 
@@ -150,6 +147,7 @@ func (sw *Snapshot) Update() {
 		HeapObjects:  m.HeapObjects,
 		NumGC:        m.NumGC,
 	}
+
 	sw.UpTime = int64(time.Now().Sub(sw.start) / time.Second)
 
 }

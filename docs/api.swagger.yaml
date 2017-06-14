@@ -1696,7 +1696,7 @@ paths:
         - name: Body
           in: body
           schema:
-            $ref: '#/definitions/wardenAccessRequest'
+            $ref: '#/definitions/wardenTokenAllowedBody'
       responses:
         '200':
           $ref: '#/responses/wardenTokenAllowedResponse'
@@ -2541,6 +2541,83 @@ definitions:
         format: int64
         x-go-name: ID
     x-go-package: github.com/ory/hydra/policy
+  swaggerWardenAllowedParameters:
+    type: object
+    properties:
+      Body:
+        $ref: '#/definitions/allowedRequest'
+    x-go-package: github.com/ory/hydra/warden
+  swaggerWardenAllowedResponse:
+    description: The allowed response
+    type: object
+    properties:
+      Body:
+        description: 'in: body'
+        type: object
+        properties:
+          allowed:
+            description: Allowed is true if the request is allowed or false otherwise
+            type: boolean
+            x-go-name: Allowed
+    x-go-package: github.com/ory/hydra/warden
+  swaggerWardenTokenAllowedParameters:
+    type: object
+    properties:
+      Body:
+        $ref: '#/definitions/wardenTokenAllowedBody'
+    x-go-package: github.com/ory/hydra/warden
+  swaggerWardenTokenAllowedResponse:
+    description: The token allowed response
+    type: object
+    properties:
+      Body:
+        description: 'in: body'
+        type: object
+        properties:
+          allowed:
+            description: Allowed is true if the request is allowed or false otherwise
+            type: boolean
+            x-go-name: Allowed
+          aud:
+            description: >-
+              Audience is who the token was issued for. This is an OAuth2 app
+              usually.
+            type: string
+            x-go-name: Audience
+          exp:
+            description: ExpiresAt is the expiry timestamp.
+            x-go-name: ExpiresAt
+          ext:
+            description: Extra represents arbitrary session data.
+            type: object
+            additionalProperties:
+              type: object
+            x-go-name: Extra
+          iat:
+            description: IssuedAt is the token creation time stamp.
+            x-go-name: IssuedAt
+          iss:
+            description: 'Issuer is the id of the issuer, typically an hydra instance.'
+            type: string
+            x-go-name: Issuer
+          scopes:
+            description: >-
+              GrantedScopes is a list of scopes that the subject authorized when
+              asked for consent.
+            type: array
+            items:
+              type: string
+            x-go-name: GrantedScopes
+          sub:
+            description: >-
+              Subject is the identity that authorized issuing the token, for
+              example a user or an OAuth2 app.
+
+              This is usually a uuid but you can choose a urn or some other id
+              too.
+            type: string
+            x-go-name: Subject
+    x-go-package: github.com/ory/hydra/warden
   tokenAllowedRequest:
     type: object
     properties:
@@ -2560,7 +2637,7 @@ definitions:
         x-go-name: Resource
     x-go-name: TokenAccessRequest
     x-go-package: github.com/ory/hydra/firewall
-  wardenAccessRequest:
+  wardenTokenAllowedBody:
     type: object
     properties:
       action:
@@ -2578,13 +2655,16 @@ definitions:
         type: string
         x-go-name: Resource
       scopes:
+        description: Scopes is an array of scopes that are requried.
         type: array
         items:
           type: string
         x-go-name: Scopes
       token:
+        description: Token is the token to introspect.
         type: string
         x-go-name: Token
+    x-go-name: swaggerWardenTokenAllowedBody
     x-go-package: github.com/ory/hydra/warden
 responses:
   clientsList:

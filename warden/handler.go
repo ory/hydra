@@ -21,7 +21,10 @@ const (
 )
 
 type wardenAuthorizedRequest struct {
+	// Scopes is an array of scopes that are requried.
 	Scopes []string `json:"scopes"`
+
+	// Token is the token to introspect.
 	Token  string   `json:"token"`
 }
 

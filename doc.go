@@ -23,7 +23,7 @@
 //     - application/json
 //
 //     SecurityDefinitions:
-//     - oauth2:
+//     oauth2:
 //         type: oauth2
 //         authorizationUrl: /oauth2/auth
 //         tokenUrl: /oauth2/token

@@ -1,0 +1,25 @@
+{
+  "id": "bridg-audience-export-group",
+  "client_secret": "bridg-audience-export-group",
+  "client_name": "Bridg Audience Export Group Application",
+  "redirect_uris": [
+    ""
+  ],
+  "grant_types": [
+    "client_credentials"
+  ],
+  "response_types": [
+    ""
+  ],
+  "scope": "bridg hydra",
+  "owner": "eng@bridg.com",
+  "policy_uri": "",
+  "tos_uri": "",
+  "client_uri": "",
+  "logo_uri": "",
+  "contacts": [
+    "eric@bridg.com",
+    "ticean@bridg.com"
+  ],
+  "public": false
+}

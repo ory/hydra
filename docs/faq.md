@@ -1,3 +1,7 @@
+# FAQ
+
+This file keeps track of questions and discussions from Gitter and general help with various issues.
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
@@ -25,10 +29,6 @@
 - [Recovering root client access](#recovering-root-client-access)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-# FAQ
-
-This file keeps track of questions and discussions from Gitter and general help with various issues.
 
 ## How can I control SQL connection limits?
 

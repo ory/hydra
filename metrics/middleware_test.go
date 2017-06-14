@@ -72,8 +72,10 @@ func TestMiddleware(t *testing.T) {
 
 	assert.EqualValues(t, 1, mw.Snapshot.Path("/oauth2/introspect").Requests)
 
+	mw.Lock()
 	mw.Update()
 	assert.NotEqual(t, 0, mw.UpTime)
+	mw.Unlock()
 
 	out, _ := json.MarshalIndent(mw, "\t", "  ")
 	t.Logf("%s", out)

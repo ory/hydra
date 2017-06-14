@@ -34,7 +34,7 @@ func TestHelperClientAuthenticate(k string, m Manager) func(t *testing.T) {
 		require.NotNil(t, err)
 
 		c, err = m.Authenticate("1234321", []byte("secret"))
-		require.Error(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, "1234321", c.ID)
 	}
 }

@@ -85,8 +85,6 @@ func TestAuthCode(t *testing.T) {
 }
 
 func testRefresh(t *testing.T, token *oauth2.Token) (*http.Response, error) {
-	// refresh
-	assert.False(t, token.Valid())
 	req, err := http.NewRequest("POST", oauthClientConfig.TokenURL, strings.NewReader(url.Values{
 		"grant_type":    []string{"refresh_token"},
 		"refresh_token": []string{token.RefreshToken},

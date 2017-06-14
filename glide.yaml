@@ -21,7 +21,7 @@ import:
 - package: github.com/oleiade/reflections
   version: 1.0.0
 - package: github.com/ory/fosite
-  version: 0.9.4
+  version: 0.9.5
   subpackages:
   - compose
   - handler/oauth2
@@ -34,7 +34,7 @@ import:
 - package: github.com/ory/herodot
   version: 0.0.3
 - package: github.com/ory/ladon
-  version: 0.7.4
+  version: 0.7.6
   subpackages:
   - manager/memory
   - manager/sql

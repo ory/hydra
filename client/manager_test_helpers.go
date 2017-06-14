@@ -2,9 +2,11 @@ package client
 
 import (
 	"testing"
-	"github.com/stretchr/testify/assert"
 	"time"
+
 	"github.com/ory/fosite"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
@@ -14,9 +16,26 @@ func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
 			RedirectURIs:      []string{"http://redirect"},
 			TermsOfServiceURI: "foo",
 		}
-		assert.Nil(t, m.CreateClient(c))
+		assert.NoError(t, m.CreateClient(c))
 		assert.NotEmpty(t, c.ID)
-		assert.Nil(t, m.DeleteClient(c.ID))
+		assert.NoError(t, m.DeleteClient(c.ID))
+	}
+}
+
+func TestHelperClientAuthenticate(k string, m Manager) func(t *testing.T) {
+	return func(t *testing.T) {
+		m.CreateClient(&Client{
+			ID:           "1234321",
+			Secret:       "secret",
+			RedirectURIs: []string{"http://redirect"},
+		})
+
+		c, err := m.Authenticate("1234321", []byte("secret1"))
+		require.NotNil(t, err)
+
+		c, err = m.Authenticate("1234321", []byte("secret"))
+		require.NoError(t, err)
+		assert.Equal(t, "1234321", c.ID)
 	}
 }
 
@@ -32,8 +51,9 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 			RedirectURIs:      []string{"http://redirect"},
 			TermsOfServiceURI: "foo",
 		}
+
 		err = m.CreateClient(c)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		if err == nil {
 			compare(t, c, k)
 		}
@@ -45,19 +65,20 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 			RedirectURIs:      []string{"http://redirect"},
 			TermsOfServiceURI: "foo",
 		})
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 
 		// RethinkDB delay
 		time.Sleep(100 * time.Millisecond)
 
 		d, err := m.GetClient(nil, "1234")
-		assert.Nil(t, err)
+		assert.NoError(t, err)
+
 		if err == nil {
 			compare(t, d, k)
 		}
 
 		ds, err := m.GetClients()
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		assert.Len(t, ds, 2)
 		assert.NotEqual(t, ds["1234"].ID, ds["2-1234"].ID)
 
@@ -68,11 +89,11 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 			RedirectURIs:      []string{"http://redirect/new"},
 			TermsOfServiceURI: "bar",
 		})
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		time.Sleep(100 * time.Millisecond)
 
 		nc, err := m.GetConcreteClient("2-1234")
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 
 		if k != "http" {
 			// http always returns an empty secret
@@ -84,7 +105,7 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 		assert.Zero(t, len(nc.Contacts))
 
 		err = m.DeleteClient("1234")
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 
 		// RethinkDB delay
 		time.Sleep(100 * time.Millisecond)

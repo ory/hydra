@@ -16,9 +16,7 @@ import (
 	. "github.com/ory/hydra/client"
 	"github.com/ory/hydra/compose"
 	"github.com/ory/hydra/integration"
-	"github.com/ory/hydra/pkg"
 	"github.com/ory/ladon"
-	"github.com/stretchr/testify/assert"
 )
 
 var clientManagers = map[string]Storage{}
@@ -103,18 +101,8 @@ func TestAuthenticateClient(t *testing.T) {
 		Clients: map[string]Client{},
 		Hasher:  &fosite.BCrypt{},
 	}
-	mem.CreateClient(&Client{
-		ID:           "1234",
-		Secret:       "secret",
-		RedirectURIs: []string{"http://redirect"},
-	})
 
-	c, err := mem.Authenticate("1234", []byte("secret1"))
-	pkg.AssertError(t, true, err)
-
-	c, err = mem.Authenticate("1234", []byte("secret"))
-	pkg.AssertError(t, false, err)
-	assert.Equal(t, "1234", c.ID)
+	TestHelperClientAuthenticate("", mem)(t)
 }
 
 func TestCreateGetDeleteClient(t *testing.T) {

@@ -17,8 +17,6 @@ import (
 	"github.com/ory/hydra/integration"
 	. "github.com/ory/hydra/warden/group"
 	"github.com/ory/ladon"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 var clientManagers = map[string]Manager{}
@@ -88,43 +86,6 @@ func connectToPG() {
 
 func TestManagers(t *testing.T) {
 	for k, m := range clientManagers {
-		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
-			_, err := m.GetGroup("4321")
-			assert.NotNil(t, err)
-
-			c := &Group{
-				ID:      "1",
-				Members: []string{"bar", "foo"},
-			}
-			assert.Nil(t, m.CreateGroup(c))
-			assert.Nil(t, m.CreateGroup(&Group{
-				ID:      "2",
-				Members: []string{"foo"},
-			}))
-
-			d, err := m.GetGroup("1")
-			require.Nil(t, err)
-			assert.EqualValues(t, c.Members, d.Members)
-			assert.EqualValues(t, c.ID, d.ID)
-
-			ds, err := m.FindGroupNames("foo")
-			require.Nil(t, err)
-			assert.Len(t, ds, 2)
-
-			assert.Nil(t, m.AddGroupMembers("1", []string{"baz"}))
-
-			ds, err = m.FindGroupNames("baz")
-			require.Nil(t, err)
-			assert.Len(t, ds, 1)
-
-			assert.Nil(t, m.RemoveGroupMembers("1", []string{"baz"}))
-			ds, err = m.FindGroupNames("baz")
-			require.Nil(t, err)
-			assert.Len(t, ds, 0)
-
-			assert.Nil(t, m.DeleteGroup("1"))
-			_, err = m.GetGroup("1")
-			require.NotNil(t, err)
-		})
+		t.Run(fmt.Sprintf("case=%s", k), TestHelperManagers(m))
 	}
 }

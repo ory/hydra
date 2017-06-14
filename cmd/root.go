@@ -110,7 +110,7 @@ func initConfig() {
 	viper.SetDefault("PORT", 4444)
 
 	viper.BindEnv("ISSUER")
-	viper.SetDefault("ISSUER", "hydra.localhost")
+	viper.SetDefault("ISSUER", "http://localhost:4444")
 
 	viper.BindEnv("BCRYPT_COST")
 	viper.SetDefault("BCRYPT_COST", 10)

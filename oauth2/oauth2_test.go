@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
@@ -67,6 +68,7 @@ var handler = &Handler{
 	},
 	CookieStore: sessions.NewCookieStore([]byte("foo-secret")),
 	ForcedHTTP:  true,
+	L:           logrus.New(),
 }
 
 var router = httprouter.New()
@@ -83,6 +85,8 @@ func init() {
 	pkg.Must(err, "")
 	keyManager.AddKeySet(ConsentEndpointKey, keys)
 	ts = httptest.NewServer(router)
+
+	handler.Issuer = ts.URL
 
 	handler.SetRoutes(router)
 	h, _ := hasher.Hash([]byte("secret"))

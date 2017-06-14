@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"os"
 
@@ -36,6 +37,17 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		}
 		serverHandler.registerRoutes(router)
 		c.ForceHTTP, _ = cmd.Flags().GetBool("dangerous-force-http")
+
+		if !c.ForceHTTP {
+			if c.Issuer == "" {
+				logger.Fatalln("Issuer must be explicitly specified unless --dangerous-force-http is passed.")
+			}
+			issuer, err := url.Parse(c.Issuer)
+			pkg.Must(err, "Could not parse issuer URL: %s", err)
+			if issuer.Scheme != "https" {
+				logger.Fatalln("Issuer must use HTTPS unless --dangerous-force-http is passed.")
+			}
+		}
 
 		if c.ClusterURL == "" {
 			proto := "https"

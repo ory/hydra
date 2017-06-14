@@ -2,7 +2,6 @@ package client
 
 import (
 	"testing"
-	"time"
 
 	"github.com/ory/fosite"
 	"github.com/stretchr/testify/assert"
@@ -52,23 +51,18 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 			TermsOfServiceURI: "foo",
 		}
 
-		err = m.CreateClient(c)
-		assert.NoError(t, err)
+		assert.NoError(t, m.CreateClient(c))
 		if err == nil {
 			compare(t, c, k)
 		}
 
-		err = m.CreateClient(&Client{
+		assert.NoError(t, m.CreateClient(&Client{
 			ID:                "2-1234",
 			Name:              "name",
 			Secret:            "secret",
 			RedirectURIs:      []string{"http://redirect"},
 			TermsOfServiceURI: "foo",
-		})
-		assert.NoError(t, err)
-
-		// RethinkDB delay
-		time.Sleep(100 * time.Millisecond)
+		}))
 
 		d, err := m.GetClient(nil, "1234")
 		assert.NoError(t, err)
@@ -90,7 +84,6 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 			TermsOfServiceURI: "bar",
 		})
 		assert.NoError(t, err)
-		time.Sleep(100 * time.Millisecond)
 
 		nc, err := m.GetConcreteClient("2-1234")
 		assert.NoError(t, err)
@@ -106,9 +99,6 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 
 		err = m.DeleteClient("1234")
 		assert.NoError(t, err)
-
-		// RethinkDB delay
-		time.Sleep(100 * time.Millisecond)
 
 		_, err = m.GetClient(nil, "1234")
 		assert.NotNil(t, err)

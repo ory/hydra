@@ -20,6 +20,7 @@ func TestExecute(t *testing.T) {
 	var path = filepath.Join(os.TempDir(), fmt.Sprintf("hydra-%s.yml", uuid.New()))
 	os.Setenv("DATABASE_URL", "memory")
 	os.Setenv("FORCE_ROOT_CLIENT_CREDENTIALS", "admin:pw")
+	os.Setenv("ISSUER", "https://localhost:4444/")
 	copy(osArgs, os.Args)
 
 	for _, c := range []struct {

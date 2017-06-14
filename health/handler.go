@@ -25,9 +25,9 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //       204: emptyResponse
 //       500: genericError
 func (h *Handler) Health(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	h.Metrics.Update()
-
 	h.Metrics.Lock()
 	defer h.Metrics.Unlock()
+
+	h.Metrics.Update()
 	h.H.Write(rw, r, h.Metrics)
 }

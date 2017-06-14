@@ -2,6 +2,22 @@
 
 This file keeps track of questions and discussions from Gitter
 
+## MySQL gives `unsupported Scan, storing driver.Value type []uint8 into type *time.Time`
+
+> did a quick test to get mysql running, but run into migrate sql issue - seems mysql related
+An error occurred while running the migrations: Could not apply ladon SQL migrations: Could not migrate sql schema, applied 0 migrations: sql: Scan error on column index 0: unsupported Scan, storing driver.Value type []uint8 into type *time.Time
+is this a known bug ? or any specific mysql version which is required (running 5.7) ?
+
+```
+$ hydra help host
+...
+   - MySQL: If DATABASE_URL is a DSN starting with mysql:// MySQL will be used as storage backend.
+        Example: DATABASE_URL=mysql://user:password@tcp(host:123)/database?parseTime=true
+
+        Be aware that the ?parseTime=true parameter is mandatory, or timestamps will not work.
+...
+```
+
 ## Insufficient Entropy
 
 > Hey there , I am getting this error when I try request an access token "The request used a security parameter (e.g., anti-replay, anti-csrf) with insufficient entropy (minimum of 8 characters)"

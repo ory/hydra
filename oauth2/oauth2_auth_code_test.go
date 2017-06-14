@@ -8,6 +8,9 @@ import (
 
 	"net/http/cookiejar"
 
+	"net/url"
+	"strings"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
 	ejwt "github.com/ory/fosite/token/jwt"
@@ -15,11 +18,9 @@ import (
 	. "github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
-	"github.com/stretchr/testify/assert"
-	"net/url"
-	"strings"
 )
 
 func TestAuthCode(t *testing.T) {

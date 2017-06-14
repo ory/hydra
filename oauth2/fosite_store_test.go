@@ -1,20 +1,15 @@
 package oauth2
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/integration"
 	"github.com/ory/hydra/pkg"
-	"github.com/pborman/uuid"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 var clientManagers = map[string]pkg.FositeStorer{}

@@ -4,14 +4,15 @@ import (
 	"context"
 	"testing"
 
-	"github.com/ory/fosite"
-	"github.com/ory/hydra/pkg"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"net/url"
 	"time"
+
+	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/pkg"
 	"github.com/pborman/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var defaultRequest = fosite.Request{
@@ -40,8 +41,8 @@ func TestHelperCreateGetDeleteOpenIDConnectSession(m pkg.FositeStorer) func(t *t
 		require.NoError(t, err)
 
 		_, err = m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{})
-		assert.NotNil(t, err)		
-	}	
+		assert.NotNil(t, err)
+	}
 }
 
 func TestHelperCreateGetDeleteRefreshTokenSession(m pkg.FositeStorer) func(t *testing.T) {
@@ -61,9 +62,9 @@ func TestHelperCreateGetDeleteRefreshTokenSession(m pkg.FositeStorer) func(t *te
 		require.NoError(t, err)
 
 		_, err = m.GetRefreshTokenSession(ctx, "4321", &fosite.DefaultSession{})
-		assert.NotNil(t, err)		
+		assert.NotNil(t, err)
 	}
-	
+
 }
 func TestHelperRevokeRefreshToken(m pkg.FositeStorer) func(t *testing.T) {
 	return func(t *testing.T) {
@@ -89,7 +90,7 @@ func TestHelperRevokeRefreshToken(m pkg.FositeStorer) func(t *testing.T) {
 
 		_, err = m.GetRefreshTokenSession(ctx, "1122", &fosite.DefaultSession{})
 		assert.NotNil(t, err)
-		
+
 	}
 
 }

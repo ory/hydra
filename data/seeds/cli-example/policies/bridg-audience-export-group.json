@@ -4,7 +4,7 @@
   "subjects": ["bridg-audience-export-group"],
   "effect": "allow",
   "resources": [
-    "rn:bridg:<(snapshots|snapshot-fb-exports)(:.+)?>"
+    "rn:bridg:accounts:<[A-z0-9_-]+:brands:[A-z0-9_-]+:audiences:[A-z0-9_-]+:(snapshots|snapshot-fb-exports)(:.+)?>"
   ],
   "actions": [
     "create"

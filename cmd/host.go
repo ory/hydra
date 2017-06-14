@@ -76,8 +76,9 @@ OAUTH2 CONTROLS
 - CONSENT_URL: The uri of the consent endpoint.
 	Example: CONSENT_URL=https://id.myapp.com/consent
 
-- ISSUER: The issuer is used for identification in all OAuth2 tokens. Should be the public url of the server.
-	Defaults to ISSUER=http://localhost:4444
+- ISSUER: Issuer is the public URL of your Hydra installation. It is used for OAuth2 and OpenID Connect and must be
+	specified and using HTTPS protocol, unless --dangerous-force-http is set.
+	Example: ISSUER=https://hydra.myapp.com/
 
 - AUTH_CODE_LIFESPAN: Lifespan of OAuth2 authorize codes. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 	Defaults to AUTH_CODE_LIFESPAN=10m

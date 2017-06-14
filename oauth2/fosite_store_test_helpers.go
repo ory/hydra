@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"time"
 	"github.com/ory/hydra/client"
+	"github.com/pborman/uuid"
 )
 
 var defaultRequest = fosite.Request{
@@ -22,6 +23,76 @@ var defaultRequest = fosite.Request{
 	Session:       &fosite.DefaultSession{Subject: "bar"},
 }
 
+func TestHelperCreateGetDeleteOpenIDConnectSession(m pkg.FositeStorer) func(t *testing.T) {
+	return func(t *testing.T) {
+		ctx := context.Background()
+		_, err := m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{})
+		assert.NotNil(t, err)
+
+		err = m.CreateOpenIDConnectSession(ctx, "4321", &defaultRequest)
+		require.NoError(t, err)
+
+		res, err := m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{Session: &fosite.DefaultSession{}})
+		require.NoError(t, err)
+		AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
+
+		err = m.DeleteOpenIDConnectSession(ctx, "4321")
+		require.NoError(t, err)
+
+		_, err = m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{})
+		assert.NotNil(t, err)		
+	}	
+}
+
+func TestHelperCreateGetDeleteRefreshTokenSession(m pkg.FositeStorer) func(t *testing.T) {
+	return func(t *testing.T) {
+		ctx := context.Background()
+		_, err := m.GetRefreshTokenSession(ctx, "4321", &fosite.DefaultSession{})
+		assert.NotNil(t, err)
+
+		err = m.CreateRefreshTokenSession(ctx, "4321", &defaultRequest)
+		require.NoError(t, err)
+
+		res, err := m.GetRefreshTokenSession(ctx, "4321", &fosite.DefaultSession{})
+		require.NoError(t, err)
+		AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
+
+		err = m.DeleteRefreshTokenSession(ctx, "4321")
+		require.NoError(t, err)
+
+		_, err = m.GetRefreshTokenSession(ctx, "4321", &fosite.DefaultSession{})
+		assert.NotNil(t, err)		
+	}
+	
+}
+func TestHelperRevokeRefreshToken(m pkg.FositeStorer) func(t *testing.T) {
+	return func(t *testing.T) {
+		ctx := context.Background()
+		id := uuid.New()
+		_, err := m.GetRefreshTokenSession(ctx, "1111", &fosite.DefaultSession{})
+		assert.NotNil(t, err)
+
+		err = m.CreateRefreshTokenSession(ctx, "1111", &fosite.Request{ID: id, Client: &client.Client{ID: "foobar"}, RequestedAt: time.Now().Round(time.Second)})
+		require.NoError(t, err)
+
+		err = m.CreateRefreshTokenSession(ctx, "1122", &fosite.Request{ID: id, Client: &client.Client{ID: "foobar"}, RequestedAt: time.Now().Round(time.Second)})
+		require.NoError(t, err)
+
+		_, err = m.GetRefreshTokenSession(ctx, "1111", &fosite.DefaultSession{})
+		require.NoError(t, err)
+
+		err = m.RevokeRefreshToken(ctx, id)
+		require.NoError(t, err)
+
+		_, err = m.GetRefreshTokenSession(ctx, "1111", &fosite.DefaultSession{})
+		assert.NotNil(t, err)
+
+		_, err = m.GetRefreshTokenSession(ctx, "1122", &fosite.DefaultSession{})
+		assert.NotNil(t, err)
+		
+	}
+
+}
 func TestHelperCreateGetDeleteAuthorizeCodes(m pkg.FositeStorer) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.Background()

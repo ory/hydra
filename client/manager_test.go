@@ -10,7 +10,6 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	_ "github.com/lib/pq"
-	"github.com/ory/dockertest"
 	"github.com/ory/fosite"
 	"github.com/ory/herodot"
 	. "github.com/ory/hydra/client"
@@ -56,9 +55,6 @@ func init() {
 		Endpoint: u,
 	}
 }
-
-var resources []*dockertest.Resource
-var pool *dockertest.Pool
 
 func TestMain(m *testing.M) {
 	connectToPG()

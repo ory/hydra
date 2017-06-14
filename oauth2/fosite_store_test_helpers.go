@@ -2,15 +2,15 @@ package oauth2
 
 import (
 	"context"
-	"net/url"
 	"testing"
-	"time"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/pkg"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"net/url"
+	"time"
+	"github.com/ory/hydra/client"
 )
 
 var defaultRequest = fosite.Request{

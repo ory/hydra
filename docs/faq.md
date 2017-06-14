@@ -18,6 +18,10 @@ $ hydra help host
 ...
 ```
 
+## The docker image exists immediately
+
+Check the logs using `docker logs <container-id>`.
+
 ## Insufficient Entropy
 
 > Hey there , I am getting this error when I try request an access token "The request used a security parameter (e.g., anti-replay, anti-csrf) with insufficient entropy (minimum of 8 characters)"

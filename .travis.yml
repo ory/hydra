@@ -4,9 +4,9 @@ go_import_path: github.com/ory/hydra
 
 cache:
   directories:
-    - $GOPATH/src
-    - $GOPATH/pkg
     - ./vendor/
+
+before_cache:
 
 services:
   - docker

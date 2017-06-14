@@ -27,7 +27,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 func (h *Handler) Health(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	h.Metrics.Update()
 
-	h.Metrics.RLock()
-	defer h.Metrics.RUnlock()
+	h.Metrics.Lock()
+	defer h.Metrics.Unlock()
 	h.H.Write(rw, r, h.Metrics)
 }

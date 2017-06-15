@@ -1,5 +1,5 @@
-hash: f30dba959465d0cba60207c8ee805e85e6d13a2b48296019aa736610827b2237
-updated: 2017-06-14T10:39:10.2926242+02:00
+hash: 177922989fd7b304a45a8cec1de807bc5635087f575f227700ccb0cadd219ddd
+updated: 2017-06-15T13:45:51.5041866+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 4918b99a7cb949bb295f3c7bbaf24b577d806e35
@@ -133,7 +133,7 @@ imports:
 - name: github.com/ory/herodot
   version: ef15ccfb8c16051feca9ec289286732f8d288fec
 - name: github.com/ory/ladon
-  version: df05c35a313f8ec1800eb7c92997029980e08b27
+  version: 5c5a76bf6358319cdc3f875fa748b28d2a2100ea
   subpackages:
   - compiler
   - manager/memory

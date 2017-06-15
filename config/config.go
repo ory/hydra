@@ -233,6 +233,12 @@ func (c *Config) Context() *Context {
 		if err != nil {
 			c.GetLogger().Fatalf("Could not load policy manager plugin %s", err)
 		}
+
+		groupManager, err = con.NewGroupManager()
+		if err != nil {
+			c.GetLogger().Fatalf("Could not load policy manager plugin %s", err)
+		}
+		break
 	default:
 		panic("Unknown connection type.")
 	}

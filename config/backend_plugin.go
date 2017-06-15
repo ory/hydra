@@ -9,6 +9,7 @@ import (
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
 	"os"
+	"github.com/Sirupsen/logrus"
 )
 
 type ClientFactory func(*Config) client.Manager
@@ -23,6 +24,7 @@ type PluginConnection struct {
 	Config     *Config
 	plugin     *plugin.Plugin
 	didConnect bool
+	Logger logrus.FieldLogger
 }
 
 func (c *PluginConnection) load() error {
@@ -60,6 +62,62 @@ func (c *PluginConnection) Connect() error {
 		}
 	}
 	return nil
+}
+
+func (c *PluginConnection) NewClientManager() (client.Manager, error) {
+	if err := c.load(); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	if l, err := c.plugin.Lookup("NewClientManager"); err != nil {
+		return nil, errors.Wrap(err, "Unable to look up `NewClientManager`")
+	} else if m, ok := l.(ClientFactory); !ok {
+		return nil, errors.Wrap(err, "Unable to type assert `NewClientManager`")
+	} else {
+		return m(c.Config), nil
+	}
+}
+
+func (c *PluginConnection) NewGroupManager() (group.Manager, error) {
+	if err := c.load(); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	if l, err := c.plugin.Lookup("NewGroupManager"); err != nil {
+		return nil, errors.Wrap(err, "Unable to look up `NewGroupManager`")
+	} else if m, ok := l.(GroupFactory); !ok {
+		return nil, errors.Wrap(err, "Unable to type assert `NewGroupManager`")
+	} else {
+		return m(c.Config), nil
+	}
+}
+
+func (c *PluginConnection) NewJWKManager() (jwk.Manager, error) {
+	if err := c.load(); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	if l, err := c.plugin.Lookup("NewJWKManager"); err != nil {
+		return nil, errors.Wrap(err, "Unable to look up `NewJWKManager`")
+	} else if m, ok := l.(JWKFactory); !ok {
+		return nil, errors.Wrap(err, "Unable to type assert `NewJWKManager`")
+	} else {
+		return m(c.Config), nil
+	}
+}
+
+func (c *PluginConnection) NewOAuth2Manager(clientManager client.Manager) (pkg.FositeStorer, error) {
+	if err := c.load(); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	if l, err := c.plugin.Lookup("NewOAuth2Manager"); err != nil {
+		return nil, errors.Wrap(err, "Unable to look up `NewOAuth2Manager`")
+	} else if m, ok := l.(OAuth2Factory); !ok {
+		return nil, errors.Wrap(err, "Unable to type assert `NewOAuth2Manager`")
+	} else {
+		return m(clientManager, c.Config), nil
+	}
 }
 
 func (c *PluginConnection) NewPolicyManager() (ladon.Manager, error) {

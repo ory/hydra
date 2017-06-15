@@ -21,9 +21,17 @@ func newClientManager(c *config.Config) client.Manager {
 			DB:     con.GetDatabase(),
 			Hasher: ctx.Hasher,
 		}
+	case *config.PluginConnection:
+		if m, err := con.NewClientManager(); err != nil {
+			c.GetLogger().Fatalf("Could not load client manager plugin %s", err)
+		} else {
+			return m
+		}
+		break
 	default:
 		panic("Unknown connection type.")
 	}
+	return nil
 }
 
 func newClientHandler(c *config.Config, router *httprouter.Router, manager client.Manager) *client.Handler {

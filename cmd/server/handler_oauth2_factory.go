@@ -40,6 +40,12 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 			L:       c.GetLogger(),
 		}
 		break
+	case *config.PluginConnection:
+		var err error
+		if store, err = con.NewOAuth2Manager(clients); err != nil {
+			c.GetLogger().Fatalf("Could not load client manager plugin %s", err)
+		}
+		break
 	default:
 		panic("Unknown connection type.")
 	}

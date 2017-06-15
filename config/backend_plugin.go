@@ -11,7 +11,6 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/ory/fosite"
 	"github.com/jmoiron/sqlx"
-	"time"
 )
 
 type PluginConnection struct {

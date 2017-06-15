@@ -8,23 +8,15 @@ import (
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
-	"os"
 	"github.com/Sirupsen/logrus"
+	"github.com/ory/fosite"
 )
-
-type ClientFactory func(*Config) client.Manager
-type GroupFactory func(*Config) group.Manager
-type JWKFactory func(*Config) jwk.Manager
-type OAuth2Factory func(client.Manager, *Config) pkg.FositeStorer
-type PolicyFactory func(*Config) ladon.Manager
-type SchemaCreator func() error
-type Connector func(url string) error
 
 type PluginConnection struct {
 	Config     *Config
 	plugin     *plugin.Plugin
 	didConnect bool
-	Logger logrus.FieldLogger
+	Logger     logrus.FieldLogger
 }
 
 func (c *PluginConnection) load() error {
@@ -54,10 +46,10 @@ func (c *PluginConnection) Connect() error {
 
 	if l, err := c.plugin.Lookup("Connect"); err != nil {
 		return errors.Wrap(err, "Unable to look up `Connect`")
-	} else if c, ok := l.(Connector); !ok {
-		return errors.Wrap(err, "Unable to type assert `Connect`")
+	} else if c, ok := l.(func(url string) error); !ok {
+		return errors.New("Unable to type assert `Connect`")
 	} else {
-		if err := c(os.Getenv(cf.DatabaseURL)); err != nil {
+		if err := c(cf.DatabaseURL); err != nil {
 			return errors.Wrap(err, "Could not Connect to database")
 		}
 	}
@@ -69,12 +61,13 @@ func (c *PluginConnection) NewClientManager() (client.Manager, error) {
 		return nil, errors.WithStack(err)
 	}
 
+	ctx := c.Config.Context()
 	if l, err := c.plugin.Lookup("NewClientManager"); err != nil {
 		return nil, errors.Wrap(err, "Unable to look up `NewClientManager`")
-	} else if m, ok := l.(ClientFactory); !ok {
-		return nil, errors.Wrap(err, "Unable to type assert `NewClientManager`")
+	} else if m, ok := l.(func(fosite.Hasher) client.Manager); !ok {
+		return nil, errors.New("Unable to type assert `NewClientManager`")
 	} else {
-		return m(c.Config), nil
+		return m(ctx.Hasher), nil
 	}
 }
 
@@ -85,10 +78,10 @@ func (c *PluginConnection) NewGroupManager() (group.Manager, error) {
 
 	if l, err := c.plugin.Lookup("NewGroupManager"); err != nil {
 		return nil, errors.Wrap(err, "Unable to look up `NewGroupManager`")
-	} else if m, ok := l.(GroupFactory); !ok {
-		return nil, errors.Wrap(err, "Unable to type assert `NewGroupManager`")
+	} else if m, ok := l.(func() group.Manager); !ok {
+		return nil, errors.New("Unable to type assert `NewGroupManager`")
 	} else {
-		return m(c.Config), nil
+		return m(), nil
 	}
 }
 
@@ -99,10 +92,12 @@ func (c *PluginConnection) NewJWKManager() (jwk.Manager, error) {
 
 	if l, err := c.plugin.Lookup("NewJWKManager"); err != nil {
 		return nil, errors.Wrap(err, "Unable to look up `NewJWKManager`")
-	} else if m, ok := l.(JWKFactory); !ok {
-		return nil, errors.Wrap(err, "Unable to type assert `NewJWKManager`")
+	} else if m, ok := l.(func(*jwk.AEAD) jwk.Manager); !ok {
+		return nil, errors.New("Unable to type assert `NewJWKManager`")
 	} else {
-		return m(c.Config), nil
+		return m(&jwk.AEAD{
+			Key: c.Config.GetSystemSecret(),
+		}), nil
 	}
 }
 
@@ -113,10 +108,10 @@ func (c *PluginConnection) NewOAuth2Manager(clientManager client.Manager) (pkg.F
 
 	if l, err := c.plugin.Lookup("NewOAuth2Manager"); err != nil {
 		return nil, errors.Wrap(err, "Unable to look up `NewOAuth2Manager`")
-	} else if m, ok := l.(OAuth2Factory); !ok {
-		return nil, errors.Wrap(err, "Unable to type assert `NewOAuth2Manager`")
+	} else if m, ok := l.(func(client.Manager, logrus.FieldLogger) pkg.FositeStorer); !ok {
+		return nil, errors.New("Unable to type assert `NewOAuth2Manager`")
 	} else {
-		return m(clientManager, c.Config), nil
+		return m(clientManager, c.Config.GetLogger()), nil
 	}
 }
 
@@ -127,9 +122,9 @@ func (c *PluginConnection) NewPolicyManager() (ladon.Manager, error) {
 
 	if l, err := c.plugin.Lookup("NewPolicyManager"); err != nil {
 		return nil, errors.Wrap(err, "Unable to look up `NewPolicyManager`")
-	} else if m, ok := l.(PolicyFactory); !ok {
-		return nil, errors.Wrap(err, "Unable to type assert `NewPolicyManager`")
+	} else if m, ok := l.(func() ladon.Manager); !ok {
+		return nil, errors.Errorf("Unable to type assert `NewPolicyManager`, got %v", l)
 	} else {
-		return m(c.Config), nil
+		return m(), nil
 	}
 }

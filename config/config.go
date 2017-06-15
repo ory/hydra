@@ -193,6 +193,7 @@ func (c *Config) Context() *Context {
 		if err := pc.Connect(); err != nil {
 			c.GetLogger().Fatalf("Could not connect via database plugin: %s", err)
 		}
+		connection = pc
 	} else if c.DatabaseURL != "memory" {
 		u, err := url.Parse(c.DatabaseURL)
 		if err != nil {
@@ -236,7 +237,7 @@ func (c *Config) Context() *Context {
 
 		groupManager, err = con.NewGroupManager()
 		if err != nil {
-			c.GetLogger().Fatalf("Could not load policy manager plugin %s", err)
+			c.GetLogger().Fatalf("Could not load group manager plugin %s", err)
 		}
 		break
 	default:

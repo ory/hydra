@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/julienschmidt/httprouter"
-	_ "github.com/lib/pq"
 	"github.com/ory/fosite"
 	"github.com/ory/herodot"
 	. "github.com/ory/hydra/client"

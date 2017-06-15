@@ -189,7 +189,7 @@ func (c *Config) Context() *Context {
 		c.GetLogger().Fatalf(`DATABASE_URL is not set, use "export DATABASE_URL=memory" for an in memory storage or the documented database adapters.`)
 	} else if c.DatabasePlugin != "" {
 		c.GetLogger().Infof("Database plugin set to %s", c.DatabasePlugin)
-		pc := &PluginConnection{Config: c}
+		pc := &PluginConnection{Config: c, Logger: c.GetLogger()}
 		if err := pc.Connect(); err != nil {
 			c.GetLogger().Fatalf("Could not connect via database plugin: %s", err)
 		}

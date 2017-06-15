@@ -22,6 +22,13 @@ func injectJWKManager(c *config.Config) {
 			},
 		}
 		break
+	case *config.PluginConnection:
+		var err error
+		ctx.KeyManager, err = con.NewJWKManager()
+		if err != nil {
+			c.GetLogger().Fatalf("Could not load client manager plugin %s", err)
+		}
+		break
 	default:
 		c.GetLogger().Fatalf("Unknown connection type.")
 	}

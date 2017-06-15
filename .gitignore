@@ -14,3 +14,5 @@ _book/
 dist/
 coverage.*
 docs/api.swagger.json
+Dockerfile-plugin-*
+plugin-*.so

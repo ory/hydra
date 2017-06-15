@@ -15,8 +15,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-type MemoryConnection struct{}
-
 type SQLConnection struct {
 	db  *sqlx.DB
 	URL *url.URL
@@ -52,15 +50,15 @@ func (c *SQLConnection) GetDatabase() *sqlx.DB {
 		}
 
 		if c.db, err = sqlx.Open(clean.Scheme, u); err != nil {
-			return errors.Errorf("Could not connect to SQL: %s", err)
+			return errors.Errorf("Could not Connect to SQL: %s", err)
 		} else if err := c.db.Ping(); err != nil {
-			return errors.Errorf("Could not connect to SQL: %s", err)
+			return errors.Errorf("Could not Connect to SQL: %s", err)
 		}
 
 		c.L.Infof("Connected to SQL!")
 		return nil
 	}); err != nil {
-		c.L.Fatalf("Could not connect to SQL: %s", err)
+		c.L.Fatalf("Could not Connect to SQL: %s", err)
 	}
 
 	maxConns := maxParallelism() * 2

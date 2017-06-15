@@ -10,10 +10,10 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/bmizerany/assert"
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/dockertest"
 	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -102,7 +102,7 @@ func TestSQLConnection(t *testing.T) {
 func killAll() {
 	pool, err := dockertest.NewPool("")
 	if err != nil {
-		log.Fatalf("Could not connect to pool because %s", err)
+		log.Fatalf("Could not Connect to pool because %s", err)
 	}
 
 	for _, resource := range resources {
@@ -122,7 +122,7 @@ func bootstrapMySQL() *url.URL {
 	pool, err := dockertest.NewPool("")
 	pool.MaxWait = time.Minute * 5
 	if err != nil {
-		log.Fatalf("Could not connect to docker: %s", err)
+		log.Fatalf("Could not Connect to docker: %s", err)
 	}
 
 	resource, err := pool.Run("mysql", "5.7", []string{"MYSQL_ROOT_PASSWORD=secret"})
@@ -141,7 +141,7 @@ func bootstrapMySQL() *url.URL {
 		return db.Ping()
 	}); err != nil {
 		pool.Purge(resource)
-		log.Fatalf("Could not connect to docker: %s", err)
+		log.Fatalf("Could not Connect to docker: %s", err)
 	}
 
 	resources = append(resources, resource)
@@ -156,7 +156,7 @@ func bootstrapPostgres() *url.URL {
 
 	pool, err := dockertest.NewPool("")
 	if err != nil {
-		log.Fatalf("Could not connect to docker: %s", err)
+		log.Fatalf("Could not Connect to docker: %s", err)
 	}
 
 	resource, err := pool.Run("postgres", "9.6", []string{"POSTGRES_PASSWORD=secret", "POSTGRES_DB=hydra"})
@@ -175,7 +175,7 @@ func bootstrapPostgres() *url.URL {
 		return db.Ping()
 	}); err != nil {
 		pool.Purge(resource)
-		log.Fatalf("Could not connect to docker: %s", err)
+		log.Fatalf("Could not Connect to docker: %s", err)
 	}
 
 	resources = append(resources, resource)

@@ -45,6 +45,7 @@ type Config struct {
 	Issuer                 string `mapstructure:"ISSUER" yaml:"-"`
 	SystemSecret           string `mapstructure:"SYSTEM_SECRET" yaml:"-"`
 	DatabaseURL            string `mapstructure:"DATABASE_URL" yaml:"-"`
+	DatabasePlugin         string `mapstructure:"DATABASE_PLUGIN" yaml:"-"`
 	ConsentURL             string `mapstructure:"CONSENT_URL" yaml:"-"`
 	AllowTLSTermination    string `mapstructure:"HTTPS_ALLOW_TERMINATION_FROM" yaml:"-"`
 	BCryptWorkFactor       int    `mapstructure:"BCRYPT_COST" yaml:"-"`
@@ -145,7 +146,7 @@ func (c *Config) DoesRequestSatisfyTermination(r *http.Request) error {
 func (c *Config) GetChallengeTokenLifespan() time.Duration {
 	d, err := time.ParseDuration(c.ChallengeTokenLifespan)
 	if err != nil {
-		logrus.Warnf("Could not parse challenge token lifespan value (%s). Defaulting to 10m", c.AccessTokenLifespan)
+		c.GetLogger().Warnf("Could not parse challenge token lifespan value (%s). Defaulting to 10m", c.AccessTokenLifespan)
 		return time.Minute * 10
 	}
 	return d
@@ -154,7 +155,7 @@ func (c *Config) GetChallengeTokenLifespan() time.Duration {
 func (c *Config) GetAccessTokenLifespan() time.Duration {
 	d, err := time.ParseDuration(c.AccessTokenLifespan)
 	if err != nil {
-		logrus.Warnf("Could not parse access token lifespan value (%s). Defaulting to 1h", c.AccessTokenLifespan)
+		c.GetLogger().Warnf("Could not parse access token lifespan value (%s). Defaulting to 1h", c.AccessTokenLifespan)
 		return time.Hour
 	}
 	return d
@@ -163,7 +164,7 @@ func (c *Config) GetAccessTokenLifespan() time.Duration {
 func (c *Config) GetAuthCodeLifespan() time.Duration {
 	d, err := time.ParseDuration(c.AuthCodeLifespan)
 	if err != nil {
-		logrus.Warnf("Could not parse auth code lifespan value (%s). Defaulting to 10m", c.AuthCodeLifespan)
+		c.GetLogger().Warnf("Could not parse auth code lifespan value (%s). Defaulting to 10m", c.AuthCodeLifespan)
 		return time.Minute * 10
 	}
 	return d
@@ -172,7 +173,7 @@ func (c *Config) GetAuthCodeLifespan() time.Duration {
 func (c *Config) GetIDTokenLifespan() time.Duration {
 	d, err := time.ParseDuration(c.IDTokenLifespan)
 	if err != nil {
-		logrus.Warnf("Could not parse id token lifespan value (%s). Defaulting to 1h", c.IDTokenLifespan)
+		c.GetLogger().Warnf("Could not parse id token lifespan value (%s). Defaulting to 1h", c.IDTokenLifespan)
 		return time.Hour
 	}
 	return d
@@ -185,11 +186,18 @@ func (c *Config) Context() *Context {
 
 	var connection interface{} = &MemoryConnection{}
 	if c.DatabaseURL == "" {
-		logrus.Fatalf(`DATABASE_URL is not set, use "export DATABASE_URL=memory" for an in memory storage or the documented database adapters.`)
+		c.GetLogger().Fatalf(`DATABASE_URL is not set, use "export DATABASE_URL=memory" for an in memory storage or the documented database adapters.`)
+	} else if c.DatabasePlugin != "" {
+		c.GetLogger().Infof("Database plugin set to %s", c.DatabasePlugin)
+		pc := &PluginConnection{Config: c, Logger: c.GetLogger()}
+		if err := pc.Connect(); err != nil {
+			c.GetLogger().Fatalf("Could not connect via database plugin: %s", err)
+		}
+		connection = pc
 	} else if c.DatabaseURL != "memory" {
 		u, err := url.Parse(c.DatabaseURL)
 		if err != nil {
-			logrus.Fatalf("Could not parse DATABASE_URL: %s", err)
+			c.GetLogger().Fatalf("Could not parse DATABASE_URL: %s", err)
 		}
 
 		switch u.Scheme {
@@ -202,7 +210,7 @@ func (c *Config) Context() *Context {
 			}
 			break
 		default:
-			logrus.Fatalf(`Unknown DSN "%s" in DATABASE_URL: %s`, u.Scheme, c.DatabaseURL)
+			c.GetLogger().Fatalf(`Unknown DSN "%s" in DATABASE_URL: %s`, u.Scheme, c.DatabaseURL)
 		}
 	}
 
@@ -210,7 +218,7 @@ func (c *Config) Context() *Context {
 	var manager ladon.Manager
 	switch con := connection.(type) {
 	case *MemoryConnection:
-		logrus.Printf("DATABASE_URL set to memory, connecting to ephermal in-memory database.")
+		c.GetLogger().Printf("DATABASE_URL set to memory, connecting to ephermal in-memory database.")
 		manager = lmem.NewMemoryManager()
 		groupManager = group.NewMemoryManager()
 		break
@@ -218,6 +226,18 @@ func (c *Config) Context() *Context {
 		manager = lsql.NewSQLManager(con.GetDatabase(), nil)
 		groupManager = &group.SQLManager{
 			DB: con.GetDatabase(),
+		}
+		break
+	case *PluginConnection:
+		var err error
+		manager, err = con.NewPolicyManager()
+		if err != nil {
+			c.GetLogger().Fatalf("Could not load policy manager plugin %s", err)
+		}
+
+		groupManager, err = con.NewGroupManager()
+		if err != nil {
+			c.GetLogger().Fatalf("Could not load group manager plugin %s", err)
 		}
 		break
 	default:
@@ -305,7 +325,7 @@ func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
 	c.oauth2Client = oauthConfig.Client(ctx)
 	if _, err := c.oauth2Client.Get(c.ClusterURL); err != nil {
 		fmt.Printf("Could not authenticate, because: %s\n", err)
-		fmt.Println("This can have multiple reasons, like a wrong cluster or wrong credentials. To resolve this, run `hydra connect`.")
+		fmt.Println("This can have multiple reasons, like a wrong cluster or wrong credentials. To resolve this, run `hydra Connect`.")
 		fmt.Println("You can disable TLS verification using the `--skip-tls-verify` flag.")
 		os.Exit(1)
 	}
@@ -333,16 +353,16 @@ func (c *Config) GetSystemSecret() []byte {
 		return secret
 	}
 
-	logrus.Warnf("Expected system secret to be at least %d characters long, got %d characters.", 32, len(c.SystemSecret))
-	logrus.Infoln("Generating a random system secret...")
+	c.GetLogger().Warnf("Expected system secret to be at least %d characters long, got %d characters.", 32, len(c.SystemSecret))
+	c.GetLogger().Infoln("Generating a random system secret...")
 	var err error
 	secret, err = pkg.GenerateSecret(32)
 	pkg.Must(err, "Could not generate global secret: %s", err)
-	logrus.Infof("Generated system secret: %s", secret)
+	c.GetLogger().Infof("Generated system secret: %s", secret)
 	hash := sha256.Sum256(secret)
 	secret = hash[:]
 	c.systemSecret = secret
-	logrus.Warnln("WARNING: DO NOT generate system secrets in production. The secret will be leaked to the logs.")
+	c.GetLogger().Warnln("WARNING: DO NOT generate system secrets in production. The secret will be leaked to the logs.")
 	return secret
 }
 
@@ -356,7 +376,7 @@ func (c *Config) Persist() error {
 		return errors.WithStack(err)
 	}
 
-	logrus.Infof("Persisting config in file %s", viper.ConfigFileUsed())
+	c.GetLogger().Infof("Persisting config in file %s", viper.ConfigFileUsed())
 	if err := ioutil.WriteFile(viper.ConfigFileUsed(), out, 0700); err != nil {
 		return errors.Errorf(`Could not write to "%s" because: %s`, viper.ConfigFileUsed(), err)
 	}

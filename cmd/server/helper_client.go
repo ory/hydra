@@ -48,14 +48,6 @@ func (h *Handler) createRootIfNewInstall(c *config.Config) {
 
 	err = h.Clients.Manager.CreateClient(root)
 	pkg.Must(err, "Could not create temporary root because %s", err)
-	err = ctx.LadonManager.Create(&ladon.DefaultPolicy{
-		Description: "This is a policy created by hydra and issued to the first client. It grants all of hydra's administrative privileges to the client and enables the client_credentials response type.",
-		Subjects:    []string{root.GetID()},
-		Effect:      ladon.AllowAccess,
-		Resources:   []string{"rn:hydra:<.*>"},
-		Actions:     []string{"<.*>"},
-	})
-	pkg.Must(err, "Could not create admin policy because %s", err)
 
 	c.ClientID = root.ID
 	c.ClientSecret = string(secret)
@@ -66,4 +58,14 @@ func (h *Handler) createRootIfNewInstall(c *config.Config) {
 		c.GetLogger().Infof("client_secret: %s", string(secret))
 		c.GetLogger().Warn("WARNING: YOU MUST delete this client once in production, as credentials may have been leaked in your logfiles.")
 	}
+
+	err = ctx.LadonManager.Create(&ladon.DefaultPolicy{
+		Description: "This is a policy created by hydra and issued to the first client. It grants all of hydra's administrative privileges to the client and enables the client_credentials response type.",
+		Subjects:    []string{root.GetID()},
+		Effect:      ladon.AllowAccess,
+		Resources:   []string{"rn:hydra:<.*>"},
+		Actions:     []string{"<.*>"},
+		ID:          "default-admin-policy",
+	})
+	pkg.Must(err, "Could not create admin policy because %s", err)
 }

@@ -30,6 +30,23 @@ This file keeps track of questions and discussions from Gitter and general help 
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+## Consent App Client
+
+> Alexander Alimovs @aalimovs 13:25  
+but this is not advised, and ideally you split consent app (identity provider) from the client app, correct?
+I'm grasping OAuth 2.0 trying to get this work and it starts to make more and more sense, almost there
+
+> Aeneas @arekkas 13:28  
+yes so your consent app is like the source of truth, the globe that knows everything
+
+> Aeneas @arekkas 13:28  
+because it has access to the cryptographic keys that allow it to issue the consent response, which in turn can be used to say: hey, this guy here is peter and he's the freaking super admin
+so hydra will be like: ok cool, welcome peter, here are your keys, don't do anything stupid with that
+so if you use the consent app client everywhere, it might leak, or some one who is not peter may say: oh look, I can look up the cryptographic keys for the consent repsonse, let me use that and impersonate peter
+so now some random internet guy is the superadmin of your system
+thus, it is extremely important to only use the consent app client in the consent app, and nowhere else
+in the error case above you are requesting the scope "hydra" which has not been granted to the client (see the scopes column)
+
 ## How can I control SQL connection limits?
 
 You can configure SQL connection limits by appending parameters `max_conns`, `max_idle_conns`, or `max_conn_lifetime`

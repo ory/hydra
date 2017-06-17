@@ -108,7 +108,7 @@ engineer membership, or [tell us](mailto:hi@ory.am) why and how you are using OR
 **[Become a ORY Hydra sponsor now](https://www.patreon.com/bePatron?c=581435&rid=1746199)** and help keep the project
 open source, free, and maintained. Additionally, sponsors unlock
 
-* Access to ORY's private community.
+* Access to ORY's private slack community.
 * Featured logo & link in the readme and on the website.
 * placement in release announcements.
 
@@ -117,15 +117,15 @@ Sponsorship starts at 600$ per month. We accept smaller contributions as well, b
 ### Engineer membership
 
 **[Get your engineer membership now](https://www.patreon.com/bePatron?c=581435&rid=1746211)**, gain priorization,
-and 1-1 support from our talented ORY Hydra engineers. Also included:
+and 1-1 support from our talented ORY Hydra engineers. This package includes:
 
 * Private technical support from ORY Hydra engineers.
-* Access to ORY's to private community.
+* Access to ORY's private slack community.
 * Prioritize bugs that are important to you.
 * Influence the feature roadmap.
 * As long as your membership is active, we guarantee maintenance of ORY Hydra.
 
-Engineer membership is 900$ per month.
+Engineer membership is 950$ per month.
 
 ### Sponsors
 

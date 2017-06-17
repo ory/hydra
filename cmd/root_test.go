@@ -42,6 +42,7 @@ func TestExecute(t *testing.T) {
 		},
 		{args: []string{"connect", "--id", "admin", "--secret", "pw", "--url", "https://127.0.0.1:4444/"}},
 		{args: []string{"clients", "create", "--id", "foobarbaz"}},
+		{args: []string{"clients", "get", "foobarbaz"}},
 		{args: []string{"clients", "create", "--id", "public-foo", "--is-public"}},
 		{args: []string{"clients", "delete", "foobarbaz"}},
 		{args: []string{"keys", "create", "foo", "-a", "HS256"}},

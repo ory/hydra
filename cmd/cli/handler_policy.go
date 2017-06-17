@@ -61,6 +61,7 @@ func (h *PolicyHandler) CreatePolicy(cmd *cobra.Command, args []string) {
 		fmt.Println(cmd.UsageString())
 		fmt.Println("")
 		fmt.Println("Got empty subject, resource or action list")
+		return
 	}
 
 	effect := ladon.DenyAccess

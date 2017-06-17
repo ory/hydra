@@ -94,7 +94,7 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 		"kid": "public",
 	}
 
-	return &Session{
+	sess := &Session{
 		DefaultSession: &openid.DefaultSession{
 			Claims: &ejwt.IDTokenClaims{
 				Audience:  a.GetClient().GetID(),
@@ -108,8 +108,9 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 			Subject: subject,
 		},
 		Extra: atExt,
-	}, err
+	}
 
+	return sess, err
 }
 
 func toStringSlice(i interface{}) []string {

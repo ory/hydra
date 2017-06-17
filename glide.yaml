@@ -64,6 +64,7 @@ import:
   subpackages:
   - clientcredentials
 - package: gopkg.in/yaml.v2
+- package: github.com/mohae/deepcopy
 testImport:
 - package: github.com/bmizerany/assert
 - package: github.com/ory/dockertest

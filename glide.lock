@@ -1,5 +1,5 @@
-hash: 9a63e299ab52d341a9a0be9f2d573ae9320ddb0276b56abb219f3e71c96f0726
-updated: 2017-06-17T15:06:25.7166367+02:00
+hash: 177922989fd7b304a45a8cec1de807bc5635087f575f227700ccb0cadd219ddd
+updated: 2017-06-15T19:24:42.4344616+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 4918b99a7cb949bb295f3c7bbaf24b577d806e35
@@ -106,6 +106,8 @@ imports:
   version: 13736c32520969a64987228c21c138a4cfdb3720
 - name: github.com/mitchellh/mapstructure
   version: db1efb556f84b25a0a13a04aad883943538ad2e0
+- name: github.com/mohae/deepcopy
+  version: 491d3605edfb866af34a48075bd4355ac1bf46ca
 - name: github.com/moul/http2curl
   version: 4e24498b31dba4683efb9d35c1c8a91e2eda28c8
 - name: github.com/Nvveen/Gotty

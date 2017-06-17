@@ -328,12 +328,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		return
 	}
 
-	if err := h.Manager.Delete(p.ID); err != nil {
-		h.H.WriteError(w, r, errors.WithStack(err))
-		return
-	}
-
-	if err := h.Manager.Create(&p); err != nil {
+	if err := h.Manager.Update(&p); err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
 		return
 	}

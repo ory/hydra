@@ -10,6 +10,7 @@ import (
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/pkg"
 	"github.com/spf13/cobra"
+	"context"
 )
 
 type ClientHandler struct {
@@ -119,4 +120,25 @@ func (h *ClientHandler) DeleteClient(cmd *cobra.Command, args []string) {
 	}
 
 	fmt.Println("Client(s) deleted.")
+}
+
+func (h *ClientHandler) GetClient(cmd *cobra.Command, args []string) {
+	m := h.newClientManager(cmd)
+
+	if len(args) == 0 {
+		fmt.Print(cmd.UsageString())
+		return
+	}
+
+	cl, err := m.GetClient(context.Background(), args[0])
+	if m.Dry {
+		fmt.Printf("%s\n", err)
+		return
+	}
+	pkg.Must(err, "Could not delete client: %s", err)
+
+	out, err := json.MarshalIndent(cl, "", "\t")
+	pkg.Must(err, "Could not convert client to JSON: %s", err)
+
+	fmt.Printf("%s\n", out)
 }

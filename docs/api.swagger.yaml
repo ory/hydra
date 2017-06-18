@@ -487,6 +487,49 @@ paths:
           $ref: '#/responses/emptyResponse'
         '500':
           $ref: '#/responses/genericError'
+  /health/stats:
+    get:
+      description: >-
+        The subject making the request needs to be assigned to a policy
+        containing:
+
+
+        ```
+
+        {
+
+        "resources": ["rn:hydra:health:stats"],
+
+        "actions": ["get"],
+
+        "effect": "allow"
+
+        }
+
+        ```
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      schemes:
+        - http
+        - https
+      tags:
+        - health
+      summary: Show instance statistics
+      operationId: getStatistics
+      security:
+        - oauth2:
+            - hydra.health
+      responses:
+        '200':
+          $ref: '#/responses/clientsList'
+        '401':
+          $ref: '#/responses/genericError'
+        '403':
+          $ref: '#/responses/genericError'
+        '500':
+          $ref: '#/responses/genericError'
   '/keys/{set}':
     get:
       description: >-

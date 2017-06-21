@@ -1,11 +1,12 @@
 package oauth2
 
 import (
-	"log"
 	"sync"
+	"time"
 
 	"context"
 
+	"github.com/fluxio/multierror"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/pkg/errors"
@@ -184,13 +185,16 @@ func (s *FositeMemoryStore) RevokeAccessToken(ctx context.Context, id string) er
 	return nil
 }
 
-func (s *FositeMemoryStore) CleanseTokens(ctx context.Context) error {
-	var found bool
+func (s *FositeMemoryStore) CleanseTokens(ctx context.Context, before time.Time) error {
+	errs := multierror.Accumulator{}
+
 	for sig, token := range s.AccessTokens {
-		log.Println(sig, token)
+		if token.GetRequestedAt().Before(before) {
+			errs.Push(s.DeleteAccessTokenSession(ctx, sig))
+		}
 	}
-	if !found {
-		return errors.New("Not found")
+	if errs.Error() != nil {
+		return errs.Error()
 	}
 	return nil
 }

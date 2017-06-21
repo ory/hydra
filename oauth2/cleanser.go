@@ -1,7 +1,10 @@
 package oauth2
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 type Cleanser interface {
-	CleanseTokens(ctx context.Context) error
+	CleanseTokens(ctx context.Context, before time.Time) error
 }

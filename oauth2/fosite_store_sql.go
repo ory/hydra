@@ -283,6 +283,6 @@ func (s *FositeSQLStore) revokeSession(id string, table string) error {
 	return nil
 }
 
-func (s *FositeSQLStore) CleanseTokens(ctx context.Context) error {
+func (s *FositeSQLStore) CleanseTokens(ctx context.Context, before time.Time) error {
 	return nil
 }

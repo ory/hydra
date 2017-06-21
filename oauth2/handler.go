@@ -207,7 +207,7 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ ht
 //       500: genericError
 func (h *Handler) CleanseHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = fosite.NewContext()
-	h.Cleanser.CleanseTokens(ctx)
+	h.Cleanser.CleanseTokens(ctx, time.Now())
 }
 
 // swagger:route POST /oauth2/introspect oauth2 introspectOAuthToken

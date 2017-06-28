@@ -1,6 +1,6 @@
 # Installing, Configuring and Running Hydra
 
-Before starting with this section, please check out the [tutorial](./demo.md). It will teach you the most important flows
+Before starting with this section, please check out the [tutorial](./tutorial.md). It will teach you the most important flows
 and settings for Hydra.
 
 ## Installing Hydra
@@ -24,8 +24,11 @@ ec91228cb105db315553499c81918258f52cee9636ea2a4821bdb8226872f54b
 
 *Note: We had to create a new docker hub repository. Tags prior to 0.7.5 are available [here](https://hub.docker.com/r/ory-am/hydra/).*
 
-Now, you should be able to open [https://localhost:4444/health](https://localhost:4444/health). If asked, accept the self signed
-certificate in your browser.
+To confirm that the instance is running properly, open [the instance metrics](https://localhost:4444/health/stats)
+or [the health check](https://localhost:4444/health/stats) - the health checks gives a blank page with status
+code 204.
+
+If asked, accept the self signedcertificate in your browser.
 
 **Using the client command line interface** can be achieved by ssh'ing into the Hydra container
 and execute the `hydra` command from there:

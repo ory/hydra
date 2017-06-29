@@ -40,7 +40,7 @@ var tokenSelfCmd = &cobra.Command{
 		})
 
 		if ok, _ := cmd.Flags().GetBool("skip-tls-verify"); ok {
-			fmt.Println("Warning: Skipping TLS Certificate Verification.")
+			// fmt.Println("Warning: Skipping TLS Certificate Verification.")
 			ctx = context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{
 				Transport: &transporter{
 					FakeTLSTermination: fakeTlsTermination,

@@ -107,11 +107,11 @@ cloud and on premise, and are securing millions of requests each day already.
 ### Products
 
 * **ORY Hydra+** is a closed source modification of ORY Hydra with fault-tolerance, low latency, increased throughput,
-reduced database load, stateless authorization, and other features. Pricing starts at 399€ per month. For more information, send us an inquiry.
+reduced database load, stateless authorization, and other features. Pricing starts at 399€ per month. For more information [send us an inquiry](https://docs.google.com/forms/d/e/1FAIpQLSfRV34gUWHF1CnOa5oiWj_AMhh7SSGwwb_6DeMNhH-EQqnAwQ/viewform).
 * **ORY Security Console** is an admin user interface for ORY Hydra and ORY Gatekeeper. Available on-premise and as a service.
-Pricing starts at 49€ / month. For more information, send us an inquiry.
+Pricing starts at 49€ / month. For more information [send us an inquiry](https://docs.google.com/forms/d/e/1FAIpQLSfRV34gUWHF1CnOa5oiWj_AMhh7SSGwwb_6DeMNhH-EQqnAwQ/viewform).
 * **ORY Gatekeeper** is a configurable firewall reverse proxy making access control easy and secure. ORY Gatekeeper is compatible with ORY Hydra
-Access Control Policies and OAuth 2.0 Access Tokens. Pricing starts at 99€ / month. For more information, send us an inquiry.
+Access Control Policies and OAuth 2.0 Access Tokens. Pricing starts at 99€ / month. For more information [send us an inquiry](https://docs.google.com/forms/d/e/1FAIpQLSfRV34gUWHF1CnOa5oiWj_AMhh7SSGwwb_6DeMNhH-EQqnAwQ/viewform).
 
 * **ORY Hydra** - this repository.
 * **ORY Fosite** is a popular open source OAuth2 and OpenID Connect SDK for Go.

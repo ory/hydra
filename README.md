@@ -40,12 +40,12 @@ community on [Gitter](https://gitter.im/ory-am/hydra). For advanced use cases, c
 
 - [What is ORY Hydra?](#what-is-ory-hydra)
   - [ORY Hydra implements open standards](#ory-hydra-implements-open-standards)
+- [ORY Cloud Security](#ory-cloud-security)
+- [Consulting](#consulting)
 - [Sponsors & Adopters](#sponsors-&-adopters)
   - [Sponsorship](#sponsorship)
-  - [Engineer membership](#engineer-membership)
   - [Sponsors](#sponsors)
   - [Adopters](#adopters)
-- [ORY Hydra for Enterprise](#ory-hydra-for-enterprise)
 - [Quickstart](#quickstart)
   - [5 minutes tutorial: Run your very own OAuth2 environment](#5-minutes-tutorial-run-your-very-own-oauth2-environment)
   - [Installation](#installation)
@@ -97,6 +97,28 @@ and the OpenID Foundation:
 * [OpenID Connect Core 1.0](http://openid.net/specs/openid-connect-core-1_0.html)
 * [OpenID Connect Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0.html)
 
+## ORY Cloud Security
+
+ORY Cloud Security (OCS) is a popular, and hardened toolbox of open and closed source services for securing your APIs
+and web services. Our products are capable of handling high throughput with low latency, work flawlessly in the
+cloud and on premise, and are securing millions of requests each day already.
+
+* **ORY Hydra+** is a closed source modification of ORY Hydra with fault-tolerance, low latency, increased throughput,
+reduced database load, stateless authorization, and other features. Pricing starts at 399€ per month. For more information, send us an inquiry.
+* **ORY Security Console** is an admin user interface for ORY Hydra and ORY Gatekeeper. Available on-premise and as a service.
+Pricing starts at 49€ / month. For more information, send us an inquiry.
+* **ORY Gatekeeper** is a configurable firewall reverse proxy making access control easy and secure. ORY Gatekeeper is compatible with ORY Hydra
+Access Control Policies and OAuth 2.0 Access Tokens. Pricing starts at 99€ / month. For more information, send us an inquiry.
+
+* **ORY Hydra** - this repository.
+* **ORY Fosite** is a popular open source OAuth2 and OpenID Connect SDK for Go.
+* **ORY Ladon** is an acclaimed open source SDK for access control policies, solving authorization in the microservice and IoT age.
+
+## Consulting
+
+Do you need help with setting up ORY Hydra in your environment, do you require custom features, or have other consulting
+needs? Then [contact us now!](https://docs.google.com/forms/d/e/1FAIpQLScy_mUDYCF9BTul3TPqYh-Fw-TCFkHHyhlzLOubrGY899hrqA/viewform).
+
 ## Sponsors & Adopters
 
 ORY Hydra is open source with a permissive license. We are a dedicated, young but also experienced team of developers
@@ -113,19 +135,6 @@ open source, free, and maintained. Additionally, sponsors unlock
 * placement in release announcements.
 
 Sponsorship starts at 600$ per month. We accept smaller contributions as well, but without the benefits listed above.
-
-### Engineer membership
-
-**[Get your engineer membership now](https://www.patreon.com/bePatron?c=581435&rid=1746211)**, gain priorization,
-and 1-1 support from our talented ORY Hydra engineers. This package includes:
-
-* Private technical support from ORY Hydra engineers.
-* Access to ORY's private slack community.
-* Prioritize bugs that are important to you.
-* Influence the feature roadmap.
-* As long as your membership is active, we guarantee maintenance of ORY Hydra.
-
-Engineer membership is 950$ per month.
 
 ### Sponsors
 
@@ -148,20 +157,6 @@ you think that your company should be listed here.
 for anyone making interactive projects. ORY Hydra secures Arduino's developer platform.</p>
 
 <br clear="all"/>
-
-## ORY Hydra for Enterprise
-
-ORY Hydra is available as an Apache 2.0-licensed Open Source technology. In enterprise environments however,
-there are numerous demands, such as
-
-* OAuth 2.0 and OpenID Connect consulting.
-* security auditing and certification.
-* auditable log trails.
-* guaranteed performance metrics, such as throughput per second.
-* management user interfaces.
-* ... and a wide range of narrow use cases specific to each business demands.
-
-Gain access to more features and our security experts with ORY Hydra for Enterprise! [Request details now!](https://docs.google.com/forms/d/e/1FAIpQLSf53GJwQxzIatTSEM7sXhpkWRh6kddKxzNfNAQ9GsLNEfuFRA/viewform)
 
 ## Quickstart
 

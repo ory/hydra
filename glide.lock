@@ -1,5 +1,5 @@
-hash: e556d77edaa725021e86cf5bc038174ac0659a5db1906965237f87d5c654b1a3
-updated: 2017-06-22T14:44:05.8112199+02:00
+hash: c8f0eb4acf67bda1b31617880a182b951dc8aabc75c7e3de38074243319fd418
+updated: 2017-06-29T11:52:11.942198+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 4918b99a7cb949bb295f3c7bbaf24b577d806e35
@@ -122,7 +122,7 @@ imports:
 - name: github.com/ory/dockertest
   version: 9d0647ae761f96a6738c5afb49688d22979b21ff
 - name: github.com/ory/fosite
-  version: 92b75d93070fdb96f0ec9975dc24b69243d8f894
+  version: 6c91a21b540c534c9a2330922e357e24c7d5fda9
   subpackages:
   - compose
   - handler/oauth2

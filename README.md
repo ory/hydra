@@ -40,12 +40,9 @@ community on [Gitter](https://gitter.im/ory-am/hydra). For advanced use cases, c
 
 - [What is ORY Hydra?](#what-is-ory-hydra)
   - [ORY Hydra implements open standards](#ory-hydra-implements-open-standards)
-- [Sponsors & Adopters](#sponsors-&-adopters)
-  - [Sponsorship](#sponsorship)
-  - [Engineer membership](#engineer-membership)
-  - [Sponsors](#sponsors)
-  - [Adopters](#adopters)
-- [ORY Hydra for Enterprise](#ory-hydra-for-enterprise)
+- [ORY Cloud Security](#ory-cloud-security)
+  - [Products](#products)
+  - [Consulting](#consulting)
 - [Quickstart](#quickstart)
   - [5 minutes tutorial: Run your very own OAuth2 environment](#5-minutes-tutorial-run-your-very-own-oauth2-environment)
   - [Installation](#installation)
@@ -54,6 +51,10 @@ community on [Gitter](https://gitter.im/ory-am/hydra). For advanced use cases, c
     - [Building from source](#building-from-source)
 - [Security](#security)
 - [Telemetry](#telemetry)
+- [Sponsors & Adopters](#sponsors-&-adopters)
+  - [Sponsorship](#sponsorship)
+  - [Sponsors](#sponsors)
+  - [Adopters](#adopters)
 - [Documentation](#documentation)
   - [Guide](#guide)
   - [HTTP API documentation](#http-api-documentation)
@@ -97,71 +98,29 @@ and the OpenID Foundation:
 * [OpenID Connect Core 1.0](http://openid.net/specs/openid-connect-core-1_0.html)
 * [OpenID Connect Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0.html)
 
-## Sponsors & Adopters
+## ORY Cloud Security
 
-ORY Hydra is open source with a permissive license. We are a dedicated, young but also experienced team of developers
-in the area of cloud computing and internet security. Please support our mission for a safer web and become a sponsor, buy an
-engineer membership, or [tell us](mailto:hi@ory.am) why and how you are using ORY Hydra.
+ORY Cloud Security (OCS) is a popular, hardened toolbox of open and closed source services for securing your APIs
+and web services. Our products are capable of handling high throughput with low latency, work flawlessly in the
+cloud and on premise, and are securing millions of requests each day already.
 
-### Sponsorship
+### Products
 
-**[Become a ORY Hydra sponsor now](https://www.patreon.com/bePatron?c=581435&rid=1746199)** and help keep the project
-open source, free, and maintained. Additionally, sponsors unlock
+* **ORY Hydra+** is a closed source modification of ORY Hydra with fault-tolerance, low latency, increased throughput,
+reduced database load, stateless authorization, and other features. Pricing starts at 399€ per month. For more information [send us an inquiry](https://docs.google.com/forms/d/e/1FAIpQLSfRV34gUWHF1CnOa5oiWj_AMhh7SSGwwb_6DeMNhH-EQqnAwQ/viewform).
+* **ORY Security Console** is an admin user interface for ORY Hydra and ORY Gatekeeper. Available on-premise and as a service.
+Pricing starts at 49€ / month. For more information [send us an inquiry](https://docs.google.com/forms/d/e/1FAIpQLSfRV34gUWHF1CnOa5oiWj_AMhh7SSGwwb_6DeMNhH-EQqnAwQ/viewform).
+* **ORY Gatekeeper** is a configurable firewall reverse proxy making access control easy and secure. ORY Gatekeeper is compatible with ORY Hydra
+Access Control Policies and OAuth 2.0 Access Tokens. Pricing starts at 99€ / month. For more information [send us an inquiry](https://docs.google.com/forms/d/e/1FAIpQLSfRV34gUWHF1CnOa5oiWj_AMhh7SSGwwb_6DeMNhH-EQqnAwQ/viewform).
 
-* Access to ORY's private slack community.
-* Featured logo & link in the readme and on the website.
-* placement in release announcements.
+* **ORY Hydra** - this repository.
+* **ORY Fosite** is a popular open source OAuth2 and OpenID Connect SDK for Go.
+* **ORY Ladon** is an acclaimed open source SDK for access control policies, solving authorization in the microservice and IoT age.
 
-Sponsorship starts at 600$ per month. We accept smaller contributions as well, but without the benefits listed above.
+### Consulting
 
-### Engineer membership
-
-**[Get your engineer membership now](https://www.patreon.com/bePatron?c=581435&rid=1746211)**, gain priorization,
-and 1-1 support from our talented ORY Hydra engineers. This package includes:
-
-* Private technical support from ORY Hydra engineers.
-* Access to ORY's private slack community.
-* Prioritize bugs that are important to you.
-* Influence the feature roadmap.
-* As long as your membership is active, we guarantee maintenance of ORY Hydra.
-
-Engineer membership is 950$ per month.
-
-### Sponsors
-
-<img src="docs/images/sponsors/auth0.png" align="left" width="30%" alt="Auth0.com" />
-
-We are proud to have [Auth0](https://auth0.com) as a **gold sponsor** for ORY Hydra. [Auth0](https://auth0.com) solves
-the most complex identity use cases with an extensible and easy to integrate platform that secures billions of logins
-every year. At ORY, we use [Auth0](https://auth0.com) in conjunction with ORY Hydra for various internal projects.
-
-<br clear="all"/>
-
-### Adopters
-
-ORY Hydra is battle-tested in production systems. This is a curated list of ORY Hydra adopters. [Tell us](mailto:hi@ory.am) if
-you think that your company should be listed here.
-
-<img src="https://www.arduino.cc/en/uploads/Trademark/ArduinoCommunityLogo.png" align="left" width="30%" alt="arduino.cc"/> 
-
-<p>Arduino is an open-source electronics platform based on easy-to-use hardware and software. It's intended
-for anyone making interactive projects. ORY Hydra secures Arduino's developer platform.</p>
-
-<br clear="all"/>
-
-## ORY Hydra for Enterprise
-
-ORY Hydra is available as an Apache 2.0-licensed Open Source technology. In enterprise environments however,
-there are numerous demands, such as
-
-* OAuth 2.0 and OpenID Connect consulting.
-* security auditing and certification.
-* auditable log trails.
-* guaranteed performance metrics, such as throughput per second.
-* management user interfaces.
-* ... and a wide range of narrow use cases specific to each business demands.
-
-Gain access to more features and our security experts with ORY Hydra for Enterprise! [Request details now!](https://docs.google.com/forms/d/e/1FAIpQLSf53GJwQxzIatTSEM7sXhpkWRh6kddKxzNfNAQ9GsLNEfuFRA/viewform)
+Do you need help with setting up ORY Hydra in your environment, do you require custom features, or have other consulting
+needs? Then [contact us now!](https://docs.google.com/forms/d/e/1FAIpQLScy_mUDYCF9BTul3TPqYh-Fw-TCFkHHyhlzLOubrGY899hrqA/viewform).
 
 ## Quickstart
 
@@ -252,6 +211,45 @@ Read [the security guide now](https://ory.gitbooks.io/hydra/content/security.htm
 
 ORY Hydra collects summarized, anonymized telemetry which can optionally be turned off. Click [here](https://ory.gitbooks.io/hydra/content/telemetry.html)
 to learn more.
+
+## Sponsors & Adopters
+
+ORY Hydra is open source with a permissive license. We are a dedicated, young but also experienced team of developers
+in the area of cloud computing and internet security. Please support our mission for a safer web and become a sponsor, buy an
+engineer membership, or [tell us](mailto:hi@ory.am) why and how you are using ORY Hydra.
+
+### Sponsorship
+
+**[Become a ORY Hydra sponsor now](https://www.patreon.com/bePatron?c=581435&rid=1746199)** and help keep the project
+open source, free, and maintained. Additionally, sponsors unlock
+
+* Access to ORY's private slack community.
+* Featured logo & link in the readme and on the website.
+* placement in release announcements.
+
+Sponsorship starts at 600$ per month. We accept smaller contributions as well, but without the benefits listed above.
+
+### Sponsors
+
+<img src="docs/images/sponsors/auth0.png" align="left" width="30%" alt="Auth0.com" />
+
+We are proud to have [Auth0](https://auth0.com) as a **gold sponsor** for ORY Hydra. [Auth0](https://auth0.com) solves
+the most complex identity use cases with an extensible and easy to integrate platform that secures billions of logins
+every year. At ORY, we use [Auth0](https://auth0.com) in conjunction with ORY Hydra for various internal projects.
+
+<br clear="all"/>
+
+### Adopters
+
+ORY Hydra is battle-tested in production systems. This is a curated list of ORY Hydra adopters. [Tell us](mailto:hi@ory.am) if
+you think that your company should be listed here.
+
+<img src="https://www.arduino.cc/en/uploads/Trademark/ArduinoCommunityLogo.png" align="left" width="30%" alt="arduino.cc"/>
+
+<p>Arduino is an open-source electronics platform based on easy-to-use hardware and software. It's intended
+for anyone making interactive projects. ORY Hydra secures Arduino's developer platform.</p>
+
+<br clear="all"/>
 
 ## Documentation
 

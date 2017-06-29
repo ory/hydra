@@ -27,7 +27,7 @@ func newRevocationHandler(c *config.Config) *RevocationHandler {
 
 func (h *RevocationHandler) RevokeToken(cmd *cobra.Command, args []string) {
 	if ok, _ := cmd.Flags().GetBool("skip-tls-verify"); ok {
-		fmt.Println("Warning: Skipping TLS Certificate Verification.")
+		// fmt.Println("Warning: Skipping TLS Certificate Verification.")
 		h.M.Client = &http.Client{Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}}

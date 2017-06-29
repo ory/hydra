@@ -22,7 +22,7 @@ var tokenUserCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		if ok, _ := cmd.Flags().GetBool("skip-tls-verify"); ok {
-			fmt.Println("Warning: Skipping TLS Certificate Verification.")
+			// fmt.Println("Warning: Skipping TLS Certificate Verification.")
 			ctx = context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			}})
@@ -32,7 +32,8 @@ var tokenUserCmd = &cobra.Command{
 		clientId, _ := cmd.Flags().GetString("id")
 		clientSecret, _ := cmd.Flags().GetString("secret")
 		redirectUrl, _ := cmd.Flags().GetString("redirect")
-		cluster, _ := cmd.Flags().GetString("cluster")
+		backend, _ := cmd.Flags().GetString("token-url")
+		frontend, _ := cmd.Flags().GetString("auth-url")
 
 		if clientId == "" {
 			clientId = c.ClientID
@@ -40,16 +41,19 @@ var tokenUserCmd = &cobra.Command{
 		if clientSecret == "" {
 			clientSecret = c.ClientSecret
 		}
-		if cluster == "" {
-			cluster = c.ClusterURL
+		if backend == "" {
+			backend = pkg.JoinURLStrings(backend, "/oauth2/token")
+		}
+		if frontend == "" {
+			frontend = pkg.JoinURLStrings(frontend, "/oauth2/auth")
 		}
 
 		conf := oauth2.Config{
 			ClientID:     clientId,
 			ClientSecret: clientSecret,
 			Endpoint: oauth2.Endpoint{
-				TokenURL: pkg.JoinURLStrings(cluster, "/oauth2/token"),
-				AuthURL:  pkg.JoinURLStrings(cluster, "/oauth2/auth"),
+				TokenURL: frontend,
+				AuthURL:  backend,
 			},
 			RedirectURL: redirectUrl,
 			Scopes:      scopes,
@@ -132,5 +136,6 @@ func init() {
 	tokenUserCmd.Flags().String("id", "", "Force a client id, defaults to value from config file")
 	tokenUserCmd.Flags().String("secret", "", "Force a client secret, defaults to value from config file")
 	tokenUserCmd.Flags().String("redirect", "http://localhost:4445/callback", "Force a redirect url")
-	tokenUserCmd.Flags().String("cluster", c.ClusterURL, "Force a cluster url, defaults to value from config file")
+	tokenUserCmd.Flags().String("auth-url", c.ClusterURL, "Force the authorization url. The authorization url is the URL that the user will open in the browser, defaults to the cluster url value from config file")
+	tokenUserCmd.Flags().String("token-url", c.ClusterURL, "Force a token url. The token url is used to exchange the auth code, defaults to the cluster url value from config file")
 }

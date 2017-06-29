@@ -28,7 +28,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //       204: emptyResponse
 //       500: genericError
 func (h *Handler) Health(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	rw.WriteHeader(http.StatusNoContent)
+	rw.Write([]byte("ok"))
 }
 
 // swagger:route GET /health/stats health getStatistics

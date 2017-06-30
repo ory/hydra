@@ -1,20 +1,19 @@
 # 5 Minute Tutorial
 
-In this example, you will set up Hydra, a Postgres instance and an exemplary identity provider written in React using docker compose. It will take you about 5 minutes to get complete this tutorial.
+To start off easy, ORY Hydra provides a docker-compose based example for setting up ORY Hydra, a PostgreSQL instance
+and an exemplary consent app (identity provider). You need to have the latest Docker version installed.
 
 <img src="images/oauth2-flow.gif" alt="OAuth2 Flow">
 
 <img alt="Running the example" align="right" width="35%" src="images/run-the-example.gif">
 
 Install [Docker and Docker Compose](https://github.com/ory-am/hydra#installation) and either clone the Hydra git repository,
-download [this zip file](https://github.com/ory-am/hydra/archive/master.zip) or use `go get github.com/ory-am/hydra` if you have Go installed on you system.
-
-We will use a dummy password as the system secret: `SYSTEM_SECRET=passwordtutorialpasswordtutorial`. Use a very secure secret in production. 
+download [this zip file](https://github.com/ory-am/hydra/archive/master.zip) or use `go get github.com/ory/hydra` if you have Go (1.8+) installed on you system.
 
 ```
-$ git clone https://github.com/ory-am/hydra.git
+$ git clone https://github.com/ory/hydra.git
 $ cd hydra
-$ SYSTEM_SECRET=passwordtutorial DOCKER_IP=localhost docker-compose up --build
+$ docker-compose up --build -d
 Starting hydra_mysqld_1
 Starting hydra_postgresd_1
 Starting hydra_hydra_1
@@ -22,33 +21,29 @@ Starting hydra_hydra_1
 [...]
 ```
 
-You now have a running hydra docker container! Additionally, a Postgres image was deployed as well as a consent app.
-Next, let us manage the host process. You can use the Hydra CLI by ssh'ing to the docker container:
+Perfect, everything is running now! Let's SSH into the ORY Hydra container and play around with some of the commands:
 
 ```
 $ docker exec -i -t hydra_hydra_1 /bin/sh
-root@b4403bb4147f:/go/src/github.com/ory-am/hydra#
-```
+root@b4403bb4147f:/go/src/github.com/ory-am/hydra$
 
-Let's start by creating a new client:
-
-```
+# Creates a new OAuth 2.0 client
 $ hydra clients create
 Client ID: c003830f-a090-4721-9463-92424270ce91
 Client Secret: Z2pJ0>Tp7.ggn>EE&rhnOzdt1
-```
 
-Now, let us issue an access token for your OAuth2 client!
-
-```
+# Issues a token for the root client (id: admin)
 $ hydra token client
 JLbnRS9GQmzUBT4x7ESNw0kj2wc0ffbMwOv3QQZW4eI.qkP-IQXn6guoFew8TvaMFUD-SnAyT8GmWuqGi3wuWXg
+
+# Introspects a token:
+$ hydra token validate $(hydra token client)
 ```
 
-Let's try this with the authorize code grant!
+Next, we will perform the OAuth 2.0 Authorization Code Grant:
 
 ```
-$ hydra token user
+$ hydra token user --auth-url http://localhost:4444/oauth2/token --token-url http://localhost:4444/oauth2/auth
 Setting up callback listener on http://localhost:4445/callback
 Press ctrl + c on Linux / Windows or cmd + c on OSX to end the process.
 If your browser does not open automatically, navigate to:

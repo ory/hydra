@@ -43,7 +43,7 @@ $ hydra token validate $(hydra token client)
 Next, we will perform the OAuth 2.0 Authorization Code Grant:
 
 ```
-$ hydra token user --auth-url http://localhost:4444/oauth2/token --token-url http://localhost:4444/oauth2/auth
+$ hydra token user --auth-url http://localhost:4444/oauth2/auth --token-url http://localhost:4444/oauth2/token
 Setting up callback listener on http://localhost:4445/callback
 Press ctrl + c on Linux / Windows or cmd + c on OSX to end the process.
 If your browser does not open automatically, navigate to:

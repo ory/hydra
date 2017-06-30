@@ -5,35 +5,31 @@
     <a href="https://community.ory.am/"><img src="https://img.shields.io/badge/join-ory%20community-00cc99.svg" alt="Join the community at https://community.ory.am/"></a>
     <a href="http://eepurl.com/bKT3N9"><img src="https://img.shields.io/badge/join-ory%20newsletter-00cc99.svg" alt="Join newsletter"></a>
     <a href="https://patreon.com/user?u=4298803"><img src="https://img.shields.io/badge/support%20us-on%20patreon-green.svg" alt="Become a patron!"></a>
-
-    <a href=""><img src="" alt=""></a>
+</p>
+<p align="center">
+    <a href="https://travis-ci.org/ory/hydra"><img src="https://travis-ci.org/ory/hydra.svg?branch=master" alt="Build Status"></a>
+    <a href="https://coveralls.io/github/ory/hydra?branch=master"><img src="https://coveralls.io/repos/ory/hydra/badge.svg?branch=master&service=github" alt="Coverage Status"></a>
+    <a href="https://codeclimate.com/github/ory/hydra"><img src="https://codeclimate.com/github/ory/hydra/badges/gpa.svg" alt="Code Climate"></a>
+    <a href="https://goreportcard.com/report/github.com/ory/hydra"><img src="https://goreportcard.com/badge/github.com/ory/hydra" alt="Go Report Card"></a>
+    <a href="https://bestpractices.coreinfrastructure.org/projects/364"><img src="https://bestpractices.coreinfrastructure.org/projects/364/badge" alt="CII Best Practices"></a>
 </p>
 
-[![Build Status](https://travis-ci.org/ory/hydra.svg?branch=master)](https://travis-ci.org/ory/hydra)
-[![Coverage Status](https://coveralls.io/repos/ory/hydra/badge.svg?branch=master&service=github)](https://coveralls.io/github/ory/hydra?branch=master)
-[![Code Climate](https://codeclimate.com/github/ory/hydra/badges/gpa.svg)](https://codeclimate.com/github/ory/hydra)
-[![Go Report Card](https://goreportcard.com/badge/github.com/ory/hydra)](https://goreportcard.com/report/github.com/ory/hydra)
-[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/364/badge)](https://bestpractices.coreinfrastructure.org/projects/364)
+<p align="center">
+    <a href="https://ory.gitbooks.io/hydra/content/"><img src="https://img.shields.io/badge/docs-guide-blue.svg" alt="Docs Guide"></a>
+    <a href="http://docs.hydra13.apiary.io/"><img src="https://img.shields.io/badge/docs-http%20api-blue.svg" alt="HTTP API Documentation"></a>
+    <a href="https://godoc.org/github.com/ory/hydra"><img src="https://img.shields.io/badge/docs-godoc-blue.svg" alt="Code Documentation"></a>
+</p>
 
-[![Docs Guide](https://img.shields.io/badge/docs-guide-blue.svg)](https://ory.gitbooks.io/hydra/content/)
-[![HTTP API Documentation](https://img.shields.io/badge/docs-http%20api-blue.svg)](http://docs.hydra13.apiary.io/)
-[![Code Documentation](https://img.shields.io/badge/docs-godoc-blue.svg)](https://godoc.org/github.com/ory/hydra)
+ORY Hydra is a security-first OAuth 2.0 and OpenID Connect server optimized for low-latency, high throughput,
+and low resource consumption. ORY Hydra *is not* an identity provider (user sign up, user log in, password reset flow),
+but connects to your existing identity provider through a [consent app](https://ory.gitbooks.io/hydra/content/oauth2.html#consent-app-flow).
+Implementing the consent app in a different language is easy, and exemplary consent apps
+([Go](https://github.com/ory/hydra-consent-app-go), [Node](https://github.com/ory/hydra-consent-app-express)) and
+SDKs ([Go](https://github.com/ory/hydra/tree/update-docs/sdk), [Node](https://github.com/ory/hydra-js)) are provided.
 
-ORY Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service and is built on top of the security-first
-OAuth2 and OpenID Connect SDK [ORY Fosite](https://github.com/ory/fosite) and the access control
-SDK [ORY Ladon](https://github.com/ory/ladon). ORY Hydra is different, because it works with
-any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language)
-you build a bridge between ORY Hydra and your authentication infrastructure.
-
-ORY Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to.
-
-ORY Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working
-on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose.
-**Knowledge of OAuth 2.0 is imperative in understanding what ORY Hydra does and how it works.**
-
-Join the [ORY Hydra Newsletter](http://eepurl.com/bKT3N9) to stay on top of new developments. ORY Hydra has a lovely, active
-community on [Gitter](https://gitter.im/ory-am/hydra). For advanced use cases, check out the
-[Enterprise Edition](#enterprise-edition) section.
+Besides mitigating various attack vectors, such as database compromisation and OAuth 2.0 weaknesses, ORY Hydra is
+able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to.
+[Click here](https://ory.gitbooks.io/hydra/content/security.html#security-overview) to read more about security.
 
 ---
 

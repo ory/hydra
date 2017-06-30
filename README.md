@@ -1,9 +1,13 @@
 <h1 align="center"><img src="docs/images/logo.png" alt="ORY Hydra"></h1>
 
-[![Join the chat at https://gitter.im/ory-am/hydra](https://img.shields.io/badge/join-ory%20chat-00cc99.svg)](https://gitter.im/ory-am/hydra?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Join the community at https://community.ory.am/](https://img.shields.io/badge/join-ory%20community-00cc99.svg)](https://community.ory.am/)
-[![Join newsletter](https://img.shields.io/badge/join-ory%20newsletter-00cc99.svg)](http://eepurl.com/bKT3N9)
-[![Become a patron!](https://img.shields.io/badge/support%20us-on%20patreon-green.svg)](https://patreon.com/user?u=4298803)
+<p align="center">
+    <a href="https://gitter.im/ory-am/hydra"><img src="https://img.shields.io/badge/join-ory%20chat-00cc99.svg" alt="Join the chat at https://gitter.im/ory-am/hydra"></a>
+    <a href="https://community.ory.am/"><img src="https://img.shields.io/badge/join-ory%20community-00cc99.svg" alt="Join the community at https://community.ory.am/"></a>
+    <a href="http://eepurl.com/bKT3N9"><img src="https://img.shields.io/badge/join-ory%20newsletter-00cc99.svg" alt="Join newsletter"></a>
+    <a href="https://patreon.com/user?u=4298803"><img src="https://img.shields.io/badge/support%20us-on%20patreon-green.svg" alt="Become a patron!"></a>
+
+    <a href=""><img src="" alt=""></a>
+</p>
 
 [![Build Status](https://travis-ci.org/ory/hydra.svg?branch=master)](https://travis-ci.org/ory/hydra)
 [![Coverage Status](https://coveralls.io/repos/ory/hydra/badge.svg?branch=master&service=github)](https://coveralls.io/github/ory/hydra?branch=master)

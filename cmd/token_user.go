@@ -52,8 +52,8 @@ var tokenUserCmd = &cobra.Command{
 			ClientID:     clientId,
 			ClientSecret: clientSecret,
 			Endpoint: oauth2.Endpoint{
-				TokenURL: frontend,
-				AuthURL:  backend,
+				TokenURL: backend,
+				AuthURL:  frontend,
 			},
 			RedirectURL: redirectUrl,
 			Scopes:      scopes,

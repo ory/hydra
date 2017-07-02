@@ -105,21 +105,20 @@ cloud and on premise, and are securing millions of requests each day already.
 
 ### Products
 
-* **ORY Hydra+** is a closed source modification of ORY Hydra with fault-tolerance, low latency, increased throughput,
-reduced database load, stateless authorization, and other features. Pricing starts at 399€ per month. For more information [send us an inquiry](https://docs.google.com/forms/d/e/1FAIpQLSfRV34gUWHF1CnOa5oiWj_AMhh7SSGwwb_6DeMNhH-EQqnAwQ/viewform).
-* **ORY Security Console** is an admin user interface for ORY Hydra and ORY Gatekeeper. Available on-premise and as a service.
-Pricing starts at 49€ / month. For more information [send us an inquiry](https://docs.google.com/forms/d/e/1FAIpQLSfRV34gUWHF1CnOa5oiWj_AMhh7SSGwwb_6DeMNhH-EQqnAwQ/viewform).
-* **ORY Gatekeeper** is a configurable firewall reverse proxy making access control easy and secure. ORY Gatekeeper is compatible with ORY Hydra
-Access Control Policies and OAuth 2.0 Access Tokens. Pricing starts at 99€ / month. For more information [send us an inquiry](https://docs.google.com/forms/d/e/1FAIpQLSfRV34gUWHF1CnOa5oiWj_AMhh7SSGwwb_6DeMNhH-EQqnAwQ/viewform).
-
 * **ORY Hydra** - this repository.
+* **[ORY Hydra+](https://www.ory.am/products/cloud-security?utm_source=github_hydra#hydra-plus)** is optimized for extreme production loads, resiliance and availability - [learn more now](https://www.ory.am/products/cloud-security?utm_source=github_hydra#hydra-plus).
+* **[ORY Security Console](https://www.ory.am/products/cloud-security?utm_source=github_hydra#security-console)** is an admin user interface for ORY Hydra and ORY Gatekeeper. Available on-premise and as a service - [learn more now](https://www.ory.am/products/cloud-security?utm_source=github_hydra#security-console).
+* **[ORY Gatekeeper](https://www.ory.am/products/cloud-security?utm_source=github_hydra#gatekeeper)** is a configurable firewall reverse proxy making access control easy and secure. ORY Gatekeeper is compatible with ORY Hydra Access Control Policies and OAuth 2.0 Access Tokens. [Learn more now](https://www.ory.am/products/cloud-security?utm_source=github_hydra#gatekeeper).
 * **ORY Fosite** is a popular open source OAuth2 and OpenID Connect SDK for Go.
 * **ORY Ladon** is an acclaimed open source SDK for access control policies, solving authorization in the microservice and IoT age.
 
 ### Consulting
 
-Do you need help with setting up ORY Hydra in your environment, do you require custom features, or have other consulting
-needs? Then [contact us now!](https://docs.google.com/forms/d/e/1FAIpQLScy_mUDYCF9BTul3TPqYh-Fw-TCFkHHyhlzLOubrGY899hrqA/viewform).
+Access Control, OAuth 2.0, and OpenID Connect are rich topics with many nuances and implementation details. Not to worry, because we offer consulting services both on these topics and our ORY Cloud Security products.
+
+We are not your typical enterprise partner, but an agile, polite, highly talented, and extremely productive team of technology experts. You will never talk with interns, out-sourced support staff, or bots - but always with the owners and maintainers of the respective products, or even the founders themselves.
+
+Go [here to learn more about our consulting services](https://www.ory.am/products/cloud-security?utm_source=github_hydra#consulting).
 
 ## Quickstart
 

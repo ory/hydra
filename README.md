@@ -1,6 +1,6 @@
-<h1 align="center"><img src="docs/images/logo.png" alt="ORY Hydra"></h1>
+<h1 align="center"><img src="https://storage.googleapis.com/ory.am/ory_banners-32.png" alt="ORY Hydra"></h1>
 
-<p align="center">
+<p align="left">
     <a href="https://gitter.im/ory-am/hydra"><img src="https://img.shields.io/badge/join-ory%20chat-00cc99.svg" alt="Join the chat at https://gitter.im/ory-am/hydra"></a>
     <a href="https://community.ory.am/"><img src="https://img.shields.io/badge/join-ory%20community-00cc99.svg" alt="Join the community at https://community.ory.am/"></a>
     <a href="http://eepurl.com/bKT3N9"><img src="https://img.shields.io/badge/join-ory%20newsletter-00cc99.svg" alt="Join newsletter"></a>

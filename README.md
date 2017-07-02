@@ -105,12 +105,16 @@ cloud and on premise, and are securing millions of requests each day already.
 
 ### Products
 
+<img src="https://www.ory.am/images/ory-security-console.png" alt="ORY Security Console" align="right" width="40%">
+
 * **ORY Hydra** - this repository.
 * **[ORY Hydra+](https://www.ory.am/products/cloud-security?utm_source=github_hydra#hydra-plus)** is optimized for extreme production loads, resiliance and availability - [learn more now](https://www.ory.am/products/cloud-security?utm_source=github_hydra#hydra-plus).
-* **[ORY Security Console](https://www.ory.am/products/cloud-security?utm_source=github_hydra#security-console)** is an admin user interface for ORY Hydra and ORY Gatekeeper. Available on-premise and as a service - [learn more now](https://www.ory.am/products/cloud-security?utm_source=github_hydra#security-console).
+* **[ORY Security Console](https://www.ory.am/products/cloud-security?utm_source=github_hydra#security-console)** (image on the right) is an admin user interface for ORY Hydra and ORY Gatekeeper. Available on-premise and as a service - [learn more now](https://www.ory.am/products/cloud-security?utm_source=github_hydra#security-console).
 * **[ORY Gatekeeper](https://www.ory.am/products/cloud-security?utm_source=github_hydra#gatekeeper)** is a configurable firewall reverse proxy making access control easy and secure. ORY Gatekeeper is compatible with ORY Hydra Access Control Policies and OAuth 2.0 Access Tokens. [Learn more now](https://www.ory.am/products/cloud-security?utm_source=github_hydra#gatekeeper).
-* **ORY Fosite** is a popular open source OAuth2 and OpenID Connect SDK for Go.
-* **ORY Ladon** is an acclaimed open source SDK for access control policies, solving authorization in the microservice and IoT age.
+* **[ORY Fosite](https://github.com/ory/fosite)** is a popular open source OAuth2 and OpenID Connect SDK for Go.
+* **[ORY Ladon](https://github.com/ory/ladon)** is an acclaimed open source SDK for access control policies, solving authorization in the microservice and IoT age.
+
+<br clear="all">
 
 ### Consulting
 

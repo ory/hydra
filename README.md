@@ -6,7 +6,7 @@
     <a href="http://eepurl.com/bKT3N9"><img src="https://img.shields.io/badge/join-ory%20newsletter-00cc99.svg" alt="Join newsletter"></a>
     <a href="https://patreon.com/user?u=4298803"><img src="https://img.shields.io/badge/support%20us-on%20patreon-green.svg" alt="Become a patron!"></a>
 </p>
-<p align="center">
+<p align="left">
     <a href="https://travis-ci.org/ory/hydra"><img src="https://travis-ci.org/ory/hydra.svg?branch=master" alt="Build Status"></a>
     <a href="https://coveralls.io/github/ory/hydra?branch=master"><img src="https://coveralls.io/repos/ory/hydra/badge.svg?branch=master&service=github" alt="Coverage Status"></a>
     <a href="https://codeclimate.com/github/ory/hydra"><img src="https://codeclimate.com/github/ory/hydra/badges/gpa.svg" alt="Code Climate"></a>
@@ -14,7 +14,7 @@
     <a href="https://bestpractices.coreinfrastructure.org/projects/364"><img src="https://bestpractices.coreinfrastructure.org/projects/364/badge" alt="CII Best Practices"></a>
 </p>
 
-<p align="center">
+<p align="left">
     <a href="https://ory.gitbooks.io/hydra/content/"><img src="https://img.shields.io/badge/docs-guide-blue.svg" alt="Docs Guide"></a>
     <a href="http://docs.hydra13.apiary.io/"><img src="https://img.shields.io/badge/docs-http%20api-blue.svg" alt="HTTP API Documentation"></a>
     <a href="https://godoc.org/github.com/ory/hydra"><img src="https://img.shields.io/badge/docs-godoc-blue.svg" alt="Code Documentation"></a>

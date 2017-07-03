@@ -172,8 +172,8 @@ ec91228cb105db315553499c81918258f52cee9636ea2a4821bdb8226872f54b
 and execute the ORY Hydra command from there:
 
 ```
-$ docker exec -i -t <hydra-container-id> /bin/bash
-# e.g. docker exec -i -t ec91228 /bin/bash
+$ docker exec -i -t <hydra-container-id> /bin/sh
+# e.g. docker exec -i -t ec91228 /bin/sh
 
 root@ec91228cb105:/go/src/github.com/ory/hydra# hydra
 Hydra is a twelve factor OAuth2 and OpenID Connect provider

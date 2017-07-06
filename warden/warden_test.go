@@ -65,7 +65,7 @@ func init() {
 		OAuth2: &fosite.Fosite{
 			Store: fositeStore,
 			TokenIntrospectionHandlers: fosite.TokenIntrospectionHandlers{
-				&foauth2.CoreValidator{
+				&warden.TokenValidator{
 					CoreStrategy:  pkg.HMACStrategy,
 					CoreStorage:   fositeStore,
 					ScopeStrategy: fosite.HierarchicScopeStrategy,

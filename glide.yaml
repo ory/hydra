@@ -1,7 +1,11 @@
 package: github.com/ory/hydra
 import:
+- package: github.com/sirupsen/logrus
+  version: master
 - package: github.com/Sirupsen/logrus
-  version: 0.11.5
+  repo: https://github.com/sirupsen/logrus.git
+  vcs: git
+  version: master
 - package: github.com/dgrijalva/jwt-go
   version: 3.0.0
 - package: github.com/go-sql-driver/mysql
@@ -21,7 +25,7 @@ import:
 - package: github.com/oleiade/reflections
   version: 1.0.0
 - package: github.com/ory/fosite
-  version: 0.9.7
+  version: 0.10.0
   subpackages:
   - compose
   - handler/oauth2
@@ -32,9 +36,9 @@ import:
 - package: github.com/ory/graceful
   version: 0.1.0
 - package: github.com/ory/herodot
-  version: 0.0.3
+  version: 0.1.1
 - package: github.com/ory/ladon
-  version: 0.8.0
+  version: 0.8.1
   subpackages:
   - manager/memory
   - manager/sql

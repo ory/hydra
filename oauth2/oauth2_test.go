@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"

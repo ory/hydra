@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"

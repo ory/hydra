@@ -288,7 +288,7 @@ DATABASE_URL=memory go run main.go host
 **Notes**
 
 * We changed organization name from `ory-am` to `ory`. In order to keep backwards compatibility, we did not rename Go packages.
-* You can ignore warnings similar to `package github.com/ory/hydra/cmd/server: case-insensitive import collision: "github.com/Sirupsen/logrus" and "github.com/sirupsen/logrus"`.
+* You can ignore warnings similar to `package github.com/ory/hydra/cmd/server: case-insensitive import collision: "github.com/sirupsen/logrus" and "github.com/sirupsen/logrus"`.
 
 ## Reception
 

@@ -10,7 +10,7 @@ import (
 	"github.com/segmentio/analytics-go"
 	"github.com/urfave/negroni"
 	//"github.com/ory/hydra/cmd"
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/ory/hydra/pkg"
 )
 

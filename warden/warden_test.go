@@ -11,7 +11,6 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
-	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/firewall"
 	"github.com/ory/hydra/oauth2"

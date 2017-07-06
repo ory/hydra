@@ -17,9 +17,9 @@ import (
 
 	"encoding/json"
 
-	"github.com/sirupsen/logrus"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/health"
+	"github.com/sirupsen/logrus"
 )
 
 func TestMiddleware(t *testing.T) {

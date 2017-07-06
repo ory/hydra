@@ -35,14 +35,13 @@ type swaggerWardenAllowedParameters struct {
 	Body firewall.AccessRequest
 }
 
-
 // swagger:model wardenTokenAllowedBody
 type swaggerWardenTokenAllowedBody struct {
 	// Scopes is an array of scopes that are requried.
 	Scopes []string `json:"scopes"`
 
 	// Token is the token to introspect.
-	Token  string   `json:"token"`
+	Token string `json:"token"`
 
 	// Resource is the resource that access is requested to.
 	Resource string `json:"resource"`

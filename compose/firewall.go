@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/hydra/firewall"
@@ -13,6 +12,7 @@ import (
 	"github.com/ory/hydra/warden"
 	"github.com/ory/hydra/warden/group"
 	"github.com/ory/ladon"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 )
 

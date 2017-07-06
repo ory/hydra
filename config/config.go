@@ -15,7 +15,6 @@ import (
 
 	"os"
 
-	"github.com/sirupsen/logrus"
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/token/hmac"
@@ -26,6 +25,7 @@ import (
 	lmem "github.com/ory/ladon/manager/memory"
 	lsql "github.com/ory/ladon/manager/sql"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"golang.org/x/oauth2"

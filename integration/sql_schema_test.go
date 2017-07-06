@@ -3,7 +3,6 @@ package integration
 import (
 	"testing"
 
-	"github.com/sirupsen/logrus"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/jwk"
@@ -11,6 +10,7 @@ import (
 	"github.com/ory/hydra/warden/group"
 	"github.com/ory/ladon"
 	lsql "github.com/ory/ladon/manager/sql"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
 

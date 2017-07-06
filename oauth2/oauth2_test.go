@@ -6,7 +6,6 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
@@ -17,6 +16,7 @@ import (
 	. "github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 )

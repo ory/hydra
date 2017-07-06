@@ -6,11 +6,11 @@ import (
 	"os"
 	"strings"
 
+	"context"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/pkg"
 	"github.com/spf13/cobra"
-	"context"
 )
 
 type ClientHandler struct {

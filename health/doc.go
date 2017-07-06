@@ -4,6 +4,5 @@ package health
 // swagger:response clientsList
 type swaggerListClientsResult struct {
 	// in: body
-	Body struct {}
+	Body struct{}
 }
-

@@ -9,13 +9,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 const (

@@ -9,11 +9,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/dockertest"
-	"github.com/stretchr/testify/require"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var (

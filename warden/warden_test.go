@@ -9,7 +9,6 @@ import (
 
 	"context"
 
-	"github.com/sirupsen/logrus"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
@@ -20,6 +19,7 @@ import (
 	"github.com/ory/hydra/warden"
 	"github.com/ory/hydra/warden/group"
 	"github.com/ory/ladon"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	coauth2 "golang.org/x/oauth2"
 )

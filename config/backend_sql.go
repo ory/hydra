@@ -7,12 +7,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type SQLConnection struct {

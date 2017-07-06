@@ -127,7 +127,7 @@ func (sw *Snapshot) GetUpTime() int64 {
 	return sw.UpTime
 }
 
-func (sw *Snapshot) Update()  {
+func (sw *Snapshot) Update() {
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
 

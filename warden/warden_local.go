@@ -5,13 +5,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/firewall"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/warden/group"
 	"github.com/ory/ladon"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type LocalWarden struct {

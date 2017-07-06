@@ -9,12 +9,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
+	"github.com/sirupsen/logrus"
 )
 
 type FositeSQLStore struct {

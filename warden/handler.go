@@ -25,7 +25,7 @@ type wardenAuthorizedRequest struct {
 	Scopes []string `json:"scopes"`
 
 	// Token is the token to introspect.
-	Token  string   `json:"token"`
+	Token string `json:"token"`
 }
 
 type wardenAccessRequest struct {

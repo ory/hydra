@@ -10,8 +10,8 @@ import (
 	"github.com/segmentio/analytics-go"
 	"github.com/urfave/negroni"
 	//"github.com/ory/hydra/cmd"
-	"github.com/sirupsen/logrus"
 	"github.com/ory/hydra/pkg"
+	"github.com/sirupsen/logrus"
 )
 
 type MetricsManager struct {

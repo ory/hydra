@@ -5,11 +5,11 @@ import (
 	"os"
 	"testing"
 
-	"github.com/sirupsen/logrus"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/integration"
 	"github.com/ory/hydra/pkg"
+	"github.com/sirupsen/logrus"
 )
 
 var clientManagers = map[string]pkg.FositeStorer{}

@@ -43,15 +43,15 @@ func TestAuthCode(t *testing.T) {
 		require.True(t, ok)
 		require.NotEmpty(t, jwtClaims)
 
-		expl :=  map[string]interface{}{"foo": "bar", "baz": map[string]interface{}{"foo": "baz"}}
+		expl := map[string]interface{}{"foo": "bar", "baz": map[string]interface{}{"foo": "baz"}}
 		consent, err := signConsentToken(map[string]interface{}{
-			"jti": jwtClaims["jti"],
-			"exp": time.Now().Add(time.Hour).Unix(),
-			"iat": time.Now().Unix(),
-			"aud": "app-client",
-			"scp": []string{"hydra", "offline"},
-			"at_ext":expl,
-			"id_ext":expl,
+			"jti":    jwtClaims["jti"],
+			"exp":    time.Now().Add(time.Hour).Unix(),
+			"iat":    time.Now().Unix(),
+			"aud":    "app-client",
+			"scp":    []string{"hydra", "offline"},
+			"at_ext": expl,
+			"id_ext": expl,
 		})
 		pkg.RequireError(t, false, err)
 

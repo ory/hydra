@@ -1,16 +1,16 @@
 package config
 
 import (
-	"plugin"
-	"github.com/ory/ladon"
+	"github.com/jmoiron/sqlx"
+	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/warden/group"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/warden/group"
+	"github.com/ory/ladon"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/ory/fosite"
-	"github.com/jmoiron/sqlx"
+	"plugin"
 )
 
 type PluginConnection struct {

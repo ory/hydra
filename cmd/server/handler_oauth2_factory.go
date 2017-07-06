@@ -16,8 +16,8 @@ import (
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
-	"github.com/pkg/errors"
 	"github.com/ory/hydra/warden"
+	"github.com/pkg/errors"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {

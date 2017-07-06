@@ -9,7 +9,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/sirupsen/logrus"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
@@ -17,6 +16,7 @@ import (
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2/clientcredentials"
 )

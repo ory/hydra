@@ -8,7 +8,7 @@ import (
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/ory/fosite"
 	"github.com/jmoiron/sqlx"
 )

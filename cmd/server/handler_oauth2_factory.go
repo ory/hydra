@@ -17,6 +17,7 @@ import (
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
+	"github.com/ory/hydra/warden"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {
@@ -95,7 +96,7 @@ func newOAuth2Provider(c *config.Config, km jwk.Manager) fosite.OAuth2Provider {
 		compose.OpenIDConnectHybridFactory,
 		compose.OpenIDConnectImplicitFactory,
 		compose.OAuth2TokenRevocationFactory,
-		compose.OAuth2TokenIntrospectionFactory,
+		warden.OAuth2TokenIntrospectionFactory,
 	)
 }
 

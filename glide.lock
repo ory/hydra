@@ -1,10 +1,10 @@
-hash: c8f0eb4acf67bda1b31617880a182b951dc8aabc75c7e3de38074243319fd418
-updated: 2017-06-29T11:52:11.942198+02:00
+hash: d82c3ebecd3594a7795f2b3686b395463c73dc31e7292d29702ad791f688a082
+updated: 2017-07-06T15:40:02.811544049+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 4918b99a7cb949bb295f3c7bbaf24b577d806e35
 - name: github.com/Azure/go-ansiterm
-  version: fa152c58bc15761d0200cb75fe958b89a9d4888e
+  version: 19f72df4d05d31cbe1c56bfc8045c96babff6c7e
   subpackages:
   - winterm
 - name: github.com/cenk/backoff
@@ -16,7 +16,7 @@ imports:
 - name: github.com/dgrijalva/jwt-go
   version: d2709f9f1f31ebcda9651b03077758c1f3a0018c
 - name: github.com/docker/docker
-  version: 4845c567eb35d68f35b0b1713a09b0c8d47fe67e
+  version: 89658bed64c2a8fe05a978e5b87dbec409d57a0f
   subpackages:
   - api/types
   - api/types/blkiodev
@@ -44,25 +44,25 @@ imports:
   - pkg/term
   - pkg/term/windows
 - name: github.com/docker/go-connections
-  version: e15c02316c12de00874640cd76311849de2aeed5
+  version: 3ede32e2033de7505e6500d6c868c2b9ed9f169d
   subpackages:
   - nat
 - name: github.com/docker/go-units
   version: 0dadbb0345b35ec7ef35e228dabb8de89a65bf52
 - name: github.com/fsnotify/fsnotify
-  version: a904159b9206978bb6d53fcc7a769e5cd726c737
+  version: 4da3e2cfbabc9f751898f250b49f2439785783a1
 - name: github.com/fsouza/go-dockerclient
-  version: 30d142bbfdec74e09ecb4bdb89a44440ae4662ac
+  version: 4bc6a18363f79b32c26f92e2e6d8bfd30d79a770
 - name: github.com/go-sql-driver/mysql
   version: a0583e0143b1624142adab07e0e97fe106d99561
 - name: github.com/golang/protobuf
-  version: 69b215d01a5606c843240eab4937eab3acee6530
+  version: 6a1fa9404c0aebf36c879bc50152edcc953910d2
   subpackages:
   - proto
 - name: github.com/gorilla/context
   version: 1ea25387ff6f684839d82767c1733ff4d4d15d0a
 - name: github.com/gorilla/securecookie
-  version: fa5329f913702981df43dcb2a380bac429c810b5
+  version: e59506cc896acb7f7bf732d4fdf5e25f7ccd8983
 - name: github.com/gorilla/sessions
   version: ca9ada44574153444b00d3fd9c8559e4cc95f896
 - name: github.com/hashicorp/go-cleanhttp
@@ -72,7 +72,7 @@ imports:
   subpackages:
   - simplelru
 - name: github.com/hashicorp/hcl
-  version: 630949a3c5fa3c613328e1b8256052cbc2327c9b
+  version: 392dba7d905ed5d04a5794ba89f558b27e2ba1ca
   subpackages:
   - hcl/ast
   - hcl/parser
@@ -87,25 +87,25 @@ imports:
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
 - name: github.com/jehiah/go-strftime
-  version: 834e15c05a45371503440cc195bbd05c9a0968d9
+  version: 2efbe75097a505e2789f7e39cb9da067b5be8e3e
 - name: github.com/jmoiron/sqlx
-  version: f4076845477b10ac2453a16377a8383467aafe72
+  version: d9bd385d68c068f1fabb5057e3dedcbcbb039d0f
   subpackages:
   - reflectx
 - name: github.com/julienschmidt/httprouter
   version: 8c199fb6259ffc1af525cc3ad52ee60ba8359669
 - name: github.com/lib/pq
-  version: ba5d4f7a35561e22fbdf7a39aa0070f4d460cfc0
+  version: 8837942c3e09574accbc5f150e2c5e057189cace
   subpackages:
   - oid
 - name: github.com/magiconair/properties
-  version: b3b15ef068fd0b17ddf408a23669f20811d194d2
+  version: 51463bfca2576e06c62a8504b5c0f06d61312647
 - name: github.com/meatballhat/negroni-logrus
-  version: 7c570a907cfc69cdc004ad506c6f5e234815b936
+  version: 259659cbe5df2a5732a3c677d040058215be1ee7
 - name: github.com/Microsoft/go-winio
-  version: 13736c32520969a64987228c21c138a4cfdb3720
+  version: f533f7a102197536779ea3a8cb881d639e21ec5a
 - name: github.com/mitchellh/mapstructure
-  version: db1efb556f84b25a0a13a04aad883943538ad2e0
+  version: d0303fe809921458f417bcf828397a65db30a7e4
 - name: github.com/mohae/deepcopy
   version: 491d3605edfb866af34a48075bd4355ac1bf46ca
 - name: github.com/moul/http2curl
@@ -115,14 +115,14 @@ imports:
 - name: github.com/oleiade/reflections
   version: 2b6ec3da648e3e834dc41bad8d9ed7f2dc6a9496
 - name: github.com/opencontainers/runc
-  version: 2daa11574b12d2dd7f6dad3ffaa302871f21bd12
+  version: 3a5b963f2f0a924e1f0b81dc3b0a31249af92ed1
   subpackages:
   - libcontainer/system
   - libcontainer/user
 - name: github.com/ory/dockertest
-  version: 9d0647ae761f96a6738c5afb49688d22979b21ff
+  version: 6d57cd43b964e928111542771659af6a3a58521f
 - name: github.com/ory/fosite
-  version: 6c91a21b540c534c9a2330922e357e24c7d5fda9
+  version: ef8f1757f0c26317fd7dbb46f66fde7516a3b4bb
   subpackages:
   - compose
   - handler/oauth2
@@ -133,19 +133,17 @@ imports:
 - name: github.com/ory/graceful
   version: 3d30c83329259f53a904d428b38d8cb8fba7bd77
 - name: github.com/ory/herodot
-  version: ef15ccfb8c16051feca9ec289286732f8d288fec
+  version: 5bb399b8a5aa583343a2108e723b990432b4a1b4
 - name: github.com/ory/ladon
-  version: ee1899d4639f9b8629c08ac4a6cc0c987cfd2d28
+  version: 80ec7e047ca2806a4491df41d5e9a2ad73b936a0
   subpackages:
   - compiler
   - manager/memory
   - manager/sql
 - name: github.com/pborman/uuid
   version: a97ce2ca70fa5a848076093f05e639a89ca34d06
-- name: github.com/pelletier/go-buffruneio
-  version: df1e16fde7fc330a0ca68167c23bf7ed6ac31d6d
 - name: github.com/pelletier/go-toml
-  version: 22139eb5469018e7374b3e7ef653de37ffb44f72
+  version: 69d355db5304c0f7f809a2edc054553e7142f016
 - name: github.com/pkg/errors
   version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/pkg/profile
@@ -155,7 +153,7 @@ imports:
   subpackages:
   - difflib
 - name: github.com/rubenv/sql-migrate
-  version: f64b6080c334adaf843209164107439e92bb170b
+  version: 72a5478faa469f9023cc1802367cddfc5270acbb
   subpackages:
   - sqlparse
 - name: github.com/segmentio/analytics-go
@@ -163,21 +161,25 @@ imports:
 - name: github.com/segmentio/backo-go
   version: 204274ad699c0983a70203a566887f17a717fef4
 - name: github.com/Sirupsen/logrus
-  version: ba1b36c82c5e05c4f912a88eab0dcd91a171688f
+  version: 7dd06bf38e1e13df288d471a57d5adbac106be9e
+  repo: https://github.com/sirupsen/logrus.git
+  vcs: git
+- name: github.com/sirupsen/logrus
+  version: 7dd06bf38e1e13df288d471a57d5adbac106be9e
 - name: github.com/spf13/afero
   version: 9be650865eab0c12963d8753212f4f9c66cdcf12
   subpackages:
   - mem
 - name: github.com/spf13/cast
-  version: f820543c3592e283e311a60d2a600a664e39f6f7
+  version: acbeb36b902d72a7a4c18e8f3241075e7ab763e4
 - name: github.com/spf13/cobra
-  version: 92ea23a837e66f46ac9e7d04fa826602b7b0a42d
+  version: 8c6fa02d2225de0f9bdcb7ca912556f68d172d8c
 - name: github.com/spf13/jwalterweatherman
-  version: fa7ca7e836cf3a8bb4ebf799f472c12d7e903d66
+  version: 0efa5202c04663c757d84f90f5219c1250baf94f
 - name: github.com/spf13/pflag
-  version: 9ff6c6923cfffbcd502984b8e0c80539a94968b7
+  version: e57e3eeb33f795204c1ca35f56c44f83227c6e66
 - name: github.com/spf13/viper
-  version: 7538d73b4eb9511d85a9f1dfef202eeb8ac260f4
+  version: c1de95864d73a5465492829d7cb2dd422b19ac96
 - name: github.com/square/go-jose
   version: aa2e30fdd1fe9dd3394119af66451ae790d50e0d
   subpackages:
@@ -194,32 +196,32 @@ imports:
 - name: github.com/xtgo/uuid
   version: a0b114877d4caeffbd7f87e3757c17fce570fea7
 - name: golang.org/x/crypto
-  version: 453249f01cfeb54c3d549ddb75ff152ca243f9d8
+  version: d625dfd80595a76324dea1452ceb9cfbcaee8e3e
   subpackages:
   - bcrypt
   - blowfish
 - name: golang.org/x/net
-  version: dd2d9a67c97da0afa00d5726e28086007a0acce5
+  version: 054b33e6527139ad5b1ec2f6232c3b175bd9a30c
   subpackages:
   - context
   - context/ctxhttp
 - name: golang.org/x/oauth2
-  version: b9780ec78894ab900c062d58ee3076cd9b2a4501
+  version: cce311a261e6fcf29de72ca96827bdb0b7d9c9e6
   subpackages:
   - clientcredentials
   - internal
 - name: golang.org/x/sys
-  version: e4594059fe4cde2daf423055a596c2cd1e6c9adf
+  version: 6faef541c73732f438fb660a212750a9ba9f9362
   subpackages:
   - unix
   - windows
 - name: golang.org/x/text
-  version: 4687d739464a2d0af89a25be0318456e0776f3ef
+  version: cfdf022e86b4ecfb646e1efbd7db175dd623a8fa
   subpackages:
   - transform
   - unicode/norm
 - name: google.golang.org/appengine
-  version: 3a452f9e00122ead39586d68ffdb9c6e1326af3c
+  version: d11fc8a8dccf41ab5bd3c51a3ea52051240e325c
   subpackages:
   - internal
   - internal/base
@@ -236,7 +238,7 @@ imports:
   - cipher
   - json
 - name: gopkg.in/yaml.v2
-  version: a3f3340b5840cee44f372bddb5880fcbc419b46a
+  version: cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b
 testImports:
 - name: github.com/bmizerany/assert
   version: b7ed37b82869576c289d7d97fb2bbd8b64a0cb28

@@ -75,6 +75,10 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 	}
 
 	subject := ejwt.ToString(jwtClaims["sub"])
+	if subject == "" {
+		return nil, errors.Errorf("Subject key is empty or undefined in consent response, check your payload.")
+	}
+
 	scopes := toStringSlice(jwtClaims["scp"])
 	for _, scope := range scopes {
 		a.GrantScope(scope)

@@ -2,6 +2,13 @@
 
 This list makes you aware of (breaking) changes. For patch notes, please check the [releases tab](https://github.com/ory/hydra/releases).
 
+## 1.0.0-alpha1
+
+This release focuses on security, spec compliance and error tracing:
+
+1. It is now possible to refresh openid connect tokens using the refresh_token grant. An ID Token is issued if the scope
+`openid` was requested, and the client is allowed to receive an ID Token.
+
 ## 0.9.0
 
 This version adds performance metrics to `/health` and sends anonymous usage statistics to our servers, [click here](https://ory.gitbooks.io/hydra/content/telemetry.html) for more

@@ -9,7 +9,6 @@ import (
 )
 
 type FositeStorer interface {
-	oauth2.AccessTokenStorage
 	fosite.Storage
 	oauth2.CoreStorage
 	openid.OpenIDConnectRequestStorage

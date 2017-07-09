@@ -5,7 +5,6 @@ import (
 	"net/url"
 	"testing"
 	"time"
-
 	"context"
 	"fmt"
 
@@ -34,9 +33,10 @@ func init() {
 	now = time.Now().Round(time.Second)
 	tokens = pkg.Tokens(3)
 	fositeStore = storage.NewExampleStore()
+	fositeStore.Clients["my-client"].Scopes = []string{"fosite", "openid", "photos", "offline", "foo.*"}
 	r := httprouter.New()
 	serv := &oauth2.Handler{
-		ScopeStrategy: fosite.HierarchicScopeStrategy,
+		ScopeStrategy: fosite.WildcardScopeStrategy,
 		OAuth2: compose.Compose(
 			fc,
 			fositeStore,
@@ -55,7 +55,7 @@ func init() {
 	ts = httptest.NewServer(r)
 
 	ar := fosite.NewAccessRequest(oauth2.NewSession("alice"))
-	ar.GrantedScopes = fosite.Arguments{"core"}
+	ar.GrantedScopes = fosite.Arguments{"core", "foo.*"}
 	ar.RequestedAt = now
 	ar.Client = &fosite.DefaultClient{ID: "siri"}
 	ar.Session.SetExpiresAt(fosite.AccessToken, now.Add(time.Hour))
@@ -63,7 +63,7 @@ func init() {
 	fositeStore.CreateAccessTokenSession(nil, tokens[0][0], ar)
 
 	ar2 := fosite.NewAccessRequest(oauth2.NewSession("siri"))
-	ar2.GrantedScopes = fosite.Arguments{"core"}
+	ar2.GrantedScopes = fosite.Arguments{"core", "foo.*"}
 	ar2.RequestedAt = now
 	ar2.Session.(*oauth2.Session).Extra = map[string]interface{}{"foo": "bar"}
 	ar2.Session.SetExpiresAt(fosite.AccessToken, now.Add(time.Hour))
@@ -71,7 +71,7 @@ func init() {
 	fositeStore.CreateAccessTokenSession(nil, tokens[1][0], ar2)
 
 	ar3 := fosite.NewAccessRequest(oauth2.NewSession("siri"))
-	ar3.GrantedScopes = fosite.Arguments{"core"}
+	ar3.GrantedScopes = fosite.Arguments{"core", "foo.*"}
 	ar3.RequestedAt = now
 	ar3.Session.(*oauth2.Session).Extra = map[string]interface{}{"foo": "bar"}
 	ar3.Client = &fosite.DefaultClient{ID: "doesnt-exist"}
@@ -102,6 +102,7 @@ func TestIntrospect(t *testing.T) {
 		for _, c := range []struct {
 			token     string
 			expectErr bool
+			scopes []string
 			assert    func(*oauth2.Introspection)
 		}{
 			{
@@ -123,6 +124,7 @@ func TestIntrospect(t *testing.T) {
 			{
 				token:     tokens[0][1],
 				expectErr: false,
+				scopes: []string{"foo.bar"},
 				assert: func(c *oauth2.Introspection) {
 					assert.Equal(t, "alice", c.Subject)
 					//assert.Equal(t, "tests", c.Issuer)
@@ -134,7 +136,7 @@ func TestIntrospect(t *testing.T) {
 			},
 		} {
 			t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
-				ctx, err := w.IntrospectToken(context.Background(), c.token)
+				ctx, err := w.IntrospectToken(context.Background(), c.token, c.scopes...)
 				if c.expectErr {
 					require.Error(t, err)
 				} else {

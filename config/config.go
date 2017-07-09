@@ -50,6 +50,7 @@ type Config struct {
 	AllowTLSTermination    string `mapstructure:"HTTPS_ALLOW_TERMINATION_FROM" yaml:"-"`
 	BCryptWorkFactor       int    `mapstructure:"BCRYPT_COST" yaml:"-"`
 	AccessTokenLifespan    string `mapstructure:"ACCESS_TOKEN_LIFESPAN" yaml:"-"`
+	ScopeStrategy          string `mapstructure:"SCOPE_STRATEGY" yaml:"-"`
 	AuthCodeLifespan       string `mapstructure:"AUTH_CODE_LIFESPAN" yaml:"-"`
 	IDTokenLifespan        string `mapstructure:"ID_TOKEN_LIFESPAN" yaml:"-"`
 	ChallengeTokenLifespan string `mapstructure:"CHALLENGE_TOKEN_LIFESPAN" yaml:"-"`
@@ -66,7 +67,15 @@ type Config struct {
 	cluster      *url.URL                `yaml:"-"`
 	oauth2Client *http.Client            `yaml:"-"`
 	context      *Context                `yaml:"-"`
-	systemSecret []byte
+	systemSecret []byte `yaml:"-"`
+}
+
+func (c *Config) GetScopeStrategy() fosite.ScopeStrategy {
+	if c.ScopeStrategy == "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY" {
+		return fosite.HierarchicScopeStrategy
+	}
+
+	return fosite.WildcardScopeStrategy
 }
 
 func matchesRange(r *http.Request, ranges []string) error {

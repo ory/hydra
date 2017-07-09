@@ -24,6 +24,7 @@ import (
 func TestHandlerWellKnown(t *testing.T) {
 	h := &Handler{
 		H:      herodot.NewJSONWriter(nil),
+		ScopeStrategy:fosite.HierarchicScopeStrategy,
 		Issuer: "http://hydra.localhost",
 	}
 
@@ -82,6 +83,7 @@ func TestIssuerRedirect(t *testing.T) {
 		Issuer:      "http://127.0.0.1/some/proxied/path",
 		OAuth2:      compose.ComposeAllEnabled(&config, storage, secret, privateKey),
 		ConsentURL:  *consentUrl,
+		ScopeStrategy:fosite.WildcardScopeStrategy,
 		CookieStore: sessions.NewCookieStore([]byte("my super secret password")),
 		Consent:     cs,
 		L:           logrus.New(),

@@ -35,6 +35,7 @@ func init() {
 	fositeStore = storage.NewExampleStore()
 	r := httprouter.New()
 	serv := &oauth2.Handler{
+		ScopeStrategy:fosite.HierarchicScopeStrategy,
 		OAuth2: compose.Compose(
 			fc,
 			fositeStore,

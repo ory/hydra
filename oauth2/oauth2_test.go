@@ -69,6 +69,7 @@ var handler = &Handler{
 	CookieStore: sessions.NewCookieStore([]byte("foo-secret")),
 	ForcedHTTP:  true,
 	L:           logrus.New(),
+	ScopeStrategy: fosite.HierarchicScopeStrategy,
 }
 
 var router = httprouter.New()

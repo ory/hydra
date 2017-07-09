@@ -5,10 +5,10 @@ import (
 	"io"
 	"testing"
 
-	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
 	"github.com/square/go-jose"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func RandomBytes(n int) ([]byte, error) {
@@ -56,7 +56,7 @@ func TestHelperManagerKey(m Manager, keys *jose.JsonWebKeySet) func(t *testing.T
 func TestHelperManagerKeySet(m Manager, keys *jose.JsonWebKeySet) func(t *testing.T) {
 	return func(t *testing.T) {
 		_, err := m.GetKeySet("foo")
-		pkg.AssertError(t, true, err)
+		require.Error(t, err)
 
 		err = m.AddKeySet("bar", keys)
 		assert.Nil(t, err)

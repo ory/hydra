@@ -56,6 +56,7 @@ func (w *LocalWarden) TokenAllowed(ctx context.Context, token string, a *firewal
 	if err != nil {
 		w.L.WithFields(logrus.Fields{
 			"request": a,
+			"scopes":   scopes,
 			"reason":  "Token is expired, malformed or missing",
 		}).WithError(err).Infof("Access denied")
 		return nil, err

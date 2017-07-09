@@ -49,6 +49,8 @@ type Handler struct {
 
 	L logrus.FieldLogger
 
+	ScopeStrategy fosite.ScopeStrategy
+
 	Issuer string
 }
 
@@ -269,7 +271,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprou
 	if accessRequest.GetGrantTypes().Exact("client_credentials") {
 		session.Subject = accessRequest.GetClient().GetID()
 		for _, scope := range accessRequest.GetRequestedScopes() {
-			if fosite.HierarchicScopeStrategy(accessRequest.GetClient().GetScopes(), scope) {
+			if h.ScopeStrategy(accessRequest.GetClient().GetScopes(), scope) {
 				accessRequest.GrantScope(scope)
 			}
 		}

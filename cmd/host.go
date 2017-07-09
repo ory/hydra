@@ -92,6 +92,8 @@ OAUTH2 CONTROLS
 - CHALLENGE_TOKEN_LIFESPAN: Lifespan of OAuth2 consent tokens. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 	Defaults to CHALLENGE_TOKEN_LIFESPAN=10m
 
+- SCOPE_STRATEGY: Set this to DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY to enable the deprecated hierarchical scope strategy.
+	This is required if you do not want to migrate to the new wildcard strategy.
 
 HTTPS CONTROLS
 ==============

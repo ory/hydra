@@ -121,36 +121,6 @@ func (s *FositeMemoryStore) CreateImplicitAccessTokenSession(ctx context.Context
 	return s.CreateAccessTokenSession(ctx, code, req)
 }
 
-func (s *FositeMemoryStore) PersistAuthorizeCodeGrantSession(ctx context.Context, authorizeCode, accessSignature, refreshSignature string, request fosite.Requester) error {
-	if err := s.DeleteAuthorizeCodeSession(ctx, authorizeCode); err != nil {
-		return err
-	} else if err := s.CreateAccessTokenSession(ctx, accessSignature, request); err != nil {
-		return err
-	}
-
-	if refreshSignature == "" {
-		return nil
-	}
-
-	if err := s.CreateRefreshTokenSession(ctx, refreshSignature, request); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (s *FositeMemoryStore) PersistRefreshTokenGrantSession(ctx context.Context, originalRefreshSignature, accessSignature, refreshSignature string, request fosite.Requester) error {
-	if err := s.DeleteRefreshTokenSession(ctx, originalRefreshSignature); err != nil {
-		return err
-	} else if err := s.CreateAccessTokenSession(ctx, accessSignature, request); err != nil {
-		return err
-	} else if err := s.CreateRefreshTokenSession(ctx, refreshSignature, request); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (s *FositeMemoryStore) RevokeRefreshToken(ctx context.Context, id string) error {
 	var found bool
 	for sig, token := range s.RefreshTokens {

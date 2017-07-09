@@ -9,6 +9,7 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // RandomBytes returns n random bytes by reading from crypto/rand.Reader
@@ -22,7 +23,7 @@ func randomBytes(n int) ([]byte, error) {
 
 func TestAEAD(t *testing.T) {
 	key, err := randomBytes(32)
-	pkg.AssertError(t, false, err)
+	require.NoError(t, err)
 
 	a := &AEAD{
 		Key: key,

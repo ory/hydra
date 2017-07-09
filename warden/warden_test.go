@@ -21,6 +21,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	coauth2 "golang.org/x/oauth2"
+	"fmt"
+	"github.com/stretchr/testify/require"
 )
 
 var ts *httptest.Server
@@ -141,155 +143,169 @@ func init() {
 
 func TestActionAllowed(t *testing.T) {
 	for n, w := range wardens {
-		for k, c := range []struct {
-			token     string
-			req       *firewall.TokenAccessRequest
-			scopes    []string
-			expectErr bool
-			assert    func(*firewall.Context)
-		}{
-			{
-				token:     "invalid",
-				req:       &firewall.TokenAccessRequest{},
-				scopes:    []string{},
-				expectErr: true,
-			},
-			{
-				token:     tokens[0][1],
-				req:       &firewall.TokenAccessRequest{},
-				scopes:    []string{"core"},
-				expectErr: true,
-			},
-			{
-				token:     tokens[0][1],
-				req:       &firewall.TokenAccessRequest{},
-				scopes:    []string{"foo"},
-				expectErr: true,
-			},
-			{
-				token: tokens[0][1],
-				req: &firewall.TokenAccessRequest{
-					Resource: "matrix",
-					Action:   "create",
-					Context:  ladon.Context{},
+		t.Run("warden="+n, func(t *testing.T) {
+			for k, c := range []struct {
+				token     string
+				req       *firewall.TokenAccessRequest
+				scopes    []string
+				expectErr bool
+				assert    func(*firewall.Context)
+			}{
+				{
+					token:     "invalid",
+					req:       &firewall.TokenAccessRequest{},
+					scopes:    []string{},
+					expectErr: true,
 				},
-				scopes:    []string{"foo"},
-				expectErr: true,
-			},
-			{
-				token: tokens[0][1],
-				req: &firewall.TokenAccessRequest{
-					Resource: "matrix",
-					Action:   "delete",
-					Context:  ladon.Context{},
+				{
+					token:     tokens[0][1],
+					req:       &firewall.TokenAccessRequest{},
+					scopes:    []string{"core"},
+					expectErr: true,
 				},
-				scopes:    []string{"core"},
-				expectErr: true,
-			},
-			{
-				token: tokens[0][1],
-				req: &firewall.TokenAccessRequest{
-					Resource: "matrix",
-					Action:   "create",
-					Context:  ladon.Context{},
+				{
+					token:     tokens[0][1],
+					req:       &firewall.TokenAccessRequest{},
+					scopes:    []string{"foo"},
+					expectErr: true,
 				},
-				scopes:    []string{"illegal"},
-				expectErr: true,
-			},
-			{
-				token: tokens[0][1],
-				req: &firewall.TokenAccessRequest{
-					Resource: "matrix",
-					Action:   "create",
-					Context:  ladon.Context{},
+				{
+					token: tokens[0][1],
+					req: &firewall.TokenAccessRequest{
+						Resource: "matrix",
+						Action:   "create",
+						Context:  ladon.Context{},
+					},
+					scopes:    []string{"foo"},
+					expectErr: true,
 				},
-				scopes:    []string{"core"},
-				expectErr: false,
-				assert: func(c *firewall.Context) {
-					assert.Equal(t, "siri", c.Audience)
-					assert.Equal(t, "alice", c.Subject)
-					assert.Equal(t, "tests", c.Issuer)
-					assert.Equal(t, now.Add(time.Hour).Unix(), c.ExpiresAt.Unix())
-					assert.Equal(t, now.Unix(), c.IssuedAt.Unix())
+				{
+					token: tokens[0][1],
+					req: &firewall.TokenAccessRequest{
+						Resource: "matrix",
+						Action:   "delete",
+						Context:  ladon.Context{},
+					},
+					scopes:    []string{"core"},
+					expectErr: true,
 				},
-			},
-			{
-				token: tokens[3][1],
-				req: &firewall.TokenAccessRequest{
-					Resource: "forbidden_matrix",
-					Action:   "create",
-					Context:  ladon.Context{},
+				{
+					token: tokens[0][1],
+					req: &firewall.TokenAccessRequest{
+						Resource: "matrix",
+						Action:   "create",
+						Context:  ladon.Context{},
+					},
+					scopes:    []string{"illegal"},
+					expectErr: true,
 				},
-				scopes:    []string{"core"},
-				expectErr: true,
-			},
-			{
-				token: tokens[3][1],
-				req: &firewall.TokenAccessRequest{
-					Resource: "matrix",
-					Action:   "create",
-					Context:  ladon.Context{},
+				{
+					token: tokens[0][1],
+					req: &firewall.TokenAccessRequest{
+						Resource: "matrix",
+						Action:   "create",
+						Context:  ladon.Context{},
+					},
+					scopes:    []string{"core"},
+					expectErr: false,
+					assert: func(c *firewall.Context) {
+						assert.Equal(t, "siri", c.Audience)
+						assert.Equal(t, "alice", c.Subject)
+						assert.Equal(t, "tests", c.Issuer)
+						assert.Equal(t, now.Add(time.Hour).Unix(), c.ExpiresAt.Unix())
+						assert.Equal(t, now.Unix(), c.IssuedAt.Unix())
+					},
 				},
-				scopes:    []string{"core"},
-				expectErr: false,
-				assert: func(c *firewall.Context) {
-					assert.Equal(t, "siri", c.Audience)
-					assert.Equal(t, "ken", c.Subject)
-					assert.Equal(t, "tests", c.Issuer)
-					assert.Equal(t, now.Add(time.Hour).Unix(), c.ExpiresAt.Unix())
-					assert.Equal(t, now.Unix(), c.IssuedAt.Unix())
+				{
+					token: tokens[3][1],
+					req: &firewall.TokenAccessRequest{
+						Resource: "forbidden_matrix",
+						Action:   "create",
+						Context:  ladon.Context{},
+					},
+					scopes:    []string{"core"},
+					expectErr: true,
 				},
-			},
-		} {
-			ctx, err := w.TokenAllowed(context.Background(), c.token, c.req, c.scopes...)
-			pkg.AssertError(t, c.expectErr, err, "ActionAllowed case", n, k)
-			if err == nil && c.assert != nil {
-				c.assert(ctx)
+				{
+					token: tokens[3][1],
+					req: &firewall.TokenAccessRequest{
+						Resource: "matrix",
+						Action:   "create",
+						Context:  ladon.Context{},
+					},
+					scopes:    []string{"core"},
+					expectErr: false,
+					assert: func(c *firewall.Context) {
+						assert.Equal(t, "siri", c.Audience)
+						assert.Equal(t, "ken", c.Subject)
+						assert.Equal(t, "tests", c.Issuer)
+						assert.Equal(t, now.Add(time.Hour).Unix(), c.ExpiresAt.Unix())
+						assert.Equal(t, now.Unix(), c.IssuedAt.Unix())
+					},
+				},
+			} {
+				t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+					ctx, err := w.TokenAllowed(context.Background(), c.token, c.req, c.scopes...)
+					if c.expectErr {
+						require.Error(t, err)
+					} else {
+						require.NoError(t, err)
+					}
+
+					if err == nil && c.assert != nil {
+						c.assert(ctx)
+					}
+				})
 			}
-		}
+		})
 	}
 }
 
 func TestAllowed(t *testing.T) {
 	for n, w := range wardens {
-		for k, c := range []struct {
-			req       *firewall.AccessRequest
-			expectErr bool
-			assert    func(*firewall.Context)
-		}{
-			{
-				req: &firewall.AccessRequest{
-					Subject:  "alice",
-					Resource: "other-thing",
-					Action:   "create",
-					Context:  ladon.Context{},
+		t.Run("warden="+n, func(t *testing.T) {
+			for k, c := range []struct {
+				req       *firewall.AccessRequest
+				expectErr bool
+				assert    func(*firewall.Context)
+			}{
+				{
+					req: &firewall.AccessRequest{
+						Subject:  "alice",
+						Resource: "other-thing",
+						Action:   "create",
+						Context:  ladon.Context{},
+					},
+					expectErr: true,
 				},
-				expectErr: true,
-			},
-			{
-				req: &firewall.AccessRequest{
-					Subject:  "alice",
-					Resource: "matrix",
-					Action:   "delete",
-					Context:  ladon.Context{},
+				{
+					req: &firewall.AccessRequest{
+						Subject:  "alice",
+						Resource: "matrix",
+						Action:   "delete",
+						Context:  ladon.Context{},
+					},
+					expectErr: true,
 				},
-				expectErr: true,
-			},
-			{
-				req: &firewall.AccessRequest{
-					Subject:  "alice",
-					Resource: "matrix",
-					Action:   "create",
-					Context:  ladon.Context{},
+				{
+					req: &firewall.AccessRequest{
+						Subject:  "alice",
+						Resource: "matrix",
+						Action:   "create",
+						Context:  ladon.Context{},
+					},
+					expectErr: false,
 				},
-				expectErr: false,
-			},
-		} {
-			err := w.IsAllowed(context.Background(), c.req)
-			pkg.AssertError(t, c.expectErr, err, "TestAllowed case", n, k)
-			t.Logf("Passed test case %d\n", k)
-		}
-		t.Logf("Passed tests %s\n", n)
+			} {
+				t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+					err := w.IsAllowed(context.Background(), c.req)
+					if c.expectErr {
+						require.Error(t, err)
+					} else {
+						require.NoError(t, err)
+					}
+				})
+			}
+		})
 	}
-
 }

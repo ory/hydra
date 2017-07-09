@@ -8,17 +8,15 @@ import (
 	"net/url"
 	"os"
 	"testing"
-	"time"
-
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/compose"
 	"github.com/ory/hydra/integration"
 	. "github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/pkg"
 	"github.com/ory/ladon"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var managers = map[string]Manager{}
@@ -107,15 +105,12 @@ func TestHTTPManagerPublicKeyGet(t *testing.T) {
 	m := httpManager
 
 	_, err := m.GetKey("anonymous", "baz")
-	pkg.AssertError(t, true, err, name)
+	require.Error(t, err)
 
-	err = m.AddKey("anonymous", First(priv))
-	pkg.AssertError(t, false, err, name)
-
-	time.Sleep(time.Millisecond * 100)
+	require.NoError(t, m.AddKey("anonymous", First(priv)))
 
 	got, err := anonymous.GetKey("anonymous", "private")
-	pkg.RequireError(t, false, err, name)
+	require.NoError(t, err, name)
 	assert.Equal(t, priv, got.Keys, "%s", name)
 }
 

@@ -5,7 +5,6 @@ import (
 	"io"
 	"testing"
 
-	"github.com/ory/hydra/pkg"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -32,10 +31,10 @@ func TestAEAD(t *testing.T) {
 	for i := 0; i < 100; i++ {
 		plain := []byte(uuid.New())
 		ct, err := a.Encrypt(plain)
-		pkg.AssertError(t, false, err)
+		require.NoError(t, err)
 
 		res, err := a.Decrypt(ct)
-		pkg.AssertError(t, false, err)
+		require.NoError(t, err)
 		assert.Equal(t, plain, res)
 	}
 }

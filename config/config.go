@@ -9,10 +9,8 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	//"os"
 	"strings"
 	"time"
-
 	"os"
 
 	"github.com/ory/fosite"
@@ -72,6 +70,7 @@ type Config struct {
 
 func (c *Config) GetScopeStrategy() fosite.ScopeStrategy {
 	if c.ScopeStrategy == "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY" {
+		c.GetLogger().Warn("Using deprecated hierarchical scope strategy, consider upgrading to wildcards.")
 		return fosite.HierarchicScopeStrategy
 	}
 
@@ -312,7 +311,7 @@ func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
 		ClientID:     c.ClientID,
 		ClientSecret: c.ClientSecret,
 		TokenURL:     pkg.JoinURLStrings(c.ClusterURL, "/oauth2/token"),
-		Scopes:       []string{"hydra"},
+		Scopes:       []string{"hydra", "hydra.*"},
 	}
 
 	fakeTlsTermination, _ := cmd.Flags().GetBool("fake-tls-termination")

@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"testing"
 	"time"
 
 	"github.com/ory/fosite/handler/oauth2"
@@ -9,9 +8,6 @@ import (
 	"github.com/ory/fosite/token/hmac"
 	"github.com/ory/ladon"
 	"github.com/ory/ladon/manager/memory"
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 var HMACStrategy = &oauth2.HMACSHAStrategy{

@@ -48,6 +48,7 @@ func TestAuthCode(t *testing.T) {
 			"jti":    jwtClaims["jti"],
 			"exp":    time.Now().Add(time.Hour).Unix(),
 			"iat":    time.Now().Unix(),
+			"sub":    "foo",
 			"aud":    "app-client",
 			"scp":    []string{"hydra", "offline"},
 			"at_ext": expl,

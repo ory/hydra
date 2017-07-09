@@ -22,30 +22,6 @@ var HMACStrategy = &oauth2.HMACSHAStrategy{
 	AuthorizeCodeLifespan: time.Hour,
 }
 
-func RequireError(t *testing.T, expectError bool, err error, args ...interface{}) {
-	if err != nil && !expectError {
-		t.Logf("Unexpected error: %s\n", err.Error())
-		t.Logf("Arguments: %v\n", args)
-		if e, ok := errors.Cause(err).(stackTracer); ok {
-			t.Logf("Stack:\n%+v\n", e.StackTrace())
-		}
-		t.Logf("\n\n")
-	}
-	require.Equal(t, expectError, err != nil, "%v", args)
-}
-
-func AssertError(t *testing.T, expectError bool, err error, args ...interface{}) {
-	assert.Equal(t, expectError, err != nil, "%v", args)
-	if err != nil && !expectError {
-		t.Logf("Unexpected error: %s\n", err.Error())
-		t.Logf("Arguments: %s\n", args)
-		if e, ok := errors.Cause(err).(stackTracer); ok {
-			t.Logf("Stack:\n%+v\n", e.StackTrace())
-		}
-		t.Logf("\n\n")
-	}
-}
-
 func LadonWarden(ps map[string]ladon.Policy) ladon.Warden {
 	return &ladon.Ladon{
 		Manager: &memory.MemoryManager{

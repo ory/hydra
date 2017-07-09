@@ -19,6 +19,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2/clientcredentials"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -124,7 +125,12 @@ func TestRevoke(t *testing.T) {
 		} {
 			t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
 				err := w.RevokeToken(context.Background(), c.token)
-				pkg.AssertError(t, c.expectErr, err)
+				if c.expectErr {
+					require.Error(t, err)
+				} else {
+					require.NoError(t, err)
+				}
+				
 				if c.assert != nil {
 					c.assert(t)
 				}

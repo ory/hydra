@@ -19,6 +19,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	goauth2 "golang.org/x/oauth2"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -35,7 +36,7 @@ func init() {
 	fositeStore = storage.NewExampleStore()
 	r := httprouter.New()
 	serv := &oauth2.Handler{
-		ScopeStrategy:fosite.HierarchicScopeStrategy,
+		ScopeStrategy: fosite.HierarchicScopeStrategy,
 		OAuth2: compose.Compose(
 			fc,
 			fositeStore,
@@ -134,7 +135,11 @@ func TestIntrospect(t *testing.T) {
 		} {
 			t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
 				ctx, err := w.IntrospectToken(context.Background(), c.token)
-				pkg.AssertError(t, c.expectErr, err)
+				if c.expectErr {
+					require.Error(t, err)
+				} else {
+					require.NoError(t, err)
+				}
 				if err == nil && c.assert != nil {
 					c.assert(ctx)
 				}

@@ -5,9 +5,7 @@ import (
 	"net/http"
 	"testing"
 	"time"
-
 	"net/http/cookiejar"
-
 	"net/url"
 	"strings"
 
@@ -16,7 +14,6 @@ import (
 	ejwt "github.com/ory/fosite/token/jwt"
 	"github.com/ory/hydra/jwk"
 	. "github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -33,10 +30,10 @@ func TestAuthCode(t *testing.T) {
 			}
 
 			pk, err := keyManager.GetKey(ConsentChallengeKey, "public")
-			pkg.RequireError(t, false, err)
+			require.NoError(t, err)
 			return jwk.MustRSAPublic(jwk.First(pk.Keys)), nil
 		})
-		pkg.RequireError(t, false, err)
+		require.NoError(t, err)
 		require.True(t, tok.Valid)
 
 		jwtClaims, ok := tok.Claims.(jwt.MapClaims)
@@ -54,7 +51,7 @@ func TestAuthCode(t *testing.T) {
 			"at_ext": expl,
 			"id_ext": expl,
 		})
-		pkg.RequireError(t, false, err)
+		require.NoError(t, err)
 
 		http.Redirect(w, r, ejwt.ToString(jwtClaims["redir"])+"&consent="+consent, http.StatusFound)
 		validConsent = true
@@ -67,20 +64,20 @@ func TestAuthCode(t *testing.T) {
 
 	cookieJar, _ := cookiejar.New(nil)
 	req, err := http.NewRequest("GET", oauthConfig.AuthCodeURL("some-foo-state"), nil)
-	pkg.RequireError(t, false, err)
+	require.NoError(t, err)
 
 	resp, err := (&http.Client{Jar: cookieJar}).Do(req)
-	pkg.RequireError(t, false, err)
+	require.NoError(t, err)
 	defer resp.Body.Close()
 
 	_, err = ioutil.ReadAll(resp.Body)
-	pkg.RequireError(t, false, err)
+	require.NoError(t, err)
 
 	require.True(t, validConsent)
 	require.NotEmpty(t, code)
 
 	token, err := oauthConfig.Exchange(oauth2.NoContext, code)
-	pkg.RequireError(t, false, err, code)
+	require.NoError(t, err, code)
 
 	time.Sleep(time.Second * 5)
 

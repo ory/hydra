@@ -3,13 +3,14 @@ package jwk
 import (
 	"testing"
 
-	"github.com/ory/hydra/pkg"
 	"github.com/square/go-jose"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"fmt"
 )
 
 func TestGenerator(t *testing.T) {
-	for _, c := range []struct {
+	for k, c := range []struct {
 		g     KeyGenerator
 		check func(*jose.JsonWebKeySet)
 	}{
@@ -40,10 +41,12 @@ func TestGenerator(t *testing.T) {
 			},
 		},
 	} {
-		keys, err := c.g.Generate("foo")
-		pkg.AssertError(t, false, err)
-		if err != nil {
-			c.check(keys)
-		}
+		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+			keys, err := c.g.Generate("foo")
+			require.NoError(t, err)
+			if err != nil {
+				c.check(keys)
+			}
+		})
 	}
 }

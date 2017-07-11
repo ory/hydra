@@ -20,7 +20,7 @@
     <a href="https://godoc.org/github.com/ory/hydra"><img src="https://img.shields.io/badge/docs-godoc-blue.svg" alt="Code Documentation"></a>
 </p>
 
-ORY Hydra is a security-first OAuth 2.0 and OpenID Connect server optimized for low-latency, high throughput,
+ORY Hydra is a hardened OAuth2 and OpenID Connect server optimized for low-latency, high throughput,
 and low resource consumption. ORY Hydra *is not* an identity provider (user sign up, user log in, password reset flow),
 but connects to your existing identity provider through a [consent app](https://ory.gitbooks.io/hydra/content/oauth2.html#consent-app-flow).
 Implementing the consent app in a different language is easy, and exemplary consent apps
@@ -38,8 +38,8 @@ able to securely manage JSON Web Keys, and has a sophisticated policy-based acce
 **Table of Contents**
 
 - [What is ORY Hydra?](#what-is-ory-hydra)
-  - [ORY Hydra implements open standards](#ory-hydra-implements-open-standards)
-- [ORY Cloud Security](#ory-cloud-security)
+  - [OAuth2 and OpenID Connect: Open Standards!](#oauth2-and-openid-connect-open-standards)
+- [ORY API Security](#ory-api-security)
   - [Products](#products)
   - [Consulting](#consulting)
 - [Quickstart](#quickstart)
@@ -80,7 +80,7 @@ or some template engine or a predefined front-end. Instead it relies on HTTP red
 to verify user consent allowing you to use ORY Hydra with any authentication endpoint, be it [authboss](https://github.com/go-authboss/authboss),
 [auth0.com](https://auth0.com/) or your proprietary PHP authentication.
 
-### ORY Hydra implements open standards
+### OAuth2 and OpenID Connect: Open Standards!
 
 ORY Hydra implements Open Standards set by the IETF:
 
@@ -97,9 +97,9 @@ and the OpenID Foundation:
 * [OpenID Connect Core 1.0](http://openid.net/specs/openid-connect-core-1_0.html)
 * [OpenID Connect Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0.html)
 
-## ORY Cloud Security
+## ORY API Security
 
-ORY Cloud Security (OCS) is a popular, hardened toolbox of open and closed source services for securing your APIs
+ORY API Security is a popular, hardened toolbox of open and closed source services for securing your APIs
 and web services. Our products are capable of handling high throughput with low latency, work flawlessly in the
 cloud and on premise, and are securing millions of requests each day already.
 
@@ -118,7 +118,7 @@ cloud and on premise, and are securing millions of requests each day already.
 
 ### Consulting
 
-Access Control, OAuth 2.0, and OpenID Connect are rich topics with many nuances and implementation details. Not to worry, because we offer consulting services both on these topics and our ORY Cloud Security products.
+Access Control, OAuth 2.0, and OpenID Connect are rich topics with many nuances and implementation details. Not to worry, because we offer consulting services both on these topics and our ORY API Security products.
 
 We are not your typical enterprise partner, but an agile, polite, highly talented, and extremely productive team of technology experts. You will never talk with interns, out-sourced support staff, or bots - but always with the owners and maintainers of the respective products, or even the founders themselves.
 
@@ -149,7 +149,7 @@ There are various ways of installing ORY Hydra on your system.
 
 The client and server **binaries are downloadable at [releases](https://github.com/ory/hydra/releases)**.
 There is currently no installer available. You have to add the ORY Hydra binary to the PATH environment variable yourself or put
-the binary in a location that is already in your path (`/usr/bin`, ...). 
+the binary in a location that is already in your path (`/usr/bin`, ...).
 If you do not understand what that all of this means, ask in our [chat channel](https://gitter.im/ory-am/hydra). We are happy to help.
 
 #### Using Docker

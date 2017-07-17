@@ -1,0 +1,24 @@
+{
+  "id": "bridg-campaign-messaging",
+  "client_name": "Bridg Campaign Messaging",
+  "client_secret": "bridg-campaign-messaging",
+  "owner": "eng@bridg.com",
+  "scope": "bridg",
+  "public": false,
+  "redirect_uris": [
+  ],
+  "grant_types": [
+    "client_credentials"
+  ],
+  "response_types": [
+    "",
+    ""
+  ],
+  "policy_uri": "",
+  "tos_uri": "",
+  "client_uri": "",
+  "logo_uri": "",
+  "contacts": [
+    "eng@bridg.com"
+  ]
+}

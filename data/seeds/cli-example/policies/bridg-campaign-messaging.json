@@ -1,0 +1,16 @@
+{
+  "id": "bridg_campaign_messaging",
+  "description": "Give bridg's campaign messaging service access to Bridg's resources.",
+  "subjects": [
+    "bridg-campaign-messaging"
+  ],
+  "effect": "allow",
+  "resources": [
+    "rn:bridg:scheduler:schedule",
+    "rn:bridg:<(accounts:[A-z0-9_-]+:brands:[A-z0-9_-]+:):(campaigns|email-engine)(:.+)?>>"
+
+  ],
+  "actions": [
+    "create", "delete", "read"
+  ]
+}

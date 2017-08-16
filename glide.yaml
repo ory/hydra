@@ -38,7 +38,7 @@ import:
 - package: github.com/ory/herodot
   version: 0.1.1
 - package: github.com/ory/ladon
-  version: 0.8.1
+  version: 0.8.2
   subpackages:
   - manager/memory
   - manager/sql

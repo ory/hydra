@@ -1,5 +1,5 @@
-hash: d82c3ebecd3594a7795f2b3686b395463c73dc31e7292d29702ad791f688a082
-updated: 2017-07-06T18:30:31.4144391+02:00
+hash: 116f662b157744514f2af5dfa680474afcd6df0e7255904a48a3f56df6766483
+updated: 2017-08-16T16:13:17.77293973+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 4918b99a7cb949bb295f3c7bbaf24b577d806e35
@@ -56,7 +56,7 @@ imports:
 - name: github.com/go-sql-driver/mysql
   version: a0583e0143b1624142adab07e0e97fe106d99561
 - name: github.com/golang/protobuf
-  version: 6a1fa9404c0aebf36c879bc50152edcc953910d2
+  version: ab9f9a6dab164b7d1246e0e688b0ab7b94d8553e
   subpackages:
   - proto
 - name: github.com/gorilla/context
@@ -99,9 +99,9 @@ imports:
   subpackages:
   - oid
 - name: github.com/magiconair/properties
-  version: 51463bfca2576e06c62a8504b5c0f06d61312647
+  version: be5ece7dd465ab0765a9682137865547526d1dfb
 - name: github.com/meatballhat/negroni-logrus
-  version: 259659cbe5df2a5732a3c677d040058215be1ee7
+  version: 31067281800f66f57548a7a32d9c6c5f963fef83
 - name: github.com/Microsoft/go-winio
   version: f533f7a102197536779ea3a8cb881d639e21ec5a
 - name: github.com/mitchellh/mapstructure
@@ -135,7 +135,7 @@ imports:
 - name: github.com/ory/herodot
   version: 5bb399b8a5aa583343a2108e723b990432b4a1b4
 - name: github.com/ory/ladon
-  version: 80ec7e047ca2806a4491df41d5e9a2ad73b936a0
+  version: 306b2e6adf322d429e72ace6be16818dda75f574
   subpackages:
   - compiler
   - manager/memory
@@ -161,9 +161,9 @@ imports:
 - name: github.com/segmentio/backo-go
   version: 204274ad699c0983a70203a566887f17a717fef4
 - name: github.com/sirupsen/logrus
-  version: 59d0ca41e5faad81cac03f7a7d84ba80d9cc9673
+  version: f006c2ac4710855cf0f916dd6b77acf6b048dc6e
 - name: github.com/Sirupsen/logrus
-  version: 59d0ca41e5faad81cac03f7a7d84ba80d9cc9673
+  version: f006c2ac4710855cf0f916dd6b77acf6b048dc6e
   repo: https://github.com/sirupsen/logrus.git
   vcs: git
 - name: github.com/spf13/afero
@@ -173,13 +173,13 @@ imports:
 - name: github.com/spf13/cast
   version: acbeb36b902d72a7a4c18e8f3241075e7ab763e4
 - name: github.com/spf13/cobra
-  version: 8c6fa02d2225de0f9bdcb7ca912556f68d172d8c
+  version: cb731b898346822cc0c225c28550a8a29d93c732
 - name: github.com/spf13/jwalterweatherman
   version: 0efa5202c04663c757d84f90f5219c1250baf94f
 - name: github.com/spf13/pflag
   version: e57e3eeb33f795204c1ca35f56c44f83227c6e66
 - name: github.com/spf13/viper
-  version: c1de95864d73a5465492829d7cb2dd422b19ac96
+  version: 25b30aa063fc18e48662b86996252eabdcf2f0c7
 - name: github.com/square/go-jose
   version: aa2e30fdd1fe9dd3394119af66451ae790d50e0d
   subpackages:
@@ -196,17 +196,18 @@ imports:
 - name: github.com/xtgo/uuid
   version: a0b114877d4caeffbd7f87e3757c17fce570fea7
 - name: golang.org/x/crypto
-  version: d625dfd80595a76324dea1452ceb9cfbcaee8e3e
+  version: b176d7def5d71bdd214203491f89843ed217f420
   subpackages:
   - bcrypt
   - blowfish
+  - ssh/terminal
 - name: golang.org/x/net
   version: 054b33e6527139ad5b1ec2f6232c3b175bd9a30c
   subpackages:
   - context
   - context/ctxhttp
 - name: golang.org/x/oauth2
-  version: cce311a261e6fcf29de72ca96827bdb0b7d9c9e6
+  version: 9a379c6b3e95a790ffc43293c2a78dee0d7b6e20
   subpackages:
   - clientcredentials
   - internal
@@ -216,12 +217,12 @@ imports:
   - unix
   - windows
 - name: golang.org/x/text
-  version: cfdf022e86b4ecfb646e1efbd7db175dd623a8fa
+  version: e56139fd9c5bc7244c76116c68e500765bb6db6b
   subpackages:
   - transform
   - unicode/norm
 - name: google.golang.org/appengine
-  version: d11fc8a8dccf41ab5bd3c51a3ea52051240e325c
+  version: d9a072cfa7b9736e44311ef77b3e09d804bfa599
   subpackages:
   - internal
   - internal/base
@@ -238,7 +239,7 @@ imports:
   - cipher
   - json
 - name: gopkg.in/yaml.v2
-  version: cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b
+  version: eb3733d160e74a9c7e442f435eb3bea458e1d19f
 testImports:
 - name: github.com/bmizerany/assert
   version: b7ed37b82869576c289d7d97fb2bbd8b64a0cb28

@@ -38,9 +38,7 @@ able to securely manage JSON Web Keys, and has a sophisticated policy-based acce
 
 - [What is ORY Hydra?](#what-is-ory-hydra)
   - [OAuth2 and OpenID Connect: Open Standards!](#oauth2-and-openid-connect-open-standards)
-- [ORY API Security](#ory-api-security)
-  - [Products](#products)
-  - [Consulting](#consulting)
+- [ORY Gatekeeper](#ory-gatekeeper)
 - [Quickstart](#quickstart)
   - [5 minutes tutorial: Run your very own OAuth2 environment](#5-minutes-tutorial-run-your-very-own-oauth2-environment)
   - [Installation](#installation)
@@ -96,32 +94,13 @@ and the OpenID Foundation:
 * [OpenID Connect Core 1.0](http://openid.net/specs/openid-connect-core-1_0.html)
 * [OpenID Connect Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0.html)
 
-## ORY API Security
+## ORY Gatekeeper
 
-ORY API Security is a popular, hardened toolbox of open and closed source services for securing your APIs
-and web services. Our products are capable of handling high throughput with low latency, work flawlessly in the
-cloud and on premise, and are securing millions of requests each day already.
+<img src="https://www.ory.am/images/ory-security-console.png" alt="ORY Gatekeeper Console" align="right" width="40%">
 
-### Products
+Gatekeeper is a firewall for APIs. It detects and prevents malicious requests and makes sure that no unauthorized requests reach your servers. Gatekeeper is set up in minutes, works with existing APIs, and makes use of ORY's popular open source ecosystem.
 
-<img src="https://www.ory.am/images/ory-security-console.png" alt="ORY Security Console" align="right" width="40%">
-
-* **ORY Hydra** - this repository.
-* **[ORY Hydra+](https://www.ory.am/products/cloud-security?utm_source=github_hydra#hydra-plus)** is optimized for extreme production loads, resiliance and availability - [learn more now](https://www.ory.am/products/cloud-security?utm_source=github_hydra#hydra-plus).
-* **[ORY Security Console](https://www.ory.am/products/cloud-security?utm_source=github_hydra#security-console)** (image on the right) is an admin user interface for ORY Hydra and ORY Gatekeeper. Available on-premise and as a service - [learn more now](https://www.ory.am/products/cloud-security?utm_source=github_hydra#security-console).
-* **[ORY Gatekeeper](https://www.ory.am/products/cloud-security?utm_source=github_hydra#gatekeeper)** is a configurable firewall reverse proxy making access control easy and secure. ORY Gatekeeper is compatible with ORY Hydra Access Control Policies and OAuth 2.0 Access Tokens. [Learn more now](https://www.ory.am/products/cloud-security?utm_source=github_hydra#gatekeeper).
-* **[ORY Fosite](https://github.com/ory/fosite)** is a popular open source OAuth2 and OpenID Connect SDK for Go.
-* **[ORY Ladon](https://github.com/ory/ladon)** is an acclaimed open source SDK for access control policies, solving authorization in the microservice and IoT age.
-
-<br clear="all">
-
-### Consulting
-
-Access Control, OAuth 2.0, and OpenID Connect are rich topics with many nuances and implementation details. Not to worry, because we offer consulting services both on these topics and our ORY API Security products.
-
-We are not your typical enterprise partner, but an agile, polite, highly talented, and extremely productive team of technology experts. You will never talk with interns, out-sourced support staff, or bots - but always with the owners and maintainers of the respective products, or even the founders themselves.
-
-Go [here to learn more about our consulting services](https://www.ory.am/products/cloud-security?utm_source=github_hydra#consulting).
+**Learn more about [Gatekeeper](https://www.ory.am/products/api-security) and try it for free!**
 
 ## Quickstart
 

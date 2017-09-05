@@ -131,7 +131,7 @@ func (sw *MetricsManager) ServeHTTP(rw http.ResponseWriter, r *http.Request, nex
 	// Latency
 	start := time.Now()
 	next(rw, r)
-	latency := time.Now().Sub(start) / time.Millisecond
+	latency := time.Since(start) / time.Millisecond
 
 	// Collecting request info
 	res := rw.(negroni.ResponseWriter)

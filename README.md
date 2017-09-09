@@ -8,6 +8,8 @@
     <a href="https://bestpractices.coreinfrastructure.org/projects/364"><img src="https://bestpractices.coreinfrastructure.org/projects/364/badge" alt="CII Best Practices"></a>
 </p>
 
+<hr>
+
 <h4 align="center">
     <a href="https://gitter.im/ory-am/hydra">Chat</a> |
     <a href="https://community.ory.am/">Forums</a> |
@@ -17,8 +19,6 @@
     <a href="https://godoc.org/github.com/ory/hydra">Code Docs</a><br/><br/>
     <a href="https://patreon.com/user?u=4298803">Support us on patreon!</a>
 </h4>
-
-<hr>
 
 ORY Hydra is a hardened OAuth2 and OpenID Connect server optimized for low-latency, high throughput,
 and low resource consumption. ORY Hydra *is not* an identity provider (user sign up, user log in, password reset flow),

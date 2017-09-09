@@ -1,5 +1,12 @@
 <p align="center"><img src="https://storage.googleapis.com/ory.am/ory_banners-32.png" alt="ORY Hydra"></p>
 
+<p align="center">
+    <a href="https://travis-ci.org/ory/hydra"><img src="https://travis-ci.org/ory/hydra.svg?branch=master" alt="Build Status"></a>
+    <a href="https://coveralls.io/github/ory/hydra?branch=master"><img src="https://coveralls.io/repos/ory/hydra/badge.svg?branch=master&service=github" alt="Coverage Status"></a>
+    <a href="https://codeclimate.com/github/ory/hydra"><img src="https://codeclimate.com/github/ory/hydra/badges/gpa.svg" alt="Code Climate"></a>
+    <a href="https://goreportcard.com/report/github.com/ory/hydra"><img src="https://goreportcard.com/badge/github.com/ory/hydra" alt="Go Report Card"></a>
+    <a href="https://bestpractices.coreinfrastructure.org/projects/364"><img src="https://bestpractices.coreinfrastructure.org/projects/364/badge" alt="CII Best Practices"></a>
+</p>
 
 <h4 align="center">
     <a href="https://gitter.im/ory-am/hydra">Chat</a> |
@@ -12,14 +19,6 @@
 </h4>
 
 <hr>
-
-<p align="center">
-    <a href="https://travis-ci.org/ory/hydra"><img src="https://travis-ci.org/ory/hydra.svg?branch=master" alt="Build Status"></a>
-    <a href="https://coveralls.io/github/ory/hydra?branch=master"><img src="https://coveralls.io/repos/ory/hydra/badge.svg?branch=master&service=github" alt="Coverage Status"></a>
-    <a href="https://codeclimate.com/github/ory/hydra"><img src="https://codeclimate.com/github/ory/hydra/badges/gpa.svg" alt="Code Climate"></a>
-    <a href="https://goreportcard.com/report/github.com/ory/hydra"><img src="https://goreportcard.com/badge/github.com/ory/hydra" alt="Go Report Card"></a>
-    <a href="https://bestpractices.coreinfrastructure.org/projects/364"><img src="https://bestpractices.coreinfrastructure.org/projects/364/badge" alt="CII Best Practices"></a>
-</p>
 
 ORY Hydra is a hardened OAuth2 and OpenID Connect server optimized for low-latency, high throughput,
 and low resource consumption. ORY Hydra *is not* an identity provider (user sign up, user log in, password reset flow),

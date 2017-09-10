@@ -1,4 +1,4 @@
-<p align="center"><img src="https://storage.googleapis.com/ory.am/banner-regular-blue/ory_01-hydra.png" alt="ORY Hydra"></p>
+<p align="center"><img src="https://storage.googleapis.com/ory.am/ory_01-hydra.png" alt="ORY Hydra"></p>
 
 <h4 align="center">
     <a href="https://gitter.im/ory-am/hydra">Chat</a> |

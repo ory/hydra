@@ -2,34 +2,35 @@ package server
 
 import (
 	"crypto/tls"
-	"net/http"
-	"os"
-	"strconv"
-	"time"
-
-	"gopkg.in/airbrake/gobrake.v2"
-
 	"fmt"
+	"net/http"
+	"net/url"
+	"strconv"
 
-	"github.com/Sirupsen/logrus"
+	"os"
+
 	"github.com/newrelic/go-agent"
 	"github.com/newrelic/go-agent/_integrations/nrlogrus"
+	"github.com/sirupsen/logrus"
+	"gopkg.in/airbrake/gobrake.v2"
+
+	"github.com/gorilla/context"
 	"github.com/julienschmidt/httprouter"
 	"github.com/meatballhat/negroni-logrus"
-	"github.com/ory-am/hydra/client"
-	"github.com/ory-am/hydra/config"
-	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/hydra/jwk"
-	"github.com/ory-am/hydra/oauth2"
-	"github.com/ory-am/hydra/pkg"
-	"github.com/ory-am/hydra/policy"
-	"github.com/ory-am/hydra/warden"
-	"github.com/ory-am/hydra/warden/group"
-	"github.com/ory-am/ladon"
+	"github.com/ory/graceful"
+	"github.com/ory/herodot"
+	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/config"
+	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/policy"
+	"github.com/ory/hydra/warden"
+	"github.com/ory/hydra/warden/group"
+	"github.com/ory/ladon"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/urfave/negroni"
-	"golang.org/x/net/context"
 )
 
 var airbrake *gobrake.Notifier
@@ -37,9 +38,24 @@ var airbrake *gobrake.Notifier
 func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		router := httprouter.New()
-		serverHandler := &Handler{Config: c}
+		logger := c.GetLogger()
+		serverHandler := &Handler{
+			Config: c,
+			H:      herodot.NewJSONWriter(logger),
+		}
 		serverHandler.registerRoutes(router)
 		c.ForceHTTP, _ = cmd.Flags().GetBool("dangerous-force-http")
+
+		if !c.ForceHTTP {
+			if c.Issuer == "" {
+				logger.Fatalln("Issuer must be explicitly specified unless --dangerous-force-http is passed. To find out more, use `hydra help host`.")
+			}
+			issuer, err := url.Parse(c.Issuer)
+			pkg.Must(err, "Could not parse issuer URL: %s", err)
+			if issuer.Scheme != "https" {
+				logger.Fatalln("Issuer must use HTTPS unless --dangerous-force-http is passed. To find out more, use `hydra help host`.")
+			}
+		}
 
 		if c.ClusterURL == "" {
 			proto := "https"
@@ -54,41 +70,51 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		}
 
 		if ok, _ := cmd.Flags().GetBool("dangerous-auto-logon"); ok {
-			logrus.Warnln("Do not use flag --dangerous-auto-logon in production.")
+			logger.Warnln("Do not use flag --dangerous-auto-logon in production.")
 			err := c.Persist()
 			pkg.Must(err, "Could not write configuration file: %s", err)
 		}
 
 		n := negroni.New()
-		useAirbrakeMiddleware(n)
-		useNewRelicMiddleware(n)
-		n.Use(negronilogrus.NewMiddleware())
-		n.UseFunc(serverHandler.rejectInsecureRequests)
-		n.UseHandler(router)
-		var srv = http.Server{
-			Addr:    c.GetAddress(),
-			Handler: n,
-			TLSConfig: &tls.Config{
-				Certificates: []tls.Certificate{
-					getOrCreateTLSCertificate(cmd, c),
-				},
-			},
-			ReadTimeout:  time.Second * 5,
-			WriteTimeout: time.Second * 10,
+
+		metrics := c.GetMetrics()
+		if ok, _ := cmd.Flags().GetBool("disable-telemetry"); !ok && os.Getenv("DISABLE_TELEMETRY") != "1" {
+			go metrics.RegisterSegment(c.BuildVersion, c.BuildHash, c.BuildTime)
+			go metrics.CommitTelemetry()
+			go metrics.TickKeepAlive()
+			n.Use(metrics)
 		}
 
-		var err error
-		logrus.Infof("Setting up http server on %s", c.GetAddress())
-		if c.ForceHTTP {
-			logrus.Warnln("HTTPS disabled. Never do this in production.")
-			err = srv.ListenAndServe()
-		} else if c.AllowTLSTermination != "" {
-			logrus.Infoln("TLS termination enabled, disabling https.")
-			err = srv.ListenAndServe()
-		} else {
-			err = srv.ListenAndServeTLS("", "")
-		}
-		pkg.Must(err, "Could not start server: %s %s.", err)
+		useAirbrakeMiddleware(n)
+		useNewRelicMiddleware(n)
+		n.Use(negronilogrus.NewMiddlewareFromLogger(logger, c.Issuer))
+		n.UseFunc(serverHandler.rejectInsecureRequests)
+		n.UseHandler(router)
+
+		var srv = graceful.WithDefaults(&http.Server{
+			Addr:    c.GetAddress(),
+			Handler: context.ClearHandler(n),
+			TLSConfig: &tls.Config{
+				Certificates: []tls.Certificate{getOrCreateTLSCertificate(cmd, c)},
+			},
+		})
+
+		err := graceful.Graceful(func() error {
+			var err error
+			logger.Infof("Setting up http server on %s", c.GetAddress())
+			if c.ForceHTTP {
+				logger.Warnln("HTTPS disabled. Never do this in production.")
+				err = srv.ListenAndServe()
+			} else if c.AllowTLSTermination != "" {
+				logger.Infoln("TLS termination enabled, disabling https.")
+				err = srv.ListenAndServe()
+			} else {
+				err = srv.ListenAndServeTLS("", "")
+			}
+
+			return err
+		}, srv.Shutdown)
+		logger.WithError(err).Fatal("Could not gracefully run server")
 	}
 }
 
@@ -112,7 +138,7 @@ func useNewRelicMiddleware(n *negroni.Negroni) {
 			n.Use(newRelicHandler)
 
 			logrus.Info("New Relic enabled!")
-		}	else {
+		} else {
 			logrus.Errorf("Error creating New Relic app: %v", err)
 		}
 	} else {
@@ -158,6 +184,7 @@ type Handler struct {
 	Groups  *group.Handler
 	Warden  *warden.WardenHandler
 	Config  *config.Config
+	H       herodot.Writer
 }
 
 func (h *Handler) registerRoutes(router *httprouter.Router) {
@@ -179,6 +206,7 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 		Issuer:              c.Issuer,
 		AccessTokenLifespan: c.GetAccessTokenLifespan(),
 		Groups:              ctx.GroupManager,
+		L:                   c.GetLogger(),
 	}
 
 	// Set up handlers
@@ -188,15 +216,12 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 	h.OAuth2 = newOAuth2Handler(c, router, ctx.KeyManager, oauth2Provider)
 	h.Warden = warden.NewHandler(c, router)
 	h.Groups = &group.Handler{
-		H:       &herodot.JSON{},
+		H:       herodot.NewJSONWriter(c.GetLogger()),
 		W:       ctx.Warden,
 		Manager: ctx.GroupManager,
 	}
 	h.Groups.SetRoutes(router)
-
-	router.GET("/health", func(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-		rw.WriteHeader(http.StatusNoContent)
-	})
+	_ = newHealthHandler(c, router)
 
 	// Create root account if new install
 	createRS256KeysIfNotExist(c, oauth2.ConsentEndpointKey, "private", "sig")
@@ -215,9 +240,8 @@ func (h *Handler) rejectInsecureRequests(rw http.ResponseWriter, r *http.Request
 		next.ServeHTTP(rw, r)
 		return
 	} else {
-		logrus.WithError(err).Warnln("Could not serve http connection")
+		h.Config.GetLogger().WithError(err).Warnln("Could not serve http connection")
 	}
 
-	ans := new(herodot.JSON)
-	ans.WriteErrorCode(context.Background(), rw, r, http.StatusBadGateway, errors.New("Can not serve request over insecure http"))
+	h.H.WriteErrorCode(rw, r, http.StatusBadGateway, errors.New("Can not serve request over insecure http"))
 }

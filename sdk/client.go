@@ -6,14 +6,15 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/ory-am/hydra/client"
-	"github.com/ory-am/hydra/jwk"
-	hoauth2 "github.com/ory-am/hydra/oauth2"
-	"github.com/ory-am/hydra/pkg"
-	"github.com/ory-am/hydra/policy"
-	"github.com/ory-am/hydra/warden"
-	"github.com/ory-am/hydra/warden/group"
-	"golang.org/x/net/context"
+	"context"
+
+	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/jwk"
+	hoauth2 "github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/policy"
+	"github.com/ory/hydra/warden"
+	"github.com/ory/hydra/warden/group"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 )
@@ -50,6 +51,9 @@ type Client struct {
 
 	// Groups offers warden group management capabilities.
 	Groups *group.HTTPManager
+
+	// Consent helps you verify consent challenges and sign consent responses.
+	Consent *Consent
 
 	http          *http.Client
 	clusterURL    *url.URL
@@ -145,6 +149,10 @@ func Connect(opts ...option) (*Client, error) {
 	c.Groups = &group.HTTPManager{
 		Endpoint: pkg.JoinURL(c.clusterURL, "/warden/groups"),
 		Client:   c.http,
+	}
+
+	c.Consent = &Consent{
+		KeyManager: c.JSONWebKeys,
 	}
 
 	return c, nil

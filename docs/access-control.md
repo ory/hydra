@@ -1,7 +1,7 @@
 # Access Control Policies
 
 Besides OAuth2 Token Introspection, Hydra offers Access Control Policies using
-the [Ladon](https://github.com/ory-am/ladon) framework. Access Control Policies are used by Hydra internally and exposed
+the [Ladon](https://github.com/ory/ladon) framework. Access Control Policies are used by Hydra internally and exposed
 via various HTTP APIs.
 
 ## Introduction to Access Control Policies
@@ -72,4 +72,4 @@ The warden knows two endpoints:
 * `/warden/allowed`: Check if a subject is allowed to do something.
 * `/warden/token/allowed`: Check if the subject of a token is allowed to do something.
 
-Both endpoints use policies to compute the result and are documented in the [HTTP API Documentation](http://docs.hdyra.apiary.io/#reference/warden:-access-control).
+Both endpoints use policies to compute the result and are documented in the [HTTP API Documentation](http://docs.hydra13.apiary.io/#reference/warden:-access-control).

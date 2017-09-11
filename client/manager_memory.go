@@ -3,9 +3,11 @@ package client
 import (
 	"sync"
 
+	"context"
+
 	"github.com/imdario/mergo"
-	"github.com/ory-am/fosite"
-	"github.com/ory-am/hydra/pkg"
+	"github.com/ory/fosite"
+	"github.com/ory/hydra/pkg"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 )
@@ -27,12 +29,12 @@ func (m *MemoryManager) GetConcreteClient(id string) (*Client, error) {
 	return &c, nil
 }
 
-func (m *MemoryManager) GetClient(id string) (fosite.Client, error) {
+func (m *MemoryManager) GetClient(_ context.Context, id string) (fosite.Client, error) {
 	return m.GetConcreteClient(id)
 }
 
 func (m *MemoryManager) UpdateClient(c *Client) error {
-	o, err := m.GetClient(c.ID)
+	o, err := m.GetClient(context.Background(), c.ID)
 	if err != nil {
 		return err
 	}

@@ -1,13 +1,10 @@
 package server
 
 import (
-	"github.com/Sirupsen/logrus"
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/hydra/client"
-	"github.com/ory-am/hydra/config"
-	"github.com/ory-am/hydra/herodot"
-	"golang.org/x/net/context"
-	r "gopkg.in/dancannon/gorethink.v2"
+	"github.com/ory/herodot"
+	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/config"
 )
 
 func newClientManager(c *config.Config) client.Manager {
@@ -20,41 +17,27 @@ func newClientManager(c *config.Config) client.Manager {
 			Hasher:  ctx.Hasher,
 		}
 	case *config.SQLConnection:
-		m := &client.SQLManager{
+		return &client.SQLManager{
 			DB:     con.GetDatabase(),
 			Hasher: ctx.Hasher,
 		}
-		if err := m.CreateSchemas(); err != nil {
-			logrus.Fatalf("Could not create client schema: %s", err)
+	case *config.PluginConnection:
+		if m, err := con.NewClientManager(); err != nil {
+			c.GetLogger().Fatalf("Could not load client manager plugin %s", err)
+		} else {
+			return m
 		}
-		return m
-	case *config.RethinkDBConnection:
-		con.CreateTableIfNotExists("hydra_clients")
-		m := &client.RethinkManager{
-			Session: con.GetSession(),
-			Table:   r.Table("hydra_clients"),
-			Hasher:  ctx.Hasher,
-		}
-		if err := m.ColdStart(); err != nil {
-			logrus.Fatalf("Could not fetch initial state: %s", err)
-		}
-		m.Watch(context.Background())
-		return m
-	case *config.RedisConnection:
-		m := &client.RedisManager{
-			DB:     con.RedisSession(),
-			Hasher: ctx.Hasher,
-		}
-		return m
+		break
 	default:
 		panic("Unknown connection type.")
 	}
+	return nil
 }
 
 func newClientHandler(c *config.Config, router *httprouter.Router, manager client.Manager) *client.Handler {
 	ctx := c.Context()
 	h := &client.Handler{
-		H: &herodot.JSON{},
+		H: herodot.NewJSONWriter(c.GetLogger()),
 		W: ctx.Warden, Manager: manager,
 	}
 

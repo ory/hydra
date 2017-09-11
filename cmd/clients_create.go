@@ -11,7 +11,7 @@ var clientsCreateCmd = &cobra.Command{
 	Long: `This command creates a basic OAuth2 client. Always specify at least one redirect url.
 
 Example:
-  hydra clients create -n "my app" -c=[http://localhost/cb] -g [authorization_code] -r [code] -a [core,foobar]
+  hydra clients create -n "my app" -c http://localhost/cb -g authorization_code -r code -a core,foobar
 `,
 	Run: cmdHandler.Clients.CreateClient,
 }

@@ -46,6 +46,20 @@ func TestSkipSSLOption(t *testing.T) {
 	assert.Equal(t, true, c.skipTLSVerify)
 }
 
+func TestSkipSSLOptionValue(t *testing.T) {
+	c := &Client{}
+
+	err := SkipTLSVerify(false)(c)
+
+	assert.Nil(t, err)
+	assert.Equal(t, false, c.skipTLSVerify)
+
+	err = SkipTLSVerify(true)(c)
+
+	assert.Nil(t, err)
+	assert.Equal(t, true, c.skipTLSVerify)
+}
+
 func TestScopesOption(t *testing.T) {
 	c := &Client{}
 

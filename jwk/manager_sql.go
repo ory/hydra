@@ -3,9 +3,9 @@ package jwk
 import (
 	"database/sql"
 	"encoding/json"
-	"github.com/Sirupsen/logrus"
+
 	"github.com/jmoiron/sqlx"
-	"github.com/ory-am/hydra/pkg"
+	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
 	"github.com/square/go-jose"
@@ -43,14 +43,13 @@ type sqlData struct {
 	Key     string `db:"keydata"`
 }
 
-func (s *SQLManager) CreateSchemas() error {
+func (s *SQLManager) CreateSchemas() (int, error) {
 	migrate.SetTable("hydra_jwk_migration")
 	n, err := migrate.Exec(s.DB.DB, s.DB.DriverName(), migrations, migrate.Up)
 	if err != nil {
-		return errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
+		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
 	}
-	logrus.Infof("Applied %d migrations %s!", n, s.DB.DriverName())
-	return nil
+	return n, nil
 }
 
 func (m *SQLManager) AddKey(set string, key *jose.JsonWebKey) error {
@@ -84,11 +83,17 @@ func (m *SQLManager) AddKeySet(set string, keys *jose.JsonWebKeySet) error {
 	for _, key := range keys.Keys {
 		out, err := json.Marshal(key)
 		if err != nil {
+			if re := tx.Rollback(); re != nil {
+				return errors.Wrap(err, re.Error())
+			}
 			return errors.WithStack(err)
 		}
 
 		encrypted, err := m.Cipher.Encrypt(out)
 		if err != nil {
+			if re := tx.Rollback(); re != nil {
+				return errors.Wrap(err, re.Error())
+			}
 			return errors.WithStack(err)
 		}
 
@@ -98,11 +103,17 @@ func (m *SQLManager) AddKeySet(set string, keys *jose.JsonWebKeySet) error {
 			Version: 0,
 			Key:     encrypted,
 		}); err != nil {
+			if re := tx.Rollback(); re != nil {
+				return errors.Wrap(err, re.Error())
+			}
 			return errors.WithStack(err)
 		}
 	}
 
 	if err := tx.Commit(); err != nil {
+		if re := tx.Rollback(); re != nil {
+			return errors.Wrap(err, re.Error())
+		}
 		return errors.WithStack(err)
 	}
 	return nil

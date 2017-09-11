@@ -5,14 +5,12 @@ import (
 	"net/url"
 	"testing"
 
-	"time"
-
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/fosite"
-	"github.com/ory-am/hydra/compose"
-	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/hydra/pkg"
-	"github.com/ory-am/ladon"
+	"github.com/ory/fosite"
+	"github.com/ory/herodot"
+	"github.com/ory/hydra/compose"
+	"github.com/ory/ladon"
+	"github.com/ory/ladon/manager/memory"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -21,22 +19,22 @@ import (
 var managers = map[string]Manager{}
 
 func init() {
-	localWarden, httpClient := compose.NewFirewall("hydra", "alice", fosite.Arguments{scope},
+	localWarden, httpClient := compose.NewMockFirewall("hydra", "alice", fosite.Arguments{scope},
 		&ladon.DefaultPolicy{
 			ID:        "1",
 			Subjects:  []string{"alice"},
 			Resources: []string{"rn:hydra:policies<.*>"},
-			Actions:   []string{"create", "get", "delete", "find", "update"},
+			Actions:   []string{"create", "get", "delete", "list", "update"},
 			Effect:    ladon.AllowAccess,
 		},
 	)
 
 	h := &Handler{
-		Manager: &ladon.MemoryManager{
+		Manager: &memory.MemoryManager{
 			Policies: map[string]ladon.Policy{},
 		},
 		W: localWarden,
-		H: new(herodot.JSON),
+		H: herodot.NewJSONWriter(nil),
 	}
 
 	r := httprouter.New()
@@ -67,37 +65,30 @@ func TestManagers(t *testing.T) {
 	}
 
 	for k, m := range managers {
-		_, err := m.Get(p.ID)
-		pkg.AssertError(t, true, err, k)
-		pkg.AssertError(t, false, m.Create(p), k)
+		t.Run("manager="+k, func(t *testing.T) {
+			_, err := m.Get(p.ID)
+			require.Error(t, err)
+			require.NoError(t, m.Create(p))
 
-		time.Sleep(200 * time.Millisecond)
+			res, err := m.Get(p.ID)
+			require.NoError(t, err)
+			assert.Equal(t, p, res)
 
-		res, err := m.Get(p.ID)
-		pkg.AssertError(t, false, err, k)
-		assert.Equal(t, p, res, "%s", k)
+			p.Subjects = []string{"stan"}
+			require.NoError(t, m.Update(p))
 
-		ps, err := m.FindPoliciesForSubject("peter")
-		pkg.RequireError(t, false, err, k)
-		require.Len(t, ps, 1, "%s", k)
-		assert.Equal(t, p, ps[0], "%s", k)
+			pols, err := m.List(10, 0)
+			require.NoError(t, err)
+			assert.Len(t, pols, 1)
 
-		ps, err = m.FindPoliciesForSubject("stan")
-		pkg.AssertError(t, false, err, k)
-		assert.Len(t, ps, 0, "%s", k)
+			res, err = m.Get(p.ID)
+			require.NoError(t, err)
+			assert.Equal(t, p, res)
 
-		p.Subjects = []string{"stan"}
-		err = m.Update(p)
-		pkg.AssertError(t, false, err, k)
+			require.NoError(t, m.Delete(p.ID))
 
-		ps, err = m.FindPoliciesForSubject("stan")
-		pkg.RequireError(t, false, err, k)
-		require.Len(t, ps, 1, "%s", k)
-		assert.Equal(t, p, ps[0], "%s", k)
-
-		pkg.AssertError(t, false, m.Delete(p.ID), k)
-
-		_, err = m.Get(p.ID)
-		pkg.AssertError(t, true, err, k)
+			_, err = m.Get(p.ID)
+			assert.Error(t, err)
+		})
 	}
 }

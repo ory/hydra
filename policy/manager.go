@@ -1,24 +1,23 @@
 package policy
 
 import (
-	"github.com/ory-am/ladon"
-	"github.com/jmoiron/sqlx"
-	"github.com/rubenv/sql-migrate"
+	"github.com/ory/ladon"
 )
 
 // Manager is responsible for managing and persisting policies.
 type Manager interface {
-	ladon.Manager
+	// Create persists the policy.
+	Create(policy ladon.Policy) error
+
+	// Get retrieves a policy.
+	Get(id string) (ladon.Policy, error)
+
+	// Delete removes a policy.
+	Delete(id string) error
+
+	// List policies.
+	List(limit, offset int64) (ladon.Policies, error)
 
 	// Update a policy.
 	Update(policy ladon.Policy) error
-}
-
-func NewSQLManager(db *sqlx.DB) (ladon.Manager, error) {
-	m := ladon.NewSQLManager(db, nil)
-	migrate.SetTable("hydra_policy_migration")
-	if err := m.CreateSchemas(); err != nil {
-		return nil, err
-	}
-	return m, nil
 }

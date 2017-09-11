@@ -7,10 +7,10 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"
-	"github.com/ory-am/fosite"
-	"github.com/ory-am/fosite/handler/openid"
-	ejwt "github.com/ory-am/fosite/token/jwt"
-	"github.com/ory-am/hydra/jwk"
+	"github.com/ory/fosite"
+	"github.com/ory/fosite/handler/openid"
+	ejwt "github.com/ory/fosite/token/jwt"
+	"github.com/ory/hydra/jwk"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 )
@@ -45,6 +45,9 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 		}
 		return rsaKey, nil
 	})
+	if err != nil {
+		return nil, errors.Wrap(err, "The consent response is not a valid JSON Web Token")
+	}
 
 	// make sure to use MapClaims since that is the default..
 	jwtClaims, ok := t.Claims.(jwt.MapClaims)
@@ -86,7 +89,12 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 		atExt = ext
 	}
 
-	return &Session{
+	// add key id to session headers
+	extHeader := map[string]interface{}{
+		"kid": "public",
+	}
+
+	sess := &Session{
 		DefaultSession: &openid.DefaultSession{
 			Claims: &ejwt.IDTokenClaims{
 				Audience:  a.GetClient().GetID(),
@@ -96,12 +104,13 @@ func (s *DefaultConsentStrategy) ValidateResponse(a fosite.AuthorizeRequester, t
 				ExpiresAt: time.Now().Add(s.DefaultIDTokenLifespan),
 				Extra:     idExt,
 			},
-			Headers: &ejwt.Headers{},
+			Headers: &ejwt.Headers{extHeader},
 			Subject: subject,
 		},
 		Extra: atExt,
-	}, err
+	}
 
+	return sess, err
 }
 
 func toStringSlice(i interface{}) []string {

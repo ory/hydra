@@ -2,22 +2,22 @@ package oauth2
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
-	"github.com/ory-am/fosite"
-	"github.com/pkg/errors"
-	"golang.org/x/net/context"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/clientcredentials"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+
+	"github.com/ory/fosite"
+	"github.com/pkg/errors"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/clientcredentials"
 )
 
 type HTTPIntrospector struct {
 	Client   *http.Client
-	Dry      bool
 	Endpoint *url.URL
 }
 
@@ -31,7 +31,7 @@ func (i *HTTPIntrospector) SetClient(c *clientcredentials.Config) {
 
 // IntrospectToken is capable of introspecting tokens according to https://tools.ietf.org/html/rfc7662
 //
-// The HTTP API is documented at http://docs.hdyra.apiary.io/#reference/oauth2/oauth2-token-introspection
+// The HTTP API is documented at http://docs.hydra13.apiary.io/#reference/oauth2/oauth2-token-introspection
 func (i *HTTPIntrospector) IntrospectToken(ctx context.Context, token string, scopes ...string) (*Introspection, error) {
 	var resp = &Introspection{
 		Extra: make(map[string]interface{}),

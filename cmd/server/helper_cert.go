@@ -7,24 +7,23 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"math/big"
+	"strings"
 	"time"
 
-	"github.com/Sirupsen/logrus"
-	"github.com/ory-am/hydra/config"
-	"github.com/ory-am/hydra/jwk"
-	"github.com/ory-am/hydra/pkg"
+	"github.com/ory/hydra/config"
+	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/square/go-jose"
-	"strings"
 )
 
 const (
 	tlsKeyName = "hydra.https-tls"
 )
 
-func loadCertificateFromFile(cmd *cobra.Command) *tls.Certificate {
+func loadCertificateFromFile(cmd *cobra.Command, c *config.Config) *tls.Certificate {
 	keyPath := viper.GetString("HTTPS_TLS_KEY_PATH")
 	certPath := viper.GetString("HTTPS_TLS_CERT_PATH")
 	if kp, _ := cmd.Flags().GetString("https-tls-key-path"); kp != "" {
@@ -37,13 +36,13 @@ func loadCertificateFromFile(cmd *cobra.Command) *tls.Certificate {
 
 	cert, err := tls.LoadX509KeyPair(certPath, keyPath)
 	if err != nil {
-		logrus.Warn("Could not load x509 key pair: %s", cert)
+		c.GetLogger().Warn("Could not load x509 key pair: %s", cert)
 		return nil
 	}
 	return &cert
 }
 
-func loadCertificateFromEnv() *tls.Certificate {
+func loadCertificateFromEnv(c *config.Config) *tls.Certificate {
 	keyString := viper.GetString("HTTPS_TLS_KEY")
 	certString := viper.GetString("HTTPS_TLS_CERT")
 	if keyString == "" || certString == "" {
@@ -56,7 +55,7 @@ func loadCertificateFromEnv() *tls.Certificate {
 	var cert tls.Certificate
 	var err error
 	if cert, err = tls.X509KeyPair([]byte(certString), []byte(keyString)); err != nil {
-		logrus.Warningf("Could not parse x509 key pair from env: %s", cert)
+		c.GetLogger().Warningf("Could not parse x509 key pair from env: %s", cert)
 		return nil
 	}
 
@@ -64,18 +63,18 @@ func loadCertificateFromEnv() *tls.Certificate {
 }
 
 func getOrCreateTLSCertificate(cmd *cobra.Command, c *config.Config) tls.Certificate {
-	if cert := loadCertificateFromFile(cmd); cert != nil {
-		logrus.Info("Loaded tls certificate from file")
+	if cert := loadCertificateFromFile(cmd, c); cert != nil {
+		c.GetLogger().Info("Loaded tls certificate from file")
 		return *cert
-	} else if cert := loadCertificateFromEnv(); cert != nil {
-		logrus.Info("Loaded certificate from environment variable")
+	} else if cert := loadCertificateFromEnv(c); cert != nil {
+		c.GetLogger().Info("Loaded certificate from environment variable")
 		return *cert
 	}
 
 	ctx := c.Context()
 	keys, err := ctx.KeyManager.GetKey(tlsKeyName, "private")
 	if errors.Cause(err) == pkg.ErrNotFound {
-		logrus.Warn("No TLS Key / Certificate for HTTPS found. Generating self-signed certificate.")
+		c.GetLogger().Warn("No TLS Key / Certificate for HTTPS found. Generating self-signed certificate.")
 
 		keys, err = new(jwk.ECDSA256Generator).Generate("")
 		pkg.Must(err, "Could not generate key: %s", err)
@@ -105,7 +104,7 @@ func getOrCreateTLSCertificate(cmd *cobra.Command, c *config.Config) tls.Certifi
 	}
 
 	if len(private.Certificates) == 0 {
-		logrus.Fatal("TLS certificate chain can not be empty")
+		c.GetLogger().Fatal("TLS certificate chain can not be empty")
 	}
 
 	pemCert := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: private.Certificates[0].Raw})

@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"github.com/ory-am/hydra/config"
+	"github.com/ory/hydra/config"
 )
 
 type Handler struct {
@@ -11,6 +11,7 @@ type Handler struct {
 	Warden     *WardenHandler
 	Revocation *RevocationHandler
 	Groups     *GroupHandler
+	Migration  *MigrateHandler
 }
 
 func NewHandler(c *config.Config) *Handler {
@@ -21,5 +22,6 @@ func NewHandler(c *config.Config) *Handler {
 		Warden:     newWardenHandler(c),
 		Revocation: newRevocationHandler(c),
 		Groups:     newGroupHandler(c),
+		Migration:  newMigrateHandler(c),
 	}
 }

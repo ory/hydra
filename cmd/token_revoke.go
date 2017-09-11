@@ -13,5 +13,4 @@ var tokenRevokeCmd = &cobra.Command{
 
 func init() {
 	tokenCmd.AddCommand(tokenRevokeCmd)
-
 }

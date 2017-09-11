@@ -4,11 +4,12 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/ory-am/fosite"
-	"github.com/ory-am/hydra/firewall"
-	"github.com/ory-am/hydra/pkg"
+	"context"
+
+	"github.com/ory/fosite"
+	"github.com/ory/hydra/firewall"
+	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
-	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 )
@@ -30,7 +31,7 @@ func (w *HTTPWarden) SetClient(c *clientcredentials.Config) {
 // TokenAllowed checks if a token is valid and if the token owner is allowed to perform an action on a resource.
 // This endpoint requires a token, a scope, a resource name, an action name and a context.
 //
-// The HTTP API is documented at http://docs.hdyra.apiary.io/#reference/warden:-access-control-for-resource-providers/check-if-an-access-tokens-subject-is-allowed-to-do-something
+// The HTTP API is documented at http://docs.hydra13.apiary.io/#reference/warden:-access-control-for-resource-providers/check-if-an-access-tokens-subject-is-allowed-to-do-something
 func (w *HTTPWarden) TokenAllowed(ctx context.Context, token string, a *firewall.TokenAccessRequest, scopes ...string) (*firewall.Context, error) {
 	var resp = struct {
 		*firewall.Context
@@ -57,7 +58,7 @@ func (w *HTTPWarden) TokenAllowed(ctx context.Context, token string, a *firewall
 
 // IsAllowed checks if an arbitrary subject is allowed to perform an action on a resource.
 //
-// The HTTP API is documented at http://docs.hdyra.apiary.io/#reference/warden:-access-control-for-resource-providers/check-if-a-subject-is-allowed-to-do-something
+// The HTTP API is documented at http://docs.hydra13.apiary.io/#reference/warden:-access-control-for-resource-providers/check-if-a-subject-is-allowed-to-do-something
 func (w *HTTPWarden) IsAllowed(ctx context.Context, a *firewall.AccessRequest) error {
 	var allowed = struct {
 		Allowed bool `json:"allowed"`

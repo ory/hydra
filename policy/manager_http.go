@@ -1,13 +1,14 @@
 package policy
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 
-	"encoding/json"
-
-	"github.com/ory-am/hydra/pkg"
-	"github.com/ory-am/ladon"
+	"github.com/ory/hydra/pkg"
+	"github.com/ory/ladon"
+	"github.com/pkg/errors"
 )
 
 type jsonPolicy struct {
@@ -21,9 +22,10 @@ type jsonPolicy struct {
 }
 
 type HTTPManager struct {
-	Endpoint *url.URL
-	Dry      bool
-	Client   *http.Client
+	Endpoint           *url.URL
+	Dry                bool
+	FakeTLSTermination bool
+	Client             *http.Client
 }
 
 // Create persists the policy.
@@ -31,6 +33,7 @@ func (m *HTTPManager) Create(policy ladon.Policy) error {
 	var r = pkg.NewSuperAgent(m.Endpoint.String())
 	r.Client = m.Client
 	r.Dry = m.Dry
+	r.FakeTLSTermination = m.FakeTLSTermination
 	return r.Create(policy)
 }
 
@@ -39,7 +42,26 @@ func (m *HTTPManager) Update(policy ladon.Policy) error {
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, policy.GetID()).String())
 	r.Client = m.Client
 	r.Dry = m.Dry
+	r.FakeTLSTermination = m.FakeTLSTermination
 	return r.Update(policy)
+}
+
+// Get retrieves a policy.
+func (m *HTTPManager) List(limit, offset int64) (ladon.Policies, error) {
+	var policies []*ladon.DefaultPolicy
+	var r = pkg.NewSuperAgent(m.Endpoint.String() + fmt.Sprintf("?limit=%d&offset=%d", limit, offset))
+	r.Client = m.Client
+	r.FakeTLSTermination = m.FakeTLSTermination
+	r.Dry = m.Dry
+	if err := r.Get(&policies); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	ret := make(ladon.Policies, len(policies))
+	for k, p := range policies {
+		ret[k] = ladon.Policy(p)
+	}
+	return ret, nil
 }
 
 // Get retrieves a policy.
@@ -49,9 +71,10 @@ func (m *HTTPManager) Get(id string) (ladon.Policy, error) {
 	}
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, id).String())
 	r.Client = m.Client
+	r.FakeTLSTermination = m.FakeTLSTermination
 	r.Dry = m.Dry
 	if err := r.Get(&policy); err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	return &policy, nil
@@ -62,6 +85,7 @@ func (m *HTTPManager) Delete(id string) error {
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, id).String())
 	r.Client = m.Client
 	r.Dry = m.Dry
+	r.FakeTLSTermination = m.FakeTLSTermination
 	return r.Delete()
 }
 
@@ -70,9 +94,10 @@ func (m *HTTPManager) FindPoliciesForSubject(subject string) (ladon.Policies, er
 	var policies []*ladon.DefaultPolicy
 	var r = pkg.NewSuperAgent(m.Endpoint.String() + "?subject=" + subject)
 	r.Client = m.Client
+	r.FakeTLSTermination = m.FakeTLSTermination
 	r.Dry = m.Dry
 	if err := r.Get(&policies); err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	ret := make(ladon.Policies, len(policies))

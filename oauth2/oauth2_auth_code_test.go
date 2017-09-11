@@ -6,16 +6,21 @@ import (
 	"testing"
 	"time"
 
+	"net/http/cookiejar"
+
+	"net/url"
+	"strings"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
-	ejwt "github.com/ory-am/fosite/token/jwt"
-	"github.com/ory-am/hydra/jwk"
-	. "github.com/ory-am/hydra/oauth2"
-	"github.com/ory-am/hydra/pkg"
+	ejwt "github.com/ory/fosite/token/jwt"
+	"github.com/ory/hydra/jwk"
+	. "github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
-	"net/http/cookiejar"
 )
 
 func TestAuthCode(t *testing.T) {
@@ -38,12 +43,15 @@ func TestAuthCode(t *testing.T) {
 		require.True(t, ok)
 		require.NotEmpty(t, jwtClaims)
 
+		expl := map[string]interface{}{"foo": "bar", "baz": map[string]interface{}{"foo": "baz"}}
 		consent, err := signConsentToken(map[string]interface{}{
-			"jti": jwtClaims["jti"],
-			"exp": time.Now().Add(time.Hour).Unix(),
-			"iat": time.Now().Unix(),
-			"aud": "app-client",
-			"scp": []string{"hydra"},
+			"jti":    jwtClaims["jti"],
+			"exp":    time.Now().Add(time.Hour).Unix(),
+			"iat":    time.Now().Unix(),
+			"aud":    "app-client",
+			"scp":    []string{"hydra", "offline"},
+			"at_ext": expl,
+			"id_ext": expl,
 		})
 		pkg.RequireError(t, false, err)
 
@@ -70,6 +78,25 @@ func TestAuthCode(t *testing.T) {
 	require.True(t, validConsent)
 	require.NotEmpty(t, code)
 
-	_, err = oauthConfig.Exchange(oauth2.NoContext, code)
+	token, err := oauthConfig.Exchange(oauth2.NoContext, code)
 	pkg.RequireError(t, false, err, code)
+
+	time.Sleep(time.Second * 5)
+
+	res, err := testRefresh(t, token)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+}
+
+func testRefresh(t *testing.T, token *oauth2.Token) (*http.Response, error) {
+	req, err := http.NewRequest("POST", oauthClientConfig.TokenURL, strings.NewReader(url.Values{
+		"grant_type":    []string{"refresh_token"},
+		"refresh_token": []string{token.RefreshToken},
+	}.Encode()))
+	require.NoError(t, err)
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth(oauthClientConfig.ClientID, oauthClientConfig.ClientSecret)
+
+	return http.DefaultClient.Do(req)
 }

@@ -1,17 +1,29 @@
 package cmd
 
 import (
-	"fmt"
-
+	"context"
 	"crypto/tls"
+	"fmt"
 	"net/http"
 
-	"github.com/ory-am/hydra/pkg"
+	"github.com/ory/hydra/pkg"
 	"github.com/spf13/cobra"
-	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 )
+
+type transporter struct {
+	*http.Transport
+	FakeTLSTermination bool
+}
+
+func (t *transporter) RoundTrip(req *http.Request) (*http.Response, error) {
+	if t.FakeTLSTermination {
+		req.Header.Set("X-Forwarded-Proto", "https")
+	}
+
+	return t.Transport.RoundTrip(req)
+}
 
 // tokenSelfCmd represents the self command
 var tokenSelfCmd = &cobra.Command{
@@ -19,12 +31,24 @@ var tokenSelfCmd = &cobra.Command{
 	Short: "Generate an OAuth2 token the client grant type",
 	Long:  "This command uses the CLI's credentials to create an access token.",
 	Run: func(cmd *cobra.Command, args []string) {
-		ctx := context.Background()
+		fakeTlsTermination, _ := cmd.Flags().GetBool("fake-tls-termination")
+		ctx := context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{
+			Transport: &transporter{
+				FakeTLSTermination: fakeTlsTermination,
+				Transport:          &http.Transport{},
+			},
+		})
+
 		if ok, _ := cmd.Flags().GetBool("skip-tls-verify"); ok {
-			fmt.Println("Warning: Skipping TLS Certificate Verification.")
-			ctx = context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			}})
+			// fmt.Println("Warning: Skipping TLS Certificate Verification.")
+			ctx = context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{
+				Transport: &transporter{
+					FakeTLSTermination: fakeTlsTermination,
+					Transport: &http.Transport{
+						TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+					},
+				},
+			})
 		}
 
 		oauthConfig := clientcredentials.Config{

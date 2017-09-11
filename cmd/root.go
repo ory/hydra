@@ -3,18 +3,25 @@ package cmd
 import (
 	"fmt"
 	"os"
-
 	"path/filepath"
 	"runtime"
 	"strings"
 
-	"github.com/ory-am/hydra/cmd/cli"
-	"github.com/ory-am/hydra/config"
+	"time"
+
+	"github.com/ory/hydra/cmd/cli"
+	"github.com/ory/hydra/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var cfgFile string
+
+var (
+	Version   = "dev-master"
+	BuildTime = time.Now().String()
+	GitHash   = "undefined"
+)
 
 var c = new(config.Config)
 
@@ -33,6 +40,10 @@ var cmdHandler = cli.NewHandler(c)
 // Execute adds all child commands to the root command sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
+	c.BuildTime = BuildTime
+	c.BuildVersion = Version
+	c.BuildHash = GitHash
+
 	if err := RootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(-1)
@@ -80,6 +91,9 @@ func initConfig() {
 	viper.BindEnv("CONSENT_URL")
 	viper.SetDefault("CONSENT_URL", "")
 
+	viper.BindEnv("DATABASE_PLUGIN")
+	viper.SetDefault("DATABASE_PLUGIN", "")
+
 	viper.BindEnv("DATABASE_URL")
 	viper.SetDefault("DATABASE_URL", "")
 
@@ -99,7 +113,7 @@ func initConfig() {
 	viper.SetDefault("PORT", 4444)
 
 	viper.BindEnv("ISSUER")
-	viper.SetDefault("ISSUER", "hydra.localhost")
+	viper.SetDefault("ISSUER", "http://localhost:4444")
 
 	viper.BindEnv("BCRYPT_COST")
 	viper.SetDefault("BCRYPT_COST", 10)
@@ -116,11 +130,20 @@ func initConfig() {
 	viper.BindEnv("CHALLENGE_TOKEN_LIFESPAN")
 	viper.SetDefault("CHALLENGE_TOKEN_LIFESPAN", "10m")
 
+	viper.BindEnv("LOG_LEVEL")
+	viper.SetDefault("LOG_LEVEL", "info")
+
+	viper.BindEnv("LOG_FORMAT")
+	viper.SetDefault("LOG_FORMAT", "")
+
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err != nil {
 		fmt.Printf(`Config file not found because "%s"`, err)
 		fmt.Println("")
 	}
+
+	iss := viper.Get("ISSUER")
+	viper.Set("ISSUER", strings.TrimSuffix(iss.(string), "/"))
 
 	if err := viper.Unmarshal(c); err != nil {
 		fatal(fmt.Sprintf("Could not read config because %s.", err))

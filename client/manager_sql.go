@@ -1,16 +1,17 @@
 package client
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
-	"github.com/imdario/mergo"
+	"strings"
+
 	"github.com/jmoiron/sqlx"
-	"github.com/ory-am/fosite"
-	"github.com/ory-am/hydra/pkg"
+	"github.com/ory/fosite"
+	"github.com/ory/hydra/pkg"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
-	"strings"
 )
 
 var migrations = &migrate.MemoryMigrationSource{
@@ -103,27 +104,27 @@ func (d *sqlData) ToClient() *Client {
 		ID:                d.ID,
 		Name:              d.Name,
 		Secret:            d.Secret,
-		RedirectURIs:      strings.Split(d.RedirectURIs, "|"),
-		GrantTypes:        strings.Split(d.GrantTypes, "|"),
-		ResponseTypes:     strings.Split(d.ResponseTypes, "|"),
+		RedirectURIs:      pkg.SplitNonEmpty(d.RedirectURIs, "|"),
+		GrantTypes:        pkg.SplitNonEmpty(d.GrantTypes, "|"),
+		ResponseTypes:     pkg.SplitNonEmpty(d.ResponseTypes, "|"),
 		Scope:             d.Scope,
 		Owner:             d.Owner,
 		PolicyURI:         d.PolicyURI,
 		TermsOfServiceURI: d.TermsOfServiceURI,
 		ClientURI:         d.ClientURI,
 		LogoURI:           d.LogoURI,
-		Contacts:          strings.Split(d.Contacts, "|"),
+		Contacts:          pkg.SplitNonEmpty(d.Contacts, "|"),
 		Public:            d.Public,
 	}
 }
 
-func (s *SQLManager) CreateSchemas() error {
+func (s *SQLManager) CreateSchemas() (int, error) {
 	migrate.SetTable("hydra_client_migration")
 	n, err := migrate.Exec(s.DB.DB, s.DB.DriverName(), migrations, migrate.Up)
 	if err != nil {
-		return errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
+		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
 	}
-	return nil
+	return n, nil
 }
 
 func (m *SQLManager) GetConcreteClient(id string) (*Client, error) {
@@ -137,14 +138,14 @@ func (m *SQLManager) GetConcreteClient(id string) (*Client, error) {
 	return d.ToClient(), nil
 }
 
-func (m *SQLManager) GetClient(id string) (fosite.Client, error) {
+func (m *SQLManager) GetClient(_ context.Context, id string) (fosite.Client, error) {
 	return m.GetConcreteClient(id)
 }
 
 func (m *SQLManager) UpdateClient(c *Client) error {
-	o, err := m.GetClient(c.ID)
+	o, err := m.GetClient(context.Background(), c.ID)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	if c.Secret == "" {
@@ -155,9 +156,6 @@ func (m *SQLManager) UpdateClient(c *Client) error {
 			return errors.WithStack(err)
 		}
 		c.Secret = string(h)
-	}
-	if err := mergo.Merge(c, o); err != nil {
-		return errors.WithStack(err)
 	}
 
 	s := sqlDataFromClient(c)

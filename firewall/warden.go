@@ -2,10 +2,9 @@
 package firewall
 
 import (
+	"context"
 	"net/http"
 	"time"
-
-	"golang.org/x/net/context"
 )
 
 // Context contains an access token's session data
@@ -34,6 +33,8 @@ type Context struct {
 }
 
 // AccessRequest is the warden's request object.
+//
+// swagger:model allowedRequest
 type AccessRequest struct {
 	// Resource is the resource that access is requested to.
 	Resource string `json:"resource"`
@@ -48,6 +49,7 @@ type AccessRequest struct {
 	Context map[string]interface{} `json:"context"`
 }
 
+// swagger:model tokenAllowedRequest
 type TokenAccessRequest struct {
 	// Resource is the resource that access is requested to.
 	Resource string `json:"resource"`

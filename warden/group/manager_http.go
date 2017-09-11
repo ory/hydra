@@ -6,21 +6,24 @@ import (
 
 	"bytes"
 	"encoding/json"
-	"github.com/ory-am/hydra/pkg"
-	"github.com/pkg/errors"
 	"io/ioutil"
+
+	"github.com/ory/hydra/pkg"
+	"github.com/pkg/errors"
 )
 
 type HTTPManager struct {
-	Client   *http.Client
-	Endpoint *url.URL
-	Dry      bool
+	Client             *http.Client
+	Endpoint           *url.URL
+	FakeTLSTermination bool
+	Dry                bool
 }
 
 func (m *HTTPManager) CreateGroup(g *Group) error {
 	var r = pkg.NewSuperAgent(m.Endpoint.String())
 	r.Client = m.Client
 	r.Dry = m.Dry
+	r.FakeTLSTermination = m.FakeTLSTermination
 	return r.Create(g)
 }
 
@@ -29,6 +32,7 @@ func (m *HTTPManager) GetGroup(id string) (*Group, error) {
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, id).String())
 	r.Client = m.Client
 	r.Dry = m.Dry
+	r.FakeTLSTermination = m.FakeTLSTermination
 	if err := r.Get(&g); err != nil {
 		return nil, err
 	}
@@ -40,6 +44,7 @@ func (m *HTTPManager) DeleteGroup(id string) error {
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, id).String())
 	r.Client = m.Client
 	r.Dry = m.Dry
+	r.FakeTLSTermination = m.FakeTLSTermination
 	return r.Delete()
 }
 
@@ -47,6 +52,7 @@ func (m *HTTPManager) AddGroupMembers(group string, members []string) error {
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, group, "members").String())
 	r.Client = m.Client
 	r.Dry = m.Dry
+	r.FakeTLSTermination = m.FakeTLSTermination
 	return r.Create(&membersRequest{
 		Members: members,
 	})
@@ -56,6 +62,7 @@ func (m *HTTPManager) RemoveGroupMembers(group string, members []string) error {
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, group, "members").String())
 	r.Client = m.Client
 	r.Dry = m.Dry
+	r.FakeTLSTermination = m.FakeTLSTermination
 	send, err := json.Marshal(&membersRequest{Members: members})
 	if err != nil {
 		return errors.WithStack(err)
@@ -89,6 +96,7 @@ func (m *HTTPManager) FindGroupNames(subject string) ([]string, error) {
 	var r = pkg.NewSuperAgent(m.Endpoint.String() + "?member=" + subject)
 	r.Client = m.Client
 	r.Dry = m.Dry
+	r.FakeTLSTermination = m.FakeTLSTermination
 	if err := r.Get(&g); err != nil {
 		return nil, err
 	}

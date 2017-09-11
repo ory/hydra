@@ -4,20 +4,20 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/Sirupsen/logrus"
+	"os"
+
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/fosite"
-	"github.com/ory-am/fosite/compose"
-	"github.com/ory-am/hydra/client"
-	"github.com/ory-am/hydra/config"
-	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/hydra/jwk"
-	"github.com/ory-am/hydra/oauth2"
-	"github.com/ory-am/hydra/pkg"
+	"github.com/ory/fosite"
+	"github.com/ory/fosite/compose"
+	"github.com/ory/herodot"
+	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/config"
+	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/warden"
 	"github.com/pkg/errors"
-	"golang.org/x/net/context"
-	r "gopkg.in/dancannon/gorethink.v2"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {
@@ -35,45 +35,17 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 		}
 		break
 	case *config.SQLConnection:
-		m := &oauth2.FositeSQLStore{
+		store = &oauth2.FositeSQLStore{
 			DB:      con.GetDatabase(),
 			Manager: clients,
+			L:       c.GetLogger(),
 		}
-		if err := m.CreateSchemas(); err != nil {
-			logrus.Fatalf("Could not create oauth2 schema: %s", err)
-		}
-		store = m
 		break
-	case *config.RethinkDBConnection:
-		con.CreateTableIfNotExists("hydra_oauth2_authorize_code")
-		con.CreateTableIfNotExists("hydra_oauth2_id_sessions")
-		con.CreateTableIfNotExists("hydra_oauth2_access_token")
-		con.CreateTableIfNotExists("hydra_oauth2_implicit")
-		con.CreateTableIfNotExists("hydra_oauth2_refresh_token")
-		m := &oauth2.FositeRehinkDBStore{
-			Session:             con.GetSession(),
-			Manager:             clients,
-			AuthorizeCodesTable: r.Table("hydra_oauth2_authorize_code"),
-			IDSessionsTable:     r.Table("hydra_oauth2_id_sessions"),
-			AccessTokensTable:   r.Table("hydra_oauth2_access_token"),
-			RefreshTokensTable:  r.Table("hydra_oauth2_refresh_token"),
-			AuthorizeCodes:      make(oauth2.RDBItems),
-			IDSessions:          make(oauth2.RDBItems),
-			AccessTokens:        make(oauth2.RDBItems),
-			RefreshTokens:       make(oauth2.RDBItems),
+	case *config.PluginConnection:
+		var err error
+		if store, err = con.NewOAuth2Manager(clients); err != nil {
+			c.GetLogger().Fatalf("Could not load client manager plugin %s", err)
 		}
-		if err := m.ColdStart(); err != nil {
-			logrus.Fatalf("Could not fetch initial state: %s", err)
-		}
-		m.Watch(context.Background())
-		store = m
-		break
-	case *config.RedisConnection:
-		m := &oauth2.FositeRedisStore{
-			DB:      con.RedisSession(),
-			Manager: clients,
-		}
-		store = m
 		break
 	default:
 		panic("Unknown connection type.")
@@ -89,15 +61,16 @@ func newOAuth2Provider(c *config.Config, km jwk.Manager) fosite.OAuth2Provider {
 	createRS256KeysIfNotExist(c, oauth2.OpenIDConnectKeyName, "private", "sig")
 	keys, err := km.GetKey(oauth2.OpenIDConnectKeyName, "private")
 	if errors.Cause(err) == pkg.ErrNotFound {
-		logrus.Warnln("Could not find OpenID Connect signing keys. Generating a new keypair...")
+		c.GetLogger().Warnln("Could not find OpenID Connect signing keys. Generating a new keypair...")
 		keys, err = new(jwk.RS256Generator).Generate("")
 
 		pkg.Must(err, "Could not generate signing key for OpenID Connect")
 		km.AddKeySet(oauth2.OpenIDConnectKeyName, keys)
-		logrus.Infoln("Keypair generated.")
-		logrus.Warnln("WARNING: Automated key creation causes low entropy. Replace the keys as soon as possible.")
-	} else {
-		pkg.Must(err, "Could not fetch signing key for OpenID Connect")
+		c.GetLogger().Infoln("Keypair generated.")
+		c.GetLogger().Warnln("WARNING: Automated key creation causes low entropy. Replace the keys as soon as possible.")
+	} else if err != nil {
+		fmt.Fprintf(os.Stderr, `Could not fetch signing key for OpenID Connect - did you forget to run "hydra migrate sql" or forget to set the SYSTEM_SECRET? Got error: %s`+"\n", err.Error())
+		os.Exit(1)
 	}
 
 	rsaKey := jwk.MustRSAPrivate(jwk.First(keys.Keys))
@@ -114,6 +87,7 @@ func newOAuth2Provider(c *config.Config, km jwk.Manager) fosite.OAuth2Provider {
 			CoreStrategy:               compose.NewOAuth2HMACStrategy(fc, c.GetSystemSecret()),
 			OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(rsaKey),
 		},
+		nil,
 		compose.OAuth2AuthorizeExplicitFactory,
 		compose.OAuth2AuthorizeImplicitFactory,
 		compose.OAuth2ClientCredentialsGrantFactory,
@@ -122,7 +96,7 @@ func newOAuth2Provider(c *config.Config, km jwk.Manager) fosite.OAuth2Provider {
 		compose.OpenIDConnectHybridFactory,
 		compose.OpenIDConnectImplicitFactory,
 		compose.OAuth2TokenRevocationFactory,
-		compose.OAuth2TokenIntrospectionFactory,
+		warden.OAuth2TokenIntrospectionFactory,
 	)
 }
 
@@ -152,9 +126,11 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 			DefaultIDTokenLifespan:   c.GetIDTokenLifespan(),
 		},
 		ConsentURL:          *consentURL,
-		H:                   &herodot.JSON{},
+		H:                   herodot.NewJSONWriter(c.GetLogger()),
 		AccessTokenLifespan: c.GetAccessTokenLifespan(),
 		CookieStore:         sessions.NewCookieStore(c.GetCookieSecret()),
+		Issuer:              c.Issuer,
+		L:                   c.GetLogger(),
 	}
 
 	handler.SetRoutes(router)

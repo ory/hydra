@@ -50,7 +50,7 @@ has Hydra is not supporting OpenID Connect Discovery yet.
 You can manage *OAuth 2.0 clients* using the cli or the HTTP REST API.
 
 * **CLI:** `hydra clients -h`
-* **REST:** Read the [API Docs](http://docs.hdyra.apiary.io/#reference/oauth2-clients)
+* **REST:** Read the [API Docs](http://docs.hydra13.apiary.io/#reference/oauth2-clients)
 
 ## Consent App Flow
 
@@ -67,15 +67,35 @@ the consent flow looks like this:
 ![Consent Flow](/images/consent.png)
 
 1. A *client* application (app in browser in laptop) requests an access token from a resource owner:
-`https://hydra.myapp.com/oauth2/auth?client_id=c3b49cf0-88e4-4faa-9489-28d5b8957858&response_type=code&scope=core+hydra&state=vboeidlizlxrywkwlsgeggff&nonce=tedgziijemvninkuotcuuiof`.
+`GET https://hydra.myapp.com/oauth2/auth?client_id=c3b49cf0-88e4-4faa-9489-28d5b8957858&response_type=code&scope=core+hydra&state=vboeidlizlxrywkwlsgeggff&nonce=tedgziijemvninkuotcuuiof`.
 2. Hydra generates a consent challenge and forwards the *user agent* (browser in laptop) to the *consent endpoint*:
-`https://login.myapp.com/?challenge=eyJhbGciOiJSUzI1N...`.
+`GET https://login.myapp.com/?challenge=eyJhbGciOiJSUzI1N...`.
 3. The *consent endpoint* verifies the resource owner's identity (e.g. cookie, username/password login form, ...).
 The consent challenge is then decoded and the information extracted. It is used to show the consent screen: `Do you want to grant _my cool app_ access to all your private data? [Yes] [No]`
 4. When consent is given, the *consent endpoint* generates a consent response token and redirects the user
 agent (browser in laptop) back to hydra:
-`https://hydra.myapp.com/oauth2/auth?client_id=c3b49cf0-88e4-4faa-9489-28d5b8957858&response_type=code&scope=core+hydra&state=vboeidlizlxrywkwlsgeggff&nonce=tedgziijemvninkuotcuuiof&consent=eyJhbGciOiJSU...`.
-5. Hydra validates the consent response token and issues the access token to the *user agent*.
+`GET https://hydra.myapp.com/oauth2/auth?client_id=c3b49cf0-88e4-4faa-9489-28d5b8957858&response_type=code&scope=core+hydra&state=vboeidlizlxrywkwlsgeggff&nonce=tedgziijemvninkuotcuuiof&consent=eyJhbGciOiJSU...`.
+5. Hydra validates the consent response token and issues the auth code to the *user agent*. The *user agent* is then redirected to the *client* application at the registered callback uri with the auth code as a parameter:
+`GET https://example.com/callback?code=aaabbbcccddd`
+6. The *client* application pairs this auth code with their client id and client secret, and requests an access token (and optionally the refresh token) from Hydra. This request must contain an Authorization header, which contains a Base64'd id/secret pairing (`client-id:client-secret`), sent as Basic authentication:
+
+```
+POST https://hydra.myapp.com/oauth2/token
+Authorization: Basic BASE64_ID_SECRET_PAIR
+Content-Type: application/x-www-form-urlencoded
+code=aaabbbcccddd&redirect_uri=https://example.com/callback&grant_type=authorization_code
+``` 
+7. If your *client* application needs to exchange a refresh token for a new access token, this request looks similar to the auth code exchange, with the `grant_type` parameter altered, and the `code` parameter replaced with `refresh_token`:
+
+```
+POST https://hydra.myapp.com/oauth2/token
+Authorization: Basic BASE64_ID_SECRET_PAIR
+Content-Type: application/x-www-form-urlencoded
+refresh_token=REFRESH_TOKEN&redirect_uri=https://example.com/callback&grant_type=refresh_token
+```
+
+If the resource owner denies the consent step, redirect to Hydra and append `&consent=denied`, for example:
+`GET https://hydra.myapp.com/oauth2/auth?client_id=c3b49cf0-88e4-4faa-9489-28d5b8957858&response_type=code&scope=core+hydra&state=vboeidlizlxrywkwlsgeggff&nonce=tedgziijemvninkuotcuuiof&consent=denied`.
 
 ### Consent App Flow Example
 
@@ -112,7 +132,7 @@ the following claims:
 The challenge claims are:
 * **jti:** A unique id.
 * **scp:** The requested scopes, e.g. `["blog.readall", "blog.writeall"]`
-* **aud:** The client id that initiated the request. You can fetch client data using the [OAuth2 Client API](http://docs.hdyra.apiary.io/#reference/oauth2/manage-the-oauth2-client-collection).
+* **aud:** The client id that initiated the request. You can fetch client data using the [OAuth2 Client API](http://docs.hydra13.apiary.io/#reference/oauth2/manage-the-oauth2-client-collection).
 * **exp:** The challenge's expiry date. Consent endpoints must not accept challenges that have expired.
 * **redir:** Where the consent endpoint should redirect the user agent to, once consent is given.
 
@@ -156,7 +176,6 @@ that contains the following claims:
     "hydra"
   ],
   "sub": "john.doe@me.com",
-  "uname": "John Doe",
   "iat": 1464511515,
   "id_ext": { "foo": "bar" },
   "at_ext": { "baz": true }
@@ -168,10 +187,9 @@ The consent claims are:
 * **scp:** The scopes the user opted in to *grant* access to, e.g. `["blog.readall"]`.
 * **sub:** Include the subject's unique id here.
 * **aud:** The client id that initiated the OAuth2 request. You can fetch
-client data using the [OAuth2 Client API](http://docs.hdyra.apiary.io/#reference/oauth2/manage-the-oauth2-client-collection).
+client data using the [OAuth2 Client API](http://docs.hydra13.apiary.io/#reference/oauth2/manage-the-oauth2-client-collection).
 * **exp:** The expiry date of this token. Use very short lifespans (< 10 min).
 * **iat:** The tokens issuance time.
-* **uname:** You can set an arbitrary, non-unique username which will be echoed in the token introspection. *(optional)*
 * **id_ext:** If set, pass this extra data to the id token. This data is not available at OAuth2 Token Introspection
  nor at the warden endpoints. *(optional)*
 * **at_ext:** If set, pass this extra data to the access token session. You can retrieve the data
@@ -192,7 +210,7 @@ Hydra follows the OAuth 2.0 error response specifications. Some errors however m
 In the case of such an error, the user agent will be redirected to the consent app
 endpoint and an `error` and `error_description` query parameter will be appended to the URL.
 
-# OAuth2 Token Introspection
+## OAuth2 Token Introspection
 
 OAuth2 Token Introspection is an [IETF](https://tools.ietf.org/html/rfc7662) standard.
 It defines a method for a protected resource to query
@@ -203,4 +221,14 @@ the authorization context of the token from the authorization server
 to the protected resource.
 
 The Token Introspection endpoint is documented in the
-[API Docs](http://docs.hdyra.apiary.io/#reference/oauth2/oauth2-token-introspection).
+[API Docs](http://docs.hydra13.apiary.io/#reference/oauth2/oauth2-token-introspection).
+
+## OAuth2 Scopes
+
+Hydra supports some scopes out of the box:
+
+* `hydra`: All endpoints that require access control also require a scope prefixed with `hydra.`, for example `hydra.clients`.
+* `offline`: Include this scope if you wish to receive a refresh token
+* `openid`: Include this scope if you wish to perform an OpenID Connect request.
+
+In Hydra, granting scope `foo` also grant's scopes `foo.bar`, `foo.baz`, `foo.bar.baz`, and all other scopes prefixed with `foo.`.

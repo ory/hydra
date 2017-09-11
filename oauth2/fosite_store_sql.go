@@ -1,24 +1,26 @@
 package oauth2
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/Sirupsen/logrus"
-	"github.com/jmoiron/sqlx"
-	"github.com/ory-am/fosite"
-	"github.com/ory-am/hydra/client"
-	"github.com/pkg/errors"
-	"github.com/rubenv/sql-migrate"
-	"golang.org/x/net/context"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/jmoiron/sqlx"
+	"github.com/ory/fosite"
+	"github.com/ory/hydra/client"
+	"github.com/pkg/errors"
+	"github.com/rubenv/sql-migrate"
+	"github.com/sirupsen/logrus"
 )
 
 type FositeSQLStore struct {
 	client.Manager
 	DB *sqlx.DB
+	L  logrus.FieldLogger
 }
 
 func sqlTemplate(table string) string {
@@ -83,9 +85,9 @@ type sqlData struct {
 	Session       []byte    `db:"session_data"`
 }
 
-func sqlSchemaFromRequest(signature string, r fosite.Requester) (*sqlData, error) {
+func sqlSchemaFromRequest(signature string, r fosite.Requester, logger logrus.FieldLogger) (*sqlData, error) {
 	if r.GetSession() == nil {
-		logrus.Debugf("Got an empty session in sqlSchemaFromRequest")
+		logger.Debugf("Got an empty session in sqlSchemaFromRequest")
 	}
 
 	session, err := json.Marshal(r.GetSession())
@@ -105,16 +107,16 @@ func sqlSchemaFromRequest(signature string, r fosite.Requester) (*sqlData, error
 	}, nil
 }
 
-func (s *sqlData) toRequest(session fosite.Session, cm client.Manager) (*fosite.Request, error) {
+func (s *sqlData) toRequest(session fosite.Session, cm client.Manager, logger logrus.FieldLogger) (*fosite.Request, error) {
 	if session != nil {
 		if err := json.Unmarshal(s.Session, session); err != nil {
 			return nil, errors.WithStack(err)
 		}
 	} else {
-		logrus.Debugf("Got an empty session in toRequest")
+		logger.Debugf("Got an empty session in toRequest")
 	}
 
-	c, err := cm.GetClient(s.Client)
+	c, err := cm.GetClient(context.Background(), s.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +140,7 @@ func (s *sqlData) toRequest(session fosite.Session, cm client.Manager) (*fosite.
 }
 
 func (s *FositeSQLStore) createSession(signature string, requester fosite.Requester, table string) error {
-	data, err := sqlSchemaFromRequest(signature, requester)
+	data, err := sqlSchemaFromRequest(signature, requester, s.L)
 	if err != nil {
 		return err
 	}
@@ -163,7 +165,7 @@ func (s *FositeSQLStore) findSessionBySignature(signature string, session fosite
 		return nil, errors.WithStack(err)
 	}
 
-	return d.toRequest(session, s.Manager)
+	return d.toRequest(session, s.Manager, s.L)
 }
 
 func (s *FositeSQLStore) deleteSession(signature string, table string) error {
@@ -173,13 +175,13 @@ func (s *FositeSQLStore) deleteSession(signature string, table string) error {
 	return nil
 }
 
-func (s *FositeSQLStore) CreateSchemas() error {
+func (s *FositeSQLStore) CreateSchemas() (int, error) {
 	migrate.SetTable("hydra_oauth2_migration")
 	n, err := migrate.Exec(s.DB.DB, s.DB.DriverName(), migrations, migrate.Up)
 	if err != nil {
-		return errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
+		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
 	}
-	return nil
+	return n, nil
 }
 
 func (s *FositeSQLStore) CreateOpenIDConnectSession(_ context.Context, signature string, requester fosite.Requester) error {

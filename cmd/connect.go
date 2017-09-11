@@ -7,7 +7,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -36,7 +35,7 @@ var connectCmd = &cobra.Command{
 		}
 
 		if u, _ := cmd.Flags().GetString("secret"); u != "" {
-			logrus.Warn("You should not provide secrets using command line flags. The secret might leak to bash history and similar systems.")
+			fmt.Println("You should not provide secrets using command line flags. The secret might leak to bash history and similar systems.")
 			c.ClientSecret = u
 		} else if u := input("Client Secret [" + secret + "]: "); u != "" {
 			c.ClientSecret = u

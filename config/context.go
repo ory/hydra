@@ -1,13 +1,13 @@
 package config
 
 import (
-	"github.com/ory-am/fosite"
-	"github.com/ory-am/fosite/handler/oauth2"
-	"github.com/ory-am/hydra/firewall"
-	"github.com/ory-am/hydra/jwk"
-	"github.com/ory-am/hydra/pkg"
-	"github.com/ory-am/hydra/warden/group"
-	"github.com/ory-am/ladon"
+	"github.com/ory/fosite"
+	"github.com/ory/fosite/handler/oauth2"
+	"github.com/ory/hydra/firewall"
+	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/warden/group"
+	"github.com/ory/ladon"
 )
 
 type Context struct {

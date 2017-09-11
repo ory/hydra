@@ -18,6 +18,9 @@ func init() {
 func TestExecute(t *testing.T) {
 	var osArgs = make([]string, len(os.Args))
 	var path = filepath.Join(os.TempDir(), fmt.Sprintf("hydra-%s.yml", uuid.New()))
+	os.Setenv("DATABASE_URL", "memory")
+	os.Setenv("FORCE_ROOT_CLIENT_CREDENTIALS", "admin:pw")
+	os.Setenv("ISSUER", "https://localhost:4444/")
 	copy(osArgs, os.Args)
 
 	for _, c := range []struct {
@@ -26,16 +29,20 @@ func TestExecute(t *testing.T) {
 		expectErr bool
 	}{
 		{
-			args: []string{"host", "--dangerous-auto-logon"},
+			args: []string{"host", "--dangerous-auto-logon", "--disable-telemetry"},
 			wait: func() bool {
 				_, err := os.Stat(path)
 				if err != nil {
 					t.Logf("Could not stat path %s because %s", path, err)
+				} else {
+					time.Sleep(time.Second * 5)
 				}
 				return err != nil
 			},
 		},
+		{args: []string{"connect", "--id", "admin", "--secret", "pw", "--url", "https://127.0.0.1:4444/"}},
 		{args: []string{"clients", "create", "--id", "foobarbaz"}},
+		{args: []string{"clients", "get", "foobarbaz"}},
 		{args: []string{"clients", "create", "--id", "public-foo", "--is-public"}},
 		{args: []string{"clients", "delete", "foobarbaz"}},
 		{args: []string{"keys", "create", "foo", "-a", "HS256"}},
@@ -44,10 +51,6 @@ func TestExecute(t *testing.T) {
 		{args: []string{"keys", "delete", "foo"}},
 		{args: []string{"token", "revoke", "foo"}},
 		{args: []string{"token", "client"}},
-		{args: []string{"token", "user", "--no-open"}, wait: func() bool {
-			time.Sleep(time.Millisecond * 10)
-			return false
-		}},
 		{args: []string{"policies", "create", "-i", "foobar", "-s", "peter,max", "-r", "blog,users", "-a", "post,ban", "--allow"}},
 		{args: []string{"policies", "actions", "add", "foobar", "update|create"}},
 		{args: []string{"policies", "actions", "remove", "foobar", "update|create"}},
@@ -62,12 +65,18 @@ func TestExecute(t *testing.T) {
 		{args: []string{"groups", "find", "peter"}},
 		{args: []string{"groups", "members", "remove", "my-group", "peter"}},
 		{args: []string{"groups", "delete", "my-group"}},
+		{args: []string{"help", "migrate", "sql"}},
+		{args: []string{"help", "migrate", "ladon", "0.6.0"}},
 		{args: []string{"version"}},
+		{args: []string{"token", "user", "--no-open"}, wait: func() bool {
+			time.Sleep(time.Millisecond * 10)
+			return false
+		}},
 	} {
 		c.args = append(c.args, []string{"--skip-tls-verify", "--config", path}...)
 		RootCmd.SetArgs(c.args)
 
-		t.Run(fmt.Sprintf("command=%v", c.args), func (t *testing.T) {
+		t.Run(fmt.Sprintf("command=%v", c.args), func(t *testing.T) {
 			if c.wait != nil {
 				go func() {
 					assert.Nil(t, RootCmd.Execute())
@@ -79,13 +88,18 @@ func TestExecute(t *testing.T) {
 				for c.wait() {
 					t.Logf("Config file has not been found yet, retrying attempt #%d...", count)
 					count++
-					if count > 30 {
+					if count > 200 {
 						t.FailNow()
 					}
-					time.Sleep(time.Second * 4)
+					time.Sleep(time.Second * 2)
 				}
 			} else {
-				assert.Equal(t, c.expectErr, RootCmd.Execute() != nil)
+				err := RootCmd.Execute()
+				if c.expectErr {
+					assert.Error(t, err)
+				} else {
+					assert.NoError(t, err)
+				}
 			}
 		})
 	}

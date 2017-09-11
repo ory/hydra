@@ -2,13 +2,14 @@ package oauth2
 
 import (
 	"bytes"
-	"github.com/pkg/errors"
-	"golang.org/x/net/context"
-	"golang.org/x/oauth2/clientcredentials"
+	"context"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
+
+	"github.com/pkg/errors"
+	"golang.org/x/oauth2/clientcredentials"
 )
 
 type HTTPRecovator struct {

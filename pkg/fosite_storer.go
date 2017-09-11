@@ -1,10 +1,11 @@
 package pkg
 
 import (
-	"github.com/ory-am/fosite"
-	"github.com/ory-am/fosite/handler/oauth2"
-	"github.com/ory-am/fosite/handler/openid"
-	"golang.org/x/net/context"
+	"context"
+
+	"github.com/ory/fosite"
+	"github.com/ory/fosite/handler/oauth2"
+	"github.com/ory/fosite/handler/openid"
 )
 
 type FositeStorer interface {
@@ -12,7 +13,6 @@ type FositeStorer interface {
 	fosite.Storage
 	oauth2.AuthorizeCodeGrantStorage
 	oauth2.RefreshTokenGrantStorage
-	oauth2.ImplicitGrantStorage
 	openid.OpenIDConnectRequestStorage
 
 	RevokeRefreshToken(ctx context.Context, requestID string) error

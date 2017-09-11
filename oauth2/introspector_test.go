@@ -6,17 +6,18 @@ import (
 	"testing"
 	"time"
 
+	"context"
 	"fmt"
-	"github.com/Sirupsen/logrus"
+
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/fosite"
-	"github.com/ory-am/fosite/compose"
-	"github.com/ory-am/fosite/storage"
-	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/hydra/oauth2"
-	"github.com/ory-am/hydra/pkg"
+	"github.com/ory/fosite"
+	"github.com/ory/fosite/compose"
+	"github.com/ory/fosite/storage"
+	"github.com/ory/herodot"
+	"github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/pkg"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/net/context"
 	goauth2 "golang.org/x/oauth2"
 )
 
@@ -41,10 +42,12 @@ func init() {
 				CoreStrategy:               compose.NewOAuth2HMACStrategy(fc, []byte("1234567890123456789012345678901234567890")),
 				OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(pkg.MustRSAKey()),
 			},
+			nil,
 			compose.OAuth2AuthorizeExplicitFactory,
 			compose.OAuth2TokenIntrospectionFactory,
 		),
-		H: &herodot.JSON{},
+		H:      herodot.NewJSONWriter(nil),
+		Issuer: "foobariss",
 	}
 	serv.SetRoutes(r)
 	ts = httptest.NewServer(r)
@@ -123,6 +126,7 @@ func TestIntrospect(t *testing.T) {
 					//assert.Equal(t, "tests", c.Issuer)
 					assert.Equal(t, now.Add(time.Hour).Unix(), c.ExpiresAt, "expires at")
 					assert.Equal(t, now.Unix(), c.IssuedAt, "issued at")
+					assert.Equal(t, "foobariss", c.Issuer, "issuer")
 					assert.Equal(t, map[string]interface{}{"foo": "bar"}, c.Extra)
 				},
 			},

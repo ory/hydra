@@ -1,15 +1,16 @@
-FROM golang:1.7
+FROM golang:1.8-alpine
 
+RUN apk add --no-cache git build-base
 RUN go get github.com/Masterminds/glide
-WORKDIR /go/src/github.com/ory-am/hydra
+WORKDIR /go/src/github.com/ory/hydra
 
 ADD ./glide.yaml ./glide.yaml
 ADD ./glide.lock ./glide.lock
-RUN glide install
+RUN glide install --skip-test -v
 
 ADD . .
 RUN go install .
 
-ENTRYPOINT /go/bin/hydra host --dangerous-auto-logon --dangerous-force-http
+ENTRYPOINT /go/bin/hydra migrate sql $DATABASE_URL; /go/bin/hydra host --dangerous-auto-logon --dangerous-force-http --disable-telemetry
 
 EXPOSE 4444

@@ -3,9 +3,8 @@ package jwk
 import (
 	"crypto/rand"
 	"crypto/rsa"
-	"fmt"
-
 	"crypto/x509"
+	"fmt"
 
 	"github.com/pkg/errors"
 	"github.com/square/go-jose"

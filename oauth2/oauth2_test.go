@@ -9,13 +9,14 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/fosite"
-	"github.com/ory-am/fosite/compose"
-	hc "github.com/ory-am/hydra/client"
-	"github.com/ory-am/hydra/jwk"
-	. "github.com/ory-am/hydra/oauth2"
-	"github.com/ory-am/hydra/pkg"
+	"github.com/ory/fosite"
+	"github.com/ory/fosite/compose"
+	hc "github.com/ory/hydra/client"
+	"github.com/ory/hydra/jwk"
+	. "github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 )
@@ -36,7 +37,10 @@ var store = &FositeMemoryStore{
 var keyManager = &jwk.MemoryManager{}
 var keyGenerator = &jwk.RS256Generator{}
 
-var fc = &compose.Config{}
+var fc = &compose.Config{
+	AccessTokenLifespan: time.Second,
+}
+
 var handler = &Handler{
 	OAuth2: compose.Compose(
 		fc,
@@ -45,6 +49,7 @@ var handler = &Handler{
 			CoreStrategy:               compose.NewOAuth2HMACStrategy(fc, []byte("some super secret secret")),
 			OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(pkg.MustRSAKey()),
 		},
+		nil,
 		compose.OAuth2AuthorizeExplicitFactory,
 		compose.OAuth2AuthorizeImplicitFactory,
 		compose.OAuth2ClientCredentialsGrantFactory,
@@ -63,6 +68,7 @@ var handler = &Handler{
 	},
 	CookieStore: sessions.NewCookieStore([]byte("foo-secret")),
 	ForcedHTTP:  true,
+	L:           logrus.New(),
 }
 
 var router = httprouter.New()
@@ -80,10 +86,13 @@ func init() {
 	keyManager.AddKeySet(ConsentEndpointKey, keys)
 	ts = httptest.NewServer(router)
 
+	handler.Issuer = ts.URL
+
 	handler.SetRoutes(router)
+	h, _ := hasher.Hash([]byte("secret"))
 	store.Manager.(*hc.MemoryManager).Clients["app"] = hc.Client{
 		ID:            "app",
-		Secret:        "secret",
+		Secret:        string(h),
 		RedirectURIs:  []string{ts.URL + "/callback"},
 		ResponseTypes: []string{"id_token", "code", "token"},
 		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
@@ -93,7 +102,6 @@ func init() {
 	c, _ := url.Parse(ts.URL + "/consent")
 	handler.ConsentURL = *c
 
-	h, _ := hasher.Hash([]byte("secret"))
 	store.Manager.(*hc.MemoryManager).Clients["app-client"] = hc.Client{
 		ID:            "app-client",
 		Secret:        string(h),

@@ -1,16 +1,20 @@
 package oauth2
 
 import (
-	"github.com/julienschmidt/httprouter"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/julienschmidt/httprouter"
+	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestHandlerConsent(t *testing.T) {
-	h := new(Handler)
+	h := &Handler{
+		L: logrus.New(),
+	}
 	r := httprouter.New()
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)

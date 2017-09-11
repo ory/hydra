@@ -1,0 +1,15 @@
+{
+  "description": "Allow a client to read the keys neccessary for performing the consent flow. Make sure to replace <my-client-id> with the client id you chose.",
+  "subjects": [
+    "<my-client-id>"
+  ],
+  "effect": "allow",
+  "resources": [
+    "rn:hydra:keys:hydra.consent.response:private",
+    "rn:hydra:keys:hydra.consent.response:public",
+    "rn:hydra:keys:hydra.consent.challenge:public"
+  ],
+  "actions": [
+    "get"
+  ]
+}

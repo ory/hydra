@@ -1,11 +1,10 @@
 package oauth2
 
 import (
-	"bytes"
-	"encoding/gob"
-	"github.com/ory-am/fosite"
-	"github.com/ory-am/fosite/handler/openid"
-	"github.com/ory-am/fosite/token/jwt"
+	"github.com/mohae/deepcopy"
+	"github.com/ory/fosite"
+	"github.com/ory/fosite/handler/openid"
+	"github.com/ory/fosite/token/jwt"
 )
 
 type Session struct {
@@ -28,11 +27,5 @@ func (s *Session) Clone() fosite.Session {
 		return nil
 	}
 
-	var clone Session
-	var mod bytes.Buffer
-	enc := gob.NewEncoder(&mod)
-	dec := gob.NewDecoder(&mod)
-	_ = enc.Encode(s)
-	_ = dec.Decode(&clone)
-	return &clone
+	return deepcopy.Copy(s).(fosite.Session)
 }

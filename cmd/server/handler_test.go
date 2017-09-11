@@ -5,9 +5,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/hydra/config"
+	"github.com/ory/hydra/config"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/urfave/negroni"
 )
@@ -15,7 +15,9 @@ import (
 func TestStart(t *testing.T) {
 	router := httprouter.New()
 	h := &Handler{
-		Config: &config.Config{},
+		Config: &config.Config{
+			DatabaseURL: "memory",
+		},
 	}
 	h.registerRoutes(router)
 }

@@ -4,12 +4,13 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"github.com/ory-am/hydra/config"
-	"github.com/ory-am/hydra/oauth2"
-	"github.com/ory-am/hydra/pkg"
+	"net/http"
+
+	"github.com/ory/hydra/config"
+	"github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/pkg"
 	"github.com/spf13/cobra"
 	"golang.org/x/oauth2/clientcredentials"
-	"net/http"
 )
 
 type RevocationHandler struct {
@@ -26,7 +27,7 @@ func newRevocationHandler(c *config.Config) *RevocationHandler {
 
 func (h *RevocationHandler) RevokeToken(cmd *cobra.Command, args []string) {
 	if ok, _ := cmd.Flags().GetBool("skip-tls-verify"); ok {
-		fmt.Println("Warning: Skipping TLS Certificate Verification.")
+		// fmt.Println("Warning: Skipping TLS Certificate Verification.")
 		h.M.Client = &http.Client{Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}}

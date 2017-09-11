@@ -3,11 +3,11 @@ package pkg
 import (
 	"time"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
-func Retry(maxWait time.Duration, failAfter time.Duration, f func() error) (err error) {
+func Retry(logger logrus.FieldLogger, maxWait time.Duration, failAfter time.Duration, f func() error) (err error) {
 	var lastStart time.Time
 	err = errors.New("Did not connect.")
 	loopWait := time.Millisecond * 100
@@ -22,8 +22,8 @@ func Retry(maxWait time.Duration, failAfter time.Duration, f func() error) (err 
 			retryStart = time.Now()
 		}
 
-		LogError(err)
-		logrus.Infof("Retrying in %f seconds...", loopWait.Seconds())
+		LogError(err, logger)
+		logger.Infof("Retrying in %f seconds...", loopWait.Seconds())
 		time.Sleep(loopWait)
 		loopWait = loopWait * time.Duration(int64(2))
 		if loopWait > maxWait {

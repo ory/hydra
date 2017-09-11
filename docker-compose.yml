@@ -30,18 +30,16 @@ services:
       - "4444:4444"
       - "4445:4445"
     environment:
-      - LOG_LEVEL=${LOG_LEVEL}
-      - SYSTEM_SECRET=${SYSTEM_SECRET}
-      - CONSENT_URL=http://${DOCKER_IP}:3000
+      - LOG_LEVEL=debug
+      - ISSUER=http://localhost:4444
+      - CONSENT_URL=http://localhost:3000/consent
       - DATABASE_URL=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable
 #     Uncomment the following line to use mysql instead.
 #      - DATABASE_URL=mysql://root:secret@tcp(mysqld:3306)/mysql?parseTime=true
 #     Uncomment the following line to use redis instead.
 #      - DATABASE_URL=redis://redisd:6379/0
       - FORCE_ROOT_CLIENT_CREDENTIALS=admin:demo-password
-      - ACCESS_TOKEN_LIFESPAN=${ACCESS_TOKEN_LIFESPAN}
-      - ID_TOKEN_LIFESPAN=${ID_TOKEN_LIFESPAN}
-      - AUTHORIZE_CODE_LIFESPAN=${AUTHORIZE_CODE_LIFESPAN}
+      - SYSTEM_SECRET=some-very-insecure-secret
     restart: unless-stopped
 
   consent:
@@ -50,7 +48,7 @@ services:
       - HYDRA_CLIENT_ID=admin
       - HYDRA_CLIENT_SECRET=demo-password
       - NODE_TLS_REJECT_UNAUTHORIZED=0
-    image: oryam/hydra-idp-react
+    image: oryd/hydra-consent-app-express:v0.1.6
     links:
       - hydra
     ports:

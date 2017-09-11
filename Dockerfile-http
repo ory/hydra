@@ -1,11 +1,12 @@
-FROM golang:1.7
+FROM golang:1.8-alpine
 
+RUN apk add --no-cache git build-base
 RUN go get github.com/Masterminds/glide
-WORKDIR /go/src/github.com/ory-am/hydra
+WORKDIR /go/src/github.com/ory/hydra
 
 ADD ./glide.yaml ./glide.yaml
 ADD ./glide.lock ./glide.lock
-RUN glide install
+RUN glide install --skip-test -v
 
 ADD . .
 RUN go install .

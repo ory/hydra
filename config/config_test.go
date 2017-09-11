@@ -9,7 +9,9 @@ import (
 )
 
 func TestConfig(t *testing.T) {
-	c := &Config{}
+	c := &Config{
+		DatabaseURL: "memory",
+	}
 	_ = c.Context()
 
 	assert.Equal(t, c.GetAccessTokenLifespan(), time.Hour)

@@ -7,18 +7,19 @@ import (
 	"testing"
 	"time"
 
+	"context"
+
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory-am/fosite"
-	foauth2 "github.com/ory-am/fosite/handler/oauth2"
-	"github.com/ory-am/hydra/firewall"
-	"github.com/ory-am/hydra/herodot"
-	"github.com/ory-am/hydra/oauth2"
-	"github.com/ory-am/hydra/pkg"
-	"github.com/ory-am/hydra/warden"
-	"github.com/ory-am/hydra/warden/group"
-	"github.com/ory-am/ladon"
+	"github.com/ory/fosite"
+	"github.com/ory/herodot"
+	"github.com/ory/hydra/firewall"
+	"github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/warden"
+	"github.com/ory/hydra/warden/group"
+	"github.com/ory/ladon"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/net/context"
 	coauth2 "golang.org/x/oauth2"
 )
 
@@ -59,10 +60,11 @@ var tokens = pkg.Tokens(4)
 func init() {
 	wardens["local"] = &warden.LocalWarden{
 		Warden: ladonWarden,
+		L:      logrus.New(),
 		OAuth2: &fosite.Fosite{
 			Store: fositeStore,
 			TokenIntrospectionHandlers: fosite.TokenIntrospectionHandlers{
-				&foauth2.CoreValidator{
+				&warden.TokenValidator{
 					CoreStrategy:  pkg.HMACStrategy,
 					CoreStorage:   fositeStore,
 					ScopeStrategy: fosite.HierarchicScopeStrategy,
@@ -84,7 +86,7 @@ func init() {
 
 	r := httprouter.New()
 	serv := &warden.WardenHandler{
-		H:      &herodot.JSON{},
+		H:      herodot.NewJSONWriter(nil),
 		Warden: wardens["local"],
 	}
 	serv.SetRoutes(r)
@@ -207,8 +209,8 @@ func TestActionAllowed(t *testing.T) {
 					assert.Equal(t, "siri", c.Audience)
 					assert.Equal(t, "alice", c.Subject)
 					assert.Equal(t, "tests", c.Issuer)
-					assert.Equal(t, now.Add(time.Hour), c.ExpiresAt)
-					assert.Equal(t, now, c.IssuedAt)
+					assert.Equal(t, now.Add(time.Hour).Unix(), c.ExpiresAt.Unix())
+					assert.Equal(t, now.Unix(), c.IssuedAt.Unix())
 				},
 			},
 			{
@@ -234,8 +236,8 @@ func TestActionAllowed(t *testing.T) {
 					assert.Equal(t, "siri", c.Audience)
 					assert.Equal(t, "ken", c.Subject)
 					assert.Equal(t, "tests", c.Issuer)
-					assert.Equal(t, now.Add(time.Hour), c.ExpiresAt)
-					assert.Equal(t, now, c.IssuedAt)
+					assert.Equal(t, now.Add(time.Hour).Unix(), c.ExpiresAt.Unix())
+					assert.Equal(t, now.Unix(), c.IssuedAt.Unix())
 				},
 			},
 		} {

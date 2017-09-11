@@ -4,12 +4,13 @@ SRCROOT ?= $(realpath .)
 BUILD_ROOT ?= $(SRCROOT)
 
 # These are paths used in the docker image
-SRCROOT_D = /go/src/github.com/ory-am/hydra
+SRCROOT_D = /go/src/github.com/ory/hydra
 BUILD_ROOT_D = $(SRCROOT_D)/tmp/dist
 
 default: build
 
 build: dep
+	gofmt -w -r '"github.com/Sirupsen/logrus" -> "github.com/sirupsen/logrus"' ./
 	CGO_ENABLED=0 go build -o $(BUILD_ROOT)/sand
 
 dep:
@@ -17,28 +18,28 @@ dep:
 	if [ ! -d vendor ]; then $(GLIDE) install; fi
 
 dist:
-	docker pull golang:1.7.1
+	docker pull golang:1.9.0
 	docker run --rm \
 	           -v $(SRCROOT):$(SRCROOT_D) \
 	           -w $(SRCROOT_D) \
 	           -e BUILD_ROOT=$(BUILD_ROOT_D) \
 	           -e UID=`id -u` \
 	           -e GID=`id -g` \
-	           golang:1.7.1 \
+	           golang:1.9.0 \
 	           make distbuild
 
 distbuild: clean build
 	-chown -R $(UID):$(GID) $(SRCROOT)
 
 distdep:
-	docker pull golang:1.7.1
+	docker pull golang:1.9.0
 	docker run --rm \
 	           -v $(SRCROOT):$(SRCROOT_D) \
 	           -w $(SRCROOT_D) \
 	           -e BUILD_ROOT=$(BUILD_ROOT_D) \
 	           -e UID=`id -u` \
 	           -e GID=`id -g` \
-	           golang:1.7.1 \
+	           golang:1.9.0 \
 	           make updatedep
 
 updatedep:

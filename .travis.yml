@@ -17,7 +17,7 @@ env:
 language: go
 
 go:
-  - 1.8
+  - 1.9
 
 before_install:
   - sudo apt-get install curl

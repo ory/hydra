@@ -25,13 +25,13 @@ before_install:
 install:
   - go get -u github.com/bradfitz/goimports github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/Masterminds/glide github.com/mitchellh/gox github.com/ory/go-acc
   - git clone https://github.com/docker-library/official-images.git ~/official-images
-  - diff -u <(echo -n) <(goimports -d -s .)
   - glide install
   - go install github.com/ory/hydra
   - glide update
   - go install github.com/ory/hydra
 
 script:
+  - diff -u <(echo -n) <(goimports -s .)
   - go-acc -o coverage.txt $(glide novendor)
   - go test -race -short $(glide novendor | grep -v /cmd)
   - docker build -t hydra-travis-ci -f Dockerfile-without-telemetry .

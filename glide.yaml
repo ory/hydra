@@ -25,7 +25,7 @@ import:
 - package: github.com/oleiade/reflections
   version: 1.0.0
 - package: github.com/ory/fosite
-  version: 0.11.2
+  version: 0.11.3
   subpackages:
   - compose
   - handler/oauth2
@@ -44,6 +44,8 @@ import:
   - manager/sql
 - package: github.com/pborman/uuid
   version: 1.0.0
+- package: github.com/segmentio/analytics-go
+  version: 2.1.1
 - package: github.com/pkg/errors
   version: 0.8.0
 - package: github.com/pkg/profile

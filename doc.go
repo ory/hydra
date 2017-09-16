@@ -25,8 +25,8 @@
 //     SecurityDefinitions:
 //     oauth2:
 //         type: oauth2
-//         authorizationUrl: /oauth2/auth
-//         tokenUrl: /oauth2/token
+//         authorizationUrl: https://your-hydra-instance.com/oauth2/auth
+//         tokenUrl: https://your-hydra-instance.com/oauth2/token
 //         flow: accessCode
 //         scopes:
 //           hydra.clients: "A scope required to manage OAuth 2.0 Clients"
@@ -37,8 +37,11 @@
 //           hydra.keys.create: "A scope required to create JSON Web Keys"
 //           hydra.keys.delete: "A scope required to delete JSON Web Keys"
 //           hydra.keys.update: "A scope required to get JSON Web Keys"
+//           hydra.health: "A scope required to get health information"
 //           offline: "A scope required when requesting refresh tokens"
 //           openid: "Request an OpenID Connect ID Token"
+//     basic:
+//         type: basic
 //
 //     Extensions:
 //     ---

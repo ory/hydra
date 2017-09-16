@@ -1,13 +1,13 @@
 package group_test
 
 import (
+	"flag"
+	"fmt"
 	"log"
 	"net/http/httptest"
 	"net/url"
 	"os"
 	"testing"
-	"fmt"
-	"flag"
 
 	"github.com/julienschmidt/httprouter"
 	_ "github.com/lib/pq"

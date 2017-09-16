@@ -225,10 +225,21 @@ The Token Introspection endpoint is documented in the
 
 ## OAuth2 Scopes
 
-Hydra supports some scopes out of the box:
+Hydra has the following pre-defined scopes:
 
-* `hydra`: All endpoints that require access control also require a scope prefixed with `hydra.`, for example `hydra.clients`.
 * `offline`: Include this scope if you wish to receive a refresh token
 * `openid`: Include this scope if you wish to perform an OpenID Connect request.
 
-In Hydra, granting scope `foo` also grant's scopes `foo.bar`, `foo.baz`, `foo.bar.baz`, and all other scopes prefixed with `foo.`.
+To manage ORY Hydra, various scopes are required. A complete list is available [here](http://docs.hydra13.apiary.io/#authentication/oauth2).
+
+### Scope strategy
+
+ORY Hydra matches scopes with wildcards:
+
+* `foo` matches `foo` but not `foo.bar`
+* `foo.*` matches `foo.bar`, `foo.baz`, `foo.bar.baz` but not `foo`
+* `foo.*.bar` matches `foo.bar.bar`, `foo.baz.bar` but not `foo.baz.baz.bar`
+* `foo*` matches `foo*` but not `foobar`
+
+To grant an OAuth2 client full management capabilities in hydra, add `hydra.*` to the allowed scopes. To grant an OAuth2
+client any scopes, simply add `*`.

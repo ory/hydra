@@ -33,7 +33,7 @@
     - [RS256](security.md#rs256)
     - [HMAC-SHA256](security.md#hmac-sha256)
     - [BCrypt](security.md#bcrypt)
-  - [Access Control](security.md##how-does-access-control-work-with-hydra)
+  - [Access Control](security.md#how-does-access-control-work-with-hydra)
 * [Telemetry](telemetry.md)
 * How-To
   * [Running Hydra in production](how-to/production.md)

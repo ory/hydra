@@ -6,12 +6,9 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 
-	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
-	"github.com/ory/herodot"
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -33,25 +30,6 @@ const (
 
 	consentCookieName = "consent_session"
 )
-
-type Handler struct {
-	OAuth2  fosite.OAuth2Provider
-	Consent ConsentStrategy
-
-	H herodot.Writer
-
-	ForcedHTTP bool
-	ConsentURL url.URL
-
-	AccessTokenLifespan time.Duration
-	CookieStore         sessions.Store
-
-	L logrus.FieldLogger
-
-	ScopeStrategy fosite.ScopeStrategy
-
-	Issuer string
-}
 
 // swagger:model WellKnown
 type WellKnown struct {

@@ -23,35 +23,23 @@ before_install:
   - sudo apt-get install curl
 
 install:
-  - go get github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/Masterminds/glide github.com/mitchellh/gox
+  - go get -u github.com/bradfitz/goimports github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/Masterminds/glide github.com/mitchellh/gox github.com/ory/go-acc
   - git clone https://github.com/docker-library/official-images.git ~/official-images
+  - diff -u <(echo -n) <(goimports -d -s .)
   - glide install
   - go install github.com/ory/hydra
   - glide update
   - go install github.com/ory/hydra
 
 script:
-  - touch ./coverage.tmp
-  - |
-    echo 'mode: atomic' > coverage.txt
-  - |
-    go list ./... | grep -v /cmd | grep -v /vendor | xargs -n1 -I{} sh -c 'go test -race -covermode=atomic -coverprofile=coverage.tmp -coverpkg $(go list ./... | grep -v /vendor | tr "\n" ",") {} && tail -n +2 coverage.tmp >> coverage.txt || exit 255' && rm coverage.tmp
-  - touch ./coverage.tmp
-  - |
-    go list ./cmd/... | xargs -n1 -I{} sh -c 'go test -covermode=atomic -coverprofile=coverage.tmp -coverpkg $(go list ./... | grep -v /vendor | tr "\n" ",") {} && tail -n +2 coverage.tmp >> coverage.txt || exit 255' && rm coverage.tmp
-  - goveralls -coverprofile="coverage.txt"
+  - go-acc -o coverage.txt $(glide novendor)
+  - go test -race -short $(glide novendor | grep -v /cmd)
   - docker build -t hydra-travis-ci -f Dockerfile-without-telemetry .
   - docker run -d hydra-travis-ci
   - DATABASE_URL=memory hydra host --dangerous-auto-logon --dangerous-force-http --disable-telemetry &
   - while ! echo exit | nc localhost 4444; do sleep 1; done
-# Test clients
-  - hydra clients create --id foobar
-  - hydra clients delete foobar
-# Test token on arbitrary endpoints
-  - |-
-    curl --header "Authorization: bearer $(hydra token client)" http://localhost:4444/clients
-# Test token validation
-  - hydra token validate $(hydra token client)
+  - ./run-e2e-tests.sh
+  - ./gen-swagger.sh
 
 after_success:
   - |-

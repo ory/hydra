@@ -17,6 +17,7 @@ import (
 	"github.com/ory/hydra/integration"
 	. "github.com/ory/hydra/warden/group"
 	"github.com/ory/ladon"
+	"flag"
 )
 
 var clientManagers = map[string]Manager{}
@@ -55,8 +56,11 @@ func init() {
 }
 
 func TestMain(m *testing.M) {
-	connectToPG()
-	connectToMySQL()
+	flag.Parse()
+	if !testing.Short() {
+		connectToPG()
+		connectToMySQL()
+	}
 
 	s := m.Run()
 	integration.KillAll()

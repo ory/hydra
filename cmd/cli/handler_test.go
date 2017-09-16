@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"flag"
 	"os"
 	"testing"
 
@@ -17,7 +18,10 @@ import (
 var db *sqlx.DB
 
 func TestMain(m *testing.M) {
-	db = integration.ConnectToPostgres()
+	flag.Parse()
+	if !testing.Short() {
+		db = integration.ConnectToPostgres()
+	}
 
 	code := m.Run()
 	integration.KillAll()
@@ -29,6 +33,10 @@ func TestNewHandler(t *testing.T) {
 }
 
 func TestMigrateHandlerSQL(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping test in short mode.")
+		return
+	}
 	handler := newMigrateHandler(&config.Config{})
 
 	assert.NoError(t, handler.runMigrateSQL(db))

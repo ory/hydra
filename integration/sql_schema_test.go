@@ -15,6 +15,11 @@ import (
 )
 
 func TestSQLSchema(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping test in short mode.")
+		return
+	}
+
 	var testGenerator = &jwk.RS256Generator{}
 	ks, _ := testGenerator.Generate("")
 	p1 := ks.Key("private")

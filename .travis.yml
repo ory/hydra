@@ -31,7 +31,8 @@ install:
   - go install github.com/ory/hydra
 
 script:
-  - diff -u <(echo -n) <(goimports -s .)
+  - |
+    [ -z "$(goimports -l $(go list -f {{.Dir}} ./... | grep -v /vendor/))" ] && exit 0
   - go-acc -o coverage.txt $(glide novendor)
   - go test -race -short $(glide novendor | grep -v /cmd)
   - docker build -t hydra-travis-ci -f Dockerfile-without-telemetry .

@@ -1,5 +1,5 @@
-hash: 116f662b157744514f2af5dfa680474afcd6df0e7255904a48a3f56df6766483
-updated: 2017-09-15T12:04:13.6327978+02:00
+hash: 52c78c986cdee750ca57036d3dca3507e23f03b2c85def17f33479d38a9ff08b
+updated: 2017-09-16T13:19:28.6519803+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 4918b99a7cb949bb295f3c7bbaf24b577d806e35
@@ -85,7 +85,7 @@ imports:
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
 - name: github.com/jehiah/go-strftime
-  version: 2efbe75097a505e2789f7e39cb9da067b5be8e3e
+  version: 834e15c05a45371503440cc195bbd05c9a0968d9
 - name: github.com/jmoiron/sqlx
   version: d9bd385d68c068f1fabb5057e3dedcbcbb039d0f
   subpackages:
@@ -120,7 +120,7 @@ imports:
 - name: github.com/ory/dockertest
   version: 4e3eadceb309bdef330865c89b5a06635c09c2f6
 - name: github.com/ory/fosite
-  version: ef8f1757f0c26317fd7dbb46f66fde7516a3b4bb
+  version: 461b38fd07e47dad709667f024e98a71bfd3792b
   subpackages:
   - compose
   - handler/oauth2
@@ -155,7 +155,7 @@ imports:
   subpackages:
   - sqlparse
 - name: github.com/segmentio/analytics-go
-  version: bdb0aeca8a993b292b85c9ec17b5ce0ff81848c8
+  version: 2d840d861c322bdf5346ba7917af1c2285e653d3
 - name: github.com/segmentio/backo-go
   version: 204274ad699c0983a70203a566887f17a717fef4
 - name: github.com/Sirupsen/logrus

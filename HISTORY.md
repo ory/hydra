@@ -4,10 +4,20 @@ This list makes you aware of (breaking) changes. For patch notes, please check t
 
 ## 1.0.0-alpha1
 
-This release focuses on security, spec compliance and error tracing:
+This release preview introduces a couple of changes.
+
+## Refreshing OpenID Connect ID Token using `refresh_token` grant type
 
 1. It is now possible to refresh openid connect tokens using the refresh_token grant. An ID Token is issued if the scope
 `openid` was requested, and the client is allowed to receive an ID Token.
+
+## Replacing hierarchical scope strategy with wildcard scope strategy
+
+The previous scope matching strategy has been replaced in favor of a wildcard-based matching strategy. Read more
+on this strategy [here](https://ory.gitbooks.io/hydra/content/oauth2.html#oauth2-scopes).
+
+To fall back to hierarchical scope matching, set the environment variable `SCOPE_STRATEGY=DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY`.
+This feature *might* be fully removed in the final 1.0.0 version.
 
 ## 0.9.0
 

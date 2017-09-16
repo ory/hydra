@@ -8,26 +8,12 @@ schemes:
   - https
 swagger: '2.0'
 info:
-  description: >-
-    Please refer to the user guide for in-depth documentation:
-    https://ory.gitbooks.io/hydra/content/
+  description: |-
+    Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/
 
-
-    Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a
-    service. Hydra is different, because it works with any existing
-    authentication infrastructure, not just LDAP or SAML. By implementing a
-    consent app (works with any programming language) you build a bridge between
-    Hydra and your authentication infrastructure.
-
-    Hydra is able to securely manage JSON Web Keys, and has a sophisticated
-    policy-based access control you can use if you want to.
-
-    Hydra is suitable for green- (new) and brownfield (existing) projects. If
-    you are not familiar with OAuth 2.0 and are working on a greenfield project,
-    we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge
-    of OAuth 2.0 is imperative in understanding what Hydra does and how it
-    works.
-
+    Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure.
+    Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to.
+    Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.
 
     The official repository is located at https://github.com/ory/hydra
   title: Hydra OAuth2 & OpenID Connect Server
@@ -43,27 +29,17 @@ basePath: /
 paths:
   /.well-known/jwks.json:
     get:
-      description: >-
-        Use this method if you do not want to let Hydra generate the JWKs for
-        you, but instead save your own.
+      description: |-
+        Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
 
-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:keys:hydra.openid.id-token:public"],
-
         "actions": ["GET"],
-
         "effect": "allow"
-
         }
-
         ```
       consumes:
         - application/json
@@ -94,9 +70,7 @@ paths:
           $ref: '#/responses/genericError'
   /.well-known/openid-configuration:
     get:
-      description: >-
-        For more information, please refer to
-        https://openid.net/specs/openid-connect-discovery-1_0.html
+      description: 'For more information, please refer to https://openid.net/specs/openid-connect-discovery-1_0.html'
       consumes:
         - application/x-www-form-urlencoded
       produces:
@@ -122,26 +96,17 @@ paths:
           $ref: '#/responses/genericError'
   /clients:
     get:
-      description: >-
+      description: |-
         Never returns a client's secret.
 
-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:clients"],
-
         "actions": ["get"],
-
         "effect": "allow"
-
         }
-
         ```
       consumes:
         - application/json
@@ -168,50 +133,29 @@ paths:
         '500':
           $ref: '#/responses/genericError'
     post:
-      description: >-
-        Be aware that an OAuth 2.0 Client may gain highly priviledged access if
-        configured that way. This
-
+      description: |-
+        Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This
         endpoint should be well protected and only called by code you trust.
 
-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:clients"],
-
         "actions": ["create"],
-
         "effect": "allow"
-
         }
-
         ```
 
-
-        Additionally, the context key "owner" is set to the owner of the client,
-        allowing policies such as:
-
+        Additionally, the context key "owner" is set to the owner of the client, allowing policies such as:
 
         ```
-
         {
-
         "resources": ["rn:hydra:clients"],
-
         "actions": ["create"],
-
         "effect": "allow",
-
         "conditions": { "owner": { "type": "EqualsSubjectCondition" } }
-
         }
-
         ```
       consumes:
         - application/json
@@ -247,47 +191,28 @@ paths:
           $ref: '#/responses/genericError'
   '/clients/{id}':
     get:
-      description: >-
+      description: |-
         Never returns the client's secret.
 
-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:clients:<some-id>"],
-
         "actions": ["get"],
-
         "effect": "allow"
-
         }
-
         ```
 
-
-        Additionally, the context key "owner" is set to the owner of the client,
-        allowing policies such as:
-
+        Additionally, the context key "owner" is set to the owner of the client, allowing policies such as:
 
         ```
-
         {
-
         "resources": ["rn:hydra:clients:<some-id> "],
-
         "actions": ["get"],
-
         "effect": "allow",
-
         "conditions": { "owner": { "type": "EqualsSubjectCondition" } }
-
         }
-
         ```
       consumes:
         - application/json
@@ -324,50 +249,29 @@ paths:
         '500':
           $ref: '#/responses/genericError'
     put:
-      description: >-
-        Be aware that an OAuth 2.0 Client may gain highly priviledged access if
-        configured that way. This
-
+      description: |-
+        Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This
         endpoint should be well protected and only called by code you trust.
 
-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:clients"],
-
         "actions": ["update"],
-
         "effect": "allow"
-
         }
-
         ```
 
-
-        Additionally, the context key "owner" is set to the owner of the client,
-        allowing policies such as:
-
+        Additionally, the context key "owner" is set to the owner of the client, allowing policies such as:
 
         ```
-
         {
-
         "resources": ["rn:hydra:clients"],
-
         "actions": ["update"],
-
         "effect": "allow",
-
         "conditions": { "owner": { "type": "EqualsSubjectCondition" } }
-
         }
-
         ```
       consumes:
         - application/json
@@ -407,44 +311,26 @@ paths:
         '500':
           $ref: '#/responses/genericError'
     delete:
-      description: >-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+      description: |-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:clients:<some-id>"],
-
         "actions": ["delete"],
-
         "effect": "allow"
-
         }
-
         ```
 
-
-        Additionally, the context key "owner" is set to the owner of the client,
-        allowing policies such as:
-
+        Additionally, the context key "owner" is set to the owner of the client, allowing policies such as:
 
         ```
-
         {
-
         "resources": ["rn:hydra:clients:<some-id>"],
-
         "actions": ["delete"],
-
         "effect": "allow",
-
         "conditions": { "owner": { "type": "EqualsSubjectCondition" } }
-
         }
-
         ```
       consumes:
         - application/json
@@ -489,23 +375,15 @@ paths:
           $ref: '#/responses/genericError'
   /health/stats:
     get:
-      description: >-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+      description: |-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:health:stats"],
-
         "actions": ["get"],
-
         "effect": "allow"
-
         }
-
         ```
       consumes:
         - application/json
@@ -532,23 +410,15 @@ paths:
           $ref: '#/responses/genericError'
   '/keys/{set}':
     get:
-      description: >-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+      description: |-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:keys:<set>:<kid>"],
-
         "actions": ["get"],
-
         "effect": "allow"
-
         }
-
         ```
       consumes:
         - application/json
@@ -583,27 +453,17 @@ paths:
         '500':
           $ref: '#/responses/genericError'
     put:
-      description: >-
-        Use this method if you do not want to let Hydra generate the JWKs for
-        you, but instead save your own.
+      description: |-
+        Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
 
-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:keys:<set>"],
-
         "actions": ["update"],
-
         "effect": "allow"
-
         }
-
         ```
       consumes:
         - application/json
@@ -642,23 +502,15 @@ paths:
         '500':
           $ref: '#/responses/genericError'
     post:
-      description: >-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+      description: |-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:keys:<set>:<kid>"],
-
         "actions": ["create"],
-
         "effect": "allow"
-
         }
-
         ```
       consumes:
         - application/json
@@ -697,23 +549,15 @@ paths:
         '500':
           $ref: '#/responses/genericError'
     delete:
-      description: >-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+      description: |-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:keys:<set>"],
-
         "actions": ["delete"],
-
         "effect": "allow"
-
         }
-
         ```
       consumes:
         - application/json
@@ -747,23 +591,15 @@ paths:
           $ref: '#/responses/genericError'
   '/keys/{set}/{kid}':
     get:
-      description: >-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+      description: |-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:keys:<set>:<kid>"],
-
         "actions": ["get"],
-
         "effect": "allow"
-
         }
-
         ```
       consumes:
         - application/json
@@ -804,27 +640,17 @@ paths:
         '500':
           $ref: '#/responses/genericError'
     put:
-      description: >-
-        Use this method if you do not want to let Hydra generate the JWKs for
-        you, but instead save your own.
+      description: |-
+        Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
 
-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:keys:<set>:<kid>"],
-
         "actions": ["update"],
-
         "effect": "allow"
-
         }
-
         ```
       consumes:
         - application/json
@@ -869,23 +695,15 @@ paths:
         '500':
           $ref: '#/responses/genericError'
     delete:
-      description: >-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+      description: |-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:keys:<set>:<kid>"],
-
         "actions": ["delete"],
-
         "effect": "allow"
-
         }
-
         ```
       consumes:
         - application/json
@@ -925,9 +743,7 @@ paths:
           $ref: '#/responses/genericError'
   /oauth2/auth:
     get:
-      description: >-
-        For more information, please refer to
-        https://tools.ietf.org/html/rfc6749#section-4
+      description: 'For more information, please refer to https://tools.ietf.org/html/rfc6749#section-4'
       consumes:
         - application/x-www-form-urlencoded
       schemes:
@@ -946,9 +762,7 @@ paths:
           $ref: '#/responses/genericError'
   /oauth2/introspect:
     post:
-      description: >-
-        For more information, please refer to
-        https://tools.ietf.org/html/rfc7662
+      description: 'For more information, please refer to https://tools.ietf.org/html/rfc7662'
       consumes:
         - application/x-www-form-urlencoded
       produces:
@@ -971,9 +785,7 @@ paths:
           $ref: '#/responses/genericError'
   /oauth2/revoke:
     post:
-      description: >-
-        For more information, please refer to
-        https://tools.ietf.org/html/rfc7009
+      description: 'For more information, please refer to https://tools.ietf.org/html/rfc7009'
       consumes:
         - application/x-www-form-urlencoded
       produces:
@@ -1009,9 +821,7 @@ paths:
           $ref: '#/responses/genericError'
   /oauth2/token:
     post:
-      description: >-
-        For more information, please refer to
-        https://tools.ietf.org/html/rfc6749#section-4
+      description: 'For more information, please refer to https://tools.ietf.org/html/rfc6749#section-4'
       consumes:
         - application/x-www-form-urlencoded
       produces:
@@ -1034,27 +844,17 @@ paths:
           $ref: '#/responses/genericError'
   /policies:
     get:
-      description: >-
-        Visit https://github.com/ory/ladon#usage for more information on policy
-        usage.
+      description: |-
+        Visit https://github.com/ory/ladon#usage for more information on policy usage.
 
-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:policies"],
-
         "actions": ["list"],
-
         "effect": "allow"
-
         }
-
         ```
       consumes:
         - application/json
@@ -1093,27 +893,17 @@ paths:
         '500':
           $ref: '#/responses/genericError'
     post:
-      description: >-
-        Visit https://github.com/ory/ladon#usage for more information on policy
-        usage.
+      description: |-
+        Visit https://github.com/ory/ladon#usage for more information on policy usage.
 
-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:policies"],
-
         "actions": ["create"],
-
         "effect": "allow"
-
         }
-
         ```
       consumes:
         - application/json
@@ -1147,27 +937,17 @@ paths:
           $ref: '#/responses/genericError'
   '/policies/{id}':
     get:
-      description: >-
-        Visit https://github.com/ory/ladon#usage for more information on policy
-        usage.
+      description: |-
+        Visit https://github.com/ory/ladon#usage for more information on policy usage.
 
-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:policies:<id>"],
-
         "actions": ["get"],
-
         "effect": "allow"
-
         }
-
         ```
       consumes:
         - application/json
@@ -1203,27 +983,17 @@ paths:
         '500':
           $ref: '#/responses/genericError'
     put:
-      description: >-
-        Visit https://github.com/ory/ladon#usage for more information on policy
-        usage.
+      description: |-
+        Visit https://github.com/ory/ladon#usage for more information on policy usage.
 
-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:policies"],
-
         "actions": ["update"],
-
         "effect": "allow"
-
         }
-
         ```
       consumes:
         - application/json
@@ -1263,27 +1033,17 @@ paths:
         '500':
           $ref: '#/responses/genericError'
     delete:
-      description: >-
-        Visit https://github.com/ory/ladon#usage for more information on policy
-        usage.
+      description: |-
+        Visit https://github.com/ory/ladon#usage for more information on policy usage.
 
-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:policies:<id>"],
-
         "actions": ["delete"],
-
         "effect": "allow"
-
         }
-
         ```
       consumes:
         - application/json
@@ -1318,32 +1078,19 @@ paths:
           $ref: '#/responses/genericError'
   /warden/allowed:
     post:
-      description: >-
-        Checks if an arbitrary subject is allowed to perform an action on a
-        resource. This endpoint requires a subject,
-
-        a resource name, an action name and a context.If the subject is not
-        allowed to perform the action on the resource,
-
+      description: |-
+        Checks if an arbitrary subject is allowed to perform an action on a resource. This endpoint requires a subject,
+        a resource name, an action name and a context.If the subject is not allowed to perform the action on the resource,
         this endpoint returns a 200 response with `{ "allowed": false} }`.
 
-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:warden:allowed"],
-
         "actions": ["decide"],
-
         "effect": "allow"
-
         }
-
         ```
       consumes:
         - application/json
@@ -1375,23 +1122,15 @@ paths:
           $ref: '#/responses/genericError'
   /warden/groups:
     get:
-      description: >-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+      description: |-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:warden:groups:<member>"],
-
         "actions": ["get"],
-
         "effect": "allow"
-
         }
-
         ```
       consumes:
         - application/json
@@ -1425,23 +1164,15 @@ paths:
         '500':
           $ref: '#/responses/genericError'
     post:
-      description: >-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+      description: |-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:warden:groups"],
-
         "actions": ["create"],
-
         "effect": "allow"
-
         }
-
         ```
       consumes:
         - application/json
@@ -1469,23 +1200,15 @@ paths:
           $ref: '#/responses/genericError'
   '/warden/groups/{id}':
     get:
-      description: >-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+      description: |-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:warden:groups:<id>"],
-
         "actions": ["create"],
-
         "effect": "allow"
-
         }
-
         ```
       consumes:
         - application/json
@@ -1520,23 +1243,15 @@ paths:
         '500':
           $ref: '#/responses/genericError'
     delete:
-      description: >-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+      description: |-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:warden:groups:<id>"],
-
         "actions": ["delete"],
-
         "effect": "allow"
-
         }
-
         ```
       consumes:
         - application/json
@@ -1572,23 +1287,15 @@ paths:
           $ref: '#/responses/genericError'
   '/warden/groups/{id}/members':
     post:
-      description: >-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+      description: |-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:warden:groups:<id>"],
-
         "actions": ["members.add"],
-
         "effect": "allow"
-
         }
-
         ```
       consumes:
         - application/json
@@ -1627,23 +1334,15 @@ paths:
         '500':
           $ref: '#/responses/genericError'
     delete:
-      description: >-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+      description: |-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:warden:groups:<id>"],
-
         "actions": ["members.remove"],
-
         "effect": "allow"
-
         }
-
         ```
       consumes:
         - application/json
@@ -1683,43 +1382,24 @@ paths:
           $ref: '#/responses/genericError'
   /warden/token/allowed:
     post:
-      description: >-
-        Checks if a token is valid and if the token owner is allowed to perform
-        an action on a resource.
+      description: |-
+        Checks if a token is valid and if the token owner is allowed to perform an action on a resource.
+        This endpoint requires a token, a scope, a resource name, an action name and a context.
 
-        This endpoint requires a token, a scope, a resource name, an action name
-        and a context.
+        If a token is expired/invalid, has not been granted the requested scope or the subject is not allowed to
+        perform the action on the resource, this endpoint returns a 200 response with `{ "allowed": false} }`.
 
-
-        If a token is expired/invalid, has not been granted the requested scope
-        or the subject is not allowed to
-
-        perform the action on the resource, this endpoint returns a 200 response
-        with `{ "allowed": false} }`.
-
-
-        Extra data set through the `at_ext` claim in the consent response will
-        be included in the response.
-
+        Extra data set through the `at_ext` claim in the consent response will be included in the response.
         The `id_ext` claim will never be returned by this endpoint.
 
-
-        The subject making the request needs to be assigned to a policy
-        containing:
-
+        The subject making the request needs to be assigned to a policy containing:
 
         ```
-
         {
-
         "resources": ["rn:hydra:warden:token:allowed"],
-
         "actions": ["decide"],
-
         "effect": "allow"
-
         }
-
         ```
       consumes:
         - application/json
@@ -1750,17 +1430,12 @@ paths:
         '500':
           $ref: '#/responses/genericError'
 definitions:
-  ConsentStrategy:
-    type: object
-    x-go-package: github.com/ory/hydra/oauth2
   Context:
     description: Context contains an access token's session data
     type: object
     properties:
       aud:
-        description: >-
-          Audience is who the token was issued for. This is an OAuth2 app
-          usually.
+        description: Audience is who the token was issued for. This is an OAuth2 app usually.
         type: string
         x-go-name: Audience
       exp:
@@ -1780,60 +1455,22 @@ definitions:
         type: string
         x-go-name: Issuer
       scopes:
-        description: >-
-          GrantedScopes is a list of scopes that the subject authorized when
-          asked for consent.
+        description: GrantedScopes is a list of scopes that the subject authorized when asked for consent.
         type: array
         items:
           type: string
         x-go-name: GrantedScopes
       sub:
-        description: >-
-          Subject is the identity that authorized issuing the token, for example
-          a user or an OAuth2 app.
-
+        description: |-
+          Subject is the identity that authorized issuing the token, for example a user or an OAuth2 app.
           This is usually a uuid but you can choose a urn or some other id too.
         type: string
         x-go-name: Subject
     x-go-package: github.com/ory/hydra/firewall
-  Duration:
-    description: |-
-      A Duration represents the elapsed time between two instants
-      as an int64 nanosecond count. The representation limits the
-      largest representable duration to approximately 290 years.
-    type: integer
-    format: int64
-    x-go-package: time
-  FieldLogger:
-    description: The FieldLogger interface generalizes the Entry and Logger types
-    type: object
-    x-go-package: github.com/ory/hydra/vendor/github.com/sirupsen/logrus
   Firewall:
     type: object
     title: Firewall offers various validation strategies for access tokens.
     x-go-package: github.com/ory/hydra/firewall
-  Handler:
-    type: object
-    properties:
-      AccessTokenLifespan:
-        $ref: '#/definitions/Duration'
-      Consent:
-        $ref: '#/definitions/ConsentStrategy'
-      ConsentURL:
-        $ref: '#/definitions/URL'
-      CookieStore:
-        $ref: '#/definitions/Store'
-      ForcedHTTP:
-        type: boolean
-      H:
-        $ref: '#/definitions/Writer'
-      Issuer:
-        type: string
-      L:
-        $ref: '#/definitions/FieldLogger'
-      OAuth2:
-        $ref: '#/definitions/OAuth2Provider'
-    x-go-package: github.com/ory/hydra/oauth2
   Headers:
     description: Headers is the jwt headers
     type: object
@@ -1870,13 +1507,6 @@ definitions:
   Manager:
     type: object
     x-go-package: github.com/ory/hydra/warden/group
-  OAuth2Provider:
-    description: Check fosite.Fosite for an implementation of this interface.
-    type: object
-    title: >-
-      OAuth2Provider is an interface that enables you to write OAuth2 handlers
-      with only a few lines of code.
-    x-go-package: github.com/ory/hydra/vendor/github.com/ory/fosite
   Session:
     type: object
     properties:
@@ -1895,82 +1525,6 @@ definitions:
           type: object
         x-go-name: Extra
     x-go-package: github.com/ory/hydra/oauth2
-  Store:
-    description: See CookieStore and FilesystemStore for examples.
-    type: object
-    title: Store is an interface for custom session stores.
-    x-go-package: github.com/ory/hydra/vendor/github.com/gorilla/sessions
-  URL:
-    description: >-
-      scheme://[userinfo@]host/path[?query][#fragment]
-
-
-      URLs that do not start with a slash after the scheme are interpreted as:
-
-
-      scheme:opaque[?query][#fragment]
-
-
-      Note that the Path field is stored in decoded form: /%47%6f%2f becomes
-      /Go/.
-
-      A consequence is that it is impossible to tell which slashes in the Path
-      were
-
-      slashes in the raw URL and which were %2f. This distinction is rarely
-      important,
-
-      but when it is, code must not use Path directly.
-
-
-      Go 1.5 introduced the RawPath field to hold the encoded form of Path.
-
-      The Parse function sets both Path and RawPath in the URL it returns,
-
-      and URL's String method uses RawPath if it is a valid encoding of Path,
-
-      by calling the EscapedPath method.
-
-
-      In earlier versions of Go, the more indirect workarounds were that an
-
-      HTTP server could consult req.RequestURI and an HTTP client could
-
-      construct a URL struct directly and set the Opaque field instead of Path.
-
-      These still work as well.
-    type: object
-    title: |-
-      A URL represents a parsed URL (technically, a URI reference).
-      The general form represented is:
-    properties:
-      ForceQuery:
-        type: boolean
-      Fragment:
-        type: string
-      Host:
-        type: string
-      Opaque:
-        type: string
-      Path:
-        type: string
-      RawPath:
-        type: string
-      RawQuery:
-        type: string
-      Scheme:
-        type: string
-      User:
-        $ref: '#/definitions/Userinfo'
-    x-go-package: net/url
-  Userinfo:
-    description: |-
-      The Userinfo type is an immutable encapsulation of username and
-      password details for a URL. An existing Userinfo value is guaranteed
-      to have a username set (potentially empty, as allowed by RFC 2396),
-      and optionally a password.
-    type: object
-    x-go-package: net/url
   WellKnown:
     type: object
     required:
@@ -1987,73 +1541,44 @@ definitions:
         type: string
         x-go-name: AuthURL
       id_token_signing_alg_values_supported:
-        description: >-
-          JSON array containing a list of the JWS signing algorithms (alg
-          values) supported by the OP for the ID Token
-
-          to encode the Claims in a JWT [JWT]. The algorithm RS256 MUST be
-          included. The value none MAY be supported,
-
-          but MUST NOT be used unless the Response Type used returns no ID Token
-          from the Authorization Endpoint
-
+        description: |-
+          JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token
+          to encode the Claims in a JWT [JWT]. The algorithm RS256 MUST be included. The value none MAY be supported,
+          but MUST NOT be used unless the Response Type used returns no ID Token from the Authorization Endpoint
           (such as when using the Authorization Code Flow).
         type: array
         items:
           type: string
         x-go-name: SigningAlgs
       issuer:
-        description: >-
-          URL using the https scheme with no query or fragment component that
-          the OP asserts as its Issuer Identifier.
-
-          If Issuer discovery is supported , this value MUST be identical to the
-          issuer value returned
-
-          by WebFinger. This also MUST be identical to the iss Claim value in ID
-          Tokens issued from this Issuer.
+        description: |-
+          URL using the https scheme with no query or fragment component that the OP asserts as its Issuer Identifier.
+          If Issuer discovery is supported , this value MUST be identical to the issuer value returned
+          by WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this Issuer.
         type: string
         x-go-name: Issuer
       jwks_uri:
-        description: >-
-          URL of the OP's JSON Web Key Set [JWK] document. This contains the
-          signing key(s) the RP uses to validate
-
-          signatures from the OP. The JWK Set MAY also contain the Server's
-          encryption key(s), which are used by RPs
-
-          to encrypt requests to the Server. When both signing and encryption
-          keys are made available, a use (Key Use)
-
-          parameter value is REQUIRED for all keys in the referenced JWK Set to
-          indicate each key's intended usage.
-
-          Although some algorithms allow the same key to be used for both
-          signatures and encryption, doing so is
-
-          NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be
-          used to provide X.509 representations of
-
-          keys provided. When used, the bare key values MUST still be present
-          and MUST match those in the certificate.
+        description: |-
+          URL of the OP's JSON Web Key Set [JWK] document. This contains the signing key(s) the RP uses to validate
+          signatures from the OP. The JWK Set MAY also contain the Server's encryption key(s), which are used by RPs
+          to encrypt requests to the Server. When both signing and encryption keys are made available, a use (Key Use)
+          parameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key's intended usage.
+          Although some algorithms allow the same key to be used for both signatures and encryption, doing so is
+          NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of
+          keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate.
         type: string
         x-go-name: JWKsURI
       response_types_supported:
-        description: >-
-          JSON array containing a list of the OAuth 2.0 response_type values
-          that this OP supports. Dynamic OpenID
-
-          Providers MUST support the code, id_token, and the token id_token
-          Response Type values.
+        description: |-
+          JSON array containing a list of the OAuth 2.0 response_type values that this OP supports. Dynamic OpenID
+          Providers MUST support the code, id_token, and the token id_token Response Type values.
         type: array
         items:
           type: string
         x-go-name: ResponseTypes
       subject_types_supported:
-        description: >-
-          JSON array containing a list of the Subject Identifier types that this
-          OP supports. Valid types include
-
+        description: |-
+          JSON array containing a list of the Subject Identifier types that this OP supports. Valid types include
           pairwise and public.
         type: array
         items:
@@ -2064,10 +1589,6 @@ definitions:
         type: string
         x-go-name: TokenURL
     x-go-package: github.com/ory/hydra/oauth2
-  Writer:
-    description: Writer is a helper to write arbitrary data to a ResponseWriter
-    type: object
-    x-go-package: github.com/ory/hydra/vendor/github.com/ory/herodot
   allowedRequest:
     type: object
     title: AccessRequest is the warden's request object.
@@ -2099,9 +1620,7 @@ definitions:
       - kid
     properties:
       alg:
-        description: >-
-          The algorithm to be used for creating the key. Supports "RS256",
-          "ES521" and "HS256"
+        description: 'The algorithm to be used for creating the key. Supports "RS256", "ES521" and "HS256"'
         type: string
         x-go-name: Algorithm
       kid:
@@ -2281,40 +1800,28 @@ definitions:
     title: Client represents an OAuth 2.0 Client.
     properties:
       client_name:
-        description: >-
-          Name is the human-readable string name of the client to be presented
-          to the
-
+        description: |-
+          Name is the human-readable string name of the client to be presented to the
           end-user during authorization.
         type: string
         x-go-name: Name
       client_secret:
-        description: >-
-          Secret is the client's secret. The secret will be included in the
-          create request as cleartext, and then
-
-          never again. The secret is stored using BCrypt so it is impossible to
-          recover it. Tell your users
-
-          that they need to write the secret down as it will not be made
-          available again.
+        description: |-
+          Secret is the client's secret. The secret will be included in the create request as cleartext, and then
+          never again. The secret is stored using BCrypt so it is impossible to recover it. Tell your users
+          that they need to write the secret down as it will not be made available again.
         type: string
         x-go-name: Secret
       client_uri:
-        description: >-
-          ClientURI is an URL string of a web page providing information about
-          the client.
-
+        description: |-
+          ClientURI is an URL string of a web page providing information about the client.
           If present, the server SHOULD display this URL to the end-user in
-
           a clickable fashion.
         type: string
         x-go-name: ClientURI
       contacts:
-        description: >-
-          Contacts is a array of strings representing ways to contact people
-          responsible
-
+        description: |-
+          Contacts is a array of strings representing ways to contact people responsible
           for this client, typically email addresses.
         type: array
         items:
@@ -2340,37 +1847,27 @@ definitions:
         type: string
         x-go-name: Owner
       policy_uri:
-        description: >-
-          PolicyURI is a URL string that points to a human-readable privacy
-          policy document
-
+        description: |-
+          PolicyURI is a URL string that points to a human-readable privacy policy document
           that describes how the deployment organization collects, uses,
-
           retains, and discloses personal data.
         type: string
         x-go-name: PolicyURI
       public:
-        description: >-
-          Public is a boolean that identifies this client as public, meaning
-          that it
-
-          does not have a secret. It will disable the client_credentials grant
-          type for this client if set.
+        description: |-
+          Public is a boolean that identifies this client as public, meaning that it
+          does not have a secret. It will disable the client_credentials grant type for this client if set.
         type: boolean
         x-go-name: Public
       redirect_uris:
-        description: >-
-          RedirectURIs is an array of allowed redirect urls for the client, for
-          example: http://mydomain/oauth/callback .
+        description: 'RedirectURIs is an array of allowed redirect urls for the client, for example: http://mydomain/oauth/callback .'
         type: array
         items:
           type: string
         x-go-name: RedirectURIs
       response_types:
-        description: >-
-          ResponseTypes is an array of the OAuth 2.0 response type strings that
-          the client can
-
+        description: |-
+          ResponseTypes is an array of the OAuth 2.0 response type strings that the client can
           use at the authorization endpoint.
         type: array
         pattern: id_token|code|token
@@ -2378,25 +1875,18 @@ definitions:
           type: string
         x-go-name: ResponseTypes
       scope:
-        description: >-
-          Scope is a string containing a space-separated list of scope values
-          (as
-
+        description: |-
+          Scope is a string containing a space-separated list of scope values (as
           described in Section 3.3 of OAuth 2.0 [RFC6749]) that the client
-
           can use when requesting access tokens.
         type: string
-        pattern: '([a-zA-Z0-9\.]+\s)+'
+        pattern: '([a-zA-Z0-9\.\*]+\s)+'
         x-go-name: Scope
       tos_uri:
-        description: >-
-          TermsOfServiceURI is a URL string that points to a human-readable
-          terms of service
-
+        description: |-
+          TermsOfServiceURI is a URL string that points to a human-readable terms of service
           document for the client that describes a contractual relationship
-
           between the end-user and the client that the end-user accepts when
-
           authorizing the client.
         type: string
         x-go-name: TermsOfServiceURI
@@ -2622,9 +2112,7 @@ definitions:
             type: boolean
             x-go-name: Allowed
           aud:
-            description: >-
-              Audience is who the token was issued for. This is an OAuth2 app
-              usually.
+            description: Audience is who the token was issued for. This is an OAuth2 app usually.
             type: string
             x-go-name: Audience
           exp:
@@ -2644,20 +2132,15 @@ definitions:
             type: string
             x-go-name: Issuer
           scopes:
-            description: >-
-              GrantedScopes is a list of scopes that the subject authorized when
-              asked for consent.
+            description: GrantedScopes is a list of scopes that the subject authorized when asked for consent.
             type: array
             items:
               type: string
             x-go-name: GrantedScopes
           sub:
-            description: >-
-              Subject is the identity that authorized issuing the token, for
-              example a user or an OAuth2 app.
-
-              This is usually a uuid but you can choose a urn or some other id
-              too.
+            description: |-
+              Subject is the identity that authorized issuing the token, for example a user or an OAuth2 app.
+              This is usually a uuid but you can choose a urn or some other id too.
             type: string
             x-go-name: Subject
     x-go-package: github.com/ory/hydra/warden
@@ -2846,11 +2329,9 @@ responses:
           format: int64
           x-go-name: IDToken
         refresh_token:
-          description: >-
+          description: |-
             The refresh token, which can be used to obtain new
-
-            access tokens. To retrieve it add the scope "offline" to your access
-            token request.
+            access tokens. To retrieve it add the scope "offline" to your access token request.
           type: string
           x-go-name: RefreshToken
         scope:
@@ -2881,9 +2362,7 @@ responses:
           type: boolean
           x-go-name: Allowed
         aud:
-          description: >-
-            Audience is who the token was issued for. This is an OAuth2 app
-            usually.
+          description: Audience is who the token was issued for. This is an OAuth2 app usually.
           type: string
           x-go-name: Audience
         exp:
@@ -2903,31 +2382,29 @@ responses:
           type: string
           x-go-name: Issuer
         scopes:
-          description: >-
-            GrantedScopes is a list of scopes that the subject authorized when
-            asked for consent.
+          description: GrantedScopes is a list of scopes that the subject authorized when asked for consent.
           type: array
           items:
             type: string
           x-go-name: GrantedScopes
         sub:
-          description: >-
-            Subject is the identity that authorized issuing the token, for
-            example a user or an OAuth2 app.
-
-            This is usually a uuid but you can choose a urn or some other id
-            too.
+          description: |-
+            Subject is the identity that authorized issuing the token, for example a user or an OAuth2 app.
+            This is usually a uuid but you can choose a urn or some other id too.
           type: string
           x-go-name: Subject
 securityDefinitions:
+  basic:
+    type: basic
   oauth2:
     type: oauth2
     flow: accessCode
-    authorizationUrl: /oauth2/auth
-    tokenUrl: /oauth2/token
+    authorizationUrl: 'https://your-hydra-instance.com/oauth2/auth'
+    tokenUrl: 'https://your-hydra-instance.com/oauth2/token'
     scopes:
       hydra.clients: A scope required to manage OAuth 2.0 Clients
       hydra.groups: A scope required to manage warden groups
+      hydra.health: A scope required to get health information
       hydra.keys.create: A scope required to create JSON Web Keys
       hydra.keys.delete: A scope required to delete JSON Web Keys
       hydra.keys.get: A scope required to fetch JSON Web Keys

@@ -9,6 +9,8 @@ import (
 
 	"context"
 
+	"fmt"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
 	"github.com/ory/herodot"
@@ -20,9 +22,8 @@ import (
 	"github.com/ory/ladon"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	coauth2 "golang.org/x/oauth2"
-	"fmt"
 	"github.com/stretchr/testify/require"
+	coauth2 "golang.org/x/oauth2"
 )
 
 var ts *httptest.Server

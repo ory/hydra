@@ -1,6 +1,8 @@
 package config
 
 import (
+	"plugin"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
@@ -10,7 +12,6 @@ import (
 	"github.com/ory/ladon"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"plugin"
 )
 
 type PluginConnection struct {

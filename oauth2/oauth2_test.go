@@ -66,9 +66,9 @@ var handler = &Handler{
 		DefaultChallengeLifespan: time.Hour,
 		DefaultIDTokenLifespan:   time.Hour * 24,
 	},
-	CookieStore: sessions.NewCookieStore([]byte("foo-secret")),
-	ForcedHTTP:  true,
-	L:           logrus.New(),
+	CookieStore:   sessions.NewCookieStore([]byte("foo-secret")),
+	ForcedHTTP:    true,
+	L:             logrus.New(),
 	ScopeStrategy: fosite.HierarchicScopeStrategy,
 }
 

@@ -79,7 +79,7 @@ func newOAuth2Provider(c *config.Config, km jwk.Manager) fosite.OAuth2Provider {
 		AuthorizeCodeLifespan: c.GetAuthCodeLifespan(),
 		IDTokenLifespan:       c.GetIDTokenLifespan(),
 		HashCost:              c.BCryptWorkFactor,
-		ScopeStrategy: c.GetScopeStrategy(),
+		ScopeStrategy:         c.GetScopeStrategy(),
 	}
 	return compose.Compose(
 		fc,
@@ -118,8 +118,8 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 	pkg.Must(err, "Could not parse consent url %s.", c.ConsentURL)
 
 	handler := &oauth2.Handler{
-		ForcedHTTP: c.ForceHTTP,
-		OAuth2:     o,
+		ForcedHTTP:    c.ForceHTTP,
+		OAuth2:        o,
 		ScopeStrategy: c.GetScopeStrategy(),
 		Consent: &oauth2.DefaultConsentStrategy{
 			Issuer:                   c.Issuer,

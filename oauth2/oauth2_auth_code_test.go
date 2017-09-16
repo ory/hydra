@@ -3,11 +3,11 @@ package oauth2_test
 import (
 	"io/ioutil"
 	"net/http"
-	"testing"
-	"time"
 	"net/http/cookiejar"
 	"net/url"
 	"strings"
+	"testing"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"

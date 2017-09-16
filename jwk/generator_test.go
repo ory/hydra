@@ -3,10 +3,11 @@ package jwk
 import (
 	"testing"
 
+	"fmt"
+
 	"github.com/square/go-jose"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"fmt"
 )
 
 func TestGenerator(t *testing.T) {

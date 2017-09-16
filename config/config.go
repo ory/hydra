@@ -9,9 +9,9 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"time"
-	"os"
 
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
@@ -65,7 +65,7 @@ type Config struct {
 	cluster      *url.URL                `yaml:"-"`
 	oauth2Client *http.Client            `yaml:"-"`
 	context      *Context                `yaml:"-"`
-	systemSecret []byte `yaml:"-"`
+	systemSecret []byte                  `yaml:"-"`
 }
 
 func (c *Config) GetScopeStrategy() fosite.ScopeStrategy {

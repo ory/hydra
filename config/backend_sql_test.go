@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"flag"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/dockertest"
 	"github.com/sirupsen/logrus"
@@ -23,8 +25,11 @@ var (
 var resources []*dockertest.Resource
 
 func TestMain(m *testing.M) {
-	mysql = bootstrapMySQL()
-	postgres = bootstrapPostgres()
+	flag.Parse()
+	if !testing.Short() {
+		mysql = bootstrapMySQL()
+		postgres = bootstrapPostgres()
+	}
 
 	s := m.Run()
 	killAll()
@@ -50,6 +55,11 @@ func TestCleanQueryURL(t *testing.T) {
 }
 
 func TestSQLConnection(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping test in short mode.")
+		return
+	}
+
 	for _, tc := range []struct {
 		s *SQLConnection
 		d string

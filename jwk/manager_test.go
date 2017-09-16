@@ -9,6 +9,8 @@ import (
 	"os"
 	"testing"
 
+	"flag"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
 	"github.com/ory/herodot"
@@ -68,8 +70,11 @@ func init() {
 var encryptionKey, _ = RandomBytes(32)
 
 func TestMain(m *testing.M) {
-	connectToPG()
-	connectToMySQL()
+	flag.Parse()
+	if !testing.Short() {
+		connectToPG()
+		connectToMySQL()
+	}
 
 	s := m.Run()
 	integration.KillAll()

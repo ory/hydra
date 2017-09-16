@@ -5,6 +5,8 @@ import (
 	"os"
 	"testing"
 
+	"flag"
+
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/integration"
@@ -28,6 +30,12 @@ func init() {
 }
 
 func TestMain(m *testing.M) {
+	flag.Parse()
+	if !testing.Short() {
+		connectToPG()
+		connectToMySQL()
+	}
+
 	s := m.Run()
 	integration.KillAll()
 	os.Exit(s)
@@ -51,12 +59,6 @@ func connectToMySQL() {
 	}
 
 	clientManagers["mysql"] = s
-}
-
-// This needs to be the first test!!
-func TestConnectToStores(t *testing.T) {
-	connectToPG()
-	connectToMySQL()
 }
 
 func TestCreateGetDeleteAuthorizeCodes(t *testing.T) {

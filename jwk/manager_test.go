@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"testing"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
 	"github.com/ory/herodot"

@@ -23,9 +23,9 @@ import (
 
 func TestHandlerWellKnown(t *testing.T) {
 	h := &Handler{
-		H:      herodot.NewJSONWriter(nil),
-		ScopeStrategy:fosite.HierarchicScopeStrategy,
-		Issuer: "http://hydra.localhost",
+		H:             herodot.NewJSONWriter(nil),
+		ScopeStrategy: fosite.HierarchicScopeStrategy,
+		Issuer:        "http://hydra.localhost",
 	}
 
 	AuthPathT := "/oauth2/auth"
@@ -79,14 +79,14 @@ func TestIssuerRedirect(t *testing.T) {
 	cs := &FakeConsentStrategy{}
 
 	h := &Handler{
-		H:           herodot.NewJSONWriter(nil),
-		Issuer:      "http://127.0.0.1/some/proxied/path",
-		OAuth2:      compose.ComposeAllEnabled(&config, storage, secret, privateKey),
-		ConsentURL:  *consentUrl,
-		ScopeStrategy:fosite.WildcardScopeStrategy,
-		CookieStore: sessions.NewCookieStore([]byte("my super secret password")),
-		Consent:     cs,
-		L:           logrus.New(),
+		H:             herodot.NewJSONWriter(nil),
+		Issuer:        "http://127.0.0.1/some/proxied/path",
+		OAuth2:        compose.ComposeAllEnabled(&config, storage, secret, privateKey),
+		ConsentURL:    *consentUrl,
+		ScopeStrategy: fosite.WildcardScopeStrategy,
+		CookieStore:   sessions.NewCookieStore([]byte("my super secret password")),
+		Consent:       cs,
+		L:             logrus.New(),
 	}
 
 	r := httprouter.New()

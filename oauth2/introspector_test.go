@@ -1,12 +1,12 @@
 package oauth2_test
 
 import (
+	"context"
+	"fmt"
 	"net/http/httptest"
 	"net/url"
 	"testing"
 	"time"
-	"context"
-	"fmt"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
@@ -17,8 +17,8 @@ import (
 	"github.com/ory/hydra/pkg"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	goauth2 "golang.org/x/oauth2"
 	"github.com/stretchr/testify/require"
+	goauth2 "golang.org/x/oauth2"
 )
 
 var (
@@ -102,7 +102,7 @@ func TestIntrospect(t *testing.T) {
 		for _, c := range []struct {
 			token     string
 			expectErr bool
-			scopes []string
+			scopes    []string
 			assert    func(*oauth2.Introspection)
 		}{
 			{
@@ -124,7 +124,7 @@ func TestIntrospect(t *testing.T) {
 			{
 				token:     tokens[0][1],
 				expectErr: false,
-				scopes: []string{"foo.bar"},
+				scopes:    []string{"foo.bar"},
 				assert: func(c *oauth2.Introspection) {
 					assert.Equal(t, "alice", c.Subject)
 					//assert.Equal(t, "tests", c.Issuer)

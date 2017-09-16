@@ -18,8 +18,8 @@ import (
 	"github.com/ory/hydra/pkg"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/oauth2/clientcredentials"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/oauth2/clientcredentials"
 )
 
 var (
@@ -130,7 +130,7 @@ func TestRevoke(t *testing.T) {
 				} else {
 					require.NoError(t, err)
 				}
-				
+
 				if c.assert != nil {
 					c.assert(t)
 				}

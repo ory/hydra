@@ -4,9 +4,8 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
-	"net/url"
-
 	"os"
+	"net/url"
 
 	"github.com/gorilla/context"
 	"github.com/julienschmidt/httprouter"

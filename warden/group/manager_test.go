@@ -6,8 +6,8 @@ import (
 	"net/url"
 	"os"
 	"testing"
-
 	"fmt"
+	"flag"
 
 	"github.com/julienschmidt/httprouter"
 	_ "github.com/lib/pq"
@@ -17,7 +17,6 @@ import (
 	"github.com/ory/hydra/integration"
 	. "github.com/ory/hydra/warden/group"
 	"github.com/ory/ladon"
-	"flag"
 )
 
 var clientManagers = map[string]Manager{}

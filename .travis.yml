@@ -23,7 +23,7 @@ before_install:
   - sudo apt-get install curl
 
 install:
-  - go get -u github.com/bradfitz/goimports github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/Masterminds/glide github.com/mitchellh/gox github.com/ory/go-acc
+  - go get -u github.com/go-swagger/go-swagger github.com/bradfitz/goimports github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/Masterminds/glide github.com/mitchellh/gox github.com/ory/go-acc
   - git clone https://github.com/docker-library/official-images.git ~/official-images
   - glide install
   - go install github.com/ory/hydra
@@ -31,10 +31,9 @@ install:
   - go install github.com/ory/hydra
 
 script:
-  - |
-    [ -z "$(goimports -l $(go list -f {{.Dir}} ./... | grep -v /vendor/))" ] && exit 0
+  - ./test-format.sh
   - go-acc -o coverage.txt $(glide novendor)
-  - go test -race -short $(glide novendor | grep -v /cmd)
+  - go test -race -short $(glide novendor | grep -v cmd)
   - docker build -t hydra-travis-ci -f Dockerfile-without-telemetry .
   - docker run -d hydra-travis-ci
   - DATABASE_URL=memory hydra host --dangerous-auto-logon --dangerous-force-http --disable-telemetry &

@@ -1,6 +1,7 @@
 package client_test
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http/httptest"
@@ -56,8 +57,11 @@ func init() {
 }
 
 func TestMain(m *testing.M) {
-	connectToPG()
-	connectToMySQL()
+	flag.Parse()
+	if !testing.Short() {
+		connectToPG()
+		connectToMySQL()
+	}
 
 	s := m.Run()
 	integration.KillAll()

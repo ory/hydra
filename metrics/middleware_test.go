@@ -2,24 +2,20 @@ package metrics_test
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/ory/herodot"
+	"github.com/ory/hydra/health"
 	"github.com/ory/hydra/metrics"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/urfave/negroni"
-	//"time"
-	"math/rand"
-	"time"
-
-	"encoding/json"
-
-	"github.com/ory/herodot"
-	"github.com/ory/hydra/health"
-	"github.com/sirupsen/logrus"
 )
 
 func TestMiddleware(t *testing.T) {
@@ -45,9 +41,7 @@ func TestMiddleware(t *testing.T) {
 			require.NoError(t, err)
 			res.Body.Close()
 
-			mw.RLock()
 			require.Equal(t, http.StatusOK, res.StatusCode)
-			mw.RUnlock()
 		})
 	}
 
@@ -57,6 +51,7 @@ func TestMiddleware(t *testing.T) {
 	assert.EqualValues(t, i, mw.Snapshot.Responses)
 
 	mw.Snapshot.Update()
+
 	assert.True(t, mw.Snapshot.UpTime > 0)
 	assert.True(t, mw.Snapshot.GetUpTime() > 0)
 
@@ -72,13 +67,10 @@ func TestMiddleware(t *testing.T) {
 
 	assert.EqualValues(t, 1, mw.Snapshot.Path("/oauth2/introspect").Requests)
 
-	mw.Lock()
-	mw.Update()
 	assert.NotEqual(t, 0, mw.UpTime)
-	mw.Unlock()
 
-	out, _ := json.MarshalIndent(mw, "\t", "  ")
-	t.Logf("%s", out)
+	//out, _ := json.MarshalIndent(mw, "\t", "  ")
+	//t.Logf("%s", out)
 }
 
 func TestRacyMiddleware(t *testing.T) {

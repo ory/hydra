@@ -6,6 +6,6 @@ import (
 )
 
 type ConsentStrategy interface {
-	ValidateResponse(authorizeRequest fosite.AuthorizeRequester, token string, session *sessions.Session) (claims *Session, err error)
-	IssueChallenge(authorizeRequest fosite.AuthorizeRequester, redirectURL string, session *sessions.Session) (token string, err error)
+	ValidateConsentRequest(req fosite.AuthorizeRequester, session string, cookie *sessions.Session) (claims *Session, err error)
+	CreateConsentRequest(req fosite.AuthorizeRequester, redirectURL string, cookie *sessions.Session) (token string, err error)
 }

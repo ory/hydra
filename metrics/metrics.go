@@ -163,6 +163,8 @@ func (s *Snapshot) Path(path string) *PathMetrics {
 		"/health",
 		"/keys",
 		"/oauth2/auth",
+		"/oauth2/session",
+		"/oauth2/consent",
 		"/oauth2/introspect",
 		"/oauth2/revoke",
 		"/oauth2/token",

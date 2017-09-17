@@ -128,6 +128,9 @@ func (sw *Snapshot) GetUpTime() int64 {
 }
 
 func (sw *Snapshot) Update() {
+	sw.Lock()
+	defer sw.Unlock()
+
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
 

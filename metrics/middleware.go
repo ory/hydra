@@ -119,14 +119,12 @@ func (sw *MetricsManager) ServeHTTP(rw http.ResponseWriter, r *http.Request, nex
 	method := r.Method
 	path := r.RequestURI
 
-	go func() {
-		sw.Lock()
-		defer sw.Unlock()
-		sw.Snapshot.AddRequest()
-		sw.Snapshot.AddMethodRequest(method)
-		sw.Snapshot.Path(r.RequestURI).AddRequest()
-		sw.Snapshot.Path(r.RequestURI).AddMethodRequest(method)
-	}()
+	sw.Lock()
+	sw.Snapshot.AddRequest()
+	sw.Snapshot.AddMethodRequest(method)
+	sw.Snapshot.Path(r.RequestURI).AddRequest()
+	sw.Snapshot.Path(r.RequestURI).AddMethodRequest(method)
+	sw.Unlock()
 
 	// Latency
 	start := time.Now()

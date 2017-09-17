@@ -1,21 +1,20 @@
 package oauth2_test
 
 import (
-	"fmt"
 	"net/http/httptest"
 	"net/url"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
+	"github.com/ory/herodot"
 	hc "github.com/ory/hydra/client"
-	"github.com/ory/hydra/jwk"
+	hcompose "github.com/ory/hydra/compose"
 	. "github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
-	"github.com/pkg/errors"
+	"github.com/ory/ladon"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
@@ -33,9 +32,6 @@ var store = &FositeMemoryStore{
 	AccessTokens:   make(map[string]fosite.Requester),
 	RefreshTokens:  make(map[string]fosite.Requester),
 }
-
-var keyManager = &jwk.MemoryManager{}
-var keyGenerator = &jwk.RS256Generator{}
 
 var fc = &compose.Config{
 	AccessTokenLifespan: time.Second,
@@ -62,7 +58,7 @@ var handler = &Handler{
 	),
 	Consent: &DefaultConsentStrategy{
 		Issuer:                   "http://hydra.localhost",
-		KeyManager:               keyManager,
+		ConsentManager:           consentManager,
 		DefaultChallengeLifespan: time.Hour,
 		DefaultIDTokenLifespan:   time.Hour * 24,
 	},
@@ -77,28 +73,34 @@ var ts *httptest.Server
 var oauthConfig *oauth2.Config
 var oauthClientConfig *clientcredentials.Config
 
+var localWarden, httpClient = hcompose.NewMockFirewall("foo", "app-client", fosite.Arguments{ConsentScope}, &ladon.DefaultPolicy{
+	ID:        "1",
+	Subjects:  []string{"app-client"},
+	Resources: []string{"rn:hydra:oauth2:consent:requests:<.*>"},
+	Actions:   []string{"get", "accept", "reject"},
+	Effect:    ladon.AllowAccess,
+})
+
+var consentHandler *ConsentSessionHandler
+var consentManager = NewConsentRequestMemoryManager()
+var consentClient *HTTPConsentManager
+
 func init() {
-	keys, err := keyGenerator.Generate("")
-	pkg.Must(err, "")
-	keyManager.AddKeySet(ConsentChallengeKey, keys)
+	consentHandler = &ConsentSessionHandler{
+		H: herodot.NewJSONWriter(nil),
+		W: localWarden,
+		M: consentManager,
+	}
 
-	keys, err = keyGenerator.Generate("")
-	pkg.Must(err, "")
-	keyManager.AddKeySet(ConsentEndpointKey, keys)
 	ts = httptest.NewServer(router)
-
 	handler.Issuer = ts.URL
 
 	handler.SetRoutes(router)
+	consentHandler.SetRoutes(router)
+
 	h, _ := hasher.Hash([]byte("secret"))
-	store.Manager.(*hc.MemoryManager).Clients["app"] = hc.Client{
-		ID:            "app",
-		Secret:        string(h),
-		RedirectURIs:  []string{ts.URL + "/callback"},
-		ResponseTypes: []string{"id_token", "code", "token"},
-		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
-		Scope:         "hydra",
-	}
+	u, _ := url.Parse(ts.URL + ConsentSessionPath)
+	consentClient = &HTTPConsentManager{Client: httpClient, Endpoint: u}
 
 	c, _ := url.Parse(ts.URL + "/consent")
 	handler.ConsentURL = *c
@@ -109,7 +111,7 @@ func init() {
 		RedirectURIs:  []string{ts.URL + "/callback"},
 		ResponseTypes: []string{"id_token", "code", "token"},
 		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
-		Scope:         "hydra",
+		Scope:         "hydra.* offline",
 	}
 
 	oauthConfig = &oauth2.Config{
@@ -120,36 +122,13 @@ func init() {
 			TokenURL: ts.URL + "/oauth2/token",
 		},
 		RedirectURL: ts.URL + "/callback",
-		Scopes:      []string{"hydra"},
+		Scopes:      []string{"hydra.*", "offline"},
 	}
 
 	oauthClientConfig = &clientcredentials.Config{
 		ClientID:     "app-client",
 		ClientSecret: "secret",
 		TokenURL:     ts.URL + "/oauth2/token",
-		Scopes:       []string{"hydra"},
+		Scopes:       []string{"hydra.consent", "offline"},
 	}
-}
-
-func signConsentToken(claims jwt.MapClaims) (string, error) {
-	token := jwt.New(jwt.SigningMethodRS256)
-	token.Claims = claims
-
-	keys, err := keyManager.GetKey(ConsentEndpointKey, "private")
-	if err != nil {
-		return "", errors.WithStack(err)
-	}
-	rsaKey, err := jwk.ToRSAPrivate(jwk.First(keys.Keys))
-	if err != nil {
-		return "", err
-	}
-
-	var signature, encoded string
-	if encoded, err = token.SigningString(); err != nil {
-		return "", errors.WithStack(err)
-	} else if signature, err = token.Method.Sign(encoded, rsaKey); err != nil {
-		return "", errors.WithStack(err)
-	}
-
-	return fmt.Sprintf("%s.%s", encoded, signature), nil
 }

@@ -37,7 +37,7 @@ func TestConsentHelper(t *testing.T) {
 
 	ar := fosite.NewAuthorizeRequest()
 	ar.Client = &fosite.DefaultClient{ID: "foobarclient"}
-	challenge, err := s.IssueChallenge(ar, "http://hydra/oauth2/auth?client_id=foobarclient", &sessions.Session{Values: map[interface{}]interface{}{}})
+	challenge, err := s.CreateConsentRequest(ar, "http://hydra/oauth2/auth?client_id=foobarclient", &sessions.Session{Values: map[interface{}]interface{}{}})
 	require.Nil(t, err)
 
 	claims, err := c.VerifyChallenge(challenge)

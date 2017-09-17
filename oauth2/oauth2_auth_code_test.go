@@ -9,12 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
-	ejwt "github.com/ory/fosite/token/jwt"
-	"github.com/ory/hydra/jwk"
 	. "github.com/ory/hydra/oauth2"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
@@ -23,37 +19,21 @@ import (
 func TestAuthCode(t *testing.T) {
 	var code string
 	var validConsent bool
+
 	router.GET("/consent", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-		tok, err := jwt.Parse(r.URL.Query().Get("challenge"), func(tt *jwt.Token) (interface{}, error) {
-			if _, ok := tt.Method.(*jwt.SigningMethodRSA); !ok {
-				return nil, errors.Errorf("Unexpected signing method: %v", tt.Header["alg"])
-			}
+		cr, err := consentClient.GetConsentRequest(r.URL.Query().Get("consent"))
+		assert.NoError(t, err)
 
-			pk, err := keyManager.GetKey(ConsentChallengeKey, "public")
-			require.NoError(t, err)
-			return jwk.MustRSAPublic(jwk.First(pk.Keys)), nil
-		})
-		require.NoError(t, err)
-		require.True(t, tok.Valid)
+		assert.EqualValues(t, []string{"hydra.*", "offline"}, cr.RequestedScope)
+		assert.Equal(t, r.URL.Query().Get("consent"), cr.ID)
+		assert.True(t, strings.Contains(cr.RedirectURL, "oauth2/auth?client_id=app-client"))
 
-		jwtClaims, ok := tok.Claims.(jwt.MapClaims)
-		require.True(t, ok)
-		require.NotEmpty(t, jwtClaims)
+		require.NoError(t, consentClient.AcceptConsentRequest(r.URL.Query().Get("consent"), &AcceptConsentRequestPayload{
+			Subject:     "foo",
+			GrantScopes: []string{"hydra.*", "offline"},
+		}))
 
-		expl := map[string]interface{}{"foo": "bar", "baz": map[string]interface{}{"foo": "baz"}}
-		consent, err := signConsentToken(map[string]interface{}{
-			"jti":    jwtClaims["jti"],
-			"exp":    time.Now().Add(time.Hour).Unix(),
-			"iat":    time.Now().Unix(),
-			"sub":    "foo",
-			"aud":    "app-client",
-			"scp":    []string{"hydra", "offline"},
-			"at_ext": expl,
-			"id_ext": expl,
-		})
-		require.NoError(t, err)
-
-		http.Redirect(w, r, ejwt.ToString(jwtClaims["redir"])+"&consent="+consent, http.StatusFound)
+		http.Redirect(w, r, cr.RedirectURL, http.StatusFound)
 		validConsent = true
 	})
 
@@ -78,6 +58,8 @@ func TestAuthCode(t *testing.T) {
 
 	token, err := oauthConfig.Exchange(oauth2.NoContext, code)
 	require.NoError(t, err, code)
+
+	t.Logf("Got extra: %v", token)
 
 	time.Sleep(time.Second * 5)
 

@@ -2,5 +2,8 @@
 
 set -euo pipefail
 
-toformat = $(goimports -l $(go list -f {{.Dir}} ./... | grep -v vendor | grep -v hydra$))
-[ -n "$toformat" ] && echo $toformat && exit 1
+toformat=$(goimports -l $(go list -f {{.Dir}} ./... | grep -v vendor | grep -v hydra$))
+[ -z "$toformat" ] && echo "All files are formatted correctly"
+[ -n "$toformat" ] && echo "Please use \`goimports\` to format the following files:" && echo $toformat && exit 1
+
+exit 0

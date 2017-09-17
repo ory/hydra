@@ -21,7 +21,7 @@ func TestHandlerConsent(t *testing.T) {
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)
 
-	res, err := http.Get(ts.URL + "/oauth2/consent")
+	res, err := http.Get(ts.URL + DefaultConsentPath)
 	assert.Nil(t, err)
 	defer res.Body.Close()
 

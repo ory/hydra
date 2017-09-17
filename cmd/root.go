@@ -11,6 +11,7 @@ import (
 
 	"github.com/ory/hydra/cmd/cli"
 	"github.com/ory/hydra/config"
+	"github.com/ory/hydra/oauth2"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -89,7 +90,7 @@ func initConfig() {
 	viper.SetDefault("CLIENT_ID", "")
 
 	viper.BindEnv("CONSENT_URL")
-	viper.SetDefault("CONSENT_URL", "")
+	viper.SetDefault("CONSENT_URL", oauth2.DefaultConsentPath)
 
 	viper.BindEnv("DATABASE_PLUGIN")
 	viper.SetDefault("DATABASE_PLUGIN", "")

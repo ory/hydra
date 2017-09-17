@@ -100,6 +100,10 @@ func (s *SuperAgent) Update(o interface{}) error {
 	return s.send("PUT", o, o)
 }
 
+func (s *SuperAgent) Patch(o interface{}) error {
+	return s.send("PATCH", o, o)
+}
+
 func (s *SuperAgent) send(method string, in interface{}, out interface{}) error {
 	if s.Client == nil {
 		s.Client = http.DefaultClient

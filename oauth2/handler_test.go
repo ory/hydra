@@ -59,11 +59,11 @@ type FakeConsentStrategy struct {
 	RedirectURL string
 }
 
-func (s *FakeConsentStrategy) ValidateResponse(authorizeRequest fosite.AuthorizeRequester, token string, session *sessions.Session) (claims *Session, err error) {
+func (s *FakeConsentStrategy) ValidateConsentRequest(authorizeRequest fosite.AuthorizeRequester, token string, session *sessions.Session) (claims *Session, err error) {
 	return nil, nil
 }
 
-func (s *FakeConsentStrategy) IssueChallenge(authorizeRequest fosite.AuthorizeRequester, redirectURL string, session *sessions.Session) (token string, err error) {
+func (s *FakeConsentStrategy) CreateConsentRequest(authorizeRequest fosite.AuthorizeRequester, redirectURL string, session *sessions.Session) (token string, err error) {
 	s.RedirectURL = redirectURL
 	return "token", nil
 }

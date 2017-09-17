@@ -17,9 +17,9 @@ import (
 const (
 	OpenIDConnectKeyName = "hydra.openid.id-token"
 
-	ConsentPath = "/oauth2/consent"
-	TokenPath   = "/oauth2/token"
-	AuthPath    = "/oauth2/auth"
+	DefaultConsentPath = "/oauth2/consent-fallback"
+	TokenPath          = "/oauth2/token"
+	AuthPath           = "/oauth2/auth"
 
 	WellKnownPath = "/.well-known/openid-configuration"
 	JWKPath       = "/.well-known/jwks.json"
@@ -86,7 +86,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.POST(TokenPath, h.TokenHandler)
 	r.GET(AuthPath, h.AuthHandler)
 	r.POST(AuthPath, h.AuthHandler)
-	r.GET(ConsentPath, h.DefaultConsentHandler)
+	r.GET(DefaultConsentPath, h.DefaultConsentHandler)
 	r.POST(IntrospectPath, h.IntrospectHandler)
 	r.POST(RevocationPath, h.RevocationHandler)
 	r.GET(WellKnownPath, h.WellKnownHandler)
@@ -290,24 +290,14 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	}
 
 	// A session_token will be available if the user was authenticated an gave consent
-	consentToken := authorizeRequest.GetRequestForm().Get("consent")
-	if consentToken == "" {
+	consent := authorizeRequest.GetRequestForm().Get("consent")
+	if consent == "" {
 		// otherwise redirect to log in endpoint
 		if err := h.redirectToConsent(w, r, authorizeRequest); err != nil {
 			pkg.LogError(err, h.L)
 			h.writeAuthorizeError(w, authorizeRequest, err)
 			return
 		}
-		return
-	} else if consentToken == "denied" {
-		err := errors.New("The resource owner denied consent for this request")
-		h.writeAuthorizeError(w, authorizeRequest, &fosite.RFC6749Error{
-			Name:        "Resource owner denied consent",
-			Description: err.Error(),
-			Debug:       err.Error(),
-			Hint:        "Token validation failed.",
-			Code:        http.StatusUnauthorized,
-		})
 		return
 	}
 
@@ -320,7 +310,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 
 	// decode consent_token claims
 	// verify anti-CSRF (inject state) and anti-replay token (expiry time, good value would be 10 seconds)
-	session, err := h.Consent.ValidateResponse(authorizeRequest, consentToken, cookie)
+	session, err := h.Consent.ValidateConsentRequest(authorizeRequest, consent, cookie)
 	if err != nil {
 		pkg.LogError(err, h.L)
 		h.writeAuthorizeError(w, authorizeRequest, errors.Wrap(fosite.ErrAccessDenied, ""))
@@ -369,14 +359,14 @@ func (h *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, auth
 	}
 	authUrl.RawQuery = r.URL.RawQuery
 
-	challenge, err := h.Consent.IssueChallenge(authorizeRequest, authUrl.String(), cookie)
+	challenge, err := h.Consent.CreateConsentRequest(authorizeRequest, authUrl.String(), cookie)
 	if err != nil {
 		return err
 	}
 
 	p := h.ConsentURL
 	q := p.Query()
-	q.Set("challenge", challenge)
+	q.Set("consent", challenge)
 	p.RawQuery = q.Encode()
 
 	if err := cookie.Save(r, w); err != nil {

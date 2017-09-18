@@ -111,6 +111,7 @@ type Handler struct {
 	Clients *client.Handler
 	Keys    *jwk.Handler
 	OAuth2  *oauth2.Handler
+	Consent *oauth2.ConsentSessionHandler
 	Policy  *policy.Handler
 	Groups  *group.Handler
 	Warden  *warden.WardenHandler
@@ -124,6 +125,7 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 
 	// Set up dependencies
 	injectJWKManager(c)
+	injectConsentManager(c)
 	clientsManager := newClientManager(c)
 	injectFositeStore(c, clientsManager)
 	oauth2Provider := newOAuth2Provider(c, ctx.KeyManager)
@@ -144,7 +146,8 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 	h.Clients = newClientHandler(c, router, clientsManager)
 	h.Keys = newJWKHandler(c, router)
 	h.Policy = newPolicyHandler(c, router)
-	h.OAuth2 = newOAuth2Handler(c, router, ctx.KeyManager, oauth2Provider)
+	h.Consent = newConsentHanlder(c, router)
+	h.OAuth2 = newOAuth2Handler(c, router, ctx.ConsentManager, oauth2Provider)
 	h.Warden = warden.NewHandler(c, router)
 	h.Groups = &group.Handler{
 		H:       herodot.NewJSONWriter(c.GetLogger()),
@@ -153,10 +156,6 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 	}
 	h.Groups.SetRoutes(router)
 	_ = newHealthHandler(c, router)
-
-	// Create root account if new install
-	createRS256KeysIfNotExist(c, oauth2.ConsentEndpointKey, "private", "sig")
-	createRS256KeysIfNotExist(c, oauth2.ConsentChallengeKey, "private", "sig")
 
 	h.createRootIfNewInstall(c)
 }

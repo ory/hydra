@@ -7,6 +7,7 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/warden/group"
 	"github.com/ory/ladon"
@@ -134,6 +135,20 @@ func (c *PluginConnection) NewPolicyManager() (ladon.Manager, error) {
 		return nil, errors.Wrap(err, "Unable to look up `NewPolicyManager`")
 	} else if m, ok := l.(func(*sqlx.DB) ladon.Manager); !ok {
 		return nil, errors.Errorf("Unable to type assert `NewPolicyManager`, got %v", l)
+	} else {
+		return m(c.db), nil
+	}
+}
+
+func (c *PluginConnection) NewConsentRequestManager() (oauth2.ConsentRequestManager, error) {
+	if err := c.load(); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	if l, err := c.plugin.Lookup("NewConsentRequestManager"); err != nil {
+		return nil, errors.Wrap(err, "Unable to look up `NewConsentRequestManager`")
+	} else if m, ok := l.(func(*sqlx.DB) oauth2.ConsentRequestManager); !ok {
+		return nil, errors.Errorf("Unable to type assert `NewConsentRequestManager`, got %v", l)
 	} else {
 		return m(c.db), nil
 	}

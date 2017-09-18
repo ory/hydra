@@ -101,7 +101,7 @@ func newOAuth2Provider(c *config.Config, km jwk.Manager) fosite.OAuth2Provider {
 	)
 }
 
-func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manager, o fosite.OAuth2Provider) *oauth2.Handler {
+func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm oauth2.ConsentRequestManager, o fosite.OAuth2Provider) *oauth2.Handler {
 	if c.ConsentURL == "" {
 		proto := "https"
 		if c.ForceHTTP {
@@ -123,7 +123,7 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 		ScopeStrategy: c.GetScopeStrategy(),
 		Consent: &oauth2.DefaultConsentStrategy{
 			Issuer:                   c.Issuer,
-			KeyManager:               km,
+			ConsentManager:           c.Context().ConsentManager,
 			DefaultChallengeLifespan: c.GetChallengeTokenLifespan(),
 			DefaultIDTokenLifespan:   c.GetIDTokenLifespan(),
 		},

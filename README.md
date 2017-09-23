@@ -1,4 +1,4 @@
-<h1 align="center"><img src="https://storage.googleapis.com/ory.am/ory_01-hydra-altb.png" alt="ORY Hydra - Open Source OAuth 2 and OpenID Connect server"></h1>
+<h1 align="center"><img src="https://storage.googleapis.com/ory.am/github-banner/ory_01-hydra-altb.png" alt="ORY Hydra - Open Source OAuth 2 and OpenID Connect server"></h1>
 
 <h4 align="center">
     <a href="https://gitter.im/ory-am/hydra">Chat</a> |

@@ -42,10 +42,10 @@ var tokenUserCmd = &cobra.Command{
 			clientSecret = c.ClientSecret
 		}
 		if backend == "" {
-			backend = pkg.JoinURLStrings(backend, "/oauth2/token")
+			backend = pkg.JoinURLStrings(c.ClusterURL, "/oauth2/token")
 		}
 		if frontend == "" {
-			frontend = pkg.JoinURLStrings(frontend, "/oauth2/auth")
+			frontend = pkg.JoinURLStrings(c.ClusterURL, "/oauth2/auth")
 		}
 
 		conf := oauth2.Config{

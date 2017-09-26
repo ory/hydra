@@ -2,7 +2,6 @@ package client
 
 import (
 	"sync"
-
 	"context"
 
 	"github.com/imdario/mergo"
@@ -16,6 +15,17 @@ type MemoryManager struct {
 	Clients map[string]Client
 	Hasher  fosite.Hasher
 	sync.RWMutex
+}
+
+func NewMemoryManager(hasher fosite.Hasher) *MemoryManager {
+	if hasher == nil {
+		hasher = new(fosite.BCrypt)
+	}
+
+	return &MemoryManager{
+		Clients: map[string]Client{},
+		Hasher:  hasher,
+	}
 }
 
 func (m *MemoryManager) GetConcreteClient(id string) (*Client, error) {

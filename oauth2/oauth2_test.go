@@ -99,7 +99,7 @@ func init() {
 	consentHandler.SetRoutes(router)
 
 	h, _ := hasher.Hash([]byte("secret"))
-	u, _ := url.Parse(ts.URL + ConsentSessionPath)
+	u, _ := url.Parse(ts.URL + ConsentRequestPath)
 	consentClient = &HTTPConsentManager{Client: httpClient, Endpoint: u}
 
 	c, _ := url.Parse(ts.URL + "/consent")

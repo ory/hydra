@@ -1,14 +1,15 @@
-package oauth2
+package oauth2_test
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"testing"
-	"flag"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/integration"
+	. "github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	"github.com/sirupsen/logrus"
 )

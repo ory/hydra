@@ -200,7 +200,6 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		secret = c.Secret
 	}
 
-
 	c.ID = ps.ByName("id")
 	if err := h.Manager.UpdateClient(&c); err != nil {
 		h.H.WriteError(w, r, err)
@@ -260,12 +259,15 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 		return
 	}
 
-	for k, cc := range c {
-		cc.Secret = ""
-		c[k] = cc
+	clients := make([]Client, len(c))
+	k := 0
+	for _, cc := range c {
+		clients[k] = cc
+		clients[k].Secret = ""
+		k++
 	}
 
-	h.H.Write(w, r, c)
+	h.H.Write(w, r, clients)
 }
 
 // swagger:route GET /clients/{id} oauth2 clients getOAuthClient

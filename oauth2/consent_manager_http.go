@@ -23,12 +23,12 @@ func (m *HTTPConsentManager) AcceptConsentRequest(id string, payload *AcceptCons
 	return r.Patch(payload)
 }
 
-func (m *HTTPConsentManager) RejectConsentRequest(id string) error {
+func (m *HTTPConsentManager) RejectConsentRequest(id string, payload *RejectConsentRequestPayload) error {
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, id, "reject").String())
 	r.Client = m.Client
 	r.Dry = m.Dry
 	r.FakeTLSTermination = m.FakeTLSTermination
-	return r.Patch(struct{}{})
+	return r.Patch(payload)
 }
 
 func (m *HTTPConsentManager) GetConsentRequest(id string) (*ConsentRequest, error) {

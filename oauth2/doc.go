@@ -10,6 +10,27 @@ type swaggerCreateClientPayload struct {
 	}
 }
 
+// swagger:parameters rejectConsentRequest
+type swaggerRejectConsentRequest struct {
+	// in: body
+	// required: true
+	Body RejectConsentRequestPayload
+}
+
+// swagger:parameters acceptConsentRequest
+type swaggerAcceptConsentRequest struct {
+	// in: body
+	// required: true
+	Body AcceptConsentRequestPayload
+}
+
+// The consent request response
+// swagger:response oauthConsentRequest
+type swaggerOAuthConsentRequest struct {
+	// in: body
+	Body ConsentRequest
+}
+
 // The token response
 // swagger:response oauthTokenResponse
 type swaggerOAuthTokenResponse struct {
@@ -82,4 +103,13 @@ type swaggerOAuthIntrospectionResponse struct {
 		// Extra session information set using the at_ext key in the consent response.
 		Session Session `json:"sess,omitempty"`
 	}
+}
+
+// swagger:parameters getConsentRequest acceptConsentRequest rejectConsentRequest
+type swaggerOAuthConsentRequestPayload struct {
+	// The id of the OAuth 2.0 Consent Request.
+	//
+	// unique: true
+	// in: path
+	ID string `json:"id"`
 }

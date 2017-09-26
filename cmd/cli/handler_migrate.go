@@ -138,10 +138,11 @@ func (h *MigrateHandler) runMigrateSQL(db *sqlx.DB) error {
 	}
 
 	for k, m := range map[string]schemaCreator{
-		"client": &client.SQLManager{DB: db},
-		"oauth2": &oauth2.FositeSQLStore{DB: db},
-		"jwk":    &jwk.SQLManager{DB: db},
-		"group":  &group.SQLManager{DB: db},
+		"client":  &client.SQLManager{DB: db},
+		"oauth2":  &oauth2.FositeSQLStore{DB: db},
+		"jwk":     &jwk.SQLManager{DB: db},
+		"group":   &group.SQLManager{DB: db},
+		"consent": oauth2.NewConsentRequestSQLManager(db),
 	} {
 		fmt.Printf("Applying `%s` SQL migrations...\n", k)
 		if num, err := m.CreateSchemas(); err != nil {

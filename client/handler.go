@@ -282,7 +282,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 //
 //  ```
 //  {
-//    "resources": ["rn:hydra:clients:<some-id> "],
+//    "resources": ["rn:hydra:clients:<some-id>"],
 //    "actions": ["get"],
 //    "effect": "allow",
 //    "conditions": { "owner": { "type": "EqualsSubjectCondition" } }

@@ -19,8 +19,6 @@ type genericError struct {
 	}
 }
 
-// The standard error format
+// An empty response
 // swagger:response emptyResponse
-type emptyResponse struct {
-	Description string `json:"description,omitempty"`
-}
+type emptyResponse struct{}

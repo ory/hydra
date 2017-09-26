@@ -33,14 +33,24 @@ func (h *ConsentSessionHandler) SetRoutes(r *httprouter.Router) {
 	r.PATCH(ConsentSessionPath+"/:id/accept", h.AcceptConsentRequestHandler)
 }
 
-// swagger:route GET /.well-known/openid-configuration oauth2 openid-connect WellKnownHandler
+// swagger:route GET /oauth2/consent/requests/{id} oauth2 consent getConsentRequest
 //
-// Server well known configuration
+// Receive consent request information
 //
-// For more information, please refer to https://openid.net/specs/openid-connect-discovery-1_0.html
+// Call this endpoint to receive information on consent requests.
+//
+// The subject making the request needs to be assigned to a policy containing:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:oauth2:consent:requests:<request-id>"],
+//    "actions": ["get"],
+//    "effect": "allow"
+//  }
+//  ```
 //
 //     Consumes:
-//     - application/x-www-form-urlencoded
+//     - application/json
 //
 //     Produces:
 //     - application/json
@@ -48,10 +58,10 @@ func (h *ConsentSessionHandler) SetRoutes(r *httprouter.Router) {
 //     Schemes: http, https
 //
 //     Security:
-//       oauth2:
+//       oauth2: hydra.consent
 //
 //     Responses:
-//       200: WellKnown
+//       200: oauthConsentRequest
 //       401: genericError
 //       500: genericError
 func (h *ConsentSessionHandler) FetchConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -71,6 +81,38 @@ func (h *ConsentSessionHandler) FetchConsentRequest(w http.ResponseWriter, r *ht
 	}
 }
 
+// swagger:route PATCH /oauth2/consent/requests/{id}/reject oauth2 consent rejectConsentRequest
+//
+// Reject a consent request
+//
+// Call this endpoint to reject a consent request. This usually happens when a user denies access rights to an
+// application.
+//
+// The subject making the request needs to be assigned to a policy containing:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:oauth2:consent:requests:<request-id>"],
+//    "actions": ["reject"],
+//    "effect": "allow"
+//  }
+//  ```
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2: hydra.consent
+//
+//     Responses:
+//       204: emptyResponse
+//       401: genericError
+//       500: genericError
 func (h *ConsentSessionHandler) RejectConsentRequestHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if _, err := h.W.TokenAllowed(r.Context(), h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: fmt.Sprintf(ConsentResource, ps.ByName("id")),
@@ -80,7 +122,13 @@ func (h *ConsentSessionHandler) RejectConsentRequestHandler(w http.ResponseWrite
 		return
 	}
 
-	if err := h.M.RejectConsentRequest(ps.ByName("id")); err != nil {
+	var payload RejectConsentRequestPayload
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		h.H.WriteError(w, r, errors.WithStack(err))
+		return
+	}
+
+	if err := h.M.RejectConsentRequest(ps.ByName("id"), &payload); err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}
@@ -88,6 +136,38 @@ func (h *ConsentSessionHandler) RejectConsentRequestHandler(w http.ResponseWrite
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// swagger:route PATCH /oauth2/consent/requests/{id}/accept oauth2 consent acceptConsentRequest
+//
+// Accept a consent request
+//
+// Call this endpoint to accept a consent request. This usually happens when a user agrees to give access rights to
+// an application.
+//
+// The subject making the request needs to be assigned to a policy containing:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:oauth2:consent:requests:<request-id>"],
+//    "actions": ["accept"],
+//    "effect": "allow"
+//  }
+//  ```
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2: hydra.consent
+//
+//     Responses:
+//       204: emptyResponse
+//       401: genericError
+//       500: genericError
 func (h *ConsentSessionHandler) AcceptConsentRequestHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if _, err := h.W.TokenAllowed(r.Context(), h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: fmt.Sprintf(ConsentResource, ps.ByName("id")),

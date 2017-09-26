@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"os"
 	"testing"
-
 	"flag"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/integration"
@@ -30,16 +28,13 @@ func init() {
 	}
 }
 
-var (
-	pgsqldb *sqlx.DB
-	mysqldb *sqlx.DB
-)
-
 func TestMain(m *testing.M) {
 	flag.Parse()
 	if !testing.Short() {
 		connectToPG()
 		connectToMySQL()
+		connectToPGConsent()
+		connectToMySQLConsent()
 	}
 
 	s := m.Run()
@@ -54,7 +49,6 @@ func connectToPG() {
 		logrus.Fatalf("Could not create postgres schema: %v", err)
 	}
 
-	pgsqldb = db
 	clientManagers["postgres"] = s
 }
 
@@ -65,7 +59,6 @@ func connectToMySQL() {
 		logrus.Fatalf("Could not create postgres schema: %v", err)
 	}
 
-	mysqldb = db
 	clientManagers["mysql"] = s
 }
 

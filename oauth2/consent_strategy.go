@@ -95,7 +95,7 @@ func (s *DefaultConsentStrategy) CreateConsentRequest(req fosite.AuthorizeReques
 		ID:               id,
 		CSRF:             csrf,
 		GrantedScopes:    []string{},
-		RequestedScope:   req.GetRequestedScopes(),
+		RequestedScopes:  req.GetRequestedScopes(),
 		Audience:         req.GetClient().GetID(),
 		ExpiresAt:        time.Now().Add(s.DefaultChallengeLifespan),
 		RedirectURL:      redirectURL + "&consent=" + id,

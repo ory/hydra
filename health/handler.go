@@ -24,16 +24,20 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //
 // Check health status of instance
 //
+// This endpoint does not require the `X-Forwarded-Proto` header when TLS termination is set.
+//
 //     Responses:
-//       204: emptyResponse
+//       200: healthStatus
 //       500: genericError
 func (h *Handler) Health(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	rw.Write([]byte("ok"))
+	rw.Write([]byte(`{"status": "ok"}`))
 }
 
 // swagger:route GET /health/stats health getStatistics
 //
 // Show instance statistics
+//
+// This endpoint returns information on the instance's health. It is currently not documented.
 //
 // The subject making the request needs to be assigned to a policy containing:
 //
@@ -57,7 +61,7 @@ func (h *Handler) Health(rw http.ResponseWriter, r *http.Request, _ httprouter.P
 //       oauth2: hydra.health
 //
 //     Responses:
-//       200: clientsList
+//       200: emptyResponse
 //       401: genericError
 //       403: genericError
 //       500: genericError

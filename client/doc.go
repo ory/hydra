@@ -23,6 +23,7 @@ type swaggerUpdateClientPayload struct {
 // swagger:response clientsList
 type swaggerListClientsResult struct {
 	// in: body
+	// type: array
 	Body []Client
 }
 

@@ -40,9 +40,9 @@ func NewHealthApiWithBasePath(basePath string) *HealthApi {
  * Show instance statistics
  * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:health:stats\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
- * @return *interface{}
+ * @return []OauthClient
  */
-func (a HealthApi) GetStatistics() (*interface{}, *APIResponse, error) {
+func (a HealthApi) GetStatistics() ([]OauthClient, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Get")
 	// create path and map variables
@@ -82,7 +82,7 @@ func (a HealthApi) GetStatistics() (*interface{}, *APIResponse, error) {
 	if localVarHttpHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
-	var successPayload = new(interface{})
+	var successPayload = new([]OauthClient)
 	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 
 	var localVarURL, _ = url.Parse(localVarPath)
@@ -94,9 +94,9 @@ func (a HealthApi) GetStatistics() (*interface{}, *APIResponse, error) {
 	}
 
 	if err != nil {
-		return successPayload, localVarAPIResponse, err
+		return *successPayload, localVarAPIResponse, err
 	}
 	err = json.Unmarshal(localVarHttpResponse.Body(), &successPayload)
-	return successPayload, localVarAPIResponse, err
+	return *successPayload, localVarAPIResponse, err
 }
 

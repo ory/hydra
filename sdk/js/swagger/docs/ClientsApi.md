@@ -166,7 +166,7 @@ Name | Type | Description  | Notes
 
 <a name="listOAuthClients"></a>
 # **listOAuthClients**
-> Object listOAuthClients()
+> [OauthClient] listOAuthClients()
 
 Lists OAuth 2.0 Clients
 
@@ -198,7 +198,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-**Object**
+[**[OauthClient]**](OauthClient.md)
 
 ### Authorization
 

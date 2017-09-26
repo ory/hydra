@@ -33,13 +33,14 @@ func (m *ConsentRequestMemoryManager) AcceptConsentRequest(id string, payload *A
 	return m.PersistConsentRequest(session)
 }
 
-func (m *ConsentRequestMemoryManager) RejectConsentRequest(id string) error {
+func (m *ConsentRequestMemoryManager) RejectConsentRequest(id string, payload *RejectConsentRequestPayload) error {
 	session, err := m.GetConsentRequest(id)
 	if err != nil {
 		return err
 	}
 
 	session.Consent = ConsentRequestRejected
+	session.DenyReason = payload.Reason
 	return m.PersistConsentRequest(session)
 }
 

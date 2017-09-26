@@ -1,8 +1,8 @@
 package client
 
 import (
-	"sync"
 	"context"
+	"sync"
 
 	"github.com/imdario/mergo"
 	"github.com/ory/fosite"

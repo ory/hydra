@@ -1,4 +1,4 @@
-/* 
+/*
  * Hydra OAuth2 & OpenID Connect Server (1.0.0-aplha1)
  *
  * Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/   Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure. Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to. Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.   The official repository is located at https://github.com/ory/hydra   ### ATTENTION - IMPORTANT NOTE   The swagger generator used to create this documentation does currently not support example responses. To see request and response payloads click on **\"Show JSON schema\"**: ![Enable JSON Schema on Apiary](https://storage.googleapis.com/ory.am/hydra/json-schema.png)
@@ -11,10 +11,10 @@
 package swagger
 
 import (
-	"net/url"
-	"strings"
 	"encoding/json"
 	"fmt"
+	"net/url"
+	"strings"
 )
 
 type GroupsApi struct {
@@ -42,7 +42,7 @@ func NewGroupsApiWithBasePath(basePath string) *GroupsApi {
  * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:groups:&lt;id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;members.add\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
  * @param id The id of the group to modify.
- * @param body 
+ * @param body
  * @return void
  */
 func (a GroupsApi) AddMembersToGroup(id int64, body MembersRequest) (*APIResponse, error) {
@@ -60,8 +60,8 @@ func (a GroupsApi) AddMembersToGroup(id int64, body MembersRequest) (*APIRespons
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -69,7 +69,7 @@ func (a GroupsApi) AddMembersToGroup(id int64, body MembersRequest) (*APIRespons
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -79,7 +79,7 @@ func (a GroupsApi) AddMembersToGroup(id int64, body MembersRequest) (*APIRespons
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -124,8 +124,8 @@ func (a GroupsApi) CreateGroup() (*Group, *APIResponse, error) {
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -133,7 +133,7 @@ func (a GroupsApi) CreateGroup() (*Group, *APIResponse, error) {
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -143,7 +143,7 @@ func (a GroupsApi) CreateGroup() (*Group, *APIResponse, error) {
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -190,8 +190,8 @@ func (a GroupsApi) DeleteGroup(id int64) (*APIResponse, error) {
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -199,7 +199,7 @@ func (a GroupsApi) DeleteGroup(id int64) (*APIResponse, error) {
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -209,7 +209,7 @@ func (a GroupsApi) DeleteGroup(id int64) (*APIResponse, error) {
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -253,8 +253,8 @@ func (a GroupsApi) FindGroupsByMember(member int64) ([]string, *APIResponse, err
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -263,7 +263,7 @@ func (a GroupsApi) FindGroupsByMember(member int64) ([]string, *APIResponse, err
 	localVarQueryParams.Add("member", a.Configuration.APIClient.ParameterToString(member, ""))
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -273,7 +273,7 @@ func (a GroupsApi) FindGroupsByMember(member int64) ([]string, *APIResponse, err
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -320,8 +320,8 @@ func (a GroupsApi) GetGroup(id int64) (*Group, *APIResponse, error) {
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -329,7 +329,7 @@ func (a GroupsApi) GetGroup(id int64) (*Group, *APIResponse, error) {
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -339,7 +339,7 @@ func (a GroupsApi) GetGroup(id int64) (*Group, *APIResponse, error) {
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -369,7 +369,7 @@ func (a GroupsApi) GetGroup(id int64) (*Group, *APIResponse, error) {
  * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:groups:&lt;id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;members.remove\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
  * @param id The id of the group to modify.
- * @param body 
+ * @param body
  * @return void
  */
 func (a GroupsApi) RemoveMembersFromGroup(id int64, body MembersRequest) (*APIResponse, error) {
@@ -387,8 +387,8 @@ func (a GroupsApi) RemoveMembersFromGroup(id int64, body MembersRequest) (*APIRe
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -396,7 +396,7 @@ func (a GroupsApi) RemoveMembersFromGroup(id int64, body MembersRequest) (*APIRe
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -406,7 +406,7 @@ func (a GroupsApi) RemoveMembersFromGroup(id int64, body MembersRequest) (*APIRe
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -430,4 +430,3 @@ func (a GroupsApi) RemoveMembersFromGroup(id int64, body MembersRequest) (*APIRe
 	}
 	return localVarAPIResponse, err
 }
-

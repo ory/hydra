@@ -1,4 +1,4 @@
-/* 
+/*
  * Hydra OAuth2 & OpenID Connect Server (1.0.0-aplha1)
  *
  * Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/   Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure. Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to. Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.   The official repository is located at https://github.com/ory/hydra   ### ATTENTION - IMPORTANT NOTE   The swagger generator used to create this documentation does currently not support example responses. To see request and response payloads click on **\"Show JSON schema\"**: ![Enable JSON Schema on Apiary](https://storage.googleapis.com/ory.am/hydra/json-schema.png)
@@ -11,10 +11,10 @@
 package swagger
 
 import (
-	"net/url"
-	"strings"
 	"encoding/json"
 	"fmt"
+	"net/url"
+	"strings"
 )
 
 type Oauth2Api struct {
@@ -41,7 +41,7 @@ func NewOauth2ApiWithBasePath(basePath string) *Oauth2Api {
  * Accept a consent request
  * Call this endpoint to accept a consent request. This usually happens when a user agrees to give access rights to an application.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;accept\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
- * @param body 
+ * @param body
  * @param id The id of the OAuth 2.0 Consent Request.
  * @return void
  */
@@ -60,8 +60,8 @@ func (a Oauth2Api) AcceptConsentRequest(body AcceptConsentRequestPayload, id str
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -69,7 +69,7 @@ func (a Oauth2Api) AcceptConsentRequest(body AcceptConsentRequestPayload, id str
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -79,7 +79,7 @@ func (a Oauth2Api) AcceptConsentRequest(body AcceptConsentRequestPayload, id str
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -108,7 +108,7 @@ func (a Oauth2Api) AcceptConsentRequest(body AcceptConsentRequestPayload, id str
  * Creates an OAuth 2.0 Client
  * Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This endpoint should be well protected and only called by code you trust.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
  *
- * @param body 
+ * @param body
  * @return *OauthClient
  */
 func (a Oauth2Api) CreateOAuthClient(body OauthClient) (*OauthClient, *APIResponse, error) {
@@ -125,8 +125,8 @@ func (a Oauth2Api) CreateOAuthClient(body OauthClient) (*OauthClient, *APIRespon
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -134,7 +134,7 @@ func (a Oauth2Api) CreateOAuthClient(body OauthClient) (*OauthClient, *APIRespon
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -144,7 +144,7 @@ func (a Oauth2Api) CreateOAuthClient(body OauthClient) (*OauthClient, *APIRespon
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -193,8 +193,8 @@ func (a Oauth2Api) DeleteOAuthClient(id string) (*APIResponse, error) {
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -202,7 +202,7 @@ func (a Oauth2Api) DeleteOAuthClient(id string) (*APIResponse, error) {
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -212,7 +212,7 @@ func (a Oauth2Api) DeleteOAuthClient(id string) (*APIResponse, error) {
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -257,8 +257,8 @@ func (a Oauth2Api) GetConsentRequest(id string) (*ConsentRequest, *APIResponse, 
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -266,7 +266,7 @@ func (a Oauth2Api) GetConsentRequest(id string) (*ConsentRequest, *APIResponse, 
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -276,7 +276,7 @@ func (a Oauth2Api) GetConsentRequest(id string) (*ConsentRequest, *APIResponse, 
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -323,8 +323,8 @@ func (a Oauth2Api) GetOAuthClient(id string) (*OauthClient, *APIResponse, error)
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -332,7 +332,7 @@ func (a Oauth2Api) GetOAuthClient(id string) (*OauthClient, *APIResponse, error)
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -342,7 +342,7 @@ func (a Oauth2Api) GetOAuthClient(id string) (*OauthClient, *APIResponse, error)
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -387,8 +387,8 @@ func (a Oauth2Api) IntrospectOAuthToken() (*InlineResponse200, *APIResponse, err
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -396,7 +396,7 @@ func (a Oauth2Api) IntrospectOAuthToken() (*InlineResponse200, *APIResponse, err
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/x-www-form-urlencoded",  }
+	localVarHttpContentTypes := []string{"application/x-www-form-urlencoded"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -406,7 +406,7 @@ func (a Oauth2Api) IntrospectOAuthToken() (*InlineResponse200, *APIResponse, err
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -451,8 +451,8 @@ func (a Oauth2Api) ListOAuthClients() ([]OauthClient, *APIResponse, error) {
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -460,7 +460,7 @@ func (a Oauth2Api) ListOAuthClients() ([]OauthClient, *APIResponse, error) {
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -470,7 +470,7 @@ func (a Oauth2Api) ListOAuthClients() ([]OauthClient, *APIResponse, error) {
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -519,7 +519,7 @@ func (a Oauth2Api) OauthAuth() (*APIResponse, error) {
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/x-www-form-urlencoded",  }
+	localVarHttpContentTypes := []string{"application/x-www-form-urlencoded"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -529,7 +529,7 @@ func (a Oauth2Api) OauthAuth() (*APIResponse, error) {
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -572,8 +572,8 @@ func (a Oauth2Api) OauthToken() (*InlineResponse2001, *APIResponse, error) {
 	var localVarFileBytes []byte
 	// authentication '(basic)' required
 	// http basic authentication required
-	if a.Configuration.Username != "" || a.Configuration.Password != ""{
-		localVarHeaderParams["Authorization"] =  "Basic " + a.Configuration.GetBasicAuthEncodedString()
+	if a.Configuration.Username != "" || a.Configuration.Password != "" {
+		localVarHeaderParams["Authorization"] = "Basic " + a.Configuration.GetBasicAuthEncodedString()
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -581,7 +581,7 @@ func (a Oauth2Api) OauthToken() (*InlineResponse2001, *APIResponse, error) {
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/x-www-form-urlencoded",  }
+	localVarHttpContentTypes := []string{"application/x-www-form-urlencoded"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -591,7 +591,7 @@ func (a Oauth2Api) OauthToken() (*InlineResponse2001, *APIResponse, error) {
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -620,7 +620,7 @@ func (a Oauth2Api) OauthToken() (*InlineResponse2001, *APIResponse, error) {
  * Reject a consent request
  * Call this endpoint to reject a consent request. This usually happens when a user denies access rights to an application.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;reject\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
- * @param body 
+ * @param body
  * @param id The id of the OAuth 2.0 Consent Request.
  * @return void
  */
@@ -639,8 +639,8 @@ func (a Oauth2Api) RejectConsentRequest(body RejectConsentRequestPayload, id str
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -648,7 +648,7 @@ func (a Oauth2Api) RejectConsentRequest(body RejectConsentRequestPayload, id str
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -658,7 +658,7 @@ func (a Oauth2Api) RejectConsentRequest(body RejectConsentRequestPayload, id str
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -687,7 +687,7 @@ func (a Oauth2Api) RejectConsentRequest(body RejectConsentRequestPayload, id str
  * Revoke an OAuth2 access token
  * For more information, please refer to https://tools.ietf.org/html/rfc7009
  *
- * @param body 
+ * @param body
  * @return void
  */
 func (a Oauth2Api) RevokeOAuthToken(body Body) (*APIResponse, error) {
@@ -704,8 +704,8 @@ func (a Oauth2Api) RevokeOAuthToken(body Body) (*APIResponse, error) {
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -713,7 +713,7 @@ func (a Oauth2Api) RevokeOAuthToken(body Body) (*APIResponse, error) {
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/x-www-form-urlencoded",  }
+	localVarHttpContentTypes := []string{"application/x-www-form-urlencoded"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -723,7 +723,7 @@ func (a Oauth2Api) RevokeOAuthToken(body Body) (*APIResponse, error) {
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -752,8 +752,8 @@ func (a Oauth2Api) RevokeOAuthToken(body Body) (*APIResponse, error) {
  * Updates an OAuth 2.0 Client
  * Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This endpoint should be well protected and only called by code you trust.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
  *
- * @param id 
- * @param body 
+ * @param id
+ * @param body
  * @return *OauthClient
  */
 func (a Oauth2Api) UpdateOAuthClient(id string, body OauthClient) (*OauthClient, *APIResponse, error) {
@@ -771,8 +771,8 @@ func (a Oauth2Api) UpdateOAuthClient(id string, body OauthClient) (*OauthClient,
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -780,7 +780,7 @@ func (a Oauth2Api) UpdateOAuthClient(id string, body OauthClient) (*OauthClient,
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -790,7 +790,7 @@ func (a Oauth2Api) UpdateOAuthClient(id string, body OauthClient) (*OauthClient,
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -837,8 +837,8 @@ func (a Oauth2Api) WellKnown() (*JwkSet, *APIResponse, error) {
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -846,7 +846,7 @@ func (a Oauth2Api) WellKnown() (*JwkSet, *APIResponse, error) {
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -856,7 +856,7 @@ func (a Oauth2Api) WellKnown() (*JwkSet, *APIResponse, error) {
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -901,8 +901,8 @@ func (a Oauth2Api) WellKnownHandler() (*WellKnown, *APIResponse, error) {
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -910,7 +910,7 @@ func (a Oauth2Api) WellKnownHandler() (*WellKnown, *APIResponse, error) {
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/x-www-form-urlencoded",  }
+	localVarHttpContentTypes := []string{"application/x-www-form-urlencoded"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -920,7 +920,7 @@ func (a Oauth2Api) WellKnownHandler() (*WellKnown, *APIResponse, error) {
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -944,4 +944,3 @@ func (a Oauth2Api) WellKnownHandler() (*WellKnown, *APIResponse, error) {
 	err = json.Unmarshal(localVarHttpResponse.Body(), &successPayload)
 	return successPayload, localVarAPIResponse, err
 }
-

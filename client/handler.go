@@ -192,9 +192,14 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		return
 	}
 
+	var secret string
 	if len(c.Secret) > 0 && len(c.Secret) < 6 {
 		h.H.WriteError(w, r, errors.New("The client secret must be at least 6 characters long"))
+		return
+	} else {
+		secret = c.Secret
 	}
+
 
 	c.ID = ps.ByName("id")
 	if err := h.Manager.UpdateClient(&c); err != nil {
@@ -202,6 +207,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		return
 	}
 
+	c.Secret = secret
 	h.H.WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 

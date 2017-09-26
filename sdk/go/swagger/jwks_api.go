@@ -1,4 +1,4 @@
-/* 
+/*
  * Hydra OAuth2 & OpenID Connect Server (1.0.0-aplha1)
  *
  * Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/   Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure. Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to. Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.   The official repository is located at https://github.com/ory/hydra   ### ATTENTION - IMPORTANT NOTE   The swagger generator used to create this documentation does currently not support example responses. To see request and response payloads click on **\"Show JSON schema\"**: ![Enable JSON Schema on Apiary](https://storage.googleapis.com/ory.am/hydra/json-schema.png)
@@ -11,10 +11,10 @@
 package swagger
 
 import (
-	"net/url"
-	"strings"
 	"encoding/json"
 	"fmt"
+	"net/url"
+	"strings"
 )
 
 type JwksApi struct {
@@ -42,7 +42,7 @@ func NewJwksApiWithBasePath(basePath string) *JwksApi {
  * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:&lt;set&gt;:&lt;kid&gt;\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
  * @param set The set
- * @param body 
+ * @param body
  * @return *JwkSet
  */
 func (a JwksApi) CreateJwkKey(set string, body CreateRequest) (*JwkSet, *APIResponse, error) {
@@ -60,8 +60,8 @@ func (a JwksApi) CreateJwkKey(set string, body CreateRequest) (*JwkSet, *APIResp
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -69,7 +69,7 @@ func (a JwksApi) CreateJwkKey(set string, body CreateRequest) (*JwkSet, *APIResp
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -79,7 +79,7 @@ func (a JwksApi) CreateJwkKey(set string, body CreateRequest) (*JwkSet, *APIResp
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -130,8 +130,8 @@ func (a JwksApi) DeleteJwkKey(kid string, set string) (*APIResponse, error) {
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -139,7 +139,7 @@ func (a JwksApi) DeleteJwkKey(kid string, set string) (*APIResponse, error) {
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -149,7 +149,7 @@ func (a JwksApi) DeleteJwkKey(kid string, set string) (*APIResponse, error) {
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -194,8 +194,8 @@ func (a JwksApi) DeleteJwkSet(set string) (*APIResponse, error) {
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -203,7 +203,7 @@ func (a JwksApi) DeleteJwkSet(set string) (*APIResponse, error) {
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -213,7 +213,7 @@ func (a JwksApi) DeleteJwkSet(set string) (*APIResponse, error) {
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -258,8 +258,8 @@ func (a JwksApi) GetJwkSet(set string) (*JwkSet, *APIResponse, error) {
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -267,7 +267,7 @@ func (a JwksApi) GetJwkSet(set string) (*JwkSet, *APIResponse, error) {
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -277,7 +277,7 @@ func (a JwksApi) GetJwkSet(set string) (*JwkSet, *APIResponse, error) {
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -326,8 +326,8 @@ func (a JwksApi) GetJwkSetKey(kid string, set string) (*JwkSet, *APIResponse, er
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -335,7 +335,7 @@ func (a JwksApi) GetJwkSetKey(kid string, set string) (*JwkSet, *APIResponse, er
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -345,7 +345,7 @@ func (a JwksApi) GetJwkSetKey(kid string, set string) (*JwkSet, *APIResponse, er
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -376,7 +376,7 @@ func (a JwksApi) GetJwkSetKey(kid string, set string) (*JwkSet, *APIResponse, er
  *
  * @param kid The kid of the desired key
  * @param set The set
- * @param body 
+ * @param body
  * @return *JwkSet
  */
 func (a JwksApi) UpdateJwkKey(kid string, set string, body JwkSet) (*JwkSet, *APIResponse, error) {
@@ -395,8 +395,8 @@ func (a JwksApi) UpdateJwkKey(kid string, set string, body JwkSet) (*JwkSet, *AP
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -404,7 +404,7 @@ func (a JwksApi) UpdateJwkKey(kid string, set string, body JwkSet) (*JwkSet, *AP
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -414,7 +414,7 @@ func (a JwksApi) UpdateJwkKey(kid string, set string, body JwkSet) (*JwkSet, *AP
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -446,7 +446,7 @@ func (a JwksApi) UpdateJwkKey(kid string, set string, body JwkSet) (*JwkSet, *AP
  * Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:&lt;set&gt;\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
  * @param set The set
- * @param body 
+ * @param body
  * @return *JwkSet
  */
 func (a JwksApi) UpdateJwkSet(set string, body JwkSet) (*JwkSet, *APIResponse, error) {
@@ -464,8 +464,8 @@ func (a JwksApi) UpdateJwkSet(set string, body JwkSet) (*JwkSet, *APIResponse, e
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -473,7 +473,7 @@ func (a JwksApi) UpdateJwkSet(set string, body JwkSet) (*JwkSet, *APIResponse, e
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -483,7 +483,7 @@ func (a JwksApi) UpdateJwkSet(set string, body JwkSet) (*JwkSet, *APIResponse, e
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -530,8 +530,8 @@ func (a JwksApi) WellKnown() (*JwkSet, *APIResponse, error) {
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -539,7 +539,7 @@ func (a JwksApi) WellKnown() (*JwkSet, *APIResponse, error) {
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -549,7 +549,7 @@ func (a JwksApi) WellKnown() (*JwkSet, *APIResponse, error) {
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -573,4 +573,3 @@ func (a JwksApi) WellKnown() (*JwkSet, *APIResponse, error) {
 	err = json.Unmarshal(localVarHttpResponse.Body(), &successPayload)
 	return successPayload, localVarAPIResponse, err
 }
-

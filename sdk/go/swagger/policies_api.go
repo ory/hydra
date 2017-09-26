@@ -1,4 +1,4 @@
-/* 
+/*
  * Hydra OAuth2 & OpenID Connect Server (1.0.0-aplha1)
  *
  * Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/   Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure. Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to. Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.   The official repository is located at https://github.com/ory/hydra   ### ATTENTION - IMPORTANT NOTE   The swagger generator used to create this documentation does currently not support example responses. To see request and response payloads click on **\"Show JSON schema\"**: ![Enable JSON Schema on Apiary](https://storage.googleapis.com/ory.am/hydra/json-schema.png)
@@ -11,10 +11,10 @@
 package swagger
 
 import (
-	"net/url"
-	"strings"
 	"encoding/json"
 	"fmt"
+	"net/url"
+	"strings"
 )
 
 type PoliciesApi struct {
@@ -41,7 +41,7 @@ func NewPoliciesApiWithBasePath(basePath string) *PoliciesApi {
  * Create an access control policy
  * Visit https://github.com/ory/ladon#usage for more information on policy usage.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:policies\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
- * @param body 
+ * @param body
  * @return *Policy
  */
 func (a PoliciesApi) CreatePolicy(body Policy) (*Policy, *APIResponse, error) {
@@ -58,8 +58,8 @@ func (a PoliciesApi) CreatePolicy(body Policy) (*Policy, *APIResponse, error) {
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -67,7 +67,7 @@ func (a PoliciesApi) CreatePolicy(body Policy) (*Policy, *APIResponse, error) {
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -77,7 +77,7 @@ func (a PoliciesApi) CreatePolicy(body Policy) (*Policy, *APIResponse, error) {
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -126,8 +126,8 @@ func (a PoliciesApi) DeletePolicy(id int64) (*APIResponse, error) {
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -135,7 +135,7 @@ func (a PoliciesApi) DeletePolicy(id int64) (*APIResponse, error) {
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -145,7 +145,7 @@ func (a PoliciesApi) DeletePolicy(id int64) (*APIResponse, error) {
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -190,8 +190,8 @@ func (a PoliciesApi) GetPolicy(id int64) (*Policy, *APIResponse, error) {
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -199,7 +199,7 @@ func (a PoliciesApi) GetPolicy(id int64) (*Policy, *APIResponse, error) {
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -209,7 +209,7 @@ func (a PoliciesApi) GetPolicy(id int64) (*Policy, *APIResponse, error) {
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -256,8 +256,8 @@ func (a PoliciesApi) ListPolicies(offset int64, limit int64) (*Policy, *APIRespo
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -267,7 +267,7 @@ func (a PoliciesApi) ListPolicies(offset int64, limit int64) (*Policy, *APIRespo
 	localVarQueryParams.Add("limit", a.Configuration.APIClient.ParameterToString(limit, ""))
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -277,7 +277,7 @@ func (a PoliciesApi) ListPolicies(offset int64, limit int64) (*Policy, *APIRespo
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -307,7 +307,7 @@ func (a PoliciesApi) ListPolicies(offset int64, limit int64) (*Policy, *APIRespo
  * Visit https://github.com/ory/ladon#usage for more information on policy usage.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:policies\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
  * @param id The id of the policy.
- * @param body 
+ * @param body
  * @return *Policy
  */
 func (a PoliciesApi) UpdatePolicy(id int64, body Policy) (*Policy, *APIResponse, error) {
@@ -325,8 +325,8 @@ func (a PoliciesApi) UpdatePolicy(id int64, body Policy) (*Policy, *APIResponse,
 	var localVarFileBytes []byte
 	// authentication '(oauth2)' required
 	// oauth required
-	if a.Configuration.AccessToken != ""{
-		localVarHeaderParams["Authorization"] =  "Bearer " + a.Configuration.AccessToken
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -334,7 +334,7 @@ func (a PoliciesApi) UpdatePolicy(id int64, body Policy) (*Policy, *APIResponse,
 	}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{ "application/json",  }
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
@@ -344,7 +344,7 @@ func (a PoliciesApi) UpdatePolicy(id int64, body Policy) (*Policy, *APIResponse,
 	// to determine the Accept header
 	localVarHttpHeaderAccepts := []string{
 		"application/json",
-		}
+	}
 
 	// set Accept header
 	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
@@ -370,4 +370,3 @@ func (a PoliciesApi) UpdatePolicy(id int64, body Policy) (*Policy, *APIResponse,
 	err = json.Unmarshal(localVarHttpResponse.Body(), &successPayload)
 	return successPayload, localVarAPIResponse, err
 }
-

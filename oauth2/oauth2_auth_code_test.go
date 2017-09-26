@@ -24,7 +24,7 @@ func TestAuthCode(t *testing.T) {
 		cr, err := consentClient.GetConsentRequest(r.URL.Query().Get("consent"))
 		assert.NoError(t, err)
 
-		assert.EqualValues(t, []string{"hydra.*", "offline"}, cr.RequestedScope)
+		assert.EqualValues(t, []string{"hydra.*", "offline"}, cr.RequestedScopes)
 		assert.Equal(t, r.URL.Query().Get("consent"), cr.ID)
 		assert.True(t, strings.Contains(cr.RedirectURL, "oauth2/auth?client_id=app-client"))
 

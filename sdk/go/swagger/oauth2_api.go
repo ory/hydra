@@ -435,9 +435,9 @@ func (a Oauth2Api) IntrospectOAuthToken() (*InlineResponse200, *APIResponse, err
  * Lists OAuth 2.0 Clients
  * Never returns a client&#39;s secret.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
- * @return *interface{}
+ * @return []OauthClient
  */
-func (a Oauth2Api) ListOAuthClients() (*interface{}, *APIResponse, error) {
+func (a Oauth2Api) ListOAuthClients() ([]OauthClient, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Get")
 	// create path and map variables
@@ -477,7 +477,7 @@ func (a Oauth2Api) ListOAuthClients() (*interface{}, *APIResponse, error) {
 	if localVarHttpHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
-	var successPayload = new(interface{})
+	var successPayload = new([]OauthClient)
 	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 
 	var localVarURL, _ = url.Parse(localVarPath)
@@ -489,10 +489,10 @@ func (a Oauth2Api) ListOAuthClients() (*interface{}, *APIResponse, error) {
 	}
 
 	if err != nil {
-		return successPayload, localVarAPIResponse, err
+		return *successPayload, localVarAPIResponse, err
 	}
 	err = json.Unmarshal(localVarHttpResponse.Body(), &successPayload)
-	return successPayload, localVarAPIResponse, err
+	return *successPayload, localVarAPIResponse, err
 }
 
 /**

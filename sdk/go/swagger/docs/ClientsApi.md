@@ -99,7 +99,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **ListOAuthClients**
-> interface{} ListOAuthClients()
+> []OauthClient ListOAuthClients()
 
 Lists OAuth 2.0 Clients
 
@@ -111,7 +111,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**interface{}**](interface{}.md)
+[**[]OauthClient**](oauthClient.md)
 
 ### Authorization
 

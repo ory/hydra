@@ -8,7 +8,7 @@ Method | HTTP request | Description
 
 
 # **GetStatistics**
-> interface{} GetStatistics()
+> []OauthClient GetStatistics()
 
 Show instance statistics
 
@@ -20,7 +20,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**interface{}**](interface{}.md)
+[**[]OauthClient**](oauthClient.md)
 
 ### Authorization
 

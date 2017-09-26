@@ -7,12 +7,13 @@ import (
 	"strings"
 	"time"
 
+	"log"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/hydra/pkg"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
-	"log"
 )
 
 var sqlConsentParams = []string{

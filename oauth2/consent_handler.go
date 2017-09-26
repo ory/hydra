@@ -15,7 +15,7 @@ const (
 	ConsentRequestAccepted = "accepted"
 	ConsentRequestRejected = "rejected"
 
-	ConsentSessionPath = "/oauth2/consent/requests"
+	ConsentRequestPath = "/oauth2/consent/requests"
 
 	ConsentResource = "rn:hydra:oauth2:consent:requests:%s"
 	ConsentScope    = "hydra.consent"
@@ -28,9 +28,9 @@ type ConsentSessionHandler struct {
 }
 
 func (h *ConsentSessionHandler) SetRoutes(r *httprouter.Router) {
-	r.GET(ConsentSessionPath+"/:id", h.FetchConsentRequest)
-	r.PATCH(ConsentSessionPath+"/:id/reject", h.RejectConsentRequestHandler)
-	r.PATCH(ConsentSessionPath+"/:id/accept", h.AcceptConsentRequestHandler)
+	r.GET(ConsentRequestPath+"/:id", h.FetchConsentRequest)
+	r.PATCH(ConsentRequestPath+"/:id/reject", h.RejectConsentRequestHandler)
+	r.PATCH(ConsentRequestPath+"/:id/accept", h.AcceptConsentRequestHandler)
 }
 
 // swagger:route GET /oauth2/consent/requests/{id} oauth2 consent getConsentRequest

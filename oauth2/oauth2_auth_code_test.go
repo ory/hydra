@@ -59,8 +59,6 @@ func TestAuthCode(t *testing.T) {
 	token, err := oauthConfig.Exchange(oauth2.NoContext, code)
 	require.NoError(t, err, code)
 
-	t.Logf("Got extra: %v", token)
-
 	time.Sleep(time.Second * 5)
 
 	res, err := testRefresh(t, token)

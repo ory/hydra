@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"net/url"
 )
 
 func TestConfig(t *testing.T) {
@@ -19,26 +20,35 @@ func TestConfig(t *testing.T) {
 
 func TestDoesRequestSatisfyTermination(t *testing.T) {
 	c := &Config{AllowTLSTermination: ""}
-	assert.NotNil(t, c.DoesRequestSatisfyTermination(new(http.Request)))
+	assert.Error(t, c.DoesRequestSatisfyTermination(&http.Request{Header: http.Header{}, URL: new(url.URL)}))
 
 	c = &Config{AllowTLSTermination: "127.0.0.1/24"}
-	r := &http.Request{Header: http.Header{}}
-	assert.NotNil(t, c.DoesRequestSatisfyTermination(r))
+	r := &http.Request{Header: http.Header{}, URL: new(url.URL)}
+	assert.Error(t, c.DoesRequestSatisfyTermination(r))
 
-	r = &http.Request{Header: http.Header{"X-Forwarded-Proto": []string{"http"}}}
-	assert.NotNil(t, c.DoesRequestSatisfyTermination(r))
+	r = &http.Request{Header: http.Header{"X-Forwarded-Proto": []string{"http"}}, URL: new(url.URL)}
+	assert.Error(t, c.DoesRequestSatisfyTermination(r))
 
 	r = &http.Request{
 		RemoteAddr: "227.0.0.1:123",
 		Header:     http.Header{"X-Forwarded-Proto": []string{"https"}},
+		URL:        new(url.URL),
 	}
-	assert.NotNil(t, c.DoesRequestSatisfyTermination(r))
+	assert.Error(t, c.DoesRequestSatisfyTermination(r))
 
 	r = &http.Request{
 		RemoteAddr: "127.0.0.1:123",
 		Header:     http.Header{"X-Forwarded-Proto": []string{"https"}},
+		URL:        new(url.URL),
 	}
-	assert.Nil(t, c.DoesRequestSatisfyTermination(r))
+	assert.NoError(t, c.DoesRequestSatisfyTermination(r))
+
+	r = &http.Request{
+		RemoteAddr: "127.0.0.1:123",
+		Header:     http.Header{"X-Forwarded-Proto": []string{"https"}},
+		URL:        &url.URL{Path: "/health"},
+	}
+	assert.NoError(t, c.DoesRequestSatisfyTermination(r))
 }
 
 func TestSystemSecret(t *testing.T) {

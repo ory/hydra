@@ -1,36 +1,37 @@
 package client_test
 
 import (
+	"net/http"
 	"net/http/httptest"
-	"github.com/ory/fosite"
-	"github.com/ory/ladon"
-	"github.com/ory/herodot"
-	"github.com/julienschmidt/httprouter"
 	"testing"
-	"github.com/ory/hydra/compose"
+
+	"github.com/julienschmidt/httprouter"
+	"github.com/ory/fosite"
+	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/compose"
 	hydra "github.com/ory/hydra/sdk/go/swagger"
+	"github.com/ory/ladon"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
-	"github.com/stretchr/testify/assert"
-	"net/http"
 )
 
 func createTestClient(prefix string) hydra.OauthClient {
 	return hydra.OauthClient{
 		Id:            "1234",
 		ClientName:    prefix + "name",
-		ClientSecret:   prefix + "secret",
-		ClientUri:      prefix + "uri",
-		Contacts:      []string{ prefix + "peter",  prefix + "pan"},
-		GrantTypes:    []string{ prefix + "client_credentials",  prefix + "authorize_code"},
-		LogoUri:        prefix + "logo",
-		Owner:         prefix +  "an-owner",
-		PolicyUri:     prefix +  "policy-uri",
-		Scope:         prefix +  "foo bar baz",
-		TosUri:        prefix +  "tos-uri",
-		ResponseTypes: []string{ prefix + "id_token", prefix +  "code"},
-		RedirectUris:  []string{ prefix + "redirect-url", prefix +  "redirect-uri"},
+		ClientSecret:  prefix + "secret",
+		ClientUri:     prefix + "uri",
+		Contacts:      []string{prefix + "peter", prefix + "pan"},
+		GrantTypes:    []string{prefix + "client_credentials", prefix + "authorize_code"},
+		LogoUri:       prefix + "logo",
+		Owner:         prefix + "an-owner",
+		PolicyUri:     prefix + "policy-uri",
+		Scope:         prefix + "foo bar baz",
+		TosUri:        prefix + "tos-uri",
+		ResponseTypes: []string{prefix + "id_token", prefix + "code"},
+		RedirectUris:  []string{prefix + "redirect-url", prefix + "redirect-uri"},
 	}
 }
 
@@ -68,19 +69,22 @@ func TestClientSDK(t *testing.T) {
 
 		compareClient := createClient
 		compareClient.ClientSecret = ""
-		result, _ , err = c.GetOAuthClient(createClient.Id)
+		result, _, err = c.GetOAuthClient(createClient.Id)
 		assert.EqualValues(t, compareClient, *result)
 
-		//results, _, err := c.ListOAuthClients()
+		results, _, err := c.ListOAuthClients()
+		require.NoError(t, err)
+		assert.Len(t, results, 1)
+		assert.EqualValues(t, compareClient, results[0])
 
-		updateClient :=  createTestClient("foo")
-		result, _ , err = c.UpdateOAuthClient(createClient.Id, updateClient)
+		updateClient := createTestClient("foo")
+		result, _, err = c.UpdateOAuthClient(createClient.Id, updateClient)
 		require.NoError(t, err)
 		assert.EqualValues(t, updateClient, *result)
 
 		compareClient = updateClient
 		compareClient.ClientSecret = ""
-		result, _ , err = c.GetOAuthClient(updateClient.Id)
+		result, _, err = c.GetOAuthClient(updateClient.Id)
 		require.NoError(t, err)
 		assert.EqualValues(t, compareClient, *result)
 

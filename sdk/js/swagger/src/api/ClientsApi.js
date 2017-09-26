@@ -188,7 +188,7 @@
      * Callback function to receive the result of the listOAuthClients operation.
      * @callback module:api/ClientsApi~listOAuthClientsCallback
      * @param {String} error Error message, if any.
-     * @param {Object} data The data returned by the service call.
+     * @param {Array.<module:model/OauthClient>} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -196,7 +196,7 @@
      * Lists OAuth 2.0 Clients
      * Never returns a client&#39;s secret.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
      * @param {module:api/ClientsApi~listOAuthClientsCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link Object}
+     * data is of type: {@link Array.<module:model/OauthClient>}
      */
     this.listOAuthClients = function(callback) {
       var postBody = null;
@@ -214,7 +214,7 @@
       var authNames = ['oauth2'];
       var contentTypes = ['application/json'];
       var accepts = ['application/json'];
-      var returnType = Object;
+      var returnType = [OauthClient];
 
       return this.apiClient.callApi(
         '/clients', 'GET',

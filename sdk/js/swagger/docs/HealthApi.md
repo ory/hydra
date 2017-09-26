@@ -9,7 +9,7 @@ Method | HTTP request | Description
 
 <a name="getStatistics"></a>
 # **getStatistics**
-> Object getStatistics()
+> [OauthClient] getStatistics()
 
 Show instance statistics
 
@@ -41,7 +41,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-**Object**
+[**[OauthClient]**](OauthClient.md)
 
 ### Authorization
 

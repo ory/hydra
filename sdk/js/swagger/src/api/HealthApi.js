@@ -17,18 +17,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/InlineResponse401'], factory);
+    define(['ApiClient', 'model/InlineResponse401', 'model/OauthClient'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/InlineResponse401'));
+    module.exports = factory(require('../ApiClient'), require('../model/InlineResponse401'), require('../model/OauthClient'));
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer100Aplha1) {
       root.HydraOAuth2OpenIdConnectServer100Aplha1 = {};
     }
-    root.HydraOAuth2OpenIdConnectServer100Aplha1.HealthApi = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse401);
+    root.HydraOAuth2OpenIdConnectServer100Aplha1.HealthApi = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse401, root.HydraOAuth2OpenIdConnectServer100Aplha1.OauthClient);
   }
-}(this, function(ApiClient, InlineResponse401) {
+}(this, function(ApiClient, InlineResponse401, OauthClient) {
   'use strict';
 
   /**
@@ -52,7 +52,7 @@
      * Callback function to receive the result of the getStatistics operation.
      * @callback module:api/HealthApi~getStatisticsCallback
      * @param {String} error Error message, if any.
-     * @param {Object} data The data returned by the service call.
+     * @param {Array.<module:model/OauthClient>} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -60,7 +60,7 @@
      * Show instance statistics
      * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:health:stats\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
      * @param {module:api/HealthApi~getStatisticsCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link Object}
+     * data is of type: {@link Array.<module:model/OauthClient>}
      */
     this.getStatistics = function(callback) {
       var postBody = null;
@@ -78,7 +78,7 @@
       var authNames = ['oauth2'];
       var contentTypes = ['application/json'];
       var accepts = ['application/json'];
-      var returnType = Object;
+      var returnType = [OauthClient];
 
       return this.apiClient.callApi(
         '/health/stats', 'GET',

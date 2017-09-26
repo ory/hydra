@@ -4,55 +4,20 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net/http/httptest"
-	"net/url"
 	"os"
 	"testing"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
-	"github.com/ory/herodot"
 	. "github.com/ory/hydra/client"
-	"github.com/ory/hydra/compose"
 	"github.com/ory/hydra/integration"
-	"github.com/ory/ladon"
 )
 
 var clientManagers = map[string]Storage{}
-
-var ts *httptest.Server
 
 func init() {
 	clientManagers["memory"] = &MemoryManager{
 		Clients: map[string]Client{},
 		Hasher:  &fosite.BCrypt{},
-	}
-
-	localWarden, httpClient := compose.NewMockFirewall("foo", "alice", fosite.Arguments{Scope}, &ladon.DefaultPolicy{
-		ID:        "1",
-		Subjects:  []string{"alice"},
-		Resources: []string{"rn:hydra:clients<.*>"},
-		Actions:   []string{"create", "get", "delete", "update"},
-		Effect:    ladon.AllowAccess,
-	})
-
-	s := &Handler{
-		Manager: &MemoryManager{
-			Clients: map[string]Client{},
-			Hasher:  &fosite.BCrypt{},
-		},
-		H: herodot.NewJSONWriter(nil),
-		W: localWarden,
-	}
-
-	routing := httprouter.New()
-	s.SetRoutes(routing)
-	ts = httptest.NewServer(routing)
-
-	u, _ := url.Parse(ts.URL + ClientsHandlerPath)
-	clientManagers["http"] = &HTTPManager{
-		Client:   httpClient,
-		Endpoint: u,
 	}
 }
 

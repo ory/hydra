@@ -136,6 +136,10 @@ func (c *Config) DoesRequestSatisfyTermination(r *http.Request) error {
 		return errors.New("TLS termination is not enabled")
 	}
 
+	if r.URL.Path == "/health" {
+		return nil
+	}
+
 	ranges := strings.Split(c.AllowTLSTermination, ",")
 	if err := matchesRange(r, ranges); err != nil {
 		return err

@@ -33,7 +33,7 @@ func (h *ConsentSessionHandler) SetRoutes(r *httprouter.Router) {
 	r.PATCH(ConsentRequestPath+"/:id/accept", h.AcceptConsentRequestHandler)
 }
 
-// swagger:route GET /oauth2/consent/requests/{id} oauth2 consent getConsentRequest
+// swagger:route GET /oauth2/consent/requests/{id} oauth2 consent getOAuth2ConsentRequest
 //
 // Receive consent request information
 //
@@ -61,7 +61,7 @@ func (h *ConsentSessionHandler) SetRoutes(r *httprouter.Router) {
 //       oauth2: hydra.consent
 //
 //     Responses:
-//       200: oauthConsentRequest
+//       200: oAuth2ConsentRequest
 //       401: genericError
 //       500: genericError
 func (h *ConsentSessionHandler) FetchConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -81,7 +81,7 @@ func (h *ConsentSessionHandler) FetchConsentRequest(w http.ResponseWriter, r *ht
 	}
 }
 
-// swagger:route PATCH /oauth2/consent/requests/{id}/reject oauth2 consent rejectConsentRequest
+// swagger:route PATCH /oauth2/consent/requests/{id}/reject oauth2 consent rejectOAuth2ConsentRequest
 //
 // Reject a consent request
 //
@@ -136,7 +136,7 @@ func (h *ConsentSessionHandler) RejectConsentRequestHandler(w http.ResponseWrite
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route PATCH /oauth2/consent/requests/{id}/accept oauth2 consent acceptConsentRequest
+// swagger:route PATCH /oauth2/consent/requests/{id}/accept oauth2 consent acceptOAuth2ConsentRequest
 //
 // Accept a consent request
 //

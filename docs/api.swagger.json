@@ -884,7 +884,7 @@
           "consent"
         ],
         "summary": "Receive consent request information",
-        "operationId": "getConsentRequest",
+        "operationId": "getOAuth2ConsentRequest",
         "security": [
           {
             "oauth2": [
@@ -892,20 +892,9 @@
             ]
           }
         ],
-        "parameters": [
-          {
-            "uniqueItems": true,
-            "type": "string",
-            "x-go-name": "ID",
-            "description": "The id of the OAuth 2.0 Consent Request.",
-            "name": "id",
-            "in": "path",
-            "required": true
-          }
-        ],
         "responses": {
           "200": {
-            "$ref": "#/responses/oauthConsentRequest"
+            "$ref": "#/responses/oAuth2ConsentRequest"
           },
           "401": {
             "$ref": "#/responses/genericError"
@@ -934,7 +923,7 @@
           "consent"
         ],
         "summary": "Accept a consent request",
-        "operationId": "acceptConsentRequest",
+        "operationId": "acceptOAuth2ConsentRequest",
         "security": [
           {
             "oauth2": [
@@ -950,15 +939,6 @@
             "schema": {
               "$ref": "#/definitions/acceptConsentRequestPayload"
             }
-          },
-          {
-            "uniqueItems": true,
-            "type": "string",
-            "x-go-name": "ID",
-            "description": "The id of the OAuth 2.0 Consent Request.",
-            "name": "id",
-            "in": "path",
-            "required": true
           }
         ],
         "responses": {
@@ -992,7 +972,7 @@
           "consent"
         ],
         "summary": "Reject a consent request",
-        "operationId": "rejectConsentRequest",
+        "operationId": "rejectOAuth2ConsentRequest",
         "security": [
           {
             "oauth2": [
@@ -1008,15 +988,6 @@
             "schema": {
               "$ref": "#/definitions/rejectConsentRequestPayload"
             }
-          },
-          {
-            "uniqueItems": true,
-            "type": "string",
-            "x-go-name": "ID",
-            "description": "The id of the OAuth 2.0 Consent Request.",
-            "name": "id",
-            "in": "path",
-            "required": true
           }
         ],
         "responses": {
@@ -1049,7 +1020,7 @@
           "oauth2"
         ],
         "summary": "Introspect an OAuth2 access token",
-        "operationId": "introspectOAuthToken",
+        "operationId": "introspectToken",
         "security": [
           {
             "oauth2": []
@@ -1057,7 +1028,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/introspectOAuthTokenResponse"
+            "$ref": "#/responses/introspectOAuth2TokenResponse"
           },
           "401": {
             "$ref": "#/responses/genericError"
@@ -1085,7 +1056,7 @@
           "oauth2"
         ],
         "summary": "Revoke an OAuth2 access token",
-        "operationId": "revokeOAuthToken",
+        "operationId": "revokeOAuth2Token",
         "security": [
           {
             "oauth2": []
@@ -1099,13 +1070,9 @@
             "schema": {
               "type": "object",
               "properties": {
-                "access_token": {
+                "token": {
                   "type": "string",
-                  "x-go-name": "AccessToken"
-                },
-                "refresh_token": {
-                  "type": "string",
-                  "x-go-name": "RefreshToken"
+                  "x-go-name": "Token"
                 }
               }
             }
@@ -2159,41 +2126,6 @@
       "x-go-name": "AccessRequest",
       "x-go-package": "github.com/ory/hydra/firewall"
     },
-    "consentRequest": {
-      "type": "object",
-      "title": "ConsentRequest represents a consent request.",
-      "properties": {
-        "audience": {
-          "description": "Audience is the client id that initiated the OAuth2 request.",
-          "type": "string",
-          "x-go-name": "Audience"
-        },
-        "expiresAt": {
-          "description": "ExpiresAt is the time where the access request will expire.",
-          "x-go-name": "ExpiresAt"
-        },
-        "id": {
-          "description": "ID is the id of this consent request.",
-          "type": "string",
-          "x-go-name": "ID"
-        },
-        "redirectUrl": {
-          "description": "Redirect URL is the URL where the user agent should be redirected to after the consent has been\naccepted or rejected.",
-          "type": "string",
-          "x-go-name": "RedirectURL"
-        },
-        "requestedScopes": {
-          "description": "RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "x-go-name": "RequestedScopes"
-        }
-      },
-      "x-go-name": "ConsentRequest",
-      "x-go-package": "github.com/ory/hydra/oauth2"
-    },
     "createJsonWebKeySetPayload": {
       "type": "object",
       "required": [
@@ -2452,6 +2384,41 @@
       },
       "x-go-name": "Client",
       "x-go-package": "github.com/ory/hydra/client"
+    },
+    "oAuth2consentRequest": {
+      "type": "object",
+      "title": "ConsentRequest represents a consent request.",
+      "properties": {
+        "audience": {
+          "description": "Audience is the client id that initiated the OAuth2 request.",
+          "type": "string",
+          "x-go-name": "Audience"
+        },
+        "expiresAt": {
+          "description": "ExpiresAt is the time where the access request will expire.",
+          "x-go-name": "ExpiresAt"
+        },
+        "id": {
+          "description": "ID is the id of this consent request.",
+          "type": "string",
+          "x-go-name": "ID"
+        },
+        "redirectUrl": {
+          "description": "Redirect URL is the URL where the user agent should be redirected to after the consent has been\naccepted or rejected.",
+          "type": "string",
+          "x-go-name": "RedirectURL"
+        },
+        "requestedScopes": {
+          "description": "RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "RequestedScopes"
+        }
+      },
+      "x-go-name": "ConsentRequest",
+      "x-go-package": "github.com/ory/hydra/oauth2"
     },
     "policy": {
       "type": "object",
@@ -2912,13 +2879,13 @@
         }
       }
     },
-    "introspectOAuthTokenResponse": {
+    "introspectOAuth2TokenResponse": {
       "description": "The token introspection response",
       "schema": {
         "type": "object",
         "properties": {
           "active": {
-            "description": "Boolean indicator of whether or not the presented token\nis currently active.  The specifics of a token's \"active\" state\nwill vary depending on the implementation of the authorization\nserver and the information it keeps about its tokens, but a \"true\"\nvalue return for the \"active\" property will generally indicate\nthat a given token has been issued by this authorization server,\nhas not been revoked by the resource owner, and is within its\ngiven time window of validity (e.g., after its issuance time and\nbefore its expiration time).",
+            "description": "Boolean indicator of whether or not the presented token\nis currently active. An active token is neither refreshed nor revoked.",
             "type": "boolean",
             "x-go-name": "Active"
           },
@@ -2975,10 +2942,10 @@
         }
       }
     },
-    "oauthConsentRequest": {
+    "oAuth2ConsentRequest": {
       "description": "The consent request response",
       "schema": {
-        "$ref": "#/definitions/consentRequest"
+        "$ref": "#/definitions/oAuth2consentRequest"
       }
     },
     "oauthTokenResponse": {

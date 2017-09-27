@@ -4,12 +4,18 @@ set -euo pipefail
 
 cd "$( dirname "${BASH_SOURCE[0]}" )/.."
 
-curl -O scripts/swagger-codegen-cli-2.2.3.jar http://central.maven.org/maven2/io/swagger/swagger-codegen-cli/2.2.3/swagger-codegen-cli-2.2.3.jar
+scripts/run-genswag.sh
+
+rm -rf ./sdk/go
+
+# curl -O scripts/swagger-codegen-cli-2.2.3.jar http://central.maven.org/maven2/io/swagger/swagger-codegen-cli/2.2.3/swagger-codegen-cli-2.2.3.jar
 
 java -jar scripts/swagger-codegen-cli-2.2.3.jar generate -i ./docs/api.swagger.json -l go -o ./sdk/go/swagger
 java -jar scripts/swagger-codegen-cli-2.2.3.jar generate -i ./docs/api.swagger.json -l javascript -o ./sdk/js/swagger
 
 scripts/run-format.sh
 
-git checkout -- ./sdk/go/swagger/configuration.go
-git checkout -- ./sdk/go/swagger/api_client.go
+git add -A .
+
+git checkout HEAD -- sdk/go/swagger/configuration.go
+git checkout HEAD -- sdk/go/swagger/api_client.go

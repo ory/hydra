@@ -2,16 +2,17 @@ package oauth2
 
 // swagger:parameters revokeOAuth2Token
 type swaggerRevokeOAuth2TokenParameters struct {
-	// in: body
+	// in: formData
 	// required: true
-	Body struct {
-		AccessToken  string `json:"access_token"`
-		RefreshToken string `json:"refresh_token"`
-	}
+	Token string `json:"token"`
 }
 
 // swagger:parameters rejectOAuth2ConsentRequest
 type swaggerRejectConsentRequest struct {
+	// in: path
+	// required: true
+	ID string `json:"id"`
+
 	// in: body
 	// required: true
 	Body RejectConsentRequestPayload
@@ -19,6 +20,10 @@ type swaggerRejectConsentRequest struct {
 
 // swagger:parameters acceptOAuth2ConsentRequest
 type swaggerAcceptConsentRequest struct {
+	// in: path
+	// required: true
+	ID string `json:"id"`
+
 	// in: body
 	// required: true
 	Body AcceptConsentRequestPayload
@@ -102,25 +107,29 @@ type swaggerOAuthIntrospectionResponse struct {
 // swagger:parameters introspectOAuth2Token
 type swaggerOAuthIntrospectionRequest struct {
 	// in: body
-	Body struct {
-		// required: true
-		// The string value of the token. For access tokens, this
-		// is the "access_token" value returned from the token endpoint
-		// defined in OAuth 2.0 [RFC6749], Section 5.1.
-		// This endpoint DOES NOT accept refresh tokens for validation.
-		Token string `json:"token"`
-
-		// An optional, space separated list of required scopes. If the access token was not granted one of the
-		// scopes, the result of active will be false.
-		Scope  string `json:"scope"`
-	}
+	Body swaggerIntrospectOAuth2TokenRequestPayload
 }
 
-// swagger:parameters getConsentRequest acceptConsentRequest rejectConsentRequest
+// swagger:model introspectOAuth2TokenRequestPayload
+type swaggerIntrospectOAuth2TokenRequestPayload struct {
+	// required: true
+	// The string value of the token. For access tokens, this
+	// is the "access_token" value returned from the token endpoint
+	// defined in OAuth 2.0 [RFC6749], Section 5.1.
+	// This endpoint DOES NOT accept refresh tokens for validation.
+	Token string `json:"token"`
+
+	// An optional, space separated list of required scopes. If the access token was not granted one of the
+	// scopes, the result of active will be false.
+	Scope string `json:"scope"`
+}
+
+// swagger:parameters getOAuth2ConsentRequest acceptConsentRequest rejectConsentRequest
 type swaggerOAuthConsentRequestPayload struct {
 	// The id of the OAuth 2.0 Consent Request.
 	//
 	// unique: true
+	// required: true
 	// in: path
 	ID string `json:"id"`
 }

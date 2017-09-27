@@ -4,9 +4,35 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**GetWellKnown**](OpenidconnectApi.md#GetWellKnown) | **Get** /.well-known/openid-configuration | Server well known configuration
 [**WellKnown**](OpenidconnectApi.md#WellKnown) | **Get** /.well-known/jwks.json | Public JWKs
-[**WellKnownHandler**](OpenidconnectApi.md#WellKnownHandler) | **Get** /.well-known/openid-configuration | Server well known configuration
 
+
+# **GetWellKnown**
+> WellKnown GetWellKnown()
+
+Server well known configuration
+
+For more information, please refer to https://openid.net/specs/openid-connect-discovery-1_0.html
+
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**WellKnown**](wellKnown.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json, application/x-www-form-urlencoded
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **WellKnown**
 > JsonWebKeySet WellKnown()
@@ -30,32 +56,6 @@ This endpoint does not need any parameter.
 ### HTTP request headers
 
  - **Content-Type**: application/json
- - **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **WellKnownHandler**
-> WellKnown WellKnownHandler()
-
-Server well known configuration
-
-For more information, please refer to https://openid.net/specs/openid-connect-discovery-1_0.html
-
-
-### Parameters
-This endpoint does not need any parameter.
-
-### Return type
-
-[**WellKnown**](WellKnown.md)
-
-### Authorization
-
-[oauth2](../README.md#oauth2)
-
-### HTTP request headers
-
- - **Content-Type**: application/x-www-form-urlencoded
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

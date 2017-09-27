@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.ConsentRequest
+# HydraOAuth2OpenIdConnectServer100Aplha1.OAuth2consentRequest
 
 ## Properties
 Name | Type | Description | Notes

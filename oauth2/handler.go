@@ -31,7 +31,7 @@ const (
 	consentCookieName = "consent_session"
 )
 
-// swagger:model WellKnown
+// swagger:model wellKnown
 type WellKnown struct {
 	// URL using the https scheme with no query or fragment component that the OP asserts as its Issuer Identifier.
 	// If Issuer discovery is supported , this value MUST be identical to the issuer value returned
@@ -92,25 +92,19 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET(WellKnownPath, h.WellKnownHandler)
 }
 
-// swagger:route GET /.well-known/openid-configuration oauth2 openid-connect WellKnownHandler
+// swagger:route GET /.well-known/openid-configuration oAuth2 openid-connect getWellKnown
 //
 // Server well known configuration
 //
 // For more information, please refer to https://openid.net/specs/openid-connect-discovery-1_0.html
-//
-//     Consumes:
-//     - application/x-www-form-urlencoded
 //
 //     Produces:
 //     - application/json
 //
 //     Schemes: http, https
 //
-//     Security:
-//       oauth2:
-//
 //     Responses:
-//       200: WellKnown
+//       200: wellKnown
 //       401: genericError
 //       500: genericError
 func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -126,7 +120,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ htt
 	h.H.Write(w, r, wellKnown)
 }
 
-// swagger:route POST /oauth2/revoke oauth2 revokeOAuth2Token
+// swagger:route POST /oauth2/revoke oAuth2 revokeOAuth2Token
 //
 // Revoke an OAuth2 access token
 //
@@ -135,13 +129,10 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ htt
 //     Consumes:
 //     - application/x-www-form-urlencoded
 //
-//     Produces:
-//     - application/json
-//
 //     Schemes: http, https
 //
 //     Security:
-//       oauth2:
+//       basic:
 //
 //     Responses:
 //       200: emptyResponse
@@ -158,7 +149,7 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ ht
 	h.OAuth2.WriteRevocationResponse(w, err)
 }
 
-// swagger:route POST /oauth2/introspect oauth2 introspectToken
+// swagger:route POST /oauth2/introspect oAuth2 introspectToken
 //
 // Introspect an OAuth2 access token
 //
@@ -173,7 +164,7 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ ht
 //     Schemes: http, https
 //
 //     Security:
-//       oauth2:
+//       basic:
 //
 //     Responses:
 //       200: introspectOAuth2TokenResponse
@@ -213,7 +204,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 	}
 }
 
-// swagger:route POST /oauth2/token oauth2 oauthToken
+// swagger:route POST /oauth2/token oAuth2 oauthToken
 //
 // The OAuth 2.0 Token endpoint
 //
@@ -264,7 +255,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprou
 	h.OAuth2.WriteAccessResponse(w, accessRequest, accessResponse)
 }
 
-// swagger:route GET /oauth2/auth oauth2 oauthAuth
+// swagger:route GET /oauth2/auth oAuth2 oauthAuth
 //
 // The OAuth 2.0 Auth endpoint
 //

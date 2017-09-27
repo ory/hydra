@@ -4,13 +4,13 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**AcceptConsentRequest**](ConsentApi.md#AcceptConsentRequest) | **Patch** /oauth2/consent/requests/{id}/accept | Accept a consent request
-[**GetConsentRequest**](ConsentApi.md#GetConsentRequest) | **Get** /oauth2/consent/requests/{id} | Receive consent request information
-[**RejectConsentRequest**](ConsentApi.md#RejectConsentRequest) | **Patch** /oauth2/consent/requests/{id}/reject | Reject a consent request
+[**AcceptOAuth2ConsentRequest**](ConsentApi.md#AcceptOAuth2ConsentRequest) | **Patch** /oauth2/consent/requests/{id}/accept | Accept a consent request
+[**GetOAuth2ConsentRequest**](ConsentApi.md#GetOAuth2ConsentRequest) | **Get** /oauth2/consent/requests/{id} | Receive consent request information
+[**RejectOAuth2ConsentRequest**](ConsentApi.md#RejectOAuth2ConsentRequest) | **Patch** /oauth2/consent/requests/{id}/reject | Reject a consent request
 
 
-# **AcceptConsentRequest**
-> AcceptConsentRequest($body, $id)
+# **AcceptOAuth2ConsentRequest**
+> AcceptOAuth2ConsentRequest($id, $body)
 
 Accept a consent request
 
@@ -21,8 +21,8 @@ Call this endpoint to accept a consent request. This usually happens when a user
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
+ **id** | **string**|  | 
  **body** | [**AcceptConsentRequestPayload**](AcceptConsentRequestPayload.md)|  | 
- **id** | **string**| The id of the OAuth 2.0 Consent Request. | 
 
 ### Return type
 
@@ -39,8 +39,8 @@ void (empty response body)
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **GetConsentRequest**
-> ConsentRequest GetConsentRequest($id)
+# **GetOAuth2ConsentRequest**
+> OAuth2consentRequest GetOAuth2ConsentRequest($id)
 
 Receive consent request information
 
@@ -55,7 +55,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**ConsentRequest**](consentRequest.md)
+[**OAuth2consentRequest**](oAuth2consentRequest.md)
 
 ### Authorization
 
@@ -68,8 +68,8 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **RejectConsentRequest**
-> RejectConsentRequest($body, $id)
+# **RejectOAuth2ConsentRequest**
+> RejectOAuth2ConsentRequest($id, $body)
 
 Reject a consent request
 
@@ -80,8 +80,8 @@ Call this endpoint to reject a consent request. This usually happens when a user
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
+ **id** | **string**|  | 
  **body** | [**RejectConsentRequestPayload**](RejectConsentRequestPayload.md)|  | 
- **id** | **string**| The id of the OAuth 2.0 Consent Request. | 
 
 ### Return type
 

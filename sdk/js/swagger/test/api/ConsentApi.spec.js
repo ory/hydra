@@ -51,30 +51,30 @@
   }
 
   describe('ConsentApi', function() {
-    describe('acceptConsentRequest', function() {
-      it('should call acceptConsentRequest successfully', function(done) {
-        //uncomment below and update the code to test acceptConsentRequest
-        //instance.acceptConsentRequest(function(error) {
+    describe('acceptOAuth2ConsentRequest', function() {
+      it('should call acceptOAuth2ConsentRequest successfully', function(done) {
+        //uncomment below and update the code to test acceptOAuth2ConsentRequest
+        //instance.acceptOAuth2ConsentRequest(function(error) {
         //  if (error) throw error;
         //expect().to.be();
         //});
         done();
       });
     });
-    describe('getConsentRequest', function() {
-      it('should call getConsentRequest successfully', function(done) {
-        //uncomment below and update the code to test getConsentRequest
-        //instance.getConsentRequest(function(error) {
+    describe('getOAuth2ConsentRequest', function() {
+      it('should call getOAuth2ConsentRequest successfully', function(done) {
+        //uncomment below and update the code to test getOAuth2ConsentRequest
+        //instance.getOAuth2ConsentRequest(function(error) {
         //  if (error) throw error;
         //expect().to.be();
         //});
         done();
       });
     });
-    describe('rejectConsentRequest', function() {
-      it('should call rejectConsentRequest successfully', function(done) {
-        //uncomment below and update the code to test rejectConsentRequest
-        //instance.rejectConsentRequest(function(error) {
+    describe('rejectOAuth2ConsentRequest', function() {
+      it('should call rejectOAuth2ConsentRequest successfully', function(done) {
+        //uncomment below and update the code to test rejectOAuth2ConsentRequest
+        //instance.rejectOAuth2ConsentRequest(function(error) {
         //  if (error) throw error;
         //expect().to.be();
         //});

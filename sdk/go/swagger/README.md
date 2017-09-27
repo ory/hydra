@@ -27,9 +27,9 @@ Class | Method | HTTP request | Description
 *ClientsApi* | [**GetOAuth2Client**](docs/ClientsApi.md#getoauth2client) | **Get** /clients/{id} | Fetches an OAuth 2.0 Client.
 *ClientsApi* | [**ListOAuth2Clients**](docs/ClientsApi.md#listoauth2clients) | **Get** /clients | Lists OAuth 2.0 Clients
 *ClientsApi* | [**UpdateOAuth2Client**](docs/ClientsApi.md#updateoauth2client) | **Put** /clients/{id} | Updates an OAuth 2.0 Client
-*ConsentApi* | [**AcceptConsentRequest**](docs/ConsentApi.md#acceptconsentrequest) | **Patch** /oauth2/consent/requests/{id}/accept | Accept a consent request
-*ConsentApi* | [**GetConsentRequest**](docs/ConsentApi.md#getconsentrequest) | **Get** /oauth2/consent/requests/{id} | Receive consent request information
-*ConsentApi* | [**RejectConsentRequest**](docs/ConsentApi.md#rejectconsentrequest) | **Patch** /oauth2/consent/requests/{id}/reject | Reject a consent request
+*ConsentApi* | [**AcceptOAuth2ConsentRequest**](docs/ConsentApi.md#acceptoauth2consentrequest) | **Patch** /oauth2/consent/requests/{id}/accept | Accept a consent request
+*ConsentApi* | [**GetOAuth2ConsentRequest**](docs/ConsentApi.md#getoauth2consentrequest) | **Get** /oauth2/consent/requests/{id} | Receive consent request information
+*ConsentApi* | [**RejectOAuth2ConsentRequest**](docs/ConsentApi.md#rejectoauth2consentrequest) | **Patch** /oauth2/consent/requests/{id}/reject | Reject a consent request
 *DefaultApi* | [**Health**](docs/DefaultApi.md#health) | **Get** /health | Check health status of instance
 *GroupsApi* | [**AddMembersToGroup**](docs/GroupsApi.md#addmemberstogroup) | **Post** /warden/groups/{id}/members | Add members to a group
 *GroupsApi* | [**CreateGroup**](docs/GroupsApi.md#creategroup) | **Post** /warden/groups | Create a group
@@ -46,22 +46,22 @@ Class | Method | HTTP request | Description
 *JsonWebKeyApi* | [**UpdateJsonWebKey**](docs/JsonWebKeyApi.md#updatejsonwebkey) | **Put** /keys/{set}/{kid} | Updates a JSON Web Key
 *JsonWebKeyApi* | [**UpdateJsonWebKeySet**](docs/JsonWebKeyApi.md#updatejsonwebkeyset) | **Put** /keys/{set} | Updates a JSON Web Key Set
 *JsonWebKeyApi* | [**WellKnown**](docs/JsonWebKeyApi.md#wellknown) | **Get** /.well-known/jwks.json | Public JWKs
+*OAuth2Api* | [**AcceptOAuth2ConsentRequest**](docs/OAuth2Api.md#acceptoauth2consentrequest) | **Patch** /oauth2/consent/requests/{id}/accept | Accept a consent request
 *OAuth2Api* | [**CreateOAuth2Client**](docs/OAuth2Api.md#createoauth2client) | **Post** /clients | Creates an OAuth 2.0 Client
 *OAuth2Api* | [**DeleteOAuth2Client**](docs/OAuth2Api.md#deleteoauth2client) | **Delete** /clients/{id} | Deletes an OAuth 2.0 Client
 *OAuth2Api* | [**GetOAuth2Client**](docs/OAuth2Api.md#getoauth2client) | **Get** /clients/{id} | Fetches an OAuth 2.0 Client.
+*OAuth2Api* | [**GetOAuth2ConsentRequest**](docs/OAuth2Api.md#getoauth2consentrequest) | **Get** /oauth2/consent/requests/{id} | Receive consent request information
+*OAuth2Api* | [**GetWellKnown**](docs/OAuth2Api.md#getwellknown) | **Get** /.well-known/openid-configuration | Server well known configuration
+*OAuth2Api* | [**IntrospectToken**](docs/OAuth2Api.md#introspecttoken) | **Post** /oauth2/introspect | Introspect an OAuth2 access token
 *OAuth2Api* | [**ListOAuth2Clients**](docs/OAuth2Api.md#listoauth2clients) | **Get** /clients | Lists OAuth 2.0 Clients
+*OAuth2Api* | [**OauthAuth**](docs/OAuth2Api.md#oauthauth) | **Get** /oauth2/auth | The OAuth 2.0 Auth endpoint
+*OAuth2Api* | [**OauthToken**](docs/OAuth2Api.md#oauthtoken) | **Post** /oauth2/token | The OAuth 2.0 Token endpoint
+*OAuth2Api* | [**RejectOAuth2ConsentRequest**](docs/OAuth2Api.md#rejectoauth2consentrequest) | **Patch** /oauth2/consent/requests/{id}/reject | Reject a consent request
+*OAuth2Api* | [**RevokeOAuth2Token**](docs/OAuth2Api.md#revokeoauth2token) | **Post** /oauth2/revoke | Revoke an OAuth2 access token
 *OAuth2Api* | [**UpdateOAuth2Client**](docs/OAuth2Api.md#updateoauth2client) | **Put** /clients/{id} | Updates an OAuth 2.0 Client
-*Oauth2Api* | [**AcceptConsentRequest**](docs/Oauth2Api.md#acceptconsentrequest) | **Patch** /oauth2/consent/requests/{id}/accept | Accept a consent request
-*Oauth2Api* | [**GetConsentRequest**](docs/Oauth2Api.md#getconsentrequest) | **Get** /oauth2/consent/requests/{id} | Receive consent request information
-*Oauth2Api* | [**IntrospectOAuthToken**](docs/Oauth2Api.md#introspectoauthtoken) | **Post** /oauth2/introspect | Introspect an OAuth2 access token
-*Oauth2Api* | [**OauthAuth**](docs/Oauth2Api.md#oauthauth) | **Get** /oauth2/auth | The OAuth 2.0 Auth endpoint
-*Oauth2Api* | [**OauthToken**](docs/Oauth2Api.md#oauthtoken) | **Post** /oauth2/token | The OAuth 2.0 Token endpoint
-*Oauth2Api* | [**RejectConsentRequest**](docs/Oauth2Api.md#rejectconsentrequest) | **Patch** /oauth2/consent/requests/{id}/reject | Reject a consent request
-*Oauth2Api* | [**RevokeOAuthToken**](docs/Oauth2Api.md#revokeoauthtoken) | **Post** /oauth2/revoke | Revoke an OAuth2 access token
 *Oauth2Api* | [**WellKnown**](docs/Oauth2Api.md#wellknown) | **Get** /.well-known/jwks.json | Public JWKs
-*Oauth2Api* | [**WellKnownHandler**](docs/Oauth2Api.md#wellknownhandler) | **Get** /.well-known/openid-configuration | Server well known configuration
+*OpenidconnectApi* | [**GetWellKnown**](docs/OpenidconnectApi.md#getwellknown) | **Get** /.well-known/openid-configuration | Server well known configuration
 *OpenidconnectApi* | [**WellKnown**](docs/OpenidconnectApi.md#wellknown) | **Get** /.well-known/jwks.json | Public JWKs
-*OpenidconnectApi* | [**WellKnownHandler**](docs/OpenidconnectApi.md#wellknownhandler) | **Get** /.well-known/openid-configuration | Server well known configuration
 *PoliciesApi* | [**CreatePolicy**](docs/PoliciesApi.md#createpolicy) | **Post** /policies | Create an access control policy
 *PoliciesApi* | [**DeletePolicy**](docs/PoliciesApi.md#deletepolicy) | **Delete** /policies/{id} | Delete an access control policy
 *PoliciesApi* | [**GetPolicy**](docs/PoliciesApi.md#getpolicy) | **Get** /policies/{id} | Get an access control policy
@@ -81,8 +81,6 @@ Class | Method | HTTP request | Description
 
  - [AcceptConsentRequestPayload](docs/AcceptConsentRequestPayload.md)
  - [AllowedRequest](docs/AllowedRequest.md)
- - [Body](docs/Body.md)
- - [ConsentRequest](docs/ConsentRequest.md)
  - [ConsentRequestClient](docs/ConsentRequestClient.md)
  - [ConsentRequestManager](docs/ConsentRequestManager.md)
  - [Context](docs/Context.md)
@@ -98,6 +96,7 @@ Class | Method | HTTP request | Description
  - [InlineResponse2003](docs/InlineResponse2003.md)
  - [InlineResponse2004](docs/InlineResponse2004.md)
  - [InlineResponse401](docs/InlineResponse401.md)
+ - [IntrospectOAuth2TokenRequestPayload](docs/IntrospectOAuth2TokenRequestPayload.md)
  - [JoseWebKeySetRequest](docs/JoseWebKeySetRequest.md)
  - [JsonWebKey](docs/JsonWebKey.md)
  - [JsonWebKeySet](docs/JsonWebKeySet.md)
@@ -105,11 +104,14 @@ Class | Method | HTTP request | Description
  - [Manager](docs/Manager.md)
  - [MembersRequest](docs/MembersRequest.md)
  - [OAuth2Client](docs/OAuth2Client.md)
+ - [OAuth2consentRequest](docs/OAuth2consentRequest.md)
  - [Policy](docs/Policy.md)
  - [PolicyConditions](docs/PolicyConditions.md)
  - [RawMessage](docs/RawMessage.md)
  - [RejectConsentRequestPayload](docs/RejectConsentRequestPayload.md)
+ - [RevokeOAuth2TokenRequestPayload](docs/RevokeOAuth2TokenRequestPayload.md)
  - [Session](docs/Session.md)
+ - [SwaggerAcceptConsentRequest](docs/SwaggerAcceptConsentRequest.md)
  - [SwaggerCreatePolicyParameters](docs/SwaggerCreatePolicyParameters.md)
  - [SwaggerGetPolicyParameters](docs/SwaggerGetPolicyParameters.md)
  - [SwaggerJsonWebKeyQuery](docs/SwaggerJsonWebKeyQuery.md)
@@ -119,6 +121,15 @@ Class | Method | HTTP request | Description
  - [SwaggerJwkUpdateSetKey](docs/SwaggerJwkUpdateSetKey.md)
  - [SwaggerListPolicyParameters](docs/SwaggerListPolicyParameters.md)
  - [SwaggerListPolicyResponse](docs/SwaggerListPolicyResponse.md)
+ - [SwaggerOAuthConsentRequest](docs/SwaggerOAuthConsentRequest.md)
+ - [SwaggerOAuthConsentRequestPayload](docs/SwaggerOAuthConsentRequestPayload.md)
+ - [SwaggerOAuthIntrospectionRequest](docs/SwaggerOAuthIntrospectionRequest.md)
+ - [SwaggerOAuthIntrospectionResponse](docs/SwaggerOAuthIntrospectionResponse.md)
+ - [SwaggerOAuthIntrospectionResponseBody](docs/SwaggerOAuthIntrospectionResponseBody.md)
+ - [SwaggerOAuthTokenResponse](docs/SwaggerOAuthTokenResponse.md)
+ - [SwaggerOAuthTokenResponseBody](docs/SwaggerOAuthTokenResponseBody.md)
+ - [SwaggerRejectConsentRequest](docs/SwaggerRejectConsentRequest.md)
+ - [SwaggerRevokeOAuth2TokenParameters](docs/SwaggerRevokeOAuth2TokenParameters.md)
  - [SwaggerUpdatePolicyParameters](docs/SwaggerUpdatePolicyParameters.md)
  - [SwaggerWardenAllowedParameters](docs/SwaggerWardenAllowedParameters.md)
  - [SwaggerWardenAllowedResponse](docs/SwaggerWardenAllowedResponse.md)

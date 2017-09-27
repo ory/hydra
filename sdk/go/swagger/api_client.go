@@ -67,7 +67,6 @@ func (c *APIClient) CallAPI(path string, method string,
 
 	rClient := c.prepareClient()
 	request := c.prepareRequest(rClient, postBody, headerParams, queryParams, formParams, fileName, fileBytes)
-
 	switch strings.ToUpper(method) {
 	case "GET":
 		response, err := request.Get(path)

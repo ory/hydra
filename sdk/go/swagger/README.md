@@ -22,11 +22,11 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*ClientsApi* | [**CreateOAuthClient**](docs/ClientsApi.md#createoauthclient) | **Post** /clients | Creates an OAuth 2.0 Client
-*ClientsApi* | [**DeleteOAuthClient**](docs/ClientsApi.md#deleteoauthclient) | **Delete** /clients/{id} | Deletes an OAuth 2.0 Client
-*ClientsApi* | [**GetOAuthClient**](docs/ClientsApi.md#getoauthclient) | **Get** /clients/{id} | Fetches an OAuth 2.0 Client.
-*ClientsApi* | [**ListOAuthClients**](docs/ClientsApi.md#listoauthclients) | **Get** /clients | Lists OAuth 2.0 Clients
-*ClientsApi* | [**UpdateOAuthClient**](docs/ClientsApi.md#updateoauthclient) | **Put** /clients/{id} | Updates an OAuth 2.0 Client
+*ClientsApi* | [**CreateOAuth2Client**](docs/ClientsApi.md#createoauth2client) | **Post** /clients | Creates an OAuth 2.0 Client
+*ClientsApi* | [**DeleteOAuth2Client**](docs/ClientsApi.md#deleteoauth2client) | **Delete** /clients/{id} | Deletes an OAuth 2.0 Client
+*ClientsApi* | [**GetOAuth2Client**](docs/ClientsApi.md#getoauth2client) | **Get** /clients/{id} | Fetches an OAuth 2.0 Client.
+*ClientsApi* | [**ListOAuth2Clients**](docs/ClientsApi.md#listoauth2clients) | **Get** /clients | Lists OAuth 2.0 Clients
+*ClientsApi* | [**UpdateOAuth2Client**](docs/ClientsApi.md#updateoauth2client) | **Put** /clients/{id} | Updates an OAuth 2.0 Client
 *ConsentApi* | [**AcceptConsentRequest**](docs/ConsentApi.md#acceptconsentrequest) | **Patch** /oauth2/consent/requests/{id}/accept | Accept a consent request
 *ConsentApi* | [**GetConsentRequest**](docs/ConsentApi.md#getconsentrequest) | **Get** /oauth2/consent/requests/{id} | Receive consent request information
 *ConsentApi* | [**RejectConsentRequest**](docs/ConsentApi.md#rejectconsentrequest) | **Patch** /oauth2/consent/requests/{id}/reject | Reject a consent request
@@ -38,26 +38,26 @@ Class | Method | HTTP request | Description
 *GroupsApi* | [**GetGroup**](docs/GroupsApi.md#getgroup) | **Get** /warden/groups/{id} | Get a group by id
 *GroupsApi* | [**RemoveMembersFromGroup**](docs/GroupsApi.md#removemembersfromgroup) | **Delete** /warden/groups/{id}/members | Remove members from a group
 *HealthApi* | [**GetStatistics**](docs/HealthApi.md#getstatistics) | **Get** /health/stats | Show instance statistics
-*JwksApi* | [**CreateJwkSetKey**](docs/JwksApi.md#createjwksetkey) | **Post** /keys/{set} | Generate a new JSON Web Key for a JSON Web Key Set
-*JwksApi* | [**DeleteJwkSet**](docs/JwksApi.md#deletejwkset) | **Delete** /keys/{set} | Delete a JSON Web Key
-*JwksApi* | [**DeleteJwkSetKey**](docs/JwksApi.md#deletejwksetkey) | **Delete** /keys/{set}/{kid} | Delete a JSON Web Key
-*JwksApi* | [**GetJwkSet**](docs/JwksApi.md#getjwkset) | **Get** /keys/{set} | Retrieves a JSON Web Key Set matching the set
-*JwksApi* | [**GetJwkSetKey**](docs/JwksApi.md#getjwksetkey) | **Get** /keys/{set}/{kid} | Retrieves a JSON Web Key Set matching the set and the kid
-*JwksApi* | [**UpdateJwkSet**](docs/JwksApi.md#updatejwkset) | **Put** /keys/{set} | Updates a JSON Web Key Set
-*JwksApi* | [**UpdateJwkSetKey**](docs/JwksApi.md#updatejwksetkey) | **Put** /keys/{set}/{kid} | Updates a JSON Web Key
-*JwksApi* | [**WellKnown**](docs/JwksApi.md#wellknown) | **Get** /.well-known/jwks.json | Public JWKs
+*JsonWebKeyApi* | [**CreateJsonWebKeySet**](docs/JsonWebKeyApi.md#createjsonwebkeyset) | **Post** /keys/{set} | Generate a new JSON Web Key for a JSON Web Key Set
+*JsonWebKeyApi* | [**DeleteJsonWebKey**](docs/JsonWebKeyApi.md#deletejsonwebkey) | **Delete** /keys/{set}/{kid} | Delete a JSON Web Key
+*JsonWebKeyApi* | [**DeleteJsonWebKeySet**](docs/JsonWebKeyApi.md#deletejsonwebkeyset) | **Delete** /keys/{set} | Delete a JSON Web Key
+*JsonWebKeyApi* | [**GetJsonWebKey**](docs/JsonWebKeyApi.md#getjsonwebkey) | **Get** /keys/{set}/{kid} | Retrieves a JSON Web Key Set matching the set and the kid
+*JsonWebKeyApi* | [**GetJsonWebKeySet**](docs/JsonWebKeyApi.md#getjsonwebkeyset) | **Get** /keys/{set} | Retrieves a JSON Web Key Set matching the set
+*JsonWebKeyApi* | [**UpdateJsonWebKey**](docs/JsonWebKeyApi.md#updatejsonwebkey) | **Put** /keys/{set}/{kid} | Updates a JSON Web Key
+*JsonWebKeyApi* | [**UpdateJsonWebKeySet**](docs/JsonWebKeyApi.md#updatejsonwebkeyset) | **Put** /keys/{set} | Updates a JSON Web Key Set
+*JsonWebKeyApi* | [**WellKnown**](docs/JsonWebKeyApi.md#wellknown) | **Get** /.well-known/jwks.json | Public JWKs
+*OAuth2Api* | [**CreateOAuth2Client**](docs/OAuth2Api.md#createoauth2client) | **Post** /clients | Creates an OAuth 2.0 Client
+*OAuth2Api* | [**DeleteOAuth2Client**](docs/OAuth2Api.md#deleteoauth2client) | **Delete** /clients/{id} | Deletes an OAuth 2.0 Client
+*OAuth2Api* | [**GetOAuth2Client**](docs/OAuth2Api.md#getoauth2client) | **Get** /clients/{id} | Fetches an OAuth 2.0 Client.
+*OAuth2Api* | [**ListOAuth2Clients**](docs/OAuth2Api.md#listoauth2clients) | **Get** /clients | Lists OAuth 2.0 Clients
+*OAuth2Api* | [**UpdateOAuth2Client**](docs/OAuth2Api.md#updateoauth2client) | **Put** /clients/{id} | Updates an OAuth 2.0 Client
 *Oauth2Api* | [**AcceptConsentRequest**](docs/Oauth2Api.md#acceptconsentrequest) | **Patch** /oauth2/consent/requests/{id}/accept | Accept a consent request
-*Oauth2Api* | [**CreateOAuthClient**](docs/Oauth2Api.md#createoauthclient) | **Post** /clients | Creates an OAuth 2.0 Client
-*Oauth2Api* | [**DeleteOAuthClient**](docs/Oauth2Api.md#deleteoauthclient) | **Delete** /clients/{id} | Deletes an OAuth 2.0 Client
 *Oauth2Api* | [**GetConsentRequest**](docs/Oauth2Api.md#getconsentrequest) | **Get** /oauth2/consent/requests/{id} | Receive consent request information
-*Oauth2Api* | [**GetOAuthClient**](docs/Oauth2Api.md#getoauthclient) | **Get** /clients/{id} | Fetches an OAuth 2.0 Client.
 *Oauth2Api* | [**IntrospectOAuthToken**](docs/Oauth2Api.md#introspectoauthtoken) | **Post** /oauth2/introspect | Introspect an OAuth2 access token
-*Oauth2Api* | [**ListOAuthClients**](docs/Oauth2Api.md#listoauthclients) | **Get** /clients | Lists OAuth 2.0 Clients
 *Oauth2Api* | [**OauthAuth**](docs/Oauth2Api.md#oauthauth) | **Get** /oauth2/auth | The OAuth 2.0 Auth endpoint
 *Oauth2Api* | [**OauthToken**](docs/Oauth2Api.md#oauthtoken) | **Post** /oauth2/token | The OAuth 2.0 Token endpoint
 *Oauth2Api* | [**RejectConsentRequest**](docs/Oauth2Api.md#rejectconsentrequest) | **Patch** /oauth2/consent/requests/{id}/reject | Reject a consent request
 *Oauth2Api* | [**RevokeOAuthToken**](docs/Oauth2Api.md#revokeoauthtoken) | **Post** /oauth2/revoke | Revoke an OAuth2 access token
-*Oauth2Api* | [**UpdateOAuthClient**](docs/Oauth2Api.md#updateoauthclient) | **Put** /clients/{id} | Updates an OAuth 2.0 Client
 *Oauth2Api* | [**WellKnown**](docs/Oauth2Api.md#wellknown) | **Get** /.well-known/jwks.json | Public JWKs
 *Oauth2Api* | [**WellKnownHandler**](docs/Oauth2Api.md#wellknownhandler) | **Get** /.well-known/openid-configuration | Server well known configuration
 *OpenidconnectApi* | [**WellKnown**](docs/OpenidconnectApi.md#wellknown) | **Get** /.well-known/jwks.json | Public JWKs
@@ -86,9 +86,10 @@ Class | Method | HTTP request | Description
  - [ConsentRequestClient](docs/ConsentRequestClient.md)
  - [ConsentRequestManager](docs/ConsentRequestManager.md)
  - [Context](docs/Context.md)
- - [CreateRequest](docs/CreateRequest.md)
+ - [CreateJsonWebKeySetPayload](docs/CreateJsonWebKeySetPayload.md)
  - [Firewall](docs/Firewall.md)
  - [Group](docs/Group.md)
+ - [Handler](docs/Handler.md)
  - [Headers](docs/Headers.md)
  - [IdTokenClaims](docs/IdTokenClaims.md)
  - [InlineResponse200](docs/InlineResponse200.md)
@@ -97,19 +98,22 @@ Class | Method | HTTP request | Description
  - [InlineResponse2003](docs/InlineResponse2003.md)
  - [InlineResponse2004](docs/InlineResponse2004.md)
  - [InlineResponse401](docs/InlineResponse401.md)
- - [Jwk](docs/Jwk.md)
- - [JwkSet](docs/JwkSet.md)
+ - [JoseWebKeySetRequest](docs/JoseWebKeySetRequest.md)
+ - [JsonWebKey](docs/JsonWebKey.md)
+ - [JsonWebKeySet](docs/JsonWebKeySet.md)
+ - [KeyGenerator](docs/KeyGenerator.md)
  - [Manager](docs/Manager.md)
  - [MembersRequest](docs/MembersRequest.md)
- - [OauthClient](docs/OauthClient.md)
+ - [OAuth2Client](docs/OAuth2Client.md)
  - [Policy](docs/Policy.md)
  - [PolicyConditions](docs/PolicyConditions.md)
+ - [RawMessage](docs/RawMessage.md)
  - [RejectConsentRequestPayload](docs/RejectConsentRequestPayload.md)
  - [Session](docs/Session.md)
  - [SwaggerCreatePolicyParameters](docs/SwaggerCreatePolicyParameters.md)
  - [SwaggerGetPolicyParameters](docs/SwaggerGetPolicyParameters.md)
- - [SwaggerJwkCreateSetKey](docs/SwaggerJwkCreateSetKey.md)
- - [SwaggerJwkSetKeyQuery](docs/SwaggerJwkSetKeyQuery.md)
+ - [SwaggerJsonWebKeyQuery](docs/SwaggerJsonWebKeyQuery.md)
+ - [SwaggerJwkCreateSet](docs/SwaggerJwkCreateSet.md)
  - [SwaggerJwkSetQuery](docs/SwaggerJwkSetQuery.md)
  - [SwaggerJwkUpdateSet](docs/SwaggerJwkUpdateSet.md)
  - [SwaggerJwkUpdateSetKey](docs/SwaggerJwkUpdateSetKey.md)
@@ -125,6 +129,7 @@ Class | Method | HTTP request | Description
  - [TokenAllowedRequest](docs/TokenAllowedRequest.md)
  - [WardenTokenAllowedBody](docs/WardenTokenAllowedBody.md)
  - [WellKnown](docs/WellKnown.md)
+ - [Writer](docs/Writer.md)
 
 
 ## Documentation For Authorization

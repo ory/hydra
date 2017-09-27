@@ -57,8 +57,38 @@
       //expect(instance).to.be.a(HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2002);
     });
 
-    it('should have the property allowed (base name: "allowed")', function() {
-      // uncomment below and update the code to test the property allowed
+    it('should have the property accessToken (base name: "access_token")', function() {
+      // uncomment below and update the code to test the property accessToken
+      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2002();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property expiresIn (base name: "expires_in")', function() {
+      // uncomment below and update the code to test the property expiresIn
+      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2002();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property idToken (base name: "id_token")', function() {
+      // uncomment below and update the code to test the property idToken
+      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2002();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property refreshToken (base name: "refresh_token")', function() {
+      // uncomment below and update the code to test the property refreshToken
+      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2002();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property scope (base name: "scope")', function() {
+      // uncomment below and update the code to test the property scope
+      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2002();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property tokenType (base name: "token_type")', function() {
+      // uncomment below and update the code to test the property tokenType
       //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2002();
       //expect(instance).to.be();
     });

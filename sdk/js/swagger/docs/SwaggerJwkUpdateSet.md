@@ -3,7 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**body** | [**JwkSet**](JwkSet.md) |  | [optional] 
+**body** | [**JsonWebKeySet**](JsonWebKeySet.md) |  | [optional] 
 **set** | **String** | The set in: path | 
 
 

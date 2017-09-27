@@ -42,9 +42,9 @@ func NewClientsApiWithBasePath(basePath string) *ClientsApi {
  * Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This endpoint should be well protected and only called by code you trust.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
  *
  * @param body
- * @return *OauthClient
+ * @return *OAuth2Client
  */
-func (a ClientsApi) CreateOAuthClient(body OauthClient) (*OauthClient, *APIResponse, error) {
+func (a ClientsApi) CreateOAuth2Client(body OAuth2Client) (*OAuth2Client, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Post")
 	// create path and map variables
@@ -86,12 +86,12 @@ func (a ClientsApi) CreateOAuthClient(body OauthClient) (*OauthClient, *APIRespo
 	}
 	// body params
 	localVarPostBody = &body
-	var successPayload = new(OauthClient)
+	var successPayload = new(OAuth2Client)
 	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 
 	var localVarURL, _ = url.Parse(localVarPath)
 	localVarURL.RawQuery = localVarQueryParams.Encode()
-	var localVarAPIResponse = &APIResponse{Operation: "CreateOAuthClient", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
+	var localVarAPIResponse = &APIResponse{Operation: "CreateOAuth2Client", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
 	if localVarHttpResponse != nil {
 		localVarAPIResponse.Response = localVarHttpResponse.RawResponse
 		localVarAPIResponse.Payload = localVarHttpResponse.Body()
@@ -111,7 +111,7 @@ func (a ClientsApi) CreateOAuthClient(body OauthClient) (*OauthClient, *APIRespo
  * @param id The id of the OAuth 2.0 Client.
  * @return void
  */
-func (a ClientsApi) DeleteOAuthClient(id string) (*APIResponse, error) {
+func (a ClientsApi) DeleteOAuth2Client(id string) (*APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Delete")
 	// create path and map variables
@@ -156,7 +156,7 @@ func (a ClientsApi) DeleteOAuthClient(id string) (*APIResponse, error) {
 
 	var localVarURL, _ = url.Parse(localVarPath)
 	localVarURL.RawQuery = localVarQueryParams.Encode()
-	var localVarAPIResponse = &APIResponse{Operation: "DeleteOAuthClient", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
+	var localVarAPIResponse = &APIResponse{Operation: "DeleteOAuth2Client", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
 	if localVarHttpResponse != nil {
 		localVarAPIResponse.Response = localVarHttpResponse.RawResponse
 		localVarAPIResponse.Payload = localVarHttpResponse.Body()
@@ -173,9 +173,9 @@ func (a ClientsApi) DeleteOAuthClient(id string) (*APIResponse, error) {
  * Never returns the client&#39;s secret.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
  *
  * @param id The id of the OAuth 2.0 Client.
- * @return *OauthClient
+ * @return *OAuth2Client
  */
-func (a ClientsApi) GetOAuthClient(id string) (*OauthClient, *APIResponse, error) {
+func (a ClientsApi) GetOAuth2Client(id string) (*OAuth2Client, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Get")
 	// create path and map variables
@@ -216,12 +216,12 @@ func (a ClientsApi) GetOAuthClient(id string) (*OauthClient, *APIResponse, error
 	if localVarHttpHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
-	var successPayload = new(OauthClient)
+	var successPayload = new(OAuth2Client)
 	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 
 	var localVarURL, _ = url.Parse(localVarPath)
 	localVarURL.RawQuery = localVarQueryParams.Encode()
-	var localVarAPIResponse = &APIResponse{Operation: "GetOAuthClient", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
+	var localVarAPIResponse = &APIResponse{Operation: "GetOAuth2Client", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
 	if localVarHttpResponse != nil {
 		localVarAPIResponse.Response = localVarHttpResponse.RawResponse
 		localVarAPIResponse.Payload = localVarHttpResponse.Body()
@@ -238,9 +238,9 @@ func (a ClientsApi) GetOAuthClient(id string) (*OauthClient, *APIResponse, error
  * Lists OAuth 2.0 Clients
  * Never returns a client&#39;s secret.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
- * @return []OauthClient
+ * @return []OAuth2Client
  */
-func (a ClientsApi) ListOAuthClients() ([]OauthClient, *APIResponse, error) {
+func (a ClientsApi) ListOAuth2Clients() ([]OAuth2Client, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Get")
 	// create path and map variables
@@ -280,12 +280,12 @@ func (a ClientsApi) ListOAuthClients() ([]OauthClient, *APIResponse, error) {
 	if localVarHttpHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
-	var successPayload = new([]OauthClient)
+	var successPayload = new([]OAuth2Client)
 	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 
 	var localVarURL, _ = url.Parse(localVarPath)
 	localVarURL.RawQuery = localVarQueryParams.Encode()
-	var localVarAPIResponse = &APIResponse{Operation: "ListOAuthClients", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
+	var localVarAPIResponse = &APIResponse{Operation: "ListOAuth2Clients", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
 	if localVarHttpResponse != nil {
 		localVarAPIResponse.Response = localVarHttpResponse.RawResponse
 		localVarAPIResponse.Payload = localVarHttpResponse.Body()
@@ -304,9 +304,9 @@ func (a ClientsApi) ListOAuthClients() ([]OauthClient, *APIResponse, error) {
  *
  * @param id
  * @param body
- * @return *OauthClient
+ * @return *OAuth2Client
  */
-func (a ClientsApi) UpdateOAuthClient(id string, body OauthClient) (*OauthClient, *APIResponse, error) {
+func (a ClientsApi) UpdateOAuth2Client(id string, body OAuth2Client) (*OAuth2Client, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Put")
 	// create path and map variables
@@ -349,12 +349,12 @@ func (a ClientsApi) UpdateOAuthClient(id string, body OauthClient) (*OauthClient
 	}
 	// body params
 	localVarPostBody = &body
-	var successPayload = new(OauthClient)
+	var successPayload = new(OAuth2Client)
 	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 
 	var localVarURL, _ = url.Parse(localVarPath)
 	localVarURL.RawQuery = localVarQueryParams.Encode()
-	var localVarAPIResponse = &APIResponse{Operation: "UpdateOAuthClient", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
+	var localVarAPIResponse = &APIResponse{Operation: "UpdateOAuth2Client", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
 	if localVarHttpResponse != nil {
 		localVarAPIResponse.Response = localVarHttpResponse.RawResponse
 		localVarAPIResponse.Payload = localVarHttpResponse.Body()

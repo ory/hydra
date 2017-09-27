@@ -17,18 +17,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/JwkSet'], factory);
+    define(['ApiClient', 'model/JsonWebKeySet'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('./JwkSet'));
+    module.exports = factory(require('../ApiClient'), require('./JsonWebKeySet'));
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer100Aplha1) {
       root.HydraOAuth2OpenIdConnectServer100Aplha1 = {};
     }
-    root.HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerJwkUpdateSet = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.JwkSet);
+    root.HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerJwkUpdateSet = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeySet);
   }
-}(this, function(ApiClient, JwkSet) {
+}(this, function(ApiClient, JsonWebKeySet) {
   'use strict';
 
 
@@ -65,7 +65,7 @@
       obj = obj || new exports();
 
       if (data.hasOwnProperty('Body')) {
-        obj['Body'] = JwkSet.constructFromObject(data['Body']);
+        obj['Body'] = JsonWebKeySet.constructFromObject(data['Body']);
       }
       if (data.hasOwnProperty('set')) {
         obj['set'] = ApiClient.convertToType(data['set'], 'String');
@@ -75,7 +75,7 @@
   }
 
   /**
-   * @member {module:model/JwkSet} Body
+   * @member {module:model/JsonWebKeySet} Body
    */
   exports.prototype['Body'] = undefined;
   /**

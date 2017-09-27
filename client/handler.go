@@ -37,7 +37,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.DELETE(ClientsHandlerPath+"/:id", h.Delete)
 }
 
-// swagger:route POST /clients oauth2 clients createOAuthClient
+// swagger:route POST /clients oAuth2 clients createOAuth2Client
 //
 // Creates an OAuth 2.0 Client
 //
@@ -77,7 +77,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //       oauth2: hydra.clients
 //
 //     Responses:
-//       200: oauthClient
+//       200: oAuth2Client
 //       401: genericError
 //       403: genericError
 //       500: genericError
@@ -122,7 +122,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	h.H.WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
-// swagger:route PUT /clients/{id} oauth2 clients updateOAuthClient
+// swagger:route PUT /clients/{id} oAuth2 clients updateOAuth2Client
 //
 // Updates an OAuth 2.0 Client
 //
@@ -162,7 +162,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 //       oauth2: hydra.clients
 //
 //     Responses:
-//       200: oauthClient
+//       200: oAuth2Client
 //       401: genericError
 //       403: genericError
 //       500: genericError
@@ -210,7 +210,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	h.H.WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
-// swagger:route GET /clients oauth2 clients listOAuthClients
+// swagger:route GET /clients oAuth2 clients listOAuth2Clients
 //
 // Lists OAuth 2.0 Clients
 //
@@ -238,7 +238,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //       oauth2: hydra.clients
 //
 //     Responses:
-//       200: clientsList
+//       200: oAuth2ClientList
 //       401: genericError
 //       403: genericError
 //       500: genericError
@@ -270,7 +270,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	h.H.Write(w, r, clients)
 }
 
-// swagger:route GET /clients/{id} oauth2 clients getOAuthClient
+// swagger:route GET /clients/{id} oAuth2 clients getOAuth2Client
 //
 // Fetches an OAuth 2.0 Client.
 //
@@ -309,7 +309,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 //       oauth2: hydra.clients
 //
 //     Responses:
-//       200: oauthClient
+//       200: oAuth2Client
 //       401: genericError
 //       403: genericError
 //       500: genericError
@@ -338,7 +338,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	h.H.Write(w, r, c)
 }
 
-// swagger:route DELETE /clients/{id} oauth2 clients deleteOAuthClient
+// swagger:route DELETE /clients/{id} oAuth2 clients deleteOAuth2Client
 //
 // Deletes an OAuth 2.0 Client
 //

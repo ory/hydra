@@ -40,9 +40,9 @@ func NewOpenidconnectApiWithBasePath(basePath string) *OpenidconnectApi {
  * Public JWKs
  * Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:hydra.openid.id-token:public\&quot;], \&quot;actions\&quot;: [\&quot;GET\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
- * @return *JwkSet
+ * @return *JsonWebKeySet
  */
-func (a OpenidconnectApi) WellKnown() (*JwkSet, *APIResponse, error) {
+func (a OpenidconnectApi) WellKnown() (*JsonWebKeySet, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Get")
 	// create path and map variables
@@ -82,7 +82,7 @@ func (a OpenidconnectApi) WellKnown() (*JwkSet, *APIResponse, error) {
 	if localVarHttpHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
-	var successPayload = new(JwkSet)
+	var successPayload = new(JsonWebKeySet)
 	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 
 	var localVarURL, _ = url.Parse(localVarPath)

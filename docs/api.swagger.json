@@ -41,12 +41,12 @@
           "https"
         ],
         "tags": [
-          "jwks",
+          "jsonWebKey",
           "oauth2",
           "openid-connect"
         ],
         "summary": "Public JWKs",
-        "operationId": "WellKnown",
+        "operationId": "wellKnown",
         "security": [
           {
             "oauth2": [
@@ -56,9 +56,9 @@
         ],
         "responses": {
           "200": {
-            "description": "jwkSet",
+            "description": "jsonWebKeySet",
             "schema": {
-              "$ref": "#/definitions/jwkSet"
+              "$ref": "#/definitions/jsonWebKeySet"
             }
           },
           "401": {
@@ -127,11 +127,11 @@
           "https"
         ],
         "tags": [
-          "oauth2",
+          "oAuth2",
           "clients"
         ],
         "summary": "Lists OAuth 2.0 Clients",
-        "operationId": "listOAuthClients",
+        "operationId": "listOAuth2Clients",
         "security": [
           {
             "oauth2": [
@@ -141,7 +141,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/clientsList"
+            "$ref": "#/responses/oAuth2ClientList"
           },
           "401": {
             "$ref": "#/responses/genericError"
@@ -167,11 +167,11 @@
           "https"
         ],
         "tags": [
-          "oauth2",
+          "oAuth2",
           "clients"
         ],
         "summary": "Creates an OAuth 2.0 Client",
-        "operationId": "createOAuthClient",
+        "operationId": "createOAuth2Client",
         "security": [
           {
             "oauth2": [
@@ -185,15 +185,15 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/oauthClient"
+              "$ref": "#/definitions/oAuth2Client"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "oauthClient",
+            "description": "oAuth2Client",
             "schema": {
-              "$ref": "#/definitions/oauthClient"
+              "$ref": "#/definitions/oAuth2Client"
             }
           },
           "401": {
@@ -222,11 +222,11 @@
           "https"
         ],
         "tags": [
-          "oauth2",
+          "oAuth2",
           "clients"
         ],
         "summary": "Fetches an OAuth 2.0 Client.",
-        "operationId": "getOAuthClient",
+        "operationId": "getOAuth2Client",
         "security": [
           {
             "oauth2": [
@@ -247,9 +247,9 @@
         ],
         "responses": {
           "200": {
-            "description": "oauthClient",
+            "description": "oAuth2Client",
             "schema": {
-              "$ref": "#/definitions/oauthClient"
+              "$ref": "#/definitions/oAuth2Client"
             }
           },
           "401": {
@@ -276,11 +276,11 @@
           "https"
         ],
         "tags": [
-          "oauth2",
+          "oAuth2",
           "clients"
         ],
         "summary": "Updates an OAuth 2.0 Client",
-        "operationId": "updateOAuthClient",
+        "operationId": "updateOAuth2Client",
         "security": [
           {
             "oauth2": [
@@ -301,15 +301,15 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/oauthClient"
+              "$ref": "#/definitions/oAuth2Client"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "oauthClient",
+            "description": "oAuth2Client",
             "schema": {
-              "$ref": "#/definitions/oauthClient"
+              "$ref": "#/definitions/oAuth2Client"
             }
           },
           "401": {
@@ -336,11 +336,11 @@
           "https"
         ],
         "tags": [
-          "oauth2",
+          "oAuth2",
           "clients"
         ],
         "summary": "Deletes an OAuth 2.0 Client",
-        "operationId": "deleteOAuthClient",
+        "operationId": "deleteOAuth2Client",
         "security": [
           {
             "oauth2": [
@@ -445,10 +445,10 @@
           "https"
         ],
         "tags": [
-          "jwks"
+          "jsonWebKey"
         ],
         "summary": "Retrieves a JSON Web Key Set matching the set",
-        "operationId": "getJwkSet",
+        "operationId": "getJsonWebKeySet",
         "security": [
           {
             "oauth2": [
@@ -468,9 +468,9 @@
         ],
         "responses": {
           "200": {
-            "description": "jwkSet",
+            "description": "jsonWebKeySet",
             "schema": {
-              "$ref": "#/definitions/jwkSet"
+              "$ref": "#/definitions/jsonWebKeySet"
             }
           },
           "401": {
@@ -497,10 +497,10 @@
           "https"
         ],
         "tags": [
-          "jwks"
+          "jsonWebKey"
         ],
         "summary": "Updates a JSON Web Key Set",
-        "operationId": "updateJwkSet",
+        "operationId": "updateJsonWebKeySet",
         "security": [
           {
             "oauth2": [
@@ -521,15 +521,15 @@
             "name": "Body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/jwkSet"
+              "$ref": "#/definitions/jsonWebKeySet"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "jwkSet",
+            "description": "jsonWebKeySet",
             "schema": {
-              "$ref": "#/definitions/jwkSet"
+              "$ref": "#/definitions/jsonWebKeySet"
             }
           },
           "401": {
@@ -556,10 +556,10 @@
           "https"
         ],
         "tags": [
-          "jwks"
+          "jsonWebKey"
         ],
         "summary": "Generate a new JSON Web Key for a JSON Web Key Set",
-        "operationId": "createJwkSetKey",
+        "operationId": "createJsonWebKeySet",
         "security": [
           {
             "oauth2": [
@@ -580,15 +580,15 @@
             "name": "Body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/createRequest"
+              "$ref": "#/definitions/createJsonWebKeySetPayload"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "jwkSet",
+            "description": "jsonWebKeySet",
             "schema": {
-              "$ref": "#/definitions/jwkSet"
+              "$ref": "#/definitions/jsonWebKeySet"
             }
           },
           "401": {
@@ -615,10 +615,10 @@
           "https"
         ],
         "tags": [
-          "jwks"
+          "jsonWebKey"
         ],
         "summary": "Delete a JSON Web Key",
-        "operationId": "deleteJwkSet",
+        "operationId": "deleteJsonWebKeySet",
         "security": [
           {
             "oauth2": [
@@ -666,10 +666,10 @@
           "https"
         ],
         "tags": [
-          "jwks"
+          "jsonWebKey"
         ],
         "summary": "Retrieves a JSON Web Key Set matching the set and the kid",
-        "operationId": "getJwkSetKey",
+        "operationId": "getJsonWebKey",
         "security": [
           {
             "oauth2": [
@@ -697,9 +697,9 @@
         ],
         "responses": {
           "200": {
-            "description": "jwkSet",
+            "description": "jsonWebKeySet",
             "schema": {
-              "$ref": "#/definitions/jwkSet"
+              "$ref": "#/definitions/jsonWebKeySet"
             }
           },
           "401": {
@@ -726,10 +726,10 @@
           "https"
         ],
         "tags": [
-          "jwks"
+          "jsonWebKey"
         ],
         "summary": "Updates a JSON Web Key",
-        "operationId": "updateJwkSetKey",
+        "operationId": "updateJsonWebKey",
         "security": [
           {
             "oauth2": [
@@ -758,15 +758,15 @@
             "name": "Body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/jwk"
+              "$ref": "#/definitions/jsonWebKey"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "jwk",
+            "description": "jsonWebKey",
             "schema": {
-              "$ref": "#/definitions/jwk"
+              "$ref": "#/definitions/jsonWebKey"
             }
           },
           "401": {
@@ -793,10 +793,10 @@
           "https"
         ],
         "tags": [
-          "jwks"
+          "jsonWebKey"
         ],
         "summary": "Delete a JSON Web Key",
-        "operationId": "deleteJwkSetKey",
+        "operationId": "deleteJsonWebKey",
         "security": [
           {
             "oauth2": [
@@ -1915,6 +1915,27 @@
       "title": "Firewall offers various validation strategies for access tokens.",
       "x-go-package": "github.com/ory/hydra/firewall"
     },
+    "Handler": {
+      "type": "object",
+      "properties": {
+        "Generators": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/KeyGenerator"
+          }
+        },
+        "H": {
+          "$ref": "#/definitions/Writer"
+        },
+        "Manager": {
+          "$ref": "#/definitions/Manager"
+        },
+        "W": {
+          "$ref": "#/definitions/Firewall"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/jwk"
+    },
     "Headers": {
       "description": "Headers is the jwt headers",
       "type": "object",
@@ -1962,9 +1983,23 @@
       },
       "x-go-package": "github.com/ory/hydra/vendor/github.com/ory/fosite/token/jwt"
     },
+    "KeyGenerator": {
+      "type": "object",
+      "x-go-package": "github.com/ory/hydra/jwk"
+    },
     "Manager": {
       "type": "object",
       "x-go-package": "github.com/ory/hydra/warden/group"
+    },
+    "RawMessage": {
+      "description": "It implements Marshaler and Unmarshaler and can\nbe used to delay JSON decoding or precompute a JSON encoding.",
+      "type": "array",
+      "title": "RawMessage is a raw encoded JSON value.",
+      "items": {
+        "type": "integer",
+        "format": "uint8"
+      },
+      "x-go-package": "encoding/json"
     },
     "Session": {
       "type": "object",
@@ -2050,6 +2085,11 @@
         }
       },
       "x-go-package": "github.com/ory/hydra/oauth2"
+    },
+    "Writer": {
+      "description": "Writer is a helper to write arbitrary data to a ResponseWriter",
+      "type": "object",
+      "x-go-package": "github.com/ory/hydra/vendor/github.com/ory/herodot"
     },
     "acceptConsentRequestPayload": {
       "type": "object",
@@ -2154,7 +2194,7 @@
       "x-go-name": "ConsentRequest",
       "x-go-package": "github.com/ory/hydra/oauth2"
     },
-    "createRequest": {
+    "createJsonWebKeySetPayload": {
       "type": "object",
       "required": [
         "alg",
@@ -2172,6 +2212,7 @@
           "x-go-name": "KeyID"
         }
       },
+      "x-go-name": "createRequest",
       "x-go-package": "github.com/ory/hydra/jwk"
     },
     "group": {
@@ -2195,7 +2236,20 @@
       "x-go-name": "Group",
       "x-go-package": "github.com/ory/hydra/warden/group"
     },
-    "jwk": {
+    "joseWebKeySetRequest": {
+      "type": "object",
+      "properties": {
+        "keys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RawMessage"
+          },
+          "x-go-name": "Keys"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/jwk"
+    },
+    "jsonWebKey": {
       "type": "object",
       "properties": {
         "alg": {
@@ -2278,14 +2332,14 @@
       "x-go-name": "swaggerJSONWebKey",
       "x-go-package": "github.com/ory/hydra/jwk"
     },
-    "jwkSet": {
+    "jsonWebKeySet": {
       "type": "object",
       "properties": {
         "keys": {
           "description": "The value of the \"keys\" parameter is an array of JWK values.  By\ndefault, the order of the JWK values within the array does not imply\nan order of preference among them, although applications of JWK Sets\ncan choose to assign a meaning to the order for their purposes, if\ndesired.",
           "type": "array",
           "items": {
-            "$ref": "#/definitions/jwk"
+            "$ref": "#/definitions/jsonWebKey"
           },
           "x-go-name": "Keys"
         }
@@ -2306,7 +2360,7 @@
       },
       "x-go-package": "github.com/ory/hydra/warden/group"
     },
-    "oauthClient": {
+    "oAuth2Client": {
       "type": "object",
       "title": "Client represents an OAuth 2.0 Client.",
       "properties": {
@@ -2496,24 +2550,7 @@
       },
       "x-go-package": "github.com/ory/hydra/policy"
     },
-    "swaggerJwkCreateSetKey": {
-      "type": "object",
-      "required": [
-        "set"
-      ],
-      "properties": {
-        "Body": {
-          "$ref": "#/definitions/createRequest"
-        },
-        "set": {
-          "description": "The set\nin: path",
-          "type": "string",
-          "x-go-name": "Set"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/jwk"
-    },
-    "swaggerJwkSetKeyQuery": {
+    "swaggerJsonWebKeyQuery": {
       "type": "object",
       "required": [
         "kid",
@@ -2524,6 +2561,23 @@
           "description": "The kid of the desired key\nin: path",
           "type": "string",
           "x-go-name": "KID"
+        },
+        "set": {
+          "description": "The set\nin: path",
+          "type": "string",
+          "x-go-name": "Set"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/jwk"
+    },
+    "swaggerJwkCreateSet": {
+      "type": "object",
+      "required": [
+        "set"
+      ],
+      "properties": {
+        "Body": {
+          "$ref": "#/definitions/createJsonWebKeySetPayload"
         },
         "set": {
           "description": "The set\nin: path",
@@ -2554,7 +2608,7 @@
       ],
       "properties": {
         "Body": {
-          "$ref": "#/definitions/jwkSet"
+          "$ref": "#/definitions/jsonWebKeySet"
         },
         "set": {
           "description": "The set\nin: path",
@@ -2572,7 +2626,7 @@
       ],
       "properties": {
         "Body": {
-          "$ref": "#/definitions/jwk"
+          "$ref": "#/definitions/jsonWebKey"
         },
         "kid": {
           "description": "The kid of the desired key\nin: path",
@@ -2788,15 +2842,6 @@
     }
   },
   "responses": {
-    "clientsList": {
-      "description": "A list of clients.",
-      "schema": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/oauthClient"
-        }
-      }
-    },
     "emptyResponse": {
       "description": "An empty response"
     },
@@ -2919,6 +2964,15 @@
       "description": "A policy",
       "schema": {
         "$ref": "#/definitions/policy"
+      }
+    },
+    "oAuth2ClientList": {
+      "description": "A list of clients.",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/oAuth2Client"
+        }
       }
     },
     "oauthConsentRequest": {

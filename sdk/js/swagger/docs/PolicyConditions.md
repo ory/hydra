@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.PolicyConditions
+# HydraOAuth2OpenIdConnectServer.PolicyConditions
 
 ## Properties
 Name | Type | Description | Notes

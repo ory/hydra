@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.JoseWebKeySetRequest
+# HydraOAuth2OpenIdConnectServer.JoseWebKeySetRequest
 
 ## Properties
 Name | Type | Description | Notes

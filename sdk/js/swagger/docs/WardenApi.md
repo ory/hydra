@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.WardenApi
+# HydraOAuth2OpenIdConnectServer.WardenApi
 
 All URIs are relative to *http://localhost*
 
@@ -24,19 +24,19 @@ The subject making the request needs to be assigned to a policy containing:  &#x
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
-var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.WardenApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
 
 var id = 789; // Number | The id of the group to modify.
 
 var opts = { 
-  'body': new HydraOAuth2OpenIdConnectServer100Aplha1.MembersRequest() // MembersRequest | 
+  'body': new HydraOAuth2OpenIdConnectServer.MembersRequest() // MembersRequest | 
 };
 
 var callback = function(error, data, response) {
@@ -79,14 +79,14 @@ The subject making the request needs to be assigned to a policy containing:  &#x
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
-var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.WardenApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
 
 var callback = function(error, data, response) {
   if (error) {
@@ -124,14 +124,14 @@ The subject making the request needs to be assigned to a policy containing:  &#x
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
-var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.WardenApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
 
 var id = 789; // Number | The id of the group to look up.
 
@@ -175,14 +175,14 @@ The subject making the request needs to be assigned to a policy containing:  &#x
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
-var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.WardenApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
 
 var opts = { 
   'member': 789 // Number | The id of the member to look up.
@@ -227,14 +227,14 @@ The subject making the request needs to be assigned to a policy containing:  &#x
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
-var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.WardenApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
 
 var id = 789; // Number | The id of the group to look up.
 
@@ -278,19 +278,19 @@ The subject making the request needs to be assigned to a policy containing:  &#x
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
-var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.WardenApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
 
 var id = 789; // Number | The id of the group to modify.
 
 var opts = { 
-  'body': new HydraOAuth2OpenIdConnectServer100Aplha1.MembersRequest() // MembersRequest | 
+  'body': new HydraOAuth2OpenIdConnectServer.MembersRequest() // MembersRequest | 
 };
 
 var callback = function(error, data, response) {
@@ -333,17 +333,17 @@ Checks if an arbitrary subject is allowed to perform an action on a resource. Th
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
-var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.WardenApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
 
 var opts = { 
-  'body': new HydraOAuth2OpenIdConnectServer100Aplha1.AllowedRequest() // AllowedRequest | 
+  'body': new HydraOAuth2OpenIdConnectServer.AllowedRequest() // AllowedRequest | 
 };
 
 var callback = function(error, data, response) {
@@ -385,17 +385,17 @@ Checks if a token is valid and if the token owner is allowed to perform an actio
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
-var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.WardenApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
 
 var opts = { 
-  'body': new HydraOAuth2OpenIdConnectServer100Aplha1.WardenTokenAllowedBody() // WardenTokenAllowedBody | 
+  'body': new HydraOAuth2OpenIdConnectServer.WardenTokenAllowedBody() // WardenTokenAllowedBody | 
 };
 
 var callback = function(error, data, response) {

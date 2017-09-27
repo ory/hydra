@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerWardenAllowedParameters
+# HydraOAuth2OpenIdConnectServer.SwaggerWardenAllowedParameters
 
 ## Properties
 Name | Type | Description | Notes

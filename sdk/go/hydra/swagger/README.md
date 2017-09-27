@@ -22,14 +22,6 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*ClientsApi* | [**CreateOAuth2Client**](docs/ClientsApi.md#createoauth2client) | **Post** /clients | Creates an OAuth 2.0 Client
-*ClientsApi* | [**DeleteOAuth2Client**](docs/ClientsApi.md#deleteoauth2client) | **Delete** /clients/{id} | Deletes an OAuth 2.0 Client
-*ClientsApi* | [**GetOAuth2Client**](docs/ClientsApi.md#getoauth2client) | **Get** /clients/{id} | Fetches an OAuth 2.0 Client.
-*ClientsApi* | [**ListOAuth2Clients**](docs/ClientsApi.md#listoauth2clients) | **Get** /clients | Lists OAuth 2.0 Clients
-*ClientsApi* | [**UpdateOAuth2Client**](docs/ClientsApi.md#updateoauth2client) | **Put** /clients/{id} | Updates an OAuth 2.0 Client
-*ConsentApi* | [**AcceptOAuth2ConsentRequest**](docs/ConsentApi.md#acceptoauth2consentrequest) | **Patch** /oauth2/consent/requests/{id}/accept | Accept a consent request
-*ConsentApi* | [**GetOAuth2ConsentRequest**](docs/ConsentApi.md#getoauth2consentrequest) | **Get** /oauth2/consent/requests/{id} | Receive consent request information
-*ConsentApi* | [**RejectOAuth2ConsentRequest**](docs/ConsentApi.md#rejectoauth2consentrequest) | **Patch** /oauth2/consent/requests/{id}/reject | Reject a consent request
 *GroupsApi* | [**AddMembersToGroup**](docs/GroupsApi.md#addmemberstogroup) | **Post** /warden/groups/{id}/members | Add members to a group
 *GroupsApi* | [**CreateGroup**](docs/GroupsApi.md#creategroup) | **Post** /warden/groups | Create a group
 *GroupsApi* | [**DeleteGroup**](docs/GroupsApi.md#deletegroup) | **Delete** /warden/groups/{id} | Delete a group by id
@@ -38,34 +30,6 @@ Class | Method | HTTP request | Description
 *GroupsApi* | [**RemoveMembersFromGroup**](docs/GroupsApi.md#removemembersfromgroup) | **Delete** /warden/groups/{id}/members | Remove members from a group
 *HealthApi* | [**GetHealthStatus**](docs/HealthApi.md#gethealthstatus) | **Get** /health | Check health status of instance
 *HealthApi* | [**GetInstanceStatistics**](docs/HealthApi.md#getinstancestatistics) | **Get** /health/stats | Show instance statistics
-*HydraApi* | [**AcceptOAuth2ConsentRequest**](docs/HydraApi.md#acceptoauth2consentrequest) | **Patch** /oauth2/consent/requests/{id}/accept | Accept a consent request
-*HydraApi* | [**CreateJsonWebKeySet**](docs/HydraApi.md#createjsonwebkeyset) | **Post** /keys/{set} | Generate a new JSON Web Key for a JSON Web Key Set
-*HydraApi* | [**CreateOAuth2Client**](docs/HydraApi.md#createoauth2client) | **Post** /clients | Creates an OAuth 2.0 Client
-*HydraApi* | [**CreatePolicy**](docs/HydraApi.md#createpolicy) | **Post** /policies | Create an access control policy
-*HydraApi* | [**DeleteJsonWebKey**](docs/HydraApi.md#deletejsonwebkey) | **Delete** /keys/{set}/{kid} | Delete a JSON Web Key
-*HydraApi* | [**DeleteJsonWebKeySet**](docs/HydraApi.md#deletejsonwebkeyset) | **Delete** /keys/{set} | Delete a JSON Web Key
-*HydraApi* | [**DeleteOAuth2Client**](docs/HydraApi.md#deleteoauth2client) | **Delete** /clients/{id} | Deletes an OAuth 2.0 Client
-*HydraApi* | [**DeletePolicy**](docs/HydraApi.md#deletepolicy) | **Delete** /policies/{id} | Delete an access control policy
-*HydraApi* | [**GetHealthStatus**](docs/HydraApi.md#gethealthstatus) | **Get** /health | Check health status of instance
-*HydraApi* | [**GetInstanceStatistics**](docs/HydraApi.md#getinstancestatistics) | **Get** /health/stats | Show instance statistics
-*HydraApi* | [**GetJsonWebKey**](docs/HydraApi.md#getjsonwebkey) | **Get** /keys/{set}/{kid} | Retrieves a JSON Web Key Set matching the set and the kid
-*HydraApi* | [**GetJsonWebKeySet**](docs/HydraApi.md#getjsonwebkeyset) | **Get** /keys/{set} | Retrieves a JSON Web Key Set matching the set
-*HydraApi* | [**GetOAuth2Client**](docs/HydraApi.md#getoauth2client) | **Get** /clients/{id} | Fetches an OAuth 2.0 Client.
-*HydraApi* | [**GetOAuth2ConsentRequest**](docs/HydraApi.md#getoauth2consentrequest) | **Get** /oauth2/consent/requests/{id} | Receive consent request information
-*HydraApi* | [**GetPolicy**](docs/HydraApi.md#getpolicy) | **Get** /policies/{id} | Get an access control policy
-*HydraApi* | [**GetWellKnown**](docs/HydraApi.md#getwellknown) | **Get** /.well-known/openid-configuration | Server well known configuration
-*HydraApi* | [**IntrospectOAuth2Token**](docs/HydraApi.md#introspectoauth2token) | **Post** /oauth2/introspect | Introspect an OAuth2 access token
-*HydraApi* | [**ListOAuth2Clients**](docs/HydraApi.md#listoauth2clients) | **Get** /clients | Lists OAuth 2.0 Clients
-*HydraApi* | [**ListPolicies**](docs/HydraApi.md#listpolicies) | **Get** /policies | List access control policies
-*HydraApi* | [**OauthAuth**](docs/HydraApi.md#oauthauth) | **Get** /oauth2/auth | The OAuth 2.0 Auth endpoint
-*HydraApi* | [**OauthToken**](docs/HydraApi.md#oauthtoken) | **Post** /oauth2/token | The OAuth 2.0 Token endpoint
-*HydraApi* | [**RejectOAuth2ConsentRequest**](docs/HydraApi.md#rejectoauth2consentrequest) | **Patch** /oauth2/consent/requests/{id}/reject | Reject a consent request
-*HydraApi* | [**RevokeOAuth2Token**](docs/HydraApi.md#revokeoauth2token) | **Post** /oauth2/revoke | Revoke an OAuth2 access token
-*HydraApi* | [**UpdateJsonWebKey**](docs/HydraApi.md#updatejsonwebkey) | **Put** /keys/{set}/{kid} | Updates a JSON Web Key
-*HydraApi* | [**UpdateJsonWebKeySet**](docs/HydraApi.md#updatejsonwebkeyset) | **Put** /keys/{set} | Updates a JSON Web Key Set
-*HydraApi* | [**UpdateOAuth2Client**](docs/HydraApi.md#updateoauth2client) | **Put** /clients/{id} | Updates an OAuth 2.0 Client
-*HydraApi* | [**UpdatePolicy**](docs/HydraApi.md#updatepolicy) | **Put** /policies/{id} | Update an access control policy
-*HydraApi* | [**WellKnown**](docs/HydraApi.md#wellknown) | **Get** /.well-known/jwks.json | Public JWKs
 *JsonWebKeyApi* | [**CreateJsonWebKeySet**](docs/JsonWebKeyApi.md#createjsonwebkeyset) | **Post** /keys/{set} | Generate a new JSON Web Key for a JSON Web Key Set
 *JsonWebKeyApi* | [**DeleteJsonWebKey**](docs/JsonWebKeyApi.md#deletejsonwebkey) | **Delete** /keys/{set}/{kid} | Delete a JSON Web Key
 *JsonWebKeyApi* | [**DeleteJsonWebKeySet**](docs/JsonWebKeyApi.md#deletejsonwebkeyset) | **Delete** /keys/{set} | Delete a JSON Web Key
@@ -73,7 +37,6 @@ Class | Method | HTTP request | Description
 *JsonWebKeyApi* | [**GetJsonWebKeySet**](docs/JsonWebKeyApi.md#getjsonwebkeyset) | **Get** /keys/{set} | Retrieves a JSON Web Key Set matching the set
 *JsonWebKeyApi* | [**UpdateJsonWebKey**](docs/JsonWebKeyApi.md#updatejsonwebkey) | **Put** /keys/{set}/{kid} | Updates a JSON Web Key
 *JsonWebKeyApi* | [**UpdateJsonWebKeySet**](docs/JsonWebKeyApi.md#updatejsonwebkeyset) | **Put** /keys/{set} | Updates a JSON Web Key Set
-*JsonWebKeyApi* | [**WellKnown**](docs/JsonWebKeyApi.md#wellknown) | **Get** /.well-known/jwks.json | Public JWKs
 *OAuth2Api* | [**AcceptOAuth2ConsentRequest**](docs/OAuth2Api.md#acceptoauth2consentrequest) | **Patch** /oauth2/consent/requests/{id}/accept | Accept a consent request
 *OAuth2Api* | [**CreateOAuth2Client**](docs/OAuth2Api.md#createoauth2client) | **Post** /clients | Creates an OAuth 2.0 Client
 *OAuth2Api* | [**DeleteOAuth2Client**](docs/OAuth2Api.md#deleteoauth2client) | **Delete** /clients/{id} | Deletes an OAuth 2.0 Client
@@ -88,8 +51,6 @@ Class | Method | HTTP request | Description
 *OAuth2Api* | [**RevokeOAuth2Token**](docs/OAuth2Api.md#revokeoauth2token) | **Post** /oauth2/revoke | Revoke an OAuth2 access token
 *OAuth2Api* | [**UpdateOAuth2Client**](docs/OAuth2Api.md#updateoauth2client) | **Put** /clients/{id} | Updates an OAuth 2.0 Client
 *Oauth2Api* | [**WellKnown**](docs/Oauth2Api.md#wellknown) | **Get** /.well-known/jwks.json | Public JWKs
-*OpenidconnectApi* | [**GetWellKnown**](docs/OpenidconnectApi.md#getwellknown) | **Get** /.well-known/openid-configuration | Server well known configuration
-*OpenidconnectApi* | [**WellKnown**](docs/OpenidconnectApi.md#wellknown) | **Get** /.well-known/jwks.json | Public JWKs
 *PolicyApi* | [**CreatePolicy**](docs/PolicyApi.md#createpolicy) | **Post** /policies | Create an access control policy
 *PolicyApi* | [**DeletePolicy**](docs/PolicyApi.md#deletepolicy) | **Delete** /policies/{id} | Delete an access control policy
 *PolicyApi* | [**GetPolicy**](docs/PolicyApi.md#getpolicy) | **Get** /policies/{id} | Get an access control policy

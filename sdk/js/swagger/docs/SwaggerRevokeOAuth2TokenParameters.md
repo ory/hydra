@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerRevokeOAuth2TokenParameters
+# HydraOAuth2OpenIdConnectServer.SwaggerRevokeOAuth2TokenParameters
 
 ## Properties
 Name | Type | Description | Notes

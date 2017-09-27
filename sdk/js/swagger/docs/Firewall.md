@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.Firewall
+# HydraOAuth2OpenIdConnectServer.Firewall
 
 ## Properties
 Name | Type | Description | Notes

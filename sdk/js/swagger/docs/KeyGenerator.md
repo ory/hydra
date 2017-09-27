@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.KeyGenerator
+# HydraOAuth2OpenIdConnectServer.KeyGenerator
 
 ## Properties
 Name | Type | Description | Notes

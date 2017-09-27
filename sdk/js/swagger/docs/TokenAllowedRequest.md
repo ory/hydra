@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.TokenAllowedRequest
+# HydraOAuth2OpenIdConnectServer.TokenAllowedRequest
 
 ## Properties
 Name | Type | Description | Notes

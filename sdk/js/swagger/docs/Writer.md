@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.Writer
+# HydraOAuth2OpenIdConnectServer.Writer
 
 ## Properties
 Name | Type | Description | Notes

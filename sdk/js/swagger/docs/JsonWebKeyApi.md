@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeyApi
+# HydraOAuth2OpenIdConnectServer.JsonWebKeyApi
 
 All URIs are relative to *http://localhost*
 
@@ -11,7 +11,6 @@ Method | HTTP request | Description
 [**getJsonWebKeySet**](JsonWebKeyApi.md#getJsonWebKeySet) | **GET** /keys/{set} | Retrieves a JSON Web Key Set matching the set
 [**updateJsonWebKey**](JsonWebKeyApi.md#updateJsonWebKey) | **PUT** /keys/{set}/{kid} | Updates a JSON Web Key
 [**updateJsonWebKeySet**](JsonWebKeyApi.md#updateJsonWebKeySet) | **PUT** /keys/{set} | Updates a JSON Web Key Set
-[**wellKnown**](JsonWebKeyApi.md#wellKnown) | **GET** /.well-known/jwks.json | Public JWKs
 
 
 <a name="createJsonWebKeySet"></a>
@@ -24,19 +23,19 @@ If the JSON Web Key Set does not exist yet, one will be created.  The subject ma
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
-var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeyApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer.JsonWebKeyApi();
 
 var set = "set_example"; // String | The set
 
 var opts = { 
-  'body': new HydraOAuth2OpenIdConnectServer100Aplha1.CreateJsonWebKeySetPayload() // CreateJsonWebKeySetPayload | 
+  'body': new HydraOAuth2OpenIdConnectServer.CreateJsonWebKeySetPayload() // CreateJsonWebKeySetPayload | 
 };
 
 var callback = function(error, data, response) {
@@ -79,14 +78,14 @@ The subject making the request needs to be assigned to a policy containing:  &#x
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
-var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeyApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer.JsonWebKeyApi();
 
 var kid = "kid_example"; // String | The kid of the desired key
 
@@ -133,14 +132,14 @@ The subject making the request needs to be assigned to a policy containing:  &#x
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
-var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeyApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer.JsonWebKeyApi();
 
 var set = "set_example"; // String | The set
 
@@ -184,14 +183,14 @@ The subject making the request needs to be assigned to a policy containing:  &#x
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
-var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeyApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer.JsonWebKeyApi();
 
 var kid = "kid_example"; // String | The kid of the desired key
 
@@ -238,14 +237,14 @@ The subject making the request needs to be assigned to a policy containing:  &#x
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
-var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeyApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer.JsonWebKeyApi();
 
 var set = "set_example"; // String | The set
 
@@ -289,21 +288,21 @@ Use this method if you do not want to let Hydra generate the JWKs for you, but i
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
-var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeyApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer.JsonWebKeyApi();
 
 var kid = "kid_example"; // String | The kid of the desired key
 
 var set = "set_example"; // String | The set
 
 var opts = { 
-  'body': new HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKey() // JsonWebKey | 
+  'body': new HydraOAuth2OpenIdConnectServer.JsonWebKey() // JsonWebKey | 
 };
 
 var callback = function(error, data, response) {
@@ -347,19 +346,19 @@ Use this method if you do not want to let Hydra generate the JWKs for you, but i
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
-var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeyApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer.JsonWebKeyApi();
 
 var set = "set_example"; // String | The set
 
 var opts = { 
-  'body': new HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeySet() // JsonWebKeySet | 
+  'body': new HydraOAuth2OpenIdConnectServer.JsonWebKeySet() // JsonWebKeySet | 
 };
 
 var callback = function(error, data, response) {
@@ -378,51 +377,6 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **set** | **String**| The set | 
  **body** | [**JsonWebKeySet**](JsonWebKeySet.md)|  | [optional] 
-
-### Return type
-
-[**JsonWebKeySet**](JsonWebKeySet.md)
-
-### Authorization
-
-[oauth2](../README.md#oauth2)
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
-<a name="wellKnown"></a>
-# **wellKnown**
-> JsonWebKeySet wellKnown()
-
-Public JWKs
-
-Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:hydra.openid.id-token:public\&quot;], \&quot;actions\&quot;: [\&quot;GET\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
-
-### Example
-```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
-var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
-
-// Configure OAuth2 access token for authorization: oauth2
-var oauth2 = defaultClient.authentications['oauth2'];
-oauth2.accessToken = 'YOUR ACCESS TOKEN';
-
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeyApi();
-
-var callback = function(error, data, response) {
-  if (error) {
-    console.error(error);
-  } else {
-    console.log('API called successfully. Returned data: ' + data);
-  }
-};
-apiInstance.wellKnown(callback);
-```
-
-### Parameters
-This endpoint does not need any parameter.
 
 ### Return type
 

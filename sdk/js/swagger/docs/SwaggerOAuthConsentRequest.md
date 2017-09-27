@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerOAuthConsentRequest
+# HydraOAuth2OpenIdConnectServer.SwaggerOAuthConsentRequest
 
 ## Properties
 Name | Type | Description | Notes

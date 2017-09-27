@@ -1,5 +1,5 @@
 /**
- * Hydra OAuth2 & OpenID Connect Server (1.0.0-aplha1)
+ * Hydra OAuth2 & OpenID Connect Server
  * Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/   Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure. Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to. Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.   The official repository is located at https://github.com/ory/hydra   ### ATTENTION - IMPORTANT NOTE   The swagger generator used to create this documentation does currently not support example responses. To see request and response payloads click on **\"Show JSON schema\"**: ![Enable JSON Schema on Apiary](https://storage.googleapis.com/ory.am/hydra/json-schema.png)
  *
  * OpenAPI spec version: Latest
@@ -23,15 +23,15 @@
     factory(require('expect.js'), require('../../src/index'));
   } else {
     // Browser globals (root is window)
-    factory(root.expect, root.HydraOAuth2OpenIdConnectServer100Aplha1);
+    factory(root.expect, root.HydraOAuth2OpenIdConnectServer);
   }
-}(this, function(expect, HydraOAuth2OpenIdConnectServer100Aplha1) {
+}(this, function(expect, HydraOAuth2OpenIdConnectServer) {
   'use strict';
 
   var instance;
 
   beforeEach(function() {
-    instance = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2001();
+    instance = new HydraOAuth2OpenIdConnectServer.InlineResponse2001();
   });
 
   var getProperty = function(object, getter, property) {
@@ -53,43 +53,43 @@
   describe('InlineResponse2001', function() {
     it('should create an instance of InlineResponse2001', function() {
       // uncomment below and update the code to test InlineResponse2001
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2001();
-      //expect(instance).to.be.a(HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2001);
+      //var instane = new HydraOAuth2OpenIdConnectServer.InlineResponse2001();
+      //expect(instance).to.be.a(HydraOAuth2OpenIdConnectServer.InlineResponse2001);
     });
 
     it('should have the property accessToken (base name: "access_token")', function() {
       // uncomment below and update the code to test the property accessToken
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2001();
+      //var instane = new HydraOAuth2OpenIdConnectServer.InlineResponse2001();
       //expect(instance).to.be();
     });
 
     it('should have the property expiresIn (base name: "expires_in")', function() {
       // uncomment below and update the code to test the property expiresIn
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2001();
+      //var instane = new HydraOAuth2OpenIdConnectServer.InlineResponse2001();
       //expect(instance).to.be();
     });
 
     it('should have the property idToken (base name: "id_token")', function() {
       // uncomment below and update the code to test the property idToken
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2001();
+      //var instane = new HydraOAuth2OpenIdConnectServer.InlineResponse2001();
       //expect(instance).to.be();
     });
 
     it('should have the property refreshToken (base name: "refresh_token")', function() {
       // uncomment below and update the code to test the property refreshToken
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2001();
+      //var instane = new HydraOAuth2OpenIdConnectServer.InlineResponse2001();
       //expect(instance).to.be();
     });
 
     it('should have the property scope (base name: "scope")', function() {
       // uncomment below and update the code to test the property scope
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2001();
+      //var instane = new HydraOAuth2OpenIdConnectServer.InlineResponse2001();
       //expect(instance).to.be();
     });
 
     it('should have the property tokenType (base name: "token_type")', function() {
       // uncomment below and update the code to test the property tokenType
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2001();
+      //var instane = new HydraOAuth2OpenIdConnectServer.InlineResponse2001();
       //expect(instance).to.be();
     });
 

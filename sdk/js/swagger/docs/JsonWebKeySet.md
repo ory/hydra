@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeySet
+# HydraOAuth2OpenIdConnectServer.JsonWebKeySet
 
 ## Properties
 Name | Type | Description | Notes

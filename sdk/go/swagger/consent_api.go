@@ -41,11 +41,11 @@ func NewConsentApiWithBasePath(basePath string) *ConsentApi {
  * Accept a consent request
  * Call this endpoint to accept a consent request. This usually happens when a user agrees to give access rights to an application.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;accept\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
+ * @param id
  * @param body
- * @param id The id of the OAuth 2.0 Consent Request.
  * @return void
  */
-func (a ConsentApi) AcceptConsentRequest(body AcceptConsentRequestPayload, id string) (*APIResponse, error) {
+func (a ConsentApi) AcceptOAuth2ConsentRequest(id string, body AcceptConsentRequestPayload) (*APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Patch")
 	// create path and map variables
@@ -92,7 +92,7 @@ func (a ConsentApi) AcceptConsentRequest(body AcceptConsentRequestPayload, id st
 
 	var localVarURL, _ = url.Parse(localVarPath)
 	localVarURL.RawQuery = localVarQueryParams.Encode()
-	var localVarAPIResponse = &APIResponse{Operation: "AcceptConsentRequest", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
+	var localVarAPIResponse = &APIResponse{Operation: "AcceptOAuth2ConsentRequest", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
 	if localVarHttpResponse != nil {
 		localVarAPIResponse.Response = localVarHttpResponse.RawResponse
 		localVarAPIResponse.Payload = localVarHttpResponse.Body()
@@ -109,9 +109,9 @@ func (a ConsentApi) AcceptConsentRequest(body AcceptConsentRequestPayload, id st
  * Call this endpoint to receive information on consent requests.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
  * @param id The id of the OAuth 2.0 Consent Request.
- * @return *ConsentRequest
+ * @return *OAuth2consentRequest
  */
-func (a ConsentApi) GetConsentRequest(id string) (*ConsentRequest, *APIResponse, error) {
+func (a ConsentApi) GetOAuth2ConsentRequest(id string) (*OAuth2consentRequest, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Get")
 	// create path and map variables
@@ -152,12 +152,12 @@ func (a ConsentApi) GetConsentRequest(id string) (*ConsentRequest, *APIResponse,
 	if localVarHttpHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
-	var successPayload = new(ConsentRequest)
+	var successPayload = new(OAuth2consentRequest)
 	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 
 	var localVarURL, _ = url.Parse(localVarPath)
 	localVarURL.RawQuery = localVarQueryParams.Encode()
-	var localVarAPIResponse = &APIResponse{Operation: "GetConsentRequest", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
+	var localVarAPIResponse = &APIResponse{Operation: "GetOAuth2ConsentRequest", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
 	if localVarHttpResponse != nil {
 		localVarAPIResponse.Response = localVarHttpResponse.RawResponse
 		localVarAPIResponse.Payload = localVarHttpResponse.Body()
@@ -174,11 +174,11 @@ func (a ConsentApi) GetConsentRequest(id string) (*ConsentRequest, *APIResponse,
  * Reject a consent request
  * Call this endpoint to reject a consent request. This usually happens when a user denies access rights to an application.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;reject\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
+ * @param id
  * @param body
- * @param id The id of the OAuth 2.0 Consent Request.
  * @return void
  */
-func (a ConsentApi) RejectConsentRequest(body RejectConsentRequestPayload, id string) (*APIResponse, error) {
+func (a ConsentApi) RejectOAuth2ConsentRequest(id string, body RejectConsentRequestPayload) (*APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Patch")
 	// create path and map variables
@@ -225,7 +225,7 @@ func (a ConsentApi) RejectConsentRequest(body RejectConsentRequestPayload, id st
 
 	var localVarURL, _ = url.Parse(localVarPath)
 	localVarURL.RawQuery = localVarQueryParams.Encode()
-	var localVarAPIResponse = &APIResponse{Operation: "RejectConsentRequest", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
+	var localVarAPIResponse = &APIResponse{Operation: "RejectOAuth2ConsentRequest", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
 	if localVarHttpResponse != nil {
 		localVarAPIResponse.Response = localVarHttpResponse.RawResponse
 		localVarAPIResponse.Payload = localVarHttpResponse.Body()

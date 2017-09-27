@@ -98,7 +98,7 @@
   }
 
   /**
-   * Boolean indicator of whether or not the presented token is currently active.  The specifics of a token's \"active\" state will vary depending on the implementation of the authorization server and the information it keeps about its tokens, but a \"true\" value return for the \"active\" property will generally indicate that a given token has been issued by this authorization server, has not been revoked by the resource owner, and is within its given time window of validity (e.g., after its issuance time and before its expiration time).
+   * Boolean indicator of whether or not the presented token is currently active. An active token is neither refreshed nor revoked.
    * @member {Boolean} active
    */
   exports.prototype['active'] = undefined;

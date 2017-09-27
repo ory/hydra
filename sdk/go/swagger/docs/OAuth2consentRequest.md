@@ -1,4 +1,4 @@
-# ConsentRequest
+# OAuth2consentRequest
 
 ## Properties
 Name | Type | Description | Notes

@@ -49,6 +49,45 @@
 
 
     /**
+     * Callback function to receive the result of the getWellKnown operation.
+     * @callback module:api/OpenidconnectApi~getWellKnownCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/WellKnown} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Server well known configuration
+     * For more information, please refer to https://openid.net/specs/openid-connect-discovery-1_0.html
+     * @param {module:api/OpenidconnectApi~getWellKnownCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/WellKnown}
+     */
+    this.getWellKnown = function(callback) {
+      var postBody = null;
+
+
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = [];
+      var contentTypes = ['application/json', 'application/x-www-form-urlencoded'];
+      var accepts = ['application/json'];
+      var returnType = WellKnown;
+
+      return this.apiClient.callApi(
+        '/.well-known/openid-configuration', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+
+    /**
      * Callback function to receive the result of the wellKnown operation.
      * @callback module:api/OpenidconnectApi~wellKnownCallback
      * @param {String} error Error message, if any.
@@ -82,45 +121,6 @@
 
       return this.apiClient.callApi(
         '/.well-known/jwks.json', 'GET',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
-    }
-
-    /**
-     * Callback function to receive the result of the wellKnownHandler operation.
-     * @callback module:api/OpenidconnectApi~wellKnownHandlerCallback
-     * @param {String} error Error message, if any.
-     * @param {module:model/WellKnown} data The data returned by the service call.
-     * @param {String} response The complete HTTP response.
-     */
-
-    /**
-     * Server well known configuration
-     * For more information, please refer to https://openid.net/specs/openid-connect-discovery-1_0.html
-     * @param {module:api/OpenidconnectApi~wellKnownHandlerCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/WellKnown}
-     */
-    this.wellKnownHandler = function(callback) {
-      var postBody = null;
-
-
-      var pathParams = {
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
-
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/x-www-form-urlencoded'];
-      var accepts = ['application/json'];
-      var returnType = WellKnown;
-
-      return this.apiClient.callApi(
-        '/.well-known/openid-configuration', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );

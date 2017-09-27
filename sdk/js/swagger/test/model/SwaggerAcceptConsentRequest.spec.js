@@ -31,7 +31,7 @@
   var instance;
 
   beforeEach(function() {
-    instance = new HydraOAuth2OpenIdConnectServer100Aplha1.ConsentRequest();
+    instance = new HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerAcceptConsentRequest();
   });
 
   var getProperty = function(object, getter, property) {
@@ -50,34 +50,16 @@
       object[property] = value;
   }
 
-  describe('ConsentRequest', function() {
-    it('should create an instance of ConsentRequest', function() {
-      // uncomment below and update the code to test ConsentRequest
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.ConsentRequest();
-      //expect(instance).to.be.a(HydraOAuth2OpenIdConnectServer100Aplha1.ConsentRequest);
+  describe('SwaggerAcceptConsentRequest', function() {
+    it('should create an instance of SwaggerAcceptConsentRequest', function() {
+      // uncomment below and update the code to test SwaggerAcceptConsentRequest
+      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerAcceptConsentRequest();
+      //expect(instance).to.be.a(HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerAcceptConsentRequest);
     });
 
-    it('should have the property audience (base name: "audience")', function() {
-      // uncomment below and update the code to test the property audience
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.ConsentRequest();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property id (base name: "id")', function() {
-      // uncomment below and update the code to test the property id
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.ConsentRequest();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property redirectUrl (base name: "redirectUrl")', function() {
-      // uncomment below and update the code to test the property redirectUrl
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.ConsentRequest();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property requestedScopes (base name: "requestedScopes")', function() {
-      // uncomment below and update the code to test the property requestedScopes
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.ConsentRequest();
+    it('should have the property body (base name: "Body")', function() {
+      // uncomment below and update the code to test the property body
+      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerAcceptConsentRequest();
       //expect(instance).to.be();
     });
 

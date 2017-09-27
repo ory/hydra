@@ -4,14 +4,14 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**acceptConsentRequest**](ConsentApi.md#acceptConsentRequest) | **PATCH** /oauth2/consent/requests/{id}/accept | Accept a consent request
-[**getConsentRequest**](ConsentApi.md#getConsentRequest) | **GET** /oauth2/consent/requests/{id} | Receive consent request information
-[**rejectConsentRequest**](ConsentApi.md#rejectConsentRequest) | **PATCH** /oauth2/consent/requests/{id}/reject | Reject a consent request
+[**acceptOAuth2ConsentRequest**](ConsentApi.md#acceptOAuth2ConsentRequest) | **PATCH** /oauth2/consent/requests/{id}/accept | Accept a consent request
+[**getOAuth2ConsentRequest**](ConsentApi.md#getOAuth2ConsentRequest) | **GET** /oauth2/consent/requests/{id} | Receive consent request information
+[**rejectOAuth2ConsentRequest**](ConsentApi.md#rejectOAuth2ConsentRequest) | **PATCH** /oauth2/consent/requests/{id}/reject | Reject a consent request
 
 
-<a name="acceptConsentRequest"></a>
-# **acceptConsentRequest**
-> acceptConsentRequest(body, id)
+<a name="acceptOAuth2ConsentRequest"></a>
+# **acceptOAuth2ConsentRequest**
+> acceptOAuth2ConsentRequest(id, body)
 
 Accept a consent request
 
@@ -28,9 +28,9 @@ oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
 var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.ConsentApi();
 
-var body = new HydraOAuth2OpenIdConnectServer100Aplha1.AcceptConsentRequestPayload(); // AcceptConsentRequestPayload | 
+var id = "id_example"; // String | 
 
-var id = "id_example"; // String | The id of the OAuth 2.0 Consent Request.
+var body = new HydraOAuth2OpenIdConnectServer100Aplha1.AcceptConsentRequestPayload(); // AcceptConsentRequestPayload | 
 
 
 var callback = function(error, data, response) {
@@ -40,15 +40,15 @@ var callback = function(error, data, response) {
     console.log('API called successfully.');
   }
 };
-apiInstance.acceptConsentRequest(body, id, callback);
+apiInstance.acceptOAuth2ConsentRequest(id, body, callback);
 ```
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
+ **id** | **String**|  | 
  **body** | [**AcceptConsentRequestPayload**](AcceptConsentRequestPayload.md)|  | 
- **id** | **String**| The id of the OAuth 2.0 Consent Request. | 
 
 ### Return type
 
@@ -63,9 +63,9 @@ null (empty response body)
  - **Content-Type**: application/json
  - **Accept**: application/json
 
-<a name="getConsentRequest"></a>
-# **getConsentRequest**
-> ConsentRequest getConsentRequest(id)
+<a name="getOAuth2ConsentRequest"></a>
+# **getOAuth2ConsentRequest**
+> OAuth2consentRequest getOAuth2ConsentRequest(id)
 
 Receive consent request information
 
@@ -92,7 +92,7 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-apiInstance.getConsentRequest(id, callback);
+apiInstance.getOAuth2ConsentRequest(id, callback);
 ```
 
 ### Parameters
@@ -103,7 +103,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**ConsentRequest**](ConsentRequest.md)
+[**OAuth2consentRequest**](OAuth2consentRequest.md)
 
 ### Authorization
 
@@ -114,9 +114,9 @@ Name | Type | Description  | Notes
  - **Content-Type**: application/json
  - **Accept**: application/json
 
-<a name="rejectConsentRequest"></a>
-# **rejectConsentRequest**
-> rejectConsentRequest(body, id)
+<a name="rejectOAuth2ConsentRequest"></a>
+# **rejectOAuth2ConsentRequest**
+> rejectOAuth2ConsentRequest(id, body)
 
 Reject a consent request
 
@@ -133,9 +133,9 @@ oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
 var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.ConsentApi();
 
-var body = new HydraOAuth2OpenIdConnectServer100Aplha1.RejectConsentRequestPayload(); // RejectConsentRequestPayload | 
+var id = "id_example"; // String | 
 
-var id = "id_example"; // String | The id of the OAuth 2.0 Consent Request.
+var body = new HydraOAuth2OpenIdConnectServer100Aplha1.RejectConsentRequestPayload(); // RejectConsentRequestPayload | 
 
 
 var callback = function(error, data, response) {
@@ -145,15 +145,15 @@ var callback = function(error, data, response) {
     console.log('API called successfully.');
   }
 };
-apiInstance.rejectConsentRequest(body, id, callback);
+apiInstance.rejectOAuth2ConsentRequest(id, body, callback);
 ```
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
+ **id** | **String**|  | 
  **body** | [**RejectConsentRequestPayload**](RejectConsentRequestPayload.md)|  | 
- **id** | **String**| The id of the OAuth 2.0 Consent Request. | 
 
 ### Return type
 

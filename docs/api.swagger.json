@@ -76,9 +76,6 @@
     "/.well-known/openid-configuration": {
       "get": {
         "description": "For more information, please refer to https://openid.net/specs/openid-connect-discovery-1_0.html",
-        "consumes": [
-          "application/x-www-form-urlencoded"
-        ],
         "produces": [
           "application/json"
         ],
@@ -87,21 +84,16 @@
           "https"
         ],
         "tags": [
-          "oauth2",
+          "oAuth2",
           "openid-connect"
         ],
         "summary": "Server well known configuration",
-        "operationId": "WellKnownHandler",
-        "security": [
-          {
-            "oauth2": []
-          }
-        ],
+        "operationId": "getWellKnown",
         "responses": {
           "200": {
-            "description": "WellKnown",
+            "description": "wellKnown",
             "schema": {
-              "$ref": "#/definitions/WellKnown"
+              "$ref": "#/definitions/wellKnown"
             }
           },
           "401": {
@@ -849,7 +841,7 @@
           "https"
         ],
         "tags": [
-          "oauth2"
+          "oAuth2"
         ],
         "summary": "The OAuth 2.0 Auth endpoint",
         "operationId": "oauthAuth",
@@ -880,7 +872,7 @@
           "https"
         ],
         "tags": [
-          "oauth2",
+          "oAuth2",
           "consent"
         ],
         "summary": "Receive consent request information",
@@ -890,6 +882,17 @@
             "oauth2": [
               "hydra.consent"
             ]
+          }
+        ],
+        "parameters": [
+          {
+            "uniqueItems": true,
+            "type": "string",
+            "x-go-name": "ID",
+            "description": "The id of the OAuth 2.0 Consent Request.",
+            "name": "id",
+            "in": "path",
+            "required": true
           }
         ],
         "responses": {
@@ -919,7 +922,7 @@
           "https"
         ],
         "tags": [
-          "oauth2",
+          "oAuth2",
           "consent"
         ],
         "summary": "Accept a consent request",
@@ -932,6 +935,13 @@
           }
         ],
         "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
           {
             "name": "Body",
             "in": "body",
@@ -968,7 +978,7 @@
           "https"
         ],
         "tags": [
-          "oauth2",
+          "oAuth2",
           "consent"
         ],
         "summary": "Reject a consent request",
@@ -981,6 +991,13 @@
           }
         ],
         "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
           {
             "name": "Body",
             "in": "body",
@@ -1017,13 +1034,13 @@
           "https"
         ],
         "tags": [
-          "oauth2"
+          "oAuth2"
         ],
         "summary": "Introspect an OAuth2 access token",
         "operationId": "introspectToken",
         "security": [
           {
-            "oauth2": []
+            "basic": []
           }
         ],
         "responses": {
@@ -1045,37 +1062,27 @@
         "consumes": [
           "application/x-www-form-urlencoded"
         ],
-        "produces": [
-          "application/json"
-        ],
         "schemes": [
           "http",
           "https"
         ],
         "tags": [
-          "oauth2"
+          "oAuth2"
         ],
         "summary": "Revoke an OAuth2 access token",
         "operationId": "revokeOAuth2Token",
         "security": [
           {
-            "oauth2": []
+            "basic": []
           }
         ],
         "parameters": [
           {
-            "name": "Body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "token": {
-                  "type": "string",
-                  "x-go-name": "Token"
-                }
-              }
-            }
+            "type": "string",
+            "x-go-name": "Token",
+            "name": "token",
+            "in": "formData",
+            "required": true
           }
         ],
         "responses": {
@@ -1105,7 +1112,7 @@
           "https"
         ],
         "tags": [
-          "oauth2"
+          "oAuth2"
         ],
         "summary": "The OAuth 2.0 Token endpoint",
         "operationId": "oauthToken",
@@ -1994,65 +2001,6 @@
       },
       "x-go-package": "github.com/ory/hydra/oauth2"
     },
-    "WellKnown": {
-      "type": "object",
-      "required": [
-        "issuer",
-        "authorization_endpoint",
-        "token_endpoint",
-        "jwks_uri",
-        "subject_types_supported",
-        "id_token_signing_alg_values_supported",
-        "response_types_supported"
-      ],
-      "properties": {
-        "authorization_endpoint": {
-          "description": "URL of the OP's OAuth 2.0 Authorization Endpoint",
-          "type": "string",
-          "x-go-name": "AuthURL"
-        },
-        "id_token_signing_alg_values_supported": {
-          "description": "JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token\nto encode the Claims in a JWT [JWT]. The algorithm RS256 MUST be included. The value none MAY be supported,\nbut MUST NOT be used unless the Response Type used returns no ID Token from the Authorization Endpoint\n(such as when using the Authorization Code Flow).",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "x-go-name": "SigningAlgs"
-        },
-        "issuer": {
-          "description": "URL using the https scheme with no query or fragment component that the OP asserts as its Issuer Identifier.\nIf Issuer discovery is supported , this value MUST be identical to the issuer value returned\nby WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this Issuer.",
-          "type": "string",
-          "x-go-name": "Issuer"
-        },
-        "jwks_uri": {
-          "description": "URL of the OP's JSON Web Key Set [JWK] document. This contains the signing key(s) the RP uses to validate\nsignatures from the OP. The JWK Set MAY also contain the Server's encryption key(s), which are used by RPs\nto encrypt requests to the Server. When both signing and encryption keys are made available, a use (Key Use)\nparameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key's intended usage.\nAlthough some algorithms allow the same key to be used for both signatures and encryption, doing so is\nNOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of\nkeys provided. When used, the bare key values MUST still be present and MUST match those in the certificate.",
-          "type": "string",
-          "x-go-name": "JWKsURI"
-        },
-        "response_types_supported": {
-          "description": "JSON array containing a list of the OAuth 2.0 response_type values that this OP supports. Dynamic OpenID\nProviders MUST support the code, id_token, and the token id_token Response Type values.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "x-go-name": "ResponseTypes"
-        },
-        "subject_types_supported": {
-          "description": "JSON array containing a list of the Subject Identifier types that this OP supports. Valid types include\npairwise and public.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "x-go-name": "SubjectTypes"
-        },
-        "token_endpoint": {
-          "description": "URL of the OP's OAuth 2.0 Token Endpoint",
-          "type": "string",
-          "x-go-name": "TokenURL"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/oauth2"
-    },
     "Writer": {
       "description": "Writer is a helper to write arbitrary data to a ResponseWriter",
       "type": "object",
@@ -2167,6 +2115,25 @@
       },
       "x-go-name": "Group",
       "x-go-package": "github.com/ory/hydra/warden/group"
+    },
+    "introspectOAuth2TokenRequestPayload": {
+      "type": "object",
+      "required": [
+        "token"
+      ],
+      "properties": {
+        "scope": {
+          "description": "An optional, space separated list of required scopes. If the access token was not granted one of the\nscopes, the result of active will be false.",
+          "type": "string",
+          "x-go-name": "Scope"
+        },
+        "token": {
+          "type": "string",
+          "x-go-name": "Token"
+        }
+      },
+      "x-go-name": "swaggerIntrospectOAuth2TokenRequestPayload",
+      "x-go-package": "github.com/ory/hydra/oauth2"
     },
     "joseWebKeySetRequest": {
       "type": "object",
@@ -2496,6 +2463,36 @@
       "x-go-name": "RejectConsentRequestPayload",
       "x-go-package": "github.com/ory/hydra/oauth2"
     },
+    "revokeOAuth2TokenRequestPayload": {
+      "type": "object",
+      "title": "Token revocation payload.",
+      "properties": {
+        "token": {
+          "type": "string",
+          "x-go-name": "Token"
+        }
+      },
+      "x-go-name": "swaggerRevokeOAuth2TokenRequestPayload",
+      "x-go-package": "github.com/ory/hydra/oauth2"
+    },
+    "swaggerAcceptConsentRequest": {
+      "type": "object",
+      "required": [
+        "id",
+        "Body"
+      ],
+      "properties": {
+        "Body": {
+          "$ref": "#/definitions/acceptConsentRequestPayload"
+        },
+        "id": {
+          "description": "in: path",
+          "type": "string",
+          "x-go-name": "ID"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/oauth2"
+    },
     "swaggerCreatePolicyParameters": {
       "type": "object",
       "properties": {
@@ -2635,6 +2632,171 @@
         }
       },
       "x-go-package": "github.com/ory/hydra/policy"
+    },
+    "swaggerOAuthConsentRequest": {
+      "description": "The consent request response",
+      "type": "object",
+      "properties": {
+        "Body": {
+          "$ref": "#/definitions/oAuth2consentRequest"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/oauth2"
+    },
+    "swaggerOAuthConsentRequestPayload": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "description": "The id of the OAuth 2.0 Consent Request.",
+          "type": "string",
+          "uniqueItems": true,
+          "x-go-name": "ID"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/oauth2"
+    },
+    "swaggerOAuthIntrospectionRequest": {
+      "type": "object",
+      "properties": {
+        "Body": {
+          "$ref": "#/definitions/introspectOAuth2TokenRequestPayload"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/oauth2"
+    },
+    "swaggerOAuthIntrospectionResponse": {
+      "description": "The token introspection response",
+      "type": "object",
+      "properties": {
+        "Body": {
+          "description": "in: body",
+          "type": "object",
+          "properties": {
+            "active": {
+              "description": "Boolean indicator of whether or not the presented token\nis currently active. An active token is neither refreshed nor revoked.",
+              "type": "boolean",
+              "x-go-name": "Active"
+            },
+            "client_id": {
+              "description": "Client identifier for the OAuth 2.0 client that\nrequested this token.",
+              "type": "string",
+              "x-go-name": "ClientID"
+            },
+            "exp": {
+              "description": "Integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token will expire",
+              "type": "integer",
+              "format": "int64",
+              "x-go-name": "ExpiresAt"
+            },
+            "iat": {
+              "description": "Integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token was\noriginally issued",
+              "type": "integer",
+              "format": "int64",
+              "x-go-name": "IssuedAt"
+            },
+            "scope": {
+              "description": "A JSON string containing a space-separated list of\nscopes associated with this token",
+              "type": "string",
+              "x-go-name": "Scope"
+            },
+            "sess": {
+              "$ref": "#/definitions/Session"
+            },
+            "sub": {
+              "description": "Subject of the token, as defined in JWT [RFC7519].\nUsually a machine-readable identifier of the resource owner who\nauthorized this token.",
+              "type": "string",
+              "x-go-name": "Subject"
+            },
+            "username": {
+              "description": "Human-readable identifier for the resource owner who\nauthorized this token. Currently not supported by Hydra.",
+              "type": "string",
+              "x-go-name": "Username"
+            }
+          }
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/oauth2"
+    },
+    "swaggerOAuthTokenResponse": {
+      "description": "The token response",
+      "type": "object",
+      "properties": {
+        "Body": {
+          "description": "in: body",
+          "type": "object",
+          "properties": {
+            "access_token": {
+              "description": "The access token issued by the authorization server.",
+              "type": "string",
+              "x-go-name": "AccessToken"
+            },
+            "expires_in": {
+              "description": "The lifetime in seconds of the access token.  For\nexample, the value \"3600\" denotes that the access token will\nexpire in one hour from the time the response was generated.",
+              "type": "integer",
+              "format": "int64",
+              "x-go-name": "ExpiresIn"
+            },
+            "id_token": {
+              "description": "To retrieve a refresh token request the id_token scope.",
+              "type": "integer",
+              "format": "int64",
+              "x-go-name": "IDToken"
+            },
+            "refresh_token": {
+              "description": "The refresh token, which can be used to obtain new\naccess tokens. To retrieve it add the scope \"offline\" to your access token request.",
+              "type": "string",
+              "x-go-name": "RefreshToken"
+            },
+            "scope": {
+              "description": "The scope of the access token",
+              "type": "integer",
+              "format": "int64",
+              "x-go-name": "Scope"
+            },
+            "token_type": {
+              "description": "The type of the token issued",
+              "type": "string",
+              "x-go-name": "TokenType"
+            }
+          }
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/oauth2"
+    },
+    "swaggerRejectConsentRequest": {
+      "type": "object",
+      "required": [
+        "id",
+        "Body"
+      ],
+      "properties": {
+        "Body": {
+          "$ref": "#/definitions/rejectConsentRequestPayload"
+        },
+        "id": {
+          "description": "in: path",
+          "type": "string",
+          "x-go-name": "ID"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/oauth2"
+    },
+    "swaggerRevokeOAuth2TokenParameters": {
+      "type": "object",
+      "required": [
+        "token"
+      ],
+      "properties": {
+        "token": {
+          "description": "in: formData",
+          "type": "string",
+          "x-go-name": "Token"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/oauth2"
     },
     "swaggerUpdatePolicyParameters": {
       "type": "object",
@@ -2806,6 +2968,66 @@
       },
       "x-go-name": "swaggerWardenTokenAllowedBody",
       "x-go-package": "github.com/ory/hydra/warden"
+    },
+    "wellKnown": {
+      "type": "object",
+      "required": [
+        "issuer",
+        "authorization_endpoint",
+        "token_endpoint",
+        "jwks_uri",
+        "subject_types_supported",
+        "id_token_signing_alg_values_supported",
+        "response_types_supported"
+      ],
+      "properties": {
+        "authorization_endpoint": {
+          "description": "URL of the OP's OAuth 2.0 Authorization Endpoint",
+          "type": "string",
+          "x-go-name": "AuthURL"
+        },
+        "id_token_signing_alg_values_supported": {
+          "description": "JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token\nto encode the Claims in a JWT [JWT]. The algorithm RS256 MUST be included. The value none MAY be supported,\nbut MUST NOT be used unless the Response Type used returns no ID Token from the Authorization Endpoint\n(such as when using the Authorization Code Flow).",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "SigningAlgs"
+        },
+        "issuer": {
+          "description": "URL using the https scheme with no query or fragment component that the OP asserts as its Issuer Identifier.\nIf Issuer discovery is supported , this value MUST be identical to the issuer value returned\nby WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this Issuer.",
+          "type": "string",
+          "x-go-name": "Issuer"
+        },
+        "jwks_uri": {
+          "description": "URL of the OP's JSON Web Key Set [JWK] document. This contains the signing key(s) the RP uses to validate\nsignatures from the OP. The JWK Set MAY also contain the Server's encryption key(s), which are used by RPs\nto encrypt requests to the Server. When both signing and encryption keys are made available, a use (Key Use)\nparameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key's intended usage.\nAlthough some algorithms allow the same key to be used for both signatures and encryption, doing so is\nNOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of\nkeys provided. When used, the bare key values MUST still be present and MUST match those in the certificate.",
+          "type": "string",
+          "x-go-name": "JWKsURI"
+        },
+        "response_types_supported": {
+          "description": "JSON array containing a list of the OAuth 2.0 response_type values that this OP supports. Dynamic OpenID\nProviders MUST support the code, id_token, and the token id_token Response Type values.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "ResponseTypes"
+        },
+        "subject_types_supported": {
+          "description": "JSON array containing a list of the Subject Identifier types that this OP supports. Valid types include\npairwise and public.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "SubjectTypes"
+        },
+        "token_endpoint": {
+          "description": "URL of the OP's OAuth 2.0 Token Endpoint",
+          "type": "string",
+          "x-go-name": "TokenURL"
+        }
+      },
+      "x-go-name": "WellKnown",
+      "x-go-package": "github.com/ory/hydra/oauth2"
     }
   },
   "responses": {

@@ -188,7 +188,7 @@ void (empty response body)
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **WardenAllowed**
-> InlineResponse2003 WardenAllowed($body)
+> InlineResponse2002 WardenAllowed($body)
 
 Check if a subject is allowed to do something
 
@@ -203,7 +203,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2003**](inline_response_200_3.md)
+[**InlineResponse2002**](inline_response_200_2.md)
 
 ### Authorization
 
@@ -217,7 +217,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **WardenTokenAllowed**
-> InlineResponse2004 WardenTokenAllowed($body)
+> InlineResponse2003 WardenTokenAllowed($body)
 
 Check if the subject of a token is allowed to do something
 
@@ -232,7 +232,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2004**](inline_response_200_4.md)
+[**InlineResponse2003**](inline_response_200_3.md)
 
 ### Authorization
 

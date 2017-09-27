@@ -63,13 +63,9 @@ type RejectConsentRequestPayload struct {
 	Reason string `json:"reason"`
 }
 
-type ConsentRequestClient interface {
+type ConsentRequestManager interface {
+	PersistConsentRequest(*ConsentRequest) error
 	AcceptConsentRequest(id string, payload *AcceptConsentRequestPayload) error
 	RejectConsentRequest(id string, payload *RejectConsentRequestPayload) error
 	GetConsentRequest(id string) (*ConsentRequest, error)
-}
-
-type ConsentRequestManager interface {
-	PersistConsentRequest(*ConsentRequest) error
-	ConsentRequestClient
 }

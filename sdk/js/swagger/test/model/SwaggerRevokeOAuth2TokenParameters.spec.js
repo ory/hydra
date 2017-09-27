@@ -57,8 +57,8 @@
       //expect(instance).to.be.a(HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerRevokeOAuth2TokenParameters);
     });
 
-    it('should have the property body (base name: "Body")', function() {
-      // uncomment below and update the code to test the property body
+    it('should have the property token (base name: "token")', function() {
+      // uncomment below and update the code to test the property token
       //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerRevokeOAuth2TokenParameters();
       //expect(instance).to.be();
     });

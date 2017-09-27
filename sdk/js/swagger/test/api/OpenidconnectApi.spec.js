@@ -51,20 +51,20 @@
   }
 
   describe('OpenidconnectApi', function() {
-    describe('wellKnown', function() {
-      it('should call wellKnown successfully', function(done) {
-        //uncomment below and update the code to test wellKnown
-        //instance.wellKnown(function(error) {
+    describe('getWellKnown', function() {
+      it('should call getWellKnown successfully', function(done) {
+        //uncomment below and update the code to test getWellKnown
+        //instance.getWellKnown(function(error) {
         //  if (error) throw error;
         //expect().to.be();
         //});
         done();
       });
     });
-    describe('wellKnownHandler', function() {
-      it('should call wellKnownHandler successfully', function(done) {
-        //uncomment below and update the code to test wellKnownHandler
-        //instance.wellKnownHandler(function(error) {
+    describe('wellKnown', function() {
+      it('should call wellKnown successfully', function(done) {
+        //uncomment below and update the code to test wellKnown
+        //instance.wellKnown(function(error) {
         //  if (error) throw error;
         //expect().to.be();
         //});

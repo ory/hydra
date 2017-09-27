@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/julienschmidt/httprouter"
-	. "github.com/ory/hydra/oauth2"
+	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
@@ -21,19 +21,22 @@ func TestAuthCode(t *testing.T) {
 	var validConsent bool
 
 	router.GET("/consent", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-		cr, err := consentClient.GetConsentRequest(r.URL.Query().Get("consent"))
+		cr, response, err := consentClient.GetOAuth2ConsentRequest(r.URL.Query().Get("consent"))
 		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, response.StatusCode)
 
 		assert.EqualValues(t, []string{"hydra.*", "offline"}, cr.RequestedScopes)
-		assert.Equal(t, r.URL.Query().Get("consent"), cr.ID)
-		assert.True(t, strings.Contains(cr.RedirectURL, "oauth2/auth?client_id=app-client"))
+		assert.Equal(t, r.URL.Query().Get("consent"), cr.Id)
+		assert.True(t, strings.Contains(cr.RedirectUrl, "oauth2/auth?client_id=app-client"))
 
-		require.NoError(t, consentClient.AcceptConsentRequest(r.URL.Query().Get("consent"), &AcceptConsentRequestPayload{
+		response, err = consentClient.AcceptOAuth2ConsentRequest(r.URL.Query().Get("consent"), hydra.AcceptConsentRequestPayload{
 			Subject:     "foo",
 			GrantScopes: []string{"hydra.*", "offline"},
-		}))
+		})
+		require.NoError(t, err)
+		assert.Equal(t, http.StatusNoContent, response.StatusCode)
 
-		http.Redirect(w, r, cr.RedirectURL, http.StatusFound)
+		http.Redirect(w, r, cr.RedirectUrl, http.StatusFound)
 		validConsent = true
 	})
 

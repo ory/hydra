@@ -3,6 +3,6 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**body** | [**SwaggerOAuthIntrospectionResponseBody**](SwaggerOAuthIntrospectionResponseBody.md) |  | [optional] 
+**body** | [**IntrospectOAuth2TokenResponsePayload**](IntrospectOAuth2TokenResponsePayload.md) |  | [optional] 
 
 

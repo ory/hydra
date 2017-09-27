@@ -17,40 +17,40 @@ import (
 	"strings"
 )
 
-type OAuth2Api struct {
+type HydraApi struct {
 	Configuration *Configuration
 }
 
-func NewOAuth2Api() *OAuth2Api {
+func NewHydraApi() *HydraApi {
 	configuration := NewConfiguration()
-	return &OAuth2Api{
+	return &HydraApi{
 		Configuration: configuration,
 	}
 }
 
-func NewOAuth2ApiWithBasePath(basePath string) *OAuth2Api {
+func NewHydraApiWithBasePath(basePath string) *HydraApi {
 	configuration := NewConfiguration()
 	configuration.BasePath = basePath
 
-	return &OAuth2Api{
+	return &HydraApi{
 		Configuration: configuration,
 	}
 }
 
 /**
- * Accept a consent request
- * Call this endpoint to accept a consent request. This usually happens when a user agrees to give access rights to an application.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;accept\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+ * Generate a new JSON Web Key for a JSON Web Key Set
+ * If the JSON Web Key Set does not exist yet, one will be created.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:&lt;set&gt;:&lt;kid&gt;\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
- * @param id
+ * @param set The set
  * @param body
- * @return void
+ * @return *JsonWebKeySet
  */
-func (a OAuth2Api) AcceptOAuth2ConsentRequest(id string, body AcceptConsentRequestPayload) (*APIResponse, error) {
+func (a HydraApi) CreateJsonWebKeySet(set string, body CreateJsonWebKeySetPayload) (*JsonWebKeySet, *APIResponse, error) {
 
-	var localVarHttpMethod = strings.ToUpper("Patch")
+	var localVarHttpMethod = strings.ToUpper("Post")
 	// create path and map variables
-	localVarPath := a.Configuration.BasePath + "/oauth2/consent/requests/{id}/accept"
-	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", fmt.Sprintf("%v", id), -1)
+	localVarPath := a.Configuration.BasePath + "/keys/{set}"
+	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", fmt.Sprintf("%v", set), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -88,20 +88,22 @@ func (a OAuth2Api) AcceptOAuth2ConsentRequest(id string, body AcceptConsentReque
 	}
 	// body params
 	localVarPostBody = &body
+	var successPayload = new(JsonWebKeySet)
 	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 
 	var localVarURL, _ = url.Parse(localVarPath)
 	localVarURL.RawQuery = localVarQueryParams.Encode()
-	var localVarAPIResponse = &APIResponse{Operation: "AcceptOAuth2ConsentRequest", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
+	var localVarAPIResponse = &APIResponse{Operation: "CreateJsonWebKeySet", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
 	if localVarHttpResponse != nil {
 		localVarAPIResponse.Response = localVarHttpResponse.RawResponse
 		localVarAPIResponse.Payload = localVarHttpResponse.Body()
 	}
 
 	if err != nil {
-		return localVarAPIResponse, err
+		return successPayload, localVarAPIResponse, err
 	}
-	return localVarAPIResponse, err
+	err = json.Unmarshal(localVarHttpResponse.Body(), &successPayload)
+	return successPayload, localVarAPIResponse, err
 }
 
 /**
@@ -111,7 +113,7 @@ func (a OAuth2Api) AcceptOAuth2ConsentRequest(id string, body AcceptConsentReque
  * @param body
  * @return *OAuth2Client
  */
-func (a OAuth2Api) CreateOAuth2Client(body OAuth2Client) (*OAuth2Client, *APIResponse, error) {
+func (a HydraApi) CreateOAuth2Client(body OAuth2Client) (*OAuth2Client, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Post")
 	// create path and map variables
@@ -172,13 +174,143 @@ func (a OAuth2Api) CreateOAuth2Client(body OAuth2Client) (*OAuth2Client, *APIRes
 }
 
 /**
+ * Delete a JSON Web Key
+ * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:&lt;set&gt;:&lt;kid&gt;\&quot;], \&quot;actions\&quot;: [\&quot;delete\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+ *
+ * @param kid The kid of the desired key
+ * @param set The set
+ * @return void
+ */
+func (a HydraApi) DeleteJsonWebKey(kid string, set string) (*APIResponse, error) {
+
+	var localVarHttpMethod = strings.ToUpper("Delete")
+	// create path and map variables
+	localVarPath := a.Configuration.BasePath + "/keys/{set}/{kid}"
+	localVarPath = strings.Replace(localVarPath, "{"+"kid"+"}", fmt.Sprintf("%v", kid), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", fmt.Sprintf("%v", set), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := make(map[string]string)
+	var localVarPostBody interface{}
+	var localVarFileName string
+	var localVarFileBytes []byte
+	// authentication '(oauth2)' required
+	// oauth required
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
+	}
+	// add default headers if any
+	for key := range a.Configuration.DefaultHeader {
+		localVarHeaderParams[key] = a.Configuration.DefaultHeader[key]
+	}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{
+		"application/json",
+	}
+
+	// set Accept header
+	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+
+	var localVarURL, _ = url.Parse(localVarPath)
+	localVarURL.RawQuery = localVarQueryParams.Encode()
+	var localVarAPIResponse = &APIResponse{Operation: "DeleteJsonWebKey", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
+	if localVarHttpResponse != nil {
+		localVarAPIResponse.Response = localVarHttpResponse.RawResponse
+		localVarAPIResponse.Payload = localVarHttpResponse.Body()
+	}
+
+	if err != nil {
+		return localVarAPIResponse, err
+	}
+	return localVarAPIResponse, err
+}
+
+/**
+ * Delete a JSON Web Key
+ * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:&lt;set&gt;\&quot;], \&quot;actions\&quot;: [\&quot;delete\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+ *
+ * @param set The set
+ * @return void
+ */
+func (a HydraApi) DeleteJsonWebKeySet(set string) (*APIResponse, error) {
+
+	var localVarHttpMethod = strings.ToUpper("Delete")
+	// create path and map variables
+	localVarPath := a.Configuration.BasePath + "/keys/{set}"
+	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", fmt.Sprintf("%v", set), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := make(map[string]string)
+	var localVarPostBody interface{}
+	var localVarFileName string
+	var localVarFileBytes []byte
+	// authentication '(oauth2)' required
+	// oauth required
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
+	}
+	// add default headers if any
+	for key := range a.Configuration.DefaultHeader {
+		localVarHeaderParams[key] = a.Configuration.DefaultHeader[key]
+	}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{
+		"application/json",
+	}
+
+	// set Accept header
+	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+
+	var localVarURL, _ = url.Parse(localVarPath)
+	localVarURL.RawQuery = localVarQueryParams.Encode()
+	var localVarAPIResponse = &APIResponse{Operation: "DeleteJsonWebKeySet", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
+	if localVarHttpResponse != nil {
+		localVarAPIResponse.Response = localVarHttpResponse.RawResponse
+		localVarAPIResponse.Payload = localVarHttpResponse.Body()
+	}
+
+	if err != nil {
+		return localVarAPIResponse, err
+	}
+	return localVarAPIResponse, err
+}
+
+/**
  * Deletes an OAuth 2.0 Client
  * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;delete\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;delete\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
  *
  * @param id The id of the OAuth 2.0 Client.
  * @return void
  */
-func (a OAuth2Api) DeleteOAuth2Client(id string) (*APIResponse, error) {
+func (a HydraApi) DeleteOAuth2Client(id string) (*APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Delete")
 	// create path and map variables
@@ -236,13 +368,147 @@ func (a OAuth2Api) DeleteOAuth2Client(id string) (*APIResponse, error) {
 }
 
 /**
+ * Retrieves a JSON Web Key Set matching the set and the kid
+ * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:&lt;set&gt;:&lt;kid&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+ *
+ * @param kid The kid of the desired key
+ * @param set The set
+ * @return *JsonWebKeySet
+ */
+func (a HydraApi) GetJsonWebKey(kid string, set string) (*JsonWebKeySet, *APIResponse, error) {
+
+	var localVarHttpMethod = strings.ToUpper("Get")
+	// create path and map variables
+	localVarPath := a.Configuration.BasePath + "/keys/{set}/{kid}"
+	localVarPath = strings.Replace(localVarPath, "{"+"kid"+"}", fmt.Sprintf("%v", kid), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", fmt.Sprintf("%v", set), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := make(map[string]string)
+	var localVarPostBody interface{}
+	var localVarFileName string
+	var localVarFileBytes []byte
+	// authentication '(oauth2)' required
+	// oauth required
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
+	}
+	// add default headers if any
+	for key := range a.Configuration.DefaultHeader {
+		localVarHeaderParams[key] = a.Configuration.DefaultHeader[key]
+	}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{
+		"application/json",
+	}
+
+	// set Accept header
+	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	var successPayload = new(JsonWebKeySet)
+	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+
+	var localVarURL, _ = url.Parse(localVarPath)
+	localVarURL.RawQuery = localVarQueryParams.Encode()
+	var localVarAPIResponse = &APIResponse{Operation: "GetJsonWebKey", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
+	if localVarHttpResponse != nil {
+		localVarAPIResponse.Response = localVarHttpResponse.RawResponse
+		localVarAPIResponse.Payload = localVarHttpResponse.Body()
+	}
+
+	if err != nil {
+		return successPayload, localVarAPIResponse, err
+	}
+	err = json.Unmarshal(localVarHttpResponse.Body(), &successPayload)
+	return successPayload, localVarAPIResponse, err
+}
+
+/**
+ * Retrieves a JSON Web Key Set matching the set
+ * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:&lt;set&gt;:&lt;kid&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+ *
+ * @param set The set
+ * @return *JsonWebKeySet
+ */
+func (a HydraApi) GetJsonWebKeySet(set string) (*JsonWebKeySet, *APIResponse, error) {
+
+	var localVarHttpMethod = strings.ToUpper("Get")
+	// create path and map variables
+	localVarPath := a.Configuration.BasePath + "/keys/{set}"
+	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", fmt.Sprintf("%v", set), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := make(map[string]string)
+	var localVarPostBody interface{}
+	var localVarFileName string
+	var localVarFileBytes []byte
+	// authentication '(oauth2)' required
+	// oauth required
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
+	}
+	// add default headers if any
+	for key := range a.Configuration.DefaultHeader {
+		localVarHeaderParams[key] = a.Configuration.DefaultHeader[key]
+	}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{
+		"application/json",
+	}
+
+	// set Accept header
+	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	var successPayload = new(JsonWebKeySet)
+	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+
+	var localVarURL, _ = url.Parse(localVarPath)
+	localVarURL.RawQuery = localVarQueryParams.Encode()
+	var localVarAPIResponse = &APIResponse{Operation: "GetJsonWebKeySet", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
+	if localVarHttpResponse != nil {
+		localVarAPIResponse.Response = localVarHttpResponse.RawResponse
+		localVarAPIResponse.Payload = localVarHttpResponse.Body()
+	}
+
+	if err != nil {
+		return successPayload, localVarAPIResponse, err
+	}
+	err = json.Unmarshal(localVarHttpResponse.Body(), &successPayload)
+	return successPayload, localVarAPIResponse, err
+}
+
+/**
  * Fetches an OAuth 2.0 Client.
  * Never returns the client&#39;s secret.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
  *
  * @param id The id of the OAuth 2.0 Client.
  * @return *OAuth2Client
  */
-func (a OAuth2Api) GetOAuth2Client(id string) (*OAuth2Client, *APIResponse, error) {
+func (a HydraApi) GetOAuth2Client(id string) (*OAuth2Client, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Get")
 	// create path and map variables
@@ -302,78 +568,12 @@ func (a OAuth2Api) GetOAuth2Client(id string) (*OAuth2Client, *APIResponse, erro
 }
 
 /**
- * Receive consent request information
- * Call this endpoint to receive information on consent requests.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
- *
- * @param id The id of the OAuth 2.0 Consent Request.
- * @return *OAuth2consentRequest
- */
-func (a OAuth2Api) GetOAuth2ConsentRequest(id string) (*OAuth2consentRequest, *APIResponse, error) {
-
-	var localVarHttpMethod = strings.ToUpper("Get")
-	// create path and map variables
-	localVarPath := a.Configuration.BasePath + "/oauth2/consent/requests/{id}"
-	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", fmt.Sprintf("%v", id), -1)
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := make(map[string]string)
-	var localVarPostBody interface{}
-	var localVarFileName string
-	var localVarFileBytes []byte
-	// authentication '(oauth2)' required
-	// oauth required
-	if a.Configuration.AccessToken != "" {
-		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
-	}
-	// add default headers if any
-	for key := range a.Configuration.DefaultHeader {
-		localVarHeaderParams[key] = a.Configuration.DefaultHeader[key]
-	}
-
-	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{"application/json"}
-
-	// set Content-Type header
-	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
-	if localVarHttpContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHttpContentType
-	}
-	// to determine the Accept header
-	localVarHttpHeaderAccepts := []string{
-		"application/json",
-	}
-
-	// set Accept header
-	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
-	if localVarHttpHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
-	}
-	var successPayload = new(OAuth2consentRequest)
-	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
-
-	var localVarURL, _ = url.Parse(localVarPath)
-	localVarURL.RawQuery = localVarQueryParams.Encode()
-	var localVarAPIResponse = &APIResponse{Operation: "GetOAuth2ConsentRequest", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
-	if localVarHttpResponse != nil {
-		localVarAPIResponse.Response = localVarHttpResponse.RawResponse
-		localVarAPIResponse.Payload = localVarHttpResponse.Body()
-	}
-
-	if err != nil {
-		return successPayload, localVarAPIResponse, err
-	}
-	err = json.Unmarshal(localVarHttpResponse.Body(), &successPayload)
-	return successPayload, localVarAPIResponse, err
-}
-
-/**
  * Server well known configuration
  * For more information, please refer to https://openid.net/specs/openid-connect-discovery-1_0.html
  *
  * @return *WellKnown
  */
-func (a OAuth2Api) GetWellKnown() (*WellKnown, *APIResponse, error) {
+func (a HydraApi) GetWellKnown() (*WellKnown, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Get")
 	// create path and map variables
@@ -434,7 +634,7 @@ func (a OAuth2Api) GetWellKnown() (*WellKnown, *APIResponse, error) {
  * @param scope An optional, space separated list of required scopes. If the access token was not granted one of the scopes, the result of active will be false.
  * @return *IntrospectOAuth2TokenResponsePayload
  */
-func (a OAuth2Api) IntrospectOAuth2Token(token string, scope string) (*IntrospectOAuth2TokenResponsePayload, *APIResponse, error) {
+func (a HydraApi) IntrospectOAuth2Token(token string, scope string) (*IntrospectOAuth2TokenResponsePayload, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Post")
 	// create path and map variables
@@ -500,7 +700,7 @@ func (a OAuth2Api) IntrospectOAuth2Token(token string, scope string) (*Introspec
  *
  * @return []OAuth2Client
  */
-func (a OAuth2Api) ListOAuth2Clients() ([]OAuth2Client, *APIResponse, error) {
+func (a HydraApi) ListOAuth2Clients() ([]OAuth2Client, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Get")
 	// create path and map variables
@@ -564,7 +764,7 @@ func (a OAuth2Api) ListOAuth2Clients() ([]OAuth2Client, *APIResponse, error) {
  *
  * @return void
  */
-func (a OAuth2Api) OauthAuth() (*APIResponse, error) {
+func (a HydraApi) OauthAuth() (*APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Get")
 	// create path and map variables
@@ -621,7 +821,7 @@ func (a OAuth2Api) OauthAuth() (*APIResponse, error) {
  *
  * @return *InlineResponse2001
  */
-func (a OAuth2Api) OauthToken() (*InlineResponse2001, *APIResponse, error) {
+func (a HydraApi) OauthToken() (*InlineResponse2001, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Post")
 	// create path and map variables
@@ -680,80 +880,13 @@ func (a OAuth2Api) OauthToken() (*InlineResponse2001, *APIResponse, error) {
 }
 
 /**
- * Reject a consent request
- * Call this endpoint to reject a consent request. This usually happens when a user denies access rights to an application.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;reject\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
- *
- * @param id
- * @param body
- * @return void
- */
-func (a OAuth2Api) RejectOAuth2ConsentRequest(id string, body RejectConsentRequestPayload) (*APIResponse, error) {
-
-	var localVarHttpMethod = strings.ToUpper("Patch")
-	// create path and map variables
-	localVarPath := a.Configuration.BasePath + "/oauth2/consent/requests/{id}/reject"
-	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", fmt.Sprintf("%v", id), -1)
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := make(map[string]string)
-	var localVarPostBody interface{}
-	var localVarFileName string
-	var localVarFileBytes []byte
-	// authentication '(oauth2)' required
-	// oauth required
-	if a.Configuration.AccessToken != "" {
-		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
-	}
-	// add default headers if any
-	for key := range a.Configuration.DefaultHeader {
-		localVarHeaderParams[key] = a.Configuration.DefaultHeader[key]
-	}
-
-	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{"application/json"}
-
-	// set Content-Type header
-	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
-	if localVarHttpContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHttpContentType
-	}
-	// to determine the Accept header
-	localVarHttpHeaderAccepts := []string{
-		"application/json",
-	}
-
-	// set Accept header
-	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
-	if localVarHttpHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
-	}
-	// body params
-	localVarPostBody = &body
-	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
-
-	var localVarURL, _ = url.Parse(localVarPath)
-	localVarURL.RawQuery = localVarQueryParams.Encode()
-	var localVarAPIResponse = &APIResponse{Operation: "RejectOAuth2ConsentRequest", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
-	if localVarHttpResponse != nil {
-		localVarAPIResponse.Response = localVarHttpResponse.RawResponse
-		localVarAPIResponse.Payload = localVarHttpResponse.Body()
-	}
-
-	if err != nil {
-		return localVarAPIResponse, err
-	}
-	return localVarAPIResponse, err
-}
-
-/**
  * Revoke an OAuth2 access token
  * For more information, please refer to https://tools.ietf.org/html/rfc7009
  *
  * @param token
  * @return void
  */
-func (a OAuth2Api) RevokeOAuth2Token(token string) (*APIResponse, error) {
+func (a HydraApi) RevokeOAuth2Token(token string) (*APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Post")
 	// create path and map variables
@@ -811,6 +944,146 @@ func (a OAuth2Api) RevokeOAuth2Token(token string) (*APIResponse, error) {
 }
 
 /**
+ * Updates a JSON Web Key
+ * Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:&lt;set&gt;:&lt;kid&gt;\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+ *
+ * @param kid The kid of the desired key
+ * @param set The set
+ * @param body
+ * @return *JsonWebKey
+ */
+func (a HydraApi) UpdateJsonWebKey(kid string, set string, body JsonWebKey) (*JsonWebKey, *APIResponse, error) {
+
+	var localVarHttpMethod = strings.ToUpper("Put")
+	// create path and map variables
+	localVarPath := a.Configuration.BasePath + "/keys/{set}/{kid}"
+	localVarPath = strings.Replace(localVarPath, "{"+"kid"+"}", fmt.Sprintf("%v", kid), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", fmt.Sprintf("%v", set), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := make(map[string]string)
+	var localVarPostBody interface{}
+	var localVarFileName string
+	var localVarFileBytes []byte
+	// authentication '(oauth2)' required
+	// oauth required
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
+	}
+	// add default headers if any
+	for key := range a.Configuration.DefaultHeader {
+		localVarHeaderParams[key] = a.Configuration.DefaultHeader[key]
+	}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{
+		"application/json",
+	}
+
+	// set Accept header
+	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	// body params
+	localVarPostBody = &body
+	var successPayload = new(JsonWebKey)
+	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+
+	var localVarURL, _ = url.Parse(localVarPath)
+	localVarURL.RawQuery = localVarQueryParams.Encode()
+	var localVarAPIResponse = &APIResponse{Operation: "UpdateJsonWebKey", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
+	if localVarHttpResponse != nil {
+		localVarAPIResponse.Response = localVarHttpResponse.RawResponse
+		localVarAPIResponse.Payload = localVarHttpResponse.Body()
+	}
+
+	if err != nil {
+		return successPayload, localVarAPIResponse, err
+	}
+	err = json.Unmarshal(localVarHttpResponse.Body(), &successPayload)
+	return successPayload, localVarAPIResponse, err
+}
+
+/**
+ * Updates a JSON Web Key Set
+ * Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:&lt;set&gt;\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+ *
+ * @param set The set
+ * @param body
+ * @return *JsonWebKeySet
+ */
+func (a HydraApi) UpdateJsonWebKeySet(set string, body JsonWebKeySet) (*JsonWebKeySet, *APIResponse, error) {
+
+	var localVarHttpMethod = strings.ToUpper("Put")
+	// create path and map variables
+	localVarPath := a.Configuration.BasePath + "/keys/{set}"
+	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", fmt.Sprintf("%v", set), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := make(map[string]string)
+	var localVarPostBody interface{}
+	var localVarFileName string
+	var localVarFileBytes []byte
+	// authentication '(oauth2)' required
+	// oauth required
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
+	}
+	// add default headers if any
+	for key := range a.Configuration.DefaultHeader {
+		localVarHeaderParams[key] = a.Configuration.DefaultHeader[key]
+	}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{
+		"application/json",
+	}
+
+	// set Accept header
+	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	// body params
+	localVarPostBody = &body
+	var successPayload = new(JsonWebKeySet)
+	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+
+	var localVarURL, _ = url.Parse(localVarPath)
+	localVarURL.RawQuery = localVarQueryParams.Encode()
+	var localVarAPIResponse = &APIResponse{Operation: "UpdateJsonWebKeySet", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
+	if localVarHttpResponse != nil {
+		localVarAPIResponse.Response = localVarHttpResponse.RawResponse
+		localVarAPIResponse.Payload = localVarHttpResponse.Body()
+	}
+
+	if err != nil {
+		return successPayload, localVarAPIResponse, err
+	}
+	err = json.Unmarshal(localVarHttpResponse.Body(), &successPayload)
+	return successPayload, localVarAPIResponse, err
+}
+
+/**
  * Updates an OAuth 2.0 Client
  * Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This endpoint should be well protected and only called by code you trust.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
  *
@@ -818,7 +1091,7 @@ func (a OAuth2Api) RevokeOAuth2Token(token string) (*APIResponse, error) {
  * @param body
  * @return *OAuth2Client
  */
-func (a OAuth2Api) UpdateOAuth2Client(id string, body OAuth2Client) (*OAuth2Client, *APIResponse, error) {
+func (a HydraApi) UpdateOAuth2Client(id string, body OAuth2Client) (*OAuth2Client, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Put")
 	// create path and map variables
@@ -867,6 +1140,70 @@ func (a OAuth2Api) UpdateOAuth2Client(id string, body OAuth2Client) (*OAuth2Clie
 	var localVarURL, _ = url.Parse(localVarPath)
 	localVarURL.RawQuery = localVarQueryParams.Encode()
 	var localVarAPIResponse = &APIResponse{Operation: "UpdateOAuth2Client", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
+	if localVarHttpResponse != nil {
+		localVarAPIResponse.Response = localVarHttpResponse.RawResponse
+		localVarAPIResponse.Payload = localVarHttpResponse.Body()
+	}
+
+	if err != nil {
+		return successPayload, localVarAPIResponse, err
+	}
+	err = json.Unmarshal(localVarHttpResponse.Body(), &successPayload)
+	return successPayload, localVarAPIResponse, err
+}
+
+/**
+ * Public JWKs
+ * Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:hydra.openid.id-token:public\&quot;], \&quot;actions\&quot;: [\&quot;GET\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+ *
+ * @return *JsonWebKeySet
+ */
+func (a HydraApi) WellKnown() (*JsonWebKeySet, *APIResponse, error) {
+
+	var localVarHttpMethod = strings.ToUpper("Get")
+	// create path and map variables
+	localVarPath := a.Configuration.BasePath + "/.well-known/jwks.json"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := make(map[string]string)
+	var localVarPostBody interface{}
+	var localVarFileName string
+	var localVarFileBytes []byte
+	// authentication '(oauth2)' required
+	// oauth required
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
+	}
+	// add default headers if any
+	for key := range a.Configuration.DefaultHeader {
+		localVarHeaderParams[key] = a.Configuration.DefaultHeader[key]
+	}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{
+		"application/json",
+	}
+
+	// set Accept header
+	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	var successPayload = new(JsonWebKeySet)
+	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+
+	var localVarURL, _ = url.Parse(localVarPath)
+	localVarURL.RawQuery = localVarQueryParams.Encode()
+	var localVarAPIResponse = &APIResponse{Operation: "WellKnown", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
 	if localVarHttpResponse != nil {
 		localVarAPIResponse.Response = localVarHttpResponse.RawResponse
 		localVarAPIResponse.Payload = localVarHttpResponse.Body()

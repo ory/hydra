@@ -12,5 +12,5 @@ package swagger
 
 // The token introspection response
 type SwaggerOAuthIntrospectionResponse struct {
-	Body SwaggerOAuthIntrospectionResponseBody `json:"Body,omitempty"`
+	Body IntrospectOAuth2TokenResponsePayload `json:"Body,omitempty"`
 }

@@ -15,29 +15,22 @@ import (
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
-	hydra "github.com/ory/hydra/sdk/go/swagger"
+	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func init() {
-	//revocators["http"] = &oauth2.HTTPRecovator{
-	//	Endpoint: ep,
-	//	Config: &clientcredentials.Config{
-	//		ClientID:     "my-client",
-	//		ClientSecret: "foobar",
-	//	},
-	//}
-}
-
-func createAccessTokenSession(subject, client string, token string, expiresAt time.Time, store *storage.MemoryStore) {
+func createAccessTokenSession(subject, client string, token string, expiresAt time.Time, fs *storage.MemoryStore, scopes fosite.Arguments) {
 	ar := fosite.NewAccessRequest(oauth2.NewSession(subject))
 	ar.GrantedScopes = fosite.Arguments{"core"}
+	if scopes != nil {
+		ar.GrantedScopes = scopes
+	}
 	ar.RequestedAt = time.Now().Round(time.Second)
 	ar.Client = &fosite.DefaultClient{ID: client}
 	ar.Session.SetExpiresAt(fosite.AccessToken, expiresAt)
 	ar.Session.(*oauth2.Session).Extra = map[string]interface{}{"foo": "bar"}
-	store.CreateAccessTokenSession(nil, token, ar)
+	fs.CreateAccessTokenSession(nil, token, ar)
 }
 
 func TestRevoke(t *testing.T) {
@@ -66,9 +59,9 @@ func TestRevoke(t *testing.T) {
 	handler.SetRoutes(router)
 	server := httptest.NewServer(router)
 
-	createAccessTokenSession("alice", "siri", tokens[0][0], now.Add(time.Hour), store)
-	createAccessTokenSession("siri", "siri", tokens[1][0], now.Add(time.Hour), store)
-	createAccessTokenSession("siri", "doesnt-exist", tokens[2][0], now.Add(-time.Hour), store)
+	createAccessTokenSession("alice", "siri", tokens[0][0], now.Add(time.Hour), store, nil)
+	createAccessTokenSession("siri", "siri", tokens[1][0], now.Add(time.Hour), store, nil)
+	createAccessTokenSession("siri", "doesnt-exist", tokens[2][0], now.Add(-time.Hour), store, nil)
 
 	client := hydra.NewOAuth2ApiWithBasePath(server.URL)
 	client.Configuration.Username = "my-client"

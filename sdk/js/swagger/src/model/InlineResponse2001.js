@@ -17,18 +17,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/Session'], factory);
+    define(['ApiClient'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('./Session'));
+    module.exports = factory(require('../ApiClient'));
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer100Aplha1) {
       root.HydraOAuth2OpenIdConnectServer100Aplha1 = {};
     }
-    root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2001 = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.Session);
+    root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2001 = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient);
   }
-}(this, function(ApiClient, Session) {
+}(this, function(ApiClient) {
   'use strict';
 
 
@@ -54,8 +54,6 @@
 
 
 
-
-
   };
 
   /**
@@ -69,73 +67,58 @@
     if (data) {
       obj = obj || new exports();
 
-      if (data.hasOwnProperty('active')) {
-        obj['active'] = ApiClient.convertToType(data['active'], 'Boolean');
+      if (data.hasOwnProperty('access_token')) {
+        obj['access_token'] = ApiClient.convertToType(data['access_token'], 'String');
       }
-      if (data.hasOwnProperty('client_id')) {
-        obj['client_id'] = ApiClient.convertToType(data['client_id'], 'String');
+      if (data.hasOwnProperty('expires_in')) {
+        obj['expires_in'] = ApiClient.convertToType(data['expires_in'], 'Number');
       }
-      if (data.hasOwnProperty('exp')) {
-        obj['exp'] = ApiClient.convertToType(data['exp'], 'Number');
+      if (data.hasOwnProperty('id_token')) {
+        obj['id_token'] = ApiClient.convertToType(data['id_token'], 'Number');
       }
-      if (data.hasOwnProperty('iat')) {
-        obj['iat'] = ApiClient.convertToType(data['iat'], 'Number');
+      if (data.hasOwnProperty('refresh_token')) {
+        obj['refresh_token'] = ApiClient.convertToType(data['refresh_token'], 'String');
       }
       if (data.hasOwnProperty('scope')) {
-        obj['scope'] = ApiClient.convertToType(data['scope'], 'String');
+        obj['scope'] = ApiClient.convertToType(data['scope'], 'Number');
       }
-      if (data.hasOwnProperty('sess')) {
-        obj['sess'] = Session.constructFromObject(data['sess']);
-      }
-      if (data.hasOwnProperty('sub')) {
-        obj['sub'] = ApiClient.convertToType(data['sub'], 'String');
-      }
-      if (data.hasOwnProperty('username')) {
-        obj['username'] = ApiClient.convertToType(data['username'], 'String');
+      if (data.hasOwnProperty('token_type')) {
+        obj['token_type'] = ApiClient.convertToType(data['token_type'], 'String');
       }
     }
     return obj;
   }
 
   /**
-   * Boolean indicator of whether or not the presented token is currently active. An active token is neither refreshed nor revoked.
-   * @member {Boolean} active
+   * The access token issued by the authorization server.
+   * @member {String} access_token
    */
-  exports.prototype['active'] = undefined;
+  exports.prototype['access_token'] = undefined;
   /**
-   * Client identifier for the OAuth 2.0 client that requested this token.
-   * @member {String} client_id
+   * The lifetime in seconds of the access token.  For example, the value \"3600\" denotes that the access token will expire in one hour from the time the response was generated.
+   * @member {Number} expires_in
    */
-  exports.prototype['client_id'] = undefined;
+  exports.prototype['expires_in'] = undefined;
   /**
-   * Integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token will expire
-   * @member {Number} exp
+   * To retrieve a refresh token request the id_token scope.
+   * @member {Number} id_token
    */
-  exports.prototype['exp'] = undefined;
+  exports.prototype['id_token'] = undefined;
   /**
-   * Integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token was originally issued
-   * @member {Number} iat
+   * The refresh token, which can be used to obtain new access tokens. To retrieve it add the scope \"offline\" to your access token request.
+   * @member {String} refresh_token
    */
-  exports.prototype['iat'] = undefined;
+  exports.prototype['refresh_token'] = undefined;
   /**
-   * A JSON string containing a space-separated list of scopes associated with this token
-   * @member {String} scope
+   * The scope of the access token
+   * @member {Number} scope
    */
   exports.prototype['scope'] = undefined;
   /**
-   * @member {module:model/Session} sess
+   * The type of the token issued
+   * @member {String} token_type
    */
-  exports.prototype['sess'] = undefined;
-  /**
-   * Subject of the token, as defined in JWT [RFC7519]. Usually a machine-readable identifier of the resource owner who authorized this token.
-   * @member {String} sub
-   */
-  exports.prototype['sub'] = undefined;
-  /**
-   * Human-readable identifier for the resource owner who authorized this token. Currently not supported by Hydra.
-   * @member {String} username
-   */
-  exports.prototype['username'] = undefined;
+  exports.prototype['token_type'] = undefined;
 
 
 

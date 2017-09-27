@@ -1,12 +1,14 @@
 package oauth2_test
 
 import (
-	"context"
 	"fmt"
 	"net/http/httptest"
-	"net/url"
 	"testing"
 	"time"
+
+	"strings"
+
+	"net/http"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
@@ -15,31 +17,23 @@ import (
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
-	"github.com/sirupsen/logrus"
+	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	goauth2 "golang.org/x/oauth2"
 )
 
-var (
-	introspectors = make(map[string]oauth2.Introspector)
-	now           = time.Now().Round(time.Second)
-	tokens        = pkg.Tokens(3)
-	fositeStore   = storage.NewExampleStore()
-)
+func TestIntrospectorSDK(t *testing.T) {
+	now := time.Now().Round(time.Second)
+	tokens := pkg.Tokens(3)
+	memoryStore := storage.NewExampleStore()
+	memoryStore.Clients["my-client"].Scopes = []string{"fosite", "openid", "photos", "offline", "foo.*"}
 
-func init() {
-	introspectors = make(map[string]oauth2.Introspector)
-	now = time.Now().Round(time.Second)
-	tokens = pkg.Tokens(3)
-	fositeStore = storage.NewExampleStore()
-	fositeStore.Clients["my-client"].Scopes = []string{"fosite", "openid", "photos", "offline", "foo.*"}
-	r := httprouter.New()
-	serv := &oauth2.Handler{
+	router := httprouter.New()
+	handler := &oauth2.Handler{
 		ScopeStrategy: fosite.WildcardScopeStrategy,
 		OAuth2: compose.Compose(
 			fc,
-			fositeStore,
+			memoryStore,
 			&compose.CommonStrategy{
 				CoreStrategy:               compose.NewOAuth2HMACStrategy(fc, []byte("1234567890123456789012345678901234567890")),
 				OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(pkg.MustRSAKey()),
@@ -51,101 +45,81 @@ func init() {
 		H:      herodot.NewJSONWriter(nil),
 		Issuer: "foobariss",
 	}
-	serv.SetRoutes(r)
-	ts = httptest.NewServer(r)
+	handler.SetRoutes(router)
+	server := httptest.NewServer(router)
 
-	ar := fosite.NewAccessRequest(oauth2.NewSession("alice"))
-	ar.GrantedScopes = fosite.Arguments{"core", "foo.*"}
-	ar.RequestedAt = now
-	ar.Client = &fosite.DefaultClient{ID: "siri"}
-	ar.Session.SetExpiresAt(fosite.AccessToken, now.Add(time.Hour))
-	ar.Session.(*oauth2.Session).Extra = map[string]interface{}{"foo": "bar"}
-	fositeStore.CreateAccessTokenSession(nil, tokens[0][0], ar)
+	createAccessTokenSession("alice", "siri", tokens[0][0], now.Add(time.Hour), memoryStore, fosite.Arguments{"core", "foo.*"})
+	createAccessTokenSession("siri", "siri", tokens[1][0], now.Add(time.Hour), memoryStore, fosite.Arguments{"core", "foo"})
+	createAccessTokenSession("siri", "doesnt-exist", tokens[2][0], now.Add(-time.Hour), memoryStore, fosite.Arguments{"core", "foo.*"})
 
-	ar2 := fosite.NewAccessRequest(oauth2.NewSession("siri"))
-	ar2.GrantedScopes = fosite.Arguments{"core", "foo.*"}
-	ar2.RequestedAt = now
-	ar2.Session.(*oauth2.Session).Extra = map[string]interface{}{"foo": "bar"}
-	ar2.Session.SetExpiresAt(fosite.AccessToken, now.Add(time.Hour))
-	ar2.Client = &fosite.DefaultClient{ID: "siri"}
-	fositeStore.CreateAccessTokenSession(nil, tokens[1][0], ar2)
+	client := hydra.NewOAuth2ApiWithBasePath(server.URL)
+	client.Configuration.Username = "my-client"
+	client.Configuration.Password = "foobar"
 
-	ar3 := fosite.NewAccessRequest(oauth2.NewSession("siri"))
-	ar3.GrantedScopes = fosite.Arguments{"core", "foo.*"}
-	ar3.RequestedAt = now
-	ar3.Session.(*oauth2.Session).Extra = map[string]interface{}{"foo": "bar"}
-	ar3.Client = &fosite.DefaultClient{ID: "doesnt-exist"}
-	ar3.Session.SetExpiresAt(fosite.AccessToken, now.Add(-time.Hour))
-	fositeStore.CreateAccessTokenSession(nil, tokens[2][0], ar3)
-
-	conf := &goauth2.Config{
-		Scopes:   []string{},
-		Endpoint: goauth2.Endpoint{},
-	}
-
-	ep, err := url.Parse(ts.URL)
-	if err != nil {
-		logrus.Fatalf("%s", err)
-	}
-	introspectors["http"] = &oauth2.HTTPIntrospector{
-		Endpoint: ep,
-		Client: conf.Client(goauth2.NoContext, &goauth2.Token{
-			AccessToken: tokens[1][1],
-			Expiry:      now.Add(time.Hour),
-			TokenType:   "bearer",
-		}),
-	}
-}
-
-func TestIntrospect(t *testing.T) {
-	for k, w := range introspectors {
-		for _, c := range []struct {
-			token     string
-			expectErr bool
-			scopes    []string
-			assert    func(*oauth2.Introspection)
+	t.Run("TestIntrospect", func(t *testing.T) {
+		for k, c := range []struct {
+			token       string
+			description string
+			expectErr   bool
+			scopes      []string
+			assert      func(*testing.T, *hydra.IntrospectOAuth2TokenResponsePayload)
 		}{
 			{
-				token:     "invalid",
-				expectErr: true,
+				description: "should fail because invalid token was supplied",
+				token:       "invalid",
+				expectErr:   true,
 			},
 			{
-				token:     tokens[2][1],
-				expectErr: true,
+				description: "should fail because token is expired",
+				token:       tokens[2][1],
+				expectErr:   true,
 			},
 			{
-				token:     tokens[1][1],
-				expectErr: true,
+				description: "should pass",
+				token:       tokens[1][1],
+				expectErr:   false,
 			},
 			{
-				token:     tokens[0][1],
-				expectErr: false,
+				description: "should fail because scope `foo.bar` was requested but only `foo` is granted",
+				token:       tokens[1][1],
+				expectErr:   true,
+				scopes:      []string{"foo.bar"},
 			},
 			{
-				token:     tokens[0][1],
-				expectErr: false,
-				scopes:    []string{"foo.bar"},
-				assert: func(c *oauth2.Introspection) {
-					assert.Equal(t, "alice", c.Subject)
-					//assert.Equal(t, "tests", c.Issuer)
-					assert.Equal(t, now.Add(time.Hour).Unix(), c.ExpiresAt, "expires at")
-					assert.Equal(t, now.Unix(), c.IssuedAt, "issued at")
-					assert.Equal(t, "foobariss", c.Issuer, "issuer")
-					assert.Equal(t, map[string]interface{}{"foo": "bar"}, c.Extra)
+				description: "should pass",
+				token:       tokens[0][1],
+				expectErr:   false,
+			},
+			{
+				description: "should pass",
+				token:       tokens[0][1],
+				expectErr:   false,
+				scopes:      []string{"foo.bar"},
+				assert: func(t *testing.T, c *hydra.IntrospectOAuth2TokenResponsePayload) {
+					assert.Equal(t, "alice", c.Sub)
+					assert.Equal(t, now.Add(time.Hour).Unix(), c.Exp, "expires at")
+					assert.Equal(t, now.Unix(), c.Iat, "issued at")
+					assert.Equal(t, "foobariss", c.Iss, "issuer")
+					assert.Equal(t, map[string]interface{}{"foo": "bar"}, c.Ext)
 				},
 			},
 		} {
-			t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
-				ctx, err := w.IntrospectToken(context.Background(), c.token, c.scopes...)
+			t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+				ctx, response, err := client.IntrospectOAuth2Token(c.token, strings.Join(c.scopes, " "))
+				require.NoError(t, err)
+				require.EqualValues(t, http.StatusOK, response.StatusCode)
+				t.Logf("Got %s", response.Payload)
+
 				if c.expectErr {
-					require.Error(t, err)
+					assert.False(t, ctx.Active)
 				} else {
-					require.NoError(t, err)
+					assert.True(t, ctx.Active)
 				}
-				if err == nil && c.assert != nil {
-					c.assert(ctx)
+
+				if !c.expectErr && c.assert != nil {
+					c.assert(t, ctx)
 				}
 			})
 		}
-	}
+	})
 }

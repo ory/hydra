@@ -10,3 +10,6 @@ java -jar scripts/swagger-codegen-cli-2.2.3.jar generate -i ./docs/api.swagger.j
 java -jar scripts/swagger-codegen-cli-2.2.3.jar generate -i ./docs/api.swagger.json -l javascript -o ./sdk/js/swagger
 
 scripts/run-format.sh
+
+git checkout -- ./sdk/go/swagger/configuration.go
+git checkout -- ./sdk/go/swagger/api_client.go

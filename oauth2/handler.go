@@ -126,7 +126,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ htt
 	h.H.Write(w, r, wellKnown)
 }
 
-// swagger:route POST /oauth2/revoke oauth2 revokeOAuthToken
+// swagger:route POST /oauth2/revoke oauth2 revokeOAuth2Token
 //
 // Revoke an OAuth2 access token
 //
@@ -158,7 +158,7 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ ht
 	h.OAuth2.WriteRevocationResponse(w, err)
 }
 
-// swagger:route POST /oauth2/introspect oauth2 introspectOAuthToken
+// swagger:route POST /oauth2/introspect oauth2 introspectToken
 //
 // Introspect an OAuth2 access token
 //
@@ -176,7 +176,7 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ ht
 //       oauth2:
 //
 //     Responses:
-//       200: introspectOAuthTokenResponse
+//       200: introspectOAuth2TokenResponse
 //       401: genericError
 //       500: genericError
 func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

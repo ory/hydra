@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"testing"
 	"time"
+	"net/url"
 
 	"github.com/stretchr/testify/assert"
-	"net/url"
 )
 
 func TestConfig(t *testing.T) {

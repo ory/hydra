@@ -4,7 +4,7 @@ package health
 // swagger:response healthStatus
 type swaggerListClientsResult struct {
 	// in: body
-	Body struct{
+	Body struct {
 		// Status always contains "ok"
 		Status string `json:"status"`
 	}

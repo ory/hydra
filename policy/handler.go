@@ -10,6 +10,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/firewall"
+	"github.com/ory/hydra/pkg"
 	"github.com/ory/ladon"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
@@ -36,7 +37,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.DELETE(endpoint+"/:id", h.Delete)
 }
 
-// swagger:route GET /policies policies listPolicies
+// swagger:route GET /policies policy hydra listPolicies
 //
 // List access control policies
 //
@@ -64,7 +65,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //       oauth2: hydra.policies
 //
 //     Responses:
-//       200: listPolicyResponse
+//       200: policyList
 //       401: genericError
 //       403: genericError
 //       500: genericError
@@ -108,7 +109,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 	h.H.Write(w, r, policies)
 }
 
-// swagger:route POST /policies policies createPolicy
+// swagger:route POST /policies policy hydra createPolicy
 //
 // Create an access control policy
 //
@@ -170,7 +171,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	h.H.WriteCreated(w, r, "/policies/"+p.ID, &p)
 }
 
-// swagger:route GET /policies/{id} policies getPolicy
+// swagger:route GET /policies/{id} policy hydra getPolicy
 //
 // Get an access control policy
 //
@@ -215,13 +216,17 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 
 	policy, err := h.Manager.Get(ps.ByName("id"))
 	if err != nil {
+		if err.Error() == "Not found" {
+			h.H.WriteError(w, r, errors.WithStack(pkg.ErrNotFound))
+			return
+		}
 		h.H.WriteError(w, r, errors.WithStack(err))
 		return
 	}
 	h.H.Write(w, r, policy)
 }
 
-// swagger:route DELETE /policies/{id} policies deletePolicy
+// swagger:route DELETE /policies/{id} policy hydra deletePolicy
 //
 // Delete an access control policy
 //
@@ -261,19 +266,19 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		Resource: fmt.Sprintf(policiesResource, id),
 		Action:   "get",
 	}, scope); err != nil {
-		h.H.WriteError(w, r, err)
+		h.H.WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
 	if err := h.Manager.Delete(id); err != nil {
-		h.H.WriteError(w, r, errors.New("Could not delete client"))
+		h.H.WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route PUT /policies/{id} policies updatePolicy
+// swagger:route PUT /policies/{id} policy hydra updatePolicy
 //
 // Update an access control policy
 //
@@ -314,7 +319,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		Resource: fmt.Sprintf(policiesResource, id),
 		Action:   "update",
 	}, scope); err != nil {
-		h.H.WriteError(w, r, err)
+		h.H.WriteError(w, r, errors.WithStack(err))
 		return
 	}
 

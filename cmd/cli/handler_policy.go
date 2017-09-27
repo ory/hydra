@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"os"
 
+	"net/http"
+
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/hydra/policy"
+	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/ory/ladon"
 	"github.com/spf13/cobra"
 	"github.com/square/go-jose/json"
@@ -16,16 +18,15 @@ type PolicyHandler struct {
 	Config *config.Config
 }
 
-func (h *PolicyHandler) newJwkManager(cmd *cobra.Command) *policy.HTTPManager {
-	dry, _ := cmd.Flags().GetBool("dry")
-	term, _ := cmd.Flags().GetBool("fake-tls-termination")
+func (h *PolicyHandler) newPolicyManager(cmd *cobra.Command) *hydra.PolicyApi {
+	c := hydra.NewPolicyApiWithBasePath(h.Config.ClusterURL)
+	c.Configuration.Transport = h.Config.OAuth2Client(cmd).Transport
 
-	return &policy.HTTPManager{
-		Dry:                dry,
-		Endpoint:           h.Config.Resolve("/policies"),
-		Client:             h.Config.OAuth2Client(cmd),
-		FakeTLSTermination: term,
+	if term, _ := cmd.Flags().GetBool("fake-tls-termination"); term {
+		c.Configuration.DefaultHeader["X-Forwarded-Proto"] = "https"
 	}
+
+	return c
 }
 
 func newPolicyHandler(c *config.Config) *PolicyHandler {
@@ -35,18 +36,20 @@ func newPolicyHandler(c *config.Config) *PolicyHandler {
 }
 
 func (h *PolicyHandler) CreatePolicy(cmd *cobra.Command, args []string) {
-	m := h.newJwkManager(cmd)
-	files, _ := cmd.Flags().GetStringSlice("files")
-	if len(files) > 0 {
+	m := h.newPolicyManager(cmd)
+
+	if files, _ := cmd.Flags().GetStringSlice("files"); len(files) > 0 {
 		for _, path := range files {
 			reader, err := os.Open(path)
 			pkg.Must(err, "Could not open file %s: %s", path, err)
-			var p ladon.DefaultPolicy
+
+			var p hydra.Policy
 			err = json.NewDecoder(reader).Decode(&p)
 			pkg.Must(err, "Could not parse JSON: %s", err)
-			err = m.Create(&p)
-			pkg.Must(err, "Could not create policy: %s", err)
-			fmt.Printf("Imported policy %s from %s.\n", p.ID, path)
+
+			_, response, err := m.CreatePolicy(p)
+			checkResponse(response, err, http.StatusCreated)
+			fmt.Printf("Imported policy %s from %s.\n", p.Id, path)
 		}
 		return
 	}
@@ -69,57 +72,45 @@ func (h *PolicyHandler) CreatePolicy(cmd *cobra.Command, args []string) {
 		effect = ladon.AllowAccess
 	}
 
-	p := &ladon.DefaultPolicy{
-		ID:          id,
+	result, response, err := m.CreatePolicy(hydra.Policy{
+		Id:          id,
 		Description: description,
 		Subjects:    subjects,
 		Resources:   resources,
 		Actions:     actions,
 		Effect:      effect,
-	}
-	err := m.Create(p)
-	if m.Dry {
-		fmt.Printf("%s\n", err)
-		return
-	}
-	pkg.Must(err, "Could not create policy: %s", err)
-	fmt.Printf("Created policy %s.\n", p.ID)
-
+	})
+	checkResponse(response, err, http.StatusCreated)
+	fmt.Printf("Created policy %s.\n", result.Id)
 }
 
 func (h *PolicyHandler) AddResourceToPolicy(cmd *cobra.Command, args []string) {
-	m := h.newJwkManager(cmd)
+	m := h.newPolicyManager(cmd)
 	if len(args) < 2 {
 		fmt.Print(cmd.UsageString())
 		return
 	}
 
-	pp, err := m.Get(args[0])
-	pkg.Must(err, "Could not get policy: %s", err)
+	p, response, err := m.GetPolicy(args[0])
+	checkResponse(response, err, http.StatusOK)
 
-	p := pp.(*ladon.DefaultPolicy)
 	p.Resources = append(p.Resources, args[1:]...)
 
-	err = m.Update(p)
-	if m.Dry {
-		fmt.Printf("%s\n", err)
-		return
-	}
-	pkg.Must(err, "Could not update policy: %s", err)
-	fmt.Printf("Added resources to policy %s", p.ID)
+	_, response, err = m.UpdatePolicy(p.Id, *p)
+	checkResponse(response, err, http.StatusOK)
+	fmt.Printf("Added resources to policy %s", p.Id)
 }
 
 func (h *PolicyHandler) RemoveResourceFromPolicy(cmd *cobra.Command, args []string) {
-	m := h.newJwkManager(cmd)
+	m := h.newPolicyManager(cmd)
 	if len(args) < 2 {
 		fmt.Print(cmd.UsageString())
 		return
 	}
 
-	pp, err := m.Get(args[0])
-	pkg.Must(err, "Could not get policy: %s", err)
+	p, response, err := m.GetPolicy(args[0])
+	checkResponse(response, err, http.StatusOK)
 
-	p := pp.(*ladon.DefaultPolicy)
 	resources := []string{}
 	for _, r := range p.Resources {
 		var filter bool
@@ -134,52 +125,38 @@ func (h *PolicyHandler) RemoveResourceFromPolicy(cmd *cobra.Command, args []stri
 	}
 	p.Resources = resources
 
-	err = m.Update(p)
-	if m.Dry {
-		fmt.Printf("%s\n", err)
-		return
-	}
-	pkg.Must(err, "Could not update policy: %s", err)
-	fmt.Printf("Removed resources from policy %s", p.ID)
+	_, response, err = m.UpdatePolicy(p.Id, *p)
+	checkResponse(response, err, http.StatusOK)
+	fmt.Printf("Removed resources from policy %s", p.Id)
 }
 
 func (h *PolicyHandler) AddSubjectToPolicy(cmd *cobra.Command, args []string) {
-	m := h.newJwkManager(cmd)
+	m := h.newPolicyManager(cmd)
 	if len(args) < 2 {
 		fmt.Print(cmd.UsageString())
 		return
 	}
 
-	pp, err := m.Get(args[0])
-	if m.Dry {
-		fmt.Printf("%s\n", err)
-	} else {
-		pkg.Must(err, "Could not get policy: %s", err)
-	}
+	p, response, err := m.GetPolicy(args[0])
+	checkResponse(response, err, http.StatusOK)
 
-	p := pp.(*ladon.DefaultPolicy)
 	p.Subjects = append(p.Subjects, args[1:]...)
 
-	err = m.Update(p)
-	if m.Dry {
-		fmt.Printf("%s\n", err)
-		return
-	}
-	pkg.Must(err, "Could not update policy: %s", err)
-	fmt.Printf("Added subjects to policy %s", p.ID)
+	_, response, err = m.UpdatePolicy(p.Id, *p)
+	checkResponse(response, err, http.StatusOK)
+	fmt.Printf("Added subjects to policy %s", p.Id)
 }
 
 func (h *PolicyHandler) RemoveSubjectFromPolicy(cmd *cobra.Command, args []string) {
-	m := h.newJwkManager(cmd)
+	m := h.newPolicyManager(cmd)
 	if len(args) < 2 {
 		fmt.Print(cmd.UsageString())
 		return
 	}
 
-	pp, err := m.Get(args[0])
-	pkg.Must(err, "Could not get policy: %s", err)
+	p, response, err := m.GetPolicy(args[0])
+	checkResponse(response, err, http.StatusOK)
 
-	p := pp.(*ladon.DefaultPolicy)
 	subjects := []string{}
 	for _, r := range p.Subjects {
 		var filter bool
@@ -193,49 +170,40 @@ func (h *PolicyHandler) RemoveSubjectFromPolicy(cmd *cobra.Command, args []strin
 		}
 	}
 	p.Subjects = subjects
+	p.Subjects = append(p.Subjects, args[1:]...)
 
-	err = m.Update(p)
-	if m.Dry {
-		fmt.Printf("%s\n", err)
-		return
-	}
-	pkg.Must(err, "Could not update policy: %s", err)
-	fmt.Printf("Removed subjects from policy %s", p.ID)
+	_, response, err = m.UpdatePolicy(p.Id, *p)
+	checkResponse(response, err, http.StatusOK)
+	fmt.Printf("Removed subjects from policy %s", p.Id)
 }
 
 func (h *PolicyHandler) AddActionToPolicy(cmd *cobra.Command, args []string) {
-	m := h.newJwkManager(cmd)
+	m := h.newPolicyManager(cmd)
 	if len(args) < 2 {
 		fmt.Print(cmd.UsageString())
 		return
 	}
 
-	pp, err := m.Get(args[0])
-	pkg.Must(err, "Could not get policy: %s", err)
+	p, response, err := m.GetPolicy(args[0])
+	checkResponse(response, err, http.StatusOK)
 
-	p := pp.(*ladon.DefaultPolicy)
 	p.Actions = append(p.Actions, args[1:]...)
 
-	err = m.Update(p)
-	if m.Dry {
-		fmt.Printf("%s\n", err)
-		return
-	}
-	pkg.Must(err, "Could not update policy: %s", err)
-	fmt.Printf("Added actions to policy %s", p.ID)
+	_, response, err = m.UpdatePolicy(p.Id, *p)
+	checkResponse(response, err, http.StatusOK)
+	fmt.Printf("Added actions to policy %s", p.Id)
 }
 
 func (h *PolicyHandler) RemoveActionFromPolicy(cmd *cobra.Command, args []string) {
-	m := h.newJwkManager(cmd)
+	m := h.newPolicyManager(cmd)
 	if len(args) < 2 {
 		fmt.Print(cmd.UsageString())
 		return
 	}
 
-	pp, err := m.Get(args[0])
-	pkg.Must(err, "Could not get policy: %s", err)
+	p, response, err := m.GetPolicy(args[0])
+	checkResponse(response, err, http.StatusOK)
 
-	p := pp.(*ladon.DefaultPolicy)
 	actions := []string{}
 	for _, r := range p.Actions {
 		var filter bool
@@ -250,49 +218,34 @@ func (h *PolicyHandler) RemoveActionFromPolicy(cmd *cobra.Command, args []string
 	}
 	p.Actions = actions
 
-	err = m.Update(p)
-	if m.Dry {
-		fmt.Printf("%s\n", err)
-		return
-	}
-	pkg.Must(err, "Could not update policy: %s", err)
-	fmt.Printf("Removed actions from policy %s", p.ID)
+	_, response, err = m.UpdatePolicy(p.Id, *p)
+	checkResponse(response, err, http.StatusOK)
+	fmt.Printf("Removed actions from policy %s", p.Id)
 }
 
 func (h *PolicyHandler) GetPolicy(cmd *cobra.Command, args []string) {
-	m := h.newJwkManager(cmd)
+	m := h.newPolicyManager(cmd)
 	if len(args) == 0 {
 		fmt.Print(cmd.UsageString())
 		return
 	}
 
-	p, err := m.Get(args[0])
-	if m.Dry {
-		fmt.Printf("%s\n", err)
-		return
-	}
-	pkg.Must(err, "Could not retrieve policy: %s", err)
+	p, response, err := m.GetPolicy(args[0])
+	checkResponse(response, err, http.StatusOK)
 
-	out, err := json.MarshalIndent(p, "", "\t")
-	pkg.Must(err, "Could not convert policy to JSON: %s", err)
-
-	fmt.Printf("%s\n", out)
+	fmt.Printf("%s\n", formatResponse(p))
 }
 
 func (h *PolicyHandler) DeletePolicy(cmd *cobra.Command, args []string) {
-	m := h.newJwkManager(cmd)
+	m := h.newPolicyManager(cmd)
 	if len(args) == 0 {
 		fmt.Print(cmd.UsageString())
 		return
 	}
 
 	for _, arg := range args {
-		err := m.Delete(arg)
-		if m.Dry {
-			fmt.Printf("%s\n", err)
-			continue
-		}
-		pkg.Must(err, "Could not delete policy: %s", err)
+		response, err := m.DeletePolicy(arg)
+		checkResponse(response, err, http.StatusNoContent)
 		fmt.Printf("Policy %s deleted.\n", arg)
 	}
 }

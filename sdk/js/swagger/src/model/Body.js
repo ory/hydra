@@ -49,7 +49,6 @@
     var _this = this;
 
 
-
   };
 
   /**
@@ -63,24 +62,17 @@
     if (data) {
       obj = obj || new exports();
 
-      if (data.hasOwnProperty('access_token')) {
-        obj['access_token'] = ApiClient.convertToType(data['access_token'], 'String');
-      }
-      if (data.hasOwnProperty('refresh_token')) {
-        obj['refresh_token'] = ApiClient.convertToType(data['refresh_token'], 'String');
+      if (data.hasOwnProperty('token')) {
+        obj['token'] = ApiClient.convertToType(data['token'], 'String');
       }
     }
     return obj;
   }
 
   /**
-   * @member {String} access_token
+   * @member {String} token
    */
-  exports.prototype['access_token'] = undefined;
-  /**
-   * @member {String} refresh_token
-   */
-  exports.prototype['refresh_token'] = undefined;
+  exports.prototype['token'] = undefined;
 
 
 

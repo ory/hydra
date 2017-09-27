@@ -6,8 +6,8 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (o *Handler) DefaultConsentHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	o.L.Warnln("It looks like no consent endpoint was set. All OAuth2 flows except client credentials will fail.")
+func (h *Handler) DefaultConsentHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	h.L.Warnln("It looks like no consent endpoint was set. All OAuth2 flows except client credentials will fail.")
 
 	w.Write([]byte(`
 <html>

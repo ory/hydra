@@ -10,17 +10,10 @@
 
 package swagger
 
-type ConsentRequest struct {
+type IntrospectOAuth2TokenRequestPayload struct {
 
-	// Audience is the client id that initiated the OAuth2 request.
-	Audience string `json:"audience,omitempty"`
+	// An optional, space separated list of required scopes. If the access token was not granted one of the scopes, the result of active will be false.
+	Scope string `json:"scope,omitempty"`
 
-	// ID is the id of this consent request.
-	Id string `json:"id,omitempty"`
-
-	// Redirect URL is the URL where the user agent should be redirected to after the consent has been accepted or rejected.
-	RedirectUrl string `json:"redirectUrl,omitempty"`
-
-	// RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator.
-	RequestedScopes []string `json:"requestedScopes,omitempty"`
+	Token string `json:"token"`
 }

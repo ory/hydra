@@ -17,18 +17,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/AcceptConsentRequestPayload', 'model/ConsentRequest', 'model/InlineResponse401', 'model/RejectConsentRequestPayload'], factory);
+    define(['ApiClient', 'model/AcceptConsentRequestPayload', 'model/InlineResponse401', 'model/OAuth2consentRequest', 'model/RejectConsentRequestPayload'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/AcceptConsentRequestPayload'), require('../model/ConsentRequest'), require('../model/InlineResponse401'), require('../model/RejectConsentRequestPayload'));
+    module.exports = factory(require('../ApiClient'), require('../model/AcceptConsentRequestPayload'), require('../model/InlineResponse401'), require('../model/OAuth2consentRequest'), require('../model/RejectConsentRequestPayload'));
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer100Aplha1) {
       root.HydraOAuth2OpenIdConnectServer100Aplha1 = {};
     }
-    root.HydraOAuth2OpenIdConnectServer100Aplha1.ConsentApi = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.AcceptConsentRequestPayload, root.HydraOAuth2OpenIdConnectServer100Aplha1.ConsentRequest, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse401, root.HydraOAuth2OpenIdConnectServer100Aplha1.RejectConsentRequestPayload);
+    root.HydraOAuth2OpenIdConnectServer100Aplha1.ConsentApi = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.AcceptConsentRequestPayload, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse401, root.HydraOAuth2OpenIdConnectServer100Aplha1.OAuth2consentRequest, root.HydraOAuth2OpenIdConnectServer100Aplha1.RejectConsentRequestPayload);
   }
-}(this, function(ApiClient, AcceptConsentRequestPayload, ConsentRequest, InlineResponse401, RejectConsentRequestPayload) {
+}(this, function(ApiClient, AcceptConsentRequestPayload, InlineResponse401, OAuth2consentRequest, RejectConsentRequestPayload) {
   'use strict';
 
   /**
@@ -49,8 +49,8 @@
 
 
     /**
-     * Callback function to receive the result of the acceptConsentRequest operation.
-     * @callback module:api/ConsentApi~acceptConsentRequestCallback
+     * Callback function to receive the result of the acceptOAuth2ConsentRequest operation.
+     * @callback module:api/ConsentApi~acceptOAuth2ConsentRequestCallback
      * @param {String} error Error message, if any.
      * @param data This operation does not return a value.
      * @param {String} response The complete HTTP response.
@@ -59,21 +59,21 @@
     /**
      * Accept a consent request
      * Call this endpoint to accept a consent request. This usually happens when a user agrees to give access rights to an application.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;accept\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * @param {String} id 
      * @param {module:model/AcceptConsentRequestPayload} body 
-     * @param {String} id The id of the OAuth 2.0 Consent Request.
-     * @param {module:api/ConsentApi~acceptConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
+     * @param {module:api/ConsentApi~acceptOAuth2ConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
      */
-    this.acceptConsentRequest = function(body, id, callback) {
+    this.acceptOAuth2ConsentRequest = function(id, body, callback) {
       var postBody = body;
-
-      // verify the required parameter 'body' is set
-      if (body === undefined || body === null) {
-        throw new Error("Missing the required parameter 'body' when calling acceptConsentRequest");
-      }
 
       // verify the required parameter 'id' is set
       if (id === undefined || id === null) {
-        throw new Error("Missing the required parameter 'id' when calling acceptConsentRequest");
+        throw new Error("Missing the required parameter 'id' when calling acceptOAuth2ConsentRequest");
+      }
+
+      // verify the required parameter 'body' is set
+      if (body === undefined || body === null) {
+        throw new Error("Missing the required parameter 'body' when calling acceptOAuth2ConsentRequest");
       }
 
 
@@ -100,10 +100,10 @@
     }
 
     /**
-     * Callback function to receive the result of the getConsentRequest operation.
-     * @callback module:api/ConsentApi~getConsentRequestCallback
+     * Callback function to receive the result of the getOAuth2ConsentRequest operation.
+     * @callback module:api/ConsentApi~getOAuth2ConsentRequestCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/ConsentRequest} data The data returned by the service call.
+     * @param {module:model/OAuth2consentRequest} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -111,15 +111,15 @@
      * Receive consent request information
      * Call this endpoint to receive information on consent requests.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
      * @param {String} id The id of the OAuth 2.0 Consent Request.
-     * @param {module:api/ConsentApi~getConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/ConsentRequest}
+     * @param {module:api/ConsentApi~getOAuth2ConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/OAuth2consentRequest}
      */
-    this.getConsentRequest = function(id, callback) {
+    this.getOAuth2ConsentRequest = function(id, callback) {
       var postBody = null;
 
       // verify the required parameter 'id' is set
       if (id === undefined || id === null) {
-        throw new Error("Missing the required parameter 'id' when calling getConsentRequest");
+        throw new Error("Missing the required parameter 'id' when calling getOAuth2ConsentRequest");
       }
 
 
@@ -136,7 +136,7 @@
       var authNames = ['oauth2'];
       var contentTypes = ['application/json'];
       var accepts = ['application/json'];
-      var returnType = ConsentRequest;
+      var returnType = OAuth2consentRequest;
 
       return this.apiClient.callApi(
         '/oauth2/consent/requests/{id}', 'GET',
@@ -146,8 +146,8 @@
     }
 
     /**
-     * Callback function to receive the result of the rejectConsentRequest operation.
-     * @callback module:api/ConsentApi~rejectConsentRequestCallback
+     * Callback function to receive the result of the rejectOAuth2ConsentRequest operation.
+     * @callback module:api/ConsentApi~rejectOAuth2ConsentRequestCallback
      * @param {String} error Error message, if any.
      * @param data This operation does not return a value.
      * @param {String} response The complete HTTP response.
@@ -156,21 +156,21 @@
     /**
      * Reject a consent request
      * Call this endpoint to reject a consent request. This usually happens when a user denies access rights to an application.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;reject\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * @param {String} id 
      * @param {module:model/RejectConsentRequestPayload} body 
-     * @param {String} id The id of the OAuth 2.0 Consent Request.
-     * @param {module:api/ConsentApi~rejectConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
+     * @param {module:api/ConsentApi~rejectOAuth2ConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
      */
-    this.rejectConsentRequest = function(body, id, callback) {
+    this.rejectOAuth2ConsentRequest = function(id, body, callback) {
       var postBody = body;
-
-      // verify the required parameter 'body' is set
-      if (body === undefined || body === null) {
-        throw new Error("Missing the required parameter 'body' when calling rejectConsentRequest");
-      }
 
       // verify the required parameter 'id' is set
       if (id === undefined || id === null) {
-        throw new Error("Missing the required parameter 'id' when calling rejectConsentRequest");
+        throw new Error("Missing the required parameter 'id' when calling rejectOAuth2ConsentRequest");
+      }
+
+      // verify the required parameter 'body' is set
+      if (body === undefined || body === null) {
+        throw new Error("Missing the required parameter 'body' when calling rejectOAuth2ConsentRequest");
       }
 
 

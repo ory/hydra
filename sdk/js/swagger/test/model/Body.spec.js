@@ -57,14 +57,8 @@
       //expect(instance).to.be.a(HydraOAuth2OpenIdConnectServer100Aplha1.Body);
     });
 
-    it('should have the property accessToken (base name: "access_token")', function() {
-      // uncomment below and update the code to test the property accessToken
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.Body();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property refreshToken (base name: "refresh_token")', function() {
-      // uncomment below and update the code to test the property refreshToken
+    it('should have the property token (base name: "token")', function() {
+      // uncomment below and update the code to test the property token
       //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.Body();
       //expect(instance).to.be();
     });

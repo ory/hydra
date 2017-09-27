@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.WardenTokenAllowedBody
+# HydraOAuth2OpenIdConnectServer.WardenTokenAllowedBody
 
 ## Properties
 Name | Type | Description | Notes

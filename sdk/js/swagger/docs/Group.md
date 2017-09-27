@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.Group
+# HydraOAuth2OpenIdConnectServer.Group
 
 ## Properties
 Name | Type | Description | Notes

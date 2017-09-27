@@ -94,7 +94,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET(WellKnownPath, h.WellKnownHandler)
 }
 
-// swagger:route GET /.well-known/openid-configuration oAuth2 openid-connect hydra getWellKnown
+// swagger:route GET /.well-known/openid-configuration oAuth2 getWellKnown
 //
 // Server well known configuration
 //
@@ -122,7 +122,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ htt
 	h.H.Write(w, r, wellKnown)
 }
 
-// swagger:route POST /oauth2/revoke oAuth2 hydra revokeOAuth2Token
+// swagger:route POST /oauth2/revoke oAuth2 revokeOAuth2Token
 //
 // Revoke an OAuth2 access token
 //
@@ -151,7 +151,7 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ ht
 	h.OAuth2.WriteRevocationResponse(w, err)
 }
 
-// swagger:route POST /oauth2/introspect oAuth2 hydra introspectOAuth2Token
+// swagger:route POST /oauth2/introspect oAuth2 introspectOAuth2Token
 //
 // Introspect an OAuth2 access token
 //
@@ -208,7 +208,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 	}
 }
 
-// swagger:route POST /oauth2/token oAuth2 hydra oauthToken
+// swagger:route POST /oauth2/token oAuth2 oauthToken
 //
 // The OAuth 2.0 Token endpoint
 //
@@ -259,7 +259,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprou
 	h.OAuth2.WriteAccessResponse(w, accessRequest, accessResponse)
 }
 
-// swagger:route GET /oauth2/auth oAuth2 hydra oauthAuth
+// swagger:route GET /oauth2/auth oAuth2 oauthAuth
 //
 // The OAuth 2.0 Auth endpoint
 //

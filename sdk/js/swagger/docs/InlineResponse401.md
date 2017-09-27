@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse401
+# HydraOAuth2OpenIdConnectServer.InlineResponse401
 
 ## Properties
 Name | Type | Description | Notes

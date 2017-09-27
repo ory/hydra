@@ -1,4 +1,4 @@
-// Package main Hydra OAuth2 & OpenID Connect Server (1.0.0-aplha1)
+// Package main Hydra OAuth2 & OpenID Connect Server
 //
 // Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/
 //

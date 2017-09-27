@@ -37,7 +37,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.DELETE(endpoint+"/:id", h.Delete)
 }
 
-// swagger:route GET /policies policy hydra listPolicies
+// swagger:route GET /policies policy listPolicies
 //
 // List access control policies
 //
@@ -109,7 +109,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 	h.H.Write(w, r, policies)
 }
 
-// swagger:route POST /policies policy hydra createPolicy
+// swagger:route POST /policies policy createPolicy
 //
 // Create an access control policy
 //
@@ -171,7 +171,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	h.H.WriteCreated(w, r, "/policies/"+p.ID, &p)
 }
 
-// swagger:route GET /policies/{id} policy hydra getPolicy
+// swagger:route GET /policies/{id} policy getPolicy
 //
 // Get an access control policy
 //
@@ -226,7 +226,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	h.H.Write(w, r, policy)
 }
 
-// swagger:route DELETE /policies/{id} policy hydra deletePolicy
+// swagger:route DELETE /policies/{id} policy deletePolicy
 //
 // Delete an access control policy
 //
@@ -278,7 +278,7 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route PUT /policies/{id} policy hydra updatePolicy
+// swagger:route PUT /policies/{id} policy updatePolicy
 //
 // Update an access control policy
 //

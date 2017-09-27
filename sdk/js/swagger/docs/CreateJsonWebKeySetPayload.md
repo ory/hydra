@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.CreateJsonWebKeySetPayload
+# HydraOAuth2OpenIdConnectServer.CreateJsonWebKeySetPayload
 
 ## Properties
 Name | Type | Description | Notes

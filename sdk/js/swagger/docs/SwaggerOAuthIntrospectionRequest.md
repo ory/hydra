@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerOAuthIntrospectionRequest
+# HydraOAuth2OpenIdConnectServer.SwaggerOAuthIntrospectionRequest
 
 ## Properties
 Name | Type | Description | Notes

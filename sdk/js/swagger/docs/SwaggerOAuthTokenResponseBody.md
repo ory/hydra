@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerOAuthTokenResponseBody
+# HydraOAuth2OpenIdConnectServer.SwaggerOAuthTokenResponseBody
 
 ## Properties
 Name | Type | Description | Notes

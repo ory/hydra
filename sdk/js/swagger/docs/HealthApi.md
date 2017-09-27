@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.HealthApi
+# HydraOAuth2OpenIdConnectServer.HealthApi
 
 All URIs are relative to *http://localhost*
 
@@ -18,9 +18,9 @@ This endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header when TLS
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.HealthApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer.HealthApi();
 
 var callback = function(error, data, response) {
   if (error) {
@@ -58,14 +58,14 @@ This endpoint returns information on the instance&#39;s health. It is currently 
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
-var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.HealthApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer.HealthApi();
 
 var callback = function(error, data, response) {
   if (error) {

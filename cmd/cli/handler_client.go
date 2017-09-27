@@ -6,11 +6,9 @@ import (
 	"os"
 	"strings"
 
-	"context"
-
-	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/pkg"
+	hydra "github.com/ory/hydra/sdk/go/swagger"
 	"github.com/spf13/cobra"
 )
 
@@ -24,16 +22,10 @@ func newClientHandler(c *config.Config) *ClientHandler {
 	}
 }
 
-func (h *ClientHandler) newClientManager(cmd *cobra.Command) *client.HTTPManager {
-	dry, _ := cmd.Flags().GetBool("dry")
-	term, _ := cmd.Flags().GetBool("fake-tls-termination")
-
-	return &client.HTTPManager{
-		Dry:                dry,
-		Endpoint:           h.Config.Resolve("/clients"),
-		Client:             h.Config.OAuth2Client(cmd),
-		FakeTLSTermination: term,
-	}
+func (h *ClientHandler) newClientManager(cmd *cobra.Command) *hydra.ClientsApi {
+	c := hydra.NewClientsApiWithBasePath(h.Config.ClusterURL)
+	c.Configuration.Transport = h.Config.OAuth2Client(cmd).Transport
+	return c
 }
 
 func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
@@ -47,17 +39,13 @@ func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 	for _, path := range args {
 		reader, err := os.Open(path)
 		pkg.Must(err, "Could not open file %s: %s", path, err)
-		var c client.Client
+		var c hydra.OauthClient
 		err = json.NewDecoder(reader).Decode(&c)
 		pkg.Must(err, "Could not parse JSON: %s", err)
 
-		err = m.CreateClient(&c)
-		if m.Dry {
-			fmt.Printf("%s\n", err)
-			continue
-		}
+		result, _, err := m.CreateOAuthClient(c)
 		pkg.Must(err, "Could not create client: %s", err)
-		fmt.Printf("Imported client %s:%s from %s.\n", c.ID, c.Secret, path)
+		fmt.Printf("Imported client %s:%s from %s.\n", result.Id, result.ClientSecret, path)
 	}
 }
 
@@ -82,25 +70,22 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		fmt.Println("You should not provide secrets using command line flags. The secret might leak to bash history and similar systems.")
 	}
 
-	cc := &client.Client{
-		ID:            id,
-		Secret:        secret,
+	cc := hydra.OauthClient{
+		Id:            id,
+		ClientSecret:  secret,
 		ResponseTypes: responseTypes,
 		Scope:         strings.Join(allowedScopes, " "),
 		GrantTypes:    grantTypes,
-		RedirectURIs:  callbacks,
-		Name:          name,
+		RedirectUris:  callbacks,
+		ClientName:    name,
 		Public:        public,
 	}
-	err = m.CreateClient(cc)
-	if m.Dry {
-		fmt.Printf("%s\n", err)
-		return
-	}
+
+	result, _, err := m.CreateOAuthClient(cc)
 	pkg.Must(err, "Could not create client: %s", err)
 
-	fmt.Printf("Client ID: %s\n", cc.ID)
-	fmt.Printf("Client Secret: %s\n", secret)
+	fmt.Printf("Client ID: %s\n", result.Id)
+	fmt.Printf("Client Secret: %s\n", result.ClientSecret)
 }
 
 func (h *ClientHandler) DeleteClient(cmd *cobra.Command, args []string) {
@@ -112,11 +97,7 @@ func (h *ClientHandler) DeleteClient(cmd *cobra.Command, args []string) {
 	}
 
 	for _, c := range args {
-		err := m.DeleteClient(c)
-		if m.Dry {
-			fmt.Printf("%s\n", err)
-			continue
-		}
+		_, err := m.DeleteOAuthClient(c)
 		pkg.Must(err, "Could not delete client: %s", err)
 	}
 
@@ -131,11 +112,7 @@ func (h *ClientHandler) GetClient(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	cl, err := m.GetClient(context.Background(), args[0])
-	if m.Dry {
-		fmt.Printf("%s\n", err)
-		return
-	}
+	cl, _, err := m.GetOAuthClient(args[0])
 	pkg.Must(err, "Could not delete client: %s", err)
 
 	out, err := json.MarshalIndent(cl, "", "\t")

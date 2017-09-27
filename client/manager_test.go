@@ -54,6 +54,12 @@ func connectToPG() {
 	clientManagers["postgres"] = s
 }
 
+func TestCreateGetDeleteClient(t *testing.T) {
+	for k, m := range clientManagers {
+		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeleteClient(k, m))
+	}
+}
+
 func TestClientAutoGenerateKey(t *testing.T) {
 	for k, m := range clientManagers {
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperClientAutoGenerateKey(k, m))
@@ -63,11 +69,5 @@ func TestClientAutoGenerateKey(t *testing.T) {
 func TestAuthenticateClient(t *testing.T) {
 	for k, m := range clientManagers {
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperClientAuthenticate(k, m))
-	}
-}
-
-func TestCreateGetDeleteClient(t *testing.T) {
-	for k, m := range clientManagers {
-		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeleteClient(k, m))
 	}
 }

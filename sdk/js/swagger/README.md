@@ -132,31 +132,41 @@ Class | Method | HTTP request | Description
 *HydraOAuth2OpenIdConnectServer100Aplha1.ConsentApi* | [**acceptOAuth2ConsentRequest**](docs/ConsentApi.md#acceptOAuth2ConsentRequest) | **PATCH** /oauth2/consent/requests/{id}/accept | Accept a consent request
 *HydraOAuth2OpenIdConnectServer100Aplha1.ConsentApi* | [**getOAuth2ConsentRequest**](docs/ConsentApi.md#getOAuth2ConsentRequest) | **GET** /oauth2/consent/requests/{id} | Receive consent request information
 *HydraOAuth2OpenIdConnectServer100Aplha1.ConsentApi* | [**rejectOAuth2ConsentRequest**](docs/ConsentApi.md#rejectOAuth2ConsentRequest) | **PATCH** /oauth2/consent/requests/{id}/reject | Reject a consent request
-*HydraOAuth2OpenIdConnectServer100Aplha1.DefaultApi* | [**health**](docs/DefaultApi.md#health) | **GET** /health | Check health status of instance
 *HydraOAuth2OpenIdConnectServer100Aplha1.GroupsApi* | [**addMembersToGroup**](docs/GroupsApi.md#addMembersToGroup) | **POST** /warden/groups/{id}/members | Add members to a group
 *HydraOAuth2OpenIdConnectServer100Aplha1.GroupsApi* | [**createGroup**](docs/GroupsApi.md#createGroup) | **POST** /warden/groups | Create a group
 *HydraOAuth2OpenIdConnectServer100Aplha1.GroupsApi* | [**deleteGroup**](docs/GroupsApi.md#deleteGroup) | **DELETE** /warden/groups/{id} | Delete a group by id
 *HydraOAuth2OpenIdConnectServer100Aplha1.GroupsApi* | [**findGroupsByMember**](docs/GroupsApi.md#findGroupsByMember) | **GET** /warden/groups | Find group IDs by member
 *HydraOAuth2OpenIdConnectServer100Aplha1.GroupsApi* | [**getGroup**](docs/GroupsApi.md#getGroup) | **GET** /warden/groups/{id} | Get a group by id
 *HydraOAuth2OpenIdConnectServer100Aplha1.GroupsApi* | [**removeMembersFromGroup**](docs/GroupsApi.md#removeMembersFromGroup) | **DELETE** /warden/groups/{id}/members | Remove members from a group
-*HydraOAuth2OpenIdConnectServer100Aplha1.HealthApi* | [**getStatistics**](docs/HealthApi.md#getStatistics) | **GET** /health/stats | Show instance statistics
+*HydraOAuth2OpenIdConnectServer100Aplha1.HealthApi* | [**getHealthStatus**](docs/HealthApi.md#getHealthStatus) | **GET** /health | Check health status of instance
+*HydraOAuth2OpenIdConnectServer100Aplha1.HealthApi* | [**getInstanceStatistics**](docs/HealthApi.md#getInstanceStatistics) | **GET** /health/stats | Show instance statistics
+*HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**acceptOAuth2ConsentRequest**](docs/HydraApi.md#acceptOAuth2ConsentRequest) | **PATCH** /oauth2/consent/requests/{id}/accept | Accept a consent request
 *HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**createJsonWebKeySet**](docs/HydraApi.md#createJsonWebKeySet) | **POST** /keys/{set} | Generate a new JSON Web Key for a JSON Web Key Set
 *HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**createOAuth2Client**](docs/HydraApi.md#createOAuth2Client) | **POST** /clients | Creates an OAuth 2.0 Client
+*HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**createPolicy**](docs/HydraApi.md#createPolicy) | **POST** /policies | Create an access control policy
 *HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**deleteJsonWebKey**](docs/HydraApi.md#deleteJsonWebKey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
 *HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**deleteJsonWebKeySet**](docs/HydraApi.md#deleteJsonWebKeySet) | **DELETE** /keys/{set} | Delete a JSON Web Key
 *HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**deleteOAuth2Client**](docs/HydraApi.md#deleteOAuth2Client) | **DELETE** /clients/{id} | Deletes an OAuth 2.0 Client
+*HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**deletePolicy**](docs/HydraApi.md#deletePolicy) | **DELETE** /policies/{id} | Delete an access control policy
+*HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**getHealthStatus**](docs/HydraApi.md#getHealthStatus) | **GET** /health | Check health status of instance
+*HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**getInstanceStatistics**](docs/HydraApi.md#getInstanceStatistics) | **GET** /health/stats | Show instance statistics
 *HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**getJsonWebKey**](docs/HydraApi.md#getJsonWebKey) | **GET** /keys/{set}/{kid} | Retrieves a JSON Web Key Set matching the set and the kid
 *HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**getJsonWebKeySet**](docs/HydraApi.md#getJsonWebKeySet) | **GET** /keys/{set} | Retrieves a JSON Web Key Set matching the set
 *HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**getOAuth2Client**](docs/HydraApi.md#getOAuth2Client) | **GET** /clients/{id} | Fetches an OAuth 2.0 Client.
+*HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**getOAuth2ConsentRequest**](docs/HydraApi.md#getOAuth2ConsentRequest) | **GET** /oauth2/consent/requests/{id} | Receive consent request information
+*HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**getPolicy**](docs/HydraApi.md#getPolicy) | **GET** /policies/{id} | Get an access control policy
 *HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**getWellKnown**](docs/HydraApi.md#getWellKnown) | **GET** /.well-known/openid-configuration | Server well known configuration
 *HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**introspectOAuth2Token**](docs/HydraApi.md#introspectOAuth2Token) | **POST** /oauth2/introspect | Introspect an OAuth2 access token
 *HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**listOAuth2Clients**](docs/HydraApi.md#listOAuth2Clients) | **GET** /clients | Lists OAuth 2.0 Clients
+*HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**listPolicies**](docs/HydraApi.md#listPolicies) | **GET** /policies | List access control policies
 *HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**oauthAuth**](docs/HydraApi.md#oauthAuth) | **GET** /oauth2/auth | The OAuth 2.0 Auth endpoint
 *HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**oauthToken**](docs/HydraApi.md#oauthToken) | **POST** /oauth2/token | The OAuth 2.0 Token endpoint
+*HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**rejectOAuth2ConsentRequest**](docs/HydraApi.md#rejectOAuth2ConsentRequest) | **PATCH** /oauth2/consent/requests/{id}/reject | Reject a consent request
 *HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**revokeOAuth2Token**](docs/HydraApi.md#revokeOAuth2Token) | **POST** /oauth2/revoke | Revoke an OAuth2 access token
 *HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**updateJsonWebKey**](docs/HydraApi.md#updateJsonWebKey) | **PUT** /keys/{set}/{kid} | Updates a JSON Web Key
 *HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**updateJsonWebKeySet**](docs/HydraApi.md#updateJsonWebKeySet) | **PUT** /keys/{set} | Updates a JSON Web Key Set
 *HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**updateOAuth2Client**](docs/HydraApi.md#updateOAuth2Client) | **PUT** /clients/{id} | Updates an OAuth 2.0 Client
+*HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**updatePolicy**](docs/HydraApi.md#updatePolicy) | **PUT** /policies/{id} | Update an access control policy
 *HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi* | [**wellKnown**](docs/HydraApi.md#wellKnown) | **GET** /.well-known/jwks.json | Public JWKs
 *HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeyApi* | [**createJsonWebKeySet**](docs/JsonWebKeyApi.md#createJsonWebKeySet) | **POST** /keys/{set} | Generate a new JSON Web Key for a JSON Web Key Set
 *HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeyApi* | [**deleteJsonWebKey**](docs/JsonWebKeyApi.md#deleteJsonWebKey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
@@ -182,11 +192,11 @@ Class | Method | HTTP request | Description
 *HydraOAuth2OpenIdConnectServer100Aplha1.Oauth2Api* | [**wellKnown**](docs/Oauth2Api.md#wellKnown) | **GET** /.well-known/jwks.json | Public JWKs
 *HydraOAuth2OpenIdConnectServer100Aplha1.OpenidconnectApi* | [**getWellKnown**](docs/OpenidconnectApi.md#getWellKnown) | **GET** /.well-known/openid-configuration | Server well known configuration
 *HydraOAuth2OpenIdConnectServer100Aplha1.OpenidconnectApi* | [**wellKnown**](docs/OpenidconnectApi.md#wellKnown) | **GET** /.well-known/jwks.json | Public JWKs
-*HydraOAuth2OpenIdConnectServer100Aplha1.PoliciesApi* | [**createPolicy**](docs/PoliciesApi.md#createPolicy) | **POST** /policies | Create an access control policy
-*HydraOAuth2OpenIdConnectServer100Aplha1.PoliciesApi* | [**deletePolicy**](docs/PoliciesApi.md#deletePolicy) | **DELETE** /policies/{id} | Delete an access control policy
-*HydraOAuth2OpenIdConnectServer100Aplha1.PoliciesApi* | [**getPolicy**](docs/PoliciesApi.md#getPolicy) | **GET** /policies/{id} | Get an access control policy
-*HydraOAuth2OpenIdConnectServer100Aplha1.PoliciesApi* | [**listPolicies**](docs/PoliciesApi.md#listPolicies) | **GET** /policies | List access control policies
-*HydraOAuth2OpenIdConnectServer100Aplha1.PoliciesApi* | [**updatePolicy**](docs/PoliciesApi.md#updatePolicy) | **PUT** /policies/{id} | Update an access control policy
+*HydraOAuth2OpenIdConnectServer100Aplha1.PolicyApi* | [**createPolicy**](docs/PolicyApi.md#createPolicy) | **POST** /policies | Create an access control policy
+*HydraOAuth2OpenIdConnectServer100Aplha1.PolicyApi* | [**deletePolicy**](docs/PolicyApi.md#deletePolicy) | **DELETE** /policies/{id} | Delete an access control policy
+*HydraOAuth2OpenIdConnectServer100Aplha1.PolicyApi* | [**getPolicy**](docs/PolicyApi.md#getPolicy) | **GET** /policies/{id} | Get an access control policy
+*HydraOAuth2OpenIdConnectServer100Aplha1.PolicyApi* | [**listPolicies**](docs/PolicyApi.md#listPolicies) | **GET** /policies | List access control policies
+*HydraOAuth2OpenIdConnectServer100Aplha1.PolicyApi* | [**updatePolicy**](docs/PolicyApi.md#updatePolicy) | **PUT** /policies/{id} | Update an access control policy
 *HydraOAuth2OpenIdConnectServer100Aplha1.WardenApi* | [**addMembersToGroup**](docs/WardenApi.md#addMembersToGroup) | **POST** /warden/groups/{id}/members | Add members to a group
 *HydraOAuth2OpenIdConnectServer100Aplha1.WardenApi* | [**createGroup**](docs/WardenApi.md#createGroup) | **POST** /warden/groups | Create a group
 *HydraOAuth2OpenIdConnectServer100Aplha1.WardenApi* | [**deleteGroup**](docs/WardenApi.md#deleteGroup) | **DELETE** /warden/groups/{id} | Delete a group by id

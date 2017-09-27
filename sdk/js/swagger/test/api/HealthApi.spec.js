@@ -51,10 +51,20 @@
   }
 
   describe('HealthApi', function() {
-    describe('getStatistics', function() {
-      it('should call getStatistics successfully', function(done) {
-        //uncomment below and update the code to test getStatistics
-        //instance.getStatistics(function(error) {
+    describe('getHealthStatus', function() {
+      it('should call getHealthStatus successfully', function(done) {
+        //uncomment below and update the code to test getHealthStatus
+        //instance.getHealthStatus(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
+    describe('getInstanceStatistics', function() {
+      it('should call getInstanceStatistics successfully', function(done) {
+        //uncomment below and update the code to test getInstanceStatistics
+        //instance.getInstanceStatistics(function(error) {
         //  if (error) throw error;
         //expect().to.be();
         //});

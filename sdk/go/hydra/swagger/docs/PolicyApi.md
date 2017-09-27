@@ -1,14 +1,14 @@
-# \PoliciesApi
+# \PolicyApi
 
 All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**CreatePolicy**](PoliciesApi.md#CreatePolicy) | **Post** /policies | Create an access control policy
-[**DeletePolicy**](PoliciesApi.md#DeletePolicy) | **Delete** /policies/{id} | Delete an access control policy
-[**GetPolicy**](PoliciesApi.md#GetPolicy) | **Get** /policies/{id} | Get an access control policy
-[**ListPolicies**](PoliciesApi.md#ListPolicies) | **Get** /policies | List access control policies
-[**UpdatePolicy**](PoliciesApi.md#UpdatePolicy) | **Put** /policies/{id} | Update an access control policy
+[**CreatePolicy**](PolicyApi.md#CreatePolicy) | **Post** /policies | Create an access control policy
+[**DeletePolicy**](PolicyApi.md#DeletePolicy) | **Delete** /policies/{id} | Delete an access control policy
+[**GetPolicy**](PolicyApi.md#GetPolicy) | **Get** /policies/{id} | Get an access control policy
+[**ListPolicies**](PolicyApi.md#ListPolicies) | **Get** /policies | List access control policies
+[**UpdatePolicy**](PolicyApi.md#UpdatePolicy) | **Put** /policies/{id} | Update an access control policy
 
 
 # **CreatePolicy**
@@ -52,7 +52,7 @@ Visit https://github.com/ory/ladon#usage for more information on policy usage.  
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **int64**| The id of the policy. | 
+ **id** | **string**| The id of the policy. | 
 
 ### Return type
 
@@ -81,7 +81,7 @@ Visit https://github.com/ory/ladon#usage for more information on policy usage.  
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **int64**| The id of the policy. | 
+ **id** | **string**| The id of the policy. | 
 
 ### Return type
 
@@ -99,7 +99,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **ListPolicies**
-> Policy ListPolicies($offset, $limit)
+> []Policy ListPolicies($offset, $limit)
 
 List access control policies
 
@@ -115,7 +115,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**Policy**](policy.md)
+[**[]Policy**](policy.md)
 
 ### Authorization
 
@@ -140,7 +140,7 @@ Visit https://github.com/ory/ladon#usage for more information on policy usage.  
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **int64**| The id of the policy. | 
+ **id** | **string**| The id of the policy. | 
  **body** | [**Policy**](Policy.md)|  | [optional] 
 
 ### Return type

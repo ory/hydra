@@ -67,7 +67,7 @@
         obj['Body'] = Policy.constructFromObject(data['Body']);
       }
       if (data.hasOwnProperty('id')) {
-        obj['id'] = ApiClient.convertToType(data['id'], 'Number');
+        obj['id'] = ApiClient.convertToType(data['id'], 'String');
       }
     }
     return obj;
@@ -79,7 +79,7 @@
   exports.prototype['Body'] = undefined;
   /**
    * The id of the policy. in: path
-   * @member {Number} id
+   * @member {String} id
    */
   exports.prototype['id'] = undefined;
 

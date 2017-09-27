@@ -1,14 +1,14 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.PoliciesApi
+# HydraOAuth2OpenIdConnectServer100Aplha1.PolicyApi
 
 All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**createPolicy**](PoliciesApi.md#createPolicy) | **POST** /policies | Create an access control policy
-[**deletePolicy**](PoliciesApi.md#deletePolicy) | **DELETE** /policies/{id} | Delete an access control policy
-[**getPolicy**](PoliciesApi.md#getPolicy) | **GET** /policies/{id} | Get an access control policy
-[**listPolicies**](PoliciesApi.md#listPolicies) | **GET** /policies | List access control policies
-[**updatePolicy**](PoliciesApi.md#updatePolicy) | **PUT** /policies/{id} | Update an access control policy
+[**createPolicy**](PolicyApi.md#createPolicy) | **POST** /policies | Create an access control policy
+[**deletePolicy**](PolicyApi.md#deletePolicy) | **DELETE** /policies/{id} | Delete an access control policy
+[**getPolicy**](PolicyApi.md#getPolicy) | **GET** /policies/{id} | Get an access control policy
+[**listPolicies**](PolicyApi.md#listPolicies) | **GET** /policies | List access control policies
+[**updatePolicy**](PolicyApi.md#updatePolicy) | **PUT** /policies/{id} | Update an access control policy
 
 
 <a name="createPolicy"></a>
@@ -28,7 +28,7 @@ var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.PoliciesApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.PolicyApi();
 
 var opts = { 
   'body': new HydraOAuth2OpenIdConnectServer100Aplha1.Policy() // Policy | 
@@ -80,9 +80,9 @@ var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.PoliciesApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.PolicyApi();
 
-var id = 789; // Number | The id of the policy.
+var id = "id_example"; // String | The id of the policy.
 
 
 var callback = function(error, data, response) {
@@ -99,7 +99,7 @@ apiInstance.deletePolicy(id, callback);
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **Number**| The id of the policy. | 
+ **id** | **String**| The id of the policy. | 
 
 ### Return type
 
@@ -131,9 +131,9 @@ var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.PoliciesApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.PolicyApi();
 
-var id = 789; // Number | The id of the policy.
+var id = "id_example"; // String | The id of the policy.
 
 
 var callback = function(error, data, response) {
@@ -150,7 +150,7 @@ apiInstance.getPolicy(id, callback);
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **Number**| The id of the policy. | 
+ **id** | **String**| The id of the policy. | 
 
 ### Return type
 
@@ -167,7 +167,7 @@ Name | Type | Description  | Notes
 
 <a name="listPolicies"></a>
 # **listPolicies**
-> Policy listPolicies(opts)
+> [Policy] listPolicies(opts)
 
 List access control policies
 
@@ -182,7 +182,7 @@ var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.PoliciesApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.PolicyApi();
 
 var opts = { 
   'offset': 789, // Number | The offset from where to start looking.
@@ -208,7 +208,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**Policy**](Policy.md)
+[**[Policy]**](Policy.md)
 
 ### Authorization
 
@@ -236,9 +236,9 @@ var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.PoliciesApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.PolicyApi();
 
-var id = 789; // Number | The id of the policy.
+var id = "id_example"; // String | The id of the policy.
 
 var opts = { 
   'body': new HydraOAuth2OpenIdConnectServer100Aplha1.Policy() // Policy | 
@@ -258,7 +258,7 @@ apiInstance.updatePolicy(id, opts, callback);
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **Number**| The id of the policy. | 
+ **id** | **String**| The id of the policy. | 
  **body** | [**Policy**](Policy.md)|  | [optional] 
 
 ### Return type

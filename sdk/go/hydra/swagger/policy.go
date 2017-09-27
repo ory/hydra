@@ -12,11 +12,11 @@ package swagger
 
 type Policy struct {
 
-	// Conditions under which the policy is active.
-	Conditions map[string]PolicyConditions `json:"Conditions,omitempty"`
-
 	// Actions impacted by the policy.
 	Actions []string `json:"actions,omitempty"`
+
+	// Conditions under which the policy is active.
+	Conditions map[string]PolicyConditions `json:"conditions,omitempty"`
 
 	// Description of the policy.
 	Description string `json:"description,omitempty"`

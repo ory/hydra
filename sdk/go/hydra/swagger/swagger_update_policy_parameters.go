@@ -14,5 +14,5 @@ type SwaggerUpdatePolicyParameters struct {
 	Body Policy `json:"Body,omitempty"`
 
 	// The id of the policy. in: path
-	Id int64 `json:"id,omitempty"`
+	Id string `json:"id,omitempty"`
 }

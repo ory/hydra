@@ -377,11 +377,12 @@
     },
     "/health": {
       "get": {
-        "description": "Check health status of instance",
+        "description": "This endpoint does not require the `X-Forwarded-Proto` header when TLS termination is set.",
+        "summary": "Check health status of instance",
         "operationId": "health",
         "responses": {
-          "204": {
-            "$ref": "#/responses/emptyResponse"
+          "200": {
+            "$ref": "#/responses/healthStatus"
           },
           "500": {
             "$ref": "#/responses/genericError"
@@ -391,7 +392,7 @@
     },
     "/health/stats": {
       "get": {
-        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:health:stats\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "This endpoint returns information on the instance's health. It is currently not documented.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:health:stats\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -416,7 +417,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/clientsList"
+            "$ref": "#/responses/emptyResponse"
           },
           "401": {
             "$ref": "#/responses/genericError"
@@ -543,7 +544,7 @@
         }
       },
       "post": {
-        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "If the JSON Web Key Set does not exist yet, one will be created.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -557,8 +558,8 @@
         "tags": [
           "jwks"
         ],
-        "summary": "Generate a new JSON Web Key",
-        "operationId": "createJwkKey",
+        "summary": "Generate a new JSON Web Key for a JSON Web Key Set",
+        "operationId": "createJwkSetKey",
         "security": [
           {
             "oauth2": [
@@ -728,7 +729,7 @@
           "jwks"
         ],
         "summary": "Updates a JSON Web Key",
-        "operationId": "updateJwkKey",
+        "operationId": "updateJwkSetKey",
         "security": [
           {
             "oauth2": [
@@ -757,15 +758,15 @@
             "name": "Body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/jwkSet"
+              "$ref": "#/definitions/jwk"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "jwkSet",
+            "description": "jwk",
             "schema": {
-              "$ref": "#/definitions/jwkSet"
+              "$ref": "#/definitions/jwk"
             }
           },
           "401": {
@@ -795,7 +796,7 @@
           "jwks"
         ],
         "summary": "Delete a JSON Web Key",
-        "operationId": "deleteJwkKey",
+        "operationId": "deleteJwkSetKey",
         "security": [
           {
             "oauth2": [
@@ -2207,43 +2208,23 @@
           "x-go-name": "Crv"
         },
         "d": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "uint8"
-          },
+          "type": "string",
           "x-go-name": "D"
         },
         "dp": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "uint8"
-          },
+          "type": "string",
           "x-go-name": "Dp"
         },
         "dq": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "uint8"
-          },
+          "type": "string",
           "x-go-name": "Dq"
         },
         "e": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "uint8"
-          },
+          "type": "string",
           "x-go-name": "E"
         },
         "k": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "uint8"
-          },
+          "type": "string",
           "x-go-name": "K"
         },
         "kid": {
@@ -2257,35 +2238,19 @@
           "x-go-name": "Kty"
         },
         "n": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "uint8"
-          },
+          "type": "string",
           "x-go-name": "N"
         },
         "p": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "uint8"
-          },
+          "type": "string",
           "x-go-name": "P"
         },
         "q": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "uint8"
-          },
+          "type": "string",
           "x-go-name": "Q"
         },
         "qi": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "uint8"
-          },
+          "type": "string",
           "x-go-name": "Qi"
         },
         "use": {
@@ -2294,11 +2259,7 @@
           "x-go-name": "Use"
         },
         "x": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "uint8"
-          },
+          "type": "string",
           "x-go-name": "X"
         },
         "x5c": {
@@ -2310,11 +2271,7 @@
           "x-go-name": "X5c"
         },
         "y": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "uint8"
-          },
+          "type": "string",
           "x-go-name": "Y"
         }
       },
@@ -2539,7 +2496,7 @@
       },
       "x-go-package": "github.com/ory/hydra/policy"
     },
-    "swaggerJwkCreateKey": {
+    "swaggerJwkCreateSetKey": {
       "type": "object",
       "required": [
         "set"
@@ -2590,20 +2547,14 @@
       },
       "x-go-package": "github.com/ory/hydra/jwk"
     },
-    "swaggerJwkUpdateKey": {
+    "swaggerJwkUpdateSet": {
       "type": "object",
       "required": [
-        "kid",
         "set"
       ],
       "properties": {
         "Body": {
           "$ref": "#/definitions/jwkSet"
-        },
-        "kid": {
-          "description": "The kid of the desired key\nin: path",
-          "type": "string",
-          "x-go-name": "KID"
         },
         "set": {
           "description": "The set\nin: path",
@@ -2613,14 +2564,20 @@
       },
       "x-go-package": "github.com/ory/hydra/jwk"
     },
-    "swaggerJwkUpdateSet": {
+    "swaggerJwkUpdateSetKey": {
       "type": "object",
       "required": [
+        "kid",
         "set"
       ],
       "properties": {
         "Body": {
-          "$ref": "#/definitions/jwkSet"
+          "$ref": "#/definitions/jwk"
+        },
+        "kid": {
+          "description": "The kid of the desired key\nin: path",
+          "type": "string",
+          "x-go-name": "KID"
         },
         "set": {
           "description": "The set\nin: path",
@@ -2895,6 +2852,19 @@
       "description": "A group",
       "schema": {
         "$ref": "#/definitions/group"
+      }
+    },
+    "healthStatus": {
+      "description": "A list of clients.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "description": "Status always contains \"ok\"",
+            "type": "string",
+            "x-go-name": "Status"
+          }
+        }
       }
     },
     "introspectOAuthTokenResponse": {

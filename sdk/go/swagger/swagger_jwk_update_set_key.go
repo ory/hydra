@@ -10,8 +10,12 @@
 
 package swagger
 
-type InlineResponse2003 struct {
+type SwaggerJwkUpdateSetKey struct {
+	Body Jwk `json:"Body,omitempty"`
 
-	// Allowed is true if the request is allowed or false otherwise
-	Allowed bool `json:"allowed,omitempty"`
+	// The kid of the desired key in: path
+	Kid string `json:"kid"`
+
+	// The set in: path
+	Set string `json:"set"`
 }

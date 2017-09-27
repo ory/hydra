@@ -17,18 +17,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/CreateRequest', 'model/InlineResponse401', 'model/JwkSet'], factory);
+    define(['ApiClient', 'model/CreateRequest', 'model/InlineResponse401', 'model/Jwk', 'model/JwkSet'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/CreateRequest'), require('../model/InlineResponse401'), require('../model/JwkSet'));
+    module.exports = factory(require('../ApiClient'), require('../model/CreateRequest'), require('../model/InlineResponse401'), require('../model/Jwk'), require('../model/JwkSet'));
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer100Aplha1) {
       root.HydraOAuth2OpenIdConnectServer100Aplha1 = {};
     }
-    root.HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.CreateRequest, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse401, root.HydraOAuth2OpenIdConnectServer100Aplha1.JwkSet);
+    root.HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.CreateRequest, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse401, root.HydraOAuth2OpenIdConnectServer100Aplha1.Jwk, root.HydraOAuth2OpenIdConnectServer100Aplha1.JwkSet);
   }
-}(this, function(ApiClient, CreateRequest, InlineResponse401, JwkSet) {
+}(this, function(ApiClient, CreateRequest, InlineResponse401, Jwk, JwkSet) {
   'use strict';
 
   /**
@@ -49,29 +49,29 @@
 
 
     /**
-     * Callback function to receive the result of the createJwkKey operation.
-     * @callback module:api/JwksApi~createJwkKeyCallback
+     * Callback function to receive the result of the createJwkSetKey operation.
+     * @callback module:api/JwksApi~createJwkSetKeyCallback
      * @param {String} error Error message, if any.
      * @param {module:model/JwkSet} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
     /**
-     * Generate a new JSON Web Key
-     * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:&lt;set&gt;:&lt;kid&gt;\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * Generate a new JSON Web Key for a JSON Web Key Set
+     * If the JSON Web Key Set does not exist yet, one will be created.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:&lt;set&gt;:&lt;kid&gt;\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
      * @param {String} set The set
      * @param {Object} opts Optional parameters
      * @param {module:model/CreateRequest} opts.body 
-     * @param {module:api/JwksApi~createJwkKeyCallback} callback The callback function, accepting three arguments: error, data, response
+     * @param {module:api/JwksApi~createJwkSetKeyCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/JwkSet}
      */
-    this.createJwkKey = function(set, opts, callback) {
+    this.createJwkSetKey = function(set, opts, callback) {
       opts = opts || {};
       var postBody = opts['body'];
 
       // verify the required parameter 'set' is set
       if (set === undefined || set === null) {
-        throw new Error("Missing the required parameter 'set' when calling createJwkKey");
+        throw new Error("Missing the required parameter 'set' when calling createJwkSetKey");
       }
 
 
@@ -92,58 +92,6 @@
 
       return this.apiClient.callApi(
         '/keys/{set}', 'POST',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
-    }
-
-    /**
-     * Callback function to receive the result of the deleteJwkKey operation.
-     * @callback module:api/JwksApi~deleteJwkKeyCallback
-     * @param {String} error Error message, if any.
-     * @param data This operation does not return a value.
-     * @param {String} response The complete HTTP response.
-     */
-
-    /**
-     * Delete a JSON Web Key
-     * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:&lt;set&gt;:&lt;kid&gt;\&quot;], \&quot;actions\&quot;: [\&quot;delete\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
-     * @param {String} kid The kid of the desired key
-     * @param {String} set The set
-     * @param {module:api/JwksApi~deleteJwkKeyCallback} callback The callback function, accepting three arguments: error, data, response
-     */
-    this.deleteJwkKey = function(kid, set, callback) {
-      var postBody = null;
-
-      // verify the required parameter 'kid' is set
-      if (kid === undefined || kid === null) {
-        throw new Error("Missing the required parameter 'kid' when calling deleteJwkKey");
-      }
-
-      // verify the required parameter 'set' is set
-      if (set === undefined || set === null) {
-        throw new Error("Missing the required parameter 'set' when calling deleteJwkKey");
-      }
-
-
-      var pathParams = {
-        'kid': kid,
-        'set': set
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
-
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = null;
-
-      return this.apiClient.callApi(
-        '/keys/{set}/{kid}', 'DELETE',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );
@@ -189,6 +137,58 @@
 
       return this.apiClient.callApi(
         '/keys/{set}', 'DELETE',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the deleteJwkSetKey operation.
+     * @callback module:api/JwksApi~deleteJwkSetKeyCallback
+     * @param {String} error Error message, if any.
+     * @param data This operation does not return a value.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Delete a JSON Web Key
+     * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:&lt;set&gt;:&lt;kid&gt;\&quot;], \&quot;actions\&quot;: [\&quot;delete\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * @param {String} kid The kid of the desired key
+     * @param {String} set The set
+     * @param {module:api/JwksApi~deleteJwkSetKeyCallback} callback The callback function, accepting three arguments: error, data, response
+     */
+    this.deleteJwkSetKey = function(kid, set, callback) {
+      var postBody = null;
+
+      // verify the required parameter 'kid' is set
+      if (kid === undefined || kid === null) {
+        throw new Error("Missing the required parameter 'kid' when calling deleteJwkSetKey");
+      }
+
+      // verify the required parameter 'set' is set
+      if (set === undefined || set === null) {
+        throw new Error("Missing the required parameter 'set' when calling deleteJwkSetKey");
+      }
+
+
+      var pathParams = {
+        'kid': kid,
+        'set': set
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = ['oauth2'];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = null;
+
+      return this.apiClient.callApi(
+        '/keys/{set}/{kid}', 'DELETE',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );
@@ -294,62 +294,6 @@
     }
 
     /**
-     * Callback function to receive the result of the updateJwkKey operation.
-     * @callback module:api/JwksApi~updateJwkKeyCallback
-     * @param {String} error Error message, if any.
-     * @param {module:model/JwkSet} data The data returned by the service call.
-     * @param {String} response The complete HTTP response.
-     */
-
-    /**
-     * Updates a JSON Web Key
-     * Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:&lt;set&gt;:&lt;kid&gt;\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
-     * @param {String} kid The kid of the desired key
-     * @param {String} set The set
-     * @param {Object} opts Optional parameters
-     * @param {module:model/JwkSet} opts.body 
-     * @param {module:api/JwksApi~updateJwkKeyCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/JwkSet}
-     */
-    this.updateJwkKey = function(kid, set, opts, callback) {
-      opts = opts || {};
-      var postBody = opts['body'];
-
-      // verify the required parameter 'kid' is set
-      if (kid === undefined || kid === null) {
-        throw new Error("Missing the required parameter 'kid' when calling updateJwkKey");
-      }
-
-      // verify the required parameter 'set' is set
-      if (set === undefined || set === null) {
-        throw new Error("Missing the required parameter 'set' when calling updateJwkKey");
-      }
-
-
-      var pathParams = {
-        'kid': kid,
-        'set': set
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
-
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = JwkSet;
-
-      return this.apiClient.callApi(
-        '/keys/{set}/{kid}', 'PUT',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
-    }
-
-    /**
      * Callback function to receive the result of the updateJwkSet operation.
      * @callback module:api/JwksApi~updateJwkSetCallback
      * @param {String} error Error message, if any.
@@ -393,6 +337,62 @@
 
       return this.apiClient.callApi(
         '/keys/{set}', 'PUT',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the updateJwkSetKey operation.
+     * @callback module:api/JwksApi~updateJwkSetKeyCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/Jwk} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Updates a JSON Web Key
+     * Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:&lt;set&gt;:&lt;kid&gt;\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * @param {String} kid The kid of the desired key
+     * @param {String} set The set
+     * @param {Object} opts Optional parameters
+     * @param {module:model/Jwk} opts.body 
+     * @param {module:api/JwksApi~updateJwkSetKeyCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/Jwk}
+     */
+    this.updateJwkSetKey = function(kid, set, opts, callback) {
+      opts = opts || {};
+      var postBody = opts['body'];
+
+      // verify the required parameter 'kid' is set
+      if (kid === undefined || kid === null) {
+        throw new Error("Missing the required parameter 'kid' when calling updateJwkSetKey");
+      }
+
+      // verify the required parameter 'set' is set
+      if (set === undefined || set === null) {
+        throw new Error("Missing the required parameter 'set' when calling updateJwkSetKey");
+      }
+
+
+      var pathParams = {
+        'kid': kid,
+        'set': set
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = ['oauth2'];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = Jwk;
+
+      return this.apiClient.callApi(
+        '/keys/{set}/{kid}', 'PUT',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );

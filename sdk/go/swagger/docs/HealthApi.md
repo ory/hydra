@@ -8,11 +8,11 @@ Method | HTTP request | Description
 
 
 # **GetStatistics**
-> []OauthClient GetStatistics()
+> GetStatistics()
 
 Show instance statistics
 
-The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:health:stats\"], \"actions\": [\"get\"], \"effect\": \"allow\" } ```
+This endpoint returns information on the instance's health. It is currently not documented.  The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:health:stats\"], \"actions\": [\"get\"], \"effect\": \"allow\" } ```
 
 
 ### Parameters
@@ -20,7 +20,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**[]OauthClient**](oauthClient.md)
+void (empty response body)
 
 ### Authorization
 

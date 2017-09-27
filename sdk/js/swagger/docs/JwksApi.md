@@ -4,23 +4,23 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**createJwkKey**](JwksApi.md#createJwkKey) | **POST** /keys/{set} | Generate a new JSON Web Key
-[**deleteJwkKey**](JwksApi.md#deleteJwkKey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
+[**createJwkSetKey**](JwksApi.md#createJwkSetKey) | **POST** /keys/{set} | Generate a new JSON Web Key for a JSON Web Key Set
 [**deleteJwkSet**](JwksApi.md#deleteJwkSet) | **DELETE** /keys/{set} | Delete a JSON Web Key
+[**deleteJwkSetKey**](JwksApi.md#deleteJwkSetKey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
 [**getJwkSet**](JwksApi.md#getJwkSet) | **GET** /keys/{set} | Retrieves a JSON Web Key Set matching the set
 [**getJwkSetKey**](JwksApi.md#getJwkSetKey) | **GET** /keys/{set}/{kid} | Retrieves a JSON Web Key Set matching the set and the kid
-[**updateJwkKey**](JwksApi.md#updateJwkKey) | **PUT** /keys/{set}/{kid} | Updates a JSON Web Key
 [**updateJwkSet**](JwksApi.md#updateJwkSet) | **PUT** /keys/{set} | Updates a JSON Web Key Set
+[**updateJwkSetKey**](JwksApi.md#updateJwkSetKey) | **PUT** /keys/{set}/{kid} | Updates a JSON Web Key
 [**wellKnown**](JwksApi.md#wellKnown) | **GET** /.well-known/jwks.json | Public JWKs
 
 
-<a name="createJwkKey"></a>
-# **createJwkKey**
-> JwkSet createJwkKey(set, opts)
+<a name="createJwkSetKey"></a>
+# **createJwkSetKey**
+> JwkSet createJwkSetKey(set, opts)
 
-Generate a new JSON Web Key
+Generate a new JSON Web Key for a JSON Web Key Set
 
-The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:&lt;set&gt;:&lt;kid&gt;\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+If the JSON Web Key Set does not exist yet, one will be created.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:&lt;set&gt;:&lt;kid&gt;\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
 
 ### Example
 ```javascript
@@ -46,7 +46,7 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-apiInstance.createJwkKey(set, opts, callback);
+apiInstance.createJwkSetKey(set, opts, callback);
 ```
 
 ### Parameters
@@ -59,60 +59,6 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**JwkSet**](JwkSet.md)
-
-### Authorization
-
-[oauth2](../README.md#oauth2)
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
-<a name="deleteJwkKey"></a>
-# **deleteJwkKey**
-> deleteJwkKey(kid, set)
-
-Delete a JSON Web Key
-
-The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:&lt;set&gt;:&lt;kid&gt;\&quot;], \&quot;actions\&quot;: [\&quot;delete\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
-
-### Example
-```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
-var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
-
-// Configure OAuth2 access token for authorization: oauth2
-var oauth2 = defaultClient.authentications['oauth2'];
-oauth2.accessToken = 'YOUR ACCESS TOKEN';
-
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi();
-
-var kid = "kid_example"; // String | The kid of the desired key
-
-var set = "set_example"; // String | The set
-
-
-var callback = function(error, data, response) {
-  if (error) {
-    console.error(error);
-  } else {
-    console.log('API called successfully.');
-  }
-};
-apiInstance.deleteJwkKey(kid, set, callback);
-```
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **kid** | **String**| The kid of the desired key | 
- **set** | **String**| The set | 
-
-### Return type
-
-null (empty response body)
 
 ### Authorization
 
@@ -159,6 +105,60 @@ apiInstance.deleteJwkSet(set, callback);
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
+ **set** | **String**| The set | 
+
+### Return type
+
+null (empty response body)
+
+### Authorization
+
+[oauth2](../README.md#oauth2)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+<a name="deleteJwkSetKey"></a>
+# **deleteJwkSetKey**
+> deleteJwkSetKey(kid, set)
+
+Delete a JSON Web Key
+
+The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:&lt;set&gt;:&lt;kid&gt;\&quot;], \&quot;actions\&quot;: [\&quot;delete\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+
+### Example
+```javascript
+var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
+var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
+
+// Configure OAuth2 access token for authorization: oauth2
+var oauth2 = defaultClient.authentications['oauth2'];
+oauth2.accessToken = 'YOUR ACCESS TOKEN';
+
+var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi();
+
+var kid = "kid_example"; // String | The kid of the desired key
+
+var set = "set_example"; // String | The set
+
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully.');
+  }
+};
+apiInstance.deleteJwkSetKey(kid, set, callback);
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **kid** | **String**| The kid of the desired key | 
  **set** | **String**| The set | 
 
 ### Return type
@@ -279,64 +279,6 @@ Name | Type | Description  | Notes
  - **Content-Type**: application/json
  - **Accept**: application/json
 
-<a name="updateJwkKey"></a>
-# **updateJwkKey**
-> JwkSet updateJwkKey(kid, set, opts)
-
-Updates a JSON Web Key
-
-Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:&lt;set&gt;:&lt;kid&gt;\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
-
-### Example
-```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
-var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
-
-// Configure OAuth2 access token for authorization: oauth2
-var oauth2 = defaultClient.authentications['oauth2'];
-oauth2.accessToken = 'YOUR ACCESS TOKEN';
-
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi();
-
-var kid = "kid_example"; // String | The kid of the desired key
-
-var set = "set_example"; // String | The set
-
-var opts = { 
-  'body': new HydraOAuth2OpenIdConnectServer100Aplha1.JwkSet() // JwkSet | 
-};
-
-var callback = function(error, data, response) {
-  if (error) {
-    console.error(error);
-  } else {
-    console.log('API called successfully. Returned data: ' + data);
-  }
-};
-apiInstance.updateJwkKey(kid, set, opts, callback);
-```
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **kid** | **String**| The kid of the desired key | 
- **set** | **String**| The set | 
- **body** | [**JwkSet**](JwkSet.md)|  | [optional] 
-
-### Return type
-
-[**JwkSet**](JwkSet.md)
-
-### Authorization
-
-[oauth2](../README.md#oauth2)
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
 <a name="updateJwkSet"></a>
 # **updateJwkSet**
 > JwkSet updateJwkSet(set, opts)
@@ -382,6 +324,64 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**JwkSet**](JwkSet.md)
+
+### Authorization
+
+[oauth2](../README.md#oauth2)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+<a name="updateJwkSetKey"></a>
+# **updateJwkSetKey**
+> Jwk updateJwkSetKey(kid, set, opts)
+
+Updates a JSON Web Key
+
+Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:&lt;set&gt;:&lt;kid&gt;\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+
+### Example
+```javascript
+var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
+var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
+
+// Configure OAuth2 access token for authorization: oauth2
+var oauth2 = defaultClient.authentications['oauth2'];
+oauth2.accessToken = 'YOUR ACCESS TOKEN';
+
+var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi();
+
+var kid = "kid_example"; // String | The kid of the desired key
+
+var set = "set_example"; // String | The set
+
+var opts = { 
+  'body': new HydraOAuth2OpenIdConnectServer100Aplha1.Jwk() // Jwk | 
+};
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+apiInstance.updateJwkSetKey(kid, set, opts, callback);
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **kid** | **String**| The kid of the desired key | 
+ **set** | **String**| The set | 
+ **body** | [**Jwk**](Jwk.md)|  | [optional] 
+
+### Return type
+
+[**Jwk**](Jwk.md)
 
 ### Authorization
 

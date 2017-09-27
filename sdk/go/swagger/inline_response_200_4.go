@@ -10,8 +10,23 @@
 
 package swagger
 
-type InlineResponse2003 struct {
+type InlineResponse2004 struct {
 
 	// Allowed is true if the request is allowed or false otherwise
 	Allowed bool `json:"allowed,omitempty"`
+
+	// Audience is who the token was issued for. This is an OAuth2 app usually.
+	Aud string `json:"aud,omitempty"`
+
+	// Extra represents arbitrary session data.
+	Ext map[string]interface{} `json:"ext,omitempty"`
+
+	// Issuer is the id of the issuer, typically an hydra instance.
+	Iss string `json:"iss,omitempty"`
+
+	// GrantedScopes is a list of scopes that the subject authorized when asked for consent.
+	Scopes []string `json:"scopes,omitempty"`
+
+	// Subject is the identity that authorized issuing the token, for example a user or an OAuth2 app. This is usually a uuid but you can choose a urn or some other id too.
+	Sub string `json:"sub,omitempty"`
 }

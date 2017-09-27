@@ -4,22 +4,22 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**CreateJwkKey**](JwksApi.md#CreateJwkKey) | **Post** /keys/{set} | Generate a new JSON Web Key
-[**DeleteJwkKey**](JwksApi.md#DeleteJwkKey) | **Delete** /keys/{set}/{kid} | Delete a JSON Web Key
+[**CreateJwkSetKey**](JwksApi.md#CreateJwkSetKey) | **Post** /keys/{set} | Generate a new JSON Web Key for a JSON Web Key Set
 [**DeleteJwkSet**](JwksApi.md#DeleteJwkSet) | **Delete** /keys/{set} | Delete a JSON Web Key
+[**DeleteJwkSetKey**](JwksApi.md#DeleteJwkSetKey) | **Delete** /keys/{set}/{kid} | Delete a JSON Web Key
 [**GetJwkSet**](JwksApi.md#GetJwkSet) | **Get** /keys/{set} | Retrieves a JSON Web Key Set matching the set
 [**GetJwkSetKey**](JwksApi.md#GetJwkSetKey) | **Get** /keys/{set}/{kid} | Retrieves a JSON Web Key Set matching the set and the kid
-[**UpdateJwkKey**](JwksApi.md#UpdateJwkKey) | **Put** /keys/{set}/{kid} | Updates a JSON Web Key
 [**UpdateJwkSet**](JwksApi.md#UpdateJwkSet) | **Put** /keys/{set} | Updates a JSON Web Key Set
+[**UpdateJwkSetKey**](JwksApi.md#UpdateJwkSetKey) | **Put** /keys/{set}/{kid} | Updates a JSON Web Key
 [**WellKnown**](JwksApi.md#WellKnown) | **Get** /.well-known/jwks.json | Public JWKs
 
 
-# **CreateJwkKey**
-> JwkSet CreateJwkKey($set, $body)
+# **CreateJwkSetKey**
+> JwkSet CreateJwkSetKey($set, $body)
 
-Generate a new JSON Web Key
+Generate a new JSON Web Key for a JSON Web Key Set
 
-The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:keys:<set>:<kid>\"], \"actions\": [\"create\"], \"effect\": \"allow\" } ```
+If the JSON Web Key Set does not exist yet, one will be created.  The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:keys:<set>:<kid>\"], \"actions\": [\"create\"], \"effect\": \"allow\" } ```
 
 
 ### Parameters
@@ -44,19 +44,18 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **DeleteJwkKey**
-> DeleteJwkKey($kid, $set)
+# **DeleteJwkSet**
+> DeleteJwkSet($set)
 
 Delete a JSON Web Key
 
-The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:keys:<set>:<kid>\"], \"actions\": [\"delete\"], \"effect\": \"allow\" } ```
+The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:keys:<set>\"], \"actions\": [\"delete\"], \"effect\": \"allow\" } ```
 
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **kid** | **string**| The kid of the desired key | 
  **set** | **string**| The set | 
 
 ### Return type
@@ -74,18 +73,19 @@ void (empty response body)
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **DeleteJwkSet**
-> DeleteJwkSet($set)
+# **DeleteJwkSetKey**
+> DeleteJwkSetKey($kid, $set)
 
 Delete a JSON Web Key
 
-The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:keys:<set>\"], \"actions\": [\"delete\"], \"effect\": \"allow\" } ```
+The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:keys:<set>:<kid>\"], \"actions\": [\"delete\"], \"effect\": \"allow\" } ```
 
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
+ **kid** | **string**| The kid of the desired key | 
  **set** | **string**| The set | 
 
 ### Return type
@@ -162,37 +162,6 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **UpdateJwkKey**
-> JwkSet UpdateJwkKey($kid, $set, $body)
-
-Updates a JSON Web Key
-
-Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.  The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:keys:<set>:<kid>\"], \"actions\": [\"update\"], \"effect\": \"allow\" } ```
-
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **kid** | **string**| The kid of the desired key | 
- **set** | **string**| The set | 
- **body** | [**JwkSet**](JwkSet.md)|  | [optional] 
-
-### Return type
-
-[**JwkSet**](jwkSet.md)
-
-### Authorization
-
-[oauth2](../README.md#oauth2)
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
 # **UpdateJwkSet**
 > JwkSet UpdateJwkSet($set, $body)
 
@@ -211,6 +180,37 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**JwkSet**](jwkSet.md)
+
+### Authorization
+
+[oauth2](../README.md#oauth2)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **UpdateJwkSetKey**
+> Jwk UpdateJwkSetKey($kid, $set, $body)
+
+Updates a JSON Web Key
+
+Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.  The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:keys:<set>:<kid>\"], \"actions\": [\"update\"], \"effect\": \"allow\" } ```
+
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **kid** | **string**| The kid of the desired key | 
+ **set** | **string**| The set | 
+ **body** | [**Jwk**](Jwk.md)|  | [optional] 
+
+### Return type
+
+[**Jwk**](jwk.md)
 
 ### Authorization
 

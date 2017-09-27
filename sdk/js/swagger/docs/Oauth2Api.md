@@ -280,7 +280,7 @@ Name | Type | Description  | Notes
 
 <a name="introspectOAuthToken"></a>
 # **introspectOAuthToken**
-> InlineResponse200 introspectOAuthToken()
+> InlineResponse2001 introspectOAuthToken()
 
 Introspect an OAuth2 access token
 
@@ -312,7 +312,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**InlineResponse200**](InlineResponse200.md)
+[**InlineResponse2001**](InlineResponse2001.md)
 
 ### Authorization
 
@@ -410,7 +410,7 @@ No authorization required
 
 <a name="oauthToken"></a>
 # **oauthToken**
-> InlineResponse2001 oauthToken()
+> InlineResponse2002 oauthToken()
 
 The OAuth 2.0 Token endpoint
 
@@ -443,7 +443,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**InlineResponse2001**](InlineResponse2001.md)
+[**InlineResponse2002**](InlineResponse2002.md)
 
 ### Authorization
 

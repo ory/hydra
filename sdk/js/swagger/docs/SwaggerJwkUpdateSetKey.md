@@ -1,0 +1,10 @@
+# HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerJwkUpdateSetKey
+
+## Properties
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**body** | [**Jwk**](Jwk.md) |  | [optional] 
+**kid** | **String** | The kid of the desired key in: path | 
+**set** | **String** | The set in: path | 
+
+

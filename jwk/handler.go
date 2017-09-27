@@ -51,6 +51,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.DELETE("/keys/:set", h.DeleteKeySet)
 }
 
+// swagger:model createJsonWebKeySetPayload
 type createRequest struct {
 	// The algorithm to be used for creating the key. Supports "RS256", "ES521" and "HS256"
 	// required: true
@@ -67,7 +68,7 @@ type joseWebKeySetRequest struct {
 	Keys []json.RawMessage `json:"keys"`
 }
 
-// swagger:route GET /.well-known/jwks.json jwks oauth2 openid-connect WellKnown
+// swagger:route GET /.well-known/jwks.json jsonWebKey oauth2 openid-connect wellKnown
 //
 // Public JWKs
 //
@@ -95,7 +96,7 @@ type joseWebKeySetRequest struct {
 //       oauth2: hydra.keys.get
 //
 //     Responses:
-//       200: jwkSet
+//       200: jsonWebKeySet
 //       401: genericError
 //       403: genericError
 //       500: genericError
@@ -126,7 +127,7 @@ func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request, ps httproute
 	h.H.Write(w, r, keys)
 }
 
-// swagger:route GET /keys/{set}/{kid} jwks getJwkSetKey
+// swagger:route GET /keys/{set}/{kid} jsonWebKey getJsonWebKey
 //
 // Retrieves a JSON Web Key Set matching the set and the kid
 //
@@ -152,7 +153,7 @@ func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request, ps httproute
 //       oauth2: hydra.keys.get
 //
 //     Responses:
-//       200: jwkSet
+//       200: jsonWebKeySet
 //       401: genericError
 //       403: genericError
 //       500: genericError
@@ -186,7 +187,7 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	h.H.Write(w, r, keys)
 }
 
-// swagger:route GET /keys/{set} jwks getJwkSet
+// swagger:route GET /keys/{set} jsonWebKey getJsonWebKeySet
 //
 // Retrieves a JSON Web Key Set matching the set
 //
@@ -212,7 +213,7 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //       oauth2: hydra.keys.get
 //
 //     Responses:
-//       200: jwkSet
+//       200: jsonWebKeySet
 //       401: genericError
 //       403: genericError
 //       500: genericError
@@ -239,9 +240,11 @@ func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httproute
 	h.H.Write(w, r, keys)
 }
 
-// swagger:route POST /keys/{set} jwks createJwkKey
+// swagger:route POST /keys/{set} jsonWebKey createJsonWebKeySet
 //
-// Generate a new JSON Web Key
+// Generate a new JSON Web Key for a JSON Web Key Set
+//
+// If the JSON Web Key Set does not exist yet, one will be created.
 //
 // The subject making the request needs to be assigned to a policy containing:
 //
@@ -265,7 +268,7 @@ func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httproute
 //       oauth2: hydra.keys.create
 //
 //     Responses:
-//       200: jwkSet
+//       200: jsonWebKeySet
 //       401: genericError
 //       403: genericError
 //       500: genericError
@@ -306,7 +309,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	h.H.WriteCreated(w, r, fmt.Sprintf("%s://%s/keys/%s", r.URL.Scheme, r.URL.Host, set), keys)
 }
 
-// swagger:route PUT /keys/{set} jwks updateJwkSet
+// swagger:route PUT /keys/{set} jsonWebKey updateJsonWebKeySet
 //
 // Updates a JSON Web Key Set
 //
@@ -334,7 +337,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //       oauth2: hydra.keys.update
 //
 //     Responses:
-//       200: jwkSet
+//       200: jsonWebKeySet
 //       401: genericError
 //       403: genericError
 //       500: genericError
@@ -373,7 +376,7 @@ func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 	h.H.Write(w, r, keySet)
 }
 
-// swagger:route PUT /keys/{set}/{kid} jwks updateJwkKey
+// swagger:route PUT /keys/{set}/{kid} jsonWebKey updateJsonWebKey
 //
 // Updates a JSON Web Key
 //
@@ -401,7 +404,7 @@ func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 //       oauth2: hydra.keys.update
 //
 //     Responses:
-//       200: jwkSet
+//       200: jsonWebKey
 //       401: genericError
 //       403: genericError
 //       500: genericError
@@ -431,7 +434,7 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 	h.H.Write(w, r, key)
 }
 
-// swagger:route DELETE /keys/{set} jwks deleteJwkSet
+// swagger:route DELETE /keys/{set} jsonWebKey deleteJsonWebKeySet
 //
 // Delete a JSON Web Key
 //
@@ -481,7 +484,7 @@ func (h *Handler) DeleteKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route DELETE /keys/{set}/{kid} jwks deleteJwkKey
+// swagger:route DELETE /keys/{set}/{kid} jsonWebKey deleteJsonWebKey
 //
 // Delete a JSON Web Key
 //

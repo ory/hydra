@@ -10,7 +10,7 @@ import (
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/compose"
-	hydra "github.com/ory/hydra/sdk/go/swagger"
+	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/ory/ladon"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

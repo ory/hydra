@@ -12,7 +12,7 @@ import (
 	"github.com/ory/hydra/integration"
 )
 
-var clientManagers = map[string]Storage{}
+var clientManagers = map[string]Manager{}
 
 func init() {
 	clientManagers["memory"] = &MemoryManager{
@@ -61,12 +61,9 @@ func TestClientAutoGenerateKey(t *testing.T) {
 }
 
 func TestAuthenticateClient(t *testing.T) {
-	var mem = &MemoryManager{
-		Clients: map[string]Client{},
-		Hasher:  &fosite.BCrypt{},
+	for k, m := range clientManagers {
+		t.Run(fmt.Sprintf("case=%s", k), TestHelperClientAuthenticate(k, m))
 	}
-
-	TestHelperClientAuthenticate("", mem)(t)
 }
 
 func TestCreateGetDeleteClient(t *testing.T) {

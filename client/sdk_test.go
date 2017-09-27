@@ -14,7 +14,6 @@ import (
 	"github.com/ory/ladon"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/oauth2"
 )
 
 func createTestClient(prefix string) hydra.OauthClient {
@@ -56,9 +55,7 @@ func TestClientSDK(t *testing.T) {
 	handler.SetRoutes(router)
 	server := httptest.NewServer(router)
 	c := hydra.NewClientsApiWithBasePath(server.URL)
-	token, err := httpClient.Transport.(*oauth2.Transport).Source.Token()
-	require.NoError(t, err)
-	c.Configuration.AccessToken = token.AccessToken
+	c.Configuration.Transport = httpClient.Transport
 
 	t.Run("foo", func(t *testing.T) {
 		createClient := createTestClient("")

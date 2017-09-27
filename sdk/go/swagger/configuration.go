@@ -31,7 +31,7 @@ type Configuration struct {
 	DefaultHeader map[string]string `json:"defaultHeader,omitempty"`
 	UserAgent     string            `json:"userAgent,omitempty"`
 	APIClient     *APIClient
-	Transport     *http.Transport
+	Transport     http.RoundTripper
 	Timeout       *time.Duration `json:"timeout,omitempty"`
 }
 

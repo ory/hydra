@@ -29,6 +29,7 @@ func (g *HS256Generator) Generate(id string) (*jose.JsonWebKeySet, error) {
 	return &jose.JsonWebKeySet{
 		Keys: []jose.JsonWebKey{
 			{
+				Algorithm:    "HS256",
 				Key:          []byte(string(key)),
 				KeyID:        id,
 				Certificates: []*x509.Certificate{},

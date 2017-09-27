@@ -21,14 +21,10 @@ import (
 
 type MigrateHandler struct {
 	c *config.Config
-	M *jwk.HTTPManager
 }
 
 func newMigrateHandler(c *config.Config) *MigrateHandler {
-	return &MigrateHandler{
-		c: c,
-		M: &jwk.HTTPManager{},
-	}
+	return &MigrateHandler{c: c}
 }
 
 type schemaCreator interface {

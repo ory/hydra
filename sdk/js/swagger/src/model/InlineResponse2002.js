@@ -49,11 +49,6 @@
     var _this = this;
 
 
-
-
-
-
-
   };
 
   /**
@@ -67,58 +62,18 @@
     if (data) {
       obj = obj || new exports();
 
-      if (data.hasOwnProperty('access_token')) {
-        obj['access_token'] = ApiClient.convertToType(data['access_token'], 'String');
-      }
-      if (data.hasOwnProperty('expires_in')) {
-        obj['expires_in'] = ApiClient.convertToType(data['expires_in'], 'Number');
-      }
-      if (data.hasOwnProperty('id_token')) {
-        obj['id_token'] = ApiClient.convertToType(data['id_token'], 'Number');
-      }
-      if (data.hasOwnProperty('refresh_token')) {
-        obj['refresh_token'] = ApiClient.convertToType(data['refresh_token'], 'String');
-      }
-      if (data.hasOwnProperty('scope')) {
-        obj['scope'] = ApiClient.convertToType(data['scope'], 'Number');
-      }
-      if (data.hasOwnProperty('token_type')) {
-        obj['token_type'] = ApiClient.convertToType(data['token_type'], 'String');
+      if (data.hasOwnProperty('allowed')) {
+        obj['allowed'] = ApiClient.convertToType(data['allowed'], 'Boolean');
       }
     }
     return obj;
   }
 
   /**
-   * The access token issued by the authorization server.
-   * @member {String} access_token
+   * Allowed is true if the request is allowed or false otherwise
+   * @member {Boolean} allowed
    */
-  exports.prototype['access_token'] = undefined;
-  /**
-   * The lifetime in seconds of the access token.  For example, the value \"3600\" denotes that the access token will expire in one hour from the time the response was generated.
-   * @member {Number} expires_in
-   */
-  exports.prototype['expires_in'] = undefined;
-  /**
-   * To retrieve a refresh token request the id_token scope.
-   * @member {Number} id_token
-   */
-  exports.prototype['id_token'] = undefined;
-  /**
-   * The refresh token, which can be used to obtain new access tokens. To retrieve it add the scope \"offline\" to your access token request.
-   * @member {String} refresh_token
-   */
-  exports.prototype['refresh_token'] = undefined;
-  /**
-   * The scope of the access token
-   * @member {Number} scope
-   */
-  exports.prototype['scope'] = undefined;
-  /**
-   * The type of the token issued
-   * @member {String} token_type
-   */
-  exports.prototype['token_type'] = undefined;
+  exports.prototype['allowed'] = undefined;
 
 
 

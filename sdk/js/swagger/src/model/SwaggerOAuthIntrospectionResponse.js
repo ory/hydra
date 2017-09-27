@@ -17,18 +17,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/SwaggerOAuthIntrospectionResponseBody'], factory);
+    define(['ApiClient', 'model/IntrospectOAuth2TokenResponsePayload'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('./SwaggerOAuthIntrospectionResponseBody'));
+    module.exports = factory(require('../ApiClient'), require('./IntrospectOAuth2TokenResponsePayload'));
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer100Aplha1) {
       root.HydraOAuth2OpenIdConnectServer100Aplha1 = {};
     }
-    root.HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerOAuthIntrospectionResponse = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerOAuthIntrospectionResponseBody);
+    root.HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerOAuthIntrospectionResponse = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.IntrospectOAuth2TokenResponsePayload);
   }
-}(this, function(ApiClient, SwaggerOAuthIntrospectionResponseBody) {
+}(this, function(ApiClient, IntrospectOAuth2TokenResponsePayload) {
   'use strict';
 
 
@@ -64,14 +64,14 @@
       obj = obj || new exports();
 
       if (data.hasOwnProperty('Body')) {
-        obj['Body'] = SwaggerOAuthIntrospectionResponseBody.constructFromObject(data['Body']);
+        obj['Body'] = IntrospectOAuth2TokenResponsePayload.constructFromObject(data['Body']);
       }
     }
     return obj;
   }
 
   /**
-   * @member {module:model/SwaggerOAuthIntrospectionResponseBody} Body
+   * @member {module:model/IntrospectOAuth2TokenResponsePayload} Body
    */
   exports.prototype['Body'] = undefined;
 

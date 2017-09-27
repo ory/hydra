@@ -31,7 +31,7 @@
   var instance;
 
   beforeEach(function() {
-    instance = new HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerOAuthIntrospectionResponseBody();
+    instance = new HydraOAuth2OpenIdConnectServer100Aplha1.IntrospectOAuth2TokenResponsePayload();
   });
 
   var getProperty = function(object, getter, property) {
@@ -50,58 +50,76 @@
       object[property] = value;
   }
 
-  describe('SwaggerOAuthIntrospectionResponseBody', function() {
-    it('should create an instance of SwaggerOAuthIntrospectionResponseBody', function() {
-      // uncomment below and update the code to test SwaggerOAuthIntrospectionResponseBody
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerOAuthIntrospectionResponseBody();
-      //expect(instance).to.be.a(HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerOAuthIntrospectionResponseBody);
+  describe('IntrospectOAuth2TokenResponsePayload', function() {
+    it('should create an instance of IntrospectOAuth2TokenResponsePayload', function() {
+      // uncomment below and update the code to test IntrospectOAuth2TokenResponsePayload
+      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.IntrospectOAuth2TokenResponsePayload();
+      //expect(instance).to.be.a(HydraOAuth2OpenIdConnectServer100Aplha1.IntrospectOAuth2TokenResponsePayload);
     });
 
     it('should have the property active (base name: "active")', function() {
       // uncomment below and update the code to test the property active
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerOAuthIntrospectionResponseBody();
+      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.IntrospectOAuth2TokenResponsePayload();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property aud (base name: "aud")', function() {
+      // uncomment below and update the code to test the property aud
+      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.IntrospectOAuth2TokenResponsePayload();
       //expect(instance).to.be();
     });
 
     it('should have the property clientId (base name: "client_id")', function() {
       // uncomment below and update the code to test the property clientId
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerOAuthIntrospectionResponseBody();
+      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.IntrospectOAuth2TokenResponsePayload();
       //expect(instance).to.be();
     });
 
     it('should have the property exp (base name: "exp")', function() {
       // uncomment below and update the code to test the property exp
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerOAuthIntrospectionResponseBody();
+      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.IntrospectOAuth2TokenResponsePayload();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property ext (base name: "ext")', function() {
+      // uncomment below and update the code to test the property ext
+      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.IntrospectOAuth2TokenResponsePayload();
       //expect(instance).to.be();
     });
 
     it('should have the property iat (base name: "iat")', function() {
       // uncomment below and update the code to test the property iat
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerOAuthIntrospectionResponseBody();
+      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.IntrospectOAuth2TokenResponsePayload();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property iss (base name: "iss")', function() {
+      // uncomment below and update the code to test the property iss
+      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.IntrospectOAuth2TokenResponsePayload();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property nbf (base name: "nbf")', function() {
+      // uncomment below and update the code to test the property nbf
+      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.IntrospectOAuth2TokenResponsePayload();
       //expect(instance).to.be();
     });
 
     it('should have the property scope (base name: "scope")', function() {
       // uncomment below and update the code to test the property scope
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerOAuthIntrospectionResponseBody();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property sess (base name: "sess")', function() {
-      // uncomment below and update the code to test the property sess
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerOAuthIntrospectionResponseBody();
+      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.IntrospectOAuth2TokenResponsePayload();
       //expect(instance).to.be();
     });
 
     it('should have the property sub (base name: "sub")', function() {
       // uncomment below and update the code to test the property sub
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerOAuthIntrospectionResponseBody();
+      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.IntrospectOAuth2TokenResponsePayload();
       //expect(instance).to.be();
     });
 
     it('should have the property username (base name: "username")', function() {
       // uncomment below and update the code to test the property username
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerOAuthIntrospectionResponseBody();
+      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.IntrospectOAuth2TokenResponsePayload();
       //expect(instance).to.be();
     });
 

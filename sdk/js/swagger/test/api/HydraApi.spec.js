@@ -31,7 +31,7 @@
   var instance;
 
   beforeEach(function() {
-    instance = new HydraOAuth2OpenIdConnectServer100Aplha1.OAuth2Api();
+    instance = new HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi();
   });
 
   var getProperty = function(object, getter, property) {
@@ -50,11 +50,11 @@
       object[property] = value;
   }
 
-  describe('OAuth2Api', function() {
-    describe('acceptOAuth2ConsentRequest', function() {
-      it('should call acceptOAuth2ConsentRequest successfully', function(done) {
-        //uncomment below and update the code to test acceptOAuth2ConsentRequest
-        //instance.acceptOAuth2ConsentRequest(function(error) {
+  describe('HydraApi', function() {
+    describe('createJsonWebKeySet', function() {
+      it('should call createJsonWebKeySet successfully', function(done) {
+        //uncomment below and update the code to test createJsonWebKeySet
+        //instance.createJsonWebKeySet(function(error) {
         //  if (error) throw error;
         //expect().to.be();
         //});
@@ -71,6 +71,26 @@
         done();
       });
     });
+    describe('deleteJsonWebKey', function() {
+      it('should call deleteJsonWebKey successfully', function(done) {
+        //uncomment below and update the code to test deleteJsonWebKey
+        //instance.deleteJsonWebKey(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
+    describe('deleteJsonWebKeySet', function() {
+      it('should call deleteJsonWebKeySet successfully', function(done) {
+        //uncomment below and update the code to test deleteJsonWebKeySet
+        //instance.deleteJsonWebKeySet(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
     describe('deleteOAuth2Client', function() {
       it('should call deleteOAuth2Client successfully', function(done) {
         //uncomment below and update the code to test deleteOAuth2Client
@@ -81,20 +101,30 @@
         done();
       });
     });
-    describe('getOAuth2Client', function() {
-      it('should call getOAuth2Client successfully', function(done) {
-        //uncomment below and update the code to test getOAuth2Client
-        //instance.getOAuth2Client(function(error) {
+    describe('getJsonWebKey', function() {
+      it('should call getJsonWebKey successfully', function(done) {
+        //uncomment below and update the code to test getJsonWebKey
+        //instance.getJsonWebKey(function(error) {
         //  if (error) throw error;
         //expect().to.be();
         //});
         done();
       });
     });
-    describe('getOAuth2ConsentRequest', function() {
-      it('should call getOAuth2ConsentRequest successfully', function(done) {
-        //uncomment below and update the code to test getOAuth2ConsentRequest
-        //instance.getOAuth2ConsentRequest(function(error) {
+    describe('getJsonWebKeySet', function() {
+      it('should call getJsonWebKeySet successfully', function(done) {
+        //uncomment below and update the code to test getJsonWebKeySet
+        //instance.getJsonWebKeySet(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
+    describe('getOAuth2Client', function() {
+      it('should call getOAuth2Client successfully', function(done) {
+        //uncomment below and update the code to test getOAuth2Client
+        //instance.getOAuth2Client(function(error) {
         //  if (error) throw error;
         //expect().to.be();
         //});
@@ -151,16 +181,6 @@
         done();
       });
     });
-    describe('rejectOAuth2ConsentRequest', function() {
-      it('should call rejectOAuth2ConsentRequest successfully', function(done) {
-        //uncomment below and update the code to test rejectOAuth2ConsentRequest
-        //instance.rejectOAuth2ConsentRequest(function(error) {
-        //  if (error) throw error;
-        //expect().to.be();
-        //});
-        done();
-      });
-    });
     describe('revokeOAuth2Token', function() {
       it('should call revokeOAuth2Token successfully', function(done) {
         //uncomment below and update the code to test revokeOAuth2Token
@@ -171,10 +191,40 @@
         done();
       });
     });
+    describe('updateJsonWebKey', function() {
+      it('should call updateJsonWebKey successfully', function(done) {
+        //uncomment below and update the code to test updateJsonWebKey
+        //instance.updateJsonWebKey(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
+    describe('updateJsonWebKeySet', function() {
+      it('should call updateJsonWebKeySet successfully', function(done) {
+        //uncomment below and update the code to test updateJsonWebKeySet
+        //instance.updateJsonWebKeySet(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
     describe('updateOAuth2Client', function() {
       it('should call updateOAuth2Client successfully', function(done) {
         //uncomment below and update the code to test updateOAuth2Client
         //instance.updateOAuth2Client(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
+    describe('wellKnown', function() {
+      it('should call wellKnown successfully', function(done) {
+        //uncomment below and update the code to test wellKnown
+        //instance.wellKnown(function(error) {
         //  if (error) throw error;
         //expect().to.be();
         //});

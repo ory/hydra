@@ -38,6 +38,24 @@ Class | Method | HTTP request | Description
 *GroupsApi* | [**GetGroup**](docs/GroupsApi.md#getgroup) | **Get** /warden/groups/{id} | Get a group by id
 *GroupsApi* | [**RemoveMembersFromGroup**](docs/GroupsApi.md#removemembersfromgroup) | **Delete** /warden/groups/{id}/members | Remove members from a group
 *HealthApi* | [**GetStatistics**](docs/HealthApi.md#getstatistics) | **Get** /health/stats | Show instance statistics
+*HydraApi* | [**CreateJsonWebKeySet**](docs/HydraApi.md#createjsonwebkeyset) | **Post** /keys/{set} | Generate a new JSON Web Key for a JSON Web Key Set
+*HydraApi* | [**CreateOAuth2Client**](docs/HydraApi.md#createoauth2client) | **Post** /clients | Creates an OAuth 2.0 Client
+*HydraApi* | [**DeleteJsonWebKey**](docs/HydraApi.md#deletejsonwebkey) | **Delete** /keys/{set}/{kid} | Delete a JSON Web Key
+*HydraApi* | [**DeleteJsonWebKeySet**](docs/HydraApi.md#deletejsonwebkeyset) | **Delete** /keys/{set} | Delete a JSON Web Key
+*HydraApi* | [**DeleteOAuth2Client**](docs/HydraApi.md#deleteoauth2client) | **Delete** /clients/{id} | Deletes an OAuth 2.0 Client
+*HydraApi* | [**GetJsonWebKey**](docs/HydraApi.md#getjsonwebkey) | **Get** /keys/{set}/{kid} | Retrieves a JSON Web Key Set matching the set and the kid
+*HydraApi* | [**GetJsonWebKeySet**](docs/HydraApi.md#getjsonwebkeyset) | **Get** /keys/{set} | Retrieves a JSON Web Key Set matching the set
+*HydraApi* | [**GetOAuth2Client**](docs/HydraApi.md#getoauth2client) | **Get** /clients/{id} | Fetches an OAuth 2.0 Client.
+*HydraApi* | [**GetWellKnown**](docs/HydraApi.md#getwellknown) | **Get** /.well-known/openid-configuration | Server well known configuration
+*HydraApi* | [**IntrospectOAuth2Token**](docs/HydraApi.md#introspectoauth2token) | **Post** /oauth2/introspect | Introspect an OAuth2 access token
+*HydraApi* | [**ListOAuth2Clients**](docs/HydraApi.md#listoauth2clients) | **Get** /clients | Lists OAuth 2.0 Clients
+*HydraApi* | [**OauthAuth**](docs/HydraApi.md#oauthauth) | **Get** /oauth2/auth | The OAuth 2.0 Auth endpoint
+*HydraApi* | [**OauthToken**](docs/HydraApi.md#oauthtoken) | **Post** /oauth2/token | The OAuth 2.0 Token endpoint
+*HydraApi* | [**RevokeOAuth2Token**](docs/HydraApi.md#revokeoauth2token) | **Post** /oauth2/revoke | Revoke an OAuth2 access token
+*HydraApi* | [**UpdateJsonWebKey**](docs/HydraApi.md#updatejsonwebkey) | **Put** /keys/{set}/{kid} | Updates a JSON Web Key
+*HydraApi* | [**UpdateJsonWebKeySet**](docs/HydraApi.md#updatejsonwebkeyset) | **Put** /keys/{set} | Updates a JSON Web Key Set
+*HydraApi* | [**UpdateOAuth2Client**](docs/HydraApi.md#updateoauth2client) | **Put** /clients/{id} | Updates an OAuth 2.0 Client
+*HydraApi* | [**WellKnown**](docs/HydraApi.md#wellknown) | **Get** /.well-known/jwks.json | Public JWKs
 *JsonWebKeyApi* | [**CreateJsonWebKeySet**](docs/JsonWebKeyApi.md#createjsonwebkeyset) | **Post** /keys/{set} | Generate a new JSON Web Key for a JSON Web Key Set
 *JsonWebKeyApi* | [**DeleteJsonWebKey**](docs/JsonWebKeyApi.md#deletejsonwebkey) | **Delete** /keys/{set}/{kid} | Delete a JSON Web Key
 *JsonWebKeyApi* | [**DeleteJsonWebKeySet**](docs/JsonWebKeyApi.md#deletejsonwebkeyset) | **Delete** /keys/{set} | Delete a JSON Web Key
@@ -52,7 +70,7 @@ Class | Method | HTTP request | Description
 *OAuth2Api* | [**GetOAuth2Client**](docs/OAuth2Api.md#getoauth2client) | **Get** /clients/{id} | Fetches an OAuth 2.0 Client.
 *OAuth2Api* | [**GetOAuth2ConsentRequest**](docs/OAuth2Api.md#getoauth2consentrequest) | **Get** /oauth2/consent/requests/{id} | Receive consent request information
 *OAuth2Api* | [**GetWellKnown**](docs/OAuth2Api.md#getwellknown) | **Get** /.well-known/openid-configuration | Server well known configuration
-*OAuth2Api* | [**IntrospectToken**](docs/OAuth2Api.md#introspecttoken) | **Post** /oauth2/introspect | Introspect an OAuth2 access token
+*OAuth2Api* | [**IntrospectOAuth2Token**](docs/OAuth2Api.md#introspectoauth2token) | **Post** /oauth2/introspect | Introspect an OAuth2 access token
 *OAuth2Api* | [**ListOAuth2Clients**](docs/OAuth2Api.md#listoauth2clients) | **Get** /clients | Lists OAuth 2.0 Clients
 *OAuth2Api* | [**OauthAuth**](docs/OAuth2Api.md#oauthauth) | **Get** /oauth2/auth | The OAuth 2.0 Auth endpoint
 *OAuth2Api* | [**OauthToken**](docs/OAuth2Api.md#oauthtoken) | **Post** /oauth2/token | The OAuth 2.0 Token endpoint
@@ -81,22 +99,18 @@ Class | Method | HTTP request | Description
 
  - [AcceptConsentRequestPayload](docs/AcceptConsentRequestPayload.md)
  - [AllowedRequest](docs/AllowedRequest.md)
- - [ConsentRequestClient](docs/ConsentRequestClient.md)
  - [ConsentRequestManager](docs/ConsentRequestManager.md)
  - [Context](docs/Context.md)
  - [CreateJsonWebKeySetPayload](docs/CreateJsonWebKeySetPayload.md)
  - [Firewall](docs/Firewall.md)
  - [Group](docs/Group.md)
  - [Handler](docs/Handler.md)
- - [Headers](docs/Headers.md)
- - [IdTokenClaims](docs/IdTokenClaims.md)
  - [InlineResponse200](docs/InlineResponse200.md)
  - [InlineResponse2001](docs/InlineResponse2001.md)
  - [InlineResponse2002](docs/InlineResponse2002.md)
  - [InlineResponse2003](docs/InlineResponse2003.md)
- - [InlineResponse2004](docs/InlineResponse2004.md)
  - [InlineResponse401](docs/InlineResponse401.md)
- - [IntrospectOAuth2TokenRequestPayload](docs/IntrospectOAuth2TokenRequestPayload.md)
+ - [IntrospectOAuth2TokenResponsePayload](docs/IntrospectOAuth2TokenResponsePayload.md)
  - [JoseWebKeySetRequest](docs/JoseWebKeySetRequest.md)
  - [JsonWebKey](docs/JsonWebKey.md)
  - [JsonWebKeySet](docs/JsonWebKeySet.md)
@@ -109,8 +123,6 @@ Class | Method | HTTP request | Description
  - [PolicyConditions](docs/PolicyConditions.md)
  - [RawMessage](docs/RawMessage.md)
  - [RejectConsentRequestPayload](docs/RejectConsentRequestPayload.md)
- - [RevokeOAuth2TokenRequestPayload](docs/RevokeOAuth2TokenRequestPayload.md)
- - [Session](docs/Session.md)
  - [SwaggerAcceptConsentRequest](docs/SwaggerAcceptConsentRequest.md)
  - [SwaggerCreatePolicyParameters](docs/SwaggerCreatePolicyParameters.md)
  - [SwaggerGetPolicyParameters](docs/SwaggerGetPolicyParameters.md)
@@ -125,7 +137,6 @@ Class | Method | HTTP request | Description
  - [SwaggerOAuthConsentRequestPayload](docs/SwaggerOAuthConsentRequestPayload.md)
  - [SwaggerOAuthIntrospectionRequest](docs/SwaggerOAuthIntrospectionRequest.md)
  - [SwaggerOAuthIntrospectionResponse](docs/SwaggerOAuthIntrospectionResponse.md)
- - [SwaggerOAuthIntrospectionResponseBody](docs/SwaggerOAuthIntrospectionResponseBody.md)
  - [SwaggerOAuthTokenResponse](docs/SwaggerOAuthTokenResponse.md)
  - [SwaggerOAuthTokenResponseBody](docs/SwaggerOAuthTokenResponseBody.md)
  - [SwaggerRejectConsentRequest](docs/SwaggerRejectConsentRequest.md)

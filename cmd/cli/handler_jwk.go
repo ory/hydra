@@ -1,11 +1,11 @@
 package cli
 
 import (
-	"encoding/json"
 	"fmt"
 
+	"net/http"
+
 	"github.com/ory/hydra/config"
-	"github.com/ory/hydra/pkg"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/spf13/cobra"
 )
@@ -17,6 +17,10 @@ type JWKHandler struct {
 func (h *JWKHandler) newJwkManager(cmd *cobra.Command) *hydra.JsonWebKeyApi {
 	c := hydra.NewJsonWebKeyApiWithBasePath(h.Config.ClusterURL)
 	c.Configuration.Transport = h.Config.OAuth2Client(cmd).Transport
+	if term, _ := cmd.Flags().GetBool("fake-tls-termination"); term {
+		c.Configuration.DefaultHeader["X-Forwarded-Proto"] = "https"
+	}
+
 	return c
 }
 
@@ -37,13 +41,9 @@ func (h *JWKHandler) CreateKeys(cmd *cobra.Command, args []string) {
 	}
 
 	alg, _ := cmd.Flags().GetString("alg")
-	keys, _, err := m.CreateJsonWebKeySet(args[0], hydra.CreateJsonWebKeySetPayload{Alg: alg, Kid: kid})
-	pkg.Must(err, "Could not generate keys: %s", err)
-
-	out, err := json.MarshalIndent(keys, "", "\t")
-	pkg.Must(err, "Could not marshall keys: %s", err)
-
-	fmt.Printf("%s\n", out)
+	keys, response, err := m.CreateJsonWebKeySet(args[0], hydra.CreateJsonWebKeySetPayload{Alg: alg, Kid: kid})
+	checkResponse(response, err, http.StatusCreated)
+	fmt.Printf("%s\n", formatResponse(keys))
 }
 
 func (h *JWKHandler) GetKeys(cmd *cobra.Command, args []string) {
@@ -53,13 +53,9 @@ func (h *JWKHandler) GetKeys(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	keys, _, err := m.GetJsonWebKeySet(args[0])
-	pkg.Must(err, "Could not generate keys: %s", err)
-
-	out, err := json.MarshalIndent(keys, "", "\t")
-	pkg.Must(err, "Could not marshall keys: %s", err)
-
-	fmt.Printf("%s\n", out)
+	keys, response, err := m.GetJsonWebKeySet(args[0])
+	checkResponse(response, err, http.StatusOK)
+	fmt.Printf("%s\n", formatResponse(keys))
 }
 
 func (h *JWKHandler) DeleteKeys(cmd *cobra.Command, args []string) {
@@ -69,7 +65,7 @@ func (h *JWKHandler) DeleteKeys(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	_, err := m.DeleteJsonWebKeySet(args[0])
-	pkg.Must(err, "Could not generate keys: %s", err)
+	response, err := m.DeleteJsonWebKeySet(args[0])
+	checkResponse(response, err, http.StatusNoContent)
 	fmt.Printf("Key set %s deleted.\n", args[0])
 }

@@ -27,7 +27,7 @@ var keysCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(keysCmd)
 	//keysCmd.PersistentFlags().Bool("dry", false, "do not execute the command but show the corresponding curl command instead")
-	//keysCmd.PersistentFlags().Bool("fake-tls-termination", false, `fake tls termination by adding "X-Forwarded-Proto: https"" to http headers`)
+	keysCmd.PersistentFlags().Bool("fake-tls-termination", false, `fake tls termination by adding "X-Forwarded-Proto: https"" to http headers`)
 
 	// Here you will define your flags and configuration settings.
 

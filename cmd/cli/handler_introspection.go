@@ -7,7 +7,10 @@ import (
 
 	"github.com/ory/hydra/config"
 	//"github.com/ory/hydra/oauth2"
-	//"github.com/ory/hydra/pkg"
+
+	"net/http"
+	"strings"
+
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/spf13/cobra"
 )
@@ -29,15 +32,14 @@ func (h *IntrospectionHandler) IsAuthorized(cmd *cobra.Command, args []string) {
 	}
 
 	c := hydra.NewOAuth2ApiWithBasePath(h.Config.ClusterURL)
-	c.Configuration.Username = h.Config.ClientID
-	c.Configuration.Password = h.Config.ClientSecret
+	c.Configuration.Transport = h.Config.OAuth2Client(cmd).Transport
 
-	//scopes, _ := cmd.Flags().GetStringSlice("scopes")
-	//res, err := c.IntrospectToken(context.Background(), args[0], scopes...)
-	//pkg.Must(err, "Could not validate token: %s", err)
-	//
-	//out, err := json.MarshalIndent(res, "", "\t")
-	//pkg.Must(err, "Could not prettify token: %s", err)
-	//
-	//fmt.Printf("%s\n", out)
+	if term, _ := cmd.Flags().GetBool("fake-tls-termination"); term {
+		c.Configuration.DefaultHeader["X-Forwarded-Proto"] = "https"
+	}
+
+	scopes, _ := cmd.Flags().GetStringSlice("scopes")
+	result, response, err := c.IntrospectOAuth2Token(args[0], strings.Join(scopes, " "))
+	checkResponse(response, err, http.StatusOK)
+	fmt.Printf("%s\n", formatResponse(result))
 }

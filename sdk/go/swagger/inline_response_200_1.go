@@ -12,21 +12,26 @@ package swagger
 
 type InlineResponse2001 struct {
 
-	// The access token issued by the authorization server.
-	AccessToken string `json:"access_token,omitempty"`
+	// Boolean indicator of whether or not the presented token is currently active.  The specifics of a token's \"active\" state will vary depending on the implementation of the authorization server and the information it keeps about its tokens, but a \"true\" value return for the \"active\" property will generally indicate that a given token has been issued by this authorization server, has not been revoked by the resource owner, and is within its given time window of validity (e.g., after its issuance time and before its expiration time).
+	Active bool `json:"active,omitempty"`
 
-	// The lifetime in seconds of the access token.  For example, the value \"3600\" denotes that the access token will expire in one hour from the time the response was generated.
-	ExpiresIn int64 `json:"expires_in,omitempty"`
+	// Client identifier for the OAuth 2.0 client that requested this token.
+	ClientId string `json:"client_id,omitempty"`
 
-	// To retrieve a refresh token request the id_token scope.
-	IdToken int64 `json:"id_token,omitempty"`
+	// Integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token will expire
+	Exp int64 `json:"exp,omitempty"`
 
-	// The refresh token, which can be used to obtain new access tokens. To retrieve it add the scope \"offline\" to your access token request.
-	RefreshToken string `json:"refresh_token,omitempty"`
+	// Integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token was originally issued
+	Iat int64 `json:"iat,omitempty"`
 
-	// The scope of the access token
-	Scope int64 `json:"scope,omitempty"`
+	// A JSON string containing a space-separated list of scopes associated with this token
+	Scope string `json:"scope,omitempty"`
 
-	// The type of the token issued
-	TokenType string `json:"token_type,omitempty"`
+	Sess Session `json:"sess,omitempty"`
+
+	// Subject of the token, as defined in JWT [RFC7519]. Usually a machine-readable identifier of the resource owner who authorized this token.
+	Sub string `json:"sub,omitempty"`
+
+	// Human-readable identifier for the resource owner who authorized this token. Currently not supported by Hydra.
+	Username string `json:"username,omitempty"`
 }

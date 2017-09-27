@@ -11,6 +11,7 @@
 package swagger
 
 import (
+	"encoding/json"
 	"net/url"
 	"strings"
 )
@@ -36,12 +37,12 @@ func NewDefaultApiWithBasePath(basePath string) *DefaultApi {
 }
 
 /**
- *
  * Check health status of instance
+ * This endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header when TLS termination is set.
  *
- * @return void
+ * @return *InlineResponse200
  */
-func (a DefaultApi) Health() (*APIResponse, error) {
+func (a DefaultApi) Health() (*InlineResponse200, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Get")
 	// create path and map variables
@@ -76,6 +77,7 @@ func (a DefaultApi) Health() (*APIResponse, error) {
 	if localVarHttpHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
+	var successPayload = new(InlineResponse200)
 	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 
 	var localVarURL, _ = url.Parse(localVarPath)
@@ -87,7 +89,8 @@ func (a DefaultApi) Health() (*APIResponse, error) {
 	}
 
 	if err != nil {
-		return localVarAPIResponse, err
+		return successPayload, localVarAPIResponse, err
 	}
-	return localVarAPIResponse, err
+	err = json.Unmarshal(localVarHttpResponse.Body(), &successPayload)
+	return successPayload, localVarAPIResponse, err
 }

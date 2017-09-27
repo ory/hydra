@@ -9,11 +9,11 @@ Method | HTTP request | Description
 
 <a name="getStatistics"></a>
 # **getStatistics**
-> [OauthClient] getStatistics()
+> getStatistics()
 
 Show instance statistics
 
-The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:health:stats\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+This endpoint returns information on the instance&#39;s health. It is currently not documented.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:health:stats\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
 
 ### Example
 ```javascript
@@ -30,7 +30,7 @@ var callback = function(error, data, response) {
   if (error) {
     console.error(error);
   } else {
-    console.log('API called successfully. Returned data: ' + data);
+    console.log('API called successfully.');
   }
 };
 apiInstance.getStatistics(callback);
@@ -41,7 +41,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**[OauthClient]**](OauthClient.md)
+null (empty response body)
 
 ### Authorization
 

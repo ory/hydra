@@ -4,15 +4,15 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**Health**](DefaultApi.md#Health) | **Get** /health | 
+[**Health**](DefaultApi.md#Health) | **Get** /health | Check health status of instance
 
 
 # **Health**
-> Health()
-
-
+> InlineResponse200 Health()
 
 Check health status of instance
+
+This endpoint does not require the `X-Forwarded-Proto` header when TLS termination is set.
 
 
 ### Parameters
@@ -20,7 +20,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-void (empty response body)
+[**InlineResponse200**](inline_response_200.md)
 
 ### Authorization
 

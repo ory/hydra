@@ -17,18 +17,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/InlineResponse401'], factory);
+    define(['ApiClient', 'model/InlineResponse200', 'model/InlineResponse401'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/InlineResponse401'));
+    module.exports = factory(require('../ApiClient'), require('../model/InlineResponse200'), require('../model/InlineResponse401'));
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer100Aplha1) {
       root.HydraOAuth2OpenIdConnectServer100Aplha1 = {};
     }
-    root.HydraOAuth2OpenIdConnectServer100Aplha1.DefaultApi = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse401);
+    root.HydraOAuth2OpenIdConnectServer100Aplha1.DefaultApi = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse200, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse401);
   }
-}(this, function(ApiClient, InlineResponse401) {
+}(this, function(ApiClient, InlineResponse200, InlineResponse401) {
   'use strict';
 
   /**
@@ -52,13 +52,15 @@
      * Callback function to receive the result of the health operation.
      * @callback module:api/DefaultApi~healthCallback
      * @param {String} error Error message, if any.
-     * @param data This operation does not return a value.
+     * @param {module:model/InlineResponse200} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
     /**
      * Check health status of instance
+     * This endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header when TLS termination is set.
      * @param {module:api/DefaultApi~healthCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/InlineResponse200}
      */
     this.health = function(callback) {
       var postBody = null;
@@ -76,7 +78,7 @@
       var authNames = [];
       var contentTypes = ['application/json', 'application/x-www-form-urlencoded'];
       var accepts = ['application/json'];
-      var returnType = null;
+      var returnType = InlineResponse200;
 
       return this.apiClient.callApi(
         '/health', 'GET',

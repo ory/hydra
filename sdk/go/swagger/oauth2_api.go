@@ -371,9 +371,9 @@ func (a Oauth2Api) GetOAuthClient(id string) (*OauthClient, *APIResponse, error)
  * Introspect an OAuth2 access token
  * For more information, please refer to https://tools.ietf.org/html/rfc7662
  *
- * @return *InlineResponse200
+ * @return *InlineResponse2001
  */
-func (a Oauth2Api) IntrospectOAuthToken() (*InlineResponse200, *APIResponse, error) {
+func (a Oauth2Api) IntrospectOAuthToken() (*InlineResponse2001, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Post")
 	// create path and map variables
@@ -413,7 +413,7 @@ func (a Oauth2Api) IntrospectOAuthToken() (*InlineResponse200, *APIResponse, err
 	if localVarHttpHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
-	var successPayload = new(InlineResponse200)
+	var successPayload = new(InlineResponse2001)
 	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 
 	var localVarURL, _ = url.Parse(localVarPath)
@@ -556,9 +556,9 @@ func (a Oauth2Api) OauthAuth() (*APIResponse, error) {
  * The OAuth 2.0 Token endpoint
  * For more information, please refer to https://tools.ietf.org/html/rfc6749#section-4
  *
- * @return *InlineResponse2001
+ * @return *InlineResponse2002
  */
-func (a Oauth2Api) OauthToken() (*InlineResponse2001, *APIResponse, error) {
+func (a Oauth2Api) OauthToken() (*InlineResponse2002, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Post")
 	// create path and map variables
@@ -598,7 +598,7 @@ func (a Oauth2Api) OauthToken() (*InlineResponse2001, *APIResponse, error) {
 	if localVarHttpHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
-	var successPayload = new(InlineResponse2001)
+	var successPayload = new(InlineResponse2002)
 	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 
 	var localVarURL, _ = url.Parse(localVarPath)

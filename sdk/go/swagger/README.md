@@ -30,7 +30,7 @@ Class | Method | HTTP request | Description
 *ConsentApi* | [**AcceptConsentRequest**](docs/ConsentApi.md#acceptconsentrequest) | **Patch** /oauth2/consent/requests/{id}/accept | Accept a consent request
 *ConsentApi* | [**GetConsentRequest**](docs/ConsentApi.md#getconsentrequest) | **Get** /oauth2/consent/requests/{id} | Receive consent request information
 *ConsentApi* | [**RejectConsentRequest**](docs/ConsentApi.md#rejectconsentrequest) | **Patch** /oauth2/consent/requests/{id}/reject | Reject a consent request
-*DefaultApi* | [**Health**](docs/DefaultApi.md#health) | **Get** /health | 
+*DefaultApi* | [**Health**](docs/DefaultApi.md#health) | **Get** /health | Check health status of instance
 *GroupsApi* | [**AddMembersToGroup**](docs/GroupsApi.md#addmemberstogroup) | **Post** /warden/groups/{id}/members | Add members to a group
 *GroupsApi* | [**CreateGroup**](docs/GroupsApi.md#creategroup) | **Post** /warden/groups | Create a group
 *GroupsApi* | [**DeleteGroup**](docs/GroupsApi.md#deletegroup) | **Delete** /warden/groups/{id} | Delete a group by id
@@ -38,13 +38,13 @@ Class | Method | HTTP request | Description
 *GroupsApi* | [**GetGroup**](docs/GroupsApi.md#getgroup) | **Get** /warden/groups/{id} | Get a group by id
 *GroupsApi* | [**RemoveMembersFromGroup**](docs/GroupsApi.md#removemembersfromgroup) | **Delete** /warden/groups/{id}/members | Remove members from a group
 *HealthApi* | [**GetStatistics**](docs/HealthApi.md#getstatistics) | **Get** /health/stats | Show instance statistics
-*JwksApi* | [**CreateJwkKey**](docs/JwksApi.md#createjwkkey) | **Post** /keys/{set} | Generate a new JSON Web Key
-*JwksApi* | [**DeleteJwkKey**](docs/JwksApi.md#deletejwkkey) | **Delete** /keys/{set}/{kid} | Delete a JSON Web Key
+*JwksApi* | [**CreateJwkSetKey**](docs/JwksApi.md#createjwksetkey) | **Post** /keys/{set} | Generate a new JSON Web Key for a JSON Web Key Set
 *JwksApi* | [**DeleteJwkSet**](docs/JwksApi.md#deletejwkset) | **Delete** /keys/{set} | Delete a JSON Web Key
+*JwksApi* | [**DeleteJwkSetKey**](docs/JwksApi.md#deletejwksetkey) | **Delete** /keys/{set}/{kid} | Delete a JSON Web Key
 *JwksApi* | [**GetJwkSet**](docs/JwksApi.md#getjwkset) | **Get** /keys/{set} | Retrieves a JSON Web Key Set matching the set
 *JwksApi* | [**GetJwkSetKey**](docs/JwksApi.md#getjwksetkey) | **Get** /keys/{set}/{kid} | Retrieves a JSON Web Key Set matching the set and the kid
-*JwksApi* | [**UpdateJwkKey**](docs/JwksApi.md#updatejwkkey) | **Put** /keys/{set}/{kid} | Updates a JSON Web Key
 *JwksApi* | [**UpdateJwkSet**](docs/JwksApi.md#updatejwkset) | **Put** /keys/{set} | Updates a JSON Web Key Set
+*JwksApi* | [**UpdateJwkSetKey**](docs/JwksApi.md#updatejwksetkey) | **Put** /keys/{set}/{kid} | Updates a JSON Web Key
 *JwksApi* | [**WellKnown**](docs/JwksApi.md#wellknown) | **Get** /.well-known/jwks.json | Public JWKs
 *Oauth2Api* | [**AcceptConsentRequest**](docs/Oauth2Api.md#acceptconsentrequest) | **Patch** /oauth2/consent/requests/{id}/accept | Accept a consent request
 *Oauth2Api* | [**CreateOAuthClient**](docs/Oauth2Api.md#createoauthclient) | **Post** /clients | Creates an OAuth 2.0 Client
@@ -95,6 +95,7 @@ Class | Method | HTTP request | Description
  - [InlineResponse2001](docs/InlineResponse2001.md)
  - [InlineResponse2002](docs/InlineResponse2002.md)
  - [InlineResponse2003](docs/InlineResponse2003.md)
+ - [InlineResponse2004](docs/InlineResponse2004.md)
  - [InlineResponse401](docs/InlineResponse401.md)
  - [Jwk](docs/Jwk.md)
  - [JwkSet](docs/JwkSet.md)
@@ -107,11 +108,11 @@ Class | Method | HTTP request | Description
  - [Session](docs/Session.md)
  - [SwaggerCreatePolicyParameters](docs/SwaggerCreatePolicyParameters.md)
  - [SwaggerGetPolicyParameters](docs/SwaggerGetPolicyParameters.md)
- - [SwaggerJwkCreateKey](docs/SwaggerJwkCreateKey.md)
+ - [SwaggerJwkCreateSetKey](docs/SwaggerJwkCreateSetKey.md)
  - [SwaggerJwkSetKeyQuery](docs/SwaggerJwkSetKeyQuery.md)
  - [SwaggerJwkSetQuery](docs/SwaggerJwkSetQuery.md)
- - [SwaggerJwkUpdateKey](docs/SwaggerJwkUpdateKey.md)
  - [SwaggerJwkUpdateSet](docs/SwaggerJwkUpdateSet.md)
+ - [SwaggerJwkUpdateSetKey](docs/SwaggerJwkUpdateSetKey.md)
  - [SwaggerListPolicyParameters](docs/SwaggerListPolicyParameters.md)
  - [SwaggerListPolicyResponse](docs/SwaggerListPolicyResponse.md)
  - [SwaggerUpdatePolicyParameters](docs/SwaggerUpdatePolicyParameters.md)

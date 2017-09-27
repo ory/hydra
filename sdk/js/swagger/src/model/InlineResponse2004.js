@@ -26,7 +26,7 @@
     if (!root.HydraOAuth2OpenIdConnectServer100Aplha1) {
       root.HydraOAuth2OpenIdConnectServer100Aplha1 = {};
     }
-    root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2003 = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient);
+    root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2004 = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient);
   }
 }(this, function(ApiClient) {
   'use strict';
@@ -35,28 +35,33 @@
 
 
   /**
-   * The InlineResponse2003 model module.
-   * @module model/InlineResponse2003
+   * The InlineResponse2004 model module.
+   * @module model/InlineResponse2004
    * @version Latest
    */
 
   /**
-   * Constructs a new <code>InlineResponse2003</code>.
-   * @alias module:model/InlineResponse2003
+   * Constructs a new <code>InlineResponse2004</code>.
+   * @alias module:model/InlineResponse2004
    * @class
    */
   var exports = function() {
     var _this = this;
 
 
+
+
+
+
+
   };
 
   /**
-   * Constructs a <code>InlineResponse2003</code> from a plain JavaScript object, optionally creating a new instance.
+   * Constructs a <code>InlineResponse2004</code> from a plain JavaScript object, optionally creating a new instance.
    * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
    * @param {Object} data The plain JavaScript object bearing properties of interest.
-   * @param {module:model/InlineResponse2003} obj Optional instance to populate.
-   * @return {module:model/InlineResponse2003} The populated <code>InlineResponse2003</code> instance.
+   * @param {module:model/InlineResponse2004} obj Optional instance to populate.
+   * @return {module:model/InlineResponse2004} The populated <code>InlineResponse2004</code> instance.
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
@@ -64,6 +69,21 @@
 
       if (data.hasOwnProperty('allowed')) {
         obj['allowed'] = ApiClient.convertToType(data['allowed'], 'Boolean');
+      }
+      if (data.hasOwnProperty('aud')) {
+        obj['aud'] = ApiClient.convertToType(data['aud'], 'String');
+      }
+      if (data.hasOwnProperty('ext')) {
+        obj['ext'] = ApiClient.convertToType(data['ext'], {'String': Object});
+      }
+      if (data.hasOwnProperty('iss')) {
+        obj['iss'] = ApiClient.convertToType(data['iss'], 'String');
+      }
+      if (data.hasOwnProperty('scopes')) {
+        obj['scopes'] = ApiClient.convertToType(data['scopes'], ['String']);
+      }
+      if (data.hasOwnProperty('sub')) {
+        obj['sub'] = ApiClient.convertToType(data['sub'], 'String');
       }
     }
     return obj;
@@ -74,6 +94,31 @@
    * @member {Boolean} allowed
    */
   exports.prototype['allowed'] = undefined;
+  /**
+   * Audience is who the token was issued for. This is an OAuth2 app usually.
+   * @member {String} aud
+   */
+  exports.prototype['aud'] = undefined;
+  /**
+   * Extra represents arbitrary session data.
+   * @member {Object.<String, Object>} ext
+   */
+  exports.prototype['ext'] = undefined;
+  /**
+   * Issuer is the id of the issuer, typically an hydra instance.
+   * @member {String} iss
+   */
+  exports.prototype['iss'] = undefined;
+  /**
+   * GrantedScopes is a list of scopes that the subject authorized when asked for consent.
+   * @member {Array.<String>} scopes
+   */
+  exports.prototype['scopes'] = undefined;
+  /**
+   * Subject is the identity that authorized issuing the token, for example a user or an OAuth2 app. This is usually a uuid but you can choose a urn or some other id too.
+   * @member {String} sub
+   */
+  exports.prototype['sub'] = undefined;
 
 
 

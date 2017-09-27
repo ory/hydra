@@ -17,18 +17,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/AllowedRequest', 'model/Group', 'model/InlineResponse2003', 'model/InlineResponse2004', 'model/InlineResponse401', 'model/MembersRequest', 'model/WardenTokenAllowedBody'], factory);
+    define(['ApiClient', 'model/AllowedRequest', 'model/Group', 'model/InlineResponse2002', 'model/InlineResponse2003', 'model/InlineResponse401', 'model/MembersRequest', 'model/WardenTokenAllowedBody'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/AllowedRequest'), require('../model/Group'), require('../model/InlineResponse2003'), require('../model/InlineResponse2004'), require('../model/InlineResponse401'), require('../model/MembersRequest'), require('../model/WardenTokenAllowedBody'));
+    module.exports = factory(require('../ApiClient'), require('../model/AllowedRequest'), require('../model/Group'), require('../model/InlineResponse2002'), require('../model/InlineResponse2003'), require('../model/InlineResponse401'), require('../model/MembersRequest'), require('../model/WardenTokenAllowedBody'));
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer100Aplha1) {
       root.HydraOAuth2OpenIdConnectServer100Aplha1 = {};
     }
-    root.HydraOAuth2OpenIdConnectServer100Aplha1.WardenApi = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.AllowedRequest, root.HydraOAuth2OpenIdConnectServer100Aplha1.Group, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2003, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2004, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse401, root.HydraOAuth2OpenIdConnectServer100Aplha1.MembersRequest, root.HydraOAuth2OpenIdConnectServer100Aplha1.WardenTokenAllowedBody);
+    root.HydraOAuth2OpenIdConnectServer100Aplha1.WardenApi = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.AllowedRequest, root.HydraOAuth2OpenIdConnectServer100Aplha1.Group, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2002, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2003, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse401, root.HydraOAuth2OpenIdConnectServer100Aplha1.MembersRequest, root.HydraOAuth2OpenIdConnectServer100Aplha1.WardenTokenAllowedBody);
   }
-}(this, function(ApiClient, AllowedRequest, Group, InlineResponse2003, InlineResponse2004, InlineResponse401, MembersRequest, WardenTokenAllowedBody) {
+}(this, function(ApiClient, AllowedRequest, Group, InlineResponse2002, InlineResponse2003, InlineResponse401, MembersRequest, WardenTokenAllowedBody) {
   'use strict';
 
   /**
@@ -321,7 +321,7 @@
      * Callback function to receive the result of the wardenAllowed operation.
      * @callback module:api/WardenApi~wardenAllowedCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/InlineResponse2003} data The data returned by the service call.
+     * @param {module:model/InlineResponse2002} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -331,7 +331,7 @@
      * @param {Object} opts Optional parameters
      * @param {module:model/AllowedRequest} opts.body 
      * @param {module:api/WardenApi~wardenAllowedCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/InlineResponse2003}
+     * data is of type: {@link module:model/InlineResponse2002}
      */
     this.wardenAllowed = function(opts, callback) {
       opts = opts || {};
@@ -350,7 +350,7 @@
       var authNames = ['oauth2'];
       var contentTypes = ['application/json'];
       var accepts = ['application/json'];
-      var returnType = InlineResponse2003;
+      var returnType = InlineResponse2002;
 
       return this.apiClient.callApi(
         '/warden/allowed', 'POST',
@@ -363,7 +363,7 @@
      * Callback function to receive the result of the wardenTokenAllowed operation.
      * @callback module:api/WardenApi~wardenTokenAllowedCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/InlineResponse2004} data The data returned by the service call.
+     * @param {module:model/InlineResponse2003} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -373,7 +373,7 @@
      * @param {Object} opts Optional parameters
      * @param {module:model/WardenTokenAllowedBody} opts.body 
      * @param {module:api/WardenApi~wardenTokenAllowedCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/InlineResponse2004}
+     * data is of type: {@link module:model/InlineResponse2003}
      */
     this.wardenTokenAllowed = function(opts, callback) {
       opts = opts || {};
@@ -392,7 +392,7 @@
       var authNames = ['oauth2'];
       var contentTypes = ['application/json'];
       var accepts = ['application/json'];
-      var returnType = InlineResponse2004;
+      var returnType = InlineResponse2003;
 
       return this.apiClient.callApi(
         '/warden/token/allowed', 'POST',

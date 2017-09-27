@@ -63,6 +63,36 @@
       //expect(instance).to.be();
     });
 
+    it('should have the property aud (base name: "aud")', function() {
+      // uncomment below and update the code to test the property aud
+      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2003();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property ext (base name: "ext")', function() {
+      // uncomment below and update the code to test the property ext
+      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2003();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property iss (base name: "iss")', function() {
+      // uncomment below and update the code to test the property iss
+      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2003();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property scopes (base name: "scopes")', function() {
+      // uncomment below and update the code to test the property scopes
+      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2003();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property sub (base name: "sub")', function() {
+      // uncomment below and update the code to test the property sub
+      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2003();
+      //expect(instance).to.be();
+    });
+
   });
 
 }));

@@ -14,6 +14,7 @@ import (
 	hcompose "github.com/ory/hydra/compose"
 	. "github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
+	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/ory/ladon"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
@@ -83,7 +84,7 @@ var localWarden, httpClient = hcompose.NewMockFirewall("foo", "app-client", fosi
 
 var consentHandler *ConsentSessionHandler
 var consentManager = NewConsentRequestMemoryManager()
-var consentClient *HTTPConsentManager
+var consentClient *hydra.OAuth2Api
 
 func init() {
 	consentHandler = &ConsentSessionHandler{
@@ -99,8 +100,8 @@ func init() {
 	consentHandler.SetRoutes(router)
 
 	h, _ := hasher.Hash([]byte("secret"))
-	u, _ := url.Parse(ts.URL + ConsentRequestPath)
-	consentClient = &HTTPConsentManager{Client: httpClient, Endpoint: u}
+	consentClient = hydra.NewOAuth2ApiWithBasePath(ts.URL)
+	consentClient.Configuration.Transport = httpClient.Transport
 
 	c, _ := url.Parse(ts.URL + "/consent")
 	handler.ConsentURL = *c

@@ -41,6 +41,7 @@
           "https"
         ],
         "tags": [
+          "hydra",
           "jsonWebKey",
           "oauth2",
           "openid-connect"
@@ -84,6 +85,7 @@
           "https"
         ],
         "tags": [
+          "hydra",
           "oAuth2",
           "openid-connect"
         ],
@@ -119,6 +121,7 @@
           "https"
         ],
         "tags": [
+          "hydra",
           "oAuth2",
           "clients"
         ],
@@ -159,6 +162,7 @@
           "https"
         ],
         "tags": [
+          "hydra",
           "oAuth2",
           "clients"
         ],
@@ -214,6 +218,7 @@
           "https"
         ],
         "tags": [
+          "hydra",
           "oAuth2",
           "clients"
         ],
@@ -268,6 +273,7 @@
           "https"
         ],
         "tags": [
+          "hydra",
           "oAuth2",
           "clients"
         ],
@@ -328,6 +334,7 @@
           "https"
         ],
         "tags": [
+          "hydra",
           "oAuth2",
           "clients"
         ],
@@ -437,6 +444,7 @@
           "https"
         ],
         "tags": [
+          "hydra",
           "jsonWebKey"
         ],
         "summary": "Retrieves a JSON Web Key Set matching the set",
@@ -489,6 +497,7 @@
           "https"
         ],
         "tags": [
+          "hydra",
           "jsonWebKey"
         ],
         "summary": "Updates a JSON Web Key Set",
@@ -548,6 +557,7 @@
           "https"
         ],
         "tags": [
+          "hydra",
           "jsonWebKey"
         ],
         "summary": "Generate a new JSON Web Key for a JSON Web Key Set",
@@ -607,6 +617,7 @@
           "https"
         ],
         "tags": [
+          "hydra",
           "jsonWebKey"
         ],
         "summary": "Delete a JSON Web Key",
@@ -658,6 +669,7 @@
           "https"
         ],
         "tags": [
+          "hydra",
           "jsonWebKey"
         ],
         "summary": "Retrieves a JSON Web Key Set matching the set and the kid",
@@ -718,6 +730,7 @@
           "https"
         ],
         "tags": [
+          "hydra",
           "jsonWebKey"
         ],
         "summary": "Updates a JSON Web Key",
@@ -785,6 +798,7 @@
           "https"
         ],
         "tags": [
+          "hydra",
           "jsonWebKey"
         ],
         "summary": "Delete a JSON Web Key",
@@ -841,6 +855,7 @@
           "https"
         ],
         "tags": [
+          "hydra",
           "oAuth2"
         ],
         "summary": "The OAuth 2.0 Auth endpoint",
@@ -1034,13 +1049,31 @@
           "https"
         ],
         "tags": [
+          "hydra",
           "oAuth2"
         ],
         "summary": "Introspect an OAuth2 access token",
-        "operationId": "introspectToken",
+        "operationId": "introspectOAuth2Token",
         "security": [
           {
             "basic": []
+          }
+        ],
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "Token",
+            "description": "The string value of the token. For access tokens, this\nis the \"access_token\" value returned from the token endpoint\ndefined in OAuth 2.0 [RFC6749], Section 5.1.\nThis endpoint DOES NOT accept refresh tokens for validation.",
+            "name": "token",
+            "in": "formData",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "Scope",
+            "description": "An optional, space separated list of required scopes. If the access token was not granted one of the\nscopes, the result of active will be false.",
+            "name": "scope",
+            "in": "formData"
           }
         ],
         "responses": {
@@ -1067,6 +1100,7 @@
           "https"
         ],
         "tags": [
+          "hydra",
           "oAuth2"
         ],
         "summary": "Revoke an OAuth2 access token",
@@ -1112,6 +1146,7 @@
           "https"
         ],
         "tags": [
+          "hydra",
           "oAuth2"
         ],
         "summary": "The OAuth 2.0 Token endpoint",
@@ -1825,17 +1860,8 @@
     }
   },
   "definitions": {
-    "ConsentRequestClient": {
-      "type": "object",
-      "x-go-package": "github.com/ory/hydra/oauth2"
-    },
     "ConsentRequestManager": {
       "type": "object",
-      "allOf": [
-        {
-          "type": "object"
-        }
-      ],
       "x-go-package": "github.com/ory/hydra/oauth2"
     },
     "Context": {
@@ -1910,53 +1936,6 @@
       },
       "x-go-package": "github.com/ory/hydra/jwk"
     },
-    "Headers": {
-      "description": "Headers is the jwt headers",
-      "type": "object",
-      "properties": {
-        "Extra": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object"
-          }
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/vendor/github.com/ory/fosite/token/jwt"
-    },
-    "IDTokenClaims": {
-      "description": "IDTokenClaims represent the claims used in open id connect requests",
-      "type": "object",
-      "properties": {
-        "AccessTokenHash": {
-          "type": "string"
-        },
-        "Audience": {
-          "type": "string"
-        },
-        "AuthTime": {},
-        "CodeHash": {
-          "type": "string"
-        },
-        "ExpiresAt": {},
-        "Extra": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object"
-          }
-        },
-        "IssuedAt": {},
-        "Issuer": {
-          "type": "string"
-        },
-        "Nonce": {
-          "type": "string"
-        },
-        "Subject": {
-          "type": "string"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/vendor/github.com/ory/fosite/token/jwt"
-    },
     "KeyGenerator": {
       "type": "object",
       "x-go-package": "github.com/ory/hydra/jwk"
@@ -1974,32 +1953,6 @@
         "format": "uint8"
       },
       "x-go-package": "encoding/json"
-    },
-    "Session": {
-      "type": "object",
-      "properties": {
-        "Claims": {
-          "$ref": "#/definitions/IDTokenClaims"
-        },
-        "ExpiresAt": {},
-        "Headers": {
-          "$ref": "#/definitions/Headers"
-        },
-        "Subject": {
-          "type": "string"
-        },
-        "Username": {
-          "type": "string"
-        },
-        "extra": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object"
-          },
-          "x-go-name": "Extra"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/oauth2"
     },
     "Writer": {
       "description": "Writer is a helper to write arbitrary data to a ResponseWriter",
@@ -2116,23 +2069,72 @@
       "x-go-name": "Group",
       "x-go-package": "github.com/ory/hydra/warden/group"
     },
-    "introspectOAuth2TokenRequestPayload": {
+    "introspectOAuth2TokenResponsePayload": {
       "type": "object",
-      "required": [
-        "token"
-      ],
       "properties": {
+        "active": {
+          "description": "Active is a boolean indicator of whether or not the presented token\nis currently active.  The specifics of a token's \"active\" state\nwill vary depending on the implementation of the authorization\nserver and the information it keeps about its tokens, but a \"true\"\nvalue return for the \"active\" property will generally indicate\nthat a given token has been issued by this authorization server,\nhas not been revoked by the resource owner, and is within its\ngiven time window of validity (e.g., after its issuance time and\nbefore its expiration time).",
+          "type": "boolean",
+          "x-go-name": "Active"
+        },
+        "aud": {
+          "description": "Audience is a service-specific string identifier or list of string\nidentifiers representing the intended audience for this token.",
+          "type": "string",
+          "x-go-name": "Audience"
+        },
+        "client_id": {
+          "description": "ClientID is aclient identifier for the OAuth 2.0 client that\nrequested this token.",
+          "type": "string",
+          "x-go-name": "ClientID"
+        },
+        "exp": {
+          "description": "Expires at is an integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token will expire.",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "ExpiresAt"
+        },
+        "ext": {
+          "description": "Extra is arbitrary data set by the session.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "x-go-name": "Extra"
+        },
+        "iat": {
+          "description": "Issued at is an integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token was\noriginally issued.",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "IssuedAt"
+        },
+        "iss": {
+          "description": "Issuer is a string representing the issuer of this token",
+          "type": "string",
+          "x-go-name": "Issuer"
+        },
+        "nbf": {
+          "description": "NotBefore is an integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token is not to be\nused before.",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "NotBefore"
+        },
         "scope": {
-          "description": "An optional, space separated list of required scopes. If the access token was not granted one of the\nscopes, the result of active will be false.",
+          "description": "Scope is a JSON string containing a space-separated list of\nscopes associated with this token.",
           "type": "string",
           "x-go-name": "Scope"
         },
-        "token": {
+        "sub": {
+          "description": "Subject of the token, as defined in JWT [RFC7519].\nUsually a machine-readable identifier of the resource owner who\nauthorized this token.",
           "type": "string",
-          "x-go-name": "Token"
+          "x-go-name": "Subject"
+        },
+        "username": {
+          "description": "Username is a human-readable identifier for the resource owner who\nauthorized this token.",
+          "type": "string",
+          "x-go-name": "Username"
         }
       },
-      "x-go-name": "swaggerIntrospectOAuth2TokenRequestPayload",
+      "x-go-name": "swaggerOAuthIntrospectionResponsePayload",
       "x-go-package": "github.com/ory/hydra/oauth2"
     },
     "joseWebKeySetRequest": {
@@ -2463,18 +2465,6 @@
       "x-go-name": "RejectConsentRequestPayload",
       "x-go-package": "github.com/ory/hydra/oauth2"
     },
-    "revokeOAuth2TokenRequestPayload": {
-      "type": "object",
-      "title": "Token revocation payload.",
-      "properties": {
-        "token": {
-          "type": "string",
-          "x-go-name": "Token"
-        }
-      },
-      "x-go-name": "swaggerRevokeOAuth2TokenRequestPayload",
-      "x-go-package": "github.com/ory/hydra/oauth2"
-    },
     "swaggerAcceptConsentRequest": {
       "type": "object",
       "required": [
@@ -2660,9 +2650,19 @@
     },
     "swaggerOAuthIntrospectionRequest": {
       "type": "object",
+      "required": [
+        "token"
+      ],
       "properties": {
-        "Body": {
-          "$ref": "#/definitions/introspectOAuth2TokenRequestPayload"
+        "scope": {
+          "description": "An optional, space separated list of required scopes. If the access token was not granted one of the\nscopes, the result of active will be false.\n\nin: formData",
+          "type": "string",
+          "x-go-name": "Scope"
+        },
+        "token": {
+          "description": "The string value of the token. For access tokens, this\nis the \"access_token\" value returned from the token endpoint\ndefined in OAuth 2.0 [RFC6749], Section 5.1.\nThis endpoint DOES NOT accept refresh tokens for validation.",
+          "type": "string",
+          "x-go-name": "Token"
         }
       },
       "x-go-package": "github.com/ory/hydra/oauth2"
@@ -2672,50 +2672,7 @@
       "type": "object",
       "properties": {
         "Body": {
-          "description": "in: body",
-          "type": "object",
-          "properties": {
-            "active": {
-              "description": "Boolean indicator of whether or not the presented token\nis currently active. An active token is neither refreshed nor revoked.",
-              "type": "boolean",
-              "x-go-name": "Active"
-            },
-            "client_id": {
-              "description": "Client identifier for the OAuth 2.0 client that\nrequested this token.",
-              "type": "string",
-              "x-go-name": "ClientID"
-            },
-            "exp": {
-              "description": "Integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token will expire",
-              "type": "integer",
-              "format": "int64",
-              "x-go-name": "ExpiresAt"
-            },
-            "iat": {
-              "description": "Integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token was\noriginally issued",
-              "type": "integer",
-              "format": "int64",
-              "x-go-name": "IssuedAt"
-            },
-            "scope": {
-              "description": "A JSON string containing a space-separated list of\nscopes associated with this token",
-              "type": "string",
-              "x-go-name": "Scope"
-            },
-            "sess": {
-              "$ref": "#/definitions/Session"
-            },
-            "sub": {
-              "description": "Subject of the token, as defined in JWT [RFC7519].\nUsually a machine-readable identifier of the resource owner who\nauthorized this token.",
-              "type": "string",
-              "x-go-name": "Subject"
-            },
-            "username": {
-              "description": "Human-readable identifier for the resource owner who\nauthorized this token. Currently not supported by Hydra.",
-              "type": "string",
-              "x-go-name": "Username"
-            }
-          }
+          "$ref": "#/definitions/introspectOAuth2TokenResponsePayload"
         }
       },
       "x-go-package": "github.com/ory/hydra/oauth2"
@@ -3104,49 +3061,7 @@
     "introspectOAuth2TokenResponse": {
       "description": "The token introspection response",
       "schema": {
-        "type": "object",
-        "properties": {
-          "active": {
-            "description": "Boolean indicator of whether or not the presented token\nis currently active. An active token is neither refreshed nor revoked.",
-            "type": "boolean",
-            "x-go-name": "Active"
-          },
-          "client_id": {
-            "description": "Client identifier for the OAuth 2.0 client that\nrequested this token.",
-            "type": "string",
-            "x-go-name": "ClientID"
-          },
-          "exp": {
-            "description": "Integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token will expire",
-            "type": "integer",
-            "format": "int64",
-            "x-go-name": "ExpiresAt"
-          },
-          "iat": {
-            "description": "Integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token was\noriginally issued",
-            "type": "integer",
-            "format": "int64",
-            "x-go-name": "IssuedAt"
-          },
-          "scope": {
-            "description": "A JSON string containing a space-separated list of\nscopes associated with this token",
-            "type": "string",
-            "x-go-name": "Scope"
-          },
-          "sess": {
-            "$ref": "#/definitions/Session"
-          },
-          "sub": {
-            "description": "Subject of the token, as defined in JWT [RFC7519].\nUsually a machine-readable identifier of the resource owner who\nauthorized this token.",
-            "type": "string",
-            "x-go-name": "Subject"
-          },
-          "username": {
-            "description": "Human-readable identifier for the resource owner who\nauthorized this token. Currently not supported by Hydra.",
-            "type": "string",
-            "x-go-name": "Username"
-          }
-        }
+        "$ref": "#/definitions/introspectOAuth2TokenResponsePayload"
       }
     },
     "listPolicyResponse": {

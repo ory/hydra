@@ -49,6 +49,11 @@
     var _this = this;
 
 
+
+
+
+
+
   };
 
   /**
@@ -65,6 +70,21 @@
       if (data.hasOwnProperty('allowed')) {
         obj['allowed'] = ApiClient.convertToType(data['allowed'], 'Boolean');
       }
+      if (data.hasOwnProperty('aud')) {
+        obj['aud'] = ApiClient.convertToType(data['aud'], 'String');
+      }
+      if (data.hasOwnProperty('ext')) {
+        obj['ext'] = ApiClient.convertToType(data['ext'], {'String': Object});
+      }
+      if (data.hasOwnProperty('iss')) {
+        obj['iss'] = ApiClient.convertToType(data['iss'], 'String');
+      }
+      if (data.hasOwnProperty('scopes')) {
+        obj['scopes'] = ApiClient.convertToType(data['scopes'], ['String']);
+      }
+      if (data.hasOwnProperty('sub')) {
+        obj['sub'] = ApiClient.convertToType(data['sub'], 'String');
+      }
     }
     return obj;
   }
@@ -74,6 +94,31 @@
    * @member {Boolean} allowed
    */
   exports.prototype['allowed'] = undefined;
+  /**
+   * Audience is who the token was issued for. This is an OAuth2 app usually.
+   * @member {String} aud
+   */
+  exports.prototype['aud'] = undefined;
+  /**
+   * Extra represents arbitrary session data.
+   * @member {Object.<String, Object>} ext
+   */
+  exports.prototype['ext'] = undefined;
+  /**
+   * Issuer is the id of the issuer, typically an hydra instance.
+   * @member {String} iss
+   */
+  exports.prototype['iss'] = undefined;
+  /**
+   * GrantedScopes is a list of scopes that the subject authorized when asked for consent.
+   * @member {Array.<String>} scopes
+   */
+  exports.prototype['scopes'] = undefined;
+  /**
+   * Subject is the identity that authorized issuing the token, for example a user or an OAuth2 app. This is usually a uuid but you can choose a urn or some other id too.
+   * @member {String} sub
+   */
+  exports.prototype['sub'] = undefined;
 
 
 

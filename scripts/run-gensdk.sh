@@ -6,7 +6,7 @@ cd "$( dirname "${BASH_SOURCE[0]}" )/.."
 
 scripts/run-genswag.sh
 
-rm -rf ./sdk/go
+rm -rf ./sdk/go/swagger
 
 # curl -O scripts/swagger-codegen-cli-2.2.3.jar http://central.maven.org/maven2/io/swagger/swagger-codegen-cli/2.2.3/swagger-codegen-cli-2.2.3.jar
 

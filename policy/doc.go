@@ -29,14 +29,14 @@ type swaggerListPolicyParameters struct {
 type swaggerGetPolicyParameters struct {
 	// The id of the policy.
 	// in: path
-	ID int `json:"id"`
+	ID string `json:"id"`
 }
 
 // swagger:parameters updatePolicy
 type swaggerUpdatePolicyParameters struct {
 	// The id of the policy.
 	// in: path
-	ID int `json:"id"`
+	ID string `json:"id"`
 
 	// in: body
 	Body swaggerPolicy
@@ -49,34 +49,35 @@ type swaggerCreatePolicyParameters struct {
 }
 
 // A policy
-// swagger:response listPolicyResponse
+// swagger:response policyList
 type swaggerListPolicyResponse struct {
 	// in: body
-	Body swaggerPolicy
+	// type: array
+	Body []swaggerPolicy
 }
 
 // swagger:model policy
 type swaggerPolicy struct {
 	// ID of the policy.
-	ID string `json:"id" gorethink:"id"`
+	ID string `json:"id"`
 
 	// Description of the policy.
-	Description string `json:"description" gorethink:"description"`
+	Description string `json:"description"`
 
 	// Subjects impacted by the policy.
-	Subjects []string `json:"subjects" gorethink:"subjects"`
+	Subjects []string `json:"subjects"`
 	// Effect of the policy
-	Effect string `json:"effect" gorethink:"effect"`
+	Effect string `json:"effect"`
 
 	// Resources impacted by the policy.
-	Resources []string `json:"resources" gorethink:"resources"`
+	Resources []string `json:"resources"`
 
 	// Actions impacted by the policy.
-	Actions []string `json:"actions" gorethink:"actions"`
+	Actions []string `json:"actions"`
 
 	// Conditions under which the policy is active.
 	Conditions map[string]struct {
-		Type    string      `json:"type"`
-		Options interface{} `json:"options"`
-	}
+		Type    string                 `json:"type"`
+		Options map[string]interface{} `json:"options"`
+	} `json:"conditions"`
 }

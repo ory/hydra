@@ -64,14 +64,15 @@
       obj = obj || new exports();
 
       if (data.hasOwnProperty('Body')) {
-        obj['Body'] = Policy.constructFromObject(data['Body']);
+        obj['Body'] = ApiClient.convertToType(data['Body'], [Policy]);
       }
     }
     return obj;
   }
 
   /**
-   * @member {module:model/Policy} Body
+   * in: body type: array
+   * @member {Array.<module:model/Policy>} Body
    */
   exports.prototype['Body'] = undefined;
 

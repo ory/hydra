@@ -51,6 +51,16 @@
   }
 
   describe('HydraApi', function() {
+    describe('acceptOAuth2ConsentRequest', function() {
+      it('should call acceptOAuth2ConsentRequest successfully', function(done) {
+        //uncomment below and update the code to test acceptOAuth2ConsentRequest
+        //instance.acceptOAuth2ConsentRequest(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
     describe('createJsonWebKeySet', function() {
       it('should call createJsonWebKeySet successfully', function(done) {
         //uncomment below and update the code to test createJsonWebKeySet
@@ -65,6 +75,16 @@
       it('should call createOAuth2Client successfully', function(done) {
         //uncomment below and update the code to test createOAuth2Client
         //instance.createOAuth2Client(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
+    describe('createPolicy', function() {
+      it('should call createPolicy successfully', function(done) {
+        //uncomment below and update the code to test createPolicy
+        //instance.createPolicy(function(error) {
         //  if (error) throw error;
         //expect().to.be();
         //});
@@ -101,6 +121,36 @@
         done();
       });
     });
+    describe('deletePolicy', function() {
+      it('should call deletePolicy successfully', function(done) {
+        //uncomment below and update the code to test deletePolicy
+        //instance.deletePolicy(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
+    describe('getHealthStatus', function() {
+      it('should call getHealthStatus successfully', function(done) {
+        //uncomment below and update the code to test getHealthStatus
+        //instance.getHealthStatus(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
+    describe('getInstanceStatistics', function() {
+      it('should call getInstanceStatistics successfully', function(done) {
+        //uncomment below and update the code to test getInstanceStatistics
+        //instance.getInstanceStatistics(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
     describe('getJsonWebKey', function() {
       it('should call getJsonWebKey successfully', function(done) {
         //uncomment below and update the code to test getJsonWebKey
@@ -125,6 +175,26 @@
       it('should call getOAuth2Client successfully', function(done) {
         //uncomment below and update the code to test getOAuth2Client
         //instance.getOAuth2Client(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
+    describe('getOAuth2ConsentRequest', function() {
+      it('should call getOAuth2ConsentRequest successfully', function(done) {
+        //uncomment below and update the code to test getOAuth2ConsentRequest
+        //instance.getOAuth2ConsentRequest(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
+    describe('getPolicy', function() {
+      it('should call getPolicy successfully', function(done) {
+        //uncomment below and update the code to test getPolicy
+        //instance.getPolicy(function(error) {
         //  if (error) throw error;
         //expect().to.be();
         //});
@@ -161,6 +231,16 @@
         done();
       });
     });
+    describe('listPolicies', function() {
+      it('should call listPolicies successfully', function(done) {
+        //uncomment below and update the code to test listPolicies
+        //instance.listPolicies(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
     describe('oauthAuth', function() {
       it('should call oauthAuth successfully', function(done) {
         //uncomment below and update the code to test oauthAuth
@@ -175,6 +255,16 @@
       it('should call oauthToken successfully', function(done) {
         //uncomment below and update the code to test oauthToken
         //instance.oauthToken(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
+    describe('rejectOAuth2ConsentRequest', function() {
+      it('should call rejectOAuth2ConsentRequest successfully', function(done) {
+        //uncomment below and update the code to test rejectOAuth2ConsentRequest
+        //instance.rejectOAuth2ConsentRequest(function(error) {
         //  if (error) throw error;
         //expect().to.be();
         //});
@@ -215,6 +305,16 @@
       it('should call updateOAuth2Client successfully', function(done) {
         //uncomment below and update the code to test updateOAuth2Client
         //instance.updateOAuth2Client(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
+    describe('updatePolicy', function() {
+      it('should call updatePolicy successfully', function(done) {
+        //uncomment below and update the code to test updatePolicy
+        //instance.updatePolicy(function(error) {
         //  if (error) throw error;
         //expect().to.be();
         //});

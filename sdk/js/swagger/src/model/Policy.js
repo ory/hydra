@@ -68,11 +68,11 @@
     if (data) {
       obj = obj || new exports();
 
-      if (data.hasOwnProperty('Conditions')) {
-        obj['Conditions'] = ApiClient.convertToType(data['Conditions'], {'String': PolicyConditions});
-      }
       if (data.hasOwnProperty('actions')) {
         obj['actions'] = ApiClient.convertToType(data['actions'], ['String']);
+      }
+      if (data.hasOwnProperty('conditions')) {
+        obj['conditions'] = ApiClient.convertToType(data['conditions'], {'String': PolicyConditions});
       }
       if (data.hasOwnProperty('description')) {
         obj['description'] = ApiClient.convertToType(data['description'], 'String');
@@ -94,15 +94,15 @@
   }
 
   /**
-   * Conditions under which the policy is active.
-   * @member {Object.<String, module:model/PolicyConditions>} Conditions
-   */
-  exports.prototype['Conditions'] = undefined;
-  /**
    * Actions impacted by the policy.
    * @member {Array.<String>} actions
    */
   exports.prototype['actions'] = undefined;
+  /**
+   * Conditions under which the policy is active.
+   * @member {Object.<String, module:model/PolicyConditions>} conditions
+   */
+  exports.prototype['conditions'] = undefined;
   /**
    * Description of the policy.
    * @member {String} description

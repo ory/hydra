@@ -57,14 +57,14 @@
       //expect(instance).to.be.a(HydraOAuth2OpenIdConnectServer100Aplha1.Policy);
     });
 
-    it('should have the property conditions (base name: "Conditions")', function() {
-      // uncomment below and update the code to test the property conditions
+    it('should have the property actions (base name: "actions")', function() {
+      // uncomment below and update the code to test the property actions
       //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.Policy();
       //expect(instance).to.be();
     });
 
-    it('should have the property actions (base name: "actions")', function() {
-      // uncomment below and update the code to test the property actions
+    it('should have the property conditions (base name: "conditions")', function() {
+      // uncomment below and update the code to test the property conditions
       //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.Policy();
       //expect(instance).to.be();
     });

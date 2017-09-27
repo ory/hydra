@@ -31,7 +31,7 @@
   var instance;
 
   beforeEach(function() {
-    instance = new HydraOAuth2OpenIdConnectServer100Aplha1.PoliciesApi();
+    instance = new HydraOAuth2OpenIdConnectServer100Aplha1.PolicyApi();
   });
 
   var getProperty = function(object, getter, property) {
@@ -50,7 +50,7 @@
       object[property] = value;
   }
 
-  describe('PoliciesApi', function() {
+  describe('PolicyApi', function() {
     describe('createPolicy', function() {
       it('should call createPolicy successfully', function(done) {
         //uncomment below and update the code to test createPolicy

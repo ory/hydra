@@ -4,12 +4,53 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**getStatistics**](HealthApi.md#getStatistics) | **GET** /health/stats | Show instance statistics
+[**getHealthStatus**](HealthApi.md#getHealthStatus) | **GET** /health | Check health status of instance
+[**getInstanceStatistics**](HealthApi.md#getInstanceStatistics) | **GET** /health/stats | Show instance statistics
 
 
-<a name="getStatistics"></a>
-# **getStatistics**
-> getStatistics()
+<a name="getHealthStatus"></a>
+# **getHealthStatus**
+> InlineResponse200 getHealthStatus()
+
+Check health status of instance
+
+This endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header when TLS termination is set.
+
+### Example
+```javascript
+var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
+
+var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.HealthApi();
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+apiInstance.getHealthStatus(callback);
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**InlineResponse200**](InlineResponse200.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json, application/x-www-form-urlencoded
+ - **Accept**: application/json
+
+<a name="getInstanceStatistics"></a>
+# **getInstanceStatistics**
+> getInstanceStatistics()
 
 Show instance statistics
 
@@ -33,7 +74,7 @@ var callback = function(error, data, response) {
     console.log('API called successfully.');
   }
 };
-apiInstance.getStatistics(callback);
+apiInstance.getInstanceStatistics(callback);
 ```
 
 ### Parameters

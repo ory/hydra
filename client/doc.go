@@ -1,14 +1,14 @@
 // Package client implements the OAuth 2.0 Client functionality and provides http handlers, http clients and storage adapters.
 package client
 
-// swagger:parameters createOAuthClient
+// swagger:parameters createOAuth2Client
 type swaggerCreateClientPayload struct {
 	// in: body
 	// required: true
 	Body Client
 }
 
-// swagger:parameters updateOAuthClient
+// swagger:parameters updateOAuth2Client
 type swaggerUpdateClientPayload struct {
 	// in: path
 	// required: true
@@ -20,14 +20,14 @@ type swaggerUpdateClientPayload struct {
 }
 
 // A list of clients.
-// swagger:response clientsList
+// swagger:response oAuth2ClientList
 type swaggerListClientsResult struct {
 	// in: body
 	// type: array
 	Body []Client
 }
 
-// swagger:parameters getOAuthClient deleteOAuthClient
+// swagger:parameters getOAuth2Client deleteOAuth2Client
 type swaggerQueryClientPayload struct {
 	// The id of the OAuth 2.0 Client.
 	//

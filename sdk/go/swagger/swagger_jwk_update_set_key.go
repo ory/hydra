@@ -11,7 +11,7 @@
 package swagger
 
 type SwaggerJwkUpdateSetKey struct {
-	Body Jwk `json:"Body,omitempty"`
+	Body JsonWebKey `json:"Body,omitempty"`
 
 	// The kid of the desired key in: path
 	Kid string `json:"kid"`

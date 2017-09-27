@@ -17,18 +17,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/Jwk'], factory);
+    define(['ApiClient', 'model/JsonWebKey'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('./Jwk'));
+    module.exports = factory(require('../ApiClient'), require('./JsonWebKey'));
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer100Aplha1) {
       root.HydraOAuth2OpenIdConnectServer100Aplha1 = {};
     }
-    root.HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerJwkUpdateSetKey = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.Jwk);
+    root.HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerJwkUpdateSetKey = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKey);
   }
-}(this, function(ApiClient, Jwk) {
+}(this, function(ApiClient, JsonWebKey) {
   'use strict';
 
 
@@ -67,7 +67,7 @@
       obj = obj || new exports();
 
       if (data.hasOwnProperty('Body')) {
-        obj['Body'] = Jwk.constructFromObject(data['Body']);
+        obj['Body'] = JsonWebKey.constructFromObject(data['Body']);
       }
       if (data.hasOwnProperty('kid')) {
         obj['kid'] = ApiClient.convertToType(data['kid'], 'String');
@@ -80,7 +80,7 @@
   }
 
   /**
-   * @member {module:model/Jwk} Body
+   * @member {module:model/JsonWebKey} Body
    */
   exports.prototype['Body'] = undefined;
   /**

@@ -16,8 +16,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createTestClient(prefix string) hydra.OauthClient {
-	return hydra.OauthClient{
+func createTestClient(prefix string) hydra.OAuth2Client {
+	return hydra.OAuth2Client{
 		Id:            "1234",
 		ClientName:    prefix + "name",
 		ClientSecret:  prefix + "secret",
@@ -54,41 +54,41 @@ func TestClientSDK(t *testing.T) {
 	router := httprouter.New()
 	handler.SetRoutes(router)
 	server := httptest.NewServer(router)
-	c := hydra.NewClientsApiWithBasePath(server.URL)
+	c := hydra.NewOAuth2ApiWithBasePath(server.URL)
 	c.Configuration.Transport = httpClient.Transport
 
 	t.Run("foo", func(t *testing.T) {
 		createClient := createTestClient("")
 
-		result, _, err := c.CreateOAuthClient(createClient)
+		result, _, err := c.CreateOAuth2Client(createClient)
 		require.NoError(t, err)
 		assert.EqualValues(t, createClient, *result)
 
 		compareClient := createClient
 		compareClient.ClientSecret = ""
-		result, _, err = c.GetOAuthClient(createClient.Id)
+		result, _, err = c.GetOAuth2Client(createClient.Id)
 		assert.EqualValues(t, compareClient, *result)
 
-		results, _, err := c.ListOAuthClients()
+		results, _, err := c.ListOAuth2Clients()
 		require.NoError(t, err)
 		assert.Len(t, results, 1)
 		assert.EqualValues(t, compareClient, results[0])
 
 		updateClient := createTestClient("foo")
-		result, _, err = c.UpdateOAuthClient(createClient.Id, updateClient)
+		result, _, err = c.UpdateOAuth2Client(createClient.Id, updateClient)
 		require.NoError(t, err)
 		assert.EqualValues(t, updateClient, *result)
 
 		compareClient = updateClient
 		compareClient.ClientSecret = ""
-		result, _, err = c.GetOAuthClient(updateClient.Id)
+		result, _, err = c.GetOAuth2Client(updateClient.Id)
 		require.NoError(t, err)
 		assert.EqualValues(t, compareClient, *result)
 
-		_, err = c.DeleteOAuthClient(updateClient.Id)
+		_, err = c.DeleteOAuth2Client(updateClient.Id)
 		require.NoError(t, err)
 
-		_, response, err := c.GetOAuthClient(updateClient.Id)
+		_, response, err := c.GetOAuth2Client(updateClient.Id)
 		require.NoError(t, err)
 		assert.Equal(t, http.StatusNotFound, response.StatusCode)
 	})

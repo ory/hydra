@@ -17,18 +17,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/InlineResponse401', 'model/OauthClient'], factory);
+    define(['ApiClient', 'model/InlineResponse401', 'model/OAuth2Client'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/InlineResponse401'), require('../model/OauthClient'));
+    module.exports = factory(require('../ApiClient'), require('../model/InlineResponse401'), require('../model/OAuth2Client'));
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer100Aplha1) {
       root.HydraOAuth2OpenIdConnectServer100Aplha1 = {};
     }
-    root.HydraOAuth2OpenIdConnectServer100Aplha1.ClientsApi = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse401, root.HydraOAuth2OpenIdConnectServer100Aplha1.OauthClient);
+    root.HydraOAuth2OpenIdConnectServer100Aplha1.ClientsApi = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse401, root.HydraOAuth2OpenIdConnectServer100Aplha1.OAuth2Client);
   }
-}(this, function(ApiClient, InlineResponse401, OauthClient) {
+}(this, function(ApiClient, InlineResponse401, OAuth2Client) {
   'use strict';
 
   /**
@@ -49,26 +49,26 @@
 
 
     /**
-     * Callback function to receive the result of the createOAuthClient operation.
-     * @callback module:api/ClientsApi~createOAuthClientCallback
+     * Callback function to receive the result of the createOAuth2Client operation.
+     * @callback module:api/ClientsApi~createOAuth2ClientCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/OauthClient} data The data returned by the service call.
+     * @param {module:model/OAuth2Client} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
     /**
      * Creates an OAuth 2.0 Client
      * Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This endpoint should be well protected and only called by code you trust.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
-     * @param {module:model/OauthClient} body 
-     * @param {module:api/ClientsApi~createOAuthClientCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/OauthClient}
+     * @param {module:model/OAuth2Client} body 
+     * @param {module:api/ClientsApi~createOAuth2ClientCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/OAuth2Client}
      */
-    this.createOAuthClient = function(body, callback) {
+    this.createOAuth2Client = function(body, callback) {
       var postBody = body;
 
       // verify the required parameter 'body' is set
       if (body === undefined || body === null) {
-        throw new Error("Missing the required parameter 'body' when calling createOAuthClient");
+        throw new Error("Missing the required parameter 'body' when calling createOAuth2Client");
       }
 
 
@@ -84,7 +84,7 @@
       var authNames = ['oauth2'];
       var contentTypes = ['application/json'];
       var accepts = ['application/json'];
-      var returnType = OauthClient;
+      var returnType = OAuth2Client;
 
       return this.apiClient.callApi(
         '/clients', 'POST',
@@ -94,8 +94,8 @@
     }
 
     /**
-     * Callback function to receive the result of the deleteOAuthClient operation.
-     * @callback module:api/ClientsApi~deleteOAuthClientCallback
+     * Callback function to receive the result of the deleteOAuth2Client operation.
+     * @callback module:api/ClientsApi~deleteOAuth2ClientCallback
      * @param {String} error Error message, if any.
      * @param data This operation does not return a value.
      * @param {String} response The complete HTTP response.
@@ -105,14 +105,14 @@
      * Deletes an OAuth 2.0 Client
      * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;delete\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;delete\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
      * @param {String} id The id of the OAuth 2.0 Client.
-     * @param {module:api/ClientsApi~deleteOAuthClientCallback} callback The callback function, accepting three arguments: error, data, response
+     * @param {module:api/ClientsApi~deleteOAuth2ClientCallback} callback The callback function, accepting three arguments: error, data, response
      */
-    this.deleteOAuthClient = function(id, callback) {
+    this.deleteOAuth2Client = function(id, callback) {
       var postBody = null;
 
       // verify the required parameter 'id' is set
       if (id === undefined || id === null) {
-        throw new Error("Missing the required parameter 'id' when calling deleteOAuthClient");
+        throw new Error("Missing the required parameter 'id' when calling deleteOAuth2Client");
       }
 
 
@@ -139,10 +139,10 @@
     }
 
     /**
-     * Callback function to receive the result of the getOAuthClient operation.
-     * @callback module:api/ClientsApi~getOAuthClientCallback
+     * Callback function to receive the result of the getOAuth2Client operation.
+     * @callback module:api/ClientsApi~getOAuth2ClientCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/OauthClient} data The data returned by the service call.
+     * @param {module:model/OAuth2Client} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -150,15 +150,15 @@
      * Fetches an OAuth 2.0 Client.
      * Never returns the client&#39;s secret.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
      * @param {String} id The id of the OAuth 2.0 Client.
-     * @param {module:api/ClientsApi~getOAuthClientCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/OauthClient}
+     * @param {module:api/ClientsApi~getOAuth2ClientCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/OAuth2Client}
      */
-    this.getOAuthClient = function(id, callback) {
+    this.getOAuth2Client = function(id, callback) {
       var postBody = null;
 
       // verify the required parameter 'id' is set
       if (id === undefined || id === null) {
-        throw new Error("Missing the required parameter 'id' when calling getOAuthClient");
+        throw new Error("Missing the required parameter 'id' when calling getOAuth2Client");
       }
 
 
@@ -175,7 +175,7 @@
       var authNames = ['oauth2'];
       var contentTypes = ['application/json'];
       var accepts = ['application/json'];
-      var returnType = OauthClient;
+      var returnType = OAuth2Client;
 
       return this.apiClient.callApi(
         '/clients/{id}', 'GET',
@@ -185,20 +185,20 @@
     }
 
     /**
-     * Callback function to receive the result of the listOAuthClients operation.
-     * @callback module:api/ClientsApi~listOAuthClientsCallback
+     * Callback function to receive the result of the listOAuth2Clients operation.
+     * @callback module:api/ClientsApi~listOAuth2ClientsCallback
      * @param {String} error Error message, if any.
-     * @param {Array.<module:model/OauthClient>} data The data returned by the service call.
+     * @param {Array.<module:model/OAuth2Client>} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
     /**
      * Lists OAuth 2.0 Clients
      * Never returns a client&#39;s secret.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
-     * @param {module:api/ClientsApi~listOAuthClientsCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link Array.<module:model/OauthClient>}
+     * @param {module:api/ClientsApi~listOAuth2ClientsCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link Array.<module:model/OAuth2Client>}
      */
-    this.listOAuthClients = function(callback) {
+    this.listOAuth2Clients = function(callback) {
       var postBody = null;
 
 
@@ -214,7 +214,7 @@
       var authNames = ['oauth2'];
       var contentTypes = ['application/json'];
       var accepts = ['application/json'];
-      var returnType = [OauthClient];
+      var returnType = [OAuth2Client];
 
       return this.apiClient.callApi(
         '/clients', 'GET',
@@ -224,10 +224,10 @@
     }
 
     /**
-     * Callback function to receive the result of the updateOAuthClient operation.
-     * @callback module:api/ClientsApi~updateOAuthClientCallback
+     * Callback function to receive the result of the updateOAuth2Client operation.
+     * @callback module:api/ClientsApi~updateOAuth2ClientCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/OauthClient} data The data returned by the service call.
+     * @param {module:model/OAuth2Client} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -235,21 +235,21 @@
      * Updates an OAuth 2.0 Client
      * Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This endpoint should be well protected and only called by code you trust.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
      * @param {String} id 
-     * @param {module:model/OauthClient} body 
-     * @param {module:api/ClientsApi~updateOAuthClientCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/OauthClient}
+     * @param {module:model/OAuth2Client} body 
+     * @param {module:api/ClientsApi~updateOAuth2ClientCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/OAuth2Client}
      */
-    this.updateOAuthClient = function(id, body, callback) {
+    this.updateOAuth2Client = function(id, body, callback) {
       var postBody = body;
 
       // verify the required parameter 'id' is set
       if (id === undefined || id === null) {
-        throw new Error("Missing the required parameter 'id' when calling updateOAuthClient");
+        throw new Error("Missing the required parameter 'id' when calling updateOAuth2Client");
       }
 
       // verify the required parameter 'body' is set
       if (body === undefined || body === null) {
-        throw new Error("Missing the required parameter 'body' when calling updateOAuthClient");
+        throw new Error("Missing the required parameter 'body' when calling updateOAuth2Client");
       }
 
 
@@ -266,7 +266,7 @@
       var authNames = ['oauth2'];
       var contentTypes = ['application/json'];
       var accepts = ['application/json'];
-      var returnType = OauthClient;
+      var returnType = OAuth2Client;
 
       return this.apiClient.callApi(
         '/clients/{id}', 'PUT',

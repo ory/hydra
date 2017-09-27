@@ -2,9 +2,9 @@ package config
 
 import (
 	"net/http"
+	"net/url"
 	"testing"
 	"time"
-	"net/url"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -9,7 +9,7 @@ Method | HTTP request | Description
 
 
 # **WellKnown**
-> JwkSet WellKnown()
+> JsonWebKeySet WellKnown()
 
 Public JWKs
 
@@ -21,7 +21,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**JwkSet**](jwkSet.md)
+[**JsonWebKeySet**](jsonWebKeySet.md)
 
 ### Authorization
 

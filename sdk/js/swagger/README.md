@@ -104,7 +104,7 @@ oauth2.accessToken = "YOUR ACCESS TOKEN"
 
 var api = new HydraOAuth2OpenIdConnectServer100Aplha1.ClientsApi()
 
-var body = new HydraOAuth2OpenIdConnectServer100Aplha1.OauthClient(); // {OauthClient} 
+var body = new HydraOAuth2OpenIdConnectServer100Aplha1.OAuth2Client(); // {OAuth2Client} 
 
 
 var callback = function(error, data, response) {
@@ -114,7 +114,7 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-api.createOAuthClient(body, callback);
+api.createOAuth2Client(body, callback);
 
 ```
 
@@ -124,11 +124,11 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*HydraOAuth2OpenIdConnectServer100Aplha1.ClientsApi* | [**createOAuthClient**](docs/ClientsApi.md#createOAuthClient) | **POST** /clients | Creates an OAuth 2.0 Client
-*HydraOAuth2OpenIdConnectServer100Aplha1.ClientsApi* | [**deleteOAuthClient**](docs/ClientsApi.md#deleteOAuthClient) | **DELETE** /clients/{id} | Deletes an OAuth 2.0 Client
-*HydraOAuth2OpenIdConnectServer100Aplha1.ClientsApi* | [**getOAuthClient**](docs/ClientsApi.md#getOAuthClient) | **GET** /clients/{id} | Fetches an OAuth 2.0 Client.
-*HydraOAuth2OpenIdConnectServer100Aplha1.ClientsApi* | [**listOAuthClients**](docs/ClientsApi.md#listOAuthClients) | **GET** /clients | Lists OAuth 2.0 Clients
-*HydraOAuth2OpenIdConnectServer100Aplha1.ClientsApi* | [**updateOAuthClient**](docs/ClientsApi.md#updateOAuthClient) | **PUT** /clients/{id} | Updates an OAuth 2.0 Client
+*HydraOAuth2OpenIdConnectServer100Aplha1.ClientsApi* | [**createOAuth2Client**](docs/ClientsApi.md#createOAuth2Client) | **POST** /clients | Creates an OAuth 2.0 Client
+*HydraOAuth2OpenIdConnectServer100Aplha1.ClientsApi* | [**deleteOAuth2Client**](docs/ClientsApi.md#deleteOAuth2Client) | **DELETE** /clients/{id} | Deletes an OAuth 2.0 Client
+*HydraOAuth2OpenIdConnectServer100Aplha1.ClientsApi* | [**getOAuth2Client**](docs/ClientsApi.md#getOAuth2Client) | **GET** /clients/{id} | Fetches an OAuth 2.0 Client.
+*HydraOAuth2OpenIdConnectServer100Aplha1.ClientsApi* | [**listOAuth2Clients**](docs/ClientsApi.md#listOAuth2Clients) | **GET** /clients | Lists OAuth 2.0 Clients
+*HydraOAuth2OpenIdConnectServer100Aplha1.ClientsApi* | [**updateOAuth2Client**](docs/ClientsApi.md#updateOAuth2Client) | **PUT** /clients/{id} | Updates an OAuth 2.0 Client
 *HydraOAuth2OpenIdConnectServer100Aplha1.ConsentApi* | [**acceptConsentRequest**](docs/ConsentApi.md#acceptConsentRequest) | **PATCH** /oauth2/consent/requests/{id}/accept | Accept a consent request
 *HydraOAuth2OpenIdConnectServer100Aplha1.ConsentApi* | [**getConsentRequest**](docs/ConsentApi.md#getConsentRequest) | **GET** /oauth2/consent/requests/{id} | Receive consent request information
 *HydraOAuth2OpenIdConnectServer100Aplha1.ConsentApi* | [**rejectConsentRequest**](docs/ConsentApi.md#rejectConsentRequest) | **PATCH** /oauth2/consent/requests/{id}/reject | Reject a consent request
@@ -140,26 +140,26 @@ Class | Method | HTTP request | Description
 *HydraOAuth2OpenIdConnectServer100Aplha1.GroupsApi* | [**getGroup**](docs/GroupsApi.md#getGroup) | **GET** /warden/groups/{id} | Get a group by id
 *HydraOAuth2OpenIdConnectServer100Aplha1.GroupsApi* | [**removeMembersFromGroup**](docs/GroupsApi.md#removeMembersFromGroup) | **DELETE** /warden/groups/{id}/members | Remove members from a group
 *HydraOAuth2OpenIdConnectServer100Aplha1.HealthApi* | [**getStatistics**](docs/HealthApi.md#getStatistics) | **GET** /health/stats | Show instance statistics
-*HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi* | [**createJwkSetKey**](docs/JwksApi.md#createJwkSetKey) | **POST** /keys/{set} | Generate a new JSON Web Key for a JSON Web Key Set
-*HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi* | [**deleteJwkSet**](docs/JwksApi.md#deleteJwkSet) | **DELETE** /keys/{set} | Delete a JSON Web Key
-*HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi* | [**deleteJwkSetKey**](docs/JwksApi.md#deleteJwkSetKey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
-*HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi* | [**getJwkSet**](docs/JwksApi.md#getJwkSet) | **GET** /keys/{set} | Retrieves a JSON Web Key Set matching the set
-*HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi* | [**getJwkSetKey**](docs/JwksApi.md#getJwkSetKey) | **GET** /keys/{set}/{kid} | Retrieves a JSON Web Key Set matching the set and the kid
-*HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi* | [**updateJwkSet**](docs/JwksApi.md#updateJwkSet) | **PUT** /keys/{set} | Updates a JSON Web Key Set
-*HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi* | [**updateJwkSetKey**](docs/JwksApi.md#updateJwkSetKey) | **PUT** /keys/{set}/{kid} | Updates a JSON Web Key
-*HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi* | [**wellKnown**](docs/JwksApi.md#wellKnown) | **GET** /.well-known/jwks.json | Public JWKs
+*HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeyApi* | [**createJsonWebKeySet**](docs/JsonWebKeyApi.md#createJsonWebKeySet) | **POST** /keys/{set} | Generate a new JSON Web Key for a JSON Web Key Set
+*HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeyApi* | [**deleteJsonWebKey**](docs/JsonWebKeyApi.md#deleteJsonWebKey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
+*HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeyApi* | [**deleteJsonWebKeySet**](docs/JsonWebKeyApi.md#deleteJsonWebKeySet) | **DELETE** /keys/{set} | Delete a JSON Web Key
+*HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeyApi* | [**getJsonWebKey**](docs/JsonWebKeyApi.md#getJsonWebKey) | **GET** /keys/{set}/{kid} | Retrieves a JSON Web Key Set matching the set and the kid
+*HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeyApi* | [**getJsonWebKeySet**](docs/JsonWebKeyApi.md#getJsonWebKeySet) | **GET** /keys/{set} | Retrieves a JSON Web Key Set matching the set
+*HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeyApi* | [**updateJsonWebKey**](docs/JsonWebKeyApi.md#updateJsonWebKey) | **PUT** /keys/{set}/{kid} | Updates a JSON Web Key
+*HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeyApi* | [**updateJsonWebKeySet**](docs/JsonWebKeyApi.md#updateJsonWebKeySet) | **PUT** /keys/{set} | Updates a JSON Web Key Set
+*HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeyApi* | [**wellKnown**](docs/JsonWebKeyApi.md#wellKnown) | **GET** /.well-known/jwks.json | Public JWKs
+*HydraOAuth2OpenIdConnectServer100Aplha1.OAuth2Api* | [**createOAuth2Client**](docs/OAuth2Api.md#createOAuth2Client) | **POST** /clients | Creates an OAuth 2.0 Client
+*HydraOAuth2OpenIdConnectServer100Aplha1.OAuth2Api* | [**deleteOAuth2Client**](docs/OAuth2Api.md#deleteOAuth2Client) | **DELETE** /clients/{id} | Deletes an OAuth 2.0 Client
+*HydraOAuth2OpenIdConnectServer100Aplha1.OAuth2Api* | [**getOAuth2Client**](docs/OAuth2Api.md#getOAuth2Client) | **GET** /clients/{id} | Fetches an OAuth 2.0 Client.
+*HydraOAuth2OpenIdConnectServer100Aplha1.OAuth2Api* | [**listOAuth2Clients**](docs/OAuth2Api.md#listOAuth2Clients) | **GET** /clients | Lists OAuth 2.0 Clients
+*HydraOAuth2OpenIdConnectServer100Aplha1.OAuth2Api* | [**updateOAuth2Client**](docs/OAuth2Api.md#updateOAuth2Client) | **PUT** /clients/{id} | Updates an OAuth 2.0 Client
 *HydraOAuth2OpenIdConnectServer100Aplha1.Oauth2Api* | [**acceptConsentRequest**](docs/Oauth2Api.md#acceptConsentRequest) | **PATCH** /oauth2/consent/requests/{id}/accept | Accept a consent request
-*HydraOAuth2OpenIdConnectServer100Aplha1.Oauth2Api* | [**createOAuthClient**](docs/Oauth2Api.md#createOAuthClient) | **POST** /clients | Creates an OAuth 2.0 Client
-*HydraOAuth2OpenIdConnectServer100Aplha1.Oauth2Api* | [**deleteOAuthClient**](docs/Oauth2Api.md#deleteOAuthClient) | **DELETE** /clients/{id} | Deletes an OAuth 2.0 Client
 *HydraOAuth2OpenIdConnectServer100Aplha1.Oauth2Api* | [**getConsentRequest**](docs/Oauth2Api.md#getConsentRequest) | **GET** /oauth2/consent/requests/{id} | Receive consent request information
-*HydraOAuth2OpenIdConnectServer100Aplha1.Oauth2Api* | [**getOAuthClient**](docs/Oauth2Api.md#getOAuthClient) | **GET** /clients/{id} | Fetches an OAuth 2.0 Client.
 *HydraOAuth2OpenIdConnectServer100Aplha1.Oauth2Api* | [**introspectOAuthToken**](docs/Oauth2Api.md#introspectOAuthToken) | **POST** /oauth2/introspect | Introspect an OAuth2 access token
-*HydraOAuth2OpenIdConnectServer100Aplha1.Oauth2Api* | [**listOAuthClients**](docs/Oauth2Api.md#listOAuthClients) | **GET** /clients | Lists OAuth 2.0 Clients
 *HydraOAuth2OpenIdConnectServer100Aplha1.Oauth2Api* | [**oauthAuth**](docs/Oauth2Api.md#oauthAuth) | **GET** /oauth2/auth | The OAuth 2.0 Auth endpoint
 *HydraOAuth2OpenIdConnectServer100Aplha1.Oauth2Api* | [**oauthToken**](docs/Oauth2Api.md#oauthToken) | **POST** /oauth2/token | The OAuth 2.0 Token endpoint
 *HydraOAuth2OpenIdConnectServer100Aplha1.Oauth2Api* | [**rejectConsentRequest**](docs/Oauth2Api.md#rejectConsentRequest) | **PATCH** /oauth2/consent/requests/{id}/reject | Reject a consent request
 *HydraOAuth2OpenIdConnectServer100Aplha1.Oauth2Api* | [**revokeOAuthToken**](docs/Oauth2Api.md#revokeOAuthToken) | **POST** /oauth2/revoke | Revoke an OAuth2 access token
-*HydraOAuth2OpenIdConnectServer100Aplha1.Oauth2Api* | [**updateOAuthClient**](docs/Oauth2Api.md#updateOAuthClient) | **PUT** /clients/{id} | Updates an OAuth 2.0 Client
 *HydraOAuth2OpenIdConnectServer100Aplha1.Oauth2Api* | [**wellKnown**](docs/Oauth2Api.md#wellKnown) | **GET** /.well-known/jwks.json | Public JWKs
 *HydraOAuth2OpenIdConnectServer100Aplha1.Oauth2Api* | [**wellKnownHandler**](docs/Oauth2Api.md#wellKnownHandler) | **GET** /.well-known/openid-configuration | Server well known configuration
 *HydraOAuth2OpenIdConnectServer100Aplha1.OpenidconnectApi* | [**wellKnown**](docs/OpenidconnectApi.md#wellKnown) | **GET** /.well-known/jwks.json | Public JWKs
@@ -188,9 +188,10 @@ Class | Method | HTTP request | Description
  - [HydraOAuth2OpenIdConnectServer100Aplha1.ConsentRequestClient](docs/ConsentRequestClient.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.ConsentRequestManager](docs/ConsentRequestManager.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.Context](docs/Context.md)
- - [HydraOAuth2OpenIdConnectServer100Aplha1.CreateRequest](docs/CreateRequest.md)
+ - [HydraOAuth2OpenIdConnectServer100Aplha1.CreateJsonWebKeySetPayload](docs/CreateJsonWebKeySetPayload.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.Firewall](docs/Firewall.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.Group](docs/Group.md)
+ - [HydraOAuth2OpenIdConnectServer100Aplha1.Handler](docs/Handler.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.Headers](docs/Headers.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.IDTokenClaims](docs/IDTokenClaims.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse200](docs/InlineResponse200.md)
@@ -199,19 +200,22 @@ Class | Method | HTTP request | Description
  - [HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2003](docs/InlineResponse2003.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2004](docs/InlineResponse2004.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse401](docs/InlineResponse401.md)
- - [HydraOAuth2OpenIdConnectServer100Aplha1.Jwk](docs/Jwk.md)
- - [HydraOAuth2OpenIdConnectServer100Aplha1.JwkSet](docs/JwkSet.md)
+ - [HydraOAuth2OpenIdConnectServer100Aplha1.JoseWebKeySetRequest](docs/JoseWebKeySetRequest.md)
+ - [HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKey](docs/JsonWebKey.md)
+ - [HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeySet](docs/JsonWebKeySet.md)
+ - [HydraOAuth2OpenIdConnectServer100Aplha1.KeyGenerator](docs/KeyGenerator.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.Manager](docs/Manager.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.MembersRequest](docs/MembersRequest.md)
- - [HydraOAuth2OpenIdConnectServer100Aplha1.OauthClient](docs/OauthClient.md)
+ - [HydraOAuth2OpenIdConnectServer100Aplha1.OAuth2Client](docs/OAuth2Client.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.Policy](docs/Policy.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.PolicyConditions](docs/PolicyConditions.md)
+ - [HydraOAuth2OpenIdConnectServer100Aplha1.RawMessage](docs/RawMessage.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.RejectConsentRequestPayload](docs/RejectConsentRequestPayload.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.Session](docs/Session.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerCreatePolicyParameters](docs/SwaggerCreatePolicyParameters.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerGetPolicyParameters](docs/SwaggerGetPolicyParameters.md)
- - [HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerJwkCreateSetKey](docs/SwaggerJwkCreateSetKey.md)
- - [HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerJwkSetKeyQuery](docs/SwaggerJwkSetKeyQuery.md)
+ - [HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerJsonWebKeyQuery](docs/SwaggerJsonWebKeyQuery.md)
+ - [HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerJwkCreateSet](docs/SwaggerJwkCreateSet.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerJwkSetQuery](docs/SwaggerJwkSetQuery.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerJwkUpdateSet](docs/SwaggerJwkUpdateSet.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerJwkUpdateSetKey](docs/SwaggerJwkUpdateSetKey.md)
@@ -227,6 +231,7 @@ Class | Method | HTTP request | Description
  - [HydraOAuth2OpenIdConnectServer100Aplha1.TokenAllowedRequest](docs/TokenAllowedRequest.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.WardenTokenAllowedBody](docs/WardenTokenAllowedBody.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.WellKnown](docs/WellKnown.md)
+ - [HydraOAuth2OpenIdConnectServer100Aplha1.Writer](docs/Writer.md)
 
 
 ## Documentation for Authorization

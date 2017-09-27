@@ -57,50 +57,8 @@
       //expect(instance).to.be.a(HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse200);
     });
 
-    it('should have the property active (base name: "active")', function() {
-      // uncomment below and update the code to test the property active
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse200();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property clientId (base name: "client_id")', function() {
-      // uncomment below and update the code to test the property clientId
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse200();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property exp (base name: "exp")', function() {
-      // uncomment below and update the code to test the property exp
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse200();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property iat (base name: "iat")', function() {
-      // uncomment below and update the code to test the property iat
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse200();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property scope (base name: "scope")', function() {
-      // uncomment below and update the code to test the property scope
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse200();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property sess (base name: "sess")', function() {
-      // uncomment below and update the code to test the property sess
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse200();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property sub (base name: "sub")', function() {
-      // uncomment below and update the code to test the property sub
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse200();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property username (base name: "username")', function() {
-      // uncomment below and update the code to test the property username
+    it('should have the property status (base name: "status")', function() {
+      // uncomment below and update the code to test the property status
       //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse200();
       //expect(instance).to.be();
     });

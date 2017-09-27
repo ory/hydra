@@ -17,18 +17,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/CreateJsonWebKeySetPayload', 'model/InlineResponse2001', 'model/InlineResponse401', 'model/IntrospectOAuth2TokenResponsePayload', 'model/JsonWebKey', 'model/JsonWebKeySet', 'model/OAuth2Client', 'model/WellKnown'], factory);
+    define(['ApiClient', 'model/AcceptConsentRequestPayload', 'model/CreateJsonWebKeySetPayload', 'model/InlineResponse200', 'model/InlineResponse2001', 'model/InlineResponse401', 'model/IntrospectOAuth2TokenResponsePayload', 'model/JsonWebKey', 'model/JsonWebKeySet', 'model/OAuth2Client', 'model/OAuth2consentRequest', 'model/Policy', 'model/RejectConsentRequestPayload', 'model/WellKnown'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/CreateJsonWebKeySetPayload'), require('../model/InlineResponse2001'), require('../model/InlineResponse401'), require('../model/IntrospectOAuth2TokenResponsePayload'), require('../model/JsonWebKey'), require('../model/JsonWebKeySet'), require('../model/OAuth2Client'), require('../model/WellKnown'));
+    module.exports = factory(require('../ApiClient'), require('../model/AcceptConsentRequestPayload'), require('../model/CreateJsonWebKeySetPayload'), require('../model/InlineResponse200'), require('../model/InlineResponse2001'), require('../model/InlineResponse401'), require('../model/IntrospectOAuth2TokenResponsePayload'), require('../model/JsonWebKey'), require('../model/JsonWebKeySet'), require('../model/OAuth2Client'), require('../model/OAuth2consentRequest'), require('../model/Policy'), require('../model/RejectConsentRequestPayload'), require('../model/WellKnown'));
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer100Aplha1) {
       root.HydraOAuth2OpenIdConnectServer100Aplha1 = {};
     }
-    root.HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.CreateJsonWebKeySetPayload, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2001, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse401, root.HydraOAuth2OpenIdConnectServer100Aplha1.IntrospectOAuth2TokenResponsePayload, root.HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKey, root.HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeySet, root.HydraOAuth2OpenIdConnectServer100Aplha1.OAuth2Client, root.HydraOAuth2OpenIdConnectServer100Aplha1.WellKnown);
+    root.HydraOAuth2OpenIdConnectServer100Aplha1.HydraApi = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.AcceptConsentRequestPayload, root.HydraOAuth2OpenIdConnectServer100Aplha1.CreateJsonWebKeySetPayload, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse200, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2001, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse401, root.HydraOAuth2OpenIdConnectServer100Aplha1.IntrospectOAuth2TokenResponsePayload, root.HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKey, root.HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeySet, root.HydraOAuth2OpenIdConnectServer100Aplha1.OAuth2Client, root.HydraOAuth2OpenIdConnectServer100Aplha1.OAuth2consentRequest, root.HydraOAuth2OpenIdConnectServer100Aplha1.Policy, root.HydraOAuth2OpenIdConnectServer100Aplha1.RejectConsentRequestPayload, root.HydraOAuth2OpenIdConnectServer100Aplha1.WellKnown);
   }
-}(this, function(ApiClient, CreateJsonWebKeySetPayload, InlineResponse2001, InlineResponse401, IntrospectOAuth2TokenResponsePayload, JsonWebKey, JsonWebKeySet, OAuth2Client, WellKnown) {
+}(this, function(ApiClient, AcceptConsentRequestPayload, CreateJsonWebKeySetPayload, InlineResponse200, InlineResponse2001, InlineResponse401, IntrospectOAuth2TokenResponsePayload, JsonWebKey, JsonWebKeySet, OAuth2Client, OAuth2consentRequest, Policy, RejectConsentRequestPayload, WellKnown) {
   'use strict';
 
   /**
@@ -47,6 +47,57 @@
   var exports = function(apiClient) {
     this.apiClient = apiClient || ApiClient.instance;
 
+
+    /**
+     * Callback function to receive the result of the acceptOAuth2ConsentRequest operation.
+     * @callback module:api/HydraApi~acceptOAuth2ConsentRequestCallback
+     * @param {String} error Error message, if any.
+     * @param data This operation does not return a value.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Accept a consent request
+     * Call this endpoint to accept a consent request. This usually happens when a user agrees to give access rights to an application.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;accept\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * @param {String} id 
+     * @param {module:model/AcceptConsentRequestPayload} body 
+     * @param {module:api/HydraApi~acceptOAuth2ConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
+     */
+    this.acceptOAuth2ConsentRequest = function(id, body, callback) {
+      var postBody = body;
+
+      // verify the required parameter 'id' is set
+      if (id === undefined || id === null) {
+        throw new Error("Missing the required parameter 'id' when calling acceptOAuth2ConsentRequest");
+      }
+
+      // verify the required parameter 'body' is set
+      if (body === undefined || body === null) {
+        throw new Error("Missing the required parameter 'body' when calling acceptOAuth2ConsentRequest");
+      }
+
+
+      var pathParams = {
+        'id': id
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = ['oauth2'];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = null;
+
+      return this.apiClient.callApi(
+        '/oauth2/consent/requests/{id}/accept', 'PATCH',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
 
     /**
      * Callback function to receive the result of the createJsonWebKeySet operation.
@@ -137,6 +188,48 @@
 
       return this.apiClient.callApi(
         '/clients', 'POST',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the createPolicy operation.
+     * @callback module:api/HydraApi~createPolicyCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/Policy} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Create an access control policy
+     * Visit https://github.com/ory/ladon#usage for more information on policy usage.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:policies\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * @param {Object} opts Optional parameters
+     * @param {module:model/Policy} opts.body 
+     * @param {module:api/HydraApi~createPolicyCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/Policy}
+     */
+    this.createPolicy = function(opts, callback) {
+      opts = opts || {};
+      var postBody = opts['body'];
+
+
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = ['oauth2'];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = Policy;
+
+      return this.apiClient.callApi(
+        '/policies', 'POST',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );
@@ -279,6 +372,128 @@
 
       return this.apiClient.callApi(
         '/clients/{id}', 'DELETE',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the deletePolicy operation.
+     * @callback module:api/HydraApi~deletePolicyCallback
+     * @param {String} error Error message, if any.
+     * @param data This operation does not return a value.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Delete an access control policy
+     * Visit https://github.com/ory/ladon#usage for more information on policy usage.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:policies:&lt;id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;delete\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * @param {String} id The id of the policy.
+     * @param {module:api/HydraApi~deletePolicyCallback} callback The callback function, accepting three arguments: error, data, response
+     */
+    this.deletePolicy = function(id, callback) {
+      var postBody = null;
+
+      // verify the required parameter 'id' is set
+      if (id === undefined || id === null) {
+        throw new Error("Missing the required parameter 'id' when calling deletePolicy");
+      }
+
+
+      var pathParams = {
+        'id': id
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = ['oauth2'];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = null;
+
+      return this.apiClient.callApi(
+        '/policies/{id}', 'DELETE',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the getHealthStatus operation.
+     * @callback module:api/HydraApi~getHealthStatusCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/InlineResponse200} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Check health status of instance
+     * This endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header when TLS termination is set.
+     * @param {module:api/HydraApi~getHealthStatusCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/InlineResponse200}
+     */
+    this.getHealthStatus = function(callback) {
+      var postBody = null;
+
+
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = [];
+      var contentTypes = ['application/json', 'application/x-www-form-urlencoded'];
+      var accepts = ['application/json'];
+      var returnType = InlineResponse200;
+
+      return this.apiClient.callApi(
+        '/health', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the getInstanceStatistics operation.
+     * @callback module:api/HydraApi~getInstanceStatisticsCallback
+     * @param {String} error Error message, if any.
+     * @param data This operation does not return a value.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Show instance statistics
+     * This endpoint returns information on the instance&#39;s health. It is currently not documented.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:health:stats\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * @param {module:api/HydraApi~getInstanceStatisticsCallback} callback The callback function, accepting three arguments: error, data, response
+     */
+    this.getInstanceStatistics = function(callback) {
+      var postBody = null;
+
+
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = ['oauth2'];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = null;
+
+      return this.apiClient.callApi(
+        '/health/stats', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );
@@ -430,6 +645,98 @@
     }
 
     /**
+     * Callback function to receive the result of the getOAuth2ConsentRequest operation.
+     * @callback module:api/HydraApi~getOAuth2ConsentRequestCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/OAuth2consentRequest} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Receive consent request information
+     * Call this endpoint to receive information on consent requests.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * @param {String} id The id of the OAuth 2.0 Consent Request.
+     * @param {module:api/HydraApi~getOAuth2ConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/OAuth2consentRequest}
+     */
+    this.getOAuth2ConsentRequest = function(id, callback) {
+      var postBody = null;
+
+      // verify the required parameter 'id' is set
+      if (id === undefined || id === null) {
+        throw new Error("Missing the required parameter 'id' when calling getOAuth2ConsentRequest");
+      }
+
+
+      var pathParams = {
+        'id': id
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = ['oauth2'];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = OAuth2consentRequest;
+
+      return this.apiClient.callApi(
+        '/oauth2/consent/requests/{id}', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the getPolicy operation.
+     * @callback module:api/HydraApi~getPolicyCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/Policy} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Get an access control policy
+     * Visit https://github.com/ory/ladon#usage for more information on policy usage.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:policies:&lt;id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * @param {String} id The id of the policy.
+     * @param {module:api/HydraApi~getPolicyCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/Policy}
+     */
+    this.getPolicy = function(id, callback) {
+      var postBody = null;
+
+      // verify the required parameter 'id' is set
+      if (id === undefined || id === null) {
+        throw new Error("Missing the required parameter 'id' when calling getPolicy");
+      }
+
+
+      var pathParams = {
+        'id': id
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = ['oauth2'];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = Policy;
+
+      return this.apiClient.callApi(
+        '/policies/{id}', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+
+    /**
      * Callback function to receive the result of the getWellKnown operation.
      * @callback module:api/HydraApi~getWellKnownCallback
      * @param {String} error Error message, if any.
@@ -558,6 +865,51 @@
     }
 
     /**
+     * Callback function to receive the result of the listPolicies operation.
+     * @callback module:api/HydraApi~listPoliciesCallback
+     * @param {String} error Error message, if any.
+     * @param {Array.<module:model/Policy>} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * List access control policies
+     * Visit https://github.com/ory/ladon#usage for more information on policy usage.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:policies\&quot;], \&quot;actions\&quot;: [\&quot;list\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * @param {Object} opts Optional parameters
+     * @param {Number} opts.offset The offset from where to start looking.
+     * @param {Number} opts.limit The maximum amount of policies returned.
+     * @param {module:api/HydraApi~listPoliciesCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link Array.<module:model/Policy>}
+     */
+    this.listPolicies = function(opts, callback) {
+      opts = opts || {};
+      var postBody = null;
+
+
+      var pathParams = {
+      };
+      var queryParams = {
+        'offset': opts['offset'],
+        'limit': opts['limit']
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = ['oauth2'];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = [Policy];
+
+      return this.apiClient.callApi(
+        '/policies', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+
+    /**
      * Callback function to receive the result of the oauthAuth operation.
      * @callback module:api/HydraApi~oauthAuthCallback
      * @param {String} error Error message, if any.
@@ -629,6 +981,57 @@
 
       return this.apiClient.callApi(
         '/oauth2/token', 'POST',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the rejectOAuth2ConsentRequest operation.
+     * @callback module:api/HydraApi~rejectOAuth2ConsentRequestCallback
+     * @param {String} error Error message, if any.
+     * @param data This operation does not return a value.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Reject a consent request
+     * Call this endpoint to reject a consent request. This usually happens when a user denies access rights to an application.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;reject\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * @param {String} id 
+     * @param {module:model/RejectConsentRequestPayload} body 
+     * @param {module:api/HydraApi~rejectOAuth2ConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
+     */
+    this.rejectOAuth2ConsentRequest = function(id, body, callback) {
+      var postBody = body;
+
+      // verify the required parameter 'id' is set
+      if (id === undefined || id === null) {
+        throw new Error("Missing the required parameter 'id' when calling rejectOAuth2ConsentRequest");
+      }
+
+      // verify the required parameter 'body' is set
+      if (body === undefined || body === null) {
+        throw new Error("Missing the required parameter 'body' when calling rejectOAuth2ConsentRequest");
+      }
+
+
+      var pathParams = {
+        'id': id
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = ['oauth2'];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = null;
+
+      return this.apiClient.callApi(
+        '/oauth2/consent/requests/{id}/reject', 'PATCH',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );
@@ -831,6 +1234,55 @@
 
       return this.apiClient.callApi(
         '/clients/{id}', 'PUT',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the updatePolicy operation.
+     * @callback module:api/HydraApi~updatePolicyCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/Policy} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Update an access control policy
+     * Visit https://github.com/ory/ladon#usage for more information on policy usage.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:policies\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * @param {String} id The id of the policy.
+     * @param {Object} opts Optional parameters
+     * @param {module:model/Policy} opts.body 
+     * @param {module:api/HydraApi~updatePolicyCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/Policy}
+     */
+    this.updatePolicy = function(id, opts, callback) {
+      opts = opts || {};
+      var postBody = opts['body'];
+
+      // verify the required parameter 'id' is set
+      if (id === undefined || id === null) {
+        throw new Error("Missing the required parameter 'id' when calling updatePolicy");
+      }
+
+
+      var pathParams = {
+        'id': id
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = ['oauth2'];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = Policy;
+
+      return this.apiClient.callApi(
+        '/policies/{id}', 'PUT',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );

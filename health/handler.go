@@ -20,7 +20,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET("/health/stats", h.Statistics)
 }
 
-// swagger:route GET /health health
+// swagger:route GET /health health hydra getHealthStatus
 //
 // Check health status of instance
 //
@@ -33,7 +33,7 @@ func (h *Handler) Health(rw http.ResponseWriter, r *http.Request, _ httprouter.P
 	rw.Write([]byte(`{"status": "ok"}`))
 }
 
-// swagger:route GET /health/stats health getStatistics
+// swagger:route GET /health/stats health hydra getInstanceStatistics
 //
 // Show instance statistics
 //

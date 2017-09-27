@@ -11,7 +11,7 @@
 package swagger
 
 type PolicyConditions struct {
-	Options interface{} `json:"options,omitempty"`
+	Options map[string]interface{} `json:"options,omitempty"`
 
 	Type_ string `json:"type,omitempty"`
 }

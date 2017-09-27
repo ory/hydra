@@ -41,10 +41,10 @@
           "https"
         ],
         "tags": [
-          "hydra",
-          "jsonWebKey",
           "oauth2",
-          "openid-connect"
+          "jsonWebKey",
+          "openid-connect",
+          "hydra"
         ],
         "summary": "Public JWKs",
         "operationId": "wellKnown",
@@ -85,9 +85,9 @@
           "https"
         ],
         "tags": [
-          "hydra",
           "oAuth2",
-          "openid-connect"
+          "openid-connect",
+          "hydra"
         ],
         "summary": "Server well known configuration",
         "operationId": "getWellKnown",
@@ -121,9 +121,9 @@
           "https"
         ],
         "tags": [
-          "hydra",
           "oAuth2",
-          "clients"
+          "clients",
+          "hydra"
         ],
         "summary": "Lists OAuth 2.0 Clients",
         "operationId": "listOAuth2Clients",
@@ -162,9 +162,9 @@
           "https"
         ],
         "tags": [
-          "hydra",
           "oAuth2",
-          "clients"
+          "clients",
+          "hydra"
         ],
         "summary": "Creates an OAuth 2.0 Client",
         "operationId": "createOAuth2Client",
@@ -218,9 +218,9 @@
           "https"
         ],
         "tags": [
-          "hydra",
           "oAuth2",
-          "clients"
+          "clients",
+          "hydra"
         ],
         "summary": "Fetches an OAuth 2.0 Client.",
         "operationId": "getOAuth2Client",
@@ -273,9 +273,9 @@
           "https"
         ],
         "tags": [
-          "hydra",
           "oAuth2",
-          "clients"
+          "clients",
+          "hydra"
         ],
         "summary": "Updates an OAuth 2.0 Client",
         "operationId": "updateOAuth2Client",
@@ -334,9 +334,9 @@
           "https"
         ],
         "tags": [
-          "hydra",
           "oAuth2",
-          "clients"
+          "clients",
+          "hydra"
         ],
         "summary": "Deletes an OAuth 2.0 Client",
         "operationId": "deleteOAuth2Client",
@@ -377,8 +377,12 @@
     "/health": {
       "get": {
         "description": "This endpoint does not require the `X-Forwarded-Proto` header when TLS termination is set.",
+        "tags": [
+          "health",
+          "hydra"
+        ],
         "summary": "Check health status of instance",
-        "operationId": "health",
+        "operationId": "getHealthStatus",
         "responses": {
           "200": {
             "$ref": "#/responses/healthStatus"
@@ -403,10 +407,11 @@
           "https"
         ],
         "tags": [
-          "health"
+          "health",
+          "hydra"
         ],
         "summary": "Show instance statistics",
-        "operationId": "getStatistics",
+        "operationId": "getInstanceStatistics",
         "security": [
           {
             "oauth2": [
@@ -444,8 +449,8 @@
           "https"
         ],
         "tags": [
-          "hydra",
-          "jsonWebKey"
+          "jsonWebKey",
+          "hydra"
         ],
         "summary": "Retrieves a JSON Web Key Set matching the set",
         "operationId": "getJsonWebKeySet",
@@ -497,8 +502,8 @@
           "https"
         ],
         "tags": [
-          "hydra",
-          "jsonWebKey"
+          "jsonWebKey",
+          "hydra"
         ],
         "summary": "Updates a JSON Web Key Set",
         "operationId": "updateJsonWebKeySet",
@@ -557,8 +562,8 @@
           "https"
         ],
         "tags": [
-          "hydra",
-          "jsonWebKey"
+          "jsonWebKey",
+          "hydra"
         ],
         "summary": "Generate a new JSON Web Key for a JSON Web Key Set",
         "operationId": "createJsonWebKeySet",
@@ -617,8 +622,8 @@
           "https"
         ],
         "tags": [
-          "hydra",
-          "jsonWebKey"
+          "jsonWebKey",
+          "hydra"
         ],
         "summary": "Delete a JSON Web Key",
         "operationId": "deleteJsonWebKeySet",
@@ -669,8 +674,8 @@
           "https"
         ],
         "tags": [
-          "hydra",
-          "jsonWebKey"
+          "jsonWebKey",
+          "hydra"
         ],
         "summary": "Retrieves a JSON Web Key Set matching the set and the kid",
         "operationId": "getJsonWebKey",
@@ -730,8 +735,8 @@
           "https"
         ],
         "tags": [
-          "hydra",
-          "jsonWebKey"
+          "jsonWebKey",
+          "hydra"
         ],
         "summary": "Updates a JSON Web Key",
         "operationId": "updateJsonWebKey",
@@ -798,8 +803,8 @@
           "https"
         ],
         "tags": [
-          "hydra",
-          "jsonWebKey"
+          "jsonWebKey",
+          "hydra"
         ],
         "summary": "Delete a JSON Web Key",
         "operationId": "deleteJsonWebKey",
@@ -855,8 +860,8 @@
           "https"
         ],
         "tags": [
-          "hydra",
-          "oAuth2"
+          "oAuth2",
+          "hydra"
         ],
         "summary": "The OAuth 2.0 Auth endpoint",
         "operationId": "oauthAuth",
@@ -888,7 +893,8 @@
         ],
         "tags": [
           "oAuth2",
-          "consent"
+          "consent",
+          "hydra"
         ],
         "summary": "Receive consent request information",
         "operationId": "getOAuth2ConsentRequest",
@@ -938,7 +944,8 @@
         ],
         "tags": [
           "oAuth2",
-          "consent"
+          "consent",
+          "hydra"
         ],
         "summary": "Accept a consent request",
         "operationId": "acceptOAuth2ConsentRequest",
@@ -994,7 +1001,8 @@
         ],
         "tags": [
           "oAuth2",
-          "consent"
+          "consent",
+          "hydra"
         ],
         "summary": "Reject a consent request",
         "operationId": "rejectOAuth2ConsentRequest",
@@ -1049,8 +1057,8 @@
           "https"
         ],
         "tags": [
-          "hydra",
-          "oAuth2"
+          "oAuth2",
+          "hydra"
         ],
         "summary": "Introspect an OAuth2 access token",
         "operationId": "introspectOAuth2Token",
@@ -1100,8 +1108,8 @@
           "https"
         ],
         "tags": [
-          "hydra",
-          "oAuth2"
+          "oAuth2",
+          "hydra"
         ],
         "summary": "Revoke an OAuth2 access token",
         "operationId": "revokeOAuth2Token",
@@ -1146,8 +1154,8 @@
           "https"
         ],
         "tags": [
-          "hydra",
-          "oAuth2"
+          "oAuth2",
+          "hydra"
         ],
         "summary": "The OAuth 2.0 Token endpoint",
         "operationId": "oauthToken",
@@ -1183,7 +1191,8 @@
           "https"
         ],
         "tags": [
-          "policies"
+          "policy",
+          "hydra"
         ],
         "summary": "List access control policies",
         "operationId": "listPolicies",
@@ -1214,7 +1223,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/listPolicyResponse"
+            "$ref": "#/responses/policyList"
           },
           "401": {
             "$ref": "#/responses/genericError"
@@ -1240,7 +1249,8 @@
           "https"
         ],
         "tags": [
-          "policies"
+          "policy",
+          "hydra"
         ],
         "summary": "Create an access control policy",
         "operationId": "createPolicy",
@@ -1293,7 +1303,8 @@
           "https"
         ],
         "tags": [
-          "policies"
+          "policy",
+          "hydra"
         ],
         "summary": "Get an access control policy",
         "operationId": "getPolicy",
@@ -1306,8 +1317,7 @@
         ],
         "parameters": [
           {
-            "type": "integer",
-            "format": "int64",
+            "type": "string",
             "x-go-name": "ID",
             "description": "The id of the policy.",
             "name": "id",
@@ -1346,7 +1356,8 @@
           "https"
         ],
         "tags": [
-          "policies"
+          "policy",
+          "hydra"
         ],
         "summary": "Update an access control policy",
         "operationId": "updatePolicy",
@@ -1359,8 +1370,7 @@
         ],
         "parameters": [
           {
-            "type": "integer",
-            "format": "int64",
+            "type": "string",
             "x-go-name": "ID",
             "description": "The id of the policy.",
             "name": "id",
@@ -1406,7 +1416,8 @@
           "https"
         ],
         "tags": [
-          "policies"
+          "policy",
+          "hydra"
         ],
         "summary": "Delete an access control policy",
         "operationId": "deletePolicy",
@@ -1419,8 +1430,7 @@
         ],
         "parameters": [
           {
-            "type": "integer",
-            "format": "int64",
+            "type": "string",
             "x-go-name": "ID",
             "description": "The id of the policy.",
             "name": "id",
@@ -2392,23 +2402,6 @@
     "policy": {
       "type": "object",
       "properties": {
-        "Conditions": {
-          "description": "Conditions under which the policy is active.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "options": {
-                "type": "object",
-                "x-go-name": "Options"
-              },
-              "type": {
-                "type": "string",
-                "x-go-name": "Type"
-              }
-            }
-          }
-        },
         "actions": {
           "description": "Actions impacted by the policy.",
           "type": "array",
@@ -2416,6 +2409,27 @@
             "type": "string"
           },
           "x-go-name": "Actions"
+        },
+        "conditions": {
+          "description": "Conditions under which the policy is active.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "options": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object"
+                },
+                "x-go-name": "Options"
+              },
+              "type": {
+                "type": "string",
+                "x-go-name": "Type"
+              }
+            }
+          },
+          "x-go-name": "Conditions"
         },
         "description": {
           "description": "Description of the policy.",
@@ -2497,8 +2511,7 @@
       "properties": {
         "id": {
           "description": "The id of the policy.\nin: path",
-          "type": "integer",
-          "format": "int64",
+          "type": "string",
           "x-go-name": "ID"
         }
       },
@@ -2618,7 +2631,11 @@
       "type": "object",
       "properties": {
         "Body": {
-          "$ref": "#/definitions/policy"
+          "description": "in: body\ntype: array",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/policy"
+          }
         }
       },
       "x-go-package": "github.com/ory/hydra/policy"
@@ -2763,8 +2780,7 @@
         },
         "id": {
           "description": "The id of the policy.\nin: path",
-          "type": "integer",
-          "format": "int64",
+          "type": "string",
           "x-go-name": "ID"
         }
       },
@@ -3064,12 +3080,6 @@
         "$ref": "#/definitions/introspectOAuth2TokenResponsePayload"
       }
     },
-    "listPolicyResponse": {
-      "description": "A policy",
-      "schema": {
-        "$ref": "#/definitions/policy"
-      }
-    },
     "oAuth2ClientList": {
       "description": "A list of clients.",
       "schema": {
@@ -3123,6 +3133,15 @@
             "type": "string",
             "x-go-name": "TokenType"
           }
+        }
+      }
+    },
+    "policyList": {
+      "description": "A policy",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/policy"
         }
       }
     },

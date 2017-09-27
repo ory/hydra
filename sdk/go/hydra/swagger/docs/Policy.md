@@ -3,8 +3,8 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Conditions** | [**map[string]PolicyConditions**](policy_Conditions.md) | Conditions under which the policy is active. | [optional] [default to null]
 **Actions** | **[]string** | Actions impacted by the policy. | [optional] [default to null]
+**Conditions** | [**map[string]PolicyConditions**](policy_conditions.md) | Conditions under which the policy is active. | [optional] [default to null]
 **Description** | **string** | Description of the policy. | [optional] [default to null]
 **Effect** | **string** | Effect of the policy | [optional] [default to null]
 **Id** | **string** | ID of the policy. | [optional] [default to null]

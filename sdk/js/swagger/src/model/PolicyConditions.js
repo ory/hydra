@@ -64,7 +64,7 @@
       obj = obj || new exports();
 
       if (data.hasOwnProperty('options')) {
-        obj['options'] = ApiClient.convertToType(data['options'], Object);
+        obj['options'] = ApiClient.convertToType(data['options'], {'String': Object});
       }
       if (data.hasOwnProperty('type')) {
         obj['type'] = ApiClient.convertToType(data['type'], 'String');
@@ -74,7 +74,7 @@
   }
 
   /**
-   * @member {Object} options
+   * @member {Object.<String, Object>} options
    */
   exports.prototype['options'] = undefined;
   /**

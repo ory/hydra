@@ -17,22 +17,22 @@ import (
 	"strings"
 )
 
-type PoliciesApi struct {
+type PolicyApi struct {
 	Configuration *Configuration
 }
 
-func NewPoliciesApi() *PoliciesApi {
+func NewPolicyApi() *PolicyApi {
 	configuration := NewConfiguration()
-	return &PoliciesApi{
+	return &PolicyApi{
 		Configuration: configuration,
 	}
 }
 
-func NewPoliciesApiWithBasePath(basePath string) *PoliciesApi {
+func NewPolicyApiWithBasePath(basePath string) *PolicyApi {
 	configuration := NewConfiguration()
 	configuration.BasePath = basePath
 
-	return &PoliciesApi{
+	return &PolicyApi{
 		Configuration: configuration,
 	}
 }
@@ -44,7 +44,7 @@ func NewPoliciesApiWithBasePath(basePath string) *PoliciesApi {
  * @param body
  * @return *Policy
  */
-func (a PoliciesApi) CreatePolicy(body Policy) (*Policy, *APIResponse, error) {
+func (a PolicyApi) CreatePolicy(body Policy) (*Policy, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Post")
 	// create path and map variables
@@ -111,7 +111,7 @@ func (a PoliciesApi) CreatePolicy(body Policy) (*Policy, *APIResponse, error) {
  * @param id The id of the policy.
  * @return void
  */
-func (a PoliciesApi) DeletePolicy(id int64) (*APIResponse, error) {
+func (a PolicyApi) DeletePolicy(id string) (*APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Delete")
 	// create path and map variables
@@ -175,7 +175,7 @@ func (a PoliciesApi) DeletePolicy(id int64) (*APIResponse, error) {
  * @param id The id of the policy.
  * @return *Policy
  */
-func (a PoliciesApi) GetPolicy(id int64) (*Policy, *APIResponse, error) {
+func (a PolicyApi) GetPolicy(id string) (*Policy, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Get")
 	// create path and map variables
@@ -240,9 +240,9 @@ func (a PoliciesApi) GetPolicy(id int64) (*Policy, *APIResponse, error) {
  *
  * @param offset The offset from where to start looking.
  * @param limit The maximum amount of policies returned.
- * @return *Policy
+ * @return []Policy
  */
-func (a PoliciesApi) ListPolicies(offset int64, limit int64) (*Policy, *APIResponse, error) {
+func (a PolicyApi) ListPolicies(offset int64, limit int64) ([]Policy, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Get")
 	// create path and map variables
@@ -284,7 +284,7 @@ func (a PoliciesApi) ListPolicies(offset int64, limit int64) (*Policy, *APIRespo
 	if localVarHttpHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
-	var successPayload = new(Policy)
+	var successPayload = new([]Policy)
 	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 
 	var localVarURL, _ = url.Parse(localVarPath)
@@ -296,10 +296,10 @@ func (a PoliciesApi) ListPolicies(offset int64, limit int64) (*Policy, *APIRespo
 	}
 
 	if err != nil {
-		return successPayload, localVarAPIResponse, err
+		return *successPayload, localVarAPIResponse, err
 	}
 	err = json.Unmarshal(localVarHttpResponse.Body(), &successPayload)
-	return successPayload, localVarAPIResponse, err
+	return *successPayload, localVarAPIResponse, err
 }
 
 /**
@@ -310,7 +310,7 @@ func (a PoliciesApi) ListPolicies(offset int64, limit int64) (*Policy, *APIRespo
  * @param body
  * @return *Policy
  */
-func (a PoliciesApi) UpdatePolicy(id int64, body Policy) (*Policy, *APIResponse, error) {
+func (a PolicyApi) UpdatePolicy(id string, body Policy) (*Policy, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Put")
 	// create path and map variables

@@ -26,20 +26,20 @@
     if (!root.HydraOAuth2OpenIdConnectServer100Aplha1) {
       root.HydraOAuth2OpenIdConnectServer100Aplha1 = {};
     }
-    root.HydraOAuth2OpenIdConnectServer100Aplha1.PoliciesApi = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse401, root.HydraOAuth2OpenIdConnectServer100Aplha1.Policy);
+    root.HydraOAuth2OpenIdConnectServer100Aplha1.PolicyApi = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse401, root.HydraOAuth2OpenIdConnectServer100Aplha1.Policy);
   }
 }(this, function(ApiClient, InlineResponse401, Policy) {
   'use strict';
 
   /**
-   * Policies service.
-   * @module api/PoliciesApi
+   * Policy service.
+   * @module api/PolicyApi
    * @version Latest
    */
 
   /**
-   * Constructs a new PoliciesApi. 
-   * @alias module:api/PoliciesApi
+   * Constructs a new PolicyApi. 
+   * @alias module:api/PolicyApi
    * @class
    * @param {module:ApiClient} apiClient Optional API client implementation to use,
    * default to {@link module:ApiClient#instance} if unspecified.
@@ -50,7 +50,7 @@
 
     /**
      * Callback function to receive the result of the createPolicy operation.
-     * @callback module:api/PoliciesApi~createPolicyCallback
+     * @callback module:api/PolicyApi~createPolicyCallback
      * @param {String} error Error message, if any.
      * @param {module:model/Policy} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
@@ -61,7 +61,7 @@
      * Visit https://github.com/ory/ladon#usage for more information on policy usage.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:policies\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
      * @param {Object} opts Optional parameters
      * @param {module:model/Policy} opts.body 
-     * @param {module:api/PoliciesApi~createPolicyCallback} callback The callback function, accepting three arguments: error, data, response
+     * @param {module:api/PolicyApi~createPolicyCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/Policy}
      */
     this.createPolicy = function(opts, callback) {
@@ -92,7 +92,7 @@
 
     /**
      * Callback function to receive the result of the deletePolicy operation.
-     * @callback module:api/PoliciesApi~deletePolicyCallback
+     * @callback module:api/PolicyApi~deletePolicyCallback
      * @param {String} error Error message, if any.
      * @param data This operation does not return a value.
      * @param {String} response The complete HTTP response.
@@ -101,8 +101,8 @@
     /**
      * Delete an access control policy
      * Visit https://github.com/ory/ladon#usage for more information on policy usage.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:policies:&lt;id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;delete\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
-     * @param {Number} id The id of the policy.
-     * @param {module:api/PoliciesApi~deletePolicyCallback} callback The callback function, accepting three arguments: error, data, response
+     * @param {String} id The id of the policy.
+     * @param {module:api/PolicyApi~deletePolicyCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.deletePolicy = function(id, callback) {
       var postBody = null;
@@ -137,7 +137,7 @@
 
     /**
      * Callback function to receive the result of the getPolicy operation.
-     * @callback module:api/PoliciesApi~getPolicyCallback
+     * @callback module:api/PolicyApi~getPolicyCallback
      * @param {String} error Error message, if any.
      * @param {module:model/Policy} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
@@ -146,8 +146,8 @@
     /**
      * Get an access control policy
      * Visit https://github.com/ory/ladon#usage for more information on policy usage.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:policies:&lt;id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
-     * @param {Number} id The id of the policy.
-     * @param {module:api/PoliciesApi~getPolicyCallback} callback The callback function, accepting three arguments: error, data, response
+     * @param {String} id The id of the policy.
+     * @param {module:api/PolicyApi~getPolicyCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/Policy}
      */
     this.getPolicy = function(id, callback) {
@@ -183,9 +183,9 @@
 
     /**
      * Callback function to receive the result of the listPolicies operation.
-     * @callback module:api/PoliciesApi~listPoliciesCallback
+     * @callback module:api/PolicyApi~listPoliciesCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/Policy} data The data returned by the service call.
+     * @param {Array.<module:model/Policy>} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -195,8 +195,8 @@
      * @param {Object} opts Optional parameters
      * @param {Number} opts.offset The offset from where to start looking.
      * @param {Number} opts.limit The maximum amount of policies returned.
-     * @param {module:api/PoliciesApi~listPoliciesCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/Policy}
+     * @param {module:api/PolicyApi~listPoliciesCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link Array.<module:model/Policy>}
      */
     this.listPolicies = function(opts, callback) {
       opts = opts || {};
@@ -217,7 +217,7 @@
       var authNames = ['oauth2'];
       var contentTypes = ['application/json'];
       var accepts = ['application/json'];
-      var returnType = Policy;
+      var returnType = [Policy];
 
       return this.apiClient.callApi(
         '/policies', 'GET',
@@ -228,7 +228,7 @@
 
     /**
      * Callback function to receive the result of the updatePolicy operation.
-     * @callback module:api/PoliciesApi~updatePolicyCallback
+     * @callback module:api/PolicyApi~updatePolicyCallback
      * @param {String} error Error message, if any.
      * @param {module:model/Policy} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
@@ -237,10 +237,10 @@
     /**
      * Update an access control policy
      * Visit https://github.com/ory/ladon#usage for more information on policy usage.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:policies\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
-     * @param {Number} id The id of the policy.
+     * @param {String} id The id of the policy.
      * @param {Object} opts Optional parameters
      * @param {module:model/Policy} opts.body 
-     * @param {module:api/PoliciesApi~updatePolicyCallback} callback The callback function, accepting three arguments: error, data, response
+     * @param {module:api/PolicyApi~updatePolicyCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/Policy}
      */
     this.updatePolicy = function(id, opts, callback) {

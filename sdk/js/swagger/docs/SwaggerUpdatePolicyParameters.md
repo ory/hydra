@@ -4,6 +4,6 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **body** | [**Policy**](Policy.md) |  | [optional] 
-**id** | **Number** | The id of the policy. in: path | [optional] 
+**id** | **String** | The id of the policy. in: path | [optional] 
 
 

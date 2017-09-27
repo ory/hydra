@@ -12,5 +12,7 @@ package swagger
 
 // A policy
 type SwaggerListPolicyResponse struct {
-	Body Policy `json:"Body,omitempty"`
+
+	// in: body type: array
+	Body []Policy `json:"Body,omitempty"`
 }

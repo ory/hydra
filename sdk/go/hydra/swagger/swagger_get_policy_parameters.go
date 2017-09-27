@@ -13,5 +13,5 @@ package swagger
 type SwaggerGetPolicyParameters struct {
 
 	// The id of the policy. in: path
-	Id int64 `json:"id,omitempty"`
+	Id string `json:"id,omitempty"`
 }

@@ -12,26 +12,6 @@ package swagger
 
 type InlineResponse200 struct {
 
-	// Boolean indicator of whether or not the presented token is currently active.  The specifics of a token's \"active\" state will vary depending on the implementation of the authorization server and the information it keeps about its tokens, but a \"true\" value return for the \"active\" property will generally indicate that a given token has been issued by this authorization server, has not been revoked by the resource owner, and is within its given time window of validity (e.g., after its issuance time and before its expiration time).
-	Active bool `json:"active,omitempty"`
-
-	// Client identifier for the OAuth 2.0 client that requested this token.
-	ClientId string `json:"client_id,omitempty"`
-
-	// Integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token will expire
-	Exp int64 `json:"exp,omitempty"`
-
-	// Integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token was originally issued
-	Iat int64 `json:"iat,omitempty"`
-
-	// A JSON string containing a space-separated list of scopes associated with this token
-	Scope string `json:"scope,omitempty"`
-
-	Sess Session `json:"sess,omitempty"`
-
-	// Subject of the token, as defined in JWT [RFC7519]. Usually a machine-readable identifier of the resource owner who authorized this token.
-	Sub string `json:"sub,omitempty"`
-
-	// Human-readable identifier for the resource owner who authorized this token. Currently not supported by Hydra.
-	Username string `json:"username,omitempty"`
+	// Status always contains \"ok\"
+	Status string `json:"status,omitempty"`
 }

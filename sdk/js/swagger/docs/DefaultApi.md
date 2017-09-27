@@ -4,16 +4,16 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**health**](DefaultApi.md#health) | **GET** /health | 
+[**health**](DefaultApi.md#health) | **GET** /health | Check health status of instance
 
 
 <a name="health"></a>
 # **health**
-> health()
-
-
+> InlineResponse200 health()
 
 Check health status of instance
+
+This endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header when TLS termination is set.
 
 ### Example
 ```javascript
@@ -25,7 +25,7 @@ var callback = function(error, data, response) {
   if (error) {
     console.error(error);
   } else {
-    console.log('API called successfully.');
+    console.log('API called successfully. Returned data: ' + data);
   }
 };
 apiInstance.health(callback);
@@ -36,7 +36,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-null (empty response body)
+[**InlineResponse200**](InlineResponse200.md)
 
 ### Authorization
 

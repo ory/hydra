@@ -85,19 +85,19 @@
         obj['crv'] = ApiClient.convertToType(data['crv'], 'String');
       }
       if (data.hasOwnProperty('d')) {
-        obj['d'] = ApiClient.convertToType(data['d'], ['Number']);
+        obj['d'] = ApiClient.convertToType(data['d'], 'String');
       }
       if (data.hasOwnProperty('dp')) {
-        obj['dp'] = ApiClient.convertToType(data['dp'], ['Number']);
+        obj['dp'] = ApiClient.convertToType(data['dp'], 'String');
       }
       if (data.hasOwnProperty('dq')) {
-        obj['dq'] = ApiClient.convertToType(data['dq'], ['Number']);
+        obj['dq'] = ApiClient.convertToType(data['dq'], 'String');
       }
       if (data.hasOwnProperty('e')) {
-        obj['e'] = ApiClient.convertToType(data['e'], ['Number']);
+        obj['e'] = ApiClient.convertToType(data['e'], 'String');
       }
       if (data.hasOwnProperty('k')) {
-        obj['k'] = ApiClient.convertToType(data['k'], ['Number']);
+        obj['k'] = ApiClient.convertToType(data['k'], 'String');
       }
       if (data.hasOwnProperty('kid')) {
         obj['kid'] = ApiClient.convertToType(data['kid'], 'String');
@@ -106,28 +106,28 @@
         obj['kty'] = ApiClient.convertToType(data['kty'], 'String');
       }
       if (data.hasOwnProperty('n')) {
-        obj['n'] = ApiClient.convertToType(data['n'], ['Number']);
+        obj['n'] = ApiClient.convertToType(data['n'], 'String');
       }
       if (data.hasOwnProperty('p')) {
-        obj['p'] = ApiClient.convertToType(data['p'], ['Number']);
+        obj['p'] = ApiClient.convertToType(data['p'], 'String');
       }
       if (data.hasOwnProperty('q')) {
-        obj['q'] = ApiClient.convertToType(data['q'], ['Number']);
+        obj['q'] = ApiClient.convertToType(data['q'], 'String');
       }
       if (data.hasOwnProperty('qi')) {
-        obj['qi'] = ApiClient.convertToType(data['qi'], ['Number']);
+        obj['qi'] = ApiClient.convertToType(data['qi'], 'String');
       }
       if (data.hasOwnProperty('use')) {
         obj['use'] = ApiClient.convertToType(data['use'], 'String');
       }
       if (data.hasOwnProperty('x')) {
-        obj['x'] = ApiClient.convertToType(data['x'], ['Number']);
+        obj['x'] = ApiClient.convertToType(data['x'], 'String');
       }
       if (data.hasOwnProperty('x5c')) {
         obj['x5c'] = ApiClient.convertToType(data['x5c'], ['String']);
       }
       if (data.hasOwnProperty('y')) {
-        obj['y'] = ApiClient.convertToType(data['y'], ['Number']);
+        obj['y'] = ApiClient.convertToType(data['y'], 'String');
       }
     }
     return obj;
@@ -143,23 +143,23 @@
    */
   exports.prototype['crv'] = undefined;
   /**
-   * @member {Array.<Number>} d
+   * @member {String} d
    */
   exports.prototype['d'] = undefined;
   /**
-   * @member {Array.<Number>} dp
+   * @member {String} dp
    */
   exports.prototype['dp'] = undefined;
   /**
-   * @member {Array.<Number>} dq
+   * @member {String} dq
    */
   exports.prototype['dq'] = undefined;
   /**
-   * @member {Array.<Number>} e
+   * @member {String} e
    */
   exports.prototype['e'] = undefined;
   /**
-   * @member {Array.<Number>} k
+   * @member {String} k
    */
   exports.prototype['k'] = undefined;
   /**
@@ -173,19 +173,19 @@
    */
   exports.prototype['kty'] = undefined;
   /**
-   * @member {Array.<Number>} n
+   * @member {String} n
    */
   exports.prototype['n'] = undefined;
   /**
-   * @member {Array.<Number>} p
+   * @member {String} p
    */
   exports.prototype['p'] = undefined;
   /**
-   * @member {Array.<Number>} q
+   * @member {String} q
    */
   exports.prototype['q'] = undefined;
   /**
-   * @member {Array.<Number>} qi
+   * @member {String} qi
    */
   exports.prototype['qi'] = undefined;
   /**
@@ -194,7 +194,7 @@
    */
   exports.prototype['use'] = undefined;
   /**
-   * @member {Array.<Number>} x
+   * @member {String} x
    */
   exports.prototype['x'] = undefined;
   /**
@@ -203,7 +203,7 @@
    */
   exports.prototype['x5c'] = undefined;
   /**
-   * @member {Array.<Number>} y
+   * @member {String} y
    */
   exports.prototype['y'] = undefined;
 

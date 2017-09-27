@@ -436,9 +436,9 @@ func (a WardenApi) RemoveMembersFromGroup(id int64, body MembersRequest) (*APIRe
  * Checks if an arbitrary subject is allowed to perform an action on a resource. This endpoint requires a subject, a resource name, an action name and a context.If the subject is not allowed to perform the action on the resource, this endpoint returns a 200 response with &#x60;{ \&quot;allowed\&quot;: false} }&#x60;.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:allowed\&quot;], \&quot;actions\&quot;: [\&quot;decide\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
  * @param body
- * @return *InlineResponse2002
+ * @return *InlineResponse2003
  */
-func (a WardenApi) WardenAllowed(body AllowedRequest) (*InlineResponse2002, *APIResponse, error) {
+func (a WardenApi) WardenAllowed(body AllowedRequest) (*InlineResponse2003, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Post")
 	// create path and map variables
@@ -480,7 +480,7 @@ func (a WardenApi) WardenAllowed(body AllowedRequest) (*InlineResponse2002, *API
 	}
 	// body params
 	localVarPostBody = &body
-	var successPayload = new(InlineResponse2002)
+	var successPayload = new(InlineResponse2003)
 	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 
 	var localVarURL, _ = url.Parse(localVarPath)
@@ -503,9 +503,9 @@ func (a WardenApi) WardenAllowed(body AllowedRequest) (*InlineResponse2002, *API
  * Checks if a token is valid and if the token owner is allowed to perform an action on a resource. This endpoint requires a token, a scope, a resource name, an action name and a context.  If a token is expired/invalid, has not been granted the requested scope or the subject is not allowed to perform the action on the resource, this endpoint returns a 200 response with &#x60;{ \&quot;allowed\&quot;: false} }&#x60;.  Extra data set through the &#x60;at_ext&#x60; claim in the consent response will be included in the response. The &#x60;id_ext&#x60; claim will never be returned by this endpoint.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:token:allowed\&quot;], \&quot;actions\&quot;: [\&quot;decide\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
  * @param body
- * @return *InlineResponse2003
+ * @return *InlineResponse2004
  */
-func (a WardenApi) WardenTokenAllowed(body WardenTokenAllowedBody) (*InlineResponse2003, *APIResponse, error) {
+func (a WardenApi) WardenTokenAllowed(body WardenTokenAllowedBody) (*InlineResponse2004, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Post")
 	// create path and map variables
@@ -547,7 +547,7 @@ func (a WardenApi) WardenTokenAllowed(body WardenTokenAllowedBody) (*InlineRespo
 	}
 	// body params
 	localVarPostBody = &body
-	var successPayload = new(InlineResponse2003)
+	var successPayload = new(InlineResponse2004)
 	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 
 	var localVarURL, _ = url.Parse(localVarPath)

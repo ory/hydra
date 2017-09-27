@@ -17,12 +17,12 @@
 (function(factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/AcceptConsentRequestPayload', 'model/AllowedRequest', 'model/Body', 'model/ConsentRequest', 'model/ConsentRequestClient', 'model/ConsentRequestManager', 'model/Context', 'model/CreateRequest', 'model/Firewall', 'model/Group', 'model/Headers', 'model/IDTokenClaims', 'model/InlineResponse200', 'model/InlineResponse2001', 'model/InlineResponse2002', 'model/InlineResponse2003', 'model/InlineResponse401', 'model/Jwk', 'model/JwkSet', 'model/Manager', 'model/MembersRequest', 'model/OauthClient', 'model/Policy', 'model/PolicyConditions', 'model/RejectConsentRequestPayload', 'model/Session', 'model/SwaggerCreatePolicyParameters', 'model/SwaggerGetPolicyParameters', 'model/SwaggerJwkCreateKey', 'model/SwaggerJwkSetKeyQuery', 'model/SwaggerJwkSetQuery', 'model/SwaggerJwkUpdateKey', 'model/SwaggerJwkUpdateSet', 'model/SwaggerListPolicyParameters', 'model/SwaggerListPolicyResponse', 'model/SwaggerUpdatePolicyParameters', 'model/SwaggerWardenAllowedParameters', 'model/SwaggerWardenAllowedResponse', 'model/SwaggerWardenAllowedResponseBody', 'model/SwaggerWardenTokenAllowedParameters', 'model/SwaggerWardenTokenAllowedResponse', 'model/SwaggerWardenTokenAllowedResponseBody', 'model/TokenAllowedRequest', 'model/WardenTokenAllowedBody', 'model/WellKnown', 'api/ClientsApi', 'api/ConsentApi', 'api/DefaultApi', 'api/GroupsApi', 'api/HealthApi', 'api/JwksApi', 'api/Oauth2Api', 'api/OpenidconnectApi', 'api/PoliciesApi', 'api/WardenApi'], factory);
+    define(['ApiClient', 'model/AcceptConsentRequestPayload', 'model/AllowedRequest', 'model/Body', 'model/ConsentRequest', 'model/ConsentRequestClient', 'model/ConsentRequestManager', 'model/Context', 'model/CreateRequest', 'model/Firewall', 'model/Group', 'model/Headers', 'model/IDTokenClaims', 'model/InlineResponse200', 'model/InlineResponse2001', 'model/InlineResponse2002', 'model/InlineResponse2003', 'model/InlineResponse2004', 'model/InlineResponse401', 'model/Jwk', 'model/JwkSet', 'model/Manager', 'model/MembersRequest', 'model/OauthClient', 'model/Policy', 'model/PolicyConditions', 'model/RejectConsentRequestPayload', 'model/Session', 'model/SwaggerCreatePolicyParameters', 'model/SwaggerGetPolicyParameters', 'model/SwaggerJwkCreateSetKey', 'model/SwaggerJwkSetKeyQuery', 'model/SwaggerJwkSetQuery', 'model/SwaggerJwkUpdateSet', 'model/SwaggerJwkUpdateSetKey', 'model/SwaggerListPolicyParameters', 'model/SwaggerListPolicyResponse', 'model/SwaggerUpdatePolicyParameters', 'model/SwaggerWardenAllowedParameters', 'model/SwaggerWardenAllowedResponse', 'model/SwaggerWardenAllowedResponseBody', 'model/SwaggerWardenTokenAllowedParameters', 'model/SwaggerWardenTokenAllowedResponse', 'model/SwaggerWardenTokenAllowedResponseBody', 'model/TokenAllowedRequest', 'model/WardenTokenAllowedBody', 'model/WellKnown', 'api/ClientsApi', 'api/ConsentApi', 'api/DefaultApi', 'api/GroupsApi', 'api/HealthApi', 'api/JwksApi', 'api/Oauth2Api', 'api/OpenidconnectApi', 'api/PoliciesApi', 'api/WardenApi'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('./ApiClient'), require('./model/AcceptConsentRequestPayload'), require('./model/AllowedRequest'), require('./model/Body'), require('./model/ConsentRequest'), require('./model/ConsentRequestClient'), require('./model/ConsentRequestManager'), require('./model/Context'), require('./model/CreateRequest'), require('./model/Firewall'), require('./model/Group'), require('./model/Headers'), require('./model/IDTokenClaims'), require('./model/InlineResponse200'), require('./model/InlineResponse2001'), require('./model/InlineResponse2002'), require('./model/InlineResponse2003'), require('./model/InlineResponse401'), require('./model/Jwk'), require('./model/JwkSet'), require('./model/Manager'), require('./model/MembersRequest'), require('./model/OauthClient'), require('./model/Policy'), require('./model/PolicyConditions'), require('./model/RejectConsentRequestPayload'), require('./model/Session'), require('./model/SwaggerCreatePolicyParameters'), require('./model/SwaggerGetPolicyParameters'), require('./model/SwaggerJwkCreateKey'), require('./model/SwaggerJwkSetKeyQuery'), require('./model/SwaggerJwkSetQuery'), require('./model/SwaggerJwkUpdateKey'), require('./model/SwaggerJwkUpdateSet'), require('./model/SwaggerListPolicyParameters'), require('./model/SwaggerListPolicyResponse'), require('./model/SwaggerUpdatePolicyParameters'), require('./model/SwaggerWardenAllowedParameters'), require('./model/SwaggerWardenAllowedResponse'), require('./model/SwaggerWardenAllowedResponseBody'), require('./model/SwaggerWardenTokenAllowedParameters'), require('./model/SwaggerWardenTokenAllowedResponse'), require('./model/SwaggerWardenTokenAllowedResponseBody'), require('./model/TokenAllowedRequest'), require('./model/WardenTokenAllowedBody'), require('./model/WellKnown'), require('./api/ClientsApi'), require('./api/ConsentApi'), require('./api/DefaultApi'), require('./api/GroupsApi'), require('./api/HealthApi'), require('./api/JwksApi'), require('./api/Oauth2Api'), require('./api/OpenidconnectApi'), require('./api/PoliciesApi'), require('./api/WardenApi'));
+    module.exports = factory(require('./ApiClient'), require('./model/AcceptConsentRequestPayload'), require('./model/AllowedRequest'), require('./model/Body'), require('./model/ConsentRequest'), require('./model/ConsentRequestClient'), require('./model/ConsentRequestManager'), require('./model/Context'), require('./model/CreateRequest'), require('./model/Firewall'), require('./model/Group'), require('./model/Headers'), require('./model/IDTokenClaims'), require('./model/InlineResponse200'), require('./model/InlineResponse2001'), require('./model/InlineResponse2002'), require('./model/InlineResponse2003'), require('./model/InlineResponse2004'), require('./model/InlineResponse401'), require('./model/Jwk'), require('./model/JwkSet'), require('./model/Manager'), require('./model/MembersRequest'), require('./model/OauthClient'), require('./model/Policy'), require('./model/PolicyConditions'), require('./model/RejectConsentRequestPayload'), require('./model/Session'), require('./model/SwaggerCreatePolicyParameters'), require('./model/SwaggerGetPolicyParameters'), require('./model/SwaggerJwkCreateSetKey'), require('./model/SwaggerJwkSetKeyQuery'), require('./model/SwaggerJwkSetQuery'), require('./model/SwaggerJwkUpdateSet'), require('./model/SwaggerJwkUpdateSetKey'), require('./model/SwaggerListPolicyParameters'), require('./model/SwaggerListPolicyResponse'), require('./model/SwaggerUpdatePolicyParameters'), require('./model/SwaggerWardenAllowedParameters'), require('./model/SwaggerWardenAllowedResponse'), require('./model/SwaggerWardenAllowedResponseBody'), require('./model/SwaggerWardenTokenAllowedParameters'), require('./model/SwaggerWardenTokenAllowedResponse'), require('./model/SwaggerWardenTokenAllowedResponseBody'), require('./model/TokenAllowedRequest'), require('./model/WardenTokenAllowedBody'), require('./model/WellKnown'), require('./api/ClientsApi'), require('./api/ConsentApi'), require('./api/DefaultApi'), require('./api/GroupsApi'), require('./api/HealthApi'), require('./api/JwksApi'), require('./api/Oauth2Api'), require('./api/OpenidconnectApi'), require('./api/PoliciesApi'), require('./api/WardenApi'));
   }
-}(function(ApiClient, AcceptConsentRequestPayload, AllowedRequest, Body, ConsentRequest, ConsentRequestClient, ConsentRequestManager, Context, CreateRequest, Firewall, Group, Headers, IDTokenClaims, InlineResponse200, InlineResponse2001, InlineResponse2002, InlineResponse2003, InlineResponse401, Jwk, JwkSet, Manager, MembersRequest, OauthClient, Policy, PolicyConditions, RejectConsentRequestPayload, Session, SwaggerCreatePolicyParameters, SwaggerGetPolicyParameters, SwaggerJwkCreateKey, SwaggerJwkSetKeyQuery, SwaggerJwkSetQuery, SwaggerJwkUpdateKey, SwaggerJwkUpdateSet, SwaggerListPolicyParameters, SwaggerListPolicyResponse, SwaggerUpdatePolicyParameters, SwaggerWardenAllowedParameters, SwaggerWardenAllowedResponse, SwaggerWardenAllowedResponseBody, SwaggerWardenTokenAllowedParameters, SwaggerWardenTokenAllowedResponse, SwaggerWardenTokenAllowedResponseBody, TokenAllowedRequest, WardenTokenAllowedBody, WellKnown, ClientsApi, ConsentApi, DefaultApi, GroupsApi, HealthApi, JwksApi, Oauth2Api, OpenidconnectApi, PoliciesApi, WardenApi) {
+}(function(ApiClient, AcceptConsentRequestPayload, AllowedRequest, Body, ConsentRequest, ConsentRequestClient, ConsentRequestManager, Context, CreateRequest, Firewall, Group, Headers, IDTokenClaims, InlineResponse200, InlineResponse2001, InlineResponse2002, InlineResponse2003, InlineResponse2004, InlineResponse401, Jwk, JwkSet, Manager, MembersRequest, OauthClient, Policy, PolicyConditions, RejectConsentRequestPayload, Session, SwaggerCreatePolicyParameters, SwaggerGetPolicyParameters, SwaggerJwkCreateSetKey, SwaggerJwkSetKeyQuery, SwaggerJwkSetQuery, SwaggerJwkUpdateSet, SwaggerJwkUpdateSetKey, SwaggerListPolicyParameters, SwaggerListPolicyResponse, SwaggerUpdatePolicyParameters, SwaggerWardenAllowedParameters, SwaggerWardenAllowedResponse, SwaggerWardenAllowedResponseBody, SwaggerWardenTokenAllowedParameters, SwaggerWardenTokenAllowedResponse, SwaggerWardenTokenAllowedResponseBody, TokenAllowedRequest, WardenTokenAllowedBody, WellKnown, ClientsApi, ConsentApi, DefaultApi, GroupsApi, HealthApi, JwksApi, Oauth2Api, OpenidconnectApi, PoliciesApi, WardenApi) {
   'use strict';
 
   /**
@@ -143,6 +143,11 @@
      */
     InlineResponse2003: InlineResponse2003,
     /**
+     * The InlineResponse2004 model constructor.
+     * @property {module:model/InlineResponse2004}
+     */
+    InlineResponse2004: InlineResponse2004,
+    /**
      * The InlineResponse401 model constructor.
      * @property {module:model/InlineResponse401}
      */
@@ -203,10 +208,10 @@
      */
     SwaggerGetPolicyParameters: SwaggerGetPolicyParameters,
     /**
-     * The SwaggerJwkCreateKey model constructor.
-     * @property {module:model/SwaggerJwkCreateKey}
+     * The SwaggerJwkCreateSetKey model constructor.
+     * @property {module:model/SwaggerJwkCreateSetKey}
      */
-    SwaggerJwkCreateKey: SwaggerJwkCreateKey,
+    SwaggerJwkCreateSetKey: SwaggerJwkCreateSetKey,
     /**
      * The SwaggerJwkSetKeyQuery model constructor.
      * @property {module:model/SwaggerJwkSetKeyQuery}
@@ -218,15 +223,15 @@
      */
     SwaggerJwkSetQuery: SwaggerJwkSetQuery,
     /**
-     * The SwaggerJwkUpdateKey model constructor.
-     * @property {module:model/SwaggerJwkUpdateKey}
-     */
-    SwaggerJwkUpdateKey: SwaggerJwkUpdateKey,
-    /**
      * The SwaggerJwkUpdateSet model constructor.
      * @property {module:model/SwaggerJwkUpdateSet}
      */
     SwaggerJwkUpdateSet: SwaggerJwkUpdateSet,
+    /**
+     * The SwaggerJwkUpdateSetKey model constructor.
+     * @property {module:model/SwaggerJwkUpdateSetKey}
+     */
+    SwaggerJwkUpdateSetKey: SwaggerJwkUpdateSetKey,
     /**
      * The SwaggerListPolicyParameters model constructor.
      * @property {module:model/SwaggerListPolicyParameters}

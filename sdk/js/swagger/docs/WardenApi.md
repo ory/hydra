@@ -325,7 +325,7 @@ null (empty response body)
 
 <a name="wardenAllowed"></a>
 # **wardenAllowed**
-> InlineResponse2002 wardenAllowed(opts)
+> InlineResponse2003 wardenAllowed(opts)
 
 Check if a subject is allowed to do something
 
@@ -364,7 +364,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2002**](InlineResponse2002.md)
+[**InlineResponse2003**](InlineResponse2003.md)
 
 ### Authorization
 
@@ -377,7 +377,7 @@ Name | Type | Description  | Notes
 
 <a name="wardenTokenAllowed"></a>
 # **wardenTokenAllowed**
-> InlineResponse2003 wardenTokenAllowed(opts)
+> InlineResponse2004 wardenTokenAllowed(opts)
 
 Check if the subject of a token is allowed to do something
 
@@ -416,7 +416,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2003**](InlineResponse2003.md)
+[**InlineResponse2004**](InlineResponse2004.md)
 
 ### Authorization
 

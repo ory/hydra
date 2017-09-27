@@ -17,18 +17,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/AcceptConsentRequestPayload', 'model/Body', 'model/ConsentRequest', 'model/InlineResponse200', 'model/InlineResponse2001', 'model/InlineResponse401', 'model/JwkSet', 'model/OauthClient', 'model/RejectConsentRequestPayload', 'model/WellKnown'], factory);
+    define(['ApiClient', 'model/AcceptConsentRequestPayload', 'model/Body', 'model/ConsentRequest', 'model/InlineResponse2001', 'model/InlineResponse2002', 'model/InlineResponse401', 'model/JwkSet', 'model/OauthClient', 'model/RejectConsentRequestPayload', 'model/WellKnown'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/AcceptConsentRequestPayload'), require('../model/Body'), require('../model/ConsentRequest'), require('../model/InlineResponse200'), require('../model/InlineResponse2001'), require('../model/InlineResponse401'), require('../model/JwkSet'), require('../model/OauthClient'), require('../model/RejectConsentRequestPayload'), require('../model/WellKnown'));
+    module.exports = factory(require('../ApiClient'), require('../model/AcceptConsentRequestPayload'), require('../model/Body'), require('../model/ConsentRequest'), require('../model/InlineResponse2001'), require('../model/InlineResponse2002'), require('../model/InlineResponse401'), require('../model/JwkSet'), require('../model/OauthClient'), require('../model/RejectConsentRequestPayload'), require('../model/WellKnown'));
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer100Aplha1) {
       root.HydraOAuth2OpenIdConnectServer100Aplha1 = {};
     }
-    root.HydraOAuth2OpenIdConnectServer100Aplha1.Oauth2Api = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.AcceptConsentRequestPayload, root.HydraOAuth2OpenIdConnectServer100Aplha1.Body, root.HydraOAuth2OpenIdConnectServer100Aplha1.ConsentRequest, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse200, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2001, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse401, root.HydraOAuth2OpenIdConnectServer100Aplha1.JwkSet, root.HydraOAuth2OpenIdConnectServer100Aplha1.OauthClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.RejectConsentRequestPayload, root.HydraOAuth2OpenIdConnectServer100Aplha1.WellKnown);
+    root.HydraOAuth2OpenIdConnectServer100Aplha1.Oauth2Api = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.AcceptConsentRequestPayload, root.HydraOAuth2OpenIdConnectServer100Aplha1.Body, root.HydraOAuth2OpenIdConnectServer100Aplha1.ConsentRequest, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2001, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2002, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse401, root.HydraOAuth2OpenIdConnectServer100Aplha1.JwkSet, root.HydraOAuth2OpenIdConnectServer100Aplha1.OauthClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.RejectConsentRequestPayload, root.HydraOAuth2OpenIdConnectServer100Aplha1.WellKnown);
   }
-}(this, function(ApiClient, AcceptConsentRequestPayload, Body, ConsentRequest, InlineResponse200, InlineResponse2001, InlineResponse401, JwkSet, OauthClient, RejectConsentRequestPayload, WellKnown) {
+}(this, function(ApiClient, AcceptConsentRequestPayload, Body, ConsentRequest, InlineResponse2001, InlineResponse2002, InlineResponse401, JwkSet, OauthClient, RejectConsentRequestPayload, WellKnown) {
   'use strict';
 
   /**
@@ -285,7 +285,7 @@
      * Callback function to receive the result of the introspectOAuthToken operation.
      * @callback module:api/Oauth2Api~introspectOAuthTokenCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/InlineResponse200} data The data returned by the service call.
+     * @param {module:model/InlineResponse2001} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -293,7 +293,7 @@
      * Introspect an OAuth2 access token
      * For more information, please refer to https://tools.ietf.org/html/rfc7662
      * @param {module:api/Oauth2Api~introspectOAuthTokenCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/InlineResponse200}
+     * data is of type: {@link module:model/InlineResponse2001}
      */
     this.introspectOAuthToken = function(callback) {
       var postBody = null;
@@ -311,7 +311,7 @@
       var authNames = ['oauth2'];
       var contentTypes = ['application/x-www-form-urlencoded'];
       var accepts = ['application/json'];
-      var returnType = InlineResponse200;
+      var returnType = InlineResponse2001;
 
       return this.apiClient.callApi(
         '/oauth2/introspect', 'POST',
@@ -401,7 +401,7 @@
      * Callback function to receive the result of the oauthToken operation.
      * @callback module:api/Oauth2Api~oauthTokenCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/InlineResponse2001} data The data returned by the service call.
+     * @param {module:model/InlineResponse2002} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -409,7 +409,7 @@
      * The OAuth 2.0 Token endpoint
      * For more information, please refer to https://tools.ietf.org/html/rfc6749#section-4
      * @param {module:api/Oauth2Api~oauthTokenCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/InlineResponse2001}
+     * data is of type: {@link module:model/InlineResponse2002}
      */
     this.oauthToken = function(callback) {
       var postBody = null;
@@ -427,7 +427,7 @@
       var authNames = ['basic'];
       var contentTypes = ['application/x-www-form-urlencoded'];
       var accepts = ['application/json'];
-      var returnType = InlineResponse2001;
+      var returnType = InlineResponse2002;
 
       return this.apiClient.callApi(
         '/oauth2/token', 'POST',

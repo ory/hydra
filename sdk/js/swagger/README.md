@@ -132,7 +132,7 @@ Class | Method | HTTP request | Description
 *HydraOAuth2OpenIdConnectServer100Aplha1.ConsentApi* | [**acceptConsentRequest**](docs/ConsentApi.md#acceptConsentRequest) | **PATCH** /oauth2/consent/requests/{id}/accept | Accept a consent request
 *HydraOAuth2OpenIdConnectServer100Aplha1.ConsentApi* | [**getConsentRequest**](docs/ConsentApi.md#getConsentRequest) | **GET** /oauth2/consent/requests/{id} | Receive consent request information
 *HydraOAuth2OpenIdConnectServer100Aplha1.ConsentApi* | [**rejectConsentRequest**](docs/ConsentApi.md#rejectConsentRequest) | **PATCH** /oauth2/consent/requests/{id}/reject | Reject a consent request
-*HydraOAuth2OpenIdConnectServer100Aplha1.DefaultApi* | [**health**](docs/DefaultApi.md#health) | **GET** /health | 
+*HydraOAuth2OpenIdConnectServer100Aplha1.DefaultApi* | [**health**](docs/DefaultApi.md#health) | **GET** /health | Check health status of instance
 *HydraOAuth2OpenIdConnectServer100Aplha1.GroupsApi* | [**addMembersToGroup**](docs/GroupsApi.md#addMembersToGroup) | **POST** /warden/groups/{id}/members | Add members to a group
 *HydraOAuth2OpenIdConnectServer100Aplha1.GroupsApi* | [**createGroup**](docs/GroupsApi.md#createGroup) | **POST** /warden/groups | Create a group
 *HydraOAuth2OpenIdConnectServer100Aplha1.GroupsApi* | [**deleteGroup**](docs/GroupsApi.md#deleteGroup) | **DELETE** /warden/groups/{id} | Delete a group by id
@@ -140,13 +140,13 @@ Class | Method | HTTP request | Description
 *HydraOAuth2OpenIdConnectServer100Aplha1.GroupsApi* | [**getGroup**](docs/GroupsApi.md#getGroup) | **GET** /warden/groups/{id} | Get a group by id
 *HydraOAuth2OpenIdConnectServer100Aplha1.GroupsApi* | [**removeMembersFromGroup**](docs/GroupsApi.md#removeMembersFromGroup) | **DELETE** /warden/groups/{id}/members | Remove members from a group
 *HydraOAuth2OpenIdConnectServer100Aplha1.HealthApi* | [**getStatistics**](docs/HealthApi.md#getStatistics) | **GET** /health/stats | Show instance statistics
-*HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi* | [**createJwkKey**](docs/JwksApi.md#createJwkKey) | **POST** /keys/{set} | Generate a new JSON Web Key
-*HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi* | [**deleteJwkKey**](docs/JwksApi.md#deleteJwkKey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
+*HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi* | [**createJwkSetKey**](docs/JwksApi.md#createJwkSetKey) | **POST** /keys/{set} | Generate a new JSON Web Key for a JSON Web Key Set
 *HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi* | [**deleteJwkSet**](docs/JwksApi.md#deleteJwkSet) | **DELETE** /keys/{set} | Delete a JSON Web Key
+*HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi* | [**deleteJwkSetKey**](docs/JwksApi.md#deleteJwkSetKey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
 *HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi* | [**getJwkSet**](docs/JwksApi.md#getJwkSet) | **GET** /keys/{set} | Retrieves a JSON Web Key Set matching the set
 *HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi* | [**getJwkSetKey**](docs/JwksApi.md#getJwkSetKey) | **GET** /keys/{set}/{kid} | Retrieves a JSON Web Key Set matching the set and the kid
-*HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi* | [**updateJwkKey**](docs/JwksApi.md#updateJwkKey) | **PUT** /keys/{set}/{kid} | Updates a JSON Web Key
 *HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi* | [**updateJwkSet**](docs/JwksApi.md#updateJwkSet) | **PUT** /keys/{set} | Updates a JSON Web Key Set
+*HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi* | [**updateJwkSetKey**](docs/JwksApi.md#updateJwkSetKey) | **PUT** /keys/{set}/{kid} | Updates a JSON Web Key
 *HydraOAuth2OpenIdConnectServer100Aplha1.JwksApi* | [**wellKnown**](docs/JwksApi.md#wellKnown) | **GET** /.well-known/jwks.json | Public JWKs
 *HydraOAuth2OpenIdConnectServer100Aplha1.Oauth2Api* | [**acceptConsentRequest**](docs/Oauth2Api.md#acceptConsentRequest) | **PATCH** /oauth2/consent/requests/{id}/accept | Accept a consent request
 *HydraOAuth2OpenIdConnectServer100Aplha1.Oauth2Api* | [**createOAuthClient**](docs/Oauth2Api.md#createOAuthClient) | **POST** /clients | Creates an OAuth 2.0 Client
@@ -197,6 +197,7 @@ Class | Method | HTTP request | Description
  - [HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2001](docs/InlineResponse2001.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2002](docs/InlineResponse2002.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2003](docs/InlineResponse2003.md)
+ - [HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse2004](docs/InlineResponse2004.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse401](docs/InlineResponse401.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.Jwk](docs/Jwk.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.JwkSet](docs/JwkSet.md)
@@ -209,11 +210,11 @@ Class | Method | HTTP request | Description
  - [HydraOAuth2OpenIdConnectServer100Aplha1.Session](docs/Session.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerCreatePolicyParameters](docs/SwaggerCreatePolicyParameters.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerGetPolicyParameters](docs/SwaggerGetPolicyParameters.md)
- - [HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerJwkCreateKey](docs/SwaggerJwkCreateKey.md)
+ - [HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerJwkCreateSetKey](docs/SwaggerJwkCreateSetKey.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerJwkSetKeyQuery](docs/SwaggerJwkSetKeyQuery.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerJwkSetQuery](docs/SwaggerJwkSetQuery.md)
- - [HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerJwkUpdateKey](docs/SwaggerJwkUpdateKey.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerJwkUpdateSet](docs/SwaggerJwkUpdateSet.md)
+ - [HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerJwkUpdateSetKey](docs/SwaggerJwkUpdateSetKey.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerListPolicyParameters](docs/SwaggerListPolicyParameters.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerListPolicyResponse](docs/SwaggerListPolicyResponse.md)
  - [HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerUpdatePolicyParameters](docs/SwaggerUpdatePolicyParameters.md)

@@ -1,9 +1,10 @@
-# InlineResponse200
+# SwaggerJwkCreateSetKey
 
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Status** | **string** | Status always contains \&quot;ok\&quot; | [optional] [default to null]
+**Body** | [**CreateRequest**](createRequest.md) |  | [optional] [default to null]
+**Set** | **string** | The set in: path | [default to null]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

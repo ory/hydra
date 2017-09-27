@@ -4,7 +4,7 @@ import "time"
 
 // ConsentRequest represents a consent request.
 //
-// swagger:model consentRequest
+// swagger:model oAuth2consentRequest
 type ConsentRequest struct {
 	// ID is the id of this consent request.
 	ID string `json:"id"`

@@ -1,7 +1,7 @@
 package oauth2
 
-// swagger:parameters revokeOAuthToken
-type swaggerCreateClientPayload struct {
+// swagger:parameters revokeOAuth2Token
+type swaggerRevokeOAuth2TokenParameters struct {
 	// in: body
 	// required: true
 	Body struct {
@@ -10,14 +10,14 @@ type swaggerCreateClientPayload struct {
 	}
 }
 
-// swagger:parameters rejectConsentRequest
+// swagger:parameters rejectOAuth2ConsentRequest
 type swaggerRejectConsentRequest struct {
 	// in: body
 	// required: true
 	Body RejectConsentRequestPayload
 }
 
-// swagger:parameters acceptConsentRequest
+// swagger:parameters acceptOAuth2ConsentRequest
 type swaggerAcceptConsentRequest struct {
 	// in: body
 	// required: true
@@ -25,7 +25,7 @@ type swaggerAcceptConsentRequest struct {
 }
 
 // The consent request response
-// swagger:response oauthConsentRequest
+// swagger:response oAuth2ConsentRequest
 type swaggerOAuthConsentRequest struct {
 	// in: body
 	Body ConsentRequest
@@ -60,19 +60,12 @@ type swaggerOAuthTokenResponse struct {
 }
 
 // The token introspection response
-// swagger:response introspectOAuthTokenResponse
+// swagger:response introspectOAuth2TokenResponse
 type swaggerOAuthIntrospectionResponse struct {
 	// in: body
 	Body struct {
 		// Boolean indicator of whether or not the presented token
-		// is currently active.  The specifics of a token's "active" state
-		// will vary depending on the implementation of the authorization
-		// server and the information it keeps about its tokens, but a "true"
-		// value return for the "active" property will generally indicate
-		// that a given token has been issued by this authorization server,
-		// has not been revoked by the resource owner, and is within its
-		// given time window of validity (e.g., after its issuance time and
-		// before its expiration time).
+		// is currently active. An active token is neither refreshed nor revoked.
 		Active bool `json:"active"`
 
 		// Client identifier for the OAuth 2.0 client that
@@ -86,6 +79,7 @@ type swaggerOAuthIntrospectionResponse struct {
 		// Integer timestamp, measured in the number of seconds
 		// since January 1 1970 UTC, indicating when this token will expire
 		ExpiresAt int64 `json:"exp,omitempty"`
+
 		// Integer timestamp, measured in the number of seconds
 		// since January 1 1970 UTC, indicating when this token was
 		//originally issued
@@ -102,6 +96,23 @@ type swaggerOAuthIntrospectionResponse struct {
 
 		// Extra session information set using the at_ext key in the consent response.
 		Session Session `json:"sess,omitempty"`
+	}
+}
+
+// swagger:parameters introspectOAuth2Token
+type swaggerOAuthIntrospectionRequest struct {
+	// in: body
+	Body struct {
+		// required: true
+		// The string value of the token. For access tokens, this
+		// is the "access_token" value returned from the token endpoint
+		// defined in OAuth 2.0 [RFC6749], Section 5.1.
+		// This endpoint DOES NOT accept refresh tokens for validation.
+		Token string `json:"token"`
+
+		// An optional, space separated list of required scopes. If the access token was not granted one of the
+		// scopes, the result of active will be false.
+		Scope  string `json:"scope"`
 	}
 }
 

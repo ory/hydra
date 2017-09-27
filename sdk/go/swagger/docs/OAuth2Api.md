@@ -1,0 +1,265 @@
+# \Oauth2Api
+
+All URIs are relative to *http://localhost*
+
+Method | HTTP request | Description
+------------- | ------------- | -------------
+[**AcceptConsentRequest**](Oauth2Api.md#AcceptConsentRequest) | **Patch** /oauth2/consent/requests/{id}/accept | Accept a consent request
+[**GetConsentRequest**](Oauth2Api.md#GetConsentRequest) | **Get** /oauth2/consent/requests/{id} | Receive consent request information
+[**IntrospectOAuthToken**](Oauth2Api.md#IntrospectOAuthToken) | **Post** /oauth2/introspect | Introspect an OAuth2 access token
+[**OauthAuth**](Oauth2Api.md#OauthAuth) | **Get** /oauth2/auth | The OAuth 2.0 Auth endpoint
+[**OauthToken**](Oauth2Api.md#OauthToken) | **Post** /oauth2/token | The OAuth 2.0 Token endpoint
+[**RejectConsentRequest**](Oauth2Api.md#RejectConsentRequest) | **Patch** /oauth2/consent/requests/{id}/reject | Reject a consent request
+[**RevokeOAuthToken**](Oauth2Api.md#RevokeOAuthToken) | **Post** /oauth2/revoke | Revoke an OAuth2 access token
+[**WellKnown**](Oauth2Api.md#WellKnown) | **Get** /.well-known/jwks.json | Public JWKs
+[**WellKnownHandler**](Oauth2Api.md#WellKnownHandler) | **Get** /.well-known/openid-configuration | Server well known configuration
+
+
+# **AcceptConsentRequest**
+> AcceptConsentRequest($body, $id)
+
+Accept a consent request
+
+Call this endpoint to accept a consent request. This usually happens when a user agrees to give access rights to an application.  The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:oauth2:consent:requests:<request-id>\"], \"actions\": [\"accept\"], \"effect\": \"allow\" } ```
+
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**AcceptConsentRequestPayload**](AcceptConsentRequestPayload.md)|  | 
+ **id** | **string**| The id of the OAuth 2.0 Consent Request. | 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[oauth2](../README.md#oauth2)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **GetConsentRequest**
+> ConsentRequest GetConsentRequest($id)
+
+Receive consent request information
+
+Call this endpoint to receive information on consent requests.  The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:oauth2:consent:requests:<request-id>\"], \"actions\": [\"get\"], \"effect\": \"allow\" } ```
+
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **string**| The id of the OAuth 2.0 Consent Request. | 
+
+### Return type
+
+[**ConsentRequest**](consentRequest.md)
+
+### Authorization
+
+[oauth2](../README.md#oauth2)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **IntrospectOAuthToken**
+> InlineResponse2001 IntrospectOAuthToken()
+
+Introspect an OAuth2 access token
+
+For more information, please refer to https://tools.ietf.org/html/rfc7662
+
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**InlineResponse2001**](inline_response_200_1.md)
+
+### Authorization
+
+[oauth2](../README.md#oauth2)
+
+### HTTP request headers
+
+ - **Content-Type**: application/x-www-form-urlencoded
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **OauthAuth**
+> OauthAuth()
+
+The OAuth 2.0 Auth endpoint
+
+For more information, please refer to https://tools.ietf.org/html/rfc6749#section-4
+
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/x-www-form-urlencoded
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **OauthToken**
+> InlineResponse2002 OauthToken()
+
+The OAuth 2.0 Token endpoint
+
+For more information, please refer to https://tools.ietf.org/html/rfc6749#section-4
+
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**InlineResponse2002**](inline_response_200_2.md)
+
+### Authorization
+
+[basic](../README.md#basic)
+
+### HTTP request headers
+
+ - **Content-Type**: application/x-www-form-urlencoded
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **RejectConsentRequest**
+> RejectConsentRequest($body, $id)
+
+Reject a consent request
+
+Call this endpoint to reject a consent request. This usually happens when a user denies access rights to an application.  The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:oauth2:consent:requests:<request-id>\"], \"actions\": [\"reject\"], \"effect\": \"allow\" } ```
+
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**RejectConsentRequestPayload**](RejectConsentRequestPayload.md)|  | 
+ **id** | **string**| The id of the OAuth 2.0 Consent Request. | 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[oauth2](../README.md#oauth2)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **RevokeOAuthToken**
+> RevokeOAuthToken($body)
+
+Revoke an OAuth2 access token
+
+For more information, please refer to https://tools.ietf.org/html/rfc7009
+
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**Body**](Body.md)|  | 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[oauth2](../README.md#oauth2)
+
+### HTTP request headers
+
+ - **Content-Type**: application/x-www-form-urlencoded
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **WellKnown**
+> JsonWebKeySet WellKnown()
+
+Public JWKs
+
+Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.  The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:keys:hydra.openid.id-token:public\"], \"actions\": [\"GET\"], \"effect\": \"allow\" } ```
+
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**JsonWebKeySet**](jsonWebKeySet.md)
+
+### Authorization
+
+[oauth2](../README.md#oauth2)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **WellKnownHandler**
+> WellKnown WellKnownHandler()
+
+Server well known configuration
+
+For more information, please refer to https://openid.net/specs/openid-connect-discovery-1_0.html
+
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**WellKnown**](WellKnown.md)
+
+### Authorization
+
+[oauth2](../README.md#oauth2)
+
+### HTTP request headers
+
+ - **Content-Type**: application/x-www-form-urlencoded
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+

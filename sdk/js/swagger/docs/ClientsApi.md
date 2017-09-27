@@ -4,16 +4,16 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**createOAuthClient**](ClientsApi.md#createOAuthClient) | **POST** /clients | Creates an OAuth 2.0 Client
-[**deleteOAuthClient**](ClientsApi.md#deleteOAuthClient) | **DELETE** /clients/{id} | Deletes an OAuth 2.0 Client
-[**getOAuthClient**](ClientsApi.md#getOAuthClient) | **GET** /clients/{id} | Fetches an OAuth 2.0 Client.
-[**listOAuthClients**](ClientsApi.md#listOAuthClients) | **GET** /clients | Lists OAuth 2.0 Clients
-[**updateOAuthClient**](ClientsApi.md#updateOAuthClient) | **PUT** /clients/{id} | Updates an OAuth 2.0 Client
+[**createOAuth2Client**](ClientsApi.md#createOAuth2Client) | **POST** /clients | Creates an OAuth 2.0 Client
+[**deleteOAuth2Client**](ClientsApi.md#deleteOAuth2Client) | **DELETE** /clients/{id} | Deletes an OAuth 2.0 Client
+[**getOAuth2Client**](ClientsApi.md#getOAuth2Client) | **GET** /clients/{id} | Fetches an OAuth 2.0 Client.
+[**listOAuth2Clients**](ClientsApi.md#listOAuth2Clients) | **GET** /clients | Lists OAuth 2.0 Clients
+[**updateOAuth2Client**](ClientsApi.md#updateOAuth2Client) | **PUT** /clients/{id} | Updates an OAuth 2.0 Client
 
 
-<a name="createOAuthClient"></a>
-# **createOAuthClient**
-> OauthClient createOAuthClient(body)
+<a name="createOAuth2Client"></a>
+# **createOAuth2Client**
+> OAuth2Client createOAuth2Client(body)
 
 Creates an OAuth 2.0 Client
 
@@ -30,7 +30,7 @@ oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
 var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.ClientsApi();
 
-var body = new HydraOAuth2OpenIdConnectServer100Aplha1.OauthClient(); // OauthClient | 
+var body = new HydraOAuth2OpenIdConnectServer100Aplha1.OAuth2Client(); // OAuth2Client | 
 
 
 var callback = function(error, data, response) {
@@ -40,18 +40,18 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-apiInstance.createOAuthClient(body, callback);
+apiInstance.createOAuth2Client(body, callback);
 ```
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**OauthClient**](OauthClient.md)|  | 
+ **body** | [**OAuth2Client**](OAuth2Client.md)|  | 
 
 ### Return type
 
-[**OauthClient**](OauthClient.md)
+[**OAuth2Client**](OAuth2Client.md)
 
 ### Authorization
 
@@ -62,9 +62,9 @@ Name | Type | Description  | Notes
  - **Content-Type**: application/json
  - **Accept**: application/json
 
-<a name="deleteOAuthClient"></a>
-# **deleteOAuthClient**
-> deleteOAuthClient(id)
+<a name="deleteOAuth2Client"></a>
+# **deleteOAuth2Client**
+> deleteOAuth2Client(id)
 
 Deletes an OAuth 2.0 Client
 
@@ -91,7 +91,7 @@ var callback = function(error, data, response) {
     console.log('API called successfully.');
   }
 };
-apiInstance.deleteOAuthClient(id, callback);
+apiInstance.deleteOAuth2Client(id, callback);
 ```
 
 ### Parameters
@@ -113,9 +113,9 @@ null (empty response body)
  - **Content-Type**: application/json
  - **Accept**: application/json
 
-<a name="getOAuthClient"></a>
-# **getOAuthClient**
-> OauthClient getOAuthClient(id)
+<a name="getOAuth2Client"></a>
+# **getOAuth2Client**
+> OAuth2Client getOAuth2Client(id)
 
 Fetches an OAuth 2.0 Client.
 
@@ -142,7 +142,7 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-apiInstance.getOAuthClient(id, callback);
+apiInstance.getOAuth2Client(id, callback);
 ```
 
 ### Parameters
@@ -153,7 +153,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**OauthClient**](OauthClient.md)
+[**OAuth2Client**](OAuth2Client.md)
 
 ### Authorization
 
@@ -164,9 +164,9 @@ Name | Type | Description  | Notes
  - **Content-Type**: application/json
  - **Accept**: application/json
 
-<a name="listOAuthClients"></a>
-# **listOAuthClients**
-> [OauthClient] listOAuthClients()
+<a name="listOAuth2Clients"></a>
+# **listOAuth2Clients**
+> [OAuth2Client] listOAuth2Clients()
 
 Lists OAuth 2.0 Clients
 
@@ -190,7 +190,7 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-apiInstance.listOAuthClients(callback);
+apiInstance.listOAuth2Clients(callback);
 ```
 
 ### Parameters
@@ -198,7 +198,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**[OauthClient]**](OauthClient.md)
+[**[OAuth2Client]**](OAuth2Client.md)
 
 ### Authorization
 
@@ -209,9 +209,9 @@ This endpoint does not need any parameter.
  - **Content-Type**: application/json
  - **Accept**: application/json
 
-<a name="updateOAuthClient"></a>
-# **updateOAuthClient**
-> OauthClient updateOAuthClient(id, body)
+<a name="updateOAuth2Client"></a>
+# **updateOAuth2Client**
+> OAuth2Client updateOAuth2Client(id, body)
 
 Updates an OAuth 2.0 Client
 
@@ -230,7 +230,7 @@ var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.ClientsApi();
 
 var id = "id_example"; // String | 
 
-var body = new HydraOAuth2OpenIdConnectServer100Aplha1.OauthClient(); // OauthClient | 
+var body = new HydraOAuth2OpenIdConnectServer100Aplha1.OAuth2Client(); // OAuth2Client | 
 
 
 var callback = function(error, data, response) {
@@ -240,7 +240,7 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-apiInstance.updateOAuthClient(id, body, callback);
+apiInstance.updateOAuth2Client(id, body, callback);
 ```
 
 ### Parameters
@@ -248,11 +248,11 @@ apiInstance.updateOAuthClient(id, body, callback);
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **id** | **String**|  | 
- **body** | [**OauthClient**](OauthClient.md)|  | 
+ **body** | [**OAuth2Client**](OAuth2Client.md)|  | 
 
 ### Return type
 
-[**OauthClient**](OauthClient.md)
+[**OAuth2Client**](OAuth2Client.md)
 
 ### Authorization
 

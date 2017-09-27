@@ -11,7 +11,7 @@
 package swagger
 
 type SwaggerJwkUpdateSet struct {
-	Body JwkSet `json:"Body,omitempty"`
+	Body JsonWebKeySet `json:"Body,omitempty"`
 
 	// The set in: path
 	Set string `json:"set"`

@@ -17,18 +17,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/InlineResponse401', 'model/JwkSet', 'model/WellKnown'], factory);
+    define(['ApiClient', 'model/InlineResponse401', 'model/JsonWebKeySet', 'model/WellKnown'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/InlineResponse401'), require('../model/JwkSet'), require('../model/WellKnown'));
+    module.exports = factory(require('../ApiClient'), require('../model/InlineResponse401'), require('../model/JsonWebKeySet'), require('../model/WellKnown'));
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer100Aplha1) {
       root.HydraOAuth2OpenIdConnectServer100Aplha1 = {};
     }
-    root.HydraOAuth2OpenIdConnectServer100Aplha1.OpenidconnectApi = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse401, root.HydraOAuth2OpenIdConnectServer100Aplha1.JwkSet, root.HydraOAuth2OpenIdConnectServer100Aplha1.WellKnown);
+    root.HydraOAuth2OpenIdConnectServer100Aplha1.OpenidconnectApi = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse401, root.HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeySet, root.HydraOAuth2OpenIdConnectServer100Aplha1.WellKnown);
   }
-}(this, function(ApiClient, InlineResponse401, JwkSet, WellKnown) {
+}(this, function(ApiClient, InlineResponse401, JsonWebKeySet, WellKnown) {
   'use strict';
 
   /**
@@ -52,7 +52,7 @@
      * Callback function to receive the result of the wellKnown operation.
      * @callback module:api/OpenidconnectApi~wellKnownCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/JwkSet} data The data returned by the service call.
+     * @param {module:model/JsonWebKeySet} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -60,7 +60,7 @@
      * Public JWKs
      * Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:hydra.openid.id-token:public\&quot;], \&quot;actions\&quot;: [\&quot;GET\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
      * @param {module:api/OpenidconnectApi~wellKnownCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/JwkSet}
+     * data is of type: {@link module:model/JsonWebKeySet}
      */
     this.wellKnown = function(callback) {
       var postBody = null;
@@ -78,7 +78,7 @@
       var authNames = ['oauth2'];
       var contentTypes = ['application/json'];
       var accepts = ['application/json'];
-      var returnType = JwkSet;
+      var returnType = JsonWebKeySet;
 
       return this.apiClient.callApi(
         '/.well-known/jwks.json', 'GET',

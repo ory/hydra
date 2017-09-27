@@ -8,7 +8,7 @@ import (
 
 // Client represents an OAuth 2.0 Client.
 //
-// swagger:model oauthClient
+// swagger:model oAuth2Client
 type Client struct {
 	// ID is the id for this client.
 	ID string `json:"id" gorethink:"id"`

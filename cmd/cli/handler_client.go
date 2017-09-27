@@ -22,8 +22,8 @@ func newClientHandler(c *config.Config) *ClientHandler {
 	}
 }
 
-func (h *ClientHandler) newClientManager(cmd *cobra.Command) *hydra.ClientsApi {
-	c := hydra.NewClientsApiWithBasePath(h.Config.ClusterURL)
+func (h *ClientHandler) newClientManager(cmd *cobra.Command) *hydra.OAuth2Api {
+	c := hydra.NewOAuth2ApiWithBasePath(h.Config.ClusterURL)
 	c.Configuration.Transport = h.Config.OAuth2Client(cmd).Transport
 	return c
 }
@@ -39,11 +39,11 @@ func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 	for _, path := range args {
 		reader, err := os.Open(path)
 		pkg.Must(err, "Could not open file %s: %s", path, err)
-		var c hydra.OauthClient
+		var c hydra.OAuth2Client
 		err = json.NewDecoder(reader).Decode(&c)
 		pkg.Must(err, "Could not parse JSON: %s", err)
 
-		result, _, err := m.CreateOAuthClient(c)
+		result, _, err := m.CreateOAuth2Client(c)
 		pkg.Must(err, "Could not create client: %s", err)
 		fmt.Printf("Imported client %s:%s from %s.\n", result.Id, result.ClientSecret, path)
 	}
@@ -70,7 +70,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		fmt.Println("You should not provide secrets using command line flags. The secret might leak to bash history and similar systems.")
 	}
 
-	cc := hydra.OauthClient{
+	cc := hydra.OAuth2Client{
 		Id:            id,
 		ClientSecret:  secret,
 		ResponseTypes: responseTypes,
@@ -81,7 +81,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		Public:        public,
 	}
 
-	result, _, err := m.CreateOAuthClient(cc)
+	result, _, err := m.CreateOAuth2Client(cc)
 	pkg.Must(err, "Could not create client: %s", err)
 
 	fmt.Printf("Client ID: %s\n", result.Id)
@@ -97,7 +97,7 @@ func (h *ClientHandler) DeleteClient(cmd *cobra.Command, args []string) {
 	}
 
 	for _, c := range args {
-		_, err := m.DeleteOAuthClient(c)
+		_, err := m.DeleteOAuth2Client(c)
 		pkg.Must(err, "Could not delete client: %s", err)
 	}
 
@@ -112,7 +112,7 @@ func (h *ClientHandler) GetClient(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	cl, _, err := m.GetOAuthClient(args[0])
+	cl, _, err := m.GetOAuth2Client(args[0])
 	pkg.Must(err, "Could not delete client: %s", err)
 
 	out, err := json.MarshalIndent(cl, "", "\t")

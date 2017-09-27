@@ -51,50 +51,50 @@
   }
 
   describe('ClientsApi', function() {
-    describe('createOAuthClient', function() {
-      it('should call createOAuthClient successfully', function(done) {
-        //uncomment below and update the code to test createOAuthClient
-        //instance.createOAuthClient(function(error) {
+    describe('createOAuth2Client', function() {
+      it('should call createOAuth2Client successfully', function(done) {
+        //uncomment below and update the code to test createOAuth2Client
+        //instance.createOAuth2Client(function(error) {
         //  if (error) throw error;
         //expect().to.be();
         //});
         done();
       });
     });
-    describe('deleteOAuthClient', function() {
-      it('should call deleteOAuthClient successfully', function(done) {
-        //uncomment below and update the code to test deleteOAuthClient
-        //instance.deleteOAuthClient(function(error) {
+    describe('deleteOAuth2Client', function() {
+      it('should call deleteOAuth2Client successfully', function(done) {
+        //uncomment below and update the code to test deleteOAuth2Client
+        //instance.deleteOAuth2Client(function(error) {
         //  if (error) throw error;
         //expect().to.be();
         //});
         done();
       });
     });
-    describe('getOAuthClient', function() {
-      it('should call getOAuthClient successfully', function(done) {
-        //uncomment below and update the code to test getOAuthClient
-        //instance.getOAuthClient(function(error) {
+    describe('getOAuth2Client', function() {
+      it('should call getOAuth2Client successfully', function(done) {
+        //uncomment below and update the code to test getOAuth2Client
+        //instance.getOAuth2Client(function(error) {
         //  if (error) throw error;
         //expect().to.be();
         //});
         done();
       });
     });
-    describe('listOAuthClients', function() {
-      it('should call listOAuthClients successfully', function(done) {
-        //uncomment below and update the code to test listOAuthClients
-        //instance.listOAuthClients(function(error) {
+    describe('listOAuth2Clients', function() {
+      it('should call listOAuth2Clients successfully', function(done) {
+        //uncomment below and update the code to test listOAuth2Clients
+        //instance.listOAuth2Clients(function(error) {
         //  if (error) throw error;
         //expect().to.be();
         //});
         done();
       });
     });
-    describe('updateOAuthClient', function() {
-      it('should call updateOAuthClient successfully', function(done) {
-        //uncomment below and update the code to test updateOAuthClient
-        //instance.updateOAuthClient(function(error) {
+    describe('updateOAuth2Client', function() {
+      it('should call updateOAuth2Client successfully', function(done) {
+        //uncomment below and update the code to test updateOAuth2Client
+        //instance.updateOAuth2Client(function(error) {
         //  if (error) throw error;
         //expect().to.be();
         //});

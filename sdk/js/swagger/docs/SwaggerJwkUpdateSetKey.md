@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerJwkUpdateSetKey
+# HydraOAuth2OpenIdConnectServer.SwaggerJwkUpdateSetKey
 
 ## Properties
 Name | Type | Description | Notes

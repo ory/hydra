@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerListPolicyResponse
+# HydraOAuth2OpenIdConnectServer.SwaggerListPolicyResponse
 
 ## Properties
 Name | Type | Description | Notes

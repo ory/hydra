@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.PolicyApi
+# HydraOAuth2OpenIdConnectServer.PolicyApi
 
 All URIs are relative to *http://localhost*
 
@@ -21,17 +21,17 @@ Visit https://github.com/ory/ladon#usage for more information on policy usage.  
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
-var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.PolicyApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer.PolicyApi();
 
 var opts = { 
-  'body': new HydraOAuth2OpenIdConnectServer100Aplha1.Policy() // Policy | 
+  'body': new HydraOAuth2OpenIdConnectServer.Policy() // Policy | 
 };
 
 var callback = function(error, data, response) {
@@ -73,14 +73,14 @@ Visit https://github.com/ory/ladon#usage for more information on policy usage.  
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
-var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.PolicyApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer.PolicyApi();
 
 var id = "id_example"; // String | The id of the policy.
 
@@ -124,14 +124,14 @@ Visit https://github.com/ory/ladon#usage for more information on policy usage.  
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
-var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.PolicyApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer.PolicyApi();
 
 var id = "id_example"; // String | The id of the policy.
 
@@ -175,14 +175,14 @@ Visit https://github.com/ory/ladon#usage for more information on policy usage.  
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
-var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.PolicyApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer.PolicyApi();
 
 var opts = { 
   'offset': 789, // Number | The offset from where to start looking.
@@ -229,19 +229,19 @@ Visit https://github.com/ory/ladon#usage for more information on policy usage.  
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer100Aplha1 = require('hydra_o_auth2__open_id_connect_server__100_aplha1');
-var defaultClient = HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient.instance;
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer100Aplha1.PolicyApi();
+var apiInstance = new HydraOAuth2OpenIdConnectServer.PolicyApi();
 
 var id = "id_example"; // String | The id of the policy.
 
 var opts = { 
-  'body': new HydraOAuth2OpenIdConnectServer100Aplha1.Policy() // Policy | 
+  'body': new HydraOAuth2OpenIdConnectServer.Policy() // Policy | 
 };
 
 var callback = function(error, data, response) {

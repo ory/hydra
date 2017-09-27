@@ -13,7 +13,7 @@
   "swagger": "2.0",
   "info": {
     "description": "Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/\n\n\nHydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure.\nHydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to.\nHydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.\n\n\nThe official repository is located at https://github.com/ory/hydra\n\n\n### ATTENTION - IMPORTANT NOTE\n\n\nThe swagger generator used to create this documentation does currently not support example responses. To see\nrequest and response payloads click on **\"Show JSON schema\"**:\n![Enable JSON Schema on Apiary](https://storage.googleapis.com/ory.am/hydra/json-schema.png)",
-    "title": "Hydra OAuth2 \u0026 OpenID Connect Server (1.0.0-aplha1)",
+    "title": "Hydra OAuth2 \u0026 OpenID Connect Server",
     "contact": {
       "name": "ORY",
       "url": "https://www.ory.am",
@@ -41,10 +41,7 @@
           "https"
         ],
         "tags": [
-          "oauth2",
-          "jsonWebKey",
-          "openid-connect",
-          "hydra"
+          "oauth2"
         ],
         "summary": "Public JWKs",
         "operationId": "wellKnown",
@@ -85,9 +82,7 @@
           "https"
         ],
         "tags": [
-          "oAuth2",
-          "openid-connect",
-          "hydra"
+          "oAuth2"
         ],
         "summary": "Server well known configuration",
         "operationId": "getWellKnown",
@@ -121,9 +116,7 @@
           "https"
         ],
         "tags": [
-          "oAuth2",
-          "clients",
-          "hydra"
+          "oAuth2"
         ],
         "summary": "Lists OAuth 2.0 Clients",
         "operationId": "listOAuth2Clients",
@@ -162,9 +155,7 @@
           "https"
         ],
         "tags": [
-          "oAuth2",
-          "clients",
-          "hydra"
+          "oAuth2"
         ],
         "summary": "Creates an OAuth 2.0 Client",
         "operationId": "createOAuth2Client",
@@ -218,9 +209,7 @@
           "https"
         ],
         "tags": [
-          "oAuth2",
-          "clients",
-          "hydra"
+          "oAuth2"
         ],
         "summary": "Fetches an OAuth 2.0 Client.",
         "operationId": "getOAuth2Client",
@@ -273,9 +262,7 @@
           "https"
         ],
         "tags": [
-          "oAuth2",
-          "clients",
-          "hydra"
+          "oAuth2"
         ],
         "summary": "Updates an OAuth 2.0 Client",
         "operationId": "updateOAuth2Client",
@@ -334,9 +321,7 @@
           "https"
         ],
         "tags": [
-          "oAuth2",
-          "clients",
-          "hydra"
+          "oAuth2"
         ],
         "summary": "Deletes an OAuth 2.0 Client",
         "operationId": "deleteOAuth2Client",
@@ -378,8 +363,7 @@
       "get": {
         "description": "This endpoint does not require the `X-Forwarded-Proto` header when TLS termination is set.",
         "tags": [
-          "health",
-          "hydra"
+          "health"
         ],
         "summary": "Check health status of instance",
         "operationId": "getHealthStatus",
@@ -407,8 +391,7 @@
           "https"
         ],
         "tags": [
-          "health",
-          "hydra"
+          "health"
         ],
         "summary": "Show instance statistics",
         "operationId": "getInstanceStatistics",
@@ -449,8 +432,7 @@
           "https"
         ],
         "tags": [
-          "jsonWebKey",
-          "hydra"
+          "jsonWebKey"
         ],
         "summary": "Retrieves a JSON Web Key Set matching the set",
         "operationId": "getJsonWebKeySet",
@@ -502,8 +484,7 @@
           "https"
         ],
         "tags": [
-          "jsonWebKey",
-          "hydra"
+          "jsonWebKey"
         ],
         "summary": "Updates a JSON Web Key Set",
         "operationId": "updateJsonWebKeySet",
@@ -562,8 +543,7 @@
           "https"
         ],
         "tags": [
-          "jsonWebKey",
-          "hydra"
+          "jsonWebKey"
         ],
         "summary": "Generate a new JSON Web Key for a JSON Web Key Set",
         "operationId": "createJsonWebKeySet",
@@ -622,8 +602,7 @@
           "https"
         ],
         "tags": [
-          "jsonWebKey",
-          "hydra"
+          "jsonWebKey"
         ],
         "summary": "Delete a JSON Web Key",
         "operationId": "deleteJsonWebKeySet",
@@ -674,8 +653,7 @@
           "https"
         ],
         "tags": [
-          "jsonWebKey",
-          "hydra"
+          "jsonWebKey"
         ],
         "summary": "Retrieves a JSON Web Key Set matching the set and the kid",
         "operationId": "getJsonWebKey",
@@ -735,8 +713,7 @@
           "https"
         ],
         "tags": [
-          "jsonWebKey",
-          "hydra"
+          "jsonWebKey"
         ],
         "summary": "Updates a JSON Web Key",
         "operationId": "updateJsonWebKey",
@@ -803,8 +780,7 @@
           "https"
         ],
         "tags": [
-          "jsonWebKey",
-          "hydra"
+          "jsonWebKey"
         ],
         "summary": "Delete a JSON Web Key",
         "operationId": "deleteJsonWebKey",
@@ -860,8 +836,7 @@
           "https"
         ],
         "tags": [
-          "oAuth2",
-          "hydra"
+          "oAuth2"
         ],
         "summary": "The OAuth 2.0 Auth endpoint",
         "operationId": "oauthAuth",
@@ -892,9 +867,7 @@
           "https"
         ],
         "tags": [
-          "oAuth2",
-          "consent",
-          "hydra"
+          "oAuth2"
         ],
         "summary": "Receive consent request information",
         "operationId": "getOAuth2ConsentRequest",
@@ -943,9 +916,7 @@
           "https"
         ],
         "tags": [
-          "oAuth2",
-          "consent",
-          "hydra"
+          "oAuth2"
         ],
         "summary": "Accept a consent request",
         "operationId": "acceptOAuth2ConsentRequest",
@@ -1000,9 +971,7 @@
           "https"
         ],
         "tags": [
-          "oAuth2",
-          "consent",
-          "hydra"
+          "oAuth2"
         ],
         "summary": "Reject a consent request",
         "operationId": "rejectOAuth2ConsentRequest",
@@ -1057,8 +1026,7 @@
           "https"
         ],
         "tags": [
-          "oAuth2",
-          "hydra"
+          "oAuth2"
         ],
         "summary": "Introspect an OAuth2 access token",
         "operationId": "introspectOAuth2Token",
@@ -1108,8 +1076,7 @@
           "https"
         ],
         "tags": [
-          "oAuth2",
-          "hydra"
+          "oAuth2"
         ],
         "summary": "Revoke an OAuth2 access token",
         "operationId": "revokeOAuth2Token",
@@ -1154,8 +1121,7 @@
           "https"
         ],
         "tags": [
-          "oAuth2",
-          "hydra"
+          "oAuth2"
         ],
         "summary": "The OAuth 2.0 Token endpoint",
         "operationId": "oauthToken",
@@ -1191,8 +1157,7 @@
           "https"
         ],
         "tags": [
-          "policy",
-          "hydra"
+          "policy"
         ],
         "summary": "List access control policies",
         "operationId": "listPolicies",
@@ -1249,8 +1214,7 @@
           "https"
         ],
         "tags": [
-          "policy",
-          "hydra"
+          "policy"
         ],
         "summary": "Create an access control policy",
         "operationId": "createPolicy",
@@ -1303,8 +1267,7 @@
           "https"
         ],
         "tags": [
-          "policy",
-          "hydra"
+          "policy"
         ],
         "summary": "Get an access control policy",
         "operationId": "getPolicy",
@@ -1356,8 +1319,7 @@
           "https"
         ],
         "tags": [
-          "policy",
-          "hydra"
+          "policy"
         ],
         "summary": "Update an access control policy",
         "operationId": "updatePolicy",
@@ -1416,8 +1378,7 @@
           "https"
         ],
         "tags": [
-          "policy",
-          "hydra"
+          "policy"
         ],
         "summary": "Delete an access control policy",
         "operationId": "deletePolicy",

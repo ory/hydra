@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerWardenAllowedResponseBody
+# HydraOAuth2OpenIdConnectServer.SwaggerWardenAllowedResponseBody
 
 ## Properties
 Name | Type | Description | Notes

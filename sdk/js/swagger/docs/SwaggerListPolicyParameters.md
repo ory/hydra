@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerListPolicyParameters
+# HydraOAuth2OpenIdConnectServer.SwaggerListPolicyParameters
 
 ## Properties
 Name | Type | Description | Notes

@@ -1,5 +1,5 @@
 /**
- * Hydra OAuth2 & OpenID Connect Server (1.0.0-aplha1)
+ * Hydra OAuth2 & OpenID Connect Server
  * Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/   Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure. Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to. Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.   The official repository is located at https://github.com/ory/hydra   ### ATTENTION - IMPORTANT NOTE   The swagger generator used to create this documentation does currently not support example responses. To see request and response payloads click on **\"Show JSON schema\"**: ![Enable JSON Schema on Apiary](https://storage.googleapis.com/ory.am/hydra/json-schema.png)
  *
  * OpenAPI spec version: Latest
@@ -23,10 +23,10 @@
     module.exports = factory(require('../ApiClient'), require('../model/CreateJsonWebKeySetPayload'), require('../model/InlineResponse401'), require('../model/JsonWebKey'), require('../model/JsonWebKeySet'));
   } else {
     // Browser globals (root is window)
-    if (!root.HydraOAuth2OpenIdConnectServer100Aplha1) {
-      root.HydraOAuth2OpenIdConnectServer100Aplha1 = {};
+    if (!root.HydraOAuth2OpenIdConnectServer) {
+      root.HydraOAuth2OpenIdConnectServer = {};
     }
-    root.HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeyApi = factory(root.HydraOAuth2OpenIdConnectServer100Aplha1.ApiClient, root.HydraOAuth2OpenIdConnectServer100Aplha1.CreateJsonWebKeySetPayload, root.HydraOAuth2OpenIdConnectServer100Aplha1.InlineResponse401, root.HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKey, root.HydraOAuth2OpenIdConnectServer100Aplha1.JsonWebKeySet);
+    root.HydraOAuth2OpenIdConnectServer.JsonWebKeyApi = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient, root.HydraOAuth2OpenIdConnectServer.CreateJsonWebKeySetPayload, root.HydraOAuth2OpenIdConnectServer.InlineResponse401, root.HydraOAuth2OpenIdConnectServer.JsonWebKey, root.HydraOAuth2OpenIdConnectServer.JsonWebKeySet);
   }
 }(this, function(ApiClient, CreateJsonWebKeySetPayload, InlineResponse401, JsonWebKey, JsonWebKeySet) {
   'use strict';
@@ -393,45 +393,6 @@
 
       return this.apiClient.callApi(
         '/keys/{set}', 'PUT',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
-    }
-
-    /**
-     * Callback function to receive the result of the wellKnown operation.
-     * @callback module:api/JsonWebKeyApi~wellKnownCallback
-     * @param {String} error Error message, if any.
-     * @param {module:model/JsonWebKeySet} data The data returned by the service call.
-     * @param {String} response The complete HTTP response.
-     */
-
-    /**
-     * Public JWKs
-     * Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:hydra.openid.id-token:public\&quot;], \&quot;actions\&quot;: [\&quot;GET\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
-     * @param {module:api/JsonWebKeyApi~wellKnownCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/JsonWebKeySet}
-     */
-    this.wellKnown = function(callback) {
-      var postBody = null;
-
-
-      var pathParams = {
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
-
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = JsonWebKeySet;
-
-      return this.apiClient.callApi(
-        '/.well-known/jwks.json', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );

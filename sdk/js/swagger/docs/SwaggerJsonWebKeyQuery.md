@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.SwaggerJsonWebKeyQuery
+# HydraOAuth2OpenIdConnectServer.SwaggerJsonWebKeyQuery
 
 ## Properties
 Name | Type | Description | Notes

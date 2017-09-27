@@ -1,5 +1,5 @@
 /**
- * Hydra OAuth2 & OpenID Connect Server (1.0.0-aplha1)
+ * Hydra OAuth2 & OpenID Connect Server
  * Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/   Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure. Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to. Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.   The official repository is located at https://github.com/ory/hydra   ### ATTENTION - IMPORTANT NOTE   The swagger generator used to create this documentation does currently not support example responses. To see request and response payloads click on **\"Show JSON schema\"**: ![Enable JSON Schema on Apiary](https://storage.googleapis.com/ory.am/hydra/json-schema.png)
  *
  * OpenAPI spec version: Latest
@@ -23,15 +23,15 @@
     factory(require('expect.js'), require('../../src/index'));
   } else {
     // Browser globals (root is window)
-    factory(root.expect, root.HydraOAuth2OpenIdConnectServer100Aplha1);
+    factory(root.expect, root.HydraOAuth2OpenIdConnectServer);
   }
-}(this, function(expect, HydraOAuth2OpenIdConnectServer100Aplha1) {
+}(this, function(expect, HydraOAuth2OpenIdConnectServer) {
   'use strict';
 
   var instance;
 
   beforeEach(function() {
-    instance = new HydraOAuth2OpenIdConnectServer100Aplha1.WellKnown();
+    instance = new HydraOAuth2OpenIdConnectServer.WellKnown();
   });
 
   var getProperty = function(object, getter, property) {
@@ -53,49 +53,49 @@
   describe('WellKnown', function() {
     it('should create an instance of WellKnown', function() {
       // uncomment below and update the code to test WellKnown
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.WellKnown();
-      //expect(instance).to.be.a(HydraOAuth2OpenIdConnectServer100Aplha1.WellKnown);
+      //var instane = new HydraOAuth2OpenIdConnectServer.WellKnown();
+      //expect(instance).to.be.a(HydraOAuth2OpenIdConnectServer.WellKnown);
     });
 
     it('should have the property authorizationEndpoint (base name: "authorization_endpoint")', function() {
       // uncomment below and update the code to test the property authorizationEndpoint
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.WellKnown();
+      //var instane = new HydraOAuth2OpenIdConnectServer.WellKnown();
       //expect(instance).to.be();
     });
 
     it('should have the property idTokenSigningAlgValuesSupported (base name: "id_token_signing_alg_values_supported")', function() {
       // uncomment below and update the code to test the property idTokenSigningAlgValuesSupported
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.WellKnown();
+      //var instane = new HydraOAuth2OpenIdConnectServer.WellKnown();
       //expect(instance).to.be();
     });
 
     it('should have the property issuer (base name: "issuer")', function() {
       // uncomment below and update the code to test the property issuer
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.WellKnown();
+      //var instane = new HydraOAuth2OpenIdConnectServer.WellKnown();
       //expect(instance).to.be();
     });
 
     it('should have the property jwksUri (base name: "jwks_uri")', function() {
       // uncomment below and update the code to test the property jwksUri
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.WellKnown();
+      //var instane = new HydraOAuth2OpenIdConnectServer.WellKnown();
       //expect(instance).to.be();
     });
 
     it('should have the property responseTypesSupported (base name: "response_types_supported")', function() {
       // uncomment below and update the code to test the property responseTypesSupported
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.WellKnown();
+      //var instane = new HydraOAuth2OpenIdConnectServer.WellKnown();
       //expect(instance).to.be();
     });
 
     it('should have the property subjectTypesSupported (base name: "subject_types_supported")', function() {
       // uncomment below and update the code to test the property subjectTypesSupported
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.WellKnown();
+      //var instane = new HydraOAuth2OpenIdConnectServer.WellKnown();
       //expect(instance).to.be();
     });
 
     it('should have the property tokenEndpoint (base name: "token_endpoint")', function() {
       // uncomment below and update the code to test the property tokenEndpoint
-      //var instane = new HydraOAuth2OpenIdConnectServer100Aplha1.WellKnown();
+      //var instane = new HydraOAuth2OpenIdConnectServer.WellKnown();
       //expect(instance).to.be();
     });
 

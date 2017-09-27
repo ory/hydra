@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer100Aplha1.WellKnown
+# HydraOAuth2OpenIdConnectServer.WellKnown
 
 ## Properties
 Name | Type | Description | Notes

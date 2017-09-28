@@ -11,12 +11,18 @@
 // The official repository is located at https://github.com/ory/hydra
 //
 //
-// ### ATTENTION - IMPORTANT NOTE
-//
+// ### Important REST API Documentation Notes
 //
 // The swagger generator used to create this documentation does currently not support example responses. To see
 // request and response payloads click on **"Show JSON schema"**:
 // ![Enable JSON Schema on Apiary](https://storage.googleapis.com/ory.am/hydra/json-schema.png)
+//
+//
+// The API documentation always refers to the latest tagged version of ORY Hydra. For previous API documentations, please
+// refer to https://github.com/ory/hydra/blob/<tag-id>/docs/api.swagger.yaml - for example:
+//
+// - 0.9.13: https://github.com/ory/hydra/blob/v0.9.13/docs/api.swagger.yaml
+// - 0.8.1: https://github.com/ory/hydra/blob/v0.8.1/docs/api.swagger.yaml
 //
 //     Schemes: http, https
 //     Host:

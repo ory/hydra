@@ -1,42 +1,36 @@
-// Package warden decides if access requests should be allowed or denied. In a scientific taxonomy, the warden
-// is classified as a Policy Decision Point. THe warden's primary goal is to implement `github.com/ory-am/hydra/firewall.Firewall`.
-// To read up on the warden, go to:
-//
-// - https://ory-am.gitbooks.io/hydra/content/policy.html
-//
-// - http://docs.hydra13.apiary.io/#reference/warden:-access-control-for-resource-providers
-//
-// Contains source files:
-//
-// - handler.go: A HTTP handler capable of validating access tokens.
-//
-// - warden_http.go: A Go API using HTTP to validate access tokens.
-//
-// - warden_local.go: A Go API using storage managers to validate access tokens.
-//
-// - warden_test.go: Functional tests all of the above.
+// Package warden implements endpoints capable of making access control decisions based on Access Control Policies
 package warden
 
-import "github.com/ory/hydra/firewall"
+import (
+	"github.com/ory/hydra/firewall"
+)
 
-// The allowed response
-// swagger:response wardenAllowedResponse
-type swaggerWardenAllowedResponse struct {
+// swagger:response wardenAccessRequestResponse
+type swaggerWardenAccessRequestResponseParameters struct {
 	// in: body
-	Body struct {
-		// Allowed is true if the request is allowed or false otherwise
-		Allowed bool `json:"allowed"`
-	}
+	Body swaggerWardenAccessRequestResponse
 }
 
-// swagger:parameters wardenAllowed
-type swaggerWardenAllowedParameters struct {
+// swagger:model wardenAccessRequestResponse
+type swaggerWardenAccessRequestResponse struct {
+	// Allowed is true if the request is allowed and false otherwise.
+	Allowed bool `json:"allowed"`
+}
+
+// swagger:parameters doesWardenAllowAccessRequest
+type swaggerDoesWardenAllowAccessRequestParameters struct {
 	// in: body
 	Body firewall.AccessRequest
 }
 
-// swagger:model wardenTokenAllowedBody
-type swaggerWardenTokenAllowedBody struct {
+// swagger:parameters doesWardenAllowTokenAccessRequest
+type swaggerDoesWardenAllowTokenAccessRequestParameters struct {
+	// in: body
+	Body swaggerWardenTokenAccessRequest
+}
+
+// swagger:model wardenTokenAccessRequest
+type swaggerWardenTokenAccessRequest struct {
 	// Scopes is an array of scopes that are requried.
 	Scopes []string `json:"scopes"`
 
@@ -53,20 +47,36 @@ type swaggerWardenTokenAllowedBody struct {
 	Context map[string]interface{} `json:"context"`
 }
 
-// swagger:parameters wardenTokenAllowed
-type swaggerWardenTokenAllowedParameters struct {
+// swagger:response wardenTokenAccessRequestResponse
+type swaggerWardenTokenAccessRequestResponse struct {
 	// in: body
-	Body swaggerWardenTokenAllowedBody
+	Body swaggerWardenTokenAccessRequestResponsePayload
 }
 
-// The token allowed response
-// swagger:response wardenTokenAllowedResponse
-type swaggerWardenTokenAllowedResponse struct {
-	// in: body
-	Body struct {
-		*firewall.Context
+// swagger:model wardenTokenAccessRequestResponsePayload
+type swaggerWardenTokenAccessRequestResponsePayload struct {
+	// Subject is the identity that authorized issuing the token, for example a user or an OAuth2 app.
+	// This is usually a uuid but you can choose a urn or some other id too.
+	Subject string `json:"sub"`
 
-		// Allowed is true if the request is allowed or false otherwise
-		Allowed bool `json:"allowed"`
-	}
+	// GrantedScopes is a list of scopes that the subject authorized when asked for consent.
+	GrantedScopes []string `json:"scopes"`
+
+	// Issuer is the id of the issuer, typically an hydra instance.
+	Issuer string `json:"iss"`
+
+	// Audience is who the token was issued for. This is an OAuth2 app usually.
+	Audience string `json:"aud"`
+
+	// IssuedAt is the token creation time stamp.
+	IssuedAt string `json:"iat"`
+
+	// ExpiresAt is the expiry timestamp.
+	ExpiresAt string `json:"exp"`
+
+	// Extra represents arbitrary session data.
+	Extra map[string]interface{} `json:"ext"`
+
+	// Allowed is true if the request is allowed and false otherwise.
+	Allowed bool `json:"allowed"`
 }

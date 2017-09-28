@@ -39,10 +39,12 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 
 // swagger:route POST /clients oAuth2 createOAuth2Client
 //
-// Creates an OAuth 2.0 Client
+// Create an OAuth 2.0 client
 //
-// Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This
-// endpoint should be well protected and only called by code you trust.
+// If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will
+// be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep
+// it somwhere safe.
+//
 //
 // The subject making the request needs to be assigned to a policy containing:
 //
@@ -124,10 +126,11 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 
 // swagger:route PUT /clients/{id} oAuth2 updateOAuth2Client
 //
-// Updates an OAuth 2.0 Client
+// Update an OAuth 2.0 Client
 //
-// Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This
-// endpoint should be well protected and only called by code you trust.
+// If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will
+// be able to retrieve the client secret, so write it down and keep it safe.
+//
 //
 // The subject making the request needs to be assigned to a policy containing:
 //
@@ -212,9 +215,10 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 
 // swagger:route GET /clients oAuth2 listOAuth2Clients
 //
-// Lists OAuth 2.0 Clients
+// List OAuth 2.0 Clients
 //
-// Never returns a client's secret.
+// This endpoint never returns passwords.
+//
 //
 // The subject making the request needs to be assigned to a policy containing:
 //
@@ -272,9 +276,10 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 
 // swagger:route GET /clients/{id} oAuth2 getOAuth2Client
 //
-// Fetches an OAuth 2.0 Client.
+// Retrieve an OAuth 2.0 Client.
 //
-// Never returns the client's secret.
+// This endpoint never returns passwords.
+//
 //
 // The subject making the request needs to be assigned to a policy containing:
 //

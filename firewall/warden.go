@@ -34,7 +34,7 @@ type Context struct {
 
 // AccessRequest is the warden's request object.
 //
-// swagger:model allowedRequest
+// swagger:model wardenAccessRequest
 type AccessRequest struct {
 	// Resource is the resource that access is requested to.
 	Resource string `json:"resource"`

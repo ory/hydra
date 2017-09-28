@@ -1,3 +1,9 @@
+// Package jwk implements JSON Web Key management capabilities
+//
+// A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data
+// structure that represents a cryptographic key. A JWK Set is a JSON data structure that
+// represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality
+// to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens).
 package jwk
 
 // swagger:parameters getJsonWebKey deleteJsonWebKey

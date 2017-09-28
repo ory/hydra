@@ -7,11 +7,11 @@ Method | HTTP request | Description
 [**addMembersToGroup**](WardenApi.md#addMembersToGroup) | **POST** /warden/groups/{id}/members | Add members to a group
 [**createGroup**](WardenApi.md#createGroup) | **POST** /warden/groups | Create a group
 [**deleteGroup**](WardenApi.md#deleteGroup) | **DELETE** /warden/groups/{id} | Delete a group by id
+[**doesWardenAllowAccessRequest**](WardenApi.md#doesWardenAllowAccessRequest) | **POST** /warden/allowed | Check if an access request is valid (without providing an access token)
+[**doesWardenAllowTokenAccessRequest**](WardenApi.md#doesWardenAllowTokenAccessRequest) | **POST** /warden/token/allowed | Check if an access request is valid (providing an access token)
 [**findGroupsByMember**](WardenApi.md#findGroupsByMember) | **GET** /warden/groups | Find group IDs by member
 [**getGroup**](WardenApi.md#getGroup) | **GET** /warden/groups/{id} | Get a group by id
 [**removeMembersFromGroup**](WardenApi.md#removeMembersFromGroup) | **DELETE** /warden/groups/{id}/members | Remove members from a group
-[**wardenAllowed**](WardenApi.md#wardenAllowed) | **POST** /warden/allowed | Check if a subject is allowed to do something
-[**wardenTokenAllowed**](WardenApi.md#wardenTokenAllowed) | **POST** /warden/token/allowed | Check if the subject of a token is allowed to do something
 
 
 <a name="addMembersToGroup"></a>
@@ -155,6 +155,110 @@ Name | Type | Description  | Notes
 ### Return type
 
 null (empty response body)
+
+### Authorization
+
+[oauth2](../README.md#oauth2)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+<a name="doesWardenAllowAccessRequest"></a>
+# **doesWardenAllowAccessRequest**
+> WardenAccessRequestResponse doesWardenAllowAccessRequest(opts)
+
+Check if an access request is valid (without providing an access token)
+
+Checks if a subject (typically a user or a service) is allowed to perform an action on a resource. This endpoint requires a subject, a resource name, an action name and a context. If the subject is not allowed to perform the action on the resource, this endpoint returns a 200 response with &#x60;{ \&quot;allowed\&quot;: false}&#x60;, otherwise &#x60;{ \&quot;allowed\&quot;: true }&#x60; is returned.   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:allowed\&quot;], \&quot;actions\&quot;: [\&quot;decide\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+
+### Example
+```javascript
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+
+// Configure OAuth2 access token for authorization: oauth2
+var oauth2 = defaultClient.authentications['oauth2'];
+oauth2.accessToken = 'YOUR ACCESS TOKEN';
+
+var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
+
+var opts = { 
+  'body': new HydraOAuth2OpenIdConnectServer.WardenAccessRequest() // WardenAccessRequest | 
+};
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+apiInstance.doesWardenAllowAccessRequest(opts, callback);
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**WardenAccessRequest**](WardenAccessRequest.md)|  | [optional] 
+
+### Return type
+
+[**WardenAccessRequestResponse**](WardenAccessRequestResponse.md)
+
+### Authorization
+
+[oauth2](../README.md#oauth2)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+<a name="doesWardenAllowTokenAccessRequest"></a>
+# **doesWardenAllowTokenAccessRequest**
+> WardenTokenAccessRequestResponsePayload doesWardenAllowTokenAccessRequest(opts)
+
+Check if an access request is valid (providing an access token)
+
+Checks if a token is valid and if the token subject is allowed to perform an action on a resource. This endpoint requires a token, a scope, a resource name, an action name and a context.   If a token is expired/invalid, has not been granted the requested scope or the subject is not allowed to perform the action on the resource, this endpoint returns a 200 response with &#x60;{ \&quot;allowed\&quot;: false}&#x60;.   Extra data set through the &#x60;accessTokenExtra&#x60; field in the consent flow will be included in the response.   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:token:allowed\&quot;], \&quot;actions\&quot;: [\&quot;decide\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+
+### Example
+```javascript
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+
+// Configure OAuth2 access token for authorization: oauth2
+var oauth2 = defaultClient.authentications['oauth2'];
+oauth2.accessToken = 'YOUR ACCESS TOKEN';
+
+var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
+
+var opts = { 
+  'body': new HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequest() // WardenTokenAccessRequest | 
+};
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+apiInstance.doesWardenAllowTokenAccessRequest(opts, callback);
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**WardenTokenAccessRequest**](WardenTokenAccessRequest.md)|  | [optional] 
+
+### Return type
+
+[**WardenTokenAccessRequestResponsePayload**](WardenTokenAccessRequestResponsePayload.md)
 
 ### Authorization
 
@@ -313,110 +417,6 @@ Name | Type | Description  | Notes
 ### Return type
 
 null (empty response body)
-
-### Authorization
-
-[oauth2](../README.md#oauth2)
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
-<a name="wardenAllowed"></a>
-# **wardenAllowed**
-> InlineResponse2002 wardenAllowed(opts)
-
-Check if a subject is allowed to do something
-
-Checks if an arbitrary subject is allowed to perform an action on a resource. This endpoint requires a subject, a resource name, an action name and a context.If the subject is not allowed to perform the action on the resource, this endpoint returns a 200 response with &#x60;{ \&quot;allowed\&quot;: false} }&#x60;.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:allowed\&quot;], \&quot;actions\&quot;: [\&quot;decide\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
-
-### Example
-```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
-
-// Configure OAuth2 access token for authorization: oauth2
-var oauth2 = defaultClient.authentications['oauth2'];
-oauth2.accessToken = 'YOUR ACCESS TOKEN';
-
-var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
-
-var opts = { 
-  'body': new HydraOAuth2OpenIdConnectServer.AllowedRequest() // AllowedRequest | 
-};
-
-var callback = function(error, data, response) {
-  if (error) {
-    console.error(error);
-  } else {
-    console.log('API called successfully. Returned data: ' + data);
-  }
-};
-apiInstance.wardenAllowed(opts, callback);
-```
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **body** | [**AllowedRequest**](AllowedRequest.md)|  | [optional] 
-
-### Return type
-
-[**InlineResponse2002**](InlineResponse2002.md)
-
-### Authorization
-
-[oauth2](../README.md#oauth2)
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
-<a name="wardenTokenAllowed"></a>
-# **wardenTokenAllowed**
-> InlineResponse2003 wardenTokenAllowed(opts)
-
-Check if the subject of a token is allowed to do something
-
-Checks if a token is valid and if the token owner is allowed to perform an action on a resource. This endpoint requires a token, a scope, a resource name, an action name and a context.  If a token is expired/invalid, has not been granted the requested scope or the subject is not allowed to perform the action on the resource, this endpoint returns a 200 response with &#x60;{ \&quot;allowed\&quot;: false} }&#x60;.  Extra data set through the &#x60;at_ext&#x60; claim in the consent response will be included in the response. The &#x60;id_ext&#x60; claim will never be returned by this endpoint.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:token:allowed\&quot;], \&quot;actions\&quot;: [\&quot;decide\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
-
-### Example
-```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
-
-// Configure OAuth2 access token for authorization: oauth2
-var oauth2 = defaultClient.authentications['oauth2'];
-oauth2.accessToken = 'YOUR ACCESS TOKEN';
-
-var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
-
-var opts = { 
-  'body': new HydraOAuth2OpenIdConnectServer.WardenTokenAllowedBody() // WardenTokenAllowedBody | 
-};
-
-var callback = function(error, data, response) {
-  if (error) {
-    console.error(error);
-  } else {
-    console.log('API called successfully. Returned data: ' + data);
-  }
-};
-apiInstance.wardenTokenAllowed(opts, callback);
-```
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **body** | [**WardenTokenAllowedBody**](WardenTokenAllowedBody.md)|  | [optional] 
-
-### Return type
-
-[**InlineResponse2003**](InlineResponse2003.md)
 
 ### Authorization
 

@@ -1,17 +1,29 @@
 // Package policy offers management capabilities for access control policies.
-// To read up on policies, go to:
 //
-// - https://github.com/ory/ladon
+// Access Control Policies (ACP) are a concept similar to Role Based Access Control and Access Control Lists. ACPs
+// however are more flexible and capable of handling complex and abstract access control scenarios. A ACP answers "**Who**
+// is **able** to do **what** on **something** given a **context**."
 //
-// - https://ory-am.gitbooks.io/hydra/content/policy.html
 //
-// Contains source files:
+// ACPs have five attributes:
 //
-// - handler.go: A HTTP handler capable of managing policies.
+// - Subject *(who)*: An arbitrary unique subject name, for example "ken" or "printer-service.mydomain.com".
+// - Effect *(able)*: The effect which can be either "allow" or "deny".
+// - Action *(what)*: An arbitrary action name, for example "delete", "create" or "scoped:action:something".
+// - Resource *(something)*: An arbitrary unique resource name, for example "something", "resources.articles.1234" or some uniform resource name like "urn:isbn:3827370191".
+// - Condition *(context)*: An optional condition that evaluates the context (e.g. IP Address, request datetime, resource owner name, department, ...). Different strategies are available to evaluate conditions:
+//   - https://github.com/ory/ladon#cidr-condition
+//   - https://github.com/ory/ladon#string-equal-condition
+//   - https://github.com/ory/ladon#string-match-condition
+//	 - https://github.com/ory/ladon#subject-condition
+//   - https://github.com/ory/ladon#string-pairs-equal-condition
 //
-// - warden_http.go: A Go API using HTTP to validate  managing policies.
 //
-// - warden_test.go: Functional tests all of the above.
+// You can find more information on ACPs here:
+//
+// - https://github.com/ory/ladon#usage for more information on policy usage.
+//
+// - https://github.com/ory/ladon#concepts
 package policy
 
 // swagger:parameters listPolicies

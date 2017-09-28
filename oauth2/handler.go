@@ -7,8 +7,6 @@ import (
 	"net/url"
 	"strings"
 
-	"fmt"
-
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/pkg"
@@ -98,7 +96,9 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //
 // Server well known configuration
 //
-// For more information, please refer to https://openid.net/specs/openid-connect-discovery-1_0.html
+// The well known endpoint an be used to retrieve information for OpenID Connect clients. We encourage you to not roll
+// your own OpenID Connect client but to use an OpenID Connect client library instead. You can learn more on this
+// flow at https://openid.net/specs/openid-connect-discovery-1_0.html
 //
 //     Produces:
 //     - application/json
@@ -124,9 +124,11 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ htt
 
 // swagger:route POST /oauth2/revoke oAuth2 revokeOAuth2Token
 //
-// Revoke an OAuth2 access token
+// Revoke OAuth2 tokens
 //
-// For more information, please refer to https://tools.ietf.org/html/rfc7009
+// Revoking a token (both access and refresh) means that the tokens will be invalid. A revoked access token can no
+// longer be used to make access requests, and a revoked refresh token can no longer be used to refresh an access token.
+// Revoking a refresh token also invalidates the access token that was created with it.
 //
 //     Consumes:
 //     - application/x-www-form-urlencoded
@@ -153,9 +155,11 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ ht
 
 // swagger:route POST /oauth2/introspect oAuth2 introspectOAuth2Token
 //
-// Introspect an OAuth2 access token
+// Introspect OAuth2 tokens
 //
-// For more information, please refer to https://tools.ietf.org/html/rfc7662
+// The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token
+// is neither expired nor revoked. If a token is active, additional information on the token will be included. You can
+// set additional data for a token by setting `accessTokenExtra` during the consent flow.
 //
 //     Consumes:
 //     - application/x-www-form-urlencoded
@@ -167,6 +171,7 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ ht
 //
 //     Security:
 //       basic:
+//       oauth2:
 //
 //     Responses:
 //       200: introspectOAuth2TokenResponse
@@ -182,8 +187,6 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		h.OAuth2.WriteIntrospectionError(w, err)
 		return
 	}
-
-	fmt.Printf("\n\nFOAJSDOIJASD: \n\n%+v\n", r.PostForm)
 
 	exp := resp.GetAccessRequester().GetSession().GetExpiresAt(fosite.AccessToken)
 	if exp.IsZero() {
@@ -210,9 +213,12 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 
 // swagger:route POST /oauth2/token oAuth2 oauthToken
 //
-// The OAuth 2.0 Token endpoint
+// The OAuth 2.0 token endpoint
 //
-// For more information, please refer to https://tools.ietf.org/html/rfc6749#section-4
+// This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.
+// OAuth2 is a very popular protocol and a library for your programming language will exists.
+//
+// To learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749
 //
 //     Consumes:
 //     - application/x-www-form-urlencoded
@@ -224,6 +230,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 //
 //     Security:
 //       basic:
+//       oauth2:
 //
 //     Responses:
 //       200: oauthTokenResponse
@@ -261,9 +268,12 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprou
 
 // swagger:route GET /oauth2/auth oAuth2 oauthAuth
 //
-// The OAuth 2.0 Auth endpoint
+// The OAuth 2.0 authorize endpoint
 //
-// For more information, please refer to https://tools.ietf.org/html/rfc6749#section-4
+// This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.
+// OAuth2 is a very popular protocol and a library for your programming language will exists.
+//
+// To learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749
 //
 //     Consumes:
 //     - application/x-www-form-urlencoded

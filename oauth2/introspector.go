@@ -1,7 +1,5 @@
 package oauth2
 
-import "context"
-
 // Introspection contains an access token's session data as specified by IETF RFC 7662, see:
 // https://tools.ietf.org/html/rfc7662
 type Introspection struct {
@@ -56,16 +54,4 @@ type Introspection struct {
 
 	// Extra is arbitrary data set by the session.
 	Extra map[string]interface{} `json:"ext,omitempty"`
-}
-
-// Introspector is capable of introspecting an access token according to IETF RFC 7662, see:
-// https://tools.ietf.org/html/rfc7662
-type Introspector interface {
-	// IntrospectToken performs a token introspection according to IETF RFC 7662, see: https://tools.ietf.org/html/rfc7662
-	//
-	//  func anyHttpHandler(w http.ResponseWriter, r *http.Request) {
-	//    ctx, err := introspector.IntrospectToken(context.Background(), introspector.TokenFromRequest(r), "photos", "files")
-	//    fmt.Sprintf("%s", ctx.Subject)
-	//  }
-	IntrospectToken(ctx context.Context, token string, scopes ...string) (*Introspection, error)
 }

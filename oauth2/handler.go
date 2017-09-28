@@ -318,7 +318,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	session, err := h.Consent.ValidateConsentRequest(authorizeRequest, consent, cookie)
 	if err != nil {
 		pkg.LogError(err, h.L)
-		h.writeAuthorizeError(w, authorizeRequest, errors.Wrap(fosite.ErrAccessDenied, ""))
+		h.writeAuthorizeError(w, authorizeRequest, err)
 		return
 	}
 

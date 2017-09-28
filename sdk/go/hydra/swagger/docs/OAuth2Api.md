@@ -4,15 +4,15 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**WellKnown**](Oauth2Api.md#WellKnown) | **Get** /.well-known/jwks.json | Public JWKs
+[**WellKnown**](Oauth2Api.md#WellKnown) | **Get** /.well-known/jwks.json | Get list of well known JSON Web Keys
 
 
 # **WellKnown**
 > JsonWebKeySet WellKnown()
 
-Public JWKs
+Get list of well known JSON Web Keys
 
-Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.  The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:keys:hydra.openid.id-token:public\"], \"actions\": [\"GET\"], \"effect\": \"allow\" } ```
+The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:keys:hydra.openid.id-token:public\"], \"actions\": [\"GET\"], \"effect\": \"allow\" } ```
 
 
 ### Parameters

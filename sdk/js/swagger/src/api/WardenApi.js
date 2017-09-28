@@ -17,18 +17,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/AllowedRequest', 'model/Group', 'model/InlineResponse2002', 'model/InlineResponse2003', 'model/InlineResponse401', 'model/MembersRequest', 'model/WardenTokenAllowedBody'], factory);
+    define(['ApiClient', 'model/Group', 'model/InlineResponse401', 'model/MembersRequest', 'model/WardenAccessRequest', 'model/WardenAccessRequestResponse', 'model/WardenTokenAccessRequest', 'model/WardenTokenAccessRequestResponsePayload'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/AllowedRequest'), require('../model/Group'), require('../model/InlineResponse2002'), require('../model/InlineResponse2003'), require('../model/InlineResponse401'), require('../model/MembersRequest'), require('../model/WardenTokenAllowedBody'));
+    module.exports = factory(require('../ApiClient'), require('../model/Group'), require('../model/InlineResponse401'), require('../model/MembersRequest'), require('../model/WardenAccessRequest'), require('../model/WardenAccessRequestResponse'), require('../model/WardenTokenAccessRequest'), require('../model/WardenTokenAccessRequestResponsePayload'));
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
       root.HydraOAuth2OpenIdConnectServer = {};
     }
-    root.HydraOAuth2OpenIdConnectServer.WardenApi = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient, root.HydraOAuth2OpenIdConnectServer.AllowedRequest, root.HydraOAuth2OpenIdConnectServer.Group, root.HydraOAuth2OpenIdConnectServer.InlineResponse2002, root.HydraOAuth2OpenIdConnectServer.InlineResponse2003, root.HydraOAuth2OpenIdConnectServer.InlineResponse401, root.HydraOAuth2OpenIdConnectServer.MembersRequest, root.HydraOAuth2OpenIdConnectServer.WardenTokenAllowedBody);
+    root.HydraOAuth2OpenIdConnectServer.WardenApi = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient, root.HydraOAuth2OpenIdConnectServer.Group, root.HydraOAuth2OpenIdConnectServer.InlineResponse401, root.HydraOAuth2OpenIdConnectServer.MembersRequest, root.HydraOAuth2OpenIdConnectServer.WardenAccessRequest, root.HydraOAuth2OpenIdConnectServer.WardenAccessRequestResponse, root.HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequest, root.HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponsePayload);
   }
-}(this, function(ApiClient, AllowedRequest, Group, InlineResponse2002, InlineResponse2003, InlineResponse401, MembersRequest, WardenTokenAllowedBody) {
+}(this, function(ApiClient, Group, InlineResponse401, MembersRequest, WardenAccessRequest, WardenAccessRequestResponse, WardenTokenAccessRequest, WardenTokenAccessRequestResponsePayload) {
   'use strict';
 
   /**
@@ -181,6 +181,90 @@
     }
 
     /**
+     * Callback function to receive the result of the doesWardenAllowAccessRequest operation.
+     * @callback module:api/WardenApi~doesWardenAllowAccessRequestCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/WardenAccessRequestResponse} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Check if an access request is valid (without providing an access token)
+     * Checks if a subject (typically a user or a service) is allowed to perform an action on a resource. This endpoint requires a subject, a resource name, an action name and a context. If the subject is not allowed to perform the action on the resource, this endpoint returns a 200 response with &#x60;{ \&quot;allowed\&quot;: false}&#x60;, otherwise &#x60;{ \&quot;allowed\&quot;: true }&#x60; is returned.   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:allowed\&quot;], \&quot;actions\&quot;: [\&quot;decide\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * @param {Object} opts Optional parameters
+     * @param {module:model/WardenAccessRequest} opts.body 
+     * @param {module:api/WardenApi~doesWardenAllowAccessRequestCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/WardenAccessRequestResponse}
+     */
+    this.doesWardenAllowAccessRequest = function(opts, callback) {
+      opts = opts || {};
+      var postBody = opts['body'];
+
+
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = ['oauth2'];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = WardenAccessRequestResponse;
+
+      return this.apiClient.callApi(
+        '/warden/allowed', 'POST',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the doesWardenAllowTokenAccessRequest operation.
+     * @callback module:api/WardenApi~doesWardenAllowTokenAccessRequestCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/WardenTokenAccessRequestResponsePayload} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Check if an access request is valid (providing an access token)
+     * Checks if a token is valid and if the token subject is allowed to perform an action on a resource. This endpoint requires a token, a scope, a resource name, an action name and a context.   If a token is expired/invalid, has not been granted the requested scope or the subject is not allowed to perform the action on the resource, this endpoint returns a 200 response with &#x60;{ \&quot;allowed\&quot;: false}&#x60;.   Extra data set through the &#x60;accessTokenExtra&#x60; field in the consent flow will be included in the response.   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:token:allowed\&quot;], \&quot;actions\&quot;: [\&quot;decide\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * @param {Object} opts Optional parameters
+     * @param {module:model/WardenTokenAccessRequest} opts.body 
+     * @param {module:api/WardenApi~doesWardenAllowTokenAccessRequestCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/WardenTokenAccessRequestResponsePayload}
+     */
+    this.doesWardenAllowTokenAccessRequest = function(opts, callback) {
+      opts = opts || {};
+      var postBody = opts['body'];
+
+
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = ['oauth2'];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = WardenTokenAccessRequestResponsePayload;
+
+      return this.apiClient.callApi(
+        '/warden/token/allowed', 'POST',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+
+    /**
      * Callback function to receive the result of the findGroupsByMember operation.
      * @callback module:api/WardenApi~findGroupsByMemberCallback
      * @param {String} error Error message, if any.
@@ -312,90 +396,6 @@
 
       return this.apiClient.callApi(
         '/warden/groups/{id}/members', 'DELETE',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
-    }
-
-    /**
-     * Callback function to receive the result of the wardenAllowed operation.
-     * @callback module:api/WardenApi~wardenAllowedCallback
-     * @param {String} error Error message, if any.
-     * @param {module:model/InlineResponse2002} data The data returned by the service call.
-     * @param {String} response The complete HTTP response.
-     */
-
-    /**
-     * Check if a subject is allowed to do something
-     * Checks if an arbitrary subject is allowed to perform an action on a resource. This endpoint requires a subject, a resource name, an action name and a context.If the subject is not allowed to perform the action on the resource, this endpoint returns a 200 response with &#x60;{ \&quot;allowed\&quot;: false} }&#x60;.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:allowed\&quot;], \&quot;actions\&quot;: [\&quot;decide\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
-     * @param {Object} opts Optional parameters
-     * @param {module:model/AllowedRequest} opts.body 
-     * @param {module:api/WardenApi~wardenAllowedCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/InlineResponse2002}
-     */
-    this.wardenAllowed = function(opts, callback) {
-      opts = opts || {};
-      var postBody = opts['body'];
-
-
-      var pathParams = {
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
-
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = InlineResponse2002;
-
-      return this.apiClient.callApi(
-        '/warden/allowed', 'POST',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
-    }
-
-    /**
-     * Callback function to receive the result of the wardenTokenAllowed operation.
-     * @callback module:api/WardenApi~wardenTokenAllowedCallback
-     * @param {String} error Error message, if any.
-     * @param {module:model/InlineResponse2003} data The data returned by the service call.
-     * @param {String} response The complete HTTP response.
-     */
-
-    /**
-     * Check if the subject of a token is allowed to do something
-     * Checks if a token is valid and if the token owner is allowed to perform an action on a resource. This endpoint requires a token, a scope, a resource name, an action name and a context.  If a token is expired/invalid, has not been granted the requested scope or the subject is not allowed to perform the action on the resource, this endpoint returns a 200 response with &#x60;{ \&quot;allowed\&quot;: false} }&#x60;.  Extra data set through the &#x60;at_ext&#x60; claim in the consent response will be included in the response. The &#x60;id_ext&#x60; claim will never be returned by this endpoint.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:token:allowed\&quot;], \&quot;actions\&quot;: [\&quot;decide\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
-     * @param {Object} opts Optional parameters
-     * @param {module:model/WardenTokenAllowedBody} opts.body 
-     * @param {module:api/WardenApi~wardenTokenAllowedCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/InlineResponse2003}
-     */
-    this.wardenTokenAllowed = function(opts, callback) {
-      opts = opts || {};
-      var postBody = opts['body'];
-
-
-      var pathParams = {
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
-
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = InlineResponse2003;
-
-      return this.apiClient.callApi(
-        '/warden/token/allowed', 'POST',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );

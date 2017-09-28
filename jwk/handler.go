@@ -70,9 +70,7 @@ type joseWebKeySetRequest struct {
 
 // swagger:route GET /.well-known/jwks.json oauth2 wellKnown
 //
-// Public JWKs
-//
-// Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
+// Get list of well known JSON Web Keys
 //
 // The subject making the request needs to be assigned to a policy containing:
 //
@@ -129,7 +127,10 @@ func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request, ps httproute
 
 // swagger:route GET /keys/{set}/{kid} jsonWebKey getJsonWebKey
 //
-// Retrieves a JSON Web Key Set matching the set and the kid
+// Retrieve a JSON Web Key
+//
+// This endpoint can be used to retrieve JWKs stored in ORY Hydra.
+//
 //
 // The subject making the request needs to be assigned to a policy containing:
 //
@@ -189,7 +190,10 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 
 // swagger:route GET /keys/{set} jsonWebKey getJsonWebKeySet
 //
-// Retrieves a JSON Web Key Set matching the set
+// Retrieve a JSON Web Key Set
+//
+// This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.
+//
 //
 // The subject making the request needs to be assigned to a policy containing:
 //
@@ -242,9 +246,14 @@ func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httproute
 
 // swagger:route POST /keys/{set} jsonWebKey createJsonWebKeySet
 //
-// Generate a new JSON Web Key for a JSON Web Key Set
+// Generate a new JSON Web Key
 //
-// If the JSON Web Key Set does not exist yet, one will be created.
+// This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as
+// symmetric cryptographic keys (HS256) and asymetric cryptographic keys (RS256, ECDSA).
+//
+//
+// If the specified JSON Web Key Set does not exist, it will be created.
+//
 //
 // The subject making the request needs to be assigned to a policy containing:
 //
@@ -311,9 +320,10 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 
 // swagger:route PUT /keys/{set} jsonWebKey updateJsonWebKeySet
 //
-// Updates a JSON Web Key Set
+// Update a JSON Web Key Set
 //
 // Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
+//
 //
 // The subject making the request needs to be assigned to a policy containing:
 //
@@ -378,9 +388,10 @@ func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 
 // swagger:route PUT /keys/{set}/{kid} jsonWebKey updateJsonWebKey
 //
-// Updates a JSON Web Key
+// Update a JSON Web Key
 //
 // Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
+//
 //
 // The subject making the request needs to be assigned to a policy containing:
 //

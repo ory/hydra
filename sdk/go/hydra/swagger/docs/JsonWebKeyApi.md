@@ -4,21 +4,21 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**CreateJsonWebKeySet**](JsonWebKeyApi.md#CreateJsonWebKeySet) | **Post** /keys/{set} | Generate a new JSON Web Key for a JSON Web Key Set
+[**CreateJsonWebKeySet**](JsonWebKeyApi.md#CreateJsonWebKeySet) | **Post** /keys/{set} | Generate a new JSON Web Key
 [**DeleteJsonWebKey**](JsonWebKeyApi.md#DeleteJsonWebKey) | **Delete** /keys/{set}/{kid} | Delete a JSON Web Key
 [**DeleteJsonWebKeySet**](JsonWebKeyApi.md#DeleteJsonWebKeySet) | **Delete** /keys/{set} | Delete a JSON Web Key
-[**GetJsonWebKey**](JsonWebKeyApi.md#GetJsonWebKey) | **Get** /keys/{set}/{kid} | Retrieves a JSON Web Key Set matching the set and the kid
-[**GetJsonWebKeySet**](JsonWebKeyApi.md#GetJsonWebKeySet) | **Get** /keys/{set} | Retrieves a JSON Web Key Set matching the set
-[**UpdateJsonWebKey**](JsonWebKeyApi.md#UpdateJsonWebKey) | **Put** /keys/{set}/{kid} | Updates a JSON Web Key
-[**UpdateJsonWebKeySet**](JsonWebKeyApi.md#UpdateJsonWebKeySet) | **Put** /keys/{set} | Updates a JSON Web Key Set
+[**GetJsonWebKey**](JsonWebKeyApi.md#GetJsonWebKey) | **Get** /keys/{set}/{kid} | Retrieve a JSON Web Key
+[**GetJsonWebKeySet**](JsonWebKeyApi.md#GetJsonWebKeySet) | **Get** /keys/{set} | Retrieve a JSON Web Key Set
+[**UpdateJsonWebKey**](JsonWebKeyApi.md#UpdateJsonWebKey) | **Put** /keys/{set}/{kid} | Update a JSON Web Key
+[**UpdateJsonWebKeySet**](JsonWebKeyApi.md#UpdateJsonWebKeySet) | **Put** /keys/{set} | Update a JSON Web Key Set
 
 
 # **CreateJsonWebKeySet**
 > JsonWebKeySet CreateJsonWebKeySet($set, $body)
 
-Generate a new JSON Web Key for a JSON Web Key Set
+Generate a new JSON Web Key
 
-If the JSON Web Key Set does not exist yet, one will be created.  The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:keys:<set>:<kid>\"], \"actions\": [\"create\"], \"effect\": \"allow\" } ```
+This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256) and asymetric cryptographic keys (RS256, ECDSA).   If the specified JSON Web Key Set does not exist, it will be created.   The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:keys:<set>:<kid>\"], \"actions\": [\"create\"], \"effect\": \"allow\" } ```
 
 
 ### Parameters
@@ -105,9 +105,9 @@ void (empty response body)
 # **GetJsonWebKey**
 > JsonWebKeySet GetJsonWebKey($kid, $set)
 
-Retrieves a JSON Web Key Set matching the set and the kid
+Retrieve a JSON Web Key
 
-The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:keys:<set>:<kid>\"], \"actions\": [\"get\"], \"effect\": \"allow\" } ```
+This endpoint can be used to retrieve JWKs stored in ORY Hydra.   The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:keys:<set>:<kid>\"], \"actions\": [\"get\"], \"effect\": \"allow\" } ```
 
 
 ### Parameters
@@ -135,9 +135,9 @@ Name | Type | Description  | Notes
 # **GetJsonWebKeySet**
 > JsonWebKeySet GetJsonWebKeySet($set)
 
-Retrieves a JSON Web Key Set matching the set
+Retrieve a JSON Web Key Set
 
-The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:keys:<set>:<kid>\"], \"actions\": [\"get\"], \"effect\": \"allow\" } ```
+This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.   The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:keys:<set>:<kid>\"], \"actions\": [\"get\"], \"effect\": \"allow\" } ```
 
 
 ### Parameters
@@ -164,9 +164,9 @@ Name | Type | Description  | Notes
 # **UpdateJsonWebKey**
 > JsonWebKey UpdateJsonWebKey($kid, $set, $body)
 
-Updates a JSON Web Key
+Update a JSON Web Key
 
-Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.  The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:keys:<set>:<kid>\"], \"actions\": [\"update\"], \"effect\": \"allow\" } ```
+Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.   The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:keys:<set>:<kid>\"], \"actions\": [\"update\"], \"effect\": \"allow\" } ```
 
 
 ### Parameters
@@ -195,9 +195,9 @@ Name | Type | Description  | Notes
 # **UpdateJsonWebKeySet**
 > JsonWebKeySet UpdateJsonWebKeySet($set, $body)
 
-Updates a JSON Web Key Set
+Update a JSON Web Key Set
 
-Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.  The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:keys:<set>\"], \"actions\": [\"update\"], \"effect\": \"allow\" } ```
+Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.   The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:keys:<set>\"], \"actions\": [\"update\"], \"effect\": \"allow\" } ```
 
 
 ### Parameters

@@ -29,7 +29,7 @@
   "paths": {
     "/.well-known/jwks.json": {
       "get": {
-        "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:hydra.openid.id-token:public\"],\n\"actions\": [\"GET\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:hydra.openid.id-token:public\"],\n\"actions\": [\"GET\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -43,7 +43,7 @@
         "tags": [
           "oauth2"
         ],
-        "summary": "Public JWKs",
+        "summary": "Get list of well known JSON Web Keys",
         "operationId": "wellKnown",
         "security": [
           {
@@ -73,7 +73,7 @@
     },
     "/.well-known/openid-configuration": {
       "get": {
-        "description": "For more information, please refer to https://openid.net/specs/openid-connect-discovery-1_0.html",
+        "description": "The well known endpoint an be used to retrieve information for OpenID Connect clients. We encourage you to not roll\nyour own OpenID Connect client but to use an OpenID Connect client library instead. You can learn more on this\nflow at https://openid.net/specs/openid-connect-discovery-1_0.html",
         "produces": [
           "application/json"
         ],
@@ -104,7 +104,7 @@
     },
     "/clients": {
       "get": {
-        "description": "Never returns a client's secret.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "This endpoint never returns passwords.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -118,7 +118,7 @@
         "tags": [
           "oAuth2"
         ],
-        "summary": "Lists OAuth 2.0 Clients",
+        "summary": "List OAuth 2.0 Clients",
         "operationId": "listOAuth2Clients",
         "security": [
           {
@@ -143,7 +143,7 @@
         }
       },
       "post": {
-        "description": "Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This\nendpoint should be well protected and only called by code you trust.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
+        "description": "If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will\nbe returned in the response and you will not be able to retrieve it later on. Write the secret down and keep\nit somwhere safe.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -157,7 +157,7 @@
         "tags": [
           "oAuth2"
         ],
-        "summary": "Creates an OAuth 2.0 Client",
+        "summary": "Create an OAuth 2.0 client",
         "operationId": "createOAuth2Client",
         "security": [
           {
@@ -197,7 +197,7 @@
     },
     "/clients/{id}": {
       "get": {
-        "description": "Never returns the client's secret.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients:\u003csome-id\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients:\u003csome-id\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
+        "description": "This endpoint never returns passwords.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients:\u003csome-id\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients:\u003csome-id\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -211,7 +211,7 @@
         "tags": [
           "oAuth2"
         ],
-        "summary": "Fetches an OAuth 2.0 Client.",
+        "summary": "Retrieve an OAuth 2.0 Client.",
         "operationId": "getOAuth2Client",
         "security": [
           {
@@ -250,7 +250,7 @@
         }
       },
       "put": {
-        "description": "Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This\nendpoint should be well protected and only called by code you trust.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
+        "description": "If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will\nbe able to retrieve the client secret, so write it down and keep it safe.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -264,7 +264,7 @@
         "tags": [
           "oAuth2"
         ],
-        "summary": "Updates an OAuth 2.0 Client",
+        "summary": "Update an OAuth 2.0 Client",
         "operationId": "updateOAuth2Client",
         "security": [
           {
@@ -359,27 +359,9 @@
         }
       }
     },
-    "/health": {
+    "/health/metrics": {
       "get": {
-        "description": "This endpoint does not require the `X-Forwarded-Proto` header when TLS termination is set.",
-        "tags": [
-          "health"
-        ],
-        "summary": "Check health status of instance",
-        "operationId": "getHealthStatus",
-        "responses": {
-          "200": {
-            "$ref": "#/responses/healthStatus"
-          },
-          "500": {
-            "$ref": "#/responses/genericError"
-          }
-        }
-      }
-    },
-    "/health/stats": {
-      "get": {
-        "description": "This endpoint returns information on the instance's health. It is currently not documented.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:health:stats\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "This endpoint returns an instance's metrics, such as average response time, status code distribution, hits per\nsecond and so on. The return values are currently not documented as this endpoint is still experimental.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:health:stats\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -393,8 +375,8 @@
         "tags": [
           "health"
         ],
-        "summary": "Show instance statistics",
-        "operationId": "getInstanceStatistics",
+        "summary": "Show instance metrics (experimental)",
+        "operationId": "getInstanceMetrics",
         "security": [
           {
             "oauth2": [
@@ -418,9 +400,27 @@
         }
       }
     },
+    "/health/status": {
+      "get": {
+        "description": "This endpoint returns `{ \"status\": \"ok\" }`. This status let's you know that the HTTP server is up and running. This\nstatus does currently not include checks whether the database connection is up and running. This endpoint does not\nrequire the `X-Forwarded-Proto` header when TLS termination is set.\n\n\nBe aware that if you are running multiple nodes of ORY Hydra, the health status will never refer to the cluster state,\nonly to a single instance.",
+        "tags": [
+          "health"
+        ],
+        "summary": "Check health status of this instance",
+        "operationId": "getInstanceStatus",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/healthStatus"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
     "/keys/{set}": {
       "get": {
-        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -434,7 +434,7 @@
         "tags": [
           "jsonWebKey"
         ],
-        "summary": "Retrieves a JSON Web Key Set matching the set",
+        "summary": "Retrieve a JSON Web Key Set",
         "operationId": "getJsonWebKeySet",
         "security": [
           {
@@ -472,7 +472,7 @@
         }
       },
       "put": {
-        "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -486,7 +486,7 @@
         "tags": [
           "jsonWebKey"
         ],
-        "summary": "Updates a JSON Web Key Set",
+        "summary": "Update a JSON Web Key Set",
         "operationId": "updateJsonWebKeySet",
         "security": [
           {
@@ -531,7 +531,7 @@
         }
       },
       "post": {
-        "description": "If the JSON Web Key Set does not exist yet, one will be created.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as\nsymmetric cryptographic keys (HS256) and asymetric cryptographic keys (RS256, ECDSA).\n\n\nIf the specified JSON Web Key Set does not exist, it will be created.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -545,7 +545,7 @@
         "tags": [
           "jsonWebKey"
         ],
-        "summary": "Generate a new JSON Web Key for a JSON Web Key Set",
+        "summary": "Generate a new JSON Web Key",
         "operationId": "createJsonWebKeySet",
         "security": [
           {
@@ -641,7 +641,7 @@
     },
     "/keys/{set}/{kid}": {
       "get": {
-        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "This endpoint can be used to retrieve JWKs stored in ORY Hydra.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -655,7 +655,7 @@
         "tags": [
           "jsonWebKey"
         ],
-        "summary": "Retrieves a JSON Web Key Set matching the set and the kid",
+        "summary": "Retrieve a JSON Web Key",
         "operationId": "getJsonWebKey",
         "security": [
           {
@@ -701,7 +701,7 @@
         }
       },
       "put": {
-        "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -715,7 +715,7 @@
         "tags": [
           "jsonWebKey"
         ],
-        "summary": "Updates a JSON Web Key",
+        "summary": "Update a JSON Web Key",
         "operationId": "updateJsonWebKey",
         "security": [
           {
@@ -827,7 +827,7 @@
     },
     "/oauth2/auth": {
       "get": {
-        "description": "For more information, please refer to https://tools.ietf.org/html/rfc6749#section-4",
+        "description": "This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.\nOAuth2 is a very popular protocol and a library for your programming language will exists.\n\nTo learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749",
         "consumes": [
           "application/x-www-form-urlencoded"
         ],
@@ -838,7 +838,7 @@
         "tags": [
           "oAuth2"
         ],
-        "summary": "The OAuth 2.0 Auth endpoint",
+        "summary": "The OAuth 2.0 authorize endpoint",
         "operationId": "oauthAuth",
         "responses": {
           "302": {
@@ -1014,7 +1014,7 @@
     },
     "/oauth2/introspect": {
       "post": {
-        "description": "For more information, please refer to https://tools.ietf.org/html/rfc7662",
+        "description": "The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token\nis neither expired nor revoked. If a token is active, additional information on the token will be included. You can\nset additional data for a token by setting `accessTokenExtra` during the consent flow.",
         "consumes": [
           "application/x-www-form-urlencoded"
         ],
@@ -1028,11 +1028,14 @@
         "tags": [
           "oAuth2"
         ],
-        "summary": "Introspect an OAuth2 access token",
+        "summary": "Introspect OAuth2 tokens",
         "operationId": "introspectOAuth2Token",
         "security": [
           {
             "basic": []
+          },
+          {
+            "oauth2": []
           }
         ],
         "parameters": [
@@ -1067,7 +1070,7 @@
     },
     "/oauth2/revoke": {
       "post": {
-        "description": "For more information, please refer to https://tools.ietf.org/html/rfc7009",
+        "description": "Revoking a token (both access and refresh) means that the tokens will be invalid. A revoked access token can no\nlonger be used to make access requests, and a revoked refresh token can no longer be used to refresh an access token.\nRevoking a refresh token also invalidates the access token that was created with it.",
         "consumes": [
           "application/x-www-form-urlencoded"
         ],
@@ -1078,7 +1081,7 @@
         "tags": [
           "oAuth2"
         ],
-        "summary": "Revoke an OAuth2 access token",
+        "summary": "Revoke OAuth2 tokens",
         "operationId": "revokeOAuth2Token",
         "security": [
           {
@@ -1109,7 +1112,7 @@
     },
     "/oauth2/token": {
       "post": {
-        "description": "For more information, please refer to https://tools.ietf.org/html/rfc6749#section-4",
+        "description": "This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.\nOAuth2 is a very popular protocol and a library for your programming language will exists.\n\nTo learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749",
         "consumes": [
           "application/x-www-form-urlencoded"
         ],
@@ -1123,11 +1126,14 @@
         "tags": [
           "oAuth2"
         ],
-        "summary": "The OAuth 2.0 Token endpoint",
+        "summary": "The OAuth 2.0 token endpoint",
         "operationId": "oauthToken",
         "security": [
           {
             "basic": []
+          },
+          {
+            "oauth2": []
           }
         ],
         "responses": {
@@ -1145,7 +1151,7 @@
     },
     "/policies": {
       "get": {
-        "description": "Visit https://github.com/ory/ladon#usage for more information on policy usage.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies\"],\n\"actions\": [\"list\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies\"],\n\"actions\": [\"list\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -1159,7 +1165,7 @@
         "tags": [
           "policy"
         ],
-        "summary": "List access control policies",
+        "summary": "List Access Control Policies",
         "operationId": "listPolicies",
         "security": [
           {
@@ -1202,7 +1208,7 @@
         }
       },
       "post": {
-        "description": "Visit https://github.com/ory/ladon#usage for more information on policy usage.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -1216,7 +1222,7 @@
         "tags": [
           "policy"
         ],
-        "summary": "Create an access control policy",
+        "summary": "Create an Access Control Policy",
         "operationId": "createPolicy",
         "security": [
           {
@@ -1255,7 +1261,7 @@
     },
     "/policies/{id}": {
       "get": {
-        "description": "Visit https://github.com/ory/ladon#usage for more information on policy usage.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies:\u003cid\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies:\u003cid\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -1269,7 +1275,7 @@
         "tags": [
           "policy"
         ],
-        "summary": "Get an access control policy",
+        "summary": "Get an Access Control Policy",
         "operationId": "getPolicy",
         "security": [
           {
@@ -1307,7 +1313,7 @@
         }
       },
       "put": {
-        "description": "Visit https://github.com/ory/ladon#usage for more information on policy usage.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -1321,7 +1327,7 @@
         "tags": [
           "policy"
         ],
-        "summary": "Update an access control policy",
+        "summary": "Update an Access Control Polic",
         "operationId": "updatePolicy",
         "security": [
           {
@@ -1366,7 +1372,7 @@
         }
       },
       "delete": {
-        "description": "Visit https://github.com/ory/ladon#usage for more information on policy usage.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies:\u003cid\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies:\u003cid\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -1380,7 +1386,7 @@
         "tags": [
           "policy"
         ],
-        "summary": "Delete an access control policy",
+        "summary": "Delete an Access Control Policy",
         "operationId": "deletePolicy",
         "security": [
           {
@@ -1417,7 +1423,7 @@
     },
     "/warden/allowed": {
       "post": {
-        "description": "Checks if an arbitrary subject is allowed to perform an action on a resource. This endpoint requires a subject,\na resource name, an action name and a context.If the subject is not allowed to perform the action on the resource,\nthis endpoint returns a 200 response with `{ \"allowed\": false} }`.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:allowed\"],\n\"actions\": [\"decide\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "Checks if a subject (typically a user or a service) is allowed to perform an action on a resource. This endpoint requires a subject,\na resource name, an action name and a context. If the subject is not allowed to perform the action on the resource,\nthis endpoint returns a 200 response with `{ \"allowed\": false}`, otherwise `{ \"allowed\": true }` is returned.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:allowed\"],\n\"actions\": [\"decide\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -1431,8 +1437,8 @@
         "tags": [
           "warden"
         ],
-        "summary": "Check if a subject is allowed to do something",
-        "operationId": "wardenAllowed",
+        "summary": "Check if an access request is valid (without providing an access token)",
+        "operationId": "doesWardenAllowAccessRequest",
         "security": [
           {
             "oauth2": [
@@ -1445,13 +1451,13 @@
             "name": "Body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/allowedRequest"
+              "$ref": "#/definitions/wardenAccessRequest"
             }
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/wardenAllowedResponse"
+            "$ref": "#/responses/wardenAccessRequestResponse"
           },
           "401": {
             "$ref": "#/responses/genericError"
@@ -1781,7 +1787,7 @@
     },
     "/warden/token/allowed": {
       "post": {
-        "description": "Checks if a token is valid and if the token owner is allowed to perform an action on a resource.\nThis endpoint requires a token, a scope, a resource name, an action name and a context.\n\nIf a token is expired/invalid, has not been granted the requested scope or the subject is not allowed to\nperform the action on the resource, this endpoint returns a 200 response with `{ \"allowed\": false} }`.\n\nExtra data set through the `at_ext` claim in the consent response will be included in the response.\nThe `id_ext` claim will never be returned by this endpoint.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:token:allowed\"],\n\"actions\": [\"decide\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "Checks if a token is valid and if the token subject is allowed to perform an action on a resource.\nThis endpoint requires a token, a scope, a resource name, an action name and a context.\n\n\nIf a token is expired/invalid, has not been granted the requested scope or the subject is not allowed to\nperform the action on the resource, this endpoint returns a 200 response with `{ \"allowed\": false}`.\n\n\nExtra data set through the `accessTokenExtra` field in the consent flow will be included in the response.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:token:allowed\"],\n\"actions\": [\"decide\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -1795,8 +1801,8 @@
         "tags": [
           "warden"
         ],
-        "summary": "Check if the subject of a token is allowed to do something",
-        "operationId": "wardenTokenAllowed",
+        "summary": "Check if an access request is valid (providing an access token)",
+        "operationId": "doesWardenAllowTokenAccessRequest",
         "security": [
           {
             "oauth2": [
@@ -1809,13 +1815,13 @@
             "name": "Body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/wardenTokenAllowedBody"
+              "$ref": "#/definitions/wardenTokenAccessRequest"
             }
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/wardenTokenAllowedResponse"
+            "$ref": "#/responses/wardenTokenAccessRequestResponse"
           },
           "401": {
             "$ref": "#/responses/genericError"
@@ -1966,37 +1972,6 @@
       },
       "x-go-name": "AcceptConsentRequestPayload",
       "x-go-package": "github.com/ory/hydra/oauth2"
-    },
-    "allowedRequest": {
-      "type": "object",
-      "title": "AccessRequest is the warden's request object.",
-      "properties": {
-        "action": {
-          "description": "Action is the action that is requested on the resource.",
-          "type": "string",
-          "x-go-name": "Action"
-        },
-        "context": {
-          "description": "Context is the request's environmental context.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "object"
-          },
-          "x-go-name": "Context"
-        },
-        "resource": {
-          "description": "Resource is the resource that access is requested to.",
-          "type": "string",
-          "x-go-name": "Resource"
-        },
-        "subject": {
-          "description": "Subejct is the subject that is requesting access.",
-          "type": "string",
-          "x-go-name": "Subject"
-        }
-      },
-      "x-go-name": "AccessRequest",
-      "x-go-package": "github.com/ory/hydra/firewall"
     },
     "createJsonWebKeySetPayload": {
       "type": "object",
@@ -2467,6 +2442,24 @@
       },
       "x-go-package": "github.com/ory/hydra/policy"
     },
+    "swaggerDoesWardenAllowAccessRequestParameters": {
+      "type": "object",
+      "properties": {
+        "Body": {
+          "$ref": "#/definitions/wardenAccessRequest"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/warden"
+    },
+    "swaggerDoesWardenAllowTokenAccessRequestParameters": {
+      "type": "object",
+      "properties": {
+        "Body": {
+          "$ref": "#/definitions/wardenTokenAccessRequest"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/warden"
+    },
     "swaggerGetPolicyParameters": {
       "type": "object",
       "properties": {
@@ -2747,95 +2740,20 @@
       },
       "x-go-package": "github.com/ory/hydra/policy"
     },
-    "swaggerWardenAllowedParameters": {
+    "swaggerWardenAccessRequestResponseParameters": {
       "type": "object",
       "properties": {
         "Body": {
-          "$ref": "#/definitions/allowedRequest"
+          "$ref": "#/definitions/wardenAccessRequestResponse"
         }
       },
       "x-go-package": "github.com/ory/hydra/warden"
     },
-    "swaggerWardenAllowedResponse": {
-      "description": "The allowed response",
+    "swaggerWardenTokenAccessRequestResponse": {
       "type": "object",
       "properties": {
         "Body": {
-          "description": "in: body",
-          "type": "object",
-          "properties": {
-            "allowed": {
-              "description": "Allowed is true if the request is allowed or false otherwise",
-              "type": "boolean",
-              "x-go-name": "Allowed"
-            }
-          }
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/warden"
-    },
-    "swaggerWardenTokenAllowedParameters": {
-      "type": "object",
-      "properties": {
-        "Body": {
-          "$ref": "#/definitions/wardenTokenAllowedBody"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/warden"
-    },
-    "swaggerWardenTokenAllowedResponse": {
-      "description": "The token allowed response",
-      "type": "object",
-      "properties": {
-        "Body": {
-          "description": "in: body",
-          "type": "object",
-          "properties": {
-            "allowed": {
-              "description": "Allowed is true if the request is allowed or false otherwise",
-              "type": "boolean",
-              "x-go-name": "Allowed"
-            },
-            "aud": {
-              "description": "Audience is who the token was issued for. This is an OAuth2 app usually.",
-              "type": "string",
-              "x-go-name": "Audience"
-            },
-            "exp": {
-              "description": "ExpiresAt is the expiry timestamp.",
-              "x-go-name": "ExpiresAt"
-            },
-            "ext": {
-              "description": "Extra represents arbitrary session data.",
-              "type": "object",
-              "additionalProperties": {
-                "type": "object"
-              },
-              "x-go-name": "Extra"
-            },
-            "iat": {
-              "description": "IssuedAt is the token creation time stamp.",
-              "x-go-name": "IssuedAt"
-            },
-            "iss": {
-              "description": "Issuer is the id of the issuer, typically an hydra instance.",
-              "type": "string",
-              "x-go-name": "Issuer"
-            },
-            "scopes": {
-              "description": "GrantedScopes is a list of scopes that the subject authorized when asked for consent.",
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "x-go-name": "GrantedScopes"
-            },
-            "sub": {
-              "description": "Subject is the identity that authorized issuing the token, for example a user or an OAuth2 app.\nThis is usually a uuid but you can choose a urn or some other id too.",
-              "type": "string",
-              "x-go-name": "Subject"
-            }
-          }
+          "$ref": "#/definitions/wardenTokenAccessRequestResponsePayload"
         }
       },
       "x-go-package": "github.com/ory/hydra/warden"
@@ -2865,7 +2783,50 @@
       "x-go-name": "TokenAccessRequest",
       "x-go-package": "github.com/ory/hydra/firewall"
     },
-    "wardenTokenAllowedBody": {
+    "wardenAccessRequest": {
+      "type": "object",
+      "title": "AccessRequest is the warden's request object.",
+      "properties": {
+        "action": {
+          "description": "Action is the action that is requested on the resource.",
+          "type": "string",
+          "x-go-name": "Action"
+        },
+        "context": {
+          "description": "Context is the request's environmental context.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "x-go-name": "Context"
+        },
+        "resource": {
+          "description": "Resource is the resource that access is requested to.",
+          "type": "string",
+          "x-go-name": "Resource"
+        },
+        "subject": {
+          "description": "Subejct is the subject that is requesting access.",
+          "type": "string",
+          "x-go-name": "Subject"
+        }
+      },
+      "x-go-name": "AccessRequest",
+      "x-go-package": "github.com/ory/hydra/firewall"
+    },
+    "wardenAccessRequestResponse": {
+      "type": "object",
+      "properties": {
+        "allowed": {
+          "description": "Allowed is true if the request is allowed and false otherwise.",
+          "type": "boolean",
+          "x-go-name": "Allowed"
+        }
+      },
+      "x-go-name": "swaggerWardenAccessRequestResponse",
+      "x-go-package": "github.com/ory/hydra/warden"
+    },
+    "wardenTokenAccessRequest": {
       "type": "object",
       "properties": {
         "action": {
@@ -2900,7 +2861,60 @@
           "x-go-name": "Token"
         }
       },
-      "x-go-name": "swaggerWardenTokenAllowedBody",
+      "x-go-name": "swaggerWardenTokenAccessRequest",
+      "x-go-package": "github.com/ory/hydra/warden"
+    },
+    "wardenTokenAccessRequestResponsePayload": {
+      "type": "object",
+      "properties": {
+        "allowed": {
+          "description": "Allowed is true if the request is allowed and false otherwise.",
+          "type": "boolean",
+          "x-go-name": "Allowed"
+        },
+        "aud": {
+          "description": "Audience is who the token was issued for. This is an OAuth2 app usually.",
+          "type": "string",
+          "x-go-name": "Audience"
+        },
+        "exp": {
+          "description": "ExpiresAt is the expiry timestamp.",
+          "type": "string",
+          "x-go-name": "ExpiresAt"
+        },
+        "ext": {
+          "description": "Extra represents arbitrary session data.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "x-go-name": "Extra"
+        },
+        "iat": {
+          "description": "IssuedAt is the token creation time stamp.",
+          "type": "string",
+          "x-go-name": "IssuedAt"
+        },
+        "iss": {
+          "description": "Issuer is the id of the issuer, typically an hydra instance.",
+          "type": "string",
+          "x-go-name": "Issuer"
+        },
+        "scopes": {
+          "description": "GrantedScopes is a list of scopes that the subject authorized when asked for consent.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "GrantedScopes"
+        },
+        "sub": {
+          "description": "Subject is the identity that authorized issuing the token, for example a user or an OAuth2 app.\nThis is usually a uuid but you can choose a urn or some other id too.",
+          "type": "string",
+          "x-go-name": "Subject"
+        }
+      },
+      "x-go-name": "swaggerWardenTokenAccessRequestResponsePayload",
       "x-go-package": "github.com/ory/hydra/warden"
     },
     "wellKnown": {
@@ -3106,69 +3120,14 @@
         }
       }
     },
-    "wardenAllowedResponse": {
-      "description": "The allowed response",
+    "wardenAccessRequestResponse": {
       "schema": {
-        "type": "object",
-        "properties": {
-          "allowed": {
-            "description": "Allowed is true if the request is allowed or false otherwise",
-            "type": "boolean",
-            "x-go-name": "Allowed"
-          }
-        }
+        "$ref": "#/definitions/wardenAccessRequestResponse"
       }
     },
-    "wardenTokenAllowedResponse": {
-      "description": "The token allowed response",
+    "wardenTokenAccessRequestResponse": {
       "schema": {
-        "type": "object",
-        "properties": {
-          "allowed": {
-            "description": "Allowed is true if the request is allowed or false otherwise",
-            "type": "boolean",
-            "x-go-name": "Allowed"
-          },
-          "aud": {
-            "description": "Audience is who the token was issued for. This is an OAuth2 app usually.",
-            "type": "string",
-            "x-go-name": "Audience"
-          },
-          "exp": {
-            "description": "ExpiresAt is the expiry timestamp.",
-            "x-go-name": "ExpiresAt"
-          },
-          "ext": {
-            "description": "Extra represents arbitrary session data.",
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "x-go-name": "Extra"
-          },
-          "iat": {
-            "description": "IssuedAt is the token creation time stamp.",
-            "x-go-name": "IssuedAt"
-          },
-          "iss": {
-            "description": "Issuer is the id of the issuer, typically an hydra instance.",
-            "type": "string",
-            "x-go-name": "Issuer"
-          },
-          "scopes": {
-            "description": "GrantedScopes is a list of scopes that the subject authorized when asked for consent.",
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "x-go-name": "GrantedScopes"
-          },
-          "sub": {
-            "description": "Subject is the identity that authorized issuing the token, for example a user or an OAuth2 app.\nThis is usually a uuid but you can choose a urn or some other id too.",
-            "type": "string",
-            "x-go-name": "Subject"
-          }
-        }
+        "$ref": "#/definitions/wardenTokenAccessRequestResponsePayload"
       }
     }
   },

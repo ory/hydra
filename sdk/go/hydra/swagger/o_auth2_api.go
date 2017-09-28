@@ -105,8 +105,8 @@ func (a OAuth2Api) AcceptOAuth2ConsentRequest(id string, body AcceptConsentReque
 }
 
 /**
- * Creates an OAuth 2.0 Client
- * Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This endpoint should be well protected and only called by code you trust.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
+ * Create an OAuth 2.0 client
+ * If you pass &#x60;client_secret&#x60; the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somwhere safe.   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
  *
  * @param body
  * @return *OAuth2Client
@@ -236,8 +236,8 @@ func (a OAuth2Api) DeleteOAuth2Client(id string) (*APIResponse, error) {
 }
 
 /**
- * Fetches an OAuth 2.0 Client.
- * Never returns the client&#39;s secret.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
+ * Retrieve an OAuth 2.0 Client.
+ * This endpoint never returns passwords.   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
  *
  * @param id The id of the OAuth 2.0 Client.
  * @return *OAuth2Client
@@ -369,7 +369,7 @@ func (a OAuth2Api) GetOAuth2ConsentRequest(id string) (*OAuth2consentRequest, *A
 
 /**
  * Server well known configuration
- * For more information, please refer to https://openid.net/specs/openid-connect-discovery-1_0.html
+ * The well known endpoint an be used to retrieve information for OpenID Connect clients. We encourage you to not roll your own OpenID Connect client but to use an OpenID Connect client library instead. You can learn more on this flow at https://openid.net/specs/openid-connect-discovery-1_0.html
  *
  * @return *WellKnown
  */
@@ -427,8 +427,8 @@ func (a OAuth2Api) GetWellKnown() (*WellKnown, *APIResponse, error) {
 }
 
 /**
- * Introspect an OAuth2 access token
- * For more information, please refer to https://tools.ietf.org/html/rfc7662
+ * Introspect OAuth2 tokens
+ * The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token is neither expired nor revoked. If a token is active, additional information on the token will be included. You can set additional data for a token by setting &#x60;accessTokenExtra&#x60; during the consent flow.
  *
  * @param token The string value of the token. For access tokens, this is the \&quot;access_token\&quot; value returned from the token endpoint defined in OAuth 2.0 [RFC6749], Section 5.1. This endpoint DOES NOT accept refresh tokens for validation.
  * @param scope An optional, space separated list of required scopes. If the access token was not granted one of the scopes, the result of active will be false.
@@ -450,6 +450,11 @@ func (a OAuth2Api) IntrospectOAuth2Token(token string, scope string) (*Introspec
 	// http basic authentication required
 	if a.Configuration.Username != "" || a.Configuration.Password != "" {
 		localVarHeaderParams["Authorization"] = "Basic " + a.Configuration.GetBasicAuthEncodedString()
+	}
+	// authentication '(oauth2)' required
+	// oauth required
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -495,8 +500,8 @@ func (a OAuth2Api) IntrospectOAuth2Token(token string, scope string) (*Introspec
 }
 
 /**
- * Lists OAuth 2.0 Clients
- * Never returns a client&#39;s secret.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+ * List OAuth 2.0 Clients
+ * This endpoint never returns passwords.   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
  * @return []OAuth2Client
  */
@@ -559,8 +564,8 @@ func (a OAuth2Api) ListOAuth2Clients() ([]OAuth2Client, *APIResponse, error) {
 }
 
 /**
- * The OAuth 2.0 Auth endpoint
- * For more information, please refer to https://tools.ietf.org/html/rfc6749#section-4
+ * The OAuth 2.0 authorize endpoint
+ * This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows. OAuth2 is a very popular protocol and a library for your programming language will exists.  To learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749
  *
  * @return void
  */
@@ -616,8 +621,8 @@ func (a OAuth2Api) OauthAuth() (*APIResponse, error) {
 }
 
 /**
- * The OAuth 2.0 Token endpoint
- * For more information, please refer to https://tools.ietf.org/html/rfc6749#section-4
+ * The OAuth 2.0 token endpoint
+ * This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows. OAuth2 is a very popular protocol and a library for your programming language will exists.  To learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749
  *
  * @return *InlineResponse2001
  */
@@ -637,6 +642,11 @@ func (a OAuth2Api) OauthToken() (*InlineResponse2001, *APIResponse, error) {
 	// http basic authentication required
 	if a.Configuration.Username != "" || a.Configuration.Password != "" {
 		localVarHeaderParams["Authorization"] = "Basic " + a.Configuration.GetBasicAuthEncodedString()
+	}
+	// authentication '(oauth2)' required
+	// oauth required
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
@@ -747,8 +757,8 @@ func (a OAuth2Api) RejectOAuth2ConsentRequest(id string, body RejectConsentReque
 }
 
 /**
- * Revoke an OAuth2 access token
- * For more information, please refer to https://tools.ietf.org/html/rfc7009
+ * Revoke OAuth2 tokens
+ * Revoking a token (both access and refresh) means that the tokens will be invalid. A revoked access token can no longer be used to make access requests, and a revoked refresh token can no longer be used to refresh an access token. Revoking a refresh token also invalidates the access token that was created with it.
  *
  * @param token
  * @return void
@@ -811,8 +821,8 @@ func (a OAuth2Api) RevokeOAuth2Token(token string) (*APIResponse, error) {
 }
 
 /**
- * Updates an OAuth 2.0 Client
- * Be aware that an OAuth 2.0 Client may gain highly priviledged access if configured that way. This endpoint should be well protected and only called by code you trust.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
+ * Update an OAuth 2.0 Client
+ * If you pass &#x60;client_secret&#x60; the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
  *
  * @param id
  * @param body

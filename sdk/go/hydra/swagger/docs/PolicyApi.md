@@ -4,19 +4,19 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**CreatePolicy**](PolicyApi.md#CreatePolicy) | **Post** /policies | Create an access control policy
-[**DeletePolicy**](PolicyApi.md#DeletePolicy) | **Delete** /policies/{id} | Delete an access control policy
-[**GetPolicy**](PolicyApi.md#GetPolicy) | **Get** /policies/{id} | Get an access control policy
-[**ListPolicies**](PolicyApi.md#ListPolicies) | **Get** /policies | List access control policies
-[**UpdatePolicy**](PolicyApi.md#UpdatePolicy) | **Put** /policies/{id} | Update an access control policy
+[**CreatePolicy**](PolicyApi.md#CreatePolicy) | **Post** /policies | Create an Access Control Policy
+[**DeletePolicy**](PolicyApi.md#DeletePolicy) | **Delete** /policies/{id} | Delete an Access Control Policy
+[**GetPolicy**](PolicyApi.md#GetPolicy) | **Get** /policies/{id} | Get an Access Control Policy
+[**ListPolicies**](PolicyApi.md#ListPolicies) | **Get** /policies | List Access Control Policies
+[**UpdatePolicy**](PolicyApi.md#UpdatePolicy) | **Put** /policies/{id} | Update an Access Control Polic
 
 
 # **CreatePolicy**
 > Policy CreatePolicy($body)
 
-Create an access control policy
+Create an Access Control Policy
 
-Visit https://github.com/ory/ladon#usage for more information on policy usage.  The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:policies\"], \"actions\": [\"create\"], \"effect\": \"allow\" } ```
+The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:policies\"], \"actions\": [\"create\"], \"effect\": \"allow\" } ```
 
 
 ### Parameters
@@ -43,9 +43,9 @@ Name | Type | Description  | Notes
 # **DeletePolicy**
 > DeletePolicy($id)
 
-Delete an access control policy
+Delete an Access Control Policy
 
-Visit https://github.com/ory/ladon#usage for more information on policy usage.  The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:policies:<id>\"], \"actions\": [\"delete\"], \"effect\": \"allow\" } ```
+The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:policies:<id>\"], \"actions\": [\"delete\"], \"effect\": \"allow\" } ```
 
 
 ### Parameters
@@ -72,9 +72,9 @@ void (empty response body)
 # **GetPolicy**
 > Policy GetPolicy($id)
 
-Get an access control policy
+Get an Access Control Policy
 
-Visit https://github.com/ory/ladon#usage for more information on policy usage.  The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:policies:<id>\"], \"actions\": [\"get\"], \"effect\": \"allow\" } ```
+The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:policies:<id>\"], \"actions\": [\"get\"], \"effect\": \"allow\" } ```
 
 
 ### Parameters
@@ -101,9 +101,9 @@ Name | Type | Description  | Notes
 # **ListPolicies**
 > []Policy ListPolicies($offset, $limit)
 
-List access control policies
+List Access Control Policies
 
-Visit https://github.com/ory/ladon#usage for more information on policy usage.  The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:policies\"], \"actions\": [\"list\"], \"effect\": \"allow\" } ```
+The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:policies\"], \"actions\": [\"list\"], \"effect\": \"allow\" } ```
 
 
 ### Parameters
@@ -131,9 +131,9 @@ Name | Type | Description  | Notes
 # **UpdatePolicy**
 > Policy UpdatePolicy($id, $body)
 
-Update an access control policy
+Update an Access Control Polic
 
-Visit https://github.com/ory/ladon#usage for more information on policy usage.  The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:policies\"], \"actions\": [\"update\"], \"effect\": \"allow\" } ```
+The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:policies\"], \"actions\": [\"update\"], \"effect\": \"allow\" } ```
 
 
 ### Parameters

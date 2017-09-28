@@ -1,4 +1,11 @@
-// Package client implements the OAuth 2.0 Client functionality and provides http handlers, http clients and storage adapters.
+// Package client implements OAuth 2.0 client management capabilities
+//
+// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are granted
+// to applications that want to use OAuth 2.0 access and refresh tokens.
+//
+//
+// In ORY Hydra, OAuth 2.0 clients are used to manage ORY Hydra itself. These clients may gain highly privileged access
+// if configured that way. This endpoint should be well protected and only called by code you trust.
 package client
 
 // swagger:parameters createOAuth2Client

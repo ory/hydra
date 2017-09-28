@@ -81,6 +81,26 @@
         done();
       });
     });
+    describe('doesWardenAllowAccessRequest', function() {
+      it('should call doesWardenAllowAccessRequest successfully', function(done) {
+        //uncomment below and update the code to test doesWardenAllowAccessRequest
+        //instance.doesWardenAllowAccessRequest(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
+    describe('doesWardenAllowTokenAccessRequest', function() {
+      it('should call doesWardenAllowTokenAccessRequest successfully', function(done) {
+        //uncomment below and update the code to test doesWardenAllowTokenAccessRequest
+        //instance.doesWardenAllowTokenAccessRequest(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
     describe('findGroupsByMember', function() {
       it('should call findGroupsByMember successfully', function(done) {
         //uncomment below and update the code to test findGroupsByMember
@@ -105,26 +125,6 @@
       it('should call removeMembersFromGroup successfully', function(done) {
         //uncomment below and update the code to test removeMembersFromGroup
         //instance.removeMembersFromGroup(function(error) {
-        //  if (error) throw error;
-        //expect().to.be();
-        //});
-        done();
-      });
-    });
-    describe('wardenAllowed', function() {
-      it('should call wardenAllowed successfully', function(done) {
-        //uncomment below and update the code to test wardenAllowed
-        //instance.wardenAllowed(function(error) {
-        //  if (error) throw error;
-        //expect().to.be();
-        //});
-        done();
-      });
-    });
-    describe('wardenTokenAllowed', function() {
-      it('should call wardenTokenAllowed successfully', function(done) {
-        //uncomment below and update the code to test wardenTokenAllowed
-        //instance.wardenTokenAllowed(function(error) {
         //  if (error) throw error;
         //expect().to.be();
         //});

@@ -57,7 +57,7 @@ func (s *DefaultConsentStrategy) ValidateConsentRequest(req fosite.AuthorizeRequ
 			Name:        "Resource owner denied consent",
 			Description: err.Error(),
 			Debug:       err.Error(),
-			Hint:        "Token validation failed.",
+			Hint:        consent.DenyReason,
 			Code:        http.StatusUnauthorized,
 		}
 	}

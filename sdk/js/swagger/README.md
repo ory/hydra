@@ -133,48 +133,47 @@ Class | Method | HTTP request | Description
 *HydraOAuth2OpenIdConnectServer.GroupsApi* | [**findGroupsByMember**](docs/GroupsApi.md#findGroupsByMember) | **GET** /warden/groups | Find group IDs by member
 *HydraOAuth2OpenIdConnectServer.GroupsApi* | [**getGroup**](docs/GroupsApi.md#getGroup) | **GET** /warden/groups/{id} | Get a group by id
 *HydraOAuth2OpenIdConnectServer.GroupsApi* | [**removeMembersFromGroup**](docs/GroupsApi.md#removeMembersFromGroup) | **DELETE** /warden/groups/{id}/members | Remove members from a group
-*HydraOAuth2OpenIdConnectServer.HealthApi* | [**getHealthStatus**](docs/HealthApi.md#getHealthStatus) | **GET** /health | Check health status of instance
-*HydraOAuth2OpenIdConnectServer.HealthApi* | [**getInstanceStatistics**](docs/HealthApi.md#getInstanceStatistics) | **GET** /health/stats | Show instance statistics
-*HydraOAuth2OpenIdConnectServer.JsonWebKeyApi* | [**createJsonWebKeySet**](docs/JsonWebKeyApi.md#createJsonWebKeySet) | **POST** /keys/{set} | Generate a new JSON Web Key for a JSON Web Key Set
+*HydraOAuth2OpenIdConnectServer.HealthApi* | [**getInstanceMetrics**](docs/HealthApi.md#getInstanceMetrics) | **GET** /health/metrics | Show instance metrics (experimental)
+*HydraOAuth2OpenIdConnectServer.HealthApi* | [**getInstanceStatus**](docs/HealthApi.md#getInstanceStatus) | **GET** /health/status | Check health status of this instance
+*HydraOAuth2OpenIdConnectServer.JsonWebKeyApi* | [**createJsonWebKeySet**](docs/JsonWebKeyApi.md#createJsonWebKeySet) | **POST** /keys/{set} | Generate a new JSON Web Key
 *HydraOAuth2OpenIdConnectServer.JsonWebKeyApi* | [**deleteJsonWebKey**](docs/JsonWebKeyApi.md#deleteJsonWebKey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
 *HydraOAuth2OpenIdConnectServer.JsonWebKeyApi* | [**deleteJsonWebKeySet**](docs/JsonWebKeyApi.md#deleteJsonWebKeySet) | **DELETE** /keys/{set} | Delete a JSON Web Key
-*HydraOAuth2OpenIdConnectServer.JsonWebKeyApi* | [**getJsonWebKey**](docs/JsonWebKeyApi.md#getJsonWebKey) | **GET** /keys/{set}/{kid} | Retrieves a JSON Web Key Set matching the set and the kid
-*HydraOAuth2OpenIdConnectServer.JsonWebKeyApi* | [**getJsonWebKeySet**](docs/JsonWebKeyApi.md#getJsonWebKeySet) | **GET** /keys/{set} | Retrieves a JSON Web Key Set matching the set
-*HydraOAuth2OpenIdConnectServer.JsonWebKeyApi* | [**updateJsonWebKey**](docs/JsonWebKeyApi.md#updateJsonWebKey) | **PUT** /keys/{set}/{kid} | Updates a JSON Web Key
-*HydraOAuth2OpenIdConnectServer.JsonWebKeyApi* | [**updateJsonWebKeySet**](docs/JsonWebKeyApi.md#updateJsonWebKeySet) | **PUT** /keys/{set} | Updates a JSON Web Key Set
+*HydraOAuth2OpenIdConnectServer.JsonWebKeyApi* | [**getJsonWebKey**](docs/JsonWebKeyApi.md#getJsonWebKey) | **GET** /keys/{set}/{kid} | Retrieve a JSON Web Key
+*HydraOAuth2OpenIdConnectServer.JsonWebKeyApi* | [**getJsonWebKeySet**](docs/JsonWebKeyApi.md#getJsonWebKeySet) | **GET** /keys/{set} | Retrieve a JSON Web Key Set
+*HydraOAuth2OpenIdConnectServer.JsonWebKeyApi* | [**updateJsonWebKey**](docs/JsonWebKeyApi.md#updateJsonWebKey) | **PUT** /keys/{set}/{kid} | Update a JSON Web Key
+*HydraOAuth2OpenIdConnectServer.JsonWebKeyApi* | [**updateJsonWebKeySet**](docs/JsonWebKeyApi.md#updateJsonWebKeySet) | **PUT** /keys/{set} | Update a JSON Web Key Set
 *HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**acceptOAuth2ConsentRequest**](docs/OAuth2Api.md#acceptOAuth2ConsentRequest) | **PATCH** /oauth2/consent/requests/{id}/accept | Accept a consent request
-*HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**createOAuth2Client**](docs/OAuth2Api.md#createOAuth2Client) | **POST** /clients | Creates an OAuth 2.0 Client
+*HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**createOAuth2Client**](docs/OAuth2Api.md#createOAuth2Client) | **POST** /clients | Create an OAuth 2.0 client
 *HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**deleteOAuth2Client**](docs/OAuth2Api.md#deleteOAuth2Client) | **DELETE** /clients/{id} | Deletes an OAuth 2.0 Client
-*HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**getOAuth2Client**](docs/OAuth2Api.md#getOAuth2Client) | **GET** /clients/{id} | Fetches an OAuth 2.0 Client.
+*HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**getOAuth2Client**](docs/OAuth2Api.md#getOAuth2Client) | **GET** /clients/{id} | Retrieve an OAuth 2.0 Client.
 *HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**getOAuth2ConsentRequest**](docs/OAuth2Api.md#getOAuth2ConsentRequest) | **GET** /oauth2/consent/requests/{id} | Receive consent request information
 *HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**getWellKnown**](docs/OAuth2Api.md#getWellKnown) | **GET** /.well-known/openid-configuration | Server well known configuration
-*HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**introspectOAuth2Token**](docs/OAuth2Api.md#introspectOAuth2Token) | **POST** /oauth2/introspect | Introspect an OAuth2 access token
-*HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**listOAuth2Clients**](docs/OAuth2Api.md#listOAuth2Clients) | **GET** /clients | Lists OAuth 2.0 Clients
-*HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**oauthAuth**](docs/OAuth2Api.md#oauthAuth) | **GET** /oauth2/auth | The OAuth 2.0 Auth endpoint
-*HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**oauthToken**](docs/OAuth2Api.md#oauthToken) | **POST** /oauth2/token | The OAuth 2.0 Token endpoint
+*HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**introspectOAuth2Token**](docs/OAuth2Api.md#introspectOAuth2Token) | **POST** /oauth2/introspect | Introspect OAuth2 tokens
+*HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**listOAuth2Clients**](docs/OAuth2Api.md#listOAuth2Clients) | **GET** /clients | List OAuth 2.0 Clients
+*HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**oauthAuth**](docs/OAuth2Api.md#oauthAuth) | **GET** /oauth2/auth | The OAuth 2.0 authorize endpoint
+*HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**oauthToken**](docs/OAuth2Api.md#oauthToken) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
 *HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**rejectOAuth2ConsentRequest**](docs/OAuth2Api.md#rejectOAuth2ConsentRequest) | **PATCH** /oauth2/consent/requests/{id}/reject | Reject a consent request
-*HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**revokeOAuth2Token**](docs/OAuth2Api.md#revokeOAuth2Token) | **POST** /oauth2/revoke | Revoke an OAuth2 access token
-*HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**updateOAuth2Client**](docs/OAuth2Api.md#updateOAuth2Client) | **PUT** /clients/{id} | Updates an OAuth 2.0 Client
-*HydraOAuth2OpenIdConnectServer.Oauth2Api* | [**wellKnown**](docs/Oauth2Api.md#wellKnown) | **GET** /.well-known/jwks.json | Public JWKs
-*HydraOAuth2OpenIdConnectServer.PolicyApi* | [**createPolicy**](docs/PolicyApi.md#createPolicy) | **POST** /policies | Create an access control policy
-*HydraOAuth2OpenIdConnectServer.PolicyApi* | [**deletePolicy**](docs/PolicyApi.md#deletePolicy) | **DELETE** /policies/{id} | Delete an access control policy
-*HydraOAuth2OpenIdConnectServer.PolicyApi* | [**getPolicy**](docs/PolicyApi.md#getPolicy) | **GET** /policies/{id} | Get an access control policy
-*HydraOAuth2OpenIdConnectServer.PolicyApi* | [**listPolicies**](docs/PolicyApi.md#listPolicies) | **GET** /policies | List access control policies
-*HydraOAuth2OpenIdConnectServer.PolicyApi* | [**updatePolicy**](docs/PolicyApi.md#updatePolicy) | **PUT** /policies/{id} | Update an access control policy
+*HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**revokeOAuth2Token**](docs/OAuth2Api.md#revokeOAuth2Token) | **POST** /oauth2/revoke | Revoke OAuth2 tokens
+*HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**updateOAuth2Client**](docs/OAuth2Api.md#updateOAuth2Client) | **PUT** /clients/{id} | Update an OAuth 2.0 Client
+*HydraOAuth2OpenIdConnectServer.Oauth2Api* | [**wellKnown**](docs/Oauth2Api.md#wellKnown) | **GET** /.well-known/jwks.json | Get list of well known JSON Web Keys
+*HydraOAuth2OpenIdConnectServer.PolicyApi* | [**createPolicy**](docs/PolicyApi.md#createPolicy) | **POST** /policies | Create an Access Control Policy
+*HydraOAuth2OpenIdConnectServer.PolicyApi* | [**deletePolicy**](docs/PolicyApi.md#deletePolicy) | **DELETE** /policies/{id} | Delete an Access Control Policy
+*HydraOAuth2OpenIdConnectServer.PolicyApi* | [**getPolicy**](docs/PolicyApi.md#getPolicy) | **GET** /policies/{id} | Get an Access Control Policy
+*HydraOAuth2OpenIdConnectServer.PolicyApi* | [**listPolicies**](docs/PolicyApi.md#listPolicies) | **GET** /policies | List Access Control Policies
+*HydraOAuth2OpenIdConnectServer.PolicyApi* | [**updatePolicy**](docs/PolicyApi.md#updatePolicy) | **PUT** /policies/{id} | Update an Access Control Polic
 *HydraOAuth2OpenIdConnectServer.WardenApi* | [**addMembersToGroup**](docs/WardenApi.md#addMembersToGroup) | **POST** /warden/groups/{id}/members | Add members to a group
 *HydraOAuth2OpenIdConnectServer.WardenApi* | [**createGroup**](docs/WardenApi.md#createGroup) | **POST** /warden/groups | Create a group
 *HydraOAuth2OpenIdConnectServer.WardenApi* | [**deleteGroup**](docs/WardenApi.md#deleteGroup) | **DELETE** /warden/groups/{id} | Delete a group by id
+*HydraOAuth2OpenIdConnectServer.WardenApi* | [**doesWardenAllowAccessRequest**](docs/WardenApi.md#doesWardenAllowAccessRequest) | **POST** /warden/allowed | Check if an access request is valid (without providing an access token)
+*HydraOAuth2OpenIdConnectServer.WardenApi* | [**doesWardenAllowTokenAccessRequest**](docs/WardenApi.md#doesWardenAllowTokenAccessRequest) | **POST** /warden/token/allowed | Check if an access request is valid (providing an access token)
 *HydraOAuth2OpenIdConnectServer.WardenApi* | [**findGroupsByMember**](docs/WardenApi.md#findGroupsByMember) | **GET** /warden/groups | Find group IDs by member
 *HydraOAuth2OpenIdConnectServer.WardenApi* | [**getGroup**](docs/WardenApi.md#getGroup) | **GET** /warden/groups/{id} | Get a group by id
 *HydraOAuth2OpenIdConnectServer.WardenApi* | [**removeMembersFromGroup**](docs/WardenApi.md#removeMembersFromGroup) | **DELETE** /warden/groups/{id}/members | Remove members from a group
-*HydraOAuth2OpenIdConnectServer.WardenApi* | [**wardenAllowed**](docs/WardenApi.md#wardenAllowed) | **POST** /warden/allowed | Check if a subject is allowed to do something
-*HydraOAuth2OpenIdConnectServer.WardenApi* | [**wardenTokenAllowed**](docs/WardenApi.md#wardenTokenAllowed) | **POST** /warden/token/allowed | Check if the subject of a token is allowed to do something
 
 
 ## Documentation for Models
 
  - [HydraOAuth2OpenIdConnectServer.AcceptConsentRequestPayload](docs/AcceptConsentRequestPayload.md)
- - [HydraOAuth2OpenIdConnectServer.AllowedRequest](docs/AllowedRequest.md)
  - [HydraOAuth2OpenIdConnectServer.ConsentRequestManager](docs/ConsentRequestManager.md)
  - [HydraOAuth2OpenIdConnectServer.Context](docs/Context.md)
  - [HydraOAuth2OpenIdConnectServer.CreateJsonWebKeySetPayload](docs/CreateJsonWebKeySetPayload.md)
@@ -183,8 +182,6 @@ Class | Method | HTTP request | Description
  - [HydraOAuth2OpenIdConnectServer.Handler](docs/Handler.md)
  - [HydraOAuth2OpenIdConnectServer.InlineResponse200](docs/InlineResponse200.md)
  - [HydraOAuth2OpenIdConnectServer.InlineResponse2001](docs/InlineResponse2001.md)
- - [HydraOAuth2OpenIdConnectServer.InlineResponse2002](docs/InlineResponse2002.md)
- - [HydraOAuth2OpenIdConnectServer.InlineResponse2003](docs/InlineResponse2003.md)
  - [HydraOAuth2OpenIdConnectServer.InlineResponse401](docs/InlineResponse401.md)
  - [HydraOAuth2OpenIdConnectServer.IntrospectOAuth2TokenResponsePayload](docs/IntrospectOAuth2TokenResponsePayload.md)
  - [HydraOAuth2OpenIdConnectServer.JoseWebKeySetRequest](docs/JoseWebKeySetRequest.md)
@@ -201,6 +198,8 @@ Class | Method | HTTP request | Description
  - [HydraOAuth2OpenIdConnectServer.RejectConsentRequestPayload](docs/RejectConsentRequestPayload.md)
  - [HydraOAuth2OpenIdConnectServer.SwaggerAcceptConsentRequest](docs/SwaggerAcceptConsentRequest.md)
  - [HydraOAuth2OpenIdConnectServer.SwaggerCreatePolicyParameters](docs/SwaggerCreatePolicyParameters.md)
+ - [HydraOAuth2OpenIdConnectServer.SwaggerDoesWardenAllowAccessRequestParameters](docs/SwaggerDoesWardenAllowAccessRequestParameters.md)
+ - [HydraOAuth2OpenIdConnectServer.SwaggerDoesWardenAllowTokenAccessRequestParameters](docs/SwaggerDoesWardenAllowTokenAccessRequestParameters.md)
  - [HydraOAuth2OpenIdConnectServer.SwaggerGetPolicyParameters](docs/SwaggerGetPolicyParameters.md)
  - [HydraOAuth2OpenIdConnectServer.SwaggerJsonWebKeyQuery](docs/SwaggerJsonWebKeyQuery.md)
  - [HydraOAuth2OpenIdConnectServer.SwaggerJwkCreateSet](docs/SwaggerJwkCreateSet.md)
@@ -218,14 +217,13 @@ Class | Method | HTTP request | Description
  - [HydraOAuth2OpenIdConnectServer.SwaggerRejectConsentRequest](docs/SwaggerRejectConsentRequest.md)
  - [HydraOAuth2OpenIdConnectServer.SwaggerRevokeOAuth2TokenParameters](docs/SwaggerRevokeOAuth2TokenParameters.md)
  - [HydraOAuth2OpenIdConnectServer.SwaggerUpdatePolicyParameters](docs/SwaggerUpdatePolicyParameters.md)
- - [HydraOAuth2OpenIdConnectServer.SwaggerWardenAllowedParameters](docs/SwaggerWardenAllowedParameters.md)
- - [HydraOAuth2OpenIdConnectServer.SwaggerWardenAllowedResponse](docs/SwaggerWardenAllowedResponse.md)
- - [HydraOAuth2OpenIdConnectServer.SwaggerWardenAllowedResponseBody](docs/SwaggerWardenAllowedResponseBody.md)
- - [HydraOAuth2OpenIdConnectServer.SwaggerWardenTokenAllowedParameters](docs/SwaggerWardenTokenAllowedParameters.md)
- - [HydraOAuth2OpenIdConnectServer.SwaggerWardenTokenAllowedResponse](docs/SwaggerWardenTokenAllowedResponse.md)
- - [HydraOAuth2OpenIdConnectServer.SwaggerWardenTokenAllowedResponseBody](docs/SwaggerWardenTokenAllowedResponseBody.md)
+ - [HydraOAuth2OpenIdConnectServer.SwaggerWardenAccessRequestResponseParameters](docs/SwaggerWardenAccessRequestResponseParameters.md)
+ - [HydraOAuth2OpenIdConnectServer.SwaggerWardenTokenAccessRequestResponse](docs/SwaggerWardenTokenAccessRequestResponse.md)
  - [HydraOAuth2OpenIdConnectServer.TokenAllowedRequest](docs/TokenAllowedRequest.md)
- - [HydraOAuth2OpenIdConnectServer.WardenTokenAllowedBody](docs/WardenTokenAllowedBody.md)
+ - [HydraOAuth2OpenIdConnectServer.WardenAccessRequest](docs/WardenAccessRequest.md)
+ - [HydraOAuth2OpenIdConnectServer.WardenAccessRequestResponse](docs/WardenAccessRequestResponse.md)
+ - [HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequest](docs/WardenTokenAccessRequest.md)
+ - [HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponsePayload](docs/WardenTokenAccessRequestResponsePayload.md)
  - [HydraOAuth2OpenIdConnectServer.WellKnown](docs/WellKnown.md)
  - [HydraOAuth2OpenIdConnectServer.Writer](docs/Writer.md)
 

@@ -49,58 +49,19 @@
 
 
     /**
-     * Callback function to receive the result of the getHealthStatus operation.
-     * @callback module:api/HealthApi~getHealthStatusCallback
-     * @param {String} error Error message, if any.
-     * @param {module:model/InlineResponse200} data The data returned by the service call.
-     * @param {String} response The complete HTTP response.
-     */
-
-    /**
-     * Check health status of instance
-     * This endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header when TLS termination is set.
-     * @param {module:api/HealthApi~getHealthStatusCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/InlineResponse200}
-     */
-    this.getHealthStatus = function(callback) {
-      var postBody = null;
-
-
-      var pathParams = {
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
-
-      var authNames = [];
-      var contentTypes = ['application/json', 'application/x-www-form-urlencoded'];
-      var accepts = ['application/json'];
-      var returnType = InlineResponse200;
-
-      return this.apiClient.callApi(
-        '/health', 'GET',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
-    }
-
-    /**
-     * Callback function to receive the result of the getInstanceStatistics operation.
-     * @callback module:api/HealthApi~getInstanceStatisticsCallback
+     * Callback function to receive the result of the getInstanceMetrics operation.
+     * @callback module:api/HealthApi~getInstanceMetricsCallback
      * @param {String} error Error message, if any.
      * @param data This operation does not return a value.
      * @param {String} response The complete HTTP response.
      */
 
     /**
-     * Show instance statistics
-     * This endpoint returns information on the instance&#39;s health. It is currently not documented.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:health:stats\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
-     * @param {module:api/HealthApi~getInstanceStatisticsCallback} callback The callback function, accepting three arguments: error, data, response
+     * Show instance metrics (experimental)
+     * This endpoint returns an instance&#39;s metrics, such as average response time, status code distribution, hits per second and so on. The return values are currently not documented as this endpoint is still experimental.   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:health:stats\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * @param {module:api/HealthApi~getInstanceMetricsCallback} callback The callback function, accepting three arguments: error, data, response
      */
-    this.getInstanceStatistics = function(callback) {
+    this.getInstanceMetrics = function(callback) {
       var postBody = null;
 
 
@@ -119,7 +80,46 @@
       var returnType = null;
 
       return this.apiClient.callApi(
-        '/health/stats', 'GET',
+        '/health/metrics', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the getInstanceStatus operation.
+     * @callback module:api/HealthApi~getInstanceStatusCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/InlineResponse200} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Check health status of this instance
+     * This endpoint returns &#x60;{ \&quot;status\&quot;: \&quot;ok\&quot; }&#x60;. This status let&#39;s you know that the HTTP server is up and running. This status does currently not include checks whether the database connection is up and running. This endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header when TLS termination is set.   Be aware that if you are running multiple nodes of ORY Hydra, the health status will never refer to the cluster state, only to a single instance.
+     * @param {module:api/HealthApi~getInstanceStatusCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/InlineResponse200}
+     */
+    this.getInstanceStatus = function(callback) {
+      var postBody = null;
+
+
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = [];
+      var contentTypes = ['application/json', 'application/x-www-form-urlencoded'];
+      var accepts = ['application/json'];
+      var returnType = InlineResponse200;
+
+      return this.apiClient.callApi(
+        '/health/status', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );

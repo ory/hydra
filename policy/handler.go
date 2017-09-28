@@ -39,9 +39,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 
 // swagger:route GET /policies policy listPolicies
 //
-// List access control policies
-//
-// Visit https://github.com/ory/ladon#usage for more information on policy usage.
+// List Access Control Policies
 //
 // The subject making the request needs to be assigned to a policy containing:
 //
@@ -111,9 +109,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 
 // swagger:route POST /policies policy createPolicy
 //
-// Create an access control policy
-//
-// Visit https://github.com/ory/ladon#usage for more information on policy usage.
+// Create an Access Control Policy
 //
 // The subject making the request needs to be assigned to a policy containing:
 //
@@ -173,9 +169,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 
 // swagger:route GET /policies/{id} policy getPolicy
 //
-// Get an access control policy
-//
-// Visit https://github.com/ory/ladon#usage for more information on policy usage.
+// Get an Access Control Policy
 //
 // The subject making the request needs to be assigned to a policy containing:
 //
@@ -228,9 +222,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 
 // swagger:route DELETE /policies/{id} policy deletePolicy
 //
-// Delete an access control policy
-//
-// Visit https://github.com/ory/ladon#usage for more information on policy usage.
+// Delete an Access Control Policy
 //
 // The subject making the request needs to be assigned to a policy containing:
 //
@@ -280,9 +272,7 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 
 // swagger:route PUT /policies/{id} policy updatePolicy
 //
-// Update an access control policy
-//
-// Visit https://github.com/ory/ladon#usage for more information on policy usage.
+// Update an Access Control Polic
 //
 // The subject making the request needs to be assigned to a policy containing:
 //

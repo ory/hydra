@@ -16,15 +16,21 @@ type Handler struct {
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
-	r.GET("/health", h.Health)
-	r.GET("/health/stats", h.Statistics)
+	r.GET("/health/status", h.Health)
+	r.GET("/health/metrics", h.Statistics)
 }
 
-// swagger:route GET /health health getHealthStatus
+// swagger:route GET /health/status health getInstanceStatus
 //
-// Check health status of instance
+// Check health status of this instance
 //
-// This endpoint does not require the `X-Forwarded-Proto` header when TLS termination is set.
+// This endpoint returns `{ "status": "ok" }`. This status let's you know that the HTTP server is up and running. This
+// status does currently not include checks whether the database connection is up and running. This endpoint does not
+// require the `X-Forwarded-Proto` header when TLS termination is set.
+//
+//
+// Be aware that if you are running multiple nodes of ORY Hydra, the health status will never refer to the cluster state,
+// only to a single instance.
 //
 //     Responses:
 //       200: healthStatus
@@ -33,11 +39,13 @@ func (h *Handler) Health(rw http.ResponseWriter, r *http.Request, _ httprouter.P
 	rw.Write([]byte(`{"status": "ok"}`))
 }
 
-// swagger:route GET /health/stats health getInstanceStatistics
+// swagger:route GET /health/metrics health getInstanceMetrics
 //
-// Show instance statistics
+// Show instance metrics (experimental)
 //
-// This endpoint returns information on the instance's health. It is currently not documented.
+// This endpoint returns an instance's metrics, such as average response time, status code distribution, hits per
+// second and so on. The return values are currently not documented as this endpoint is still experimental.
+//
 //
 // The subject making the request needs to be assigned to a policy containing:
 //

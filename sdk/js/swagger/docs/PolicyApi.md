@@ -4,20 +4,20 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**createPolicy**](PolicyApi.md#createPolicy) | **POST** /policies | Create an access control policy
-[**deletePolicy**](PolicyApi.md#deletePolicy) | **DELETE** /policies/{id} | Delete an access control policy
-[**getPolicy**](PolicyApi.md#getPolicy) | **GET** /policies/{id} | Get an access control policy
-[**listPolicies**](PolicyApi.md#listPolicies) | **GET** /policies | List access control policies
-[**updatePolicy**](PolicyApi.md#updatePolicy) | **PUT** /policies/{id} | Update an access control policy
+[**createPolicy**](PolicyApi.md#createPolicy) | **POST** /policies | Create an Access Control Policy
+[**deletePolicy**](PolicyApi.md#deletePolicy) | **DELETE** /policies/{id} | Delete an Access Control Policy
+[**getPolicy**](PolicyApi.md#getPolicy) | **GET** /policies/{id} | Get an Access Control Policy
+[**listPolicies**](PolicyApi.md#listPolicies) | **GET** /policies | List Access Control Policies
+[**updatePolicy**](PolicyApi.md#updatePolicy) | **PUT** /policies/{id} | Update an Access Control Polic
 
 
 <a name="createPolicy"></a>
 # **createPolicy**
 > Policy createPolicy(opts)
 
-Create an access control policy
+Create an Access Control Policy
 
-Visit https://github.com/ory/ladon#usage for more information on policy usage.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:policies\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:policies\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
 
 ### Example
 ```javascript
@@ -67,9 +67,9 @@ Name | Type | Description  | Notes
 # **deletePolicy**
 > deletePolicy(id)
 
-Delete an access control policy
+Delete an Access Control Policy
 
-Visit https://github.com/ory/ladon#usage for more information on policy usage.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:policies:&lt;id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;delete\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:policies:&lt;id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;delete\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
 
 ### Example
 ```javascript
@@ -118,9 +118,9 @@ null (empty response body)
 # **getPolicy**
 > Policy getPolicy(id)
 
-Get an access control policy
+Get an Access Control Policy
 
-Visit https://github.com/ory/ladon#usage for more information on policy usage.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:policies:&lt;id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:policies:&lt;id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
 
 ### Example
 ```javascript
@@ -169,9 +169,9 @@ Name | Type | Description  | Notes
 # **listPolicies**
 > [Policy] listPolicies(opts)
 
-List access control policies
+List Access Control Policies
 
-Visit https://github.com/ory/ladon#usage for more information on policy usage.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:policies\&quot;], \&quot;actions\&quot;: [\&quot;list\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:policies\&quot;], \&quot;actions\&quot;: [\&quot;list\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
 
 ### Example
 ```javascript
@@ -223,9 +223,9 @@ Name | Type | Description  | Notes
 # **updatePolicy**
 > Policy updatePolicy(id, opts)
 
-Update an access control policy
+Update an Access Control Polic
 
-Visit https://github.com/ory/ladon#usage for more information on policy usage.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:policies\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:policies\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
 
 ### Example
 ```javascript

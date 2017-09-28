@@ -1,5 +1,5 @@
-hash: 52c78c986cdee750ca57036d3dca3507e23f03b2c85def17f33479d38a9ff08b
-updated: 2017-09-16T13:19:28.6519803+02:00
+hash: c4be9b74aa40e60d7722f40bf12dd531809a39647f5b1958345598024b9e8509
+updated: 2017-09-28T14:15:00.3622344+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 4918b99a7cb949bb295f3c7bbaf24b577d806e35
@@ -53,6 +53,8 @@ imports:
   version: 4da3e2cfbabc9f751898f250b49f2439785783a1
 - name: github.com/fsouza/go-dockerclient
   version: 98edf3edfae6a6500fecc69d2bcccf1302544004
+- name: github.com/go-resty/resty
+  version: 9ac9c42358f7c3c69ac9f8610e8790d7c338e85d
 - name: github.com/go-sql-driver/mysql
   version: a0583e0143b1624142adab07e0e97fe106d99561
 - name: github.com/golang/protobuf
@@ -158,12 +160,12 @@ imports:
   version: 2d840d861c322bdf5346ba7917af1c2285e653d3
 - name: github.com/segmentio/backo-go
   version: 204274ad699c0983a70203a566887f17a717fef4
+- name: github.com/sirupsen/logrus
+  version: 89742aefa4b206dcf400792f3bd35b542998eb3b
 - name: github.com/Sirupsen/logrus
   version: 89742aefa4b206dcf400792f3bd35b542998eb3b
   repo: https://github.com/sirupsen/logrus.git
   vcs: git
-- name: github.com/sirupsen/logrus
-  version: 89742aefa4b206dcf400792f3bd35b542998eb3b
 - name: github.com/spf13/afero
   version: ee1bd8ee15a1306d1f9201acc41ef39cd9f99a1b
   subpackages:
@@ -204,6 +206,7 @@ imports:
   subpackages:
   - context
   - context/ctxhttp
+  - publicsuffix
 - name: golang.org/x/oauth2
   version: 13449ad91cb26cb47661c1b080790392170385fd
   subpackages:

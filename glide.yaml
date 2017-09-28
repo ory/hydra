@@ -19,6 +19,8 @@ import:
 - package: github.com/jmoiron/sqlx
 - package: github.com/julienschmidt/httprouter
   version: 1.1.0
+- package: github.com/go-resty/resty
+  version: 1.0.0
 - package: github.com/lib/pq
 - package: github.com/meatballhat/negroni-logrus
 - package: github.com/moul/http2curl

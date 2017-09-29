@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// swagger:model groupMembers
 type membersRequest struct {
 	Members []string `json:"members"`
 }
@@ -40,16 +41,16 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.DELETE(GroupsHandlerPath+"/:id/members", h.RemoveGroupMembers)
 }
 
-// swagger:route GET /warden/groups warden groups findGroupsByMember
+// swagger:route GET /warden/groups warden findGroupsByMember
 //
-// Find group IDs by member
+// Find groups by member
 //
 // The subject making the request needs to be assigned to a policy containing:
 //
 //  ```
 //  {
-//    "resources": ["rn:hydra:warden:groups:<member>"],
-//    "actions": ["get"],
+//    "resources": ["rn:hydra:warden:groups"],
+//    "actions": ["list"],
 //    "effect": "allow"
 //  }
 //  ```
@@ -74,24 +75,24 @@ func (h *Handler) FindGroupNames(w http.ResponseWriter, r *http.Request, _ httpr
 	var ctx = r.Context()
 	var member = r.URL.Query().Get("member")
 
-	g, err := h.Manager.FindGroupNames(member)
-	if err != nil {
-		h.H.WriteError(w, r, err)
-		return
-	}
-
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: fmt.Sprintf(GroupResource, member),
-		Action:   "get",
+		Resource: GroupsResource,
+		Action:   "list",
 	}, Scope); err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}
 
-	h.H.Write(w, r, g)
+	groups, err := h.Manager.FindGroupsByMember(member)
+	if err != nil {
+		h.H.WriteError(w, r, err)
+		return
+	}
+
+	h.H.Write(w, r, groups)
 }
 
-// swagger:route POST /warden/groups warden groups createGroup
+// swagger:route POST /warden/groups warden createGroup
 //
 // Create a group
 //
@@ -146,7 +147,7 @@ func (h *Handler) CreateGroup(w http.ResponseWriter, r *http.Request, _ httprout
 	h.H.WriteCreated(w, r, GroupsHandlerPath+"/"+g.ID, &g)
 }
 
-// swagger:route GET /warden/groups/{id} warden groups getGroup
+// swagger:route GET /warden/groups/{id} warden getGroup
 //
 // Get a group by id
 //
@@ -197,7 +198,7 @@ func (h *Handler) GetGroup(w http.ResponseWriter, r *http.Request, ps httprouter
 	h.H.Write(w, r, g)
 }
 
-// swagger:route DELETE /warden/groups/{id} warden groups deleteGroup
+// swagger:route DELETE /warden/groups/{id} warden deleteGroup
 //
 // Delete a group by id
 //
@@ -247,7 +248,7 @@ func (h *Handler) DeleteGroup(w http.ResponseWriter, r *http.Request, ps httprou
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route POST /warden/groups/{id}/members warden groups addMembersToGroup
+// swagger:route POST /warden/groups/{id}/members warden addMembersToGroup
 //
 // Add members to a group
 //
@@ -303,7 +304,7 @@ func (h *Handler) AddGroupMembers(w http.ResponseWriter, r *http.Request, ps htt
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route DELETE /warden/groups/{id}/members warden groups removeMembersFromGroup
+// swagger:route DELETE /warden/groups/{id}/members warden removeMembersFromGroup
 //
 // Remove members from a group
 //

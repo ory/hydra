@@ -37,7 +37,7 @@ func (c *ConsentRequest) IsConsentGranted() bool {
 
 // AcceptConsentRequestPayload represents data that will be used to accept a consent request.
 //
-// swagger:model acceptConsentRequestPayload
+// swagger:model consentRequestAcceptance
 type AcceptConsentRequestPayload struct {
 	// AccessTokenExtra represents arbitrary data that will be added to the access token and that will be returned
 	// on introspection and warden requests.
@@ -57,7 +57,7 @@ type AcceptConsentRequestPayload struct {
 
 // RejectConsentRequestPayload represents data that will be used to reject a consent request.
 //
-// swagger:model rejectConsentRequestPayload
+// swagger:model consentRequestRejection
 type RejectConsentRequestPayload struct {
 	// Reason represents the reason why the user rejected the consent request.
 	Reason string `json:"reason"`

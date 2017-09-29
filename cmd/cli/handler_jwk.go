@@ -41,7 +41,7 @@ func (h *JWKHandler) CreateKeys(cmd *cobra.Command, args []string) {
 	}
 
 	alg, _ := cmd.Flags().GetString("alg")
-	keys, response, err := m.CreateJsonWebKeySet(args[0], hydra.CreateJsonWebKeySetPayload{Alg: alg, Kid: kid})
+	keys, response, err := m.CreateJsonWebKeySet(args[0], hydra.JsonWebKeySetGeneratorRequest{Alg: alg, Kid: kid})
 	checkResponse(response, err, http.StatusCreated)
 	fmt.Printf("%s\n", formatResponse(keys))
 }

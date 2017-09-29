@@ -26,7 +26,7 @@ func createAccessTokenSession(subject, client string, token string, expiresAt ti
 	if scopes != nil {
 		ar.GrantedScopes = scopes
 	}
-	ar.RequestedAt = time.Now().Round(time.Second)
+	ar.RequestedAt = time.Now().Round(time.Minute)
 	ar.Client = &fosite.DefaultClient{ID: client}
 	ar.Session.SetExpiresAt(fosite.AccessToken, expiresAt)
 	ar.Session.(*oauth2.Session).Extra = map[string]interface{}{"foo": "bar"}

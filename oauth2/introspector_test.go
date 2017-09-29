@@ -23,7 +23,6 @@ import (
 )
 
 func TestIntrospectorSDK(t *testing.T) {
-	now := time.Now().Round(time.Second)
 	tokens := pkg.Tokens(3)
 	memoryStore := storage.NewExampleStore()
 	memoryStore.Clients["my-client"].Scopes = []string{"fosite", "openid", "photos", "offline", "foo.*"}
@@ -48,6 +47,7 @@ func TestIntrospectorSDK(t *testing.T) {
 	handler.SetRoutes(router)
 	server := httptest.NewServer(router)
 
+	now := time.Now().Round(time.Minute)
 	createAccessTokenSession("alice", "siri", tokens[0][0], now.Add(time.Hour), memoryStore, fosite.Arguments{"core", "foo.*"})
 	createAccessTokenSession("siri", "siri", tokens[1][0], now.Add(time.Hour), memoryStore, fosite.Arguments{"core", "foo"})
 	createAccessTokenSession("siri", "doesnt-exist", tokens[2][0], now.Add(-time.Hour), memoryStore, fosite.Arguments{"core", "foo.*"})
@@ -62,7 +62,7 @@ func TestIntrospectorSDK(t *testing.T) {
 			description string
 			expectErr   bool
 			scopes      []string
-			assert      func(*testing.T, *hydra.IntrospectOAuth2TokenResponsePayload)
+			assert      func(*testing.T, *hydra.OAuth2TokenIntrospection)
 		}{
 			{
 				description: "should fail because invalid token was supplied",
@@ -95,7 +95,7 @@ func TestIntrospectorSDK(t *testing.T) {
 				token:       tokens[0][1],
 				expectErr:   false,
 				scopes:      []string{"foo.bar"},
-				assert: func(t *testing.T, c *hydra.IntrospectOAuth2TokenResponsePayload) {
+				assert: func(t *testing.T, c *hydra.OAuth2TokenIntrospection) {
 					assert.Equal(t, "alice", c.Sub)
 					assert.Equal(t, now.Add(time.Hour).Unix(), c.Exp, "expires at")
 					assert.Equal(t, now.Unix(), c.Iat, "issued at")

@@ -71,7 +71,7 @@ type swaggerOAuthIntrospectionResponse struct {
 	Body swaggerOAuthIntrospectionResponsePayload
 }
 
-// swagger:model introspectOAuth2TokenResponsePayload
+// swagger:model oAuth2TokenIntrospection
 type swaggerOAuthIntrospectionResponsePayload struct {
 	// Active is a boolean indicator of whether or not the presented token
 	// is currently active.  The specifics of a token's "active" state

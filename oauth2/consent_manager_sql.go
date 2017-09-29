@@ -7,8 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"log"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/hydra/pkg"
 	"github.com/pborman/uuid"
@@ -168,7 +166,6 @@ func (m *ConsentRequestSQLManager) PersistConsentRequest(request *ConsentRequest
 		strings.Join(sqlConsentParams, ", "),
 		":"+strings.Join(sqlConsentParams, ", :"),
 	)
-	log.Printf("Got sql statement: %s", query)
 	if _, err := m.db.NamedExec(query, data); err != nil {
 		return errors.WithStack(err)
 	}

@@ -19,5 +19,5 @@ type Manager interface {
 	AddGroupMembers(group string, members []string) error
 	RemoveGroupMembers(group string, members []string) error
 
-	FindGroupNames(subject string) ([]string, error)
+	FindGroupsByMember(subject string) ([]Group, error)
 }

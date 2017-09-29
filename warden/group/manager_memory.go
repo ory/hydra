@@ -3,6 +3,7 @@ package group
 import (
 	"sync"
 
+	"github.com/ory/hydra/pkg"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 )
@@ -32,7 +33,7 @@ func (m *MemoryManager) CreateGroup(g *Group) error {
 
 func (m *MemoryManager) GetGroup(id string) (*Group, error) {
 	if g, ok := m.Groups[id]; !ok {
-		return nil, errors.New("not found")
+		return nil, errors.WithStack(pkg.ErrNotFound)
 	} else {
 		return &g, nil
 	}
@@ -76,16 +77,16 @@ func (m *MemoryManager) RemoveGroupMembers(group string, subjects []string) erro
 	return m.CreateGroup(g)
 }
 
-func (m *MemoryManager) FindGroupNames(subject string) ([]string, error) {
+func (m *MemoryManager) FindGroupsByMember(subject string) ([]Group, error) {
 	if m.Groups == nil {
 		m.Groups = map[string]Group{}
 	}
 
-	var res []string
+	var res = []Group{}
 	for _, g := range m.Groups {
 		for _, s := range g.Members {
 			if s == subject {
-				res = append(res, g.ID)
+				res = append(res, g)
 				break
 			}
 		}

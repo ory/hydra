@@ -12,7 +12,7 @@
   ],
   "swagger": "2.0",
   "info": {
-    "description": "Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/\n\n\nHydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure.\nHydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to.\nHydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.\n\n\nThe official repository is located at https://github.com/ory/hydra\n\n\n### ATTENTION - IMPORTANT NOTE\n\n\nThe swagger generator used to create this documentation does currently not support example responses. To see\nrequest and response payloads click on **\"Show JSON schema\"**:\n![Enable JSON Schema on Apiary](https://storage.googleapis.com/ory.am/hydra/json-schema.png)",
+    "description": "Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/\n\n\nHydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure.\nHydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to.\nHydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.\n\n\nThe official repository is located at https://github.com/ory/hydra\n\n\n### Important REST API Documentation Notes\n\nThe swagger generator used to create this documentation does currently not support example responses. To see\nrequest and response payloads click on **\"Show JSON schema\"**:\n![Enable JSON Schema on Apiary](https://storage.googleapis.com/ory.am/hydra/json-schema.png)\n\n\nThe API documentation always refers to the latest tagged version of ORY Hydra. For previous API documentations, please\nrefer to https://github.com/ory/hydra/blob/\u003ctag-id\u003e/docs/api.swagger.yaml - for example:\n\n0.9.13: https://github.com/ory/hydra/blob/v0.9.13/docs/api.swagger.yaml\n0.8.1: https://github.com/ory/hydra/blob/v0.8.1/docs/api.swagger.yaml",
     "title": "Hydra OAuth2 \u0026 OpenID Connect Server",
     "contact": {
       "name": "ORY",
@@ -41,7 +41,7 @@
           "https"
         ],
         "tags": [
-          "oauth2"
+          "oAuth2"
         ],
         "summary": "Get list of well known JSON Web Keys",
         "operationId": "wellKnown",
@@ -567,7 +567,7 @@
             "name": "Body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/createJsonWebKeySetPayload"
+              "$ref": "#/definitions/jsonWebKeySetGeneratorRequest"
             }
           }
         ],
@@ -940,7 +940,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/acceptConsentRequestPayload"
+              "$ref": "#/definitions/consentRequestAcceptance"
             }
           }
         ],
@@ -995,7 +995,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/rejectConsentRequestPayload"
+              "$ref": "#/definitions/consentRequestRejection"
             }
           }
         ],
@@ -1473,7 +1473,7 @@
     },
     "/warden/groups": {
       "get": {
-        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups:\u003cmember\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups\"],\n\"actions\": [\"list\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -1485,10 +1485,9 @@
           "https"
         ],
         "tags": [
-          "warden",
-          "groups"
+          "warden"
         ],
-        "summary": "Find group IDs by member",
+        "summary": "Find groups by member",
         "operationId": "findGroupsByMember",
         "security": [
           {
@@ -1499,12 +1498,12 @@
         ],
         "parameters": [
           {
-            "type": "integer",
-            "format": "int64",
+            "type": "string",
             "x-go-name": "Member",
             "description": "The id of the member to look up.",
             "name": "member",
-            "in": "query"
+            "in": "query",
+            "required": true
           }
         ],
         "responses": {
@@ -1535,8 +1534,7 @@
           "https"
         ],
         "tags": [
-          "warden",
-          "groups"
+          "warden"
         ],
         "summary": "Create a group",
         "operationId": "createGroup",
@@ -1545,6 +1543,15 @@
             "oauth2": [
               "hydra.groups"
             ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/group"
+            }
           }
         ],
         "responses": {
@@ -1577,8 +1584,7 @@
           "https"
         ],
         "tags": [
-          "warden",
-          "groups"
+          "warden"
         ],
         "summary": "Get a group by id",
         "operationId": "getGroup",
@@ -1591,8 +1597,7 @@
         ],
         "parameters": [
           {
-            "type": "integer",
-            "format": "int64",
+            "type": "string",
             "x-go-name": "ID",
             "description": "The id of the group to look up.",
             "name": "id",
@@ -1628,8 +1633,7 @@
           "https"
         ],
         "tags": [
-          "warden",
-          "groups"
+          "warden"
         ],
         "summary": "Delete a group by id",
         "operationId": "deleteGroup",
@@ -1642,8 +1646,7 @@
         ],
         "parameters": [
           {
-            "type": "integer",
-            "format": "int64",
+            "type": "string",
             "x-go-name": "ID",
             "description": "The id of the group to look up.",
             "name": "id",
@@ -1681,8 +1684,7 @@
           "https"
         ],
         "tags": [
-          "warden",
-          "groups"
+          "warden"
         ],
         "summary": "Add members to a group",
         "operationId": "addMembersToGroup",
@@ -1695,8 +1697,7 @@
         ],
         "parameters": [
           {
-            "type": "integer",
-            "format": "int64",
+            "type": "string",
             "x-go-name": "ID",
             "description": "The id of the group to modify.",
             "name": "id",
@@ -1707,7 +1708,7 @@
             "name": "Body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/membersRequest"
+              "$ref": "#/definitions/groupMembers"
             }
           }
         ],
@@ -1739,8 +1740,7 @@
           "https"
         ],
         "tags": [
-          "warden",
-          "groups"
+          "warden"
         ],
         "summary": "Remove members from a group",
         "operationId": "removeMembersFromGroup",
@@ -1753,8 +1753,7 @@
         ],
         "parameters": [
           {
-            "type": "integer",
-            "format": "int64",
+            "type": "string",
             "x-go-name": "ID",
             "description": "The id of the group to modify.",
             "name": "id",
@@ -1765,7 +1764,7 @@
             "name": "Body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/membersRequest"
+              "$ref": "#/definitions/groupMembers"
             }
           }
         ],
@@ -1936,7 +1935,7 @@
       "type": "object",
       "x-go-package": "github.com/ory/hydra/vendor/github.com/ory/herodot"
     },
-    "acceptConsentRequestPayload": {
+    "consentRequestAcceptance": {
       "type": "object",
       "title": "AcceptConsentRequestPayload represents data that will be used to accept a consent request.",
       "properties": {
@@ -1973,26 +1972,18 @@
       "x-go-name": "AcceptConsentRequestPayload",
       "x-go-package": "github.com/ory/hydra/oauth2"
     },
-    "createJsonWebKeySetPayload": {
+    "consentRequestRejection": {
       "type": "object",
-      "required": [
-        "alg",
-        "kid"
-      ],
+      "title": "RejectConsentRequestPayload represents data that will be used to reject a consent request.",
       "properties": {
-        "alg": {
-          "description": "The algorithm to be used for creating the key. Supports \"RS256\", \"ES521\" and \"HS256\"",
+        "reason": {
+          "description": "Reason represents the reason why the user rejected the consent request.",
           "type": "string",
-          "x-go-name": "Algorithm"
-        },
-        "kid": {
-          "description": "The kid of the key to be created",
-          "type": "string",
-          "x-go-name": "KeyID"
+          "x-go-name": "Reason"
         }
       },
-      "x-go-name": "createRequest",
-      "x-go-package": "github.com/ory/hydra/jwk"
+      "x-go-name": "RejectConsentRequestPayload",
+      "x-go-package": "github.com/ory/hydra/oauth2"
     },
     "group": {
       "description": "Group represents a warden group",
@@ -2015,73 +2006,19 @@
       "x-go-name": "Group",
       "x-go-package": "github.com/ory/hydra/warden/group"
     },
-    "introspectOAuth2TokenResponsePayload": {
+    "groupMembers": {
       "type": "object",
       "properties": {
-        "active": {
-          "description": "Active is a boolean indicator of whether or not the presented token\nis currently active.  The specifics of a token's \"active\" state\nwill vary depending on the implementation of the authorization\nserver and the information it keeps about its tokens, but a \"true\"\nvalue return for the \"active\" property will generally indicate\nthat a given token has been issued by this authorization server,\nhas not been revoked by the resource owner, and is within its\ngiven time window of validity (e.g., after its issuance time and\nbefore its expiration time).",
-          "type": "boolean",
-          "x-go-name": "Active"
-        },
-        "aud": {
-          "description": "Audience is a service-specific string identifier or list of string\nidentifiers representing the intended audience for this token.",
-          "type": "string",
-          "x-go-name": "Audience"
-        },
-        "client_id": {
-          "description": "ClientID is aclient identifier for the OAuth 2.0 client that\nrequested this token.",
-          "type": "string",
-          "x-go-name": "ClientID"
-        },
-        "exp": {
-          "description": "Expires at is an integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token will expire.",
-          "type": "integer",
-          "format": "int64",
-          "x-go-name": "ExpiresAt"
-        },
-        "ext": {
-          "description": "Extra is arbitrary data set by the session.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "object"
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "string"
           },
-          "x-go-name": "Extra"
-        },
-        "iat": {
-          "description": "Issued at is an integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token was\noriginally issued.",
-          "type": "integer",
-          "format": "int64",
-          "x-go-name": "IssuedAt"
-        },
-        "iss": {
-          "description": "Issuer is a string representing the issuer of this token",
-          "type": "string",
-          "x-go-name": "Issuer"
-        },
-        "nbf": {
-          "description": "NotBefore is an integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token is not to be\nused before.",
-          "type": "integer",
-          "format": "int64",
-          "x-go-name": "NotBefore"
-        },
-        "scope": {
-          "description": "Scope is a JSON string containing a space-separated list of\nscopes associated with this token.",
-          "type": "string",
-          "x-go-name": "Scope"
-        },
-        "sub": {
-          "description": "Subject of the token, as defined in JWT [RFC7519].\nUsually a machine-readable identifier of the resource owner who\nauthorized this token.",
-          "type": "string",
-          "x-go-name": "Subject"
-        },
-        "username": {
-          "description": "Username is a human-readable identifier for the resource owner who\nauthorized this token.",
-          "type": "string",
-          "x-go-name": "Username"
+          "x-go-name": "Members"
         }
       },
-      "x-go-name": "swaggerOAuthIntrospectionResponsePayload",
-      "x-go-package": "github.com/ory/hydra/oauth2"
+      "x-go-name": "membersRequest",
+      "x-go-package": "github.com/ory/hydra/warden/group"
     },
     "joseWebKeySetRequest": {
       "type": "object",
@@ -2194,18 +2131,26 @@
       "x-go-name": "swaggerJSONWebKeySet",
       "x-go-package": "github.com/ory/hydra/jwk"
     },
-    "membersRequest": {
+    "jsonWebKeySetGeneratorRequest": {
       "type": "object",
+      "required": [
+        "alg",
+        "kid"
+      ],
       "properties": {
-        "members": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "x-go-name": "Members"
+        "alg": {
+          "description": "The algorithm to be used for creating the key. Supports \"RS256\", \"ES521\" and \"HS256\"",
+          "type": "string",
+          "x-go-name": "Algorithm"
+        },
+        "kid": {
+          "description": "The kid of the key to be created",
+          "type": "string",
+          "x-go-name": "KeyID"
         }
       },
-      "x-go-package": "github.com/ory/hydra/warden/group"
+      "x-go-name": "createRequest",
+      "x-go-package": "github.com/ory/hydra/jwk"
     },
     "oAuth2Client": {
       "type": "object",
@@ -2299,6 +2244,74 @@
       },
       "x-go-name": "Client",
       "x-go-package": "github.com/ory/hydra/client"
+    },
+    "oAuth2TokenIntrospection": {
+      "type": "object",
+      "properties": {
+        "active": {
+          "description": "Active is a boolean indicator of whether or not the presented token\nis currently active.  The specifics of a token's \"active\" state\nwill vary depending on the implementation of the authorization\nserver and the information it keeps about its tokens, but a \"true\"\nvalue return for the \"active\" property will generally indicate\nthat a given token has been issued by this authorization server,\nhas not been revoked by the resource owner, and is within its\ngiven time window of validity (e.g., after its issuance time and\nbefore its expiration time).",
+          "type": "boolean",
+          "x-go-name": "Active"
+        },
+        "aud": {
+          "description": "Audience is a service-specific string identifier or list of string\nidentifiers representing the intended audience for this token.",
+          "type": "string",
+          "x-go-name": "Audience"
+        },
+        "client_id": {
+          "description": "ClientID is aclient identifier for the OAuth 2.0 client that\nrequested this token.",
+          "type": "string",
+          "x-go-name": "ClientID"
+        },
+        "exp": {
+          "description": "Expires at is an integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token will expire.",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "ExpiresAt"
+        },
+        "ext": {
+          "description": "Extra is arbitrary data set by the session.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "x-go-name": "Extra"
+        },
+        "iat": {
+          "description": "Issued at is an integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token was\noriginally issued.",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "IssuedAt"
+        },
+        "iss": {
+          "description": "Issuer is a string representing the issuer of this token",
+          "type": "string",
+          "x-go-name": "Issuer"
+        },
+        "nbf": {
+          "description": "NotBefore is an integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token is not to be\nused before.",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "NotBefore"
+        },
+        "scope": {
+          "description": "Scope is a JSON string containing a space-separated list of\nscopes associated with this token.",
+          "type": "string",
+          "x-go-name": "Scope"
+        },
+        "sub": {
+          "description": "Subject of the token, as defined in JWT [RFC7519].\nUsually a machine-readable identifier of the resource owner who\nauthorized this token.",
+          "type": "string",
+          "x-go-name": "Subject"
+        },
+        "username": {
+          "description": "Username is a human-readable identifier for the resource owner who\nauthorized this token.",
+          "type": "string",
+          "x-go-name": "Username"
+        }
+      },
+      "x-go-name": "swaggerOAuthIntrospectionResponsePayload",
+      "x-go-package": "github.com/ory/hydra/oauth2"
     },
     "oAuth2consentRequest": {
       "type": "object",
@@ -2402,19 +2415,6 @@
       "x-go-name": "swaggerPolicy",
       "x-go-package": "github.com/ory/hydra/policy"
     },
-    "rejectConsentRequestPayload": {
-      "type": "object",
-      "title": "RejectConsentRequestPayload represents data that will be used to reject a consent request.",
-      "properties": {
-        "reason": {
-          "description": "Reason represents the reason why the user rejected the consent request.",
-          "type": "string",
-          "x-go-name": "Reason"
-        }
-      },
-      "x-go-name": "RejectConsentRequestPayload",
-      "x-go-package": "github.com/ory/hydra/oauth2"
-    },
     "swaggerAcceptConsentRequest": {
       "type": "object",
       "required": [
@@ -2423,7 +2423,7 @@
       ],
       "properties": {
         "Body": {
-          "$ref": "#/definitions/acceptConsentRequestPayload"
+          "$ref": "#/definitions/consentRequestAcceptance"
         },
         "id": {
           "description": "in: path",
@@ -2498,7 +2498,7 @@
       ],
       "properties": {
         "Body": {
-          "$ref": "#/definitions/createJsonWebKeySetPayload"
+          "$ref": "#/definitions/jsonWebKeySetGeneratorRequest"
         },
         "set": {
           "description": "The set\nin: path",
@@ -2643,7 +2643,7 @@
       "type": "object",
       "properties": {
         "Body": {
-          "$ref": "#/definitions/introspectOAuth2TokenResponsePayload"
+          "$ref": "#/definitions/oAuth2TokenIntrospection"
         }
       },
       "x-go-package": "github.com/ory/hydra/oauth2"
@@ -2702,7 +2702,7 @@
       ],
       "properties": {
         "Body": {
-          "$ref": "#/definitions/rejectConsentRequestPayload"
+          "$ref": "#/definitions/consentRequestRejection"
         },
         "id": {
           "description": "in: path",
@@ -2987,7 +2987,7 @@
       "schema": {
         "type": "array",
         "items": {
-          "type": "string"
+          "$ref": "#/definitions/group"
         }
       }
     },
@@ -3052,7 +3052,7 @@
     "introspectOAuth2TokenResponse": {
       "description": "The token introspection response",
       "schema": {
-        "$ref": "#/definitions/introspectOAuth2TokenResponsePayload"
+        "$ref": "#/definitions/oAuth2TokenIntrospection"
       }
     },
     "oAuth2ClientList": {

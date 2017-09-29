@@ -24,7 +24,7 @@ func TestConsentSDK(t *testing.T) {
 		RequestedScopes:  []string{"foo", "bar"},
 		GrantedScopes:    []string{"baz", "bar"},
 		CSRF:             "some-csrf",
-		ExpiresAt:        time.Now().Round(time.Second),
+		ExpiresAt:        time.Now().Round(time.Minute),
 		Consent:          ConsentRequestAccepted,
 		DenyReason:       "some reason",
 		AccessTokenExtra: map[string]interface{}{"atfoo": "bar", "atbaz": "bar"},
@@ -59,7 +59,7 @@ func TestConsentSDK(t *testing.T) {
 	assert.EqualValues(t, req.RequestedScopes, got.RequestedScopes)
 	assert.EqualValues(t, req.RedirectURL, got.RedirectUrl)
 
-	accept := hydra.AcceptConsentRequestPayload{
+	accept := hydra.ConsentRequestAcceptance{
 		Subject:          "some-subject",
 		GrantScopes:      []string{"scope1", "scope2"},
 		AccessTokenExtra: map[string]interface{}{"at": "bar"},
@@ -78,7 +78,7 @@ func TestConsentSDK(t *testing.T) {
 	assert.Equal(t, accept.IdTokenExtra, gotMem.IDTokenExtra)
 	assert.True(t, gotMem.IsConsentGranted())
 
-	response, err = client.RejectOAuth2ConsentRequest(req.ID, hydra.RejectConsentRequestPayload{Reason: "MyReason"})
+	response, err = client.RejectOAuth2ConsentRequest(req.ID, hydra.ConsentRequestRejection{Reason: "MyReason"})
 	require.NoError(t, err)
 	assert.EqualValues(t, http.StatusNoContent, response.StatusCode)
 

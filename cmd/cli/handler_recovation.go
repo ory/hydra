@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"crypto/tls"
+
 	"github.com/ory/hydra/config"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/spf13/cobra"
@@ -24,7 +26,14 @@ func (h *RevocationHandler) RevokeToken(cmd *cobra.Command, args []string) {
 	}
 
 	handler := hydra.NewOAuth2ApiWithBasePath(h.Config.ClusterURL)
-	handler.Configuration.Transport = h.Config.OAuth2Client(cmd).Transport
+	handler.Configuration.Username = h.Config.ClientID
+	handler.Configuration.Password = h.Config.ClientSecret
+
+	if skip, _ := cmd.Flags().GetBool("skip-tls-verify"); skip {
+		handler.Configuration.Transport = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	}
 
 	if term, _ := cmd.Flags().GetBool("fake-tls-termination"); term {
 		handler.Configuration.DefaultHeader["X-Forwarded-Proto"] = "https"

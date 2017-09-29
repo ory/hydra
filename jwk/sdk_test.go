@@ -52,7 +52,7 @@ func TestJWKSDK(t *testing.T) {
 	t.Run("JSON Web Key", func(t *testing.T) {
 		t.Run("CreateJwkSetKey", func(t *testing.T) {
 			// Create a key called set-foo
-			resultKeys, _, err := client.CreateJsonWebKeySet("set-foo", hydra.CreateJsonWebKeySetPayload{
+			resultKeys, _, err := client.CreateJsonWebKeySet("set-foo", hydra.JsonWebKeySetGeneratorRequest{
 				Alg: "HS256",
 				Kid: "key-bar",
 			})
@@ -94,7 +94,7 @@ func TestJWKSDK(t *testing.T) {
 
 	t.Run("JWK Set", func(t *testing.T) {
 		t.Run("CreateJwkSetKey", func(t *testing.T) {
-			resultKeys, _, err := client.CreateJsonWebKeySet("set-foo2", hydra.CreateJsonWebKeySetPayload{
+			resultKeys, _, err := client.CreateJsonWebKeySet("set-foo2", hydra.JsonWebKeySetGeneratorRequest{
 				Alg: "HS256",
 				Kid: "key-bar",
 			})

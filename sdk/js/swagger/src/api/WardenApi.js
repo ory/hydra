@@ -1,6 +1,6 @@
 /**
  * Hydra OAuth2 & OpenID Connect Server
- * Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/   Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure. Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to. Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.   The official repository is located at https://github.com/ory/hydra   ### ATTENTION - IMPORTANT NOTE   The swagger generator used to create this documentation does currently not support example responses. To see request and response payloads click on **\"Show JSON schema\"**: ![Enable JSON Schema on Apiary](https://storage.googleapis.com/ory.am/hydra/json-schema.png)
+ * Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/   Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure. Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to. Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.   The official repository is located at https://github.com/ory/hydra   ### Important REST API Documentation Notes  The swagger generator used to create this documentation does currently not support example responses. To see request and response payloads click on **\"Show JSON schema\"**: ![Enable JSON Schema on Apiary](https://storage.googleapis.com/ory.am/hydra/json-schema.png)   The API documentation always refers to the latest tagged version of ORY Hydra. For previous API documentations, please refer to https://github.com/ory/hydra/blob/<tag-id>/docs/api.swagger.yaml - for example:  0.9.13: https://github.com/ory/hydra/blob/v0.9.13/docs/api.swagger.yaml 0.8.1: https://github.com/ory/hydra/blob/v0.8.1/docs/api.swagger.yaml
  *
  * OpenAPI spec version: Latest
  * Contact: hi@ory.am
@@ -17,18 +17,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/Group', 'model/InlineResponse401', 'model/MembersRequest', 'model/WardenAccessRequest', 'model/WardenAccessRequestResponse', 'model/WardenTokenAccessRequest', 'model/WardenTokenAccessRequestResponsePayload'], factory);
+    define(['ApiClient', 'model/Group', 'model/GroupMembers', 'model/InlineResponse401', 'model/WardenAccessRequest', 'model/WardenAccessRequestResponse', 'model/WardenTokenAccessRequest', 'model/WardenTokenAccessRequestResponsePayload'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/Group'), require('../model/InlineResponse401'), require('../model/MembersRequest'), require('../model/WardenAccessRequest'), require('../model/WardenAccessRequestResponse'), require('../model/WardenTokenAccessRequest'), require('../model/WardenTokenAccessRequestResponsePayload'));
+    module.exports = factory(require('../ApiClient'), require('../model/Group'), require('../model/GroupMembers'), require('../model/InlineResponse401'), require('../model/WardenAccessRequest'), require('../model/WardenAccessRequestResponse'), require('../model/WardenTokenAccessRequest'), require('../model/WardenTokenAccessRequestResponsePayload'));
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
       root.HydraOAuth2OpenIdConnectServer = {};
     }
-    root.HydraOAuth2OpenIdConnectServer.WardenApi = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient, root.HydraOAuth2OpenIdConnectServer.Group, root.HydraOAuth2OpenIdConnectServer.InlineResponse401, root.HydraOAuth2OpenIdConnectServer.MembersRequest, root.HydraOAuth2OpenIdConnectServer.WardenAccessRequest, root.HydraOAuth2OpenIdConnectServer.WardenAccessRequestResponse, root.HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequest, root.HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponsePayload);
+    root.HydraOAuth2OpenIdConnectServer.WardenApi = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient, root.HydraOAuth2OpenIdConnectServer.Group, root.HydraOAuth2OpenIdConnectServer.GroupMembers, root.HydraOAuth2OpenIdConnectServer.InlineResponse401, root.HydraOAuth2OpenIdConnectServer.WardenAccessRequest, root.HydraOAuth2OpenIdConnectServer.WardenAccessRequestResponse, root.HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequest, root.HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponsePayload);
   }
-}(this, function(ApiClient, Group, InlineResponse401, MembersRequest, WardenAccessRequest, WardenAccessRequestResponse, WardenTokenAccessRequest, WardenTokenAccessRequestResponsePayload) {
+}(this, function(ApiClient, Group, GroupMembers, InlineResponse401, WardenAccessRequest, WardenAccessRequestResponse, WardenTokenAccessRequest, WardenTokenAccessRequestResponsePayload) {
   'use strict';
 
   /**
@@ -59,9 +59,9 @@
     /**
      * Add members to a group
      * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:groups:&lt;id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;members.add\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
-     * @param {Number} id The id of the group to modify.
+     * @param {String} id The id of the group to modify.
      * @param {Object} opts Optional parameters
-     * @param {module:model/MembersRequest} opts.body 
+     * @param {module:model/GroupMembers} opts.body 
      * @param {module:api/WardenApi~addMembersToGroupCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.addMembersToGroup = function(id, opts, callback) {
@@ -107,11 +107,14 @@
     /**
      * Create a group
      * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:groups\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * @param {Object} opts Optional parameters
+     * @param {module:model/Group} opts.body 
      * @param {module:api/WardenApi~createGroupCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/Group}
      */
-    this.createGroup = function(callback) {
-      var postBody = null;
+    this.createGroup = function(opts, callback) {
+      opts = opts || {};
+      var postBody = opts['body'];
 
 
       var pathParams = {
@@ -146,7 +149,7 @@
     /**
      * Delete a group by id
      * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:groups:&lt;id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;delete\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
-     * @param {Number} id The id of the group to look up.
+     * @param {String} id The id of the group to look up.
      * @param {module:api/WardenApi~deleteGroupCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.deleteGroup = function(id, callback) {
@@ -268,27 +271,30 @@
      * Callback function to receive the result of the findGroupsByMember operation.
      * @callback module:api/WardenApi~findGroupsByMemberCallback
      * @param {String} error Error message, if any.
-     * @param {Array.<'String'>} data The data returned by the service call.
+     * @param {Array.<module:model/Group>} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
     /**
-     * Find group IDs by member
-     * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:groups:&lt;member&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
-     * @param {Object} opts Optional parameters
-     * @param {Number} opts.member The id of the member to look up.
+     * Find groups by member
+     * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:groups\&quot;], \&quot;actions\&quot;: [\&quot;list\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * @param {String} member The id of the member to look up.
      * @param {module:api/WardenApi~findGroupsByMemberCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link Array.<'String'>}
+     * data is of type: {@link Array.<module:model/Group>}
      */
-    this.findGroupsByMember = function(opts, callback) {
-      opts = opts || {};
+    this.findGroupsByMember = function(member, callback) {
       var postBody = null;
+
+      // verify the required parameter 'member' is set
+      if (member === undefined || member === null) {
+        throw new Error("Missing the required parameter 'member' when calling findGroupsByMember");
+      }
 
 
       var pathParams = {
       };
       var queryParams = {
-        'member': opts['member']
+        'member': member
       };
       var headerParams = {
       };
@@ -298,7 +304,7 @@
       var authNames = ['oauth2'];
       var contentTypes = ['application/json'];
       var accepts = ['application/json'];
-      var returnType = ['String'];
+      var returnType = [Group];
 
       return this.apiClient.callApi(
         '/warden/groups', 'GET',
@@ -318,7 +324,7 @@
     /**
      * Get a group by id
      * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:groups:&lt;id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
-     * @param {Number} id The id of the group to look up.
+     * @param {String} id The id of the group to look up.
      * @param {module:api/WardenApi~getGroupCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/Group}
      */
@@ -364,9 +370,9 @@
     /**
      * Remove members from a group
      * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:groups:&lt;id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;members.remove\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
-     * @param {Number} id The id of the group to modify.
+     * @param {String} id The id of the group to modify.
      * @param {Object} opts Optional parameters
-     * @param {module:model/MembersRequest} opts.body 
+     * @param {module:model/GroupMembers} opts.body 
      * @param {module:api/WardenApi~removeMembersFromGroupCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.removeMembersFromGroup = function(id, opts, callback) {

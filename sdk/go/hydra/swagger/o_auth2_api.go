@@ -1,7 +1,7 @@
 /*
  * Hydra OAuth2 & OpenID Connect Server
  *
- * Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/   Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure. Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to. Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.   The official repository is located at https://github.com/ory/hydra   ### ATTENTION - IMPORTANT NOTE   The swagger generator used to create this documentation does currently not support example responses. To see request and response payloads click on **\"Show JSON schema\"**: ![Enable JSON Schema on Apiary](https://storage.googleapis.com/ory.am/hydra/json-schema.png)
+ * Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/   Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure. Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to. Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.   The official repository is located at https://github.com/ory/hydra   ### Important REST API Documentation Notes  The swagger generator used to create this documentation does currently not support example responses. To see request and response payloads click on **\"Show JSON schema\"**: ![Enable JSON Schema on Apiary](https://storage.googleapis.com/ory.am/hydra/json-schema.png)   The API documentation always refers to the latest tagged version of ORY Hydra. For previous API documentations, please refer to https://github.com/ory/hydra/blob/<tag-id>/docs/api.swagger.yaml - for example:  0.9.13: https://github.com/ory/hydra/blob/v0.9.13/docs/api.swagger.yaml 0.8.1: https://github.com/ory/hydra/blob/v0.8.1/docs/api.swagger.yaml
  *
  * OpenAPI spec version: Latest
  * Contact: hi@ory.am
@@ -45,7 +45,7 @@ func NewOAuth2ApiWithBasePath(basePath string) *OAuth2Api {
  * @param body
  * @return void
  */
-func (a OAuth2Api) AcceptOAuth2ConsentRequest(id string, body AcceptConsentRequestPayload) (*APIResponse, error) {
+func (a OAuth2Api) AcceptOAuth2ConsentRequest(id string, body ConsentRequestAcceptance) (*APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Patch")
 	// create path and map variables
@@ -432,9 +432,9 @@ func (a OAuth2Api) GetWellKnown() (*WellKnown, *APIResponse, error) {
  *
  * @param token The string value of the token. For access tokens, this is the \&quot;access_token\&quot; value returned from the token endpoint defined in OAuth 2.0 [RFC6749], Section 5.1. This endpoint DOES NOT accept refresh tokens for validation.
  * @param scope An optional, space separated list of required scopes. If the access token was not granted one of the scopes, the result of active will be false.
- * @return *IntrospectOAuth2TokenResponsePayload
+ * @return *OAuth2TokenIntrospection
  */
-func (a OAuth2Api) IntrospectOAuth2Token(token string, scope string) (*IntrospectOAuth2TokenResponsePayload, *APIResponse, error) {
+func (a OAuth2Api) IntrospectOAuth2Token(token string, scope string) (*OAuth2TokenIntrospection, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Post")
 	// create path and map variables
@@ -481,7 +481,7 @@ func (a OAuth2Api) IntrospectOAuth2Token(token string, scope string) (*Introspec
 	}
 	localVarFormParams["token"] = a.Configuration.APIClient.ParameterToString(token, "")
 	localVarFormParams["scope"] = a.Configuration.APIClient.ParameterToString(scope, "")
-	var successPayload = new(IntrospectOAuth2TokenResponsePayload)
+	var successPayload = new(OAuth2TokenIntrospection)
 	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 
 	var localVarURL, _ = url.Parse(localVarPath)
@@ -697,7 +697,7 @@ func (a OAuth2Api) OauthToken() (*InlineResponse2001, *APIResponse, error) {
  * @param body
  * @return void
  */
-func (a OAuth2Api) RejectOAuth2ConsentRequest(id string, body RejectConsentRequestPayload) (*APIResponse, error) {
+func (a OAuth2Api) RejectOAuth2ConsentRequest(id string, body ConsentRequestRejection) (*APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Patch")
 	// create path and map variables

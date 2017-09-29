@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.CreateJsonWebKeySetPayload
+# HydraOAuth2OpenIdConnectServer.JsonWebKeySetGeneratorRequest
 
 ## Properties
 Name | Type | Description | Notes

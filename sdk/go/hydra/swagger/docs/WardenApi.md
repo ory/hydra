@@ -9,7 +9,7 @@ Method | HTTP request | Description
 [**DeleteGroup**](WardenApi.md#DeleteGroup) | **Delete** /warden/groups/{id} | Delete a group by id
 [**DoesWardenAllowAccessRequest**](WardenApi.md#DoesWardenAllowAccessRequest) | **Post** /warden/allowed | Check if an access request is valid (without providing an access token)
 [**DoesWardenAllowTokenAccessRequest**](WardenApi.md#DoesWardenAllowTokenAccessRequest) | **Post** /warden/token/allowed | Check if an access request is valid (providing an access token)
-[**FindGroupsByMember**](WardenApi.md#FindGroupsByMember) | **Get** /warden/groups | Find group IDs by member
+[**FindGroupsByMember**](WardenApi.md#FindGroupsByMember) | **Get** /warden/groups | Find groups by member
 [**GetGroup**](WardenApi.md#GetGroup) | **Get** /warden/groups/{id} | Get a group by id
 [**RemoveMembersFromGroup**](WardenApi.md#RemoveMembersFromGroup) | **Delete** /warden/groups/{id}/members | Remove members from a group
 
@@ -26,8 +26,8 @@ The subject making the request needs to be assigned to a policy containing:  ```
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **int64**| The id of the group to modify. | 
- **body** | [**MembersRequest**](MembersRequest.md)|  | [optional] 
+ **id** | **string**| The id of the group to modify. | 
+ **body** | [**GroupMembers**](GroupMembers.md)|  | [optional] 
 
 ### Return type
 
@@ -45,7 +45,7 @@ void (empty response body)
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **CreateGroup**
-> Group CreateGroup()
+> Group CreateGroup($body)
 
 Create a group
 
@@ -53,7 +53,10 @@ The subject making the request needs to be assigned to a policy containing:  ```
 
 
 ### Parameters
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**Group**](Group.md)|  | [optional] 
 
 ### Return type
 
@@ -82,7 +85,7 @@ The subject making the request needs to be assigned to a policy containing:  ```
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **int64**| The id of the group to look up. | 
+ **id** | **string**| The id of the group to look up. | 
 
 ### Return type
 
@@ -158,22 +161,22 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **FindGroupsByMember**
-> []string FindGroupsByMember($member)
+> []Group FindGroupsByMember($member)
 
-Find group IDs by member
+Find groups by member
 
-The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:warden:groups:<member>\"], \"actions\": [\"get\"], \"effect\": \"allow\" } ```
+The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:warden:groups\"], \"actions\": [\"list\"], \"effect\": \"allow\" } ```
 
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **member** | **int64**| The id of the member to look up. | [optional] 
+ **member** | **string**| The id of the member to look up. | 
 
 ### Return type
 
-**[]string**
+[**[]Group**](group.md)
 
 ### Authorization
 
@@ -198,7 +201,7 @@ The subject making the request needs to be assigned to a policy containing:  ```
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **int64**| The id of the group to look up. | 
+ **id** | **string**| The id of the group to look up. | 
 
 ### Return type
 
@@ -227,8 +230,8 @@ The subject making the request needs to be assigned to a policy containing:  ```
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **int64**| The id of the group to modify. | 
- **body** | [**MembersRequest**](MembersRequest.md)|  | [optional] 
+ **id** | **string**| The id of the group to modify. | 
+ **body** | [**GroupMembers**](GroupMembers.md)|  | [optional] 
 
 ### Return type
 

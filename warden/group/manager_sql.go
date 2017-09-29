@@ -1,7 +1,10 @@
 package group
 
 import (
+	"database/sql"
+
 	"github.com/jmoiron/sqlx"
+	"github.com/ory/hydra/pkg"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
@@ -31,9 +34,9 @@ type SQLManager struct {
 	DB *sqlx.DB
 }
 
-func (s *SQLManager) CreateSchemas() (int, error) {
+func (m *SQLManager) CreateSchemas() (int, error) {
 	migrate.SetTable("hydra_groups_migration")
-	n, err := migrate.Exec(s.DB.DB, s.DB.DriverName(), migrations, migrate.Up)
+	n, err := migrate.Exec(m.DB.DB, m.DB.DriverName(), migrations, migrate.Up)
 	if err != nil {
 		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
 	}
@@ -59,7 +62,9 @@ func (m *SQLManager) GetGroup(id string) (*Group, error) {
 	}
 
 	var q []string
-	if err := m.DB.Select(&q, m.DB.Rebind("SELECT member from hydra_warden_group_member WHERE group_id = ?"), found); err != nil {
+	if err := m.DB.Select(&q, m.DB.Rebind("SELECT member from hydra_warden_group_member WHERE group_id = ?"), found); err == sql.ErrNoRows {
+		return nil, errors.WithStack(pkg.ErrNotFound)
+	} else if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
@@ -123,11 +128,23 @@ func (m *SQLManager) RemoveGroupMembers(group string, subjects []string) error {
 	return nil
 }
 
-func (m *SQLManager) FindGroupNames(subject string) ([]string, error) {
-	var q []string
-	if err := m.DB.Select(&q, m.DB.Rebind("SELECT group_id from hydra_warden_group_member WHERE member = ? GROUP BY group_id"), subject); err != nil {
+func (m *SQLManager) FindGroupsByMember(subject string) ([]Group, error) {
+	var ids []string
+	if err := m.DB.Select(&ids, m.DB.Rebind("SELECT group_id from hydra_warden_group_member WHERE member = ? GROUP BY group_id"), subject); err == sql.ErrNoRows {
+		return nil, errors.WithStack(pkg.ErrNotFound)
+	} else if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	return q, nil
+	var groups = make([]Group, len(ids))
+	for k, id := range ids {
+		group, err := m.GetGroup(id)
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+
+		groups[k] = *group
+	}
+
+	return groups, nil
 }

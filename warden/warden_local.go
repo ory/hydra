@@ -91,7 +91,7 @@ func (w *LocalWarden) TokenAllowed(ctx context.Context, token string, a *firewal
 }
 
 func (w *LocalWarden) isAllowed(ctx context.Context, a *ladon.Request) error {
-	groups, err := w.Groups.FindGroupNames(a.Subject)
+	groups, err := w.Groups.FindGroupsByMember(a.Subject)
 	if err != nil {
 		return err
 	}
@@ -108,7 +108,7 @@ func (w *LocalWarden) isAllowed(ctx context.Context, a *ladon.Request) error {
 		errs[k+1] = w.Warden.IsAllowed(&ladon.Request{
 			Resource: a.Resource,
 			Action:   a.Action,
-			Subject:  g,
+			Subject:  g.ID,
 			Context:  a.Context,
 		})
 	}

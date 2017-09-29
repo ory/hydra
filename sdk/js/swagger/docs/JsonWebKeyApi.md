@@ -35,7 +35,7 @@ var apiInstance = new HydraOAuth2OpenIdConnectServer.JsonWebKeyApi();
 var set = "set_example"; // String | The set
 
 var opts = { 
-  'body': new HydraOAuth2OpenIdConnectServer.CreateJsonWebKeySetPayload() // CreateJsonWebKeySetPayload | 
+  'body': new HydraOAuth2OpenIdConnectServer.JsonWebKeySetGeneratorRequest() // JsonWebKeySetGeneratorRequest | 
 };
 
 var callback = function(error, data, response) {
@@ -53,7 +53,7 @@ apiInstance.createJsonWebKeySet(set, opts, callback);
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **set** | **String**| The set | 
- **body** | [**CreateJsonWebKeySetPayload**](CreateJsonWebKeySetPayload.md)|  | [optional] 
+ **body** | [**JsonWebKeySetGeneratorRequest**](JsonWebKeySetGeneratorRequest.md)|  | [optional] 
 
 ### Return type
 

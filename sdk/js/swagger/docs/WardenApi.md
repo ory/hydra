@@ -9,7 +9,7 @@ Method | HTTP request | Description
 [**deleteGroup**](WardenApi.md#deleteGroup) | **DELETE** /warden/groups/{id} | Delete a group by id
 [**doesWardenAllowAccessRequest**](WardenApi.md#doesWardenAllowAccessRequest) | **POST** /warden/allowed | Check if an access request is valid (without providing an access token)
 [**doesWardenAllowTokenAccessRequest**](WardenApi.md#doesWardenAllowTokenAccessRequest) | **POST** /warden/token/allowed | Check if an access request is valid (providing an access token)
-[**findGroupsByMember**](WardenApi.md#findGroupsByMember) | **GET** /warden/groups | Find group IDs by member
+[**findGroupsByMember**](WardenApi.md#findGroupsByMember) | **GET** /warden/groups | Find groups by member
 [**getGroup**](WardenApi.md#getGroup) | **GET** /warden/groups/{id} | Get a group by id
 [**removeMembersFromGroup**](WardenApi.md#removeMembersFromGroup) | **DELETE** /warden/groups/{id}/members | Remove members from a group
 
@@ -33,10 +33,10 @@ oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
 var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
 
-var id = 789; // Number | The id of the group to modify.
+var id = "id_example"; // String | The id of the group to modify.
 
 var opts = { 
-  'body': new HydraOAuth2OpenIdConnectServer.MembersRequest() // MembersRequest | 
+  'body': new HydraOAuth2OpenIdConnectServer.GroupMembers() // GroupMembers | 
 };
 
 var callback = function(error, data, response) {
@@ -53,8 +53,8 @@ apiInstance.addMembersToGroup(id, opts, callback);
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **Number**| The id of the group to modify. | 
- **body** | [**MembersRequest**](MembersRequest.md)|  | [optional] 
+ **id** | **String**| The id of the group to modify. | 
+ **body** | [**GroupMembers**](GroupMembers.md)|  | [optional] 
 
 ### Return type
 
@@ -71,7 +71,7 @@ null (empty response body)
 
 <a name="createGroup"></a>
 # **createGroup**
-> Group createGroup()
+> Group createGroup(opts)
 
 Create a group
 
@@ -88,6 +88,10 @@ oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
 var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
 
+var opts = { 
+  'body': new HydraOAuth2OpenIdConnectServer.Group() // Group | 
+};
+
 var callback = function(error, data, response) {
   if (error) {
     console.error(error);
@@ -95,11 +99,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-apiInstance.createGroup(callback);
+apiInstance.createGroup(opts, callback);
 ```
 
 ### Parameters
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**Group**](Group.md)|  | [optional] 
 
 ### Return type
 
@@ -133,7 +140,7 @@ oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
 var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
 
-var id = 789; // Number | The id of the group to look up.
+var id = "id_example"; // String | The id of the group to look up.
 
 
 var callback = function(error, data, response) {
@@ -150,7 +157,7 @@ apiInstance.deleteGroup(id, callback);
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **Number**| The id of the group to look up. | 
+ **id** | **String**| The id of the group to look up. | 
 
 ### Return type
 
@@ -271,11 +278,11 @@ Name | Type | Description  | Notes
 
 <a name="findGroupsByMember"></a>
 # **findGroupsByMember**
-> [&#39;String&#39;] findGroupsByMember(opts)
+> [Group] findGroupsByMember(member)
 
-Find group IDs by member
+Find groups by member
 
-The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:groups:&lt;member&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:groups\&quot;], \&quot;actions\&quot;: [\&quot;list\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
 
 ### Example
 ```javascript
@@ -288,9 +295,8 @@ oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
 var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
 
-var opts = { 
-  'member': 789 // Number | The id of the member to look up.
-};
+var member = "member_example"; // String | The id of the member to look up.
+
 
 var callback = function(error, data, response) {
   if (error) {
@@ -299,18 +305,18 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-apiInstance.findGroupsByMember(opts, callback);
+apiInstance.findGroupsByMember(member, callback);
 ```
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **member** | **Number**| The id of the member to look up. | [optional] 
+ **member** | **String**| The id of the member to look up. | 
 
 ### Return type
 
-**[&#39;String&#39;]**
+[**[Group]**](Group.md)
 
 ### Authorization
 
@@ -340,7 +346,7 @@ oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
 var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
 
-var id = 789; // Number | The id of the group to look up.
+var id = "id_example"; // String | The id of the group to look up.
 
 
 var callback = function(error, data, response) {
@@ -357,7 +363,7 @@ apiInstance.getGroup(id, callback);
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **Number**| The id of the group to look up. | 
+ **id** | **String**| The id of the group to look up. | 
 
 ### Return type
 
@@ -391,10 +397,10 @@ oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
 var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
 
-var id = 789; // Number | The id of the group to modify.
+var id = "id_example"; // String | The id of the group to modify.
 
 var opts = { 
-  'body': new HydraOAuth2OpenIdConnectServer.MembersRequest() // MembersRequest | 
+  'body': new HydraOAuth2OpenIdConnectServer.GroupMembers() // GroupMembers | 
 };
 
 var callback = function(error, data, response) {
@@ -411,8 +417,8 @@ apiInstance.removeMembersFromGroup(id, opts, callback);
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **Number**| The id of the group to modify. | 
- **body** | [**MembersRequest**](MembersRequest.md)|  | [optional] 
+ **id** | **String**| The id of the group to modify. | 
+ **body** | [**GroupMembers**](GroupMembers.md)|  | [optional] 
 
 ### Return type
 

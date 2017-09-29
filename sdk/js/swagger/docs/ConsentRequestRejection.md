@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.RejectConsentRequestPayload
+# HydraOAuth2OpenIdConnectServer.ConsentRequestRejection
 
 ## Properties
 Name | Type | Description | Notes

@@ -1,4 +1,4 @@
-# IntrospectOAuth2TokenResponsePayload
+# OAuth2TokenIntrospection
 
 ## Properties
 Name | Type | Description | Notes

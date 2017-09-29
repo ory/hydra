@@ -44,7 +44,7 @@ Class | Method | HTTP request | Description
 *OAuth2Api* | [**RejectOAuth2ConsentRequest**](docs/OAuth2Api.md#rejectoauth2consentrequest) | **Patch** /oauth2/consent/requests/{id}/reject | Reject a consent request
 *OAuth2Api* | [**RevokeOAuth2Token**](docs/OAuth2Api.md#revokeoauth2token) | **Post** /oauth2/revoke | Revoke OAuth2 tokens
 *OAuth2Api* | [**UpdateOAuth2Client**](docs/OAuth2Api.md#updateoauth2client) | **Put** /clients/{id} | Update an OAuth 2.0 Client
-*Oauth2Api* | [**WellKnown**](docs/Oauth2Api.md#wellknown) | **Get** /.well-known/jwks.json | Get list of well known JSON Web Keys
+*OAuth2Api* | [**WellKnown**](docs/OAuth2Api.md#wellknown) | **Get** /.well-known/jwks.json | Get list of well known JSON Web Keys
 *PolicyApi* | [**CreatePolicy**](docs/PolicyApi.md#createpolicy) | **Post** /policies | Create an Access Control Policy
 *PolicyApi* | [**DeletePolicy**](docs/PolicyApi.md#deletepolicy) | **Delete** /policies/{id} | Delete an Access Control Policy
 *PolicyApi* | [**GetPolicy**](docs/PolicyApi.md#getpolicy) | **Get** /policies/{id} | Get an Access Control Policy

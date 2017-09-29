@@ -29,7 +29,7 @@ func TestAuthCode(t *testing.T) {
 		assert.Equal(t, r.URL.Query().Get("consent"), cr.Id)
 		assert.True(t, strings.Contains(cr.RedirectUrl, "oauth2/auth?client_id=app-client"))
 
-		response, err = consentClient.AcceptOAuth2ConsentRequest(r.URL.Query().Get("consent"), hydra.AcceptConsentRequestPayload{
+		response, err = consentClient.AcceptOAuth2ConsentRequest(r.URL.Query().Get("consent"), hydra.ConsentRequestAcceptance{
 			Subject:     "foo",
 			GrantScopes: []string{"hydra.*", "offline"},
 		})

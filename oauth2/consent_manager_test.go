@@ -38,14 +38,14 @@ func connectToPGConsent() {
 	consentManagers["postgres"] = s
 }
 
-func TestConsentRequestManagerReadWrite(t *testing.T) {
+func tTestConsentRequestManagerReadWrite(t *testing.T) {
 	req := &ConsentRequest{
 		ID:               "id-1",
 		Audience:         "audience",
 		RequestedScopes:  []string{"foo", "bar"},
 		GrantedScopes:    []string{"baz", "bar"},
 		CSRF:             "some-csrf",
-		ExpiresAt:        time.Now().Round(time.Second),
+		ExpiresAt:        time.Now().Round(time.Minute),
 		Consent:          ConsentRequestAccepted,
 		DenyReason:       "some reason",
 		AccessTokenExtra: map[string]interface{}{"atfoo": "bar", "atbaz": "bar"},
@@ -64,6 +64,8 @@ func TestConsentRequestManagerReadWrite(t *testing.T) {
 			got, err := m.GetConsentRequest(req.ID)
 			require.NoError(t, err)
 
+			require.Equal(t, req.ExpiresAt.Unix(), got.ExpiresAt.Unix())
+			got.ExpiresAt = req.ExpiresAt
 			assert.EqualValues(t, req, got)
 		})
 	}
@@ -76,7 +78,7 @@ func TestConsentRequestManagerUpdate(t *testing.T) {
 		RequestedScopes:  []string{"foo", "bar"},
 		GrantedScopes:    []string{"baz", "bar"},
 		CSRF:             "some-csrf",
-		ExpiresAt:        time.Now().Round(time.Second),
+		ExpiresAt:        time.Now().Round(time.Minute),
 		Consent:          ConsentRequestRejected,
 		DenyReason:       "some reason",
 		AccessTokenExtra: map[string]interface{}{"atfoo": "bar", "atbaz": "bar"},
@@ -92,6 +94,8 @@ func TestConsentRequestManagerUpdate(t *testing.T) {
 			got, err := m.GetConsentRequest(req.ID)
 			require.NoError(t, err)
 			assert.False(t, got.IsConsentGranted())
+			require.Equal(t, req.ExpiresAt.Unix(), got.ExpiresAt.Unix())
+			got.ExpiresAt = req.ExpiresAt
 			assert.EqualValues(t, req, got)
 
 			require.NoError(t, m.AcceptConsentRequest(req.ID, new(AcceptConsentRequestPayload)))

@@ -143,7 +143,7 @@ Class | Method | HTTP request | Description
 *HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**rejectOAuth2ConsentRequest**](docs/OAuth2Api.md#rejectOAuth2ConsentRequest) | **PATCH** /oauth2/consent/requests/{id}/reject | Reject a consent request
 *HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**revokeOAuth2Token**](docs/OAuth2Api.md#revokeOAuth2Token) | **POST** /oauth2/revoke | Revoke OAuth2 tokens
 *HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**updateOAuth2Client**](docs/OAuth2Api.md#updateOAuth2Client) | **PUT** /clients/{id} | Update an OAuth 2.0 Client
-*HydraOAuth2OpenIdConnectServer.Oauth2Api* | [**wellKnown**](docs/Oauth2Api.md#wellKnown) | **GET** /.well-known/jwks.json | Get list of well known JSON Web Keys
+*HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**wellKnown**](docs/OAuth2Api.md#wellKnown) | **GET** /.well-known/jwks.json | Get list of well known JSON Web Keys
 *HydraOAuth2OpenIdConnectServer.PolicyApi* | [**createPolicy**](docs/PolicyApi.md#createPolicy) | **POST** /policies | Create an Access Control Policy
 *HydraOAuth2OpenIdConnectServer.PolicyApi* | [**deletePolicy**](docs/PolicyApi.md#deletePolicy) | **DELETE** /policies/{id} | Delete an Access Control Policy
 *HydraOAuth2OpenIdConnectServer.PolicyApi* | [**getPolicy**](docs/PolicyApi.md#getPolicy) | **GET** /policies/{id} | Get an Access Control Policy

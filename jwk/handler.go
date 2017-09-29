@@ -51,7 +51,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.DELETE("/keys/:set", h.DeleteKeySet)
 }
 
-// swagger:model createJsonWebKeySetPayload
+// swagger:model jsonWebKeySetGeneratorRequest
 type createRequest struct {
 	// The algorithm to be used for creating the key. Supports "RS256", "ES521" and "HS256"
 	// required: true
@@ -68,7 +68,7 @@ type joseWebKeySetRequest struct {
 	Keys []json.RawMessage `json:"keys"`
 }
 
-// swagger:route GET /.well-known/jwks.json oauth2 wellKnown
+// swagger:route GET /.well-known/jwks.json oAuth2 wellKnown
 //
 // Get list of well known JSON Web Keys
 //

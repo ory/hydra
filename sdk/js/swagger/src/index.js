@@ -1,6 +1,6 @@
 /**
  * Hydra OAuth2 & OpenID Connect Server
- * Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/   Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure. Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to. Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.   The official repository is located at https://github.com/ory/hydra   ### ATTENTION - IMPORTANT NOTE   The swagger generator used to create this documentation does currently not support example responses. To see request and response payloads click on **\"Show JSON schema\"**: ![Enable JSON Schema on Apiary](https://storage.googleapis.com/ory.am/hydra/json-schema.png)
+ * Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/   Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure. Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to. Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.   The official repository is located at https://github.com/ory/hydra   ### Important REST API Documentation Notes  The swagger generator used to create this documentation does currently not support example responses. To see request and response payloads click on **\"Show JSON schema\"**: ![Enable JSON Schema on Apiary](https://storage.googleapis.com/ory.am/hydra/json-schema.png)   The API documentation always refers to the latest tagged version of ORY Hydra. For previous API documentations, please refer to https://github.com/ory/hydra/blob/<tag-id>/docs/api.swagger.yaml - for example:  0.9.13: https://github.com/ory/hydra/blob/v0.9.13/docs/api.swagger.yaml 0.8.1: https://github.com/ory/hydra/blob/v0.8.1/docs/api.swagger.yaml
  *
  * OpenAPI spec version: Latest
  * Contact: hi@ory.am
@@ -17,16 +17,16 @@
 (function(factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/AcceptConsentRequestPayload', 'model/ConsentRequestManager', 'model/Context', 'model/CreateJsonWebKeySetPayload', 'model/Firewall', 'model/Group', 'model/Handler', 'model/InlineResponse200', 'model/InlineResponse2001', 'model/InlineResponse401', 'model/IntrospectOAuth2TokenResponsePayload', 'model/JoseWebKeySetRequest', 'model/JsonWebKey', 'model/JsonWebKeySet', 'model/KeyGenerator', 'model/Manager', 'model/MembersRequest', 'model/OAuth2Client', 'model/OAuth2consentRequest', 'model/Policy', 'model/PolicyConditions', 'model/RawMessage', 'model/RejectConsentRequestPayload', 'model/SwaggerAcceptConsentRequest', 'model/SwaggerCreatePolicyParameters', 'model/SwaggerDoesWardenAllowAccessRequestParameters', 'model/SwaggerDoesWardenAllowTokenAccessRequestParameters', 'model/SwaggerGetPolicyParameters', 'model/SwaggerJsonWebKeyQuery', 'model/SwaggerJwkCreateSet', 'model/SwaggerJwkSetQuery', 'model/SwaggerJwkUpdateSet', 'model/SwaggerJwkUpdateSetKey', 'model/SwaggerListPolicyParameters', 'model/SwaggerListPolicyResponse', 'model/SwaggerOAuthConsentRequest', 'model/SwaggerOAuthConsentRequestPayload', 'model/SwaggerOAuthIntrospectionRequest', 'model/SwaggerOAuthIntrospectionResponse', 'model/SwaggerOAuthTokenResponse', 'model/SwaggerOAuthTokenResponseBody', 'model/SwaggerRejectConsentRequest', 'model/SwaggerRevokeOAuth2TokenParameters', 'model/SwaggerUpdatePolicyParameters', 'model/SwaggerWardenAccessRequestResponseParameters', 'model/SwaggerWardenTokenAccessRequestResponse', 'model/TokenAllowedRequest', 'model/WardenAccessRequest', 'model/WardenAccessRequestResponse', 'model/WardenTokenAccessRequest', 'model/WardenTokenAccessRequestResponsePayload', 'model/WellKnown', 'model/Writer', 'api/GroupsApi', 'api/HealthApi', 'api/JsonWebKeyApi', 'api/OAuth2Api', 'api/Oauth2Api', 'api/PolicyApi', 'api/WardenApi'], factory);
+    define(['ApiClient', 'model/ConsentRequestAcceptance', 'model/ConsentRequestManager', 'model/ConsentRequestRejection', 'model/Context', 'model/Firewall', 'model/Group', 'model/GroupMembers', 'model/Handler', 'model/InlineResponse200', 'model/InlineResponse2001', 'model/InlineResponse401', 'model/JoseWebKeySetRequest', 'model/JsonWebKey', 'model/JsonWebKeySet', 'model/JsonWebKeySetGeneratorRequest', 'model/KeyGenerator', 'model/Manager', 'model/OAuth2Client', 'model/OAuth2TokenIntrospection', 'model/OAuth2consentRequest', 'model/Policy', 'model/PolicyConditions', 'model/RawMessage', 'model/SwaggerAcceptConsentRequest', 'model/SwaggerCreatePolicyParameters', 'model/SwaggerDoesWardenAllowAccessRequestParameters', 'model/SwaggerDoesWardenAllowTokenAccessRequestParameters', 'model/SwaggerGetPolicyParameters', 'model/SwaggerJsonWebKeyQuery', 'model/SwaggerJwkCreateSet', 'model/SwaggerJwkSetQuery', 'model/SwaggerJwkUpdateSet', 'model/SwaggerJwkUpdateSetKey', 'model/SwaggerListPolicyParameters', 'model/SwaggerListPolicyResponse', 'model/SwaggerOAuthConsentRequest', 'model/SwaggerOAuthConsentRequestPayload', 'model/SwaggerOAuthIntrospectionRequest', 'model/SwaggerOAuthIntrospectionResponse', 'model/SwaggerOAuthTokenResponse', 'model/SwaggerOAuthTokenResponseBody', 'model/SwaggerRejectConsentRequest', 'model/SwaggerRevokeOAuth2TokenParameters', 'model/SwaggerUpdatePolicyParameters', 'model/SwaggerWardenAccessRequestResponseParameters', 'model/SwaggerWardenTokenAccessRequestResponse', 'model/TokenAllowedRequest', 'model/WardenAccessRequest', 'model/WardenAccessRequestResponse', 'model/WardenTokenAccessRequest', 'model/WardenTokenAccessRequestResponsePayload', 'model/WellKnown', 'model/Writer', 'api/HealthApi', 'api/JsonWebKeyApi', 'api/OAuth2Api', 'api/Oauth2Api', 'api/PolicyApi', 'api/WardenApi'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('./ApiClient'), require('./model/AcceptConsentRequestPayload'), require('./model/ConsentRequestManager'), require('./model/Context'), require('./model/CreateJsonWebKeySetPayload'), require('./model/Firewall'), require('./model/Group'), require('./model/Handler'), require('./model/InlineResponse200'), require('./model/InlineResponse2001'), require('./model/InlineResponse401'), require('./model/IntrospectOAuth2TokenResponsePayload'), require('./model/JoseWebKeySetRequest'), require('./model/JsonWebKey'), require('./model/JsonWebKeySet'), require('./model/KeyGenerator'), require('./model/Manager'), require('./model/MembersRequest'), require('./model/OAuth2Client'), require('./model/OAuth2consentRequest'), require('./model/Policy'), require('./model/PolicyConditions'), require('./model/RawMessage'), require('./model/RejectConsentRequestPayload'), require('./model/SwaggerAcceptConsentRequest'), require('./model/SwaggerCreatePolicyParameters'), require('./model/SwaggerDoesWardenAllowAccessRequestParameters'), require('./model/SwaggerDoesWardenAllowTokenAccessRequestParameters'), require('./model/SwaggerGetPolicyParameters'), require('./model/SwaggerJsonWebKeyQuery'), require('./model/SwaggerJwkCreateSet'), require('./model/SwaggerJwkSetQuery'), require('./model/SwaggerJwkUpdateSet'), require('./model/SwaggerJwkUpdateSetKey'), require('./model/SwaggerListPolicyParameters'), require('./model/SwaggerListPolicyResponse'), require('./model/SwaggerOAuthConsentRequest'), require('./model/SwaggerOAuthConsentRequestPayload'), require('./model/SwaggerOAuthIntrospectionRequest'), require('./model/SwaggerOAuthIntrospectionResponse'), require('./model/SwaggerOAuthTokenResponse'), require('./model/SwaggerOAuthTokenResponseBody'), require('./model/SwaggerRejectConsentRequest'), require('./model/SwaggerRevokeOAuth2TokenParameters'), require('./model/SwaggerUpdatePolicyParameters'), require('./model/SwaggerWardenAccessRequestResponseParameters'), require('./model/SwaggerWardenTokenAccessRequestResponse'), require('./model/TokenAllowedRequest'), require('./model/WardenAccessRequest'), require('./model/WardenAccessRequestResponse'), require('./model/WardenTokenAccessRequest'), require('./model/WardenTokenAccessRequestResponsePayload'), require('./model/WellKnown'), require('./model/Writer'), require('./api/GroupsApi'), require('./api/HealthApi'), require('./api/JsonWebKeyApi'), require('./api/OAuth2Api'), require('./api/Oauth2Api'), require('./api/PolicyApi'), require('./api/WardenApi'));
+    module.exports = factory(require('./ApiClient'), require('./model/ConsentRequestAcceptance'), require('./model/ConsentRequestManager'), require('./model/ConsentRequestRejection'), require('./model/Context'), require('./model/Firewall'), require('./model/Group'), require('./model/GroupMembers'), require('./model/Handler'), require('./model/InlineResponse200'), require('./model/InlineResponse2001'), require('./model/InlineResponse401'), require('./model/JoseWebKeySetRequest'), require('./model/JsonWebKey'), require('./model/JsonWebKeySet'), require('./model/JsonWebKeySetGeneratorRequest'), require('./model/KeyGenerator'), require('./model/Manager'), require('./model/OAuth2Client'), require('./model/OAuth2TokenIntrospection'), require('./model/OAuth2consentRequest'), require('./model/Policy'), require('./model/PolicyConditions'), require('./model/RawMessage'), require('./model/SwaggerAcceptConsentRequest'), require('./model/SwaggerCreatePolicyParameters'), require('./model/SwaggerDoesWardenAllowAccessRequestParameters'), require('./model/SwaggerDoesWardenAllowTokenAccessRequestParameters'), require('./model/SwaggerGetPolicyParameters'), require('./model/SwaggerJsonWebKeyQuery'), require('./model/SwaggerJwkCreateSet'), require('./model/SwaggerJwkSetQuery'), require('./model/SwaggerJwkUpdateSet'), require('./model/SwaggerJwkUpdateSetKey'), require('./model/SwaggerListPolicyParameters'), require('./model/SwaggerListPolicyResponse'), require('./model/SwaggerOAuthConsentRequest'), require('./model/SwaggerOAuthConsentRequestPayload'), require('./model/SwaggerOAuthIntrospectionRequest'), require('./model/SwaggerOAuthIntrospectionResponse'), require('./model/SwaggerOAuthTokenResponse'), require('./model/SwaggerOAuthTokenResponseBody'), require('./model/SwaggerRejectConsentRequest'), require('./model/SwaggerRevokeOAuth2TokenParameters'), require('./model/SwaggerUpdatePolicyParameters'), require('./model/SwaggerWardenAccessRequestResponseParameters'), require('./model/SwaggerWardenTokenAccessRequestResponse'), require('./model/TokenAllowedRequest'), require('./model/WardenAccessRequest'), require('./model/WardenAccessRequestResponse'), require('./model/WardenTokenAccessRequest'), require('./model/WardenTokenAccessRequestResponsePayload'), require('./model/WellKnown'), require('./model/Writer'), require('./api/HealthApi'), require('./api/JsonWebKeyApi'), require('./api/OAuth2Api'), require('./api/Oauth2Api'), require('./api/PolicyApi'), require('./api/WardenApi'));
   }
-}(function(ApiClient, AcceptConsentRequestPayload, ConsentRequestManager, Context, CreateJsonWebKeySetPayload, Firewall, Group, Handler, InlineResponse200, InlineResponse2001, InlineResponse401, IntrospectOAuth2TokenResponsePayload, JoseWebKeySetRequest, JsonWebKey, JsonWebKeySet, KeyGenerator, Manager, MembersRequest, OAuth2Client, OAuth2consentRequest, Policy, PolicyConditions, RawMessage, RejectConsentRequestPayload, SwaggerAcceptConsentRequest, SwaggerCreatePolicyParameters, SwaggerDoesWardenAllowAccessRequestParameters, SwaggerDoesWardenAllowTokenAccessRequestParameters, SwaggerGetPolicyParameters, SwaggerJsonWebKeyQuery, SwaggerJwkCreateSet, SwaggerJwkSetQuery, SwaggerJwkUpdateSet, SwaggerJwkUpdateSetKey, SwaggerListPolicyParameters, SwaggerListPolicyResponse, SwaggerOAuthConsentRequest, SwaggerOAuthConsentRequestPayload, SwaggerOAuthIntrospectionRequest, SwaggerOAuthIntrospectionResponse, SwaggerOAuthTokenResponse, SwaggerOAuthTokenResponseBody, SwaggerRejectConsentRequest, SwaggerRevokeOAuth2TokenParameters, SwaggerUpdatePolicyParameters, SwaggerWardenAccessRequestResponseParameters, SwaggerWardenTokenAccessRequestResponse, TokenAllowedRequest, WardenAccessRequest, WardenAccessRequestResponse, WardenTokenAccessRequest, WardenTokenAccessRequestResponsePayload, WellKnown, Writer, GroupsApi, HealthApi, JsonWebKeyApi, OAuth2Api, Oauth2Api, PolicyApi, WardenApi) {
+}(function(ApiClient, ConsentRequestAcceptance, ConsentRequestManager, ConsentRequestRejection, Context, Firewall, Group, GroupMembers, Handler, InlineResponse200, InlineResponse2001, InlineResponse401, JoseWebKeySetRequest, JsonWebKey, JsonWebKeySet, JsonWebKeySetGeneratorRequest, KeyGenerator, Manager, OAuth2Client, OAuth2TokenIntrospection, OAuth2consentRequest, Policy, PolicyConditions, RawMessage, SwaggerAcceptConsentRequest, SwaggerCreatePolicyParameters, SwaggerDoesWardenAllowAccessRequestParameters, SwaggerDoesWardenAllowTokenAccessRequestParameters, SwaggerGetPolicyParameters, SwaggerJsonWebKeyQuery, SwaggerJwkCreateSet, SwaggerJwkSetQuery, SwaggerJwkUpdateSet, SwaggerJwkUpdateSetKey, SwaggerListPolicyParameters, SwaggerListPolicyResponse, SwaggerOAuthConsentRequest, SwaggerOAuthConsentRequestPayload, SwaggerOAuthIntrospectionRequest, SwaggerOAuthIntrospectionResponse, SwaggerOAuthTokenResponse, SwaggerOAuthTokenResponseBody, SwaggerRejectConsentRequest, SwaggerRevokeOAuth2TokenParameters, SwaggerUpdatePolicyParameters, SwaggerWardenAccessRequestResponseParameters, SwaggerWardenTokenAccessRequestResponse, TokenAllowedRequest, WardenAccessRequest, WardenAccessRequestResponse, WardenTokenAccessRequest, WardenTokenAccessRequestResponsePayload, WellKnown, Writer, HealthApi, JsonWebKeyApi, OAuth2Api, Oauth2Api, PolicyApi, WardenApi) {
   'use strict';
 
   /**
-   * Please_refer_to_the_user_guide_for_in_depth_documentation_httpsory_gitbooks_iohydracontentHydra_offers_OAuth_2_0_and_OpenID_Connect_Core_1_0_capabilities_as_a_service__Hydra_is_different_because_it_works_with_any_existing_authentication_infrastructure_not_just_LDAP_or_SAML__By_implementing_a_consent_app__works_with_any_programming_language_you_build_a_bridge_between_Hydra_and_your_authentication_infrastructure_Hydra_is_able_to_securely_manage_JSON_Web_Keys_and_has_a_sophisticated_policy_based_access_control_you_can_use_if_you_want_to_Hydra_is_suitable_for_green___new_and_brownfield__existing_projects__If_you_are_not_familiar_with_OAuth_2_0_and_are_working_on_a_greenfield_project_we_recommend_evaluating_if_OAuth_2_0_really_serves_your_purpose__Knowledge_of_OAuth_2_0_is_imperative_in_understanding_what_Hydra_does_and_how_it_works_The_official_repository_is_located_at_httpsgithub_comoryhydra_ATTENTION___IMPORTANT_NOTEThe_swagger_generator_used_to_create_this_documentation_does_currently_not_support_example_responses__To_seerequest_and_response_payloads_click_on_Show_JSON_schema_Enable_JSON_Schema_on_Apiary_httpsstorage_googleapis_comory_amhydrajson_schema_png.<br>
+   * Please_refer_to_the_user_guide_for_in_depth_documentation_httpsory_gitbooks_iohydracontentHydra_offers_OAuth_2_0_and_OpenID_Connect_Core_1_0_capabilities_as_a_service__Hydra_is_different_because_it_works_with_any_existing_authentication_infrastructure_not_just_LDAP_or_SAML__By_implementing_a_consent_app__works_with_any_programming_language_you_build_a_bridge_between_Hydra_and_your_authentication_infrastructure_Hydra_is_able_to_securely_manage_JSON_Web_Keys_and_has_a_sophisticated_policy_based_access_control_you_can_use_if_you_want_to_Hydra_is_suitable_for_green___new_and_brownfield__existing_projects__If_you_are_not_familiar_with_OAuth_2_0_and_are_working_on_a_greenfield_project_we_recommend_evaluating_if_OAuth_2_0_really_serves_your_purpose__Knowledge_of_OAuth_2_0_is_imperative_in_understanding_what_Hydra_does_and_how_it_works_The_official_repository_is_located_at_httpsgithub_comoryhydra_Important_REST_API_Documentation_NotesThe_swagger_generator_used_to_create_this_documentation_does_currently_not_support_example_responses__To_seerequest_and_response_payloads_click_on_Show_JSON_schema_Enable_JSON_Schema_on_Apiary_httpsstorage_googleapis_comory_amhydrajson_schema_pngThe_API_documentation_always_refers_to_the_latest_tagged_version_of_ORY_Hydra__For_previous_API_documentations_pleaserefer_to_httpsgithub_comoryhydrablobtag_iddocsapi_swagger_yaml___for_example0_9_13_httpsgithub_comoryhydrablobv0_9_13docsapi_swagger_yaml0_8_1_httpsgithub_comoryhydrablobv0_8_1docsapi_swagger_yaml.<br>
    * The <code>index</code> module provides access to constructors for all the classes which comprise the public API.
    * <p>
    * An AMD (recommended!) or CommonJS application will generally do something equivalent to the following:
@@ -63,25 +63,25 @@
      */
     ApiClient: ApiClient,
     /**
-     * The AcceptConsentRequestPayload model constructor.
-     * @property {module:model/AcceptConsentRequestPayload}
+     * The ConsentRequestAcceptance model constructor.
+     * @property {module:model/ConsentRequestAcceptance}
      */
-    AcceptConsentRequestPayload: AcceptConsentRequestPayload,
+    ConsentRequestAcceptance: ConsentRequestAcceptance,
     /**
      * The ConsentRequestManager model constructor.
      * @property {module:model/ConsentRequestManager}
      */
     ConsentRequestManager: ConsentRequestManager,
     /**
+     * The ConsentRequestRejection model constructor.
+     * @property {module:model/ConsentRequestRejection}
+     */
+    ConsentRequestRejection: ConsentRequestRejection,
+    /**
      * The Context model constructor.
      * @property {module:model/Context}
      */
     Context: Context,
-    /**
-     * The CreateJsonWebKeySetPayload model constructor.
-     * @property {module:model/CreateJsonWebKeySetPayload}
-     */
-    CreateJsonWebKeySetPayload: CreateJsonWebKeySetPayload,
     /**
      * The Firewall model constructor.
      * @property {module:model/Firewall}
@@ -92,6 +92,11 @@
      * @property {module:model/Group}
      */
     Group: Group,
+    /**
+     * The GroupMembers model constructor.
+     * @property {module:model/GroupMembers}
+     */
+    GroupMembers: GroupMembers,
     /**
      * The Handler model constructor.
      * @property {module:model/Handler}
@@ -113,11 +118,6 @@
      */
     InlineResponse401: InlineResponse401,
     /**
-     * The IntrospectOAuth2TokenResponsePayload model constructor.
-     * @property {module:model/IntrospectOAuth2TokenResponsePayload}
-     */
-    IntrospectOAuth2TokenResponsePayload: IntrospectOAuth2TokenResponsePayload,
-    /**
      * The JoseWebKeySetRequest model constructor.
      * @property {module:model/JoseWebKeySetRequest}
      */
@@ -133,6 +133,11 @@
      */
     JsonWebKeySet: JsonWebKeySet,
     /**
+     * The JsonWebKeySetGeneratorRequest model constructor.
+     * @property {module:model/JsonWebKeySetGeneratorRequest}
+     */
+    JsonWebKeySetGeneratorRequest: JsonWebKeySetGeneratorRequest,
+    /**
      * The KeyGenerator model constructor.
      * @property {module:model/KeyGenerator}
      */
@@ -143,15 +148,15 @@
      */
     Manager: Manager,
     /**
-     * The MembersRequest model constructor.
-     * @property {module:model/MembersRequest}
-     */
-    MembersRequest: MembersRequest,
-    /**
      * The OAuth2Client model constructor.
      * @property {module:model/OAuth2Client}
      */
     OAuth2Client: OAuth2Client,
+    /**
+     * The OAuth2TokenIntrospection model constructor.
+     * @property {module:model/OAuth2TokenIntrospection}
+     */
+    OAuth2TokenIntrospection: OAuth2TokenIntrospection,
     /**
      * The OAuth2consentRequest model constructor.
      * @property {module:model/OAuth2consentRequest}
@@ -172,11 +177,6 @@
      * @property {module:model/RawMessage}
      */
     RawMessage: RawMessage,
-    /**
-     * The RejectConsentRequestPayload model constructor.
-     * @property {module:model/RejectConsentRequestPayload}
-     */
-    RejectConsentRequestPayload: RejectConsentRequestPayload,
     /**
      * The SwaggerAcceptConsentRequest model constructor.
      * @property {module:model/SwaggerAcceptConsentRequest}
@@ -327,11 +327,6 @@
      * @property {module:model/Writer}
      */
     Writer: Writer,
-    /**
-     * The GroupsApi service constructor.
-     * @property {module:api/GroupsApi}
-     */
-    GroupsApi: GroupsApi,
     /**
      * The HealthApi service constructor.
      * @property {module:api/HealthApi}

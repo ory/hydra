@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.IntrospectOAuth2TokenResponsePayload
+# HydraOAuth2OpenIdConnectServer.OAuth2TokenIntrospection
 
 ## Properties
 Name | Type | Description | Notes

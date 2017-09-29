@@ -3,7 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**body** | [**CreateJsonWebKeySetPayload**](CreateJsonWebKeySetPayload.md) |  | [optional] 
+**body** | [**JsonWebKeySetGeneratorRequest**](JsonWebKeySetGeneratorRequest.md) |  | [optional] 
 **set** | **String** | The set in: path | 
 
 

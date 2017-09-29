@@ -1,7 +1,7 @@
 /*
  * Hydra OAuth2 & OpenID Connect Server
  *
- * Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/   Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure. Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to. Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.   The official repository is located at https://github.com/ory/hydra   ### ATTENTION - IMPORTANT NOTE   The swagger generator used to create this documentation does currently not support example responses. To see request and response payloads click on **\"Show JSON schema\"**: ![Enable JSON Schema on Apiary](https://storage.googleapis.com/ory.am/hydra/json-schema.png)
+ * Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/   Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure. Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to. Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.   The official repository is located at https://github.com/ory/hydra   ### Important REST API Documentation Notes  The swagger generator used to create this documentation does currently not support example responses. To see request and response payloads click on **\"Show JSON schema\"**: ![Enable JSON Schema on Apiary](https://storage.googleapis.com/ory.am/hydra/json-schema.png)   The API documentation always refers to the latest tagged version of ORY Hydra. For previous API documentations, please refer to https://github.com/ory/hydra/blob/<tag-id>/docs/api.swagger.yaml - for example:  0.9.13: https://github.com/ory/hydra/blob/v0.9.13/docs/api.swagger.yaml 0.8.1: https://github.com/ory/hydra/blob/v0.8.1/docs/api.swagger.yaml
  *
  * OpenAPI spec version: Latest
  * Contact: hi@ory.am
@@ -45,7 +45,7 @@ func NewWardenApiWithBasePath(basePath string) *WardenApi {
  * @param body
  * @return void
  */
-func (a WardenApi) AddMembersToGroup(id int64, body MembersRequest) (*APIResponse, error) {
+func (a WardenApi) AddMembersToGroup(id string, body GroupMembers) (*APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Post")
 	// create path and map variables
@@ -108,9 +108,10 @@ func (a WardenApi) AddMembersToGroup(id int64, body MembersRequest) (*APIRespons
  * Create a group
  * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:groups\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
+ * @param body
  * @return *Group
  */
-func (a WardenApi) CreateGroup() (*Group, *APIResponse, error) {
+func (a WardenApi) CreateGroup(body Group) (*Group, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Post")
 	// create path and map variables
@@ -150,6 +151,8 @@ func (a WardenApi) CreateGroup() (*Group, *APIResponse, error) {
 	if localVarHttpHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
+	// body params
+	localVarPostBody = &body
 	var successPayload = new(Group)
 	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 
@@ -175,7 +178,7 @@ func (a WardenApi) CreateGroup() (*Group, *APIResponse, error) {
  * @param id The id of the group to look up.
  * @return void
  */
-func (a WardenApi) DeleteGroup(id int64) (*APIResponse, error) {
+func (a WardenApi) DeleteGroup(id string) (*APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Delete")
 	// create path and map variables
@@ -367,13 +370,13 @@ func (a WardenApi) DoesWardenAllowTokenAccessRequest(body WardenTokenAccessReque
 }
 
 /**
- * Find group IDs by member
- * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:groups:&lt;member&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+ * Find groups by member
+ * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:groups\&quot;], \&quot;actions\&quot;: [\&quot;list\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
  * @param member The id of the member to look up.
- * @return []string
+ * @return []Group
  */
-func (a WardenApi) FindGroupsByMember(member int64) ([]string, *APIResponse, error) {
+func (a WardenApi) FindGroupsByMember(member string) ([]Group, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Get")
 	// create path and map variables
@@ -414,7 +417,7 @@ func (a WardenApi) FindGroupsByMember(member int64) ([]string, *APIResponse, err
 	if localVarHttpHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
-	var successPayload = new([]string)
+	var successPayload = new([]Group)
 	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 
 	var localVarURL, _ = url.Parse(localVarPath)
@@ -439,7 +442,7 @@ func (a WardenApi) FindGroupsByMember(member int64) ([]string, *APIResponse, err
  * @param id The id of the group to look up.
  * @return *Group
  */
-func (a WardenApi) GetGroup(id int64) (*Group, *APIResponse, error) {
+func (a WardenApi) GetGroup(id string) (*Group, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Get")
 	// create path and map variables
@@ -506,7 +509,7 @@ func (a WardenApi) GetGroup(id int64) (*Group, *APIResponse, error) {
  * @param body
  * @return void
  */
-func (a WardenApi) RemoveMembersFromGroup(id int64, body MembersRequest) (*APIResponse, error) {
+func (a WardenApi) RemoveMembersFromGroup(id string, body GroupMembers) (*APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Delete")
 	// create path and map variables

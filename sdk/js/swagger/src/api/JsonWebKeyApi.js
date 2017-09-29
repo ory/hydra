@@ -1,6 +1,6 @@
 /**
  * Hydra OAuth2 & OpenID Connect Server
- * Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/   Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure. Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to. Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.   The official repository is located at https://github.com/ory/hydra   ### ATTENTION - IMPORTANT NOTE   The swagger generator used to create this documentation does currently not support example responses. To see request and response payloads click on **\"Show JSON schema\"**: ![Enable JSON Schema on Apiary](https://storage.googleapis.com/ory.am/hydra/json-schema.png)
+ * Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/   Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure. Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to. Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.   The official repository is located at https://github.com/ory/hydra   ### Important REST API Documentation Notes  The swagger generator used to create this documentation does currently not support example responses. To see request and response payloads click on **\"Show JSON schema\"**: ![Enable JSON Schema on Apiary](https://storage.googleapis.com/ory.am/hydra/json-schema.png)   The API documentation always refers to the latest tagged version of ORY Hydra. For previous API documentations, please refer to https://github.com/ory/hydra/blob/<tag-id>/docs/api.swagger.yaml - for example:  0.9.13: https://github.com/ory/hydra/blob/v0.9.13/docs/api.swagger.yaml 0.8.1: https://github.com/ory/hydra/blob/v0.8.1/docs/api.swagger.yaml
  *
  * OpenAPI spec version: Latest
  * Contact: hi@ory.am
@@ -17,18 +17,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/CreateJsonWebKeySetPayload', 'model/InlineResponse401', 'model/JsonWebKey', 'model/JsonWebKeySet'], factory);
+    define(['ApiClient', 'model/InlineResponse401', 'model/JsonWebKey', 'model/JsonWebKeySet', 'model/JsonWebKeySetGeneratorRequest'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/CreateJsonWebKeySetPayload'), require('../model/InlineResponse401'), require('../model/JsonWebKey'), require('../model/JsonWebKeySet'));
+    module.exports = factory(require('../ApiClient'), require('../model/InlineResponse401'), require('../model/JsonWebKey'), require('../model/JsonWebKeySet'), require('../model/JsonWebKeySetGeneratorRequest'));
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
       root.HydraOAuth2OpenIdConnectServer = {};
     }
-    root.HydraOAuth2OpenIdConnectServer.JsonWebKeyApi = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient, root.HydraOAuth2OpenIdConnectServer.CreateJsonWebKeySetPayload, root.HydraOAuth2OpenIdConnectServer.InlineResponse401, root.HydraOAuth2OpenIdConnectServer.JsonWebKey, root.HydraOAuth2OpenIdConnectServer.JsonWebKeySet);
+    root.HydraOAuth2OpenIdConnectServer.JsonWebKeyApi = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient, root.HydraOAuth2OpenIdConnectServer.InlineResponse401, root.HydraOAuth2OpenIdConnectServer.JsonWebKey, root.HydraOAuth2OpenIdConnectServer.JsonWebKeySet, root.HydraOAuth2OpenIdConnectServer.JsonWebKeySetGeneratorRequest);
   }
-}(this, function(ApiClient, CreateJsonWebKeySetPayload, InlineResponse401, JsonWebKey, JsonWebKeySet) {
+}(this, function(ApiClient, InlineResponse401, JsonWebKey, JsonWebKeySet, JsonWebKeySetGeneratorRequest) {
   'use strict';
 
   /**
@@ -61,7 +61,7 @@
      * This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256) and asymetric cryptographic keys (RS256, ECDSA).   If the specified JSON Web Key Set does not exist, it will be created.   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:&lt;set&gt;:&lt;kid&gt;\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
      * @param {String} set The set
      * @param {Object} opts Optional parameters
-     * @param {module:model/CreateJsonWebKeySetPayload} opts.body 
+     * @param {module:model/JsonWebKeySetGeneratorRequest} opts.body 
      * @param {module:api/JsonWebKeyApi~createJsonWebKeySetCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/JsonWebKeySet}
      */

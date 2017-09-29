@@ -3,7 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**body** | [**AcceptConsentRequestPayload**](AcceptConsentRequestPayload.md) |  | 
+**body** | [**ConsentRequestAcceptance**](ConsentRequestAcceptance.md) |  | 
 **id** | **String** | in: path | 
 
 

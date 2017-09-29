@@ -1,4 +1,4 @@
-# AcceptConsentRequestPayload
+# ConsentRequestAcceptance
 
 ## Properties
 Name | Type | Description | Notes

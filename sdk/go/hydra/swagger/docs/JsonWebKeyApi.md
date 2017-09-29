@@ -26,7 +26,7 @@ This endpoint is capable of generating JSON Web Key Sets for you. There a differ
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **set** | **string**| The set | 
- **body** | [**CreateJsonWebKeySetPayload**](CreateJsonWebKeySetPayload.md)|  | [optional] 
+ **body** | [**JsonWebKeySetGeneratorRequest**](JsonWebKeySetGeneratorRequest.md)|  | [optional] 
 
 ### Return type
 

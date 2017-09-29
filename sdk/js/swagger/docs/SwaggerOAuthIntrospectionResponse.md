@@ -3,6 +3,6 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**body** | [**IntrospectOAuth2TokenResponsePayload**](IntrospectOAuth2TokenResponsePayload.md) |  | [optional] 
+**body** | [**OAuth2TokenIntrospection**](OAuth2TokenIntrospection.md) |  | [optional] 
 
 

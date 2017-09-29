@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.MembersRequest
+# HydraOAuth2OpenIdConnectServer.GroupMembers
 
 ## Properties
 Name | Type | Description | Notes

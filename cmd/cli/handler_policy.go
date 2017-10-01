@@ -293,6 +293,6 @@ func (h *PolicyHandler) DeletePolicy(cmd *cobra.Command, args []string) {
 			continue
 		}
 		pkg.Must(err, "Could not delete policy: %s", err)
-		fmt.Printf("Connection %s deleted.\n", arg)
+		fmt.Printf("Policy %s deleted.\n", arg)
 	}
 }

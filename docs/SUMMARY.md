@@ -38,11 +38,9 @@
 * How-To
   * [Running Hydra in production](how-to/production.md)
   * [Secure the consent app](how-to/consent-app.md)
-* [Client Libraries](sdk.md)
-  * [Hydra SDK for Go](sdk/go.md)
+* SDKs
+  * [SDK for Go](sdk/go.md)
 * [Contribute](contribute.md)
-  * [Architecture and Design](contribute.md)
-  * [Running Tests](contribute.md)
 * [FAQ](faq.md)
   - [How can I control SQL connection limits?](faq.md#how-can-i-control-sql-connection-limits)
   - [Why is the Resource Owner Password Credentials grant not supported?](faq.md#why-is-the-resource-owner-password-credentials-grant-not-supported)
@@ -58,7 +56,7 @@
   - [How can I disable HTTPS for testing?](faq.md#how-can-i-disable-https-for-testing)
   - [MySQL gives `unsupported Scan, storing driver.Value type []uint8 into type *time.Time`](faq.md#mysql-gives-unsupported-scan-storing-drivervalue-type-uint8-into-type-timetime)
   - [Insufficient Entropy](faq.md#insufficient-entropy)
-  - [The docker image exists immediately](faq.md#the-docker-image-exists-immediately)
+  - [The docker image exits immediately](faq.md#the-docker-image-exits-immediately)
   - [I get compile errors!](faq.md#i-get-compile-errors)
   - [Is JWT supported?](faq.md#is-jwt-supported)
   - [Refreshing tokens](faq.md#refreshing-tokens)

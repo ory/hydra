@@ -3,6 +3,6 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**body** | [**WardenTokenAccessRequestResponsePayload**](WardenTokenAccessRequestResponsePayload.md) |  | [optional] 
+**body** | [**WardenTokenAccessRequestResponse**](WardenTokenAccessRequestResponse.md) |  | [optional] 
 
 

@@ -226,7 +226,7 @@ Name | Type | Description  | Notes
 
 <a name="doesWardenAllowTokenAccessRequest"></a>
 # **doesWardenAllowTokenAccessRequest**
-> WardenTokenAccessRequestResponsePayload doesWardenAllowTokenAccessRequest(opts)
+> WardenTokenAccessRequestResponse doesWardenAllowTokenAccessRequest(opts)
 
 Check if an access request is valid (providing an access token)
 
@@ -265,7 +265,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**WardenTokenAccessRequestResponsePayload**](WardenTokenAccessRequestResponsePayload.md)
+[**WardenTokenAccessRequestResponse**](WardenTokenAccessRequestResponse.md)
 
 ### Authorization
 

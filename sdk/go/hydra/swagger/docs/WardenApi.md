@@ -132,7 +132,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **DoesWardenAllowTokenAccessRequest**
-> WardenTokenAccessRequestResponsePayload DoesWardenAllowTokenAccessRequest($body)
+> WardenTokenAccessRequestResponse DoesWardenAllowTokenAccessRequest($body)
 
 Check if an access request is valid (providing an access token)
 
@@ -147,7 +147,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**WardenTokenAccessRequestResponsePayload**](wardenTokenAccessRequestResponsePayload.md)
+[**WardenTokenAccessRequestResponse**](wardenTokenAccessRequestResponse.md)
 
 ### Authorization
 

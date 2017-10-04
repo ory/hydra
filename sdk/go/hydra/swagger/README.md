@@ -112,7 +112,7 @@ Class | Method | HTTP request | Description
  - [WardenAccessRequest](docs/WardenAccessRequest.md)
  - [WardenAccessRequestResponse](docs/WardenAccessRequestResponse.md)
  - [WardenTokenAccessRequest](docs/WardenTokenAccessRequest.md)
- - [WardenTokenAccessRequestResponsePayload](docs/WardenTokenAccessRequestResponsePayload.md)
+ - [WardenTokenAccessRequestResponse](docs/WardenTokenAccessRequestResponse.md)
  - [WellKnown](docs/WellKnown.md)
  - [Writer](docs/Writer.md)
 

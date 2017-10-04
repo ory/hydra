@@ -144,7 +144,7 @@ var (
 			scopes:    []string{"core"},
 			expectErr: false,
 			assert: func(t *testing.T, c *firewall.Context) {
-				assert.Equal(t, "siri", c.Audience)
+				assert.Equal(t, "siri", c.ClientID)
 				assert.Equal(t, "alice", c.Subject)
 				assert.Equal(t, "tests", c.Issuer)
 				assert.Equal(t, now.Add(time.Hour).Unix(), c.ExpiresAt.Unix())
@@ -171,7 +171,7 @@ var (
 			scopes:    []string{"core"},
 			expectErr: false,
 			assert: func(t *testing.T, c *firewall.Context) {
-				assert.Equal(t, "siri", c.Audience)
+				assert.Equal(t, "siri", c.ClientID)
 				assert.Equal(t, "ken", c.Subject)
 				assert.Equal(t, "tests", c.Issuer)
 				assert.Equal(t, now.Add(time.Hour).Unix(), c.ExpiresAt.Unix())

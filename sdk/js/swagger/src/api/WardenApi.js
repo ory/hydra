@@ -17,18 +17,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/Group', 'model/GroupMembers', 'model/InlineResponse401', 'model/WardenAccessRequest', 'model/WardenAccessRequestResponse', 'model/WardenTokenAccessRequest', 'model/WardenTokenAccessRequestResponsePayload'], factory);
+    define(['ApiClient', 'model/Group', 'model/GroupMembers', 'model/InlineResponse401', 'model/WardenAccessRequest', 'model/WardenAccessRequestResponse', 'model/WardenTokenAccessRequest', 'model/WardenTokenAccessRequestResponse'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/Group'), require('../model/GroupMembers'), require('../model/InlineResponse401'), require('../model/WardenAccessRequest'), require('../model/WardenAccessRequestResponse'), require('../model/WardenTokenAccessRequest'), require('../model/WardenTokenAccessRequestResponsePayload'));
+    module.exports = factory(require('../ApiClient'), require('../model/Group'), require('../model/GroupMembers'), require('../model/InlineResponse401'), require('../model/WardenAccessRequest'), require('../model/WardenAccessRequestResponse'), require('../model/WardenTokenAccessRequest'), require('../model/WardenTokenAccessRequestResponse'));
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
       root.HydraOAuth2OpenIdConnectServer = {};
     }
-    root.HydraOAuth2OpenIdConnectServer.WardenApi = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient, root.HydraOAuth2OpenIdConnectServer.Group, root.HydraOAuth2OpenIdConnectServer.GroupMembers, root.HydraOAuth2OpenIdConnectServer.InlineResponse401, root.HydraOAuth2OpenIdConnectServer.WardenAccessRequest, root.HydraOAuth2OpenIdConnectServer.WardenAccessRequestResponse, root.HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequest, root.HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponsePayload);
+    root.HydraOAuth2OpenIdConnectServer.WardenApi = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient, root.HydraOAuth2OpenIdConnectServer.Group, root.HydraOAuth2OpenIdConnectServer.GroupMembers, root.HydraOAuth2OpenIdConnectServer.InlineResponse401, root.HydraOAuth2OpenIdConnectServer.WardenAccessRequest, root.HydraOAuth2OpenIdConnectServer.WardenAccessRequestResponse, root.HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequest, root.HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponse);
   }
-}(this, function(ApiClient, Group, GroupMembers, InlineResponse401, WardenAccessRequest, WardenAccessRequestResponse, WardenTokenAccessRequest, WardenTokenAccessRequestResponsePayload) {
+}(this, function(ApiClient, Group, GroupMembers, InlineResponse401, WardenAccessRequest, WardenAccessRequestResponse, WardenTokenAccessRequest, WardenTokenAccessRequestResponse) {
   'use strict';
 
   /**
@@ -229,7 +229,7 @@
      * Callback function to receive the result of the doesWardenAllowTokenAccessRequest operation.
      * @callback module:api/WardenApi~doesWardenAllowTokenAccessRequestCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/WardenTokenAccessRequestResponsePayload} data The data returned by the service call.
+     * @param {module:model/WardenTokenAccessRequestResponse} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -239,7 +239,7 @@
      * @param {Object} opts Optional parameters
      * @param {module:model/WardenTokenAccessRequest} opts.body 
      * @param {module:api/WardenApi~doesWardenAllowTokenAccessRequestCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/WardenTokenAccessRequestResponsePayload}
+     * data is of type: {@link module:model/WardenTokenAccessRequestResponse}
      */
     this.doesWardenAllowTokenAccessRequest = function(opts, callback) {
       opts = opts || {};
@@ -258,7 +258,7 @@
       var authNames = ['oauth2'];
       var contentTypes = ['application/json'];
       var accepts = ['application/json'];
-      var returnType = WardenTokenAccessRequestResponsePayload;
+      var returnType = WardenTokenAccessRequestResponse;
 
       return this.apiClient.callApi(
         '/warden/token/allowed', 'POST',

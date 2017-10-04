@@ -1,10 +1,10 @@
-# WardenTokenAccessRequestResponsePayload
+# WardenTokenAccessRequestResponse
 
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Allowed** | **bool** | Allowed is true if the request is allowed and false otherwise. | [optional] [default to null]
-**Aud** | **string** | Audience is who the token was issued for. This is an OAuth2 app usually. | [optional] [default to null]
+**Cid** | **string** | ClientID is the id of the OAuth2 client that requested the token. | [optional] [default to null]
 **Exp** | **string** | ExpiresAt is the expiry timestamp. | [optional] [default to null]
 **Ext** | [**map[string]interface{}**](interface{}.md) | Extra represents arbitrary session data. | [optional] [default to null]
 **Iat** | **string** | IssuedAt is the token creation time stamp. | [optional] [default to null]

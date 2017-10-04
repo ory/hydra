@@ -17,18 +17,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/WardenTokenAccessRequestResponsePayload'], factory);
+    define(['ApiClient', 'model/WardenTokenAccessRequestResponse'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('./WardenTokenAccessRequestResponsePayload'));
+    module.exports = factory(require('../ApiClient'), require('./WardenTokenAccessRequestResponse'));
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
       root.HydraOAuth2OpenIdConnectServer = {};
     }
-    root.HydraOAuth2OpenIdConnectServer.SwaggerWardenTokenAccessRequestResponse = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient, root.HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponsePayload);
+    root.HydraOAuth2OpenIdConnectServer.SwaggerWardenTokenAccessRequestResponse = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient, root.HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponse);
   }
-}(this, function(ApiClient, WardenTokenAccessRequestResponsePayload) {
+}(this, function(ApiClient, WardenTokenAccessRequestResponse) {
   'use strict';
 
 
@@ -63,14 +63,14 @@
       obj = obj || new exports();
 
       if (data.hasOwnProperty('Body')) {
-        obj['Body'] = WardenTokenAccessRequestResponsePayload.constructFromObject(data['Body']);
+        obj['Body'] = WardenTokenAccessRequestResponse.constructFromObject(data['Body']);
       }
     }
     return obj;
   }
 
   /**
-   * @member {module:model/WardenTokenAccessRequestResponsePayload} Body
+   * @member {module:model/WardenTokenAccessRequestResponse} Body
    */
   exports.prototype['Body'] = undefined;
 

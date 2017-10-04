@@ -11,5 +11,5 @@
 package swagger
 
 type SwaggerWardenTokenAccessRequestResponse struct {
-	Body WardenTokenAccessRequestResponsePayload `json:"Body,omitempty"`
+	Body WardenTokenAccessRequestResponse `json:"Body,omitempty"`
 }

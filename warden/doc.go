@@ -53,7 +53,7 @@ type swaggerWardenTokenAccessRequestResponse struct {
 	Body swaggerWardenTokenAccessRequestResponsePayload
 }
 
-// swagger:model wardenTokenAccessRequestResponsePayload
+// swagger:model wardenTokenAccessRequestResponse
 type swaggerWardenTokenAccessRequestResponsePayload struct {
 	// Subject is the identity that authorized issuing the token, for example a user or an OAuth2 app.
 	// This is usually a uuid but you can choose a urn or some other id too.
@@ -65,8 +65,8 @@ type swaggerWardenTokenAccessRequestResponsePayload struct {
 	// Issuer is the id of the issuer, typically an hydra instance.
 	Issuer string `json:"iss"`
 
-	// Audience is who the token was issued for. This is an OAuth2 app usually.
-	Audience string `json:"aud"`
+	// ClientID is the id of the OAuth2 client that requested the token.
+	ClientID string `json:"cid"`
 
 	// IssuedAt is the token creation time stamp.
 	IssuedAt string `json:"iat"`

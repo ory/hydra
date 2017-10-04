@@ -211,7 +211,7 @@ Class | Method | HTTP request | Description
  - [HydraOAuth2OpenIdConnectServer.WardenAccessRequest](docs/WardenAccessRequest.md)
  - [HydraOAuth2OpenIdConnectServer.WardenAccessRequestResponse](docs/WardenAccessRequestResponse.md)
  - [HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequest](docs/WardenTokenAccessRequest.md)
- - [HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponsePayload](docs/WardenTokenAccessRequestResponsePayload.md)
+ - [HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponse](docs/WardenTokenAccessRequestResponse.md)
  - [HydraOAuth2OpenIdConnectServer.WellKnown](docs/WellKnown.md)
  - [HydraOAuth2OpenIdConnectServer.Writer](docs/Writer.md)
 

@@ -307,9 +307,9 @@ func (a WardenApi) DoesWardenAllowAccessRequest(body WardenAccessRequest) (*Ward
  * Checks if a token is valid and if the token subject is allowed to perform an action on a resource. This endpoint requires a token, a scope, a resource name, an action name and a context.   If a token is expired/invalid, has not been granted the requested scope or the subject is not allowed to perform the action on the resource, this endpoint returns a 200 response with &#x60;{ \&quot;allowed\&quot;: false}&#x60;.   Extra data set through the &#x60;accessTokenExtra&#x60; field in the consent flow will be included in the response.   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:token:allowed\&quot;], \&quot;actions\&quot;: [\&quot;decide\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
  * @param body
- * @return *WardenTokenAccessRequestResponsePayload
+ * @return *WardenTokenAccessRequestResponse
  */
-func (a WardenApi) DoesWardenAllowTokenAccessRequest(body WardenTokenAccessRequest) (*WardenTokenAccessRequestResponsePayload, *APIResponse, error) {
+func (a WardenApi) DoesWardenAllowTokenAccessRequest(body WardenTokenAccessRequest) (*WardenTokenAccessRequestResponse, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Post")
 	// create path and map variables
@@ -351,7 +351,7 @@ func (a WardenApi) DoesWardenAllowTokenAccessRequest(body WardenTokenAccessReque
 	}
 	// body params
 	localVarPostBody = &body
-	var successPayload = new(WardenTokenAccessRequestResponsePayload)
+	var successPayload = new(WardenTokenAccessRequestResponse)
 	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 
 	var localVarURL, _ = url.Parse(localVarPath)

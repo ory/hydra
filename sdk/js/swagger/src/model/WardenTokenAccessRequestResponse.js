@@ -26,7 +26,7 @@
     if (!root.HydraOAuth2OpenIdConnectServer) {
       root.HydraOAuth2OpenIdConnectServer = {};
     }
-    root.HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponsePayload = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient);
+    root.HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponse = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient);
   }
 }(this, function(ApiClient) {
   'use strict';
@@ -35,14 +35,14 @@
 
 
   /**
-   * The WardenTokenAccessRequestResponsePayload model module.
-   * @module model/WardenTokenAccessRequestResponsePayload
+   * The WardenTokenAccessRequestResponse model module.
+   * @module model/WardenTokenAccessRequestResponse
    * @version Latest
    */
 
   /**
-   * Constructs a new <code>WardenTokenAccessRequestResponsePayload</code>.
-   * @alias module:model/WardenTokenAccessRequestResponsePayload
+   * Constructs a new <code>WardenTokenAccessRequestResponse</code>.
+   * @alias module:model/WardenTokenAccessRequestResponse
    * @class
    */
   var exports = function() {
@@ -59,11 +59,11 @@
   };
 
   /**
-   * Constructs a <code>WardenTokenAccessRequestResponsePayload</code> from a plain JavaScript object, optionally creating a new instance.
+   * Constructs a <code>WardenTokenAccessRequestResponse</code> from a plain JavaScript object, optionally creating a new instance.
    * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
    * @param {Object} data The plain JavaScript object bearing properties of interest.
-   * @param {module:model/WardenTokenAccessRequestResponsePayload} obj Optional instance to populate.
-   * @return {module:model/WardenTokenAccessRequestResponsePayload} The populated <code>WardenTokenAccessRequestResponsePayload</code> instance.
+   * @param {module:model/WardenTokenAccessRequestResponse} obj Optional instance to populate.
+   * @return {module:model/WardenTokenAccessRequestResponse} The populated <code>WardenTokenAccessRequestResponse</code> instance.
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
@@ -72,8 +72,8 @@
       if (data.hasOwnProperty('allowed')) {
         obj['allowed'] = ApiClient.convertToType(data['allowed'], 'Boolean');
       }
-      if (data.hasOwnProperty('aud')) {
-        obj['aud'] = ApiClient.convertToType(data['aud'], 'String');
+      if (data.hasOwnProperty('cid')) {
+        obj['cid'] = ApiClient.convertToType(data['cid'], 'String');
       }
       if (data.hasOwnProperty('exp')) {
         obj['exp'] = ApiClient.convertToType(data['exp'], 'String');
@@ -103,10 +103,10 @@
    */
   exports.prototype['allowed'] = undefined;
   /**
-   * Audience is who the token was issued for. This is an OAuth2 app usually.
-   * @member {String} aud
+   * ClientID is the id of the OAuth2 client that requested the token.
+   * @member {String} cid
    */
-  exports.prototype['aud'] = undefined;
+  exports.prototype['cid'] = undefined;
   /**
    * ExpiresAt is the expiry timestamp.
    * @member {String} exp

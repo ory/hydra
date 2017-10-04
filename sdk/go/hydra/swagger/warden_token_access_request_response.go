@@ -10,13 +10,13 @@
 
 package swagger
 
-type WardenTokenAccessRequestResponsePayload struct {
+type WardenTokenAccessRequestResponse struct {
 
 	// Allowed is true if the request is allowed and false otherwise.
 	Allowed bool `json:"allowed,omitempty"`
 
-	// Audience is who the token was issued for. This is an OAuth2 app usually.
-	Aud string `json:"aud,omitempty"`
+	// ClientID is the id of the OAuth2 client that requested the token.
+	Cid string `json:"cid,omitempty"`
 
 	// ExpiresAt is the expiry timestamp.
 	Exp string `json:"exp,omitempty"`

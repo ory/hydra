@@ -77,7 +77,7 @@ func TestWardenSDK(t *testing.T) {
 						Subject:       result.Sub,
 						GrantedScopes: result.Scopes,
 						Issuer:        result.Iss,
-						Audience:      result.Aud,
+						ClientID:      result.Aud,
 						Extra:         result.Ext,
 						ExpiresAt:     mustParseTime(result.Exp),
 						IssuedAt:      mustParseTime(result.Iat),

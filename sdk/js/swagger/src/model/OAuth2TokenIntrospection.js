@@ -115,7 +115,7 @@
    */
   exports.prototype['active'] = undefined;
   /**
-   * Audience is a service-specific string identifier or list of string identifiers representing the intended audience for this token.
+   * ClientID is a service-specific string identifier or list of string identifiers representing the intended audience for this token.
    * @member {String} aud
    */
   exports.prototype['aud'] = undefined;

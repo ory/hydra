@@ -18,7 +18,7 @@ This file keeps track of questions and discussions from Gitter and general help 
 - [Is there an HTTP API Documentation?](#is-there-an-http-api-documentation)
 - [How can I disable HTTPS for testing?](#how-can-i-disable-https-for-testing)
 - [MySQL gives `unsupported Scan, storing driver.Value type []uint8 into type *time.Time`](#mysql-gives-unsupported-scan-storing-drivervalue-type-uint8-into-type-timetime)
-- [The docker image exists immediately](#the-docker-image-exists-immediately)
+- [The docker image exits immediately](#the-docker-image-exits-immediately)
 - [Insufficient Entropy](#insufficient-entropy)
 - [I get compile errors!](#i-get-compile-errors)
 - [Is JWT supported?](#is-jwt-supported)
@@ -213,7 +213,7 @@ $ hydra help host
 ...
 ```
 
-## The docker image exists immediately
+## The docker image exits immediately
 
 Check the logs using `docker logs <container-id>`.
 

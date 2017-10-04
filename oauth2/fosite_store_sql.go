@@ -282,3 +282,10 @@ func (s *FositeSQLStore) revokeSession(id string, table string) error {
 	}
 	return nil
 }
+
+func (s *FositeSQLStore) CleanseTokens(ctx context.Context, before time.Time) error {
+	if _, err := s.DB.Exec(s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE requested_at<?", sqlTableAccess)), before); err != nil {
+		return errors.WithStack(err)
+	}
+	return nil
+}

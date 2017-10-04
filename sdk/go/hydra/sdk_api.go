@@ -2,6 +2,7 @@ package hydra
 
 import "github.com/ory/hydra/sdk/go/hydra/swagger"
 
+// SDK helps developers interact with ORY Hydra using a Go API.
 type SDK interface {
 	PolicyAPI
 	WardenAPI
@@ -9,11 +10,92 @@ type SDK interface {
 	OAuth2API
 }
 
+// PolicyAPI offers capabilities for policy management.
 type PolicyAPI interface {
+	// CreatePolicy creates a policy. If successful, error is nil and the response status code is http.StatusCreated.
+	//
+	//
+	//	import "github.com/ory/hydra/sdk/go/hydra/swagger"
+	//
+	//  policy, response, err := sdk.CreatePolicy(swagger.Policy{
+	//  	Subjects: []string{"foo", "bar"},
+	//  	Resources: []string{"foo", "bar"},
+	//  	// ...
+	// 	})
+	//	if err != nil {
+	//		// handle network error
+	//	} else if response.StatusCode != http.StatusCreated {
+	//		// handle application error
+	// 	}
+	//
+	//	fmt.Printf("Policy created: %+v", policy)
 	CreatePolicy(body swagger.Policy) (*swagger.Policy, *swagger.APIResponse, error)
+
+	// DeletePolicy deletes a policy. If successful, error is nil and the response status code is http.StatusNoContent.
+	//
+	//
+	//	import "github.com/ory/hydra/sdk/go/hydra/swagger"
+	//
+	//	id := "1234"
+	//  response, err := sdk.DeletePolicy(id)
+	//	if err != nil {
+	//		// handle network error
+	//	} else if response.StatusCode != http.StatusNoContent {
+	//		// handle application error
+	// 	}
+	//
+	//	fmt.Printf("Policy created: %s", id)
 	DeletePolicy(id string) (*swagger.APIResponse, error)
+
+	// GetPolicy returns a policy. If successful, error is nil and the response status code is http.StatusOK.
+	//
+	//
+	//	import "github.com/ory/hydra/sdk/go/hydra/swagger"
+	//
+	//	id := "1234"
+	//  policy, response, err := sdk.GetPolicy(id)
+	//	if err != nil {
+	//		// handle network error
+	//	} else if response.StatusCode != http.StatusOK {
+	//		// handle application error
+	// 	}
+	//
+	//	fmt.Printf("Policy received: %+v", policy)
 	GetPolicy(id string) (*swagger.Policy, *swagger.APIResponse, error)
+
+	// ListPolicies returns a policy slice given an offset and a limit. If successful, error is nil and the response status code is http.StatusOK.
+	//
+	//
+	//	import "github.com/ory/hydra/sdk/go/hydra/swagger"
+	//
+	//  policies, response, err := sdk.ListPolicies(0, 100)
+	//	if err != nil {
+	//		// handle network error
+	//	} else if response.StatusCode != http.StatusOK {
+	//		// handle application error
+	// 	}
+	//
+	//	fmt.Printf("Policies received: %+v", policies)
 	ListPolicies(offset int64, limit int64) ([]swagger.Policy, *swagger.APIResponse, error)
+
+	// UpdatePolicy updates a policy. If successful, error is nil and the response status code is http.StatusOK.
+	//
+	//
+	//	import "github.com/ory/hydra/sdk/go/hydra/swagger"
+	//
+	//  policies, response, err := sdk.ListPolicies("1234", swagger.Policy{
+	//		ID: "1234",
+	//  	Subjects: []string{"foo", "bar"},
+	//  	Resources: []string{"foo", "bar"},
+	//  	// ...
+	// 	})
+	//	if err != nil {
+	//		// handle network error
+	//	} else if response.StatusCode != http.StatusOK {
+	//		// handle application error
+	// 	}
+	//
+	//	fmt.Printf("Policy updated: %+v", policies)
 	UpdatePolicy(id string, body swagger.Policy) (*swagger.Policy, *swagger.APIResponse, error)
 }
 

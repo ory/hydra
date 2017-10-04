@@ -7,8 +7,8 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 )
 
-// SDK contains all relevant API clients for interacting with ORY Hydra.
-type SDK struct {
+// CodeGenSDK contains all relevant API clients for interacting with ORY Hydra.
+type CodeGenSDK struct {
 	*swagger.OAuth2Api
 	*swagger.JsonWebKeyApi
 	*swagger.WardenApi
@@ -17,7 +17,7 @@ type SDK struct {
 	Configuration *Configuration
 }
 
-// Configuration configures the SDK.
+// Configuration configures the CodeGenSDK.
 type Configuration struct {
 	// EndpointURL should point to the url of ORY Hydra, for example: http://localhost:4444
 	EndpointURL     string
@@ -29,7 +29,7 @@ type Configuration struct {
 	// ClientSecret is the secret of the management client.
 	ClientSecret string
 
-	// Scopes is a list of scopes the SDK should request. If no scopes are given, this defaults to `hydra.*`
+	// Scopes is a list of scopes the CodeGenSDK should request. If no scopes are given, this defaults to `hydra.*`
 	Scopes       []string
 }
 
@@ -40,8 +40,8 @@ func removeTrailingSlash(path string) string {
 	return path
 }
 
-// NewSDK instantiates a new SDK instance or returns an error.
-func NewSDK(c *Configuration) (*SDK, error) {
+// NewSDK instantiates a new CodeGenSDK instance or returns an error.
+func NewSDK(c *Configuration) (*CodeGenSDK, error) {
 	if c.EndpointURL == "" {
 		return nil, errors.New("Please specify an EndpointURL url")
 	}
@@ -79,7 +79,7 @@ func NewSDK(c *Configuration) (*SDK, error) {
 	p := swagger.NewPolicyApiWithBasePath(c.EndpointURL)
 	p.Configuration.Transport = oAuth2Client.Transport
 
-	sdk := &SDK{
+	sdk := &CodeGenSDK{
 		OAuth2Api:     o,
 		JsonWebKeyApi: j,
 		WardenApi:     w,

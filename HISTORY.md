@@ -8,6 +8,8 @@ This list makes you aware of (breaking) changes. For patch notes, please check t
 
 Version 0.10.0 is a preview tag of the 1.0.0 release. It contains multiple breaking changes.
 
+This release requires running `hydra migrate sql` before `hydra host`.
+
 ## New consent flow
 
 Previously, the consent flow looked roughly like this:
@@ -85,7 +87,6 @@ on this strategy [here](https://ory.gitbooks.io/hydra/content/oauth2.html#oauth2
 
 To fall back to hierarchical scope matching, set the environment variable `SCOPE_STRATEGY=DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY`.
 This feature *might* be fully removed in the final 1.0.0 version.
-
 
 ## 0.9.0
 

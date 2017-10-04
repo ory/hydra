@@ -14,12 +14,11 @@ provider (e.g. AWS CA) for last mile security.
 You may also choose to set Hydra to HTTPS mode without actually accepting TLS connections. In that case,
 all Hydra URLs are prefixed with `https://`, but the server is actually accepting http. This makes sense if you don't want
 last mile security using TLS, and trust your network to properly handle internal traffic. To use this setting, check
-the setting `HTTPS_ALLOW_TERMINATION_FROM` in `hydra help host`.
+for `HTTPS_ALLOW_TERMINATION_FROM` in `hydra help host`.
 
-Be aware that you will have no way of connecting to ORY Hydra except if the origin is the trusted IP addresses provided
-in the `HTTPS_ALLOW_TERMINATION_FROM` environment variable.
-
-Using this setting, ORY Hydra does not open up a port for TLS communication.
+With TLS termination enabled, ORY Hydra discards all requests unless:
+* The request is coming from a trusted IP address set by `HTTPS_ALLOW_TERMINATION_FROM` and the header `X-Forwarded-Proto` is set to `https`.
+* The request goes to `/health/status` which does not require TLS termination and that is used to check the health of an instance.
 
 ### Routing
 

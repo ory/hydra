@@ -40,12 +40,11 @@ script:
   - while ! echo exit | nc localhost 4444; do sleep 1; done
   - ./scripts/test-e2e.sh
   - ./scripts/run-genswag.sh
+  - goveralls -service=travis-ci -coverprofile=coverage.txt
 
 after_success:
   - |-
     [ "${TRAVIS_TAG}" != "" ] && gox -ldflags "-X github.com/ory/hydra/cmd.Version=`git describe --tags` -X github.com/ory/hydra/cmd.BuildTime=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory/hydra/cmd.GitHash=`git rev-parse HEAD`" -output "dist/{{.Dir}}-{{.OS}}-{{.Arch}}"
-
-
 
 before_deploy:
   - npm version --no-git-tag-version $(git describe --tag)

@@ -53,6 +53,8 @@ is now enough to confirm a consent request:
 5. Redirects the browser back to Hydra.
 6. Hydra validates consent request by checking if it was accepted and generates access tokens, authorize codes, refresh tokens, and id tokens.
 
+Learn more on how the new consent flow works in the guide: https://ory.gitbooks.io/hydra/content/oauth2.html#consent-flow
+
 ## Audience
 
 Previously, the audience terminology was used as a synonym for OAuth2 client IDs. This is no longer the case. The audience

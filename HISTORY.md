@@ -10,6 +10,10 @@ Version 0.10.0 is a preview tag of the 1.0.0 release. It contains multiple break
 
 This release requires running `hydra migrate sql` before `hydra host`.
 
+Please also note that the new scope strategy might render your administrative client incapable of performing requests.
+Set the environment variable `SCOPE_STRATEGY=DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY` to temporarily use the previous
+scope strategy and migrate the scopes manually. You may append `.*` to all scopes. For example, `hydra` is now `hydra hydra.*`
+
 ## New consent flow
 
 Previously, the consent flow looked roughly like this:

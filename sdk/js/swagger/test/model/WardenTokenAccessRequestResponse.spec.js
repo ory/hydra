@@ -57,50 +57,50 @@
       //expect(instance).to.be.a(HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponse);
     });
 
+    it('should have the property accessTokenExtra (base name: "accessTokenExtra")', function() {
+      // uncomment below and update the code to test the property accessTokenExtra
+      //var instane = new HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponse();
+      //expect(instance).to.be();
+    });
+
     it('should have the property allowed (base name: "allowed")', function() {
       // uncomment below and update the code to test the property allowed
       //var instane = new HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponse();
       //expect(instance).to.be();
     });
 
-    it('should have the property cid (base name: "cid")', function() {
-      // uncomment below and update the code to test the property cid
+    it('should have the property clientId (base name: "clientId")', function() {
+      // uncomment below and update the code to test the property clientId
       //var instane = new HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponse();
       //expect(instance).to.be();
     });
 
-    it('should have the property exp (base name: "exp")', function() {
-      // uncomment below and update the code to test the property exp
+    it('should have the property expiresAt (base name: "expiresAt")', function() {
+      // uncomment below and update the code to test the property expiresAt
       //var instane = new HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponse();
       //expect(instance).to.be();
     });
 
-    it('should have the property ext (base name: "ext")', function() {
-      // uncomment below and update the code to test the property ext
+    it('should have the property grantedScopes (base name: "grantedScopes")', function() {
+      // uncomment below and update the code to test the property grantedScopes
       //var instane = new HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponse();
       //expect(instance).to.be();
     });
 
-    it('should have the property iat (base name: "iat")', function() {
-      // uncomment below and update the code to test the property iat
+    it('should have the property issuedAt (base name: "issuedAt")', function() {
+      // uncomment below and update the code to test the property issuedAt
       //var instane = new HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponse();
       //expect(instance).to.be();
     });
 
-    it('should have the property iss (base name: "iss")', function() {
-      // uncomment below and update the code to test the property iss
+    it('should have the property issuer (base name: "issuer")', function() {
+      // uncomment below and update the code to test the property issuer
       //var instane = new HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponse();
       //expect(instance).to.be();
     });
 
-    it('should have the property scopes (base name: "scopes")', function() {
-      // uncomment below and update the code to test the property scopes
-      //var instane = new HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponse();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property sub (base name: "sub")', function() {
-      // uncomment below and update the code to test the property sub
+    it('should have the property subject (base name: "subject")', function() {
+      // uncomment below and update the code to test the property subject
       //var instane = new HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponse();
       //expect(instance).to.be();
     });

@@ -39,6 +39,8 @@
   * [Running Hydra in production](how-to/production.md)
 * [SDKs](sdk.md)
   * [SDK for Go](sdk/go.md)
+  * [SDK for Go](sdk/js.md)
+  * [Other languages](sdk.md)
 * [Contribute](contribute.md)
 * [FAQ](faq.md)
   - [How can I control SQL connection limits?](faq.md#how-can-i-control-sql-connection-limits)

@@ -13,27 +13,27 @@ package swagger
 // The warden access request (with token) response
 type WardenTokenAccessRequestResponse struct {
 
+	// Extra represents arbitrary session data.
+	AccessTokenExtra map[string]interface{} `json:"accessTokenExtra,omitempty"`
+
 	// Allowed is true if the request is allowed and false otherwise.
 	Allowed bool `json:"allowed,omitempty"`
 
 	// ClientID is the id of the OAuth2 client that requested the token.
-	Cid string `json:"cid,omitempty"`
+	ClientId string `json:"clientId,omitempty"`
 
 	// ExpiresAt is the expiry timestamp.
-	Exp string `json:"exp,omitempty"`
-
-	// Extra represents arbitrary session data.
-	Ext map[string]interface{} `json:"ext,omitempty"`
-
-	// IssuedAt is the token creation time stamp.
-	Iat string `json:"iat,omitempty"`
-
-	// Issuer is the id of the issuer, typically an hydra instance.
-	Iss string `json:"iss,omitempty"`
+	ExpiresAt string `json:"expiresAt,omitempty"`
 
 	// GrantedScopes is a list of scopes that the subject authorized when asked for consent.
-	Scopes []string `json:"scopes,omitempty"`
+	GrantedScopes []string `json:"grantedScopes,omitempty"`
+
+	// IssuedAt is the token creation time stamp.
+	IssuedAt string `json:"issuedAt,omitempty"`
+
+	// Issuer is the id of the issuer, typically an hydra instance.
+	Issuer string `json:"issuer,omitempty"`
 
 	// Subject is the identity that authorized issuing the token, for example a user or an OAuth2 app. This is usually a uuid but you can choose a urn or some other id too.
-	Sub string `json:"sub,omitempty"`
+	Subject string `json:"subject,omitempty"`
 }

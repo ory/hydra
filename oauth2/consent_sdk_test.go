@@ -55,7 +55,7 @@ func TestConsentSDK(t *testing.T) {
 	got, _, err := client.GetOAuth2ConsentRequest(req.ID)
 	require.NoError(t, err)
 	assert.EqualValues(t, req.ID, got.Id)
-	assert.EqualValues(t, req.ClientID, got.ClientID)
+	assert.EqualValues(t, req.ClientID, got.ClientId)
 	assert.EqualValues(t, req.RequestedScopes, got.RequestedScopes)
 	assert.EqualValues(t, req.RedirectURL, got.RedirectUrl)
 

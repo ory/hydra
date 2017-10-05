@@ -70,34 +70,39 @@
     if (data) {
       obj = obj || new exports();
 
+      if (data.hasOwnProperty('accessTokenExtra')) {
+        obj['accessTokenExtra'] = ApiClient.convertToType(data['accessTokenExtra'], {'String': Object});
+      }
       if (data.hasOwnProperty('allowed')) {
         obj['allowed'] = ApiClient.convertToType(data['allowed'], 'Boolean');
       }
-      if (data.hasOwnProperty('cid')) {
-        obj['cid'] = ApiClient.convertToType(data['cid'], 'String');
+      if (data.hasOwnProperty('clientId')) {
+        obj['clientId'] = ApiClient.convertToType(data['clientId'], 'String');
       }
-      if (data.hasOwnProperty('exp')) {
-        obj['exp'] = ApiClient.convertToType(data['exp'], 'String');
+      if (data.hasOwnProperty('expiresAt')) {
+        obj['expiresAt'] = ApiClient.convertToType(data['expiresAt'], 'String');
       }
-      if (data.hasOwnProperty('ext')) {
-        obj['ext'] = ApiClient.convertToType(data['ext'], {'String': Object});
+      if (data.hasOwnProperty('grantedScopes')) {
+        obj['grantedScopes'] = ApiClient.convertToType(data['grantedScopes'], ['String']);
       }
-      if (data.hasOwnProperty('iat')) {
-        obj['iat'] = ApiClient.convertToType(data['iat'], 'String');
+      if (data.hasOwnProperty('issuedAt')) {
+        obj['issuedAt'] = ApiClient.convertToType(data['issuedAt'], 'String');
       }
-      if (data.hasOwnProperty('iss')) {
-        obj['iss'] = ApiClient.convertToType(data['iss'], 'String');
+      if (data.hasOwnProperty('issuer')) {
+        obj['issuer'] = ApiClient.convertToType(data['issuer'], 'String');
       }
-      if (data.hasOwnProperty('scopes')) {
-        obj['scopes'] = ApiClient.convertToType(data['scopes'], ['String']);
-      }
-      if (data.hasOwnProperty('sub')) {
-        obj['sub'] = ApiClient.convertToType(data['sub'], 'String');
+      if (data.hasOwnProperty('subject')) {
+        obj['subject'] = ApiClient.convertToType(data['subject'], 'String');
       }
     }
     return obj;
   }
 
+  /**
+   * Extra represents arbitrary session data.
+   * @member {Object.<String, Object>} accessTokenExtra
+   */
+  exports.prototype['accessTokenExtra'] = undefined;
   /**
    * Allowed is true if the request is allowed and false otherwise.
    * @member {Boolean} allowed
@@ -105,39 +110,34 @@
   exports.prototype['allowed'] = undefined;
   /**
    * ClientID is the id of the OAuth2 client that requested the token.
-   * @member {String} cid
+   * @member {String} clientId
    */
-  exports.prototype['cid'] = undefined;
+  exports.prototype['clientId'] = undefined;
   /**
    * ExpiresAt is the expiry timestamp.
-   * @member {String} exp
+   * @member {String} expiresAt
    */
-  exports.prototype['exp'] = undefined;
-  /**
-   * Extra represents arbitrary session data.
-   * @member {Object.<String, Object>} ext
-   */
-  exports.prototype['ext'] = undefined;
-  /**
-   * IssuedAt is the token creation time stamp.
-   * @member {String} iat
-   */
-  exports.prototype['iat'] = undefined;
-  /**
-   * Issuer is the id of the issuer, typically an hydra instance.
-   * @member {String} iss
-   */
-  exports.prototype['iss'] = undefined;
+  exports.prototype['expiresAt'] = undefined;
   /**
    * GrantedScopes is a list of scopes that the subject authorized when asked for consent.
-   * @member {Array.<String>} scopes
+   * @member {Array.<String>} grantedScopes
    */
-  exports.prototype['scopes'] = undefined;
+  exports.prototype['grantedScopes'] = undefined;
+  /**
+   * IssuedAt is the token creation time stamp.
+   * @member {String} issuedAt
+   */
+  exports.prototype['issuedAt'] = undefined;
+  /**
+   * Issuer is the id of the issuer, typically an hydra instance.
+   * @member {String} issuer
+   */
+  exports.prototype['issuer'] = undefined;
   /**
    * Subject is the identity that authorized issuing the token, for example a user or an OAuth2 app. This is usually a uuid but you can choose a urn or some other id too.
-   * @member {String} sub
+   * @member {String} subject
    */
-  exports.prototype['sub'] = undefined;
+  exports.prototype['subject'] = undefined;
 
 
 

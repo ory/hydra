@@ -61,25 +61,25 @@ type swaggerWardenTokenAccessRequestResponse struct {
 type swaggerWardenTokenAccessRequestResponsePayload struct {
 	// Subject is the identity that authorized issuing the token, for example a user or an OAuth2 app.
 	// This is usually a uuid but you can choose a urn or some other id too.
-	Subject string `json:"sub"`
+	Subject string `json:"subject"`
 
 	// GrantedScopes is a list of scopes that the subject authorized when asked for consent.
-	GrantedScopes []string `json:"scopes"`
+	GrantedScopes []string `json:"grantedScopes"`
 
 	// Issuer is the id of the issuer, typically an hydra instance.
-	Issuer string `json:"iss"`
+	Issuer string `json:"issuer"`
 
 	// ClientID is the id of the OAuth2 client that requested the token.
-	ClientID string `json:"cid"`
+	ClientID string `json:"clientId"`
 
 	// IssuedAt is the token creation time stamp.
-	IssuedAt string `json:"iat"`
+	IssuedAt string `json:"issuedAt"`
 
 	// ExpiresAt is the expiry timestamp.
-	ExpiresAt string `json:"exp"`
+	ExpiresAt string `json:"expiresAt"`
 
 	// Extra represents arbitrary session data.
-	Extra map[string]interface{} `json:"ext"`
+	Extra map[string]interface{} `json:"accessTokenExtra"`
 
 	// Allowed is true if the request is allowed and false otherwise.
 	Allowed bool `json:"allowed"`

@@ -11,25 +11,25 @@ import (
 type Context struct {
 	// Subject is the identity that authorized issuing the token, for example a user or an OAuth2 app.
 	// This is usually a uuid but you can choose a urn or some other id too.
-	Subject string `json:"sub"`
+	Subject string `json:"subject"`
 
 	// GrantedScopes is a list of scopes that the subject authorized when asked for consent.
-	GrantedScopes []string `json:"scopes"`
+	GrantedScopes []string `json:"grantedScopes"`
 
 	// Issuer is the id of the issuer, typically an hydra instance.
-	Issuer string `json:"iss"`
+	Issuer string `json:"issuer"`
 
-	// Audience is who the token was issued for. This is an OAuth2 app usually.
-	Audience string `json:"aud"`
+	// ClientID is id of the client the token was issued for..
+	ClientID string `json:"clientId"`
 
 	// IssuedAt is the token creation time stamp.
-	IssuedAt time.Time `json:"iat"`
+	IssuedAt time.Time `json:"issuedAt"`
 
 	// ExpiresAt is the expiry timestamp.
-	ExpiresAt time.Time `json:"exp"`
+	ExpiresAt time.Time `json:"expiresAt"`
 
 	// Extra represents arbitrary session data.
-	Extra map[string]interface{} `json:"ext"`
+	Extra map[string]interface{} `json:"accessTokenExtra"`
 }
 
 // AccessRequest is the warden's request object.

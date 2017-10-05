@@ -74,13 +74,13 @@ func TestWardenSDK(t *testing.T) {
 
 				if err == nil && c.assert != nil {
 					c.assert(t, &firewall.Context{
-						Subject:       result.Sub,
-						GrantedScopes: result.Scopes,
-						Issuer:        result.Iss,
-						ClientID:      result.Aud,
-						Extra:         result.Ext,
-						ExpiresAt:     mustParseTime(result.Exp),
-						IssuedAt:      mustParseTime(result.Iat),
+						Subject:       result.Subject,
+						GrantedScopes: result.GrantedScopes,
+						Issuer:        result.Issuer,
+						ClientID:      result.ClientId,
+						Extra:         result.AccessTokenExtra,
+						ExpiresAt:     mustParseTime(result.ExpiresAt),
+						IssuedAt:      mustParseTime(result.IssuedAt),
 					})
 				}
 			})

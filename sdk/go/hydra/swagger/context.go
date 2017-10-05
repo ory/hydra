@@ -13,8 +13,8 @@ package swagger
 // Context contains an access token's session data
 type Context struct {
 
-	// ClientID is who the token was issued for. This is an OAuth2 app usually.
-	Cid string `json:"cid,omitempty"`
+	// Audience is who the token was issued for. This is an OAuth2 app usually.
+	Aud string `json:"aud,omitempty"`
 
 	// Extra represents arbitrary session data.
 	Ext map[string]interface{} `json:"ext,omitempty"`

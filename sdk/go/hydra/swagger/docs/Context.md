@@ -3,7 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Cid** | **string** | ClientID is who the token was issued for. This is an OAuth2 app usually. | [optional] [default to null]
+**Aud** | **string** | Audience is who the token was issued for. This is an OAuth2 app usually. | [optional] [default to null]
 **Ext** | [**map[string]interface{}**](interface{}.md) | Extra represents arbitrary session data. | [optional] [default to null]
 **Iss** | **string** | Issuer is the id of the issuer, typically an hydra instance. | [optional] [default to null]
 **Scopes** | **[]string** | GrantedScopes is a list of scopes that the subject authorized when asked for consent. | [optional] [default to null]

@@ -82,7 +82,7 @@
   }
 
   /**
-   * ClientID is the audience this token is meant for. Usually a URL.
+   * Audience is the client id that initiated the OAuth2 request.
    * @member {String} audience
    */
   exports.prototype['audience'] = undefined;

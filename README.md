@@ -17,7 +17,7 @@ and low resource consumption. ORY Hydra *is not* an identity provider (user sign
 but connects to your existing identity provider through a [consent app](https://ory.gitbooks.io/hydra/content/oauth2.html#consent-app-flow).
 Implementing the consent app in a different language is easy, and exemplary consent apps
 ([Go](https://github.com/ory/hydra-consent-app-go), [Node](https://github.com/ory/hydra-consent-app-express)) and
-SDKs ([Go](https://github.com/ory/hydra/tree/update-docs/sdk), [Node](https://github.com/ory/hydra-js)) are provided.
+[SDKs](https://ory.gitbooks.io/hydra/content/sdk.html) are provided.
 
 Besides mitigating various attack vectors, such as database compromisation and OAuth 2.0 weaknesses, ORY Hydra is
 able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to.
@@ -288,7 +288,6 @@ Fosite (which is what this is based on) is a very good implementation from a sec
 ## Libraries and third-party projects
 
 Official:
-* [Consent App SDK For NodeJS](https://github.com/ory/hydra-js)
 * [Consent App Example written in Go](https://github.com/ory/hydra-consent-app-go)
 * [Exemplary Consent App with Express and NodeJS](https://github.com/ory/hydra-consent-app-express)
 

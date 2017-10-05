@@ -67,8 +67,8 @@
     if (data) {
       obj = obj || new exports();
 
-      if (data.hasOwnProperty('cid')) {
-        obj['cid'] = ApiClient.convertToType(data['cid'], 'String');
+      if (data.hasOwnProperty('aud')) {
+        obj['aud'] = ApiClient.convertToType(data['aud'], 'String');
       }
       if (data.hasOwnProperty('ext')) {
         obj['ext'] = ApiClient.convertToType(data['ext'], {'String': Object});
@@ -87,10 +87,10 @@
   }
 
   /**
-   * ClientID is who the token was issued for. This is an OAuth2 app usually.
-   * @member {String} cid
+   * Audience is who the token was issued for. This is an OAuth2 app usually.
+   * @member {String} aud
    */
-  exports.prototype['cid'] = undefined;
+  exports.prototype['aud'] = undefined;
   /**
    * Extra represents arbitrary session data.
    * @member {Object.<String, Object>} ext

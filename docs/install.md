@@ -76,7 +76,7 @@ $ docker run -d \
   -e ISSUER=https://localhost:9000/ \
   -e CONSENT_URL=http://localhost:9020/consent \
   -e FORCE_ROOT_CLIENT_CREDENTIALS=admin:demo-password \
-  oryd/hydra:v0.9.12
+  oryd/hydra:v0.10.0-alpha1
 
 # And check if it's running:
 $ docker logs ory-hydra-example--hydra
@@ -249,7 +249,7 @@ $ hydra clients create --skip-tls-verify \
   --name "Consent App Client" \
   --grant-types client_credentials \
   --response-types token \
-  --allowed-scopes hydra.keys.get
+  --allowed-scopes hydra.consent*
 ```
 
 Let's dive into the arguments:
@@ -260,7 +260,7 @@ The secret is visible *only once and can not be retrieved again*.
 * `--name "Consent App Client"` is a human-readable name.
 * `--grant-types client_credentials` allows this client to perform the OAuth 2.0 Client Credentials grant.
 * `--response-types token` allows this client to request access tokens, but not authorize codes or refresh tokens.
-* `--scope hydra.keys.get` allows this client to request access tokens capable of requesting cryptographic keys.
+* `--scope hydra.consent` allows this client to request access tokens capable of managing consent requests.
 
 Cool, next we need to create a policy for this client as well. ORY Hydra uses policies to decide whether a user
 is allowed to do something in the system or not. It is different from OAuth 2.0 Scopes, as those apply only to the
@@ -271,11 +271,11 @@ required cryptographic keys for validating and signing the consent challenge and
 # For more information on access control policies, please read
 # https://ory.gitbooks.io/hydra/content/security.html#access-control-policies
 $ hydra policies create --skip-tls-verify \
-  --actions get \
-  --description "Allow consent-app to access the cryptographic keys for signing and validating the consent challenge and response" \
+  --actions get,accept,reject \
+  --description "Allow consent-app to manage OAuth2 consent requests." \
   --allow \
   --id consent-app-policy \
-  --resources rn:hydra:keys:hydra.consent.challenge:public,rn:hydra:keys:hydra.consent.response:private \
+  --resources rn:hydra:oauth2:consent:requests:<.*> \
   --subjects consent-app
 
 Created policy consent-app-policy.
@@ -283,11 +283,10 @@ Created policy consent-app-policy.
 
 Let's take a look at the arguments:
 
-* `--actions get` we need to access the keys
+* `--actions get,accept,reject` we need to be able to get, accept and reject consent requests.
 * `--allow` sets the policy effect to `allow`. Omit to set this for `deny`.
 * `--id consent-app-policy` a unique identifier.
-* `--resources rn:hydra:keys:hydra.consent.challenge:public,rn:hydra:keys:hydra.consent.response:private` an array
-of comma-separated resource names. These two are fixed in ORY Hydra.
+* `--resources rn:hydra:oauth2:consent:requests:<.*> ` we need to be able to access the consent request resource.
 * `--subjects consent-app` the subject ("user") of this policy is our consent app.
 
 Awesome! Next we will run the [ORY Hydra Consent App Example (NodeJS)](https://github.com/ory/hydra-consent-app-express).
@@ -303,7 +302,7 @@ $ docker run -d \
   -e HYDRA_CLIENT_SECRET=consent-secret \
   -e HYDRA_URL=https://hydra:4444 \
   -e NODE_TLS_REJECT_UNAUTHORIZED=0 \
-  oryd/hydra-consent-app-express:v0.9.12
+  oryd/hydra-consent-app-express:v0.10.0-alpha1
 
 # Let's check if it's running ok:
 $ docker logs ory-hydra-example--consent

@@ -140,7 +140,7 @@ func (w *LocalWarden) newContext(auth fosite.AccessRequester) *firewall.Context 
 		Subject:       session.Subject,
 		GrantedScopes: auth.GetGrantedScopes(),
 		Issuer:        w.Issuer,
-		ClientID:      auth.GetClient().GetID(),
+		Audience:      auth.GetClient().GetID(),
 		IssuedAt:      auth.GetRequestedAt(),
 		ExpiresAt:     exp,
 		Extra:         session.Extra,

@@ -31,6 +31,17 @@ func (s *DefaultConsentStrategy) ValidateConsentRequest(req fosite.AuthorizeRequ
 		return nil, errors.WithStack(err)
 	}
 
+	if !consent.IsConsentGranted() {
+		err := errors.New("The resource owner denied consent for this request")
+		return nil, &fosite.RFC6749Error{
+			Name:        "rejected_consent_request",
+			Description: consent.DenyReason,
+			Debug:       err.Error(),
+			Hint:        consent.DenyReason,
+			Code:        http.StatusUnauthorized,
+		}
+	}
+
 	if time.Now().After(consent.ExpiresAt) {
 		return nil, errors.Errorf("Token expired")
 	}
@@ -49,17 +60,6 @@ func (s *DefaultConsentStrategy) ValidateConsentRequest(req fosite.AuthorizeRequ
 		return nil, errors.Errorf("Session cookie anti-replay value is not a string")
 	} else if js != consent.CSRF {
 		return nil, errors.Errorf("Session cookie anti-replay value does not match value from consent response")
-	}
-
-	if !consent.IsConsentGranted() {
-		err := errors.New("The resource owner denied consent for this request")
-		return nil, &fosite.RFC6749Error{
-			Name:        "Resource owner denied consent",
-			Description: err.Error(),
-			Debug:       err.Error(),
-			Hint:        consent.DenyReason,
-			Code:        http.StatusUnauthorized,
-		}
 	}
 
 	for _, scope := range consent.GrantedScopes {

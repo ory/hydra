@@ -42,7 +42,7 @@ script:
   - ./scripts/run-genswag.sh
   - goveralls -service=travis-ci -coverprofile=coverage.txt
 
-before_deploy:
+after_success:
   - ./scripts/run-deploy.sh
 
 deploy:

@@ -42,6 +42,7 @@
 
   /**
    * Constructs a new <code>SwaggerWardenTokenAccessRequestResponse</code>.
+   * The warden access request (with token) response
    * @alias module:model/SwaggerWardenTokenAccessRequestResponse
    * @class
    */

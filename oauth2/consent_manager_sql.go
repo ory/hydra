@@ -15,7 +15,7 @@ import (
 )
 
 var sqlConsentParams = []string{
-	"id", "audience", "expires_at", "redirect_url", "requested_scopes",
+	"id", "client_id", "expires_at", "redirect_url", "requested_scopes",
 	"csrf", "granted_scopes", "access_token_extra", "id_token_extra",
 	"consent", "deny_reason", "subject",
 }
@@ -27,7 +27,7 @@ var consentMigrations = &migrate.MemoryMigrationSource{
 			Up: []string{`CREATE TABLE IF NOT EXISTS hydra_consent_request (
 	id      			varchar(36) NOT NULL PRIMARY KEY,
 	requested_scopes 	text NOT NULL,
-	audience 			text NOT NULL,
+	client_id 			text NOT NULL,
 	expires_at 			timestamp NOT NULL,
 	redirect_url 		text NOT NULL,
 	csrf 				text NOT NULL,
@@ -48,7 +48,7 @@ var consentMigrations = &migrate.MemoryMigrationSource{
 type consentRequestSqlData struct {
 	ID               string    `db:"id"`
 	RequestedScopes  string    `db:"requested_scopes"`
-	Audience         string    `db:"audience"`
+	ClientID         string    `db:"client_id"`
 	ExpiresAt        time.Time `db:"expires_at"`
 	RedirectURL      string    `db:"redirect_url"`
 	CSRF             string    `db:"csrf"`
@@ -91,7 +91,7 @@ func newConsentRequestSqlData(request *ConsentRequest) (*consentRequestSqlData, 
 		ID:               request.ID,
 		RequestedScopes:  strings.Join(request.RequestedScopes, " "),
 		GrantedScopes:    strings.Join(request.GrantedScopes, " "),
-		Audience:         request.Audience,
+		ClientID:         request.ClientID,
 		ExpiresAt:        request.ExpiresAt,
 		RedirectURL:      request.RedirectURL,
 		CSRF:             request.CSRF,
@@ -120,7 +120,7 @@ func (r *consentRequestSqlData) toConsentRequest() (*ConsentRequest, error) {
 
 	return &ConsentRequest{
 		ID:               r.ID,
-		Audience:         r.Audience,
+		ClientID:         r.ClientID,
 		ExpiresAt:        r.ExpiresAt,
 		RedirectURL:      r.RedirectURL,
 		CSRF:             r.CSRF,

@@ -161,6 +161,7 @@ Class | Method | HTTP request | Description
 
 ## Documentation for Models
 
+ - [HydraOAuth2OpenIdConnectServer.ConsentRequest](docs/ConsentRequest.md)
  - [HydraOAuth2OpenIdConnectServer.ConsentRequestAcceptance](docs/ConsentRequestAcceptance.md)
  - [HydraOAuth2OpenIdConnectServer.ConsentRequestManager](docs/ConsentRequestManager.md)
  - [HydraOAuth2OpenIdConnectServer.ConsentRequestRejection](docs/ConsentRequestRejection.md)
@@ -179,8 +180,8 @@ Class | Method | HTTP request | Description
  - [HydraOAuth2OpenIdConnectServer.KeyGenerator](docs/KeyGenerator.md)
  - [HydraOAuth2OpenIdConnectServer.Manager](docs/Manager.md)
  - [HydraOAuth2OpenIdConnectServer.OAuth2Client](docs/OAuth2Client.md)
+ - [HydraOAuth2OpenIdConnectServer.OAuth2ConsentRequest](docs/OAuth2ConsentRequest.md)
  - [HydraOAuth2OpenIdConnectServer.OAuth2TokenIntrospection](docs/OAuth2TokenIntrospection.md)
- - [HydraOAuth2OpenIdConnectServer.OAuth2consentRequest](docs/OAuth2consentRequest.md)
  - [HydraOAuth2OpenIdConnectServer.Policy](docs/Policy.md)
  - [HydraOAuth2OpenIdConnectServer.PolicyConditions](docs/PolicyConditions.md)
  - [HydraOAuth2OpenIdConnectServer.RawMessage](docs/RawMessage.md)

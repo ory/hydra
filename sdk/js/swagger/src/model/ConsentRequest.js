@@ -26,7 +26,7 @@
     if (!root.HydraOAuth2OpenIdConnectServer) {
       root.HydraOAuth2OpenIdConnectServer = {};
     }
-    root.HydraOAuth2OpenIdConnectServer.WardenAccessRequestResponse = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient);
+    root.HydraOAuth2OpenIdConnectServer.ConsentRequest = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient);
   }
 }(this, function(ApiClient) {
   'use strict';
@@ -35,46 +35,72 @@
 
 
   /**
-   * The WardenAccessRequestResponse model module.
-   * @module model/WardenAccessRequestResponse
+   * The ConsentRequest model module.
+   * @module model/ConsentRequest
    * @version Latest
    */
 
   /**
-   * Constructs a new <code>WardenAccessRequestResponse</code>.
-   * The warden access request response
-   * @alias module:model/WardenAccessRequestResponse
+   * Constructs a new <code>ConsentRequest</code>.
+   * @alias module:model/ConsentRequest
    * @class
    */
   var exports = function() {
     var _this = this;
 
 
+
+
+
   };
 
   /**
-   * Constructs a <code>WardenAccessRequestResponse</code> from a plain JavaScript object, optionally creating a new instance.
+   * Constructs a <code>ConsentRequest</code> from a plain JavaScript object, optionally creating a new instance.
    * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
    * @param {Object} data The plain JavaScript object bearing properties of interest.
-   * @param {module:model/WardenAccessRequestResponse} obj Optional instance to populate.
-   * @return {module:model/WardenAccessRequestResponse} The populated <code>WardenAccessRequestResponse</code> instance.
+   * @param {module:model/ConsentRequest} obj Optional instance to populate.
+   * @return {module:model/ConsentRequest} The populated <code>ConsentRequest</code> instance.
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
       obj = obj || new exports();
 
-      if (data.hasOwnProperty('allowed')) {
-        obj['allowed'] = ApiClient.convertToType(data['allowed'], 'Boolean');
+      if (data.hasOwnProperty('clientId')) {
+        obj['clientId'] = ApiClient.convertToType(data['clientId'], 'String');
+      }
+      if (data.hasOwnProperty('id')) {
+        obj['id'] = ApiClient.convertToType(data['id'], 'String');
+      }
+      if (data.hasOwnProperty('redirectUrl')) {
+        obj['redirectUrl'] = ApiClient.convertToType(data['redirectUrl'], 'String');
+      }
+      if (data.hasOwnProperty('requestedScopes')) {
+        obj['requestedScopes'] = ApiClient.convertToType(data['requestedScopes'], ['String']);
       }
     }
     return obj;
   }
 
   /**
-   * Allowed is true if the request is allowed and false otherwise.
-   * @member {Boolean} allowed
+   * ClientID is the client id that initiated the OAuth2 request.
+   * @member {String} clientId
    */
-  exports.prototype['allowed'] = undefined;
+  exports.prototype['clientId'] = undefined;
+  /**
+   * ID is the id of this consent request.
+   * @member {String} id
+   */
+  exports.prototype['id'] = undefined;
+  /**
+   * Redirect URL is the URL where the user agent should be redirected to after the consent has been accepted or rejected.
+   * @member {String} redirectUrl
+   */
+  exports.prototype['redirectUrl'] = undefined;
+  /**
+   * RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator.
+   * @member {Array.<String>} requestedScopes
+   */
+  exports.prototype['requestedScopes'] = undefined;
 
 
 

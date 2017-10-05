@@ -31,7 +31,7 @@
   var instance;
 
   beforeEach(function() {
-    instance = new HydraOAuth2OpenIdConnectServer.OAuth2ConsentRequest();
+    instance = new HydraOAuth2OpenIdConnectServer.ConsentRequest();
   });
 
   var getProperty = function(object, getter, property) {
@@ -50,40 +50,34 @@
       object[property] = value;
   }
 
-  describe('OAuth2ConsentRequest', function() {
-    it('should create an instance of OAuth2ConsentRequest', function() {
-      // uncomment below and update the code to test OAuth2ConsentRequest
-      //var instane = new HydraOAuth2OpenIdConnectServer.OAuth2ConsentRequest();
-      //expect(instance).to.be.a(HydraOAuth2OpenIdConnectServer.OAuth2ConsentRequest);
+  describe('ConsentRequest', function() {
+    it('should create an instance of ConsentRequest', function() {
+      // uncomment below and update the code to test ConsentRequest
+      //var instane = new HydraOAuth2OpenIdConnectServer.ConsentRequest();
+      //expect(instance).to.be.a(HydraOAuth2OpenIdConnectServer.ConsentRequest);
     });
 
     it('should have the property clientId (base name: "clientId")', function() {
       // uncomment below and update the code to test the property clientId
-      //var instane = new HydraOAuth2OpenIdConnectServer.OAuth2ConsentRequest();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property expiresAt (base name: "expiresAt")', function() {
-      // uncomment below and update the code to test the property expiresAt
-      //var instane = new HydraOAuth2OpenIdConnectServer.OAuth2ConsentRequest();
+      //var instane = new HydraOAuth2OpenIdConnectServer.ConsentRequest();
       //expect(instance).to.be();
     });
 
     it('should have the property id (base name: "id")', function() {
       // uncomment below and update the code to test the property id
-      //var instane = new HydraOAuth2OpenIdConnectServer.OAuth2ConsentRequest();
+      //var instane = new HydraOAuth2OpenIdConnectServer.ConsentRequest();
       //expect(instance).to.be();
     });
 
     it('should have the property redirectUrl (base name: "redirectUrl")', function() {
       // uncomment below and update the code to test the property redirectUrl
-      //var instane = new HydraOAuth2OpenIdConnectServer.OAuth2ConsentRequest();
+      //var instane = new HydraOAuth2OpenIdConnectServer.ConsentRequest();
       //expect(instance).to.be();
     });
 
     it('should have the property requestedScopes (base name: "requestedScopes")', function() {
       // uncomment below and update the code to test the property requestedScopes
-      //var instane = new HydraOAuth2OpenIdConnectServer.OAuth2ConsentRequest();
+      //var instane = new HydraOAuth2OpenIdConnectServer.ConsentRequest();
       //expect(instance).to.be();
     });
 

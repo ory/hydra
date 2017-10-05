@@ -10,6 +10,7 @@
 
 package swagger
 
+// The warden access request (with token) response
 type WardenTokenAccessRequestResponse struct {
 
 	// Allowed is true if the request is allowed and false otherwise.

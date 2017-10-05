@@ -1840,10 +1840,10 @@
       "type": "object",
       "title": "ConsentRequest represents a consent request.",
       "properties": {
-        "audience": {
-          "description": "Audience is the client id that initiated the OAuth2 request.",
+        "clientId": {
+          "description": "ClientID is the client id that initiated the OAuth2 request.",
           "type": "string",
-          "x-go-name": "Audience"
+          "x-go-name": "ClientID"
         },
         "expiresAt": {
           "description": "ExpiresAt is the time where the access request will expire.",
@@ -1878,16 +1878,7 @@
       "description": "Context contains an access token's session data",
       "type": "object",
       "properties": {
-        "aud": {
-          "description": "Audience is who the token was issued for. This is an OAuth2 app usually.",
-          "type": "string",
-          "x-go-name": "Audience"
-        },
-        "exp": {
-          "description": "ExpiresAt is the expiry timestamp.",
-          "x-go-name": "ExpiresAt"
-        },
-        "ext": {
+        "accessTokenExtra": {
           "description": "Extra represents arbitrary session data.",
           "type": "object",
           "additionalProperties": {
@@ -1895,16 +1886,16 @@
           },
           "x-go-name": "Extra"
         },
-        "iat": {
-          "description": "IssuedAt is the token creation time stamp.",
-          "x-go-name": "IssuedAt"
-        },
-        "iss": {
-          "description": "Issuer is the id of the issuer, typically an hydra instance.",
+        "clientId": {
+          "description": "ClientID is id of the client the token was issued for..",
           "type": "string",
-          "x-go-name": "Issuer"
+          "x-go-name": "ClientID"
         },
-        "scopes": {
+        "expiresAt": {
+          "description": "ExpiresAt is the expiry timestamp.",
+          "x-go-name": "ExpiresAt"
+        },
+        "grantedScopes": {
           "description": "GrantedScopes is a list of scopes that the subject authorized when asked for consent.",
           "type": "array",
           "items": {
@@ -1912,7 +1903,16 @@
           },
           "x-go-name": "GrantedScopes"
         },
-        "sub": {
+        "issuedAt": {
+          "description": "IssuedAt is the token creation time stamp.",
+          "x-go-name": "IssuedAt"
+        },
+        "issuer": {
+          "description": "Issuer is the id of the issuer, typically an hydra instance.",
+          "type": "string",
+          "x-go-name": "Issuer"
+        },
+        "subject": {
           "description": "Subject is the identity that authorized issuing the token, for example a user or an OAuth2 app.\nThis is usually a uuid but you can choose a urn or some other id too.",
           "type": "string",
           "x-go-name": "Subject"
@@ -1928,6 +1928,12 @@
     "Handler": {
       "type": "object",
       "properties": {
+        "Generators": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/KeyGenerator"
+          }
+        },
         "H": {
           "$ref": "#/definitions/Writer"
         },
@@ -1938,7 +1944,7 @@
           "$ref": "#/definitions/Firewall"
         }
       },
-      "x-go-package": "github.com/ory/hydra/warden/group"
+      "x-go-package": "github.com/ory/hydra/jwk"
     },
     "KeyGenerator": {
       "type": "object",
@@ -2273,6 +2279,42 @@
       "x-go-name": "Client",
       "x-go-package": "github.com/ory/hydra/client"
     },
+    "oAuth2ConsentRequest": {
+      "type": "object",
+      "title": "ConsentRequest represents a consent request.",
+      "properties": {
+        "clientId": {
+          "description": "ClientID is the client id that initiated the OAuth2 request.",
+          "type": "string",
+          "x-go-name": "ClientID"
+        },
+        "expiresAt": {
+          "description": "ExpiresAt is the time where the access request will expire.",
+          "type": "string",
+          "x-go-name": "ExpiresAt"
+        },
+        "id": {
+          "description": "ID is the id of this consent request.",
+          "type": "string",
+          "x-go-name": "ID"
+        },
+        "redirectUrl": {
+          "description": "Redirect URL is the URL where the user agent should be redirected to after the consent has been\naccepted or rejected.",
+          "type": "string",
+          "x-go-name": "RedirectURL"
+        },
+        "requestedScopes": {
+          "description": "RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "RequestedScopes"
+        }
+      },
+      "x-go-name": "swaggerConsentRequest",
+      "x-go-package": "github.com/ory/hydra/oauth2"
+    },
     "oAuth2TokenIntrospection": {
       "type": "object",
       "properties": {
@@ -2282,7 +2324,7 @@
           "x-go-name": "Active"
         },
         "aud": {
-          "description": "Audience is a service-specific string identifier or list of string\nidentifiers representing the intended audience for this token.",
+          "description": "ClientID is a service-specific string identifier or list of string\nidentifiers representing the intended audience for this token.",
           "type": "string",
           "x-go-name": "Audience"
         },
@@ -2339,42 +2381,6 @@
         }
       },
       "x-go-name": "swaggerOAuthIntrospectionResponsePayload",
-      "x-go-package": "github.com/ory/hydra/oauth2"
-    },
-    "oAuth2consentRequest": {
-      "type": "object",
-      "title": "ConsentRequest represents a consent request.",
-      "properties": {
-        "audience": {
-          "description": "Audience is the client id that initiated the OAuth2 request.",
-          "type": "string",
-          "x-go-name": "Audience"
-        },
-        "expiresAt": {
-          "description": "ExpiresAt is the time where the access request will expire.",
-          "type": "string",
-          "x-go-name": "ExpiresAt"
-        },
-        "id": {
-          "description": "ID is the id of this consent request.",
-          "type": "string",
-          "x-go-name": "ID"
-        },
-        "redirectUrl": {
-          "description": "Redirect URL is the URL where the user agent should be redirected to after the consent has been\naccepted or rejected.",
-          "type": "string",
-          "x-go-name": "RedirectURL"
-        },
-        "requestedScopes": {
-          "description": "RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "x-go-name": "RequestedScopes"
-        }
-      },
-      "x-go-name": "swaggerConsentRequest",
       "x-go-package": "github.com/ory/hydra/oauth2"
     },
     "policy": {
@@ -2628,7 +2634,7 @@
       "type": "object",
       "properties": {
         "Body": {
-          "$ref": "#/definitions/ConsentRequest"
+          "$ref": "#/definitions/oAuth2ConsentRequest"
         }
       },
       "x-go-package": "github.com/ory/hydra/oauth2"
@@ -3100,7 +3106,7 @@
     "oAuth2ConsentRequest": {
       "description": "The consent request response",
       "schema": {
-        "$ref": "#/definitions/ConsentRequest"
+        "$ref": "#/definitions/oAuth2ConsentRequest"
       }
     },
     "oauthTokenResponse": {

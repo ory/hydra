@@ -35,8 +35,8 @@ func (s *DefaultConsentStrategy) ValidateConsentRequest(req fosite.AuthorizeRequ
 		return nil, errors.Errorf("Token expired")
 	}
 
-	if consent.Audience != req.GetClient().GetID() {
-		return nil, errors.Errorf("Audience mismatch")
+	if consent.ClientID != req.GetClient().GetID() {
+		return nil, errors.Errorf("ClientID mismatch")
 	}
 
 	if consent.Subject == "" {
@@ -96,7 +96,7 @@ func (s *DefaultConsentStrategy) CreateConsentRequest(req fosite.AuthorizeReques
 		CSRF:             csrf,
 		GrantedScopes:    []string{},
 		RequestedScopes:  req.GetRequestedScopes(),
-		Audience:         req.GetClient().GetID(),
+		ClientID:         req.GetClient().GetID(),
 		ExpiresAt:        time.Now().Add(s.DefaultChallengeLifespan),
 		RedirectURL:      redirectURL + "&consent=" + id,
 		AccessTokenExtra: map[string]interface{}{},

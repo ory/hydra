@@ -39,7 +39,7 @@ func NewOAuth2ApiWithBasePath(basePath string) *OAuth2Api {
 
 /**
  * Accept a consent request
- * Call this endpoint to accept a consent request. This usually happens when a user agrees to give access rights to an application.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;accept\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+ * Call this endpoint to accept a consent request. This usually happens when a user agrees to give access rights to an application.   The consent request id is usually transmitted via the URL query &#x60;consent&#x60;. For example: &#x60;http://consent-app.mydomain.com/?consent&#x3D;1234abcd&#x60;   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;accept\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
  * @param id
  * @param body
@@ -303,12 +303,12 @@ func (a OAuth2Api) GetOAuth2Client(id string) (*OAuth2Client, *APIResponse, erro
 
 /**
  * Receive consent request information
- * Call this endpoint to receive information on consent requests.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+ * Call this endpoint to receive information on consent requests. The consent request id is usually transmitted via the URL query &#x60;consent&#x60;. For example: &#x60;http://consent-app.mydomain.com/?consent&#x3D;1234abcd&#x60;   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
  * @param id The id of the OAuth 2.0 Consent Request.
- * @return *OAuth2consentRequest
+ * @return *OAuth2ConsentRequest
  */
-func (a OAuth2Api) GetOAuth2ConsentRequest(id string) (*OAuth2consentRequest, *APIResponse, error) {
+func (a OAuth2Api) GetOAuth2ConsentRequest(id string) (*OAuth2ConsentRequest, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Get")
 	// create path and map variables
@@ -349,7 +349,7 @@ func (a OAuth2Api) GetOAuth2ConsentRequest(id string) (*OAuth2consentRequest, *A
 	if localVarHttpHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
-	var successPayload = new(OAuth2consentRequest)
+	var successPayload = new(OAuth2ConsentRequest)
 	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 
 	var localVarURL, _ = url.Parse(localVarPath)
@@ -691,7 +691,7 @@ func (a OAuth2Api) OauthToken() (*InlineResponse2001, *APIResponse, error) {
 
 /**
  * Reject a consent request
- * Call this endpoint to reject a consent request. This usually happens when a user denies access rights to an application.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;reject\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+ * Call this endpoint to reject a consent request. This usually happens when a user denies access rights to an application.   The consent request id is usually transmitted via the URL query &#x60;consent&#x60;. For example: &#x60;http://consent-app.mydomain.com/?consent&#x3D;1234abcd&#x60;   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;reject\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
  * @param id
  * @param body

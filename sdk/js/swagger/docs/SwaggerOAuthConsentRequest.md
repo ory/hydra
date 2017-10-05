@@ -3,6 +3,6 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**body** | [**OAuth2consentRequest**](OAuth2consentRequest.md) |  | [optional] 
+**body** | [**OAuth2ConsentRequest**](OAuth2ConsentRequest.md) |  | [optional] 
 
 

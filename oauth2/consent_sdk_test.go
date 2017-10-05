@@ -20,7 +20,7 @@ import (
 func TestConsentSDK(t *testing.T) {
 	req := &ConsentRequest{
 		ID:               "id-3",
-		Audience:         "audience",
+		ClientID:         "client-id",
 		RequestedScopes:  []string{"foo", "bar"},
 		GrantedScopes:    []string{"baz", "bar"},
 		CSRF:             "some-csrf",
@@ -55,7 +55,7 @@ func TestConsentSDK(t *testing.T) {
 	got, _, err := client.GetOAuth2ConsentRequest(req.ID)
 	require.NoError(t, err)
 	assert.EqualValues(t, req.ID, got.Id)
-	assert.EqualValues(t, req.Audience, got.Audience)
+	assert.EqualValues(t, req.ClientID, got.ClientID)
 	assert.EqualValues(t, req.RequestedScopes, got.RequestedScopes)
 	assert.EqualValues(t, req.RedirectURL, got.RedirectUrl)
 

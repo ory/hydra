@@ -1,9 +1,16 @@
 package hydra
 
-import "github.com/ory/hydra/sdk/go/hydra/swagger"
+import (
+	goauth2 "github.com/golang/oauth2"
+	"github.com/golang/oauth2/clientcredentials"
+	"github.com/ory/hydra/sdk/go/hydra/swagger"
+)
 
 // SDK helps developers interact with ORY Hydra using a Go API.
 type SDK interface {
+	GetOAuth2ClientConfig() *clientcredentials.Config
+	GetOAuth2Config() *goauth2.Config
+
 	PolicyAPI
 	WardenAPI
 	JWKApi

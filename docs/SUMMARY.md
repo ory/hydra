@@ -38,7 +38,7 @@
 * How-To
   * [Running Hydra in production](how-to/production.md)
   * [Secure the consent app](how-to/consent-app.md)
-* SDKs
+* [SDKs](sdk.md)
   * [SDK for Go](sdk/go.md)
 * [Contribute](contribute.md)
 * [FAQ](faq.md)

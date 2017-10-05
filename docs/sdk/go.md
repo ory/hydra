@@ -1,5 +1,15 @@
 ## Go SDK
 
+### Installation
+
+To install the Go SDK, run:
+
+```
+go get -u -d github.com/ory/hydra/sdk/go/hydra
+```
+
+### Configuration
+
 The Go SDK is auto generated from swagger but contains some helpers, such as `NewSDK`:
 
 ```go
@@ -12,6 +22,8 @@ sdk, err := hydra.NewSDK(&hydra.Configuration{
     Scopes:       []string{"hydra.*"},
 })
 ```
+
+### API Usage
 
 APIs usually have three return values. Please check for errors as well as status codes!
 

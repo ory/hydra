@@ -49,4 +49,7 @@ if err != nil {
 }
 ```
 
-For more information on API usage, please head to [GoDoc](https://godoc.org/github.com/ory/hydra/sdk/go/hydra).
+### API Docs
+
+API docs are available [here](https://github.com/ory/hydra/blob/prepare-1.0.0-alpha1/sdk/go/hydra/swagger/README.md).
+Please note that those docs are generated and may introduce bugs if code examples are used 1:1.

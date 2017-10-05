@@ -17,7 +17,7 @@ func TestConsentRequestSqlDataTransforms(t *testing.T) {
 			d: "fully hydrated request object",
 			r: &ConsentRequest{
 				ID:               "id",
-				Audience:         "audience",
+				ClientID:         "client-id",
 				RequestedScopes:  []string{"foo", "bar"},
 				GrantedScopes:    []string{"baz", "bar"},
 				CSRF:             "some-csrf",

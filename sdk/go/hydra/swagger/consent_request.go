@@ -10,10 +10,10 @@
 
 package swagger
 
-type OAuth2consentRequest struct {
+type ConsentRequest struct {
 
-	// Audience is the client id that initiated the OAuth2 request.
-	Audience string `json:"audience,omitempty"`
+	// ClientID is the client id that initiated the OAuth2 request.
+	ClientId string `json:"clientId,omitempty"`
 
 	// ID is the id of this consent request.
 	Id string `json:"id,omitempty"`

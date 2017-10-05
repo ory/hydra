@@ -13,18 +13,18 @@ package swagger
 // Context contains an access token's session data
 type Context struct {
 
-	// Audience is who the token was issued for. This is an OAuth2 app usually.
-	Aud string `json:"aud,omitempty"`
-
 	// Extra represents arbitrary session data.
-	Ext map[string]interface{} `json:"ext,omitempty"`
+	AccessTokenExtra map[string]interface{} `json:"accessTokenExtra,omitempty"`
 
-	// Issuer is the id of the issuer, typically an hydra instance.
-	Iss string `json:"iss,omitempty"`
+	// ClientID is id of the client the token was issued for..
+	ClientId string `json:"clientId,omitempty"`
 
 	// GrantedScopes is a list of scopes that the subject authorized when asked for consent.
-	Scopes []string `json:"scopes,omitempty"`
+	GrantedScopes []string `json:"grantedScopes,omitempty"`
+
+	// Issuer is the id of the issuer, typically an hydra instance.
+	Issuer string `json:"issuer,omitempty"`
 
 	// Subject is the identity that authorized issuing the token, for example a user or an OAuth2 app. This is usually a uuid but you can choose a urn or some other id too.
-	Sub string `json:"sub,omitempty"`
+	Subject string `json:"subject,omitempty"`
 }

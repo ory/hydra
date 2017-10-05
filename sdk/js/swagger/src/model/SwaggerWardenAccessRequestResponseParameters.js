@@ -42,6 +42,7 @@
 
   /**
    * Constructs a new <code>SwaggerWardenAccessRequestResponseParameters</code>.
+   * The warden access request response
    * @alias module:model/SwaggerWardenAccessRequestResponseParameters
    * @class
    */

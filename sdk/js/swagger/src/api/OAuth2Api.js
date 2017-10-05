@@ -17,18 +17,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/ConsentRequestAcceptance', 'model/ConsentRequestRejection', 'model/InlineResponse2001', 'model/InlineResponse401', 'model/JsonWebKeySet', 'model/OAuth2Client', 'model/OAuth2TokenIntrospection', 'model/OAuth2consentRequest', 'model/WellKnown'], factory);
+    define(['ApiClient', 'model/ConsentRequestAcceptance', 'model/ConsentRequestRejection', 'model/InlineResponse2001', 'model/InlineResponse401', 'model/JsonWebKeySet', 'model/OAuth2Client', 'model/OAuth2ConsentRequest', 'model/OAuth2TokenIntrospection', 'model/WellKnown'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/ConsentRequestAcceptance'), require('../model/ConsentRequestRejection'), require('../model/InlineResponse2001'), require('../model/InlineResponse401'), require('../model/JsonWebKeySet'), require('../model/OAuth2Client'), require('../model/OAuth2TokenIntrospection'), require('../model/OAuth2consentRequest'), require('../model/WellKnown'));
+    module.exports = factory(require('../ApiClient'), require('../model/ConsentRequestAcceptance'), require('../model/ConsentRequestRejection'), require('../model/InlineResponse2001'), require('../model/InlineResponse401'), require('../model/JsonWebKeySet'), require('../model/OAuth2Client'), require('../model/OAuth2ConsentRequest'), require('../model/OAuth2TokenIntrospection'), require('../model/WellKnown'));
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
       root.HydraOAuth2OpenIdConnectServer = {};
     }
-    root.HydraOAuth2OpenIdConnectServer.OAuth2Api = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient, root.HydraOAuth2OpenIdConnectServer.ConsentRequestAcceptance, root.HydraOAuth2OpenIdConnectServer.ConsentRequestRejection, root.HydraOAuth2OpenIdConnectServer.InlineResponse2001, root.HydraOAuth2OpenIdConnectServer.InlineResponse401, root.HydraOAuth2OpenIdConnectServer.JsonWebKeySet, root.HydraOAuth2OpenIdConnectServer.OAuth2Client, root.HydraOAuth2OpenIdConnectServer.OAuth2TokenIntrospection, root.HydraOAuth2OpenIdConnectServer.OAuth2consentRequest, root.HydraOAuth2OpenIdConnectServer.WellKnown);
+    root.HydraOAuth2OpenIdConnectServer.OAuth2Api = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient, root.HydraOAuth2OpenIdConnectServer.ConsentRequestAcceptance, root.HydraOAuth2OpenIdConnectServer.ConsentRequestRejection, root.HydraOAuth2OpenIdConnectServer.InlineResponse2001, root.HydraOAuth2OpenIdConnectServer.InlineResponse401, root.HydraOAuth2OpenIdConnectServer.JsonWebKeySet, root.HydraOAuth2OpenIdConnectServer.OAuth2Client, root.HydraOAuth2OpenIdConnectServer.OAuth2ConsentRequest, root.HydraOAuth2OpenIdConnectServer.OAuth2TokenIntrospection, root.HydraOAuth2OpenIdConnectServer.WellKnown);
   }
-}(this, function(ApiClient, ConsentRequestAcceptance, ConsentRequestRejection, InlineResponse2001, InlineResponse401, JsonWebKeySet, OAuth2Client, OAuth2TokenIntrospection, OAuth2consentRequest, WellKnown) {
+}(this, function(ApiClient, ConsentRequestAcceptance, ConsentRequestRejection, InlineResponse2001, InlineResponse401, JsonWebKeySet, OAuth2Client, OAuth2ConsentRequest, OAuth2TokenIntrospection, WellKnown) {
   'use strict';
 
   /**
@@ -58,7 +58,7 @@
 
     /**
      * Accept a consent request
-     * Call this endpoint to accept a consent request. This usually happens when a user agrees to give access rights to an application.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;accept\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * Call this endpoint to accept a consent request. This usually happens when a user agrees to give access rights to an application.   The consent request id is usually transmitted via the URL query &#x60;consent&#x60;. For example: &#x60;http://consent-app.mydomain.com/?consent&#x3D;1234abcd&#x60;   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;accept\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
      * @param {String} id 
      * @param {module:model/ConsentRequestAcceptance} body 
      * @param {module:api/OAuth2Api~acceptOAuth2ConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
@@ -239,16 +239,16 @@
      * Callback function to receive the result of the getOAuth2ConsentRequest operation.
      * @callback module:api/OAuth2Api~getOAuth2ConsentRequestCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/OAuth2consentRequest} data The data returned by the service call.
+     * @param {module:model/OAuth2ConsentRequest} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
     /**
      * Receive consent request information
-     * Call this endpoint to receive information on consent requests.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * Call this endpoint to receive information on consent requests. The consent request id is usually transmitted via the URL query &#x60;consent&#x60;. For example: &#x60;http://consent-app.mydomain.com/?consent&#x3D;1234abcd&#x60;   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
      * @param {String} id The id of the OAuth 2.0 Consent Request.
      * @param {module:api/OAuth2Api~getOAuth2ConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/OAuth2consentRequest}
+     * data is of type: {@link module:model/OAuth2ConsentRequest}
      */
     this.getOAuth2ConsentRequest = function(id, callback) {
       var postBody = null;
@@ -272,7 +272,7 @@
       var authNames = ['oauth2'];
       var contentTypes = ['application/json'];
       var accepts = ['application/json'];
-      var returnType = OAuth2consentRequest;
+      var returnType = OAuth2ConsentRequest;
 
       return this.apiClient.callApi(
         '/oauth2/consent/requests/{id}', 'GET',
@@ -496,7 +496,7 @@
 
     /**
      * Reject a consent request
-     * Call this endpoint to reject a consent request. This usually happens when a user denies access rights to an application.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;reject\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * Call this endpoint to reject a consent request. This usually happens when a user denies access rights to an application.   The consent request id is usually transmitted via the URL query &#x60;consent&#x60;. For example: &#x60;http://consent-app.mydomain.com/?consent&#x3D;1234abcd&#x60;   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;reject\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
      * @param {String} id 
      * @param {module:model/ConsentRequestRejection} body 
      * @param {module:api/OAuth2Api~rejectOAuth2ConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response

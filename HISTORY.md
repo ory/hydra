@@ -64,6 +64,14 @@ endpoint `http://mydomain.com/users`, then the audience would be `http://mydomai
 The audience feature is currently not supported in Hydra, only the terminology changed. Fields named `audience` are thus
 renamed to `clientId` (where previously named `audience`) and `cid` (where previously named `aud`).
 
+**IMPORTANT NOTE:** This does **not** apply to OpenID Connect ID tokens. There, the `aud` claim **MUST** match the `client_id`.
+This discrepancy between OpenID Connect and OAuth 2.0 is what caused the confusion with the OAuth 2.0 audience terminology.
+
+## Response payload changes to `/warden/token/allowed`
+
+Previously, the response of the warden endpoint contained shorthands like `aud`, `iss`, and so on. Those have now been changed
+to their full names. For example, `iss` is now `issuer`. Additionally, `aud` is now named `clientId`.
+
 ## Go SDK
 
 The Go SDK was completely replaced in favor of a SDK based on `swagger-codegen`. Read more on it here: https://ory.gitbooks.io/hydra/content/sdk/go.html

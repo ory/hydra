@@ -26,7 +26,7 @@
     if (!root.HydraOAuth2OpenIdConnectServer) {
       root.HydraOAuth2OpenIdConnectServer = {};
     }
-    root.HydraOAuth2OpenIdConnectServer.OAuth2consentRequest = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient);
+    root.HydraOAuth2OpenIdConnectServer.OAuth2ConsentRequest = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient);
   }
 }(this, function(ApiClient) {
   'use strict';
@@ -35,14 +35,14 @@
 
 
   /**
-   * The OAuth2consentRequest model module.
-   * @module model/OAuth2consentRequest
+   * The OAuth2ConsentRequest model module.
+   * @module model/OAuth2ConsentRequest
    * @version Latest
    */
 
   /**
-   * Constructs a new <code>OAuth2consentRequest</code>.
-   * @alias module:model/OAuth2consentRequest
+   * Constructs a new <code>OAuth2ConsentRequest</code>.
+   * @alias module:model/OAuth2ConsentRequest
    * @class
    */
   var exports = function() {
@@ -52,21 +52,25 @@
 
 
 
+
   };
 
   /**
-   * Constructs a <code>OAuth2consentRequest</code> from a plain JavaScript object, optionally creating a new instance.
+   * Constructs a <code>OAuth2ConsentRequest</code> from a plain JavaScript object, optionally creating a new instance.
    * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
    * @param {Object} data The plain JavaScript object bearing properties of interest.
-   * @param {module:model/OAuth2consentRequest} obj Optional instance to populate.
-   * @return {module:model/OAuth2consentRequest} The populated <code>OAuth2consentRequest</code> instance.
+   * @param {module:model/OAuth2ConsentRequest} obj Optional instance to populate.
+   * @return {module:model/OAuth2ConsentRequest} The populated <code>OAuth2ConsentRequest</code> instance.
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
       obj = obj || new exports();
 
-      if (data.hasOwnProperty('audience')) {
-        obj['audience'] = ApiClient.convertToType(data['audience'], 'String');
+      if (data.hasOwnProperty('clientId')) {
+        obj['clientId'] = ApiClient.convertToType(data['clientId'], 'String');
+      }
+      if (data.hasOwnProperty('expiresAt')) {
+        obj['expiresAt'] = ApiClient.convertToType(data['expiresAt'], 'String');
       }
       if (data.hasOwnProperty('id')) {
         obj['id'] = ApiClient.convertToType(data['id'], 'String');
@@ -82,10 +86,15 @@
   }
 
   /**
-   * Audience is the client id that initiated the OAuth2 request.
-   * @member {String} audience
+   * ClientID is the client id that initiated the OAuth2 request.
+   * @member {String} clientId
    */
-  exports.prototype['audience'] = undefined;
+  exports.prototype['clientId'] = undefined;
+  /**
+   * ExpiresAt is the time where the access request will expire.
+   * @member {String} expiresAt
+   */
+  exports.prototype['expiresAt'] = undefined;
   /**
    * ID is the id of this consent request.
    * @member {String} id

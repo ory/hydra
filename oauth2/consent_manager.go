@@ -8,10 +8,10 @@ type ConsentRequest struct {
 	ID string `json:"id"`
 
 	// RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator.
-	RequestedScopes []string `json:"requestedScopes,omitempty"`
+	RequestedScopes []string `json:"requestedScopes"`
 
-	// Audience is the client id that initiated the OAuth2 request.
-	Audience string `json:"audience"`
+	// ClientID is the client id that initiated the OAuth2 request.
+	ClientID string `json:"clientId"`
 
 	// ExpiresAt is the time where the access request will expire.
 	ExpiresAt time.Time `json:"expiresAt"`

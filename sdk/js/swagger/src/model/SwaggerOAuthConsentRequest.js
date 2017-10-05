@@ -17,18 +17,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/OAuth2consentRequest'], factory);
+    define(['ApiClient', 'model/OAuth2ConsentRequest'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('./OAuth2consentRequest'));
+    module.exports = factory(require('../ApiClient'), require('./OAuth2ConsentRequest'));
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
       root.HydraOAuth2OpenIdConnectServer = {};
     }
-    root.HydraOAuth2OpenIdConnectServer.SwaggerOAuthConsentRequest = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient, root.HydraOAuth2OpenIdConnectServer.OAuth2consentRequest);
+    root.HydraOAuth2OpenIdConnectServer.SwaggerOAuthConsentRequest = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient, root.HydraOAuth2OpenIdConnectServer.OAuth2ConsentRequest);
   }
-}(this, function(ApiClient, OAuth2consentRequest) {
+}(this, function(ApiClient, OAuth2ConsentRequest) {
   'use strict';
 
 
@@ -64,14 +64,14 @@
       obj = obj || new exports();
 
       if (data.hasOwnProperty('Body')) {
-        obj['Body'] = OAuth2consentRequest.constructFromObject(data['Body']);
+        obj['Body'] = OAuth2ConsentRequest.constructFromObject(data['Body']);
       }
     }
     return obj;
   }
 
   /**
-   * @member {module:model/OAuth2consentRequest} Body
+   * @member {module:model/OAuth2ConsentRequest} Body
    */
   exports.prototype['Body'] = undefined;
 

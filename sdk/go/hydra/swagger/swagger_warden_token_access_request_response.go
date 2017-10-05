@@ -10,6 +10,7 @@
 
 package swagger
 
+// The warden access request (with token) response
 type SwaggerWardenTokenAccessRequestResponse struct {
 	Body WardenTokenAccessRequestResponse `json:"Body,omitempty"`
 }

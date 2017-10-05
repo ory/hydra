@@ -1,15 +1,15 @@
 package hydra
 
 import (
-	goauth2 "github.com/golang/oauth2"
-	"github.com/golang/oauth2/clientcredentials"
 	"github.com/ory/hydra/sdk/go/hydra/swagger"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/clientcredentials"
 )
 
 // SDK helps developers interact with ORY Hydra using a Go API.
 type SDK interface {
 	GetOAuth2ClientConfig() *clientcredentials.Config
-	GetOAuth2Config() *goauth2.Config
+	GetOAuth2Config() *oauth2.Config
 
 	PolicyAPI
 	WardenAPI
@@ -132,7 +132,7 @@ type OAuth2API interface {
 	CreateOAuth2Client(body swagger.OAuth2Client) (*swagger.OAuth2Client, *swagger.APIResponse, error)
 	DeleteOAuth2Client(id string) (*swagger.APIResponse, error)
 	GetOAuth2Client(id string) (*swagger.OAuth2Client, *swagger.APIResponse, error)
-	GetOAuth2ConsentRequest(id string) (*swagger.OAuth2consentRequest, *swagger.APIResponse, error)
+	GetOAuth2ConsentRequest(id string) (*swagger.OAuth2ConsentRequest, *swagger.APIResponse, error)
 	GetWellKnown() (*swagger.WellKnown, *swagger.APIResponse, error)
 	IntrospectOAuth2Token(token string, scope string) (*swagger.OAuth2TokenIntrospection, *swagger.APIResponse, error)
 	ListOAuth2Clients() ([]swagger.OAuth2Client, *swagger.APIResponse, error)

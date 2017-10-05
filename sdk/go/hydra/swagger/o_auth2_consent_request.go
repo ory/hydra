@@ -10,7 +10,20 @@
 
 package swagger
 
-// The consent request response
-type SwaggerOAuthConsentRequest struct {
-	Body OAuth2ConsentRequest `json:"Body,omitempty"`
+type OAuth2ConsentRequest struct {
+
+	// ClientID is the client id that initiated the OAuth2 request.
+	ClientId string `json:"clientId,omitempty"`
+
+	// ExpiresAt is the time where the access request will expire.
+	ExpiresAt string `json:"expiresAt,omitempty"`
+
+	// ID is the id of this consent request.
+	Id string `json:"id,omitempty"`
+
+	// Redirect URL is the URL where the user agent should be redirected to after the consent has been accepted or rejected.
+	RedirectUrl string `json:"redirectUrl,omitempty"`
+
+	// RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator.
+	RequestedScopes []string `json:"requestedScopes,omitempty"`
 }

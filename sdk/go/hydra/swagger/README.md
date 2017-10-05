@@ -62,6 +62,7 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
+ - [ConsentRequest](docs/ConsentRequest.md)
  - [ConsentRequestAcceptance](docs/ConsentRequestAcceptance.md)
  - [ConsentRequestManager](docs/ConsentRequestManager.md)
  - [ConsentRequestRejection](docs/ConsentRequestRejection.md)
@@ -80,8 +81,8 @@ Class | Method | HTTP request | Description
  - [KeyGenerator](docs/KeyGenerator.md)
  - [Manager](docs/Manager.md)
  - [OAuth2Client](docs/OAuth2Client.md)
+ - [OAuth2ConsentRequest](docs/OAuth2ConsentRequest.md)
  - [OAuth2TokenIntrospection](docs/OAuth2TokenIntrospection.md)
- - [OAuth2consentRequest](docs/OAuth2consentRequest.md)
  - [Policy](docs/Policy.md)
  - [PolicyConditions](docs/PolicyConditions.md)
  - [RawMessage](docs/RawMessage.md)

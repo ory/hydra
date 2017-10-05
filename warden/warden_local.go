@@ -70,21 +70,21 @@ func (w *LocalWarden) TokenAllowed(ctx context.Context, token string, a *firewal
 		Context:  a.Context,
 	}); err != nil {
 		w.L.WithFields(logrus.Fields{
-			"scopes":   scopes,
-			"subject":  session.GetSubject(),
-			"audience": auth.GetClient().GetID(),
-			"request":  a,
-			"reason":   "The policy decision point denied the request",
+			"scopes":    scopes,
+			"subject":   session.GetSubject(),
+			"client_id": auth.GetClient().GetID(),
+			"request":   a,
+			"reason":    "The policy decision point denied the request",
 		}).WithError(err).Infof("Access denied")
 		return nil, err
 	}
 
 	c := w.newContext(auth)
 	w.L.WithFields(logrus.Fields{
-		"subject":  c.Subject,
-		"audience": auth.GetClient().GetID(),
-		"request":  auth,
-		"result":   c,
+		"subject":   c.Subject,
+		"client_id": auth.GetClient().GetID(),
+		"request":   auth,
+		"result":    c,
 	}).Infof("Access granted")
 
 	return c, nil
@@ -140,7 +140,7 @@ func (w *LocalWarden) newContext(auth fosite.AccessRequester) *firewall.Context 
 		Subject:       session.Subject,
 		GrantedScopes: auth.GetGrantedScopes(),
 		Issuer:        w.Issuer,
-		Audience:      auth.GetClient().GetID(),
+		ClientID:      auth.GetClient().GetID(),
 		IssuedAt:      auth.GetRequestedAt(),
 		ExpiresAt:     exp,
 		Extra:         session.Extra,

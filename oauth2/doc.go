@@ -1,7 +1,7 @@
 package oauth2
 
 // ConsentRequest represents a consent request.
-// swagger:model oAuth2consentRequest
+// swagger:model oAuth2ConsentRequest
 type swaggerConsentRequest struct {
 	// ID is the id of this consent request.
 	ID string `json:"id"`
@@ -9,8 +9,8 @@ type swaggerConsentRequest struct {
 	// RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator.
 	RequestedScopes []string `json:"requestedScopes,omitempty"`
 
-	// Audience is the client id that initiated the OAuth2 request.
-	Audience string `json:"audience"`
+	// ClientID is the client id that initiated the OAuth2 request.
+	ClientID string `json:"clientId"`
 
 	// ExpiresAt is the time where the access request will expire.
 	ExpiresAt string `json:"expiresAt"`
@@ -53,7 +53,7 @@ type swaggerAcceptConsentRequest struct {
 // swagger:response oAuth2ConsentRequest
 type swaggerOAuthConsentRequest struct {
 	// in: body
-	Body ConsentRequest
+	Body swaggerConsentRequest
 }
 
 // The token response
@@ -135,7 +135,7 @@ type swaggerOAuthIntrospectionResponsePayload struct {
 	// authorized this token.
 	Username string `json:"username,omitempty"`
 
-	// Audience is a service-specific string identifier or list of string
+	// ClientID is a service-specific string identifier or list of string
 	// identifiers representing the intended audience for this token.
 	Audience string `json:"aud,omitempty"`
 

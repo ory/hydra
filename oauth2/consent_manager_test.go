@@ -41,7 +41,7 @@ func connectToPGConsent() {
 func tTestConsentRequestManagerReadWrite(t *testing.T) {
 	req := &ConsentRequest{
 		ID:               "id-1",
-		Audience:         "audience",
+		ClientID:         "client-id",
 		RequestedScopes:  []string{"foo", "bar"},
 		GrantedScopes:    []string{"baz", "bar"},
 		CSRF:             "some-csrf",
@@ -74,7 +74,7 @@ func tTestConsentRequestManagerReadWrite(t *testing.T) {
 func TestConsentRequestManagerUpdate(t *testing.T) {
 	req := &ConsentRequest{
 		ID:               "id-2",
-		Audience:         "audience",
+		ClientID:         "client-id",
 		RequestedScopes:  []string{"foo", "bar"},
 		GrantedScopes:    []string{"baz", "bar"},
 		CSRF:             "some-csrf",

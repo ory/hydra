@@ -26,6 +26,8 @@ import:
 - package: github.com/moul/http2curl
 - package: github.com/oleiade/reflections
   version: 1.0.0
+- package: github.com/go-resty/resty
+  version: 1.0.0
 - package: github.com/ory/fosite
   version: 0.11.3
   subpackages:

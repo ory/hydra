@@ -5,12 +5,14 @@ import (
 	"github.com/ory/hydra/firewall"
 )
 
+// The warden access request response
 // swagger:response wardenAccessRequestResponse
 type swaggerWardenAccessRequestResponseParameters struct {
 	// in: body
 	Body swaggerWardenAccessRequestResponse
 }
 
+// The warden access request response
 // swagger:model wardenAccessRequestResponse
 type swaggerWardenAccessRequestResponse struct {
 	// Allowed is true if the request is allowed and false otherwise.
@@ -47,12 +49,14 @@ type swaggerWardenTokenAccessRequest struct {
 	Context map[string]interface{} `json:"context"`
 }
 
+// The warden access request (with token) response
 // swagger:response wardenTokenAccessRequestResponse
 type swaggerWardenTokenAccessRequestResponse struct {
 	// in: body
 	Body swaggerWardenTokenAccessRequestResponsePayload
 }
 
+// The warden access request (with token) response
 // swagger:model wardenTokenAccessRequestResponse
 type swaggerWardenTokenAccessRequestResponsePayload struct {
 	// Subject is the identity that authorized issuing the token, for example a user or an OAuth2 app.

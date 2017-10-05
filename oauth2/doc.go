@@ -1,5 +1,25 @@
 package oauth2
 
+// ConsentRequest represents a consent request.
+// swagger:model oAuth2consentRequest
+type swaggerConsentRequest struct {
+	// ID is the id of this consent request.
+	ID string `json:"id"`
+
+	// RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator.
+	RequestedScopes []string `json:"requestedScopes,omitempty"`
+
+	// Audience is the client id that initiated the OAuth2 request.
+	Audience string `json:"audience"`
+
+	// ExpiresAt is the time where the access request will expire.
+	ExpiresAt string `json:"expiresAt"`
+
+	// Redirect URL is the URL where the user agent should be redirected to after the consent has been
+	// accepted or rejected.
+	RedirectURL string `json:"redirectUrl"`
+}
+
 // swagger:parameters revokeOAuth2Token
 type swaggerRevokeOAuth2TokenParameters struct {
 	// in: formData

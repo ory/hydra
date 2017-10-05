@@ -8,7 +8,7 @@
 * Understanding Hydra
   * [OAuth2 & OpenID Connect](oauth2.md)
     * [Overview](oauth2.md#overview)
-    * [Confirming User Consent: Consent App Flow](oauth2.md#consent-app-flow)
+    * [Confirming User Consent: Consent Flow](oauth2.md#consent-flow)
     * [Validating Tokens: OAuth2 Token Introspection](oauth2.md#oauth2-token-introspection)
     * [OAuth2 Scopes](oauth2.md#oauth2-scopes)
   * [JSON Web Keys](jwk.md)
@@ -37,7 +37,6 @@
 * [Telemetry](telemetry.md)
 * How-To
   * [Running Hydra in production](how-to/production.md)
-  * [Secure the consent app](how-to/consent-app.md)
 * [SDKs](sdk.md)
   * [SDK for Go](sdk/go.md)
 * [Contribute](contribute.md)

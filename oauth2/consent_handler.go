@@ -37,7 +37,9 @@ func (h *ConsentSessionHandler) SetRoutes(r *httprouter.Router) {
 //
 // Receive consent request information
 //
-// Call this endpoint to receive information on consent requests.
+// Call this endpoint to receive information on consent requests. The consent request id is usually transmitted via the URL query `consent`.
+// For example: `http://consent-app.mydomain.com/?consent=1234abcd`
+//
 //
 // The subject making the request needs to be assigned to a policy containing:
 //
@@ -87,6 +89,11 @@ func (h *ConsentSessionHandler) FetchConsentRequest(w http.ResponseWriter, r *ht
 //
 // Call this endpoint to reject a consent request. This usually happens when a user denies access rights to an
 // application.
+//
+//
+// The consent request id is usually transmitted via the URL query `consent`.
+// For example: `http://consent-app.mydomain.com/?consent=1234abcd`
+//
 //
 // The subject making the request needs to be assigned to a policy containing:
 //
@@ -142,6 +149,11 @@ func (h *ConsentSessionHandler) RejectConsentRequestHandler(w http.ResponseWrite
 //
 // Call this endpoint to accept a consent request. This usually happens when a user agrees to give access rights to
 // an application.
+//
+//
+// The consent request id is usually transmitted via the URL query `consent`.
+// For example: `http://consent-app.mydomain.com/?consent=1234abcd`
+//
 //
 // The subject making the request needs to be assigned to a policy containing:
 //

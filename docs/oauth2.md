@@ -52,157 +52,53 @@ You can manage *OAuth 2.0 clients* using the cli or the HTTP REST API.
 * **CLI:** `hydra clients -h`
 * **REST:** Read the [API Docs](http://docs.hydra13.apiary.io/#reference/oauth2-clients)
 
-## Consent App Flow
+## Consent Flow
 
-Hydra does not include user authentication and things like lost password, user registration or user activation. This is the
-responsibility of the so called *consent app*. In the consent app, you usually want to authenticate the user (e.g. log in
-form) and then ask for the user's consent (e.g. "do you really want to grant superapp access to your photos?"). It
-is not uncommon to extend your existing authentication endpoint with a consent screen.
- 
-When Hydra receives an OAuth 2.0 request that requires user authorization, Hydra redirects the user to the consent
-app (sometimes referred to as *consent endpoint*). Once the consent app authenticated the user and asked for his consent, it must redirect
-the user back to Hydra, passing along a JSON Web Token including information for Hydra to process. In abstract,
-the consent flow looks like this:
+The consent flow is a HTTP redirect flow responsible for authenticating users.
 
-![Consent Flow](/images/consent.png)
+ORY Hydra does not include user authentication itself and things like lost password, user registration or user activation
+(commonly known as "Login Service", "User Management" or "Identity Management") are not supported by ORY Hydra.
 
-1. A *client* application (app in browser in laptop) requests an access token from a resource owner:
-`GET https://hydra.myapp.com/oauth2/auth?client_id=c3b49cf0-88e4-4faa-9489-28d5b8957858&response_type=code&scope=core+hydra&state=vboeidlizlxrywkwlsgeggff&nonce=tedgziijemvninkuotcuuiof`.
-2. Hydra generates a consent challenge and forwards the *user agent* (browser in laptop) to the *consent endpoint*:
-`GET https://login.myapp.com/?challenge=eyJhbGciOiJSUzI1N...`.
-3. The *consent endpoint* verifies the resource owner's identity (e.g. cookie, username/password login form, ...).
-The consent challenge is then decoded and the information extracted. It is used to show the consent screen: `Do you want to grant _my cool app_ access to all your private data? [Yes] [No]`
-4. When consent is given, the *consent endpoint* generates a consent response token and redirects the user
-agent (browser in laptop) back to hydra:
-`GET https://hydra.myapp.com/oauth2/auth?client_id=c3b49cf0-88e4-4faa-9489-28d5b8957858&response_type=code&scope=core+hydra&state=vboeidlizlxrywkwlsgeggff&nonce=tedgziijemvninkuotcuuiof&consent=eyJhbGciOiJSU...`.
-5. Hydra validates the consent response token and issues the auth code to the *user agent*. The *user agent* is then redirected to the *client* application at the registered callback uri with the auth code as a parameter:
-`GET https://example.com/callback?code=aaabbbcccddd`
-6. The *client* application pairs this auth code with their client id and client secret, and requests an access token (and optionally the refresh token) from Hydra. This request must contain an Authorization header, which contains a Base64'd id/secret pairing (`client-id:client-secret`), sent as Basic authentication:
+To connect to your user management solution, you need to implement the consent flow. The app or service implementing the
+consent flow is called consent app. The consent app does not have to be its own service, you can modify your existing
+login service ("user management") and implement the consent flow with it.
 
-```
-POST https://hydra.myapp.com/oauth2/token
-Authorization: Basic BASE64_ID_SECRET_PAIR
-Content-Type: application/x-www-form-urlencoded
-code=aaabbbcccddd&redirect_uri=https://example.com/callback&grant_type=authorization_code
-``` 
-7. If your *client* application needs to exchange a refresh token for a new access token, this request looks similar to the auth code exchange, with the `grant_type` parameter altered, and the `code` parameter replaced with `refresh_token`:
+### Flow Overview
 
-```
-POST https://hydra.myapp.com/oauth2/token
-Authorization: Basic BASE64_ID_SECRET_PAIR
-Content-Type: application/x-www-form-urlencoded
-refresh_token=REFRESH_TOKEN&redirect_uri=https://example.com/callback&grant_type=refresh_token
-```
+Let's start with an overview of the consent flow:
 
-If the resource owner denies the consent step, redirect to Hydra and append `&consent=denied`, for example:
-`GET https://hydra.myapp.com/oauth2/auth?client_id=c3b49cf0-88e4-4faa-9489-28d5b8957858&response_type=code&scope=core+hydra&state=vboeidlizlxrywkwlsgeggff&nonce=tedgziijemvninkuotcuuiof&consent=denied`.
+![Consent flow](./images/consent-flow.svg)
 
-### Consent App Flow Example
+**Legend:**
 
-In this section we assume that hydra runs on `https://192.168.99.100:4444` and our
-consent app on `https:/192.168.99.100:3000`.
+* User Agent: The "user agent" the user is using to access an app
+that requires OAuth2 tokens to make calls to a protected API
+or that requires OpenID Connect tokens. Typically, this is a browser
+or a mobile app.
+* Client App: This could be a server side app,
+a single page app (web app), or a mobile app. In the case
+of a mobile app, the user agent is also the client app.
+* Hydra: Well, that's Hydra of course.
+* Consent App: The app implementing the consent flow.
+* Protected API: An API that requires valid access tokens for authorization.
+* Consent Request ID: `?consent=jfu3...` is the consent request ID. You need to use this request ID to
+fetch infromation on the authroization request and to accept or reject the
+consent request.
 
-All user-based OAuth2 requests, including the OpenID Connect workflow, begin at the `/oauth2/auth` endpoint.
-For example: `https://192.168.99.100:4444/oauth2/auth?client_id=c3b49cf0-88e4-4faa-9489-28d5b8957858&response_type=code&scope=core+hydra&state=wewuphkgywhtldsmainefkyx&nonce=uqfjjzftqpjccdvxltaposri`
+#### Exemplary Consent App UI
 
-If the request includes a valid redirect uri and a valid client id, hydra redirects the user to then consent url.
-The consent url can be set using the `CONSENT_URL` environment variable.
+Here is how Google chose to design the login and consent UI (what we call the "consent app"):
 
-Let's set the `CONSENT_URL` to `https:/192.168.99.100:3000/consent`, where a NodeJS application
-is running (the *consent app*). Next, Hydra appends a consent challenge to the consent url and redirects the user to it.
-For example: `http://192.168.99.100:3000/consent/?challenge=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJjM2I0OWNmMC04OGU0LTRmYWEtOTQ4OS0yOGQ1Yjg5NTc4NTgiLCJleHAiOjE0NjQ1MTU0ODIsImp0aSI6IjNmYWRlN2NjLTdlYTItNGViMi05MGI1LWY5OTUwNTI4MzgyOSIsInJlZGlyIjoiaHR0cHM6Ly8xOTIuMTY4Ljk5LjEwMDo0NDQ0L29hdXRoMi9hdXRoP2NsaWVudF9pZD1jM2I0OWNmMC04OGU0LTRmYWEtOTQ4OS0yOGQ1Yjg5NTc4NThcdTAwMjZyZXNwb25zZV90eXBlPWNvZGVcdTAwMjZzY29wZT1jb3JlK2h5ZHJhXHUwMDI2c3RhdGU9d2V3dXBoa2d5d2h0bGRzbWFpbmVma3l4XHUwMDI2bm9uY2U9dXFmamp6ZnRxcGpjY2R2eGx0YXBvc3JpIiwic2NwIjpbImNvcmUiLCJoeWRyYSJdfQ.KpLBotIEE4izVSAjLOeCCfm_wYZ7UWSCA81akr6Ci1yycKs8e_bhBYdSThy8JW3bAvofNcZ0v48ov9KxZVegWm8GuNbBEcNvKeiyW_8PiJXWE92YsMv-tDIL3VFPOp0469FmDLsSg5ohsFj5S89FzykNYfVxLPBAFcAS_JElWbo`
+![./images/google.png]
+![./images/google2.png]
 
-The consent challenge is a signed RSA-SHA 256 (RS256) [JSON Web Token](https://tools.ietf.org/html/rfc7519) and contains
-the following claims:
+### Consent REST API
 
+There are three API endpoints available for managing consent request:
 
-```json
-{
-  "aud": "c3b49cf0-88e4-4faa-9489-28d5b8957858",
-  "exp": 1464515099,
-  "jti": "64c4f79e-e016-45b8-8c0e-d96c671c1e8a",
-  "redir": "https://192.168.99.100:4444/oauth2/auth?client_id=c3b49cf0-88e4-4faa-9489-28d5b8957858&response_type=code&scope=core+hydra&state=myhnxqmwzhteycweovblswwj&nonce=gmmsuvtsbtoeumeohesztshg",
-  "scp": [
-    "core",
-    "hydra"
-  ]
-}
-```
-
-The challenge claims are:
-* **jti:** A unique id.
-* **scp:** The requested scopes, e.g. `["blog.readall", "blog.writeall"]`
-* **aud:** The client id that initiated the request. You can fetch client data using the [OAuth2 Client API](http://docs.hydra13.apiary.io/#reference/oauth2/manage-the-oauth2-client-collection).
-* **exp:** The challenge's expiry date. Consent endpoints must not accept challenges that have expired.
-* **redir:** Where the consent endpoint should redirect the user agent to, once consent is given.
-
-Hydra signs the consent response token with a key called `hydra.consent.challenge`.
-The public key can be looked up via the [Key Manager](https://ory-am.gitbooks.io/hydra/content/jwk.html):
-
-```
-https://192.168.99.100:4444/keys/hydra.consent.challenge/public
-```
-
-Next, the consent-app must check if the user is authenticated. This can be done by e.g. using a session cookie.
-If the user is not authenticate, he must be challenged to provide valid credentials through e.g. a HTML form.
-The consent-app could use LDAP, MySQL, RethinkDB or any other backend to store and verify the credentials.
-
-Upon user authentication, the consent-app must ask for the user's consent. This could look like:
-
-> _That super useful service app_ would like to:
-> * Know who you are
-> * View your extended profile info
-> * Get read access to all your cloud pictures
-> 
-> [Deny] - [Allow]
-
-If the user clicks *Allow*, the consent-app redirects him back to the *redir* claim value. The consent-app appends
-a signed consent response token to the URL:
-
-```
-https://192.168.99.100:4444/oauth2/auth?client_id=c3b49cf0-88e4-4faa-9489-28d5b8957858&response_type=code&scope=core+hydra&state=myhnxqmwzhteycweovblswwj&nonce=gmmsuvtsbtoeumeohesztshg&consent=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJjM2I0OWNmMC04OGU0LTRmYWEtOTQ4OS0yOGQ1Yjg5NTc4NTgiLCJleHAiOjE0NjQ1MTUwOTksInNjcCI6WyJjb3JlIiwiaHlkcmEiXSwic3ViIjoiam9obi5kb2VAbWUuY29tIiwiaWF0IjoxNDY0NTExNTE1fQ.tX5TKdP9hHCgPbqBzKIYMjJVwqOdxf5ACScmQ6t20Qteo8AYEfavGwq8KxRF1Oz_otcQDdZY--jcl1caom0yT2eTvj1d9E2Hs7eXmYuW_xF9pTpmDwJnrcOlONFKsNZN97n41qprzMrsX5ez0T5AcopGwpPMxKhwGDSXq9CQgQU
-```
-
-The consent response token is a RSA-SHA 256 (RS256) signed [JSON Web Token](https://tools.ietf.org/html/rfc7519)
-that contains the following claims:
-
-```json
-{
-  "jti": "64c4f79e-e016-45b8-8c0e-d96c671c1e8a",
-  "aud": "c3b49cf0-88e4-4faa-9489-28d5b8957858",
-  "exp": 1464515099,
-  "scp": [
-    "core",
-    "hydra"
-  ],
-  "sub": "john.doe@me.com",
-  "iat": 1464511515,
-  "id_ext": { "foo": "bar" },
-  "at_ext": { "baz": true }
-}
-```
-
-The consent claims are:
-* **jti:** Include the `jti` value from the consent challenge here.
-* **scp:** The scopes the user opted in to *grant* access to, e.g. `["blog.readall"]`.
-* **sub:** Include the subject's unique id here.
-* **aud:** The client id that initiated the OAuth2 request. You can fetch
-client data using the [OAuth2 Client API](http://docs.hydra13.apiary.io/#reference/oauth2/manage-the-oauth2-client-collection).
-* **exp:** The expiry date of this token. Use very short lifespans (< 10 min).
-* **iat:** The tokens issuance time.
-* **id_ext:** If set, pass this extra data to the id token. This data is not available at OAuth2 Token Introspection
- nor at the warden endpoints. *(optional)*
-* **at_ext:** If set, pass this extra data to the access token session. You can retrieve the data
-by using OAuth2 Token Introspection or the warden endpoints. *(optional)*
-
-Hydra validates the consent response token with consent-app's public key. The public
-key must be stored in the [JSON Web Key Manager](./jwk.md)
-at `https://localhost:4444/keys/hydra.consent.response/public`
-
-If you want, you can use the Key Manager to store and retrieve private keys as well. When Hydra boots for the first time,
-a private/public `hydra.consent.response` keypair is created.
-You can use that keypair to sign consent response tokens. The private key is available at
-`https://localhost:4444/keys/asymmetric/hydra.consent.response/private`.
+* [Fetch information on a consent request](http://docs.hydra13.apiary.io/#r/oauth2/oauth2consentrequestsid)
+* [Accept a consent request](http://docs.hydra13.apiary.io/#r/oauth2/oauth2consentrequestsidaccept)
+* [Reject a consent request](http://docs.hydra13.apiary.io/#r/oauth2/oauth2consentrequestsidreject)
 
 ### Error Handling during Consent App Flow
 
@@ -231,6 +127,9 @@ Hydra has the following pre-defined scopes:
 * `openid`: Include this scope if you wish to perform an OpenID Connect request.
 
 To manage ORY Hydra, various scopes are required. A complete list is available [here](http://docs.hydra13.apiary.io/#authentication/oauth2).
+
+Please be aware that any OAuth2 client requesting a set of scopes must also be allowed to request said scopes. You can define
+the allowed scopes using the OAuth2 client REST API.
 
 ### Scope strategy
 

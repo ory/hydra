@@ -51,6 +51,10 @@ func TestRuneSequenceMatchesPattern(t *testing.T) {
 }
 
 func TestRuneSequenceIsPseudoUnique(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	// 1 in 100 probability of collision
 	times := 9000
 	runes := []rune("ab")

@@ -11,6 +11,10 @@ import (
 )
 
 func TestGenerator(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	for k, c := range []struct {
 		g     KeyGenerator
 		check func(*jose.JsonWebKeySet)

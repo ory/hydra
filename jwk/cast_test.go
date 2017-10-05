@@ -7,6 +7,10 @@ import (
 )
 
 func TestMustRSAPrivate(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	keys, err := new(RS256Generator).Generate("")
 	assert.Nil(t, err)
 

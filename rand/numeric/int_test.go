@@ -27,6 +27,10 @@ func TestUInt32(t *testing.T) {
 }
 
 func TestInt64IsUnique(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	// Probability of collision is around 1 in a million
 	times := 6000000
 	s := make(map[int64]bool)
@@ -43,6 +47,10 @@ func TestInt64IsUnique(t *testing.T) {
 }
 
 func TestUInt64IsUnique(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	// Probability of collision is around 1 in a million
 	times := 6000000
 	s := make(map[uint64]bool)
@@ -59,6 +67,10 @@ func TestUInt64IsUnique(t *testing.T) {
 }
 
 func TestInt32IsUnique(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	// Probability of collision is around 1 in 1000
 	times := 3000
 	s := make(map[int32]bool)
@@ -75,6 +87,10 @@ func TestInt32IsUnique(t *testing.T) {
 }
 
 func TestUInt32IsUnique(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	// Probability of collision is around 1 in 1000
 	times := 3000
 	s := make(map[uint32]bool)

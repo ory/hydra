@@ -57,6 +57,12 @@
       //expect(instance).to.be.a(HydraOAuth2OpenIdConnectServer.Handler);
     });
 
+    it('should have the property generators (base name: "Generators")', function() {
+      // uncomment below and update the code to test the property generators
+      //var instane = new HydraOAuth2OpenIdConnectServer.Handler();
+      //expect(instance).to.be();
+    });
+
     it('should have the property H (base name: "H")', function() {
       // uncomment below and update the code to test the property H
       //var instane = new HydraOAuth2OpenIdConnectServer.Handler();

@@ -20,3 +20,4 @@ git add -A .
 
 git checkout HEAD -- sdk/go/hydra/swagger/configuration.go
 git checkout HEAD -- sdk/go/hydra/swagger/api_client.go
+rm -f ./sdk/js/swagger/package.json

@@ -57,8 +57,8 @@
       //expect(instance).to.be.a(HydraOAuth2OpenIdConnectServer.Context);
     });
 
-    it('should have the property cid (base name: "cid")', function() {
-      // uncomment below and update the code to test the property cid
+    it('should have the property aud (base name: "aud")', function() {
+      // uncomment below and update the code to test the property aud
       //var instane = new HydraOAuth2OpenIdConnectServer.Context();
       //expect(instance).to.be();
     });

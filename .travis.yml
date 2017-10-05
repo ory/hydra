@@ -50,7 +50,7 @@ deploy:
   - provider: npm
     api_key: "$NPM_TOKEN"
     email: "$NPM_EMAIL"
-    skip_cleanup: false
+    skip_cleanup: true
     on:
       tags: true
   - provider: releases

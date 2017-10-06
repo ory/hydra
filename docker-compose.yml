@@ -22,8 +22,6 @@ services:
       - postgresd:postgresd
 #     Uncomment the following line to use mysql instead.
 #      - mysqld:mysqld
-#     Uncomment the following line to use redis instead.
-#      - redisd:redisd
     volumes:
       - hydravolume:/root
     ports:
@@ -36,10 +34,8 @@ services:
       - DATABASE_URL=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable
 #     Uncomment the following line to use mysql instead.
 #      - DATABASE_URL=mysql://root:secret@tcp(mysqld:3306)/mysql?parseTime=true
-#     Uncomment the following line to use redis instead.
-#      - DATABASE_URL=redis://redisd:6379/0
       - FORCE_ROOT_CLIENT_CREDENTIALS=admin:demo-password
-      - SYSTEM_SECRET=some-very-insecure-secret
+      - SYSTEM_SECRET=youReallyNeedToChangeThis
     restart: unless-stopped
 
   consent:
@@ -69,10 +65,6 @@ services:
 #    image: mysql:5.7
 #    environment:
 #      - MYSQL_ROOT_PASSWORD=secret
-
-#  Uncomment the following section to use redis instead.
-#  redisd:
-#    image: redis:3.2
 
 volumes:
   hydravolume:

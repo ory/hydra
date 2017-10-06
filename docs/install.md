@@ -302,7 +302,7 @@ $ docker run -d \
   -e HYDRA_CLIENT_SECRET=consent-secret \
   -e HYDRA_URL=https://hydra:4444 \
   -e NODE_TLS_REJECT_UNAUTHORIZED=0 \
-  oryd/hydra-consent-app-express:v0.10.0-alpha1
+  oryd/hydra-consent-app-express:v0.10.0-alpha.7
 
 # Let's check if it's running ok:
 $ docker logs ory-hydra-example--consent

@@ -52,7 +52,7 @@ func (s *SQLManager) CreateSchemas() (int, error) {
 	return n, nil
 }
 
-func (m *SQLManager) AddKey(set string, key *jose.JsonWebKey) error {
+func (m *SQLManager) AddKey(set string, key *jose.JSONWebKey) error {
 	out, err := json.Marshal(key)
 	if err != nil {
 		return errors.WithStack(err)
@@ -74,7 +74,7 @@ func (m *SQLManager) AddKey(set string, key *jose.JsonWebKey) error {
 	return nil
 }
 
-func (m *SQLManager) AddKeySet(set string, keys *jose.JsonWebKeySet) error {
+func (m *SQLManager) AddKeySet(set string, keys *jose.JSONWebKeySet) error {
 	tx, err := m.DB.Beginx()
 	if err != nil {
 		return errors.WithStack(err)
@@ -119,7 +119,7 @@ func (m *SQLManager) AddKeySet(set string, keys *jose.JsonWebKeySet) error {
 	return nil
 }
 
-func (m *SQLManager) GetKey(set, kid string) (*jose.JsonWebKeySet, error) {
+func (m *SQLManager) GetKey(set, kid string) (*jose.JSONWebKeySet, error) {
 	var d sqlData
 	if err := m.DB.Get(&d, m.DB.Rebind("SELECT * FROM hydra_jwk WHERE sid=? AND kid=?"), set, kid); err == sql.ErrNoRows {
 		return nil, errors.Wrap(pkg.ErrNotFound, "")
@@ -132,17 +132,17 @@ func (m *SQLManager) GetKey(set, kid string) (*jose.JsonWebKeySet, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	var c jose.JsonWebKey
+	var c jose.JSONWebKey
 	if err := json.Unmarshal(key, &c); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	return &jose.JsonWebKeySet{
-		Keys: []jose.JsonWebKey{c},
+	return &jose.JSONWebKeySet{
+		Keys: []jose.JSONWebKey{c},
 	}, nil
 }
 
-func (m *SQLManager) GetKeySet(set string) (*jose.JsonWebKeySet, error) {
+func (m *SQLManager) GetKeySet(set string) (*jose.JSONWebKeySet, error) {
 	var ds []sqlData
 	if err := m.DB.Select(&ds, m.DB.Rebind("SELECT * FROM hydra_jwk WHERE sid=?"), set); err == sql.ErrNoRows {
 		return nil, errors.Wrap(pkg.ErrNotFound, "")
@@ -154,14 +154,14 @@ func (m *SQLManager) GetKeySet(set string) (*jose.JsonWebKeySet, error) {
 		return nil, errors.Wrap(pkg.ErrNotFound, "")
 	}
 
-	keys := &jose.JsonWebKeySet{Keys: []jose.JsonWebKey{}}
+	keys := &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{}}
 	for _, d := range ds {
 		key, err := m.Cipher.Decrypt(d.Key)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
 
-		var c jose.JsonWebKey
+		var c jose.JSONWebKey
 		if err := json.Unmarshal(key, &c); err != nil {
 			return nil, errors.WithStack(err)
 		}

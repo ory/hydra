@@ -16,14 +16,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func genKey() *jose.JsonWebKeySet {
+func genKey() *jose.JSONWebKeySet {
 	g := &jwk.RS256Generator{}
 	k, _ := g.Generate("")
 	return k
 }
 
 func TestConsentHelper(t *testing.T) {
-	km := &jwk.MemoryManager{Keys: map[string]*jose.JsonWebKeySet{}}
+	km := &jwk.MemoryManager{Keys: map[string]*jose.JSONWebKeySet{}}
 	km.AddKeySet(oauth2.ConsentChallengeKey, genKey())
 	km.AddKeySet(oauth2.ConsentEndpointKey, genKey())
 

@@ -1,5 +1,5 @@
-hash: 116f662b157744514f2af5dfa680474afcd6df0e7255904a48a3f56df6766483
-updated: 2017-09-15T12:04:13.6327978+02:00
+hash: aad3297c5199dfa86e0a27733ac9dfd1acfa14d009391af687ba303749850702
+updated: 2017-10-09T14:11:26.683738-06:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 4918b99a7cb949bb295f3c7bbaf24b577d806e35
@@ -85,7 +85,7 @@ imports:
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
 - name: github.com/jehiah/go-strftime
-  version: 2efbe75097a505e2789f7e39cb9da067b5be8e3e
+  version: 834e15c05a45371503440cc195bbd05c9a0968d9
 - name: github.com/jmoiron/sqlx
   version: d9bd385d68c068f1fabb5057e3dedcbcbb039d0f
   subpackages:
@@ -158,12 +158,12 @@ imports:
   version: bdb0aeca8a993b292b85c9ec17b5ce0ff81848c8
 - name: github.com/segmentio/backo-go
   version: 204274ad699c0983a70203a566887f17a717fef4
+- name: github.com/sirupsen/logrus
+  version: 89742aefa4b206dcf400792f3bd35b542998eb3b
 - name: github.com/Sirupsen/logrus
   version: 89742aefa4b206dcf400792f3bd35b542998eb3b
   repo: https://github.com/sirupsen/logrus.git
   vcs: git
-- name: github.com/sirupsen/logrus
-  version: 89742aefa4b206dcf400792f3bd35b542998eb3b
 - name: github.com/spf13/afero
   version: ee1bd8ee15a1306d1f9201acc41ef39cd9f99a1b
   subpackages:

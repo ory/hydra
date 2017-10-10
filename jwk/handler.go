@@ -341,7 +341,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var ctx = context.Background()
 	var requests joseWebKeySetRequest
-	var keySet = new(jose.JsonWebKeySet)
+	var keySet = new(jose.JSONWebKeySet)
 	var set = ps.ByName("set")
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
@@ -358,7 +358,7 @@ func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	for _, request := range requests.Keys {
-		key := &jose.JsonWebKey{}
+		key := &jose.JSONWebKey{}
 		if err := key.UnmarshalJSON(request); err != nil {
 			h.H.WriteError(w, r, errors.WithStack(err))
 		}
@@ -407,7 +407,7 @@ func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 //       500: genericError
 func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var ctx = context.Background()
-	var key jose.JsonWebKey
+	var key jose.JSONWebKey
 	var set = ps.ByName("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&key); err != nil {

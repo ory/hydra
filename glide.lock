@@ -1,10 +1,10 @@
-hash: aad3297c5199dfa86e0a27733ac9dfd1acfa14d009391af687ba303749850702
-updated: 2017-10-09T14:11:26.683738-06:00
+hash: 4f5430a29f1bb6f18cc5a1d401f62b5f4f6ebda2eb461f04b4084be1f975109d
+updated: 2017-10-10T21:36:28.006157-06:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 4918b99a7cb949bb295f3c7bbaf24b577d806e35
 - name: github.com/Azure/go-ansiterm
-  version: 19f72df4d05d31cbe1c56bfc8045c96babff6c7e
+  version: d6e3b3328b783f23731bc4d058875b0371ff8109
   subpackages:
   - winterm
 - name: github.com/cenk/backoff
@@ -52,11 +52,11 @@ imports:
 - name: github.com/fsnotify/fsnotify
   version: 4da3e2cfbabc9f751898f250b49f2439785783a1
 - name: github.com/fsouza/go-dockerclient
-  version: 98edf3edfae6a6500fecc69d2bcccf1302544004
+  version: d2a6d0596004cc01062a2a068540b817f911e6dc
 - name: github.com/go-sql-driver/mysql
   version: a0583e0143b1624142adab07e0e97fe106d99561
 - name: github.com/golang/protobuf
-  version: 11b8df160996e00fd4b55cbaafb3d84ec6d50fa8
+  version: 130e6b02ab059e7b717a096f397c5b60111cae74
   subpackages:
   - proto
 - name: github.com/gorilla/context
@@ -70,7 +70,7 @@ imports:
   subpackages:
   - simplelru
 - name: github.com/hashicorp/hcl
-  version: 68e816d1c783414e79bc65b3994d9ab6b0a722ab
+  version: 42e33e2d55a0ff1d6263f738896ea8c13571a8d0
   subpackages:
   - hcl/ast
   - hcl/parser
@@ -93,7 +93,7 @@ imports:
 - name: github.com/julienschmidt/httprouter
   version: 8c199fb6259ffc1af525cc3ad52ee60ba8359669
 - name: github.com/lib/pq
-  version: e42267488fe361b9dc034be7a6bffef5b195bceb
+  version: 30d59eaf01528a141f560f34f0208e0ec5218e75
   subpackages:
   - oid
 - name: github.com/magiconair/properties
@@ -105,20 +105,20 @@ imports:
 - name: github.com/mitchellh/mapstructure
   version: d0303fe809921458f417bcf828397a65db30a7e4
 - name: github.com/mohae/deepcopy
-  version: 491d3605edfb866af34a48075bd4355ac1bf46ca
+  version: c48cc78d482608239f6c4c92a4abd87eb8761c90
 - name: github.com/moul/http2curl
-  version: 4e24498b31dba4683efb9d35c1c8a91e2eda28c8
+  version: 9ac6cf4d929b2fa8fd2d2e6dec5bb0feb4f4911d
 - name: github.com/Nvveen/Gotty
   version: cd527374f1e5bff4938207604a14f2e38a9cf512
 - name: github.com/oleiade/reflections
   version: 2b6ec3da648e3e834dc41bad8d9ed7f2dc6a9496
 - name: github.com/opencontainers/runc
-  version: 593914b8bd5448a93f7c3e4902a03408b6d5c0ce
+  version: beb8716fcb400d5f555c5d96a0534572d40f0248
   subpackages:
   - libcontainer/system
   - libcontainer/user
 - name: github.com/ory/dockertest
-  version: 4e3eadceb309bdef330865c89b5a06635c09c2f6
+  version: b6cb198a39dfd21edd511aad53bab6e1a247b437
 - name: github.com/ory/fosite
   version: ef8f1757f0c26317fd7dbb46f66fde7516a3b4bb
   subpackages:
@@ -141,7 +141,7 @@ imports:
 - name: github.com/pborman/uuid
   version: a97ce2ca70fa5a848076093f05e639a89ca34d06
 - name: github.com/pelletier/go-toml
-  version: 1d6b12b7cb290426e27e6b4e38b89fcda3aeef03
+  version: 2009e44b6f182e34d8ce081ac2767622937ea3d4
 - name: github.com/pkg/errors
   version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/pkg/profile
@@ -158,28 +158,28 @@ imports:
   version: bdb0aeca8a993b292b85c9ec17b5ce0ff81848c8
 - name: github.com/segmentio/backo-go
   version: 204274ad699c0983a70203a566887f17a717fef4
-- name: github.com/sirupsen/logrus
-  version: 89742aefa4b206dcf400792f3bd35b542998eb3b
 - name: github.com/Sirupsen/logrus
   version: 89742aefa4b206dcf400792f3bd35b542998eb3b
   repo: https://github.com/sirupsen/logrus.git
   vcs: git
+- name: github.com/sirupsen/logrus
+  version: 89742aefa4b206dcf400792f3bd35b542998eb3b
 - name: github.com/spf13/afero
-  version: ee1bd8ee15a1306d1f9201acc41ef39cd9f99a1b
+  version: e67d870304c4bca21331b02f414f970df13aa694
   subpackages:
   - mem
 - name: github.com/spf13/cast
   version: acbeb36b902d72a7a4c18e8f3241075e7ab763e4
 - name: github.com/spf13/cobra
-  version: b78744579491c1ceeaaa3b40205e56b0591b93a3
+  version: 4d6af280c76ff7d266434f2dba207c4b75dfc076
 - name: github.com/spf13/jwalterweatherman
   version: 12bd96e66386c1960ab0f74ced1362f66f552f7b
 - name: github.com/spf13/pflag
-  version: 7aff26db30c1be810f9de5038ec5ef96ac41fd7c
+  version: a9789e855c7696159b7db0db7f440b449edf2b31
 - name: github.com/spf13/viper
-  version: 25b30aa063fc18e48662b86996252eabdcf2f0c7
+  version: d9cca5ef33035202efb1586825bdbb15ff9ec3ba
 - name: github.com/square/go-jose
-  version: aa2e30fdd1fe9dd3394119af66451ae790d50e0d
+  version: f8f38de21b4dcd69d0413faf231983f5fd6634b1
   subpackages:
   - json
 - name: github.com/stretchr/testify
@@ -194,33 +194,35 @@ imports:
 - name: github.com/xtgo/uuid
   version: a0b114877d4caeffbd7f87e3757c17fce570fea7
 - name: golang.org/x/crypto
-  version: faadfbdc035307d901e69eea569f5dda451a3ee3
+  version: 9419663f5a44be8b34ca85f08abc5fe1be11f8a3
   subpackages:
   - bcrypt
   - blowfish
+  - ed25519
+  - ed25519/internal/edwards25519
   - ssh/terminal
 - name: golang.org/x/net
-  version: 859d1a86bb617c0c20d154590c3c5d3fcb670b07
+  version: a04bdaca5b32abe1c069418fb7088ae607de5bd0
   subpackages:
   - context
   - context/ctxhttp
 - name: golang.org/x/oauth2
-  version: 13449ad91cb26cb47661c1b080790392170385fd
+  version: bb50c06baba3d0c76f9d125c0719093e315b5b44
   subpackages:
   - clientcredentials
   - internal
 - name: golang.org/x/sys
-  version: 062cd7e4e68206d8bab9b18396626e855c992658
+  version: ebfc5b4631820b793c9010c87fd8fef0f39eb082
   subpackages:
   - unix
   - windows
 - name: golang.org/x/text
-  version: 1cbadb444a806fd9430d14ad08967ed91da4fa0a
+  version: 825fc78a2fd6fa0a5447e300189e3219e05e1f25
   subpackages:
   - transform
   - unicode/norm
 - name: google.golang.org/appengine
-  version: d9a072cfa7b9736e44311ef77b3e09d804bfa599
+  version: 07f075729064fd38e1360517947f0f6e03500651
   subpackages:
   - internal
   - internal/base
@@ -231,8 +233,8 @@ imports:
   - urlfetch
 - name: gopkg.in/gorp.v1
   version: c87af80f3cc5036b55b83d77171e156791085e2e
-- name: gopkg.in/square/go-jose.v1
-  version: aa2e30fdd1fe9dd3394119af66451ae790d50e0d
+- name: gopkg.in/square/go-jose.v2
+  version: f8f38de21b4dcd69d0413faf231983f5fd6634b1
   subpackages:
   - cipher
   - json

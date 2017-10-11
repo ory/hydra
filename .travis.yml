@@ -29,6 +29,8 @@ install:
   - go install github.com/ory/hydra
   - glide update
   - go install github.com/ory/hydra
+  - dep ensure
+  - go install github.com/ory/hydra
 
 script:
   - touch ./coverage.tmp

@@ -15,10 +15,10 @@ type HTTPManager struct {
 	FakeTLSTermination bool
 }
 
-func (m *HTTPManager) CreateKeys(set, algorithm string) (*jose.JsonWebKeySet, error) {
+func (m *HTTPManager) CreateKeys(set, algorithm string) (*jose.JSONWebKeySet, error) {
 	var c = struct {
 		Algorithm string            `json:"alg"`
-		Keys      []jose.JsonWebKey `json:"keys"`
+		Keys      []jose.JSONWebKey `json:"keys"`
 	}{
 		Algorithm: algorithm,
 	}
@@ -31,12 +31,12 @@ func (m *HTTPManager) CreateKeys(set, algorithm string) (*jose.JsonWebKeySet, er
 		return nil, err
 	}
 
-	return &jose.JsonWebKeySet{
+	return &jose.JSONWebKeySet{
 		Keys: c.Keys,
 	}, nil
 }
 
-func (m *HTTPManager) AddKey(set string, key *jose.JsonWebKey) error {
+func (m *HTTPManager) AddKey(set string, key *jose.JSONWebKey) error {
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, set, key.KeyID).String())
 	r.Client = m.Client
 	r.Dry = m.Dry
@@ -44,7 +44,7 @@ func (m *HTTPManager) AddKey(set string, key *jose.JsonWebKey) error {
 	return r.Update(key)
 }
 
-func (m *HTTPManager) AddKeySet(set string, keys *jose.JsonWebKeySet) error {
+func (m *HTTPManager) AddKeySet(set string, keys *jose.JSONWebKeySet) error {
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, set).String())
 	r.Client = m.Client
 	r.Dry = m.Dry
@@ -52,8 +52,8 @@ func (m *HTTPManager) AddKeySet(set string, keys *jose.JsonWebKeySet) error {
 	return r.Update(keys)
 }
 
-func (m *HTTPManager) GetKey(set, kid string) (*jose.JsonWebKeySet, error) {
-	var c jose.JsonWebKeySet
+func (m *HTTPManager) GetKey(set, kid string) (*jose.JSONWebKeySet, error) {
+	var c jose.JSONWebKeySet
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, set, kid).String())
 	r.Client = m.Client
 	r.Dry = m.Dry
@@ -65,8 +65,8 @@ func (m *HTTPManager) GetKey(set, kid string) (*jose.JsonWebKeySet, error) {
 	return &c, nil
 }
 
-func (m *HTTPManager) GetKeySet(set string) (*jose.JsonWebKeySet, error) {
-	var c jose.JsonWebKeySet
+func (m *HTTPManager) GetKeySet(set string) (*jose.JSONWebKeySet, error) {
+	var c jose.JSONWebKeySet
 	var r = pkg.NewSuperAgent(pkg.JoinURL(m.Endpoint, set).String())
 	r.Client = m.Client
 	r.Dry = m.Dry

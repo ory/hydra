@@ -19,7 +19,7 @@ func RandomBytes(n int) ([]byte, error) {
 	return bytes, nil
 }
 
-func TestHelperManagerKey(m Manager, keys *jose.JsonWebKeySet) func(t *testing.T) {
+func TestHelperManagerKey(m Manager, keys *jose.JSONWebKeySet) func(t *testing.T) {
 	pub := keys.Key("public")
 	priv := keys.Key("private")
 
@@ -53,7 +53,7 @@ func TestHelperManagerKey(m Manager, keys *jose.JsonWebKeySet) func(t *testing.T
 	}
 }
 
-func TestHelperManagerKeySet(m Manager, keys *jose.JsonWebKeySet) func(t *testing.T) {
+func TestHelperManagerKeySet(m Manager, keys *jose.JSONWebKeySet) func(t *testing.T) {
 	return func(t *testing.T) {
 		_, err := m.GetKeySet("foo")
 		pkg.AssertError(t, true, err)

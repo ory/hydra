@@ -19,6 +19,7 @@ type FositeMemoryStore struct {
 	RefreshTokens  map[string]fosite.Requester
 
 	sync.RWMutex
+	passwordStore ResourceOwnerPasswordCredentialsGrantStore
 }
 
 func (s *FositeMemoryStore) CreateOpenIDConnectSession(_ context.Context, authorizeCode string, requester fosite.Requester) error {
@@ -151,4 +152,8 @@ func (s *FositeMemoryStore) RevokeAccessToken(ctx context.Context, id string) er
 		return errors.New("Not found")
 	}
 	return nil
+}
+
+func (s *FositeMemoryStore) Authenticate(ctx context.Context, name string, secret string) error {
+	return s.passwordStore.Authenticate(ctx, name, secret);
 }

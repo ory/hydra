@@ -256,6 +256,15 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprou
 		}
 	}
 
+	if accessRequest.GetGrantTypes().Exact("password") {
+		session.Subject = accessRequest.GetRequestForm().Get("username");
+		for _, scope := range accessRequest.GetRequestedScopes() {
+			if h.ScopeStrategy(accessRequest.GetClient().GetScopes(), scope) {
+				accessRequest.GrantScope(scope)
+			}
+		}
+	}
+
 	accessResponse, err := h.OAuth2.NewAccessResponse(ctx, accessRequest)
 	if err != nil {
 		pkg.LogError(err, h.L)

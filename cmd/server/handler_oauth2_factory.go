@@ -97,6 +97,7 @@ func newOAuth2Provider(c *config.Config, km jwk.Manager) fosite.OAuth2Provider {
 		compose.OpenIDConnectHybridFactory,
 		compose.OpenIDConnectImplicitFactory,
 		compose.OAuth2TokenRevocationFactory,
+		compose.OAuth2ResourceOwnerPasswordCredentialsFactory,
 		warden.OAuth2TokenIntrospectionFactory,
 	)
 }

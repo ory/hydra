@@ -14,25 +14,24 @@
  *
  */
 
-(function(root, factory) {
+;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient'], factory);
+    define(['ApiClient'], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'));
+    module.exports = factory(require('../ApiClient'))
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
-      root.HydraOAuth2OpenIdConnectServer = {};
+      root.HydraOAuth2OpenIdConnectServer = {}
     }
-    root.HydraOAuth2OpenIdConnectServer.Context = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient);
+    root.HydraOAuth2OpenIdConnectServer.Context = factory(
+      root.HydraOAuth2OpenIdConnectServer.ApiClient
+    )
   }
-}(this, function(ApiClient) {
-  'use strict';
-
-
-
+})(this, function(ApiClient) {
+  'use strict'
 
   /**
    * The Context model module.
@@ -47,14 +46,8 @@
    * @class
    */
   var exports = function() {
-    var _this = this;
-
-
-
-
-
-
-  };
+    var _this = this
+  }
 
   /**
    * Constructs a <code>Context</code> from a plain JavaScript object, optionally creating a new instance.
@@ -65,56 +58,57 @@
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
-      obj = obj || new exports();
+      obj = obj || new exports()
 
       if (data.hasOwnProperty('accessTokenExtra')) {
-        obj['accessTokenExtra'] = ApiClient.convertToType(data['accessTokenExtra'], {'String': Object});
+        obj['accessTokenExtra'] = ApiClient.convertToType(
+          data['accessTokenExtra'],
+          { String: Object }
+        )
       }
       if (data.hasOwnProperty('clientId')) {
-        obj['clientId'] = ApiClient.convertToType(data['clientId'], 'String');
+        obj['clientId'] = ApiClient.convertToType(data['clientId'], 'String')
       }
       if (data.hasOwnProperty('grantedScopes')) {
-        obj['grantedScopes'] = ApiClient.convertToType(data['grantedScopes'], ['String']);
+        obj['grantedScopes'] = ApiClient.convertToType(data['grantedScopes'], [
+          'String'
+        ])
       }
       if (data.hasOwnProperty('issuer')) {
-        obj['issuer'] = ApiClient.convertToType(data['issuer'], 'String');
+        obj['issuer'] = ApiClient.convertToType(data['issuer'], 'String')
       }
       if (data.hasOwnProperty('subject')) {
-        obj['subject'] = ApiClient.convertToType(data['subject'], 'String');
+        obj['subject'] = ApiClient.convertToType(data['subject'], 'String')
       }
     }
-    return obj;
+    return obj
   }
 
   /**
    * Extra represents arbitrary session data.
    * @member {Object.<String, Object>} accessTokenExtra
    */
-  exports.prototype['accessTokenExtra'] = undefined;
+  exports.prototype['accessTokenExtra'] = undefined
   /**
    * ClientID is id of the client the token was issued for..
    * @member {String} clientId
    */
-  exports.prototype['clientId'] = undefined;
+  exports.prototype['clientId'] = undefined
   /**
    * GrantedScopes is a list of scopes that the subject authorized when asked for consent.
    * @member {Array.<String>} grantedScopes
    */
-  exports.prototype['grantedScopes'] = undefined;
+  exports.prototype['grantedScopes'] = undefined
   /**
    * Issuer is the id of the issuer, typically an hydra instance.
    * @member {String} issuer
    */
-  exports.prototype['issuer'] = undefined;
+  exports.prototype['issuer'] = undefined
   /**
    * Subject is the identity that authorized issuing the token, for example a user or an OAuth2 app. This is usually a uuid but you can choose a urn or some other id too.
    * @member {String} subject
    */
-  exports.prototype['subject'] = undefined;
+  exports.prototype['subject'] = undefined
 
-
-
-  return exports;
-}));
-
-
+  return exports
+})

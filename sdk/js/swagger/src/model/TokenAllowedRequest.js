@@ -14,25 +14,24 @@
  *
  */
 
-(function(root, factory) {
+;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient'], factory);
+    define(['ApiClient'], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'));
+    module.exports = factory(require('../ApiClient'))
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
-      root.HydraOAuth2OpenIdConnectServer = {};
+      root.HydraOAuth2OpenIdConnectServer = {}
     }
-    root.HydraOAuth2OpenIdConnectServer.TokenAllowedRequest = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient);
+    root.HydraOAuth2OpenIdConnectServer.TokenAllowedRequest = factory(
+      root.HydraOAuth2OpenIdConnectServer.ApiClient
+    )
   }
-}(this, function(ApiClient) {
-  'use strict';
-
-
-
+})(this, function(ApiClient) {
+  'use strict'
 
   /**
    * The TokenAllowedRequest model module.
@@ -46,12 +45,8 @@
    * @class
    */
   var exports = function() {
-    var _this = this;
-
-
-
-
-  };
+    var _this = this
+  }
 
   /**
    * Constructs a <code>TokenAllowedRequest</code> from a plain JavaScript object, optionally creating a new instance.
@@ -62,40 +57,38 @@
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
-      obj = obj || new exports();
+      obj = obj || new exports()
 
       if (data.hasOwnProperty('action')) {
-        obj['action'] = ApiClient.convertToType(data['action'], 'String');
+        obj['action'] = ApiClient.convertToType(data['action'], 'String')
       }
       if (data.hasOwnProperty('context')) {
-        obj['context'] = ApiClient.convertToType(data['context'], {'String': Object});
+        obj['context'] = ApiClient.convertToType(data['context'], {
+          String: Object
+        })
       }
       if (data.hasOwnProperty('resource')) {
-        obj['resource'] = ApiClient.convertToType(data['resource'], 'String');
+        obj['resource'] = ApiClient.convertToType(data['resource'], 'String')
       }
     }
-    return obj;
+    return obj
   }
 
   /**
    * Action is the action that is requested on the resource.
    * @member {String} action
    */
-  exports.prototype['action'] = undefined;
+  exports.prototype['action'] = undefined
   /**
    * Context is the request's environmental context.
    * @member {Object.<String, Object>} context
    */
-  exports.prototype['context'] = undefined;
+  exports.prototype['context'] = undefined
   /**
    * Resource is the resource that access is requested to.
    * @member {String} resource
    */
-  exports.prototype['resource'] = undefined;
+  exports.prototype['resource'] = undefined
 
-
-
-  return exports;
-}));
-
-
+  return exports
+})

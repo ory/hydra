@@ -14,22 +14,69 @@
  *
  */
 
-(function(root, factory) {
+;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/ConsentRequestAcceptance', 'model/ConsentRequestRejection', 'model/InlineResponse2001', 'model/InlineResponse401', 'model/JsonWebKeySet', 'model/OAuth2Client', 'model/OAuth2ConsentRequest', 'model/OAuth2TokenIntrospection', 'model/WellKnown'], factory);
+    define(
+      [
+        'ApiClient',
+        'model/ConsentRequestAcceptance',
+        'model/ConsentRequestRejection',
+        'model/InlineResponse2001',
+        'model/InlineResponse401',
+        'model/JsonWebKeySet',
+        'model/OAuth2Client',
+        'model/OAuth2ConsentRequest',
+        'model/OAuth2TokenIntrospection',
+        'model/WellKnown'
+      ],
+      factory
+    )
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/ConsentRequestAcceptance'), require('../model/ConsentRequestRejection'), require('../model/InlineResponse2001'), require('../model/InlineResponse401'), require('../model/JsonWebKeySet'), require('../model/OAuth2Client'), require('../model/OAuth2ConsentRequest'), require('../model/OAuth2TokenIntrospection'), require('../model/WellKnown'));
+    module.exports = factory(
+      require('../ApiClient'),
+      require('../model/ConsentRequestAcceptance'),
+      require('../model/ConsentRequestRejection'),
+      require('../model/InlineResponse2001'),
+      require('../model/InlineResponse401'),
+      require('../model/JsonWebKeySet'),
+      require('../model/OAuth2Client'),
+      require('../model/OAuth2ConsentRequest'),
+      require('../model/OAuth2TokenIntrospection'),
+      require('../model/WellKnown')
+    )
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
-      root.HydraOAuth2OpenIdConnectServer = {};
+      root.HydraOAuth2OpenIdConnectServer = {}
     }
-    root.HydraOAuth2OpenIdConnectServer.OAuth2Api = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient, root.HydraOAuth2OpenIdConnectServer.ConsentRequestAcceptance, root.HydraOAuth2OpenIdConnectServer.ConsentRequestRejection, root.HydraOAuth2OpenIdConnectServer.InlineResponse2001, root.HydraOAuth2OpenIdConnectServer.InlineResponse401, root.HydraOAuth2OpenIdConnectServer.JsonWebKeySet, root.HydraOAuth2OpenIdConnectServer.OAuth2Client, root.HydraOAuth2OpenIdConnectServer.OAuth2ConsentRequest, root.HydraOAuth2OpenIdConnectServer.OAuth2TokenIntrospection, root.HydraOAuth2OpenIdConnectServer.WellKnown);
+    root.HydraOAuth2OpenIdConnectServer.OAuth2Api = factory(
+      root.HydraOAuth2OpenIdConnectServer.ApiClient,
+      root.HydraOAuth2OpenIdConnectServer.ConsentRequestAcceptance,
+      root.HydraOAuth2OpenIdConnectServer.ConsentRequestRejection,
+      root.HydraOAuth2OpenIdConnectServer.InlineResponse2001,
+      root.HydraOAuth2OpenIdConnectServer.InlineResponse401,
+      root.HydraOAuth2OpenIdConnectServer.JsonWebKeySet,
+      root.HydraOAuth2OpenIdConnectServer.OAuth2Client,
+      root.HydraOAuth2OpenIdConnectServer.OAuth2ConsentRequest,
+      root.HydraOAuth2OpenIdConnectServer.OAuth2TokenIntrospection,
+      root.HydraOAuth2OpenIdConnectServer.WellKnown
+    )
   }
-}(this, function(ApiClient, ConsentRequestAcceptance, ConsentRequestRejection, InlineResponse2001, InlineResponse401, JsonWebKeySet, OAuth2Client, OAuth2ConsentRequest, OAuth2TokenIntrospection, WellKnown) {
-  'use strict';
+})(this, function(
+  ApiClient,
+  ConsentRequestAcceptance,
+  ConsentRequestRejection,
+  InlineResponse2001,
+  InlineResponse401,
+  JsonWebKeySet,
+  OAuth2Client,
+  OAuth2ConsentRequest,
+  OAuth2TokenIntrospection,
+  WellKnown
+) {
+  'use strict'
 
   /**
    * OAuth2 service.
@@ -45,8 +92,7 @@
    * default to {@link module:ApiClient#instance} if unspecified.
    */
   var exports = function(apiClient) {
-    this.apiClient = apiClient || ApiClient.instance;
-
+    this.apiClient = apiClient || ApiClient.instance
 
     /**
      * Callback function to receive the result of the acceptOAuth2ConsentRequest operation.
@@ -64,39 +110,48 @@
      * @param {module:api/OAuth2Api~acceptOAuth2ConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.acceptOAuth2ConsentRequest = function(id, body, callback) {
-      var postBody = body;
+      var postBody = body
 
       // verify the required parameter 'id' is set
       if (id === undefined || id === null) {
-        throw new Error("Missing the required parameter 'id' when calling acceptOAuth2ConsentRequest");
+        throw new Error(
+          "Missing the required parameter 'id' when calling acceptOAuth2ConsentRequest"
+        )
       }
 
       // verify the required parameter 'body' is set
       if (body === undefined || body === null) {
-        throw new Error("Missing the required parameter 'body' when calling acceptOAuth2ConsentRequest");
+        throw new Error(
+          "Missing the required parameter 'body' when calling acceptOAuth2ConsentRequest"
+        )
       }
 
-
       var pathParams = {
-        'id': id
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
+        id: id
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = null;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = null
 
       return this.apiClient.callApi(
-        '/oauth2/consent/requests/{id}/accept', 'PATCH',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/oauth2/consent/requests/{id}/accept',
+        'PATCH',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -115,33 +170,39 @@
      * data is of type: {@link module:model/OAuth2Client}
      */
     this.createOAuth2Client = function(body, callback) {
-      var postBody = body;
+      var postBody = body
 
       // verify the required parameter 'body' is set
       if (body === undefined || body === null) {
-        throw new Error("Missing the required parameter 'body' when calling createOAuth2Client");
+        throw new Error(
+          "Missing the required parameter 'body' when calling createOAuth2Client"
+        )
       }
 
+      var pathParams = {}
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var pathParams = {
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
-
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = OAuth2Client;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = OAuth2Client
 
       return this.apiClient.callApi(
-        '/clients', 'POST',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/clients',
+        'POST',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -159,34 +220,41 @@
      * @param {module:api/OAuth2Api~deleteOAuth2ClientCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.deleteOAuth2Client = function(id, callback) {
-      var postBody = null;
+      var postBody = null
 
       // verify the required parameter 'id' is set
       if (id === undefined || id === null) {
-        throw new Error("Missing the required parameter 'id' when calling deleteOAuth2Client");
+        throw new Error(
+          "Missing the required parameter 'id' when calling deleteOAuth2Client"
+        )
       }
 
-
       var pathParams = {
-        'id': id
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
+        id: id
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = null;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = null
 
       return this.apiClient.callApi(
-        '/clients/{id}', 'DELETE',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/clients/{id}',
+        'DELETE',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -205,34 +273,41 @@
      * data is of type: {@link module:model/OAuth2Client}
      */
     this.getOAuth2Client = function(id, callback) {
-      var postBody = null;
+      var postBody = null
 
       // verify the required parameter 'id' is set
       if (id === undefined || id === null) {
-        throw new Error("Missing the required parameter 'id' when calling getOAuth2Client");
+        throw new Error(
+          "Missing the required parameter 'id' when calling getOAuth2Client"
+        )
       }
 
-
       var pathParams = {
-        'id': id
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
+        id: id
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = OAuth2Client;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = OAuth2Client
 
       return this.apiClient.callApi(
-        '/clients/{id}', 'GET',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/clients/{id}',
+        'GET',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -251,34 +326,41 @@
      * data is of type: {@link module:model/OAuth2ConsentRequest}
      */
     this.getOAuth2ConsentRequest = function(id, callback) {
-      var postBody = null;
+      var postBody = null
 
       // verify the required parameter 'id' is set
       if (id === undefined || id === null) {
-        throw new Error("Missing the required parameter 'id' when calling getOAuth2ConsentRequest");
+        throw new Error(
+          "Missing the required parameter 'id' when calling getOAuth2ConsentRequest"
+        )
       }
 
-
       var pathParams = {
-        'id': id
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
+        id: id
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = OAuth2ConsentRequest;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = OAuth2ConsentRequest
 
       return this.apiClient.callApi(
-        '/oauth2/consent/requests/{id}', 'GET',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/oauth2/consent/requests/{id}',
+        'GET',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -296,28 +378,35 @@
      * data is of type: {@link module:model/WellKnown}
      */
     this.getWellKnown = function(callback) {
-      var postBody = null;
+      var postBody = null
 
+      var pathParams = {}
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var pathParams = {
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
-
-      var authNames = [];
-      var contentTypes = ['application/json', 'application/x-www-form-urlencoded'];
-      var accepts = ['application/json'];
-      var returnType = WellKnown;
+      var authNames = []
+      var contentTypes = [
+        'application/json',
+        'application/x-www-form-urlencoded'
+      ]
+      var accepts = ['application/json']
+      var returnType = WellKnown
 
       return this.apiClient.callApi(
-        '/.well-known/openid-configuration', 'GET',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/.well-known/openid-configuration',
+        'GET',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -338,36 +427,43 @@
      * data is of type: {@link module:model/OAuth2TokenIntrospection}
      */
     this.introspectOAuth2Token = function(token, opts, callback) {
-      opts = opts || {};
-      var postBody = null;
+      opts = opts || {}
+      var postBody = null
 
       // verify the required parameter 'token' is set
       if (token === undefined || token === null) {
-        throw new Error("Missing the required parameter 'token' when calling introspectOAuth2Token");
+        throw new Error(
+          "Missing the required parameter 'token' when calling introspectOAuth2Token"
+        )
       }
 
-
-      var pathParams = {
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
+      var pathParams = {}
+      var queryParams = {}
+      var headerParams = {}
       var formParams = {
-        'token': token,
-        'scope': opts['scope']
-      };
+        token: token,
+        scope: opts['scope']
+      }
 
-      var authNames = ['basic', 'oauth2'];
-      var contentTypes = ['application/x-www-form-urlencoded'];
-      var accepts = ['application/json'];
-      var returnType = OAuth2TokenIntrospection;
+      var authNames = ['basic', 'oauth2']
+      var contentTypes = ['application/x-www-form-urlencoded']
+      var accepts = ['application/json']
+      var returnType = OAuth2TokenIntrospection
 
       return this.apiClient.callApi(
-        '/oauth2/introspect', 'POST',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/oauth2/introspect',
+        'POST',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -385,28 +481,32 @@
      * data is of type: {@link Array.<module:model/OAuth2Client>}
      */
     this.listOAuth2Clients = function(callback) {
-      var postBody = null;
+      var postBody = null
 
+      var pathParams = {}
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var pathParams = {
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
-
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = [OAuth2Client];
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = [OAuth2Client]
 
       return this.apiClient.callApi(
-        '/clients', 'GET',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/clients',
+        'GET',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -423,28 +523,32 @@
      * @param {module:api/OAuth2Api~oauthAuthCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.oauthAuth = function(callback) {
-      var postBody = null;
+      var postBody = null
 
+      var pathParams = {}
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var pathParams = {
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
-
-      var authNames = [];
-      var contentTypes = ['application/x-www-form-urlencoded'];
-      var accepts = ['application/json'];
-      var returnType = null;
+      var authNames = []
+      var contentTypes = ['application/x-www-form-urlencoded']
+      var accepts = ['application/json']
+      var returnType = null
 
       return this.apiClient.callApi(
-        '/oauth2/auth', 'GET',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/oauth2/auth',
+        'GET',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -462,28 +566,32 @@
      * data is of type: {@link module:model/InlineResponse2001}
      */
     this.oauthToken = function(callback) {
-      var postBody = null;
+      var postBody = null
 
+      var pathParams = {}
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var pathParams = {
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
-
-      var authNames = ['basic', 'oauth2'];
-      var contentTypes = ['application/x-www-form-urlencoded'];
-      var accepts = ['application/json'];
-      var returnType = InlineResponse2001;
+      var authNames = ['basic', 'oauth2']
+      var contentTypes = ['application/x-www-form-urlencoded']
+      var accepts = ['application/json']
+      var returnType = InlineResponse2001
 
       return this.apiClient.callApi(
-        '/oauth2/token', 'POST',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/oauth2/token',
+        'POST',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -502,39 +610,48 @@
      * @param {module:api/OAuth2Api~rejectOAuth2ConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.rejectOAuth2ConsentRequest = function(id, body, callback) {
-      var postBody = body;
+      var postBody = body
 
       // verify the required parameter 'id' is set
       if (id === undefined || id === null) {
-        throw new Error("Missing the required parameter 'id' when calling rejectOAuth2ConsentRequest");
+        throw new Error(
+          "Missing the required parameter 'id' when calling rejectOAuth2ConsentRequest"
+        )
       }
 
       // verify the required parameter 'body' is set
       if (body === undefined || body === null) {
-        throw new Error("Missing the required parameter 'body' when calling rejectOAuth2ConsentRequest");
+        throw new Error(
+          "Missing the required parameter 'body' when calling rejectOAuth2ConsentRequest"
+        )
       }
 
-
       var pathParams = {
-        'id': id
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
+        id: id
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = null;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = null
 
       return this.apiClient.callApi(
-        '/oauth2/consent/requests/{id}/reject', 'PATCH',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/oauth2/consent/requests/{id}/reject',
+        'PATCH',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -552,34 +669,41 @@
      * @param {module:api/OAuth2Api~revokeOAuth2TokenCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.revokeOAuth2Token = function(token, callback) {
-      var postBody = null;
+      var postBody = null
 
       // verify the required parameter 'token' is set
       if (token === undefined || token === null) {
-        throw new Error("Missing the required parameter 'token' when calling revokeOAuth2Token");
+        throw new Error(
+          "Missing the required parameter 'token' when calling revokeOAuth2Token"
+        )
       }
 
-
-      var pathParams = {
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
+      var pathParams = {}
+      var queryParams = {}
+      var headerParams = {}
       var formParams = {
-        'token': token
-      };
+        token: token
+      }
 
-      var authNames = ['basic'];
-      var contentTypes = ['application/x-www-form-urlencoded'];
-      var accepts = ['application/json'];
-      var returnType = null;
+      var authNames = ['basic']
+      var contentTypes = ['application/x-www-form-urlencoded']
+      var accepts = ['application/json']
+      var returnType = null
 
       return this.apiClient.callApi(
-        '/oauth2/revoke', 'POST',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/oauth2/revoke',
+        'POST',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -599,39 +723,48 @@
      * data is of type: {@link module:model/OAuth2Client}
      */
     this.updateOAuth2Client = function(id, body, callback) {
-      var postBody = body;
+      var postBody = body
 
       // verify the required parameter 'id' is set
       if (id === undefined || id === null) {
-        throw new Error("Missing the required parameter 'id' when calling updateOAuth2Client");
+        throw new Error(
+          "Missing the required parameter 'id' when calling updateOAuth2Client"
+        )
       }
 
       // verify the required parameter 'body' is set
       if (body === undefined || body === null) {
-        throw new Error("Missing the required parameter 'body' when calling updateOAuth2Client");
+        throw new Error(
+          "Missing the required parameter 'body' when calling updateOAuth2Client"
+        )
       }
 
-
       var pathParams = {
-        'id': id
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
+        id: id
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = OAuth2Client;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = OAuth2Client
 
       return this.apiClient.callApi(
-        '/clients/{id}', 'PUT',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/clients/{id}',
+        'PUT',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -649,30 +782,34 @@
      * data is of type: {@link module:model/JsonWebKeySet}
      */
     this.wellKnown = function(callback) {
-      var postBody = null;
+      var postBody = null
 
+      var pathParams = {}
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var pathParams = {
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
-
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = JsonWebKeySet;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = JsonWebKeySet
 
       return this.apiClient.callApi(
-        '/.well-known/jwks.json', 'GET',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/.well-known/jwks.json',
+        'GET',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
-  };
+  }
 
-  return exports;
-}));
+  return exports
+})

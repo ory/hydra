@@ -14,22 +14,61 @@
  *
  */
 
-(function(root, factory) {
+;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/Group', 'model/GroupMembers', 'model/InlineResponse401', 'model/WardenAccessRequest', 'model/WardenAccessRequestResponse', 'model/WardenTokenAccessRequest', 'model/WardenTokenAccessRequestResponse'], factory);
+    define(
+      [
+        'ApiClient',
+        'model/Group',
+        'model/GroupMembers',
+        'model/InlineResponse401',
+        'model/WardenAccessRequest',
+        'model/WardenAccessRequestResponse',
+        'model/WardenTokenAccessRequest',
+        'model/WardenTokenAccessRequestResponse'
+      ],
+      factory
+    )
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/Group'), require('../model/GroupMembers'), require('../model/InlineResponse401'), require('../model/WardenAccessRequest'), require('../model/WardenAccessRequestResponse'), require('../model/WardenTokenAccessRequest'), require('../model/WardenTokenAccessRequestResponse'));
+    module.exports = factory(
+      require('../ApiClient'),
+      require('../model/Group'),
+      require('../model/GroupMembers'),
+      require('../model/InlineResponse401'),
+      require('../model/WardenAccessRequest'),
+      require('../model/WardenAccessRequestResponse'),
+      require('../model/WardenTokenAccessRequest'),
+      require('../model/WardenTokenAccessRequestResponse')
+    )
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
-      root.HydraOAuth2OpenIdConnectServer = {};
+      root.HydraOAuth2OpenIdConnectServer = {}
     }
-    root.HydraOAuth2OpenIdConnectServer.WardenApi = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient, root.HydraOAuth2OpenIdConnectServer.Group, root.HydraOAuth2OpenIdConnectServer.GroupMembers, root.HydraOAuth2OpenIdConnectServer.InlineResponse401, root.HydraOAuth2OpenIdConnectServer.WardenAccessRequest, root.HydraOAuth2OpenIdConnectServer.WardenAccessRequestResponse, root.HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequest, root.HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponse);
+    root.HydraOAuth2OpenIdConnectServer.WardenApi = factory(
+      root.HydraOAuth2OpenIdConnectServer.ApiClient,
+      root.HydraOAuth2OpenIdConnectServer.Group,
+      root.HydraOAuth2OpenIdConnectServer.GroupMembers,
+      root.HydraOAuth2OpenIdConnectServer.InlineResponse401,
+      root.HydraOAuth2OpenIdConnectServer.WardenAccessRequest,
+      root.HydraOAuth2OpenIdConnectServer.WardenAccessRequestResponse,
+      root.HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequest,
+      root.HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponse
+    )
   }
-}(this, function(ApiClient, Group, GroupMembers, InlineResponse401, WardenAccessRequest, WardenAccessRequestResponse, WardenTokenAccessRequest, WardenTokenAccessRequestResponse) {
-  'use strict';
+})(this, function(
+  ApiClient,
+  Group,
+  GroupMembers,
+  InlineResponse401,
+  WardenAccessRequest,
+  WardenAccessRequestResponse,
+  WardenTokenAccessRequest,
+  WardenTokenAccessRequestResponse
+) {
+  'use strict'
 
   /**
    * Warden service.
@@ -45,8 +84,7 @@
    * default to {@link module:ApiClient#instance} if unspecified.
    */
   var exports = function(apiClient) {
-    this.apiClient = apiClient || ApiClient.instance;
-
+    this.apiClient = apiClient || ApiClient.instance
 
     /**
      * Callback function to receive the result of the addMembersToGroup operation.
@@ -65,35 +103,42 @@
      * @param {module:api/WardenApi~addMembersToGroupCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.addMembersToGroup = function(id, opts, callback) {
-      opts = opts || {};
-      var postBody = opts['body'];
+      opts = opts || {}
+      var postBody = opts['body']
 
       // verify the required parameter 'id' is set
       if (id === undefined || id === null) {
-        throw new Error("Missing the required parameter 'id' when calling addMembersToGroup");
+        throw new Error(
+          "Missing the required parameter 'id' when calling addMembersToGroup"
+        )
       }
 
-
       var pathParams = {
-        'id': id
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
+        id: id
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = null;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = null
 
       return this.apiClient.callApi(
-        '/warden/groups/{id}/members', 'POST',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/warden/groups/{id}/members',
+        'POST',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -113,29 +158,33 @@
      * data is of type: {@link module:model/Group}
      */
     this.createGroup = function(opts, callback) {
-      opts = opts || {};
-      var postBody = opts['body'];
+      opts = opts || {}
+      var postBody = opts['body']
 
+      var pathParams = {}
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var pathParams = {
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
-
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = Group;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = Group
 
       return this.apiClient.callApi(
-        '/warden/groups', 'POST',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/warden/groups',
+        'POST',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -153,34 +202,41 @@
      * @param {module:api/WardenApi~deleteGroupCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.deleteGroup = function(id, callback) {
-      var postBody = null;
+      var postBody = null
 
       // verify the required parameter 'id' is set
       if (id === undefined || id === null) {
-        throw new Error("Missing the required parameter 'id' when calling deleteGroup");
+        throw new Error(
+          "Missing the required parameter 'id' when calling deleteGroup"
+        )
       }
 
-
       var pathParams = {
-        'id': id
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
+        id: id
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = null;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = null
 
       return this.apiClient.callApi(
-        '/warden/groups/{id}', 'DELETE',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/warden/groups/{id}',
+        'DELETE',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -200,29 +256,33 @@
      * data is of type: {@link module:model/WardenAccessRequestResponse}
      */
     this.doesWardenAllowAccessRequest = function(opts, callback) {
-      opts = opts || {};
-      var postBody = opts['body'];
+      opts = opts || {}
+      var postBody = opts['body']
 
+      var pathParams = {}
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var pathParams = {
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
-
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = WardenAccessRequestResponse;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = WardenAccessRequestResponse
 
       return this.apiClient.callApi(
-        '/warden/allowed', 'POST',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/warden/allowed',
+        'POST',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -242,29 +302,33 @@
      * data is of type: {@link module:model/WardenTokenAccessRequestResponse}
      */
     this.doesWardenAllowTokenAccessRequest = function(opts, callback) {
-      opts = opts || {};
-      var postBody = opts['body'];
+      opts = opts || {}
+      var postBody = opts['body']
 
+      var pathParams = {}
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var pathParams = {
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
-
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = WardenTokenAccessRequestResponse;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = WardenTokenAccessRequestResponse
 
       return this.apiClient.callApi(
-        '/warden/token/allowed', 'POST',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/warden/token/allowed',
+        'POST',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -283,34 +347,41 @@
      * data is of type: {@link Array.<module:model/Group>}
      */
     this.findGroupsByMember = function(member, callback) {
-      var postBody = null;
+      var postBody = null
 
       // verify the required parameter 'member' is set
       if (member === undefined || member === null) {
-        throw new Error("Missing the required parameter 'member' when calling findGroupsByMember");
+        throw new Error(
+          "Missing the required parameter 'member' when calling findGroupsByMember"
+        )
       }
 
-
-      var pathParams = {
-      };
+      var pathParams = {}
       var queryParams = {
-        'member': member
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
+        member: member
+      }
+      var headerParams = {}
+      var formParams = {}
 
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = [Group];
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = [Group]
 
       return this.apiClient.callApi(
-        '/warden/groups', 'GET',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/warden/groups',
+        'GET',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -329,34 +400,41 @@
      * data is of type: {@link module:model/Group}
      */
     this.getGroup = function(id, callback) {
-      var postBody = null;
+      var postBody = null
 
       // verify the required parameter 'id' is set
       if (id === undefined || id === null) {
-        throw new Error("Missing the required parameter 'id' when calling getGroup");
+        throw new Error(
+          "Missing the required parameter 'id' when calling getGroup"
+        )
       }
 
-
       var pathParams = {
-        'id': id
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
+        id: id
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = Group;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = Group
 
       return this.apiClient.callApi(
-        '/warden/groups/{id}', 'GET',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/warden/groups/{id}',
+        'GET',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -376,37 +454,44 @@
      * @param {module:api/WardenApi~removeMembersFromGroupCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.removeMembersFromGroup = function(id, opts, callback) {
-      opts = opts || {};
-      var postBody = opts['body'];
+      opts = opts || {}
+      var postBody = opts['body']
 
       // verify the required parameter 'id' is set
       if (id === undefined || id === null) {
-        throw new Error("Missing the required parameter 'id' when calling removeMembersFromGroup");
+        throw new Error(
+          "Missing the required parameter 'id' when calling removeMembersFromGroup"
+        )
       }
 
-
       var pathParams = {
-        'id': id
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
+        id: id
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = null;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = null
 
       return this.apiClient.callApi(
-        '/warden/groups/{id}/members', 'DELETE',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/warden/groups/{id}/members',
+        'DELETE',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
-  };
+  }
 
-  return exports;
-}));
+  return exports
+})

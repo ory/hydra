@@ -14,25 +14,24 @@
  *
  */
 
-(function(root, factory) {
+;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient'], factory);
+    define(['ApiClient'], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'));
+    module.exports = factory(require('../ApiClient'))
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
-      root.HydraOAuth2OpenIdConnectServer = {};
+      root.HydraOAuth2OpenIdConnectServer = {}
     }
-    root.HydraOAuth2OpenIdConnectServer.WellKnown = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient);
+    root.HydraOAuth2OpenIdConnectServer.WellKnown = factory(
+      root.HydraOAuth2OpenIdConnectServer.ApiClient
+    )
   }
-}(this, function(ApiClient) {
-  'use strict';
-
-
-
+})(this, function(ApiClient) {
+  'use strict'
 
   /**
    * The WellKnown model module.
@@ -52,17 +51,27 @@
    * @param subjectTypesSupported {Array.<String>} JSON array containing a list of the Subject Identifier types that this OP supports. Valid types include pairwise and public.
    * @param tokenEndpoint {String} URL of the OP's OAuth 2.0 Token Endpoint
    */
-  var exports = function(authorizationEndpoint, idTokenSigningAlgValuesSupported, issuer, jwksUri, responseTypesSupported, subjectTypesSupported, tokenEndpoint) {
-    var _this = this;
+  var exports = function(
+    authorizationEndpoint,
+    idTokenSigningAlgValuesSupported,
+    issuer,
+    jwksUri,
+    responseTypesSupported,
+    subjectTypesSupported,
+    tokenEndpoint
+  ) {
+    var _this = this
 
-    _this['authorization_endpoint'] = authorizationEndpoint;
-    _this['id_token_signing_alg_values_supported'] = idTokenSigningAlgValuesSupported;
-    _this['issuer'] = issuer;
-    _this['jwks_uri'] = jwksUri;
-    _this['response_types_supported'] = responseTypesSupported;
-    _this['subject_types_supported'] = subjectTypesSupported;
-    _this['token_endpoint'] = tokenEndpoint;
-  };
+    _this['authorization_endpoint'] = authorizationEndpoint
+    _this[
+      'id_token_signing_alg_values_supported'
+    ] = idTokenSigningAlgValuesSupported
+    _this['issuer'] = issuer
+    _this['jwks_uri'] = jwksUri
+    _this['response_types_supported'] = responseTypesSupported
+    _this['subject_types_supported'] = subjectTypesSupported
+    _this['token_endpoint'] = tokenEndpoint
+  }
 
   /**
    * Constructs a <code>WellKnown</code> from a plain JavaScript object, optionally creating a new instance.
@@ -73,72 +82,85 @@
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
-      obj = obj || new exports();
+      obj = obj || new exports()
 
       if (data.hasOwnProperty('authorization_endpoint')) {
-        obj['authorization_endpoint'] = ApiClient.convertToType(data['authorization_endpoint'], 'String');
+        obj['authorization_endpoint'] = ApiClient.convertToType(
+          data['authorization_endpoint'],
+          'String'
+        )
       }
       if (data.hasOwnProperty('id_token_signing_alg_values_supported')) {
-        obj['id_token_signing_alg_values_supported'] = ApiClient.convertToType(data['id_token_signing_alg_values_supported'], ['String']);
+        obj[
+          'id_token_signing_alg_values_supported'
+        ] = ApiClient.convertToType(
+          data['id_token_signing_alg_values_supported'],
+          ['String']
+        )
       }
       if (data.hasOwnProperty('issuer')) {
-        obj['issuer'] = ApiClient.convertToType(data['issuer'], 'String');
+        obj['issuer'] = ApiClient.convertToType(data['issuer'], 'String')
       }
       if (data.hasOwnProperty('jwks_uri')) {
-        obj['jwks_uri'] = ApiClient.convertToType(data['jwks_uri'], 'String');
+        obj['jwks_uri'] = ApiClient.convertToType(data['jwks_uri'], 'String')
       }
       if (data.hasOwnProperty('response_types_supported')) {
-        obj['response_types_supported'] = ApiClient.convertToType(data['response_types_supported'], ['String']);
+        obj['response_types_supported'] = ApiClient.convertToType(
+          data['response_types_supported'],
+          ['String']
+        )
       }
       if (data.hasOwnProperty('subject_types_supported')) {
-        obj['subject_types_supported'] = ApiClient.convertToType(data['subject_types_supported'], ['String']);
+        obj['subject_types_supported'] = ApiClient.convertToType(
+          data['subject_types_supported'],
+          ['String']
+        )
       }
       if (data.hasOwnProperty('token_endpoint')) {
-        obj['token_endpoint'] = ApiClient.convertToType(data['token_endpoint'], 'String');
+        obj['token_endpoint'] = ApiClient.convertToType(
+          data['token_endpoint'],
+          'String'
+        )
       }
     }
-    return obj;
+    return obj
   }
 
   /**
    * URL of the OP's OAuth 2.0 Authorization Endpoint
    * @member {String} authorization_endpoint
    */
-  exports.prototype['authorization_endpoint'] = undefined;
+  exports.prototype['authorization_endpoint'] = undefined
   /**
    * JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token to encode the Claims in a JWT [JWT]. The algorithm RS256 MUST be included. The value none MAY be supported, but MUST NOT be used unless the Response Type used returns no ID Token from the Authorization Endpoint (such as when using the Authorization Code Flow).
    * @member {Array.<String>} id_token_signing_alg_values_supported
    */
-  exports.prototype['id_token_signing_alg_values_supported'] = undefined;
+  exports.prototype['id_token_signing_alg_values_supported'] = undefined
   /**
    * URL using the https scheme with no query or fragment component that the OP asserts as its Issuer Identifier. If Issuer discovery is supported , this value MUST be identical to the issuer value returned by WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this Issuer.
    * @member {String} issuer
    */
-  exports.prototype['issuer'] = undefined;
+  exports.prototype['issuer'] = undefined
   /**
    * URL of the OP's JSON Web Key Set [JWK] document. This contains the signing key(s) the RP uses to validate signatures from the OP. The JWK Set MAY also contain the Server's encryption key(s), which are used by RPs to encrypt requests to the Server. When both signing and encryption keys are made available, a use (Key Use) parameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key's intended usage. Although some algorithms allow the same key to be used for both signatures and encryption, doing so is NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate.
    * @member {String} jwks_uri
    */
-  exports.prototype['jwks_uri'] = undefined;
+  exports.prototype['jwks_uri'] = undefined
   /**
    * JSON array containing a list of the OAuth 2.0 response_type values that this OP supports. Dynamic OpenID Providers MUST support the code, id_token, and the token id_token Response Type values.
    * @member {Array.<String>} response_types_supported
    */
-  exports.prototype['response_types_supported'] = undefined;
+  exports.prototype['response_types_supported'] = undefined
   /**
    * JSON array containing a list of the Subject Identifier types that this OP supports. Valid types include pairwise and public.
    * @member {Array.<String>} subject_types_supported
    */
-  exports.prototype['subject_types_supported'] = undefined;
+  exports.prototype['subject_types_supported'] = undefined
   /**
    * URL of the OP's OAuth 2.0 Token Endpoint
    * @member {String} token_endpoint
    */
-  exports.prototype['token_endpoint'] = undefined;
+  exports.prototype['token_endpoint'] = undefined
 
-
-
-  return exports;
-}));
-
-
+  return exports
+})

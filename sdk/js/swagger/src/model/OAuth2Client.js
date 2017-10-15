@@ -14,25 +14,24 @@
  *
  */
 
-(function(root, factory) {
+;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient'], factory);
+    define(['ApiClient'], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'));
+    module.exports = factory(require('../ApiClient'))
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
-      root.HydraOAuth2OpenIdConnectServer = {};
+      root.HydraOAuth2OpenIdConnectServer = {}
     }
-    root.HydraOAuth2OpenIdConnectServer.OAuth2Client = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient);
+    root.HydraOAuth2OpenIdConnectServer.OAuth2Client = factory(
+      root.HydraOAuth2OpenIdConnectServer.ApiClient
+    )
   }
-}(this, function(ApiClient) {
-  'use strict';
-
-
-
+})(this, function(ApiClient) {
+  'use strict'
 
   /**
    * The OAuth2Client model module.
@@ -46,23 +45,8 @@
    * @class
    */
   var exports = function() {
-    var _this = this;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  };
+    var _this = this
+  }
 
   /**
    * Constructs a <code>OAuth2Client</code> from a plain JavaScript object, optionally creating a new instance.
@@ -73,128 +57,143 @@
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
-      obj = obj || new exports();
+      obj = obj || new exports()
 
       if (data.hasOwnProperty('client_name')) {
-        obj['client_name'] = ApiClient.convertToType(data['client_name'], 'String');
+        obj['client_name'] = ApiClient.convertToType(
+          data['client_name'],
+          'String'
+        )
       }
       if (data.hasOwnProperty('client_secret')) {
-        obj['client_secret'] = ApiClient.convertToType(data['client_secret'], 'String');
+        obj['client_secret'] = ApiClient.convertToType(
+          data['client_secret'],
+          'String'
+        )
       }
       if (data.hasOwnProperty('client_uri')) {
-        obj['client_uri'] = ApiClient.convertToType(data['client_uri'], 'String');
+        obj['client_uri'] = ApiClient.convertToType(
+          data['client_uri'],
+          'String'
+        )
       }
       if (data.hasOwnProperty('contacts')) {
-        obj['contacts'] = ApiClient.convertToType(data['contacts'], ['String']);
+        obj['contacts'] = ApiClient.convertToType(data['contacts'], ['String'])
       }
       if (data.hasOwnProperty('grant_types')) {
-        obj['grant_types'] = ApiClient.convertToType(data['grant_types'], ['String']);
+        obj['grant_types'] = ApiClient.convertToType(data['grant_types'], [
+          'String'
+        ])
       }
       if (data.hasOwnProperty('id')) {
-        obj['id'] = ApiClient.convertToType(data['id'], 'String');
+        obj['id'] = ApiClient.convertToType(data['id'], 'String')
       }
       if (data.hasOwnProperty('logo_uri')) {
-        obj['logo_uri'] = ApiClient.convertToType(data['logo_uri'], 'String');
+        obj['logo_uri'] = ApiClient.convertToType(data['logo_uri'], 'String')
       }
       if (data.hasOwnProperty('owner')) {
-        obj['owner'] = ApiClient.convertToType(data['owner'], 'String');
+        obj['owner'] = ApiClient.convertToType(data['owner'], 'String')
       }
       if (data.hasOwnProperty('policy_uri')) {
-        obj['policy_uri'] = ApiClient.convertToType(data['policy_uri'], 'String');
+        obj['policy_uri'] = ApiClient.convertToType(
+          data['policy_uri'],
+          'String'
+        )
       }
       if (data.hasOwnProperty('public')) {
-        obj['public'] = ApiClient.convertToType(data['public'], 'Boolean');
+        obj['public'] = ApiClient.convertToType(data['public'], 'Boolean')
       }
       if (data.hasOwnProperty('redirect_uris')) {
-        obj['redirect_uris'] = ApiClient.convertToType(data['redirect_uris'], ['String']);
+        obj['redirect_uris'] = ApiClient.convertToType(data['redirect_uris'], [
+          'String'
+        ])
       }
       if (data.hasOwnProperty('response_types')) {
-        obj['response_types'] = ApiClient.convertToType(data['response_types'], ['String']);
+        obj['response_types'] = ApiClient.convertToType(
+          data['response_types'],
+          ['String']
+        )
       }
       if (data.hasOwnProperty('scope')) {
-        obj['scope'] = ApiClient.convertToType(data['scope'], 'String');
+        obj['scope'] = ApiClient.convertToType(data['scope'], 'String')
       }
       if (data.hasOwnProperty('tos_uri')) {
-        obj['tos_uri'] = ApiClient.convertToType(data['tos_uri'], 'String');
+        obj['tos_uri'] = ApiClient.convertToType(data['tos_uri'], 'String')
       }
     }
-    return obj;
+    return obj
   }
 
   /**
    * Name is the human-readable string name of the client to be presented to the end-user during authorization.
    * @member {String} client_name
    */
-  exports.prototype['client_name'] = undefined;
+  exports.prototype['client_name'] = undefined
   /**
    * Secret is the client's secret. The secret will be included in the create request as cleartext, and then never again. The secret is stored using BCrypt so it is impossible to recover it. Tell your users that they need to write the secret down as it will not be made available again.
    * @member {String} client_secret
    */
-  exports.prototype['client_secret'] = undefined;
+  exports.prototype['client_secret'] = undefined
   /**
    * ClientURI is an URL string of a web page providing information about the client. If present, the server SHOULD display this URL to the end-user in a clickable fashion.
    * @member {String} client_uri
    */
-  exports.prototype['client_uri'] = undefined;
+  exports.prototype['client_uri'] = undefined
   /**
    * Contacts is a array of strings representing ways to contact people responsible for this client, typically email addresses.
    * @member {Array.<String>} contacts
    */
-  exports.prototype['contacts'] = undefined;
+  exports.prototype['contacts'] = undefined
   /**
    * GrantTypes is an array of grant types the client is allowed to use.
    * @member {Array.<String>} grant_types
    */
-  exports.prototype['grant_types'] = undefined;
+  exports.prototype['grant_types'] = undefined
   /**
    * ID is the id for this client.
    * @member {String} id
    */
-  exports.prototype['id'] = undefined;
+  exports.prototype['id'] = undefined
   /**
    * LogoURI is an URL string that references a logo for the client.
    * @member {String} logo_uri
    */
-  exports.prototype['logo_uri'] = undefined;
+  exports.prototype['logo_uri'] = undefined
   /**
    * Owner is a string identifying the owner of the OAuth 2.0 Client.
    * @member {String} owner
    */
-  exports.prototype['owner'] = undefined;
+  exports.prototype['owner'] = undefined
   /**
    * PolicyURI is a URL string that points to a human-readable privacy policy document that describes how the deployment organization collects, uses, retains, and discloses personal data.
    * @member {String} policy_uri
    */
-  exports.prototype['policy_uri'] = undefined;
+  exports.prototype['policy_uri'] = undefined
   /**
    * Public is a boolean that identifies this client as public, meaning that it does not have a secret. It will disable the client_credentials grant type for this client if set.
    * @member {Boolean} public
    */
-  exports.prototype['public'] = undefined;
+  exports.prototype['public'] = undefined
   /**
    * RedirectURIs is an array of allowed redirect urls for the client, for example: http://mydomain/oauth/callback .
    * @member {Array.<String>} redirect_uris
    */
-  exports.prototype['redirect_uris'] = undefined;
+  exports.prototype['redirect_uris'] = undefined
   /**
    * ResponseTypes is an array of the OAuth 2.0 response type strings that the client can use at the authorization endpoint.
    * @member {Array.<String>} response_types
    */
-  exports.prototype['response_types'] = undefined;
+  exports.prototype['response_types'] = undefined
   /**
    * Scope is a string containing a space-separated list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749]) that the client can use when requesting access tokens.
    * @member {String} scope
    */
-  exports.prototype['scope'] = undefined;
+  exports.prototype['scope'] = undefined
   /**
    * TermsOfServiceURI is a URL string that points to a human-readable terms of service document for the client that describes a contractual relationship between the end-user and the client that the end-user accepts when authorizing the client.
    * @member {String} tos_uri
    */
-  exports.prototype['tos_uri'] = undefined;
+  exports.prototype['tos_uri'] = undefined
 
-
-
-  return exports;
-}));
-
-
+  return exports
+})

@@ -14,25 +14,28 @@
  *
  */
 
-(function(root, factory) {
+;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/OAuth2ConsentRequest'], factory);
+    define(['ApiClient', 'model/OAuth2ConsentRequest'], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('./OAuth2ConsentRequest'));
+    module.exports = factory(
+      require('../ApiClient'),
+      require('./OAuth2ConsentRequest')
+    )
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
-      root.HydraOAuth2OpenIdConnectServer = {};
+      root.HydraOAuth2OpenIdConnectServer = {}
     }
-    root.HydraOAuth2OpenIdConnectServer.SwaggerOAuthConsentRequest = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient, root.HydraOAuth2OpenIdConnectServer.OAuth2ConsentRequest);
+    root.HydraOAuth2OpenIdConnectServer.SwaggerOAuthConsentRequest = factory(
+      root.HydraOAuth2OpenIdConnectServer.ApiClient,
+      root.HydraOAuth2OpenIdConnectServer.OAuth2ConsentRequest
+    )
   }
-}(this, function(ApiClient, OAuth2ConsentRequest) {
-  'use strict';
-
-
-
+})(this, function(ApiClient, OAuth2ConsentRequest) {
+  'use strict'
 
   /**
    * The SwaggerOAuthConsentRequest model module.
@@ -47,10 +50,8 @@
    * @class
    */
   var exports = function() {
-    var _this = this;
-
-
-  };
+    var _this = this
+  }
 
   /**
    * Constructs a <code>SwaggerOAuthConsentRequest</code> from a plain JavaScript object, optionally creating a new instance.
@@ -61,23 +62,19 @@
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
-      obj = obj || new exports();
+      obj = obj || new exports()
 
       if (data.hasOwnProperty('Body')) {
-        obj['Body'] = OAuth2ConsentRequest.constructFromObject(data['Body']);
+        obj['Body'] = OAuth2ConsentRequest.constructFromObject(data['Body'])
       }
     }
-    return obj;
+    return obj
   }
 
   /**
    * @member {module:model/OAuth2ConsentRequest} Body
    */
-  exports.prototype['Body'] = undefined;
+  exports.prototype['Body'] = undefined
 
-
-
-  return exports;
-}));
-
-
+  return exports
+})

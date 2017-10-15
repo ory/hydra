@@ -14,25 +14,24 @@
  *
  */
 
-(function(root, factory) {
+;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient'], factory);
+    define(['ApiClient'], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'));
+    module.exports = factory(require('../ApiClient'))
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
-      root.HydraOAuth2OpenIdConnectServer = {};
+      root.HydraOAuth2OpenIdConnectServer = {}
     }
-    root.HydraOAuth2OpenIdConnectServer.JsonWebKeySetGeneratorRequest = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient);
+    root.HydraOAuth2OpenIdConnectServer.JsonWebKeySetGeneratorRequest = factory(
+      root.HydraOAuth2OpenIdConnectServer.ApiClient
+    )
   }
-}(this, function(ApiClient) {
-  'use strict';
-
-
-
+})(this, function(ApiClient) {
+  'use strict'
 
   /**
    * The JsonWebKeySetGeneratorRequest model module.
@@ -48,11 +47,11 @@
    * @param kid {String} The kid of the key to be created
    */
   var exports = function(alg, kid) {
-    var _this = this;
+    var _this = this
 
-    _this['alg'] = alg;
-    _this['kid'] = kid;
-  };
+    _this['alg'] = alg
+    _this['kid'] = kid
+  }
 
   /**
    * Constructs a <code>JsonWebKeySetGeneratorRequest</code> from a plain JavaScript object, optionally creating a new instance.
@@ -63,32 +62,28 @@
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
-      obj = obj || new exports();
+      obj = obj || new exports()
 
       if (data.hasOwnProperty('alg')) {
-        obj['alg'] = ApiClient.convertToType(data['alg'], 'String');
+        obj['alg'] = ApiClient.convertToType(data['alg'], 'String')
       }
       if (data.hasOwnProperty('kid')) {
-        obj['kid'] = ApiClient.convertToType(data['kid'], 'String');
+        obj['kid'] = ApiClient.convertToType(data['kid'], 'String')
       }
     }
-    return obj;
+    return obj
   }
 
   /**
    * The algorithm to be used for creating the key. Supports \"RS256\", \"ES521\" and \"HS256\"
    * @member {String} alg
    */
-  exports.prototype['alg'] = undefined;
+  exports.prototype['alg'] = undefined
   /**
    * The kid of the key to be created
    * @member {String} kid
    */
-  exports.prototype['kid'] = undefined;
+  exports.prototype['kid'] = undefined
 
-
-
-  return exports;
-}));
-
-
+  return exports
+})

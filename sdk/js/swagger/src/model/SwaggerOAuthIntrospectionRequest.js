@@ -14,25 +14,24 @@
  *
  */
 
-(function(root, factory) {
+;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient'], factory);
+    define(['ApiClient'], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'));
+    module.exports = factory(require('../ApiClient'))
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
-      root.HydraOAuth2OpenIdConnectServer = {};
+      root.HydraOAuth2OpenIdConnectServer = {}
     }
-    root.HydraOAuth2OpenIdConnectServer.SwaggerOAuthIntrospectionRequest = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient);
+    root.HydraOAuth2OpenIdConnectServer.SwaggerOAuthIntrospectionRequest = factory(
+      root.HydraOAuth2OpenIdConnectServer.ApiClient
+    )
   }
-}(this, function(ApiClient) {
-  'use strict';
-
-
-
+})(this, function(ApiClient) {
+  'use strict'
 
   /**
    * The SwaggerOAuthIntrospectionRequest model module.
@@ -47,11 +46,10 @@
    * @param token {String} The string value of the token. For access tokens, this is the \"access_token\" value returned from the token endpoint defined in OAuth 2.0 [RFC6749], Section 5.1. This endpoint DOES NOT accept refresh tokens for validation.
    */
   var exports = function(token) {
-    var _this = this;
+    var _this = this
 
-
-    _this['token'] = token;
-  };
+    _this['token'] = token
+  }
 
   /**
    * Constructs a <code>SwaggerOAuthIntrospectionRequest</code> from a plain JavaScript object, optionally creating a new instance.
@@ -62,32 +60,28 @@
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
-      obj = obj || new exports();
+      obj = obj || new exports()
 
       if (data.hasOwnProperty('scope')) {
-        obj['scope'] = ApiClient.convertToType(data['scope'], 'String');
+        obj['scope'] = ApiClient.convertToType(data['scope'], 'String')
       }
       if (data.hasOwnProperty('token')) {
-        obj['token'] = ApiClient.convertToType(data['token'], 'String');
+        obj['token'] = ApiClient.convertToType(data['token'], 'String')
       }
     }
-    return obj;
+    return obj
   }
 
   /**
    * An optional, space separated list of required scopes. If the access token was not granted one of the scopes, the result of active will be false.  in: formData
    * @member {String} scope
    */
-  exports.prototype['scope'] = undefined;
+  exports.prototype['scope'] = undefined
   /**
    * The string value of the token. For access tokens, this is the \"access_token\" value returned from the token endpoint defined in OAuth 2.0 [RFC6749], Section 5.1. This endpoint DOES NOT accept refresh tokens for validation.
    * @member {String} token
    */
-  exports.prototype['token'] = undefined;
+  exports.prototype['token'] = undefined
 
-
-
-  return exports;
-}));
-
-
+  return exports
+})

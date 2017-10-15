@@ -14,25 +14,24 @@
  *
  */
 
-(function(root, factory) {
+;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient'], factory);
+    define(['ApiClient'], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'));
+    module.exports = factory(require('../ApiClient'))
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
-      root.HydraOAuth2OpenIdConnectServer = {};
+      root.HydraOAuth2OpenIdConnectServer = {}
     }
-    root.HydraOAuth2OpenIdConnectServer.SwaggerRevokeOAuth2TokenParameters = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient);
+    root.HydraOAuth2OpenIdConnectServer.SwaggerRevokeOAuth2TokenParameters = factory(
+      root.HydraOAuth2OpenIdConnectServer.ApiClient
+    )
   }
-}(this, function(ApiClient) {
-  'use strict';
-
-
-
+})(this, function(ApiClient) {
+  'use strict'
 
   /**
    * The SwaggerRevokeOAuth2TokenParameters model module.
@@ -47,10 +46,10 @@
    * @param token {String} in: formData
    */
   var exports = function(token) {
-    var _this = this;
+    var _this = this
 
-    _this['token'] = token;
-  };
+    _this['token'] = token
+  }
 
   /**
    * Constructs a <code>SwaggerRevokeOAuth2TokenParameters</code> from a plain JavaScript object, optionally creating a new instance.
@@ -61,24 +60,20 @@
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
-      obj = obj || new exports();
+      obj = obj || new exports()
 
       if (data.hasOwnProperty('token')) {
-        obj['token'] = ApiClient.convertToType(data['token'], 'String');
+        obj['token'] = ApiClient.convertToType(data['token'], 'String')
       }
     }
-    return obj;
+    return obj
   }
 
   /**
    * in: formData
    * @member {String} token
    */
-  exports.prototype['token'] = undefined;
+  exports.prototype['token'] = undefined
 
-
-
-  return exports;
-}));
-
-
+  return exports
+})

@@ -14,25 +14,25 @@
  *
  */
 
-(function(root, factory) {
+;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/RawMessage'], factory);
+    define(['ApiClient', 'model/RawMessage'], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('./RawMessage'));
+    module.exports = factory(require('../ApiClient'), require('./RawMessage'))
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
-      root.HydraOAuth2OpenIdConnectServer = {};
+      root.HydraOAuth2OpenIdConnectServer = {}
     }
-    root.HydraOAuth2OpenIdConnectServer.JoseWebKeySetRequest = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient, root.HydraOAuth2OpenIdConnectServer.RawMessage);
+    root.HydraOAuth2OpenIdConnectServer.JoseWebKeySetRequest = factory(
+      root.HydraOAuth2OpenIdConnectServer.ApiClient,
+      root.HydraOAuth2OpenIdConnectServer.RawMessage
+    )
   }
-}(this, function(ApiClient, RawMessage) {
-  'use strict';
-
-
-
+})(this, function(ApiClient, RawMessage) {
+  'use strict'
 
   /**
    * The JoseWebKeySetRequest model module.
@@ -46,10 +46,8 @@
    * @class
    */
   var exports = function() {
-    var _this = this;
-
-
-  };
+    var _this = this
+  }
 
   /**
    * Constructs a <code>JoseWebKeySetRequest</code> from a plain JavaScript object, optionally creating a new instance.
@@ -60,23 +58,19 @@
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
-      obj = obj || new exports();
+      obj = obj || new exports()
 
       if (data.hasOwnProperty('keys')) {
-        obj['keys'] = ApiClient.convertToType(data['keys'], [RawMessage]);
+        obj['keys'] = ApiClient.convertToType(data['keys'], [RawMessage])
       }
     }
-    return obj;
+    return obj
   }
 
   /**
    * @member {Array.<module:model/RawMessage>} keys
    */
-  exports.prototype['keys'] = undefined;
+  exports.prototype['keys'] = undefined
 
-
-
-  return exports;
-}));
-
-
+  return exports
+})

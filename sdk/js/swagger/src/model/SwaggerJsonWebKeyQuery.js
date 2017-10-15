@@ -14,25 +14,24 @@
  *
  */
 
-(function(root, factory) {
+;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient'], factory);
+    define(['ApiClient'], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'));
+    module.exports = factory(require('../ApiClient'))
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
-      root.HydraOAuth2OpenIdConnectServer = {};
+      root.HydraOAuth2OpenIdConnectServer = {}
     }
-    root.HydraOAuth2OpenIdConnectServer.SwaggerJsonWebKeyQuery = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient);
+    root.HydraOAuth2OpenIdConnectServer.SwaggerJsonWebKeyQuery = factory(
+      root.HydraOAuth2OpenIdConnectServer.ApiClient
+    )
   }
-}(this, function(ApiClient) {
-  'use strict';
-
-
-
+})(this, function(ApiClient) {
+  'use strict'
 
   /**
    * The SwaggerJsonWebKeyQuery model module.
@@ -48,11 +47,11 @@
    * @param set {String} The set in: path
    */
   var exports = function(kid, set) {
-    var _this = this;
+    var _this = this
 
-    _this['kid'] = kid;
-    _this['set'] = set;
-  };
+    _this['kid'] = kid
+    _this['set'] = set
+  }
 
   /**
    * Constructs a <code>SwaggerJsonWebKeyQuery</code> from a plain JavaScript object, optionally creating a new instance.
@@ -63,32 +62,28 @@
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
-      obj = obj || new exports();
+      obj = obj || new exports()
 
       if (data.hasOwnProperty('kid')) {
-        obj['kid'] = ApiClient.convertToType(data['kid'], 'String');
+        obj['kid'] = ApiClient.convertToType(data['kid'], 'String')
       }
       if (data.hasOwnProperty('set')) {
-        obj['set'] = ApiClient.convertToType(data['set'], 'String');
+        obj['set'] = ApiClient.convertToType(data['set'], 'String')
       }
     }
-    return obj;
+    return obj
   }
 
   /**
    * The kid of the desired key in: path
    * @member {String} kid
    */
-  exports.prototype['kid'] = undefined;
+  exports.prototype['kid'] = undefined
   /**
    * The set in: path
    * @member {String} set
    */
-  exports.prototype['set'] = undefined;
+  exports.prototype['set'] = undefined
 
-
-
-  return exports;
-}));
-
-
+  return exports
+})

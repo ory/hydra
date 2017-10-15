@@ -14,22 +14,30 @@
  *
  */
 
-(function(root, factory) {
+;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/InlineResponse401', 'model/Policy'], factory);
+    define(['ApiClient', 'model/InlineResponse401', 'model/Policy'], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/InlineResponse401'), require('../model/Policy'));
+    module.exports = factory(
+      require('../ApiClient'),
+      require('../model/InlineResponse401'),
+      require('../model/Policy')
+    )
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
-      root.HydraOAuth2OpenIdConnectServer = {};
+      root.HydraOAuth2OpenIdConnectServer = {}
     }
-    root.HydraOAuth2OpenIdConnectServer.PolicyApi = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient, root.HydraOAuth2OpenIdConnectServer.InlineResponse401, root.HydraOAuth2OpenIdConnectServer.Policy);
+    root.HydraOAuth2OpenIdConnectServer.PolicyApi = factory(
+      root.HydraOAuth2OpenIdConnectServer.ApiClient,
+      root.HydraOAuth2OpenIdConnectServer.InlineResponse401,
+      root.HydraOAuth2OpenIdConnectServer.Policy
+    )
   }
-}(this, function(ApiClient, InlineResponse401, Policy) {
-  'use strict';
+})(this, function(ApiClient, InlineResponse401, Policy) {
+  'use strict'
 
   /**
    * Policy service.
@@ -45,8 +53,7 @@
    * default to {@link module:ApiClient#instance} if unspecified.
    */
   var exports = function(apiClient) {
-    this.apiClient = apiClient || ApiClient.instance;
-
+    this.apiClient = apiClient || ApiClient.instance
 
     /**
      * Callback function to receive the result of the createPolicy operation.
@@ -65,29 +72,33 @@
      * data is of type: {@link module:model/Policy}
      */
     this.createPolicy = function(opts, callback) {
-      opts = opts || {};
-      var postBody = opts['body'];
+      opts = opts || {}
+      var postBody = opts['body']
 
+      var pathParams = {}
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var pathParams = {
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
-
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = Policy;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = Policy
 
       return this.apiClient.callApi(
-        '/policies', 'POST',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/policies',
+        'POST',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -105,34 +116,41 @@
      * @param {module:api/PolicyApi~deletePolicyCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.deletePolicy = function(id, callback) {
-      var postBody = null;
+      var postBody = null
 
       // verify the required parameter 'id' is set
       if (id === undefined || id === null) {
-        throw new Error("Missing the required parameter 'id' when calling deletePolicy");
+        throw new Error(
+          "Missing the required parameter 'id' when calling deletePolicy"
+        )
       }
 
-
       var pathParams = {
-        'id': id
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
+        id: id
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = null;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = null
 
       return this.apiClient.callApi(
-        '/policies/{id}', 'DELETE',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/policies/{id}',
+        'DELETE',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -151,34 +169,41 @@
      * data is of type: {@link module:model/Policy}
      */
     this.getPolicy = function(id, callback) {
-      var postBody = null;
+      var postBody = null
 
       // verify the required parameter 'id' is set
       if (id === undefined || id === null) {
-        throw new Error("Missing the required parameter 'id' when calling getPolicy");
+        throw new Error(
+          "Missing the required parameter 'id' when calling getPolicy"
+        )
       }
 
-
       var pathParams = {
-        'id': id
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
+        id: id
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = Policy;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = Policy
 
       return this.apiClient.callApi(
-        '/policies/{id}', 'GET',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/policies/{id}',
+        'GET',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -199,31 +224,36 @@
      * data is of type: {@link Array.<module:model/Policy>}
      */
     this.listPolicies = function(opts, callback) {
-      opts = opts || {};
-      var postBody = null;
+      opts = opts || {}
+      var postBody = null
 
-
-      var pathParams = {
-      };
+      var pathParams = {}
       var queryParams = {
-        'offset': opts['offset'],
-        'limit': opts['limit']
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
+        offset: opts['offset'],
+        limit: opts['limit']
+      }
+      var headerParams = {}
+      var formParams = {}
 
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = [Policy];
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = [Policy]
 
       return this.apiClient.callApi(
-        '/policies', 'GET',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/policies',
+        'GET',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -244,37 +274,44 @@
      * data is of type: {@link module:model/Policy}
      */
     this.updatePolicy = function(id, opts, callback) {
-      opts = opts || {};
-      var postBody = opts['body'];
+      opts = opts || {}
+      var postBody = opts['body']
 
       // verify the required parameter 'id' is set
       if (id === undefined || id === null) {
-        throw new Error("Missing the required parameter 'id' when calling updatePolicy");
+        throw new Error(
+          "Missing the required parameter 'id' when calling updatePolicy"
+        )
       }
 
-
       var pathParams = {
-        'id': id
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
+        id: id
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = Policy;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = Policy
 
       return this.apiClient.callApi(
-        '/policies/{id}', 'PUT',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/policies/{id}',
+        'PUT',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
-  };
+  }
 
-  return exports;
-}));
+  return exports
+})

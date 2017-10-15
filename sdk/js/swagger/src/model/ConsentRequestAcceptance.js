@@ -14,25 +14,24 @@
  *
  */
 
-(function(root, factory) {
+;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient'], factory);
+    define(['ApiClient'], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'));
+    module.exports = factory(require('../ApiClient'))
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
-      root.HydraOAuth2OpenIdConnectServer = {};
+      root.HydraOAuth2OpenIdConnectServer = {}
     }
-    root.HydraOAuth2OpenIdConnectServer.ConsentRequestAcceptance = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient);
+    root.HydraOAuth2OpenIdConnectServer.ConsentRequestAcceptance = factory(
+      root.HydraOAuth2OpenIdConnectServer.ApiClient
+    )
   }
-}(this, function(ApiClient) {
-  'use strict';
-
-
-
+})(this, function(ApiClient) {
+  'use strict'
 
   /**
    * The ConsentRequestAcceptance model module.
@@ -46,13 +45,8 @@
    * @class
    */
   var exports = function() {
-    var _this = this;
-
-
-
-
-
-  };
+    var _this = this
+  }
 
   /**
    * Constructs a <code>ConsentRequestAcceptance</code> from a plain JavaScript object, optionally creating a new instance.
@@ -63,48 +57,51 @@
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
-      obj = obj || new exports();
+      obj = obj || new exports()
 
       if (data.hasOwnProperty('accessTokenExtra')) {
-        obj['accessTokenExtra'] = ApiClient.convertToType(data['accessTokenExtra'], {'String': Object});
+        obj['accessTokenExtra'] = ApiClient.convertToType(
+          data['accessTokenExtra'],
+          { String: Object }
+        )
       }
       if (data.hasOwnProperty('grantScopes')) {
-        obj['grantScopes'] = ApiClient.convertToType(data['grantScopes'], ['String']);
+        obj['grantScopes'] = ApiClient.convertToType(data['grantScopes'], [
+          'String'
+        ])
       }
       if (data.hasOwnProperty('idTokenExtra')) {
-        obj['idTokenExtra'] = ApiClient.convertToType(data['idTokenExtra'], {'String': Object});
+        obj['idTokenExtra'] = ApiClient.convertToType(data['idTokenExtra'], {
+          String: Object
+        })
       }
       if (data.hasOwnProperty('subject')) {
-        obj['subject'] = ApiClient.convertToType(data['subject'], 'String');
+        obj['subject'] = ApiClient.convertToType(data['subject'], 'String')
       }
     }
-    return obj;
+    return obj
   }
 
   /**
    * AccessTokenExtra represents arbitrary data that will be added to the access token and that will be returned on introspection and warden requests.
    * @member {Object.<String, Object>} accessTokenExtra
    */
-  exports.prototype['accessTokenExtra'] = undefined;
+  exports.prototype['accessTokenExtra'] = undefined
   /**
    * A list of scopes that the user agreed to grant. It should be a subset of requestedScopes from the consent request.
    * @member {Array.<String>} grantScopes
    */
-  exports.prototype['grantScopes'] = undefined;
+  exports.prototype['grantScopes'] = undefined
   /**
    * IDTokenExtra represents arbitrary data that will be added to the ID token. The ID token will only be issued if the user agrees to it and if the client requested an ID token.
    * @member {Object.<String, Object>} idTokenExtra
    */
-  exports.prototype['idTokenExtra'] = undefined;
+  exports.prototype['idTokenExtra'] = undefined
   /**
    * Subject represents a unique identifier of the user (or service, or legal entity, ...) that accepted the OAuth2 request.
    * @member {String} subject
    */
-  exports.prototype['subject'] = undefined;
+  exports.prototype['subject'] = undefined
 
-
-
-  return exports;
-}));
-
-
+  return exports
+})

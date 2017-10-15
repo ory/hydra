@@ -14,25 +14,28 @@
  *
  */
 
-(function(root, factory) {
+;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/WardenAccessRequestResponse'], factory);
+    define(['ApiClient', 'model/WardenAccessRequestResponse'], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('./WardenAccessRequestResponse'));
+    module.exports = factory(
+      require('../ApiClient'),
+      require('./WardenAccessRequestResponse')
+    )
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
-      root.HydraOAuth2OpenIdConnectServer = {};
+      root.HydraOAuth2OpenIdConnectServer = {}
     }
-    root.HydraOAuth2OpenIdConnectServer.SwaggerWardenAccessRequestResponseParameters = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient, root.HydraOAuth2OpenIdConnectServer.WardenAccessRequestResponse);
+    root.HydraOAuth2OpenIdConnectServer.SwaggerWardenAccessRequestResponseParameters = factory(
+      root.HydraOAuth2OpenIdConnectServer.ApiClient,
+      root.HydraOAuth2OpenIdConnectServer.WardenAccessRequestResponse
+    )
   }
-}(this, function(ApiClient, WardenAccessRequestResponse) {
-  'use strict';
-
-
-
+})(this, function(ApiClient, WardenAccessRequestResponse) {
+  'use strict'
 
   /**
    * The SwaggerWardenAccessRequestResponseParameters model module.
@@ -47,10 +50,8 @@
    * @class
    */
   var exports = function() {
-    var _this = this;
-
-
-  };
+    var _this = this
+  }
 
   /**
    * Constructs a <code>SwaggerWardenAccessRequestResponseParameters</code> from a plain JavaScript object, optionally creating a new instance.
@@ -61,23 +62,21 @@
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
-      obj = obj || new exports();
+      obj = obj || new exports()
 
       if (data.hasOwnProperty('Body')) {
-        obj['Body'] = WardenAccessRequestResponse.constructFromObject(data['Body']);
+        obj['Body'] = WardenAccessRequestResponse.constructFromObject(
+          data['Body']
+        )
       }
     }
-    return obj;
+    return obj
   }
 
   /**
    * @member {module:model/WardenAccessRequestResponse} Body
    */
-  exports.prototype['Body'] = undefined;
+  exports.prototype['Body'] = undefined
 
-
-
-  return exports;
-}));
-
-
+  return exports
+})

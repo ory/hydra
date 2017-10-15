@@ -14,25 +14,28 @@
  *
  */
 
-(function(root, factory) {
+;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/JsonWebKeySetGeneratorRequest'], factory);
+    define(['ApiClient', 'model/JsonWebKeySetGeneratorRequest'], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('./JsonWebKeySetGeneratorRequest'));
+    module.exports = factory(
+      require('../ApiClient'),
+      require('./JsonWebKeySetGeneratorRequest')
+    )
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
-      root.HydraOAuth2OpenIdConnectServer = {};
+      root.HydraOAuth2OpenIdConnectServer = {}
     }
-    root.HydraOAuth2OpenIdConnectServer.SwaggerJwkCreateSet = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient, root.HydraOAuth2OpenIdConnectServer.JsonWebKeySetGeneratorRequest);
+    root.HydraOAuth2OpenIdConnectServer.SwaggerJwkCreateSet = factory(
+      root.HydraOAuth2OpenIdConnectServer.ApiClient,
+      root.HydraOAuth2OpenIdConnectServer.JsonWebKeySetGeneratorRequest
+    )
   }
-}(this, function(ApiClient, JsonWebKeySetGeneratorRequest) {
-  'use strict';
-
-
-
+})(this, function(ApiClient, JsonWebKeySetGeneratorRequest) {
+  'use strict'
 
   /**
    * The SwaggerJwkCreateSet model module.
@@ -47,11 +50,10 @@
    * @param set {String} The set in: path
    */
   var exports = function(set) {
-    var _this = this;
+    var _this = this
 
-
-    _this['set'] = set;
-  };
+    _this['set'] = set
+  }
 
   /**
    * Constructs a <code>SwaggerJwkCreateSet</code> from a plain JavaScript object, optionally creating a new instance.
@@ -62,31 +64,29 @@
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
-      obj = obj || new exports();
+      obj = obj || new exports()
 
       if (data.hasOwnProperty('Body')) {
-        obj['Body'] = JsonWebKeySetGeneratorRequest.constructFromObject(data['Body']);
+        obj['Body'] = JsonWebKeySetGeneratorRequest.constructFromObject(
+          data['Body']
+        )
       }
       if (data.hasOwnProperty('set')) {
-        obj['set'] = ApiClient.convertToType(data['set'], 'String');
+        obj['set'] = ApiClient.convertToType(data['set'], 'String')
       }
     }
-    return obj;
+    return obj
   }
 
   /**
    * @member {module:model/JsonWebKeySetGeneratorRequest} Body
    */
-  exports.prototype['Body'] = undefined;
+  exports.prototype['Body'] = undefined
   /**
    * The set in: path
    * @member {String} set
    */
-  exports.prototype['set'] = undefined;
+  exports.prototype['set'] = undefined
 
-
-
-  return exports;
-}));
-
-
+  return exports
+})

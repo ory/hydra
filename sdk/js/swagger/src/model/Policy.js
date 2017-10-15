@@ -14,25 +14,28 @@
  *
  */
 
-(function(root, factory) {
+;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/PolicyConditions'], factory);
+    define(['ApiClient', 'model/PolicyConditions'], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('./PolicyConditions'));
+    module.exports = factory(
+      require('../ApiClient'),
+      require('./PolicyConditions')
+    )
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
-      root.HydraOAuth2OpenIdConnectServer = {};
+      root.HydraOAuth2OpenIdConnectServer = {}
     }
-    root.HydraOAuth2OpenIdConnectServer.Policy = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient, root.HydraOAuth2OpenIdConnectServer.PolicyConditions);
+    root.HydraOAuth2OpenIdConnectServer.Policy = factory(
+      root.HydraOAuth2OpenIdConnectServer.ApiClient,
+      root.HydraOAuth2OpenIdConnectServer.PolicyConditions
+    )
   }
-}(this, function(ApiClient, PolicyConditions) {
-  'use strict';
-
-
-
+})(this, function(ApiClient, PolicyConditions) {
+  'use strict'
 
   /**
    * The Policy model module.
@@ -46,16 +49,8 @@
    * @class
    */
   var exports = function() {
-    var _this = this;
-
-
-
-
-
-
-
-
-  };
+    var _this = this
+  }
 
   /**
    * Constructs a <code>Policy</code> from a plain JavaScript object, optionally creating a new instance.
@@ -66,72 +61,75 @@
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
-      obj = obj || new exports();
+      obj = obj || new exports()
 
       if (data.hasOwnProperty('actions')) {
-        obj['actions'] = ApiClient.convertToType(data['actions'], ['String']);
+        obj['actions'] = ApiClient.convertToType(data['actions'], ['String'])
       }
       if (data.hasOwnProperty('conditions')) {
-        obj['conditions'] = ApiClient.convertToType(data['conditions'], {'String': PolicyConditions});
+        obj['conditions'] = ApiClient.convertToType(data['conditions'], {
+          String: PolicyConditions
+        })
       }
       if (data.hasOwnProperty('description')) {
-        obj['description'] = ApiClient.convertToType(data['description'], 'String');
+        obj['description'] = ApiClient.convertToType(
+          data['description'],
+          'String'
+        )
       }
       if (data.hasOwnProperty('effect')) {
-        obj['effect'] = ApiClient.convertToType(data['effect'], 'String');
+        obj['effect'] = ApiClient.convertToType(data['effect'], 'String')
       }
       if (data.hasOwnProperty('id')) {
-        obj['id'] = ApiClient.convertToType(data['id'], 'String');
+        obj['id'] = ApiClient.convertToType(data['id'], 'String')
       }
       if (data.hasOwnProperty('resources')) {
-        obj['resources'] = ApiClient.convertToType(data['resources'], ['String']);
+        obj['resources'] = ApiClient.convertToType(data['resources'], [
+          'String'
+        ])
       }
       if (data.hasOwnProperty('subjects')) {
-        obj['subjects'] = ApiClient.convertToType(data['subjects'], ['String']);
+        obj['subjects'] = ApiClient.convertToType(data['subjects'], ['String'])
       }
     }
-    return obj;
+    return obj
   }
 
   /**
    * Actions impacted by the policy.
    * @member {Array.<String>} actions
    */
-  exports.prototype['actions'] = undefined;
+  exports.prototype['actions'] = undefined
   /**
    * Conditions under which the policy is active.
    * @member {Object.<String, module:model/PolicyConditions>} conditions
    */
-  exports.prototype['conditions'] = undefined;
+  exports.prototype['conditions'] = undefined
   /**
    * Description of the policy.
    * @member {String} description
    */
-  exports.prototype['description'] = undefined;
+  exports.prototype['description'] = undefined
   /**
    * Effect of the policy
    * @member {String} effect
    */
-  exports.prototype['effect'] = undefined;
+  exports.prototype['effect'] = undefined
   /**
    * ID of the policy.
    * @member {String} id
    */
-  exports.prototype['id'] = undefined;
+  exports.prototype['id'] = undefined
   /**
    * Resources impacted by the policy.
    * @member {Array.<String>} resources
    */
-  exports.prototype['resources'] = undefined;
+  exports.prototype['resources'] = undefined
   /**
    * Subjects impacted by the policy.
    * @member {Array.<String>} subjects
    */
-  exports.prototype['subjects'] = undefined;
+  exports.prototype['subjects'] = undefined
 
-
-
-  return exports;
-}));
-
-
+  return exports
+})

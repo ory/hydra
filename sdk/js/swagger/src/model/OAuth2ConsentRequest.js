@@ -14,25 +14,24 @@
  *
  */
 
-(function(root, factory) {
+;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient'], factory);
+    define(['ApiClient'], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'));
+    module.exports = factory(require('../ApiClient'))
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
-      root.HydraOAuth2OpenIdConnectServer = {};
+      root.HydraOAuth2OpenIdConnectServer = {}
     }
-    root.HydraOAuth2OpenIdConnectServer.OAuth2ConsentRequest = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient);
+    root.HydraOAuth2OpenIdConnectServer.OAuth2ConsentRequest = factory(
+      root.HydraOAuth2OpenIdConnectServer.ApiClient
+    )
   }
-}(this, function(ApiClient) {
-  'use strict';
-
-
-
+})(this, function(ApiClient) {
+  'use strict'
 
   /**
    * The OAuth2ConsentRequest model module.
@@ -46,14 +45,8 @@
    * @class
    */
   var exports = function() {
-    var _this = this;
-
-
-
-
-
-
-  };
+    var _this = this
+  }
 
   /**
    * Constructs a <code>OAuth2ConsentRequest</code> from a plain JavaScript object, optionally creating a new instance.
@@ -64,56 +57,58 @@
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
-      obj = obj || new exports();
+      obj = obj || new exports()
 
       if (data.hasOwnProperty('clientId')) {
-        obj['clientId'] = ApiClient.convertToType(data['clientId'], 'String');
+        obj['clientId'] = ApiClient.convertToType(data['clientId'], 'String')
       }
       if (data.hasOwnProperty('expiresAt')) {
-        obj['expiresAt'] = ApiClient.convertToType(data['expiresAt'], 'String');
+        obj['expiresAt'] = ApiClient.convertToType(data['expiresAt'], 'String')
       }
       if (data.hasOwnProperty('id')) {
-        obj['id'] = ApiClient.convertToType(data['id'], 'String');
+        obj['id'] = ApiClient.convertToType(data['id'], 'String')
       }
       if (data.hasOwnProperty('redirectUrl')) {
-        obj['redirectUrl'] = ApiClient.convertToType(data['redirectUrl'], 'String');
+        obj['redirectUrl'] = ApiClient.convertToType(
+          data['redirectUrl'],
+          'String'
+        )
       }
       if (data.hasOwnProperty('requestedScopes')) {
-        obj['requestedScopes'] = ApiClient.convertToType(data['requestedScopes'], ['String']);
+        obj['requestedScopes'] = ApiClient.convertToType(
+          data['requestedScopes'],
+          ['String']
+        )
       }
     }
-    return obj;
+    return obj
   }
 
   /**
    * ClientID is the client id that initiated the OAuth2 request.
    * @member {String} clientId
    */
-  exports.prototype['clientId'] = undefined;
+  exports.prototype['clientId'] = undefined
   /**
    * ExpiresAt is the time where the access request will expire.
    * @member {String} expiresAt
    */
-  exports.prototype['expiresAt'] = undefined;
+  exports.prototype['expiresAt'] = undefined
   /**
    * ID is the id of this consent request.
    * @member {String} id
    */
-  exports.prototype['id'] = undefined;
+  exports.prototype['id'] = undefined
   /**
    * Redirect URL is the URL where the user agent should be redirected to after the consent has been accepted or rejected.
    * @member {String} redirectUrl
    */
-  exports.prototype['redirectUrl'] = undefined;
+  exports.prototype['redirectUrl'] = undefined
   /**
    * RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator.
    * @member {Array.<String>} requestedScopes
    */
-  exports.prototype['requestedScopes'] = undefined;
+  exports.prototype['requestedScopes'] = undefined
 
-
-
-  return exports;
-}));
-
-
+  return exports
+})

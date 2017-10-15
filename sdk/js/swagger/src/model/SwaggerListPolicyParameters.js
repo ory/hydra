@@ -14,25 +14,24 @@
  *
  */
 
-(function(root, factory) {
+;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient'], factory);
+    define(['ApiClient'], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'));
+    module.exports = factory(require('../ApiClient'))
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
-      root.HydraOAuth2OpenIdConnectServer = {};
+      root.HydraOAuth2OpenIdConnectServer = {}
     }
-    root.HydraOAuth2OpenIdConnectServer.SwaggerListPolicyParameters = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient);
+    root.HydraOAuth2OpenIdConnectServer.SwaggerListPolicyParameters = factory(
+      root.HydraOAuth2OpenIdConnectServer.ApiClient
+    )
   }
-}(this, function(ApiClient) {
-  'use strict';
-
-
-
+})(this, function(ApiClient) {
+  'use strict'
 
   /**
    * The SwaggerListPolicyParameters model module.
@@ -46,11 +45,8 @@
    * @class
    */
   var exports = function() {
-    var _this = this;
-
-
-
-  };
+    var _this = this
+  }
 
   /**
    * Constructs a <code>SwaggerListPolicyParameters</code> from a plain JavaScript object, optionally creating a new instance.
@@ -61,32 +57,28 @@
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
-      obj = obj || new exports();
+      obj = obj || new exports()
 
       if (data.hasOwnProperty('limit')) {
-        obj['limit'] = ApiClient.convertToType(data['limit'], 'Number');
+        obj['limit'] = ApiClient.convertToType(data['limit'], 'Number')
       }
       if (data.hasOwnProperty('offset')) {
-        obj['offset'] = ApiClient.convertToType(data['offset'], 'Number');
+        obj['offset'] = ApiClient.convertToType(data['offset'], 'Number')
       }
     }
-    return obj;
+    return obj
   }
 
   /**
    * The maximum amount of policies returned. in: query
    * @member {Number} limit
    */
-  exports.prototype['limit'] = undefined;
+  exports.prototype['limit'] = undefined
   /**
    * The offset from where to start looking. in: query
    * @member {Number} offset
    */
-  exports.prototype['offset'] = undefined;
+  exports.prototype['offset'] = undefined
 
-
-
-  return exports;
-}));
-
-
+  return exports
+})

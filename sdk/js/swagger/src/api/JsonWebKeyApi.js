@@ -14,22 +14,49 @@
  *
  */
 
-(function(root, factory) {
+;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/InlineResponse401', 'model/JsonWebKey', 'model/JsonWebKeySet', 'model/JsonWebKeySetGeneratorRequest'], factory);
+    define(
+      [
+        'ApiClient',
+        'model/InlineResponse401',
+        'model/JsonWebKey',
+        'model/JsonWebKeySet',
+        'model/JsonWebKeySetGeneratorRequest'
+      ],
+      factory
+    )
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/InlineResponse401'), require('../model/JsonWebKey'), require('../model/JsonWebKeySet'), require('../model/JsonWebKeySetGeneratorRequest'));
+    module.exports = factory(
+      require('../ApiClient'),
+      require('../model/InlineResponse401'),
+      require('../model/JsonWebKey'),
+      require('../model/JsonWebKeySet'),
+      require('../model/JsonWebKeySetGeneratorRequest')
+    )
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
-      root.HydraOAuth2OpenIdConnectServer = {};
+      root.HydraOAuth2OpenIdConnectServer = {}
     }
-    root.HydraOAuth2OpenIdConnectServer.JsonWebKeyApi = factory(root.HydraOAuth2OpenIdConnectServer.ApiClient, root.HydraOAuth2OpenIdConnectServer.InlineResponse401, root.HydraOAuth2OpenIdConnectServer.JsonWebKey, root.HydraOAuth2OpenIdConnectServer.JsonWebKeySet, root.HydraOAuth2OpenIdConnectServer.JsonWebKeySetGeneratorRequest);
+    root.HydraOAuth2OpenIdConnectServer.JsonWebKeyApi = factory(
+      root.HydraOAuth2OpenIdConnectServer.ApiClient,
+      root.HydraOAuth2OpenIdConnectServer.InlineResponse401,
+      root.HydraOAuth2OpenIdConnectServer.JsonWebKey,
+      root.HydraOAuth2OpenIdConnectServer.JsonWebKeySet,
+      root.HydraOAuth2OpenIdConnectServer.JsonWebKeySetGeneratorRequest
+    )
   }
-}(this, function(ApiClient, InlineResponse401, JsonWebKey, JsonWebKeySet, JsonWebKeySetGeneratorRequest) {
-  'use strict';
+})(this, function(
+  ApiClient,
+  InlineResponse401,
+  JsonWebKey,
+  JsonWebKeySet,
+  JsonWebKeySetGeneratorRequest
+) {
+  'use strict'
 
   /**
    * JsonWebKey service.
@@ -45,8 +72,7 @@
    * default to {@link module:ApiClient#instance} if unspecified.
    */
   var exports = function(apiClient) {
-    this.apiClient = apiClient || ApiClient.instance;
-
+    this.apiClient = apiClient || ApiClient.instance
 
     /**
      * Callback function to receive the result of the createJsonWebKeySet operation.
@@ -66,35 +92,42 @@
      * data is of type: {@link module:model/JsonWebKeySet}
      */
     this.createJsonWebKeySet = function(set, opts, callback) {
-      opts = opts || {};
-      var postBody = opts['body'];
+      opts = opts || {}
+      var postBody = opts['body']
 
       // verify the required parameter 'set' is set
       if (set === undefined || set === null) {
-        throw new Error("Missing the required parameter 'set' when calling createJsonWebKeySet");
+        throw new Error(
+          "Missing the required parameter 'set' when calling createJsonWebKeySet"
+        )
       }
 
-
       var pathParams = {
-        'set': set
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
+        set: set
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = JsonWebKeySet;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = JsonWebKeySet
 
       return this.apiClient.callApi(
-        '/keys/{set}', 'POST',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/keys/{set}',
+        'POST',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -113,40 +146,49 @@
      * @param {module:api/JsonWebKeyApi~deleteJsonWebKeyCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.deleteJsonWebKey = function(kid, set, callback) {
-      var postBody = null;
+      var postBody = null
 
       // verify the required parameter 'kid' is set
       if (kid === undefined || kid === null) {
-        throw new Error("Missing the required parameter 'kid' when calling deleteJsonWebKey");
+        throw new Error(
+          "Missing the required parameter 'kid' when calling deleteJsonWebKey"
+        )
       }
 
       // verify the required parameter 'set' is set
       if (set === undefined || set === null) {
-        throw new Error("Missing the required parameter 'set' when calling deleteJsonWebKey");
+        throw new Error(
+          "Missing the required parameter 'set' when calling deleteJsonWebKey"
+        )
       }
 
-
       var pathParams = {
-        'kid': kid,
-        'set': set
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
+        kid: kid,
+        set: set
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = null;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = null
 
       return this.apiClient.callApi(
-        '/keys/{set}/{kid}', 'DELETE',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/keys/{set}/{kid}',
+        'DELETE',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -164,34 +206,41 @@
      * @param {module:api/JsonWebKeyApi~deleteJsonWebKeySetCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.deleteJsonWebKeySet = function(set, callback) {
-      var postBody = null;
+      var postBody = null
 
       // verify the required parameter 'set' is set
       if (set === undefined || set === null) {
-        throw new Error("Missing the required parameter 'set' when calling deleteJsonWebKeySet");
+        throw new Error(
+          "Missing the required parameter 'set' when calling deleteJsonWebKeySet"
+        )
       }
 
-
       var pathParams = {
-        'set': set
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
+        set: set
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = null;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = null
 
       return this.apiClient.callApi(
-        '/keys/{set}', 'DELETE',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/keys/{set}',
+        'DELETE',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -211,40 +260,49 @@
      * data is of type: {@link module:model/JsonWebKeySet}
      */
     this.getJsonWebKey = function(kid, set, callback) {
-      var postBody = null;
+      var postBody = null
 
       // verify the required parameter 'kid' is set
       if (kid === undefined || kid === null) {
-        throw new Error("Missing the required parameter 'kid' when calling getJsonWebKey");
+        throw new Error(
+          "Missing the required parameter 'kid' when calling getJsonWebKey"
+        )
       }
 
       // verify the required parameter 'set' is set
       if (set === undefined || set === null) {
-        throw new Error("Missing the required parameter 'set' when calling getJsonWebKey");
+        throw new Error(
+          "Missing the required parameter 'set' when calling getJsonWebKey"
+        )
       }
 
-
       var pathParams = {
-        'kid': kid,
-        'set': set
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
+        kid: kid,
+        set: set
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = JsonWebKeySet;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = JsonWebKeySet
 
       return this.apiClient.callApi(
-        '/keys/{set}/{kid}', 'GET',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/keys/{set}/{kid}',
+        'GET',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -263,34 +321,41 @@
      * data is of type: {@link module:model/JsonWebKeySet}
      */
     this.getJsonWebKeySet = function(set, callback) {
-      var postBody = null;
+      var postBody = null
 
       // verify the required parameter 'set' is set
       if (set === undefined || set === null) {
-        throw new Error("Missing the required parameter 'set' when calling getJsonWebKeySet");
+        throw new Error(
+          "Missing the required parameter 'set' when calling getJsonWebKeySet"
+        )
       }
 
-
       var pathParams = {
-        'set': set
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
+        set: set
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = JsonWebKeySet;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = JsonWebKeySet
 
       return this.apiClient.callApi(
-        '/keys/{set}', 'GET',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/keys/{set}',
+        'GET',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -312,41 +377,50 @@
      * data is of type: {@link module:model/JsonWebKey}
      */
     this.updateJsonWebKey = function(kid, set, opts, callback) {
-      opts = opts || {};
-      var postBody = opts['body'];
+      opts = opts || {}
+      var postBody = opts['body']
 
       // verify the required parameter 'kid' is set
       if (kid === undefined || kid === null) {
-        throw new Error("Missing the required parameter 'kid' when calling updateJsonWebKey");
+        throw new Error(
+          "Missing the required parameter 'kid' when calling updateJsonWebKey"
+        )
       }
 
       // verify the required parameter 'set' is set
       if (set === undefined || set === null) {
-        throw new Error("Missing the required parameter 'set' when calling updateJsonWebKey");
+        throw new Error(
+          "Missing the required parameter 'set' when calling updateJsonWebKey"
+        )
       }
 
-
       var pathParams = {
-        'kid': kid,
-        'set': set
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
+        kid: kid,
+        set: set
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = JsonWebKey;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = JsonWebKey
 
       return this.apiClient.callApi(
-        '/keys/{set}/{kid}', 'PUT',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/keys/{set}/{kid}',
+        'PUT',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
 
     /**
@@ -367,37 +441,44 @@
      * data is of type: {@link module:model/JsonWebKeySet}
      */
     this.updateJsonWebKeySet = function(set, opts, callback) {
-      opts = opts || {};
-      var postBody = opts['body'];
+      opts = opts || {}
+      var postBody = opts['body']
 
       // verify the required parameter 'set' is set
       if (set === undefined || set === null) {
-        throw new Error("Missing the required parameter 'set' when calling updateJsonWebKeySet");
+        throw new Error(
+          "Missing the required parameter 'set' when calling updateJsonWebKeySet"
+        )
       }
 
-
       var pathParams = {
-        'set': set
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
+        set: set
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
 
-      var authNames = ['oauth2'];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = JsonWebKeySet;
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = JsonWebKeySet
 
       return this.apiClient.callApi(
-        '/keys/{set}', 'PUT',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
+        '/keys/{set}',
+        'PUT',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
     }
-  };
+  }
 
-  return exports;
-}));
+  return exports
+})

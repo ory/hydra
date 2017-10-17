@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
@@ -40,15 +41,25 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.DELETE(GroupsHandlerPath+"/:id/members", h.RemoveGroupMembers)
 }
 
-// swagger:route GET /warden/groups warden groups findGroupsByMember
+// swagger:route GET /warden/groups warden groups findGroups
 //
-// Find group IDs by member
+// Find group IDs
 //
-// The subject making the request needs to be assigned to a policy containing:
+// The subject making the request, if member is specified, needs to be assigned to a policy containing:
 //
 //  ```
 //  {
 //    "resources": ["rn:hydra:warden:groups:<member>"],
+//    "actions": ["get"],
+//    "effect": "allow"
+//  }
+//  ```
+//
+// If member is not specified, the subject making the request needs to be assigned to a policy containing:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:warden:groups"],
 //    "actions": ["get"],
 //    "effect": "allow"
 //  }
@@ -66,7 +77,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //       oauth2: hydra.groups
 //
 //     Responses:
-//       200: findGroupsByMemberResponse
+//       200: findGroupsResponse
 //       401: genericError
 //       403: genericError
 //       500: genericError
@@ -74,16 +85,57 @@ func (h *Handler) FindGroupNames(w http.ResponseWriter, r *http.Request, _ httpr
 	var ctx = r.Context()
 	var member = r.URL.Query().Get("member")
 
-	g, err := h.Manager.FindGroupNames(member)
-	if err != nil {
+	accessReq := &firewall.TokenAccessRequest{
+		Resource: GroupsResource,
+		Action:   "get",
+	}
+
+	if member != "" {
+		accessReq.Resource = fmt.Sprintf(GroupResource, member)
+	}
+
+	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), accessReq, Scope); err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}
 
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: fmt.Sprintf(GroupResource, member),
-		Action:   "get",
-	}, Scope); err != nil {
+	if member != "" {
+		g, err := h.Manager.FindGroupNames(member)
+
+		if err != nil {
+			h.H.WriteError(w, r, err)
+			return
+		}
+
+		h.H.Write(w, r, g)
+		return
+	}
+
+	val := r.URL.Query().Get("offset")
+	if val == "" {
+		val = "0"
+	}
+
+	offset, err := strconv.ParseInt(val, 10, 64)
+	if err != nil {
+		h.H.WriteError(w, r, errors.WithStack(err))
+		return
+	}
+
+	val = r.URL.Query().Get("limit")
+	if val == "" {
+		val = "500"
+	}
+
+	limit, err := strconv.ParseInt(val, 10, 64)
+	if err != nil {
+		h.H.WriteError(w, r, errors.WithStack(err))
+		return
+	}
+
+	g, err := h.Manager.ListGroups(limit, offset)
+
+	if err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}

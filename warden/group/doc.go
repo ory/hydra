@@ -2,17 +2,25 @@
 package group
 
 // A list of groups the member is belonging to
-// swagger:response findGroupsByMemberResponse
-type swaggerFindGroupsByMemberResponse struct {
+// swagger:response findGroupsResponse
+type swaggerFindGroupsResponse struct {
 	// in: body
 	Body []string
 }
 
-// swagger:parameters findGroupsByMember
-type swaggerFindGroupsByMemberParameters struct {
+// swagger:parameters findGroups
+type swaggerFindGroupsParameters struct {
 	// The id of the member to look up.
 	// in: query
 	Member int `json:"member"`
+
+	// The offset from where to start looking if member isn't specified.
+	// in: query
+	Offset int `json:"offset"`
+
+	// The maximum amount of policies returned if member isn't specified.
+	// in: query
+	Limit int `json:"limit"`
 }
 
 // swagger:parameters getGroup deleteGroup

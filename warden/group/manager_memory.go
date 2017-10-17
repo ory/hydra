@@ -1,6 +1,7 @@
 package group
 
 import (
+	"sort"
 	"sync"
 
 	"github.com/pborman/uuid"
@@ -17,6 +18,8 @@ type MemoryManager struct {
 	Groups map[string]Group
 	sync.RWMutex
 }
+
+var _ Manager = (*MemoryManager)(nil)
 
 func (m *MemoryManager) CreateGroup(g *Group) error {
 	if g.ID == "" {
@@ -74,6 +77,39 @@ func (m *MemoryManager) RemoveGroupMembers(group string, subjects []string) erro
 
 	g.Members = subs
 	return m.CreateGroup(g)
+}
+
+func (m *MemoryManager) ListGroups(limit, offset int64) ([]string, error) {
+	if limit < 0 {
+		return nil, errors.New("limit can't be less than 0")
+	}
+
+	if offset < 0 {
+		return nil, errors.New("offset can't be less than 0")
+	}
+
+	if offset >= int64(len(m.Groups)) {
+		return nil, nil
+	}
+
+	var res []string
+	for _, g := range m.Groups {
+		res = append(res, g.ID)
+	}
+
+	sort.Strings(res)
+
+	res = res[offset:]
+
+	if limit == 0 {
+		limit = 500
+	}
+
+	if limit < int64(len(res)) {
+		res = res[:limit]
+	}
+
+	return res, nil
 }
 
 func (m *MemoryManager) FindGroupNames(subject string) ([]string, error) {

@@ -1376,8 +1376,8 @@ paths:
   /warden/groups:
     get:
       description: >-
-        The subject making the request needs to be assigned to a policy
-        containing:
+        The subject making the request, if member is specified, needs to be
+        assigned to a policy containing:
 
 
         ```
@@ -1385,6 +1385,23 @@ paths:
         {
 
         "resources": ["rn:hydra:warden:groups:<member>"],
+
+        "actions": ["get"],
+
+        "effect": "allow"
+
+        }
+
+        ```
+
+        If member is not specified, the subject making the request needs to be
+        assigned to a policy containing:
+
+        ```
+
+        {
+
+        "resources": ["rn:hydra:warden:groups"],
 
         "actions": ["get"],
 
@@ -1403,8 +1420,8 @@ paths:
       tags:
         - warden
         - groups
-      summary: Find group IDs by member
-      operationId: findGroupsByMember
+      summary: Find group IDs
+      operationId: findGroups
       security:
         - oauth2:
             - hydra.groups
@@ -1415,9 +1432,21 @@ paths:
           description: The id of the member to look up.
           name: member
           in: query
+        - type: integer
+          format: int64
+          x-go-name: Offset
+          description: The offset from where to start looking if member isn't specified.
+          name: offset
+          in: query
+        - type: integer
+          format: int64
+          x-go-name: Limit
+          description: The maximum amount of policies returned if member isn't specified.
+          name: limit
+          in: query
       responses:
         '200':
-          $ref: '#/responses/findGroupsByMemberResponse'
+          $ref: '#/responses/findGroupsResponse'
         '401':
           $ref: '#/responses/genericError'
         '403':
@@ -2721,7 +2750,7 @@ responses:
     headers:
       description:
         type: string
-  findGroupsByMemberResponse:
+  findGroupsResponse:
     description: A list of groups the member is belonging to
     schema:
       type: array

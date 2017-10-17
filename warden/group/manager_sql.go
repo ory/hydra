@@ -31,6 +31,8 @@ type SQLManager struct {
 	DB *sqlx.DB
 }
 
+var _ Manager = (*SQLManager)(nil)
+
 func (s *SQLManager) CreateSchemas() (int, error) {
 	migrate.SetTable("hydra_groups_migration")
 	n, err := migrate.Exec(s.DB.DB, s.DB.DriverName(), migrations, migrate.Up)
@@ -121,6 +123,28 @@ func (m *SQLManager) RemoveGroupMembers(group string, subjects []string) error {
 		return errors.Wrap(err, "Could not commit transaction")
 	}
 	return nil
+}
+
+func (m *SQLManager) ListGroups(limit, offset int64) ([]string, error) {
+	if limit < 0 {
+		return nil, errors.New("limit can't be less than 0")
+	}
+
+	if offset < 0 {
+		return nil, errors.New("offset can't be less than 0")
+	}
+
+	var q []string
+
+	if limit == 0 {
+		limit = 500
+	}
+
+	if err := m.DB.Select(&q, m.DB.Rebind("SELECT id from hydra_warden_group ORDER BY id LIMIT ? OFFSET ?"), limit, offset); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return q, nil
 }
 
 func (m *SQLManager) FindGroupNames(subject string) ([]string, error) {

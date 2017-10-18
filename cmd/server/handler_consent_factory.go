@@ -16,7 +16,7 @@ func injectConsentManager(c *config.Config) {
 		manager = oauth2.NewConsentRequestMemoryManager()
 		break
 	case *config.SQLConnection:
-		manager = oauth2.NewConsentRequestMemoryManager()
+		manager = oauth2.NewConsentRequestSQLManager(con.GetDatabase())
 		break
 	case *config.PluginConnection:
 		var err error

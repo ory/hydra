@@ -39,7 +39,7 @@
   * [Running Hydra in production](how-to/production.md)
 * [SDKs](sdk.md)
   * [SDK for Go](sdk/go.md)
-  * [SDK for Go](sdk/js.md)
+  * [SDK for JavaScript](sdk/js.md)
   * [Other languages](sdk.md)
 * [Contribute](contribute.md)
 * [FAQ](faq.md)

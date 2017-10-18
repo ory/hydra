@@ -126,19 +126,15 @@ func (m *SQLManager) RemoveGroupMembers(group string, subjects []string) error {
 }
 
 func (m *SQLManager) ListGroups(limit, offset int64) ([]string, error) {
-	if limit < 0 {
-		return nil, errors.New("limit can't be less than 0")
+	if limit <= 0 {
+		limit = 500
 	}
 
 	if offset < 0 {
-		return nil, errors.New("offset can't be less than 0")
+		offset = 0
 	}
 
 	var q []string
-
-	if limit == 0 {
-		limit = 500
-	}
 
 	if err := m.DB.Select(&q, m.DB.Rebind("SELECT id from hydra_warden_group ORDER BY id LIMIT ? OFFSET ?"), limit, offset); err != nil {
 		return nil, errors.WithStack(err)

@@ -2,14 +2,14 @@
 package group
 
 // A list of groups the member is belonging to
-// swagger:response findGroupsResponse
-type swaggerFindGroupsResponse struct {
+// swagger:response listGroupsResponse
+type swaggerListGroupsResponse struct {
 	// in: body
 	Body []string
 }
 
-// swagger:parameters findGroups
-type swaggerFindGroupsParameters struct {
+// swagger:parameters listGroups
+type swaggerListGroupsParameters struct {
 	// The id of the member to look up.
 	// in: query
 	Member int `json:"member"`

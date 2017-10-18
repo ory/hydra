@@ -14,15 +14,15 @@ func TestHelperManagers(m Manager) func(t *testing.T) {
 		assert.Empty(t, ds)
 
 		ds, err = m.ListGroups(-1, 0)
-		assert.Error(t, err)
+		assert.NoError(t, err)
 		assert.Nil(t, ds)
 
 		ds, err = m.ListGroups(0, -1)
-		assert.Error(t, err)
+		assert.NoError(t, err)
 		assert.Nil(t, ds)
 
 		ds, err = m.ListGroups(-1, -1)
-		assert.Error(t, err)
+		assert.NoError(t, err)
 		assert.Nil(t, ds)
 
 		_, err = m.GetGroup("4321")

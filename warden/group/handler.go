@@ -90,10 +90,6 @@ func (h *Handler) FindGroupNames(w http.ResponseWriter, r *http.Request, _ httpr
 		Action:   "get",
 	}
 
-	if member != "" {
-		accessReq.Resource = fmt.Sprintf(GroupResource, member)
-	}
-
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), accessReq, Scope); err != nil {
 		h.H.WriteError(w, r, err)
 		return
@@ -111,26 +107,20 @@ func (h *Handler) FindGroupNames(w http.ResponseWriter, r *http.Request, _ httpr
 		return
 	}
 
-	val := r.URL.Query().Get("offset")
-	if val == "" {
-		val = "0"
-	}
-
-	offset, err := strconv.ParseInt(val, 10, 64)
+	limit, err := intFromQuery(r, "limit")
 	if err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
-	val = r.URL.Query().Get("limit")
-	if val == "" {
-		val = "500"
-	}
-
-	limit, err := strconv.ParseInt(val, 10, 64)
+	offset, err := intFromQuery(r, "offset")
 	if err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
 		return
+	}
+
+	if limit == 0 {
+		limit = 500
 	}
 
 	g, err := h.Manager.ListGroups(limit, offset)
@@ -141,6 +131,15 @@ func (h *Handler) FindGroupNames(w http.ResponseWriter, r *http.Request, _ httpr
 	}
 
 	h.H.Write(w, r, g)
+}
+
+func intFromQuery(r *http.Request, key string) (int64, error) {
+	val := r.URL.Query().Get(key)
+	if val == "" {
+		val = "0"
+	}
+
+	return strconv.ParseInt(val, 10, 64)
 }
 
 // swagger:route POST /warden/groups warden groups createGroup

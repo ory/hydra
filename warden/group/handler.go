@@ -41,21 +41,11 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.DELETE(GroupsHandlerPath+"/:id/members", h.RemoveGroupMembers)
 }
 
-// swagger:route GET /warden/groups warden groups findGroups
+// swagger:route GET /warden/groups warden groups listGroups
 //
-// Find group IDs
+// List group IDs
 //
-// The subject making the request, if member is specified, needs to be assigned to a policy containing:
-//
-//  ```
-//  {
-//    "resources": ["rn:hydra:warden:groups:<member>"],
-//    "actions": ["get"],
-//    "effect": "allow"
-//  }
-//  ```
-//
-// If member is not specified, the subject making the request needs to be assigned to a policy containing:
+// The subject making the request needs to be assigned to a policy containing:
 //
 //  ```
 //  {
@@ -77,7 +67,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //       oauth2: hydra.groups
 //
 //     Responses:
-//       200: findGroupsResponse
+//       200: listGroupsResponse
 //       401: genericError
 //       403: genericError
 //       500: genericError
@@ -107,20 +97,16 @@ func (h *Handler) FindGroupNames(w http.ResponseWriter, r *http.Request, _ httpr
 		return
 	}
 
-	limit, err := intFromQuery(r, "limit")
+	limit, err := intFromQuery(r, "limit", 500)
 	if err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
-	offset, err := intFromQuery(r, "offset")
+	offset, err := intFromQuery(r, "offset", 0)
 	if err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
 		return
-	}
-
-	if limit == 0 {
-		limit = 500
 	}
 
 	g, err := h.Manager.ListGroups(limit, offset)
@@ -133,10 +119,10 @@ func (h *Handler) FindGroupNames(w http.ResponseWriter, r *http.Request, _ httpr
 	h.H.Write(w, r, g)
 }
 
-func intFromQuery(r *http.Request, key string) (int64, error) {
+func intFromQuery(r *http.Request, key string, def int64) (int64, error) {
 	val := r.URL.Query().Get(key)
 	if val == "" {
-		val = "0"
+		return def, nil
 	}
 
 	return strconv.ParseInt(val, 10, 64)

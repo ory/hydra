@@ -76,7 +76,7 @@ $ docker run -d \
   -e ISSUER=https://localhost:9000/ \
   -e CONSENT_URL=http://localhost:9020/consent \
   -e FORCE_ROOT_CLIENT_CREDENTIALS=admin:demo-password \
-  oryd/hydra:v0.10.0-alpha1
+  oryd/hydra:v0.10.0-alpha.1
 
 # And check if it's running:
 $ docker logs ory-hydra-example--hydra
@@ -275,7 +275,7 @@ $ hydra policies create --skip-tls-verify \
   --description "Allow consent-app to manage OAuth2 consent requests." \
   --allow \
   --id consent-app-policy \
-  --resources rn:hydra:oauth2:consent:requests:<.*> \
+  --resources "rn:hydra:oauth2:consent:requests:<.*>" \
   --subjects consent-app
 
 Created policy consent-app-policy.
@@ -286,7 +286,7 @@ Let's take a look at the arguments:
 * `--actions get,accept,reject` we need to be able to get, accept and reject consent requests.
 * `--allow` sets the policy effect to `allow`. Omit to set this for `deny`.
 * `--id consent-app-policy` a unique identifier.
-* `--resources rn:hydra:oauth2:consent:requests:<.*> ` we need to be able to access the consent request resource.
+* `--resources "rn:hydra:oauth2:consent:requests:<.*>" ` we need to be able to access the consent request resource.
 * `--subjects consent-app` the subject ("user") of this policy is our consent app.
 
 Awesome! Next we will run the [ORY Hydra Consent App Example (NodeJS)](https://github.com/ory/hydra-consent-app-express).

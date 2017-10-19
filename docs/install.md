@@ -76,7 +76,7 @@ $ docker run -d \
   -e ISSUER=https://localhost:9000/ \
   -e CONSENT_URL=http://localhost:9020/consent \
   -e FORCE_ROOT_CLIENT_CREDENTIALS=admin:demo-password \
-  oryd/hydra:v0.10.0-alpha.1
+  oryd/hydra:v0.10.0-alpha.8
 
 # And check if it's running:
 $ docker logs ory-hydra-example--hydra

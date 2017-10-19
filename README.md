@@ -1,26 +1,18 @@
-<h1 align="center"><img src="https://storage.googleapis.com/ory.am/ory_banners-32.png" alt="ORY Hydra"></h1>
+<h1 align="center"><img src="https://storage.googleapis.com/ory.am/github-banner/ory_01-hydra-altb.png" alt="ORY Hydra - Open Source OAuth 2 and OpenID Connect server"></h1>
 
-<p align="left">
-    <a href="https://gitter.im/ory-am/hydra"><img src="https://img.shields.io/badge/join-ory%20chat-00cc99.svg" alt="Join the chat at https://gitter.im/ory-am/hydra"></a>
-    <a href="https://community.ory.am/"><img src="https://img.shields.io/badge/join-ory%20community-00cc99.svg" alt="Join the community at https://community.ory.am/"></a>
-    <a href="http://eepurl.com/bKT3N9"><img src="https://img.shields.io/badge/join-ory%20newsletter-00cc99.svg" alt="Join newsletter"></a>
-    <a href="https://patreon.com/user?u=4298803"><img src="https://img.shields.io/badge/support%20us-on%20patreon-green.svg" alt="Become a patron!"></a>
-</p>
-<p align="left">
-    <a href="https://travis-ci.org/ory/hydra"><img src="https://travis-ci.org/ory/hydra.svg?branch=master" alt="Build Status"></a>
-    <a href="https://coveralls.io/github/ory/hydra?branch=master"><img src="https://coveralls.io/repos/ory/hydra/badge.svg?branch=master&service=github" alt="Coverage Status"></a>
-    <a href="https://codeclimate.com/github/ory/hydra"><img src="https://codeclimate.com/github/ory/hydra/badges/gpa.svg" alt="Code Climate"></a>
-    <a href="https://goreportcard.com/report/github.com/ory/hydra"><img src="https://goreportcard.com/badge/github.com/ory/hydra" alt="Go Report Card"></a>
-    <a href="https://bestpractices.coreinfrastructure.org/projects/364"><img src="https://bestpractices.coreinfrastructure.org/projects/364/badge" alt="CII Best Practices"></a>
-</p>
+<h4 align="center">
+    <a href="https://gitter.im/ory-am/hydra">Chat</a> |
+    <a href="https://community.ory.am/">Forums</a> |
+    <a href="http://eepurl.com/bKT3N9">Newsletter</a><br/><br/>
+    <a href="https://ory.gitbooks.io/hydra/content">Guide</a> |
+    <a href="http://docs.hydra13.apiary.io/">API Docs</a> |
+    <a href="https://godoc.org/github.com/ory/hydra">Code Docs</a><br/><br/>
+    <a href="https://patreon.com/user?u=4298803">Support us on patreon!</a>
+</h4>
 
-<p align="left">
-    <a href="https://ory.gitbooks.io/hydra/content/"><img src="https://img.shields.io/badge/docs-guide-blue.svg" alt="Docs Guide"></a>
-    <a href="http://docs.hydra13.apiary.io/"><img src="https://img.shields.io/badge/docs-http%20api-blue.svg" alt="HTTP API Documentation"></a>
-    <a href="https://godoc.org/github.com/ory/hydra"><img src="https://img.shields.io/badge/docs-godoc-blue.svg" alt="Code Documentation"></a>
-</p>
+---
 
-ORY Hydra is a security-first OAuth 2.0 and OpenID Connect server optimized for low-latency, high throughput,
+ORY Hydra is a hardened OAuth2 and OpenID Connect server optimized for low-latency, high throughput,
 and low resource consumption. ORY Hydra *is not* an identity provider (user sign up, user log in, password reset flow),
 but connects to your existing identity provider through a [consent app](https://ory.gitbooks.io/hydra/content/oauth2.html#consent-app-flow).
 Implementing the consent app in a different language is easy, and exemplary consent apps
@@ -31,6 +23,15 @@ Besides mitigating various attack vectors, such as database compromisation and O
 able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to.
 [Click here](https://ory.gitbooks.io/hydra/content/security.html#security-overview) to read more about security.
 
+
+<p align="left">
+    <a href="https://travis-ci.org/ory/hydra"><img src="https://travis-ci.org/ory/hydra.svg?branch=master" alt="Build Status"></a>
+    <a href="https://coveralls.io/github/ory/hydra?branch=master"><img src="https://coveralls.io/repos/ory/hydra/badge.svg?branch=master&service=github" alt="Coverage Status"></a>
+    <a href="https://codeclimate.com/github/ory/hydra"><img src="https://codeclimate.com/github/ory/hydra/badges/gpa.svg" alt="Code Climate"></a>
+    <a href="https://goreportcard.com/report/github.com/ory/hydra"><img src="https://goreportcard.com/badge/github.com/ory/hydra" alt="Go Report Card"></a>
+    <a href="https://bestpractices.coreinfrastructure.org/projects/364"><img src="https://bestpractices.coreinfrastructure.org/projects/364/badge" alt="CII Best Practices"></a>
+</p>
+
 ---
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
@@ -38,10 +39,8 @@ able to securely manage JSON Web Keys, and has a sophisticated policy-based acce
 **Table of Contents**
 
 - [What is ORY Hydra?](#what-is-ory-hydra)
-  - [ORY Hydra implements open standards](#ory-hydra-implements-open-standards)
-- [ORY Cloud Security](#ory-cloud-security)
-  - [Products](#products)
-  - [Consulting](#consulting)
+  - [OAuth2 and OpenID Connect: Open Standards!](#oauth2-and-openid-connect-open-standards)
+- [ORY Gatekeeper](#ory-gatekeeper)
 - [Quickstart](#quickstart)
   - [5 minutes tutorial: Run your very own OAuth2 environment](#5-minutes-tutorial-run-your-very-own-oauth2-environment)
   - [Installation](#installation)
@@ -80,7 +79,7 @@ or some template engine or a predefined front-end. Instead it relies on HTTP red
 to verify user consent allowing you to use ORY Hydra with any authentication endpoint, be it [authboss](https://github.com/go-authboss/authboss),
 [auth0.com](https://auth0.com/) or your proprietary PHP authentication.
 
-### ORY Hydra implements open standards
+### OAuth2 and OpenID Connect: Open Standards!
 
 ORY Hydra implements Open Standards set by the IETF:
 
@@ -97,32 +96,13 @@ and the OpenID Foundation:
 * [OpenID Connect Core 1.0](http://openid.net/specs/openid-connect-core-1_0.html)
 * [OpenID Connect Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0.html)
 
-## ORY Cloud Security
+## ORY Gatekeeper
 
-ORY Cloud Security (OCS) is a popular, hardened toolbox of open and closed source services for securing your APIs
-and web services. Our products are capable of handling high throughput with low latency, work flawlessly in the
-cloud and on premise, and are securing millions of requests each day already.
+<img src="https://www.ory.am/images/ory-security-console.png" alt="ORY Gatekeeper Console" align="right" width="40%">
 
-### Products
+Gatekeeper is a firewall for APIs. It detects and prevents malicious requests and makes sure that no unauthorized requests reach your servers. Gatekeeper is set up in minutes, works with existing APIs, and makes use of ORY's popular open source ecosystem.
 
-<img src="https://www.ory.am/images/ory-security-console.png" alt="ORY Security Console" align="right" width="40%">
-
-* **ORY Hydra** - this repository.
-* **[ORY Hydra+](https://www.ory.am/products/cloud-security?utm_source=github_hydra#hydra-plus)** is optimized for extreme production loads, resiliance and availability - [learn more now](https://www.ory.am/products/cloud-security?utm_source=github_hydra#hydra-plus).
-* **[ORY Security Console](https://www.ory.am/products/cloud-security?utm_source=github_hydra#security-console)** (image on the right) is an admin user interface for ORY Hydra and ORY Gatekeeper. Available on-premise and as a service - [learn more now](https://www.ory.am/products/cloud-security?utm_source=github_hydra#security-console).
-* **[ORY Gatekeeper](https://www.ory.am/products/cloud-security?utm_source=github_hydra#gatekeeper)** is a configurable firewall reverse proxy making access control easy and secure. ORY Gatekeeper is compatible with ORY Hydra Access Control Policies and OAuth 2.0 Access Tokens. [Learn more now](https://www.ory.am/products/cloud-security?utm_source=github_hydra#gatekeeper).
-* **[ORY Fosite](https://github.com/ory/fosite)** is a popular open source OAuth2 and OpenID Connect SDK for Go.
-* **[ORY Ladon](https://github.com/ory/ladon)** is an acclaimed open source SDK for access control policies, solving authorization in the microservice and IoT age.
-
-<br clear="all">
-
-### Consulting
-
-Access Control, OAuth 2.0, and OpenID Connect are rich topics with many nuances and implementation details. Not to worry, because we offer consulting services both on these topics and our ORY Cloud Security products.
-
-We are not your typical enterprise partner, but an agile, polite, highly talented, and extremely productive team of technology experts. You will never talk with interns, out-sourced support staff, or bots - but always with the owners and maintainers of the respective products, or even the founders themselves.
-
-Go [here to learn more about our consulting services](https://www.ory.am/products/cloud-security?utm_source=github_hydra#consulting).
+**Learn more about [Gatekeeper](https://www.ory.am/products/api-security) and try it for free!**
 
 ## Quickstart
 
@@ -149,7 +129,7 @@ There are various ways of installing ORY Hydra on your system.
 
 The client and server **binaries are downloadable at [releases](https://github.com/ory/hydra/releases)**.
 There is currently no installer available. You have to add the ORY Hydra binary to the PATH environment variable yourself or put
-the binary in a location that is already in your path (`/usr/bin`, ...). 
+the binary in a location that is already in your path (`/usr/bin`, ...).
 If you do not understand what that all of this means, ask in our [chat channel](https://gitter.im/ory-am/hydra). We are happy to help.
 
 #### Using Docker

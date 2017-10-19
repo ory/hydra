@@ -11,23 +11,23 @@ import (
 func TestGenerator(t *testing.T) {
 	for _, c := range []struct {
 		g     KeyGenerator
-		check func(*jose.JsonWebKeySet)
+		check func(*jose.JSONWebKeySet)
 	}{
 		{
 			g: &RS256Generator{},
-			check: func(ks *jose.JsonWebKeySet) {
+			check: func(ks *jose.JSONWebKeySet) {
 				assert.Len(t, ks, 2)
 			},
 		},
 		{
 			g: &ECDSA521Generator{},
-			check: func(ks *jose.JsonWebKeySet) {
+			check: func(ks *jose.JSONWebKeySet) {
 				assert.Len(t, ks, 2)
 			},
 		},
 		{
 			g: &ECDSA256Generator{},
-			check: func(ks *jose.JsonWebKeySet) {
+			check: func(ks *jose.JSONWebKeySet) {
 				assert.Len(t, ks, 2)
 			},
 		},
@@ -35,7 +35,7 @@ func TestGenerator(t *testing.T) {
 			g: &HS256Generator{
 				Length: 32,
 			},
-			check: func(ks *jose.JsonWebKeySet) {
+			check: func(ks *jose.JSONWebKeySet) {
 				assert.Len(t, ks, 1)
 			},
 		},

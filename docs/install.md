@@ -310,7 +310,7 @@ $ docker logs ory-hydra-example--consent
 ```
 
 Let's take a look at the arguments:
-* `-p 9020:3000` exposes this service at port 9010. If you remember, that's the port of the `CONSENT_URL` value
+* `-p 9020:3000` exposes this service at port 9020. If you remember, that's the port of the `CONSENT_URL` value
 from the ORY Hydra docker container (`CONSENT_URL=http://localhost:9020/consent`).
 * `-e HYDRA_CLIENT_ID=consent-app` this is the client id we created in the steps above.
 * `-e HYDRA_CLIENT_SECRET=consent-secret` this is the client secret we set in the steps above.

@@ -3,9 +3,9 @@ import:
 - package: github.com/sirupsen/logrus
   version: master
 - package: github.com/Sirupsen/logrus
+  version: master
   repo: https://github.com/sirupsen/logrus.git
   vcs: git
-  version: master
 - package: github.com/dgrijalva/jwt-go
   version: 3.0.0
 - package: github.com/go-sql-driver/mysql
@@ -38,7 +38,7 @@ import:
 - package: github.com/ory/herodot
   version: 0.1.1
 - package: github.com/ory/ladon
-  version: 0.8.1
+  version: 0.8.2
   subpackages:
   - manager/memory
   - manager/sql
@@ -52,9 +52,7 @@ import:
 - package: github.com/spf13/cobra
 - package: github.com/spf13/viper
 - package: github.com/square/go-jose
-  version: ~1.1.0
-  subpackages:
-  - json
+  version: 2.1.3
 - package: github.com/stretchr/testify
   version: 1.1.4
   subpackages:

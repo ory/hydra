@@ -14,7 +14,7 @@ the user's account is limited to the "scope" of the authorization granted (e.g. 
 2. **Authorization Server (Hydra)** verifies the identity of the user and issues access tokens to the *client application*.
 3. **Client** is the *application* that wants to access the user's account. Before it may do so, it must be authorized
 by the user.
-4. **Identity Provider** contains a log in user interface and a database of all your users. To integrate Hydra,
+4. **Identity Provider** contains a login user interface and a database of all your users. To integrate Hydra,
 you must modify the Identity Provider. It mus be able to generate consent tokens and ask for the user's consent.
 5. **User Agent** is usually the resource owner's browser.
 6. **Consent App** is an app (e.g. NodeJS) that is able to receive consent challenges and create consent tokens.
@@ -24,12 +24,12 @@ if he consents to allowing the client access to his resources.
 
 Examples:
 1. Peter wants to give MyPhotoBook access to his Dropbox. Peter is the resource owner.
-2. The Authorization Server (Hydra) is responsible for managing the access request fom MyPhotoBook. Hydra handles
+2. The Authorization Server (Hydra) is responsible for managing the access request for MyPhotoBook. Hydra handles
 the communication between the resource owner, the consent endpoint and the client. Hydra is the authorization server.
 In this case, Dropbox would be the one who uses Hydra.
 3. MyPhotoBook is the client and was issued an id and a password by Hydra. MyPhotoBook uses these credentials
 to talk with Hydra.
-4. Dropbox has a database and a frontend that allow their users to log in, using their username and password.
+4. Dropbox has a database and a frontend that allow their users to login, using their username and password.
 This is what an Identity Provider does.
 5. The User Agent is Peter's FireFox.
 6. The Consent App is a frontend app that asks the user if he is willing to give MyPhotoBook access to his pictures stored
@@ -43,7 +43,7 @@ first.
 
 Hydra uses the [JSON Web Key Manager](./jwk.md) to retrieve the
 key pair `hydra.openid.id-token` for signing ID tokens. You can use that endpoint to retrieve the public key for verification,
-has Hydra is not supporting OpenID Connect Discovery yet.
+as Hydra does not supporting OpenID Connect Discovery yet.
 
 ### OAuth 2.0 Clients
 

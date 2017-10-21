@@ -42,8 +42,8 @@ If you are new to OpenID Connect, please read the [Introduction to OAuth 2.0 and
 first. 
 
 Hydra uses the [JSON Web Key Manager](./jwk.md) to retrieve the
-key pair `hydra.openid.id-token` for signing ID tokens. You can use that endpoint to retrieve the public key for verification,
-as Hydra does not supporting OpenID Connect Discovery yet.
+key pair `hydra.openid.id-token` for signing ID tokens. You can use that endpoint to retrieve the public key for verification.
+Additionally, Hydra supports OpenID Connect Discovery.
 
 ### OAuth 2.0 Clients
 

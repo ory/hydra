@@ -96,9 +96,9 @@ Here is how Google chose to design the login and consent UI (what we call the "c
 
 There are three API endpoints available for managing consent request:
 
-* [Fetch information on a consent request](http://docs.hydra13.apiary.io/#r/oauth2/oauth2consentrequestsid)
-* [Accept a consent request](http://docs.hydra13.apiary.io/#r/oauth2/oauth2consentrequestsidaccept)
-* [Reject a consent request](http://docs.hydra13.apiary.io/#r/oauth2/oauth2consentrequestsidreject)
+* [Fetch information on a consent request](http://docs.hydra13.apiary.io/#reference/oauth2/oauth2consentrequestsid)
+* [Accept a consent request](http://docs.hydra13.apiary.io/#reference/oauth2/oauth2consentrequestsidaccept)
+* [Reject a consent request](http://docs.hydra13.apiary.io/#reference/oauth2/oauth2consentrequestsidreject)
 
 ### Error Handling during Consent App Flow
 

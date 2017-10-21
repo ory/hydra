@@ -46,11 +46,11 @@ $ export SYSTEM_SECRET=this_needs_to_be_the_same_always_and_also_very_$3cuR3-._
 $ export DATABASE_URL=postgres://hydra:secret@postgres:5432/hydra?sslmode=disable
 
 # Before starting, let's pull the latest ORY Hydra tag from docker.
-$ docker pull oryd/hydra:v0.9.12
+$ docker pull oryd/hydra:v0.10.0-alpha.8
 
 # This command will show you all the environment variables that you can set. Read this carefully.
 # It is the equivalent to `hydra help host`.
-$ docker run -it --entrypoint hydra oryd/hydra:v0.9.12 help host
+$ docker run -it --entrypoint hydra oryd/hydra:v0.10.0-alpha.8 help host
 
 Starts all HTTP/2 APIs and connects to a database backend.
 [...]
@@ -58,7 +58,7 @@ Starts all HTTP/2 APIs and connects to a database backend.
 # ORY Hydra does not do magic, it requires concious decisions, for example, when running SQL migrations, which is required
 # when installing a new version of ORY Hydra, or upgrading an existing installation.
 # It is the equivalent to `hydra migrate sql postgres://hydra:secret@postgres:5432/hydra?sslmode=disable`
-$ docker run --link ory-hydra-example--postgres:postgres -it --entrypoint hydra oryd/hydra:v0.9.12 migrate sql $DATABASE_URL
+$ docker run --link ory-hydra-example--postgres:postgres -it --entrypoint hydra oryd/hydra:v0.10.0-alpha.8 migrate sql $DATABASE_URL
 
 Applying `ladon` SQL migrations...
 Applied 3 `ladon` SQL migrations.
@@ -134,7 +134,7 @@ ORY Hydra can be managed using the Hydra Command Line Interface (CLI), which is 
 see the available commands, run:
 
 ```
-$ docker run -it --entrypoint hydra oryd/hydra:v0.9.12 help
+$ docker run -it --entrypoint hydra oryd/hydra:v0.10.0-alpha.8 help
 Hydra is a cloud native high throughput OAuth2 and OpenID Connect provider
 
 Usage:
@@ -205,7 +205,7 @@ Next we need to connect to ORY Hydra and set up OAuth 2.0 Clients and access con
 ```
 # We run a shell with ORY Hydra installed. We also expose port 4445 which we will use later to perform
 # the authorize code flow. Also, we connect this container to our ORY Hydra instance.
-$ docker run -p 9010:4445 --link ory-hydra-example--hydra:hydra -it --entrypoint "/bin/sh" oryd/hydra:v0.9.12
+$ docker run -p 9010:4445 --link ory-hydra-example--hydra:hydra -it --entrypoint "/bin/sh" oryd/hydra:v0.10.0-alpha.8
 
 # Let's connect to the ORY Hydra cluster
 $ hydra connect
@@ -249,7 +249,7 @@ $ hydra clients create --skip-tls-verify \
   --name "Consent App Client" \
   --grant-types client_credentials \
   --response-types token \
-  --allowed-scopes hydra.consent*
+  --allowed-scopes hydra.consent
 ```
 
 Let's dive into the arguments:
@@ -302,7 +302,7 @@ $ docker run -d \
   -e HYDRA_CLIENT_SECRET=consent-secret \
   -e HYDRA_URL=https://hydra:4444 \
   -e NODE_TLS_REJECT_UNAUTHORIZED=0 \
-  oryd/hydra-consent-app-express:v0.10.0-alpha.7
+  oryd/hydra-consent-app-express:v0.10.0-alpha.9
 
 # Let's check if it's running ok:
 $ docker logs ory-hydra-example--consent
@@ -317,7 +317,7 @@ from the ORY Hydra docker container (`CONSENT_URL=http://localhost:9020/consent`
 * `NODE_TLS_REJECT_UNAUTHORIZED=0` disables TLS verification, because we are using self-signed certificates.
 
 Now close this shell and return to the one which is connected to the ORY Hydra bash container
-(`docker run -p 9010:4445 --link ory-hydra-example--hydra:hydra -it --entrypoint "/bin/sh" oryd/hydra:v0.9.12`).
+(`docker run -p 9010:4445 --link ory-hydra-example--hydra:hydra -it --entrypoint "/bin/sh" oryd/hydra:v0.10.0-alpha.8`).
 
 ## Perform OAuth 2.0 Flow
 

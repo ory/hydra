@@ -1,6 +1,7 @@
 package group
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 
@@ -18,6 +19,8 @@ type HTTPManager struct {
 	FakeTLSTermination bool
 	Dry                bool
 }
+
+var _ Manager = (*HTTPManager)(nil)
 
 func (m *HTTPManager) CreateGroup(g *Group) error {
 	var r = pkg.NewSuperAgent(m.Endpoint.String())
@@ -89,6 +92,19 @@ func (m *HTTPManager) RemoveGroupMembers(group string, members []string) error {
 	}
 
 	return nil
+}
+
+func (m *HTTPManager) ListGroups(limit, offset int64) ([]string, error) {
+	var g []string
+	var r = pkg.NewSuperAgent(m.Endpoint.String() + fmt.Sprintf("?limit=%d&offset=%d", limit, offset))
+	r.Client = m.Client
+	r.Dry = m.Dry
+	r.FakeTLSTermination = m.FakeTLSTermination
+	if err := r.Get(&g); err != nil {
+		return nil, err
+	}
+
+	return g, nil
 }
 
 func (m *HTTPManager) FindGroupNames(subject string) ([]string, error) {

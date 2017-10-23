@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
@@ -40,15 +41,15 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.DELETE(GroupsHandlerPath+"/:id/members", h.RemoveGroupMembers)
 }
 
-// swagger:route GET /warden/groups warden groups findGroupsByMember
+// swagger:route GET /warden/groups warden groups listGroups
 //
-// Find group IDs by member
+// List group IDs
 //
 // The subject making the request needs to be assigned to a policy containing:
 //
 //  ```
 //  {
-//    "resources": ["rn:hydra:warden:groups:<member>"],
+//    "resources": ["rn:hydra:warden:groups"],
 //    "actions": ["get"],
 //    "effect": "allow"
 //  }
@@ -66,7 +67,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //       oauth2: hydra.groups
 //
 //     Responses:
-//       200: findGroupsByMemberResponse
+//       200: listGroupsResponse
 //       401: genericError
 //       403: genericError
 //       500: genericError
@@ -74,21 +75,57 @@ func (h *Handler) FindGroupNames(w http.ResponseWriter, r *http.Request, _ httpr
 	var ctx = r.Context()
 	var member = r.URL.Query().Get("member")
 
-	g, err := h.Manager.FindGroupNames(member)
+	accessReq := &firewall.TokenAccessRequest{
+		Resource: GroupsResource,
+		Action:   "get",
+	}
+
+	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), accessReq, Scope); err != nil {
+		h.H.WriteError(w, r, err)
+		return
+	}
+
+	if member != "" {
+		g, err := h.Manager.FindGroupNames(member)
+
+		if err != nil {
+			h.H.WriteError(w, r, err)
+			return
+		}
+
+		h.H.Write(w, r, g)
+		return
+	}
+
+	limit, err := intFromQuery(r, "limit", 500)
+	if err != nil {
+		h.H.WriteError(w, r, errors.WithStack(err))
+		return
+	}
+
+	offset, err := intFromQuery(r, "offset", 0)
+	if err != nil {
+		h.H.WriteError(w, r, errors.WithStack(err))
+		return
+	}
+
+	g, err := h.Manager.ListGroups(limit, offset)
+
 	if err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}
 
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: fmt.Sprintf(GroupResource, member),
-		Action:   "get",
-	}, Scope); err != nil {
-		h.H.WriteError(w, r, err)
-		return
+	h.H.Write(w, r, g)
+}
+
+func intFromQuery(r *http.Request, key string, def int64) (int64, error) {
+	val := r.URL.Query().Get(key)
+	if val == "" {
+		return def, nil
 	}
 
-	h.H.Write(w, r, g)
+	return strconv.ParseInt(val, 10, 64)
 }
 
 // swagger:route POST /warden/groups warden groups createGroup

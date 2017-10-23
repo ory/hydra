@@ -85,6 +85,8 @@ func connectToPG() {
 }
 
 func TestManagers(t *testing.T) {
+	t.Parallel()
+
 	for k, m := range clientManagers {
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperManagers(m))
 	}

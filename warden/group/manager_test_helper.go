@@ -12,18 +12,22 @@ func TestHelperManagers(m Manager) func(t *testing.T) {
 		ds, err := m.ListGroups(0, 0)
 		assert.NoError(t, err)
 		assert.Empty(t, ds)
+		assert.NotNil(t, ds)
 
 		ds, err = m.ListGroups(-1, 0)
 		assert.NoError(t, err)
-		assert.Nil(t, ds)
+		assert.Empty(t, ds)
+		assert.NotNil(t, ds)
 
 		ds, err = m.ListGroups(0, -1)
 		assert.NoError(t, err)
-		assert.Nil(t, ds)
+		assert.Empty(t, ds)
+		assert.NotNil(t, ds)
 
 		ds, err = m.ListGroups(-1, -1)
 		assert.NoError(t, err)
-		assert.Nil(t, ds)
+		assert.Empty(t, ds)
+		assert.NotNil(t, ds)
 
 		_, err = m.GetGroup("4321")
 		assert.NotNil(t, err)
@@ -36,10 +40,12 @@ func TestHelperManagers(m Manager) func(t *testing.T) {
 		ds, err = m.ListGroups(0, 0)
 		require.NoError(t, err)
 		assert.Len(t, ds, 1)
+		assert.NotNil(t, ds)
 
 		ds, err = m.ListGroups(0, 1)
 		require.NoError(t, err)
 		assert.Len(t, ds, 0)
+		assert.NotNil(t, ds)
 
 		assert.NoError(t, m.CreateGroup(&Group{
 			ID:      "2",
@@ -48,30 +54,37 @@ func TestHelperManagers(m Manager) func(t *testing.T) {
 		ds, err = m.ListGroups(0, 0)
 		require.NoError(t, err)
 		assert.Len(t, ds, 2)
+		assert.NotNil(t, ds)
 
 		ds, err = m.ListGroups(0, 1)
 		require.NoError(t, err)
 		assert.Len(t, ds, 1)
+		assert.NotNil(t, ds)
 
 		ds, err = m.ListGroups(0, 2)
 		require.NoError(t, err)
 		assert.Len(t, ds, 0)
+		assert.NotNil(t, ds)
 
 		ds, err = m.ListGroups(1, 0)
 		require.NoError(t, err)
 		assert.Len(t, ds, 1)
+		assert.NotNil(t, ds)
 
 		ds, err = m.ListGroups(2, 0)
 		require.NoError(t, err)
 		assert.Len(t, ds, 2)
+		assert.NotNil(t, ds)
 
 		ds, err = m.ListGroups(1, 1)
 		require.NoError(t, err)
 		assert.Len(t, ds, 1)
+		assert.NotNil(t, ds)
 
 		ds, err = m.ListGroups(0, 2)
 		require.NoError(t, err)
 		assert.Len(t, ds, 0)
+		assert.NotNil(t, ds)
 
 		assert.NoError(t, m.CreateGroup(&Group{
 			ID:      "3",
@@ -80,6 +93,7 @@ func TestHelperManagers(m Manager) func(t *testing.T) {
 		ds, err = m.ListGroups(0, 0)
 		require.NoError(t, err)
 		assert.Len(t, ds, 3)
+		assert.NotNil(t, ds)
 
 		d, err := m.GetGroup("1")
 		require.NoError(t, err)
@@ -89,17 +103,20 @@ func TestHelperManagers(m Manager) func(t *testing.T) {
 		ds, err = m.FindGroupNames("foo")
 		require.NoError(t, err)
 		assert.Len(t, ds, 2)
+		assert.NotNil(t, ds)
 
 		assert.NoError(t, m.AddGroupMembers("1", []string{"baz"}))
 
 		ds, err = m.FindGroupNames("baz")
 		require.NoError(t, err)
 		assert.Len(t, ds, 1)
+		assert.NotNil(t, ds)
 
 		assert.NoError(t, m.RemoveGroupMembers("1", []string{"baz"}))
 		ds, err = m.FindGroupNames("baz")
 		require.NoError(t, err)
 		assert.Len(t, ds, 0)
+		assert.NotNil(t, ds)
 
 		assert.NoError(t, m.DeleteGroup("1"))
 		_, err = m.GetGroup("1")
@@ -108,6 +125,6 @@ func TestHelperManagers(m Manager) func(t *testing.T) {
 		ds, err = m.ListGroups(0, 0)
 		require.NoError(t, err)
 		assert.Len(t, ds, 2)
-
+		assert.NotNil(t, ds)
 	}
 }

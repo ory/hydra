@@ -88,11 +88,12 @@ func (m *MemoryManager) ListGroups(limit, offset int64) ([]string, error) {
 		offset = 0
 	}
 
+	res := []string{}
+
 	if offset >= int64(len(m.Groups)) {
-		return nil, nil
+		return res, nil
 	}
 
-	var res []string
 	for _, g := range m.Groups {
 		res = append(res, g.ID)
 	}
@@ -113,7 +114,7 @@ func (m *MemoryManager) FindGroupNames(subject string) ([]string, error) {
 		m.Groups = map[string]Group{}
 	}
 
-	var res []string
+	res := []string{}
 	for _, g := range m.Groups {
 		for _, s := range g.Members {
 			if s == subject {

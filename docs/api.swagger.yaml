@@ -2113,7 +2113,7 @@ definitions:
       alg:
         description: >-
           The algorithm to be used for creating the key. Supports "RS256",
-          "ES521" and "HS256"
+          "ES256", "ES521" and "HS256"
         type: string
         x-go-name: Algorithm
       kid:

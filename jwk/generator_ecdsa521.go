@@ -12,14 +12,14 @@ import (
 
 type ECDSA521Generator struct{}
 
-func (g *ECDSA521Generator) Generate(id string) (*jose.JsonWebKeySet, error) {
+func (g *ECDSA521Generator) Generate(id string) (*jose.JSONWebKeySet, error) {
 	key, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
 	if err != nil {
 		return nil, errors.Errorf("Could not generate key because %s", err)
 	}
 
-	return &jose.JsonWebKeySet{
-		Keys: []jose.JsonWebKey{
+	return &jose.JSONWebKeySet{
+		Keys: []jose.JSONWebKey{
 			{
 				Key:          key,
 				KeyID:        ider("private", id),

@@ -10,6 +10,7 @@ import (
 
 func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
 	return func(t *testing.T) {
+		t.Parallel()
 		c := &Client{
 			Secret:            "secret",
 			RedirectURIs:      []string{"http://redirect"},
@@ -23,6 +24,7 @@ func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
 
 func TestHelperClientAuthenticate(k string, m Manager) func(t *testing.T) {
 	return func(t *testing.T) {
+		t.Parallel()
 		m.CreateClient(&Client{
 			ID:           "1234321",
 			Secret:       "secret",
@@ -40,6 +42,7 @@ func TestHelperClientAuthenticate(k string, m Manager) func(t *testing.T) {
 
 func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 	return func(t *testing.T) {
+		t.Parallel()
 		_, err := m.GetClient(nil, "4321")
 		assert.NotNil(t, err)
 

@@ -9,6 +9,8 @@ import (
 
 func TestHelperManagers(m Manager) func(t *testing.T) {
 	return func(t *testing.T) {
+		t.Parallel()
+
 		_, err := m.GetGroup("4321")
 		assert.NotNil(t, err)
 

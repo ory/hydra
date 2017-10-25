@@ -9,6 +9,7 @@ import (
 )
 
 func TestConsentRequestSqlDataTransforms(t *testing.T) {
+	t.Parallel()
 	for _, tc := range []struct {
 		d string
 		r *ConsentRequest

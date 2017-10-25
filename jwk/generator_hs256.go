@@ -1,17 +1,17 @@
 package jwk
 
 import (
+	"crypto/rand"
 	"crypto/x509"
+	"io"
+
 	"github.com/pkg/errors"
 	"github.com/square/go-jose"
-	"io"
-	"crypto/rand"
 )
 
-type HS256Generator struct {
-}
+type HS256Generator struct{}
 
-func (g *HS256Generator) Generate(id string) (*jose.JsonWebKeySet, error) {
+func (g *HS256Generator) Generate(id string) (*jose.JSONWebKeySet, error) {
 	// Taken from NewHMACKey
 	key := &[32]byte{}
 	_, err := io.ReadFull(rand.Reader, key[:])
@@ -19,11 +19,10 @@ func (g *HS256Generator) Generate(id string) (*jose.JsonWebKeySet, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	var sliceKey []byte
-	copy(sliceKey, key[:])
+	var sliceKey = key[:]
 
-	return &jose.JsonWebKeySet{
-		Keys: []jose.JsonWebKey{
+	return &jose.JSONWebKeySet{
+		Keys: []jose.JSONWebKey{
 			{
 				Algorithm:    "HS256",
 				Key:          sliceKey,

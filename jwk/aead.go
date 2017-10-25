@@ -2,8 +2,9 @@ package jwk
 
 import (
 	"encoding/base64"
-	"github.com/pkg/errors"
+
 	"github.com/gtank/cryptopasta"
+	"github.com/pkg/errors"
 )
 
 type AEAD struct {

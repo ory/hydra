@@ -1,6 +1,6 @@
 {
   "name": "ory-hydra-sdk",
-  "version": "latest",
+  "version": "0.0.0",
   "description": "The official JavaScript / NodeJS SDK for ORY Hydra.",
   "license": "Apache 2.0",
   "main": "sdk/js/swagger/src/index.js",

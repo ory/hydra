@@ -43,7 +43,7 @@
    * Constructs a new <code>JsonWebKeySetGeneratorRequest</code>.
    * @alias module:model/JsonWebKeySetGeneratorRequest
    * @class
-   * @param alg {String} The algorithm to be used for creating the key. Supports \"RS256\", \"ES521\" and \"HS256\"
+   * @param alg {String} The algorithm to be used for creating the key. Supports \"RS256\", \"ES521\", \"HS512\", and \"HS256\"
    * @param kid {String} The kid of the key to be created
    */
   var exports = function(alg, kid) {
@@ -75,7 +75,7 @@
   }
 
   /**
-   * The algorithm to be used for creating the key. Supports \"RS256\", \"ES521\" and \"HS256\"
+   * The algorithm to be used for creating the key. Supports \"RS256\", \"ES521\", \"HS512\", and \"HS256\"
    * @member {String} alg
    */
   exports.prototype['alg'] = undefined

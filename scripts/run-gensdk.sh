@@ -16,8 +16,6 @@ java -jar scripts/swagger-codegen-cli-2.2.3.jar generate -i ./docs/api.swagger.j
 
 scripts/run-format.sh
 
-git add -A .
-
 git checkout HEAD -- sdk/go/hydra/swagger/configuration.go
 git checkout HEAD -- sdk/go/hydra/swagger/api_client.go
 rm -f ./sdk/js/swagger/package.json

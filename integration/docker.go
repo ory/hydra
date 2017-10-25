@@ -5,6 +5,8 @@ import (
 	"log"
 	"time"
 
+	"os"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -24,6 +26,14 @@ func KillAll() {
 }
 
 func ConnectToMySQL() *sqlx.DB {
+	if url := os.Getenv("TEST_DATABASE_MYSQL"); url != "" {
+		db, err := sqlx.Open("mysql", url)
+		if err != nil {
+			log.Fatalf("Could not connect to bootstrapped database: %s", err)
+		}
+		return db
+	}
+
 	var db *sqlx.DB
 	var err error
 	pool, err = dockertest.NewPool("")
@@ -54,6 +64,14 @@ func ConnectToMySQL() *sqlx.DB {
 }
 
 func ConnectToPostgres() *sqlx.DB {
+	if url := os.Getenv("TEST_DATABASE_POSTGRESQL"); url != "" {
+		db, err := sqlx.Open("postgres", url)
+		if err != nil {
+			log.Fatalf("Could not connect to bootstrapped database: %s", err)
+		}
+		return db
+	}
+
 	var db *sqlx.DB
 	var err error
 	pool, err = dockertest.NewPool("")

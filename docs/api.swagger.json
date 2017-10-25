@@ -531,7 +531,7 @@
         }
       },
       "post": {
-        "description": "This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as\nsymmetric cryptographic keys (HS256) and asymetric cryptographic keys (RS256, ECDSA).\n\n\nIf the specified JSON Web Key Set does not exist, it will be created.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as\nsymmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA).\n\n\nIf the specified JSON Web Key Set does not exist, it will be created.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -2167,7 +2167,7 @@
       ],
       "properties": {
         "alg": {
-          "description": "The algorithm to be used for creating the key. Supports \"RS256\", \"ES521\" and \"HS256\"",
+          "description": "The algorithm to be used for creating the key. Supports \"RS256\", \"ES521\", \"HS512\", and \"HS256\"",
           "type": "string",
           "x-go-name": "Algorithm"
         },

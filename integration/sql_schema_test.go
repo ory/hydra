@@ -25,12 +25,13 @@ func TestSQLSchema(t *testing.T) {
 	p1 := ks.Key("private")
 	r := fosite.NewRequest()
 	r.ID = "foo"
-	db := ConnectToMySQL()
+	db := ConnectToPostgres()
 
 	cm := &client.SQLManager{DB: db, Hasher: &fosite.BCrypt{}}
 	gm := group.SQLManager{DB: db}
 	jm := jwk.SQLManager{DB: db, Cipher: &jwk.AEAD{Key: []byte("11111111111111111111111111111111")}}
 	om := oauth2.FositeSQLStore{Manager: cm, DB: db, L: logrus.New()}
+	crm := oauth2.NewConsentRequestSQLManager(db)
 	pm := lsql.NewSQLManager(db, nil)
 
 	_, err := pm.CreateSchemas("", "hydra_ladon_migration")
@@ -43,12 +44,15 @@ func TestSQLSchema(t *testing.T) {
 	require.NoError(t, err)
 	_, err = om.CreateSchemas()
 	require.NoError(t, err)
+	_, err = crm.CreateSchemas()
+	require.NoError(t, err)
 
-	require.Nil(t, jm.AddKey("foo", jwk.First(p1)))
-	require.Nil(t, pm.Create(&ladon.DefaultPolicy{ID: "foo"}))
-	require.Nil(t, cm.CreateClient(&client.Client{ID: "foo"}))
-	require.Nil(t, om.CreateAccessTokenSession(nil, "asdfasdf", r))
-	require.Nil(t, gm.CreateGroup(&group.Group{
+	require.NoError(t, jm.AddKey("foo", jwk.First(p1)))
+	require.NoError(t, pm.Create(&ladon.DefaultPolicy{ID: "foo"}))
+	require.NoError(t, cm.CreateClient(&client.Client{ID: "foo"}))
+	require.NoError(t, crm.PersistConsentRequest(&oauth2.ConsentRequest{ID: "foo"}))
+	require.NoError(t, om.CreateAccessTokenSession(nil, "asdfasdf", r))
+	require.NoError(t, gm.CreateGroup(&group.Group{
 		ID:      "asdfas",
 		Members: []string{"asdf"},
 	}))

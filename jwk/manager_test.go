@@ -23,7 +23,7 @@ import (
 
 var managers = map[string]Manager{}
 
-var testGenerator = &RS256Generator{}
+var testGenerators = (&Handler{}).GetGenerators()
 
 var ts *httptest.Server
 var httpManager *HTTPManager
@@ -40,13 +40,13 @@ func init() {
 		}, &ladon.DefaultPolicy{
 			ID:        "1",
 			Subjects:  []string{"alice"},
-			Resources: []string{"rn:hydra:keys:<faz|bar|foo|anonymous><.*>"},
+			Resources: []string{"rn:hydra:keys:<RS256|ES256|ES521|HS256><faz|bar|foo|anonymous><.*>"},
 			Actions:   []string{"create", "get", "delete", "update"},
 			Effect:    ladon.AllowAccess,
 		}, &ladon.DefaultPolicy{
 			ID:        "2",
 			Subjects:  []string{"alice", ""},
-			Resources: []string{"rn:hydra:keys:anonymous<.*>"},
+			Resources: []string{"rn:hydra:keys:<RS256|ES256|ES521|HS256>anonymous<.*>"},
 			Actions:   []string{"get"},
 			Effect:    ladon.AllowAccess,
 		},
@@ -99,50 +99,72 @@ func connectToMySQL() {
 }
 
 func TestHTTPManagerPublicKeyGet(t *testing.T) {
-	anonymous := &HTTPManager{Endpoint: httpManager.Endpoint, Client: http.DefaultClient}
-	ks, _ := testGenerator.Generate("")
-	priv := ks.Key("private")
+	for algo, testGenerator := range testGenerators {
+		if algo == "HS256" {
+			// this is a symmetrical algorithm
+			continue
+		}
 
-	name := "http"
-	m := httpManager
+		anonymous := &HTTPManager{Endpoint: httpManager.Endpoint, Client: http.DefaultClient}
+		ks, _ := testGenerator.Generate("")
+		priv := ks.Key("private")
 
-	_, err := m.GetKey("anonymous", "baz")
-	pkg.AssertError(t, true, err, name)
+		name := "http"
+		m := httpManager
 
-	err = m.AddKey("anonymous", First(priv))
-	pkg.AssertError(t, false, err, name)
+		_, err := m.GetKey(algo+"anonymous", "baz")
+		pkg.AssertError(t, true, err, name)
 
-	time.Sleep(time.Millisecond * 100)
+		err = m.AddKey(algo+"anonymous", First(priv))
+		pkg.AssertError(t, false, err, name)
 
-	got, err := anonymous.GetKey("anonymous", "private")
-	pkg.RequireError(t, false, err, name)
-	assert.Equal(t, priv, got.Keys, "%s", name)
+		time.Sleep(time.Millisecond * 100)
+
+		got, err := anonymous.GetKey(algo+"anonymous", "private")
+		pkg.RequireError(t, false, err, name)
+		assert.Equal(t, priv, got.Keys, "%s", name)
+	}
 }
 
 func TestManagerKey(t *testing.T) {
-	ks, _ := testGenerator.Generate("")
+	for algo, testGenerator := range testGenerators {
+		if algo == "HS256" {
+			// this is a symmetrical algorithm
+			continue
+		}
 
-	for name, m := range managers {
-		t.Run(fmt.Sprintf("case=%s", name), func(t *testing.T) {
-			TestHelperManagerKey(m, ks)(t)
-		})
+		ks, err := testGenerator.Generate("")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		for name, m := range managers {
+			t.Run(fmt.Sprintf("case=%s/%s", algo, name), func(t *testing.T) {
+				TestHelperManagerKey(m, algo, ks)(t)
+			})
+		}
+
+		priv := ks.Key("private")
+		err = managers["http"].AddKey("nonono", First(priv))
+		assert.NotNil(t, err)
 	}
-
-	priv := ks.Key("private")
-	err := managers["http"].AddKey("nonono", First(priv))
-	assert.NotNil(t, err)
 }
 
 func TestManagerKeySet(t *testing.T) {
-	ks, _ := testGenerator.Generate("")
-	ks.Key("private")
+	for algo, testGenerator := range testGenerators {
+		ks, err := testGenerator.Generate("")
+		if err != nil {
+			t.Fatal(err)
+		}
+		ks.Key("private")
 
-	for name, m := range managers {
-		t.Run(fmt.Sprintf("case=%s", name), func(t *testing.T) {
-			TestHelperManagerKeySet(m, ks)(t)
-		})
+		for name, m := range managers {
+			t.Run(fmt.Sprintf("case=%s/%s", algo, name), func(t *testing.T) {
+				TestHelperManagerKeySet(m, algo, ks)(t)
+			})
+		}
+
+		err = managers["http"].AddKeySet("nonono", ks)
+		assert.NotNil(t, err)
 	}
-
-	err := managers["http"].AddKeySet("nonono", ks)
-	assert.NotNil(t, err)
 }

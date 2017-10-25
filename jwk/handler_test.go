@@ -38,7 +38,7 @@ func init() {
 		},
 	)
 	router := httprouter.New()
-	IDKS, _ = testGenerator.Generate("")
+	IDKS, _ = testGenerators["RS256"].Generate("")
 
 	h := Handler{
 		Manager: &MemoryManager{},

@@ -15,7 +15,7 @@ var managers = map[string]Manager{
 	"memory": new(MemoryManager),
 }
 
-var testGenerator = &RS256Generator{}
+var testGenerators = (&Handler{}).GetGenerators()
 
 var encryptionKey, _ = RandomBytes(32)
 
@@ -53,22 +53,37 @@ func connectToMySQL() {
 }
 
 func TestManagerKey(t *testing.T) {
-	ks, _ := testGenerator.Generate("")
+	for algo, testGenerator := range testGenerators {
+		if algo == "HS256" {
+			// this is a symmetrical algorithm
+			continue
+		}
 
-	for name, m := range managers {
-		t.Run(fmt.Sprintf("case=%s", name), func(t *testing.T) {
-			TestHelperManagerKey(m, ks)(t)
-		})
+		ks, err := testGenerator.Generate("")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		for name, m := range managers {
+			t.Run(fmt.Sprintf("case=%s/%s", algo, name), func(t *testing.T) {
+				TestHelperManagerKey(m, algo, ks)(t)
+			})
+		}
 	}
 }
 
 func TestManagerKeySet(t *testing.T) {
-	ks, _ := testGenerator.Generate("")
-	ks.Key("private")
+	for algo, testGenerator := range testGenerators {
+		ks, err := testGenerator.Generate("")
+		if err != nil {
+			t.Fatal(err)
+		}
+		ks.Key("private")
 
-	for name, m := range managers {
-		t.Run(fmt.Sprintf("case=%s", name), func(t *testing.T) {
-			TestHelperManagerKeySet(m, ks)(t)
-		})
+		for name, m := range managers {
+			t.Run(fmt.Sprintf("case=%s/%s", algo, name), func(t *testing.T) {
+				TestHelperManagerKeySet(m, algo, ks)(t)
+			})
+		}
 	}
 }

@@ -23,11 +23,13 @@ before_install:
   - sudo apt-get install curl
 
 install:
-  - go get -u github.com/go-swagger/go-swagger/cmd/swagger github.com/bradfitz/goimports github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/Masterminds/glide github.com/mitchellh/gox github.com/ory/go-acc
+  - go get -u github.com/go-swagger/go-swagger/cmd/swagger github.com/bradfitz/goimports github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/Masterminds/glide github.com/mitchellh/gox github.com/golang/dep/cmd/dep github.com/ory/go-acc
   - git clone https://github.com/docker-library/official-images.git ~/official-images
   - glide install
   - go install github.com/ory/hydra
   - glide update
+  - go install github.com/ory/hydra
+  - dep ensure
   - go install github.com/ory/hydra
 
 script:

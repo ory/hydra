@@ -18,7 +18,7 @@ import (
 )
 
 var testServer *httptest.Server
-var IDKS *jose.JsonWebKeySet
+var IDKS *jose.JSONWebKeySet
 
 func init() {
 	localWarden, _ := compose.NewMockFirewall(
@@ -38,7 +38,7 @@ func init() {
 		},
 	)
 	router := httprouter.New()
-	IDKS, _ = testGenerator.Generate("")
+	IDKS, _ = testGenerators["RS256"].Generate("")
 
 	h := Handler{
 		Manager: &MemoryManager{},
@@ -57,7 +57,7 @@ func TestHandlerWellKnown(t *testing.T) {
 	require.NoError(t, err, "problem in http request")
 	defer res.Body.Close()
 
-	var known jose.JsonWebKeySet
+	var known jose.JSONWebKeySet
 	err = json.NewDecoder(res.Body).Decode(&known)
 	require.NoError(t, err, "problem in decoding response")
 

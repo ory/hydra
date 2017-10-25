@@ -1487,8 +1487,8 @@
         "tags": [
           "warden"
         ],
-        "summary": "Find groups by member",
-        "operationId": "findGroupsByMember",
+        "summary": "List groups",
+        "operationId": "listGroups",
         "security": [
           {
             "oauth2": [
@@ -1504,11 +1504,27 @@
             "name": "member",
             "in": "query",
             "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Offset",
+            "description": "The offset from where to start looking if member isn't specified.",
+            "name": "offset",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Limit",
+            "description": "The maximum amount of policies returned if member isn't specified.",
+            "name": "limit",
+            "in": "query"
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/findGroupsByMemberResponse"
+            "$ref": "#/responses/listGroupsResponse"
           },
           "401": {
             "$ref": "#/responses/genericError"
@@ -1928,12 +1944,6 @@
     "Handler": {
       "type": "object",
       "properties": {
-        "Generators": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/KeyGenerator"
-          }
-        },
         "H": {
           "$ref": "#/definitions/Writer"
         },
@@ -1944,7 +1954,7 @@
           "$ref": "#/definitions/Firewall"
         }
       },
-      "x-go-package": "github.com/ory/hydra/jwk"
+      "x-go-package": "github.com/ory/hydra/warden/group"
     },
     "KeyGenerator": {
       "type": "object",
@@ -2173,7 +2183,7 @@
       ],
       "properties": {
         "alg": {
-          "description": "The algorithm to be used for creating the key. Supports \"RS256\", \"ES521\" and \"HS256\"",
+          "description": "The algorithm to be used for creating the key. Supports \"RS256\", \"ES256\", \"ES521\" and \"HS256\"",
           "type": "string",
           "x-go-name": "Algorithm"
         },
@@ -3021,15 +3031,6 @@
     "emptyResponse": {
       "description": "An empty response"
     },
-    "findGroupsByMemberResponse": {
-      "description": "A list of groups the member is belonging to",
-      "schema": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/group"
-        }
-      }
-    },
     "genericError": {
       "description": "The standard error format",
       "schema": {
@@ -3092,6 +3093,15 @@
       "description": "The token introspection response",
       "schema": {
         "$ref": "#/definitions/oAuth2TokenIntrospection"
+      }
+    },
+    "listGroupsResponse": {
+      "description": "A list of groups the member is belonging to",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/group"
+        }
       }
     },
     "oAuth2ClientList": {

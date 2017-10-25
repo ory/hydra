@@ -1,13 +1,9 @@
 package jwk
 
 import (
-	"crypto/aes"
-	"crypto/cipher"
-	"crypto/rand"
 	"encoding/base64"
-	"io"
-
 	"github.com/pkg/errors"
+	"github.com/gtank/cryptopasta"
 )
 
 type AEAD struct {
@@ -15,29 +11,19 @@ type AEAD struct {
 }
 
 func (c *AEAD) Encrypt(plaintext []byte) (string, error) {
-	// The key argument should be the AES key, either 16 or 32 bytes
-	// to select AES-128 or AES-256.
 	if len(c.Key) < 32 {
-		return "", errors.Errorf("Key must be longer 32 bytes, got %d bytes", len(c.Key))
+		return "", errors.Errorf("Key must be 32 bytes, got %d bytes", len(c.Key))
 	}
 
-	block, err := aes.NewCipher(c.Key[:32])
+	var key [32]byte
+	copy(key[:], c.Key[:32])
+
+	ciphertext, err := cryptopasta.Encrypt(plaintext, &key)
 	if err != nil {
 		return "", errors.WithStack(err)
 	}
 
-	nonce := make([]byte, 12)
-	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
-		return "", errors.WithStack(err)
-	}
-
-	aesgcm, err := cipher.NewGCM(block)
-	if err != nil {
-		return "", errors.WithStack(err)
-	}
-
-	ciphertext := aesgcm.Seal(nil, nonce, plaintext, nil)
-	return base64.URLEncoding.EncodeToString(append(ciphertext, nonce...)), nil
+	return base64.URLEncoding.EncodeToString(ciphertext), nil
 }
 
 func (c *AEAD) Decrypt(ciphertext string) ([]byte, error) {
@@ -45,26 +31,14 @@ func (c *AEAD) Decrypt(ciphertext string) ([]byte, error) {
 		return []byte{}, errors.Errorf("Key must be longer 32 bytes, got %d bytes", len(c.Key))
 	}
 
+	var key [32]byte
+	copy(key[:], c.Key[:32])
+
 	raw, err := base64.URLEncoding.DecodeString(ciphertext)
 	if err != nil {
 		return []byte{}, errors.WithStack(err)
 	}
 
-	n := len(raw)
-	block, err := aes.NewCipher(c.Key)
-	if err != nil {
-		return []byte{}, errors.WithStack(err)
-	}
-
-	aesgcm, err := cipher.NewGCM(block)
-	if err != nil {
-		return []byte{}, errors.WithStack(err)
-	}
-
-	plaintext, err := aesgcm.Open(nil, raw[n-12:n], raw[:n-12], nil)
-	if err != nil {
-		return []byte{}, errors.WithStack(err)
-	}
-
+	plaintext, err := cryptopasta.Decrypt(raw, &key)
 	return plaintext, nil
 }

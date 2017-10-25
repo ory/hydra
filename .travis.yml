@@ -1,39 +1,33 @@
 sudo: required
 
-go_import_path: github.com/ory/hydra
-
-cache:
-  directories:
-    - ./vendor/
-
-before_cache:
-
-services:
-  - docker
-
-env:
-  - DOCKER_BIND_LOCALHOST=true DATABASE_URL=memory
-
 language: go
 
 go:
   - 1.9
 
+go_import_path: github.com/ory/hydra
+
+services:
+  - docker
+
+env:
+  - DOCKER_BIND_LOCALHOST=true DATABASE_URL=memory DEP_VERSION="0.3.2"
+
 before_install:
+  - curl -L -s https://github.com/golang/dep/releases/download/v${DEP_VERSION}/dep-linux-amd64 -o $GOPATH/bin/dep
+  - chmod +x $GOPATH/bin/dep
   - sudo apt-get install curl
 
 install:
-  - go get -u github.com/go-swagger/go-swagger/cmd/swagger github.com/bradfitz/goimports github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/Masterminds/glide github.com/mitchellh/gox github.com/ory/go-acc
+  - go get -u github.com/go-swagger/go-swagger/cmd/swagger github.com/bradfitz/goimports github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/mitchellh/gox github.com/ory/go-acc
   - git clone https://github.com/docker-library/official-images.git ~/official-images
-  - glide install
-  - go install github.com/ory/hydra
-  - glide update
+  - dep ensure
   - go install github.com/ory/hydra
 
 script:
   - ./scripts/test-format.sh
-  - go-acc -o coverage.txt $(glide novendor)
-  - go test -race -short $(glide novendor | grep -v cmd)
+  - go-acc -o coverage.txt ./...
+  - go test -race -short $(go list ./... | grep -v cmd)
   - docker build -t hydra-travis-ci -f Dockerfile-without-telemetry .
   - docker run -d hydra-travis-ci
   - DATABASE_URL=memory hydra host --dangerous-auto-logon --dangerous-force-http --disable-telemetry &

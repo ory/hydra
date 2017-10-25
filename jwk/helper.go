@@ -10,7 +10,7 @@ import (
 	"github.com/square/go-jose"
 )
 
-func First(keys []jose.JsonWebKey) *jose.JsonWebKey {
+func First(keys []jose.JSONWebKey) *jose.JSONWebKey {
 	if len(keys) == 0 {
 		return nil
 	}

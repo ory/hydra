@@ -34,6 +34,8 @@ type SQLManager struct {
 	DB *sqlx.DB
 }
 
+var _ Manager = (*SQLManager)(nil)
+
 func (m *SQLManager) CreateSchemas() (int, error) {
 	migrate.SetTable("hydra_groups_migration")
 	n, err := migrate.Exec(m.DB.DB, m.DB.DriverName(), migrations, migrate.Up)
@@ -128,14 +130,7 @@ func (m *SQLManager) RemoveGroupMembers(group string, subjects []string) error {
 	return nil
 }
 
-func (m *SQLManager) FindGroupsByMember(subject string) ([]Group, error) {
-	var ids []string
-	if err := m.DB.Select(&ids, m.DB.Rebind("SELECT group_id from hydra_warden_group_member WHERE member = ? GROUP BY group_id"), subject); err == sql.ErrNoRows {
-		return nil, errors.WithStack(pkg.ErrNotFound)
-	} else if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
+func (m *SQLManager) idsToGroups(ids []string) ([]Group, error) {
 	var groups = make([]Group, len(ids))
 	for k, id := range ids {
 		group, err := m.GetGroup(id)
@@ -147,4 +142,32 @@ func (m *SQLManager) FindGroupsByMember(subject string) ([]Group, error) {
 	}
 
 	return groups, nil
+}
+
+func (m *SQLManager) ListGroups(limit, offset int64) ([]Group, error) {
+	if limit <= 0 {
+		limit = 500
+	}
+
+	if offset < 0 {
+		offset = 0
+	}
+
+	var ids []string
+	if err := m.DB.Select(&ids, m.DB.Rebind("SELECT id from hydra_warden_group ORDER BY id LIMIT ? OFFSET ?"), limit, offset); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return m.idsToGroups(ids)
+}
+
+func (m *SQLManager) FindGroupsByMember(subject string) ([]Group, error) {
+	var ids []string
+	if err := m.DB.Select(&ids, m.DB.Rebind("SELECT group_id from hydra_warden_group_member WHERE member = ? GROUP BY group_id"), subject); err == sql.ErrNoRows {
+		return nil, errors.WithStack(pkg.ErrNotFound)
+	} else if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return m.idsToGroups(ids)
 }

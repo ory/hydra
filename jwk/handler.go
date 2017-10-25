@@ -28,6 +28,7 @@ func (h *Handler) GetGenerators() map[string]KeyGenerator {
 	if h.Generators == nil || len(h.Generators) == 0 {
 		h.Generators = map[string]KeyGenerator{
 			"RS256": &RS256Generator{},
+			"ES256": &ECDSA256Generator{},
 			"ES521": &ECDSA521Generator{},
 			"HS256": &HS256Generator{
 				Length: 32,
@@ -53,7 +54,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 
 // swagger:model jsonWebKeySetGeneratorRequest
 type createRequest struct {
-	// The algorithm to be used for creating the key. Supports "RS256", "ES521" and "HS256"
+	// The algorithm to be used for creating the key. Supports "RS256", "ES256", "ES521" and "HS256"
 	// required: true
 	// in: body
 	Algorithm string `json:"alg"`

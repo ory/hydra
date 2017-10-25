@@ -70,7 +70,7 @@ func (s *FakeConsentStrategy) CreateConsentRequest(authorizeRequest fosite.Autho
 
 func TestIssuerRedirect(t *testing.T) {
 	storage := storage.NewExampleStore()
-	secret := []byte("my super secret password")
+	secret := []byte("my super secret password password password password")
 	config := compose.Config{}
 	privateKey, _ := rsa.GenerateKey(rand.Reader, 2048)
 

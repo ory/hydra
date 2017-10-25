@@ -1,6 +1,29 @@
+
+# Gopkg.toml example
+#
+# Refer to https://github.com/golang/dep/blob/master/docs/Gopkg.toml.md
+# for detailed Gopkg.toml documentation.
+#
+# required = ["github.com/user/thing/cmd/thing"]
+# ignored = ["github.com/user/project/pkgX", "bitbucket.org/user/project/pkgA/pkgY"]
+#
+# [[constraint]]
+#   name = "github.com/user/project"
+#   version = "1.0.0"
+#
+# [[constraint]]
+#   name = "github.com/user/project2"
+#   branch = "dev"
+#   source = "github.com/myfork/project2"
+#
+# [[override]]
+#  name = "github.com/x/y"
+#  version = "2.4.0"
+
+
 [[constraint]]
-  name = "github.com/dgrijalva/jwt-go"
-  version = "3.0.0"
+  name = "github.com/go-resty/resty"
+  version = "1.0.0"
 
 [[constraint]]
   name = "github.com/go-sql-driver/mysql"
@@ -15,20 +38,44 @@
   version = "1.1.0"
 
 [[constraint]]
+  branch = "master"
+  name = "github.com/gtank/cryptopasta"
+
+[[constraint]]
   name = "github.com/imdario/mergo"
-  version = "0.2.2"
+  version = "0.2.4"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/jmoiron/sqlx"
 
 [[constraint]]
   name = "github.com/julienschmidt/httprouter"
   version = "1.1.0"
 
 [[constraint]]
+  branch = "master"
+  name = "github.com/lib/pq"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/meatballhat/negroni-logrus"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/mohae/deepcopy"
+
+[[constraint]]
   name = "github.com/oleiade/reflections"
   version = "1.0.0"
 
 [[constraint]]
+  name = "github.com/ory/dockertest"
+  version = "3.0.9"
+
+[[constraint]]
   name = "github.com/ory/fosite"
-  version = "0.11.3"
+  version = "0.13.0"
 
 [[constraint]]
   name = "github.com/ory/graceful"
@@ -44,7 +91,7 @@
 
 [[constraint]]
   name = "github.com/pborman/uuid"
-  version = "1.0.0"
+  version = "1.1.0"
 
 [[constraint]]
   name = "github.com/pkg/errors"
@@ -53,6 +100,26 @@
 [[constraint]]
   name = "github.com/pkg/profile"
   version = "1.2.1"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/rubenv/sql-migrate"
+
+[[constraint]]
+  name = "github.com/segmentio/analytics-go"
+  version = "2.1.1"
+
+[[constraint]]
+  name = "github.com/sirupsen/logrus"
+  version = "1.0.3"
+
+[[constraint]]
+  name = "github.com/spf13/cobra"
+  version = "0.0.1"
+
+[[constraint]]
+  name = "github.com/spf13/viper"
+  version = "1.0.0"
 
 [[constraint]]
   name = "github.com/square/go-jose"
@@ -71,9 +138,9 @@
   version = "0.2.0"
 
 [[constraint]]
-  name = "github.com/go-resty/resty"
-  version = "1.0.0"
+  branch = "master"
+  name = "golang.org/x/oauth2"
 
 [[constraint]]
-  name = "github.com/segmentio/analytics-go"
-  version = "2.1.1"
+  branch = "v2"
+  name = "gopkg.in/yaml.v2"

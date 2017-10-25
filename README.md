@@ -163,14 +163,13 @@ Hydra is a twelve factor OAuth2 and OpenID Connect provider
 
 #### Building from source
 
-If you wish to compile ORY Hydra yourself, you need to install and set up [Go 1.8+](https://golang.org/) and add `$GOPATH/bin`
-to your `$PATH`. To do so, run the following commands in a shell (bash, sh, cmd.exe, ...):
+If you wish to compile ORY Hydra yourself, you need to install and set up [Go 1.9+](https://golang.org/) and add `$GOPATH/bin`
+to your `$PATH` as well as [golang/dep](http://github.com/golang/dep). To do so, run the following commands in a shell (bash, sh, cmd.exe, ...):
 
 ```
 go get -d -u github.com/ory/hydra
-go get github.com/Masterminds/glide
 cd $GOPATH/src/github.com/ory/hydra
-glide install
+dep ensure
 go install github.com/ory/hydra
 hydra
 ```
@@ -253,10 +252,9 @@ Developing with ORY Hydra is as easy as:
 
 ```
 go get -d -u github.com/ory/hydra
-go get github.com/Masterminds/glide
 cd $GOPATH/src/github.com/ory/hydra
-glide install
-go test $(glide novendor)
+dep ensure
+go test ./...
 ```
 
 Then run it with in-memory database:

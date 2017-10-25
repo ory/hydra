@@ -23,26 +23,38 @@ func TestGenerator(t *testing.T) {
 			g: &RS256Generator{},
 			check: func(ks *jose.JSONWebKeySet) {
 				assert.Len(t, ks, 2)
+				assert.NotEmpty(t, ks.Keys[0].Key)
+				assert.NotEmpty(t, ks.Keys[1].Key)
 			},
 		},
 		{
 			g: &ECDSA521Generator{},
 			check: func(ks *jose.JSONWebKeySet) {
 				assert.Len(t, ks, 2)
+				assert.NotEmpty(t, ks.Keys[0].Key)
+				assert.NotEmpty(t, ks.Keys[1].Key)
 			},
 		},
 		{
 			g: &ECDSA256Generator{},
 			check: func(ks *jose.JSONWebKeySet) {
 				assert.Len(t, ks, 2)
+				assert.NotEmpty(t, ks.Keys[0].Key)
+				assert.NotEmpty(t, ks.Keys[1].Key)
 			},
 		},
 		{
-			g: &HS256Generator{
-				Length: 32,
-			},
+			g: &HS256Generator{},
 			check: func(ks *jose.JSONWebKeySet) {
 				assert.Len(t, ks, 1)
+				assert.NotEmpty(t, ks.Keys[0].Key)
+			},
+		},
+		{
+			g: &HS512Generator{},
+			check: func(ks *jose.JSONWebKeySet) {
+				assert.Len(t, ks, 1)
+				assert.NotEmpty(t, ks.Keys[0].Key)
 			},
 		},
 	} {

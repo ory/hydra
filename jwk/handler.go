@@ -30,6 +30,7 @@ func (h *Handler) GetGenerators() map[string]KeyGenerator {
 			"RS256": &RS256Generator{},
 			"ES521": &ECDSA521Generator{},
 			"HS256": &HS256Generator{},
+			"HS512": &HS512Generator{},
 		}
 	}
 	return h.Generators
@@ -51,7 +52,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 
 // swagger:model jsonWebKeySetGeneratorRequest
 type createRequest struct {
-	// The algorithm to be used for creating the key. Supports "RS256", "ES521" and "HS256"
+	// The algorithm to be used for creating the key. Supports "RS256", "ES521", "HS512", and "HS256"
 	// required: true
 	// in: body
 	Algorithm string `json:"alg"`
@@ -247,7 +248,7 @@ func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httproute
 // Generate a new JSON Web Key
 //
 // This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as
-// symmetric cryptographic keys (HS256) and asymetric cryptographic keys (RS256, ECDSA).
+// symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA).
 //
 //
 // If the specified JSON Web Key Set does not exist, it will be created.

@@ -9,11 +9,11 @@ import (
 	"github.com/square/go-jose"
 )
 
-type HS256Generator struct{}
+type HS512Generator struct{}
 
-func (g *HS256Generator) Generate(id string) (*jose.JSONWebKeySet, error) {
+func (g *HS512Generator) Generate(id string) (*jose.JSONWebKeySet, error) {
 	// Taken from NewHMACKey
-	key := &[16]byte{}
+	key := &[32]byte{}
 	_, err := io.ReadFull(rand.Reader, key[:])
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -24,7 +24,7 @@ func (g *HS256Generator) Generate(id string) (*jose.JSONWebKeySet, error) {
 	return &jose.JSONWebKeySet{
 		Keys: []jose.JSONWebKey{
 			{
-				Algorithm:    "HS256",
+				Algorithm:    "HS512",
 				Key:          sliceKey,
 				KeyID:        id,
 				Certificates: []*x509.Certificate{},

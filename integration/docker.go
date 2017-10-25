@@ -27,6 +27,7 @@ func KillAll() {
 
 func ConnectToMySQL() *sqlx.DB {
 	if url := os.Getenv("TEST_DATABASE_MYSQL"); url != "" {
+		log.Println("Found mysql test database config, skipping dockertest...")
 		db, err := sqlx.Open("mysql", url)
 		if err != nil {
 			log.Fatalf("Could not connect to bootstrapped database: %s", err)
@@ -65,6 +66,7 @@ func ConnectToMySQL() *sqlx.DB {
 
 func ConnectToPostgres() *sqlx.DB {
 	if url := os.Getenv("TEST_DATABASE_POSTGRESQL"); url != "" {
+		log.Println("Found postgresql test database config, skipping dockertest...")
 		db, err := sqlx.Open("postgres", url)
 		if err != nil {
 			log.Fatalf("Could not connect to bootstrapped database: %s", err)

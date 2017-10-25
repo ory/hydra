@@ -1,6 +1,7 @@
 package config
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/url"
@@ -9,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"flag"
-
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 	"github.com/ory/dockertest"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -125,6 +126,16 @@ func killAll() {
 }
 
 func bootstrapMySQL() *url.URL {
+	if uu := os.Getenv("TEST_DATABASE_MYSQL"); uu != "" {
+		log.Println("Found mysql test database config, skipping dockertest...")
+		_, err := sqlx.Open("postgres", uu)
+		if err != nil {
+			log.Fatalf("Could not connect to bootstrapped database: %s", err)
+		}
+		u, _ := url.Parse("mysql://" + uu)
+		return u
+	}
+
 	var db *sqlx.DB
 	var err error
 	var urls string
@@ -160,6 +171,16 @@ func bootstrapMySQL() *url.URL {
 }
 
 func bootstrapPostgres() *url.URL {
+	if uu := os.Getenv("TEST_DATABASE_POSTGRESQL"); uu != "" {
+		log.Println("Found postgresql test database config, skipping dockertest...")
+		_, err := sqlx.Open("postgres", uu)
+		if err != nil {
+			log.Fatalf("Could not connect to bootstrapped database: %s", err)
+		}
+		u, _ := url.Parse(uu)
+		return u
+	}
+
 	var db *sqlx.DB
 	var err error
 	var urls string

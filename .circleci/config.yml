@@ -18,13 +18,13 @@ jobs:
     docker:
       - image: circleci/golang:1.9
         environment:
-        - TEST_DATABASE_POSTGRES=postgres://test:test@localhost:5432/hydra?sslmode=disable
+        - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/hydra?sslmode=disable
         - TEST_DATABASE_MYSQL=root:test@(localhost:3306)/mysql?parseTime=true
       - image: postgres:9.5
         environment:
         - POSTGRES_USER=test
         - POSTGRES_PASSWORD=test
-        - POSTGRES_DB=oathkeeper
+        - POSTGRES_DB=hydra
       - image: mysql:5.7
         environment:
         - MYSQL_ROOT_PASSWORD=test
@@ -35,8 +35,8 @@ jobs:
       - run: go get -u github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/ory/go-acc
       - run: dep ensure -vendor-only
       - run: go install github.com/ory/hydra
-      - run: go test -race -short $(go list ./... | grep -v cmd)
       - run: go-acc -o coverage.txt ./...
+      - run: go test -race -short $(go list ./... | grep -v cmd)
       - run: ./scripts/test-e2e.sh
       - run: goveralls -service=circle-ci -coverprofile=coverage.txt -repotoken=$COVERALLS_REPO_TOKEN
 

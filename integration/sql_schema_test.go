@@ -34,7 +34,7 @@ func TestSQLSchema(t *testing.T) {
 	crm := oauth2.NewConsentRequestSQLManager(db)
 	pm := lsql.NewSQLManager(db, nil)
 
-	_, err := pm.CreateSchemas("", "hydra_ladon_migration")
+	_, err := pm.CreateSchemas("", "hydra_policy_migration")
 	require.NoError(t, err)
 	_, err = cm.CreateSchemas()
 	require.NoError(t, err)
@@ -47,13 +47,13 @@ func TestSQLSchema(t *testing.T) {
 	_, err = crm.CreateSchemas()
 	require.NoError(t, err)
 
-	require.NoError(t, jm.AddKey("foo", jwk.First(p1)))
-	require.NoError(t, pm.Create(&ladon.DefaultPolicy{ID: "foo"}))
-	require.NoError(t, cm.CreateClient(&client.Client{ID: "foo"}))
-	require.NoError(t, crm.PersistConsentRequest(&oauth2.ConsentRequest{ID: "foo"}))
+	require.NoError(t, jm.AddKey("integration-test-foo", jwk.First(p1)))
+	require.NoError(t, pm.Create(&ladon.DefaultPolicy{ID: "integration-test-foo", Resources: []string{"foo"}, Actions: []string{"bar"}, Subjects: []string{"baz"}, Effect: "allow"}))
+	require.NoError(t, cm.CreateClient(&client.Client{ID: "integration-test-foo"}))
+	require.NoError(t, crm.PersistConsentRequest(&oauth2.ConsentRequest{ID: "integration-test-foo"}))
 	require.NoError(t, om.CreateAccessTokenSession(nil, "asdfasdf", r))
 	require.NoError(t, gm.CreateGroup(&group.Group{
-		ID:      "asdfas",
+		ID:      "integration-test-asdfas",
 		Members: []string{"asdf"},
 	}))
 }

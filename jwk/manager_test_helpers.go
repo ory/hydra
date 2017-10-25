@@ -24,6 +24,7 @@ func TestHelperManagerKey(m Manager, keys *jose.JsonWebKeySet) func(t *testing.T
 	priv := keys.Key("private")
 
 	return func(t *testing.T) {
+		t.Parallel()
 		_, err := m.GetKey("faz", "baz")
 		assert.NotNil(t, err)
 
@@ -55,6 +56,7 @@ func TestHelperManagerKey(m Manager, keys *jose.JsonWebKeySet) func(t *testing.T
 
 func TestHelperManagerKeySet(m Manager, keys *jose.JsonWebKeySet) func(t *testing.T) {
 	return func(t *testing.T) {
+		t.Parallel()
 		_, err := m.GetKeySet("foo")
 		require.Error(t, err)
 

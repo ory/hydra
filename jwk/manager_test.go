@@ -56,9 +56,7 @@ func TestManagerKey(t *testing.T) {
 	ks, _ := testGenerator.Generate("")
 
 	for name, m := range managers {
-		t.Run(fmt.Sprintf("case=%s", name), func(t *testing.T) {
-			TestHelperManagerKey(m, ks)(t)
-		})
+		t.Run(fmt.Sprintf("case=%s", name), TestHelperManagerKey(m, ks))
 	}
 }
 
@@ -67,8 +65,6 @@ func TestManagerKeySet(t *testing.T) {
 	ks.Key("private")
 
 	for name, m := range managers {
-		t.Run(fmt.Sprintf("case=%s", name), func(t *testing.T) {
-			TestHelperManagerKeySet(m, ks)(t)
-		})
+		t.Run(fmt.Sprintf("case=%s", name), TestHelperManagerKeySet(m, ks))
 	}
 }

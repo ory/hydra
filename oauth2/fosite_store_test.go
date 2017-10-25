@@ -64,30 +64,35 @@ func connectToMySQL() {
 }
 
 func TestCreateGetDeleteAuthorizeCodes(t *testing.T) {
+	t.Parallel()
 	for k, m := range clientManagers {
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeleteAuthorizeCodes(m))
 	}
 }
 
 func TestCreateGetDeleteAccessTokenSession(t *testing.T) {
+	t.Parallel()
 	for k, m := range clientManagers {
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeleteAccessTokenSession(m))
 	}
 }
 
 func TestCreateGetDeleteOpenIDConnectSession(t *testing.T) {
+	t.Parallel()
 	for k, m := range clientManagers {
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeleteOpenIDConnectSession(m))
 	}
 }
 
 func TestCreateGetDeleteRefreshTokenSession(t *testing.T) {
+	t.Parallel()
 	for k, m := range clientManagers {
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeleteRefreshTokenSession(m))
 	}
 }
 
 func TestRevokeRefreshToken(t *testing.T) {
+	t.Parallel()
 	for k, m := range clientManagers {
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperRevokeRefreshToken(m))
 	}

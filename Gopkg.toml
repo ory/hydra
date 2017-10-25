@@ -87,7 +87,7 @@
 
 [[constraint]]
   name = "github.com/ory/ladon"
-  version = "0.8.2"
+  version = "0.8.3"
 
 [[constraint]]
   name = "github.com/pborman/uuid"

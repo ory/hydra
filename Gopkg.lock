@@ -250,8 +250,8 @@
 [[projects]]
   name = "github.com/ory/ladon"
   packages = [".","compiler","manager/memory","manager/sql"]
-  revision = "306b2e6adf322d429e72ace6be16818dda75f574"
-  version = "v0.8.2"
+  revision = "4223d97b7a16808bc1213cc641d529e764e67eea"
+  version = "v0.8.3"
 
 [[projects]]
   name = "github.com/pborman/uuid"
@@ -430,6 +430,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b7e038321a6b38112add68025b57fd952e9dd2f8687de5d4c945cb87641b0f8f"
+  inputs-digest = "bd4e4e49a90e5ae6c9c2eab26a2873ad73904748258fd27f09cf1a7d911dbfe6"
   solver-name = "gps-cdcl"
   solver-version = 1

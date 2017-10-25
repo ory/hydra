@@ -1,8 +1,97 @@
 # History
 
-This list makes you aware of (breaking) changes. For patch notes, please check the [releases tab](https://github.com/ory/hydra/releases).
+This list makes you aware of any breaking and substantial non-breaking changes.
 
-## 0.10.0-alpha1
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+- [0.10.0-alpha.9](#0100-alpha9)
+  - [Breaking changes](#breaking-changes)
+    - [AES-GCM nonce storage](#aes-gcm-nonce-storage)
+  - [Other changes](#other-changes)
+    - [Token signature algorithm changed from HMAC-SHA256 to HMAC-SHA512](#token-signature-algorithm-changed-from-hmac-sha256-to-hmac-sha512)
+    - [RS256 JWK Generator now uses all 256 bit](#rs256-jwk-generator-now-uses-all-256-bit)
+- [0.10.0-alpha.1](#0100-alpha1)
+  - [Breaking changes](#breaking-changes-1)
+    - [New consent flow](#new-consent-flow)
+    - [Audience](#audience)
+    - [Response payload changes to `/warden/token/allowed`](#response-payload-changes-to-wardentokenallowed)
+    - [Go SDK](#go-sdk)
+    - [Health endpoints](#health-endpoints)
+    - [Group endpoints](#group-endpoints)
+    - [Replacing hierarchical scope strategy with wildcard scope strategy](#replacing-hierarchical-scope-strategy-with-wildcard-scope-strategy)
+  - [Non-breaking changes](#non-breaking-changes)
+    - [Refreshing OpenID Connect ID Token using `refresh_token` grant type](#refreshing-openid-connect-id-token-using-refresh_token-grant-type)
+- [0.9.0](#090)
+- [0.8.0](#080)
+  - [Breaking changes](#breaking-changes-2)
+    - [Ladon updated to 0.6.0](#ladon-updated-to-060)
+    - [Redis and RethinkDB deprecated](#redis-and-rethinkdb-deprecated)
+    - [Moved to ory namespace](#moved-to-ory-namespace)
+    - [SDK](#sdk)
+    - [JWK](#jwk)
+    - [Migrations are no longer automatically applied](#migrations-are-no-longer-automatically-applied)
+  - [Changes](#changes)
+    - [Log format: json](#log-format-json)
+    - [SQL Connection Control](#sql-connection-control)
+    - [REST API Docs are now generated from source code](#rest-api-docs-are-now-generated-from-source-code)
+    - [Documentation on scopes](#documentation-on-scopes)
+    - [New response writer library](#new-response-writer-library)
+    - [Graceful http handling](#graceful-http-handling)
+    - [Best practice HTTP server config](#best-practice-http-server-config)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## 0.10.0-alpha.9
+
+This release focuses on cryptographic security by leveraging best practices that emerged within the last one and a
+half years. Before upgrading to this version, make a back up of the JWK table in your SQL database.
+
+### Breaking changes
+
+#### AES-GCM nonce storage
+
+Our use of `crypto/aes`'s AES-GCM was replaced in favor of [`cryptopasta/encrypt`](https://github.com/gtank/cryptopasta/blob/master/encrypt.go).
+As this includes a change of how nonces are appended to the ciphertext, ORY Hydra will be unable to decipher existing
+databases.
+
+There are two paths to migrate this change:
+1. If you have not added any keys to the JWK store:
+  1. Stop all Hydra instances.
+  2. Drop all rows from the `hydra_jwk` table.
+  3. Start **one** Hydra instance and wait for it to boot.
+  4. Restart all remaining Hydra instances.
+2. If you added keys to the JWK store:
+  1. If you can afford to re-generate those keys:
+    1. Write down all key ids you generated.
+    2. Stop all Hydra instances.
+    3. Drop all rows from the `hydra_jwk` table.
+    4. Start **one** Hydra instance and wait for it to boot.
+    5. Restart all remaining Hydra instances.
+    6. Regenerate the keys and use the key ids you wrote down.
+  2. If you can not afford to re-generate the keys:
+    1. Export said keys using the REST API.
+    2. Stop all Hydra instances.
+    3. Drop all rows from the `hydra_jwk` table.
+    4. Start **one** Hydra instance and wait for it to boot.
+    5. Restart all remaining Hydra instances.
+    6. Import said keys using the REST API.
+
+### Other changes
+
+#### Token signature algorithm changed from HMAC-SHA256 to HMAC-SHA512
+
+The signature algorithm used to generate authorize codes, access tokens, and refresh tokens has been upgraded
+from HMAC-SHA256 to HMAC-SHA512. With upgrading to alpha.9, all previously issued authorize codes, access tokens, and refresh will thus be
+rendered invalid. Apart from some re-authorization procedures, which are usually automated, this should not have any
+significant impact on your installation.
+
+#### RS256 JWK Generator now uses all 256 bit
+
+The RS256 JWK Generator now uses the full 256 bit range to generate secrets instead of a predefined rune sequence.
+This change only affects keys generated in the future.
+
+## 0.10.0-alpha.1
 
 **Warning: This version introduces breaking changes and is not suited for production use yet.**
 
@@ -14,7 +103,9 @@ Please also note that the new scope strategy might render your administrative cl
 Set the environment variable `SCOPE_STRATEGY=DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY` to temporarily use the previous
 scope strategy and migrate the scopes manually. You may append `.*` to all scopes. For example, `hydra` is now `hydra hydra.*`
 
-## New consent flow
+### Breaking changes
+
+#### New consent flow
 
 Previously, the consent flow looked roughly like this:
 
@@ -59,7 +150,7 @@ is now enough to confirm a consent request:
 
 Learn more on how the new consent flow works in the guide: https://ory.gitbooks.io/hydra/content/oauth2.html#consent-flow
 
-## Audience
+#### Audience
 
 Previously, the audience terminology was used as a synonym for OAuth2 client IDs. This is no longer the case. The audience
 is typically a URL identifying the endpoint(s) the token is intended for. For example, if a client requires access to
@@ -71,36 +162,38 @@ renamed to `clientId` (where previously named `audience`) and `cid` (where previ
 **IMPORTANT NOTE:** This does **not** apply to OpenID Connect ID tokens. There, the `aud` claim **MUST** match the `client_id`.
 This discrepancy between OpenID Connect and OAuth 2.0 is what caused the confusion with the OAuth 2.0 audience terminology.
 
-## Response payload changes to `/warden/token/allowed`
+#### Response payload changes to `/warden/token/allowed`
 
 Previously, the response of the warden endpoint contained shorthands like `aud`, `iss`, and so on. Those have now been changed
 to their full names. For example, `iss` is now `issuer`. Additionally, `aud` is now named `clientId`.
 
-## Go SDK
+#### Go SDK
 
 The Go SDK was completely replaced in favor of a SDK based on `swagger-codegen`. Read more on it here: https://ory.gitbooks.io/hydra/content/sdk/go.html
 
-## Health endpoints
+#### Health endpoints
 
 * `GET /health` is now `GET /health/status`
 * `GET /health/stats` is now `GET /health/metrics`
 
-## Group endpoints
+#### Group endpoints
 
 * `GET /warden/groups` now returns a list of groups, not just a group id
 
-## Refreshing OpenID Connect ID Token using `refresh_token` grant type
-
-1. It is now possible to refresh openid connect tokens using the refresh_token grant. An ID Token is issued if the scope
-`openid` was requested, and the client is allowed to receive an ID Token.
-
-## Replacing hierarchical scope strategy with wildcard scope strategy
+#### Replacing hierarchical scope strategy with wildcard scope strategy
 
 The previous scope matching strategy has been replaced in favor of a wildcard-based matching strategy. Read more
 on this strategy [here](https://ory.gitbooks.io/hydra/content/oauth2.html#oauth2-scopes).
 
 To fall back to hierarchical scope matching, set the environment variable `SCOPE_STRATEGY=DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY`.
 This feature *might* be fully removed in the final 1.0.0 version.
+
+### Non-breaking changes
+
+#### Refreshing OpenID Connect ID Token using `refresh_token` grant type
+
+1. It is now possible to refresh openid connect tokens using the refresh_token grant. An ID Token is issued if the scope
+`openid` was requested, and the client is allowed to receive an ID Token.
 
 ## 0.9.0
 

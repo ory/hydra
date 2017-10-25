@@ -18,7 +18,7 @@ Method | HTTP request | Description
 
 Generate a new JSON Web Key
 
-This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256) and asymetric cryptographic keys (RS256, ECDSA).   If the specified JSON Web Key Set does not exist, it will be created.   The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:keys:<set>:<kid>\"], \"actions\": [\"create\"], \"effect\": \"allow\" } ```
+This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA).   If the specified JSON Web Key Set does not exist, it will be created.   The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:keys:<set>:<kid>\"], \"actions\": [\"create\"], \"effect\": \"allow\" } ```
 
 
 ### Parameters

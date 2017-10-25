@@ -1,0 +1,181 @@
+# Golang CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-go/ for more details
+version: 2
+jobs:
+  format:
+    docker:
+      - image: circleci/golang:1.9
+    working_directory: /go/src/github.com/ory/hydra
+    steps:
+      - checkout
+      - run: curl -L -s https://github.com/golang/dep/releases/download/v0.3.2/dep-linux-amd64 -o /go/bin/dep && chmod +x /go/bin/dep
+      - run: go get -u golang.org/x/tools/cmd/goimports
+      - run: dep ensure -vendor-only
+      - run: ./scripts/test-format.sh
+
+  test:
+    docker:
+      - image: circleci/golang:1.9
+        environment:
+        - TEST_DATABASE_POSTGRES=postgres://test:test@localhost:5432/hydra?sslmode=disable
+        - TEST_DATABASE_MYSQL=root:test@(localhost:3306)/mysql?parseTime=true
+      - image: postgres:9.5
+        environment:
+        - POSTGRES_USER=test
+        - POSTGRES_PASSWORD=test
+        - POSTGRES_DB=oathkeeper
+      - image: mysql:5.7
+        environment:
+        - MYSQL_ROOT_PASSWORD=test
+    working_directory: /go/src/github.com/ory/hydra
+    steps:
+      - checkout
+      - run: curl -L -s https://github.com/golang/dep/releases/download/v0.3.2/dep-linux-amd64 -o /go/bin/dep && chmod +x /go/bin/dep
+      - run: go get -u github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/ory/go-acc
+      - run: dep ensure -vendor-only
+      - run: go install github.com/ory/hydra
+      - run: go test -race -short $(go list ./... | grep -v cmd)
+      - run: go-acc -o coverage.txt ./...
+      - run: ./scripts/test-e2e.sh
+      - run: goveralls -service=circle-ci -coverprofile=coverage.txt -repotoken=$COVERALLS_REPO_TOKEN
+
+  swagger:
+    docker:
+      - image: circleci/golang:1.9
+    working_directory: /go/src/github.com/ory/hydra
+    steps:
+      - checkout
+      - run: curl -L -s https://github.com/golang/dep/releases/download/v0.3.2/dep-linux-amd64 -o /go/bin/dep && chmod +x /go/bin/dep
+      - run: go get -u github.com/go-swagger/go-swagger/cmd/swagger golang.org/x/tools/cmd/goimports
+      - run: dep ensure -vendor-only
+      - run: curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+      - run: sudo apt-get install -y default-jre nodejs
+      - run: sudo npm i -g yarn
+      - run: yarn
+      - run: ./scripts/test-sdk.sh
+
+  build-docker-default:
+    docker:
+      - image: library/docker:17.10
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: docker build -f Dockerfile .
+
+  build-docker-http:
+    docker:
+      - image: library/docker:17.10
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: docker build -f Dockerfile-http .
+
+  build-docker-demo:
+    docker:
+      - image: library/docker:17.10
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: docker build -f Dockerfile-demo .
+
+  build-docker-automigrate:
+    docker:
+      - image: library/docker:17.10
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: docker build -f Dockerfile-automigrate .
+
+  build-docker-without-telemetry:
+    docker:
+      - image: library/docker:17.10
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: docker build -t hydra-travis-ci -f Dockerfile-without-telemetry .
+      - run: docker run -d hydra-travis-ci
+
+  build:
+    docker:
+      - image: circleci/golang:1.9
+    working_directory: /go/src/github.com/ory/hydra
+    steps:
+      - checkout
+      - run: curl -L -s https://github.com/golang/dep/releases/download/v0.3.2/dep-linux-amd64 -o /go/bin/dep && chmod +x /go/bin/dep
+      - run: go get -u github.com/mitchellh/gox github.com/tcnksm/ghr
+      - run: dep ensure -vendor-only
+      - run: sudo apt-get install -y nodejs
+      - run: ./scripts/run-deploy.sh
+      - run: ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME --replace `git describe --tags` dist/
+      - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+      - run: npm publish
+
+workflows:
+  version: 2
+  "test, build, push, and deploy":
+    jobs:
+      - format:
+          filters:
+            tags:
+              only: /.*/
+      - test:
+          filters:
+            tags:
+              only: /.*/
+      - swagger:
+          filters:
+            tags:
+              only: /.*/
+      - build-docker-default:
+          requires:
+            - test
+            - swagger
+            - format
+          filters:
+            tags:
+              only: /.*/
+      - build-docker-http:
+          requires:
+            - test
+            - swagger
+            - format
+          filters:
+            tags:
+              only: /.*/
+      - build-docker-demo:
+          requires:
+            - test
+            - swagger
+            - format
+          filters:
+            tags:
+              only: /.*/
+      - build-docker-automigrate:
+          requires:
+            - test
+            - swagger
+            - format
+          filters:
+            tags:
+              only: /.*/
+      - build-docker-without-telemetry:
+          requires:
+            - test
+            - swagger
+            - format
+          filters:
+            tags:
+              only: /.*/
+      - build:
+          requires:
+            - build-docker-without-telemetry
+            - build-docker-demo
+            - build-docker-automigrate
+            - build-docker-http
+            - build-docker-default
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/

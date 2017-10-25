@@ -12,7 +12,7 @@ package swagger
 
 type JsonWebKeySetGeneratorRequest struct {
 
-	// The algorithm to be used for creating the key. Supports \"RS256\", \"ES521\" and \"HS256\"
+	// The algorithm to be used for creating the key. Supports \"RS256\", \"ES521\", \"HS512\", and \"HS256\"
 	Alg string `json:"alg"`
 
 	// The kid of the key to be created

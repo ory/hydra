@@ -138,7 +138,7 @@ ec91228cb105db315553499c81918258f52cee9636ea2a4821bdb8226872f54b
 
 *Note: We had to create a new docker hub repository. Tags prior to 0.7.5 are available [here](https://hub.docker.com/r/ory-am/hydra/).*
 
-**Using the client command line interface:** You can ssh into the ORY Hydra container
+**Using the client command line interface:** You can enter into the ORY Hydra container
 and execute the ORY Hydra command from there:
 
 ```

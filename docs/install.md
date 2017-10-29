@@ -101,7 +101,7 @@ app in the following sections **(required)**.
 account to manage your ORY Hydra instance. If this is not set, ORY Hydra will auto-generate a client and display
 the credentials in the logs **(optional)**.
 
-To confirm that the instance is running properly, [open the health check](https://localhost:9000/health). If asked,
+To confirm that the instance is running properly, [open the health check](https://localhost:9000/health/status). If asked,
 accept the self signed certificate in your browser. You should simply see `ok`.
 
 On start up, ORY Hydra is initializing some values. Let's take a look at the logs:

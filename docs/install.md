@@ -249,7 +249,7 @@ $ hydra clients create --skip-tls-verify \
   --name "Consent App Client" \
   --grant-types client_credentials \
   --response-types token \
-  --allowed-scopes hydra.consent
+  --allowed-scopes hydra.consent,hydra.consent.*
 ```
 
 Let's dive into the arguments:
@@ -260,7 +260,7 @@ The secret is visible *only once and can not be retrieved again*.
 * `--name "Consent App Client"` is a human-readable name.
 * `--grant-types client_credentials` allows this client to perform the OAuth 2.0 Client Credentials grant.
 * `--response-types token` allows this client to request access tokens, but not authorize codes or refresh tokens.
-* `--scope hydra.consent` allows this client to request access tokens capable of managing consent requests.
+* `--allowed-scopes hydra.consent,hydra.consent.*` allows this client to request access tokens capable of managing consent requests.
 
 Cool, next we need to create a policy for this client as well. ORY Hydra uses policies to decide whether a user
 is allowed to do something in the system or not. It is different from OAuth 2.0 Scopes, as those apply only to the

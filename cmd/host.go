@@ -46,8 +46,9 @@ CORE CONTROLS
 
 - FORCE_ROOT_CLIENT_CREDENTIALS: On first start up, Hydra generates a root client with random id and secret. Use
 	this environment variable in the form of "FORCE_ROOT_CLIENT_CREDENTIALS=id:secret" to set
-	the client id and secret yourself.
-	Example: FORCE_ROOT_CLIENT_CREDENTIALS=admin:kf0AKfm12fas3F-.f
+	the client id and secret yourself. Please www-url-encode the id
+	and the secret: "FORCE_ROOT_CLIENT_CREDENTIALS=urlencode(id):urlencode(secret)".
+	Example: FORCE_ROOT_CLIENT_CREDENTIALS=admin:h6hy92tK4dQcZ2EaFsGNRtqg
 
 - PORT: The port hydra should listen on.
 	Defaults to PORT=4444

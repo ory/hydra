@@ -4,6 +4,8 @@ import (
 	"os"
 	"strings"
 
+	"net/url"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/pkg"
@@ -28,8 +30,16 @@ func (h *Handler) createRootIfNewInstall(c *config.Config) {
 	if forceRoot != "" {
 		credentials := strings.Split(forceRoot, ":")
 		if len(credentials) == 2 {
-			id = credentials[0]
-			secret = credentials[1]
+			if id, err = url.QueryUnescape(credentials[0]); err != nil {
+				c.GetLogger().Warn("Unable to www-url-unescape the root client id, falling back to random values.")
+				secret = ""
+				id = ""
+			}
+			if secret, err = url.QueryUnescape(credentials[1]); err != nil {
+				c.GetLogger().Warn("Unable to www-url-unescape the root client secret, falling back to random values.")
+				secret = ""
+				id = ""
+			}
 		} else {
 			c.GetLogger().Warnln("You passed malformed root client credentials, falling back to random values.")
 		}

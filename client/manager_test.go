@@ -25,7 +25,7 @@ func TestMain(m *testing.M) {
 	flag.Parse()
 	if !testing.Short() {
 		connectToPG()
-		connectToMySQL()
+		// connectToMySQL()
 	}
 
 	s := m.Run()

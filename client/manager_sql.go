@@ -38,6 +38,22 @@ var migrations = &migrate.MemoryMigrationSource{
 				"DROP TABLE hydra_client",
 			},
 		},
+		{
+			Id: "2",
+			Up: []string{
+				`ALTER TABLE hydra_client DROP CONSTRAINT hydra_client_pkey`,
+				`ALTER TABLE hydra_client RENAME COLUMN id TO surrogate_id`,
+				`ALTER TABLE hydra_client ADD CONSTRAINT hydra_client_surrogate_id_unique UNIQUE (surrogate_id)`,
+				`ALTER TABLE hydra_client ADD COLUMN id SERIAL`,
+				`ALTER TABLE hydra_client ADD PRIMARY KEY (id)`,
+			},
+			Down: []string{
+				`ALTER TABLE hydra_client DROP CONSTRAINT hydra_client_pkey`,
+				`ALTER TABLE hydra_client DROP COLUMN id`,
+				`ALTER TABLE hydra_client RENAME COLUMN surrogate_id TO id`,
+				`ALTER TABLE hydra_client ADD PRIMARY KEY (id)`,
+			},
+		},
 	},
 }
 
@@ -47,7 +63,8 @@ type SQLManager struct {
 }
 
 type sqlData struct {
-	ID                string `db:"id"`
+	ID                string `db:"surrogate_id"`
+	SerialID          int64 `db:"id"`
 	Name              string `db:"client_name"`
 	Secret            string `db:"client_secret"`
 	RedirectURIs      string `db:"redirect_uris"`
@@ -64,7 +81,7 @@ type sqlData struct {
 }
 
 var sqlParams = []string{
-	"id",
+	"surrogate_id",
 	"client_name",
 	"client_secret",
 	"redirect_uris",
@@ -129,7 +146,7 @@ func (s *SQLManager) CreateSchemas() (int, error) {
 
 func (m *SQLManager) GetConcreteClient(id string) (*Client, error) {
 	var d sqlData
-	if err := m.DB.Get(&d, m.DB.Rebind("SELECT * FROM hydra_client WHERE id=?"), id); err == sql.ErrNoRows {
+	if err := m.DB.Get(&d, m.DB.Rebind("SELECT * FROM hydra_client WHERE surrogate_id=?"), id); err == sql.ErrNoRows {
 		return nil, errors.Wrap(pkg.ErrNotFound, "")
 	} else if err != nil {
 		return nil, errors.WithStack(err)
@@ -164,7 +181,7 @@ func (m *SQLManager) UpdateClient(c *Client) error {
 		query = append(query, fmt.Sprintf("%s=:%s", param, param))
 	}
 
-	if _, err := m.DB.NamedExec(fmt.Sprintf(`UPDATE hydra_client SET %s WHERE id=:id`, strings.Join(query, ", ")), s); err != nil {
+	if _, err := m.DB.NamedExec(fmt.Sprintf(`UPDATE hydra_client SET %s WHERE surrogate_id=:surrogate_id`, strings.Join(query, ", ")), s); err != nil {
 		return errors.WithStack(err)
 	}
 	return nil
@@ -206,7 +223,7 @@ func (m *SQLManager) CreateClient(c *Client) error {
 }
 
 func (m *SQLManager) DeleteClient(id string) error {
-	if _, err := m.DB.Exec(m.DB.Rebind(`DELETE FROM hydra_client WHERE id=?`), id); err != nil {
+	if _, err := m.DB.Exec(m.DB.Rebind(`DELETE FROM hydra_client WHERE surrogate_id=?`), id); err != nil {
 		return errors.WithStack(err)
 	}
 	return nil

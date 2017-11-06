@@ -106,7 +106,7 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - build-docker-demo:
+      - build-docker:
           requires:
             - test
             - swagger
@@ -116,7 +116,7 @@ workflows:
               only: /.*/
       - release:
           requires:
-            - build-docker-demo
+            - build-docker
           filters:
             tags:
               only: /.*/

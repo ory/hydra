@@ -100,9 +100,13 @@ func (s *FositeMemoryStore) GetAccessTokenSession(_ context.Context, signature s
 	return rel, nil
 }
 
-func (s *FositeMemoryStore) DeleteAccessTokenSession(_ context.Context, signature string) error {
+func (s *FositeMemoryStore) DeleteAccessTokenSession(ctx context.Context, signature string) error {
 	s.Lock()
 	defer s.Unlock()
+	return s.deleteAccessTokenSession(ctx, signature)
+}
+
+func (s *FositeMemoryStore) deleteAccessTokenSession(_ context.Context, signature string) error {
 	delete(s.AccessTokens, signature)
 	return nil
 }
@@ -124,9 +128,13 @@ func (s *FositeMemoryStore) GetRefreshTokenSession(_ context.Context, signature 
 	return rel, nil
 }
 
-func (s *FositeMemoryStore) DeleteRefreshTokenSession(_ context.Context, signature string) error {
+func (s *FositeMemoryStore) DeleteRefreshTokenSession(ctx context.Context, signature string) error {
 	s.Lock()
 	defer s.Unlock()
+	return s.deleteRefreshTokenSession(ctx, signature)
+}
+
+func (s *FositeMemoryStore) deleteRefreshTokenSession(_ context.Context, signature string) error {
 	delete(s.RefreshTokens, signature)
 	return nil
 }
@@ -136,10 +144,12 @@ func (s *FositeMemoryStore) CreateImplicitAccessTokenSession(ctx context.Context
 }
 
 func (s *FositeMemoryStore) RevokeRefreshToken(ctx context.Context, id string) error {
+	s.Lock()
+	defer s.Unlock()
 	var found bool
 	for sig, token := range s.RefreshTokens {
 		if token.GetID() == id {
-			if err := s.DeleteRefreshTokenSession(ctx, sig); err != nil {
+			if err := s.deleteRefreshTokenSession(ctx, sig); err != nil {
 				return err
 			}
 			found = true
@@ -152,10 +162,12 @@ func (s *FositeMemoryStore) RevokeRefreshToken(ctx context.Context, id string) e
 }
 
 func (s *FositeMemoryStore) RevokeAccessToken(ctx context.Context, id string) error {
+	s.Lock()
+	defer s.Unlock()
 	var found bool
 	for sig, token := range s.AccessTokens {
 		if token.GetID() == id {
-			if err := s.DeleteAccessTokenSession(ctx, sig); err != nil {
+			if err := s.deleteAccessTokenSession(ctx, sig); err != nil {
 				return err
 			}
 			found = true

@@ -15,12 +15,15 @@
 package oauth2
 
 import (
+	"sync"
+
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
 )
 
 type ConsentRequestMemoryManager struct {
 	requests map[string]ConsentRequest
+	sync.RWMutex
 }
 
 func NewConsentRequestMemoryManager() *ConsentRequestMemoryManager {
@@ -28,6 +31,8 @@ func NewConsentRequestMemoryManager() *ConsentRequestMemoryManager {
 }
 
 func (m *ConsentRequestMemoryManager) PersistConsentRequest(session *ConsentRequest) error {
+	m.Lock()
+	defer m.Unlock()
 	m.requests[session.ID] = *session
 	return nil
 }
@@ -59,6 +64,8 @@ func (m *ConsentRequestMemoryManager) RejectConsentRequest(id string, payload *R
 }
 
 func (m *ConsentRequestMemoryManager) GetConsentRequest(id string) (*ConsentRequest, error) {
+	m.RLock()
+	defer m.RUnlock()
 	if session, found := m.requests[id]; !found {
 		return nil, errors.Wrap(pkg.ErrNotFound, "")
 	} else {

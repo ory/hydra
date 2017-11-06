@@ -88,6 +88,8 @@ jobs:
       - run: docker push oryd/hydra:$CIRCLE_TAG
       # Release node / JavaScript SDK
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+      - run: npm i -g npm
+      - run: npm view ory-hydra-sdk
       - run: npm publish
 
 workflows:

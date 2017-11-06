@@ -44,6 +44,11 @@ This list makes you aware of any breaking and substantial non-breaking changes.
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+## 0.10.0-alpha.13
+
+This release removes build tags `-http`, `-automigrate`, `-without-telemetry` from the docker hub repository and replaces
+it with a new and tiny (~30MB) docker image containing the binary only.
+
 ## 0.10.0-alpha.11
 
 This release adds the possibility to specify special characters in the `FORCE_ROOT_CLIENT_CREDENTIALS` by `www-url-decoding`

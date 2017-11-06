@@ -55,22 +55,6 @@ jobs:
       - run: yarn
       - run: ./scripts/test-sdk.sh
 
-  build-docker-default:
-    docker:
-      - image: library/docker:17.10
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run: docker build -f Dockerfile .
-
-  build-docker-http:
-    docker:
-      - image: library/docker:17.10
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run: docker build -f Dockerfile-http .
-
   build-docker-demo:
     docker:
       - image: library/docker:17.10
@@ -79,36 +63,27 @@ jobs:
       - setup_remote_docker
       - run: docker build -f Dockerfile-demo .
 
-  build-docker-automigrate:
-    docker:
-      - image: library/docker:17.10
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run: docker build -f Dockerfile-automigrate .
-
-  build-docker-without-telemetry:
-    docker:
-      - image: library/docker:17.10
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run: docker build -t hydra-travis-ci -f Dockerfile-without-telemetry .
-      - run: docker run -d hydra-travis-ci
-
-  build:
+  release:
     docker:
       - image: circleci/golang:1.9
     working_directory: /go/src/github.com/ory/hydra
     steps:
       - checkout
+      - setup_remote_docker
+      # Environment dependencies
       - run: curl -L -s https://github.com/golang/dep/releases/download/v0.3.2/dep-linux-amd64 -o /go/bin/dep && chmod +x /go/bin/dep
       - run: go get -u github.com/mitchellh/gox github.com/tcnksm/ghr
       - run: dep ensure -vendor-only
       - run: curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
       - run: sudo apt-get install -y nodejs
+      # Build binaries for GitHub
       - run: ./scripts/run-deploy.sh
       - run: ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME --replace `git describe --tags` dist/
+      # Push docker image
+      - run: docker login --username "$DOCKER_USERNAME" --password "$DOCKER_PASSWORD"
+      - run: docker build -f Dockerfile -t oryd/hydra:$CIRCLE_TAG .
+      - run: docker push oryd/hydra:$CIRCLE_TAG
+      # Release node / JavaScript SDK
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
       - run: npm publish
 
@@ -128,22 +103,6 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - build-docker-default:
-          requires:
-            - test
-            - swagger
-            - format
-          filters:
-            tags:
-              only: /.*/
-      - build-docker-http:
-          requires:
-            - test
-            - swagger
-            - format
-          filters:
-            tags:
-              only: /.*/
       - build-docker-demo:
           requires:
             - test
@@ -152,29 +111,9 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - build-docker-automigrate:
+      - release:
           requires:
-            - test
-            - swagger
-            - format
-          filters:
-            tags:
-              only: /.*/
-      - build-docker-without-telemetry:
-          requires:
-            - test
-            - swagger
-            - format
-          filters:
-            tags:
-              only: /.*/
-      - build:
-          requires:
-            - build-docker-without-telemetry
             - build-docker-demo
-            - build-docker-automigrate
-            - build-docker-http
-            - build-docker-default
           filters:
             tags:
               only: /.*/

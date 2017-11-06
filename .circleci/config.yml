@@ -62,7 +62,8 @@ jobs:
       - checkout
       - setup_remote_docker:
           version: 17.10.0-ce
-      - run: docker build -f Dockerfile .
+      - run: docker build -f Dockerfile -t hydra-test .
+      - run: docker run hydra-test help
 
   release:
     docker:

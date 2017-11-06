@@ -1,18 +1,7 @@
-FROM golang:1.9-alpine
+FROM alpine:3.6
 
-RUN apk add --no-cache git build-base curl
-RUN curl -L -s https://github.com/golang/dep/releases/download/v0.3.2/dep-linux-amd64 -o $GOPATH/bin/dep
-RUN chmod +x $GOPATH/bin/dep
+RUN apk add --update ca-certificates # Certificates for SSL
 
-WORKDIR /go/src/github.com/ory/hydra
+ADD dist/hydra-linux-amd64 /go/bin/hydra
 
-ADD ./Gopkg.lock ./Gopkg.lock
-ADD ./Gopkg.toml ./Gopkg.toml
-RUN dep ensure -vendor-only
-
-ADD . .
-RUN go install .
-
-ENTRYPOINT /go/bin/hydra host
-
-EXPOSE 4444
+ENTRYPOINT ["/go/bin/hydra", "host"]

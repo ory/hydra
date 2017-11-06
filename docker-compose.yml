@@ -14,19 +14,33 @@ version: '2'
 
 services:
 
+  hydra-migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    links:
+      - postgresd:postgresd
+    command:
+      migrate sql postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable
+    restart: on-failure
+
   hydra:
     build:
       context: .
-      dockerfile: Dockerfile-demo
+      dockerfile: Dockerfile
     links:
       - postgresd:postgresd
 #     Uncomment the following line to use mysql instead.
 #      - mysqld:mysqld
+    depends_on:
+      - hydra-migrate
     volumes:
       - hydravolume:/root
     ports:
       - "4444:4444"
       - "4445:4445"
+    command:
+      host --dangerous-auto-logon --dangerous-force-http --disable-telemetry
     environment:
       - LOG_LEVEL=debug
       - ISSUER=http://localhost:4444

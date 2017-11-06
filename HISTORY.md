@@ -6,6 +6,8 @@ This list makes you aware of any breaking and substantial non-breaking changes.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
+- [0.10.0-alpha.15](#0100-alpha15)
+- [0.10.0-alpha.13](#0100-alpha13)
 - [0.10.0-alpha.11](#0100-alpha11)
 - [0.10.0-alpha.9](#0100-alpha9)
   - [Breaking changes](#breaking-changes)
@@ -43,6 +45,11 @@ This list makes you aware of any breaking and substantial non-breaking changes.
     - [Best practice HTTP server config](#best-practice-http-server-config)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## 0.10.0-alpha.15
+
+Versions `0.10.0-alpha.13` and `0.10.0-alpha.14` had issues with the static binary of ORY Hydra which has been resolved.
+Now, the uncompressed docker image size is ~12MB and the base image is `scratch` instead of `alpine`.
 
 ## 0.10.0-alpha.13
 

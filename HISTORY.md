@@ -5,6 +5,8 @@ This list makes you aware of any breaking and substantial non-breaking changes.
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+
+- [0.10.0-alpha.11](#0100-alpha11)
 - [0.10.0-alpha.9](#0100-alpha9)
   - [Breaking changes](#breaking-changes)
     - [AES-GCM nonce storage](#aes-gcm-nonce-storage)
@@ -41,6 +43,12 @@ This list makes you aware of any breaking and substantial non-breaking changes.
     - [Best practice HTTP server config](#best-practice-http-server-config)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## 0.10.0-alpha.11
+
+This release adds the possibility to specify special characters in the `FORCE_ROOT_CLIENT_CREDENTIALS` by `www-url-decoding`
+the values. If you have characters that are not url safe in your root client credentials, please use the following
+form to specify them: `"FORCE_ROOT_CLIENT_CREDENTIALS=urlencode(id):urlencode(secret)"`.
 
 ## 0.10.0-alpha.9
 

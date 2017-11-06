@@ -351,7 +351,7 @@ func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
 	c.oauth2Client = oauthConfig.Client(ctx)
 	if _, err := c.oauth2Client.Get(c.ClusterURL); err != nil {
 		fmt.Printf("Could not authenticate, because: %s\n", err)
-		fmt.Println("This can have multiple reasons, like a wrong cluster or wrong credentials. To resolve this, run `hydra Connect`.")
+		fmt.Println("This can have multiple reasons, like a wrong cluster or wrong credentials. To resolve this, run `hydra connect`.")
 		fmt.Println("You can disable TLS verification using the `--skip-tls-verify` flag.")
 		os.Exit(1)
 	}

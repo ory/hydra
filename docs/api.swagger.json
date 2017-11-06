@@ -1847,6 +1847,8 @@
         },
         "expiresAt": {
           "description": "ExpiresAt is the time where the access request will expire.",
+          "type": "string",
+          "format": "date-time",
           "x-go-name": "ExpiresAt"
         },
         "id": {
@@ -1893,6 +1895,8 @@
         },
         "expiresAt": {
           "description": "ExpiresAt is the expiry timestamp.",
+          "type": "string",
+          "format": "date-time",
           "x-go-name": "ExpiresAt"
         },
         "grantedScopes": {
@@ -1905,6 +1909,8 @@
         },
         "issuedAt": {
           "description": "IssuedAt is the token creation time stamp.",
+          "type": "string",
+          "format": "date-time",
           "x-go-name": "IssuedAt"
         },
         "issuer": {
@@ -1928,6 +1934,12 @@
     "Handler": {
       "type": "object",
       "properties": {
+        "Generators": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/KeyGenerator"
+          }
+        },
         "H": {
           "$ref": "#/definitions/Writer"
         },
@@ -1938,7 +1950,7 @@
           "$ref": "#/definitions/Firewall"
         }
       },
-      "x-go-package": "github.com/ory/hydra/warden/group"
+      "x-go-package": "github.com/ory/hydra/jwk"
     },
     "KeyGenerator": {
       "type": "object",

@@ -27,7 +27,8 @@ the target architecture (amd64, darwin, ...), and the number of CPUs available o
 
 ## Identification
 
-The running instance is identified using an unique identifier which is set every time ORY Hydra starts. The identifier
+To identify an installation and group together clusters, we create a SHA-512 hash of the Issuer URL for identification.
+Additionally, each running instance is identified using an unique identifier which is set every time ORY Hydra starts. The identifier
 is a Universally Unique Identifier (V4) and is thus a cryptographically safe random string. Identification is triggered
 when the instance has been running for more than 15 minutes.
 

@@ -139,7 +139,7 @@ func (c *Config) GetLogger() *logrus.Logger {
 
 func (c *Config) GetMetrics() *metrics.MetricsManager {
 	if c.metrics == nil {
-		c.metrics = metrics.NewMetricsManager(c.GetLogger())
+		c.metrics = metrics.NewMetricsManager(c.Issuer, c.DatabaseURL, c.GetLogger())
 	}
 
 	return c.metrics

@@ -58,7 +58,7 @@ var handler = &Handler{
 		store,
 		&compose.CommonStrategy{
 			CoreStrategy:               compose.NewOAuth2HMACStrategy(fc, []byte("some super secret secret secret secret")),
-			OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(pkg.MustRSAKey()),
+			OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(pkg.MustINSECURELOWENTROPYRSAKEYFORTEST()),
 		},
 		nil,
 		compose.OAuth2AuthorizeExplicitFactory,

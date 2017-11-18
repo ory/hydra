@@ -19,7 +19,7 @@ import (
 	"crypto/rsa"
 )
 
-func MustRSAKey() *rsa.PrivateKey {
+func MustINSECURELOWENTROPYRSAKEYFORTEST() *rsa.PrivateKey {
 	key, err := rsa.GenerateKey(rand.Reader, 1024)
 	if err != nil {
 		panic(err)

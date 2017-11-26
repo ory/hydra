@@ -71,7 +71,7 @@
 
 [[constraint]]
   name = "github.com/ory/dockertest"
-  version = "3.0.9"
+  version = "3.1.0"
 
 [[constraint]]
   name = "github.com/ory/fosite"
@@ -87,7 +87,7 @@
 
 [[constraint]]
   name = "github.com/ory/ladon"
-  version = "0.8.3"
+  version = "0.8.4"
 
 [[constraint]]
   name = "github.com/pborman/uuid"

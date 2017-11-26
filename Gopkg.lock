@@ -50,10 +50,9 @@
   version = "v3.1.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/docker/docker"
   packages = ["api/types","api/types/blkiodev","api/types/container","api/types/filters","api/types/mount","api/types/network","api/types/registry","api/types/strslice","api/types/swarm","api/types/swarm/runtime","api/types/versions","opts","pkg/archive","pkg/fileutils","pkg/homedir","pkg/idtools","pkg/ioutils","pkg/jsonmessage","pkg/longpath","pkg/mount","pkg/pools","pkg/stdcopy","pkg/system","pkg/term","pkg/term/windows"]
-  revision = "d85f5e73203a1f8537b7db02e1eadcb6d75798b2"
+  revision = "fe8aac6f5ae413a967adb0adad0b54abdfb825c4"
 
 [[projects]]
   name = "github.com/docker/go-connections"
@@ -74,10 +73,10 @@
   version = "v1.4.2"
 
 [[projects]]
-  branch = "master"
   name = "github.com/fsouza/go-dockerclient"
   packages = ["."]
-  revision = "5c271fbf9db00b7011f28131e150e29725b8a1a6"
+  revision = "2ff310040c161b75fa19fb9b287a90a6e03c0012"
+  version = "1.1"
 
 [[projects]]
   name = "github.com/go-resty/resty"
@@ -226,8 +225,8 @@
 [[projects]]
   name = "github.com/ory/dockertest"
   packages = ["."]
-  revision = "6d57cd43b964e928111542771659af6a3a58521f"
-  version = "3.0.9"
+  revision = "0c237abec5aabb10bde95a5385d008ce4900accf"
+  version = "v3.1.0"
 
 [[projects]]
   name = "github.com/ory/fosite"
@@ -250,8 +249,8 @@
 [[projects]]
   name = "github.com/ory/ladon"
   packages = [".","compiler","manager/memory","manager/sql"]
-  revision = "4223d97b7a16808bc1213cc641d529e764e67eea"
-  version = "v0.8.3"
+  revision = "941d70faef8cc9656a9f0d6403a108a08d2ab631"
+  version = "v0.8.6"
 
 [[projects]]
   name = "github.com/pborman/uuid"
@@ -430,6 +429,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "bd4e4e49a90e5ae6c9c2eab26a2873ad73904748258fd27f09cf1a7d911dbfe6"
+  inputs-digest = "84adae40be77577a117ce15ecebc3b44bf07b68a81539f2d548bbbb072457d26"
   solver-name = "gps-cdcl"
   solver-version = 1

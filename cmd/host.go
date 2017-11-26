@@ -32,6 +32,7 @@ you can also set environments by prepending key value pairs: "KEY=VALUE KEY2=VAL
 All possible controls are listed below. The host process additionally exposes a few flags, which are listed below
 the controls section.
 
+
 CORE CONTROLS
 =============
 
@@ -110,6 +111,7 @@ OAUTH2 CONTROLS
 - SCOPE_STRATEGY: Set this to DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY to enable the deprecated hierarchical scope strategy.
 	This is required if you do not want to migrate to the new wildcard strategy.
 
+
 HTTPS CONTROLS
 ==============
 
@@ -130,6 +132,30 @@ HTTPS CONTROLS
 
 - HTTPS_TLS_KEY: A pem encoded TLS key passed as string. Can be used instead of HTTPS_TLS_KEY_PATH.
 	Example: HTTPS_TLS_KEY="-----BEGIN ENCRYPTED PRIVATE KEY-----\nMIIFDjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDg..."
+
+
+CORS CONTROLS
+==============
+- CORS_ALLOWED_ORIGINS: A list of origins (comma separated values) a cross-domain request can be executed from.
+	If the special * value is present in the list, all origins will be allowed. An origin may contain a wildcard (*)
+	to replace 0 or more characters (i.e.: http://*.domain.com). Usage of wildcards implies a small performance penality.
+	Only one wildcard can be used per origin. The default value is *.
+	Example: CORS_ALLOWED_ORIGINS=http://*.domain.com,http://*.domain2.com
+
+- CORS_ALLOWED_METHODS: A list of methods  (comma separated values) the client is allowed to use with cross-domain
+	requests. Default value is simple methods (GET and POST).
+	Example: CORS_ALLOWED_METHODS=POST,GET,PUT
+
+- CORS_ALLOWED_CREDENTIALS: Indicates whether the request can include user credentials like cookies, HTTP authentication
+	or client side SSL certificates. The default is false.
+
+- CORS_DEBUG: Debugging flag adds additional output to debug server side CORS issues.
+
+- CORS_MAX_AGE: Indicates how long (in seconds) the results of a preflight request can be cached. The default is 0 which stands for no max age.
+
+- CORS_ALLOWED_HEADERS: A list of non simple headers (comma separated values) the client is allowed to use with cross-domain requests.
+
+- CORS_EXPOSED_HEADERS: Indicates which headers (comma separated values) are safe to expose to the API of a CORS API specification.
 
 
 DEBUG CONTROLS

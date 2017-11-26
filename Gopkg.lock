@@ -283,6 +283,12 @@
   version = "v1.0.0"
 
 [[projects]]
+  name = "github.com/rs/cors"
+  packages = ["."]
+  revision = "7af7a1e09ba336d2ea14b1ce73bf693c6837dbf6"
+  version = "v1.2"
+
+[[projects]]
   branch = "master"
   name = "github.com/rubenv/sql-migrate"
   packages = [".","sqlparse"]
@@ -429,6 +435,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "84adae40be77577a117ce15ecebc3b44bf07b68a81539f2d548bbbb072457d26"
+  inputs-digest = "6a9689f7b7fcfba40c510b3d4e502ac1b09b7c9208c54bc5706eaea5c9f89687"
   solver-name = "gps-cdcl"
   solver-version = 1

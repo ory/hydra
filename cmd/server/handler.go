@@ -21,6 +21,9 @@ import (
 	"net/url"
 	"os"
 
+	"strconv"
+	"strings"
+
 	"github.com/gorilla/context"
 	"github.com/julienschmidt/httprouter"
 	"github.com/meatballhat/negroni-logrus"
@@ -36,9 +39,26 @@ import (
 	"github.com/ory/hydra/warden/group"
 	"github.com/ory/ladon"
 	"github.com/pkg/errors"
+	"github.com/rs/cors"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/urfave/negroni"
 )
+
+func parseCorsOptions() cors.Options {
+	allowCredentials, _ := strconv.ParseBool(viper.GetString("CORS_ALLOWED_CREDENTIALS"))
+	debug, _ := strconv.ParseBool(viper.GetString("CORS_DEBUG"))
+	maxAge, _ := strconv.Atoi(viper.GetString("CORS_MAX_AGE"))
+	return cors.Options{
+		AllowedOrigins:   strings.Split(viper.GetString("CORS_ALLOWED_ORIGINS"), ","),
+		AllowedMethods:   strings.Split(viper.GetString("CORS_ALLOWED_METHODS"), ","),
+		AllowedHeaders:   strings.Split(viper.GetString("CORS_ALLOWED_HEADERS"), ","),
+		ExposedHeaders:   strings.Split(viper.GetString("CORS_EXPOSED_HEADERS"), ","),
+		AllowCredentials: allowCredentials,
+		MaxAge:           maxAge,
+		Debug:            debug,
+	}
+}
 
 func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
@@ -93,10 +113,11 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		n.Use(negronilogrus.NewMiddlewareFromLogger(logger, c.Issuer))
 		n.UseFunc(serverHandler.rejectInsecureRequests)
 		n.UseHandler(router)
+		corsHandler := cors.New(parseCorsOptions()).Handler(n)
 
 		var srv = graceful.WithDefaults(&http.Server{
 			Addr:    c.GetAddress(),
-			Handler: context.ClearHandler(n),
+			Handler: context.ClearHandler(corsHandler),
 			TLSConfig: &tls.Config{
 				Certificates: []tls.Certificate{getOrCreateTLSCertificate(cmd, c)},
 			},

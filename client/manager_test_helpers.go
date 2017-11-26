@@ -103,7 +103,7 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 		assert.NoError(t, err)
 
 		nc, err := m.GetConcreteClient("2-1234")
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		if k != "http" {
 			// http always returns an empty secret

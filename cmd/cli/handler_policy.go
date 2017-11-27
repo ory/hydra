@@ -184,11 +184,10 @@ func (h *PolicyHandler) RemoveSubjectFromPolicy(cmd *cobra.Command, args []strin
 		}
 	}
 	p.Subjects = subjects
-	p.Subjects = append(p.Subjects, args[1:]...)
 
 	_, response, err = m.UpdatePolicy(p.Id, *p)
 	checkResponse(response, err, http.StatusOK)
-	fmt.Printf("Removed subjects from policy %s", p.Id)
+	fmt.Printf("Removed subjects from policy %s.\n", p.Id)
 }
 
 func (h *PolicyHandler) AddActionToPolicy(cmd *cobra.Command, args []string) {
@@ -205,7 +204,7 @@ func (h *PolicyHandler) AddActionToPolicy(cmd *cobra.Command, args []string) {
 
 	_, response, err = m.UpdatePolicy(p.Id, *p)
 	checkResponse(response, err, http.StatusOK)
-	fmt.Printf("Added actions to policy %s", p.Id)
+	fmt.Printf("Added actions to policy %s.\n", p.Id)
 }
 
 func (h *PolicyHandler) RemoveActionFromPolicy(cmd *cobra.Command, args []string) {
@@ -234,7 +233,7 @@ func (h *PolicyHandler) RemoveActionFromPolicy(cmd *cobra.Command, args []string
 
 	_, response, err = m.UpdatePolicy(p.Id, *p)
 	checkResponse(response, err, http.StatusOK)
-	fmt.Printf("Removed actions from policy %s", p.Id)
+	fmt.Printf("Removed actions from policy %s.\n", p.Id)
 }
 
 func (h *PolicyHandler) GetPolicy(cmd *cobra.Command, args []string) {

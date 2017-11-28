@@ -49,10 +49,9 @@ able to securely manage JSON Web Keys, and has a sophisticated policy-based acce
     - [Building from source](#building-from-source)
 - [Security](#security)
 - [Telemetry](#telemetry)
-- [Sponsors & Adopters](#sponsors-&-adopters)
+- [Sponsors](#sponsors)
   - [Sponsorship](#sponsorship)
-  - [Sponsors](#sponsors)
-  - [Adopters](#adopters)
+  - [Sponsors](#sponsors-1)
 - [Documentation](#documentation)
   - [Guide](#guide)
   - [HTTP API documentation](#http-api-documentation)
@@ -60,7 +59,7 @@ able to securely manage JSON Web Keys, and has a sophisticated policy-based acce
   - [Develop](#develop)
 - [Reception](#reception)
 - [Libraries and third-party projects](#libraries-and-third-party-projects)
-- [Blog posts & articles](#blog-posts-&-articles)
+- [Blog posts & articles](#blog-posts--articles)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -193,7 +192,7 @@ Read [the security guide now](https://ory.gitbooks.io/hydra/content/security.htm
 ORY Hydra collects summarized, anonymized telemetry which can optionally be turned off. Click [here](https://ory.gitbooks.io/hydra/content/telemetry.html)
 to learn more.
 
-## Sponsors & Adopters
+## Sponsors
 
 ORY Hydra is open source with a permissive license. We are a dedicated, young but also experienced team of developers
 in the area of cloud computing and internet security. Please support our mission for a safer web and become a sponsor, buy an
@@ -217,18 +216,6 @@ Sponsorship starts at 600$ per month. We accept smaller contributions as well, b
 We are proud to have [Auth0](https://auth0.com) as a **gold sponsor** for ORY Hydra. [Auth0](https://auth0.com) solves
 the most complex identity use cases with an extensible and easy to integrate platform that secures billions of logins
 every year. At ORY, we use [Auth0](https://auth0.com) in conjunction with ORY Hydra for various internal projects.
-
-<br clear="all"/>
-
-### Adopters
-
-ORY Hydra is battle-tested in production systems. This is a curated list of ORY Hydra adopters. [Tell us](mailto:hi@ory.am) if
-you think that your company should be listed here.
-
-<img src="https://www.arduino.cc/en/uploads/Trademark/ArduinoCommunityLogo.png" align="left" width="30%" alt="arduino.cc"/>
-
-<p>Arduino is an open-source electronics platform based on easy-to-use hardware and software. It's intended
-for anyone making interactive projects. ORY Hydra secures Arduino's developer platform.</p>
 
 <br clear="all"/>
 

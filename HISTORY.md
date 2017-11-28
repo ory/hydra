@@ -46,6 +46,11 @@ This list makes you aware of any breaking and substantial non-breaking changes.
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+## 0.10.0-alpha.22
+
+The JWK algorithm `ES521` was renamed to `ES512`. If you want to generate a key using this algorithm, you have to use
+the update name in the future.
+
 ## 0.10.0-alpha.16
 
 Versions `0.10.0-alpha.13`, `0.10.0-alpha.14`, and `0.10.0-alpha.15` had issues with the static binary of ORY Hydra which has been resolved.

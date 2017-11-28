@@ -24,9 +24,9 @@ import (
 	"github.com/square/go-jose"
 )
 
-type ECDSA521Generator struct{}
+type ECDSA512Generator struct{}
 
-func (g *ECDSA521Generator) Generate(id string) (*jose.JSONWebKeySet, error) {
+func (g *ECDSA512Generator) Generate(id string) (*jose.JSONWebKeySet, error) {
 	key, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
 	if err != nil {
 		return nil, errors.Errorf("Could not generate key because %s", err)

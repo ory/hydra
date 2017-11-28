@@ -1934,12 +1934,6 @@
     "Handler": {
       "type": "object",
       "properties": {
-        "Generators": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/KeyGenerator"
-          }
-        },
         "H": {
           "$ref": "#/definitions/Writer"
         },
@@ -1950,7 +1944,7 @@
           "$ref": "#/definitions/Firewall"
         }
       },
-      "x-go-package": "github.com/ory/hydra/jwk"
+      "x-go-package": "github.com/ory/hydra/warden/group"
     },
     "KeyGenerator": {
       "type": "object",
@@ -2179,7 +2173,7 @@
       ],
       "properties": {
         "alg": {
-          "description": "The algorithm to be used for creating the key. Supports \"RS256\", \"ES521\", \"HS512\", and \"HS256\"",
+          "description": "The algorithm to be used for creating the key. Supports \"RS256\", \"ES512\", \"HS512\", and \"HS256\"",
           "type": "string",
           "x-go-name": "Algorithm"
         },

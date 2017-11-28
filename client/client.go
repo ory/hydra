@@ -54,7 +54,7 @@ type Client struct {
 	// described in Section 3.3 of OAuth 2.0 [RFC6749]) that the client
 	// can use when requesting access tokens.
 	//
-	// Pattern: ([a-zA-Z0-9\.\*]+\s)+
+	// Pattern: ([a-zA-Z0-9\.\*]+\s?)+
 	Scope string `json:"scope" gorethink:"scope"`
 
 	// Owner is a string identifying the owner of the OAuth 2.0 Client.

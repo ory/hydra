@@ -6,17 +6,21 @@ This list makes you aware of any breaking and substantial non-breaking changes.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
+- [0.10.0-alpha.22](#0100-alpha22)
+  - [Breaking changes](#breaking-changes)
+  - [Additions](#additions)
+  - [Changes](#changes)
 - [0.10.0-alpha.16](#0100-alpha16)
 - [0.10.0-alpha.13](#0100-alpha13)
 - [0.10.0-alpha.11](#0100-alpha11)
 - [0.10.0-alpha.9](#0100-alpha9)
-  - [Breaking changes](#breaking-changes)
+  - [Breaking changes](#breaking-changes-1)
     - [AES-GCM nonce storage](#aes-gcm-nonce-storage)
   - [Other changes](#other-changes)
     - [Token signature algorithm changed from HMAC-SHA256 to HMAC-SHA512](#token-signature-algorithm-changed-from-hmac-sha256-to-hmac-sha512)
     - [RS256 JWK Generator now uses all 256 bit](#rs256-jwk-generator-now-uses-all-256-bit)
 - [0.10.0-alpha.1](#0100-alpha1)
-  - [Breaking changes](#breaking-changes-1)
+  - [Breaking changes](#breaking-changes-2)
     - [New consent flow](#new-consent-flow)
     - [Audience](#audience)
     - [Response payload changes to `/warden/token/allowed`](#response-payload-changes-to-wardentokenallowed)
@@ -28,14 +32,14 @@ This list makes you aware of any breaking and substantial non-breaking changes.
     - [Refreshing OpenID Connect ID Token using `refresh_token` grant type](#refreshing-openid-connect-id-token-using-refresh_token-grant-type)
 - [0.9.0](#090)
 - [0.8.0](#080)
-  - [Breaking changes](#breaking-changes-2)
+  - [Breaking changes](#breaking-changes-3)
     - [Ladon updated to 0.6.0](#ladon-updated-to-060)
     - [Redis and RethinkDB deprecated](#redis-and-rethinkdb-deprecated)
     - [Moved to ory namespace](#moved-to-ory-namespace)
     - [SDK](#sdk)
     - [JWK](#jwk)
     - [Migrations are no longer automatically applied](#migrations-are-no-longer-automatically-applied)
-  - [Changes](#changes)
+  - [Changes](#changes-1)
     - [Log format: json](#log-format-json)
     - [SQL Connection Control](#sql-connection-control)
     - [REST API Docs are now generated from source code](#rest-api-docs-are-now-generated-from-source-code)
@@ -56,6 +60,13 @@ the update name in the future.
 ### Additions
 
 It is now possible to alter resource name prefixes (`rn:hydra`) using the `RESOURCE_NAME_PREFIX` environment variable.
+
+### Changes
+
+To improve ORY Hydra and understand how the software is used, optional, anonymized telemetry data is shared with ORY.
+A change was made to help us understand which telemetry sources belong to the same installation by hashing (SHA256)
+two environment variables which make up a unique identifier. [Click here](https://ory.gitbooks.io/hydra/content/telemetry.html)
+to read more about how we collect telemetry data, why we do it, and how to enable or disable it.
 
 ## 0.10.0-alpha.16
 

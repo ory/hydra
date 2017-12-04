@@ -49,7 +49,7 @@ func sqlSchemaUp(table string, id string) string {
 	form_data  		text NOT NULL,
 	session_data  	text NOT NULL
 )`, table),
-		"2": fmt.Sprintf("ALTER TABLE hydra_oauth2_%s ADD subject text NOT NULL", table),
+		"2": fmt.Sprintf("ALTER TABLE hydra_oauth2_%s ADD subject varchar(255) NOT NULL DEFAULT ''", table),
 	}
 
 	return schemas[id]
@@ -58,7 +58,7 @@ func sqlSchemaUp(table string, id string) string {
 func sqlSchemaDown(table string, id string) string {
 	schemas := map[string]string{
 		"1": fmt.Sprintf(`DROP TABLE %s)`, table),
-		"2": fmt.Sprintf("ALTER TABLE hydra_oauth2_%s DROP COLUMN subject text", table),
+		"2": fmt.Sprintf("ALTER TABLE hydra_oauth2_%s DROP COLUMN subject", table),
 	}
 
 	return schemas[id]
@@ -131,8 +131,11 @@ type sqlData struct {
 }
 
 func sqlSchemaFromRequest(signature string, r fosite.Requester, logger logrus.FieldLogger) (*sqlData, error) {
+	subject := ""
 	if r.GetSession() == nil {
 		logger.Debugf("Got an empty session in sqlSchemaFromRequest")
+	} else {
+		subject = r.GetSession().GetSubject()
 	}
 
 	session, err := json.Marshal(r.GetSession())
@@ -149,7 +152,7 @@ func sqlSchemaFromRequest(signature string, r fosite.Requester, logger logrus.Fi
 		GrantedScopes: strings.Join([]string(r.GetGrantedScopes()), "|"),
 		Form:          r.GetRequestForm().Encode(),
 		Session:       session,
-		Subject:       r.GetSession().GetSubject(),
+		Subject:       subject,
 	}, nil
 }
 

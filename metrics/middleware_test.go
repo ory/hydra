@@ -34,7 +34,7 @@ import (
 
 func TestMiddleware(t *testing.T) {
 	rand.Seed(time.Now().Unix())
-	mw := metrics.NewMetricsManager(logrus.StandardLogger())
+	mw := metrics.NewMetricsManager("", "", logrus.StandardLogger())
 	n := negroni.New()
 	r := httprouter.New()
 
@@ -89,7 +89,7 @@ func TestMiddleware(t *testing.T) {
 
 func TestRacyMiddleware(t *testing.T) {
 	rand.Seed(time.Now().Unix())
-	mw := metrics.NewMetricsManager(logrus.StandardLogger())
+	mw := metrics.NewMetricsManager("", "", logrus.StandardLogger())
 	n := negroni.New()
 	r := httprouter.New()
 

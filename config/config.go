@@ -52,24 +52,25 @@ type Config struct {
 	ClientSecret string `mapstructure:"CLIENT_SECRET" yaml:"client_secret,omitempty"`
 
 	// These are used by the host command
-	BindPort               int    `mapstructure:"PORT" yaml:"-"`
-	BindHost               string `mapstructure:"HOST" yaml:"-"`
-	Issuer                 string `mapstructure:"ISSUER" yaml:"-"`
-	SystemSecret           string `mapstructure:"SYSTEM_SECRET" yaml:"-"`
-	DatabaseURL            string `mapstructure:"DATABASE_URL" yaml:"-"`
-	DatabasePlugin         string `mapstructure:"DATABASE_PLUGIN" yaml:"-"`
-	ConsentURL             string `mapstructure:"CONSENT_URL" yaml:"-"`
-	AllowTLSTermination    string `mapstructure:"HTTPS_ALLOW_TERMINATION_FROM" yaml:"-"`
-	BCryptWorkFactor       int    `mapstructure:"BCRYPT_COST" yaml:"-"`
-	AccessTokenLifespan    string `mapstructure:"ACCESS_TOKEN_LIFESPAN" yaml:"-"`
-	ScopeStrategy          string `mapstructure:"SCOPE_STRATEGY" yaml:"-"`
-	AuthCodeLifespan       string `mapstructure:"AUTH_CODE_LIFESPAN" yaml:"-"`
-	IDTokenLifespan        string `mapstructure:"ID_TOKEN_LIFESPAN" yaml:"-"`
-	ChallengeTokenLifespan string `mapstructure:"CHALLENGE_TOKEN_LIFESPAN" yaml:"-"`
-	CookieSecret           string `mapstructure:"COOKIE_SECRET" yaml:"-"`
-	LogLevel               string `mapstructure:"LOG_LEVEL" yaml:"-"`
-	LogFormat              string `mapstructure:"LOG_FORMAT" yaml:"-"`
-	ForceHTTP              bool   `yaml:"-"`
+	BindPort                    int    `mapstructure:"PORT" yaml:"-"`
+	BindHost                    string `mapstructure:"HOST" yaml:"-"`
+	Issuer                      string `mapstructure:"ISSUER" yaml:"-"`
+	SystemSecret                string `mapstructure:"SYSTEM_SECRET" yaml:"-"`
+	DatabaseURL                 string `mapstructure:"DATABASE_URL" yaml:"-"`
+	DatabasePlugin              string `mapstructure:"DATABASE_PLUGIN" yaml:"-"`
+	ConsentURL                  string `mapstructure:"CONSENT_URL" yaml:"-"`
+	AllowTLSTermination         string `mapstructure:"HTTPS_ALLOW_TERMINATION_FROM" yaml:"-"`
+	BCryptWorkFactor            int    `mapstructure:"BCRYPT_COST" yaml:"-"`
+	AccessTokenLifespan         string `mapstructure:"ACCESS_TOKEN_LIFESPAN" yaml:"-"`
+	ScopeStrategy               string `mapstructure:"SCOPE_STRATEGY" yaml:"-"`
+	AuthCodeLifespan            string `mapstructure:"AUTH_CODE_LIFESPAN" yaml:"-"`
+	IDTokenLifespan             string `mapstructure:"ID_TOKEN_LIFESPAN" yaml:"-"`
+	ChallengeTokenLifespan      string `mapstructure:"CHALLENGE_TOKEN_LIFESPAN" yaml:"-"`
+	CookieSecret                string `mapstructure:"COOKIE_SECRET" yaml:"-"`
+	LogLevel                    string `mapstructure:"LOG_LEVEL" yaml:"-"`
+	LogFormat                   string `mapstructure:"LOG_FORMAT" yaml:"-"`
+	AccessControlResourcePrefix string `mapstructure:"RESOURCE_NAME_PREFIX" yaml:"-"`
+	ForceHTTP                   bool   `yaml:"-"`
 
 	BuildVersion string                  `yaml:"-"`
 	BuildHash    string                  `yaml:"-"`

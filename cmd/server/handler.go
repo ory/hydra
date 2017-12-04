@@ -185,9 +185,10 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 	h.OAuth2 = newOAuth2Handler(c, router, ctx.ConsentManager, oauth2Provider)
 	h.Warden = warden.NewHandler(c, router)
 	h.Groups = &group.Handler{
-		H:       herodot.NewJSONWriter(c.GetLogger()),
-		W:       ctx.Warden,
-		Manager: ctx.GroupManager,
+		H:              herodot.NewJSONWriter(c.GetLogger()),
+		W:              ctx.Warden,
+		Manager:        ctx.GroupManager,
+		ResourcePrefix: c.AccessControlResourcePrefix,
 	}
 	h.Groups.SetRoutes(router)
 	_ = newHealthHandler(c, router)

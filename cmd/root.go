@@ -151,6 +151,9 @@ func initConfig() {
 	viper.BindEnv("LOG_FORMAT")
 	viper.SetDefault("LOG_FORMAT", "")
 
+	viper.BindEnv("RESOURCE_NAME_PREFIX")
+	viper.SetDefault("RESOURCE_NAME_PREFIX", "")
+
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err != nil {
 		fmt.Printf(`Config file not found because "%s"`, err)

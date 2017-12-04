@@ -24,7 +24,6 @@ import (
 	"fmt"
 
 	"github.com/julienschmidt/httprouter"
-	pkg2 "github.com/ory/common/pkg"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/firewall"
 	"github.com/ory/hydra/pkg"
@@ -225,7 +224,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 			return
 		}
 	} else {
-		h.H.WriteError(w, r, errors.WithStack(pkg2.ErrUnauthorized))
+		h.H.WriteError(w, r, errors.WithStack(fosite.ErrRequestUnauthorized))
 		return
 	}
 

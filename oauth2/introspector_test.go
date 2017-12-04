@@ -41,7 +41,7 @@ import (
 )
 
 func TestIntrospectorSDK(t *testing.T) {
-	tokens := pkg.Tokens(3)
+	tokens := pkg.Tokens(4)
 	memoryStore := storage.NewExampleStore()
 	memoryStore.Clients["my-client"].Scopes = []string{"fosite", "openid", "photos", "offline", "foo.*"}
 
@@ -83,6 +83,7 @@ func TestIntrospectorSDK(t *testing.T) {
 	createAccessTokenSession("alice", "siri", tokens[0][0], now.Add(time.Hour), memoryStore, fosite.Arguments{"core", "foo.*"})
 	createAccessTokenSession("siri", "siri", tokens[1][0], now.Add(time.Hour), memoryStore, fosite.Arguments{"core", "foo"})
 	createAccessTokenSession("siri", "doesnt-exist", tokens[2][0], now.Add(-time.Hour), memoryStore, fosite.Arguments{"core", "foo.*"})
+	createAccessTokenSession("my-client", "my-client", tokens[3][0], now.Add(time.Hour), memoryStore, fosite.Arguments{"hydra.*"})
 
 	client := hydra.NewOAuth2ApiWithBasePath(server.URL)
 	client.Configuration.Username = "my-client"
@@ -95,6 +96,7 @@ func TestIntrospectorSDK(t *testing.T) {
 			expectErr   bool
 			scopes      []string
 			assert      func(*testing.T, *hydra.OAuth2TokenIntrospection)
+			prepare func(*testing.T)
 		}{
 			{
 				description: "should fail because invalid token was supplied",
@@ -126,6 +128,14 @@ func TestIntrospectorSDK(t *testing.T) {
 				description: "should pass",
 				token:       tokens[0][1],
 				expectErr:   false,
+				prepare: func(t *testing.T) {
+					client.Configuration.OAuthToken = tokens[3][0]
+				},
+			},
+			{
+				description: "should pass",
+				token:       tokens[0][1],
+				expectErr:   false,
 				scopes:      []string{"foo.bar"},
 				assert: func(t *testing.T, c *hydra.OAuth2TokenIntrospection) {
 					assert.Equal(t, "alice", c.Sub)
@@ -137,6 +147,10 @@ func TestIntrospectorSDK(t *testing.T) {
 			},
 		} {
 			t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+				if c.prepare != nil {
+					c.prepare(t)
+				}
+
 				ctx, response, err := client.IntrospectOAuth2Token(c.token, strings.Join(c.scopes, " "))
 				require.NoError(t, err)
 				require.EqualValues(t, http.StatusOK, response.StatusCode)

@@ -49,7 +49,7 @@ func createAccessTokenSession(subject, client string, token string, expiresAt ti
 
 func TestRevoke(t *testing.T) {
 	var (
-		tokens = pkg.Tokens(3)
+		tokens = pkg.Tokens(4)
 		store  = storage.NewExampleStore()
 		now    = time.Now().Round(time.Second)
 	)
@@ -73,9 +73,10 @@ func TestRevoke(t *testing.T) {
 	handler.SetRoutes(router)
 	server := httptest.NewServer(router)
 
-	createAccessTokenSession("alice", "siri", tokens[0][0], now.Add(time.Hour), store, nil)
-	createAccessTokenSession("siri", "siri", tokens[1][0], now.Add(time.Hour), store, nil)
-	createAccessTokenSession("siri", "doesnt-exist", tokens[2][0], now.Add(-time.Hour), store, nil)
+	createAccessTokenSession("alice", "my-client", tokens[0][0], now.Add(time.Hour), store, nil)
+	createAccessTokenSession("siri", "my-client", tokens[1][0], now.Add(time.Hour), store, nil)
+	createAccessTokenSession("siri", "my-client", tokens[2][0], now.Add(-time.Hour), store, nil)
+	createAccessTokenSession("siri", "doesnt-exist", tokens[3][0], now.Add(-time.Hour), store, nil)
 
 	client := hydra.NewOAuth2ApiWithBasePath(server.URL)
 	client.Configuration.Username = "my-client"
@@ -89,9 +90,15 @@ func TestRevoke(t *testing.T) {
 			token: "invalid",
 		},
 		{
+			token: tokens[3][1],
+			assert: func(t *testing.T) {
+				assert.Len(t, store.AccessTokens, 4)
+			},
+		},
+		{
 			token: tokens[0][1],
 			assert: func(t *testing.T) {
-				assert.Len(t, store.AccessTokens, 2)
+				assert.Len(t, store.AccessTokens, 3)
 			},
 		},
 		{
@@ -100,13 +107,13 @@ func TestRevoke(t *testing.T) {
 		{
 			token: tokens[2][1],
 			assert: func(t *testing.T) {
-				assert.Len(t, store.AccessTokens, 1)
+				assert.Len(t, store.AccessTokens, 2)
 			},
 		},
 		{
 			token: tokens[1][1],
 			assert: func(t *testing.T) {
-				assert.Len(t, store.AccessTokens, 0)
+				assert.Len(t, store.AccessTokens, 1)
 			},
 		},
 	} {

@@ -21,6 +21,7 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/ory/fosite"
 	"github.com/ory/herodot"
+	"github.com/ory/hydra/firewall"
 	"github.com/sirupsen/logrus"
 )
 
@@ -41,4 +42,20 @@ type Handler struct {
 	ScopeStrategy fosite.ScopeStrategy
 
 	Issuer string
+
+	W firewall.Firewall
+
+	ResourcePrefix string
+}
+
+func (h *Handler) PrefixResource(resource string) string {
+	if h.ResourcePrefix == "" {
+		h.ResourcePrefix = "rn:hydra"
+	}
+
+	if h.ResourcePrefix[len(h.ResourcePrefix)-1] == ':' {
+		h.ResourcePrefix = h.ResourcePrefix[:len(h.ResourcePrefix)-1]
+	}
+
+	return h.ResourcePrefix + ":" + resource
 }

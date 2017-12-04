@@ -29,9 +29,13 @@ import (
 	"github.com/ory/fosite/compose"
 	"github.com/ory/fosite/storage"
 	"github.com/ory/herodot"
+	compose2 "github.com/ory/hydra/compose"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
+	"github.com/ory/hydra/warden"
+	"github.com/ory/ladon"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -40,6 +44,18 @@ func TestIntrospectorSDK(t *testing.T) {
 	tokens := pkg.Tokens(3)
 	memoryStore := storage.NewExampleStore()
 	memoryStore.Clients["my-client"].Scopes = []string{"fosite", "openid", "photos", "offline", "foo.*"}
+
+	var localWarden, _ = compose2.NewMockFirewall("foo", "app-client", fosite.Arguments{"hydra.introspect"}, &ladon.DefaultPolicy{
+		ID:        "1",
+		Subjects:  []string{"my-client"},
+		Resources: []string{"rn:hydra:oauth2:tokens"},
+		Actions:   []string{"introspect"},
+		Effect:    ladon.AllowAccess,
+	})
+	localWarden.(*warden.LocalWarden).OAuth2.(*fosite.Fosite).Store = memoryStore
+
+	l := logrus.New()
+	l.Level = logrus.DebugLevel
 
 	router := httprouter.New()
 	handler := &oauth2.Handler{
@@ -55,13 +71,15 @@ func TestIntrospectorSDK(t *testing.T) {
 			compose.OAuth2AuthorizeExplicitFactory,
 			compose.OAuth2TokenIntrospectionFactory,
 		),
-		H:      herodot.NewJSONWriter(nil),
+		H:      herodot.NewJSONWriter(l),
 		Issuer: "foobariss",
+		W:      localWarden,
 	}
 	handler.SetRoutes(router)
 	server := httptest.NewServer(router)
 
 	now := time.Now().Round(time.Minute)
+	createAccessTokenSession("alice", "siri", tokens[0][0], now.Add(time.Hour), memoryStore, fosite.Arguments{"core", "foo.*"})
 	createAccessTokenSession("alice", "siri", tokens[0][0], now.Add(time.Hour), memoryStore, fosite.Arguments{"core", "foo.*"})
 	createAccessTokenSession("siri", "siri", tokens[1][0], now.Add(time.Hour), memoryStore, fosite.Arguments{"core", "foo"})
 	createAccessTokenSession("siri", "doesnt-exist", tokens[2][0], now.Add(-time.Hour), memoryStore, fosite.Arguments{"core", "foo.*"})

@@ -62,9 +62,6 @@
       if (data.hasOwnProperty('clientId')) {
         obj['clientId'] = ApiClient.convertToType(data['clientId'], 'String')
       }
-      if (data.hasOwnProperty('expiresAt')) {
-        obj['expiresAt'] = ApiClient.convertToType(data['expiresAt'], 'Date')
-      }
       if (data.hasOwnProperty('id')) {
         obj['id'] = ApiClient.convertToType(data['id'], 'String')
       }
@@ -89,11 +86,6 @@
    * @member {String} clientId
    */
   exports.prototype['clientId'] = undefined
-  /**
-   * ExpiresAt is the time where the access request will expire.
-   * @member {Date} expiresAt
-   */
-  exports.prototype['expiresAt'] = undefined
   /**
    * ID is the id of this consent request.
    * @member {String} id

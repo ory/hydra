@@ -11,9 +11,13 @@
 package swagger
 
 type Handler struct {
+	Generators map[string]KeyGenerator `json:"Generators,omitempty"`
+
 	H Writer `json:"H,omitempty"`
 
 	Manager Manager `json:"Manager,omitempty"`
+
+	ResourcePrefix string `json:"ResourcePrefix,omitempty"`
 
 	W Firewall `json:"W,omitempty"`
 }

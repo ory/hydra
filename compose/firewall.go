@@ -46,6 +46,8 @@ func NewMockFirewall(issuer string, subject string, scopes fosite.Arguments, p .
 	fositeStore.CreateAccessTokenSession(nil, tokens[0][0], ar)
 
 	conf := &oauth2.Config{Scopes: scopes, Endpoint: oauth2.Endpoint{}}
+	l := logrus.New()
+	l.Level = logrus.DebugLevel
 
 	return &warden.LocalWarden{
 			Warden: ladonWarden,
@@ -63,7 +65,7 @@ func NewMockFirewall(issuer string, subject string, scopes fosite.Arguments, p .
 			Issuer:              issuer,
 			AccessTokenLifespan: time.Hour,
 			Groups:              group.NewMemoryManager(),
-			L:                   logrus.New(),
+			L:                   l,
 		}, conf.Client(oauth2.NoContext, &oauth2.Token{
 			AccessToken: tokens[0][1],
 			Expiry:      time.Now().Add(time.Hour),

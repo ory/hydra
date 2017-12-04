@@ -21,8 +21,12 @@ import (
 	"net/url"
 	"strings"
 
+	"fmt"
+
 	"github.com/julienschmidt/httprouter"
+	pkg2 "github.com/ory/common/pkg"
 	"github.com/ory/fosite"
+	"github.com/ory/hydra/firewall"
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -41,6 +45,8 @@ const (
 	// IntrospectPath points to the OAuth2 introspection endpoint.
 	IntrospectPath = "/oauth2/introspect"
 	RevocationPath = "/oauth2/revoke"
+
+	IntrospectScope = "hydra.introspect"
 
 	consentCookieName = "consent_session"
 )
@@ -175,6 +181,14 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ ht
 // is neither expired nor revoked. If a token is active, additional information on the token will be included. You can
 // set additional data for a token by setting `accessTokenExtra` during the consent flow.
 //
+//  ```
+//  {
+//    "resources": ["rn:hydra:oauth2:tokens"],
+//    "actions": ["introspect"],
+//    "effect": "allow"
+//  }
+//  ```
+//
 //     Consumes:
 //     - application/x-www-form-urlencoded
 //
@@ -185,13 +199,36 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ ht
 //
 //     Security:
 //       basic:
-//       oauth2:
+//       oauth2: hydra.introspect
 //
 //     Responses:
 //       200: introspectOAuth2TokenResponse
 //       401: genericError
 //       500: genericError
 func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	if token := h.W.TokenFromRequest(r); token != "" {
+		if _, err := h.W.TokenAllowed(r.Context(), h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
+			Resource: fmt.Sprintf(h.PrefixResource("oauth2:tokens")),
+			Action:   "introspect",
+		}, IntrospectScope); err != nil {
+			h.H.WriteError(w, r, err)
+			return
+		}
+	} else if client, _, ok := r.BasicAuth(); ok {
+		// If no token is given, we do not need a scope.
+		if err := h.W.IsAllowed(r.Context(), &firewall.AccessRequest{
+			Subject:  client,
+			Resource: fmt.Sprintf(h.PrefixResource("oauth2:tokens")),
+			Action:   "introspect",
+		}); err != nil {
+			h.H.WriteError(w, r, err)
+			return
+		}
+	} else {
+		h.H.WriteError(w, r, errors.WithStack(pkg2.ErrUnauthorized))
+		return
+	}
+
 	var session = NewSession("")
 
 	var ctx = fosite.NewContext()

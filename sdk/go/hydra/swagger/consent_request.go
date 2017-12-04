@@ -10,17 +10,10 @@
 
 package swagger
 
-import (
-	"time"
-)
-
 type ConsentRequest struct {
 
 	// ClientID is the client id that initiated the OAuth2 request.
 	ClientId string `json:"clientId,omitempty"`
-
-	// ExpiresAt is the time where the access request will expire.
-	ExpiresAt time.Time `json:"expiresAt,omitempty"`
 
 	// ID is the id of this consent request.
 	Id string `json:"id,omitempty"`

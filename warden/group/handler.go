@@ -34,6 +34,20 @@ type Handler struct {
 	Manager Manager
 	H       herodot.Writer
 	W       firewall.Firewall
+
+	ResourcePrefix string
+}
+
+func (h *Handler) PrefixResource(resource string) string {
+	if h.ResourcePrefix == "" {
+		h.ResourcePrefix = "rn:hydra"
+	}
+
+	if h.ResourcePrefix[len(h.ResourcePrefix)-1] == ':' {
+		h.ResourcePrefix = h.ResourcePrefix[:len(h.ResourcePrefix)-1]
+	}
+
+	return h.ResourcePrefix + ":" + resource
 }
 
 const (
@@ -41,8 +55,8 @@ const (
 )
 
 const (
-	GroupsResource = "rn:hydra:warden:groups"
-	GroupResource  = "rn:hydra:warden:groups:%s"
+	GroupsResource = "warden:groups"
+	GroupResource  = "warden:groups:%s"
 	Scope          = "hydra.warden.groups"
 )
 
@@ -90,7 +104,7 @@ func (h *Handler) FindGroupNames(w http.ResponseWriter, r *http.Request, _ httpr
 	var member = r.URL.Query().Get("member")
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: GroupsResource,
+		Resource: h.PrefixResource(GroupsResource),
 		Action:   "list",
 	}, Scope); err != nil {
 		h.H.WriteError(w, r, err)
@@ -146,7 +160,7 @@ func (h *Handler) CreateGroup(w http.ResponseWriter, r *http.Request, _ httprout
 	}
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: GroupsResource,
+		Resource: h.PrefixResource(GroupsResource),
 		Action:   "create",
 	}, Scope); err != nil {
 		h.H.WriteError(w, r, err)
@@ -202,7 +216,7 @@ func (h *Handler) GetGroup(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: fmt.Sprintf(GroupResource, id),
+		Resource: fmt.Sprintf(h.PrefixResource(GroupResource), id),
 		Action:   "get",
 	}, Scope); err != nil {
 		h.H.WriteError(w, r, err)
@@ -247,7 +261,7 @@ func (h *Handler) DeleteGroup(w http.ResponseWriter, r *http.Request, ps httprou
 	var id = ps.ByName("id")
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: fmt.Sprintf(GroupResource, id),
+		Resource: fmt.Sprintf(h.PrefixResource(GroupResource), id),
 		Action:   "delete",
 	}, Scope); err != nil {
 		h.H.WriteError(w, r, err)
@@ -303,7 +317,7 @@ func (h *Handler) AddGroupMembers(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: fmt.Sprintf(GroupResource, id),
+		Resource: fmt.Sprintf(h.PrefixResource(GroupResource), id),
 		Action:   "members.add",
 	}, Scope); err != nil {
 		h.H.WriteError(w, r, err)
@@ -359,7 +373,7 @@ func (h *Handler) RemoveGroupMembers(w http.ResponseWriter, r *http.Request, ps 
 	}
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: fmt.Sprintf(GroupResource, id),
+		Resource: fmt.Sprintf(h.PrefixResource(GroupResource), id),
 		Action:   "members.remove",
 	}, Scope); err != nil {
 		h.H.WriteError(w, r, err)

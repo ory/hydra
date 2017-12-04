@@ -33,14 +33,27 @@ import (
 const (
 	endpoint         = "/policies"
 	scope            = "hydra.policies"
-	policyResource   = "rn:hydra:policies"
-	policiesResource = "rn:hydra:policies:%s"
+	policyResource   = "policies"
+	policiesResource = "policies:%s"
 )
 
 type Handler struct {
-	Manager ladon.Manager
-	H       herodot.Writer
-	W       firewall.Firewall
+	Manager        ladon.Manager
+	H              herodot.Writer
+	W              firewall.Firewall
+	ResourcePrefix string
+}
+
+func (h *Handler) PrefixResource(resource string) string {
+	if h.ResourcePrefix == "" {
+		h.ResourcePrefix = "rn:hydra"
+	}
+
+	if h.ResourcePrefix[len(h.ResourcePrefix)-1] == ':' {
+		h.ResourcePrefix = h.ResourcePrefix[:len(h.ResourcePrefix)-1]
+	}
+
+	return h.ResourcePrefix + ":" + resource
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
@@ -84,7 +97,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 func (h *Handler) List(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = r.Context()
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: policyResource,
+		Resource: h.PrefixResource(policyResource),
 		Action:   "list",
 	}, scope); err != nil {
 		h.H.WriteError(w, r, err)
@@ -158,7 +171,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	ctx := r.Context()
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: policyResource,
+		Resource: h.PrefixResource(policyResource),
 		Action:   "create",
 	}, scope); err != nil {
 		h.H.WriteError(w, r, err)
@@ -215,7 +228,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	ctx := r.Context()
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: fmt.Sprintf(policiesResource, ps.ByName("id")),
+		Resource: fmt.Sprintf(h.PrefixResource(policiesResource), ps.ByName("id")),
 		Action:   "get",
 	}, scope); err != nil {
 		h.H.WriteError(w, r, err)
@@ -269,7 +282,7 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	id := ps.ByName("id")
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: fmt.Sprintf(policiesResource, id),
+		Resource: fmt.Sprintf(h.PrefixResource(policiesResource), id),
 		Action:   "get",
 	}, scope); err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
@@ -320,7 +333,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	var ctx = r.Context()
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: fmt.Sprintf(policiesResource, id),
+		Resource: fmt.Sprintf(h.PrefixResource(policiesResource), id),
 		Action:   "update",
 	}, scope); err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))

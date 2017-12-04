@@ -24,9 +24,10 @@ import (
 func newPolicyHandler(c *config.Config, router *httprouter.Router) *policy.Handler {
 	ctx := c.Context()
 	h := &policy.Handler{
-		H:       herodot.NewJSONWriter(c.GetLogger()),
-		W:       ctx.Warden,
-		Manager: ctx.LadonManager,
+		H:              herodot.NewJSONWriter(c.GetLogger()),
+		W:              ctx.Warden,
+		Manager:        ctx.LadonManager,
+		ResourcePrefix: c.AccessControlResourcePrefix,
 	}
 	h.SetRoutes(router)
 	return h

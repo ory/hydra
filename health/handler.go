@@ -24,9 +24,22 @@ import (
 )
 
 type Handler struct {
-	Metrics *metrics.MetricsManager
-	H       *herodot.JSONWriter
-	W       firewall.Firewall
+	Metrics        *metrics.MetricsManager
+	H              *herodot.JSONWriter
+	W              firewall.Firewall
+	ResourcePrefix string
+}
+
+func (h *Handler) PrefixResource(resource string) string {
+	if h.ResourcePrefix == "" {
+		h.ResourcePrefix = "rn:hydra"
+	}
+
+	if h.ResourcePrefix[len(h.ResourcePrefix)-1] == ':' {
+		h.ResourcePrefix = h.ResourcePrefix[:len(h.ResourcePrefix)-1]
+	}
+
+	return h.ResourcePrefix + ":" + resource
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
@@ -91,7 +104,7 @@ func (h *Handler) Statistics(w http.ResponseWriter, r *http.Request, ps httprout
 	var ctx = r.Context()
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: "rn:hydra:health:stats",
+		Resource: h.PrefixResource("health:stats"),
 		Action:   "get",
 	}, "hydra.health"); err != nil {
 		h.H.WriteError(w, r, err)

@@ -28,9 +28,10 @@ import (
 )
 
 type Handler struct {
-	Manager Manager
-	H       herodot.Writer
-	W       firewall.Firewall
+	Manager        Manager
+	H              herodot.Writer
+	W              firewall.Firewall
+	ResourcePrefix string
 }
 
 const (
@@ -38,10 +39,22 @@ const (
 )
 
 const (
-	ClientsResource = "rn:hydra:clients"
-	ClientResource  = "rn:hydra:clients:%s"
+	ClientsResource = "clients"
+	ClientResource  = "clients:%s"
 	Scope           = "hydra.clients"
 )
+
+func (h *Handler) PrefixResource(resource string) string {
+	if h.ResourcePrefix == "" {
+		h.ResourcePrefix = "rn:hydra"
+	}
+
+	if h.ResourcePrefix[len(h.ResourcePrefix)-1] == ':' {
+		h.ResourcePrefix = h.ResourcePrefix[:len(h.ResourcePrefix)-1]
+	}
+
+	return h.ResourcePrefix + ":" + resource
+}
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET(ClientsHandlerPath, h.List)
@@ -107,7 +120,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	}
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: ClientsResource,
+		Resource: h.PrefixResource(ClientsResource),
 		Action:   "create",
 		Context: map[string]interface{}{
 			"owner": c.Owner,
@@ -199,7 +212,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	}
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: ClientsResource,
+		Resource: h.PrefixResource(ClientsResource),
 		Action:   "update",
 		Context: ladon.Context{
 			"owner": o.Owner,
@@ -264,7 +277,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	var ctx = r.Context()
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: ClientsResource,
+		Resource: h.PrefixResource(ClientsResource),
 		Action:   "get",
 	}, Scope); err != nil {
 		h.H.WriteError(w, r, err)
@@ -343,7 +356,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	}
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: fmt.Sprintf(ClientResource, id),
+		Resource: fmt.Sprintf(h.PrefixResource(ClientResource), id),
 		Action:   "get",
 		Context: ladon.Context{
 			"owner": c.GetOwner(),
@@ -409,7 +422,7 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	}
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: fmt.Sprintf(ClientResource, id),
+		Resource: fmt.Sprintf(h.PrefixResource(ClientResource), id),
 		Action:   "delete",
 		Context: ladon.Context{
 			"owner": c.GetOwner(),

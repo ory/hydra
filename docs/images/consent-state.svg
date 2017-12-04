@@ -1,0 +1,360 @@
+<svg id="mermaidChart0" xmlns="http://www.w3.org/2000/svg" height="100%" viewBox="0 0 697.1875 952.7750091552734" style="max-width:697.1875px;"><style>
+  /* Flowchart variables */
+/* Sequence Diagram variables */
+/* Gantt chart variables */
+.mermaid .label {
+  font-family: 'trebuchet ms', verdana, arial;
+  color: #333;
+}
+.node rect,
+.node circle,
+.node ellipse,
+.node polygon {
+  fill: #cde498;
+  stroke: #13540c;
+  stroke-width: 1px;
+}
+.arrowheadPath {
+  fill: green;
+}
+.edgePath .path {
+  stroke: green;
+  stroke-width: 1.5px;
+}
+.edgeLabel {
+  background-color: #e8e8e8;
+}
+.cluster rect {
+  fill: #cdffb2 !important;
+  rx: 4 !important;
+  stroke: #6eaa49 !important;
+  stroke-width: 1px !important;
+}
+.cluster text {
+  fill: #333;
+}
+.actor {
+  stroke: #13540c;
+  fill: #cde498;
+}
+text.actor {
+  fill: black;
+  stroke: none;
+}
+.actor-line {
+  stroke: grey;
+}
+.messageLine0 {
+  stroke-width: 1.5;
+  stroke-dasharray: "2 2";
+  marker-end: "url(#arrowhead)";
+  stroke: #333;
+}
+.messageLine1 {
+  stroke-width: 1.5;
+  stroke-dasharray: "2 2";
+  stroke: #333;
+}
+#arrowhead {
+  fill: #333;
+}
+#crosshead path {
+  fill: #333 !important;
+  stroke: #333 !important;
+}
+.messageText {
+  fill: #333;
+  stroke: none;
+}
+.labelBox {
+  stroke: #326932;
+  fill: #cde498;
+}
+.labelText {
+  fill: black;
+  stroke: none;
+}
+.loopText {
+  fill: black;
+  stroke: none;
+}
+.loopLine {
+  stroke-width: 2;
+  stroke-dasharray: "2 2";
+  marker-end: "url(#arrowhead)";
+  stroke: #326932;
+}
+.note {
+  stroke: #6eaa49;
+  fill: #fff5ad;
+}
+.noteText {
+  fill: black;
+  stroke: none;
+  font-family: 'trebuchet ms', verdana, arial;
+  font-size: 14px;
+}
+/** Section styling */
+.section {
+  stroke: none;
+  opacity: 0.2;
+}
+.section0 {
+  fill: #6eaa49;
+}
+.section2 {
+  fill: #6eaa49;
+}
+.section1,
+.section3 {
+  fill: white;
+  opacity: 0.2;
+}
+.sectionTitle0 {
+  fill: #333;
+}
+.sectionTitle1 {
+  fill: #333;
+}
+.sectionTitle2 {
+  fill: #333;
+}
+.sectionTitle3 {
+  fill: #333;
+}
+.sectionTitle {
+  text-anchor: start;
+  font-size: 11px;
+  text-height: 14px;
+}
+/* Grid and axis */
+.grid .tick {
+  stroke: lightgrey;
+  opacity: 0.3;
+  shape-rendering: crispEdges;
+}
+.grid path {
+  stroke-width: 0;
+}
+/* Today line */
+.today {
+  fill: none;
+  stroke: red;
+  stroke-width: 2px;
+}
+/* Task styling */
+/* Default task */
+.task {
+  stroke-width: 2;
+}
+.taskText {
+  text-anchor: middle;
+  font-size: 11px;
+}
+.taskTextOutsideRight {
+  fill: black;
+  text-anchor: start;
+  font-size: 11px;
+}
+.taskTextOutsideLeft {
+  fill: black;
+  text-anchor: end;
+  font-size: 11px;
+}
+/* Specific task settings for the sections*/
+.taskText0,
+.taskText1,
+.taskText2,
+.taskText3 {
+  fill: white;
+}
+.task0,
+.task1,
+.task2,
+.task3 {
+  fill: #487e3a;
+  stroke: #13540c;
+}
+.taskTextOutside0,
+.taskTextOutside2 {
+  fill: black;
+}
+.taskTextOutside1,
+.taskTextOutside3 {
+  fill: black;
+}
+/* Active task */
+.active0,
+.active1,
+.active2,
+.active3 {
+  fill: #cde498;
+  stroke: #13540c;
+}
+.activeText0,
+.activeText1,
+.activeText2,
+.activeText3 {
+  fill: black !important;
+}
+/* Completed task */
+.done0,
+.done1,
+.done2,
+.done3 {
+  stroke: grey;
+  fill: lightgrey;
+  stroke-width: 2;
+}
+.doneText0,
+.doneText1,
+.doneText2,
+.doneText3 {
+  fill: black !important;
+}
+/* Tasks on the critical line */
+.crit0,
+.crit1,
+.crit2,
+.crit3 {
+  stroke: #ff8888;
+  fill: red;
+  stroke-width: 2;
+}
+.activeCrit0,
+.activeCrit1,
+.activeCrit2,
+.activeCrit3 {
+  stroke: #ff8888;
+  fill: #cde498;
+  stroke-width: 2;
+}
+.doneCrit0,
+.doneCrit1,
+.doneCrit2,
+.doneCrit3 {
+  stroke: #ff8888;
+  fill: lightgrey;
+  stroke-width: 2;
+  cursor: pointer;
+  shape-rendering: crispEdges;
+}
+.doneCritText0,
+.doneCritText1,
+.doneCritText2,
+.doneCritText3 {
+  fill: black !important;
+}
+.activeCritText0,
+.activeCritText1,
+.activeCritText2,
+.activeCritText3 {
+  fill: black !important;
+}
+.titleText {
+  text-anchor: middle;
+  font-size: 18px;
+  fill: black;
+}
+g.classGroup text {
+  fill: #13540c;
+  stroke: none;
+  font-family: 'trebuchet ms', verdana, arial;
+  font-size: 10px;
+}
+g.classGroup rect {
+  fill: #cde498;
+  stroke: #13540c;
+}
+g.classGroup line {
+  stroke: #13540c;
+  stroke-width: 1;
+}
+svg .classLabel .box {
+  stroke: none;
+  stroke-width: 0;
+  fill: #cde498;
+  opacity: 0.5;
+}
+svg .classLabel .label {
+  fill: #13540c;
+  font-size: 10px;
+}
+.relation {
+  stroke: #13540c;
+  stroke-width: 1;
+  fill: none;
+}
+.composition {
+  fill: #13540c;
+  stroke: #13540c;
+  stroke-width: 1;
+}
+#compositionStart {
+  fill: #13540c;
+  stroke: #13540c;
+  stroke-width: 1;
+}
+#compositionEnd {
+  fill: #13540c;
+  stroke: #13540c;
+  stroke-width: 1;
+}
+.aggregation {
+  fill: #cde498;
+  stroke: #13540c;
+  stroke-width: 1;
+}
+#aggregationStart {
+  fill: #cde498;
+  stroke: #13540c;
+  stroke-width: 1;
+}
+#aggregationEnd {
+  fill: #cde498;
+  stroke: #13540c;
+  stroke-width: 1;
+}
+#dependencyStart {
+  fill: #13540c;
+  stroke: #13540c;
+  stroke-width: 1;
+}
+#dependencyEnd {
+  fill: #13540c;
+  stroke: #13540c;
+  stroke-width: 1;
+}
+#extensionStart {
+  fill: #13540c;
+  stroke: #13540c;
+  stroke-width: 1;
+}
+#extensionEnd {
+  fill: #13540c;
+  stroke: #13540c;
+  stroke-width: 1;
+}
+.node text {
+  font-family: 'trebuchet ms', verdana, arial;
+  font-size: 14px;
+}
+div.mermaidTooltip {
+  position: absolute;
+  text-align: center;
+  max-width: 200px;
+  padding: 2px;
+  font-family: 'trebuchet ms', verdana, arial;
+  font-size: 12px;
+  background: #cdffb2;
+  border: 1px solid #6eaa49;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 100;
+}
+
+svg {
+  color: rgba(0, 0, 0, 0.65);
+  font: normal normal 400 normal 12px / 18px "Helvetica Neue For Number", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+  </style><g><g class="output"><g class="clusters"></g><g class="edgePaths"><g class="edgePath" style="opacity: 1;"><path class="path" d="M304.34374999999994,92.23749847412107L303.84375,125.73750305175781L304.34375,160.23750457763677" marker-end="url(#arrowhead51)" style="fill:none"></path><defs><marker id="arrowhead51" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker></defs></g><g class="edgePath" style="opacity: 1;"><path class="path" d="M304.34375,261.5375015258789L303.84375,295.0375061035156L303.84375,329.0375061035156" marker-end="url(#arrowhead52)" style="fill:none"></path><defs><marker id="arrowhead52" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker></defs></g><g class="edgePath" style="opacity: 1;"><path class="path" d="M280.5922759433962,367.0375061035156L238.984375,401.0375061035156L238.984375,454.0375061035156L238.984375,507.0375061035156L280.5922759433962,541.0375061035156" marker-end="url(#arrowhead53)" style="fill:none"></path><defs><marker id="arrowhead53" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker></defs></g><g class="edgePath" style="opacity: 1;"><path class="path" d="M327.0952240566038,367.0375061035156L368.703125,401.0375061035156L368.703125,435.0375061035156" marker-end="url(#arrowhead54)" style="fill:none"></path><defs><marker id="arrowhead54" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker></defs></g><g class="edgePath" style="opacity: 1;"><path class="path" d="M454.828125,441.66610903311084L500.9739583333333,435.0375061035156L512.5104166666667,435.0375061035156L524.046875,454.0375061035156L512.5104166666667,473.0375061035156L500.9739583333333,473.0375061035156L454.828125,466.4089031739204" marker-end="url(#arrowhead55)" style="fill:none"></path><defs><marker id="arrowhead55" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker></defs></g><g class="edgePath" style="opacity: 1;"><path class="path" d="M368.703125,473.0375061035156L368.703125,507.0375061035156L327.0952240566038,541.0375061035156" marker-end="url(#arrowhead56)" style="fill:none"></path><defs><marker id="arrowhead56" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker></defs></g><g class="edgePath" style="opacity: 1;"><path class="path" d="M242.25619103773585,579.0375061035156L132.046875,613.0375061035156L132.046875,647.0375061035156" marker-end="url(#arrowhead57)" style="fill:none"></path><defs><marker id="arrowhead57" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker></defs></g><g class="edgePath" style="opacity: 1;"><path class="path" d="M365.43130896226415,579.0375061035156L475.640625,613.0375061035156L475.640625,647.0375061035156" marker-end="url(#arrowhead58)" style="fill:none"></path><defs><marker id="arrowhead58" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker></defs></g><g class="edgePath" style="opacity: 1;"><path class="path" d="M132.046875,685.0375061035156L132.046875,710.0375061035156L229.65873579545456,735.0375061035156" marker-end="url(#arrowhead59)" style="fill:none"></path><defs><marker id="arrowhead59" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker></defs></g><g class="edgePath" style="opacity: 1;"><path class="path" d="M475.640625,685.0375061035156L475.640625,710.0375061035156L378.02876420454544,735.0375061035156" marker-end="url(#arrowhead60)" style="fill:none"></path><defs><marker id="arrowhead60" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker></defs></g><g class="edgePath" style="opacity: 1;"><path class="path" d="M303.84375,773.0375061035156L303.84375,807.0375061035156L304.34374999999994,841.537507629394" marker-end="url(#arrowhead61)" style="fill:none"></path><defs><marker id="arrowhead61" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker></defs></g></g><g class="edgeLabels"><g class="edgeLabel" style="opacity: 1;" transform="translate(303.84375,125.73750305175781)"><g transform="translate(-129.7578125,-9)" class="label"><foreignObject width="259.515625" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;"><span class="edgeLabel">Redirects to consent app with consent request ID</span></div></foreignObject></g></g><g class="edgeLabel" style="opacity: 1;" transform="translate(303.84375,295.0375061035156)"><g transform="translate(-57.9609375,-9)" class="label"><foreignObject width="115.921875" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;"><span class="edgeLabel">Initiates Consent Flow</span></div></foreignObject></g></g><g class="edgeLabel" style="opacity: 1;" transform="translate(238.984375,454.0375061035156)"><g transform="translate(-8.59375,-9)" class="label"><foreignObject width="17.1875" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;"><span class="edgeLabel">yes</span></div></foreignObject></g></g><g class="edgeLabel" style="opacity: 1;" transform="translate(368.703125,401.0375061035156)"><g transform="translate(-6.9140625,-9)" class="label"><foreignObject width="13.828125" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;"><span class="edgeLabel">no</span></div></foreignObject></g></g><g class="edgeLabel" style="opacity: 1;" transform="translate(524.046875,454.0375061035156)"><g transform="translate(-34.21875,-9)" class="label"><foreignObject width="68.4375" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;"><span class="edgeLabel">Sign in failed</span></div></foreignObject></g></g><g class="edgeLabel" style="opacity: 1;" transform="translate(368.703125,507.0375061035156)"><g transform="translate(-46.1484375,-9)" class="label"><foreignObject width="92.296875" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;"><span class="edgeLabel">Sign in successful</span></div></foreignObject></g></g><g class="edgeLabel" style="opacity: 1;" transform="translate(132.046875,613.0375061035156)"><g transform="translate(-67.4765625,-9)" class="label"><foreignObject width="134.953125" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;"><span class="edgeLabel">User denies authorization</span></div></foreignObject></g></g><g class="edgeLabel" style="opacity: 1;" transform="translate(475.640625,613.0375061035156)"><g transform="translate(-70.1171875,-9)" class="label"><foreignObject width="140.234375" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;"><span class="edgeLabel">User accepts authorization</span></div></foreignObject></g></g><g class="edgeLabel" style="opacity: 1;" transform=""><g transform="translate(0,0)" class="label"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel" style="opacity: 1;" transform=""><g transform="translate(0,0)" class="label"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel" style="opacity: 1;" transform="translate(303.84375,807.0375061035156)"><g transform="translate(-73.859375,-9)" class="label"><foreignObject width="147.71875" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;"><span class="edgeLabel">Redirect to redirectUrl value</span></div></foreignObject></g></g></g><g class="nodes"><g class="node" style="opacity: 1;" id="H" transform="translate(303.84375,55.868751525878906)"><polygon points="35.86875,0 71.7375,-35.86875 35.86875,-71.7375 0,-35.86875" rx="5" ry="5" transform="translate(-35.86875,35.86875)"></polygon><g class="label" transform="translate(0,0)"><g transform="translate(-15.8359375,-9)"><foreignObject width="31.671875" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">Hydra</div></foreignObject></g></g></g><g class="node" style="opacity: 1;" id="C" transform="translate(303.84375,210.38750457763672)"><polygon points="50.650000000000006,0 101.30000000000001,-50.650000000000006 50.650000000000006,-101.30000000000001 0,-50.650000000000006" rx="5" ry="5" transform="translate(-50.650000000000006,50.650000000000006)"></polygon><g class="label" transform="translate(0,0)"><g transform="translate(-34.3125,-9)"><foreignObject width="68.625" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">Consent App</div></foreignObject></g></g></g><g class="node" style="opacity: 1;" id="CA" transform="translate(303.84375,348.0375061035156)"><rect rx="5" ry="5" x="-86.453125" y="-19" width="172.90625" height="38"></rect><g class="label" transform="translate(0,0)"><g transform="translate(-76.453125,-9)"><foreignObject width="152.90625" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">Is the user signed in already?</div></foreignObject></g></g></g><g class="node" style="opacity: 1;" id="CC" transform="translate(303.84375,560.0375061035156)"><rect rx="5" ry="5" x="-113.703125" y="-19" width="227.40625" height="38"></rect><g class="label" transform="translate(0,0)"><g transform="translate(-103.703125,-9)"><foreignObject width="207.40625" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">Ask user to authorize requested scopes</div></foreignObject></g></g></g><g class="node" style="opacity: 1;" id="CL" transform="translate(368.703125,454.0375061035156)"><rect rx="5" ry="5" x="-86.125" y="-19" width="172.25" height="38"></rect><g class="label" transform="translate(0,0)"><g transform="translate(-76.125,-9)"><foreignObject width="152.25" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">Sign user in using login form</div></foreignObject></g></g></g><g class="node" style="opacity: 1;" id="CHD" transform="translate(132.046875,666.0375061035156)"><rect rx="5" ry="5" x="-112.046875" y="-19" width="224.09375" height="38"></rect><g class="label" transform="translate(0,0)"><g transform="translate(-102.046875,-9)"><foreignObject width="204.09375" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">Tell Hydra to deny the consent request</div></foreignObject></g></g></g><g class="node" style="opacity: 1;" id="CHA" transform="translate(475.640625,666.0375061035156)"><rect rx="5" ry="5" x="-181.546875" y="-19" width="363.09375" height="38"></rect><g class="label" transform="translate(0,0)"><g transform="translate(-171.546875,-9)"><foreignObject width="343.09375" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">Tell Hydra to accept the consent request with the granted scopes</div></foreignObject></g></g></g><g class="node" style="opacity: 1;" id="CHR" transform="translate(303.84375,754.0375061035156)"><rect rx="5" ry="5" x="-149.1640625" y="-19" width="298.328125" height="38"></rect><g class="label" transform="translate(0,0)"><g transform="translate(-139.1640625,-9)"><foreignObject width="278.328125" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">Read redirectUrl value from consent request payload</div></foreignObject></g></g></g><g class="node" style="opacity: 1;" id="H2" transform="translate(303.84375,876.9062576293945)"><polygon points="35.86875,0 71.7375,-35.86875 35.86875,-71.7375 0,-35.86875" rx="5" ry="5" transform="translate(-35.86875,35.86875)"></polygon><g class="label" transform="translate(0,0)"><g transform="translate(-15.8359375,-9)"><foreignObject width="31.671875" height="18"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">Hydra</div></foreignObject></g></g></g></g></g></g></svg>

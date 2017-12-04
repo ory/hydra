@@ -67,7 +67,7 @@ login service ("user management") and implement the consent flow with it.
 
 Let us look at the sequence of requests being made to successfully perform an OAuth 2.0 authorize code flow using ORY Hydra:
 
-![Consent flow](./images/consent-flow.svg)
+![Consent flow sequence diagram](./images/consent-flow.svg)
 
 The state machine of the consent app itself typically looks as followed.
 
@@ -86,7 +86,7 @@ CHA-->CHR
 CHR-->|Redirect to redirectUrl value|H2{Hydra}
 -->
 
-![](./images/consent-state.svg)
+![Consent app state diagram](./images/consent-state.svg)
 
 **Legend:**
 
@@ -108,9 +108,9 @@ consent request.
 
 Here is how Google chose to design the login and consent UI (what we call the "consent app"):
 
-!()[./images/google.png]
+![Google OAuth 2.0 Log In Screen](./images/google.png)
 
-!()[./images/google2.png]
+![Google OAuth 2.0 Authorization In Screen](./images/google2.png)
 
 ### Consent REST API
 

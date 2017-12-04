@@ -48,6 +48,7 @@ able to securely manage JSON Web Keys, and has a sophisticated policy-based acce
     - [Using Docker](#using-docker)
     - [Building from source](#building-from-source)
 - [Security](#security)
+  - [Disclosing vulnerabilities](#disclosing-vulnerabilities)
 - [Telemetry](#telemetry)
 - [Sponsors](#sponsors)
   - [Sponsorship](#sponsorship)
@@ -186,6 +187,11 @@ OAuth2 and OAuth2 related specifications are over 400 written pages. Implementin
 ORY Hydra is trusted by companies all around the world, has a vibrant community and faces millions of requests in production
 each day. Of course, we also compiled a security guide with more details on cryptography and security concepts.
 Read [the security guide now](https://ory.gitbooks.io/hydra/content/security.html).
+
+### Disclosing vulnerabilities
+
+If you think you found a security vulnerability, please refrain from posting it publicly on the forums, the chat, or GitHub
+and send us an email to [hi@ory.am](mailto:hi@ory.am) instead.
 
 ## Telemetry
 

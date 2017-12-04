@@ -56,6 +56,7 @@ able to securely manage JSON Web Keys, and has a sophisticated policy-based acce
 - [Documentation](#documentation)
   - [Guide](#guide)
   - [HTTP API documentation](#http-api-documentation)
+  - [Upgrading and Changelog](#upgrading-and-changelog)
   - [Command line documentation](#command-line-documentation)
   - [Develop](#develop)
 - [Reception](#reception)
@@ -234,6 +235,11 @@ The Guide is available on [GitBook](https://ory.gitbooks.io/hydra/content/).
 ### HTTP API documentation
 
 The HTTP API is documented at [Apiary](http://docs.hydra13.apiary.io/).
+
+### Upgrading and Changelog
+
+New releases might introduce breaking changes. To help you identify and incorporate those changes, we document these
+changes in [UPGRADE.md](./UPGRADE.md) and [CHANGELOG.md](./CHANGELOG.md).
 
 ### Command line documentation
 

@@ -25,7 +25,9 @@ import:
 - package: github.com/oleiade/reflections
   version: 1.0.0
 - package: github.com/ory/fosite
-  version: 0.10.0
+  repo: https://github.com/coupa/fosite
+  vcs: git
+  version: v_0.10.0
   subpackages:
   - compose
   - handler/oauth2

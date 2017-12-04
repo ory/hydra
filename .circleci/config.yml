@@ -103,7 +103,8 @@ jobs:
       - run: github_changelog_generator -u ory -p hydra -o CHANGELOG.md --token $GITHUB_TOKEN
       - run: doctoc CHANGELOG.md
       - run: git add CHANGELOG.md
-      - run: git commit -m "docs: Incorporates changes from version $(git describe --tags)" -- CHANGELOG.md
+      - run: |
+          git commit -m "docs: Incorporates changes from version $(git describe --tags)" -- CHANGELOG.md
       - run: git remote rm origin
       - run: git remote add origin https://arekkas:$GITHUB_TOKEN@github.com/ory/hydra.git
       - run: git push origin

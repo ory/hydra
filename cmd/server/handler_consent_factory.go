@@ -51,6 +51,7 @@ func newConsentHanlder(c *config.Config, router *httprouter.Router) *oauth2.Cons
 	h := &oauth2.ConsentSessionHandler{
 		H: herodot.NewJSONWriter(c.GetLogger()),
 		W: ctx.Warden, M: ctx.ConsentManager,
+		ResourcePrefix: c.AccessControlResourcePrefix,
 	}
 
 	h.SetRoutes(router)

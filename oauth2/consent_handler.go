@@ -31,7 +31,7 @@ const (
 
 	ConsentRequestPath = "/oauth2/consent/requests"
 
-	ConsentResource = "rn:hydra:oauth2:consent:requests:%s"
+	ConsentResource = "oauth2:consent:requests:%s"
 	ConsentScope    = "hydra.consent"
 )
 
@@ -39,6 +39,20 @@ type ConsentSessionHandler struct {
 	H herodot.Writer
 	M ConsentRequestManager
 	W firewall.Firewall
+
+	ResourcePrefix string
+}
+
+func (h *ConsentSessionHandler) PrefixResource(resource string) string {
+	if h.ResourcePrefix == "" {
+		h.ResourcePrefix = "rn:hydra"
+	}
+
+	if h.ResourcePrefix[len(h.ResourcePrefix)-1] == ':' {
+		h.ResourcePrefix = h.ResourcePrefix[:len(h.ResourcePrefix)-1]
+	}
+
+	return h.ResourcePrefix + ":" + resource
 }
 
 func (h *ConsentSessionHandler) SetRoutes(r *httprouter.Router) {
@@ -82,7 +96,7 @@ func (h *ConsentSessionHandler) SetRoutes(r *httprouter.Router) {
 //       500: genericError
 func (h *ConsentSessionHandler) FetchConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if _, err := h.W.TokenAllowed(r.Context(), h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: fmt.Sprintf(ConsentResource, ps.ByName("id")),
+		Resource: fmt.Sprintf(h.PrefixResource(ConsentResource), ps.ByName("id")),
 		Action:   "get",
 	}, ConsentScope); err != nil {
 		h.H.WriteError(w, r, err)
@@ -136,7 +150,7 @@ func (h *ConsentSessionHandler) FetchConsentRequest(w http.ResponseWriter, r *ht
 //       500: genericError
 func (h *ConsentSessionHandler) RejectConsentRequestHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if _, err := h.W.TokenAllowed(r.Context(), h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: fmt.Sprintf(ConsentResource, ps.ByName("id")),
+		Resource: fmt.Sprintf(h.PrefixResource(ConsentResource), ps.ByName("id")),
 		Action:   "reject",
 	}, ConsentScope); err != nil {
 		h.H.WriteError(w, r, err)
@@ -196,7 +210,7 @@ func (h *ConsentSessionHandler) RejectConsentRequestHandler(w http.ResponseWrite
 //       500: genericError
 func (h *ConsentSessionHandler) AcceptConsentRequestHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if _, err := h.W.TokenAllowed(r.Context(), h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: fmt.Sprintf(ConsentResource, ps.ByName("id")),
+		Resource: fmt.Sprintf(h.PrefixResource(ConsentResource), ps.ByName("id")),
 		Action:   "accept",
 	}, ConsentScope); err != nil {
 		h.H.WriteError(w, r, err)

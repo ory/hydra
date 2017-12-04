@@ -42,7 +42,7 @@ func TestGenerator(t *testing.T) {
 			},
 		},
 		{
-			g: &ECDSA521Generator{},
+			g: &ECDSA512Generator{},
 			check: func(ks *jose.JSONWebKeySet) {
 				assert.Len(t, ks, 2)
 				assert.NotEmpty(t, ks.Keys[0].Key)

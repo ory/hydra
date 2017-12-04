@@ -55,14 +55,29 @@ var notAllowed = struct {
 type WardenHandler struct {
 	H      herodot.Writer
 	Warden firewall.Firewall
+
+	ResourcePrefix string
+}
+
+func (h *WardenHandler) PrefixResource(resource string) string {
+	if h.ResourcePrefix == "" {
+		h.ResourcePrefix = "rn:hydra"
+	}
+
+	if h.ResourcePrefix[len(h.ResourcePrefix)-1] == ':' {
+		h.ResourcePrefix = h.ResourcePrefix[:len(h.ResourcePrefix)-1]
+	}
+
+	return h.ResourcePrefix + ":" + resource
 }
 
 func NewHandler(c *config.Config, router *httprouter.Router) *WardenHandler {
 	ctx := c.Context()
 
 	h := &WardenHandler{
-		H:      herodot.NewJSONWriter(c.GetLogger()),
-		Warden: ctx.Warden,
+		H:              herodot.NewJSONWriter(c.GetLogger()),
+		Warden:         ctx.Warden,
+		ResourcePrefix: c.AccessControlResourcePrefix,
 	}
 	h.SetRoutes(router)
 
@@ -112,7 +127,7 @@ func (h *WardenHandler) SetRoutes(r *httprouter.Router) {
 func (h *WardenHandler) Allowed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = r.Context()
 	if _, err := h.Warden.TokenAllowed(ctx, h.Warden.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: "rn:hydra:warden:allowed",
+		Resource: h.PrefixResource("warden:allowed"),
 		Action:   "decide",
 	}, "hydra.warden"); err != nil {
 		h.H.WriteError(w, r, err)
@@ -180,7 +195,7 @@ func (h *WardenHandler) Allowed(w http.ResponseWriter, r *http.Request, _ httpro
 func (h *WardenHandler) TokenAllowed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := r.Context()
 	_, err := h.Warden.TokenAllowed(ctx, h.Warden.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: "rn:hydra:warden:token:allowed",
+		Resource: h.PrefixResource("warden:token:allowed"),
 		Action:   "decide",
 	}, "hydra.warden")
 	if err != nil {

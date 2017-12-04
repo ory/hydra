@@ -32,17 +32,30 @@ const (
 )
 
 type Handler struct {
-	Manager    Manager
-	Generators map[string]KeyGenerator
-	H          herodot.Writer
-	W          firewall.Firewall
+	Manager        Manager
+	Generators     map[string]KeyGenerator
+	H              herodot.Writer
+	W              firewall.Firewall
+	ResourcePrefix string
+}
+
+func (h *Handler) PrefixResource(resource string) string {
+	if h.ResourcePrefix == "" {
+		h.ResourcePrefix = "rn:hydra"
+	}
+
+	if h.ResourcePrefix[len(h.ResourcePrefix)-1] == ':' {
+		h.ResourcePrefix = h.ResourcePrefix[:len(h.ResourcePrefix)-1]
+	}
+
+	return h.ResourcePrefix + ":" + resource
 }
 
 func (h *Handler) GetGenerators() map[string]KeyGenerator {
 	if h.Generators == nil || len(h.Generators) == 0 {
 		h.Generators = map[string]KeyGenerator{
 			"RS256": &RS256Generator{},
-			"ES521": &ECDSA521Generator{},
+			"ES512": &ECDSA512Generator{},
 			"HS256": &HS256Generator{},
 			"HS512": &HS512Generator{},
 		}
@@ -66,7 +79,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 
 // swagger:model jsonWebKeySetGeneratorRequest
 type createRequest struct {
-	// The algorithm to be used for creating the key. Supports "RS256", "ES521", "HS512", and "HS256"
+	// The algorithm to be used for creating the key. Supports "RS256", "ES512", "HS512", and "HS256"
 	// required: true
 	// in: body
 	Algorithm string `json:"alg"`
@@ -114,12 +127,12 @@ type joseWebKeySetRequest struct {
 func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var ctx = context.Background()
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: "rn:hydra:keys:" + IDTokenKeyName + ":public",
+		Resource: h.PrefixResource("keys:" + IDTokenKeyName + ":public"),
 		Action:   "get",
 	}, "hydra.keys.get"); err != nil {
 		if err := h.W.IsAllowed(ctx, &firewall.AccessRequest{
 			Subject:  "",
-			Resource: "rn:hydra:keys:" + IDTokenKeyName + ":public",
+			Resource: h.PrefixResource("keys:" + IDTokenKeyName + ":public"),
 			Action:   "get",
 		}); err != nil {
 			h.H.WriteError(w, r, err)
@@ -177,12 +190,12 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	var keyName = ps.ByName("key")
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: "rn:hydra:keys:" + setName + ":" + keyName,
+		Resource: h.PrefixResource("keys:" + setName + ":" + keyName),
 		Action:   "get",
 	}, "hydra.keys.get"); err != nil {
 		if err := h.W.IsAllowed(ctx, &firewall.AccessRequest{
 			Subject:  "",
-			Resource: "rn:hydra:keys:" + setName + ":" + keyName,
+			Resource: h.PrefixResource("keys:" + setName + ":" + keyName),
 			Action:   "get",
 		}); err != nil {
 			h.H.WriteError(w, r, err)
@@ -246,7 +259,7 @@ func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httproute
 
 	for _, key := range keys.Keys {
 		if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-			Resource: "rn:hydra:keys:" + setName + ":" + key.KeyID,
+			Resource: h.PrefixResource("keys:" + setName + ":" + key.KeyID),
 			Action:   "get",
 		}, "hydra.keys.get"); err != nil {
 			h.H.WriteError(w, r, err)
@@ -300,7 +313,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	var set = ps.ByName("set")
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: "rn:hydra:keys:" + set,
+		Resource: h.PrefixResource("keys:" + set),
 		Action:   "create",
 	}, "hydra.keys.create"); err != nil {
 		h.H.WriteError(w, r, err)
@@ -371,7 +384,7 @@ func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 	var set = ps.ByName("set")
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: "rn:hydra:keys:" + set,
+		Resource: h.PrefixResource("keys:" + set),
 		Action:   "update",
 	}, "hydra.keys.update"); err != nil {
 		h.H.WriteError(w, r, err)
@@ -443,7 +456,7 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 	}
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: "rn:hydra:keys:" + set + ":" + key.KeyID,
+		Resource: h.PrefixResource("keys:" + set + ":" + key.KeyID),
 		Action:   "update",
 	}, "hydra.keys.update"); err != nil {
 		h.H.WriteError(w, r, err)
@@ -493,7 +506,7 @@ func (h *Handler) DeleteKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 	var setName = ps.ByName("set")
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: "rn:hydra:keys:" + setName,
+		Resource: h.PrefixResource("keys:" + setName),
 		Action:   "delete",
 	}, "hydra.keys.delete"); err != nil {
 		h.H.WriteError(w, r, err)
@@ -544,7 +557,7 @@ func (h *Handler) DeleteKey(w http.ResponseWriter, r *http.Request, ps httproute
 	var keyName = ps.ByName("key")
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: "rn:hydra:keys:" + setName + ":" + keyName,
+		Resource: h.PrefixResource("keys:" + setName + ":" + keyName),
 		Action:   "delete",
 	}, "hydra.keys.delete"); err != nil {
 		h.H.WriteError(w, r, err)

@@ -53,6 +53,7 @@ func newClientHandler(c *config.Config, router *httprouter.Router, manager clien
 	h := &client.Handler{
 		H: herodot.NewJSONWriter(c.GetLogger()),
 		W: ctx.Warden, Manager: manager,
+		ResourcePrefix: c.AccessControlResourcePrefix,
 	}
 
 	h.SetRoutes(router)

@@ -75,12 +75,13 @@ The state machine of the consent app itself typically looks as followed.
 graph TD
 H{Hydra} -->|Redirects to consent app with consent request ID| C{Consent App}
 C -->|Initiates Consent Flow| CA(Is the user signed in already?)
-CA -->|yes| CC(Ask user to authorize requested scopes)
+CA -->|yes| CG(Fetch consent request from Hydra using REST API)
 CA -->|no| CL(Sign user in using login form)
 CL -->|Sign in failed| CL
-CL -->|Sign in successful| CC
-CC -->|User denies authorization| CHD(Tell Hydra to deny the consent request)
-CC -->|User accepts authorization| CHA(Tell Hydra to accept the consent request with the granted scopes)
+CL -->|Sign in successful| CG
+CG-->CC(Ask user to authorize requested scopes)
+CC -->|User denies authorization| CHD(Tell Hydra to deny the consent request using REST API)
+CC -->|User accepts authorization| CHA(Tell Hydra to accept the consent request with the granted scopes using REST API)
 CHD-->CHR(Read redirectUrl value from consent request payload)
 CHA-->CHR
 CHR-->|Redirect to redirectUrl value|H2{Hydra}

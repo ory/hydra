@@ -151,8 +151,8 @@ func initConfig() {
 	viper.BindEnv("LOG_FORMAT")
 	viper.SetDefault("LOG_FORMAT", "")
 
-	viper.BindEnv("AC_RESOURCE_PREFIX")
-	viper.SetDefault("AC_RESOURCE_PREFIX", "")
+	viper.BindEnv("RESOURCE_NAME_PREFIX")
+	viper.SetDefault("RESOURCE_NAME_PREFIX", "")
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err != nil {

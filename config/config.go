@@ -69,7 +69,7 @@ type Config struct {
 	CookieSecret                string `mapstructure:"COOKIE_SECRET" yaml:"-"`
 	LogLevel                    string `mapstructure:"LOG_LEVEL" yaml:"-"`
 	LogFormat                   string `mapstructure:"LOG_FORMAT" yaml:"-"`
-	AccessControlResourcePrefix string `mapstructure:"AC_RESOURCE_PREFIX" yaml:"-"`
+	AccessControlResourcePrefix string `mapstructure:"RESOURCE_NAME_PREFIX" yaml:"-"`
 	ForceHTTP                   bool   `yaml:"-"`
 
 	BuildVersion string                  `yaml:"-"`

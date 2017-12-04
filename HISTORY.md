@@ -48,6 +48,10 @@ This list makes you aware of any breaking and substantial non-breaking changes.
 
 ## 0.10.0-alpha.22
 
+### Additions
+
+### Breaking changes
+
 The JWK algorithm `ES521` was renamed to `ES512`. If you want to generate a key using this algorithm, you have to use
 the update name in the future.
 

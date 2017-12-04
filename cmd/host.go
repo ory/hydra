@@ -85,6 +85,10 @@ CORE CONTROLS
 	visit https://ory.gitbooks.io/hydra/content/telemetry.html
 	Example: DISABLE_TELEMETRY="1"
 
+- RESOURCE_NAME_PREFIX: Allows the alternation of the "rn:hydra:" prefix in all resource names declared by ORY Hydra.
+	Defaults to "rn:hydra" if empty and removes the last trailing colon.
+	Example: RESOURCE_NAME_PREFIX="resources:my-domain.com"
+
 
 OAUTH2 CONTROLS
 ===============

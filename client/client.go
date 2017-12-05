@@ -36,7 +36,7 @@ type Client struct {
 	// that they need to write the secret down as it will not be made available again.
 	Secret string `json:"client_secret,omitempty" gorethink:"client_secret"`
 
-	// RedirectURIs is an array of allowed redirect urls for the client, for example: http://mydomain/oauth/callback .
+	// RedirectURIs is an array of allowed redirect urls for the client, for example http://mydomain/oauth/callback .
 	RedirectURIs []string `json:"redirect_uris" gorethink:"redirect_uris"`
 
 	// GrantTypes is an array of grant types the client is allowed to use.

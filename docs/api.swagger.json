@@ -2254,12 +2254,12 @@
           "x-go-name": "Public"
         },
         "redirect_uris": {
+          "description": "RedirectURIs is an array of allowed redirect urls for the client, for example http://mydomain/oauth/callback .",
           "type": "array",
           "items": {
             "type": "string"
           },
-          "x-go-name": "RedirectURIs",
-          "example": "http://mydomain/oauth/callback ."
+          "x-go-name": "RedirectURIs"
         },
         "response_types": {
           "description": "ResponseTypes is an array of the OAuth 2.0 response type strings that the client can\nuse at the authorization endpoint.",
@@ -2273,7 +2273,7 @@
         "scope": {
           "description": "Scope is a string containing a space-separated list of scope values (as\ndescribed in Section 3.3 of OAuth 2.0 [RFC6749]) that the client\ncan use when requesting access tokens.",
           "type": "string",
-          "pattern": "([a-zA-Z0-9\\.\\*]+\\s?)+",
+          "pattern": "([a-zA-Z0-9\\.\\*]+\\s)+",
           "x-go-name": "Scope"
         },
         "tos_uri": {

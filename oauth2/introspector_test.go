@@ -16,13 +16,11 @@ package oauth2_test
 
 import (
 	"fmt"
+	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
-
-	"strings"
-
-	"net/http"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
@@ -33,7 +31,6 @@ import (
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
-	"github.com/ory/hydra/warden"
 	"github.com/ory/ladon"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -41,18 +38,17 @@ import (
 )
 
 func TestIntrospectorSDK(t *testing.T) {
-	tokens := pkg.Tokens(4)
+	tokens := pkg.Tokens(3)
 	memoryStore := storage.NewExampleStore()
 	memoryStore.Clients["my-client"].Scopes = []string{"fosite", "openid", "photos", "offline", "foo.*"}
 
-	var localWarden, _ = compose2.NewMockFirewall("foo", "app-client", fosite.Arguments{"hydra.introspect"}, &ladon.DefaultPolicy{
+	var localWarden, _ = compose2.NewMockFirewallWithStore("foo", "my-client", fosite.Arguments{"hydra.introspect"}, memoryStore, &ladon.DefaultPolicy{
 		ID:        "1",
 		Subjects:  []string{"my-client"},
 		Resources: []string{"rn:hydra:oauth2:tokens"},
 		Actions:   []string{"introspect"},
 		Effect:    ladon.AllowAccess,
 	})
-	localWarden.(*warden.LocalWarden).OAuth2.(*fosite.Fosite).Store = memoryStore
 
 	l := logrus.New()
 	l.Level = logrus.DebugLevel
@@ -79,64 +75,30 @@ func TestIntrospectorSDK(t *testing.T) {
 	server := httptest.NewServer(router)
 
 	now := time.Now().Round(time.Minute)
-	createAccessTokenSession("alice", "siri", tokens[0][0], now.Add(time.Hour), memoryStore, fosite.Arguments{"core", "foo.*"})
-	createAccessTokenSession("alice", "siri", tokens[0][0], now.Add(time.Hour), memoryStore, fosite.Arguments{"core", "foo.*"})
-	createAccessTokenSession("siri", "siri", tokens[1][0], now.Add(time.Hour), memoryStore, fosite.Arguments{"core", "foo"})
-	createAccessTokenSession("siri", "doesnt-exist", tokens[2][0], now.Add(-time.Hour), memoryStore, fosite.Arguments{"core", "foo.*"})
-	createAccessTokenSession("my-client", "my-client", tokens[3][0], now.Add(time.Hour), memoryStore, fosite.Arguments{"hydra.*"})
-
-	client := hydra.NewOAuth2ApiWithBasePath(server.URL)
-	client.Configuration.Username = "my-client"
-	client.Configuration.Password = "foobar"
+	createAccessTokenSession("alice", "my-client", tokens[0][0], now.Add(time.Hour), memoryStore, fosite.Arguments{"core", "foo.*"})
+	createAccessTokenSession("siri", "my-client", tokens[1][0], now.Add(-time.Hour), memoryStore, fosite.Arguments{"core", "foo.*"})
+	createAccessTokenSession("my-client", "my-client", tokens[2][0], now.Add(time.Hour), memoryStore, fosite.Arguments{"hydra.introspect"})
 
 	t.Run("TestIntrospect", func(t *testing.T) {
 		for k, c := range []struct {
-			token       string
-			description string
-			expectErr   bool
-			scopes      []string
-			assert      func(*testing.T, *hydra.OAuth2TokenIntrospection)
-			prepare func(*testing.T)
+			token          string
+			description    string
+			expectInactive bool
+			expectCode     int
+			scopes         []string
+			assert         func(*testing.T, *hydra.OAuth2TokenIntrospection)
+			prepare        func(*testing.T) *hydra.OAuth2Api
 		}{
 			{
-				description: "should fail because invalid token was supplied",
-				token:       "invalid",
-				expectErr:   true,
-			},
-			{
-				description: "should fail because token is expired",
-				token:       tokens[2][1],
-				expectErr:   true,
-			},
-			{
-				description: "should pass",
-				token:       tokens[1][1],
-				expectErr:   false,
-			},
-			{
-				description: "should fail because scope `foo.bar` was requested but only `foo` is granted",
-				token:       tokens[1][1],
-				expectErr:   true,
-				scopes:      []string{"foo.bar"},
-			},
-			{
-				description: "should pass",
-				token:       tokens[0][1],
-				expectErr:   false,
-			},
-			{
-				description: "should pass",
-				token:       tokens[0][1],
-				expectErr:   false,
-				prepare: func(t *testing.T) {
-					client.Configuration.OAuthToken = tokens[3][0]
+				description: "should pass using bearer authorization",
+				prepare: func(*testing.T) *hydra.OAuth2Api {
+					client := hydra.NewOAuth2ApiWithBasePath(server.URL)
+					client.Configuration.DefaultHeader["Authorization"] = "bearer " + tokens[2][1]
+					return client
 				},
-			},
-			{
-				description: "should pass",
-				token:       tokens[0][1],
-				expectErr:   false,
-				scopes:      []string{"foo.bar"},
+				token:          tokens[0][1],
+				expectInactive: false,
+				scopes:         []string{"foo.bar"},
 				assert: func(t *testing.T, c *hydra.OAuth2TokenIntrospection) {
 					assert.Equal(t, "alice", c.Sub)
 					assert.Equal(t, now.Add(time.Hour).Unix(), c.Exp, "expires at")
@@ -146,23 +108,32 @@ func TestIntrospectorSDK(t *testing.T) {
 				},
 			},
 		} {
-			t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+			t.Run(fmt.Sprintf("case=%d/description=%s", k, c.description), func(t *testing.T) {
+				var client *hydra.OAuth2Api
 				if c.prepare != nil {
-					c.prepare(t)
+					client = c.prepare(t)
+				} else {
+					client = hydra.NewOAuth2ApiWithBasePath(server.URL)
+					client.Configuration.Username = "my-client"
+					client.Configuration.Password = "foobar"
 				}
 
 				ctx, response, err := client.IntrospectOAuth2Token(c.token, strings.Join(c.scopes, " "))
 				require.NoError(t, err)
-				require.EqualValues(t, http.StatusOK, response.StatusCode)
-				t.Logf("Got %s", response.Payload)
 
-				if c.expectErr {
+				if c.expectCode == 0 {
+					require.EqualValues(t, http.StatusOK, response.StatusCode)
+				} else {
+					require.EqualValues(t, c.expectCode, response.StatusCode)
+				}
+
+				if c.expectInactive {
 					assert.False(t, ctx.Active)
 				} else {
 					assert.True(t, ctx.Active)
 				}
 
-				if !c.expectErr && c.assert != nil {
+				if !c.expectInactive && c.assert != nil {
 					c.assert(t, ctx)
 				}
 			})

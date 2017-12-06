@@ -20,6 +20,7 @@ import (
 
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
+	"github.com/ory/fosite/storage"
 	"github.com/ory/hydra/firewall"
 	. "github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
@@ -31,9 +32,13 @@ import (
 )
 
 func NewMockFirewall(issuer string, subject string, scopes fosite.Arguments, p ...ladon.Policy) (firewall.Firewall, *http.Client) {
+	return NewMockFirewallWithStore(issuer, subject, scopes, pkg.FositeStore(), p...)
+}
+
+func NewMockFirewallWithStore(issuer string, subject string, scopes fosite.Arguments, storage *storage.MemoryStore, p ...ladon.Policy) (firewall.Firewall, *http.Client) {
 	tokens := pkg.Tokens(1)
 
-	fositeStore := pkg.FositeStore()
+	fositeStore := storage
 	ps := map[string]ladon.Policy{}
 
 	for _, x := range p {

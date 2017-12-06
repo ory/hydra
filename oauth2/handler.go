@@ -16,12 +16,11 @@ package oauth2
 
 import (
 	"encoding/json"
+	"fmt"
 	"net"
 	"net/http"
 	"net/url"
 	"strings"
-
-	"fmt"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
@@ -206,7 +205,7 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ ht
 //       500: genericError
 func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	if token := h.W.TokenFromRequest(r); token != "" {
-		if _, err := h.W.TokenAllowed(r.Context(), h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
+		if _, err := h.W.TokenAllowed(r.Context(), token, &firewall.TokenAccessRequest{
 			Resource: fmt.Sprintf(h.PrefixResource("oauth2:tokens")),
 			Action:   "introspect",
 		}, IntrospectScope); err != nil {
@@ -244,7 +243,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 	}
 
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
-	err = json.NewEncoder(w).Encode(&Introspection{
+	if err = json.NewEncoder(w).Encode(&Introspection{
 		Active:    true,
 		ClientID:  resp.GetAccessRequester().GetClient().GetID(),
 		Scope:     strings.Join(resp.GetAccessRequester().GetGrantedScopes(), " "),
@@ -255,8 +254,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		Extra:     resp.GetAccessRequester().GetSession().(*Session).Extra,
 		Audience:  resp.GetAccessRequester().GetClient().GetID(),
 		Issuer:    h.Issuer,
-	})
-	if err != nil {
+	}); err != nil {
 		pkg.LogError(err, h.L)
 	}
 }

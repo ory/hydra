@@ -1,10 +1,23 @@
-# Access Control Policies
+# Access Control
 
-Besides OAuth2 Token Introspection, Hydra offers Access Control Policies using
-the [Ladon](https://github.com/ory/ladon) framework. Access Control Policies are used by Hydra internally and exposed
-via various HTTP APIs.
+OAuth 2.0 is a protocol that allows applications to act on a user's behalf,
+without knowing their credentials. While it offers a secure flow for applications
+(web apps, mobile apps, touchpoints, IoT) to gain access to your APIs,
+it does not specify what access rights users actually have.
+The frequent question "is the user actually allowed to access that resource?"
+is not answered by OAuth 2.0, nor by OpenID Connect.
 
-## Introduction to Access Control Policies
+For that reason, ORY Hydra offers something we call Access Control Policies.
+If you ever worked with Google Cloud IAM or AWS IAM, you probably know
+what these policies look like. Access Control Policies are a powerful tool
+capable of modeling simple and complex access control environments, such as
+simple read/write APIs or complex multi-tenant environments.
+
+The next sections give you an overview and best practices of these principles.
+
+## Access Control Policies
+
+### Introduction
 
 Hydra's Access Control is able to answer the question:
 
@@ -63,6 +76,35 @@ In this case, the access request will be allowed:
 3. `resource:articles:ladon-introduction` matches `"resources": ["resources:articles:<.*>", "resources:printer"],`
 4. `"remoteIP": "192.168.0.5"` matches the [`CIDRCondition`](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
 condition that was configured for the field `remoteIP`.
+
+### Best Practices
+
+This sections gives an overview of best practices for access control policies
+we developed over the years at ORY.
+
+#### URNs
+
+> “There are only two hard things in Computer Science: cache invalidation and naming things.”
+-- Phil Karlton
+
+URN naming is as hard as naming API endpoints. Thankfully, by doing the latter, the former is usually solved as well.
+We will explore further best practices in the following sections.
+
+##### Scope the organization name
+
+A rule of thumb is to prefix resource names with a domain that represents the organization creating the software.
+
+* **Do not:** `<some-id>`
+* **Do:** `<organizaion-id>:<some-id>`
+
+##### Scope actions, resources and subjects
+
+It is wise to scope actions, resources, and subjects in order to prevent name collisions:
+
+* **Do not:** `myorg.com:<subject-id>`, `myorg.com:<resource-id>`, `myorg.com:<action-id>`
+* **Do:** `myorg.com:subjects:<subject-id>`, `myorg.com:resources:<resource-id>`, `myorg.com:actions:<action-id>`
+* **Do:** `subjects:myorg.com:<subject-id>`, `resources:myorg.com:<resource-id>`, `actions:myorg.com:<action-id>`
+
 
 ## Access Control Decisions: The Warden
 

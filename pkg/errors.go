@@ -43,6 +43,9 @@ type stackTracer interface {
 }
 
 func LogError(err error, logger log.FieldLogger) {
+	if logger == nil {
+		logger = log.New()
+	}
 	if e, ok := errors.Cause(err).(stackTracer); ok {
 		logger.WithError(err).Errorln("An error occurred")
 		logger.Debugf("Stack trace: %+v", e.StackTrace())

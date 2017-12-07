@@ -15,8 +15,8 @@
 package pkg
 
 import (
-	"reflect"
 	"net/http"
+	"reflect"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"

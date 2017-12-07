@@ -9,21 +9,9 @@ before finalizing the upgrade process.
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-- [0.10.0-alpha.22](#0100-alpha22)
-  - [Breaking changes](#breaking-changes)
-  - [Additions](#additions)
-  - [Changes](#changes)
-- [0.10.0-alpha.16](#0100-alpha16)
-- [0.10.0-alpha.13](#0100-alpha13)
-- [0.10.0-alpha.11](#0100-alpha11)
-- [0.10.0-alpha.9](#0100-alpha9)
-  - [Breaking changes](#breaking-changes-1)
-    - [AES-GCM nonce storage](#aes-gcm-nonce-storage)
-  - [Other changes](#other-changes)
-    - [Token signature algorithm changed from HMAC-SHA256 to HMAC-SHA512](#token-signature-algorithm-changed-from-hmac-sha256-to-hmac-sha512)
-    - [RS256 JWK Generator now uses all 256 bit](#rs256-jwk-generator-now-uses-all-256-bit)
-- [0.10.0-alpha.1](#0100-alpha1)
-  - [Breaking changes](#breaking-changes-2)
+
+- [0.10.0](#0100)
+  - [Breaking Changes](#breaking-changes)
     - [New consent flow](#new-consent-flow)
     - [Audience](#audience)
     - [Response payload changes to `/warden/token/allowed`](#response-payload-changes-to-wardentokenallowed)
@@ -31,18 +19,26 @@ before finalizing the upgrade process.
     - [Health endpoints](#health-endpoints)
     - [Group endpoints](#group-endpoints)
     - [Replacing hierarchical scope strategy with wildcard scope strategy](#replacing-hierarchical-scope-strategy-with-wildcard-scope-strategy)
-  - [Non-breaking changes](#non-breaking-changes)
+    - [AES-GCM nonce storage](#aes-gcm-nonce-storage)
+    - [Token signature algorithm changed from HMAC-SHA256 to HMAC-SHA512](#token-signature-algorithm-changed-from-hmac-sha256-to-hmac-sha512)
+    - [RS256 JWK Generator now uses all 256 bit](#rs256-jwk-generator-now-uses-all-256-bit)
+    - [Minor Breaking Changes](#minor-breaking-changes)
+  - [Important Additions](#important-additions)
+    - [Prefixing Resources Names](#prefixing-resources-names)
     - [Refreshing OpenID Connect ID Token using `refresh_token` grant type](#refreshing-openid-connect-id-token-using-refresh_token-grant-type)
+  - [Important Changes](#important-changes)
+    - [Telemetry](#telemetry)
+    - [URL Encoding Root Client Credentials](#url-encoding-root-client-credentials)
 - [0.9.0](#090)
 - [0.8.0](#080)
-  - [Breaking changes](#breaking-changes-3)
+  - [Breaking changes](#breaking-changes)
     - [Ladon updated to 0.6.0](#ladon-updated-to-060)
     - [Redis and RethinkDB deprecated](#redis-and-rethinkdb-deprecated)
     - [Moved to ory namespace](#moved-to-ory-namespace)
     - [SDK](#sdk)
     - [JWK](#jwk)
     - [Migrations are no longer automatically applied](#migrations-are-no-longer-automatically-applied)
-  - [Changes](#changes-1)
+  - [Changes](#changes)
     - [Log format: json](#log-format-json)
     - [SQL Connection Control](#sql-connection-control)
     - [REST API Docs are now generated from source code](#rest-api-docs-are-now-generated-from-source-code)
@@ -53,102 +49,21 @@ before finalizing the upgrade process.
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## 0.10.0-alpha.22
+## 0.10.0
 
-### Breaking changes
-
-The JWK algorithm `ES521` was renamed to `ES512`. If you want to generate a key using this algorithm, you have to use
-the update name in the future.
-
-### Additions
-
-It is now possible to alter resource name prefixes (`rn:hydra`) using the `RESOURCE_NAME_PREFIX` environment variable.
-
-### Changes
-
-To improve ORY Hydra and understand how the software is used, optional, anonymized telemetry data is shared with ORY.
-A change was made to help us understand which telemetry sources belong to the same installation by hashing (SHA256)
-two environment variables which make up a unique identifier. [Click here](https://ory.gitbooks.io/hydra/content/telemetry.html)
-to read more about how we collect telemetry data, why we do it, and how to enable or disable it.
-
-## 0.10.0-alpha.16
-
-Versions `0.10.0-alpha.13`, `0.10.0-alpha.14`, and `0.10.0-alpha.15` had issues with the static binary of ORY Hydra which has been resolved.
-Now, the uncompressed docker image size is ~12MB and the base image is `scratch` instead of `alpine`.
-
-## 0.10.0-alpha.13
-
-This release removes build tags `-http`, `-automigrate`, `-without-telemetry` from the docker hub repository and replaces
-it with a new and tiny (~30MB) docker image containing the binary only.
-
-## 0.10.0-alpha.11
-
-This release adds the possibility to specify special characters in the `FORCE_ROOT_CLIENT_CREDENTIALS` by `www-url-decoding`
-the values. If you have characters that are not url safe in your root client credentials, please use the following
-form to specify them: `"FORCE_ROOT_CLIENT_CREDENTIALS=urlencode(id):urlencode(secret)"`.
-
-## 0.10.0-alpha.9
-
-This release focuses on cryptographic security by leveraging best practices that emerged within the last one and a
-half years. Before upgrading to this version, make a back up of the JWK table in your SQL database.
-
-### Breaking changes
-
-#### AES-GCM nonce storage
-
-Our use of `crypto/aes`'s AES-GCM was replaced in favor of [`cryptopasta/encrypt`](https://github.com/gtank/cryptopasta/blob/master/encrypt.go).
-As this includes a change of how nonces are appended to the ciphertext, ORY Hydra will be unable to decipher existing
-databases.
-
-There are two paths to migrate this change:
-1. If you have not added any keys to the JWK store:
-  1. Stop all Hydra instances.
-  2. Drop all rows from the `hydra_jwk` table.
-  3. Start **one** Hydra instance and wait for it to boot.
-  4. Restart all remaining Hydra instances.
-2. If you added keys to the JWK store:
-  1. If you can afford to re-generate those keys:
-    1. Write down all key ids you generated.
-    2. Stop all Hydra instances.
-    3. Drop all rows from the `hydra_jwk` table.
-    4. Start **one** Hydra instance and wait for it to boot.
-    5. Restart all remaining Hydra instances.
-    6. Regenerate the keys and use the key ids you wrote down.
-  2. If you can not afford to re-generate the keys:
-    1. Export said keys using the REST API.
-    2. Stop all Hydra instances.
-    3. Drop all rows from the `hydra_jwk` table.
-    4. Start **one** Hydra instance and wait for it to boot.
-    5. Restart all remaining Hydra instances.
-    6. Import said keys using the REST API.
-
-### Other changes
-
-#### Token signature algorithm changed from HMAC-SHA256 to HMAC-SHA512
-
-The signature algorithm used to generate authorize codes, access tokens, and refresh tokens has been upgraded
-from HMAC-SHA256 to HMAC-SHA512. With upgrading to alpha.9, all previously issued authorize codes, access tokens, and refresh will thus be
-rendered invalid. Apart from some re-authorization procedures, which are usually automated, this should not have any
-significant impact on your installation.
-
-#### RS256 JWK Generator now uses all 256 bit
-
-The RS256 JWK Generator now uses the full 256 bit range to generate secrets instead of a predefined rune sequence.
-This change only affects keys generated in the future.
-
-## 0.10.0-alpha.1
-
-**Warning: This version introduces breaking changes and is not suited for production use yet.**
-
-Version 0.10.0 is a preview tag of the 1.0.0 release. It contains multiple breaking changes.
+This release has several major improvements, and some breaking changes. It focuses on cryptographic security
+by leveraging best practices that emerged within the last one and a half years. Before upgrading to this version,
+make a back up of the JWK table in your SQL database.
 
 This release requires running `hydra migrate sql` before `hydra host`.
 
-Please also note that the new scope strategy might render your administrative client incapable of performing requests.
-Set the environment variable `SCOPE_STRATEGY=DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY` to temporarily use the previous
-scope strategy and migrate the scopes manually. You may append `.*` to all scopes. For example, `hydra` is now `hydra hydra.*`
+The most important breaking changes are the SDK libraries, the new consent flow, the AES-GCM improvement, and the
+response payload changes to the warden.
 
-### Breaking changes
+We know that these are a lot of changes, but we highly recommend upgrading to this version. It will be the last before
+releasing 1.0.0.
+
+### Breaking Changes
 
 #### New consent flow
 
@@ -165,7 +80,7 @@ Previously, the consent flow looked roughly like this:
   3. Redirects the browser back to Hydra, appending the consent response (http://hydra.mydomain.com/oauth2/auth?client_id=...&consent=zxI...).
 6. Hydra validates consent response and generates access tokens, authorize codes, refresh tokens, and id tokens.
 
-This approach has several disadvantages:
+This approach had several disadvantages:
 
 1. Validating and generating the JSON Web Tokens (JWTs) requires libraries for each language
   1. Because libraries are required, auto generating SDKs from the swagger spec is impossible. Thus, every language
@@ -231,14 +146,82 @@ The previous scope matching strategy has been replaced in favor of a wildcard-ba
 on this strategy [here](https://ory.gitbooks.io/hydra/content/oauth2.html#oauth2-scopes).
 
 To fall back to hierarchical scope matching, set the environment variable `SCOPE_STRATEGY=DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY`.
-This feature *might* be fully removed in the final 1.0.0 version.
+This feature *might* be fully removed in a later version.
 
-### Non-breaking changes
+#### AES-GCM nonce storage
+
+Our use of `crypto/aes`'s AES-GCM was replaced in favor of [`cryptopasta/encrypt`](https://github.com/gtank/cryptopasta/blob/master/encrypt.go).
+As this includes a change of how nonces are appended to the ciphertext, ORY Hydra will be unable to decipher existing
+databases.
+
+There are two paths to migrate this change:
+
+1. If you have not added any keys to the JWK store:
+  1. Stop all Hydra instances.
+  2. Drop all rows from the `hydra_jwk` table.
+  3. Start **one** Hydra instance and wait for it to boot.
+  4. Restart all remaining Hydra instances.
+2. If you added keys to the JWK store:
+  1. If you can afford to re-generate those keys:
+    1. Write down all key ids you generated.
+    2. Stop all Hydra instances.
+    3. Drop all rows from the `hydra_jwk` table.
+    4. Start **one** Hydra instance and wait for it to boot.
+    5. Restart all remaining Hydra instances.
+    6. Regenerate the keys and use the key ids you wrote down.
+  2. If you can not afford to re-generate the keys:
+    1. Export said keys using the REST API.
+    2. Stop all Hydra instances.
+    3. Drop all rows from the `hydra_jwk` table.
+    4. Start **one** Hydra instance and wait for it to boot.
+    5. Restart all remaining Hydra instances.
+    6. Import said keys using the REST API.
+
+#### Token signature algorithm changed from HMAC-SHA256 to HMAC-SHA512
+
+The signature algorithm used to generate authorize codes, access tokens, and refresh tokens has been upgraded
+from HMAC-SHA256 to HMAC-SHA512. With upgrading to alpha.9, all previously issued authorize codes, access tokens, and refresh will thus be
+rendered invalid. Apart from some re-authorization procedures, which are usually automated, this should not have any
+significant impact on your installation.
+
+#### RS256 JWK Generator now uses all 256 bit
+
+The RS256 JWK Generator now uses the full 256 bit range to generate secrets instead of a predefined rune sequence.
+This change only affects keys generated in the future.
+
+#### Minor Breaking Changes
+
+* The JWK algorithm `ES521` was renamed to `ES512`. If you want to generate a key using this algorithm, you have to use
+the update name in the future.
+* This release removes build tags `-http`, `-automigrate`, `-without-telemetry` from the docker hub repository and replaces
+it with a new and tiny (~6MB) docker image containing the binary only. Please note that this docker image does not have
+a shell, which makes it harder to penetrate.
+
+### Important Additions
+
+#### Prefixing Resources Names
+
+It is now possible to alter resource name prefixes (`rn:hydra`) using the `RESOURCE_NAME_PREFIX` environment variable.
 
 #### Refreshing OpenID Connect ID Token using `refresh_token` grant type
 
 1. It is now possible to refresh openid connect tokens using the refresh_token grant. An ID Token is issued if the scope
 `openid` was requested, and the client is allowed to receive an ID Token.
+
+### Important Changes
+
+#### Telemetry
+
+To improve ORY Hydra and understand how the software is used, optional, anonymized telemetry data is shared with ORY.
+A change was made to help us understand which telemetry sources belong to the same installation by hashing (SHA256)
+two environment variables which make up a unique identifier. [Click here](https://ory.gitbooks.io/hydra/content/telemetry.html)
+to read more about how we collect telemetry data, why we do it, and how to enable or disable it.
+
+#### URL Encoding Root Client Credentials
+
+This release adds the possibility to specify special characters in the `FORCE_ROOT_CLIENT_CREDENTIALS` by `www-url-decoding`
+the values. If you have characters that are not url safe in your root client credentials, please use the following
+form to specify them: `"FORCE_ROOT_CLIENT_CREDENTIALS=urlencode(id):urlencode(secret)"`.
 
 ## 0.9.0
 

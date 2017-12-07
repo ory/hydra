@@ -31,7 +31,7 @@ func TestLogError(t *testing.T) {
 
 	assert.True(t, strings.Contains(string(buf.Bytes()), "Stack trace"))
 
-	LogError(new(errStackTracer), l)
+	LogError(errors.Wrap(new(errStackTracer), ""), l)
 }
 
 func TestLogErrorDoesNotPanic(t *testing.T) {

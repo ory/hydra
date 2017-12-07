@@ -90,12 +90,58 @@ func TestIntrospectorSDK(t *testing.T) {
 			prepare        func(*testing.T) *hydra.OAuth2Api
 		}{
 			{
+				description:    "should fail because invalid token was supplied",
+				token:          "invalid",
+				expectInactive: true,
+			},
+			{
+				description:    "should fail because token is expired",
+				token:          tokens[1][1],
+				expectInactive: true,
+			},
+			{
+				description:    "should fail because username / password are invalid",
+				token:          tokens[0][1],
+				expectInactive: true,
+				expectCode:     http.StatusForbidden,
+				prepare: func(*testing.T) *hydra.OAuth2Api {
+					client := hydra.NewOAuth2ApiWithBasePath(server.URL)
+					client.Configuration.Username = "foo"
+					client.Configuration.Password = "foo"
+					return client
+				},
+			},
+			{
+				description:    "should fail because scope `bar` was requested but only `foo` is granted",
+				token:          tokens[0][1],
+				expectInactive: true,
+				scopes:         []string{"bar"},
+			},
+			{
+				description:    "should pass",
+				token:          tokens[0][1],
+				expectInactive: false,
+			},
+			{
 				description: "should pass using bearer authorization",
 				prepare: func(*testing.T) *hydra.OAuth2Api {
 					client := hydra.NewOAuth2ApiWithBasePath(server.URL)
 					client.Configuration.DefaultHeader["Authorization"] = "bearer " + tokens[2][1]
 					return client
 				},
+				token:          tokens[0][1],
+				expectInactive: false,
+				scopes:         []string{"foo.bar"},
+				assert: func(t *testing.T, c *hydra.OAuth2TokenIntrospection) {
+					assert.Equal(t, "alice", c.Sub)
+					assert.Equal(t, now.Add(time.Hour).Unix(), c.Exp, "expires at")
+					assert.Equal(t, now.Unix(), c.Iat, "issued at")
+					assert.Equal(t, "foobariss", c.Iss, "issuer")
+					assert.Equal(t, map[string]interface{}{"foo": "bar"}, c.Ext)
+				},
+			},
+			{
+				description:    "should pass using regular authorization",
 				token:          tokens[0][1],
 				expectInactive: false,
 				scopes:         []string{"foo.bar"},

@@ -28,9 +28,8 @@ Hydra's Access Control is able to answer the question:
 * **What**: An arbitrary action name, for example "delete", "create" or "scoped:action:something".
 * **Something**: An arbitrary unique resource name, for example "something", "resources.articles.1234" or some uniform
     resource name like "urn:isbn:3827370191".
-* **Context**: The current context containing information about the environment such as the IP Address,
-    request date, the resource owner name, the department ken is working in or any other information you want to pass along.
-    (optional)
+* **Context**: The current context containing information about the environment such as the IP Address, the time or date
+    of access, or some other type of context. (optional)
 
 To decide what the answer is, Hydra uses policy documents which can be represented as JSON. Values `actions`, `subjects`
 and `resources` can use regular expressions by encapsulating the expression in `<>`, for example `<.*>`.
@@ -90,14 +89,14 @@ we developed over the years at ORY.
 URN naming is as hard as naming API endpoints. Thankfully, by doing the latter, the former is usually solved as well.
 We will explore further best practices in the following sections.
 
-##### Scope the organization name
+##### Scope the Organization Name
 
 A rule of thumb is to prefix resource names with a domain that represents the organization creating the software.
 
 * **Do not:** `<some-id>`
 * **Do:** `<organizaion-id>:<some-id>`
 
-##### Scope actions, resources and subjects
+##### Scope Actions, Resources and Subjects
 
 It is wise to scope actions, resources, and subjects in order to prevent name collisions:
 
@@ -105,6 +104,17 @@ It is wise to scope actions, resources, and subjects in order to prevent name co
 * **Do:** `myorg.com:subjects:<subject-id>`, `myorg.com:resources:<resource-id>`, `myorg.com:actions:<action-id>`
 * **Do:** `subjects:myorg.com:<subject-id>`, `resources:myorg.com:<resource-id>`, `actions:myorg.com:<action-id>`
 
+##### Multi-Tenant Systems
+
+Multi-tenant systems typically have resources which should not be access by other tenants in the system. This can be
+achieved by adding the tenant id to the URN:
+
+* **Do:** `resources:myorg.com:tenants:<tenant-id>:<resource-id>`
+
+In some environments, it is common to have organizations and projects belonging to those organizations. Here, the
+following URN semantics can be used:
+
+* **Do:** `resources:myorg.com:organizations:<organization-id>:projects:<project-id>:<resource-id>`
 
 ## Access Control Decisions: The Warden
 

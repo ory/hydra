@@ -1014,7 +1014,7 @@
     },
     "/oauth2/introspect": {
       "post": {
-        "description": "The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token\nis neither expired nor revoked. If a token is active, additional information on the token will be included. You can\nset additional data for a token by setting `accessTokenExtra` during the consent flow.",
+        "description": "The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token\nis neither expired nor revoked. If a token is active, additional information on the token will be included. You can\nset additional data for a token by setting `accessTokenExtra` during the consent flow.\n\n```\n{\n\"resources\": [\"rn:hydra:oauth2:tokens\"],\n\"actions\": [\"introspect\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/x-www-form-urlencoded"
         ],
@@ -1035,7 +1035,9 @@
             "basic": []
           },
           {
-            "oauth2": []
+            "oauth2": [
+              "hydra.introspect"
+            ]
           }
         ],
         "parameters": [
@@ -1847,8 +1849,6 @@
         },
         "expiresAt": {
           "description": "ExpiresAt is the time where the access request will expire.",
-          "type": "string",
-          "format": "date-time",
           "x-go-name": "ExpiresAt"
         },
         "id": {
@@ -1895,8 +1895,6 @@
         },
         "expiresAt": {
           "description": "ExpiresAt is the expiry timestamp.",
-          "type": "string",
-          "format": "date-time",
           "x-go-name": "ExpiresAt"
         },
         "grantedScopes": {
@@ -1909,8 +1907,6 @@
         },
         "issuedAt": {
           "description": "IssuedAt is the token creation time stamp.",
-          "type": "string",
-          "format": "date-time",
           "x-go-name": "IssuedAt"
         },
         "issuer": {
@@ -1934,17 +1930,26 @@
     "Handler": {
       "type": "object",
       "properties": {
+        "Generators": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/KeyGenerator"
+          }
+        },
         "H": {
           "$ref": "#/definitions/Writer"
         },
         "Manager": {
           "$ref": "#/definitions/Manager"
         },
+        "ResourcePrefix": {
+          "type": "string"
+        },
         "W": {
           "$ref": "#/definitions/Firewall"
         }
       },
-      "x-go-package": "github.com/ory/hydra/warden/group"
+      "x-go-package": "github.com/ory/hydra/jwk"
     },
     "KeyGenerator": {
       "type": "object",

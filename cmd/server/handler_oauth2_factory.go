@@ -147,6 +147,8 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm oauth2.Con
 		CookieStore:         sessions.NewCookieStore(c.GetCookieSecret()),
 		Issuer:              c.Issuer,
 		L:                   c.GetLogger(),
+		W:                   c.Context().Warden,
+		ResourcePrefix:      c.AccessControlResourcePrefix,
 	}
 
 	handler.SetRoutes(router)

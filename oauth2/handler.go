@@ -16,6 +16,7 @@ package oauth2
 
 import (
 	"encoding/json"
+	"fmt"
 	"net"
 	"net/http"
 	"net/url"
@@ -23,6 +24,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
+	"github.com/ory/hydra/firewall"
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -41,6 +43,8 @@ const (
 	// IntrospectPath points to the OAuth2 introspection endpoint.
 	IntrospectPath = "/oauth2/introspect"
 	RevocationPath = "/oauth2/revoke"
+
+	IntrospectScope = "hydra.introspect"
 
 	consentCookieName = "consent_session"
 )
@@ -175,6 +179,14 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ ht
 // is neither expired nor revoked. If a token is active, additional information on the token will be included. You can
 // set additional data for a token by setting `accessTokenExtra` during the consent flow.
 //
+//  ```
+//  {
+//    "resources": ["rn:hydra:oauth2:tokens"],
+//    "actions": ["introspect"],
+//    "effect": "allow"
+//  }
+//  ```
+//
 //     Consumes:
 //     - application/x-www-form-urlencoded
 //
@@ -185,13 +197,36 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ ht
 //
 //     Security:
 //       basic:
-//       oauth2:
+//       oauth2: hydra.introspect
 //
 //     Responses:
 //       200: introspectOAuth2TokenResponse
 //       401: genericError
 //       500: genericError
 func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	if token := h.W.TokenFromRequest(r); token != "" {
+		if _, err := h.W.TokenAllowed(r.Context(), token, &firewall.TokenAccessRequest{
+			Resource: fmt.Sprintf(h.PrefixResource("oauth2:tokens")),
+			Action:   "introspect",
+		}, IntrospectScope); err != nil {
+			h.H.WriteError(w, r, err)
+			return
+		}
+	} else if client, _, ok := r.BasicAuth(); ok {
+		// If no token is given, we do not need a scope.
+		if err := h.W.IsAllowed(r.Context(), &firewall.AccessRequest{
+			Subject:  client,
+			Resource: fmt.Sprintf(h.PrefixResource("oauth2:tokens")),
+			Action:   "introspect",
+		}); err != nil {
+			h.H.WriteError(w, r, err)
+			return
+		}
+	} else {
+		h.H.WriteError(w, r, errors.WithStack(fosite.ErrRequestUnauthorized))
+		return
+	}
+
 	var session = NewSession("")
 
 	var ctx = fosite.NewContext()
@@ -208,7 +243,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 	}
 
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
-	err = json.NewEncoder(w).Encode(&Introspection{
+	if err = json.NewEncoder(w).Encode(&Introspection{
 		Active:    true,
 		ClientID:  resp.GetAccessRequester().GetClient().GetID(),
 		Scope:     strings.Join(resp.GetAccessRequester().GetGrantedScopes(), " "),
@@ -219,8 +254,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		Extra:     resp.GetAccessRequester().GetSession().(*Session).Extra,
 		Audience:  resp.GetAccessRequester().GetClient().GetID(),
 		Issuer:    h.Issuer,
-	})
-	if err != nil {
+	}); err != nil {
 		pkg.LogError(err, h.L)
 	}
 }

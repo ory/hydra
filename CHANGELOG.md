@@ -3,7 +3,10 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
-  - [Unreleased](#unreleased)
+  - [v0.10.3 (2017-12-08)](#v0103-2017-12-08)
+  - [v0.10.2 (2017-12-08)](#v0102-2017-12-08)
+  - [v0.10.1 (2017-12-08)](#v0101-2017-12-08)
+  - [v0.10.0 (2017-12-08)](#v0100-2017-12-08)
   - [v0.10.0-alpha.21 (2017-11-27)](#v0100-alpha21-2017-11-27)
   - [v0.10.0-alpha.20 (2017-11-26)](#v0100-alpha20-2017-11-26)
   - [v0.10.0-alpha.19 (2017-11-26)](#v0100-alpha19-2017-11-26)
@@ -13,8 +16,8 @@
   - [v0.10.0-alpha.15 (2017-11-06)](#v0100-alpha15-2017-11-06)
   - [v0.10.0-alpha.14 (2017-11-06)](#v0100-alpha14-2017-11-06)
   - [v0.10.0-alpha.13 (2017-11-06)](#v0100-alpha13-2017-11-06)
-  - [v0.10.0-alpha.12 (2017-11-06)](#v0100-alpha12-2017-11-06)
   - [v0.10.0-alpha.11 (2017-11-06)](#v0100-alpha11-2017-11-06)
+  - [v0.10.0-alpha.12 (2017-11-06)](#v0100-alpha12-2017-11-06)
   - [v0.10.0-alpha.10 (2017-10-26)](#v0100-alpha10-2017-10-26)
   - [v0.10.0-alpha.9 (2017-10-25)](#v0100-alpha9-2017-10-25)
   - [v0.9.16 (2017-10-23)](#v0916-2017-10-23)
@@ -58,8 +61,8 @@
   - [v0.7.8 (2017-03-24)](#v078-2017-03-24)
   - [v0.7.7 (2017-02-11)](#v077-2017-02-11)
   - [v0.7.4 (2017-02-11)](#v074-2017-02-11)
-  - [v0.7.6 (2017-02-11)](#v076-2017-02-11)
   - [v0.7.5 (2017-02-11)](#v075-2017-02-11)
+  - [v0.7.6 (2017-02-11)](#v076-2017-02-11)
   - [v0.7.3 (2017-01-22)](#v073-2017-01-22)
   - [v0.7.2 (2017-01-02)](#v072-2017-01-02)
   - [v0.7.1 (2016-12-30)](#v071-2016-12-30)
@@ -84,9 +87,9 @@
   - [v0.5.2 (2016-09-23)](#v052-2016-09-23)
   - [v0.5.0 (2016-09-22)](#v050-2016-09-22)
   - [v0.5.1 (2016-09-22)](#v051-2016-09-22)
-  - [v0.4.3 (2016-09-03)](#v043-2016-09-03)
-  - [v0.4.2 (2016-09-03)](#v042-2016-09-03)
   - [v0.4.2-alpha.4 (2016-09-03)](#v042-alpha4-2016-09-03)
+  - [v0.4.2 (2016-09-03)](#v042-2016-09-03)
+  - [v0.4.3 (2016-09-03)](#v043-2016-09-03)
   - [v0.4.2-alpha.3 (2016-09-02)](#v042-alpha3-2016-09-02)
   - [v0.4.2-alpha.2 (2016-09-01)](#v042-alpha2-2016-09-01)
   - [v0.4.2-alpha.1 (2016-09-01)](#v042-alpha1-2016-09-01)
@@ -105,24 +108,59 @@
 
 # Change Log
 
-## [Unreleased](https://github.com/ory/hydra/tree/HEAD)
+## [v0.10.3](https://github.com/ory/hydra/tree/v0.10.3) (2017-12-08)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.10.2...v0.10.3)
 
-[Full Changelog](https://github.com/ory/hydra/compare/v0.10.0-alpha.21...HEAD)
+## [v0.10.2](https://github.com/ory/hydra/tree/v0.10.2) (2017-12-08)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.10.1...v0.10.2)
+
+## [v0.10.1](https://github.com/ory/hydra/tree/v0.10.1) (2017-12-08)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.10.0...v0.10.1)
+
+**Implemented enhancements:**
+
+- Open source policy naming guidelines [\#680](https://github.com/ory/hydra/issues/680)
+
+**Closed issues:**
+
+- docs: docker --link should be replaced by networks [\#555](https://github.com/ory/hydra/issues/555)
+
+## [v0.10.0](https://github.com/ory/hydra/tree/v0.10.0) (2017-12-08)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.10.0-alpha.21...v0.10.0)
+
+**Implemented enhancements:**
+
+- docs: Improve release and breaking changes management [\#675](https://github.com/ory/hydra/issues/675)
+- oauth2: Make sub explicit in the database [\#658](https://github.com/ory/hydra/issues/658)
+- oauth2: Add access control to token introspection endpoint [\#655](https://github.com/ory/hydra/issues/655)
+- all: make policy resource and action names configurable [\#640](https://github.com/ory/hydra/issues/640)
+- Subject field [\#674](https://github.com/ory/hydra/pull/674) ([arekkas](https://github.com/arekkas))
+- Add changelog [\#673](https://github.com/ory/hydra/pull/673) ([arekkas](https://github.com/arekkas))
 
 **Fixed bugs:**
 
+- oauth2: Token revokation should check client id before revoking tokens [\#676](https://github.com/ory/hydra/issues/676)
 - cli/policies: removing a policy subject adds the subject Instead [\#662](https://github.com/ory/hydra/issues/662)
 - jwk: Rename ES521 key generation algorithm to ES512 [\#651](https://github.com/ory/hydra/issues/651)
+- oauth2: Fixes clients being able to revoke any token [\#677](https://github.com/ory/hydra/pull/677) ([arekkas](https://github.com/arekkas))
 
 **Closed issues:**
 
 - Json logging [\#670](https://github.com/ory/hydra/issues/670)
+- swagger: scope pattern requires a space [\#661](https://github.com/ory/hydra/issues/661)
 - docs: Add list of undisclosed adopters with requests ranges to readme [\#659](https://github.com/ory/hydra/issues/659)
 
 **Merged pull requests:**
 
+- Update release notes and prepare 0.10.0 [\#685](https://github.com/ory/hydra/pull/685) ([arekkas](https://github.com/arekkas))
+- docs: Adds multi-tenant best practices [\#684](https://github.com/ory/hydra/pull/684) ([arekkas](https://github.com/arekkas))
+- ci: Resolves code climate issues [\#683](https://github.com/ory/hydra/pull/683) ([arekkas](https://github.com/arekkas))
+- pkg: Adds test for LogError [\#682](https://github.com/ory/hydra/pull/682) ([arekkas](https://github.com/arekkas))
+- docs: Adds ACP best practices [\#681](https://github.com/ory/hydra/pull/681) ([arekkas](https://github.com/arekkas))
+- oauth2: Requires firewall check for introspecting access tokens [\#678](https://github.com/ory/hydra/pull/678) ([arekkas](https://github.com/arekkas))
 - Makes policy resource names prefixes configurable [\#672](https://github.com/ory/hydra/pull/672) ([arekkas](https://github.com/arekkas))
 - docs: Adds consent state machine [\#671](https://github.com/ory/hydra/pull/671) ([arekkas](https://github.com/arekkas))
+- docs: Make space optional in scope regex \(\#661\) [\#668](https://github.com/ory/hydra/pull/668) ([pnicolcev-tulipretail](https://github.com/pnicolcev-tulipretail))
 - Various minor fixes [\#667](https://github.com/ory/hydra/pull/667) ([arekkas](https://github.com/arekkas))
 - telemetry: Update telemetry identification [\#654](https://github.com/ory/hydra/pull/654) ([arekkas](https://github.com/arekkas))
 
@@ -194,7 +232,7 @@
 - Fix racy behaviour in oauth2 memory managers [\#646](https://github.com/ory/hydra/pull/646) ([arekkas](https://github.com/arekkas))
 
 ## [v0.10.0-alpha.13](https://github.com/ory/hydra/tree/v0.10.0-alpha.13) (2017-11-06)
-[Full Changelog](https://github.com/ory/hydra/compare/v0.10.0-alpha.12...v0.10.0-alpha.13)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.10.0-alpha.11...v0.10.0-alpha.13)
 
 **Implemented enhancements:**
 
@@ -204,11 +242,11 @@
 
 - docker: Stop building from source in docker image [\#645](https://github.com/ory/hydra/pull/645) ([arekkas](https://github.com/arekkas))
 
-## [v0.10.0-alpha.12](https://github.com/ory/hydra/tree/v0.10.0-alpha.12) (2017-11-06)
-[Full Changelog](https://github.com/ory/hydra/compare/v0.10.0-alpha.11...v0.10.0-alpha.12)
-
 ## [v0.10.0-alpha.11](https://github.com/ory/hydra/tree/v0.10.0-alpha.11) (2017-11-06)
-[Full Changelog](https://github.com/ory/hydra/compare/v0.10.0-alpha.10...v0.10.0-alpha.11)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.10.0-alpha.12...v0.10.0-alpha.11)
+
+## [v0.10.0-alpha.12](https://github.com/ory/hydra/tree/v0.10.0-alpha.12) (2017-11-06)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.10.0-alpha.10...v0.10.0-alpha.12)
 
 **Closed issues:**
 
@@ -851,13 +889,13 @@
 [Full Changelog](https://github.com/ory/hydra/compare/v0.7.4...v0.7.7)
 
 ## [v0.7.4](https://github.com/ory/hydra/tree/v0.7.4) (2017-02-11)
-[Full Changelog](https://github.com/ory/hydra/compare/v0.7.6...v0.7.4)
-
-## [v0.7.6](https://github.com/ory/hydra/tree/v0.7.6) (2017-02-11)
-[Full Changelog](https://github.com/ory/hydra/compare/v0.7.5...v0.7.6)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.7.5...v0.7.4)
 
 ## [v0.7.5](https://github.com/ory/hydra/tree/v0.7.5) (2017-02-11)
-[Full Changelog](https://github.com/ory/hydra/compare/v0.7.3...v0.7.5)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.7.6...v0.7.5)
+
+## [v0.7.6](https://github.com/ory/hydra/tree/v0.7.6) (2017-02-11)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.7.3...v0.7.6)
 
 **Implemented enhancements:**
 
@@ -1161,7 +1199,7 @@
 [Full Changelog](https://github.com/ory/hydra/compare/v0.5.1...v0.5.0)
 
 ## [v0.5.1](https://github.com/ory/hydra/tree/v0.5.1) (2016-09-22)
-[Full Changelog](https://github.com/ory/hydra/compare/v0.4.3...v0.5.1)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.4.2-alpha.4...v0.5.1)
 
 **Implemented enhancements:**
 
@@ -1201,14 +1239,14 @@
 
 - docs: add notes on operational considerations [\#252](https://github.com/ory/hydra/pull/252) ([boyvinall](https://github.com/boyvinall))
 
-## [v0.4.3](https://github.com/ory/hydra/tree/v0.4.3) (2016-09-03)
-[Full Changelog](https://github.com/ory/hydra/compare/v0.4.2...v0.4.3)
+## [v0.4.2-alpha.4](https://github.com/ory/hydra/tree/v0.4.2-alpha.4) (2016-09-03)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.4.2...v0.4.2-alpha.4)
 
 ## [v0.4.2](https://github.com/ory/hydra/tree/v0.4.2) (2016-09-03)
-[Full Changelog](https://github.com/ory/hydra/compare/v0.4.2-alpha.4...v0.4.2)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.4.3...v0.4.2)
 
-## [v0.4.2-alpha.4](https://github.com/ory/hydra/tree/v0.4.2-alpha.4) (2016-09-03)
-[Full Changelog](https://github.com/ory/hydra/compare/v0.4.2-alpha.3...v0.4.2-alpha.4)
+## [v0.4.3](https://github.com/ory/hydra/tree/v0.4.3) (2016-09-03)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.4.2-alpha.3...v0.4.3)
 
 ## [v0.4.2-alpha.3](https://github.com/ory/hydra/tree/v0.4.2-alpha.3) (2016-09-02)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.4.2-alpha.2...v0.4.2-alpha.3)

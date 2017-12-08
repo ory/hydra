@@ -51,5 +51,5 @@ if err != nil {
 
 ### API Docs
 
-API docs are available [here](https://github.com/ory/hydra/blob/prepare-1.0.0-alpha1/sdk/go/hydra/swagger/README.md).
+API docs are available [here](https://github.com/ory/hydra/blob/master/sdk/go/hydra/swagger/README.md).
 Please note that those docs are generated and may introduce bugs if code examples are used 1:1.

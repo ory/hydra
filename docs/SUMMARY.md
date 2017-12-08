@@ -18,6 +18,7 @@
       * [Best Practices](access-control.md#best-practices)
     * [The Warden](access-control.md#warden)
 - [Install, Configure and Run ORY Hydra (15 minutes)](install.md#install-configure-and-run-ory-hydra)
+  - [Create a Network](install.md#create-a-network)
   - [Start a PostgreSQL container](install.md#start-a-postgresql-container)
   - [Install and run ORY Hydra](install.md#install-and-run-ory-hydra)
     - [Install ORY Hydra without Docker](install.md#install-ory-hydra-without-docker)

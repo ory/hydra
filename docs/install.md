@@ -15,12 +15,19 @@ This guide will:
 
 Before starting with this guide, please install the most recent version of [Docker](https://www.docker.com/community-edition#/download).
 
+## Create a network
+
+```
+$ docker network create hydraguide
+```
+
 ## Start a PostgreSQL container
 
 For the purpose of this tutorial, we will use a PostgreSQL container. Never run databases in Docker in production!
 
 ```
 $ docker run \
+  --network hydraguide \
   --name ory-hydra-example--postgres \
   -e POSTGRES_USER=hydra \
   -e POSTGRES_PASSWORD=secret \
@@ -43,22 +50,25 @@ $ export SYSTEM_SECRET=this_needs_to_be_the_same_always_and_also_very_$3cuR3-._
 
 # The database url points us at the postgres instance. This could also be an ephermal in-memory database (`export DATABASE_URL=memory`)
 # or a MySQL url.
-$ export DATABASE_URL=postgres://hydra:secret@postgres:5432/hydra?sslmode=disable
+$ export DATABASE_URL=postgres://hydra:secret@ory-hydra-example--postgres:5432/hydra?sslmode=disable
 
 # Before starting, let's pull the latest ORY Hydra tag from docker.
-$ docker pull oryd/hydra:v0.10.0-alpha.11
+$ docker pull oryd/hydra:v0.10.0-alpha.21
 
 # This command will show you all the environment variables that you can set. Read this carefully.
 # It is the equivalent to `hydra help host`.
-$ docker run -it --entrypoint hydra oryd/hydra:v0.10.0-alpha.11 help host
+$ docker run -it --rm --entrypoint hydra oryd/hydra:v0.10.0-alpha.21 help host
 
 Starts all HTTP/2 APIs and connects to a database backend.
 [...]
 
 # ORY Hydra does not do magic, it requires concious decisions, for example, when running SQL migrations, which is required
 # when installing a new version of ORY Hydra, or upgrading an existing installation.
-# It is the equivalent to `hydra migrate sql postgres://hydra:secret@postgres:5432/hydra?sslmode=disable`
-$ docker run --link ory-hydra-example--postgres:postgres -it --entrypoint hydra oryd/hydra:v0.10.0-alpha.11 migrate sql $DATABASE_URL
+# It is the equivalent to `hydra migrate sql postgres://hydra:secret@ory-hydra-example--postgres:5432/hydra?sslmode=disable`
+$ docker run -it --rm \
+  --network hydraguide \
+  oryd/hydra:v0.10.0-alpha.21 \
+  migrate sql $DATABASE_URL
 
 Applying `ladon` SQL migrations...
 Applied 3 `ladon` SQL migrations.
@@ -66,17 +76,17 @@ Applying `client` SQL migrations...
 [...]
 Migration successful!
 
-# Let's run our docker server (settings explained below):
+# Let's run the server (settings explained below):
 $ docker run -d \
   --name ory-hydra-example--hydra \
-  --link ory-hydra-example--postgres:postgres \
+  --network hydraguide \
   -p 9000:4444 \
   -e SYSTEM_SECRET=$SYSTEM_SECRET \
   -e DATABASE_URL=$DATABASE_URL \
   -e ISSUER=https://localhost:9000/ \
   -e CONSENT_URL=http://localhost:9020/consent \
   -e FORCE_ROOT_CLIENT_CREDENTIALS=admin:demo-password \
-  oryd/hydra:v0.10.0-alpha.11
+  oryd/hydra:v0.10.0-alpha.21
 
 # And check if it's running:
 $ docker logs ory-hydra-example--hydra
@@ -89,8 +99,7 @@ time="2017-06-29T21:26:34Z" level=info msg="Setting up http server on :4444"
 
 Let's dive into the various settings:
 
-* `--link ory-hydra-example--postgres:postgres` connects this instance to postgres. Attention, this feature will
-be deprecated in docker in the future.
+* `--network hydraguide` connects this instance to the network and makes it possible to connect to the PostgreSQL database.
 * `-p 9000:4444` exposes ORY Hydra on `https://localhost:9000/`.
 * `-e SYSTEM_SECRET=$SYSTEM_SECRET` sets the system secret environment variable **(required)**.
 * `-e DATABASE_URL=$DATABASE_URL` sets the database url environment variable **(required)**.
@@ -134,7 +143,7 @@ ORY Hydra can be managed using the Hydra Command Line Interface (CLI), which is 
 see the available commands, run:
 
 ```
-$ docker run -it --entrypoint hydra oryd/hydra:v0.10.0-alpha.11 help
+$ docker run --rm -it --entrypoint hydra oryd/hydra:v0.10.0-alpha.21 help
 Hydra is a cloud native high throughput OAuth2 and OpenID Connect provider
 
 Usage:
@@ -179,7 +188,7 @@ to your `$PATH`. To do so, run the following commands in a shell (bash, sh, cmd.
 $ go get -d -u github.com/ory/hydra
 $ go get github.com/Masterminds/glide
 $ cd $GOPATH/src/github.com/ory/hydra
-$ glide install
+$ dep ensure --vendor-only
 $ go install github.com/ory/hydra
 $ hydra
 
@@ -195,33 +204,59 @@ Available Commands:
 
 ## Configure ORY Hydra
 
-Next we need to connect to ORY Hydra and set up OAuth 2.0 Clients and access control üolicies. In particular
+Next we will take a look at configuring ORY Hydra, specifically:
 
 1. we create an OAuth 2.0 Client to use in the consent app (id: `consent-app`).
 2. we set up access control policies for `consent-app`.
 3. we add a policy that allows anybody to access the public keys for validating OpenID Connect ID Tokens.
 3. we create another client capable of performing the client credentials grant and the authorize code grant.
 
+To do so, we will repeatedly use the same docker command layout
+
 ```
-# We run a shell with ORY Hydra installed. We also expose port 4445 which we will use later to perform
-# the authorize code flow. Also, we connect this container to our ORY Hydra instance.
-$ docker run -p 9010:4445 --link ory-hydra-example--hydra:hydra -it --entrypoint "/bin/sh" oryd/hydra:v0.10.0-alpha.11
+$ docker run --rm -it \
+  -e CLUSTER_URL=https://ory-hydra-example--hydra:4444 \
+  -e CLIENT_ID=admin \
+  -e CLIENT_SECRET=demo-password \
+  --network hydraguide \
+  oryd/hydra:v0.10.0-alpha.21 \
+  <command>
+```
 
-# Let's connect to the ORY Hydra cluster
-$ hydra connect
+where
 
-Cluster URL []: https://hydra:4444
-Client ID []: admin
-Client Secret [empty]: demo-password
-Persisting config in file /root/.hydra.yml
+* `--rm` removes the container after it is done.
+* `-it` allows interactive processes.
+* `-e CLUSTER_URL=https://ory-hydra-example--hydra:4444`, `-e CLIENT_ID=admin`, `-e CLIENT_SECRET=demo-password` tell
+the command what credentials to use and where hydra is hosted. If you use the ORY Hydra CLI locally, you can skip this
+step by running `hydra connect`.
+* `--network hydraguide` connects the container to the network, so it is actually able to speak to our ORY Hydra host process.
 
-# And issue an access token to validate that everything is working (ps: we need to disable TLS verification
+Ready? Let's go!
+
+```
+# Issue an access token to validate that everything is working (ps: we need to disable TLS verification
 # because the TLS certificate is self-signed).
-$ hydra token client --skip-tls-verify
+$ docker run --rm -it \
+  -e CLUSTER_URL=https://ory-hydra-example--hydra:4444 \
+  -e CLIENT_ID=admin \
+  -e CLIENT_SECRET=demo-password \
+  --network hydraguide \
+  oryd/hydra:v0.10.0-alpha.21 \
+  token client --skip-tls-verify
+
 tY9tGakiYAUn8VIGn_yCDlTahckSfGbDQIlXahjXtX0.BQlCxRDL3ngag6hdsSl9N2qrz7R399cQMfld8aI2Mlg
 
-# We can also validate a token:
-$ hydra token validate --skip-tls-verify $(hydra token client --skip-tls-verify)
+# We can also validate the token. Please make sure to copy the previous value here.
+$ docker run --rm -it \
+  -e CLUSTER_URL=https://ory-hydra-example--hydra:4444 \
+  -e CLIENT_ID=admin \
+  -e CLIENT_SECRET=demo-password \
+  -e TOKEN=$token \
+  --network hydraguide \
+  oryd/hydra:v0.10.0-alpha.21 \
+  token validate --skip-tls-verify \  
+  tY9tGakiYAUn8VIGn_yCDlTahckSfGbDQIlXahjXtX0.BQlCxRDL3ngag6hdsSl9N2qrz7R399cQMfld8aI2Mlg
 
 {
         "active": true,
@@ -243,13 +278,20 @@ use the following command:
 
 ```
 # Create the client for consent-app
-$ hydra clients create --skip-tls-verify \
-  --id consent-app \
-  --secret consent-secret \
-  --name "Consent App Client" \
-  --grant-types client_credentials \
-  --response-types token \
-  --allowed-scopes hydra.consent
+$ docker run --rm -it \
+  -e CLUSTER_URL=https://ory-hydra-example--hydra:4444 \
+  -e CLIENT_ID=admin \
+  -e CLIENT_SECRET=demo-password \
+  --network hydraguide \
+  -p 9010:4445 \
+  oryd/hydra:v0.10.0-alpha.21 \
+  clients create --skip-tls-verify \
+    --id consent-app \
+    --secret consent-secret \
+    --name "Consent App Client" \
+    --grant-types client_credentials \
+    --response-types token \
+    --allowed-scopes hydra.consent
 ```
 
 Let's dive into the arguments:
@@ -270,13 +312,20 @@ required cryptographic keys for validating and signing the consent challenge and
 ```
 # For more information on access control policies, please read
 # https://ory.gitbooks.io/hydra/content/security.html#access-control-policies
-$ hydra policies create --skip-tls-verify \
-  --actions get,accept,reject \
-  --description "Allow consent-app to manage OAuth2 consent requests." \
-  --allow \
-  --id consent-app-policy \
-  --resources "rn:hydra:oauth2:consent:requests:<.*>" \
-  --subjects consent-app
+$ docker run --rm -it \
+  -e CLUSTER_URL=https://ory-hydra-example--hydra:4444 \
+  -e CLIENT_ID=admin \
+  -e CLIENT_SECRET=demo-password \
+  --network hydraguide \
+  -p 9010:4445 \
+  oryd/hydra:v0.10.0-alpha.21 \
+  policies create --skip-tls-verify \
+    --actions get,accept,reject \
+    --description "Allow consent-app to manage OAuth2 consent requests." \
+    --allow \
+    --id consent-app-policy \
+    --resources "rn:hydra:oauth2:consent:requests:<.*>" \
+    --subjects consent-app
 
 Created policy consent-app-policy.
 ```
@@ -291,16 +340,16 @@ Let's take a look at the arguments:
 
 Awesome! Next we will run the [ORY Hydra Consent App Example (NodeJS)](https://github.com/ory/hydra-consent-app-express).
 This app is also available in [Golang](https://github.com/ory/hydra-consent-app-go), but for the purpose of this
-tutorial we will use the NodeJS one. **In a new shell**, run:
+tutorial we will use the NodeJS one:
 
 ```
 $ docker run -d \
   --name ory-hydra-example--consent \
-  --link ory-hydra-example--hydra:hydra \
   -p 9020:3000 \
+  --network hydraguide \
   -e HYDRA_CLIENT_ID=consent-app \
   -e HYDRA_CLIENT_SECRET=consent-secret \
-  -e HYDRA_URL=https://hydra:4444 \
+  -e HYDRA_URL=https://ory-hydra-example--hydra:4444 \
   -e NODE_TLS_REJECT_UNAUTHORIZED=0 \
   oryd/hydra-consent-app-express:v0.10.0-alpha.9
 
@@ -316,22 +365,25 @@ from the ORY Hydra docker container (`CONSENT_URL=http://localhost:9020/consent`
 * `HYDRA_URL=http://hydra:4444` point to the ORY Hydra container.
 * `NODE_TLS_REJECT_UNAUTHORIZED=0` disables TLS verification, because we are using self-signed certificates.
 
-Now close this shell and return to the one which is connected to the ORY Hydra bash container
-(`docker run -p 9010:4445 --link ory-hydra-example--hydra:hydra -it --entrypoint "/bin/sh" oryd/hydra:v0.10.0-alpha.11`).
-
 ## Perform OAuth 2.0 Flow
 
 Awesome, our infrastructure is set up! Now it's time to create an OAuth 2.0 Consumer and perform the OAuth 2.0 Authorize Code flow.
 To do so, we will create a new client:
 
 ```
-$ hydra clients create --skip-tls-verify \
-  --id some-consumer \
-  --secret consumer-secret \
-  --grant-types authorization_code,refresh_token,client_credentials,implicit \
-  --response-types token,code,id_token \
-  --allowed-scopes openid,offline,hydra.clients \
-  --callbacks http://localhost:9010/callback
+$ docker run --rm -it \
+  -e CLUSTER_URL=https://ory-hydra-example--hydra:4444 \
+  -e CLIENT_ID=admin \
+  -e CLIENT_SECRET=demo-password \
+  --network hydraguide \
+  oryd/hydra:v0.10.0-alpha.21 \
+  clients create --skip-tls-verify \
+    --id some-consumer \
+    --secret consumer-secret \
+    --grant-types authorization_code,refresh_token,client_credentials,implicit \
+    --response-types token,code,id_token \
+    --allowed-scopes openid,offline,hydra.clients \
+    --callbacks http://localhost:9010/callback
 
 Client ID: some-consumer
 Client Secret: consumer-secret
@@ -348,13 +400,19 @@ OpenID Connect ID Tokens.
 Also, we want to allow everyone (not only our consumer) access to the public key of the OpenID Connect ID Token, which can be achieved with:
 
 ```
-$ hydra policies create --skip-tls-verify \
-  --actions get \
-  --description "Allow everyone to read the OpenID Connect ID Token public key" \
-  --allow \
-  --id openid-id_token-policy \
-  --resources rn:hydra:keys:hydra.openid.id-token:public \
-  --subjects "<.*>"
+$ docker run --rm -it \
+  -e CLUSTER_URL=https://ory-hydra-example--hydra:4444 \
+  -e CLIENT_ID=admin \
+  -e CLIENT_SECRET=demo-password \
+  --network hydraguide \
+  oryd/hydra:v0.10.0-alpha.21 \
+  policies create --skip-tls-verify \
+    --actions get \
+    --description "Allow everyone to read the OpenID Connect ID Token public key" \
+    --allow \
+    --id openid-id_token-policy \
+    --resources rn:hydra:keys:hydra.openid.id-token:public \
+    --subjects "<.*>"
 
 Created policy openid-id_token-policy.
 ```
@@ -365,13 +423,17 @@ an auth code url, redirecting the browser to it, and then exchanging the authori
 same thing happens with this command:
 
 ```
-$ hydra token user --skip-tls-verify \
-  --auth-url https://localhost:9000/oauth2/auth \
-  --token-url https://hydra:4444/oauth2/token \
-  --id some-consumer \
-  --secret consumer-secret \
-  --scopes openid,offline,hydra.clients \
-  --redirect http://localhost:9010/callback
+$ docker run --rm -it \
+  --network hydraguide \
+  -p 9010:4445 \
+  oryd/hydra:v0.10.0-alpha.21 \
+  token user --skip-tls-verify \
+    --auth-url https://localhost:9000/oauth2/auth \
+    --token-url https://ory-hydra-example--hydra:4444/oauth2/token \
+    --id some-consumer \
+    --secret consumer-secret \
+    --scopes openid,offline,hydra.clients \
+    --redirect http://localhost:9010/callback
 
 Setting up callback listener on http://localhost:4445/callback
 Press ctrl + c on Linux / Windows or cmd + c on OSX to end the process.

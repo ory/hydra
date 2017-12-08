@@ -20,9 +20,11 @@ before finalizing the upgrade process.
     - [Group endpoints](#group-endpoints)
     - [Replacing hierarchical scope strategy with wildcard scope strategy](#replacing-hierarchical-scope-strategy-with-wildcard-scope-strategy)
     - [AES-GCM nonce storage](#aes-gcm-nonce-storage)
-    - [Token signature algorithm changed from HMAC-SHA256 to HMAC-SHA512](#token-signature-algorithm-changed-from-hmac-sha256-to-hmac-sha512)
-    - [RS256 JWK Generator now uses all 256 bit](#rs256-jwk-generator-now-uses-all-256-bit)
     - [Minor Breaking Changes](#minor-breaking-changes)
+      - [Token signature algorithm changed from HMAC-SHA256 to HMAC-SHA512](#token-signature-algorithm-changed-from-hmac-sha256-to-hmac-sha512)
+      - [RS256 JWK Generator now uses all 256 bit](#rs256-jwk-generator-now-uses-all-256-bit)
+      - [ES512 Key generator](#es512-key-generator)
+      - [Build tags deprecated](#build-tags-deprecated)
   - [Important Additions](#important-additions)
     - [Prefixing Resources Names](#prefixing-resources-names)
     - [Refreshing OpenID Connect ID Token using `refresh_token` grant type](#refreshing-openid-connect-id-token-using-refresh_token-grant-type)
@@ -116,20 +118,32 @@ Previously, the audience terminology was used as a synonym for OAuth2 client IDs
 is typically a URL identifying the endpoint(s) the token is intended for. For example, if a client requires access to
 endpoint `http://mydomain.com/users`, then the audience would be `http://mydomain.com/users`.
 
-The audience feature is currently not supported in Hydra, only the terminology changed. Fields named `audience` are thus
-renamed to `clientId` (where previously named `audience`) and `cid` (where previously named `aud`).
+This changes the payload of `/warden/token/allowed` and is incorporated in the new consent flow as well. Please note
+that it is currently not possible to set the audience of a token. This feature is tracked with [here](https://github.com/ory/hydra/issues/687).
 
-**IMPORTANT NOTE:** This does **not** apply to OpenID Connect ID tokens. There, the `aud` claim **MUST** match the `client_id`.
-This discrepancy between OpenID Connect and OAuth 2.0 is what caused the confusion with the OAuth 2.0 audience terminology.
+**IMPORTANT NOTE:** In OpenID Connect ID Tokens, the token is issued for that client. Thus, the `aud` claim must equal
+to the `client_id` that initiated the request.
 
 #### Response payload changes to `/warden/token/allowed`
 
 Previously, the response of the warden endpoint contained shorthands like `aud`, `iss`, and so on. Those have now been changed
-to their full names. For example, `iss` is now `issuer`. Additionally, `aud` is now named `clientId`.
+to their full names:
+
+* `sub` is now named `subject`.
+* `scopes` is now named `grantedScopes`.
+* `iss` is now named `issuer`.
+* `aud` is now named `clientId`.
+* `iat` is now named `issuedAt`.
+* `exp` is now named `expiresAt`.
+* `ext` is now named `accessTokenExtra`.
 
 #### Go SDK
 
-The Go SDK was completely replaced in favor of a SDK based on `swagger-codegen`. Read more on it here: https://ory.gitbooks.io/hydra/content/sdk/go.html
+The Go SDK was completely replaced in favor of a SDK based on `swagger-codegen`. Unfortunately this means that
+any code relying on the old SDK has to be replaced. On the bright side the dependency tree is much smaller as
+no direct dependencies to ORY Hydra's code base exist any more.
+
+Read more on it here: https://ory.gitbooks.io/hydra/content/sdk/go.html
 
 #### Health endpoints
 
@@ -138,12 +152,17 @@ The Go SDK was completely replaced in favor of a SDK based on `swagger-codegen`.
 
 #### Group endpoints
 
-* `GET /warden/groups` now returns a list of groups, not just a group id
+`GET /warden/groups` now returns a list of groups, not just a list of strings (group ids).
 
 #### Replacing hierarchical scope strategy with wildcard scope strategy
 
-The previous scope matching strategy has been replaced in favor of a wildcard-based matching strategy. Read more
-on this strategy [here](https://ory.gitbooks.io/hydra/content/oauth2.html#oauth2-scopes).
+The previous scope matching strategy has been replaced in favor of a wildcard-based matching strategy. Previously,
+`foo` matched `foo` and `foo.bar` and `foo.baz`. This is no longer the case. So `foo` matches only `foo`. Matching
+subsets is possible using wildcards. `foo.*` matches `foo.bar` and `foo.baz`.
+
+This change makes setting scopes more explicit and is more secure, as it is less likely to make mistakes.
+
+Read more on this strategy [here](https://ory.gitbooks.io/hydra/content/oauth2.html#oauth2-scopes).
 
 To fall back to hierarchical scope matching, set the environment variable `SCOPE_STRATEGY=DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY`.
 This feature *might* be fully removed in a later version.
@@ -177,25 +196,33 @@ There are two paths to migrate this change:
     5. Restart all remaining Hydra instances.
     6. Import said keys using the REST API.
 
-#### Token signature algorithm changed from HMAC-SHA256 to HMAC-SHA512
+#### Minor Breaking Changes
+
+##### Token signature algorithm changed from HMAC-SHA256 to HMAC-SHA512
 
 The signature algorithm used to generate authorize codes, access tokens, and refresh tokens has been upgraded
 from HMAC-SHA256 to HMAC-SHA512. With upgrading to alpha.9, all previously issued authorize codes, access tokens, and refresh will thus be
 rendered invalid. Apart from some re-authorization procedures, which are usually automated, this should not have any
 significant impact on your installation.
 
-#### RS256 JWK Generator now uses all 256 bit
+##### RS256 JWK Generator now uses all 256 bit
 
 The RS256 JWK Generator now uses the full 256 bit range to generate secrets instead of a predefined rune sequence.
 This change only affects keys generated in the future.
 
-#### Minor Breaking Changes
+##### ES512 Key generator
 
-* The JWK algorithm `ES521` was renamed to `ES512`. If you want to generate a key using this algorithm, you have to use
+The JWK algorithm `ES521` was renamed to `ES512`. If you want to generate a key using this algorithm, you have to use
 the update name in the future.
-* This release removes build tags `-http`, `-automigrate`, `-without-telemetry` from the docker hub repository and replaces
+
+##### Build tags deprecated
+
+This release removes build tags `-http`, `-automigrate`, `-without-telemetry` from the docker hub repository and replaces
 it with a new and tiny (~6MB) docker image containing the binary only. Please note that this docker image does not have
 a shell, which makes it harder to penetrate.
+
+Instead of relying on tags to pass arguments, it is now possible to pass command arguments such as `docker run oryd/hydra:v0.10.0 host --dangerous-force-http`
+directly.
 
 ### Important Additions
 

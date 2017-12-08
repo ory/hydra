@@ -107,6 +107,6 @@ refreshToken().then(() => {
 
 ### API Docs
 
-API docs are available [here](https://github.com/ory/hydra/blob/prepare-1.0.0-alpha1/sdk/js/hydra/swagger/README.md).
+API docs are available [here](https://github.com/ory/hydra/blob/master/sdk/js/hydra/swagger/README.md).
 Please note that those docs are generated and may introduce bugs if code examples are used 1:1. Especially
 the package name is not correct.

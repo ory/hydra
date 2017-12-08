@@ -27,7 +27,6 @@ able to securely manage JSON Web Keys, and has a sophisticated policy-based acce
 <p align="left">
     <a href="https://circleci.com/gh/ory/hydra/tree/master"><img src="https://circleci.com/gh/ory/hydra/tree/master.svg?style=shield" alt="Build Status"></a>
     <a href="https://coveralls.io/github/ory/hydra?branch=master"><img src="https://coveralls.io/repos/ory/hydra/badge.svg?branch=master&service=github" alt="Coverage Status"></a>
-    <a href="https://codeclimate.com/github/ory/hydra/maintainability"><img src="https://api.codeclimate.com/v1/badges/18f41f1b79cee60deb7c/maintainability" /></a>
     <a href="https://goreportcard.com/report/github.com/ory/hydra"><img src="https://goreportcard.com/badge/github.com/ory/hydra" alt="Go Report Card"></a>
     <a href="https://bestpractices.coreinfrastructure.org/projects/364"><img src="https://bestpractices.coreinfrastructure.org/projects/364/badge" alt="CII Best Practices"></a>
 </p>

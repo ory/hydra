@@ -53,11 +53,11 @@ $ export SYSTEM_SECRET=this_needs_to_be_the_same_always_and_also_very_$3cuR3-._
 $ export DATABASE_URL=postgres://hydra:secret@ory-hydra-example--postgres:5432/hydra?sslmode=disable
 
 # Before starting, let's pull the latest ORY Hydra tag from docker.
-$ docker pull oryd/hydra:v0.10.0-alpha.21
+$ docker pull oryd/hydra:v0.10.0
 
 # This command will show you all the environment variables that you can set. Read this carefully.
 # It is the equivalent to `hydra help host`.
-$ docker run -it --rm --entrypoint hydra oryd/hydra:v0.10.0-alpha.21 help host
+$ docker run -it --rm --entrypoint hydra oryd/hydra:v0.10.0 help host
 
 Starts all HTTP/2 APIs and connects to a database backend.
 [...]
@@ -67,7 +67,7 @@ Starts all HTTP/2 APIs and connects to a database backend.
 # It is the equivalent to `hydra migrate sql postgres://hydra:secret@ory-hydra-example--postgres:5432/hydra?sslmode=disable`
 $ docker run -it --rm \
   --network hydraguide \
-  oryd/hydra:v0.10.0-alpha.21 \
+  oryd/hydra:v0.10.0 \
   migrate sql $DATABASE_URL
 
 Applying `ladon` SQL migrations...
@@ -86,7 +86,7 @@ $ docker run -d \
   -e ISSUER=https://localhost:9000/ \
   -e CONSENT_URL=http://localhost:9020/consent \
   -e FORCE_ROOT_CLIENT_CREDENTIALS=admin:demo-password \
-  oryd/hydra:v0.10.0-alpha.21
+  oryd/hydra:v0.10.0
 
 # And check if it's running:
 $ docker logs ory-hydra-example--hydra
@@ -143,7 +143,7 @@ ORY Hydra can be managed using the Hydra Command Line Interface (CLI), which is 
 see the available commands, run:
 
 ```
-$ docker run --rm -it --entrypoint hydra oryd/hydra:v0.10.0-alpha.21 help
+$ docker run --rm -it --entrypoint hydra oryd/hydra:v0.10.0 help
 Hydra is a cloud native high throughput OAuth2 and OpenID Connect provider
 
 Usage:
@@ -219,7 +219,7 @@ $ docker run --rm -it \
   -e CLIENT_ID=admin \
   -e CLIENT_SECRET=demo-password \
   --network hydraguide \
-  oryd/hydra:v0.10.0-alpha.21 \
+  oryd/hydra:v0.10.0 \
   <command>
 ```
 
@@ -242,7 +242,7 @@ $ docker run --rm -it \
   -e CLIENT_ID=admin \
   -e CLIENT_SECRET=demo-password \
   --network hydraguide \
-  oryd/hydra:v0.10.0-alpha.21 \
+  oryd/hydra:v0.10.0 \
   token client --skip-tls-verify
 
 tY9tGakiYAUn8VIGn_yCDlTahckSfGbDQIlXahjXtX0.BQlCxRDL3ngag6hdsSl9N2qrz7R399cQMfld8aI2Mlg
@@ -254,7 +254,7 @@ $ docker run --rm -it \
   -e CLIENT_SECRET=demo-password \
   -e TOKEN=$token \
   --network hydraguide \
-  oryd/hydra:v0.10.0-alpha.21 \
+  oryd/hydra:v0.10.0 \
   token validate --skip-tls-verify \  
   tY9tGakiYAUn8VIGn_yCDlTahckSfGbDQIlXahjXtX0.BQlCxRDL3ngag6hdsSl9N2qrz7R399cQMfld8aI2Mlg
 
@@ -284,7 +284,7 @@ $ docker run --rm -it \
   -e CLIENT_SECRET=demo-password \
   --network hydraguide \
   -p 9010:4445 \
-  oryd/hydra:v0.10.0-alpha.21 \
+  oryd/hydra:v0.10.0 \
   clients create --skip-tls-verify \
     --id consent-app \
     --secret consent-secret \
@@ -318,7 +318,7 @@ $ docker run --rm -it \
   -e CLIENT_SECRET=demo-password \
   --network hydraguide \
   -p 9010:4445 \
-  oryd/hydra:v0.10.0-alpha.21 \
+  oryd/hydra:v0.10.0 \
   policies create --skip-tls-verify \
     --actions get,accept,reject \
     --description "Allow consent-app to manage OAuth2 consent requests." \
@@ -376,7 +376,7 @@ $ docker run --rm -it \
   -e CLIENT_ID=admin \
   -e CLIENT_SECRET=demo-password \
   --network hydraguide \
-  oryd/hydra:v0.10.0-alpha.21 \
+  oryd/hydra:v0.10.0 \
   clients create --skip-tls-verify \
     --id some-consumer \
     --secret consumer-secret \
@@ -405,7 +405,7 @@ $ docker run --rm -it \
   -e CLIENT_ID=admin \
   -e CLIENT_SECRET=demo-password \
   --network hydraguide \
-  oryd/hydra:v0.10.0-alpha.21 \
+  oryd/hydra:v0.10.0 \
   policies create --skip-tls-verify \
     --actions get \
     --description "Allow everyone to read the OpenID Connect ID Token public key" \
@@ -426,7 +426,7 @@ same thing happens with this command:
 $ docker run --rm -it \
   --network hydraguide \
   -p 9010:4445 \
-  oryd/hydra:v0.10.0-alpha.21 \
+  oryd/hydra:v0.10.0 \
   token user --skip-tls-verify \
     --auth-url https://localhost:9000/oauth2/auth \
     --token-url https://ory-hydra-example--hydra:4444/oauth2/token \

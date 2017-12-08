@@ -22,7 +22,7 @@ before finalizing the upgrade process.
     - [AES-GCM nonce storage](#aes-gcm-nonce-storage)
     - [Minor Breaking Changes](#minor-breaking-changes)
       - [Token signature algorithm changed from HMAC-SHA256 to HMAC-SHA512](#token-signature-algorithm-changed-from-hmac-sha256-to-hmac-sha512)
-      - [RS256 JWK Generator now uses all 256 bit](#rs256-jwk-generator-now-uses-all-256-bit)
+      - [HS256 JWK Generator now uses all 256 bit](#hs256-jwk-generator-now-uses-all-256-bit)
       - [ES512 Key generator](#es512-key-generator)
       - [Build tags deprecated](#build-tags-deprecated)
   - [Important Additions](#important-additions)
@@ -205,10 +205,10 @@ from HMAC-SHA256 to HMAC-SHA512. With upgrading to alpha.9, all previously issue
 rendered invalid. Apart from some re-authorization procedures, which are usually automated, this should not have any
 significant impact on your installation.
 
-##### RS256 JWK Generator now uses all 256 bit
+##### HS256 JWK Generator now uses all 256 bit
 
-The RS256 JWK Generator now uses the full 256 bit range to generate secrets instead of a predefined rune sequence.
-This change only affects keys generated in the future.
+The HS256 (symmetric/shared keys) JWK Generator now uses the full 256 bit range to generate secrets instead of a
+predefined rune sequence. This change only affects keys generated in the future.
 
 ##### ES512 Key generator
 

@@ -98,7 +98,7 @@ jobs:
     steps:
       - checkout
       - run: gem install github_changelog_generator
-      - run: npm i -g doctoc
+      - run: sudo npm i -g doctoc
       - run: github_changelog_generator -u ory -p hydra -o CHANGELOG.md --token $GITHUB_TOKEN
       - run: doctoc CHANGELOG.md
       - run: git config --global user.email "circleci@ory.am"

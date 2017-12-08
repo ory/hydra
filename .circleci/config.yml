@@ -95,7 +95,6 @@ jobs:
   changelog:
     docker:
       - image: circleci/ruby:2.4-node
-    working_directory: /go/src/github.com/ory/hydra
     steps:
       - checkout
       - run: gem install github_changelog_generator

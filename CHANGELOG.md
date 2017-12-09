@@ -3,6 +3,8 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [Unreleased](#unreleased)
+  - [v0.10.4 (2017-12-09)](#v0104-2017-12-09)
   - [v0.10.3 (2017-12-08)](#v0103-2017-12-08)
   - [v0.10.2 (2017-12-08)](#v0102-2017-12-08)
   - [v0.10.1 (2017-12-08)](#v0101-2017-12-08)
@@ -107,6 +109,21 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Change Log
+
+## [Unreleased](https://github.com/ory/hydra/tree/HEAD)
+
+[Full Changelog](https://github.com/ory/hydra/compare/v0.10.4...HEAD)
+
+**Closed issues:**
+
+- oauth2: Support userinfo endpoint [\#652](https://github.com/ory/hydra/issues/652)
+
+## [v0.10.4](https://github.com/ory/hydra/tree/v0.10.4) (2017-12-09)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.10.3...v0.10.4)
+
+**Merged pull requests:**
+
+- oauth2: Adds basic userinfo endpoint [\#690](https://github.com/ory/hydra/pull/690) ([arekkas](https://github.com/arekkas))
 
 ## [v0.10.3](https://github.com/ory/hydra/tree/v0.10.3) (2017-12-08)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.10.2...v0.10.3)

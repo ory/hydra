@@ -30,6 +30,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
+	"bytes"
 )
 
 func TestAuthCode(t *testing.T) {
@@ -89,27 +90,53 @@ func TestAuthCode(t *testing.T) {
 		token, err := oauthConfig.Exchange(oauth2.NoContext, code)
 		require.NoError(t, err, code)
 
-		req, err = http.NewRequest("GET", ts.URL+"/userinfo", nil)
-		require.NoError(t, err)
-		req.Header.Add("Authorization", "bearer "+token.AccessToken)
-		resp, err = http.DefaultClient.Do(req)
-		require.NoError(t, err)
-		defer resp.Body.Close()
+		t.Run("case=userinfo", func(t *testing.T) {
 
-		out, err := ioutil.ReadAll(resp.Body)
-		require.NoError(t, err)
+			var makeRequest = func(req *http.Request) *http.Response {
+				resp, err = http.DefaultClient.Do(req)
+				require.NoError(t, err)
+				return resp
+			}
 
-		t.Logf("Got payload %s", out)
+			var testSuccess = func(response *http.Response) {
+				defer resp.Body.Close()
+
+				require.Equal(t, http.StatusOK, resp.StatusCode)
+
+				var claims map[string]interface{}
+				require.NoError(t, json.NewDecoder(resp.Body).Decode(&claims))
+				assert.Equal(t, "foo", claims["sub"])
+			}
+
+			req, err = http.NewRequest("GET", ts.URL+"/userinfo", nil)
+			req.Header.Add("Authorization", "bearer "+token.AccessToken)
+			testSuccess(makeRequest(req))
+
+			req, err = http.NewRequest("POST", ts.URL+"/userinfo", nil)
+			req.Header.Add("Authorization", "bearer "+token.AccessToken)
+			testSuccess(makeRequest(req))
+
+			req, err = http.NewRequest("POST", ts.URL+"/userinfo", bytes.NewBuffer([]byte("access_token="+token.AccessToken)))
+			req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+			testSuccess(makeRequest(req))
+
+			req, err = http.NewRequest("GET", ts.URL+"/userinfo", nil)
+			req.Header.Add("Authorization", "bearer asdfg")
+			resp := makeRequest(req)
+			require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
+		})
 
 		time.Sleep(time.Second * 5)
-
-		var claims map[string]interface{}
-		require.NoError(t, json.Unmarshal(out, &claims))
-		assert.Equal(t, "foo", claims["sub"])
 
 		res, err := testRefresh(t, token)
 		require.NoError(t, err)
 		assert.Equal(t, http.StatusOK, res.StatusCode)
+
+		t.Run("duplicate code exchange fails", func(t *testing.T) {
+			token, err := oauthConfig.Exchange(oauth2.NoContext, code)
+			require.Error(t, err)
+			require.Nil(t, token)
+		})
 	})
 
 	t.Run("case=test deny consent request", func(t *testing.T) {

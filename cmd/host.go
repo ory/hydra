@@ -116,6 +116,20 @@ OAUTH2 CONTROLS
 	This is required if you do not want to migrate to the new wildcard strategy.
 
 
+OPENID CONNECT CONTROLS
+===============
+
+- OIDC_DISCOVERY_CLAIMS_SUPPORTED: A comma separated list of supported claims to be advertised at the OpenID Connect
+	Discovery endpoint /.well-known/openid-configuration. Always adds "sub" to the supported claims.
+
+- OIDC_DISCOVERY_SCOPES_SUPPORTED: A comma separated list of supported scopes to be advertised at the OpenID Connect
+	Discovery endpoint /.well-known/openid-configuration. Always adds "offline", "openid" to the supported scopes.
+
+- OIDC_DISCOVERY_USERINFO_ENDPOINT: A URL of the userinfo endpoint to be advertised at the OpenID Connect
+	Discovery endpoint /.well-known/openid-configuration. Defaults to ORY Hydra's userinfo endpoint at /userinfo.
+	Set this value if you want to handle this endpoint yourself.
+
+
 HTTPS CONTROLS
 ==============
 

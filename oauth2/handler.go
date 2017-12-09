@@ -142,6 +142,21 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //       401: genericError
 //       500: genericError
 func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	userInfoEndpoint := h.Issuer + UserinfoPath
+	if h.UserinfoEndpoint != "" {
+		userInfoEndpoint = h.UserinfoEndpoint
+	}
+
+	claimsSupported := []string{"sub"}
+	if h.ClaimsSupported != "" {
+		claimsSupported = append(claimsSupported, strings.Split(h.ClaimsSupported, ",")...)
+	}
+
+	scopesSupported := []string{"offline", "openid"}
+	if h.ScopesSupported != "" {
+		scopesSupported = append(scopesSupported, strings.Split(h.ScopesSupported, ",")...)
+	}
+
 	wellKnown := WellKnown{
 		Issuer:           h.Issuer,
 		AuthURL:          h.Issuer + AuthPath,
@@ -150,9 +165,9 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ htt
 		SubjectTypes:     []string{"pairwise", "public"},
 		SigningAlgs:      []string{"RS256"},
 		ResponseTypes:    []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
-		ClaimsSupported:  []string{"sub"},
-		ScopesSupported:  []string{"offline", "openid"},
-		UserinfoEndpoint: h.Issuer + UserinfoPath,
+		ClaimsSupported:  claimsSupported,
+		ScopesSupported:  scopesSupported,
+		UserinfoEndpoint: userInfoEndpoint,
 	}
 	h.H.Write(w, r, wellKnown)
 }

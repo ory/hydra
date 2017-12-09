@@ -17,6 +17,7 @@ Method | HTTP request | Description
 [**RejectOAuth2ConsentRequest**](OAuth2Api.md#RejectOAuth2ConsentRequest) | **Patch** /oauth2/consent/requests/{id}/reject | Reject a consent request
 [**RevokeOAuth2Token**](OAuth2Api.md#RevokeOAuth2Token) | **Post** /oauth2/revoke | Revoke OAuth2 tokens
 [**UpdateOAuth2Client**](OAuth2Api.md#UpdateOAuth2Client) | **Put** /clients/{id} | Update an OAuth 2.0 Client
+[**Userinfo**](OAuth2Api.md#Userinfo) | **Post** /userinfo | OpenID Connect Userinfo
 [**WellKnown**](OAuth2Api.md#WellKnown) | **Get** /.well-known/jwks.json | Get list of well known JSON Web Keys
 
 
@@ -385,6 +386,32 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **Userinfo**
+> SwaggeruserinfoResponsePayload Userinfo()
+
+OpenID Connect Userinfo
+
+This endpoint returns the payload of the ID Token, including the idTokenExtra values, of the provided OAuth 2.0 access token. The endpoint implements http://openid.net/specs/openid-connect-core-1_0.html#UserInfo .
+
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**SwaggeruserinfoResponsePayload**](swaggeruserinfoResponsePayload.md)
+
+### Authorization
+
+[oauth2](../README.md#oauth2)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json, application/x-www-form-urlencoded
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

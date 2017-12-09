@@ -44,6 +44,7 @@ Class | Method | HTTP request | Description
 *OAuth2Api* | [**RejectOAuth2ConsentRequest**](docs/OAuth2Api.md#rejectoauth2consentrequest) | **Patch** /oauth2/consent/requests/{id}/reject | Reject a consent request
 *OAuth2Api* | [**RevokeOAuth2Token**](docs/OAuth2Api.md#revokeoauth2token) | **Post** /oauth2/revoke | Revoke OAuth2 tokens
 *OAuth2Api* | [**UpdateOAuth2Client**](docs/OAuth2Api.md#updateoauth2client) | **Put** /clients/{id} | Update an OAuth 2.0 Client
+*OAuth2Api* | [**Userinfo**](docs/OAuth2Api.md#userinfo) | **Post** /userinfo | OpenID Connect Userinfo
 *OAuth2Api* | [**WellKnown**](docs/OAuth2Api.md#wellknown) | **Get** /.well-known/jwks.json | Get list of well known JSON Web Keys
 *PolicyApi* | [**CreatePolicy**](docs/PolicyApi.md#createpolicy) | **Post** /policies | Create an Access Control Policy
 *PolicyApi* | [**DeletePolicy**](docs/PolicyApi.md#deletepolicy) | **Delete** /policies/{id} | Delete an Access Control Policy
@@ -109,6 +110,8 @@ Class | Method | HTTP request | Description
  - [SwaggerUpdatePolicyParameters](docs/SwaggerUpdatePolicyParameters.md)
  - [SwaggerWardenAccessRequestResponseParameters](docs/SwaggerWardenAccessRequestResponseParameters.md)
  - [SwaggerWardenTokenAccessRequestResponse](docs/SwaggerWardenTokenAccessRequestResponse.md)
+ - [SwaggeruserinfoResponse](docs/SwaggeruserinfoResponse.md)
+ - [SwaggeruserinfoResponsePayload](docs/SwaggeruserinfoResponsePayload.md)
  - [TokenAllowedRequest](docs/TokenAllowedRequest.md)
  - [WardenAccessRequest](docs/WardenAccessRequest.md)
  - [WardenAccessRequestResponse](docs/WardenAccessRequestResponse.md)

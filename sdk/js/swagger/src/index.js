@@ -67,6 +67,8 @@
         'model/SwaggerUpdatePolicyParameters',
         'model/SwaggerWardenAccessRequestResponseParameters',
         'model/SwaggerWardenTokenAccessRequestResponse',
+        'model/SwaggeruserinfoResponse',
+        'model/SwaggeruserinfoResponsePayload',
         'model/TokenAllowedRequest',
         'model/WardenAccessRequest',
         'model/WardenAccessRequestResponse',
@@ -133,6 +135,8 @@
       require('./model/SwaggerUpdatePolicyParameters'),
       require('./model/SwaggerWardenAccessRequestResponseParameters'),
       require('./model/SwaggerWardenTokenAccessRequestResponse'),
+      require('./model/SwaggeruserinfoResponse'),
+      require('./model/SwaggeruserinfoResponsePayload'),
       require('./model/TokenAllowedRequest'),
       require('./model/WardenAccessRequest'),
       require('./model/WardenAccessRequestResponse'),
@@ -196,6 +200,8 @@
   SwaggerUpdatePolicyParameters,
   SwaggerWardenAccessRequestResponseParameters,
   SwaggerWardenTokenAccessRequestResponse,
+  SwaggeruserinfoResponse,
+  SwaggeruserinfoResponsePayload,
   TokenAllowedRequest,
   WardenAccessRequest,
   WardenAccessRequestResponse,
@@ -483,6 +489,16 @@
      * @property {module:model/SwaggerWardenTokenAccessRequestResponse}
      */
     SwaggerWardenTokenAccessRequestResponse: SwaggerWardenTokenAccessRequestResponse,
+    /**
+     * The SwaggeruserinfoResponse model constructor.
+     * @property {module:model/SwaggeruserinfoResponse}
+     */
+    SwaggeruserinfoResponse: SwaggeruserinfoResponse,
+    /**
+     * The SwaggeruserinfoResponsePayload model constructor.
+     * @property {module:model/SwaggeruserinfoResponsePayload}
+     */
+    SwaggeruserinfoResponsePayload: SwaggeruserinfoResponsePayload,
     /**
      * The TokenAllowedRequest model constructor.
      * @property {module:model/TokenAllowedRequest}

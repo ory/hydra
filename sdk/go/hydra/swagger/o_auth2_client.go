@@ -42,7 +42,7 @@ type OAuth2Client struct {
 	// Public is a boolean that identifies this client as public, meaning that it does not have a secret. It will disable the client_credentials grant type for this client if set.
 	Public bool `json:"public,omitempty"`
 
-	// RedirectURIs is an array of allowed redirect urls for the client, for example: http://mydomain/oauth/callback .
+	// RedirectURIs is an array of allowed redirect urls for the client, for example http://mydomain/oauth/callback .
 	RedirectUris []string `json:"redirect_uris,omitempty"`
 
 	// ResponseTypes is an array of the OAuth 2.0 response type strings that the client can use at the authorization endpoint.

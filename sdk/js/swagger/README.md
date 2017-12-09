@@ -143,6 +143,7 @@ Class | Method | HTTP request | Description
 *HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**rejectOAuth2ConsentRequest**](docs/OAuth2Api.md#rejectOAuth2ConsentRequest) | **PATCH** /oauth2/consent/requests/{id}/reject | Reject a consent request
 *HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**revokeOAuth2Token**](docs/OAuth2Api.md#revokeOAuth2Token) | **POST** /oauth2/revoke | Revoke OAuth2 tokens
 *HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**updateOAuth2Client**](docs/OAuth2Api.md#updateOAuth2Client) | **PUT** /clients/{id} | Update an OAuth 2.0 Client
+*HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**userinfo**](docs/OAuth2Api.md#userinfo) | **POST** /userinfo | OpenID Connect Userinfo
 *HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**wellKnown**](docs/OAuth2Api.md#wellKnown) | **GET** /.well-known/jwks.json | Get list of well known JSON Web Keys
 *HydraOAuth2OpenIdConnectServer.PolicyApi* | [**createPolicy**](docs/PolicyApi.md#createPolicy) | **POST** /policies | Create an Access Control Policy
 *HydraOAuth2OpenIdConnectServer.PolicyApi* | [**deletePolicy**](docs/PolicyApi.md#deletePolicy) | **DELETE** /policies/{id} | Delete an Access Control Policy
@@ -208,6 +209,8 @@ Class | Method | HTTP request | Description
  - [HydraOAuth2OpenIdConnectServer.SwaggerUpdatePolicyParameters](docs/SwaggerUpdatePolicyParameters.md)
  - [HydraOAuth2OpenIdConnectServer.SwaggerWardenAccessRequestResponseParameters](docs/SwaggerWardenAccessRequestResponseParameters.md)
  - [HydraOAuth2OpenIdConnectServer.SwaggerWardenTokenAccessRequestResponse](docs/SwaggerWardenTokenAccessRequestResponse.md)
+ - [HydraOAuth2OpenIdConnectServer.SwaggeruserinfoResponse](docs/SwaggeruserinfoResponse.md)
+ - [HydraOAuth2OpenIdConnectServer.SwaggeruserinfoResponsePayload](docs/SwaggeruserinfoResponsePayload.md)
  - [HydraOAuth2OpenIdConnectServer.TokenAllowedRequest](docs/TokenAllowedRequest.md)
  - [HydraOAuth2OpenIdConnectServer.WardenAccessRequest](docs/WardenAccessRequest.md)
  - [HydraOAuth2OpenIdConnectServer.WardenAccessRequestResponse](docs/WardenAccessRequestResponse.md)

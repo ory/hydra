@@ -90,6 +90,7 @@ func (s *DefaultConsentStrategy) ValidateConsentRequest(req fosite.AuthorizeRequ
 				Issuer:    s.Issuer,
 				IssuedAt:  time.Now(),
 				ExpiresAt: time.Now().Add(s.DefaultIDTokenLifespan),
+				AuthTime:  time.Now(),
 				Extra:     consent.IDTokenExtra,
 			},
 			// required for lookup on jwk endpoint

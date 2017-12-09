@@ -154,6 +154,15 @@ func initConfig() {
 	viper.BindEnv("RESOURCE_NAME_PREFIX")
 	viper.SetDefault("RESOURCE_NAME_PREFIX", "")
 
+	viper.BindEnv("OIDC_DISCOVERY_CLAIMS_SUPPORTED")
+	viper.SetDefault("OIDC_DISCOVERY_CLAIMS_SUPPORTED", "")
+
+	viper.BindEnv("OIDC_DISCOVERY_SCOPES_SUPPORTED")
+	viper.SetDefault("OIDC_DISCOVERY_SCOPES_SUPPORTED", "")
+
+	viper.BindEnv("OIDC_DISCOVERY_USERINFO_ENDPOINT")
+	viper.SetDefault("OIDC_DISCOVERY_USERINFO_ENDPOINT", "")
+
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err != nil {
 		fmt.Printf(`Config file not found because "%s"`, err)

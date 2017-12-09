@@ -46,6 +46,10 @@ type Handler struct {
 	W firewall.Firewall
 
 	ResourcePrefix string
+
+	ClaimsSupported  string
+	ScopesSupported  string
+	UserinfoEndpoint string
 }
 
 func (h *Handler) PrefixResource(resource string) string {

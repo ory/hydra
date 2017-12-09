@@ -51,7 +51,7 @@ func TestHandlerWellKnown(t *testing.T) {
 	ts := httptest.NewServer(r)
 
 	res, err := http.Get(ts.URL + "/.well-known/openid-configuration")
-
+	require.NoError(t, err)
 	defer res.Body.Close()
 
 	trueConfig := WellKnown{
@@ -69,7 +69,20 @@ func TestHandlerWellKnown(t *testing.T) {
 	var wellKnownResp WellKnown
 	err = json.NewDecoder(res.Body).Decode(&wellKnownResp)
 	require.NoError(t, err, "problem decoding wellknown json response: %+v", err)
-	assert.Equal(t, trueConfig, wellKnownResp)
+	assert.EqualValues(t, trueConfig, wellKnownResp)
+
+	h.ScopesSupported = "foo,bar"
+	h.ClaimsSupported = "baz,oof"
+	h.UserinfoEndpoint = "bar"
+
+	res, err = http.Get(ts.URL + "/.well-known/openid-configuration")
+	require.NoError(t, err)
+	defer res.Body.Close()
+	require.NoError(t, json.NewDecoder(res.Body).Decode(&wellKnownResp))
+
+	assert.EqualValues(t, wellKnownResp.ClaimsSupported, []string{"sub", "baz", "oof"})
+	assert.EqualValues(t, wellKnownResp.ScopesSupported, []string{"offline", "openid", "foo", "bar"})
+	assert.Equal(t, wellKnownResp.UserinfoEndpoint, "bar")
 }
 
 type FakeConsentStrategy struct {

@@ -132,9 +132,12 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm oauth2.Con
 	pkg.Must(err, "Could not parse consent url %s.", c.ConsentURL)
 
 	handler := &oauth2.Handler{
-		ForcedHTTP:    c.ForceHTTP,
-		OAuth2:        o,
-		ScopeStrategy: c.GetScopeStrategy(),
+		ScopesSupported:  c.OpenIDDiscoveryScopesSupported,
+		UserinfoEndpoint: c.OpenIDDiscoveryUserinfoEndpoint,
+		ClaimsSupported:  c.OpenIDDiscoveryClaimsSupported,
+		ForcedHTTP:       c.ForceHTTP,
+		OAuth2:           o,
+		ScopeStrategy:    c.GetScopeStrategy(),
 		Consent: &oauth2.DefaultConsentStrategy{
 			Issuer:                   c.Issuer,
 			ConsentManager:           c.Context().ConsentManager,

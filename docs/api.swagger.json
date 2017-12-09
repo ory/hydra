@@ -1963,12 +1963,6 @@
     "Handler": {
       "type": "object",
       "properties": {
-        "Generators": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/KeyGenerator"
-          }
-        },
         "H": {
           "$ref": "#/definitions/Writer"
         },
@@ -1982,7 +1976,7 @@
           "$ref": "#/definitions/Firewall"
         }
       },
-      "x-go-package": "github.com/ory/hydra/jwk"
+      "x-go-package": "github.com/ory/hydra/warden/group"
     },
     "KeyGenerator": {
       "type": "object",
@@ -3123,6 +3117,14 @@
           "type": "string",
           "x-go-name": "AuthURL"
         },
+        "claims_supported": {
+          "description": "JSON array containing a list of the Claim Names of the Claims that the OpenID Provider MAY be able to supply\nvalues for. Note that for privacy or other reasons, this might not be an exhaustive list.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "ClaimsSupported"
+        },
         "id_token_signing_alg_values_supported": {
           "description": "JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token\nto encode the Claims in a JWT [JWT]. The algorithm RS256 MUST be included. The value none MAY be supported,\nbut MUST NOT be used unless the Response Type used returns no ID Token from the Authorization Endpoint\n(such as when using the Authorization Code Flow).",
           "type": "array",
@@ -3149,6 +3151,14 @@
           },
           "x-go-name": "ResponseTypes"
         },
+        "scopes_supported": {
+          "description": "SON array containing a list of the OAuth 2.0 [RFC6749] scope values that this server supports. The server MUST\nsupport the openid scope value. Servers MAY choose not to advertise some supported scope values even when this parameter is used",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "ScopesSupported"
+        },
         "subject_types_supported": {
           "description": "JSON array containing a list of the Subject Identifier types that this OP supports. Valid types include\npairwise and public.",
           "type": "array",
@@ -3161,6 +3171,11 @@
           "description": "URL of the OP's OAuth 2.0 Token Endpoint",
           "type": "string",
           "x-go-name": "TokenURL"
+        },
+        "userinfo_endpoint": {
+          "description": "URL of the OP's UserInfo Endpoint.",
+          "type": "string",
+          "x-go-name": "UserinfoEndpoint"
         }
       },
       "x-go-name": "WellKnown",

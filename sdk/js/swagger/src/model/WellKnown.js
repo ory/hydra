@@ -63,12 +63,14 @@
     var _this = this
 
     _this['authorization_endpoint'] = authorizationEndpoint
+
     _this[
       'id_token_signing_alg_values_supported'
     ] = idTokenSigningAlgValuesSupported
     _this['issuer'] = issuer
     _this['jwks_uri'] = jwksUri
     _this['response_types_supported'] = responseTypesSupported
+
     _this['subject_types_supported'] = subjectTypesSupported
     _this['token_endpoint'] = tokenEndpoint
   }
@@ -88,6 +90,12 @@
         obj['authorization_endpoint'] = ApiClient.convertToType(
           data['authorization_endpoint'],
           'String'
+        )
+      }
+      if (data.hasOwnProperty('claims_supported')) {
+        obj['claims_supported'] = ApiClient.convertToType(
+          data['claims_supported'],
+          ['String']
         )
       }
       if (data.hasOwnProperty('id_token_signing_alg_values_supported')) {
@@ -110,6 +118,12 @@
           ['String']
         )
       }
+      if (data.hasOwnProperty('scopes_supported')) {
+        obj['scopes_supported'] = ApiClient.convertToType(
+          data['scopes_supported'],
+          ['String']
+        )
+      }
       if (data.hasOwnProperty('subject_types_supported')) {
         obj['subject_types_supported'] = ApiClient.convertToType(
           data['subject_types_supported'],
@@ -122,6 +136,12 @@
           'String'
         )
       }
+      if (data.hasOwnProperty('userinfo_endpoint')) {
+        obj['userinfo_endpoint'] = ApiClient.convertToType(
+          data['userinfo_endpoint'],
+          'String'
+        )
+      }
     }
     return obj
   }
@@ -131,6 +151,11 @@
    * @member {String} authorization_endpoint
    */
   exports.prototype['authorization_endpoint'] = undefined
+  /**
+   * JSON array containing a list of the Claim Names of the Claims that the OpenID Provider MAY be able to supply values for. Note that for privacy or other reasons, this might not be an exhaustive list.
+   * @member {Array.<String>} claims_supported
+   */
+  exports.prototype['claims_supported'] = undefined
   /**
    * JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token to encode the Claims in a JWT [JWT]. The algorithm RS256 MUST be included. The value none MAY be supported, but MUST NOT be used unless the Response Type used returns no ID Token from the Authorization Endpoint (such as when using the Authorization Code Flow).
    * @member {Array.<String>} id_token_signing_alg_values_supported
@@ -152,6 +177,11 @@
    */
   exports.prototype['response_types_supported'] = undefined
   /**
+   * SON array containing a list of the OAuth 2.0 [RFC6749] scope values that this server supports. The server MUST support the openid scope value. Servers MAY choose not to advertise some supported scope values even when this parameter is used
+   * @member {Array.<String>} scopes_supported
+   */
+  exports.prototype['scopes_supported'] = undefined
+  /**
    * JSON array containing a list of the Subject Identifier types that this OP supports. Valid types include pairwise and public.
    * @member {Array.<String>} subject_types_supported
    */
@@ -161,6 +191,11 @@
    * @member {String} token_endpoint
    */
   exports.prototype['token_endpoint'] = undefined
+  /**
+   * URL of the OP's UserInfo Endpoint.
+   * @member {String} userinfo_endpoint
+   */
+  exports.prototype['userinfo_endpoint'] = undefined
 
   return exports
 })

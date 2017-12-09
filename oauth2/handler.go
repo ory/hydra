@@ -99,6 +99,17 @@ type WellKnown struct {
 	//
 	// required: true
 	ResponseTypes []string `json:"response_types_supported"`
+
+	// JSON array containing a list of the Claim Names of the Claims that the OpenID Provider MAY be able to supply
+	// values for. Note that for privacy or other reasons, this might not be an exhaustive list.
+	ClaimsSupported []string `json:"claims_supported"`
+
+	// URL of the OP's UserInfo Endpoint.
+	UserinfoEndpoint string `json:"userinfo_endpoint"`
+
+	// SON array containing a list of the OAuth 2.0 [RFC6749] scope values that this server supports. The server MUST
+	// support the openid scope value. Servers MAY choose not to advertise some supported scope values even when this parameter is used
+	ScopesSupported []string `json:"scopes_supported"`
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
@@ -131,13 +142,16 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //       500: genericError
 func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	wellKnown := WellKnown{
-		Issuer:        h.Issuer,
-		AuthURL:       h.Issuer + AuthPath,
-		TokenURL:      h.Issuer + TokenPath,
-		JWKsURI:       h.Issuer + JWKPath,
-		SubjectTypes:  []string{"pairwise", "public"},
-		SigningAlgs:   []string{"RS256"},
-		ResponseTypes: []string{"code", "code id_token", "id_token", "token id_token", "token"},
+		Issuer:           h.Issuer,
+		AuthURL:          h.Issuer + AuthPath,
+		TokenURL:         h.Issuer + TokenPath,
+		JWKsURI:          h.Issuer + JWKPath,
+		SubjectTypes:     []string{"pairwise", "public"},
+		SigningAlgs:      []string{"RS256"},
+		ResponseTypes:    []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
+		ClaimsSupported:  []string{"sub"},
+		ScopesSupported:  []string{"offline", "openid"},
+		UserinfoEndpoint: h.Issuer + UserinfoPath,
 	}
 	h.H.Write(w, r, wellKnown)
 }

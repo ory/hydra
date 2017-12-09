@@ -55,13 +55,16 @@ func TestHandlerWellKnown(t *testing.T) {
 	defer res.Body.Close()
 
 	trueConfig := WellKnown{
-		Issuer:        h.Issuer,
-		AuthURL:       h.Issuer + AuthPathT,
-		TokenURL:      h.Issuer + TokenPathT,
-		JWKsURI:       h.Issuer + JWKPathT,
-		SubjectTypes:  []string{"pairwise", "public"},
-		SigningAlgs:   []string{"RS256"},
-		ResponseTypes: []string{"code", "code id_token", "id_token", "token id_token", "token"},
+		Issuer:           h.Issuer,
+		AuthURL:          h.Issuer + AuthPathT,
+		TokenURL:         h.Issuer + TokenPathT,
+		JWKsURI:          h.Issuer + JWKPathT,
+		SubjectTypes:     []string{"pairwise", "public"},
+		SigningAlgs:      []string{"RS256"},
+		ResponseTypes:    []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
+		ClaimsSupported:  []string{"sub"},
+		ScopesSupported:  []string{"offline", "openid"},
+		UserinfoEndpoint: h.Issuer + UserinfoPath,
 	}
 	var wellKnownResp WellKnown
 	err = json.NewDecoder(res.Body).Decode(&wellKnownResp)

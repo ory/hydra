@@ -28,6 +28,7 @@
         'model/OAuth2Client',
         'model/OAuth2ConsentRequest',
         'model/OAuth2TokenIntrospection',
+        'model/SwaggeruserinfoResponsePayload',
         'model/WellKnown'
       ],
       factory
@@ -44,6 +45,7 @@
       require('../model/OAuth2Client'),
       require('../model/OAuth2ConsentRequest'),
       require('../model/OAuth2TokenIntrospection'),
+      require('../model/SwaggeruserinfoResponsePayload'),
       require('../model/WellKnown')
     )
   } else {
@@ -61,6 +63,7 @@
       root.HydraOAuth2OpenIdConnectServer.OAuth2Client,
       root.HydraOAuth2OpenIdConnectServer.OAuth2ConsentRequest,
       root.HydraOAuth2OpenIdConnectServer.OAuth2TokenIntrospection,
+      root.HydraOAuth2OpenIdConnectServer.SwaggeruserinfoResponsePayload,
       root.HydraOAuth2OpenIdConnectServer.WellKnown
     )
   }
@@ -74,6 +77,7 @@
   OAuth2Client,
   OAuth2ConsentRequest,
   OAuth2TokenIntrospection,
+  SwaggeruserinfoResponsePayload,
   WellKnown
 ) {
   'use strict'
@@ -754,6 +758,52 @@
       return this.apiClient.callApi(
         '/clients/{id}',
         'PUT',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
+    }
+
+    /**
+     * Callback function to receive the result of the userinfo operation.
+     * @callback module:api/OAuth2Api~userinfoCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/SwaggeruserinfoResponsePayload} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * OpenID Connect Userinfo
+     * This endpoint returns the payload of the ID Token, including the idTokenExtra values, of the provided OAuth 2.0 access token. The endpoint implements http://openid.net/specs/openid-connect-core-1_0.html#UserInfo .
+     * @param {module:api/OAuth2Api~userinfoCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/SwaggeruserinfoResponsePayload}
+     */
+    this.userinfo = function(callback) {
+      var postBody = null
+
+      var pathParams = {}
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
+
+      var authNames = ['oauth2']
+      var contentTypes = [
+        'application/json',
+        'application/x-www-form-urlencoded'
+      ]
+      var accepts = ['application/json']
+      var returnType = SwaggeruserinfoResponsePayload
+
+      return this.apiClient.callApi(
+        '/userinfo',
+        'POST',
         pathParams,
         queryParams,
         headerParams,

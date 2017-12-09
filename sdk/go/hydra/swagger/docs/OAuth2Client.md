@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 **Owner** | **string** | Owner is a string identifying the owner of the OAuth 2.0 Client. | [optional] [default to null]
 **PolicyUri** | **string** | PolicyURI is a URL string that points to a human-readable privacy policy document that describes how the deployment organization collects, uses, retains, and discloses personal data. | [optional] [default to null]
 **Public** | **bool** | Public is a boolean that identifies this client as public, meaning that it does not have a secret. It will disable the client_credentials grant type for this client if set. | [optional] [default to null]
-**RedirectUris** | **[]string** | RedirectURIs is an array of allowed redirect urls for the client, for example: http://mydomain/oauth/callback . | [optional] [default to null]
+**RedirectUris** | **[]string** | RedirectURIs is an array of allowed redirect urls for the client, for example http://mydomain/oauth/callback . | [optional] [default to null]
 **ResponseTypes** | **[]string** | ResponseTypes is an array of the OAuth 2.0 response type strings that the client can use at the authorization endpoint. | [optional] [default to null]
 **Scope** | **string** | Scope is a string containing a space-separated list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749]) that the client can use when requesting access tokens. | [optional] [default to null]
 **TosUri** | **string** | TermsOfServiceURI is a URL string that points to a human-readable terms of service document for the client that describes a contractual relationship between the end-user and the client that the end-user accepts when authorizing the client. | [optional] [default to null]

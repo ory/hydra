@@ -37,6 +37,7 @@ const (
 	TokenPath          = "/oauth2/token"
 	AuthPath           = "/oauth2/auth"
 
+	UserinfoPath  = "/userinfo"
 	WellKnownPath = "/.well-known/openid-configuration"
 	JWKPath       = "/.well-known/jwks.json"
 
@@ -108,6 +109,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.POST(IntrospectPath, h.IntrospectHandler)
 	r.POST(RevocationPath, h.RevocationHandler)
 	r.GET(WellKnownPath, h.WellKnownHandler)
+	r.GET(UserinfoPath, h.UserinfoHandler)
 }
 
 // swagger:route GET /.well-known/openid-configuration oAuth2 getWellKnown
@@ -138,6 +140,36 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ htt
 		ResponseTypes: []string{"code", "code id_token", "id_token", "token id_token", "token"},
 	}
 	h.H.Write(w, r, wellKnown)
+}
+
+// swagger:route POST /userinfo oAuth2 userinfo
+//
+// OpenID Connect Userinfo
+//
+// This endpoint returns the payload of the ID Token, including the idTokenExtra values, of the provided OAuth 2.0 access token.
+// The endpoint implements http://openid.net/specs/openid-connect-core-1_0.html#UserInfo .
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2:
+//
+//     Responses:
+//       200: userinfoResponse
+//       401: genericError
+//       500: genericError
+func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	session := NewSession("")
+	ar, err := h.OAuth2.IntrospectToken(r.Context(), fosite.AccessTokenFromRequest(r), fosite.AccessToken, session)
+	if err != nil {
+		h.H.WriteError(w, r, err)
+		return
+	}
+
+	h.H.Write(w, r, ar.GetSession().(*Session).IDTokenClaims().ToMap())
 }
 
 // swagger:route POST /oauth2/revoke oAuth2 revokeOAuth2Token

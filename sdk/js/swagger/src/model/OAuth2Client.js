@@ -175,7 +175,7 @@
    */
   exports.prototype['public'] = undefined
   /**
-   * RedirectURIs is an array of allowed redirect urls for the client, for example: http://mydomain/oauth/callback .
+   * RedirectURIs is an array of allowed redirect urls for the client, for example http://mydomain/oauth/callback .
    * @member {Array.<String>} redirect_uris
    */
   exports.prototype['redirect_uris'] = undefined

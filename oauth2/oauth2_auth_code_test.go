@@ -23,6 +23,8 @@ import (
 	"testing"
 	"time"
 
+	"encoding/json"
+
 	"github.com/julienschmidt/httprouter"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/stretchr/testify/assert"
@@ -50,13 +52,13 @@ func TestAuthCode(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, http.StatusOK, response.StatusCode)
 
-			assert.EqualValues(t, []string{"hydra.*", "offline"}, cr.RequestedScopes)
+			assert.EqualValues(t, []string{"hydra.*", "offline", "openid"}, cr.RequestedScopes)
 			assert.Equal(t, r.URL.Query().Get("consent"), cr.Id)
 			assert.True(t, strings.Contains(cr.RedirectUrl, "oauth2/auth?client_id=app-client"))
 
 			response, err = consentClient.AcceptOAuth2ConsentRequest(r.URL.Query().Get("consent"), hydra.ConsentRequestAcceptance{
 				Subject:     "foo",
-				GrantScopes: []string{"hydra.*", "offline"},
+				GrantScopes: []string{"hydra.*", "offline", "openid"},
 			})
 			require.NoError(t, err)
 			assert.Equal(t, http.StatusNoContent, response.StatusCode)
@@ -87,7 +89,23 @@ func TestAuthCode(t *testing.T) {
 		token, err := oauthConfig.Exchange(oauth2.NoContext, code)
 		require.NoError(t, err, code)
 
+		req, err = http.NewRequest("GET", ts.URL+"/userinfo", nil)
+		require.NoError(t, err)
+		req.Header.Add("Authorization", "bearer "+token.AccessToken)
+		resp, err = http.DefaultClient.Do(req)
+		require.NoError(t, err)
+		defer resp.Body.Close()
+
+		out, err := ioutil.ReadAll(resp.Body)
+		require.NoError(t, err)
+
+		t.Logf("Got payload %s", out)
+
 		time.Sleep(time.Second * 5)
+
+		var claims map[string]interface{}
+		require.NoError(t, json.Unmarshal(out, &claims))
+		assert.Equal(t, "foo", claims["sub"])
 
 		res, err := testRefresh(t, token)
 		require.NoError(t, err)

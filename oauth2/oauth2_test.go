@@ -81,6 +81,7 @@ var handler = &Handler{
 	ForcedHTTP:    true,
 	L:             logrus.New(),
 	ScopeStrategy: fosite.HierarchicScopeStrategy,
+	H:             herodot.NewJSONWriter(nil),
 }
 
 var router = httprouter.New()
@@ -126,7 +127,7 @@ func init() {
 		RedirectURIs:  []string{ts.URL + "/callback"},
 		ResponseTypes: []string{"id_token", "code", "token"},
 		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
-		Scope:         "hydra.* offline",
+		Scope:         "hydra.* offline openid",
 	}
 
 	oauthConfig = &oauth2.Config{
@@ -137,7 +138,7 @@ func init() {
 			TokenURL: ts.URL + "/oauth2/token",
 		},
 		RedirectURL: ts.URL + "/callback",
-		Scopes:      []string{"hydra.*", "offline"},
+		Scopes:      []string{"hydra.*", "offline", "openid"},
 	}
 
 	oauthClientConfig = &clientcredentials.Config{

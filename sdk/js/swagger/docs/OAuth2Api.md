@@ -17,6 +17,7 @@ Method | HTTP request | Description
 [**rejectOAuth2ConsentRequest**](OAuth2Api.md#rejectOAuth2ConsentRequest) | **PATCH** /oauth2/consent/requests/{id}/reject | Reject a consent request
 [**revokeOAuth2Token**](OAuth2Api.md#revokeOAuth2Token) | **POST** /oauth2/revoke | Revoke OAuth2 tokens
 [**updateOAuth2Client**](OAuth2Api.md#updateOAuth2Client) | **PUT** /clients/{id} | Update an OAuth 2.0 Client
+[**userinfo**](OAuth2Api.md#userinfo) | **POST** /userinfo | OpenID Connect Userinfo
 [**wellKnown**](OAuth2Api.md#wellKnown) | **GET** /.well-known/jwks.json | Get list of well known JSON Web Keys
 
 
@@ -671,6 +672,51 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/json
+
+<a name="userinfo"></a>
+# **userinfo**
+> SwaggeruserinfoResponsePayload userinfo()
+
+OpenID Connect Userinfo
+
+This endpoint returns the payload of the ID Token, including the idTokenExtra values, of the provided OAuth 2.0 access token. The endpoint implements http://openid.net/specs/openid-connect-core-1_0.html#UserInfo .
+
+### Example
+```javascript
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+
+// Configure OAuth2 access token for authorization: oauth2
+var oauth2 = defaultClient.authentications['oauth2'];
+oauth2.accessToken = 'YOUR ACCESS TOKEN';
+
+var apiInstance = new HydraOAuth2OpenIdConnectServer.OAuth2Api();
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+apiInstance.userinfo(callback);
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**SwaggeruserinfoResponsePayload**](SwaggeruserinfoResponsePayload.md)
+
+### Authorization
+
+[oauth2](../README.md#oauth2)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json, application/x-www-form-urlencoded
  - **Accept**: application/json
 
 <a name="wellKnown"></a>

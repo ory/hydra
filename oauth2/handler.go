@@ -121,6 +121,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.POST(RevocationPath, h.RevocationHandler)
 	r.GET(WellKnownPath, h.WellKnownHandler)
 	r.GET(UserinfoPath, h.UserinfoHandler)
+	r.POST(UserinfoPath, h.UserinfoHandler)
 }
 
 // swagger:route GET /.well-known/openid-configuration oAuth2 getWellKnown

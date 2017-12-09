@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [v0.10.7 (2017-12-09)](#v0107-2017-12-09)
   - [v0.10.6 (2017-12-09)](#v0106-2017-12-09)
   - [v0.10.5 (2017-12-09)](#v0105-2017-12-09)
   - [v0.10.4 (2017-12-09)](#v0104-2017-12-09)
@@ -110,6 +111,9 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Change Log
+
+## [v0.10.7](https://github.com/ory/hydra/tree/v0.10.7) (2017-12-09)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.10.6...v0.10.7)
 
 ## [v0.10.6](https://github.com/ory/hydra/tree/v0.10.6) (2017-12-09)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.10.5...v0.10.6)

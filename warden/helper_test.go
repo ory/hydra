@@ -91,7 +91,7 @@ var (
 		},
 	})
 	fositeStore                 = pkg.FositeStore()
-	now                         = time.Now().Round(time.Second)
+	now                         = time.Now().UTC().Round(time.Second)
 	tokens                      = pkg.Tokens(4)
 	accessRequestTokenTestCases = []struct {
 		token     string
@@ -201,7 +201,7 @@ func createAccessTokenSession(subject, client string, token string, expiresAt ti
 	if scopes != nil {
 		ar.GrantedScopes = scopes
 	}
-	ar.RequestedAt = time.Now().Round(time.Second)
+	ar.RequestedAt = time.Now().UTC().Round(time.Second)
 	ar.Client = &fosite.DefaultClient{ID: client}
 	ar.Session.SetExpiresAt(fosite.AccessToken, expiresAt)
 	ar.Session.(*oauth2.Session).Extra = map[string]interface{}{"foo": "bar"}

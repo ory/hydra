@@ -1894,6 +1894,22 @@
           "type": "string",
           "x-go-name": "RedirectURL"
         },
+        "requestedAcr": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "RequestedACR"
+        },
+        "requestedMaxAge": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "MaxAge"
+        },
+        "requestedPrompt": {
+          "type": "string",
+          "x-go-name": "RequestedPrompt"
+        },
         "requestedScopes": {
           "description": "RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator.",
           "type": "array",
@@ -2019,6 +2035,12 @@
           },
           "x-go-name": "AccessTokenExtra"
         },
+        "authTime": {
+          "description": "AuthTime is the time when the End-User authentication occurred. Its value is a JSON number representing the\nnumber of seconds from 1970-01-01T0:0:0Z as measured in UTC until the date/time.",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "AuthTime"
+        },
         "grantScopes": {
           "description": "A list of scopes that the user agreed to grant. It should be a subset of requestedScopes from the consent request.",
           "type": "array",
@@ -2035,6 +2057,11 @@
           },
           "x-go-name": "IDTokenExtra"
         },
+        "providedAcr": {
+          "description": "ProvidedAuthenticationContextClassReference specifies an Authentication Context Class Reference value that identifies\nthe Authentication Context Class that the authentication performed satisfied. The value \"0\" indicates the End-User\nauthentication did not meet the requirements of ISO/IEC 29115 [ISO29115] level 1.\n\nIn summary ISO/IEC 29115 defines four levels, broadly summarized as follows.\n\nacr=0 does not satisfy Level 1 and could be, for example, authentication using a long-lived browser cookie.\nLevel 1 (acr=1): Minimal confidence in the asserted identity of the entity, but enough confidence that the\nentity is the same over consecutive authentication events. For example presenting a self-registered\nusername or password.\nLevel 2 (acr=2): There is some confidence in the asserted identity of the entity. For example confirming\nauthentication using a mobile app (\"Something you have\").\nLevel 3 (acr=3): High confidence in an asserted identity of the entity. For example sending a code to a mobile\nphone or using Google Authenticator or a fingerprint scanner (\"Something you have and something you know\" / \"Something you are\")\nLevel 4 (acr=4): Very high confidence in an asserted identity of the entity. Requires in-person identification.",
+          "type": "string",
+          "x-go-name": "ProvidedAuthenticationContextClassReference"
+        },
         "subject": {
           "description": "Subject represents a unique identifier of the user (or service, or legal entity, ...) that accepted the\nOAuth2 request.",
           "type": "string",
@@ -2048,6 +2075,11 @@
       "type": "object",
       "title": "RejectConsentRequestPayload represents data that will be used to reject a consent request.",
       "properties": {
+        "error": {
+          "description": "Error can be used to return an OpenID Connect or OAuth 2.0 error to the OAuth 2.0 client, such as login_required,\ninteraction_required, consent_required.",
+          "type": "string",
+          "x-go-name": "Error"
+        },
         "reason": {
           "description": "Reason represents the reason why the user rejected the consent request.",
           "type": "string",
@@ -2337,9 +2369,28 @@
           "x-go-name": "ID"
         },
         "redirectUrl": {
-          "description": "Redirect URL is the URL where the user agent should be redirected to after the consent has been\naccepted or rejected.",
+          "description": "RedirectURL is the URL where the user agent should be redirected to after the consent has been\naccepted or rejected.",
           "type": "string",
           "x-go-name": "RedirectURL"
+        },
+        "requestedAcr": {
+          "description": "RequestedAuthenticationContextClassReference specifies an Authentication Context Class Reference value that identifies\nthe Authentication Context Class that the authentication performed satisfied. The value \"0\" indicates the End-User\nauthentication did not meet the requirements of ISO/IEC 29115 [ISO29115] level 1.\n\nIn summary ISO/IEC 29115 defines four levels, broadly summarized as follows.\n\nacr=0 does not satisfy Level 1 and could be, for example, authentication using a long-lived browser cookie.\nLevel 1 (acr=1): Minimal confidence in the asserted identity of the entity, but enough confidence that the\nentity is the same over consecutive authentication events. For example presenting a self-registered\nusername or password.\nLevel 2 (acr=2): There is some confidence in the asserted identity of the entity. For example confirming\nauthentication using a mobile app (\"Something you have\").\nLevel 3 (acr=3): High confidence in an asserted identity of the entity. For example sending a code to a mobile\nphone or using Google Authenticator or a fingerprint scanner (\"Something you have and something you know\" / \"Something you are\")\nLevel 4 (acr=4): Very high confidence in an asserted identity of the entity. Requires in-person identification.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "RequestedAuthenticationContextClassReference"
+        },
+        "requestedMaxAge": {
+          "description": "MaxAge specifies the allowable elapsed time in seconds since the last time the End-User was actively\nauthenticated by the OP. If the elapsed time is greater than this value, the OP MUST attempt to actively\nre-authenticate the End-User.",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "MaxAge"
+        },
+        "requestedPrompt": {
+          "description": "Space delimited, case sensitive list of ASCII string values that specifies whether the Authorization Server\nprompts the End-User for reauthentication and consent. The defined values are:\n\nnone: The consent app MUST NOT display any authentication or consent user interface pages. An error is returned\nif an End-User is not already authenticated or the Client does not have pre-configured consent for the requested\nClaims or does not fulfill other conditions for processing the request. The error code will typically be\nlogin_required, interaction_required. This can be used as a method to check for existing authentication and/or consent.\nlogin: The consent app SHOULD prompt the End-User for reauthentication. If it cannot reauthenticate the\nEnd-User, it MUST return an error, typically login_required.\nconsent: The consent app SHOULD prompt the End-User for consent before returning information to the Client.\nIf it cannot obtain consent, it MUST return an error, typically consent_required.\nselect_account: The consent app SHOULD prompt the End-User to select a user account. This enables an End-User\nwho has multiple accounts at the Authorization Server to select amongst the multiple accounts that they\nmight have current sessions for. If it cannot obtain an account selection choice made by the End-User,\nit MUST return an error, typically account_selection_required.\n\nThe prompt parameter can be used by the Client to make sure that the End-User is still present for the current\nsession or to bring attention to the request. If this parameter contains none with any other value, an error is returned.",
+          "type": "string",
+          "x-go-name": "Prompt"
         },
         "requestedScopes": {
           "description": "RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator.",
@@ -3114,8 +3165,8 @@
         "token_endpoint",
         "jwks_uri",
         "subject_types_supported",
-        "id_token_signing_alg_values_supported",
-        "response_types_supported"
+        "response_types_supported",
+        "id_token_signing_alg_values_supported"
       ],
       "properties": {
         "authorization_endpoint": {
@@ -3132,12 +3183,12 @@
           "x-go-name": "ClaimsSupported"
         },
         "id_token_signing_alg_values_supported": {
-          "description": "JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token\nto encode the Claims in a JWT [JWT]. The algorithm RS256 MUST be included. The value none MAY be supported,\nbut MUST NOT be used unless the Response Type used returns no ID Token from the Authorization Endpoint\n(such as when using the Authorization Code Flow).",
+          "description": "JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token\nto encode the Claims in a JWT.",
           "type": "array",
           "items": {
             "type": "string"
           },
-          "x-go-name": "SigningAlgs"
+          "x-go-name": "IDTokenSigningAlgValuesSupported"
         },
         "issuer": {
           "description": "URL using the https scheme with no query or fragment component that the OP asserts as its Issuer Identifier.\nIf Issuer discovery is supported , this value MUST be identical to the issuer value returned\nby WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this Issuer.",
@@ -3177,6 +3228,14 @@
           "description": "URL of the OP's OAuth 2.0 Token Endpoint",
           "type": "string",
           "x-go-name": "TokenURL"
+        },
+        "token_endpoint_auth_methods_supported": {
+          "description": "JSON array containing a list of Client Authentication methods supported by this Token Endpoint. The options are\nclient_secret_post, client_secret_basic, client_secret_jwt, and private_key_jwt, as described in Section 9 of OpenID Connect Core 1.0",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "TokenEndpointAuthMethodsSupported"
         },
         "userinfo_endpoint": {
           "description": "URL of the OP's UserInfo Endpoint.",

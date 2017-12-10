@@ -73,7 +73,7 @@ func NewMockFirewallWithStore(issuer string, subject string, scopes fosite.Argum
 			L:                   l,
 		}, conf.Client(oauth2.NoContext, &oauth2.Token{
 			AccessToken: tokens[0][1],
-			Expiry:      time.Now().Add(time.Hour),
+			Expiry:      time.Now().UTC().Add(time.Hour),
 			TokenType:   "bearer",
 		})
 }

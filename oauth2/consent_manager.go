@@ -34,6 +34,10 @@ type ConsentRequest struct {
 	// accepted or rejected.
 	RedirectURL string `json:"redirectUrl"`
 
+	RequestedACR    []string `json:"requestedAcr"`
+	RequestedPrompt string   `json:"requestedPrompt"`
+	RequestedMaxAge int64    `json:"requestedMaxAge"`
+
 	CSRF             string                 `json:"-"`
 	GrantedScopes    []string               `json:"-"`
 	Subject          string                 `json:"-"`
@@ -41,6 +45,9 @@ type ConsentRequest struct {
 	IDTokenExtra     map[string]interface{} `json:"-"`
 	Consent          string                 `json:"-"`
 	DenyReason       string                 `json:"-"`
+	DenyError        string                 `json:"-"`
+	AuthTime         int64                  `json:"-"`
+	ProvidedACR      string                 `json:"-"`
 }
 
 func (c *ConsentRequest) IsConsentGranted() bool {
@@ -65,6 +72,27 @@ type AcceptConsentRequestPayload struct {
 
 	// A list of scopes that the user agreed to grant. It should be a subset of requestedScopes from the consent request.
 	GrantScopes []string `json:"grantScopes"`
+
+	// ProvidedAuthenticationContextClassReference specifies an Authentication Context Class Reference value that identifies
+	// the Authentication Context Class that the authentication performed satisfied. The value "0" indicates the End-User
+	// authentication did not meet the requirements of ISO/IEC 29115 [ISO29115] level 1.
+	//
+	// In summary ISO/IEC 29115 defines four levels, broadly summarized as follows.
+	//
+	// * acr=0 does not satisfy Level 1 and could be, for example, authentication using a long-lived browser cookie.
+	// * Level 1 (acr=1): Minimal confidence in the asserted identity of the entity, but enough confidence that the
+	// 		entity is the same over consecutive authentication events. For example presenting a self-registered
+	// 		username or password.
+	// * Level 2 (acr=2): There is some confidence in the asserted identity of the entity. For example confirming
+	// 		authentication using a mobile app ("Something you have").
+	// * Level 3 (acr=3): High confidence in an asserted identity of the entity. For example sending a code to a mobile
+	// 		phone or using Google Authenticator or a fingerprint scanner ("Something you have and something you know" / "Something you are")
+	// * Level 4 (acr=4): Very high confidence in an asserted identity of the entity. Requires in-person identification.
+	ProvidedAuthenticationContextClassReference string `json:"providedAcr"`
+
+	// AuthTime is the time when the End-User authentication occurred. Its value is a JSON number representing the
+	// number of seconds from 1970-01-01T0:0:0Z as measured in UTC until the date/time.
+	AuthTime int64 `json:"authTime"`
 }
 
 // RejectConsentRequestPayload represents data that will be used to reject a consent request.
@@ -73,6 +101,10 @@ type AcceptConsentRequestPayload struct {
 type RejectConsentRequestPayload struct {
 	// Reason represents the reason why the user rejected the consent request.
 	Reason string `json:"reason"`
+
+	// Error can be used to return an OpenID Connect or OAuth 2.0 error to the OAuth 2.0 client, such as login_required,
+	// interaction_required, consent_required.
+	Error string `json:"error"`
 }
 
 type ConsentRequestManager interface {

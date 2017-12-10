@@ -31,7 +31,8 @@ import (
 var sqlConsentParams = []string{
 	"id", "client_id", "expires_at", "redirect_url", "requested_scopes",
 	"csrf", "granted_scopes", "access_token_extra", "id_token_extra",
-	"consent", "deny_reason", "subject",
+	"consent", "deny_reason", "subject", "requested_acr", "requested_prompt",
+	"provided_acr", "auth_time", "deny_error",
 }
 
 var consentMigrations = &migrate.MemoryMigrationSource{
@@ -56,6 +57,23 @@ var consentMigrations = &migrate.MemoryMigrationSource{
 				"DROP TABLE hydra_consent_request",
 			},
 		},
+		{
+			Id: "2",
+			Up: []string{
+				"ALTER TABLE hydra_consent_request ADD requested_acr text NOT NULL",
+				"ALTER TABLE hydra_consent_request ADD provided_acr text NOT NULL",
+				"ALTER TABLE hydra_consent_request ADD auth_time text NOT NULL",
+				"ALTER TABLE hydra_consent_request ADD requested_prompt text NOT NULL",
+				"ALTER TABLE hydra_consent_request ADD deny_error text NOT NULL",
+			},
+			Down: []string{
+				"ALTER TABLE hydra_consent_request DROP COLUMN requested_acr",
+				"ALTER TABLE hydra_consent_request DROP COLUMN provided_acr",
+				"ALTER TABLE hydra_consent_request DROP COLUMN auth_time",
+				"ALTER TABLE hydra_consent_request DROP COLUMN requested_prompt",
+				"ALTER TABLE hydra_consent_request DROP COLUMN deny_error",
+			},
+		},
 	},
 }
 
@@ -72,6 +90,11 @@ type consentRequestSqlData struct {
 	Consent          string    `db:"consent"`
 	DenyReason       string    `db:"deny_reason"`
 	Subject          string    `db:"subject"`
+	RequestedACR     string    `db:"requested_acr"`
+	RequestedPrompt  string    `db:"requested_prompt"`
+	ProvidedACR      string    `db:"provided_acr"`
+	AuthTime         int64     `db:"auth_time"`
+	DenyError        string    `db:"deny_error"`
 }
 
 func newConsentRequestSqlData(request *ConsentRequest) (*consentRequestSqlData, error) {
@@ -113,7 +136,12 @@ func newConsentRequestSqlData(request *ConsentRequest) (*consentRequestSqlData, 
 		IDTokenExtra:     idtext,
 		Consent:          request.Consent,
 		DenyReason:       request.DenyReason,
+		DenyError:        request.DenyError,
 		Subject:          request.Subject,
+		AuthTime:         request.AuthTime,
+		RequestedACR:     strings.Join(request.RequestedACR, " "),
+		ProvidedACR:      request.ProvidedACR,
+		RequestedPrompt:  request.RequestedPrompt,
 	}, nil
 }
 
@@ -140,11 +168,16 @@ func (r *consentRequestSqlData) toConsentRequest() (*ConsentRequest, error) {
 		CSRF:             r.CSRF,
 		Consent:          r.Consent,
 		DenyReason:       r.DenyReason,
+		DenyError:        r.DenyError,
 		RequestedScopes:  strings.Split(r.RequestedScopes, " "),
 		GrantedScopes:    strings.Split(r.GrantedScopes, " "),
 		AccessTokenExtra: atext,
 		IDTokenExtra:     idtext,
 		Subject:          r.Subject,
+		AuthTime:         r.AuthTime,
+		RequestedACR:     strings.Split(r.RequestedACR, " "),
+		ProvidedACR:      r.ProvidedACR,
+		RequestedPrompt:  r.RequestedPrompt,
 	}, nil
 }
 
@@ -197,6 +230,8 @@ func (m *ConsentRequestSQLManager) AcceptConsentRequest(id string, payload *Acce
 	r.IDTokenExtra = payload.IDTokenExtra
 	r.Consent = ConsentRequestAccepted
 	r.GrantedScopes = payload.GrantScopes
+	r.AuthTime = payload.AuthTime
+	r.ProvidedACR = payload.ProvidedAuthenticationContextClassReference
 
 	return m.updateConsentRequest(r)
 }
@@ -209,6 +244,7 @@ func (m *ConsentRequestSQLManager) RejectConsentRequest(id string, payload *Reje
 
 	r.Consent = ConsentRequestRejected
 	r.DenyReason = payload.Reason
+	r.DenyError = payload.Error
 
 	return m.updateConsentRequest(r)
 }

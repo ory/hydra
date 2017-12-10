@@ -59,13 +59,18 @@ func tTestConsentRequestManagerReadWrite(t *testing.T) {
 		RequestedScopes:  []string{"foo", "bar"},
 		GrantedScopes:    []string{"baz", "bar"},
 		CSRF:             "some-csrf",
-		ExpiresAt:        time.Now().Round(time.Minute),
+		ExpiresAt:        time.Now().UTC().Round(time.Minute),
 		Consent:          ConsentRequestAccepted,
 		DenyReason:       "some reason",
 		AccessTokenExtra: map[string]interface{}{"atfoo": "bar", "atbaz": "bar"},
 		IDTokenExtra:     map[string]interface{}{"idfoo": "bar", "idbaz": "bar"},
 		RedirectURL:      "https://redirect-me/foo",
 		Subject:          "Peter",
+		RequestedACR:     []string{"1", "2"},
+		RequestedPrompt:  "none",
+		ProvidedACR:      "2",
+		AuthTime:         100,
+		DenyError:        "invalid_login",
 	}
 
 	for k, m := range consentManagers {
@@ -92,13 +97,18 @@ func TestConsentRequestManagerUpdate(t *testing.T) {
 		RequestedScopes:  []string{"foo", "bar"},
 		GrantedScopes:    []string{"baz", "bar"},
 		CSRF:             "some-csrf",
-		ExpiresAt:        time.Now().Round(time.Minute),
+		ExpiresAt:        time.Now().UTC().Round(time.Minute),
 		Consent:          ConsentRequestRejected,
 		DenyReason:       "some reason",
 		AccessTokenExtra: map[string]interface{}{"atfoo": "bar", "atbaz": "bar"},
 		IDTokenExtra:     map[string]interface{}{"idfoo": "bar", "idbaz": "bar"},
 		RedirectURL:      "https://redirect-me/foo",
 		Subject:          "Peter",
+		RequestedACR:     []string{"1", "2"},
+		RequestedPrompt:  "none",
+		ProvidedACR:      "2",
+		AuthTime:         100,
+		DenyError:        "invalid_login",
 	}
 
 	for k, m := range consentManagers {

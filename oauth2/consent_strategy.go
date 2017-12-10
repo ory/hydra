@@ -90,12 +90,13 @@ func (s *DefaultConsentStrategy) ValidateConsentRequest(req fosite.AuthorizeRequ
 	return &Session{
 		DefaultSession: &openid.DefaultSession{
 			Claims: &ejwt.IDTokenClaims{
-				Audience:  req.GetClient().GetID(),
-				Subject:   consent.Subject,
-				Issuer:    s.Issuer,
-				IssuedAt:  time.Now().UTC(),
-				ExpiresAt: time.Now().UTC().Add(s.DefaultIDTokenLifespan),
-				AuthTime:  time.Unix(consent.AuthTime, 0),
+				Audience:    req.GetClient().GetID(),
+				Subject:     consent.Subject,
+				Issuer:      s.Issuer,
+				IssuedAt:    time.Now().UTC(),
+				RequestedAt: time.Now().UTC(),
+				ExpiresAt:   time.Now().UTC().Add(s.DefaultIDTokenLifespan),
+				AuthTime:    time.Unix(consent.AuthTime, 0),
 				AuthenticationContextClassReference: consent.ProvidedACR,
 				Extra: consent.IDTokenExtra,
 			},

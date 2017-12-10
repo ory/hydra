@@ -71,6 +71,7 @@ var tokenSelfCmd = &cobra.Command{
 			TokenURL:     pkg.JoinURLStrings(c.ClusterURL, "/oauth2/token"),
 			Scopes: []string{
 				"hydra",
+				"hydra.*",
 			},
 		}
 

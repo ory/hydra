@@ -34,7 +34,7 @@ var cfgFile string
 
 var (
 	Version   = "dev-master"
-	BuildTime = time.Now().String()
+	BuildTime = time.Now().UTC().String()
 	GitHash   = "undefined"
 )
 

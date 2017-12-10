@@ -21,6 +21,12 @@ type ConsentRequest struct {
 	// Redirect URL is the URL where the user agent should be redirected to after the consent has been accepted or rejected.
 	RedirectUrl string `json:"redirectUrl,omitempty"`
 
+	RequestedAcr []string `json:"requestedAcr,omitempty"`
+
+	RequestedMaxAge int64 `json:"requestedMaxAge,omitempty"`
+
+	RequestedPrompt string `json:"requestedPrompt,omitempty"`
+
 	// RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator.
 	RequestedScopes []string `json:"requestedScopes,omitempty"`
 }

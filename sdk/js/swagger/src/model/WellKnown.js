@@ -44,7 +44,7 @@
    * @alias module:model/WellKnown
    * @class
    * @param authorizationEndpoint {String} URL of the OP's OAuth 2.0 Authorization Endpoint
-   * @param idTokenSigningAlgValuesSupported {Array.<String>} JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token to encode the Claims in a JWT [JWT]. The algorithm RS256 MUST be included. The value none MAY be supported, but MUST NOT be used unless the Response Type used returns no ID Token from the Authorization Endpoint (such as when using the Authorization Code Flow).
+   * @param idTokenSigningAlgValuesSupported {Array.<String>} JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token to encode the Claims in a JWT.
    * @param issuer {String} URL using the https scheme with no query or fragment component that the OP asserts as its Issuer Identifier. If Issuer discovery is supported , this value MUST be identical to the issuer value returned by WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this Issuer.
    * @param jwksUri {String} URL of the OP's JSON Web Key Set [JWK] document. This contains the signing key(s) the RP uses to validate signatures from the OP. The JWK Set MAY also contain the Server's encryption key(s), which are used by RPs to encrypt requests to the Server. When both signing and encryption keys are made available, a use (Key Use) parameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key's intended usage. Although some algorithms allow the same key to be used for both signatures and encryption, doing so is NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate.
    * @param responseTypesSupported {Array.<String>} JSON array containing a list of the OAuth 2.0 response_type values that this OP supports. Dynamic OpenID Providers MUST support the code, id_token, and the token id_token Response Type values.
@@ -136,6 +136,14 @@
           'String'
         )
       }
+      if (data.hasOwnProperty('token_endpoint_auth_methods_supported')) {
+        obj[
+          'token_endpoint_auth_methods_supported'
+        ] = ApiClient.convertToType(
+          data['token_endpoint_auth_methods_supported'],
+          ['String']
+        )
+      }
       if (data.hasOwnProperty('userinfo_endpoint')) {
         obj['userinfo_endpoint'] = ApiClient.convertToType(
           data['userinfo_endpoint'],
@@ -157,7 +165,7 @@
    */
   exports.prototype['claims_supported'] = undefined
   /**
-   * JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token to encode the Claims in a JWT [JWT]. The algorithm RS256 MUST be included. The value none MAY be supported, but MUST NOT be used unless the Response Type used returns no ID Token from the Authorization Endpoint (such as when using the Authorization Code Flow).
+   * JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token to encode the Claims in a JWT.
    * @member {Array.<String>} id_token_signing_alg_values_supported
    */
   exports.prototype['id_token_signing_alg_values_supported'] = undefined
@@ -191,6 +199,11 @@
    * @member {String} token_endpoint
    */
   exports.prototype['token_endpoint'] = undefined
+  /**
+   * JSON array containing a list of Client Authentication methods supported by this Token Endpoint. The options are client_secret_post, client_secret_basic, client_secret_jwt, and private_key_jwt, as described in Section 9 of OpenID Connect Core 1.0
+   * @member {Array.<String>} token_endpoint_auth_methods_supported
+   */
+  exports.prototype['token_endpoint_auth_methods_supported'] = undefined
   /**
    * URL of the OP's UserInfo Endpoint.
    * @member {String} userinfo_endpoint

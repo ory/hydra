@@ -50,7 +50,7 @@ func TestWardenSDK(t *testing.T) {
 	client := hydra.NewWardenApiWithBasePath(server.URL)
 	client.Configuration.Transport = conf.Client(coauth2.NoContext, &coauth2.Token{
 		AccessToken: tokens[1][1],
-		Expiry:      time.Now().Add(time.Hour),
+		Expiry:      time.Now().UTC().Add(time.Hour),
 		TokenType:   "bearer",
 	}).Transport
 

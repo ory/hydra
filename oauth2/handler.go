@@ -201,7 +201,17 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request, _ http
 		return
 	}
 
-	h.H.Write(w, r, ar.GetSession().(*Session).IDTokenClaims().ToMap())
+	interim := ar.GetSession().(*Session).IDTokenClaims().ToMap()
+	delete(interim, "aud")
+	delete(interim, "iss")
+	delete(interim, "nonce")
+	delete(interim, "at_hash")
+	delete(interim, "c_hash")
+	delete(interim, "auth_time")
+	delete(interim, "iat")
+	delete(interim, "exp")
+
+	h.H.Write(w, r, interim)
 }
 
 // swagger:route POST /oauth2/revoke oAuth2 revokeOAuth2Token

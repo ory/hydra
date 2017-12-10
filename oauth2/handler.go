@@ -494,7 +494,7 @@ func (h *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, auth
 }
 
 func (h *Handler) writeAuthorizeError(w http.ResponseWriter, ar fosite.AuthorizeRequester, err error) {
-	if !ar.IsRedirectURIValid() || errors.Cause(err).Error() == fosite.ErrInactiveAuthorizationCode.Error() {
+	if !ar.IsRedirectURIValid() {
 		var rfcerr = fosite.ErrorToRFC6749Error(err)
 
 		redirectURI := h.ConsentURL

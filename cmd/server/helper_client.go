@@ -59,6 +59,14 @@ func (h *Handler) createRootIfNewInstall(c *config.Config) {
 		}
 	}
 
+	// Overwrite the default redirect uri for the temporary root client.
+	// Comma seperated values are supported. No URL validation is done.
+	redirectURIs := []string{"http://localhost:4445/callback"}
+	forceRedirectURIs := os.Getenv("FORCE_ROOT_CLIENT_REDIRECT_URI")
+	if forceRedirectURIs != "" {
+		redirectURIs := strings.Split(forceRedirectURIs, ",")
+	}
+
 	c.GetLogger().Warn("No clients were found. Creating a temporary root client...")
 	root := &client.Client{
 		ID:            id,
@@ -66,7 +74,7 @@ func (h *Handler) createRootIfNewInstall(c *config.Config) {
 		ResponseTypes: []string{"id_token", "code", "token"},
 		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
 		Scope:         "hydra.* openid offline hydra",
-		RedirectURIs:  []string{"http://localhost:4445/callback"},
+		RedirectURIs:  redirectURIs,
 		Secret:        secret,
 	}
 

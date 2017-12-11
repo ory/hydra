@@ -65,6 +65,12 @@ CORE CONTROLS
 	and the secret: "FORCE_ROOT_CLIENT_CREDENTIALS=urlencode(id):urlencode(secret)".
 	Example: FORCE_ROOT_CLIENT_CREDENTIALS=admin:h6hy92tK4dQcZ2EaFsGNRtqg
 
+- FORCE_ROOT_CLIENT_REDIRECT_URI: When generating the root client on first start up, it's redirect URI will be set to
+	"http://localhost:4445/callback". This can be overwritten using the "FORCE_ROOT_CLIENT_REDIRECT_URI" environment variable.
+	It comes in handy if you're developing against Hydra locally but behind a proxy like Traefik or Nginx.
+	Multiple URIs can also be set using commas between URIs.
+	Example: FORCE_ROOT_CLIENT_REDIRECT_URI=http://myapp.example/callback,http://localhost:9000/cb
+
 - PORT: The port hydra should listen on.
 	Defaults to PORT=4444
 

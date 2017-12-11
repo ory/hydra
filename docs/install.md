@@ -86,6 +86,7 @@ $ docker run -d \
   -e ISSUER=https://localhost:9000/ \
   -e CONSENT_URL=http://localhost:9020/consent \
   -e FORCE_ROOT_CLIENT_CREDENTIALS=admin:demo-password \
+  -e FORCE_ROOT_CLIENT_REDIRECT_URI=http://myapp.example/callback` \
   oryd/hydra:v0.10.0
 
 # And check if it's running:
@@ -109,6 +110,9 @@ app in the following sections **(required)**.
 * `-e FORCE_ROOT_CLIENT_CREDENTIALS=admin:demo-password` sets the credentials of the root account. Use the root
 account to manage your ORY Hydra instance. If this is not set, ORY Hydra will auto-generate a client and display
 the credentials in the logs **(optional)**.
+* `-e FORCE_ROOT_CLIENT_REDIRECT_URI=http://myapp.example/callback` sets the redirect URI of the root account.
+If you want to set multiple URLs you can separate them using commas.
+If this is not set, it will default to `http://localhost:4445/callback`. **(optional)**.
 
 To confirm that the instance is running properly, [open the health check](https://localhost:9000/health/status). If asked,
 accept the self signed certificate in your browser. You should simply see `ok`.
@@ -137,7 +141,8 @@ Note this down, otherwise you won't be able to restart Hydra.
 using a self-signed certificate, which is why we need to run all commands using --skip-tls-verify.
 3. If the OAuth 2.0 Client database table is empty, a new root client with random credentials is created. Root clients
 have access to all APIs, OAuth 2.0 flows and are allowed to do everything. If the `FORCE_ROOT_CLIENT_CREDENTIALS` environment.
-is set, those credentials will be used instead.
+is set, those credentials will be used instead. Additionally by using `FORCE_ROOT_CLIENT_REDIRECT_URI` the redirect URI can be set.
+Multiple URIs can be set by separating them with commas.
 
 ORY Hydra can be managed using the Hydra Command Line Interface (CLI), which is using ORY Hydra's REST APIs. To
 see the available commands, run:

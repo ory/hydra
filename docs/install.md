@@ -86,7 +86,7 @@ $ docker run -d \
   -e ISSUER=https://localhost:9000/ \
   -e CONSENT_URL=http://localhost:9020/consent \
   -e FORCE_ROOT_CLIENT_CREDENTIALS=admin:demo-password \
-  -e FORCE_ROOT_CLIENT_REDIRECT_URI=http://myapp.example/callback` \
+  -e FORCE_ROOT_CLIENT_REDIRECT_URI=http://myapp.example/callback \
   oryd/hydra:v0.10.0
 
 # And check if it's running:

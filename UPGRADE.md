@@ -12,6 +12,7 @@ before finalizing the upgrade process.
 
 - [0.10.0](#0100)
   - [Breaking Changes](#breaking-changes)
+    - [Introspection now requires authorization](#introspection-now-requires-authorization)
     - [New consent flow](#new-consent-flow)
     - [Audience](#audience)
     - [Response payload changes to `/warden/token/allowed`](#response-payload-changes-to-wardentokenallowed)
@@ -66,6 +67,16 @@ We know that these are a lot of changes, but we highly recommend upgrading to th
 releasing 1.0.0.
 
 ### Breaking Changes
+
+#### Introspection now requires authorization
+
+The introspection endpoint was previously accessible to anyone with valid client credentials or a valid access token.
+According to spec, the introspection endpoint should be protected by additional access control mechanisms. This
+version introduces new access control requirements for this endpoint.
+
+The client id of the basic authorization / subject of the bearer token must be allowed action `introspect`
+on resource `rn:hydra:oauth2:tokens`. If an access token is used for authorization, it needs to be granted the
+`hydra.introspect` scope.
 
 #### New consent flow
 

@@ -235,6 +235,8 @@ a shell, which makes it harder to penetrate.
 Instead of relying on tags to pass arguments, it is now possible to pass command arguments such as `docker run oryd/hydra:v0.10.0 host --dangerous-force-http`
 directly.
 
+**Version 0.10.8 reintroduces an image with a shell, appended with tag `-alpine`.**
+
 ### Important Additions
 
 #### Prefixing Resources Names

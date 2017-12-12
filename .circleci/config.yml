@@ -63,6 +63,7 @@ jobs:
       - setup_remote_docker:
           version: 17.10.0-ce
       - run: docker build -f Dockerfile -t hydra-test .
+      - run: docker build -f Dockerfile-alpine -t hydra-test-alpine .
       - run: docker run hydra-test help
 
   release:
@@ -84,8 +85,10 @@ jobs:
       - run: ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME --replace `git describe --tags` dist/
       # Build and push docker image
       - run: docker build --build-arg git_tag=$(git describe --tags) --build-arg git_commit=$(git rev-parse HEAD) -f Dockerfile -t oryd/hydra:$CIRCLE_TAG .
+      - run: docker build --build-arg git_tag=$(git describe --tags) --build-arg git_commit=$(git rev-parse HEAD) -f Dockerfile-alpine -t oryd/hydra:$CIRCLE_TAG-alpine .
       - run: docker login --username "$DOCKER_USERNAME" --password "$DOCKER_PASSWORD"
       - run: docker push oryd/hydra:$CIRCLE_TAG
+      - run: docker push oryd/hydra:$CIRCLE_TAG-alpine
       # Release node / JavaScript SDK
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
       - run: sudo npm i -g npm

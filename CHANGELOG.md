@@ -3,6 +3,8 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [Unreleased](#unreleased)
+  - [v0.10.8 (2017-12-12)](#v0108-2017-12-12)
   - [v0.10.7 (2017-12-09)](#v0107-2017-12-09)
   - [v0.10.6 (2017-12-09)](#v0106-2017-12-09)
   - [v0.10.5 (2017-12-09)](#v0105-2017-12-09)
@@ -111,6 +113,25 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Change Log
+
+## [Unreleased](https://github.com/ory/hydra/tree/HEAD)
+
+[Full Changelog](https://github.com/ory/hydra/compare/v0.10.8...HEAD)
+
+**Implemented enhancements:**
+
+- Reintroduce alpine based image with shell [\#703](https://github.com/ory/hydra/issues/703)
+
+## [v0.10.8](https://github.com/ory/hydra/tree/v0.10.8) (2017-12-12)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.10.7...v0.10.8)
+
+**Closed issues:**
+
+- docs: Add introspect bc to upgrade [\#698](https://github.com/ory/hydra/issues/698)
+
+**Merged pull requests:**
+
+- Reintroduces alpine based docker image [\#704](https://github.com/ory/hydra/pull/704) ([arekkas](https://github.com/arekkas))
 
 ## [v0.10.7](https://github.com/ory/hydra/tree/v0.10.7) (2017-12-09)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.10.6...v0.10.7)

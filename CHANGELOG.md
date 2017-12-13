@@ -3,7 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
-  - [Unreleased](#unreleased)
+  - [v0.10.9 (2017-12-13)](#v0109-2017-12-13)
   - [v0.10.8 (2017-12-12)](#v0108-2017-12-12)
   - [v0.10.7 (2017-12-09)](#v0107-2017-12-09)
   - [v0.10.6 (2017-12-09)](#v0106-2017-12-09)
@@ -114,13 +114,16 @@
 
 # Change Log
 
-## [Unreleased](https://github.com/ory/hydra/tree/HEAD)
-
-[Full Changelog](https://github.com/ory/hydra/compare/v0.10.8...HEAD)
+## [v0.10.9](https://github.com/ory/hydra/tree/v0.10.9) (2017-12-13)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.10.8...v0.10.9)
 
 **Implemented enhancements:**
 
 - Reintroduce alpine based image with shell [\#703](https://github.com/ory/hydra/issues/703)
+
+**Merged pull requests:**
+
+- pkg: Fixes returning nil instead of empty array in split [\#705](https://github.com/ory/hydra/pull/705) ([arekkas](https://github.com/arekkas))
 
 ## [v0.10.8](https://github.com/ory/hydra/tree/v0.10.8) (2017-12-12)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.10.7...v0.10.8)

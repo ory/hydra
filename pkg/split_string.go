@@ -20,7 +20,7 @@ import "strings"
 // which returns an empty slice if string is empty
 func SplitNonEmpty(s, sep string) []string {
 	if s == "" {
-		return nil
+		return []string{}
 	}
 
 	return strings.Split(s, sep)

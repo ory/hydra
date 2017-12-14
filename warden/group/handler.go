@@ -92,7 +92,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //     Schemes: http, https
 //
 //     Security:
-//       oauth2: hydra.groups
+//       oauth2: hydra.warden.groups
 //
 //     Responses:
 //       200: findGroupsByMemberResponse
@@ -143,7 +143,7 @@ func (h *Handler) FindGroupNames(w http.ResponseWriter, r *http.Request, _ httpr
 //     Schemes: http, https
 //
 //     Security:
-//       oauth2: hydra.groups
+//       oauth2: hydra.warden.groups
 //
 //     Responses:
 //       201: groupResponse
@@ -198,7 +198,7 @@ func (h *Handler) CreateGroup(w http.ResponseWriter, r *http.Request, _ httprout
 //     Schemes: http, https
 //
 //     Security:
-//       oauth2: hydra.groups
+//       oauth2: hydra.warden.groups
 //
 //     Responses:
 //       201: groupResponse
@@ -249,7 +249,7 @@ func (h *Handler) GetGroup(w http.ResponseWriter, r *http.Request, ps httprouter
 //     Schemes: http, https
 //
 //     Security:
-//       oauth2: hydra.groups
+//       oauth2: hydra.warden.groups
 //
 //     Responses:
 //       204: emptyResponse
@@ -299,7 +299,7 @@ func (h *Handler) DeleteGroup(w http.ResponseWriter, r *http.Request, ps httprou
 //     Schemes: http, https
 //
 //     Security:
-//       oauth2: hydra.groups
+//       oauth2: hydra.warden.groups
 //
 //     Responses:
 //       204: emptyResponse
@@ -355,7 +355,7 @@ func (h *Handler) AddGroupMembers(w http.ResponseWriter, r *http.Request, ps htt
 //     Schemes: http, https
 //
 //     Security:
-//       oauth2: hydra.groups
+//       oauth2: hydra.warden.groups
 //
 //     Responses:
 //       204: emptyResponse

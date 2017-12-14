@@ -83,5 +83,5 @@ var tokenClientCmd = &cobra.Command{
 func init() {
 	tokenCmd.AddCommand(tokenClientCmd)
 
-	tokenUserCmd.Flags().StringSlice("scopes", []string{"hydra", "hydra.*"}, "User a specific set of scopes")
+	tokenClientCmd.Flags().StringSlice("scopes", []string{"hydra", "hydra.*"}, "User a specific set of scopes")
 }

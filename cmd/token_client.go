@@ -39,8 +39,8 @@ func (t *transporter) RoundTrip(req *http.Request) (*http.Response, error) {
 	return t.Transport.RoundTrip(req)
 }
 
-// tokenSelfCmd represents the self command
-var tokenSelfCmd = &cobra.Command{
+// tokenClientCmd represents the self command
+var tokenClientCmd = &cobra.Command{
 	Use:   "client",
 	Short: "Generate an OAuth2 token the client grant type",
 	Long:  "This command uses the CLI's credentials to create an access token.",
@@ -65,13 +65,13 @@ var tokenSelfCmd = &cobra.Command{
 			})
 		}
 
+		scopes, _ := cmd.Flags().GetStringSlice("scopes")
+
 		oauthConfig := clientcredentials.Config{
 			ClientID:     c.ClientID,
 			ClientSecret: c.ClientSecret,
 			TokenURL:     pkg.JoinURLStrings(c.ClusterURL, "/oauth2/token"),
-			Scopes: []string{
-				"hydra",
-			},
+			Scopes:       scopes,
 		}
 
 		t, err := oauthConfig.Token(ctx)
@@ -81,5 +81,7 @@ var tokenSelfCmd = &cobra.Command{
 }
 
 func init() {
-	tokenCmd.AddCommand(tokenSelfCmd)
+	tokenCmd.AddCommand(tokenClientCmd)
+
+	tokenUserCmd.Flags().StringSlice("scopes", []string{"hydra", "hydra.*"}, "User a specific set of scopes")
 }

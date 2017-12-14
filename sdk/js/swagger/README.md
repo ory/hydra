@@ -235,7 +235,6 @@ Class | Method | HTTP request | Description
 - **Scopes**: 
   - hydra.clients: A scope required to manage OAuth 2.0 Clients
   - hydra.consent: A scope required to fetch and modify consent requests
-  - hydra.groups: A scope required to manage warden groups
   - hydra.health: A scope required to get health information
   - hydra.keys.create: A scope required to create JSON Web Keys
   - hydra.keys.delete: A scope required to delete JSON Web Keys
@@ -243,6 +242,7 @@ Class | Method | HTTP request | Description
   - hydra.keys.update: A scope required to get JSON Web Keys
   - hydra.policies: A scope required to manage access control policies
   - hydra.warden: A scope required to make access control inquiries
+  - hydra.warden.groups: A scope required to manage warden groups
   - offline: A scope required when requesting refresh tokens
   - openid: Request an OpenID Connect ID Token
 

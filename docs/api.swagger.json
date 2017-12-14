@@ -1527,7 +1527,7 @@
         "security": [
           {
             "oauth2": [
-              "hydra.groups"
+              "hydra.warden.groups"
             ]
           }
         ],
@@ -1576,7 +1576,7 @@
         "security": [
           {
             "oauth2": [
-              "hydra.groups"
+              "hydra.warden.groups"
             ]
           }
         ],
@@ -1626,7 +1626,7 @@
         "security": [
           {
             "oauth2": [
-              "hydra.groups"
+              "hydra.warden.groups"
             ]
           }
         ],
@@ -1675,7 +1675,7 @@
         "security": [
           {
             "oauth2": [
-              "hydra.groups"
+              "hydra.warden.groups"
             ]
           }
         ],
@@ -1726,7 +1726,7 @@
         "security": [
           {
             "oauth2": [
-              "hydra.groups"
+              "hydra.warden.groups"
             ]
           }
         ],
@@ -1782,7 +1782,7 @@
         "security": [
           {
             "oauth2": [
-              "hydra.groups"
+              "hydra.warden.groups"
             ]
           }
         ],
@@ -1963,6 +1963,12 @@
     "Handler": {
       "type": "object",
       "properties": {
+        "Generators": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/KeyGenerator"
+          }
+        },
         "H": {
           "$ref": "#/definitions/Writer"
         },
@@ -1976,7 +1982,7 @@
           "$ref": "#/definitions/Firewall"
         }
       },
-      "x-go-package": "github.com/ory/hydra/warden/group"
+      "x-go-package": "github.com/ory/hydra/jwk"
     },
     "KeyGenerator": {
       "type": "object",
@@ -3355,7 +3361,6 @@
       "scopes": {
         "hydra.clients": "A scope required to manage OAuth 2.0 Clients",
         "hydra.consent": "A scope required to fetch and modify consent requests",
-        "hydra.groups": "A scope required to manage warden groups",
         "hydra.health": "A scope required to get health information",
         "hydra.keys.create": "A scope required to create JSON Web Keys",
         "hydra.keys.delete": "A scope required to delete JSON Web Keys",
@@ -3363,6 +3368,7 @@
         "hydra.keys.update": "A scope required to get JSON Web Keys",
         "hydra.policies": "A scope required to manage access control policies",
         "hydra.warden": "A scope required to make access control inquiries",
+        "hydra.warden.groups": "A scope required to manage warden groups",
         "offline": "A scope required when requesting refresh tokens",
         "openid": "Request an OpenID Connect ID Token"
       }

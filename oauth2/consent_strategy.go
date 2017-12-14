@@ -85,13 +85,14 @@ func (s *DefaultConsentStrategy) ValidateConsentRequest(req fosite.AuthorizeRequ
 	return &Session{
 		DefaultSession: &openid.DefaultSession{
 			Claims: &ejwt.IDTokenClaims{
-				Audience:  req.GetClient().GetID(),
-				Subject:   consent.Subject,
-				Issuer:    s.Issuer,
-				IssuedAt:  time.Now(),
-				ExpiresAt: time.Now().Add(s.DefaultIDTokenLifespan),
-				AuthTime:  time.Now(),
-				Extra:     consent.IDTokenExtra,
+				Audience:    req.GetClient().GetID(),
+				Subject:     consent.Subject,
+				Issuer:      s.Issuer,
+				IssuedAt:    time.Now(),
+				ExpiresAt:   time.Now().Add(s.DefaultIDTokenLifespan),
+				AuthTime:    time.Now(),
+				RequestedAt: time.Now().UTC(),
+				Extra:       consent.IDTokenExtra,
 			},
 			// required for lookup on jwk endpoint
 			Headers: &ejwt.Headers{Extra: map[string]interface{}{"kid": "public"}},

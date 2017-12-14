@@ -18,7 +18,6 @@ import (
 	"github.com/mohae/deepcopy"
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
-	"github.com/ory/fosite/token/jwt"
 )
 
 type Session struct {
@@ -27,12 +26,10 @@ type Session struct {
 }
 
 func NewSession(subject string) *Session {
+	session := openid.NewDefaultSession()
+	session.Subject = subject
 	return &Session{
-		DefaultSession: &openid.DefaultSession{
-			Claims:  new(jwt.IDTokenClaims),
-			Headers: new(jwt.Headers),
-			Subject: subject,
-		},
+		DefaultSession: session,
 	}
 }
 

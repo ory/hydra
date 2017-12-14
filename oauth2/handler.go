@@ -86,14 +86,6 @@ type WellKnown struct {
 	// required: true
 	SubjectTypes []string `json:"subject_types_supported"`
 
-	// JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token
-	// to encode the Claims in a JWT [JWT]. The algorithm RS256 MUST be included. The value none MAY be supported,
-	// but MUST NOT be used unless the Response Type used returns no ID Token from the Authorization Endpoint
-	// (such as when using the Authorization Code Flow).
-	//
-	// required: true
-	SigningAlgs []string `json:"id_token_signing_alg_values_supported"`
-
 	// JSON array containing a list of the OAuth 2.0 response_type values that this OP supports. Dynamic OpenID
 	// Providers MUST support the code, id_token, and the token id_token Response Type values.
 	//
@@ -110,6 +102,16 @@ type WellKnown struct {
 	// SON array containing a list of the OAuth 2.0 [RFC6749] scope values that this server supports. The server MUST
 	// support the openid scope value. Servers MAY choose not to advertise some supported scope values even when this parameter is used
 	ScopesSupported []string `json:"scopes_supported"`
+
+	// JSON array containing a list of Client Authentication methods supported by this Token Endpoint. The options are
+	// client_secret_post, client_secret_basic, client_secret_jwt, and private_key_jwt, as described in Section 9 of OpenID Connect Core 1.0
+	TokenEndpointAuthMethodsSupported []string `json:"token_endpoint_auth_methods_supported"`
+
+	// JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token
+	// to encode the Claims in a JWT.
+	//
+	// required: true
+	IDTokenSigningAlgValuesSupported []string `json:"id_token_signing_alg_values_supported"`
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
@@ -157,19 +159,19 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ htt
 		scopesSupported = append(scopesSupported, strings.Split(h.ScopesSupported, ",")...)
 	}
 
-	wellKnown := WellKnown{
-		Issuer:           h.Issuer,
-		AuthURL:          h.Issuer + AuthPath,
-		TokenURL:         h.Issuer + TokenPath,
-		JWKsURI:          h.Issuer + JWKPath,
-		SubjectTypes:     []string{"pairwise", "public"},
-		SigningAlgs:      []string{"RS256"},
-		ResponseTypes:    []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
-		ClaimsSupported:  claimsSupported,
-		ScopesSupported:  scopesSupported,
-		UserinfoEndpoint: userInfoEndpoint,
-	}
-	h.H.Write(w, r, wellKnown)
+	h.H.Write(w, r, &WellKnown{
+		Issuer:                            h.Issuer,
+		AuthURL:                           h.Issuer + AuthPath,
+		TokenURL:                          h.Issuer + TokenPath,
+		JWKsURI:                           h.Issuer + JWKPath,
+		SubjectTypes:                      []string{"pairwise", "public"},
+		ResponseTypes:                     []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
+		ClaimsSupported:                   claimsSupported,
+		ScopesSupported:                   scopesSupported,
+		UserinfoEndpoint:                  userInfoEndpoint,
+		TokenEndpointAuthMethodsSupported: []string{"client_secret_post", "client_secret_basic"},
+		IDTokenSigningAlgValuesSupported:  []string{"RS256"},
+	})
 }
 
 // swagger:route POST /userinfo oAuth2 userinfo
@@ -199,7 +201,17 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request, _ http
 		return
 	}
 
-	h.H.Write(w, r, ar.GetSession().(*Session).IDTokenClaims().ToMap())
+	interim := ar.GetSession().(*Session).IDTokenClaims().ToMap()
+	delete(interim, "aud")
+	delete(interim, "iss")
+	delete(interim, "nonce")
+	delete(interim, "at_hash")
+	delete(interim, "c_hash")
+	delete(interim, "auth_time")
+	delete(interim, "iat")
+	delete(interim, "exp")
+
+	h.H.Write(w, r, interim)
 }
 
 // swagger:route POST /oauth2/revoke oAuth2 revokeOAuth2Token
@@ -492,7 +504,7 @@ func (h *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, auth
 }
 
 func (h *Handler) writeAuthorizeError(w http.ResponseWriter, ar fosite.AuthorizeRequester, err error) {
-	if !ar.IsRedirectURIValid() || errors.Cause(err).Error() == fosite.ErrInactiveAuthorizationCode.Error() {
+	if !ar.IsRedirectURIValid() {
 		var rfcerr = fosite.ErrorToRFC6749Error(err)
 
 		redirectURI := h.ConsentURL

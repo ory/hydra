@@ -165,7 +165,7 @@ func (sw *Snapshot) Update() {
 		NumGC:        m.NumGC,
 	}
 
-	sw.UpTime = int64(time.Now().Sub(sw.start) / time.Second)
+	sw.UpTime = int64(time.Now().UTC().Sub(sw.start) / time.Second)
 
 }
 

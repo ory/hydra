@@ -65,7 +65,7 @@ func NewMetricsManager(issuerURL string, databaseURL string, l logrus.FieldLogge
 			Metrics:        newMetrics(),
 			HTTPMetrics:    newHttpMetrics(),
 			Paths:          map[string]*PathMetrics{},
-			start:          time.Now(),
+			start:          time.Now().UTC(),
 		},
 		internalID:  uuid.New(),
 		Segment:     analytics.New("h8dRH3kVCWKkIFWydBmWsyYHR4M0u0vr"),
@@ -179,9 +179,9 @@ func (sw *MetricsManager) ServeHTTP(rw http.ResponseWriter, r *http.Request, nex
 	sw.Unlock()
 
 	// Latency
-	start := time.Now()
+	start := time.Now().UTC()
 	next(rw, r)
-	latency := time.Now().Sub(start) / time.Millisecond
+	latency := time.Now().UTC().Sub(start) / time.Millisecond
 
 	// Collecting request info
 	res := rw.(negroni.ResponseWriter)

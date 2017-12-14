@@ -25,15 +25,15 @@ func Retry(logger logrus.FieldLogger, maxWait time.Duration, failAfter time.Dura
 	var lastStart time.Time
 	err = errors.New("Did not connect.")
 	loopWait := time.Millisecond * 100
-	retryStart := time.Now()
-	for retryStart.Add(failAfter).After(time.Now()) {
-		lastStart = time.Now()
+	retryStart := time.Now().UTC()
+	for retryStart.Add(failAfter).After(time.Now().UTC()) {
+		lastStart = time.Now().UTC()
 		if err = f(); err == nil {
 			return nil
 		}
 
-		if lastStart.Add(maxWait * 2).Before(time.Now()) {
-			retryStart = time.Now()
+		if lastStart.Add(maxWait * 2).Before(time.Now().UTC()) {
+			retryStart = time.Now().UTC()
 		}
 
 		LogError(err, logger)

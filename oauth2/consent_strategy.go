@@ -15,9 +15,10 @@
 package oauth2
 
 import (
-	"time"
-
 	"net/http"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/gorilla/sessions"
 	"github.com/ory/fosite"
@@ -46,17 +47,21 @@ func (s *DefaultConsentStrategy) ValidateConsentRequest(req fosite.AuthorizeRequ
 	}
 
 	if !consent.IsConsentGranted() {
-		err := errors.New("The resource owner denied consent for this request")
+		errorName := "rejected_consent_request"
+		if consent.DenyError != "" {
+			errorName = consent.DenyError
+		}
+
 		return nil, &fosite.RFC6749Error{
-			Name:        "rejected_consent_request",
+			Name:        errorName,
 			Description: consent.DenyReason,
-			Debug:       err.Error(),
+			Debug:       "The consent app denied the authorization request",
 			Hint:        consent.DenyReason,
 			Code:        http.StatusUnauthorized,
 		}
 	}
 
-	if time.Now().After(consent.ExpiresAt) {
+	if time.Now().UTC().After(consent.ExpiresAt) {
 		return nil, errors.Errorf("Token expired")
 	}
 
@@ -85,13 +90,15 @@ func (s *DefaultConsentStrategy) ValidateConsentRequest(req fosite.AuthorizeRequ
 	return &Session{
 		DefaultSession: &openid.DefaultSession{
 			Claims: &ejwt.IDTokenClaims{
-				Audience:  req.GetClient().GetID(),
-				Subject:   consent.Subject,
-				Issuer:    s.Issuer,
-				IssuedAt:  time.Now(),
-				ExpiresAt: time.Now().Add(s.DefaultIDTokenLifespan),
-				AuthTime:  time.Now(),
-				Extra:     consent.IDTokenExtra,
+				Audience:    req.GetClient().GetID(),
+				Subject:     consent.Subject,
+				Issuer:      s.Issuer,
+				IssuedAt:    time.Now().UTC(),
+				RequestedAt: time.Now().UTC(),
+				ExpiresAt:   time.Now().UTC().Add(s.DefaultIDTokenLifespan),
+				AuthTime:    time.Unix(consent.AuthTime, 0),
+				AuthenticationContextClassReference: consent.ProvidedACR,
+				Extra: consent.IDTokenExtra,
 			},
 			// required for lookup on jwk endpoint
 			Headers: &ejwt.Headers{Extra: map[string]interface{}{"kid": "public"}},
@@ -105,6 +112,11 @@ func (s *DefaultConsentStrategy) CreateConsentRequest(req fosite.AuthorizeReques
 	csrf := uuid.New()
 	id := uuid.New()
 
+	maxAge, err := strconv.ParseInt(req.GetRequestForm().Get("max_age"), 10, 64)
+	if err != nil {
+		maxAge = 0
+	}
+
 	cookie.Values[CookieCSRFKey] = csrf
 	consent := &ConsentRequest{
 		ID:               id,
@@ -112,10 +124,13 @@ func (s *DefaultConsentStrategy) CreateConsentRequest(req fosite.AuthorizeReques
 		GrantedScopes:    []string{},
 		RequestedScopes:  req.GetRequestedScopes(),
 		ClientID:         req.GetClient().GetID(),
-		ExpiresAt:        time.Now().Add(s.DefaultChallengeLifespan),
+		ExpiresAt:        time.Now().UTC().Add(s.DefaultChallengeLifespan),
 		RedirectURL:      redirectURL + "&consent=" + id,
 		AccessTokenExtra: map[string]interface{}{},
 		IDTokenExtra:     map[string]interface{}{},
+		RequestedACR:     strings.Split(req.GetRequestForm().Get("acr"), " "),
+		RequestedPrompt:  req.GetRequestForm().Get("prompt"),
+		RequestedMaxAge:  maxAge,
 	}
 
 	if err := s.ConsentManager.PersistConsentRequest(consent); err != nil {

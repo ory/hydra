@@ -38,13 +38,18 @@ func TestConsentSDK(t *testing.T) {
 		RequestedScopes:  []string{"foo", "bar"},
 		GrantedScopes:    []string{"baz", "bar"},
 		CSRF:             "some-csrf",
-		ExpiresAt:        time.Now().Round(time.Minute),
+		ExpiresAt:        time.Now().UTC().Round(time.Minute),
 		Consent:          ConsentRequestAccepted,
 		DenyReason:       "some reason",
 		AccessTokenExtra: map[string]interface{}{"atfoo": "bar", "atbaz": "bar"},
 		IDTokenExtra:     map[string]interface{}{"idfoo": "bar", "idbaz": "bar"},
 		RedirectURL:      "https://redirect-me/foo",
 		Subject:          "Peter",
+		RequestedACR:     []string{"1", "2"},
+		RequestedPrompt:  "none",
+		ProvidedACR:      "2",
+		AuthTime:         100,
+		DenyError:        "invalid_login",
 	}
 
 	memm := NewConsentRequestMemoryManager()
@@ -72,12 +77,17 @@ func TestConsentSDK(t *testing.T) {
 	assert.EqualValues(t, req.ClientID, got.ClientId)
 	assert.EqualValues(t, req.RequestedScopes, got.RequestedScopes)
 	assert.EqualValues(t, req.RedirectURL, got.RedirectUrl)
+	assert.EqualValues(t, req.RequestedPrompt, got.RequestedPrompt)
+	assert.EqualValues(t, req.RequestedACR, got.RequestedAcr)
+	assert.EqualValues(t, req.RequestedMaxAge, got.RequestedMaxAge)
 
 	accept := hydra.ConsentRequestAcceptance{
 		Subject:          "some-subject",
 		GrantScopes:      []string{"scope1", "scope2"},
 		AccessTokenExtra: map[string]interface{}{"at": "bar"},
 		IdTokenExtra:     map[string]interface{}{"id": "bar"},
+		AuthTime:         100,
+		ProvidedAcr:      "1",
 	}
 
 	response, err := client.AcceptOAuth2ConsentRequest(req.ID, accept)

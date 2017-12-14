@@ -48,6 +48,8 @@ func (m *ConsentRequestMemoryManager) AcceptConsentRequest(id string, payload *A
 	session.IDTokenExtra = payload.IDTokenExtra
 	session.Consent = ConsentRequestAccepted
 	session.GrantedScopes = payload.GrantScopes
+	session.AuthTime = payload.AuthTime
+	session.ProvidedACR = payload.ProvidedAuthenticationContextClassReference
 
 	return m.PersistConsentRequest(session)
 }
@@ -60,6 +62,8 @@ func (m *ConsentRequestMemoryManager) RejectConsentRequest(id string, payload *R
 
 	session.Consent = ConsentRequestRejected
 	session.DenyReason = payload.Reason
+	session.DenyError = payload.Error
+
 	return m.PersistConsentRequest(session)
 }
 

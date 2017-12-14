@@ -71,6 +71,23 @@
           'String'
         )
       }
+      if (data.hasOwnProperty('requestedAcr')) {
+        obj['requestedAcr'] = ApiClient.convertToType(data['requestedAcr'], [
+          'String'
+        ])
+      }
+      if (data.hasOwnProperty('requestedMaxAge')) {
+        obj['requestedMaxAge'] = ApiClient.convertToType(
+          data['requestedMaxAge'],
+          'Number'
+        )
+      }
+      if (data.hasOwnProperty('requestedPrompt')) {
+        obj['requestedPrompt'] = ApiClient.convertToType(
+          data['requestedPrompt'],
+          'String'
+        )
+      }
       if (data.hasOwnProperty('requestedScopes')) {
         obj['requestedScopes'] = ApiClient.convertToType(
           data['requestedScopes'],
@@ -96,6 +113,18 @@
    * @member {String} redirectUrl
    */
   exports.prototype['redirectUrl'] = undefined
+  /**
+   * @member {Array.<String>} requestedAcr
+   */
+  exports.prototype['requestedAcr'] = undefined
+  /**
+   * @member {Number} requestedMaxAge
+   */
+  exports.prototype['requestedMaxAge'] = undefined
+  /**
+   * @member {String} requestedPrompt
+   */
+  exports.prototype['requestedPrompt'] = undefined
   /**
    * RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator.
    * @member {Array.<String>} requestedScopes

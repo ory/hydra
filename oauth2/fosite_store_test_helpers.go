@@ -30,7 +30,7 @@ import (
 )
 
 var defaultRequest = fosite.Request{
-	RequestedAt:   time.Now().Round(time.Second),
+	RequestedAt:   time.Now().UTC().Round(time.Second),
 	Client:        &client.Client{ID: "foobar"},
 	Scopes:        fosite.Arguments{"fa", "ba"},
 	GrantedScopes: fosite.Arguments{"fa", "ba"},
@@ -87,10 +87,10 @@ func TestHelperRevokeRefreshToken(m pkg.FositeStorer) func(t *testing.T) {
 		_, err := m.GetRefreshTokenSession(ctx, "1111", &fosite.DefaultSession{})
 		assert.NotNil(t, err)
 
-		err = m.CreateRefreshTokenSession(ctx, "1111", &fosite.Request{ID: id, Client: &client.Client{ID: "foobar"}, RequestedAt: time.Now().Round(time.Second), Session: &fosite.DefaultSession{}})
+		err = m.CreateRefreshTokenSession(ctx, "1111", &fosite.Request{ID: id, Client: &client.Client{ID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &fosite.DefaultSession{}})
 		require.NoError(t, err)
 
-		err = m.CreateRefreshTokenSession(ctx, "1122", &fosite.Request{ID: id, Client: &client.Client{ID: "foobar"}, RequestedAt: time.Now().Round(time.Second), Session: &fosite.DefaultSession{}})
+		err = m.CreateRefreshTokenSession(ctx, "1122", &fosite.Request{ID: id, Client: &client.Client{ID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &fosite.DefaultSession{}})
 		require.NoError(t, err)
 
 		_, err = m.GetRefreshTokenSession(ctx, "1111", &fosite.DefaultSession{})

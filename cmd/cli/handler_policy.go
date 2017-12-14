@@ -49,22 +49,37 @@ func newPolicyHandler(c *config.Config) *PolicyHandler {
 	}
 }
 
+func (h *PolicyHandler) ImportPolicy(cmd *cobra.Command, args []string) {
+	if len(args) == 0 {
+		fmt.Println(cmd.UsageString())
+		return
+	}
+
+	m := h.newPolicyManager(cmd)
+
+	for _, path := range args {
+		reader, err := os.Open(path)
+		pkg.Must(err, "Could not open file %s: %s", path, err)
+
+		var p hydra.Policy
+		err = json.NewDecoder(reader).Decode(&p)
+		pkg.Must(err, "Could not parse JSON: %s", err)
+
+		_, response, err := m.CreatePolicy(p)
+		checkResponse(response, err, http.StatusCreated)
+		fmt.Printf("Imported policy %s from %s.\n", p.Id, path)
+	}
+
+	return
+}
+
 func (h *PolicyHandler) CreatePolicy(cmd *cobra.Command, args []string) {
 	m := h.newPolicyManager(cmd)
 
 	if files, _ := cmd.Flags().GetStringSlice("files"); len(files) > 0 {
-		for _, path := range files {
-			reader, err := os.Open(path)
-			pkg.Must(err, "Could not open file %s: %s", path, err)
-
-			var p hydra.Policy
-			err = json.NewDecoder(reader).Decode(&p)
-			pkg.Must(err, "Could not parse JSON: %s", err)
-
-			_, response, err := m.CreatePolicy(p)
-			checkResponse(response, err, http.StatusCreated)
-			fmt.Printf("Imported policy %s from %s.\n", p.Id, path)
-		}
+		fmt.Println("Importing policies using the -f flag is deprecated and will be removed in the future.")
+		fmt.Println(`Please use "hydra policies import" instead.`)
+		h.ImportPolicy(cmd, files)
 		return
 	}
 
@@ -74,6 +89,7 @@ func (h *PolicyHandler) CreatePolicy(cmd *cobra.Command, args []string) {
 	resources, _ := cmd.Flags().GetStringSlice("resources")
 	actions, _ := cmd.Flags().GetStringSlice("actions")
 	isAllow, _ := cmd.Flags().GetBool("allow")
+
 	if len(subjects) == 0 || len(resources) == 0 || len(actions) == 0 {
 		fmt.Println(cmd.UsageString())
 		fmt.Println("")

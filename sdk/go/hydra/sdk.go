@@ -68,13 +68,13 @@ func (s *CodeGenSDK) GetOAuth2Config() *oauth2.Config {
 // NewSDK instantiates a new CodeGenSDK instance or returns an error.
 func NewSDK(c *Configuration) (*CodeGenSDK, error) {
 	if c.EndpointURL == "" {
-		return nil, errors.New("Please specify an EndpointURL url")
+		return nil, errors.New("Please specify the ORY Hydra Endpoint URL")
 	}
 	if c.ClientSecret == "" {
-		return nil, errors.New("Please specify a client id")
+		return nil, errors.New("Please specify an OAuth 2.0 Client Secret")
 	}
 	if c.ClientID == "" {
-		return nil, errors.New("Please specify a client secret")
+		return nil, errors.New("Please specify an OAuth 2.0 Client ID")
 	}
 	if len(c.Scopes) == 0 {
 		c.Scopes = []string{"hydra.*"}

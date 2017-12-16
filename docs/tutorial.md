@@ -13,8 +13,8 @@ download [this zip file](https://github.com/ory-am/hydra/archive/master.zip) or 
 ```
 $ git clone https://github.com/ory/hydra.git
 $ cd hydra
-$ git checkout tags/v0.10.0
-$ docker-compose up --build -d
+$ git checkout tags/v0.10.10
+$ docker-compose -p hydra up --build -d
 Starting hydra_mysqld_1
 Starting hydra_postgresd_1
 Starting hydra_hydra_1

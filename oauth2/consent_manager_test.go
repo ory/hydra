@@ -52,7 +52,7 @@ func connectToPGConsent() {
 	consentManagers["postgres"] = s
 }
 
-func tTestConsentRequestManagerReadWrite(t *testing.T) {
+func TestConsentRequestManagerReadWrite(t *testing.T) {
 	req := &ConsentRequest{
 		ID:               "id-1",
 		ClientID:         "client-id",
@@ -121,6 +121,94 @@ func TestConsentRequestManagerUpdate(t *testing.T) {
 			got, err = m.GetConsentRequest(req.ID)
 			require.NoError(t, err)
 			assert.False(t, got.IsConsentGranted())
+		})
+	}
+}
+
+func TestConsentRequestManagerPreviousConsent(t *testing.T) {
+	reqs := []ConsentRequest{
+		{
+			ID:            "id-1",
+			ClientID:      "client-1",
+			GrantedScopes: []string{"baz", "bar"},
+			RequestedAt:   time.Now().UTC().Round(time.Millisecond),
+			Subject:       "peter",
+			Consent:       ConsentRequestAccepted,
+		},
+		{
+			ID:            "id-2",
+			ClientID:      "client-1",
+			GrantedScopes: []string{"baz", "bar"},
+			RequestedAt:   time.Now().Add(-time.Hour).UTC().Round(time.Millisecond),
+			Subject:       "peter",
+			Consent:       ConsentRequestAccepted,
+		},
+		{
+			ID:            "id-3",
+			ClientID:      "client-2",
+			GrantedScopes: []string{"baz", "bar"},
+			RequestedAt:   time.Now().UTC().Round(time.Millisecond),
+			Subject:       "peter",
+			Consent:       ConsentRequestRejected,
+		},
+		{
+			ID:            "id-4",
+			ClientID:      "client-2",
+			GrantedScopes: []string{"baz", "bar"},
+			RequestedAt:   time.Now().UTC().Round(time.Millisecond),
+			Subject:       "alice",
+			Consent:       ConsentRequestAccepted,
+		},
+		{
+			ID:            "id-5",
+			ClientID:      "client-3",
+			GrantedScopes: []string{},
+			RequestedAt:   time.Now().UTC().Round(time.Millisecond),
+			Subject:       "alice",
+			Consent:       ConsentRequestAccepted,
+		},
+	}
+
+	for k, m := range consentManagers {
+		t.Run(fmt.Sprintf("manager=%s", k), func(t *testing.T) {
+			for _, r := range reqs {
+				require.NoError(t, m.PersistConsentRequest(&r))
+			}
+
+			t.Run("case=can not find a matching consent", func(t *testing.T) {
+				session, err := m.GetPreviouslyGrantedConsent("peter", "nonexistent-client", []string{})
+				require.Error(t, err)
+				assert.Nil(t, session)
+
+				session, err = m.GetPreviouslyGrantedConsent("peter", "client-1", []string{"baz", "bar", "foo"})
+				require.Error(t, err)
+				assert.Nil(t, session)
+			})
+
+			t.Run("case=returns the newer of two consents", func(t *testing.T) {
+				session, err := m.GetPreviouslyGrantedConsent("peter", "client-1", []string{"baz", "bar"})
+				require.NoError(t, err)
+				assert.Equal(t, &reqs[0], session)
+			})
+
+			t.Run("case=returns the only valid consent for client-2", func(t *testing.T) {
+				session, err := m.GetPreviouslyGrantedConsent("peter", "client-2", []string{"baz", "bar"})
+				require.Error(t, err)
+				assert.Nil(t, session)
+
+				session, err = m.GetPreviouslyGrantedConsent("alice", "client-2", []string{"baz", "bar"})
+				require.NoError(t, err)
+				assert.Equal(t, &reqs[3], session)
+			})
+			t.Run("case=returns the only valid consent for client-3", func(t *testing.T) {
+				session, err := m.GetPreviouslyGrantedConsent("alice", "client-3", []string{"baz"})
+				require.Error(t, err)
+				assert.Nil(t, session)
+
+				session, err = m.GetPreviouslyGrantedConsent("alice", "client-3", []string{})
+				require.NoError(t, err)
+				assert.Equal(t, &reqs[4], session)
+			})
 		})
 	}
 }

@@ -15,6 +15,8 @@
 package oauth2_test
 
 import (
+	"bytes"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
@@ -22,10 +24,6 @@ import (
 	"strings"
 	"testing"
 	"time"
-
-	"encoding/json"
-
-	"bytes"
 
 	"github.com/julienschmidt/httprouter"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"

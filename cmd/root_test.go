@@ -22,19 +22,28 @@ import (
 	"time"
 
 	"github.com/pborman/uuid"
+	"github.com/phayes/freeport"
 	"github.com/stretchr/testify/assert"
 )
 
+var port int
+
 func init() {
-	c.BindPort = 13124
+	var err error
+	port, err = freeport.GetFreePort()
+	if err != nil {
+		panic(err.Error())
+	}
+	os.Setenv("DATABASE_URL", "memory")
+	os.Setenv("FORCE_ROOT_CLIENT_CREDENTIALS", "admin:pw")
+	os.Setenv("ISSUER", fmt.Sprintf("https://localhost:%d/", port))
+	os.Setenv("PORT", fmt.Sprintf("%d", port))
+	os.Setenv("LOG_LEVEL", "debug")
 }
 
 func TestExecute(t *testing.T) {
 	var osArgs = make([]string, len(os.Args))
 	var path = filepath.Join(os.TempDir(), fmt.Sprintf("hydra-%s.yml", uuid.New()))
-	os.Setenv("DATABASE_URL", "memory")
-	os.Setenv("FORCE_ROOT_CLIENT_CREDENTIALS", "admin:pw")
-	os.Setenv("ISSUER", "https://localhost:4444/")
 	copy(osArgs, os.Args)
 
 	for _, c := range []struct {
@@ -54,7 +63,7 @@ func TestExecute(t *testing.T) {
 				return err != nil
 			},
 		},
-		{args: []string{"connect", "--id", "admin", "--secret", "pw", "--url", "https://127.0.0.1:4444"}},
+		{args: []string{"connect", "--id", "admin", "--secret", "pw", "--url", fmt.Sprintf("https://127.0.0.1:%d", port)}},
 		{args: []string{"clients", "create", "--id", "foobarbaz"}},
 		{args: []string{"clients", "get", "foobarbaz"}},
 		{args: []string{"clients", "create", "--id", "public-foo", "--is-public"}},

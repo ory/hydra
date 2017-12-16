@@ -15,6 +15,7 @@
 package oauth2
 
 import (
+	"sort"
 	"sync"
 
 	"github.com/ory/hydra/pkg"
@@ -71,4 +72,24 @@ func (m *ConsentRequestMemoryManager) GetConsentRequest(id string) (*ConsentRequ
 	} else {
 		return &session, nil
 	}
+}
+
+func (m *ConsentRequestMemoryManager) GetPreviouslyGrantedConsent(subject string, client string, scopes []string) (*ConsentRequest, error) {
+	m.Lock()
+	defer m.Unlock()
+
+	var found []ConsentRequest
+	for _, request := range m.requests {
+		if request.Consent == ConsentRequestAccepted && request.Subject == subject && client == request.ClientID && isSubset(scopes, request.GrantedScopes) {
+			found = append(found, request)
+		}
+	}
+
+	if len(found) == 0 {
+		return nil, errors.New("No matching consent request found")
+	}
+
+	toSort := byTime(found)
+	sort.Sort(toSort)
+	return &toSort[0], nil
 }

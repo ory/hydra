@@ -415,38 +415,19 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		return
 	}
 
-	// A session_token will be available if the user was authenticated an gave consent
-	consent := authorizeRequest.GetRequestForm().Get("consent")
-	if consent == "" {
-		// otherwise redirect to log in endpoint
-		if err := h.redirectToConsent(w, r, authorizeRequest); err != nil {
-			pkg.LogError(err, h.L)
-			h.writeAuthorizeError(w, authorizeRequest, err)
+	var session *Session
+	// A consent will be available if the user was authenticated an gave consent
+	if consent := authorizeRequest.GetRequestForm().Get("consent"); consent == "" {
+		var err error
+		if session, err = h.handleAuthWithoutConsent(w, r, authorizeRequest); err != nil {
+			// error was already handled
 			return
 		}
-		return
-	}
-
-	cookie, err := h.CookieStore.Get(r, consentCookieName)
-	if err != nil {
-		pkg.LogError(err, h.L)
-		h.writeAuthorizeError(w, authorizeRequest, errors.Wrapf(fosite.ErrServerError, "Could not open session: %s", err))
-		return
-	}
-
-	// decode consent_token claims
-	// verify anti-CSRF (inject state) and anti-replay token (expiry time, good value would be 10 seconds)
-	session, err := h.Consent.ValidateConsentRequest(authorizeRequest, consent, cookie)
-	if err != nil {
-		pkg.LogError(err, h.L)
-		h.writeAuthorizeError(w, authorizeRequest, err)
-		return
-	}
-
-	if err := cookie.Save(r, w); err != nil {
-		pkg.LogError(err, h.L)
-		h.writeAuthorizeError(w, authorizeRequest, errors.Wrapf(fosite.ErrServerError, "Could not store session cookie: %s", err))
-		return
+	} else {
+		if session, err = h.handleAuthWithConsent(w, r, consent, authorizeRequest); err != nil {
+			// error was already handled
+			return
+		}
 	}
 
 	// done
@@ -458,6 +439,56 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	}
 
 	h.OAuth2.WriteAuthorizeResponse(w, authorizeRequest, response)
+}
+
+func (h *Handler) handleAuthWithConsent(w http.ResponseWriter, r *http.Request, consent string, authorizeRequest fosite.AuthorizeRequester) (*Session, error) {
+	var err error
+	cookie, err := h.CookieStore.Get(r, consentCookieName)
+	if err != nil {
+		pkg.LogError(err, h.L)
+		h.writeAuthorizeError(w, authorizeRequest, errors.WithStack(fosite.ErrServerError.WithDebug(fmt.Sprintf("Could not open session: %s", err))))
+		return nil, err
+	}
+
+	// decode consent_token claims
+	// verify anti-CSRF (inject state) and anti-replay token (expiry time, good value would be 10 seconds)
+	session, err := h.Consent.ValidateConsentRequest(authorizeRequest, consent, cookie)
+	if err != nil {
+		pkg.LogError(err, h.L)
+		h.writeAuthorizeError(w, authorizeRequest, err)
+		return nil, err
+	}
+
+	if err := cookie.Save(r, w); err != nil {
+		pkg.LogError(err, h.L)
+		h.writeAuthorizeError(w, authorizeRequest, errors.WithStack(fosite.ErrServerError.WithDebug(fmt.Sprintf("Could not store session cookie: %s", err))))
+		return nil, err
+	}
+
+	return session, nil
+}
+
+func (h *Handler) handleAuthWithoutConsent(w http.ResponseWriter, r *http.Request, authorizeRequest fosite.AuthorizeRequester) (*Session, error) {
+	// Error can be ignored because a session will always be returned
+	cookie, _ := h.CookieStore.Get(r, consentCookieName)
+	defer cookie.Save(r, w)
+
+	var err error
+	session, err := h.Consent.HandleConsentRequest(authorizeRequest, cookie)
+	if err.Error() == errRequiresAuthentication.Error() {
+		if err := h.redirectToConsent(w, r, authorizeRequest); err != nil {
+			pkg.LogError(err, h.L)
+			h.writeAuthorizeError(w, authorizeRequest, err)
+			return nil, err
+		}
+		return nil, err
+	} else if err != nil {
+		pkg.LogError(err, h.L)
+		h.writeAuthorizeError(w, authorizeRequest, err)
+		return nil, err
+	}
+
+	return session, nil
 }
 
 func (h *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, authorizeRequest fosite.AuthorizeRequester) error {

@@ -17,12 +17,11 @@ package oauth2
 import (
 	"crypto/rand"
 	"crypto/rsa"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
-
-	"encoding/json"
 
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
@@ -91,12 +90,16 @@ type FakeConsentStrategy struct {
 }
 
 func (s *FakeConsentStrategy) ValidateConsentRequest(authorizeRequest fosite.AuthorizeRequester, token string, session *sessions.Session) (claims *Session, err error) {
-	return nil, nil
+	return NewSession("consent-user"), nil
 }
 
 func (s *FakeConsentStrategy) CreateConsentRequest(authorizeRequest fosite.AuthorizeRequester, redirectURL string, session *sessions.Session) (token string, err error) {
 	s.RedirectURL = redirectURL
 	return "token", nil
+}
+
+func (s *FakeConsentStrategy) HandleConsentRequest(authorizeRequest fosite.AuthorizeRequester, session *sessions.Session) (claims *Session, err error) {
+	return nil, errRequiresAuthentication
 }
 
 func TestIssuerRedirect(t *testing.T) {

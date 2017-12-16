@@ -16,9 +16,8 @@ package oauth2
 
 import (
 	"context"
-	"testing"
-
 	"net/url"
+	"testing"
 	"time"
 
 	"github.com/ory/fosite"

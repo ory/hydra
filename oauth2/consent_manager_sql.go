@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/pkg"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
@@ -56,6 +57,19 @@ var consentMigrations = &migrate.MemoryMigrationSource{
 				"DROP TABLE hydra_consent_request",
 			},
 		},
+		{
+			Id: "2",
+			Up: []string{
+				"ALTER TABLE hydra_consent_request ADD client text NOT NULL DEFAULT '{}'",
+				"ALTER TABLE hydra_consent_request ADD oidc_context text NOT NULL DEFAULT '{}'",
+				"ALTER TABLE hydra_consent_request ADD requested_at timestamp NOT NULL DEFAULT '1970-01-01 00:00:01.000000'",
+			},
+			Down: []string{
+				"ALTER TABLE hydra_consent_request DROP COLUMN client",
+				"ALTER TABLE hydra_consent_request DROP COLUMN oidc_context",
+				"ALTER TABLE hydra_consent_request DROP COLUMN requested_at",
+			},
+		},
 	},
 }
 
@@ -72,6 +86,9 @@ type consentRequestSqlData struct {
 	Consent          string    `db:"consent"`
 	DenyReason       string    `db:"deny_reason"`
 	Subject          string    `db:"subject"`
+	Client           string    `db:"client"`
+	OIDCContext      string    `db:"oidc_context"`
+	RequestedAt      time.Time `db:"requested_at"`
 }
 
 func newConsentRequestSqlData(request *ConsentRequest) (*consentRequestSqlData, error) {
@@ -101,6 +118,16 @@ func newConsentRequestSqlData(request *ConsentRequest) (*consentRequestSqlData, 
 		}
 	}
 
+	cl, err := json.Marshal(request.Client)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	oidcContext, err := json.Marshal(request.OpenIDConnectContext)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
 	return &consentRequestSqlData{
 		ID:               request.ID,
 		RequestedScopes:  strings.Join(request.RequestedScopes, " "),
@@ -114,11 +141,16 @@ func newConsentRequestSqlData(request *ConsentRequest) (*consentRequestSqlData, 
 		Consent:          request.Consent,
 		DenyReason:       request.DenyReason,
 		Subject:          request.Subject,
+		Client:           string(cl),
+		OIDCContext:      string(oidcContext),
+		RequestedAt:      request.RequestedAt,
 	}, nil
 }
 
 func (r *consentRequestSqlData) toConsentRequest() (*ConsentRequest, error) {
 	var atext, idtext map[string]interface{}
+	var cl client.Client
+	var oidcContext ConsentRequestOpenIDConnectContext
 
 	if r.IDTokenExtra != "" {
 		if err := json.Unmarshal([]byte(r.IDTokenExtra), &idtext); err != nil {
@@ -132,19 +164,29 @@ func (r *consentRequestSqlData) toConsentRequest() (*ConsentRequest, error) {
 		}
 	}
 
+	if err := json.Unmarshal([]byte(r.Client), &cl); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	if err := json.Unmarshal([]byte(r.OIDCContext), &oidcContext); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
 	return &ConsentRequest{
-		ID:               r.ID,
-		ClientID:         r.ClientID,
-		ExpiresAt:        r.ExpiresAt,
-		RedirectURL:      r.RedirectURL,
-		CSRF:             r.CSRF,
-		Consent:          r.Consent,
-		DenyReason:       r.DenyReason,
-		RequestedScopes:  strings.Split(r.RequestedScopes, " "),
-		GrantedScopes:    strings.Split(r.GrantedScopes, " "),
-		AccessTokenExtra: atext,
-		IDTokenExtra:     idtext,
-		Subject:          r.Subject,
+		ID:                   r.ID,
+		ClientID:             r.ClientID,
+		ExpiresAt:            r.ExpiresAt,
+		RedirectURL:          r.RedirectURL,
+		CSRF:                 r.CSRF,
+		Consent:              r.Consent,
+		DenyReason:           r.DenyReason,
+		RequestedScopes:      strings.Split(r.RequestedScopes, " "),
+		GrantedScopes:        strings.Split(r.GrantedScopes, " "),
+		AccessTokenExtra:     atext,
+		IDTokenExtra:         idtext,
+		Subject:              r.Subject,
+		Client:               &cl,
+		OpenIDConnectContext: &oidcContext,
 	}, nil
 }
 
@@ -244,4 +286,8 @@ func (m *ConsentRequestSQLManager) GetConsentRequest(id string) (*ConsentRequest
 		return nil, errors.WithStack(err)
 	}
 	return r, nil
+}
+
+func (m *ConsentRequestSQLManager) GetPreviouslyGrantedConsent(subject string, client string, scopes []string) (*ConsentRequest, error) {
+	return nil, errors.New("No matching consent request found")
 }

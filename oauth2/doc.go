@@ -16,23 +16,23 @@ package oauth2
 
 // ConsentRequest represents a consent request.
 // swagger:model oAuth2ConsentRequest
-type swaggerConsentRequest struct {
-	// ID is the id of this consent request.
-	ID string `json:"id"`
-
-	// RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator.
-	RequestedScopes []string `json:"requestedScopes,omitempty"`
-
-	// ClientID is the client id that initiated the OAuth2 request.
-	ClientID string `json:"clientId"`
-
-	// ExpiresAt is the time where the access request will expire.
-	ExpiresAt string `json:"expiresAt"`
-
-	// Redirect URL is the URL where the user agent should be redirected to after the consent has been
-	// accepted or rejected.
-	RedirectURL string `json:"redirectUrl"`
-}
+//type swaggerConsentRequest struct {
+//	// ID is the id of this consent request.
+//	ID string `json:"id"`
+//
+//	// RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator.
+//	RequestedScopes []string `json:"requestedScopes,omitempty"`
+//
+//	// ClientID is the client id that initiated the OAuth2 request.
+//	ClientID string `json:"clientId"`
+//
+//	// ExpiresAt is the time where the access request will expire.
+//	ExpiresAt string `json:"expiresAt"`
+//
+//	// Redirect URL is the URL where the user agent should be redirected to after the consent has been
+//	// accepted or rejected.
+//	RedirectURL string `json:"redirectUrl"`
+//}
 
 // swagger:parameters revokeOAuth2Token
 type swaggerRevokeOAuth2TokenParameters struct {
@@ -64,10 +64,11 @@ type swaggerAcceptConsentRequest struct {
 }
 
 // The consent request response
-// swagger:response oAuth2ConsentRequest
+//
+// swagger:response oAuth2ConsentRequestResponse
 type swaggerOAuthConsentRequest struct {
 	// in: body
-	Body swaggerConsentRequest
+	Body ConsentRequest
 }
 
 // The userinfo response
@@ -215,7 +216,7 @@ type swaggerOAuthIntrospectionResponsePayload struct {
 	// authorized this token.
 	Username string `json:"username,omitempty"`
 
-	// ClientID is a service-specific string identifier or list of string
+	// Audience is a service-specific list of string
 	// identifiers representing the intended audience for this token.
 	Audience string `json:"aud,omitempty"`
 

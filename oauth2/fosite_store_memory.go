@@ -15,9 +15,8 @@
 package oauth2
 
 import (
-	"sync"
-
 	"context"
+	"sync"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"

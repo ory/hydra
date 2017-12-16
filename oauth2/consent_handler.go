@@ -91,7 +91,7 @@ func (h *ConsentSessionHandler) SetRoutes(r *httprouter.Router) {
 //       oauth2: hydra.consent
 //
 //     Responses:
-//       200: oAuth2ConsentRequest
+//       200: oAuth2ConsentRequestResponse
 //       401: genericError
 //       500: genericError
 func (h *ConsentSessionHandler) FetchConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

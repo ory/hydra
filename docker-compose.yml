@@ -17,7 +17,7 @@ services:
   hydra-migrate:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-alpine
     links:
       - postgresd:postgresd
     command:
@@ -27,7 +27,7 @@ services:
   hydra:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-alpine
     links:
       - postgresd:postgresd
 #     Uncomment the following line to use mysql instead.

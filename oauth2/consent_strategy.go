@@ -174,6 +174,10 @@ func (s *DefaultConsentStrategy) HandleConsentRequest(req fosite.AuthorizeReques
 		return nil, errors.WithStack(errRequiresAuthentication)
 	}
 
+	if req.GetClient().IsPublic() {
+		return nil, errors.WithStack(errRequiresAuthentication)
+	}
+
 	var user string
 	var ok bool
 	var authTime time.Time

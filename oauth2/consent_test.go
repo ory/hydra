@@ -237,6 +237,16 @@ func TestHandleConsentRequest(t *testing.T) {
 			requiresAuth: true,
 		},
 		{
+			d: "should require authentication when client is public",
+			req: &fosite.AuthorizeRequest{
+				Request: fosite.Request{
+					Client: &client.Client{Public: true},
+					Form:   url.Values{},
+				},
+			},
+			requiresAuth: true,
+		},
+		{
 			d:            "should require authentication when prompt is select_account",
 			req:          newRequest(url.Values{"prompt": []string{"select_account"}}),
 			requiresAuth: true,

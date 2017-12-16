@@ -21,13 +21,14 @@ import (
 	"strings"
 	"time"
 
+	"sort"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/pkg"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
-	"sort"
 )
 
 var sqlConsentParams = []string{

@@ -20,11 +20,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/integration"
 	. "github.com/ory/hydra/oauth2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/ory/hydra/client"
 )
 
 var consentManagers = map[string]ConsentRequestManager{
@@ -55,21 +55,21 @@ func connectToPGConsent() {
 
 func TestConsentRequestManagerReadWrite(t *testing.T) {
 	req := &ConsentRequest{
-		ID:               "id-1",
-		ClientID:         "client-id",
-		RequestedScopes:  []string{"foo", "bar"},
-		GrantedScopes:    []string{"baz", "bar"},
-		Client: &client.Client{ID: "client-id"},
-		OpenIDConnectContext:&ConsentRequestOpenIDConnectContext{Prompt: "foo"},
-		CSRF:             "some-csrf",
-		ExpiresAt:        time.Now().Round(time.Minute).UTC(),
-		RequestedAt:      time.Now().Round(time.Minute).UTC(),
-		Consent:          ConsentRequestAccepted,
-		DenyReason:       "some reason",
-		AccessTokenExtra: map[string]interface{}{"atfoo": "bar", "atbaz": "bar"},
-		IDTokenExtra:     map[string]interface{}{"idfoo": "bar", "idbaz": "bar"},
-		RedirectURL:      "https://redirect-me/foo",
-		Subject:          "Peter",
+		ID:                   "id-1",
+		ClientID:             "client-id",
+		RequestedScopes:      []string{"foo", "bar"},
+		GrantedScopes:        []string{"baz", "bar"},
+		Client:               &client.Client{ID: "client-id"},
+		OpenIDConnectContext: &ConsentRequestOpenIDConnectContext{Prompt: "foo"},
+		CSRF:                 "some-csrf",
+		ExpiresAt:            time.Now().Round(time.Minute).UTC(),
+		RequestedAt:          time.Now().Round(time.Minute).UTC(),
+		Consent:              ConsentRequestAccepted,
+		DenyReason:           "some reason",
+		AccessTokenExtra:     map[string]interface{}{"atfoo": "bar", "atbaz": "bar"},
+		IDTokenExtra:         map[string]interface{}{"idfoo": "bar", "idbaz": "bar"},
+		RedirectURL:          "https://redirect-me/foo",
+		Subject:              "Peter",
 	}
 
 	for k, m := range consentManagers {
@@ -108,21 +108,21 @@ func TestConsentRequestManagerReadWrite(t *testing.T) {
 
 func TestConsentRequestManagerUpdate(t *testing.T) {
 	req := &ConsentRequest{
-		ID:               "id-2",
-		ClientID:         "client-id",
-		Client: &client.Client{ID: "client-id"},
-		OpenIDConnectContext:&ConsentRequestOpenIDConnectContext{Prompt: "foo"},
-		RequestedScopes:  []string{"foo", "bar"},
-		GrantedScopes:    []string{"baz", "bar"},
-		CSRF:             "some-csrf",
-		ExpiresAt:        time.Now().Round(time.Minute).UTC(),
-		RequestedAt:      time.Now().Round(time.Minute).UTC(),
-		Consent:          ConsentRequestRejected,
-		DenyReason:       "some reason",
-		AccessTokenExtra: map[string]interface{}{"atfoo": "bar", "atbaz": "bar"},
-		IDTokenExtra:     map[string]interface{}{"idfoo": "bar", "idbaz": "bar"},
-		RedirectURL:      "https://redirect-me/foo",
-		Subject:          "Peter",
+		ID:                   "id-2",
+		ClientID:             "client-id",
+		Client:               &client.Client{ID: "client-id"},
+		OpenIDConnectContext: &ConsentRequestOpenIDConnectContext{Prompt: "foo"},
+		RequestedScopes:      []string{"foo", "bar"},
+		GrantedScopes:        []string{"baz", "bar"},
+		CSRF:                 "some-csrf",
+		ExpiresAt:            time.Now().Round(time.Minute).UTC(),
+		RequestedAt:          time.Now().Round(time.Minute).UTC(),
+		Consent:              ConsentRequestRejected,
+		DenyReason:           "some reason",
+		AccessTokenExtra:     map[string]interface{}{"atfoo": "bar", "atbaz": "bar"},
+		IDTokenExtra:         map[string]interface{}{"idfoo": "bar", "idbaz": "bar"},
+		RedirectURL:          "https://redirect-me/foo",
+		Subject:              "Peter",
 	}
 
 	for k, m := range consentManagers {

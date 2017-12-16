@@ -18,7 +18,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"sync"
 	"testing"
 
 	"github.com/ory/fosite"
@@ -48,30 +47,10 @@ func TestMain(m *testing.M) {
 	flag.Parse()
 
 	if !testing.Short() {
-		var wg sync.WaitGroup
-		wg.Add(4)
-
-		go func() {
-			connectToPG()
-			wg.Done()
-		}()
-
-		go func() {
-			connectToMySQL()
-			wg.Done()
-		}()
-
-		go func() {
-			connectToPGConsent()
-			wg.Done()
-		}()
-
-		go func() {
-			connectToMySQLConsent()
-			wg.Done()
-		}()
-
-		wg.Wait()
+		connectToPG()
+		connectToMySQL()
+		connectToPGConsent()
+		connectToMySQLConsent()
 	}
 
 	s := m.Run()

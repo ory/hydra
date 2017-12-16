@@ -24,6 +24,7 @@ import (
 	. "github.com/ory/hydra/oauth2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/ory/hydra/client"
 )
 
 var consentManagers = map[string]ConsentRequestManager{
@@ -58,8 +59,11 @@ func TestConsentRequestManagerReadWrite(t *testing.T) {
 		ClientID:         "client-id",
 		RequestedScopes:  []string{"foo", "bar"},
 		GrantedScopes:    []string{"baz", "bar"},
+		Client: &client.Client{ID: "client-id"},
+		OpenIDConnectContext:&ConsentRequestOpenIDConnectContext{Prompt: "foo"},
 		CSRF:             "some-csrf",
-		ExpiresAt:        time.Now().Round(time.Minute),
+		ExpiresAt:        time.Now().Round(time.Minute).UTC(),
+		RequestedAt:      time.Now().Round(time.Minute).UTC(),
 		Consent:          ConsentRequestAccepted,
 		DenyReason:       "some reason",
 		AccessTokenExtra: map[string]interface{}{"atfoo": "bar", "atbaz": "bar"},
@@ -80,7 +84,24 @@ func TestConsentRequestManagerReadWrite(t *testing.T) {
 
 			require.Equal(t, req.ExpiresAt.Unix(), got.ExpiresAt.Unix())
 			got.ExpiresAt = req.ExpiresAt
-			assert.EqualValues(t, req, got)
+			require.Equal(t, req.RequestedAt.Unix(), got.RequestedAt.Unix())
+			got.RequestedAt = req.RequestedAt
+
+			assert.EqualValues(t, req.ID, got.ID)
+			assert.EqualValues(t, req.RequestedScopes, got.RequestedScopes)
+			assert.EqualValues(t, req.ClientID, got.ClientID)
+			assert.EqualValues(t, *req.Client, *got.Client)
+			assert.EqualValues(t, req.ExpiresAt, got.ExpiresAt)
+			assert.EqualValues(t, req.RedirectURL, got.RedirectURL)
+			assert.EqualValues(t, *req.OpenIDConnectContext, *got.OpenIDConnectContext)
+			assert.EqualValues(t, req.RequestedAt, got.RequestedAt)
+			assert.EqualValues(t, req.CSRF, got.CSRF)
+			assert.EqualValues(t, req.GrantedScopes, got.GrantedScopes)
+			assert.EqualValues(t, req.Subject, got.Subject)
+			assert.EqualValues(t, req.AccessTokenExtra, got.AccessTokenExtra)
+			assert.EqualValues(t, req.IDTokenExtra, got.IDTokenExtra)
+			assert.EqualValues(t, req.Consent, got.Consent)
+			assert.EqualValues(t, req.DenyReason, got.DenyReason)
 		})
 	}
 }
@@ -89,10 +110,13 @@ func TestConsentRequestManagerUpdate(t *testing.T) {
 	req := &ConsentRequest{
 		ID:               "id-2",
 		ClientID:         "client-id",
+		Client: &client.Client{ID: "client-id"},
+		OpenIDConnectContext:&ConsentRequestOpenIDConnectContext{Prompt: "foo"},
 		RequestedScopes:  []string{"foo", "bar"},
 		GrantedScopes:    []string{"baz", "bar"},
 		CSRF:             "some-csrf",
-		ExpiresAt:        time.Now().Round(time.Minute),
+		ExpiresAt:        time.Now().Round(time.Minute).UTC(),
+		RequestedAt:      time.Now().Round(time.Minute).UTC(),
 		Consent:          ConsentRequestRejected,
 		DenyReason:       "some reason",
 		AccessTokenExtra: map[string]interface{}{"atfoo": "bar", "atbaz": "bar"},
@@ -108,9 +132,27 @@ func TestConsentRequestManagerUpdate(t *testing.T) {
 			got, err := m.GetConsentRequest(req.ID)
 			require.NoError(t, err)
 			assert.False(t, got.IsConsentGranted())
+
 			require.Equal(t, req.ExpiresAt.Unix(), got.ExpiresAt.Unix())
 			got.ExpiresAt = req.ExpiresAt
-			assert.EqualValues(t, req, got)
+			require.Equal(t, req.RequestedAt.Unix(), got.RequestedAt.Unix())
+			got.RequestedAt = req.RequestedAt
+
+			assert.EqualValues(t, req.ID, got.ID)
+			assert.EqualValues(t, req.RequestedScopes, got.RequestedScopes)
+			assert.EqualValues(t, req.ClientID, got.ClientID)
+			assert.EqualValues(t, *req.Client, *got.Client)
+			assert.EqualValues(t, req.ExpiresAt, got.ExpiresAt)
+			assert.EqualValues(t, req.RedirectURL, got.RedirectURL)
+			assert.EqualValues(t, *req.OpenIDConnectContext, *got.OpenIDConnectContext)
+			assert.EqualValues(t, req.RequestedAt, got.RequestedAt)
+			assert.EqualValues(t, req.CSRF, got.CSRF)
+			assert.EqualValues(t, req.GrantedScopes, got.GrantedScopes)
+			assert.EqualValues(t, req.Subject, got.Subject)
+			assert.EqualValues(t, req.AccessTokenExtra, got.AccessTokenExtra)
+			assert.EqualValues(t, req.IDTokenExtra, got.IDTokenExtra)
+			assert.EqualValues(t, req.Consent, got.Consent)
+			assert.EqualValues(t, req.DenyReason, got.DenyReason)
 
 			require.NoError(t, m.AcceptConsentRequest(req.ID, new(AcceptConsentRequestPayload)))
 			got, err = m.GetConsentRequest(req.ID)
@@ -128,42 +170,47 @@ func TestConsentRequestManagerUpdate(t *testing.T) {
 func TestConsentRequestManagerPreviousConsent(t *testing.T) {
 	reqs := []ConsentRequest{
 		{
-			ID:            "id-1",
+			ID:            "cid-1",
 			ClientID:      "client-1",
 			GrantedScopes: []string{"baz", "bar"},
 			RequestedAt:   time.Now().UTC().Round(time.Millisecond),
+			ExpiresAt:     time.Now().UTC().Round(time.Millisecond),
 			Subject:       "peter",
 			Consent:       ConsentRequestAccepted,
 		},
 		{
-			ID:            "id-2",
+			ID:            "cid-2",
 			ClientID:      "client-1",
 			GrantedScopes: []string{"baz", "bar"},
 			RequestedAt:   time.Now().Add(-time.Hour).UTC().Round(time.Millisecond),
+			ExpiresAt:     time.Now().UTC().Round(time.Millisecond),
 			Subject:       "peter",
 			Consent:       ConsentRequestAccepted,
 		},
 		{
-			ID:            "id-3",
+			ID:            "cid-3",
 			ClientID:      "client-2",
 			GrantedScopes: []string{"baz", "bar"},
 			RequestedAt:   time.Now().UTC().Round(time.Millisecond),
+			ExpiresAt:     time.Now().UTC().Round(time.Millisecond),
 			Subject:       "peter",
 			Consent:       ConsentRequestRejected,
 		},
 		{
-			ID:            "id-4",
+			ID:            "cid-4",
 			ClientID:      "client-2",
 			GrantedScopes: []string{"baz", "bar"},
 			RequestedAt:   time.Now().UTC().Round(time.Millisecond),
+			ExpiresAt:     time.Now().UTC().Round(time.Millisecond),
 			Subject:       "alice",
 			Consent:       ConsentRequestAccepted,
 		},
 		{
-			ID:            "id-5",
+			ID:            "cid-5",
 			ClientID:      "client-3",
 			GrantedScopes: []string{},
 			RequestedAt:   time.Now().UTC().Round(time.Millisecond),
+			ExpiresAt:     time.Now().UTC().Round(time.Millisecond),
 			Subject:       "alice",
 			Consent:       ConsentRequestAccepted,
 		},
@@ -188,7 +235,7 @@ func TestConsentRequestManagerPreviousConsent(t *testing.T) {
 			t.Run("case=returns the newer of two consents", func(t *testing.T) {
 				session, err := m.GetPreviouslyGrantedConsent("peter", "client-1", []string{"baz", "bar"})
 				require.NoError(t, err)
-				assert.Equal(t, &reqs[0], session)
+				assert.Equal(t, reqs[0].ID, session.ID)
 			})
 
 			t.Run("case=returns the only valid consent for client-2", func(t *testing.T) {
@@ -198,7 +245,7 @@ func TestConsentRequestManagerPreviousConsent(t *testing.T) {
 
 				session, err = m.GetPreviouslyGrantedConsent("alice", "client-2", []string{"baz", "bar"})
 				require.NoError(t, err)
-				assert.Equal(t, &reqs[3], session)
+				assert.Equal(t, reqs[3].ID, session.ID)
 			})
 			t.Run("case=returns the only valid consent for client-3", func(t *testing.T) {
 				session, err := m.GetPreviouslyGrantedConsent("alice", "client-3", []string{"baz"})
@@ -207,7 +254,7 @@ func TestConsentRequestManagerPreviousConsent(t *testing.T) {
 
 				session, err = m.GetPreviouslyGrantedConsent("alice", "client-3", []string{})
 				require.NoError(t, err)
-				assert.Equal(t, &reqs[4], session)
+				assert.Equal(t, reqs[4].ID, session.ID)
 			})
 		})
 	}

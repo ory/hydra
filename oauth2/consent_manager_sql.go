@@ -27,19 +27,21 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
+	"sort"
 )
 
 var sqlConsentParams = []string{
 	"id", "client_id", "expires_at", "redirect_url", "requested_scopes",
 	"csrf", "granted_scopes", "access_token_extra", "id_token_extra",
-	"consent", "deny_reason", "subject",
+	"consent", "deny_reason", "subject", "client", "oidc_context", "requested_at",
 }
 
-var consentMigrations = &migrate.MemoryMigrationSource{
-	Migrations: []*migrate.Migration{
-		{
-			Id: "1",
-			Up: []string{`CREATE TABLE IF NOT EXISTS hydra_consent_request (
+var consentMigrations = func(db string) *migrate.MemoryMigrationSource {
+	return &migrate.MemoryMigrationSource{
+		Migrations: []*migrate.Migration{
+			{
+				Id: "1",
+				Up: []string{`CREATE TABLE IF NOT EXISTS hydra_consent_request (
 	id      			varchar(36) NOT NULL PRIMARY KEY,
 	requested_scopes 	text NOT NULL,
 	client_id 			text NOT NULL,
@@ -53,24 +55,51 @@ var consentMigrations = &migrate.MemoryMigrationSource{
 	deny_reason			text NOT NULL,
 	subject				text NOT NULL
 )`},
-			Down: []string{
-				"DROP TABLE hydra_consent_request",
+				Down: []string{
+					"DROP TABLE hydra_consent_request",
+				},
+			},
+			{
+				Id: "2",
+				Up: func() []string {
+					if db == "mysql" {
+						return []string{
+							"ALTER TABLE hydra_consent_request ADD client text",
+							"ALTER TABLE hydra_consent_request ADD oidc_context text",
+							"UPDATE hydra_consent_request SET client='{}'",
+							"UPDATE hydra_consent_request SET oidc_context='{}'",
+							"ALTER TABLE hydra_consent_request MODIFY client text NOT NULL",
+							"ALTER TABLE hydra_consent_request MODIFY oidc_context text NOT NULL",
+							"ALTER TABLE hydra_consent_request ADD requested_at timestamp NOT NULL DEFAULT '1990-1-1 00:00:00'",
+							"ALTER TABLE hydra_consent_request MODIFY subject varchar(255)",
+							"ALTER TABLE hydra_consent_request MODIFY client_id varchar(255)",
+							"ALTER TABLE hydra_consent_request ADD INDEX hydra_consent_request_subject_idx (subject)",
+							"ALTER TABLE hydra_consent_request ADD INDEX hydra_consent_request_client_id_idx (client_id)",
+						}
+					} else {
+						return []string{
+							"ALTER TABLE hydra_consent_request ADD client text",
+							"ALTER TABLE hydra_consent_request ADD oidc_context text",
+							"UPDATE hydra_consent_request SET client='{}'",
+							"UPDATE hydra_consent_request SET oidc_context='{}'",
+							"ALTER TABLE hydra_consent_request ALTER COLUMN client SET NOT NULL",
+							"ALTER TABLE hydra_consent_request ALTER COLUMN oidc_context SET NOT NULL",
+							"ALTER TABLE hydra_consent_request ADD requested_at timestamp NOT NULL DEFAULT '1990-1-1 00:00:00'",
+							"ALTER TABLE hydra_consent_request ALTER COLUMN subject TYPE varchar(255)",
+							"ALTER TABLE hydra_consent_request ALTER COLUMN client_id TYPE varchar(255)",
+							"CREATE INDEX hydra_consent_request_subject_idx ON hydra_consent_request (subject)",
+							"CREATE INDEX hydra_consent_request_client_id_idx ON hydra_consent_request (client_id)",
+						}
+					}
+				}(),
+				Down: []string{
+					"ALTER TABLE hydra_consent_request DROP COLUMN client",
+					"ALTER TABLE hydra_consent_request DROP COLUMN oidc_context",
+					"ALTER TABLE hydra_consent_request DROP COLUMN requested_at",
+				},
 			},
 		},
-		{
-			Id: "2",
-			Up: []string{
-				"ALTER TABLE hydra_consent_request ADD client text NOT NULL DEFAULT '{}'",
-				"ALTER TABLE hydra_consent_request ADD oidc_context text NOT NULL DEFAULT '{}'",
-				"ALTER TABLE hydra_consent_request ADD requested_at timestamp NOT NULL DEFAULT '1970-01-01 00:00:01.000000'",
-			},
-			Down: []string{
-				"ALTER TABLE hydra_consent_request DROP COLUMN client",
-				"ALTER TABLE hydra_consent_request DROP COLUMN oidc_context",
-				"ALTER TABLE hydra_consent_request DROP COLUMN requested_at",
-			},
-		},
-	},
+	}
 }
 
 type consentRequestSqlData struct {
@@ -118,14 +147,18 @@ func newConsentRequestSqlData(request *ConsentRequest) (*consentRequestSqlData, 
 		}
 	}
 
-	cl, err := json.Marshal(request.Client)
-	if err != nil {
+	cl := "{}"
+	oidcContext := "{}"
+	if out, err := json.Marshal(request.Client); err != nil {
 		return nil, errors.WithStack(err)
+	} else {
+		cl = string(out)
 	}
 
-	oidcContext, err := json.Marshal(request.OpenIDConnectContext)
-	if err != nil {
+	if out, err := json.Marshal(request.OpenIDConnectContext); err != nil {
 		return nil, errors.WithStack(err)
+	} else {
+		oidcContext = string(out)
 	}
 
 	return &consentRequestSqlData{
@@ -141,8 +174,8 @@ func newConsentRequestSqlData(request *ConsentRequest) (*consentRequestSqlData, 
 		Consent:          request.Consent,
 		DenyReason:       request.DenyReason,
 		Subject:          request.Subject,
-		Client:           string(cl),
-		OIDCContext:      string(oidcContext),
+		Client:           cl,
+		OIDCContext:      oidcContext,
 		RequestedAt:      request.RequestedAt,
 	}, nil
 }
@@ -176,12 +209,13 @@ func (r *consentRequestSqlData) toConsentRequest() (*ConsentRequest, error) {
 		ID:                   r.ID,
 		ClientID:             r.ClientID,
 		ExpiresAt:            r.ExpiresAt,
+		RequestedAt:          r.RequestedAt,
 		RedirectURL:          r.RedirectURL,
 		CSRF:                 r.CSRF,
 		Consent:              r.Consent,
 		DenyReason:           r.DenyReason,
-		RequestedScopes:      strings.Split(r.RequestedScopes, " "),
-		GrantedScopes:        strings.Split(r.GrantedScopes, " "),
+		RequestedScopes:      pkg.SplitNonEmpty(r.RequestedScopes, " "),
+		GrantedScopes:        pkg.SplitNonEmpty(r.GrantedScopes, " "),
 		AccessTokenExtra:     atext,
 		IDTokenExtra:         idtext,
 		Subject:              r.Subject,
@@ -200,7 +234,7 @@ func NewConsentRequestSQLManager(db *sqlx.DB) *ConsentRequestSQLManager {
 
 func (m *ConsentRequestSQLManager) CreateSchemas() (int, error) {
 	migrate.SetTable("hydra_consent_request_migration")
-	n, err := migrate.Exec(m.db.DB, m.db.DriverName(), consentMigrations, migrate.Up)
+	n, err := migrate.Exec(m.db.DB, m.db.DriverName(), consentMigrations(m.db.DriverName()), migrate.Up)
 	if err != nil {
 		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
 	}
@@ -289,5 +323,31 @@ func (m *ConsentRequestSQLManager) GetConsentRequest(id string) (*ConsentRequest
 }
 
 func (m *ConsentRequestSQLManager) GetPreviouslyGrantedConsent(subject string, client string, scopes []string) (*ConsentRequest, error) {
-	return nil, errors.New("No matching consent request found")
+	var d []consentRequestSqlData
+	if err := m.db.Select(&d, m.db.Rebind("SELECT * FROM hydra_consent_request WHERE subject=? AND client_id=? AND consent=?"), subject, client, ConsentRequestAccepted); err == sql.ErrNoRows {
+		return nil, errors.WithStack(pkg.ErrNotFound)
+	} else if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	var dd []ConsentRequest
+	for _, v := range d {
+		vd, err := v.toConsentRequest()
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+
+		if isSubset(scopes, vd.GrantedScopes) {
+			dd = append(dd, *vd)
+		}
+	}
+
+	if len(dd) == 0 {
+		return nil, errors.WithStack(pkg.ErrNotFound)
+	}
+
+	toSort := byTime(dd)
+	sort.Sort(toSort)
+
+	return &dd[0], nil
 }

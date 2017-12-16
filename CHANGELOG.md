@@ -3,6 +3,8 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [Unreleased](#unreleased)
+  - [v0.10.10 (2017-12-16)](#v01010-2017-12-16)
   - [v0.10.9 (2017-12-13)](#v0109-2017-12-13)
   - [v0.10.8 (2017-12-12)](#v0108-2017-12-12)
   - [v0.10.7 (2017-12-09)](#v0107-2017-12-09)
@@ -114,6 +116,41 @@
 
 # Change Log
 
+## [Unreleased](https://github.com/ory/hydra/tree/HEAD)
+
+[Full Changelog](https://github.com/ory/hydra/compare/v0.10.10...HEAD)
+
+**Closed issues:**
+
+- Resolve broken docker-compose tutorial guide [\#717](https://github.com/ory/hydra/issues/717)
+
+## [v0.10.10](https://github.com/ory/hydra/tree/v0.10.10) (2017-12-16)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.10.9...v0.10.10)
+
+**Implemented enhancements:**
+
+- Make scopes in `hydra token client` command configurable [\#711](https://github.com/ory/hydra/issues/711)
+- cmd: Makes scopes in token command configurable [\#712](https://github.com/ory/hydra/pull/712) ([arekkas](https://github.com/arekkas))
+- cmd: Adds a dedicated command for importing policies [\#709](https://github.com/ory/hydra/pull/709) ([arekkas](https://github.com/arekkas))
+
+**Fixed bugs:**
+
+- Misleading error message when using the SDK [\#686](https://github.com/ory/hydra/issues/686)
+- sdk/go: Resolves incorrect error message [\#713](https://github.com/ory/hydra/pull/713) ([arekkas](https://github.com/arekkas))
+
+**Closed issues:**
+
+- Docker readme, in case it is lost [\#719](https://github.com/ory/hydra/issues/719)
+- Keep track of version and build hash [\#706](https://github.com/ory/hydra/issues/706)
+- Scope is documented as hydra.groups but should by hydra.warden.groups [\#702](https://github.com/ory/hydra/issues/702)
+- Rename `hydra policies create -f` to `hydra policies import` [\#701](https://github.com/ory/hydra/issues/701)
+
+**Merged pull requests:**
+
+- docs: Resolves issue with broken 5-minute tutorial [\#721](https://github.com/ory/hydra/pull/721) ([arekkas](https://github.com/arekkas))
+- Improves userinfo endpoint [\#714](https://github.com/ory/hydra/pull/714) ([arekkas](https://github.com/arekkas))
+- groups: Corrects group scope documentation [\#710](https://github.com/ory/hydra/pull/710) ([arekkas](https://github.com/arekkas))
+
 ## [v0.10.9](https://github.com/ory/hydra/tree/v0.10.9) (2017-12-13)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.10.8...v0.10.9)
 
@@ -127,6 +164,10 @@
 
 ## [v0.10.8](https://github.com/ory/hydra/tree/v0.10.8) (2017-12-12)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.10.7...v0.10.8)
+
+**Implemented enhancements:**
+
+- oauth2: Add token\_endpoint\_auth\_methods\_supported to openid-configuration [\#695](https://github.com/ory/hydra/issues/695)
 
 **Closed issues:**
 

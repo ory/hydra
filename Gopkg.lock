@@ -231,7 +231,7 @@
 [[projects]]
   name = "github.com/ory/fosite"
   packages = [".","compose","handler/oauth2","handler/openid","storage","token/hmac","token/jwt"]
-  revision = "97fbeb333e353d5d7d7d2368f51899262338ce62"
+  revision = "c85b32d355a183dac3e46e50aac8b2c344cbd2d7"
   version = "v0.15.3"
 
 [[projects]]

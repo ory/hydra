@@ -231,8 +231,8 @@
 [[projects]]
   name = "github.com/ory/fosite"
   packages = [".","compose","handler/oauth2","handler/openid","storage","token/hmac","token/jwt"]
-  revision = "c85b32d355a183dac3e46e50aac8b2c344cbd2d7"
-  version = "v0.15.3"
+  revision = "6831f7543000b3704879e52d8c9a4555653b4bd5"
+  version = "v0.15.4"
 
 [[projects]]
   name = "github.com/ory/graceful"
@@ -441,6 +441,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "253e08c8885aa6fe93f421ca72cbdc4ccd9504eb4ea244929b1e98aa09dddff9"
+  inputs-digest = "d8394025cea9ce104790b6b73ab13acef15b29777bed1845facb4b95d205f97c"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -133,6 +133,9 @@ func initConfig() {
 	viper.BindEnv("BCRYPT_COST")
 	viper.SetDefault("BCRYPT_COST", 10)
 
+	viper.BindEnv("OAUTH2_SHARE_ERROR_DEBUG")
+	viper.SetDefault("OAUTH2_SHARE_ERROR_DEBUG", false)
+
 	viper.BindEnv("ACCESS_TOKEN_LIFESPAN")
 	viper.SetDefault("ACCESS_TOKEN_LIFESPAN", "1h")
 

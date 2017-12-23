@@ -32,12 +32,6 @@
   version = "v1.1.0"
 
 [[projects]]
-  name = "github.com/cenkalti/backoff"
-  packages = ["."]
-  revision = "61153c768f31ee5f130071d08fc82b85208528de"
-  version = "v1.1.0"
-
-[[projects]]
   branch = "master"
   name = "github.com/containerd/continuity"
   packages = ["pathdriver"]
@@ -109,12 +103,6 @@
   revision = "1643683e1b54a9e88ad26d98f81400c8c9d9f4f9"
 
 [[projects]]
-  name = "github.com/gorethink/gorethink"
-  packages = ["."]
-  revision = "7f5bdfd858bb064d80559b2a32b86669c5de5d3b"
-  version = "v3.0.5"
-
-[[projects]]
   name = "github.com/gorilla/context"
   packages = ["."]
   revision = "1ea25387ff6f684839d82767c1733ff4d4d15d0a"
@@ -137,12 +125,6 @@
   name = "github.com/gtank/cryptopasta"
   packages = ["."]
   revision = "1f550f6f2f69009f6ae57347c188e0a67cd4e500"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/hailocab/go-hostpool"
-  packages = ["."]
-  revision = "e80d13ce29ede4452c43dea11e79b9bc8a15b478"
 
 [[projects]]
   branch = "master"
@@ -249,8 +231,8 @@
 [[projects]]
   name = "github.com/ory/fosite"
   packages = [".","compose","handler/oauth2","handler/openid","storage","token/hmac","token/jwt"]
-  revision = "97fbeb333e353d5d7d7d2368f51899262338ce62"
-  version = "v0.15.2"
+  revision = "2aa8e70bb88aa6bafde8d4ea949c5d514c6f568e"
+  version = "v0.15.6"
 
 [[projects]]
   name = "github.com/ory/graceful"
@@ -399,7 +381,7 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
-  packages = ["bcrypt","blowfish","ed25519","ed25519/internal/edwards25519","pbkdf2","ssh/terminal"]
+  packages = ["bcrypt","blowfish","ed25519","ed25519/internal/edwards25519","ssh/terminal"]
   revision = "2509b142fb2b797aa7587dad548f113b2c0f20ce"
 
 [[projects]]
@@ -433,18 +415,6 @@
   version = "v1.0.0"
 
 [[projects]]
-  branch = "v2.0.0"
-  name = "gopkg.in/fatih/pool.v2"
-  packages = ["."]
-  revision = "010e0b745d12eaf8426c95f9c3924d81dd0b668f"
-
-[[projects]]
-  name = "gopkg.in/gorethink/gorethink.v3"
-  packages = ["encoding","ql2","types"]
-  revision = "7f5bdfd858bb064d80559b2a32b86669c5de5d3b"
-  version = "v3.0.5"
-
-[[projects]]
   name = "gopkg.in/gorp.v1"
   packages = ["."]
   revision = "c87af80f3cc5036b55b83d77171e156791085e2e"
@@ -465,6 +435,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "0e7c47e5c64cb59c2f39dc7a1a7d26e843a5ec3344dc276924571077b9be22f1"
+  inputs-digest = "215ca8ae9619ea76e05d3ef5502125b6aa9c38335fce1d1307e33cf8e8c0ddee"
   solver-name = "gps-cdcl"
   solver-version = 1

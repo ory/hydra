@@ -5,6 +5,7 @@
   * [Introduction to Hydra](README.md#introduction-to-hydra)
   * [OAuth2 Case Study](README.md#oauth-20-case-study)
 * [Introduction Tutorial (5 minutes)](tutorial.md)
+* [Dependencies](environment.md)
 * Understanding Hydra
   * [OAuth2 & OpenID Connect](oauth2.md)
     * [Overview](oauth2.md#overview)

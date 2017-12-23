@@ -18,9 +18,9 @@ import (
 	"net/http"
 	"reflect"
 
+	"github.com/ory/fosite"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"github.com/ory/fosite"
 )
 
 var (
@@ -54,14 +54,14 @@ func LogError(err error, logger log.FieldLogger) {
 			extra["debug"] = e.Debug
 		}
 		if e.Hint != "" {
-			extra["hint"]= e.Hint
+			extra["hint"] = e.Hint
 		}
 	} else if e, ok := errors.Cause(err).(*fosite.RFC6749Error); ok {
 		if e.Debug != "" {
 			extra["debug"] = e.Debug
 		}
 		if e.Hint != "" {
-			extra["hint"]= e.Hint
+			extra["hint"] = e.Hint
 		}
 	}
 

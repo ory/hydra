@@ -30,6 +30,7 @@ import (
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/token/hmac"
+	"github.com/ory/hydra/health"
 	"github.com/ory/hydra/metrics"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/warden/group"
@@ -155,7 +156,7 @@ func (c *Config) DoesRequestSatisfyTermination(r *http.Request) error {
 		return errors.New("TLS termination is not enabled")
 	}
 
-	if r.URL.Path == "/health" {
+	if r.URL.Path == health.HealthStatusPath {
 		return nil
 	}
 

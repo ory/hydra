@@ -23,6 +23,11 @@ import (
 	"github.com/ory/hydra/metrics"
 )
 
+const (
+	HealthStatusPath  = "/health/status"
+	HealthMetricsPath = "/health/metrics"
+)
+
 type Handler struct {
 	Metrics        *metrics.MetricsManager
 	H              *herodot.JSONWriter
@@ -43,8 +48,8 @@ func (h *Handler) PrefixResource(resource string) string {
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
-	r.GET("/health/status", h.Health)
-	r.GET("/health/metrics", h.Statistics)
+	r.GET(HealthStatusPath, h.Health)
+	r.GET(HealthMetricsPath, h.Statistics)
 }
 
 // swagger:route GET /health/status health getInstanceStatus

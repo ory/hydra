@@ -70,4 +70,5 @@ func TestSQLSchema(t *testing.T) {
 		ID:      "integration-test-asdfas",
 		Members: []string{"asdf"},
 	}))
+	require.NoError(t, gm.DeleteGroup("integration-test-asdfas"))
 }

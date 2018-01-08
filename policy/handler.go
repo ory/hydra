@@ -19,8 +19,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"strconv"
-
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/firewall"
@@ -104,28 +102,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 		return
 	}
 
-	val := r.URL.Query().Get("offset")
-	if val == "" {
-		val = "0"
-	}
-
-	offset, err := strconv.ParseInt(val, 10, 64)
-	if err != nil {
-		h.H.WriteError(w, r, errors.WithStack(err))
-		return
-	}
-
-	val = r.URL.Query().Get("limit")
-	if val == "" {
-		val = "500"
-	}
-
-	limit, err := strconv.ParseInt(val, 10, 64)
-	if err != nil {
-		h.H.WriteError(w, r, errors.WithStack(err))
-		return
-	}
-
+	offset, limit := pkg.ParsePagination(r, 500, 0, 1000)
 	policies, err := h.Manager.GetAll(limit, offset)
 	if err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))

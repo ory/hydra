@@ -43,18 +43,30 @@ func TestHelperManagers(m Manager) func(t *testing.T) {
 		assert.EqualValues(t, c.Members, d.Members)
 		assert.EqualValues(t, c.ID, d.ID)
 
-		ds, err := m.FindGroupsByMember("foo")
+		ds, err := m.FindGroupsByMember("foo", 100, 0)
 		require.NoError(t, err)
 		assert.Len(t, ds, 2)
 
+		ds, err = m.FindGroupsByMember("foo", 1, 0)
+		require.NoError(t, err)
+		assert.Len(t, ds, 1)
+
+		ds, err = m.ListGroups(100, 0)
+		require.NoError(t, err)
+		assert.Len(t, ds, 2)
+
+		ds, err = m.ListGroups(1, 0)
+		require.NoError(t, err)
+		assert.Len(t, ds, 1)
+
 		assert.NoError(t, m.AddGroupMembers("1", []string{"baz"}))
 
-		ds, err = m.FindGroupsByMember("baz")
+		ds, err = m.FindGroupsByMember("baz", 100, 0)
 		require.NoError(t, err)
 		assert.Len(t, ds, 1)
 
 		assert.NoError(t, m.RemoveGroupMembers("1", []string{"baz"}))
-		ds, err = m.FindGroupsByMember("baz")
+		ds, err = m.FindGroupsByMember("baz", 100, 0)
 		require.NoError(t, err)
 		assert.Len(t, ds, 0)
 

@@ -105,7 +105,7 @@ func (w *LocalWarden) TokenAllowed(ctx context.Context, token string, a *firewal
 }
 
 func (w *LocalWarden) isAllowed(ctx context.Context, a *ladon.Request) error {
-	groups, err := w.Groups.FindGroupsByMember(a.Subject)
+	groups, err := w.Groups.FindGroupsByMember(a.Subject, 10000, 0)
 	if err != nil {
 		return err
 	}

@@ -82,14 +82,29 @@ func TestGroupSDK(t *testing.T) {
 		assert.Equal(t, http.StatusOK, response.StatusCode)
 		assert.EqualValues(t, firstGroup, *result)
 
-		results, response, err := client.FindGroupsByMember("foo")
+		results, response, err := client.ListGroups("foo", 100, 0)
 		require.NoError(t, err)
 		assert.Equal(t, http.StatusOK, response.StatusCode)
 		assert.Len(t, results, 2)
 
+		results, response, err = client.ListGroups("", 100, 0)
+		require.NoError(t, err)
+		assert.Equal(t, http.StatusOK, response.StatusCode)
+		assert.Len(t, results, 2)
+
+		results, response, err = client.ListGroups("", 1, 0)
+		require.NoError(t, err)
+		assert.Equal(t, http.StatusOK, response.StatusCode)
+		assert.Len(t, results, 1)
+
+		results, response, err = client.ListGroups("foo", 1, 0)
+		require.NoError(t, err)
+		assert.Equal(t, http.StatusOK, response.StatusCode)
+		assert.Len(t, results, 1)
+
 		client.AddMembersToGroup("1", hydra.GroupMembers{Members: []string{"baz"}})
 
-		results, response, err = client.FindGroupsByMember("baz")
+		results, response, err = client.ListGroups("baz", 100, 0)
 		require.NoError(t, err)
 		assert.Equal(t, http.StatusOK, response.StatusCode)
 		assert.Len(t, results, 1)
@@ -98,7 +113,7 @@ func TestGroupSDK(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, http.StatusNoContent, response.StatusCode)
 
-		results, response, err = client.FindGroupsByMember("baz")
+		results, response, err = client.ListGroups("baz", 100, 0)
 		require.NoError(t, err)
 		assert.Equal(t, http.StatusOK, response.StatusCode)
 		assert.Len(t, results, 0)

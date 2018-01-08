@@ -29,6 +29,13 @@
   "paths": {
     "/.well-known/jwks.json": {
       "get": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.keys.get"
+            ]
+          }
+        ],
         "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:hydra.openid.id-token:public\"],\n\"actions\": [\"GET\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -45,13 +52,6 @@
         ],
         "summary": "Get list of well known JSON Web Keys",
         "operationId": "wellKnown",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.keys.get"
-            ]
-          }
-        ],
         "responses": {
           "200": {
             "description": "jsonWebKeySet",
@@ -104,6 +104,13 @@
     },
     "/clients": {
       "get": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.clients"
+            ]
+          }
+        ],
         "description": "This endpoint never returns passwords.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -120,13 +127,6 @@
         ],
         "summary": "List OAuth 2.0 Clients",
         "operationId": "listOAuth2Clients",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.clients"
-            ]
-          }
-        ],
         "responses": {
           "200": {
             "$ref": "#/responses/oAuth2ClientList"
@@ -143,6 +143,13 @@
         }
       },
       "post": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.clients"
+            ]
+          }
+        ],
         "description": "If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will\nbe returned in the response and you will not be able to retrieve it later on. Write the secret down and keep\nit somwhere safe.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
         "consumes": [
           "application/json"
@@ -159,13 +166,6 @@
         ],
         "summary": "Create an OAuth 2.0 client",
         "operationId": "createOAuth2Client",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.clients"
-            ]
-          }
-        ],
         "parameters": [
           {
             "name": "Body",
@@ -197,6 +197,13 @@
     },
     "/clients/{id}": {
       "get": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.clients"
+            ]
+          }
+        ],
         "description": "This endpoint never returns passwords.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients:\u003csome-id\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients:\u003csome-id\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
         "consumes": [
           "application/json"
@@ -213,13 +220,6 @@
         ],
         "summary": "Retrieve an OAuth 2.0 Client.",
         "operationId": "getOAuth2Client",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.clients"
-            ]
-          }
-        ],
         "parameters": [
           {
             "uniqueItems": true,
@@ -250,6 +250,13 @@
         }
       },
       "put": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.clients"
+            ]
+          }
+        ],
         "description": "If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will\nbe able to retrieve the client secret, so write it down and keep it safe.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
         "consumes": [
           "application/json"
@@ -266,13 +273,6 @@
         ],
         "summary": "Update an OAuth 2.0 Client",
         "operationId": "updateOAuth2Client",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.clients"
-            ]
-          }
-        ],
         "parameters": [
           {
             "type": "string",
@@ -309,6 +309,13 @@
         }
       },
       "delete": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.clients"
+            ]
+          }
+        ],
         "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients:\u003csome-id\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients:\u003csome-id\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
         "consumes": [
           "application/json"
@@ -325,13 +332,6 @@
         ],
         "summary": "Deletes an OAuth 2.0 Client",
         "operationId": "deleteOAuth2Client",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.clients"
-            ]
-          }
-        ],
         "parameters": [
           {
             "uniqueItems": true,
@@ -361,6 +361,13 @@
     },
     "/health/metrics": {
       "get": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.health"
+            ]
+          }
+        ],
         "description": "This endpoint returns an instance's metrics, such as average response time, status code distribution, hits per\nsecond and so on. The return values are currently not documented as this endpoint is still experimental.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:health:stats\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -377,13 +384,6 @@
         ],
         "summary": "Show instance metrics (experimental)",
         "operationId": "getInstanceMetrics",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.health"
-            ]
-          }
-        ],
         "responses": {
           "200": {
             "$ref": "#/responses/emptyResponse"
@@ -420,6 +420,13 @@
     },
     "/keys/{set}": {
       "get": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.keys.get"
+            ]
+          }
+        ],
         "description": "This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -436,13 +443,6 @@
         ],
         "summary": "Retrieve a JSON Web Key Set",
         "operationId": "getJsonWebKeySet",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.keys.get"
-            ]
-          }
-        ],
         "parameters": [
           {
             "type": "string",
@@ -472,6 +472,13 @@
         }
       },
       "put": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.keys.update"
+            ]
+          }
+        ],
         "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -488,13 +495,6 @@
         ],
         "summary": "Update a JSON Web Key Set",
         "operationId": "updateJsonWebKeySet",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.keys.update"
-            ]
-          }
-        ],
         "parameters": [
           {
             "type": "string",
@@ -531,6 +531,13 @@
         }
       },
       "post": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.keys.create"
+            ]
+          }
+        ],
         "description": "This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as\nsymmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA).\n\n\nIf the specified JSON Web Key Set does not exist, it will be created.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -547,13 +554,6 @@
         ],
         "summary": "Generate a new JSON Web Key",
         "operationId": "createJsonWebKeySet",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.keys.create"
-            ]
-          }
-        ],
         "parameters": [
           {
             "type": "string",
@@ -590,6 +590,13 @@
         }
       },
       "delete": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.keys.delete"
+            ]
+          }
+        ],
         "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -606,13 +613,6 @@
         ],
         "summary": "Delete a JSON Web Key",
         "operationId": "deleteJsonWebKeySet",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.keys.delete"
-            ]
-          }
-        ],
         "parameters": [
           {
             "type": "string",
@@ -641,6 +641,13 @@
     },
     "/keys/{set}/{kid}": {
       "get": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.keys.get"
+            ]
+          }
+        ],
         "description": "This endpoint can be used to retrieve JWKs stored in ORY Hydra.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -657,13 +664,6 @@
         ],
         "summary": "Retrieve a JSON Web Key",
         "operationId": "getJsonWebKey",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.keys.get"
-            ]
-          }
-        ],
         "parameters": [
           {
             "type": "string",
@@ -701,6 +701,13 @@
         }
       },
       "put": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.keys.update"
+            ]
+          }
+        ],
         "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -717,13 +724,6 @@
         ],
         "summary": "Update a JSON Web Key",
         "operationId": "updateJsonWebKey",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.keys.update"
-            ]
-          }
-        ],
         "parameters": [
           {
             "type": "string",
@@ -768,6 +768,13 @@
         }
       },
       "delete": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.keys.delete"
+            ]
+          }
+        ],
         "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -784,13 +791,6 @@
         ],
         "summary": "Delete a JSON Web Key",
         "operationId": "deleteJsonWebKey",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.keys.delete"
-            ]
-          }
-        ],
         "parameters": [
           {
             "type": "string",
@@ -855,6 +855,13 @@
     },
     "/oauth2/consent/requests/{id}": {
       "get": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.consent"
+            ]
+          }
+        ],
         "description": "Call this endpoint to receive information on consent requests. The consent request id is usually transmitted via the URL query `consent`.\nFor example: `http://consent-app.mydomain.com/?consent=1234abcd`\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:oauth2:consent:requests:\u003crequest-id\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -871,13 +878,6 @@
         ],
         "summary": "Receive consent request information",
         "operationId": "getOAuth2ConsentRequest",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.consent"
-            ]
-          }
-        ],
         "parameters": [
           {
             "uniqueItems": true,
@@ -904,6 +904,13 @@
     },
     "/oauth2/consent/requests/{id}/accept": {
       "patch": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.consent"
+            ]
+          }
+        ],
         "description": "Call this endpoint to accept a consent request. This usually happens when a user agrees to give access rights to\nan application.\n\n\nThe consent request id is usually transmitted via the URL query `consent`.\nFor example: `http://consent-app.mydomain.com/?consent=1234abcd`\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:oauth2:consent:requests:\u003crequest-id\u003e\"],\n\"actions\": [\"accept\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -920,13 +927,6 @@
         ],
         "summary": "Accept a consent request",
         "operationId": "acceptOAuth2ConsentRequest",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.consent"
-            ]
-          }
-        ],
         "parameters": [
           {
             "type": "string",
@@ -959,6 +959,13 @@
     },
     "/oauth2/consent/requests/{id}/reject": {
       "patch": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.consent"
+            ]
+          }
+        ],
         "description": "Call this endpoint to reject a consent request. This usually happens when a user denies access rights to an\napplication.\n\n\nThe consent request id is usually transmitted via the URL query `consent`.\nFor example: `http://consent-app.mydomain.com/?consent=1234abcd`\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:oauth2:consent:requests:\u003crequest-id\u003e\"],\n\"actions\": [\"reject\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -975,13 +982,6 @@
         ],
         "summary": "Reject a consent request",
         "operationId": "rejectOAuth2ConsentRequest",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.consent"
-            ]
-          }
-        ],
         "parameters": [
           {
             "type": "string",
@@ -1014,6 +1014,16 @@
     },
     "/oauth2/introspect": {
       "post": {
+        "security": [
+          {
+            "basic": []
+          },
+          {
+            "oauth2": [
+              "hydra.introspect"
+            ]
+          }
+        ],
         "description": "The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token\nis neither expired nor revoked. If a token is active, additional information on the token will be included. You can\nset additional data for a token by setting `accessTokenExtra` during the consent flow.\n\n```\n{\n\"resources\": [\"rn:hydra:oauth2:tokens\"],\n\"actions\": [\"introspect\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/x-www-form-urlencoded"
@@ -1030,16 +1040,6 @@
         ],
         "summary": "Introspect OAuth2 tokens",
         "operationId": "introspectOAuth2Token",
-        "security": [
-          {
-            "basic": []
-          },
-          {
-            "oauth2": [
-              "hydra.introspect"
-            ]
-          }
-        ],
         "parameters": [
           {
             "type": "string",
@@ -1072,6 +1072,11 @@
     },
     "/oauth2/revoke": {
       "post": {
+        "security": [
+          {
+            "basic": []
+          }
+        ],
         "description": "Revoking a token (both access and refresh) means that the tokens will be invalid. A revoked access token can no\nlonger be used to make access requests, and a revoked refresh token can no longer be used to refresh an access token.\nRevoking a refresh token also invalidates the access token that was created with it.",
         "consumes": [
           "application/x-www-form-urlencoded"
@@ -1085,11 +1090,6 @@
         ],
         "summary": "Revoke OAuth2 tokens",
         "operationId": "revokeOAuth2Token",
-        "security": [
-          {
-            "basic": []
-          }
-        ],
         "parameters": [
           {
             "type": "string",
@@ -1114,6 +1114,14 @@
     },
     "/oauth2/token": {
       "post": {
+        "security": [
+          {
+            "basic": []
+          },
+          {
+            "oauth2": []
+          }
+        ],
         "description": "This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.\nOAuth2 is a very popular protocol and a library for your programming language will exists.\n\nTo learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749",
         "consumes": [
           "application/x-www-form-urlencoded"
@@ -1130,14 +1138,6 @@
         ],
         "summary": "The OAuth 2.0 token endpoint",
         "operationId": "oauthToken",
-        "security": [
-          {
-            "basic": []
-          },
-          {
-            "oauth2": []
-          }
-        ],
         "responses": {
           "200": {
             "$ref": "#/responses/oauthTokenResponse"
@@ -1153,6 +1153,13 @@
     },
     "/policies": {
       "get": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.policies"
+            ]
+          }
+        ],
         "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies\"],\n\"actions\": [\"list\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -1169,13 +1176,6 @@
         ],
         "summary": "List Access Control Policies",
         "operationId": "listPolicies",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.policies"
-            ]
-          }
-        ],
         "parameters": [
           {
             "type": "integer",
@@ -1210,6 +1210,13 @@
         }
       },
       "post": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.policies"
+            ]
+          }
+        ],
         "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -1226,13 +1233,6 @@
         ],
         "summary": "Create an Access Control Policy",
         "operationId": "createPolicy",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.policies"
-            ]
-          }
-        ],
         "parameters": [
           {
             "name": "Body",
@@ -1263,6 +1263,13 @@
     },
     "/policies/{id}": {
       "get": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.policies"
+            ]
+          }
+        ],
         "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies:\u003cid\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -1279,13 +1286,6 @@
         ],
         "summary": "Get an Access Control Policy",
         "operationId": "getPolicy",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.policies"
-            ]
-          }
-        ],
         "parameters": [
           {
             "type": "string",
@@ -1315,6 +1315,13 @@
         }
       },
       "put": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.policies"
+            ]
+          }
+        ],
         "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -1331,13 +1338,6 @@
         ],
         "summary": "Update an Access Control Polic",
         "operationId": "updatePolicy",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.policies"
-            ]
-          }
-        ],
         "parameters": [
           {
             "type": "string",
@@ -1374,6 +1374,13 @@
         }
       },
       "delete": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.policies"
+            ]
+          }
+        ],
         "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies:\u003cid\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -1390,13 +1397,6 @@
         ],
         "summary": "Delete an Access Control Policy",
         "operationId": "deletePolicy",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.policies"
-            ]
-          }
-        ],
         "parameters": [
           {
             "type": "string",
@@ -1425,6 +1425,11 @@
     },
     "/userinfo": {
       "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
         "description": "This endpoint returns the payload of the ID Token, including the idTokenExtra values, of the provided OAuth 2.0 access token.\nThe endpoint implements http://openid.net/specs/openid-connect-core-1_0.html#UserInfo .",
         "produces": [
           "application/json"
@@ -1438,11 +1443,6 @@
         ],
         "summary": "OpenID Connect Userinfo",
         "operationId": "userinfo",
-        "security": [
-          {
-            "oauth2": []
-          }
-        ],
         "responses": {
           "200": {
             "$ref": "#/responses/userinfoResponse"
@@ -1458,6 +1458,13 @@
     },
     "/warden/allowed": {
       "post": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.warden"
+            ]
+          }
+        ],
         "description": "Checks if a subject (typically a user or a service) is allowed to perform an action on a resource. This endpoint requires a subject,\na resource name, an action name and a context. If the subject is not allowed to perform the action on the resource,\nthis endpoint returns a 200 response with `{ \"allowed\": false}`, otherwise `{ \"allowed\": true }` is returned.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:allowed\"],\n\"actions\": [\"decide\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -1474,13 +1481,6 @@
         ],
         "summary": "Check if an access request is valid (without providing an access token)",
         "operationId": "doesWardenAllowAccessRequest",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.warden"
-            ]
-          }
-        ],
         "parameters": [
           {
             "name": "Body",
@@ -1508,6 +1508,13 @@
     },
     "/warden/groups": {
       "get": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.warden.groups"
+            ]
+          }
+        ],
         "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups\"],\n\"actions\": [\"list\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -1522,28 +1529,36 @@
         "tags": [
           "warden"
         ],
-        "summary": "Find groups by member",
-        "operationId": "findGroupsByMember",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.warden.groups"
-            ]
-          }
-        ],
+        "summary": "List groups",
+        "operationId": "listGroups",
         "parameters": [
           {
             "type": "string",
             "x-go-name": "Member",
             "description": "The id of the member to look up.",
             "name": "member",
-            "in": "query",
-            "required": true
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Limit",
+            "description": "The maximum amount of policies returned.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Offset",
+            "description": "The offset from where to start looking.",
+            "name": "offset",
+            "in": "query"
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/findGroupsByMemberResponse"
+            "$ref": "#/responses/listGroupsResponse"
           },
           "401": {
             "$ref": "#/responses/genericError"
@@ -1557,6 +1572,13 @@
         }
       },
       "post": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.warden.groups"
+            ]
+          }
+        ],
         "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -1573,13 +1595,6 @@
         ],
         "summary": "Create a group",
         "operationId": "createGroup",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.warden.groups"
-            ]
-          }
-        ],
         "parameters": [
           {
             "name": "Body",
@@ -1607,6 +1622,13 @@
     },
     "/warden/groups/{id}": {
       "get": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.warden.groups"
+            ]
+          }
+        ],
         "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups:\u003cid\u003e\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -1623,13 +1645,6 @@
         ],
         "summary": "Get a group by id",
         "operationId": "getGroup",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.warden.groups"
-            ]
-          }
-        ],
         "parameters": [
           {
             "type": "string",
@@ -1656,6 +1671,13 @@
         }
       },
       "delete": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.warden.groups"
+            ]
+          }
+        ],
         "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups:\u003cid\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -1672,13 +1694,6 @@
         ],
         "summary": "Delete a group by id",
         "operationId": "deleteGroup",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.warden.groups"
-            ]
-          }
-        ],
         "parameters": [
           {
             "type": "string",
@@ -1707,6 +1722,13 @@
     },
     "/warden/groups/{id}/members": {
       "post": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.warden.groups"
+            ]
+          }
+        ],
         "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups:\u003cid\u003e\"],\n\"actions\": [\"members.add\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -1723,13 +1745,6 @@
         ],
         "summary": "Add members to a group",
         "operationId": "addMembersToGroup",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.warden.groups"
-            ]
-          }
-        ],
         "parameters": [
           {
             "type": "string",
@@ -1763,6 +1778,13 @@
         }
       },
       "delete": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.warden.groups"
+            ]
+          }
+        ],
         "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups:\u003cid\u003e\"],\n\"actions\": [\"members.remove\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -1779,13 +1801,6 @@
         ],
         "summary": "Remove members from a group",
         "operationId": "removeMembersFromGroup",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.warden.groups"
-            ]
-          }
-        ],
         "parameters": [
           {
             "type": "string",
@@ -1821,6 +1836,13 @@
     },
     "/warden/token/allowed": {
       "post": {
+        "security": [
+          {
+            "oauth2": [
+              "hydra.warden"
+            ]
+          }
+        ],
         "description": "Checks if a token is valid and if the token subject is allowed to perform an action on a resource.\nThis endpoint requires a token, a scope, a resource name, an action name and a context.\n\n\nIf a token is expired/invalid, has not been granted the requested scope or the subject is not allowed to\nperform the action on the resource, this endpoint returns a 200 response with `{ \"allowed\": false}`.\n\n\nExtra data set through the `accessTokenExtra` field in the consent flow will be included in the response.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:token:allowed\"],\n\"actions\": [\"decide\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -1837,13 +1859,6 @@
         ],
         "summary": "Check if an access request is valid (providing an access token)",
         "operationId": "doesWardenAllowTokenAccessRequest",
-        "security": [
-          {
-            "oauth2": [
-              "hydra.warden"
-            ]
-          }
-        ],
         "parameters": [
           {
             "name": "Body",
@@ -1882,6 +1897,8 @@
         },
         "expiresAt": {
           "description": "ExpiresAt is the time where the access request will expire.",
+          "type": "string",
+          "format": "date-time",
           "x-go-name": "ExpiresAt"
         },
         "id": {
@@ -1893,22 +1910,6 @@
           "description": "Redirect URL is the URL where the user agent should be redirected to after the consent has been\naccepted or rejected.",
           "type": "string",
           "x-go-name": "RedirectURL"
-        },
-        "requestedAcr": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "x-go-name": "RequestedACR"
-        },
-        "requestedMaxAge": {
-          "type": "integer",
-          "format": "int64",
-          "x-go-name": "MaxAge"
-        },
-        "requestedPrompt": {
-          "type": "string",
-          "x-go-name": "RequestedPrompt"
         },
         "requestedScopes": {
           "description": "RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator.",
@@ -1944,6 +1945,8 @@
         },
         "expiresAt": {
           "description": "ExpiresAt is the expiry timestamp.",
+          "type": "string",
+          "format": "date-time",
           "x-go-name": "ExpiresAt"
         },
         "grantedScopes": {
@@ -1956,6 +1959,8 @@
         },
         "issuedAt": {
           "description": "IssuedAt is the token creation time stamp.",
+          "type": "string",
+          "format": "date-time",
           "x-go-name": "IssuedAt"
         },
         "issuer": {
@@ -2035,12 +2040,6 @@
           },
           "x-go-name": "AccessTokenExtra"
         },
-        "authTime": {
-          "description": "AuthTime is the time when the End-User authentication occurred. Its value is a JSON number representing the\nnumber of seconds from 1970-01-01T0:0:0Z as measured in UTC until the date/time.",
-          "type": "integer",
-          "format": "int64",
-          "x-go-name": "AuthTime"
-        },
         "grantScopes": {
           "description": "A list of scopes that the user agreed to grant. It should be a subset of requestedScopes from the consent request.",
           "type": "array",
@@ -2057,11 +2056,6 @@
           },
           "x-go-name": "IDTokenExtra"
         },
-        "providedAcr": {
-          "description": "ProvidedAuthenticationContextClassReference specifies an Authentication Context Class Reference value that identifies\nthe Authentication Context Class that the authentication performed satisfied. The value \"0\" indicates the End-User\nauthentication did not meet the requirements of ISO/IEC 29115 [ISO29115] level 1.\n\nIn summary ISO/IEC 29115 defines four levels, broadly summarized as follows.\n\nacr=0 does not satisfy Level 1 and could be, for example, authentication using a long-lived browser cookie.\nLevel 1 (acr=1): Minimal confidence in the asserted identity of the entity, but enough confidence that the\nentity is the same over consecutive authentication events. For example presenting a self-registered\nusername or password.\nLevel 2 (acr=2): There is some confidence in the asserted identity of the entity. For example confirming\nauthentication using a mobile app (\"Something you have\").\nLevel 3 (acr=3): High confidence in an asserted identity of the entity. For example sending a code to a mobile\nphone or using Google Authenticator or a fingerprint scanner (\"Something you have and something you know\" / \"Something you are\")\nLevel 4 (acr=4): Very high confidence in an asserted identity of the entity. Requires in-person identification.",
-          "type": "string",
-          "x-go-name": "ProvidedAuthenticationContextClassReference"
-        },
         "subject": {
           "description": "Subject represents a unique identifier of the user (or service, or legal entity, ...) that accepted the\nOAuth2 request.",
           "type": "string",
@@ -2075,11 +2069,6 @@
       "type": "object",
       "title": "RejectConsentRequestPayload represents data that will be used to reject a consent request.",
       "properties": {
-        "error": {
-          "description": "Error can be used to return an OpenID Connect or OAuth 2.0 error to the OAuth 2.0 client, such as login_required,\ninteraction_required, consent_required.",
-          "type": "string",
-          "x-go-name": "Error"
-        },
         "reason": {
           "description": "Reason represents the reason why the user rejected the consent request.",
           "type": "string",
@@ -2369,28 +2358,9 @@
           "x-go-name": "ID"
         },
         "redirectUrl": {
-          "description": "RedirectURL is the URL where the user agent should be redirected to after the consent has been\naccepted or rejected.",
+          "description": "Redirect URL is the URL where the user agent should be redirected to after the consent has been\naccepted or rejected.",
           "type": "string",
           "x-go-name": "RedirectURL"
-        },
-        "requestedAcr": {
-          "description": "RequestedAuthenticationContextClassReference specifies an Authentication Context Class Reference value that identifies\nthe Authentication Context Class that the authentication performed satisfied. The value \"0\" indicates the End-User\nauthentication did not meet the requirements of ISO/IEC 29115 [ISO29115] level 1.\n\nIn summary ISO/IEC 29115 defines four levels, broadly summarized as follows.\n\nacr=0 does not satisfy Level 1 and could be, for example, authentication using a long-lived browser cookie.\nLevel 1 (acr=1): Minimal confidence in the asserted identity of the entity, but enough confidence that the\nentity is the same over consecutive authentication events. For example presenting a self-registered\nusername or password.\nLevel 2 (acr=2): There is some confidence in the asserted identity of the entity. For example confirming\nauthentication using a mobile app (\"Something you have\").\nLevel 3 (acr=3): High confidence in an asserted identity of the entity. For example sending a code to a mobile\nphone or using Google Authenticator or a fingerprint scanner (\"Something you have and something you know\" / \"Something you are\")\nLevel 4 (acr=4): Very high confidence in an asserted identity of the entity. Requires in-person identification.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "x-go-name": "RequestedAuthenticationContextClassReference"
-        },
-        "requestedMaxAge": {
-          "description": "MaxAge specifies the allowable elapsed time in seconds since the last time the End-User was actively\nauthenticated by the OP. If the elapsed time is greater than this value, the OP MUST attempt to actively\nre-authenticate the End-User.",
-          "type": "integer",
-          "format": "int64",
-          "x-go-name": "MaxAge"
-        },
-        "requestedPrompt": {
-          "description": "Space delimited, case sensitive list of ASCII string values that specifies whether the Authorization Server\nprompts the End-User for reauthentication and consent. The defined values are:\n\nnone: The consent app MUST NOT display any authentication or consent user interface pages. An error is returned\nif an End-User is not already authenticated or the Client does not have pre-configured consent for the requested\nClaims or does not fulfill other conditions for processing the request. The error code will typically be\nlogin_required, interaction_required. This can be used as a method to check for existing authentication and/or consent.\nlogin: The consent app SHOULD prompt the End-User for reauthentication. If it cannot reauthenticate the\nEnd-User, it MUST return an error, typically login_required.\nconsent: The consent app SHOULD prompt the End-User for consent before returning information to the Client.\nIf it cannot obtain consent, it MUST return an error, typically consent_required.\nselect_account: The consent app SHOULD prompt the End-User to select a user account. This enables an End-User\nwho has multiple accounts at the Authorization Server to select amongst the multiple accounts that they\nmight have current sessions for. If it cannot obtain an account selection choice made by the End-User,\nit MUST return an error, typically account_selection_required.\n\nThe prompt parameter can be used by the Client to make sure that the End-User is still present for the current\nsession or to bring attention to the request. If this parameter contains none with any other value, an error is returned.",
-          "type": "string",
-          "x-go-name": "Prompt"
         },
         "requestedScopes": {
           "description": "RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator.",
@@ -3251,15 +3221,6 @@
     "emptyResponse": {
       "description": "An empty response"
     },
-    "findGroupsByMemberResponse": {
-      "description": "A list of groups the member is belonging to",
-      "schema": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/group"
-        }
-      }
-    },
     "genericError": {
       "description": "The standard error format",
       "schema": {
@@ -3322,6 +3283,15 @@
       "description": "The token introspection response",
       "schema": {
         "$ref": "#/definitions/oAuth2TokenIntrospection"
+      }
+    },
+    "listGroupsResponse": {
+      "description": "A list of groups the member is belonging to",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/group"
+        }
       }
     },
     "oAuth2ClientList": {

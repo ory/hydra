@@ -91,12 +91,12 @@ func (m *MemoryManager) RemoveGroupMembers(group string, subjects []string) erro
 	return m.CreateGroup(g)
 }
 
-func (m *MemoryManager) FindGroupsByMember(subject string) ([]Group, error) {
+func (m *MemoryManager) FindGroupsByMember(subject string, limit, offset int64) ([]Group, error) {
 	if m.Groups == nil {
 		m.Groups = map[string]Group{}
 	}
 
-	var res = []Group{}
+	res := make([]Group, 0)
 	for _, g := range m.Groups {
 		for _, s := range g.Members {
 			if s == subject {
@@ -106,5 +106,30 @@ func (m *MemoryManager) FindGroupsByMember(subject string) ([]Group, error) {
 		}
 	}
 
-	return res, nil
+	if offset+limit > int64(len(res)) {
+		limit = int64(len(res))
+		offset = 0
+	}
+
+	return res[offset:limit], nil
+}
+
+func (m *MemoryManager) ListGroups(limit, offset int64) ([]Group, error) {
+	if m.Groups == nil {
+		m.Groups = map[string]Group{}
+	}
+
+	i := int64(0)
+	res := make([]Group, len(m.Groups))
+	for _, g := range m.Groups {
+		res[i] = g
+		i++
+	}
+
+	if offset+limit > int64(len(res)) {
+		limit = int64(len(res))
+		offset = 0
+	}
+
+	return res[offset:limit], nil
 }

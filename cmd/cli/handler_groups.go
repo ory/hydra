@@ -99,7 +99,7 @@ func (h *GroupHandler) FindGroups(cmd *cobra.Command, args []string) {
 	}
 
 	m := h.newGroupManager(cmd)
-	groups, response, err := m.FindGroupsByMember(args[0])
+	groups, response, err := m.ListGroups(args[0], 500, 0)
 	checkResponse(response, err, http.StatusOK)
 	formatResponse(groups)
 }

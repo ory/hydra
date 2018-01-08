@@ -1,0 +1,22 @@
+{
+  "name": "ory/hydra-sdk",
+  "description": "ORY Hydra SDK",
+  "keywords": [
+    "swagger",
+    "php",
+    "sdk",
+    "api"
+  ],
+  "homepage": "https://github.com/ory/hydra",
+  "license": "Apache 2.0",
+  "authors": [],
+  "require": {
+    "php": ">=5.4",
+    "ext-curl": "*",
+    "ext-json": "*",
+    "ext-mbstring": "*"
+  },
+  "autoload": {
+    "psr-4": { "Hydra\\SDK\\" : "sdk/php/swagger/" }
+  }
+}

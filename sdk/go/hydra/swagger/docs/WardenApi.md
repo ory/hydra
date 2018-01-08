@@ -9,8 +9,8 @@ Method | HTTP request | Description
 [**DeleteGroup**](WardenApi.md#DeleteGroup) | **Delete** /warden/groups/{id} | Delete a group by id
 [**DoesWardenAllowAccessRequest**](WardenApi.md#DoesWardenAllowAccessRequest) | **Post** /warden/allowed | Check if an access request is valid (without providing an access token)
 [**DoesWardenAllowTokenAccessRequest**](WardenApi.md#DoesWardenAllowTokenAccessRequest) | **Post** /warden/token/allowed | Check if an access request is valid (providing an access token)
-[**FindGroupsByMember**](WardenApi.md#FindGroupsByMember) | **Get** /warden/groups | Find groups by member
 [**GetGroup**](WardenApi.md#GetGroup) | **Get** /warden/groups/{id} | Get a group by id
+[**ListGroups**](WardenApi.md#ListGroups) | **Get** /warden/groups | List groups
 [**RemoveMembersFromGroup**](WardenApi.md#RemoveMembersFromGroup) | **Delete** /warden/groups/{id}/members | Remove members from a group
 
 
@@ -160,35 +160,6 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **FindGroupsByMember**
-> []Group FindGroupsByMember($member)
-
-Find groups by member
-
-The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:warden:groups\"], \"actions\": [\"list\"], \"effect\": \"allow\" } ```
-
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **member** | **string**| The id of the member to look up. | 
-
-### Return type
-
-[**[]Group**](group.md)
-
-### Authorization
-
-[oauth2](../README.md#oauth2)
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
 # **GetGroup**
 > Group GetGroup($id)
 
@@ -206,6 +177,37 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**Group**](group.md)
+
+### Authorization
+
+[oauth2](../README.md#oauth2)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **ListGroups**
+> []Group ListGroups($member, $limit, $offset)
+
+List groups
+
+The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:warden:groups\"], \"actions\": [\"list\"], \"effect\": \"allow\" } ```
+
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **member** | **string**| The id of the member to look up. | [optional] 
+ **limit** | **int64**| The maximum amount of policies returned. | [optional] 
+ **offset** | **int64**| The offset from where to start looking. | [optional] 
+
+### Return type
+
+[**[]Group**](group.md)
 
 ### Authorization
 

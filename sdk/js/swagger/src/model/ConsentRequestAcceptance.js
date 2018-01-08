@@ -65,9 +65,6 @@
           { String: Object }
         )
       }
-      if (data.hasOwnProperty('authTime')) {
-        obj['authTime'] = ApiClient.convertToType(data['authTime'], 'Number')
-      }
       if (data.hasOwnProperty('grantScopes')) {
         obj['grantScopes'] = ApiClient.convertToType(data['grantScopes'], [
           'String'
@@ -77,12 +74,6 @@
         obj['idTokenExtra'] = ApiClient.convertToType(data['idTokenExtra'], {
           String: Object
         })
-      }
-      if (data.hasOwnProperty('providedAcr')) {
-        obj['providedAcr'] = ApiClient.convertToType(
-          data['providedAcr'],
-          'String'
-        )
       }
       if (data.hasOwnProperty('subject')) {
         obj['subject'] = ApiClient.convertToType(data['subject'], 'String')
@@ -97,11 +88,6 @@
    */
   exports.prototype['accessTokenExtra'] = undefined
   /**
-   * AuthTime is the time when the End-User authentication occurred. Its value is a JSON number representing the number of seconds from 1970-01-01T0:0:0Z as measured in UTC until the date/time.
-   * @member {Number} authTime
-   */
-  exports.prototype['authTime'] = undefined
-  /**
    * A list of scopes that the user agreed to grant. It should be a subset of requestedScopes from the consent request.
    * @member {Array.<String>} grantScopes
    */
@@ -111,11 +97,6 @@
    * @member {Object.<String, Object>} idTokenExtra
    */
   exports.prototype['idTokenExtra'] = undefined
-  /**
-   * ProvidedAuthenticationContextClassReference specifies an Authentication Context Class Reference value that identifies the Authentication Context Class that the authentication performed satisfied. The value \"0\" indicates the End-User authentication did not meet the requirements of ISO/IEC 29115 [ISO29115] level 1.  In summary ISO/IEC 29115 defines four levels, broadly summarized as follows.  acr=0 does not satisfy Level 1 and could be, for example, authentication using a long-lived browser cookie. Level 1 (acr=1): Minimal confidence in the asserted identity of the entity, but enough confidence that the entity is the same over consecutive authentication events. For example presenting a self-registered username or password. Level 2 (acr=2): There is some confidence in the asserted identity of the entity. For example confirming authentication using a mobile app (\"Something you have\"). Level 3 (acr=3): High confidence in an asserted identity of the entity. For example sending a code to a mobile phone or using Google Authenticator or a fingerprint scanner (\"Something you have and something you know\" / \"Something you are\") Level 4 (acr=4): Very high confidence in an asserted identity of the entity. Requires in-person identification.
-   * @member {String} providedAcr
-   */
-  exports.prototype['providedAcr'] = undefined
   /**
    * Subject represents a unique identifier of the user (or service, or legal entity, ...) that accepted the OAuth2 request.
    * @member {String} subject

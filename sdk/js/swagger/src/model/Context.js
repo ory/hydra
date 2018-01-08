@@ -69,10 +69,16 @@
       if (data.hasOwnProperty('clientId')) {
         obj['clientId'] = ApiClient.convertToType(data['clientId'], 'String')
       }
+      if (data.hasOwnProperty('expiresAt')) {
+        obj['expiresAt'] = ApiClient.convertToType(data['expiresAt'], 'Date')
+      }
       if (data.hasOwnProperty('grantedScopes')) {
         obj['grantedScopes'] = ApiClient.convertToType(data['grantedScopes'], [
           'String'
         ])
+      }
+      if (data.hasOwnProperty('issuedAt')) {
+        obj['issuedAt'] = ApiClient.convertToType(data['issuedAt'], 'Date')
       }
       if (data.hasOwnProperty('issuer')) {
         obj['issuer'] = ApiClient.convertToType(data['issuer'], 'String')
@@ -95,10 +101,20 @@
    */
   exports.prototype['clientId'] = undefined
   /**
+   * ExpiresAt is the expiry timestamp.
+   * @member {Date} expiresAt
+   */
+  exports.prototype['expiresAt'] = undefined
+  /**
    * GrantedScopes is a list of scopes that the subject authorized when asked for consent.
    * @member {Array.<String>} grantedScopes
    */
   exports.prototype['grantedScopes'] = undefined
+  /**
+   * IssuedAt is the token creation time stamp.
+   * @member {Date} issuedAt
+   */
+  exports.prototype['issuedAt'] = undefined
   /**
    * Issuer is the id of the issuer, typically an hydra instance.
    * @member {String} issuer

@@ -103,3 +103,15 @@ func (h *GroupHandler) FindGroups(cmd *cobra.Command, args []string) {
 	checkResponse(response, err, http.StatusOK)
 	formatResponse(groups)
 }
+
+func (h *GroupHandler) ListGroups(cmd *cobra.Command, args []string) {
+	if len(args) != 1 {
+		fmt.Print(cmd.UsageString())
+		return
+	}
+
+	m := h.newGroupManager(cmd)
+	groups, response, err := m.ListGroups("", 500, 0)
+	checkResponse(response, err, http.StatusOK)
+	formatResponse(groups)
+}

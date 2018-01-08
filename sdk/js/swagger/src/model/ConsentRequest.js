@@ -62,29 +62,15 @@
       if (data.hasOwnProperty('clientId')) {
         obj['clientId'] = ApiClient.convertToType(data['clientId'], 'String')
       }
+      if (data.hasOwnProperty('expiresAt')) {
+        obj['expiresAt'] = ApiClient.convertToType(data['expiresAt'], 'Date')
+      }
       if (data.hasOwnProperty('id')) {
         obj['id'] = ApiClient.convertToType(data['id'], 'String')
       }
       if (data.hasOwnProperty('redirectUrl')) {
         obj['redirectUrl'] = ApiClient.convertToType(
           data['redirectUrl'],
-          'String'
-        )
-      }
-      if (data.hasOwnProperty('requestedAcr')) {
-        obj['requestedAcr'] = ApiClient.convertToType(data['requestedAcr'], [
-          'String'
-        ])
-      }
-      if (data.hasOwnProperty('requestedMaxAge')) {
-        obj['requestedMaxAge'] = ApiClient.convertToType(
-          data['requestedMaxAge'],
-          'Number'
-        )
-      }
-      if (data.hasOwnProperty('requestedPrompt')) {
-        obj['requestedPrompt'] = ApiClient.convertToType(
-          data['requestedPrompt'],
           'String'
         )
       }
@@ -104,6 +90,11 @@
    */
   exports.prototype['clientId'] = undefined
   /**
+   * ExpiresAt is the time where the access request will expire.
+   * @member {Date} expiresAt
+   */
+  exports.prototype['expiresAt'] = undefined
+  /**
    * ID is the id of this consent request.
    * @member {String} id
    */
@@ -113,18 +104,6 @@
    * @member {String} redirectUrl
    */
   exports.prototype['redirectUrl'] = undefined
-  /**
-   * @member {Array.<String>} requestedAcr
-   */
-  exports.prototype['requestedAcr'] = undefined
-  /**
-   * @member {Number} requestedMaxAge
-   */
-  exports.prototype['requestedMaxAge'] = undefined
-  /**
-   * @member {String} requestedPrompt
-   */
-  exports.prototype['requestedPrompt'] = undefined
   /**
    * RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator.
    * @member {Array.<String>} requestedScopes

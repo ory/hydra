@@ -52,6 +52,15 @@ before finalizing the upgrade process.
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+## 0.11.0
+
+This release has a minor breaking change in the experimental Warden Group SDK: 
+`FindGroupsByMember(member string) ([]swagger.Group, *swagger.APIResponse, error)` is now
+`ListGroups(member string, limit, offset int64) ([]swagger.Group, *swagger.APIResponse, error)`.
+The change has to be applied in a similar fashion to other SDKs generated using swagger.
+
+Leave the `member` parameter empty to list all groups, and add it to filter groups by member id.
+
 ## 0.10.0
 
 This release has several major improvements, and some breaking changes. It focuses on cryptographic security

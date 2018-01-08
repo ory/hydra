@@ -126,7 +126,7 @@ type WardenAPI interface {
 	DeleteGroup(id string) (*swagger.APIResponse, error)
 	DoesWardenAllowAccessRequest(body swagger.WardenAccessRequest) (*swagger.WardenAccessRequestResponse, *swagger.APIResponse, error)
 	DoesWardenAllowTokenAccessRequest(body swagger.WardenTokenAccessRequest) (*swagger.WardenTokenAccessRequestResponse, *swagger.APIResponse, error)
-	FindGroupsByMember(member string) ([]swagger.Group, *swagger.APIResponse, error)
+	ListGroups(member string, limit, offset int64) ([]swagger.Group, *swagger.APIResponse, error)
 	GetGroup(id string) (*swagger.Group, *swagger.APIResponse, error)
 	RemoveMembersFromGroup(id string, body swagger.GroupMembers) (*swagger.APIResponse, error)
 }

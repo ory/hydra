@@ -155,8 +155,8 @@ Class | Method | HTTP request | Description
 *HydraOAuth2OpenIdConnectServer.WardenApi* | [**deleteGroup**](docs/WardenApi.md#deleteGroup) | **DELETE** /warden/groups/{id} | Delete a group by id
 *HydraOAuth2OpenIdConnectServer.WardenApi* | [**doesWardenAllowAccessRequest**](docs/WardenApi.md#doesWardenAllowAccessRequest) | **POST** /warden/allowed | Check if an access request is valid (without providing an access token)
 *HydraOAuth2OpenIdConnectServer.WardenApi* | [**doesWardenAllowTokenAccessRequest**](docs/WardenApi.md#doesWardenAllowTokenAccessRequest) | **POST** /warden/token/allowed | Check if an access request is valid (providing an access token)
-*HydraOAuth2OpenIdConnectServer.WardenApi* | [**findGroupsByMember**](docs/WardenApi.md#findGroupsByMember) | **GET** /warden/groups | Find groups by member
 *HydraOAuth2OpenIdConnectServer.WardenApi* | [**getGroup**](docs/WardenApi.md#getGroup) | **GET** /warden/groups/{id} | Get a group by id
+*HydraOAuth2OpenIdConnectServer.WardenApi* | [**listGroups**](docs/WardenApi.md#listGroups) | **GET** /warden/groups | List groups
 *HydraOAuth2OpenIdConnectServer.WardenApi* | [**removeMembersFromGroup**](docs/WardenApi.md#removeMembersFromGroup) | **DELETE** /warden/groups/{id}/members | Remove members from a group
 
 

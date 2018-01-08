@@ -18,18 +18,29 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// findCmd represents the find command
-var findCmd = &cobra.Command{
-	Use:   "find <subject>",
-	Short: "Find all groups a subject belongs to",
-	Long: `This command finds all groups a subject belongs to.
+// listCmd represents the list command
+var listCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List all groups",
+	Long: `This command lists all groups.
 
 Example:
-  hydra groups find peter
+  hydra groups list
 `,
-	Run: cmdHandler.Groups.FindGroups,
+	Run: cmdHandler.Groups.ListGroups,
 }
 
 func init() {
-	groupsCmd.AddCommand(findCmd)
+	groupsCmd.AddCommand(listCmd)
+
+	// Here you will define your flags and configuration settings.
+
+	// Cobra supports Persistent Flags which will work for this command
+	// and all subcommands, e.g.:
+	// listCmd.PersistentFlags().String("foo", "", "A help for foo")
+
+	// Cobra supports local flags which will only run when this command
+	// is called directly, e.g.:
+	// listCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
 }

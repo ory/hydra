@@ -29,7 +29,7 @@ type GroupHandler struct {
 }
 
 func (h *GroupHandler) newGroupManager(cmd *cobra.Command) *hydra.WardenApi {
-	client := hydra.NewWardenApiWithBasePath(h.Config.ClusterURL)
+	client := hydra.NewWardenApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlash())
 	client.Configuration.Transport = h.Config.OAuth2Client(cmd).Transport
 	if term, _ := cmd.Flags().GetBool("fake-tls-termination"); term {
 		client.Configuration.DefaultHeader["X-Forwarded-Proto"] = "https"

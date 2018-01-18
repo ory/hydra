@@ -24,6 +24,7 @@ import (
 	"github.com/ory/hydra/firewall"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/ladon"
+	"github.com/ory/pagination"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 )
@@ -102,8 +103,8 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 		return
 	}
 
-	limit, offset := pkg.ParsePagination(r, 500, 0, 1000)
-	policies, err := h.Manager.GetAll(limit, offset)
+	limit, offset := pagination.Parse(r, 500, 0, 1000)
+	policies, err := h.Manager.GetAll(int64(limit), int64(offset))
 	if err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
 		return

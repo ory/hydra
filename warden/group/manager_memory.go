@@ -18,6 +18,7 @@ import (
 	"sync"
 
 	"github.com/ory/hydra/pkg"
+	"github.com/ory/pagination"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 )
@@ -91,7 +92,7 @@ func (m *MemoryManager) RemoveGroupMembers(group string, subjects []string) erro
 	return m.CreateGroup(g)
 }
 
-func (m *MemoryManager) FindGroupsByMember(subject string, limit, offset int64) ([]Group, error) {
+func (m *MemoryManager) FindGroupsByMember(subject string, limit, offset int) ([]Group, error) {
 	if m.Groups == nil {
 		m.Groups = map[string]Group{}
 	}
@@ -106,29 +107,22 @@ func (m *MemoryManager) FindGroupsByMember(subject string, limit, offset int64) 
 		}
 	}
 
-	if offset+limit > int64(len(res)) {
-		return []Group{}, nil
-	}
-
-	return res[offset:limit], nil
+	start, end := pagination.Index(limit, offset, len(res))
+	return res[start:end], nil
 }
 
-func (m *MemoryManager) ListGroups(limit, offset int64) ([]Group, error) {
+func (m *MemoryManager) ListGroups(limit, offset int) ([]Group, error) {
 	if m.Groups == nil {
 		m.Groups = map[string]Group{}
 	}
 
-	if offset+limit > int64(len(m.Groups)) {
-		return []Group{}, nil
-	}
-
-	i := int64(0)
+	i := 0
 	res := make([]Group, len(m.Groups))
 	for _, g := range m.Groups {
 		res[i] = g
 		i++
 	}
 
-
-	return res[offset:limit], nil
+	start, end := pagination.Index(limit, offset, len(res))
+	return res[start:end], nil
 }

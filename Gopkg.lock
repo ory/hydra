@@ -249,8 +249,14 @@
 [[projects]]
   name = "github.com/ory/ladon"
   packages = [".","compiler","manager/memory","manager/sql"]
-  revision = "941d70faef8cc9656a9f0d6403a108a08d2ab631"
-  version = "v0.8.6"
+  revision = "73217e44ed7e4a6bbd44ae7dd858d11932f08cf8"
+  version = "v0.8.8"
+
+[[projects]]
+  name = "github.com/ory/pagination"
+  packages = ["."]
+  revision = "abd7ec33a01fdec119267449c8f3bad187f881f6"
+  version = "v0.0.1"
 
 [[projects]]
   name = "github.com/pborman/uuid"
@@ -435,6 +441,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "74f885ed4e8bfad02ad2497ef672db4b7bfc39a820677d4caca1bd1eb3f15c8b"
+  inputs-digest = "3ac73b4a2792495a72e7cb50575db622556e1e100b19956fd7a3ca6e3f7e9def"
   solver-name = "gps-cdcl"
   solver-version = 1

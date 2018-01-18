@@ -22,7 +22,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/firewall"
-	"github.com/ory/hydra/pkg"
+	"github.com/ory/pagination"
 	"github.com/pkg/errors"
 )
 
@@ -111,7 +111,7 @@ func (h *Handler) ListGroupsHandler(w http.ResponseWriter, r *http.Request, _ ht
 		return
 	}
 
-	limit, offset := pkg.ParsePagination(r, 100, 0, 500)
+	limit, offset := pagination.Parse(r, 100, 0, 500)
 	if member := r.URL.Query().Get("member"); member != "" {
 		h.FindGroupNames(w, r, member, limit, offset)
 		return
@@ -121,7 +121,7 @@ func (h *Handler) ListGroupsHandler(w http.ResponseWriter, r *http.Request, _ ht
 	}
 }
 
-func (h *Handler) ListGroups(w http.ResponseWriter, r *http.Request, limit, offset int64) {
+func (h *Handler) ListGroups(w http.ResponseWriter, r *http.Request, limit, offset int) {
 	groups, err := h.Manager.ListGroups(limit, offset)
 	if err != nil {
 		h.H.WriteError(w, r, err)
@@ -131,7 +131,7 @@ func (h *Handler) ListGroups(w http.ResponseWriter, r *http.Request, limit, offs
 	h.H.Write(w, r, groups)
 }
 
-func (h *Handler) FindGroupNames(w http.ResponseWriter, r *http.Request, member string, limit, offset int64) {
+func (h *Handler) FindGroupNames(w http.ResponseWriter, r *http.Request, member string, limit, offset int) {
 	groups, err := h.Manager.FindGroupsByMember(member, limit, offset)
 	if err != nil {
 		h.H.WriteError(w, r, err)

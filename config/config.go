@@ -88,6 +88,10 @@ type Config struct {
 	systemSecret []byte                  `yaml:"-"`
 }
 
+func (c *Config) GetClusterURLWithoutTailingSlash() string {
+	return strings.TrimRight(c.ClusterURL, "/")
+}
+
 func (c *Config) GetScopeStrategy() fosite.ScopeStrategy {
 	if c.ScopeStrategy == "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY" {
 		c.GetLogger().Warn("Using deprecated hierarchical scope strategy, consider upgrading to wildcards.")

@@ -33,7 +33,7 @@ type PolicyHandler struct {
 }
 
 func (h *PolicyHandler) newPolicyManager(cmd *cobra.Command) *hydra.PolicyApi {
-	c := hydra.NewPolicyApiWithBasePath(h.Config.ClusterURL)
+	c := hydra.NewPolicyApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlash())
 	c.Configuration.Transport = h.Config.OAuth2Client(cmd).Transport
 
 	if term, _ := cmd.Flags().GetBool("fake-tls-termination"); term {

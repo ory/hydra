@@ -107,8 +107,7 @@ func (m *MemoryManager) FindGroupsByMember(subject string, limit, offset int64) 
 	}
 
 	if offset+limit > int64(len(res)) {
-		limit = int64(len(res))
-		offset = 0
+		return []Group{}, nil
 	}
 
 	return res[offset:limit], nil
@@ -119,6 +118,10 @@ func (m *MemoryManager) ListGroups(limit, offset int64) ([]Group, error) {
 		m.Groups = map[string]Group{}
 	}
 
+	if offset+limit > int64(len(m.Groups)) {
+		return []Group{}, nil
+	}
+
 	i := int64(0)
 	res := make([]Group, len(m.Groups))
 	for _, g := range m.Groups {
@@ -126,10 +129,6 @@ func (m *MemoryManager) ListGroups(limit, offset int64) ([]Group, error) {
 		i++
 	}
 
-	if offset+limit > int64(len(res)) {
-		limit = int64(len(res))
-		offset = 0
-	}
 
 	return res[offset:limit], nil
 }

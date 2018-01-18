@@ -102,7 +102,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 		return
 	}
 
-	offset, limit := pkg.ParsePagination(r, 500, 0, 1000)
+	limit, offset := pkg.ParsePagination(r, 500, 0, 1000)
 	policies, err := h.Manager.GetAll(limit, offset)
 	if err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))

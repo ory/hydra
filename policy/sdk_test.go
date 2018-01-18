@@ -111,10 +111,15 @@ func TestPolicySDK(t *testing.T) {
 		assert.Equal(t, http.StatusOK, response.StatusCode)
 		assert.EqualValues(t, p, *result)
 
-		results, response, err := client.ListPolicies(10, 0)
+		results, response, err := client.ListPolicies(0, 10)
 		require.NoError(t, err)
 		assert.Equal(t, http.StatusOK, response.StatusCode)
 		assert.Len(t, results, 1)
+
+		results, response, err = client.ListPolicies(10, 1)
+		require.NoError(t, err)
+		assert.Equal(t, http.StatusOK, response.StatusCode)
+		assert.Len(t, results, 0)
 
 		result, response, err = client.GetPolicy(p.Id)
 		require.NoError(t, err)

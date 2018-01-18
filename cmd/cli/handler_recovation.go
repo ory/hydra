@@ -39,7 +39,7 @@ func (h *RevocationHandler) RevokeToken(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	handler := hydra.NewOAuth2ApiWithBasePath(h.Config.ClusterURL)
+	handler := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlash())
 	handler.Configuration.Username = h.Config.ClientID
 	handler.Configuration.Password = h.Config.ClientSecret
 

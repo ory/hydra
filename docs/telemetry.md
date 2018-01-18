@@ -10,11 +10,10 @@ transparent on what data we transmit why and how. The source code of the telemet
 and located [here](https://github.com/ory/hydra/tree/master/metrics). If you do not wish to help us improving ORY Hydra
 by sharing telemetry data, it is possible to [turn this feature off](#disabling-telemetry).
 
-To protect your privacy, we filter out any data that could identify you, or your users. We are taking the following
+To protect your privacy, we filter out any data that could identify you or your users. We are taking the following
 measures to protect your privacy:
 
-1. We only transmit information on how often endpoints are requested, how fast they respond and what http status code
-was sent.
+1. We only transmit information on how often endpoints are requested, how fast they respond and the reply's http status code.
 2. We filter out any query parameters, headers, response and request bodies and path parameters. A full list of transmitted
 URL paths is listed in section [Request telemetry](#request-telemetry). For example:
   * `GET /clients/1235` becomes `GET /clients`
@@ -27,7 +26,7 @@ the target architecture (amd64, darwin, ...), and the number of CPUs available o
 
 ## Identification
 
-To identify an installation and group together clusters, we create a SHA-512 hash of the Issuer URL for identification.
+To identify an installation and group together clusters, we create a SHA-256 hash of the Issuer URL for identification.
 Additionally, each running instance is identified using an unique identifier which is set every time ORY Hydra starts. The identifier
 is a Universally Unique Identifier (V4) and is thus a cryptographically safe random string. Identification is triggered
 when the instance has been running for more than 15 minutes.
@@ -68,25 +67,12 @@ the endpoints:
 "/",
 ```
 
-Additionally, the following data is submitted to us:
-
-* Total number of requests, responses, response latencies and response sizes.
-* Total number of requests, responses, response latencies and response sizes per HTTP method.
-* Total number of requests, responses, response latencies and response sizes per anonymized API endpoint and HTTP method.
-* Total number of requests, responses, response latencies and response sizes per anonymized API endpoint.
-* Memory statistics such as heap allocations, gc cycles, and other.
-
 A raw data example can be found [here](https://github.com/ory/hydra/tree/master/docs/metrics/telemetry-example.json).
-
-## Keep alive
-
-A keep-alive containing no information except the instance id is sent every 5 minutes.
 
 ## Data processing
 
-Once the data was transmitted to [Segment.com](http://segment.com/) it is then fed to an AWS S3 bucket and stored
-there for later analysis. At the moment, we are working on a python / numpy toolchain to help us analyze the data
-we get.
+Once the data was transmitted to [Segment.com](http://segment.com/) it is then fed to an encrypted AWS S3 bucket and stored
+there for analysis.
 
 ## Disabling telemetry
 

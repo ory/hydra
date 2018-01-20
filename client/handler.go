@@ -351,6 +351,14 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 
 	c, err := h.Manager.GetConcreteClient(id)
 	if err != nil {
+		if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
+			Resource: fmt.Sprintf(h.PrefixResource(ClientResource), id),
+			Action:   "get",
+		}, Scope); err != nil {
+			h.H.WriteError(w, r, err)
+			return
+		}
+
 		h.H.WriteError(w, r, err)
 		return
 	}

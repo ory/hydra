@@ -17,6 +17,7 @@ package metrics
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"net"
 	"net/http"
 	"net/url"
@@ -37,7 +38,7 @@ import (
 )
 
 type MetricsManager struct {
-	sync.RWMutex `json:"-"`
+	sync.RWMutex                    `json:"-"`
 	start        time.Time          `json:"-"`
 	Segment      analytics.Client   `json:"-"`
 	Logger       logrus.FieldLogger `json:"-"`
@@ -68,9 +69,16 @@ func hash(value string) string {
 func NewMetricsManager(issuerURL string, databaseURL string, l logrus.FieldLogger) *MetricsManager {
 	l.Info("Setting up telemetry - for more information please visit https://ory.gitbooks.io/hydra/content/telemetry.html")
 
+	client, err := analytics.NewWithConfig("h8dRH3kVCWKkIFWydBmWsyYHR4M0u0vr", analytics.Config{
+		Interval: time.Minute * 10,
+	})
+	if err != nil {
+		panic(fmt.Sprintf("Unable to initialise segment: %s", err))
+	}
+
 	mm := &MetricsManager{
 		InstanceID:       uuid.New(),
-		Segment:          analytics.New("h8dRH3kVCWKkIFWydBmWsyYHR4M0u0vr"),
+		Segment:          client,
 		Logger:           l,
 		issuerURL:        issuerURL,
 		databaseURL:      databaseURL,
@@ -164,7 +172,7 @@ func (sw *MetricsManager) ServeHTTP(rw http.ResponseWriter, r *http.Request, nex
 		Name:   path,
 		Properties: analytics.
 			NewProperties().
-			SetURL(scheme+"//"+sw.ID+path+"?"+query).
+			SetURL(scheme + "//" + sw.ID + path + "?" + query).
 			SetPath(path).
 			SetName(path).
 			Set("status", status).

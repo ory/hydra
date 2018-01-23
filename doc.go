@@ -53,7 +53,6 @@
 //           hydra.keys.create: "A scope required to create JSON Web Keys"
 //           hydra.keys.delete: "A scope required to delete JSON Web Keys"
 //           hydra.keys.update: "A scope required to get JSON Web Keys"
-//           hydra.health: "A scope required to get health information"
 //           hydra.consent: "A scope required to fetch and modify consent requests"
 //           offline: "A scope required when requesting refresh tokens"
 //           openid: "Request an OpenID Connect ID Token"

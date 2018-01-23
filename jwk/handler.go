@@ -28,7 +28,9 @@ import (
 )
 
 const (
-	IDTokenKeyName = "hydra.openid.id-token"
+	IDTokenKeyName    = "hydra.openid.id-token"
+	KeyHandlerPath    = "/keys"
+	WellKnownKeysPath = "/.well-known/jwks.json"
 )
 
 type Handler struct {
@@ -64,17 +66,17 @@ func (h *Handler) GetGenerators() map[string]KeyGenerator {
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
-	r.GET("/.well-known/jwks.json", h.WellKnown)
-	r.GET("/keys/:set/:key", h.GetKey)
-	r.GET("/keys/:set", h.GetKeySet)
+	r.GET(WellKnownKeysPath, h.WellKnown)
+	r.GET(KeyHandlerPath+"/:set/:key", h.GetKey)
+	r.GET(KeyHandlerPath+"/:set", h.GetKeySet)
 
-	r.POST("/keys/:set", h.Create)
+	r.POST(KeyHandlerPath+"/:set", h.Create)
 
-	r.PUT("/keys/:set/:key", h.UpdateKey)
-	r.PUT("/keys/:set", h.UpdateKeySet)
+	r.PUT(KeyHandlerPath+"/:set/:key", h.UpdateKey)
+	r.PUT(KeyHandlerPath+"/:set", h.UpdateKeySet)
 
-	r.DELETE("/keys/:set/:key", h.DeleteKey)
-	r.DELETE("/keys/:set", h.DeleteKeySet)
+	r.DELETE(KeyHandlerPath+"/:set/:key", h.DeleteKey)
+	r.DELETE(KeyHandlerPath+"/:set", h.DeleteKeySet)
 }
 
 // swagger:model jsonWebKeySetGeneratorRequest

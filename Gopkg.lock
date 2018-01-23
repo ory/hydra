@@ -152,12 +152,6 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/jehiah/go-strftime"
-  packages = ["."]
-  revision = "2efbe75097a505e2789f7e39cb9da067b5be8e3e"
-
-[[projects]]
-  branch = "master"
   name = "github.com/jmoiron/sqlx"
   packages = [".","reflectx"]
   revision = "3379e5993990b1f927fc8db926485e6f6becf2d2"
@@ -303,8 +297,8 @@
 [[projects]]
   name = "github.com/segmentio/analytics-go"
   packages = ["."]
-  revision = "2d840d861c322bdf5346ba7917af1c2285e653d3"
-  version = "2.1.1"
+  revision = "1178b964a36694a8f9c161b19e6fe28cb37e8482"
+  version = "3.0.0"
 
 [[projects]]
   branch = "master"
@@ -441,6 +435,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3ac73b4a2792495a72e7cb50575db622556e1e100b19956fd7a3ca6e3f7e9def"
+  inputs-digest = "ae3e46dafffc920953db2766f35a1c0f3c87a46bbf740740bc778e37f3c33a34"
   solver-name = "gps-cdcl"
   solver-version = 1

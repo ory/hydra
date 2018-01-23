@@ -30,10 +30,10 @@ import (
 )
 
 const (
-	endpoint         = "/policies"
-	scope            = "hydra.policies"
-	policyResource   = "policies"
-	policiesResource = "policies:%s"
+	PolicyHandlerPath = "/policies"
+	scope             = "hydra.policies"
+	policyResource    = "policies"
+	policiesResource  = "policies:%s"
 )
 
 type Handler struct {
@@ -56,11 +56,11 @@ func (h *Handler) PrefixResource(resource string) string {
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
-	r.POST(endpoint, h.Create)
-	r.GET(endpoint, h.List)
-	r.GET(endpoint+"/:id", h.Get)
-	r.PUT(endpoint+"/:id", h.Update)
-	r.DELETE(endpoint+"/:id", h.Delete)
+	r.POST(PolicyHandlerPath, h.Create)
+	r.GET(PolicyHandlerPath, h.List)
+	r.GET(PolicyHandlerPath+"/:id", h.Get)
+	r.PUT(PolicyHandlerPath+"/:id", h.Update)
+	r.DELETE(PolicyHandlerPath+"/:id", h.Delete)
 }
 
 // swagger:route GET /policies policy listPolicies

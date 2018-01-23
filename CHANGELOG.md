@@ -3,7 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
-  - [Unreleased](#unreleased)
+  - [v0.11.3 (2018-01-23)](#v0113-2018-01-23)
   - [v0.11.2 (2018-01-22)](#v0112-2018-01-22)
   - [v0.11.1 (2018-01-18)](#v0111-2018-01-18)
   - [v0.11.0 (2018-01-08)](#v0110-2018-01-08)
@@ -119,9 +119,12 @@
 
 # Change Log
 
-## [Unreleased](https://github.com/ory/hydra/tree/HEAD)
+## [v0.11.3](https://github.com/ory/hydra/tree/v0.11.3) (2018-01-23)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.11.2...v0.11.3)
 
-[Full Changelog](https://github.com/ory/hydra/compare/v0.11.2...HEAD)
+**Implemented enhancements:**
+
+- Improve telemetry module [\#752](https://github.com/ory/hydra/pull/752) ([arekkas](https://github.com/arekkas))
 
 **Closed issues:**
 

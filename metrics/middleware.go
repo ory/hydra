@@ -19,6 +19,7 @@ import (
 	"encoding/hex"
 	"net"
 	"net/http"
+	"net/url"
 	"runtime"
 	"strings"
 	"sync"
@@ -37,13 +38,14 @@ import (
 )
 
 type MetricsManager struct {
-	sync.RWMutex                    `json:"-"`
+	sync.RWMutex `json:"-"`
 	start        time.Time          `json:"-"`
 	Segment      analytics.Client   `json:"-"`
 	Logger       logrus.FieldLogger `json:"-"`
 	issuerURL    string             `json:"-"`
 	databaseURL  string             `json:"-"`
 	shouldCommit bool               `json:"-"`
+	salt         string
 
 	ID               string            `json:"id"`
 	UpTime           int64             `json:"uptime"`
@@ -58,9 +60,9 @@ func shouldCommit(issuerURL string, databaseURL string) bool {
 	return !(databaseURL == "" || databaseURL == "memory" || issuerURL == "" || strings.Contains(issuerURL, "localhost"))
 }
 
-func identify(issuerURL string) string {
+func hash(value string) string {
 	hash := sha256.New()
-	hash.Write([]byte(issuerURL))
+	hash.Write([]byte(value))
 	return hex.EncodeToString(hash.Sum(nil))
 }
 
@@ -74,9 +76,10 @@ func NewMetricsManager(issuerURL string, databaseURL string, l logrus.FieldLogge
 		issuerURL:        issuerURL,
 		databaseURL:      databaseURL,
 		MemoryStatistics: &MemoryStatistics{},
-		ID:               identify(issuerURL),
+		ID:               hash(issuerURL),
 		start:            time.Now().UTC(),
 		shouldCommit:     shouldCommit(issuerURL, databaseURL),
+		salt:             uuid.New(),
 	}
 	return mm
 }
@@ -141,7 +144,8 @@ func (sw *MetricsManager) ServeHTTP(rw http.ResponseWriter, r *http.Request, nex
 	}
 
 	start := time.Now().UTC()
-	path := anonymizePath(r.URL.Path)
+	path := anonymizePath(r.URL.Path, sw.salt)
+	query := anonymizeQuery(r.URL.Query(), sw.salt)
 
 	next(rw, r)
 
@@ -161,18 +165,19 @@ func (sw *MetricsManager) ServeHTTP(rw http.ResponseWriter, r *http.Request, nex
 		Name:   path,
 		Properties: analytics.
 			NewProperties().
-			SetURL(scheme + "//" + sw.ID + path).
+			SetURL(scheme+"//"+sw.ID+path+"?"+query).
 			SetPath(path).
 			SetName(path).
 			Set("status", status).
 			Set("size", size).
 			Set("latency", latency).
+			Set("instance", sw.InstanceID).
 			Set("method", r.Method),
 		Context: &analytics.Context{IP: net.IPv4(0, 0, 0, 0)},
 	})
 }
 
-func anonymizePath(path string) string {
+func anonymizePath(path string, salt string) string {
 	paths := []string{
 		client.ClientsHandlerPath,
 		jwk.KeyHandlerPath,
@@ -192,12 +197,28 @@ func anonymizePath(path string) string {
 		"/health/status",
 		"/",
 	}
+	path = strings.ToLower(path)
 
 	for _, p := range paths {
-		if len(path) >= len(p) && strings.ToLower(path[:len(p)]) == strings.ToLower(p) {
+		p = strings.ToLower(p)
+		if len(path) == len(p) && path[:len(p)] == strings.ToLower(p) {
 			return p
+		} else if len(path) > len(p) && path[:len(p)+1] == strings.ToLower(p)+"/" {
+			return path[:len(p)] + "/" + hash(path[len(p):]+"|"+salt)
 		}
 	}
 
 	return ""
+}
+
+func anonymizeQuery(query url.Values, salt string) string {
+	for _, q := range query {
+		for i, s := range q {
+			if s != "" {
+				s = hash(s + "|" + salt)
+				q[i] = s
+			}
+		}
+	}
+	return query.Encode()
 }

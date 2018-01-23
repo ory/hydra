@@ -69,7 +69,7 @@ func hash(value string) string {
 func NewMetricsManager(issuerURL string, databaseURL string, l logrus.FieldLogger) *MetricsManager {
 	l.Info("Setting up telemetry - for more information please visit https://ory.gitbooks.io/hydra/content/telemetry.html")
 
-	client, err := analytics.NewWithConfig("h8dRH3kVCWKkIFWydBmWsyYHR4M0u0vr", analytics.Config{
+	segment, err := analytics.NewWithConfig("h8dRH3kVCWKkIFWydBmWsyYHR4M0u0vr", analytics.Config{
 		Interval: time.Minute * 10,
 	})
 	if err != nil {
@@ -78,7 +78,7 @@ func NewMetricsManager(issuerURL string, databaseURL string, l logrus.FieldLogge
 
 	mm := &MetricsManager{
 		InstanceID:       uuid.New(),
-		Segment:          client,
+		Segment:          segment,
 		Logger:           l,
 		issuerURL:        issuerURL,
 		databaseURL:      databaseURL,

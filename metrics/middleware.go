@@ -38,7 +38,7 @@ import (
 )
 
 type MetricsManager struct {
-	sync.RWMutex                    `json:"-"`
+	sync.RWMutex `json:"-"`
 	start        time.Time          `json:"-"`
 	Segment      analytics.Client   `json:"-"`
 	Logger       logrus.FieldLogger `json:"-"`
@@ -172,7 +172,7 @@ func (sw *MetricsManager) ServeHTTP(rw http.ResponseWriter, r *http.Request, nex
 		Name:   path,
 		Properties: analytics.
 			NewProperties().
-			SetURL(scheme + "//" + sw.ID + path + "?" + query).
+			SetURL(scheme+"//"+sw.ID+path+"?"+query).
 			SetPath(path).
 			SetName(path).
 			Set("status", status).

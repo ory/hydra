@@ -4,20 +4,11 @@
 
 Installation is best done using [composer](https://getcomposer.org/)
 
-Create a composer.json file with the following:
-
-```json
-{
-    "repositories": {
-        "tulip/hydra-php-sdk": { "type": "vcs", "url": "git@git.internal.tulip.io:shared/composer-libraries/hydra-php-sdk.git" }
-    },
-    "require": {
-        "tulip/hydra-php-sdk": "dev-master"
-    }
-}
+```
+composer require ory/hydra-sdk
 ```
 
-Then run `composer install` and include the generated autoload file in your script.
+If your project doesn't already make use of composer, you will need to include the resulting `vendor/autoload.php` file.
 
 ### Configuration
 

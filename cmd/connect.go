@@ -22,6 +22,8 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"net/url"
+	"net/http"
 )
 
 // connectCmd represents the connect command
@@ -54,6 +56,38 @@ var connectCmd = &cobra.Command{
 		} else if u := input("Client Secret [" + secret + "]: "); u != "" {
 			c.ClientSecret = u
 		}
+
+		if !c.SignedUpForNewsletter {
+			u := "https://ory.us10.list-manage.com/subscribe/post?u=ffb1a878e4ec6c0ed312a3480&id=f605a41b53"
+			fmt.Println("Enter your email address here to sign up for our newsletter so you never miss important security information and updates")
+			m := input("[enter email here]:")
+
+			v := url.Values{}
+			v.Add("EMAIL", m)
+
+			req, err := http.NewRequest("POST", u, strings.NewReader(v.Encode()))
+			req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+			if m == "" {
+				c.SignedUpForNewsletter = true
+			} else {
+				if err != nil {
+					fmt.Printf("there was some error: %v\n", err)
+				} else {
+					resp, err := http.DefaultClient.Do(req)
+
+					if err != nil {
+						fmt.Printf("there was some error: %v\n", err)
+					} else {
+						defer resp.Body.Close()
+
+						fmt.Println("To complete the subscription process, please click the link in the email we just sent you.")
+						c.SignedUpForNewsletter = true
+					}
+				}
+			}
+		}
+
 		if err := c.Persist(); err != nil {
 			log.Fatalf("Unable to save config file because %s.", err)
 		}

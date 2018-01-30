@@ -48,9 +48,10 @@ import (
 
 type Config struct {
 	// These are used by client commands
-	ClusterURL   string `mapstructure:"CLUSTER_URL" yaml:"cluster_url"`
-	ClientID     string `mapstructure:"CLIENT_ID" yaml:"client_id,omitempty"`
-	ClientSecret string `mapstructure:"CLIENT_SECRET" yaml:"client_secret,omitempty"`
+	ClusterURL            string `mapstructure:"CLUSTER_URL" yaml:"cluster_url"`
+	ClientID              string `mapstructure:"CLIENT_ID" yaml:"client_id,omitempty"`
+	ClientSecret          string `mapstructure:"CLIENT_SECRET" yaml:"client_secret,omitempty"`
+	SignedUpForNewsletter bool   `yaml:"signed_up_for_newsletter,omitempty"`
 
 	// These are used by the host command
 	BindPort                         int    `mapstructure:"PORT" yaml:"-"`

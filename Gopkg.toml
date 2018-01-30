@@ -87,7 +87,7 @@
 
 [[constraint]]
   name = "github.com/ory/ladon"
-  version = "0.8.4"
+  version = "0.8.8"
 
 [[constraint]]
   name = "github.com/pborman/uuid"
@@ -107,7 +107,7 @@
 
 [[constraint]]
   name = "github.com/segmentio/analytics-go"
-  version = "2.1.1"
+  version = "3.0.0"
 
 [[constraint]]
   name = "github.com/sirupsen/logrus"

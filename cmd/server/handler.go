@@ -104,11 +104,10 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 
 		n := negroni.New()
 
-		metrics := c.GetMetrics()
 		if ok, _ := cmd.Flags().GetBool("disable-telemetry"); !ok && os.Getenv("DISABLE_TELEMETRY") != "1" {
+			metrics := c.GetMetrics()
 			go metrics.RegisterSegment(c.BuildVersion, c.BuildHash, c.BuildTime)
-			go metrics.CommitTelemetry()
-			go metrics.TickKeepAlive()
+			go metrics.CommitMemoryStatistics()
 			n.Use(metrics)
 		}
 

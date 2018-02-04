@@ -21,9 +21,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/spf13/cobra"
-	"net/url"
 	"net/http"
+	"net/url"
+
+	"github.com/spf13/cobra"
 )
 
 // connectCmd represents the connect command

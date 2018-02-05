@@ -19,7 +19,9 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
+	"fmt"
 
+	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/square/go-jose"
 )
@@ -29,6 +31,31 @@ func First(keys []jose.JSONWebKey) *jose.JSONWebKey {
 		return nil
 	}
 	return &keys[0]
+}
+
+func FindKeyByPrefix(set *jose.JSONWebKeySet, prefix string) (key *jose.JSONWebKey, err error) {
+	keys, err := FindKeysByPrefix(set, prefix)
+	if err != nil {
+		return nil, err
+	}
+
+	return First(keys.Keys), nil
+}
+
+func FindKeysByPrefix(set *jose.JSONWebKeySet, prefix string) (*jose.JSONWebKeySet, error) {
+	keys := new(jose.JSONWebKeySet)
+
+	for _, k := range set.Keys {
+		if len(k.KeyID) >= len(prefix)+1 && k.KeyID[:len(prefix)+1] == prefix+":" {
+			keys.Keys = append(keys.Keys, k)
+		}
+	}
+
+	if len(keys.Keys) == 0 {
+		return nil, errors.Errorf("Unable to find key with prefix %s in JSON Web Key Set", prefix)
+	}
+
+	return keys, nil
 }
 
 func PEMBlockForKey(key interface{}) (*pem.Block, error) {
@@ -44,4 +71,11 @@ func PEMBlockForKey(key interface{}) (*pem.Block, error) {
 	default:
 		return nil, errors.New("Invalid key type")
 	}
+}
+
+func ider(typ, id string) string {
+	if id == "" {
+		id = uuid.New()
+	}
+	return fmt.Sprintf("%s:%s", typ, id)
 }

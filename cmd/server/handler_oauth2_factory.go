@@ -18,8 +18,6 @@ import (
 	"fmt"
 	"net/url"
 
-	"os"
-
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
@@ -31,7 +29,6 @@ import (
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/warden"
-	"github.com/pkg/errors"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {
@@ -68,26 +65,20 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 	ctx.FositeStore = store
 }
 
-func newOAuth2Provider(c *config.Config, km jwk.Manager) fosite.OAuth2Provider {
+func newOAuth2Provider(c *config.Config) (fosite.OAuth2Provider, string) {
 	var ctx = c.Context()
 	var store = ctx.FositeStore
 
-	createRS256KeysIfNotExist(c, oauth2.OpenIDConnectKeyName, "private", "sig")
-	keys, err := km.GetKey(oauth2.OpenIDConnectKeyName, "private")
-	if errors.Cause(err) == pkg.ErrNotFound {
-		c.GetLogger().Warnln("Could not find OpenID Connect signing keys. Generating a new keypair...")
-		keys, err = new(jwk.RS256Generator).Generate("")
-
-		pkg.Must(err, "Could not generate signing key for OpenID Connect")
-		km.AddKeySet(oauth2.OpenIDConnectKeyName, keys)
-		c.GetLogger().Infoln("Keypair generated.")
-		c.GetLogger().Warnln("WARNING: Automated key creation causes low entropy. Replace the keys as soon as possible.")
-	} else if err != nil {
-		fmt.Fprintf(os.Stderr, `Could not fetch signing key for OpenID Connect - did you forget to run "hydra migrate sql" or forget to set the SYSTEM_SECRET? Got error: %s`+"\n", err.Error())
-		os.Exit(1)
+	privateKey, err := createOrGetJWK(c, oauth2.OpenIDConnectKeyName, "private")
+	if err != nil {
+		c.GetLogger().WithError(err).Fatalf(`Could not fetch private signing key for OpenID Connect - did you forget to run "hydra migrate sql" or forget to set the SYSTEM_SECRET?`)
 	}
 
-	rsaKey := jwk.MustRSAPrivate(jwk.First(keys.Keys))
+	publicKey, err := createOrGetJWK(c, oauth2.OpenIDConnectKeyName, "public")
+	if err != nil {
+		c.GetLogger().WithError(err).Fatalf(`Could not fetch public signing key for OpenID Connect - did you forget to run "hydra migrate sql" or forget to set the SYSTEM_SECRET?`)
+	}
+
 	fc := &compose.Config{
 		AccessTokenLifespan:        c.GetAccessTokenLifespan(),
 		AuthorizeCodeLifespan:      c.GetAuthCodeLifespan(),
@@ -96,12 +87,13 @@ func newOAuth2Provider(c *config.Config, km jwk.Manager) fosite.OAuth2Provider {
 		ScopeStrategy:              c.GetScopeStrategy(),
 		SendDebugMessagesToClients: c.SendOAuth2DebugMessagesToClients,
 	}
+
 	return compose.Compose(
 		fc,
 		store,
 		&compose.CommonStrategy{
 			CoreStrategy:               compose.NewOAuth2HMACStrategy(fc, c.GetSystemSecret()),
-			OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(rsaKey),
+			OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(jwk.MustRSAPrivate(privateKey)),
 		},
 		nil,
 		compose.OAuth2AuthorizeExplicitFactory,
@@ -113,10 +105,10 @@ func newOAuth2Provider(c *config.Config, km jwk.Manager) fosite.OAuth2Provider {
 		compose.OpenIDConnectImplicitFactory,
 		compose.OAuth2TokenRevocationFactory,
 		warden.OAuth2TokenIntrospectionFactory,
-	)
+	), publicKey.KeyID
 }
 
-func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm oauth2.ConsentRequestManager, o fosite.OAuth2Provider) *oauth2.Handler {
+func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm oauth2.ConsentRequestManager, o fosite.OAuth2Provider, idTokenKeyID string) *oauth2.Handler {
 	if c.ConsentURL == "" {
 		proto := "https"
 		if c.ForceHTTP {
@@ -144,6 +136,7 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm oauth2.Con
 			ConsentManager:           c.Context().ConsentManager,
 			DefaultChallengeLifespan: c.GetChallengeTokenLifespan(),
 			DefaultIDTokenLifespan:   c.GetIDTokenLifespan(),
+			KeyID: idTokenKeyID,
 		},
 		ConsentURL:          *consentURL,
 		H:                   herodot.NewJSONWriter(c.GetLogger()),

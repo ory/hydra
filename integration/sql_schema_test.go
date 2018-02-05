@@ -35,8 +35,8 @@ func TestSQLSchema(t *testing.T) {
 	}
 
 	var testGenerator = &jwk.RS256Generator{}
-	ks, _ := testGenerator.Generate("")
-	p1 := ks.Key("private")
+	ks, _ := testGenerator.Generate("foo")
+	p1 := ks.Key("private:foo")
 	r := fosite.NewRequest()
 	r.ID = "foo"
 	db := ConnectToPostgres()

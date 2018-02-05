@@ -10,6 +10,10 @@
 
 package swagger
 
+import (
+	"time"
+)
+
 // Context contains an access token's session data
 type Context struct {
 
@@ -19,8 +23,14 @@ type Context struct {
 	// ClientID is id of the client the token was issued for..
 	ClientId string `json:"clientId,omitempty"`
 
+	// ExpiresAt is the expiry timestamp.
+	ExpiresAt time.Time `json:"expiresAt,omitempty"`
+
 	// GrantedScopes is a list of scopes that the subject authorized when asked for consent.
 	GrantedScopes []string `json:"grantedScopes,omitempty"`
+
+	// IssuedAt is the token creation time stamp.
+	IssuedAt time.Time `json:"issuedAt,omitempty"`
 
 	// Issuer is the id of the issuer, typically an hydra instance.
 	Issuer string `json:"issuer,omitempty"`

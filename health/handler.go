@@ -23,6 +23,10 @@ import (
 	"github.com/ory/hydra/metrics"
 )
 
+const (
+	HealthStatusPath = "/health/status"
+)
+
 type Handler struct {
 	Metrics        *metrics.MetricsManager
 	H              *herodot.JSONWriter
@@ -43,8 +47,7 @@ func (h *Handler) PrefixResource(resource string) string {
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
-	r.GET("/health/status", h.Health)
-	r.GET("/health/metrics", h.Statistics)
+	r.GET(HealthStatusPath, h.Health)
 }
 
 // swagger:route GET /health/status health getInstanceStatus
@@ -64,56 +67,4 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //       500: genericError
 func (h *Handler) Health(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	rw.Write([]byte(`{"status": "ok"}`))
-}
-
-// swagger:route GET /health/metrics health getInstanceMetrics
-//
-// Show instance metrics (experimental)
-//
-// This endpoint returns an instance's metrics, such as average response time, status code distribution, hits per
-// second and so on. The return values are currently not documented as this endpoint is still experimental.
-//
-//
-// The subject making the request needs to be assigned to a policy containing:
-//
-// ```
-// {
-//   "resources": ["rn:hydra:health:stats"],
-//   "actions": ["get"],
-//   "effect": "allow"
-// }
-// ```
-//
-//     Consumes:
-//     - application/json
-//
-//     Produces:
-//     - application/json
-//
-//     Schemes: http, https
-//
-//     Security:
-//       oauth2: hydra.health
-//
-//     Responses:
-//       200: emptyResponse
-//       401: genericError
-//       403: genericError
-//       500: genericError
-func (h *Handler) Statistics(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var ctx = r.Context()
-
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: h.PrefixResource("health:stats"),
-		Action:   "get",
-	}, "hydra.health"); err != nil {
-		h.H.WriteError(w, r, err)
-		return
-	}
-
-	h.Metrics.Lock()
-	defer h.Metrics.Unlock()
-
-	h.Metrics.Update()
-	h.H.Write(w, r, h.Metrics)
 }

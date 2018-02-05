@@ -40,12 +40,24 @@ const (
 type DefaultConsentStrategy struct {
 	Issuer string
 
+	KeyID                    string
 	DefaultIDTokenLifespan   time.Duration
 	DefaultChallengeLifespan time.Duration
 	ConsentManager           ConsentRequestManager
 }
 
 var errRequiresAuthentication = errors.New("Requires authentication")
+
+func checkAntiReplayToken(consent *ConsentRequest, cookie *sessions.Session) error {
+	if j, ok := cookie.Values[cookieCSRFKey]; !ok {
+		return errors.Errorf("Session cookie is missing anti-replay token")
+	} else if js, ok := j.(string); !ok {
+		return errors.Errorf("Session cookie anti-replay value is not a string")
+	} else if js != consent.CSRF {
+		return errors.Errorf("Session cookie anti-replay value does not match value from consent response")
+	}
+	return nil
+}
 
 func (s *DefaultConsentStrategy) ValidateConsentRequest(req fosite.AuthorizeRequester, session string, cookie *sessions.Session) (claims *Session, err error) {
 	consent, err := s.ConsentManager.GetConsentRequest(session)
@@ -76,12 +88,13 @@ func (s *DefaultConsentStrategy) ValidateConsentRequest(req fosite.AuthorizeRequ
 		return nil, errors.Errorf("Subject key is empty or undefined in consent response, check your payload.")
 	}
 
-	if j, ok := cookie.Values[cookieCSRFKey]; !ok {
-		return nil, errors.Errorf("Session cookie is missing anti-replay token")
-	} else if js, ok := j.(string); !ok {
-		return nil, errors.Errorf("Session cookie anti-replay value is not a string")
-	} else if js != consent.CSRF {
-		return nil, errors.Errorf("Session cookie anti-replay value does not match value from consent response")
+	if err := checkAntiReplayToken(consent, cookie); err != nil {
+		if err := s.ConsentManager.RejectConsentRequest(session, &RejectConsentRequestPayload{
+			Reason: "Session cookie is missing anti-replay token",
+		}); err != nil {
+			return nil, err
+		}
+		return nil, err
 	}
 
 	for _, scope := range consent.GrantedScopes {
@@ -107,7 +120,7 @@ func (s *DefaultConsentStrategy) ValidateConsentRequest(req fosite.AuthorizeRequ
 				Extra:       consent.IDTokenExtra,
 			},
 			// required for lookup on jwk endpoint
-			Headers: &ejwt.Headers{Extra: map[string]interface{}{"kid": "public"}},
+			Headers: &ejwt.Headers{Extra: map[string]interface{}{"kid": s.KeyID}},
 			Subject: consent.Subject,
 		},
 		Extra: consent.AccessTokenExtra,

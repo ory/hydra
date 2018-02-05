@@ -115,6 +115,11 @@ OAUTH2 CONTROLS
 - SCOPE_STRATEGY: Set this to DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY to enable the deprecated hierarchical scope strategy.
 	This is required if you do not want to migrate to the new wildcard strategy.
 
+- OAUTH2_SHARE_ERROR_DEBUG: Set this to true if you want to share error debugging information with your OAuth 2.0 clients.
+	Keep in mind that debug information is very valuable when dealing with errors, but might also expose database error
+	codes and similar errors.
+	Defaults to OAUTH2_SHARE_ERROR_DEBUG=false
+
 
 OPENID CONNECT CONTROLS
 ===============

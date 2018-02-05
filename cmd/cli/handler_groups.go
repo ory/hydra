@@ -29,7 +29,7 @@ type GroupHandler struct {
 }
 
 func (h *GroupHandler) newGroupManager(cmd *cobra.Command) *hydra.WardenApi {
-	client := hydra.NewWardenApiWithBasePath(h.Config.ClusterURL)
+	client := hydra.NewWardenApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlash())
 	client.Configuration.Transport = h.Config.OAuth2Client(cmd).Transport
 	if term, _ := cmd.Flags().GetBool("fake-tls-termination"); term {
 		client.Configuration.DefaultHeader["X-Forwarded-Proto"] = "https"
@@ -99,7 +99,19 @@ func (h *GroupHandler) FindGroups(cmd *cobra.Command, args []string) {
 	}
 
 	m := h.newGroupManager(cmd)
-	groups, response, err := m.FindGroupsByMember(args[0])
+	groups, response, err := m.ListGroups(args[0], 500, 0)
+	checkResponse(response, err, http.StatusOK)
+	formatResponse(groups)
+}
+
+func (h *GroupHandler) ListGroups(cmd *cobra.Command, args []string) {
+	if len(args) != 1 {
+		fmt.Print(cmd.UsageString())
+		return
+	}
+
+	m := h.newGroupManager(cmd)
+	groups, response, err := m.ListGroups("", 500, 0)
 	checkResponse(response, err, http.StatusOK)
 	formatResponse(groups)
 }

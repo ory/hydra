@@ -22,6 +22,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/firewall"
+	"github.com/ory/pagination"
 	"github.com/pkg/errors"
 )
 
@@ -62,16 +63,16 @@ const (
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.POST(GroupsHandlerPath, h.CreateGroup)
-	r.GET(GroupsHandlerPath, h.FindGroupNames)
+	r.GET(GroupsHandlerPath, h.ListGroupsHandler)
 	r.GET(GroupsHandlerPath+"/:id", h.GetGroup)
 	r.DELETE(GroupsHandlerPath+"/:id", h.DeleteGroup)
 	r.POST(GroupsHandlerPath+"/:id/members", h.AddGroupMembers)
 	r.DELETE(GroupsHandlerPath+"/:id/members", h.RemoveGroupMembers)
 }
 
-// swagger:route GET /warden/groups warden findGroupsByMember
+// swagger:route GET /warden/groups warden listGroups
 //
-// Find groups by member
+// List groups
 //
 // The subject making the request needs to be assigned to a policy containing:
 //
@@ -95,13 +96,12 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //       oauth2: hydra.warden.groups
 //
 //     Responses:
-//       200: findGroupsByMemberResponse
+//       200: listGroupsResponse
 //       401: genericError
 //       403: genericError
 //       500: genericError
-func (h *Handler) FindGroupNames(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) ListGroupsHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = r.Context()
-	var member = r.URL.Query().Get("member")
 
 	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: h.PrefixResource(GroupsResource),
@@ -111,7 +111,28 @@ func (h *Handler) FindGroupNames(w http.ResponseWriter, r *http.Request, _ httpr
 		return
 	}
 
-	groups, err := h.Manager.FindGroupsByMember(member)
+	limit, offset := pagination.Parse(r, 100, 0, 500)
+	if member := r.URL.Query().Get("member"); member != "" {
+		h.FindGroupNames(w, r, member, limit, offset)
+		return
+	} else {
+		h.ListGroups(w, r, limit, offset)
+		return
+	}
+}
+
+func (h *Handler) ListGroups(w http.ResponseWriter, r *http.Request, limit, offset int) {
+	groups, err := h.Manager.ListGroups(limit, offset)
+	if err != nil {
+		h.H.WriteError(w, r, err)
+		return
+	}
+
+	h.H.Write(w, r, groups)
+}
+
+func (h *Handler) FindGroupNames(w http.ResponseWriter, r *http.Request, member string, limit, offset int) {
+	groups, err := h.Manager.FindGroupsByMember(member, limit, offset)
 	if err != nil {
 		h.H.WriteError(w, r, err)
 		return

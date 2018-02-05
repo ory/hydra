@@ -12,122 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package metrics_test
+package metrics
 
 import (
-	"fmt"
-	"math/rand"
-	"net/http"
-	"net/http/httptest"
+	"net/url"
 	"testing"
-	"time"
 
-	"github.com/julienschmidt/httprouter"
-	"github.com/ory/herodot"
-	"github.com/ory/hydra/health"
-	"github.com/ory/hydra/metrics"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"github.com/urfave/negroni"
 )
 
-func TestMiddleware(t *testing.T) {
-	rand.Seed(time.Now().UTC().Unix())
-	mw := metrics.NewMetricsManager("", "", logrus.StandardLogger())
-	n := negroni.New()
-	r := httprouter.New()
-
-	time.Sleep(time.Second)
-
-	n.Use(mw)
-	r.GET("/", handle)
-	r.GET("/oauth2/introspect", handle)
-	r.POST("/", handle)
-	n.UseHandler(r)
-
-	s := httptest.NewServer(n)
-	defer s.Close()
-
-	for i := 1; i <= 100; i++ {
-		t.Run(fmt.Sprintf("case=%d", i), func(t *testing.T) {
-			res, err := http.Get(s.URL)
-			require.NoError(t, err)
-			res.Body.Close()
-
-			require.Equal(t, http.StatusOK, res.StatusCode)
-		})
-	}
-
-	i := 100
-	assert.EqualValues(t, i, mw.Snapshot.Requests)
-	assert.EqualValues(t, i, mw.Snapshot.Requests)
-	assert.EqualValues(t, i, mw.Snapshot.Responses)
-
-	mw.Snapshot.Update()
-
-	assert.True(t, mw.Snapshot.UpTime > 0)
-	assert.True(t, mw.Snapshot.GetUpTime() > 0)
-
-	assert.EqualValues(t, 0, mw.Snapshot.Status[http.StatusOK].Requests)
-	assert.EqualValues(t, i, mw.Snapshot.Status[http.StatusOK].Responses)
-
-	assert.EqualValues(t, i, mw.Snapshot.Methods["GET"].Requests)
-	assert.EqualValues(t, i, mw.Snapshot.Methods["GET"].Responses)
-
-	res, err := http.Get(s.URL + "/oauth2/introspect/1231")
-	require.NoError(t, err)
-	res.Body.Close()
-
-	assert.EqualValues(t, 1, mw.Snapshot.Path("/oauth2/introspect").Requests)
-
-	assert.NotEqual(t, 0, mw.UpTime)
-
-	//out, _ := json.MarshalIndent(mw, "\t", "  ")
-	//t.Logf("%s", out)
+func TestShouldCommit(t *testing.T) {
+	assert.False(t, shouldCommit("http://localhost/", "postgres"))
+	assert.False(t, shouldCommit("", "postgres"))
+	assert.False(t, shouldCommit("http://localhost/", "memory"))
+	assert.False(t, shouldCommit("http://some-domain/", "memory"))
+	assert.True(t, shouldCommit("http://some-domain/", "postgres"))
 }
 
-func TestRacyMiddleware(t *testing.T) {
-	rand.Seed(time.Now().UTC().Unix())
-	mw := metrics.NewMetricsManager("", "", logrus.StandardLogger())
-	n := negroni.New()
-	r := httprouter.New()
-
-	h := health.Handler{
-		H:       herodot.NewJSONWriter(nil),
-		Metrics: mw,
-	}
-
-	n.Use(mw)
-	h.SetRoutes(r)
-	n.UseHandler(r)
-
-	s := httptest.NewServer(n)
-	defer s.Close()
-
-	for i := 1; i <= 100; i++ {
-		t.Run("type=concurrent", func(t *testing.T) {
-			go func() {
-				res, err := http.Get(s.URL + "/health")
-				require.NoError(t, err)
-				res.Body.Close()
-			}()
-
-		})
-	}
-
-	time.Sleep(time.Second)
+func TestAnonymizePath(t *testing.T) {
+	assert.Equal(t, "/keys/837b4168b57215f2ba0d4e64e57a653d6a6ecd6065e78598283209467d172373", anonymizePath("/keys/1234", "somesupersaltysalt"))
+	assert.Equal(t, "/keys", anonymizePath("/keys", "somesupersaltysalt"))
 }
 
-func handle(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	time.Sleep(time.Duration(random(0, 10)) * time.Millisecond)
-	w.WriteHeader(http.StatusOK)
-
-	for i := 0; i <= random(1, 100); i++ {
-		w.Write([]byte("ok"))
-	}
-}
-
-func random(min, max int) int {
-	return rand.Intn(max-min) + min
+func TestAnonymizeQuery(t *testing.T) {
+	assert.EqualValues(t, "foo=2ec879270efe890972d975251e9d454f4af49df1f07b4317fd5b6ae90de4c774&foo=1864a573566eba1b9ddab79d8f4bab5a39c938918a21b80a64ae1c9c12fa9aa2&foo2=186084f6bd8e222bedade9439d6ae69ed274b954eeebe9b54fd5f47e54dd7675&foo2=1ee7158281cc3b5a27de4c337e07987e8677f5f687a4671ca369b79c653d379d", anonymizeQuery(url.Values{
+		"foo":  []string{"bar", "baz"},
+		"foo2": []string{"bar2", "baz2"},
+	}, "somesupersaltysalt"))
+	assert.EqualValues(t, "", anonymizeQuery(url.Values{
+		"foo": []string{},
+	}, "somesupersaltysalt"))
+	assert.EqualValues(t, "foo=", anonymizeQuery(url.Values{
+		"foo": []string{""},
+	}, "somesupersaltysalt"))
+	assert.EqualValues(t, "", anonymizeQuery(url.Values{}, "somesupersaltysalt"))
 }

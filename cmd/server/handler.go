@@ -62,6 +62,8 @@ func parseCorsOptions() cors.Options {
 
 func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
+		fmt.Println(banner)
+
 		router := httprouter.New()
 		logger := c.GetLogger()
 		serverHandler := &Handler{
@@ -94,19 +96,12 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 			c.ClusterURL = fmt.Sprintf("%s://%s:%d", proto, host, c.BindPort)
 		}
 
-		if ok, _ := cmd.Flags().GetBool("dangerous-auto-logon"); ok {
-			logger.Warnln("Do not use flag --dangerous-auto-logon in production.")
-			err := c.Persist()
-			pkg.Must(err, "Could not write configuration file: %s", err)
-		}
-
 		n := negroni.New()
 
-		metrics := c.GetMetrics()
 		if ok, _ := cmd.Flags().GetBool("disable-telemetry"); !ok && os.Getenv("DISABLE_TELEMETRY") != "1" {
+			metrics := c.GetMetrics()
 			go metrics.RegisterSegment(c.BuildVersion, c.BuildHash, c.BuildTime)
-			go metrics.CommitTelemetry()
-			go metrics.TickKeepAlive()
+			go metrics.CommitMemoryStatistics()
 			n.Use(metrics)
 		}
 
@@ -122,6 +117,12 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 				Certificates: []tls.Certificate{getOrCreateTLSCertificate(cmd, c)},
 			},
 		})
+
+		if ok, _ := cmd.Flags().GetBool("dangerous-auto-logon"); ok {
+			logger.Warnln("Do not use flag --dangerous-auto-logon in production.")
+			err := c.Persist()
+			pkg.Must(err, "Could not write configuration file: %s", err)
+		}
 
 		err := graceful.Graceful(func() error {
 			var err error
@@ -163,7 +164,7 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 	injectConsentManager(c)
 	clientsManager := newClientManager(c)
 	injectFositeStore(c, clientsManager)
-	oauth2Provider := newOAuth2Provider(c, ctx.KeyManager)
+	oauth2Provider, idTokenKeyID := newOAuth2Provider(c)
 
 	// set up warden
 	ctx.Warden = &warden.LocalWarden{
@@ -182,7 +183,7 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 	h.Keys = newJWKHandler(c, router)
 	h.Policy = newPolicyHandler(c, router)
 	h.Consent = newConsentHanlder(c, router)
-	h.OAuth2 = newOAuth2Handler(c, router, ctx.ConsentManager, oauth2Provider)
+	h.OAuth2 = newOAuth2Handler(c, router, ctx.ConsentManager, oauth2Provider, idTokenKeyID)
 	h.Warden = warden.NewHandler(c, router)
 	h.Groups = &group.Handler{
 		H:              herodot.NewJSONWriter(c.GetLogger()),

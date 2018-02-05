@@ -67,18 +67,18 @@ func connectToMySQL() {
 }
 
 func TestManagerKey(t *testing.T) {
-	ks, _ := testGenerator.Generate("")
+	ks, _ := testGenerator.Generate("TestManagerKey")
 
 	for name, m := range managers {
-		t.Run(fmt.Sprintf("case=%s", name), TestHelperManagerKey(m, ks))
+		t.Run(fmt.Sprintf("case=%s", name), TestHelperManagerKey(m, ks, "TestManagerKey"))
 	}
 }
 
 func TestManagerKeySet(t *testing.T) {
-	ks, _ := testGenerator.Generate("")
+	ks, _ := testGenerator.Generate("TestManagerKeySet")
 	ks.Key("private")
 
 	for name, m := range managers {
-		t.Run(fmt.Sprintf("case=%s", name), TestHelperManagerKeySet(m, ks))
+		t.Run(fmt.Sprintf("case=%s", name), TestHelperManagerKeySet(m, ks, "TestManagerKeySet"))
 	}
 }

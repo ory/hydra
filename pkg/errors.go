@@ -18,6 +18,7 @@ import (
 	"net/http"
 	"reflect"
 
+	"github.com/ory/fosite"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
@@ -43,17 +44,35 @@ type stackTracer interface {
 }
 
 func LogError(err error, logger log.FieldLogger) {
+	extra := map[string]interface{}{}
 	if logger == nil {
 		logger = log.New()
 	}
+
+	if e, ok := err.(*fosite.RFC6749Error); ok {
+		if e.Debug != "" {
+			extra["debug"] = e.Debug
+		}
+		if e.Hint != "" {
+			extra["hint"] = e.Hint
+		}
+	} else if e, ok := errors.Cause(err).(*fosite.RFC6749Error); ok {
+		if e.Debug != "" {
+			extra["debug"] = e.Debug
+		}
+		if e.Hint != "" {
+			extra["hint"] = e.Hint
+		}
+	}
+
 	if e, ok := errors.Cause(err).(stackTracer); ok {
-		logger.WithError(err).Errorln("An error occurred")
+		logger.WithError(err).WithFields(extra).Errorln("An error occurred")
 		logger.Debugf("Stack trace: %+v", e.StackTrace())
 	} else if e, ok := err.(stackTracer); ok {
-		logger.WithError(err).Errorln("An error occurred")
+		logger.WithError(err).WithFields(extra).Errorln("An error occurred")
 		logger.Debugf("Stack trace: %+v", e.StackTrace())
 	} else {
-		logger.WithError(err).Errorln("An error occurred")
+		logger.WithError(err).WithFields(extra).Errorln("An error occurred")
 		logger.Debugf("Stack trace could not be recovered from error type %s", reflect.TypeOf(err))
 	}
 }

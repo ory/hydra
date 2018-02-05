@@ -22,7 +22,7 @@ import (
 var findCmd = &cobra.Command{
 	Use:   "find <subject>",
 	Short: "Find all groups a subject belongs to",
-	Long: `This command find all groups a subject belongs to.
+	Long: `This command finds all groups a subject belongs to.
 
 Example:
   hydra groups find peter

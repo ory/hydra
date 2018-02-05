@@ -63,7 +63,7 @@ func TestExecute(t *testing.T) {
 				return err != nil
 			},
 		},
-		{args: []string{"connect", "--id", "admin", "--secret", "pw", "--url", fmt.Sprintf("https://127.0.0.1:%d", port)}},
+		{args: []string{"connect", "--skip-newsletter", "--id", "admin", "--secret", "pw", "--url", fmt.Sprintf("https://127.0.0.1:%d", port)}},
 		{args: []string{"clients", "create", "--id", "foobarbaz"}},
 		{args: []string{"clients", "get", "foobarbaz"}},
 		{args: []string{"clients", "create", "--id", "public-foo", "--is-public"}},

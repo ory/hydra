@@ -370,72 +370,6 @@ func (a WardenApi) DoesWardenAllowTokenAccessRequest(body WardenTokenAccessReque
 }
 
 /**
- * Find groups by member
- * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:groups\&quot;], \&quot;actions\&quot;: [\&quot;list\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
- *
- * @param member The id of the member to look up.
- * @return []Group
- */
-func (a WardenApi) FindGroupsByMember(member string) ([]Group, *APIResponse, error) {
-
-	var localVarHttpMethod = strings.ToUpper("Get")
-	// create path and map variables
-	localVarPath := a.Configuration.BasePath + "/warden/groups"
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := make(map[string]string)
-	var localVarPostBody interface{}
-	var localVarFileName string
-	var localVarFileBytes []byte
-	// authentication '(oauth2)' required
-	// oauth required
-	if a.Configuration.AccessToken != "" {
-		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
-	}
-	// add default headers if any
-	for key := range a.Configuration.DefaultHeader {
-		localVarHeaderParams[key] = a.Configuration.DefaultHeader[key]
-	}
-	localVarQueryParams.Add("member", a.Configuration.APIClient.ParameterToString(member, ""))
-
-	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{"application/json"}
-
-	// set Content-Type header
-	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
-	if localVarHttpContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHttpContentType
-	}
-	// to determine the Accept header
-	localVarHttpHeaderAccepts := []string{
-		"application/json",
-	}
-
-	// set Accept header
-	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
-	if localVarHttpHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
-	}
-	var successPayload = new([]Group)
-	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
-
-	var localVarURL, _ = url.Parse(localVarPath)
-	localVarURL.RawQuery = localVarQueryParams.Encode()
-	var localVarAPIResponse = &APIResponse{Operation: "FindGroupsByMember", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
-	if localVarHttpResponse != nil {
-		localVarAPIResponse.Response = localVarHttpResponse.RawResponse
-		localVarAPIResponse.Payload = localVarHttpResponse.Body()
-	}
-
-	if err != nil {
-		return *successPayload, localVarAPIResponse, err
-	}
-	err = json.Unmarshal(localVarHttpResponse.Body(), &successPayload)
-	return *successPayload, localVarAPIResponse, err
-}
-
-/**
  * Get a group by id
  * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:groups:&lt;id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
@@ -499,6 +433,76 @@ func (a WardenApi) GetGroup(id string) (*Group, *APIResponse, error) {
 	}
 	err = json.Unmarshal(localVarHttpResponse.Body(), &successPayload)
 	return successPayload, localVarAPIResponse, err
+}
+
+/**
+ * List groups
+ * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:groups\&quot;], \&quot;actions\&quot;: [\&quot;list\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+ *
+ * @param member The id of the member to look up.
+ * @param limit The maximum amount of policies returned.
+ * @param offset The offset from where to start looking.
+ * @return []Group
+ */
+func (a WardenApi) ListGroups(member string, limit int64, offset int64) ([]Group, *APIResponse, error) {
+
+	var localVarHttpMethod = strings.ToUpper("Get")
+	// create path and map variables
+	localVarPath := a.Configuration.BasePath + "/warden/groups"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := make(map[string]string)
+	var localVarPostBody interface{}
+	var localVarFileName string
+	var localVarFileBytes []byte
+	// authentication '(oauth2)' required
+	// oauth required
+	if a.Configuration.AccessToken != "" {
+		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
+	}
+	// add default headers if any
+	for key := range a.Configuration.DefaultHeader {
+		localVarHeaderParams[key] = a.Configuration.DefaultHeader[key]
+	}
+	localVarQueryParams.Add("member", a.Configuration.APIClient.ParameterToString(member, ""))
+	localVarQueryParams.Add("limit", a.Configuration.APIClient.ParameterToString(limit, ""))
+	localVarQueryParams.Add("offset", a.Configuration.APIClient.ParameterToString(offset, ""))
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := a.Configuration.APIClient.SelectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{
+		"application/json",
+	}
+
+	// set Accept header
+	localVarHttpHeaderAccept := a.Configuration.APIClient.SelectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	var successPayload = new([]Group)
+	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+
+	var localVarURL, _ = url.Parse(localVarPath)
+	localVarURL.RawQuery = localVarQueryParams.Encode()
+	var localVarAPIResponse = &APIResponse{Operation: "ListGroups", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
+	if localVarHttpResponse != nil {
+		localVarAPIResponse.Response = localVarHttpResponse.RawResponse
+		localVarAPIResponse.Payload = localVarHttpResponse.Body()
+	}
+
+	if err != nil {
+		return *successPayload, localVarAPIResponse, err
+	}
+	err = json.Unmarshal(localVarHttpResponse.Body(), &successPayload)
+	return *successPayload, localVarAPIResponse, err
 }
 
 /**

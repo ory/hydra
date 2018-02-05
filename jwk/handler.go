@@ -28,7 +28,9 @@ import (
 )
 
 const (
-	IDTokenKeyName = "hydra.openid.id-token"
+	IDTokenKeyName    = "hydra.openid.id-token"
+	KeyHandlerPath    = "/keys"
+	WellKnownKeysPath = "/.well-known/jwks.json"
 )
 
 type Handler struct {
@@ -64,17 +66,17 @@ func (h *Handler) GetGenerators() map[string]KeyGenerator {
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
-	r.GET("/.well-known/jwks.json", h.WellKnown)
-	r.GET("/keys/:set/:key", h.GetKey)
-	r.GET("/keys/:set", h.GetKeySet)
+	r.GET(WellKnownKeysPath, h.WellKnown)
+	r.GET(KeyHandlerPath+"/:set/:key", h.GetKey)
+	r.GET(KeyHandlerPath+"/:set", h.GetKeySet)
 
-	r.POST("/keys/:set", h.Create)
+	r.POST(KeyHandlerPath+"/:set", h.Create)
 
-	r.PUT("/keys/:set/:key", h.UpdateKey)
-	r.PUT("/keys/:set", h.UpdateKeySet)
+	r.PUT(KeyHandlerPath+"/:set/:key", h.UpdateKey)
+	r.PUT(KeyHandlerPath+"/:set", h.UpdateKeySet)
 
-	r.DELETE("/keys/:set/:key", h.DeleteKey)
-	r.DELETE("/keys/:set", h.DeleteKeySet)
+	r.DELETE(KeyHandlerPath+"/:set/:key", h.DeleteKey)
+	r.DELETE(KeyHandlerPath+"/:set", h.DeleteKeySet)
 }
 
 // swagger:model jsonWebKeySetGeneratorRequest
@@ -126,26 +128,47 @@ type joseWebKeySetRequest struct {
 //       500: genericError
 func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var ctx = context.Background()
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: h.PrefixResource("keys:" + IDTokenKeyName + ":public"),
-		Action:   "get",
-	}, "hydra.keys.get"); err != nil {
-		if err := h.W.IsAllowed(ctx, &firewall.AccessRequest{
-			Subject:  "",
-			Resource: h.PrefixResource("keys:" + IDTokenKeyName + ":public"),
+
+	var fw = func(id string) error {
+		if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
+			Resource: h.PrefixResource("keys:" + IDTokenKeyName + ":" + id),
 			Action:   "get",
-		}); err != nil {
-			h.H.WriteError(w, r, err)
-			return
-		} else {
-			// Allow unauthorized requests to access this resource if it is enabled by policies
+		}, "hydra.keys.get"); err != nil {
+			if err := h.W.IsAllowed(ctx, &firewall.AccessRequest{
+				Subject:  "",
+				Resource: h.PrefixResource("keys:" + IDTokenKeyName + ":" + id),
+				Action:   "get",
+			}); err != nil {
+				h.H.WriteError(w, r, err)
+				return err
+			} else {
+				// Allow unauthorized requests to access this resource if it is enabled by policies
+				return nil
+			}
 		}
+		return nil
 	}
 
-	keys, err := h.Manager.GetKey(IDTokenKeyName, "public")
+	keys, err := h.Manager.GetKeySet(IDTokenKeyName)
+	if err != nil {
+		if err := fw("public:"); err != nil {
+			return
+		}
+
+		h.H.WriteError(w, r, err)
+		return
+	}
+
+	keys, err = FindKeysByPrefix(keys, "public")
 	if err != nil {
 		h.H.WriteError(w, r, err)
 		return
+	}
+
+	for _, key := range keys.Keys {
+		if err := fw(key.KeyID); err != nil {
+			return
+		}
 	}
 
 	h.H.Write(w, r, keys)

@@ -9,8 +9,8 @@ Method | HTTP request | Description
 [**deleteGroup**](WardenApi.md#deleteGroup) | **DELETE** /warden/groups/{id} | Delete a group by id
 [**doesWardenAllowAccessRequest**](WardenApi.md#doesWardenAllowAccessRequest) | **POST** /warden/allowed | Check if an access request is valid (without providing an access token)
 [**doesWardenAllowTokenAccessRequest**](WardenApi.md#doesWardenAllowTokenAccessRequest) | **POST** /warden/token/allowed | Check if an access request is valid (providing an access token)
-[**findGroupsByMember**](WardenApi.md#findGroupsByMember) | **GET** /warden/groups | Find groups by member
 [**getGroup**](WardenApi.md#getGroup) | **GET** /warden/groups/{id} | Get a group by id
+[**listGroups**](WardenApi.md#listGroups) | **GET** /warden/groups | List groups
 [**removeMembersFromGroup**](WardenApi.md#removeMembersFromGroup) | **DELETE** /warden/groups/{id}/members | Remove members from a group
 
 
@@ -276,57 +276,6 @@ Name | Type | Description  | Notes
  - **Content-Type**: application/json
  - **Accept**: application/json
 
-<a name="findGroupsByMember"></a>
-# **findGroupsByMember**
-> [Group] findGroupsByMember(member)
-
-Find groups by member
-
-The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:groups\&quot;], \&quot;actions\&quot;: [\&quot;list\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
-
-### Example
-```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
-
-// Configure OAuth2 access token for authorization: oauth2
-var oauth2 = defaultClient.authentications['oauth2'];
-oauth2.accessToken = 'YOUR ACCESS TOKEN';
-
-var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
-
-var member = "member_example"; // String | The id of the member to look up.
-
-
-var callback = function(error, data, response) {
-  if (error) {
-    console.error(error);
-  } else {
-    console.log('API called successfully. Returned data: ' + data);
-  }
-};
-apiInstance.findGroupsByMember(member, callback);
-```
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **member** | **String**| The id of the member to look up. | 
-
-### Return type
-
-[**[Group]**](Group.md)
-
-### Authorization
-
-[oauth2](../README.md#oauth2)
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
 <a name="getGroup"></a>
 # **getGroup**
 > Group getGroup(id)
@@ -368,6 +317,62 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**Group**](Group.md)
+
+### Authorization
+
+[oauth2](../README.md#oauth2)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+<a name="listGroups"></a>
+# **listGroups**
+> [Group] listGroups(opts)
+
+List groups
+
+The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:groups\&quot;], \&quot;actions\&quot;: [\&quot;list\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+
+### Example
+```javascript
+var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+
+// Configure OAuth2 access token for authorization: oauth2
+var oauth2 = defaultClient.authentications['oauth2'];
+oauth2.accessToken = 'YOUR ACCESS TOKEN';
+
+var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
+
+var opts = { 
+  'member': "member_example", // String | The id of the member to look up.
+  'limit': 789, // Number | The maximum amount of policies returned.
+  'offset': 789 // Number | The offset from where to start looking.
+};
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+apiInstance.listGroups(opts, callback);
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **member** | **String**| The id of the member to look up. | [optional] 
+ **limit** | **Number**| The maximum amount of policies returned. | [optional] 
+ **offset** | **Number**| The offset from where to start looking. | [optional] 
+
+### Return type
+
+[**[Group]**](Group.md)
 
 ### Authorization
 

@@ -18,7 +18,6 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
-	"fmt"
 
 	"github.com/pkg/errors"
 	"github.com/square/go-jose"
@@ -58,11 +57,4 @@ func (g *RS256Generator) Generate(id string) (*jose.JSONWebKeySet, error) {
 			},
 		},
 	}, nil
-}
-
-func ider(typ, id string) string {
-	if id != "" {
-		return fmt.Sprintf("%s:%s", typ, id)
-	}
-	return typ
 }

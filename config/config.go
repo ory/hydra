@@ -30,6 +30,7 @@ import (
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/token/hmac"
+	"github.com/ory/hydra/health"
 	"github.com/ory/hydra/metrics"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/warden/group"
@@ -47,33 +48,35 @@ import (
 
 type Config struct {
 	// These are used by client commands
-	ClusterURL   string `mapstructure:"CLUSTER_URL" yaml:"cluster_url"`
-	ClientID     string `mapstructure:"CLIENT_ID" yaml:"client_id,omitempty"`
-	ClientSecret string `mapstructure:"CLIENT_SECRET" yaml:"client_secret,omitempty"`
+	ClusterURL            string `mapstructure:"CLUSTER_URL" yaml:"cluster_url"`
+	ClientID              string `mapstructure:"CLIENT_ID" yaml:"client_id,omitempty"`
+	ClientSecret          string `mapstructure:"CLIENT_SECRET" yaml:"client_secret,omitempty"`
+	SignedUpForNewsletter bool   `yaml:"signed_up_for_newsletter,omitempty"`
 
 	// These are used by the host command
-	BindPort                        int    `mapstructure:"PORT" yaml:"-"`
-	BindHost                        string `mapstructure:"HOST" yaml:"-"`
-	Issuer                          string `mapstructure:"ISSUER" yaml:"-"`
-	SystemSecret                    string `mapstructure:"SYSTEM_SECRET" yaml:"-"`
-	DatabaseURL                     string `mapstructure:"DATABASE_URL" yaml:"-"`
-	DatabasePlugin                  string `mapstructure:"DATABASE_PLUGIN" yaml:"-"`
-	ConsentURL                      string `mapstructure:"CONSENT_URL" yaml:"-"`
-	AllowTLSTermination             string `mapstructure:"HTTPS_ALLOW_TERMINATION_FROM" yaml:"-"`
-	BCryptWorkFactor                int    `mapstructure:"BCRYPT_COST" yaml:"-"`
-	AccessTokenLifespan             string `mapstructure:"ACCESS_TOKEN_LIFESPAN" yaml:"-"`
-	ScopeStrategy                   string `mapstructure:"SCOPE_STRATEGY" yaml:"-"`
-	AuthCodeLifespan                string `mapstructure:"AUTH_CODE_LIFESPAN" yaml:"-"`
-	IDTokenLifespan                 string `mapstructure:"ID_TOKEN_LIFESPAN" yaml:"-"`
-	ChallengeTokenLifespan          string `mapstructure:"CHALLENGE_TOKEN_LIFESPAN" yaml:"-"`
-	CookieSecret                    string `mapstructure:"COOKIE_SECRET" yaml:"-"`
-	LogLevel                        string `mapstructure:"LOG_LEVEL" yaml:"-"`
-	LogFormat                       string `mapstructure:"LOG_FORMAT" yaml:"-"`
-	AccessControlResourcePrefix     string `mapstructure:"RESOURCE_NAME_PREFIX" yaml:"-"`
-	OpenIDDiscoveryClaimsSupported  string `mapstructure:"OIDC_DISCOVERY_CLAIMS_SUPPORTED" yaml:"-"`
-	OpenIDDiscoveryScopesSupported  string `mapstructure:"OIDC_DISCOVERY_SCOPES_SUPPORTED" yaml:"-"`
-	OpenIDDiscoveryUserinfoEndpoint string `mapstructure:"OIDC_DISCOVERY_USERINFO_ENDPOINT" yaml:"-"`
-	ForceHTTP                       bool   `yaml:"-"`
+	BindPort                         int    `mapstructure:"PORT" yaml:"-"`
+	BindHost                         string `mapstructure:"HOST" yaml:"-"`
+	Issuer                           string `mapstructure:"ISSUER" yaml:"-"`
+	SystemSecret                     string `mapstructure:"SYSTEM_SECRET" yaml:"-"`
+	DatabaseURL                      string `mapstructure:"DATABASE_URL" yaml:"-"`
+	DatabasePlugin                   string `mapstructure:"DATABASE_PLUGIN" yaml:"-"`
+	ConsentURL                       string `mapstructure:"CONSENT_URL" yaml:"-"`
+	AllowTLSTermination              string `mapstructure:"HTTPS_ALLOW_TERMINATION_FROM" yaml:"-"`
+	BCryptWorkFactor                 int    `mapstructure:"BCRYPT_COST" yaml:"-"`
+	AccessTokenLifespan              string `mapstructure:"ACCESS_TOKEN_LIFESPAN" yaml:"-"`
+	ScopeStrategy                    string `mapstructure:"SCOPE_STRATEGY" yaml:"-"`
+	AuthCodeLifespan                 string `mapstructure:"AUTH_CODE_LIFESPAN" yaml:"-"`
+	IDTokenLifespan                  string `mapstructure:"ID_TOKEN_LIFESPAN" yaml:"-"`
+	ChallengeTokenLifespan           string `mapstructure:"CHALLENGE_TOKEN_LIFESPAN" yaml:"-"`
+	CookieSecret                     string `mapstructure:"COOKIE_SECRET" yaml:"-"`
+	LogLevel                         string `mapstructure:"LOG_LEVEL" yaml:"-"`
+	LogFormat                        string `mapstructure:"LOG_FORMAT" yaml:"-"`
+	AccessControlResourcePrefix      string `mapstructure:"RESOURCE_NAME_PREFIX" yaml:"-"`
+	OpenIDDiscoveryClaimsSupported   string `mapstructure:"OIDC_DISCOVERY_CLAIMS_SUPPORTED" yaml:"-"`
+	OpenIDDiscoveryScopesSupported   string `mapstructure:"OIDC_DISCOVERY_SCOPES_SUPPORTED" yaml:"-"`
+	OpenIDDiscoveryUserinfoEndpoint  string `mapstructure:"OIDC_DISCOVERY_USERINFO_ENDPOINT" yaml:"-"`
+	SendOAuth2DebugMessagesToClients bool   `mapstructure:"OAUTH2_SHARE_ERROR_DEBUG" yaml:"-"`
+	ForceHTTP                        bool   `yaml:"-"`
 
 	BuildVersion string                  `yaml:"-"`
 	BuildHash    string                  `yaml:"-"`
@@ -84,6 +87,10 @@ type Config struct {
 	oauth2Client *http.Client            `yaml:"-"`
 	context      *Context                `yaml:"-"`
 	systemSecret []byte                  `yaml:"-"`
+}
+
+func (c *Config) GetClusterURLWithoutTailingSlash() string {
+	return strings.TrimRight(c.ClusterURL, "/")
 }
 
 func (c *Config) GetScopeStrategy() fosite.ScopeStrategy {
@@ -154,7 +161,7 @@ func (c *Config) DoesRequestSatisfyTermination(r *http.Request) error {
 		return errors.New("TLS termination is not enabled")
 	}
 
-	if r.URL.Path == "/health" {
+	if r.URL.Path == health.HealthStatusPath {
 		return nil
 	}
 

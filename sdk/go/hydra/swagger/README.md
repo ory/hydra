@@ -56,8 +56,8 @@ Class | Method | HTTP request | Description
 *WardenApi* | [**DeleteGroup**](docs/WardenApi.md#deletegroup) | **Delete** /warden/groups/{id} | Delete a group by id
 *WardenApi* | [**DoesWardenAllowAccessRequest**](docs/WardenApi.md#doeswardenallowaccessrequest) | **Post** /warden/allowed | Check if an access request is valid (without providing an access token)
 *WardenApi* | [**DoesWardenAllowTokenAccessRequest**](docs/WardenApi.md#doeswardenallowtokenaccessrequest) | **Post** /warden/token/allowed | Check if an access request is valid (providing an access token)
-*WardenApi* | [**FindGroupsByMember**](docs/WardenApi.md#findgroupsbymember) | **Get** /warden/groups | Find groups by member
 *WardenApi* | [**GetGroup**](docs/WardenApi.md#getgroup) | **Get** /warden/groups/{id} | Get a group by id
+*WardenApi* | [**ListGroups**](docs/WardenApi.md#listgroups) | **Get** /warden/groups | List groups
 *WardenApi* | [**RemoveMembersFromGroup**](docs/WardenApi.md#removemembersfromgroup) | **Delete** /warden/groups/{id}/members | Remove members from a group
 
 

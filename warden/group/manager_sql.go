@@ -142,9 +142,30 @@ func (m *SQLManager) RemoveGroupMembers(group string, subjects []string) error {
 	return nil
 }
 
-func (m *SQLManager) FindGroupsByMember(subject string) ([]Group, error) {
+func (m *SQLManager) FindGroupsByMember(subject string, limit, offset int) ([]Group, error) {
 	var ids []string
-	if err := m.DB.Select(&ids, m.DB.Rebind("SELECT group_id from hydra_warden_group_member WHERE member = ? GROUP BY group_id"), subject); err == sql.ErrNoRows {
+	if err := m.DB.Select(&ids, m.DB.Rebind("SELECT group_id from hydra_warden_group_member WHERE member = ? GROUP BY group_id ORDER BY group_id LIMIT ? OFFSET ?"), subject, limit, offset); err == sql.ErrNoRows {
+		return nil, errors.WithStack(pkg.ErrNotFound)
+	} else if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	var groups = make([]Group, len(ids))
+	for k, id := range ids {
+		group, err := m.GetGroup(id)
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+
+		groups[k] = *group
+	}
+
+	return groups, nil
+}
+
+func (m *SQLManager) ListGroups(limit, offset int) ([]Group, error) {
+	var ids []string
+	if err := m.DB.Select(&ids, m.DB.Rebind("SELECT group_id from hydra_warden_group_member GROUP BY group_id ORDER BY group_id LIMIT ? OFFSET ?"), limit, offset); err == sql.ErrNoRows {
 		return nil, errors.WithStack(pkg.ErrNotFound)
 	} else if err != nil {
 		return nil, errors.WithStack(err)

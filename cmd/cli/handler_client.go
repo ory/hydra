@@ -39,7 +39,7 @@ func newClientHandler(c *config.Config) *ClientHandler {
 }
 
 func (h *ClientHandler) newClientManager(cmd *cobra.Command) *hydra.OAuth2Api {
-	c := hydra.NewOAuth2ApiWithBasePath(h.Config.ClusterURL)
+	c := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlash())
 	c.Configuration.Transport = h.Config.OAuth2Client(cmd).Transport
 
 	if term, _ := cmd.Flags().GetBool("fake-tls-termination"); term {

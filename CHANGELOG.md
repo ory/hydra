@@ -3,6 +3,12 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [v0.11.4 (2018-01-23)](#v0114-2018-01-23)
+  - [v0.11.3 (2018-01-23)](#v0113-2018-01-23)
+  - [v0.11.2 (2018-01-22)](#v0112-2018-01-22)
+  - [v0.11.1 (2018-01-18)](#v0111-2018-01-18)
+  - [v0.11.0 (2018-01-08)](#v0110-2018-01-08)
+  - [v0.10.10 (2017-12-16)](#v01010-2017-12-16)
   - [v0.10.9 (2017-12-13)](#v0109-2017-12-13)
   - [v0.10.8 (2017-12-12)](#v0108-2017-12-12)
   - [v0.10.7 (2017-12-09)](#v0107-2017-12-09)
@@ -114,6 +120,108 @@
 
 # Change Log
 
+## [v0.11.4](https://github.com/ory/hydra/tree/v0.11.4) (2018-01-23)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.11.3...v0.11.4)
+
+## [v0.11.3](https://github.com/ory/hydra/tree/v0.11.3) (2018-01-23)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.11.2...v0.11.3)
+
+**Implemented enhancements:**
+
+- Improve telemetry module [\#752](https://github.com/ory/hydra/pull/752) ([arekkas](https://github.com/arekkas))
+
+**Closed issues:**
+
+- possible consent session id attack? [\#753](https://github.com/ory/hydra/issues/753)
+
+## [v0.11.2](https://github.com/ory/hydra/tree/v0.11.2) (2018-01-22)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.11.1...v0.11.2)
+
+**Fixed bugs:**
+
+- client: Returns 404 only when policy allows getting a client [\#751](https://github.com/ory/hydra/pull/751) ([arekkas](https://github.com/arekkas))
+
+**Merged pull requests:**
+
+- oauth2: Protects consent flow against session fixation [\#754](https://github.com/ory/hydra/pull/754) ([arekkas](https://github.com/arekkas))
+
+## [v0.11.1](https://github.com/ory/hydra/tree/v0.11.1) (2018-01-18)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.11.0...v0.11.1)
+
+**Implemented enhancements:**
+
+- groups: Add ability to list all groups, not just by member [\#729](https://github.com/ory/hydra/issues/729)
+
+**Fixed bugs:**
+
+-  Resolves issues with pagination [\#750](https://github.com/ory/hydra/pull/750) ([arekkas](https://github.com/arekkas))
+
+**Closed issues:**
+
+- Timezone Issue with new consent flow in 0.10? [\#735](https://github.com/ory/hydra/issues/735)
+- policies: change effect type from string to boolean [\#666](https://github.com/ory/hydra/issues/666)
+- cmd: `hydra connect --url` should work with and without trailing slash [\#650](https://github.com/ory/hydra/issues/650)
+
+**Merged pull requests:**
+
+- add a save way to get the ClusterURL and append to it [\#748](https://github.com/ory/hydra/pull/748) ([zepatrik](https://github.com/zepatrik))
+
+## [v0.11.0](https://github.com/ory/hydra/tree/v0.11.0) (2018-01-08)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.10.10...v0.11.0)
+
+**Implemented enhancements:**
+
+- group: List groups without owner [\#732](https://github.com/ory/hydra/issues/732)
+- Add an alias for offline scope called offline\_access [\#722](https://github.com/ory/hydra/issues/722)
+- oauth2: Print debug message to logs and evaluate transmitting it to clients too [\#715](https://github.com/ory/hydra/issues/715)
+- groups: Add ability to list all groups, not just by member [\#734](https://github.com/ory/hydra/pull/734) ([arekkas](https://github.com/arekkas))
+- sdk: Adds php registry dummy [\#733](https://github.com/ory/hydra/pull/733) ([arekkas](https://github.com/arekkas))
+- oauth2: Prints debug message to logs and evaluate transmitting it to clients too [\#727](https://github.com/ory/hydra/pull/727) ([arekkas](https://github.com/arekkas))
+- vendor: Adds offline\_access scope alias [\#724](https://github.com/ory/hydra/pull/724) ([arekkas](https://github.com/arekkas))
+
+**Fixed bugs:**
+
+- health: Should not require x-forwarded-proto [\#726](https://github.com/ory/hydra/issues/726)
+- health: Stop requiring x-forwarded-proto [\#731](https://github.com/ory/hydra/pull/731) ([arekkas](https://github.com/arekkas))
+
+**Closed issues:**
+
+- variable part in the subject and resource in ladon policy to be filled by request [\#730](https://github.com/ory/hydra/issues/730)
+- Trailing slash redirect strips directories from path [\#723](https://github.com/ory/hydra/issues/723)
+- Resolve broken docker-compose tutorial guide [\#717](https://github.com/ory/hydra/issues/717)
+- Document external dependencies [\#716](https://github.com/ory/hydra/issues/716)
+
+**Merged pull requests:**
+
+- docs: Adds documentation on third-party deps [\#728](https://github.com/ory/hydra/pull/728) ([arekkas](https://github.com/arekkas))
+
+## [v0.10.10](https://github.com/ory/hydra/tree/v0.10.10) (2017-12-16)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.10.9...v0.10.10)
+
+**Implemented enhancements:**
+
+- Make scopes in `hydra token client` command configurable [\#711](https://github.com/ory/hydra/issues/711)
+- cmd: Makes scopes in token command configurable [\#712](https://github.com/ory/hydra/pull/712) ([arekkas](https://github.com/arekkas))
+- cmd: Adds a dedicated command for importing policies [\#709](https://github.com/ory/hydra/pull/709) ([arekkas](https://github.com/arekkas))
+
+**Fixed bugs:**
+
+- Misleading error message when using the SDK [\#686](https://github.com/ory/hydra/issues/686)
+- sdk/go: Resolves incorrect error message [\#713](https://github.com/ory/hydra/pull/713) ([arekkas](https://github.com/arekkas))
+
+**Closed issues:**
+
+- Docker readme, in case it is lost [\#719](https://github.com/ory/hydra/issues/719)
+- Keep track of version and build hash [\#706](https://github.com/ory/hydra/issues/706)
+- Scope is documented as hydra.groups but should by hydra.warden.groups [\#702](https://github.com/ory/hydra/issues/702)
+- Rename `hydra policies create -f` to `hydra policies import` [\#701](https://github.com/ory/hydra/issues/701)
+
+**Merged pull requests:**
+
+- docs: Resolves issue with broken 5-minute tutorial [\#721](https://github.com/ory/hydra/pull/721) ([arekkas](https://github.com/arekkas))
+- Improves userinfo endpoint [\#714](https://github.com/ory/hydra/pull/714) ([arekkas](https://github.com/arekkas))
+- groups: Corrects group scope documentation [\#710](https://github.com/ory/hydra/pull/710) ([arekkas](https://github.com/arekkas))
+
 ## [v0.10.9](https://github.com/ory/hydra/tree/v0.10.9) (2017-12-13)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.10.8...v0.10.9)
 
@@ -127,6 +235,10 @@
 
 ## [v0.10.8](https://github.com/ory/hydra/tree/v0.10.8) (2017-12-12)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.10.7...v0.10.8)
+
+**Implemented enhancements:**
+
+- oauth2: Add token\_endpoint\_auth\_methods\_supported to openid-configuration [\#695](https://github.com/ory/hydra/issues/695)
 
 **Closed issues:**
 
@@ -331,10 +443,6 @@
 
 ## [v0.10.0-alpha.9](https://github.com/ory/hydra/tree/v0.10.0-alpha.9) (2017-10-25)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.9.16...v0.10.0-alpha.9)
-
-**Fixed bugs:**
-
-- Hydra connect fails when the client secret contains "%" [\#631](https://github.com/ory/hydra/issues/631)
 
 **Closed issues:**
 

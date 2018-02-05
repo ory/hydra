@@ -332,59 +332,6 @@
     }
 
     /**
-     * Callback function to receive the result of the findGroupsByMember operation.
-     * @callback module:api/WardenApi~findGroupsByMemberCallback
-     * @param {String} error Error message, if any.
-     * @param {Array.<module:model/Group>} data The data returned by the service call.
-     * @param {String} response The complete HTTP response.
-     */
-
-    /**
-     * Find groups by member
-     * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:groups\&quot;], \&quot;actions\&quot;: [\&quot;list\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
-     * @param {String} member The id of the member to look up.
-     * @param {module:api/WardenApi~findGroupsByMemberCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link Array.<module:model/Group>}
-     */
-    this.findGroupsByMember = function(member, callback) {
-      var postBody = null
-
-      // verify the required parameter 'member' is set
-      if (member === undefined || member === null) {
-        throw new Error(
-          "Missing the required parameter 'member' when calling findGroupsByMember"
-        )
-      }
-
-      var pathParams = {}
-      var queryParams = {
-        member: member
-      }
-      var headerParams = {}
-      var formParams = {}
-
-      var authNames = ['oauth2']
-      var contentTypes = ['application/json']
-      var accepts = ['application/json']
-      var returnType = [Group]
-
-      return this.apiClient.callApi(
-        '/warden/groups',
-        'GET',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
-    }
-
-    /**
      * Callback function to receive the result of the getGroup operation.
      * @callback module:api/WardenApi~getGroupCallback
      * @param {String} error Error message, if any.
@@ -423,6 +370,58 @@
 
       return this.apiClient.callApi(
         '/warden/groups/{id}',
+        'GET',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
+    }
+
+    /**
+     * Callback function to receive the result of the listGroups operation.
+     * @callback module:api/WardenApi~listGroupsCallback
+     * @param {String} error Error message, if any.
+     * @param {Array.<module:model/Group>} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * List groups
+     * The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:warden:groups\&quot;], \&quot;actions\&quot;: [\&quot;list\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * @param {Object} opts Optional parameters
+     * @param {String} opts.member The id of the member to look up.
+     * @param {Number} opts.limit The maximum amount of policies returned.
+     * @param {Number} opts.offset The offset from where to start looking.
+     * @param {module:api/WardenApi~listGroupsCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link Array.<module:model/Group>}
+     */
+    this.listGroups = function(opts, callback) {
+      opts = opts || {}
+      var postBody = null
+
+      var pathParams = {}
+      var queryParams = {
+        member: opts['member'],
+        limit: opts['limit'],
+        offset: opts['offset']
+      }
+      var headerParams = {}
+      var formParams = {}
+
+      var authNames = ['oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = [Group]
+
+      return this.apiClient.callApi(
+        '/warden/groups',
         'GET',
         pathParams,
         queryParams,

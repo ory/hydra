@@ -60,8 +60,8 @@ var connectCmd = &cobra.Command{
 
 		if !c.SignedUpForNewsletter {
 			u := "https://ory.us10.list-manage.com/subscribe/post?u=ffb1a878e4ec6c0ed312a3480&id=f605a41b53"
-			fmt.Println("Enter your email address here to sign up for our newsletter so you never miss important security information and updates")
-			m := input("[enter email here]:")
+			fmt.Println("Never miss any security patches! Enter your email address here to sign up for our newsletter.")
+			m := input("Email Address:")
 
 			v := url.Values{}
 			v.Add("EMAIL", m)

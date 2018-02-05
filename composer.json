@@ -17,6 +17,6 @@
     "ext-mbstring": "*"
   },
   "autoload": {
-    "psr-4": { "Hydra\\SDK\\" : "sdk/php/swagger/" }
+    "psr-4": { "Hydra\\SDK\\" : "sdk/php/swagger/lib/" }
   }
 }

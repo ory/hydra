@@ -58,7 +58,7 @@ var connectCmd = &cobra.Command{
 			c.ClientSecret = u
 		}
 
-		if !c.SignedUpForNewsletter {
+		if skipNewsletter, _ := cmd.Flags().GetBool("skip-newsletter"); !c.SignedUpForNewsletter && !skipNewsletter {
 			u := "https://ory.us10.list-manage.com/subscribe/post?u=ffb1a878e4ec6c0ed312a3480&id=f605a41b53"
 			fmt.Println("Never miss any security patches! Enter your email address here to sign up for our newsletter.")
 			m := input("Email Address:")
@@ -70,19 +70,18 @@ var connectCmd = &cobra.Command{
 			req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 			if m == "" {
-				c.SignedUpForNewsletter = true
 			} else {
 				if err != nil {
-					fmt.Printf("there was some error: %v\n", err)
+					fmt.Printf("There was some error: %s\n", err.Error())
 				} else {
 					resp, err := http.DefaultClient.Do(req)
 
 					if err != nil {
-						fmt.Printf("there was some error: %v\n", err)
+						fmt.Printf("There was some error: %s\n", err.Error())
 					} else {
 						defer resp.Body.Close()
 
-						fmt.Println("To complete the subscription process, please click the link in the email we just sent you.")
+						fmt.Println("To complete the subscription process, please click the link in the email you just received.")
 						c.SignedUpForNewsletter = true
 					}
 				}
@@ -111,4 +110,5 @@ func init() {
 	connectCmd.Flags().String("url", "", "The cluster URL")
 	connectCmd.Flags().String("id", "", "The client id")
 	connectCmd.Flags().String("secret", "", "The client secret")
+	connectCmd.Flags().Bool("skip-newsletter", false, "Skip the newsletter sign up question")
 }

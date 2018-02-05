@@ -15,13 +15,13 @@
 package server
 
 import (
+	"net/url"
 	"os"
 	"strings"
 
-	"net/url"
-
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
+	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/ladon"
 )
@@ -83,13 +83,33 @@ func (h *Handler) createRootIfNewInstall(c *config.Config) {
 		c.GetLogger().Warn("WARNING: YOU MUST delete this client once in production, as credentials may have been leaked in your logfiles.")
 	}
 
-	err = ctx.LadonManager.Create(&ladon.DefaultPolicy{
-		Description: "This is a policy created by hydra and issued to the first client. It grants all of hydra's administrative privileges to the client and enables the client_credentials response type.",
+	pkg.Must(ctx.LadonManager.Create(&ladon.DefaultPolicy{
+		Description: "This is a policy created by ORY Hydra and issued to the first client. It grants all of hydra's administrative privileges to the client and enables the client_credentials response type.",
 		Subjects:    []string{root.GetID()},
 		Effect:      ladon.AllowAccess,
-		Resources:   []string{"rn:hydra:<.*>"},
+		Resources:   []string{prefixResource(c.AccessControlResourcePrefix, "<.*>")},
 		Actions:     []string{"<.*>"},
 		ID:          "default-admin-policy",
-	})
-	pkg.Must(err, "Could not create admin policy because %s", err)
+	}), "Could not create admin policy because %s", err)
+
+	pkg.Must(ctx.LadonManager.Create(&ladon.DefaultPolicy{
+		Description: "This is a policy created by ORY Hydra which allows all users, including anonymous ones, access to the /.well-known/jwks.json endpoint. This endpoint is used for verifying OpenID Connect ID Tokens.",
+		Subjects:    []string{"<.*>"},
+		Effect:      ladon.AllowAccess,
+		Resources:   []string{prefixResource(c.AccessControlResourcePrefix, "keys:"+oauth2.OpenIDConnectKeyName+":public:<.*>")},
+		Actions:     []string{"get"},
+		ID:          "default-oidc-id-token-public-policy",
+	}), "Could not create wellknown JWKS policy because %s", err)
+}
+
+func prefixResource(prefix, resource string) string {
+	if prefix == "" {
+		prefix = "rn:hydra"
+	}
+
+	if prefix[len(prefix)-1] == ':' {
+		prefix = prefix[:len(prefix)-1]
+	}
+
+	return prefix + ":" + resource
 }

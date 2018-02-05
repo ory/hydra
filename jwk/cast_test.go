@@ -21,19 +21,19 @@ import (
 )
 
 func TestMustRSAPrivate(t *testing.T) {
-	if testing.Short() {
-		t.SkipNow()
-	}
+	//if testing.Short() {
+	//	t.SkipNow()
+	//}
 
-	keys, err := new(RS256Generator).Generate("")
+	keys, err := new(RS256Generator).Generate("foo")
 	assert.Nil(t, err)
 
-	_, err = ToRSAPrivate(&keys.Key("private")[0])
+	_, err = ToRSAPrivate(&keys.Key("private:foo")[0])
 	assert.Nil(t, err)
 
-	MustRSAPrivate(&keys.Key("private")[0])
+	MustRSAPrivate(&keys.Key("private:foo")[0])
 
-	_, err = ToRSAPublic(&keys.Key("public")[0])
+	_, err = ToRSAPublic(&keys.Key("public:foo")[0])
 	assert.Nil(t, err)
-	MustRSAPublic(&keys.Key("public")[0])
+	MustRSAPublic(&keys.Key("public:foo")[0])
 }

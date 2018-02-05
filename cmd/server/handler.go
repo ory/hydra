@@ -94,12 +94,6 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 			c.ClusterURL = fmt.Sprintf("%s://%s:%d", proto, host, c.BindPort)
 		}
 
-		if ok, _ := cmd.Flags().GetBool("dangerous-auto-logon"); ok {
-			logger.Warnln("Do not use flag --dangerous-auto-logon in production.")
-			err := c.Persist()
-			pkg.Must(err, "Could not write configuration file: %s", err)
-		}
-
 		n := negroni.New()
 
 		if ok, _ := cmd.Flags().GetBool("disable-telemetry"); !ok && os.Getenv("DISABLE_TELEMETRY") != "1" {
@@ -121,6 +115,12 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 				Certificates: []tls.Certificate{getOrCreateTLSCertificate(cmd, c)},
 			},
 		})
+
+		if ok, _ := cmd.Flags().GetBool("dangerous-auto-logon"); ok {
+			logger.Warnln("Do not use flag --dangerous-auto-logon in production.")
+			err := c.Persist()
+			pkg.Must(err, "Could not write configuration file: %s", err)
+		}
 
 		err := graceful.Graceful(func() error {
 			var err error

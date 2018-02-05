@@ -8,7 +8,7 @@
     "api"
   ],
   "homepage": "https://github.com/ory/hydra",
-  "license": "Apache License 2.0",
+  "license": "Apache-2.0",
   "authors": [],
   "require": {
     "php": ">=5.4",

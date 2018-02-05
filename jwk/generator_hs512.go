@@ -19,6 +19,7 @@ import (
 	"crypto/x509"
 	"io"
 
+	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/square/go-jose"
 )
@@ -31,6 +32,10 @@ func (g *HS512Generator) Generate(id string) (*jose.JSONWebKeySet, error) {
 	_, err := io.ReadFull(rand.Reader, key[:])
 	if err != nil {
 		return nil, errors.WithStack(err)
+	}
+
+	if id == "" {
+		id = uuid.New()
 	}
 
 	var sliceKey = key[:]

@@ -33,9 +33,9 @@ func RandomBytes(n int) ([]byte, error) {
 	return bytes, nil
 }
 
-func TestHelperManagerKey(m Manager, keys *jose.JSONWebKeySet) func(t *testing.T) {
-	pub := keys.Key("public")
-	priv := keys.Key("private")
+func TestHelperManagerKey(m Manager, keys *jose.JSONWebKeySet, suffix string) func(t *testing.T) {
+	pub := keys.Key("public:" + suffix)
+	priv := keys.Key("private:" + suffix)
 
 	return func(t *testing.T) {
 		t.Parallel()
@@ -45,30 +45,30 @@ func TestHelperManagerKey(m Manager, keys *jose.JSONWebKeySet) func(t *testing.T
 		err = m.AddKey("faz", First(priv))
 		assert.Nil(t, err)
 
-		got, err := m.GetKey("faz", "private")
+		got, err := m.GetKey("faz", "private:"+suffix)
 		assert.Nil(t, err)
 		assert.Equal(t, priv, got.Keys)
 
 		err = m.AddKey("faz", First(pub))
 		assert.Nil(t, err)
 
-		got, err = m.GetKey("faz", "private")
+		got, err = m.GetKey("faz", "private:"+suffix)
 		assert.Nil(t, err)
 		assert.Equal(t, priv, got.Keys)
 
-		got, err = m.GetKey("faz", "public")
+		got, err = m.GetKey("faz", "public:"+suffix)
 		assert.Nil(t, err)
 		assert.Equal(t, pub, got.Keys)
 
-		err = m.DeleteKey("faz", "public")
+		err = m.DeleteKey("faz", "public:"+suffix)
 		assert.Nil(t, err)
 
-		_, err = m.GetKey("faz", "public")
+		_, err = m.GetKey("faz", "public:"+suffix)
 		assert.NotNil(t, err)
 	}
 }
 
-func TestHelperManagerKeySet(m Manager, keys *jose.JSONWebKeySet) func(t *testing.T) {
+func TestHelperManagerKeySet(m Manager, keys *jose.JSONWebKeySet, suffix string) func(t *testing.T) {
 	return func(t *testing.T) {
 		t.Parallel()
 		_, err := m.GetKeySet("foo")
@@ -79,8 +79,8 @@ func TestHelperManagerKeySet(m Manager, keys *jose.JSONWebKeySet) func(t *testin
 
 		got, err := m.GetKeySet("bar")
 		assert.Nil(t, err)
-		assert.Equal(t, keys.Key("public"), got.Key("public"))
-		assert.Equal(t, keys.Key("private"), got.Key("private"))
+		assert.Equal(t, keys.Key("public:"+suffix), got.Key("public:"+suffix))
+		assert.Equal(t, keys.Key("private:"+suffix), got.Key("private:"+suffix))
 
 		err = m.DeleteKeySet("bar")
 		assert.Nil(t, err)

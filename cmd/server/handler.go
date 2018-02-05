@@ -162,7 +162,7 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 	injectConsentManager(c)
 	clientsManager := newClientManager(c)
 	injectFositeStore(c, clientsManager)
-	oauth2Provider := newOAuth2Provider(c, ctx.KeyManager)
+	oauth2Provider, idTokenKeyID := newOAuth2Provider(c)
 
 	// set up warden
 	ctx.Warden = &warden.LocalWarden{
@@ -181,7 +181,7 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 	h.Keys = newJWKHandler(c, router)
 	h.Policy = newPolicyHandler(c, router)
 	h.Consent = newConsentHanlder(c, router)
-	h.OAuth2 = newOAuth2Handler(c, router, ctx.ConsentManager, oauth2Provider)
+	h.OAuth2 = newOAuth2Handler(c, router, ctx.ConsentManager, oauth2Provider, idTokenKeyID)
 	h.Warden = warden.NewHandler(c, router)
 	h.Groups = &group.Handler{
 		H:              herodot.NewJSONWriter(c.GetLogger()),

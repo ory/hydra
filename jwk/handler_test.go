@@ -46,13 +46,13 @@ func init() {
 		}, &ladon.DefaultPolicy{
 			ID:        "1",
 			Subjects:  []string{"<.*>"},
-			Resources: []string{"rn:hydra:keys:<[^:]+>:public"},
+			Resources: []string{"rn:hydra:keys:<[^:]+>:public:test-id"},
 			Actions:   []string{"get"},
 			Effect:    ladon.AllowAccess,
 		},
 	)
 	router := httprouter.New()
-	IDKS, _ = testGenerator.Generate("")
+	IDKS, _ = testGenerator.Generate("test-id")
 
 	h := Handler{
 		Manager: &MemoryManager{},
@@ -75,7 +75,7 @@ func TestHandlerWellKnown(t *testing.T) {
 	err = json.NewDecoder(res.Body).Decode(&known)
 	require.NoError(t, err, "problem in decoding response")
 
-	resp := known.Key("public")
+	resp := known.Key("public:test-id")
 	require.NotNil(t, resp, "Could not find key public")
-	assert.Equal(t, resp, IDKS.Key("public"))
+	assert.Equal(t, resp, IDKS.Key("public:test-id"))
 }

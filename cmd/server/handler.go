@@ -62,6 +62,8 @@ func parseCorsOptions() cors.Options {
 
 func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
+		fmt.Println(banner)
+
 		router := httprouter.New()
 		logger := c.GetLogger()
 		serverHandler := &Handler{

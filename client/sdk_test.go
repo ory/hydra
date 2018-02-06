@@ -71,7 +71,7 @@ func TestClientSDK(t *testing.T) {
 	c := hydra.NewOAuth2ApiWithBasePath(server.URL)
 	c.Configuration.Transport = httpClient.Transport
 
-	t.Run("foo", func(t *testing.T) {
+	t.Run("case=client is created and updated", func(t *testing.T) {
 		createClient := createTestClient("")
 
 		result, _, err := c.CreateOAuth2Client(createClient)
@@ -105,5 +105,19 @@ func TestClientSDK(t *testing.T) {
 		_, response, err := c.GetOAuth2Client(updateClient.Id)
 		require.NoError(t, err)
 		assert.Equal(t, http.StatusNotFound, response.StatusCode)
+	})
+
+	t.Run("case=public client is transmitted without secret", func(t *testing.T) {
+		result, _, err := c.CreateOAuth2Client(hydra.OAuth2Client{
+			Public: true,
+		})
+
+		require.NoError(t, err)
+		assert.Equal(t, "", result.ClientSecret)
+
+		result, _, err = c.CreateOAuth2Client(createTestClient(""))
+
+		require.NoError(t, err)
+		assert.NotEqual(t, "", result.ClientSecret)
 	})
 }

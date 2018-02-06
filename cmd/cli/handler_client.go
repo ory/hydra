@@ -106,7 +106,12 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	checkResponse(response, err, http.StatusCreated)
 
 	fmt.Printf("OAuth2 client id: %s\n", result.Id)
-	fmt.Printf("OAuth2 client secret: %s\n", result.ClientSecret)
+
+	if result.ClientSecret == "" {
+		fmt.Println("This client has no secret.")
+	} else {
+		fmt.Printf("OAuth2 client secret: %s\n", result.ClientSecret)
+	}
 }
 
 func (h *ClientHandler) DeleteClient(cmd *cobra.Command, args []string) {

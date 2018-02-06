@@ -139,6 +139,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 		c.Secret = string(secret)
 	} else if len(c.Secret) < 6 {
 		h.H.WriteError(w, r, errors.New("The client secret must be at least 6 characters long"))
+		return
 	}
 
 	secret := c.Secret
@@ -147,7 +148,12 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 		return
 	}
 
-	c.Secret = secret
+	c.Secret = ""
+
+	if !c.Public {
+		c.Secret = secret
+	}
+
 	h.H.WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 

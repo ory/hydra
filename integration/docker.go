@@ -17,10 +17,9 @@ package integration
 import (
 	"fmt"
 	"log"
+	"os"
 	"sync"
 	"time"
-
-	"os"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
@@ -32,6 +31,13 @@ var resources []*dockertest.Resource
 var pool *dockertest.Pool
 
 func BootParallel(fs []func()) {
+	if os.Getenv("TEST_DATABASE_POSTGRESQL") != "" || os.Getenv("TEST_DATABASE_MYSQL") != "" {
+		for _, f := range fs {
+			f()
+		}
+		return
+	}
+
 	wg := sync.WaitGroup{}
 
 	wg.Add(len(fs))

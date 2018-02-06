@@ -22,12 +22,14 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/firewall"
+	"github.com/ory/hydra/pkg"
 	"github.com/sirupsen/logrus"
 )
 
 type Handler struct {
 	OAuth2  fosite.OAuth2Provider
 	Consent ConsentStrategy
+	Storage pkg.FositeStorer
 
 	H herodot.Writer
 

@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
@@ -36,20 +37,23 @@ var clientManager = &client.MemoryManager{
 
 func init() {
 	clientManagers["memory"] = &FositeMemoryStore{
-		AuthorizeCodes: make(map[string]fosite.Requester),
-		IDSessions:     make(map[string]fosite.Requester),
-		AccessTokens:   make(map[string]fosite.Requester),
-		RefreshTokens:  make(map[string]fosite.Requester),
+		AuthorizeCodes:      make(map[string]fosite.Requester),
+		IDSessions:          make(map[string]fosite.Requester),
+		AccessTokens:        make(map[string]fosite.Requester),
+		RefreshTokens:       make(map[string]fosite.Requester),
+		AccessTokenLifespan: time.Hour,
 	}
 }
 
 func TestMain(m *testing.M) {
 	flag.Parse()
 	if !testing.Short() {
-		connectToPG()
-		connectToMySQL()
-		connectToPGConsent()
-		connectToMySQLConsent()
+		integration.BootParallel([]func(){
+			connectToPG,
+			connectToMySQL,
+			connectToPGConsent,
+			connectToMySQLConsent,
+		})
 	}
 
 	s := m.Run()
@@ -59,7 +63,7 @@ func TestMain(m *testing.M) {
 
 func connectToPG() {
 	var db = integration.ConnectToPostgres()
-	s := &FositeSQLStore{DB: db, Manager: clientManager, L: logrus.New()}
+	s := &FositeSQLStore{DB: db, Manager: clientManager, L: logrus.New(), AccessTokenLifespan: time.Hour}
 	if _, err := s.CreateSchemas(); err != nil {
 		logrus.Fatalf("Could not create postgres schema: %v", err)
 	}
@@ -69,7 +73,7 @@ func connectToPG() {
 
 func connectToMySQL() {
 	var db = integration.ConnectToMySQL()
-	s := &FositeSQLStore{DB: db, Manager: clientManager, L: logrus.New()}
+	s := &FositeSQLStore{DB: db, Manager: clientManager, L: logrus.New(), AccessTokenLifespan: time.Hour}
 	if _, err := s.CreateSchemas(); err != nil {
 		logrus.Fatalf("Could not create postgres schema: %v", err)
 	}
@@ -109,5 +113,12 @@ func TestRevokeRefreshToken(t *testing.T) {
 	t.Parallel()
 	for k, m := range clientManagers {
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperRevokeRefreshToken(m))
+	}
+}
+
+func TestFlushAccessTokens(t *testing.T) {
+	t.Parallel()
+	for k, m := range clientManagers {
+		t.Run(fmt.Sprintf("case=%s", k), TestHelperFlushTokens(m, time.Hour))
 	}
 }

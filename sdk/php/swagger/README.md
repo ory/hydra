@@ -57,15 +57,13 @@ Please follow the [installation procedure](#installation--usage) and then run th
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-// Configure OAuth2 access token for authorization: oauth2
-Hydra\SDK\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
-
 $api_instance = new Hydra\SDK\Api\HealthApi();
 
 try {
-    $api_instance->getInstanceMetrics();
+    $result = $api_instance->getInstanceStatus();
+    print_r($result);
 } catch (Exception $e) {
-    echo 'Exception when calling HealthApi->getInstanceMetrics: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling HealthApi->getInstanceStatus: ', $e->getMessage(), PHP_EOL;
 }
 
 ?>
@@ -77,7 +75,6 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*HealthApi* | [**getInstanceMetrics**](docs/Api/HealthApi.md#getinstancemetrics) | **GET** /health/metrics | Show instance metrics (experimental)
 *HealthApi* | [**getInstanceStatus**](docs/Api/HealthApi.md#getinstancestatus) | **GET** /health/status | Check health status of this instance
 *JsonWebKeyApi* | [**createJsonWebKeySet**](docs/Api/JsonWebKeyApi.md#createjsonwebkeyset) | **POST** /keys/{set} | Generate a new JSON Web Key
 *JsonWebKeyApi* | [**deleteJsonWebKey**](docs/Api/JsonWebKeyApi.md#deletejsonwebkey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
@@ -89,6 +86,7 @@ Class | Method | HTTP request | Description
 *OAuth2Api* | [**acceptOAuth2ConsentRequest**](docs/Api/OAuth2Api.md#acceptoauth2consentrequest) | **PATCH** /oauth2/consent/requests/{id}/accept | Accept a consent request
 *OAuth2Api* | [**createOAuth2Client**](docs/Api/OAuth2Api.md#createoauth2client) | **POST** /clients | Create an OAuth 2.0 client
 *OAuth2Api* | [**deleteOAuth2Client**](docs/Api/OAuth2Api.md#deleteoauth2client) | **DELETE** /clients/{id} | Deletes an OAuth 2.0 Client
+*OAuth2Api* | [**flushInactiveOAuth2Tokens**](docs/Api/OAuth2Api.md#flushinactiveoauth2tokens) | **POST** /oauth2/flush | Flush Expired OAuth2 Access Tokens
 *OAuth2Api* | [**getOAuth2Client**](docs/Api/OAuth2Api.md#getoauth2client) | **GET** /clients/{id} | Retrieve an OAuth 2.0 Client.
 *OAuth2Api* | [**getOAuth2ConsentRequest**](docs/Api/OAuth2Api.md#getoauth2consentrequest) | **GET** /oauth2/consent/requests/{id} | Receive consent request information
 *OAuth2Api* | [**getWellKnown**](docs/Api/OAuth2Api.md#getwellknown) | **GET** /.well-known/openid-configuration | Server well known configuration
@@ -124,6 +122,7 @@ Class | Method | HTTP request | Description
  - [ConsentRequestRejection](docs/Model/ConsentRequestRejection.md)
  - [Context](docs/Model/Context.md)
  - [Firewall](docs/Model/Firewall.md)
+ - [FlushInactiveOAuth2TokensRequest](docs/Model/FlushInactiveOAuth2TokensRequest.md)
  - [Group](docs/Model/Group.md)
  - [GroupMembers](docs/Model/GroupMembers.md)
  - [Handler](docs/Model/Handler.md)
@@ -146,6 +145,7 @@ Class | Method | HTTP request | Description
  - [SwaggerCreatePolicyParameters](docs/Model/SwaggerCreatePolicyParameters.md)
  - [SwaggerDoesWardenAllowAccessRequestParameters](docs/Model/SwaggerDoesWardenAllowAccessRequestParameters.md)
  - [SwaggerDoesWardenAllowTokenAccessRequestParameters](docs/Model/SwaggerDoesWardenAllowTokenAccessRequestParameters.md)
+ - [SwaggerFlushInactiveAccessTokens](docs/Model/SwaggerFlushInactiveAccessTokens.md)
  - [SwaggerGetPolicyParameters](docs/Model/SwaggerGetPolicyParameters.md)
  - [SwaggerJsonWebKeyQuery](docs/Model/SwaggerJsonWebKeyQuery.md)
  - [SwaggerJwkCreateSet](docs/Model/SwaggerJwkCreateSet.md)
@@ -191,7 +191,6 @@ Class | Method | HTTP request | Description
 - **Scopes**: 
  - **hydra.clients**: A scope required to manage OAuth 2.0 Clients
  - **hydra.consent**: A scope required to fetch and modify consent requests
- - **hydra.health**: A scope required to get health information
  - **hydra.keys.create**: A scope required to create JSON Web Keys
  - **hydra.keys.delete**: A scope required to delete JSON Web Keys
  - **hydra.keys.get**: A scope required to fetch JSON Web Keys

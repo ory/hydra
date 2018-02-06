@@ -82,6 +82,7 @@ func TestExecute(t *testing.T) {
 		{args: []string{"help", "migrate", "sql"}},
 		{args: []string{"help", "migrate", "ladon", "0.6.0"}},
 		{args: []string{"version"}},
+		{args: []string{"token", "flush"}},
 		{args: []string{"token", "user", "--no-open"}, wait: func() bool {
 			time.Sleep(time.Millisecond * 10)
 			return false

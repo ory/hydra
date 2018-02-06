@@ -15,17 +15,20 @@
 package cmd
 
 import (
+	"time"
+
 	"github.com/spf13/cobra"
 )
 
-// tokenCmd represents the token command
-var tokenCmd = &cobra.Command{
-	Use:   "token",
-	Short: "Issue and Manage OAuth2 tokens",
+// flushCmd represents the flush command
+var tokenFlushCmd = &cobra.Command{
+	Use:   "flush",
+	Short: "Removes inactive access tokens from the database",
+	Run:   cmdHandler.Token.FlushTokens,
 }
 
 func init() {
-	RootCmd.AddCommand(tokenCmd)
-	//tokenCmd.PersistentFlags().Bool("dry", false, "do not execute the command but show the corresponding curl command instead")
-	tokenCmd.PersistentFlags().Bool("fake-tls-termination", false, `fake tls termination by adding "X-Forwarded-Proto: https"" to http headers`)
+	tokenCmd.AddCommand(tokenFlushCmd)
+
+	tokenFlushCmd.Flags().Duration("min-age", time.Duration(0), "Skip removing tokens which do not satisfy the minimum age (1s, 1m, 1h, 1d)")
 }

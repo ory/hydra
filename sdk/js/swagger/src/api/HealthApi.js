@@ -59,48 +59,6 @@
     this.apiClient = apiClient || ApiClient.instance
 
     /**
-     * Callback function to receive the result of the getInstanceMetrics operation.
-     * @callback module:api/HealthApi~getInstanceMetricsCallback
-     * @param {String} error Error message, if any.
-     * @param data This operation does not return a value.
-     * @param {String} response The complete HTTP response.
-     */
-
-    /**
-     * Show instance metrics (experimental)
-     * This endpoint returns an instance&#39;s metrics, such as average response time, status code distribution, hits per second and so on. The return values are currently not documented as this endpoint is still experimental.   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:health:stats\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
-     * @param {module:api/HealthApi~getInstanceMetricsCallback} callback The callback function, accepting three arguments: error, data, response
-     */
-    this.getInstanceMetrics = function(callback) {
-      var postBody = null
-
-      var pathParams = {}
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
-
-      var authNames = ['oauth2']
-      var contentTypes = ['application/json']
-      var accepts = ['application/json']
-      var returnType = null
-
-      return this.apiClient.callApi(
-        '/health/metrics',
-        'GET',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
-    }
-
-    /**
      * Callback function to receive the result of the getInstanceStatus operation.
      * @callback module:api/HealthApi~getInstanceStatusCallback
      * @param {String} error Error message, if any.

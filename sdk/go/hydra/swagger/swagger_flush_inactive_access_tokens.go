@@ -10,12 +10,6 @@
 
 package swagger
 
-type Handler struct {
-	H Writer `json:"H,omitempty"`
-
-	Manager Manager `json:"Manager,omitempty"`
-
-	ResourcePrefix string `json:"ResourcePrefix,omitempty"`
-
-	W Firewall `json:"W,omitempty"`
+type SwaggerFlushInactiveAccessTokens struct {
+	Body FlushInactiveOAuth2TokensRequest `json:"Body,omitempty"`
 }

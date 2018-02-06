@@ -96,22 +96,16 @@ Please follow the [installation](#installation) instruction and execute the foll
 ```javascript
 var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
 
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
-
-// Configure OAuth2 access token for authorization: oauth2
-var oauth2 = defaultClient.authentications['oauth2'];
-oauth2.accessToken = "YOUR ACCESS TOKEN"
-
 var api = new HydraOAuth2OpenIdConnectServer.HealthApi()
 
 var callback = function(error, data, response) {
   if (error) {
     console.error(error);
   } else {
-    console.log('API called successfully.');
+    console.log('API called successfully. Returned data: ' + data);
   }
 };
-api.getInstanceMetrics(callback);
+api.getInstanceStatus(callback);
 
 ```
 
@@ -121,7 +115,6 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*HydraOAuth2OpenIdConnectServer.HealthApi* | [**getInstanceMetrics**](docs/HealthApi.md#getInstanceMetrics) | **GET** /health/metrics | Show instance metrics (experimental)
 *HydraOAuth2OpenIdConnectServer.HealthApi* | [**getInstanceStatus**](docs/HealthApi.md#getInstanceStatus) | **GET** /health/status | Check health status of this instance
 *HydraOAuth2OpenIdConnectServer.JsonWebKeyApi* | [**createJsonWebKeySet**](docs/JsonWebKeyApi.md#createJsonWebKeySet) | **POST** /keys/{set} | Generate a new JSON Web Key
 *HydraOAuth2OpenIdConnectServer.JsonWebKeyApi* | [**deleteJsonWebKey**](docs/JsonWebKeyApi.md#deleteJsonWebKey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
@@ -133,6 +126,7 @@ Class | Method | HTTP request | Description
 *HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**acceptOAuth2ConsentRequest**](docs/OAuth2Api.md#acceptOAuth2ConsentRequest) | **PATCH** /oauth2/consent/requests/{id}/accept | Accept a consent request
 *HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**createOAuth2Client**](docs/OAuth2Api.md#createOAuth2Client) | **POST** /clients | Create an OAuth 2.0 client
 *HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**deleteOAuth2Client**](docs/OAuth2Api.md#deleteOAuth2Client) | **DELETE** /clients/{id} | Deletes an OAuth 2.0 Client
+*HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**flushInactiveOAuth2Tokens**](docs/OAuth2Api.md#flushInactiveOAuth2Tokens) | **POST** /oauth2/flush | Flush Expired OAuth2 Access Tokens
 *HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**getOAuth2Client**](docs/OAuth2Api.md#getOAuth2Client) | **GET** /clients/{id} | Retrieve an OAuth 2.0 Client.
 *HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**getOAuth2ConsentRequest**](docs/OAuth2Api.md#getOAuth2ConsentRequest) | **GET** /oauth2/consent/requests/{id} | Receive consent request information
 *HydraOAuth2OpenIdConnectServer.OAuth2Api* | [**getWellKnown**](docs/OAuth2Api.md#getWellKnown) | **GET** /.well-known/openid-configuration | Server well known configuration
@@ -168,6 +162,7 @@ Class | Method | HTTP request | Description
  - [HydraOAuth2OpenIdConnectServer.ConsentRequestRejection](docs/ConsentRequestRejection.md)
  - [HydraOAuth2OpenIdConnectServer.Context](docs/Context.md)
  - [HydraOAuth2OpenIdConnectServer.Firewall](docs/Firewall.md)
+ - [HydraOAuth2OpenIdConnectServer.FlushInactiveOAuth2TokensRequest](docs/FlushInactiveOAuth2TokensRequest.md)
  - [HydraOAuth2OpenIdConnectServer.Group](docs/Group.md)
  - [HydraOAuth2OpenIdConnectServer.GroupMembers](docs/GroupMembers.md)
  - [HydraOAuth2OpenIdConnectServer.Handler](docs/Handler.md)
@@ -190,6 +185,7 @@ Class | Method | HTTP request | Description
  - [HydraOAuth2OpenIdConnectServer.SwaggerCreatePolicyParameters](docs/SwaggerCreatePolicyParameters.md)
  - [HydraOAuth2OpenIdConnectServer.SwaggerDoesWardenAllowAccessRequestParameters](docs/SwaggerDoesWardenAllowAccessRequestParameters.md)
  - [HydraOAuth2OpenIdConnectServer.SwaggerDoesWardenAllowTokenAccessRequestParameters](docs/SwaggerDoesWardenAllowTokenAccessRequestParameters.md)
+ - [HydraOAuth2OpenIdConnectServer.SwaggerFlushInactiveAccessTokens](docs/SwaggerFlushInactiveAccessTokens.md)
  - [HydraOAuth2OpenIdConnectServer.SwaggerGetPolicyParameters](docs/SwaggerGetPolicyParameters.md)
  - [HydraOAuth2OpenIdConnectServer.SwaggerJsonWebKeyQuery](docs/SwaggerJsonWebKeyQuery.md)
  - [HydraOAuth2OpenIdConnectServer.SwaggerJwkCreateSet](docs/SwaggerJwkCreateSet.md)
@@ -235,7 +231,6 @@ Class | Method | HTTP request | Description
 - **Scopes**: 
   - hydra.clients: A scope required to manage OAuth 2.0 Clients
   - hydra.consent: A scope required to fetch and modify consent requests
-  - hydra.health: A scope required to get health information
   - hydra.keys.create: A scope required to create JSON Web Keys
   - hydra.keys.delete: A scope required to delete JSON Web Keys
   - hydra.keys.get: A scope required to fetch JSON Web Keys

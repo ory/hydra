@@ -4,35 +4,8 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**GetInstanceMetrics**](HealthApi.md#GetInstanceMetrics) | **Get** /health/metrics | Show instance metrics (experimental)
 [**GetInstanceStatus**](HealthApi.md#GetInstanceStatus) | **Get** /health/status | Check health status of this instance
 
-
-# **GetInstanceMetrics**
-> GetInstanceMetrics()
-
-Show instance metrics (experimental)
-
-This endpoint returns an instance's metrics, such as average response time, status code distribution, hits per second and so on. The return values are currently not documented as this endpoint is still experimental.   The subject making the request needs to be assigned to a policy containing:  ``` { \"resources\": [\"rn:hydra:health:stats\"], \"actions\": [\"get\"], \"effect\": \"allow\" } ```
-
-
-### Parameters
-This endpoint does not need any parameter.
-
-### Return type
-
-void (empty response body)
-
-### Authorization
-
-[oauth2](../README.md#oauth2)
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **GetInstanceStatus**
 > InlineResponse200 GetInstanceStatus()

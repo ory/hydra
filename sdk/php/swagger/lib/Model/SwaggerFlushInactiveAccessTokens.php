@@ -1,6 +1,6 @@
 <?php
 /**
- * Handler
+ * SwaggerFlushInactiveAccessTokens
  *
  * PHP version 5
  *
@@ -32,14 +32,14 @@ namespace Hydra\SDK\Model;
 use \ArrayAccess;
 
 /**
- * Handler Class Doc Comment
+ * SwaggerFlushInactiveAccessTokens Class Doc Comment
  *
  * @category    Class
  * @package     Hydra\SDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
  */
-class Handler implements ArrayAccess
+class SwaggerFlushInactiveAccessTokens implements ArrayAccess
 {
     const DISCRIMINATOR = null;
 
@@ -47,17 +47,14 @@ class Handler implements ArrayAccess
       * The original name of the model.
       * @var string
       */
-    protected static $swaggerModelName = 'Handler';
+    protected static $swaggerModelName = 'swaggerFlushInactiveAccessTokens';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'h' => '\Hydra\SDK\Model\Writer',
-        'manager' => '\Hydra\SDK\Model\Manager',
-        'resource_prefix' => 'string',
-        'w' => '\Hydra\SDK\Model\Firewall'
+        'body' => '\Hydra\SDK\Model\FlushInactiveOAuth2TokensRequest'
     ];
 
     /**
@@ -65,10 +62,7 @@ class Handler implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerFormats = [
-        'h' => null,
-        'manager' => null,
-        'resource_prefix' => null,
-        'w' => null
+        'body' => null
     ];
 
     public static function swaggerTypes()
@@ -86,10 +80,7 @@ class Handler implements ArrayAccess
      * @var string[]
      */
     protected static $attributeMap = [
-        'h' => 'H',
-        'manager' => 'Manager',
-        'resource_prefix' => 'ResourcePrefix',
-        'w' => 'W'
+        'body' => 'Body'
     ];
 
 
@@ -98,10 +89,7 @@ class Handler implements ArrayAccess
      * @var string[]
      */
     protected static $setters = [
-        'h' => 'setH',
-        'manager' => 'setManager',
-        'resource_prefix' => 'setResourcePrefix',
-        'w' => 'setW'
+        'body' => 'setBody'
     ];
 
 
@@ -110,10 +98,7 @@ class Handler implements ArrayAccess
      * @var string[]
      */
     protected static $getters = [
-        'h' => 'getH',
-        'manager' => 'getManager',
-        'resource_prefix' => 'getResourcePrefix',
-        'w' => 'getW'
+        'body' => 'getBody'
     ];
 
     public static function attributeMap()
@@ -147,10 +132,7 @@ class Handler implements ArrayAccess
      */
     public function __construct(array $data = null)
     {
-        $this->container['h'] = isset($data['h']) ? $data['h'] : null;
-        $this->container['manager'] = isset($data['manager']) ? $data['manager'] : null;
-        $this->container['resource_prefix'] = isset($data['resource_prefix']) ? $data['resource_prefix'] : null;
-        $this->container['w'] = isset($data['w']) ? $data['w'] : null;
+        $this->container['body'] = isset($data['body']) ? $data['body'] : null;
     }
 
     /**
@@ -179,85 +161,22 @@ class Handler implements ArrayAccess
 
 
     /**
-     * Gets h
-     * @return \Hydra\SDK\Model\Writer
+     * Gets body
+     * @return \Hydra\SDK\Model\FlushInactiveOAuth2TokensRequest
      */
-    public function getH()
+    public function getBody()
     {
-        return $this->container['h'];
+        return $this->container['body'];
     }
 
     /**
-     * Sets h
-     * @param \Hydra\SDK\Model\Writer $h
+     * Sets body
+     * @param \Hydra\SDK\Model\FlushInactiveOAuth2TokensRequest $body
      * @return $this
      */
-    public function setH($h)
+    public function setBody($body)
     {
-        $this->container['h'] = $h;
-
-        return $this;
-    }
-
-    /**
-     * Gets manager
-     * @return \Hydra\SDK\Model\Manager
-     */
-    public function getManager()
-    {
-        return $this->container['manager'];
-    }
-
-    /**
-     * Sets manager
-     * @param \Hydra\SDK\Model\Manager $manager
-     * @return $this
-     */
-    public function setManager($manager)
-    {
-        $this->container['manager'] = $manager;
-
-        return $this;
-    }
-
-    /**
-     * Gets resource_prefix
-     * @return string
-     */
-    public function getResourcePrefix()
-    {
-        return $this->container['resource_prefix'];
-    }
-
-    /**
-     * Sets resource_prefix
-     * @param string $resource_prefix
-     * @return $this
-     */
-    public function setResourcePrefix($resource_prefix)
-    {
-        $this->container['resource_prefix'] = $resource_prefix;
-
-        return $this;
-    }
-
-    /**
-     * Gets w
-     * @return \Hydra\SDK\Model\Firewall
-     */
-    public function getW()
-    {
-        return $this->container['w'];
-    }
-
-    /**
-     * Sets w
-     * @param \Hydra\SDK\Model\Firewall $w
-     * @return $this
-     */
-    public function setW($w)
-    {
-        $this->container['w'] = $w;
+        $this->container['body'] = $body;
 
         return $this;
     }

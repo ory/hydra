@@ -7,6 +7,7 @@ Method | HTTP request | Description
 [**AcceptOAuth2ConsentRequest**](OAuth2Api.md#AcceptOAuth2ConsentRequest) | **Patch** /oauth2/consent/requests/{id}/accept | Accept a consent request
 [**CreateOAuth2Client**](OAuth2Api.md#CreateOAuth2Client) | **Post** /clients | Create an OAuth 2.0 client
 [**DeleteOAuth2Client**](OAuth2Api.md#DeleteOAuth2Client) | **Delete** /clients/{id} | Deletes an OAuth 2.0 Client
+[**FlushInactiveOAuth2Tokens**](OAuth2Api.md#FlushInactiveOAuth2Tokens) | **Post** /oauth2/flush | Flush Expired OAuth2 Access Tokens
 [**GetOAuth2Client**](OAuth2Api.md#GetOAuth2Client) | **Get** /clients/{id} | Retrieve an OAuth 2.0 Client.
 [**GetOAuth2ConsentRequest**](OAuth2Api.md#GetOAuth2ConsentRequest) | **Get** /oauth2/consent/requests/{id} | Receive consent request information
 [**GetWellKnown**](OAuth2Api.md#GetWellKnown) | **Get** /.well-known/openid-configuration | Server well known configuration
@@ -101,6 +102,35 @@ void (empty response body)
 ### Authorization
 
 [oauth2](../README.md#oauth2)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **FlushInactiveOAuth2Tokens**
+> FlushInactiveOAuth2Tokens($body)
+
+Flush Expired OAuth2 Access Tokens
+
+This endpoint flushes expired OAuth2 access tokens from the database. You can set a time after which no tokens will be not be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted automatically when performing the refresh flow.   ``` { \"resources\": [\"rn:hydra:oauth2:tokens\"], \"actions\": [\"flush\"], \"effect\": \"allow\" } ```
+
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**FlushInactiveOAuth2TokensRequest**](FlushInactiveOAuth2TokensRequest.md)|  | [optional] 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[basic](../README.md#basic), [oauth2](../README.md#oauth2)
 
 ### HTTP request headers
 

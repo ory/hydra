@@ -17,6 +17,7 @@ package integration
 import (
 	"fmt"
 	"log"
+	"sync"
 	"time"
 
 	"os"
@@ -29,6 +30,20 @@ import (
 
 var resources []*dockertest.Resource
 var pool *dockertest.Pool
+
+func BootParallel(fs []func()) {
+	wg := sync.WaitGroup{}
+
+	wg.Add(len(fs))
+	for _, f := range fs {
+		go func(f func()) {
+			f()
+			wg.Done()
+		}(f)
+	}
+
+	wg.Wait()
+}
 
 func KillAll() {
 	for _, resource := range resources {

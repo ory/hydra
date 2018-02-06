@@ -390,6 +390,97 @@ class OAuth2Api
     }
 
     /**
+     * Operation flushInactiveOAuth2Tokens
+     *
+     * Flush Expired OAuth2 Access Tokens
+     *
+     * Client for Hydra
+     *
+     * @param \Hydra\SDK\Model\FlushInactiveOAuth2TokensRequest $body  (optional)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return void
+     */
+    public function flushInactiveOAuth2Tokens($body = null)
+    {
+        list($response) = $this->flushInactiveOAuth2TokensWithHttpInfo($body);
+        return $response;
+    }
+
+    /**
+     * Operation flushInactiveOAuth2TokensWithHttpInfo
+     *
+     * Flush Expired OAuth2 Access Tokens
+     *
+     * Client for Hydra
+     *
+     * @param \Hydra\SDK\Model\FlushInactiveOAuth2TokensRequest $body  (optional)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of null, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function flushInactiveOAuth2TokensWithHttpInfo($body = null)
+    {
+        // parse inputs
+        $resourcePath = "/oauth2/flush";
+        $httpBody = '';
+        $queryParams = [];
+        $headerParams = [];
+        $formParams = [];
+        $_header_accept = $this->apiClient->selectHeaderAccept(['application/json']);
+        if (!is_null($_header_accept)) {
+            $headerParams['Accept'] = $_header_accept;
+        }
+        $headerParams['Content-Type'] = $this->apiClient->selectHeaderContentType(['application/json']);
+
+        // body params
+        $_tempBody = null;
+        if (isset($body)) {
+            $_tempBody = $body;
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            $httpBody = $_tempBody; // $_tempBody is the method argument, if present
+        } elseif (count($formParams) > 0) {
+            $httpBody = $formParams; // for HTTP post (form)
+        }
+        // this endpoint requires HTTP basic authentication
+        if (strlen($this->apiClient->getConfig()->getUsername()) !== 0 or strlen($this->apiClient->getConfig()->getPassword()) !== 0) {
+            $headerParams['Authorization'] = 'Basic ' . base64_encode($this->apiClient->getConfig()->getUsername() . ":" . $this->apiClient->getConfig()->getPassword());
+        }
+        // this endpoint requires OAuth (access token)
+        if (strlen($this->apiClient->getConfig()->getAccessToken()) !== 0) {
+            $headerParams['Authorization'] = 'Bearer ' . $this->apiClient->getConfig()->getAccessToken();
+        }
+        // make the API Call
+        try {
+            list($response, $statusCode, $httpHeader) = $this->apiClient->callApi(
+                $resourcePath,
+                'POST',
+                $queryParams,
+                $httpBody,
+                $headerParams,
+                null,
+                '/oauth2/flush'
+            );
+
+            return [null, $statusCode, $httpHeader];
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 401:
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\InlineResponse401', $e->getResponseHeaders());
+                    $e->setResponseObject($data);
+                    break;
+                case 500:
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\InlineResponse401', $e->getResponseHeaders());
+                    $e->setResponseObject($data);
+                    break;
+            }
+
+            throw $e;
+        }
+    }
+
+    /**
      * Operation getOAuth2Client
      *
      * Retrieve an OAuth 2.0 Client.

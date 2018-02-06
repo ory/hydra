@@ -10,12 +10,12 @@
 
 package swagger
 
-type Handler struct {
-	H Writer `json:"H,omitempty"`
+import (
+	"time"
+)
 
-	Manager Manager `json:"Manager,omitempty"`
+type FlushInactiveOAuth2TokensRequest struct {
 
-	ResourcePrefix string `json:"ResourcePrefix,omitempty"`
-
-	W Firewall `json:"W,omitempty"`
+	// NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history of recently issued tokens for auditing.
+	NotAfter time.Time `json:"notAfter,omitempty"`
 }

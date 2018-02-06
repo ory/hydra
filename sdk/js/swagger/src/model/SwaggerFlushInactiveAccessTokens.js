@@ -17,42 +17,35 @@
 ;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(
-      ['ApiClient', 'model/Firewall', 'model/Manager', 'model/Writer'],
-      factory
-    )
+    define(['ApiClient', 'model/FlushInactiveOAuth2TokensRequest'], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
     module.exports = factory(
       require('../ApiClient'),
-      require('./Firewall'),
-      require('./Manager'),
-      require('./Writer')
+      require('./FlushInactiveOAuth2TokensRequest')
     )
   } else {
     // Browser globals (root is window)
     if (!root.HydraOAuth2OpenIdConnectServer) {
       root.HydraOAuth2OpenIdConnectServer = {}
     }
-    root.HydraOAuth2OpenIdConnectServer.Handler = factory(
+    root.HydraOAuth2OpenIdConnectServer.SwaggerFlushInactiveAccessTokens = factory(
       root.HydraOAuth2OpenIdConnectServer.ApiClient,
-      root.HydraOAuth2OpenIdConnectServer.Firewall,
-      root.HydraOAuth2OpenIdConnectServer.Manager,
-      root.HydraOAuth2OpenIdConnectServer.Writer
+      root.HydraOAuth2OpenIdConnectServer.FlushInactiveOAuth2TokensRequest
     )
   }
-})(this, function(ApiClient, Firewall, Manager, Writer) {
+})(this, function(ApiClient, FlushInactiveOAuth2TokensRequest) {
   'use strict'
 
   /**
-   * The Handler model module.
-   * @module model/Handler
+   * The SwaggerFlushInactiveAccessTokens model module.
+   * @module model/SwaggerFlushInactiveAccessTokens
    * @version Latest
    */
 
   /**
-   * Constructs a new <code>Handler</code>.
-   * @alias module:model/Handler
+   * Constructs a new <code>SwaggerFlushInactiveAccessTokens</code>.
+   * @alias module:model/SwaggerFlushInactiveAccessTokens
    * @class
    */
   var exports = function() {
@@ -60,51 +53,29 @@
   }
 
   /**
-   * Constructs a <code>Handler</code> from a plain JavaScript object, optionally creating a new instance.
+   * Constructs a <code>SwaggerFlushInactiveAccessTokens</code> from a plain JavaScript object, optionally creating a new instance.
    * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
    * @param {Object} data The plain JavaScript object bearing properties of interest.
-   * @param {module:model/Handler} obj Optional instance to populate.
-   * @return {module:model/Handler} The populated <code>Handler</code> instance.
+   * @param {module:model/SwaggerFlushInactiveAccessTokens} obj Optional instance to populate.
+   * @return {module:model/SwaggerFlushInactiveAccessTokens} The populated <code>SwaggerFlushInactiveAccessTokens</code> instance.
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
       obj = obj || new exports()
 
-      if (data.hasOwnProperty('H')) {
-        obj['H'] = Writer.constructFromObject(data['H'])
-      }
-      if (data.hasOwnProperty('Manager')) {
-        obj['Manager'] = Manager.constructFromObject(data['Manager'])
-      }
-      if (data.hasOwnProperty('ResourcePrefix')) {
-        obj['ResourcePrefix'] = ApiClient.convertToType(
-          data['ResourcePrefix'],
-          'String'
+      if (data.hasOwnProperty('Body')) {
+        obj['Body'] = FlushInactiveOAuth2TokensRequest.constructFromObject(
+          data['Body']
         )
-      }
-      if (data.hasOwnProperty('W')) {
-        obj['W'] = Firewall.constructFromObject(data['W'])
       }
     }
     return obj
   }
 
   /**
-   * @member {module:model/Writer} H
+   * @member {module:model/FlushInactiveOAuth2TokensRequest} Body
    */
-  exports.prototype['H'] = undefined
-  /**
-   * @member {module:model/Manager} Manager
-   */
-  exports.prototype['Manager'] = undefined
-  /**
-   * @member {String} ResourcePrefix
-   */
-  exports.prototype['ResourcePrefix'] = undefined
-  /**
-   * @member {module:model/Firewall} W
-   */
-  exports.prototype['W'] = undefined
+  exports.prototype['Body'] = undefined
 
   return exports
 })

@@ -3,7 +3,6 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Generators** | [**map[string]KeyGenerator**](KeyGenerator.md) |  | [optional] [default to null]
 **H** | [**Writer**](Writer.md) |  | [optional] [default to null]
 **Manager** | [**Manager**](Manager.md) |  | [optional] [default to null]
 **ResourcePrefix** | **string** |  | [optional] [default to null]

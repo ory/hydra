@@ -22,7 +22,6 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*HealthApi* | [**GetInstanceMetrics**](docs/HealthApi.md#getinstancemetrics) | **Get** /health/metrics | Show instance metrics (experimental)
 *HealthApi* | [**GetInstanceStatus**](docs/HealthApi.md#getinstancestatus) | **Get** /health/status | Check health status of this instance
 *JsonWebKeyApi* | [**CreateJsonWebKeySet**](docs/JsonWebKeyApi.md#createjsonwebkeyset) | **Post** /keys/{set} | Generate a new JSON Web Key
 *JsonWebKeyApi* | [**DeleteJsonWebKey**](docs/JsonWebKeyApi.md#deletejsonwebkey) | **Delete** /keys/{set}/{kid} | Delete a JSON Web Key
@@ -34,6 +33,7 @@ Class | Method | HTTP request | Description
 *OAuth2Api* | [**AcceptOAuth2ConsentRequest**](docs/OAuth2Api.md#acceptoauth2consentrequest) | **Patch** /oauth2/consent/requests/{id}/accept | Accept a consent request
 *OAuth2Api* | [**CreateOAuth2Client**](docs/OAuth2Api.md#createoauth2client) | **Post** /clients | Create an OAuth 2.0 client
 *OAuth2Api* | [**DeleteOAuth2Client**](docs/OAuth2Api.md#deleteoauth2client) | **Delete** /clients/{id} | Deletes an OAuth 2.0 Client
+*OAuth2Api* | [**FlushInactiveOAuth2Tokens**](docs/OAuth2Api.md#flushinactiveoauth2tokens) | **Post** /oauth2/flush | Flush Expired OAuth2 Access Tokens
 *OAuth2Api* | [**GetOAuth2Client**](docs/OAuth2Api.md#getoauth2client) | **Get** /clients/{id} | Retrieve an OAuth 2.0 Client.
 *OAuth2Api* | [**GetOAuth2ConsentRequest**](docs/OAuth2Api.md#getoauth2consentrequest) | **Get** /oauth2/consent/requests/{id} | Receive consent request information
 *OAuth2Api* | [**GetWellKnown**](docs/OAuth2Api.md#getwellknown) | **Get** /.well-known/openid-configuration | Server well known configuration
@@ -69,6 +69,7 @@ Class | Method | HTTP request | Description
  - [ConsentRequestRejection](docs/ConsentRequestRejection.md)
  - [Context](docs/Context.md)
  - [Firewall](docs/Firewall.md)
+ - [FlushInactiveOAuth2TokensRequest](docs/FlushInactiveOAuth2TokensRequest.md)
  - [Group](docs/Group.md)
  - [GroupMembers](docs/GroupMembers.md)
  - [Handler](docs/Handler.md)
@@ -91,6 +92,7 @@ Class | Method | HTTP request | Description
  - [SwaggerCreatePolicyParameters](docs/SwaggerCreatePolicyParameters.md)
  - [SwaggerDoesWardenAllowAccessRequestParameters](docs/SwaggerDoesWardenAllowAccessRequestParameters.md)
  - [SwaggerDoesWardenAllowTokenAccessRequestParameters](docs/SwaggerDoesWardenAllowTokenAccessRequestParameters.md)
+ - [SwaggerFlushInactiveAccessTokens](docs/SwaggerFlushInactiveAccessTokens.md)
  - [SwaggerGetPolicyParameters](docs/SwaggerGetPolicyParameters.md)
  - [SwaggerJsonWebKeyQuery](docs/SwaggerJsonWebKeyQuery.md)
  - [SwaggerJwkCreateSet](docs/SwaggerJwkCreateSet.md)
@@ -136,7 +138,6 @@ Class | Method | HTTP request | Description
 - **Scopes**: 
  - **hydra.clients**: A scope required to manage OAuth 2.0 Clients
  - **hydra.consent**: A scope required to fetch and modify consent requests
- - **hydra.health**: A scope required to get health information
  - **hydra.keys.create**: A scope required to create JSON Web Keys
  - **hydra.keys.delete**: A scope required to delete JSON Web Keys
  - **hydra.keys.get**: A scope required to fetch JSON Web Keys

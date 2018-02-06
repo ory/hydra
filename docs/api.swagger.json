@@ -359,47 +359,6 @@
         }
       }
     },
-    "/health/metrics": {
-      "get": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.health"
-            ]
-          }
-        ],
-        "description": "This endpoint returns an instance's metrics, such as average response time, status code distribution, hits per\nsecond and so on. The return values are currently not documented as this endpoint is still experimental.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:health:stats\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "health"
-        ],
-        "summary": "Show instance metrics (experimental)",
-        "operationId": "getInstanceMetrics",
-        "responses": {
-          "200": {
-            "$ref": "#/responses/emptyResponse"
-          },
-          "401": {
-            "$ref": "#/responses/genericError"
-          },
-          "403": {
-            "$ref": "#/responses/genericError"
-          },
-          "500": {
-            "$ref": "#/responses/genericError"
-          }
-        }
-      }
-    },
     "/health/status": {
       "get": {
         "description": "This endpoint returns `{ \"status\": \"ok\" }`. This status let's you know that the HTTP server is up and running. This\nstatus does currently not include checks whether the database connection is up and running. This endpoint does not\nrequire the `X-Forwarded-Proto` header when TLS termination is set.\n\n\nBe aware that if you are running multiple nodes of ORY Hydra, the health status will never refer to the cluster state,\nonly to a single instance.",
@@ -996,6 +955,53 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/consentRequestRejection"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/responses/emptyResponse"
+          },
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
+    "/oauth2/flush": {
+      "post": {
+        "security": [
+          {
+            "basic": []
+          },
+          {
+            "oauth2": [
+              "hydra.oauth2.flush"
+            ]
+          }
+        ],
+        "description": "This endpoint flushes expired OAuth2 access tokens from the database. You can set a time after which no tokens will be\nnot be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted\nautomatically when performing the refresh flow.\n\n\n```\n{\n\"resources\": [\"rn:hydra:oauth2:tokens\"],\n\"actions\": [\"flush\"],\n\"effect\": \"allow\"\n}\n```",
+        "consumes": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "oAuth2"
+        ],
+        "summary": "Flush Expired OAuth2 Access Tokens",
+        "operationId": "flushInactiveOAuth2Tokens",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/flushInactiveOAuth2TokensRequest"
             }
           }
         ],
@@ -1984,12 +1990,6 @@
     "Handler": {
       "type": "object",
       "properties": {
-        "Generators": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/KeyGenerator"
-          }
-        },
         "H": {
           "$ref": "#/definitions/Writer"
         },
@@ -2003,7 +2003,7 @@
           "$ref": "#/definitions/Firewall"
         }
       },
-      "x-go-package": "github.com/ory/hydra/jwk"
+      "x-go-package": "github.com/ory/hydra/warden/group"
     },
     "KeyGenerator": {
       "type": "object",
@@ -2076,6 +2076,19 @@
         }
       },
       "x-go-name": "RejectConsentRequestPayload",
+      "x-go-package": "github.com/ory/hydra/oauth2"
+    },
+    "flushInactiveOAuth2TokensRequest": {
+      "type": "object",
+      "properties": {
+        "notAfter": {
+          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.",
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "NotAfter"
+        }
+      },
+      "x-go-name": "FlushInactiveOAuth2TokensRequest",
       "x-go-package": "github.com/ory/hydra/oauth2"
     },
     "group": {
@@ -2553,6 +2566,15 @@
         }
       },
       "x-go-package": "github.com/ory/hydra/warden"
+    },
+    "swaggerFlushInactiveAccessTokens": {
+      "type": "object",
+      "properties": {
+        "Body": {
+          "$ref": "#/definitions/flushInactiveOAuth2TokensRequest"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/oauth2"
     },
     "swaggerGetPolicyParameters": {
       "type": "object",
@@ -3390,7 +3412,6 @@
       "scopes": {
         "hydra.clients": "A scope required to manage OAuth 2.0 Clients",
         "hydra.consent": "A scope required to fetch and modify consent requests",
-        "hydra.health": "A scope required to get health information",
         "hydra.keys.create": "A scope required to create JSON Web Keys",
         "hydra.keys.delete": "A scope required to delete JSON Web Keys",
         "hydra.keys.get": "A scope required to fetch JSON Web Keys",

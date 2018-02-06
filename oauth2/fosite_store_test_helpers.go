@@ -16,9 +16,8 @@ package oauth2
 
 import (
 	"context"
-	"testing"
-
 	"net/url"
+	"testing"
 	"time"
 
 	"github.com/ory/fosite"
@@ -147,5 +146,74 @@ func TestHelperCreateGetDeleteAccessTokenSession(m pkg.FositeStorer) func(t *tes
 
 		_, err = m.GetAccessTokenSession(ctx, "4321", &fosite.DefaultSession{})
 		assert.NotNil(t, err)
+	}
+}
+
+var lifespan = time.Hour
+var flushRequests = []*fosite.Request{
+	{
+		ID:            "flush-1",
+		RequestedAt:   time.Now().Round(time.Second),
+		Client:        &client.Client{ID: "foobar"},
+		Scopes:        fosite.Arguments{"fa", "ba"},
+		GrantedScopes: fosite.Arguments{"fa", "ba"},
+		Form:          url.Values{"foo": []string{"bar", "baz"}},
+		Session:       &fosite.DefaultSession{Subject: "bar"},
+	},
+	{
+		ID:            "flush-2",
+		RequestedAt:   time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
+		Client:        &client.Client{ID: "foobar"},
+		Scopes:        fosite.Arguments{"fa", "ba"},
+		GrantedScopes: fosite.Arguments{"fa", "ba"},
+		Form:          url.Values{"foo": []string{"bar", "baz"}},
+		Session:       &fosite.DefaultSession{Subject: "bar"},
+	},
+	{
+		ID:            "flush-3",
+		RequestedAt:   time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
+		Client:        &client.Client{ID: "foobar"},
+		Scopes:        fosite.Arguments{"fa", "ba"},
+		GrantedScopes: fosite.Arguments{"fa", "ba"},
+		Form:          url.Values{"foo": []string{"bar", "baz"}},
+		Session:       &fosite.DefaultSession{Subject: "bar"},
+	},
+}
+
+func TestHelperFlushTokens(m pkg.FositeStorer, lifespan time.Duration) func(t *testing.T) {
+
+	ds := &fosite.DefaultSession{}
+
+	return func(t *testing.T) {
+		ctx := context.Background()
+		for _, r := range flushRequests {
+			require.NoError(t, m.CreateAccessTokenSession(ctx, r.ID, r))
+			_, err := m.GetAccessTokenSession(ctx, r.ID, ds)
+			require.NoError(t, err)
+		}
+
+		require.NoError(t, m.FlushInactiveAccessTokens(ctx, time.Now().Add(-time.Hour*24)))
+		_, err := m.GetAccessTokenSession(ctx, "flush-1", ds)
+		require.NoError(t, err)
+		_, err = m.GetAccessTokenSession(ctx, "flush-2", ds)
+		require.NoError(t, err)
+		_, err = m.GetAccessTokenSession(ctx, "flush-3", ds)
+		require.NoError(t, err)
+
+		require.NoError(t, m.FlushInactiveAccessTokens(ctx, time.Now().Add(-(lifespan+time.Hour/2))))
+		_, err = m.GetAccessTokenSession(ctx, "flush-1", ds)
+		require.NoError(t, err)
+		_, err = m.GetAccessTokenSession(ctx, "flush-2", ds)
+		require.NoError(t, err)
+		_, err = m.GetAccessTokenSession(ctx, "flush-3", ds)
+		require.Error(t, err)
+
+		require.NoError(t, m.FlushInactiveAccessTokens(ctx, time.Now()))
+		_, err = m.GetAccessTokenSession(ctx, "flush-1", ds)
+		require.NoError(t, err)
+		_, err = m.GetAccessTokenSession(ctx, "flush-2", ds)
+		require.Error(t, err)
+		_, err = m.GetAccessTokenSession(ctx, "flush-3", ds)
+		require.Error(t, err)
 	}
 }

@@ -22,7 +22,7 @@ import (
 var tokenRevokeCmd = &cobra.Command{
 	Use:   "revoke <token>",
 	Short: "Revoke an access or refresh token",
-	Run:   cmdHandler.Revocation.RevokeToken,
+	Run:   cmdHandler.Token.RevokeToken,
 }
 
 func init() {

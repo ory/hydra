@@ -77,6 +77,12 @@ type swaggeruserinfoResponse struct {
 	Body swaggeruserinfoResponsePayload
 }
 
+// swagger:parameters flushInactiveOAuth2Tokens
+type swaggerFlushInactiveAccessTokens struct {
+	// in: body
+	Body FlushInactiveOAuth2TokensRequest
+}
+
 type swaggeruserinfoResponsePayload struct {
 	// Subject - Identifier for the End-User at the Issuer.
 	Subject string `json:"sub"`

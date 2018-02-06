@@ -22,6 +22,7 @@
         'ApiClient',
         'model/ConsentRequestAcceptance',
         'model/ConsentRequestRejection',
+        'model/FlushInactiveOAuth2TokensRequest',
         'model/InlineResponse2001',
         'model/InlineResponse401',
         'model/JsonWebKeySet',
@@ -39,6 +40,7 @@
       require('../ApiClient'),
       require('../model/ConsentRequestAcceptance'),
       require('../model/ConsentRequestRejection'),
+      require('../model/FlushInactiveOAuth2TokensRequest'),
       require('../model/InlineResponse2001'),
       require('../model/InlineResponse401'),
       require('../model/JsonWebKeySet'),
@@ -57,6 +59,7 @@
       root.HydraOAuth2OpenIdConnectServer.ApiClient,
       root.HydraOAuth2OpenIdConnectServer.ConsentRequestAcceptance,
       root.HydraOAuth2OpenIdConnectServer.ConsentRequestRejection,
+      root.HydraOAuth2OpenIdConnectServer.FlushInactiveOAuth2TokensRequest,
       root.HydraOAuth2OpenIdConnectServer.InlineResponse2001,
       root.HydraOAuth2OpenIdConnectServer.InlineResponse401,
       root.HydraOAuth2OpenIdConnectServer.JsonWebKeySet,
@@ -71,6 +74,7 @@
   ApiClient,
   ConsentRequestAcceptance,
   ConsentRequestRejection,
+  FlushInactiveOAuth2TokensRequest,
   InlineResponse2001,
   InlineResponse401,
   JsonWebKeySet,
@@ -248,6 +252,51 @@
       return this.apiClient.callApi(
         '/clients/{id}',
         'DELETE',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
+    }
+
+    /**
+     * Callback function to receive the result of the flushInactiveOAuth2Tokens operation.
+     * @callback module:api/OAuth2Api~flushInactiveOAuth2TokensCallback
+     * @param {String} error Error message, if any.
+     * @param data This operation does not return a value.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Flush Expired OAuth2 Access Tokens
+     * This endpoint flushes expired OAuth2 access tokens from the database. You can set a time after which no tokens will be not be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted automatically when performing the refresh flow.   &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:tokens\&quot;], \&quot;actions\&quot;: [\&quot;flush\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * @param {Object} opts Optional parameters
+     * @param {module:model/FlushInactiveOAuth2TokensRequest} opts.body 
+     * @param {module:api/OAuth2Api~flushInactiveOAuth2TokensCallback} callback The callback function, accepting three arguments: error, data, response
+     */
+    this.flushInactiveOAuth2Tokens = function(opts, callback) {
+      opts = opts || {}
+      var postBody = opts['body']
+
+      var pathParams = {}
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
+
+      var authNames = ['basic', 'oauth2']
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = null
+
+      return this.apiClient.callApi(
+        '/oauth2/flush',
+        'POST',
         pathParams,
         queryParams,
         headerParams,

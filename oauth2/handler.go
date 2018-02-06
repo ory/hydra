@@ -15,12 +15,14 @@
 package oauth2
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
@@ -44,6 +46,7 @@ const (
 	// IntrospectPath points to the OAuth2 introspection endpoint.
 	IntrospectPath = "/oauth2/introspect"
 	RevocationPath = "/oauth2/revoke"
+	FlushPath      = "/oauth2/flush"
 
 	IntrospectScope = "hydra.introspect"
 
@@ -114,6 +117,13 @@ type WellKnown struct {
 	IDTokenSigningAlgValuesSupported []string `json:"id_token_signing_alg_values_supported"`
 }
 
+// swagger:model flushInactiveOAuth2TokensRequest
+type FlushInactiveOAuth2TokensRequest struct {
+	// NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history
+	// of recently issued tokens for auditing.
+	NotAfter time.Time `json:"notAfter"`
+}
+
 func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.POST(TokenPath, h.TokenHandler)
 	r.GET(AuthPath, h.AuthHandler)
@@ -124,6 +134,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET(WellKnownPath, h.WellKnownHandler)
 	r.GET(UserinfoPath, h.UserinfoHandler)
 	r.POST(UserinfoPath, h.UserinfoHandler)
+	r.POST(FlushPath, h.FlushHandler)
 }
 
 // swagger:route GET /.well-known/openid-configuration oAuth2 getWellKnown
@@ -330,6 +341,68 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 	}); err != nil {
 		pkg.LogError(err, h.L)
 	}
+}
+
+// swagger:route POST /oauth2/flush oAuth2 flushInactiveOAuth2Tokens
+//
+// Flush Expired OAuth2 Access Tokens
+//
+// This endpoint flushes expired OAuth2 access tokens from the database. You can set a time after which no tokens will be
+// not be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted
+// automatically when performing the refresh flow.
+//
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:oauth2:tokens"],
+//    "actions": ["flush"],
+//    "effect": "allow"
+//  }
+//  ```
+//
+//     Consumes:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       basic:
+//       oauth2: hydra.oauth2.flush
+//
+//     Responses:
+//       204: emptyResponse
+//       401: genericError
+//       500: genericError
+func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	if token := h.W.TokenFromRequest(r); token != "" {
+		if _, err := h.W.TokenAllowed(r.Context(), token, &firewall.TokenAccessRequest{
+			Resource: fmt.Sprintf(h.PrefixResource("oauth2:tokens")),
+			Action:   "flush",
+		}, "hydra.oauth2.flush"); err != nil {
+			h.H.WriteError(w, r, err)
+			return
+		}
+	} else {
+		h.H.WriteError(w, r, errors.WithStack(fosite.ErrRequestUnauthorized))
+		return
+	}
+
+	var fr FlushInactiveOAuth2TokensRequest
+	if err := json.NewDecoder(r.Body).Decode(&fr); err != nil {
+		h.H.WriteError(w, r, err)
+		return
+	}
+
+	if fr.NotAfter.IsZero() {
+		fr.NotAfter = time.Now()
+	}
+
+	if err := h.Storage.FlushInactiveAccessTokens(context.Background(), fr.NotAfter); err != nil {
+		h.H.WriteError(w, r, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 // swagger:route POST /oauth2/token oAuth2 oauthToken

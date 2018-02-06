@@ -16,6 +16,7 @@ package pkg
 
 import (
 	"context"
+	"time"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/oauth2"
@@ -30,4 +31,6 @@ type FositeStorer interface {
 	RevokeRefreshToken(ctx context.Context, requestID string) error
 
 	RevokeAccessToken(ctx context.Context, requestID string) error
+
+	FlushInactiveAccessTokens(ctx context.Context, notAfter time.Time) error
 }

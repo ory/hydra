@@ -148,7 +148,12 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 		return
 	}
 
-	c.Secret = secret
+	c.Secret = ""
+
+	if !c.Public {
+		c.Secret = secret
+	}
+
 	h.H.WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 

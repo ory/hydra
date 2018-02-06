@@ -107,7 +107,7 @@ to AWS IAM. Requests can be checked for authorization either based on an access 
 The Ladon documentation is located at [https://github.com/ory/ladon/blob/master/README.md](https://github.com/ory/ladon/blob/master/README.md)
 and further explanation can be given upon request. Within Hydra, Ladon is used to protect various resources, like
 the JWK API. An example policy for reading public/private keys from the JWK API can be found
-[here](https://github.com/ory/hydra/blob/master/docs/access-control/policies/allow-client-consent-key).
+[here](https://github.com/ory/hydra/blob/master/docs/access-control/policies/everyone-can-read-public-keys.json).
 
 ### Access Control Policies
 

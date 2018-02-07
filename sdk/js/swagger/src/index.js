@@ -26,6 +26,7 @@
         'model/ConsentRequestRejection',
         'model/Context',
         'model/Firewall',
+        'model/FlushInactiveOAuth2TokensRequest',
         'model/Group',
         'model/GroupMembers',
         'model/Handler',
@@ -48,6 +49,7 @@
         'model/SwaggerCreatePolicyParameters',
         'model/SwaggerDoesWardenAllowAccessRequestParameters',
         'model/SwaggerDoesWardenAllowTokenAccessRequestParameters',
+        'model/SwaggerFlushInactiveAccessTokens',
         'model/SwaggerGetPolicyParameters',
         'model/SwaggerJsonWebKeyQuery',
         'model/SwaggerJwkCreateSet',
@@ -94,6 +96,7 @@
       require('./model/ConsentRequestRejection'),
       require('./model/Context'),
       require('./model/Firewall'),
+      require('./model/FlushInactiveOAuth2TokensRequest'),
       require('./model/Group'),
       require('./model/GroupMembers'),
       require('./model/Handler'),
@@ -116,6 +119,7 @@
       require('./model/SwaggerCreatePolicyParameters'),
       require('./model/SwaggerDoesWardenAllowAccessRequestParameters'),
       require('./model/SwaggerDoesWardenAllowTokenAccessRequestParameters'),
+      require('./model/SwaggerFlushInactiveAccessTokens'),
       require('./model/SwaggerGetPolicyParameters'),
       require('./model/SwaggerJsonWebKeyQuery'),
       require('./model/SwaggerJwkCreateSet'),
@@ -159,6 +163,7 @@
   ConsentRequestRejection,
   Context,
   Firewall,
+  FlushInactiveOAuth2TokensRequest,
   Group,
   GroupMembers,
   Handler,
@@ -181,6 +186,7 @@
   SwaggerCreatePolicyParameters,
   SwaggerDoesWardenAllowAccessRequestParameters,
   SwaggerDoesWardenAllowTokenAccessRequestParameters,
+  SwaggerFlushInactiveAccessTokens,
   SwaggerGetPolicyParameters,
   SwaggerJsonWebKeyQuery,
   SwaggerJwkCreateSet,
@@ -284,6 +290,11 @@
      * @property {module:model/Firewall}
      */
     Firewall: Firewall,
+    /**
+     * The FlushInactiveOAuth2TokensRequest model constructor.
+     * @property {module:model/FlushInactiveOAuth2TokensRequest}
+     */
+    FlushInactiveOAuth2TokensRequest: FlushInactiveOAuth2TokensRequest,
     /**
      * The Group model constructor.
      * @property {module:model/Group}
@@ -394,6 +405,11 @@
      * @property {module:model/SwaggerDoesWardenAllowTokenAccessRequestParameters}
      */
     SwaggerDoesWardenAllowTokenAccessRequestParameters: SwaggerDoesWardenAllowTokenAccessRequestParameters,
+    /**
+     * The SwaggerFlushInactiveAccessTokens model constructor.
+     * @property {module:model/SwaggerFlushInactiveAccessTokens}
+     */
+    SwaggerFlushInactiveAccessTokens: SwaggerFlushInactiveAccessTokens,
     /**
      * The SwaggerGetPolicyParameters model constructor.
      * @property {module:model/SwaggerGetPolicyParameters}

@@ -33,8 +33,22 @@ import (
 
 type FositeSQLStore struct {
 	client.Manager
-	DB *sqlx.DB
-	L  logrus.FieldLogger
+	DB                  *sqlx.DB
+	L                   logrus.FieldLogger
+	AccessTokenLifespan time.Duration
+}
+
+func NewFositeSQLStore(m client.Manager,
+	db *sqlx.DB,
+	l logrus.FieldLogger,
+	accessTokenLifespan time.Duration,
+) *FositeSQLStore {
+	return &FositeSQLStore{
+		Manager:             m,
+		L:                   l,
+		DB:                  db,
+		AccessTokenLifespan: accessTokenLifespan,
+	}
 }
 
 func sqlSchemaUp(table string, id string) string {
@@ -299,5 +313,15 @@ func (s *FositeSQLStore) revokeSession(id string, table string) error {
 	} else if err != nil {
 		return errors.WithStack(err)
 	}
+	return nil
+}
+
+func (s *FositeSQLStore) FlushInactiveAccessTokens(ctx context.Context, notAfter time.Time) error {
+	if _, err := s.DB.Exec(s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE requested_at < ? AND requested_at < ?", sqlTableAccess)), time.Now().Add(-s.AccessTokenLifespan), notAfter); err == sql.ErrNoRows {
+		return errors.Wrap(fosite.ErrNotFound, "")
+	} else if err != nil {
+		return errors.WithStack(err)
+	}
+
 	return nil
 }

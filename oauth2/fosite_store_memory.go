@@ -17,19 +17,32 @@ package oauth2
 import (
 	"context"
 	"sync"
+	"time"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/pkg/errors"
 )
 
+func NewFositeMemoryStore(m client.Manager, ls time.Duration) *FositeMemoryStore {
+	return &FositeMemoryStore{
+		AuthorizeCodes:      make(map[string]fosite.Requester),
+		IDSessions:          make(map[string]fosite.Requester),
+		AccessTokens:        make(map[string]fosite.Requester),
+		RefreshTokens:       make(map[string]fosite.Requester),
+		AccessTokenLifespan: ls,
+		Manager:             m,
+	}
+}
+
 type FositeMemoryStore struct {
 	client.Manager
 
-	AuthorizeCodes map[string]fosite.Requester
-	IDSessions     map[string]fosite.Requester
-	AccessTokens   map[string]fosite.Requester
-	RefreshTokens  map[string]fosite.Requester
+	AuthorizeCodes      map[string]fosite.Requester
+	IDSessions          map[string]fosite.Requester
+	AccessTokens        map[string]fosite.Requester
+	RefreshTokens       map[string]fosite.Requester
+	AccessTokenLifespan time.Duration
 
 	sync.RWMutex
 }
@@ -175,5 +188,25 @@ func (s *FositeMemoryStore) RevokeAccessToken(ctx context.Context, id string) er
 	if !found {
 		return errors.New("Not found")
 	}
+	return nil
+}
+
+func (s *FositeMemoryStore) FlushInactiveAccessTokens(ctx context.Context, notAfter time.Time) error {
+	s.Lock()
+	defer s.Unlock()
+
+	now := time.Now()
+	for sig, token := range s.AccessTokens {
+		expiresAt := token.GetRequestedAt().Add(s.AccessTokenLifespan)
+		isExpired := expiresAt.Before(now)
+		isNotAfter := token.GetRequestedAt().Before(notAfter)
+
+		if isExpired && isNotAfter {
+			if err := s.deleteAccessTokenSession(ctx, sig); err != nil {
+				return err
+			}
+		}
+	}
+
 	return nil
 }

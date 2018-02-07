@@ -36,8 +36,12 @@ var encryptionKey, _ = RandomBytes(32)
 func TestMain(m *testing.M) {
 	flag.Parse()
 	if !testing.Short() {
-		connectToPG()
-		connectToMySQL()
+		if !testing.Short() {
+			integration.BootParallel([]func(){
+				connectToPG,
+				connectToMySQL,
+			})
+		}
 	}
 
 	s := m.Run()

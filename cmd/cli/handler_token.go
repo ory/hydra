@@ -15,25 +15,35 @@
 package cli
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net/http"
-
-	"crypto/tls"
+	"time"
 
 	"github.com/ory/hydra/config"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/spf13/cobra"
 )
 
-type RevocationHandler struct {
+type TokenHandler struct {
 	Config *config.Config
 }
 
-func newRevocationHandler(c *config.Config) *RevocationHandler {
-	return &RevocationHandler{Config: c}
+func (h *TokenHandler) newTokenManager(cmd *cobra.Command) *hydra.OAuth2Api {
+	c := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlash())
+	c.Configuration.Transport = h.Config.OAuth2Client(cmd).Transport
+	if term, _ := cmd.Flags().GetBool("fake-tls-termination"); term {
+		c.Configuration.DefaultHeader["X-Forwarded-Proto"] = "https"
+	}
+
+	return c
 }
 
-func (h *RevocationHandler) RevokeToken(cmd *cobra.Command, args []string) {
+func newTokenHandler(c *config.Config) *TokenHandler {
+	return &TokenHandler{Config: c}
+}
+
+func (h *TokenHandler) RevokeToken(cmd *cobra.Command, args []string) {
 	if len(args) != 1 {
 		fmt.Print(cmd.UsageString())
 		return
@@ -57,4 +67,14 @@ func (h *RevocationHandler) RevokeToken(cmd *cobra.Command, args []string) {
 	response, err := handler.RevokeOAuth2Token(args[0])
 	checkResponse(response, err, http.StatusOK)
 	fmt.Printf("Revoked token %s", token)
+}
+
+func (h *TokenHandler) FlushTokens(cmd *cobra.Command, args []string) {
+	handler := h.newTokenManager(cmd)
+
+	minAge, _ := cmd.Flags().GetDuration("min-age")
+
+	response, err := handler.FlushInactiveOAuth2Tokens(hydra.FlushInactiveOAuth2TokensRequest{NotAfter: time.Now().Add(-minAge)})
+	checkResponse(response, err, http.StatusNoContent)
+	fmt.Println("Successfully flushed inactive access tokens.")
 }

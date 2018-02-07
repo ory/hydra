@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package oauth2
+package oauth2_test
 
 import (
+	"context"
 	"crypto/rand"
 	"crypto/rsa"
 	"encoding/json"
@@ -22,6 +23,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
+	"time"
 
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
@@ -29,13 +31,120 @@ import (
 	"github.com/ory/fosite/compose"
 	"github.com/ory/fosite/storage"
 	"github.com/ory/herodot"
+	"github.com/ory/hydra/client"
+	c2 "github.com/ory/hydra/compose"
+	"github.com/ory/hydra/oauth2"
+	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
+	"github.com/ory/ladon"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
+var lifespan = time.Hour
+var flushRequests = []*fosite.Request{
+	{
+		ID:            "flush-1",
+		RequestedAt:   time.Now().Round(time.Second),
+		Client:        &client.Client{ID: "foobar"},
+		Scopes:        fosite.Arguments{"fa", "ba"},
+		GrantedScopes: fosite.Arguments{"fa", "ba"},
+		Form:          url.Values{"foo": []string{"bar", "baz"}},
+		Session:       &fosite.DefaultSession{Subject: "bar"},
+	},
+	{
+		ID:            "flush-2",
+		RequestedAt:   time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
+		Client:        &client.Client{ID: "foobar"},
+		Scopes:        fosite.Arguments{"fa", "ba"},
+		GrantedScopes: fosite.Arguments{"fa", "ba"},
+		Form:          url.Values{"foo": []string{"bar", "baz"}},
+		Session:       &fosite.DefaultSession{Subject: "bar"},
+	},
+	{
+		ID:            "flush-3",
+		RequestedAt:   time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
+		Client:        &client.Client{ID: "foobar"},
+		Scopes:        fosite.Arguments{"fa", "ba"},
+		GrantedScopes: fosite.Arguments{"fa", "ba"},
+		Form:          url.Values{"foo": []string{"bar", "baz"}},
+		Session:       &fosite.DefaultSession{Subject: "bar"},
+	},
+}
+
+func TestHandlerFlushHandler(t *testing.T) {
+	localWarden, httpClient := c2.NewMockFirewall(
+		"tests",
+		"alice",
+		fosite.Arguments{
+			"hydra.oauth2.flush",
+		}, &ladon.DefaultPolicy{
+			ID:        "1",
+			Subjects:  []string{"<.*>"},
+			Resources: []string{"rn:hydra:oauth2:tokens"},
+			Actions:   []string{"flush"},
+			Effect:    ladon.AllowAccess,
+		},
+	)
+
+	store := oauth2.NewFositeMemoryStore(nil, lifespan)
+	h := &oauth2.Handler{
+		H:             herodot.NewJSONWriter(nil),
+		W:             localWarden,
+		ScopeStrategy: fosite.HierarchicScopeStrategy,
+		Issuer:        "http://hydra.localhost",
+		Storage:       store,
+	}
+
+	for _, r := range flushRequests {
+		require.NoError(t, store.CreateAccessTokenSession(nil, r.ID, r))
+	}
+
+	r := httprouter.New()
+	h.SetRoutes(r)
+	ts := httptest.NewServer(r)
+	c := hydra.NewOAuth2ApiWithBasePath(ts.URL)
+	c.Configuration.Transport = httpClient.Transport
+
+	ds := new(fosite.DefaultSession)
+	ctx := context.Background()
+
+	resp, err := c.FlushInactiveOAuth2Tokens(hydra.FlushInactiveOAuth2TokensRequest{NotAfter: time.Now().Add(-time.Hour * 24)})
+	require.NoError(t, err)
+	assert.EqualValues(t, http.StatusNoContent, resp.StatusCode)
+
+	_, err = store.GetAccessTokenSession(ctx, "flush-1", ds)
+	require.NoError(t, err)
+	_, err = store.GetAccessTokenSession(ctx, "flush-2", ds)
+	require.NoError(t, err)
+	_, err = store.GetAccessTokenSession(ctx, "flush-3", ds)
+	require.NoError(t, err)
+
+	resp, err = c.FlushInactiveOAuth2Tokens(hydra.FlushInactiveOAuth2TokensRequest{NotAfter: time.Now().Add(-(lifespan + time.Hour/2))})
+	require.NoError(t, err)
+	assert.EqualValues(t, http.StatusNoContent, resp.StatusCode)
+
+	_, err = store.GetAccessTokenSession(ctx, "flush-1", ds)
+	require.NoError(t, err)
+	_, err = store.GetAccessTokenSession(ctx, "flush-2", ds)
+	require.NoError(t, err)
+	_, err = store.GetAccessTokenSession(ctx, "flush-3", ds)
+	require.Error(t, err)
+
+	resp, err = c.FlushInactiveOAuth2Tokens(hydra.FlushInactiveOAuth2TokensRequest{NotAfter: time.Now()})
+	require.NoError(t, err)
+	assert.EqualValues(t, http.StatusNoContent, resp.StatusCode)
+
+	_, err = store.GetAccessTokenSession(ctx, "flush-1", ds)
+	require.NoError(t, err)
+	_, err = store.GetAccessTokenSession(ctx, "flush-2", ds)
+	require.Error(t, err)
+	_, err = store.GetAccessTokenSession(ctx, "flush-3", ds)
+	require.Error(t, err)
+}
+
 func TestHandlerWellKnown(t *testing.T) {
-	h := &Handler{
+	h := &oauth2.Handler{
 		H:             herodot.NewJSONWriter(nil),
 		ScopeStrategy: fosite.HierarchicScopeStrategy,
 		Issuer:        "http://hydra.localhost",
@@ -53,7 +162,7 @@ func TestHandlerWellKnown(t *testing.T) {
 	require.NoError(t, err)
 	defer res.Body.Close()
 
-	trueConfig := WellKnown{
+	trueConfig := oauth2.WellKnown{
 		Issuer:                            h.Issuer,
 		AuthURL:                           h.Issuer + AuthPathT,
 		TokenURL:                          h.Issuer + TokenPathT,
@@ -62,11 +171,11 @@ func TestHandlerWellKnown(t *testing.T) {
 		ResponseTypes:                     []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
 		ClaimsSupported:                   []string{"sub"},
 		ScopesSupported:                   []string{"offline", "openid"},
-		UserinfoEndpoint:                  h.Issuer + UserinfoPath,
+		UserinfoEndpoint:                  h.Issuer + oauth2.UserinfoPath,
 		TokenEndpointAuthMethodsSupported: []string{"client_secret_post", "client_secret_basic"},
 		IDTokenSigningAlgValuesSupported:  []string{"RS256"},
 	}
-	var wellKnownResp WellKnown
+	var wellKnownResp oauth2.WellKnown
 	err = json.NewDecoder(res.Body).Decode(&wellKnownResp)
 	require.NoError(t, err, "problem decoding wellknown json response: %+v", err)
 	assert.EqualValues(t, trueConfig, wellKnownResp)
@@ -89,8 +198,8 @@ type FakeConsentStrategy struct {
 	RedirectURL string
 }
 
-func (s *FakeConsentStrategy) ValidateConsentRequest(authorizeRequest fosite.AuthorizeRequester, token string, session *sessions.Session) (claims *Session, err error) {
-	return NewSession("consent-user"), nil
+func (s *FakeConsentStrategy) ValidateConsentRequest(authorizeRequest fosite.AuthorizeRequester, token string, session *sessions.Session) (claims *oauth2.Session, err error) {
+	return oauth2.NewSession("consent-user"), nil
 }
 
 func (s *FakeConsentStrategy) CreateConsentRequest(authorizeRequest fosite.AuthorizeRequester, redirectURL string, session *sessions.Session) (token string, err error) {
@@ -99,7 +208,7 @@ func (s *FakeConsentStrategy) CreateConsentRequest(authorizeRequest fosite.Autho
 }
 
 func (s *FakeConsentStrategy) HandleConsentRequest(authorizeRequest fosite.AuthorizeRequester, session *sessions.Session) (claims *Session, err error) {
-	return nil, errRequiresAuthentication
+	return nil, oauth2.errRequiresAuthentication
 }
 
 func TestIssuerRedirect(t *testing.T) {
@@ -112,7 +221,7 @@ func TestIssuerRedirect(t *testing.T) {
 
 	cs := &FakeConsentStrategy{}
 
-	h := &Handler{
+	h := &oauth2.Handler{
 		H:             herodot.NewJSONWriter(nil),
 		Issuer:        "http://127.0.0.1/some/proxied/path",
 		OAuth2:        compose.ComposeAllEnabled(&config, storage, secret, privateKey),

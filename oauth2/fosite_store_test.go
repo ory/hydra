@@ -47,6 +47,7 @@ func init() {
 
 func TestMain(m *testing.M) {
 	flag.Parse()
+
 	if !testing.Short() {
 		integration.BootParallel([]func(){
 			connectToPG,

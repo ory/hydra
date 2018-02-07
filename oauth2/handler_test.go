@@ -199,12 +199,16 @@ type FakeConsentStrategy struct {
 }
 
 func (s *FakeConsentStrategy) ValidateConsentRequest(authorizeRequest fosite.AuthorizeRequester, token string, session *sessions.Session) (claims *oauth2.Session, err error) {
-	return nil, nil
+	return oauth2.NewSession("consent-user"), nil
 }
 
 func (s *FakeConsentStrategy) CreateConsentRequest(authorizeRequest fosite.AuthorizeRequester, redirectURL string, session *sessions.Session) (token string, err error) {
 	s.RedirectURL = redirectURL
 	return "token", nil
+}
+
+func (s *FakeConsentStrategy) HandleConsentRequest(authorizeRequest fosite.AuthorizeRequester, session *sessions.Session) (claims *oauth2.Session, err error) {
+	return nil, oauth2.ErrRequiresAuthentication
 }
 
 func TestIssuerRedirect(t *testing.T) {

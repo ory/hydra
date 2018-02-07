@@ -77,28 +77,28 @@ func TestConsentStrategy(t *testing.T) {
 				session:   "granted_expired",
 				expectErr: true,
 				req:       &fosite.AuthorizeRequest{Request: fosite.Request{Client: &fosite.DefaultClient{ID: "client_id"}}},
-				cookie:    &sessions.Session{Values: map[interface{}]interface{}{CookieCSRFKey: "csrf_token"}},
+				cookie:    &sessions.Session{Values: map[interface{}]interface{}{cookieCSRFKey: "csrf_token"}},
 			},
 			{
 				d:         "granted",
 				session:   "granted",
 				expectErr: false,
 				req:       &fosite.AuthorizeRequest{Request: fosite.Request{Client: &fosite.DefaultClient{ID: "client_id"}}},
-				cookie:    &sessions.Session{Values: map[interface{}]interface{}{CookieCSRFKey: "csrf_token"}},
+				cookie:    &sessions.Session{Values: map[interface{}]interface{}{cookieCSRFKey: "csrf_token"}},
 			},
 			{
 				d:         "client mismatch",
 				session:   "granted",
 				expectErr: true,
 				req:       &fosite.AuthorizeRequest{Request: fosite.Request{Client: &fosite.DefaultClient{ID: "mismatch_client"}}},
-				cookie:    &sessions.Session{Values: map[interface{}]interface{}{CookieCSRFKey: "csrf_token"}},
+				cookie:    &sessions.Session{Values: map[interface{}]interface{}{cookieCSRFKey: "csrf_token"}},
 			},
 			{
 				d:         "csrf detected",
 				session:   "granted_csrf",
 				expectErr: true,
 				req:       &fosite.AuthorizeRequest{Request: fosite.Request{Client: &fosite.DefaultClient{ID: "client_id"}}},
-				cookie:    &sessions.Session{Values: map[interface{}]interface{}{CookieCSRFKey: "invalid_csrf"}},
+				cookie:    &sessions.Session{Values: map[interface{}]interface{}{cookieCSRFKey: "invalid_csrf"}},
 				assert: func(t *testing.T, session *Session) {
 					cr, err := strategy.ConsentManager.GetConsentRequest("granted_csrf")
 					require.NoError(t, err)

@@ -19,16 +19,32 @@ package main
 type genericError struct {
 	// in: body
 	Body struct {
+		// Code is the HTTP status code
+		//
+		// example: 404
 		Code int `json:"code,omitempty"`
 
+		// Status is the HTTP status
+		//
+		// example: "Not found"
 		Status string `json:"status,omitempty"`
 
+		// Request is the value from the X-Request-Id HTTP header, if set
+		//
+		// Example: de8760cf-59c7-4b9a-87da-59b8c748d9db
 		Request string `json:"request,omitempty"`
 
+		// Reason is the reason why the request failed
+		//
+		// example: "The element could not be found in the database"
 		Reason string `json:"reason,omitempty"`
 
+		// Details contains detailed information aimed at debugging the error
 		Details []map[string]interface{} `json:"details,omitempty"`
 
+		// Message is a human readable error message
+		//
+		// example: "The request failed because the resource could not be found"
 		Message string `json:"message"`
 	}
 }

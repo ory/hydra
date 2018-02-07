@@ -18,12 +18,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/client"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestConsentRequestSqlDataTransforms(t *testing.T) {
-	t.Parallel()
 	for _, tc := range []struct {
 		d string
 		r *ConsentRequest
@@ -31,18 +31,20 @@ func TestConsentRequestSqlDataTransforms(t *testing.T) {
 		{
 			d: "fully hydrated request object",
 			r: &ConsentRequest{
-				ID:               "id",
-				ClientID:         "client-id",
-				RequestedScopes:  []string{"foo", "bar"},
-				GrantedScopes:    []string{"baz", "bar"},
-				CSRF:             "some-csrf",
-				ExpiresAt:        time.Now().Round(time.Second),
-				Consent:          ConsentRequestAccepted,
-				DenyReason:       "some reason",
-				AccessTokenExtra: map[string]interface{}{"atfoo": "bar", "atbaz": "bar"},
-				IDTokenExtra:     map[string]interface{}{"idfoo": "bar", "idbaz": "bar"},
-				RedirectURL:      "https://redirect-me/foo",
-				Subject:          "Peter",
+				ID:                   "id",
+				ClientID:             "client-id",
+				RequestedScopes:      []string{"foo", "bar"},
+				GrantedScopes:        []string{"baz", "bar"},
+				CSRF:                 "some-csrf",
+				ExpiresAt:            time.Now().Round(time.Second),
+				Consent:              ConsentRequestAccepted,
+				DenyReason:           "some reason",
+				AccessTokenExtra:     map[string]interface{}{"atfoo": "bar", "atbaz": "bar"},
+				IDTokenExtra:         map[string]interface{}{"idfoo": "bar", "idbaz": "bar"},
+				RedirectURL:          "https://redirect-me/foo",
+				Subject:              "Peter",
+				Client:               &client.Client{ID: "foo"},
+				OpenIDConnectContext: &ConsentRequestOpenIDConnectContext{Prompt: "foo"},
 			},
 		},
 	} {

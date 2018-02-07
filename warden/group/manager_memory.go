@@ -126,3 +126,24 @@ func (m *MemoryManager) ListGroups(limit, offset int) ([]Group, error) {
 	start, end := pagination.Index(limit, offset, len(res))
 	return res[start:end], nil
 }
+
+func (m *MemoryManager) OverwriteGroupMembers(group string, members []string) error {
+	id := group
+
+	err := m.DeleteGroup(id)
+
+	if err != nil {
+		return err
+	}
+
+	err = m.CreateGroup(&Group{
+		ID: id,
+		Members: members,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

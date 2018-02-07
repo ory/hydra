@@ -32,6 +32,7 @@ type Manager interface {
 
 	AddGroupMembers(group string, members []string) error
 	RemoveGroupMembers(group string, members []string) error
+	OverwriteGroupMembers(group string, members []string) error
 
 	FindGroupsByMember(subject string, limit, offset int) ([]Group, error)
 	ListGroups(limit, offset int) ([]Group, error)

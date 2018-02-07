@@ -548,7 +548,7 @@ func (h *Handler) handleAuthWithoutConsent(w http.ResponseWriter, r *http.Reques
 
 	var err error
 	session, err := h.Consent.HandleConsentRequest(authorizeRequest, cookie)
-	if err != nil && err.Error() == errRequiresAuthentication.Error() {
+	if err != nil && err.Error() == ErrRequiresAuthentication.Error() {
 		if err := h.redirectToConsent(w, r, authorizeRequest); err != nil {
 			pkg.LogError(err, h.L)
 			h.writeAuthorizeError(w, authorizeRequest, err)

@@ -46,7 +46,7 @@ type DefaultConsentStrategy struct {
 	ConsentManager           ConsentRequestManager
 }
 
-var errRequiresAuthentication = errors.New("Requires authentication")
+var ErrRequiresAuthentication = errors.New("Requires authentication")
 
 func checkAntiReplayToken(consent *ConsentRequest, cookie *sessions.Session) error {
 	if j, ok := cookie.Values[cookieCSRFKey]; !ok {
@@ -184,11 +184,11 @@ func (s *DefaultConsentStrategy) HandleConsentRequest(req fosite.AuthorizeReques
 	}
 
 	if contains(prompts, "login") || contains(prompts, "consent") || contains(prompts, "select_account") {
-		return nil, errors.WithStack(errRequiresAuthentication)
+		return nil, errors.WithStack(ErrRequiresAuthentication)
 	}
 
 	if req.GetClient().IsPublic() {
-		return nil, errors.WithStack(errRequiresAuthentication)
+		return nil, errors.WithStack(ErrRequiresAuthentication)
 	}
 
 	var user string
@@ -199,21 +199,21 @@ func (s *DefaultConsentStrategy) HandleConsentRequest(req fosite.AuthorizeReques
 		if contains(prompts, "none") {
 			return nil, errors.WithStack(fosite.ErrLoginRequired.WithDebug("Session not set but prompt is set to none"))
 		}
-		return nil, errors.WithStack(errRequiresAuthentication)
+		return nil, errors.WithStack(ErrRequiresAuthentication)
 	}
 
 	if authTime, ok = authTimeFromCookie(cookie); !ok {
 		if contains(prompts, "none") {
 			return nil, errors.WithStack(fosite.ErrLoginRequired.WithDebug("Session not set but prompt is set to none"))
 		}
-		return nil, errors.WithStack(errRequiresAuthentication)
+		return nil, errors.WithStack(ErrRequiresAuthentication)
 	}
 
 	if maxAge > 0 && authTime.UTC().Add(time.Second*time.Duration(maxAge)).Before(time.Now().UTC()) {
 		if contains(prompts, "none") {
 			return nil, errors.WithStack(fosite.ErrLoginRequired.WithDebug("Max age was reached and prompt is set to none"))
 		}
-		return nil, errors.WithStack(errRequiresAuthentication)
+		return nil, errors.WithStack(ErrRequiresAuthentication)
 	}
 
 	consent, err := s.ConsentManager.GetPreviouslyGrantedConsent(user, req.GetClient().GetID(), req.GetRequestedScopes())
@@ -221,7 +221,7 @@ func (s *DefaultConsentStrategy) HandleConsentRequest(req fosite.AuthorizeReques
 		if contains(prompts, "none") {
 			return nil, errors.WithStack(fosite.ErrLoginRequired.WithDebug(err.Error()))
 		} else {
-			return nil, errors.WithStack(errRequiresAuthentication)
+			return nil, errors.WithStack(ErrRequiresAuthentication)
 		}
 	}
 

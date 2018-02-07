@@ -207,8 +207,8 @@ func (s *FakeConsentStrategy) CreateConsentRequest(authorizeRequest fosite.Autho
 	return "token", nil
 }
 
-func (s *FakeConsentStrategy) HandleConsentRequest(authorizeRequest fosite.AuthorizeRequester, session *sessions.Session) (claims *Session, err error) {
-	return nil, oauth2.errRequiresAuthentication
+func (s *FakeConsentStrategy) HandleConsentRequest(authorizeRequest fosite.AuthorizeRequester, session *sessions.Session) (claims *oauth2.Session, err error) {
+	return nil, oauth2.ErrRequiresAuthentication
 }
 
 func TestIssuerRedirect(t *testing.T) {

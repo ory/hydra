@@ -388,7 +388,7 @@ func TestHandleConsentRequest(t *testing.T) {
 			if tc.expectErr != nil {
 				assert.EqualError(t, err, tc.expectErr.Error())
 			} else if tc.requiresAuth {
-				assert.EqualError(t, err, errRequiresAuthentication.Error())
+				assert.EqualError(t, err, ErrRequiresAuthentication.Error())
 			} else {
 				require.NoError(t, err)
 				if tc.assert != nil {

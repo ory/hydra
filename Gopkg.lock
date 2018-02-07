@@ -333,6 +333,12 @@
   version = "v1.0.1"
 
 [[projects]]
+  name = "github.com/phayes/freeport"
+  packages = ["."]
+  revision = "b8543db493a5ed890c5499e935e2cad7504f3a04"
+  version = "1.0.2"
+
+[[projects]]
   name = "github.com/pkg/errors"
   packages = ["."]
   revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
@@ -559,6 +565,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "317cab4cb3c65a5029c1794f8a1a8d58fb8eb6f8a184d8da47482c94a6a73547"
+  inputs-digest = "34cce2dc5819c0f84f0cc752c7f9f96467bd0c2feb05f0635241b587ac3351ab"
   solver-name = "gps-cdcl"
   solver-version = 1

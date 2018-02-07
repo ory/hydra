@@ -70,12 +70,14 @@ func newOAuth2Provider(c *config.Config) (fosite.OAuth2Provider, string) {
 	}
 
 	fc := &compose.Config{
-		AccessTokenLifespan:        c.GetAccessTokenLifespan(),
-		AuthorizeCodeLifespan:      c.GetAuthCodeLifespan(),
-		IDTokenLifespan:            c.GetIDTokenLifespan(),
-		HashCost:                   c.BCryptWorkFactor,
-		ScopeStrategy:              c.GetScopeStrategy(),
-		SendDebugMessagesToClients: c.SendOAuth2DebugMessagesToClients,
+		AccessTokenLifespan:            c.GetAccessTokenLifespan(),
+		AuthorizeCodeLifespan:          c.GetAuthCodeLifespan(),
+		IDTokenLifespan:                c.GetIDTokenLifespan(),
+		HashCost:                       c.BCryptWorkFactor,
+		ScopeStrategy:                  c.GetScopeStrategy(),
+		SendDebugMessagesToClients:     c.SendOAuth2DebugMessagesToClients,
+		EnforcePKCE:                    false,
+		EnablePKCEPlainChallengeMethod: false,
 	}
 
 	return compose.Compose(
@@ -90,6 +92,7 @@ func newOAuth2Provider(c *config.Config) (fosite.OAuth2Provider, string) {
 		compose.OAuth2AuthorizeImplicitFactory,
 		compose.OAuth2ClientCredentialsGrantFactory,
 		compose.OAuth2RefreshTokenGrantFactory,
+		compose.OAuth2PKCEFactory,
 		compose.OpenIDConnectExplicitFactory,
 		compose.OpenIDConnectHybridFactory,
 		compose.OpenIDConnectImplicitFactory,

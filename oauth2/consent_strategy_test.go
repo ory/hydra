@@ -16,6 +16,7 @@ package oauth2
 
 import (
 	"fmt"
+	"net/url"
 	"testing"
 	"time"
 
@@ -43,7 +44,15 @@ func TestConsentStrategy(t *testing.T) {
 			ExpiresAt: time.Now().Add(time.Hour),
 		}))
 		require.NoError(t, strategy.ConsentManager.PersistConsentRequest(&ConsentRequest{
-			ID:        "granted_csrf",
+			ID:        "granted_csrf_cookie",
+			Consent:   ConsentRequestAccepted,
+			ClientID:  "client_id",
+			Subject:   "peter",
+			CSRF:      "csrf_token",
+			ExpiresAt: time.Now().Add(time.Hour),
+		}))
+		require.NoError(t, strategy.ConsentManager.PersistConsentRequest(&ConsentRequest{
+			ID:        "granted_csrf_request",
 			Consent:   ConsentRequestAccepted,
 			ClientID:  "client_id",
 			Subject:   "peter",
@@ -71,36 +80,49 @@ func TestConsentStrategy(t *testing.T) {
 				d:         "invalid session",
 				session:   "not_granted",
 				expectErr: true,
+				cookie:    &sessions.Session{Values: map[interface{}]interface{}{CookieCSRFKey: "csrf_token"}},
 			},
 			{
 				d:         "session expired",
 				session:   "granted_expired",
 				expectErr: true,
-				req:       &fosite.AuthorizeRequest{Request: fosite.Request{Client: &fosite.DefaultClient{ID: "client_id"}}},
+				req:       &fosite.AuthorizeRequest{Request: fosite.Request{Client: &fosite.DefaultClient{ID: "client_id"}, Form: url.Values{"consent_csrf": {"csrf_token"}}}},
 				cookie:    &sessions.Session{Values: map[interface{}]interface{}{CookieCSRFKey: "csrf_token"}},
 			},
 			{
 				d:         "granted",
 				session:   "granted",
 				expectErr: false,
-				req:       &fosite.AuthorizeRequest{Request: fosite.Request{Client: &fosite.DefaultClient{ID: "client_id"}}},
+				req:       &fosite.AuthorizeRequest{Request: fosite.Request{Client: &fosite.DefaultClient{ID: "client_id"}, Form: url.Values{"consent_csrf": {"csrf_token"}}}},
 				cookie:    &sessions.Session{Values: map[interface{}]interface{}{CookieCSRFKey: "csrf_token"}},
 			},
 			{
 				d:         "client mismatch",
 				session:   "granted",
 				expectErr: true,
-				req:       &fosite.AuthorizeRequest{Request: fosite.Request{Client: &fosite.DefaultClient{ID: "mismatch_client"}}},
+				req:       &fosite.AuthorizeRequest{Request: fosite.Request{Client: &fosite.DefaultClient{ID: "mismatch_client"}, Form: url.Values{"consent_csrf": {"csrf_token"}}}},
 				cookie:    &sessions.Session{Values: map[interface{}]interface{}{CookieCSRFKey: "csrf_token"}},
 			},
 			{
-				d:         "csrf detected",
-				session:   "granted_csrf",
+				d:         "consent request was not initiated by this user agent",
+				session:   "granted_csrf_cookie",
 				expectErr: true,
-				req:       &fosite.AuthorizeRequest{Request: fosite.Request{Client: &fosite.DefaultClient{ID: "client_id"}}},
-				cookie:    &sessions.Session{Values: map[interface{}]interface{}{CookieCSRFKey: "invalid_csrf"}},
+				req:       &fosite.AuthorizeRequest{Request: fosite.Request{Client: &fosite.DefaultClient{ID: "client_id"}, Form: url.Values{"consent_csrf": {"csrf_token"}}}},
+				cookie:    &sessions.Session{Values: map[interface{}]interface{}{CookieCSRFKey: "very_different_csrf_token"}},
 				assert: func(t *testing.T, session *Session) {
-					cr, err := strategy.ConsentManager.GetConsentRequest("granted_csrf")
+					cr, err := strategy.ConsentManager.GetConsentRequest("granted_csrf_cookie")
+					require.NoError(t, err)
+					assert.False(t, cr.IsConsentGranted())
+				},
+			},
+			{
+				d:         "authorize url contains csrf token that does not match token set in consent request",
+				session:   "granted_csrf_request",
+				expectErr: true,
+				req:       &fosite.AuthorizeRequest{Request: fosite.Request{Client: &fosite.DefaultClient{ID: "client_id"}, Form: url.Values{"consent_csrf": {"very_different_csrf_token"}}}},
+				cookie:    &sessions.Session{Values: map[interface{}]interface{}{CookieCSRFKey: "csrf_token"}},
+				assert: func(t *testing.T, session *Session) {
+					cr, err := strategy.ConsentManager.GetConsentRequest("granted_csrf_request")
 					require.NoError(t, err)
 					assert.False(t, cr.IsConsentGranted())
 				},

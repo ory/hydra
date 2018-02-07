@@ -15,9 +15,8 @@
 package oauth2
 
 import (
-	"time"
-
 	"net/http"
+	"time"
 
 	"github.com/gorilla/sessions"
 	"github.com/ory/fosite"
@@ -39,18 +38,35 @@ type DefaultConsentStrategy struct {
 	ConsentManager           ConsentRequestManager
 }
 
-func checkAntiReplayToken(consent *ConsentRequest, cookie *sessions.Session) error {
+func (s *DefaultConsentStrategy) validateSession(req fosite.AuthorizeRequester, consent *ConsentRequest, cookie *sessions.Session) error {
 	if j, ok := cookie.Values[CookieCSRFKey]; !ok {
-		return errors.Errorf("Session cookie is missing anti-replay token")
+		return errors.Errorf("Session cookie is missing CSRF token")
 	} else if js, ok := j.(string); !ok {
-		return errors.Errorf("Session cookie anti-replay value is not a string")
+		return errors.Errorf("CSRF value in session cookie is not a string")
 	} else if js != consent.CSRF {
-		return errors.Errorf("Session cookie anti-replay value does not match value from consent response")
+		return errors.Errorf("CSRF value in session cookie does not match consent CSRF value")
+	} else if consent.CSRF != req.GetRequestForm().Get("consent_csrf") {
+		return errors.Errorf("CSRF value from query parameters does not match consent CSRF value")
 	}
+
+	if time.Now().After(consent.ExpiresAt) {
+		return errors.Errorf("Consent session expired")
+	}
+
+	if consent.ClientID != req.GetClient().GetID() {
+		return errors.Errorf("ClientID mismatch")
+	}
+
+	if consent.Subject == "" {
+		return errors.Errorf("Subject key is empty or undefined in consent response, check your payload.")
+	}
+
 	return nil
 }
 
 func (s *DefaultConsentStrategy) ValidateConsentRequest(req fosite.AuthorizeRequester, session string, cookie *sessions.Session) (claims *Session, err error) {
+	defer delete(cookie.Values, CookieCSRFKey)
+
 	consent, err := s.ConsentManager.GetConsentRequest(session)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -67,21 +83,9 @@ func (s *DefaultConsentStrategy) ValidateConsentRequest(req fosite.AuthorizeRequ
 		}
 	}
 
-	if time.Now().After(consent.ExpiresAt) {
-		return nil, errors.Errorf("Token expired")
-	}
-
-	if consent.ClientID != req.GetClient().GetID() {
-		return nil, errors.Errorf("ClientID mismatch")
-	}
-
-	if consent.Subject == "" {
-		return nil, errors.Errorf("Subject key is empty or undefined in consent response, check your payload.")
-	}
-
-	if err := checkAntiReplayToken(consent, cookie); err != nil {
+	if err := s.validateSession(req, consent, cookie); err != nil {
 		if err := s.ConsentManager.RejectConsentRequest(session, &RejectConsentRequestPayload{
-			Reason: "Session cookie is missing anti-replay token",
+			Reason: "Unable to validate consent request",
 		}); err != nil {
 			return nil, err
 		}
@@ -91,8 +95,6 @@ func (s *DefaultConsentStrategy) ValidateConsentRequest(req fosite.AuthorizeRequ
 	for _, scope := range consent.GrantedScopes {
 		req.GrantScope(scope)
 	}
-
-	delete(cookie.Values, CookieCSRFKey)
 
 	return &Session{
 		DefaultSession: &openid.DefaultSession{
@@ -126,7 +128,7 @@ func (s *DefaultConsentStrategy) CreateConsentRequest(req fosite.AuthorizeReques
 		RequestedScopes:  req.GetRequestedScopes(),
 		ClientID:         req.GetClient().GetID(),
 		ExpiresAt:        time.Now().Add(s.DefaultChallengeLifespan),
-		RedirectURL:      redirectURL + "&consent=" + id,
+		RedirectURL:      redirectURL + "&consent=" + id + "&consent_csrf=" + csrf,
 		AccessTokenExtra: map[string]interface{}{},
 		IDTokenExtra:     map[string]interface{}{},
 	}

@@ -439,7 +439,7 @@ Name | Type | Description  | Notes
 
 <a name="listOAuth2Clients"></a>
 # **listOAuth2Clients**
-> [OAuth2Client] listOAuth2Clients()
+> [OAuth2Client] listOAuth2Clients(opts)
 
 List OAuth 2.0 Clients
 
@@ -456,6 +456,11 @@ oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
 var apiInstance = new HydraOAuth2OpenIdConnectServer.OAuth2Api();
 
+var opts = { 
+  'limit': 789, // Number | The maximum amount of policies returned.
+  'offset': 789 // Number | The offset from where to start looking.
+};
+
 var callback = function(error, data, response) {
   if (error) {
     console.error(error);
@@ -463,11 +468,15 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-apiInstance.listOAuth2Clients(callback);
+apiInstance.listOAuth2Clients(opts, callback);
 ```
 
 ### Parameters
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **limit** | **Number**| The maximum amount of policies returned. | [optional] 
+ **offset** | **Number**| The offset from where to start looking. | [optional] 
 
 ### Return type
 

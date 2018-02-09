@@ -149,7 +149,7 @@ type OAuth2API interface {
 	GetOAuth2ConsentRequest(id string) (*swagger.OAuth2ConsentRequest, *swagger.APIResponse, error)
 	GetWellKnown() (*swagger.WellKnown, *swagger.APIResponse, error)
 	IntrospectOAuth2Token(token string, scope string) (*swagger.OAuth2TokenIntrospection, *swagger.APIResponse, error)
-	ListOAuth2Clients() ([]swagger.OAuth2Client, *swagger.APIResponse, error)
+	ListOAuth2Clients(limit int64, offset int64) ([]swagger.OAuth2Client, *swagger.APIResponse, error)
 	RejectOAuth2ConsentRequest(id string, body swagger.ConsentRequestRejection) (*swagger.APIResponse, error)
 	RevokeOAuth2Token(token string) (*swagger.APIResponse, error)
 	UpdateOAuth2Client(id string, body swagger.OAuth2Client) (*swagger.OAuth2Client, *swagger.APIResponse, error)

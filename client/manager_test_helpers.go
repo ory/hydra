@@ -88,10 +88,18 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 			compare(t, d, k)
 		}
 
-		ds, err := m.GetClients()
+		ds, err := m.GetClients(100, 0)
 		assert.NoError(t, err)
 		assert.Len(t, ds, 2)
 		assert.NotEqual(t, ds["1234"].ID, ds["2-1234"].ID)
+
+		ds, err = m.GetClients(1, 0)
+		assert.NoError(t, err)
+		assert.Len(t, ds, 1)
+
+		ds, err = m.GetClients(100, 100)
+		assert.NoError(t, err)
+		assert.Len(t, ds, 0)
 
 		err = m.UpdateClient(&Client{
 			ID:                "2-1234",

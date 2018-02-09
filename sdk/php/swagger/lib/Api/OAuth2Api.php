@@ -871,12 +871,14 @@ class OAuth2Api
      *
      * Client for Hydra
      *
+     * @param int $limit The maximum amount of policies returned. (optional)
+     * @param int $offset The offset from where to start looking. (optional)
      * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return \Hydra\SDK\Model\OAuth2Client[]
      */
-    public function listOAuth2Clients()
+    public function listOAuth2Clients($limit = null, $offset = null)
     {
-        list($response) = $this->listOAuth2ClientsWithHttpInfo();
+        list($response) = $this->listOAuth2ClientsWithHttpInfo($limit, $offset);
         return $response;
     }
 
@@ -887,10 +889,12 @@ class OAuth2Api
      *
      * Client for Hydra
      *
+     * @param int $limit The maximum amount of policies returned. (optional)
+     * @param int $offset The offset from where to start looking. (optional)
      * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return array of \Hydra\SDK\Model\OAuth2Client[], HTTP status code, HTTP response headers (array of strings)
      */
-    public function listOAuth2ClientsWithHttpInfo()
+    public function listOAuth2ClientsWithHttpInfo($limit = null, $offset = null)
     {
         // parse inputs
         $resourcePath = "/clients";
@@ -904,6 +908,14 @@ class OAuth2Api
         }
         $headerParams['Content-Type'] = $this->apiClient->selectHeaderContentType(['application/json']);
 
+        // query params
+        if ($limit !== null) {
+            $queryParams['limit'] = $this->apiClient->getSerializer()->toQueryValue($limit);
+        }
+        // query params
+        if ($offset !== null) {
+            $queryParams['offset'] = $this->apiClient->getSerializer()->toQueryValue($offset);
+        }
 
         // for model (json/xml)
         if (isset($_tempBody)) {

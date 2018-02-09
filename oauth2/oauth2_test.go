@@ -38,10 +38,7 @@ import (
 var hasher = &fosite.BCrypt{}
 
 var store = &FositeMemoryStore{
-	Manager: &hc.MemoryManager{
-		Clients: map[string]hc.Client{},
-		Hasher:  hasher,
-	},
+	Manager:        hc.NewMemoryManager(hasher),
 	AuthorizeCodes: make(map[string]fosite.Requester),
 	IDSessions:     make(map[string]fosite.Requester),
 	AccessTokens:   make(map[string]fosite.Requester),
@@ -121,14 +118,14 @@ func init() {
 	c, _ := url.Parse(ts.URL + "/consent")
 	handler.ConsentURL = *c
 
-	store.Manager.(*hc.MemoryManager).Clients["app-client"] = hc.Client{
+	store.Manager.(*hc.MemoryManager).Clients = append(store.Manager.(*hc.MemoryManager).Clients, hc.Client{
 		ID:            "app-client",
 		Secret:        string(h),
 		RedirectURIs:  []string{ts.URL + "/callback"},
 		ResponseTypes: []string{"id_token", "code", "token"},
 		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
 		Scope:         "hydra.* offline openid",
-	}
+	})
 
 	oauthConfig = &oauth2.Config{
 		ClientID:     "app-client",

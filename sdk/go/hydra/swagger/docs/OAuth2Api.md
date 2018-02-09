@@ -254,7 +254,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **ListOAuth2Clients**
-> []OAuth2Client ListOAuth2Clients()
+> []OAuth2Client ListOAuth2Clients($limit, $offset)
 
 List OAuth 2.0 Clients
 
@@ -262,7 +262,11 @@ This endpoint never returns passwords.   The subject making the request needs to
 
 
 ### Parameters
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **limit** | **int64**| The maximum amount of policies returned. | [optional] 
+ **offset** | **int64**| The offset from where to start looking. | [optional] 
 
 ### Return type
 

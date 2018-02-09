@@ -127,6 +127,24 @@
         ],
         "summary": "List OAuth 2.0 Clients",
         "operationId": "listOAuth2Clients",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Limit",
+            "description": "The maximum amount of policies returned.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Offset",
+            "description": "The offset from where to start looking.",
+            "name": "offset",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "$ref": "#/responses/oAuth2ClientList"

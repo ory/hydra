@@ -24,6 +24,7 @@ import (
 	"github.com/ory/hydra/firewall"
 	"github.com/ory/hydra/rand/sequence"
 	"github.com/ory/ladon"
+	"github.com/ory/pagination"
 	"github.com/pkg/errors"
 )
 
@@ -290,7 +291,8 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 		return
 	}
 
-	c, err := h.Manager.GetClients()
+	limit, offset := pagination.Parse(r, 100, 0, 500)
+	c, err := h.Manager.GetClients(limit, offset)
 	if err != nil {
 		h.H.WriteError(w, r, err)
 		return

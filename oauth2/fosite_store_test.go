@@ -31,7 +31,7 @@ import (
 
 var clientManagers = map[string]pkg.FositeStorer{}
 var clientManager = &client.MemoryManager{
-	Clients: map[string]client.Client{"foobar": {ID: "foobar"}},
+	Clients: []client.Client{{ID: "foobar"}},
 	Hasher:  &fosite.BCrypt{},
 }
 

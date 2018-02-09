@@ -29,7 +29,7 @@ import (
 func (h *Handler) createRootIfNewInstall(c *config.Config) {
 	ctx := c.Context()
 
-	clients, err := h.Clients.Manager.GetClients()
+	clients, err := h.Clients.Manager.GetClients(100, 0)
 	pkg.Must(err, "Could not fetch client list: %s", err)
 	if len(clients) != 0 {
 		return

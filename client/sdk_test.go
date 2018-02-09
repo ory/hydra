@@ -83,7 +83,7 @@ func TestClientSDK(t *testing.T) {
 		result, _, err = c.GetOAuth2Client(createClient.Id)
 		assert.EqualValues(t, compareClient, *result)
 
-		results, _, err := c.ListOAuth2Clients()
+		results, _, err := c.ListOAuth2Clients(100, 0)
 		require.NoError(t, err)
 		assert.Len(t, results, 1)
 		assert.EqualValues(t, compareClient, results[0])

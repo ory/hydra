@@ -40,6 +40,18 @@ type swaggerUpdateClientPayload struct {
 	Body Client
 }
 
+// swagger:parameters listOAuth2Clients
+type swaggerListClientsParameter struct {
+
+	// The maximum amount of policies returned.
+	// in: query
+	Limit int `json:"limit"`
+
+	// The offset from where to start looking.
+	// in: query
+	Offset int `json:"offset"`
+}
+
 // A list of clients.
 // swagger:response oAuth2ClientList
 type swaggerListClientsResult struct {

@@ -230,7 +230,7 @@ func (m *SQLManager) GetClients(limit, offset int) (clients map[string]Client, e
 	d := make([]sqlData, 0)
 	clients = make(map[string]Client)
 
-	if err := m.DB.Select(&d, "SELECT * FROM hydra_client ORDER BY id LIMIT ? OFFSET ?", limit, offset); err != nil {
+	if err := m.DB.Select(&d, m.DB.Rebind("SELECT * FROM hydra_client ORDER BY id LIMIT ? OFFSET ?"), limit, offset); err != nil {
 		return nil, errors.WithStack(err)
 	}
 

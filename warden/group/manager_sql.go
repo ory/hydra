@@ -59,11 +59,9 @@ func (m *SQLManager) CreateSchemas() (int, error) {
 
 func (m *SQLManager) createGroup(group string) func(tx *sqlx.Tx) error {
 	return func(tx *sqlx.Tx) error {
-		if _, err := tx.Exec(m.DB.Rebind("INSERT INTO hydra_warden_group (id) VALUES (?)"), group); err != nil {
-			return err
-		}
+		_, err := tx.Exec(m.DB.Rebind("INSERT INTO hydra_warden_group (id) VALUES (?)"), group)
 
-		return nil
+		return errors.WithStack(err)
 	}
 }
 
@@ -72,7 +70,7 @@ func (m *SQLManager) CreateGroup(g *Group) error {
 		g.ID = uuid.New()
 	}
 
-	return m.applyInTransaction(m.createGroup(g.ID), m.addGroupMembers(g.ID, g.Members))
+	return errors.WithStack(m.applyInTransaction(m.createGroup(g.ID), m.addGroupMembers(g.ID, g.Members)))
 }
 
 func (m *SQLManager) GetGroup(id string) (*Group, error) {
@@ -96,26 +94,21 @@ func (m *SQLManager) GetGroup(id string) (*Group, error) {
 
 func (m *SQLManager) deleteGroup(id string) func(tx *sqlx.Tx) error {
 	return func(tx *sqlx.Tx) error {
-		if _, err := tx.Exec(m.DB.Rebind("DELETE FROM hydra_warden_group WHERE id=?"), id); err != nil {
-			return err
-		}
+		_, err := tx.Exec(m.DB.Rebind("DELETE FROM hydra_warden_group WHERE id=?"), id)
 
-		return nil
+		return errors.WithStack(err)
 	}
 }
 
 func (m *SQLManager) DeleteGroup(id string) error {
-	return m.applyInTransaction(m.deleteGroup(id))
+	return errors.WithStack(m.applyInTransaction(m.deleteGroup(id)))
 }
 
 func (m *SQLManager) addGroupMembers(group string, subjects []string) func(tx *sqlx.Tx) error {
 	return func(tx *sqlx.Tx) error {
 		for _, subject := range subjects {
 			if _, err := tx.Exec(m.DB.Rebind("INSERT INTO hydra_warden_group_member (group_id, member) VALUES (?, ?)"), group, subject); err != nil {
-				if err := tx.Rollback(); err != nil {
-					return err
-				}
-				return err
+				return errors.WithStack(err)
 			}
 		}
 
@@ -124,16 +117,13 @@ func (m *SQLManager) addGroupMembers(group string, subjects []string) func(tx *s
 }
 
 func (m *SQLManager) AddGroupMembers(group string, subjects []string) error {
-	return m.applyInTransaction(m.addGroupMembers(group, subjects))
+	return errors.WithStack(m.applyInTransaction(m.addGroupMembers(group, subjects)))
 }
 
 func (m *SQLManager) removeGroupMembers(group string, subjects []string) func(tx *sqlx.Tx) error {
 	return func(tx *sqlx.Tx) error {
 		for _, subject := range subjects {
 			if _, err := tx.Exec(m.DB.Rebind("DELETE FROM hydra_warden_group_member WHERE member=? AND group_id=?"), subject, group); err != nil {
-				if err := tx.Rollback(); err != nil {
-					return errors.WithStack(err)
-				}
 				return errors.WithStack(err)
 			}
 		}
@@ -143,7 +133,7 @@ func (m *SQLManager) removeGroupMembers(group string, subjects []string) func(tx
 }
 
 func (m *SQLManager) RemoveGroupMembers(group string, subjects []string) error {
-	return m.applyInTransaction(m.removeGroupMembers(group, subjects))
+	return errors.WithStack(m.applyInTransaction(m.removeGroupMembers(group, subjects)))
 }
 
 func (m *SQLManager) FindGroupsByMember(subject string, limit, offset int) ([]Group, error) {
@@ -189,11 +179,7 @@ func (m *SQLManager) ListGroups(limit, offset int) ([]Group, error) {
 }
 
 func (m *SQLManager) OverwriteGroupMembers(group string, members []string) error {
-	if err := m.applyInTransaction(m.deleteGroup(group), m.createGroup(group), m.addGroupMembers(group, members)); err != nil {
-		return err
-	}
-
-	return nil
+	return errors.WithStack(m.applyInTransaction(m.deleteGroup(group), m.createGroup(group), m.addGroupMembers(group, members)))
 }
 
 func (m *SQLManager) applyInTransaction(requests ...func(tx *sqlx.Tx) error) error {
@@ -204,7 +190,10 @@ func (m *SQLManager) applyInTransaction(requests ...func(tx *sqlx.Tx) error) err
 
 	for _, req := range requests {
 		if err := req(tx); err != nil {
-			tx.Rollback()
+			if err := tx.Rollback(); err != nil {
+				return errors.WithStack(err)
+			}
+
 			return errors.WithStack(err)
 		}
 	}
@@ -215,5 +204,6 @@ func (m *SQLManager) applyInTransaction(requests ...func(tx *sqlx.Tx) error) err
 		}
 		return errors.Wrap(err, "Could not commit transaction")
 	}
+
 	return nil
 }

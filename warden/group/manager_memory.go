@@ -137,7 +137,7 @@ func (m *MemoryManager) OverwriteGroupMembers(group string, members []string) er
 	}
 
 	err = m.CreateGroup(&Group{
-		ID: id,
+		ID:      id,
 		Members: members,
 	})
 

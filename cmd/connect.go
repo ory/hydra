@@ -60,8 +60,8 @@ var connectCmd = &cobra.Command{
 
 		if skipNewsletter, _ := cmd.Flags().GetBool("skip-newsletter"); !c.SignedUpForNewsletter && !skipNewsletter {
 			u := "https://ory.us10.list-manage.com/subscribe/post?u=ffb1a878e4ec6c0ed312a3480&id=f605a41b53"
-			fmt.Println("Never miss any security patches! Enter your email address here to sign up for our newsletter.")
-			m := input("Email Address:")
+			fmt.Println("You are using the CLI for the first time. It is really important to keep your installation up to date. Because this technology is open source, we have no way of knowing who you are and how to contact you. Subscribe to our release and security announcements, and never miss important patches again:")
+			m := input("[Enter Email Address]:")
 
 			v := url.Values{}
 			v.Add("EMAIL", m)

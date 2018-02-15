@@ -70,7 +70,7 @@ func (m *SQLManager) CreateGroup(g *Group) error {
 		g.ID = uuid.New()
 	}
 
-	return errors.WithStack(m.applyInTransaction(m.createGroup(g.ID), m.addGroupMembers(g.ID, g.Members)))
+	return m.applyInTransaction(m.createGroup(g.ID), m.addGroupMembers(g.ID, g.Members))
 }
 
 func (m *SQLManager) GetGroup(id string) (*Group, error) {
@@ -101,7 +101,7 @@ func (m *SQLManager) deleteGroup(id string) func(tx *sqlx.Tx) error {
 }
 
 func (m *SQLManager) DeleteGroup(id string) error {
-	return errors.WithStack(m.applyInTransaction(m.deleteGroup(id)))
+	return m.applyInTransaction(m.deleteGroup(id))
 }
 
 func (m *SQLManager) addGroupMembers(group string, subjects []string) func(tx *sqlx.Tx) error {
@@ -117,7 +117,7 @@ func (m *SQLManager) addGroupMembers(group string, subjects []string) func(tx *s
 }
 
 func (m *SQLManager) AddGroupMembers(group string, subjects []string) error {
-	return errors.WithStack(m.applyInTransaction(m.addGroupMembers(group, subjects)))
+	return m.applyInTransaction(m.addGroupMembers(group, subjects))
 }
 
 func (m *SQLManager) removeGroupMembers(group string, subjects []string) func(tx *sqlx.Tx) error {
@@ -133,7 +133,7 @@ func (m *SQLManager) removeGroupMembers(group string, subjects []string) func(tx
 }
 
 func (m *SQLManager) RemoveGroupMembers(group string, subjects []string) error {
-	return errors.WithStack(m.applyInTransaction(m.removeGroupMembers(group, subjects)))
+	return m.applyInTransaction(m.removeGroupMembers(group, subjects))
 }
 
 func (m *SQLManager) FindGroupsByMember(subject string, limit, offset int) ([]Group, error) {
@@ -148,7 +148,7 @@ func (m *SQLManager) FindGroupsByMember(subject string, limit, offset int) ([]Gr
 	for k, id := range ids {
 		group, err := m.GetGroup(id)
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, err
 		}
 
 		groups[k] = *group
@@ -169,7 +169,7 @@ func (m *SQLManager) ListGroups(limit, offset int) ([]Group, error) {
 	for k, id := range ids {
 		group, err := m.GetGroup(id)
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, err
 		}
 
 		groups[k] = *group
@@ -178,23 +178,23 @@ func (m *SQLManager) ListGroups(limit, offset int) ([]Group, error) {
 	return groups, nil
 }
 
-func (m *SQLManager) OverwriteGroupMembers(group string, members []string) error {
-	return errors.WithStack(m.applyInTransaction(m.deleteGroup(group), m.createGroup(group), m.addGroupMembers(group, members)))
+func (m *SQLManager) UpdateGroupMembers(group string, members []string) error {
+	return m.applyInTransaction(m.deleteGroup(group), m.createGroup(group), m.addGroupMembers(group, members))
 }
 
-func (m *SQLManager) applyInTransaction(requests ...func(tx *sqlx.Tx) error) error {
+func (m *SQLManager) applyInTransaction(executors ...func(tx *sqlx.Tx) error) error {
 	tx, err := m.DB.Beginx()
 	if err != nil {
 		return errors.Wrap(err, "Could not begin transaction")
 	}
 
-	for _, req := range requests {
-		if err := req(tx); err != nil {
+	for _, exec := range executors {
+		if err := exec(tx); err != nil {
 			if err := tx.Rollback(); err != nil {
 				return errors.WithStack(err)
 			}
 
-			return errors.WithStack(err)
+			return err
 		}
 	}
 

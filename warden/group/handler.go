@@ -68,7 +68,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.DELETE(GroupsHandlerPath+"/:id", h.DeleteGroup)
 	r.POST(GroupsHandlerPath+"/:id/members", h.AddGroupMembers)
 	r.DELETE(GroupsHandlerPath+"/:id/members", h.RemoveGroupMembers)
-	r.PUT(GroupsHandlerPath+"/:id/members", h.OverwriteGroupMembers)
+	r.PUT(GroupsHandlerPath+"/:id/members", h.UpdateGroupMembers)
 }
 
 // swagger:route GET /warden/groups warden listGroups
@@ -384,10 +384,40 @@ func (h *Handler) RemoveGroupMembers(w http.ResponseWriter, r *http.Request, ps 
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (h *Handler) OverwriteGroupMembers(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+// swagger:route PUT /warden/groups/{id}/members warden replaceMembersInGroup
+//
+// Replace the members of a group
+//
+// The subject making the request needs to be assigned to a policy containing:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:warden:groups:<id>"],
+//    "actions": ["members.update"],
+//    "effect": "allow"
+//  }
+//  ```
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2: hydra.warden.groups
+//
+//     Responses:
+//       204: emptyResponse
+//       401: genericError
+//       403: genericError
+//       500: genericError
+func (h *Handler) UpdateGroupMembers(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 
-	if err := h.checkRequest(r, fmt.Sprintf(h.PrefixResource(GroupResource), id), "members.remove"); err != nil {
+	if err := h.checkRequest(r, fmt.Sprintf(h.PrefixResource(GroupResource), id), "members.update"); err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}
@@ -398,7 +428,7 @@ func (h *Handler) OverwriteGroupMembers(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 
-	if err := h.Manager.OverwriteGroupMembers(id, m.Members); err != nil {
+	if err := h.Manager.UpdateGroupMembers(id, m.Members); err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}

@@ -29,10 +29,7 @@ import (
 var clientManagers = map[string]Manager{}
 
 func init() {
-	clientManagers["memory"] = &MemoryManager{
-		Clients: map[string]Client{},
-		Hasher:  &fosite.BCrypt{},
-	}
+	clientManagers["memory"] = NewMemoryManager(&fosite.BCrypt{})
 }
 
 func TestMain(m *testing.M) {

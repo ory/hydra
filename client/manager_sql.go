@@ -226,11 +226,11 @@ func (m *SQLManager) DeleteClient(id string) error {
 	return nil
 }
 
-func (m *SQLManager) GetClients() (clients map[string]Client, err error) {
-	var d = []sqlData{}
+func (m *SQLManager) GetClients(limit, offset int) (clients map[string]Client, err error) {
+	d := make([]sqlData, 0)
 	clients = make(map[string]Client)
 
-	if err := m.DB.Select(&d, "SELECT * FROM hydra_client"); err != nil {
+	if err := m.DB.Select(&d, m.DB.Rebind("SELECT * FROM hydra_client ORDER BY id LIMIT ? OFFSET ?"), limit, offset); err != nil {
 		return nil, errors.WithStack(err)
 	}
 

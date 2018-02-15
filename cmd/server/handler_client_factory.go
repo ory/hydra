@@ -26,10 +26,7 @@ func newClientManager(c *config.Config) client.Manager {
 
 	switch con := ctx.Connection.(type) {
 	case *config.MemoryConnection:
-		return &client.MemoryManager{
-			Clients: map[string]client.Client{},
-			Hasher:  ctx.Hasher,
-		}
+		return client.NewMemoryManager(ctx.Hasher)
 	case *config.SQLConnection:
 		return &client.SQLManager{
 			DB:     con.GetDatabase(),

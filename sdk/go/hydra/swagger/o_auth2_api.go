@@ -573,9 +573,11 @@ func (a OAuth2Api) IntrospectOAuth2Token(token string, scope string) (*OAuth2Tok
  * List OAuth 2.0 Clients
  * This endpoint never returns passwords.   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
  *
+ * @param limit The maximum amount of policies returned.
+ * @param offset The offset from where to start looking.
  * @return []OAuth2Client
  */
-func (a OAuth2Api) ListOAuth2Clients() ([]OAuth2Client, *APIResponse, error) {
+func (a OAuth2Api) ListOAuth2Clients(limit int64, offset int64) ([]OAuth2Client, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Get")
 	// create path and map variables
@@ -596,6 +598,8 @@ func (a OAuth2Api) ListOAuth2Clients() ([]OAuth2Client, *APIResponse, error) {
 	for key := range a.Configuration.DefaultHeader {
 		localVarHeaderParams[key] = a.Configuration.DefaultHeader[key]
 	}
+	localVarQueryParams.Add("limit", a.Configuration.APIClient.ParameterToString(limit, ""))
+	localVarQueryParams.Add("offset", a.Configuration.APIClient.ParameterToString(offset, ""))
 
 	// to determine the Content-Type header
 	localVarHttpContentTypes := []string{"application/json"}

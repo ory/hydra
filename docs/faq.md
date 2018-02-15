@@ -301,9 +301,6 @@ yes
 This section is intended to give operations folk some useful guidelines on
 how to best manage a hydra deployment.
 
-Note: some of this section is specific to rethinkdb, which is the only persistence
-engine supported at the time of writing.
-
 ### Managing Client/Policy Definitions
 
 It is useful for JSON files for client and policy definitions to be persisted outside
@@ -347,18 +344,11 @@ If you somehow manage to lose admin access to your Hydra system, you can regain 
 by making use of Hydra's temporary root client creation - which is triggered when
 hydra is unable to find any client definitions upon startup. Due to the ID given to
 policy used for temporary root clients, you may need to also delete configured
-policies. With a rethinkdb connection `r`, you can perform these operations as follows:
+policies. To do so, make a (sql) back up of existing clients and policies,
+then empty tables `hydra_clients` and `hydra_policies`, and:
 
-````
-r.db('hydra').table('hydra_clients').delete()
-r.db('hydra').table('hydra_policies').delete()
-````
-
-then:
-
-- restart Hydra
-- re-import your client/policy definitions, as described above
-- delete your new temporary root client
-- ensure that any Hydra clients which have read keys from hydra are refreshed, possibly
+- Restart Hydra
+- Re-import your client/policy definitions, as described above
+- Delete your new temporary root client
+- Ensure that any Hydra clients which have read keys from hydra are refreshed, possibly
   involving a simple restart to effect a timely update
-- play the maracas, FTW

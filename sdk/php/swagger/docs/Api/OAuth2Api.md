@@ -408,7 +408,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **listOAuth2Clients**
-> \Hydra\SDK\Model\OAuth2Client[] listOAuth2Clients()
+> \Hydra\SDK\Model\OAuth2Client[] listOAuth2Clients($limit, $offset)
 
 List OAuth 2.0 Clients
 
@@ -423,9 +423,11 @@ require_once(__DIR__ . '/vendor/autoload.php');
 Hydra\SDK\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
 
 $api_instance = new Hydra\SDK\Api\OAuth2Api();
+$limit = 789; // int | The maximum amount of policies returned.
+$offset = 789; // int | The offset from where to start looking.
 
 try {
-    $result = $api_instance->listOAuth2Clients();
+    $result = $api_instance->listOAuth2Clients($limit, $offset);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling OAuth2Api->listOAuth2Clients: ', $e->getMessage(), PHP_EOL;
@@ -434,7 +436,11 @@ try {
 ```
 
 ### Parameters
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **limit** | **int**| The maximum amount of policies returned. | [optional]
+ **offset** | **int**| The offset from where to start looking. | [optional]
 
 ### Return type
 

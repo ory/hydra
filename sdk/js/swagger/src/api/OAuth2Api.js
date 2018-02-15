@@ -530,14 +530,21 @@
     /**
      * List OAuth 2.0 Clients
      * This endpoint never returns passwords.   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * @param {Object} opts Optional parameters
+     * @param {Number} opts.limit The maximum amount of policies returned.
+     * @param {Number} opts.offset The offset from where to start looking.
      * @param {module:api/OAuth2Api~listOAuth2ClientsCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Array.<module:model/OAuth2Client>}
      */
-    this.listOAuth2Clients = function(callback) {
+    this.listOAuth2Clients = function(opts, callback) {
+      opts = opts || {}
       var postBody = null
 
       var pathParams = {}
-      var queryParams = {}
+      var queryParams = {
+        limit: opts['limit'],
+        offset: opts['offset']
+      }
       var headerParams = {}
       var formParams = {}
 

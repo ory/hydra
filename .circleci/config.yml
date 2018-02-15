@@ -38,7 +38,7 @@ jobs:
       - run: go-acc -o coverage.txt ./...
       - run: go test -race -short $(go list ./... | grep -v cmd)
       - run: ./scripts/test-e2e.sh
-      - run: goveralls -service=circle-ci -coverprofile=coverage.txt -repotoken=$COVERALLS_REPO_TOKEN
+      - run: goveralls -service=circle-ci -coverprofile=coverage.txt
 
   swagger:
     docker:

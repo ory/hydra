@@ -4,7 +4,6 @@
   "gitbook": ">=3.2.0",
   "plugins": [
     "edit-link",
-    "summary",
     "etoc",
     "domain-redirect"
   ],

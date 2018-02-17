@@ -113,6 +113,18 @@ jobs:
       - run: git remote add origin https://arekkas:$GITHUB_TOKEN@github.com/ory/hydra.git
       - run: git push origin HEAD:master
 
+  publish-docs:
+    docker:
+      - image: alpine/git:1.0.4
+    working_directory: /go/src/github.com/ory/oathkeeper
+    steps:
+      - checkout
+      - run: git config --global user.email "hi@ory.am"
+      - run: git config --global user.name "ORY Continuous Integration"
+      - run: "git clone https://arekkas:$DOCS_TOKEN_PUSH@github.com/ory/ory-am.git ../ory-am"
+      - run: "cp -R ./docs/* ../ory-am/docs/1-hydra/"
+      - run: "(cd ../ory-am && git add -A && git commit -a -m \"docs: Updates ORY Hydra docs\" && git push origin) || exit 0"
+
 workflows:
   version: 2
   "test, build, push, and deploy":
@@ -125,6 +137,10 @@ workflows:
           filters:
             tags:
               only: /.*/
+      - publish-docs:
+          filters:
+            branches:
+              only: master
       - swagger:
           filters:
             tags:

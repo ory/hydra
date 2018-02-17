@@ -3,9 +3,9 @@
 To start off easy, ORY Hydra provides a docker-compose based example for setting up ORY Hydra, a PostgreSQL instance
 and an exemplary consent app (identity provider). You need to have the latest Docker version installed.
 
-<img src="images/oauth2-flow.gif" alt="OAuth2 Flow">
+<img src="../images/oauth2-flow.gif" alt="OAuth2 Flow">
 
-<img alt="Running the example" align="right" width="35%" src="images/run-the-example.gif">
+<img alt="Running the example" align="right" width="35%" src="../images/run-the-example.gif">
 
 Install [Docker and Docker Compose](https://github.com/ory-am/hydra#installation) and either clone the Hydra git repository,
 download [this zip file](https://github.com/ory-am/hydra/archive/master.zip) or use `go get github.com/ory/hydra` if you have Go (1.8+) installed on you system.

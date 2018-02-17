@@ -445,4 +445,4 @@ If your browser does not open automatically, navigate to:
 open the link, as prompted, in your browser, and follow the steps shown there. When completed, you should land
 at a screen that looks like this one:
 
-![OAuth 2.0 result](images/install-result.png)
+![OAuth 2.0 result](../images/install-result.png)

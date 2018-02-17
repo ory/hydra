@@ -5,7 +5,8 @@
   "plugins": [
     "edit-link",
     "summary",
-    "etoc"
+    "etoc",
+    "domain-redirect"
   ],
   "pluginsConfig": {
     "edit-link": {
@@ -17,6 +18,10 @@
       "mindepth": 2,
       "maxdepth": 5,
       "notoc": false
+    },
+    "domain-redirect": {
+      "from": "ory.gitbooks.io/hydra/content/",
+      "to": "www.ory.sh/docs/hydra"
     }
   }
 }

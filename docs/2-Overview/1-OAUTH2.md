@@ -41,7 +41,7 @@ uses the Identity Provider to authenticate peter, for example by using cookies o
 If you are new to OpenID Connect, please read the [Introduction to OAuth 2.0 and OpenID Connect](README.md#introduction-to-oauth-20-and-openid-connect)
 first. 
 
-Hydra uses the [JSON Web Key Manager](./jwk.md) to retrieve the
+Hydra uses the [JSON Web Key Manager](2-JWK.md) to retrieve the
 key pair `hydra.openid.id-token` for signing ID tokens. You can use that endpoint to retrieve the public key for verification.
 Additionally, Hydra supports OpenID Connect Discovery.
 
@@ -67,7 +67,7 @@ login service ("user management") and implement the consent flow with it.
 
 Let us look at the sequence of requests being made to successfully perform an OAuth 2.0 authorize code flow using ORY Hydra:
 
-![Consent flow sequence diagram](./images/consent-flow.svg)
+![Consent flow sequence diagram](../images/consent-flow.svg)
 
 The state machine of the consent app itself typically looks as followed.
 
@@ -87,7 +87,7 @@ CHA-->CHR
 CHR-->|Redirect to redirectUrl value|H2{Hydra}
 -->
 
-![Consent app state diagram](./images/consent-state.svg)
+![Consent app state diagram](../images/consent-state.svg)
 
 **Legend:**
 
@@ -109,9 +109,9 @@ consent request.
 
 Here is how Google chose to design the login and consent UI (what we call the "consent app"):
 
-![Google OAuth 2.0 Log In Screen](./images/google.png)
+![Google OAuth 2.0 Log In Screen](../images/google.png)
 
-![Google OAuth 2.0 Authorization In Screen](./images/google2.png)
+![Google OAuth 2.0 Authorization In Screen](../images/google2.png)
 
 ### Consent REST API
 

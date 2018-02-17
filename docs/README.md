@@ -13,7 +13,7 @@ the [Language-Level API Documentation](https://godoc.org/github.com/ory-am/hydra
 
 <hr>
 
-# Introduction
+# ORY Hydra
 
 Welcome to the Hydra documentation. This documentation will
 

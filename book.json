@@ -20,7 +20,7 @@
     },
     "domain-redirect": {
       "from": "ory.gitbooks.io/hydra/content/",
-      "to": "www.ory.sh/docs/hydra"
+      "to": "www.ory.sh/docs/1-hydra"
     }
   }
 }

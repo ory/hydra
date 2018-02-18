@@ -1,5 +1,5 @@
 <h1 align="center" style="margin-bottom: 8px">
-    <img alt="Hydra - cloud native access control" src="../images/logo-essential.png">
+    <img alt="Hydra - cloud native access control" src="./images/logo-essential.png">
 </h1>
 
 <h4 style="margin: 0 20% 1.275em" align="center">

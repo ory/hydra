@@ -12,8 +12,8 @@
   ],
   "swagger": "2.0",
   "info": {
-    "description": "Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure.\nHydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to.\nHydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.\n\nThe API documentation always refers to the latest tagged version of ORY Hydra. For previous API documentations, please\nrefer to `https://github.com/ory/hydra/blob/\u003ctag-id\u003e/docs/api.swagger.yaml` - for example:\n\n0.9.13: https://github.com/ory/hydra/blob/v0.9.13/docs/api.swagger.yaml\n0.8.1: https://github.com/ory/hydra/blob/v0.8.1/docs/api.swagger.yaml",
-    "title": "Hydra OAuth2 \u0026 OpenID Connect Server",
+    "description": "Welcome to the ORY Hydra HTTP API documentation. You will find documentation for all HTTP APIs here. Keep in mind that this document reflects the latest branch, always. Support for versioned documentation is coming in the future.",
+    "title": "ORY Hydra - Cloud Native OAuth 2.0 and OpenID Connect Server",
     "contact": {
       "name": "ORY",
       "url": "https://www.ory.sh",
@@ -36,7 +36,7 @@
             ]
           }
         ],
-        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:hydra.openid.id-token:public\"],\n\"actions\": [\"GET\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "Returns metadata for discovering important JSON Web Keys. Currently, this endpoint returns the public key for verifying OpenID Connect ID Tokens.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:hydra.openid.id-token:public\"],\n\"actions\": [\"GET\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -50,7 +50,7 @@
         "tags": [
           "oAuth2"
         ],
-        "summary": "Get list of well known JSON Web Keys",
+        "summary": "Get Well-Known JSON Web Keys",
         "operationId": "wellKnown",
         "responses": {
           "200": {
@@ -111,7 +111,7 @@
             ]
           }
         ],
-        "description": "This endpoint never returns passwords.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "This endpoint lists all clients in the database, and never returns client secrets.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -168,7 +168,7 @@
             ]
           }
         ],
-        "description": "If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will\nbe returned in the response and you will not be able to retrieve it later on. Write the secret down and keep\nit somwhere safe.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
+        "description": "Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somwhere safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -222,7 +222,7 @@
             ]
           }
         ],
-        "description": "This endpoint never returns passwords.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients:\u003csome-id\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients:\u003csome-id\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
+        "description": "Get an OAUth 2.0 client by its ID. This endpoint never returns passwords.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients:\u003csome-id\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients:\u003csome-id\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -236,7 +236,7 @@
         "tags": [
           "oAuth2"
         ],
-        "summary": "Retrieve an OAuth 2.0 Client.",
+        "summary": "Get an OAuth 2.0 Client.",
         "operationId": "getOAuth2Client",
         "parameters": [
           {
@@ -275,7 +275,7 @@
             ]
           }
         ],
-        "description": "If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will\nbe able to retrieve the client secret, so write it down and keep it safe.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
+        "description": "Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -334,7 +334,7 @@
             ]
           }
         ],
-        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients:\u003csome-id\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients:\u003csome-id\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
+        "description": "Delete an existing OAuth 2.0 Client by its ID.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients:\u003csome-id\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients:\u003csome-id\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -379,11 +379,11 @@
     },
     "/health/status": {
       "get": {
-        "description": "This endpoint returns `{ \"status\": \"ok\" }`. This status let's you know that the HTTP server is up and running. This\nstatus does currently not include checks whether the database connection is up and running. This endpoint does not\nrequire the `X-Forwarded-Proto` header when TLS termination is set.\n\n\nBe aware that if you are running multiple nodes of ORY Hydra, the health status will never refer to the cluster state,\nonly to a single instance.",
+        "description": "This endpoint returns a 200 status code when the HTTP server is up running. `{ \"status\": \"ok\" }`. This status does currently not include checks whether the database connection is working. This endpoint does not require the `X-Forwarded-Proto` header when TLS termination is set.\n\nBe aware that if you are running multiple nodes of ORY Hydra, the health status will never refer to the cluster state, only to a single instance.",
         "tags": [
           "health"
         ],
-        "summary": "Check health status of this instance",
+        "summary": "Check the Health Status",
         "operationId": "getInstanceStatus",
         "responses": {
           "200": {
@@ -404,7 +404,7 @@
             ]
           }
         ],
-        "description": "This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -456,7 +456,7 @@
             ]
           }
         ],
-        "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -515,7 +515,7 @@
             ]
           }
         ],
-        "description": "This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as\nsymmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA).\n\n\nIf the specified JSON Web Key Set does not exist, it will be created.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -574,7 +574,7 @@
             ]
           }
         ],
-        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "Use this endpoint to delete a complete JSON Web Key Set and all the keys in that set.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -588,7 +588,7 @@
         "tags": [
           "jsonWebKey"
         ],
-        "summary": "Delete a JSON Web Key",
+        "summary": "Delete a JSON Web Key Set",
         "operationId": "deleteJsonWebKeySet",
         "parameters": [
           {
@@ -625,7 +625,7 @@
             ]
           }
         ],
-        "description": "This endpoint can be used to retrieve JWKs stored in ORY Hydra.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "This endpoint can be used to retrieve JWKs stored in ORY Hydra.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -685,7 +685,7 @@
             ]
           }
         ],
-        "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -752,7 +752,7 @@
             ]
           }
         ],
-        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "Use this endpoint to delete a single JSON Web Key.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -2008,6 +2008,12 @@
     "Handler": {
       "type": "object",
       "properties": {
+        "Generators": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/KeyGenerator"
+          }
+        },
         "H": {
           "$ref": "#/definitions/Writer"
         },
@@ -2021,7 +2027,7 @@
           "$ref": "#/definitions/Firewall"
         }
       },
-      "x-go-package": "github.com/ory/hydra/warden/group"
+      "x-go-package": "github.com/ory/hydra/jwk"
     },
     "KeyGenerator": {
       "type": "object",

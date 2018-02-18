@@ -3,9 +3,9 @@
 // OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are granted
 // to applications that want to use OAuth 2.0 access and refresh tokens.
 //
-//
 // In ORY Hydra, OAuth 2.0 clients are used to manage ORY Hydra itself. These clients may gain highly privileged access
 // if configured that way. This endpoint should be well protected and only called by code you trust.
+//
 // Copyright © 2017 Aeneas Rekkas <aeneas+oss@aeneas.io>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");

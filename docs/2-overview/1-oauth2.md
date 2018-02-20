@@ -35,7 +35,7 @@ uses the Identity Provider to authenticate peter, for example by using cookies o
 
 ### OpenID Connect 1.0
 
-Hydra uses the [JSON Web Key Manager](2-JWK.md) to retrieve the
+Hydra uses the [JSON Web Key Manager](2-jwk.md) to retrieve the
 key pair `hydra.openid.id-token` for signing ID tokens. You can use that endpoint to retrieve the public key for verification.
 Additionally, Hydra supports OpenID Connect Discovery.
 

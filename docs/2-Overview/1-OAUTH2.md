@@ -1,8 +1,5 @@
 # OAuth 2.0 & OpenID Connect
 
-If you are new to OAuth2, please read the [Introduction to OAuth 2.0 and OpenID Connect](README.md#introduction-to-oauth-20-and-openid-connect)
-first.
-
 ## Overview
 
 This section defines a glossary, provides additional information on OpenID Connect and introduces OAuth 2.0 Clients.
@@ -37,9 +34,6 @@ on Dropbox. It is responsible to tell Hydra if the user accepted or rejected the
 uses the Identity Provider to authenticate peter, for example by using cookies or presenting a user/password login view.
 
 ### OpenID Connect 1.0
-
-If you are new to OpenID Connect, please read the [Introduction to OAuth 2.0 and OpenID Connect](README.md#introduction-to-oauth-20-and-openid-connect)
-first. 
 
 Hydra uses the [JSON Web Key Manager](2-JWK.md) to retrieve the
 key pair `hydra.openid.id-token` for signing ID tokens. You can use that endpoint to retrieve the public key for verification.

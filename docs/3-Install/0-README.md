@@ -1,7 +1,7 @@
 # Install, Configure and Run ORY Hydra
 
 The goal of this section is to familiarize you with the specifics of setting up ORY Hydra in your environment.
-Before starting with this section, please check out the [tutorial](./tutorial.md). It will teach you the most important flows
+Before starting with this section, please check out the [tutorial](../0-Tutorial/0-README.md). It will teach you the most important flows
 and settings for Hydra.
 
 This guide will:

@@ -63,7 +63,7 @@ $hydraApiClient = new \Hydra\SDK\ApiClient($config);
 
 ### API Usage
 
-There are several APIs made available, see [../../sdk/php/swagger/README.md](The full API docs) for a list of clients and methods.
+There are several APIs made available, see [the full API docs](https://github.com/ory/hydra/blob/master/sdk/js/hydra/swagger/README.md)for a list of clients and methods.
 
 For this example, lets use the OAuth2Api to get a list of clients and use the `$hydraApiClient` from above:
 

@@ -79,10 +79,10 @@ var tokenUserCmd = &cobra.Command{
 			Scopes:      scopes,
 		}
 
-		state, err := sequence.RuneSequence(24, []rune("abcdefghijklmnopqrstuvwxyz"))
+		state, err := sequence.RuneSequence(24, sequence.AlphaLower)
 		pkg.Must(err, "Could not generate random state: %s", err)
 
-		nonce, err := sequence.RuneSequence(24, []rune("abcdefghijklmnopqrstuvwxyz"))
+		nonce, err := sequence.RuneSequence(24, sequence.AlphaLower)
 		pkg.Must(err, "Could not generate random state: %s", err)
 
 		location := conf.AuthCodeURL(string(state)) + "&nonce=" + string(nonce)

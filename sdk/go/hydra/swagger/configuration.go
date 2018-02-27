@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  * @author		Aeneas Rekkas <aeneas+oss@aeneas.io>
- * @Copyright 	2017-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @copyright 	2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
  * @license 	Apache-2.0
  */
 

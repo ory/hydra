@@ -1,7 +1,7 @@
 <h1 align="center"><img src="https://storage.googleapis.com/ory.am/github-banner/ory_01-hydra-altb.png" alt="ORY Hydra - Open Source OAuth 2 and OpenID Connect server"></h1>
 
 <h4 align="center">
-    [![Join the chat at https://discord.gg/PAMQWkr](https://img.shields.io/badge/join-chat-00cc99.svg)](https://discord.gg/PAMQWkr)
+    <a href="https://discord.gg/PAMQWkr">Chat</a> |
     <a href="https://community.ory.am/">Forums</a> |
     <a href="http://eepurl.com/bKT3N9">Newsletter</a><br/><br/>
     <a href="https://www.ory.sh/docs/1-hydra/">Guide</a> |

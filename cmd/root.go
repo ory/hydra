@@ -21,8 +21,6 @@ import (
 	"runtime"
 	"strings"
 
-	"time"
-
 	"github.com/ory/hydra/cmd/cli"
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/oauth2"
@@ -34,7 +32,7 @@ var cfgFile string
 
 var (
 	Version   = "dev-master"
-	BuildTime = time.Now().UTC().String()
+	BuildTime = "undefined"
 	GitHash   = "undefined"
 )
 

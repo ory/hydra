@@ -1,0 +1,64 @@
+{
+  "redirects": [
+    {
+      "from": "sdk.html",
+      "to": "7-sdk/0-README.html"
+    },
+    {
+      "from": "sdk/js.html",
+      "to": "7-sdk/2-js.html"
+    },
+    {
+      "from": "sdk/go.html",
+      "to": "7-sdk/1-go.html"
+    },
+    {
+      "from": "sdk/php.html",
+      "to": "7-sdk/3-php.html"
+    },
+    {
+      "from": "how-to/production.html",
+      "to": "6-how-to/1-production.html"
+    },
+    {
+      "from": "access-control.html",
+      "to": "2-overview/3-access-control.html"
+    },
+    {
+      "from": "faq.html",
+      "to": "8-faq/0-README.html"
+    },
+    {
+      "from": "environment.html",
+      "to": "1-environment/0-README.html"
+    },
+    {
+      "from": "install.html",
+      "to": "3-install/0-README.html"
+    },
+    {
+      "from": "jwk.html",
+      "to": "2-overview/2-jwk.html"
+    },
+    {
+      "from": "oauth2.html",
+      "to": "2-overview/1-oauth2.html"
+    },
+    {
+      "from": "overview.html",
+      "to": "2-overview/0-README.html"
+    },
+    {
+      "from": "security.html",
+      "to": "4-security/0-README.html"
+    },
+    {
+      "from": "telemetry.html",
+      "to": "5-telemetry/0-README.html"
+    },
+    {
+      "from": "tutorial.html",
+      "to": "0-tutorial/0-README.html"
+    }
+  ]
+}

@@ -5,6 +5,7 @@
   "plugins": [
     "edit-link",
     "etoc",
+    "bulk-redirect",
     "domain-redirect"
   ],
   "pluginsConfig": {
@@ -21,6 +22,10 @@
     "domain-redirect": {
       "from": "ory.gitbooks.io/hydra/content/",
       "to": "www.ory.sh/docs/1-hydra"
+    },
+    "bulk-redirect": {
+      "basepath": "/hydra/content/",
+      "redirectsFile": "redirects.json"
     }
   }
 }

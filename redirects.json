@@ -2,7 +2,7 @@
   "redirects": [
     {
       "from": "sdk.html",
-      "to": "7-sdk/0-readme.html"
+      "to": "7-sdk/0-README.html"
     },
     {
       "from": "sdk/js.html",
@@ -26,15 +26,15 @@
     },
     {
       "from": "faq.html",
-      "to": "8-faq/0-readme.html"
+      "to": "8-faq/0-README.html"
     },
     {
       "from": "environment.html",
-      "to": "1-environment/0-readme.html"
+      "to": "1-environment/0-README.html"
     },
     {
       "from": "install.html",
-      "to": "3-install/0-readme.html"
+      "to": "3-install/0-README.html"
     },
     {
       "from": "jwk.html",
@@ -46,19 +46,19 @@
     },
     {
       "from": "overview.html",
-      "to": "2-overview/0-readme.html"
+      "to": "2-overview/0-README.html"
     },
     {
       "from": "security.html",
-      "to": "4-security/0-readme.html"
+      "to": "4-security/0-README.html"
     },
     {
       "from": "telemetry.html",
-      "to": "5-telemetry/0-readme.html"
+      "to": "5-telemetry/0-README.html"
     },
     {
       "from": "tutorial.html",
-      "to": "0-tutorial/0-readme.html"
+      "to": "0-tutorial/0-README.html"
     }
   ]
 }

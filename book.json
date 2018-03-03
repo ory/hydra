@@ -6,8 +6,7 @@
     "edit-link",
     "etoc",
     "bulk-redirect",
-    "domain-redirect",
-    "summary"
+    "domain-redirect"
   ],
   "pluginsConfig": {
     "edit-link": {

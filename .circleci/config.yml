@@ -116,14 +116,14 @@ jobs:
   publish-docs:
     docker:
       - image: alpine/git:1.0.4
-    working_directory: /go/src/github.com/ory/oathkeeper
+    working_directory: /go/src/github.com/ory/hydra
     steps:
       - checkout
       - run: git config --global user.email "hi@ory.am"
       - run: git config --global user.name "ORY Continuous Integration"
       - run: "git clone https://arekkas:$DOCS_TOKEN_PUSH@github.com/ory/docs.git ../docs"
       - run: "cp ./docs/api.swagger.json ../docs/apis/hydra.json"
-      - run: "(cd ../docs && git add -A && git commit -a -m \"docs: Updates ORY Hydra Swagger definitions\" && git push origin) || exit 0"
+      - run: "(cd ../docs && git add -A && git commit -a -m \"Updates ORY Hydra Swagger definitions\" && git push origin) || exit 0"
 
 workflows:
   version: 2

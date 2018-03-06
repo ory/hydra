@@ -121,9 +121,9 @@ jobs:
       - checkout
       - run: git config --global user.email "hi@ory.am"
       - run: git config --global user.name "ORY Continuous Integration"
-      - run: "git clone https://arekkas:$DOCS_TOKEN_PUSH@github.com/ory/ory-am.git ../ory-am"
-      - run: "cp -R ./docs/* ../ory-am/docs/1-hydra/"
-      - run: "(cd ../ory-am && git add -A && git commit -a -m \"docs: Updates ORY Hydra docs\" && git push origin) || exit 0"
+      - run: "git clone https://arekkas:$DOCS_TOKEN_PUSH@github.com/ory/docs.git ../ory-am"
+      - run: "cp ./docs/api.swagger.json ../ory-am/docs/api/hydra.json"
+      - run: "(cd ../docs && git add -A && git commit -a -m \"docs: Updates ORY Hydra swagger\" && git push origin) || exit 0"
 
 workflows:
   version: 2

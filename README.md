@@ -23,7 +23,6 @@ Besides mitigating various attack vectors, such as database compromisation and O
 able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to.
 [Click here](https://www.ory.sh/docs/1-hydra/4-security/0-readme) to read more about security.
 
-
 <p align="left">
     <a href="https://circleci.com/gh/ory/hydra/tree/master"><img src="https://circleci.com/gh/ory/hydra/tree/master.svg?style=shield" alt="Build Status"></a>
     <a href="https://coveralls.io/github/ory/hydra?branch=master"><img src="https://coveralls.io/repos/ory/hydra/badge.svg?branch=master&service=github" alt="Coverage Status"></a>
@@ -39,7 +38,6 @@ able to securely manage JSON Web Keys, and has a sophisticated policy-based acce
 
 - [What is ORY Hydra?](#what-is-ory-hydra)
   - [OAuth2 and OpenID Connect: Open Standards!](#oauth2-and-openid-connect-open-standards)
-- [ORY Gatekeeper](#ory-gatekeeper)
 - [Quickstart](#quickstart)
   - [5 minutes tutorial: Run your very own OAuth2 environment](#5-minutes-tutorial-run-your-very-own-oauth2-environment)
   - [Installation](#installation)
@@ -50,17 +48,14 @@ able to securely manage JSON Web Keys, and has a sophisticated policy-based acce
   - [Disclosing vulnerabilities](#disclosing-vulnerabilities)
 - [Telemetry](#telemetry)
 - [Sponsors](#sponsors)
-  - [Sponsorship](#sponsorship)
-  - [Sponsors](#sponsors-1)
 - [Documentation](#documentation)
   - [Guide](#guide)
   - [HTTP API documentation](#http-api-documentation)
   - [Upgrading and Changelog](#upgrading-and-changelog)
   - [Command line documentation](#command-line-documentation)
   - [Develop](#develop)
-- [Reception](#reception)
 - [Libraries and third-party projects](#libraries-and-third-party-projects)
-- [Blog posts & articles](#blog-posts--articles)
+- [Blog posts & articles](#blog-posts-&-articles)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -96,14 +91,6 @@ and the OpenID Foundation:
 
 * [OpenID Connect Core 1.0](http://openid.net/specs/openid-connect-core-1_0.html)
 * [OpenID Connect Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0.html)
-
-## ORY Gatekeeper
-
-<img src="https://www.ory.am/images/ory-security-console.png" alt="ORY Gatekeeper Console" align="right" width="40%">
-
-Gatekeeper is a firewall for APIs. It detects and prevents malicious requests and makes sure that no unauthorized requests reach your servers. Gatekeeper is set up in minutes, works with existing APIs, and makes use of ORY's popular open source ecosystem.
-
-**Learn more about [Gatekeeper](https://www.ory.am/products/api-security) and try it for free!**
 
 ## Quickstart
 
@@ -205,27 +192,6 @@ ORY Hydra is open source with a permissive license. We are a dedicated, young bu
 in the area of cloud computing and internet security. Please support our mission for a safer web and become a sponsor, buy an
 engineer membership, or [tell us](mailto:hi@ory.am) why and how you are using ORY Hydra.
 
-### Sponsorship
-
-**[Become a ORY Hydra sponsor now](https://www.patreon.com/bePatron?c=581435&rid=1746199)** and help keep the project
-open source, free, and maintained. Additionally, sponsors unlock
-
-* Access to ORY's private slack community.
-* Featured logo & link in the readme and on the website.
-* placement in release announcements.
-
-Sponsorship starts at 600$ per month. We accept smaller contributions as well, but without the benefits listed above.
-
-### Sponsors
-
-<img src="docs/images/sponsors/auth0.png" align="left" width="30%" alt="Auth0.com" />
-
-We are proud to have [Auth0](https://auth0.com) as a **gold sponsor** for ORY Hydra. [Auth0](https://auth0.com) solves
-the most complex identity use cases with an extensible and easy to integrate platform that secures billions of logins
-every year. At ORY, we use [Auth0](https://auth0.com) in conjunction with ORY Hydra for various internal projects.
-
-<br clear="all"/>
-
 ## Documentation
 
 ### Guide
@@ -266,21 +232,6 @@ DATABASE_URL=memory go run main.go host
 
 * We changed organization name from `ory-am` to `ory`. In order to keep backwards compatibility, we did not rename Go packages.
 * You can ignore warnings similar to `package github.com/ory/hydra/cmd/server: case-insensitive import collision: "github.com/sirupsen/logrus" and "github.com/sirupsen/logrus"`.
-
-## Reception
-
-Hydra has received a lot of positive feedback. Let's see what the community is saying:
-
-> Nice! Lowering barriers to the use of technologies like these is important.
-
-[Pyxl101](https://news.ycombinator.com/item?id=11798641)
-
-> OAuth is a framework not a protocol. The security it provides can vary greatly between implementations.
-Fosite (which is what this is based on) is a very good implementation from a security perspective: https://github.com/ory/fosite#a-word-on-security
-
-[abritishguy](https://news.ycombinator.com/item?id=11800515)
-
-> [...] Thanks for releasing this by the way, looks really well engineered. [...]
 
 ## Libraries and third-party projects
 

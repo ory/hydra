@@ -60,13 +60,17 @@ func shouldCommit(issuerURL string, databaseURL string) bool {
 	return !(databaseURL == "" || databaseURL == "memory" || issuerURL == "" || strings.Contains(issuerURL, "localhost"))
 }
 
-func hash(value string) string {
+func generateID(issuerURL string, databaseURL string) string {
+	if !shouldCommit(issuerURL, databaseURL) {
+		return "local"
+	}
+
 	hash := sha256.New()
-	hash.Write([]byte(value))
+	hash.Write([]byte(issuerURL))
 	return hex.EncodeToString(hash.Sum(nil))
 }
 
-func NewMetricsManager(issuerURL string, databaseURL string, l logrus.FieldLogger) *MetricsManager {
+func NewMetricsManager(issuerURL string, databaseURL string, l logrus.FieldLogger, version, hash, buildTime string) *MetricsManager {
 	l.Info("Setting up telemetry - for more information please visit https://ory.gitbooks.io/hydra/content/telemetry.html")
 
 	segment, err := analytics.NewWithConfig("h8dRH3kVCWKkIFWydBmWsyYHR4M0u0vr", analytics.Config{
@@ -83,15 +87,17 @@ func NewMetricsManager(issuerURL string, databaseURL string, l logrus.FieldLogge
 		issuerURL:        issuerURL,
 		databaseURL:      databaseURL,
 		MemoryStatistics: &MemoryStatistics{},
-		ID:               hash(issuerURL),
+		ID:               generateID(issuerURL, databaseURL),
 		start:            time.Now().UTC(),
-		shouldCommit:     shouldCommit(issuerURL, databaseURL),
-		salt:             uuid.New(),
+		//shouldCommit:   shouldCommit(issuerURL, databaseURL),
+		shouldCommit: true,
+		salt:         uuid.New(),
+		BuildTime:    buildTime, BuildVersion: version, BuildHash: hash,
 	}
 	return mm
 }
 
-func (sw *MetricsManager) RegisterSegment(version, hash, buildTime string) {
+func (sw *MetricsManager) RegisterSegment() {
 	sw.Lock()
 	defer sw.Unlock()
 
@@ -104,14 +110,14 @@ func (sw *MetricsManager) RegisterSegment(version, hash, buildTime string) {
 		return sw.Segment.Enqueue(analytics.Identify{
 			UserId: sw.ID,
 			Traits: analytics.NewTraits().
-				Set("goarch", runtime.GOARCH).
-				Set("goos", runtime.GOOS).
-				Set("numCpu", runtime.NumCPU()).
+				Set("runtimeGoarch", runtime.GOARCH).
+				Set("runtimeGoos", runtime.GOOS).
+				Set("runtimeNumCpu", runtime.NumCPU()).
 				Set("runtimeVersion", runtime.Version()).
-				Set("version", version).
-				Set("hash", hash).
-				Set("buildTime", buildTime).
-				Set("instanceId", sw.InstanceID),
+				Set("buildVersion", sw.BuildVersion).
+				Set("buildHash", sw.BuildHash).
+				Set("buildTime", sw.BuildTime).
+				Set("instance", sw.InstanceID),
 			Context: &analytics.Context{
 				IP: net.IPv4(0, 0, 0, 0),
 			},
@@ -131,14 +137,23 @@ func (sw *MetricsManager) CommitMemoryStatistics() {
 	for {
 		sw.MemoryStatistics.Update()
 		if err := sw.Segment.Enqueue(analytics.Track{
-			UserId:     sw.ID,
-			Event:      "stats.memory",
-			Properties: analytics.Properties(sw.MemoryStatistics.ToMap()),
-			Context:    &analytics.Context{IP: net.IPv4(0, 0, 0, 0)},
+			UserId: sw.ID,
+			Event:  "stats.memory",
+			Properties: analytics.Properties(sw.MemoryStatistics.ToMap()).
+				Set("runtimeGoarch", runtime.GOARCH).
+				Set("runtimeGoos", runtime.GOOS).
+				Set("runtimeNumCpu", runtime.NumCPU()).
+				Set("runtimeVersion", runtime.Version()).
+				Set("buildVersion", sw.BuildVersion).
+				Set("buildHash", sw.BuildHash).
+				Set("buildTime", sw.BuildTime).
+				Set("instance", sw.InstanceID).
+				Set("nonInteraction", 1),
+			Context: &analytics.Context{IP: net.IPv4(0, 0, 0, 0)},
 		}); err != nil {
 			sw.Logger.WithError(err).Debug("Could not commit anonymized telemetry data")
 		} else {
-			sw.Logger.Debug("Telemetry data transmitted")
+			sw.Logger.Debug("Transmitted anonymized memory usage statistics")
 		}
 		time.Sleep(time.Hour)
 	}
@@ -167,7 +182,7 @@ func (sw *MetricsManager) ServeHTTP(rw http.ResponseWriter, r *http.Request, nex
 	status := res.Status()
 	size := res.Size()
 
-	sw.Segment.Enqueue(analytics.Page{
+	if err := sw.Segment.Enqueue(analytics.Page{
 		UserId: sw.ID,
 		Name:   path,
 		Properties: analytics.
@@ -175,13 +190,22 @@ func (sw *MetricsManager) ServeHTTP(rw http.ResponseWriter, r *http.Request, nex
 			SetURL(scheme+"//"+sw.ID+path+"?"+query).
 			SetPath(path).
 			SetName(path).
-			Set("status", status).
-			Set("size", size).
-			Set("latency", latency).
-			Set("instance", sw.InstanceID).
-			Set("method", r.Method),
+			Set("requestMethod", r.Method).
+			Set("requestStatus", status).
+			Set("requestSize", size).
+			Set("requestLatency", latency).
+			Set("runtimeGoarch", runtime.GOARCH).
+			Set("runtimeGoos", runtime.GOOS).
+			Set("runtimeNumCpu", runtime.NumCPU()).
+			Set("runtimeVersion", runtime.Version()).
+			Set("buildVersion", sw.BuildVersion).
+			Set("buildHash", sw.BuildHash).
+			Set("buildTime", sw.BuildTime).
+			Set("instance", sw.InstanceID),
 		Context: &analytics.Context{IP: net.IPv4(0, 0, 0, 0)},
-	})
+	}); err != nil {
+		sw.Logger.WithError(err).Debug("Unable to queue analytics")
+	}
 }
 
 func anonymizePath(path string, salt string) string {
@@ -211,7 +235,7 @@ func anonymizePath(path string, salt string) string {
 		if len(path) == len(p) && path[:len(p)] == strings.ToLower(p) {
 			return p
 		} else if len(path) > len(p) && path[:len(p)+1] == strings.ToLower(p)+"/" {
-			return path[:len(p)] + "/" + hash(path[len(p):]+"|"+salt)
+			return path[:len(p)] + "/" + generateID(path[len(p):]+"|"+salt, "should-commit")
 		}
 	}
 
@@ -222,7 +246,7 @@ func anonymizeQuery(query url.Values, salt string) string {
 	for _, q := range query {
 		for i, s := range q {
 			if s != "" {
-				s = hash(s + "|" + salt)
+				s = generateID(s+"|"+salt, "should-commit")
 				q[i] = s
 			}
 		}

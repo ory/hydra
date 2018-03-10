@@ -38,20 +38,20 @@ type MemoryStatistics struct {
 
 func (ms *MemoryStatistics) ToMap() map[string]interface{} {
 	return map[string]interface{}{
-		"alloc":          ms.Alloc,
-		"totalAlloc":     ms.TotalAlloc,
-		"sys":            ms.Sys,
-		"lookups":        ms.Lookups,
-		"mallocs":        ms.Mallocs,
-		"frees":          ms.Frees,
-		"heapAlloc":      ms.HeapAlloc,
-		"heapSys":        ms.HeapSys,
-		"heapIdle":       ms.HeapIdle,
-		"heapInuse":      ms.HeapInuse,
-		"heapReleased":   ms.HeapReleased,
-		"heapObjects":    ms.HeapObjects,
-		"numGC":          ms.NumGC,
-		"nonInteraction": 1,
+		"memoryAlloc":        ms.Alloc,
+		"memoryTotalAlloc":   ms.TotalAlloc,
+		"memorySys":          ms.Sys,
+		"memoryLookups":      ms.Lookups,
+		"memoryMallocs":      ms.Mallocs,
+		"memoryFrees":        ms.Frees,
+		"memoryHeapAlloc":    ms.HeapAlloc,
+		"memoryHeapSys":      ms.HeapSys,
+		"memoryHeapIdle":     ms.HeapIdle,
+		"memoryHeapInuse":    ms.HeapInuse,
+		"memoryHeapReleased": ms.HeapReleased,
+		"memoryHeapObjects":  ms.HeapObjects,
+		"memoryNumGC":        ms.NumGC,
+		"nonInteraction":     1,
 	}
 }
 

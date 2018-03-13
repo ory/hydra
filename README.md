@@ -169,7 +169,7 @@ hydra
 * We changed organization name from `ory-am` to `ory`. In order to keep backwards compatibility, we did not rename Go packages.
 * You can ignore warnings similar to `package github.com/ory/hydra/cmd/server: case-insensitive import collision: "github.com/Sirupsen/logrus" and "github.com/sirupsen/logrus"`.
 
-## Complementary Software
+## Ecosystem
 
 <a href="https://console.ory.am/auth/login">
     <img align="right" width="30%" src="docs/images/sec-console.png" alt="ORY Security Console">

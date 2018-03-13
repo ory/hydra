@@ -46,7 +46,7 @@ able to securely manage JSON Web Keys, and has a sophisticated policy-based acce
     - [Building from source](#building-from-source)
 - [Complementary Software](#complementary-software)
   - [ORY Security Console: Administrative User Interface](#ory-security-console-administrative-user-interface)
-  - [ORY Oathkeeper](#ory-oathkeeper)
+  - [ORY Oathkeeper: Identity & Access Proxy](#ory-oathkeeper-identity-&-access-proxy)
 - [Security](#security)
   - [Disclosing vulnerabilities](#disclosing-vulnerabilities)
 - [Telemetry](#telemetry)
@@ -171,11 +171,11 @@ hydra
 
 ## Complementary Software
 
-### ORY Security Console: Administrative User Interface
-
 <a href="https://console.ory.am/auth/login">
     <img align="right" width="30%" src="docs/images/sec-console.png" alt="ORY Security Console">
 </a>
+
+### ORY Security Console: Administrative User Interface
 
 The [ORY Security Console](https://console.ory.am/auth/login). connects with your existing ORY Hydra and ORY Oathkeeper isntallation and lets you manage and monitor them through an intuitive UI.
 

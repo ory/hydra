@@ -118,7 +118,7 @@ There are various ways of installing ORY Hydra on your system.
 The client and server **binaries are downloadable at [releases](https://github.com/ory/hydra/releases)**.
 There is currently no installer available. You have to add the ORY Hydra binary to the PATH environment variable yourself or put
 the binary in a location that is already in your path (`/usr/bin`, ...).
-If you do not understand what that all of this means, ask in our [chat channel](https://gitter.im/ory-am/hydra). We are happy to help.
+If you do not understand what that all of this means, ask in our [chat channel](https://www.ory.sh/chat). We are happy to help.
 
 #### Using Docker
 
@@ -167,6 +167,17 @@ hydra
 * We changed organization name from `ory-am` to `ory`. In order to keep backwards compatibility, we did not rename Go packages.
 * You can ignore warnings similar to `package github.com/ory/hydra/cmd/server: case-insensitive import collision: "github.com/Sirupsen/logrus" and "github.com/sirupsen/logrus"`.
 
+## Complementary Software
+
+### ORY Security Console: Administrative User Interface
+
+<img float="right" width="30%" src="docs/images/oauth2-flow.gif" alt="OAuth2 Flow">
+
+The [ORY Security Console](https://console.ory.am/auth/login). connects with your existing ORY Hydra and ORY Oathkeeper isntallation and lets you manage and monitor them through an intuitive UI.
+
+### ORY Oathkeeper
+
+
 ## Security
 
 *Why should I use ORY Hydra? It's not that hard to implement two OAuth2 endpoints and there are numerous SDKs out there!*
@@ -185,12 +196,6 @@ and send us an email to [hi@ory.am](mailto:hi@ory.am) instead.
 
 ORY Hydra collects summarized, anonymized telemetry which can optionally be turned off. Click [here](https://www.ory.sh/docs/1-hydra/0-tutorial/0-readme)
 to learn more.
-
-## Sponsors
-
-ORY Hydra is open source with a permissive license. We are a dedicated, young but also experienced team of developers
-in the area of cloud computing and internet security. Please support our mission for a safer web and become a sponsor, buy an
-engineer membership, or [tell us](mailto:hi@ory.am) why and how you are using ORY Hydra.
 
 ## Documentation
 

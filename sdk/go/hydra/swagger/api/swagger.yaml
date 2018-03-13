@@ -1,0 +1,3312 @@
+---
+swagger: "2.0"
+info:
+  description: "Welcome to the ORY Hydra HTTP API documentation. You will find documentation\
+    \ for all HTTP APIs here. Keep in mind that this document reflects the latest\
+    \ branch, always. Support for versioned documentation is coming in the future."
+  version: "Latest"
+  title: "ORY Hydra - Cloud Native OAuth 2.0 and OpenID Connect Server"
+  contact:
+    name: "ORY"
+    url: "https://www.ory.sh"
+    email: "hi@ory.am"
+  license:
+    name: "Apache 2.0"
+    url: "https://github.com/ory/hydra/blob/master/LICENSE"
+basePath: "/"
+schemes:
+- "http"
+- "https"
+consumes:
+- "application/json"
+- "application/x-www-form-urlencoded"
+produces:
+- "application/json"
+paths:
+  /.well-known/jwks.json:
+    get:
+      tags:
+      - "oAuth2"
+      summary: "Get Well-Known JSON Web Keys"
+      description: "Returns metadata for discovering important JSON Web Keys. Currently,\
+        \ this endpoint returns the public key for verifying OpenID Connect ID Tokens.\n\
+        \nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure\
+        \ that represents a cryptographic key. A JWK Set is a JSON data structure\
+        \ that represents a set of JWKs. A JSON Web Key is identified by its set and\
+        \ key id. ORY Hydra uses this functionality to store cryptographic keys used\
+        \ for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows\
+        \ storing user-defined keys as well.\n\nThe subject making the request needs\
+        \ to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:hydra.openid.id-token:public\"\
+        ],\n\"actions\": [\"GET\"],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "wellKnown"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "jsonWebKeySet"
+          schema:
+            $ref: "#/definitions/jsonWebKeySet"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.keys.get"
+  /.well-known/openid-configuration:
+    get:
+      tags:
+      - "oAuth2"
+      summary: "Server well known configuration"
+      description: "The well known endpoint an be used to retrieve information for\
+        \ OpenID Connect clients. We encourage you to not roll\nyour own OpenID Connect\
+        \ client but to use an OpenID Connect client library instead. You can learn\
+        \ more on this\nflow at https://openid.net/specs/openid-connect-discovery-1_0.html"
+      operationId: "getWellKnown"
+      schemes:
+      - "http"
+      - "https"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "wellKnown"
+          schema:
+            $ref: "#/definitions/wellKnown"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+  /clients:
+    get:
+      tags:
+      - "oAuth2"
+      summary: "List OAuth 2.0 Clients"
+      description: "This endpoint lists all clients in the database, and never returns\
+        \ client secrets.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID\
+        \ Connect flows. Usually, OAuth 2.0 clients are generated for applications\
+        \ which want to consume your OAuth 2.0 or OpenID Connect capabilities. To\
+        \ manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that\
+        \ this endpoint is well protected and only callable by first-party components.\n\
+        \nThe subject making the request needs to be assigned to a policy containing:\n\
+        \n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"get\"],\n\
+        \"effect\": \"allow\"\n}\n```"
+      operationId: "listOAuth2Clients"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "limit"
+        in: "query"
+        description: "The maximum amount of policies returned."
+        required: false
+        type: "integer"
+        format: "int64"
+        x-go-name: "Limit"
+        x-exportParamName: "Limit"
+      - name: "offset"
+        in: "query"
+        description: "The offset from where to start looking."
+        required: false
+        type: "integer"
+        format: "int64"
+        x-go-name: "Offset"
+        x-exportParamName: "Offset"
+      responses:
+        200:
+          description: "A list of clients."
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/oAuth2Client"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.clients"
+    post:
+      tags:
+      - "oAuth2"
+      summary: "Create an OAuth 2.0 client"
+      description: "Create a new OAuth 2.0 client If you pass `client_secret` the\
+        \ secret will be used, otherwise a random secret will be generated. The secret\
+        \ will be returned in the response and you will not be able to retrieve it\
+        \ later on. Write the secret down and keep it somwhere safe.\n\nOAuth 2.0\
+        \ clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually,\
+        \ OAuth 2.0 clients are generated for applications which want to consume your\
+        \ OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will\
+        \ need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected\
+        \ and only callable by first-party components.\n\nThe subject making the request\
+        \ needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"\
+        rn:hydra:clients\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n\
+        }\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the\
+        \ client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"\
+        ],\n\"actions\": [\"create\"],\n\"effect\": \"allow\",\n\"conditions\": {\
+        \ \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```"
+      operationId: "createOAuth2Client"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "Body"
+        required: true
+        schema:
+          $ref: "#/definitions/oAuth2Client"
+        x-exportParamName: "Body"
+      responses:
+        200:
+          description: "oAuth2Client"
+          schema:
+            $ref: "#/definitions/oAuth2Client"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.clients"
+  /clients/{id}:
+    get:
+      tags:
+      - "oAuth2"
+      summary: "Get an OAuth 2.0 Client."
+      description: "Get an OAUth 2.0 client by its ID. This endpoint never returns\
+        \ passwords.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID\
+        \ Connect flows. Usually, OAuth 2.0 clients are generated for applications\
+        \ which want to consume your OAuth 2.0 or OpenID Connect capabilities. To\
+        \ manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that\
+        \ this endpoint is well protected and only callable by first-party components.\n\
+        \nThe subject making the request needs to be assigned to a policy containing:\n\
+        \n```\n{\n\"resources\": [\"rn:hydra:clients:<some-id>\"],\n\"actions\": [\"\
+        get\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"\
+        owner\" is set to the owner of the client, allowing policies such as:\n\n\
+        ```\n{\n\"resources\": [\"rn:hydra:clients:<some-id>\"],\n\"actions\": [\"\
+        get\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\":\
+        \ \"EqualsSubjectCondition\" } }\n}\n```"
+      operationId: "getOAuth2Client"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The id of the OAuth 2.0 Client."
+        required: true
+        type: "string"
+        uniqueItems: true
+        x-go-name: "ID"
+        x-exportParamName: "Id"
+      responses:
+        200:
+          description: "oAuth2Client"
+          schema:
+            $ref: "#/definitions/oAuth2Client"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.clients"
+    put:
+      tags:
+      - "oAuth2"
+      summary: "Update an OAuth 2.0 Client"
+      description: "Update an existing OAuth 2.0 Client. If you pass `client_secret`\
+        \ the secret will be updated and returned via the API. This is the only time\
+        \ you will be able to retrieve the client secret, so write it down and keep\
+        \ it safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect\
+        \ flows. Usually, OAuth 2.0 clients are generated for applications which want\
+        \ to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY\
+        \ Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint\
+        \ is well protected and only callable by first-party components.\n\nThe subject\
+        \ making the request needs to be assigned to a policy containing:\n\n```\n\
+        {\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"update\"],\n\"\
+        effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is\
+        \ set to the owner of the client, allowing policies such as:\n\n```\n{\n\"\
+        resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"update\"],\n\"effect\"\
+        : \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\"\
+        \ } }\n}\n```"
+      operationId: "updateOAuth2Client"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "string"
+        x-go-name: "ID"
+        x-exportParamName: "Id"
+      - in: "body"
+        name: "Body"
+        required: true
+        schema:
+          $ref: "#/definitions/oAuth2Client"
+        x-exportParamName: "Body"
+      responses:
+        200:
+          description: "oAuth2Client"
+          schema:
+            $ref: "#/definitions/oAuth2Client"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.clients"
+    delete:
+      tags:
+      - "oAuth2"
+      summary: "Deletes an OAuth 2.0 Client"
+      description: "Delete an existing OAuth 2.0 Client by its ID.\n\nOAuth 2.0 clients\
+        \ are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0\
+        \ clients are generated for applications which want to consume your OAuth\
+        \ 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an\
+        \ OAuth 2.0 Client as well. Make sure that this endpoint is well protected\
+        \ and only callable by first-party components.\n\nThe subject making the request\
+        \ needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"\
+        rn:hydra:clients:<some-id>\"],\n\"actions\": [\"delete\"],\n\"effect\": \"\
+        allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner\
+        \ of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"\
+        rn:hydra:clients:<some-id>\"],\n\"actions\": [\"delete\"],\n\"effect\": \"\
+        allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\"\
+        \ } }\n}\n```"
+      operationId: "deleteOAuth2Client"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The id of the OAuth 2.0 Client."
+        required: true
+        type: "string"
+        uniqueItems: true
+        x-go-name: "ID"
+        x-exportParamName: "Id"
+      responses:
+        204:
+          description: "An empty response"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.clients"
+  /health/status:
+    get:
+      tags:
+      - "health"
+      summary: "Check the Health Status"
+      description: "This endpoint returns a 200 status code when the HTTP server is\
+        \ up running. `{ \"status\": \"ok\" }`. This status does currently not include\
+        \ checks whether the database connection is working. This endpoint does not\
+        \ require the `X-Forwarded-Proto` header when TLS termination is set.\n\n\
+        Be aware that if you are running multiple nodes of ORY Hydra, the health status\
+        \ will never refer to the cluster state, only to a single instance."
+      operationId: "getInstanceStatus"
+      parameters: []
+      responses:
+        200:
+          description: "A list of clients."
+          schema:
+            $ref: "#/definitions/inline_response_200"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+  /keys/{set}:
+    get:
+      tags:
+      - "jsonWebKey"
+      summary: "Retrieve a JSON Web Key Set"
+      description: "This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.\n\
+        \nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure\
+        \ that represents a cryptographic key. A JWK Set is a JSON data structure\
+        \ that represents a set of JWKs. A JSON Web Key is identified by its set and\
+        \ key id. ORY Hydra uses this functionality to store cryptographic keys used\
+        \ for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows\
+        \ storing user-defined keys as well.\n\nThe subject making the request needs\
+        \ to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:<set>:<kid>\"\
+        ],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "getJsonWebKeySet"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "set"
+        in: "path"
+        description: "The set"
+        required: true
+        type: "string"
+        x-go-name: "Set"
+        x-exportParamName: "Set"
+      responses:
+        200:
+          description: "jsonWebKeySet"
+          schema:
+            $ref: "#/definitions/jsonWebKeySet"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.keys.get"
+    post:
+      tags:
+      - "jsonWebKey"
+      summary: "Generate a new JSON Web Key"
+      description: "This endpoint is capable of generating JSON Web Key Sets for you.\
+        \ There a different strategies available, such as symmetric cryptographic\
+        \ keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA). If\
+        \ the specified JSON Web Key Set does not exist, it will be created.\n\nA\
+        \ JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure\
+        \ that represents a cryptographic key. A JWK Set is a JSON data structure\
+        \ that represents a set of JWKs. A JSON Web Key is identified by its set and\
+        \ key id. ORY Hydra uses this functionality to store cryptographic keys used\
+        \ for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows\
+        \ storing user-defined keys as well.\n\nThe subject making the request needs\
+        \ to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:<set>:<kid>\"\
+        ],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "createJsonWebKeySet"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "set"
+        in: "path"
+        description: "The set"
+        required: true
+        type: "string"
+        x-go-name: "Set"
+        x-exportParamName: "Set"
+      - in: "body"
+        name: "Body"
+        required: false
+        schema:
+          $ref: "#/definitions/jsonWebKeySetGeneratorRequest"
+        x-exportParamName: "Body"
+      responses:
+        200:
+          description: "jsonWebKeySet"
+          schema:
+            $ref: "#/definitions/jsonWebKeySet"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.keys.create"
+    put:
+      tags:
+      - "jsonWebKey"
+      summary: "Update a JSON Web Key Set"
+      description: "Use this method if you do not want to let Hydra generate the JWKs\
+        \ for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript\
+        \ Object Notation (JSON) data structure that represents a cryptographic key.\
+        \ A JWK Set is a JSON data structure that represents a set of JWKs. A JSON\
+        \ Web Key is identified by its set and key id. ORY Hydra uses this functionality\
+        \ to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID\
+        \ Connect ID tokens), and allows storing user-defined keys as well.\n\nThe\
+        \ subject making the request needs to be assigned to a policy containing:\n\
+        \n```\n{\n\"resources\": [\"rn:hydra:keys:<set>\"],\n\"actions\": [\"update\"\
+        ],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "updateJsonWebKeySet"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "set"
+        in: "path"
+        description: "The set"
+        required: true
+        type: "string"
+        x-go-name: "Set"
+        x-exportParamName: "Set"
+      - in: "body"
+        name: "Body"
+        required: false
+        schema:
+          $ref: "#/definitions/jsonWebKeySet"
+        x-exportParamName: "Body"
+      responses:
+        200:
+          description: "jsonWebKeySet"
+          schema:
+            $ref: "#/definitions/jsonWebKeySet"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.keys.update"
+    delete:
+      tags:
+      - "jsonWebKey"
+      summary: "Delete a JSON Web Key Set"
+      description: "Use this endpoint to delete a complete JSON Web Key Set and all\
+        \ the keys in that set.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation\
+        \ (JSON) data structure that represents a cryptographic key. A JWK Set is\
+        \ a JSON data structure that represents a set of JWKs. A JSON Web Key is identified\
+        \ by its set and key id. ORY Hydra uses this functionality to store cryptographic\
+        \ keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens),\
+        \ and allows storing user-defined keys as well.\n\nThe subject making the\
+        \ request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\"\
+        : [\"rn:hydra:keys:<set>\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\"\
+        \n}\n```"
+      operationId: "deleteJsonWebKeySet"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "set"
+        in: "path"
+        description: "The set"
+        required: true
+        type: "string"
+        x-go-name: "Set"
+        x-exportParamName: "Set"
+      responses:
+        204:
+          description: "An empty response"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.keys.delete"
+  /keys/{set}/{kid}:
+    get:
+      tags:
+      - "jsonWebKey"
+      summary: "Retrieve a JSON Web Key"
+      description: "This endpoint can be used to retrieve JWKs stored in ORY Hydra.\n\
+        \nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure\
+        \ that represents a cryptographic key. A JWK Set is a JSON data structure\
+        \ that represents a set of JWKs. A JSON Web Key is identified by its set and\
+        \ key id. ORY Hydra uses this functionality to store cryptographic keys used\
+        \ for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows\
+        \ storing user-defined keys as well.\n\nThe subject making the request needs\
+        \ to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:<set>:<kid>\"\
+        ],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "getJsonWebKey"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "kid"
+        in: "path"
+        description: "The kid of the desired key"
+        required: true
+        type: "string"
+        x-go-name: "KID"
+        x-exportParamName: "Kid"
+      - name: "set"
+        in: "path"
+        description: "The set"
+        required: true
+        type: "string"
+        x-go-name: "Set"
+        x-exportParamName: "Set"
+      responses:
+        200:
+          description: "jsonWebKeySet"
+          schema:
+            $ref: "#/definitions/jsonWebKeySet"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.keys.get"
+    put:
+      tags:
+      - "jsonWebKey"
+      summary: "Update a JSON Web Key"
+      description: "Use this method if you do not want to let Hydra generate the JWKs\
+        \ for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript\
+        \ Object Notation (JSON) data structure that represents a cryptographic key.\
+        \ A JWK Set is a JSON data structure that represents a set of JWKs. A JSON\
+        \ Web Key is identified by its set and key id. ORY Hydra uses this functionality\
+        \ to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID\
+        \ Connect ID tokens), and allows storing user-defined keys as well.\n\nThe\
+        \ subject making the request needs to be assigned to a policy containing:\n\
+        \n```\n{\n\"resources\": [\"rn:hydra:keys:<set>:<kid>\"],\n\"actions\": [\"\
+        update\"],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "updateJsonWebKey"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "kid"
+        in: "path"
+        description: "The kid of the desired key"
+        required: true
+        type: "string"
+        x-go-name: "KID"
+        x-exportParamName: "Kid"
+      - name: "set"
+        in: "path"
+        description: "The set"
+        required: true
+        type: "string"
+        x-go-name: "Set"
+        x-exportParamName: "Set"
+      - in: "body"
+        name: "Body"
+        required: false
+        schema:
+          $ref: "#/definitions/jsonWebKey"
+        x-exportParamName: "Body"
+      responses:
+        200:
+          description: "jsonWebKey"
+          schema:
+            $ref: "#/definitions/jsonWebKey"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.keys.update"
+    delete:
+      tags:
+      - "jsonWebKey"
+      summary: "Delete a JSON Web Key"
+      description: "Use this endpoint to delete a single JSON Web Key.\n\nA JSON Web\
+        \ Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents\
+        \ a cryptographic key. A JWK Set is a JSON data structure that represents\
+        \ a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra\
+        \ uses this functionality to store cryptographic keys used for TLS and JSON\
+        \ Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined\
+        \ keys as well.\n\nThe subject making the request needs to be assigned to\
+        \ a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:<set>:<kid>\"\
+        ],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "deleteJsonWebKey"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "kid"
+        in: "path"
+        description: "The kid of the desired key"
+        required: true
+        type: "string"
+        x-go-name: "KID"
+        x-exportParamName: "Kid"
+      - name: "set"
+        in: "path"
+        description: "The set"
+        required: true
+        type: "string"
+        x-go-name: "Set"
+        x-exportParamName: "Set"
+      responses:
+        204:
+          description: "An empty response"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.keys.delete"
+  /oauth2/auth:
+    get:
+      tags:
+      - "oAuth2"
+      summary: "The OAuth 2.0 authorize endpoint"
+      description: "This endpoint is not documented here because you should never\
+        \ use your own implementation to perform OAuth2 flows.\nOAuth2 is a very popular\
+        \ protocol and a library for your programming language will exists.\n\nTo\
+        \ learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749"
+      operationId: "oauthAuth"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      parameters: []
+      responses:
+        302:
+          description: "An empty response"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+  /oauth2/consent/requests/{id}:
+    get:
+      tags:
+      - "oAuth2"
+      summary: "Receive consent request information"
+      description: "Call this endpoint to receive information on consent requests.\
+        \ The consent request id is usually transmitted via the URL query `consent`.\n\
+        For example: `http://consent-app.mydomain.com/?consent=1234abcd`\n\n\nThe\
+        \ subject making the request needs to be assigned to a policy containing:\n\
+        \n```\n{\n\"resources\": [\"rn:hydra:oauth2:consent:requests:<request-id>\"\
+        ],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "getOAuth2ConsentRequest"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The id of the OAuth 2.0 Consent Request."
+        required: true
+        type: "string"
+        uniqueItems: true
+        x-go-name: "ID"
+        x-exportParamName: "Id"
+      responses:
+        200:
+          description: "The consent request response"
+          schema:
+            $ref: "#/definitions/oAuth2ConsentRequest"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.consent"
+  /oauth2/consent/requests/{id}/accept:
+    patch:
+      tags:
+      - "oAuth2"
+      summary: "Accept a consent request"
+      description: "Call this endpoint to accept a consent request. This usually happens\
+        \ when a user agrees to give access rights to\nan application.\n\n\nThe consent\
+        \ request id is usually transmitted via the URL query `consent`.\nFor example:\
+        \ `http://consent-app.mydomain.com/?consent=1234abcd`\n\n\nThe subject making\
+        \ the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\"\
+        : [\"rn:hydra:oauth2:consent:requests:<request-id>\"],\n\"actions\": [\"accept\"\
+        ],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "acceptOAuth2ConsentRequest"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "string"
+        x-go-name: "ID"
+        x-exportParamName: "Id"
+      - in: "body"
+        name: "Body"
+        required: true
+        schema:
+          $ref: "#/definitions/consentRequestAcceptance"
+        x-exportParamName: "Body"
+      responses:
+        204:
+          description: "An empty response"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.consent"
+  /oauth2/consent/requests/{id}/reject:
+    patch:
+      tags:
+      - "oAuth2"
+      summary: "Reject a consent request"
+      description: "Call this endpoint to reject a consent request. This usually happens\
+        \ when a user denies access rights to an\napplication.\n\n\nThe consent request\
+        \ id is usually transmitted via the URL query `consent`.\nFor example: `http://consent-app.mydomain.com/?consent=1234abcd`\n\
+        \n\nThe subject making the request needs to be assigned to a policy containing:\n\
+        \n```\n{\n\"resources\": [\"rn:hydra:oauth2:consent:requests:<request-id>\"\
+        ],\n\"actions\": [\"reject\"],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "rejectOAuth2ConsentRequest"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "string"
+        x-go-name: "ID"
+        x-exportParamName: "Id"
+      - in: "body"
+        name: "Body"
+        required: true
+        schema:
+          $ref: "#/definitions/consentRequestRejection"
+        x-exportParamName: "Body"
+      responses:
+        204:
+          description: "An empty response"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.consent"
+  /oauth2/flush:
+    post:
+      tags:
+      - "oAuth2"
+      summary: "Flush Expired OAuth2 Access Tokens"
+      description: "This endpoint flushes expired OAuth2 access tokens from the database.\
+        \ You can set a time after which no tokens will be\nnot be touched, in case\
+        \ you want to keep recent tokens for auditing. Refresh tokens can not be flushed\
+        \ as they are deleted\nautomatically when performing the refresh flow.\n\n\
+        \n```\n{\n\"resources\": [\"rn:hydra:oauth2:tokens\"],\n\"actions\": [\"flush\"\
+        ],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "flushInactiveOAuth2Tokens"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "Body"
+        required: false
+        schema:
+          $ref: "#/definitions/flushInactiveOAuth2TokensRequest"
+        x-exportParamName: "Body"
+      responses:
+        204:
+          description: "An empty response"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - basic: []
+      - oauth2:
+        - "hydra.oauth2.flush"
+  /oauth2/introspect:
+    post:
+      tags:
+      - "oAuth2"
+      summary: "Introspect OAuth2 tokens"
+      description: "The introspection endpoint allows to check if a token (both refresh\
+        \ and access) is active or not. An active token\nis neither expired nor revoked.\
+        \ If a token is active, additional information on the token will be included.\
+        \ You can\nset additional data for a token by setting `accessTokenExtra` during\
+        \ the consent flow.\n\n```\n{\n\"resources\": [\"rn:hydra:oauth2:tokens\"\
+        ],\n\"actions\": [\"introspect\"],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "introspectOAuth2Token"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token"
+        in: "formData"
+        description: "The string value of the token. For access tokens, this\nis the\
+          \ \"access_token\" value returned from the token endpoint\ndefined in OAuth\
+          \ 2.0 [RFC6749], Section 5.1.\nThis endpoint DOES NOT accept refresh tokens\
+          \ for validation."
+        required: true
+        type: "string"
+        x-go-name: "Token"
+        x-exportParamName: "Token"
+      - name: "scope"
+        in: "formData"
+        description: "An optional, space separated list of required scopes. If the\
+          \ access token was not granted one of the\nscopes, the result of active\
+          \ will be false."
+        required: false
+        type: "string"
+        x-go-name: "Scope"
+        x-exportParamName: "Scope"
+      responses:
+        200:
+          description: "The token introspection response"
+          schema:
+            $ref: "#/definitions/oAuth2TokenIntrospection"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - basic: []
+      - oauth2:
+        - "hydra.introspect"
+  /oauth2/revoke:
+    post:
+      tags:
+      - "oAuth2"
+      summary: "Revoke OAuth2 tokens"
+      description: "Revoking a token (both access and refresh) means that the tokens\
+        \ will be invalid. A revoked access token can no\nlonger be used to make access\
+        \ requests, and a revoked refresh token can no longer be used to refresh an\
+        \ access token.\nRevoking a refresh token also invalidates the access token\
+        \ that was created with it."
+      operationId: "revokeOAuth2Token"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      parameters:
+      - name: "token"
+        in: "formData"
+        required: true
+        type: "string"
+        x-go-name: "Token"
+        x-exportParamName: "Token"
+      responses:
+        200:
+          description: "An empty response"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - basic: []
+  /oauth2/token:
+    post:
+      tags:
+      - "oAuth2"
+      summary: "The OAuth 2.0 token endpoint"
+      description: "This endpoint is not documented here because you should never\
+        \ use your own implementation to perform OAuth2 flows.\nOAuth2 is a very popular\
+        \ protocol and a library for your programming language will exists.\n\nTo\
+        \ learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749"
+      operationId: "oauthToken"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "The token response"
+          schema:
+            $ref: "#/definitions/inline_response_200_1"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - basic: []
+      - oauth2: []
+  /policies:
+    get:
+      tags:
+      - "policy"
+      summary: "List Access Control Policies"
+      description: "The subject making the request needs to be assigned to a policy\
+        \ containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies\"],\n\"actions\"\
+        : [\"list\"],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "listPolicies"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "offset"
+        in: "query"
+        description: "The offset from where to start looking."
+        required: false
+        type: "integer"
+        format: "int64"
+        x-go-name: "Offset"
+        x-exportParamName: "Offset"
+      - name: "limit"
+        in: "query"
+        description: "The maximum amount of policies returned."
+        required: false
+        type: "integer"
+        format: "int64"
+        x-go-name: "Limit"
+        x-exportParamName: "Limit"
+      responses:
+        200:
+          description: "A policy"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/policy"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.policies"
+    post:
+      tags:
+      - "policy"
+      summary: "Create an Access Control Policy"
+      description: "The subject making the request needs to be assigned to a policy\
+        \ containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies\"],\n\"actions\"\
+        : [\"create\"],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "createPolicy"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "Body"
+        required: false
+        schema:
+          $ref: "#/definitions/policy"
+        x-exportParamName: "Body"
+      responses:
+        201:
+          description: "policy"
+          schema:
+            $ref: "#/definitions/policy"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.policies"
+  /policies/{id}:
+    get:
+      tags:
+      - "policy"
+      summary: "Get an Access Control Policy"
+      description: "The subject making the request needs to be assigned to a policy\
+        \ containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies:<id>\"],\n\"\
+        actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "getPolicy"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The id of the policy."
+        required: true
+        type: "string"
+        x-go-name: "ID"
+        x-exportParamName: "Id"
+      responses:
+        200:
+          description: "policy"
+          schema:
+            $ref: "#/definitions/policy"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.policies"
+    put:
+      tags:
+      - "policy"
+      summary: "Update an Access Control Polic"
+      description: "The subject making the request needs to be assigned to a policy\
+        \ containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies\"],\n\"actions\"\
+        : [\"update\"],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "updatePolicy"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The id of the policy."
+        required: true
+        type: "string"
+        x-go-name: "ID"
+        x-exportParamName: "Id"
+      - in: "body"
+        name: "Body"
+        required: false
+        schema:
+          $ref: "#/definitions/policy"
+        x-exportParamName: "Body"
+      responses:
+        200:
+          description: "policy"
+          schema:
+            $ref: "#/definitions/policy"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.policies"
+    delete:
+      tags:
+      - "policy"
+      summary: "Delete an Access Control Policy"
+      description: "The subject making the request needs to be assigned to a policy\
+        \ containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies:<id>\"],\n\"\
+        actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "deletePolicy"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The id of the policy."
+        required: true
+        type: "string"
+        x-go-name: "ID"
+        x-exportParamName: "Id"
+      responses:
+        204:
+          description: "An empty response"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.policies"
+  /userinfo:
+    post:
+      tags:
+      - "oAuth2"
+      summary: "OpenID Connect Userinfo"
+      description: "This endpoint returns the payload of the ID Token, including the\
+        \ idTokenExtra values, of the provided OAuth 2.0 access token.\nThe endpoint\
+        \ implements http://openid.net/specs/openid-connect-core-1_0.html#UserInfo\
+        \ ."
+      operationId: "userinfo"
+      schemes:
+      - "http"
+      - "https"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "The userinfo response"
+          schema:
+            $ref: "#/definitions/swaggeruserinfoResponsePayload"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2: []
+  /warden/allowed:
+    post:
+      tags:
+      - "warden"
+      summary: "Check if an access request is valid (without providing an access token)"
+      description: "Checks if a subject (typically a user or a service) is allowed\
+        \ to perform an action on a resource. This endpoint requires a subject,\n\
+        a resource name, an action name and a context. If the subject is not allowed\
+        \ to perform the action on the resource,\nthis endpoint returns a 200 response\
+        \ with `{ \"allowed\": false}`, otherwise `{ \"allowed\": true }` is returned.\n\
+        \n\nThe subject making the request needs to be assigned to a policy containing:\n\
+        \n```\n{\n\"resources\": [\"rn:hydra:warden:allowed\"],\n\"actions\": [\"\
+        decide\"],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "doesWardenAllowAccessRequest"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "Body"
+        required: false
+        schema:
+          $ref: "#/definitions/wardenAccessRequest"
+        x-exportParamName: "Body"
+      responses:
+        200:
+          description: "The warden access request response"
+          schema:
+            $ref: "#/definitions/wardenAccessRequestResponse"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.warden"
+  /warden/groups:
+    get:
+      tags:
+      - "warden"
+      summary: "List groups"
+      description: "The subject making the request needs to be assigned to a policy\
+        \ containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups\"],\n\"\
+        actions\": [\"list\"],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "listGroups"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "member"
+        in: "query"
+        description: "The id of the member to look up."
+        required: false
+        type: "string"
+        x-go-name: "Member"
+        x-exportParamName: "Member"
+      - name: "limit"
+        in: "query"
+        description: "The maximum amount of policies returned."
+        required: false
+        type: "integer"
+        format: "int64"
+        x-go-name: "Limit"
+        x-exportParamName: "Limit"
+      - name: "offset"
+        in: "query"
+        description: "The offset from where to start looking."
+        required: false
+        type: "integer"
+        format: "int64"
+        x-go-name: "Offset"
+        x-exportParamName: "Offset"
+      responses:
+        200:
+          description: "A list of groups the member is belonging to"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/group"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.warden.groups"
+    post:
+      tags:
+      - "warden"
+      summary: "Create a group"
+      description: "The subject making the request needs to be assigned to a policy\
+        \ containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups\"],\n\"\
+        actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "createGroup"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "Body"
+        required: false
+        schema:
+          $ref: "#/definitions/group"
+        x-exportParamName: "Body"
+      responses:
+        201:
+          description: "A group"
+          schema:
+            $ref: "#/definitions/group"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.warden.groups"
+  /warden/groups/{id}:
+    get:
+      tags:
+      - "warden"
+      summary: "Get a group by id"
+      description: "The subject making the request needs to be assigned to a policy\
+        \ containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups:<id>\"],\n\
+        \"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "getGroup"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The id of the group to look up."
+        required: true
+        type: "string"
+        x-go-name: "ID"
+        x-exportParamName: "Id"
+      responses:
+        201:
+          description: "A group"
+          schema:
+            $ref: "#/definitions/group"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.warden.groups"
+    delete:
+      tags:
+      - "warden"
+      summary: "Delete a group by id"
+      description: "The subject making the request needs to be assigned to a policy\
+        \ containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups:<id>\"],\n\
+        \"actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "deleteGroup"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The id of the group to look up."
+        required: true
+        type: "string"
+        x-go-name: "ID"
+        x-exportParamName: "Id"
+      responses:
+        204:
+          description: "An empty response"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.warden.groups"
+  /warden/groups/{id}/members:
+    post:
+      tags:
+      - "warden"
+      summary: "Add members to a group"
+      description: "The subject making the request needs to be assigned to a policy\
+        \ containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups:<id>\"],\n\
+        \"actions\": [\"members.add\"],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "addMembersToGroup"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The id of the group to modify."
+        required: true
+        type: "string"
+        x-go-name: "ID"
+        x-exportParamName: "Id"
+      - in: "body"
+        name: "Body"
+        required: false
+        schema:
+          $ref: "#/definitions/groupMembers"
+        x-exportParamName: "Body"
+      responses:
+        204:
+          description: "An empty response"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.warden.groups"
+    delete:
+      tags:
+      - "warden"
+      summary: "Remove members from a group"
+      description: "The subject making the request needs to be assigned to a policy\
+        \ containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups:<id>\"],\n\
+        \"actions\": [\"members.remove\"],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "removeMembersFromGroup"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The id of the group to modify."
+        required: true
+        type: "string"
+        x-go-name: "ID"
+        x-exportParamName: "Id"
+      - in: "body"
+        name: "Body"
+        required: false
+        schema:
+          $ref: "#/definitions/groupMembers"
+        x-exportParamName: "Body"
+      responses:
+        204:
+          description: "An empty response"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.warden.groups"
+  /warden/token/allowed:
+    post:
+      tags:
+      - "warden"
+      summary: "Check if an access request is valid (providing an access token)"
+      description: "Checks if a token is valid and if the token subject is allowed\
+        \ to perform an action on a resource.\nThis endpoint requires a token, a scope,\
+        \ a resource name, an action name and a context.\n\n\nIf a token is expired/invalid,\
+        \ has not been granted the requested scope or the subject is not allowed to\n\
+        perform the action on the resource, this endpoint returns a 200 response with\
+        \ `{ \"allowed\": false}`.\n\n\nExtra data set through the `accessTokenExtra`\
+        \ field in the consent flow will be included in the response.\n\n\nThe subject\
+        \ making the request needs to be assigned to a policy containing:\n\n```\n\
+        {\n\"resources\": [\"rn:hydra:warden:token:allowed\"],\n\"actions\": [\"decide\"\
+        ],\n\"effect\": \"allow\"\n}\n```"
+      operationId: "doesWardenAllowTokenAccessRequest"
+      schemes:
+      - "http"
+      - "https"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "Body"
+        required: false
+        schema:
+          $ref: "#/definitions/wardenTokenAccessRequest"
+        x-exportParamName: "Body"
+      responses:
+        200:
+          description: "The warden access request (with token) response"
+          schema:
+            $ref: "#/definitions/wardenTokenAccessRequestResponse"
+        401:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        403:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+        500:
+          description: "The standard error format"
+          schema:
+            $ref: "#/definitions/inline_response_401"
+      security:
+      - oauth2:
+        - "hydra.warden"
+securityDefinitions:
+  basic:
+    type: "basic"
+  oauth2:
+    type: "oauth2"
+    authorizationUrl: "https://your-hydra-instance.com/oauth2/auth"
+    tokenUrl: "https://your-hydra-instance.com/oauth2/token"
+    flow: "accessCode"
+    scopes:
+      hydra.clients: "A scope required to manage OAuth 2.0 Clients"
+      hydra.consent: "A scope required to fetch and modify consent requests"
+      hydra.keys.create: "A scope required to create JSON Web Keys"
+      hydra.keys.delete: "A scope required to delete JSON Web Keys"
+      hydra.keys.get: "A scope required to fetch JSON Web Keys"
+      hydra.keys.update: "A scope required to get JSON Web Keys"
+      hydra.policies: "A scope required to manage access control policies"
+      hydra.warden: "A scope required to make access control inquiries"
+      hydra.warden.groups: "A scope required to manage warden groups"
+      offline: "A scope required when requesting refresh tokens"
+      openid: "Request an OpenID Connect ID Token"
+definitions:
+  ConsentRequest:
+    type: "object"
+    properties:
+      clientId:
+        type: "string"
+        description: "ClientID is the client id that initiated the OAuth2 request."
+        x-go-name: "ClientID"
+      expiresAt:
+        type: "string"
+        format: "date-time"
+        description: "ExpiresAt is the time where the access request will expire."
+        x-go-name: "ExpiresAt"
+      id:
+        type: "string"
+        description: "ID is the id of this consent request."
+        x-go-name: "ID"
+      redirectUrl:
+        type: "string"
+        description: "Redirect URL is the URL where the user agent should be redirected\
+          \ to after the consent has been\naccepted or rejected."
+        x-go-name: "RedirectURL"
+      requestedScopes:
+        type: "array"
+        description: "RequestedScopes represents a list of scopes that have been requested\
+          \ by the OAuth2 request initiator."
+        items:
+          type: "string"
+        x-go-name: "RequestedScopes"
+    title: "ConsentRequest represents a consent request."
+    x-go-package: "github.com/ory/hydra/oauth2"
+  ConsentRequestManager:
+    type: "object"
+    x-go-package: "github.com/ory/hydra/oauth2"
+  Context:
+    type: "object"
+    properties:
+      accessTokenExtra:
+        type: "object"
+        description: "Extra represents arbitrary session data."
+        additionalProperties:
+          type: "object"
+          properties: {}
+        x-go-name: "Extra"
+      clientId:
+        type: "string"
+        description: "ClientID is id of the client the token was issued for.."
+        x-go-name: "ClientID"
+      expiresAt:
+        type: "string"
+        format: "date-time"
+        description: "ExpiresAt is the expiry timestamp."
+        x-go-name: "ExpiresAt"
+      grantedScopes:
+        type: "array"
+        description: "GrantedScopes is a list of scopes that the subject authorized\
+          \ when asked for consent."
+        items:
+          type: "string"
+        x-go-name: "GrantedScopes"
+      issuedAt:
+        type: "string"
+        format: "date-time"
+        description: "IssuedAt is the token creation time stamp."
+        x-go-name: "IssuedAt"
+      issuer:
+        type: "string"
+        description: "Issuer is the id of the issuer, typically an hydra instance."
+        x-go-name: "Issuer"
+      subject:
+        type: "string"
+        description: "Subject is the identity that authorized issuing the token, for\
+          \ example a user or an OAuth2 app.\nThis is usually a uuid but you can choose\
+          \ a urn or some other id too."
+        x-go-name: "Subject"
+    description: "Context contains an access token's session data"
+    x-go-package: "github.com/ory/hydra/firewall"
+  Firewall:
+    type: "object"
+    title: "Firewall offers various validation strategies for access tokens."
+    x-go-package: "github.com/ory/hydra/firewall"
+  Handler:
+    type: "object"
+    properties:
+      Generators:
+        type: "object"
+        additionalProperties:
+          $ref: "#/definitions/KeyGenerator"
+      H:
+        $ref: "#/definitions/Writer"
+      Manager:
+        $ref: "#/definitions/Manager"
+      ResourcePrefix:
+        type: "string"
+      W:
+        $ref: "#/definitions/Firewall"
+    x-go-package: "github.com/ory/hydra/jwk"
+  KeyGenerator:
+    type: "object"
+    x-go-package: "github.com/ory/hydra/jwk"
+  Manager:
+    type: "object"
+    x-go-package: "github.com/ory/hydra/warden/group"
+  RawMessage:
+    title: "RawMessage is a raw encoded JSON value."
+    type: "array"
+    description: "It implements Marshaler and Unmarshaler and can\nbe used to delay\
+      \ JSON decoding or precompute a JSON encoding."
+    items:
+      type: "integer"
+      format: "uint8"
+    x-go-package: "encoding/json"
+  Writer:
+    type: "object"
+    description: "Writer is a helper to write arbitrary data to a ResponseWriter"
+    x-go-package: "github.com/ory/hydra/vendor/github.com/ory/herodot"
+  consentRequestAcceptance:
+    type: "object"
+    properties:
+      accessTokenExtra:
+        type: "object"
+        description: "AccessTokenExtra represents arbitrary data that will be added\
+          \ to the access token and that will be returned\non introspection and warden\
+          \ requests."
+        additionalProperties:
+          type: "object"
+          properties: {}
+        x-go-name: "AccessTokenExtra"
+      grantScopes:
+        type: "array"
+        description: "A list of scopes that the user agreed to grant. It should be\
+          \ a subset of requestedScopes from the consent request."
+        items:
+          type: "string"
+        x-go-name: "GrantScopes"
+      idTokenExtra:
+        type: "object"
+        description: "IDTokenExtra represents arbitrary data that will be added to\
+          \ the ID token. The ID token will only be issued\nif the user agrees to\
+          \ it and if the client requested an ID token."
+        additionalProperties:
+          type: "object"
+          properties: {}
+        x-go-name: "IDTokenExtra"
+      subject:
+        type: "string"
+        description: "Subject represents a unique identifier of the user (or service,\
+          \ or legal entity, ...) that accepted the\nOAuth2 request."
+        x-go-name: "Subject"
+    title: "AcceptConsentRequestPayload represents data that will be used to accept\
+      \ a consent request."
+    x-go-name: "AcceptConsentRequestPayload"
+    x-go-package: "github.com/ory/hydra/oauth2"
+  consentRequestRejection:
+    type: "object"
+    properties:
+      reason:
+        type: "string"
+        description: "Reason represents the reason why the user rejected the consent\
+          \ request."
+        x-go-name: "Reason"
+    title: "RejectConsentRequestPayload represents data that will be used to reject\
+      \ a consent request."
+    x-go-name: "RejectConsentRequestPayload"
+    x-go-package: "github.com/ory/hydra/oauth2"
+  flushInactiveOAuth2TokensRequest:
+    type: "object"
+    properties:
+      notAfter:
+        type: "string"
+        format: "date-time"
+        description: "NotAfter sets after which point tokens should not be flushed.\
+          \ This is useful when you want to keep a history\nof recently issued tokens\
+          \ for auditing."
+        x-go-name: "NotAfter"
+    x-go-name: "FlushInactiveOAuth2TokensRequest"
+    x-go-package: "github.com/ory/hydra/oauth2"
+  group:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        description: "ID is the groups id."
+        x-go-name: "ID"
+      members:
+        type: "array"
+        description: "Members is who belongs to the group."
+        items:
+          type: "string"
+        x-go-name: "Members"
+    description: "Group represents a warden group"
+    example:
+      members:
+      - "members"
+      - "members"
+      id: "id"
+    x-go-name: "Group"
+    x-go-package: "github.com/ory/hydra/warden/group"
+  groupMembers:
+    type: "object"
+    properties:
+      members:
+        type: "array"
+        items:
+          type: "string"
+        x-go-name: "Members"
+    x-go-name: "membersRequest"
+    x-go-package: "github.com/ory/hydra/warden/group"
+  joseWebKeySetRequest:
+    type: "object"
+    properties:
+      keys:
+        type: "array"
+        items:
+          $ref: "#/definitions/RawMessage"
+        x-go-name: "Keys"
+    x-go-package: "github.com/ory/hydra/jwk"
+  jsonWebKey:
+    type: "object"
+    properties:
+      alg:
+        type: "string"
+        description: "The \"alg\" (algorithm) parameter identifies the algorithm intended\
+          \ for\nuse with the key.  The values used should either be registered in\
+          \ the\nIANA \"JSON Web Signature and Encryption Algorithms\" registry\n\
+          established by [JWA] or be a value that contains a Collision-\nResistant\
+          \ Name."
+        x-go-name: "Alg"
+      crv:
+        type: "string"
+        x-go-name: "Crv"
+      d:
+        type: "string"
+        x-go-name: "D"
+      dp:
+        type: "string"
+        x-go-name: "Dp"
+      dq:
+        type: "string"
+        x-go-name: "Dq"
+      e:
+        type: "string"
+        x-go-name: "E"
+      k:
+        type: "string"
+        x-go-name: "K"
+      kid:
+        type: "string"
+        description: "The \"kid\" (key ID) parameter is used to match a specific key.\
+          \  This\nis used, for instance, to choose among a set of keys within a JWK\
+          \ Set\nduring key rollover.  The structure of the \"kid\" value is\nunspecified.\
+          \  When \"kid\" values are used within a JWK Set, different\nkeys within\
+          \ the JWK Set SHOULD use distinct \"kid\" values.  (One\nexample in which\
+          \ different keys might use the same \"kid\" value is if\nthey have different\
+          \ \"kty\" (key type) values but are considered to be\nequivalent alternatives\
+          \ by the application using them.)  The \"kid\"\nvalue is a case-sensitive\
+          \ string."
+        x-go-name: "Kid"
+      kty:
+        type: "string"
+        description: "The \"kty\" (key type) parameter identifies the cryptographic\
+          \ algorithm\nfamily used with the key, such as \"RSA\" or \"EC\". \"kty\"\
+          \ values should\neither be registered in the IANA \"JSON Web Key Types\"\
+          \ registry\nestablished by [JWA] or be a value that contains a Collision-\n\
+          Resistant Name.  The \"kty\" value is a case-sensitive string."
+        x-go-name: "Kty"
+      n:
+        type: "string"
+        x-go-name: "N"
+      p:
+        type: "string"
+        x-go-name: "P"
+      q:
+        type: "string"
+        x-go-name: "Q"
+      qi:
+        type: "string"
+        x-go-name: "Qi"
+      use:
+        type: "string"
+        description: "The \"use\" (public key use) parameter identifies the intended\
+          \ use of\nthe public key. The \"use\" parameter is employed to indicate\
+          \ whether\na public key is used for encrypting data or verifying the signature\n\
+          on data. Values are commonly \"sig\" (signature) or \"enc\" (encryption)."
+        x-go-name: "Use"
+      x:
+        type: "string"
+        x-go-name: "X"
+      x5c:
+        type: "array"
+        description: "The \"x5c\" (X.509 certificate chain) parameter contains a chain\
+          \ of one\nor more PKIX certificates [RFC5280].  The certificate chain is\n\
+          represented as a JSON array of certificate value strings.  Each\nstring\
+          \ in the array is a base64-encoded (Section 4 of [RFC4648] --\nnot base64url-encoded)\
+          \ DER [ITU.X690.1994] PKIX certificate value.\nThe PKIX certificate containing\
+          \ the key value MUST be the first\ncertificate."
+        items:
+          type: "string"
+        x-go-name: "X5c"
+      y:
+        type: "string"
+        x-go-name: "Y"
+    example:
+      d: "d"
+      e: "e"
+      crv: "crv"
+      use: "use"
+      kid: "kid"
+      x5c:
+      - "x5c"
+      - "x5c"
+      k: "k"
+      dp: "dp"
+      dq: "dq"
+      n: "n"
+      p: "p"
+      kty: "kty"
+      q: "q"
+      qi: "qi"
+      x: "x"
+      y: "y"
+      alg: "alg"
+    x-go-name: "swaggerJSONWebKey"
+    x-go-package: "github.com/ory/hydra/jwk"
+  jsonWebKeySet:
+    type: "object"
+    properties:
+      keys:
+        type: "array"
+        description: "The value of the \"keys\" parameter is an array of JWK values.\
+          \  By\ndefault, the order of the JWK values within the array does not imply\n\
+          an order of preference among them, although applications of JWK Sets\ncan\
+          \ choose to assign a meaning to the order for their purposes, if\ndesired."
+        items:
+          $ref: "#/definitions/jsonWebKey"
+        x-go-name: "Keys"
+    example:
+      keys:
+      - d: "d"
+        e: "e"
+        crv: "crv"
+        use: "use"
+        kid: "kid"
+        x5c:
+        - "x5c"
+        - "x5c"
+        k: "k"
+        dp: "dp"
+        dq: "dq"
+        n: "n"
+        p: "p"
+        kty: "kty"
+        q: "q"
+        qi: "qi"
+        x: "x"
+        y: "y"
+        alg: "alg"
+      - d: "d"
+        e: "e"
+        crv: "crv"
+        use: "use"
+        kid: "kid"
+        x5c:
+        - "x5c"
+        - "x5c"
+        k: "k"
+        dp: "dp"
+        dq: "dq"
+        n: "n"
+        p: "p"
+        kty: "kty"
+        q: "q"
+        qi: "qi"
+        x: "x"
+        y: "y"
+        alg: "alg"
+    x-go-name: "swaggerJSONWebKeySet"
+    x-go-package: "github.com/ory/hydra/jwk"
+  jsonWebKeySetGeneratorRequest:
+    type: "object"
+    required:
+    - "alg"
+    - "kid"
+    properties:
+      alg:
+        type: "string"
+        description: "The algorithm to be used for creating the key. Supports \"RS256\"\
+          , \"ES512\", \"HS512\", and \"HS256\""
+        x-go-name: "Algorithm"
+      kid:
+        type: "string"
+        description: "The kid of the key to be created"
+        x-go-name: "KeyID"
+    x-go-name: "createRequest"
+    x-go-package: "github.com/ory/hydra/jwk"
+  oAuth2Client:
+    type: "object"
+    properties:
+      client_name:
+        type: "string"
+        description: "Name is the human-readable string name of the client to be presented\
+          \ to the\nend-user during authorization."
+        x-go-name: "Name"
+      client_secret:
+        type: "string"
+        description: "Secret is the client's secret. The secret will be included in\
+          \ the create request as cleartext, and then\nnever again. The secret is\
+          \ stored using BCrypt so it is impossible to recover it. Tell your users\n\
+          that they need to write the secret down as it will not be made available\
+          \ again."
+        x-go-name: "Secret"
+      client_uri:
+        type: "string"
+        description: "ClientURI is an URL string of a web page providing information\
+          \ about the client.\nIf present, the server SHOULD display this URL to the\
+          \ end-user in\na clickable fashion."
+        x-go-name: "ClientURI"
+      contacts:
+        type: "array"
+        description: "Contacts is a array of strings representing ways to contact\
+          \ people responsible\nfor this client, typically email addresses."
+        items:
+          type: "string"
+        x-go-name: "Contacts"
+      grant_types:
+        type: "array"
+        description: "GrantTypes is an array of grant types the client is allowed\
+          \ to use."
+        items:
+          type: "string"
+        x-go-name: "GrantTypes"
+      id:
+        type: "string"
+        description: "ID is the id for this client."
+        x-go-name: "ID"
+      logo_uri:
+        type: "string"
+        description: "LogoURI is an URL string that references a logo for the client."
+        x-go-name: "LogoURI"
+      owner:
+        type: "string"
+        description: "Owner is a string identifying the owner of the OAuth 2.0 Client."
+        x-go-name: "Owner"
+      policy_uri:
+        type: "string"
+        description: "PolicyURI is a URL string that points to a human-readable privacy\
+          \ policy document\nthat describes how the deployment organization collects,\
+          \ uses,\nretains, and discloses personal data."
+        x-go-name: "PolicyURI"
+      public:
+        type: "boolean"
+        description: "Public is a boolean that identifies this client as public, meaning\
+          \ that it\ndoes not have a secret. It will disable the client_credentials\
+          \ grant type for this client if set."
+        x-go-name: "Public"
+      redirect_uris:
+        type: "array"
+        description: "RedirectURIs is an array of allowed redirect urls for the client,\
+          \ for example http://mydomain/oauth/callback ."
+        items:
+          type: "string"
+        x-go-name: "RedirectURIs"
+      response_types:
+        type: "array"
+        description: "ResponseTypes is an array of the OAuth 2.0 response type strings\
+          \ that the client can\nuse at the authorization endpoint."
+        items:
+          type: "string"
+        x-go-name: "ResponseTypes"
+      scope:
+        type: "string"
+        description: "Scope is a string containing a space-separated list of scope\
+          \ values (as\ndescribed in Section 3.3 of OAuth 2.0 [RFC6749]) that the\
+          \ client\ncan use when requesting access tokens."
+        pattern: "([a-zA-Z0-9\\.\\*]+\\s?)+"
+        x-go-name: "Scope"
+      tos_uri:
+        type: "string"
+        description: "TermsOfServiceURI is a URL string that points to a human-readable\
+          \ terms of service\ndocument for the client that describes a contractual\
+          \ relationship\nbetween the end-user and the client that the end-user accepts\
+          \ when\nauthorizing the client."
+        x-go-name: "TermsOfServiceURI"
+    title: "Client represents an OAuth 2.0 Client."
+    example:
+      owner: "owner"
+      client_uri: "client_uri"
+      grant_types:
+      - "grant_types"
+      - "grant_types"
+      logo_uri: "logo_uri"
+      redirect_uris:
+      - "redirect_uris"
+      - "redirect_uris"
+      public: true
+      scope: "scope"
+      client_secret: "client_secret"
+      id: "id"
+      tos_uri: "tos_uri"
+      client_name: "client_name"
+      contacts:
+      - "contacts"
+      - "contacts"
+      policy_uri: "policy_uri"
+      response_types:
+      - "response_types"
+      - "response_types"
+    x-go-name: "Client"
+    x-go-package: "github.com/ory/hydra/client"
+  oAuth2ConsentRequest:
+    type: "object"
+    properties:
+      clientId:
+        type: "string"
+        description: "ClientID is the client id that initiated the OAuth2 request."
+        x-go-name: "ClientID"
+      expiresAt:
+        type: "string"
+        description: "ExpiresAt is the time where the access request will expire."
+        x-go-name: "ExpiresAt"
+      id:
+        type: "string"
+        description: "ID is the id of this consent request."
+        x-go-name: "ID"
+      redirectUrl:
+        type: "string"
+        description: "Redirect URL is the URL where the user agent should be redirected\
+          \ to after the consent has been\naccepted or rejected."
+        x-go-name: "RedirectURL"
+      requestedScopes:
+        type: "array"
+        description: "RequestedScopes represents a list of scopes that have been requested\
+          \ by the OAuth2 request initiator."
+        items:
+          type: "string"
+        x-go-name: "RequestedScopes"
+    title: "ConsentRequest represents a consent request."
+    example:
+      clientId: "clientId"
+      redirectUrl: "redirectUrl"
+      id: "id"
+      requestedScopes:
+      - "requestedScopes"
+      - "requestedScopes"
+      expiresAt: "expiresAt"
+    x-go-name: "swaggerConsentRequest"
+    x-go-package: "github.com/ory/hydra/oauth2"
+  oAuth2TokenIntrospection:
+    type: "object"
+    properties:
+      active:
+        type: "boolean"
+        description: "Active is a boolean indicator of whether or not the presented\
+          \ token\nis currently active.  The specifics of a token's \"active\" state\n\
+          will vary depending on the implementation of the authorization\nserver and\
+          \ the information it keeps about its tokens, but a \"true\"\nvalue return\
+          \ for the \"active\" property will generally indicate\nthat a given token\
+          \ has been issued by this authorization server,\nhas not been revoked by\
+          \ the resource owner, and is within its\ngiven time window of validity (e.g.,\
+          \ after its issuance time and\nbefore its expiration time)."
+        x-go-name: "Active"
+      aud:
+        type: "string"
+        description: "ClientID is a service-specific string identifier or list of\
+          \ string\nidentifiers representing the intended audience for this token."
+        x-go-name: "Audience"
+      client_id:
+        type: "string"
+        description: "ClientID is aclient identifier for the OAuth 2.0 client that\n\
+          requested this token."
+        x-go-name: "ClientID"
+      exp:
+        type: "integer"
+        format: "int64"
+        description: "Expires at is an integer timestamp, measured in the number of\
+          \ seconds\nsince January 1 1970 UTC, indicating when this token will expire."
+        x-go-name: "ExpiresAt"
+      ext:
+        type: "object"
+        description: "Extra is arbitrary data set by the session."
+        additionalProperties:
+          type: "object"
+          properties: {}
+        x-go-name: "Extra"
+      iat:
+        type: "integer"
+        format: "int64"
+        description: "Issued at is an integer timestamp, measured in the number of\
+          \ seconds\nsince January 1 1970 UTC, indicating when this token was\noriginally\
+          \ issued."
+        x-go-name: "IssuedAt"
+      iss:
+        type: "string"
+        description: "Issuer is a string representing the issuer of this token"
+        x-go-name: "Issuer"
+      nbf:
+        type: "integer"
+        format: "int64"
+        description: "NotBefore is an integer timestamp, measured in the number of\
+          \ seconds\nsince January 1 1970 UTC, indicating when this token is not to\
+          \ be\nused before."
+        x-go-name: "NotBefore"
+      scope:
+        type: "string"
+        description: "Scope is a JSON string containing a space-separated list of\n\
+          scopes associated with this token."
+        x-go-name: "Scope"
+      sub:
+        type: "string"
+        description: "Subject of the token, as defined in JWT [RFC7519].\nUsually\
+          \ a machine-readable identifier of the resource owner who\nauthorized this\
+          \ token."
+        x-go-name: "Subject"
+      username:
+        type: "string"
+        description: "Username is a human-readable identifier for the resource owner\
+          \ who\nauthorized this token."
+        x-go-name: "Username"
+    example:
+      ext:
+        key: "{}"
+      aud: "aud"
+      sub: "sub"
+      nbf: 1
+      scope: "scope"
+      iss: "iss"
+      active: true
+      exp: 0
+      iat: 6
+      client_id: "client_id"
+      username: "username"
+    x-go-name: "swaggerOAuthIntrospectionResponsePayload"
+    x-go-package: "github.com/ory/hydra/oauth2"
+  policy:
+    type: "object"
+    properties:
+      actions:
+        type: "array"
+        description: "Actions impacted by the policy."
+        items:
+          type: "string"
+        x-go-name: "Actions"
+      conditions:
+        type: "object"
+        description: "Conditions under which the policy is active."
+        additionalProperties:
+          $ref: "#/definitions/policy_conditions"
+        x-go-name: "Conditions"
+      description:
+        type: "string"
+        description: "Description of the policy."
+        x-go-name: "Description"
+      effect:
+        type: "string"
+        description: "Effect of the policy"
+        x-go-name: "Effect"
+      id:
+        type: "string"
+        description: "ID of the policy."
+        x-go-name: "ID"
+      resources:
+        type: "array"
+        description: "Resources impacted by the policy."
+        items:
+          type: "string"
+        x-go-name: "Resources"
+      subjects:
+        type: "array"
+        description: "Subjects impacted by the policy."
+        items:
+          type: "string"
+        x-go-name: "Subjects"
+    example:
+      effect: "effect"
+      subjects:
+      - "subjects"
+      - "subjects"
+      description: "description"
+      resources:
+      - "resources"
+      - "resources"
+      id: "id"
+      conditions:
+        key:
+          options:
+            key: "{}"
+          type: "type"
+      actions:
+      - "actions"
+      - "actions"
+    x-go-name: "swaggerPolicy"
+    x-go-package: "github.com/ory/hydra/policy"
+  swaggerAcceptConsentRequest:
+    type: "object"
+    required:
+    - "Body"
+    - "id"
+    properties:
+      Body:
+        $ref: "#/definitions/consentRequestAcceptance"
+      id:
+        type: "string"
+        description: "in: path"
+        x-go-name: "ID"
+    x-go-package: "github.com/ory/hydra/oauth2"
+  swaggerCreatePolicyParameters:
+    type: "object"
+    properties:
+      Body:
+        $ref: "#/definitions/policy"
+    x-go-package: "github.com/ory/hydra/policy"
+  swaggerDoesWardenAllowAccessRequestParameters:
+    type: "object"
+    properties:
+      Body:
+        $ref: "#/definitions/wardenAccessRequest"
+    x-go-package: "github.com/ory/hydra/warden"
+  swaggerDoesWardenAllowTokenAccessRequestParameters:
+    type: "object"
+    properties:
+      Body:
+        $ref: "#/definitions/wardenTokenAccessRequest"
+    x-go-package: "github.com/ory/hydra/warden"
+  swaggerFlushInactiveAccessTokens:
+    type: "object"
+    properties:
+      Body:
+        $ref: "#/definitions/flushInactiveOAuth2TokensRequest"
+    x-go-package: "github.com/ory/hydra/oauth2"
+  swaggerGetPolicyParameters:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        description: "The id of the policy.\nin: path"
+        x-go-name: "ID"
+    x-go-package: "github.com/ory/hydra/policy"
+  swaggerJsonWebKeyQuery:
+    type: "object"
+    required:
+    - "kid"
+    - "set"
+    properties:
+      kid:
+        type: "string"
+        description: "The kid of the desired key\nin: path"
+        x-go-name: "KID"
+      set:
+        type: "string"
+        description: "The set\nin: path"
+        x-go-name: "Set"
+    x-go-package: "github.com/ory/hydra/jwk"
+  swaggerJwkCreateSet:
+    type: "object"
+    required:
+    - "set"
+    properties:
+      Body:
+        $ref: "#/definitions/jsonWebKeySetGeneratorRequest"
+      set:
+        type: "string"
+        description: "The set\nin: path"
+        x-go-name: "Set"
+    x-go-package: "github.com/ory/hydra/jwk"
+  swaggerJwkSetQuery:
+    type: "object"
+    required:
+    - "set"
+    properties:
+      set:
+        type: "string"
+        description: "The set\nin: path"
+        x-go-name: "Set"
+    x-go-package: "github.com/ory/hydra/jwk"
+  swaggerJwkUpdateSet:
+    type: "object"
+    required:
+    - "set"
+    properties:
+      Body:
+        $ref: "#/definitions/jsonWebKeySet"
+      set:
+        type: "string"
+        description: "The set\nin: path"
+        x-go-name: "Set"
+    x-go-package: "github.com/ory/hydra/jwk"
+  swaggerJwkUpdateSetKey:
+    type: "object"
+    required:
+    - "kid"
+    - "set"
+    properties:
+      Body:
+        $ref: "#/definitions/jsonWebKey"
+      kid:
+        type: "string"
+        description: "The kid of the desired key\nin: path"
+        x-go-name: "KID"
+      set:
+        type: "string"
+        description: "The set\nin: path"
+        x-go-name: "Set"
+    x-go-package: "github.com/ory/hydra/jwk"
+  swaggerListPolicyParameters:
+    type: "object"
+    properties:
+      limit:
+        type: "integer"
+        format: "int64"
+        description: "The maximum amount of policies returned.\nin: query"
+        x-go-name: "Limit"
+      offset:
+        type: "integer"
+        format: "int64"
+        description: "The offset from where to start looking.\nin: query"
+        x-go-name: "Offset"
+    x-go-package: "github.com/ory/hydra/policy"
+  swaggerListPolicyResponse:
+    type: "object"
+    properties:
+      Body:
+        type: "array"
+        description: "in: body\ntype: array"
+        items:
+          $ref: "#/definitions/policy"
+    description: "A policy"
+    x-go-package: "github.com/ory/hydra/policy"
+  swaggerOAuthConsentRequest:
+    type: "object"
+    properties:
+      Body:
+        $ref: "#/definitions/oAuth2ConsentRequest"
+    description: "The consent request response"
+    x-go-package: "github.com/ory/hydra/oauth2"
+  swaggerOAuthConsentRequestPayload:
+    type: "object"
+    required:
+    - "id"
+    properties:
+      id:
+        type: "string"
+        description: "The id of the OAuth 2.0 Consent Request."
+        x-go-name: "ID"
+    x-go-package: "github.com/ory/hydra/oauth2"
+  swaggerOAuthIntrospectionRequest:
+    type: "object"
+    required:
+    - "token"
+    properties:
+      scope:
+        type: "string"
+        description: "An optional, space separated list of required scopes. If the\
+          \ access token was not granted one of the\nscopes, the result of active\
+          \ will be false.\n\nin: formData"
+        x-go-name: "Scope"
+      token:
+        type: "string"
+        description: "The string value of the token. For access tokens, this\nis the\
+          \ \"access_token\" value returned from the token endpoint\ndefined in OAuth\
+          \ 2.0 [RFC6749], Section 5.1.\nThis endpoint DOES NOT accept refresh tokens\
+          \ for validation."
+        x-go-name: "Token"
+    x-go-package: "github.com/ory/hydra/oauth2"
+  swaggerOAuthIntrospectionResponse:
+    type: "object"
+    properties:
+      Body:
+        $ref: "#/definitions/oAuth2TokenIntrospection"
+    description: "The token introspection response"
+    x-go-package: "github.com/ory/hydra/oauth2"
+  swaggerOAuthTokenResponse:
+    type: "object"
+    properties:
+      Body:
+        $ref: "#/definitions/swaggerOAuthTokenResponse_Body"
+    description: "The token response"
+    x-go-package: "github.com/ory/hydra/oauth2"
+  swaggerRejectConsentRequest:
+    type: "object"
+    required:
+    - "Body"
+    - "id"
+    properties:
+      Body:
+        $ref: "#/definitions/consentRequestRejection"
+      id:
+        type: "string"
+        description: "in: path"
+        x-go-name: "ID"
+    x-go-package: "github.com/ory/hydra/oauth2"
+  swaggerRevokeOAuth2TokenParameters:
+    type: "object"
+    required:
+    - "token"
+    properties:
+      token:
+        type: "string"
+        description: "in: formData"
+        x-go-name: "Token"
+    x-go-package: "github.com/ory/hydra/oauth2"
+  swaggerUpdatePolicyParameters:
+    type: "object"
+    properties:
+      Body:
+        $ref: "#/definitions/policy"
+      id:
+        type: "string"
+        description: "The id of the policy.\nin: path"
+        x-go-name: "ID"
+    x-go-package: "github.com/ory/hydra/policy"
+  swaggerWardenAccessRequestResponseParameters:
+    type: "object"
+    properties:
+      Body:
+        $ref: "#/definitions/wardenAccessRequestResponse"
+    description: "The warden access request response"
+    x-go-package: "github.com/ory/hydra/warden"
+  swaggerWardenTokenAccessRequestResponse:
+    type: "object"
+    properties:
+      Body:
+        $ref: "#/definitions/wardenTokenAccessRequestResponse"
+    description: "The warden access request (with token) response"
+    x-go-package: "github.com/ory/hydra/warden"
+  swaggeruserinfoResponse:
+    type: "object"
+    properties:
+      Body:
+        $ref: "#/definitions/swaggeruserinfoResponsePayload"
+    description: "The userinfo response"
+    x-go-package: "github.com/ory/hydra/oauth2"
+  swaggeruserinfoResponsePayload:
+    type: "object"
+    properties:
+      birthdate:
+        type: "string"
+        description: "End-User's birthday, represented as an ISO 8601:2004 [ISO8601‑\
+          2004] YYYY-MM-DD format. The year MAY be 0000, indicating that it is omitted.\
+          \ To represent only the year, YYYY format is allowed. Note that depending\
+          \ on the underlying platform's date related function, providing just year\
+          \ can result in varying month and day, so the implementers need to take\
+          \ this factor into account to correctly process the dates."
+        x-go-name: "Birthdate"
+      email:
+        type: "string"
+        description: "End-User's preferred e-mail address. Its value MUST conform\
+          \ to the RFC 5322 [RFC5322] addr-spec syntax. The RP MUST NOT rely upon\
+          \ this value being unique, as discussed in Section 5.7."
+        x-go-name: "Email"
+      email_verified:
+        type: "boolean"
+        description: "True if the End-User's e-mail address has been verified; otherwise\
+          \ false. When this Claim Value is true, this means that the OP took affirmative\
+          \ steps to ensure that this e-mail address was controlled by the End-User\
+          \ at the time the verification was performed. The means by which an e-mail\
+          \ address is verified is context-specific, and dependent upon the trust\
+          \ framework or contractual agreements within which the parties are operating."
+        x-go-name: "EmailVerified"
+      family_name:
+        type: "string"
+        description: "Surname(s) or last name(s) of the End-User. Note that in some\
+          \ cultures, people can have multiple family names or no family name; all\
+          \ can be present, with the names being separated by space characters."
+        x-go-name: "FamilyName"
+      gender:
+        type: "string"
+        description: "End-User's gender. Values defined by this specification are\
+          \ female and male. Other values MAY be used when neither of the defined\
+          \ values are applicable."
+        x-go-name: "Gender"
+      given_name:
+        type: "string"
+        description: "Given name(s) or first name(s) of the End-User. Note that in\
+          \ some cultures, people can have multiple given names; all can be present,\
+          \ with the names being separated by space characters."
+        x-go-name: "GivenName"
+      locale:
+        type: "string"
+        description: "End-User's locale, represented as a BCP47 [RFC5646] language\
+          \ tag. This is typically an ISO 639-1 Alpha-2 [ISO639‑1] language code in\
+          \ lowercase and an ISO 3166-1 Alpha-2 [ISO3166‑1] country code in uppercase,\
+          \ separated by a dash. For example, en-US or fr-CA. As a compatibility note,\
+          \ some implementations have used an underscore as the separator rather than\
+          \ a dash, for example, en_US; Relying Parties MAY choose to accept this\
+          \ locale syntax as well."
+        x-go-name: "Locale"
+      middle_name:
+        type: "string"
+        description: "Middle name(s) of the End-User. Note that in some cultures,\
+          \ people can have multiple middle names; all can be present, with the names\
+          \ being separated by space characters. Also note that in some cultures,\
+          \ middle names are not used."
+        x-go-name: "MiddleName"
+      name:
+        type: "string"
+        description: "End-User's full name in displayable form including all name\
+          \ parts, possibly including titles and suffixes, ordered according to the\
+          \ End-User's locale and preferences."
+        x-go-name: "Name"
+      nickname:
+        type: "string"
+        description: "Casual name of the End-User that may or may not be the same\
+          \ as the given_name. For instance, a nickname value of Mike might be returned\
+          \ alongside a given_name value of Michael."
+        x-go-name: "Nickname"
+      phone_number:
+        type: "string"
+        description: "End-User's preferred telephone number. E.164 [E.164] is RECOMMENDED\
+          \ as the format of this Claim, for example, +1 (425) 555-1212 or +56 (2)\
+          \ 687 2400. If the phone number contains an extension, it is RECOMMENDED\
+          \ that the extension be represented using the RFC 3966 [RFC3966] extension\
+          \ syntax, for example, +1 (604) 555-1234;ext=5678."
+        x-go-name: "PhoneNumber"
+      phone_number_verified:
+        type: "boolean"
+        description: "True if the End-User's phone number has been verified; otherwise\
+          \ false. When this Claim Value is true, this means that the OP took affirmative\
+          \ steps to ensure that this phone number was controlled by the End-User\
+          \ at the time the verification was performed. The means by which a phone\
+          \ number is verified is context-specific, and dependent upon the trust framework\
+          \ or contractual agreements within which the parties are operating. When\
+          \ true, the phone_number Claim MUST be in E.164 format and any extensions\
+          \ MUST be represented in RFC 3966 format."
+        x-go-name: "PhoneNumberVerified"
+      picture:
+        type: "string"
+        description: "URL of the End-User's profile picture. This URL MUST refer to\
+          \ an image file (for example, a PNG, JPEG, or GIF image file), rather than\
+          \ to a Web page containing an image. Note that this URL SHOULD specifically\
+          \ reference a profile photo of the End-User suitable for displaying when\
+          \ describing the End-User, rather than an arbitrary photo taken by the End-User."
+        x-go-name: "Picture"
+      preferred_username:
+        type: "string"
+        description: "Non-unique shorthand name by which the End-User wishes to be\
+          \ referred to at the RP, such as janedoe or j.doe. This value MAY be any\
+          \ valid JSON string including special characters such as @, /, or whitespace."
+        x-go-name: "PreferredUsername"
+      profile:
+        type: "string"
+        description: "URL of the End-User's profile page. The contents of this Web\
+          \ page SHOULD be about the End-User."
+        x-go-name: "Profile"
+      sub:
+        type: "string"
+        description: "Subject - Identifier for the End-User at the Issuer."
+        x-go-name: "Subject"
+      updated_at:
+        type: "integer"
+        format: "int64"
+        description: "Time the End-User's information was last updated. Its value\
+          \ is a JSON number representing the number of seconds from 1970-01-01T0:0:0Z\
+          \ as measured in UTC until the date/time."
+        x-go-name: "UpdatedAt"
+      website:
+        type: "string"
+        description: "URL of the End-User's Web page or blog. This Web page SHOULD\
+          \ contain information published by the End-User or an organization that\
+          \ the End-User is affiliated with."
+        x-go-name: "Website"
+      zoneinfo:
+        type: "string"
+        description: "String from zoneinfo [zoneinfo] time zone database representing\
+          \ the End-User's time zone. For example, Europe/Paris or America/Los_Angeles."
+        x-go-name: "Zoneinfo"
+    example:
+      sub: "sub"
+      website: "website"
+      zoneinfo: "zoneinfo"
+      birthdate: "birthdate"
+      email_verified: true
+      gender: "gender"
+      profile: "profile"
+      phone_number_verified: true
+      preferred_username: "preferred_username"
+      given_name: "given_name"
+      locale: "locale"
+      middle_name: "middle_name"
+      picture: "picture"
+      updated_at: 0
+      name: "name"
+      nickname: "nickname"
+      phone_number: "phone_number"
+      family_name: "family_name"
+      email: "email"
+    x-go-package: "github.com/ory/hydra/oauth2"
+  tokenAllowedRequest:
+    type: "object"
+    properties:
+      action:
+        type: "string"
+        description: "Action is the action that is requested on the resource."
+        x-go-name: "Action"
+      context:
+        type: "object"
+        description: "Context is the request's environmental context."
+        additionalProperties:
+          type: "object"
+          properties: {}
+        x-go-name: "Context"
+      resource:
+        type: "string"
+        description: "Resource is the resource that access is requested to."
+        x-go-name: "Resource"
+    x-go-name: "TokenAccessRequest"
+    x-go-package: "github.com/ory/hydra/firewall"
+  wardenAccessRequest:
+    type: "object"
+    properties:
+      action:
+        type: "string"
+        description: "Action is the action that is requested on the resource."
+        x-go-name: "Action"
+      context:
+        type: "object"
+        description: "Context is the request's environmental context."
+        additionalProperties:
+          type: "object"
+          properties: {}
+        x-go-name: "Context"
+      resource:
+        type: "string"
+        description: "Resource is the resource that access is requested to."
+        x-go-name: "Resource"
+      subject:
+        type: "string"
+        description: "Subejct is the subject that is requesting access."
+        x-go-name: "Subject"
+    title: "AccessRequest is the warden's request object."
+    x-go-name: "AccessRequest"
+    x-go-package: "github.com/ory/hydra/firewall"
+  wardenAccessRequestResponse:
+    type: "object"
+    properties:
+      allowed:
+        type: "boolean"
+        description: "Allowed is true if the request is allowed and false otherwise."
+        x-go-name: "Allowed"
+    description: "The warden access request response"
+    example:
+      allowed: true
+    x-go-name: "swaggerWardenAccessRequestResponse"
+    x-go-package: "github.com/ory/hydra/warden"
+  wardenTokenAccessRequest:
+    type: "object"
+    properties:
+      action:
+        type: "string"
+        description: "Action is the action that is requested on the resource."
+        x-go-name: "Action"
+      context:
+        type: "object"
+        description: "Context is the request's environmental context."
+        additionalProperties:
+          type: "object"
+          properties: {}
+        x-go-name: "Context"
+      resource:
+        type: "string"
+        description: "Resource is the resource that access is requested to."
+        x-go-name: "Resource"
+      scopes:
+        type: "array"
+        description: "Scopes is an array of scopes that are requried."
+        items:
+          type: "string"
+        x-go-name: "Scopes"
+      token:
+        type: "string"
+        description: "Token is the token to introspect."
+        x-go-name: "Token"
+    x-go-name: "swaggerWardenTokenAccessRequest"
+    x-go-package: "github.com/ory/hydra/warden"
+  wardenTokenAccessRequestResponse:
+    type: "object"
+    properties:
+      accessTokenExtra:
+        type: "object"
+        description: "Extra represents arbitrary session data."
+        additionalProperties:
+          type: "object"
+          properties: {}
+        x-go-name: "Extra"
+      allowed:
+        type: "boolean"
+        description: "Allowed is true if the request is allowed and false otherwise."
+        x-go-name: "Allowed"
+      clientId:
+        type: "string"
+        description: "ClientID is the id of the OAuth2 client that requested the token."
+        x-go-name: "ClientID"
+      expiresAt:
+        type: "string"
+        description: "ExpiresAt is the expiry timestamp."
+        x-go-name: "ExpiresAt"
+      grantedScopes:
+        type: "array"
+        description: "GrantedScopes is a list of scopes that the subject authorized\
+          \ when asked for consent."
+        items:
+          type: "string"
+        x-go-name: "GrantedScopes"
+      issuedAt:
+        type: "string"
+        description: "IssuedAt is the token creation time stamp."
+        x-go-name: "IssuedAt"
+      issuer:
+        type: "string"
+        description: "Issuer is the id of the issuer, typically an hydra instance."
+        x-go-name: "Issuer"
+      subject:
+        type: "string"
+        description: "Subject is the identity that authorized issuing the token, for\
+          \ example a user or an OAuth2 app.\nThis is usually a uuid but you can choose\
+          \ a urn or some other id too."
+        x-go-name: "Subject"
+    description: "The warden access request (with token) response"
+    example:
+      grantedScopes:
+      - "grantedScopes"
+      - "grantedScopes"
+      clientId: "clientId"
+      allowed: true
+      subject: "subject"
+      accessTokenExtra:
+        key: "{}"
+      issuedAt: "issuedAt"
+      expiresAt: "expiresAt"
+      issuer: "issuer"
+    x-go-name: "swaggerWardenTokenAccessRequestResponsePayload"
+    x-go-package: "github.com/ory/hydra/warden"
+  wellKnown:
+    type: "object"
+    required:
+    - "authorization_endpoint"
+    - "id_token_signing_alg_values_supported"
+    - "issuer"
+    - "jwks_uri"
+    - "response_types_supported"
+    - "subject_types_supported"
+    - "token_endpoint"
+    properties:
+      authorization_endpoint:
+        type: "string"
+        description: "URL of the OP's OAuth 2.0 Authorization Endpoint"
+        x-go-name: "AuthURL"
+      claims_supported:
+        type: "array"
+        description: "JSON array containing a list of the Claim Names of the Claims\
+          \ that the OpenID Provider MAY be able to supply\nvalues for. Note that\
+          \ for privacy or other reasons, this might not be an exhaustive list."
+        items:
+          type: "string"
+        x-go-name: "ClaimsSupported"
+      id_token_signing_alg_values_supported:
+        type: "array"
+        description: "JSON array containing a list of the JWS signing algorithms (alg\
+          \ values) supported by the OP for the ID Token\nto encode the Claims in\
+          \ a JWT."
+        items:
+          type: "string"
+        x-go-name: "IDTokenSigningAlgValuesSupported"
+      issuer:
+        type: "string"
+        description: "URL using the https scheme with no query or fragment component\
+          \ that the OP asserts as its Issuer Identifier.\nIf Issuer discovery is\
+          \ supported , this value MUST be identical to the issuer value returned\n\
+          by WebFinger. This also MUST be identical to the iss Claim value in ID Tokens\
+          \ issued from this Issuer."
+        x-go-name: "Issuer"
+      jwks_uri:
+        type: "string"
+        description: "URL of the OP's JSON Web Key Set [JWK] document. This contains\
+          \ the signing key(s) the RP uses to validate\nsignatures from the OP. The\
+          \ JWK Set MAY also contain the Server's encryption key(s), which are used\
+          \ by RPs\nto encrypt requests to the Server. When both signing and encryption\
+          \ keys are made available, a use (Key Use)\nparameter value is REQUIRED\
+          \ for all keys in the referenced JWK Set to indicate each key's intended\
+          \ usage.\nAlthough some algorithms allow the same key to be used for both\
+          \ signatures and encryption, doing so is\nNOT RECOMMENDED, as it is less\
+          \ secure. The JWK x5c parameter MAY be used to provide X.509 representations\
+          \ of\nkeys provided. When used, the bare key values MUST still be present\
+          \ and MUST match those in the certificate."
+        x-go-name: "JWKsURI"
+      response_types_supported:
+        type: "array"
+        description: "JSON array containing a list of the OAuth 2.0 response_type\
+          \ values that this OP supports. Dynamic OpenID\nProviders MUST support the\
+          \ code, id_token, and the token id_token Response Type values."
+        items:
+          type: "string"
+        x-go-name: "ResponseTypes"
+      scopes_supported:
+        type: "array"
+        description: "SON array containing a list of the OAuth 2.0 [RFC6749] scope\
+          \ values that this server supports. The server MUST\nsupport the openid\
+          \ scope value. Servers MAY choose not to advertise some supported scope\
+          \ values even when this parameter is used"
+        items:
+          type: "string"
+        x-go-name: "ScopesSupported"
+      subject_types_supported:
+        type: "array"
+        description: "JSON array containing a list of the Subject Identifier types\
+          \ that this OP supports. Valid types include\npairwise and public."
+        items:
+          type: "string"
+        x-go-name: "SubjectTypes"
+      token_endpoint:
+        type: "string"
+        description: "URL of the OP's OAuth 2.0 Token Endpoint"
+        x-go-name: "TokenURL"
+      token_endpoint_auth_methods_supported:
+        type: "array"
+        description: "JSON array containing a list of Client Authentication methods\
+          \ supported by this Token Endpoint. The options are\nclient_secret_post,\
+          \ client_secret_basic, client_secret_jwt, and private_key_jwt, as described\
+          \ in Section 9 of OpenID Connect Core 1.0"
+        items:
+          type: "string"
+        x-go-name: "TokenEndpointAuthMethodsSupported"
+      userinfo_endpoint:
+        type: "string"
+        description: "URL of the OP's UserInfo Endpoint."
+        x-go-name: "UserinfoEndpoint"
+    example:
+      response_types_supported:
+      - "response_types_supported"
+      - "response_types_supported"
+      claims_supported:
+      - "claims_supported"
+      - "claims_supported"
+      jwks_uri: "jwks_uri"
+      subject_types_supported:
+      - "subject_types_supported"
+      - "subject_types_supported"
+      id_token_signing_alg_values_supported:
+      - "id_token_signing_alg_values_supported"
+      - "id_token_signing_alg_values_supported"
+      token_endpoint_auth_methods_supported:
+      - "token_endpoint_auth_methods_supported"
+      - "token_endpoint_auth_methods_supported"
+      scopes_supported:
+      - "scopes_supported"
+      - "scopes_supported"
+      issuer: "issuer"
+      authorization_endpoint: "authorization_endpoint"
+      token_endpoint: "token_endpoint"
+      userinfo_endpoint: "userinfo_endpoint"
+    x-go-name: "WellKnown"
+    x-go-package: "github.com/ory/hydra/oauth2"
+  inline_response_401:
+    properties:
+      code:
+        type: "integer"
+        format: "int64"
+        x-go-name: "Code"
+      details:
+        type: "array"
+        items:
+          type: "object"
+          additionalProperties:
+            type: "object"
+            properties: {}
+        x-go-name: "Details"
+      message:
+        type: "string"
+        x-go-name: "Message"
+      reason:
+        type: "string"
+        x-go-name: "Reason"
+      request:
+        type: "string"
+        x-go-name: "Request"
+      status:
+        type: "string"
+        x-go-name: "Status"
+  inline_response_200:
+    properties:
+      status:
+        type: "string"
+        description: "Status always contains \"ok\""
+        x-go-name: "Status"
+    example:
+      status: "status"
+  inline_response_200_1:
+    properties:
+      access_token:
+        type: "string"
+        description: "The access token issued by the authorization server."
+        x-go-name: "AccessToken"
+      expires_in:
+        type: "integer"
+        format: "int64"
+        description: "The lifetime in seconds of the access token.  For\nexample,\
+          \ the value \"3600\" denotes that the access token will\nexpire in one hour\
+          \ from the time the response was generated."
+        x-go-name: "ExpiresIn"
+      id_token:
+        type: "integer"
+        format: "int64"
+        description: "To retrieve a refresh token request the id_token scope."
+        x-go-name: "IDToken"
+      refresh_token:
+        type: "string"
+        description: "The refresh token, which can be used to obtain new\naccess tokens.\
+          \ To retrieve it add the scope \"offline\" to your access token request."
+        x-go-name: "RefreshToken"
+      scope:
+        type: "integer"
+        format: "int64"
+        description: "The scope of the access token"
+        x-go-name: "Scope"
+      token_type:
+        type: "string"
+        description: "The type of the token issued"
+        x-go-name: "TokenType"
+    example:
+      access_token: "access_token"
+      refresh_token: "refresh_token"
+      scope: 1
+      id_token: 6
+      token_type: "token_type"
+      expires_in: 0
+  policy_conditions:
+    properties:
+      options:
+        type: "object"
+        additionalProperties:
+          type: "object"
+          properties: {}
+        x-go-name: "Options"
+      type:
+        type: "string"
+        x-go-name: "Type"
+    example:
+      options:
+        key: "{}"
+      type: "type"
+  swaggerOAuthTokenResponse_Body:
+    properties:
+      access_token:
+        type: "string"
+        description: "The access token issued by the authorization server."
+        x-go-name: "AccessToken"
+      expires_in:
+        type: "integer"
+        format: "int64"
+        description: "The lifetime in seconds of the access token.  For\nexample,\
+          \ the value \"3600\" denotes that the access token will\nexpire in one hour\
+          \ from the time the response was generated."
+        x-go-name: "ExpiresIn"
+      id_token:
+        type: "integer"
+        format: "int64"
+        description: "To retrieve a refresh token request the id_token scope."
+        x-go-name: "IDToken"
+      refresh_token:
+        type: "string"
+        description: "The refresh token, which can be used to obtain new\naccess tokens.\
+          \ To retrieve it add the scope \"offline\" to your access token request."
+        x-go-name: "RefreshToken"
+      scope:
+        type: "integer"
+        format: "int64"
+        description: "The scope of the access token"
+        x-go-name: "Scope"
+      token_type:
+        type: "string"
+        description: "The type of the token issued"
+        x-go-name: "TokenType"
+    description: "in: body"
+responses:
+  emptyResponse:
+    description: "An empty response"
+  genericError:
+    description: "The standard error format"
+    schema:
+      $ref: "#/definitions/inline_response_401"
+  groupResponse:
+    description: "A group"
+    schema:
+      $ref: "#/definitions/group"
+  healthStatus:
+    description: "A list of clients."
+    schema:
+      $ref: "#/definitions/inline_response_200"
+  introspectOAuth2TokenResponse:
+    description: "The token introspection response"
+    schema:
+      $ref: "#/definitions/oAuth2TokenIntrospection"
+  listGroupsResponse:
+    description: "A list of groups the member is belonging to"
+    schema:
+      type: "array"
+      items:
+        $ref: "#/definitions/group"
+  oAuth2ClientList:
+    description: "A list of clients."
+    schema:
+      type: "array"
+      items:
+        $ref: "#/definitions/oAuth2Client"
+  oAuth2ConsentRequest:
+    description: "The consent request response"
+    schema:
+      $ref: "#/definitions/oAuth2ConsentRequest"
+  oauthTokenResponse:
+    description: "The token response"
+    schema:
+      $ref: "#/definitions/inline_response_200_1"
+  policyList:
+    description: "A policy"
+    schema:
+      type: "array"
+      items:
+        $ref: "#/definitions/policy"
+  userinfoResponse:
+    description: "The userinfo response"
+    schema:
+      $ref: "#/definitions/swaggeruserinfoResponsePayload"
+  wardenAccessRequestResponse:
+    description: "The warden access request response"
+    schema:
+      $ref: "#/definitions/wardenAccessRequestResponse"
+  wardenTokenAccessRequestResponse:
+    description: "The warden access request (with token) response"
+    schema:
+      $ref: "#/definitions/wardenTokenAccessRequestResponse"
+x-forwarded-proto: "string"
+x-request-id: "string"

@@ -173,13 +173,15 @@ hydra
 
 ### ORY Security Console: Administrative User Interface
 
+<a href="https://console.ory.am/auth/login">
+    <img align="right" width="30%" src="docs/images/sec-console.png" alt="ORY Security Console">
+</a>
+
 The [ORY Security Console](https://console.ory.am/auth/login). connects with your existing ORY Hydra and ORY Oathkeeper isntallation and lets you manage and monitor them through an intuitive UI.
 
-<img float="right" width="30%" src="docs/images/oauth2-flow.gif" alt="OAuth2 Flow">
+### ORY Oathkeeper: Identity & Access Proxy
 
-### ORY Oathkeeper
-
-[ORY Oathkeeper](https://github.com/ory/oathkeeper) is a BeyondCorp/Zero Trust Identity & Access Proxy (IAP) built on top of OAuth2 and ORY Hydra. 
+[ORY Oathkeeper](https://github.com/ory/oathkeeper) is a BeyondCorp/Zero Trust Identity & Access Proxy (IAP) built on top of OAuth2 and ORY Hydra.    
 
 ## Security
 

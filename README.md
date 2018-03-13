@@ -173,9 +173,9 @@ hydra
 
 ### ORY Security Console: Administrative User Interface
 
-<img float="right" width="30%" src="docs/images/oauth2-flow.gif" alt="OAuth2 Flow">
-
 The [ORY Security Console](https://console.ory.am/auth/login). connects with your existing ORY Hydra and ORY Oathkeeper isntallation and lets you manage and monitor them through an intuitive UI.
+
+<img float="right" width="30%" src="docs/images/oauth2-flow.gif" alt="OAuth2 Flow">
 
 ### ORY Oathkeeper
 

@@ -44,7 +44,7 @@ able to securely manage JSON Web Keys, and has a sophisticated policy-based acce
     - [Download binaries](#download-binaries)
     - [Using Docker](#using-docker)
     - [Building from source](#building-from-source)
-- [Complementary Software](#complementary-software)
+- [Ecosystem](#ecosystem)
   - [ORY Security Console: Administrative User Interface](#ory-security-console-administrative-user-interface)
   - [ORY Oathkeeper: Identity & Access Proxy](#ory-oathkeeper-identity-&-access-proxy)
 - [Security](#security)

@@ -39,7 +39,6 @@ import (
 	"github.com/ory/hydra/health"
 	"github.com/ory/hydra/metrics"
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/hydra/warden/group"
 	"github.com/ory/ladon"
 	lmem "github.com/ory/ladon/manager/memory"
 	lsql "github.com/ory/ladon/manager/sql"
@@ -257,30 +256,20 @@ func (c *Config) Context() *Context {
 		}
 	}
 
-	var groupManager group.Manager
 	var manager ladon.Manager
 	switch con := connection.(type) {
 	case *MemoryConnection:
 		c.GetLogger().Printf("DATABASE_URL set to memory, connecting to ephermal in-memory database.")
 		manager = lmem.NewMemoryManager()
-		groupManager = group.NewMemoryManager()
 		break
 	case *SQLConnection:
 		manager = lsql.NewSQLManager(con.GetDatabase(), nil)
-		groupManager = &group.SQLManager{
-			DB: con.GetDatabase(),
-		}
 		break
 	case *PluginConnection:
 		var err error
 		manager, err = con.NewPolicyManager()
 		if err != nil {
 			c.GetLogger().Fatalf("Could not load policy manager plugin %s", err)
-		}
-
-		groupManager, err = con.NewGroupManager()
-		if err != nil {
-			c.GetLogger().Fatalf("Could not load group manager plugin %s", err)
 		}
 		break
 	default:
@@ -300,7 +289,6 @@ func (c *Config) Context() *Context {
 			AccessTokenLifespan:   c.GetAccessTokenLifespan(),
 			AuthorizeCodeLifespan: c.GetAuthCodeLifespan(),
 		},
-		GroupManager: groupManager,
 	}
 
 	return c.context

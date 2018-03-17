@@ -25,7 +25,6 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
-	"github.com/ory/hydra/firewall"
 	"github.com/ory/hydra/metrics"
 )
 
@@ -36,7 +35,6 @@ const (
 type Handler struct {
 	Metrics        *metrics.MetricsManager
 	H              *herodot.JSONWriter
-	W              firewall.Firewall
 	ResourcePrefix string
 }
 

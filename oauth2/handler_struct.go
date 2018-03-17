@@ -27,7 +27,6 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/ory/fosite"
 	"github.com/ory/herodot"
-	"github.com/ory/hydra/firewall"
 	"github.com/ory/hydra/pkg"
 	"github.com/sirupsen/logrus"
 )
@@ -50,8 +49,6 @@ type Handler struct {
 	ScopeStrategy fosite.ScopeStrategy
 
 	Issuer string
-
-	W firewall.Firewall
 
 	ResourcePrefix string
 

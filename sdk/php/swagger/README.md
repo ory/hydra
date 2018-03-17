@@ -99,19 +99,6 @@ Class | Method | HTTP request | Description
 *OAuth2Api* | [**updateOAuth2Client**](docs/Api/OAuth2Api.md#updateoauth2client) | **PUT** /clients/{id} | Update an OAuth 2.0 Client
 *OAuth2Api* | [**userinfo**](docs/Api/OAuth2Api.md#userinfo) | **POST** /userinfo | OpenID Connect Userinfo
 *OAuth2Api* | [**wellKnown**](docs/Api/OAuth2Api.md#wellknown) | **GET** /.well-known/jwks.json | Get Well-Known JSON Web Keys
-*PolicyApi* | [**createPolicy**](docs/Api/PolicyApi.md#createpolicy) | **POST** /policies | Create an Access Control Policy
-*PolicyApi* | [**deletePolicy**](docs/Api/PolicyApi.md#deletepolicy) | **DELETE** /policies/{id} | Delete an Access Control Policy
-*PolicyApi* | [**getPolicy**](docs/Api/PolicyApi.md#getpolicy) | **GET** /policies/{id} | Get an Access Control Policy
-*PolicyApi* | [**listPolicies**](docs/Api/PolicyApi.md#listpolicies) | **GET** /policies | List Access Control Policies
-*PolicyApi* | [**updatePolicy**](docs/Api/PolicyApi.md#updatepolicy) | **PUT** /policies/{id} | Update an Access Control Polic
-*WardenApi* | [**addMembersToGroup**](docs/Api/WardenApi.md#addmemberstogroup) | **POST** /warden/groups/{id}/members | Add members to a group
-*WardenApi* | [**createGroup**](docs/Api/WardenApi.md#creategroup) | **POST** /warden/groups | Create a group
-*WardenApi* | [**deleteGroup**](docs/Api/WardenApi.md#deletegroup) | **DELETE** /warden/groups/{id} | Delete a group by id
-*WardenApi* | [**doesWardenAllowAccessRequest**](docs/Api/WardenApi.md#doeswardenallowaccessrequest) | **POST** /warden/allowed | Check if an access request is valid (without providing an access token)
-*WardenApi* | [**doesWardenAllowTokenAccessRequest**](docs/Api/WardenApi.md#doeswardenallowtokenaccessrequest) | **POST** /warden/token/allowed | Check if an access request is valid (providing an access token)
-*WardenApi* | [**getGroup**](docs/Api/WardenApi.md#getgroup) | **GET** /warden/groups/{id} | Get a group by id
-*WardenApi* | [**listGroups**](docs/Api/WardenApi.md#listgroups) | **GET** /warden/groups | List groups
-*WardenApi* | [**removeMembersFromGroup**](docs/Api/WardenApi.md#removemembersfromgroup) | **DELETE** /warden/groups/{id}/members | Remove members from a group
 
 
 ## Documentation For Models
@@ -120,11 +107,7 @@ Class | Method | HTTP request | Description
  - [ConsentRequestAcceptance](docs/Model/ConsentRequestAcceptance.md)
  - [ConsentRequestManager](docs/Model/ConsentRequestManager.md)
  - [ConsentRequestRejection](docs/Model/ConsentRequestRejection.md)
- - [Context](docs/Model/Context.md)
- - [Firewall](docs/Model/Firewall.md)
  - [FlushInactiveOAuth2TokensRequest](docs/Model/FlushInactiveOAuth2TokensRequest.md)
- - [Group](docs/Model/Group.md)
- - [GroupMembers](docs/Model/GroupMembers.md)
  - [Handler](docs/Model/Handler.md)
  - [InlineResponse200](docs/Model/InlineResponse200.md)
  - [InlineResponse401](docs/Model/InlineResponse401.md)
@@ -138,33 +121,19 @@ Class | Method | HTTP request | Description
  - [OAuth2ConsentRequest](docs/Model/OAuth2ConsentRequest.md)
  - [OAuth2TokenIntrospection](docs/Model/OAuth2TokenIntrospection.md)
  - [OauthTokenResponse](docs/Model/OauthTokenResponse.md)
- - [Policy](docs/Model/Policy.md)
- - [PolicyConditions](docs/Model/PolicyConditions.md)
  - [RawMessage](docs/Model/RawMessage.md)
  - [SwaggerAcceptConsentRequest](docs/Model/SwaggerAcceptConsentRequest.md)
- - [SwaggerCreatePolicyParameters](docs/Model/SwaggerCreatePolicyParameters.md)
- - [SwaggerDoesWardenAllowAccessRequestParameters](docs/Model/SwaggerDoesWardenAllowAccessRequestParameters.md)
- - [SwaggerDoesWardenAllowTokenAccessRequestParameters](docs/Model/SwaggerDoesWardenAllowTokenAccessRequestParameters.md)
  - [SwaggerFlushInactiveAccessTokens](docs/Model/SwaggerFlushInactiveAccessTokens.md)
- - [SwaggerGetPolicyParameters](docs/Model/SwaggerGetPolicyParameters.md)
  - [SwaggerJsonWebKeyQuery](docs/Model/SwaggerJsonWebKeyQuery.md)
  - [SwaggerJwkCreateSet](docs/Model/SwaggerJwkCreateSet.md)
  - [SwaggerJwkSetQuery](docs/Model/SwaggerJwkSetQuery.md)
  - [SwaggerJwkUpdateSet](docs/Model/SwaggerJwkUpdateSet.md)
  - [SwaggerJwkUpdateSetKey](docs/Model/SwaggerJwkUpdateSetKey.md)
- - [SwaggerListPolicyParameters](docs/Model/SwaggerListPolicyParameters.md)
- - [SwaggerListPolicyResponse](docs/Model/SwaggerListPolicyResponse.md)
  - [SwaggerOAuthConsentRequestPayload](docs/Model/SwaggerOAuthConsentRequestPayload.md)
  - [SwaggerOAuthIntrospectionRequest](docs/Model/SwaggerOAuthIntrospectionRequest.md)
  - [SwaggerRejectConsentRequest](docs/Model/SwaggerRejectConsentRequest.md)
  - [SwaggerRevokeOAuth2TokenParameters](docs/Model/SwaggerRevokeOAuth2TokenParameters.md)
- - [SwaggerUpdatePolicyParameters](docs/Model/SwaggerUpdatePolicyParameters.md)
- - [TokenAllowedRequest](docs/Model/TokenAllowedRequest.md)
  - [UserinfoResponse](docs/Model/UserinfoResponse.md)
- - [WardenAccessRequest](docs/Model/WardenAccessRequest.md)
- - [WardenAccessRequestResponse](docs/Model/WardenAccessRequestResponse.md)
- - [WardenTokenAccessRequest](docs/Model/WardenTokenAccessRequest.md)
- - [WardenTokenAccessRequestResponse](docs/Model/WardenTokenAccessRequestResponse.md)
  - [WellKnown](docs/Model/WellKnown.md)
  - [Writer](docs/Model/Writer.md)
 
@@ -182,15 +151,6 @@ Class | Method | HTTP request | Description
 - **Flow**: accessCode
 - **Authorization URL**: https://your-hydra-instance.com/oauth2/auth
 - **Scopes**: 
- - **hydra.clients**: A scope required to manage OAuth 2.0 Clients
- - **hydra.consent**: A scope required to fetch and modify consent requests
- - **hydra.keys.create**: A scope required to create JSON Web Keys
- - **hydra.keys.delete**: A scope required to delete JSON Web Keys
- - **hydra.keys.get**: A scope required to fetch JSON Web Keys
- - **hydra.keys.update**: A scope required to get JSON Web Keys
- - **hydra.policies**: A scope required to manage access control policies
- - **hydra.warden**: A scope required to make access control inquiries
- - **hydra.warden.groups**: A scope required to manage warden groups
  - **offline**: A scope required when requesting refresh tokens
  - **openid**: Request an OpenID Connect ID Token
 

@@ -33,8 +33,6 @@ import (
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/hydra/warden/group"
-	ladon "github.com/ory/ladon/manager/sql"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -78,50 +76,6 @@ func (h *MigrateHandler) connectToSql(dsn string) (*sqlx.DB, error) {
 	return db, nil
 }
 
-func (h *MigrateHandler) MigrateLadon050To060(cmd *cobra.Command, args []string) {
-	if len(args) != 2 {
-		fmt.Println(cmd.UsageString())
-		return
-	} else if args[0] != "0.6.0" {
-		fmt.Println(cmd.UsageString())
-		return
-	}
-
-	db, err := h.connectToSql(args[1])
-	if err != nil {
-		fmt.Printf("An error occurred while connecting to SQL: %s", err)
-		os.Exit(1)
-		return
-	}
-
-	if err := h.runMigrateLadon050To060(db); err != nil {
-		fmt.Printf("An error occurred while running the migrations: %s", err)
-		os.Exit(1)
-		return
-	}
-}
-
-func (h *MigrateHandler) runMigrateLadon050To060(db *sqlx.DB) error {
-	m := ladon.NewSQLManager(db, nil)
-	fmt.Printf("Applying `%s` SQL migrations.\n", "ladon")
-	if num, err := m.CreateSchemas("", "hydra_policy_migration"); err != nil {
-		return errors.Wrap(err, "Could not apply `ladon` SQL migrations")
-	} else {
-		fmt.Printf("Applied %d `%s` SQL migrations.\n", num, "ladon")
-	}
-
-	fmt.Println("Moving policies to new schema")
-	mm := ladon.SQLManagerMigrateFromMajor0Minor6ToMajor0Minor7{
-		DB:         db,
-		SQLManager: m,
-	}
-	if err := mm.Migrate(); err != nil {
-		return errors.Wrap(err, "Could not move policies to new schema")
-	}
-	fmt.Println("Migration successful!")
-	return nil
-}
-
 func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 	if len(args) == 0 {
 		fmt.Println(cmd.UsageString())
@@ -145,19 +99,10 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 
 func (h *MigrateHandler) runMigrateSQL(db *sqlx.DB) error {
 	var total int
-	fmt.Printf("Applying `%s` SQL migrations...\n", "ladon")
-	if num, err := ladon.NewSQLManager(db, nil).CreateSchemas("", "hydra_policy_migration"); err != nil {
-		return errors.Wrap(err, "Could not apply `ladon` SQL migrations")
-	} else {
-		fmt.Printf("Applied %d `%s` SQL migrations.\n", num, "ladon")
-		total += num
-	}
-
 	for k, m := range map[string]schemaCreator{
 		"client":  &client.SQLManager{DB: db},
 		"oauth2":  &oauth2.FositeSQLStore{DB: db},
 		"jwk":     &jwk.SQLManager{DB: db},
-		"group":   &group.SQLManager{DB: db},
 		"consent": oauth2.NewConsentRequestSQLManager(db),
 	} {
 		fmt.Printf("Applying `%s` SQL migrations...\n", k)

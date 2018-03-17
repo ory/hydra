@@ -36,7 +36,6 @@ import (
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/hydra/warden/group"
 	"github.com/pborman/uuid"
 	"github.com/segmentio/analytics-go"
 	"github.com/sirupsen/logrus"
@@ -227,10 +226,6 @@ func anonymizePath(path string, salt string) string {
 		oauth2.IntrospectPath,
 		oauth2.RevocationPath,
 		oauth2.ConsentRequestPath,
-		"/policies",
-		"/warden/token/allowed",
-		"/warden/allowed",
-		group.GroupsHandlerPath,
 		"/health/status",
 		"/",
 	}

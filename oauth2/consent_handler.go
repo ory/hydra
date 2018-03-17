@@ -22,12 +22,10 @@ package oauth2
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
-	"github.com/ory/hydra/firewall"
 	"github.com/pkg/errors"
 )
 
@@ -44,7 +42,6 @@ const (
 type ConsentSessionHandler struct {
 	H herodot.Writer
 	M ConsentRequestManager
-	W firewall.Firewall
 
 	ResourcePrefix string
 }
@@ -74,17 +71,6 @@ func (h *ConsentSessionHandler) SetRoutes(r *httprouter.Router) {
 // Call this endpoint to receive information on consent requests. The consent request id is usually transmitted via the URL query `consent`.
 // For example: `http://consent-app.mydomain.com/?consent=1234abcd`
 //
-//
-// The subject making the request needs to be assigned to a policy containing:
-//
-//  ```
-//  {
-//    "resources": ["rn:hydra:oauth2:consent:requests:<request-id>"],
-//    "actions": ["get"],
-//    "effect": "allow"
-//  }
-//  ```
-//
 //     Consumes:
 //     - application/json
 //
@@ -93,22 +79,11 @@ func (h *ConsentSessionHandler) SetRoutes(r *httprouter.Router) {
 //
 //     Schemes: http, https
 //
-//     Security:
-//       oauth2: hydra.consent
-//
 //     Responses:
 //       200: oAuth2ConsentRequest
 //       401: genericError
 //       500: genericError
 func (h *ConsentSessionHandler) FetchConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	if _, err := h.W.TokenAllowed(r.Context(), h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: fmt.Sprintf(h.PrefixResource(ConsentResource), ps.ByName("id")),
-		Action:   "get",
-	}, ConsentScope); err != nil {
-		h.H.WriteError(w, r, err)
-		return
-	}
-
 	if session, err := h.M.GetConsentRequest(ps.ByName("id")); err != nil {
 		h.H.WriteError(w, r, err)
 		return
@@ -128,17 +103,6 @@ func (h *ConsentSessionHandler) FetchConsentRequest(w http.ResponseWriter, r *ht
 // The consent request id is usually transmitted via the URL query `consent`.
 // For example: `http://consent-app.mydomain.com/?consent=1234abcd`
 //
-//
-// The subject making the request needs to be assigned to a policy containing:
-//
-//  ```
-//  {
-//    "resources": ["rn:hydra:oauth2:consent:requests:<request-id>"],
-//    "actions": ["reject"],
-//    "effect": "allow"
-//  }
-//  ```
-//
 //     Consumes:
 //     - application/json
 //
@@ -147,22 +111,11 @@ func (h *ConsentSessionHandler) FetchConsentRequest(w http.ResponseWriter, r *ht
 //
 //     Schemes: http, https
 //
-//     Security:
-//       oauth2: hydra.consent
-//
 //     Responses:
 //       204: emptyResponse
 //       401: genericError
 //       500: genericError
 func (h *ConsentSessionHandler) RejectConsentRequestHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	if _, err := h.W.TokenAllowed(r.Context(), h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: fmt.Sprintf(h.PrefixResource(ConsentResource), ps.ByName("id")),
-		Action:   "reject",
-	}, ConsentScope); err != nil {
-		h.H.WriteError(w, r, err)
-		return
-	}
-
 	var payload RejectConsentRequestPayload
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
@@ -188,17 +141,6 @@ func (h *ConsentSessionHandler) RejectConsentRequestHandler(w http.ResponseWrite
 // The consent request id is usually transmitted via the URL query `consent`.
 // For example: `http://consent-app.mydomain.com/?consent=1234abcd`
 //
-//
-// The subject making the request needs to be assigned to a policy containing:
-//
-//  ```
-//  {
-//    "resources": ["rn:hydra:oauth2:consent:requests:<request-id>"],
-//    "actions": ["accept"],
-//    "effect": "allow"
-//  }
-//  ```
-//
 //     Consumes:
 //     - application/json
 //
@@ -207,22 +149,11 @@ func (h *ConsentSessionHandler) RejectConsentRequestHandler(w http.ResponseWrite
 //
 //     Schemes: http, https
 //
-//     Security:
-//       oauth2: hydra.consent
-//
 //     Responses:
 //       204: emptyResponse
 //       401: genericError
 //       500: genericError
 func (h *ConsentSessionHandler) AcceptConsentRequestHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	if _, err := h.W.TokenAllowed(r.Context(), h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: fmt.Sprintf(h.PrefixResource(ConsentResource), ps.ByName("id")),
-		Action:   "accept",
-	}, ConsentScope); err != nil {
-		h.H.WriteError(w, r, err)
-		return
-	}
-
 	var payload AcceptConsentRequestPayload
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))

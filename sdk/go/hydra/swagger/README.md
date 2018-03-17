@@ -46,19 +46,6 @@ Class | Method | HTTP request | Description
 *OAuth2Api* | [**UpdateOAuth2Client**](docs/OAuth2Api.md#updateoauth2client) | **Put** /clients/{id} | Update an OAuth 2.0 Client
 *OAuth2Api* | [**Userinfo**](docs/OAuth2Api.md#userinfo) | **Post** /userinfo | OpenID Connect Userinfo
 *OAuth2Api* | [**WellKnown**](docs/OAuth2Api.md#wellknown) | **Get** /.well-known/jwks.json | Get Well-Known JSON Web Keys
-*PolicyApi* | [**CreatePolicy**](docs/PolicyApi.md#createpolicy) | **Post** /policies | Create an Access Control Policy
-*PolicyApi* | [**DeletePolicy**](docs/PolicyApi.md#deletepolicy) | **Delete** /policies/{id} | Delete an Access Control Policy
-*PolicyApi* | [**GetPolicy**](docs/PolicyApi.md#getpolicy) | **Get** /policies/{id} | Get an Access Control Policy
-*PolicyApi* | [**ListPolicies**](docs/PolicyApi.md#listpolicies) | **Get** /policies | List Access Control Policies
-*PolicyApi* | [**UpdatePolicy**](docs/PolicyApi.md#updatepolicy) | **Put** /policies/{id} | Update an Access Control Polic
-*WardenApi* | [**AddMembersToGroup**](docs/WardenApi.md#addmemberstogroup) | **Post** /warden/groups/{id}/members | Add members to a group
-*WardenApi* | [**CreateGroup**](docs/WardenApi.md#creategroup) | **Post** /warden/groups | Create a group
-*WardenApi* | [**DeleteGroup**](docs/WardenApi.md#deletegroup) | **Delete** /warden/groups/{id} | Delete a group by id
-*WardenApi* | [**DoesWardenAllowAccessRequest**](docs/WardenApi.md#doeswardenallowaccessrequest) | **Post** /warden/allowed | Check if an access request is valid (without providing an access token)
-*WardenApi* | [**DoesWardenAllowTokenAccessRequest**](docs/WardenApi.md#doeswardenallowtokenaccessrequest) | **Post** /warden/token/allowed | Check if an access request is valid (providing an access token)
-*WardenApi* | [**GetGroup**](docs/WardenApi.md#getgroup) | **Get** /warden/groups/{id} | Get a group by id
-*WardenApi* | [**ListGroups**](docs/WardenApi.md#listgroups) | **Get** /warden/groups | List groups
-*WardenApi* | [**RemoveMembersFromGroup**](docs/WardenApi.md#removemembersfromgroup) | **Delete** /warden/groups/{id}/members | Remove members from a group
 
 
 ## Documentation For Models
@@ -67,11 +54,7 @@ Class | Method | HTTP request | Description
  - [ConsentRequestAcceptance](docs/ConsentRequestAcceptance.md)
  - [ConsentRequestManager](docs/ConsentRequestManager.md)
  - [ConsentRequestRejection](docs/ConsentRequestRejection.md)
- - [Context](docs/Context.md)
- - [Firewall](docs/Firewall.md)
  - [FlushInactiveOAuth2TokensRequest](docs/FlushInactiveOAuth2TokensRequest.md)
- - [Group](docs/Group.md)
- - [GroupMembers](docs/GroupMembers.md)
  - [Handler](docs/Handler.md)
  - [InlineResponse200](docs/InlineResponse200.md)
  - [InlineResponse401](docs/InlineResponse401.md)
@@ -85,33 +68,19 @@ Class | Method | HTTP request | Description
  - [OAuth2ConsentRequest](docs/OAuth2ConsentRequest.md)
  - [OAuth2TokenIntrospection](docs/OAuth2TokenIntrospection.md)
  - [OauthTokenResponse](docs/OauthTokenResponse.md)
- - [Policy](docs/Policy.md)
- - [PolicyConditions](docs/PolicyConditions.md)
  - [RawMessage](docs/RawMessage.md)
  - [SwaggerAcceptConsentRequest](docs/SwaggerAcceptConsentRequest.md)
- - [SwaggerCreatePolicyParameters](docs/SwaggerCreatePolicyParameters.md)
- - [SwaggerDoesWardenAllowAccessRequestParameters](docs/SwaggerDoesWardenAllowAccessRequestParameters.md)
- - [SwaggerDoesWardenAllowTokenAccessRequestParameters](docs/SwaggerDoesWardenAllowTokenAccessRequestParameters.md)
  - [SwaggerFlushInactiveAccessTokens](docs/SwaggerFlushInactiveAccessTokens.md)
- - [SwaggerGetPolicyParameters](docs/SwaggerGetPolicyParameters.md)
  - [SwaggerJsonWebKeyQuery](docs/SwaggerJsonWebKeyQuery.md)
  - [SwaggerJwkCreateSet](docs/SwaggerJwkCreateSet.md)
  - [SwaggerJwkSetQuery](docs/SwaggerJwkSetQuery.md)
  - [SwaggerJwkUpdateSet](docs/SwaggerJwkUpdateSet.md)
  - [SwaggerJwkUpdateSetKey](docs/SwaggerJwkUpdateSetKey.md)
- - [SwaggerListPolicyParameters](docs/SwaggerListPolicyParameters.md)
- - [SwaggerListPolicyResponse](docs/SwaggerListPolicyResponse.md)
  - [SwaggerOAuthConsentRequestPayload](docs/SwaggerOAuthConsentRequestPayload.md)
  - [SwaggerOAuthIntrospectionRequest](docs/SwaggerOAuthIntrospectionRequest.md)
  - [SwaggerRejectConsentRequest](docs/SwaggerRejectConsentRequest.md)
  - [SwaggerRevokeOAuth2TokenParameters](docs/SwaggerRevokeOAuth2TokenParameters.md)
- - [SwaggerUpdatePolicyParameters](docs/SwaggerUpdatePolicyParameters.md)
- - [TokenAllowedRequest](docs/TokenAllowedRequest.md)
  - [UserinfoResponse](docs/UserinfoResponse.md)
- - [WardenAccessRequest](docs/WardenAccessRequest.md)
- - [WardenAccessRequestResponse](docs/WardenAccessRequestResponse.md)
- - [WardenTokenAccessRequest](docs/WardenTokenAccessRequest.md)
- - [WardenTokenAccessRequestResponse](docs/WardenTokenAccessRequestResponse.md)
  - [WellKnown](docs/WellKnown.md)
  - [Writer](docs/Writer.md)
 
@@ -129,15 +98,6 @@ Class | Method | HTTP request | Description
 - **Flow**: accessCode
 - **Authorization URL**: https://your-hydra-instance.com/oauth2/auth
 - **Scopes**: 
- - **hydra.clients**: A scope required to manage OAuth 2.0 Clients
- - **hydra.consent**: A scope required to fetch and modify consent requests
- - **hydra.keys.create**: A scope required to create JSON Web Keys
- - **hydra.keys.delete**: A scope required to delete JSON Web Keys
- - **hydra.keys.get**: A scope required to fetch JSON Web Keys
- - **hydra.keys.update**: A scope required to get JSON Web Keys
- - **hydra.policies**: A scope required to manage access control policies
- - **hydra.warden**: A scope required to make access control inquiries
- - **hydra.warden.groups**: A scope required to manage warden groups
  - **offline**: A scope required when requesting refresh tokens
  - **openid**: Request an OpenID Connect ID Token
 

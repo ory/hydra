@@ -52,10 +52,9 @@ func newClientManager(c *config.Config) client.Manager {
 }
 
 func newClientHandler(c *config.Config, router *httprouter.Router, manager client.Manager) *client.Handler {
-	ctx := c.Context()
 	h := &client.Handler{
-		H: herodot.NewJSONWriter(c.GetLogger()),
-		W: ctx.Warden, Manager: manager,
+		H:              herodot.NewJSONWriter(c.GetLogger()),
+		Manager:        manager,
 		ResourcePrefix: c.AccessControlResourcePrefix,
 	}
 

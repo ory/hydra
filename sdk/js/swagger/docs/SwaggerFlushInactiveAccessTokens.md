@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.SwaggerFlushInactiveAccessTokens
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerFlushInactiveAccessTokens
 
 ## Properties
 Name | Type | Description | Notes

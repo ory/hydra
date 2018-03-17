@@ -868,7 +868,10 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/oAuth2ConsentRequest"
+            "description": "oAuth2ConsentRequest",
+            "schema": {
+              "$ref": "#/definitions/oAuth2ConsentRequest"
+            }
           },
           "401": {
             "$ref": "#/responses/genericError"
@@ -1083,7 +1086,10 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/introspectOAuth2TokenResponse"
+            "description": "oAuth2TokenIntrospection",
+            "schema": {
+              "$ref": "#/definitions/oAuth2TokenIntrospection"
+            }
           },
           "401": {
             "$ref": "#/responses/genericError"
@@ -1164,7 +1170,10 @@
         "operationId": "oauthToken",
         "responses": {
           "200": {
-            "$ref": "#/responses/oauthTokenResponse"
+            "description": "oauthTokenResponse",
+            "schema": {
+              "$ref": "#/definitions/oauthTokenResponse"
+            }
           },
           "401": {
             "$ref": "#/responses/genericError"
@@ -1469,7 +1478,10 @@
         "operationId": "userinfo",
         "responses": {
           "200": {
-            "$ref": "#/responses/userinfoResponse"
+            "description": "userinfoResponse",
+            "schema": {
+              "$ref": "#/definitions/userinfoResponse"
+            }
           },
           "401": {
             "$ref": "#/responses/genericError"
@@ -1516,7 +1528,10 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/wardenAccessRequestResponse"
+            "description": "wardenAccessRequestResponse",
+            "schema": {
+              "$ref": "#/definitions/wardenAccessRequestResponse"
+            }
           },
           "401": {
             "$ref": "#/responses/genericError"
@@ -1630,7 +1645,10 @@
         ],
         "responses": {
           "201": {
-            "$ref": "#/responses/groupResponse"
+            "description": "group",
+            "schema": {
+              "$ref": "#/definitions/group"
+            }
           },
           "401": {
             "$ref": "#/responses/genericError"
@@ -1681,7 +1699,10 @@
         ],
         "responses": {
           "201": {
-            "$ref": "#/responses/groupResponse"
+            "description": "group",
+            "schema": {
+              "$ref": "#/definitions/group"
+            }
           },
           "401": {
             "$ref": "#/responses/genericError"
@@ -1894,7 +1915,10 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/wardenTokenAccessRequestResponse"
+            "description": "wardenTokenAccessRequestResponse",
+            "schema": {
+              "$ref": "#/definitions/wardenTokenAccessRequestResponse"
+            }
           },
           "401": {
             "$ref": "#/responses/genericError"
@@ -2479,6 +2503,47 @@
       "x-go-name": "swaggerOAuthIntrospectionResponsePayload",
       "x-go-package": "github.com/ory/hydra/oauth2"
     },
+    "oauthTokenResponse": {
+      "description": "The token response",
+      "type": "object",
+      "properties": {
+        "access_token": {
+          "description": "The access token issued by the authorization server.",
+          "type": "string",
+          "x-go-name": "AccessToken"
+        },
+        "expires_in": {
+          "description": "The lifetime in seconds of the access token.  For\nexample, the value \"3600\" denotes that the access token will\nexpire in one hour from the time the response was generated.",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "ExpiresIn"
+        },
+        "id_token": {
+          "description": "To retrieve a refresh token request the id_token scope.",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "IDToken"
+        },
+        "refresh_token": {
+          "description": "The refresh token, which can be used to obtain new\naccess tokens. To retrieve it add the scope \"offline\" to your access token request.",
+          "type": "string",
+          "x-go-name": "RefreshToken"
+        },
+        "scope": {
+          "description": "The scope of the access token",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Scope"
+        },
+        "token_type": {
+          "description": "The type of the token issued",
+          "type": "string",
+          "x-go-name": "TokenType"
+        }
+      },
+      "x-go-name": "swaggerOAuthTokenResponse",
+      "x-go-package": "github.com/ory/hydra/oauth2"
+    },
     "policy": {
       "type": "object",
       "properties": {
@@ -2734,16 +2799,6 @@
       },
       "x-go-package": "github.com/ory/hydra/policy"
     },
-    "swaggerOAuthConsentRequest": {
-      "description": "The consent request response",
-      "type": "object",
-      "properties": {
-        "Body": {
-          "$ref": "#/definitions/oAuth2ConsentRequest"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/oauth2"
-    },
     "swaggerOAuthConsentRequestPayload": {
       "type": "object",
       "required": [
@@ -2774,62 +2829,6 @@
           "description": "The string value of the token. For access tokens, this\nis the \"access_token\" value returned from the token endpoint\ndefined in OAuth 2.0 [RFC6749], Section 5.1.\nThis endpoint DOES NOT accept refresh tokens for validation.",
           "type": "string",
           "x-go-name": "Token"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/oauth2"
-    },
-    "swaggerOAuthIntrospectionResponse": {
-      "description": "The token introspection response",
-      "type": "object",
-      "properties": {
-        "Body": {
-          "$ref": "#/definitions/oAuth2TokenIntrospection"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/oauth2"
-    },
-    "swaggerOAuthTokenResponse": {
-      "description": "The token response",
-      "type": "object",
-      "properties": {
-        "Body": {
-          "description": "in: body",
-          "type": "object",
-          "properties": {
-            "access_token": {
-              "description": "The access token issued by the authorization server.",
-              "type": "string",
-              "x-go-name": "AccessToken"
-            },
-            "expires_in": {
-              "description": "The lifetime in seconds of the access token.  For\nexample, the value \"3600\" denotes that the access token will\nexpire in one hour from the time the response was generated.",
-              "type": "integer",
-              "format": "int64",
-              "x-go-name": "ExpiresIn"
-            },
-            "id_token": {
-              "description": "To retrieve a refresh token request the id_token scope.",
-              "type": "integer",
-              "format": "int64",
-              "x-go-name": "IDToken"
-            },
-            "refresh_token": {
-              "description": "The refresh token, which can be used to obtain new\naccess tokens. To retrieve it add the scope \"offline\" to your access token request.",
-              "type": "string",
-              "x-go-name": "RefreshToken"
-            },
-            "scope": {
-              "description": "The scope of the access token",
-              "type": "integer",
-              "format": "int64",
-              "x-go-name": "Scope"
-            },
-            "token_type": {
-              "description": "The type of the token issued",
-              "type": "string",
-              "x-go-name": "TokenType"
-            }
-          }
         }
       },
       "x-go-package": "github.com/ory/hydra/oauth2"
@@ -2880,37 +2879,33 @@
       },
       "x-go-package": "github.com/ory/hydra/policy"
     },
-    "swaggerWardenAccessRequestResponseParameters": {
-      "description": "The warden access request response",
+    "tokenAllowedRequest": {
       "type": "object",
       "properties": {
-        "Body": {
-          "$ref": "#/definitions/wardenAccessRequestResponse"
+        "action": {
+          "description": "Action is the action that is requested on the resource.",
+          "type": "string",
+          "x-go-name": "Action"
+        },
+        "context": {
+          "description": "Context is the request's environmental context.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "x-go-name": "Context"
+        },
+        "resource": {
+          "description": "Resource is the resource that access is requested to.",
+          "type": "string",
+          "x-go-name": "Resource"
         }
       },
-      "x-go-package": "github.com/ory/hydra/warden"
+      "x-go-name": "TokenAccessRequest",
+      "x-go-package": "github.com/ory/hydra/firewall"
     },
-    "swaggerWardenTokenAccessRequestResponse": {
-      "description": "The warden access request (with token) response",
-      "type": "object",
-      "properties": {
-        "Body": {
-          "$ref": "#/definitions/wardenTokenAccessRequestResponse"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/warden"
-    },
-    "swaggeruserinfoResponse": {
+    "userinfoResponse": {
       "description": "The userinfo response",
-      "type": "object",
-      "properties": {
-        "Body": {
-          "$ref": "#/definitions/swaggeruserinfoResponsePayload"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/oauth2"
-    },
-    "swaggeruserinfoResponsePayload": {
       "type": "object",
       "properties": {
         "birthdate": {
@@ -3010,32 +3005,8 @@
           "x-go-name": "Zoneinfo"
         }
       },
+      "x-go-name": "swaggeruserinfoResponsePayload",
       "x-go-package": "github.com/ory/hydra/oauth2"
-    },
-    "tokenAllowedRequest": {
-      "type": "object",
-      "properties": {
-        "action": {
-          "description": "Action is the action that is requested on the resource.",
-          "type": "string",
-          "x-go-name": "Action"
-        },
-        "context": {
-          "description": "Context is the request's environmental context.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "object"
-          },
-          "x-go-name": "Context"
-        },
-        "resource": {
-          "description": "Resource is the resource that access is requested to.",
-          "type": "string",
-          "x-go-name": "Resource"
-        }
-      },
-      "x-go-name": "TokenAccessRequest",
-      "x-go-package": "github.com/ory/hydra/firewall"
     },
     "wardenAccessRequest": {
       "type": "object",
@@ -3306,14 +3277,8 @@
         }
       }
     },
-    "groupResponse": {
-      "description": "A group",
-      "schema": {
-        "$ref": "#/definitions/group"
-      }
-    },
     "healthStatus": {
-      "description": "A list of clients.",
+      "description": "Instance health report",
       "schema": {
         "type": "object",
         "properties": {
@@ -3323,12 +3288,6 @@
             "x-go-name": "Status"
           }
         }
-      }
-    },
-    "introspectOAuth2TokenResponse": {
-      "description": "The token introspection response",
-      "schema": {
-        "$ref": "#/definitions/oAuth2TokenIntrospection"
       }
     },
     "listGroupsResponse": {
@@ -3349,53 +3308,6 @@
         }
       }
     },
-    "oAuth2ConsentRequest": {
-      "description": "The consent request response",
-      "schema": {
-        "$ref": "#/definitions/oAuth2ConsentRequest"
-      }
-    },
-    "oauthTokenResponse": {
-      "description": "The token response",
-      "schema": {
-        "type": "object",
-        "properties": {
-          "access_token": {
-            "description": "The access token issued by the authorization server.",
-            "type": "string",
-            "x-go-name": "AccessToken"
-          },
-          "expires_in": {
-            "description": "The lifetime in seconds of the access token.  For\nexample, the value \"3600\" denotes that the access token will\nexpire in one hour from the time the response was generated.",
-            "type": "integer",
-            "format": "int64",
-            "x-go-name": "ExpiresIn"
-          },
-          "id_token": {
-            "description": "To retrieve a refresh token request the id_token scope.",
-            "type": "integer",
-            "format": "int64",
-            "x-go-name": "IDToken"
-          },
-          "refresh_token": {
-            "description": "The refresh token, which can be used to obtain new\naccess tokens. To retrieve it add the scope \"offline\" to your access token request.",
-            "type": "string",
-            "x-go-name": "RefreshToken"
-          },
-          "scope": {
-            "description": "The scope of the access token",
-            "type": "integer",
-            "format": "int64",
-            "x-go-name": "Scope"
-          },
-          "token_type": {
-            "description": "The type of the token issued",
-            "type": "string",
-            "x-go-name": "TokenType"
-          }
-        }
-      }
-    },
     "policyList": {
       "description": "A policy",
       "schema": {
@@ -3403,24 +3315,6 @@
         "items": {
           "$ref": "#/definitions/policy"
         }
-      }
-    },
-    "userinfoResponse": {
-      "description": "The userinfo response",
-      "schema": {
-        "$ref": "#/definitions/swaggeruserinfoResponsePayload"
-      }
-    },
-    "wardenAccessRequestResponse": {
-      "description": "The warden access request response",
-      "schema": {
-        "$ref": "#/definitions/wardenAccessRequestResponse"
-      }
-    },
-    "wardenTokenAccessRequestResponse": {
-      "description": "The warden access request (with token) response",
-      "schema": {
-        "$ref": "#/definitions/wardenTokenAccessRequestResponse"
       }
     }
   },

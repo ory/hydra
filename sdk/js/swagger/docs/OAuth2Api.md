@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.OAuth2Api
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api
 
 All URIs are relative to *http://localhost*
 
@@ -8,7 +8,7 @@ Method | HTTP request | Description
 [**createOAuth2Client**](OAuth2Api.md#createOAuth2Client) | **POST** /clients | Create an OAuth 2.0 client
 [**deleteOAuth2Client**](OAuth2Api.md#deleteOAuth2Client) | **DELETE** /clients/{id} | Deletes an OAuth 2.0 Client
 [**flushInactiveOAuth2Tokens**](OAuth2Api.md#flushInactiveOAuth2Tokens) | **POST** /oauth2/flush | Flush Expired OAuth2 Access Tokens
-[**getOAuth2Client**](OAuth2Api.md#getOAuth2Client) | **GET** /clients/{id} | Retrieve an OAuth 2.0 Client.
+[**getOAuth2Client**](OAuth2Api.md#getOAuth2Client) | **GET** /clients/{id} | Get an OAuth 2.0 Client.
 [**getOAuth2ConsentRequest**](OAuth2Api.md#getOAuth2ConsentRequest) | **GET** /oauth2/consent/requests/{id} | Receive consent request information
 [**getWellKnown**](OAuth2Api.md#getWellKnown) | **GET** /.well-known/openid-configuration | Server well known configuration
 [**introspectOAuth2Token**](OAuth2Api.md#introspectOAuth2Token) | **POST** /oauth2/introspect | Introspect OAuth2 tokens
@@ -19,7 +19,7 @@ Method | HTTP request | Description
 [**revokeOAuth2Token**](OAuth2Api.md#revokeOAuth2Token) | **POST** /oauth2/revoke | Revoke OAuth2 tokens
 [**updateOAuth2Client**](OAuth2Api.md#updateOAuth2Client) | **PUT** /clients/{id} | Update an OAuth 2.0 Client
 [**userinfo**](OAuth2Api.md#userinfo) | **POST** /userinfo | OpenID Connect Userinfo
-[**wellKnown**](OAuth2Api.md#wellKnown) | **GET** /.well-known/jwks.json | Get list of well known JSON Web Keys
+[**wellKnown**](OAuth2Api.md#wellKnown) | **GET** /.well-known/jwks.json | Get Well-Known JSON Web Keys
 
 
 <a name="acceptOAuth2ConsentRequest"></a>
@@ -32,18 +32,18 @@ Call this endpoint to accept a consent request. This usually happens when a user
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.OAuth2Api();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api();
 
 var id = "id_example"; // String | 
 
-var body = new HydraOAuth2OpenIdConnectServer.ConsentRequestAcceptance(); // ConsentRequestAcceptance | 
+var body = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ConsentRequestAcceptance(); // ConsentRequestAcceptance | 
 
 
 var callback = function(error, data, response) {
@@ -82,20 +82,20 @@ null (empty response body)
 
 Create an OAuth 2.0 client
 
-If you pass &#x60;client_secret&#x60; the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somwhere safe.   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
+Create a new OAuth 2.0 client If you pass &#x60;client_secret&#x60; the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somwhere safe.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.OAuth2Api();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api();
 
-var body = new HydraOAuth2OpenIdConnectServer.OAuth2Client(); // OAuth2Client | 
+var body = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Client(); // OAuth2Client | 
 
 
 var callback = function(error, data, response) {
@@ -133,18 +133,18 @@ Name | Type | Description  | Notes
 
 Deletes an OAuth 2.0 Client
 
-The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;delete\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;delete\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
+Delete an existing OAuth 2.0 Client by its ID.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;delete\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;delete\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.OAuth2Api();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api();
 
 var id = "id_example"; // String | The id of the OAuth 2.0 Client.
 
@@ -188,8 +188,8 @@ This endpoint flushes expired OAuth2 access tokens from the database. You can se
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure HTTP basic authorization: basic
 var basic = defaultClient.authentications['basic'];
@@ -200,10 +200,10 @@ basic.password = 'YOUR PASSWORD';
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.OAuth2Api();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api();
 
 var opts = { 
-  'body': new HydraOAuth2OpenIdConnectServer.FlushInactiveOAuth2TokensRequest() // FlushInactiveOAuth2TokensRequest | 
+  'body': new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.FlushInactiveOAuth2TokensRequest() // FlushInactiveOAuth2TokensRequest | 
 };
 
 var callback = function(error, data, response) {
@@ -239,20 +239,20 @@ null (empty response body)
 # **getOAuth2Client**
 > OAuth2Client getOAuth2Client(id)
 
-Retrieve an OAuth 2.0 Client.
+Get an OAuth 2.0 Client.
 
-This endpoint never returns passwords.   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
+Get an OAUth 2.0 client by its ID. This endpoint never returns passwords.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.OAuth2Api();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api();
 
 var id = "id_example"; // String | The id of the OAuth 2.0 Client.
 
@@ -296,14 +296,14 @@ Call this endpoint to receive information on consent requests. The consent reque
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.OAuth2Api();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api();
 
 var id = "id_example"; // String | The id of the OAuth 2.0 Consent Request.
 
@@ -347,9 +347,9 @@ The well known endpoint an be used to retrieve information for OpenID Connect cl
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.OAuth2Api();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api();
 
 var callback = function(error, data, response) {
   if (error) {
@@ -387,8 +387,8 @@ The introspection endpoint allows to check if a token (both refresh and access) 
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure HTTP basic authorization: basic
 var basic = defaultClient.authentications['basic'];
@@ -399,7 +399,7 @@ basic.password = 'YOUR PASSWORD';
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.OAuth2Api();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api();
 
 var token = "token_example"; // String | The string value of the token. For access tokens, this is the \"access_token\" value returned from the token endpoint defined in OAuth 2.0 [RFC6749], Section 5.1. This endpoint DOES NOT accept refresh tokens for validation.
 
@@ -443,18 +443,18 @@ Name | Type | Description  | Notes
 
 List OAuth 2.0 Clients
 
-This endpoint never returns passwords.   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+This endpoint lists all clients in the database, and never returns client secrets.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.OAuth2Api();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api();
 
 var opts = { 
   'limit': 789, // Number | The maximum amount of policies returned.
@@ -501,9 +501,9 @@ This endpoint is not documented here because you should never use your own imple
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.OAuth2Api();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api();
 
 var callback = function(error, data, response) {
   if (error) {
@@ -533,7 +533,7 @@ No authorization required
 
 <a name="oauthToken"></a>
 # **oauthToken**
-> InlineResponse2001 oauthToken()
+> OauthTokenResponse oauthToken()
 
 The OAuth 2.0 token endpoint
 
@@ -541,8 +541,8 @@ This endpoint is not documented here because you should never use your own imple
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure HTTP basic authorization: basic
 var basic = defaultClient.authentications['basic'];
@@ -553,7 +553,7 @@ basic.password = 'YOUR PASSWORD';
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.OAuth2Api();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api();
 
 var callback = function(error, data, response) {
   if (error) {
@@ -570,7 +570,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**InlineResponse2001**](InlineResponse2001.md)
+[**OauthTokenResponse**](OauthTokenResponse.md)
 
 ### Authorization
 
@@ -591,18 +591,18 @@ Call this endpoint to reject a consent request. This usually happens when a user
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.OAuth2Api();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api();
 
 var id = "id_example"; // String | 
 
-var body = new HydraOAuth2OpenIdConnectServer.ConsentRequestRejection(); // ConsentRequestRejection | 
+var body = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ConsentRequestRejection(); // ConsentRequestRejection | 
 
 
 var callback = function(error, data, response) {
@@ -645,15 +645,15 @@ Revoking a token (both access and refresh) means that the tokens will be invalid
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure HTTP basic authorization: basic
 var basic = defaultClient.authentications['basic'];
 basic.username = 'YOUR USERNAME';
 basic.password = 'YOUR PASSWORD';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.OAuth2Api();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api();
 
 var token = "token_example"; // String | 
 
@@ -693,22 +693,22 @@ null (empty response body)
 
 Update an OAuth 2.0 Client
 
-If you pass &#x60;client_secret&#x60; the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
+Update an existing OAuth 2.0 Client. If you pass &#x60;client_secret&#x60; the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.OAuth2Api();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api();
 
 var id = "id_example"; // String | 
 
-var body = new HydraOAuth2OpenIdConnectServer.OAuth2Client(); // OAuth2Client | 
+var body = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Client(); // OAuth2Client | 
 
 
 var callback = function(error, data, response) {
@@ -743,7 +743,7 @@ Name | Type | Description  | Notes
 
 <a name="userinfo"></a>
 # **userinfo**
-> SwaggeruserinfoResponsePayload userinfo()
+> UserinfoResponse userinfo()
 
 OpenID Connect Userinfo
 
@@ -751,14 +751,14 @@ This endpoint returns the payload of the ID Token, including the idTokenExtra va
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.OAuth2Api();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api();
 
 var callback = function(error, data, response) {
   if (error) {
@@ -775,7 +775,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**SwaggeruserinfoResponsePayload**](SwaggeruserinfoResponsePayload.md)
+[**UserinfoResponse**](UserinfoResponse.md)
 
 ### Authorization
 
@@ -790,20 +790,20 @@ This endpoint does not need any parameter.
 # **wellKnown**
 > JsonWebKeySet wellKnown()
 
-Get list of well known JSON Web Keys
+Get Well-Known JSON Web Keys
 
-The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:hydra.openid.id-token:public\&quot;], \&quot;actions\&quot;: [\&quot;GET\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+Returns metadata for discovering important JSON Web Keys. Currently, this endpoint returns the public key for verifying OpenID Connect ID Tokens.  A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:hydra.openid.id-token:public\&quot;], \&quot;actions\&quot;: [\&quot;GET\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.OAuth2Api();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api();
 
 var callback = function(error, data, response) {
   if (error) {

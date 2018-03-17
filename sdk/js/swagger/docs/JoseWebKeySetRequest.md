@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.JoseWebKeySetRequest
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JoseWebKeySetRequest
 
 ## Properties
 Name | Type | Description | Notes

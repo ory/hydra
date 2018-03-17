@@ -69,10 +69,3 @@ type swaggerModifyMembersParameters struct {
 	// in: body
 	Body membersRequest
 }
-
-// A group
-// swagger:response groupResponse
-type swaggerGroupResponse struct {
-	// in: body
-	Body Group
-}

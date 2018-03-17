@@ -1,4 +1,4 @@
-# InlineResponse2001
+# OauthTokenResponse
 
 ## Properties
 Name | Type | Description | Notes

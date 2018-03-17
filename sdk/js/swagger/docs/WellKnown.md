@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.WellKnown
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WellKnown
 
 ## Properties
 Name | Type | Description | Notes

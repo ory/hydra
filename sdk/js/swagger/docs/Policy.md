@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.Policy
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.Policy
 
 ## Properties
 Name | Type | Description | Notes

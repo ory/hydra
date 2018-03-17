@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.SwaggeruserinfoResponsePayload
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.UserinfoResponse
 
 ## Properties
 Name | Type | Description | Notes

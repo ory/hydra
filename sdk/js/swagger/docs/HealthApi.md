@@ -1,25 +1,25 @@
-# HydraOAuth2OpenIdConnectServer.HealthApi
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthApi
 
 All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**getInstanceStatus**](HealthApi.md#getInstanceStatus) | **GET** /health/status | Check health status of this instance
+[**getInstanceStatus**](HealthApi.md#getInstanceStatus) | **GET** /health/status | Check the Health Status
 
 
 <a name="getInstanceStatus"></a>
 # **getInstanceStatus**
 > InlineResponse200 getInstanceStatus()
 
-Check health status of this instance
+Check the Health Status
 
-This endpoint returns &#x60;{ \&quot;status\&quot;: \&quot;ok\&quot; }&#x60;. This status let&#39;s you know that the HTTP server is up and running. This status does currently not include checks whether the database connection is up and running. This endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header when TLS termination is set.   Be aware that if you are running multiple nodes of ORY Hydra, the health status will never refer to the cluster state, only to a single instance.
+This endpoint returns a 200 status code when the HTTP server is up running. &#x60;{ \&quot;status\&quot;: \&quot;ok\&quot; }&#x60;. This status does currently not include checks whether the database connection is working. This endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header when TLS termination is set.  Be aware that if you are running multiple nodes of ORY Hydra, the health status will never refer to the cluster state, only to a single instance.
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.HealthApi();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthApi();
 
 var callback = function(error, data, response) {
   if (error) {

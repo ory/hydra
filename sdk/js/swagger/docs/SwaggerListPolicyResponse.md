@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.SwaggerListPolicyResponse
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerListPolicyResponse
 
 ## Properties
 Name | Type | Description | Notes

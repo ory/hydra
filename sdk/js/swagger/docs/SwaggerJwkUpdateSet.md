@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.SwaggerJwkUpdateSet
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerJwkUpdateSet
 
 ## Properties
 Name | Type | Description | Notes

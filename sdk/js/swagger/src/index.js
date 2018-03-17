@@ -1,26 +1,6 @@
-/*
- * Copyright © 2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * @author		Aeneas Rekkas <aeneas+oss@aeneas.io>
- * @Copyright 	2017-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
- * @license 	Apache-2.0
- */
-
 /**
- * Hydra OAuth2 & OpenID Connect Server
- * Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/   Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure. Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to. Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.   The official repository is located at https://github.com/ory/hydra   ### Important REST API Documentation Notes  The swagger generator used to create this documentation does currently not support example responses. To see request and response payloads click on **\"Show JSON schema\"**: ![Enable JSON Schema on Apiary](https://storage.googleapis.com/ory.am/hydra/json-schema.png)   The API documentation always refers to the latest tagged version of ORY Hydra. For previous API documentations, please refer to https://github.com/ory/hydra/blob/<tag-id>/docs/api.swagger.yaml - for example:  0.9.13: https://github.com/ory/hydra/blob/v0.9.13/docs/api.swagger.yaml 0.8.1: https://github.com/ory/hydra/blob/v0.8.1/docs/api.swagger.yaml
+ * ORY Hydra - Cloud Native OAuth 2.0 and OpenID Connect Server
+ * Welcome to the ORY Hydra HTTP API documentation. You will find documentation for all HTTP APIs here. Keep in mind that this document reflects the latest branch, always. Support for versioned documentation is coming in the future.
  *
  * OpenAPI spec version: Latest
  * Contact: hi@ory.am
@@ -51,7 +31,6 @@
         'model/GroupMembers',
         'model/Handler',
         'model/InlineResponse200',
-        'model/InlineResponse2001',
         'model/InlineResponse401',
         'model/JoseWebKeySetRequest',
         'model/JsonWebKey',
@@ -62,6 +41,7 @@
         'model/OAuth2Client',
         'model/OAuth2ConsentRequest',
         'model/OAuth2TokenIntrospection',
+        'model/OauthTokenResponse',
         'model/Policy',
         'model/PolicyConditions',
         'model/RawMessage',
@@ -78,20 +58,13 @@
         'model/SwaggerJwkUpdateSetKey',
         'model/SwaggerListPolicyParameters',
         'model/SwaggerListPolicyResponse',
-        'model/SwaggerOAuthConsentRequest',
         'model/SwaggerOAuthConsentRequestPayload',
         'model/SwaggerOAuthIntrospectionRequest',
-        'model/SwaggerOAuthIntrospectionResponse',
-        'model/SwaggerOAuthTokenResponse',
-        'model/SwaggerOAuthTokenResponseBody',
         'model/SwaggerRejectConsentRequest',
         'model/SwaggerRevokeOAuth2TokenParameters',
         'model/SwaggerUpdatePolicyParameters',
-        'model/SwaggerWardenAccessRequestResponseParameters',
-        'model/SwaggerWardenTokenAccessRequestResponse',
-        'model/SwaggeruserinfoResponse',
-        'model/SwaggeruserinfoResponsePayload',
         'model/TokenAllowedRequest',
+        'model/UserinfoResponse',
         'model/WardenAccessRequest',
         'model/WardenAccessRequestResponse',
         'model/WardenTokenAccessRequest',
@@ -121,7 +94,6 @@
       require('./model/GroupMembers'),
       require('./model/Handler'),
       require('./model/InlineResponse200'),
-      require('./model/InlineResponse2001'),
       require('./model/InlineResponse401'),
       require('./model/JoseWebKeySetRequest'),
       require('./model/JsonWebKey'),
@@ -132,6 +104,7 @@
       require('./model/OAuth2Client'),
       require('./model/OAuth2ConsentRequest'),
       require('./model/OAuth2TokenIntrospection'),
+      require('./model/OauthTokenResponse'),
       require('./model/Policy'),
       require('./model/PolicyConditions'),
       require('./model/RawMessage'),
@@ -148,20 +121,13 @@
       require('./model/SwaggerJwkUpdateSetKey'),
       require('./model/SwaggerListPolicyParameters'),
       require('./model/SwaggerListPolicyResponse'),
-      require('./model/SwaggerOAuthConsentRequest'),
       require('./model/SwaggerOAuthConsentRequestPayload'),
       require('./model/SwaggerOAuthIntrospectionRequest'),
-      require('./model/SwaggerOAuthIntrospectionResponse'),
-      require('./model/SwaggerOAuthTokenResponse'),
-      require('./model/SwaggerOAuthTokenResponseBody'),
       require('./model/SwaggerRejectConsentRequest'),
       require('./model/SwaggerRevokeOAuth2TokenParameters'),
       require('./model/SwaggerUpdatePolicyParameters'),
-      require('./model/SwaggerWardenAccessRequestResponseParameters'),
-      require('./model/SwaggerWardenTokenAccessRequestResponse'),
-      require('./model/SwaggeruserinfoResponse'),
-      require('./model/SwaggeruserinfoResponsePayload'),
       require('./model/TokenAllowedRequest'),
+      require('./model/UserinfoResponse'),
       require('./model/WardenAccessRequest'),
       require('./model/WardenAccessRequestResponse'),
       require('./model/WardenTokenAccessRequest'),
@@ -188,7 +154,6 @@
   GroupMembers,
   Handler,
   InlineResponse200,
-  InlineResponse2001,
   InlineResponse401,
   JoseWebKeySetRequest,
   JsonWebKey,
@@ -199,6 +164,7 @@
   OAuth2Client,
   OAuth2ConsentRequest,
   OAuth2TokenIntrospection,
+  OauthTokenResponse,
   Policy,
   PolicyConditions,
   RawMessage,
@@ -215,20 +181,13 @@
   SwaggerJwkUpdateSetKey,
   SwaggerListPolicyParameters,
   SwaggerListPolicyResponse,
-  SwaggerOAuthConsentRequest,
   SwaggerOAuthConsentRequestPayload,
   SwaggerOAuthIntrospectionRequest,
-  SwaggerOAuthIntrospectionResponse,
-  SwaggerOAuthTokenResponse,
-  SwaggerOAuthTokenResponseBody,
   SwaggerRejectConsentRequest,
   SwaggerRevokeOAuth2TokenParameters,
   SwaggerUpdatePolicyParameters,
-  SwaggerWardenAccessRequestResponseParameters,
-  SwaggerWardenTokenAccessRequestResponse,
-  SwaggeruserinfoResponse,
-  SwaggeruserinfoResponsePayload,
   TokenAllowedRequest,
+  UserinfoResponse,
   WardenAccessRequest,
   WardenAccessRequestResponse,
   WardenTokenAccessRequest,
@@ -244,14 +203,14 @@
   'use strict'
 
   /**
-   * Please_refer_to_the_user_guide_for_in_depth_documentation_httpsory_gitbooks_iohydracontentHydra_offers_OAuth_2_0_and_OpenID_Connect_Core_1_0_capabilities_as_a_service__Hydra_is_different_because_it_works_with_any_existing_authentication_infrastructure_not_just_LDAP_or_SAML__By_implementing_a_consent_app__works_with_any_programming_language_you_build_a_bridge_between_Hydra_and_your_authentication_infrastructure_Hydra_is_able_to_securely_manage_JSON_Web_Keys_and_has_a_sophisticated_policy_based_access_control_you_can_use_if_you_want_to_Hydra_is_suitable_for_green___new_and_brownfield__existing_projects__If_you_are_not_familiar_with_OAuth_2_0_and_are_working_on_a_greenfield_project_we_recommend_evaluating_if_OAuth_2_0_really_serves_your_purpose__Knowledge_of_OAuth_2_0_is_imperative_in_understanding_what_Hydra_does_and_how_it_works_The_official_repository_is_located_at_httpsgithub_comoryhydra_Important_REST_API_Documentation_NotesThe_swagger_generator_used_to_create_this_documentation_does_currently_not_support_example_responses__To_seerequest_and_response_payloads_click_on_Show_JSON_schema_Enable_JSON_Schema_on_Apiary_httpsstorage_googleapis_comory_amhydrajson_schema_pngThe_API_documentation_always_refers_to_the_latest_tagged_version_of_ORY_Hydra__For_previous_API_documentations_pleaserefer_to_httpsgithub_comoryhydrablobtag_iddocsapi_swagger_yaml___for_example0_9_13_httpsgithub_comoryhydrablobv0_9_13docsapi_swagger_yaml0_8_1_httpsgithub_comoryhydrablobv0_8_1docsapi_swagger_yaml.<br>
+   * Welcome_to_the_ORY_Hydra_HTTP_API_documentation__You_will_find_documentation_for_all_HTTP_APIs_here__Keep_in_mind_that_this_document_reflects_the_latest_branch_always__Support_for_versioned_documentation_is_coming_in_the_future_.<br>
    * The <code>index</code> module provides access to constructors for all the classes which comprise the public API.
    * <p>
    * An AMD (recommended!) or CommonJS application will generally do something equivalent to the following:
    * <pre>
-   * var HydraOAuth2OpenIdConnectServer = require('index'); // See note below*.
-   * var xxxSvc = new HydraOAuth2OpenIdConnectServer.XxxApi(); // Allocate the API class we're going to use.
-   * var yyyModel = new HydraOAuth2OpenIdConnectServer.Yyy(); // Construct a model instance.
+   * var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('index'); // See note below*.
+   * var xxxSvc = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.XxxApi(); // Allocate the API class we're going to use.
+   * var yyyModel = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.Yyy(); // Construct a model instance.
    * yyyModel.someProperty = 'someValue';
    * ...
    * var zzz = xxxSvc.doSomething(yyyModel); // Invoke the service.
@@ -263,8 +222,8 @@
    * <p>
    * A non-AMD browser application (discouraged) might do something like this:
    * <pre>
-   * var xxxSvc = new HydraOAuth2OpenIdConnectServer.XxxApi(); // Allocate the API class we're going to use.
-   * var yyy = new HydraOAuth2OpenIdConnectServer.Yyy(); // Construct a model instance.
+   * var xxxSvc = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.XxxApi(); // Allocate the API class we're going to use.
+   * var yyy = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.Yyy(); // Construct a model instance.
    * yyyModel.someProperty = 'someValue';
    * ...
    * var zzz = xxxSvc.doSomething(yyyModel); // Invoke the service.
@@ -336,11 +295,6 @@
      */
     InlineResponse200: InlineResponse200,
     /**
-     * The InlineResponse2001 model constructor.
-     * @property {module:model/InlineResponse2001}
-     */
-    InlineResponse2001: InlineResponse2001,
-    /**
      * The InlineResponse401 model constructor.
      * @property {module:model/InlineResponse401}
      */
@@ -390,6 +344,11 @@
      * @property {module:model/OAuth2TokenIntrospection}
      */
     OAuth2TokenIntrospection: OAuth2TokenIntrospection,
+    /**
+     * The OauthTokenResponse model constructor.
+     * @property {module:model/OauthTokenResponse}
+     */
+    OauthTokenResponse: OauthTokenResponse,
     /**
      * The Policy model constructor.
      * @property {module:model/Policy}
@@ -471,11 +430,6 @@
      */
     SwaggerListPolicyResponse: SwaggerListPolicyResponse,
     /**
-     * The SwaggerOAuthConsentRequest model constructor.
-     * @property {module:model/SwaggerOAuthConsentRequest}
-     */
-    SwaggerOAuthConsentRequest: SwaggerOAuthConsentRequest,
-    /**
      * The SwaggerOAuthConsentRequestPayload model constructor.
      * @property {module:model/SwaggerOAuthConsentRequestPayload}
      */
@@ -485,21 +439,6 @@
      * @property {module:model/SwaggerOAuthIntrospectionRequest}
      */
     SwaggerOAuthIntrospectionRequest: SwaggerOAuthIntrospectionRequest,
-    /**
-     * The SwaggerOAuthIntrospectionResponse model constructor.
-     * @property {module:model/SwaggerOAuthIntrospectionResponse}
-     */
-    SwaggerOAuthIntrospectionResponse: SwaggerOAuthIntrospectionResponse,
-    /**
-     * The SwaggerOAuthTokenResponse model constructor.
-     * @property {module:model/SwaggerOAuthTokenResponse}
-     */
-    SwaggerOAuthTokenResponse: SwaggerOAuthTokenResponse,
-    /**
-     * The SwaggerOAuthTokenResponseBody model constructor.
-     * @property {module:model/SwaggerOAuthTokenResponseBody}
-     */
-    SwaggerOAuthTokenResponseBody: SwaggerOAuthTokenResponseBody,
     /**
      * The SwaggerRejectConsentRequest model constructor.
      * @property {module:model/SwaggerRejectConsentRequest}
@@ -516,30 +455,15 @@
      */
     SwaggerUpdatePolicyParameters: SwaggerUpdatePolicyParameters,
     /**
-     * The SwaggerWardenAccessRequestResponseParameters model constructor.
-     * @property {module:model/SwaggerWardenAccessRequestResponseParameters}
-     */
-    SwaggerWardenAccessRequestResponseParameters: SwaggerWardenAccessRequestResponseParameters,
-    /**
-     * The SwaggerWardenTokenAccessRequestResponse model constructor.
-     * @property {module:model/SwaggerWardenTokenAccessRequestResponse}
-     */
-    SwaggerWardenTokenAccessRequestResponse: SwaggerWardenTokenAccessRequestResponse,
-    /**
-     * The SwaggeruserinfoResponse model constructor.
-     * @property {module:model/SwaggeruserinfoResponse}
-     */
-    SwaggeruserinfoResponse: SwaggeruserinfoResponse,
-    /**
-     * The SwaggeruserinfoResponsePayload model constructor.
-     * @property {module:model/SwaggeruserinfoResponsePayload}
-     */
-    SwaggeruserinfoResponsePayload: SwaggeruserinfoResponsePayload,
-    /**
      * The TokenAllowedRequest model constructor.
      * @property {module:model/TokenAllowedRequest}
      */
     TokenAllowedRequest: TokenAllowedRequest,
+    /**
+     * The UserinfoResponse model constructor.
+     * @property {module:model/UserinfoResponse}
+     */
+    UserinfoResponse: UserinfoResponse,
     /**
      * The WardenAccessRequest model constructor.
      * @property {module:model/WardenAccessRequest}

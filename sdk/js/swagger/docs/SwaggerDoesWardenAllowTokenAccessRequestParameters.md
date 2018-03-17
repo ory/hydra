@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.SwaggerDoesWardenAllowTokenAccessRequestParameters
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerDoesWardenAllowTokenAccessRequestParameters
 
 ## Properties
 Name | Type | Description | Notes

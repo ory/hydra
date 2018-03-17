@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.JsonWebKey
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKey
 
 ## Properties
 Name | Type | Description | Notes

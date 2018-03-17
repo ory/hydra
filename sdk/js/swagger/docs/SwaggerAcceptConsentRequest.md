@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.SwaggerAcceptConsentRequest
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerAcceptConsentRequest
 
 ## Properties
 Name | Type | Description | Notes

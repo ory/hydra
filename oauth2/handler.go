@@ -291,7 +291,7 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ ht
 //       oauth2: hydra.introspect
 //
 //     Responses:
-//       200: introspectOAuth2TokenResponse
+//       200: oAuth2TokenIntrospection
 //       401: genericError
 //       500: genericError
 func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

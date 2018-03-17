@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.GroupMembers
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.GroupMembers
 
 ## Properties
 Name | Type | Description | Notes

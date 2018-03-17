@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.TokenAllowedRequest
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.TokenAllowedRequest
 
 ## Properties
 Name | Type | Description | Notes

@@ -173,7 +173,7 @@ func (h *Handler) FindGroupNames(w http.ResponseWriter, r *http.Request, member 
 //       oauth2: hydra.warden.groups
 //
 //     Responses:
-//       201: groupResponse
+//       201: group
 //       401: genericError
 //       403: genericError
 //       500: genericError
@@ -228,7 +228,7 @@ func (h *Handler) CreateGroup(w http.ResponseWriter, r *http.Request, _ httprout
 //       oauth2: hydra.warden.groups
 //
 //     Responses:
-//       201: groupResponse
+//       201: group
 //       401: genericError
 //       403: genericError
 //       500: genericError

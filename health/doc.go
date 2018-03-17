@@ -20,7 +20,7 @@
 
 package health
 
-// A list of clients.
+// Instance health report
 // swagger:response healthStatus
 type swaggerListClientsResult struct {
 	// in: body

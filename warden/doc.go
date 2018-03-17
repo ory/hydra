@@ -27,13 +27,6 @@ import (
 )
 
 // The warden access request response
-// swagger:response wardenAccessRequestResponse
-type swaggerWardenAccessRequestResponseParameters struct {
-	// in: body
-	Body swaggerWardenAccessRequestResponse
-}
-
-// The warden access request response
 // swagger:model wardenAccessRequestResponse
 type swaggerWardenAccessRequestResponse struct {
 	// Allowed is true if the request is allowed and false otherwise.
@@ -68,13 +61,6 @@ type swaggerWardenTokenAccessRequest struct {
 
 	// Context is the request's environmental context.
 	Context map[string]interface{} `json:"context"`
-}
-
-// The warden access request (with token) response
-// swagger:response wardenTokenAccessRequestResponse
-type swaggerWardenTokenAccessRequestResponse struct {
-	// in: body
-	Body swaggerWardenTokenAccessRequestResponsePayload
 }
 
 // The warden access request (with token) response

@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.SwaggerCreatePolicyParameters
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerCreatePolicyParameters
 
 ## Properties
 Name | Type | Description | Notes

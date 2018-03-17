@@ -1,4 +1,4 @@
-# SwaggeruserinfoResponsePayload
+# UserinfoResponse
 
 ## Properties
 Name | Type | Description | Notes

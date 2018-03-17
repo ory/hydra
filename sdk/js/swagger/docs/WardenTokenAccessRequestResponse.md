@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequestResponse
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WardenTokenAccessRequestResponse
 
 ## Properties
 Name | Type | Description | Notes

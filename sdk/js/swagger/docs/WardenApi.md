@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.WardenApi
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WardenApi
 
 All URIs are relative to *http://localhost*
 
@@ -24,19 +24,19 @@ The subject making the request needs to be assigned to a policy containing:  &#x
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WardenApi();
 
 var id = "id_example"; // String | The id of the group to modify.
 
 var opts = { 
-  'body': new HydraOAuth2OpenIdConnectServer.GroupMembers() // GroupMembers | 
+  'body': new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.GroupMembers() // GroupMembers | 
 };
 
 var callback = function(error, data, response) {
@@ -79,17 +79,17 @@ The subject making the request needs to be assigned to a policy containing:  &#x
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WardenApi();
 
 var opts = { 
-  'body': new HydraOAuth2OpenIdConnectServer.Group() // Group | 
+  'body': new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.Group() // Group | 
 };
 
 var callback = function(error, data, response) {
@@ -131,14 +131,14 @@ The subject making the request needs to be assigned to a policy containing:  &#x
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WardenApi();
 
 var id = "id_example"; // String | The id of the group to look up.
 
@@ -182,17 +182,17 @@ Checks if a subject (typically a user or a service) is allowed to perform an act
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WardenApi();
 
 var opts = { 
-  'body': new HydraOAuth2OpenIdConnectServer.WardenAccessRequest() // WardenAccessRequest | 
+  'body': new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WardenAccessRequest() // WardenAccessRequest | 
 };
 
 var callback = function(error, data, response) {
@@ -234,17 +234,17 @@ Checks if a token is valid and if the token subject is allowed to perform an act
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WardenApi();
 
 var opts = { 
-  'body': new HydraOAuth2OpenIdConnectServer.WardenTokenAccessRequest() // WardenTokenAccessRequest | 
+  'body': new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WardenTokenAccessRequest() // WardenTokenAccessRequest | 
 };
 
 var callback = function(error, data, response) {
@@ -286,14 +286,14 @@ The subject making the request needs to be assigned to a policy containing:  &#x
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WardenApi();
 
 var id = "id_example"; // String | The id of the group to look up.
 
@@ -337,14 +337,14 @@ The subject making the request needs to be assigned to a policy containing:  &#x
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WardenApi();
 
 var opts = { 
   'member': "member_example", // String | The id of the member to look up.
@@ -393,19 +393,19 @@ The subject making the request needs to be assigned to a policy containing:  &#x
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.WardenApi();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WardenApi();
 
 var id = "id_example"; // String | The id of the group to modify.
 
 var opts = { 
-  'body': new HydraOAuth2OpenIdConnectServer.GroupMembers() // GroupMembers | 
+  'body': new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.GroupMembers() // GroupMembers | 
 };
 
 var callback = function(error, data, response) {

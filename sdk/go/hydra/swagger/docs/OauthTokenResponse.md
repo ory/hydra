@@ -1,4 +1,4 @@
-# SwaggerOAuthTokenResponseBody
+# OauthTokenResponse
 
 ## Properties
 Name | Type | Description | Notes

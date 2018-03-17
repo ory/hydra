@@ -139,19 +139,6 @@ Class | Method | HTTP request | Description
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**updateOAuth2Client**](docs/OAuth2Api.md#updateOAuth2Client) | **PUT** /clients/{id} | Update an OAuth 2.0 Client
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**userinfo**](docs/OAuth2Api.md#userinfo) | **POST** /userinfo | OpenID Connect Userinfo
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**wellKnown**](docs/OAuth2Api.md#wellKnown) | **GET** /.well-known/jwks.json | Get Well-Known JSON Web Keys
-*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.PolicyApi* | [**createPolicy**](docs/PolicyApi.md#createPolicy) | **POST** /policies | Create an Access Control Policy
-*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.PolicyApi* | [**deletePolicy**](docs/PolicyApi.md#deletePolicy) | **DELETE** /policies/{id} | Delete an Access Control Policy
-*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.PolicyApi* | [**getPolicy**](docs/PolicyApi.md#getPolicy) | **GET** /policies/{id} | Get an Access Control Policy
-*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.PolicyApi* | [**listPolicies**](docs/PolicyApi.md#listPolicies) | **GET** /policies | List Access Control Policies
-*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.PolicyApi* | [**updatePolicy**](docs/PolicyApi.md#updatePolicy) | **PUT** /policies/{id} | Update an Access Control Polic
-*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WardenApi* | [**addMembersToGroup**](docs/WardenApi.md#addMembersToGroup) | **POST** /warden/groups/{id}/members | Add members to a group
-*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WardenApi* | [**createGroup**](docs/WardenApi.md#createGroup) | **POST** /warden/groups | Create a group
-*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WardenApi* | [**deleteGroup**](docs/WardenApi.md#deleteGroup) | **DELETE** /warden/groups/{id} | Delete a group by id
-*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WardenApi* | [**doesWardenAllowAccessRequest**](docs/WardenApi.md#doesWardenAllowAccessRequest) | **POST** /warden/allowed | Check if an access request is valid (without providing an access token)
-*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WardenApi* | [**doesWardenAllowTokenAccessRequest**](docs/WardenApi.md#doesWardenAllowTokenAccessRequest) | **POST** /warden/token/allowed | Check if an access request is valid (providing an access token)
-*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WardenApi* | [**getGroup**](docs/WardenApi.md#getGroup) | **GET** /warden/groups/{id} | Get a group by id
-*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WardenApi* | [**listGroups**](docs/WardenApi.md#listGroups) | **GET** /warden/groups | List groups
-*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WardenApi* | [**removeMembersFromGroup**](docs/WardenApi.md#removeMembersFromGroup) | **DELETE** /warden/groups/{id}/members | Remove members from a group
 
 
 ## Documentation for Models
@@ -160,11 +147,7 @@ Class | Method | HTTP request | Description
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ConsentRequestAcceptance](docs/ConsentRequestAcceptance.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ConsentRequestManager](docs/ConsentRequestManager.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ConsentRequestRejection](docs/ConsentRequestRejection.md)
- - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.Context](docs/Context.md)
- - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.Firewall](docs/Firewall.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.FlushInactiveOAuth2TokensRequest](docs/FlushInactiveOAuth2TokensRequest.md)
- - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.Group](docs/Group.md)
- - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.GroupMembers](docs/GroupMembers.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.Handler](docs/Handler.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.InlineResponse200](docs/InlineResponse200.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.InlineResponse401](docs/InlineResponse401.md)
@@ -178,33 +161,19 @@ Class | Method | HTTP request | Description
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2ConsentRequest](docs/OAuth2ConsentRequest.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2TokenIntrospection](docs/OAuth2TokenIntrospection.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OauthTokenResponse](docs/OauthTokenResponse.md)
- - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.Policy](docs/Policy.md)
- - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.PolicyConditions](docs/PolicyConditions.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.RawMessage](docs/RawMessage.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerAcceptConsentRequest](docs/SwaggerAcceptConsentRequest.md)
- - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerCreatePolicyParameters](docs/SwaggerCreatePolicyParameters.md)
- - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerDoesWardenAllowAccessRequestParameters](docs/SwaggerDoesWardenAllowAccessRequestParameters.md)
- - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerDoesWardenAllowTokenAccessRequestParameters](docs/SwaggerDoesWardenAllowTokenAccessRequestParameters.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerFlushInactiveAccessTokens](docs/SwaggerFlushInactiveAccessTokens.md)
- - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerGetPolicyParameters](docs/SwaggerGetPolicyParameters.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerJsonWebKeyQuery](docs/SwaggerJsonWebKeyQuery.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerJwkCreateSet](docs/SwaggerJwkCreateSet.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerJwkSetQuery](docs/SwaggerJwkSetQuery.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerJwkUpdateSet](docs/SwaggerJwkUpdateSet.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerJwkUpdateSetKey](docs/SwaggerJwkUpdateSetKey.md)
- - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerListPolicyParameters](docs/SwaggerListPolicyParameters.md)
- - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerListPolicyResponse](docs/SwaggerListPolicyResponse.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerOAuthConsentRequestPayload](docs/SwaggerOAuthConsentRequestPayload.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerOAuthIntrospectionRequest](docs/SwaggerOAuthIntrospectionRequest.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerRejectConsentRequest](docs/SwaggerRejectConsentRequest.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerRevokeOAuth2TokenParameters](docs/SwaggerRevokeOAuth2TokenParameters.md)
- - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerUpdatePolicyParameters](docs/SwaggerUpdatePolicyParameters.md)
- - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.TokenAllowedRequest](docs/TokenAllowedRequest.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.UserinfoResponse](docs/UserinfoResponse.md)
- - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WardenAccessRequest](docs/WardenAccessRequest.md)
- - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WardenAccessRequestResponse](docs/WardenAccessRequestResponse.md)
- - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WardenTokenAccessRequest](docs/WardenTokenAccessRequest.md)
- - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WardenTokenAccessRequestResponse](docs/WardenTokenAccessRequestResponse.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WellKnown](docs/WellKnown.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.Writer](docs/Writer.md)
 
@@ -222,15 +191,6 @@ Class | Method | HTTP request | Description
 - **Flow**: accessCode
 - **Authorization URL**: https://your-hydra-instance.com/oauth2/auth
 - **Scopes**: 
-  - hydra.clients: A scope required to manage OAuth 2.0 Clients
-  - hydra.consent: A scope required to fetch and modify consent requests
-  - hydra.keys.create: A scope required to create JSON Web Keys
-  - hydra.keys.delete: A scope required to delete JSON Web Keys
-  - hydra.keys.get: A scope required to fetch JSON Web Keys
-  - hydra.keys.update: A scope required to get JSON Web Keys
-  - hydra.policies: A scope required to manage access control policies
-  - hydra.warden: A scope required to make access control inquiries
-  - hydra.warden.groups: A scope required to manage warden groups
   - offline: A scope required when requesting refresh tokens
   - openid: Request an OpenID Connect ID Token
 

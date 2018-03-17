@@ -34,7 +34,6 @@ import (
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/hydra/warden"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {
@@ -104,7 +103,6 @@ func newOAuth2Provider(c *config.Config) (fosite.OAuth2Provider, string) {
 		compose.OpenIDConnectImplicitFactory,
 		compose.OpenIDConnectRefreshFactory,
 		compose.OAuth2TokenRevocationFactory,
-		warden.OAuth2TokenIntrospectionFactory,
 	), publicKey.KeyID
 }
 
@@ -145,7 +143,6 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm oauth2.Con
 		CookieStore:         sessions.NewCookieStore(c.GetCookieSecret()),
 		Issuer:              c.Issuer,
 		L:                   c.GetLogger(),
-		W:                   c.Context().Warden,
 		ResourcePrefix:      c.AccessControlResourcePrefix,
 	}
 

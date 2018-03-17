@@ -29,14 +29,7 @@
   "paths": {
     "/.well-known/jwks.json": {
       "get": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.keys.get"
-            ]
-          }
-        ],
-        "description": "Returns metadata for discovering important JSON Web Keys. Currently, this endpoint returns the public key for verifying OpenID Connect ID Tokens.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:hydra.openid.id-token:public\"],\n\"actions\": [\"GET\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "Returns metadata for discovering important JSON Web Keys. Currently, this endpoint returns the public key for verifying OpenID Connect ID Tokens.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
         "consumes": [
           "application/json"
         ],
@@ -104,14 +97,7 @@
     },
     "/clients": {
       "get": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.clients"
-            ]
-          }
-        ],
-        "description": "This endpoint lists all clients in the database, and never returns client secrets.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "This endpoint lists all clients in the database, and never returns client secrets.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.",
         "consumes": [
           "application/json"
         ],
@@ -161,14 +147,7 @@
         }
       },
       "post": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.clients"
-            ]
-          }
-        ],
-        "description": "Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somwhere safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
+        "description": "Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somwhere safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
         "consumes": [
           "application/json"
         ],
@@ -215,14 +194,7 @@
     },
     "/clients/{id}": {
       "get": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.clients"
-            ]
-          }
-        ],
-        "description": "Get an OAUth 2.0 client by its ID. This endpoint never returns passwords.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients:\u003csome-id\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients:\u003csome-id\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
+        "description": "Get an OAUth 2.0 client by its ID. This endpoint never returns passwords.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.",
         "consumes": [
           "application/json"
         ],
@@ -268,14 +240,7 @@
         }
       },
       "put": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.clients"
-            ]
-          }
-        ],
-        "description": "Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
+        "description": "Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.",
         "consumes": [
           "application/json"
         ],
@@ -327,14 +292,7 @@
         }
       },
       "delete": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.clients"
-            ]
-          }
-        ],
-        "description": "Delete an existing OAuth 2.0 Client by its ID.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:clients:\u003csome-id\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients:\u003csome-id\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
+        "description": "Delete an existing OAuth 2.0 Client by its ID.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.",
         "consumes": [
           "application/json"
         ],
@@ -397,14 +355,7 @@
     },
     "/keys/{set}": {
       "get": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.keys.get"
-            ]
-          }
-        ],
-        "description": "This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
         "consumes": [
           "application/json"
         ],
@@ -449,14 +400,7 @@
         }
       },
       "put": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.keys.update"
-            ]
-          }
-        ],
-        "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
         "consumes": [
           "application/json"
         ],
@@ -508,14 +452,7 @@
         }
       },
       "post": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.keys.create"
-            ]
-          }
-        ],
-        "description": "This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
         "consumes": [
           "application/json"
         ],
@@ -567,14 +504,7 @@
         }
       },
       "delete": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.keys.delete"
-            ]
-          }
-        ],
-        "description": "Use this endpoint to delete a complete JSON Web Key Set and all the keys in that set.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "Use this endpoint to delete a complete JSON Web Key Set and all the keys in that set.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
         "consumes": [
           "application/json"
         ],
@@ -618,14 +548,7 @@
     },
     "/keys/{set}/{kid}": {
       "get": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.keys.get"
-            ]
-          }
-        ],
-        "description": "This endpoint can be used to retrieve JWKs stored in ORY Hydra.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "This endpoint can be used to retrieve JWKs stored in ORY Hydra.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
         "consumes": [
           "application/json"
         ],
@@ -678,14 +601,7 @@
         }
       },
       "put": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.keys.update"
-            ]
-          }
-        ],
-        "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
         "consumes": [
           "application/json"
         ],
@@ -745,14 +661,7 @@
         }
       },
       "delete": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.keys.delete"
-            ]
-          }
-        ],
-        "description": "Use this endpoint to delete a single JSON Web Key.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:keys:\u003cset\u003e:\u003ckid\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "Use this endpoint to delete a single JSON Web Key.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
         "consumes": [
           "application/json"
         ],
@@ -832,14 +741,7 @@
     },
     "/oauth2/consent/requests/{id}": {
       "get": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.consent"
-            ]
-          }
-        ],
-        "description": "Call this endpoint to receive information on consent requests. The consent request id is usually transmitted via the URL query `consent`.\nFor example: `http://consent-app.mydomain.com/?consent=1234abcd`\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:oauth2:consent:requests:\u003crequest-id\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "Call this endpoint to receive information on consent requests. The consent request id is usually transmitted via the URL query `consent`.\nFor example: `http://consent-app.mydomain.com/?consent=1234abcd`",
         "consumes": [
           "application/json"
         ],
@@ -884,14 +786,7 @@
     },
     "/oauth2/consent/requests/{id}/accept": {
       "patch": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.consent"
-            ]
-          }
-        ],
-        "description": "Call this endpoint to accept a consent request. This usually happens when a user agrees to give access rights to\nan application.\n\n\nThe consent request id is usually transmitted via the URL query `consent`.\nFor example: `http://consent-app.mydomain.com/?consent=1234abcd`\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:oauth2:consent:requests:\u003crequest-id\u003e\"],\n\"actions\": [\"accept\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "Call this endpoint to accept a consent request. This usually happens when a user agrees to give access rights to\nan application.\n\n\nThe consent request id is usually transmitted via the URL query `consent`.\nFor example: `http://consent-app.mydomain.com/?consent=1234abcd`",
         "consumes": [
           "application/json"
         ],
@@ -939,14 +834,7 @@
     },
     "/oauth2/consent/requests/{id}/reject": {
       "patch": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.consent"
-            ]
-          }
-        ],
-        "description": "Call this endpoint to reject a consent request. This usually happens when a user denies access rights to an\napplication.\n\n\nThe consent request id is usually transmitted via the URL query `consent`.\nFor example: `http://consent-app.mydomain.com/?consent=1234abcd`\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:oauth2:consent:requests:\u003crequest-id\u003e\"],\n\"actions\": [\"reject\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "Call this endpoint to reject a consent request. This usually happens when a user denies access rights to an\napplication.\n\n\nThe consent request id is usually transmitted via the URL query `consent`.\nFor example: `http://consent-app.mydomain.com/?consent=1234abcd`",
         "consumes": [
           "application/json"
         ],
@@ -994,16 +882,6 @@
     },
     "/oauth2/flush": {
       "post": {
-        "security": [
-          {
-            "basic": []
-          },
-          {
-            "oauth2": [
-              "hydra.oauth2.flush"
-            ]
-          }
-        ],
         "description": "This endpoint flushes expired OAuth2 access tokens from the database. You can set a time after which no tokens will be\nnot be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted\nautomatically when performing the refresh flow.\n\n\n```\n{\n\"resources\": [\"rn:hydra:oauth2:tokens\"],\n\"actions\": [\"flush\"],\n\"effect\": \"allow\"\n}\n```",
         "consumes": [
           "application/json"
@@ -1046,9 +924,7 @@
             "basic": []
           },
           {
-            "oauth2": [
-              "hydra.introspect"
-            ]
+            "oauth2": []
           }
         ],
         "description": "The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token\nis neither expired nor revoked. If a token is active, additional information on the token will be included. You can\nset additional data for a token by setting `accessTokenExtra` during the consent flow.\n\n```\n{\n\"resources\": [\"rn:hydra:oauth2:tokens\"],\n\"actions\": [\"introspect\"],\n\"effect\": \"allow\"\n}\n```",
@@ -1105,6 +981,9 @@
         "security": [
           {
             "basic": []
+          },
+          {
+            "oauth2": []
           }
         ],
         "description": "Revoking a token (both access and refresh) means that the tokens will be invalid. A revoked access token can no\nlonger be used to make access requests, and a revoked refresh token can no longer be used to refresh an access token.\nRevoking a refresh token also invalidates the access token that was created with it.",
@@ -1184,278 +1063,6 @@
         }
       }
     },
-    "/policies": {
-      "get": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.policies"
-            ]
-          }
-        ],
-        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies\"],\n\"actions\": [\"list\"],\n\"effect\": \"allow\"\n}\n```",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "policy"
-        ],
-        "summary": "List Access Control Policies",
-        "operationId": "listPolicies",
-        "parameters": [
-          {
-            "type": "integer",
-            "format": "int64",
-            "x-go-name": "Offset",
-            "description": "The offset from where to start looking.",
-            "name": "offset",
-            "in": "query"
-          },
-          {
-            "type": "integer",
-            "format": "int64",
-            "x-go-name": "Limit",
-            "description": "The maximum amount of policies returned.",
-            "name": "limit",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/responses/policyList"
-          },
-          "401": {
-            "$ref": "#/responses/genericError"
-          },
-          "403": {
-            "$ref": "#/responses/genericError"
-          },
-          "500": {
-            "$ref": "#/responses/genericError"
-          }
-        }
-      },
-      "post": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.policies"
-            ]
-          }
-        ],
-        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "policy"
-        ],
-        "summary": "Create an Access Control Policy",
-        "operationId": "createPolicy",
-        "parameters": [
-          {
-            "name": "Body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/policy"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "policy",
-            "schema": {
-              "$ref": "#/definitions/policy"
-            }
-          },
-          "401": {
-            "$ref": "#/responses/genericError"
-          },
-          "403": {
-            "$ref": "#/responses/genericError"
-          },
-          "500": {
-            "$ref": "#/responses/genericError"
-          }
-        }
-      }
-    },
-    "/policies/{id}": {
-      "get": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.policies"
-            ]
-          }
-        ],
-        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies:\u003cid\u003e\"],\n\"actions\": [\"get\"],\n\"effect\": \"allow\"\n}\n```",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "policy"
-        ],
-        "summary": "Get an Access Control Policy",
-        "operationId": "getPolicy",
-        "parameters": [
-          {
-            "type": "string",
-            "x-go-name": "ID",
-            "description": "The id of the policy.",
-            "name": "id",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "policy",
-            "schema": {
-              "$ref": "#/definitions/policy"
-            }
-          },
-          "401": {
-            "$ref": "#/responses/genericError"
-          },
-          "403": {
-            "$ref": "#/responses/genericError"
-          },
-          "500": {
-            "$ref": "#/responses/genericError"
-          }
-        }
-      },
-      "put": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.policies"
-            ]
-          }
-        ],
-        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies\"],\n\"actions\": [\"update\"],\n\"effect\": \"allow\"\n}\n```",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "policy"
-        ],
-        "summary": "Update an Access Control Polic",
-        "operationId": "updatePolicy",
-        "parameters": [
-          {
-            "type": "string",
-            "x-go-name": "ID",
-            "description": "The id of the policy.",
-            "name": "id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "name": "Body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/policy"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "policy",
-            "schema": {
-              "$ref": "#/definitions/policy"
-            }
-          },
-          "401": {
-            "$ref": "#/responses/genericError"
-          },
-          "403": {
-            "$ref": "#/responses/genericError"
-          },
-          "500": {
-            "$ref": "#/responses/genericError"
-          }
-        }
-      },
-      "delete": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.policies"
-            ]
-          }
-        ],
-        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:policies:\u003cid\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "policy"
-        ],
-        "summary": "Delete an Access Control Policy",
-        "operationId": "deletePolicy",
-        "parameters": [
-          {
-            "type": "string",
-            "x-go-name": "ID",
-            "description": "The id of the policy.",
-            "name": "id",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "204": {
-            "$ref": "#/responses/emptyResponse"
-          },
-          "401": {
-            "$ref": "#/responses/genericError"
-          },
-          "403": {
-            "$ref": "#/responses/genericError"
-          },
-          "500": {
-            "$ref": "#/responses/genericError"
-          }
-        }
-      }
-    },
     "/userinfo": {
       "post": {
         "security": [
@@ -1484,446 +1091,6 @@
             }
           },
           "401": {
-            "$ref": "#/responses/genericError"
-          },
-          "500": {
-            "$ref": "#/responses/genericError"
-          }
-        }
-      }
-    },
-    "/warden/allowed": {
-      "post": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.warden"
-            ]
-          }
-        ],
-        "description": "Checks if a subject (typically a user or a service) is allowed to perform an action on a resource. This endpoint requires a subject,\na resource name, an action name and a context. If the subject is not allowed to perform the action on the resource,\nthis endpoint returns a 200 response with `{ \"allowed\": false}`, otherwise `{ \"allowed\": true }` is returned.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:allowed\"],\n\"actions\": [\"decide\"],\n\"effect\": \"allow\"\n}\n```",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "warden"
-        ],
-        "summary": "Check if an access request is valid (without providing an access token)",
-        "operationId": "doesWardenAllowAccessRequest",
-        "parameters": [
-          {
-            "name": "Body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/wardenAccessRequest"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "wardenAccessRequestResponse",
-            "schema": {
-              "$ref": "#/definitions/wardenAccessRequestResponse"
-            }
-          },
-          "401": {
-            "$ref": "#/responses/genericError"
-          },
-          "403": {
-            "$ref": "#/responses/genericError"
-          },
-          "500": {
-            "$ref": "#/responses/genericError"
-          }
-        }
-      }
-    },
-    "/warden/groups": {
-      "get": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.warden.groups"
-            ]
-          }
-        ],
-        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups\"],\n\"actions\": [\"list\"],\n\"effect\": \"allow\"\n}\n```",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "warden"
-        ],
-        "summary": "List groups",
-        "operationId": "listGroups",
-        "parameters": [
-          {
-            "type": "string",
-            "x-go-name": "Member",
-            "description": "The id of the member to look up.",
-            "name": "member",
-            "in": "query"
-          },
-          {
-            "type": "integer",
-            "format": "int64",
-            "x-go-name": "Limit",
-            "description": "The maximum amount of policies returned.",
-            "name": "limit",
-            "in": "query"
-          },
-          {
-            "type": "integer",
-            "format": "int64",
-            "x-go-name": "Offset",
-            "description": "The offset from where to start looking.",
-            "name": "offset",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/responses/listGroupsResponse"
-          },
-          "401": {
-            "$ref": "#/responses/genericError"
-          },
-          "403": {
-            "$ref": "#/responses/genericError"
-          },
-          "500": {
-            "$ref": "#/responses/genericError"
-          }
-        }
-      },
-      "post": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.warden.groups"
-            ]
-          }
-        ],
-        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "warden"
-        ],
-        "summary": "Create a group",
-        "operationId": "createGroup",
-        "parameters": [
-          {
-            "name": "Body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/group"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "group",
-            "schema": {
-              "$ref": "#/definitions/group"
-            }
-          },
-          "401": {
-            "$ref": "#/responses/genericError"
-          },
-          "403": {
-            "$ref": "#/responses/genericError"
-          },
-          "500": {
-            "$ref": "#/responses/genericError"
-          }
-        }
-      }
-    },
-    "/warden/groups/{id}": {
-      "get": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.warden.groups"
-            ]
-          }
-        ],
-        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups:\u003cid\u003e\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\"\n}\n```",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "warden"
-        ],
-        "summary": "Get a group by id",
-        "operationId": "getGroup",
-        "parameters": [
-          {
-            "type": "string",
-            "x-go-name": "ID",
-            "description": "The id of the group to look up.",
-            "name": "id",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "group",
-            "schema": {
-              "$ref": "#/definitions/group"
-            }
-          },
-          "401": {
-            "$ref": "#/responses/genericError"
-          },
-          "403": {
-            "$ref": "#/responses/genericError"
-          },
-          "500": {
-            "$ref": "#/responses/genericError"
-          }
-        }
-      },
-      "delete": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.warden.groups"
-            ]
-          }
-        ],
-        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups:\u003cid\u003e\"],\n\"actions\": [\"delete\"],\n\"effect\": \"allow\"\n}\n```",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "warden"
-        ],
-        "summary": "Delete a group by id",
-        "operationId": "deleteGroup",
-        "parameters": [
-          {
-            "type": "string",
-            "x-go-name": "ID",
-            "description": "The id of the group to look up.",
-            "name": "id",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "204": {
-            "$ref": "#/responses/emptyResponse"
-          },
-          "401": {
-            "$ref": "#/responses/genericError"
-          },
-          "403": {
-            "$ref": "#/responses/genericError"
-          },
-          "500": {
-            "$ref": "#/responses/genericError"
-          }
-        }
-      }
-    },
-    "/warden/groups/{id}/members": {
-      "post": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.warden.groups"
-            ]
-          }
-        ],
-        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups:\u003cid\u003e\"],\n\"actions\": [\"members.add\"],\n\"effect\": \"allow\"\n}\n```",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "warden"
-        ],
-        "summary": "Add members to a group",
-        "operationId": "addMembersToGroup",
-        "parameters": [
-          {
-            "type": "string",
-            "x-go-name": "ID",
-            "description": "The id of the group to modify.",
-            "name": "id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "name": "Body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/groupMembers"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "$ref": "#/responses/emptyResponse"
-          },
-          "401": {
-            "$ref": "#/responses/genericError"
-          },
-          "403": {
-            "$ref": "#/responses/genericError"
-          },
-          "500": {
-            "$ref": "#/responses/genericError"
-          }
-        }
-      },
-      "delete": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.warden.groups"
-            ]
-          }
-        ],
-        "description": "The subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:groups:\u003cid\u003e\"],\n\"actions\": [\"members.remove\"],\n\"effect\": \"allow\"\n}\n```",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "warden"
-        ],
-        "summary": "Remove members from a group",
-        "operationId": "removeMembersFromGroup",
-        "parameters": [
-          {
-            "type": "string",
-            "x-go-name": "ID",
-            "description": "The id of the group to modify.",
-            "name": "id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "name": "Body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/groupMembers"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "$ref": "#/responses/emptyResponse"
-          },
-          "401": {
-            "$ref": "#/responses/genericError"
-          },
-          "403": {
-            "$ref": "#/responses/genericError"
-          },
-          "500": {
-            "$ref": "#/responses/genericError"
-          }
-        }
-      }
-    },
-    "/warden/token/allowed": {
-      "post": {
-        "security": [
-          {
-            "oauth2": [
-              "hydra.warden"
-            ]
-          }
-        ],
-        "description": "Checks if a token is valid and if the token subject is allowed to perform an action on a resource.\nThis endpoint requires a token, a scope, a resource name, an action name and a context.\n\n\nIf a token is expired/invalid, has not been granted the requested scope or the subject is not allowed to\nperform the action on the resource, this endpoint returns a 200 response with `{ \"allowed\": false}`.\n\n\nExtra data set through the `accessTokenExtra` field in the consent flow will be included in the response.\n\n\nThe subject making the request needs to be assigned to a policy containing:\n\n```\n{\n\"resources\": [\"rn:hydra:warden:token:allowed\"],\n\"actions\": [\"decide\"],\n\"effect\": \"allow\"\n}\n```",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "warden"
-        ],
-        "summary": "Check if an access request is valid (providing an access token)",
-        "operationId": "doesWardenAllowTokenAccessRequest",
-        "parameters": [
-          {
-            "name": "Body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/wardenTokenAccessRequest"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "wardenTokenAccessRequestResponse",
-            "schema": {
-              "$ref": "#/definitions/wardenTokenAccessRequestResponse"
-            }
-          },
-          "401": {
-            "$ref": "#/responses/genericError"
-          },
-          "403": {
             "$ref": "#/responses/genericError"
           },
           "500": {
@@ -1974,61 +1141,6 @@
       "type": "object",
       "x-go-package": "github.com/ory/hydra/oauth2"
     },
-    "Context": {
-      "description": "Context contains an access token's session data",
-      "type": "object",
-      "properties": {
-        "accessTokenExtra": {
-          "description": "Extra represents arbitrary session data.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "object"
-          },
-          "x-go-name": "Extra"
-        },
-        "clientId": {
-          "description": "ClientID is id of the client the token was issued for..",
-          "type": "string",
-          "x-go-name": "ClientID"
-        },
-        "expiresAt": {
-          "description": "ExpiresAt is the expiry timestamp.",
-          "type": "string",
-          "format": "date-time",
-          "x-go-name": "ExpiresAt"
-        },
-        "grantedScopes": {
-          "description": "GrantedScopes is a list of scopes that the subject authorized when asked for consent.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "x-go-name": "GrantedScopes"
-        },
-        "issuedAt": {
-          "description": "IssuedAt is the token creation time stamp.",
-          "type": "string",
-          "format": "date-time",
-          "x-go-name": "IssuedAt"
-        },
-        "issuer": {
-          "description": "Issuer is the id of the issuer, typically an hydra instance.",
-          "type": "string",
-          "x-go-name": "Issuer"
-        },
-        "subject": {
-          "description": "Subject is the identity that authorized issuing the token, for example a user or an OAuth2 app.\nThis is usually a uuid but you can choose a urn or some other id too.",
-          "type": "string",
-          "x-go-name": "Subject"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/firewall"
-    },
-    "Firewall": {
-      "type": "object",
-      "title": "Firewall offers various validation strategies for access tokens.",
-      "x-go-package": "github.com/ory/hydra/firewall"
-    },
     "Handler": {
       "type": "object",
       "properties": {
@@ -2046,9 +1158,6 @@
         },
         "ResourcePrefix": {
           "type": "string"
-        },
-        "W": {
-          "$ref": "#/definitions/Firewall"
         }
       },
       "x-go-package": "github.com/ory/hydra/jwk"
@@ -2059,7 +1168,7 @@
     },
     "Manager": {
       "type": "object",
-      "x-go-package": "github.com/ory/hydra/warden/group"
+      "x-go-package": "github.com/ory/hydra/jwk"
     },
     "RawMessage": {
       "description": "It implements Marshaler and Unmarshaler and can\nbe used to delay JSON decoding or precompute a JSON encoding.",
@@ -2138,41 +1247,6 @@
       },
       "x-go-name": "FlushInactiveOAuth2TokensRequest",
       "x-go-package": "github.com/ory/hydra/oauth2"
-    },
-    "group": {
-      "description": "Group represents a warden group",
-      "type": "object",
-      "properties": {
-        "id": {
-          "description": "ID is the groups id.",
-          "type": "string",
-          "x-go-name": "ID"
-        },
-        "members": {
-          "description": "Members is who belongs to the group.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "x-go-name": "Members"
-        }
-      },
-      "x-go-name": "Group",
-      "x-go-package": "github.com/ory/hydra/warden/group"
-    },
-    "groupMembers": {
-      "type": "object",
-      "properties": {
-        "members": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "x-go-name": "Members"
-        }
-      },
-      "x-go-name": "membersRequest",
-      "x-go-package": "github.com/ory/hydra/warden/group"
     },
     "joseWebKeySetRequest": {
       "type": "object",
@@ -2544,73 +1618,6 @@
       "x-go-name": "swaggerOAuthTokenResponse",
       "x-go-package": "github.com/ory/hydra/oauth2"
     },
-    "policy": {
-      "type": "object",
-      "properties": {
-        "actions": {
-          "description": "Actions impacted by the policy.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "x-go-name": "Actions"
-        },
-        "conditions": {
-          "description": "Conditions under which the policy is active.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "options": {
-                "type": "object",
-                "additionalProperties": {
-                  "type": "object"
-                },
-                "x-go-name": "Options"
-              },
-              "type": {
-                "type": "string",
-                "x-go-name": "Type"
-              }
-            }
-          },
-          "x-go-name": "Conditions"
-        },
-        "description": {
-          "description": "Description of the policy.",
-          "type": "string",
-          "x-go-name": "Description"
-        },
-        "effect": {
-          "description": "Effect of the policy",
-          "type": "string",
-          "x-go-name": "Effect"
-        },
-        "id": {
-          "description": "ID of the policy.",
-          "type": "string",
-          "x-go-name": "ID"
-        },
-        "resources": {
-          "description": "Resources impacted by the policy.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "x-go-name": "Resources"
-        },
-        "subjects": {
-          "description": "Subjects impacted by the policy.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "x-go-name": "Subjects"
-        }
-      },
-      "x-go-name": "swaggerPolicy",
-      "x-go-package": "github.com/ory/hydra/policy"
-    },
     "swaggerAcceptConsentRequest": {
       "type": "object",
       "required": [
@@ -2629,33 +1636,6 @@
       },
       "x-go-package": "github.com/ory/hydra/oauth2"
     },
-    "swaggerCreatePolicyParameters": {
-      "type": "object",
-      "properties": {
-        "Body": {
-          "$ref": "#/definitions/policy"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/policy"
-    },
-    "swaggerDoesWardenAllowAccessRequestParameters": {
-      "type": "object",
-      "properties": {
-        "Body": {
-          "$ref": "#/definitions/wardenAccessRequest"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/warden"
-    },
-    "swaggerDoesWardenAllowTokenAccessRequestParameters": {
-      "type": "object",
-      "properties": {
-        "Body": {
-          "$ref": "#/definitions/wardenTokenAccessRequest"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/warden"
-    },
     "swaggerFlushInactiveAccessTokens": {
       "type": "object",
       "properties": {
@@ -2664,17 +1644,6 @@
         }
       },
       "x-go-package": "github.com/ory/hydra/oauth2"
-    },
-    "swaggerGetPolicyParameters": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "description": "The id of the policy.\nin: path",
-          "type": "string",
-          "x-go-name": "ID"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/policy"
     },
     "swaggerJsonWebKeyQuery": {
       "type": "object",
@@ -2767,38 +1736,6 @@
       },
       "x-go-package": "github.com/ory/hydra/jwk"
     },
-    "swaggerListPolicyParameters": {
-      "type": "object",
-      "properties": {
-        "limit": {
-          "description": "The maximum amount of policies returned.\nin: query",
-          "type": "integer",
-          "format": "int64",
-          "x-go-name": "Limit"
-        },
-        "offset": {
-          "description": "The offset from where to start looking.\nin: query",
-          "type": "integer",
-          "format": "int64",
-          "x-go-name": "Offset"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/policy"
-    },
-    "swaggerListPolicyResponse": {
-      "description": "A policy",
-      "type": "object",
-      "properties": {
-        "Body": {
-          "description": "in: body\ntype: array",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/policy"
-          }
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/policy"
-    },
     "swaggerOAuthConsentRequestPayload": {
       "type": "object",
       "required": [
@@ -2864,45 +1801,6 @@
         }
       },
       "x-go-package": "github.com/ory/hydra/oauth2"
-    },
-    "swaggerUpdatePolicyParameters": {
-      "type": "object",
-      "properties": {
-        "Body": {
-          "$ref": "#/definitions/policy"
-        },
-        "id": {
-          "description": "The id of the policy.\nin: path",
-          "type": "string",
-          "x-go-name": "ID"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/policy"
-    },
-    "tokenAllowedRequest": {
-      "type": "object",
-      "properties": {
-        "action": {
-          "description": "Action is the action that is requested on the resource.",
-          "type": "string",
-          "x-go-name": "Action"
-        },
-        "context": {
-          "description": "Context is the request's environmental context.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "object"
-          },
-          "x-go-name": "Context"
-        },
-        "resource": {
-          "description": "Resource is the resource that access is requested to.",
-          "type": "string",
-          "x-go-name": "Resource"
-        }
-      },
-      "x-go-name": "TokenAccessRequest",
-      "x-go-package": "github.com/ory/hydra/firewall"
     },
     "userinfoResponse": {
       "description": "The userinfo response",
@@ -3007,142 +1905,6 @@
       },
       "x-go-name": "swaggeruserinfoResponsePayload",
       "x-go-package": "github.com/ory/hydra/oauth2"
-    },
-    "wardenAccessRequest": {
-      "type": "object",
-      "title": "AccessRequest is the warden's request object.",
-      "properties": {
-        "action": {
-          "description": "Action is the action that is requested on the resource.",
-          "type": "string",
-          "x-go-name": "Action"
-        },
-        "context": {
-          "description": "Context is the request's environmental context.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "object"
-          },
-          "x-go-name": "Context"
-        },
-        "resource": {
-          "description": "Resource is the resource that access is requested to.",
-          "type": "string",
-          "x-go-name": "Resource"
-        },
-        "subject": {
-          "description": "Subejct is the subject that is requesting access.",
-          "type": "string",
-          "x-go-name": "Subject"
-        }
-      },
-      "x-go-name": "AccessRequest",
-      "x-go-package": "github.com/ory/hydra/firewall"
-    },
-    "wardenAccessRequestResponse": {
-      "description": "The warden access request response",
-      "type": "object",
-      "properties": {
-        "allowed": {
-          "description": "Allowed is true if the request is allowed and false otherwise.",
-          "type": "boolean",
-          "x-go-name": "Allowed"
-        }
-      },
-      "x-go-name": "swaggerWardenAccessRequestResponse",
-      "x-go-package": "github.com/ory/hydra/warden"
-    },
-    "wardenTokenAccessRequest": {
-      "type": "object",
-      "properties": {
-        "action": {
-          "description": "Action is the action that is requested on the resource.",
-          "type": "string",
-          "x-go-name": "Action"
-        },
-        "context": {
-          "description": "Context is the request's environmental context.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "object"
-          },
-          "x-go-name": "Context"
-        },
-        "resource": {
-          "description": "Resource is the resource that access is requested to.",
-          "type": "string",
-          "x-go-name": "Resource"
-        },
-        "scopes": {
-          "description": "Scopes is an array of scopes that are requried.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "x-go-name": "Scopes"
-        },
-        "token": {
-          "description": "Token is the token to introspect.",
-          "type": "string",
-          "x-go-name": "Token"
-        }
-      },
-      "x-go-name": "swaggerWardenTokenAccessRequest",
-      "x-go-package": "github.com/ory/hydra/warden"
-    },
-    "wardenTokenAccessRequestResponse": {
-      "description": "The warden access request (with token) response",
-      "type": "object",
-      "properties": {
-        "accessTokenExtra": {
-          "description": "Extra represents arbitrary session data.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "object"
-          },
-          "x-go-name": "Extra"
-        },
-        "allowed": {
-          "description": "Allowed is true if the request is allowed and false otherwise.",
-          "type": "boolean",
-          "x-go-name": "Allowed"
-        },
-        "clientId": {
-          "description": "ClientID is the id of the OAuth2 client that requested the token.",
-          "type": "string",
-          "x-go-name": "ClientID"
-        },
-        "expiresAt": {
-          "description": "ExpiresAt is the expiry timestamp.",
-          "type": "string",
-          "x-go-name": "ExpiresAt"
-        },
-        "grantedScopes": {
-          "description": "GrantedScopes is a list of scopes that the subject authorized when asked for consent.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "x-go-name": "GrantedScopes"
-        },
-        "issuedAt": {
-          "description": "IssuedAt is the token creation time stamp.",
-          "type": "string",
-          "x-go-name": "IssuedAt"
-        },
-        "issuer": {
-          "description": "Issuer is the id of the issuer, typically an hydra instance.",
-          "type": "string",
-          "x-go-name": "Issuer"
-        },
-        "subject": {
-          "description": "Subject is the identity that authorized issuing the token, for example a user or an OAuth2 app.\nThis is usually a uuid but you can choose a urn or some other id too.",
-          "type": "string",
-          "x-go-name": "Subject"
-        }
-      },
-      "x-go-name": "swaggerWardenTokenAccessRequestResponsePayload",
-      "x-go-package": "github.com/ory/hydra/warden"
     },
     "wellKnown": {
       "type": "object",
@@ -3290,30 +2052,12 @@
         }
       }
     },
-    "listGroupsResponse": {
-      "description": "A list of groups the member is belonging to",
-      "schema": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/group"
-        }
-      }
-    },
     "oAuth2ClientList": {
       "description": "A list of clients.",
       "schema": {
         "type": "array",
         "items": {
           "$ref": "#/definitions/oAuth2Client"
-        }
-      }
-    },
-    "policyList": {
-      "description": "A policy",
-      "schema": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/policy"
         }
       }
     }
@@ -3328,15 +2072,6 @@
       "authorizationUrl": "https://your-hydra-instance.com/oauth2/auth",
       "tokenUrl": "https://your-hydra-instance.com/oauth2/token",
       "scopes": {
-        "hydra.clients": "A scope required to manage OAuth 2.0 Clients",
-        "hydra.consent": "A scope required to fetch and modify consent requests",
-        "hydra.keys.create": "A scope required to create JSON Web Keys",
-        "hydra.keys.delete": "A scope required to delete JSON Web Keys",
-        "hydra.keys.get": "A scope required to fetch JSON Web Keys",
-        "hydra.keys.update": "A scope required to get JSON Web Keys",
-        "hydra.policies": "A scope required to manage access control policies",
-        "hydra.warden": "A scope required to make access control inquiries",
-        "hydra.warden.groups": "A scope required to manage warden groups",
         "offline": "A scope required when requesting refresh tokens",
         "openid": "Request an OpenID Connect ID Token"
       }

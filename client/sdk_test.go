@@ -26,12 +26,9 @@ import (
 	"testing"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory/fosite"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/compose"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
-	"github.com/ory/ladon"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -56,26 +53,15 @@ func createTestClient(prefix string) hydra.OAuth2Client {
 
 func TestClientSDK(t *testing.T) {
 	manager := client.NewMemoryManager(nil)
-
-	localWarden, httpClient := compose.NewMockFirewall("foo", "alice", fosite.Arguments{client.Scope}, &ladon.DefaultPolicy{
-		ID:        "1",
-		Subjects:  []string{"alice"},
-		Resources: []string{"rn:hydra:clients<.*>"},
-		Actions:   []string{"create", "get", "delete", "update"},
-		Effect:    ladon.AllowAccess,
-	})
-
 	handler := &client.Handler{
 		Manager: manager,
 		H:       herodot.NewJSONWriter(nil),
-		W:       localWarden,
 	}
 
 	router := httprouter.New()
 	handler.SetRoutes(router)
 	server := httptest.NewServer(router)
 	c := hydra.NewOAuth2ApiWithBasePath(server.URL)
-	c.Configuration.Transport = httpClient.Transport
 
 	t.Run("case=client is created and updated", func(t *testing.T) {
 		createClient := createTestClient("")

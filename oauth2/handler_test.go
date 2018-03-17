@@ -38,10 +38,8 @@ import (
 	"github.com/ory/fosite/storage"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
-	c2 "github.com/ory/hydra/compose"
 	"github.com/ory/hydra/oauth2"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
-	"github.com/ory/ladon"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -79,24 +77,9 @@ var flushRequests = []*fosite.Request{
 }
 
 func TestHandlerFlushHandler(t *testing.T) {
-	localWarden, httpClient := c2.NewMockFirewall(
-		"tests",
-		"alice",
-		fosite.Arguments{
-			"hydra.oauth2.flush",
-		}, &ladon.DefaultPolicy{
-			ID:        "1",
-			Subjects:  []string{"<.*>"},
-			Resources: []string{"rn:hydra:oauth2:tokens"},
-			Actions:   []string{"flush"},
-			Effect:    ladon.AllowAccess,
-		},
-	)
-
 	store := oauth2.NewFositeMemoryStore(nil, lifespan)
 	h := &oauth2.Handler{
 		H:             herodot.NewJSONWriter(nil),
-		W:             localWarden,
 		ScopeStrategy: fosite.HierarchicScopeStrategy,
 		Issuer:        "http://hydra.localhost",
 		Storage:       store,
@@ -110,7 +93,6 @@ func TestHandlerFlushHandler(t *testing.T) {
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)
 	c := hydra.NewOAuth2ApiWithBasePath(ts.URL)
-	c.Configuration.Transport = httpClient.Transport
 
 	ds := new(fosite.DefaultSession)
 	ctx := context.Background()

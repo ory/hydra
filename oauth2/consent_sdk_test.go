@@ -27,12 +27,9 @@ import (
 	"time"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory/fosite"
 	"github.com/ory/herodot"
-	"github.com/ory/hydra/compose"
 	. "github.com/ory/hydra/oauth2"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
-	"github.com/ory/ladon"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -54,23 +51,15 @@ func TestConsentSDK(t *testing.T) {
 	}
 
 	memm := NewConsentRequestMemoryManager()
-	var localWarden, httpClient = compose.NewMockFirewall("foo", "app-client", fosite.Arguments{ConsentScope}, &ladon.DefaultPolicy{
-		ID:        "1",
-		Subjects:  []string{"app-client"},
-		Resources: []string{"rn:hydra:oauth2:consent:requests:<.*>"},
-		Actions:   []string{"get", "accept", "reject"},
-		Effect:    ladon.AllowAccess,
-	})
 
 	require.NoError(t, memm.PersistConsentRequest(req))
-	h := &ConsentSessionHandler{M: memm, W: localWarden, H: herodot.NewJSONWriter(nil)}
+	h := &ConsentSessionHandler{M: memm, H: herodot.NewJSONWriter(nil)}
 
 	r := httprouter.New()
 	h.SetRoutes(r)
 	server := httptest.NewServer(r)
 
 	client := hydra.NewOAuth2ApiWithBasePath(server.URL)
-	client.Configuration.Transport = httpClient.Transport
 
 	got, _, err := client.GetOAuth2ConsentRequest(req.ID)
 	require.NoError(t, err)

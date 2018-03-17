@@ -57,8 +57,7 @@ class Handler implements ArrayAccess
         'generators' => 'map[string,\Hydra\SDK\Model\KeyGenerator]',
         'h' => '\Hydra\SDK\Model\Writer',
         'manager' => '\Hydra\SDK\Model\Manager',
-        'resource_prefix' => 'string',
-        'w' => '\Hydra\SDK\Model\Firewall'
+        'resource_prefix' => 'string'
     ];
 
     /**
@@ -69,8 +68,7 @@ class Handler implements ArrayAccess
         'generators' => null,
         'h' => null,
         'manager' => null,
-        'resource_prefix' => null,
-        'w' => null
+        'resource_prefix' => null
     ];
 
     public static function swaggerTypes()
@@ -91,8 +89,7 @@ class Handler implements ArrayAccess
         'generators' => 'Generators',
         'h' => 'H',
         'manager' => 'Manager',
-        'resource_prefix' => 'ResourcePrefix',
-        'w' => 'W'
+        'resource_prefix' => 'ResourcePrefix'
     ];
 
 
@@ -104,8 +101,7 @@ class Handler implements ArrayAccess
         'generators' => 'setGenerators',
         'h' => 'setH',
         'manager' => 'setManager',
-        'resource_prefix' => 'setResourcePrefix',
-        'w' => 'setW'
+        'resource_prefix' => 'setResourcePrefix'
     ];
 
 
@@ -117,8 +113,7 @@ class Handler implements ArrayAccess
         'generators' => 'getGenerators',
         'h' => 'getH',
         'manager' => 'getManager',
-        'resource_prefix' => 'getResourcePrefix',
-        'w' => 'getW'
+        'resource_prefix' => 'getResourcePrefix'
     ];
 
     public static function attributeMap()
@@ -156,7 +151,6 @@ class Handler implements ArrayAccess
         $this->container['h'] = isset($data['h']) ? $data['h'] : null;
         $this->container['manager'] = isset($data['manager']) ? $data['manager'] : null;
         $this->container['resource_prefix'] = isset($data['resource_prefix']) ? $data['resource_prefix'] : null;
-        $this->container['w'] = isset($data['w']) ? $data['w'] : null;
     }
 
     /**
@@ -264,27 +258,6 @@ class Handler implements ArrayAccess
     public function setResourcePrefix($resource_prefix)
     {
         $this->container['resource_prefix'] = $resource_prefix;
-
-        return $this;
-    }
-
-    /**
-     * Gets w
-     * @return \Hydra\SDK\Model\Firewall
-     */
-    public function getW()
-    {
-        return $this->container['w'];
-    }
-
-    /**
-     * Sets w
-     * @param \Hydra\SDK\Model\Firewall $w
-     * @return $this
-     */
-    public function setW($w)
-    {
-        $this->container['w'] = $w;
 
         return $this;
     }

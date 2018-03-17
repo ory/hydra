@@ -31,11 +31,9 @@ import (
 	"github.com/ory/fosite/compose"
 	"github.com/ory/herodot"
 	hc "github.com/ory/hydra/client"
-	hcompose "github.com/ory/hydra/compose"
 	. "github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
-	"github.com/ory/ladon"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
@@ -92,14 +90,6 @@ var ts *httptest.Server
 var oauthConfig *oauth2.Config
 var oauthClientConfig *clientcredentials.Config
 
-var localWarden, httpClient = hcompose.NewMockFirewall("foo", "app-client", fosite.Arguments{ConsentScope}, &ladon.DefaultPolicy{
-	ID:        "1",
-	Subjects:  []string{"app-client"},
-	Resources: []string{"rn:hydra:oauth2:consent:requests:<.*>"},
-	Actions:   []string{"get", "accept", "reject"},
-	Effect:    ladon.AllowAccess,
-})
-
 var consentHandler *ConsentSessionHandler
 var consentManager = NewConsentRequestMemoryManager()
 var consentClient *hydra.OAuth2Api
@@ -107,7 +97,6 @@ var consentClient *hydra.OAuth2Api
 func init() {
 	consentHandler = &ConsentSessionHandler{
 		H: herodot.NewJSONWriter(nil),
-		W: localWarden,
 		M: consentManager,
 	}
 
@@ -119,7 +108,6 @@ func init() {
 
 	h, _ := hasher.Hash([]byte("secret"))
 	consentClient = hydra.NewOAuth2ApiWithBasePath(ts.URL)
-	consentClient.Configuration.Transport = httpClient.Transport
 
 	c, _ := url.Parse(ts.URL + "/consent")
 	handler.ConsentURL = *c

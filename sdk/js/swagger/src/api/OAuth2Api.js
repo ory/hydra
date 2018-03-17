@@ -117,7 +117,7 @@
 
     /**
      * Accept a consent request
-     * Call this endpoint to accept a consent request. This usually happens when a user agrees to give access rights to an application.   The consent request id is usually transmitted via the URL query &#x60;consent&#x60;. For example: &#x60;http://consent-app.mydomain.com/?consent&#x3D;1234abcd&#x60;   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;accept\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * Call this endpoint to accept a consent request. This usually happens when a user agrees to give access rights to an application.   The consent request id is usually transmitted via the URL query &#x60;consent&#x60;. For example: &#x60;http://consent-app.mydomain.com/?consent&#x3D;1234abcd&#x60;
      * @param {String} id 
      * @param {module:model/ConsentRequestAcceptance} body 
      * @param {module:api/OAuth2Api~acceptOAuth2ConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
@@ -146,7 +146,7 @@
       var headerParams = {}
       var formParams = {}
 
-      var authNames = ['oauth2']
+      var authNames = []
       var contentTypes = ['application/json']
       var accepts = ['application/json']
       var returnType = null
@@ -177,7 +177,7 @@
 
     /**
      * Create an OAuth 2.0 client
-     * Create a new OAuth 2.0 client If you pass &#x60;client_secret&#x60; the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somwhere safe.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
+     * Create a new OAuth 2.0 client If you pass &#x60;client_secret&#x60; the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somwhere safe.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
      * @param {module:model/OAuth2Client} body 
      * @param {module:api/OAuth2Api~createOAuth2ClientCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/OAuth2Client}
@@ -197,7 +197,7 @@
       var headerParams = {}
       var formParams = {}
 
-      var authNames = ['oauth2']
+      var authNames = []
       var contentTypes = ['application/json']
       var accepts = ['application/json']
       var returnType = OAuth2Client
@@ -228,7 +228,7 @@
 
     /**
      * Deletes an OAuth 2.0 Client
-     * Delete an existing OAuth 2.0 Client by its ID.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;delete\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;delete\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
+     * Delete an existing OAuth 2.0 Client by its ID.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
      * @param {String} id The id of the OAuth 2.0 Client.
      * @param {module:api/OAuth2Api~deleteOAuth2ClientCallback} callback The callback function, accepting three arguments: error, data, response
      */
@@ -249,7 +249,7 @@
       var headerParams = {}
       var formParams = {}
 
-      var authNames = ['oauth2']
+      var authNames = []
       var contentTypes = ['application/json']
       var accepts = ['application/json']
       var returnType = null
@@ -294,7 +294,7 @@
       var headerParams = {}
       var formParams = {}
 
-      var authNames = ['basic', 'oauth2']
+      var authNames = []
       var contentTypes = ['application/json']
       var accepts = ['application/json']
       var returnType = null
@@ -325,7 +325,7 @@
 
     /**
      * Get an OAuth 2.0 Client.
-     * Get an OAUth 2.0 client by its ID. This endpoint never returns passwords.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients:&lt;some-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
+     * Get an OAUth 2.0 client by its ID. This endpoint never returns passwords.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
      * @param {String} id The id of the OAuth 2.0 Client.
      * @param {module:api/OAuth2Api~getOAuth2ClientCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/OAuth2Client}
@@ -347,7 +347,7 @@
       var headerParams = {}
       var formParams = {}
 
-      var authNames = ['oauth2']
+      var authNames = []
       var contentTypes = ['application/json']
       var accepts = ['application/json']
       var returnType = OAuth2Client
@@ -378,7 +378,7 @@
 
     /**
      * Receive consent request information
-     * Call this endpoint to receive information on consent requests. The consent request id is usually transmitted via the URL query &#x60;consent&#x60;. For example: &#x60;http://consent-app.mydomain.com/?consent&#x3D;1234abcd&#x60;   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * Call this endpoint to receive information on consent requests. The consent request id is usually transmitted via the URL query &#x60;consent&#x60;. For example: &#x60;http://consent-app.mydomain.com/?consent&#x3D;1234abcd&#x60;
      * @param {String} id The id of the OAuth 2.0 Consent Request.
      * @param {module:api/OAuth2Api~getOAuth2ConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/OAuth2ConsentRequest}
@@ -400,7 +400,7 @@
       var headerParams = {}
       var formParams = {}
 
-      var authNames = ['oauth2']
+      var authNames = []
       var contentTypes = ['application/json']
       var accepts = ['application/json']
       var returnType = OAuth2ConsentRequest
@@ -534,7 +534,7 @@
 
     /**
      * List OAuth 2.0 Clients
-     * This endpoint lists all clients in the database, and never returns client secrets.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * This endpoint lists all clients in the database, and never returns client secrets.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
      * @param {Object} opts Optional parameters
      * @param {Number} opts.limit The maximum amount of policies returned.
      * @param {Number} opts.offset The offset from where to start looking.
@@ -553,7 +553,7 @@
       var headerParams = {}
       var formParams = {}
 
-      var authNames = ['oauth2']
+      var authNames = []
       var contentTypes = ['application/json']
       var accepts = ['application/json']
       var returnType = [OAuth2Client]
@@ -669,7 +669,7 @@
 
     /**
      * Reject a consent request
-     * Call this endpoint to reject a consent request. This usually happens when a user denies access rights to an application.   The consent request id is usually transmitted via the URL query &#x60;consent&#x60;. For example: &#x60;http://consent-app.mydomain.com/?consent&#x3D;1234abcd&#x60;   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:consent:requests:&lt;request-id&gt;\&quot;], \&quot;actions\&quot;: [\&quot;reject\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * Call this endpoint to reject a consent request. This usually happens when a user denies access rights to an application.   The consent request id is usually transmitted via the URL query &#x60;consent&#x60;. For example: &#x60;http://consent-app.mydomain.com/?consent&#x3D;1234abcd&#x60;
      * @param {String} id 
      * @param {module:model/ConsentRequestRejection} body 
      * @param {module:api/OAuth2Api~rejectOAuth2ConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
@@ -698,7 +698,7 @@
       var headerParams = {}
       var formParams = {}
 
-      var authNames = ['oauth2']
+      var authNames = []
       var contentTypes = ['application/json']
       var accepts = ['application/json']
       var returnType = null
@@ -750,7 +750,7 @@
         token: token
       }
 
-      var authNames = ['basic']
+      var authNames = ['basic', 'oauth2']
       var contentTypes = ['application/x-www-form-urlencoded']
       var accepts = ['application/json']
       var returnType = null
@@ -781,7 +781,7 @@
 
     /**
      * Update an OAuth 2.0 Client
-     * Update an existing OAuth 2.0 Client. If you pass &#x60;client_secret&#x60; the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;update\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
+     * Update an existing OAuth 2.0 Client. If you pass &#x60;client_secret&#x60; the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
      * @param {String} id 
      * @param {module:model/OAuth2Client} body 
      * @param {module:api/OAuth2Api~updateOAuth2ClientCallback} callback The callback function, accepting three arguments: error, data, response
@@ -811,7 +811,7 @@
       var headerParams = {}
       var formParams = {}
 
-      var authNames = ['oauth2']
+      var authNames = []
       var contentTypes = ['application/json']
       var accepts = ['application/json']
       var returnType = OAuth2Client
@@ -888,7 +888,7 @@
 
     /**
      * Get Well-Known JSON Web Keys
-     * Returns metadata for discovering important JSON Web Keys. Currently, this endpoint returns the public key for verifying OpenID Connect ID Tokens.  A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.  The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:keys:hydra.openid.id-token:public\&quot;], \&quot;actions\&quot;: [\&quot;GET\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
+     * Returns metadata for discovering important JSON Web Keys. Currently, this endpoint returns the public key for verifying OpenID Connect ID Tokens.  A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
      * @param {module:api/OAuth2Api~wellKnownCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/JsonWebKeySet}
      */
@@ -900,7 +900,7 @@
       var headerParams = {}
       var formParams = {}
 
-      var authNames = ['oauth2']
+      var authNames = []
       var contentTypes = ['application/json']
       var accepts = ['application/json']
       var returnType = JsonWebKeySet

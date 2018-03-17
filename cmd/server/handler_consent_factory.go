@@ -53,10 +53,8 @@ func injectConsentManager(c *config.Config) {
 }
 
 func newConsentHanlder(c *config.Config, router *httprouter.Router) *oauth2.ConsentSessionHandler {
-	ctx := c.Context()
 	h := &oauth2.ConsentSessionHandler{
-		H: herodot.NewJSONWriter(c.GetLogger()),
-		W: ctx.Warden, M: ctx.ConsentManager,
+		H:              herodot.NewJSONWriter(c.GetLogger()),
 		ResourcePrefix: c.AccessControlResourcePrefix,
 	}
 

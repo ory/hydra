@@ -29,7 +29,6 @@ import (
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/hydra/warden/group"
 	"github.com/ory/ladon"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -99,20 +98,6 @@ func (c *PluginConnection) NewClientManager() (client.Manager, error) {
 		return nil, errors.New("Unable to type assert `NewClientManager`")
 	} else {
 		return m(c.db, ctx.Hasher), nil
-	}
-}
-
-func (c *PluginConnection) NewGroupManager() (group.Manager, error) {
-	if err := c.load(); err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	if l, err := c.plugin.Lookup("NewGroupManager"); err != nil {
-		return nil, errors.Wrap(err, "Unable to look up `NewGroupManager`")
-	} else if m, ok := l.(func(*sqlx.DB) group.Manager); !ok {
-		return nil, errors.New("Unable to type assert `NewGroupManager`")
-	} else {
-		return m(c.db), nil
 	}
 }
 

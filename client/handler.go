@@ -22,14 +22,11 @@ package client
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
-	"github.com/ory/hydra/firewall"
 	"github.com/ory/hydra/rand/sequence"
-	"github.com/ory/ladon"
 	"github.com/ory/pagination"
 	"github.com/pkg/errors"
 )
@@ -37,7 +34,6 @@ import (
 type Handler struct {
 	Manager        Manager
 	H              herodot.Writer
-	W              firewall.Firewall
 	ResourcePrefix string
 }
 
@@ -79,16 +75,6 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //
 // OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
 //
-// The subject making the request needs to be assigned to a policy containing:
-//
-//  ```
-//  {
-//    "resources": ["rn:hydra:clients"],
-//    "actions": ["create"],
-//    "effect": "allow"
-//  }
-//  ```
-//
 //  Additionally, the context key "owner" is set to the owner of the client, allowing policies such as:
 //
 //  ```
@@ -108,9 +94,6 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //
 //     Schemes: http, https
 //
-//     Security:
-//       oauth2: hydra.clients
-//
 //     Responses:
 //       200: oAuth2Client
 //       401: genericError
@@ -118,21 +101,9 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //       500: genericError
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var c Client
-	var ctx = r.Context()
 
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
-		return
-	}
-
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: h.PrefixResource(ClientsResource),
-		Action:   "create",
-		Context: map[string]interface{}{
-			"owner": c.Owner,
-		},
-	}, Scope); err != nil {
-		h.H.WriteError(w, r, err)
 		return
 	}
 
@@ -171,27 +142,6 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 //
 // OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
 //
-// The subject making the request needs to be assigned to a policy containing:
-//
-//  ```
-//  {
-//    "resources": ["rn:hydra:clients"],
-//    "actions": ["update"],
-//    "effect": "allow"
-//  }
-//  ```
-//
-//  Additionally, the context key "owner" is set to the owner of the client, allowing policies such as:
-//
-//  ```
-//  {
-//    "resources": ["rn:hydra:clients"],
-//    "actions": ["update"],
-//    "effect": "allow",
-//    "conditions": { "owner": { "type": "EqualsSubjectCondition" } }
-//  }
-//  ```
-//
 //     Consumes:
 //     - application/json
 //
@@ -200,9 +150,6 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 //
 //     Schemes: http, https
 //
-//     Security:
-//       oauth2: hydra.clients
-//
 //     Responses:
 //       200: oAuth2Client
 //       401: genericError
@@ -210,27 +157,9 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 //       500: genericError
 func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var c Client
-	var ctx = r.Context()
 
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
-		return
-	}
-
-	o, err := h.Manager.GetConcreteClient(ps.ByName("id"))
-	if err != nil {
-		h.H.WriteError(w, r, err)
-		return
-	}
-
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: h.PrefixResource(ClientsResource),
-		Action:   "update",
-		Context: ladon.Context{
-			"owner": o.Owner,
-		},
-	}, Scope); err != nil {
-		h.H.WriteError(w, r, err)
 		return
 	}
 
@@ -260,16 +189,6 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //
 // OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
 //
-// The subject making the request needs to be assigned to a policy containing:
-//
-// ```
-// {
-//   "resources": ["rn:hydra:clients"],
-//   "actions": ["get"],
-//   "effect": "allow"
-// }
-// ```
-//
 //     Consumes:
 //     - application/json
 //
@@ -278,25 +197,12 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //
 //     Schemes: http, https
 //
-//     Security:
-//       oauth2: hydra.clients
-//
 //     Responses:
 //       200: oAuth2ClientList
 //       401: genericError
 //       403: genericError
 //       500: genericError
 func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var ctx = r.Context()
-
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: h.PrefixResource(ClientsResource),
-		Action:   "get",
-	}, Scope); err != nil {
-		h.H.WriteError(w, r, err)
-		return
-	}
-
 	limit, offset := pagination.Parse(r, 100, 0, 500)
 	c, err := h.Manager.GetClients(limit, offset)
 	if err != nil {
@@ -323,26 +229,6 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 //
 // OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
 //
-// The subject making the request needs to be assigned to a policy containing:
-//
-//  ```
-//  {
-//    "resources": ["rn:hydra:clients:<some-id>"],
-//    "actions": ["get"],
-//    "effect": "allow"
-//  }
-//  ```
-//
-//  Additionally, the context key "owner" is set to the owner of the client, allowing policies such as:
-//
-//  ```
-//  {
-//    "resources": ["rn:hydra:clients:<some-id>"],
-//    "actions": ["get"],
-//    "effect": "allow",
-//    "conditions": { "owner": { "type": "EqualsSubjectCondition" } }
-//  }
-//  ```
 //
 //     Consumes:
 //     - application/json
@@ -352,39 +238,16 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 //
 //     Schemes: http, https
 //
-//     Security:
-//       oauth2: hydra.clients
-//
 //     Responses:
 //       200: oAuth2Client
 //       401: genericError
 //       403: genericError
 //       500: genericError
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var ctx = r.Context()
 	var id = ps.ByName("id")
 
 	c, err := h.Manager.GetConcreteClient(id)
 	if err != nil {
-		if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-			Resource: fmt.Sprintf(h.PrefixResource(ClientResource), id),
-			Action:   "get",
-		}, Scope); err != nil {
-			h.H.WriteError(w, r, err)
-			return
-		}
-
-		h.H.WriteError(w, r, err)
-		return
-	}
-
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: fmt.Sprintf(h.PrefixResource(ClientResource), id),
-		Action:   "get",
-		Context: ladon.Context{
-			"owner": c.GetOwner(),
-		},
-	}, Scope); err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}
@@ -401,27 +264,6 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 //
 // OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
 //
-// The subject making the request needs to be assigned to a policy containing:
-//
-//  ```
-//  {
-//    "resources": ["rn:hydra:clients:<some-id>"],
-//    "actions": ["delete"],
-//    "effect": "allow"
-//  }
-//  ```
-//
-//  Additionally, the context key "owner" is set to the owner of the client, allowing policies such as:
-//
-//  ```
-//  {
-//    "resources": ["rn:hydra:clients:<some-id>"],
-//    "actions": ["delete"],
-//    "effect": "allow",
-//    "conditions": { "owner": { "type": "EqualsSubjectCondition" } }
-//  }
-//  ```
-//
 //     Consumes:
 //     - application/json
 //
@@ -430,34 +272,13 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 //
 //     Schemes: http, https
 //
-//     Security:
-//       oauth2: hydra.clients
-//
 //     Responses:
 //       204: emptyResponse
 //       401: genericError
 //       403: genericError
 //       500: genericError
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var ctx = r.Context()
 	var id = ps.ByName("id")
-
-	c, err := h.Manager.GetConcreteClient(id)
-	if err != nil {
-		h.H.WriteError(w, r, err)
-		return
-	}
-
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: fmt.Sprintf(h.PrefixResource(ClientResource), id),
-		Action:   "delete",
-		Context: ladon.Context{
-			"owner": c.GetOwner(),
-		},
-	}, Scope); err != nil {
-		h.H.WriteError(w, r, err)
-		return
-	}
 
 	if err := h.Manager.DeleteClient(id); err != nil {
 		h.H.WriteError(w, r, err)

@@ -23,7 +23,6 @@ package oauth2
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net"
 	"net/http"
 	"net/url"
@@ -32,7 +31,6 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/firewall"
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -246,6 +244,7 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request, _ http
 //
 //     Security:
 //       basic:
+//       oauth2:
 //
 //     Responses:
 //       200: emptyResponse
@@ -288,42 +287,23 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ ht
 //
 //     Security:
 //       basic:
-//       oauth2: hydra.introspect
+//       oauth2:
 //
 //     Responses:
 //       200: oAuth2TokenIntrospection
 //       401: genericError
 //       500: genericError
 func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	if token := h.W.TokenFromRequest(r); token != "" {
-		if _, err := h.W.TokenAllowed(r.Context(), token, &firewall.TokenAccessRequest{
-			Resource: fmt.Sprintf(h.PrefixResource("oauth2:tokens")),
-			Action:   "introspect",
-		}, IntrospectScope); err != nil {
-			h.H.WriteError(w, r, err)
-			return
-		}
-	} else if client, _, ok := r.BasicAuth(); ok {
-		// If no token is given, we do not need a scope.
-		if err := h.W.IsAllowed(r.Context(), &firewall.AccessRequest{
-			Subject:  client,
-			Resource: fmt.Sprintf(h.PrefixResource("oauth2:tokens")),
-			Action:   "introspect",
-		}); err != nil {
-			h.H.WriteError(w, r, err)
-			return
-		}
-	} else {
-		h.H.WriteError(w, r, errors.WithStack(fosite.ErrRequestUnauthorized))
-		return
-	}
-
 	var session = NewSession("")
+
+	z1, z2, _ := r.BasicAuth()
+	logrus.Printf("Got auth %s %s %s", z1, z2)
 
 	var ctx = fosite.NewContext()
 	resp, err := h.OAuth2.NewIntrospectionRequest(ctx, r, session)
+	logrus.Printf("Got response %s %s", resp.IsActive(), err)
 	if err != nil {
-		pkg.LogError(err, h.L)
+		pkg.LogError(errors.WithStack(err), h.L)
 		h.OAuth2.WriteIntrospectionError(w, err)
 		return
 	}
@@ -345,7 +325,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		Extra:     resp.GetAccessRequester().GetSession().(*Session).Extra,
 		Issuer:    h.Issuer,
 	}); err != nil {
-		pkg.LogError(err, h.L)
+		pkg.LogError(errors.WithStack(err), h.L)
 	}
 }
 
@@ -371,28 +351,11 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 //
 //     Schemes: http, https
 //
-//     Security:
-//       basic:
-//       oauth2: hydra.oauth2.flush
-//
 //     Responses:
 //       204: emptyResponse
 //       401: genericError
 //       500: genericError
 func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	if token := h.W.TokenFromRequest(r); token != "" {
-		if _, err := h.W.TokenAllowed(r.Context(), token, &firewall.TokenAccessRequest{
-			Resource: fmt.Sprintf(h.PrefixResource("oauth2:tokens")),
-			Action:   "flush",
-		}, "hydra.oauth2.flush"); err != nil {
-			h.H.WriteError(w, r, err)
-			return
-		}
-	} else {
-		h.H.WriteError(w, r, errors.WithStack(fosite.ErrRequestUnauthorized))
-		return
-	}
-
 	var fr FlushInactiveOAuth2TokensRequest
 	if err := json.NewDecoder(r.Body).Decode(&fr); err != nil {
 		h.H.WriteError(w, r, err)

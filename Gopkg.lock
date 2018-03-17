@@ -288,8 +288,8 @@
     "token/hmac",
     "token/jwt"
   ]
-  revision = "45128532dc4bbb40a56bf6250a58f9c5d57a9c7a"
-  version = "v0.16.4"
+  revision = "338399becb5114f84e6dc7166a95f6d036a6b748"
+  version = "v0.16.5"
 
 [[projects]]
   name = "github.com/ory/graceful"
@@ -424,10 +424,7 @@
 
 [[projects]]
   name = "github.com/square/go-jose"
-  packages = [
-    ".",
-    "json"
-  ]
+  packages = ["."]
   revision = "f8f38de21b4dcd69d0413faf231983f5fd6634b1"
   version = "v2.1.3"
 
@@ -559,6 +556,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "317cab4cb3c65a5029c1794f8a1a8d58fb8eb6f8a184d8da47482c94a6a73547"
+  inputs-digest = "a12106ee4455c466c786afa19eb6e21728d313be1b2e325b47cef27e8b270268"
   solver-name = "gps-cdcl"
   solver-version = 1

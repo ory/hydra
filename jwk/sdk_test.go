@@ -21,53 +21,30 @@
 package jwk_test
 
 import (
+	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"net/http"
-
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory/fosite"
 	"github.com/ory/herodot"
-	"github.com/ory/hydra/compose"
 	. "github.com/ory/hydra/jwk"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
-	"github.com/ory/ladon"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestJWKSDK(t *testing.T) {
-	localWarden, httpClient := compose.NewMockFirewall(
-		"tests",
-		"alice",
-		fosite.Arguments{
-			"hydra.keys.create",
-			"hydra.keys.get",
-			"hydra.keys.delete",
-			"hydra.keys.update",
-		}, &ladon.DefaultPolicy{
-			ID:        "1",
-			Subjects:  []string{"alice"},
-			Resources: []string{"rn:hydra:keys:<.*>"},
-			Actions:   []string{"create", "get", "delete", "update"},
-			Effect:    ladon.AllowAccess,
-		},
-	)
-
 	manager := new(MemoryManager)
 
 	router := httprouter.New()
 	h := Handler{
 		Manager: manager,
-		W:       localWarden,
 		H:       herodot.NewJSONWriter(nil),
 	}
 	h.SetRoutes(router)
 	server := httptest.NewServer(router)
 
 	client := hydra.NewJsonWebKeyApiWithBasePath(server.URL)
-	client.Configuration.Transport = httpClient.Transport
 
 	t.Run("JSON Web Key", func(t *testing.T) {
 		t.Run("CreateJwkSetKey", func(t *testing.T) {

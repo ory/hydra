@@ -21,14 +21,12 @@
 package jwk
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
-	"github.com/ory/hydra/firewall"
 	"github.com/pkg/errors"
 	"github.com/square/go-jose"
 )
@@ -43,7 +41,6 @@ type Handler struct {
 	Manager        Manager
 	Generators     map[string]KeyGenerator
 	H              herodot.Writer
-	W              firewall.Firewall
 	ResourcePrefix string
 }
 
@@ -110,15 +107,6 @@ type joseWebKeySetRequest struct {
 //
 // A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 //
-// The subject making the request needs to be assigned to a policy containing:
-//
-//  ```
-//  {
-//    "resources": ["rn:hydra:keys:hydra.openid.id-token:public"],
-//    "actions": ["GET"],
-//    "effect": "allow"
-//  }
-//  ```
 //
 //     Consumes:
 //     - application/json
@@ -128,43 +116,14 @@ type joseWebKeySetRequest struct {
 //
 //     Schemes: http, https
 //
-//     Security:
-//       oauth2: hydra.keys.get
-//
 //     Responses:
 //       200: jsonWebKeySet
 //       401: genericError
 //       403: genericError
 //       500: genericError
 func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var ctx = context.Background()
-
-	var fw = func(id string) error {
-		if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-			Resource: h.PrefixResource("keys:" + IDTokenKeyName + ":" + id),
-			Action:   "get",
-		}, "hydra.keys.get"); err != nil {
-			if err := h.W.IsAllowed(ctx, &firewall.AccessRequest{
-				Subject:  "",
-				Resource: h.PrefixResource("keys:" + IDTokenKeyName + ":" + id),
-				Action:   "get",
-			}); err != nil {
-				h.H.WriteError(w, r, err)
-				return err
-			} else {
-				// Allow unauthorized requests to access this resource if it is enabled by policies
-				return nil
-			}
-		}
-		return nil
-	}
-
 	keys, err := h.Manager.GetKeySet(IDTokenKeyName)
 	if err != nil {
-		if err := fw("public:"); err != nil {
-			return
-		}
-
 		h.H.WriteError(w, r, err)
 		return
 	}
@@ -173,12 +132,6 @@ func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request, ps httproute
 	if err != nil {
 		h.H.WriteError(w, r, err)
 		return
-	}
-
-	for _, key := range keys.Keys {
-		if err := fw(key.KeyID); err != nil {
-			return
-		}
 	}
 
 	h.H.Write(w, r, keys)
@@ -192,16 +145,6 @@ func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request, ps httproute
 //
 // A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 //
-// The subject making the request needs to be assigned to a policy containing:
-//
-//  ```
-//  {
-//    "resources": ["rn:hydra:keys:<set>:<kid>"],
-//    "actions": ["get"],
-//    "effect": "allow"
-//  }
-//  ```
-//
 //     Consumes:
 //     - application/json
 //
@@ -210,34 +153,14 @@ func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request, ps httproute
 //
 //     Schemes: http, https
 //
-//     Security:
-//       oauth2: hydra.keys.get
-//
 //     Responses:
 //       200: jsonWebKeySet
 //       401: genericError
 //       403: genericError
 //       500: genericError
 func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var ctx = context.Background()
 	var setName = ps.ByName("set")
 	var keyName = ps.ByName("key")
-
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: h.PrefixResource("keys:" + setName + ":" + keyName),
-		Action:   "get",
-	}, "hydra.keys.get"); err != nil {
-		if err := h.W.IsAllowed(ctx, &firewall.AccessRequest{
-			Subject:  "",
-			Resource: h.PrefixResource("keys:" + setName + ":" + keyName),
-			Action:   "get",
-		}); err != nil {
-			h.H.WriteError(w, r, err)
-			return
-		} else {
-			// Allow unauthorized requests to access this resource if it is enabled by policies
-		}
-	}
 
 	keys, err := h.Manager.GetKey(setName, keyName)
 	if err != nil {
@@ -256,16 +179,6 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //
 // A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 //
-// The subject making the request needs to be assigned to a policy containing:
-//
-//  ```
-//  {
-//    "resources": ["rn:hydra:keys:<set>:<kid>"],
-//    "actions": ["get"],
-//    "effect": "allow"
-//  }
-//  ```
-//
 //     Consumes:
 //     - application/json
 //
@@ -274,32 +187,18 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //
 //     Schemes: http, https
 //
-//     Security:
-//       oauth2: hydra.keys.get
-//
 //     Responses:
 //       200: jsonWebKeySet
 //       401: genericError
 //       403: genericError
 //       500: genericError
 func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var ctx = context.Background()
 	var setName = ps.ByName("set")
 
 	keys, err := h.Manager.GetKeySet(setName)
 	if err != nil {
 		h.H.WriteError(w, r, err)
 		return
-	}
-
-	for _, key := range keys.Keys {
-		if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-			Resource: h.PrefixResource("keys:" + setName + ":" + key.KeyID),
-			Action:   "get",
-		}, "hydra.keys.get"); err != nil {
-			h.H.WriteError(w, r, err)
-			return
-		}
 	}
 
 	h.H.Write(w, r, keys)
@@ -313,16 +212,6 @@ func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httproute
 //
 // A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 //
-// The subject making the request needs to be assigned to a policy containing:
-//
-//  ```
-//  {
-//    "resources": ["rn:hydra:keys:<set>:<kid>"],
-//    "actions": ["create"],
-//    "effect": "allow"
-//  }
-//  ```
-//
 //     Consumes:
 //     - application/json
 //
@@ -331,26 +220,14 @@ func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httproute
 //
 //     Schemes: http, https
 //
-//     Security:
-//       oauth2: hydra.keys.create
-//
 //     Responses:
 //       200: jsonWebKeySet
 //       401: genericError
 //       403: genericError
 //       500: genericError
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var ctx = context.Background()
 	var keyRequest createRequest
 	var set = ps.ByName("set")
-
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: h.PrefixResource("keys:" + set),
-		Action:   "create",
-	}, "hydra.keys.create"); err != nil {
-		h.H.WriteError(w, r, err)
-		return
-	}
 
 	if err := json.NewDecoder(r.Body).Decode(&keyRequest); err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
@@ -384,16 +261,6 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //
 // A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 //
-// The subject making the request needs to be assigned to a policy containing:
-//
-//  ```
-//  {
-//    "resources": ["rn:hydra:keys:<set>"],
-//    "actions": ["update"],
-//    "effect": "allow"
-//  }
-//  ```
-//
 //     Consumes:
 //     - application/json
 //
@@ -402,27 +269,15 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //
 //     Schemes: http, https
 //
-//     Security:
-//       oauth2: hydra.keys.update
-//
 //     Responses:
 //       200: jsonWebKeySet
 //       401: genericError
 //       403: genericError
 //       500: genericError
 func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var ctx = context.Background()
 	var requests joseWebKeySetRequest
 	var keySet = new(jose.JSONWebKeySet)
 	var set = ps.ByName("set")
-
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: h.PrefixResource("keys:" + set),
-		Action:   "update",
-	}, "hydra.keys.update"); err != nil {
-		h.H.WriteError(w, r, err)
-		return
-	}
 
 	if err := json.NewDecoder(r.Body).Decode(&requests); err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
@@ -453,16 +308,6 @@ func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 //
 // A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 //
-// The subject making the request needs to be assigned to a policy containing:
-//
-//  ```
-//  {
-//    "resources": ["rn:hydra:keys:<set>:<kid>"],
-//    "actions": ["update"],
-//    "effect": "allow"
-//  }
-//  ```
-//
 //     Consumes:
 //     - application/json
 //
@@ -471,29 +316,17 @@ func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 //
 //     Schemes: http, https
 //
-//     Security:
-//       oauth2: hydra.keys.update
-//
 //     Responses:
 //       200: jsonWebKey
 //       401: genericError
 //       403: genericError
 //       500: genericError
 func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var ctx = context.Background()
 	var key jose.JSONWebKey
 	var set = ps.ByName("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&key); err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
-		return
-	}
-
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: h.PrefixResource("keys:" + set + ":" + key.KeyID),
-		Action:   "update",
-	}, "hydra.keys.update"); err != nil {
-		h.H.WriteError(w, r, err)
 		return
 	}
 
@@ -513,16 +346,6 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 //
 // A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 //
-// The subject making the request needs to be assigned to a policy containing:
-//
-//  ```
-//  {
-//    "resources": ["rn:hydra:keys:<set>"],
-//    "actions": ["delete"],
-//    "effect": "allow"
-//  }
-//  ```
-//
 //     Consumes:
 //     - application/json
 //
@@ -531,25 +354,13 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 //
 //     Schemes: http, https
 //
-//     Security:
-//       oauth2: hydra.keys.delete
-//
 //     Responses:
 //       204: emptyResponse
 //       401: genericError
 //       403: genericError
 //       500: genericError
 func (h *Handler) DeleteKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var ctx = context.Background()
 	var setName = ps.ByName("set")
-
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: h.PrefixResource("keys:" + setName),
-		Action:   "delete",
-	}, "hydra.keys.delete"); err != nil {
-		h.H.WriteError(w, r, err)
-		return
-	}
 
 	if err := h.Manager.DeleteKeySet(setName); err != nil {
 		h.H.WriteError(w, r, err)
@@ -567,16 +378,6 @@ func (h *Handler) DeleteKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 //
 // A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 //
-// The subject making the request needs to be assigned to a policy containing:
-//
-//  ```
-//  {
-//    "resources": ["rn:hydra:keys:<set>:<kid>"],
-//    "actions": ["delete"],
-//    "effect": "allow"
-//  }
-//  ```
-//
 //     Consumes:
 //     - application/json
 //
@@ -585,26 +386,14 @@ func (h *Handler) DeleteKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 //
 //     Schemes: http, https
 //
-//     Security:
-//       oauth2: hydra.keys.delete
-//
 //     Responses:
 //       204: emptyResponse
 //       401: genericError
 //       403: genericError
 //       500: genericError
 func (h *Handler) DeleteKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var ctx = context.Background()
 	var setName = ps.ByName("set")
 	var keyName = ps.ByName("key")
-
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: h.PrefixResource("keys:" + setName + ":" + keyName),
-		Action:   "delete",
-	}, "hydra.keys.delete"); err != nil {
-		h.H.WriteError(w, r, err)
-		return
-	}
 
 	if err := h.Manager.DeleteKey(setName, keyName); err != nil {
 		h.H.WriteError(w, r, err)

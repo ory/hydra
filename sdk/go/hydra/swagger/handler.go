@@ -16,6 +16,4 @@ type Handler struct {
 	Manager Manager `json:"Manager,omitempty"`
 
 	ResourcePrefix string `json:"ResourcePrefix,omitempty"`
-
-	W Firewall `json:"W,omitempty"`
 }

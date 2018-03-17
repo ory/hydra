@@ -27,7 +27,6 @@ import (
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/warden/group"
 	"github.com/ory/ladon"
 	lsql "github.com/ory/ladon/manager/sql"
 	"github.com/sirupsen/logrus"
@@ -48,7 +47,6 @@ func TestSQLSchema(t *testing.T) {
 	db := ConnectToPostgres()
 
 	cm := &client.SQLManager{DB: db, Hasher: &fosite.BCrypt{}}
-	gm := group.SQLManager{DB: db}
 	jm := jwk.SQLManager{DB: db, Cipher: &jwk.AEAD{Key: []byte("11111111111111111111111111111111")}}
 	om := oauth2.FositeSQLStore{Manager: cm, DB: db, L: logrus.New()}
 	crm := oauth2.NewConsentRequestSQLManager(db)
@@ -58,7 +56,6 @@ func TestSQLSchema(t *testing.T) {
 	require.NoError(t, err)
 	_, err = cm.CreateSchemas()
 	require.NoError(t, err)
-	_, err = gm.CreateSchemas()
 	require.NoError(t, err)
 	_, err = jm.CreateSchemas()
 	require.NoError(t, err)
@@ -72,9 +69,4 @@ func TestSQLSchema(t *testing.T) {
 	require.NoError(t, cm.CreateClient(&client.Client{ID: "integration-test-foo"}))
 	require.NoError(t, crm.PersistConsentRequest(&oauth2.ConsentRequest{ID: "integration-test-foo"}))
 	require.NoError(t, om.CreateAccessTokenSession(nil, "asdfasdf", r))
-	require.NoError(t, gm.CreateGroup(&group.Group{
-		ID:      "integration-test-asdfas",
-		Members: []string{"asdf"},
-	}))
-	require.NoError(t, gm.DeleteGroup("integration-test-asdfas"))
 }

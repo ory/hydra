@@ -40,10 +40,6 @@ import (
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/hydra/policy"
-	"github.com/ory/hydra/warden"
-	"github.com/ory/hydra/warden/group"
-	"github.com/ory/ladon"
 	"github.com/pkg/errors"
 	"github.com/rs/cors"
 	"github.com/spf13/cobra"
@@ -154,9 +150,6 @@ type Handler struct {
 	Keys    *jwk.Handler
 	OAuth2  *oauth2.Handler
 	Consent *oauth2.ConsentSessionHandler
-	Policy  *policy.Handler
-	Groups  *group.Handler
-	Warden  *warden.WardenHandler
 	Config  *config.Config
 	H       herodot.Writer
 }
@@ -172,32 +165,11 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 	injectFositeStore(c, clientsManager)
 	oauth2Provider, idTokenKeyID := newOAuth2Provider(c)
 
-	// set up warden
-	ctx.Warden = &warden.LocalWarden{
-		Warden: &ladon.Ladon{
-			Manager: ctx.LadonManager,
-		},
-		OAuth2:              oauth2Provider,
-		Issuer:              c.Issuer,
-		AccessTokenLifespan: c.GetAccessTokenLifespan(),
-		Groups:              ctx.GroupManager,
-		L:                   c.GetLogger(),
-	}
-
 	// Set up handlers
 	h.Clients = newClientHandler(c, router, clientsManager)
 	h.Keys = newJWKHandler(c, router)
-	h.Policy = newPolicyHandler(c, router)
 	h.Consent = newConsentHanlder(c, router)
 	h.OAuth2 = newOAuth2Handler(c, router, ctx.ConsentManager, oauth2Provider, idTokenKeyID)
-	h.Warden = warden.NewHandler(c, router)
-	h.Groups = &group.Handler{
-		H:              herodot.NewJSONWriter(c.GetLogger()),
-		W:              ctx.Warden,
-		Manager:        ctx.GroupManager,
-		ResourcePrefix: c.AccessControlResourcePrefix,
-	}
-	h.Groups.SetRoutes(router)
 	_ = newHealthHandler(c, router)
 
 	h.createRootIfNewInstall(c)

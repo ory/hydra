@@ -71,7 +71,7 @@ func (s *DefaultConsentStrategy) validateSession(req fosite.AuthorizeRequester, 
 	return nil
 }
 
-func (s *DefaultConsentStrategy) ValidateConsentRequest(req fosite.AuthorizeRequester, session string, cookie *sessions.Session) (claims *Session, err error) {
+func (s *DefaultConsentStrategy) ValidateConsentRequest(req fosite.AuthorizeRequester, session string, cookie *sessions.Session) (*Session, error) {
 	defer delete(cookie.Values, CookieCSRFKey)
 
 	consent, err := s.ConsentManager.GetConsentRequest(session)

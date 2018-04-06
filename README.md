@@ -9,7 +9,7 @@
     <a href="https://godoc.org/github.com/ory/hydra">Code Docs</a><br/><br/>
     <a href="https://patreon.com/user?u=4298803">Support us on patreon!</a>
 </h4>
-
+ 
 ---
 
 ORY Hydra is a hardened OAuth2 and OpenID Connect server optimized for low-latency, high throughput,
@@ -25,9 +25,10 @@ able to securely manage JSON Web Keys, and has a sophisticated policy-based acce
 
 <p align="left">
     <a href="https://circleci.com/gh/ory/hydra/tree/master"><img src="https://circleci.com/gh/ory/hydra/tree/master.svg?style=shield" alt="Build Status"></a>
-    <a href="https://coveralls.io/github/ory/hydra?branch=master"><img src="https://coveralls.io/repos/ory/hydra/badge.svg?branch=master&service=github" alt="Coverage Status"></a>
+    <a href="https://coveralls.io/github/ory/hydra?branch=master"> <img src="https://coveralls.io/repos/ory/hydra/badge.svg?branch=master&service=github" alt="Coverage Status"></a>
     <a href="https://goreportcard.com/report/github.com/ory/hydra"><img src="https://goreportcard.com/badge/github.com/ory/hydra" alt="Go Report Card"></a>
     <a href="https://bestpractices.coreinfrastructure.org/projects/364"><img src="https://bestpractices.coreinfrastructure.org/projects/364/badge" alt="CII Best Practices"></a>
+    <a href="#backers" alt="sponsors on Open Collective"><img src="https://opencollective.com/ory-hydra/backers/badge.svg" /></a> <a href="#sponsors" alt="Sponsors on Open Collective"><img src="https://opencollective.com/ory-hydra/sponsors/badge.svg" /></a>
 </p>
 
 ---
@@ -259,3 +260,33 @@ Community:
 * [Creating an oauth2 custom lamda authorizer for use with Amazons (AWS) API Gateway using Hydra](https://blogs.edwardwilde.com/2017/01/12/creating-an-oauth2-custom-lamda-authorizer-for-use-with-amazons-aws-api-gateway-using-hydra/)
 * Warning, ORY Hydra has changed almost everything since writing this
 article: [Hydra: Run your own Identity and Access Management service in <5 Minutes](https://blog.gopheracademy.com/advent-2015/hydra-auth/)
+
+## Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+<a href="graphs/contributors"><img src="https://opencollective.com/ory-hydra/contributors.svg?width=890&button=false" /></a>
+
+
+## Backers
+
+Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/ory-hydra#backer)]
+
+<a href="https://opencollective.com/ory-hydra#backers" target="_blank"><img src="https://opencollective.com/ory-hydra/backers.svg?width=890"></a>
+
+
+## Sponsors
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/ory-hydra#sponsor)]
+
+<a href="https://opencollective.com/ory-hydra/sponsor/0/website" target="_blank"><img src="https://opencollective.com/ory-hydra/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/ory-hydra/sponsor/1/website" target="_blank"><img src="https://opencollective.com/ory-hydra/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/ory-hydra/sponsor/2/website" target="_blank"><img src="https://opencollective.com/ory-hydra/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/ory-hydra/sponsor/3/website" target="_blank"><img src="https://opencollective.com/ory-hydra/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/ory-hydra/sponsor/4/website" target="_blank"><img src="https://opencollective.com/ory-hydra/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/ory-hydra/sponsor/5/website" target="_blank"><img src="https://opencollective.com/ory-hydra/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/ory-hydra/sponsor/6/website" target="_blank"><img src="https://opencollective.com/ory-hydra/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/ory-hydra/sponsor/7/website" target="_blank"><img src="https://opencollective.com/ory-hydra/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/ory-hydra/sponsor/8/website" target="_blank"><img src="https://opencollective.com/ory-hydra/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/ory-hydra/sponsor/9/website" target="_blank"><img src="https://opencollective.com/ory-hydra/sponsor/9/avatar.svg"></a>
+
+

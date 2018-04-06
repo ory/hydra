@@ -5,15 +5,22 @@
   "license": "Apache 2.0",
   "main": "sdk/js/swagger/src/index.js",
   "scripts": {
-    "prettier": "prettier --single-quote --parser flow --no-semi --write \"sdk/js/**/*.js\""
+    "prettier": "prettier --single-quote --parser flow --no-semi --write \"sdk/js/**/*.js\"",
+    "postinstall": "opencollective postinstall"
   },
   "browser": {
     "fs": false
   },
   "dependencies": {
+    "opencollective": "^1.0.3",
     "superagent": "3.5.2"
   },
   "devDependencies": {
     "prettier": "^1.7.4"
+  },
+  "collective": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/ory-hydra",
+    "logo": "https://opencollective.com/ory-hydra/logo.txt"
   }
 }

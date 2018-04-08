@@ -10,6 +10,7 @@ before finalizing the upgrade process.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
+- [0.11.11](#01111)
 - [0.11.3](#0113)
 - [0.11.0](#0110)
 - [0.10.0](#0100)
@@ -53,6 +54,38 @@ before finalizing the upgrade process.
     - [Best practice HTTP server config](#best-practice-http-server-config)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## 0.11.11
+
+This release resolves a security issue (reported by [platform.sh](https://www.platform.sh)) related to the fosite
+storage implementation in this project. Fosite used to pass all of the request body from both authorize and token
+endpoints to the storage adapters. As some of these values are needed in consecutive requests, the storage adapter
+of this project chose to drop all of the key/value pairs to the database in plaintext.
+
+This implied that confidential parameters, such as the `client_secret` which can be passed in the request body since
+fosite version 0.15.0, were stored as key/value pairs in plaintext in the database. While most client secrets are generated
+programmatically (as opposed to set by the user) and most popular OAuth2 providers choose to store the secret in plaintext
+for later retrieval, we see it as a considerable security issue nonetheless.
+
+The issue has been resolved by sanitizing the request body and only including those values truly required by their
+respective handlers. This also implies that typos (eg `client_secet`) won't "leak" to the database.
+
+There are no special upgrade paths required for this version.
+
+This issue does not apply to you if you do not use an SQL backend. If you do upgrade to this version, you need to run
+`hydra migrate sql path://to.your/database`.
+
+If your users use POST body client authentication, it might
+be a good move to remove old data. There are multiple ways of doing that. **Back up your data before you do this**:
+
+1. **Radical solution:** Drop all rows from tables `hydra_oauth2_refresh`, `hydra_oauth2_access`, `hydra_oauth2_oidc`,
+`hydra_oauth2_code`. This implies that all your users have to re-authorize.
+2. **Sensitive solution:** Replace all values in column `form_data` in tables `hydra_oauth2_refresh`, `hydra_oauth2_access` with
+an empty string. This will keep all authorization sessions alive. Tables `hydra_oauth2_oidc` and `hydra_oauth2_code`
+do not contain sensitive information, unless your users accidentally sent the client_secret to the `/oauth2/auth` endpoint.
+
+We would like to thank [platform.sh](https://www.platform.sh) for sponsoring the development of a patch that resolves this
+issue.
 
 ## 0.11.3
 

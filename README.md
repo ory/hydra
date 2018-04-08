@@ -60,7 +60,7 @@ able to securely manage JSON Web Keys, and has a sophisticated policy-based acce
   - [Develop](#develop)
 - [Reception](#reception)
 - [Libraries and third-party projects](#libraries-and-third-party-projects)
-- [Blog posts & articles](#blog-posts--articles)
+- [Blog posts & articles](#blog-posts-&-articles)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

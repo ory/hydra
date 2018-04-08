@@ -149,3 +149,24 @@ func TestHelperCreateGetDeleteAccessTokenSession(m pkg.FositeStorer) func(t *tes
 		assert.NotNil(t, err)
 	}
 }
+
+func TestHelperCreateGetDeletePKCERequestSession(m pkg.FositeStorer) func(t *testing.T) {
+	return func(t *testing.T) {
+		ctx := context.Background()
+		_, err := m.GetAccessTokenSession(ctx, "4321", &fosite.DefaultSession{})
+		assert.NotNil(t, err)
+
+		err = m.CreateAccessTokenSession(ctx, "4321", &defaultRequest)
+		require.NoError(t, err)
+
+		res, err := m.GetAccessTokenSession(ctx, "4321", &fosite.DefaultSession{})
+		require.NoError(t, err)
+		AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
+
+		err = m.DeleteAccessTokenSession(ctx, "4321")
+		require.NoError(t, err)
+
+		_, err = m.GetAccessTokenSession(ctx, "4321", &fosite.DefaultSession{})
+		assert.NotNil(t, err)
+	}
+}

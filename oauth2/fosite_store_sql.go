@@ -58,7 +58,8 @@ func sqlSchemaUp(table string, id string) string {
 	scope  			text NOT NULL,
 	granted_scope 	text NOT NULL,
 	form_data  		text NOT NULL,
-	session_data  	text NOT NULL`,
+	session_data  	text NOT NULL
+)`,
 	}
 
 	return schemas[id]

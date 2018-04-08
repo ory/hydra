@@ -156,7 +156,7 @@ func (c *Config) GetLogger() *logrus.Logger {
 
 func (c *Config) GetMetrics() *metrics.MetricsManager {
 	if c.metrics == nil {
-		c.metrics = metrics.NewMetricsManager(c.Issuer, c.DatabaseURL, c.GetLogger())
+		c.metrics = metrics.NewMetricsManager(c.Issuer, c.DatabaseURL, c.GetLogger(), c.BuildVersion, c.BuildHash, c.BuildTime)
 	}
 
 	return c.metrics

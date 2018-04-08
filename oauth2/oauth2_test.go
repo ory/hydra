@@ -46,6 +46,7 @@ var store = &FositeMemoryStore{
 	IDSessions:     make(map[string]fosite.Requester),
 	AccessTokens:   make(map[string]fosite.Requester),
 	RefreshTokens:  make(map[string]fosite.Requester),
+	PKCES:          make(map[string]fosite.Requester),
 }
 
 var fc = &compose.Config{

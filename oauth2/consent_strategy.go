@@ -49,7 +49,7 @@ func (s *DefaultConsentStrategy) validateSession(req fosite.AuthorizeRequester, 
 		return errors.Errorf("CSRF value from query parameters does not match consent CSRF value")
 	}
 
-	if time.Now().After(consent.ExpiresAt) {
+	if time.Now().UTC().After(consent.ExpiresAt) {
 		return errors.Errorf("Consent session expired")
 	}
 
@@ -102,9 +102,9 @@ func (s *DefaultConsentStrategy) ValidateConsentRequest(req fosite.AuthorizeRequ
 				Audience:    req.GetClient().GetID(),
 				Subject:     consent.Subject,
 				Issuer:      s.Issuer,
-				IssuedAt:    time.Now(),
-				ExpiresAt:   time.Now().Add(s.DefaultIDTokenLifespan),
-				AuthTime:    time.Now(),
+				IssuedAt:    time.Now().UTC(),
+				ExpiresAt:   time.Now().UTC().Add(s.DefaultIDTokenLifespan),
+				AuthTime:    time.Now().UTC(),
 				RequestedAt: time.Now().UTC(),
 				Extra:       consent.IDTokenExtra,
 			},
@@ -127,7 +127,7 @@ func (s *DefaultConsentStrategy) CreateConsentRequest(req fosite.AuthorizeReques
 		GrantedScopes:    []string{},
 		RequestedScopes:  req.GetRequestedScopes(),
 		ClientID:         req.GetClient().GetID(),
-		ExpiresAt:        time.Now().Add(s.DefaultChallengeLifespan),
+		ExpiresAt:        time.Now().UTC().Add(s.DefaultChallengeLifespan),
 		RedirectURL:      redirectURL + "&consent=" + id + "&consent_csrf=" + csrf,
 		AccessTokenExtra: map[string]interface{}{},
 		IDTokenExtra:     map[string]interface{}{},

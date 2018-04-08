@@ -20,12 +20,14 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/handler/openid"
+	"github.com/ory/fosite/handler/pkce"
 )
 
 type FositeStorer interface {
 	fosite.Storage
 	oauth2.CoreStorage
 	openid.OpenIDConnectRequestStorage
+	pkce.PKCERequestStorage
 
 	RevokeRefreshToken(ctx context.Context, requestID string) error
 

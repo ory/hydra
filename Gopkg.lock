@@ -283,11 +283,12 @@
     "compose",
     "handler/oauth2",
     "handler/openid",
+    "handler/pkce",
     "storage",
     "token/hmac",
     "token/jwt"
   ]
-  revision = "1ef3041c4da40d27ea25d56710e59d5f9352df5f"
+  revision = "018b5c12b71b0da443255f4a5cf0ac9543bbf9f7"
   version = "v0.17.0"
 
 [[projects]]
@@ -558,6 +559,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6ac3c005e9329d3744310c022f4591ec5c5ec0d7f1bdeee9346157659ec311d1"
+  inputs-digest = "a07c2ec3722790b9a1b7f2f42505c8aae981d7124042a79bf30cb7b867f3bd88"
   solver-name = "gps-cdcl"
   solver-version = 1

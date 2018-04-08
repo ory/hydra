@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.InlineResponse200
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.InlineResponse200
 
 ## Properties
 Name | Type | Description | Notes

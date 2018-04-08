@@ -1,16 +1,22 @@
-// Copyright © 2017 Aeneas Rekkas <aeneas+oss@aeneas.io>
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * Copyright © 2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author		Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @copyright 	2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @license 	Apache-2.0
+ */
 
 package oauth2_test
 
@@ -19,6 +25,7 @@ import (
 	"fmt"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
@@ -30,26 +37,29 @@ import (
 
 var clientManagers = map[string]pkg.FositeStorer{}
 var clientManager = &client.MemoryManager{
-	Clients: map[string]client.Client{"foobar": {ID: "foobar"}},
+	Clients: []client.Client{{ID: "foobar"}},
 	Hasher:  &fosite.BCrypt{},
 }
 
 func init() {
 	clientManagers["memory"] = &FositeMemoryStore{
-		AuthorizeCodes: make(map[string]fosite.Requester),
-		IDSessions:     make(map[string]fosite.Requester),
-		AccessTokens:   make(map[string]fosite.Requester),
-		RefreshTokens:  make(map[string]fosite.Requester),
+		AuthorizeCodes:      make(map[string]fosite.Requester),
+		IDSessions:          make(map[string]fosite.Requester),
+		AccessTokens:        make(map[string]fosite.Requester),
+		RefreshTokens:       make(map[string]fosite.Requester),
+		AccessTokenLifespan: time.Hour,
 	}
 }
 
 func TestMain(m *testing.M) {
 	flag.Parse()
 	if !testing.Short() {
-		connectToPG()
-		connectToMySQL()
-		connectToPGConsent()
-		connectToMySQLConsent()
+		integration.BootParallel([]func(){
+			connectToPG,
+			connectToMySQL,
+			connectToPGConsent,
+			connectToMySQLConsent,
+		})
 	}
 
 	s := m.Run()
@@ -59,7 +69,7 @@ func TestMain(m *testing.M) {
 
 func connectToPG() {
 	var db = integration.ConnectToPostgres()
-	s := &FositeSQLStore{DB: db, Manager: clientManager, L: logrus.New()}
+	s := &FositeSQLStore{DB: db, Manager: clientManager, L: logrus.New(), AccessTokenLifespan: time.Hour}
 	if _, err := s.CreateSchemas(); err != nil {
 		logrus.Fatalf("Could not create postgres schema: %v", err)
 	}
@@ -69,7 +79,7 @@ func connectToPG() {
 
 func connectToMySQL() {
 	var db = integration.ConnectToMySQL()
-	s := &FositeSQLStore{DB: db, Manager: clientManager, L: logrus.New()}
+	s := &FositeSQLStore{DB: db, Manager: clientManager, L: logrus.New(), AccessTokenLifespan: time.Hour}
 	if _, err := s.CreateSchemas(); err != nil {
 		logrus.Fatalf("Could not create postgres schema: %v", err)
 	}
@@ -109,5 +119,12 @@ func TestRevokeRefreshToken(t *testing.T) {
 	t.Parallel()
 	for k, m := range clientManagers {
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperRevokeRefreshToken(m))
+	}
+}
+
+func TestFlushAccessTokens(t *testing.T) {
+	t.Parallel()
+	for k, m := range clientManagers {
+		t.Run(fmt.Sprintf("case=%s", k), TestHelperFlushTokens(m, time.Hour))
 	}
 }

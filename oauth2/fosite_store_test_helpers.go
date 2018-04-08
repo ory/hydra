@@ -1,24 +1,29 @@
-// Copyright © 2017 Aeneas Rekkas <aeneas+oss@aeneas.io>
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * Copyright © 2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author		Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @copyright 	2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @license 	Apache-2.0
+ */
 
 package oauth2
 
 import (
 	"context"
-	"testing"
-
 	"net/url"
+	"testing"
 	"time"
 
 	"github.com/ory/fosite"
@@ -147,5 +152,74 @@ func TestHelperCreateGetDeleteAccessTokenSession(m pkg.FositeStorer) func(t *tes
 
 		_, err = m.GetAccessTokenSession(ctx, "4321", &fosite.DefaultSession{})
 		assert.NotNil(t, err)
+	}
+}
+
+var lifespan = time.Hour
+var flushRequests = []*fosite.Request{
+	{
+		ID:            "flush-1",
+		RequestedAt:   time.Now().Round(time.Second),
+		Client:        &client.Client{ID: "foobar"},
+		Scopes:        fosite.Arguments{"fa", "ba"},
+		GrantedScopes: fosite.Arguments{"fa", "ba"},
+		Form:          url.Values{"foo": []string{"bar", "baz"}},
+		Session:       &fosite.DefaultSession{Subject: "bar"},
+	},
+	{
+		ID:            "flush-2",
+		RequestedAt:   time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
+		Client:        &client.Client{ID: "foobar"},
+		Scopes:        fosite.Arguments{"fa", "ba"},
+		GrantedScopes: fosite.Arguments{"fa", "ba"},
+		Form:          url.Values{"foo": []string{"bar", "baz"}},
+		Session:       &fosite.DefaultSession{Subject: "bar"},
+	},
+	{
+		ID:            "flush-3",
+		RequestedAt:   time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
+		Client:        &client.Client{ID: "foobar"},
+		Scopes:        fosite.Arguments{"fa", "ba"},
+		GrantedScopes: fosite.Arguments{"fa", "ba"},
+		Form:          url.Values{"foo": []string{"bar", "baz"}},
+		Session:       &fosite.DefaultSession{Subject: "bar"},
+	},
+}
+
+func TestHelperFlushTokens(m pkg.FositeStorer, lifespan time.Duration) func(t *testing.T) {
+
+	ds := &fosite.DefaultSession{}
+
+	return func(t *testing.T) {
+		ctx := context.Background()
+		for _, r := range flushRequests {
+			require.NoError(t, m.CreateAccessTokenSession(ctx, r.ID, r))
+			_, err := m.GetAccessTokenSession(ctx, r.ID, ds)
+			require.NoError(t, err)
+		}
+
+		require.NoError(t, m.FlushInactiveAccessTokens(ctx, time.Now().Add(-time.Hour*24)))
+		_, err := m.GetAccessTokenSession(ctx, "flush-1", ds)
+		require.NoError(t, err)
+		_, err = m.GetAccessTokenSession(ctx, "flush-2", ds)
+		require.NoError(t, err)
+		_, err = m.GetAccessTokenSession(ctx, "flush-3", ds)
+		require.NoError(t, err)
+
+		require.NoError(t, m.FlushInactiveAccessTokens(ctx, time.Now().Add(-(lifespan+time.Hour/2))))
+		_, err = m.GetAccessTokenSession(ctx, "flush-1", ds)
+		require.NoError(t, err)
+		_, err = m.GetAccessTokenSession(ctx, "flush-2", ds)
+		require.NoError(t, err)
+		_, err = m.GetAccessTokenSession(ctx, "flush-3", ds)
+		require.Error(t, err)
+
+		require.NoError(t, m.FlushInactiveAccessTokens(ctx, time.Now()))
+		_, err = m.GetAccessTokenSession(ctx, "flush-1", ds)
+		require.NoError(t, err)
+		_, err = m.GetAccessTokenSession(ctx, "flush-2", ds)
+		require.Error(t, err)
+		_, err = m.GetAccessTokenSession(ctx, "flush-3", ds)
+		require.Error(t, err)
 	}
 }

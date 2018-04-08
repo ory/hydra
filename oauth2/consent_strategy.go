@@ -1,16 +1,22 @@
-// Copyright © 2017 Aeneas Rekkas <aeneas+oss@aeneas.io>
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * Copyright © 2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author		Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @copyright 	2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @license 	Apache-2.0
+ */
 
 package oauth2
 
@@ -33,6 +39,7 @@ const (
 type DefaultConsentStrategy struct {
 	Issuer string
 
+	KeyID                    string
 	DefaultIDTokenLifespan   time.Duration
 	DefaultChallengeLifespan time.Duration
 	ConsentManager           ConsentRequestManager
@@ -49,7 +56,7 @@ func (s *DefaultConsentStrategy) validateSession(req fosite.AuthorizeRequester, 
 		return errors.Errorf("CSRF value from query parameters does not match consent CSRF value")
 	}
 
-	if time.Now().After(consent.ExpiresAt) {
+	if time.Now().UTC().After(consent.ExpiresAt) {
 		return errors.Errorf("Consent session expired")
 	}
 
@@ -64,7 +71,7 @@ func (s *DefaultConsentStrategy) validateSession(req fosite.AuthorizeRequester, 
 	return nil
 }
 
-func (s *DefaultConsentStrategy) ValidateConsentRequest(req fosite.AuthorizeRequester, session string, cookie *sessions.Session) (claims *Session, err error) {
+func (s *DefaultConsentStrategy) ValidateConsentRequest(req fosite.AuthorizeRequester, session string, cookie *sessions.Session) (*Session, error) {
 	defer delete(cookie.Values, CookieCSRFKey)
 
 	consent, err := s.ConsentManager.GetConsentRequest(session)
@@ -102,14 +109,14 @@ func (s *DefaultConsentStrategy) ValidateConsentRequest(req fosite.AuthorizeRequ
 				Audience:    req.GetClient().GetID(),
 				Subject:     consent.Subject,
 				Issuer:      s.Issuer,
-				IssuedAt:    time.Now(),
-				ExpiresAt:   time.Now().Add(s.DefaultIDTokenLifespan),
-				AuthTime:    time.Now(),
+				IssuedAt:    time.Now().UTC(),
+				ExpiresAt:   time.Now().Add(s.DefaultIDTokenLifespan).UTC(),
+				AuthTime:    time.Now().UTC(),
 				RequestedAt: time.Now().UTC(),
 				Extra:       consent.IDTokenExtra,
 			},
 			// required for lookup on jwk endpoint
-			Headers: &ejwt.Headers{Extra: map[string]interface{}{"kid": "public"}},
+			Headers: &ejwt.Headers{Extra: map[string]interface{}{"kid": s.KeyID}},
 			Subject: consent.Subject,
 		},
 		Extra: consent.AccessTokenExtra,
@@ -127,7 +134,7 @@ func (s *DefaultConsentStrategy) CreateConsentRequest(req fosite.AuthorizeReques
 		GrantedScopes:    []string{},
 		RequestedScopes:  req.GetRequestedScopes(),
 		ClientID:         req.GetClient().GetID(),
-		ExpiresAt:        time.Now().Add(s.DefaultChallengeLifespan),
+		ExpiresAt:        time.Now().Add(s.DefaultChallengeLifespan).UTC(),
 		RedirectURL:      redirectURL + "&consent=" + id + "&consent_csrf=" + csrf,
 		AccessTokenExtra: map[string]interface{}{},
 		IDTokenExtra:     map[string]interface{}{},

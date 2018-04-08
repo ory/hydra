@@ -1,16 +1,22 @@
-// Copyright © 2017 Aeneas Rekkas <aeneas+oss@aeneas.io>
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * Copyright © 2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author		Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @copyright 	2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @license 	Apache-2.0
+ */
 
 package client_test
 
@@ -71,7 +77,7 @@ func TestClientSDK(t *testing.T) {
 	c := hydra.NewOAuth2ApiWithBasePath(server.URL)
 	c.Configuration.Transport = httpClient.Transport
 
-	t.Run("foo", func(t *testing.T) {
+	t.Run("case=client is created and updated", func(t *testing.T) {
 		createClient := createTestClient("")
 
 		result, _, err := c.CreateOAuth2Client(createClient)
@@ -83,7 +89,7 @@ func TestClientSDK(t *testing.T) {
 		result, _, err = c.GetOAuth2Client(createClient.Id)
 		assert.EqualValues(t, compareClient, *result)
 
-		results, _, err := c.ListOAuth2Clients()
+		results, _, err := c.ListOAuth2Clients(100, 0)
 		require.NoError(t, err)
 		assert.Len(t, results, 1)
 		assert.EqualValues(t, compareClient, results[0])
@@ -105,5 +111,19 @@ func TestClientSDK(t *testing.T) {
 		_, response, err := c.GetOAuth2Client(updateClient.Id)
 		require.NoError(t, err)
 		assert.Equal(t, http.StatusNotFound, response.StatusCode)
+	})
+
+	t.Run("case=public client is transmitted without secret", func(t *testing.T) {
+		result, _, err := c.CreateOAuth2Client(hydra.OAuth2Client{
+			Public: true,
+		})
+
+		require.NoError(t, err)
+		assert.Equal(t, "", result.ClientSecret)
+
+		result, _, err = c.CreateOAuth2Client(createTestClient(""))
+
+		require.NoError(t, err)
+		assert.NotEqual(t, "", result.ClientSecret)
 	})
 }

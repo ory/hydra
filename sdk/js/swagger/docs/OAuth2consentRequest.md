@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.OAuth2ConsentRequest
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2ConsentRequest
 
 ## Properties
 Name | Type | Description | Notes

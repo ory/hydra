@@ -1,16 +1,22 @@
-// Copyright © 2017 Aeneas Rekkas <aeneas+oss@aeneas.io>
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * Copyright © 2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author		Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @copyright 	2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @license 	Apache-2.0
+ */
 
 package jwk_test
 
@@ -46,13 +52,13 @@ func init() {
 		}, &ladon.DefaultPolicy{
 			ID:        "1",
 			Subjects:  []string{"<.*>"},
-			Resources: []string{"rn:hydra:keys:<[^:]+>:public"},
+			Resources: []string{"rn:hydra:keys:<[^:]+>:public:test-id"},
 			Actions:   []string{"get"},
 			Effect:    ladon.AllowAccess,
 		},
 	)
 	router := httprouter.New()
-	IDKS, _ = testGenerator.Generate("")
+	IDKS, _ = testGenerator.Generate("test-id")
 
 	h := Handler{
 		Manager: &MemoryManager{},
@@ -75,7 +81,7 @@ func TestHandlerWellKnown(t *testing.T) {
 	err = json.NewDecoder(res.Body).Decode(&known)
 	require.NoError(t, err, "problem in decoding response")
 
-	resp := known.Key("public")
+	resp := known.Key("public:test-id")
 	require.NotNil(t, resp, "Could not find key public")
-	assert.Equal(t, resp, IDKS.Key("public"))
+	assert.Equal(t, resp, IDKS.Key("public:test-id"))
 }

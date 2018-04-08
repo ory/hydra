@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.OAuth2Client
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Client
 
 ## Properties
 Name | Type | Description | Notes

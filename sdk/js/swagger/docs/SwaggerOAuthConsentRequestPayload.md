@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.SwaggerOAuthConsentRequestPayload
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerOAuthConsentRequestPayload
 
 ## Properties
 Name | Type | Description | Notes

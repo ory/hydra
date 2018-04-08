@@ -1,36 +1,54 @@
-// Copyright © 2017 Aeneas Rekkas <aeneas+oss@aeneas.io>
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * Copyright © 2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author		Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @copyright 	2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @license 	Apache-2.0
+ */
 
 package oauth2
 
 import (
-	"sync"
-
 	"context"
+	"sync"
+	"time"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/pkg/errors"
 )
 
+func NewFositeMemoryStore(m client.Manager, ls time.Duration) *FositeMemoryStore {
+	return &FositeMemoryStore{
+		AuthorizeCodes:      make(map[string]fosite.Requester),
+		IDSessions:          make(map[string]fosite.Requester),
+		AccessTokens:        make(map[string]fosite.Requester),
+		RefreshTokens:       make(map[string]fosite.Requester),
+		AccessTokenLifespan: ls,
+		Manager:             m,
+	}
+}
+
 type FositeMemoryStore struct {
 	client.Manager
 
-	AuthorizeCodes map[string]fosite.Requester
-	IDSessions     map[string]fosite.Requester
-	AccessTokens   map[string]fosite.Requester
-	RefreshTokens  map[string]fosite.Requester
+	AuthorizeCodes      map[string]fosite.Requester
+	IDSessions          map[string]fosite.Requester
+	AccessTokens        map[string]fosite.Requester
+	RefreshTokens       map[string]fosite.Requester
+	AccessTokenLifespan time.Duration
 
 	sync.RWMutex
 }
@@ -176,5 +194,25 @@ func (s *FositeMemoryStore) RevokeAccessToken(ctx context.Context, id string) er
 	if !found {
 		return errors.New("Not found")
 	}
+	return nil
+}
+
+func (s *FositeMemoryStore) FlushInactiveAccessTokens(ctx context.Context, notAfter time.Time) error {
+	s.Lock()
+	defer s.Unlock()
+
+	now := time.Now()
+	for sig, token := range s.AccessTokens {
+		expiresAt := token.GetRequestedAt().Add(s.AccessTokenLifespan)
+		isExpired := expiresAt.Before(now)
+		isNotAfter := token.GetRequestedAt().Before(notAfter)
+
+		if isExpired && isNotAfter {
+			if err := s.deleteAccessTokenSession(ctx, sig); err != nil {
+				return err
+			}
+		}
+	}
+
 	return nil
 }

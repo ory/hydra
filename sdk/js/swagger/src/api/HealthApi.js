@@ -1,6 +1,6 @@
 /**
- * Hydra OAuth2 & OpenID Connect Server
- * Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/   Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure. Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to. Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.   The official repository is located at https://github.com/ory/hydra   ### Important REST API Documentation Notes  The swagger generator used to create this documentation does currently not support example responses. To see request and response payloads click on **\"Show JSON schema\"**: ![Enable JSON Schema on Apiary](https://storage.googleapis.com/ory.am/hydra/json-schema.png)   The API documentation always refers to the latest tagged version of ORY Hydra. For previous API documentations, please refer to https://github.com/ory/hydra/blob/<tag-id>/docs/api.swagger.yaml - for example:  0.9.13: https://github.com/ory/hydra/blob/v0.9.13/docs/api.swagger.yaml 0.8.1: https://github.com/ory/hydra/blob/v0.8.1/docs/api.swagger.yaml
+ * ORY Hydra - Cloud Native OAuth 2.0 and OpenID Connect Server
+ * Welcome to the ORY Hydra HTTP API documentation. You will find documentation for all HTTP APIs here. Keep in mind that this document reflects the latest branch, always. Support for versioned documentation is coming in the future.
  *
  * OpenAPI spec version: Latest
  * Contact: hi@ory.am
@@ -30,13 +30,13 @@
     )
   } else {
     // Browser globals (root is window)
-    if (!root.HydraOAuth2OpenIdConnectServer) {
-      root.HydraOAuth2OpenIdConnectServer = {}
+    if (!root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer) {
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {}
     }
-    root.HydraOAuth2OpenIdConnectServer.HealthApi = factory(
-      root.HydraOAuth2OpenIdConnectServer.ApiClient,
-      root.HydraOAuth2OpenIdConnectServer.InlineResponse200,
-      root.HydraOAuth2OpenIdConnectServer.InlineResponse401
+    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthApi = factory(
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient,
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.InlineResponse200,
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.InlineResponse401
     )
   }
 })(this, function(ApiClient, InlineResponse200, InlineResponse401) {
@@ -59,48 +59,6 @@
     this.apiClient = apiClient || ApiClient.instance
 
     /**
-     * Callback function to receive the result of the getInstanceMetrics operation.
-     * @callback module:api/HealthApi~getInstanceMetricsCallback
-     * @param {String} error Error message, if any.
-     * @param data This operation does not return a value.
-     * @param {String} response The complete HTTP response.
-     */
-
-    /**
-     * Show instance metrics (experimental)
-     * This endpoint returns an instance&#39;s metrics, such as average response time, status code distribution, hits per second and so on. The return values are currently not documented as this endpoint is still experimental.   The subject making the request needs to be assigned to a policy containing:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:health:stats\&quot;], \&quot;actions\&quot;: [\&quot;get\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
-     * @param {module:api/HealthApi~getInstanceMetricsCallback} callback The callback function, accepting three arguments: error, data, response
-     */
-    this.getInstanceMetrics = function(callback) {
-      var postBody = null
-
-      var pathParams = {}
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
-
-      var authNames = ['oauth2']
-      var contentTypes = ['application/json']
-      var accepts = ['application/json']
-      var returnType = null
-
-      return this.apiClient.callApi(
-        '/health/metrics',
-        'GET',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
-    }
-
-    /**
      * Callback function to receive the result of the getInstanceStatus operation.
      * @callback module:api/HealthApi~getInstanceStatusCallback
      * @param {String} error Error message, if any.
@@ -109,8 +67,8 @@
      */
 
     /**
-     * Check health status of this instance
-     * This endpoint returns &#x60;{ \&quot;status\&quot;: \&quot;ok\&quot; }&#x60;. This status let&#39;s you know that the HTTP server is up and running. This status does currently not include checks whether the database connection is up and running. This endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header when TLS termination is set.   Be aware that if you are running multiple nodes of ORY Hydra, the health status will never refer to the cluster state, only to a single instance.
+     * Check the Health Status
+     * This endpoint returns a 200 status code when the HTTP server is up running. &#x60;{ \&quot;status\&quot;: \&quot;ok\&quot; }&#x60;. This status does currently not include checks whether the database connection is working. This endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header when TLS termination is set.  Be aware that if you are running multiple nodes of ORY Hydra, the health status will never refer to the cluster state, only to a single instance.
      * @param {module:api/HealthApi~getInstanceStatusCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/InlineResponse200}
      */

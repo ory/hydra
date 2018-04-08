@@ -1,16 +1,22 @@
-// Copyright © 2017 Aeneas Rekkas <aeneas+oss@aeneas.io>
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * Copyright © 2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author		Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @copyright 	2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @license 	Apache-2.0
+ */
 
 package server
 
@@ -30,7 +36,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/square/go-jose"
 )
 
 const (
@@ -86,42 +91,36 @@ func getOrCreateTLSCertificate(cmd *cobra.Command, c *config.Config) tls.Certifi
 	}
 
 	ctx := c.Context()
-	keys, err := ctx.KeyManager.GetKey(tlsKeyName, "private")
-	if errors.Cause(err) == pkg.ErrNotFound {
-		c.GetLogger().Warn("No TLS Key / Certificate for HTTPS found. Generating self-signed certificate.")
-
-		keys, err = new(jwk.ECDSA256Generator).Generate("")
-		pkg.Must(err, "Could not generate key: %s", err)
-
-		cert, err := createSelfSignedCertificate(jwk.First(keys.Key("private")).Key)
-		pkg.Must(err, "Could not create X509 PEM Key Pair: %s", err)
-
-		private := jwk.First(keys.Key("private"))
-		private.Certificates = []*x509.Certificate{cert}
-		keys = &jose.JSONWebKeySet{
-			Keys: []jose.JSONWebKey{
-				*private,
-				*jwk.First(keys.Key("public")),
-			},
-		}
-
-		err = ctx.KeyManager.AddKeySet(tlsKeyName, keys)
-		pkg.Must(err, "Could not persist key: %s", err)
-	} else {
-		pkg.Must(err, "Could not retrieve key: %s", err)
+	privateKey, err := createOrGetJWK(c, tlsKeyName, "private")
+	if err != nil {
+		c.GetLogger().WithError(err).Fatalf(`Could not fetch TLS keys - did you forget to run "hydra migrate sql" or forget to set the SYSTEM_SECRET?`)
 	}
 
-	private := jwk.First(keys.Key("private"))
-	block, err := jwk.PEMBlockForKey(private.Key)
+	if len(privateKey.Certificates) == 0 {
+		cert, err := createSelfSignedCertificate(privateKey.Key)
+		if err != nil {
+			c.GetLogger().WithError(err).Fatalf(`Could not generate a self signed TLS certificate.`)
+		}
+
+		privateKey.Certificates = []*x509.Certificate{cert}
+		if err := ctx.KeyManager.DeleteKey(tlsKeyName, privateKey.KeyID); err != nil {
+			c.GetLogger().WithError(err).Fatalf(`Could not update (delete) the self signed TLS certificate.`)
+		}
+		if err := ctx.KeyManager.AddKey(tlsKeyName, privateKey); err != nil {
+			c.GetLogger().WithError(err).Fatalf(`Could not update (add) the self signed TLS certificate.`)
+		}
+	}
+
+	block, err := jwk.PEMBlockForKey(privateKey.Key)
 	if err != nil {
 		pkg.Must(err, "Could not encode key to PEM: %s", err)
 	}
 
-	if len(private.Certificates) == 0 {
+	if len(privateKey.Certificates) == 0 {
 		c.GetLogger().Fatal("TLS certificate chain can not be empty")
 	}
 
-	pemCert := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: private.Certificates[0].Raw})
+	pemCert := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: privateKey.Certificates[0].Raw})
 	pemKey := pem.EncodeToMemory(block)
 	cert, err := tls.X509KeyPair(pemCert, pemKey)
 	pkg.Must(err, "Could not decode certificate: %s", err)

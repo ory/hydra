@@ -1,16 +1,22 @@
-// Copyright © 2017 Aeneas Rekkas <aeneas+oss@aeneas.io>
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * Copyright © 2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author		Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @copyright 	2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @license 	Apache-2.0
+ */
 
 package oauth2
 
@@ -63,20 +69,14 @@ type swaggerAcceptConsentRequest struct {
 	Body AcceptConsentRequestPayload
 }
 
-// The consent request response
-// swagger:response oAuth2ConsentRequest
-type swaggerOAuthConsentRequest struct {
+// swagger:parameters flushInactiveOAuth2Tokens
+type swaggerFlushInactiveAccessTokens struct {
 	// in: body
-	Body swaggerConsentRequest
+	Body FlushInactiveOAuth2TokensRequest
 }
 
 // The userinfo response
-// swagger:response userinfoResponse
-type swaggeruserinfoResponse struct {
-	// in: body
-	Body swaggeruserinfoResponsePayload
-}
-
+// swagger:model userinfoResponse
 type swaggeruserinfoResponsePayload struct {
 	// Subject - Identifier for the End-User at the Issuer.
 	Subject string `json:"sub"`
@@ -137,38 +137,28 @@ type swaggeruserinfoResponsePayload struct {
 }
 
 // The token response
-// swagger:response oauthTokenResponse
+// swagger:model oauthTokenResponse
 type swaggerOAuthTokenResponse struct {
-	// in: body
-	Body struct {
-		// The lifetime in seconds of the access token.  For
-		//  example, the value "3600" denotes that the access token will
-		// expire in one hour from the time the response was generated.
-		ExpiresIn int `json:"expires_in"`
+	// The lifetime in seconds of the access token.  For
+	//  example, the value "3600" denotes that the access token will
+	// expire in one hour from the time the response was generated.
+	ExpiresIn int `json:"expires_in"`
 
-		// The scope of the access token
-		Scope int `json:"scope"`
+	// The scope of the access token
+	Scope int `json:"scope"`
 
-		// To retrieve a refresh token request the id_token scope.
-		IDToken int `json:"id_token"`
+	// To retrieve a refresh token request the id_token scope.
+	IDToken int `json:"id_token"`
 
-		// The access token issued by the authorization server.
-		AccessToken string `json:"access_token"`
+	// The access token issued by the authorization server.
+	AccessToken string `json:"access_token"`
 
-		// The refresh token, which can be used to obtain new
-		// access tokens. To retrieve it add the scope "offline" to your access token request.
-		RefreshToken string `json:"refresh_token"`
+	// The refresh token, which can be used to obtain new
+	// access tokens. To retrieve it add the scope "offline" to your access token request.
+	RefreshToken string `json:"refresh_token"`
 
-		// The type of the token issued
-		TokenType string `json:"token_type"`
-	}
-}
-
-// The token introspection response
-// swagger:response introspectOAuth2TokenResponse
-type swaggerOAuthIntrospectionResponse struct {
-	// in: body
-	Body swaggerOAuthIntrospectionResponsePayload
+	// The type of the token issued
+	TokenType string `json:"token_type"`
 }
 
 // swagger:model oAuth2TokenIntrospection

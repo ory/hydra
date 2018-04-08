@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.PolicyApi
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.PolicyApi
 
 All URIs are relative to *http://localhost*
 
@@ -21,17 +21,17 @@ The subject making the request needs to be assigned to a policy containing:  &#x
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.PolicyApi();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.PolicyApi();
 
 var opts = { 
-  'body': new HydraOAuth2OpenIdConnectServer.Policy() // Policy | 
+  'body': new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.Policy() // Policy | 
 };
 
 var callback = function(error, data, response) {
@@ -73,14 +73,14 @@ The subject making the request needs to be assigned to a policy containing:  &#x
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.PolicyApi();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.PolicyApi();
 
 var id = "id_example"; // String | The id of the policy.
 
@@ -124,14 +124,14 @@ The subject making the request needs to be assigned to a policy containing:  &#x
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.PolicyApi();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.PolicyApi();
 
 var id = "id_example"; // String | The id of the policy.
 
@@ -175,14 +175,14 @@ The subject making the request needs to be assigned to a policy containing:  &#x
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.PolicyApi();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.PolicyApi();
 
 var opts = { 
   'offset': 789, // Number | The offset from where to start looking.
@@ -229,19 +229,19 @@ The subject making the request needs to be assigned to a policy containing:  &#x
 
 ### Example
 ```javascript
-var HydraOAuth2OpenIdConnectServer = require('hydra_o_auth2__open_id_connect_server');
-var defaultClient = HydraOAuth2OpenIdConnectServer.ApiClient.instance;
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var defaultClient = OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient.instance;
 
 // Configure OAuth2 access token for authorization: oauth2
 var oauth2 = defaultClient.authentications['oauth2'];
 oauth2.accessToken = 'YOUR ACCESS TOKEN';
 
-var apiInstance = new HydraOAuth2OpenIdConnectServer.PolicyApi();
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.PolicyApi();
 
 var id = "id_example"; // String | The id of the policy.
 
 var opts = { 
-  'body': new HydraOAuth2OpenIdConnectServer.Policy() // Policy | 
+  'body': new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.Policy() // Policy | 
 };
 
 var callback = function(error, data, response) {

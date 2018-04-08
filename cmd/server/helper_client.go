@@ -1,27 +1,33 @@
-// Copyright © 2017 Aeneas Rekkas <aeneas+oss@aeneas.io>
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * Copyright © 2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author		Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @copyright 	2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @license 	Apache-2.0
+ */
 
 package server
 
 import (
+	"net/url"
 	"os"
 	"strings"
 
-	"net/url"
-
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
+	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/ladon"
 )
@@ -29,7 +35,7 @@ import (
 func (h *Handler) createRootIfNewInstall(c *config.Config) {
 	ctx := c.Context()
 
-	clients, err := h.Clients.Manager.GetClients()
+	clients, err := h.Clients.Manager.GetClients(100, 0)
 	pkg.Must(err, "Could not fetch client list: %s", err)
 	if len(clients) != 0 {
 		return
@@ -83,13 +89,33 @@ func (h *Handler) createRootIfNewInstall(c *config.Config) {
 		c.GetLogger().Warn("WARNING: YOU MUST delete this client once in production, as credentials may have been leaked in your logfiles.")
 	}
 
-	err = ctx.LadonManager.Create(&ladon.DefaultPolicy{
-		Description: "This is a policy created by hydra and issued to the first client. It grants all of hydra's administrative privileges to the client and enables the client_credentials response type.",
+	pkg.Must(ctx.LadonManager.Create(&ladon.DefaultPolicy{
+		Description: "This is a policy created by ORY Hydra and issued to the first client. It grants all of hydra's administrative privileges to the client and enables the client_credentials response type.",
 		Subjects:    []string{root.GetID()},
 		Effect:      ladon.AllowAccess,
-		Resources:   []string{"rn:hydra:<.*>"},
+		Resources:   []string{prefixResource(c.AccessControlResourcePrefix, "<.*>")},
 		Actions:     []string{"<.*>"},
 		ID:          "default-admin-policy",
-	})
-	pkg.Must(err, "Could not create admin policy because %s", err)
+	}), "Could not create admin policy because %s", err)
+
+	pkg.Must(ctx.LadonManager.Create(&ladon.DefaultPolicy{
+		Description: "This is a policy created by ORY Hydra which allows all users, including anonymous ones, access to the /.well-known/jwks.json endpoint. This endpoint is used for verifying OpenID Connect ID Tokens.",
+		Subjects:    []string{"<.*>"},
+		Effect:      ladon.AllowAccess,
+		Resources:   []string{prefixResource(c.AccessControlResourcePrefix, "keys:"+oauth2.OpenIDConnectKeyName+":public:<.*>")},
+		Actions:     []string{"get"},
+		ID:          "default-oidc-id-token-public-policy",
+	}), "Could not create wellknown JWKS policy because %s", err)
+}
+
+func prefixResource(prefix, resource string) string {
+	if prefix == "" {
+		prefix = "rn:hydra"
+	}
+
+	if prefix[len(prefix)-1] == ':' {
+		prefix = prefix[:len(prefix)-1]
+	}
+
+	return prefix + ":" + resource
 }

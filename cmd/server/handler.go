@@ -1,16 +1,22 @@
-// Copyright © 2017 Aeneas Rekkas <aeneas+oss@aeneas.io>
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * Copyright © 2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author		Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @copyright 	2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @license 	Apache-2.0
+ */
 
 package server
 
@@ -62,6 +68,8 @@ func parseCorsOptions() cors.Options {
 
 func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
+		fmt.Println(banner)
+
 		router := httprouter.New()
 		logger := c.GetLogger()
 		serverHandler := &Handler{
@@ -94,12 +102,6 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 			c.ClusterURL = fmt.Sprintf("%s://%s:%d", proto, host, c.BindPort)
 		}
 
-		if ok, _ := cmd.Flags().GetBool("dangerous-auto-logon"); ok {
-			logger.Warnln("Do not use flag --dangerous-auto-logon in production.")
-			err := c.Persist()
-			pkg.Must(err, "Could not write configuration file: %s", err)
-		}
-
 		n := negroni.New()
 
 		if ok, _ := cmd.Flags().GetBool("disable-telemetry"); !ok && os.Getenv("DISABLE_TELEMETRY") != "1" {
@@ -121,6 +123,12 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 				Certificates: []tls.Certificate{getOrCreateTLSCertificate(cmd, c)},
 			},
 		})
+
+		if ok, _ := cmd.Flags().GetBool("dangerous-auto-logon"); ok {
+			logger.Warnln("Do not use flag --dangerous-auto-logon in production.")
+			err := c.Persist()
+			pkg.Must(err, "Could not write configuration file: %s", err)
+		}
 
 		err := graceful.Graceful(func() error {
 			var err error
@@ -162,7 +170,7 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 	injectConsentManager(c)
 	clientsManager := newClientManager(c)
 	injectFositeStore(c, clientsManager)
-	oauth2Provider := newOAuth2Provider(c, ctx.KeyManager)
+	oauth2Provider, idTokenKeyID := newOAuth2Provider(c)
 
 	// set up warden
 	ctx.Warden = &warden.LocalWarden{
@@ -181,7 +189,7 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 	h.Keys = newJWKHandler(c, router)
 	h.Policy = newPolicyHandler(c, router)
 	h.Consent = newConsentHanlder(c, router)
-	h.OAuth2 = newOAuth2Handler(c, router, ctx.ConsentManager, oauth2Provider)
+	h.OAuth2 = newOAuth2Handler(c, router, ctx.ConsentManager, oauth2Provider, idTokenKeyID)
 	h.Warden = warden.NewHandler(c, router)
 	h.Groups = &group.Handler{
 		H:              herodot.NewJSONWriter(c.GetLogger()),

@@ -1,4 +1,4 @@
-# HydraOAuth2OpenIdConnectServer.KeyGenerator
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.KeyGenerator
 
 ## Properties
 Name | Type | Description | Notes

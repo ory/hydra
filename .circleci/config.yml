@@ -38,7 +38,7 @@ jobs:
       - run: go-acc -o coverage.txt ./...
       - run: go test -race -short $(go list ./... | grep -v cmd)
       - run: ./scripts/test-e2e.sh
-      - run: goveralls -service=circle-ci -coverprofile=coverage.txt -repotoken=$COVERALLS_REPO_TOKEN
+      - run: test -z "$CIRCLE_PR_NUMBER" && goveralls -service=circle-ci -coverprofile=coverage.txt -repotoken=$COVERALLS_REPO_TOKEN || echo "forks are not allowed to push to coveralls"
 
   swagger:
     docker:
@@ -113,6 +113,18 @@ jobs:
       - run: git remote add origin https://arekkas:$GITHUB_TOKEN@github.com/ory/hydra.git
       - run: git push origin HEAD:master
 
+  publish-docs:
+    docker:
+      - image: alpine/git:1.0.4
+    working_directory: /go/src/github.com/ory/hydra
+    steps:
+      - checkout
+      - run: git config --global user.email "hi@ory.am"
+      - run: git config --global user.name "ORY Continuous Integration"
+      - run: "git clone https://arekkas:$DOCS_TOKEN_PUSH@github.com/ory/docs.git ../docs"
+      - run: "cp ./docs/api.swagger.json ../docs/apis/hydra.json"
+      - run: "(cd ../docs && git add -A && git commit -a -m \"Updates ORY Hydra Swagger definitions\" && git push origin) || exit 0"
+
 workflows:
   version: 2
   "test, build, push, and deploy":
@@ -125,6 +137,10 @@ workflows:
           filters:
             tags:
               only: /.*/
+      - publish-docs:
+          filters:
+            branches:
+              only: master
       - swagger:
           filters:
             tags:

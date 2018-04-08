@@ -1,16 +1,22 @@
-// Copyright © 2017 Aeneas Rekkas <aeneas+oss@aeneas.io>
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * Copyright © 2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author		Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @copyright 	2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @license 	Apache-2.0
+ */
 
 package client
 
@@ -24,6 +30,7 @@ import (
 	"github.com/ory/hydra/firewall"
 	"github.com/ory/hydra/rand/sequence"
 	"github.com/ory/ladon"
+	"github.com/ory/pagination"
 	"github.com/pkg/errors"
 )
 
@@ -68,10 +75,9 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //
 // Create an OAuth 2.0 client
 //
-// If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will
-// be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep
-// it somwhere safe.
+// Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somwhere safe.
 //
+// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
 //
 // The subject making the request needs to be assigned to a policy containing:
 //
@@ -139,6 +145,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 		c.Secret = string(secret)
 	} else if len(c.Secret) < 6 {
 		h.H.WriteError(w, r, errors.New("The client secret must be at least 6 characters long"))
+		return
 	}
 
 	secret := c.Secret
@@ -147,7 +154,12 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 		return
 	}
 
-	c.Secret = secret
+	c.Secret = ""
+
+	if !c.Public {
+		c.Secret = secret
+	}
+
 	h.H.WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
@@ -155,9 +167,9 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 //
 // Update an OAuth 2.0 Client
 //
-// If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will
-// be able to retrieve the client secret, so write it down and keep it safe.
+// Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
 //
+// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
 //
 // The subject making the request needs to be assigned to a policy containing:
 //
@@ -244,8 +256,9 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //
 // List OAuth 2.0 Clients
 //
-// This endpoint never returns passwords.
+// This endpoint lists all clients in the database, and never returns client secrets.
 //
+// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
 //
 // The subject making the request needs to be assigned to a policy containing:
 //
@@ -284,7 +297,8 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 		return
 	}
 
-	c, err := h.Manager.GetClients()
+	limit, offset := pagination.Parse(r, 100, 0, 500)
+	c, err := h.Manager.GetClients(limit, offset)
 	if err != nil {
 		h.H.WriteError(w, r, err)
 		return
@@ -303,10 +317,11 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 
 // swagger:route GET /clients/{id} oAuth2 getOAuth2Client
 //
-// Retrieve an OAuth 2.0 Client.
+// Get an OAuth 2.0 Client.
 //
-// This endpoint never returns passwords.
+// Get an OAUth 2.0 client by its ID. This endpoint never returns passwords.
 //
+// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
 //
 // The subject making the request needs to be assigned to a policy containing:
 //
@@ -381,6 +396,10 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 // swagger:route DELETE /clients/{id} oAuth2 deleteOAuth2Client
 //
 // Deletes an OAuth 2.0 Client
+//
+// Delete an existing OAuth 2.0 Client by its ID.
+//
+// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
 //
 // The subject making the request needs to be assigned to a policy containing:
 //

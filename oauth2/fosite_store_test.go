@@ -43,10 +43,11 @@ var clientManager = &client.MemoryManager{
 
 func init() {
 	clientManagers["memory"] = &FositeMemoryStore{
-		AuthorizeCodes:      make(map[string]fosite.Requester),
-		IDSessions:          make(map[string]fosite.Requester),
-		AccessTokens:        make(map[string]fosite.Requester),
-		RefreshTokens:       make(map[string]fosite.Requester),
+		AuthorizeCodes: make(map[string]fosite.Requester),
+		IDSessions:     make(map[string]fosite.Requester),
+		AccessTokens:   make(map[string]fosite.Requester),
+		RefreshTokens:  make(map[string]fosite.Requester),
+		PKCES:          make(map[string]fosite.Requester),
 		AccessTokenLifespan: time.Hour,
 	}
 }

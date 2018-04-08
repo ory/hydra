@@ -10,7 +10,7 @@ before finalizing the upgrade process.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
-- [0.11.11](#01111)
+- [0.11.12](#01112)
 - [0.11.3](#0113)
 - [0.11.0](#0110)
 - [0.10.0](#0100)
@@ -55,7 +55,7 @@ before finalizing the upgrade process.
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## 0.11.11
+## 0.11.12
 
 This release resolves a security issue (reported by [platform.sh](https://www.platform.sh)) related to the fosite
 storage implementation in this project. Fosite used to pass all of the request body from both authorize and token

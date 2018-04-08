@@ -283,13 +283,12 @@
     "compose",
     "handler/oauth2",
     "handler/openid",
-    "handler/pkce",
     "storage",
     "token/hmac",
     "token/jwt"
   ]
-  revision = "45128532dc4bbb40a56bf6250a58f9c5d57a9c7a"
-  version = "v0.16.4"
+  revision = "1ef3041c4da40d27ea25d56710e59d5f9352df5f"
+  version = "v0.17.0"
 
 [[projects]]
   name = "github.com/ory/graceful"
@@ -559,6 +558,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "317cab4cb3c65a5029c1794f8a1a8d58fb8eb6f8a184d8da47482c94a6a73547"
+  inputs-digest = "6ac3c005e9329d3744310c022f4591ec5c5ec0d7f1bdeee9346157659ec311d1"
   solver-name = "gps-cdcl"
   solver-version = 1

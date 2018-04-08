@@ -122,6 +122,13 @@ func TestRevokeRefreshToken(t *testing.T) {
 	}
 }
 
+func TestPKCEReuqest(t *testing.T) {
+	t.Parallel()
+	for k, m := range clientManagers {
+		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeletePKCERequestSession(m))
+	}
+}
+
 func TestFlushAccessTokens(t *testing.T) {
 	t.Parallel()
 	for k, m := range clientManagers {

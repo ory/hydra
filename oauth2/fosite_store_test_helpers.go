@@ -150,7 +150,6 @@ func TestHelperCreateGetDeleteAccessTokenSession(m pkg.FositeStorer) func(t *tes
 	}
 }
 
-
 func TestHelperCreateGetDeletePKCERequestSession(m pkg.FositeStorer) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.Background()

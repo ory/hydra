@@ -50,7 +50,7 @@ func sqlSchemaUp(table string, id string) string {
 	session_data  	text NOT NULL
 )`, table),
 		"2": fmt.Sprintf("ALTER TABLE hydra_oauth2_%s ADD subject varchar(255) NOT NULL DEFAULT ''", table),
-		"3": fmt.Sprintf(`CREATE TABLE IF NOT EXISTS hydra_oauth2_%s (
+		"3": `CREATE TABLE IF NOT EXISTS hydra_oauth2_pkce (
 	signature      	varchar(255) NOT NULL PRIMARY KEY,
 	request_id  	varchar(255) NOT NULL,
 	requested_at  	timestamp NOT NULL DEFAULT now(),
@@ -58,8 +58,7 @@ func sqlSchemaUp(table string, id string) string {
 	scope  			text NOT NULL,
 	granted_scope 	text NOT NULL,
 	form_data  		text NOT NULL,
-	session_data  	text NOT NULL
-)`, table),
+	session_data  	text NOT NULL`,
 	}
 
 	return schemas[id]
@@ -69,7 +68,7 @@ func sqlSchemaDown(table string, id string) string {
 	schemas := map[string]string{
 		"1": fmt.Sprintf(`DROP TABLE %s)`, table),
 		"2": fmt.Sprintf("ALTER TABLE hydra_oauth2_%s DROP COLUMN subject", table),
-		"3": fmt.Sprintf(`DROP TABLE %s)`, table),
+		"3": "DROP TABLE hydra_oauth2_pkce",
 	}
 
 	return schemas[id]

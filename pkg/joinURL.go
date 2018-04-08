@@ -30,7 +30,7 @@ func JoinURLStrings(host string, parts ...string) string {
 
 	u, err := url.Parse(host)
 	if err != nil {
-		return fmt.Sprintf("%s%s%s", path.Join(append([]string{u.Path}, parts...)...), trailing)
+		return fmt.Sprintf("%s%s", path.Join(append([]string{u.Path}, parts...)...), trailing)
 	}
 
 	if u.Path == "" {

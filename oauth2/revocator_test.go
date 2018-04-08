@@ -40,7 +40,7 @@ func createAccessTokenSession(subject, client string, token string, expiresAt ti
 	if scopes != nil {
 		ar.GrantedScopes = scopes
 	}
-	ar.RequestedAt = time.Now().Round(time.Minute)
+	ar.RequestedAt = time.Now().UTC().Round(time.Minute)
 	ar.Client = &fosite.DefaultClient{ID: client}
 	ar.Session.SetExpiresAt(fosite.AccessToken, expiresAt)
 	ar.Session.(*oauth2.Session).Extra = map[string]interface{}{"foo": "bar"}
@@ -51,7 +51,7 @@ func TestRevoke(t *testing.T) {
 	var (
 		tokens = pkg.Tokens(4)
 		store  = storage.NewExampleStore()
-		now    = time.Now().Round(time.Second)
+		now    = time.Now().UTC().Round(time.Second)
 	)
 
 	handler := &oauth2.Handler{

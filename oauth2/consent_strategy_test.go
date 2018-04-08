@@ -41,7 +41,7 @@ func TestConsentStrategy(t *testing.T) {
 			ClientID:  "client_id",
 			Subject:   "peter",
 			CSRF:      "csrf_token",
-			ExpiresAt: time.Now().Add(time.Hour),
+			ExpiresAt: time.Now().UTC().Add(time.Hour),
 		}))
 		require.NoError(t, strategy.ConsentManager.PersistConsentRequest(&ConsentRequest{
 			ID:        "granted_csrf_cookie",
@@ -49,7 +49,7 @@ func TestConsentStrategy(t *testing.T) {
 			ClientID:  "client_id",
 			Subject:   "peter",
 			CSRF:      "csrf_token",
-			ExpiresAt: time.Now().Add(time.Hour),
+			ExpiresAt: time.Now().UTC().Add(time.Hour),
 		}))
 		require.NoError(t, strategy.ConsentManager.PersistConsentRequest(&ConsentRequest{
 			ID:        "granted_csrf_request",
@@ -57,14 +57,14 @@ func TestConsentStrategy(t *testing.T) {
 			ClientID:  "client_id",
 			Subject:   "peter",
 			CSRF:      "csrf_token",
-			ExpiresAt: time.Now().Add(time.Hour),
+			ExpiresAt: time.Now().UTC().Add(time.Hour),
 		}))
 		require.NoError(t, strategy.ConsentManager.PersistConsentRequest(&ConsentRequest{
 			ID:        "granted_expired",
 			Consent:   ConsentRequestAccepted,
 			Subject:   "peter",
 			ClientID:  "client_id",
-			ExpiresAt: time.Now().Add(-time.Hour),
+			ExpiresAt: time.Now().UTC().Add(-time.Hour),
 			CSRF:      "csrf_token",
 		}))
 

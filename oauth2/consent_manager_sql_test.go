@@ -36,7 +36,7 @@ func TestConsentRequestSqlDataTransforms(t *testing.T) {
 				RequestedScopes:  []string{"foo", "bar"},
 				GrantedScopes:    []string{"baz", "bar"},
 				CSRF:             "some-csrf",
-				ExpiresAt:        time.Now().Round(time.Second),
+				ExpiresAt:        time.Now().UTC().Round(time.Second),
 				Consent:          ConsentRequestAccepted,
 				DenyReason:       "some reason",
 				AccessTokenExtra: map[string]interface{}{"atfoo": "bar", "atbaz": "bar"},

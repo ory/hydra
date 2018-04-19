@@ -10,9 +10,9 @@
  */
 
 /**
- * ORY Hydra - Cloud Native OAuth 2.0 and OpenID Connect Server
+ * Hydra OAuth2 & OpenID Connect Server
  *
- * Welcome to the ORY Hydra HTTP API documentation. You will find documentation for all HTTP APIs here. Keep in mind that this document reflects the latest branch, always. Support for versioned documentation is coming in the future.
+ * Please refer to the user guide for in-depth documentation: https://ory.gitbooks.io/hydra/content/   Hydra offers OAuth 2.0 and OpenID Connect Core 1.0 capabilities as a service. Hydra is different, because it works with any existing authentication infrastructure, not just LDAP or SAML. By implementing a consent app (works with any programming language) you build a bridge between Hydra and your authentication infrastructure. Hydra is able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to. Hydra is suitable for green- (new) and brownfield (existing) projects. If you are not familiar with OAuth 2.0 and are working on a greenfield project, we recommend evaluating if OAuth 2.0 really serves your purpose. Knowledge of OAuth 2.0 is imperative in understanding what Hydra does and how it works.   The official repository is located at https://github.com/ory/hydra   ### Important REST API Documentation Notes  The swagger generator used to create this documentation does currently not support example responses. To see request and response payloads click on **\"Show JSON schema\"**: ![Enable JSON Schema on Apiary](https://storage.googleapis.com/ory.am/hydra/json-schema.png)   The API documentation always refers to the latest tagged version of ORY Hydra. For previous API documentations, please refer to https://github.com/ory/hydra/blob/<tag-id>/docs/api.swagger.yaml - for example:  0.9.13: https://github.com/ory/hydra/blob/v0.9.13/docs/api.swagger.yaml 0.8.1: https://github.com/ory/hydra/blob/v0.8.1/docs/api.swagger.yaml
  *
  * OpenAPI spec version: Latest
  * Contact: hi@ory.am
@@ -390,100 +390,9 @@ class OAuth2Api
     }
 
     /**
-     * Operation flushInactiveOAuth2Tokens
-     *
-     * Flush Expired OAuth2 Access Tokens
-     *
-     * Client for Hydra
-     *
-     * @param \Hydra\SDK\Model\FlushInactiveOAuth2TokensRequest $body  (optional)
-     * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return void
-     */
-    public function flushInactiveOAuth2Tokens($body = null)
-    {
-        list($response) = $this->flushInactiveOAuth2TokensWithHttpInfo($body);
-        return $response;
-    }
-
-    /**
-     * Operation flushInactiveOAuth2TokensWithHttpInfo
-     *
-     * Flush Expired OAuth2 Access Tokens
-     *
-     * Client for Hydra
-     *
-     * @param \Hydra\SDK\Model\FlushInactiveOAuth2TokensRequest $body  (optional)
-     * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return array of null, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function flushInactiveOAuth2TokensWithHttpInfo($body = null)
-    {
-        // parse inputs
-        $resourcePath = "/oauth2/flush";
-        $httpBody = '';
-        $queryParams = [];
-        $headerParams = [];
-        $formParams = [];
-        $_header_accept = $this->apiClient->selectHeaderAccept(['application/json']);
-        if (!is_null($_header_accept)) {
-            $headerParams['Accept'] = $_header_accept;
-        }
-        $headerParams['Content-Type'] = $this->apiClient->selectHeaderContentType(['application/json']);
-
-        // body params
-        $_tempBody = null;
-        if (isset($body)) {
-            $_tempBody = $body;
-        }
-
-        // for model (json/xml)
-        if (isset($_tempBody)) {
-            $httpBody = $_tempBody; // $_tempBody is the method argument, if present
-        } elseif (count($formParams) > 0) {
-            $httpBody = $formParams; // for HTTP post (form)
-        }
-        // this endpoint requires HTTP basic authentication
-        if (strlen($this->apiClient->getConfig()->getUsername()) !== 0 or strlen($this->apiClient->getConfig()->getPassword()) !== 0) {
-            $headerParams['Authorization'] = 'Basic ' . base64_encode($this->apiClient->getConfig()->getUsername() . ":" . $this->apiClient->getConfig()->getPassword());
-        }
-        // this endpoint requires OAuth (access token)
-        if (strlen($this->apiClient->getConfig()->getAccessToken()) !== 0) {
-            $headerParams['Authorization'] = 'Bearer ' . $this->apiClient->getConfig()->getAccessToken();
-        }
-        // make the API Call
-        try {
-            list($response, $statusCode, $httpHeader) = $this->apiClient->callApi(
-                $resourcePath,
-                'POST',
-                $queryParams,
-                $httpBody,
-                $headerParams,
-                null,
-                '/oauth2/flush'
-            );
-
-            return [null, $statusCode, $httpHeader];
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-                case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\InlineResponse401', $e->getResponseHeaders());
-                    $e->setResponseObject($data);
-                    break;
-                case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\InlineResponse401', $e->getResponseHeaders());
-                    $e->setResponseObject($data);
-                    break;
-            }
-
-            throw $e;
-        }
-    }
-
-    /**
      * Operation getOAuth2Client
      *
-     * Get an OAuth 2.0 Client.
+     * Retrieve an OAuth 2.0 Client.
      *
      * Client for Hydra
      *
@@ -500,7 +409,7 @@ class OAuth2Api
     /**
      * Operation getOAuth2ClientWithHttpInfo
      *
-     * Get an OAuth 2.0 Client.
+     * Retrieve an OAuth 2.0 Client.
      *
      * Client for Hydra
      *
@@ -871,14 +780,12 @@ class OAuth2Api
      *
      * Client for Hydra
      *
-     * @param int $limit The maximum amount of policies returned. (optional)
-     * @param int $offset The offset from where to start looking. (optional)
      * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return \Hydra\SDK\Model\OAuth2Client[]
      */
-    public function listOAuth2Clients($limit = null, $offset = null)
+    public function listOAuth2Clients()
     {
-        list($response) = $this->listOAuth2ClientsWithHttpInfo($limit, $offset);
+        list($response) = $this->listOAuth2ClientsWithHttpInfo();
         return $response;
     }
 
@@ -889,12 +796,10 @@ class OAuth2Api
      *
      * Client for Hydra
      *
-     * @param int $limit The maximum amount of policies returned. (optional)
-     * @param int $offset The offset from where to start looking. (optional)
      * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return array of \Hydra\SDK\Model\OAuth2Client[], HTTP status code, HTTP response headers (array of strings)
      */
-    public function listOAuth2ClientsWithHttpInfo($limit = null, $offset = null)
+    public function listOAuth2ClientsWithHttpInfo()
     {
         // parse inputs
         $resourcePath = "/clients";
@@ -908,14 +813,6 @@ class OAuth2Api
         }
         $headerParams['Content-Type'] = $this->apiClient->selectHeaderContentType(['application/json']);
 
-        // query params
-        if ($limit !== null) {
-            $queryParams['limit'] = $this->apiClient->getSerializer()->toQueryValue($limit);
-        }
-        // query params
-        if ($offset !== null) {
-            $queryParams['offset'] = $this->apiClient->getSerializer()->toQueryValue($offset);
-        }
 
         // for model (json/xml)
         if (isset($_tempBody)) {
@@ -1048,7 +945,7 @@ class OAuth2Api
      * Client for Hydra
      *
      * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return \Hydra\SDK\Model\OauthTokenResponse
+     * @return \Hydra\SDK\Model\InlineResponse2001
      */
     public function oauthToken()
     {
@@ -1064,7 +961,7 @@ class OAuth2Api
      * Client for Hydra
      *
      * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return array of \Hydra\SDK\Model\OauthTokenResponse, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \Hydra\SDK\Model\InlineResponse2001, HTTP status code, HTTP response headers (array of strings)
      */
     public function oauthTokenWithHttpInfo()
     {
@@ -1103,15 +1000,15 @@ class OAuth2Api
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\Hydra\SDK\Model\OauthTokenResponse',
+                '\Hydra\SDK\Model\InlineResponse2001',
                 '/oauth2/token'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\OauthTokenResponse', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\InlineResponse2001', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\OauthTokenResponse', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\InlineResponse2001', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
@@ -1444,7 +1341,7 @@ class OAuth2Api
      * Client for Hydra
      *
      * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return \Hydra\SDK\Model\UserinfoResponse
+     * @return \Hydra\SDK\Model\SwaggeruserinfoResponsePayload
      */
     public function userinfo()
     {
@@ -1460,7 +1357,7 @@ class OAuth2Api
      * Client for Hydra
      *
      * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return array of \Hydra\SDK\Model\UserinfoResponse, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \Hydra\SDK\Model\SwaggeruserinfoResponsePayload, HTTP status code, HTTP response headers (array of strings)
      */
     public function userinfoWithHttpInfo()
     {
@@ -1495,15 +1392,15 @@ class OAuth2Api
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\Hydra\SDK\Model\UserinfoResponse',
+                '\Hydra\SDK\Model\SwaggeruserinfoResponsePayload',
                 '/userinfo'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\UserinfoResponse', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\SwaggeruserinfoResponsePayload', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\UserinfoResponse', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\SwaggeruserinfoResponsePayload', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
@@ -1523,7 +1420,7 @@ class OAuth2Api
     /**
      * Operation wellKnown
      *
-     * Get Well-Known JSON Web Keys
+     * Get list of well known JSON Web Keys
      *
      * Client for Hydra
      *
@@ -1539,7 +1436,7 @@ class OAuth2Api
     /**
      * Operation wellKnownWithHttpInfo
      *
-     * Get Well-Known JSON Web Keys
+     * Get list of well known JSON Web Keys
      *
      * Client for Hydra
      *

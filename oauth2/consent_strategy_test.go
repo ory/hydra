@@ -47,7 +47,7 @@ func TestConsentStrategy(t *testing.T) {
 			ClientID:  "client_id",
 			Subject:   "peter",
 			CSRF:      "csrf_token",
-			ExpiresAt: time.Now().Add(time.Hour),
+			ExpiresAt: time.Now().UTC().Add(time.Hour),
 		}))
 		require.NoError(t, strategy.ConsentManager.PersistConsentRequest(&ConsentRequest{
 			ID:        "granted_csrf_cookie",
@@ -55,7 +55,7 @@ func TestConsentStrategy(t *testing.T) {
 			ClientID:  "client_id",
 			Subject:   "peter",
 			CSRF:      "csrf_token",
-			ExpiresAt: time.Now().Add(time.Hour),
+			ExpiresAt: time.Now().UTC().Add(time.Hour),
 		}))
 		require.NoError(t, strategy.ConsentManager.PersistConsentRequest(&ConsentRequest{
 			ID:        "granted_csrf_request",
@@ -63,14 +63,14 @@ func TestConsentStrategy(t *testing.T) {
 			ClientID:  "client_id",
 			Subject:   "peter",
 			CSRF:      "csrf_token",
-			ExpiresAt: time.Now().Add(time.Hour),
+			ExpiresAt: time.Now().UTC().Add(time.Hour),
 		}))
 		require.NoError(t, strategy.ConsentManager.PersistConsentRequest(&ConsentRequest{
 			ID:        "granted_expired",
 			Consent:   ConsentRequestAccepted,
 			Subject:   "peter",
 			ClientID:  "client_id",
-			ExpiresAt: time.Now().Add(-time.Hour),
+			ExpiresAt: time.Now().UTC().Add(-time.Hour),
 			CSRF:      "csrf_token",
 		}))
 
@@ -125,7 +125,7 @@ func TestConsentStrategy(t *testing.T) {
 				d:         "authorize url contains csrf token that does not match token set in consent request",
 				session:   "granted_csrf_request",
 				expectErr: true,
-				req:       &fosite.AuthorizeRequest{Request: fosite.Request{Client: &fosite.DefaultClient{ID: "client_id"}, Form: url.Values{"consent_csrf": {"very_different_csrf_token"}}}},
+				req:       &fosite.AuthorizeRequest{Request: fosite.Request{Client: &fosite.DefaultClient{ID: "client_id"}}},
 				cookie:    &sessions.Session{Values: map[interface{}]interface{}{CookieCSRFKey: "csrf_token"}},
 				assert: func(t *testing.T, session *Session) {
 					cr, err := strategy.ConsentManager.GetConsentRequest("granted_csrf_request")

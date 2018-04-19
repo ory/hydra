@@ -48,6 +48,7 @@ func init() {
 		AccessTokens:        make(map[string]fosite.Requester),
 		RefreshTokens:       make(map[string]fosite.Requester),
 		AccessTokenLifespan: time.Hour,
+		PKCES:          make(map[string]fosite.Requester),
 	}
 }
 
@@ -119,6 +120,13 @@ func TestRevokeRefreshToken(t *testing.T) {
 	t.Parallel()
 	for k, m := range clientManagers {
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperRevokeRefreshToken(m))
+	}
+}
+
+func TestPKCEReuqest(t *testing.T) {
+	t.Parallel()
+	for k, m := range clientManagers {
+		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeletePKCERequestSession(m))
 	}
 }
 

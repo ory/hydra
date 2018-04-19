@@ -48,6 +48,7 @@ type FositeMemoryStore struct {
 	IDSessions          map[string]fosite.Requester
 	AccessTokens        map[string]fosite.Requester
 	RefreshTokens       map[string]fosite.Requester
+	PKCES          		map[string]fosite.Requester
 	AccessTokenLifespan time.Duration
 
 	sync.RWMutex
@@ -214,5 +215,23 @@ func (s *FositeMemoryStore) FlushInactiveAccessTokens(ctx context.Context, notAf
 		}
 	}
 
+	return nil
+}
+
+func (s *FositeMemoryStore) CreatePKCERequestSession(_ context.Context, code string, req fosite.Requester) error {
+	s.PKCES[code] = req
+	return nil
+}
+
+func (s *FositeMemoryStore) GetPKCERequestSession(_ context.Context, code string, _ fosite.Session) (fosite.Requester, error) {
+	rel, ok := s.PKCES[code]
+	if !ok {
+		return nil, fosite.ErrNotFound
+	}
+	return rel, nil
+}
+
+func (s *FositeMemoryStore) DeletePKCERequestSession(_ context.Context, code string) error {
+	delete(s.PKCES, code)
 	return nil
 }

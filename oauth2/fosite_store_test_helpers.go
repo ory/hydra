@@ -155,6 +155,27 @@ func TestHelperCreateGetDeleteAccessTokenSession(m pkg.FositeStorer) func(t *tes
 	}
 }
 
+func TestHelperCreateGetDeletePKCERequestSession(m pkg.FositeStorer) func(t *testing.T) {
+	return func(t *testing.T) {
+		ctx := context.Background()
+		_, err := m.GetPKCERequestSession(ctx, "4321", &fosite.DefaultSession{})
+		assert.NotNil(t, err)
+
+		err = m.CreatePKCERequestSession(ctx, "4321", &defaultRequest)
+		require.NoError(t, err)
+
+		res, err := m.GetPKCERequestSession(ctx, "4321", &fosite.DefaultSession{})
+		require.NoError(t, err)
+		AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
+
+		err = m.DeletePKCERequestSession(ctx, "4321")
+		require.NoError(t, err)
+
+		_, err = m.GetPKCERequestSession(ctx, "4321", &fosite.DefaultSession{})
+		assert.NotNil(t, err)
+	}
+}
+
 var lifespan = time.Hour
 var flushRequests = []*fosite.Request{
 	{

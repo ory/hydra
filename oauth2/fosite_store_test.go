@@ -48,7 +48,7 @@ func init() {
 		AccessTokens:        make(map[string]fosite.Requester),
 		RefreshTokens:       make(map[string]fosite.Requester),
 		AccessTokenLifespan: time.Hour,
-		PKCES:          make(map[string]fosite.Requester),
+		PKCES:               make(map[string]fosite.Requester),
 	}
 }
 

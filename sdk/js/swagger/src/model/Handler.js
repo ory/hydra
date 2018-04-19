@@ -18,13 +18,7 @@
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
     define(
-      [
-        'ApiClient',
-        'model/Firewall',
-        'model/KeyGenerator',
-        'model/Manager',
-        'model/Writer'
-      ],
+      ['ApiClient', 'model/Firewall', 'model/Manager', 'model/Writer'],
       factory
     )
   } else if (typeof module === 'object' && module.exports) {
@@ -32,7 +26,6 @@
     module.exports = factory(
       require('../ApiClient'),
       require('./Firewall'),
-      require('./KeyGenerator'),
       require('./Manager'),
       require('./Writer')
     )
@@ -44,12 +37,11 @@
     root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.Handler = factory(
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.Firewall,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.KeyGenerator,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.Manager,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.Writer
     )
   }
-})(this, function(ApiClient, Firewall, KeyGenerator, Manager, Writer) {
+})(this, function(ApiClient, Firewall, Manager, Writer) {
   'use strict'
 
   /**
@@ -78,11 +70,6 @@
     if (data) {
       obj = obj || new exports()
 
-      if (data.hasOwnProperty('Generators')) {
-        obj['Generators'] = ApiClient.convertToType(data['Generators'], {
-          String: KeyGenerator
-        })
-      }
       if (data.hasOwnProperty('H')) {
         obj['H'] = Writer.constructFromObject(data['H'])
       }
@@ -102,10 +89,6 @@
     return obj
   }
 
-  /**
-   * @member {Object.<String, module:model/KeyGenerator>} Generators
-   */
-  exports.prototype['Generators'] = undefined
   /**
    * @member {module:model/Writer} H
    */

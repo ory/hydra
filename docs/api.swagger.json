@@ -2032,12 +2032,6 @@
     "Handler": {
       "type": "object",
       "properties": {
-        "Generators": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/KeyGenerator"
-          }
-        },
         "H": {
           "$ref": "#/definitions/Writer"
         },
@@ -2051,7 +2045,7 @@
           "$ref": "#/definitions/Firewall"
         }
       },
-      "x-go-package": "github.com/ory/hydra/jwk"
+      "x-go-package": "github.com/ory/hydra/warden/group"
     },
     "KeyGenerator": {
       "type": "object",

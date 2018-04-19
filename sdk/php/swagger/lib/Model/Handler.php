@@ -54,7 +54,6 @@ class Handler implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'generators' => 'map[string,\Hydra\SDK\Model\KeyGenerator]',
         'h' => '\Hydra\SDK\Model\Writer',
         'manager' => '\Hydra\SDK\Model\Manager',
         'resource_prefix' => 'string',
@@ -66,7 +65,6 @@ class Handler implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerFormats = [
-        'generators' => null,
         'h' => null,
         'manager' => null,
         'resource_prefix' => null,
@@ -88,7 +86,6 @@ class Handler implements ArrayAccess
      * @var string[]
      */
     protected static $attributeMap = [
-        'generators' => 'Generators',
         'h' => 'H',
         'manager' => 'Manager',
         'resource_prefix' => 'ResourcePrefix',
@@ -101,7 +98,6 @@ class Handler implements ArrayAccess
      * @var string[]
      */
     protected static $setters = [
-        'generators' => 'setGenerators',
         'h' => 'setH',
         'manager' => 'setManager',
         'resource_prefix' => 'setResourcePrefix',
@@ -114,7 +110,6 @@ class Handler implements ArrayAccess
      * @var string[]
      */
     protected static $getters = [
-        'generators' => 'getGenerators',
         'h' => 'getH',
         'manager' => 'getManager',
         'resource_prefix' => 'getResourcePrefix',
@@ -152,7 +147,6 @@ class Handler implements ArrayAccess
      */
     public function __construct(array $data = null)
     {
-        $this->container['generators'] = isset($data['generators']) ? $data['generators'] : null;
         $this->container['h'] = isset($data['h']) ? $data['h'] : null;
         $this->container['manager'] = isset($data['manager']) ? $data['manager'] : null;
         $this->container['resource_prefix'] = isset($data['resource_prefix']) ? $data['resource_prefix'] : null;
@@ -183,27 +177,6 @@ class Handler implements ArrayAccess
         return true;
     }
 
-
-    /**
-     * Gets generators
-     * @return map[string,\Hydra\SDK\Model\KeyGenerator]
-     */
-    public function getGenerators()
-    {
-        return $this->container['generators'];
-    }
-
-    /**
-     * Sets generators
-     * @param map[string,\Hydra\SDK\Model\KeyGenerator] $generators
-     * @return $this
-     */
-    public function setGenerators($generators)
-    {
-        $this->container['generators'] = $generators;
-
-        return $this;
-    }
 
     /**
      * Gets h

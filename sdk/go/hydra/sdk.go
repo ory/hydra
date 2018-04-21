@@ -81,7 +81,7 @@ func NewSDK(c *Configuration) (*CodeGenSDK, error) {
 		return nil, errors.New("Please specify an OAuth 2.0 Client ID")
 	}
 	if len(c.Scopes) == 0 {
-		c.Scopes = []string{"hydra.*"}
+		c.Scopes = []string{}
 	}
 
 	c.EndpointURL = removeTrailingSlash(c.EndpointURL)

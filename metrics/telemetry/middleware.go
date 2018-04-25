@@ -18,7 +18,7 @@
  * @license 	Apache-2.0
  */
 
-package metrics
+package telemetry
 
 import (
 	"crypto/sha256"
@@ -100,6 +100,7 @@ func NewMetricsManager(issuerURL string, databaseURL string, l logrus.FieldLogge
 		salt:         uuid.New(),
 		BuildTime:    buildTime, BuildVersion: version, BuildHash: hash,
 	}
+
 	return mm
 }
 

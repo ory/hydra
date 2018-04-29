@@ -82,7 +82,12 @@ var tokenClientCmd = &cobra.Command{
 
 		t, err := oauthConfig.Token(ctx)
 		pkg.Must(err, "Could not retrieve access token because: %s", err)
-		fmt.Printf("%s\n", t.AccessToken)
+
+		if verbose, _ := cmd.Flags().GetBool("verbose"); verbose {
+			fmt.Printf("%+v\n", t)
+		} else {
+			fmt.Printf("%s\n", t)
+		}
 	},
 }
 
@@ -90,4 +95,5 @@ func init() {
 	tokenCmd.AddCommand(tokenClientCmd)
 
 	tokenClientCmd.Flags().StringSlice("scopes", []string{"hydra", "hydra.*"}, "User a specific set of scopes")
+	tokenClientCmd.Flags().BoolP("verbose", "v", false, "Toggle verbose output mode")
 }

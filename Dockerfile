@@ -4,8 +4,7 @@ ARG git_tag
 ARG git_commit
 
 RUN apk add --no-cache git build-base curl
-RUN curl -L -s https://github.com/golang/dep/releases/download/v0.3.2/dep-linux-amd64 -o $GOPATH/bin/dep
-RUN chmod +x $GOPATH/bin/dep
+RUN curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
 WORKDIR /go/src/github.com/ory/hydra
 

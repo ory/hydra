@@ -21,20 +21,14 @@
 package server
 
 import (
-	"net/url"
 	"os"
-	"strings"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
-	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/ladon"
 )
 
 func (h *Handler) createRootIfNewInstall(c *config.Config) {
-	ctx := c.Context()
-
 	clients, err := h.Clients.Manager.GetClients(100, 0)
 	pkg.Must(err, "Could not fetch client list: %s", err)
 	if len(clients) != 0 {
@@ -43,26 +37,16 @@ func (h *Handler) createRootIfNewInstall(c *config.Config) {
 
 	rs, err := pkg.GenerateSecret(16)
 	pkg.Must(err, "Could notgenerate secret because %s", err)
+	var providedSecrets bool
 	secret := string(rs)
 
 	id := ""
-	forceRoot := os.Getenv("FORCE_ROOT_CLIENT_CREDENTIALS")
-	if forceRoot != "" {
-		credentials := strings.Split(forceRoot, ":")
-		if len(credentials) == 2 {
-			if id, err = url.QueryUnescape(credentials[0]); err != nil {
-				c.GetLogger().Warn("Unable to www-url-unescape the root client id, falling back to random values.")
-				secret = ""
-				id = ""
-			}
-			if secret, err = url.QueryUnescape(credentials[1]); err != nil {
-				c.GetLogger().Warn("Unable to www-url-unescape the root client secret, falling back to random values.")
-				secret = ""
-				id = ""
-			}
-		} else {
-			c.GetLogger().Warnln("You passed malformed root client credentials, falling back to random values.")
-		}
+	forceRootClientID := os.Getenv("FORCE_ROOT_CLIENT_ID")
+	forceRootClientSecret := os.Getenv("FORCE_ROOT_CLIENT_SECRET")
+	if forceRootClientID != "" && forceRootClientSecret != "" {
+		id = forceRootClientID
+		secret = forceRootClientSecret
+		providedSecrets = true
 	}
 
 	c.GetLogger().Warn("No clients were found. Creating a temporary root client...")
@@ -83,29 +67,11 @@ func (h *Handler) createRootIfNewInstall(c *config.Config) {
 	c.ClientSecret = string(secret)
 
 	c.GetLogger().Infoln("Temporary root client created.")
-	if forceRoot == "" {
+	if !providedSecrets {
 		c.GetLogger().Infof("client_id: %s", root.GetID())
 		c.GetLogger().Infof("client_secret: %s", string(secret))
 		c.GetLogger().Warn("WARNING: YOU MUST delete this client once in production, as credentials may have been leaked in your logfiles.")
 	}
-
-	pkg.Must(ctx.LadonManager.Create(&ladon.DefaultPolicy{
-		Description: "This is a policy created by ORY Hydra and issued to the first client. It grants all of hydra's administrative privileges to the client and enables the client_credentials response type.",
-		Subjects:    []string{root.GetID()},
-		Effect:      ladon.AllowAccess,
-		Resources:   []string{prefixResource(c.AccessControlResourcePrefix, "<.*>")},
-		Actions:     []string{"<.*>"},
-		ID:          "default-admin-policy",
-	}), "Could not create admin policy because %s", err)
-
-	pkg.Must(ctx.LadonManager.Create(&ladon.DefaultPolicy{
-		Description: "This is a policy created by ORY Hydra which allows all users, including anonymous ones, access to the /.well-known/jwks.json endpoint. This endpoint is used for verifying OpenID Connect ID Tokens.",
-		Subjects:    []string{"<.*>"},
-		Effect:      ladon.AllowAccess,
-		Resources:   []string{prefixResource(c.AccessControlResourcePrefix, "keys:"+oauth2.OpenIDConnectKeyName+":public:<.*>")},
-		Actions:     []string{"get"},
-		ID:          "default-oidc-id-token-public-policy",
-	}), "Could not create wellknown JWKS policy because %s", err)
 }
 
 func prefixResource(prefix, resource string) string {

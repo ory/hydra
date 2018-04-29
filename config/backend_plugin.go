@@ -29,7 +29,6 @@ import (
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/ladon"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -128,20 +127,6 @@ func (c *PluginConnection) NewOAuth2Manager(clientManager client.Manager) (pkg.F
 		return nil, errors.New("Unable to type assert `NewOAuth2Manager`")
 	} else {
 		return m(c.db, clientManager, c.Config.GetLogger()), nil
-	}
-}
-
-func (c *PluginConnection) NewPolicyManager() (ladon.Manager, error) {
-	if err := c.load(); err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	if l, err := c.plugin.Lookup("NewPolicyManager"); err != nil {
-		return nil, errors.Wrap(err, "Unable to look up `NewPolicyManager`")
-	} else if m, ok := l.(func(*sqlx.DB) ladon.Manager); !ok {
-		return nil, errors.Errorf("Unable to type assert `NewPolicyManager`, got %v", l)
-	} else {
-		return m(c.db), nil
 	}
 }
 

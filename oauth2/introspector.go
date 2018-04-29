@@ -65,9 +65,7 @@ type Introspection struct {
 	// authorized this token.
 	Username string `json:"username,omitempty"`
 
-	// ClientID is a service-specific string identifier or list of string
-	// identifiers representing the intended audience for this token.
-	Audience string `json:"aud,omitempty"`
+	Audience []string `json:"aud,omitempty"`
 
 	// Issuer is a string representing the issuer of this token
 	Issuer string `json:"iss,omitempty"`

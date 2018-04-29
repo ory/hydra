@@ -296,14 +296,10 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ ht
 func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var session = NewSession("")
 
-	z1, z2, _ := r.BasicAuth()
-	logrus.Printf("Got auth %s %s %s", z1, z2)
-
 	var ctx = fosite.NewContext()
 	resp, err := h.OAuth2.NewIntrospectionRequest(ctx, r, session)
-	logrus.Printf("Got response %s %s", resp.IsActive(), err)
 	if err != nil {
-		pkg.LogError(errors.WithStack(err), h.L)
+		pkg.LogError(err, h.L)
 		h.OAuth2.WriteIntrospectionError(w, err)
 		return
 	}
@@ -323,6 +319,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		Subject:   resp.GetAccessRequester().GetSession().GetSubject(),
 		Username:  resp.GetAccessRequester().GetSession().GetUsername(),
 		Extra:     resp.GetAccessRequester().GetSession().(*Session).Extra,
+		Audience:  resp.GetAccessRequester().GetSession().(*Session).Audience,
 		Issuer:    h.Issuer,
 	}); err != nil {
 		pkg.LogError(errors.WithStack(err), h.L)

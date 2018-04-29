@@ -29,6 +29,7 @@ import (
 
 type Session struct {
 	*openid.DefaultSession `json:"idToken"`
+	Audience []string
 	Extra                  map[string]interface{} `json:"extra"`
 }
 

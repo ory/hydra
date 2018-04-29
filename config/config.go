@@ -39,9 +39,6 @@ import (
 	"github.com/ory/hydra/health"
 	"github.com/ory/hydra/metrics"
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/ladon"
-	lmem "github.com/ory/ladon/manager/memory"
-	lsql "github.com/ory/ladon/manager/sql"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -256,32 +253,11 @@ func (c *Config) Context() *Context {
 		}
 	}
 
-	var manager ladon.Manager
-	switch con := connection.(type) {
-	case *MemoryConnection:
-		c.GetLogger().Printf("DATABASE_URL set to memory, connecting to ephermal in-memory database.")
-		manager = lmem.NewMemoryManager()
-		break
-	case *SQLConnection:
-		manager = lsql.NewSQLManager(con.GetDatabase(), nil)
-		break
-	case *PluginConnection:
-		var err error
-		manager, err = con.NewPolicyManager()
-		if err != nil {
-			c.GetLogger().Fatalf("Could not load policy manager plugin %s", err)
-		}
-		break
-	default:
-		panic("Unknown connection type.")
-	}
-
 	c.context = &Context{
 		Connection: connection,
 		Hasher: &fosite.BCrypt{
 			WorkFactor: c.BCryptWorkFactor,
 		},
-		LadonManager: manager,
 		FositeStrategy: &foauth2.HMACSHAStrategy{
 			Enigma: &hmac.HMACStrategy{
 				GlobalSecret: c.GetSystemSecret(),

@@ -59,9 +59,43 @@ before finalizing the upgrade process.
 
 This section summarizes important changes introduced in 1.0.0.
 
+### Major breaking changes
+
+#### Access Control Policies and Warden moved to ORY Keto
+
+#### camelCase JSON is now under_score
+
+##### Warden
+
+* `grantedScopes` -> `granted_scope` (notice singular)
+* `issuer` -> `issuer` (unchanged)
+* `clientId` -> `client_id`
+* `issuedAt` -> `issued_at`
+* `expiresAt` -> `expires_at`
+* `notBefore` -> `not_before`
+* `username` -> `username`
+* `audience` -> `audience`
+* `accessTokenExtra` -> `session`
+
+
+* Warden endpoint accepts
+ * token (unchanged)
+ * scopes -> scope
+
+
 ### Minor breaking changes
 
 Minor breaking changes do not require any special upgrade paths, unless you explicitly rely on those features in some way.
+
+#### Introspection now capable of introspecting refresh tokens
+
+Previously, we disabled the introspection of refresh tokens. This has now changed to comply with the OAuth 2.0 specification.
+To distinguish tokens, use the `token_type` in the introspection response. It can either be `access_token` or `refresh_token`.
+
+#### FORCE_ROOT_CLIENT_CREDENTIALS
+
+The variable `FORCE_ROOT_CLIENT_CREDENTIALS` has caused some pain due to url-encoding conventions. It has been replaced
+by `FORCE_ROOT_CLIENT_ID` and `FORCE_ROOT_CLIENT_SECRET` which do not need to be encoded.
 
 #### jwk: Forces JWK to have a unique ID
 

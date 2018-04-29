@@ -26,14 +26,12 @@ import (
 	"github.com/ory/hydra/jwk"
 	hoa2 "github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/ladon"
 )
 
 type Context struct {
 	Connection interface{}
 
 	Hasher         fosite.Hasher
-	LadonManager   ladon.Manager
 	FositeStrategy oauth2.CoreStrategy
 	FositeStore    pkg.FositeStorer
 	KeyManager     jwk.Manager

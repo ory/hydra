@@ -151,7 +151,7 @@ func (s *SQLManager) CreateSchemas() (int, error) {
 func (m *SQLManager) GetConcreteClient(id string) (*Client, error) {
 	var d sqlData
 	if err := m.DB.Get(&d, m.DB.Rebind("SELECT * FROM hydra_client WHERE id=?"), id); err == sql.ErrNoRows {
-		return nil, errors.Wrap(pkg.ErrNotFound, "")
+		return nil, errors.Errorf("Unable to find client %s", id)
 	} else if err != nil {
 		return nil, errors.WithStack(err)
 	}

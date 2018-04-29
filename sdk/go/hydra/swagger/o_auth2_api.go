@@ -491,6 +491,7 @@ func (a OAuth2Api) IntrospectOAuth2Token(token string, scope string) (*OAuth2Tok
 	if a.Configuration.AccessToken != "" {
 		localVarHeaderParams["Authorization"] = "Bearer " + a.Configuration.AccessToken
 	}
+
 	// add default headers if any
 	for key := range a.Configuration.DefaultHeader {
 		localVarHeaderParams[key] = a.Configuration.DefaultHeader[key]

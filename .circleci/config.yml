@@ -5,7 +5,7 @@ version: 2
 jobs:
   format:
     docker:
-      - image: circleci/golang:1.9
+      - image: circleci/golang:1.10
     working_directory: /go/src/github.com/ory/hydra
     steps:
       - checkout
@@ -16,7 +16,7 @@ jobs:
 
   test:
     docker:
-      - image: circleci/golang:1.9
+      - image: circleci/golang:1.10
         environment:
         - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/hydra?sslmode=disable
         - TEST_DATABASE_MYSQL=root:test@(localhost:3306)/mysql?parseTime=true
@@ -42,7 +42,7 @@ jobs:
 
   swagger:
     docker:
-      - image: circleci/golang:1.9
+      - image: circleci/golang:1.10
     working_directory: /go/src/github.com/ory/hydra
     steps:
       - checkout
@@ -68,7 +68,7 @@ jobs:
 
   release:
     docker:
-      - image: circleci/golang:1.9
+      - image: circleci/golang:1.10
     working_directory: /go/src/github.com/ory/hydra
     steps:
       - checkout

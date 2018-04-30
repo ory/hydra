@@ -217,7 +217,7 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request, _ http
 	}
 
 	if tokenType != fosite.AccessToken {
-		h.H.WriteErrorCode(w,r,http.StatusUnauthorized,errors.New("Only access tokens are allowed in the authorization header"))
+		h.H.WriteErrorCode(w, r, http.StatusUnauthorized, errors.New("Only access tokens are allowed in the authorization header"))
 		return
 	}
 

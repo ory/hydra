@@ -19,8 +19,8 @@ Implementing the consent app in a different language is easy, and exemplary cons
 ([Go](https://github.com/ory/hydra-consent-app-go), [Node](https://github.com/ory/hydra-consent-app-express)) and
 [SDKs](https://www.ory.sh/docs/1-hydra/7-sdk/0-readme) are provided.
 
-Besides mitigating various attack vectors, such as database compromisation and OAuth 2.0 weaknesses, ORY Hydra is
-able to securely manage JSON Web Keys, and has a sophisticated policy-based access control you can use if you want to.
+Besides mitigating various attack vectors, such as database compromisation and OAuth 2.0 weaknesses, ORY Hydra is also
+able to securely manage JSON Web Keys.
 [Click here](https://www.ory.sh/docs/1-hydra/4-security/0-readme) to read more about security.
 
 <p align="left">
@@ -48,6 +48,7 @@ able to securely manage JSON Web Keys, and has a sophisticated policy-based acce
 - [Ecosystem](#ecosystem)
   - [ORY Security Console: Administrative User Interface](#ory-security-console-administrative-user-interface)
   - [ORY Oathkeeper: Identity & Access Proxy](#ory-oathkeeper-identity-&-access-proxy)
+  - [ORY Keto: Access Control Policies as a Server](#ory-keto-access-control-policies-as-a-server)
 - [Security](#security)
   - [Disclosing vulnerabilities](#disclosing-vulnerabilities)
 - [Telemetry](#telemetry)
@@ -59,6 +60,9 @@ able to securely manage JSON Web Keys, and has a sophisticated policy-based acce
   - [Develop](#develop)
 - [Libraries and third-party projects](#libraries-and-third-party-projects)
 - [Blog posts & articles](#blog-posts-&-articles)
+- [Contributors](#contributors)
+- [Backers](#backers)
+- [Sponsors](#sponsors)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -178,11 +182,19 @@ hydra
 
 ### ORY Security Console: Administrative User Interface
 
-The [ORY Security Console](https://console.ory.am/auth/login). connects with your existing ORY Hydra and ORY Oathkeeper isntallation and lets you manage and monitor them through an intuitive UI.
+The [ORY Security Console](https://console.ory.am/auth/login) is a visual admin interface for managing ORY Hydra,
+ORY Oathkeeper, and ORY Keto.
 
 ### ORY Oathkeeper: Identity & Access Proxy
 
-[ORY Oathkeeper](https://github.com/ory/oathkeeper) is a BeyondCorp/Zero Trust Identity & Access Proxy (IAP) built on top of OAuth2 and ORY Hydra.    
+[ORY Oathkeeper](https://github.com/ory/oathkeeper) is a BeyondCorp/Zero Trust Identity & Access Proxy (IAP) built
+on top of OAuth2 and ORY Hydra.
+
+### ORY Keto: Access Control Policies as a Server
+
+[ORY Keto](https://github.com/ory/keto) is a policy decision point. It uses a set of access control policies, similar
+to AWS IAM Policies, in order to determine whether a subject (user, application, service, car, ...) is authorized to
+perform a certain action on a resource.
 
 ## Security
 
@@ -200,8 +212,8 @@ and send us an email to [hi@ory.am](mailto:hi@ory.am) instead.
 
 ## Telemetry
 
-ORY Hydra collects summarized, anonymized telemetry which can optionally be turned off. Click [here](https://www.ory.sh/docs/1-hydra/0-tutorial/0-readme)
-to learn more.
+Our services collect summarized, anonymized data which can optionally be turned off. Click
+[here](https://www.ory.sh/docs/1-hydra/9-telemetry) to learn more.
 
 ## Documentation
 

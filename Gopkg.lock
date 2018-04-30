@@ -271,8 +271,8 @@
     "token/hmac",
     "token/jwt"
   ]
-  revision = "018b5c12b71b0da443255f4a5cf0ac9543bbf9f7"
-  version = "v0.17.0"
+  revision = "2bf9b6c4177be3050ff9ba3b82c6474e4c324c39"
+  version = "v0.18.0"
 
 [[projects]]
   name = "github.com/ory/graceful"
@@ -545,6 +545,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4d67506c9823ebf2da89def430b63fb31fc90f19eb167c505ddacbaa8c34822a"
+  inputs-digest = "33ad6060ba98ec0df48b987abfb552bace7263bf08d56a91deac2f8a31b75553"
   solver-name = "gps-cdcl"
   solver-version = 1

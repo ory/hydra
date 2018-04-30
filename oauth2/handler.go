@@ -311,7 +311,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 	if err = json.NewEncoder(w).Encode(&Introspection{
-		Active:    true,
+		Active:    resp.IsActive(),
 		ClientID:  resp.GetAccessRequester().GetClient().GetID(),
 		Scope:     strings.Join(resp.GetAccessRequester().GetGrantedScopes(), " "),
 		ExpiresAt: exp.Unix(),
@@ -321,6 +321,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		Extra:     resp.GetAccessRequester().GetSession().(*Session).Extra,
 		Audience:  resp.GetAccessRequester().GetSession().(*Session).Audience,
 		Issuer:    h.Issuer,
+		TokenType: string(resp.GetTokenType()),
 	}); err != nil {
 		pkg.LogError(errors.WithStack(err), h.L)
 	}

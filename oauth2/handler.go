@@ -210,9 +210,14 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ htt
 //       500: genericError
 func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	session := NewSession("")
-	ar, err := h.OAuth2.IntrospectToken(r.Context(), fosite.AccessTokenFromRequest(r), fosite.AccessToken, session)
+	tokenType, ar, err := h.OAuth2.IntrospectToken(r.Context(), fosite.AccessTokenFromRequest(r), fosite.AccessToken, session)
 	if err != nil {
 		h.H.WriteError(w, r, err)
+		return
+	}
+
+	if tokenType != fosite.AccessToken {
+		h.H.WriteErrorCode(w,r,http.StatusUnauthorized,errors.New("Only access tokens are allowed in the authorization header"))
 		return
 	}
 

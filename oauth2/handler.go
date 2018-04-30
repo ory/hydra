@@ -210,9 +210,14 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ htt
 //       500: genericError
 func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	session := NewSession("")
-	ar, err := h.OAuth2.IntrospectToken(r.Context(), fosite.AccessTokenFromRequest(r), fosite.AccessToken, session)
+	tokenType, ar, err := h.OAuth2.IntrospectToken(r.Context(), fosite.AccessTokenFromRequest(r), fosite.AccessToken, session)
 	if err != nil {
 		h.H.WriteError(w, r, err)
+		return
+	}
+
+	if tokenType != fosite.AccessToken {
+		h.H.WriteErrorCode(w, r, http.StatusUnauthorized, errors.New("Only access tokens are allowed in the authorization header"))
 		return
 	}
 
@@ -311,7 +316,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 	if err = json.NewEncoder(w).Encode(&Introspection{
-		Active:    true,
+		Active:    resp.IsActive(),
 		ClientID:  resp.GetAccessRequester().GetClient().GetID(),
 		Scope:     strings.Join(resp.GetAccessRequester().GetGrantedScopes(), " "),
 		ExpiresAt: exp.Unix(),
@@ -321,6 +326,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		Extra:     resp.GetAccessRequester().GetSession().(*Session).Extra,
 		Audience:  resp.GetAccessRequester().GetSession().(*Session).Audience,
 		Issuer:    h.Issuer,
+		TokenType: string(resp.GetTokenType()),
 	}); err != nil {
 		pkg.LogError(errors.WithStack(err), h.L)
 	}

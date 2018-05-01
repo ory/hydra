@@ -21,8 +21,8 @@
 package oauth2_test
 
 import (
+	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"time"
 
 	"github.com/gorilla/sessions"
@@ -31,9 +31,9 @@ import (
 	"github.com/ory/fosite/compose"
 	"github.com/ory/herodot"
 	hc "github.com/ory/hydra/client"
+	"github.com/ory/hydra/consent"
 	. "github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
-	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
@@ -54,6 +54,27 @@ var fc = &compose.Config{
 	AccessTokenLifespan: time.Second,
 }
 
+type consentMock struct{ deny bool }
+
+func (c *consentMock) HandleOAuth2AuthorizationRequest(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester) (*consent.HandledConsentRequest, error) {
+	if c.deny {
+		return nil, fosite.ErrRequestForbidden
+	}
+
+	return &consent.HandledConsentRequest{
+		ConsentRequest: &consent.ConsentRequest{
+			Subject: "foo",
+		},
+		GrantedScope: []string{"offline", "openid", "hydra.*"},
+		Session: &consent.ConsentRequestSessionData{
+			AccessToken: map[string]interface{}{},
+			IDToken:     map[string]interface{}{},
+		},
+	}, nil
+}
+
+var consentStrategy = &consentMock{}
+
 var handler = &Handler{
 	OAuth2: compose.Compose(
 		fc,
@@ -73,17 +94,13 @@ var handler = &Handler{
 		compose.OAuth2TokenRevocationFactory,
 		compose.OAuth2TokenIntrospectionFactory,
 	),
-	Consent: &DefaultConsentStrategy{
-		Issuer:                   "http://hydra.localhost",
-		ConsentManager:           consentManager,
-		DefaultChallengeLifespan: time.Hour,
-		DefaultIDTokenLifespan:   time.Hour * 24,
-	},
-	CookieStore:   sessions.NewCookieStore([]byte("foo-secret")),
-	ForcedHTTP:    true,
-	L:             logrus.New(),
-	ScopeStrategy: fosite.HierarchicScopeStrategy,
-	H:             herodot.NewJSONWriter(nil),
+	Consent:         consentStrategy,
+	CookieStore:     sessions.NewCookieStore([]byte("foo-secret")),
+	ForcedHTTP:      true,
+	L:               logrus.New(),
+	ScopeStrategy:   fosite.HierarchicScopeStrategy,
+	H:               herodot.NewJSONWriter(nil),
+	IDTokenLifespan: time.Minute,
 }
 
 var router = httprouter.New()
@@ -91,27 +108,13 @@ var ts *httptest.Server
 var oauthConfig *oauth2.Config
 var oauthClientConfig *clientcredentials.Config
 
-var consentHandler *ConsentSessionHandler
-var consentManager = NewConsentRequestMemoryManager()
-var consentClient *hydra.OAuth2Api
-
 func init() {
-	consentHandler = &ConsentSessionHandler{
-		H: herodot.NewJSONWriter(nil),
-		M: consentManager,
-	}
-
 	ts = httptest.NewServer(router)
 	handler.Issuer = ts.URL
 
 	handler.SetRoutes(router)
-	consentHandler.SetRoutes(router)
 
 	h, _ := hasher.Hash([]byte("secret"))
-	consentClient = hydra.NewOAuth2ApiWithBasePath(ts.URL)
-
-	c, _ := url.Parse(ts.URL + "/consent")
-	handler.ConsentURL = *c
 
 	store.Manager.(*hc.MemoryManager).Clients = append(store.Manager.(*hc.MemoryManager).Clients, hc.Client{
 		ID:            "app-client",

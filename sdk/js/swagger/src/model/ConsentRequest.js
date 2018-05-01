@@ -17,20 +17,29 @@
 ;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient'], factory)
+    define(
+      ['ApiClient', 'model/OAuth2Client', 'model/OpenIDConnectContext'],
+      factory
+    )
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'))
+    module.exports = factory(
+      require('../ApiClient'),
+      require('./OAuth2Client'),
+      require('./OpenIDConnectContext')
+    )
   } else {
     // Browser globals (root is window)
     if (!root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer) {
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {}
     }
     root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ConsentRequest = factory(
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient,
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Client,
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OpenIDConnectContext
     )
   }
-})(this, function(ApiClient) {
+})(this, function(ApiClient, OAuth2Client, OpenIDConnectContext) {
   'use strict'
 
   /**
@@ -59,56 +68,72 @@
     if (data) {
       obj = obj || new exports()
 
-      if (data.hasOwnProperty('clientId')) {
-        obj['clientId'] = ApiClient.convertToType(data['clientId'], 'String')
+      if (data.hasOwnProperty('challenge')) {
+        obj['challenge'] = ApiClient.convertToType(data['challenge'], 'String')
       }
-      if (data.hasOwnProperty('expiresAt')) {
-        obj['expiresAt'] = ApiClient.convertToType(data['expiresAt'], 'Date')
+      if (data.hasOwnProperty('client')) {
+        obj['client'] = OAuth2Client.constructFromObject(data['client'])
       }
-      if (data.hasOwnProperty('id')) {
-        obj['id'] = ApiClient.convertToType(data['id'], 'String')
+      if (data.hasOwnProperty('oidc_context')) {
+        obj['oidc_context'] = OpenIDConnectContext.constructFromObject(
+          data['oidc_context']
+        )
       }
-      if (data.hasOwnProperty('redirectUrl')) {
-        obj['redirectUrl'] = ApiClient.convertToType(
-          data['redirectUrl'],
+      if (data.hasOwnProperty('request_url')) {
+        obj['request_url'] = ApiClient.convertToType(
+          data['request_url'],
           'String'
         )
       }
-      if (data.hasOwnProperty('requestedScopes')) {
-        obj['requestedScopes'] = ApiClient.convertToType(
-          data['requestedScopes'],
+      if (data.hasOwnProperty('requested_scope')) {
+        obj['requested_scope'] = ApiClient.convertToType(
+          data['requested_scope'],
           ['String']
         )
+      }
+      if (data.hasOwnProperty('skip')) {
+        obj['skip'] = ApiClient.convertToType(data['skip'], 'Boolean')
+      }
+      if (data.hasOwnProperty('subject')) {
+        obj['subject'] = ApiClient.convertToType(data['subject'], 'String')
       }
     }
     return obj
   }
 
   /**
-   * ClientID is the client id that initiated the OAuth2 request.
-   * @member {String} clientId
+   * Challenge is the identifier (\"authorization challenge\") of the consent authorization request. It is used to identify the session.
+   * @member {String} challenge
    */
-  exports.prototype['clientId'] = undefined
+  exports.prototype['challenge'] = undefined
   /**
-   * ExpiresAt is the time where the access request will expire.
-   * @member {Date} expiresAt
+   * @member {module:model/OAuth2Client} client
    */
-  exports.prototype['expiresAt'] = undefined
+  exports.prototype['client'] = undefined
   /**
-   * ID is the id of this consent request.
-   * @member {String} id
+   * @member {module:model/OpenIDConnectContext} oidc_context
    */
-  exports.prototype['id'] = undefined
+  exports.prototype['oidc_context'] = undefined
   /**
-   * Redirect URL is the URL where the user agent should be redirected to after the consent has been accepted or rejected.
-   * @member {String} redirectUrl
+   * RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but might come in handy if you want to deal with additional request parameters.
+   * @member {String} request_url
    */
-  exports.prototype['redirectUrl'] = undefined
+  exports.prototype['request_url'] = undefined
   /**
-   * RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator.
-   * @member {Array.<String>} requestedScopes
+   * RequestedScope contains all scopes requested by the OAuth 2.0 client.
+   * @member {Array.<String>} requested_scope
    */
-  exports.prototype['requestedScopes'] = undefined
+  exports.prototype['requested_scope'] = undefined
+  /**
+   * Skip, if true, implies that the client has requested the same scopes from the same user previously. If true, you must not ask the user to grant the requested scopes. You must however either allow or deny the consent request using the usual API call.
+   * @member {Boolean} skip
+   */
+  exports.prototype['skip'] = undefined
+  /**
+   * Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope requested by the OAuth 2.0 client.
+   * @member {String} subject
+   */
+  exports.prototype['subject'] = undefined
 
   return exports
 })

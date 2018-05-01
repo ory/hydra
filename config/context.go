@@ -23,8 +23,8 @@ package config
 import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/oauth2"
+	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
-	hoa2 "github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 )
 
@@ -35,5 +35,5 @@ type Context struct {
 	FositeStrategy oauth2.CoreStrategy
 	FositeStore    pkg.FositeStorer
 	KeyManager     jwk.Manager
-	ConsentManager hoa2.ConsentRequestManager
+	ConsentManager consent.Manager
 }

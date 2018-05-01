@@ -25,9 +25,11 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/rand/sequence"
 	"github.com/spf13/cobra"
@@ -48,7 +50,7 @@ var tokenUserCmd = &cobra.Command{
 			}})
 		}
 
-		scopes, _ := cmd.Flags().GetStringSlice("scopes")
+		scopes, _ := cmd.Flags().GetStringSlice("scope")
 		clientId, _ := cmd.Flags().GetString("id")
 		clientSecret, _ := cmd.Flags().GetString("secret")
 		redirectUrl, _ := cmd.Flags().GetString("redirect")
@@ -62,10 +64,14 @@ var tokenUserCmd = &cobra.Command{
 			clientSecret = c.ClientSecret
 		}
 		if backend == "" {
-			backend = pkg.JoinURLStrings(c.ClusterURL, "/oauth2/token")
+			bu, err := url.Parse(c.ClusterURL)
+			pkg.Must(err, `Unable to parse cluster url ("%s"): %s`, c.ClusterURL, err)
+			backend = urlx.AppendPaths(bu, "/oauth2/token").String()
 		}
 		if frontend == "" {
-			frontend = pkg.JoinURLStrings(c.ClusterURL, "/oauth2/auth")
+			fu, err := url.Parse(c.ClusterURL)
+			pkg.Must(err, `Unable to parse cluster url ("%s"): %s`, c.ClusterURL, err)
+			frontend = urlx.AppendPaths(fu, "/oauth2/auth").String()
 		}
 
 		conf := oauth2.Config{
@@ -152,7 +158,7 @@ var tokenUserCmd = &cobra.Command{
 func init() {
 	tokenCmd.AddCommand(tokenUserCmd)
 	tokenUserCmd.Flags().Bool("no-open", false, "Do not open the browser window automatically")
-	tokenUserCmd.Flags().StringSlice("scopes", []string{"hydra", "offline", "openid"}, "Force scopes")
+	tokenUserCmd.Flags().StringSlice("scope", []string{"hydra", "offline", "openid"}, "Force scopes")
 	tokenUserCmd.Flags().String("id", "", "Force a client id, defaults to value from config file")
 	tokenUserCmd.Flags().String("secret", "", "Force a client secret, defaults to value from config file")
 	tokenUserCmd.Flags().String("redirect", "http://localhost:4445/callback", "Force a redirect url")

@@ -30,6 +30,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
+	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
@@ -103,7 +104,7 @@ func (h *MigrateHandler) runMigrateSQL(db *sqlx.DB) error {
 		"client":  &client.SQLManager{DB: db},
 		"oauth2":  &oauth2.FositeSQLStore{DB: db},
 		"jwk":     &jwk.SQLManager{DB: db},
-		"consent": oauth2.NewConsentRequestSQLManager(db),
+		"consent": consent.NewSQLManager(db, nil),
 	} {
 		fmt.Printf("Applying `%s` SQL migrations...\n", k)
 		if num, err := m.CreateSchemas(); err != nil {

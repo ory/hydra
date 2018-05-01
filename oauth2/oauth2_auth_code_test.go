@@ -21,6 +21,8 @@
 package oauth2_test
 
 import (
+	"bytes"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
@@ -29,51 +31,20 @@ import (
 	"testing"
 	"time"
 
-	"encoding/json"
-
-	"bytes"
-
 	"github.com/julienschmidt/httprouter"
-	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
 )
 
 func TestAuthCode(t *testing.T) {
-	var consentHandler httprouter.Handle
 	var callbackHandler httprouter.Handle
-
-	router.GET("/consent", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		consentHandler(w, r, ps)
-	})
 	router.GET("/callback", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		callbackHandler(w, r, ps)
 	})
 
 	t.Run("case=test accept consent request", func(t *testing.T) {
 		var code string
-		var validConsent bool
-
-		consentHandler = func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-			cr, response, err := consentClient.GetOAuth2ConsentRequest(r.URL.Query().Get("consent"))
-			assert.NoError(t, err)
-			assert.Equal(t, http.StatusOK, response.StatusCode)
-
-			assert.EqualValues(t, []string{"hydra.*", "offline", "openid"}, cr.RequestedScopes)
-			assert.Equal(t, r.URL.Query().Get("consent"), cr.Id)
-			assert.True(t, strings.Contains(cr.RedirectUrl, "oauth2/auth?client_id=app-client"))
-
-			response, err = consentClient.AcceptOAuth2ConsentRequest(r.URL.Query().Get("consent"), hydra.ConsentRequestAcceptance{
-				Subject:     "foo",
-				GrantScopes: []string{"hydra.*", "offline", "openid"},
-			})
-			require.NoError(t, err)
-			assert.Equal(t, http.StatusNoContent, response.StatusCode)
-
-			http.Redirect(w, r, cr.RedirectUrl, http.StatusFound)
-			validConsent = true
-		}
 
 		callbackHandler = func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 			code = r.URL.Query().Get("code")
@@ -91,7 +62,6 @@ func TestAuthCode(t *testing.T) {
 		_, err = ioutil.ReadAll(resp.Body)
 		require.NoError(t, err)
 
-		assert.True(t, validConsent)
 		require.NotEmpty(t, code)
 
 		token, err := oauthConfig.Exchange(oauth2.NoContext, code)
@@ -147,25 +117,13 @@ func TestAuthCode(t *testing.T) {
 	})
 
 	t.Run("case=test deny consent request", func(t *testing.T) {
-		var validConsent bool
+		consentStrategy.deny = true
 
-		consentHandler = func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-			cr, response, err := consentClient.GetOAuth2ConsentRequest(r.URL.Query().Get("consent"))
-			assert.NoError(t, err)
-			assert.Equal(t, http.StatusOK, response.StatusCode)
-
-			response, err = consentClient.RejectOAuth2ConsentRequest(r.URL.Query().Get("consent"), hydra.ConsentRequestRejection{Reason: "some reason"})
-			require.NoError(t, err)
-			assert.Equal(t, http.StatusNoContent, response.StatusCode)
-
-			http.Redirect(w, r, cr.RedirectUrl, http.StatusFound)
-			validConsent = true
-		}
 		callbackHandler = func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 			t.Logf("GOT URL: %s", r.URL.String())
 
-			assert.Equal(t, "some reason", r.URL.Query().Get("error_description"))
-			assert.Equal(t, "rejected_consent_request", r.URL.Query().Get("error"))
+			assert.Equal(t, "The request is not allowed", r.URL.Query().Get("error_description"))
+			assert.Equal(t, "request_forbidden", r.URL.Query().Get("error"))
 			w.WriteHeader(http.StatusNoContent)
 		}
 
@@ -177,8 +135,9 @@ func TestAuthCode(t *testing.T) {
 		require.NoError(t, err)
 		defer resp.Body.Close()
 
-		assert.True(t, validConsent)
 		assert.Equal(t, http.StatusNoContent, resp.StatusCode)
+
+		consentStrategy.deny = false
 	})
 }
 

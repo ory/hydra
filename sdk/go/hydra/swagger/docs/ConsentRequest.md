@@ -3,11 +3,13 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ClientId** | **string** | ClientID is the client id that initiated the OAuth2 request. | [optional] [default to null]
-**ExpiresAt** | [**time.Time**](time.Time.md) | ExpiresAt is the time where the access request will expire. | [optional] [default to null]
-**Id** | **string** | ID is the id of this consent request. | [optional] [default to null]
-**RedirectUrl** | **string** | Redirect URL is the URL where the user agent should be redirected to after the consent has been accepted or rejected. | [optional] [default to null]
-**RequestedScopes** | **[]string** | RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator. | [optional] [default to null]
+**Challenge** | **string** | Challenge is the identifier (\&quot;authorization challenge\&quot;) of the consent authorization request. It is used to identify the session. | [optional] [default to null]
+**Client** | [**OAuth2Client**](oAuth2Client.md) |  | [optional] [default to null]
+**OidcContext** | [**OpenIdConnectContext**](openIDConnectContext.md) |  | [optional] [default to null]
+**RequestUrl** | **string** | RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but might come in handy if you want to deal with additional request parameters. | [optional] [default to null]
+**RequestedScope** | **[]string** | RequestedScope contains all scopes requested by the OAuth 2.0 client. | [optional] [default to null]
+**Skip** | **bool** | Skip, if true, implies that the client has requested the same scopes from the same user previously. If true, you must not ask the user to grant the requested scopes. You must however either allow or deny the consent request using the usual API call. | [optional] [default to null]
+**Subject** | **string** | Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope requested by the OAuth 2.0 client. | [optional] [default to null]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

@@ -107,8 +107,14 @@ func initConfig() {
 	viper.BindEnv("CLIENT_ID")
 	viper.SetDefault("CLIENT_ID", "")
 
-	viper.BindEnv("CONSENT_URL")
-	viper.SetDefault("CONSENT_URL", oauth2.DefaultConsentPath)
+	viper.BindEnv("OAUTH2_CONSENT_URL")
+	viper.SetDefault("OAUTH2_CONSENT_URL", oauth2.DefaultConsentPath)
+
+	viper.BindEnv("OAUTH2_LOGIN_URL")
+	viper.SetDefault("OAUTH2_LOGIN_URL", oauth2.DefaultConsentPath)
+
+	viper.BindEnv("OAUTH2_ERROR_URL")
+	viper.SetDefault("OAUTH2_ERROR_URL", oauth2.DefaultErrorPath)
 
 	viper.BindEnv("DATABASE_PLUGIN")
 	viper.SetDefault("DATABASE_PLUGIN", "")
@@ -131,8 +137,8 @@ func initConfig() {
 	viper.BindEnv("PORT")
 	viper.SetDefault("PORT", 4444)
 
-	viper.BindEnv("ISSUER")
-	viper.SetDefault("ISSUER", "http://localhost:4444")
+	viper.BindEnv("OAUTH2_ISSUER_URL")
+	viper.SetDefault("OAUTH2_ISSUER_URL", "http://localhost:4444")
 
 	viper.BindEnv("BCRYPT_COST")
 	viper.SetDefault("BCRYPT_COST", 10)
@@ -176,7 +182,7 @@ func initConfig() {
 		fmt.Println("")
 	}
 
-	iss := viper.Get("ISSUER")
+	iss := viper.Get("OAUTH2_ISSUER_URL")
 	viper.Set("ISSUER", strings.TrimSuffix(iss.(string), "/"))
 
 	if err := viper.Unmarshal(c); err != nil {

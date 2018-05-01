@@ -84,6 +84,15 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/golang/gddo"
+  packages = [
+    "httputil",
+    "httputil/header"
+  ]
+  revision = "416d5fc8c9c85e9ec9252a70d01e069f4b287ff0"
+
+[[projects]]
+  branch = "master"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
   revision = "1643683e1b54a9e88ad26d98f81400c8c9d9f4f9"
@@ -271,8 +280,19 @@
     "token/hmac",
     "token/jwt"
   ]
-  revision = "2bf9b6c4177be3050ff9ba3b82c6474e4c324c39"
-  version = "v0.18.0"
+  revision = "91c9d194a88e6b395668211df60cb512eab08541"
+  version = "v0.18.1"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/ory/go-convenience"
+  packages = [
+    "mapx",
+    "stringslice",
+    "stringsx",
+    "urlx"
+  ]
+  revision = "cf3c3570c7b941a7180cdc036c8b06eebd95dcb1"
 
 [[projects]]
   name = "github.com/ory/graceful"
@@ -283,8 +303,8 @@
 [[projects]]
   name = "github.com/ory/herodot"
   packages = ["."]
-  revision = "e16e86900c6c08ed085117308701a823b3da77fc"
-  version = "v0.1.3"
+  revision = "809d81bb89b684063f794913e1fe3635f0b20222"
+  version = "v0.2.2"
 
 [[projects]]
   name = "github.com/ory/ladon"
@@ -545,6 +565,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "33ad6060ba98ec0df48b987abfb552bace7263bf08d56a91deac2f8a31b75553"
+  inputs-digest = "ed156fb22c2ead58aea442975fec6c0e30ab3bc8deb7fd0c0e821ec2c6648b76"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -65,12 +65,6 @@ CORE CONTROLS
 	a separate secret in production.
 	Example: COOKIE_SECRET=fjah8uFhgjSiuf-AS
 
-- FORCE_ROOT_CLIENT_CREDENTIALS: On first start up, Hydra generates a root client with random id and secret. Use
-	this environment variable in the form of "FORCE_ROOT_CLIENT_CREDENTIALS=id:secret" to set
-	the client id and secret yourself. Please www-url-encode the id
-	and the secret: "FORCE_ROOT_CLIENT_CREDENTIALS=urlencode(id):urlencode(secret)".
-	Example: FORCE_ROOT_CLIENT_CREDENTIALS=admin:h6hy92tK4dQcZ2EaFsGNRtqg
-
 - PORT: The port hydra should listen on.
 	Defaults to PORT=4444
 
@@ -99,12 +93,18 @@ CORE CONTROLS
 OAUTH2 CONTROLS
 ===============
 
-- CONSENT_URL: The uri of the consent endpoint.
-	Example: CONSENT_URL=https://id.myapp.com/consent
+- OAUTH2_ERROR_URL: A dedicated endpoint that shows critical errors in a user-friendly way.
+	Example: OAUTH2_ERROR_URL=https://id.myapp.com/error
 
-- ISSUER: Issuer is the public URL of your Hydra installation. It is used for OAuth2 and OpenID Connect and must be
+- OAUTH2_CONSENT_URL: The consent provider's URL.
+	Example: OAUTH2_CONSENT_URL=https://id.myapp.com/consent
+
+- OAUTH2_LOGIN_URL: The login provider's URL.
+	Example: OAUTH2_LOGIN_URL=https://id.myapp.com/login
+
+- OAUTH2_ISSUER_URL: Issuer is the public URL of your Hydra installation. It is used for OAuth2 and OpenID Connect and must be
 	specified and using HTTPS protocol, unless --dangerous-force-http is set.
-	Example: ISSUER=https://hydra.myapp.com/
+	Example: OAUTH2_ISSUER_URL=https://hydra.myapp.com/
 
 - AUTH_CODE_LIFESPAN: Lifespan of OAuth2 authorize codes. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 	Defaults to AUTH_CODE_LIFESPAN=10m

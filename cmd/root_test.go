@@ -41,7 +41,7 @@ func TestExecute(t *testing.T) {
 	os.Setenv("DATABASE_URL", "memory")
 	os.Setenv("FORCE_ROOT_CLIENT_ID", "admin")
 	os.Setenv("FORCE_ROOT_CLIENT_SECRET", "pw")
-	os.Setenv("ISSUER", "https://localhost:4444/")
+	os.Setenv("OAUTH2_ISSUER_URL", "https://localhost:4444/")
 	copy(osArgs, os.Args)
 
 	for _, c := range []struct {

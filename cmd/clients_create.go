@@ -42,7 +42,7 @@ func init() {
 	clientsCreateCmd.Flags().StringSliceP("callbacks", "c", []string{}, "REQUIRED list of allowed callback URLs")
 	clientsCreateCmd.Flags().StringSliceP("grant-types", "g", []string{"authorization_code"}, "A list of allowed grant types")
 	clientsCreateCmd.Flags().StringSliceP("response-types", "r", []string{"code"}, "A list of allowed response types")
-	clientsCreateCmd.Flags().StringSliceP("allowed-scopes", "a", []string{""}, "A list of allowed scopes")
+	clientsCreateCmd.Flags().StringSliceP("scope", "a", []string{""}, "The scope the client is allowed to request")
 	clientsCreateCmd.Flags().Bool("is-public", false, "Use this flag to create a public client")
 	clientsCreateCmd.Flags().String("secret", "", "Provide the client's secret")
 	clientsCreateCmd.Flags().StringP("name", "n", "", "The client's name")

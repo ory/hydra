@@ -23,6 +23,7 @@ package server
 import (
 	"fmt"
 	"net/url"
+	"time"
 
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
@@ -31,6 +32,7 @@ import (
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
+	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
@@ -107,21 +109,29 @@ func newOAuth2Provider(c *config.Config) (fosite.OAuth2Provider, string) {
 	), publicKey.KeyID
 }
 
-func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm oauth2.ConsentRequestManager, o fosite.OAuth2Provider, idTokenKeyID string) *oauth2.Handler {
-	if c.ConsentURL == "" {
-		proto := "https"
-		if c.ForceHTTP {
-			proto = "http"
-		}
-		host := "localhost"
-		if c.BindHost != "" {
-			host = c.BindHost
-		}
-		c.ConsentURL = fmt.Sprintf("%s://%s:%d/oauth2/consent", proto, host, c.BindPort)
+func setDefaultConsentURL(s string, c *config.Config, path string) string {
+	if s != "" {
+		return s
 	}
+	proto := "https"
+	if c.ForceHTTP {
+		proto = "http"
+	}
+	host := "localhost"
+	if c.BindHost != "" {
+		host = c.BindHost
+	}
+	return fmt.Sprintf("%s://%s:%d/%s", proto, host, c.BindPort, path)
+}
 
-	consentURL, err := url.Parse(c.ConsentURL)
-	pkg.Must(err, "Could not parse consent url %s.", c.ConsentURL)
+//func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm oauth2.ConsentRequestManager, o fosite.OAuth2Provider, idTokenKeyID string) *oauth2.Handler {
+func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm consent.Manager, o fosite.OAuth2Provider, idTokenKeyID string) *oauth2.Handler {
+	c.ConsentURL = setDefaultConsentURL(c.ConsentURL, c, "oauth2/fallbacks/consent")
+	c.LoginURL = setDefaultConsentURL(c.LoginURL, c, "oauth2/fallbacks/consent")
+	c.ErrorURL = setDefaultConsentURL(c.ErrorURL, c, "oauth2/fallbacks/error")
+
+	errorURL, err := url.Parse(c.ErrorURL)
+	pkg.Must(err, "Could not parse error url %s.", errorURL)
 
 	handler := &oauth2.Handler{
 		ScopesSupported:  c.OpenIDDiscoveryScopesSupported,
@@ -130,21 +140,33 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm oauth2.Con
 		ForcedHTTP:       c.ForceHTTP,
 		OAuth2:           o,
 		ScopeStrategy:    c.GetScopeStrategy(),
-		Consent: &oauth2.DefaultConsentStrategy{
-			Issuer:                   c.Issuer,
-			ConsentManager:           c.Context().ConsentManager,
-			DefaultChallengeLifespan: c.GetChallengeTokenLifespan(),
-			DefaultIDTokenLifespan:   c.GetIDTokenLifespan(),
-			KeyID: idTokenKeyID,
+		Consent: &consent.DefaultStrategy{
+			RequestMaxAge:     time.Minute * 15,
+			AuthenticationURL: c.LoginURL,
+			ConsentURL:        c.ConsentURL,
+			IssuerURL:         c.Issuer,
+			OAuth2AuthURL:     "/oauth2/auth",
+			M:                 cm,
+			CookieStore:       sessions.NewCookieStore(c.GetCookieSecret()),
+			ScopeStrategy:     c.GetScopeStrategy(),
+			RunsHTTPS:         !c.ForceHTTP,
 		},
+		//Consent: &oauth2.DefaultConsentStrategy{
+		//	Issuer:                   c.Issuer,
+		//	ConsentManager:           c.Context().ConsentManager,
+		//	DefaultChallengeLifespan: c.GetChallengeTokenLifespan(),
+		//	DefaultIDTokenLifespan:   c.GetIDTokenLifespan(),
+		//	KeyID: idTokenKeyID,
+		//},
 		Storage:             c.Context().FositeStore,
-		ConsentURL:          *consentURL,
+		ErrorURL:            *errorURL,
 		H:                   herodot.NewJSONWriter(c.GetLogger()),
 		AccessTokenLifespan: c.GetAccessTokenLifespan(),
 		CookieStore:         sessions.NewCookieStore(c.GetCookieSecret()),
 		Issuer:              c.Issuer,
 		L:                   c.GetLogger(),
-		ResourcePrefix:      c.AccessControlResourcePrefix,
+		IDTokenPublicKeyID:  idTokenKeyID,
+		IDTokenLifespan:     c.GetIDTokenLifespan(),
 	}
 
 	handler.SetRoutes(router)

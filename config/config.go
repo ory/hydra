@@ -36,6 +36,7 @@ import (
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/token/hmac"
+	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/hydra/health"
 	"github.com/ory/hydra/metrics"
 	"github.com/ory/hydra/pkg"
@@ -58,11 +59,13 @@ type Config struct {
 	// These are used by the host command
 	BindPort                         int    `mapstructure:"PORT" yaml:"-"`
 	BindHost                         string `mapstructure:"HOST" yaml:"-"`
-	Issuer                           string `mapstructure:"ISSUER" yaml:"-"`
+	Issuer                           string `mapstructure:"OAUTH2_ISSUER_URL" yaml:"-"`
 	SystemSecret                     string `mapstructure:"SYSTEM_SECRET" yaml:"-"`
 	DatabaseURL                      string `mapstructure:"DATABASE_URL" yaml:"-"`
 	DatabasePlugin                   string `mapstructure:"DATABASE_PLUGIN" yaml:"-"`
-	ConsentURL                       string `mapstructure:"CONSENT_URL" yaml:"-"`
+	ConsentURL                       string `mapstructure:"OAUTH2_CONSENT_URL" yaml:"-"`
+	LoginURL                         string `mapstructure:"OAUTH2_LOGIN_URL" yaml:"-"`
+	ErrorURL                         string `mapstructure:"OAUTH2_ERROR_URL" yaml:"-"`
 	AllowTLSTermination              string `mapstructure:"HTTPS_ALLOW_TERMINATION_FROM" yaml:"-"`
 	BCryptWorkFactor                 int    `mapstructure:"BCRYPT_COST" yaml:"-"`
 	AccessTokenLifespan              string `mapstructure:"ACCESS_TOKEN_LIFESPAN" yaml:"-"`
@@ -281,7 +284,7 @@ func (c *Config) Resolve(join ...string) *url.URL {
 		return c.cluster
 	}
 
-	return pkg.JoinURL(c.cluster, join...)
+	return urlx.AppendPaths(c.cluster, join...)
 }
 
 type transporter struct {
@@ -302,10 +305,13 @@ func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
 		return c.oauth2Client
 	}
 
+	cu, err := url.Parse(c.ClusterURL)
+	pkg.Must(err, `Unable to parse cluster url ("%s"): %s`, c.ClusterURL, err)
+
 	oauthConfig := clientcredentials.Config{
 		ClientID:     c.ClientID,
 		ClientSecret: c.ClientSecret,
-		TokenURL:     pkg.JoinURLStrings(c.ClusterURL, "/oauth2/token"),
+		TokenURL:     urlx.AppendPaths(cu, "/oauth2/token").String(),
 		Scopes:       []string{"hydra", "hydra.*"},
 	}
 

@@ -58,8 +58,6 @@ func TestMain(m *testing.M) {
 		integration.BootParallel([]func(){
 			connectToPG,
 			connectToMySQL,
-			connectToPGConsent,
-			connectToMySQLConsent,
 		})
 	}
 

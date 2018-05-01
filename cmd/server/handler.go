@@ -37,6 +37,7 @@ import (
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
+	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
@@ -46,6 +47,8 @@ import (
 	"github.com/spf13/viper"
 	"github.com/urfave/negroni"
 )
+
+var _ = &consent.Handler{}
 
 func parseCorsOptions() cors.Options {
 	allowCredentials, _ := strconv.ParseBool(viper.GetString("CORS_ALLOWED_CREDENTIALS"))
@@ -120,12 +123,6 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 			},
 		})
 
-		if ok, _ := cmd.Flags().GetBool("dangerous-auto-logon"); ok {
-			logger.Warnln("Do not use flag --dangerous-auto-logon in production.")
-			err := c.Persist()
-			pkg.Must(err, "Could not write configuration file: %s", err)
-		}
-
 		err := graceful.Graceful(func() error {
 			var err error
 			logger.Infof("Setting up http server on %s", c.GetAddress())
@@ -149,7 +146,7 @@ type Handler struct {
 	Clients *client.Handler
 	Keys    *jwk.Handler
 	OAuth2  *oauth2.Handler
-	Consent *oauth2.ConsentSessionHandler
+	Consent *consent.Handler
 	Config  *config.Config
 	H       herodot.Writer
 }
@@ -168,11 +165,9 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 	// Set up handlers
 	h.Clients = newClientHandler(c, router, clientsManager)
 	h.Keys = newJWKHandler(c, router)
-	h.Consent = newConsentHanlder(c, router)
+	h.Consent = newConsentHandler(c, router)
 	h.OAuth2 = newOAuth2Handler(c, router, ctx.ConsentManager, oauth2Provider, idTokenKeyID)
 	_ = newHealthHandler(c, router)
-
-	h.createRootIfNewInstall(c)
 }
 
 func (h *Handler) rejectInsecureRequests(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {

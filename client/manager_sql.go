@@ -28,7 +28,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/pkg"
+	"github.com/ory/go-convenience/stringsx"
 	"github.com/ory/sqlcon"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
@@ -125,16 +125,16 @@ func (d *sqlData) ToClient() *Client {
 		ID:                d.ID,
 		Name:              d.Name,
 		Secret:            d.Secret,
-		RedirectURIs:      pkg.SplitNonEmpty(d.RedirectURIs, "|"),
-		GrantTypes:        pkg.SplitNonEmpty(d.GrantTypes, "|"),
-		ResponseTypes:     pkg.SplitNonEmpty(d.ResponseTypes, "|"),
+		RedirectURIs:      stringsx.Splitx(d.RedirectURIs, "|"),
+		GrantTypes:        stringsx.Splitx(d.GrantTypes, "|"),
+		ResponseTypes:     stringsx.Splitx(d.ResponseTypes, "|"),
 		Scope:             d.Scope,
 		Owner:             d.Owner,
 		PolicyURI:         d.PolicyURI,
 		TermsOfServiceURI: d.TermsOfServiceURI,
 		ClientURI:         d.ClientURI,
 		LogoURI:           d.LogoURI,
-		Contacts:          pkg.SplitNonEmpty(d.Contacts, "|"),
+		Contacts:          stringsx.Splitx(d.Contacts, "|"),
 		Public:            d.Public,
 	}
 }

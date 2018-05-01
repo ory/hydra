@@ -25,7 +25,9 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"net/url"
 
+	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/hydra/pkg"
 	"github.com/spf13/cobra"
 	"golang.org/x/oauth2"
@@ -73,10 +75,13 @@ var tokenClientCmd = &cobra.Command{
 
 		scopes, _ := cmd.Flags().GetStringSlice("scopes")
 
+		cu, err := url.Parse(c.ClusterURL)
+		pkg.Must(err, `Unable to parse cluster url ("%s"): %s`, c.ClusterURL, err)
+
 		oauthConfig := clientcredentials.Config{
 			ClientID:     c.ClientID,
 			ClientSecret: c.ClientSecret,
-			TokenURL:     pkg.JoinURLStrings(c.ClusterURL, "/oauth2/token"),
+			TokenURL:     urlx.AppendPaths(cu, "/oauth2/token").String(),
 			Scopes:       scopes,
 		}
 

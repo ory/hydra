@@ -83,18 +83,21 @@ Class | Method | HTTP request | Description
 *JsonWebKeyApi* | [**getJsonWebKeySet**](docs/Api/JsonWebKeyApi.md#getjsonwebkeyset) | **GET** /keys/{set} | Retrieve a JSON Web Key Set
 *JsonWebKeyApi* | [**updateJsonWebKey**](docs/Api/JsonWebKeyApi.md#updatejsonwebkey) | **PUT** /keys/{set}/{kid} | Update a JSON Web Key
 *JsonWebKeyApi* | [**updateJsonWebKeySet**](docs/Api/JsonWebKeyApi.md#updatejsonwebkeyset) | **PUT** /keys/{set} | Update a JSON Web Key Set
-*OAuth2Api* | [**acceptOAuth2ConsentRequest**](docs/Api/OAuth2Api.md#acceptoauth2consentrequest) | **PATCH** /oauth2/consent/requests/{id}/accept | Accept a consent request
+*OAuth2Api* | [**acceptConsentRequest**](docs/Api/OAuth2Api.md#acceptconsentrequest) | **PUT** /oauth2/auth/requests/consent/{challenge}/accept | Accept an consent request
+*OAuth2Api* | [**acceptLoginRequest**](docs/Api/OAuth2Api.md#acceptloginrequest) | **PUT** /oauth2/auth/requests/login/{challenge}/accept | Accept an login request
 *OAuth2Api* | [**createOAuth2Client**](docs/Api/OAuth2Api.md#createoauth2client) | **POST** /clients | Create an OAuth 2.0 client
 *OAuth2Api* | [**deleteOAuth2Client**](docs/Api/OAuth2Api.md#deleteoauth2client) | **DELETE** /clients/{id} | Deletes an OAuth 2.0 Client
 *OAuth2Api* | [**flushInactiveOAuth2Tokens**](docs/Api/OAuth2Api.md#flushinactiveoauth2tokens) | **POST** /oauth2/flush | Flush Expired OAuth2 Access Tokens
+*OAuth2Api* | [**getConsentRequest**](docs/Api/OAuth2Api.md#getconsentrequest) | **GET** /oauth2/auth/requests/consent/{challenge} | Get consent request information
+*OAuth2Api* | [**getLoginRequest**](docs/Api/OAuth2Api.md#getloginrequest) | **GET** /oauth2/auth/requests/login/{challenge} | Get an login request
 *OAuth2Api* | [**getOAuth2Client**](docs/Api/OAuth2Api.md#getoauth2client) | **GET** /clients/{id} | Get an OAuth 2.0 Client.
-*OAuth2Api* | [**getOAuth2ConsentRequest**](docs/Api/OAuth2Api.md#getoauth2consentrequest) | **GET** /oauth2/consent/requests/{id} | Receive consent request information
 *OAuth2Api* | [**getWellKnown**](docs/Api/OAuth2Api.md#getwellknown) | **GET** /.well-known/openid-configuration | Server well known configuration
 *OAuth2Api* | [**introspectOAuth2Token**](docs/Api/OAuth2Api.md#introspectoauth2token) | **POST** /oauth2/introspect | Introspect OAuth2 tokens
 *OAuth2Api* | [**listOAuth2Clients**](docs/Api/OAuth2Api.md#listoauth2clients) | **GET** /clients | List OAuth 2.0 Clients
 *OAuth2Api* | [**oauthAuth**](docs/Api/OAuth2Api.md#oauthauth) | **GET** /oauth2/auth | The OAuth 2.0 authorize endpoint
 *OAuth2Api* | [**oauthToken**](docs/Api/OAuth2Api.md#oauthtoken) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
-*OAuth2Api* | [**rejectOAuth2ConsentRequest**](docs/Api/OAuth2Api.md#rejectoauth2consentrequest) | **PATCH** /oauth2/consent/requests/{id}/reject | Reject a consent request
+*OAuth2Api* | [**rejectConsentRequest**](docs/Api/OAuth2Api.md#rejectconsentrequest) | **PUT** /oauth2/auth/requests/consent/{challenge}/reject | Reject an consent request
+*OAuth2Api* | [**rejectLoginRequest**](docs/Api/OAuth2Api.md#rejectloginrequest) | **PUT** /oauth2/auth/requests/login/{challenge}/reject | Reject an logout request
 *OAuth2Api* | [**revokeOAuth2Token**](docs/Api/OAuth2Api.md#revokeoauth2token) | **POST** /oauth2/revoke | Revoke OAuth2 tokens
 *OAuth2Api* | [**updateOAuth2Client**](docs/Api/OAuth2Api.md#updateoauth2client) | **PUT** /clients/{id} | Update an OAuth 2.0 Client
 *OAuth2Api* | [**userinfo**](docs/Api/OAuth2Api.md#userinfo) | **POST** /userinfo | OpenID Connect Userinfo
@@ -103,10 +106,12 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
+ - [AcceptConsentRequest](docs/Model/AcceptConsentRequest.md)
+ - [AcceptLoginRequest](docs/Model/AcceptLoginRequest.md)
+ - [AuthenticationSession](docs/Model/AuthenticationSession.md)
+ - [CompletedRequest](docs/Model/CompletedRequest.md)
  - [ConsentRequest](docs/Model/ConsentRequest.md)
- - [ConsentRequestAcceptance](docs/Model/ConsentRequestAcceptance.md)
- - [ConsentRequestManager](docs/Model/ConsentRequestManager.md)
- - [ConsentRequestRejection](docs/Model/ConsentRequestRejection.md)
+ - [ConsentRequestSession](docs/Model/ConsentRequestSession.md)
  - [FlushInactiveOAuth2TokensRequest](docs/Model/FlushInactiveOAuth2TokensRequest.md)
  - [Handler](docs/Model/Handler.md)
  - [InlineResponse200](docs/Model/InlineResponse200.md)
@@ -116,22 +121,21 @@ Class | Method | HTTP request | Description
  - [JsonWebKeySet](docs/Model/JsonWebKeySet.md)
  - [JsonWebKeySetGeneratorRequest](docs/Model/JsonWebKeySetGeneratorRequest.md)
  - [KeyGenerator](docs/Model/KeyGenerator.md)
+ - [LoginRequest](docs/Model/LoginRequest.md)
  - [Manager](docs/Model/Manager.md)
  - [OAuth2Client](docs/Model/OAuth2Client.md)
- - [OAuth2ConsentRequest](docs/Model/OAuth2ConsentRequest.md)
  - [OAuth2TokenIntrospection](docs/Model/OAuth2TokenIntrospection.md)
  - [OauthTokenResponse](docs/Model/OauthTokenResponse.md)
+ - [OpenIDConnectContext](docs/Model/OpenIDConnectContext.md)
  - [RawMessage](docs/Model/RawMessage.md)
- - [SwaggerAcceptConsentRequest](docs/Model/SwaggerAcceptConsentRequest.md)
+ - [RejectRequest](docs/Model/RejectRequest.md)
  - [SwaggerFlushInactiveAccessTokens](docs/Model/SwaggerFlushInactiveAccessTokens.md)
  - [SwaggerJsonWebKeyQuery](docs/Model/SwaggerJsonWebKeyQuery.md)
  - [SwaggerJwkCreateSet](docs/Model/SwaggerJwkCreateSet.md)
  - [SwaggerJwkSetQuery](docs/Model/SwaggerJwkSetQuery.md)
  - [SwaggerJwkUpdateSet](docs/Model/SwaggerJwkUpdateSet.md)
  - [SwaggerJwkUpdateSetKey](docs/Model/SwaggerJwkUpdateSetKey.md)
- - [SwaggerOAuthConsentRequestPayload](docs/Model/SwaggerOAuthConsentRequestPayload.md)
  - [SwaggerOAuthIntrospectionRequest](docs/Model/SwaggerOAuthIntrospectionRequest.md)
- - [SwaggerRejectConsentRequest](docs/Model/SwaggerRejectConsentRequest.md)
  - [SwaggerRevokeOAuth2TokenParameters](docs/Model/SwaggerRevokeOAuth2TokenParameters.md)
  - [UserinfoResponse](docs/Model/UserinfoResponse.md)
  - [WellKnown](docs/Model/WellKnown.md)

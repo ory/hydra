@@ -22,9 +22,11 @@ package integration
 
 import (
 	"testing"
+	"time"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/ladon"
@@ -49,7 +51,7 @@ func TestSQLSchema(t *testing.T) {
 	cm := &client.SQLManager{DB: db, Hasher: &fosite.BCrypt{}}
 	jm := jwk.SQLManager{DB: db, Cipher: &jwk.AEAD{Key: []byte("11111111111111111111111111111111")}}
 	om := oauth2.FositeSQLStore{Manager: cm, DB: db, L: logrus.New()}
-	crm := oauth2.NewConsentRequestSQLManager(db)
+	crm := consent.NewSQLManager(db, nil)
 	pm := lsql.NewSQLManager(db, nil)
 
 	_, err := pm.CreateSchemas("", "hydra_policy_migration")
@@ -67,6 +69,10 @@ func TestSQLSchema(t *testing.T) {
 	require.NoError(t, jm.AddKey("integration-test-foo", jwk.First(p1)))
 	require.NoError(t, pm.Create(&ladon.DefaultPolicy{ID: "integration-test-foo", Resources: []string{"foo"}, Actions: []string{"bar"}, Subjects: []string{"baz"}, Effect: "allow"}))
 	require.NoError(t, cm.CreateClient(&client.Client{ID: "integration-test-foo"}))
-	require.NoError(t, crm.PersistConsentRequest(&oauth2.ConsentRequest{ID: "integration-test-foo"}))
+	require.NoError(t, crm.CreateAuthenticationSession(&consent.AuthenticationSession{
+		ID:              "foo",
+		AuthenticatedAt: time.Now(),
+		Subject:         "bar",
+	}))
 	require.NoError(t, om.CreateAccessTokenSession(nil, "asdfasdf", r))
 }

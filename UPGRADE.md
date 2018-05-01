@@ -59,6 +59,60 @@ This section summarizes important changes introduced in 1.0.0.
 
 ### Major breaking changes
 
+#### Changes to the CLI
+
+The CLI has changed in order to improve developer experience and adopt to the changes made with this release.
+
+##### `hydra host`
+
+The command `hydra host` has been renamed to `hydra serve` as projects ORY Oathkeeper and ORY Keto use the `serve` terminology
+as well.
+
+Because this patch removes the internal access control, no root client and root policy will be created upon start up. Thus,
+environment variable `FORCE_ROOT_CLIENT_CREDENTIALS` has been removed without replacement.
+
+To better reflect what environment variables touch which system, ISSUER has been renamed to `OAUTH2_ISSUER_URL` and
+`CONSENT_URL` has been renamed to `OAUTH2_CONSENT_URL`.
+
+Additionally, flag `--dangerous-force-auto-logon` has been removed it has no effect any more.
+
+##### Access Control & `hydra connect`
+
+WHAT HAPPENED TO THIS COMMAND? TBD
+
+As access control has been removed, most commands (except `token user`, `token client`, `token revoke`, `token introspect`)
+work without supplying any credentials at all. The listed exceptions support setting an OAuth 2.0 Client ID and Client Secret
+using flags `--client-id` and `--client-secret` or environment variables `OAUTH2_CLIENT_ID` and `OAUTH2_CLIENT_SECRET`.
+
+All other commands, such as `hydra clients create`, still support scenarios where you would need an OAuth2 Access Token.
+In those cases, you can supply the access token using flag `--access-token` or environment variable `OAUTH2_ACCESS_TOKEN`.
+
+#### `hydra token validate`
+
+This command has been renamed to `hydra token introspect` to properly reflect that you are performing OAuth 2.0
+Token Introspection.
+
+#### `hydra clients create`
+
+As OAuth 2.0 specifies that terminology `scope` does not have a plural `scopes`, we updated the places where the
+incorrect `scopes` was used in order to provide a more consistent developer experience.
+
+This command renamed flag `--allowed-scopes` to `--scope`.
+
+#### `hydra migrate ladon`
+
+This command is a relict of an old version of ORY Hydra which is, according to our metrics, not being used any more.
+
+### sdk
+
+	AcceptConsentRequest(challenge string, body swagger.AcceptConsentRequest) (*swagger.CompletedRequest, *swagger.APIResponse, error)
+	AcceptLoginRequest(challenge string, body swagger.AcceptLoginRequest) (*swagger.CompletedRequest, *swagger.APIResponse, error)
+	RejectConsentRequest(challenge string, body swagger.RejectRequest) (*swagger.CompletedRequest, *swagger.APIResponse, error)
+	RejectLoginRequest(challenge string, body swagger.RejectRequest) (*swagger.CompletedRequest, *swagger.APIResponse, error)
+	GetLoginRequest(challenge string) (*swagger.LoginRequest, *swagger.APIResponse, error)
+	GetConsentRequest(challenge string) (*swagger.ConsentRequest, *swagger.APIResponse, error)
+
+
 #### Access Control Policies and Warden moved to ORY Keto
 
 #### camelCase JSON is now under_score
@@ -89,11 +143,6 @@ Minor breaking changes do not require any special upgrade paths, unless you expl
 
 Previously, we disabled the introspection of refresh tokens. This has now changed to comply with the OAuth 2.0 specification.
 To distinguish tokens, use the `token_type` in the introspection response. It can either be `access_token` or `refresh_token`.
-
-#### FORCE_ROOT_CLIENT_CREDENTIALS
-
-The variable `FORCE_ROOT_CLIENT_CREDENTIALS` has caused some pain due to url-encoding conventions. It has been replaced
-by `FORCE_ROOT_CLIENT_ID` and `FORCE_ROOT_CLIENT_SECRET` which do not need to be encoded.
 
 #### jwk: Forces JWK to have a unique ID
 

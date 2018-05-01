@@ -20,10 +20,12 @@
     define(
       [
         'ApiClient',
+        'model/AcceptConsentRequest',
+        'model/AcceptLoginRequest',
+        'model/AuthenticationSession',
+        'model/CompletedRequest',
         'model/ConsentRequest',
-        'model/ConsentRequestAcceptance',
-        'model/ConsentRequestManager',
-        'model/ConsentRequestRejection',
+        'model/ConsentRequestSession',
         'model/FlushInactiveOAuth2TokensRequest',
         'model/Handler',
         'model/InlineResponse200',
@@ -33,22 +35,21 @@
         'model/JsonWebKeySet',
         'model/JsonWebKeySetGeneratorRequest',
         'model/KeyGenerator',
+        'model/LoginRequest',
         'model/Manager',
         'model/OAuth2Client',
-        'model/OAuth2ConsentRequest',
         'model/OAuth2TokenIntrospection',
         'model/OauthTokenResponse',
+        'model/OpenIDConnectContext',
         'model/RawMessage',
-        'model/SwaggerAcceptConsentRequest',
+        'model/RejectRequest',
         'model/SwaggerFlushInactiveAccessTokens',
         'model/SwaggerJsonWebKeyQuery',
         'model/SwaggerJwkCreateSet',
         'model/SwaggerJwkSetQuery',
         'model/SwaggerJwkUpdateSet',
         'model/SwaggerJwkUpdateSetKey',
-        'model/SwaggerOAuthConsentRequestPayload',
         'model/SwaggerOAuthIntrospectionRequest',
-        'model/SwaggerRejectConsentRequest',
         'model/SwaggerRevokeOAuth2TokenParameters',
         'model/UserinfoResponse',
         'model/WellKnown',
@@ -63,10 +64,12 @@
     // CommonJS-like environments that support module.exports, like Node.
     module.exports = factory(
       require('./ApiClient'),
+      require('./model/AcceptConsentRequest'),
+      require('./model/AcceptLoginRequest'),
+      require('./model/AuthenticationSession'),
+      require('./model/CompletedRequest'),
       require('./model/ConsentRequest'),
-      require('./model/ConsentRequestAcceptance'),
-      require('./model/ConsentRequestManager'),
-      require('./model/ConsentRequestRejection'),
+      require('./model/ConsentRequestSession'),
       require('./model/FlushInactiveOAuth2TokensRequest'),
       require('./model/Handler'),
       require('./model/InlineResponse200'),
@@ -76,22 +79,21 @@
       require('./model/JsonWebKeySet'),
       require('./model/JsonWebKeySetGeneratorRequest'),
       require('./model/KeyGenerator'),
+      require('./model/LoginRequest'),
       require('./model/Manager'),
       require('./model/OAuth2Client'),
-      require('./model/OAuth2ConsentRequest'),
       require('./model/OAuth2TokenIntrospection'),
       require('./model/OauthTokenResponse'),
+      require('./model/OpenIDConnectContext'),
       require('./model/RawMessage'),
-      require('./model/SwaggerAcceptConsentRequest'),
+      require('./model/RejectRequest'),
       require('./model/SwaggerFlushInactiveAccessTokens'),
       require('./model/SwaggerJsonWebKeyQuery'),
       require('./model/SwaggerJwkCreateSet'),
       require('./model/SwaggerJwkSetQuery'),
       require('./model/SwaggerJwkUpdateSet'),
       require('./model/SwaggerJwkUpdateSetKey'),
-      require('./model/SwaggerOAuthConsentRequestPayload'),
       require('./model/SwaggerOAuthIntrospectionRequest'),
-      require('./model/SwaggerRejectConsentRequest'),
       require('./model/SwaggerRevokeOAuth2TokenParameters'),
       require('./model/UserinfoResponse'),
       require('./model/WellKnown'),
@@ -103,10 +105,12 @@
   }
 })(function(
   ApiClient,
+  AcceptConsentRequest,
+  AcceptLoginRequest,
+  AuthenticationSession,
+  CompletedRequest,
   ConsentRequest,
-  ConsentRequestAcceptance,
-  ConsentRequestManager,
-  ConsentRequestRejection,
+  ConsentRequestSession,
   FlushInactiveOAuth2TokensRequest,
   Handler,
   InlineResponse200,
@@ -116,22 +120,21 @@
   JsonWebKeySet,
   JsonWebKeySetGeneratorRequest,
   KeyGenerator,
+  LoginRequest,
   Manager,
   OAuth2Client,
-  OAuth2ConsentRequest,
   OAuth2TokenIntrospection,
   OauthTokenResponse,
+  OpenIDConnectContext,
   RawMessage,
-  SwaggerAcceptConsentRequest,
+  RejectRequest,
   SwaggerFlushInactiveAccessTokens,
   SwaggerJsonWebKeyQuery,
   SwaggerJwkCreateSet,
   SwaggerJwkSetQuery,
   SwaggerJwkUpdateSet,
   SwaggerJwkUpdateSetKey,
-  SwaggerOAuthConsentRequestPayload,
   SwaggerOAuthIntrospectionRequest,
-  SwaggerRejectConsentRequest,
   SwaggerRevokeOAuth2TokenParameters,
   UserinfoResponse,
   WellKnown,
@@ -180,25 +183,35 @@
      */
     ApiClient: ApiClient,
     /**
+     * The AcceptConsentRequest model constructor.
+     * @property {module:model/AcceptConsentRequest}
+     */
+    AcceptConsentRequest: AcceptConsentRequest,
+    /**
+     * The AcceptLoginRequest model constructor.
+     * @property {module:model/AcceptLoginRequest}
+     */
+    AcceptLoginRequest: AcceptLoginRequest,
+    /**
+     * The AuthenticationSession model constructor.
+     * @property {module:model/AuthenticationSession}
+     */
+    AuthenticationSession: AuthenticationSession,
+    /**
+     * The CompletedRequest model constructor.
+     * @property {module:model/CompletedRequest}
+     */
+    CompletedRequest: CompletedRequest,
+    /**
      * The ConsentRequest model constructor.
      * @property {module:model/ConsentRequest}
      */
     ConsentRequest: ConsentRequest,
     /**
-     * The ConsentRequestAcceptance model constructor.
-     * @property {module:model/ConsentRequestAcceptance}
+     * The ConsentRequestSession model constructor.
+     * @property {module:model/ConsentRequestSession}
      */
-    ConsentRequestAcceptance: ConsentRequestAcceptance,
-    /**
-     * The ConsentRequestManager model constructor.
-     * @property {module:model/ConsentRequestManager}
-     */
-    ConsentRequestManager: ConsentRequestManager,
-    /**
-     * The ConsentRequestRejection model constructor.
-     * @property {module:model/ConsentRequestRejection}
-     */
-    ConsentRequestRejection: ConsentRequestRejection,
+    ConsentRequestSession: ConsentRequestSession,
     /**
      * The FlushInactiveOAuth2TokensRequest model constructor.
      * @property {module:model/FlushInactiveOAuth2TokensRequest}
@@ -245,6 +258,11 @@
      */
     KeyGenerator: KeyGenerator,
     /**
+     * The LoginRequest model constructor.
+     * @property {module:model/LoginRequest}
+     */
+    LoginRequest: LoginRequest,
+    /**
      * The Manager model constructor.
      * @property {module:model/Manager}
      */
@@ -254,11 +272,6 @@
      * @property {module:model/OAuth2Client}
      */
     OAuth2Client: OAuth2Client,
-    /**
-     * The OAuth2ConsentRequest model constructor.
-     * @property {module:model/OAuth2ConsentRequest}
-     */
-    OAuth2ConsentRequest: OAuth2ConsentRequest,
     /**
      * The OAuth2TokenIntrospection model constructor.
      * @property {module:model/OAuth2TokenIntrospection}
@@ -270,15 +283,20 @@
      */
     OauthTokenResponse: OauthTokenResponse,
     /**
+     * The OpenIDConnectContext model constructor.
+     * @property {module:model/OpenIDConnectContext}
+     */
+    OpenIDConnectContext: OpenIDConnectContext,
+    /**
      * The RawMessage model constructor.
      * @property {module:model/RawMessage}
      */
     RawMessage: RawMessage,
     /**
-     * The SwaggerAcceptConsentRequest model constructor.
-     * @property {module:model/SwaggerAcceptConsentRequest}
+     * The RejectRequest model constructor.
+     * @property {module:model/RejectRequest}
      */
-    SwaggerAcceptConsentRequest: SwaggerAcceptConsentRequest,
+    RejectRequest: RejectRequest,
     /**
      * The SwaggerFlushInactiveAccessTokens model constructor.
      * @property {module:model/SwaggerFlushInactiveAccessTokens}
@@ -310,20 +328,10 @@
      */
     SwaggerJwkUpdateSetKey: SwaggerJwkUpdateSetKey,
     /**
-     * The SwaggerOAuthConsentRequestPayload model constructor.
-     * @property {module:model/SwaggerOAuthConsentRequestPayload}
-     */
-    SwaggerOAuthConsentRequestPayload: SwaggerOAuthConsentRequestPayload,
-    /**
      * The SwaggerOAuthIntrospectionRequest model constructor.
      * @property {module:model/SwaggerOAuthIntrospectionRequest}
      */
     SwaggerOAuthIntrospectionRequest: SwaggerOAuthIntrospectionRequest,
-    /**
-     * The SwaggerRejectConsentRequest model constructor.
-     * @property {module:model/SwaggerRejectConsentRequest}
-     */
-    SwaggerRejectConsentRequest: SwaggerRejectConsentRequest,
     /**
      * The SwaggerRevokeOAuth2TokenParameters model constructor.
      * @property {module:model/SwaggerRevokeOAuth2TokenParameters}

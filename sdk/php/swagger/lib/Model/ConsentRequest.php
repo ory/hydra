@@ -47,18 +47,20 @@ class ConsentRequest implements ArrayAccess
       * The original name of the model.
       * @var string
       */
-    protected static $swaggerModelName = 'ConsentRequest';
+    protected static $swaggerModelName = 'consentRequest';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'client_id' => 'string',
-        'expires_at' => '\DateTime',
-        'id' => 'string',
-        'redirect_url' => 'string',
-        'requested_scopes' => 'string[]'
+        'challenge' => 'string',
+        'client' => '\Hydra\SDK\Model\OAuth2Client',
+        'oidc_context' => '\Hydra\SDK\Model\OpenIDConnectContext',
+        'request_url' => 'string',
+        'requested_scope' => 'string[]',
+        'skip' => 'bool',
+        'subject' => 'string'
     ];
 
     /**
@@ -66,11 +68,13 @@ class ConsentRequest implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerFormats = [
-        'client_id' => null,
-        'expires_at' => 'date-time',
-        'id' => null,
-        'redirect_url' => null,
-        'requested_scopes' => null
+        'challenge' => null,
+        'client' => null,
+        'oidc_context' => null,
+        'request_url' => null,
+        'requested_scope' => null,
+        'skip' => null,
+        'subject' => null
     ];
 
     public static function swaggerTypes()
@@ -88,11 +92,13 @@ class ConsentRequest implements ArrayAccess
      * @var string[]
      */
     protected static $attributeMap = [
-        'client_id' => 'clientId',
-        'expires_at' => 'expiresAt',
-        'id' => 'id',
-        'redirect_url' => 'redirectUrl',
-        'requested_scopes' => 'requestedScopes'
+        'challenge' => 'challenge',
+        'client' => 'client',
+        'oidc_context' => 'oidc_context',
+        'request_url' => 'request_url',
+        'requested_scope' => 'requested_scope',
+        'skip' => 'skip',
+        'subject' => 'subject'
     ];
 
 
@@ -101,11 +107,13 @@ class ConsentRequest implements ArrayAccess
      * @var string[]
      */
     protected static $setters = [
-        'client_id' => 'setClientId',
-        'expires_at' => 'setExpiresAt',
-        'id' => 'setId',
-        'redirect_url' => 'setRedirectUrl',
-        'requested_scopes' => 'setRequestedScopes'
+        'challenge' => 'setChallenge',
+        'client' => 'setClient',
+        'oidc_context' => 'setOidcContext',
+        'request_url' => 'setRequestUrl',
+        'requested_scope' => 'setRequestedScope',
+        'skip' => 'setSkip',
+        'subject' => 'setSubject'
     ];
 
 
@@ -114,11 +122,13 @@ class ConsentRequest implements ArrayAccess
      * @var string[]
      */
     protected static $getters = [
-        'client_id' => 'getClientId',
-        'expires_at' => 'getExpiresAt',
-        'id' => 'getId',
-        'redirect_url' => 'getRedirectUrl',
-        'requested_scopes' => 'getRequestedScopes'
+        'challenge' => 'getChallenge',
+        'client' => 'getClient',
+        'oidc_context' => 'getOidcContext',
+        'request_url' => 'getRequestUrl',
+        'requested_scope' => 'getRequestedScope',
+        'skip' => 'getSkip',
+        'subject' => 'getSubject'
     ];
 
     public static function attributeMap()
@@ -152,11 +162,13 @@ class ConsentRequest implements ArrayAccess
      */
     public function __construct(array $data = null)
     {
-        $this->container['client_id'] = isset($data['client_id']) ? $data['client_id'] : null;
-        $this->container['expires_at'] = isset($data['expires_at']) ? $data['expires_at'] : null;
-        $this->container['id'] = isset($data['id']) ? $data['id'] : null;
-        $this->container['redirect_url'] = isset($data['redirect_url']) ? $data['redirect_url'] : null;
-        $this->container['requested_scopes'] = isset($data['requested_scopes']) ? $data['requested_scopes'] : null;
+        $this->container['challenge'] = isset($data['challenge']) ? $data['challenge'] : null;
+        $this->container['client'] = isset($data['client']) ? $data['client'] : null;
+        $this->container['oidc_context'] = isset($data['oidc_context']) ? $data['oidc_context'] : null;
+        $this->container['request_url'] = isset($data['request_url']) ? $data['request_url'] : null;
+        $this->container['requested_scope'] = isset($data['requested_scope']) ? $data['requested_scope'] : null;
+        $this->container['skip'] = isset($data['skip']) ? $data['skip'] : null;
+        $this->container['subject'] = isset($data['subject']) ? $data['subject'] : null;
     }
 
     /**
@@ -185,106 +197,148 @@ class ConsentRequest implements ArrayAccess
 
 
     /**
-     * Gets client_id
+     * Gets challenge
      * @return string
      */
-    public function getClientId()
+    public function getChallenge()
     {
-        return $this->container['client_id'];
+        return $this->container['challenge'];
     }
 
     /**
-     * Sets client_id
-     * @param string $client_id ClientID is the client id that initiated the OAuth2 request.
+     * Sets challenge
+     * @param string $challenge Challenge is the identifier (\"authorization challenge\") of the consent authorization request. It is used to identify the session.
      * @return $this
      */
-    public function setClientId($client_id)
+    public function setChallenge($challenge)
     {
-        $this->container['client_id'] = $client_id;
+        $this->container['challenge'] = $challenge;
 
         return $this;
     }
 
     /**
-     * Gets expires_at
-     * @return \DateTime
+     * Gets client
+     * @return \Hydra\SDK\Model\OAuth2Client
      */
-    public function getExpiresAt()
+    public function getClient()
     {
-        return $this->container['expires_at'];
+        return $this->container['client'];
     }
 
     /**
-     * Sets expires_at
-     * @param \DateTime $expires_at ExpiresAt is the time where the access request will expire.
+     * Sets client
+     * @param \Hydra\SDK\Model\OAuth2Client $client
      * @return $this
      */
-    public function setExpiresAt($expires_at)
+    public function setClient($client)
     {
-        $this->container['expires_at'] = $expires_at;
+        $this->container['client'] = $client;
 
         return $this;
     }
 
     /**
-     * Gets id
+     * Gets oidc_context
+     * @return \Hydra\SDK\Model\OpenIDConnectContext
+     */
+    public function getOidcContext()
+    {
+        return $this->container['oidc_context'];
+    }
+
+    /**
+     * Sets oidc_context
+     * @param \Hydra\SDK\Model\OpenIDConnectContext $oidc_context
+     * @return $this
+     */
+    public function setOidcContext($oidc_context)
+    {
+        $this->container['oidc_context'] = $oidc_context;
+
+        return $this;
+    }
+
+    /**
+     * Gets request_url
      * @return string
      */
-    public function getId()
+    public function getRequestUrl()
     {
-        return $this->container['id'];
+        return $this->container['request_url'];
     }
 
     /**
-     * Sets id
-     * @param string $id ID is the id of this consent request.
+     * Sets request_url
+     * @param string $request_url RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but might come in handy if you want to deal with additional request parameters.
      * @return $this
      */
-    public function setId($id)
+    public function setRequestUrl($request_url)
     {
-        $this->container['id'] = $id;
+        $this->container['request_url'] = $request_url;
 
         return $this;
     }
 
     /**
-     * Gets redirect_url
-     * @return string
-     */
-    public function getRedirectUrl()
-    {
-        return $this->container['redirect_url'];
-    }
-
-    /**
-     * Sets redirect_url
-     * @param string $redirect_url Redirect URL is the URL where the user agent should be redirected to after the consent has been accepted or rejected.
-     * @return $this
-     */
-    public function setRedirectUrl($redirect_url)
-    {
-        $this->container['redirect_url'] = $redirect_url;
-
-        return $this;
-    }
-
-    /**
-     * Gets requested_scopes
+     * Gets requested_scope
      * @return string[]
      */
-    public function getRequestedScopes()
+    public function getRequestedScope()
     {
-        return $this->container['requested_scopes'];
+        return $this->container['requested_scope'];
     }
 
     /**
-     * Sets requested_scopes
-     * @param string[] $requested_scopes RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator.
+     * Sets requested_scope
+     * @param string[] $requested_scope RequestedScope contains all scopes requested by the OAuth 2.0 client.
      * @return $this
      */
-    public function setRequestedScopes($requested_scopes)
+    public function setRequestedScope($requested_scope)
     {
-        $this->container['requested_scopes'] = $requested_scopes;
+        $this->container['requested_scope'] = $requested_scope;
+
+        return $this;
+    }
+
+    /**
+     * Gets skip
+     * @return bool
+     */
+    public function getSkip()
+    {
+        return $this->container['skip'];
+    }
+
+    /**
+     * Sets skip
+     * @param bool $skip Skip, if true, implies that the client has requested the same scopes from the same user previously. If true, you must not ask the user to grant the requested scopes. You must however either allow or deny the consent request using the usual API call.
+     * @return $this
+     */
+    public function setSkip($skip)
+    {
+        $this->container['skip'] = $skip;
+
+        return $this;
+    }
+
+    /**
+     * Gets subject
+     * @return string
+     */
+    public function getSubject()
+    {
+        return $this->container['subject'];
+    }
+
+    /**
+     * Sets subject
+     * @param string $subject Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope requested by the OAuth 2.0 client.
+     * @return $this
+     */
+    public function setSubject($subject)
+    {
+        $this->container['subject'] = $subject;
 
         return $this;
     }

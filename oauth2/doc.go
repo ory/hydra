@@ -20,53 +20,11 @@
 
 package oauth2
 
-// ConsentRequest represents a consent request.
-// swagger:model oAuth2ConsentRequest
-type swaggerConsentRequest struct {
-	// ID is the id of this consent request.
-	ID string `json:"id"`
-
-	// RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator.
-	RequestedScopes []string `json:"requestedScopes,omitempty"`
-
-	// ClientID is the client id that initiated the OAuth2 request.
-	ClientID string `json:"clientId"`
-
-	// ExpiresAt is the time where the access request will expire.
-	ExpiresAt string `json:"expiresAt"`
-
-	// Redirect URL is the URL where the user agent should be redirected to after the consent has been
-	// accepted or rejected.
-	RedirectURL string `json:"redirectUrl"`
-}
-
 // swagger:parameters revokeOAuth2Token
 type swaggerRevokeOAuth2TokenParameters struct {
 	// in: formData
 	// required: true
 	Token string `json:"token"`
-}
-
-// swagger:parameters rejectOAuth2ConsentRequest
-type swaggerRejectConsentRequest struct {
-	// in: path
-	// required: true
-	ID string `json:"id"`
-
-	// in: body
-	// required: true
-	Body RejectConsentRequestPayload
-}
-
-// swagger:parameters acceptOAuth2ConsentRequest
-type swaggerAcceptConsentRequest struct {
-	// in: path
-	// required: true
-	ID string `json:"id"`
-
-	// in: body
-	// required: true
-	Body AcceptConsentRequestPayload
 }
 
 // swagger:parameters flushInactiveOAuth2Tokens
@@ -232,14 +190,4 @@ type swaggerOAuthIntrospectionRequest struct {
 	//
 	// in: formData
 	Scope string `json:"scope"`
-}
-
-// swagger:parameters getOAuth2ConsentRequest acceptConsentRequest rejectConsentRequest
-type swaggerOAuthConsentRequestPayload struct {
-	// The id of the OAuth 2.0 Consent Request.
-	//
-	// unique: true
-	// required: true
-	// in: path
-	ID string `json:"id"`
 }

@@ -20,15 +20,18 @@
     define(
       [
         'ApiClient',
-        'model/ConsentRequestAcceptance',
-        'model/ConsentRequestRejection',
+        'model/AcceptConsentRequest',
+        'model/AcceptLoginRequest',
+        'model/CompletedRequest',
+        'model/ConsentRequest',
         'model/FlushInactiveOAuth2TokensRequest',
         'model/InlineResponse401',
         'model/JsonWebKeySet',
+        'model/LoginRequest',
         'model/OAuth2Client',
-        'model/OAuth2ConsentRequest',
         'model/OAuth2TokenIntrospection',
         'model/OauthTokenResponse',
+        'model/RejectRequest',
         'model/UserinfoResponse',
         'model/WellKnown'
       ],
@@ -38,15 +41,18 @@
     // CommonJS-like environments that support module.exports, like Node.
     module.exports = factory(
       require('../ApiClient'),
-      require('../model/ConsentRequestAcceptance'),
-      require('../model/ConsentRequestRejection'),
+      require('../model/AcceptConsentRequest'),
+      require('../model/AcceptLoginRequest'),
+      require('../model/CompletedRequest'),
+      require('../model/ConsentRequest'),
       require('../model/FlushInactiveOAuth2TokensRequest'),
       require('../model/InlineResponse401'),
       require('../model/JsonWebKeySet'),
+      require('../model/LoginRequest'),
       require('../model/OAuth2Client'),
-      require('../model/OAuth2ConsentRequest'),
       require('../model/OAuth2TokenIntrospection'),
       require('../model/OauthTokenResponse'),
+      require('../model/RejectRequest'),
       require('../model/UserinfoResponse'),
       require('../model/WellKnown')
     )
@@ -58,34 +64,38 @@
     root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api = factory(
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer
-        .ConsentRequestAcceptance,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer
-        .ConsentRequestRejection,
+        .AcceptConsentRequest,
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.AcceptLoginRequest,
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.CompletedRequest,
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ConsentRequest,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer
         .FlushInactiveOAuth2TokensRequest,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.InlineResponse401,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKeySet,
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.LoginRequest,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Client,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer
-        .OAuth2ConsentRequest,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer
         .OAuth2TokenIntrospection,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OauthTokenResponse,
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.RejectRequest,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.UserinfoResponse,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WellKnown
     )
   }
 })(this, function(
   ApiClient,
-  ConsentRequestAcceptance,
-  ConsentRequestRejection,
+  AcceptConsentRequest,
+  AcceptLoginRequest,
+  CompletedRequest,
+  ConsentRequest,
   FlushInactiveOAuth2TokensRequest,
   InlineResponse401,
   JsonWebKeySet,
+  LoginRequest,
   OAuth2Client,
-  OAuth2ConsentRequest,
   OAuth2TokenIntrospection,
   OauthTokenResponse,
+  RejectRequest,
   UserinfoResponse,
   WellKnown
 ) {
@@ -108,39 +118,35 @@
     this.apiClient = apiClient || ApiClient.instance
 
     /**
-     * Callback function to receive the result of the acceptOAuth2ConsentRequest operation.
-     * @callback module:api/OAuth2Api~acceptOAuth2ConsentRequestCallback
+     * Callback function to receive the result of the acceptConsentRequest operation.
+     * @callback module:api/OAuth2Api~acceptConsentRequestCallback
      * @param {String} error Error message, if any.
-     * @param data This operation does not return a value.
+     * @param {module:model/CompletedRequest} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
     /**
-     * Accept a consent request
-     * Call this endpoint to accept a consent request. This usually happens when a user agrees to give access rights to an application.   The consent request id is usually transmitted via the URL query &#x60;consent&#x60;. For example: &#x60;http://consent-app.mydomain.com/?consent&#x3D;1234abcd&#x60;
-     * @param {String} id 
-     * @param {module:model/ConsentRequestAcceptance} body 
-     * @param {module:api/OAuth2Api~acceptOAuth2ConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
+     * Accept an consent request
+     * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider to authenticate the user and then tell ORY Hydra now about it. If the user authenticated, he/she must now be asked if the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the user&#39;s behalf.  The consent provider which handles this request and is a web app implemented and hosted by you. It shows a user interface which asks the user to grant or deny the client access to the requested scope (\&quot;Application my-dropbox-app wants write access to all your private files\&quot;).  The consent challenge is appended to the consent provider&#39;s URL to which the user&#39;s user-agent (browser) is redirected to. The consent provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the user accepted or rejected the request.  This endpoint tells ORY Hydra that the user has authorized the OAuth 2.0 client to access resources on his/her behalf. The consent provider includes additional information, such as session data for access and ID tokens, and if the consent request should be used as basis for future requests.  The response contains a redirect URL which the consent provider should redirect the user-agent to.
+     * @param {String} challenge 
+     * @param {Object} opts Optional parameters
+     * @param {module:model/AcceptConsentRequest} opts.body 
+     * @param {module:api/OAuth2Api~acceptConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/CompletedRequest}
      */
-    this.acceptOAuth2ConsentRequest = function(id, body, callback) {
-      var postBody = body
+    this.acceptConsentRequest = function(challenge, opts, callback) {
+      opts = opts || {}
+      var postBody = opts['body']
 
-      // verify the required parameter 'id' is set
-      if (id === undefined || id === null) {
+      // verify the required parameter 'challenge' is set
+      if (challenge === undefined || challenge === null) {
         throw new Error(
-          "Missing the required parameter 'id' when calling acceptOAuth2ConsentRequest"
-        )
-      }
-
-      // verify the required parameter 'body' is set
-      if (body === undefined || body === null) {
-        throw new Error(
-          "Missing the required parameter 'body' when calling acceptOAuth2ConsentRequest"
+          "Missing the required parameter 'challenge' when calling acceptConsentRequest"
         )
       }
 
       var pathParams = {
-        id: id
+        challenge: challenge
       }
       var queryParams = {}
       var headerParams = {}
@@ -149,11 +155,67 @@
       var authNames = []
       var contentTypes = ['application/json']
       var accepts = ['application/json']
-      var returnType = null
+      var returnType = CompletedRequest
 
       return this.apiClient.callApi(
-        '/oauth2/consent/requests/{id}/accept',
-        'PATCH',
+        '/oauth2/auth/requests/consent/{challenge}/accept',
+        'PUT',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
+    }
+
+    /**
+     * Callback function to receive the result of the acceptLoginRequest operation.
+     * @callback module:api/OAuth2Api~acceptLoginRequestCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/CompletedRequest} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Accept an login request
+     * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider (sometimes called \&quot;identity provider\&quot;) to authenticate the user and then tell ORY Hydra now about it. The login provider is an web-app you write and host, and it must be able to authenticate (\&quot;show the user a login screen\&quot;) a user (in OAuth2 the proper name for user is \&quot;resource owner\&quot;).  The authentication challenge is appended to the login provider URL to which the user&#39;s user-agent (browser) is redirected to. The login provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.  This endpoint tells ORY Hydra that the user has successfully authenticated and includes additional information such as the user&#39;s ID and if ORY Hydra should remember the user&#39;s user agent for future authentication attempts by setting a cookie.  The response contains a redirect URL which the login provider should redirect the user-agent to.
+     * @param {String} challenge 
+     * @param {Object} opts Optional parameters
+     * @param {module:model/AcceptLoginRequest} opts.body 
+     * @param {module:api/OAuth2Api~acceptLoginRequestCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/CompletedRequest}
+     */
+    this.acceptLoginRequest = function(challenge, opts, callback) {
+      opts = opts || {}
+      var postBody = opts['body']
+
+      // verify the required parameter 'challenge' is set
+      if (challenge === undefined || challenge === null) {
+        throw new Error(
+          "Missing the required parameter 'challenge' when calling acceptLoginRequest"
+        )
+      }
+
+      var pathParams = {
+        challenge: challenge
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
+
+      var authNames = []
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = CompletedRequest
+
+      return this.apiClient.callApi(
+        '/oauth2/auth/requests/login/{challenge}/accept',
+        'PUT',
         pathParams,
         queryParams,
         headerParams,
@@ -316,6 +378,112 @@
     }
 
     /**
+     * Callback function to receive the result of the getConsentRequest operation.
+     * @callback module:api/OAuth2Api~getConsentRequestCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/ConsentRequest} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Get consent request information
+     * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider to authenticate the user and then tell ORY Hydra now about it. If the user authenticated, he/she must now be asked if the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the user&#39;s behalf.  The consent provider which handles this request and is a web app implemented and hosted by you. It shows a user interface which asks the user to grant or deny the client access to the requested scope (\&quot;Application my-dropbox-app wants write access to all your private files\&quot;).  The consent challenge is appended to the consent provider&#39;s URL to which the user&#39;s user-agent (browser) is redirected to. The consent provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the user accepted or rejected the request.
+     * @param {String} challenge 
+     * @param {module:api/OAuth2Api~getConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/ConsentRequest}
+     */
+    this.getConsentRequest = function(challenge, callback) {
+      var postBody = null
+
+      // verify the required parameter 'challenge' is set
+      if (challenge === undefined || challenge === null) {
+        throw new Error(
+          "Missing the required parameter 'challenge' when calling getConsentRequest"
+        )
+      }
+
+      var pathParams = {
+        challenge: challenge
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
+
+      var authNames = []
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = ConsentRequest
+
+      return this.apiClient.callApi(
+        '/oauth2/auth/requests/consent/{challenge}',
+        'GET',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
+    }
+
+    /**
+     * Callback function to receive the result of the getLoginRequest operation.
+     * @callback module:api/OAuth2Api~getLoginRequestCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/LoginRequest} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Get an login request
+     * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider (sometimes called \&quot;identity provider\&quot;) to authenticate the user and then tell ORY Hydra now about it. The login provider is an web-app you write and host, and it must be able to authenticate (\&quot;show the user a login screen\&quot;) a user (in OAuth2 the proper name for user is \&quot;resource owner\&quot;).  The authentication challenge is appended to the login provider URL to which the user&#39;s user-agent (browser) is redirected to. The login provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
+     * @param {String} challenge 
+     * @param {module:api/OAuth2Api~getLoginRequestCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/LoginRequest}
+     */
+    this.getLoginRequest = function(challenge, callback) {
+      var postBody = null
+
+      // verify the required parameter 'challenge' is set
+      if (challenge === undefined || challenge === null) {
+        throw new Error(
+          "Missing the required parameter 'challenge' when calling getLoginRequest"
+        )
+      }
+
+      var pathParams = {
+        challenge: challenge
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
+
+      var authNames = []
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = LoginRequest
+
+      return this.apiClient.callApi(
+        '/oauth2/auth/requests/login/{challenge}',
+        'GET',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
+    }
+
+    /**
      * Callback function to receive the result of the getOAuth2Client operation.
      * @callback module:api/OAuth2Api~getOAuth2ClientCallback
      * @param {String} error Error message, if any.
@@ -354,59 +522,6 @@
 
       return this.apiClient.callApi(
         '/clients/{id}',
-        'GET',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
-    }
-
-    /**
-     * Callback function to receive the result of the getOAuth2ConsentRequest operation.
-     * @callback module:api/OAuth2Api~getOAuth2ConsentRequestCallback
-     * @param {String} error Error message, if any.
-     * @param {module:model/OAuth2ConsentRequest} data The data returned by the service call.
-     * @param {String} response The complete HTTP response.
-     */
-
-    /**
-     * Receive consent request information
-     * Call this endpoint to receive information on consent requests. The consent request id is usually transmitted via the URL query &#x60;consent&#x60;. For example: &#x60;http://consent-app.mydomain.com/?consent&#x3D;1234abcd&#x60;
-     * @param {String} id The id of the OAuth 2.0 Consent Request.
-     * @param {module:api/OAuth2Api~getOAuth2ConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/OAuth2ConsentRequest}
-     */
-    this.getOAuth2ConsentRequest = function(id, callback) {
-      var postBody = null
-
-      // verify the required parameter 'id' is set
-      if (id === undefined || id === null) {
-        throw new Error(
-          "Missing the required parameter 'id' when calling getOAuth2ConsentRequest"
-        )
-      }
-
-      var pathParams = {
-        id: id
-      }
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
-
-      var authNames = []
-      var contentTypes = ['application/json']
-      var accepts = ['application/json']
-      var returnType = OAuth2ConsentRequest
-
-      return this.apiClient.callApi(
-        '/oauth2/consent/requests/{id}',
         'GET',
         pathParams,
         queryParams,
@@ -660,39 +775,35 @@
     }
 
     /**
-     * Callback function to receive the result of the rejectOAuth2ConsentRequest operation.
-     * @callback module:api/OAuth2Api~rejectOAuth2ConsentRequestCallback
+     * Callback function to receive the result of the rejectConsentRequest operation.
+     * @callback module:api/OAuth2Api~rejectConsentRequestCallback
      * @param {String} error Error message, if any.
-     * @param data This operation does not return a value.
+     * @param {module:model/CompletedRequest} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
     /**
-     * Reject a consent request
-     * Call this endpoint to reject a consent request. This usually happens when a user denies access rights to an application.   The consent request id is usually transmitted via the URL query &#x60;consent&#x60;. For example: &#x60;http://consent-app.mydomain.com/?consent&#x3D;1234abcd&#x60;
-     * @param {String} id 
-     * @param {module:model/ConsentRequestRejection} body 
-     * @param {module:api/OAuth2Api~rejectOAuth2ConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
+     * Reject an consent request
+     * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider to authenticate the user and then tell ORY Hydra now about it. If the user authenticated, he/she must now be asked if the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the user&#39;s behalf.  The consent provider which handles this request and is a web app implemented and hosted by you. It shows a user interface which asks the user to grant or deny the client access to the requested scope (\&quot;Application my-dropbox-app wants write access to all your private files\&quot;).  The consent challenge is appended to the consent provider&#39;s URL to which the user&#39;s user-agent (browser) is redirected to. The consent provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the user accepted or rejected the request.  This endpoint tells ORY Hydra that the user has not authorized the OAuth 2.0 client to access resources on his/her behalf. The consent provider must include a reason why the consent was not granted.  The response contains a redirect URL which the consent provider should redirect the user-agent to.
+     * @param {String} challenge 
+     * @param {Object} opts Optional parameters
+     * @param {module:model/RejectRequest} opts.body 
+     * @param {module:api/OAuth2Api~rejectConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/CompletedRequest}
      */
-    this.rejectOAuth2ConsentRequest = function(id, body, callback) {
-      var postBody = body
+    this.rejectConsentRequest = function(challenge, opts, callback) {
+      opts = opts || {}
+      var postBody = opts['body']
 
-      // verify the required parameter 'id' is set
-      if (id === undefined || id === null) {
+      // verify the required parameter 'challenge' is set
+      if (challenge === undefined || challenge === null) {
         throw new Error(
-          "Missing the required parameter 'id' when calling rejectOAuth2ConsentRequest"
-        )
-      }
-
-      // verify the required parameter 'body' is set
-      if (body === undefined || body === null) {
-        throw new Error(
-          "Missing the required parameter 'body' when calling rejectOAuth2ConsentRequest"
+          "Missing the required parameter 'challenge' when calling rejectConsentRequest"
         )
       }
 
       var pathParams = {
-        id: id
+        challenge: challenge
       }
       var queryParams = {}
       var headerParams = {}
@@ -701,11 +812,67 @@
       var authNames = []
       var contentTypes = ['application/json']
       var accepts = ['application/json']
-      var returnType = null
+      var returnType = CompletedRequest
 
       return this.apiClient.callApi(
-        '/oauth2/consent/requests/{id}/reject',
-        'PATCH',
+        '/oauth2/auth/requests/consent/{challenge}/reject',
+        'PUT',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
+    }
+
+    /**
+     * Callback function to receive the result of the rejectLoginRequest operation.
+     * @callback module:api/OAuth2Api~rejectLoginRequestCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/CompletedRequest} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Reject an logout request
+     * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider (sometimes called \&quot;identity provider\&quot;) to authenticate the user and then tell ORY Hydra now about it. The login provider is an web-app you write and host, and it must be able to authenticate (\&quot;show the user a login screen\&quot;) a user (in OAuth2 the proper name for user is \&quot;resource owner\&quot;).  The authentication challenge is appended to the login provider URL to which the user&#39;s user-agent (browser) is redirected to. The login provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.  This endpoint tells ORY Hydra that the user has not authenticated and includes a reason why the authentication was be denied.  The response contains a redirect URL which the login provider should redirect the user-agent to.
+     * @param {String} challenge 
+     * @param {Object} opts Optional parameters
+     * @param {module:model/RejectRequest} opts.body 
+     * @param {module:api/OAuth2Api~rejectLoginRequestCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/CompletedRequest}
+     */
+    this.rejectLoginRequest = function(challenge, opts, callback) {
+      opts = opts || {}
+      var postBody = opts['body']
+
+      // verify the required parameter 'challenge' is set
+      if (challenge === undefined || challenge === null) {
+        throw new Error(
+          "Missing the required parameter 'challenge' when calling rejectLoginRequest"
+        )
+      }
+
+      var pathParams = {
+        challenge: challenge
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
+
+      var authNames = []
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = CompletedRequest
+
+      return this.apiClient.callApi(
+        '/oauth2/auth/requests/login/{challenge}/reject',
+        'PUT',
         pathParams,
         queryParams,
         headerParams,

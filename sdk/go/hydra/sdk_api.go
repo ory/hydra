@@ -46,15 +46,19 @@ type JWKApi interface {
 }
 
 type OAuth2API interface {
-	AcceptOAuth2ConsentRequest(id string, body swagger.ConsentRequestAcceptance) (*swagger.APIResponse, error)
+	AcceptConsentRequest(challenge string, body swagger.AcceptConsentRequest) (*swagger.CompletedRequest, *swagger.APIResponse, error)
+	AcceptLoginRequest(challenge string, body swagger.AcceptLoginRequest) (*swagger.CompletedRequest, *swagger.APIResponse, error)
+	RejectConsentRequest(challenge string, body swagger.RejectRequest) (*swagger.CompletedRequest, *swagger.APIResponse, error)
+	RejectLoginRequest(challenge string, body swagger.RejectRequest) (*swagger.CompletedRequest, *swagger.APIResponse, error)
+	GetLoginRequest(challenge string) (*swagger.LoginRequest, *swagger.APIResponse, error)
+	GetConsentRequest(challenge string) (*swagger.ConsentRequest, *swagger.APIResponse, error)
+
 	CreateOAuth2Client(body swagger.OAuth2Client) (*swagger.OAuth2Client, *swagger.APIResponse, error)
 	DeleteOAuth2Client(id string) (*swagger.APIResponse, error)
 	GetOAuth2Client(id string) (*swagger.OAuth2Client, *swagger.APIResponse, error)
-	GetOAuth2ConsentRequest(id string) (*swagger.OAuth2ConsentRequest, *swagger.APIResponse, error)
 	GetWellKnown() (*swagger.WellKnown, *swagger.APIResponse, error)
 	IntrospectOAuth2Token(token string, scope string) (*swagger.OAuth2TokenIntrospection, *swagger.APIResponse, error)
 	ListOAuth2Clients(limit int64, offset int64) ([]swagger.OAuth2Client, *swagger.APIResponse, error)
-	RejectOAuth2ConsentRequest(id string, body swagger.ConsentRequestRejection) (*swagger.APIResponse, error)
 	RevokeOAuth2Token(token string) (*swagger.APIResponse, error)
 	UpdateOAuth2Client(id string, body swagger.OAuth2Client) (*swagger.OAuth2Client, *swagger.APIResponse, error)
 

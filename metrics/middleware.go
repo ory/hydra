@@ -225,7 +225,7 @@ func anonymizePath(path string, salt string) string {
 		oauth2.WellKnownPath,
 		oauth2.IntrospectPath,
 		oauth2.RevocationPath,
-		oauth2.ConsentRequestPath,
+		//oauth2.ConsentRequestPath,
 		"/health/status",
 		"/",
 	}

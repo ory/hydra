@@ -11,7 +11,7 @@ export HYDRA_URL=http://localhost:4444/
 export OAUTH2_CLIENT_ID=foobar
 export OAUTH2_CLIENT_SECRET=bazbar
 
-hydra clients create --id $OAUTH_CLIENT_ID --secret $OAUTH_CLIENT_SECRET -g client_credentials
+hydra clients create --id $OAUTH2_CLIENT_ID --secret $OAUTH2_CLIENT_SECRET -g client_credentials
 token=$(hydra token client)
 hydra token introspect $token
 hydra clients delete foobar

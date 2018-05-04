@@ -21,17 +21,22 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/spf13/cobra"
 )
 
 // validateCmd represents the validate command
-var tokenValidatorCmd = &cobra.Command{
-	Use:   "validate <token>",
-	Short: "Check if an access token is valid",
-	Run:   cmdHandler.Warden.IsAuthorized,
+var tokenIntrospectCmd = &cobra.Command{
+	Use:   "introspect <token>",
+	Short: "Introspect an access or refresh token",
+	Run:   cmdHandler.Introspection.Introspect,
 }
 
 func init() {
-	tokenCmd.AddCommand(tokenValidatorCmd)
-	tokenValidatorCmd.Flags().StringSlice("scopes", []string{""}, "Additionally check if scope was granted")
+	tokenCmd.AddCommand(tokenIntrospectCmd)
+	tokenIntrospectCmd.Flags().StringSlice("scopes", []string{}, "Additionally check if scope was granted")
+
+	tokenIntrospectCmd.Flags().String("client-id", os.Getenv("OAUTH2_CLIENT_ID"), "Use the provided OAuth 2.0 Client ID, defaults to environment variable OAUTH2_CLIENT_ID")
+	tokenIntrospectCmd.Flags().String("client-secret", os.Getenv("OAUTH2_CLIENT_SECRET"), "Use the provided OAuth 2.0 Client Secret, defaults to environment variable OAUTH2_CLIENT_SECRET")
 }

@@ -76,8 +76,8 @@ func init() {
 	// Cobra supports Persistent Flags, which, if defined here,
 	// will be global for your application.
 
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.hydra.yaml)")
-	RootCmd.PersistentFlags().Bool("skip-tls-verify", false, "foolishly accept TLS certificates signed by unkown certificate authorities")
+	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "Config file (default is $HOME/.hydra.yaml)")
+	RootCmd.PersistentFlags().Bool("skip-tls-verify", false, "Foolishly accept TLS certificates signed by unkown certificate authorities")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.

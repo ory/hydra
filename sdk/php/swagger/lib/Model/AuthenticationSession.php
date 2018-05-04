@@ -47,7 +47,7 @@ class AuthenticationSession implements ArrayAccess
       * The original name of the model.
       * @var string
       */
-    protected static $swaggerModelName = 'authenticationSession';
+    protected static $swaggerModelName = 'AuthenticationSession';
 
     /**
       * Array of property to type mappings. Used for (de)serialization

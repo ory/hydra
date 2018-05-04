@@ -25,19 +25,19 @@ import (
 )
 
 type Handler struct {
-	Clients   *ClientHandler
-	Keys      *JWKHandler
-	Warden    *IntrospectionHandler
-	Token     *TokenHandler
-	Migration *MigrateHandler
+	Clients       *ClientHandler
+	Keys          *JWKHandler
+	Introspection *IntrospectionHandler
+	Token         *TokenHandler
+	Migration     *MigrateHandler
 }
 
 func NewHandler(c *config.Config) *Handler {
 	return &Handler{
-		Clients:   newClientHandler(c),
-		Keys:      newJWKHandler(c),
-		Warden:    newIntrospectionHandler(c),
-		Token:     newTokenHandler(c),
-		Migration: newMigrateHandler(c),
+		Clients:       newClientHandler(c),
+		Keys:          newJWKHandler(c),
+		Introspection: newIntrospectionHandler(c),
+		Token:         newTokenHandler(c),
+		Migration:     newMigrateHandler(c),
 	}
 }

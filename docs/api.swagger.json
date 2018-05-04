@@ -1246,6 +1246,22 @@
     }
   },
   "definitions": {
+    "AuthenticationSession": {
+      "type": "object",
+      "properties": {
+        "AuthenticatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "Subject": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/consent"
+    },
     "Handler": {
       "type": "object",
       "properties": {
@@ -1347,22 +1363,6 @@
         }
       },
       "x-go-name": "HandledAuthenticationRequest",
-      "x-go-package": "github.com/ory/hydra/consent"
-    },
-    "authenticationSession": {
-      "type": "object",
-      "properties": {
-        "AuthenticatedAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "ID": {
-          "type": "string"
-        },
-        "Subject": {
-          "type": "string"
-        }
-      },
       "x-go-package": "github.com/ory/hydra/consent"
     },
     "completedRequest": {

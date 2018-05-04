@@ -36,10 +36,19 @@ type TokenHandler struct {
 }
 
 func (h *TokenHandler) newTokenManager(cmd *cobra.Command) *hydra.OAuth2Api {
-	c := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlash())
-	c.Configuration.Transport = h.Config.OAuth2Client(cmd).Transport
+	c := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlash(cmd))
+
+	skipTLSTermination, _ := cmd.Flags().GetBool("skip-tls-verify")
+	c.Configuration.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: skipTLSTermination},
+	}
+
 	if term, _ := cmd.Flags().GetBool("fake-tls-termination"); term {
 		c.Configuration.DefaultHeader["X-Forwarded-Proto"] = "https"
+	}
+
+	if token, _ := cmd.Flags().GetString("access-token"); token != "" {
+		c.Configuration.DefaultHeader["Authorization"] = "Bearer " + token
 	}
 
 	return c
@@ -55,9 +64,23 @@ func (h *TokenHandler) RevokeToken(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	handler := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlash())
-	handler.Configuration.Username = h.Config.ClientID
-	handler.Configuration.Password = h.Config.ClientSecret
+	handler := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlash(cmd))
+
+	skipTLSTermination, _ := cmd.Flags().GetBool("skip-tls-verify")
+	handler.Configuration.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: skipTLSTermination},
+	}
+
+	clientID, _ := cmd.Flags().GetString("client-id")
+	clientSecret, _ := cmd.Flags().GetString("client-secret")
+	if clientID == "" || clientSecret == "" {
+		fmt.Print(cmd.UsageString())
+		fmt.Println("Please provide a Client ID and Client Secret using flags --client-id and --client-secret, or environment variables OAUTH2_CLIENT_ID and OAUTH2_CLIENT_SECRET.")
+		return
+	}
+
+	handler.Configuration.Username = clientID
+	handler.Configuration.Password = clientSecret
 
 	if skip, _ := cmd.Flags().GetBool("skip-tls-verify"); skip {
 		handler.Configuration.Transport = &http.Transport{

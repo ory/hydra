@@ -78,7 +78,10 @@ Additionally, flag `--dangerous-force-auto-logon` has been removed it has no eff
 
 ##### Access Control & `hydra connect`
 
-WHAT HAPPENED TO THIS COMMAND? TBD
+The command `hydra connect` has been removed as it no longer serves a purpose now that the internal access control
+has been removed. Every command you call now needs the environment variable `HYDRA_URL` (previously named `CLUSTER_URL`)
+which should point to ORY Hydra's URL. Removing this command has an additional benefit - privileged client IDs and secrets
+will no longer be stored in a plaintext file on your system if you use this command.
 
 As access control has been removed, most commands (except `token user`, `token client`, `token revoke`, `token introspect`)
 work without supplying any credentials at all. The listed exceptions support setting an OAuth 2.0 Client ID and Client Secret
@@ -86,6 +89,12 @@ using flags `--client-id` and `--client-secret` or environment variables `OAUTH2
 
 All other commands, such as `hydra clients create`, still support scenarios where you would need an OAuth2 Access Token.
 In those cases, you can supply the access token using flag `--access-token` or environment variable `OAUTH2_ACCESS_TOKEN`.
+
+All commands now support the `--endpoint` flag which sets the `HYDRA_URL` in case you don't want to use environment variables.
+
+#### `hydra token user`
+
+Flags `--id` and `--secret` are now called `--client-id` and `--client-secret`.
 
 #### `hydra token validate`
 

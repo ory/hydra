@@ -25,9 +25,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// hostCmd represents the host command
-var hostCmd = &cobra.Command{
-	Use:   "host",
+// serveCmd represents the host command
+var serveCmd = &cobra.Command{
+	Use:   "serve",
 	Short: "Start the HTTP/2 host service",
 	Long: `Starts all HTTP/2 APIs and connects to a database backend.
 
@@ -198,19 +198,19 @@ DEBUG CONTROLS
 }
 
 func init() {
-	RootCmd.AddCommand(hostCmd)
+	RootCmd.AddCommand(serveCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// hostCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// serveCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	hostCmd.Flags().BoolVar(&c.ForceHTTP, "dangerous-force-http", false, "Disable HTTP/2 over TLS (HTTPS) and serve HTTP instead. Never use this in production.")
-	hostCmd.Flags().Bool("dangerous-auto-logon", false, "Stores the root credentials in ~/.hydra.yml. Do not use in production.")
-	hostCmd.Flags().Bool("disable-telemetry", false, "Disable telemetry collection and sharing - for more information please visit https://ory.gitbooks.io/hydra/content/telemetry.html")
-	hostCmd.Flags().String("https-tls-key-path", "", "Path to the key file for HTTP/2 over TLS (https). You can set HTTPS_TLS_KEY_PATH or HTTPS_TLS_KEY instead.")
-	hostCmd.Flags().String("https-tls-cert-path", "", "Path to the certificate file for HTTP/2 over TLS (https). You can set HTTPS_TLS_CERT_PATH or HTTPS_TLS_CERT instead.")
+	serveCmd.Flags().BoolVar(&c.ForceHTTP, "dangerous-force-http", false, "Disable HTTP/2 over TLS (HTTPS) and serve HTTP instead. Never use this in production.")
+	//serveCmd.Flags().Bool("dangerous-auto-logon", false, "Stores the root credentials in ~/.hydra.yml. Do not use in production.")
+	serveCmd.Flags().Bool("disable-telemetry", false, "Disable telemetry collection and sharing - for more information please visit https://ory.gitbooks.io/hydra/content/telemetry.html")
+	serveCmd.Flags().String("https-tls-key-path", "", "Path to the key file for HTTP/2 over TLS (https). You can set HTTPS_TLS_KEY_PATH or HTTPS_TLS_KEY instead.")
+	serveCmd.Flags().String("https-tls-cert-path", "", "Path to the certificate file for HTTP/2 over TLS (https). You can set HTTPS_TLS_CERT_PATH or HTTPS_TLS_CERT instead.")
 }

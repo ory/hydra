@@ -326,7 +326,10 @@
 [[projects]]
   branch = "master"
   name = "github.com/ory/sqlcon"
-  packages = ["."]
+  packages = [
+    ".",
+    "dockertest"
+  ]
   revision = "a3e701ace784da54e7d5a96e7b08eb394f2af5e4"
 
 [[projects]]
@@ -340,6 +343,12 @@
   packages = ["."]
   revision = "16398bac157da96aa88f98a2df640c7f32af1da2"
   version = "v1.0.1"
+
+[[projects]]
+  name = "github.com/phayes/freeport"
+  packages = ["."]
+  revision = "b8543db493a5ed890c5499e935e2cad7504f3a04"
+  version = "1.0.2"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -565,6 +574,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ed156fb22c2ead58aea442975fec6c0e30ab3bc8deb7fd0c0e821ec2c6648b76"
+  inputs-digest = "3466a081a963ffa7a9a2375e28ebfc156fb199299ed52d9ba930ffd0de4779e5"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"time"
 
 	"github.com/julienschmidt/httprouter"
@@ -51,31 +52,31 @@ var tokenUserCmd = &cobra.Command{
 		}
 
 		scopes, _ := cmd.Flags().GetStringSlice("scope")
-		clientId, _ := cmd.Flags().GetString("id")
-		clientSecret, _ := cmd.Flags().GetString("secret")
 		redirectUrl, _ := cmd.Flags().GetString("redirect")
 		backend, _ := cmd.Flags().GetString("token-url")
 		frontend, _ := cmd.Flags().GetString("auth-url")
 
-		if clientId == "" {
-			clientId = c.ClientID
+		clientID, _ := cmd.Flags().GetString("client-id")
+		clientSecret, _ := cmd.Flags().GetString("client-secret")
+		if clientID == "" || clientSecret == "" {
+			fmt.Print(cmd.UsageString())
+			fmt.Println("Please provide a Client ID and Client Secret using flags --client-id and --client-secret, or environment variables OAUTH2_CLIENT_ID and OAUTH2_CLIENT_SECRET.")
+			return
 		}
-		if clientSecret == "" {
-			clientSecret = c.ClientSecret
-		}
+
 		if backend == "" {
-			bu, err := url.Parse(c.ClusterURL)
-			pkg.Must(err, `Unable to parse cluster url ("%s"): %s`, c.ClusterURL, err)
+			bu, err := url.Parse(c.GetClusterURLWithoutTailingSlash(cmd))
+			pkg.Must(err, `Unable to parse cluster url ("%s"): %s`, c.GetClusterURLWithoutTailingSlash(cmd), err)
 			backend = urlx.AppendPaths(bu, "/oauth2/token").String()
 		}
 		if frontend == "" {
-			fu, err := url.Parse(c.ClusterURL)
-			pkg.Must(err, `Unable to parse cluster url ("%s"): %s`, c.ClusterURL, err)
+			fu, err := url.Parse(c.GetClusterURLWithoutTailingSlash(cmd))
+			pkg.Must(err, `Unable to parse cluster url ("%s"): %s`, c.GetClusterURLWithoutTailingSlash(cmd), err)
 			frontend = urlx.AppendPaths(fu, "/oauth2/auth").String()
 		}
 
 		conf := oauth2.Config{
-			ClientID:     clientId,
+			ClientID:     clientID,
 			ClientSecret: clientSecret,
 			Endpoint: oauth2.Endpoint{
 				TokenURL: backend,
@@ -158,10 +159,13 @@ var tokenUserCmd = &cobra.Command{
 func init() {
 	tokenCmd.AddCommand(tokenUserCmd)
 	tokenUserCmd.Flags().Bool("no-open", false, "Do not open the browser window automatically")
-	tokenUserCmd.Flags().StringSlice("scope", []string{"hydra", "offline", "openid"}, "Force scopes")
-	tokenUserCmd.Flags().String("id", "", "Force a client id, defaults to value from config file")
-	tokenUserCmd.Flags().String("secret", "", "Force a client secret, defaults to value from config file")
+	tokenUserCmd.Flags().StringSlice("scope", []string{"offline", "openid"}, "Request OAuth2 scope")
+
+	tokenUserCmd.Flags().String("client-id", os.Getenv("OAUTH2_CLIENT_ID"), "Use the provided OAuth 2.0 Client ID, defaults to environment variable OAUTH2_CLIENT_ID")
+	tokenUserCmd.Flags().String("client-secret", os.Getenv("OAUTH2_CLIENT_SECRET"), "Use the provided OAuth 2.0 Client Secret, defaults to environment variable OAUTH2_CLIENT_SECRET")
+
 	tokenUserCmd.Flags().String("redirect", "http://localhost:4445/callback", "Force a redirect url")
-	tokenUserCmd.Flags().String("auth-url", c.ClusterURL, "Force the authorization url. The authorization url is the URL that the user will open in the browser, defaults to the cluster url value from config file")
-	tokenUserCmd.Flags().String("token-url", c.ClusterURL, "Force a token url. The token url is used to exchange the auth code, defaults to the cluster url value from config file")
+	tokenUserCmd.Flags().String("auth-url", os.Getenv("HYDRA_URL"), "Usually it is enough to specify the `endpoint` flag, but if you want to force the authorization url, use this flag")
+	tokenUserCmd.Flags().String("token-url", os.Getenv("HYDRA_URL"), "Usually it is enough to specify the `endpoint` flag, but if you want to force the token url, use this flag")
+	tokenUserCmd.PersistentFlags().String("endpoint", os.Getenv("HYDRA_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_URL")
 }

@@ -21,6 +21,7 @@
 package cli
 
 import (
+	"crypto/tls"
 	"fmt"
 
 	"net/http"
@@ -35,10 +36,19 @@ type JWKHandler struct {
 }
 
 func (h *JWKHandler) newJwkManager(cmd *cobra.Command) *hydra.JsonWebKeyApi {
-	c := hydra.NewJsonWebKeyApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlash())
-	c.Configuration.Transport = h.Config.OAuth2Client(cmd).Transport
+	c := hydra.NewJsonWebKeyApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlash(cmd))
+
+	skipTLSTermination, _ := cmd.Flags().GetBool("skip-tls-verify")
+	c.Configuration.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: skipTLSTermination},
+	}
+
 	if term, _ := cmd.Flags().GetBool("fake-tls-termination"); term {
 		c.Configuration.DefaultHeader["X-Forwarded-Proto"] = "https"
+	}
+
+	if token, _ := cmd.Flags().GetString("access-token"); token != "" {
+		c.Configuration.DefaultHeader["Authorization"] = "Bearer " + token
 	}
 
 	return c

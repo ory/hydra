@@ -89,18 +89,6 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 			}
 		}
 
-		if c.ClusterURL == "" {
-			proto := "https"
-			if c.ForceHTTP {
-				proto = "http"
-			}
-			host := "localhost"
-			if c.BindHost != "" {
-				host = c.BindHost
-			}
-			c.ClusterURL = fmt.Sprintf("%s://%s:%d", proto, host, c.BindPort)
-		}
-
 		n := negroni.New()
 
 		if ok, _ := cmd.Flags().GetBool("disable-telemetry"); !ok && os.Getenv("DISABLE_TELEMETRY") != "1" {

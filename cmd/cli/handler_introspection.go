@@ -21,6 +21,7 @@
 package cli
 
 import (
+	"crypto/tls"
 	//"context"
 	//"encoding/json"
 	"fmt"
@@ -45,14 +46,29 @@ func newIntrospectionHandler(c *config.Config) *IntrospectionHandler {
 	}
 }
 
-func (h *IntrospectionHandler) IsAuthorized(cmd *cobra.Command, args []string) {
+func (h *IntrospectionHandler) Introspect(cmd *cobra.Command, args []string) {
 	if len(args) != 1 {
 		fmt.Print(cmd.UsageString())
 		return
 	}
 
-	c := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlash())
-	c.Configuration.Transport = h.Config.OAuth2Client(cmd).Transport
+	c := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlash(cmd))
+
+	clientID, _ := cmd.Flags().GetString("client-id")
+	clientSecret, _ := cmd.Flags().GetString("client-secret")
+	if clientID == "" || clientSecret == "" {
+		fmt.Print(cmd.UsageString())
+		fmt.Println("Please provide a Client ID and Client Secret using flags --client-id and --client-secret, or environment variables OAUTH2_CLIENT_ID and OAUTH2_CLIENT_SECRET.")
+		return
+	}
+
+	c.Configuration.Username = clientID
+	c.Configuration.Password = clientSecret
+
+	skipTLSTermination, _ := cmd.Flags().GetBool("skip-tls-verify")
+	c.Configuration.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: skipTLSTermination},
+	}
 
 	if term, _ := cmd.Flags().GetBool("fake-tls-termination"); term {
 		c.Configuration.DefaultHeader["X-Forwarded-Proto"] = "https"

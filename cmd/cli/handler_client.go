@@ -21,12 +21,12 @@
 package cli
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
-
-	"net/http"
 
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/pkg"
@@ -45,11 +45,19 @@ func newClientHandler(c *config.Config) *ClientHandler {
 }
 
 func (h *ClientHandler) newClientManager(cmd *cobra.Command) *hydra.OAuth2Api {
-	c := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlash())
-	c.Configuration.Transport = h.Config.OAuth2Client(cmd).Transport
+	c := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlash(cmd))
+
+	fakeTlsTermination, _ := cmd.Flags().GetBool("skip-tls-verify")
+	c.Configuration.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: fakeTlsTermination},
+	}
 
 	if term, _ := cmd.Flags().GetBool("fake-tls-termination"); term {
 		c.Configuration.DefaultHeader["X-Forwarded-Proto"] = "https"
+	}
+
+	if token, _ := cmd.Flags().GetString("access-token"); token != "" {
+		c.Configuration.DefaultHeader["Authorization"] = "Bearer " + token
 	}
 
 	return c
@@ -81,7 +89,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	m := h.newClientManager(cmd)
 	responseTypes, _ := cmd.Flags().GetStringSlice("response-types")
 	grantTypes, _ := cmd.Flags().GetStringSlice("grant-types")
-	allowedScopes, _ := cmd.Flags().GetStringSlice("allowed-scopes")
+	allowedScopes, _ := cmd.Flags().GetStringSlice("scope")
 	callbacks, _ := cmd.Flags().GetStringSlice("callbacks")
 	name, _ := cmd.Flags().GetString("name")
 	secret, _ := cmd.Flags().GetString("secret")

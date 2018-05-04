@@ -21,28 +21,36 @@
 package cmd
 
 import (
+	"crypto/tls"
 	"fmt"
+	"net/http"
 	"os"
-	"path/filepath"
 	"testing"
 	"time"
 
-	"github.com/pborman/uuid"
+	"github.com/phayes/freeport"
 	"github.com/stretchr/testify/assert"
 )
 
+var port int
+
 func init() {
-	c.BindPort = 13124
+	var err error
+	port, err = freeport.GetFreePort()
+	if err != nil {
+		panic(err.Error())
+	}
+	os.Setenv("PORT", fmt.Sprintf("%d", port))
+	os.Setenv("DATABASE_URL", "memory")
+	os.Setenv("HYDRA_URL", fmt.Sprintf("https://localhost:%d/", port))
+	os.Setenv("OAUTH2_ISSUER_URL", fmt.Sprintf("https://localhost:%d/", port))
 }
 
 func TestExecute(t *testing.T) {
 	var osArgs = make([]string, len(os.Args))
-	var path = filepath.Join(os.TempDir(), fmt.Sprintf("hydra-%s.yml", uuid.New()))
-	os.Setenv("DATABASE_URL", "memory")
-	os.Setenv("FORCE_ROOT_CLIENT_ID", "admin")
-	os.Setenv("FORCE_ROOT_CLIENT_SECRET", "pw")
-	os.Setenv("OAUTH2_ISSUER_URL", "https://localhost:4444/")
 	copy(osArgs, os.Args)
+
+	endpoint := fmt.Sprintf("https://localhost:%d/", port)
 
 	for _, c := range []struct {
 		args      []string
@@ -50,38 +58,41 @@ func TestExecute(t *testing.T) {
 		expectErr bool
 	}{
 		{
-			args: []string{"host", "--dangerous-auto-logon", "--disable-telemetry"},
+			args: []string{"serve", "--disable-telemetry"},
 			wait: func() bool {
-				_, err := os.Stat(path)
+				client := &http.Client{
+					Transport: &transporter{
+						FakeTLSTermination: true,
+						Transport: &http.Transport{
+							TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+						},
+					},
+				}
+
+				_, err := client.Get(fmt.Sprintf("https://127.0.0.1:%d/health/status", port))
 				if err != nil {
-					t.Logf("Could not stat path %s because %s", path, err)
+					t.Logf("HTTP request failed: %s", err)
 				} else {
 					time.Sleep(time.Second * 5)
 				}
 				return err != nil
 			},
 		},
-		{args: []string{"connect", "--skip-newsletter", "--id", "admin", "--secret", "pw", "--url", "https://127.0.0.1:4444"}},
-		{args: []string{"clients", "create", "--id", "foobarbaz"}},
-		{args: []string{"clients", "get", "foobarbaz"}},
-		{args: []string{"clients", "create", "--id", "public-foo", "--is-public"}},
-		{args: []string{"clients", "delete", "foobarbaz"}},
-		{args: []string{"keys", "create", "foo", "-a", "HS256"}},
-		{args: []string{"keys", "create", "foo", "-a", "HS256"}},
-		{args: []string{"keys", "get", "foo"}},
-		{args: []string{"keys", "delete", "foo"}},
-		{args: []string{"token", "revoke", "foo"}},
-		{args: []string{"token", "client"}},
+		{args: []string{"clients", "create", "--endpoint", endpoint, "--id", "foobarbaz", "--secret", "foobar", "-g", "client_credentials"}},
+		{args: []string{"clients", "get", "--endpoint", endpoint, "foobarbaz"}},
+		{args: []string{"clients", "create", "--endpoint", endpoint, "--id", "public-foo", "--is-public"}},
+		{args: []string{"clients", "delete", "--endpoint", endpoint, "public-foo"}},
+		{args: []string{"keys", "create", "foo", "--endpoint", endpoint, "-a", "HS256"}},
+		{args: []string{"keys", "create", "foo", "--endpoint", endpoint, "-a", "HS256"}},
+		{args: []string{"keys", "get", "--endpoint", endpoint, "foo"}},
+		{args: []string{"keys", "delete", "--endpoint", endpoint, "foo"}},
+		{args: []string{"token", "revoke", "--endpoint", endpoint, "--client-secret", "foobar", "--client-id", "foobarbaz", "foo"}},
+		{args: []string{"token", "client", "--endpoint", endpoint, "--client-secret", "foobar", "--client-id", "foobarbaz"}},
 		{args: []string{"help", "migrate", "sql"}},
-		{args: []string{"help", "migrate", "ladon", "0.6.0"}},
 		{args: []string{"version"}},
-		{args: []string{"token", "flush"}},
-		{args: []string{"token", "user", "--no-open"}, wait: func() bool {
-			time.Sleep(time.Millisecond * 10)
-			return false
-		}},
+		{args: []string{"token", "flush", "--endpoint", endpoint}},
 	} {
-		c.args = append(c.args, []string{"--skip-tls-verify", "--config", path}...)
+		c.args = append(c.args, []string{"--skip-tls-verify"}...)
 		RootCmd.SetArgs(c.args)
 
 		t.Run(fmt.Sprintf("command=%v", c.args), func(t *testing.T) {

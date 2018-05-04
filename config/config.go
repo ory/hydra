@@ -21,15 +21,12 @@
 package config
 
 import (
-	"context"
 	"crypto/sha256"
-	"crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 	"time"
 
@@ -44,17 +41,12 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/clientcredentials"
 	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
 	// These are used by client commands
-	ClusterURL            string `mapstructure:"CLUSTER_URL" yaml:"cluster_url"`
-	ClientID              string `mapstructure:"CLIENT_ID" yaml:"client_id,omitempty"`
-	ClientSecret          string `mapstructure:"CLIENT_SECRET" yaml:"client_secret,omitempty"`
-	SignedUpForNewsletter bool   `yaml:"signed_up_for_newsletter,omitempty"`
+	EndpointURL string `mapstructure:"HYDRA_URL" yaml:"-"`
 
 	// These are used by the host command
 	BindPort                         int    `mapstructure:"PORT" yaml:"-"`
@@ -94,8 +86,11 @@ type Config struct {
 	systemSecret []byte                  `yaml:"-"`
 }
 
-func (c *Config) GetClusterURLWithoutTailingSlash() string {
-	return strings.TrimRight(c.ClusterURL, "/")
+func (c *Config) GetClusterURLWithoutTailingSlash(cmd *cobra.Command) string {
+	if endpoint, _ := cmd.Flags().GetString("endpoint"); endpoint != "" {
+		return strings.TrimRight(endpoint, "/")
+	}
+	return strings.TrimRight(c.EndpointURL, "/")
 }
 
 func (c *Config) GetScopeStrategy() fosite.ScopeStrategy {
@@ -275,7 +270,7 @@ func (c *Config) Context() *Context {
 
 func (c *Config) Resolve(join ...string) *url.URL {
 	if c.cluster == nil {
-		cluster, err := url.Parse(c.ClusterURL)
+		cluster, err := url.Parse(c.EndpointURL)
 		c.cluster = cluster
 		pkg.Must(err, "Could not parse cluster url: %s", err)
 	}
@@ -285,65 +280,6 @@ func (c *Config) Resolve(join ...string) *url.URL {
 	}
 
 	return urlx.AppendPaths(c.cluster, join...)
-}
-
-type transporter struct {
-	*http.Transport
-	FakeTLSTermination bool
-}
-
-func (t *transporter) RoundTrip(req *http.Request) (*http.Response, error) {
-	if t.FakeTLSTermination {
-		req.Header.Set("X-Forwarded-Proto", "https")
-	}
-
-	return t.Transport.RoundTrip(req)
-}
-
-func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
-	if c.oauth2Client != nil {
-		return c.oauth2Client
-	}
-
-	cu, err := url.Parse(c.ClusterURL)
-	pkg.Must(err, `Unable to parse cluster url ("%s"): %s`, c.ClusterURL, err)
-
-	oauthConfig := clientcredentials.Config{
-		ClientID:     c.ClientID,
-		ClientSecret: c.ClientSecret,
-		TokenURL:     urlx.AppendPaths(cu, "/oauth2/token").String(),
-		Scopes:       []string{"hydra", "hydra.*"},
-	}
-
-	fakeTlsTermination, _ := cmd.Flags().GetBool("fake-tls-termination")
-	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{
-		Transport: &transporter{
-			FakeTLSTermination: fakeTlsTermination,
-			Transport:          &http.Transport{},
-		},
-	})
-
-	if ok, _ := cmd.Flags().GetBool("skip-tls-verify"); ok {
-		// fmt.Println("Warning: Skipping TLS Certificate Verification.")
-		ctx = context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{
-			Transport: &transporter{
-				FakeTLSTermination: fakeTlsTermination,
-				Transport: &http.Transport{
-					TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-				},
-			},
-		})
-	}
-
-	c.oauth2Client = oauthConfig.Client(ctx)
-	if _, err := c.oauth2Client.Get(c.ClusterURL); err != nil {
-		fmt.Printf("Could not authenticate, because: %s\n", err)
-		fmt.Println("This can have multiple reasons, like a wrong cluster or wrong credentials. To resolve this, run `hydra connect`.")
-		fmt.Println("You can disable TLS verification using the `--skip-tls-verify` flag.")
-		os.Exit(1)
-	}
-
-	return c.oauth2Client
 }
 
 func (c *Config) GetCookieSecret() []byte {

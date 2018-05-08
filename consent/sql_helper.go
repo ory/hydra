@@ -294,7 +294,7 @@ func (s *sqlHandledConsentRequest) toHandledConsentRequest(r *ConsentRequest) (*
 			IDToken:     idt,
 			AccessToken: at,
 		},
-		Error:          &e,
+		Error:          e,
 		ConsentRequest: r,
 	}, nil
 }

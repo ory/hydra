@@ -131,7 +131,14 @@ var tokenUserCmd = &cobra.Command{
 
 			code := r.URL.Query().Get("code")
 			token, err := conf.Exchange(ctx, code)
-			pkg.Must(err, "Could not exchange code for token: %s", err)
+			if err != nil {
+				fmt.Printf("Unable to exchange code for token: %s\n", err)
+
+				w.WriteHeader(http.StatusInternalServerError)
+				fmt.Fprintf(w, "<html><body><h1>An error occurred</h1><p>%s</p></body></html>", err)
+				go shutdown()
+				return
+			}
 
 			fmt.Printf("Access Token:\n\t%s\n", token.AccessToken)
 			fmt.Printf("Refresh Token:\n\t%s\n\n", token.RefreshToken)

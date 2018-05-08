@@ -59,6 +59,36 @@ This section summarizes important changes introduced in 1.0.0.
 
 ### Major breaking changes
 
+#### Access Control & Warden API
+
+Internal access control, access control policies, and the Warden API have moved to a separate project called [ORY Keto](https://github.com/ory/keto).
+You will be able to run a combination of ORY Hydra, ORY Oathkeeper, and ORY Keto which will be backwards compatible with
+ORY Hydra before the 1.0.0 release. This section explains how to upgrade and links to an example explaining the set up
+of the three services.
+
+Assuming that you have the 1.0.0 release binary of ORY Hydra and ORY Keto locally installed, you can migrate the existing
+policies and Warden Groups using the migrate commands. Please back up your database before doing this:
+
+```
+$ export DATABASE_URL=<your-database-url>
+$ keto migrate hydra $DATABASE_URL
+$ hydra migrate sql $DATABASE_URL
+```
+
+Now you can run `keto serve` and endpoints `/policies` as well as `/warden` will be available at ORY Keto's URL.
+
+##### Running the backwards compatible set up
+
+
+
+##### Changes to Warden Groups
+
+Warden Groups have been an experiment determined to simplify managing multiple subjects with the same access rights.
+In ORY Keto, Warden Groups have been renamed to **Roles** and the endpoint has moved from `/warden/groups` to `/roles`.
+No request or response payloads have changed, only the URL is a different one.
+
+
+
 #### Changes to the CLI
 
 The CLI has changed in order to improve developer experience and adopt to the changes made with this release.

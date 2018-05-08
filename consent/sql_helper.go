@@ -329,20 +329,23 @@ func newSQLHandledAuthenticationRequest(c *HandledAuthenticationRequest) (*sqlHa
 }
 
 func (s *sqlHandledAuthenticationRequest) toHandledAuthenticationRequest(a *AuthenticationRequest) (*HandledAuthenticationRequest, error) {
-	var e RequestDeniedError
+	var e *RequestDeniedError
 
-	if err := json.Unmarshal([]byte(s.Error), &e); err != nil {
-		return nil, errors.WithStack(err)
+	if len(s.Error) > 0 && s.Error != "{}" {
+		e = new(RequestDeniedError)
+		if err := json.Unmarshal([]byte(s.Error), &e); err != nil {
+			return nil, errors.WithStack(err)
+		}
 	}
 
 	return &HandledAuthenticationRequest{
-		RememberFor: s.RememberFor,
-		Remember:    s.Remember,
-		Challenge:   s.Challenge,
-		RequestedAt: s.RequestedAt,
-		WasUsed:     s.WasUsed,
-		ACR:         s.ACR,
-		Error:       &e,
+		RememberFor:           s.RememberFor,
+		Remember:              s.Remember,
+		Challenge:             s.Challenge,
+		RequestedAt:           s.RequestedAt,
+		WasUsed:               s.WasUsed,
+		ACR:                   s.ACR,
+		Error:                 e,
 		AuthenticationRequest: a,
 	}, nil
 }

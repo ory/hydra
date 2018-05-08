@@ -323,6 +323,7 @@ func newSQLHandledAuthenticationRequest(c *HandledAuthenticationRequest) (*sqlHa
 
 	return &sqlHandledAuthenticationRequest{
 		ACR:         c.ACR,
+		Subject:     c.Subject,
 		Remember:    c.Remember,
 		RememberFor: c.RememberFor,
 		Error:       e,
@@ -351,5 +352,6 @@ func (s *sqlHandledAuthenticationRequest) toHandledAuthenticationRequest(a *Auth
 		ACR:         s.ACR,
 		Error:       e,
 		AuthenticationRequest: a,
+		Subject:               s.Subject,
 	}, nil
 }

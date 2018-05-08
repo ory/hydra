@@ -103,6 +103,9 @@ func mockAuthRequest(key string) (c *AuthenticationRequest, h *HandledAuthentica
 		Challenge:             "challenge" + key,
 		RequestedAt:           time.Now().UTC().Add(-time.Minute),
 		Error:                 err,
+		Subject:               c.Subject,
+		ACR:                   "acr",
+		WasUsed:               false,
 	}
 
 	return c, h

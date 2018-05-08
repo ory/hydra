@@ -146,7 +146,7 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 	// Set up dependencies
 	injectJWKManager(c)
 	clientsManager := newClientManager(c)
-	injectConsentManager(c,clientsManager )
+	injectConsentManager(c, clientsManager)
 
 	injectFositeStore(c, clientsManager)
 	oauth2Provider, idTokenKeyID := newOAuth2Provider(c)

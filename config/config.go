@@ -37,7 +37,8 @@ import (
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/token/hmac"
 	"github.com/ory/hydra/health"
-	"github.com/ory/hydra/metrics"
+	"github.com/ory/hydra/metrics/prometheus"
+	"github.com/ory/hydra/metrics/telemetry"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/warden/group"
 	"github.com/ory/ladon"
@@ -84,15 +85,16 @@ type Config struct {
 	SendOAuth2DebugMessagesToClients bool   `mapstructure:"OAUTH2_SHARE_ERROR_DEBUG" yaml:"-"`
 	ForceHTTP                        bool   `yaml:"-"`
 
-	BuildVersion string                  `yaml:"-"`
-	BuildHash    string                  `yaml:"-"`
-	BuildTime    string                  `yaml:"-"`
-	logger       *logrus.Logger          `yaml:"-"`
-	metrics      *metrics.MetricsManager `yaml:"-"`
-	cluster      *url.URL                `yaml:"-"`
-	oauth2Client *http.Client            `yaml:"-"`
-	context      *Context                `yaml:"-"`
-	systemSecret []byte                  `yaml:"-"`
+	BuildVersion string                     `yaml:"-"`
+	BuildHash    string                     `yaml:"-"`
+	BuildTime    string                     `yaml:"-"`
+	logger       *logrus.Logger             `yaml:"-"`
+	telemetry    *telemetry.MetricsManager  `yaml:"-"`
+	prometheus   *prometheus.MetricsManager `yaml:"-"`
+	cluster      *url.URL                   `yaml:"-"`
+	oauth2Client *http.Client               `yaml:"-"`
+	context      *Context                   `yaml:"-"`
+	systemSecret []byte                     `yaml:"-"`
 }
 
 func (c *Config) GetClusterURLWithoutTailingSlash() string {
@@ -154,12 +156,21 @@ func (c *Config) GetLogger() *logrus.Logger {
 	return c.logger
 }
 
-func (c *Config) GetMetrics() *metrics.MetricsManager {
-	if c.metrics == nil {
-		c.metrics = metrics.NewMetricsManager(c.Issuer, c.DatabaseURL, c.GetLogger(), c.BuildVersion, c.BuildHash, c.BuildTime)
+func (c *Config) GetTelemetryMetrics() *telemetry.MetricsManager {
+	if c.telemetry == nil {
+		c.telemetry = telemetry.NewMetricsManager(c.Issuer, c.DatabaseURL, c.GetLogger(), c.BuildVersion, c.BuildHash, c.BuildTime)
 	}
 
-	return c.metrics
+	return c.telemetry
+}
+
+func (c *Config) GetPrometheusMetrics() *prometheus.MetricsManager {
+	if c.prometheus == nil {
+		c.GetLogger().Info("Setting up Prometheus metrics")
+		c.prometheus = prometheus.NewMetricsManager(c.BuildVersion, c.BuildHash, c.BuildTime)
+	}
+
+	return c.prometheus
 }
 
 func (c *Config) DoesRequestSatisfyTermination(r *http.Request) error {

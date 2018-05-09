@@ -34,7 +34,7 @@ import (
 
 func TestHealth(t *testing.T) {
 	handler := &Handler{
-		H: herodot.NewJSONWriter(nil),
+		H:             herodot.NewJSONWriter(nil),
 		VersionString: "test version",
 	}
 	router := httprouter.New()

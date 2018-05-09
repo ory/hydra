@@ -119,6 +119,9 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 		return
 	}
 
+	// has to be 0 because it is not supposed to be set
+	c.SecretExpiresAt = 0
+
 	secret := c.Secret
 	if err := h.Manager.CreateClient(&c); err != nil {
 		h.H.WriteError(w, r, err)

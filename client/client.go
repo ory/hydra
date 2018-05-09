@@ -92,6 +92,12 @@ type Client struct {
 	// Public is a boolean that identifies this client as public, meaning that it
 	// does not have a secret. It will disable the client_credentials grant type for this client if set.
 	Public bool `json:"public" gorethink:"public"`
+
+	// SecretExpiresAt is an integer holding the time at which the client
+	// secret will expire or 0 if it will not expire. The time is
+	// represented as the number of seconds from 1970-01-01T00:00:00Z as
+	// measured in UTC until the date/time of expiration.
+	SecretExpiresAt int
 }
 
 func (c *Client) GetID() string {

@@ -8,11 +8,38 @@ before finalizing the upgrade process.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
+- [1.0.0-alpha.1](#100-alpha1)
+  - [Breaking Changes](#breaking-changes)
+    - [Introspection API](#introspection-api)
+      - [Introspection is now capable of introspecting refresh tokens](#introspection-is-now-capable-of-introspecting-refresh-tokens)
+    - [Access Control & Warden API](#access-control-&-warden-api)
+      - [Running the backwards compatible set up](#running-the-backwards-compatible-set-up)
+        - [Warden API](#warden-api)
+        - [Warden Groups](#warden-groups)
+    - [jwk: Forces JWK to have a unique ID](#jwk-forces-jwk-to-have-a-unique-id)
+    - [Consent Flow](#consent-flow)
+    - [Changes to the CLI](#changes-to-the-cli)
+      - [`hydra host`](#hydra-host)
+      - [`hydra connect`](#hydra-connect)
+      - [`hydra token user`](#hydra-token-user)
+      - [`hydra token client`](#hydra-token-client)
+      - [`hydra token validate`](#hydra-token-validate)
+      - [`hydra clients create`](#hydra-clients-create)
+      - [`hydra migrate ladon`](#hydra-migrate-ladon)
+      - [`hydra policies`](#hydra-policies)
+      - [`hydra groups`](#hydra-groups)
+    - [SDK](#sdk)
+  - [Improvements](#improvements)
+    - [Unknown request body payloads result in error](#unknown-request-body-payloads-result-in-error)
+    - [UTC everywhere](#utc-everywhere)
+    - [Pagination everywhere](#pagination-everywhere)
+    - [Flushing old access tokens](#flushing-old-access-tokens)
+    - [Prometheus endpoint](#prometheus-endpoint)
 - [0.11.12](#01112)
 - [0.11.3](#0113)
 - [0.11.0](#0110)
 - [0.10.0](#0100)
-  - [Breaking Changes](#breaking-changes)
+  - [Breaking Changes](#breaking-changes-1)
     - [Introspection now requires authorization](#introspection-now-requires-authorization)
     - [New consent flow](#new-consent-flow)
     - [Audience](#audience)
@@ -39,7 +66,7 @@ before finalizing the upgrade process.
     - [Ladon updated to 0.6.0](#ladon-updated-to-060)
     - [Redis and RethinkDB deprecated](#redis-and-rethinkdb-deprecated)
     - [Moved to ory namespace](#moved-to-ory-namespace)
-    - [SDK](#sdk)
+    - [SDK](#sdk-1)
     - [JWK](#jwk)
     - [Migrations are no longer automatically applied](#migrations-are-no-longer-automatically-applied)
   - [Changes](#changes)
@@ -53,105 +80,110 @@ before finalizing the upgrade process.
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## 1.0.0-prerelease
+## 1.0.0-alpha.1
 
-This section summarizes important changes introduced in 1.0.0.
+This section summarizes important changes introduced in 1.0.0. **Follow it chronologically to ensure a proper migration.**
 
-### Major breaking changes
+### Breaking Changes
 
-#### Changes to the CLI
+#### Introspection API
 
-The CLI has changed in order to improve developer experience and adopt to the changes made with this release.
+One change has been made to the introspection API which is that key `aud` is no longer a string, but an array of strings.
+As this claim has not been supported actively up until now, this will most likely not affect you at all.
 
-##### `hydra host`
-
-The command `hydra host` has been renamed to `hydra serve` as projects ORY Oathkeeper and ORY Keto use the `serve` terminology
-as well.
-
-Because this patch removes the internal access control, no root client and root policy will be created upon start up. Thus,
-environment variable `FORCE_ROOT_CLIENT_CREDENTIALS` has been removed without replacement.
-
-To better reflect what environment variables touch which system, ISSUER has been renamed to `OAUTH2_ISSUER_URL` and
-`CONSENT_URL` has been renamed to `OAUTH2_CONSENT_URL`.
-
-Additionally, flag `--dangerous-force-auto-logon` has been removed it has no effect any more.
-
-##### Access Control & `hydra connect`
-
-The command `hydra connect` has been removed as it no longer serves a purpose now that the internal access control
-has been removed. Every command you call now needs the environment variable `HYDRA_URL` (previously named `CLUSTER_URL`)
-which should point to ORY Hydra's URL. Removing this command has an additional benefit - privileged client IDs and secrets
-will no longer be stored in a plaintext file on your system if you use this command.
-
-As access control has been removed, most commands (except `token user`, `token client`, `token revoke`, `token introspect`)
-work without supplying any credentials at all. The listed exceptions support setting an OAuth 2.0 Client ID and Client Secret
-using flags `--client-id` and `--client-secret` or environment variables `OAUTH2_CLIENT_ID` and `OAUTH2_CLIENT_SECRET`.
-
-All other commands, such as `hydra clients create`, still support scenarios where you would need an OAuth2 Access Token.
-In those cases, you can supply the access token using flag `--access-token` or environment variable `OAUTH2_ACCESS_TOKEN`.
-
-All commands now support the `--endpoint` flag which sets the `HYDRA_URL` in case you don't want to use environment variables.
-
-#### `hydra token user`
-
-Flags `--id` and `--secret` are now called `--client-id` and `--client-secret`.
-
-#### `hydra token validate`
-
-This command has been renamed to `hydra token introspect` to properly reflect that you are performing OAuth 2.0
-Token Introspection.
-
-#### `hydra clients create`
-
-As OAuth 2.0 specifies that terminology `scope` does not have a plural `scopes`, we updated the places where the
-incorrect `scopes` was used in order to provide a more consistent developer experience.
-
-This command renamed flag `--allowed-scopes` to `--scope`.
-
-#### `hydra migrate ladon`
-
-This command is a relict of an old version of ORY Hydra which is, according to our metrics, not being used any more.
-
-### sdk
-
-	AcceptConsentRequest(challenge string, body swagger.AcceptConsentRequest) (*swagger.CompletedRequest, *swagger.APIResponse, error)
-	AcceptLoginRequest(challenge string, body swagger.AcceptLoginRequest) (*swagger.CompletedRequest, *swagger.APIResponse, error)
-	RejectConsentRequest(challenge string, body swagger.RejectRequest) (*swagger.CompletedRequest, *swagger.APIResponse, error)
-	RejectLoginRequest(challenge string, body swagger.RejectRequest) (*swagger.CompletedRequest, *swagger.APIResponse, error)
-	GetLoginRequest(challenge string) (*swagger.LoginRequest, *swagger.APIResponse, error)
-	GetConsentRequest(challenge string) (*swagger.ConsentRequest, *swagger.APIResponse, error)
-
-
-#### Access Control Policies and Warden moved to ORY Keto
-
-#### camelCase JSON is now under_score
-
-##### Warden
-
-* `grantedScopes` -> `granted_scope` (notice singular)
-* `issuer` -> `issuer` (unchanged)
-* `clientId` -> `client_id`
-* `issuedAt` -> `issued_at`
-* `expiresAt` -> `expires_at`
-* `notBefore` -> `not_before`
-* `username` -> `username`
-* `audience` -> `audience`
-* `accessTokenExtra` -> `session`
-
-
-* Warden endpoint accepts
- * token (unchanged)
- * scopes -> scope
-
-
-### Minor breaking changes
-
-Minor breaking changes do not require any special upgrade paths, unless you explicitly rely on those features in some way.
-
-#### Introspection now capable of introspecting refresh tokens
+##### Introspection is now capable of introspecting refresh tokens
 
 Previously, we disabled the introspection of refresh tokens. This has now changed to comply with the OAuth 2.0 specification.
 To distinguish tokens, use the `token_type` in the introspection response. It can either be `access_token` or `refresh_token`.
+
+#### Access Control & Warden API
+
+Internal access control, access control policies, and the Warden API have moved to a separate project called [ORY Keto](https://github.com/ory/keto).
+You will be able to run a combination of ORY Hydra, [ORY Oathkeeper](https://github.com/ory/oathkeeper), and [ORY Keto](https://github.com/ory/keto) which will be backwards compatible with
+ORY Hydra before the 1.0.0 release. This section explains how to upgrade and links to an example explaining the set up
+of the three services.
+
+[ORY Keto](https://github.com/ory/keto) handles access control using access control policies. The project currently supports the Warden API, Access Control Policy
+management, and Roles (previously known as [Warden Groups](#warden-groups)). ORY Keto is independent from ORY Hydra
+as it does not rely on any proprietary APIs but instead uses open standards such as OAuth 2.0 Token Introspection
+and the OAuth 2.0 Client Credentials Grant to authenticate credentials. ORY Keto can be used as a standalone project,
+and might even be used with other OAuth 2.0 providers, opening up tons of possible use cases and scenarios. To learn
+more about the project, head over to [github.com/ory/keto](https://github.com/ory/keto).
+
+Assuming that you have the 1.0.0 release binary of ORY Hydra and ORY Keto locally installed, you can migrate the existing
+policies and Warden Groups using the migrate commands. Please back up your database before doing this:
+
+```
+$ export DATABASE_URL=<your-database-url>
+
+# Migrate the policies and warden groups to keto
+$ keto migrate hydra $DATABASE_URL
+
+# Create other Keto database schemas
+$ keto migrate sql $DATABASE_URL
+
+# Run Hydra migrations
+$ hydra migrate sql $DATABASE_URL
+```
+
+Now you can run `keto serve` and endpoints `/policies` as well as `/warden` will be available at ORY Keto's URL.
+
+##### Running the backwards compatible set up
+
+We have set up a docker-compose example of a set up that resembles ORY Hydra prior to this release. You can find
+the source and documentation at [github.com/ory/examples](https://github.com/ory/examples).
+
+###### Warden API
+
+The Warden endpoints have moved to a new project. Thus, obviously, the URL changes too. The Warden API paths have changed
+as well:
+
+* `/warden/allowed` is now `/warden/subjects/authorize`
+* `/warden/token/allowed` is now `/warden/oauth2/access-tokens/authorize`
+* `/warden/oauth2/clients/authorize` is a new endpoint that lets you authorize OAuth 2.0 Clients using their ID and secret.
+
+The backwards compatible set up properly forwards the old paths. If you use that image and you have been using
+`http://my-hydra/warden/token/allowed` previously, you can still use that URL to access that functionality if the
+backwards-compatible image is hosted at that location. This image does, however, currently not rewrite the request
+and response payloads. If you think that's a good idea, [let us know](https://github.com/ory/examples/issues/new).
+
+The request payload of these endpoints has changed:
+
+* `/warden/token/allowed` - only key `scopes` was renamed to `scope` in order to have a coherent API with any OAuth 2.0
+endpoints which use the `scope` for singular and plural:
+  * Key `scopes` is now `scope` - a response body is `{ "token": "...", "action": "...", "resource": "...", "scope": ["scope-a", "scope-b"] }`
+  instead of (previously) `{ "token": "...", "action": "...", "resource": "...", "scopes": ["scope-a", "scope-b"] }`.
+
+All other endpoints have not experienced any request payload changes.
+
+The response payload of these endpoints has changed:
+
+* `/warden/token/allowed` - keys have been changed to conform to the OAuth 2.0 Introspection response payload and offer
+a coherent API.
+  * Key `grantedScopes` is now `scope` and is no longer an array string but rather a space-delimited string ("scope-a scope-b").
+  * Key `clientId` is now `client_id`.
+  * Key `issuedAt` is now `iat`.
+  * Key `expires_at` is now `exp`.
+  * Key `subject` is now `sub`.
+  * Key `accessTokenExtra` is now `session` and might be omitted if the OAuth 2.0 Introspection Endpoint does not provide
+  session data.
+  * Key `aud` ("audience") has been added as a string array.
+  * Key `iss` ("issuer") has been added.
+  * Key `nbf` ("not before") has been added.
+
+We are aware that these changes are rather serious, especially if you rely on the Warden API in each of your endpoints.
+If you have ideas on how to improve upgrading or offer a backwards compatible API, please [open an issue](https://github.com/ory/keto/issues/new)
+and let us know.
+
+All other endpoints have not experienced any response payload changes.
+
+###### Warden Groups
+
+Warden Groups have been an experiment determined to simplify managing multiple subjects with the same access rights.
+In ORY Keto, Warden Groups have been renamed to **Roles** and the endpoint has moved from `/warden/groups` to `/roles`.
+No request or response payloads have changed, only the URL is a different one.
+
+If you use the backwards-compatible image, you can access roles using the `/warden/groups` path as you did before.
 
 #### jwk: Forces JWK to have a unique ID
 
@@ -176,6 +208,160 @@ programming language.
 
 These keys will be generated automatically if they do not exist yet in the database. No further steps for upgrading are
 required.
+
+#### Consent Flow
+
+The consent flow has been refactored in order to implement session (login & consent) management in ORY Hydra and in order
+to properly support OpenID Connect parameters such as `prompt`, `max_age`, and others.
+
+First, the consent flow has been renamed to "User Login and Consent Flow". The consent app has been renamed to `User Login Provider`
+and `User Consent Provider`. If you implement both features (explained in the next sections) in one program, you can call
+it the `User Login and Consent Provider`.
+
+A reference implementation of the new User Login and Consent Provider is available at
+[github.com/ory/hydra-login-consent-node](https://github.com/ory/hydra-login-consent-node).
+
+The major difference between the old and new flow is, that authentication (user login) and scope authorization (user consent)
+are now two separate endpoints.
+
+The new User Login and Consent Flow is documented in the [developer guide](https://www.ory.sh/docs/guides/latest/1-hydra/).
+
+#### Changes to the CLI
+
+The CLI has changed in order to improve developer experience and adopt to the changes made with this release.
+
+##### `hydra host`
+
+The command `hydra host` has been renamed to `hydra serve` as projects ORY Oathkeeper and ORY Keto use the `serve` terminology
+as well.
+
+Because this patch removes the internal access control, no root client and root policy will be created upon start up. Thus,
+environment variable `FORCE_ROOT_CLIENT_CREDENTIALS` has been removed without replacement.
+
+To better reflect what environment variables touch which system, ISSUER has been renamed to `OAUTH2_ISSUER_URL` and
+`CONSENT_URL` has been renamed to `OAUTH2_CONSENT_URL`.
+
+Additionally, flag `--dangerous-force-auto-logon` has been removed it has no effect any more.
+
+##### `hydra connect`
+
+The command `hydra connect` has been removed as it no longer serves a purpose now that the internal access control
+has been removed. Every command you call now needs the environment variable `HYDRA_URL` (previously named `CLUSTER_URL`)
+which should point to ORY Hydra's URL. Removing this command has an additional benefit - privileged client IDs and secrets
+will no longer be stored in a plaintext file on your system if you use this command.
+
+As access control has been removed, most commands (except `token user`, `token client`, `token revoke`, `token introspect`)
+work without supplying any credentials at all. The listed exceptions support setting an OAuth 2.0 Client ID and Client Secret
+using flags `--client-id` and `--client-secret` or environment variables `OAUTH2_CLIENT_ID` and `OAUTH2_CLIENT_SECRET`.
+
+All other commands, such as `hydra clients create`, still support scenarios where you would need an OAuth2 Access Token.
+In those cases, you can supply the access token using flag `--access-token` or environment variable `OAUTH2_ACCESS_TOKEN`.
+Assuming that you would like to automate management in a protected scenario, you could do something like this:
+
+```
+$ token=$(hydra token client --client-id foo --client-secret bar --endpoint http://foobar)
+$ hydra clients create --access-token $token ...
+```
+
+All commands now support the `--endpoint` flag which sets the `HYDRA_URL` in case you don't want to use environment variables.
+
+##### `hydra token user`
+
+Flags `--id` and `--secret` are now called `--client-id` and `--client-secret`.
+
+##### `hydra token client`
+
+Flags `--client-id` and `--client-secret` have been added.
+
+Flag `--scopes` has been renamed to `--scope`.
+
+##### `hydra token validate`
+
+This command has been renamed to `hydra token introspect` to properly reflect that you are performing OAuth 2.0
+Token Introspection.
+
+Flags `--client-id` and `--client-secret` have been added.
+
+Flag `--scopes` has been renamed to `--scope`.
+
+##### `hydra clients create`
+
+As OAuth 2.0 specifies that terminology `scope` does not have a plural `scopes`, we updated the places where the
+incorrect `scopes` was used in order to provide a more consistent developer experience.
+
+This command renamed flag `--allowed-scopes` to `--scope`.
+
+##### `hydra migrate ladon`
+
+This command is a relict of an old version of ORY Hydra which is, according to our metrics, not being used any more.
+
+##### `hydra policies`
+
+This command has moved to Keto. All commands work the same way, but you have to have Keto installed and replace `hydra`
+with `keto`. For example `hydra policies create ...` is now `keto policies create ...`
+
+##### `hydra groups`
+
+This command has moved to Keto. All commands work the same way, but you have to have Keto installed and replace `hydra groups`
+with `keto roles`. For example `hydra groups create ...` is now `keto roles create ...`
+
+#### SDK
+
+As the SDK is code-generated, and we are not specialists in every language, we have only documented changes to the Go API.
+Please help improving this section by adding upgrade guides for the SDK you upgraded.
+
+The following methods have been moved.
+
+* The Access Control Policy SDK has moved to ORY Keto:
+  * `CreatePolicy(body swagger.Policy) (*swagger.Policy, *swagger.APIResponse, error)` is now available via `github.com/ory/keto/sdk/go/keto`. The method signature has not changed, apart from types `github.com/ory/hydra/sdk/go/hydra/swagger` now being included from `github.com/ory/keto/sdk/go/keto/swagger`.
+  * `DeletePolicy(id string) (*swagger.APIResponse, error)` is now available via `github.com/ory/keto/sdk/go/keto`. The method signature has not changed, apart from types `github.com/ory/hydra/sdk/go/hydra/swagger` now being included from `github.com/ory/keto/sdk/go/keto/swagger`.
+  * `GetPolicy(id string) (*swagger.Policy, *swagger.APIResponse, error)` is now available via `github.com/ory/keto/sdk/go/keto`. The method signature has not changed, apart from types `github.com/ory/hydra/sdk/go/hydra/swagger` now being included from `github.com/ory/keto/sdk/go/keto/swagger`.
+  * `ListPolicies(offset int64, limit int64) ([]swagger.Policy, *swagger.APIResponse, error)` is now available via `github.com/ory/keto/sdk/go/keto`. The method signature has not changed, apart from types `github.com/ory/hydra/sdk/go/hydra/swagger` now being included from `github.com/ory/keto/sdk/go/keto/swagger`.
+  * `UpdatePolicy(id string, body swagger.Policy) (*swagger.Policy, *swagger.APIResponse, error)` is now available via `github.com/ory/keto/sdk/go/keto`. The method signature has not changed, apart from types `github.com/ory/hydra/sdk/go/hydra/swagger` now being included from `github.com/ory/keto/sdk/go/keto/swagger`.
+* The Warden Group SDK has moved to Keto:
+  - `AddMembersToGroup(id string, body swagger.GroupMembers) (*swagger.APIResponse, error)` is now `AddMembersToRole(id string, body swagger.RoleMembers) (*swagger.APIResponse, error)` and is now available via `github.com/ory/keto/sdk/go/keto`.
+  - `CreateGroup(body swagger.Group) (*swagger.Group, *swagger.APIResponse, error)` is now `CreateRole(body swagger.Role) (*swagger.Role, *swagger.APIResponse, error` and is now available via `github.com/ory/keto/sdk/go/keto`.
+  - `DeleteGroup(id string) (*swagger.APIResponse, error)` is now `DeleteRole(id string) (*swagger.APIResponse, error)` and is now available via `github.com/ory/keto/sdk/go/keto`.
+  - `ListGroups(member string, limit, offset int64) ([]swagger.Group, *swagger.APIResponse, error)` is now `ListRoles(member string, limit int64, offset int64) ([]swagger.Role, *swagger.APIResponse, error)` and is now available via `github.com/ory/keto/sdk/go/keto`.
+  - `GetGroup(id string) (*swagger.Group, *swagger.APIResponse, error)` is now `GetRole(id string) (*swagger.Role, *swagger.APIResponse, error)` and is now available via `github.com/ory/keto/sdk/go/keto`.
+  - `RemoveMembersFromGroup(id string, body swagger.GroupMembers) (*swagger.APIResponse, error)` is now `RemoveMembersFromRole(id string, body swagger.RoleMembers) (*swagger.APIResponse, error)` and is now available via `github.com/ory/keto/sdk/go/keto`.
+* The Warden API SDK has moved to Keto:
+  - `DoesWardenAllowAccessRequest(body swagger.WardenAccessRequest) (*swagger.WardenAccessRequestResponse, *swagger.APIResponse, error)` is now `IsSubjectAuthorized(body swagger.WardenSubjectAuthorizationRequest) (*swagger.WardenSubjectAuthorizationResponse, *swagger.APIResponse, error)`. Please check out the changes to the request/response body as well.
+  - `DoesWardenAllowTokenAccessRequest(body swagger.WardenTokenAccessRequest) (*swagger.WardenTokenAccessRequestResponse, *swagger.APIResponse, error)` is now `IsOAuth2AccessTokenAuthorized(body swagger.WardenOAuth2AccessTokenAuthorizationRequest) (*swagger.WardenOAuth2AccessTokenAuthorizationResponse, *swagger.APIResponse, error)`. Please check out the changes to the request/response body as well.
+* The Consent API SDK has been deprecated:
+  - `AcceptOAuth2ConsentRequest(id string, body swagger.ConsentRequestAcceptance) (*swagger.APIResponse, error)` has been removed without replacement.
+  - `GetOAuth2ConsentRequest(id string) (*swagger.OAuth2ConsentRequest, *swagger.APIResponse, error)` has been removed without replacement.
+  - `RejectOAuth2ConsentRequest(id string, body swagger.ConsentRequestRejection) (*swagger.APIResponse, error)` has been removed without replacement.
+* The Login & Consent API SDK has been added:
+  - `AcceptConsentRequest(challenge string, body swagger.AcceptConsentRequest) (*swagger.CompletedRequest, *swagger.APIResponse, error)`
+  - `AcceptLoginRequest(challenge string, body swagger.AcceptLoginRequest) (*swagger.CompletedRequest, *swagger.APIResponse, error)`
+  - `RejectConsentRequest(challenge string, body swagger.RejectRequest) (*swagger.CompletedRequest, *swagger.APIResponse, error)`
+  - `RejectLoginRequest(challenge string, body swagger.RejectRequest) (*swagger.CompletedRequest, *swagger.APIResponse, error)`
+  - `GetLoginRequest(challenge string) (*swagger.LoginRequest, *swagger.APIResponse, error)`
+  - `GetConsentRequest(challenge string) (*swagger.ConsentRequest, *swagger.APIResponse, error)`
+
+### Improvements
+
+#### Unknown request body payloads result in error
+
+Previously, if you had a typo in the JSON (e.g. `client_nme` instead of `client_name`), ORY Hydra simply ignored that key.
+Now, an error is thrown if unknown JSON keys are included.
+
+#### UTC everywhere
+
+ORY Hydra now uses UTC everywhere, reducing the possibility of errors stemming from different timezones.
+
+#### Pagination everywhere
+
+Each endpoint that returns a list of items now supports pagination using `limit` and `offset` query parameters.
+
+#### Flushing old access tokens
+
+An endpoint (`/oauth2/flush`) has been added that allows you to flush old access tokens.
+
+#### Prometheus endpoint
+
+An endpoint `/health/prometheus` for providing data to Prometheus has been added.
 
 ## 0.11.12
 

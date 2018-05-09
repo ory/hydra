@@ -92,11 +92,13 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		n := negroni.New()
 
 		if ok, _ := cmd.Flags().GetBool("disable-telemetry"); !ok && os.Getenv("DISABLE_TELEMETRY") != "1" {
-			metrics := c.GetMetrics()
-			go metrics.RegisterSegment()
-			go metrics.CommitMemoryStatistics()
-			n.Use(metrics)
+			telemetryMetrics := c.GetTelemetryMetrics()
+			go telemetryMetrics.RegisterSegment()
+			go telemetryMetrics.CommitMemoryStatistics()
+			n.Use(telemetryMetrics)
 		}
+
+		n.Use(c.GetPrometheusMetrics())
 
 		n.Use(negronilogrus.NewMiddlewareFromLogger(logger, c.Issuer))
 		n.UseFunc(serverHandler.rejectInsecureRequests)
@@ -145,8 +147,9 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 
 	// Set up dependencies
 	injectJWKManager(c)
-	injectConsentManager(c)
 	clientsManager := newClientManager(c)
+	injectConsentManager(c, clientsManager)
+
 	injectFositeStore(c, clientsManager)
 	oauth2Provider, idTokenKeyID := newOAuth2Provider(c)
 

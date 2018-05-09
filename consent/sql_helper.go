@@ -267,7 +267,7 @@ func newSQLHandledConsentRequest(c *HandledConsentRequest) (*sqlHandledConsentRe
 func (s *sqlHandledConsentRequest) toHandledConsentRequest(r *ConsentRequest) (*HandledConsentRequest, error) {
 	var idt map[string]interface{}
 	var at map[string]interface{}
-	var e RequestDeniedError
+	var e *RequestDeniedError
 
 	if err := json.Unmarshal([]byte(s.SessionIDToken), &idt); err != nil {
 		return nil, errors.WithStack(err)
@@ -275,8 +275,12 @@ func (s *sqlHandledConsentRequest) toHandledConsentRequest(r *ConsentRequest) (*
 	if err := json.Unmarshal([]byte(s.SessionAccessToken), &at); err != nil {
 		return nil, errors.WithStack(err)
 	}
-	if err := json.Unmarshal([]byte(s.Error), &e); err != nil {
-		return nil, errors.WithStack(err)
+
+	if len(s.Error) > 0 && s.Error != "{}" {
+		e = new(RequestDeniedError)
+		if err := json.Unmarshal([]byte(s.Error), &e); err != nil {
+			return nil, errors.WithStack(err)
+		}
 	}
 
 	return &HandledConsentRequest{
@@ -290,7 +294,7 @@ func (s *sqlHandledConsentRequest) toHandledConsentRequest(r *ConsentRequest) (*
 			IDToken:     idt,
 			AccessToken: at,
 		},
-		Error:          &e,
+		Error:          e,
 		ConsentRequest: r,
 	}, nil
 }
@@ -319,6 +323,7 @@ func newSQLHandledAuthenticationRequest(c *HandledAuthenticationRequest) (*sqlHa
 
 	return &sqlHandledAuthenticationRequest{
 		ACR:         c.ACR,
+		Subject:     c.Subject,
 		Remember:    c.Remember,
 		RememberFor: c.RememberFor,
 		Error:       e,
@@ -329,10 +334,13 @@ func newSQLHandledAuthenticationRequest(c *HandledAuthenticationRequest) (*sqlHa
 }
 
 func (s *sqlHandledAuthenticationRequest) toHandledAuthenticationRequest(a *AuthenticationRequest) (*HandledAuthenticationRequest, error) {
-	var e RequestDeniedError
+	var e *RequestDeniedError
 
-	if err := json.Unmarshal([]byte(s.Error), &e); err != nil {
-		return nil, errors.WithStack(err)
+	if len(s.Error) > 0 && s.Error != "{}" {
+		e = new(RequestDeniedError)
+		if err := json.Unmarshal([]byte(s.Error), &e); err != nil {
+			return nil, errors.WithStack(err)
+		}
 	}
 
 	return &HandledAuthenticationRequest{
@@ -342,7 +350,8 @@ func (s *sqlHandledAuthenticationRequest) toHandledAuthenticationRequest(a *Auth
 		RequestedAt: s.RequestedAt,
 		WasUsed:     s.WasUsed,
 		ACR:         s.ACR,
-		Error:       &e,
+		Error:       e,
 		AuthenticationRequest: a,
+		Subject:               s.Subject,
 	}, nil
 }

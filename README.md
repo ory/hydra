@@ -213,7 +213,7 @@ and send us an email to [hi@ory.am](mailto:hi@ory.am) instead.
 ## Telemetry
 
 Our services collect summarized, anonymized data which can optionally be turned off. Click
-[here](https://www.ory.sh/docs/1-hydra/9-telemetry) to learn more.
+[here](https://www.ory.sh/docs/guides/latest/9-telemetry) to learn more.
 
 ## Documentation
 

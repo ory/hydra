@@ -23,11 +23,12 @@ package server
 import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
+	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/consent"
 )
 
-func injectConsentManager(c *config.Config) {
+func injectConsentManager(c *config.Config, cm client.Manager) {
 	var ctx = c.Context()
 	var manager consent.Manager
 
@@ -36,7 +37,10 @@ func injectConsentManager(c *config.Config) {
 		manager = consent.NewMemoryManager()
 		break
 	case *config.SQLConnection:
-		panic("not implemented yet")
+		manager = consent.NewSQLManager(
+			con.GetDatabase(),
+			cm,
+		)
 		break
 	case *config.PluginConnection:
 		var err error

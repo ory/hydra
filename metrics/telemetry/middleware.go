@@ -18,7 +18,7 @@
  * @license 	Apache-2.0
  */
 
-package metrics
+package telemetry
 
 import (
 	"crypto/sha256"
@@ -76,7 +76,7 @@ func generateID(issuerURL string, databaseURL string) string {
 }
 
 func NewMetricsManager(issuerURL string, databaseURL string, l logrus.FieldLogger, version, hash, buildTime string) *MetricsManager {
-	l.Info("Setting up telemetry - for more information please visit https://ory.gitbooks.io/hydra/content/telemetry.html")
+	// l.Info("Setting up telemetry - for more information please visit https://ory.gitbooks.io/hydra/content/telemetry.html")
 
 	segment, err := analytics.NewWithConfig("h8dRH3kVCWKkIFWydBmWsyYHR4M0u0vr", analytics.Config{
 		Interval: time.Minute * 10,
@@ -99,6 +99,7 @@ func NewMetricsManager(issuerURL string, databaseURL string, l logrus.FieldLogge
 		salt:         uuid.New(),
 		BuildTime:    buildTime, BuildVersion: version, BuildHash: hash,
 	}
+
 	return mm
 }
 

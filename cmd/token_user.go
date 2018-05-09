@@ -104,28 +104,41 @@ var tokenUserCmd = &cobra.Command{
 
 		r := httprouter.New()
 		server := &http.Server{Addr: ":4445", Handler: r}
+		var shutdown = func() {
+			time.Sleep(time.Second * 1)
+			ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
+			server.Shutdown(ctx)
+		}
+
 		r.GET("/callback", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-			if r.URL.Query().Get("error") != "" {
-				message := fmt.Sprintf("Got error: %s", r.URL.Query().Get("error_description"))
-				fmt.Println(message)
+			if len(r.URL.Query().Get("error")) > 0 {
+				fmt.Printf("Got error: %s\n", r.URL.Query().Get("error_description"))
 
 				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte(message))
+				fmt.Fprintf(w, "<html><body><h1>An error occurred</h1><h2>%s</h2><p>%s</p></body></html>", r.URL.Query().Get("error"), r.URL.Query().Get("error_description"))
+				go shutdown()
 				return
 			}
 
 			if r.URL.Query().Get("state") != string(state) {
-				message := fmt.Sprintf("States do not match. Expected %s, got %s", string(state), r.URL.Query().Get("state"))
-				fmt.Println(message)
+				fmt.Printf("States do not match. Expected %s, got %s\n", string(state), r.URL.Query().Get("state"))
 
 				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte(message))
+				fmt.Fprintf(w, "<html><body><h1>An error occurred</h1><h2>%s</h2><p>%s</p></body></html>", "States do not match", "Expected state "+string(state)+" but got "+r.URL.Query().Get("state"))
+				go shutdown()
 				return
 			}
 
 			code := r.URL.Query().Get("code")
 			token, err := conf.Exchange(ctx, code)
-			pkg.Must(err, "Could not exchange code for token: %s", err)
+			if err != nil {
+				fmt.Printf("Unable to exchange code for token: %s\n", err)
+
+				w.WriteHeader(http.StatusInternalServerError)
+				fmt.Fprintf(w, "<html><body><h1>An error occurred</h1><p>%s</p></body></html>", err)
+				go shutdown()
+				return
+			}
 
 			fmt.Printf("Access Token:\n\t%s\n", token.AccessToken)
 			fmt.Printf("Refresh Token:\n\t%s\n\n", token.RefreshToken)
@@ -146,11 +159,7 @@ var tokenUserCmd = &cobra.Command{
 			}
 			w.Write([]byte("</ul></body></html>"))
 
-			go func() {
-				time.Sleep(time.Second * 1)
-				ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
-				server.Shutdown(ctx)
-			}()
+			go shutdown()
 		})
 		server.ListenAndServe()
 	},

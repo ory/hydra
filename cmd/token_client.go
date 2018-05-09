@@ -74,7 +74,7 @@ var tokenClientCmd = &cobra.Command{
 			})
 		}
 
-		scopes, _ := cmd.Flags().GetStringSlice("scopes")
+		scopes, _ := cmd.Flags().GetStringSlice("scope")
 
 		cu, err := url.Parse(c.GetClusterURLWithoutTailingSlash(cmd))
 		pkg.Must(err, `Unable to parse cluster url ("%s"): %s`, c.GetClusterURLWithoutTailingSlash(cmd), err)
@@ -108,7 +108,7 @@ var tokenClientCmd = &cobra.Command{
 func init() {
 	tokenCmd.AddCommand(tokenClientCmd)
 
-	tokenClientCmd.Flags().StringSlice("scopes", []string{}, "OAuth2 scope to request")
+	tokenClientCmd.Flags().StringSlice("scope", []string{}, "OAuth2 scope to request")
 	tokenClientCmd.Flags().BoolP("verbose", "v", false, "Toggle verbose output mode")
 	tokenClientCmd.Flags().String("client-id", os.Getenv("OAUTH2_CLIENT_ID"), "Use the provided OAuth 2.0 Client ID, defaults to environment variable OAUTH2_CLIENT_ID")
 	tokenClientCmd.Flags().String("client-secret", os.Getenv("OAUTH2_CLIENT_SECRET"), "Use the provided OAuth 2.0 Client Secret, defaults to environment variable OAUTH2_CLIENT_SECRET")

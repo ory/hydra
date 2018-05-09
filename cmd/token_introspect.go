@@ -35,7 +35,7 @@ var tokenIntrospectCmd = &cobra.Command{
 
 func init() {
 	tokenCmd.AddCommand(tokenIntrospectCmd)
-	tokenIntrospectCmd.Flags().StringSlice("scopes", []string{}, "Additionally check if scope was granted")
+	tokenIntrospectCmd.Flags().StringSlice("scope", []string{}, "Additionally check if scope was granted")
 	tokenIntrospectCmd.Flags().String("endpoint", os.Getenv("HYDRA_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_URL")
 	tokenIntrospectCmd.Flags().String("client-id", os.Getenv("OAUTH2_CLIENT_ID"), "Use the provided OAuth 2.0 Client ID, defaults to environment variable OAUTH2_CLIENT_ID")
 	tokenIntrospectCmd.Flags().String("client-secret", os.Getenv("OAUTH2_CLIENT_SECRET"), "Use the provided OAuth 2.0 Client Secret, defaults to environment variable OAUTH2_CLIENT_SECRET")

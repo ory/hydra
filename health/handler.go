@@ -21,9 +21,8 @@
 package health
 
 import (
-	"net/http"
-
 	"fmt"
+	"net/http"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
@@ -71,14 +70,16 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //       200: healthStatus
 //       500: genericError
 func (h *Handler) Health(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	rw.Write([]byte(`{"status": "ok"}`))
+	h.H.Write(rw,r,&HealthStatus{
+		Status: "ok",
+	})
 }
 
-// swagger:route GET /health/version ??
+// swagger:route GET /health/version health getVersion
 //
 // Get the version of Hydra
 //
-// This endpoint returns the version as `{ "version": "VERSION" }`. The version might only be correct with the prebuilt binary and not custom builds.
+// This endpoint returns the version as `{ "version": "VERSION" }`. The version is only correct with the prebuilt binary and not custom builds.
 //
 //		Responses:
 // 		200: version

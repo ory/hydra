@@ -21,7 +21,6 @@
 package health
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -31,8 +30,8 @@ import (
 )
 
 const (
-	HealthStatusPath  = "/health/status"
-	HealthVersionPath = "/health/version"
+	HealthStatusPath     = "/health/status"
+	HealthVersionPath    = "/health/version"
 	PrometheusStatusPath = "/health/prometheus"
 )
 
@@ -75,7 +74,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //       200: healthStatus
 //       500: genericError
 func (h *Handler) Health(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	h.H.Write(rw,r,&HealthStatus{
+	h.H.Write(rw, r, &HealthStatus{
 		Status: "ok",
 	})
 }
@@ -87,8 +86,10 @@ func (h *Handler) Health(rw http.ResponseWriter, r *http.Request, _ httprouter.P
 // This endpoint returns the version as `{ "version": "VERSION" }`. The version is only correct with the prebuilt binary and not custom builds.
 //
 //		Responses:
-// 		200: version
+// 		200: healthVersion
 //		500: genericError
 func (h *Handler) Version(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	rw.Write([]byte(fmt.Sprintf(`{"version": "%s"}`, h.VersionString)))
+	h.H.Write(rw, r, &HealthVersion{
+		Version: h.VersionString,
+	})
 }

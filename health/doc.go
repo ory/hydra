@@ -25,3 +25,8 @@ type HealthStatus struct {
 	// Status always contains "ok"
 	Status string `json:"status"`
 }
+
+// swagger:model healthVersion
+type HealthVersion struct {
+	Version string `json:"version"`
+}

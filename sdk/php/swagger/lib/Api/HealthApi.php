@@ -95,7 +95,7 @@ class HealthApi
      * Client for Hydra
      *
      * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return \Hydra\SDK\Model\InlineResponse200
+     * @return \Hydra\SDK\Model\HealthStatus
      */
     public function getInstanceStatus()
     {
@@ -111,7 +111,7 @@ class HealthApi
      * Client for Hydra
      *
      * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return array of \Hydra\SDK\Model\InlineResponse200, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \Hydra\SDK\Model\HealthStatus, HTTP status code, HTTP response headers (array of strings)
      */
     public function getInstanceStatusWithHttpInfo()
     {
@@ -142,15 +142,91 @@ class HealthApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\Hydra\SDK\Model\InlineResponse200',
+                '\Hydra\SDK\Model\HealthStatus',
                 '/health/status'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\InlineResponse200', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\HealthStatus', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\InlineResponse200', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\HealthStatus', $e->getResponseHeaders());
+                    $e->setResponseObject($data);
+                    break;
+                case 500:
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\InlineResponse401', $e->getResponseHeaders());
+                    $e->setResponseObject($data);
+                    break;
+            }
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation getVersion
+     *
+     * Get the version of Hydra
+     *
+     * Client for Hydra
+     *
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return \Hydra\SDK\Model\HealthVersion
+     */
+    public function getVersion()
+    {
+        list($response) = $this->getVersionWithHttpInfo();
+        return $response;
+    }
+
+    /**
+     * Operation getVersionWithHttpInfo
+     *
+     * Get the version of Hydra
+     *
+     * Client for Hydra
+     *
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of \Hydra\SDK\Model\HealthVersion, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function getVersionWithHttpInfo()
+    {
+        // parse inputs
+        $resourcePath = "/health/version";
+        $httpBody = '';
+        $queryParams = [];
+        $headerParams = [];
+        $formParams = [];
+        $_header_accept = $this->apiClient->selectHeaderAccept(['application/json']);
+        if (!is_null($_header_accept)) {
+            $headerParams['Accept'] = $_header_accept;
+        }
+        $headerParams['Content-Type'] = $this->apiClient->selectHeaderContentType(['application/json', 'application/x-www-form-urlencoded']);
+
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            $httpBody = $_tempBody; // $_tempBody is the method argument, if present
+        } elseif (count($formParams) > 0) {
+            $httpBody = $formParams; // for HTTP post (form)
+        }
+        // make the API Call
+        try {
+            list($response, $statusCode, $httpHeader) = $this->apiClient->callApi(
+                $resourcePath,
+                'GET',
+                $queryParams,
+                $httpBody,
+                $headerParams,
+                '\Hydra\SDK\Model\HealthVersion',
+                '/health/version'
+            );
+
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\HealthVersion', $httpHeader), $statusCode, $httpHeader];
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\HealthVersion', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:

@@ -17,26 +17,23 @@
 ;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(
-      [
-        'ApiClient',
-        'model/AcceptConsentRequest',
-        'model/AcceptLoginRequest',
-        'model/CompletedRequest',
-        'model/ConsentRequest',
-        'model/FlushInactiveOAuth2TokensRequest',
-        'model/InlineResponse401',
-        'model/JsonWebKeySet',
-        'model/LoginRequest',
-        'model/OAuth2Client',
-        'model/OAuth2TokenIntrospection',
-        'model/OauthTokenResponse',
-        'model/RejectRequest',
-        'model/UserinfoResponse',
-        'model/WellKnown'
-      ],
-      factory
-    )
+    define([
+      'ApiClient',
+      'model/AcceptConsentRequest',
+      'model/AcceptLoginRequest',
+      'model/CompletedRequest',
+      'model/ConsentRequest',
+      'model/FlushInactiveOAuth2TokensRequest',
+      'model/InlineResponse401',
+      'model/JsonWebKeySet',
+      'model/LoginRequest',
+      'model/OAuth2Client',
+      'model/OAuth2TokenIntrospection',
+      'model/OauthTokenResponse',
+      'model/RejectRequest',
+      'model/UserinfoResponse',
+      'model/WellKnown'
+    ], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
     module.exports = factory(
@@ -108,7 +105,7 @@
    */
 
   /**
-   * Constructs a new OAuth2Api. 
+   * Constructs a new OAuth2Api.
    * @alias module:api/OAuth2Api
    * @class
    * @param {module:ApiClient} apiClient Optional API client implementation to use,
@@ -128,9 +125,9 @@
     /**
      * Accept an consent request
      * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider to authenticate the user and then tell ORY Hydra now about it. If the user authenticated, he/she must now be asked if the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the user&#39;s behalf.  The consent provider which handles this request and is a web app implemented and hosted by you. It shows a user interface which asks the user to grant or deny the client access to the requested scope (\&quot;Application my-dropbox-app wants write access to all your private files\&quot;).  The consent challenge is appended to the consent provider&#39;s URL to which the user&#39;s user-agent (browser) is redirected to. The consent provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the user accepted or rejected the request.  This endpoint tells ORY Hydra that the user has authorized the OAuth 2.0 client to access resources on his/her behalf. The consent provider includes additional information, such as session data for access and ID tokens, and if the consent request should be used as basis for future requests.  The response contains a redirect URL which the consent provider should redirect the user-agent to.
-     * @param {String} challenge 
+     * @param {String} challenge
      * @param {Object} opts Optional parameters
-     * @param {module:model/AcceptConsentRequest} opts.body 
+     * @param {module:model/AcceptConsentRequest} opts.body
      * @param {module:api/OAuth2Api~acceptConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/CompletedRequest}
      */
@@ -184,9 +181,9 @@
     /**
      * Accept an login request
      * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider (sometimes called \&quot;identity provider\&quot;) to authenticate the user and then tell ORY Hydra now about it. The login provider is an web-app you write and host, and it must be able to authenticate (\&quot;show the user a login screen\&quot;) a user (in OAuth2 the proper name for user is \&quot;resource owner\&quot;).  The authentication challenge is appended to the login provider URL to which the user&#39;s user-agent (browser) is redirected to. The login provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.  This endpoint tells ORY Hydra that the user has successfully authenticated and includes additional information such as the user&#39;s ID and if ORY Hydra should remember the user&#39;s user agent for future authentication attempts by setting a cookie.  The response contains a redirect URL which the login provider should redirect the user-agent to.
-     * @param {String} challenge 
+     * @param {String} challenge
      * @param {Object} opts Optional parameters
-     * @param {module:model/AcceptLoginRequest} opts.body 
+     * @param {module:model/AcceptLoginRequest} opts.body
      * @param {module:api/OAuth2Api~acceptLoginRequestCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/CompletedRequest}
      */
@@ -240,7 +237,7 @@
     /**
      * Create an OAuth 2.0 client
      * Create a new OAuth 2.0 client If you pass &#x60;client_secret&#x60; the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somwhere safe.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.  Additionally, the context key \&quot;owner\&quot; is set to the owner of the client, allowing policies such as:  &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:clients\&quot;], \&quot;actions\&quot;: [\&quot;create\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot;, \&quot;conditions\&quot;: { \&quot;owner\&quot;: { \&quot;type\&quot;: \&quot;EqualsSubjectCondition\&quot; } } } &#x60;&#x60;&#x60;
-     * @param {module:model/OAuth2Client} body 
+     * @param {module:model/OAuth2Client} body
      * @param {module:api/OAuth2Api~createOAuth2ClientCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/OAuth2Client}
      */
@@ -344,7 +341,7 @@
      * Flush Expired OAuth2 Access Tokens
      * This endpoint flushes expired OAuth2 access tokens from the database. You can set a time after which no tokens will be not be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted automatically when performing the refresh flow.   &#x60;&#x60;&#x60; { \&quot;resources\&quot;: [\&quot;rn:hydra:oauth2:tokens\&quot;], \&quot;actions\&quot;: [\&quot;flush\&quot;], \&quot;effect\&quot;: \&quot;allow\&quot; } &#x60;&#x60;&#x60;
      * @param {Object} opts Optional parameters
-     * @param {module:model/FlushInactiveOAuth2TokensRequest} opts.body 
+     * @param {module:model/FlushInactiveOAuth2TokensRequest} opts.body
      * @param {module:api/OAuth2Api~flushInactiveOAuth2TokensCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.flushInactiveOAuth2Tokens = function(opts, callback) {
@@ -388,7 +385,7 @@
     /**
      * Get consent request information
      * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider to authenticate the user and then tell ORY Hydra now about it. If the user authenticated, he/she must now be asked if the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the user&#39;s behalf.  The consent provider which handles this request and is a web app implemented and hosted by you. It shows a user interface which asks the user to grant or deny the client access to the requested scope (\&quot;Application my-dropbox-app wants write access to all your private files\&quot;).  The consent challenge is appended to the consent provider&#39;s URL to which the user&#39;s user-agent (browser) is redirected to. The consent provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the user accepted or rejected the request.
-     * @param {String} challenge 
+     * @param {String} challenge
      * @param {module:api/OAuth2Api~getConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/ConsentRequest}
      */
@@ -441,7 +438,7 @@
     /**
      * Get an login request
      * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider (sometimes called \&quot;identity provider\&quot;) to authenticate the user and then tell ORY Hydra now about it. The login provider is an web-app you write and host, and it must be able to authenticate (\&quot;show the user a login screen\&quot;) a user (in OAuth2 the proper name for user is \&quot;resource owner\&quot;).  The authentication challenge is appended to the login provider URL to which the user&#39;s user-agent (browser) is redirected to. The login provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
-     * @param {String} challenge 
+     * @param {String} challenge
      * @param {module:api/OAuth2Api~getLoginRequestCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/LoginRequest}
      */
@@ -785,9 +782,9 @@
     /**
      * Reject an consent request
      * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider to authenticate the user and then tell ORY Hydra now about it. If the user authenticated, he/she must now be asked if the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the user&#39;s behalf.  The consent provider which handles this request and is a web app implemented and hosted by you. It shows a user interface which asks the user to grant or deny the client access to the requested scope (\&quot;Application my-dropbox-app wants write access to all your private files\&quot;).  The consent challenge is appended to the consent provider&#39;s URL to which the user&#39;s user-agent (browser) is redirected to. The consent provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the user accepted or rejected the request.  This endpoint tells ORY Hydra that the user has not authorized the OAuth 2.0 client to access resources on his/her behalf. The consent provider must include a reason why the consent was not granted.  The response contains a redirect URL which the consent provider should redirect the user-agent to.
-     * @param {String} challenge 
+     * @param {String} challenge
      * @param {Object} opts Optional parameters
-     * @param {module:model/RejectRequest} opts.body 
+     * @param {module:model/RejectRequest} opts.body
      * @param {module:api/OAuth2Api~rejectConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/CompletedRequest}
      */
@@ -841,9 +838,9 @@
     /**
      * Reject an logout request
      * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider (sometimes called \&quot;identity provider\&quot;) to authenticate the user and then tell ORY Hydra now about it. The login provider is an web-app you write and host, and it must be able to authenticate (\&quot;show the user a login screen\&quot;) a user (in OAuth2 the proper name for user is \&quot;resource owner\&quot;).  The authentication challenge is appended to the login provider URL to which the user&#39;s user-agent (browser) is redirected to. The login provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.  This endpoint tells ORY Hydra that the user has not authenticated and includes a reason why the authentication was be denied.  The response contains a redirect URL which the login provider should redirect the user-agent to.
-     * @param {String} challenge 
+     * @param {String} challenge
      * @param {Object} opts Optional parameters
-     * @param {module:model/RejectRequest} opts.body 
+     * @param {module:model/RejectRequest} opts.body
      * @param {module:api/OAuth2Api~rejectLoginRequestCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/CompletedRequest}
      */
@@ -897,7 +894,7 @@
     /**
      * Revoke OAuth2 tokens
      * Revoking a token (both access and refresh) means that the tokens will be invalid. A revoked access token can no longer be used to make access requests, and a revoked refresh token can no longer be used to refresh an access token. Revoking a refresh token also invalidates the access token that was created with it.
-     * @param {String} token 
+     * @param {String} token
      * @param {module:api/OAuth2Api~revokeOAuth2TokenCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.revokeOAuth2Token = function(token, callback) {
@@ -949,8 +946,8 @@
     /**
      * Update an OAuth 2.0 Client
      * Update an existing OAuth 2.0 Client. If you pass &#x60;client_secret&#x60; the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
-     * @param {String} id 
-     * @param {module:model/OAuth2Client} body 
+     * @param {String} id
+     * @param {module:model/OAuth2Client} body
      * @param {module:api/OAuth2Api~updateOAuth2ClientCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/OAuth2Client}
      */

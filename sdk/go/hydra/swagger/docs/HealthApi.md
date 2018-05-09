@@ -5,10 +5,11 @@ All URIs are relative to *http://localhost*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**GetInstanceStatus**](HealthApi.md#GetInstanceStatus) | **Get** /health/status | Check the Health Status
+[**GetVersion**](HealthApi.md#GetVersion) | **Get** /health/version | Get the version of Hydra
 
 
 # **GetInstanceStatus**
-> InlineResponse200 GetInstanceStatus()
+> HealthStatus GetInstanceStatus()
 
 Check the Health Status
 
@@ -20,7 +21,33 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**InlineResponse200**](inline_response_200.md)
+[**HealthStatus**](healthStatus.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json, application/x-www-form-urlencoded
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **GetVersion**
+> HealthVersion GetVersion()
+
+Get the version of Hydra
+
+This endpoint returns the version as `{ \"version\": \"VERSION\" }`. The version is only correct with the prebuilt binary and not custom builds.
+
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**HealthVersion**](healthVersion.md)
 
 ### Authorization
 

@@ -76,6 +76,7 @@ All URIs are relative to *http://localhost*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *HealthApi* | [**getInstanceStatus**](docs/Api/HealthApi.md#getinstancestatus) | **GET** /health/status | Check the Health Status
+*HealthApi* | [**getVersion**](docs/Api/HealthApi.md#getversion) | **GET** /health/version | Get the version of Hydra
 *JsonWebKeyApi* | [**createJsonWebKeySet**](docs/Api/JsonWebKeyApi.md#createjsonwebkeyset) | **POST** /keys/{set} | Generate a new JSON Web Key
 *JsonWebKeyApi* | [**deleteJsonWebKey**](docs/Api/JsonWebKeyApi.md#deletejsonwebkey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
 *JsonWebKeyApi* | [**deleteJsonWebKeySet**](docs/Api/JsonWebKeyApi.md#deletejsonwebkeyset) | **DELETE** /keys/{set} | Delete a JSON Web Key Set
@@ -114,7 +115,8 @@ Class | Method | HTTP request | Description
  - [ConsentRequestSession](docs/Model/ConsentRequestSession.md)
  - [FlushInactiveOAuth2TokensRequest](docs/Model/FlushInactiveOAuth2TokensRequest.md)
  - [Handler](docs/Model/Handler.md)
- - [InlineResponse200](docs/Model/InlineResponse200.md)
+ - [HealthStatus](docs/Model/HealthStatus.md)
+ - [HealthVersion](docs/Model/HealthVersion.md)
  - [InlineResponse401](docs/Model/InlineResponse401.md)
  - [JoseWebKeySetRequest](docs/Model/JoseWebKeySetRequest.md)
  - [JsonWebKey](docs/Model/JsonWebKey.md)

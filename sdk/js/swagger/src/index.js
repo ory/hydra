@@ -17,49 +17,47 @@
 ;(function(factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(
-      [
-        'ApiClient',
-        'model/AcceptConsentRequest',
-        'model/AcceptLoginRequest',
-        'model/AuthenticationSession',
-        'model/CompletedRequest',
-        'model/ConsentRequest',
-        'model/ConsentRequestSession',
-        'model/FlushInactiveOAuth2TokensRequest',
-        'model/Handler',
-        'model/InlineResponse200',
-        'model/InlineResponse401',
-        'model/JoseWebKeySetRequest',
-        'model/JsonWebKey',
-        'model/JsonWebKeySet',
-        'model/JsonWebKeySetGeneratorRequest',
-        'model/KeyGenerator',
-        'model/LoginRequest',
-        'model/Manager',
-        'model/OAuth2Client',
-        'model/OAuth2TokenIntrospection',
-        'model/OauthTokenResponse',
-        'model/OpenIDConnectContext',
-        'model/RawMessage',
-        'model/RejectRequest',
-        'model/SwaggerFlushInactiveAccessTokens',
-        'model/SwaggerJsonWebKeyQuery',
-        'model/SwaggerJwkCreateSet',
-        'model/SwaggerJwkSetQuery',
-        'model/SwaggerJwkUpdateSet',
-        'model/SwaggerJwkUpdateSetKey',
-        'model/SwaggerOAuthIntrospectionRequest',
-        'model/SwaggerRevokeOAuth2TokenParameters',
-        'model/UserinfoResponse',
-        'model/WellKnown',
-        'model/Writer',
-        'api/HealthApi',
-        'api/JsonWebKeyApi',
-        'api/OAuth2Api'
-      ],
-      factory
-    )
+    define([
+      'ApiClient',
+      'model/AcceptConsentRequest',
+      'model/AcceptLoginRequest',
+      'model/AuthenticationSession',
+      'model/CompletedRequest',
+      'model/ConsentRequest',
+      'model/ConsentRequestSession',
+      'model/FlushInactiveOAuth2TokensRequest',
+      'model/Handler',
+      'model/HealthStatus',
+      'model/HealthVersion',
+      'model/InlineResponse401',
+      'model/JoseWebKeySetRequest',
+      'model/JsonWebKey',
+      'model/JsonWebKeySet',
+      'model/JsonWebKeySetGeneratorRequest',
+      'model/KeyGenerator',
+      'model/LoginRequest',
+      'model/Manager',
+      'model/OAuth2Client',
+      'model/OAuth2TokenIntrospection',
+      'model/OauthTokenResponse',
+      'model/OpenIDConnectContext',
+      'model/RawMessage',
+      'model/RejectRequest',
+      'model/SwaggerFlushInactiveAccessTokens',
+      'model/SwaggerJsonWebKeyQuery',
+      'model/SwaggerJwkCreateSet',
+      'model/SwaggerJwkSetQuery',
+      'model/SwaggerJwkUpdateSet',
+      'model/SwaggerJwkUpdateSetKey',
+      'model/SwaggerOAuthIntrospectionRequest',
+      'model/SwaggerRevokeOAuth2TokenParameters',
+      'model/UserinfoResponse',
+      'model/WellKnown',
+      'model/Writer',
+      'api/HealthApi',
+      'api/JsonWebKeyApi',
+      'api/OAuth2Api'
+    ], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
     module.exports = factory(
@@ -72,7 +70,8 @@
       require('./model/ConsentRequestSession'),
       require('./model/FlushInactiveOAuth2TokensRequest'),
       require('./model/Handler'),
-      require('./model/InlineResponse200'),
+      require('./model/HealthStatus'),
+      require('./model/HealthVersion'),
       require('./model/InlineResponse401'),
       require('./model/JoseWebKeySetRequest'),
       require('./model/JsonWebKey'),
@@ -113,7 +112,8 @@
   ConsentRequestSession,
   FlushInactiveOAuth2TokensRequest,
   Handler,
-  InlineResponse200,
+  HealthStatus,
+  HealthVersion,
   InlineResponse401,
   JoseWebKeySetRequest,
   JsonWebKey,
@@ -223,10 +223,15 @@
      */
     Handler: Handler,
     /**
-     * The InlineResponse200 model constructor.
-     * @property {module:model/InlineResponse200}
+     * The HealthStatus model constructor.
+     * @property {module:model/HealthStatus}
      */
-    InlineResponse200: InlineResponse200,
+    HealthStatus: HealthStatus,
+    /**
+     * The HealthVersion model constructor.
+     * @property {module:model/HealthVersion}
+     */
+    HealthVersion: HealthVersion,
     /**
      * The InlineResponse401 model constructor.
      * @property {module:model/InlineResponse401}

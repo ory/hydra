@@ -116,6 +116,7 @@ All URIs are relative to *http://localhost*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthApi* | [**getInstanceStatus**](docs/HealthApi.md#getInstanceStatus) | **GET** /health/status | Check the Health Status
+*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthApi* | [**getVersion**](docs/HealthApi.md#getVersion) | **GET** /health/version | Get the version of Hydra
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKeyApi* | [**createJsonWebKeySet**](docs/JsonWebKeyApi.md#createJsonWebKeySet) | **POST** /keys/{set} | Generate a new JSON Web Key
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKeyApi* | [**deleteJsonWebKey**](docs/JsonWebKeyApi.md#deleteJsonWebKey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKeyApi* | [**deleteJsonWebKeySet**](docs/JsonWebKeyApi.md#deleteJsonWebKeySet) | **DELETE** /keys/{set} | Delete a JSON Web Key Set
@@ -154,7 +155,8 @@ Class | Method | HTTP request | Description
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ConsentRequestSession](docs/ConsentRequestSession.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.FlushInactiveOAuth2TokensRequest](docs/FlushInactiveOAuth2TokensRequest.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.Handler](docs/Handler.md)
- - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.InlineResponse200](docs/InlineResponse200.md)
+ - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthStatus](docs/HealthStatus.md)
+ - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthVersion](docs/HealthVersion.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.InlineResponse401](docs/InlineResponse401.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JoseWebKeySetRequest](docs/JoseWebKeySetRequest.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKey](docs/JsonWebKey.md)

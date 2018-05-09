@@ -17,15 +17,18 @@
 ;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(
-      ['ApiClient', 'model/InlineResponse200', 'model/InlineResponse401'],
-      factory
-    )
+    define([
+      'ApiClient',
+      'model/HealthStatus',
+      'model/HealthVersion',
+      'model/InlineResponse401'
+    ], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
     module.exports = factory(
       require('../ApiClient'),
-      require('../model/InlineResponse200'),
+      require('../model/HealthStatus'),
+      require('../model/HealthVersion'),
       require('../model/InlineResponse401')
     )
   } else {
@@ -35,11 +38,12 @@
     }
     root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthApi = factory(
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.InlineResponse200,
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthStatus,
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthVersion,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.InlineResponse401
     )
   }
-})(this, function(ApiClient, InlineResponse200, InlineResponse401) {
+})(this, function(ApiClient, HealthStatus, HealthVersion, InlineResponse401) {
   'use strict'
 
   /**
@@ -49,7 +53,7 @@
    */
 
   /**
-   * Constructs a new HealthApi. 
+   * Constructs a new HealthApi.
    * @alias module:api/HealthApi
    * @class
    * @param {module:ApiClient} apiClient Optional API client implementation to use,
@@ -62,7 +66,7 @@
      * Callback function to receive the result of the getInstanceStatus operation.
      * @callback module:api/HealthApi~getInstanceStatusCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/InlineResponse200} data The data returned by the service call.
+     * @param {module:model/HealthStatus} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -70,7 +74,7 @@
      * Check the Health Status
      * This endpoint returns a 200 status code when the HTTP server is up running. &#x60;{ \&quot;status\&quot;: \&quot;ok\&quot; }&#x60;. This status does currently not include checks whether the database connection is working. This endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header when TLS termination is set.  Be aware that if you are running multiple nodes of ORY Hydra, the health status will never refer to the cluster state, only to a single instance.
      * @param {module:api/HealthApi~getInstanceStatusCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/InlineResponse200}
+     * data is of type: {@link module:model/HealthStatus}
      */
     this.getInstanceStatus = function(callback) {
       var postBody = null
@@ -86,10 +90,56 @@
         'application/x-www-form-urlencoded'
       ]
       var accepts = ['application/json']
-      var returnType = InlineResponse200
+      var returnType = HealthStatus
 
       return this.apiClient.callApi(
         '/health/status',
+        'GET',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
+    }
+
+    /**
+     * Callback function to receive the result of the getVersion operation.
+     * @callback module:api/HealthApi~getVersionCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/HealthVersion} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Get the version of Hydra
+     * This endpoint returns the version as &#x60;{ \&quot;version\&quot;: \&quot;VERSION\&quot; }&#x60;. The version is only correct with the prebuilt binary and not custom builds.
+     * @param {module:api/HealthApi~getVersionCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/HealthVersion}
+     */
+    this.getVersion = function(callback) {
+      var postBody = null
+
+      var pathParams = {}
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
+
+      var authNames = []
+      var contentTypes = [
+        'application/json',
+        'application/x-www-form-urlencoded'
+      ]
+      var accepts = ['application/json']
+      var returnType = HealthVersion
+
+      return this.apiClient.callApi(
+        '/health/version',
         'GET',
         pathParams,
         queryParams,

@@ -35,6 +35,7 @@ use \ArrayAccess;
  * OAuth2TokenIntrospection Class Doc Comment
  *
  * @category    Class
+ * @description https://tools.ietf.org/html/rfc7662
  * @package     Hydra\SDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
@@ -55,7 +56,7 @@ class OAuth2TokenIntrospection implements ArrayAccess
       */
     protected static $swaggerTypes = [
         'active' => 'bool',
-        'aud' => 'string',
+        'aud' => 'string[]',
         'client_id' => 'string',
         'exp' => 'int',
         'ext' => 'map[string,object]',
@@ -64,6 +65,7 @@ class OAuth2TokenIntrospection implements ArrayAccess
         'nbf' => 'int',
         'scope' => 'string',
         'sub' => 'string',
+        'token_type' => 'string',
         'username' => 'string'
     ];
 
@@ -82,6 +84,7 @@ class OAuth2TokenIntrospection implements ArrayAccess
         'nbf' => 'int64',
         'scope' => null,
         'sub' => null,
+        'token_type' => null,
         'username' => null
     ];
 
@@ -110,6 +113,7 @@ class OAuth2TokenIntrospection implements ArrayAccess
         'nbf' => 'nbf',
         'scope' => 'scope',
         'sub' => 'sub',
+        'token_type' => 'token_type',
         'username' => 'username'
     ];
 
@@ -129,6 +133,7 @@ class OAuth2TokenIntrospection implements ArrayAccess
         'nbf' => 'setNbf',
         'scope' => 'setScope',
         'sub' => 'setSub',
+        'token_type' => 'setTokenType',
         'username' => 'setUsername'
     ];
 
@@ -148,6 +153,7 @@ class OAuth2TokenIntrospection implements ArrayAccess
         'nbf' => 'getNbf',
         'scope' => 'getScope',
         'sub' => 'getSub',
+        'token_type' => 'getTokenType',
         'username' => 'getUsername'
     ];
 
@@ -192,6 +198,7 @@ class OAuth2TokenIntrospection implements ArrayAccess
         $this->container['nbf'] = isset($data['nbf']) ? $data['nbf'] : null;
         $this->container['scope'] = isset($data['scope']) ? $data['scope'] : null;
         $this->container['sub'] = isset($data['sub']) ? $data['sub'] : null;
+        $this->container['token_type'] = isset($data['token_type']) ? $data['token_type'] : null;
         $this->container['username'] = isset($data['username']) ? $data['username'] : null;
     }
 
@@ -243,7 +250,7 @@ class OAuth2TokenIntrospection implements ArrayAccess
 
     /**
      * Gets aud
-     * @return string
+     * @return string[]
      */
     public function getAud()
     {
@@ -252,7 +259,7 @@ class OAuth2TokenIntrospection implements ArrayAccess
 
     /**
      * Sets aud
-     * @param string $aud ClientID is a service-specific string identifier or list of string identifiers representing the intended audience for this token.
+     * @param string[] $aud
      * @return $this
      */
     public function setAud($aud)
@@ -426,6 +433,27 @@ class OAuth2TokenIntrospection implements ArrayAccess
     public function setSub($sub)
     {
         $this->container['sub'] = $sub;
+
+        return $this;
+    }
+
+    /**
+     * Gets token_type
+     * @return string
+     */
+    public function getTokenType()
+    {
+        return $this->container['token_type'];
+    }
+
+    /**
+     * Sets token_type
+     * @param string $token_type TokenType is the introspected token's type, for example `access_token` or `refresh_token`.
+     * @return $this
+     */
+    public function setTokenType($token_type)
+    {
+        $this->container['token_type'] = $token_type;
 
         return $this;
     }

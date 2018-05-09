@@ -1725,7 +1725,9 @@
       "x-go-package": "github.com/ory/hydra/client"
     },
     "oAuth2TokenIntrospection": {
+      "description": "https://tools.ietf.org/html/rfc7662",
       "type": "object",
+      "title": "Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
       "properties": {
         "active": {
           "description": "Active is a boolean indicator of whether or not the presented token\nis currently active.  The specifics of a token's \"active\" state\nwill vary depending on the implementation of the authorization\nserver and the information it keeps about its tokens, but a \"true\"\nvalue return for the \"active\" property will generally indicate\nthat a given token has been issued by this authorization server,\nhas not been revoked by the resource owner, and is within its\ngiven time window of validity (e.g., after its issuance time and\nbefore its expiration time).",
@@ -1733,8 +1735,10 @@
           "x-go-name": "Active"
         },
         "aud": {
-          "description": "ClientID is a service-specific string identifier or list of string\nidentifiers representing the intended audience for this token.",
-          "type": "string",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
           "x-go-name": "Audience"
         },
         "client_id": {
@@ -1783,13 +1787,18 @@
           "type": "string",
           "x-go-name": "Subject"
         },
+        "token_type": {
+          "description": "TokenType is the introspected token's type, for example `access_token` or `refresh_token`.",
+          "type": "string",
+          "x-go-name": "TokenType"
+        },
         "username": {
           "description": "Username is a human-readable identifier for the resource owner who\nauthorized this token.",
           "type": "string",
           "x-go-name": "Username"
         }
       },
-      "x-go-name": "swaggerOAuthIntrospectionResponsePayload",
+      "x-go-name": "Introspection",
       "x-go-package": "github.com/ory/hydra/oauth2"
     },
     "oauthTokenResponse": {

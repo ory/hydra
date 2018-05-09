@@ -26,16 +26,19 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/metrics"
+	"fmt"
 )
 
 const (
-	HealthStatusPath = "/health/status"
+	HealthStatusPath  = "/health/status"
+	HealthVersionPath = "/health/version"
 )
 
 type Handler struct {
 	Metrics        *metrics.MetricsManager
 	H              *herodot.JSONWriter
 	ResourcePrefix string
+	VersionString  string
 }
 
 func (h *Handler) PrefixResource(resource string) string {
@@ -52,6 +55,7 @@ func (h *Handler) PrefixResource(resource string) string {
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET(HealthStatusPath, h.Health)
+	r.GET(HealthVersionPath, h.Version)
 }
 
 // swagger:route GET /health/status health getInstanceStatus
@@ -67,4 +71,17 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //       500: genericError
 func (h *Handler) Health(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	rw.Write([]byte(`{"status": "ok"}`))
+}
+
+// swagger:route GET /health/version ??
+//
+// Get the version of Hydra
+//
+// This endpoint returns the version as `{ "version": "VERSION" }`. The version might only be correct with the prebuilt binary and not custom builds.
+//
+//		Responses:
+// 		200: version
+//		500: genericError
+func (h *Handler) Version(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	rw.Write([]byte(fmt.Sprintf(`{"version": "%s"}`, h.VersionString)))
 }

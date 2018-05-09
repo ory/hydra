@@ -74,7 +74,7 @@ func (h *IntrospectionHandler) Introspect(cmd *cobra.Command, args []string) {
 		c.Configuration.DefaultHeader["X-Forwarded-Proto"] = "https"
 	}
 
-	scopes, _ := cmd.Flags().GetStringSlice("scopes")
+	scopes, _ := cmd.Flags().GetStringSlice("scope")
 	result, response, err := c.IntrospectOAuth2Token(args[0], strings.Join(scopes, " "))
 	checkResponse(response, err, http.StatusOK)
 	fmt.Printf("%s\n", formatResponse(result))

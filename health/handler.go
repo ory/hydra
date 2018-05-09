@@ -23,10 +23,11 @@ package health
 import (
 	"net/http"
 
+	"fmt"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/metrics"
-	"fmt"
 )
 
 const (

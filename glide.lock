@@ -244,6 +244,8 @@ imports:
   - urlfetch
 - name: gopkg.in/airbrake/gobrake.v2
   version: 5d77bd50d083834501349f8be70197b26963674d
+- name: gopkg.in/alexcesaro/statsd.v2
+  version: 7fea3f0d2fab1ad973e641e51dba45443a311a90
 - name: gopkg.in/gorp.v1
   version: c87af80f3cc5036b55b83d77171e156791085e2e
 - name: gopkg.in/square/go-jose.v2

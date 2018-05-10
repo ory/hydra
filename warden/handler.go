@@ -3,6 +3,7 @@ package warden
 import (
 	"encoding/json"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"github.com/julienschmidt/httprouter"
@@ -10,6 +11,7 @@ import (
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/firewall"
 	"github.com/pkg/errors"
+	"gopkg.in/alexcesaro/statsd.v2"
 )
 
 const (
@@ -39,16 +41,20 @@ var notAllowed = struct {
 
 // WardenHandler is capable of handling HTTP request and validating access tokens and access requests.
 type WardenHandler struct {
-	H      herodot.Writer
-	Warden firewall.Firewall
+	H            herodot.Writer
+	Warden       firewall.Firewall
+	Statsd       *statsd.Client
+	StatsdRegexp *regexp.Regexp
 }
 
-func NewHandler(c *config.Config, router *httprouter.Router) *WardenHandler {
+func NewHandler(c *config.Config, router *httprouter.Router, statsd *statsd.Client, regx *regexp.Regexp) *WardenHandler {
 	ctx := c.Context()
 
 	h := &WardenHandler{
-		H:      herodot.NewJSONWriter(c.GetLogger()),
-		Warden: ctx.Warden,
+		H:            herodot.NewJSONWriter(c.GetLogger()),
+		Warden:       ctx.Warden,
+		Statsd:       statsd,
+		StatsdRegexp: regx,
 	}
 	h.SetRoutes(router)
 
@@ -162,12 +168,21 @@ func (h *WardenHandler) Allowed(w http.ResponseWriter, r *http.Request, _ httpro
 //       500: genericError
 func (h *WardenHandler) TokenAllowed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := r.Context()
-	_, err := h.Warden.TokenAllowed(ctx, h.Warden.TokenFromRequest(r), &firewall.TokenAccessRequest{
+
+	authContext, err := h.Warden.TokenAllowed(ctx, h.Warden.TokenFromRequest(r), &firewall.TokenAccessRequest{
 		Resource: "rn:hydra:warden:token:allowed",
 		Action:   "decide",
 	}, "hydra.warden")
+	client_id := ""
+	if authContext != nil {
+		client_id = authContext.Subject
+	}
 	if err != nil {
 		h.H.WriteError(w, r, err)
+		if h.Statsd != nil {
+			statsdClient := h.Statsd.Clone(statsd.Tags("client_id", client_id, "resource", "rn_hydra_warden_token_allowed"))
+			statsdClient.Increment("Warden.Failure.UnauthorizedService")
+		}
 		return
 	}
 
@@ -177,13 +192,26 @@ func (h *WardenHandler) TokenAllowed(w http.ResponseWriter, r *http.Request, _ h
 	}
 	if err := json.NewDecoder(r.Body).Decode(&ar); err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
+		if h.Statsd != nil {
+			statsdClient := h.Statsd.Clone(statsd.Tags("client_id", client_id, "resource", "rn_hydra_warden_token_allowed"))
+			statsdClient.Increment("Warden.Failure.MalformedRequest")
+		}
 		return
 	}
 	defer r.Body.Close()
 
-	authContext, err := h.Warden.TokenAllowed(ctx, ar.Token, ar.TokenAccessRequest, ar.Scopes...)
+	resource := ar.TokenAccessRequest.Resource
+	if h.StatsdRegexp != nil {
+		resource = h.StatsdRegexp.ReplaceAllString(resource, "_")
+	}
+
+	authContext, err = h.Warden.TokenAllowed(ctx, ar.Token, ar.TokenAccessRequest, ar.Scopes...)
 	if err != nil {
 		h.H.Write(w, r, &notAllowed)
+		if h.Statsd != nil {
+			statsdClient := h.Statsd.Clone(statsd.Tags("client_id", authContext.Subject, "resource", resource))
+			statsdClient.Increment("Warden.Failure.UnauthorizedClient")
+		}
 		return
 	}
 
@@ -194,6 +222,11 @@ func (h *WardenHandler) TokenAllowed(w http.ResponseWriter, r *http.Request, _ h
 		Context: authContext,
 		Allowed: true,
 	})
+
+	if h.Statsd != nil {
+		statsdClient := h.Statsd.Clone(statsd.Tags("client_id", authContext.Subject, "resource", resource))
+		statsdClient.Increment("Warden.Success.AuthorizedClient")
+	}
 }
 
 func TokenFromRequest(r *http.Request) string {

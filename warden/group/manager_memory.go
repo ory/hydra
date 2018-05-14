@@ -132,3 +132,20 @@ func (m *MemoryManager) ListGroups(limit, offset int) ([]Group, error) {
 	start, end := pagination.Index(limit, offset, len(res))
 	return res[start:end], nil
 }
+
+func (m *MemoryManager) UpdateGroupMembers(group string, members []string) error {
+	id := group
+
+	if err := m.DeleteGroup(id); err != nil {
+		return err
+	}
+
+	if err := m.CreateGroup(&Group{
+		ID:      id,
+		Members: members,
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}

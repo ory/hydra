@@ -74,6 +74,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.DELETE(GroupsHandlerPath+"/:id", h.DeleteGroup)
 	r.POST(GroupsHandlerPath+"/:id/members", h.AddGroupMembers)
 	r.DELETE(GroupsHandlerPath+"/:id/members", h.RemoveGroupMembers)
+	r.PUT(GroupsHandlerPath+"/:id/members", h.UpdateGroupMembers)
 }
 
 // swagger:route GET /warden/groups warden listGroups
@@ -107,12 +108,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //       403: genericError
 //       500: genericError
 func (h *Handler) ListGroupsHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var ctx = r.Context()
-
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: h.PrefixResource(GroupsResource),
-		Action:   "list",
-	}, Scope); err != nil {
+	if err := h.checkRequest(r, h.PrefixResource(GroupsResource), "list"); err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}
@@ -178,19 +174,14 @@ func (h *Handler) FindGroupNames(w http.ResponseWriter, r *http.Request, member 
 //       403: genericError
 //       500: genericError
 func (h *Handler) CreateGroup(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var g Group
-	var ctx = r.Context()
-
-	if err := json.NewDecoder(r.Body).Decode(&g); err != nil {
-		h.H.WriteError(w, r, errors.WithStack(err))
+	if err := h.checkRequest(r, h.PrefixResource(GroupsResource), "create"); err != nil {
+		h.H.WriteError(w, r, err)
 		return
 	}
 
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: h.PrefixResource(GroupsResource),
-		Action:   "create",
-	}, Scope); err != nil {
-		h.H.WriteError(w, r, err)
+	var g Group
+	if err := json.NewDecoder(r.Body).Decode(&g); err != nil {
+		h.H.WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
@@ -233,19 +224,15 @@ func (h *Handler) CreateGroup(w http.ResponseWriter, r *http.Request, _ httprout
 //       403: genericError
 //       500: genericError
 func (h *Handler) GetGroup(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var ctx = r.Context()
 	var id = ps.ByName("id")
 
-	g, err := h.Manager.GetGroup(id)
-	if err != nil {
+	if err := h.checkRequest(r, fmt.Sprintf(h.PrefixResource(GroupResource), id), "get"); err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}
 
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: fmt.Sprintf(h.PrefixResource(GroupResource), id),
-		Action:   "get",
-	}, Scope); err != nil {
+	g, err := h.Manager.GetGroup(id)
+	if err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}
@@ -284,13 +271,9 @@ func (h *Handler) GetGroup(w http.ResponseWriter, r *http.Request, ps httprouter
 //       403: genericError
 //       500: genericError
 func (h *Handler) DeleteGroup(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var ctx = r.Context()
 	var id = ps.ByName("id")
 
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: fmt.Sprintf(h.PrefixResource(GroupResource), id),
-		Action:   "delete",
-	}, Scope); err != nil {
+	if err := h.checkRequest(r, fmt.Sprintf(h.PrefixResource(GroupResource), id), "delete"); err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}
@@ -334,20 +317,16 @@ func (h *Handler) DeleteGroup(w http.ResponseWriter, r *http.Request, ps httprou
 //       403: genericError
 //       500: genericError
 func (h *Handler) AddGroupMembers(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var ctx = r.Context()
 	var id = ps.ByName("id")
+
+	if err := h.checkRequest(r, fmt.Sprintf(h.PrefixResource(GroupResource), id), "members.add"); err != nil {
+		h.H.WriteError(w, r, err)
+		return
+	}
 
 	var m membersRequest
 	if err := json.NewDecoder(r.Body).Decode(&m); err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
-		return
-	}
-
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: fmt.Sprintf(h.PrefixResource(GroupResource), id),
-		Action:   "members.add",
-	}, Scope); err != nil {
-		h.H.WriteError(w, r, err)
 		return
 	}
 
@@ -390,20 +369,16 @@ func (h *Handler) AddGroupMembers(w http.ResponseWriter, r *http.Request, ps htt
 //       403: genericError
 //       500: genericError
 func (h *Handler) RemoveGroupMembers(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var ctx = r.Context()
 	var id = ps.ByName("id")
+
+	if err := h.checkRequest(r, fmt.Sprintf(h.PrefixResource(GroupResource), id), "members.remove"); err != nil {
+		h.H.WriteError(w, r, err)
+		return
+	}
 
 	var m membersRequest
 	if err := json.NewDecoder(r.Body).Decode(&m); err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
-		return
-	}
-
-	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
-		Resource: fmt.Sprintf(h.PrefixResource(GroupResource), id),
-		Action:   "members.remove",
-	}, Scope); err != nil {
-		h.H.WriteError(w, r, err)
 		return
 	}
 
@@ -413,4 +388,69 @@ func (h *Handler) RemoveGroupMembers(w http.ResponseWriter, r *http.Request, ps 
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+// swagger:route PUT /warden/groups/{id}/members warden replaceMembersInGroup
+//
+// Replace the members of a group
+//
+// The subject making the request needs to be assigned to a policy containing:
+//
+//  ```
+//  {
+//    "resources": ["rn:hydra:warden:groups:<id>"],
+//    "actions": ["members.update"],
+//    "effect": "allow"
+//  }
+//  ```
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Security:
+//       oauth2: hydra.warden.groups
+//
+//     Responses:
+//       204: emptyResponse
+//       401: genericError
+//       403: genericError
+//       500: genericError
+func (h *Handler) UpdateGroupMembers(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	var id = ps.ByName("id")
+
+	if err := h.checkRequest(r, fmt.Sprintf(h.PrefixResource(GroupResource), id), "members.update"); err != nil {
+		h.H.WriteError(w, r, err)
+		return
+	}
+
+	var m membersRequest
+	if err := json.NewDecoder(r.Body).Decode(&m); err != nil {
+		h.H.WriteError(w, r, errors.WithStack(err))
+		return
+	}
+
+	if err := h.Manager.UpdateGroupMembers(id, m.Members); err != nil {
+		h.H.WriteError(w, r, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (h *Handler) checkRequest(r *http.Request, resource string, action string) error {
+	var ctx = r.Context()
+
+	if _, err := h.W.TokenAllowed(ctx, h.W.TokenFromRequest(r), &firewall.TokenAccessRequest{
+		Resource: resource,
+		Action:   action,
+	}, Scope); err != nil {
+		return errors.WithStack(err)
+	}
+
+	return nil
 }

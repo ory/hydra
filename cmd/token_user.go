@@ -41,7 +41,8 @@ import (
 // tokenUserCmd represents the token command
 var tokenUserCmd = &cobra.Command{
 	Use:   "user",
-	Short: "Generate an OAuth2 token using the code flow",
+	Short: "Starts a web server that initiates and handles OAuth 2.0 requests",
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		if ok, _ := cmd.Flags().GetBool("skip-tls-verify"); ok {
@@ -51,6 +52,7 @@ var tokenUserCmd = &cobra.Command{
 			}})
 		}
 
+		port, _ := cmd.Flags().GetInt("port")
 		scopes, _ := cmd.Flags().GetStringSlice("scope")
 		redirectUrl, _ := cmd.Flags().GetString("redirect")
 		backend, _ := cmd.Flags().GetString("token-url")
@@ -62,6 +64,11 @@ var tokenUserCmd = &cobra.Command{
 			fmt.Print(cmd.UsageString())
 			fmt.Println("Please provide a Client ID and Client Secret using flags --client-id and --client-secret, or environment variables OAUTH2_CLIENT_ID and OAUTH2_CLIENT_SECRET.")
 			return
+		}
+
+		serverLocation := fmt.Sprintf("http://127.0.0.1:%d/", port)
+		if redirectUrl == "" {
+			redirectUrl = serverLocation + "callback"
 		}
 
 		if backend == "" {
@@ -92,23 +99,34 @@ var tokenUserCmd = &cobra.Command{
 		nonce, err := sequence.RuneSequence(24, sequence.AlphaLower)
 		pkg.Must(err, "Could not generate random state: %s", err)
 
-		location := conf.AuthCodeURL(string(state)) + "&nonce=" + string(nonce)
+		authCodeURL := conf.AuthCodeURL(string(state)) + "&nonce=" + string(nonce)
 
 		if ok, _ := cmd.Flags().GetBool("no-open"); !ok {
-			webbrowser.Open(location)
+			webbrowser.Open(serverLocation)
 		}
 
-		fmt.Println("Setting up callback listener on http://localhost:4445/callback")
+		fmt.Println("Setting up home route on " + serverLocation)
+		fmt.Println("Setting up callback listener on " + serverLocation + "callback")
 		fmt.Println("Press ctrl + c on Linux / Windows or cmd + c on OSX to end the process.")
-		fmt.Printf("If your browser does not open automatically, navigate to:\n\n\t%s\n\n", location)
+		fmt.Printf("If your browser does not open automatically, navigate to:\n\n\t%s\n\n", serverLocation)
 
 		r := httprouter.New()
-		server := &http.Server{Addr: ":4445", Handler: r}
+		server := &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: r}
 		var shutdown = func() {
 			time.Sleep(time.Second * 1)
 			ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
 			server.Shutdown(ctx)
 		}
+
+		r.GET("/", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+			w.Write([]byte(fmt.Sprintf(`
+<html><head></head><body>
+<h1>Welcome to the example OAuth 2.0 Consumer</h1>
+<p>This example requests an OAuth 2.0 Access, Refresh, and OpenID Connect ID Token from the OAuth 2.0 Server (ORY Hydra). To initiate the flow, click the "Authorize Application" button.</p>
+<p><a href="%s">Authorize application</a></p>
+</body>
+`, authCodeURL)))
+		})
 
 		r.GET("/callback", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 			if len(r.URL.Query().Get("error")) > 0 {
@@ -168,12 +186,13 @@ var tokenUserCmd = &cobra.Command{
 func init() {
 	tokenCmd.AddCommand(tokenUserCmd)
 	tokenUserCmd.Flags().Bool("no-open", false, "Do not open the browser window automatically")
+	tokenUserCmd.Flags().IntP("port", "p", 4445, "The port on which the server should run")
 	tokenUserCmd.Flags().StringSlice("scope", []string{"offline", "openid"}, "Request OAuth2 scope")
 
 	tokenUserCmd.Flags().String("client-id", os.Getenv("OAUTH2_CLIENT_ID"), "Use the provided OAuth 2.0 Client ID, defaults to environment variable OAUTH2_CLIENT_ID")
 	tokenUserCmd.Flags().String("client-secret", os.Getenv("OAUTH2_CLIENT_SECRET"), "Use the provided OAuth 2.0 Client Secret, defaults to environment variable OAUTH2_CLIENT_SECRET")
 
-	tokenUserCmd.Flags().String("redirect", "http://localhost:4445/callback", "Force a redirect url")
+	tokenUserCmd.Flags().String("redirect", "", "Force a redirect url")
 	tokenUserCmd.Flags().String("auth-url", os.Getenv("HYDRA_URL"), "Usually it is enough to specify the `endpoint` flag, but if you want to force the authorization url, use this flag")
 	tokenUserCmd.Flags().String("token-url", os.Getenv("HYDRA_URL"), "Usually it is enough to specify the `endpoint` flag, but if you want to force the token url, use this flag")
 	tokenUserCmd.PersistentFlags().String("endpoint", os.Getenv("HYDRA_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_URL")

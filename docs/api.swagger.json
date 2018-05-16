@@ -345,7 +345,31 @@
         "operationId": "getInstanceStatus",
         "responses": {
           "200": {
-            "$ref": "#/responses/healthStatus"
+            "description": "healthStatus",
+            "schema": {
+              "$ref": "#/definitions/healthStatus"
+            }
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
+    "/health/version": {
+      "get": {
+        "description": "This endpoint returns the version as `{ \"version\": \"VERSION\" }`. The version is only correct with the prebuilt binary and not custom builds.",
+        "tags": [
+          "health"
+        ],
+        "summary": "Get the version of Hydra",
+        "operationId": "getVersion",
+        "responses": {
+          "200": {
+            "description": "healthVersion",
+            "schema": {
+              "$ref": "#/definitions/healthVersion"
+            }
           },
           "500": {
             "$ref": "#/responses/genericError"
@@ -1457,6 +1481,29 @@
       "x-go-name": "FlushInactiveOAuth2TokensRequest",
       "x-go-package": "github.com/ory/hydra/oauth2"
     },
+    "healthStatus": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "description": "Status always contains \"ok\"",
+          "type": "string",
+          "x-go-name": "Status"
+        }
+      },
+      "x-go-name": "HealthStatus",
+      "x-go-package": "github.com/ory/hydra/health"
+    },
+    "healthVersion": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string",
+          "x-go-name": "Version"
+        }
+      },
+      "x-go-name": "HealthVersion",
+      "x-go-package": "github.com/ory/hydra/health"
+    },
     "joseWebKeySetRequest": {
       "type": "object",
       "properties": {
@@ -2264,19 +2311,6 @@
             "x-go-name": "Request"
           },
           "status": {
-            "type": "string",
-            "x-go-name": "Status"
-          }
-        }
-      }
-    },
-    "healthStatus": {
-      "description": "Instance health report",
-      "schema": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "description": "Status always contains \"ok\"",
             "type": "string",
             "x-go-name": "Status"
           }

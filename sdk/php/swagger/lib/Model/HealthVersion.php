@@ -1,6 +1,6 @@
 <?php
 /**
- * InlineResponse200
+ * HealthVersion
  *
  * PHP version 5
  *
@@ -32,14 +32,14 @@ namespace Hydra\SDK\Model;
 use \ArrayAccess;
 
 /**
- * InlineResponse200 Class Doc Comment
+ * HealthVersion Class Doc Comment
  *
  * @category    Class
  * @package     Hydra\SDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
  */
-class InlineResponse200 implements ArrayAccess
+class HealthVersion implements ArrayAccess
 {
     const DISCRIMINATOR = null;
 
@@ -47,14 +47,14 @@ class InlineResponse200 implements ArrayAccess
       * The original name of the model.
       * @var string
       */
-    protected static $swaggerModelName = 'inline_response_200';
+    protected static $swaggerModelName = 'healthVersion';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'status' => 'string'
+        'version' => 'string'
     ];
 
     /**
@@ -62,7 +62,7 @@ class InlineResponse200 implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerFormats = [
-        'status' => null
+        'version' => null
     ];
 
     public static function swaggerTypes()
@@ -80,7 +80,7 @@ class InlineResponse200 implements ArrayAccess
      * @var string[]
      */
     protected static $attributeMap = [
-        'status' => 'status'
+        'version' => 'version'
     ];
 
 
@@ -89,7 +89,7 @@ class InlineResponse200 implements ArrayAccess
      * @var string[]
      */
     protected static $setters = [
-        'status' => 'setStatus'
+        'version' => 'setVersion'
     ];
 
 
@@ -98,7 +98,7 @@ class InlineResponse200 implements ArrayAccess
      * @var string[]
      */
     protected static $getters = [
-        'status' => 'getStatus'
+        'version' => 'getVersion'
     ];
 
     public static function attributeMap()
@@ -132,7 +132,7 @@ class InlineResponse200 implements ArrayAccess
      */
     public function __construct(array $data = null)
     {
-        $this->container['status'] = isset($data['status']) ? $data['status'] : null;
+        $this->container['version'] = isset($data['version']) ? $data['version'] : null;
     }
 
     /**
@@ -161,22 +161,22 @@ class InlineResponse200 implements ArrayAccess
 
 
     /**
-     * Gets status
+     * Gets version
      * @return string
      */
-    public function getStatus()
+    public function getVersion()
     {
-        return $this->container['status'];
+        return $this->container['version'];
     }
 
     /**
-     * Sets status
-     * @param string $status Status always contains \"ok\"
+     * Sets version
+     * @param string $version
      * @return $this
      */
-    public function setStatus($status)
+    public function setVersion($version)
     {
-        $this->container['status'] = $status;
+        $this->container['version'] = $version;
 
         return $this;
     }

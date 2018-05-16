@@ -10,7 +10,7 @@
 
 package swagger
 
-type InlineResponse200 struct {
+type HealthStatus struct {
 
 	// Status always contains \"ok\"
 	Status string `json:"status,omitempty"`

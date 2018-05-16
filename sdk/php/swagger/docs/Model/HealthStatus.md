@@ -1,4 +1,4 @@
-# InlineResponse200
+# HealthStatus
 
 ## Properties
 Name | Type | Description | Notes

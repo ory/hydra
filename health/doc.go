@@ -20,12 +20,13 @@
 
 package health
 
-// Instance health report
-// swagger:response healthStatus
-type swaggerListClientsResult struct {
-	// in: body
-	Body struct {
-		// Status always contains "ok"
-		Status string `json:"status"`
-	}
+// swagger:model healthStatus
+type HealthStatus struct {
+	// Status always contains "ok"
+	Status string `json:"status"`
+}
+
+// swagger:model healthVersion
+type HealthVersion struct {
+	Version string `json:"version"`
 }

@@ -26,7 +26,7 @@
     if (!root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer) {
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {}
     }
-    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.InlineResponse200 = factory(
+    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthVersion = factory(
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient
     )
   }
@@ -34,14 +34,14 @@
   'use strict'
 
   /**
-   * The InlineResponse200 model module.
-   * @module model/InlineResponse200
+   * The HealthVersion model module.
+   * @module model/HealthVersion
    * @version Latest
    */
 
   /**
-   * Constructs a new <code>InlineResponse200</code>.
-   * @alias module:model/InlineResponse200
+   * Constructs a new <code>HealthVersion</code>.
+   * @alias module:model/HealthVersion
    * @class
    */
   var exports = function() {
@@ -49,28 +49,27 @@
   }
 
   /**
-   * Constructs a <code>InlineResponse200</code> from a plain JavaScript object, optionally creating a new instance.
+   * Constructs a <code>HealthVersion</code> from a plain JavaScript object, optionally creating a new instance.
    * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
    * @param {Object} data The plain JavaScript object bearing properties of interest.
-   * @param {module:model/InlineResponse200} obj Optional instance to populate.
-   * @return {module:model/InlineResponse200} The populated <code>InlineResponse200</code> instance.
+   * @param {module:model/HealthVersion} obj Optional instance to populate.
+   * @return {module:model/HealthVersion} The populated <code>HealthVersion</code> instance.
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
       obj = obj || new exports()
 
-      if (data.hasOwnProperty('status')) {
-        obj['status'] = ApiClient.convertToType(data['status'], 'String')
+      if (data.hasOwnProperty('version')) {
+        obj['version'] = ApiClient.convertToType(data['version'], 'String')
       }
     }
     return obj
   }
 
   /**
-   * Status always contains \"ok\"
-   * @member {String} status
+   * @member {String} version
    */
-  exports.prototype['status'] = undefined
+  exports.prototype['version'] = undefined
 
   return exports
 })

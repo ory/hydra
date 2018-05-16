@@ -17,16 +17,13 @@
 ;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(
-      [
-        'ApiClient',
-        'model/InlineResponse401',
-        'model/JsonWebKey',
-        'model/JsonWebKeySet',
-        'model/JsonWebKeySetGeneratorRequest'
-      ],
-      factory
-    )
+    define([
+      'ApiClient',
+      'model/InlineResponse401',
+      'model/JsonWebKey',
+      'model/JsonWebKeySet',
+      'model/JsonWebKeySetGeneratorRequest'
+    ], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
     module.exports = factory(
@@ -66,7 +63,7 @@
    */
 
   /**
-   * Constructs a new JsonWebKeyApi. 
+   * Constructs a new JsonWebKeyApi.
    * @alias module:api/JsonWebKeyApi
    * @class
    * @param {module:ApiClient} apiClient Optional API client implementation to use,
@@ -88,7 +85,7 @@
      * This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.  A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
      * @param {String} set The set
      * @param {Object} opts Optional parameters
-     * @param {module:model/JsonWebKeySetGeneratorRequest} opts.body 
+     * @param {module:model/JsonWebKeySetGeneratorRequest} opts.body
      * @param {module:api/JsonWebKeyApi~createJsonWebKeySetCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/JsonWebKeySet}
      */
@@ -373,7 +370,7 @@
      * @param {String} kid The kid of the desired key
      * @param {String} set The set
      * @param {Object} opts Optional parameters
-     * @param {module:model/JsonWebKey} opts.body 
+     * @param {module:model/JsonWebKey} opts.body
      * @param {module:api/JsonWebKeyApi~updateJsonWebKeyCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/JsonWebKey}
      */
@@ -437,7 +434,7 @@
      * Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.  A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
      * @param {String} set The set
      * @param {Object} opts Optional parameters
-     * @param {module:model/JsonWebKeySet} opts.body 
+     * @param {module:model/JsonWebKeySet} opts.body
      * @param {module:api/JsonWebKeyApi~updateJsonWebKeySetCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/JsonWebKeySet}
      */

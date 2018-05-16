@@ -1,4 +1,4 @@
-# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.InlineResponse200
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthStatus
 
 ## Properties
 Name | Type | Description | Notes

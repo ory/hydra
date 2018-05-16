@@ -31,6 +31,7 @@ import (
 
 const (
 	HealthStatusPath     = "/health/status"
+	HealthVersionPath    = "/health/version"
 	PrometheusStatusPath = "/health/prometheus"
 )
 
@@ -38,6 +39,7 @@ type Handler struct {
 	Metrics        *telemetry.MetricsManager
 	H              *herodot.JSONWriter
 	ResourcePrefix string
+	VersionString  string
 }
 
 func (h *Handler) PrefixResource(resource string) string {
@@ -54,6 +56,9 @@ func (h *Handler) PrefixResource(resource string) string {
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET(HealthStatusPath, h.Health)
+	r.GET(HealthVersionPath, h.Version)
+
+	// using r.Handler because promhttp.Handler() returns http.Handler
 	r.Handler("GET", PrometheusStatusPath, promhttp.Handler())
 }
 
@@ -69,5 +74,22 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //       200: healthStatus
 //       500: genericError
 func (h *Handler) Health(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	rw.Write([]byte(`{"status": "ok"}`))
+	h.H.Write(rw, r, &HealthStatus{
+		Status: "ok",
+	})
+}
+
+// swagger:route GET /health/version health getVersion
+//
+// Get the version of Hydra
+//
+// This endpoint returns the version as `{ "version": "VERSION" }`. The version is only correct with the prebuilt binary and not custom builds.
+//
+//		Responses:
+// 		200: healthVersion
+//		500: genericError
+func (h *Handler) Version(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	h.H.Write(rw, r, &HealthVersion{
+		Version: h.VersionString,
+	})
 }

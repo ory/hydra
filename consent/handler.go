@@ -140,6 +140,9 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	} else if ar.Subject != "" && p.Subject != ar.Subject {
 		h.H.WriteErrorCode(w, r, http.StatusBadRequest, errors.New("Subject from payload does not match subject from previous authentication"))
 		return
+	} else if ar.Skip && p.Remember {
+		h.H.WriteErrorCode(w, r, http.StatusBadRequest, errors.New("Can not remember authentication because no user interaction was required"))
+		return
 	}
 
 	request, err := h.M.HandleAuthenticationRequest(ps.ByName("challenge"), &p)
@@ -302,6 +305,9 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 	hr, err := h.M.HandleConsentRequest(ps.ByName("challenge"), &p)
 	if err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
+		return
+	} else if hr.Skip && p.Remember {
+		h.H.WriteErrorCode(w, r, http.StatusBadRequest, errors.New("Can not remember consent because no user interaction was required"))
 		return
 	}
 

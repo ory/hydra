@@ -96,6 +96,8 @@ func TestStrategy(t *testing.T) {
 		expectErr             []bool
 		expectErrType         []error
 		expectFinalStatusCode int
+		prompt                string
+		maxAge                string
 		jar                   http.CookieJar
 	}{
 		{
@@ -396,7 +398,7 @@ func TestStrategy(t *testing.T) {
 			},
 		},
 		{
-			d:   "This fail because skip is true and remember as well when doing login",
+			d:   "This should fail because skip is true and remember as well when doing login",
 			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
 			jar: persistentCJ,
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -472,6 +474,95 @@ func TestStrategy(t *testing.T) {
 			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request},
 			expectErr:             []bool{true, true},
 		},
+		{
+			d:      "This should fail because prompt is none but no auth session exists",
+			prompt: "none",
+			req:    fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
+			jar:    newCookieJar(),
+			expectFinalStatusCode: http.StatusBadRequest,
+			expectErrType:         []error{fosite.ErrLoginRequired},
+			expectErr:             []bool{true},
+		},
+		{
+			d:      "This should fail because prompt is none and consent is missing a permission which requires re-authorization of the app",
+			prompt: "none",
+			req:    fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a", "this-scope-has-not-been-granted-before"}}},
+
+			jar: persistentCJ,
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					rr, res, err := apiClient.GetLoginRequest(r.URL.Query().Get("login_challenge"))
+					require.NoError(t, err)
+					require.EqualValues(t, http.StatusOK, res.StatusCode)
+					assert.True(t, rr.Skip)
+					assert.Equal(t, "user", rr.Subject)
+
+					v, res, err := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
+						Subject:     "user",
+						Remember:    false,
+						RememberFor: 0,
+						Acr:         "1",
+					})
+					require.NoError(t, err)
+					require.EqualValues(t, http.StatusOK, res.StatusCode)
+					require.NotEmpty(t, v.RedirectTo)
+					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+				}
+			},
+			expectFinalStatusCode: http.StatusBadRequest,
+			expectErrType:         []error{ErrAbortOAuth2Request, fosite.ErrConsentRequired},
+			expectErr:             []bool{true, true},
+		},
+		{
+			d:      "This pass and properly require authentication as well as authorization because prompt is set to login and consent - although previous session exists",
+			req:    fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
+			jar:    persistentCJ,
+			prompt: "login+consent",
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					rr, res, err := apiClient.GetLoginRequest(r.URL.Query().Get("login_challenge"))
+					require.NoError(t, err)
+					require.EqualValues(t, http.StatusOK, res.StatusCode)
+					assert.False(t, rr.Skip)
+
+					v, res, err := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
+						Subject:     "user",
+						Remember:    false,
+						RememberFor: 0,
+						Acr:         "1",
+					})
+					require.NoError(t, err)
+					require.EqualValues(t, http.StatusOK, res.StatusCode)
+					require.NotEmpty(t, v.RedirectTo)
+					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+				}
+			},
+			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					rr, res, err := apiClient.GetConsentRequest(r.URL.Query().Get("consent_challenge"))
+					require.NoError(t, err)
+					require.EqualValues(t, http.StatusOK, res.StatusCode)
+					assert.False(t, rr.Skip)
+
+					v, res, err := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{
+						GrantScope:  []string{"scope-a"},
+						Remember:    false,
+						RememberFor: 0,
+						Session: swagger.ConsentRequestSession{
+							AccessToken: map[string]interface{}{"foo": "bar"},
+							IdToken:     map[string]interface{}{"bar": "baz"},
+						},
+					})
+					require.NoError(t, err)
+					require.EqualValues(t, http.StatusOK, res.StatusCode)
+					require.NotEmpty(t, v.RedirectTo)
+					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+				}
+			},
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+		},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
 			if tc.lph != nil {
@@ -528,7 +619,9 @@ func TestStrategy(t *testing.T) {
 			resp, err := cl.Get(
 				ap.URL + "?" +
 					"login_verifier=" + tc.lv + "&" +
-					"consent_verifier=" + tc.cv + "&",
+					"consent_verifier=" + tc.cv + "&" +
+					"prompt=" + tc.prompt + "&" +
+					"max_age" + tc.maxAge + "&",
 			)
 			require.NoError(t, err)
 			out, err := ioutil.ReadAll(resp.Body)

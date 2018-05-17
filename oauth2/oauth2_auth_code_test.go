@@ -109,8 +109,8 @@ func TestAuthCodeSuite(t *testing.T) {
 		},
 		{
 			d:                         "should pass because prompt=none and max_age < auth_time",
-			authURL:                   oauthConfig.AuthCodeURL("some-foo-state") + "&prompt=none&max_age=10",
-			authTime:                  time.Now().UTC().Add(-time.Second * 5),
+			authURL:                   oauthConfig.AuthCodeURL("some-foo-state") + "&prompt=none&max_age=3600",
+			authTime:                  time.Now().UTC().Add(-time.Minute),
 			requestTime:               time.Now().UTC(),
 			shouldPassConsentStrategy: true,
 			cb: func(t *testing.T) httprouter.Handle {

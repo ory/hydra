@@ -38,6 +38,7 @@ import (
 	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/hydra/metrics/telemetry"
 	"github.com/ory/hydra/pkg"
+	"github.com/ory/sqlcon"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -252,9 +253,9 @@ func (c *Config) Context() *Context {
 		case "postgres":
 			fallthrough
 		case "mysql":
-			connection = &SQLConnection{
-				URL: u,
-				L:   c.GetLogger(),
+			connection, err = sqlcon.NewSQLConnection(c.DatabaseURL, c.GetLogger())
+			if err != nil {
+				c.GetLogger().WithError(err).Fatalf(`Unable to initialize SQL connection`)
 			}
 			break
 		default:

@@ -22,25 +22,33 @@ package cli
 
 import (
 	"flag"
-	"os"
+	"log"
 	"testing"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/hydra/config"
-	"github.com/ory/hydra/integration"
+	"github.com/ory/sqlcon/dockertest"
 )
 
 var db *sqlx.DB
 
 func TestMain(m *testing.M) {
+	runner := dockertest.Register()
+
 	flag.Parse()
 	if !testing.Short() {
-		db = integration.ConnectToPostgres()
+		dockertest.Parallel([]func(){
+			func() {
+				var err error
+				db, err = dockertest.ConnectToTestPostgreSQL()
+				if err != nil {
+					log.Fatalf("Unable to connect to database: %s", err)
+				}
+			},
+		})
 	}
 
-	code := m.Run()
-	integration.KillAll()
-	os.Exit(code)
+	runner.Exit(m.Run())
 }
 
 func TestNewHandler(t *testing.T) {

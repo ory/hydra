@@ -25,6 +25,7 @@ import (
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/jwk"
+	"github.com/ory/sqlcon"
 )
 
 func injectJWKManager(c *config.Config) {
@@ -34,7 +35,7 @@ func injectJWKManager(c *config.Config) {
 	case *config.MemoryConnection:
 		ctx.KeyManager = &jwk.MemoryManager{}
 		break
-	case *config.SQLConnection:
+	case *sqlcon.SQLConnection:
 		ctx.KeyManager = &jwk.SQLManager{
 			DB: con.GetDatabase(),
 			Cipher: &jwk.AEAD{

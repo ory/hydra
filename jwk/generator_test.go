@@ -21,9 +21,8 @@
 package jwk
 
 import (
-	"testing"
-
 	"fmt"
+	"testing"
 
 	"github.com/square/go-jose"
 	"github.com/stretchr/testify/assert"

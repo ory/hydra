@@ -22,11 +22,10 @@ package oauth2_test
 
 import (
 	"fmt"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
-
-	"net/http"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"

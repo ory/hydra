@@ -26,6 +26,7 @@ import (
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/consent"
+	"github.com/ory/sqlcon"
 )
 
 func injectConsentManager(c *config.Config, cm client.Manager) {
@@ -36,7 +37,7 @@ func injectConsentManager(c *config.Config, cm client.Manager) {
 	case *config.MemoryConnection:
 		manager = consent.NewMemoryManager()
 		break
-	case *config.SQLConnection:
+	case *sqlcon.SQLConnection:
 		manager = consent.NewSQLManager(
 			con.GetDatabase(),
 			cm,

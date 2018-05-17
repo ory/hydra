@@ -21,6 +21,8 @@
 package consent
 
 import (
+	"flag"
+	"log"
 	"testing"
 	"time"
 
@@ -113,53 +115,61 @@ func mockAuthRequest(key string) (c *AuthenticationRequest, h *HandledAuthentica
 	return c, h
 }
 
-func connectToPostgres(t *testing.T, managers map[string]Manager, c client.Manager) {
+func connectToPostgres(managers map[string]Manager, c client.Manager) {
 	db, err := dockertest.ConnectToTestPostgreSQL()
 	if err != nil {
-		t.Logf("Could not connect to database: %v", err)
-		t.FailNow()
+		log.Fatalf("Could not connect to database: %v", err)
 		return
 	}
 
 	s := NewSQLManager(db, c)
 	if _, err := s.CreateSchemas(); err != nil {
-		t.Logf("Could not create postgres schema: %v", err)
-		t.FailNow()
+		log.Fatalf("Could not connect to database: %v", err)
 		return
 	}
 
 	managers["postgres"] = s
 }
 
-func connectToMySQL(t *testing.T, managers map[string]Manager, c client.Manager) {
+func connectToMySQL(managers map[string]Manager, c client.Manager) {
 	db, err := dockertest.ConnectToTestMySQL()
 	if err != nil {
-		t.Logf("Could not connect to database: %v", err)
-		t.FailNow()
+		log.Fatalf("Could not connect to database: %v", err)
 		return
 	}
 
 	s := NewSQLManager(db, c)
 	if _, err := s.CreateSchemas(); err != nil {
-		t.Logf("Could not create mysql schema: %v", err)
-		t.FailNow()
+		log.Fatalf("Could not create mysql schema: %v", err)
 		return
 	}
 
 	managers["mysql"] = s
 }
 
-func TestManagers(t *testing.T) {
-	clientManager := client.NewMemoryManager(&fosite.BCrypt{WorkFactor: 8})
-	var managers = map[string]Manager{
-		"memory": NewMemoryManager(),
-	}
+var clientManager = client.NewMemoryManager(&fosite.BCrypt{WorkFactor: 8})
+var managers = map[string]Manager{
+	"memory": NewMemoryManager(),
+}
 
+func TestMain(m *testing.M) {
+	runner := dockertest.Register()
+
+	flag.Parse()
 	if !testing.Short() {
-		connectToPostgres(t, managers, clientManager)
-		connectToMySQL(t, managers, clientManager)
+		dockertest.Parallel([]func(){
+			func() {
+				connectToPostgres(managers, clientManager)
+			}, func() {
+				connectToMySQL(managers, clientManager)
+			},
+		})
 	}
 
+	runner.Exit(m.Run())
+}
+
+func TestManagers(t *testing.T) {
 	t.Run("case=auth-session", func(t *testing.T) {
 		for k, m := range managers {
 			t.Run("manager="+k, func(t *testing.T) {

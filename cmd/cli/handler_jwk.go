@@ -23,7 +23,6 @@ package cli
 import (
 	"crypto/tls"
 	"fmt"
-
 	"net/http"
 
 	"github.com/ory/hydra/config"

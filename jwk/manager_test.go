@@ -24,11 +24,10 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"os"
 	"testing"
 
-	"github.com/ory/hydra/integration"
 	. "github.com/ory/hydra/jwk"
+	"github.com/ory/sqlcon/dockertest"
 )
 
 var managers = map[string]Manager{
@@ -40,37 +39,43 @@ var testGenerator = &RS256Generator{}
 var encryptionKey, _ = RandomBytes(32)
 
 func TestMain(m *testing.M) {
+	runner := dockertest.Register()
+
 	flag.Parse()
 	if !testing.Short() {
-		if !testing.Short() {
-			integration.BootParallel([]func(){
-				connectToPG,
-				connectToMySQL,
-			})
-		}
+		dockertest.Parallel([]func(){
+			connectToPG,
+			connectToMySQL,
+		})
 	}
 
-	s := m.Run()
-	integration.KillAll()
-	os.Exit(s)
+	runner.Exit(m.Run())
 }
 
 func connectToPG() {
-	var db = integration.ConnectToPostgres()
+	db, err := dockertest.ConnectToTestPostgreSQL()
+	if err != nil {
+		log.Fatalf("Could not connect to database: %v", err)
+	}
+
 	s := &SQLManager{DB: db, Cipher: &AEAD{Key: encryptionKey}}
 	if _, err := s.CreateSchemas(); err != nil {
-		log.Fatalf("Could not create postgres schema: %v", err)
+		log.Fatalf("Could not create schema: %v", err)
 	}
 
 	managers["postgres"] = s
 }
 
 func connectToMySQL() {
-	var db = integration.ConnectToMySQL()
+	db, err := dockertest.ConnectToTestMySQL()
+	if err != nil {
+		log.Fatalf("Could not connect to database: %v", err)
+	}
+
 	s := &SQLManager{DB: db, Cipher: &AEAD{Key: encryptionKey}}
 
 	if _, err := s.CreateSchemas(); err != nil {
-		log.Fatalf("Could not create postgres schema: %v", err)
+		log.Fatalf("Could not create schema: %v", err)
 	}
 
 	managers["mysql"] = s

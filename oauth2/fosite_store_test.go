@@ -23,15 +23,15 @@ package oauth2_test
 import (
 	"flag"
 	"fmt"
-	"os"
+	"log"
 	"testing"
 	"time"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/integration"
 	. "github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
+	"github.com/ory/sqlcon/dockertest"
 	"github.com/sirupsen/logrus"
 )
 
@@ -53,34 +53,42 @@ func init() {
 }
 
 func TestMain(m *testing.M) {
+	runner := dockertest.Register()
+
 	flag.Parse()
 	if !testing.Short() {
-		integration.BootParallel([]func(){
+		dockertest.Parallel([]func(){
 			connectToPG,
 			connectToMySQL,
 		})
 	}
 
-	s := m.Run()
-	integration.KillAll()
-	os.Exit(s)
+	runner.Exit(m.Run())
 }
 
 func connectToPG() {
-	var db = integration.ConnectToPostgres()
+	db, err := dockertest.ConnectToTestPostgreSQL()
+	if err != nil {
+		log.Fatalf("Could not connect to database: %v", err)
+	}
+
 	s := &FositeSQLStore{DB: db, Manager: clientManager, L: logrus.New(), AccessTokenLifespan: time.Hour}
 	if _, err := s.CreateSchemas(); err != nil {
-		logrus.Fatalf("Could not create postgres schema: %v", err)
+		log.Fatalf("Could not create postgres schema: %v", err)
 	}
 
 	clientManagers["postgres"] = s
 }
 
 func connectToMySQL() {
-	var db = integration.ConnectToMySQL()
+	db, err := dockertest.ConnectToTestMySQL()
+	if err != nil {
+		log.Fatalf("Could not connect to database: %v", err)
+	}
+
 	s := &FositeSQLStore{DB: db, Manager: clientManager, L: logrus.New(), AccessTokenLifespan: time.Hour}
 	if _, err := s.CreateSchemas(); err != nil {
-		logrus.Fatalf("Could not create postgres schema: %v", err)
+		log.Fatalf("Could not create postgres schema: %v", err)
 	}
 
 	clientManagers["mysql"] = s

@@ -20,10 +20,13 @@
 
 package oauth2
 
-import "testing"
-import "github.com/oleiade/reflections"
-import "github.com/stretchr/testify/assert"
-import "github.com/stretchr/testify/require"
+import (
+	"testing"
+
+	"github.com/oleiade/reflections"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
 
 func AssertObjectKeysEqual(t *testing.T, a, b interface{}, keys ...string) {
 	assert.True(t, len(keys) > 0, "No keys provided.")

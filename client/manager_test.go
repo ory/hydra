@@ -24,12 +24,11 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"os"
 	"testing"
 
 	"github.com/ory/fosite"
 	. "github.com/ory/hydra/client"
-	"github.com/ory/hydra/integration"
+	"github.com/ory/sqlcon/dockertest"
 )
 
 var clientManagers = map[string]Manager{}
@@ -39,37 +38,43 @@ func init() {
 }
 
 func TestMain(m *testing.M) {
+	runner := dockertest.Register()
+
 	flag.Parse()
 	if !testing.Short() {
-		if !testing.Short() {
-			integration.BootParallel([]func(){
-				connectToPG,
-				connectToMySQL,
-			})
-		}
+		dockertest.Parallel([]func(){
+			connectToPG,
+			connectToMySQL,
+		})
 	}
 
-	s := m.Run()
-	integration.KillAll()
-	os.Exit(s)
+	runner.Exit(m.Run())
 }
 
 func connectToMySQL() {
-	var db = integration.ConnectToMySQL()
+	db, err := dockertest.ConnectToTestMySQL()
+	if err != nil {
+		log.Fatalf("Could not connect to database: %v", err)
+	}
+
 	s := &SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}
 	if _, err := s.CreateSchemas(); err != nil {
-		log.Fatalf("Could not create postgres schema: %v", err)
+		log.Fatalf("Could not create schema: %v", err)
 	}
 
 	clientManagers["mysql"] = s
 }
 
 func connectToPG() {
-	var db = integration.ConnectToPostgres()
+	db, err := dockertest.ConnectToTestPostgreSQL()
+	if err != nil {
+		log.Fatalf("Could not connect to database: %v", err)
+	}
+
 	s := &SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}
 
 	if _, err := s.CreateSchemas(); err != nil {
-		log.Fatalf("Could not create postgres schema: %v", err)
+		log.Fatalf("Could not create schema: %v", err)
 	}
 
 	clientManagers["postgres"] = s

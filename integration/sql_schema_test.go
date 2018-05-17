@@ -21,6 +21,7 @@
 package integration
 
 import (
+	"log"
 	"testing"
 	"time"
 
@@ -31,6 +32,7 @@ import (
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/ladon"
 	lsql "github.com/ory/ladon/manager/sql"
+	"github.com/ory/sqlcon/dockertest"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
@@ -46,7 +48,11 @@ func TestSQLSchema(t *testing.T) {
 	p1 := ks.Key("private:foo")
 	r := fosite.NewRequest()
 	r.ID = "foo"
-	db := ConnectToPostgres()
+
+	db, err := dockertest.ConnectToTestPostgreSQL()
+	if err != nil {
+		log.Fatalf("Could not connect to database: %v", err)
+	}
 
 	cm := &client.SQLManager{DB: db, Hasher: &fosite.BCrypt{}}
 	jm := jwk.SQLManager{DB: db, Cipher: &jwk.AEAD{Key: []byte("11111111111111111111111111111111")}}
@@ -54,7 +60,7 @@ func TestSQLSchema(t *testing.T) {
 	crm := consent.NewSQLManager(db, nil)
 	pm := lsql.NewSQLManager(db, nil)
 
-	_, err := pm.CreateSchemas("", "hydra_policy_migration")
+	_, err = pm.CreateSchemas("", "hydra_policy_migration")
 	require.NoError(t, err)
 	_, err = cm.CreateSchemas()
 	require.NoError(t, err)

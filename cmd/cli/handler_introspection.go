@@ -25,12 +25,11 @@ import (
 	//"context"
 	//"encoding/json"
 	"fmt"
+	"net/http"
+	"strings"
 
 	"github.com/ory/hydra/config"
 	//"github.com/ory/hydra/oauth2"
-
-	"net/http"
-	"strings"
 
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/spf13/cobra"

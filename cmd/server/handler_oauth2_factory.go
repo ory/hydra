@@ -36,6 +36,7 @@ import (
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
+	"github.com/ory/sqlcon"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {
@@ -46,7 +47,7 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 	case *config.MemoryConnection:
 		store = oauth2.NewFositeMemoryStore(clients, c.GetAccessTokenLifespan())
 		break
-	case *config.SQLConnection:
+	case *sqlcon.SQLConnection:
 		store = oauth2.NewFositeSQLStore(clients, con.GetDatabase(), c.GetLogger(), c.GetAccessTokenLifespan())
 		break
 	case *config.PluginConnection:

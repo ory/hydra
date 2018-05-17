@@ -35,7 +35,7 @@ type MemoryManager struct {
 	authRequests           map[string]AuthenticationRequest
 	handledAuthRequests    map[string]HandledAuthenticationRequest
 	authSessions           map[string]AuthenticationSession
-	sync.RWMutex
+	m                      map[string]*sync.RWMutex
 }
 
 func NewMemoryManager() *MemoryManager {
@@ -45,19 +45,26 @@ func NewMemoryManager() *MemoryManager {
 		authRequests:           map[string]AuthenticationRequest{},
 		handledAuthRequests:    map[string]HandledAuthenticationRequest{},
 		authSessions:           map[string]AuthenticationSession{},
+		m: map[string]*sync.RWMutex{
+			"consentRequests":        new(sync.RWMutex),
+			"handledConsentRequests": new(sync.RWMutex),
+			"authRequests":           new(sync.RWMutex),
+			"handledAuthRequests":    new(sync.RWMutex),
+			"authSessions":           new(sync.RWMutex),
+		},
 	}
 }
 
 func (m *MemoryManager) CreateConsentRequest(c *ConsentRequest) error {
-	m.Lock()
-	defer m.Unlock()
+	m.m["consentRequests"].Lock()
+	defer m.m["consentRequests"].Unlock()
 	m.consentRequests[c.Challenge] = *c
 	return nil
 }
 
 func (m *MemoryManager) GetConsentRequest(challenge string) (*ConsentRequest, error) {
-	m.RLock()
-	defer m.RUnlock()
+	m.m["consentRequests"].RLock()
+	defer m.m["consentRequests"].RUnlock()
 	if c, ok := m.consentRequests[challenge]; ok {
 		return &c, nil
 	}
@@ -65,9 +72,9 @@ func (m *MemoryManager) GetConsentRequest(challenge string) (*ConsentRequest, er
 }
 
 func (m *MemoryManager) HandleConsentRequest(challenge string, r *HandledConsentRequest) (*ConsentRequest, error) {
-	m.Lock()
+	m.m["handledConsentRequests"].Lock()
 	m.handledConsentRequests[r.Challenge] = *r
-	m.Unlock()
+	m.m["handledConsentRequests"].Unlock()
 	return m.GetConsentRequest(challenge)
 }
 
@@ -137,8 +144,8 @@ func (m *MemoryManager) FindPreviouslyGrantedConsentRequests(client string, subj
 }
 
 func (m *MemoryManager) GetAuthenticationSession(id string) (*AuthenticationSession, error) {
-	m.RLock()
-	defer m.RUnlock()
+	m.m["authSessions"].RLock()
+	defer m.m["authSessions"].RUnlock()
 	if c, ok := m.authSessions[id]; ok {
 		return &c, nil
 	}
@@ -146,29 +153,29 @@ func (m *MemoryManager) GetAuthenticationSession(id string) (*AuthenticationSess
 }
 
 func (m *MemoryManager) CreateAuthenticationSession(a *AuthenticationSession) error {
-	m.Lock()
-	defer m.Unlock()
+	m.m["authSessions"].Lock()
+	defer m.m["authSessions"].Unlock()
 	m.authSessions[a.ID] = *a
 	return nil
 }
 
 func (m *MemoryManager) DeleteAuthenticationSession(id string) error {
-	m.Lock()
-	defer m.Unlock()
+	m.m["authSessions"].Lock()
+	defer m.m["authSessions"].Unlock()
 	delete(m.authSessions, id)
 	return nil
 }
 
 func (m *MemoryManager) CreateAuthenticationRequest(a *AuthenticationRequest) error {
-	m.Lock()
-	defer m.Unlock()
+	m.m["authRequests"].Lock()
+	defer m.m["authRequests"].Unlock()
 	m.authRequests[a.Challenge] = *a
 	return nil
 }
 
 func (m *MemoryManager) GetAuthenticationRequest(challenge string) (*AuthenticationRequest, error) {
-	m.RLock()
-	defer m.RUnlock()
+	m.m["authRequests"].RLock()
+	defer m.m["authRequests"].RUnlock()
 	if c, ok := m.authRequests[challenge]; ok {
 		return &c, nil
 	}
@@ -176,9 +183,9 @@ func (m *MemoryManager) GetAuthenticationRequest(challenge string) (*Authenticat
 }
 
 func (m *MemoryManager) HandleAuthenticationRequest(challenge string, r *HandledAuthenticationRequest) (*AuthenticationRequest, error) {
-	m.Lock()
-	defer m.Unlock()
+	m.m["handledAuthRequests"].Lock()
 	m.handledAuthRequests[r.Challenge] = *r
+	m.m["handledAuthRequests"].Unlock()
 	return m.GetAuthenticationRequest(challenge)
 }
 

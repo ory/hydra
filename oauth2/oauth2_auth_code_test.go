@@ -51,23 +51,14 @@ func noopHandler(t *testing.T) httprouter.Handle {
 
 func TestAuthCodeSuite(t *testing.T) {
 	// Regular request without any previous authentication
-
 	// Regular request with previous authentication
-
 	// Regular request with previous authentication and prompt login/consent
-
 	// Regular request with previous authentication and prompt none
-
 	// Regular request with previous authentication and prompt none and proper id_token_hint
-
 	// Regular request without authentication and prompt none (fail)
-
 	// Regular request with previous authentication and prompt none and very low max_age (fail)
-
 	// Regular request with previous authentication and prompt none and mismatching id_token_hint (fail)
-
 	// Regular request fails if login is denied
-
 	// Regular request fails if consent is denied
 
 	var callbackHandler *httprouter.Handle
@@ -100,22 +91,23 @@ func TestAuthCodeSuite(t *testing.T) {
 		},
 		{
 			d:                         "should fail because prompt=none and max_age > auth_time",
-			authURL:                   oauthConfig.AuthCodeURL("some-foo-state") + "prompt=none&max_age=1",
+			authURL:                   oauthConfig.AuthCodeURL("some-foo-state") + "&prompt=none&max_age=1",
 			authTime:                  time.Now().UTC().Add(-time.Minute),
 			requestTime:               time.Now().UTC(),
 			shouldPassConsentStrategy: true,
 			cb: func(t *testing.T) httprouter.Handle {
 				return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 					code = r.URL.Query().Get("code")
-					require.NotEmpty(t, code)
-					w.Write([]byte(r.URL.Query().Get("code")))
+					err := r.URL.Query().Get("error")
+					require.Empty(t, code)
+					require.EqualValues(t, fosite.ErrLoginRequired.Error(), err)
 				}
 			},
-			expectOAuthTokenError: true,
+			expectOAuthAuthError: true,
 		},
 		{
 			d:                         "should pass because prompt=none and max_age < auth_time",
-			authURL:                   oauthConfig.AuthCodeURL("some-foo-state") + "prompt=none&max_age=10",
+			authURL:                   oauthConfig.AuthCodeURL("some-foo-state") + "&prompt=none&max_age=10",
 			authTime:                  time.Now().UTC().Add(-time.Second),
 			requestTime:               time.Now().UTC(),
 			shouldPassConsentStrategy: true,
@@ -128,18 +120,20 @@ func TestAuthCodeSuite(t *testing.T) {
 			},
 		},
 		{
-			d:                         "should pass because prompt=none but auth_time suggests recent authentication",
-			authURL:                   oauthConfig.AuthCodeURL("some-foo-state") + "prompt=none",
+			d:                         "should fail because prompt=none but auth_time suggests recent authentication",
+			authURL:                   oauthConfig.AuthCodeURL("some-foo-state") + "&prompt=none",
 			authTime:                  time.Now().UTC().Add(time.Second),
 			requestTime:               time.Now().UTC(),
 			shouldPassConsentStrategy: true,
 			cb: func(t *testing.T) httprouter.Handle {
 				return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 					code = r.URL.Query().Get("code")
-					require.NotEmpty(t, code)
-					w.Write([]byte(r.URL.Query().Get("code")))
+					err := r.URL.Query().Get("error")
+					require.Empty(t, code)
+					require.EqualValues(t, fosite.ErrLoginRequired.Error(), err)
 				}
 			},
+			expectOAuthAuthError: true,
 		},
 		{
 			d:                         "should fail because consent strategy fails",

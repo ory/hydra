@@ -60,12 +60,13 @@ func mockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 	}
 
 	h = &HandledConsentRequest{
-		ConsentRequest: c,
-		RememberFor:    rememberFor,
-		Remember:       remember,
-		Challenge:      "challenge" + key,
-		RequestedAt:    time.Now().UTC().Add(-time.Minute),
-		Error:          err,
+		ConsentRequest:  c,
+		RememberFor:     rememberFor,
+		Remember:        remember,
+		Challenge:       "challenge" + key,
+		RequestedAt:     time.Now().UTC().Add(-time.Minute),
+		AuthenticatedAt: time.Now().UTC().Add(-time.Minute),
+		Error:           err,
 	}
 
 	return c, h
@@ -102,6 +103,7 @@ func mockAuthRequest(key string) (c *AuthenticationRequest, h *HandledAuthentica
 		Remember:              true,
 		Challenge:             "challenge" + key,
 		RequestedAt:           time.Now().UTC().Add(-time.Minute),
+		AuthenticatedAt:       time.Now().UTC().Add(-time.Minute),
 		Error:                 err,
 		Subject:               c.Subject,
 		ACR:                   "acr",

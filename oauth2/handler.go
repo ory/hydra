@@ -481,7 +481,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 				Issuer:      h.IssuerURL,
 				IssuedAt:    time.Now().UTC(),
 				ExpiresAt:   time.Now().Add(h.IDTokenLifespan).UTC(),
-				AuthTime:    time.Now().UTC(),
+				AuthTime:    session.AuthenticatedAt,
 				RequestedAt: time.Now().UTC(),
 				Extra:       session.Session.IDToken,
 			},

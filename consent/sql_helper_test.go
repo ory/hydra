@@ -29,6 +29,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestMySQLHack(t *testing.T) {
+	now := time.Now().UTC()
+	assert.EqualValues(t, now, fromMySQLDateHack(toMySQLDateHack(now)))
+	assert.EqualValues(t, time.Time{}, fromMySQLDateHack(toMySQLDateHack(time.Time{})))
+}
+
 func TestSQLAuthenticationConverter(t *testing.T) {
 	a := &AuthenticationRequest{
 		OpenIDConnectContext: &OpenIDConnectContext{
@@ -36,14 +42,15 @@ func TestSQLAuthenticationConverter(t *testing.T) {
 			UILocales: []string{"fr", "de"},
 			Display:   "popup",
 		},
-		Client:         &client.Client{ID: "client"},
-		Subject:        "subject",
-		RequestURL:     "https://request-url/path",
-		Skip:           true,
-		Challenge:      "challenge",
-		RequestedScope: []string{"scopea", "scopeb"},
-		Verifier:       "verifier",
-		CSRF:           "csrf",
+		AuthenticatedAt: time.Now().UTC().Add(-time.Minute),
+		Client:          &client.Client{ID: "client"},
+		Subject:         "subject",
+		RequestURL:      "https://request-url/path",
+		Skip:            true,
+		Challenge:       "challenge",
+		RequestedScope:  []string{"scopea", "scopeb"},
+		Verifier:        "verifier",
+		CSRF:            "csrf",
 	}
 
 	b := &HandledAuthenticationRequest{
@@ -52,6 +59,7 @@ func TestSQLAuthenticationConverter(t *testing.T) {
 		Remember:              true,
 		Challenge:             "challenge",
 		RequestedAt:           time.Now().UTC().Add(-time.Minute),
+		AuthenticatedAt:       time.Now().UTC().Add(-time.Minute),
 		Error: &RequestDeniedError{
 			Name:        "error_name",
 			Description: "error_description",
@@ -87,22 +95,24 @@ func TestSQLConsentConverter(t *testing.T) {
 			UILocales: []string{"fr", "de"},
 			Display:   "popup",
 		},
-		Client:         &client.Client{ID: "client"},
-		Subject:        "subject",
-		RequestURL:     "https://request-url/path",
-		Skip:           true,
-		Challenge:      "challenge",
-		RequestedScope: []string{"scopea", "scopeb"},
-		Verifier:       "verifier",
-		CSRF:           "csrf",
+		Client:          &client.Client{ID: "client"},
+		Subject:         "subject",
+		RequestURL:      "https://request-url/path",
+		Skip:            true,
+		Challenge:       "challenge",
+		RequestedScope:  []string{"scopea", "scopeb"},
+		Verifier:        "verifier",
+		CSRF:            "csrf",
+		AuthenticatedAt: time.Now().UTC().Add(-time.Minute),
 	}
 
 	b := &HandledConsentRequest{
-		ConsentRequest: a,
-		RememberFor:    10,
-		Remember:       true,
-		GrantedScope:   []string{"asdf", "fdsa"},
-		Challenge:      "challenge",
+		ConsentRequest:  a,
+		RememberFor:     10,
+		Remember:        true,
+		GrantedScope:    []string{"asdf", "fdsa"},
+		AuthenticatedAt: time.Now().UTC().Add(-time.Minute),
+		Challenge:       "challenge",
 		Session: &ConsentRequestSessionData{
 			AccessToken: map[string]interface{}{"asdf": "fdsa"},
 			IDToken:     map[string]interface{}{"foo": "fab"},

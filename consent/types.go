@@ -96,11 +96,12 @@ type HandledConsentRequest struct {
 	// authorization will be remembered indefinitely.
 	RememberFor int `json:"remember_for"`
 
-	ConsentRequest *ConsentRequest     `json:"-"`
-	Error          *RequestDeniedError `json:"-"`
-	Challenge      string              `json:"-"`
-	RequestedAt    time.Time           `json:"-"`
-	WasUsed        bool                `json:"-"`
+	ConsentRequest  *ConsentRequest     `json:"-"`
+	Error           *RequestDeniedError `json:"-"`
+	Challenge       string              `json:"-"`
+	RequestedAt     time.Time           `json:"-"`
+	AuthenticatedAt time.Time           `json:"-"`
+	WasUsed         bool                `json:"-"`
 }
 
 // The request payload used to accept a login request.
@@ -127,6 +128,7 @@ type HandledAuthenticationRequest struct {
 	Error                 *RequestDeniedError    `json:"-"`
 	Challenge             string                 `json:"-"`
 	RequestedAt           time.Time              `json:"-"`
+	AuthenticatedAt       time.Time              `json:"-"`
 	WasUsed               bool                   `json:"-"`
 }
 
@@ -199,8 +201,9 @@ type AuthenticationRequest struct {
 	// might come in handy if you want to deal with additional request parameters.
 	RequestURL string `json:"request_url"`
 
-	Verifier string `json:"-"`
-	CSRF     string `json:"-"`
+	Verifier        string    `json:"-"`
+	CSRF            string    `json:"-"`
+	AuthenticatedAt time.Time `json:"-"`
 }
 
 // Contains information on an ongoing consent request.
@@ -235,8 +238,9 @@ type ConsentRequest struct {
 	// might come in handy if you want to deal with additional request parameters.
 	RequestURL string `json:"request_url"`
 
-	Verifier string `json:"-"`
-	CSRF     string `json:"-"`
+	Verifier        string    `json:"-"`
+	CSRF            string    `json:"-"`
+	AuthenticatedAt time.Time `json:"-"`
 }
 
 // Used to pass session data to a consent request.

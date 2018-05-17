@@ -23,7 +23,7 @@ package oauth2_test
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"fmt"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
@@ -32,113 +32,211 @@ import (
 	"time"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/ory/fosite"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
 )
 
-func TestAuthCode(t *testing.T) {
-	var callbackHandler httprouter.Handle
+func newCookieJar() http.CookieJar {
+	c, _ := cookiejar.New(nil)
+	return c
+}
+
+func noopHandler(t *testing.T) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		w.WriteHeader(http.StatusNotImplemented)
+	}
+}
+
+func TestAuthCodeSuite(t *testing.T) {
+	// Regular request without any previous authentication
+
+	// Regular request with previous authentication
+
+	// Regular request with previous authentication and prompt login/consent
+
+	// Regular request with previous authentication and prompt none
+
+	// Regular request with previous authentication and prompt none and proper id_token_hint
+
+	// Regular request without authentication and prompt none (fail)
+
+	// Regular request with previous authentication and prompt none and very low max_age (fail)
+
+	// Regular request with previous authentication and prompt none and mismatching id_token_hint (fail)
+
+	// Regular request fails if login is denied
+
+	// Regular request fails if consent is denied
+
+	var callbackHandler *httprouter.Handle
 	router.GET("/callback", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		callbackHandler(w, r, ps)
+		(*callbackHandler)(w, r, ps)
 	})
 
-	t.Run("case=test accept consent request", func(t *testing.T) {
-		var code string
-
-		callbackHandler = func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-			code = r.URL.Query().Get("code")
-			w.Write([]byte(r.URL.Query().Get("code")))
-		}
-
-		cookieJar, _ := cookiejar.New(nil)
-		req, err := http.NewRequest("GET", oauthConfig.AuthCodeURL("some-foo-state"), nil)
-		require.NoError(t, err)
-
-		resp, err := (&http.Client{Jar: cookieJar}).Do(req)
-		require.NoError(t, err)
-		defer resp.Body.Close()
-
-		_, err = ioutil.ReadAll(resp.Body)
-		require.NoError(t, err)
-
-		require.NotEmpty(t, code)
-
-		token, err := oauthConfig.Exchange(oauth2.NoContext, code)
-		require.NoError(t, err, code)
-
-		t.Run("case=userinfo", func(t *testing.T) {
-
-			var makeRequest = func(req *http.Request) *http.Response {
-				resp, err = http.DefaultClient.Do(req)
-				require.NoError(t, err)
-				return resp
+	var code string
+	for k, tc := range []struct {
+		d                         string
+		cb                        func(t *testing.T) httprouter.Handle
+		authURL                   string
+		shouldPassConsentStrategy bool
+		expectOAuthAuthError      bool
+		expectOAuthTokenError     bool
+		authTime                  time.Time
+		requestTime               time.Time
+	}{
+		{
+			d:                         "should pass request if no previous authN or authZ exists",
+			authURL:                   oauthConfig.AuthCodeURL("some-foo-state"),
+			shouldPassConsentStrategy: true,
+			cb: func(t *testing.T) httprouter.Handle {
+				return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+					code = r.URL.Query().Get("code")
+					require.NotEmpty(t, code)
+					w.Write([]byte(r.URL.Query().Get("code")))
+				}
+			},
+		},
+		{
+			d:                         "should fail because prompt=none and max_age > auth_time",
+			authURL:                   oauthConfig.AuthCodeURL("some-foo-state") + "prompt=none&max_age=1",
+			authTime:                  time.Now().UTC().Add(-time.Minute),
+			requestTime:               time.Now().UTC(),
+			shouldPassConsentStrategy: true,
+			cb: func(t *testing.T) httprouter.Handle {
+				return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+					code = r.URL.Query().Get("code")
+					require.NotEmpty(t, code)
+					w.Write([]byte(r.URL.Query().Get("code")))
+				}
+			},
+			expectOAuthTokenError: true,
+		},
+		{
+			d:                         "should pass because prompt=none and max_age < auth_time",
+			authURL:                   oauthConfig.AuthCodeURL("some-foo-state") + "prompt=none&max_age=10",
+			authTime:                  time.Now().UTC().Add(-time.Second),
+			requestTime:               time.Now().UTC(),
+			shouldPassConsentStrategy: true,
+			cb: func(t *testing.T) httprouter.Handle {
+				return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+					code = r.URL.Query().Get("code")
+					require.NotEmpty(t, code)
+					w.Write([]byte(r.URL.Query().Get("code")))
+				}
+			},
+		},
+		{
+			d:                         "should pass because prompt=none but auth_time suggests recent authentication",
+			authURL:                   oauthConfig.AuthCodeURL("some-foo-state") + "prompt=none",
+			authTime:                  time.Now().UTC().Add(time.Second),
+			requestTime:               time.Now().UTC(),
+			shouldPassConsentStrategy: true,
+			cb: func(t *testing.T) httprouter.Handle {
+				return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+					code = r.URL.Query().Get("code")
+					require.NotEmpty(t, code)
+					w.Write([]byte(r.URL.Query().Get("code")))
+				}
+			},
+		},
+		{
+			d:                         "should fail because consent strategy fails",
+			authURL:                   oauthConfig.AuthCodeURL("some-foo-state"),
+			expectOAuthAuthError:      true,
+			shouldPassConsentStrategy: false,
+			cb: func(t *testing.T) httprouter.Handle {
+				return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+					require.Empty(t, r.URL.Query().Get("code"))
+					assert.Equal(t, fosite.ErrRequestForbidden.Error(), r.URL.Query().Get("error"))
+				}
+			},
+		},
+	} {
+		t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
+			if tc.cb == nil {
+				tc.cb = noopHandler
 			}
 
-			var testSuccess = func(response *http.Response) {
-				defer resp.Body.Close()
+			consentStrategy.deny = !tc.shouldPassConsentStrategy
+			consentStrategy.authTime = tc.authTime
+			consentStrategy.requestTime = tc.requestTime
 
-				require.Equal(t, http.StatusOK, resp.StatusCode)
+			cb := tc.cb(t)
+			callbackHandler = &cb
 
-				var claims map[string]interface{}
-				require.NoError(t, json.NewDecoder(resp.Body).Decode(&claims))
-				assert.Equal(t, "foo", claims["sub"])
+			req, err := http.NewRequest("GET", tc.authURL, nil)
+			require.NoError(t, err)
+
+			resp, err := (&http.Client{Jar: newCookieJar()}).Do(req)
+			require.NoError(t, err)
+			defer resp.Body.Close()
+
+			if tc.expectOAuthAuthError {
+				return
 			}
 
-			req, err = http.NewRequest("GET", ts.URL+"/userinfo", nil)
-			req.Header.Add("Authorization", "bearer "+token.AccessToken)
-			testSuccess(makeRequest(req))
+			require.NotEmpty(t, code)
 
-			req, err = http.NewRequest("POST", ts.URL+"/userinfo", nil)
-			req.Header.Add("Authorization", "bearer "+token.AccessToken)
-			testSuccess(makeRequest(req))
-
-			req, err = http.NewRequest("POST", ts.URL+"/userinfo", bytes.NewBuffer([]byte("access_token="+token.AccessToken)))
-			req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-			testSuccess(makeRequest(req))
-
-			req, err = http.NewRequest("GET", ts.URL+"/userinfo", nil)
-			req.Header.Add("Authorization", "bearer asdfg")
-			resp := makeRequest(req)
-			require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
-		})
-
-		time.Sleep(time.Second * 5)
-
-		res, err := testRefresh(t, token)
-		require.NoError(t, err)
-		assert.Equal(t, http.StatusOK, res.StatusCode)
-
-		t.Run("duplicate code exchange fails", func(t *testing.T) {
 			token, err := oauthConfig.Exchange(oauth2.NoContext, code)
-			require.Error(t, err)
-			require.Nil(t, token)
+
+			if tc.expectOAuthTokenError {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err, code)
+
+			t.Run("case=userinfo", func(t *testing.T) {
+
+				var makeRequest = func(req *http.Request) *http.Response {
+					resp, err = http.DefaultClient.Do(req)
+					require.NoError(t, err)
+					return resp
+				}
+
+				var testSuccess = func(response *http.Response) {
+					defer resp.Body.Close()
+
+					require.Equal(t, http.StatusOK, resp.StatusCode)
+
+					var claims map[string]interface{}
+					require.NoError(t, json.NewDecoder(resp.Body).Decode(&claims))
+					assert.Equal(t, "foo", claims["sub"])
+				}
+
+				req, err = http.NewRequest("GET", ts.URL+"/userinfo", nil)
+				req.Header.Add("Authorization", "bearer "+token.AccessToken)
+				testSuccess(makeRequest(req))
+
+				req, err = http.NewRequest("POST", ts.URL+"/userinfo", nil)
+				req.Header.Add("Authorization", "bearer "+token.AccessToken)
+				testSuccess(makeRequest(req))
+
+				req, err = http.NewRequest("POST", ts.URL+"/userinfo", bytes.NewBuffer([]byte("access_token="+token.AccessToken)))
+				req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+				testSuccess(makeRequest(req))
+
+				req, err = http.NewRequest("GET", ts.URL+"/userinfo", nil)
+				req.Header.Add("Authorization", "bearer asdfg")
+				resp := makeRequest(req)
+				require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
+			})
+
+			res, err := testRefresh(t, token)
+			require.NoError(t, err)
+			assert.Equal(t, http.StatusOK, res.StatusCode)
+
+			t.Run("duplicate code exchange fails", func(t *testing.T) {
+				token, err := oauthConfig.Exchange(oauth2.NoContext, code)
+				require.Error(t, err)
+				require.Nil(t, token)
+			})
+
+			code = ""
 		})
-	})
-
-	t.Run("case=test deny consent request", func(t *testing.T) {
-		consentStrategy.deny = true
-
-		callbackHandler = func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-			t.Logf("GOT URL: %s", r.URL.String())
-
-			assert.Equal(t, "The request is not allowed", r.URL.Query().Get("error_description"))
-			assert.Equal(t, "request_forbidden", r.URL.Query().Get("error"))
-			w.WriteHeader(http.StatusNoContent)
-		}
-
-		cookieJar, _ := cookiejar.New(nil)
-		req, err := http.NewRequest("GET", oauthConfig.AuthCodeURL("some-foo-state"), nil)
-		require.NoError(t, err)
-
-		resp, err := (&http.Client{Jar: cookieJar}).Do(req)
-		require.NoError(t, err)
-		defer resp.Body.Close()
-
-		assert.Equal(t, http.StatusNoContent, resp.StatusCode)
-
-		consentStrategy.deny = false
-	})
+	}
 }
 
 func testRefresh(t *testing.T, token *oauth2.Token) (*http.Response, error) {

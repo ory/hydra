@@ -24,4 +24,4 @@ Keep in mind that this is just a template, feel free to adapt it to your needs. 
 
 **What is the expected behavior?**
 
-**Which version of the software is affected?
+**Which version of the software is affected?**

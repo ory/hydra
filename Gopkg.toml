@@ -75,7 +75,7 @@
 
 [[constraint]]
   name = "github.com/ory/fosite"
-  version = "0.18.1"
+  version = "0.19.0"
 
 [[constraint]]
   name = "github.com/ory/graceful"

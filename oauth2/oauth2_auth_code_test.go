@@ -28,6 +28,7 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -65,6 +66,7 @@ func TestAuthCodeSuite(t *testing.T) {
 	router.GET("/callback", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		(*callbackHandler)(w, r, ps)
 	})
+	m := sync.Mutex{}
 
 	var code string
 	for k, tc := range []struct {
@@ -108,7 +110,7 @@ func TestAuthCodeSuite(t *testing.T) {
 		{
 			d:                         "should pass because prompt=none and max_age < auth_time",
 			authURL:                   oauthConfig.AuthCodeURL("some-foo-state") + "&prompt=none&max_age=10",
-			authTime:                  time.Now().UTC().Add(-time.Second),
+			authTime:                  time.Now().UTC().Add(-time.Second * 5),
 			requestTime:               time.Now().UTC(),
 			shouldPassConsentStrategy: true,
 			cb: func(t *testing.T) httprouter.Handle {
@@ -122,7 +124,7 @@ func TestAuthCodeSuite(t *testing.T) {
 		{
 			d:                         "should fail because prompt=none but auth_time suggests recent authentication",
 			authURL:                   oauthConfig.AuthCodeURL("some-foo-state") + "&prompt=none",
-			authTime:                  time.Now().UTC().Add(time.Second),
+			authTime:                  time.Now().UTC().Add(time.Minute),
 			requestTime:               time.Now().UTC(),
 			shouldPassConsentStrategy: true,
 			cb: func(t *testing.T) httprouter.Handle {
@@ -149,6 +151,8 @@ func TestAuthCodeSuite(t *testing.T) {
 		},
 	} {
 		t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
+			m.Lock()
+			defer m.Unlock()
 			if tc.cb == nil {
 				tc.cb = noopHandler
 			}

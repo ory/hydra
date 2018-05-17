@@ -87,32 +87,32 @@ var errNoPreviousConsentFound = errors.New("No previous OAuth 2.0 Consent could 
 func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester) error {
 	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
 	if stringslice.Has(prompt, "login") {
-		return s.forwardAuthenticationRequest(w, r, ar, "")
+		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{})
 	}
 
 	// We try to open the session cookie. If it does not exist (indicated by the error), we must authenticate the user.
 	cookie, err := s.CookieStore.Get(r, cookieAuthenticationName)
 	if err != nil {
 		//id.L.WithError(err).Debug("No OAuth2 authentication session was found, performing consent authentication flow")
-		return s.forwardAuthenticationRequest(w, r, ar, "")
+		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{})
 	}
 
 	sessionID := mapx.GetStringDefault(cookie.Values, cookieAuthenticationSIDName, "")
 	if sessionID == "" {
-		return s.forwardAuthenticationRequest(w, r, ar, "")
+		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{})
 	}
 
 	session, err := s.M.GetAuthenticationSession(sessionID)
 	if errors.Cause(err) == pkg.ErrNotFound {
-		return s.forwardAuthenticationRequest(w, r, ar, "")
+		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{})
 	} else if err != nil {
 		return err
 	}
 
-	return s.forwardAuthenticationRequest(w, r, ar, session.Subject)
+	return s.forwardAuthenticationRequest(w, r, ar, session.Subject, session.AuthenticatedAt)
 }
 
-func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, subject string) error {
+func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, subject string, authenticatedAt time.Time) error {
 	skip := false
 	if subject != "" {
 		skip = true
@@ -140,14 +140,15 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 	// Set the session
 	if err := s.M.CreateAuthenticationRequest(
 		&AuthenticationRequest{
-			Challenge:      challenge,
-			Verifier:       verifier,
-			CSRF:           csrf,
-			Skip:           skip,
-			RequestedScope: []string(ar.GetRequestedScopes()),
-			Subject:        subject,
-			Client:         sanitizeClient(ar),
-			RequestURL:     iu.String(),
+			Challenge:       challenge,
+			Verifier:        verifier,
+			CSRF:            csrf,
+			Skip:            skip,
+			RequestedScope:  []string(ar.GetRequestedScopes()),
+			Subject:         subject,
+			Client:          sanitizeClient(ar),
+			RequestURL:      iu.String(),
+			AuthenticatedAt: authenticatedAt,
 			OpenIDConnectContext: &OpenIDConnectContext{
 				ACRValues: stringsx.Splitx(ar.GetRequestForm().Get("acr_values"), " "),
 				UILocales: stringsx.Splitx(ar.GetRequestForm().Get("ui_locales"), " "),
@@ -197,6 +198,24 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return nil, err
 	}
 
+	if session.AuthenticationRequest.Skip && session.Remember {
+		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("The login request is marked as remember, but is also marked as skipped - only one of the values can be true."))
+	}
+
+	if session.AuthenticationRequest.Skip && session.AuthenticationRequest.AuthenticatedAt.IsZero() {
+		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("Login request was skipped but initial authenticatedAt is not set."))
+	} else if !session.AuthenticationRequest.Skip && !session.AuthenticationRequest.AuthenticatedAt.IsZero() {
+		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("Login request was not skipped but initial authenticatedAt is not zero."))
+	}
+
+	if session.AuthenticationRequest.Skip && session.AuthenticationRequest.AuthenticatedAt != session.AuthenticatedAt {
+		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("Login request was skipped but authenticatedAt values mismatch."))
+	} else if !session.AuthenticationRequest.Skip &&
+		!(time.Now().UTC().Add(-time.Minute).Before(session.AuthenticatedAt) &&
+			time.Now().UTC().Add(time.Minute).After(session.AuthenticatedAt)) {
+		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("Login request was handled but authenticatedAt value from session appears to be set incorrectly."))
+	}
+
 	if !session.Remember {
 		return session, nil
 	}
@@ -210,7 +229,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	if err := s.M.CreateAuthenticationSession(&AuthenticationSession{
 		ID:              sid,
 		Subject:         session.Subject,
-		AuthenticatedAt: time.Now().UTC(),
+		AuthenticatedAt: session.AuthenticatedAt,
 	}); err != nil {
 		return nil, err
 	}
@@ -279,14 +298,15 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 
 	if err := s.M.CreateConsentRequest(
 		&ConsentRequest{
-			Challenge:      challenge,
-			Verifier:       verifier,
-			CSRF:           csrf,
-			Skip:           skip,
-			RequestedScope: []string(ar.GetRequestedScopes()),
-			Subject:        as.Subject,
-			Client:         sanitizeClient(ar),
-			RequestURL:     as.AuthenticationRequest.RequestURL,
+			Challenge:       challenge,
+			Verifier:        verifier,
+			CSRF:            csrf,
+			Skip:            skip,
+			RequestedScope:  []string(ar.GetRequestedScopes()),
+			Subject:         as.Subject,
+			Client:          sanitizeClient(ar),
+			RequestURL:      as.AuthenticationRequest.RequestURL,
+			AuthenticatedAt: as.AuthenticatedAt,
 		},
 	); err != nil {
 		return errors.WithStack(err)
@@ -327,9 +347,15 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 		return nil, errors.WithStack(session.Error.toRFCError())
 	}
 
+	if session.ConsentRequest.AuthenticatedAt.IsZero() {
+		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("The authenticatedAt value was not set."))
+	}
+
 	if err := validateCsrfSession(r, s.CookieStore, cookieConsentCSRFName, session.ConsentRequest.CSRF); err != nil {
 		return nil, err
 	}
+
+	session.AuthenticatedAt = session.ConsentRequest.AuthenticatedAt
 
 	return session, nil
 }

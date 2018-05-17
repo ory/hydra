@@ -37,29 +37,31 @@ var migrations = &migrate.MemoryMigrationSource{
 			Id: "1",
 			Up: []string{
 				`CREATE TABLE hydra_oauth2_consent_request (
-	challenge  		varchar(40) NOT NULL PRIMARY KEY,
-	verifier 		varchar(40) NOT NULL,
-	client_id		varchar(255) NOT NULL,
-	subject			varchar(255) NOT NULL,
-	request_url		text NOT NULL,
-	skip			bool NOT NULL,
-	requested_scope	text NOT NULL,
-	csrf			varchar(40) NOT NULL,
-	oidc_context	text NOT NULL
+	challenge  			varchar(40) NOT NULL PRIMARY KEY,
+	verifier 			varchar(40) NOT NULL,
+	client_id			varchar(255) NOT NULL,
+	subject				varchar(255) NOT NULL,
+	request_url			text NOT NULL,
+	skip				bool NOT NULL,
+	requested_scope		text NOT NULL,
+	csrf				varchar(40) NOT NULL,
+	authenticated_at	timestamp NOT NULL DEFAULT now(),
+	oidc_context		text NOT NULL
 )`,
 				// It would probably make sense here to have a FK relation to clients, but it increases testing complexity and might also
 				// purge important audit data when a client is deleted. Also, stale data does not have a negative impact here
 				// 		FOREIGN KEY (client_id) REFERENCES hydra_client (id) ON DELETE CASCADE
 				`CREATE TABLE hydra_oauth2_authentication_request (
-	challenge  		varchar(40) NOT NULL PRIMARY KEY,
-	requested_scope	text NOT NULL,
-	verifier 		varchar(40) NOT NULL,
-	csrf			varchar(40) NOT NULL,
-	subject			varchar(255) NOT NULL,
-	request_url		text NOT NULL,
-	skip			bool NOT NULL,
-	client_id		varchar(255) NOT NULL,
-	oidc_context	text NOT NULL
+	challenge  			varchar(40) NOT NULL PRIMARY KEY,
+	requested_scope		text NOT NULL,
+	verifier 			varchar(40) NOT NULL,
+	csrf				varchar(40) NOT NULL,
+	subject				varchar(255) NOT NULL,
+	request_url			text NOT NULL,
+	skip				bool NOT NULL,
+	client_id			varchar(255) NOT NULL,
+	authenticated_at	timestamp NOT NULL DEFAULT now(),
+	oidc_context		text NOT NULL
 )`,
 				// It would probably make sense here to have a FK relation to clients, but it increases testing complexity and might also
 				// purge important audit data when a client is deleted. Also, stale data does not have a negative impact here
@@ -78,17 +80,19 @@ var migrations = &migrate.MemoryMigrationSource{
 	requested_at  			timestamp NOT NULL DEFAULT now(),
 	session_access_token 	text NOT NULL,
 	session_id_token 		text NOT NULL,
+	authenticated_at		timestamp NOT NULL DEFAULT now(),
 	was_used 				bool NOT NULL
 )`,
 				`CREATE TABLE hydra_oauth2_authentication_request_handled (
-	challenge  		varchar(40) NOT NULL PRIMARY KEY,
-	subject 		varchar(255) NOT NULL,
-	remember		bool NOT NULL,
-	remember_for	int NOT NULL,
-	error			text NOT NULL,
-	acr				text NOT NULL,
-	requested_at  	timestamp NOT NULL DEFAULT now(),
-	was_used 		bool NOT NULL
+	challenge  			varchar(40) NOT NULL PRIMARY KEY,
+	subject 			varchar(255) NOT NULL,
+	remember			bool NOT NULL,
+	remember_for		int NOT NULL,
+	error				text NOT NULL,
+	acr					text NOT NULL,
+	requested_at  		timestamp NOT NULL DEFAULT now(),
+	authenticated_at	timestamp NOT NULL DEFAULT now(),
+	was_used 			bool NOT NULL
 )`,
 			},
 			Down: []string{
@@ -109,6 +113,7 @@ var sqlParamsAuthenticationRequestHandled = []string{
 	"remember_for",
 	"error",
 	"requested_at",
+	"authenticated_at",
 	"acr",
 	"was_used",
 }
@@ -121,6 +126,7 @@ var sqlParamsRequest = []string{
 	"request_url",
 	"skip",
 	"requested_scope",
+	"authenticated_at",
 	"csrf",
 	"oidc_context",
 }
@@ -129,6 +135,7 @@ var sqlParamsConsentRequestHandled = []string{
 	"granted_scope",
 	"remember",
 	"remember_for",
+	"authenticated_at",
 	"error",
 	"requested_at",
 	"session_access_token",
@@ -142,15 +149,32 @@ var sqlParamsAuthSession = []string{
 }
 
 type sqlRequest struct {
-	OpenIDConnectContext string `db:"oidc_context"`
-	Client               string `db:"client_id"`
-	Subject              string `db:"subject"`
-	RequestURL           string `db:"request_url"`
-	Skip                 bool   `db:"skip"`
-	Challenge            string `db:"challenge"`
-	RequestedScope       string `db:"requested_scope"`
-	Verifier             string `db:"verifier"`
-	CSRF                 string `db:"csrf"`
+	OpenIDConnectContext string    `db:"oidc_context"`
+	Client               string    `db:"client_id"`
+	Subject              string    `db:"subject"`
+	RequestURL           string    `db:"request_url"`
+	Skip                 bool      `db:"skip"`
+	Challenge            string    `db:"challenge"`
+	RequestedScope       string    `db:"requested_scope"`
+	Verifier             string    `db:"verifier"`
+	CSRF                 string    `db:"csrf"`
+	AuthenticatedAt      time.Time `db:"authenticated_at"`
+}
+
+// Ugly hack to prevent mySql from going berzerk with: Received unexpected error Error 1292: Incorrect datetime value: '0000-00-00' for column 'authenticated_at' at row 1
+var zeroDate = time.Unix(1, 0).UTC()
+
+func toMySQLDateHack(t time.Time) time.Time {
+	if t.IsZero() {
+		return zeroDate
+	}
+	return t
+}
+func fromMySQLDateHack(t time.Time) time.Time {
+	if t == zeroDate {
+		return time.Time{}
+	}
+	return t
 }
 
 func newSQLConsentRequest(c *ConsentRequest) (*sqlRequest, error) {
@@ -169,6 +193,7 @@ func newSQLConsentRequest(c *ConsentRequest) (*sqlRequest, error) {
 		RequestedScope:       strings.Join(c.RequestedScope, "|"),
 		Verifier:             c.Verifier,
 		CSRF:                 c.CSRF,
+		AuthenticatedAt:      toMySQLDateHack(c.AuthenticatedAt),
 	}, nil
 }
 
@@ -205,6 +230,7 @@ func (s *sqlRequest) toConsentRequest(client *client.Client) (*ConsentRequest, e
 		RequestedScope:       stringsx.Splitx(s.RequestedScope, "|"),
 		Verifier:             s.Verifier,
 		CSRF:                 s.CSRF,
+		AuthenticatedAt:      fromMySQLDateHack(s.AuthenticatedAt),
 	}, nil
 }
 
@@ -218,6 +244,7 @@ type sqlHandledConsentRequest struct {
 	Challenge          string    `db:"challenge"`
 	RequestedAt        time.Time `db:"requested_at"`
 	WasUsed            bool      `db:"was_used"`
+	AuthenticatedAt    time.Time `db:"authenticated_at"`
 }
 
 func newSQLHandledConsentRequest(c *HandledConsentRequest) (*sqlHandledConsentRequest, error) {
@@ -261,6 +288,7 @@ func newSQLHandledConsentRequest(c *HandledConsentRequest) (*sqlHandledConsentRe
 		Challenge:          c.Challenge,
 		RequestedAt:        c.RequestedAt,
 		WasUsed:            c.WasUsed,
+		AuthenticatedAt:    toMySQLDateHack(c.AuthenticatedAt),
 	}, nil
 }
 
@@ -294,20 +322,22 @@ func (s *sqlHandledConsentRequest) toHandledConsentRequest(r *ConsentRequest) (*
 			IDToken:     idt,
 			AccessToken: at,
 		},
-		Error:          e,
-		ConsentRequest: r,
+		Error:           e,
+		ConsentRequest:  r,
+		AuthenticatedAt: fromMySQLDateHack(s.AuthenticatedAt),
 	}, nil
 }
 
 type sqlHandledAuthenticationRequest struct {
-	Remember    bool      `db:"remember"`
-	RememberFor int       `db:"remember_for"`
-	ACR         string    `db:"acr"`
-	Subject     string    `db:"subject"`
-	Error       string    `db:"error"`
-	Challenge   string    `db:"challenge"`
-	RequestedAt time.Time `db:"requested_at"`
-	WasUsed     bool      `db:"was_used"`
+	Remember        bool      `db:"remember"`
+	RememberFor     int       `db:"remember_for"`
+	ACR             string    `db:"acr"`
+	Subject         string    `db:"subject"`
+	Error           string    `db:"error"`
+	Challenge       string    `db:"challenge"`
+	RequestedAt     time.Time `db:"requested_at"`
+	WasUsed         bool      `db:"was_used"`
+	AuthenticatedAt time.Time `db:"authenticated_at"`
 }
 
 func newSQLHandledAuthenticationRequest(c *HandledAuthenticationRequest) (*sqlHandledAuthenticationRequest, error) {
@@ -322,14 +352,15 @@ func newSQLHandledAuthenticationRequest(c *HandledAuthenticationRequest) (*sqlHa
 	}
 
 	return &sqlHandledAuthenticationRequest{
-		ACR:         c.ACR,
-		Subject:     c.Subject,
-		Remember:    c.Remember,
-		RememberFor: c.RememberFor,
-		Error:       e,
-		Challenge:   c.Challenge,
-		RequestedAt: c.RequestedAt,
-		WasUsed:     c.WasUsed,
+		ACR:             c.ACR,
+		Subject:         c.Subject,
+		Remember:        c.Remember,
+		RememberFor:     c.RememberFor,
+		Error:           e,
+		Challenge:       c.Challenge,
+		RequestedAt:     c.RequestedAt,
+		WasUsed:         c.WasUsed,
+		AuthenticatedAt: toMySQLDateHack(c.AuthenticatedAt),
 	}, nil
 }
 
@@ -353,5 +384,6 @@ func (s *sqlHandledAuthenticationRequest) toHandledAuthenticationRequest(a *Auth
 		Error:       e,
 		AuthenticationRequest: a,
 		Subject:               s.Subject,
+		AuthenticatedAt:       fromMySQLDateHack(s.AuthenticatedAt),
 	}, nil
 }

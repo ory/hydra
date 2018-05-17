@@ -22,6 +22,7 @@ package consent
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
@@ -394,6 +395,83 @@ func TestStrategy(t *testing.T) {
 				},
 			},
 		},
+		{
+			d:   "This fail because skip is true and remember as well when doing login",
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
+			jar: persistentCJ,
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					rr, res, err := apiClient.GetLoginRequest(r.URL.Query().Get("login_challenge"))
+					require.NoError(t, err)
+					require.EqualValues(t, http.StatusOK, res.StatusCode)
+					assert.True(t, rr.Skip)
+
+					_, res, err = apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
+						Subject:     "user",
+						Remember:    true,
+						RememberFor: 0,
+						Acr:         "1",
+					})
+					require.NoError(t, err)
+					require.EqualValues(t, http.StatusBadRequest, res.StatusCode)
+
+					w.WriteHeader(http.StatusNoContent)
+				}
+			},
+			expectFinalStatusCode: http.StatusNoContent,
+			expectErrType:         []error{ErrAbortOAuth2Request},
+			expectErr:             []bool{true},
+		},
+		{
+			d:   "This fail because skip is true and remember as well when doing consent",
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
+			jar: persistentCJ,
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					rr, res, err := apiClient.GetLoginRequest(r.URL.Query().Get("login_challenge"))
+					require.NoError(t, err)
+					require.EqualValues(t, http.StatusOK, res.StatusCode)
+					assert.True(t, rr.Skip)
+					assert.Equal(t, "user", rr.Subject)
+
+					v, res, err := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
+						Subject:     "user",
+						Remember:    false,
+						RememberFor: 0,
+						Acr:         "1",
+					})
+					require.NoError(t, err)
+					require.EqualValues(t, http.StatusOK, res.StatusCode)
+					require.NotEmpty(t, v.RedirectTo)
+					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+				}
+			},
+			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					rr, res, err := apiClient.GetConsentRequest(r.URL.Query().Get("consent_challenge"))
+					require.NoError(t, err)
+					require.EqualValues(t, http.StatusOK, res.StatusCode)
+					assert.True(t, rr.Skip)
+
+					_, res, err = apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{
+						GrantScope:  []string{"scope-a"},
+						Remember:    true,
+						RememberFor: 0,
+						Session: swagger.ConsentRequestSession{
+							AccessToken: map[string]interface{}{"foo": "bar"},
+							IdToken:     map[string]interface{}{"bar": "baz"},
+						},
+					})
+					require.NoError(t, err)
+					require.EqualValues(t, http.StatusBadRequest, res.StatusCode)
+
+					w.WriteHeader(http.StatusNoContent)
+				}
+			},
+			expectFinalStatusCode: http.StatusNoContent,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request},
+			expectErr:             []bool{true, true},
+		},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
 			if tc.lph != nil {
@@ -421,7 +499,7 @@ func TestStrategy(t *testing.T) {
 				if tc.expectErr[calls] {
 					assert.Error(t, err)
 					if tc.expectErrType[calls] != nil {
-						assert.EqualError(t, err, tc.expectErrType[calls].Error())
+						assert.EqualError(t, err, tc.expectErrType[calls].Error(), "%+v", err)
 					}
 				} else {
 					require.NoError(t, err)
@@ -453,8 +531,11 @@ func TestStrategy(t *testing.T) {
 					"consent_verifier=" + tc.cv + "&",
 			)
 			require.NoError(t, err)
+			out, err := ioutil.ReadAll(resp.Body)
+			require.NoError(t, err)
 			resp.Body.Close()
-			assert.EqualValues(t, tc.expectFinalStatusCode, resp.StatusCode)
+			assert.EqualValues(t, tc.expectFinalStatusCode, resp.StatusCode, "%s\n%s", resp.Request.URL.String(), out)
+			//assert.Empty(t, resp.Request.URL.String())
 		})
 	}
 }

@@ -33,8 +33,9 @@ import (
 )
 
 type Handler struct {
-	H herodot.Writer
-	M Manager
+	H             herodot.Writer
+	M             Manager
+	RequestMaxAge time.Duration
 }
 
 func NewHandler(
@@ -134,7 +135,8 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	p.Challenge = ps.ByName("challenge")
 	p.RequestedAt = time.Now().UTC()
 
-	if ar, err := h.M.GetAuthenticationRequest(ps.ByName("challenge")); err != nil {
+	ar, err := h.M.GetAuthenticationRequest(ps.ByName("challenge"))
+	if err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	} else if ar.Subject != "" && p.Subject != ar.Subject {
@@ -143,6 +145,12 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	} else if ar.Skip && p.Remember {
 		h.H.WriteErrorCode(w, r, http.StatusBadRequest, errors.New("Can not remember authentication because no user interaction was required"))
 		return
+	}
+
+	if !ar.Skip {
+		p.AuthenticatedAt = time.Now().UTC()
+	} else {
+		p.AuthenticatedAt = ar.AuthenticatedAt
 	}
 
 	request, err := h.M.HandleAuthenticationRequest(ps.ByName("challenge"), &p)

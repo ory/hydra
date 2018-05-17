@@ -54,7 +54,11 @@ var fc = &compose.Config{
 	AccessTokenLifespan: time.Second,
 }
 
-type consentMock struct{ deny bool }
+type consentMock struct {
+	deny        bool
+	authTime    time.Time
+	requestTime time.Time
+}
 
 func (c *consentMock) HandleOAuth2AuthorizationRequest(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester) (*consent.HandledConsentRequest, error) {
 	if c.deny {
@@ -65,11 +69,13 @@ func (c *consentMock) HandleOAuth2AuthorizationRequest(w http.ResponseWriter, r 
 		ConsentRequest: &consent.ConsentRequest{
 			Subject: "foo",
 		},
-		GrantedScope: []string{"offline", "openid", "hydra.*"},
+		AuthenticatedAt: c.authTime,
+		GrantedScope:    []string{"offline", "openid", "hydra.*"},
 		Session: &consent.ConsentRequestSessionData{
 			AccessToken: map[string]interface{}{},
 			IDToken:     map[string]interface{}{},
 		},
+		RequestedAt: c.requestTime,
 	}, nil
 }
 

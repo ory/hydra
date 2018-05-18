@@ -21,6 +21,7 @@
 package consent
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -33,6 +34,7 @@ import (
 	"github.com/ory/go-convenience/stringsx"
 	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/hydra/pkg"
+	"github.com/ory/sqlcon"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 )
@@ -103,7 +105,7 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 	}
 
 	session, err := s.M.GetAuthenticationSession(sessionID)
-	if errors.Cause(err) == pkg.ErrNotFound {
+	if errors.Cause(err) == sqlcon.ErrNoRows {
 		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{})
 	} else if err != nil {
 		return err
@@ -113,6 +115,10 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 }
 
 func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, subject string, authenticatedAt time.Time) error {
+	if (subject != "" && authenticatedAt.IsZero()) ||  (subject == "" && !authenticatedAt.IsZero() ) {
+		return errors.WithStack(fosite.ErrServerError.WithDebug("Consent strategy returned a non-empty subject with an empty auth date, or an empty subject with a non-empty auth date"))
+	}
+
 	skip := false
 	if subject != "" {
 		skip = true
@@ -203,9 +209,9 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	}
 
 	if session.AuthenticationRequest.Skip && session.AuthenticationRequest.AuthenticatedAt.IsZero() {
-		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("Login request was skipped but initial authenticatedAt is not set."))
+		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("An internal error occurred where the login screen was skipped, but an initial authenticated time was not provided."))
 	} else if !session.AuthenticationRequest.Skip && !session.AuthenticationRequest.AuthenticatedAt.IsZero() {
-		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("Login request was not skipped but initial authenticatedAt is not zero."))
+		return nil, errors.WithStack(fosite.ErrServerError.WithDebug(fmt.Sprintf("An internal error occurred where the login screen was handled, but an initial authenticated time (%s) was included as well.", session.AuthenticationRequest.AuthenticatedAt)))
 	}
 
 	if session.AuthenticationRequest.Skip && session.AuthenticationRequest.AuthenticatedAt != session.AuthenticatedAt {

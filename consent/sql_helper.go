@@ -45,7 +45,7 @@ var migrations = &migrate.MemoryMigrationSource{
 	skip				bool NOT NULL,
 	requested_scope		text NOT NULL,
 	csrf				varchar(40) NOT NULL,
-	authenticated_at	timestamp NOT NULL DEFAULT now(),
+	authenticated_at	timestamp NULL,
 	oidc_context		text NOT NULL
 )`,
 				// It would probably make sense here to have a FK relation to clients, but it increases testing complexity and might also
@@ -60,7 +60,7 @@ var migrations = &migrate.MemoryMigrationSource{
 	request_url			text NOT NULL,
 	skip				bool NOT NULL,
 	client_id			varchar(255) NOT NULL,
-	authenticated_at	timestamp NOT NULL DEFAULT now(),
+	authenticated_at	timestamp NULL,
 	oidc_context		text NOT NULL
 )`,
 				// It would probably make sense here to have a FK relation to clients, but it increases testing complexity and might also
@@ -80,7 +80,7 @@ var migrations = &migrate.MemoryMigrationSource{
 	requested_at  			timestamp NOT NULL DEFAULT now(),
 	session_access_token 	text NOT NULL,
 	session_id_token 		text NOT NULL,
-	authenticated_at		timestamp NOT NULL DEFAULT now(),
+	authenticated_at		timestamp NULL,
 	was_used 				bool NOT NULL
 )`,
 				`CREATE TABLE hydra_oauth2_authentication_request_handled (
@@ -91,7 +91,7 @@ var migrations = &migrate.MemoryMigrationSource{
 	error				text NOT NULL,
 	acr					text NOT NULL,
 	requested_at  		timestamp NOT NULL DEFAULT now(),
-	authenticated_at	timestamp NOT NULL DEFAULT now(),
+	authenticated_at		timestamp NULL,
 	was_used 			bool NOT NULL
 )`,
 			},
@@ -158,23 +158,21 @@ type sqlRequest struct {
 	RequestedScope       string    `db:"requested_scope"`
 	Verifier             string    `db:"verifier"`
 	CSRF                 string    `db:"csrf"`
-	AuthenticatedAt      time.Time `db:"authenticated_at"`
+	AuthenticatedAt      *time.Time `db:"authenticated_at"`
 }
 
-// Ugly hack to prevent mySql from going berzerk with: Received unexpected error Error 1292: Incorrect datetime value: '0000-00-00' for column 'authenticated_at' at row 1
-var zeroDate = time.Unix(1, 0).UTC()
-
-func toMySQLDateHack(t time.Time) time.Time {
+func toMySQLDateHack(t time.Time) *time.Time {
 	if t.IsZero() {
-		return zeroDate
+		return nil
 	}
-	return t
+	return &t
 }
-func fromMySQLDateHack(t time.Time) time.Time {
-	if t == zeroDate {
+
+func fromMySQLDateHack(t *time.Time) time.Time {
+	if t == nil {
 		return time.Time{}
 	}
-	return t
+	return *t
 }
 
 func newSQLConsentRequest(c *ConsentRequest) (*sqlRequest, error) {
@@ -244,7 +242,7 @@ type sqlHandledConsentRequest struct {
 	Challenge          string    `db:"challenge"`
 	RequestedAt        time.Time `db:"requested_at"`
 	WasUsed            bool      `db:"was_used"`
-	AuthenticatedAt    time.Time `db:"authenticated_at"`
+	AuthenticatedAt    *time.Time `db:"authenticated_at"`
 }
 
 func newSQLHandledConsentRequest(c *HandledConsentRequest) (*sqlHandledConsentRequest, error) {
@@ -337,7 +335,7 @@ type sqlHandledAuthenticationRequest struct {
 	Challenge       string    `db:"challenge"`
 	RequestedAt     time.Time `db:"requested_at"`
 	WasUsed         bool      `db:"was_used"`
-	AuthenticatedAt time.Time `db:"authenticated_at"`
+	AuthenticatedAt *time.Time `db:"authenticated_at"`
 }
 
 func newSQLHandledAuthenticationRequest(c *HandledAuthenticationRequest) (*sqlHandledAuthenticationRequest, error) {

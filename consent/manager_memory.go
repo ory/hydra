@@ -58,6 +58,9 @@ func NewMemoryManager() *MemoryManager {
 func (m *MemoryManager) CreateConsentRequest(c *ConsentRequest) error {
 	m.m["consentRequests"].Lock()
 	defer m.m["consentRequests"].Unlock()
+	if _, ok := m.consentRequests[c.Challenge]; ok {
+		return errors.New("Key already exists")
+	}
 	m.consentRequests[c.Challenge] = *c
 	return nil
 }
@@ -157,6 +160,9 @@ func (m *MemoryManager) GetAuthenticationSession(id string) (*AuthenticationSess
 func (m *MemoryManager) CreateAuthenticationSession(a *AuthenticationSession) error {
 	m.m["authSessions"].Lock()
 	defer m.m["authSessions"].Unlock()
+	if _, ok := m.authSessions[a.ID]; ok {
+		return errors.New("Key already exists")
+	}
 	m.authSessions[a.ID] = *a
 	return nil
 }
@@ -171,6 +177,9 @@ func (m *MemoryManager) DeleteAuthenticationSession(id string) error {
 func (m *MemoryManager) CreateAuthenticationRequest(a *AuthenticationRequest) error {
 	m.m["authRequests"].Lock()
 	defer m.m["authRequests"].Unlock()
+	if _, ok := m.authRequests[a.Challenge]; ok {
+		return errors.New("Key already exists")
+	}
 	m.authRequests[a.Challenge] = *a
 	return nil
 }

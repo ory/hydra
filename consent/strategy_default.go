@@ -24,11 +24,14 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
+	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"
 	"github.com/ory/fosite"
+	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/go-convenience/mapx"
 	"github.com/ory/go-convenience/stringslice"
 	"github.com/ory/go-convenience/stringsx"
@@ -57,6 +60,7 @@ type DefaultStrategy struct {
 	ScopeStrategy     fosite.ScopeStrategy
 	RunsHTTPS         bool
 	RequestMaxAge     time.Duration
+	JWTStrategy       jwt.JWTStrategy
 }
 
 func NewStrategy(
@@ -69,6 +73,7 @@ func NewStrategy(
 	scopeStrategy fosite.ScopeStrategy,
 	runsHTTPS bool,
 	requestMaxAge time.Duration,
+	jwtStrategy jwt.JWTStrategy,
 ) *DefaultStrategy {
 	return &DefaultStrategy{
 		AuthenticationURL: authenticationURL,
@@ -80,6 +85,7 @@ func NewStrategy(
 		ScopeStrategy:     scopeStrategy,
 		RunsHTTPS:         runsHTTPS,
 		RequestMaxAge:     requestMaxAge,
+		JWTStrategy:jwtStrategy,
 	}
 }
 
@@ -111,11 +117,49 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 		return err
 	}
 
-	return s.forwardAuthenticationRequest(w, r, ar, session.Subject, session.AuthenticatedAt)
+	maxAge := int64(0)
+	if ma := ar.GetRequestForm().Get("max_age"); len(ma) > 0 {
+		var err error
+		maxAge, err = strconv.ParseInt(ma, 10, 64)
+		if err != nil {
+			return err
+		}
+	}
+
+	if maxAge > 0 && session.AuthenticatedAt.UTC().Add(time.Second * time.Duration(maxAge)).Before(time.Now().UTC()) {
+		if stringslice.Has(prompt, "none") {
+			return errors.WithStack(fosite.ErrLoginRequired.WithDebug("Request failed because prompt is set to \"none\" and authentication time reached max_age"))
+		}
+		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{})
+	}
+
+	idTokenHint := ar.GetRequestForm().Get("id_token_hint")
+	if idTokenHint == "" {
+		return s.forwardAuthenticationRequest(w, r, ar, session.Subject, session.AuthenticatedAt)
+	}
+
+	token, err := s.JWTStrategy.Decode(idTokenHint)
+	if err != nil {
+		return err
+	}
+
+	if hintClaims, ok := token.Claims.(jwtgo.MapClaims); !ok {
+		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Failed to validate OpenID Connect request as decoding id token from id_token_hint to *jwt.StandardClaims failed"))
+	} else if hintSub, _ := hintClaims["sub"].(string); hintSub == "" {
+		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Failed to validate OpenID Connect request because provided id token from id_token_hint does not have a subject"))
+	} else if hintSub != session.Subject {
+		if stringslice.Has(prompt, "none") {
+			return errors.WithStack(fosite.ErrLoginRequired.WithDebug("Request failed because prompt is set to \"none\" and subject claim from id_token_hint does not match subject from authentication session"))
+		}
+
+		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{})
+	} else {
+		return s.forwardAuthenticationRequest(w, r, ar, session.Subject, session.AuthenticatedAt)
+	}
 }
 
 func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, subject string, authenticatedAt time.Time) error {
-	if (subject != "" && authenticatedAt.IsZero()) ||  (subject == "" && !authenticatedAt.IsZero() ) {
+	if (subject != "" && authenticatedAt.IsZero()) || (subject == "" && !authenticatedAt.IsZero()) {
 		return errors.WithStack(fosite.ErrServerError.WithDebug("Consent strategy returned a non-empty subject with an empty auth date, or an empty subject with a non-empty auth date"))
 	}
 
@@ -155,6 +199,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 			Client:          sanitizeClient(ar),
 			RequestURL:      iu.String(),
 			AuthenticatedAt: authenticatedAt,
+			RequestedAt:     time.Now().UTC(),
 			OpenIDConnectContext: &OpenIDConnectContext{
 				ACRValues: stringsx.Splitx(ar.GetRequestForm().Get("acr_values"), " "),
 				UILocales: stringsx.Splitx(ar.GetRequestForm().Get("ui_locales"), " "),
@@ -313,6 +358,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 			Client:          sanitizeClient(ar),
 			RequestURL:      as.AuthenticationRequest.RequestURL,
 			AuthenticatedAt: as.AuthenticatedAt,
+			RequestedAt:     as.RequestedAt,
 		},
 	); err != nil {
 		return errors.WithStack(err)

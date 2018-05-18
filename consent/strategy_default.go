@@ -85,7 +85,7 @@ func NewStrategy(
 		ScopeStrategy:     scopeStrategy,
 		RunsHTTPS:         runsHTTPS,
 		RequestMaxAge:     requestMaxAge,
-		JWTStrategy:jwtStrategy,
+		JWTStrategy:       jwtStrategy,
 	}
 }
 
@@ -126,7 +126,7 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 		}
 	}
 
-	if maxAge > 0 && session.AuthenticatedAt.UTC().Add(time.Second * time.Duration(maxAge)).Before(time.Now().UTC()) {
+	if maxAge > 0 && session.AuthenticatedAt.UTC().Add(time.Second*time.Duration(maxAge)).Before(time.Now().UTC()) {
 		if stringslice.Has(prompt, "none") {
 			return errors.WithStack(fosite.ErrLoginRequired.WithDebug("Request failed because prompt is set to \"none\" and authentication time reached max_age"))
 		}
@@ -272,10 +272,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	}
 
 	cookie, _ := s.CookieStore.Get(r, cookieAuthenticationName)
-	sid, err := mapx.GetString(cookie.Values, cookieAuthenticationSIDName)
-	if err != nil {
-		sid = uuid.New()
-	}
+	sid := uuid.New()
 
 	if err := s.M.CreateAuthenticationSession(&AuthenticationSession{
 		ID:              sid,

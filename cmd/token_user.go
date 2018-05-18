@@ -27,6 +27,8 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/julienschmidt/httprouter"
@@ -54,6 +56,8 @@ var tokenUserCmd = &cobra.Command{
 
 		port, _ := cmd.Flags().GetInt("port")
 		scopes, _ := cmd.Flags().GetStringSlice("scope")
+		prompt, _ := cmd.Flags().GetStringSlice("prompt")
+		maxAge, _ := cmd.Flags().GetInt("max-age")
 		redirectUrl, _ := cmd.Flags().GetString("redirect")
 		backend, _ := cmd.Flags().GetString("token-url")
 		frontend, _ := cmd.Flags().GetString("auth-url")
@@ -99,7 +103,7 @@ var tokenUserCmd = &cobra.Command{
 		nonce, err := sequence.RuneSequence(24, sequence.AlphaLower)
 		pkg.Must(err, "Could not generate random state: %s", err)
 
-		authCodeURL := conf.AuthCodeURL(string(state)) + "&nonce=" + string(nonce)
+		authCodeURL := conf.AuthCodeURL(string(state)) + "&nonce=" + string(nonce) + "&prompt=" + strings.Join(prompt, "+") + "&max_age=" + strconv.Itoa(maxAge)
 
 		if ok, _ := cmd.Flags().GetBool("no-open"); !ok {
 			webbrowser.Open(serverLocation)
@@ -188,6 +192,8 @@ func init() {
 	tokenUserCmd.Flags().Bool("no-open", false, "Do not open the browser window automatically")
 	tokenUserCmd.Flags().IntP("port", "p", 4445, "The port on which the server should run")
 	tokenUserCmd.Flags().StringSlice("scope", []string{"offline", "openid"}, "Request OAuth2 scope")
+	tokenUserCmd.Flags().StringSlice("prompt", []string{}, "Set the OpenID Connect prompt parameter")
+	tokenUserCmd.Flags().Int("max-age", 0, "Set the OpenID Connect max_age parameter")
 
 	tokenUserCmd.Flags().String("client-id", os.Getenv("OAUTH2_CLIENT_ID"), "Use the provided OAuth 2.0 Client ID, defaults to environment variable OAUTH2_CLIENT_ID")
 	tokenUserCmd.Flags().String("client-secret", os.Getenv("OAUTH2_CLIENT_SECRET"), "Use the provided OAuth 2.0 Client Secret, defaults to environment variable OAUTH2_CLIENT_SECRET")

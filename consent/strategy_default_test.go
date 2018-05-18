@@ -21,6 +21,8 @@
 package consent
 
 import (
+	"crypto/rand"
+	"crypto/rsa"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -32,6 +34,7 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
+	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/sdk/go/hydra/swagger"
@@ -40,11 +43,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func mustRSAKey() *rsa.PrivateKey {
+	key, err := rsa.GenerateKey(rand.Reader, 1024)
+	if err != nil {
+		panic(err)
+	}
+	return key
+}
+
 func mockProvider(h *func(w http.ResponseWriter, r *http.Request)) *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		(*h)(w, r)
 	}))
-
 }
 
 func noopHandler(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -80,6 +90,9 @@ func TestStrategy(t *testing.T) {
 		fosite.ExactScopeStrategy,
 		false,
 		time.Hour,
+		&jwt.RS256JWTStrategy{
+			PrivateKey: mustRSAKey(),
+		},
 	)
 	_ = swagger.NewOAuth2ApiWithBasePath(api.URL)
 	apiClient := swagger.NewOAuth2ApiWithBasePath(api.URL)
@@ -201,10 +214,10 @@ func TestStrategy(t *testing.T) {
 			expectErr:             []bool{true, true},
 		},
 		{
-			d:   "This should fail because consent verifier was set but does not exist",
-			jar: newCookieJar(),
-			cv:  "invalid",
-			req: fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
+			d:                     "This should fail because consent verifier was set but does not exist",
+			jar:                   newCookieJar(),
+			cv:                    "invalid",
+			req:                   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
 			expectFinalStatusCode: http.StatusForbidden,
 			expectErrType:         []error{fosite.ErrAccessDenied},
 			expectErr:             []bool{true},
@@ -234,11 +247,11 @@ func TestStrategy(t *testing.T) {
 			expectErr:             []bool{true, true, true},
 		},
 		{
-			d:   "This should pass because login and consent have been granted",
-			req: fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
-			jar: newCookieJar(),
-			lph: passAuthentication(apiClient, false),
-			cph: passAuthorization(apiClient, false),
+			d:                     "This should pass because login and consent have been granted",
+			req:                   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
+			jar:                   newCookieJar(),
+			lph:                   passAuthentication(apiClient, false),
+			cph:                   passAuthorization(apiClient, false),
 			expectFinalStatusCode: http.StatusOK,
 			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
 			expectErr:             []bool{true, true, false},
@@ -254,11 +267,11 @@ func TestStrategy(t *testing.T) {
 			},
 		},
 		{
-			d:   "This should pass because login and consent have been granted, this time we remember the decision",
-			req: fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
-			jar: persistentCJ,
-			lph: passAuthentication(apiClient, true),
-			cph: passAuthorization(apiClient, true),
+			d:                     "This should pass because login and consent have been granted, this time we remember the decision",
+			req:                   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
+			jar:                   persistentCJ,
+			lph:                   passAuthentication(apiClient, true),
+			cph:                   passAuthorization(apiClient, true),
 			expectFinalStatusCode: http.StatusOK,
 			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
 			expectErr:             []bool{true, true, false},
@@ -475,10 +488,10 @@ func TestStrategy(t *testing.T) {
 			expectErr:             []bool{true, true},
 		},
 		{
-			d:      "This should fail because prompt is none but no auth session exists",
-			prompt: "none",
-			req:    fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
-			jar:    newCookieJar(),
+			d:                     "This should fail because prompt is none but no auth session exists",
+			prompt:                "none",
+			req:                   fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
+			jar:                   newCookieJar(),
 			expectFinalStatusCode: http.StatusBadRequest,
 			expectErrType:         []error{fosite.ErrLoginRequired},
 			expectErr:             []bool{true},

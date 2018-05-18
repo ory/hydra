@@ -482,7 +482,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 				IssuedAt:    time.Now().UTC(),
 				ExpiresAt:   time.Now().Add(h.IDTokenLifespan).UTC(),
 				AuthTime:    session.AuthenticatedAt,
-				RequestedAt: time.Now().UTC(),
+				RequestedAt: session.RequestedAt,
 				Extra:       session.Session.IDToken,
 			},
 			// required for lookup on jwk endpoint

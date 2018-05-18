@@ -204,6 +204,7 @@ type AuthenticationRequest struct {
 	Verifier        string    `json:"-"`
 	CSRF            string    `json:"-"`
 	AuthenticatedAt time.Time `json:"-"`
+	RequestedAt     time.Time `json:"-"`
 }
 
 // Contains information on an ongoing consent request.
@@ -241,6 +242,7 @@ type ConsentRequest struct {
 	Verifier        string    `json:"-"`
 	CSRF            string    `json:"-"`
 	AuthenticatedAt time.Time `json:"-"`
+	RequestedAt     time.Time `json:"-"`
 }
 
 // Used to pass session data to a consent request.

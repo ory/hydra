@@ -70,6 +70,7 @@ func TestAuthCodeSuite(t *testing.T) {
 
 	var code string
 	for k, tc := range []struct {
+		cj                        http.CookieJar
 		d                         string
 		cb                        func(t *testing.T) httprouter.Handle
 		authURL                   string
@@ -149,6 +150,50 @@ func TestAuthCodeSuite(t *testing.T) {
 				}
 			},
 		},
+		{
+			d:                         "should pass with prompt=login when authentication time is recent",
+			authURL:                   oauthConfig.AuthCodeURL("some-foo-state") + "&prompt=login",
+			authTime:                  time.Now().UTC().Add(-time.Second),
+			requestTime:               time.Now().UTC().Add(-time.Minute),
+			shouldPassConsentStrategy: true,
+			cb: func(t *testing.T) httprouter.Handle {
+				return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+					code = r.URL.Query().Get("code")
+					require.NotEmpty(t, code)
+					w.Write([]byte(r.URL.Query().Get("code")))
+				}
+			},
+		},
+		{
+			d:                         "should fail with prompt=login when authentication time is in the past",
+			authURL:                   oauthConfig.AuthCodeURL("some-foo-state") + "&prompt=login",
+			authTime:                  time.Now().UTC().Add(-time.Minute),
+			requestTime:               time.Now().UTC(),
+			expectOAuthAuthError:      true,
+			shouldPassConsentStrategy: true,
+			cb: func(t *testing.T) httprouter.Handle {
+				return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+					code = r.URL.Query().Get("code")
+					require.Empty(t, code)
+					assert.Equal(t, fosite.ErrLoginRequired.Error(), r.URL.Query().Get("error"))
+				}
+			},
+		},
+		{
+			d:                         "should fail with prompt=login when authentication time is in the future",
+			authURL:                   oauthConfig.AuthCodeURL("some-foo-state") + "&prompt=login",
+			authTime:                  time.Now().UTC().Add(time.Minute),
+			requestTime:               time.Now().UTC(),
+			expectOAuthAuthError:      false,
+			expectOAuthTokenError:     true,
+			shouldPassConsentStrategy: true,
+			cb: func(t *testing.T) httprouter.Handle {
+				return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+					code = r.URL.Query().Get("code")
+					require.NotEmpty(t, code)
+				}
+			},
+		},
 	} {
 		t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
 			m.Lock()
@@ -167,11 +212,16 @@ func TestAuthCodeSuite(t *testing.T) {
 			req, err := http.NewRequest("GET", tc.authURL, nil)
 			require.NoError(t, err)
 
-			resp, err := (&http.Client{Jar: newCookieJar()}).Do(req)
+			if tc.cj == nil {
+				tc.cj = newCookieJar()
+			}
+
+			resp, err := (&http.Client{Jar: tc.cj}).Do(req)
 			require.NoError(t, err)
 			defer resp.Body.Close()
 
 			if tc.expectOAuthAuthError {
+				require.Empty(t, code)
 				return
 			}
 

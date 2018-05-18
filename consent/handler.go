@@ -133,8 +133,6 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	}
 
 	p.Challenge = ps.ByName("challenge")
-	p.RequestedAt = time.Now().UTC()
-
 	ar, err := h.M.GetAuthenticationRequest(ps.ByName("challenge"))
 	if err != nil {
 		h.H.WriteError(w, r, err)
@@ -152,6 +150,7 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	} else {
 		p.AuthenticatedAt = ar.AuthenticatedAt
 	}
+	p.RequestedAt = ar.RequestedAt
 
 	request, err := h.M.HandleAuthenticationRequest(ps.ByName("challenge"), &p)
 	if err != nil {
@@ -208,10 +207,16 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
+	ar, err := h.M.GetAuthenticationRequest(ps.ByName("challenge"))
+	if err != nil {
+		h.H.WriteError(w, r, err)
+		return
+	}
+
 	request, err := h.M.HandleAuthenticationRequest(ps.ByName("challenge"), &HandledAuthenticationRequest{
 		Error:       &p,
 		Challenge:   ps.ByName("challenge"),
-		RequestedAt: time.Now().UTC(),
+		RequestedAt: ar.RequestedAt,
 	})
 	if err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
@@ -308,8 +313,15 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 		return
 	}
 
+	cr, err := h.M.GetConsentRequest(ps.ByName("challenge"))
+	if err != nil {
+		h.H.WriteError(w, r, errors.WithStack(err))
+		return
+	}
+
 	p.Challenge = ps.ByName("challenge")
-	p.RequestedAt = time.Now().UTC()
+	p.RequestedAt = cr.RequestedAt
+
 	hr, err := h.M.HandleConsentRequest(ps.ByName("challenge"), &p)
 	if err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
@@ -371,10 +383,16 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 		return
 	}
 
+	hr, err := h.M.GetConsentRequest(ps.ByName("challenge"))
+	if err != nil {
+		h.H.WriteError(w, r, errors.WithStack(err))
+		return
+	}
+
 	request, err := h.M.HandleConsentRequest(ps.ByName("challenge"), &HandledConsentRequest{
 		Error:       &p,
 		Challenge:   ps.ByName("challenge"),
-		RequestedAt: time.Now().UTC(),
+		RequestedAt: hr.RequestedAt,
 	})
 	if err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))

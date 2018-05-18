@@ -105,7 +105,9 @@ func (m *MemoryManager) FindPreviouslyGrantedConsentRequests(client string, subj
 	var rs []HandledConsentRequest
 	for _, c := range m.handledConsentRequests {
 		cr, err := m.GetConsentRequest(c.Challenge)
-		if err != nil {
+		if errors.Cause(err) == pkg.ErrNotFound {
+			return nil, errors.WithStack(errNoPreviousConsentFound)
+		} else if err != nil {
 			return nil, err
 		}
 

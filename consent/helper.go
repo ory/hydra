@@ -23,6 +23,8 @@ package consent
 import (
 	"net/http"
 
+	"fmt"
+
 	"github.com/gorilla/sessions"
 	"github.com/ory/fosite"
 	"github.com/ory/go-convenience/mapx"
@@ -63,6 +65,7 @@ func createCsrfSession(w http.ResponseWriter, r *http.Request, store sessions.St
 	session.Values["csrf"] = csrf
 	session.Options.HttpOnly = true
 	session.Options.Secure = secure
+	fmt.Printf("\n\n\n\nCREATE COOKIE %+v\n\n\n\n", session.Values)
 
 	if err := session.Save(r, w); err != nil {
 		return errors.WithStack(err)
@@ -75,6 +78,7 @@ func validateCsrfSession(r *http.Request, store sessions.Store, name, expectedCS
 	if cookie, err := store.Get(r, name); err != nil {
 		return errors.WithStack(fosite.ErrRequestForbidden.WithDebug("CSRF session cookie could not be decoded"))
 	} else if csrf, err := mapx.GetString(cookie.Values, "csrf"); err != nil {
+		fmt.Printf("\n\n\n\nGOT COOKIE %+v\n\n\n\nHEADER: %+v", cookie.Values, r.Header)
 		return errors.WithStack(fosite.ErrRequestForbidden.WithDebug("No CSRF value available in the session cookie"))
 	} else if csrf != expectedCSRF {
 		return errors.WithStack(fosite.ErrRequestForbidden.WithDebug("The CSRF value from the token does not match the CSRF value from the data store"))

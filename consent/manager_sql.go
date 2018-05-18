@@ -21,6 +21,7 @@
 package consent
 
 import (
+	"database/sql"
 	"fmt"
 	"strings"
 	"time"
@@ -253,6 +254,9 @@ WHERE
 	AND
 		(h.error='{}' AND h.remember=TRUE)
 `), subject, client); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.WithStack(errNoPreviousConsentFound)
+		}
 		return nil, sqlcon.HandleError(err)
 	}
 
@@ -261,6 +265,8 @@ WHERE
 		r, err := m.GetConsentRequest(v.Challenge)
 		if err != nil {
 			return nil, err
+		} else if errors.Cause(err) == sqlcon.ErrNoRows {
+			return nil, errors.WithStack(errNoPreviousConsentFound)
 		}
 
 		if v.RememberFor > 0 && v.RequestedAt.Add(time.Duration(v.RememberFor)*time.Second).Before(time.Now().UTC()) {

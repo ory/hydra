@@ -133,7 +133,7 @@ var tokenUserCmd = &cobra.Command{
 				fmt.Printf("Got error: %s\n", r.URL.Query().Get("error_description"))
 
 				w.WriteHeader(http.StatusInternalServerError)
-				fmt.Fprintf(w, "<html><body><h1>An error occurred</h1><h2>%s</h2><p>%s</p></body></html>", r.URL.Query().Get("error"), r.URL.Query().Get("error_description"))
+				fmt.Fprintf(w, "<html><body><h1>An error occurred</h1><h2>%s</h2><p>%s</p><p>%s</p></body></html>", r.URL.Query().Get("error"), r.URL.Query().Get("error_description"), r.URL.Query().Get("error_debug"))
 				go shutdown()
 				return
 			}

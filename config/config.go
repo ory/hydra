@@ -30,6 +30,8 @@ import (
 	"strings"
 	"time"
 
+	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/token/hmac"

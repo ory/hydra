@@ -26,6 +26,8 @@ import (
 	"testing"
 	"time"
 
+	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/ory/sqlcon/dockertest"

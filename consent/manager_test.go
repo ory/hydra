@@ -35,7 +35,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func mockConsentRequest(key string, remember bool, rememberFor int, hasError bool, skip bool) (c *ConsentRequest, h *HandledConsentRequest) {
+func mockConsentRequest(key string, remember bool, rememberFor int, hasError bool, skip bool, authAt bool) (c *ConsentRequest, h *HandledConsentRequest) {
 	c = &ConsentRequest{
 		OpenIDConnectContext: &OpenIDConnectContext{
 			ACRValues: []string{"1" + key, "2" + key},
@@ -63,20 +63,25 @@ func mockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 		}
 	}
 
+	var authenticatedAt time.Time
+	if authAt {
+		time.Now().UTC().Add(-time.Minute)
+	}
+
 	h = &HandledConsentRequest{
 		ConsentRequest:  c,
 		RememberFor:     rememberFor,
 		Remember:        remember,
 		Challenge:       "challenge" + key,
 		RequestedAt:     time.Now().UTC().Add(-time.Minute),
-		AuthenticatedAt: time.Now().UTC().Add(-time.Minute),
+		AuthenticatedAt: authenticatedAt,
 		Error:           err,
 	}
 
 	return c, h
 }
 
-func mockAuthRequest(key string) (c *AuthenticationRequest, h *HandledAuthenticationRequest) {
+func mockAuthRequest(key string, authAt bool) (c *AuthenticationRequest, h *HandledAuthenticationRequest) {
 	c = &AuthenticationRequest{
 		OpenIDConnectContext: &OpenIDConnectContext{
 			ACRValues: []string{"1" + key, "2" + key},
@@ -101,13 +106,18 @@ func mockAuthRequest(key string) (c *AuthenticationRequest, h *HandledAuthentica
 		Debug:       "error_debug,omitempty" + key,
 	}
 
+	var authenticatedAt time.Time
+	if authAt {
+		time.Now().UTC().Add(-time.Minute)
+	}
+
 	h = &HandledAuthenticationRequest{
 		AuthenticationRequest: c,
 		RememberFor:           120,
 		Remember:              true,
 		Challenge:             "challenge" + key,
 		RequestedAt:           time.Now().UTC().Add(-time.Minute),
-		AuthenticatedAt:       time.Now().UTC().Add(-time.Minute),
+		AuthenticatedAt:       authenticatedAt,
 		Error:                 err,
 		Subject:               c.Subject,
 		ACR:                   "acr",
@@ -238,16 +248,18 @@ func TestManagers(t *testing.T) {
 					rememberFor int
 					hasError    bool
 					skip        bool
+					authAt bool
 				}{
-					{"1", true, 0, false, false},
-					{"2", true, 0, true, false},
-					{"3", true, 1, false, false},
-					{"4", false, 0, false, false},
-					{"5", true, 120, false, false},
-					{"6", true, 120, false, true},
+					{"1", true, 0, false, false, true},
+					{"2", true, 0, true, false, true},
+					{"3", true, 1, false, false, true},
+					{"4", false, 0, false, false, true},
+					{"5", true, 120, false, false, true},
+					{"6", true, 120, false, true, true},
+					{"7", false, 0, false, false, false},
 				} {
 					t.Run("key="+tc.key, func(t *testing.T) {
-						c, h := mockConsentRequest(tc.key, tc.remember, tc.rememberFor, tc.hasError, tc.skip)
+						c, h := mockConsentRequest(tc.key, tc.remember, tc.rememberFor, tc.hasError, tc.skip, tc.authAt)
 						clientManager.CreateClient(c.Client) // Ignore errors that are caused by duplication
 
 						_, err := m.GetConsentRequest("challenge" + tc.key)
@@ -302,15 +314,17 @@ func TestManagers(t *testing.T) {
 			t.Run("manager="+k, func(t *testing.T) {
 				for _, tc := range []struct {
 					key string
+					authAt bool
 				}{
-					{"1"},
-					{"2"},
-					{"3"},
-					{"4"},
-					{"5"},
+					{"1", true},
+					{"2", true},
+					{"3", true},
+					{"4", true},
+					{"5", true},
+					{"6", false},
 				} {
 					t.Run("key="+tc.key, func(t *testing.T) {
-						c, h := mockAuthRequest(tc.key)
+						c, h := mockAuthRequest(tc.key, tc.authAt)
 						clientManager.CreateClient(c.Client) // Ignore errors that are caused by duplication
 
 						_, err := m.GetAuthenticationRequest("challenge" + tc.key)

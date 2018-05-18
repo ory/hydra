@@ -42,6 +42,7 @@ func mockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 			UILocales: []string{"fr" + key, "de" + key},
 			Display:   "popup" + key,
 		},
+		RequestedAt:    time.Now().UTC().Add(-time.Hour),
 		Client:         &client.Client{ID: "client" + key},
 		Subject:        "subject" + key,
 		RequestURL:     "https://request-url/path" + key,
@@ -88,6 +89,7 @@ func mockAuthRequest(key string, authAt bool) (c *AuthenticationRequest, h *Hand
 			UILocales: []string{"fr" + key, "de" + key},
 			Display:   "popup" + key,
 		},
+		RequestedAt:    time.Now().UTC().Add(-time.Hour),
 		Client:         &client.Client{ID: "client" + key},
 		Subject:        "subject" + key,
 		RequestURL:     "https://request-url/path" + key,
@@ -248,7 +250,7 @@ func TestManagers(t *testing.T) {
 					rememberFor int
 					hasError    bool
 					skip        bool
-					authAt bool
+					authAt      bool
 				}{
 					{"1", true, 0, false, false, true},
 					{"2", true, 0, true, false, true},
@@ -313,7 +315,7 @@ func TestManagers(t *testing.T) {
 		for k, m := range managers {
 			t.Run("manager="+k, func(t *testing.T) {
 				for _, tc := range []struct {
-					key string
+					key    string
 					authAt bool
 				}{
 					{"1", true},

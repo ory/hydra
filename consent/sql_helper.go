@@ -46,6 +46,7 @@ var migrations = &migrate.MemoryMigrationSource{
 	requested_scope		text NOT NULL,
 	csrf				varchar(40) NOT NULL,
 	authenticated_at	timestamp NULL,
+	requested_at  		timestamp NOT NULL DEFAULT now(),
 	oidc_context		text NOT NULL
 )`,
 				// It would probably make sense here to have a FK relation to clients, but it increases testing complexity and might also
@@ -60,6 +61,7 @@ var migrations = &migrate.MemoryMigrationSource{
 	request_url			text NOT NULL,
 	skip				bool NOT NULL,
 	client_id			varchar(255) NOT NULL,
+	requested_at  		timestamp NOT NULL DEFAULT now(),
 	authenticated_at	timestamp NULL,
 	oidc_context		text NOT NULL
 )`,
@@ -91,7 +93,7 @@ var migrations = &migrate.MemoryMigrationSource{
 	error				text NOT NULL,
 	acr					text NOT NULL,
 	requested_at  		timestamp NOT NULL DEFAULT now(),
-	authenticated_at		timestamp NULL,
+	authenticated_at	timestamp NULL,
 	was_used 			bool NOT NULL
 )`,
 			},
@@ -127,6 +129,7 @@ var sqlParamsRequest = []string{
 	"skip",
 	"requested_scope",
 	"authenticated_at",
+	"requested_at",
 	"csrf",
 	"oidc_context",
 }
@@ -149,16 +152,17 @@ var sqlParamsAuthSession = []string{
 }
 
 type sqlRequest struct {
-	OpenIDConnectContext string    `db:"oidc_context"`
-	Client               string    `db:"client_id"`
-	Subject              string    `db:"subject"`
-	RequestURL           string    `db:"request_url"`
-	Skip                 bool      `db:"skip"`
-	Challenge            string    `db:"challenge"`
-	RequestedScope       string    `db:"requested_scope"`
-	Verifier             string    `db:"verifier"`
-	CSRF                 string    `db:"csrf"`
+	OpenIDConnectContext string     `db:"oidc_context"`
+	Client               string     `db:"client_id"`
+	Subject              string     `db:"subject"`
+	RequestURL           string     `db:"request_url"`
+	Skip                 bool       `db:"skip"`
+	Challenge            string     `db:"challenge"`
+	RequestedScope       string     `db:"requested_scope"`
+	Verifier             string     `db:"verifier"`
+	CSRF                 string     `db:"csrf"`
 	AuthenticatedAt      *time.Time `db:"authenticated_at"`
+	RequestedAt          time.Time  `db:"requested_at"`
 }
 
 func toMySQLDateHack(t time.Time) *time.Time {
@@ -192,6 +196,7 @@ func newSQLConsentRequest(c *ConsentRequest) (*sqlRequest, error) {
 		Verifier:             c.Verifier,
 		CSRF:                 c.CSRF,
 		AuthenticatedAt:      toMySQLDateHack(c.AuthenticatedAt),
+		RequestedAt:          c.RequestedAt,
 	}, nil
 }
 
@@ -229,19 +234,20 @@ func (s *sqlRequest) toConsentRequest(client *client.Client) (*ConsentRequest, e
 		Verifier:             s.Verifier,
 		CSRF:                 s.CSRF,
 		AuthenticatedAt:      fromMySQLDateHack(s.AuthenticatedAt),
+		RequestedAt:          s.RequestedAt,
 	}, nil
 }
 
 type sqlHandledConsentRequest struct {
-	GrantedScope       string    `db:"granted_scope"`
-	SessionIDToken     string    `db:"session_id_token"`
-	SessionAccessToken string    `db:"session_access_token"`
-	Remember           bool      `db:"remember"`
-	RememberFor        int       `db:"remember_for"`
-	Error              string    `db:"error"`
-	Challenge          string    `db:"challenge"`
-	RequestedAt        time.Time `db:"requested_at"`
-	WasUsed            bool      `db:"was_used"`
+	GrantedScope       string     `db:"granted_scope"`
+	SessionIDToken     string     `db:"session_id_token"`
+	SessionAccessToken string     `db:"session_access_token"`
+	Remember           bool       `db:"remember"`
+	RememberFor        int        `db:"remember_for"`
+	Error              string     `db:"error"`
+	Challenge          string     `db:"challenge"`
+	RequestedAt        time.Time  `db:"requested_at"`
+	WasUsed            bool       `db:"was_used"`
 	AuthenticatedAt    *time.Time `db:"authenticated_at"`
 }
 
@@ -327,14 +333,14 @@ func (s *sqlHandledConsentRequest) toHandledConsentRequest(r *ConsentRequest) (*
 }
 
 type sqlHandledAuthenticationRequest struct {
-	Remember        bool      `db:"remember"`
-	RememberFor     int       `db:"remember_for"`
-	ACR             string    `db:"acr"`
-	Subject         string    `db:"subject"`
-	Error           string    `db:"error"`
-	Challenge       string    `db:"challenge"`
-	RequestedAt     time.Time `db:"requested_at"`
-	WasUsed         bool      `db:"was_used"`
+	Remember        bool       `db:"remember"`
+	RememberFor     int        `db:"remember_for"`
+	ACR             string     `db:"acr"`
+	Subject         string     `db:"subject"`
+	Error           string     `db:"error"`
+	Challenge       string     `db:"challenge"`
+	RequestedAt     time.Time  `db:"requested_at"`
+	WasUsed         bool       `db:"was_used"`
 	AuthenticatedAt *time.Time `db:"authenticated_at"`
 }
 

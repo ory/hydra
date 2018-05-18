@@ -51,7 +51,8 @@ var store = &FositeMemoryStore{
 }
 
 var fc = &compose.Config{
-	AccessTokenLifespan: time.Second,
+	AccessTokenLifespan:        time.Second,
+	SendDebugMessagesToClients: true,
 }
 
 type consentMock struct {
@@ -103,9 +104,7 @@ var handler = &Handler{
 	Consent:         consentStrategy,
 	CookieStore:     sessions.NewCookieStore([]byte("foo-secret")),
 	ForcedHTTP:      true,
-	L:               logrus.New(),
 	ScopeStrategy:   fosite.HierarchicScopeStrategy,
-	H:               herodot.NewJSONWriter(nil),
 	IDTokenLifespan: time.Minute,
 }
 
@@ -118,6 +117,10 @@ func init() {
 	ts = httptest.NewServer(router)
 	handler.Issuer = ts.URL
 
+	l := logrus.New()
+	l.Level = logrus.DebugLevel
+	handler.L = l
+	handler.H = herodot.NewJSONWriter(l)
 	handler.SetRoutes(router)
 
 	h, _ := hasher.Hash([]byte("secret"))

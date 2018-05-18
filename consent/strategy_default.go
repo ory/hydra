@@ -172,7 +172,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 	q.Set("login_challenge", challenge)
 	au.RawQuery = q.Encode()
 
-	http.Redirect(w, r, au.String(), http.StatusTemporaryRedirect)
+	http.Redirect(w, r, au.String(), http.StatusFound)
 
 	// generate the verifier
 	return errors.WithStack(ErrAbortOAuth2Request)
@@ -325,7 +325,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 	q.Set("consent_challenge", challenge)
 	cu.RawQuery = q.Encode()
 
-	http.Redirect(w, r, cu.String(), http.StatusTemporaryRedirect)
+	http.Redirect(w, r, cu.String(), http.StatusFound)
 
 	// generate the verifier
 	return errors.WithStack(ErrAbortOAuth2Request)

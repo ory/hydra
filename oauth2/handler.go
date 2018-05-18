@@ -511,7 +511,7 @@ func (h *Handler) writeAuthorizeError(w http.ResponseWriter, ar fosite.Authorize
 		redirectURI.RawQuery = query.Encode()
 
 		w.Header().Add("Location", redirectURI.String())
-		w.WriteHeader(http.StatusFound)
+		w.WriteHeader(http.StatusTemporaryRedirect)
 		return
 	}
 

@@ -56,6 +56,7 @@ class OpenIDConnectContext implements ArrayAccess
     protected static $swaggerTypes = [
         'acr_values' => 'string[]',
         'display' => 'string',
+        'id_token_hint_claims' => 'map[string,object]',
         'ui_locales' => 'string[]'
     ];
 
@@ -66,6 +67,7 @@ class OpenIDConnectContext implements ArrayAccess
     protected static $swaggerFormats = [
         'acr_values' => null,
         'display' => null,
+        'id_token_hint_claims' => null,
         'ui_locales' => null
     ];
 
@@ -86,6 +88,7 @@ class OpenIDConnectContext implements ArrayAccess
     protected static $attributeMap = [
         'acr_values' => 'acr_values',
         'display' => 'display',
+        'id_token_hint_claims' => 'id_token_hint_claims',
         'ui_locales' => 'ui_locales'
     ];
 
@@ -97,6 +100,7 @@ class OpenIDConnectContext implements ArrayAccess
     protected static $setters = [
         'acr_values' => 'setAcrValues',
         'display' => 'setDisplay',
+        'id_token_hint_claims' => 'setIdTokenHintClaims',
         'ui_locales' => 'setUiLocales'
     ];
 
@@ -108,6 +112,7 @@ class OpenIDConnectContext implements ArrayAccess
     protected static $getters = [
         'acr_values' => 'getAcrValues',
         'display' => 'getDisplay',
+        'id_token_hint_claims' => 'getIdTokenHintClaims',
         'ui_locales' => 'getUiLocales'
     ];
 
@@ -144,6 +149,7 @@ class OpenIDConnectContext implements ArrayAccess
     {
         $this->container['acr_values'] = isset($data['acr_values']) ? $data['acr_values'] : null;
         $this->container['display'] = isset($data['display']) ? $data['display'] : null;
+        $this->container['id_token_hint_claims'] = isset($data['id_token_hint_claims']) ? $data['id_token_hint_claims'] : null;
         $this->container['ui_locales'] = isset($data['ui_locales']) ? $data['ui_locales'] : null;
     }
 
@@ -210,6 +216,27 @@ class OpenIDConnectContext implements ArrayAccess
     public function setDisplay($display)
     {
         $this->container['display'] = $display;
+
+        return $this;
+    }
+
+    /**
+     * Gets id_token_hint_claims
+     * @return map[string,object]
+     */
+    public function getIdTokenHintClaims()
+    {
+        return $this->container['id_token_hint_claims'];
+    }
+
+    /**
+     * Sets id_token_hint_claims
+     * @param map[string,object] $id_token_hint_claims IDTokenHintClaims are the claims of the ID Token previously issued by the Authorization Server being passed as a hint about the End-User's current or past authenticated session with the Client.
+     * @return $this
+     */
+    public function setIdTokenHintClaims($id_token_hint_claims)
+    {
+        $this->container['id_token_hint_claims'] = $id_token_hint_claims;
 
         return $this;
     }

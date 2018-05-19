@@ -173,10 +173,10 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ htt
 	}
 
 	h.H.Write(w, r, &WellKnown{
-		Issuer:                            h.Issuer,
-		AuthURL:                           h.Issuer + AuthPath,
-		TokenURL:                          h.Issuer + TokenPath,
-		JWKsURI:                           h.Issuer + JWKPath,
+		Issuer:                            strings.TrimRight(h.Issuer, "/") + "/",
+		AuthURL:                           strings.TrimRight(h.Issuer, "/") + AuthPath,
+		TokenURL:                          strings.TrimRight(h.Issuer, "/") + TokenPath,
+		JWKsURI:                           strings.TrimRight(h.Issuer, "/") + JWKPath,
 		SubjectTypes:                      []string{"pairwise", "public"},
 		ResponseTypes:                     []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
 		ClaimsSupported:                   claimsSupported,

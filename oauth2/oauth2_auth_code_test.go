@@ -532,7 +532,6 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 // - [x] should fail because consent strategy fails
 // - [x] should pass with prompt=login when authentication time is recent
 // - [x] should fail with prompt=login when authentication time is in the past
-// - [x] should fail with prompt=login when authentication time is in the future
 func TestAuthCodeWithMockStrategy(t *testing.T) {
 	consentStrategy := &consentMock{}
 	router := httprouter.New()
@@ -652,8 +651,8 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 		{
 			d:                         "should fail because prompt=none but auth_time suggests recent authentication",
 			authURL:                   oauthConfig.AuthCodeURL("some-foo-state") + "&prompt=none",
-			authTime:                  time.Now().UTC().Add(time.Minute),
-			requestTime:               time.Now().UTC(),
+			authTime:                  time.Now().UTC().Add(-time.Minute),
+			requestTime:               time.Now().UTC().Add(-time.Hour),
 			shouldPassConsentStrategy: true,
 			cb: func(t *testing.T) httprouter.Handle {
 				return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -703,21 +702,6 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 					code = r.URL.Query().Get("code")
 					require.Empty(t, code)
 					assert.Equal(t, fosite.ErrLoginRequired.Error(), r.URL.Query().Get("error"))
-				}
-			},
-		},
-		{
-			d:                         "should fail with prompt=login when authentication time is in the future",
-			authURL:                   oauthConfig.AuthCodeURL("some-foo-state") + "&prompt=login",
-			authTime:                  time.Now().UTC().Add(time.Minute),
-			requestTime:               time.Now().UTC(),
-			expectOAuthAuthError:      false,
-			expectOAuthTokenError:     true,
-			shouldPassConsentStrategy: true,
-			cb: func(t *testing.T) httprouter.Handle {
-				return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-					code = r.URL.Query().Get("code")
-					require.NotEmpty(t, code)
 				}
 			},
 		},

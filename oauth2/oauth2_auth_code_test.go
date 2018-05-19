@@ -122,7 +122,14 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			case "mysql":
 				fallthrough
 			case "postgres":
-				cm = consent.NewSQLManager(databases[km], fs.(*FositeSQLStore).Manager)
+				scm := consent.NewSQLManager(databases[km], fs.(*FositeSQLStore).Manager)
+				_, err := scm.CreateSchemas()
+				require.NoError(t, err)
+
+				_, err = (fs.(*FositeSQLStore)).CreateSchemas()
+				require.NoError(t, err)
+
+				cm = scm
 			}
 
 			router := httprouter.New()

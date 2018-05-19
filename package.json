@@ -16,7 +16,7 @@
     "superagent": "3.5.2"
   },
   "devDependencies": {
-    "prettier": "^1.7.4"
+    "prettier": "^1.12.1"
   },
   "collective": {
     "type": "opencollective",

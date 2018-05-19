@@ -67,6 +67,12 @@
       if (data.hasOwnProperty('display')) {
         obj['display'] = ApiClient.convertToType(data['display'], 'String')
       }
+      if (data.hasOwnProperty('id_token_hint_claims')) {
+        obj['id_token_hint_claims'] = ApiClient.convertToType(
+          data['id_token_hint_claims'],
+          { String: Object }
+        )
+      }
       if (data.hasOwnProperty('ui_locales')) {
         obj['ui_locales'] = ApiClient.convertToType(data['ui_locales'], [
           'String'
@@ -86,6 +92,11 @@
    * @member {String} display
    */
   exports.prototype['display'] = undefined
+  /**
+   * IDTokenHintClaims are the claims of the ID Token previously issued by the Authorization Server being passed as a hint about the End-User's current or past authenticated session with the Client.
+   * @member {Object.<String, Object>} id_token_hint_claims
+   */
+  exports.prototype['id_token_hint_claims'] = undefined
   /**
    * UILocales is the End-User'id preferred languages and scripts for the user interface, represented as a space-separated list of BCP47 [RFC5646] language tag values, ordered by preference. For instance, the value \"fr-CA fr en\" represents a preference for French as spoken in Canada, then French (without a region designation), followed by English (without a region designation). An error SHOULD NOT result if some or all of the requested locales are not supported by the OpenID Provider.
    * @member {Array.<String>} ui_locales

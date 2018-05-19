@@ -1906,6 +1906,14 @@
           "type": "string",
           "x-go-name": "Display"
         },
+        "id_token_hint_claims": {
+          "description": "IDTokenHintClaims are the claims of the ID Token previously issued by the Authorization Server being passed as a hint about the\nEnd-User's current or past authenticated session with the Client.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "x-go-name": "IDTokenHintClaims"
+        },
         "ui_locales": {
           "description": "UILocales is the End-User'id preferred languages and scripts for the user interface, represented as a\nspace-separated list of BCP47 [RFC5646] language tag values, ordered by preference. For instance, the value\n\"fr-CA fr en\" represents a preference for French as spoken in Canada, then French (without a region designation),\nfollowed by English (without a region designation). An error SHOULD NOT result if some or all of the requested\nlocales are not supported by the OpenID Provider.",
           "type": "array",

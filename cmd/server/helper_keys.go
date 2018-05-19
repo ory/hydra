@@ -70,6 +70,11 @@ func createJWKS(ctx *config.Context, set string) (*jose.JSONWebKeySet, error) {
 		return nil, errors.Wrapf(err, "Could not generate %s key", set)
 	}
 
+	for i, k := range keys.Keys {
+		k.Use = "sig"
+		keys.Keys[i] = k
+	}
+
 	err = ctx.KeyManager.AddKeySet(set, keys)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not persist %s key", set)

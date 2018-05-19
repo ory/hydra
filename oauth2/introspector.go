@@ -22,6 +22,7 @@ package oauth2
 
 // Introspection contains an access token's session data as specified by IETF RFC 7662, see:
 // https://tools.ietf.org/html/rfc7662
+// swagger:model oAuth2TokenIntrospection
 type Introspection struct {
 	// Active is a boolean indicator of whether or not the presented token
 	// is currently active.  The specifics of a token's "active" state
@@ -65,12 +66,13 @@ type Introspection struct {
 	// authorized this token.
 	Username string `json:"username,omitempty"`
 
-	// ClientID is a service-specific string identifier or list of string
-	// identifiers representing the intended audience for this token.
-	Audience string `json:"aud,omitempty"`
+	Audience []string `json:"aud,omitempty"`
 
 	// Issuer is a string representing the issuer of this token
 	Issuer string `json:"iss,omitempty"`
+
+	// TokenType is the introspected token's type, for example `access_token` or `refresh_token`.
+	TokenType string `json:"token_type,omitempty"`
 
 	// Extra is arbitrary data set by the session.
 	Extra map[string]interface{} `json:"ext,omitempty"`

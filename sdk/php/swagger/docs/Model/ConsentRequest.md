@@ -3,11 +3,13 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**client_id** | **string** | ClientID is the client id that initiated the OAuth2 request. | [optional] 
-**expires_at** | [**\DateTime**](\DateTime.md) | ExpiresAt is the time where the access request will expire. | [optional] 
-**id** | **string** | ID is the id of this consent request. | [optional] 
-**redirect_url** | **string** | Redirect URL is the URL where the user agent should be redirected to after the consent has been accepted or rejected. | [optional] 
-**requested_scopes** | **string[]** | RequestedScopes represents a list of scopes that have been requested by the OAuth2 request initiator. | [optional] 
+**challenge** | **string** | Challenge is the identifier (\&quot;authorization challenge\&quot;) of the consent authorization request. It is used to identify the session. | [optional] 
+**client** | [**\Hydra\SDK\Model\OAuth2Client**](OAuth2Client.md) |  | [optional] 
+**oidc_context** | [**\Hydra\SDK\Model\OpenIDConnectContext**](OpenIDConnectContext.md) |  | [optional] 
+**request_url** | **string** | RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but might come in handy if you want to deal with additional request parameters. | [optional] 
+**requested_scope** | **string[]** | RequestedScope contains all scopes requested by the OAuth 2.0 client. | [optional] 
+**skip** | **bool** | Skip, if true, implies that the client has requested the same scopes from the same user previously. If true, you must not ask the user to grant the requested scopes. You must however either allow or deny the consent request using the usual API call. | [optional] 
+**subject** | **string** | Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope requested by the OAuth 2.0 client. | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

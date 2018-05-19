@@ -26,11 +26,9 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/hydra/warden/group"
-	"github.com/ory/ladon"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -102,20 +100,6 @@ func (c *PluginConnection) NewClientManager() (client.Manager, error) {
 	}
 }
 
-func (c *PluginConnection) NewGroupManager() (group.Manager, error) {
-	if err := c.load(); err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	if l, err := c.plugin.Lookup("NewGroupManager"); err != nil {
-		return nil, errors.Wrap(err, "Unable to look up `NewGroupManager`")
-	} else if m, ok := l.(func(*sqlx.DB) group.Manager); !ok {
-		return nil, errors.New("Unable to type assert `NewGroupManager`")
-	} else {
-		return m(c.db), nil
-	}
-}
-
 func (c *PluginConnection) NewJWKManager() (jwk.Manager, error) {
 	if err := c.load(); err != nil {
 		return nil, errors.WithStack(err)
@@ -146,29 +130,15 @@ func (c *PluginConnection) NewOAuth2Manager(clientManager client.Manager) (pkg.F
 	}
 }
 
-func (c *PluginConnection) NewPolicyManager() (ladon.Manager, error) {
+func (c *PluginConnection) NewConsentManager() (consent.Manager, error) {
 	if err := c.load(); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	if l, err := c.plugin.Lookup("NewPolicyManager"); err != nil {
-		return nil, errors.Wrap(err, "Unable to look up `NewPolicyManager`")
-	} else if m, ok := l.(func(*sqlx.DB) ladon.Manager); !ok {
-		return nil, errors.Errorf("Unable to type assert `NewPolicyManager`, got %v", l)
-	} else {
-		return m(c.db), nil
-	}
-}
-
-func (c *PluginConnection) NewConsentRequestManager() (oauth2.ConsentRequestManager, error) {
-	if err := c.load(); err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	if l, err := c.plugin.Lookup("NewConsentRequestManager"); err != nil {
-		return nil, errors.Wrap(err, "Unable to look up `NewConsentRequestManager`")
-	} else if m, ok := l.(func(*sqlx.DB) oauth2.ConsentRequestManager); !ok {
-		return nil, errors.Errorf("Unable to type assert `NewConsentRequestManager`, got %v", l)
+	if l, err := c.plugin.Lookup("NewConsentManager"); err != nil {
+		return nil, errors.Wrap(err, "Unable to look up `NewConsentManager`")
+	} else if m, ok := l.(func(*sqlx.DB) consent.Manager); !ok {
+		return nil, errors.Errorf("Unable to type assert `NewConsentManager`, got %v", l)
 	} else {
 		return m(c.db), nil
 	}

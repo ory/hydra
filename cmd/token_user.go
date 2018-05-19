@@ -25,9 +25,14 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"net/url"
+	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/rand/sequence"
 	"github.com/spf13/cobra"
@@ -38,7 +43,8 @@ import (
 // tokenUserCmd represents the token command
 var tokenUserCmd = &cobra.Command{
 	Use:   "user",
-	Short: "Generate an OAuth2 token using the code flow",
+	Short: "Starts a web server that initiates and handles OAuth 2.0 requests",
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		if ok, _ := cmd.Flags().GetBool("skip-tls-verify"); ok {
@@ -48,28 +54,40 @@ var tokenUserCmd = &cobra.Command{
 			}})
 		}
 
-		scopes, _ := cmd.Flags().GetStringSlice("scopes")
-		clientId, _ := cmd.Flags().GetString("id")
-		clientSecret, _ := cmd.Flags().GetString("secret")
+		port, _ := cmd.Flags().GetInt("port")
+		scopes, _ := cmd.Flags().GetStringSlice("scope")
+		prompt, _ := cmd.Flags().GetStringSlice("prompt")
+		maxAge, _ := cmd.Flags().GetInt("max-age")
 		redirectUrl, _ := cmd.Flags().GetString("redirect")
 		backend, _ := cmd.Flags().GetString("token-url")
 		frontend, _ := cmd.Flags().GetString("auth-url")
 
-		if clientId == "" {
-			clientId = c.ClientID
+		clientID, _ := cmd.Flags().GetString("client-id")
+		clientSecret, _ := cmd.Flags().GetString("client-secret")
+		if clientID == "" || clientSecret == "" {
+			fmt.Print(cmd.UsageString())
+			fmt.Println("Please provide a Client ID and Client Secret using flags --client-id and --client-secret, or environment variables OAUTH2_CLIENT_ID and OAUTH2_CLIENT_SECRET.")
+			return
 		}
-		if clientSecret == "" {
-			clientSecret = c.ClientSecret
+
+		serverLocation := fmt.Sprintf("http://127.0.0.1:%d/", port)
+		if redirectUrl == "" {
+			redirectUrl = serverLocation + "callback"
 		}
+
 		if backend == "" {
-			backend = pkg.JoinURLStrings(c.ClusterURL, "/oauth2/token")
+			bu, err := url.Parse(c.GetClusterURLWithoutTailingSlash(cmd))
+			pkg.Must(err, `Unable to parse cluster url ("%s"): %s`, c.GetClusterURLWithoutTailingSlash(cmd), err)
+			backend = urlx.AppendPaths(bu, "/oauth2/token").String()
 		}
 		if frontend == "" {
-			frontend = pkg.JoinURLStrings(c.ClusterURL, "/oauth2/auth")
+			fu, err := url.Parse(c.GetClusterURLWithoutTailingSlash(cmd))
+			pkg.Must(err, `Unable to parse cluster url ("%s"): %s`, c.GetClusterURLWithoutTailingSlash(cmd), err)
+			frontend = urlx.AppendPaths(fu, "/oauth2/auth").String()
 		}
 
 		conf := oauth2.Config{
-			ClientID:     clientId,
+			ClientID:     clientID,
 			ClientSecret: clientSecret,
 			Endpoint: oauth2.Endpoint{
 				TokenURL: backend,
@@ -85,40 +103,64 @@ var tokenUserCmd = &cobra.Command{
 		nonce, err := sequence.RuneSequence(24, sequence.AlphaLower)
 		pkg.Must(err, "Could not generate random state: %s", err)
 
-		location := conf.AuthCodeURL(string(state)) + "&nonce=" + string(nonce)
+		authCodeURL := conf.AuthCodeURL(string(state)) + "&nonce=" + string(nonce) + "&prompt=" + strings.Join(prompt, "+") + "&max_age=" + strconv.Itoa(maxAge)
 
 		if ok, _ := cmd.Flags().GetBool("no-open"); !ok {
-			webbrowser.Open(location)
+			webbrowser.Open(serverLocation)
 		}
 
-		fmt.Println("Setting up callback listener on http://localhost:4445/callback")
+		fmt.Println("Setting up home route on " + serverLocation)
+		fmt.Println("Setting up callback listener on " + serverLocation + "callback")
 		fmt.Println("Press ctrl + c on Linux / Windows or cmd + c on OSX to end the process.")
-		fmt.Printf("If your browser does not open automatically, navigate to:\n\n\t%s\n\n", location)
+		fmt.Printf("If your browser does not open automatically, navigate to:\n\n\t%s\n\n", serverLocation)
 
 		r := httprouter.New()
-		server := &http.Server{Addr: ":4445", Handler: r}
+		server := &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: r}
+		var shutdown = func() {
+			time.Sleep(time.Second * 1)
+			ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
+			server.Shutdown(ctx)
+		}
+
+		r.GET("/", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+			w.Write([]byte(fmt.Sprintf(`
+<html><head></head><body>
+<h1>Welcome to the example OAuth 2.0 Consumer</h1>
+<p>This example requests an OAuth 2.0 Access, Refresh, and OpenID Connect ID Token from the OAuth 2.0 Server (ORY Hydra). To initiate the flow, click the "Authorize Application" button.</p>
+<p><a href="%s">Authorize application</a></p>
+</body>
+`, authCodeURL)))
+		})
+
 		r.GET("/callback", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-			if r.URL.Query().Get("error") != "" {
-				message := fmt.Sprintf("Got error: %s", r.URL.Query().Get("error_description"))
-				fmt.Println(message)
+			if len(r.URL.Query().Get("error")) > 0 {
+				fmt.Printf("Got error: %s\n", r.URL.Query().Get("error_description"))
 
 				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte(message))
+				fmt.Fprintf(w, "<html><body><h1>An error occurred</h1><h2>%s</h2><p>%s</p><p>%s</p></body></html>", r.URL.Query().Get("error"), r.URL.Query().Get("error_description"), r.URL.Query().Get("error_debug"))
+				go shutdown()
 				return
 			}
 
 			if r.URL.Query().Get("state") != string(state) {
-				message := fmt.Sprintf("States do not match. Expected %s, got %s", string(state), r.URL.Query().Get("state"))
-				fmt.Println(message)
+				fmt.Printf("States do not match. Expected %s, got %s\n", string(state), r.URL.Query().Get("state"))
 
 				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte(message))
+				fmt.Fprintf(w, "<html><body><h1>An error occurred</h1><h2>%s</h2><p>%s</p></body></html>", "States do not match", "Expected state "+string(state)+" but got "+r.URL.Query().Get("state"))
+				go shutdown()
 				return
 			}
 
 			code := r.URL.Query().Get("code")
 			token, err := conf.Exchange(ctx, code)
-			pkg.Must(err, "Could not exchange code for token: %s", err)
+			if err != nil {
+				fmt.Printf("Unable to exchange code for token: %s\n", err)
+
+				w.WriteHeader(http.StatusInternalServerError)
+				fmt.Fprintf(w, "<html><body><h1>An error occurred</h1><p>%s</p></body></html>", err)
+				go shutdown()
+				return
+			}
 
 			fmt.Printf("Access Token:\n\t%s\n", token.AccessToken)
 			fmt.Printf("Refresh Token:\n\t%s\n\n", token.RefreshToken)
@@ -139,11 +181,7 @@ var tokenUserCmd = &cobra.Command{
 			}
 			w.Write([]byte("</ul></body></html>"))
 
-			go func() {
-				time.Sleep(time.Second * 1)
-				ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
-				server.Shutdown(ctx)
-			}()
+			go shutdown()
 		})
 		server.ListenAndServe()
 	},
@@ -152,10 +190,16 @@ var tokenUserCmd = &cobra.Command{
 func init() {
 	tokenCmd.AddCommand(tokenUserCmd)
 	tokenUserCmd.Flags().Bool("no-open", false, "Do not open the browser window automatically")
-	tokenUserCmd.Flags().StringSlice("scopes", []string{"hydra", "offline", "openid"}, "Force scopes")
-	tokenUserCmd.Flags().String("id", "", "Force a client id, defaults to value from config file")
-	tokenUserCmd.Flags().String("secret", "", "Force a client secret, defaults to value from config file")
-	tokenUserCmd.Flags().String("redirect", "http://localhost:4445/callback", "Force a redirect url")
-	tokenUserCmd.Flags().String("auth-url", c.ClusterURL, "Force the authorization url. The authorization url is the URL that the user will open in the browser, defaults to the cluster url value from config file")
-	tokenUserCmd.Flags().String("token-url", c.ClusterURL, "Force a token url. The token url is used to exchange the auth code, defaults to the cluster url value from config file")
+	tokenUserCmd.Flags().IntP("port", "p", 4445, "The port on which the server should run")
+	tokenUserCmd.Flags().StringSlice("scope", []string{"offline", "openid"}, "Request OAuth2 scope")
+	tokenUserCmd.Flags().StringSlice("prompt", []string{}, "Set the OpenID Connect prompt parameter")
+	tokenUserCmd.Flags().Int("max-age", 0, "Set the OpenID Connect max_age parameter")
+
+	tokenUserCmd.Flags().String("client-id", os.Getenv("OAUTH2_CLIENT_ID"), "Use the provided OAuth 2.0 Client ID, defaults to environment variable OAUTH2_CLIENT_ID")
+	tokenUserCmd.Flags().String("client-secret", os.Getenv("OAUTH2_CLIENT_SECRET"), "Use the provided OAuth 2.0 Client Secret, defaults to environment variable OAUTH2_CLIENT_SECRET")
+
+	tokenUserCmd.Flags().String("redirect", "", "Force a redirect url")
+	tokenUserCmd.Flags().String("auth-url", os.Getenv("HYDRA_URL"), "Usually it is enough to specify the `endpoint` flag, but if you want to force the authorization url, use this flag")
+	tokenUserCmd.Flags().String("token-url", os.Getenv("HYDRA_URL"), "Usually it is enough to specify the `endpoint` flag, but if you want to force the token url, use this flag")
+	tokenUserCmd.PersistentFlags().String("endpoint", os.Getenv("HYDRA_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_URL")
 }

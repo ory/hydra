@@ -22,8 +22,6 @@ package oauth2_test
 
 import (
 	"context"
-	"crypto/rand"
-	"crypto/rsa"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -31,18 +29,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
-	"github.com/ory/fosite/compose"
-	"github.com/ory/fosite/storage"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
-	c2 "github.com/ory/hydra/compose"
 	"github.com/ory/hydra/oauth2"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
-	"github.com/ory/ladon"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -79,24 +71,9 @@ var flushRequests = []*fosite.Request{
 }
 
 func TestHandlerFlushHandler(t *testing.T) {
-	localWarden, httpClient := c2.NewMockFirewall(
-		"tests",
-		"alice",
-		fosite.Arguments{
-			"hydra.oauth2.flush",
-		}, &ladon.DefaultPolicy{
-			ID:        "1",
-			Subjects:  []string{"<.*>"},
-			Resources: []string{"rn:hydra:oauth2:tokens"},
-			Actions:   []string{"flush"},
-			Effect:    ladon.AllowAccess,
-		},
-	)
-
 	store := oauth2.NewFositeMemoryStore(nil, lifespan)
 	h := &oauth2.Handler{
 		H:             herodot.NewJSONWriter(nil),
-		W:             localWarden,
 		ScopeStrategy: fosite.HierarchicScopeStrategy,
 		Issuer:        "http://hydra.localhost",
 		Storage:       store,
@@ -110,7 +87,6 @@ func TestHandlerFlushHandler(t *testing.T) {
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)
 	c := hydra.NewOAuth2ApiWithBasePath(ts.URL)
-	c.Configuration.Transport = httpClient.Transport
 
 	ds := new(fosite.DefaultSession)
 	ctx := context.Background()
@@ -198,67 +174,4 @@ func TestHandlerWellKnown(t *testing.T) {
 	assert.EqualValues(t, wellKnownResp.ClaimsSupported, []string{"sub", "baz", "oof"})
 	assert.EqualValues(t, wellKnownResp.ScopesSupported, []string{"offline", "openid", "foo", "bar"})
 	assert.Equal(t, wellKnownResp.UserinfoEndpoint, "bar")
-}
-
-type FakeConsentStrategy struct {
-	RedirectURL string
-}
-
-func (s *FakeConsentStrategy) ValidateConsentRequest(authorizeRequest fosite.AuthorizeRequester, token string, session *sessions.Session) (claims *oauth2.Session, err error) {
-	return nil, nil
-}
-
-func (s *FakeConsentStrategy) CreateConsentRequest(authorizeRequest fosite.AuthorizeRequester, redirectURL string, session *sessions.Session) (token string, err error) {
-	s.RedirectURL = redirectURL
-	return "token", nil
-}
-
-func TestIssuerRedirect(t *testing.T) {
-	storage := storage.NewExampleStore()
-	secret := []byte("my super secret password password password password")
-	config := compose.Config{}
-	privateKey, _ := rsa.GenerateKey(rand.Reader, 2048)
-
-	consentUrl, _ := url.Parse("http://consent.localhost")
-
-	cs := &FakeConsentStrategy{}
-
-	h := &oauth2.Handler{
-		H:             herodot.NewJSONWriter(nil),
-		Issuer:        "http://127.0.0.1/some/proxied/path",
-		OAuth2:        compose.ComposeAllEnabled(&config, storage, secret, privateKey),
-		ConsentURL:    *consentUrl,
-		ScopeStrategy: fosite.WildcardScopeStrategy,
-		CookieStore:   sessions.NewCookieStore([]byte("my super secret password")),
-		Consent:       cs,
-		L:             logrus.New(),
-	}
-
-	r := httprouter.New()
-	h.SetRoutes(r)
-	ts := httptest.NewServer(r)
-
-	authUrl, _ := url.Parse(ts.URL)
-	v := url.Values{}
-	v.Set("response_type", "code")
-	v.Set("client_id", "my-client")
-	v.Set("redirect_uri", "http://localhost:3846/callback")
-	v.Set("scope", "openid")
-	v.Set("state", "my super secret state")
-	authUrl.Path = "/oauth2/auth"
-	authUrl.RawQuery = v.Encode()
-
-	client := &http.Client{
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
-		},
-	}
-
-	res, _ := client.Get(authUrl.String())
-
-	authRedirect, _ := url.Parse(cs.RedirectURL)
-	assert.Equal(t, "/some/proxied/path/oauth2/auth", authRedirect.Path, "The redirect URL sent in the challenge includes the full issuer path")
-	assert.Equal(t, authUrl.Query(), authRedirect.Query(), "The auth redirect should have the same parameters with the addition of challenge")
-
-	defer res.Body.Close()
 }

@@ -23,18 +23,21 @@ package server
 import (
 	"fmt"
 	"net/url"
+	"time"
 
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
+	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
+	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/hydra/warden"
+	"github.com/ory/sqlcon"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {
@@ -45,7 +48,7 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 	case *config.MemoryConnection:
 		store = oauth2.NewFositeMemoryStore(clients, c.GetAccessTokenLifespan())
 		break
-	case *config.SQLConnection:
+	case *sqlcon.SQLConnection:
 		store = oauth2.NewFositeSQLStore(clients, con.GetDatabase(), c.GetLogger(), c.GetAccessTokenLifespan())
 		break
 	case *config.PluginConnection:
@@ -104,25 +107,40 @@ func newOAuth2Provider(c *config.Config) (fosite.OAuth2Provider, string) {
 		compose.OpenIDConnectImplicitFactory,
 		compose.OpenIDConnectRefreshFactory,
 		compose.OAuth2TokenRevocationFactory,
-		warden.OAuth2TokenIntrospectionFactory,
+		compose.OAuth2TokenIntrospectionFactory,
 	), publicKey.KeyID
 }
 
-func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm oauth2.ConsentRequestManager, o fosite.OAuth2Provider, idTokenKeyID string) *oauth2.Handler {
-	if c.ConsentURL == "" {
-		proto := "https"
-		if c.ForceHTTP {
-			proto = "http"
-		}
-		host := "localhost"
-		if c.BindHost != "" {
-			host = c.BindHost
-		}
-		c.ConsentURL = fmt.Sprintf("%s://%s:%d/oauth2/consent", proto, host, c.BindPort)
+func setDefaultConsentURL(s string, c *config.Config, path string) string {
+	if s != "" {
+		return s
+	}
+	proto := "https"
+	if c.ForceHTTP {
+		proto = "http"
+	}
+	host := "localhost"
+	if c.BindHost != "" {
+		host = c.BindHost
+	}
+	return fmt.Sprintf("%s://%s:%d/%s", proto, host, c.BindPort, path)
+}
+
+//func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm oauth2.ConsentRequestManager, o fosite.OAuth2Provider, idTokenKeyID string) *oauth2.Handler {
+func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm consent.Manager, o fosite.OAuth2Provider, idTokenKeyID string) *oauth2.Handler {
+	c.ConsentURL = setDefaultConsentURL(c.ConsentURL, c, "oauth2/fallbacks/consent")
+	c.LoginURL = setDefaultConsentURL(c.LoginURL, c, "oauth2/fallbacks/consent")
+	c.ErrorURL = setDefaultConsentURL(c.ErrorURL, c, "oauth2/fallbacks/error")
+
+	errorURL, err := url.Parse(c.ErrorURL)
+	pkg.Must(err, "Could not parse error url %s.", errorURL)
+
+	privateKey, err := createOrGetJWK(c, oauth2.OpenIDConnectKeyName, "private")
+	if err != nil {
+		c.GetLogger().WithError(err).Fatalf(`Could not fetch private signing key for OpenID Connect - did you forget to run "hydra migrate sql" or forget to set the SYSTEM_SECRET?`)
 	}
 
-	consentURL, err := url.Parse(c.ConsentURL)
-	pkg.Must(err, "Could not parse consent url %s.", c.ConsentURL)
+	jwtStrategy := compose.NewOpenIDConnectStrategy(jwk.MustRSAPrivate(privateKey))
 
 	handler := &oauth2.Handler{
 		ScopesSupported:  c.OpenIDDiscoveryScopesSupported,
@@ -131,22 +149,23 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm oauth2.Con
 		ForcedHTTP:       c.ForceHTTP,
 		OAuth2:           o,
 		ScopeStrategy:    c.GetScopeStrategy(),
-		Consent: &oauth2.DefaultConsentStrategy{
-			Issuer:                   c.Issuer,
-			ConsentManager:           c.Context().ConsentManager,
-			DefaultChallengeLifespan: c.GetChallengeTokenLifespan(),
-			DefaultIDTokenLifespan:   c.GetIDTokenLifespan(),
-			KeyID: idTokenKeyID,
-		},
+		Consent: consent.NewStrategy(
+			c.LoginURL, c.ConsentURL, c.Issuer,
+			"/oauth2/auth", cm,
+			sessions.NewCookieStore(c.GetCookieSecret()), c.GetScopeStrategy(),
+			!c.ForceHTTP, time.Minute*15,
+			jwtStrategy,
+			openid.NewOpenIDConnectRequestValidator(nil, jwtStrategy),
+		),
 		Storage:             c.Context().FositeStore,
-		ConsentURL:          *consentURL,
+		ErrorURL:            *errorURL,
 		H:                   herodot.NewJSONWriter(c.GetLogger()),
 		AccessTokenLifespan: c.GetAccessTokenLifespan(),
 		CookieStore:         sessions.NewCookieStore(c.GetCookieSecret()),
 		Issuer:              c.Issuer,
 		L:                   c.GetLogger(),
-		W:                   c.Context().Warden,
-		ResourcePrefix:      c.AccessControlResourcePrefix,
+		IDTokenPublicKeyID:  idTokenKeyID,
+		IDTokenLifespan:     c.GetIDTokenLifespan(),
 	}
 
 	handler.SetRoutes(router)

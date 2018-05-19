@@ -21,15 +21,69 @@
 package oauth2_test
 
 import (
+	"context"
+	"net/http/httptest"
 	"testing"
+	"time"
 
+	"github.com/gorilla/sessions"
+	"github.com/julienschmidt/httprouter"
+	"github.com/ory/fosite"
+	"github.com/ory/fosite/compose"
+	"github.com/ory/herodot"
+	hc "github.com/ory/hydra/client"
+	. "github.com/ory/hydra/oauth2"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/clientcredentials"
 )
 
 func TestClientCredentials(t *testing.T) {
-	tok, err := oauthClientConfig.Token(oauth2.NoContext)
+	router := httprouter.New()
+	l := logrus.New()
+	l.Level = logrus.DebugLevel
+	store := NewFositeMemoryStore(hc.NewMemoryManager(hasher), time.Second)
+
+	ts := httptest.NewServer(router)
+	handler := &Handler{
+		OAuth2: compose.Compose(
+			fc,
+			store,
+			oauth2Strategy,
+			nil,
+			compose.OAuth2ClientCredentialsGrantFactory,
+			compose.OAuth2TokenIntrospectionFactory,
+		),
+		//Consent:         consentStrategy,
+		CookieStore:     sessions.NewCookieStore([]byte("foo-secret")),
+		ForcedHTTP:      true,
+		ScopeStrategy:   fosite.HierarchicScopeStrategy,
+		IDTokenLifespan: time.Minute,
+		H:               herodot.NewJSONWriter(l),
+		L:               l,
+		Issuer:          ts.URL,
+	}
+
+	handler.SetRoutes(router)
+
+	require.NoError(t, store.CreateClient(&hc.Client{
+		ID:            "app-client",
+		Secret:        "secret",
+		RedirectURIs:  []string{ts.URL + "/callback"},
+		ResponseTypes: []string{"token"},
+		GrantTypes:    []string{"client_credentials"},
+		Scope:         "foobar",
+	}))
+
+	oauthClientConfig := &clientcredentials.Config{
+		ClientID:     "app-client",
+		ClientSecret: "secret",
+		TokenURL:     ts.URL + "/oauth2/token",
+		Scopes:       []string{"foobar"},
+	}
+
+	tok, err := oauthClientConfig.Token(context.Background())
 	require.NoError(t, err)
 	assert.NotEmpty(t, tok.AccessToken)
 }

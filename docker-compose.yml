@@ -17,7 +17,7 @@ services:
   hydra-migrate:
     build:
       context: .
-      dockerfile: Dockerfile-alpine
+      dockerfile: Dockerfile
     links:
       - postgresd:postgresd
     command:
@@ -27,38 +27,34 @@ services:
   hydra:
     build:
       context: .
-      dockerfile: Dockerfile-alpine
+      dockerfile: Dockerfile
     links:
       - postgresd:postgresd
 #     Uncomment the following line to use mysql instead.
 #      - mysqld:mysqld
     depends_on:
       - hydra-migrate
-    volumes:
-      - hydravolume:/root
     ports:
       - "4444:4444"
       - "4445:4445"
     command:
-      host --dangerous-auto-logon --dangerous-force-http --disable-telemetry
+      serve --dangerous-force-http
     environment:
-      - LOG_LEVEL=debug
-      - ISSUER=http://localhost:4444
-      - CONSENT_URL=http://localhost:3000/consent
+#      - LOG_LEVEL=debug
+      - OAUTH2_ISSUER_URL=http://localhost:4444
+      - OAUTH2_CONSENT_URL=http://localhost:3000/consent
+      - OAUTH2_LOGIN_URL=http://localhost:3000/login
       - DATABASE_URL=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable
 #     Uncomment the following line to use mysql instead.
 #      - DATABASE_URL=mysql://root:secret@tcp(mysqld:3306)/mysql?parseTime=true
-      - FORCE_ROOT_CLIENT_CREDENTIALS=admin:demo-password
       - SYSTEM_SECRET=youReallyNeedToChangeThis
+      - OAUTH2_SHARE_ERROR_DEBUG=1
     restart: unless-stopped
 
   consent:
     environment:
       - HYDRA_URL=http://hydra:4444
-      - HYDRA_CLIENT_ID=admin
-      - HYDRA_CLIENT_SECRET=demo-password
-      - NODE_TLS_REJECT_UNAUTHORIZED=0
-    image: oryd/hydra-consent-app-express:v0.10.0-alpha.7
+    image: oryd/hydra-login-consent-node:latest
     links:
       - hydra
     ports:
@@ -79,7 +75,3 @@ services:
 #    image: mysql:5.7
 #    environment:
 #      - MYSQL_ROOT_PASSWORD=secret
-
-volumes:
-  hydravolume:
-    driver: local

@@ -21,53 +21,47 @@
 package config
 
 import (
-	"context"
 	"crypto/sha256"
-	"crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 	"time"
 
+	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/token/hmac"
+	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/hydra/health"
 	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/hydra/metrics/telemetry"
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/hydra/warden/group"
-	"github.com/ory/ladon"
-	lmem "github.com/ory/ladon/manager/memory"
-	lsql "github.com/ory/ladon/manager/sql"
+	"github.com/ory/sqlcon"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/clientcredentials"
 	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
 	// These are used by client commands
-	ClusterURL            string `mapstructure:"CLUSTER_URL" yaml:"cluster_url"`
-	ClientID              string `mapstructure:"CLIENT_ID" yaml:"client_id,omitempty"`
-	ClientSecret          string `mapstructure:"CLIENT_SECRET" yaml:"client_secret,omitempty"`
-	SignedUpForNewsletter bool   `yaml:"signed_up_for_newsletter,omitempty"`
+	EndpointURL string `mapstructure:"HYDRA_URL" yaml:"-"`
 
 	// These are used by the host command
 	BindPort                         int    `mapstructure:"PORT" yaml:"-"`
 	BindHost                         string `mapstructure:"HOST" yaml:"-"`
-	Issuer                           string `mapstructure:"ISSUER" yaml:"-"`
+	Issuer                           string `mapstructure:"OAUTH2_ISSUER_URL" yaml:"-"`
 	SystemSecret                     string `mapstructure:"SYSTEM_SECRET" yaml:"-"`
 	DatabaseURL                      string `mapstructure:"DATABASE_URL" yaml:"-"`
 	DatabasePlugin                   string `mapstructure:"DATABASE_PLUGIN" yaml:"-"`
-	ConsentURL                       string `mapstructure:"CONSENT_URL" yaml:"-"`
+	ConsentURL                       string `mapstructure:"OAUTH2_CONSENT_URL" yaml:"-"`
+	LoginURL                         string `mapstructure:"OAUTH2_LOGIN_URL" yaml:"-"`
+	ErrorURL                         string `mapstructure:"OAUTH2_ERROR_URL" yaml:"-"`
 	AllowTLSTermination              string `mapstructure:"HTTPS_ALLOW_TERMINATION_FROM" yaml:"-"`
 	BCryptWorkFactor                 int    `mapstructure:"BCRYPT_COST" yaml:"-"`
 	AccessTokenLifespan              string `mapstructure:"ACCESS_TOKEN_LIFESPAN" yaml:"-"`
@@ -97,8 +91,11 @@ type Config struct {
 	systemSecret []byte                     `yaml:"-"`
 }
 
-func (c *Config) GetClusterURLWithoutTailingSlash() string {
-	return strings.TrimRight(c.ClusterURL, "/")
+func (c *Config) GetClusterURLWithoutTailingSlash(cmd *cobra.Command) string {
+	if endpoint, _ := cmd.Flags().GetString("endpoint"); endpoint != "" {
+		return strings.TrimRight(endpoint, "/")
+	}
+	return strings.TrimRight(c.EndpointURL, "/")
 }
 
 func (c *Config) GetScopeStrategy() fosite.ScopeStrategy {
@@ -258,9 +255,9 @@ func (c *Config) Context() *Context {
 		case "postgres":
 			fallthrough
 		case "mysql":
-			connection = &SQLConnection{
-				URL: u,
-				L:   c.GetLogger(),
+			connection, err = sqlcon.NewSQLConnection(c.DatabaseURL, c.GetLogger())
+			if err != nil {
+				c.GetLogger().WithError(err).Fatalf(`Unable to initialize SQL connection`)
 			}
 			break
 		default:
@@ -268,42 +265,11 @@ func (c *Config) Context() *Context {
 		}
 	}
 
-	var groupManager group.Manager
-	var manager ladon.Manager
-	switch con := connection.(type) {
-	case *MemoryConnection:
-		c.GetLogger().Printf("DATABASE_URL set to memory, connecting to ephermal in-memory database.")
-		manager = lmem.NewMemoryManager()
-		groupManager = group.NewMemoryManager()
-		break
-	case *SQLConnection:
-		manager = lsql.NewSQLManager(con.GetDatabase(), nil)
-		groupManager = &group.SQLManager{
-			DB: con.GetDatabase(),
-		}
-		break
-	case *PluginConnection:
-		var err error
-		manager, err = con.NewPolicyManager()
-		if err != nil {
-			c.GetLogger().Fatalf("Could not load policy manager plugin %s", err)
-		}
-
-		groupManager, err = con.NewGroupManager()
-		if err != nil {
-			c.GetLogger().Fatalf("Could not load group manager plugin %s", err)
-		}
-		break
-	default:
-		panic("Unknown connection type.")
-	}
-
 	c.context = &Context{
 		Connection: connection,
 		Hasher: &fosite.BCrypt{
 			WorkFactor: c.BCryptWorkFactor,
 		},
-		LadonManager: manager,
 		FositeStrategy: &foauth2.HMACSHAStrategy{
 			Enigma: &hmac.HMACStrategy{
 				GlobalSecret: c.GetSystemSecret(),
@@ -311,7 +277,6 @@ func (c *Config) Context() *Context {
 			AccessTokenLifespan:   c.GetAccessTokenLifespan(),
 			AuthorizeCodeLifespan: c.GetAuthCodeLifespan(),
 		},
-		GroupManager: groupManager,
 	}
 
 	return c.context
@@ -319,7 +284,7 @@ func (c *Config) Context() *Context {
 
 func (c *Config) Resolve(join ...string) *url.URL {
 	if c.cluster == nil {
-		cluster, err := url.Parse(c.ClusterURL)
+		cluster, err := url.Parse(c.EndpointURL)
 		c.cluster = cluster
 		pkg.Must(err, "Could not parse cluster url: %s", err)
 	}
@@ -328,63 +293,7 @@ func (c *Config) Resolve(join ...string) *url.URL {
 		return c.cluster
 	}
 
-	return pkg.JoinURL(c.cluster, join...)
-}
-
-type transporter struct {
-	*http.Transport
-	FakeTLSTermination bool
-}
-
-func (t *transporter) RoundTrip(req *http.Request) (*http.Response, error) {
-	if t.FakeTLSTermination {
-		req.Header.Set("X-Forwarded-Proto", "https")
-	}
-
-	return t.Transport.RoundTrip(req)
-}
-
-func (c *Config) OAuth2Client(cmd *cobra.Command) *http.Client {
-	if c.oauth2Client != nil {
-		return c.oauth2Client
-	}
-
-	oauthConfig := clientcredentials.Config{
-		ClientID:     c.ClientID,
-		ClientSecret: c.ClientSecret,
-		TokenURL:     pkg.JoinURLStrings(c.ClusterURL, "/oauth2/token"),
-		Scopes:       []string{"hydra", "hydra.*"},
-	}
-
-	fakeTlsTermination, _ := cmd.Flags().GetBool("fake-tls-termination")
-	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{
-		Transport: &transporter{
-			FakeTLSTermination: fakeTlsTermination,
-			Transport:          &http.Transport{},
-		},
-	})
-
-	if ok, _ := cmd.Flags().GetBool("skip-tls-verify"); ok {
-		// fmt.Println("Warning: Skipping TLS Certificate Verification.")
-		ctx = context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{
-			Transport: &transporter{
-				FakeTLSTermination: fakeTlsTermination,
-				Transport: &http.Transport{
-					TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-				},
-			},
-		})
-	}
-
-	c.oauth2Client = oauthConfig.Client(ctx)
-	if _, err := c.oauth2Client.Get(c.ClusterURL); err != nil {
-		fmt.Printf("Could not authenticate, because: %s\n", err)
-		fmt.Println("This can have multiple reasons, like a wrong cluster or wrong credentials. To resolve this, run `hydra connect`.")
-		fmt.Println("You can disable TLS verification using the `--skip-tls-verify` flag.")
-		os.Exit(1)
-	}
-
-	return c.oauth2Client
+	return urlx.AppendPaths(c.cluster, join...)
 }
 
 func (c *Config) GetCookieSecret() []byte {

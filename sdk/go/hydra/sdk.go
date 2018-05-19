@@ -33,8 +33,6 @@ import (
 type CodeGenSDK struct {
 	*swagger.OAuth2Api
 	*swagger.JsonWebKeyApi
-	*swagger.WardenApi
-	*swagger.PolicyApi
 
 	Configuration      *Configuration
 	oAuth2ClientConfig *clientcredentials.Config
@@ -83,7 +81,7 @@ func NewSDK(c *Configuration) (*CodeGenSDK, error) {
 		return nil, errors.New("Please specify an OAuth 2.0 Client ID")
 	}
 	if len(c.Scopes) == 0 {
-		c.Scopes = []string{"hydra.*"}
+		c.Scopes = []string{}
 	}
 
 	c.EndpointURL = removeTrailingSlash(c.EndpointURL)
@@ -113,17 +111,9 @@ func NewSDK(c *Configuration) (*CodeGenSDK, error) {
 	j := swagger.NewJsonWebKeyApiWithBasePath(c.EndpointURL)
 	j.Configuration.Transport = oAuth2Client.Transport
 
-	w := swagger.NewWardenApiWithBasePath(c.EndpointURL)
-	w.Configuration.Transport = oAuth2Client.Transport
-
-	p := swagger.NewPolicyApiWithBasePath(c.EndpointURL)
-	p.Configuration.Transport = oAuth2Client.Transport
-
 	sdk := &CodeGenSDK{
 		OAuth2Api:          o,
 		JsonWebKeyApi:      j,
-		WardenApi:          w,
-		PolicyApi:          p,
 		Configuration:      c,
 		oAuth2ClientConfig: oAuth2ClientConfig,
 		oAuth2Config:       oAuth2Config,

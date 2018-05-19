@@ -23,25 +23,24 @@ package oauth2
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	"net"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/firewall"
+	"github.com/ory/fosite/handler/openid"
+	"github.com/ory/fosite/token/jwt"
+	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 const (
 	OpenIDConnectKeyName = "hydra.openid.id-token"
 
-	DefaultConsentPath = "/oauth2/consent-fallback"
+	DefaultConsentPath = "/oauth2/fallbacks/consent"
+	DefaultErrorPath   = "/oauth2/fallbacks/error"
 	TokenPath          = "/oauth2/token"
 	AuthPath           = "/oauth2/auth"
 
@@ -53,10 +52,6 @@ const (
 	IntrospectPath = "/oauth2/introspect"
 	RevocationPath = "/oauth2/revoke"
 	FlushPath      = "/oauth2/flush"
-
-	IntrospectScope = "hydra.introspect"
-
-	consentCookieName = "consent_session"
 )
 
 // swagger:model wellKnown
@@ -135,6 +130,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET(AuthPath, h.AuthHandler)
 	r.POST(AuthPath, h.AuthHandler)
 	r.GET(DefaultConsentPath, h.DefaultConsentHandler)
+	r.GET(DefaultErrorPath, h.DefaultErrorHandler)
 	r.POST(IntrospectPath, h.IntrospectHandler)
 	r.POST(RevocationPath, h.RevocationHandler)
 	r.GET(WellKnownPath, h.WellKnownHandler)
@@ -212,9 +208,14 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ htt
 //       500: genericError
 func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	session := NewSession("")
-	ar, err := h.OAuth2.IntrospectToken(r.Context(), fosite.AccessTokenFromRequest(r), fosite.AccessToken, session)
+	tokenType, ar, err := h.OAuth2.IntrospectToken(r.Context(), fosite.AccessTokenFromRequest(r), fosite.AccessToken, session)
 	if err != nil {
 		h.H.WriteError(w, r, err)
+		return
+	}
+
+	if tokenType != fosite.AccessToken {
+		h.H.WriteErrorCode(w, r, http.StatusUnauthorized, errors.New("Only access tokens are allowed in the authorization header"))
 		return
 	}
 
@@ -246,6 +247,7 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request, _ http
 //
 //     Security:
 //       basic:
+//       oauth2:
 //
 //     Responses:
 //       200: emptyResponse
@@ -288,36 +290,13 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ ht
 //
 //     Security:
 //       basic:
-//       oauth2: hydra.introspect
+//       oauth2:
 //
 //     Responses:
 //       200: oAuth2TokenIntrospection
 //       401: genericError
 //       500: genericError
 func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	if token := h.W.TokenFromRequest(r); token != "" {
-		if _, err := h.W.TokenAllowed(r.Context(), token, &firewall.TokenAccessRequest{
-			Resource: fmt.Sprintf(h.PrefixResource("oauth2:tokens")),
-			Action:   "introspect",
-		}, IntrospectScope); err != nil {
-			h.H.WriteError(w, r, err)
-			return
-		}
-	} else if client, _, ok := r.BasicAuth(); ok {
-		// If no token is given, we do not need a scope.
-		if err := h.W.IsAllowed(r.Context(), &firewall.AccessRequest{
-			Subject:  client,
-			Resource: fmt.Sprintf(h.PrefixResource("oauth2:tokens")),
-			Action:   "introspect",
-		}); err != nil {
-			h.H.WriteError(w, r, err)
-			return
-		}
-	} else {
-		h.H.WriteError(w, r, errors.WithStack(fosite.ErrRequestUnauthorized))
-		return
-	}
-
 	var session = NewSession("")
 
 	var ctx = fosite.NewContext()
@@ -335,7 +314,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 	if err = json.NewEncoder(w).Encode(&Introspection{
-		Active:    true,
+		Active:    resp.IsActive(),
 		ClientID:  resp.GetAccessRequester().GetClient().GetID(),
 		Scope:     strings.Join(resp.GetAccessRequester().GetGrantedScopes(), " "),
 		ExpiresAt: exp.Unix(),
@@ -343,9 +322,11 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		Subject:   resp.GetAccessRequester().GetSession().GetSubject(),
 		Username:  resp.GetAccessRequester().GetSession().GetUsername(),
 		Extra:     resp.GetAccessRequester().GetSession().(*Session).Extra,
+		Audience:  resp.GetAccessRequester().GetSession().(*Session).Audience,
 		Issuer:    h.Issuer,
+		TokenType: string(resp.GetTokenType()),
 	}); err != nil {
-		pkg.LogError(err, h.L)
+		pkg.LogError(errors.WithStack(err), h.L)
 	}
 }
 
@@ -371,28 +352,11 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 //
 //     Schemes: http, https
 //
-//     Security:
-//       basic:
-//       oauth2: hydra.oauth2.flush
-//
 //     Responses:
 //       204: emptyResponse
 //       401: genericError
 //       500: genericError
 func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	if token := h.W.TokenFromRequest(r); token != "" {
-		if _, err := h.W.TokenAllowed(r.Context(), token, &firewall.TokenAccessRequest{
-			Resource: fmt.Sprintf(h.PrefixResource("oauth2:tokens")),
-			Action:   "flush",
-		}, "hydra.oauth2.flush"); err != nil {
-			h.H.WriteError(w, r, err)
-			return
-		}
-	} else {
-		h.H.WriteError(w, r, errors.WithStack(fosite.ErrRequestUnauthorized))
-		return
-	}
-
 	var fr FlushInactiveOAuth2TokensRequest
 	if err := json.NewDecoder(r.Body).Decode(&fr); err != nil {
 		h.H.WriteError(w, r, err)
@@ -494,42 +458,39 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		return
 	}
 
-	// A session_token will be available if the user was authenticated an gave consent
-	consent := authorizeRequest.GetRequestForm().Get("consent")
-	if consent == "" {
-		// otherwise redirect to log in endpoint
-		if err := h.redirectToConsent(w, r, authorizeRequest); err != nil {
-			pkg.LogError(err, h.L)
-			h.writeAuthorizeError(w, authorizeRequest, err)
-			return
-		}
+	session, err := h.Consent.HandleOAuth2AuthorizationRequest(w, r, authorizeRequest)
+	if errors.Cause(err) == consent.ErrAbortOAuth2Request {
+		// do nothing
 		return
-	}
-
-	cookie, err := h.CookieStore.Get(r, consentCookieName)
-	if err != nil {
-		pkg.LogError(err, h.L)
-		h.writeAuthorizeError(w, authorizeRequest, errors.Wrapf(fosite.ErrServerError, "Could not open session: %s", err))
-		return
-	}
-
-	// decode consent_token claims
-	// verify anti-CSRF (inject state) and anti-replay token (expiry time, good value would be 10 seconds)
-	session, err := h.Consent.ValidateConsentRequest(authorizeRequest, consent, cookie)
-	if err != nil {
+	} else if err != nil {
 		pkg.LogError(err, h.L)
 		h.writeAuthorizeError(w, authorizeRequest, err)
 		return
 	}
 
-	if err := cookie.Save(r, w); err != nil {
-		pkg.LogError(err, h.L)
-		h.writeAuthorizeError(w, authorizeRequest, errors.Wrapf(fosite.ErrServerError, "Could not store session cookie: %s", err))
-		return
+	for _, scope := range session.GrantedScope {
+		authorizeRequest.GrantScope(scope)
 	}
 
 	// done
-	response, err := h.OAuth2.NewAuthorizeResponse(ctx, authorizeRequest, session)
+	response, err := h.OAuth2.NewAuthorizeResponse(ctx, authorizeRequest, &Session{
+		DefaultSession: &openid.DefaultSession{
+			Claims: &jwt.IDTokenClaims{
+				Audience:    authorizeRequest.GetClient().GetID(),
+				Subject:     session.ConsentRequest.Subject,
+				Issuer:      h.IssuerURL,
+				IssuedAt:    time.Now().UTC(),
+				ExpiresAt:   time.Now().Add(h.IDTokenLifespan).UTC(),
+				AuthTime:    session.AuthenticatedAt,
+				RequestedAt: session.RequestedAt,
+				Extra:       session.Session.IDToken,
+			},
+			// required for lookup on jwk endpoint
+			Headers: &jwt.Headers{Extra: map[string]interface{}{"kid": h.IDTokenPublicKeyID}},
+			Subject: session.ConsentRequest.Subject,
+		},
+		Extra: session.Session.AccessToken,
+	})
 	if err != nil {
 		pkg.LogError(err, h.L)
 		h.writeAuthorizeError(w, authorizeRequest, err)
@@ -539,54 +500,11 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	h.OAuth2.WriteAuthorizeResponse(w, authorizeRequest, response)
 }
 
-func (h *Handler) redirectToConsent(w http.ResponseWriter, r *http.Request, authorizeRequest fosite.AuthorizeRequester) error {
-	// Error can be ignored because a session will always be returned
-	cookie, _ := h.CookieStore.Get(r, consentCookieName)
-
-	host, _, err := net.SplitHostPort(r.Host)
-	if err != nil {
-		host = r.Host
-	}
-
-	authUrl, err := url.Parse(h.Issuer + AuthPath)
-	if err != nil {
-		return err
-	}
-	authHost, _, err := net.SplitHostPort(authUrl.Host)
-	if err != nil {
-		authHost = authUrl.Host
-	}
-	if authHost != host {
-		h.L.WithFields(logrus.Fields{
-			"request_host": host,
-			"issuer_host":  authHost,
-		}).Warnln("Host from auth request does not match issuer host. The consent return redirect may fail.")
-	}
-	authUrl.RawQuery = r.URL.RawQuery
-
-	challenge, err := h.Consent.CreateConsentRequest(authorizeRequest, authUrl.String(), cookie)
-	if err != nil {
-		return err
-	}
-
-	p := h.ConsentURL
-	q := p.Query()
-	q.Set("consent", challenge)
-	p.RawQuery = q.Encode()
-
-	if err := cookie.Save(r, w); err != nil {
-		return err
-	}
-
-	http.Redirect(w, r, p.String(), http.StatusFound)
-	return nil
-}
-
 func (h *Handler) writeAuthorizeError(w http.ResponseWriter, ar fosite.AuthorizeRequester, err error) {
 	if !ar.IsRedirectURIValid() {
 		var rfcerr = fosite.ErrorToRFC6749Error(err)
 
-		redirectURI := h.ConsentURL
+		redirectURI := h.ErrorURL
 		query := redirectURI.Query()
 		query.Add("error", rfcerr.Name)
 		query.Add("error_description", rfcerr.Description)

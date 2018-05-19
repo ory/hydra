@@ -23,6 +23,7 @@ All URIs are relative to *http://localhost*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *HealthApi* | [**GetInstanceStatus**](docs/HealthApi.md#getinstancestatus) | **Get** /health/status | Check the Health Status
+*HealthApi* | [**GetVersion**](docs/HealthApi.md#getversion) | **Get** /health/version | Get the version of Hydra
 *JsonWebKeyApi* | [**CreateJsonWebKeySet**](docs/JsonWebKeyApi.md#createjsonwebkeyset) | **Post** /keys/{set} | Generate a new JSON Web Key
 *JsonWebKeyApi* | [**DeleteJsonWebKey**](docs/JsonWebKeyApi.md#deletejsonwebkey) | **Delete** /keys/{set}/{kid} | Delete a JSON Web Key
 *JsonWebKeyApi* | [**DeleteJsonWebKeySet**](docs/JsonWebKeyApi.md#deletejsonwebkeyset) | **Delete** /keys/{set} | Delete a JSON Web Key Set
@@ -30,88 +31,62 @@ Class | Method | HTTP request | Description
 *JsonWebKeyApi* | [**GetJsonWebKeySet**](docs/JsonWebKeyApi.md#getjsonwebkeyset) | **Get** /keys/{set} | Retrieve a JSON Web Key Set
 *JsonWebKeyApi* | [**UpdateJsonWebKey**](docs/JsonWebKeyApi.md#updatejsonwebkey) | **Put** /keys/{set}/{kid} | Update a JSON Web Key
 *JsonWebKeyApi* | [**UpdateJsonWebKeySet**](docs/JsonWebKeyApi.md#updatejsonwebkeyset) | **Put** /keys/{set} | Update a JSON Web Key Set
-*OAuth2Api* | [**AcceptOAuth2ConsentRequest**](docs/OAuth2Api.md#acceptoauth2consentrequest) | **Patch** /oauth2/consent/requests/{id}/accept | Accept a consent request
+*OAuth2Api* | [**AcceptConsentRequest**](docs/OAuth2Api.md#acceptconsentrequest) | **Put** /oauth2/auth/requests/consent/{challenge}/accept | Accept an consent request
+*OAuth2Api* | [**AcceptLoginRequest**](docs/OAuth2Api.md#acceptloginrequest) | **Put** /oauth2/auth/requests/login/{challenge}/accept | Accept an login request
 *OAuth2Api* | [**CreateOAuth2Client**](docs/OAuth2Api.md#createoauth2client) | **Post** /clients | Create an OAuth 2.0 client
 *OAuth2Api* | [**DeleteOAuth2Client**](docs/OAuth2Api.md#deleteoauth2client) | **Delete** /clients/{id} | Deletes an OAuth 2.0 Client
 *OAuth2Api* | [**FlushInactiveOAuth2Tokens**](docs/OAuth2Api.md#flushinactiveoauth2tokens) | **Post** /oauth2/flush | Flush Expired OAuth2 Access Tokens
+*OAuth2Api* | [**GetConsentRequest**](docs/OAuth2Api.md#getconsentrequest) | **Get** /oauth2/auth/requests/consent/{challenge} | Get consent request information
+*OAuth2Api* | [**GetLoginRequest**](docs/OAuth2Api.md#getloginrequest) | **Get** /oauth2/auth/requests/login/{challenge} | Get an login request
 *OAuth2Api* | [**GetOAuth2Client**](docs/OAuth2Api.md#getoauth2client) | **Get** /clients/{id} | Get an OAuth 2.0 Client.
-*OAuth2Api* | [**GetOAuth2ConsentRequest**](docs/OAuth2Api.md#getoauth2consentrequest) | **Get** /oauth2/consent/requests/{id} | Receive consent request information
 *OAuth2Api* | [**GetWellKnown**](docs/OAuth2Api.md#getwellknown) | **Get** /.well-known/openid-configuration | Server well known configuration
 *OAuth2Api* | [**IntrospectOAuth2Token**](docs/OAuth2Api.md#introspectoauth2token) | **Post** /oauth2/introspect | Introspect OAuth2 tokens
 *OAuth2Api* | [**ListOAuth2Clients**](docs/OAuth2Api.md#listoauth2clients) | **Get** /clients | List OAuth 2.0 Clients
 *OAuth2Api* | [**OauthAuth**](docs/OAuth2Api.md#oauthauth) | **Get** /oauth2/auth | The OAuth 2.0 authorize endpoint
 *OAuth2Api* | [**OauthToken**](docs/OAuth2Api.md#oauthtoken) | **Post** /oauth2/token | The OAuth 2.0 token endpoint
-*OAuth2Api* | [**RejectOAuth2ConsentRequest**](docs/OAuth2Api.md#rejectoauth2consentrequest) | **Patch** /oauth2/consent/requests/{id}/reject | Reject a consent request
+*OAuth2Api* | [**RejectConsentRequest**](docs/OAuth2Api.md#rejectconsentrequest) | **Put** /oauth2/auth/requests/consent/{challenge}/reject | Reject an consent request
+*OAuth2Api* | [**RejectLoginRequest**](docs/OAuth2Api.md#rejectloginrequest) | **Put** /oauth2/auth/requests/login/{challenge}/reject | Reject an logout request
 *OAuth2Api* | [**RevokeOAuth2Token**](docs/OAuth2Api.md#revokeoauth2token) | **Post** /oauth2/revoke | Revoke OAuth2 tokens
 *OAuth2Api* | [**UpdateOAuth2Client**](docs/OAuth2Api.md#updateoauth2client) | **Put** /clients/{id} | Update an OAuth 2.0 Client
 *OAuth2Api* | [**Userinfo**](docs/OAuth2Api.md#userinfo) | **Post** /userinfo | OpenID Connect Userinfo
 *OAuth2Api* | [**WellKnown**](docs/OAuth2Api.md#wellknown) | **Get** /.well-known/jwks.json | Get Well-Known JSON Web Keys
-*PolicyApi* | [**CreatePolicy**](docs/PolicyApi.md#createpolicy) | **Post** /policies | Create an Access Control Policy
-*PolicyApi* | [**DeletePolicy**](docs/PolicyApi.md#deletepolicy) | **Delete** /policies/{id} | Delete an Access Control Policy
-*PolicyApi* | [**GetPolicy**](docs/PolicyApi.md#getpolicy) | **Get** /policies/{id} | Get an Access Control Policy
-*PolicyApi* | [**ListPolicies**](docs/PolicyApi.md#listpolicies) | **Get** /policies | List Access Control Policies
-*PolicyApi* | [**UpdatePolicy**](docs/PolicyApi.md#updatepolicy) | **Put** /policies/{id} | Update an Access Control Polic
-*WardenApi* | [**AddMembersToGroup**](docs/WardenApi.md#addmemberstogroup) | **Post** /warden/groups/{id}/members | Add members to a group
-*WardenApi* | [**CreateGroup**](docs/WardenApi.md#creategroup) | **Post** /warden/groups | Create a group
-*WardenApi* | [**DeleteGroup**](docs/WardenApi.md#deletegroup) | **Delete** /warden/groups/{id} | Delete a group by id
-*WardenApi* | [**DoesWardenAllowAccessRequest**](docs/WardenApi.md#doeswardenallowaccessrequest) | **Post** /warden/allowed | Check if an access request is valid (without providing an access token)
-*WardenApi* | [**DoesWardenAllowTokenAccessRequest**](docs/WardenApi.md#doeswardenallowtokenaccessrequest) | **Post** /warden/token/allowed | Check if an access request is valid (providing an access token)
-*WardenApi* | [**GetGroup**](docs/WardenApi.md#getgroup) | **Get** /warden/groups/{id} | Get a group by id
-*WardenApi* | [**ListGroups**](docs/WardenApi.md#listgroups) | **Get** /warden/groups | List groups
-*WardenApi* | [**RemoveMembersFromGroup**](docs/WardenApi.md#removemembersfromgroup) | **Delete** /warden/groups/{id}/members | Remove members from a group
 
 
 ## Documentation For Models
 
+ - [AcceptConsentRequest](docs/AcceptConsentRequest.md)
+ - [AcceptLoginRequest](docs/AcceptLoginRequest.md)
+ - [AuthenticationSession](docs/AuthenticationSession.md)
+ - [CompletedRequest](docs/CompletedRequest.md)
  - [ConsentRequest](docs/ConsentRequest.md)
- - [ConsentRequestAcceptance](docs/ConsentRequestAcceptance.md)
- - [ConsentRequestManager](docs/ConsentRequestManager.md)
- - [ConsentRequestRejection](docs/ConsentRequestRejection.md)
- - [Context](docs/Context.md)
- - [Firewall](docs/Firewall.md)
+ - [ConsentRequestSession](docs/ConsentRequestSession.md)
  - [FlushInactiveOAuth2TokensRequest](docs/FlushInactiveOAuth2TokensRequest.md)
- - [Group](docs/Group.md)
- - [GroupMembers](docs/GroupMembers.md)
  - [Handler](docs/Handler.md)
- - [InlineResponse200](docs/InlineResponse200.md)
+ - [HealthStatus](docs/HealthStatus.md)
+ - [HealthVersion](docs/HealthVersion.md)
  - [InlineResponse401](docs/InlineResponse401.md)
  - [JoseWebKeySetRequest](docs/JoseWebKeySetRequest.md)
  - [JsonWebKey](docs/JsonWebKey.md)
  - [JsonWebKeySet](docs/JsonWebKeySet.md)
  - [JsonWebKeySetGeneratorRequest](docs/JsonWebKeySetGeneratorRequest.md)
  - [KeyGenerator](docs/KeyGenerator.md)
+ - [LoginRequest](docs/LoginRequest.md)
  - [Manager](docs/Manager.md)
  - [OAuth2Client](docs/OAuth2Client.md)
- - [OAuth2ConsentRequest](docs/OAuth2ConsentRequest.md)
  - [OAuth2TokenIntrospection](docs/OAuth2TokenIntrospection.md)
  - [OauthTokenResponse](docs/OauthTokenResponse.md)
- - [Policy](docs/Policy.md)
- - [PolicyConditions](docs/PolicyConditions.md)
+ - [OpenIdConnectContext](docs/OpenIdConnectContext.md)
  - [RawMessage](docs/RawMessage.md)
- - [SwaggerAcceptConsentRequest](docs/SwaggerAcceptConsentRequest.md)
- - [SwaggerCreatePolicyParameters](docs/SwaggerCreatePolicyParameters.md)
- - [SwaggerDoesWardenAllowAccessRequestParameters](docs/SwaggerDoesWardenAllowAccessRequestParameters.md)
- - [SwaggerDoesWardenAllowTokenAccessRequestParameters](docs/SwaggerDoesWardenAllowTokenAccessRequestParameters.md)
+ - [RejectRequest](docs/RejectRequest.md)
  - [SwaggerFlushInactiveAccessTokens](docs/SwaggerFlushInactiveAccessTokens.md)
- - [SwaggerGetPolicyParameters](docs/SwaggerGetPolicyParameters.md)
  - [SwaggerJsonWebKeyQuery](docs/SwaggerJsonWebKeyQuery.md)
  - [SwaggerJwkCreateSet](docs/SwaggerJwkCreateSet.md)
  - [SwaggerJwkSetQuery](docs/SwaggerJwkSetQuery.md)
  - [SwaggerJwkUpdateSet](docs/SwaggerJwkUpdateSet.md)
  - [SwaggerJwkUpdateSetKey](docs/SwaggerJwkUpdateSetKey.md)
- - [SwaggerListPolicyParameters](docs/SwaggerListPolicyParameters.md)
- - [SwaggerListPolicyResponse](docs/SwaggerListPolicyResponse.md)
- - [SwaggerOAuthConsentRequestPayload](docs/SwaggerOAuthConsentRequestPayload.md)
  - [SwaggerOAuthIntrospectionRequest](docs/SwaggerOAuthIntrospectionRequest.md)
- - [SwaggerRejectConsentRequest](docs/SwaggerRejectConsentRequest.md)
  - [SwaggerRevokeOAuth2TokenParameters](docs/SwaggerRevokeOAuth2TokenParameters.md)
- - [SwaggerUpdatePolicyParameters](docs/SwaggerUpdatePolicyParameters.md)
- - [TokenAllowedRequest](docs/TokenAllowedRequest.md)
  - [UserinfoResponse](docs/UserinfoResponse.md)
- - [WardenAccessRequest](docs/WardenAccessRequest.md)
- - [WardenAccessRequestResponse](docs/WardenAccessRequestResponse.md)
- - [WardenTokenAccessRequest](docs/WardenTokenAccessRequest.md)
- - [WardenTokenAccessRequestResponse](docs/WardenTokenAccessRequestResponse.md)
  - [WellKnown](docs/WellKnown.md)
  - [Writer](docs/Writer.md)
 
@@ -129,15 +104,6 @@ Class | Method | HTTP request | Description
 - **Flow**: accessCode
 - **Authorization URL**: https://your-hydra-instance.com/oauth2/auth
 - **Scopes**: 
- - **hydra.clients**: A scope required to manage OAuth 2.0 Clients
- - **hydra.consent**: A scope required to fetch and modify consent requests
- - **hydra.keys.create**: A scope required to create JSON Web Keys
- - **hydra.keys.delete**: A scope required to delete JSON Web Keys
- - **hydra.keys.get**: A scope required to fetch JSON Web Keys
- - **hydra.keys.update**: A scope required to get JSON Web Keys
- - **hydra.policies**: A scope required to manage access control policies
- - **hydra.warden**: A scope required to make access control inquiries
- - **hydra.warden.groups**: A scope required to manage warden groups
  - **offline**: A scope required when requesting refresh tokens
  - **openid**: Request an OpenID Connect ID Token
 

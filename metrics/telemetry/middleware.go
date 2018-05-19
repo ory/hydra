@@ -36,7 +36,6 @@ import (
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/hydra/warden/group"
 	"github.com/pborman/uuid"
 	"github.com/segmentio/analytics-go"
 	"github.com/sirupsen/logrus"
@@ -77,7 +76,7 @@ func generateID(issuerURL string, databaseURL string) string {
 }
 
 func NewMetricsManager(issuerURL string, databaseURL string, l logrus.FieldLogger, version, hash, buildTime string) *MetricsManager {
-	l.Info("Setting up telemetry - for more information please visit https://ory.gitbooks.io/hydra/content/telemetry.html")
+	// l.Info("Setting up telemetry - for more information please visit https://ory.gitbooks.io/hydra/content/telemetry.html")
 
 	segment, err := analytics.NewWithConfig("h8dRH3kVCWKkIFWydBmWsyYHR4M0u0vr", analytics.Config{
 		Interval: time.Minute * 10,
@@ -227,11 +226,7 @@ func anonymizePath(path string, salt string) string {
 		oauth2.WellKnownPath,
 		oauth2.IntrospectPath,
 		oauth2.RevocationPath,
-		oauth2.ConsentRequestPath,
-		"/policies",
-		"/warden/token/allowed",
-		"/warden/allowed",
-		group.GroupsHandlerPath,
+		//oauth2.ConsentRequestPath,
 		"/health/status",
 		"/",
 	}

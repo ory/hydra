@@ -81,14 +81,14 @@ func TestSystemSecret(t *testing.T) {
 }
 
 func TestResolve(t *testing.T) {
-	c := &Config{ClusterURL: "https://localhost:1234"}
+	c := &Config{EndpointURL: "https://localhost:1234"}
 	assert.Equal(t, c.Resolve("foo", "bar").String(), "https://localhost:1234/foo/bar")
 	assert.Equal(t, c.Resolve("/foo", "/bar").String(), "https://localhost:1234/foo/bar")
 
-	c = &Config{ClusterURL: "https://localhost:1234/"}
+	c = &Config{EndpointURL: "https://localhost:1234/"}
 	assert.Equal(t, c.Resolve("/foo", "/bar").String(), "https://localhost:1234/foo/bar")
 
-	c = &Config{ClusterURL: "https://localhost:1234/bar"}
+	c = &Config{EndpointURL: "https://localhost:1234/bar"}
 	assert.Equal(t, c.Resolve("/foo", "/bar").String(), "https://localhost:1234/bar/foo/bar")
 }
 

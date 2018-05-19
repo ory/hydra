@@ -17,21 +17,16 @@
 ;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(
-      [
-        'ApiClient',
-        'model/Firewall',
-        'model/KeyGenerator',
-        'model/Manager',
-        'model/Writer'
-      ],
-      factory
-    )
+    define([
+      'ApiClient',
+      'model/KeyGenerator',
+      'model/Manager',
+      'model/Writer'
+    ], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
     module.exports = factory(
       require('../ApiClient'),
-      require('./Firewall'),
       require('./KeyGenerator'),
       require('./Manager'),
       require('./Writer')
@@ -43,13 +38,12 @@
     }
     root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.Handler = factory(
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.Firewall,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.KeyGenerator,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.Manager,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.Writer
     )
   }
-})(this, function(ApiClient, Firewall, KeyGenerator, Manager, Writer) {
+})(this, function(ApiClient, KeyGenerator, Manager, Writer) {
   'use strict'
 
   /**
@@ -95,9 +89,6 @@
           'String'
         )
       }
-      if (data.hasOwnProperty('W')) {
-        obj['W'] = Firewall.constructFromObject(data['W'])
-      }
     }
     return obj
   }
@@ -118,10 +109,6 @@
    * @member {String} ResourcePrefix
    */
   exports.prototype['ResourcePrefix'] = undefined
-  /**
-   * @member {module:model/Firewall} W
-   */
-  exports.prototype['W'] = undefined
 
   return exports
 })

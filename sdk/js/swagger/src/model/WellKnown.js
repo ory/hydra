@@ -99,9 +99,7 @@
         )
       }
       if (data.hasOwnProperty('id_token_signing_alg_values_supported')) {
-        obj[
-          'id_token_signing_alg_values_supported'
-        ] = ApiClient.convertToType(
+        obj['id_token_signing_alg_values_supported'] = ApiClient.convertToType(
           data['id_token_signing_alg_values_supported'],
           ['String']
         )
@@ -137,9 +135,7 @@
         )
       }
       if (data.hasOwnProperty('token_endpoint_auth_methods_supported')) {
-        obj[
-          'token_endpoint_auth_methods_supported'
-        ] = ApiClient.convertToType(
+        obj['token_endpoint_auth_methods_supported'] = ApiClient.convertToType(
           data['token_endpoint_auth_methods_supported'],
           ['String']
         )

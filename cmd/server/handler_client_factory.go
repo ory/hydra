@@ -25,6 +25,7 @@ import (
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
+	"github.com/ory/sqlcon"
 )
 
 func newClientManager(c *config.Config) client.Manager {
@@ -33,7 +34,7 @@ func newClientManager(c *config.Config) client.Manager {
 	switch con := ctx.Connection.(type) {
 	case *config.MemoryConnection:
 		return client.NewMemoryManager(ctx.Hasher)
-	case *config.SQLConnection:
+	case *sqlcon.SQLConnection:
 		return &client.SQLManager{
 			DB:     con.GetDatabase(),
 			Hasher: ctx.Hasher,
@@ -52,10 +53,9 @@ func newClientManager(c *config.Config) client.Manager {
 }
 
 func newClientHandler(c *config.Config, router *httprouter.Router, manager client.Manager) *client.Handler {
-	ctx := c.Context()
 	h := &client.Handler{
-		H: herodot.NewJSONWriter(c.GetLogger()),
-		W: ctx.Warden, Manager: manager,
+		H:              herodot.NewJSONWriter(c.GetLogger()),
+		Manager:        manager,
 		ResourcePrefix: c.AccessControlResourcePrefix,
 	}
 

@@ -41,6 +41,7 @@
 
   /**
    * Constructs a new <code>OAuth2TokenIntrospection</code>.
+   * https://tools.ietf.org/html/rfc7662
    * @alias module:model/OAuth2TokenIntrospection
    * @class
    */
@@ -63,7 +64,7 @@
         obj['active'] = ApiClient.convertToType(data['active'], 'Boolean')
       }
       if (data.hasOwnProperty('aud')) {
-        obj['aud'] = ApiClient.convertToType(data['aud'], 'String')
+        obj['aud'] = ApiClient.convertToType(data['aud'], ['String'])
       }
       if (data.hasOwnProperty('client_id')) {
         obj['client_id'] = ApiClient.convertToType(data['client_id'], 'String')
@@ -89,6 +90,12 @@
       if (data.hasOwnProperty('sub')) {
         obj['sub'] = ApiClient.convertToType(data['sub'], 'String')
       }
+      if (data.hasOwnProperty('token_type')) {
+        obj['token_type'] = ApiClient.convertToType(
+          data['token_type'],
+          'String'
+        )
+      }
       if (data.hasOwnProperty('username')) {
         obj['username'] = ApiClient.convertToType(data['username'], 'String')
       }
@@ -102,8 +109,7 @@
    */
   exports.prototype['active'] = undefined
   /**
-   * ClientID is a service-specific string identifier or list of string identifiers representing the intended audience for this token.
-   * @member {String} aud
+   * @member {Array.<String>} aud
    */
   exports.prototype['aud'] = undefined
   /**
@@ -146,6 +152,11 @@
    * @member {String} sub
    */
   exports.prototype['sub'] = undefined
+  /**
+   * TokenType is the introspected token's type, for example `access_token` or `refresh_token`.
+   * @member {String} token_type
+   */
+  exports.prototype['token_type'] = undefined
   /**
    * Username is a human-readable identifier for the resource owner who authorized this token.
    * @member {String} username

@@ -17,188 +17,131 @@
 ;(function(factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(
-      [
-        'ApiClient',
-        'model/ConsentRequest',
-        'model/ConsentRequestAcceptance',
-        'model/ConsentRequestManager',
-        'model/ConsentRequestRejection',
-        'model/Context',
-        'model/Firewall',
-        'model/FlushInactiveOAuth2TokensRequest',
-        'model/Group',
-        'model/GroupMembers',
-        'model/Handler',
-        'model/InlineResponse200',
-        'model/InlineResponse401',
-        'model/JoseWebKeySetRequest',
-        'model/JsonWebKey',
-        'model/JsonWebKeySet',
-        'model/JsonWebKeySetGeneratorRequest',
-        'model/KeyGenerator',
-        'model/Manager',
-        'model/OAuth2Client',
-        'model/OAuth2ConsentRequest',
-        'model/OAuth2TokenIntrospection',
-        'model/OauthTokenResponse',
-        'model/Policy',
-        'model/PolicyConditions',
-        'model/RawMessage',
-        'model/SwaggerAcceptConsentRequest',
-        'model/SwaggerCreatePolicyParameters',
-        'model/SwaggerDoesWardenAllowAccessRequestParameters',
-        'model/SwaggerDoesWardenAllowTokenAccessRequestParameters',
-        'model/SwaggerFlushInactiveAccessTokens',
-        'model/SwaggerGetPolicyParameters',
-        'model/SwaggerJsonWebKeyQuery',
-        'model/SwaggerJwkCreateSet',
-        'model/SwaggerJwkSetQuery',
-        'model/SwaggerJwkUpdateSet',
-        'model/SwaggerJwkUpdateSetKey',
-        'model/SwaggerListPolicyParameters',
-        'model/SwaggerListPolicyResponse',
-        'model/SwaggerOAuthConsentRequestPayload',
-        'model/SwaggerOAuthIntrospectionRequest',
-        'model/SwaggerRejectConsentRequest',
-        'model/SwaggerRevokeOAuth2TokenParameters',
-        'model/SwaggerUpdatePolicyParameters',
-        'model/TokenAllowedRequest',
-        'model/UserinfoResponse',
-        'model/WardenAccessRequest',
-        'model/WardenAccessRequestResponse',
-        'model/WardenTokenAccessRequest',
-        'model/WardenTokenAccessRequestResponse',
-        'model/WellKnown',
-        'model/Writer',
-        'api/HealthApi',
-        'api/JsonWebKeyApi',
-        'api/OAuth2Api',
-        'api/PolicyApi',
-        'api/WardenApi'
-      ],
-      factory
-    )
+    define([
+      'ApiClient',
+      'model/AcceptConsentRequest',
+      'model/AcceptLoginRequest',
+      'model/AuthenticationSession',
+      'model/CompletedRequest',
+      'model/ConsentRequest',
+      'model/ConsentRequestSession',
+      'model/FlushInactiveOAuth2TokensRequest',
+      'model/Handler',
+      'model/HealthStatus',
+      'model/HealthVersion',
+      'model/InlineResponse401',
+      'model/JoseWebKeySetRequest',
+      'model/JsonWebKey',
+      'model/JsonWebKeySet',
+      'model/JsonWebKeySetGeneratorRequest',
+      'model/KeyGenerator',
+      'model/LoginRequest',
+      'model/Manager',
+      'model/OAuth2Client',
+      'model/OAuth2TokenIntrospection',
+      'model/OauthTokenResponse',
+      'model/OpenIDConnectContext',
+      'model/RawMessage',
+      'model/RejectRequest',
+      'model/SwaggerFlushInactiveAccessTokens',
+      'model/SwaggerJsonWebKeyQuery',
+      'model/SwaggerJwkCreateSet',
+      'model/SwaggerJwkSetQuery',
+      'model/SwaggerJwkUpdateSet',
+      'model/SwaggerJwkUpdateSetKey',
+      'model/SwaggerOAuthIntrospectionRequest',
+      'model/SwaggerRevokeOAuth2TokenParameters',
+      'model/UserinfoResponse',
+      'model/WellKnown',
+      'model/Writer',
+      'api/HealthApi',
+      'api/JsonWebKeyApi',
+      'api/OAuth2Api'
+    ], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
     module.exports = factory(
       require('./ApiClient'),
+      require('./model/AcceptConsentRequest'),
+      require('./model/AcceptLoginRequest'),
+      require('./model/AuthenticationSession'),
+      require('./model/CompletedRequest'),
       require('./model/ConsentRequest'),
-      require('./model/ConsentRequestAcceptance'),
-      require('./model/ConsentRequestManager'),
-      require('./model/ConsentRequestRejection'),
-      require('./model/Context'),
-      require('./model/Firewall'),
+      require('./model/ConsentRequestSession'),
       require('./model/FlushInactiveOAuth2TokensRequest'),
-      require('./model/Group'),
-      require('./model/GroupMembers'),
       require('./model/Handler'),
-      require('./model/InlineResponse200'),
+      require('./model/HealthStatus'),
+      require('./model/HealthVersion'),
       require('./model/InlineResponse401'),
       require('./model/JoseWebKeySetRequest'),
       require('./model/JsonWebKey'),
       require('./model/JsonWebKeySet'),
       require('./model/JsonWebKeySetGeneratorRequest'),
       require('./model/KeyGenerator'),
+      require('./model/LoginRequest'),
       require('./model/Manager'),
       require('./model/OAuth2Client'),
-      require('./model/OAuth2ConsentRequest'),
       require('./model/OAuth2TokenIntrospection'),
       require('./model/OauthTokenResponse'),
-      require('./model/Policy'),
-      require('./model/PolicyConditions'),
+      require('./model/OpenIDConnectContext'),
       require('./model/RawMessage'),
-      require('./model/SwaggerAcceptConsentRequest'),
-      require('./model/SwaggerCreatePolicyParameters'),
-      require('./model/SwaggerDoesWardenAllowAccessRequestParameters'),
-      require('./model/SwaggerDoesWardenAllowTokenAccessRequestParameters'),
+      require('./model/RejectRequest'),
       require('./model/SwaggerFlushInactiveAccessTokens'),
-      require('./model/SwaggerGetPolicyParameters'),
       require('./model/SwaggerJsonWebKeyQuery'),
       require('./model/SwaggerJwkCreateSet'),
       require('./model/SwaggerJwkSetQuery'),
       require('./model/SwaggerJwkUpdateSet'),
       require('./model/SwaggerJwkUpdateSetKey'),
-      require('./model/SwaggerListPolicyParameters'),
-      require('./model/SwaggerListPolicyResponse'),
-      require('./model/SwaggerOAuthConsentRequestPayload'),
       require('./model/SwaggerOAuthIntrospectionRequest'),
-      require('./model/SwaggerRejectConsentRequest'),
       require('./model/SwaggerRevokeOAuth2TokenParameters'),
-      require('./model/SwaggerUpdatePolicyParameters'),
-      require('./model/TokenAllowedRequest'),
       require('./model/UserinfoResponse'),
-      require('./model/WardenAccessRequest'),
-      require('./model/WardenAccessRequestResponse'),
-      require('./model/WardenTokenAccessRequest'),
-      require('./model/WardenTokenAccessRequestResponse'),
       require('./model/WellKnown'),
       require('./model/Writer'),
       require('./api/HealthApi'),
       require('./api/JsonWebKeyApi'),
-      require('./api/OAuth2Api'),
-      require('./api/PolicyApi'),
-      require('./api/WardenApi')
+      require('./api/OAuth2Api')
     )
   }
 })(function(
   ApiClient,
+  AcceptConsentRequest,
+  AcceptLoginRequest,
+  AuthenticationSession,
+  CompletedRequest,
   ConsentRequest,
-  ConsentRequestAcceptance,
-  ConsentRequestManager,
-  ConsentRequestRejection,
-  Context,
-  Firewall,
+  ConsentRequestSession,
   FlushInactiveOAuth2TokensRequest,
-  Group,
-  GroupMembers,
   Handler,
-  InlineResponse200,
+  HealthStatus,
+  HealthVersion,
   InlineResponse401,
   JoseWebKeySetRequest,
   JsonWebKey,
   JsonWebKeySet,
   JsonWebKeySetGeneratorRequest,
   KeyGenerator,
+  LoginRequest,
   Manager,
   OAuth2Client,
-  OAuth2ConsentRequest,
   OAuth2TokenIntrospection,
   OauthTokenResponse,
-  Policy,
-  PolicyConditions,
+  OpenIDConnectContext,
   RawMessage,
-  SwaggerAcceptConsentRequest,
-  SwaggerCreatePolicyParameters,
-  SwaggerDoesWardenAllowAccessRequestParameters,
-  SwaggerDoesWardenAllowTokenAccessRequestParameters,
+  RejectRequest,
   SwaggerFlushInactiveAccessTokens,
-  SwaggerGetPolicyParameters,
   SwaggerJsonWebKeyQuery,
   SwaggerJwkCreateSet,
   SwaggerJwkSetQuery,
   SwaggerJwkUpdateSet,
   SwaggerJwkUpdateSetKey,
-  SwaggerListPolicyParameters,
-  SwaggerListPolicyResponse,
-  SwaggerOAuthConsentRequestPayload,
   SwaggerOAuthIntrospectionRequest,
-  SwaggerRejectConsentRequest,
   SwaggerRevokeOAuth2TokenParameters,
-  SwaggerUpdatePolicyParameters,
-  TokenAllowedRequest,
   UserinfoResponse,
-  WardenAccessRequest,
-  WardenAccessRequestResponse,
-  WardenTokenAccessRequest,
-  WardenTokenAccessRequestResponse,
   WellKnown,
   Writer,
   HealthApi,
   JsonWebKeyApi,
-  OAuth2Api,
-  PolicyApi,
-  WardenApi
+  OAuth2Api
 ) {
   'use strict'
 
@@ -240,60 +183,55 @@
      */
     ApiClient: ApiClient,
     /**
+     * The AcceptConsentRequest model constructor.
+     * @property {module:model/AcceptConsentRequest}
+     */
+    AcceptConsentRequest: AcceptConsentRequest,
+    /**
+     * The AcceptLoginRequest model constructor.
+     * @property {module:model/AcceptLoginRequest}
+     */
+    AcceptLoginRequest: AcceptLoginRequest,
+    /**
+     * The AuthenticationSession model constructor.
+     * @property {module:model/AuthenticationSession}
+     */
+    AuthenticationSession: AuthenticationSession,
+    /**
+     * The CompletedRequest model constructor.
+     * @property {module:model/CompletedRequest}
+     */
+    CompletedRequest: CompletedRequest,
+    /**
      * The ConsentRequest model constructor.
      * @property {module:model/ConsentRequest}
      */
     ConsentRequest: ConsentRequest,
     /**
-     * The ConsentRequestAcceptance model constructor.
-     * @property {module:model/ConsentRequestAcceptance}
+     * The ConsentRequestSession model constructor.
+     * @property {module:model/ConsentRequestSession}
      */
-    ConsentRequestAcceptance: ConsentRequestAcceptance,
-    /**
-     * The ConsentRequestManager model constructor.
-     * @property {module:model/ConsentRequestManager}
-     */
-    ConsentRequestManager: ConsentRequestManager,
-    /**
-     * The ConsentRequestRejection model constructor.
-     * @property {module:model/ConsentRequestRejection}
-     */
-    ConsentRequestRejection: ConsentRequestRejection,
-    /**
-     * The Context model constructor.
-     * @property {module:model/Context}
-     */
-    Context: Context,
-    /**
-     * The Firewall model constructor.
-     * @property {module:model/Firewall}
-     */
-    Firewall: Firewall,
+    ConsentRequestSession: ConsentRequestSession,
     /**
      * The FlushInactiveOAuth2TokensRequest model constructor.
      * @property {module:model/FlushInactiveOAuth2TokensRequest}
      */
     FlushInactiveOAuth2TokensRequest: FlushInactiveOAuth2TokensRequest,
     /**
-     * The Group model constructor.
-     * @property {module:model/Group}
-     */
-    Group: Group,
-    /**
-     * The GroupMembers model constructor.
-     * @property {module:model/GroupMembers}
-     */
-    GroupMembers: GroupMembers,
-    /**
      * The Handler model constructor.
      * @property {module:model/Handler}
      */
     Handler: Handler,
     /**
-     * The InlineResponse200 model constructor.
-     * @property {module:model/InlineResponse200}
+     * The HealthStatus model constructor.
+     * @property {module:model/HealthStatus}
      */
-    InlineResponse200: InlineResponse200,
+    HealthStatus: HealthStatus,
+    /**
+     * The HealthVersion model constructor.
+     * @property {module:model/HealthVersion}
+     */
+    HealthVersion: HealthVersion,
     /**
      * The InlineResponse401 model constructor.
      * @property {module:model/InlineResponse401}
@@ -325,6 +263,11 @@
      */
     KeyGenerator: KeyGenerator,
     /**
+     * The LoginRequest model constructor.
+     * @property {module:model/LoginRequest}
+     */
+    LoginRequest: LoginRequest,
+    /**
      * The Manager model constructor.
      * @property {module:model/Manager}
      */
@@ -334,11 +277,6 @@
      * @property {module:model/OAuth2Client}
      */
     OAuth2Client: OAuth2Client,
-    /**
-     * The OAuth2ConsentRequest model constructor.
-     * @property {module:model/OAuth2ConsentRequest}
-     */
-    OAuth2ConsentRequest: OAuth2ConsentRequest,
     /**
      * The OAuth2TokenIntrospection model constructor.
      * @property {module:model/OAuth2TokenIntrospection}
@@ -350,50 +288,25 @@
      */
     OauthTokenResponse: OauthTokenResponse,
     /**
-     * The Policy model constructor.
-     * @property {module:model/Policy}
+     * The OpenIDConnectContext model constructor.
+     * @property {module:model/OpenIDConnectContext}
      */
-    Policy: Policy,
-    /**
-     * The PolicyConditions model constructor.
-     * @property {module:model/PolicyConditions}
-     */
-    PolicyConditions: PolicyConditions,
+    OpenIDConnectContext: OpenIDConnectContext,
     /**
      * The RawMessage model constructor.
      * @property {module:model/RawMessage}
      */
     RawMessage: RawMessage,
     /**
-     * The SwaggerAcceptConsentRequest model constructor.
-     * @property {module:model/SwaggerAcceptConsentRequest}
+     * The RejectRequest model constructor.
+     * @property {module:model/RejectRequest}
      */
-    SwaggerAcceptConsentRequest: SwaggerAcceptConsentRequest,
-    /**
-     * The SwaggerCreatePolicyParameters model constructor.
-     * @property {module:model/SwaggerCreatePolicyParameters}
-     */
-    SwaggerCreatePolicyParameters: SwaggerCreatePolicyParameters,
-    /**
-     * The SwaggerDoesWardenAllowAccessRequestParameters model constructor.
-     * @property {module:model/SwaggerDoesWardenAllowAccessRequestParameters}
-     */
-    SwaggerDoesWardenAllowAccessRequestParameters: SwaggerDoesWardenAllowAccessRequestParameters,
-    /**
-     * The SwaggerDoesWardenAllowTokenAccessRequestParameters model constructor.
-     * @property {module:model/SwaggerDoesWardenAllowTokenAccessRequestParameters}
-     */
-    SwaggerDoesWardenAllowTokenAccessRequestParameters: SwaggerDoesWardenAllowTokenAccessRequestParameters,
+    RejectRequest: RejectRequest,
     /**
      * The SwaggerFlushInactiveAccessTokens model constructor.
      * @property {module:model/SwaggerFlushInactiveAccessTokens}
      */
     SwaggerFlushInactiveAccessTokens: SwaggerFlushInactiveAccessTokens,
-    /**
-     * The SwaggerGetPolicyParameters model constructor.
-     * @property {module:model/SwaggerGetPolicyParameters}
-     */
-    SwaggerGetPolicyParameters: SwaggerGetPolicyParameters,
     /**
      * The SwaggerJsonWebKeyQuery model constructor.
      * @property {module:model/SwaggerJsonWebKeyQuery}
@@ -420,70 +333,20 @@
      */
     SwaggerJwkUpdateSetKey: SwaggerJwkUpdateSetKey,
     /**
-     * The SwaggerListPolicyParameters model constructor.
-     * @property {module:model/SwaggerListPolicyParameters}
-     */
-    SwaggerListPolicyParameters: SwaggerListPolicyParameters,
-    /**
-     * The SwaggerListPolicyResponse model constructor.
-     * @property {module:model/SwaggerListPolicyResponse}
-     */
-    SwaggerListPolicyResponse: SwaggerListPolicyResponse,
-    /**
-     * The SwaggerOAuthConsentRequestPayload model constructor.
-     * @property {module:model/SwaggerOAuthConsentRequestPayload}
-     */
-    SwaggerOAuthConsentRequestPayload: SwaggerOAuthConsentRequestPayload,
-    /**
      * The SwaggerOAuthIntrospectionRequest model constructor.
      * @property {module:model/SwaggerOAuthIntrospectionRequest}
      */
     SwaggerOAuthIntrospectionRequest: SwaggerOAuthIntrospectionRequest,
-    /**
-     * The SwaggerRejectConsentRequest model constructor.
-     * @property {module:model/SwaggerRejectConsentRequest}
-     */
-    SwaggerRejectConsentRequest: SwaggerRejectConsentRequest,
     /**
      * The SwaggerRevokeOAuth2TokenParameters model constructor.
      * @property {module:model/SwaggerRevokeOAuth2TokenParameters}
      */
     SwaggerRevokeOAuth2TokenParameters: SwaggerRevokeOAuth2TokenParameters,
     /**
-     * The SwaggerUpdatePolicyParameters model constructor.
-     * @property {module:model/SwaggerUpdatePolicyParameters}
-     */
-    SwaggerUpdatePolicyParameters: SwaggerUpdatePolicyParameters,
-    /**
-     * The TokenAllowedRequest model constructor.
-     * @property {module:model/TokenAllowedRequest}
-     */
-    TokenAllowedRequest: TokenAllowedRequest,
-    /**
      * The UserinfoResponse model constructor.
      * @property {module:model/UserinfoResponse}
      */
     UserinfoResponse: UserinfoResponse,
-    /**
-     * The WardenAccessRequest model constructor.
-     * @property {module:model/WardenAccessRequest}
-     */
-    WardenAccessRequest: WardenAccessRequest,
-    /**
-     * The WardenAccessRequestResponse model constructor.
-     * @property {module:model/WardenAccessRequestResponse}
-     */
-    WardenAccessRequestResponse: WardenAccessRequestResponse,
-    /**
-     * The WardenTokenAccessRequest model constructor.
-     * @property {module:model/WardenTokenAccessRequest}
-     */
-    WardenTokenAccessRequest: WardenTokenAccessRequest,
-    /**
-     * The WardenTokenAccessRequestResponse model constructor.
-     * @property {module:model/WardenTokenAccessRequestResponse}
-     */
-    WardenTokenAccessRequestResponse: WardenTokenAccessRequestResponse,
     /**
      * The WellKnown model constructor.
      * @property {module:model/WellKnown}
@@ -508,17 +371,7 @@
      * The OAuth2Api service constructor.
      * @property {module:api/OAuth2Api}
      */
-    OAuth2Api: OAuth2Api,
-    /**
-     * The PolicyApi service constructor.
-     * @property {module:api/PolicyApi}
-     */
-    PolicyApi: PolicyApi,
-    /**
-     * The WardenApi service constructor.
-     * @property {module:api/WardenApi}
-     */
-    WardenApi: WardenApi
+    OAuth2Api: OAuth2Api
   }
 
   return exports

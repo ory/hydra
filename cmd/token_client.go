@@ -25,7 +25,10 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"net/url"
+	"os"
 
+	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/hydra/pkg"
 	"github.com/spf13/cobra"
 	"golang.org/x/oauth2"
@@ -71,23 +74,44 @@ var tokenClientCmd = &cobra.Command{
 			})
 		}
 
-		scopes, _ := cmd.Flags().GetStringSlice("scopes")
+		scopes, _ := cmd.Flags().GetStringSlice("scope")
+
+		cu, err := url.Parse(c.GetClusterURLWithoutTailingSlash(cmd))
+		pkg.Must(err, `Unable to parse cluster url ("%s"): %s`, c.GetClusterURLWithoutTailingSlash(cmd), err)
+
+		clientID, _ := cmd.Flags().GetString("client-id")
+		clientSecret, _ := cmd.Flags().GetString("client-secret")
+		if clientID == "" || clientSecret == "" {
+			fmt.Print(cmd.UsageString())
+			fmt.Println("Please provide a Client ID and Client Secret using flags --client-id and --client-secret, or environment variables OAUTH2_CLIENT_ID and OAUTH2_CLIENT_SECRET.")
+			return
+		}
 
 		oauthConfig := clientcredentials.Config{
-			ClientID:     c.ClientID,
-			ClientSecret: c.ClientSecret,
-			TokenURL:     pkg.JoinURLStrings(c.ClusterURL, "/oauth2/token"),
+			ClientID:     clientID,
+			ClientSecret: clientSecret,
+			TokenURL:     urlx.AppendPaths(cu, "/oauth2/token").String(),
 			Scopes:       scopes,
 		}
 
 		t, err := oauthConfig.Token(ctx)
 		pkg.Must(err, "Could not retrieve access token because: %s", err)
-		fmt.Printf("%s\n", t.AccessToken)
+
+		if verbose, _ := cmd.Flags().GetBool("verbose"); verbose {
+			fmt.Printf("%+v\n", t)
+		} else {
+			fmt.Printf("%s\n", t.AccessToken)
+		}
 	},
 }
 
 func init() {
 	tokenCmd.AddCommand(tokenClientCmd)
 
-	tokenClientCmd.Flags().StringSlice("scopes", []string{"hydra", "hydra.*"}, "User a specific set of scopes")
+	tokenClientCmd.Flags().StringSlice("scope", []string{}, "OAuth2 scope to request")
+	tokenClientCmd.Flags().BoolP("verbose", "v", false, "Toggle verbose output mode")
+	tokenClientCmd.Flags().String("client-id", os.Getenv("OAUTH2_CLIENT_ID"), "Use the provided OAuth 2.0 Client ID, defaults to environment variable OAUTH2_CLIENT_ID")
+	tokenClientCmd.Flags().String("client-secret", os.Getenv("OAUTH2_CLIENT_SECRET"), "Use the provided OAuth 2.0 Client Secret, defaults to environment variable OAUTH2_CLIENT_SECRET")
+	tokenClientCmd.PersistentFlags().String("endpoint", os.Getenv("HYDRA_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_URL")
+
 }

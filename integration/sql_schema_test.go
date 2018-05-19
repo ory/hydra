@@ -21,15 +21,20 @@
 package integration
 
 import (
+	"log"
 	"testing"
+	"time"
 
+	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/warden/group"
 	"github.com/ory/ladon"
 	lsql "github.com/ory/ladon/manager/sql"
+	"github.com/ory/sqlcon/dockertest"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
@@ -45,20 +50,22 @@ func TestSQLSchema(t *testing.T) {
 	p1 := ks.Key("private:foo")
 	r := fosite.NewRequest()
 	r.ID = "foo"
-	db := ConnectToPostgres()
+
+	db, err := dockertest.ConnectToTestPostgreSQL()
+	if err != nil {
+		log.Fatalf("Could not connect to database: %v", err)
+	}
 
 	cm := &client.SQLManager{DB: db, Hasher: &fosite.BCrypt{}}
-	gm := group.SQLManager{DB: db}
 	jm := jwk.SQLManager{DB: db, Cipher: &jwk.AEAD{Key: []byte("11111111111111111111111111111111")}}
 	om := oauth2.FositeSQLStore{Manager: cm, DB: db, L: logrus.New()}
-	crm := oauth2.NewConsentRequestSQLManager(db)
+	crm := consent.NewSQLManager(db, nil)
 	pm := lsql.NewSQLManager(db, nil)
 
-	_, err := pm.CreateSchemas("", "hydra_policy_migration")
+	_, err = pm.CreateSchemas("", "hydra_policy_migration")
 	require.NoError(t, err)
 	_, err = cm.CreateSchemas()
 	require.NoError(t, err)
-	_, err = gm.CreateSchemas()
 	require.NoError(t, err)
 	_, err = jm.CreateSchemas()
 	require.NoError(t, err)
@@ -70,11 +77,10 @@ func TestSQLSchema(t *testing.T) {
 	require.NoError(t, jm.AddKey("integration-test-foo", jwk.First(p1)))
 	require.NoError(t, pm.Create(&ladon.DefaultPolicy{ID: "integration-test-foo", Resources: []string{"foo"}, Actions: []string{"bar"}, Subjects: []string{"baz"}, Effect: "allow"}))
 	require.NoError(t, cm.CreateClient(&client.Client{ID: "integration-test-foo"}))
-	require.NoError(t, crm.PersistConsentRequest(&oauth2.ConsentRequest{ID: "integration-test-foo"}))
-	require.NoError(t, om.CreateAccessTokenSession(nil, "asdfasdf", r))
-	require.NoError(t, gm.CreateGroup(&group.Group{
-		ID:      "integration-test-asdfas",
-		Members: []string{"asdf"},
+	require.NoError(t, crm.CreateAuthenticationSession(&consent.AuthenticationSession{
+		ID:              "foo",
+		AuthenticatedAt: time.Now(),
+		Subject:         "bar",
 	}))
-	require.NoError(t, gm.DeleteGroup("integration-test-asdfas"))
+	require.NoError(t, om.CreateAccessTokenSession(nil, "asdfasdf", r))
 }

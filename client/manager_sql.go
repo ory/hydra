@@ -28,7 +28,8 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/pkg"
+	"github.com/ory/go-convenience/stringsx"
+	"github.com/ory/sqlcon"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
@@ -124,16 +125,16 @@ func (d *sqlData) ToClient() *Client {
 		ID:                d.ID,
 		Name:              d.Name,
 		Secret:            d.Secret,
-		RedirectURIs:      pkg.SplitNonEmpty(d.RedirectURIs, "|"),
-		GrantTypes:        pkg.SplitNonEmpty(d.GrantTypes, "|"),
-		ResponseTypes:     pkg.SplitNonEmpty(d.ResponseTypes, "|"),
+		RedirectURIs:      stringsx.Splitx(d.RedirectURIs, "|"),
+		GrantTypes:        stringsx.Splitx(d.GrantTypes, "|"),
+		ResponseTypes:     stringsx.Splitx(d.ResponseTypes, "|"),
 		Scope:             d.Scope,
 		Owner:             d.Owner,
 		PolicyURI:         d.PolicyURI,
 		TermsOfServiceURI: d.TermsOfServiceURI,
 		ClientURI:         d.ClientURI,
 		LogoURI:           d.LogoURI,
-		Contacts:          pkg.SplitNonEmpty(d.Contacts, "|"),
+		Contacts:          stringsx.Splitx(d.Contacts, "|"),
 		Public:            d.Public,
 	}
 }
@@ -150,7 +151,7 @@ func (s *SQLManager) CreateSchemas() (int, error) {
 func (m *SQLManager) GetConcreteClient(id string) (*Client, error) {
 	var d sqlData
 	if err := m.DB.Get(&d, m.DB.Rebind("SELECT * FROM hydra_client WHERE id=?"), id); err == sql.ErrNoRows {
-		return nil, errors.Wrap(pkg.ErrNotFound, "")
+		return nil, errors.Errorf("Unable to find client %s", id)
 	} else if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -220,8 +221,9 @@ func (m *SQLManager) CreateClient(c *Client) error {
 		strings.Join(sqlParams, ", "),
 		":"+strings.Join(sqlParams, ", :"),
 	), data); err != nil {
-		return errors.WithStack(err)
+		return sqlcon.HandleError(err)
 	}
+
 	return nil
 }
 

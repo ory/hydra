@@ -23,108 +23,128 @@ package oauth2_test
 import (
 	"flag"
 	"fmt"
-	"os"
+	"log"
 	"testing"
 	"time"
 
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/integration"
 	. "github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
+	"github.com/ory/sqlcon/dockertest"
 	"github.com/sirupsen/logrus"
 )
 
-var clientManagers = map[string]pkg.FositeStorer{}
+var fositeStores = map[string]pkg.FositeStorer{}
 var clientManager = &client.MemoryManager{
 	Clients: []client.Client{{ID: "foobar"}},
 	Hasher:  &fosite.BCrypt{},
 }
+var databases = make(map[string]*sqlx.DB)
 
 func init() {
-	clientManagers["memory"] = &FositeMemoryStore{
+	fositeStores["memory"] = &FositeMemoryStore{
 		AuthorizeCodes:      make(map[string]fosite.Requester),
 		IDSessions:          make(map[string]fosite.Requester),
 		AccessTokens:        make(map[string]fosite.Requester),
 		RefreshTokens:       make(map[string]fosite.Requester),
 		AccessTokenLifespan: time.Hour,
+		PKCES:               make(map[string]fosite.Requester),
 	}
 }
 
 func TestMain(m *testing.M) {
+	runner := dockertest.Register()
+
 	flag.Parse()
 	if !testing.Short() {
-		integration.BootParallel([]func(){
+		dockertest.Parallel([]func(){
 			connectToPG,
 			connectToMySQL,
-			connectToPGConsent,
-			connectToMySQLConsent,
 		})
 	}
 
-	s := m.Run()
-	integration.KillAll()
-	os.Exit(s)
+	runner.Exit(m.Run())
 }
 
 func connectToPG() {
-	var db = integration.ConnectToPostgres()
-	s := &FositeSQLStore{DB: db, Manager: clientManager, L: logrus.New(), AccessTokenLifespan: time.Hour}
-	if _, err := s.CreateSchemas(); err != nil {
-		logrus.Fatalf("Could not create postgres schema: %v", err)
+	db, err := dockertest.ConnectToTestPostgreSQL()
+	if err != nil {
+		log.Fatalf("Could not connect to database: %v", err)
 	}
 
-	clientManagers["postgres"] = s
+	s := &FositeSQLStore{DB: db, Manager: clientManager, L: logrus.New(), AccessTokenLifespan: time.Hour}
+	if _, err := s.CreateSchemas(); err != nil {
+		log.Fatalf("Could not create postgres schema: %v", err)
+	}
+
+	databases["postgres"] = db
+	fositeStores["postgres"] = s
 }
 
 func connectToMySQL() {
-	var db = integration.ConnectToMySQL()
-	s := &FositeSQLStore{DB: db, Manager: clientManager, L: logrus.New(), AccessTokenLifespan: time.Hour}
-	if _, err := s.CreateSchemas(); err != nil {
-		logrus.Fatalf("Could not create postgres schema: %v", err)
+	db, err := dockertest.ConnectToTestMySQL()
+	if err != nil {
+		log.Fatalf("Could not connect to database: %v", err)
 	}
 
-	clientManagers["mysql"] = s
+	s := &FositeSQLStore{DB: db, Manager: clientManager, L: logrus.New(), AccessTokenLifespan: time.Hour}
+	if _, err := s.CreateSchemas(); err != nil {
+		log.Fatalf("Could not create postgres schema: %v", err)
+	}
+
+	databases["mysql"] = db
+	fositeStores["mysql"] = s
 }
 
 func TestCreateGetDeleteAuthorizeCodes(t *testing.T) {
 	t.Parallel()
-	for k, m := range clientManagers {
+	for k, m := range fositeStores {
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeleteAuthorizeCodes(m))
 	}
 }
 
 func TestCreateGetDeleteAccessTokenSession(t *testing.T) {
 	t.Parallel()
-	for k, m := range clientManagers {
+	for k, m := range fositeStores {
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeleteAccessTokenSession(m))
 	}
 }
 
 func TestCreateGetDeleteOpenIDConnectSession(t *testing.T) {
 	t.Parallel()
-	for k, m := range clientManagers {
+	for k, m := range fositeStores {
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeleteOpenIDConnectSession(m))
 	}
 }
 
 func TestCreateGetDeleteRefreshTokenSession(t *testing.T) {
 	t.Parallel()
-	for k, m := range clientManagers {
+	for k, m := range fositeStores {
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeleteRefreshTokenSession(m))
 	}
 }
 
 func TestRevokeRefreshToken(t *testing.T) {
 	t.Parallel()
-	for k, m := range clientManagers {
+	for k, m := range fositeStores {
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperRevokeRefreshToken(m))
+	}
+}
+
+func TestPKCEReuqest(t *testing.T) {
+	t.Parallel()
+	for k, m := range fositeStores {
+		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeletePKCERequestSession(m))
 	}
 }
 
 func TestFlushAccessTokens(t *testing.T) {
 	t.Parallel()
-	for k, m := range clientManagers {
+	for k, m := range fositeStores {
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperFlushTokens(m, time.Hour))
 	}
 }

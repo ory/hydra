@@ -29,6 +29,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
+	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
@@ -134,6 +135,13 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm consent.Ma
 	errorURL, err := url.Parse(c.ErrorURL)
 	pkg.Must(err, "Could not parse error url %s.", errorURL)
 
+	privateKey, err := createOrGetJWK(c, oauth2.OpenIDConnectKeyName, "private")
+	if err != nil {
+		c.GetLogger().WithError(err).Fatalf(`Could not fetch private signing key for OpenID Connect - did you forget to run "hydra migrate sql" or forget to set the SYSTEM_SECRET?`)
+	}
+
+	jwtStrategy := compose.NewOpenIDConnectStrategy(jwk.MustRSAPrivate(privateKey))
+
 	handler := &oauth2.Handler{
 		ScopesSupported:  c.OpenIDDiscoveryScopesSupported,
 		UserinfoEndpoint: c.OpenIDDiscoveryUserinfoEndpoint,
@@ -141,24 +149,14 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm consent.Ma
 		ForcedHTTP:       c.ForceHTTP,
 		OAuth2:           o,
 		ScopeStrategy:    c.GetScopeStrategy(),
-		Consent: &consent.DefaultStrategy{
-			RequestMaxAge:     time.Minute * 15,
-			AuthenticationURL: c.LoginURL,
-			ConsentURL:        c.ConsentURL,
-			IssuerURL:         c.Issuer,
-			OAuth2AuthURL:     "/oauth2/auth",
-			M:                 cm,
-			CookieStore:       sessions.NewCookieStore(c.GetCookieSecret()),
-			ScopeStrategy:     c.GetScopeStrategy(),
-			RunsHTTPS:         !c.ForceHTTP,
-		},
-		//Consent: &oauth2.DefaultConsentStrategy{
-		//	Issuer:                   c.Issuer,
-		//	ConsentManager:           c.Context().ConsentManager,
-		//	DefaultChallengeLifespan: c.GetChallengeTokenLifespan(),
-		//	DefaultIDTokenLifespan:   c.GetIDTokenLifespan(),
-		//	KeyID: idTokenKeyID,
-		//},
+		Consent: consent.NewStrategy(
+			c.LoginURL, c.ConsentURL, c.Issuer,
+			"/oauth2/auth", cm,
+			sessions.NewCookieStore(c.GetCookieSecret()), c.GetScopeStrategy(),
+			!c.ForceHTTP, time.Minute*15,
+			jwtStrategy,
+			openid.NewOpenIDConnectRequestValidator(nil, jwtStrategy),
+		),
 		Storage:             c.Context().FositeStore,
 		ErrorURL:            *errorURL,
 		H:                   herodot.NewJSONWriter(c.GetLogger()),

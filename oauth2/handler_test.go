@@ -26,6 +26,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
 	"time"
 
@@ -145,10 +146,10 @@ func TestHandlerWellKnown(t *testing.T) {
 	defer res.Body.Close()
 
 	trueConfig := oauth2.WellKnown{
-		Issuer:                            h.Issuer,
-		AuthURL:                           h.Issuer + AuthPathT,
-		TokenURL:                          h.Issuer + TokenPathT,
-		JWKsURI:                           h.Issuer + JWKPathT,
+		Issuer:                            strings.TrimRight(h.Issuer, "/") + "/",
+		AuthURL:                           strings.TrimRight(h.Issuer, "/") + AuthPathT,
+		TokenURL:                          strings.TrimRight(h.Issuer, "/") + TokenPathT,
+		JWKsURI:                           strings.TrimRight(h.Issuer, "/") + JWKPathT,
 		SubjectTypes:                      []string{"pairwise", "public"},
 		ResponseTypes:                     []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
 		ClaimsSupported:                   []string{"sub"},

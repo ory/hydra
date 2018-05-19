@@ -28,6 +28,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
@@ -37,14 +38,15 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var clientManagers = map[string]pkg.FositeStorer{}
+var fositeStores = map[string]pkg.FositeStorer{}
 var clientManager = &client.MemoryManager{
 	Clients: []client.Client{{ID: "foobar"}},
 	Hasher:  &fosite.BCrypt{},
 }
+var databases map[string]*sqlx.DB
 
 func init() {
-	clientManagers["memory"] = &FositeMemoryStore{
+	fositeStores["memory"] = &FositeMemoryStore{
 		AuthorizeCodes:      make(map[string]fosite.Requester),
 		IDSessions:          make(map[string]fosite.Requester),
 		AccessTokens:        make(map[string]fosite.Requester),
@@ -79,7 +81,8 @@ func connectToPG() {
 		log.Fatalf("Could not create postgres schema: %v", err)
 	}
 
-	clientManagers["postgres"] = s
+	databases["postgres"] = db
+	fositeStores["postgres"] = s
 }
 
 func connectToMySQL() {
@@ -93,54 +96,55 @@ func connectToMySQL() {
 		log.Fatalf("Could not create postgres schema: %v", err)
 	}
 
-	clientManagers["mysql"] = s
+	databases["mysql"] = db
+	fositeStores["mysql"] = s
 }
 
 func TestCreateGetDeleteAuthorizeCodes(t *testing.T) {
 	t.Parallel()
-	for k, m := range clientManagers {
+	for k, m := range fositeStores {
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeleteAuthorizeCodes(m))
 	}
 }
 
 func TestCreateGetDeleteAccessTokenSession(t *testing.T) {
 	t.Parallel()
-	for k, m := range clientManagers {
+	for k, m := range fositeStores {
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeleteAccessTokenSession(m))
 	}
 }
 
 func TestCreateGetDeleteOpenIDConnectSession(t *testing.T) {
 	t.Parallel()
-	for k, m := range clientManagers {
+	for k, m := range fositeStores {
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeleteOpenIDConnectSession(m))
 	}
 }
 
 func TestCreateGetDeleteRefreshTokenSession(t *testing.T) {
 	t.Parallel()
-	for k, m := range clientManagers {
+	for k, m := range fositeStores {
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeleteRefreshTokenSession(m))
 	}
 }
 
 func TestRevokeRefreshToken(t *testing.T) {
 	t.Parallel()
-	for k, m := range clientManagers {
+	for k, m := range fositeStores {
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperRevokeRefreshToken(m))
 	}
 }
 
 func TestPKCEReuqest(t *testing.T) {
 	t.Parallel()
-	for k, m := range clientManagers {
+	for k, m := range fositeStores {
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeletePKCERequestSession(m))
 	}
 }
 
 func TestFlushAccessTokens(t *testing.T) {
 	t.Parallel()
-	for k, m := range clientManagers {
+	for k, m := range fositeStores {
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperFlushTokens(m, time.Hour))
 	}
 }

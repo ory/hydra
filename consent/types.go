@@ -164,6 +164,10 @@ type OpenIDConnectContext struct {
 	// The Authorization Server MAY also attempt to detect the capabilities of the User Agent and present an appropriate display.
 	Display string `json:"display,omitempty"`
 
+	// IDTokenHintClaims are the claims of the ID Token previously issued by the Authorization Server being passed as a hint about the
+	// End-User's current or past authenticated session with the Client.
+	IDTokenHintClaims map[string]interface{} `json:"id_token_hint_claims,omitempty"`
+
 	// not supported
 	//LoginHint    string   `json:"login_hint,omitempty"`
 }

@@ -21,7 +21,6 @@
 package consent
 
 import (
-	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -31,6 +30,7 @@ import (
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"
 	"github.com/ory/fosite"
+	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/go-convenience/mapx"
 	"github.com/ory/go-convenience/stringslice"
@@ -51,16 +51,17 @@ const (
 )
 
 type DefaultStrategy struct {
-	AuthenticationURL string
-	ConsentURL        string
-	IssuerURL         string
-	OAuth2AuthURL     string
-	M                 Manager
-	CookieStore       sessions.Store
-	ScopeStrategy     fosite.ScopeStrategy
-	RunsHTTPS         bool
-	RequestMaxAge     time.Duration
-	JWTStrategy       jwt.JWTStrategy
+	AuthenticationURL             string
+	ConsentURL                    string
+	IssuerURL                     string
+	OAuth2AuthURL                 string
+	M                             Manager
+	CookieStore                   sessions.Store
+	ScopeStrategy                 fosite.ScopeStrategy
+	RunsHTTPS                     bool
+	RequestMaxAge                 time.Duration
+	JWTStrategy                   jwt.JWTStrategy
+	OpenIDConnectRequestValidator *openid.OpenIDConnectRequestValidator
 }
 
 func NewStrategy(
@@ -74,18 +75,20 @@ func NewStrategy(
 	runsHTTPS bool,
 	requestMaxAge time.Duration,
 	jwtStrategy jwt.JWTStrategy,
+	openIDConnectRequestValidator *openid.OpenIDConnectRequestValidator,
 ) *DefaultStrategy {
 	return &DefaultStrategy{
-		AuthenticationURL: authenticationURL,
-		ConsentURL:        consentURL,
-		IssuerURL:         issuerURL,
-		OAuth2AuthURL:     oAuth2AuthURL,
-		M:                 m,
-		CookieStore:       cookieStore,
-		ScopeStrategy:     scopeStrategy,
-		RunsHTTPS:         runsHTTPS,
-		RequestMaxAge:     requestMaxAge,
-		JWTStrategy:       jwtStrategy,
+		AuthenticationURL:             authenticationURL,
+		ConsentURL:                    consentURL,
+		IssuerURL:                     issuerURL,
+		OAuth2AuthURL:                 oAuth2AuthURL,
+		M:                             m,
+		CookieStore:                   cookieStore,
+		ScopeStrategy:                 scopeStrategy,
+		RunsHTTPS:                     runsHTTPS,
+		RequestMaxAge:                 requestMaxAge,
+		JWTStrategy:                   jwtStrategy,
+		OpenIDConnectRequestValidator: openIDConnectRequestValidator,
 	}
 }
 
@@ -148,11 +151,7 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 	} else if hintSub, _ := hintClaims["sub"].(string); hintSub == "" {
 		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Failed to validate OpenID Connect request because provided id token from id_token_hint does not have a subject"))
 	} else if hintSub != session.Subject {
-		if stringslice.Has(prompt, "none") {
-			return errors.WithStack(fosite.ErrLoginRequired.WithDebug("Request failed because prompt is set to \"none\" and subject claim from id_token_hint does not match subject from authentication session"))
-		}
-
-		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{})
+		return errors.WithStack(fosite.ErrLoginRequired.WithDebug("Request failed because subject claim from id_token_hint does not match subject from authentication session"))
 	} else {
 		return s.forwardAuthenticationRequest(w, r, ar, session.Subject, session.AuthenticatedAt)
 	}
@@ -187,6 +186,15 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 	iu = urlx.AppendPaths(iu, s.OAuth2AuthURL)
 	iu.RawQuery = r.URL.RawQuery
 
+	var idTokenHintClaims jwtgo.MapClaims
+	if idTokenHint := ar.GetRequestForm().Get("id_token_hint"); len(idTokenHint) > 0 {
+		if token, err := s.JWTStrategy.Decode(idTokenHint); err == nil {
+			if hintClaims, ok := token.Claims.(jwtgo.MapClaims); ok {
+				idTokenHintClaims = hintClaims
+			}
+		}
+	}
+
 	// Set the session
 	if err := s.M.CreateAuthenticationRequest(
 		&AuthenticationRequest{
@@ -201,9 +209,10 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 			AuthenticatedAt: authenticatedAt,
 			RequestedAt:     time.Now().UTC(),
 			OpenIDConnectContext: &OpenIDConnectContext{
-				ACRValues: stringsx.Splitx(ar.GetRequestForm().Get("acr_values"), " "),
-				UILocales: stringsx.Splitx(ar.GetRequestForm().Get("ui_locales"), " "),
-				Display:   ar.GetRequestForm().Get("display"),
+				IDTokenHintClaims: idTokenHintClaims,
+				ACRValues:         stringsx.Splitx(ar.GetRequestForm().Get("acr_values"), " "),
+				UILocales:         stringsx.Splitx(ar.GetRequestForm().Get("ui_locales"), " "),
+				Display:           ar.GetRequestForm().Get("display"),
 			},
 		},
 	); err != nil {
@@ -227,6 +236,24 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 
 	// generate the verifier
 	return errors.WithStack(ErrAbortOAuth2Request)
+}
+
+func (s *DefaultStrategy) revokeAuthenticationSession(w http.ResponseWriter, r *http.Request) error {
+	cookie, _ := s.CookieStore.Get(r, cookieAuthenticationName)
+	sid, _ := mapx.GetString(cookie.Values, cookieAuthenticationSIDName)
+
+	cookie.Options.MaxAge = -1
+	cookie.Values[cookieAuthenticationSIDName] = ""
+
+	if err := cookie.Save(r, w); err != nil {
+		return errors.WithStack(err)
+	}
+
+	if sid == "" {
+		return nil
+	}
+
+	return s.M.DeleteAuthenticationSession(sid)
 }
 
 func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*HandledAuthenticationRequest, error) {
@@ -253,21 +280,59 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("The login request is marked as remember, but is also marked as skipped - only one of the values can be true."))
 	}
 
-	if session.AuthenticationRequest.Skip && session.AuthenticationRequest.AuthenticatedAt.IsZero() {
-		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("An internal error occurred where the login screen was skipped, but an initial authenticated time was not provided."))
-	} else if !session.AuthenticationRequest.Skip && !session.AuthenticationRequest.AuthenticatedAt.IsZero() {
-		return nil, errors.WithStack(fosite.ErrServerError.WithDebug(fmt.Sprintf("An internal error occurred where the login screen was handled, but an initial authenticated time (%s) was included as well.", session.AuthenticationRequest.AuthenticatedAt)))
+	if session.AuthenticationRequest.Skip && session.Subject != session.AuthenticationRequest.Subject {
+		// Revoke the session because there's clearly a mix up wrt the subject that's being authenticated
+		if err := s.revokeAuthenticationSession(w, r); err != nil {
+			return nil, err
+		}
+
+		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("The login request is marked as remember, but the subject from the login confirmation does not match the original subject from the cookie."))
 	}
 
-	if session.AuthenticationRequest.Skip && session.AuthenticationRequest.AuthenticatedAt != session.AuthenticatedAt {
-		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("Login request was skipped but authenticatedAt values mismatch."))
-	} else if !session.AuthenticationRequest.Skip &&
-		!(time.Now().UTC().Add(-time.Minute).Before(session.AuthenticatedAt) &&
-			time.Now().UTC().Add(time.Minute).After(session.AuthenticatedAt)) {
-		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("Login request was handled but authenticatedAt value from session appears to be set incorrectly."))
+	if err := s.OpenIDConnectRequestValidator.ValidatePrompt(&fosite.AuthorizeRequest{
+		ResponseTypes: req.GetResponseTypes(),
+		RedirectURI:   req.GetRedirectURI(),
+		State:         req.GetState(),
+		//HandledResponseTypes, this can be safely ignored because it's not being used by validation
+		Request: fosite.Request{
+			ID:            req.GetID(),
+			RequestedAt:   req.GetRequestedAt(),
+			Client:        req.GetClient(),
+			Scopes:        req.GetRequestedScopes(),
+			GrantedScopes: req.GetGrantedScopes(),
+			Form:          req.GetRequestForm(),
+			Session: &openid.DefaultSession{
+				Claims: &jwt.IDTokenClaims{
+					Subject:     session.Subject,
+					IssuedAt:    time.Now().UTC(),                // doesn't matter
+					ExpiresAt:   time.Now().Add(time.Hour).UTC(), // doesn't matter
+					AuthTime:    session.AuthenticatedAt,
+					RequestedAt: session.RequestedAt,
+				},
+				Headers: &jwt.Headers{},
+				Subject: session.Subject,
+			},
+		},
+	}); errors.Cause(err) == fosite.ErrLoginRequired {
+		// This indicates that something went wrong with checking the subject id - let's destroy the session to be safe
+		if err := s.revokeAuthenticationSession(w, r); err != nil {
+			return nil, err
+		}
+
+		return nil, err
+	} else if err != nil {
+		return nil, err
 	}
 
 	if !session.Remember {
+		if session.Subject != session.AuthenticationRequest.Subject {
+			// We should not remember the session but at the same time a different user has logged in than was previously
+			// logged in - so let's bust that authentication.
+			if err := s.revokeAuthenticationSession(w, r); err != nil {
+				return nil, err
+			}
+		}
+
 		return session, nil
 	}
 

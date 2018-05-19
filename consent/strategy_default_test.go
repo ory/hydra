@@ -34,9 +34,11 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
+	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -75,7 +77,7 @@ func TestStrategy(t *testing.T) {
 	ap := mockProvider(&aph)
 
 	jwts := &jwt.RS256JWTStrategy{
-		PrivateKey: mustRSAKey(),
+		PrivateKey: pkg.MustINSECURELOWENTROPYRSAKEYFORTEST(),
 	}
 
 	fooUserIDToken, _, err := jwts.Generate((jwt.IDTokenClaims{
@@ -102,11 +104,12 @@ func TestStrategy(t *testing.T) {
 		false,
 		time.Hour,
 		jwts,
+		openid.NewOpenIDConnectRequestValidator(nil, jwts),
 	)
-	_ = swagger.NewOAuth2ApiWithBasePath(api.URL)
 	apiClient := swagger.NewOAuth2ApiWithBasePath(api.URL)
 
 	persistentCJ := newCookieJar()
+	persistentCJ2 := newCookieJar()
 
 	for k, tc := range []struct {
 		setup                 func()
@@ -761,7 +764,35 @@ func TestStrategy(t *testing.T) {
 			expectErr:             []bool{true},
 		},
 		{
-			d:           "This should pass and require authenticationbecause id_token_hint does not match subject from session",
+			d:           "This should pass and require authentication because id_token_hint does not match subject from session",
+			req:         fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
+			jar:         persistentCJ,
+			idTokenHint: fooUserIDToken,
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					rr, res, err := apiClient.GetLoginRequest(r.URL.Query().Get("login_challenge"))
+					require.NoError(t, err)
+					require.EqualValues(t, http.StatusOK, res.StatusCode)
+					assert.False(t, rr.Skip)
+
+					v, res, err := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
+						Subject:     "not-foouser",
+						Remember:    false,
+						RememberFor: 0,
+						Acr:         "1",
+					})
+					require.NoError(t, err)
+					require.EqualValues(t, http.StatusOK, res.StatusCode)
+					require.NotEmpty(t, v.RedirectTo)
+					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+				}
+			},
+			expectFinalStatusCode: fosite.ErrLoginRequired.StatusCode(),
+			expectErrType:         []error{ErrAbortOAuth2Request, fosite.ErrLoginRequired},
+			expectErr:             []bool{true, true},
+		},
+		{
+			d:           "This should pass and require authentication because id_token_hint does not match subject from session",
 			req:         fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
 			jar:         persistentCJ,
 			idTokenHint: fooUserIDToken,
@@ -820,8 +851,115 @@ func TestStrategy(t *testing.T) {
 				},
 			},
 		},
+
+		// checks revoking sessions
+		{
+			d:   "This should pass as regularly and create a new session",
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
+			jar: persistentCJ2,
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					v, _, _ := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
+						Subject:  "auth-user",
+						Remember: true,
+					})
+					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+				}
+			},
+			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					v, _, _ := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{GrantScope: []string{"scope-a"}})
+					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+				}
+			},
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+		},
+		{
+			d:      "This should pass and also revoke the session cookie",
+			req:    fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
+			jar:    persistentCJ2,
+			prompt: "login",
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					v, _, _ := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
+						Subject:  "not-auth-user",
+						Remember: false,
+					})
+					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+				}
+			},
+			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					v, _, _ := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{GrantScope: []string{"scope-a"}})
+					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+				}
+			},
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+		}, // these two tests depend on one another
+		{
+			d:   "This should require re-authentication because the session was revoked in the previous test",
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
+			jar: persistentCJ2,
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					rr, res, err := apiClient.GetLoginRequest(r.URL.Query().Get("login_challenge"))
+					require.NoError(t, err)
+					require.EqualValues(t, http.StatusOK, res.StatusCode)
+					assert.False(t, rr.Skip)
+					assert.Empty(t, "", rr.Subject)
+
+					v, res, err := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
+						Subject:  "foouser",
+						Remember: true,
+					})
+					require.NoError(t, err)
+					require.EqualValues(t, http.StatusOK, res.StatusCode)
+					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+				}
+			},
+			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					v, _, _ := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{GrantScope: []string{"scope-a"}})
+					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+				}
+			},
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+		},
+		{
+			d:           "This should fail because the user from the ID token does not match the user from the accept login request",
+			req:         fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
+			jar:         newCookieJar(),
+			idTokenHint: fooUserIDToken,
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					rr, res, err := apiClient.GetLoginRequest(r.URL.Query().Get("login_challenge"))
+					require.NoError(t, err)
+					require.EqualValues(t, http.StatusOK, res.StatusCode)
+					assert.False(t, rr.Skip)
+					assert.EqualValues(t, "", rr.Subject)
+					assert.EqualValues(t, "foouser", rr.OidcContext.IdTokenHintClaims["sub"])
+
+					v, res, err := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
+						Subject:  "not-foouser",
+						Remember: false,
+					})
+					require.NoError(t, err)
+					require.EqualValues(t, http.StatusOK, res.StatusCode)
+					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+				}
+			},
+			expectFinalStatusCode: http.StatusBadRequest,
+			expectErrType:         []error{ErrAbortOAuth2Request, fosite.ErrLoginRequired},
+			expectErr:             []bool{true, true},
+		},
 	} {
-		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+		t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
 			if tc.setup != nil {
 				tc.setup()
 			}

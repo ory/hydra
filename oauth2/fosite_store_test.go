@@ -43,7 +43,7 @@ var clientManager = &client.MemoryManager{
 	Clients: []client.Client{{ID: "foobar"}},
 	Hasher:  &fosite.BCrypt{},
 }
-var databases map[string]*sqlx.DB
+var databases = make(map[string]*sqlx.DB)
 
 func init() {
 	fositeStores["memory"] = &FositeMemoryStore{

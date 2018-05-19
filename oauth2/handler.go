@@ -157,7 +157,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //       401: genericError
 //       500: genericError
 func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	userInfoEndpoint := h.IssuerURL + UserinfoPath
+	userInfoEndpoint := strings.TrimRight(h.IssuerURL, "/") + UserinfoPath
 	if h.UserinfoEndpoint != "" {
 		userInfoEndpoint = h.UserinfoEndpoint
 	}

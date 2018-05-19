@@ -154,7 +154,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		ResponseTypes:                     []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
 		ClaimsSupported:                   []string{"sub"},
 		ScopesSupported:                   []string{"offline", "openid"},
-		UserinfoEndpoint:                  h.IssuerURL + oauth2.UserinfoPath,
+		UserinfoEndpoint:                  strings.TrimRight(h.IssuerURL, "/") + oauth2.UserinfoPath,
 		TokenEndpointAuthMethodsSupported: []string{"client_secret_post", "client_secret_basic"},
 		IDTokenSigningAlgValuesSupported:  []string{"RS256"},
 	}

@@ -58,7 +58,7 @@ type UserinfoResponse struct {
 	// URL of the End-User's profile page. The contents of this Web page SHOULD be about the End-User.
 	Profile string `json:"profile,omitempty"`
 
-	// Subject - Identifier for the End-User at the Issuer.
+	// Subject - Identifier for the End-User at the IssuerURL.
 	Sub string `json:"sub,omitempty"`
 
 	// Time the End-User's information was last updated. Its value is a JSON number representing the number of seconds from 1970-01-01T0:0:0Z as measured in UTC until the date/time.

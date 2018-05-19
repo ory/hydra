@@ -63,8 +63,8 @@ func TestIntrospectorSDK(t *testing.T) {
 			compose.OAuth2AuthorizeExplicitFactory,
 			compose.OAuth2TokenIntrospectionFactory,
 		),
-		H:      herodot.NewJSONWriter(l),
-		Issuer: "foobariss",
+		H:         herodot.NewJSONWriter(l),
+		IssuerURL: "foobariss",
 	}
 	handler.SetRoutes(router)
 	server := httptest.NewServer(router)

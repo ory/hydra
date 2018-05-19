@@ -56,9 +56,9 @@ const (
 
 // swagger:model wellKnown
 type WellKnown struct {
-	// URL using the https scheme with no query or fragment component that the OP asserts as its Issuer Identifier.
-	// If Issuer discovery is supported , this value MUST be identical to the issuer value returned
-	// by WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this Issuer.
+	// URL using the https scheme with no query or fragment component that the OP asserts as its IssuerURL Identifier.
+	// If IssuerURL discovery is supported , this value MUST be identical to the issuer value returned
+	// by WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this IssuerURL.
 	//
 	// required: true
 	Issuer string `json:"issuer"`
@@ -157,7 +157,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //       401: genericError
 //       500: genericError
 func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	userInfoEndpoint := h.Issuer + UserinfoPath
+	userInfoEndpoint := h.IssuerURL + UserinfoPath
 	if h.UserinfoEndpoint != "" {
 		userInfoEndpoint = h.UserinfoEndpoint
 	}
@@ -173,10 +173,10 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ htt
 	}
 
 	h.H.Write(w, r, &WellKnown{
-		Issuer:                            strings.TrimRight(h.Issuer, "/") + "/",
-		AuthURL:                           strings.TrimRight(h.Issuer, "/") + AuthPath,
-		TokenURL:                          strings.TrimRight(h.Issuer, "/") + TokenPath,
-		JWKsURI:                           strings.TrimRight(h.Issuer, "/") + JWKPath,
+		Issuer:                            strings.TrimRight(h.IssuerURL, "/") + "/",
+		AuthURL:                           strings.TrimRight(h.IssuerURL, "/") + AuthPath,
+		TokenURL:                          strings.TrimRight(h.IssuerURL, "/") + TokenPath,
+		JWKsURI:                           strings.TrimRight(h.IssuerURL, "/") + JWKPath,
 		SubjectTypes:                      []string{"pairwise", "public"},
 		ResponseTypes:                     []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
 		ClaimsSupported:                   claimsSupported,
@@ -323,7 +323,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		Username:  resp.GetAccessRequester().GetSession().GetUsername(),
 		Extra:     resp.GetAccessRequester().GetSession().(*Session).Extra,
 		Audience:  resp.GetAccessRequester().GetSession().(*Session).Audience,
-		Issuer:    h.Issuer,
+		Issuer:    h.IssuerURL,
 		TokenType: string(resp.GetTokenType()),
 	}); err != nil {
 		pkg.LogError(errors.WithStack(err), h.L)

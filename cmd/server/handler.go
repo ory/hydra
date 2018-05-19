@@ -79,12 +79,12 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 
 		if !c.ForceHTTP {
 			if c.Issuer == "" {
-				logger.Fatalln("Issuer must be explicitly specified unless --dangerous-force-http is passed. To find out more, use `hydra help host`.")
+				logger.Fatalln("IssuerURL must be explicitly specified unless --dangerous-force-http is passed. To find out more, use `hydra help host`.")
 			}
 			issuer, err := url.Parse(c.Issuer)
 			pkg.Must(err, "Could not parse issuer URL: %s", err)
 			if issuer.Scheme != "https" {
-				logger.Fatalln("Issuer must use HTTPS unless --dangerous-force-http is passed. To find out more, use `hydra help host`.")
+				logger.Fatalln("IssuerURL must use HTTPS unless --dangerous-force-http is passed. To find out more, use `hydra help host`.")
 			}
 		}
 

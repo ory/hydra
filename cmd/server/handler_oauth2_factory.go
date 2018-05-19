@@ -162,7 +162,7 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm consent.Ma
 		H:                   herodot.NewJSONWriter(c.GetLogger()),
 		AccessTokenLifespan: c.GetAccessTokenLifespan(),
 		CookieStore:         sessions.NewCookieStore(c.GetCookieSecret()),
-		Issuer:              c.Issuer,
+		IssuerURL:           c.Issuer,
 		L:                   c.GetLogger(),
 		IDTokenPublicKeyID:  idTokenKeyID,
 		IDTokenLifespan:     c.GetIDTokenLifespan(),

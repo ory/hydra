@@ -62,7 +62,7 @@ func TestClientCredentials(t *testing.T) {
 		IDTokenLifespan: time.Minute,
 		H:               herodot.NewJSONWriter(l),
 		L:               l,
-		Issuer:          ts.URL,
+		IssuerURL:       ts.URL,
 	}
 
 	handler.SetRoutes(router)

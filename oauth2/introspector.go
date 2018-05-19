@@ -68,7 +68,7 @@ type Introspection struct {
 
 	Audience []string `json:"aud,omitempty"`
 
-	// Issuer is a string representing the issuer of this token
+	// IssuerURL is a string representing the issuer of this token
 	Issuer string `json:"iss,omitempty"`
 
 	// TokenType is the introspected token's type, for example `access_token` or `refresh_token`.

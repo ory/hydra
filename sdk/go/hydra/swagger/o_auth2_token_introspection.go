@@ -30,7 +30,7 @@ type OAuth2TokenIntrospection struct {
 	// Issued at is an integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token was originally issued.
 	Iat int64 `json:"iat,omitempty"`
 
-	// Issuer is a string representing the issuer of this token
+	// IssuerURL is a string representing the issuer of this token
 	Iss string `json:"iss,omitempty"`
 
 	// NotBefore is an integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token is not to be used before.

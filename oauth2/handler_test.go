@@ -76,7 +76,7 @@ func TestHandlerFlushHandler(t *testing.T) {
 	h := &oauth2.Handler{
 		H:             herodot.NewJSONWriter(nil),
 		ScopeStrategy: fosite.HierarchicScopeStrategy,
-		Issuer:        "http://hydra.localhost",
+		IssuerURL:     "http://hydra.localhost",
 		Storage:       store,
 	}
 
@@ -130,7 +130,7 @@ func TestHandlerWellKnown(t *testing.T) {
 	h := &oauth2.Handler{
 		H:             herodot.NewJSONWriter(nil),
 		ScopeStrategy: fosite.HierarchicScopeStrategy,
-		Issuer:        "http://hydra.localhost",
+		IssuerURL:     "http://hydra.localhost",
 	}
 
 	AuthPathT := "/oauth2/auth"
@@ -146,15 +146,15 @@ func TestHandlerWellKnown(t *testing.T) {
 	defer res.Body.Close()
 
 	trueConfig := oauth2.WellKnown{
-		Issuer:                            strings.TrimRight(h.Issuer, "/") + "/",
-		AuthURL:                           strings.TrimRight(h.Issuer, "/") + AuthPathT,
-		TokenURL:                          strings.TrimRight(h.Issuer, "/") + TokenPathT,
-		JWKsURI:                           strings.TrimRight(h.Issuer, "/") + JWKPathT,
+		Issuer:                            strings.TrimRight(h.IssuerURL, "/") + "/",
+		AuthURL:                           strings.TrimRight(h.IssuerURL, "/") + AuthPathT,
+		TokenURL:                          strings.TrimRight(h.IssuerURL, "/") + TokenPathT,
+		JWKsURI:                           strings.TrimRight(h.IssuerURL, "/") + JWKPathT,
 		SubjectTypes:                      []string{"pairwise", "public"},
 		ResponseTypes:                     []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
 		ClaimsSupported:                   []string{"sub"},
 		ScopesSupported:                   []string{"offline", "openid"},
-		UserinfoEndpoint:                  h.Issuer + oauth2.UserinfoPath,
+		UserinfoEndpoint:                  h.IssuerURL + oauth2.UserinfoPath,
 		TokenEndpointAuthMethodsSupported: []string{"client_secret_post", "client_secret_basic"},
 		IDTokenSigningAlgValuesSupported:  []string{"RS256"},
 	}

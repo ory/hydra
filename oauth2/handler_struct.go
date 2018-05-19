@@ -48,13 +48,11 @@ type Handler struct {
 
 	IDTokenPublicKeyID string
 
-	IssuerURL string
-
 	L logrus.FieldLogger
 
 	ScopeStrategy fosite.ScopeStrategy
 
-	Issuer string
+	IssuerURL string
 
 	ClaimsSupported  string
 	ScopesSupported  string

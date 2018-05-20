@@ -292,8 +292,8 @@
     "token/hmac",
     "token/jwt"
   ]
-  revision = "aaec9940e2c3fc5a696b3d174d517a6ff1490a6f"
-  version = "v0.19.3"
+  revision = "0f18305e742c17db1eee6784ce3451837b5fd09a"
+  version = "v0.19.4"
 
 [[projects]]
   branch = "master"

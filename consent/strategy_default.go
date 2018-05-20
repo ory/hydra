@@ -470,6 +470,11 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 	}
 
 	session.AuthenticatedAt = session.ConsentRequest.AuthenticatedAt
+	if session.AuthenticatedAt.After(session.ConsentRequest.RequestedAt) {
+		// If we authenticated after the initial request hit the /oauth2/auth endpoint, we can update the
+		// auth time to now which will resolve issues with very short max_age times
+		session.AuthenticatedAt = time.Now().UTC()
+	}
 
 	return session, nil
 }

@@ -332,10 +332,12 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	}
 
 	if !session.Remember {
-		// If the session should not be remembered, than the user clearly don't wants us to store a cookie. So let's
-		// bust the authentication session (if one exists).
-		if err := s.revokeAuthenticationSession(w, r); err != nil {
-			return nil, err
+		if !session.AuthenticationRequest.Skip {
+			// If the session should not be remembered (and we're actually not skipping), than the user clearly don't
+			// wants us to store a cookie. So let's bust the authentication session (if one exists).
+			if err := s.revokeAuthenticationSession(w, r); err != nil {
+				return nil, err
+			}
 		}
 
 		return session, nil

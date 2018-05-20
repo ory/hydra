@@ -449,6 +449,56 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					expectIDToken:         true,
 					expectRefreshToken:    false,
 				},
+				{
+					d:       "should not cause issues if max_age is very low and consent takes a long time",
+					authURL: oauthConfig.AuthCodeURL("some-hardcoded-state") + "&max_age=1",
+					//cj:      persistentCJ,
+					lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+						return func(w http.ResponseWriter, r *http.Request) {
+							_, res, err := apiClient.GetLoginRequest(r.URL.Query().Get("login_challenge"))
+							require.NoError(t, err)
+							require.EqualValues(t, http.StatusOK, res.StatusCode)
+
+							v, res, err := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{Subject: "user-a"})
+							require.NoError(t, err)
+							require.EqualValues(t, http.StatusOK, res.StatusCode)
+							require.NotEmpty(t, v.RedirectTo)
+							http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+						}
+					},
+					cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+						return func(w http.ResponseWriter, r *http.Request) {
+							_, res, err := apiClient.GetConsentRequest(r.URL.Query().Get("consent_challenge"))
+							require.NoError(t, err)
+							require.EqualValues(t, http.StatusOK, res.StatusCode)
+
+							time.Sleep(time.Second * 2)
+
+							v, res, err := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{
+								GrantScope: []string{"hydra", "openid"},
+								Session: swagger.ConsentRequestSession{
+									AccessToken: map[string]interface{}{"foo": "bar"},
+									IdToken:     map[string]interface{}{"bar": "baz"},
+								},
+							})
+							require.NoError(t, err)
+							require.EqualValues(t, http.StatusOK, res.StatusCode)
+							require.NotEmpty(t, v.RedirectTo)
+							http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+						}
+					},
+					cb: func(t *testing.T) httprouter.Handle {
+						return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+							code = r.URL.Query().Get("code")
+							require.NotEmpty(t, code)
+							w.WriteHeader(http.StatusOK)
+						}
+					},
+					expectOAuthAuthError:  false,
+					expectOAuthTokenError: false,
+					expectIDToken:         true,
+					expectRefreshToken:    false,
+				},
 			} {
 				t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
 					m.Lock()

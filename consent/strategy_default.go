@@ -213,6 +213,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 				ACRValues:         stringsx.Splitx(ar.GetRequestForm().Get("acr_values"), " "),
 				UILocales:         stringsx.Splitx(ar.GetRequestForm().Get("ui_locales"), " "),
 				Display:           ar.GetRequestForm().Get("display"),
+				LoginHint:         ar.GetRequestForm().Get("login_hint"),
 			},
 		},
 	); err != nil {

@@ -89,12 +89,14 @@ func newOAuth2Provider(c *config.Config) (fosite.OAuth2Provider, string) {
 		EnablePKCEPlainChallengeMethod: false,
 	}
 
+	jwtStrategy := compose.NewOpenIDConnectStrategy(jwk.MustRSAPrivate(privateKey))
 	return compose.Compose(
 		fc,
 		store,
 		&compose.CommonStrategy{
 			CoreStrategy:               compose.NewOAuth2HMACStrategy(fc, c.GetSystemSecret()),
-			OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(jwk.MustRSAPrivate(privateKey)),
+			OpenIDConnectTokenStrategy: jwtStrategy,
+			JWTStrategy:                jwtStrategy,
 		},
 		nil,
 		compose.OAuth2AuthorizeExplicitFactory,

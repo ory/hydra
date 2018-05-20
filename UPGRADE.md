@@ -9,6 +9,7 @@ before finalizing the upgrade process.
 
 
 - [1.0.0-alpha.1](#100-alpha1)
+  - [OpenID Connect Certified](#openid-connect-certified)
   - [Breaking Changes](#breaking-changes)
     - [Introspection API](#introspection-api)
       - [Introspection is now capable of introspecting refresh tokens](#introspection-is-now-capable-of-introspecting-refresh-tokens)
@@ -84,6 +85,21 @@ before finalizing the upgrade process.
 
 This section summarizes important changes introduced in 1.0.0. **Follow it chronologically to ensure a proper migration.**
 
+We are very well aware that the changelist is huge and we try to prepare you as good as we can to migrate to this version.
+We also understand that breaking changes are frustrating and it takes time to adopt to them. We sincerely hope that
+the benefits from this version (improved consent flow, easier set up, clear boundaries & responsibilities)
+outweigh the hassle of upgrading to the new version.
+
+If you have difficulties upgrading and would like a helping hand, reach out to us at [mailto:hi@ory.sh](hi@ory.sh) and
+we will help you with the upgrade process. Our services are billed by the hour and are priced fairly.
+
+### OpenID Connect Certified
+
+ORY Hydra is now OpenID Connect Certified! Certification spans the OAuth 2.0 Authorize Code Flow, Implicit Flow, and Hybrid Flow
+as well as dynamic discovery.
+
+The certification is one reason for the breaking changes in the consent app.
+
 ### Breaking Changes
 
 #### Introspection API
@@ -132,6 +148,9 @@ Now you can run `keto serve` and endpoints `/policies` as well as `/warden` will
 
 We have set up a docker-compose example of a set up that resembles ORY Hydra prior to this release. You can find
 the source and documentation at [github.com/ory/examples](https://github.com/ory/examples).
+
+If you find it difficult to run this set up but would like to use the old access control mechanisms, feel free
+to reach out to us at [mailto:hi@ory.sh](hi@ory.sh).
 
 ###### Warden API
 

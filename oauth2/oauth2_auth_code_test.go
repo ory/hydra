@@ -451,13 +451,15 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				},
 				{
 					d:       "should not cause issues if max_age is very low and consent takes a long time",
-					authURL: oauthConfig.AuthCodeURL("some-hardcoded-state") + "&max_age=1",
+					authURL: oauthConfig.AuthCodeURL("some-hardcoded-state") + "&max_age=3",
 					//cj:      persistentCJ,
 					lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 						return func(w http.ResponseWriter, r *http.Request) {
 							_, res, err := apiClient.GetLoginRequest(r.URL.Query().Get("login_challenge"))
 							require.NoError(t, err)
 							require.EqualValues(t, http.StatusOK, res.StatusCode)
+
+							time.Sleep(time.Second * 5)
 
 							v, res, err := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{Subject: "user-a"})
 							require.NoError(t, err)
@@ -472,7 +474,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							require.NoError(t, err)
 							require.EqualValues(t, http.StatusOK, res.StatusCode)
 
-							time.Sleep(time.Second * 2)
+							time.Sleep(time.Second * 5)
 
 							v, res, err := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{
 								GrantScope: []string{"hydra", "openid"},

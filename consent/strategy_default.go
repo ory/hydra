@@ -289,6 +289,13 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("The login request is marked as remember, but the subject from the login confirmation does not match the original subject from the cookie."))
 	}
 
+	authTime := session.AuthenticatedAt
+	if session.AuthenticatedAt.After(session.RequestedAt) {
+		// If we authenticated after the initial request hit the /oauth2/auth endpoint, we can update the
+		// auth time to now which will resolve issues with very short max_age times
+		authTime = time.Now().UTC()
+	}
+
 	if err := s.OpenIDConnectRequestValidator.ValidatePrompt(&fosite.AuthorizeRequest{
 		ResponseTypes: req.GetResponseTypes(),
 		RedirectURI:   req.GetRedirectURI(),
@@ -306,7 +313,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 					Subject:     session.Subject,
 					IssuedAt:    time.Now().UTC(),                // doesn't matter
 					ExpiresAt:   time.Now().Add(time.Hour).UTC(), // doesn't matter
-					AuthTime:    session.AuthenticatedAt,
+					AuthTime:    authTime,
 					RequestedAt: session.RequestedAt,
 				},
 				Headers: &jwt.Headers{},

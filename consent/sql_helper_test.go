@@ -38,9 +38,11 @@ func TestMySQLHack(t *testing.T) {
 func TestSQLAuthenticationConverter(t *testing.T) {
 	a := &AuthenticationRequest{
 		OpenIDConnectContext: &OpenIDConnectContext{
-			ACRValues: []string{"1", "2"},
-			UILocales: []string{"fr", "de"},
-			Display:   "popup",
+			ACRValues:         []string{"1", "2"},
+			UILocales:         []string{"fr", "de"},
+			LoginHint:         "popup",
+			IDTokenHintClaims: map[string]interface{}{"foo": "bar"},
+			Display:           "popup",
 		},
 		AuthenticatedAt: time.Now().UTC().Add(-time.Minute),
 		RequestedAt:     time.Now().UTC().Add(-time.Hour),
@@ -92,9 +94,11 @@ func TestSQLAuthenticationConverter(t *testing.T) {
 func TestSQLConsentConverter(t *testing.T) {
 	a := &ConsentRequest{
 		OpenIDConnectContext: &OpenIDConnectContext{
-			ACRValues: []string{"1", "2"},
-			UILocales: []string{"fr", "de"},
-			Display:   "popup",
+			ACRValues:         []string{"1", "2"},
+			UILocales:         []string{"fr", "de"},
+			Display:           "popup",
+			LoginHint:         "popup",
+			IDTokenHintClaims: map[string]interface{}{"foo": "bar"},
 		},
 		RequestedAt:     time.Now().UTC().Add(-time.Hour),
 		Client:          &client.Client{ID: "client"},

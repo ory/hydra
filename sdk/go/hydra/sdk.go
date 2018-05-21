@@ -22,6 +22,7 @@ package hydra
 
 import (
 	"context"
+	"strings"
 
 	"github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/pkg/errors"
@@ -55,68 +56,39 @@ type Configuration struct {
 	Scopes []string
 }
 
-func removeTrailingSlash(path string) string {
-	for len(path) > 0 && path[len(path)-1] == '/' {
-		path = path[0 : len(path)-1]
-	}
-	return path
-}
-
-func (s *CodeGenSDK) GetOAuth2ClientConfig() *clientcredentials.Config {
-	return s.oAuth2ClientConfig
-}
-func (s *CodeGenSDK) GetOAuth2Config() *oauth2.Config {
-	return s.oAuth2Config
-}
-
 // NewSDK instantiates a new CodeGenSDK instance or returns an error.
 func NewSDK(c *Configuration) (*CodeGenSDK, error) {
 	if c.EndpointURL == "" {
 		return nil, errors.New("Please specify the ORY Hydra Endpoint URL")
 	}
-	if c.ClientSecret == "" {
-		return nil, errors.New("Please specify an OAuth 2.0 Client Secret")
-	}
-	if c.ClientID == "" {
-		return nil, errors.New("Please specify an OAuth 2.0 Client ID")
-	}
-	if len(c.Scopes) == 0 {
-		c.Scopes = []string{}
-	}
 
-	c.EndpointURL = removeTrailingSlash(c.EndpointURL)
-	oAuth2Config := &oauth2.Config{
-		ClientSecret: c.ClientSecret,
-		ClientID:     c.ClientID,
-		Scopes:       c.Scopes,
-		Endpoint: oauth2.Endpoint{
-			TokenURL: c.EndpointURL + "/oauth2/token",
-			AuthURL:  c.EndpointURL + "/oauth2/auth",
-		},
-	}
-
-	oAuth2ClientConfig := &clientcredentials.Config{
-		ClientSecret: c.ClientSecret,
-		ClientID:     c.ClientID,
-		Scopes:       c.Scopes,
-		TokenURL:     c.EndpointURL + "/oauth2/token",
-	}
-	oAuth2Client := oAuth2ClientConfig.Client(context.Background())
-
+	c.EndpointURL = strings.TrimLeft(c.EndpointURL, "/")
 	o := swagger.NewOAuth2ApiWithBasePath(c.EndpointURL)
-	o.Configuration.Transport = oAuth2Client.Transport
-	o.Configuration.Username = c.ClientID
-	o.Configuration.Password = c.ClientSecret
-
 	j := swagger.NewJsonWebKeyApiWithBasePath(c.EndpointURL)
-	j.Configuration.Transport = oAuth2Client.Transport
-
 	sdk := &CodeGenSDK{
-		OAuth2Api:          o,
-		JsonWebKeyApi:      j,
-		Configuration:      c,
-		oAuth2ClientConfig: oAuth2ClientConfig,
-		oAuth2Config:       oAuth2Config,
+		OAuth2Api:     o,
+		JsonWebKeyApi: j,
+		Configuration: c,
+	}
+
+	if c.ClientSecret != "" && c.ClientID != "" {
+		if len(c.Scopes) == 0 {
+			c.Scopes = []string{}
+		}
+
+		oAuth2ClientConfig := &clientcredentials.Config{
+			ClientSecret: c.ClientSecret,
+			ClientID:     c.ClientID,
+			Scopes:       c.Scopes,
+			TokenURL:     c.EndpointURL + "/oauth2/token",
+		}
+		oAuth2Client := oAuth2ClientConfig.Client(context.Background())
+		o.Configuration.Transport = oAuth2Client.Transport
+		o.Configuration.Username = c.ClientID
+		o.Configuration.Password = c.ClientSecret
+		j.Configuration.Transport = oAuth2Client.Transport
+
+		sdk.oAuth2ClientConfig = oAuth2ClientConfig
 	}
 
 	return sdk, nil

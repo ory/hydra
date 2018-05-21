@@ -359,6 +359,13 @@ The following methods have been moved.
   - `GetLoginRequest(challenge string) (*swagger.LoginRequest, *swagger.APIResponse, error)`
   - `GetConsentRequest(challenge string) (*swagger.ConsentRequest, *swagger.APIResponse, error)`
 
+Additionally, the following methods have been removed as they were of very little use and also mixed the Client Credentials
+flow with the Authorize Code Flow which lead to weird usage. It's much easier to configure `clientcredentials.Config` or
+`oauth2.Config` yourself.
+
+* `GetOAuth2ClientConfig() (*clientcredentials.Config)`
+* `GetOAuth2Config() (*oauth2.Config)`
+
 ### Improvements
 
 #### Unknown request body payloads result in error

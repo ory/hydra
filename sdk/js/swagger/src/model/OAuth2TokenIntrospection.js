@@ -133,7 +133,7 @@
    */
   exports.prototype['iat'] = undefined
   /**
-   * Issuer is a string representing the issuer of this token
+   * IssuerURL is a string representing the issuer of this token
    * @member {String} iss
    */
   exports.prototype['iss'] = undefined

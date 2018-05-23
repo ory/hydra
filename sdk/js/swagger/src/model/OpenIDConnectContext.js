@@ -73,6 +73,12 @@
           { String: Object }
         )
       }
+      if (data.hasOwnProperty('login_hint')) {
+        obj['login_hint'] = ApiClient.convertToType(
+          data['login_hint'],
+          'String'
+        )
+      }
       if (data.hasOwnProperty('ui_locales')) {
         obj['ui_locales'] = ApiClient.convertToType(data['ui_locales'], [
           'String'
@@ -97,6 +103,11 @@
    * @member {Object.<String, Object>} id_token_hint_claims
    */
   exports.prototype['id_token_hint_claims'] = undefined
+  /**
+   * LoginHint hints about the login identifier the End-User might use to log in (if necessary). This hint can be used by an RP if it first asks the End-User for their e-mail address (or other identifier) and then wants to pass that value as a hint to the discovered authorization service. This value MAY also be a phone number in the format specified for the phone_number Claim. The use of this parameter is optional.
+   * @member {String} login_hint
+   */
+  exports.prototype['login_hint'] = undefined
   /**
    * UILocales is the End-User'id preferred languages and scripts for the user interface, represented as a space-separated list of BCP47 [RFC5646] language tag values, ordered by preference. For instance, the value \"fr-CA fr en\" represents a preference for French as spoken in Canada, then French (without a region designation), followed by English (without a region designation). An error SHOULD NOT result if some or all of the requested locales are not supported by the OpenID Provider.
    * @member {Array.<String>} ui_locales

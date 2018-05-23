@@ -57,6 +57,7 @@ class OpenIDConnectContext implements ArrayAccess
         'acr_values' => 'string[]',
         'display' => 'string',
         'id_token_hint_claims' => 'map[string,object]',
+        'login_hint' => 'string',
         'ui_locales' => 'string[]'
     ];
 
@@ -68,6 +69,7 @@ class OpenIDConnectContext implements ArrayAccess
         'acr_values' => null,
         'display' => null,
         'id_token_hint_claims' => null,
+        'login_hint' => null,
         'ui_locales' => null
     ];
 
@@ -89,6 +91,7 @@ class OpenIDConnectContext implements ArrayAccess
         'acr_values' => 'acr_values',
         'display' => 'display',
         'id_token_hint_claims' => 'id_token_hint_claims',
+        'login_hint' => 'login_hint',
         'ui_locales' => 'ui_locales'
     ];
 
@@ -101,6 +104,7 @@ class OpenIDConnectContext implements ArrayAccess
         'acr_values' => 'setAcrValues',
         'display' => 'setDisplay',
         'id_token_hint_claims' => 'setIdTokenHintClaims',
+        'login_hint' => 'setLoginHint',
         'ui_locales' => 'setUiLocales'
     ];
 
@@ -113,6 +117,7 @@ class OpenIDConnectContext implements ArrayAccess
         'acr_values' => 'getAcrValues',
         'display' => 'getDisplay',
         'id_token_hint_claims' => 'getIdTokenHintClaims',
+        'login_hint' => 'getLoginHint',
         'ui_locales' => 'getUiLocales'
     ];
 
@@ -150,6 +155,7 @@ class OpenIDConnectContext implements ArrayAccess
         $this->container['acr_values'] = isset($data['acr_values']) ? $data['acr_values'] : null;
         $this->container['display'] = isset($data['display']) ? $data['display'] : null;
         $this->container['id_token_hint_claims'] = isset($data['id_token_hint_claims']) ? $data['id_token_hint_claims'] : null;
+        $this->container['login_hint'] = isset($data['login_hint']) ? $data['login_hint'] : null;
         $this->container['ui_locales'] = isset($data['ui_locales']) ? $data['ui_locales'] : null;
     }
 
@@ -237,6 +243,27 @@ class OpenIDConnectContext implements ArrayAccess
     public function setIdTokenHintClaims($id_token_hint_claims)
     {
         $this->container['id_token_hint_claims'] = $id_token_hint_claims;
+
+        return $this;
+    }
+
+    /**
+     * Gets login_hint
+     * @return string
+     */
+    public function getLoginHint()
+    {
+        return $this->container['login_hint'];
+    }
+
+    /**
+     * Sets login_hint
+     * @param string $login_hint LoginHint hints about the login identifier the End-User might use to log in (if necessary). This hint can be used by an RP if it first asks the End-User for their e-mail address (or other identifier) and then wants to pass that value as a hint to the discovered authorization service. This value MAY also be a phone number in the format specified for the phone_number Claim. The use of this parameter is optional.
+     * @return $this
+     */
+    public function setLoginHint($login_hint)
+    {
+        $this->container['login_hint'] = $login_hint;
 
         return $this;
     }

@@ -1682,6 +1682,11 @@
       "type": "object",
       "title": "Client represents an OAuth 2.0 Client.",
       "properties": {
+        "SecretExpiresAt": {
+          "description": "SecretExpiresAt is an integer holding the time at which the client\nsecret will expire or 0 if it will not expire. The time is\nrepresented as the number of seconds from 1970-01-01T00:00:00Z as\nmeasured in UTC until the date/time of expiration.",
+          "type": "integer",
+          "format": "int64"
+        },
         "client_name": {
           "description": "Name is the human-readable string name of the client to be presented to the\nend-user during authorization.",
           "type": "string",
@@ -1814,7 +1819,7 @@
           "x-go-name": "IssuedAt"
         },
         "iss": {
-          "description": "Issuer is a string representing the issuer of this token",
+          "description": "IssuerURL is a string representing the issuer of this token",
           "type": "string",
           "x-go-name": "Issuer"
         },
@@ -1913,6 +1918,11 @@
             "type": "object"
           },
           "x-go-name": "IDTokenHintClaims"
+        },
+        "login_hint": {
+          "description": "LoginHint hints about the login identifier the End-User might use to log in (if necessary).\nThis hint can be used by an RP if it first asks the End-User for their e-mail address (or other identifier)\nand then wants to pass that value as a hint to the discovered authorization service. This value MAY also be a\nphone number in the format specified for the phone_number Claim. The use of this parameter is optional.",
+          "type": "string",
+          "x-go-name": "LoginHint"
         },
         "ui_locales": {
           "description": "UILocales is the End-User'id preferred languages and scripts for the user interface, represented as a\nspace-separated list of BCP47 [RFC5646] language tag values, ordered by preference. For instance, the value\n\"fr-CA fr en\" represents a preference for French as spoken in Canada, then French (without a region designation),\nfollowed by English (without a region designation). An error SHOULD NOT result if some or all of the requested\nlocales are not supported by the OpenID Provider.",
@@ -2168,7 +2178,7 @@
           "x-go-name": "Profile"
         },
         "sub": {
-          "description": "Subject - Identifier for the End-User at the Issuer.",
+          "description": "Subject - Identifier for the End-User at the IssuerURL.",
           "type": "string",
           "x-go-name": "Subject"
         },
@@ -2226,7 +2236,7 @@
           "x-go-name": "IDTokenSigningAlgValuesSupported"
         },
         "issuer": {
-          "description": "URL using the https scheme with no query or fragment component that the OP asserts as its Issuer Identifier.\nIf Issuer discovery is supported , this value MUST be identical to the issuer value returned\nby WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this Issuer.",
+          "description": "URL using the https scheme with no query or fragment component that the OP asserts as its IssuerURL Identifier.\nIf IssuerURL discovery is supported , this value MUST be identical to the issuer value returned\nby WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this IssuerURL.",
           "type": "string",
           "x-go-name": "Issuer"
         },

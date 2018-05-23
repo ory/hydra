@@ -221,7 +221,7 @@
    */
   exports.prototype['profile'] = undefined
   /**
-   * Subject - Identifier for the End-User at the Issuer.
+   * Subject - Identifier for the End-User at the IssuerURL.
    * @member {String} sub
    */
   exports.prototype['sub'] = undefined

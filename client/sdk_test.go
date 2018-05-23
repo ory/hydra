@@ -66,14 +66,15 @@ func TestClientSDK(t *testing.T) {
 
 	t.Run("case=client is created and updated", func(t *testing.T) {
 		createClient := createTestClient("")
+		compareClient := createClient
+		createClient.SecretExpiresAt = 10
 
-		// returned client is not modified
+		// returned client is correct on Create
 		result, _, err := c.CreateOAuth2Client(createClient)
 		require.NoError(t, err)
-		assert.EqualValues(t, createClient, *result)
+		assert.EqualValues(t, compareClient, *result)
 
 		// secret is not returned on GetOAuth2Client
-		compareClient := createClient
 		compareClient.ClientSecret = ""
 		result, _, err = c.GetOAuth2Client(createClient.Id)
 		assert.EqualValues(t, compareClient, *result)
@@ -85,17 +86,10 @@ func TestClientSDK(t *testing.T) {
 		assert.EqualValues(t, compareClient, results[0])
 
 		// SecretExpiresAt gets overwritten with 0 on Update
-		createClient.SecretExpiresAt = 10
+		compareClient.ClientSecret = createClient.ClientSecret
 		result, _, err = c.UpdateOAuth2Client(createClient.Id, createClient)
 		require.NoError(t, err)
-		require.EqualValues(t, result, compareClient)
-
-		// SecretExpiresAt gets overwritten with 0 on Create
-		compareClient.Id = "changed" + compareClient.Id
-		createClient.Id = "changed" + createClient.Id
-		result, _, err = c.CreateOAuth2Client(createClient)
-		require.NoError(t, err)
-		require.EqualValues(t, compareClient, result)
+		assert.EqualValues(t, compareClient, *result)
 
 		// create another client
 		updateClient := createTestClient("foo")

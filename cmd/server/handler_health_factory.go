@@ -29,10 +29,9 @@ import (
 
 func newHealthHandler(c *config.Config, router *httprouter.Router) *health.Handler {
 	h := &health.Handler{
-		Metrics:        c.GetTelemetryMetrics(),
-		H:              herodot.NewJSONWriter(c.GetLogger()),
-		ResourcePrefix: c.AccessControlResourcePrefix,
-		VersionString:  c.BuildVersion,
+		Metrics:       c.GetTelemetryMetrics(),
+		H:             herodot.NewJSONWriter(c.GetLogger()),
+		VersionString: c.BuildVersion,
 	}
 	h.SetRoutes(router)
 	return h

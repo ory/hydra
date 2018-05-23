@@ -70,12 +70,8 @@
   version = "1.0.0"
 
 [[constraint]]
-  name = "github.com/ory/dockertest"
-  version = "3.3.0"
-
-[[constraint]]
   name = "github.com/ory/fosite"
-  version = "0.19.4"
+  version = "0.19.5"
 
 [[constraint]]
   name = "github.com/ory/graceful"

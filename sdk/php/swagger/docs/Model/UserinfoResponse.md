@@ -18,7 +18,7 @@ Name | Type | Description | Notes
 **picture** | **string** | URL of the End-User&#39;s profile picture. This URL MUST refer to an image file (for example, a PNG, JPEG, or GIF image file), rather than to a Web page containing an image. Note that this URL SHOULD specifically reference a profile photo of the End-User suitable for displaying when describing the End-User, rather than an arbitrary photo taken by the End-User. | [optional] 
 **preferred_username** | **string** | Non-unique shorthand name by which the End-User wishes to be referred to at the RP, such as janedoe or j.doe. This value MAY be any valid JSON string including special characters such as @, /, or whitespace. | [optional] 
 **profile** | **string** | URL of the End-User&#39;s profile page. The contents of this Web page SHOULD be about the End-User. | [optional] 
-**sub** | **string** | Subject - Identifier for the End-User at the Issuer. | [optional] 
+**sub** | **string** | Subject - Identifier for the End-User at the IssuerURL. | [optional] 
 **updated_at** | **int** | Time the End-User&#39;s information was last updated. Its value is a JSON number representing the number of seconds from 1970-01-01T0:0:0Z as measured in UTC until the date/time. | [optional] 
 **website** | **string** | URL of the End-User&#39;s Web page or blog. This Web page SHOULD contain information published by the End-User or an organization that the End-User is affiliated with. | [optional] 
 **zoneinfo** | **string** | String from zoneinfo [zoneinfo] time zone database representing the End-User&#39;s time zone. For example, Europe/Paris or America/Los_Angeles. | [optional] 

@@ -41,15 +41,21 @@ func TestHealth(t *testing.T) {
 	handler.SetRoutes(router)
 	ts := httptest.NewServer(router)
 
-	client := swagger.NewHealthApiWithBasePath(ts.URL)
+	healthClient := swagger.NewHealthApiWithBasePath(ts.URL)
 
-	body, response, err := client.GetInstanceStatus()
+	body, response, err := healthClient.GetInstanceStatus()
 	require.NoError(t, err)
 	require.EqualValues(t, http.StatusOK, response.StatusCode)
 	assert.EqualValues(t, "ok", body.Status)
 
-	version, response, err := client.GetVersion()
+	versionClient := swagger.NewVersionApiWithBasePath(ts.URL)
+	version, response, err := versionClient.GetVersion()
 	require.NoError(t, err)
 	require.EqualValues(t, http.StatusOK, response.StatusCode)
 	require.EqualValues(t, version.Version, handler.VersionString)
+
+	metricsClient := swagger.NewMetricsApiWithBasePath(ts.URL)
+	response, err = metricsClient.GetPrometheusMetrics()
+	require.NoError(t, err)
+	require.EqualValues(t, http.StatusOK, response.StatusCode)
 }

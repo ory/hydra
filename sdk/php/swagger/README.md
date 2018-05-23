@@ -75,8 +75,7 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*HealthApi* | [**getInstanceStatus**](docs/Api/HealthApi.md#getinstancestatus) | **GET** /health/status | Check the Health Status
-*HealthApi* | [**getVersion**](docs/Api/HealthApi.md#getversion) | **GET** /health/version | Get the version of Hydra
+*HealthApi* | [**getInstanceStatus**](docs/Api/HealthApi.md#getinstancestatus) | **GET** /health | Check the Health Status
 *JsonWebKeyApi* | [**createJsonWebKeySet**](docs/Api/JsonWebKeyApi.md#createjsonwebkeyset) | **POST** /keys/{set} | Generate a new JSON Web Key
 *JsonWebKeyApi* | [**deleteJsonWebKey**](docs/Api/JsonWebKeyApi.md#deletejsonwebkey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
 *JsonWebKeyApi* | [**deleteJsonWebKeySet**](docs/Api/JsonWebKeyApi.md#deletejsonwebkeyset) | **DELETE** /keys/{set} | Delete a JSON Web Key Set
@@ -84,6 +83,7 @@ Class | Method | HTTP request | Description
 *JsonWebKeyApi* | [**getJsonWebKeySet**](docs/Api/JsonWebKeyApi.md#getjsonwebkeyset) | **GET** /keys/{set} | Retrieve a JSON Web Key Set
 *JsonWebKeyApi* | [**updateJsonWebKey**](docs/Api/JsonWebKeyApi.md#updatejsonwebkey) | **PUT** /keys/{set}/{kid} | Update a JSON Web Key
 *JsonWebKeyApi* | [**updateJsonWebKeySet**](docs/Api/JsonWebKeyApi.md#updatejsonwebkeyset) | **PUT** /keys/{set} | Update a JSON Web Key Set
+*MetricsApi* | [**getPrometheusMetrics**](docs/Api/MetricsApi.md#getprometheusmetrics) | **GET** /metrics/prometheus | Retrieve Prometheus metrics
 *OAuth2Api* | [**acceptConsentRequest**](docs/Api/OAuth2Api.md#acceptconsentrequest) | **PUT** /oauth2/auth/requests/consent/{challenge}/accept | Accept an consent request
 *OAuth2Api* | [**acceptLoginRequest**](docs/Api/OAuth2Api.md#acceptloginrequest) | **PUT** /oauth2/auth/requests/login/{challenge}/accept | Accept an login request
 *OAuth2Api* | [**createOAuth2Client**](docs/Api/OAuth2Api.md#createoauth2client) | **POST** /clients | Create an OAuth 2.0 client
@@ -103,6 +103,7 @@ Class | Method | HTTP request | Description
 *OAuth2Api* | [**updateOAuth2Client**](docs/Api/OAuth2Api.md#updateoauth2client) | **PUT** /clients/{id} | Update an OAuth 2.0 Client
 *OAuth2Api* | [**userinfo**](docs/Api/OAuth2Api.md#userinfo) | **POST** /userinfo | OpenID Connect Userinfo
 *OAuth2Api* | [**wellKnown**](docs/Api/OAuth2Api.md#wellknown) | **GET** /.well-known/jwks.json | Get Well-Known JSON Web Keys
+*VersionApi* | [**getVersion**](docs/Api/VersionApi.md#getversion) | **GET** /version | Get the version of Hydra
 
 
 ## Documentation For Models
@@ -116,7 +117,6 @@ Class | Method | HTTP request | Description
  - [FlushInactiveOAuth2TokensRequest](docs/Model/FlushInactiveOAuth2TokensRequest.md)
  - [Handler](docs/Model/Handler.md)
  - [HealthStatus](docs/Model/HealthStatus.md)
- - [HealthVersion](docs/Model/HealthVersion.md)
  - [InlineResponse401](docs/Model/InlineResponse401.md)
  - [JoseWebKeySetRequest](docs/Model/JoseWebKeySetRequest.md)
  - [JsonWebKey](docs/Model/JsonWebKey.md)
@@ -140,6 +140,7 @@ Class | Method | HTTP request | Description
  - [SwaggerOAuthIntrospectionRequest](docs/Model/SwaggerOAuthIntrospectionRequest.md)
  - [SwaggerRevokeOAuth2TokenParameters](docs/Model/SwaggerRevokeOAuth2TokenParameters.md)
  - [UserinfoResponse](docs/Model/UserinfoResponse.md)
+ - [Version](docs/Model/Version.md)
  - [WellKnown](docs/Model/WellKnown.md)
  - [Writer](docs/Model/Writer.md)
 

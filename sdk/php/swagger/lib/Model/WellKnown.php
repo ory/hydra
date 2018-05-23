@@ -336,7 +336,7 @@ class WellKnown implements ArrayAccess
 
     /**
      * Sets issuer
-     * @param string $issuer URL using the https scheme with no query or fragment component that the OP asserts as its Issuer Identifier. If Issuer discovery is supported , this value MUST be identical to the issuer value returned by WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this Issuer.
+     * @param string $issuer URL using the https scheme with no query or fragment component that the OP asserts as its IssuerURL Identifier. If IssuerURL discovery is supported , this value MUST be identical to the issuer value returned by WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this IssuerURL.
      * @return $this
      */
     public function setIssuer($issuer)

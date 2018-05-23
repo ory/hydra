@@ -26,7 +26,7 @@
     if (!root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer) {
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {}
     }
-    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthVersion = factory(
+    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.Version = factory(
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient
     )
   }
@@ -34,14 +34,14 @@
   'use strict'
 
   /**
-   * The HealthVersion model module.
-   * @module model/HealthVersion
+   * The Version model module.
+   * @module model/Version
    * @version Latest
    */
 
   /**
-   * Constructs a new <code>HealthVersion</code>.
-   * @alias module:model/HealthVersion
+   * Constructs a new <code>Version</code>.
+   * @alias module:model/Version
    * @class
    */
   var exports = function() {
@@ -49,11 +49,11 @@
   }
 
   /**
-   * Constructs a <code>HealthVersion</code> from a plain JavaScript object, optionally creating a new instance.
+   * Constructs a <code>Version</code> from a plain JavaScript object, optionally creating a new instance.
    * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
    * @param {Object} data The plain JavaScript object bearing properties of interest.
-   * @param {module:model/HealthVersion} obj Optional instance to populate.
-   * @return {module:model/HealthVersion} The populated <code>HealthVersion</code> instance.
+   * @param {module:model/Version} obj Optional instance to populate.
+   * @return {module:model/Version} The populated <code>Version</code> instance.
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {

@@ -595,7 +595,7 @@ class UserinfoResponse implements ArrayAccess
 
     /**
      * Sets sub
-     * @param string $sub Subject - Identifier for the End-User at the Issuer.
+     * @param string $sub Subject - Identifier for the End-User at the IssuerURL.
      * @return $this
      */
     public function setSub($sub)

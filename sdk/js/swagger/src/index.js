@@ -28,7 +28,6 @@
       'model/FlushInactiveOAuth2TokensRequest',
       'model/Handler',
       'model/HealthStatus',
-      'model/HealthVersion',
       'model/InlineResponse401',
       'model/JoseWebKeySetRequest',
       'model/JsonWebKey',
@@ -52,11 +51,14 @@
       'model/SwaggerOAuthIntrospectionRequest',
       'model/SwaggerRevokeOAuth2TokenParameters',
       'model/UserinfoResponse',
+      'model/Version',
       'model/WellKnown',
       'model/Writer',
       'api/HealthApi',
       'api/JsonWebKeyApi',
-      'api/OAuth2Api'
+      'api/MetricsApi',
+      'api/OAuth2Api',
+      'api/VersionApi'
     ], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
@@ -71,7 +73,6 @@
       require('./model/FlushInactiveOAuth2TokensRequest'),
       require('./model/Handler'),
       require('./model/HealthStatus'),
-      require('./model/HealthVersion'),
       require('./model/InlineResponse401'),
       require('./model/JoseWebKeySetRequest'),
       require('./model/JsonWebKey'),
@@ -95,11 +96,14 @@
       require('./model/SwaggerOAuthIntrospectionRequest'),
       require('./model/SwaggerRevokeOAuth2TokenParameters'),
       require('./model/UserinfoResponse'),
+      require('./model/Version'),
       require('./model/WellKnown'),
       require('./model/Writer'),
       require('./api/HealthApi'),
       require('./api/JsonWebKeyApi'),
-      require('./api/OAuth2Api')
+      require('./api/MetricsApi'),
+      require('./api/OAuth2Api'),
+      require('./api/VersionApi')
     )
   }
 })(function(
@@ -113,7 +117,6 @@
   FlushInactiveOAuth2TokensRequest,
   Handler,
   HealthStatus,
-  HealthVersion,
   InlineResponse401,
   JoseWebKeySetRequest,
   JsonWebKey,
@@ -137,11 +140,14 @@
   SwaggerOAuthIntrospectionRequest,
   SwaggerRevokeOAuth2TokenParameters,
   UserinfoResponse,
+  Version,
   WellKnown,
   Writer,
   HealthApi,
   JsonWebKeyApi,
-  OAuth2Api
+  MetricsApi,
+  OAuth2Api,
+  VersionApi
 ) {
   'use strict'
 
@@ -227,11 +233,6 @@
      * @property {module:model/HealthStatus}
      */
     HealthStatus: HealthStatus,
-    /**
-     * The HealthVersion model constructor.
-     * @property {module:model/HealthVersion}
-     */
-    HealthVersion: HealthVersion,
     /**
      * The InlineResponse401 model constructor.
      * @property {module:model/InlineResponse401}
@@ -348,6 +349,11 @@
      */
     UserinfoResponse: UserinfoResponse,
     /**
+     * The Version model constructor.
+     * @property {module:model/Version}
+     */
+    Version: Version,
+    /**
      * The WellKnown model constructor.
      * @property {module:model/WellKnown}
      */
@@ -368,10 +374,20 @@
      */
     JsonWebKeyApi: JsonWebKeyApi,
     /**
+     * The MetricsApi service constructor.
+     * @property {module:api/MetricsApi}
+     */
+    MetricsApi: MetricsApi,
+    /**
      * The OAuth2Api service constructor.
      * @property {module:api/OAuth2Api}
      */
-    OAuth2Api: OAuth2Api
+    OAuth2Api: OAuth2Api,
+    /**
+     * The VersionApi service constructor.
+     * @property {module:api/VersionApi}
+     */
+    VersionApi: VersionApi
   }
 
   return exports

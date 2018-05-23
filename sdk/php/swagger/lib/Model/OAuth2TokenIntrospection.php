@@ -364,7 +364,7 @@ class OAuth2TokenIntrospection implements ArrayAccess
 
     /**
      * Sets iss
-     * @param string $iss Issuer is a string representing the issuer of this token
+     * @param string $iss IssuerURL is a string representing the issuer of this token
      * @return $this
      */
     public function setIss($iss)

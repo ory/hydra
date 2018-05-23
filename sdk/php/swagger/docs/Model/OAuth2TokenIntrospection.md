@@ -9,7 +9,7 @@ Name | Type | Description | Notes
 **exp** | **int** | Expires at is an integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token will expire. | [optional] 
 **ext** | **map[string,object]** | Extra is arbitrary data set by the session. | [optional] 
 **iat** | **int** | Issued at is an integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token was originally issued. | [optional] 
-**iss** | **string** | Issuer is a string representing the issuer of this token | [optional] 
+**iss** | **string** | IssuerURL is a string representing the issuer of this token | [optional] 
 **nbf** | **int** | NotBefore is an integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token is not to be used before. | [optional] 
 **scope** | **string** | Scope is a JSON string containing a space-separated list of scopes associated with this token. | [optional] 
 **sub** | **string** | Subject of the token, as defined in JWT [RFC7519]. Usually a machine-readable identifier of the resource owner who authorized this token. | [optional] 

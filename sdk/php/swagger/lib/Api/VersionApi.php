@@ -1,6 +1,6 @@
 <?php
 /**
- * HealthApi
+ * VersionApi
  * PHP version 5
  *
  * @category Class
@@ -34,14 +34,14 @@ use \Hydra\SDK\Configuration;
 use \Hydra\SDK\ObjectSerializer;
 
 /**
- * HealthApi Class Doc Comment
+ * VersionApi Class Doc Comment
  *
  * @category Class
  * @package  Hydra\SDK
  * @author   Swagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
-class HealthApi
+class VersionApi
 {
     /**
      * API Client
@@ -79,7 +79,7 @@ class HealthApi
      *
      * @param \Hydra\SDK\ApiClient $apiClient set the API client
      *
-     * @return HealthApi
+     * @return VersionApi
      */
     public function setApiClient(\Hydra\SDK\ApiClient $apiClient)
     {
@@ -88,35 +88,35 @@ class HealthApi
     }
 
     /**
-     * Operation getInstanceStatus
+     * Operation getVersion
      *
-     * Check the Health Status
+     * Get the version of Hydra
      *
      * Client for Hydra
      *
      * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return \Hydra\SDK\Model\HealthStatus
+     * @return \Hydra\SDK\Model\Version
      */
-    public function getInstanceStatus()
+    public function getVersion()
     {
-        list($response) = $this->getInstanceStatusWithHttpInfo();
+        list($response) = $this->getVersionWithHttpInfo();
         return $response;
     }
 
     /**
-     * Operation getInstanceStatusWithHttpInfo
+     * Operation getVersionWithHttpInfo
      *
-     * Check the Health Status
+     * Get the version of Hydra
      *
      * Client for Hydra
      *
      * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return array of \Hydra\SDK\Model\HealthStatus, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \Hydra\SDK\Model\Version, HTTP status code, HTTP response headers (array of strings)
      */
-    public function getInstanceStatusWithHttpInfo()
+    public function getVersionWithHttpInfo()
     {
         // parse inputs
-        $resourcePath = "/health";
+        $resourcePath = "/version";
         $httpBody = '';
         $queryParams = [];
         $headerParams = [];
@@ -142,19 +142,15 @@ class HealthApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\Hydra\SDK\Model\HealthStatus',
-                '/health'
+                '\Hydra\SDK\Model\Version',
+                '/version'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\HealthStatus', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\Version', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\HealthStatus', $e->getResponseHeaders());
-                    $e->setResponseObject($data);
-                    break;
-                case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\InlineResponse401', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\Version', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }

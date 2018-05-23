@@ -273,14 +273,6 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ ht
 // is neither expired nor revoked. If a token is active, additional information on the token will be included. You can
 // set additional data for a token by setting `accessTokenExtra` during the consent flow.
 //
-//  ```
-//  {
-//    "resources": ["rn:hydra:oauth2:tokens"],
-//    "actions": ["introspect"],
-//    "effect": "allow"
-//  }
-//  ```
-//
 //     Consumes:
 //     - application/x-www-form-urlencoded
 //
@@ -338,15 +330,6 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 // This endpoint flushes expired OAuth2 access tokens from the database. You can set a time after which no tokens will be
 // not be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted
 // automatically when performing the refresh flow.
-//
-//
-//  ```
-//  {
-//    "resources": ["rn:hydra:oauth2:tokens"],
-//    "actions": ["flush"],
-//    "effect": "allow"
-//  }
-//  ```
 //
 //     Consumes:
 //     - application/json

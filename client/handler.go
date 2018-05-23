@@ -32,32 +32,13 @@ import (
 )
 
 type Handler struct {
-	Manager        Manager
-	H              herodot.Writer
-	ResourcePrefix string
+	Manager Manager
+	H       herodot.Writer
 }
 
 const (
 	ClientsHandlerPath = "/clients"
 )
-
-const (
-	ClientsResource = "clients"
-	ClientResource  = "clients:%s"
-	Scope           = "hydra.clients"
-)
-
-func (h *Handler) PrefixResource(resource string) string {
-	if h.ResourcePrefix == "" {
-		h.ResourcePrefix = "rn:hydra"
-	}
-
-	if h.ResourcePrefix[len(h.ResourcePrefix)-1] == ':' {
-		h.ResourcePrefix = h.ResourcePrefix[:len(h.ResourcePrefix)-1]
-	}
-
-	return h.ResourcePrefix + ":" + resource
-}
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET(ClientsHandlerPath, h.List)
@@ -75,16 +56,6 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //
 // OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
 //
-//  Additionally, the context key "owner" is set to the owner of the client, allowing policies such as:
-//
-//  ```
-//  {
-//    "resources": ["rn:hydra:clients"],
-//    "actions": ["create"],
-//    "effect": "allow",
-//    "conditions": { "owner": { "type": "EqualsSubjectCondition" } }
-//  }
-//  ```
 //
 //     Consumes:
 //     - application/json

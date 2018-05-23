@@ -7,7 +7,7 @@
     <a href="https://www.ory.sh/docs/1-hydra/">Guide</a> |
     <a href="https://www.ory.sh/docs/api/hydra">API Docs</a> |
     <a href="https://godoc.org/github.com/ory/hydra">Code Docs</a><br/><br/>
-    <a href="https://patreon.com/user?u=4298803">Support us on patreon!</a>
+    <a href="https://opencollective.com/ory-hydra">Support this project!</a>
 </h4>
  
 ---
@@ -285,6 +285,13 @@ Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com
 
 <a href="https://opencollective.com/ory-hydra#backers" target="_blank"><img src="https://opencollective.com/ory-hydra/backers.svg?width=890"></a>
 
+We would also like to thank (past & current) supporters (in alphabetical order) on [Patreon](https://www.patreon.com/_ory):
+
+* Alexander Alimovs
+* Chancy Kennedy
+* Drozzy
+* Oz Haven
+* TheCrealm
 
 ## Sponsors
 
@@ -301,4 +308,4 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 <a href="https://opencollective.com/ory-hydra/sponsor/8/website" target="_blank"><img src="https://opencollective.com/ory-hydra/sponsor/8/avatar.svg"></a>
 <a href="https://opencollective.com/ory-hydra/sponsor/9/website" target="_blank"><img src="https://opencollective.com/ory-hydra/sponsor/9/avatar.svg"></a>
 
-
+A special thanks goes out to **Wayne Robinson** for supporting this project with $200 every month since Oktober 2016 [on Patreon](https://www.patreon.com/_ory).

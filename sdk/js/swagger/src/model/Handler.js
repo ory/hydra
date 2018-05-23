@@ -83,12 +83,6 @@
       if (data.hasOwnProperty('Manager')) {
         obj['Manager'] = Manager.constructFromObject(data['Manager'])
       }
-      if (data.hasOwnProperty('ResourcePrefix')) {
-        obj['ResourcePrefix'] = ApiClient.convertToType(
-          data['ResourcePrefix'],
-          'String'
-        )
-      }
     }
     return obj
   }
@@ -105,10 +99,6 @@
    * @member {module:model/Manager} Manager
    */
   exports.prototype['Manager'] = undefined
-  /**
-   * @member {String} ResourcePrefix
-   */
-  exports.prototype['ResourcePrefix'] = undefined
 
   return exports
 })

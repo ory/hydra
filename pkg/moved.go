@@ -14,29 +14,20 @@
  * limitations under the License.
  *
  * @author		Aeneas Rekkas <aeneas+oss@aeneas.io>
- * @copyright 	2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @Copyright 	2017-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
  * @license 	Apache-2.0
  */
 
-package health
+package pkg
 
-// swagger:model healthStatus
-type swaggerHealthStatus struct {
-	// Status always contains "ok"
-	Status string `json:"status"`
+import (
+	"net/http"
+
+	"github.com/julienschmidt/httprouter"
+)
+
+func PermanentRedirect(to string) func(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	return func(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		http.Redirect(rw, r, to, http.StatusPermanentRedirect)
+	}
 }
-
-// swagger:model version
-type swaggerVersion struct {
-	Version string `json:"version"`
-}
-
-// swagger:route GET /metrics/prometheus metrics getPrometheusMetrics
-//
-// Retrieve Prometheus metrics
-//
-// This endpoint returns metrics formatted for Prometheus.
-//
-//     Responses:
-//       200
-func prometheusDummy() {}

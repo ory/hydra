@@ -5,8 +5,7 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**getInstanceStatus**](HealthApi.md#getInstanceStatus) | **GET** /health/status | Check the Health Status
-[**getVersion**](HealthApi.md#getVersion) | **GET** /health/version | Get the version of Hydra
+[**getInstanceStatus**](HealthApi.md#getInstanceStatus) | **GET** /health | Check the Health Status
 
 
 # **getInstanceStatus**
@@ -38,47 +37,6 @@ This endpoint does not need any parameter.
 ### Return type
 
 [**\Hydra\SDK\Model\HealthStatus**](../Model/HealthStatus.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: application/json, application/x-www-form-urlencoded
- - **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
-
-# **getVersion**
-> \Hydra\SDK\Model\HealthVersion getVersion()
-
-Get the version of Hydra
-
-This endpoint returns the version as `{ \"version\": \"VERSION\" }`. The version is only correct with the prebuilt binary and not custom builds.
-
-### Example
-```php
-<?php
-require_once(__DIR__ . '/vendor/autoload.php');
-
-$api_instance = new Hydra\SDK\Api\HealthApi();
-
-try {
-    $result = $api_instance->getVersion();
-    print_r($result);
-} catch (Exception $e) {
-    echo 'Exception when calling HealthApi->getVersion: ', $e->getMessage(), PHP_EOL;
-}
-?>
-```
-
-### Parameters
-This endpoint does not need any parameter.
-
-### Return type
-
-[**\Hydra\SDK\Model\HealthVersion**](../Model/HealthVersion.md)
 
 ### Authorization
 

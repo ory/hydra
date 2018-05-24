@@ -377,14 +377,37 @@ func (s *DefaultStrategy) requestConsent(w http.ResponseWriter, r *http.Request,
 		return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
 	}
 
+	// https://tools.ietf.org/html/rfc6749
+	//
+	// As stated in Section 10.2 of OAuth 2.0 [RFC6749], the authorization
+	// server SHOULD NOT process authorization requests automatically
+	// without user consent or interaction, except when the identity of the
+	// client can be assured.  This includes the case where the user has
+	// previously approved an authorization request for a given client id --
+	// unless the identity of the client can be proven, the request SHOULD
+	// be processed as if no previous request had been approved.
+	//
+	// Measures such as claimed "https" scheme redirects MAY be accepted by
+	// authorization servers as identity proof.  Some operating systems may
+	// offer alternative platform-specific identity features that MAY be
+	// accepted, as appropriate.
 	if ar.GetClient().IsPublic() {
-		return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
+		// The OpenID Connect Test Tool fails if this returns `consent_required` when `prompt=none` is used.
+		// According to the quote above, it should be ok to allow https to skip consent.
+		//
+		// This is tracked as issue: https://github.com/ory/hydra/issues/866
+		// This is also tracked as upstream issue: https://github.com/openid-certification/oidctest/issues/97
+		if ar.GetRedirectURI().Scheme != "https" {
+			return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
+		}
 	}
 
-	if ar.GetResponseTypes().Has("token") {
-		// We're probably requesting the implicit or hybrid flow in which case we MUST authenticate and authorize the request
-		return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
-	}
+	// This breaks OIDC Conformity Tests and is probably a bit paranoid.
+	//
+	// if ar.GetResponseTypes().Has("token") {
+	//	 // We're probably requesting the implicit or hybrid flow in which case we MUST authenticate and authorize the request
+	// 	 return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
+	// }
 
 	consentSessions, err := s.M.FindPreviouslyGrantedConsentRequests(ar.GetClient().GetID(), authenticationSession.Subject)
 	if errors.Cause(err) == errNoPreviousConsentFound {
@@ -406,7 +429,6 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 		skip = true
 	}
 
-	// Let'id validate that prompt is actually not "none" if we can't skip authentication
 	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
 	if stringslice.Has(prompt, "none") && !skip {
 		return errors.WithStack(fosite.ErrConsentRequired.WithDebug(`Prompt "none" was requested, but no previous consent was found`))

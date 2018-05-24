@@ -31,6 +31,7 @@ before finalizing the upgrade process.
       - [`hydra groups`](#hydra-groups)
     - [SDK](#sdk)
   - [Improvements](#improvements)
+    - [Health Check endpoint has moved](#health-check-endpoint-has-moved)
     - [Unknown request body payloads result in error](#unknown-request-body-payloads-result-in-error)
     - [UTC everywhere](#utc-everywhere)
     - [Pagination everywhere](#pagination-everywhere)
@@ -367,6 +368,11 @@ flow with the Authorize Code Flow which lead to weird usage. It's much easier to
 * `GetOAuth2Config() (*oauth2.Config)`
 
 ### Improvements
+
+#### Health Check endpoint has moved
+
+The health check endpoint has moved from `/health/status` to `/health`. We set up a 308 redirect from `/health/status`
+to `/health` so this should not cause any issues.
 
 #### Unknown request body payloads result in error
 

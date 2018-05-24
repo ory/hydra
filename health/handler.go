@@ -26,43 +26,35 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/metrics/telemetry"
+	"github.com/ory/hydra/pkg"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 const (
-	HealthStatusPath     = "/health/status"
-	HealthVersionPath    = "/health/version"
-	PrometheusStatusPath = "/health/prometheus"
+	HealthCheckPath       = "/health"
+	VersionPath           = "/version"
+	MetricsPrometheusPath = "/metrics/prometheus"
 )
 
 type Handler struct {
-	Metrics        *telemetry.MetricsManager
-	H              *herodot.JSONWriter
-	ResourcePrefix string
-	VersionString  string
-}
-
-func (h *Handler) PrefixResource(resource string) string {
-	if h.ResourcePrefix == "" {
-		h.ResourcePrefix = "rn:hydra"
-	}
-
-	if h.ResourcePrefix[len(h.ResourcePrefix)-1] == ':' {
-		h.ResourcePrefix = h.ResourcePrefix[:len(h.ResourcePrefix)-1]
-	}
-
-	return h.ResourcePrefix + ":" + resource
+	Metrics       *telemetry.MetricsManager
+	H             *herodot.JSONWriter
+	VersionString string
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
-	r.GET(HealthStatusPath, h.Health)
-	r.GET(HealthVersionPath, h.Version)
+	r.GET(HealthCheckPath, h.Health)
+	r.GET(VersionPath, h.Version)
 
 	// using r.Handler because promhttp.Handler() returns http.Handler
-	r.Handler("GET", PrometheusStatusPath, promhttp.Handler())
+	r.Handler("GET", MetricsPrometheusPath, promhttp.Handler())
+
+	// BC compatible health check
+	r.GET("/health/status", pkg.PermanentRedirect(HealthCheckPath))
+
 }
 
-// swagger:route GET /health/status health getInstanceStatus
+// swagger:route GET /health health getInstanceStatus
 //
 // Check the Health Status
 //
@@ -74,22 +66,21 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //       200: healthStatus
 //       500: genericError
 func (h *Handler) Health(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	h.H.Write(rw, r, &HealthStatus{
+	h.H.Write(rw, r, &swaggerHealthStatus{
 		Status: "ok",
 	})
 }
 
-// swagger:route GET /health/version health getVersion
+// swagger:route GET /version version getVersion
 //
 // Get the version of Hydra
 //
 // This endpoint returns the version as `{ "version": "VERSION" }`. The version is only correct with the prebuilt binary and not custom builds.
 //
 //		Responses:
-// 		200: healthVersion
-//		500: genericError
+// 		200: version
 func (h *Handler) Version(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	h.H.Write(rw, r, &HealthVersion{
+	h.H.Write(rw, r, &swaggerVersion{
 		Version: h.VersionString,
 	})
 }

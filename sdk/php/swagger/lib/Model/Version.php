@@ -1,6 +1,6 @@
 <?php
 /**
- * HealthVersion
+ * Version
  *
  * PHP version 5
  *
@@ -32,14 +32,14 @@ namespace Hydra\SDK\Model;
 use \ArrayAccess;
 
 /**
- * HealthVersion Class Doc Comment
+ * Version Class Doc Comment
  *
  * @category    Class
  * @package     Hydra\SDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
  */
-class HealthVersion implements ArrayAccess
+class Version implements ArrayAccess
 {
     const DISCRIMINATOR = null;
 
@@ -47,7 +47,7 @@ class HealthVersion implements ArrayAccess
       * The original name of the model.
       * @var string
       */
-    protected static $swaggerModelName = 'healthVersion';
+    protected static $swaggerModelName = 'version';
 
     /**
       * Array of property to type mappings. Used for (de)serialization

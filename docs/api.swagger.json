@@ -147,7 +147,7 @@
         }
       },
       "post": {
-        "description": "Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somwhere safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.\n\nAdditionally, the context key \"owner\" is set to the owner of the client, allowing policies such as:\n\n```\n{\n\"resources\": [\"rn:hydra:clients\"],\n\"actions\": [\"create\"],\n\"effect\": \"allow\",\n\"conditions\": { \"owner\": { \"type\": \"EqualsSubjectCondition\" } }\n}\n```",
+        "description": "Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somwhere safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.",
         "consumes": [
           "application/json"
         ],
@@ -335,7 +335,7 @@
         }
       }
     },
-    "/health/status": {
+    "/health": {
       "get": {
         "description": "This endpoint returns a 200 status code when the HTTP server is up running. `{ \"status\": \"ok\" }`. This status does currently not include checks whether the database connection is working. This endpoint does not require the `X-Forwarded-Proto` header when TLS termination is set.\n\nBe aware that if you are running multiple nodes of ORY Hydra, the health status will never refer to the cluster state, only to a single instance.",
         "tags": [
@@ -348,27 +348,6 @@
             "description": "healthStatus",
             "schema": {
               "$ref": "#/definitions/healthStatus"
-            }
-          },
-          "500": {
-            "$ref": "#/responses/genericError"
-          }
-        }
-      }
-    },
-    "/health/version": {
-      "get": {
-        "description": "This endpoint returns the version as `{ \"version\": \"VERSION\" }`. The version is only correct with the prebuilt binary and not custom builds.",
-        "tags": [
-          "health"
-        ],
-        "summary": "Get the version of Hydra",
-        "operationId": "getVersion",
-        "responses": {
-          "200": {
-            "description": "healthVersion",
-            "schema": {
-              "$ref": "#/definitions/healthVersion"
             }
           },
           "500": {
@@ -735,6 +714,17 @@
         }
       }
     },
+    "/metrics/prometheus": {
+      "get": {
+        "description": "This endpoint returns metrics formatted for Prometheus.",
+        "tags": [
+          "metrics"
+        ],
+        "summary": "Retrieve Prometheus metrics",
+        "operationId": "getPrometheusMetrics",
+        "responses": {}
+      }
+    },
     "/oauth2/auth": {
       "get": {
         "description": "This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.\nOAuth2 is a very popular protocol and a library for your programming language will exists.\n\nTo learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749",
@@ -1051,7 +1041,7 @@
     },
     "/oauth2/flush": {
       "post": {
-        "description": "This endpoint flushes expired OAuth2 access tokens from the database. You can set a time after which no tokens will be\nnot be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted\nautomatically when performing the refresh flow.\n\n\n```\n{\n\"resources\": [\"rn:hydra:oauth2:tokens\"],\n\"actions\": [\"flush\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "This endpoint flushes expired OAuth2 access tokens from the database. You can set a time after which no tokens will be\nnot be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted\nautomatically when performing the refresh flow.",
         "consumes": [
           "application/json"
         ],
@@ -1096,7 +1086,7 @@
             "oauth2": []
           }
         ],
-        "description": "The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token\nis neither expired nor revoked. If a token is active, additional information on the token will be included. You can\nset additional data for a token by setting `accessTokenExtra` during the consent flow.\n\n```\n{\n\"resources\": [\"rn:hydra:oauth2:tokens\"],\n\"actions\": [\"introspect\"],\n\"effect\": \"allow\"\n}\n```",
+        "description": "The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token\nis neither expired nor revoked. If a token is active, additional information on the token will be included. You can\nset additional data for a token by setting `accessTokenExtra` during the consent flow.",
         "consumes": [
           "application/x-www-form-urlencoded"
         ],
@@ -1267,6 +1257,24 @@
           }
         }
       }
+    },
+    "/version": {
+      "get": {
+        "description": "This endpoint returns the version as `{ \"version\": \"VERSION\" }`. The version is only correct with the prebuilt binary and not custom builds.",
+        "tags": [
+          "version"
+        ],
+        "summary": "Get the version of Hydra",
+        "operationId": "getVersion",
+        "responses": {
+          "200": {
+            "description": "version",
+            "schema": {
+              "$ref": "#/definitions/version"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -1300,9 +1308,6 @@
         },
         "Manager": {
           "$ref": "#/definitions/Manager"
-        },
-        "ResourcePrefix": {
-          "type": "string"
         }
       },
       "x-go-package": "github.com/ory/hydra/jwk"
@@ -1490,18 +1495,7 @@
           "x-go-name": "Status"
         }
       },
-      "x-go-name": "HealthStatus",
-      "x-go-package": "github.com/ory/hydra/health"
-    },
-    "healthVersion": {
-      "type": "object",
-      "properties": {
-        "version": {
-          "type": "string",
-          "x-go-name": "Version"
-        }
-      },
-      "x-go-name": "HealthVersion",
+      "x-go-name": "swaggerHealthStatus",
       "x-go-package": "github.com/ory/hydra/health"
     },
     "joseWebKeySetRequest": {
@@ -2201,6 +2195,17 @@
       },
       "x-go-name": "swaggeruserinfoResponsePayload",
       "x-go-package": "github.com/ory/hydra/oauth2"
+    },
+    "version": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string",
+          "x-go-name": "Version"
+        }
+      },
+      "x-go-name": "swaggerVersion",
+      "x-go-package": "github.com/ory/hydra/health"
     },
     "wellKnown": {
       "type": "object",

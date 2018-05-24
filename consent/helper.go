@@ -30,12 +30,16 @@ import (
 	"github.com/pkg/errors"
 )
 
-func sanitizeClient(ar fosite.AuthorizeRequester) *client.Client {
-	c := new(client.Client)
+func sanitizeClientFromRequest(ar fosite.AuthorizeRequester) *client.Client {
+	return sanitizeClient(ar.GetClient().(*client.Client))
+}
+
+func sanitizeClient(c *client.Client) *client.Client {
+	cc := new(client.Client)
 	// Remove the hashed secret here
-	*c = *ar.GetClient().(*client.Client)
-	c.Secret = ""
-	return c
+	*cc = *c
+	cc.Secret = ""
+	return cc
 }
 
 func matchScopes(scopeStrategy fosite.ScopeStrategy, previousConsent []HandledConsentRequest, requestedScope []string) *HandledConsentRequest {

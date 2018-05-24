@@ -21,12 +21,22 @@
 package health
 
 // swagger:model healthStatus
-type HealthStatus struct {
+type swaggerHealthStatus struct {
 	// Status always contains "ok"
 	Status string `json:"status"`
 }
 
-// swagger:model healthVersion
-type HealthVersion struct {
+// swagger:model version
+type swaggerVersion struct {
 	Version string `json:"version"`
 }
+
+// swagger:route GET /metrics/prometheus metrics getPrometheusMetrics
+//
+// Retrieve Prometheus metrics
+//
+// This endpoint returns metrics formatted for Prometheus.
+//
+//     Responses:
+//       200
+func prometheusDummy() {}

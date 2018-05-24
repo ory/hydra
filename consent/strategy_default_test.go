@@ -28,6 +28,7 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 	"time"
 
@@ -51,6 +52,12 @@ func mustRSAKey() *rsa.PrivateKey {
 		panic(err)
 	}
 	return key
+}
+
+func mustParseURL(t *testing.T, u string) *url.URL {
+	uu, err := url.Parse(u)
+	require.NoError(t, err)
+	return uu
 }
 
 func mockProvider(h *func(w http.ResponseWriter, r *http.Request)) *httptest.Server {
@@ -301,67 +308,78 @@ func TestStrategy(t *testing.T) {
 			},
 		},
 		{
-			d:   "This should pass but require consent because it's not an authorization_code flow",
-			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
-			jar: persistentCJ,
-			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
-				return func(w http.ResponseWriter, r *http.Request) {
-					rr, res, err := apiClient.GetLoginRequest(r.URL.Query().Get("login_challenge"))
-					require.NoError(t, err)
-					require.EqualValues(t, http.StatusOK, res.StatusCode)
-					assert.True(t, rr.Skip)
-					assert.Equal(t, "user", rr.Subject)
-
-					v, res, err := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
-						Subject:     "user",
-						Remember:    false,
-						RememberFor: 0,
-						Acr:         "1",
-					})
-					require.NoError(t, err)
-					require.EqualValues(t, http.StatusOK, res.StatusCode)
-					require.NotEmpty(t, v.RedirectTo)
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
-				}
-			},
-			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
-				return func(w http.ResponseWriter, r *http.Request) {
-					rr, res, err := apiClient.GetConsentRequest(r.URL.Query().Get("consent_challenge"))
-					require.NoError(t, err)
-					require.EqualValues(t, http.StatusOK, res.StatusCode)
-					assert.False(t, rr.Skip)
-					assert.Equal(t, "client-id", rr.Client.Id)
-					assert.Equal(t, "user", rr.Subject)
-
-					v, res, err := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{
-						GrantScope:  []string{"scope-a"},
-						Remember:    false,
-						RememberFor: 0,
-						Session: swagger.ConsentRequestSession{
-							AccessToken: map[string]interface{}{"foo": "bar"},
-							IdToken:     map[string]interface{}{"bar": "baz"},
-						},
-					})
-					require.NoError(t, err)
-					require.EqualValues(t, http.StatusOK, res.StatusCode)
-					require.NotEmpty(t, v.RedirectTo)
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
-				}
-			},
-			expectFinalStatusCode: http.StatusOK,
-			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
-			expectErr:             []bool{true, true, false},
-			expectSession: &HandledConsentRequest{
-				ConsentRequest: &ConsentRequest{Subject: "user"},
-				GrantedScope:   []string{"scope-a"},
-				Remember:       false,
-				RememberFor:    0,
-				Session: &ConsentRequestSessionData{
-					AccessToken: map[string]interface{}{"foo": "bar"},
-					IDToken:     map[string]interface{}{"bar": "baz"},
-				},
-			},
+			d:      "This should fail because prompt=none, client is public, and redirection scheme is not HTTPS but a custom scheme",
+			req:    fosite.AuthorizeRequest{RedirectURI: mustParseURL(t, "custom://redirection-scheme/path"), Request: fosite.Request{Client: &client.Client{Public: true, ID: "client-id"}, Scopes: []string{"scope-a"}}},
+			prompt: "none",
+			jar:    persistentCJ,
+			lph:    passAuthentication(apiClient, false),
+			expectFinalStatusCode: fosite.ErrConsentRequired.StatusCode(),
+			expectErrType:         []error{ErrAbortOAuth2Request, fosite.ErrConsentRequired},
+			expectErr:             []bool{true, true},
 		},
+		// This test is disabled because it breaks OIDC Conformity Tests
+		//{
+		//	d:   "This should pass but require consent because it's not an authorization_code flow",
+		//	req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
+		//	jar: persistentCJ,
+		//	lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+		//		return func(w http.ResponseWriter, r *http.Request) {
+		//			rr, res, err := apiClient.GetLoginRequest(r.URL.Query().Get("login_challenge"))
+		//			require.NoError(t, err)
+		//			require.EqualValues(t, http.StatusOK, res.StatusCode)
+		//			assert.True(t, rr.Skip)
+		//			assert.Equal(t, "user", rr.Subject)
+		//
+		//			v, res, err := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
+		//				Subject:     "user",
+		//				Remember:    false,
+		//				RememberFor: 0,
+		//				Acr:         "1",
+		//			})
+		//			require.NoError(t, err)
+		//			require.EqualValues(t, http.StatusOK, res.StatusCode)
+		//			require.NotEmpty(t, v.RedirectTo)
+		//			http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+		//		}
+		//	},
+		//	cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+		//		return func(w http.ResponseWriter, r *http.Request) {
+		//			rr, res, err := apiClient.GetConsentRequest(r.URL.Query().Get("consent_challenge"))
+		//			require.NoError(t, err)
+		//			require.EqualValues(t, http.StatusOK, res.StatusCode)
+		//			assert.False(t, rr.Skip)
+		//			assert.Equal(t, "client-id", rr.Client.Id)
+		//			assert.Equal(t, "user", rr.Subject)
+		//
+		//			v, res, err := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{
+		//				GrantScope:  []string{"scope-a"},
+		//				Remember:    false,
+		//				RememberFor: 0,
+		//				Session: swagger.ConsentRequestSession{
+		//					AccessToken: map[string]interface{}{"foo": "bar"},
+		//					IdToken:     map[string]interface{}{"bar": "baz"},
+		//				},
+		//			})
+		//			require.NoError(t, err)
+		//			require.EqualValues(t, http.StatusOK, res.StatusCode)
+		//			require.NotEmpty(t, v.RedirectTo)
+		//			http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+		//		}
+		//	},
+		//	expectFinalStatusCode: http.StatusOK,
+		//	expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+		//	expectErr:             []bool{true, true, false},
+		//	expectSession: &HandledConsentRequest{
+		//		ConsentRequest: &ConsentRequest{Subject: "user"},
+		//		GrantedScope:   []string{"scope-a"},
+		//		Remember:       false,
+		//		RememberFor:    0,
+		//		Session: &ConsentRequestSessionData{
+		//			AccessToken: map[string]interface{}{"foo": "bar"},
+		//			IDToken:     map[string]interface{}{"bar": "baz"},
+		//		},
+		//	},
+		//},
 		{
 			d:   "This should fail at login screen because subject from accept does not match subject from session",
 			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
@@ -392,7 +410,7 @@ func TestStrategy(t *testing.T) {
 		},
 		{
 			d:   "This should pass and confirm previous authentication and consent because it is a authorization_code",
-			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ID: "client-id", Secret: "should-not-be-included"}, Scopes: []string{"scope-a"}}},
 			jar: persistentCJ,
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 				return func(w http.ResponseWriter, r *http.Request) {
@@ -401,6 +419,7 @@ func TestStrategy(t *testing.T) {
 					require.EqualValues(t, http.StatusOK, res.StatusCode)
 					assert.True(t, rr.Skip)
 					assert.Equal(t, "user", rr.Subject)
+					assert.Empty(t, rr.Client.ClientSecret)
 
 					v, res, err := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
 						Subject:     "user",
@@ -422,6 +441,7 @@ func TestStrategy(t *testing.T) {
 					assert.True(t, rr.Skip)
 					assert.Equal(t, "client-id", rr.Client.Id)
 					assert.Equal(t, "user", rr.Subject)
+					assert.Empty(t, rr.Client.ClientSecret)
 
 					v, res, err := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{
 						GrantScope:  []string{"scope-a"},
@@ -976,20 +996,21 @@ func TestStrategy(t *testing.T) {
 				cph = noopHandler(t)
 			}
 
-			calls := 0
+			calls := -1
 			aph = func(w http.ResponseWriter, r *http.Request) {
+				calls++
 				require.True(t, len(tc.expectErrType) >= calls+1, "%d (expect) < %d (got)", len(tc.expectErrType), calls+1)
 				require.True(t, len(tc.expectErr) >= calls+1, "%d (expect) < %d (got)", len(tc.expectErr), calls+1)
 				require.NoError(t, r.ParseForm())
 				tc.req.Form = r.Form
 
 				c, err := strategy.HandleOAuth2AuthorizationRequest(w, r, &tc.req)
-				t.Logf("DefaultStrategy returned:\n\t%+v\n\t%s", c, err)
+				t.Logf("DefaultStrategy returned at call %d:\n\tgot: %+v\n\texpected: %s", calls, c, err)
 
 				if tc.expectErr[calls] {
 					assert.Error(t, err)
 					if tc.expectErrType[calls] != nil {
-						assert.EqualError(t, err, tc.expectErrType[calls].Error(), "%+v", err)
+						assert.EqualError(t, tc.expectErrType[calls], err.Error(), "%+v", err)
 					}
 				} else {
 					require.NoError(t, err)
@@ -1002,7 +1023,6 @@ func TestStrategy(t *testing.T) {
 					}
 				}
 
-				calls++
 				if errors.Cause(err) == ErrAbortOAuth2Request {
 					// nothing to do, indicates redirect
 				} else if err != nil {

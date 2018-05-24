@@ -10,6 +10,6 @@
 
 package swagger
 
-type HealthVersion struct {
+type Version struct {
 	Version string `json:"version,omitempty"`
 }

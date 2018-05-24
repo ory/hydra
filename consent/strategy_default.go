@@ -204,7 +204,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 			Skip:            skip,
 			RequestedScope:  []string(ar.GetRequestedScopes()),
 			Subject:         subject,
-			Client:          sanitizeClient(ar),
+			Client:          sanitizeClientFromRequest(ar),
 			RequestURL:      iu.String(),
 			AuthenticatedAt: authenticatedAt,
 			RequestedAt:     time.Now().UTC(),
@@ -290,13 +290,6 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("The login request is marked as remember, but the subject from the login confirmation does not match the original subject from the cookie."))
 	}
 
-	authTime := session.AuthenticatedAt
-	if session.AuthenticatedAt.After(session.RequestedAt) {
-		// If we authenticated after the initial request hit the /oauth2/auth endpoint, we can update the
-		// auth time to now which will resolve issues with very short max_age times
-		authTime = time.Now().UTC()
-	}
-
 	if err := s.OpenIDConnectRequestValidator.ValidatePrompt(&fosite.AuthorizeRequest{
 		ResponseTypes: req.GetResponseTypes(),
 		RedirectURI:   req.GetRedirectURI(),
@@ -314,7 +307,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 					Subject:     session.Subject,
 					IssuedAt:    time.Now().UTC(),                // doesn't matter
 					ExpiresAt:   time.Now().Add(time.Hour).UTC(), // doesn't matter
-					AuthTime:    authTime,
+					AuthTime:    session.AuthenticatedAt,
 					RequestedAt: session.RequestedAt,
 				},
 				Headers: &jwt.Headers{},
@@ -377,14 +370,37 @@ func (s *DefaultStrategy) requestConsent(w http.ResponseWriter, r *http.Request,
 		return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
 	}
 
+	// https://tools.ietf.org/html/rfc6749
+	//
+	// As stated in Section 10.2 of OAuth 2.0 [RFC6749], the authorization
+	// server SHOULD NOT process authorization requests automatically
+	// without user consent or interaction, except when the identity of the
+	// client can be assured.  This includes the case where the user has
+	// previously approved an authorization request for a given client id --
+	// unless the identity of the client can be proven, the request SHOULD
+	// be processed as if no previous request had been approved.
+	//
+	// Measures such as claimed "https" scheme redirects MAY be accepted by
+	// authorization servers as identity proof.  Some operating systems may
+	// offer alternative platform-specific identity features that MAY be
+	// accepted, as appropriate.
 	if ar.GetClient().IsPublic() {
-		return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
+		// The OpenID Connect Test Tool fails if this returns `consent_required` when `prompt=none` is used.
+		// According to the quote above, it should be ok to allow https to skip consent.
+		//
+		// This is tracked as issue: https://github.com/ory/hydra/issues/866
+		// This is also tracked as upstream issue: https://github.com/openid-certification/oidctest/issues/97
+		if ar.GetRedirectURI().Scheme != "https" {
+			return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
+		}
 	}
 
-	if ar.GetResponseTypes().Has("token") {
-		// We're probably requesting the implicit or hybrid flow in which case we MUST authenticate and authorize the request
-		return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
-	}
+	// This breaks OIDC Conformity Tests and is probably a bit paranoid.
+	//
+	// if ar.GetResponseTypes().Has("token") {
+	//	 // We're probably requesting the implicit or hybrid flow in which case we MUST authenticate and authorize the request
+	// 	 return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
+	// }
 
 	consentSessions, err := s.M.FindPreviouslyGrantedConsentRequests(ar.GetClient().GetID(), authenticationSession.Subject)
 	if errors.Cause(err) == errNoPreviousConsentFound {
@@ -406,7 +422,6 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 		skip = true
 	}
 
-	// Let'id validate that prompt is actually not "none" if we can't skip authentication
 	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
 	if stringslice.Has(prompt, "none") && !skip {
 		return errors.WithStack(fosite.ErrConsentRequired.WithDebug(`Prompt "none" was requested, but no previous consent was found`))
@@ -425,7 +440,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 			Skip:            skip,
 			RequestedScope:  []string(ar.GetRequestedScopes()),
 			Subject:         as.Subject,
-			Client:          sanitizeClient(ar),
+			Client:          sanitizeClientFromRequest(ar),
 			RequestURL:      as.AuthenticationRequest.RequestURL,
 			AuthenticatedAt: as.AuthenticatedAt,
 			RequestedAt:     as.RequestedAt,
@@ -478,12 +493,6 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 	}
 
 	session.AuthenticatedAt = session.ConsentRequest.AuthenticatedAt
-	if session.AuthenticatedAt.After(session.ConsentRequest.RequestedAt) {
-		// If we authenticated after the initial request hit the /oauth2/auth endpoint, we can update the
-		// auth time to now which will resolve issues with very short max_age times
-		session.AuthenticatedAt = time.Now().UTC()
-	}
-
 	return session, nil
 }
 

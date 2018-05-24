@@ -38,22 +38,9 @@ const (
 )
 
 type Handler struct {
-	Manager        Manager
-	Generators     map[string]KeyGenerator
-	H              herodot.Writer
-	ResourcePrefix string
-}
-
-func (h *Handler) PrefixResource(resource string) string {
-	if h.ResourcePrefix == "" {
-		h.ResourcePrefix = "rn:hydra"
-	}
-
-	if h.ResourcePrefix[len(h.ResourcePrefix)-1] == ':' {
-		h.ResourcePrefix = h.ResourcePrefix[:len(h.ResourcePrefix)-1]
-	}
-
-	return h.ResourcePrefix + ":" + resource
+	Manager    Manager
+	Generators map[string]KeyGenerator
+	H          herodot.Writer
 }
 
 func (h *Handler) GetGenerators() map[string]KeyGenerator {

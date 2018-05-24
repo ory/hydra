@@ -1,4 +1,4 @@
-# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthVersion
+# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.Version
 
 ## Properties
 Name | Type | Description | Notes

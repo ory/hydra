@@ -14,25 +14,20 @@
  * limitations under the License.
  *
  * @author		Aeneas Rekkas <aeneas+oss@aeneas.io>
- * @copyright 	2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
+ * @Copyright 	2017-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
  * @license 	Apache-2.0
  */
 
-package server
+package pkg
 
 import (
+	"net/http"
+
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory/herodot"
-	"github.com/ory/hydra/config"
-	"github.com/ory/hydra/health"
 )
 
-func newHealthHandler(c *config.Config, router *httprouter.Router) *health.Handler {
-	h := &health.Handler{
-		Metrics:       c.GetTelemetryMetrics(),
-		H:             herodot.NewJSONWriter(c.GetLogger()),
-		VersionString: c.BuildVersion,
+func PermanentRedirect(to string) func(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	return func(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		http.Redirect(rw, r, to, http.StatusPermanentRedirect)
 	}
-	h.SetRoutes(router)
-	return h
 }

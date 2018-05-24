@@ -17,41 +17,31 @@
 ;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define([
-      'ApiClient',
-      'model/HealthStatus',
-      'model/InlineResponse401'
-    ], factory)
+    define(['ApiClient'], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(
-      require('../ApiClient'),
-      require('../model/HealthStatus'),
-      require('../model/InlineResponse401')
-    )
+    module.exports = factory(require('../ApiClient'))
   } else {
     // Browser globals (root is window)
     if (!root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer) {
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {}
     }
-    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthApi = factory(
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthStatus,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.InlineResponse401
+    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.MetricsApi = factory(
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient
     )
   }
-})(this, function(ApiClient, HealthStatus, InlineResponse401) {
+})(this, function(ApiClient) {
   'use strict'
 
   /**
-   * Health service.
-   * @module api/HealthApi
+   * Metrics service.
+   * @module api/MetricsApi
    * @version Latest
    */
 
   /**
-   * Constructs a new HealthApi.
-   * @alias module:api/HealthApi
+   * Constructs a new MetricsApi.
+   * @alias module:api/MetricsApi
    * @class
    * @param {module:ApiClient} apiClient Optional API client implementation to use,
    * default to {@link module:ApiClient#instance} if unspecified.
@@ -60,20 +50,19 @@
     this.apiClient = apiClient || ApiClient.instance
 
     /**
-     * Callback function to receive the result of the getInstanceStatus operation.
-     * @callback module:api/HealthApi~getInstanceStatusCallback
+     * Callback function to receive the result of the getPrometheusMetrics operation.
+     * @callback module:api/MetricsApi~getPrometheusMetricsCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/HealthStatus} data The data returned by the service call.
+     * @param data This operation does not return a value.
      * @param {String} response The complete HTTP response.
      */
 
     /**
-     * Check the Health Status
-     * This endpoint returns a 200 status code when the HTTP server is up running. &#x60;{ \&quot;status\&quot;: \&quot;ok\&quot; }&#x60;. This status does currently not include checks whether the database connection is working. This endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header when TLS termination is set.  Be aware that if you are running multiple nodes of ORY Hydra, the health status will never refer to the cluster state, only to a single instance.
-     * @param {module:api/HealthApi~getInstanceStatusCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/HealthStatus}
+     * Retrieve Prometheus metrics
+     * This endpoint returns metrics formatted for Prometheus.
+     * @param {module:api/MetricsApi~getPrometheusMetricsCallback} callback The callback function, accepting three arguments: error, data, response
      */
-    this.getInstanceStatus = function(callback) {
+    this.getPrometheusMetrics = function(callback) {
       var postBody = null
 
       var pathParams = {}
@@ -87,10 +76,10 @@
         'application/x-www-form-urlencoded'
       ]
       var accepts = ['application/json']
-      var returnType = HealthStatus
+      var returnType = null
 
       return this.apiClient.callApi(
-        '/health',
+        '/metrics/prometheus',
         'GET',
         pathParams,
         queryParams,

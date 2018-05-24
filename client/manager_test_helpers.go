@@ -72,6 +72,7 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 			Secret:            "secret",
 			RedirectURIs:      []string{"http://redirect"},
 			TermsOfServiceURI: "foo",
+			SecretExpiresAt:   0,
 		}
 
 		assert.NoError(t, m.CreateClient(c))
@@ -85,6 +86,7 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 			Secret:            "secret",
 			RedirectURIs:      []string{"http://redirect"},
 			TermsOfServiceURI: "foo",
+			SecretExpiresAt:   1,
 		}))
 
 		d, err := m.GetClient(nil, "1234")
@@ -98,6 +100,10 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Len(t, ds, 2)
 		assert.NotEqual(t, ds["1234"].ID, ds["2-1234"].ID)
+
+		//test if SecretExpiresAt was set properly
+		assert.Equal(t, ds["1234"].SecretExpiresAt, 0)
+		assert.Equal(t, ds["2-1234"].SecretExpiresAt, 1)
 
 		ds, err = m.GetClients(1, 0)
 		assert.NoError(t, err)

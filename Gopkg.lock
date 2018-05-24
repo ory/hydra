@@ -292,8 +292,8 @@
     "token/hmac",
     "token/jwt"
   ]
-  revision = "28822d7b686c3a48ca9afec5291699b758c5f6cf"
-  version = "v0.19.5"
+  revision = "180c74965cb128059d63e894ba2dd04184458a33"
+  version = "v0.19.6"
 
 [[projects]]
   branch = "master"
@@ -622,6 +622,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2c69d848183194e9e917a866c7bc121233b6f560a7d852a8329eb880ef30c335"
+  inputs-digest = "48cca55fd95e0b94a01e8538240d040761fa1ed80150e1a80bcc8a6a07f01150"
   solver-name = "gps-cdcl"
   solver-version = 1

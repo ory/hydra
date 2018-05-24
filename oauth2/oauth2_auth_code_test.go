@@ -407,6 +407,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							require.EqualValues(t, http.StatusOK, res.StatusCode)
 							assert.False(t, rr.Skip)
 							assert.EqualValues(t, "", rr.Subject)
+							assert.Empty(t, rr.Client.ClientSecret)
 
 							v, res, err := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{Subject: "user-a"})
 							require.NoError(t, err)
@@ -422,6 +423,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							require.EqualValues(t, http.StatusOK, res.StatusCode)
 							assert.True(t, rr.Skip)
 							assert.EqualValues(t, "user-a", rr.Subject)
+							assert.Empty(t, rr.Client.ClientSecret)
 
 							v, res, err := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{
 								GrantScope: []string{"hydra", "openid"},

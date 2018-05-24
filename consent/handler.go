@@ -90,6 +90,8 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
+	request.Client = sanitizeClient(request.Client)
+
 	h.H.Write(w, r, request)
 }
 
@@ -267,6 +269,8 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 		h.H.WriteError(w, r, err)
 		return
 	}
+
+	request.Client = sanitizeClient(request.Client)
 
 	h.H.Write(w, r, request)
 }

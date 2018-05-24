@@ -38,7 +38,7 @@ func TestSanitizeClient(t *testing.T) {
 			Client: c,
 		},
 	}
-	got := sanitizeClient(ar)
+	got := sanitizeClientFromRequest(ar)
 	assert.Empty(t, got.Secret)
 	assert.NotEmpty(t, c.Secret)
 }

@@ -229,6 +229,7 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request, _ http
 	delete(interim, "iat")
 	delete(interim, "rat")
 	delete(interim, "exp")
+	delete(interim, "jti")
 
 	h.H.Write(w, r, interim)
 }

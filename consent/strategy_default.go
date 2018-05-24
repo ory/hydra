@@ -257,6 +257,29 @@ func (s *DefaultStrategy) revokeAuthenticationSession(w http.ResponseWriter, r *
 	return s.M.DeleteAuthenticationSession(sid)
 }
 
+func (s *DefaultStrategy) updateAuthenticationSessionTime(w http.ResponseWriter, r *http.Request, authTime time.Time) error {
+	cookie, _ := s.CookieStore.Get(r, cookieAuthenticationName)
+	sid, _ := mapx.GetString(cookie.Values, cookieAuthenticationSIDName)
+	if sid == "" {
+		// No sid exists so let's ignore this call.
+		return nil
+	}
+
+	as, err := s.M.GetAuthenticationSession(sid)
+	if err != nil {
+		// No sid exists so let's ignore this call.
+		return nil
+	}
+
+	if err := s.M.DeleteAuthenticationSession(sid); err != nil {
+		return err
+	}
+
+	as.AuthenticatedAt = authTime
+
+	return s.M.CreateAuthenticationSession(as)
+}
+
 func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*HandledAuthenticationRequest, error) {
 	session, err := s.M.VerifyAndInvalidateAuthenticationRequest(verifier)
 	if errors.Cause(err) == pkg.ErrNotFound {
@@ -504,6 +527,18 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 		// If we authenticated after the initial request hit the /oauth2/auth endpoint, we can update the
 		// auth time to now which will resolve issues with very short max_age times
 		session.AuthenticatedAt = time.Now().UTC()
+
+		// This resolves an issue where, on the second request with a remembered authentication, the auth_time
+		// claim is different from the first issuance and the difference depends on how long the consent request takes.
+		//
+		// To mitigate this we'll update the authentication session (if one exists).
+		//
+		// See https://github.com/ory/hydra/issues/874
+		if session.AuthenticatedAt != session.ConsentRequest.AuthenticatedAt {
+			if err := s.updateAuthenticationSessionTime(w, r, session.AuthenticatedAt); err != nil {
+				return nil, err
+			}
+		}
 	}
 
 	return session, nil

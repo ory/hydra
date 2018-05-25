@@ -90,6 +90,9 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 		return
 	}
 
+	// has to be 0 because it is not supposed to be set
+	c.SecretExpiresAt = 0
+
 	secret := c.Secret
 	if err := h.Manager.CreateClient(&c); err != nil {
 		h.H.WriteError(w, r, err)
@@ -143,6 +146,10 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	}
 
 	c.ID = ps.ByName("id")
+
+	// has to be 0 because it is not supposed to be set
+	c.SecretExpiresAt = 0
+
 	if err := h.Manager.UpdateClient(&c); err != nil {
 		h.H.WriteError(w, r, err)
 		return

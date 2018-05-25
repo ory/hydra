@@ -59,6 +59,15 @@ var migrations = &migrate.MemoryMigrationSource{
 				"DROP TABLE hydra_client",
 			},
 		},
+		{
+			Id: "2",
+			Up: []string{
+				`ALTER TABLE hydra_client ADD client_secret_expires_at INTEGER NOT NULL DEFAULT 0`,
+			},
+			Down: []string{
+				`ALTER TABLE hydra_client DROP COLUMN client_secret_expires_at`,
+			},
+		},
 	},
 }
 
@@ -82,6 +91,7 @@ type sqlData struct {
 	LogoURI           string `db:"logo_uri"`
 	Contacts          string `db:"contacts"`
 	Public            bool   `db:"public"`
+	SecretExpiresAt   int    `db:"client_secret_expires_at"`
 }
 
 var sqlParams = []string{
@@ -99,6 +109,7 @@ var sqlParams = []string{
 	"logo_uri",
 	"contacts",
 	"public",
+	"client_secret_expires_at",
 }
 
 func sqlDataFromClient(d *Client) *sqlData {
@@ -117,6 +128,7 @@ func sqlDataFromClient(d *Client) *sqlData {
 		LogoURI:           d.LogoURI,
 		Contacts:          strings.Join(d.Contacts, "|"),
 		Public:            d.Public,
+		SecretExpiresAt:   d.SecretExpiresAt,
 	}
 }
 
@@ -136,6 +148,7 @@ func (d *sqlData) ToClient() *Client {
 		LogoURI:           d.LogoURI,
 		Contacts:          stringsx.Splitx(d.Contacts, "|"),
 		Public:            d.Public,
+		SecretExpiresAt:   d.SecretExpiresAt,
 	}
 }
 

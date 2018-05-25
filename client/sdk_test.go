@@ -35,19 +35,20 @@ import (
 
 func createTestClient(prefix string) hydra.OAuth2Client {
 	return hydra.OAuth2Client{
-		Id:            "1234",
-		ClientName:    prefix + "name",
-		ClientSecret:  prefix + "secret",
-		ClientUri:     prefix + "uri",
-		Contacts:      []string{prefix + "peter", prefix + "pan"},
-		GrantTypes:    []string{prefix + "client_credentials", prefix + "authorize_code"},
-		LogoUri:       prefix + "logo",
-		Owner:         prefix + "an-owner",
-		PolicyUri:     prefix + "policy-uri",
-		Scope:         prefix + "foo bar baz",
-		TosUri:        prefix + "tos-uri",
-		ResponseTypes: []string{prefix + "id_token", prefix + "code"},
-		RedirectUris:  []string{prefix + "redirect-url", prefix + "redirect-uri"},
+		Id:              "1234",
+		ClientName:      prefix + "name",
+		ClientSecret:    prefix + "secret",
+		ClientUri:       prefix + "uri",
+		Contacts:        []string{prefix + "peter", prefix + "pan"},
+		GrantTypes:      []string{prefix + "client_credentials", prefix + "authorize_code"},
+		LogoUri:         prefix + "logo",
+		Owner:           prefix + "an-owner",
+		PolicyUri:       prefix + "policy-uri",
+		Scope:           prefix + "foo bar baz",
+		TosUri:          prefix + "tos-uri",
+		ResponseTypes:   []string{prefix + "id_token", prefix + "code"},
+		RedirectUris:    []string{prefix + "redirect-url", prefix + "redirect-uri"},
+		SecretExpiresAt: 0,
 	}
 }
 
@@ -65,32 +66,45 @@ func TestClientSDK(t *testing.T) {
 
 	t.Run("case=client is created and updated", func(t *testing.T) {
 		createClient := createTestClient("")
+		compareClient := createClient
+		createClient.SecretExpiresAt = 10
 
+		// returned client is correct on Create
 		result, _, err := c.CreateOAuth2Client(createClient)
 		require.NoError(t, err)
-		assert.EqualValues(t, createClient, *result)
+		assert.EqualValues(t, compareClient, *result)
 
-		compareClient := createClient
+		// secret is not returned on GetOAuth2Client
 		compareClient.ClientSecret = ""
 		result, _, err = c.GetOAuth2Client(createClient.Id)
 		assert.EqualValues(t, compareClient, *result)
 
+		// listing clients returns the only added one
 		results, _, err := c.ListOAuth2Clients(100, 0)
 		require.NoError(t, err)
 		assert.Len(t, results, 1)
 		assert.EqualValues(t, compareClient, results[0])
 
+		// SecretExpiresAt gets overwritten with 0 on Update
+		compareClient.ClientSecret = createClient.ClientSecret
+		result, _, err = c.UpdateOAuth2Client(createClient.Id, createClient)
+		require.NoError(t, err)
+		assert.EqualValues(t, compareClient, *result)
+
+		// create another client
 		updateClient := createTestClient("foo")
 		result, _, err = c.UpdateOAuth2Client(createClient.Id, updateClient)
 		require.NoError(t, err)
 		assert.EqualValues(t, updateClient, *result)
 
+		// again, test if secret is not returned on Get
 		compareClient = updateClient
 		compareClient.ClientSecret = ""
 		result, _, err = c.GetOAuth2Client(updateClient.Id)
 		require.NoError(t, err)
 		assert.EqualValues(t, compareClient, *result)
 
+		// client can not be found after being deleted
 		_, err = c.DeleteOAuth2Client(updateClient.Id)
 		require.NoError(t, err)
 

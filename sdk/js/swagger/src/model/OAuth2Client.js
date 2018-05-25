@@ -59,6 +59,12 @@
     if (data) {
       obj = obj || new exports()
 
+      if (data.hasOwnProperty('SecretExpiresAt')) {
+        obj['SecretExpiresAt'] = ApiClient.convertToType(
+          data['SecretExpiresAt'],
+          'Number'
+        )
+      }
       if (data.hasOwnProperty('client_name')) {
         obj['client_name'] = ApiClient.convertToType(
           data['client_name'],
@@ -124,6 +130,11 @@
     return obj
   }
 
+  /**
+   * SecretExpiresAt is an integer holding the time at which the client secret will expire or 0 if it will not expire. The time is represented as the number of seconds from 1970-01-01T00:00:00Z as measured in UTC until the date/time of expiration.
+   * @member {Number} SecretExpiresAt
+   */
+  exports.prototype['SecretExpiresAt'] = undefined
   /**
    * Name is the human-readable string name of the client to be presented to the end-user during authorization.
    * @member {String} client_name

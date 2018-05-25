@@ -1676,6 +1676,11 @@
       "type": "object",
       "title": "Client represents an OAuth 2.0 Client.",
       "properties": {
+        "SecretExpiresAt": {
+          "description": "SecretExpiresAt is an integer holding the time at which the client\nsecret will expire or 0 if it will not expire. The time is\nrepresented as the number of seconds from 1970-01-01T00:00:00Z as\nmeasured in UTC until the date/time of expiration.",
+          "type": "integer",
+          "format": "int64"
+        },
         "client_name": {
           "description": "Name is the human-readable string name of the client to be presented to the\nend-user during authorization.",
           "type": "string",

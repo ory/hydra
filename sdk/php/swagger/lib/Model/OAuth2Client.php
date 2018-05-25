@@ -54,6 +54,7 @@ class OAuth2Client implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
+        'secret_expires_at' => 'int',
         'client_name' => 'string',
         'client_secret' => 'string',
         'client_uri' => 'string',
@@ -75,6 +76,7 @@ class OAuth2Client implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerFormats = [
+        'secret_expires_at' => 'int64',
         'client_name' => null,
         'client_secret' => null,
         'client_uri' => null,
@@ -106,6 +108,7 @@ class OAuth2Client implements ArrayAccess
      * @var string[]
      */
     protected static $attributeMap = [
+        'secret_expires_at' => 'SecretExpiresAt',
         'client_name' => 'client_name',
         'client_secret' => 'client_secret',
         'client_uri' => 'client_uri',
@@ -128,6 +131,7 @@ class OAuth2Client implements ArrayAccess
      * @var string[]
      */
     protected static $setters = [
+        'secret_expires_at' => 'setSecretExpiresAt',
         'client_name' => 'setClientName',
         'client_secret' => 'setClientSecret',
         'client_uri' => 'setClientUri',
@@ -150,6 +154,7 @@ class OAuth2Client implements ArrayAccess
      * @var string[]
      */
     protected static $getters = [
+        'secret_expires_at' => 'getSecretExpiresAt',
         'client_name' => 'getClientName',
         'client_secret' => 'getClientSecret',
         'client_uri' => 'getClientUri',
@@ -197,6 +202,7 @@ class OAuth2Client implements ArrayAccess
      */
     public function __construct(array $data = null)
     {
+        $this->container['secret_expires_at'] = isset($data['secret_expires_at']) ? $data['secret_expires_at'] : null;
         $this->container['client_name'] = isset($data['client_name']) ? $data['client_name'] : null;
         $this->container['client_secret'] = isset($data['client_secret']) ? $data['client_secret'] : null;
         $this->container['client_uri'] = isset($data['client_uri']) ? $data['client_uri'] : null;
@@ -244,6 +250,27 @@ class OAuth2Client implements ArrayAccess
         return true;
     }
 
+
+    /**
+     * Gets secret_expires_at
+     * @return int
+     */
+    public function getSecretExpiresAt()
+    {
+        return $this->container['secret_expires_at'];
+    }
+
+    /**
+     * Sets secret_expires_at
+     * @param int $secret_expires_at SecretExpiresAt is an integer holding the time at which the client secret will expire or 0 if it will not expire. The time is represented as the number of seconds from 1970-01-01T00:00:00Z as measured in UTC until the date/time of expiration.
+     * @return $this
+     */
+    public function setSecretExpiresAt($secret_expires_at)
+    {
+        $this->container['secret_expires_at'] = $secret_expires_at;
+
+        return $this;
+    }
 
     /**
      * Gets client_name

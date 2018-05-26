@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strconv"
 
 	"os"
@@ -31,9 +32,23 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/urfave/negroni"
+	"gopkg.in/alexcesaro/statsd.v2"
 )
 
 var airbrake *gobrake.Notifier
+var regx *regexp.Regexp
+
+func init() {
+	regx = newStatsdTagsSanitizerRegex()
+}
+
+func newStatsdTagsSanitizerRegex() *regexp.Regexp {
+	regx, err := regexp.Compile("[^a-zA-Z0-9._-]+")
+	if err != nil {
+		panic(fmt.Sprintf("Error compiling statsd resource tag sanitizer regex : %v", err))
+	}
+	return regx
+}
 
 func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
@@ -163,6 +178,30 @@ func useAirbrakeMiddleware(n *negroni.Negroni) {
 	logrus.Info("Airbrake enabled!")
 }
 
+func NewStatsdClient() (*statsd.Client, error) {
+	enabled := os.Getenv("ENABLE_STATSD")
+	if enabled == "true" {
+		sampleRate, err := strconv.ParseFloat(os.Getenv("STATSD_SAMPLE_RATE"), 32)
+		if err != nil {
+			return nil, err
+		}
+
+		client, err := statsd.New(
+			statsd.Address(os.Getenv("STATSD_ADDRESS")),
+			statsd.Prefix(os.Getenv("STATSD_PREFIX")),
+			statsd.SampleRate(float32(sampleRate)),
+			statsd.TagsFormat(statsd.InfluxDB),
+		)
+		if err == nil {
+			logrus.Info("Statsd enabled!")
+		}
+		return client, err
+	} else {
+		logrus.Info("Statsd disabled")
+		return nil, nil
+	}
+}
+
 type airbrakeMW struct {
 }
 
@@ -209,12 +248,18 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 		L:                   c.GetLogger(),
 	}
 
+	// Set statsd
+	statsdClient, err := NewStatsdClient()
+	if err != nil {
+		logrus.Fatalf("Error creating Statsd client : %v", err)
+	}
+
 	// Set up handlers
 	h.Clients = newClientHandler(c, router, clientsManager)
 	h.Keys = newJWKHandler(c, router)
 	h.Policy = newPolicyHandler(c, router)
-	h.OAuth2 = newOAuth2Handler(c, router, ctx.KeyManager, oauth2Provider)
-	h.Warden = warden.NewHandler(c, router)
+	h.OAuth2 = newOAuth2Handler(c, router, ctx.KeyManager, oauth2Provider, statsdClient)
+	h.Warden = warden.NewHandler(c, router, statsdClient, regx)
 	h.Groups = &group.Handler{
 		H:       herodot.NewJSONWriter(c.GetLogger()),
 		W:       ctx.Warden,

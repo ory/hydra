@@ -18,6 +18,7 @@ import (
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/warden"
 	"github.com/pkg/errors"
+	"gopkg.in/alexcesaro/statsd.v2"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {
@@ -100,7 +101,7 @@ func newOAuth2Provider(c *config.Config, km jwk.Manager) fosite.OAuth2Provider {
 	)
 }
 
-func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manager, o fosite.OAuth2Provider) *oauth2.Handler {
+func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manager, o fosite.OAuth2Provider, statsd *statsd.Client) *oauth2.Handler {
 	if c.ConsentURL == "" {
 		proto := "https"
 		if c.ForceHTTP {
@@ -131,6 +132,7 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, km jwk.Manage
 		CookieStore:         sessions.NewCookieStore(c.GetCookieSecret()),
 		Issuer:              c.Issuer,
 		L:                   c.GetLogger(),
+		Statsd:              statsd,
 	}
 
 	handler.SetRoutes(router)

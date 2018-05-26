@@ -18,28 +18,28 @@ dep:
 	if [ ! -d vendor ]; then $(GLIDE) install; fi
 
 dist:
-	docker pull golang:1.9.0
+	docker pull golang:1.10.0
 	docker run --rm \
 	           -v $(SRCROOT):$(SRCROOT_D) \
 	           -w $(SRCROOT_D) \
 	           -e BUILD_ROOT=$(BUILD_ROOT_D) \
 	           -e UID=`id -u` \
 	           -e GID=`id -g` \
-	           golang:1.9.0 \
+	           golang:1.10.0 \
 	           make distbuild
 
 distbuild: clean build
 	-chown -R $(UID):$(GID) $(SRCROOT)
 
 distdep:
-	docker pull golang:1.9.0
+	docker pull golang:1.10.0
 	docker run --rm \
 	           -v $(SRCROOT):$(SRCROOT_D) \
 	           -w $(SRCROOT_D) \
 	           -e BUILD_ROOT=$(BUILD_ROOT_D) \
 	           -e UID=`id -u` \
 	           -e GID=`id -g` \
-	           golang:1.9.0 \
+	           golang:1.10.0 \
 	           make updatedep
 
 updatedep:

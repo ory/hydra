@@ -71,6 +71,8 @@ import:
 - package: gopkg.in/airbrake/gobrake.v2
 - package: github.com/newrelic/go-agent
 - package: github.com/mohae/deepcopy
+- package: gopkg.in/alexcesaro/statsd.v2
+  version: v2.0.0
 testImport:
 - package: github.com/bmizerany/assert
 - package: github.com/ory/dockertest

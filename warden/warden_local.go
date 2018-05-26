@@ -53,12 +53,13 @@ func (w *LocalWarden) IsAllowed(ctx context.Context, a *firewall.AccessRequest) 
 
 func (w *LocalWarden) TokenAllowed(ctx context.Context, token string, a *firewall.TokenAccessRequest, scopes ...string) (*firewall.Context, error) {
 	var auth, err = w.OAuth2.IntrospectToken(ctx, token, fosite.AccessToken, oauth2.NewSession(""), scopes...)
+	c := w.newBasicContext()
 	if err != nil {
 		w.L.WithFields(logrus.Fields{
 			"request": a,
 			"reason":  "Token is expired, malformed or missing",
 		}).WithError(err).Infof("Access denied")
-		return nil, err
+		return c, err
 	}
 
 	session := auth.GetSession()
@@ -75,10 +76,11 @@ func (w *LocalWarden) TokenAllowed(ctx context.Context, token string, a *firewal
 			"request":  a,
 			"reason":   "The policy decision point denied the request",
 		}).WithError(err).Infof("Access denied")
-		return nil, err
+		c.Subject = session.GetSubject()
+		return c, err
 	}
 
-	c := w.newContext(auth)
+	c = w.newContext(auth)
 	w.L.WithFields(logrus.Fields{
 		"subject":  c.Subject,
 		"audience": auth.GetClient().GetID(),
@@ -146,4 +148,8 @@ func (w *LocalWarden) newContext(auth fosite.AccessRequester) *firewall.Context 
 	}
 
 	return c
+}
+
+func (w *LocalWarden) newBasicContext() *firewall.Context {
+	return &firewall.Context{}
 }

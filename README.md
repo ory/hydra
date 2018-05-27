@@ -3,7 +3,7 @@
 <h4 align="center">
     <a href="https://discord.gg/PAMQWkr">Chat</a> |
     <a href="https://community.ory.am/">Forums</a> |
-    <a href="http://eepurl.com/bKT3N9">Newsletter</a><br/><br/>
+    <a href="http://eepurl.com/di390P">Newsletter</a><br/><br/>
     <a href="https://www.ory.sh/docs/1-hydra/">Guide</a> |
     <a href="https://www.ory.sh/docs/api/hydra">API Docs</a> |
     <a href="https://godoc.org/github.com/ory/hydra">Code Docs</a><br/><br/>

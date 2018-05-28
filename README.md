@@ -4,8 +4,8 @@
     <a href="https://discord.gg/PAMQWkr">Chat</a> |
     <a href="https://community.ory.am/">Forums</a> |
     <a href="http://eepurl.com/di390P">Newsletter</a><br/><br/>
-    <a href="https://www.ory.sh/docs/1-hydra/">Guide</a> |
-    <a href="https://www.ory.sh/docs/api/hydra">API Docs</a> |
+    <a href="https://www.ory.sh/docs/guides/master/hydra/">Guide</a> |
+    <a href="https://www.ory.sh/docs/api/hydra?version=master">API Docs</a> |
     <a href="https://godoc.org/github.com/ory/hydra">Code Docs</a><br/><br/>
     <a href="https://opencollective.com/ory-hydra">Support this project!</a>
 </h4>
@@ -219,11 +219,11 @@ Our services collect summarized, anonymized data which can optionally be turned 
 
 ### Guide
 
-The Guide is available [here](https://www.ory.sh/docs/1-hydra/).
+The Guide is available [here](https://www.ory.sh/docs/guides/master/hydra/).
 
 ### HTTP API documentation
 
-The HTTP API is documented [here](https://www.ory.sh/docs/api/hydra).
+The HTTP API is documented [here](https://www.ory.sh/docs/api/hydra?version=latest).
 
 ### Upgrading and Changelog
 

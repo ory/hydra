@@ -120,6 +120,9 @@ You will be able to run a combination of ORY Hydra, [ORY Oathkeeper](https://git
 ORY Hydra before the 1.0.0 release. This section explains how to upgrade and links to an example explaining the set up
 of the three services.
 
+**This means that ORY Hydra has no longer any type of internal access control. Endpoints such as `POST /clients` no longer
+require access tokens to be accessed. You must secure these endpoints yourself. For more information, [click here](https://www.ory.sh/docs/guides/master/hydra/2-environment/1-securing-ory-hydra).**
+
 [ORY Keto](https://github.com/ory/keto) handles access control using access control policies. The project currently supports the Warden API, Access Control Policy
 management, and Roles (previously known as [Warden Groups](#warden-groups)). ORY Keto is independent from ORY Hydra
 as it does not rely on any proprietary APIs but instead uses open standards such as OAuth 2.0 Token Introspection

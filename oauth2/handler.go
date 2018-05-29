@@ -461,7 +461,8 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	response, err := h.OAuth2.NewAuthorizeResponse(ctx, authorizeRequest, &Session{
 		DefaultSession: &openid.DefaultSession{
 			Claims: &jwt.IDTokenClaims{
-				Audience:    authorizeRequest.GetClient().GetID(),
+				// We do not need to pass the audience because it's included directly by ORY Fosite
+				//Audience:    []string{authorizeRequest.GetClient().GetID()},
 				Subject:     session.ConsentRequest.Subject,
 				Issuer:      h.IssuerURL,
 				IssuedAt:    time.Now().UTC(),
@@ -475,6 +476,8 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 			Subject: session.ConsentRequest.Subject,
 		},
 		Extra: session.Session.AccessToken,
+		// Here, we do not include the client because it's typically not the audience.
+		Audience: []string{},
 	})
 	if err != nil {
 		pkg.LogError(err, h.L)

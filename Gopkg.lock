@@ -292,12 +292,13 @@
     "token/hmac",
     "token/jwt"
   ]
-  revision = "72bff7f33ee8c3a4a8806cc266ca7299ff1785d4"
-  version = "v0.20.0"
+  revision = "57b14710c9aa845f2fa87322e0a3f3fa1e3e09c9"
+  version = "v0.20.1"
 
 [[projects]]
   name = "github.com/ory/go-convenience"
   packages = [
+    "corsx",
     "mapx",
     "stringslice",
     "stringsx",
@@ -622,6 +623,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3e6a4e67e6aa3e745f1a72ec9ec452b17cd26ace9a03f747dd261fd94f5f639e"
+  inputs-digest = "190378718b646d3668e6a0cfea43a3e912e2f7159e843537e5f877947e2c5f46"
   solver-name = "gps-cdcl"
   solver-version = 1

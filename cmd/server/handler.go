@@ -21,48 +21,37 @@
 package server
 
 import (
-	"crypto/tls"
-	"fmt"
-	"net/http"
-	"net/url"
-	"os"
-	"strconv"
-	"strings"
+"crypto/tls"
+"fmt"
+"net/http"
+"net/url"
+"os"
 
-	"github.com/gorilla/context"
-	"github.com/julienschmidt/httprouter"
-	"github.com/meatballhat/negroni-logrus"
+
+
+
+
+
+"github.com/gorilla/context"
+"github.com/julienschmidt/httprouter"
+"github.com/meatballhat/negroni-logrus"
+	"github.com/ory/go-convenience/corsx"
 	"github.com/ory/graceful"
-	"github.com/ory/herodot"
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/config"
-	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/pkg"
-	"github.com/pkg/errors"
-	"github.com/rs/cors"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"github.com/urfave/negroni"
+"github.com/ory/herodot"
+"github.com/ory/hydra/client"
+"github.com/ory/hydra/config"
+"github.com/ory/hydra/consent"
+"github.com/ory/hydra/jwk"
+"github.com/ory/hydra/oauth2"
+"github.com/ory/hydra/pkg"
+"github.com/pkg/errors"
+"github.com/rs/cors"
+"github.com/spf13/cobra"
+"github.com/urfave/negroni"
+
 )
 
 var _ = &consent.Handler{}
-
-func parseCorsOptions() cors.Options {
-	allowCredentials, _ := strconv.ParseBool(viper.GetString("CORS_ALLOWED_CREDENTIALS"))
-	debug, _ := strconv.ParseBool(viper.GetString("CORS_DEBUG"))
-	maxAge, _ := strconv.Atoi(viper.GetString("CORS_MAX_AGE"))
-	return cors.Options{
-		AllowedOrigins:   strings.Split(viper.GetString("CORS_ALLOWED_ORIGINS"), ","),
-		AllowedMethods:   strings.Split(viper.GetString("CORS_ALLOWED_METHODS"), ","),
-		AllowedHeaders:   strings.Split(viper.GetString("CORS_ALLOWED_HEADERS"), ","),
-		ExposedHeaders:   strings.Split(viper.GetString("CORS_EXPOSED_HEADERS"), ","),
-		AllowCredentials: allowCredentials,
-		MaxAge:           maxAge,
-		Debug:            debug,
-	}
-}
 
 func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
@@ -102,7 +91,7 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		n.Use(negronilogrus.NewMiddlewareFromLogger(logger, c.Issuer))
 		n.UseFunc(serverHandler.rejectInsecureRequests)
 		n.UseHandler(router)
-		corsHandler := cors.New(parseCorsOptions()).Handler(n)
+		corsHandler := cors.New(corsx.ParseOptions()).Handler(n)
 
 		var srv = graceful.WithDefaults(&http.Server{
 			Addr:    c.GetAddress(),

@@ -331,6 +331,12 @@
   version = "v0.8.8"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/ory/metrics-middleware"
+  packages = ["."]
+  revision = "db3300574e48a229d5ddb1e30ea4adfd139d493a"
+
+[[projects]]
   name = "github.com/ory/pagination"
   packages = ["."]
   revision = "abd7ec33a01fdec119267449c8f3bad187f881f6"
@@ -513,8 +519,8 @@
 [[projects]]
   name = "github.com/urfave/negroni"
   packages = ["."]
-  revision = "fde5e16d32adc7ad637e9cd9ad21d4ebc6192535"
-  version = "v0.2.0"
+  revision = "5dbbc83f748fc3ad38585842b0aedab546d0ea1e"
+  version = "v0.3.0"
 
 [[projects]]
   branch = "master"
@@ -623,6 +629,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3875e83639b38520422a3b1a4be0fa21144cf2ceb8bdd2b1b7a673684e0d12ee"
+  inputs-digest = "4019dee33d1150efa277de79772ee7729e55ba703a8685410c66f3d8474bc099"
   solver-name = "gps-cdcl"
   solver-version = 1

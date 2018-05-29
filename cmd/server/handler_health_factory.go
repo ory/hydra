@@ -53,7 +53,6 @@ func newHealthHandler(c *config.Config, router *httprouter.Router) *health.Handl
 	}
 
 	h := &health.Handler{
-		Metrics:       c.GetTelemetryMetrics(),
 		H:             herodot.NewJSONWriter(c.GetLogger()),
 		VersionString: c.BuildVersion,
 		ReadyChecks: map[string]health.ReadyChecker{

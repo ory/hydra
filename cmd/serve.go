@@ -21,6 +21,9 @@
 package cmd
 
 import (
+	"os"
+	"strconv"
+
 	"github.com/ory/hydra/cmd/server"
 	"github.com/spf13/cobra"
 )
@@ -210,7 +213,10 @@ func init() {
 	// is called directly, e.g.:
 	serveCmd.Flags().BoolVar(&c.ForceHTTP, "dangerous-force-http", false, "Disable HTTP/2 over TLS (HTTPS) and serve HTTP instead. Never use this in production.")
 	//serveCmd.Flags().Bool("dangerous-auto-logon", false, "Stores the root credentials in ~/.hydra.yml. Do not use in production.")
-	serveCmd.Flags().Bool("disable-telemetry", false, "Disable telemetry collection and sharing")
+
+	disableTelemetryEnv, _ := strconv.ParseBool(os.Getenv("DISABLE_TELEMETRY"))
+	serveCmd.Flags().Bool("disable-telemetry", disableTelemetryEnv, "Disable anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/guides/telemetry")
+
 	serveCmd.Flags().String("https-tls-key-path", "", "Path to the key file for HTTP/2 over TLS (https). You can set HTTPS_TLS_KEY_PATH or HTTPS_TLS_KEY instead.")
 	serveCmd.Flags().String("https-tls-cert-path", "", "Path to the certificate file for HTTP/2 over TLS (https). You can set HTTPS_TLS_CERT_PATH or HTTPS_TLS_CERT instead.")
 }

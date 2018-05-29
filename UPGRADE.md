@@ -8,7 +8,7 @@ before finalizing the upgrade process.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
-- [1.0.0-alpha.1](#100-alpha1)
+- [1.0.0-alpha.1](#100-beta1)
   - [OpenID Connect Certified](#openid-connect-certified)
   - [Breaking Changes](#breaking-changes)
     - [Introspection API](#introspection-api)
@@ -82,7 +82,7 @@ before finalizing the upgrade process.
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## 1.0.0-alpha.1
+## 1.0.0-beta.1
 
 This section summarizes important changes introduced in 1.0.0. **Follow it chronologically to ensure a proper migration.**
 

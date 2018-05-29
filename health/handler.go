@@ -31,41 +31,84 @@ import (
 )
 
 const (
-	HealthCheckPath       = "/health"
+	AliveCheckPath        = "/health/alive"
+	ReadyCheckPath        = "/health/ready"
 	VersionPath           = "/version"
 	MetricsPrometheusPath = "/metrics/prometheus"
 )
+
+type ReadyChecker func() error
 
 type Handler struct {
 	Metrics       *telemetry.MetricsManager
 	H             *herodot.JSONWriter
 	VersionString string
+	ReadyChecks   map[string]ReadyChecker
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
-	r.GET(HealthCheckPath, h.Health)
+	r.GET(AliveCheckPath, h.Alive)
+	r.GET(ReadyCheckPath, h.Ready)
 	r.GET(VersionPath, h.Version)
 
 	// using r.Handler because promhttp.Handler() returns http.Handler
 	r.Handler("GET", MetricsPrometheusPath, promhttp.Handler())
 
 	// BC compatible health check
-	r.GET("/health/status", pkg.PermanentRedirect(HealthCheckPath))
+	r.GET("/health/status", pkg.PermanentRedirect(AliveCheckPath))
 
 }
 
-// swagger:route GET /health health getInstanceStatus
+// swagger:route GET /health/alive health isInstanceAlive
 //
-// Check the Health Status
+// Check the Alive Status
 //
-// This endpoint returns a 200 status code when the HTTP server is up running. `{ "status": "ok" }`. This status does currently not include checks whether the database connection is working. This endpoint does not require the `X-Forwarded-Proto` header when TLS termination is set.
+// This endpoint returns a 200 status code when the HTTP server is up running.
+// This status does currently not include checks whether the database connection is working.
+// This endpoint does not require the `X-Forwarded-Proto` header when TLS termination is set.
 //
 // Be aware that if you are running multiple nodes of ORY Hydra, the health status will never refer to the cluster state, only to a single instance.
 //
 //     Responses:
 //       200: healthStatus
 //       500: genericError
-func (h *Handler) Health(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) Alive(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	h.H.Write(rw, r, &swaggerHealthStatus{
+		Status: "ok",
+	})
+}
+
+// swagger:route GET /health/ready health isInstanceReady
+//
+// Check the Readiness Status
+//
+// This endpoint returns a 200 status code when the HTTP server is up running and the environment dependencies (e.g.
+// the database) are responsive as well.
+//
+// This status does currently not include checks whether the database connection is working.
+// This endpoint does not require the `X-Forwarded-Proto` header when TLS termination is set.
+//
+// Be aware that if you are running multiple nodes of ORY Hydra, the health status will never refer to the cluster state, only to a single instance.
+//
+//     Responses:
+//       200: healthStatus
+//       503: healthNotReadyStatus
+func (h *Handler) Ready(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	var notReady = swaggerNotReadyStatus{
+		Errors: map[string]string{},
+	}
+
+	for n, c := range h.ReadyChecks {
+		if err := c(); err != nil {
+			notReady.Errors[n] = err.Error()
+		}
+	}
+
+	if len(notReady.Errors) > 0 {
+		h.H.WriteCode(rw, r, http.StatusServiceUnavailable, notReady)
+		return
+	}
+
 	h.H.Write(rw, r, &swaggerHealthStatus{
 		Status: "ok",
 	})

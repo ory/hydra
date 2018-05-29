@@ -59,12 +59,6 @@
     if (data) {
       obj = obj || new exports()
 
-      if (data.hasOwnProperty('SecretExpiresAt')) {
-        obj['SecretExpiresAt'] = ApiClient.convertToType(
-          data['SecretExpiresAt'],
-          'Number'
-        )
-      }
       if (data.hasOwnProperty('client_name')) {
         obj['client_name'] = ApiClient.convertToType(
           data['client_name'],
@@ -75,6 +69,12 @@
         obj['client_secret'] = ApiClient.convertToType(
           data['client_secret'],
           'String'
+        )
+      }
+      if (data.hasOwnProperty('client_secret_expires_at')) {
+        obj['client_secret_expires_at'] = ApiClient.convertToType(
+          data['client_secret_expires_at'],
+          'Number'
         )
       }
       if (data.hasOwnProperty('client_uri')) {
@@ -131,11 +131,6 @@
   }
 
   /**
-   * SecretExpiresAt is an integer holding the time at which the client secret will expire or 0 if it will not expire. The time is represented as the number of seconds from 1970-01-01T00:00:00Z as measured in UTC until the date/time of expiration.
-   * @member {Number} SecretExpiresAt
-   */
-  exports.prototype['SecretExpiresAt'] = undefined
-  /**
    * Name is the human-readable string name of the client to be presented to the end-user during authorization.
    * @member {String} client_name
    */
@@ -145,6 +140,11 @@
    * @member {String} client_secret
    */
   exports.prototype['client_secret'] = undefined
+  /**
+   * SecretExpiresAt is an integer holding the time at which the client secret will expire or 0 if it will not expire. The time is represented as the number of seconds from 1970-01-01T00:00:00Z as measured in UTC until the date/time of expiration.
+   * @member {Number} client_secret_expires_at
+   */
+  exports.prototype['client_secret_expires_at'] = undefined
   /**
    * ClientURI is an URL string of a web page providing information about the client. If present, the server SHOULD display this URL to the end-user in a clickable fashion.
    * @member {String} client_uri

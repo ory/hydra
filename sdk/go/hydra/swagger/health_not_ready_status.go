@@ -10,8 +10,6 @@
 
 package swagger
 
-type HealthStatus struct {
-
-	// Status always contains \"ok\".
-	Status string `json:"status,omitempty"`
+type HealthNotReadyStatus struct {
+	Errors map[string]string `json:"errors,omitempty"`
 }

@@ -175,7 +175,7 @@ func (c *Config) DoesRequestSatisfyTermination(r *http.Request) error {
 		return errors.New("TLS termination is not enabled")
 	}
 
-	if r.URL.Path == health.HealthCheckPath {
+	if r.URL.Path == health.AliveCheckPath || r.URL.Path == health.ReadyCheckPath {
 		return nil
 	}
 

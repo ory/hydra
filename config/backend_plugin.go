@@ -56,6 +56,10 @@ func (c *PluginConnection) load() error {
 	return nil
 }
 
+func (c *PluginConnection) Ping() error {
+	return c.db.Ping()
+}
+
 func (c *PluginConnection) Connect() error {
 	cf := c.Config
 	if c.didConnect {

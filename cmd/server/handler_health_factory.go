@@ -25,14 +25,42 @@ import (
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/health"
+	"github.com/ory/sqlcon"
 )
 
 func newHealthHandler(c *config.Config, router *httprouter.Router) *health.Handler {
+	ctx := c.Context()
+	var rc health.ReadyChecker
+
+	switch con := ctx.Connection.(type) {
+	case *config.MemoryConnection:
+		rc = func() error {
+			return nil
+		}
+		break
+	case *sqlcon.SQLConnection:
+		rc = func() error {
+			return con.GetDatabase().Ping()
+		}
+		break
+	case *config.PluginConnection:
+		rc = func() error {
+			return con.Ping()
+		}
+		break
+	default:
+		panic("Unknown connection type.")
+	}
+
 	h := &health.Handler{
 		Metrics:       c.GetTelemetryMetrics(),
 		H:             herodot.NewJSONWriter(c.GetLogger()),
 		VersionString: c.BuildVersion,
+		ReadyChecks: map[string]health.ReadyChecker{
+			"database": rc,
+		},
 	}
+
 	h.SetRoutes(router)
 	return h
 }

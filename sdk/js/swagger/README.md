@@ -105,7 +105,7 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-api.getInstanceStatus(callback);
+api.isInstanceAlive(callback);
 
 ```
 
@@ -115,7 +115,8 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthApi* | [**getInstanceStatus**](docs/HealthApi.md#getInstanceStatus) | **GET** /health | Check the Health Status
+*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthApi* | [**isInstanceAlive**](docs/HealthApi.md#isInstanceAlive) | **GET** /health/alive | Check the Alive Status
+*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthApi* | [**isInstanceReady**](docs/HealthApi.md#isInstanceReady) | **GET** /health/ready | Check the Readiness Status
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKeyApi* | [**createJsonWebKeySet**](docs/JsonWebKeyApi.md#createJsonWebKeySet) | **POST** /keys/{set} | Generate a new JSON Web Key
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKeyApi* | [**deleteJsonWebKey**](docs/JsonWebKeyApi.md#deleteJsonWebKey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKeyApi* | [**deleteJsonWebKeySet**](docs/JsonWebKeyApi.md#deleteJsonWebKeySet) | **DELETE** /keys/{set} | Delete a JSON Web Key Set
@@ -156,6 +157,7 @@ Class | Method | HTTP request | Description
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ConsentRequestSession](docs/ConsentRequestSession.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.FlushInactiveOAuth2TokensRequest](docs/FlushInactiveOAuth2TokensRequest.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.Handler](docs/Handler.md)
+ - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthNotReadyStatus](docs/HealthNotReadyStatus.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthStatus](docs/HealthStatus.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.InlineResponse401](docs/InlineResponse401.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JoseWebKeySetRequest](docs/JoseWebKeySetRequest.md)

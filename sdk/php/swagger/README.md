@@ -60,10 +60,10 @@ require_once(__DIR__ . '/vendor/autoload.php');
 $api_instance = new Hydra\SDK\Api\HealthApi();
 
 try {
-    $result = $api_instance->getInstanceStatus();
+    $result = $api_instance->isInstanceAlive();
     print_r($result);
 } catch (Exception $e) {
-    echo 'Exception when calling HealthApi->getInstanceStatus: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling HealthApi->isInstanceAlive: ', $e->getMessage(), PHP_EOL;
 }
 
 ?>
@@ -75,7 +75,8 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*HealthApi* | [**getInstanceStatus**](docs/Api/HealthApi.md#getinstancestatus) | **GET** /health | Check the Health Status
+*HealthApi* | [**isInstanceAlive**](docs/Api/HealthApi.md#isinstancealive) | **GET** /health/alive | Check the Alive Status
+*HealthApi* | [**isInstanceReady**](docs/Api/HealthApi.md#isinstanceready) | **GET** /health/ready | Check the Readiness Status
 *JsonWebKeyApi* | [**createJsonWebKeySet**](docs/Api/JsonWebKeyApi.md#createjsonwebkeyset) | **POST** /keys/{set} | Generate a new JSON Web Key
 *JsonWebKeyApi* | [**deleteJsonWebKey**](docs/Api/JsonWebKeyApi.md#deletejsonwebkey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
 *JsonWebKeyApi* | [**deleteJsonWebKeySet**](docs/Api/JsonWebKeyApi.md#deletejsonwebkeyset) | **DELETE** /keys/{set} | Delete a JSON Web Key Set
@@ -116,6 +117,7 @@ Class | Method | HTTP request | Description
  - [ConsentRequestSession](docs/Model/ConsentRequestSession.md)
  - [FlushInactiveOAuth2TokensRequest](docs/Model/FlushInactiveOAuth2TokensRequest.md)
  - [Handler](docs/Model/Handler.md)
+ - [HealthNotReadyStatus](docs/Model/HealthNotReadyStatus.md)
  - [HealthStatus](docs/Model/HealthStatus.md)
  - [InlineResponse401](docs/Model/InlineResponse401.md)
  - [JoseWebKeySetRequest](docs/Model/JoseWebKeySetRequest.md)

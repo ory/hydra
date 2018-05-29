@@ -67,7 +67,7 @@ jobs:
       - run: docker build -f Dockerfile-alpine -t hydra-test-alpine .
       - run: docker run hydra-test help
 
-  release:
+  release-docker:
     docker:
       - image: circleci/golang:1.10
     working_directory: /go/src/github.com/ory/hydra
@@ -75,28 +75,44 @@ jobs:
       - checkout
       - setup_remote_docker:
           version: 17.10.0-ce
-      # Environment dependencies
-      - run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-      - run: go get -u github.com/mitchellh/gox github.com/tcnksm/ghr
-      - run: dep ensure -vendor-only
-      - run: curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-      - run: sudo apt-get install -y nodejs
-      # Build binaries for GitHub
-      - run: ./scripts/run-deploy.sh
-      - run: ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME --replace `git describe --tags` dist/
       # Build and push docker image
       - run: docker build --build-arg git_tag=$(git describe --tags) --build-arg git_commit=$(git rev-parse HEAD) -f Dockerfile -t oryd/hydra:$CIRCLE_TAG .
       - run: docker build --build-arg git_tag=$(git describe --tags) --build-arg git_commit=$(git rev-parse HEAD) -f Dockerfile-alpine -t oryd/hydra:$CIRCLE_TAG-alpine .
+      - run: docker tag oryd/hydra:$CIRCLE_TAG oryd/hydra:latest
+      - run: docker tag oryd/hydra:$CIRCLE_TAG-alpine oryd/hydra:latest-alpine
       - run: docker login --username "$DOCKER_USERNAME" --password "$DOCKER_PASSWORD"
       - run: docker push oryd/hydra:$CIRCLE_TAG
       - run: docker push oryd/hydra:$CIRCLE_TAG-alpine
-      # Release node / JavaScript SDK
-      - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-      - run: sudo npm i -g npm
+      - run: docker push oryd/hydra:latest-alpine
+      - run: docker push oryd/hydra:latest-alpine
+
+  release-npm:
+    docker:
+      - image: circleci/node:8.9.3
+    working_directory: ~/hydra
+    steps:
+      - checkout
+      - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
+      - run: |
+          npm version -f --no-git-tag-version $CIRCLE_TAG
       - run: npm view ory-hydra-sdk
+      - run: npm whoami
       - run: npm publish
 
-  changelog:
+  release-binaries:
+    docker:
+      - image: circleci/golang:1.10
+    working_directory: /go/src/github.com/ory/hydra
+    steps:
+      - checkout
+      - run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+      - run: go get -u github.com/mitchellh/gox github.com/tcnksm/ghr
+      - run: dep ensure -vendor-only
+      - run: |
+          gox -parallel=2 -ldflags "-X github.com/ory/hydra/cmd.Version=`git describe --tags` -X github.com/ory/hydra/cmd.BuildTime=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory/hydra/cmd.GitHash=`git rev-parse HEAD`" -output "dist/{{.Dir}}-{{.OS}}-{{.Arch}}";
+      - run: ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME --replace `git describe --tags` dist/
+
+  release-changelog:
     docker:
       - image: circleci/ruby:2.4-node
     steps:
@@ -114,7 +130,7 @@ jobs:
       - run: git remote add origin https://arekkas:$GITHUB_TOKEN@github.com/ory/hydra.git
       - run: git push origin HEAD:master
 
-  publish-docs:
+  release-docs:
     docker:
       - image: alpine/git:1.0.4
     working_directory: /go/src/github.com/ory/hydra
@@ -138,7 +154,7 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - publish-docs:
+      - release-docs:
           filters:
             branches:
               only: master
@@ -154,7 +170,7 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - release:
+      - release-binaries:
           requires:
             - build-docker
           filters:
@@ -162,9 +178,27 @@ workflows:
               only: /.*/
             branches:
               ignore: /.*/
-      - changelog:
+      - release-docker:
           requires:
-            - release
+            - build-docker
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
+      - release-npm:
+          requires:
+            - build-docker
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
+      - release-changelog:
+          requires:
+            - release-docker
+            - release-npm
+            - release-binaries
           filters:
             tags:
               only: /.*/

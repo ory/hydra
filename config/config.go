@@ -38,7 +38,6 @@ import (
 	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/hydra/health"
 	"github.com/ory/hydra/metrics/prometheus"
-	"github.com/ory/hydra/metrics/telemetry"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/sqlcon"
 	"github.com/pkg/errors"
@@ -83,7 +82,6 @@ type Config struct {
 	BuildHash    string                     `yaml:"-"`
 	BuildTime    string                     `yaml:"-"`
 	logger       *logrus.Logger             `yaml:"-"`
-	telemetry    *telemetry.MetricsManager  `yaml:"-"`
 	prometheus   *prometheus.MetricsManager `yaml:"-"`
 	cluster      *url.URL                   `yaml:"-"`
 	oauth2Client *http.Client               `yaml:"-"`
@@ -153,17 +151,10 @@ func (c *Config) GetLogger() *logrus.Logger {
 	return c.logger
 }
 
-func (c *Config) GetTelemetryMetrics() *telemetry.MetricsManager {
-	if c.telemetry == nil {
-		c.telemetry = telemetry.NewMetricsManager(c.Issuer, c.DatabaseURL, c.GetLogger(), c.BuildVersion, c.BuildHash, c.BuildTime)
-	}
-
-	return c.telemetry
-}
-
 func (c *Config) GetPrometheusMetrics() *prometheus.MetricsManager {
+	c.GetLogger().Info("Setting up Prometheus middleware")
+
 	if c.prometheus == nil {
-		c.GetLogger().Info("Setting up Prometheus metrics")
 		c.prometheus = prometheus.NewMetricsManager(c.BuildVersion, c.BuildHash, c.BuildTime)
 	}
 
@@ -314,6 +305,11 @@ func (c *Config) GetSystemSecret() []byte {
 		secret = hash[:]
 		c.systemSecret = secret
 		return secret
+	}
+
+	if len(c.SystemSecret) > 0 {
+		c.GetLogger().Fatalln("System secret must be undefined or have at least 16 characters, but it has %d characters.", len(c.SystemSecret))
+		return nil
 	}
 
 	c.GetLogger().Warnf("Expected system secret to be at least %d characters long, got %d characters.", 32, len(c.SystemSecret))

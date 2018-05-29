@@ -106,10 +106,6 @@
   name = "github.com/rubenv/sql-migrate"
 
 [[constraint]]
-  name = "github.com/segmentio/analytics-go"
-  version = "3.0.0"
-
-[[constraint]]
   name = "github.com/sirupsen/logrus"
   version = "1.0.3"
 
@@ -135,7 +131,7 @@
 
 [[constraint]]
   name = "github.com/urfave/negroni"
-  version = "0.2.0"
+  version = "0.3.0"
 
 [[constraint]]
   name = "github.com/ory/go-convenience"
@@ -148,6 +144,10 @@
 [[constraint]]
   branch = "v2"
   name = "gopkg.in/yaml.v2"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/ory/metrics-middleware"
 
 [[constraint]]
   name = "github.com/prometheus/client_golang"

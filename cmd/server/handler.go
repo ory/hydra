@@ -25,7 +25,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"os"
+	"strings"
 
 	"github.com/gorilla/context"
 	"github.com/julienschmidt/httprouter"
@@ -36,9 +36,11 @@ import (
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/health"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
+	"github.com/ory/metrics-middleware"
 	"github.com/pkg/errors"
 	"github.com/rs/cors"
 	"github.com/spf13/cobra"
@@ -72,17 +74,45 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		}
 
 		n := negroni.New()
-
-		if ok, _ := cmd.Flags().GetBool("disable-telemetry"); !ok && os.Getenv("DISABLE_TELEMETRY") != "1" {
-			telemetryMetrics := c.GetTelemetryMetrics()
-			go telemetryMetrics.RegisterSegment()
-			go telemetryMetrics.CommitMemoryStatistics()
-			n.Use(telemetryMetrics)
-		}
-
+		n.Use(negronilogrus.NewMiddlewareFromLogger(logger, c.Issuer))
 		n.Use(c.GetPrometheusMetrics())
 
-		n.Use(negronilogrus.NewMiddlewareFromLogger(logger, c.Issuer))
+		if ok, _ := cmd.Flags().GetBool("disable-telemetry"); !ok {
+			c.GetLogger().Println("Transmission of telemetry data is enabled, to learn more go to: https://www.ory.sh/docs/guides/latest/telemetry/")
+
+			enable := !(c.DatabaseURL == "" || c.DatabaseURL == "memory" || c.Issuer == "" || strings.Contains(c.Issuer, "localhost"))
+			m := metrics.NewMetricsManager(
+				metrics.Hash(c.Issuer+"|"+c.DatabaseURL),
+				enable,
+				"h8dRH3kVCWKkIFWydBmWsyYHR4M0u0vr",
+				[]string{
+					client.ClientsHandlerPath,
+					jwk.KeyHandlerPath,
+					jwk.WellKnownKeysPath,
+					oauth2.DefaultConsentPath,
+					oauth2.TokenPath,
+					oauth2.AuthPath,
+					oauth2.UserinfoPath,
+					oauth2.WellKnownPath,
+					oauth2.IntrospectPath,
+					oauth2.RevocationPath,
+					consent.ConsentPath,
+					consent.LoginPath,
+					health.AliveCheckPath,
+					health.ReadyCheckPath,
+					health.VersionPath,
+					health.MetricsPrometheusPath,
+					"/health/status",
+					"/",
+				},
+				logger,
+				"ory-hydra",
+			)
+			go m.RegisterSegment(c.BuildVersion, c.BuildHash, c.BuildTime)
+			go m.CommitMemoryStatistics()
+			n.Use(m)
+		}
+
 		n.UseFunc(serverHandler.rejectInsecureRequests)
 		n.UseHandler(router)
 		corsHandler := cors.New(corsx.ParseOptions()).Handler(n)

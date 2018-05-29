@@ -25,7 +25,6 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
-	"github.com/ory/hydra/metrics/telemetry"
 	"github.com/ory/hydra/pkg"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -40,7 +39,6 @@ const (
 type ReadyChecker func() error
 
 type Handler struct {
-	Metrics       *telemetry.MetricsManager
 	H             *herodot.JSONWriter
 	VersionString string
 	ReadyChecks   map[string]ReadyChecker

@@ -38,6 +38,11 @@ type Handler struct {
 	RequestMaxAge time.Duration
 }
 
+const (
+	LoginPath   = "/oauth2/auth/requests/login"
+	ConsentPath = "/oauth2/auth/requests/consent"
+)
+
 func NewHandler(
 	h herodot.Writer,
 	m Manager,
@@ -49,13 +54,13 @@ func NewHandler(
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
-	r.GET("/oauth2/auth/requests/login/:challenge", h.GetLoginRequest)
-	r.PUT("/oauth2/auth/requests/login/:challenge/accept", h.AcceptLoginRequest)
-	r.PUT("/oauth2/auth/requests/login/:challenge/reject", h.RejectLoginRequest)
+	r.GET(LoginPath+"/:challenge", h.GetLoginRequest)
+	r.PUT(LoginPath+"/:challenge/accept", h.AcceptLoginRequest)
+	r.PUT(LoginPath+"/:challenge/reject", h.RejectLoginRequest)
 
-	r.GET("/oauth2/auth/requests/consent/:challenge", h.GetConsentRequest)
-	r.PUT("/oauth2/auth/requests/consent/:challenge/accept", h.AcceptConsentRequest)
-	r.PUT("/oauth2/auth/requests/consent/:challenge/reject", h.RejectConsentRequest)
+	r.GET(ConsentPath+"/:challenge", h.GetConsentRequest)
+	r.PUT(ConsentPath+"/:challenge/accept", h.AcceptConsentRequest)
+	r.PUT(ConsentPath+"/:challenge/reject", h.RejectConsentRequest)
 }
 
 // swagger:route GET /oauth2/auth/requests/login/{challenge} oAuth2 getLoginRequest

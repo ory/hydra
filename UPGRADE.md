@@ -374,8 +374,13 @@ flow with the Authorize Code Flow which lead to weird usage. It's much easier to
 
 #### Health Check endpoint has moved
 
-The health check endpoint has moved from `/health/status` to `/health`. We set up a 308 redirect from `/health/status`
-to `/health` so this should not cause any issues.
+The health check endpoint has moved from `/health/status` to `/health/alive`. We set up a 308 redirect from `/health/status`
+to `/health/alive` so this should not cause any issues.
+
+The `/health/alive` endpoint returns `200 OK` as soon as the HTTP server is responsive. Another endpoint `/health/ready`
+was added which returns `200 OK` only if the database connection is working as well.
+
+As part of this change, function `getInstanceStatus` of the SDK is now `isInstanceAlive` and `isInstanceReady`.
 
 #### Unknown request body payloads result in error
 

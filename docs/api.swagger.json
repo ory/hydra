@@ -335,14 +335,14 @@
         }
       }
     },
-    "/health": {
+    "/health/alive": {
       "get": {
-        "description": "This endpoint returns a 200 status code when the HTTP server is up running. `{ \"status\": \"ok\" }`. This status does currently not include checks whether the database connection is working. This endpoint does not require the `X-Forwarded-Proto` header when TLS termination is set.\n\nBe aware that if you are running multiple nodes of ORY Hydra, the health status will never refer to the cluster state, only to a single instance.",
+        "description": "This endpoint returns a 200 status code when the HTTP server is up running.\nThis status does currently not include checks whether the database connection is working.\nThis endpoint does not require the `X-Forwarded-Proto` header when TLS termination is set.\n\nBe aware that if you are running multiple nodes of ORY Hydra, the health status will never refer to the cluster state, only to a single instance.",
         "tags": [
           "health"
         ],
-        "summary": "Check the Health Status",
-        "operationId": "getInstanceStatus",
+        "summary": "Check the Alive Status",
+        "operationId": "isInstanceAlive",
         "responses": {
           "200": {
             "description": "healthStatus",
@@ -352,6 +352,30 @@
           },
           "500": {
             "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "description": "This endpoint returns a 200 status code when the HTTP server is up running and the environment dependencies (e.g.\nthe database) are responsive as well.\n\nThis status does currently not include checks whether the database connection is working.\nThis endpoint does not require the `X-Forwarded-Proto` header when TLS termination is set.\n\nBe aware that if you are running multiple nodes of ORY Hydra, the health status will never refer to the cluster state, only to a single instance.",
+        "tags": [
+          "health"
+        ],
+        "summary": "Check the Readiness Status",
+        "operationId": "isInstanceReady",
+        "responses": {
+          "200": {
+            "description": "healthStatus",
+            "schema": {
+              "$ref": "#/definitions/healthStatus"
+            }
+          },
+          "503": {
+            "description": "healthNotReadyStatus",
+            "schema": {
+              "$ref": "#/definitions/healthNotReadyStatus"
+            }
           }
         }
       }
@@ -1486,11 +1510,25 @@
       "x-go-name": "FlushInactiveOAuth2TokensRequest",
       "x-go-package": "github.com/ory/hydra/oauth2"
     },
+    "healthNotReadyStatus": {
+      "type": "object",
+      "properties": {
+        "errors": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "x-go-name": "Errors"
+        }
+      },
+      "x-go-name": "swaggerNotReadyStatus",
+      "x-go-package": "github.com/ory/hydra/health"
+    },
     "healthStatus": {
       "type": "object",
       "properties": {
         "status": {
-          "description": "Status always contains \"ok\"",
+          "description": "Status always contains \"ok\".",
           "type": "string",
           "x-go-name": "Status"
         }
@@ -1676,11 +1714,6 @@
       "type": "object",
       "title": "Client represents an OAuth 2.0 Client.",
       "properties": {
-        "SecretExpiresAt": {
-          "description": "SecretExpiresAt is an integer holding the time at which the client\nsecret will expire or 0 if it will not expire. The time is\nrepresented as the number of seconds from 1970-01-01T00:00:00Z as\nmeasured in UTC until the date/time of expiration.",
-          "type": "integer",
-          "format": "int64"
-        },
         "client_name": {
           "description": "Name is the human-readable string name of the client to be presented to the\nend-user during authorization.",
           "type": "string",
@@ -1690,6 +1723,12 @@
           "description": "Secret is the client's secret. The secret will be included in the create request as cleartext, and then\nnever again. The secret is stored using BCrypt so it is impossible to recover it. Tell your users\nthat they need to write the secret down as it will not be made available again.",
           "type": "string",
           "x-go-name": "Secret"
+        },
+        "client_secret_expires_at": {
+          "description": "SecretExpiresAt is an integer holding the time at which the client\nsecret will expire or 0 if it will not expire. The time is\nrepresented as the number of seconds from 1970-01-01T00:00:00Z as\nmeasured in UTC until the date/time of expiration.",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "SecretExpiresAt"
         },
         "client_uri": {
           "description": "ClientURI is an URL string of a web page providing information about the client.\nIf present, the server SHOULD display this URL to the end-user in\na clickable fashion.",

@@ -21,6 +21,7 @@
 package health
 
 import (
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -33,9 +34,15 @@ import (
 )
 
 func TestHealth(t *testing.T) {
+	alive := errors.New("not alive")
 	handler := &Handler{
 		H:             herodot.NewJSONWriter(nil),
 		VersionString: "test version",
+		ReadyChecks: map[string]ReadyChecker{
+			"test": func() error {
+				return alive
+			},
+		},
 	}
 	router := httprouter.New()
 	handler.SetRoutes(router)
@@ -43,7 +50,7 @@ func TestHealth(t *testing.T) {
 
 	healthClient := swagger.NewHealthApiWithBasePath(ts.URL)
 
-	body, response, err := healthClient.GetInstanceStatus()
+	body, response, err := healthClient.IsInstanceAlive()
 	require.NoError(t, err)
 	require.EqualValues(t, http.StatusOK, response.StatusCode)
 	assert.EqualValues(t, "ok", body.Status)
@@ -58,4 +65,15 @@ func TestHealth(t *testing.T) {
 	response, err = metricsClient.GetPrometheusMetrics()
 	require.NoError(t, err)
 	require.EqualValues(t, http.StatusOK, response.StatusCode)
+
+	_, response, err = healthClient.IsInstanceReady()
+	require.NoError(t, err)
+	require.EqualValues(t, http.StatusServiceUnavailable, response.StatusCode)
+	assert.Equal(t, `{"errors":{"test":"not alive"}}`, string(response.Payload))
+
+	alive = nil
+	body, response, err = healthClient.IsInstanceReady()
+	require.NoError(t, err)
+	require.EqualValues(t, http.StatusOK, response.StatusCode)
+	assert.EqualValues(t, "ok", body.Status)
 }

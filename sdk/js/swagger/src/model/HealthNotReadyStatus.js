@@ -26,7 +26,7 @@
     if (!root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer) {
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {}
     }
-    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthStatus = factory(
+    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthNotReadyStatus = factory(
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient
     )
   }
@@ -34,14 +34,14 @@
   'use strict'
 
   /**
-   * The HealthStatus model module.
-   * @module model/HealthStatus
+   * The HealthNotReadyStatus model module.
+   * @module model/HealthNotReadyStatus
    * @version Latest
    */
 
   /**
-   * Constructs a new <code>HealthStatus</code>.
-   * @alias module:model/HealthStatus
+   * Constructs a new <code>HealthNotReadyStatus</code>.
+   * @alias module:model/HealthNotReadyStatus
    * @class
    */
   var exports = function() {
@@ -49,28 +49,29 @@
   }
 
   /**
-   * Constructs a <code>HealthStatus</code> from a plain JavaScript object, optionally creating a new instance.
+   * Constructs a <code>HealthNotReadyStatus</code> from a plain JavaScript object, optionally creating a new instance.
    * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
    * @param {Object} data The plain JavaScript object bearing properties of interest.
-   * @param {module:model/HealthStatus} obj Optional instance to populate.
-   * @return {module:model/HealthStatus} The populated <code>HealthStatus</code> instance.
+   * @param {module:model/HealthNotReadyStatus} obj Optional instance to populate.
+   * @return {module:model/HealthNotReadyStatus} The populated <code>HealthNotReadyStatus</code> instance.
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
       obj = obj || new exports()
 
-      if (data.hasOwnProperty('status')) {
-        obj['status'] = ApiClient.convertToType(data['status'], 'String')
+      if (data.hasOwnProperty('errors')) {
+        obj['errors'] = ApiClient.convertToType(data['errors'], {
+          String: 'String'
+        })
       }
     }
     return obj
   }
 
   /**
-   * Status always contains \"ok\".
-   * @member {String} status
+   * @member {Object.<String, String>} errors
    */
-  exports.prototype['status'] = undefined
+  exports.prototype['errors'] = undefined
 
   return exports
 })

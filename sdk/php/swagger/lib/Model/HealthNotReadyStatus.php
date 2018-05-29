@@ -1,6 +1,6 @@
 <?php
 /**
- * HealthStatus
+ * HealthNotReadyStatus
  *
  * PHP version 5
  *
@@ -32,14 +32,14 @@ namespace Hydra\SDK\Model;
 use \ArrayAccess;
 
 /**
- * HealthStatus Class Doc Comment
+ * HealthNotReadyStatus Class Doc Comment
  *
  * @category    Class
  * @package     Hydra\SDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
  */
-class HealthStatus implements ArrayAccess
+class HealthNotReadyStatus implements ArrayAccess
 {
     const DISCRIMINATOR = null;
 
@@ -47,14 +47,14 @@ class HealthStatus implements ArrayAccess
       * The original name of the model.
       * @var string
       */
-    protected static $swaggerModelName = 'healthStatus';
+    protected static $swaggerModelName = 'healthNotReadyStatus';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'status' => 'string'
+        'errors' => 'map[string,string]'
     ];
 
     /**
@@ -62,7 +62,7 @@ class HealthStatus implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerFormats = [
-        'status' => null
+        'errors' => null
     ];
 
     public static function swaggerTypes()
@@ -80,7 +80,7 @@ class HealthStatus implements ArrayAccess
      * @var string[]
      */
     protected static $attributeMap = [
-        'status' => 'status'
+        'errors' => 'errors'
     ];
 
 
@@ -89,7 +89,7 @@ class HealthStatus implements ArrayAccess
      * @var string[]
      */
     protected static $setters = [
-        'status' => 'setStatus'
+        'errors' => 'setErrors'
     ];
 
 
@@ -98,7 +98,7 @@ class HealthStatus implements ArrayAccess
      * @var string[]
      */
     protected static $getters = [
-        'status' => 'getStatus'
+        'errors' => 'getErrors'
     ];
 
     public static function attributeMap()
@@ -132,7 +132,7 @@ class HealthStatus implements ArrayAccess
      */
     public function __construct(array $data = null)
     {
-        $this->container['status'] = isset($data['status']) ? $data['status'] : null;
+        $this->container['errors'] = isset($data['errors']) ? $data['errors'] : null;
     }
 
     /**
@@ -161,22 +161,22 @@ class HealthStatus implements ArrayAccess
 
 
     /**
-     * Gets status
-     * @return string
+     * Gets errors
+     * @return map[string,string]
      */
-    public function getStatus()
+    public function getErrors()
     {
-        return $this->container['status'];
+        return $this->container['errors'];
     }
 
     /**
-     * Sets status
-     * @param string $status Status always contains \"ok\".
+     * Sets errors
+     * @param map[string,string] $errors
      * @return $this
      */
-    public function setStatus($status)
+    public function setErrors($errors)
     {
-        $this->container['status'] = $status;
+        $this->container['errors'] = $errors;
 
         return $this;
     }

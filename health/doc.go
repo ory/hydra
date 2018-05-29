@@ -22,8 +22,14 @@ package health
 
 // swagger:model healthStatus
 type swaggerHealthStatus struct {
-	// Status always contains "ok"
+	// Status always contains "ok".
 	Status string `json:"status"`
+}
+
+// swagger:model healthNotReadyStatus
+type swaggerNotReadyStatus struct {
+	// Errors contains a list of errors that caused the not ready status.
+	Errors map[string]string `json:"errors"`
 }
 
 // swagger:model version

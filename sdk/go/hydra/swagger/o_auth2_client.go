@@ -12,14 +12,14 @@ package swagger
 
 type OAuth2Client struct {
 
-	// SecretExpiresAt is an integer holding the time at which the client secret will expire or 0 if it will not expire. The time is represented as the number of seconds from 1970-01-01T00:00:00Z as measured in UTC until the date/time of expiration.
-	SecretExpiresAt int64 `json:"SecretExpiresAt,omitempty"`
-
 	// Name is the human-readable string name of the client to be presented to the end-user during authorization.
 	ClientName string `json:"client_name,omitempty"`
 
 	// Secret is the client's secret. The secret will be included in the create request as cleartext, and then never again. The secret is stored using BCrypt so it is impossible to recover it. Tell your users that they need to write the secret down as it will not be made available again.
 	ClientSecret string `json:"client_secret,omitempty"`
+
+	// SecretExpiresAt is an integer holding the time at which the client secret will expire or 0 if it will not expire. The time is represented as the number of seconds from 1970-01-01T00:00:00Z as measured in UTC until the date/time of expiration.
+	ClientSecretExpiresAt int64 `json:"client_secret_expires_at,omitempty"`
 
 	// ClientURI is an URL string of a web page providing information about the client. If present, the server SHOULD display this URL to the end-user in a clickable fashion.
 	ClientUri string `json:"client_uri,omitempty"`

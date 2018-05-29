@@ -27,6 +27,7 @@
       'model/ConsentRequestSession',
       'model/FlushInactiveOAuth2TokensRequest',
       'model/Handler',
+      'model/HealthNotReadyStatus',
       'model/HealthStatus',
       'model/InlineResponse401',
       'model/JoseWebKeySetRequest',
@@ -72,6 +73,7 @@
       require('./model/ConsentRequestSession'),
       require('./model/FlushInactiveOAuth2TokensRequest'),
       require('./model/Handler'),
+      require('./model/HealthNotReadyStatus'),
       require('./model/HealthStatus'),
       require('./model/InlineResponse401'),
       require('./model/JoseWebKeySetRequest'),
@@ -116,6 +118,7 @@
   ConsentRequestSession,
   FlushInactiveOAuth2TokensRequest,
   Handler,
+  HealthNotReadyStatus,
   HealthStatus,
   InlineResponse401,
   JoseWebKeySetRequest,
@@ -228,6 +231,11 @@
      * @property {module:model/Handler}
      */
     Handler: Handler,
+    /**
+     * The HealthNotReadyStatus model constructor.
+     * @property {module:model/HealthNotReadyStatus}
+     */
+    HealthNotReadyStatus: HealthNotReadyStatus,
     /**
      * The HealthStatus model constructor.
      * @property {module:model/HealthStatus}

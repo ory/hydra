@@ -46,14 +46,7 @@ var clientManager = &client.MemoryManager{
 var databases = make(map[string]*sqlx.DB)
 
 func init() {
-	fositeStores["memory"] = &FositeMemoryStore{
-		AuthorizeCodes:      make(map[string]fosite.Requester),
-		IDSessions:          make(map[string]fosite.Requester),
-		AccessTokens:        make(map[string]fosite.Requester),
-		RefreshTokens:       make(map[string]fosite.Requester),
-		AccessTokenLifespan: time.Hour,
-		PKCES:               make(map[string]fosite.Requester),
-	}
+	fositeStores["memory"] = NewFositeMemoryStore(nil, time.Hour)
 }
 
 func TestMain(m *testing.M) {

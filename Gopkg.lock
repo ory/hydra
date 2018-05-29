@@ -55,8 +55,8 @@
 [[projects]]
   name = "github.com/dgrijalva/jwt-go"
   packages = ["."]
-  revision = "dbeaa9332f19a944acb5736b4456cfcc02140e29"
-  version = "v3.1.0"
+  revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
+  version = "v3.2.0"
 
 [[projects]]
   name = "github.com/docker/go-connections"
@@ -292,11 +292,10 @@
     "token/hmac",
     "token/jwt"
   ]
-  revision = "608bf5fff7f5f7fc0dde0b3aecd03534974ba982"
-  version = "v0.19.8"
+  revision = "72bff7f33ee8c3a4a8806cc266ca7299ff1785d4"
+  version = "v0.20.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/ory/go-convenience"
   packages = [
     "mapx",
@@ -304,7 +303,8 @@
     "stringsx",
     "urlx"
   ]
-  revision = "cf3c3570c7b941a7180cdc036c8b06eebd95dcb1"
+  revision = "42cb17c3e4dc0d7d7672cfaffbdfe8f5deb494db"
+  version = "v0.0.2"
 
 [[projects]]
   name = "github.com/ory/graceful"
@@ -336,13 +336,13 @@
   version = "v0.0.1"
 
 [[projects]]
-  branch = "master"
   name = "github.com/ory/sqlcon"
   packages = [
     ".",
     "dockertest"
   ]
-  revision = "2e99584773f66ac91fcf23af73d90a28df2709c9"
+  revision = "08e1c6762dd59c776a735acc134889f757574f66"
+  version = "v0.0.2"
 
 [[projects]]
   name = "github.com/pborman/uuid"
@@ -622,6 +622,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a532f2a7dec7d15d20b623c2d181f9c6bc6313aea2b39082552793a48ede5040"
+  inputs-digest = "3e6a4e67e6aa3e745f1a72ec9ec452b17cd26ace9a03f747dd261fd94f5f639e"
   solver-name = "gps-cdcl"
   solver-version = 1

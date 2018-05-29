@@ -116,21 +116,24 @@ func TestHelperRevokeRefreshToken(m pkg.FositeStorer) func(t *testing.T) {
 func TestHelperCreateGetDeleteAuthorizeCodes(m pkg.FositeStorer) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.Background()
-		_, err := m.GetAuthorizeCodeSession(ctx, "4321", &fosite.DefaultSession{})
-		assert.NotNil(t, err)
+		res, err := m.GetAuthorizeCodeSession(ctx, "4321", &fosite.DefaultSession{})
+		assert.Error(t, err)
+		assert.Nil(t, res)
 
 		err = m.CreateAuthorizeCodeSession(ctx, "4321", &defaultRequest)
 		require.NoError(t, err)
 
-		res, err := m.GetAuthorizeCodeSession(ctx, "4321", &fosite.DefaultSession{})
+		res, err = m.GetAuthorizeCodeSession(ctx, "4321", &fosite.DefaultSession{})
 		require.NoError(t, err)
 		AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
 
-		err = m.DeleteAuthorizeCodeSession(ctx, "4321")
+		err = m.InvalidateAuthorizeCodeSession(ctx, "4321")
 		require.NoError(t, err)
 
-		_, err = m.GetAuthorizeCodeSession(ctx, "4321", &fosite.DefaultSession{})
-		assert.NotNil(t, err)
+		res, err = m.GetAuthorizeCodeSession(ctx, "4321", &fosite.DefaultSession{})
+		require.Error(t, err)
+		assert.EqualError(t, err, fosite.ErrInvalidatedAuthorizeCode.Error())
+		assert.NotNil(t, res)
 	}
 }
 
@@ -227,7 +230,7 @@ func TestHelperFlushTokens(m pkg.FositeStorer, lifespan time.Duration) func(t *t
 		_, err = m.GetAccessTokenSession(ctx, "flush-3", ds)
 		require.NoError(t, err)
 
-		require.NoError(t, m.FlushInactiveAccessTokens(ctx, time.Now().Add(-(lifespan+time.Hour/2))))
+		require.NoError(t, m.FlushInactiveAccessTokens(ctx, time.Now().Add(-(lifespan + time.Hour/2))))
 		_, err = m.GetAccessTokenSession(ctx, "flush-1", ds)
 		require.NoError(t, err)
 		_, err = m.GetAccessTokenSession(ctx, "flush-2", ds)

@@ -30,6 +30,10 @@
   version = "1.3.0"
 
 [[constraint]]
+  name = "github.com/ory/sqlcon"
+  version = "0.0.2"
+
+[[constraint]]
   name = "github.com/gorilla/context"
   version = "1.1.0"
 
@@ -71,7 +75,7 @@
 
 [[constraint]]
   name = "github.com/ory/fosite"
-  version = "0.19.8"
+  version = "0.20.0"
 
 [[constraint]]
   name = "github.com/ory/graceful"
@@ -132,6 +136,10 @@
 [[constraint]]
   name = "github.com/urfave/negroni"
   version = "0.2.0"
+
+[[constraint]]
+  name = "github.com/ory/go-convenience"
+  version = "0.0.2"
 
 [[constraint]]
   branch = "master"

@@ -39,6 +39,7 @@ able to securely manage JSON Web Keys.
 
 - [What is ORY Hydra?](#what-is-ory-hydra)
   - [OAuth2 and OpenID Connect: Open Standards!](#oauth2-and-openid-connect-open-standards)
+  - [OpenID Connect Certified](#openid-connect-certified)
 - [Quickstart](#quickstart)
   - [5 minutes tutorial: Run your very own OAuth2 environment](#5-minutes-tutorial-run-your-very-own-oauth2-environment)
   - [Installation](#installation)
@@ -98,6 +99,15 @@ and the OpenID Foundation:
 
 * [OpenID Connect Core 1.0](http://openid.net/specs/openid-connect-core-1_0.html)
 * [OpenID Connect Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0.html)
+
+### OpenID Connect Certified
+
+While ORY Hydra is *not yet officially* OpenID Connect Certified, our reference deployment using the [reference user
+login and consent app](https://github.com/ory/hydra-login-consent-node) and the latest ORY Hydra release does pass all
+self-service test of the OpenID Foundation, a critical requirement for achieving full OpenID Connect conformity.
+
+If you'd like to see the test cases, head over to [./docs/certification](./docs/certification). We are aiming
+to be certified for all explicit, implicit, and hybrid flows as well as OpenID Connect Discovery.
 
 ## Quickstart
 

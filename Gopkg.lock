@@ -292,8 +292,8 @@
     "token/hmac",
     "token/jwt"
   ]
-  revision = "57b14710c9aa845f2fa87322e0a3f3fa1e3e09c9"
-  version = "v0.20.1"
+  revision = "93618d66a99d2756e0a4c638727b728afc62520f"
+  version = "v0.20.2"
 
 [[projects]]
   name = "github.com/ory/go-convenience"
@@ -304,8 +304,8 @@
     "stringsx",
     "urlx"
   ]
-  revision = "42cb17c3e4dc0d7d7672cfaffbdfe8f5deb494db"
-  version = "v0.0.2"
+  revision = "8e5660ff0e4c9c7e0cecd82ea8a87a793ff9ed23"
+  version = "v0.0.3"
 
 [[projects]]
   name = "github.com/ory/graceful"
@@ -623,6 +623,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "190378718b646d3668e6a0cfea43a3e912e2f7159e843537e5f877947e2c5f46"
+  inputs-digest = "3875e83639b38520422a3b1a4be0fa21144cf2ceb8bdd2b1b7a673684e0d12ee"
   solver-name = "gps-cdcl"
   solver-version = 1

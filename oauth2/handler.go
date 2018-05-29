@@ -317,7 +317,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		Username:  resp.GetAccessRequester().GetSession().GetUsername(),
 		Extra:     resp.GetAccessRequester().GetSession().(*Session).Extra,
 		Audience:  resp.GetAccessRequester().GetSession().(*Session).Audience,
-		Issuer:    h.IssuerURL,
+		Issuer:    strings.TrimRight(h.IssuerURL, "/") + "/",
 		TokenType: string(resp.GetTokenType()),
 	}); err != nil {
 		pkg.LogError(errors.WithStack(err), h.L)

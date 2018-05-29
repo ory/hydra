@@ -35,20 +35,20 @@ import (
 
 func createTestClient(prefix string) hydra.OAuth2Client {
 	return hydra.OAuth2Client{
-		Id:              "1234",
-		ClientName:      prefix + "name",
-		ClientSecret:    prefix + "secret",
-		ClientUri:       prefix + "uri",
-		Contacts:        []string{prefix + "peter", prefix + "pan"},
-		GrantTypes:      []string{prefix + "client_credentials", prefix + "authorize_code"},
-		LogoUri:         prefix + "logo",
-		Owner:           prefix + "an-owner",
-		PolicyUri:       prefix + "policy-uri",
-		Scope:           prefix + "foo bar baz",
-		TosUri:          prefix + "tos-uri",
-		ResponseTypes:   []string{prefix + "id_token", prefix + "code"},
-		RedirectUris:    []string{prefix + "redirect-url", prefix + "redirect-uri"},
-		SecretExpiresAt: 0,
+		Id:                    "1234",
+		ClientName:            prefix + "name",
+		ClientSecret:          prefix + "secret",
+		ClientUri:             prefix + "uri",
+		Contacts:              []string{prefix + "peter", prefix + "pan"},
+		GrantTypes:            []string{prefix + "client_credentials", prefix + "authorize_code"},
+		LogoUri:               prefix + "logo",
+		Owner:                 prefix + "an-owner",
+		PolicyUri:             prefix + "policy-uri",
+		Scope:                 prefix + "foo bar baz",
+		TosUri:                prefix + "tos-uri",
+		ResponseTypes:         []string{prefix + "id_token", prefix + "code"},
+		RedirectUris:          []string{prefix + "redirect-url", prefix + "redirect-uri"},
+		ClientSecretExpiresAt: 0,
 	}
 }
 
@@ -67,7 +67,7 @@ func TestClientSDK(t *testing.T) {
 	t.Run("case=client is created and updated", func(t *testing.T) {
 		createClient := createTestClient("")
 		compareClient := createClient
-		createClient.SecretExpiresAt = 10
+		createClient.ClientSecretExpiresAt = 10
 
 		// returned client is correct on Create
 		result, _, err := c.CreateOAuth2Client(createClient)

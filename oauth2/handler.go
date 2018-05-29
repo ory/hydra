@@ -464,7 +464,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 				// We do not need to pass the audience because it's included directly by ORY Fosite
 				//Audience:    []string{authorizeRequest.GetClient().GetID()},
 				Subject:     session.ConsentRequest.Subject,
-				Issuer:      h.IssuerURL,
+				Issuer:      strings.TrimRight(h.IssuerURL, "/") + "/",
 				IssuedAt:    time.Now().UTC(),
 				ExpiresAt:   time.Now().Add(h.IDTokenLifespan).UTC(),
 				AuthTime:    session.AuthenticatedAt,

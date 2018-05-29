@@ -1,0 +1,21 @@
+{
+  "name": "ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server",
+  "version": "Latest",
+  "description": "Welcome_to_the_ORY_Hydra_HTTP_API_documentation__You_will_find_documentation_for_all_HTTP_APIs_here__Keep_in_mind_that_this_document_reflects_the_latest_branch_always__Support_for_versioned_documentation_is_coming_in_the_future_",
+  "license": "Unlicense",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha --recursive"
+  },
+  "browser": {
+    "fs": false
+  },
+  "dependencies": {
+    "superagent": "3.5.2"
+  },
+  "devDependencies": {
+    "mocha": "~2.3.4",
+    "sinon": "1.17.3",
+    "expect.js": "~0.3.1"
+  }
+}

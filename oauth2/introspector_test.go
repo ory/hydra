@@ -131,7 +131,7 @@ func TestIntrospectorSDK(t *testing.T) {
 					assert.Equal(t, "alice", c.Sub)
 					assert.Equal(t, now.Add(time.Hour).Unix(), c.Exp, "expires at")
 					assert.Equal(t, now.Unix(), c.Iat, "issued at")
-					assert.Equal(t, "foobariss", c.Iss, "issuer")
+					assert.Equal(t, "foobariss/", c.Iss, "issuer")
 					assert.Equal(t, map[string]interface{}{"foo": "bar"}, c.Ext)
 				},
 			},
@@ -144,7 +144,7 @@ func TestIntrospectorSDK(t *testing.T) {
 					assert.Equal(t, "alice", c.Sub)
 					assert.Equal(t, now.Add(time.Hour).Unix(), c.Exp, "expires at")
 					assert.Equal(t, now.Unix(), c.Iat, "issued at")
-					assert.Equal(t, "foobariss", c.Iss, "issuer")
+					assert.Equal(t, "foobariss/", c.Iss, "issuer")
 					assert.Equal(t, map[string]interface{}{"foo": "bar"}, c.Ext)
 				},
 			},

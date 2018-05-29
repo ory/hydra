@@ -21,34 +21,28 @@
 package server
 
 import (
-"crypto/tls"
-"fmt"
-"net/http"
-"net/url"
-"os"
+	"crypto/tls"
+	"fmt"
+	"net/http"
+	"net/url"
+	"os"
 
-
-
-
-
-
-"github.com/gorilla/context"
-"github.com/julienschmidt/httprouter"
-"github.com/meatballhat/negroni-logrus"
+	"github.com/gorilla/context"
+	"github.com/julienschmidt/httprouter"
+	"github.com/meatballhat/negroni-logrus"
 	"github.com/ory/go-convenience/corsx"
 	"github.com/ory/graceful"
-"github.com/ory/herodot"
-"github.com/ory/hydra/client"
-"github.com/ory/hydra/config"
-"github.com/ory/hydra/consent"
-"github.com/ory/hydra/jwk"
-"github.com/ory/hydra/oauth2"
-"github.com/ory/hydra/pkg"
-"github.com/pkg/errors"
-"github.com/rs/cors"
-"github.com/spf13/cobra"
-"github.com/urfave/negroni"
-
+	"github.com/ory/herodot"
+	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/config"
+	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/pkg"
+	"github.com/pkg/errors"
+	"github.com/rs/cors"
+	"github.com/spf13/cobra"
+	"github.com/urfave/negroni"
 )
 
 var _ = &consent.Handler{}

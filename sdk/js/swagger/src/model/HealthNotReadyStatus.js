@@ -69,6 +69,7 @@
   }
 
   /**
+   * Errors contains a list of errors that caused the not ready status.
    * @member {Object.<String, String>} errors
    */
   exports.prototype['errors'] = undefined

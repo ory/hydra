@@ -11,5 +11,7 @@
 package swagger
 
 type HealthNotReadyStatus struct {
+
+	// Errors contains a list of errors that caused the not ready status.
 	Errors map[string]string `json:"errors,omitempty"`
 }

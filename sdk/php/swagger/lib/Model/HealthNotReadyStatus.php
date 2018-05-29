@@ -171,7 +171,7 @@ class HealthNotReadyStatus implements ArrayAccess
 
     /**
      * Sets errors
-     * @param map[string,string] $errors
+     * @param map[string,string] $errors Errors contains a list of errors that caused the not ready status.
      * @return $this
      */
     public function setErrors($errors)

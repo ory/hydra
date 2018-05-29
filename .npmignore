@@ -13,9 +13,11 @@ pkg/
 policy/
 rand/
 scripts/
-sdk/go/
 vendor/
 warden/
+dist/
+sdk/php/
+sdk/go/
 *.yml
 *.go
 *.md

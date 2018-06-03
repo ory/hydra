@@ -157,7 +157,8 @@ jobs:
       - run: ./scripts/run-bench.sh
       - run: git remote rm origin
       - run: git remote add origin https://arekkas:$GITHUB_TOKEN@github.com/ory/hydra.git
-      - run: "git commit -m \"Updates benchmark document\" -- CHANGELOG.md && git push --set-upstream $CIRCLE_BRANCH origin || exit 0"
+      - run: "git commit -m \"Updates benchmark document\" -- BENCHMARKS.md || exit 0"
+      - run: git push --set-upstream $CIRCLE_BRANCH origin || exit 0
 
 workflows:
   version: 2

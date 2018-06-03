@@ -20,8 +20,11 @@ services:
       dockerfile: Dockerfile
     links:
       - postgresd:postgresd
+    environment:
+#      - LOG_LEVEL=debug
+      - DATABASE_URL=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable
     command:
-      migrate sql postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable
+      migrate sql -e
     restart: on-failure
 
   hydra:

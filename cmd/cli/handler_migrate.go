@@ -36,6 +36,7 @@ import (
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 type MigrateHandler struct {
@@ -78,12 +79,24 @@ func (h *MigrateHandler) connectToSql(dsn string) (*sqlx.DB, error) {
 }
 
 func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
-	if len(args) == 0 {
-		fmt.Println(cmd.UsageString())
-		return
+	var dburl string
+	if readFromEnv, _ := cmd.Flags().GetBool("read-from-env"); readFromEnv {
+		if len(viper.GetString("DATABASE_URL")) == 0 {
+			fmt.Println(cmd.UsageString())
+			fmt.Println("")
+			fmt.Println("When using flag -e, environment variable DATABASE_URL must be set")
+			return
+		}
+		dburl = viper.GetString("DATABASE_URL")
+	} else {
+		if len(args) != 1 {
+			fmt.Println(cmd.UsageString())
+			return
+		}
+		dburl = args[0]
 	}
 
-	db, err := h.connectToSql(args[0])
+	db, err := h.connectToSql(dburl)
 	if err != nil {
 		fmt.Printf("An error occurred while connecting to SQL: %s", err)
 		os.Exit(1)

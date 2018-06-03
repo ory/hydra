@@ -32,6 +32,10 @@ upgrading Hydra 0.7.0 to 0.8.0 requires running this command.
 It is recommended to run this command close to the SQL instance (e.g. same subnet) instead of over the public internet.
 This decreases risk of failure and decreases time required.
 
+You can read in the database URL using the -e flag, for example:
+	export DATABASE_URL=...
+	hydra migrate sql -e
+
 ### WARNING ###
 
 Before running this command on an existing database, create a back up!
@@ -41,4 +45,6 @@ Before running this command on an existing database, create a back up!
 
 func init() {
 	migrateCmd.AddCommand(migrateSqlCmd)
+
+	migrateSqlCmd.Flags().BoolP("read-from-env", "e", false, "If set, reads the database URL from the environment variable DATABASE_URL.")
 }

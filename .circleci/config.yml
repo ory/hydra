@@ -179,7 +179,7 @@ workflows:
       - benchmark:
           filters:
             branches:
-              only: test-bench
+              only: master
       - swagger:
           filters:
             tags:

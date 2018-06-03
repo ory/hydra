@@ -155,7 +155,7 @@ jobs:
       - run: dep ensure -vendor-only
       - run: go install .
       - run: ./scripts/run-bench.sh
-      - run: "git commit -a -m \"Updates benchmark document\" && git push origin || exit 0"
+      - run: "git commit -a -m \"Updates benchmark document\" && git push --set-upstream $CIRCLE_BRANCH origin || exit 0"
 
 workflows:
   version: 2

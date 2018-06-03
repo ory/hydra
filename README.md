@@ -52,6 +52,7 @@ able to securely manage JSON Web Keys.
   - [ORY Keto: Access Control Policies as a Server](#ory-keto-access-control-policies-as-a-server)
 - [Security](#security)
   - [Disclosing vulnerabilities](#disclosing-vulnerabilities)
+- [Benchmarks](#benchmarks)
 - [Telemetry](#telemetry)
 - [Documentation](#documentation)
   - [Guide](#guide)
@@ -219,6 +220,10 @@ Read [the security guide now](https://www.ory.sh/docs/1-hydra/0-tutorial/0-readm
 
 If you think you found a security vulnerability, please refrain from posting it publicly on the forums, the chat, or GitHub
 and send us an email to [hi@ory.am](mailto:hi@ory.am) instead.
+
+## Benchmarks
+
+Our continuous integration runs a collection of benchmarks against ORY Hydra. You can find the results in [./BENCHMARKS.md](BENCHMARKS.md).
 
 ## Telemetry
 

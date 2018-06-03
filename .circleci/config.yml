@@ -142,6 +142,21 @@ jobs:
       - run: "cp ./docs/api.swagger.json ../docs/apis/hydra.json"
       - run: "(cd ../docs && git add -A && git commit -a -m \"Updates ORY Hydra Swagger definitions\" && git push origin) || exit 0"
 
+  benchmark:
+    docker:
+      - image: circleci/golang:1.10
+    working_directory: /go/src/github.com/ory/hydra
+    steps:
+      - checkout
+      - run: git config --global user.email "hi@ory.am"
+      - run: git config --global user.name "ORY Continuous Integration"
+      - run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+      - run: go get -u https://github.com/rakyll/hey
+      - run: dep ensure -vendor-only
+      - run: go install .
+      - run: ./scripts/test-install.sh
+      - run: "git commit -a -m \"Updates benchmark document\" && git push origin || exit 0"
+
 workflows:
   version: 2
   "test, build, push, and deploy":
@@ -155,6 +170,10 @@ workflows:
             tags:
               only: /.*/
       - release-docs:
+          filters:
+            branches:
+              only: master
+      - benchmark:
           filters:
             branches:
               only: master

@@ -151,7 +151,7 @@ jobs:
       - run: git config --global user.email "hi@ory.am"
       - run: git config --global user.name "ORY Continuous Integration"
       - run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-      - run: go get -u https://github.com/rakyll/hey
+      - run: go get -u github.com/rakyll/hey
       - run: dep ensure -vendor-only
       - run: go install .
       - run: ./scripts/test-install.sh

@@ -81,12 +81,12 @@ This endpoint uses [BCrypt](#bcrypt).
 \`\`\`
 EOF
 
-#hey -n $numReqs -c $numParallel -m POST \
-#	-H "Authorization: Basic $basicAuth" \
-#    -H "Content-Type: application/x-www-form-urlencoded" \
-#    -d "grant_type=client_credentials" \
-#    http://localhost:9000/oauth2/token 2>&1 \
-#    | tee -a BENCHMARKS.md
+hey -n $numReqs -c $numParallel -m POST \
+	-H "Authorization: Basic $basicAuth" \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    -d "grant_type=client_credentials" \
+    http://localhost:9000/oauth2/token 2>&1 \
+    | tee -a BENCHMARKS.md
 
 
 cat >> BENCHMARKS.md << EOF

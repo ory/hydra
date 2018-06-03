@@ -82,7 +82,6 @@ Status code distribution:
 This endpoint uses [BCrypt](#bcrypt).
 
 ```
-
 Summary:
   Total:	24.5185 secs
   Slowest:	0.8679 secs

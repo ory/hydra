@@ -158,7 +158,7 @@ jobs:
       - run: git remote rm origin
       - run: git remote add origin https://arekkas:$GITHUB_TOKEN@github.com/ory/hydra.git
       - run: git fetch origin
-      - run: "if [[ $string != \"Updates benchmarks\" ]]; then (git commit -m \"Updates benchmarks\" -- BENCHMARKS.md && git push -u origin $CIRCLE_BRANCH); fi"
+      - run: "if [[ $(git log --oneline -n 1) != \"Updates benchmarks\" ]]; then (git commit -m \"Updates benchmarks\" -- BENCHMARKS.md && git push -u origin $CIRCLE_BRANCH); fi"
 
 workflows:
   version: 2

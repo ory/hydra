@@ -169,21 +169,24 @@ Hydra is a twelve factor OAuth2 and OpenID Connect provider
 
 #### Building from source
 
-If you wish to compile ORY Hydra yourself, you need to install and set up [Go 1.9+](https://golang.org/) and add `$GOPATH/bin`
-to your `$PATH` as well as [golang/dep](http://github.com/golang/dep). To do so, run the following commands in a shell (bash, sh, cmd.exe, ...):
+If you wish to compile ORY Hydra yourself, you need to install and set up [Go 1.10+](https://golang.org/) and add `$GOPATH/bin`
+to your `$PATH` as well as [golang/dep](http://github.com/golang/dep).
+
+The following commands will check out the latest release tag of ORY Hydra and compile it and set up flags so that `hydra version`
+works as expected. Please note that this will only work with a linux shell like bash or sh.
 
 ```
 go get -d -u github.com/ory/hydra
-cd $GOPATH/src/github.com/ory/hydra
-dep ensure
-go install github.com/ory/hydra
-hydra
+cd $(go env GOPATH)/src/github.com/ory/hydra
+HYDRA_LATEST=$(git describe --abbrev=0 --tags)
+git checkout $HYDRA_LATEST
+dep ensure -vendor-only
+go install \
+    -ldflags "-X github.com/ory/hydra/cmd.Version=$HYDRA_LATEST -X github.com/ory/hydra/cmd.BuildTime=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory/hydra/cmd.GitHash=`git rev-parse HEAD`" \
+    github.com/ory/hydra
+git checkout master
+hydra help
 ```
-
-**Notes**
-
-* We changed organization name from `ory-am` to `ory`. In order to keep backwards compatibility, we did not rename Go packages.
-* You can ignore warnings similar to `package github.com/ory/hydra/cmd/server: case-insensitive import collision: "github.com/Sirupsen/logrus" and "github.com/sirupsen/logrus"`.
 
 ## Ecosystem
 

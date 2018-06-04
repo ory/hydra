@@ -434,16 +434,17 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 
 	if err := s.M.CreateConsentRequest(
 		&ConsentRequest{
-			Challenge:       challenge,
-			Verifier:        verifier,
-			CSRF:            csrf,
-			Skip:            skip,
-			RequestedScope:  []string(ar.GetRequestedScopes()),
-			Subject:         as.Subject,
-			Client:          sanitizeClientFromRequest(ar),
-			RequestURL:      as.AuthenticationRequest.RequestURL,
-			AuthenticatedAt: as.AuthenticatedAt,
-			RequestedAt:     as.RequestedAt,
+			Challenge:            challenge,
+			Verifier:             verifier,
+			CSRF:                 csrf,
+			Skip:                 skip,
+			RequestedScope:       []string(ar.GetRequestedScopes()),
+			Subject:              as.Subject,
+			Client:               sanitizeClientFromRequest(ar),
+			RequestURL:           as.AuthenticationRequest.RequestURL,
+			AuthenticatedAt:      as.AuthenticatedAt,
+			RequestedAt:          as.RequestedAt,
+			OpenIDConnectContext: as.AuthenticationRequest.OpenIDConnectContext,
 		},
 	); err != nil {
 		return errors.WithStack(err)

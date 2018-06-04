@@ -132,6 +132,7 @@ func TestStrategy(t *testing.T) {
 		prompt                string
 		maxAge                string
 		idTokenHint           string
+		other                 string
 		jar                   http.CookieJar
 	}{
 		{
@@ -141,7 +142,8 @@ func TestStrategy(t *testing.T) {
 			expectErrType:         []error{fosite.ErrAccessDenied},
 			expectErr:             []bool{true},
 			expectFinalStatusCode: http.StatusForbidden,
-		}, {
+		},
+		{
 			d:                     "This should fail because a consent verifier was given but no login verifier",
 			req:                   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ID: "client-id"}}},
 			lv:                    "",
@@ -151,8 +153,14 @@ func TestStrategy(t *testing.T) {
 			expectFinalStatusCode: http.StatusForbidden,
 		},
 		{
-			d:   "This should fail because the request was redirected but the login endpoint doesn't do anything (like redirecting back)",
-			req: fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
+			d: "This should fail because the request was redirected but the login endpoint doesn't do anything (like redirecting back)",
+			req: fosite.AuthorizeRequest{
+				Request: fosite.Request{
+					Client: &client.Client{ID: "client-id"},
+					Scopes: []string{"scope-a"},
+				},
+			},
+			other: "display=page&ui_locales=de+en",
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 				return func(w http.ResponseWriter, r *http.Request) {
 					lr, res, err := apiClient.GetLoginRequest(r.URL.Query().Get("login_challenge"))
@@ -165,7 +173,7 @@ func TestStrategy(t *testing.T) {
 					assert.Contains(t, lr.RequestUrl, "/oauth2/auth?login_verifier=&consent_verifier=&")
 					assert.EqualValues(t, false, lr.Skip)
 					assert.EqualValues(t, "", lr.Subject)
-					assert.EqualValues(t, swagger.OpenIdConnectContext{AcrValues: nil, Display: "", UiLocales: nil}, lr.OidcContext)
+					assert.EqualValues(t, swagger.OpenIdConnectContext{AcrValues: nil, Display: "page", UiLocales: []string{"de", "en"}}, lr.OidcContext, "%s", res.Payload)
 					w.WriteHeader(http.StatusNoContent)
 				}
 			},
@@ -210,10 +218,11 @@ func TestStrategy(t *testing.T) {
 			expectErr:             []bool{true, true},
 		},
 		{
-			d:   "This should fail because consent endpoints idles after login was granted - but consent endpoint should be called because cookie jar exists",
-			jar: newCookieJar(),
-			req: fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
-			lph: passAuthentication(apiClient, false),
+			d:     "This should fail because consent endpoints idles after login was granted - but consent endpoint should be called because cookie jar exists",
+			jar:   newCookieJar(),
+			req:   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
+			lph:   passAuthentication(apiClient, false),
+			other: "display=page&ui_locales=de+en&acr_values=1+2",
 			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 				return func(w http.ResponseWriter, r *http.Request) {
 					lr, res, err := apiClient.GetConsentRequest(r.URL.Query().Get("consent_challenge"))
@@ -226,7 +235,7 @@ func TestStrategy(t *testing.T) {
 					assert.Contains(t, lr.RequestUrl, "/oauth2/auth?login_verifier=&consent_verifier=&")
 					assert.EqualValues(t, false, lr.Skip)
 					assert.EqualValues(t, "user", lr.Subject)
-					assert.EqualValues(t, swagger.OpenIdConnectContext{AcrValues: nil, Display: "", UiLocales: nil}, lr.OidcContext)
+					assert.EqualValues(t, swagger.OpenIdConnectContext{AcrValues: []string{"1", "2"}, Display: "page", UiLocales: []string{"de", "en"}}, lr.OidcContext)
 					w.WriteHeader(http.StatusNoContent)
 				}
 			},
@@ -1041,7 +1050,7 @@ func TestStrategy(t *testing.T) {
 					"consent_verifier=" + tc.cv + "&" +
 					"prompt=" + tc.prompt + "&" +
 					"max_age=" + tc.maxAge + "&" +
-					"id_token_hint=" + tc.idTokenHint + "&",
+					"id_token_hint=" + tc.idTokenHint + "&" + tc.other,
 			)
 			require.NoError(t, err)
 			out, err := ioutil.ReadAll(resp.Body)

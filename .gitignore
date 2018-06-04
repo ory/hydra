@@ -17,3 +17,4 @@ Dockerfile-plugin-*
 plugin-*.so
 hydra-docker-bin
 cookies.txt
+vendor.orig

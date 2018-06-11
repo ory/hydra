@@ -80,8 +80,7 @@ SDKs are being used. The primary goal of ORY Hydra is to make OAuth 2.0 and Open
 
 ORY Hydra implements the flows described in OAuth2 and OpenID Connect 1.0 without forcing you to use a "Hydra User Management"
 or some template engine or a predefined front-end. Instead it relies on HTTP redirection and cryptographic methods
-to verify user consent allowing you to use ORY Hydra with any authentication endpoint, be it [authboss](https://github.com/go-authboss/authboss),
-[auth0.com](https://auth0.com/) or your proprietary PHP authentication.
+to verify user consent allowing you to use ORY Hydra with any authentication endpoint, be it [authboss](https://github.com/go-authboss/authboss), [User Frosting](https://www.userfrosting.com/) or your proprietary Java authentication.
 
 ### OAuth2 and OpenID Connect: Open Standards!
 
@@ -114,14 +113,14 @@ to be certified for all explicit, implicit, and hybrid flows as well as OpenID C
 
 This section is a quickstart guide to working with ORY Hydra. In-depth docs are available as well:
 
-* The documentation is available [here](https://www.ory.sh/docs/1-hydra/).
+* The documentation is available [here](https://www.ory.sh/docs/hydra/).
 * The REST API documentation is available [here](https://www.ory.sh/docs/api/hydra).
 
 ### 5 minutes tutorial: Run your very own OAuth2 environment
 
-The **[tutorial](https://www.ory.sh/docs/1-hydra/0-tutorial/0-readme)** teaches you to set up ORY Hydra,
+The **[tutorial](https://www.ory.sh/docs/guides/latest/hydra/1-tutorial/)** teaches you to set up ORY Hydra,
 a Postgres instance and an exemplary identity provider written in React using docker compose.
-It will take you about 5 minutes to complete the **[tutorial](https://www.ory.sh/docs/1-hydra/0-tutorial/0-readme)**.
+It will take you about 5 minutes to complete the **[tutorial](https://www.ory.sh/docs/guides/latest/hydra/1-tutorial/)**.
 
 <img src="docs/images/oauth2-flow.gif" alt="OAuth2 Flow">
 
@@ -217,12 +216,12 @@ perform a certain action on a resource.
 OAuth2 and OAuth2 related specifications are over 400 written pages. Implementing OAuth2 is easy, getting it right is hard.
 ORY Hydra is trusted by companies all around the world, has a vibrant community and faces millions of requests in production
 each day. Of course, we also compiled a security guide with more details on cryptography and security concepts.
-Read [the security guide now](https://www.ory.sh/docs/1-hydra/0-tutorial/0-readme).
+Read [the security guide now](https://www.ory.sh/docs/guides/latest/hydra/5-security/).
 
 ### Disclosing vulnerabilities
 
 If you think you found a security vulnerability, please refrain from posting it publicly on the forums, the chat, or GitHub
-and send us an email to [hi@ory.am](mailto:hi@ory.am) instead.
+and send us an email to [hi@ory.am](mailto:hi@ory.sh) instead.
 
 ## Benchmarks
 
@@ -277,8 +276,7 @@ DATABASE_URL=memory go run main.go host
 ## Libraries and third-party projects
 
 Official:
-* [Consent App Example written in Go](https://github.com/ory/hydra-consent-app-go)
-* [Exemplary Consent App with Express and NodeJS](https://github.com/ory/hydra-consent-app-express)
+* [User Login & Consent Example](https://github.com/ory/hydra-login-consent-node)
 
 Community:
 * [Consent App SDK for Go](https://github.com/janekolszak/idp)
@@ -295,7 +293,6 @@ article: [Hydra: Run your own Identity and Access Management service in <5 Minut
 
 This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
 <a href="graphs/contributors"><img src="https://opencollective.com/ory-hydra/contributors.svg?width=890&button=false" /></a>
-
 
 ## Backers
 

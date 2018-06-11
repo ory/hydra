@@ -584,25 +584,25 @@ databases.
 There are two paths to migrate this change:
 
 1. If you have not added any keys to the JWK store:
-  1. Stop all Hydra instances.
-  2. Drop all rows from the `hydra_jwk` table.
-  3. Start **one** Hydra instance and wait for it to boot.
-  4. Restart all remaining Hydra instances.
+   1. Stop all Hydra instances.
+   2. Drop all rows from the `hydra_jwk` table.
+   3. Start **one** Hydra instance and wait for it to boot.
+   4. Restart all remaining Hydra instances.
 2. If you added keys to the JWK store:
-  1. If you can afford to re-generate those keys:
-    1. Write down all key ids you generated.
-    2. Stop all Hydra instances.
-    3. Drop all rows from the `hydra_jwk` table.
-    4. Start **one** Hydra instance and wait for it to boot.
-    5. Restart all remaining Hydra instances.
-    6. Regenerate the keys and use the key ids you wrote down.
-  2. If you can not afford to re-generate the keys:
-    1. Export said keys using the REST API.
-    2. Stop all Hydra instances.
-    3. Drop all rows from the `hydra_jwk` table.
-    4. Start **one** Hydra instance and wait for it to boot.
-    5. Restart all remaining Hydra instances.
-    6. Import said keys using the REST API.
+   1. If you can afford to re-generate those keys:
+      1. Write down all key ids you generated.
+      2. Stop all Hydra instances.
+      3. Drop all rows from the `hydra_jwk` table.
+      4. Start **one** Hydra instance and wait for it to boot.
+      5. Restart all remaining Hydra instances.
+      6. Regenerate the keys and use the key ids you wrote down.
+   2. If you can not afford to re-generate the keys:
+      1. Export said keys using the REST API.
+      2. Stop all Hydra instances.
+      3. Drop all rows from the `hydra_jwk` table.
+      4. Start **one** Hydra instance and wait for it to boot.
+      5. Restart all remaining Hydra instances.
+      6. Import said keys using the REST API.
 
 #### Minor Breaking Changes
 

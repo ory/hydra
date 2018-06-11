@@ -94,6 +94,33 @@ outweigh the hassle of upgrading to the new version.
 If you have difficulties upgrading and would like a helping hand, reach out to us at [mailto:hi@ory.sh](hi@ory.sh) and
 we will help you with the upgrade process. Our services are billed by the hour and are priced fairly.
 
+### Upgrading from versions v0.9.x
+
+This is a (potentially incomplete) summary of what needs to be done to upgrade from versions of the 0.9.x branch, which are still common. First of all, these changes are important:
+
+1. [Replacing hierarchical scope strategy with wildcard scope strategy](#replacing-hierarchical-scope-strategy-with-wildcard-scope-strategy)
+2. [AES-GCM nonce storage](#aes-gcm-nonce-storage)
+
+The second change is particularly important as you need to perform the strategies presented there before upgrading to 1.0.0.
+
+When upgrading, try to follow these steps. As always, try this with a staging environment first and create back ups. Never run this directly in production unless you are 100% sure everything works:
+
+1. Get the latest ORY Hydra binary or docker image from the 1.0.0 branch.
+2. Run `$ export DATABASE_URL=<your-database-url>`.
+3. If you want to keep using Access Control Policies and the Warden API, you must install ORY Keto using the binaries or the docker image:
+   1. `$ keto migrate hydra $DATABASE_URL`.
+   2. `$ keto migrate sql $DATABASE_URL`.
+   3. Read how to update the JWK storage: [AES-GCM nonce storage](#aes-gcm-nonce-storage). If you only use auto-generated keys and have never used POST or PUT on the `/keys` API, you can probably just execute a `DELETE FROM hydra_jwk` to just remove all the auto-generated keys. When starting the ORY Hydra 1.0.0 CLI the required keys will be re-generated automatically.
+   4. `$ hydra migrate $DATABASE_URL`.
+4. If you do use Access Control Policies nor the Warden API, you can skip ORY Keto:
+   1. Read how to update the JWK storage: [AES-GCM nonce storage](#aes-gcm-nonce-storage) and **read point 3.3 of this list**.
+   2. `$ hydra migrate $DATABASE_URL`.
+5. `$ export SCOPE_STRATEGY=DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY` - this will set the [scope strategy](#replacing-hierarchical-scope-strategy-with-wildcard-scope-strategy) to the old scope strategy used in version 0.9.x. If you set this, you don't need to update the scopes your OAuth 2.0 Clients are allowed to request.
+6. `$ hydra help serve`.
+7. `$ hydra serve --your-flags`.
+   
+It's still a good idea to read through the changes in 0.10.0, for example: [Response payload changes to `/warden/token/allowed`](#response-payload-changes-to-wardentokenallowed). You can, however, skip the [New consent flow](#new-consent-flow) subsection in the 0.10.0 section. All required changes are explained in detail in this release's consent flow description.
+
 ### OpenID Connect Certified
 
 ORY Hydra is now OpenID Connect Certified! Certification spans the OAuth 2.0 Authorize Code Flow, Implicit Flow, and Hybrid Flow

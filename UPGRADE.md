@@ -225,8 +225,8 @@ with the UUID part being random for every installation.
 
 This change will help greatly with key rotation in the future.
 
-If you rely on these keys in your applications and if they are hardcoded in some way, you may want to use the `./well-known/openid-configuration`
-or `./well-known/jwks.json` endpoints instead. Libraries, which handle these standards appropriately, exist for almost any
+If you rely on these keys in your applications and if they are hardcoded in some way, you may want to use the `/.well-known/openid-configuration`
+or `/.well-known/jwks.json` endpoints instead. Libraries, which handle these standards appropriately, exist for almost any
 programming language.
 
 These keys will be generated automatically if they do not exist yet in the database. No further steps for upgrading are

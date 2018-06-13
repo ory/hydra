@@ -139,7 +139,7 @@ jobs:
       - run: git config --global user.email "hi@ory.am"
       - run: git config --global user.name "ORY Continuous Integration"
       - run: "git clone https://arekkas:$DOCS_TOKEN_PUSH@github.com/ory/docs.git ../docs"
-      - run: "cp ./docs/api.swagger.json ../docs/apis/hydra.json"
+      - run: "yes | cp -rf ./docs/api.swagger.json ../docs/apis/hydra.json"
       - run: "(cd ../docs && git add -A && git commit -a -m \"Updates ORY Hydra Swagger definitions\" && git push origin) || exit 0"
 
   benchmark:
@@ -156,10 +156,9 @@ jobs:
       - run: go install .
       - run: ./scripts/run-bench.sh
       - run: cat BENCHMARKS.md
-#      - run: git remote rm origin
-#      - run: git remote add origin https://arekkas:$GITHUB_TOKEN@github.com/ory/hydra.git
-#      - run: git fetch origin
-#      - run: "if [[ $(git log --oneline -n 1) != *\"Updates benchmarks\"* ]]; then (git commit -m \"Updates benchmarks\" -- BENCHMARKS.md && git push -u origin $CIRCLE_BRANCH); fi"
+      - run: "git clone https://arekkas:$DOCS_TOKEN_PUSH@github.com/ory/docs.git ../docs"
+      - run: "yes | cp -rf BENCHMARKS.md ../docs/guides/performance/1-hydra.md"
+      - run: "(cd ../docs && git add -A && git commit -a -m \"Updates ORY Hydra Performance benchmarks\" && git push origin) || exit 0"
 
 workflows:
   version: 2
@@ -178,9 +177,12 @@ workflows:
             branches:
               only: master
       - benchmark:
+          # Avoids race conditions when pushing
+          requires:
+            - release-docs
           filters:
             branches:
-              only: /.*/
+              only: master
       - swagger:
           filters:
             tags:

@@ -113,7 +113,7 @@ to be certified for all explicit, implicit, and hybrid flows as well as OpenID C
 
 This section is a quickstart guide to working with ORY Hydra. In-depth docs are available as well:
 
-* The documentation is available [here](https://www.ory.sh/docs/hydra/).
+* The documentation is available [here](https://www.ory.sh/docs/guides/master/hydra/).
 * The REST API documentation is available [here](https://www.ory.sh/docs/api/hydra).
 
 ### 5 minutes tutorial: Run your very own OAuth2 environment

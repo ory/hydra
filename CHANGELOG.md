@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [v1.0.0-beta.3 (2018-06-13)](#v100-beta3-2018-06-13)
   - [v1.0.0-beta.2 (2018-05-29)](#v100-beta2-2018-05-29)
   - [v1.0.0-beta.1 (2018-05-29)](#v100-beta1-2018-05-29)
   - [v0.11.12 (2018-04-08)](#v01112-2018-04-08)
@@ -126,6 +127,28 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Change Log
+
+## [v1.0.0-beta.3](https://github.com/ory/hydra/tree/v1.0.0-beta.3) (2018-06-13)
+[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-beta.2...v1.0.0-beta.3)
+
+**Implemented enhancements:**
+
+- cmd: Allows reading database from env in migrate sql [\#898](https://github.com/ory/hydra/pull/898) ([arekkas](https://github.com/arekkas))
+
+**Fixed bugs:**
+
+- oidc\_context empty [\#900](https://github.com/ory/hydra/issues/900)
+-  consent: Propagates oidc\_context to consent request [\#901](https://github.com/ory/hydra/pull/901) ([arekkas](https://github.com/arekkas))
+
+**Closed issues:**
+
+- cmd: Add flag to allow reading database url in migration command from env [\#896](https://github.com/ory/hydra/issues/896)
+
+**Merged pull requests:**
+
+- ci: Stops benchmark result commit & pushes [\#905](https://github.com/ory/hydra/pull/905) ([arekkas](https://github.com/arekkas))
+- docs: Adds CI benchmarks  [\#897](https://github.com/ory/hydra/pull/897) ([arekkas](https://github.com/arekkas))
+- all: Moves to metrics-middleware [\#895](https://github.com/ory/hydra/pull/895) ([arekkas](https://github.com/arekkas))
 
 ## [v1.0.0-beta.2](https://github.com/ory/hydra/tree/v1.0.0-beta.2) (2018-05-29)
 [Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-beta.1...v1.0.0-beta.2)

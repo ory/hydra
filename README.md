@@ -7,7 +7,7 @@
     <a href="https://www.ory.sh/docs/guides/master/hydra/">Guide</a> |
     <a href="https://www.ory.sh/docs/api/hydra?version=master">API Docs</a> |
     <a href="https://godoc.org/github.com/ory/hydra">Code Docs</a><br/><br/>
-    <a href="https://opencollective.com/ory-hydra">Support this project!</a>
+    <a href="https://opencollective.com/ory">Support this project!</a>
 </h4>
  
 ---
@@ -28,7 +28,7 @@ able to securely manage JSON Web Keys.
     <a href="https://coveralls.io/github/ory/hydra?branch=master"> <img src="https://coveralls.io/repos/ory/hydra/badge.svg?branch=master&service=github" alt="Coverage Status"></a>
     <a href="https://goreportcard.com/report/github.com/ory/hydra"><img src="https://goreportcard.com/badge/github.com/ory/hydra" alt="Go Report Card"></a>
     <a href="https://bestpractices.coreinfrastructure.org/projects/364"><img src="https://bestpractices.coreinfrastructure.org/projects/364/badge" alt="CII Best Practices"></a>
-    <a href="#backers" alt="sponsors on Open Collective"><img src="https://opencollective.com/ory-hydra/backers/badge.svg" /></a> <a href="#sponsors" alt="Sponsors on Open Collective"><img src="https://opencollective.com/ory-hydra/sponsors/badge.svg" /></a>
+    <a href="#backers" alt="sponsors on Open Collective"><img src="https://opencollective.com/ory/backers/badge.svg" /></a> <a href="#sponsors" alt="Sponsors on Open Collective"><img src="https://opencollective.com/ory/sponsors/badge.svg" /></a>
 </p>
 
 ---
@@ -292,35 +292,29 @@ article: [Hydra: Run your own Identity and Access Management service in <5 Minut
 ## Contributors
 
 This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
-<a href="graphs/contributors"><img src="https://opencollective.com/ory-hydra/contributors.svg?width=890&button=false" /></a>
+<a href="graphs/contributors"><img src="https://opencollective.com/ory/contributors.svg?width=890&button=false" /></a>
 
 ## Backers
 
-Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/ory-hydra#backer)]
+Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/ory#backer)]
 
-<a href="https://opencollective.com/ory-hydra#backers" target="_blank"><img src="https://opencollective.com/ory-hydra/backers.svg?width=890"></a>
+<a href="https://opencollective.com/ory#backers" target="_blank"><img src="https://opencollective.com/ory/backers.svg?width=890"></a>
 
-We would also like to thank (past & current) supporters (in alphabetical order) on [Patreon](https://www.patreon.com/_ory):
-
-* Alexander Alimovs
-* Chancy Kennedy
-* Drozzy
-* Oz Haven
-* TheCrealm
+We would also like to thank (past & current) supporters (in alphabetical order) on [Patreon](https://www.patreon.com/_ory): Alexander Alimovs, Chancy Kennedy, Drozzy, Oz Haven, TheCrealm
 
 ## Sponsors
 
-Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/ory-hydra#sponsor)]
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/ory#sponsor)]
 
-<a href="https://opencollective.com/ory-hydra/sponsor/0/website" target="_blank"><img src="https://opencollective.com/ory-hydra/sponsor/0/avatar.svg"></a>
-<a href="https://opencollective.com/ory-hydra/sponsor/1/website" target="_blank"><img src="https://opencollective.com/ory-hydra/sponsor/1/avatar.svg"></a>
-<a href="https://opencollective.com/ory-hydra/sponsor/2/website" target="_blank"><img src="https://opencollective.com/ory-hydra/sponsor/2/avatar.svg"></a>
-<a href="https://opencollective.com/ory-hydra/sponsor/3/website" target="_blank"><img src="https://opencollective.com/ory-hydra/sponsor/3/avatar.svg"></a>
-<a href="https://opencollective.com/ory-hydra/sponsor/4/website" target="_blank"><img src="https://opencollective.com/ory-hydra/sponsor/4/avatar.svg"></a>
-<a href="https://opencollective.com/ory-hydra/sponsor/5/website" target="_blank"><img src="https://opencollective.com/ory-hydra/sponsor/5/avatar.svg"></a>
-<a href="https://opencollective.com/ory-hydra/sponsor/6/website" target="_blank"><img src="https://opencollective.com/ory-hydra/sponsor/6/avatar.svg"></a>
-<a href="https://opencollective.com/ory-hydra/sponsor/7/website" target="_blank"><img src="https://opencollective.com/ory-hydra/sponsor/7/avatar.svg"></a>
-<a href="https://opencollective.com/ory-hydra/sponsor/8/website" target="_blank"><img src="https://opencollective.com/ory-hydra/sponsor/8/avatar.svg"></a>
-<a href="https://opencollective.com/ory-hydra/sponsor/9/website" target="_blank"><img src="https://opencollective.com/ory-hydra/sponsor/9/avatar.svg"></a>
+<a href="https://opencollective.com/ory/sponsor/0/website" target="_blank"><img src="https://opencollective.com/ory/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/ory/sponsor/1/website" target="_blank"><img src="https://opencollective.com/ory/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/ory/sponsor/2/website" target="_blank"><img src="https://opencollective.com/ory/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/ory/sponsor/3/website" target="_blank"><img src="https://opencollective.com/ory/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/ory/sponsor/4/website" target="_blank"><img src="https://opencollective.com/ory/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/ory/sponsor/5/website" target="_blank"><img src="https://opencollective.com/ory/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/ory/sponsor/6/website" target="_blank"><img src="https://opencollective.com/ory/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/ory/sponsor/7/website" target="_blank"><img src="https://opencollective.com/ory/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/ory/sponsor/8/website" target="_blank"><img src="https://opencollective.com/ory/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/ory/sponsor/9/website" target="_blank"><img src="https://opencollective.com/ory/sponsor/9/avatar.svg"></a>
 
-A special thanks goes out to **Wayne Robinson** for supporting this project with $200 every month since Oktober 2016 [on Patreon](https://www.patreon.com/_ory).
+A special thanks goes out to **Wayne Robinson** for supporting this ecosystem with $200 every month since Oktober 2016 [on Patreon](https://www.patreon.com/_ory).

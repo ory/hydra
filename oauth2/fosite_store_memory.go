@@ -44,11 +44,11 @@ func NewFositeMemoryStore(m client.Manager, ls time.Duration) *FositeMemoryStore
 type FositeMemoryStore struct {
 	client.Manager
 
-	AuthorizeCodes map[string]fosite.Requester
-	IDSessions     map[string]fosite.Requester
-	AccessTokens   map[string]fosite.Requester
-	RefreshTokens  map[string]fosite.Requester
-	PKCES          map[string]fosite.Requester
+	AuthorizeCodes      map[string]fosite.Requester
+	IDSessions          map[string]fosite.Requester
+	AccessTokens        map[string]fosite.Requester
+	RefreshTokens       map[string]fosite.Requester
+	PKCES               map[string]fosite.Requester
 	AccessTokenLifespan time.Duration
 
 	sync.RWMutex

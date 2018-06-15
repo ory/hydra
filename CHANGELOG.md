@@ -3,6 +3,8 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [Unreleased](#unreleased)
+  - [v0.11.13 (2018-06-14)](#v01113-2018-06-14)
   - [v1.0.0-beta.4 (2018-06-13)](#v100-beta4-2018-06-13)
   - [v1.0.0-beta.3 (2018-06-13)](#v100-beta3-2018-06-13)
   - [v1.0.0-beta.2 (2018-05-29)](#v100-beta2-2018-05-29)
@@ -128,6 +130,17 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Change Log
+
+## [Unreleased](https://github.com/ory/hydra/tree/HEAD)
+
+[Full Changelog](https://github.com/ory/hydra/compare/v0.11.13...HEAD)
+
+**Fixed bugs:**
+
+- Missing commits between v0.11.10 and v0.11.12 [\#894](https://github.com/ory/hydra/issues/894)
+
+## [v0.11.13](https://github.com/ory/hydra/tree/v0.11.13) (2018-06-14)
+[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-beta.4...v0.11.13)
 
 ## [v1.0.0-beta.4](https://github.com/ory/hydra/tree/v1.0.0-beta.4) (2018-06-13)
 [Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-beta.3...v1.0.0-beta.4)

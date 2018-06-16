@@ -126,6 +126,19 @@ type WellKnown struct {
 	//
 	// required: true
 	IDTokenSigningAlgValuesSupported []string `json:"id_token_signing_alg_values_supported"`
+
+	// 	Boolean value specifying whether the OP supports use of the request parameter, with true indicating support.
+	RequestParameterSupported bool `json:"request_parameter_supported"`
+
+	// Boolean value specifying whether the OP supports use of the request_uri parameter, with true indicating support.
+	RequestURIParameterSupported bool `json:"request_uri_parameter_supported"`
+
+	// Boolean value specifying whether the OP requires any request_uri values used to be pre-registered
+	// using the request_uris registration parameter.
+	RequireRequestURIRegistration bool `json:"require_request_uri_registration"`
+
+	// Boolean value specifying whether the OP supports use of the claims parameter, with true indicating support.
+	ClaimsParameterSupported bool `json:"claims_parameter_supported"`
 }
 
 // swagger:model flushInactiveOAuth2TokensRequest

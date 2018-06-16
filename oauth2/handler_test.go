@@ -150,12 +150,15 @@ func TestHandlerWellKnown(t *testing.T) {
 		AuthURL:                           strings.TrimRight(h.IssuerURL, "/") + AuthPathT,
 		TokenURL:                          strings.TrimRight(h.IssuerURL, "/") + TokenPathT,
 		JWKsURI:                           strings.TrimRight(h.IssuerURL, "/") + JWKPathT,
+		RegistrationEndpoint:              strings.TrimRight(h.IssuerURL, "/") + client.ClientsHandlerPath,
 		SubjectTypes:                      []string{"pairwise", "public"},
 		ResponseTypes:                     []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
 		ClaimsSupported:                   []string{"sub"},
 		ScopesSupported:                   []string{"offline", "openid"},
 		UserinfoEndpoint:                  strings.TrimRight(h.IssuerURL, "/") + oauth2.UserinfoPath,
 		TokenEndpointAuthMethodsSupported: []string{"client_secret_post", "client_secret_basic"},
+		GrantTypesSupported:               []string{"authorization_code", "implicit", "client_credentials"},
+		ResponseModesSupported:            []string{"query", "fragment"},
 		IDTokenSigningAlgValuesSupported:  []string{"RS256"},
 	}
 	var wellKnownResp oauth2.WellKnown

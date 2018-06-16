@@ -104,11 +104,11 @@ type WellKnown struct {
 	// values for. Note that for privacy or other reasons, this might not be an exhaustive list.
 	ClaimsSupported []string `json:"claims_supported"`
 
-	// 	JSON array containing a list of the OAuth 2.0 Grant Type values that this OP supports.
+	// JSON array containing a list of the OAuth 2.0 Grant Type values that this OP supports.
 	GrantTypesSupported []string `json:"grant_types_supported"`
 
 	// JSON array containing a list of the OAuth 2.0 response_mode values that this OP supports.
-	ResponseModesSupported []string `json:"grant_types_supported"`
+	ResponseModesSupported []string `json:"response_modes_supported"`
 
 	// URL of the OP's UserInfo Endpoint.
 	UserinfoEndpoint string `json:"userinfo_endpoint"`

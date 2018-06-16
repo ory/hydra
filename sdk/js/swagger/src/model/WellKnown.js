@@ -123,6 +123,12 @@
           'String'
         )
       }
+      if (data.hasOwnProperty('response_modes_supported')) {
+        obj['response_modes_supported'] = ApiClient.convertToType(
+          data['response_modes_supported'],
+          ['String']
+        )
+      }
       if (data.hasOwnProperty('response_types_supported')) {
         obj['response_types_supported'] = ApiClient.convertToType(
           data['response_types_supported'],
@@ -174,7 +180,7 @@
    */
   exports.prototype['claims_supported'] = undefined
   /**
-   * JSON array containing a list of the OAuth 2.0 response_mode values that this OP supports.
+   * JSON array containing a list of the OAuth 2.0 Grant Type values that this OP supports.
    * @member {Array.<String>} grant_types_supported
    */
   exports.prototype['grant_types_supported'] = undefined
@@ -198,6 +204,11 @@
    * @member {String} registration_endpoint
    */
   exports.prototype['registration_endpoint'] = undefined
+  /**
+   * JSON array containing a list of the OAuth 2.0 response_mode values that this OP supports.
+   * @member {Array.<String>} response_modes_supported
+   */
+  exports.prototype['response_modes_supported'] = undefined
   /**
    * JSON array containing a list of the OAuth 2.0 response_type values that this OP supports. Dynamic OpenID Providers MUST support the code, id_token, and the token id_token Response Type values.
    * @member {Array.<String>} response_types_supported

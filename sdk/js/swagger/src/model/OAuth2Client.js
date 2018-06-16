@@ -123,6 +123,12 @@
       if (data.hasOwnProperty('scope')) {
         obj['scope'] = ApiClient.convertToType(data['scope'], 'String')
       }
+      if (data.hasOwnProperty('sector_identifier_uri')) {
+        obj['sector_identifier_uri'] = ApiClient.convertToType(
+          data['sector_identifier_uri'],
+          'String'
+        )
+      }
       if (data.hasOwnProperty('tos_uri')) {
         obj['tos_uri'] = ApiClient.convertToType(data['tos_uri'], 'String')
       }
@@ -200,6 +206,11 @@
    * @member {String} scope
    */
   exports.prototype['scope'] = undefined
+  /**
+   * URL using the https scheme to be used in calculating Pseudonymous Identifiers by the OP. The URL references a file with a single JSON array of redirect_uri values.
+   * @member {String} sector_identifier_uri
+   */
+  exports.prototype['sector_identifier_uri'] = undefined
   /**
    * TermsOfServiceURI is a URL string that points to a human-readable terms of service document for the client that describes a contractual relationship between the end-user and the client that the end-user accepts when authorizing the client.
    * @member {String} tos_uri

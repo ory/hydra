@@ -50,16 +50,13 @@ func createTestClient(prefix string) hydra.OAuth2Client {
 		ResponseTypes:         []string{prefix + "id_token", prefix + "code"},
 		RedirectUris:          []string{prefix + "redirect-url", prefix + "redirect-uri"},
 		ClientSecretExpiresAt: 0,
+		//SectorIdentifierUri:   "https://sector",
 	}
 }
 
 func TestClientSDK(t *testing.T) {
 	manager := client.NewMemoryManager(nil)
-	handler := &client.Handler{
-		Manager:             manager,
-		H:                   herodot.NewJSONWriter(nil),
-		DefaultClientScopes: []string{"foo", "bar"},
-	}
+	handler := client.NewHandler(manager, herodot.NewJSONWriter(nil), []string{"foo", "bar"})
 
 	router := httprouter.New()
 	handler.SetRoutes(router)

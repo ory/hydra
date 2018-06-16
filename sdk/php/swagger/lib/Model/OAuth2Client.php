@@ -68,6 +68,7 @@ class OAuth2Client implements ArrayAccess
         'redirect_uris' => 'string[]',
         'response_types' => 'string[]',
         'scope' => 'string',
+        'sector_identifier_uri' => 'string',
         'tos_uri' => 'string'
     ];
 
@@ -90,6 +91,7 @@ class OAuth2Client implements ArrayAccess
         'redirect_uris' => null,
         'response_types' => null,
         'scope' => null,
+        'sector_identifier_uri' => null,
         'tos_uri' => null
     ];
 
@@ -122,6 +124,7 @@ class OAuth2Client implements ArrayAccess
         'redirect_uris' => 'redirect_uris',
         'response_types' => 'response_types',
         'scope' => 'scope',
+        'sector_identifier_uri' => 'sector_identifier_uri',
         'tos_uri' => 'tos_uri'
     ];
 
@@ -145,6 +148,7 @@ class OAuth2Client implements ArrayAccess
         'redirect_uris' => 'setRedirectUris',
         'response_types' => 'setResponseTypes',
         'scope' => 'setScope',
+        'sector_identifier_uri' => 'setSectorIdentifierUri',
         'tos_uri' => 'setTosUri'
     ];
 
@@ -168,6 +172,7 @@ class OAuth2Client implements ArrayAccess
         'redirect_uris' => 'getRedirectUris',
         'response_types' => 'getResponseTypes',
         'scope' => 'getScope',
+        'sector_identifier_uri' => 'getSectorIdentifierUri',
         'tos_uri' => 'getTosUri'
     ];
 
@@ -216,6 +221,7 @@ class OAuth2Client implements ArrayAccess
         $this->container['redirect_uris'] = isset($data['redirect_uris']) ? $data['redirect_uris'] : null;
         $this->container['response_types'] = isset($data['response_types']) ? $data['response_types'] : null;
         $this->container['scope'] = isset($data['scope']) ? $data['scope'] : null;
+        $this->container['sector_identifier_uri'] = isset($data['sector_identifier_uri']) ? $data['sector_identifier_uri'] : null;
         $this->container['tos_uri'] = isset($data['tos_uri']) ? $data['tos_uri'] : null;
     }
 
@@ -546,6 +552,27 @@ class OAuth2Client implements ArrayAccess
         }
 
         $this->container['scope'] = $scope;
+
+        return $this;
+    }
+
+    /**
+     * Gets sector_identifier_uri
+     * @return string
+     */
+    public function getSectorIdentifierUri()
+    {
+        return $this->container['sector_identifier_uri'];
+    }
+
+    /**
+     * Sets sector_identifier_uri
+     * @param string $sector_identifier_uri URL using the https scheme to be used in calculating Pseudonymous Identifiers by the OP. The URL references a file with a single JSON array of redirect_uri values.
+     * @return $this
+     */
+    public function setSectorIdentifierUri($sector_identifier_uri)
+    {
+        $this->container['sector_identifier_uri'] = $sector_identifier_uri;
 
         return $this;
     }

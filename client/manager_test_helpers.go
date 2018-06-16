@@ -67,12 +67,13 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 		assert.NotNil(t, err)
 
 		c := &Client{
-			ID:                "1234",
-			Name:              "name",
-			Secret:            "secret",
-			RedirectURIs:      []string{"http://redirect"},
-			TermsOfServiceURI: "foo",
-			SecretExpiresAt:   0,
+			ID:                  "1234",
+			Name:                "name",
+			Secret:              "secret",
+			RedirectURIs:        []string{"http://redirect"},
+			TermsOfServiceURI:   "foo",
+			SecretExpiresAt:     0,
+			SectorIdentifierURI: "https://sector",
 		}
 
 		assert.NoError(t, m.CreateClient(c))

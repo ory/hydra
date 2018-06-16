@@ -98,6 +98,10 @@ type Client struct {
 	// represented as the number of seconds from 1970-01-01T00:00:00Z as
 	// measured in UTC until the date/time of expiration.
 	SecretExpiresAt int `json:"client_secret_expires_at"`
+
+	// URL using the https scheme to be used in calculating Pseudonymous Identifiers by the OP. The URL references a
+	// file with a single JSON array of redirect_uri values.
+	SectorIdentifierURI string `json:"sector_identifier_uri"`
 }
 
 func (c *Client) GetID() string {

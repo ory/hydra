@@ -68,6 +68,15 @@ var migrations = &migrate.MemoryMigrationSource{
 				`ALTER TABLE hydra_client DROP COLUMN client_secret_expires_at`,
 			},
 		},
+		{
+			Id: "3",
+			Up: []string{
+				`ALTER TABLE hydra_client ADD sector_identifier_uri TEXT NOT NULL`,
+			},
+			Down: []string{
+				`ALTER TABLE hydra_client DROP COLUMN sector_identifier_uri`,
+			},
+		},
 	},
 }
 
@@ -77,21 +86,22 @@ type SQLManager struct {
 }
 
 type sqlData struct {
-	ID                string `db:"id"`
-	Name              string `db:"client_name"`
-	Secret            string `db:"client_secret"`
-	RedirectURIs      string `db:"redirect_uris"`
-	GrantTypes        string `db:"grant_types"`
-	ResponseTypes     string `db:"response_types"`
-	Scope             string `db:"scope"`
-	Owner             string `db:"owner"`
-	PolicyURI         string `db:"policy_uri"`
-	TermsOfServiceURI string `db:"tos_uri"`
-	ClientURI         string `db:"client_uri"`
-	LogoURI           string `db:"logo_uri"`
-	Contacts          string `db:"contacts"`
-	Public            bool   `db:"public"`
-	SecretExpiresAt   int    `db:"client_secret_expires_at"`
+	ID                  string `db:"id"`
+	Name                string `db:"client_name"`
+	Secret              string `db:"client_secret"`
+	RedirectURIs        string `db:"redirect_uris"`
+	GrantTypes          string `db:"grant_types"`
+	ResponseTypes       string `db:"response_types"`
+	Scope               string `db:"scope"`
+	Owner               string `db:"owner"`
+	PolicyURI           string `db:"policy_uri"`
+	TermsOfServiceURI   string `db:"tos_uri"`
+	ClientURI           string `db:"client_uri"`
+	LogoURI             string `db:"logo_uri"`
+	Contacts            string `db:"contacts"`
+	Public              bool   `db:"public"`
+	SecretExpiresAt     int    `db:"client_secret_expires_at"`
+	SectorIdentifierURI string `db:"sector_identifier_uri"`
 }
 
 var sqlParams = []string{
@@ -110,45 +120,48 @@ var sqlParams = []string{
 	"contacts",
 	"public",
 	"client_secret_expires_at",
+	"sector_identifier_uri",
 }
 
 func sqlDataFromClient(d *Client) *sqlData {
 	return &sqlData{
-		ID:                d.ID,
-		Name:              d.Name,
-		Secret:            d.Secret,
-		RedirectURIs:      strings.Join(d.RedirectURIs, "|"),
-		GrantTypes:        strings.Join(d.GrantTypes, "|"),
-		ResponseTypes:     strings.Join(d.ResponseTypes, "|"),
-		Scope:             d.Scope,
-		Owner:             d.Owner,
-		PolicyURI:         d.PolicyURI,
-		TermsOfServiceURI: d.TermsOfServiceURI,
-		ClientURI:         d.ClientURI,
-		LogoURI:           d.LogoURI,
-		Contacts:          strings.Join(d.Contacts, "|"),
-		Public:            d.Public,
-		SecretExpiresAt:   d.SecretExpiresAt,
+		ID:                  d.ID,
+		Name:                d.Name,
+		Secret:              d.Secret,
+		RedirectURIs:        strings.Join(d.RedirectURIs, "|"),
+		GrantTypes:          strings.Join(d.GrantTypes, "|"),
+		ResponseTypes:       strings.Join(d.ResponseTypes, "|"),
+		Scope:               d.Scope,
+		Owner:               d.Owner,
+		PolicyURI:           d.PolicyURI,
+		TermsOfServiceURI:   d.TermsOfServiceURI,
+		ClientURI:           d.ClientURI,
+		LogoURI:             d.LogoURI,
+		Contacts:            strings.Join(d.Contacts, "|"),
+		Public:              d.Public,
+		SecretExpiresAt:     d.SecretExpiresAt,
+		SectorIdentifierURI: d.SectorIdentifierURI,
 	}
 }
 
 func (d *sqlData) ToClient() *Client {
 	return &Client{
-		ID:                d.ID,
-		Name:              d.Name,
-		Secret:            d.Secret,
-		RedirectURIs:      stringsx.Splitx(d.RedirectURIs, "|"),
-		GrantTypes:        stringsx.Splitx(d.GrantTypes, "|"),
-		ResponseTypes:     stringsx.Splitx(d.ResponseTypes, "|"),
-		Scope:             d.Scope,
-		Owner:             d.Owner,
-		PolicyURI:         d.PolicyURI,
-		TermsOfServiceURI: d.TermsOfServiceURI,
-		ClientURI:         d.ClientURI,
-		LogoURI:           d.LogoURI,
-		Contacts:          stringsx.Splitx(d.Contacts, "|"),
-		Public:            d.Public,
-		SecretExpiresAt:   d.SecretExpiresAt,
+		ID:                  d.ID,
+		Name:                d.Name,
+		Secret:              d.Secret,
+		RedirectURIs:        stringsx.Splitx(d.RedirectURIs, "|"),
+		GrantTypes:          stringsx.Splitx(d.GrantTypes, "|"),
+		ResponseTypes:       stringsx.Splitx(d.ResponseTypes, "|"),
+		Scope:               d.Scope,
+		Owner:               d.Owner,
+		PolicyURI:           d.PolicyURI,
+		TermsOfServiceURI:   d.TermsOfServiceURI,
+		ClientURI:           d.ClientURI,
+		LogoURI:             d.LogoURI,
+		Contacts:            stringsx.Splitx(d.Contacts, "|"),
+		Public:              d.Public,
+		SecretExpiresAt:     d.SecretExpiresAt,
+		SectorIdentifierURI: d.SectorIdentifierURI,
 	}
 }
 

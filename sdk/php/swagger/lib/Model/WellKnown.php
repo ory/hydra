@@ -61,6 +61,7 @@ class WellKnown implements ArrayAccess
         'issuer' => 'string',
         'jwks_uri' => 'string',
         'registration_endpoint' => 'string',
+        'response_modes_supported' => 'string[]',
         'response_types_supported' => 'string[]',
         'scopes_supported' => 'string[]',
         'subject_types_supported' => 'string[]',
@@ -81,6 +82,7 @@ class WellKnown implements ArrayAccess
         'issuer' => null,
         'jwks_uri' => null,
         'registration_endpoint' => null,
+        'response_modes_supported' => null,
         'response_types_supported' => null,
         'scopes_supported' => null,
         'subject_types_supported' => null,
@@ -111,6 +113,7 @@ class WellKnown implements ArrayAccess
         'issuer' => 'issuer',
         'jwks_uri' => 'jwks_uri',
         'registration_endpoint' => 'registration_endpoint',
+        'response_modes_supported' => 'response_modes_supported',
         'response_types_supported' => 'response_types_supported',
         'scopes_supported' => 'scopes_supported',
         'subject_types_supported' => 'subject_types_supported',
@@ -132,6 +135,7 @@ class WellKnown implements ArrayAccess
         'issuer' => 'setIssuer',
         'jwks_uri' => 'setJwksUri',
         'registration_endpoint' => 'setRegistrationEndpoint',
+        'response_modes_supported' => 'setResponseModesSupported',
         'response_types_supported' => 'setResponseTypesSupported',
         'scopes_supported' => 'setScopesSupported',
         'subject_types_supported' => 'setSubjectTypesSupported',
@@ -153,6 +157,7 @@ class WellKnown implements ArrayAccess
         'issuer' => 'getIssuer',
         'jwks_uri' => 'getJwksUri',
         'registration_endpoint' => 'getRegistrationEndpoint',
+        'response_modes_supported' => 'getResponseModesSupported',
         'response_types_supported' => 'getResponseTypesSupported',
         'scopes_supported' => 'getScopesSupported',
         'subject_types_supported' => 'getSubjectTypesSupported',
@@ -199,6 +204,7 @@ class WellKnown implements ArrayAccess
         $this->container['issuer'] = isset($data['issuer']) ? $data['issuer'] : null;
         $this->container['jwks_uri'] = isset($data['jwks_uri']) ? $data['jwks_uri'] : null;
         $this->container['registration_endpoint'] = isset($data['registration_endpoint']) ? $data['registration_endpoint'] : null;
+        $this->container['response_modes_supported'] = isset($data['response_modes_supported']) ? $data['response_modes_supported'] : null;
         $this->container['response_types_supported'] = isset($data['response_types_supported']) ? $data['response_types_supported'] : null;
         $this->container['scopes_supported'] = isset($data['scopes_supported']) ? $data['scopes_supported'] : null;
         $this->container['subject_types_supported'] = isset($data['subject_types_supported']) ? $data['subject_types_supported'] : null;
@@ -327,7 +333,7 @@ class WellKnown implements ArrayAccess
 
     /**
      * Sets grant_types_supported
-     * @param string[] $grant_types_supported JSON array containing a list of the OAuth 2.0 response_mode values that this OP supports.
+     * @param string[] $grant_types_supported JSON array containing a list of the OAuth 2.0 Grant Type values that this OP supports.
      * @return $this
      */
     public function setGrantTypesSupported($grant_types_supported)
@@ -417,6 +423,27 @@ class WellKnown implements ArrayAccess
     public function setRegistrationEndpoint($registration_endpoint)
     {
         $this->container['registration_endpoint'] = $registration_endpoint;
+
+        return $this;
+    }
+
+    /**
+     * Gets response_modes_supported
+     * @return string[]
+     */
+    public function getResponseModesSupported()
+    {
+        return $this->container['response_modes_supported'];
+    }
+
+    /**
+     * Sets response_modes_supported
+     * @param string[] $response_modes_supported JSON array containing a list of the OAuth 2.0 response_mode values that this OP supports.
+     * @return $this
+     */
+    public function setResponseModesSupported($response_modes_supported)
+    {
+        $this->container['response_modes_supported'] = $response_modes_supported;
 
         return $this;
     }

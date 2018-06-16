@@ -40,7 +40,7 @@ PORT=$hydraport \
     OAUTH2_LOGIN_URL=https://$domain/login \
     OAUTH2_ISSUER_URL=https://$domain/ \
     OAUTH2_SHARE_ERROR_DEBUG=1 \
-    OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE=openid,offline \
+    OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE=openid,offline,offline_access,profile,email,address,phone \
     LOG_LEVEL=debug \
     DATABASE_URL=memory \
     hydra serve --dangerous-force-http

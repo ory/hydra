@@ -21,6 +21,8 @@
 package server
 
 import (
+	"strings"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
@@ -54,8 +56,9 @@ func newClientManager(c *config.Config) client.Manager {
 
 func newClientHandler(c *config.Config, router *httprouter.Router, manager client.Manager) *client.Handler {
 	h := &client.Handler{
-		H:       herodot.NewJSONWriter(c.GetLogger()),
-		Manager: manager,
+		H:                   herodot.NewJSONWriter(c.GetLogger()),
+		Manager:             manager,
+		DefaultClientScopes: strings.Split(c.DefaultClientScope, ","),
 	}
 
 	h.SetRoutes(router)

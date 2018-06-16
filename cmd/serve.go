@@ -143,6 +143,12 @@ OPENID CONNECT CONTROLS
 	Discovery endpoint /.well-known/openid-configuration. Defaults to ORY Hydra's userinfo endpoint at /userinfo.
 	Set this value if you want to handle this endpoint yourself.
 
+- OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE: The OpenID Connect Dynamic Client Registration specification
+	has no concept of whitelisting OAuth 2.0 Scope. If you want to expose Dynamic Client Registration, you should set the default
+	scope enabled for newly registered clients. Keep in mind that users can overwrite this default by setting the
+	"scope" key in the registration payload, effectively disabling the concept of whitelisted scopes.
+	Example: OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE=openid,offline,scope-a,scope-b
+
 
 HTTPS CONTROLS
 ==============

@@ -50,6 +50,7 @@ able to securely manage JSON Web Keys.
   - [ORY Security Console: Administrative User Interface](#ory-security-console-administrative-user-interface)
   - [ORY Oathkeeper: Identity & Access Proxy](#ory-oathkeeper-identity-&-access-proxy)
   - [ORY Keto: Access Control Policies as a Server](#ory-keto-access-control-policies-as-a-server)
+  - [Examples](#examples)
 - [Security](#security)
   - [Disclosing vulnerabilities](#disclosing-vulnerabilities)
 - [Benchmarks](#benchmarks)
@@ -208,6 +209,11 @@ on top of OAuth2 and ORY Hydra.
 [ORY Keto](https://github.com/ory/keto) is a policy decision point. It uses a set of access control policies, similar
 to AWS IAM Policies, in order to determine whether a subject (user, application, service, car, ...) is authorized to
 perform a certain action on a resource.
+
+### Examples
+
+The [ory/examples](https://github.com/ory/examples) repository contains numerous examples of setting up this project
+individually and together with other services from the ORY Ecosystem.
 
 ## Security
 

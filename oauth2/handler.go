@@ -31,6 +31,7 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
+	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
@@ -63,10 +64,13 @@ type WellKnown struct {
 	// required: true
 	Issuer string `json:"issuer"`
 
-	// URL of the OP's OAuth 2.0 Authorization Endpoint
+	// URL of the OP's OAuth 2.0 Authorization Endpoint.
 	//
 	// required: true
 	AuthURL string `json:"authorization_endpoint"`
+
+	// URL of the OP's Dynamic Client Registration Endpoint.
+	RegistrationEndpoint string `json:"registration_endpoint"`
 
 	// URL of the OP's OAuth 2.0 Token Endpoint
 	//
@@ -99,6 +103,12 @@ type WellKnown struct {
 	// JSON array containing a list of the Claim Names of the Claims that the OpenID Provider MAY be able to supply
 	// values for. Note that for privacy or other reasons, this might not be an exhaustive list.
 	ClaimsSupported []string `json:"claims_supported"`
+
+	// 	JSON array containing a list of the OAuth 2.0 Grant Type values that this OP supports.
+	GrantTypesSupported []string `json:"grant_types_supported"`
+
+	// JSON array containing a list of the OAuth 2.0 response_mode values that this OP supports.
+	ResponseModesSupported []string `json:"grant_types_supported"`
 
 	// URL of the OP's UserInfo Endpoint.
 	UserinfoEndpoint string `json:"userinfo_endpoint"`
@@ -177,6 +187,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ htt
 		AuthURL:                           strings.TrimRight(h.IssuerURL, "/") + AuthPath,
 		TokenURL:                          strings.TrimRight(h.IssuerURL, "/") + TokenPath,
 		JWKsURI:                           strings.TrimRight(h.IssuerURL, "/") + JWKPath,
+		RegistrationEndpoint:              strings.TrimRight(h.IssuerURL, "/") + client.ClientsHandlerPath,
 		SubjectTypes:                      []string{"pairwise", "public"},
 		ResponseTypes:                     []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
 		ClaimsSupported:                   claimsSupported,
@@ -184,6 +195,8 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ htt
 		UserinfoEndpoint:                  userInfoEndpoint,
 		TokenEndpointAuthMethodsSupported: []string{"client_secret_post", "client_secret_basic"},
 		IDTokenSigningAlgValuesSupported:  []string{"RS256"},
+		GrantTypesSupported:               []string{"authorization_code", "implicit", "client_credentials"},
+		ResponseModesSupported:            []string{"query", "fragment"},
 	})
 }
 

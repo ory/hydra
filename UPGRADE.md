@@ -9,7 +9,8 @@ before finalizing the upgrade process.
 
 
 - [1.0.0-beta.5](#100-beta5)
-  - [OAuth 2.0 Client `id` is now `client_id`](#oauth-20-client-id-is-now-client_id)
+  - [Schema Changes](#schema-changes)
+  - [OAuth 2.0 Client field `id` is now `client_id`](#oauth-20-client-field-id-is-now-client_id)
 - [1.0.0-beta.1](#100-beta1)
   - [Upgrading from versions v0.9.x](#upgrading-from-versions-v09x)
   - [OpenID Connect Certified](#openid-connect-certified)
@@ -86,6 +87,11 @@ before finalizing the upgrade process.
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## 1.0.0-beta.5
+
+### Schema Changes
+
+This patch introduces some minor database schema changes. Before you apply it, you must run `hydra migrate sql` against
+your database.
 
 ### OAuth 2.0 Client field `id` is now `client_id`
 

@@ -35,7 +35,7 @@ import (
 
 func createTestClient(prefix string) hydra.OAuth2Client {
 	return hydra.OAuth2Client{
-		Id:                    "1234",
+		ClientId:              "1234",
 		ClientName:            prefix + "name",
 		ClientSecret:          prefix + "secret",
 		ClientUri:             prefix + "uri",
@@ -76,7 +76,7 @@ func TestClientSDK(t *testing.T) {
 
 		// secret is not returned on GetOAuth2Client
 		compareClient.ClientSecret = ""
-		result, _, err = c.GetOAuth2Client(createClient.Id)
+		result, _, err = c.GetOAuth2Client(createClient.ClientId)
 		assert.EqualValues(t, compareClient, *result)
 
 		// listing clients returns the only added one
@@ -87,28 +87,28 @@ func TestClientSDK(t *testing.T) {
 
 		// SecretExpiresAt gets overwritten with 0 on Update
 		compareClient.ClientSecret = createClient.ClientSecret
-		result, _, err = c.UpdateOAuth2Client(createClient.Id, createClient)
+		result, _, err = c.UpdateOAuth2Client(createClient.ClientId, createClient)
 		require.NoError(t, err)
 		assert.EqualValues(t, compareClient, *result)
 
 		// create another client
 		updateClient := createTestClient("foo")
-		result, _, err = c.UpdateOAuth2Client(createClient.Id, updateClient)
+		result, _, err = c.UpdateOAuth2Client(createClient.ClientId, updateClient)
 		require.NoError(t, err)
 		assert.EqualValues(t, updateClient, *result)
 
 		// again, test if secret is not returned on Get
 		compareClient = updateClient
 		compareClient.ClientSecret = ""
-		result, _, err = c.GetOAuth2Client(updateClient.Id)
+		result, _, err = c.GetOAuth2Client(updateClient.ClientId)
 		require.NoError(t, err)
 		assert.EqualValues(t, compareClient, *result)
 
 		// client can not be found after being deleted
-		_, err = c.DeleteOAuth2Client(updateClient.Id)
+		_, err = c.DeleteOAuth2Client(updateClient.ClientId)
 		require.NoError(t, err)
 
-		_, response, err := c.GetOAuth2Client(updateClient.Id)
+		_, response, err := c.GetOAuth2Client(updateClient.ClientId)
 		require.NoError(t, err)
 		assert.Equal(t, http.StatusNotFound, response.StatusCode)
 	})

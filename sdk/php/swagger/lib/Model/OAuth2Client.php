@@ -54,13 +54,13 @@ class OAuth2Client implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
+        'client_id' => 'string',
         'client_name' => 'string',
         'client_secret' => 'string',
         'client_secret_expires_at' => 'int',
         'client_uri' => 'string',
         'contacts' => 'string[]',
         'grant_types' => 'string[]',
-        'id' => 'string',
         'logo_uri' => 'string',
         'owner' => 'string',
         'policy_uri' => 'string',
@@ -76,13 +76,13 @@ class OAuth2Client implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerFormats = [
+        'client_id' => null,
         'client_name' => null,
         'client_secret' => null,
         'client_secret_expires_at' => 'int64',
         'client_uri' => null,
         'contacts' => null,
         'grant_types' => null,
-        'id' => null,
         'logo_uri' => null,
         'owner' => null,
         'policy_uri' => null,
@@ -108,13 +108,13 @@ class OAuth2Client implements ArrayAccess
      * @var string[]
      */
     protected static $attributeMap = [
+        'client_id' => 'client_id',
         'client_name' => 'client_name',
         'client_secret' => 'client_secret',
         'client_secret_expires_at' => 'client_secret_expires_at',
         'client_uri' => 'client_uri',
         'contacts' => 'contacts',
         'grant_types' => 'grant_types',
-        'id' => 'id',
         'logo_uri' => 'logo_uri',
         'owner' => 'owner',
         'policy_uri' => 'policy_uri',
@@ -131,13 +131,13 @@ class OAuth2Client implements ArrayAccess
      * @var string[]
      */
     protected static $setters = [
+        'client_id' => 'setClientId',
         'client_name' => 'setClientName',
         'client_secret' => 'setClientSecret',
         'client_secret_expires_at' => 'setClientSecretExpiresAt',
         'client_uri' => 'setClientUri',
         'contacts' => 'setContacts',
         'grant_types' => 'setGrantTypes',
-        'id' => 'setId',
         'logo_uri' => 'setLogoUri',
         'owner' => 'setOwner',
         'policy_uri' => 'setPolicyUri',
@@ -154,13 +154,13 @@ class OAuth2Client implements ArrayAccess
      * @var string[]
      */
     protected static $getters = [
+        'client_id' => 'getClientId',
         'client_name' => 'getClientName',
         'client_secret' => 'getClientSecret',
         'client_secret_expires_at' => 'getClientSecretExpiresAt',
         'client_uri' => 'getClientUri',
         'contacts' => 'getContacts',
         'grant_types' => 'getGrantTypes',
-        'id' => 'getId',
         'logo_uri' => 'getLogoUri',
         'owner' => 'getOwner',
         'policy_uri' => 'getPolicyUri',
@@ -202,13 +202,13 @@ class OAuth2Client implements ArrayAccess
      */
     public function __construct(array $data = null)
     {
+        $this->container['client_id'] = isset($data['client_id']) ? $data['client_id'] : null;
         $this->container['client_name'] = isset($data['client_name']) ? $data['client_name'] : null;
         $this->container['client_secret'] = isset($data['client_secret']) ? $data['client_secret'] : null;
         $this->container['client_secret_expires_at'] = isset($data['client_secret_expires_at']) ? $data['client_secret_expires_at'] : null;
         $this->container['client_uri'] = isset($data['client_uri']) ? $data['client_uri'] : null;
         $this->container['contacts'] = isset($data['contacts']) ? $data['contacts'] : null;
         $this->container['grant_types'] = isset($data['grant_types']) ? $data['grant_types'] : null;
-        $this->container['id'] = isset($data['id']) ? $data['id'] : null;
         $this->container['logo_uri'] = isset($data['logo_uri']) ? $data['logo_uri'] : null;
         $this->container['owner'] = isset($data['owner']) ? $data['owner'] : null;
         $this->container['policy_uri'] = isset($data['policy_uri']) ? $data['policy_uri'] : null;
@@ -250,6 +250,27 @@ class OAuth2Client implements ArrayAccess
         return true;
     }
 
+
+    /**
+     * Gets client_id
+     * @return string
+     */
+    public function getClientId()
+    {
+        return $this->container['client_id'];
+    }
+
+    /**
+     * Sets client_id
+     * @param string $client_id ID is the id for this client.
+     * @return $this
+     */
+    public function setClientId($client_id)
+    {
+        $this->container['client_id'] = $client_id;
+
+        return $this;
+    }
 
     /**
      * Gets client_name
@@ -373,27 +394,6 @@ class OAuth2Client implements ArrayAccess
     public function setGrantTypes($grant_types)
     {
         $this->container['grant_types'] = $grant_types;
-
-        return $this;
-    }
-
-    /**
-     * Gets id
-     * @return string
-     */
-    public function getId()
-    {
-        return $this->container['id'];
-    }
-
-    /**
-     * Sets id
-     * @param string $id ID is the id for this client.
-     * @return $this
-     */
-    public function setId($id)
-    {
-        $this->container['id'] = $id;
 
         return $this;
     }

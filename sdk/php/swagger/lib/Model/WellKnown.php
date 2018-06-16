@@ -56,9 +56,11 @@ class WellKnown implements ArrayAccess
     protected static $swaggerTypes = [
         'authorization_endpoint' => 'string',
         'claims_supported' => 'string[]',
+        'grant_types_supported' => 'string[]',
         'id_token_signing_alg_values_supported' => 'string[]',
         'issuer' => 'string',
         'jwks_uri' => 'string',
+        'registration_endpoint' => 'string',
         'response_types_supported' => 'string[]',
         'scopes_supported' => 'string[]',
         'subject_types_supported' => 'string[]',
@@ -74,9 +76,11 @@ class WellKnown implements ArrayAccess
     protected static $swaggerFormats = [
         'authorization_endpoint' => null,
         'claims_supported' => null,
+        'grant_types_supported' => null,
         'id_token_signing_alg_values_supported' => null,
         'issuer' => null,
         'jwks_uri' => null,
+        'registration_endpoint' => null,
         'response_types_supported' => null,
         'scopes_supported' => null,
         'subject_types_supported' => null,
@@ -102,9 +106,11 @@ class WellKnown implements ArrayAccess
     protected static $attributeMap = [
         'authorization_endpoint' => 'authorization_endpoint',
         'claims_supported' => 'claims_supported',
+        'grant_types_supported' => 'grant_types_supported',
         'id_token_signing_alg_values_supported' => 'id_token_signing_alg_values_supported',
         'issuer' => 'issuer',
         'jwks_uri' => 'jwks_uri',
+        'registration_endpoint' => 'registration_endpoint',
         'response_types_supported' => 'response_types_supported',
         'scopes_supported' => 'scopes_supported',
         'subject_types_supported' => 'subject_types_supported',
@@ -121,9 +127,11 @@ class WellKnown implements ArrayAccess
     protected static $setters = [
         'authorization_endpoint' => 'setAuthorizationEndpoint',
         'claims_supported' => 'setClaimsSupported',
+        'grant_types_supported' => 'setGrantTypesSupported',
         'id_token_signing_alg_values_supported' => 'setIdTokenSigningAlgValuesSupported',
         'issuer' => 'setIssuer',
         'jwks_uri' => 'setJwksUri',
+        'registration_endpoint' => 'setRegistrationEndpoint',
         'response_types_supported' => 'setResponseTypesSupported',
         'scopes_supported' => 'setScopesSupported',
         'subject_types_supported' => 'setSubjectTypesSupported',
@@ -140,9 +148,11 @@ class WellKnown implements ArrayAccess
     protected static $getters = [
         'authorization_endpoint' => 'getAuthorizationEndpoint',
         'claims_supported' => 'getClaimsSupported',
+        'grant_types_supported' => 'getGrantTypesSupported',
         'id_token_signing_alg_values_supported' => 'getIdTokenSigningAlgValuesSupported',
         'issuer' => 'getIssuer',
         'jwks_uri' => 'getJwksUri',
+        'registration_endpoint' => 'getRegistrationEndpoint',
         'response_types_supported' => 'getResponseTypesSupported',
         'scopes_supported' => 'getScopesSupported',
         'subject_types_supported' => 'getSubjectTypesSupported',
@@ -184,9 +194,11 @@ class WellKnown implements ArrayAccess
     {
         $this->container['authorization_endpoint'] = isset($data['authorization_endpoint']) ? $data['authorization_endpoint'] : null;
         $this->container['claims_supported'] = isset($data['claims_supported']) ? $data['claims_supported'] : null;
+        $this->container['grant_types_supported'] = isset($data['grant_types_supported']) ? $data['grant_types_supported'] : null;
         $this->container['id_token_signing_alg_values_supported'] = isset($data['id_token_signing_alg_values_supported']) ? $data['id_token_signing_alg_values_supported'] : null;
         $this->container['issuer'] = isset($data['issuer']) ? $data['issuer'] : null;
         $this->container['jwks_uri'] = isset($data['jwks_uri']) ? $data['jwks_uri'] : null;
+        $this->container['registration_endpoint'] = isset($data['registration_endpoint']) ? $data['registration_endpoint'] : null;
         $this->container['response_types_supported'] = isset($data['response_types_supported']) ? $data['response_types_supported'] : null;
         $this->container['scopes_supported'] = isset($data['scopes_supported']) ? $data['scopes_supported'] : null;
         $this->container['subject_types_supported'] = isset($data['subject_types_supported']) ? $data['subject_types_supported'] : null;
@@ -273,7 +285,7 @@ class WellKnown implements ArrayAccess
 
     /**
      * Sets authorization_endpoint
-     * @param string $authorization_endpoint URL of the OP's OAuth 2.0 Authorization Endpoint
+     * @param string $authorization_endpoint URL of the OP's OAuth 2.0 Authorization Endpoint.
      * @return $this
      */
     public function setAuthorizationEndpoint($authorization_endpoint)
@@ -300,6 +312,27 @@ class WellKnown implements ArrayAccess
     public function setClaimsSupported($claims_supported)
     {
         $this->container['claims_supported'] = $claims_supported;
+
+        return $this;
+    }
+
+    /**
+     * Gets grant_types_supported
+     * @return string[]
+     */
+    public function getGrantTypesSupported()
+    {
+        return $this->container['grant_types_supported'];
+    }
+
+    /**
+     * Sets grant_types_supported
+     * @param string[] $grant_types_supported JSON array containing a list of the OAuth 2.0 response_mode values that this OP supports.
+     * @return $this
+     */
+    public function setGrantTypesSupported($grant_types_supported)
+    {
+        $this->container['grant_types_supported'] = $grant_types_supported;
 
         return $this;
     }
@@ -363,6 +396,27 @@ class WellKnown implements ArrayAccess
     public function setJwksUri($jwks_uri)
     {
         $this->container['jwks_uri'] = $jwks_uri;
+
+        return $this;
+    }
+
+    /**
+     * Gets registration_endpoint
+     * @return string
+     */
+    public function getRegistrationEndpoint()
+    {
+        return $this->container['registration_endpoint'];
+    }
+
+    /**
+     * Sets registration_endpoint
+     * @param string $registration_endpoint URL of the OP's Dynamic Client Registration Endpoint.
+     * @return $this
+     */
+    public function setRegistrationEndpoint($registration_endpoint)
+    {
+        $this->container['registration_endpoint'] = $registration_endpoint;
 
         return $this;
     }

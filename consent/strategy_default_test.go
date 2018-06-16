@@ -168,7 +168,7 @@ func TestStrategy(t *testing.T) {
 					require.EqualValues(t, http.StatusOK, res.StatusCode)
 					assert.NotEmpty(t, lr.Challenge)
 					assert.EqualValues(t, r.URL.Query().Get("login_challenge"), lr.Challenge)
-					assert.EqualValues(t, "client-id", lr.Client.Id)
+					assert.EqualValues(t, "client-id", lr.Client.ClientId)
 					assert.EqualValues(t, []string{"scope-a"}, lr.RequestedScope)
 					assert.Contains(t, lr.RequestUrl, "/oauth2/auth?login_verifier=&consent_verifier=&")
 					assert.EqualValues(t, false, lr.Skip)
@@ -230,7 +230,7 @@ func TestStrategy(t *testing.T) {
 					require.EqualValues(t, http.StatusOK, res.StatusCode)
 					assert.NotEmpty(t, lr.Challenge)
 					assert.EqualValues(t, r.URL.Query().Get("consent_challenge"), lr.Challenge)
-					assert.EqualValues(t, "client-id", lr.Client.Id)
+					assert.EqualValues(t, "client-id", lr.Client.ClientId)
 					assert.EqualValues(t, []string{"scope-a"}, lr.RequestedScope)
 					assert.Contains(t, lr.RequestUrl, "/oauth2/auth?login_verifier=&consent_verifier=&")
 					assert.EqualValues(t, false, lr.Skip)
@@ -357,7 +357,7 @@ func TestStrategy(t *testing.T) {
 		//			require.NoError(t, err)
 		//			require.EqualValues(t, http.StatusOK, res.StatusCode)
 		//			assert.False(t, rr.Skip)
-		//			assert.Equal(t, "client-id", rr.Client.Id)
+		//			assert.Equal(t, "client-id", rr.Client.ClientId)
 		//			assert.Equal(t, "user", rr.Subject)
 		//
 		//			v, res, err := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{
@@ -448,7 +448,7 @@ func TestStrategy(t *testing.T) {
 					require.NoError(t, err)
 					require.EqualValues(t, http.StatusOK, res.StatusCode)
 					assert.True(t, rr.Skip)
-					assert.Equal(t, "client-id", rr.Client.Id)
+					assert.Equal(t, "client-id", rr.Client.ClientId)
 					assert.Equal(t, "user", rr.Subject)
 					assert.Empty(t, rr.Client.ClientSecret)
 

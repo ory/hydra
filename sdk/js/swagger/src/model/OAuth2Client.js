@@ -59,6 +59,9 @@
     if (data) {
       obj = obj || new exports()
 
+      if (data.hasOwnProperty('client_id')) {
+        obj['client_id'] = ApiClient.convertToType(data['client_id'], 'String')
+      }
       if (data.hasOwnProperty('client_name')) {
         obj['client_name'] = ApiClient.convertToType(
           data['client_name'],
@@ -90,9 +93,6 @@
         obj['grant_types'] = ApiClient.convertToType(data['grant_types'], [
           'String'
         ])
-      }
-      if (data.hasOwnProperty('id')) {
-        obj['id'] = ApiClient.convertToType(data['id'], 'String')
       }
       if (data.hasOwnProperty('logo_uri')) {
         obj['logo_uri'] = ApiClient.convertToType(data['logo_uri'], 'String')
@@ -131,6 +131,11 @@
   }
 
   /**
+   * ID is the id for this client.
+   * @member {String} client_id
+   */
+  exports.prototype['client_id'] = undefined
+  /**
    * Name is the human-readable string name of the client to be presented to the end-user during authorization.
    * @member {String} client_name
    */
@@ -160,11 +165,6 @@
    * @member {Array.<String>} grant_types
    */
   exports.prototype['grant_types'] = undefined
-  /**
-   * ID is the id for this client.
-   * @member {String} id
-   */
-  exports.prototype['id'] = undefined
   /**
    * LogoURI is an URL string that references a logo for the client.
    * @member {String} logo_uri

@@ -8,7 +8,10 @@ before finalizing the upgrade process.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
-- [1.0.0-alpha.1](#100-beta1)
+- [1.0.0-beta.5](#100-beta5)
+  - [OAuth 2.0 Client `id` is now `client_id`](#oauth-20-client-id-is-now-client_id)
+- [1.0.0-beta.1](#100-beta1)
+  - [Upgrading from versions v0.9.x](#upgrading-from-versions-v09x)
   - [OpenID Connect Certified](#openid-connect-certified)
   - [Breaking Changes](#breaking-changes)
     - [Introspection API](#introspection-api)
@@ -81,6 +84,37 @@ before finalizing the upgrade process.
     - [Best practice HTTP server config](#best-practice-http-server-config)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## 1.0.0-beta.5
+
+### OAuth 2.0 Client field `id` is now `client_id`
+
+The [OpenID Connect Dynamic Client Registration 1.0](https://openid.net/specs/openid-connect-registration-1_0.html) spec
+formulates that the client's ID should be sent as field `client_id`. Until now, the id was sent as field `id`. This
+release changes that. For example, what was previously
+
+```
+$ curl http://hydra/clients/my-client
+
+{
+    "id": "my-client",
+    // ...
+}
+```
+
+is now
+
+```
+$ curl http://hydra/clients/my-client
+
+{
+    "client_id": "my-client",
+    // ...
+}
+```
+
+
+The Go SDK changes the naming as well, what was previously `client.Id` is now `client.ClientId`
 
 ## 1.0.0-beta.1
 

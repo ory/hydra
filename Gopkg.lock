@@ -292,7 +292,7 @@
     "token/hmac",
     "token/jwt"
   ]
-  revision = "edc491045155abbdbc54409889d7ccc7c3999019"
+  revision = "647bfe2fdf51a929bcee862090dff014ec511a4b"
   version = "v0.20.2"
 
 [[projects]]

@@ -60,6 +60,7 @@ type Config struct {
 	DatabasePlugin                   string `mapstructure:"DATABASE_PLUGIN" yaml:"-"`
 	ConsentURL                       string `mapstructure:"OAUTH2_CONSENT_URL" yaml:"-"`
 	LoginURL                         string `mapstructure:"OAUTH2_LOGIN_URL" yaml:"-"`
+	DefaultClientScope               string `mapstructure:"OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE" yaml:"-"`
 	ErrorURL                         string `mapstructure:"OAUTH2_ERROR_URL" yaml:"-"`
 	AllowTLSTermination              string `mapstructure:"HTTPS_ALLOW_TERMINATION_FROM" yaml:"-"`
 	BCryptWorkFactor                 int    `mapstructure:"BCRYPT_COST" yaml:"-"`

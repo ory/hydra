@@ -23,6 +23,7 @@ package client
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
@@ -32,8 +33,9 @@ import (
 )
 
 type Handler struct {
-	Manager Manager
-	H       herodot.Writer
+	Manager             Manager
+	H                   herodot.Writer
+	DefaultClientScopes []string
 }
 
 const (
@@ -88,6 +90,10 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	} else if len(c.Secret) < 6 {
 		h.H.WriteError(w, r, errors.New("The client secret must be at least 6 characters long"))
 		return
+	}
+
+	if len(c.Scope) == 0 {
+		c.Scope = strings.Join(h.DefaultClientScopes, " ")
 	}
 
 	// has to be 0 because it is not supposed to be set

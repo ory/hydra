@@ -164,6 +164,9 @@ func initConfig() {
 	viper.BindEnv("LOG_FORMAT")
 	viper.SetDefault("LOG_FORMAT", "")
 
+	viper.BindEnv("OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE")
+	viper.SetDefault("OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE", "")
+
 	viper.BindEnv("RESOURCE_NAME_PREFIX")
 	viper.SetDefault("RESOURCE_NAME_PREFIX", "")
 

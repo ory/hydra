@@ -23,6 +23,7 @@ package client_test
 import (
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/julienschmidt/httprouter"
@@ -55,14 +56,27 @@ func createTestClient(prefix string) hydra.OAuth2Client {
 func TestClientSDK(t *testing.T) {
 	manager := client.NewMemoryManager(nil)
 	handler := &client.Handler{
-		Manager: manager,
-		H:       herodot.NewJSONWriter(nil),
+		Manager:             manager,
+		H:                   herodot.NewJSONWriter(nil),
+		DefaultClientScopes: []string{"foo", "bar"},
 	}
 
 	router := httprouter.New()
 	handler.SetRoutes(router)
 	server := httptest.NewServer(router)
 	c := hydra.NewOAuth2ApiWithBasePath(server.URL)
+	t.Run("case=client default scopes are set", func(t *testing.T) {
+		result, response, err := c.CreateOAuth2Client(hydra.OAuth2Client{
+			ClientId: "scoped",
+		})
+		require.NoError(t, err)
+		require.EqualValues(t, http.StatusCreated, response.StatusCode)
+		assert.EqualValues(t, handler.DefaultClientScopes, strings.Split(result.Scope, " "))
+
+		response, err = c.DeleteOAuth2Client("scoped")
+		require.NoError(t, err)
+		require.EqualValues(t, http.StatusNoContent, response.StatusCode)
+	})
 
 	t.Run("case=client is created and updated", func(t *testing.T) {
 		createClient := createTestClient("")

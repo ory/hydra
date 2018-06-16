@@ -80,7 +80,7 @@ func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 
 		result, response, err := m.CreateOAuth2Client(c)
 		checkResponse(response, err, http.StatusCreated)
-		fmt.Printf("Imported OAuth2 client %s:%s from %s.\n", result.Id, result.ClientSecret, path)
+		fmt.Printf("Imported OAuth2 client %s:%s from %s.\n", result.ClientId, result.ClientSecret, path)
 	}
 }
 
@@ -106,7 +106,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	}
 
 	cc := hydra.OAuth2Client{
-		Id:            id,
+		ClientId:      id,
 		ClientSecret:  secret,
 		ResponseTypes: responseTypes,
 		Scope:         strings.Join(allowedScopes, " "),
@@ -119,7 +119,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	result, response, err := m.CreateOAuth2Client(cc)
 	checkResponse(response, err, http.StatusCreated)
 
-	fmt.Printf("OAuth2 client id: %s\n", result.Id)
+	fmt.Printf("OAuth2 client id: %s\n", result.ClientId)
 
 	if result.ClientSecret == "" {
 		fmt.Println("This client has no secret.")

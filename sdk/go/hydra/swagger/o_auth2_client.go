@@ -12,6 +12,9 @@ package swagger
 
 type OAuth2Client struct {
 
+	// ID is the id for this client.
+	ClientId string `json:"client_id,omitempty"`
+
 	// Name is the human-readable string name of the client to be presented to the end-user during authorization.
 	ClientName string `json:"client_name,omitempty"`
 
@@ -29,9 +32,6 @@ type OAuth2Client struct {
 
 	// GrantTypes is an array of grant types the client is allowed to use.
 	GrantTypes []string `json:"grant_types,omitempty"`
-
-	// ID is the id for this client.
-	Id string `json:"id,omitempty"`
 
 	// LogoURI is an URL string that references a logo for the client.
 	LogoUri string `json:"logo_uri,omitempty"`

@@ -36,11 +36,26 @@ type Handler struct {
 	Manager             Manager
 	H                   herodot.Writer
 	DefaultClientScopes []string
+	Validator           *DynamicValidator
 }
 
 const (
 	ClientsHandlerPath = "/clients"
 )
+
+func NewHandler(
+	manager Manager,
+	h herodot.Writer,
+	defaultClientScopes []string,
+) *Handler {
+	return &Handler{
+		Manager:             manager,
+		H:                   h,
+		DefaultClientScopes: defaultClientScopes,
+		Validator:           NewDynamicValidator(),
+	}
+
+}
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET(ClientsHandlerPath, h.List)
@@ -77,6 +92,11 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
+		return
+	}
+
+	if err := h.Validator.Validate(&c); err != nil {
+		h.H.WriteError(w, r, err)
 		return
 	}
 
@@ -140,6 +160,11 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
+		return
+	}
+
+	if err := h.Validator.Validate(&c); err != nil {
+		h.H.WriteError(w, r, err)
 		return
 	}
 

@@ -18,7 +18,7 @@ type WellKnown struct {
 	// JSON array containing a list of the Claim Names of the Claims that the OpenID Provider MAY be able to supply values for. Note that for privacy or other reasons, this might not be an exhaustive list.
 	ClaimsSupported []string `json:"claims_supported,omitempty"`
 
-	// JSON array containing a list of the OAuth 2.0 response_mode values that this OP supports.
+	// JSON array containing a list of the OAuth 2.0 Grant Type values that this OP supports.
 	GrantTypesSupported []string `json:"grant_types_supported,omitempty"`
 
 	// JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token to encode the Claims in a JWT.
@@ -32,6 +32,9 @@ type WellKnown struct {
 
 	// URL of the OP's Dynamic Client Registration Endpoint.
 	RegistrationEndpoint string `json:"registration_endpoint,omitempty"`
+
+	// JSON array containing a list of the OAuth 2.0 response_mode values that this OP supports.
+	ResponseModesSupported []string `json:"response_modes_supported,omitempty"`
 
 	// JSON array containing a list of the OAuth 2.0 response_type values that this OP supports. Dynamic OpenID Providers MUST support the code, id_token, and the token id_token Response Type values.
 	ResponseTypesSupported []string `json:"response_types_supported"`

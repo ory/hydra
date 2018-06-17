@@ -88,10 +88,25 @@ before finalizing the upgrade process.
 
 ## 1.0.0-beta.5
 
+This patch implements the OpenID Connect Dynamic Client registration specification and thus now supports client authentication
+via JSON Web Tokens signed with RSA public/private keypairs, alongside HTTP Basic Authorization and sending the client's
+ID and secret in the POST body.
+
+For more information on this, please refer to the [specification](http://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication).
+
 ### Schema Changes
 
 This patch introduces some minor database schema changes. Before you apply it, you must run `hydra migrate sql` against
 your database.
+
+### OAuth 2.0 Clients must specify correct `token_endpoint_auth_method`
+
+With support for the OpenID Connect Dynamic Discovery specification, a new field has been added to the OAuth 2.0 Client's
+metadata which is `token_endpoint_auth_method`. The `token_endpoint_auth_method` specifies which authentication methods
+the client can use at the token, introspection, and revocation endpoint.
+
+The default value for this method is `client_secret_basic` which uses the Basic HTTP Authorization scheme. If your client
+uses the POST body to perform authentication, this value must be changed to `client_secret_post`
 
 ### OAuth 2.0 Client field `id` is now `client_id`
 

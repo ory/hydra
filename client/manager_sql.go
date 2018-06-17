@@ -23,6 +23,7 @@ package client
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -33,6 +34,7 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
+	"gopkg.in/square/go-jose.v2"
 )
 
 var migrations = &migrate.MemoryMigrationSource{
@@ -72,9 +74,17 @@ var migrations = &migrate.MemoryMigrationSource{
 			Id: "3",
 			Up: []string{
 				`ALTER TABLE hydra_client ADD sector_identifier_uri TEXT NOT NULL`,
+				`ALTER TABLE hydra_client ADD jwks TEXT NOT NULL`,
+				`ALTER TABLE hydra_client ADD jwks_uri TEXT NOT NULL`,
+				`ALTER TABLE hydra_client ADD token_endpoint_auth_method TEXT NOT NULL`,
+				`ALTER TABLE hydra_client ADD request_uris TEXT NOT NULL`,
 			},
 			Down: []string{
 				`ALTER TABLE hydra_client DROP COLUMN sector_identifier_uri`,
+				`ALTER TABLE hydra_client DROP COLUMN jwks`,
+				`ALTER TABLE hydra_client DROP COLUMN jwks_uri`,
+				`ALTER TABLE hydra_client DROP COLUMN token_endpoint_auth_method`,
+				`ALTER TABLE hydra_client DROP COLUMN request_uris`,
 			},
 		},
 	},
@@ -86,22 +96,26 @@ type SQLManager struct {
 }
 
 type sqlData struct {
-	ID                  string `db:"id"`
-	Name                string `db:"client_name"`
-	Secret              string `db:"client_secret"`
-	RedirectURIs        string `db:"redirect_uris"`
-	GrantTypes          string `db:"grant_types"`
-	ResponseTypes       string `db:"response_types"`
-	Scope               string `db:"scope"`
-	Owner               string `db:"owner"`
-	PolicyURI           string `db:"policy_uri"`
-	TermsOfServiceURI   string `db:"tos_uri"`
-	ClientURI           string `db:"client_uri"`
-	LogoURI             string `db:"logo_uri"`
-	Contacts            string `db:"contacts"`
-	Public              bool   `db:"public"`
-	SecretExpiresAt     int    `db:"client_secret_expires_at"`
-	SectorIdentifierURI string `db:"sector_identifier_uri"`
+	ID                      string `db:"id"`
+	Name                    string `db:"client_name"`
+	Secret                  string `db:"client_secret"`
+	RedirectURIs            string `db:"redirect_uris"`
+	GrantTypes              string `db:"grant_types"`
+	ResponseTypes           string `db:"response_types"`
+	Scope                   string `db:"scope"`
+	Owner                   string `db:"owner"`
+	PolicyURI               string `db:"policy_uri"`
+	TermsOfServiceURI       string `db:"tos_uri"`
+	ClientURI               string `db:"client_uri"`
+	LogoURI                 string `db:"logo_uri"`
+	Contacts                string `db:"contacts"`
+	Public                  bool   `db:"public"`
+	SecretExpiresAt         int    `db:"client_secret_expires_at"`
+	SectorIdentifierURI     string `db:"sector_identifier_uri"`
+	JSONWebKeysURI          string `json:"jwks_uri"`
+	JSONWebKeys             string `json:"jwks"`
+	TokenEndpointAuthMethod string `json:"token_endpoint_auth_method"`
+	RequestURIs             string `json:"request_uris"`
 }
 
 var sqlParams = []string{
@@ -121,48 +135,78 @@ var sqlParams = []string{
 	"public",
 	"client_secret_expires_at",
 	"sector_identifier_uri",
+	"jwks",
+	"jwks_uri",
+	"token_endpoint_auth_method",
+	"request_uris",
 }
 
-func sqlDataFromClient(d *Client) *sqlData {
+func sqlDataFromClient(d *Client) (*sqlData, error) {
+	jwks := ""
+
+	if d.JSONWebKeys != nil {
+		out, err := json.Marshal(d.JSONWebKeys)
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+		jwks = string(out)
+	}
+
 	return &sqlData{
-		ID:                  d.ID,
-		Name:                d.Name,
-		Secret:              d.Secret,
-		RedirectURIs:        strings.Join(d.RedirectURIs, "|"),
-		GrantTypes:          strings.Join(d.GrantTypes, "|"),
-		ResponseTypes:       strings.Join(d.ResponseTypes, "|"),
-		Scope:               d.Scope,
-		Owner:               d.Owner,
-		PolicyURI:           d.PolicyURI,
-		TermsOfServiceURI:   d.TermsOfServiceURI,
-		ClientURI:           d.ClientURI,
-		LogoURI:             d.LogoURI,
-		Contacts:            strings.Join(d.Contacts, "|"),
-		Public:              d.Public,
-		SecretExpiresAt:     d.SecretExpiresAt,
-		SectorIdentifierURI: d.SectorIdentifierURI,
-	}
+		ID:                      d.ID,
+		Name:                    d.Name,
+		Secret:                  d.Secret,
+		RedirectURIs:            strings.Join(d.RedirectURIs, "|"),
+		GrantTypes:              strings.Join(d.GrantTypes, "|"),
+		ResponseTypes:           strings.Join(d.ResponseTypes, "|"),
+		Scope:                   d.Scope,
+		Owner:                   d.Owner,
+		PolicyURI:               d.PolicyURI,
+		TermsOfServiceURI:       d.TermsOfServiceURI,
+		ClientURI:               d.ClientURI,
+		LogoURI:                 d.LogoURI,
+		Contacts:                strings.Join(d.Contacts, "|"),
+		Public:                  d.Public,
+		SecretExpiresAt:         d.SecretExpiresAt,
+		SectorIdentifierURI:     d.SectorIdentifierURI,
+		JSONWebKeysURI:          d.JSONWebKeysURI,
+		JSONWebKeys:             jwks,
+		TokenEndpointAuthMethod: d.TokenEndpointAuthMethod,
+		RequestURIs:             strings.Join(d.RequestURIs, "|"),
+	}, nil
 }
 
-func (d *sqlData) ToClient() *Client {
-	return &Client{
-		ID:                  d.ID,
-		Name:                d.Name,
-		Secret:              d.Secret,
-		RedirectURIs:        stringsx.Splitx(d.RedirectURIs, "|"),
-		GrantTypes:          stringsx.Splitx(d.GrantTypes, "|"),
-		ResponseTypes:       stringsx.Splitx(d.ResponseTypes, "|"),
-		Scope:               d.Scope,
-		Owner:               d.Owner,
-		PolicyURI:           d.PolicyURI,
-		TermsOfServiceURI:   d.TermsOfServiceURI,
-		ClientURI:           d.ClientURI,
-		LogoURI:             d.LogoURI,
-		Contacts:            stringsx.Splitx(d.Contacts, "|"),
-		Public:              d.Public,
-		SecretExpiresAt:     d.SecretExpiresAt,
-		SectorIdentifierURI: d.SectorIdentifierURI,
+func (d *sqlData) ToClient() (*Client, error) {
+	c := &Client{
+		ID:                      d.ID,
+		Name:                    d.Name,
+		Secret:                  d.Secret,
+		RedirectURIs:            stringsx.Splitx(d.RedirectURIs, "|"),
+		GrantTypes:              stringsx.Splitx(d.GrantTypes, "|"),
+		ResponseTypes:           stringsx.Splitx(d.ResponseTypes, "|"),
+		Scope:                   d.Scope,
+		Owner:                   d.Owner,
+		PolicyURI:               d.PolicyURI,
+		TermsOfServiceURI:       d.TermsOfServiceURI,
+		ClientURI:               d.ClientURI,
+		LogoURI:                 d.LogoURI,
+		Contacts:                stringsx.Splitx(d.Contacts, "|"),
+		Public:                  d.Public,
+		SecretExpiresAt:         d.SecretExpiresAt,
+		SectorIdentifierURI:     d.SectorIdentifierURI,
+		JSONWebKeysURI:          d.JSONWebKeysURI,
+		TokenEndpointAuthMethod: d.TokenEndpointAuthMethod,
+		RequestURIs:             stringsx.Splitx(d.RequestURIs, "|"),
 	}
+
+	if d.JSONWebKeys != "" {
+		c.JSONWebKeys = new(jose.JSONWebKeySet)
+		if err := json.Unmarshal([]byte(d.JSONWebKeys), &c.JSONWebKeys); err != nil {
+			return nil, errors.WithStack(err)
+		}
+	}
+
+	return c, nil
 }
 
 func (s *SQLManager) CreateSchemas() (int, error) {
@@ -182,7 +226,7 @@ func (m *SQLManager) GetConcreteClient(id string) (*Client, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	return d.ToClient(), nil
+	return d.ToClient()
 }
 
 func (m *SQLManager) GetClient(_ context.Context, id string) (fosite.Client, error) {
@@ -205,7 +249,11 @@ func (m *SQLManager) UpdateClient(c *Client) error {
 		c.Secret = string(h)
 	}
 
-	s := sqlDataFromClient(c)
+	s, err := sqlDataFromClient(c)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
 	var query []string
 	for _, param := range sqlParams {
 		query = append(query, fmt.Sprintf("%s=:%s", param, param))
@@ -241,7 +289,11 @@ func (m *SQLManager) CreateClient(c *Client) error {
 	}
 	c.Secret = string(h)
 
-	data := sqlDataFromClient(c)
+	data, err := sqlDataFromClient(c)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
 	if _, err := m.DB.NamedExec(fmt.Sprintf(
 		"INSERT INTO hydra_client (%s) VALUES (%s)",
 		strings.Join(sqlParams, ", "),
@@ -269,7 +321,12 @@ func (m *SQLManager) GetClients(limit, offset int) (clients map[string]Client, e
 	}
 
 	for _, k := range d {
-		clients[k.ID] = *k.ToClient()
+		c, err := k.ToClient()
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+
+		clients[k.ID] = *c
 	}
 	return clients, nil
 }

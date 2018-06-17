@@ -27,6 +27,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var _ fosite.OpenIDConnectClient = new(Client)
+var _ fosite.Client = new(Client)
+
 func TestClient(t *testing.T) {
 	c := &Client{
 		ID:           "foo",

@@ -23,6 +23,7 @@ package server
 import (
 	"fmt"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/gorilla/sessions"
@@ -87,6 +88,7 @@ func newOAuth2Provider(c *config.Config) (fosite.OAuth2Provider, string) {
 		SendDebugMessagesToClients:     c.SendOAuth2DebugMessagesToClients,
 		EnforcePKCE:                    false,
 		EnablePKCEPlainChallengeMethod: false,
+		TokenURL:                       strings.TrimRight(c.Issuer, "/") + oauth2.TokenPath,
 	}
 
 	jwtStrategy := compose.NewOpenIDConnectStrategy(jwk.MustRSAPrivate(privateKey))

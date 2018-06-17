@@ -156,7 +156,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		ClaimsSupported:                   []string{"sub"},
 		ScopesSupported:                   []string{"offline", "openid"},
 		UserinfoEndpoint:                  strings.TrimRight(h.IssuerURL, "/") + oauth2.UserinfoPath,
-		TokenEndpointAuthMethodsSupported: []string{"client_secret_post", "client_secret_basic"},
+		TokenEndpointAuthMethodsSupported: []string{"client_secret_post", "client_secret_basic", "private_key_jwt", "none"},
 		GrantTypesSupported:               []string{"authorization_code", "implicit", "client_credentials"},
 		ResponseModesSupported:            []string{"query", "fragment"},
 		IDTokenSigningAlgValuesSupported:  []string{"RS256"},

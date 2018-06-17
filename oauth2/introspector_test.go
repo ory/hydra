@@ -44,7 +44,7 @@ import (
 func TestIntrospectorSDK(t *testing.T) {
 	tokens := pkg.Tokens(3)
 	memoryStore := storage.NewExampleStore()
-	memoryStore.Clients["my-client"].Scopes = []string{"fosite", "openid", "photos", "offline", "foo.*"}
+	memoryStore.Clients["my-client"].(*fosite.DefaultClient).Scopes = []string{"fosite", "openid", "photos", "offline", "foo.*"}
 
 	l := logrus.New()
 	l.Level = logrus.DebugLevel

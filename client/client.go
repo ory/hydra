@@ -24,6 +24,7 @@ import (
 	"strings"
 
 	"github.com/ory/fosite"
+	"gopkg.in/square/go-jose.v2"
 )
 
 // Client represents an OAuth 2.0 Client.
@@ -101,7 +102,36 @@ type Client struct {
 
 	// URL using the https scheme to be used in calculating Pseudonymous Identifiers by the OP. The URL references a
 	// file with a single JSON array of redirect_uri values.
-	SectorIdentifierURI string `json:"sector_identifier_uri"`
+	SectorIdentifierURI string `json:"sector_identifier_uri,omitempty"`
+
+	// URL for the Client's JSON Web Key Set [JWK] document. If the Client signs requests to the Server, it contains
+	// the signing key(s) the Server uses to validate signatures from the Client. The JWK Set MAY also contain the
+	// Client's encryption keys(s), which are used by the Server to encrypt responses to the Client. When both signing
+	// and encryption keys are made available, a use (Key Use) parameter value is REQUIRED for all keys in the referenced
+	// JWK Set to indicate each key's intended usage. Although some algorithms allow the same key to be used for both
+	// signatures and encryption, doing so is NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used
+	// to provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST
+	// match those in the certificate.
+	JSONWebKeysURI string `json:"jwks_uri,omitempty"`
+
+	// Client's JSON Web Key Set [JWK] document, passed by value. The semantics of the jwks parameter are the same as
+	// the jwks_uri parameter, other than that the JWK Set is passed by value, rather than by reference. This parameter
+	// is intended only to be used by Clients that, for some reason, are unable to use the jwks_uri parameter, for
+	// instance, by native applications that might not have a location to host the contents of the JWK Set. If a Client
+	// can use jwks_uri, it MUST NOT use jwks. One significant downside of jwks is that it does not enable key rotation
+	// (which jwks_uri does, as described in Section 10 of OpenID Connect Core 1.0 [OpenID.Core]). The jwks_uri and jwks
+	// parameters MUST NOT be used together.
+	JSONWebKeys *jose.JSONWebKeySet `json:"jwks,omitempty"`
+
+	// Requested Client Authentication method for the Token Endpoint. The options are client_secret_post,
+	// client_secret_basic, client_secret_jwt, private_key_jwt, and none.
+	TokenEndpointAuthMethod string `json:"token_endpoint_auth_method,omitempty"`
+
+	// Array of request_uri values that are pre-registered by the RP for use at the OP. Servers MAY cache the
+	// contents of the files referenced by these URIs and not retrieve them at the time they are used in a request.
+	// OPs can require that request_uri values used be pre-registered with the require_request_uri_registration
+	// discovery parameter.
+	RequestURIs []string `json:"request_uris,omitempty"`
 }
 
 func (c *Client) GetID() string {
@@ -150,4 +180,31 @@ func (c *Client) GetOwner() string {
 
 func (c *Client) IsPublic() bool {
 	return c.Public
+}
+
+func (c *Client) GetJSONWebKeysURI() string {
+	return c.JSONWebKeysURI
+}
+
+func (c *Client) GetJSONWebKeys() *jose.JSONWebKeySet {
+	return c.JSONWebKeys
+}
+
+func (c *Client) GetTokenEndpointAuthSigningAlgorithm() string {
+	return "RS256"
+}
+
+func (c *Client) GetRequestObjectSigningAlgorithm() string {
+	return "RS256"
+}
+
+func (c *Client) GetTokenEndpointAuthMethod() string {
+	if c.TokenEndpointAuthMethod == "" {
+		return "client_secret_basic"
+	}
+	return c.TokenEndpointAuthMethod
+}
+
+func (c *Client) GetRequestURIs() []string {
+	return c.RequestURIs
 }

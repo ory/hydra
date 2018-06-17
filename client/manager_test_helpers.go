@@ -26,6 +26,7 @@ import (
 	"github.com/ory/fosite"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/square/go-jose.v2"
 )
 
 func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
@@ -67,13 +68,17 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 		assert.NotNil(t, err)
 
 		c := &Client{
-			ID:                  "1234",
-			Name:                "name",
-			Secret:              "secret",
-			RedirectURIs:        []string{"http://redirect"},
-			TermsOfServiceURI:   "foo",
-			SecretExpiresAt:     0,
-			SectorIdentifierURI: "https://sector",
+			ID:                      "1234",
+			Name:                    "name",
+			Secret:                  "secret",
+			RedirectURIs:            []string{"http://redirect"},
+			TermsOfServiceURI:       "foo",
+			SecretExpiresAt:         0,
+			SectorIdentifierURI:     "https://sector",
+			JSONWebKeysURI:          "https://...",
+			JSONWebKeys:             &jose.JSONWebKeySet{},
+			TokenEndpointAuthMethod: "none",
+			RequestURIs:             []string{"foo"},
 		}
 
 		assert.NoError(t, m.CreateClient(c))

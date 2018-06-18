@@ -210,6 +210,9 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ htt
 		IDTokenSigningAlgValuesSupported:  []string{"RS256"},
 		GrantTypesSupported:               []string{"authorization_code", "implicit", "client_credentials"},
 		ResponseModesSupported:            []string{"query", "fragment"},
+		RequestParameterSupported:         true,
+		RequestURIParameterSupported:      true,
+		RequireRequestURIRegistration:     true,
 	})
 }
 

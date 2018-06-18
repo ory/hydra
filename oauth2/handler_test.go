@@ -160,6 +160,9 @@ func TestHandlerWellKnown(t *testing.T) {
 		GrantTypesSupported:               []string{"authorization_code", "implicit", "client_credentials"},
 		ResponseModesSupported:            []string{"query", "fragment"},
 		IDTokenSigningAlgValuesSupported:  []string{"RS256"},
+		RequestParameterSupported:         true,
+		RequestURIParameterSupported:      true,
+		RequireRequestURIRegistration:     true,
 	}
 	var wellKnownResp oauth2.WellKnown
 	err = json.NewDecoder(res.Body).Decode(&wellKnownResp)

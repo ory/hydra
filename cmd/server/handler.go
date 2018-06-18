@@ -57,6 +57,7 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		logger := c.GetLogger()
 		h := herodot.NewJSONWriter(logger)
 		h.WrapError = false
+		h.ToRichError = false
 		serverHandler := &Handler{
 			Config: c,
 			H:      h,

@@ -59,6 +59,7 @@ func newJWKHandler(c *config.Config, router *httprouter.Router) *jwk.Handler {
 	ctx := c.Context()
 	w := herodot.NewJSONWriter(c.GetLogger())
 	w.WrapError = false
+	w.ToRichError = false
 	h := &jwk.Handler{
 		H:       w,
 		Manager: ctx.KeyManager,

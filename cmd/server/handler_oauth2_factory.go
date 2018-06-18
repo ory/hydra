@@ -148,6 +148,7 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm consent.Ma
 
 	w := herodot.NewJSONWriter(c.GetLogger())
 	w.WrapError = false
+	w.ToRichError = false
 	handler := &oauth2.Handler{
 		ScopesSupported:  c.OpenIDDiscoveryScopesSupported,
 		UserinfoEndpoint: c.OpenIDDiscoveryUserinfoEndpoint,

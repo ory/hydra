@@ -53,8 +53,8 @@ func newHealthHandler(c *config.Config, router *httprouter.Router) *health.Handl
 	}
 
 	w := herodot.NewJSONWriter(c.GetLogger())
-	w.WrapError = false
-	w.ToRichError = false
+	w.ErrorEnhancer = writerErrorEnhancer
+
 	h := &health.Handler{
 		H:             w,
 		VersionString: c.BuildVersion,

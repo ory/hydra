@@ -55,12 +55,12 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 
 		router := httprouter.New()
 		logger := c.GetLogger()
-		h := herodot.NewJSONWriter(logger)
-		h.WrapError = false
-		h.ToRichError = false
+		w := herodot.NewJSONWriter(logger)
+		w.ErrorEnhancer = nil
+
 		serverHandler := &Handler{
 			Config: c,
-			H:      h,
+			H:      w,
 		}
 		serverHandler.registerRoutes(router)
 		c.ForceHTTP, _ = cmd.Flags().GetBool("dangerous-force-http")

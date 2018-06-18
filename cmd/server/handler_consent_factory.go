@@ -60,8 +60,8 @@ func newConsentHandler(c *config.Config, router *httprouter.Router) *consent.Han
 	var ctx = c.Context()
 
 	w := herodot.NewJSONWriter(c.GetLogger())
-	w.WrapError = false
-	w.ToRichError = false
+	w.ErrorEnhancer = writerErrorEnhancer
+
 	h := &consent.Handler{
 		H: w,
 		M: ctx.ConsentManager,

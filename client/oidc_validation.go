@@ -68,7 +68,7 @@ func (v *DynamicValidator) validateSectorIdentifierURL(location string, redirect
 		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Value sector_identifier_uri must be an HTTPS URL but it is not."))
 	}
 
-	response, err := v.c.Get(location)client: Disallow fragments in client's redirect uri
+	response, err := v.c.Get(location)
 	if err != nil {
 		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug(fmt.Sprintf("Unable to connect to URL set by sector_identifier_uri: %s", err)))
 	}

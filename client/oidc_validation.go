@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/ory/fosite"
 	"github.com/ory/go-convenience/stringslice"
@@ -48,20 +49,26 @@ func (v *DynamicValidator) Validate(c *Client) error {
 		}
 	}
 
+	for _, r := range c.RedirectURIs {
+		if strings.Contains(r, "#") {
+			return errors.WithStack(fosite.ErrInvalidRequest.WithHint("Redirect URIs must not contain fragments (#)"))
+		}
+	}
+
 	return nil
 }
 
 func (v *DynamicValidator) validateSectorIdentifierURL(location string, redirectURIs []string) error {
 	l, err := url.Parse(location)
 	if err != nil {
-		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug(fmt.Sprintf("Value of sector_identifier_uri could not be parsed: %s", err)))
+		return errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf("Value of sector_identifier_uri could not be parsed: %s", err)))
 	}
 
 	if l.Scheme != "https" {
 		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Value sector_identifier_uri must be an HTTPS URL but it is not."))
 	}
 
-	response, err := v.c.Get(location)
+	response, err := v.c.Get(location)client: Disallow fragments in client's redirect uri
 	if err != nil {
 		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug(fmt.Sprintf("Unable to connect to URL set by sector_identifier_uri: %s", err)))
 	}

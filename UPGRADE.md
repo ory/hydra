@@ -10,6 +10,8 @@ before finalizing the upgrade process.
 
 - [1.0.0-beta.5](#100-beta5)
   - [Schema Changes](#schema-changes)
+  - [HTTP Error Payload](#http-error-payload)
+  - [OAuth 2.0 Clients must specify correct `token_endpoint_auth_method`](#oauth-20-clients-must-specify-correct-token_endpoint_auth_method)
   - [OAuth 2.0 Client field `id` is now `client_id`](#oauth-20-client-field-id-is-now-client_id)
 - [1.0.0-beta.1](#100-beta1)
   - [Upgrading from versions v0.9.x](#upgrading-from-versions-v09x)
@@ -98,6 +100,37 @@ For more information on this, please refer to the [specification](http://openid.
 
 This patch introduces some minor database schema changes. Before you apply it, you must run `hydra migrate sql` against
 your database.
+
+### HTTP Error Payload
+
+Previously, errors have been returned as nested objects:
+
+```json
+{
+    "error": {
+        "error": "invalid_request"
+        // ...
+    }
+}
+```
+
+while other endpoints, specifically those under OAuth 2.0 / OpenID Connect returned them without nesting:
+
+```json
+{
+    "error": "invalid_request"
+    // ...
+}
+```
+
+This patch updates all error responses and formats them coherently as across all APIs:
+
+```json
+{
+    "error": "invalid_request"
+    // ...
+}
+```
 
 ### OAuth 2.0 Clients must specify correct `token_endpoint_auth_method`
 

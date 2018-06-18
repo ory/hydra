@@ -52,8 +52,10 @@ func newHealthHandler(c *config.Config, router *httprouter.Router) *health.Handl
 		panic("Unknown connection type.")
 	}
 
+	w := herodot.NewJSONWriter(c.GetLogger())
+	w.WrapError = false
 	h := &health.Handler{
-		H:             herodot.NewJSONWriter(c.GetLogger()),
+		H:             w,
 		VersionString: c.BuildVersion,
 		ReadyChecks: map[string]health.ReadyChecker{
 			"database": rc,

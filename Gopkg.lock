@@ -316,7 +316,7 @@
 [[projects]]
   name = "github.com/ory/herodot"
   packages = ["."]
-  revision = "809d81bb89b684063f794913e1fe3635f0b20222"
+  revision = "8752bb4e07ae341dd5e1e6183b80e76408991991"
   version = "v0.2.2"
 
 [[projects]]

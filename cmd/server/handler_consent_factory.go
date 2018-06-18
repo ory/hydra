@@ -58,8 +58,11 @@ func injectConsentManager(c *config.Config, cm client.Manager) {
 
 func newConsentHandler(c *config.Config, router *httprouter.Router) *consent.Handler {
 	var ctx = c.Context()
+
+	w := herodot.NewJSONWriter(c.GetLogger())
+	w.WrapError = false
 	h := &consent.Handler{
-		H: herodot.NewJSONWriter(c.GetLogger()),
+		H: w,
 		M: ctx.ConsentManager,
 	}
 

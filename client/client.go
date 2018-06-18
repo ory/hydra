@@ -132,6 +132,10 @@ type Client struct {
 	// OPs can require that request_uri values used be pre-registered with the require_request_uri_registration
 	// discovery parameter.
 	RequestURIs []string `json:"request_uris,omitempty"`
+
+	// JWS [JWS] alg algorithm [JWA] that MUST be used for signing Request Objects sent to the OP. All Request Objects
+	// from this Client MUST be rejected, if not signed with this algorithm.
+	RequestObjectSigningAlgorithm string `json:"request_object_signing_alg,omitempty"`
 }
 
 func (c *Client) GetID() string {
@@ -195,7 +199,10 @@ func (c *Client) GetTokenEndpointAuthSigningAlgorithm() string {
 }
 
 func (c *Client) GetRequestObjectSigningAlgorithm() string {
-	return "RS256"
+	if c.RequestObjectSigningAlgorithm == "" {
+		return "RS256"
+	}
+	return c.RequestObjectSigningAlgorithm
 }
 
 func (c *Client) GetTokenEndpointAuthMethod() string {

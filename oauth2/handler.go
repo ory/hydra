@@ -208,7 +208,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ htt
 		UserinfoEndpoint:                  userInfoEndpoint,
 		TokenEndpointAuthMethodsSupported: []string{"client_secret_post", "client_secret_basic", "private_key_jwt", "none"},
 		IDTokenSigningAlgValuesSupported:  []string{"RS256"},
-		GrantTypesSupported:               []string{"authorization_code", "implicit", "client_credentials"},
+		GrantTypesSupported:               []string{"authorization_code", "implicit", "client_credentials", "refresh_token"},
 		ResponseModesSupported:            []string{"query", "fragment"},
 		RequestParameterSupported:         true,
 		RequestURIParameterSupported:      true,

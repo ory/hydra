@@ -29,9 +29,9 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
 	. "github.com/ory/hydra/jwk"
-	"github.com/square/go-jose"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/square/go-jose.v2"
 )
 
 var testServer *httptest.Server
@@ -39,7 +39,7 @@ var IDKS *jose.JSONWebKeySet
 
 func init() {
 	router := httprouter.New()
-	IDKS, _ = testGenerator.Generate("test-id")
+	IDKS, _ = testGenerator.Generate("test-id", "sig")
 
 	h := Handler{
 		Manager: &MemoryManager{},

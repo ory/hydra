@@ -55,7 +55,8 @@ class JsonWebKeySetGeneratorRequest implements ArrayAccess
       */
     protected static $swaggerTypes = [
         'alg' => 'string',
-        'kid' => 'string'
+        'kid' => 'string',
+        'use' => 'string'
     ];
 
     /**
@@ -64,7 +65,8 @@ class JsonWebKeySetGeneratorRequest implements ArrayAccess
       */
     protected static $swaggerFormats = [
         'alg' => null,
-        'kid' => null
+        'kid' => null,
+        'use' => null
     ];
 
     public static function swaggerTypes()
@@ -83,7 +85,8 @@ class JsonWebKeySetGeneratorRequest implements ArrayAccess
      */
     protected static $attributeMap = [
         'alg' => 'alg',
-        'kid' => 'kid'
+        'kid' => 'kid',
+        'use' => 'use'
     ];
 
 
@@ -93,7 +96,8 @@ class JsonWebKeySetGeneratorRequest implements ArrayAccess
      */
     protected static $setters = [
         'alg' => 'setAlg',
-        'kid' => 'setKid'
+        'kid' => 'setKid',
+        'use' => 'setUse'
     ];
 
 
@@ -103,7 +107,8 @@ class JsonWebKeySetGeneratorRequest implements ArrayAccess
      */
     protected static $getters = [
         'alg' => 'getAlg',
-        'kid' => 'getKid'
+        'kid' => 'getKid',
+        'use' => 'getUse'
     ];
 
     public static function attributeMap()
@@ -139,6 +144,7 @@ class JsonWebKeySetGeneratorRequest implements ArrayAccess
     {
         $this->container['alg'] = isset($data['alg']) ? $data['alg'] : null;
         $this->container['kid'] = isset($data['kid']) ? $data['kid'] : null;
+        $this->container['use'] = isset($data['use']) ? $data['use'] : null;
     }
 
     /**
@@ -156,6 +162,9 @@ class JsonWebKeySetGeneratorRequest implements ArrayAccess
         if ($this->container['kid'] === null) {
             $invalid_properties[] = "'kid' can't be null";
         }
+        if ($this->container['use'] === null) {
+            $invalid_properties[] = "'use' can't be null";
+        }
         return $invalid_properties;
     }
 
@@ -172,6 +181,9 @@ class JsonWebKeySetGeneratorRequest implements ArrayAccess
             return false;
         }
         if ($this->container['kid'] === null) {
+            return false;
+        }
+        if ($this->container['use'] === null) {
             return false;
         }
         return true;
@@ -216,6 +228,27 @@ class JsonWebKeySetGeneratorRequest implements ArrayAccess
     public function setKid($kid)
     {
         $this->container['kid'] = $kid;
+
+        return $this;
+    }
+
+    /**
+     * Gets use
+     * @return string
+     */
+    public function getUse()
+    {
+        return $this->container['use'];
+    }
+
+    /**
+     * Sets use
+     * @param string $use The \"use\" (public key use) parameter identifies the intended use of the public key. The \"use\" parameter is employed to indicate whether a public key is used for encrypting data or verifying the signature on data. Valid values are \"enc\" and \"sig\".
+     * @return $this
+     */
+    public function setUse($use)
+    {
+        $this->container['use'] = $use;
 
         return $this;
     }

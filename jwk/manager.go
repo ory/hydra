@@ -20,7 +20,7 @@
 
 package jwk
 
-import "github.com/square/go-jose"
+import "gopkg.in/square/go-jose.v2"
 
 type Manager interface {
 	AddKey(set string, key *jose.JSONWebKey) error

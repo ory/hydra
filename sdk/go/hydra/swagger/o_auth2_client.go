@@ -12,7 +12,7 @@ package swagger
 
 type OAuth2Client struct {
 
-	// ID is the id for this client.
+	// ClientID  is the id for this client.
 	ClientId string `json:"client_id,omitempty"`
 
 	// Name is the human-readable string name of the client to be presented to the end-user during authorization.
@@ -33,6 +33,14 @@ type OAuth2Client struct {
 	// GrantTypes is an array of grant types the client is allowed to use.
 	GrantTypes []string `json:"grant_types,omitempty"`
 
+	// ID is an alisa for client_id.
+	Id string `json:"id,omitempty"`
+
+	Jwks JsonWebKeySet `json:"jwks,omitempty"`
+
+	// URL for the Client's JSON Web Key Set [JWK] document. If the Client signs requests to the Server, it contains the signing key(s) the Server uses to validate signatures from the Client. The JWK Set MAY also contain the Client's encryption keys(s), which are used by the Server to encrypt responses to the Client. When both signing and encryption keys are made available, a use (Key Use) parameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key's intended usage. Although some algorithms allow the same key to be used for both signatures and encryption, doing so is NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate.
+	JwksUri string `json:"jwks_uri,omitempty"`
+
 	// LogoURI is an URL string that references a logo for the client.
 	LogoUri string `json:"logo_uri,omitempty"`
 
@@ -48,6 +56,12 @@ type OAuth2Client struct {
 	// RedirectURIs is an array of allowed redirect urls for the client, for example http://mydomain/oauth/callback .
 	RedirectUris []string `json:"redirect_uris,omitempty"`
 
+	// JWS [JWS] alg algorithm [JWA] that MUST be used for signing Request Objects sent to the OP. All Request Objects from this Client MUST be rejected, if not signed with this algorithm.
+	RequestObjectSigningAlg string `json:"request_object_signing_alg,omitempty"`
+
+	// Array of request_uri values that are pre-registered by the RP for use at the OP. Servers MAY cache the contents of the files referenced by these URIs and not retrieve them at the time they are used in a request. OPs can require that request_uri values used be pre-registered with the require_request_uri_registration discovery parameter.
+	RequestUris []string `json:"request_uris,omitempty"`
+
 	// ResponseTypes is an array of the OAuth 2.0 response type strings that the client can use at the authorization endpoint.
 	ResponseTypes []string `json:"response_types,omitempty"`
 
@@ -56,6 +70,9 @@ type OAuth2Client struct {
 
 	// URL using the https scheme to be used in calculating Pseudonymous Identifiers by the OP. The URL references a file with a single JSON array of redirect_uri values.
 	SectorIdentifierUri string `json:"sector_identifier_uri,omitempty"`
+
+	// Requested Client Authentication method for the Token Endpoint. The options are client_secret_post, client_secret_basic, client_secret_jwt, private_key_jwt, and none.
+	TokenEndpointAuthMethod string `json:"token_endpoint_auth_method,omitempty"`
 
 	// TermsOfServiceURI is a URL string that points to a human-readable terms of service document for the client that describes a contractual relationship between the end-user and the client that the end-user accepts when authorizing the client.
 	TosUri string `json:"tos_uri,omitempty"`

@@ -30,6 +30,7 @@ import (
 	_ "github.com/lib/pq"
 	. "github.com/ory/hydra/jwk"
 	"github.com/ory/sqlcon/dockertest"
+	"github.com/stretchr/testify/require"
 )
 
 var managers = map[string]Manager{
@@ -84,7 +85,8 @@ func connectToMySQL() {
 }
 
 func TestManagerKey(t *testing.T) {
-	ks, _ := testGenerator.Generate("TestManagerKey")
+	ks, err := testGenerator.Generate("TestManagerKey", "sig")
+	require.NoError(t, err)
 
 	for name, m := range managers {
 		t.Run(fmt.Sprintf("case=%s", name), TestHelperManagerKey(m, ks, "TestManagerKey"))
@@ -92,7 +94,8 @@ func TestManagerKey(t *testing.T) {
 }
 
 func TestManagerKeySet(t *testing.T) {
-	ks, _ := testGenerator.Generate("TestManagerKeySet")
+	ks, err := testGenerator.Generate("TestManagerKeySet", "sig")
+	require.NoError(t, err)
 	ks.Key("private")
 
 	for name, m := range managers {

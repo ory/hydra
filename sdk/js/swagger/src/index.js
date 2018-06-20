@@ -21,28 +21,40 @@
       'ApiClient',
       'model/AcceptConsentRequest',
       'model/AcceptLoginRequest',
+      'model/AttributeTypeAndValue',
       'model/AuthenticationSession',
+      'model/Certificate',
       'model/CompletedRequest',
       'model/ConsentRequest',
       'model/ConsentRequestSession',
+      'model/ExtKeyUsage',
+      'model/Extension',
       'model/FlushInactiveOAuth2TokensRequest',
-      'model/Handler',
       'model/HealthNotReadyStatus',
       'model/HealthStatus',
+      'model/IP',
+      'model/IPMask',
+      'model/IPNet',
       'model/InlineResponse401',
+      'model/JSONWebKey',
+      'model/JSONWebKeySet',
       'model/JoseWebKeySetRequest',
       'model/JsonWebKey',
       'model/JsonWebKeySet',
       'model/JsonWebKeySetGeneratorRequest',
-      'model/KeyGenerator',
+      'model/KeyUsage',
       'model/LoginRequest',
-      'model/Manager',
+      'model/ModelInt',
+      'model/Name',
       'model/OAuth2Client',
       'model/OAuth2TokenIntrospection',
       'model/OauthTokenResponse',
+      'model/ObjectIdentifier',
       'model/OpenIDConnectContext',
+      'model/PublicKeyAlgorithm',
       'model/RawMessage',
       'model/RejectRequest',
+      'model/SignatureAlgorithm',
       'model/SwaggerFlushInactiveAccessTokens',
       'model/SwaggerJsonWebKeyQuery',
       'model/SwaggerJwkCreateSet',
@@ -51,10 +63,11 @@
       'model/SwaggerJwkUpdateSetKey',
       'model/SwaggerOAuthIntrospectionRequest',
       'model/SwaggerRevokeOAuth2TokenParameters',
+      'model/URL',
+      'model/Userinfo',
       'model/UserinfoResponse',
       'model/Version',
       'model/WellKnown',
-      'model/Writer',
       'api/HealthApi',
       'api/JsonWebKeyApi',
       'api/MetricsApi',
@@ -67,28 +80,40 @@
       require('./ApiClient'),
       require('./model/AcceptConsentRequest'),
       require('./model/AcceptLoginRequest'),
+      require('./model/AttributeTypeAndValue'),
       require('./model/AuthenticationSession'),
+      require('./model/Certificate'),
       require('./model/CompletedRequest'),
       require('./model/ConsentRequest'),
       require('./model/ConsentRequestSession'),
+      require('./model/ExtKeyUsage'),
+      require('./model/Extension'),
       require('./model/FlushInactiveOAuth2TokensRequest'),
-      require('./model/Handler'),
       require('./model/HealthNotReadyStatus'),
       require('./model/HealthStatus'),
+      require('./model/IP'),
+      require('./model/IPMask'),
+      require('./model/IPNet'),
       require('./model/InlineResponse401'),
+      require('./model/JSONWebKey'),
+      require('./model/JSONWebKeySet'),
       require('./model/JoseWebKeySetRequest'),
       require('./model/JsonWebKey'),
       require('./model/JsonWebKeySet'),
       require('./model/JsonWebKeySetGeneratorRequest'),
-      require('./model/KeyGenerator'),
+      require('./model/KeyUsage'),
       require('./model/LoginRequest'),
-      require('./model/Manager'),
+      require('./model/ModelInt'),
+      require('./model/Name'),
       require('./model/OAuth2Client'),
       require('./model/OAuth2TokenIntrospection'),
       require('./model/OauthTokenResponse'),
+      require('./model/ObjectIdentifier'),
       require('./model/OpenIDConnectContext'),
+      require('./model/PublicKeyAlgorithm'),
       require('./model/RawMessage'),
       require('./model/RejectRequest'),
+      require('./model/SignatureAlgorithm'),
       require('./model/SwaggerFlushInactiveAccessTokens'),
       require('./model/SwaggerJsonWebKeyQuery'),
       require('./model/SwaggerJwkCreateSet'),
@@ -97,10 +122,11 @@
       require('./model/SwaggerJwkUpdateSetKey'),
       require('./model/SwaggerOAuthIntrospectionRequest'),
       require('./model/SwaggerRevokeOAuth2TokenParameters'),
+      require('./model/URL'),
+      require('./model/Userinfo'),
       require('./model/UserinfoResponse'),
       require('./model/Version'),
       require('./model/WellKnown'),
-      require('./model/Writer'),
       require('./api/HealthApi'),
       require('./api/JsonWebKeyApi'),
       require('./api/MetricsApi'),
@@ -112,28 +138,40 @@
   ApiClient,
   AcceptConsentRequest,
   AcceptLoginRequest,
+  AttributeTypeAndValue,
   AuthenticationSession,
+  Certificate,
   CompletedRequest,
   ConsentRequest,
   ConsentRequestSession,
+  ExtKeyUsage,
+  Extension,
   FlushInactiveOAuth2TokensRequest,
-  Handler,
   HealthNotReadyStatus,
   HealthStatus,
+  IP,
+  IPMask,
+  IPNet,
   InlineResponse401,
+  JSONWebKey,
+  JSONWebKeySet,
   JoseWebKeySetRequest,
   JsonWebKey,
   JsonWebKeySet,
   JsonWebKeySetGeneratorRequest,
-  KeyGenerator,
+  KeyUsage,
   LoginRequest,
-  Manager,
+  ModelInt,
+  Name,
   OAuth2Client,
   OAuth2TokenIntrospection,
   OauthTokenResponse,
+  ObjectIdentifier,
   OpenIDConnectContext,
+  PublicKeyAlgorithm,
   RawMessage,
   RejectRequest,
+  SignatureAlgorithm,
   SwaggerFlushInactiveAccessTokens,
   SwaggerJsonWebKeyQuery,
   SwaggerJwkCreateSet,
@@ -142,10 +180,11 @@
   SwaggerJwkUpdateSetKey,
   SwaggerOAuthIntrospectionRequest,
   SwaggerRevokeOAuth2TokenParameters,
+  URL,
+  Userinfo,
   UserinfoResponse,
   Version,
   WellKnown,
-  Writer,
   HealthApi,
   JsonWebKeyApi,
   MetricsApi,
@@ -202,10 +241,20 @@
      */
     AcceptLoginRequest: AcceptLoginRequest,
     /**
+     * The AttributeTypeAndValue model constructor.
+     * @property {module:model/AttributeTypeAndValue}
+     */
+    AttributeTypeAndValue: AttributeTypeAndValue,
+    /**
      * The AuthenticationSession model constructor.
      * @property {module:model/AuthenticationSession}
      */
     AuthenticationSession: AuthenticationSession,
+    /**
+     * The Certificate model constructor.
+     * @property {module:model/Certificate}
+     */
+    Certificate: Certificate,
     /**
      * The CompletedRequest model constructor.
      * @property {module:model/CompletedRequest}
@@ -222,15 +271,20 @@
      */
     ConsentRequestSession: ConsentRequestSession,
     /**
+     * The ExtKeyUsage model constructor.
+     * @property {module:model/ExtKeyUsage}
+     */
+    ExtKeyUsage: ExtKeyUsage,
+    /**
+     * The Extension model constructor.
+     * @property {module:model/Extension}
+     */
+    Extension: Extension,
+    /**
      * The FlushInactiveOAuth2TokensRequest model constructor.
      * @property {module:model/FlushInactiveOAuth2TokensRequest}
      */
     FlushInactiveOAuth2TokensRequest: FlushInactiveOAuth2TokensRequest,
-    /**
-     * The Handler model constructor.
-     * @property {module:model/Handler}
-     */
-    Handler: Handler,
     /**
      * The HealthNotReadyStatus model constructor.
      * @property {module:model/HealthNotReadyStatus}
@@ -242,10 +296,35 @@
      */
     HealthStatus: HealthStatus,
     /**
+     * The IP model constructor.
+     * @property {module:model/IP}
+     */
+    IP: IP,
+    /**
+     * The IPMask model constructor.
+     * @property {module:model/IPMask}
+     */
+    IPMask: IPMask,
+    /**
+     * The IPNet model constructor.
+     * @property {module:model/IPNet}
+     */
+    IPNet: IPNet,
+    /**
      * The InlineResponse401 model constructor.
      * @property {module:model/InlineResponse401}
      */
     InlineResponse401: InlineResponse401,
+    /**
+     * The JSONWebKey model constructor.
+     * @property {module:model/JSONWebKey}
+     */
+    JSONWebKey: JSONWebKey,
+    /**
+     * The JSONWebKeySet model constructor.
+     * @property {module:model/JSONWebKeySet}
+     */
+    JSONWebKeySet: JSONWebKeySet,
     /**
      * The JoseWebKeySetRequest model constructor.
      * @property {module:model/JoseWebKeySetRequest}
@@ -267,20 +346,25 @@
      */
     JsonWebKeySetGeneratorRequest: JsonWebKeySetGeneratorRequest,
     /**
-     * The KeyGenerator model constructor.
-     * @property {module:model/KeyGenerator}
+     * The KeyUsage model constructor.
+     * @property {module:model/KeyUsage}
      */
-    KeyGenerator: KeyGenerator,
+    KeyUsage: KeyUsage,
     /**
      * The LoginRequest model constructor.
      * @property {module:model/LoginRequest}
      */
     LoginRequest: LoginRequest,
     /**
-     * The Manager model constructor.
-     * @property {module:model/Manager}
+     * The ModelInt model constructor.
+     * @property {module:model/ModelInt}
      */
-    Manager: Manager,
+    ModelInt: ModelInt,
+    /**
+     * The Name model constructor.
+     * @property {module:model/Name}
+     */
+    Name: Name,
     /**
      * The OAuth2Client model constructor.
      * @property {module:model/OAuth2Client}
@@ -297,10 +381,20 @@
      */
     OauthTokenResponse: OauthTokenResponse,
     /**
+     * The ObjectIdentifier model constructor.
+     * @property {module:model/ObjectIdentifier}
+     */
+    ObjectIdentifier: ObjectIdentifier,
+    /**
      * The OpenIDConnectContext model constructor.
      * @property {module:model/OpenIDConnectContext}
      */
     OpenIDConnectContext: OpenIDConnectContext,
+    /**
+     * The PublicKeyAlgorithm model constructor.
+     * @property {module:model/PublicKeyAlgorithm}
+     */
+    PublicKeyAlgorithm: PublicKeyAlgorithm,
     /**
      * The RawMessage model constructor.
      * @property {module:model/RawMessage}
@@ -311,6 +405,11 @@
      * @property {module:model/RejectRequest}
      */
     RejectRequest: RejectRequest,
+    /**
+     * The SignatureAlgorithm model constructor.
+     * @property {module:model/SignatureAlgorithm}
+     */
+    SignatureAlgorithm: SignatureAlgorithm,
     /**
      * The SwaggerFlushInactiveAccessTokens model constructor.
      * @property {module:model/SwaggerFlushInactiveAccessTokens}
@@ -352,6 +451,16 @@
      */
     SwaggerRevokeOAuth2TokenParameters: SwaggerRevokeOAuth2TokenParameters,
     /**
+     * The URL model constructor.
+     * @property {module:model/URL}
+     */
+    URL: URL,
+    /**
+     * The Userinfo model constructor.
+     * @property {module:model/Userinfo}
+     */
+    Userinfo: Userinfo,
+    /**
      * The UserinfoResponse model constructor.
      * @property {module:model/UserinfoResponse}
      */
@@ -366,11 +475,6 @@
      * @property {module:model/WellKnown}
      */
     WellKnown: WellKnown,
-    /**
-     * The Writer model constructor.
-     * @property {module:model/Writer}
-     */
-    Writer: Writer,
     /**
      * The HealthApi service constructor.
      * @property {module:api/HealthApi}

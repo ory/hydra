@@ -28,7 +28,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
 	"github.com/pkg/errors"
-	"github.com/square/go-jose"
+	"gopkg.in/square/go-jose.v2"
 )
 
 const (
@@ -67,23 +67,6 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 
 	r.DELETE(KeyHandlerPath+"/:set/:key", h.DeleteKey)
 	r.DELETE(KeyHandlerPath+"/:set", h.DeleteKeySet)
-}
-
-// swagger:model jsonWebKeySetGeneratorRequest
-type createRequest struct {
-	// The algorithm to be used for creating the key. Supports "RS256", "ES512", "HS512", and "HS256"
-	// required: true
-	// in: body
-	Algorithm string `json:"alg"`
-
-	// The kid of the key to be created
-	// required: true
-	// in: body
-	KeyID string `json:"kid"`
-}
-
-type joseWebKeySetRequest struct {
-	Keys []json.RawMessage `json:"keys"`
 }
 
 // swagger:route GET /.well-known/jwks.json oAuth2 wellKnown
@@ -226,7 +209,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		return
 	}
 
-	keys, err := generator.Generate(keyRequest.KeyID)
+	keys, err := generator.Generate(keyRequest.KeyID, keyRequest.Use)
 	if err != nil {
 		h.H.WriteError(w, r, err)
 		return
@@ -314,6 +297,11 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 
 	if err := json.NewDecoder(r.Body).Decode(&key); err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
+		return
+	}
+
+	if err := h.Manager.DeleteKey(set, key.KeyID); err != nil {
+		h.H.WriteError(w, r, err)
 		return
 	}
 

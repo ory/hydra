@@ -61,14 +61,20 @@ class OAuth2Client implements ArrayAccess
         'client_uri' => 'string',
         'contacts' => 'string[]',
         'grant_types' => 'string[]',
+        'id' => 'string',
+        'jwks' => '\Hydra\SDK\Model\JSONWebKeySet',
+        'jwks_uri' => 'string',
         'logo_uri' => 'string',
         'owner' => 'string',
         'policy_uri' => 'string',
         'public' => 'bool',
         'redirect_uris' => 'string[]',
+        'request_object_signing_alg' => 'string',
+        'request_uris' => 'string[]',
         'response_types' => 'string[]',
         'scope' => 'string',
         'sector_identifier_uri' => 'string',
+        'token_endpoint_auth_method' => 'string',
         'tos_uri' => 'string'
     ];
 
@@ -84,14 +90,20 @@ class OAuth2Client implements ArrayAccess
         'client_uri' => null,
         'contacts' => null,
         'grant_types' => null,
+        'id' => null,
+        'jwks' => null,
+        'jwks_uri' => null,
         'logo_uri' => null,
         'owner' => null,
         'policy_uri' => null,
         'public' => null,
         'redirect_uris' => null,
+        'request_object_signing_alg' => null,
+        'request_uris' => null,
         'response_types' => null,
         'scope' => null,
         'sector_identifier_uri' => null,
+        'token_endpoint_auth_method' => null,
         'tos_uri' => null
     ];
 
@@ -117,14 +129,20 @@ class OAuth2Client implements ArrayAccess
         'client_uri' => 'client_uri',
         'contacts' => 'contacts',
         'grant_types' => 'grant_types',
+        'id' => 'id',
+        'jwks' => 'jwks',
+        'jwks_uri' => 'jwks_uri',
         'logo_uri' => 'logo_uri',
         'owner' => 'owner',
         'policy_uri' => 'policy_uri',
         'public' => 'public',
         'redirect_uris' => 'redirect_uris',
+        'request_object_signing_alg' => 'request_object_signing_alg',
+        'request_uris' => 'request_uris',
         'response_types' => 'response_types',
         'scope' => 'scope',
         'sector_identifier_uri' => 'sector_identifier_uri',
+        'token_endpoint_auth_method' => 'token_endpoint_auth_method',
         'tos_uri' => 'tos_uri'
     ];
 
@@ -141,14 +159,20 @@ class OAuth2Client implements ArrayAccess
         'client_uri' => 'setClientUri',
         'contacts' => 'setContacts',
         'grant_types' => 'setGrantTypes',
+        'id' => 'setId',
+        'jwks' => 'setJwks',
+        'jwks_uri' => 'setJwksUri',
         'logo_uri' => 'setLogoUri',
         'owner' => 'setOwner',
         'policy_uri' => 'setPolicyUri',
         'public' => 'setPublic',
         'redirect_uris' => 'setRedirectUris',
+        'request_object_signing_alg' => 'setRequestObjectSigningAlg',
+        'request_uris' => 'setRequestUris',
         'response_types' => 'setResponseTypes',
         'scope' => 'setScope',
         'sector_identifier_uri' => 'setSectorIdentifierUri',
+        'token_endpoint_auth_method' => 'setTokenEndpointAuthMethod',
         'tos_uri' => 'setTosUri'
     ];
 
@@ -165,14 +189,20 @@ class OAuth2Client implements ArrayAccess
         'client_uri' => 'getClientUri',
         'contacts' => 'getContacts',
         'grant_types' => 'getGrantTypes',
+        'id' => 'getId',
+        'jwks' => 'getJwks',
+        'jwks_uri' => 'getJwksUri',
         'logo_uri' => 'getLogoUri',
         'owner' => 'getOwner',
         'policy_uri' => 'getPolicyUri',
         'public' => 'getPublic',
         'redirect_uris' => 'getRedirectUris',
+        'request_object_signing_alg' => 'getRequestObjectSigningAlg',
+        'request_uris' => 'getRequestUris',
         'response_types' => 'getResponseTypes',
         'scope' => 'getScope',
         'sector_identifier_uri' => 'getSectorIdentifierUri',
+        'token_endpoint_auth_method' => 'getTokenEndpointAuthMethod',
         'tos_uri' => 'getTosUri'
     ];
 
@@ -214,14 +244,20 @@ class OAuth2Client implements ArrayAccess
         $this->container['client_uri'] = isset($data['client_uri']) ? $data['client_uri'] : null;
         $this->container['contacts'] = isset($data['contacts']) ? $data['contacts'] : null;
         $this->container['grant_types'] = isset($data['grant_types']) ? $data['grant_types'] : null;
+        $this->container['id'] = isset($data['id']) ? $data['id'] : null;
+        $this->container['jwks'] = isset($data['jwks']) ? $data['jwks'] : null;
+        $this->container['jwks_uri'] = isset($data['jwks_uri']) ? $data['jwks_uri'] : null;
         $this->container['logo_uri'] = isset($data['logo_uri']) ? $data['logo_uri'] : null;
         $this->container['owner'] = isset($data['owner']) ? $data['owner'] : null;
         $this->container['policy_uri'] = isset($data['policy_uri']) ? $data['policy_uri'] : null;
         $this->container['public'] = isset($data['public']) ? $data['public'] : null;
         $this->container['redirect_uris'] = isset($data['redirect_uris']) ? $data['redirect_uris'] : null;
+        $this->container['request_object_signing_alg'] = isset($data['request_object_signing_alg']) ? $data['request_object_signing_alg'] : null;
+        $this->container['request_uris'] = isset($data['request_uris']) ? $data['request_uris'] : null;
         $this->container['response_types'] = isset($data['response_types']) ? $data['response_types'] : null;
         $this->container['scope'] = isset($data['scope']) ? $data['scope'] : null;
         $this->container['sector_identifier_uri'] = isset($data['sector_identifier_uri']) ? $data['sector_identifier_uri'] : null;
+        $this->container['token_endpoint_auth_method'] = isset($data['token_endpoint_auth_method']) ? $data['token_endpoint_auth_method'] : null;
         $this->container['tos_uri'] = isset($data['tos_uri']) ? $data['tos_uri'] : null;
     }
 
@@ -268,7 +304,7 @@ class OAuth2Client implements ArrayAccess
 
     /**
      * Sets client_id
-     * @param string $client_id ID is the id for this client.
+     * @param string $client_id ClientID  is the id for this client.
      * @return $this
      */
     public function setClientId($client_id)
@@ -405,6 +441,69 @@ class OAuth2Client implements ArrayAccess
     }
 
     /**
+     * Gets id
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->container['id'];
+    }
+
+    /**
+     * Sets id
+     * @param string $id ID is an alisa for client_id.
+     * @return $this
+     */
+    public function setId($id)
+    {
+        $this->container['id'] = $id;
+
+        return $this;
+    }
+
+    /**
+     * Gets jwks
+     * @return \Hydra\SDK\Model\JSONWebKeySet
+     */
+    public function getJwks()
+    {
+        return $this->container['jwks'];
+    }
+
+    /**
+     * Sets jwks
+     * @param \Hydra\SDK\Model\JSONWebKeySet $jwks
+     * @return $this
+     */
+    public function setJwks($jwks)
+    {
+        $this->container['jwks'] = $jwks;
+
+        return $this;
+    }
+
+    /**
+     * Gets jwks_uri
+     * @return string
+     */
+    public function getJwksUri()
+    {
+        return $this->container['jwks_uri'];
+    }
+
+    /**
+     * Sets jwks_uri
+     * @param string $jwks_uri URL for the Client's JSON Web Key Set [JWK] document. If the Client signs requests to the Server, it contains the signing key(s) the Server uses to validate signatures from the Client. The JWK Set MAY also contain the Client's encryption keys(s), which are used by the Server to encrypt responses to the Client. When both signing and encryption keys are made available, a use (Key Use) parameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key's intended usage. Although some algorithms allow the same key to be used for both signatures and encryption, doing so is NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate.
+     * @return $this
+     */
+    public function setJwksUri($jwks_uri)
+    {
+        $this->container['jwks_uri'] = $jwks_uri;
+
+        return $this;
+    }
+
+    /**
      * Gets logo_uri
      * @return string
      */
@@ -510,6 +609,48 @@ class OAuth2Client implements ArrayAccess
     }
 
     /**
+     * Gets request_object_signing_alg
+     * @return string
+     */
+    public function getRequestObjectSigningAlg()
+    {
+        return $this->container['request_object_signing_alg'];
+    }
+
+    /**
+     * Sets request_object_signing_alg
+     * @param string $request_object_signing_alg JWS [JWS] alg algorithm [JWA] that MUST be used for signing Request Objects sent to the OP. All Request Objects from this Client MUST be rejected, if not signed with this algorithm.
+     * @return $this
+     */
+    public function setRequestObjectSigningAlg($request_object_signing_alg)
+    {
+        $this->container['request_object_signing_alg'] = $request_object_signing_alg;
+
+        return $this;
+    }
+
+    /**
+     * Gets request_uris
+     * @return string[]
+     */
+    public function getRequestUris()
+    {
+        return $this->container['request_uris'];
+    }
+
+    /**
+     * Sets request_uris
+     * @param string[] $request_uris Array of request_uri values that are pre-registered by the RP for use at the OP. Servers MAY cache the contents of the files referenced by these URIs and not retrieve them at the time they are used in a request. OPs can require that request_uri values used be pre-registered with the require_request_uri_registration discovery parameter.
+     * @return $this
+     */
+    public function setRequestUris($request_uris)
+    {
+        $this->container['request_uris'] = $request_uris;
+
+        return $this;
+    }
+
+    /**
      * Gets response_types
      * @return string[]
      */
@@ -573,6 +714,27 @@ class OAuth2Client implements ArrayAccess
     public function setSectorIdentifierUri($sector_identifier_uri)
     {
         $this->container['sector_identifier_uri'] = $sector_identifier_uri;
+
+        return $this;
+    }
+
+    /**
+     * Gets token_endpoint_auth_method
+     * @return string
+     */
+    public function getTokenEndpointAuthMethod()
+    {
+        return $this->container['token_endpoint_auth_method'];
+    }
+
+    /**
+     * Sets token_endpoint_auth_method
+     * @param string $token_endpoint_auth_method Requested Client Authentication method for the Token Endpoint. The options are client_secret_post, client_secret_basic, client_secret_jwt, private_key_jwt, and none.
+     * @return $this
+     */
+    public function setTokenEndpointAuthMethod($token_endpoint_auth_method)
+    {
+        $this->container['token_endpoint_auth_method'] = $token_endpoint_auth_method;
 
         return $this;
     }

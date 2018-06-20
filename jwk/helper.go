@@ -29,7 +29,7 @@ import (
 
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
-	"github.com/square/go-jose"
+	"gopkg.in/square/go-jose.v2"
 )
 
 func First(keys []jose.JSONWebKey) *jose.JSONWebKey {

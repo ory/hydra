@@ -45,12 +45,14 @@
    * @class
    * @param alg {String} The algorithm to be used for creating the key. Supports \"RS256\", \"ES512\", \"HS512\", and \"HS256\"
    * @param kid {String} The kid of the key to be created
+   * @param use {String} The \"use\" (public key use) parameter identifies the intended use of the public key. The \"use\" parameter is employed to indicate whether a public key is used for encrypting data or verifying the signature on data. Valid values are \"enc\" and \"sig\".
    */
-  var exports = function(alg, kid) {
+  var exports = function(alg, kid, use) {
     var _this = this
 
     _this['alg'] = alg
     _this['kid'] = kid
+    _this['use'] = use
   }
 
   /**
@@ -70,6 +72,9 @@
       if (data.hasOwnProperty('kid')) {
         obj['kid'] = ApiClient.convertToType(data['kid'], 'String')
       }
+      if (data.hasOwnProperty('use')) {
+        obj['use'] = ApiClient.convertToType(data['use'], 'String')
+      }
     }
     return obj
   }
@@ -84,6 +89,11 @@
    * @member {String} kid
    */
   exports.prototype['kid'] = undefined
+  /**
+   * The \"use\" (public key use) parameter identifies the intended use of the public key. The \"use\" parameter is employed to indicate whether a public key is used for encrypting data or verifying the signature on data. Valid values are \"enc\" and \"sig\".
+   * @member {String} use
+   */
+  exports.prototype['use'] = undefined
 
   return exports
 })

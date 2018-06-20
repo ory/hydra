@@ -23,9 +23,13 @@ package jwk
 import (
 	"sync"
 
+	"fmt"
+	"net/http"
+
+	"github.com/ory/fosite"
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
-	"github.com/square/go-jose"
+	"gopkg.in/square/go-jose.v2"
 )
 
 type MemoryManager struct {
@@ -41,7 +45,18 @@ func (m *MemoryManager) AddKey(set string, key *jose.JSONWebKey) error {
 	if m.Keys[set] == nil {
 		m.Keys[set] = &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{}}
 	}
-	m.Keys[set].Keys = append(m.Keys[set].Keys, *key)
+
+	for _, k := range m.Keys[set].Keys {
+		if k.KeyID == key.KeyID {
+			return errors.WithStack(&fosite.RFC6749Error{
+				Code:        http.StatusConflict,
+				Name:        http.StatusText(http.StatusConflict),
+				Description: fmt.Sprintf("Unable to create key with kid \"%s\" in set \"%s\" because that kid already exists in the set.", key.KeyID, set),
+			})
+		}
+	}
+
+	m.Keys[set].Keys = append([]jose.JSONWebKey{*key}, m.Keys[set].Keys...)
 	return nil
 }
 
@@ -59,12 +74,12 @@ func (m *MemoryManager) GetKey(set, kid string) (*jose.JSONWebKeySet, error) {
 	m.alloc()
 	keys, found := m.Keys[set]
 	if !found {
-		return nil, errors.Wrap(pkg.ErrNotFound, "")
+		return nil, errors.WithStack(pkg.ErrNotFound)
 	}
 
 	result := keys.Key(kid)
 	if len(result) == 0 {
-		return nil, errors.Wrap(pkg.ErrNotFound, "")
+		return nil, errors.WithStack(pkg.ErrNotFound)
 	}
 
 	return &jose.JSONWebKeySet{
@@ -79,7 +94,7 @@ func (m *MemoryManager) GetKeySet(set string) (*jose.JSONWebKeySet, error) {
 	m.alloc()
 	keys, found := m.Keys[set]
 	if !found {
-		return nil, errors.Wrap(pkg.ErrNotFound, "")
+		return nil, errors.WithStack(pkg.ErrNotFound)
 	}
 
 	return keys, nil

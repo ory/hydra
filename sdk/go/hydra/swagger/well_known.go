@@ -15,6 +15,9 @@ type WellKnown struct {
 	// URL of the OP's OAuth 2.0 Authorization Endpoint.
 	AuthorizationEndpoint string `json:"authorization_endpoint"`
 
+	// Boolean value specifying whether the OP supports use of the claims parameter, with true indicating support.
+	ClaimsParameterSupported bool `json:"claims_parameter_supported,omitempty"`
+
 	// JSON array containing a list of the Claim Names of the Claims that the OpenID Provider MAY be able to supply values for. Note that for privacy or other reasons, this might not be an exhaustive list.
 	ClaimsSupported []string `json:"claims_supported,omitempty"`
 
@@ -32,6 +35,15 @@ type WellKnown struct {
 
 	// URL of the OP's Dynamic Client Registration Endpoint.
 	RegistrationEndpoint string `json:"registration_endpoint,omitempty"`
+
+	// Boolean value specifying whether the OP supports use of the request parameter, with true indicating support.
+	RequestParameterSupported bool `json:"request_parameter_supported,omitempty"`
+
+	// Boolean value specifying whether the OP supports use of the request_uri parameter, with true indicating support.
+	RequestUriParameterSupported bool `json:"request_uri_parameter_supported,omitempty"`
+
+	// Boolean value specifying whether the OP requires any request_uri values used to be pre-registered using the request_uris registration parameter.
+	RequireRequestUriRegistration bool `json:"require_request_uri_registration,omitempty"`
 
 	// JSON array containing a list of the OAuth 2.0 response_mode values that this OP supports.
 	ResponseModesSupported []string `json:"response_modes_supported,omitempty"`

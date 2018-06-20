@@ -31,7 +31,7 @@ func TestMustRSAPrivate(t *testing.T) {
 	//	t.SkipNow()
 	//}
 
-	keys, err := new(RS256Generator).Generate("foo")
+	keys, err := new(RS256Generator).Generate("foo", "sig")
 	assert.Nil(t, err)
 
 	_, err = ToRSAPrivate(&keys.Key("private:foo")[0])

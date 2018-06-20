@@ -28,7 +28,7 @@ import (
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
-	"github.com/square/go-jose"
+	"gopkg.in/square/go-jose.v2"
 )
 
 type SQLManager struct {
@@ -51,6 +51,15 @@ var migrations = &migrate.MemoryMigrationSource{
 			},
 			Down: []string{
 				"DROP TABLE hydra_jwk",
+			},
+		},
+		{
+			Id: "2",
+			Up: []string{
+				`ALTER TABLE hydra_jwk ADD created_at TIMESTAMP NOT NULL DEFAULT NOW()`,
+			},
+			Down: []string{
+				`ALTER TABLE hydra_jwk DROP COLUMN created_at`,
 			},
 		},
 	},
@@ -141,7 +150,7 @@ func (m *SQLManager) AddKeySet(set string, keys *jose.JSONWebKeySet) error {
 
 func (m *SQLManager) GetKey(set, kid string) (*jose.JSONWebKeySet, error) {
 	var d sqlData
-	if err := m.DB.Get(&d, m.DB.Rebind("SELECT * FROM hydra_jwk WHERE sid=? AND kid=?"), set, kid); err == sql.ErrNoRows {
+	if err := m.DB.Get(&d, m.DB.Rebind("SELECT * FROM hydra_jwk WHERE sid=? AND kid=? ORDER BY created_at DESC"), set, kid); err == sql.ErrNoRows {
 		return nil, errors.Wrap(pkg.ErrNotFound, "")
 	} else if err != nil {
 		return nil, errors.WithStack(err)
@@ -164,7 +173,7 @@ func (m *SQLManager) GetKey(set, kid string) (*jose.JSONWebKeySet, error) {
 
 func (m *SQLManager) GetKeySet(set string) (*jose.JSONWebKeySet, error) {
 	var ds []sqlData
-	if err := m.DB.Select(&ds, m.DB.Rebind("SELECT * FROM hydra_jwk WHERE sid=?"), set); err == sql.ErrNoRows {
+	if err := m.DB.Select(&ds, m.DB.Rebind("SELECT * FROM hydra_jwk WHERE sid=? ORDER BY created_at DESC"), set); err == sql.ErrNoRows {
 		return nil, errors.Wrap(pkg.ErrNotFound, "")
 	} else if err != nil {
 		return nil, errors.WithStack(err)

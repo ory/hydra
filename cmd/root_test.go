@@ -85,6 +85,7 @@ func TestExecute(t *testing.T) {
 		{args: []string{"keys", "create", "foo", "--endpoint", endpoint, "-a", "HS256"}},
 		{args: []string{"keys", "create", "foo", "--endpoint", endpoint, "-a", "HS256"}},
 		{args: []string{"keys", "get", "--endpoint", endpoint, "foo"}},
+		{args: []string{"keys", "rotate", "--endpoint", endpoint, "foo"}},
 		{args: []string{"keys", "delete", "--endpoint", endpoint, "foo"}},
 		{args: []string{"token", "revoke", "--endpoint", endpoint, "--client-secret", "foobar", "--client-id", "foobarbaz", "foo"}},
 		{args: []string{"token", "client", "--endpoint", endpoint, "--client-secret", "foobar", "--client-id", "foobarbaz"}},

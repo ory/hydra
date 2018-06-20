@@ -24,7 +24,7 @@ import (
 	"crypto/rsa"
 
 	"github.com/pkg/errors"
-	"github.com/square/go-jose"
+	"gopkg.in/square/go-jose.v2"
 )
 
 func MustRSAPublic(key *jose.JSONWebKey) *rsa.PublicKey {

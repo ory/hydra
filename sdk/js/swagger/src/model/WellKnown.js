@@ -93,6 +93,12 @@
           'String'
         )
       }
+      if (data.hasOwnProperty('claims_parameter_supported')) {
+        obj['claims_parameter_supported'] = ApiClient.convertToType(
+          data['claims_parameter_supported'],
+          'Boolean'
+        )
+      }
       if (data.hasOwnProperty('claims_supported')) {
         obj['claims_supported'] = ApiClient.convertToType(
           data['claims_supported'],
@@ -121,6 +127,24 @@
         obj['registration_endpoint'] = ApiClient.convertToType(
           data['registration_endpoint'],
           'String'
+        )
+      }
+      if (data.hasOwnProperty('request_parameter_supported')) {
+        obj['request_parameter_supported'] = ApiClient.convertToType(
+          data['request_parameter_supported'],
+          'Boolean'
+        )
+      }
+      if (data.hasOwnProperty('request_uri_parameter_supported')) {
+        obj['request_uri_parameter_supported'] = ApiClient.convertToType(
+          data['request_uri_parameter_supported'],
+          'Boolean'
+        )
+      }
+      if (data.hasOwnProperty('require_request_uri_registration')) {
+        obj['require_request_uri_registration'] = ApiClient.convertToType(
+          data['require_request_uri_registration'],
+          'Boolean'
         )
       }
       if (data.hasOwnProperty('response_modes_supported')) {
@@ -175,6 +199,11 @@
    */
   exports.prototype['authorization_endpoint'] = undefined
   /**
+   * Boolean value specifying whether the OP supports use of the claims parameter, with true indicating support.
+   * @member {Boolean} claims_parameter_supported
+   */
+  exports.prototype['claims_parameter_supported'] = undefined
+  /**
    * JSON array containing a list of the Claim Names of the Claims that the OpenID Provider MAY be able to supply values for. Note that for privacy or other reasons, this might not be an exhaustive list.
    * @member {Array.<String>} claims_supported
    */
@@ -204,6 +233,21 @@
    * @member {String} registration_endpoint
    */
   exports.prototype['registration_endpoint'] = undefined
+  /**
+   * Boolean value specifying whether the OP supports use of the request parameter, with true indicating support.
+   * @member {Boolean} request_parameter_supported
+   */
+  exports.prototype['request_parameter_supported'] = undefined
+  /**
+   * Boolean value specifying whether the OP supports use of the request_uri parameter, with true indicating support.
+   * @member {Boolean} request_uri_parameter_supported
+   */
+  exports.prototype['request_uri_parameter_supported'] = undefined
+  /**
+   * Boolean value specifying whether the OP requires any request_uri values used to be pre-registered using the request_uris registration parameter.
+   * @member {Boolean} require_request_uri_registration
+   */
+  exports.prototype['require_request_uri_registration'] = undefined
   /**
    * JSON array containing a list of the OAuth 2.0 response_mode values that this OP supports.
    * @member {Array.<String>} response_modes_supported

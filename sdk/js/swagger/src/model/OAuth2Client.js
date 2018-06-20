@@ -17,20 +17,24 @@
 ;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient'], factory)
+    define(['ApiClient', 'model/JSONWebKeySet'], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'))
+    module.exports = factory(
+      require('../ApiClient'),
+      require('./JSONWebKeySet')
+    )
   } else {
     // Browser globals (root is window)
     if (!root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer) {
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {}
     }
     root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Client = factory(
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient,
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JSONWebKeySet
     )
   }
-})(this, function(ApiClient) {
+})(this, function(ApiClient, JSONWebKeySet) {
   'use strict'
 
   /**
@@ -94,6 +98,15 @@
           'String'
         ])
       }
+      if (data.hasOwnProperty('id')) {
+        obj['id'] = ApiClient.convertToType(data['id'], 'String')
+      }
+      if (data.hasOwnProperty('jwks')) {
+        obj['jwks'] = JSONWebKeySet.constructFromObject(data['jwks'])
+      }
+      if (data.hasOwnProperty('jwks_uri')) {
+        obj['jwks_uri'] = ApiClient.convertToType(data['jwks_uri'], 'String')
+      }
       if (data.hasOwnProperty('logo_uri')) {
         obj['logo_uri'] = ApiClient.convertToType(data['logo_uri'], 'String')
       }
@@ -114,6 +127,17 @@
           'String'
         ])
       }
+      if (data.hasOwnProperty('request_object_signing_alg')) {
+        obj['request_object_signing_alg'] = ApiClient.convertToType(
+          data['request_object_signing_alg'],
+          'String'
+        )
+      }
+      if (data.hasOwnProperty('request_uris')) {
+        obj['request_uris'] = ApiClient.convertToType(data['request_uris'], [
+          'String'
+        ])
+      }
       if (data.hasOwnProperty('response_types')) {
         obj['response_types'] = ApiClient.convertToType(
           data['response_types'],
@@ -129,6 +153,12 @@
           'String'
         )
       }
+      if (data.hasOwnProperty('token_endpoint_auth_method')) {
+        obj['token_endpoint_auth_method'] = ApiClient.convertToType(
+          data['token_endpoint_auth_method'],
+          'String'
+        )
+      }
       if (data.hasOwnProperty('tos_uri')) {
         obj['tos_uri'] = ApiClient.convertToType(data['tos_uri'], 'String')
       }
@@ -137,7 +167,7 @@
   }
 
   /**
-   * ID is the id for this client.
+   * ClientID  is the id for this client.
    * @member {String} client_id
    */
   exports.prototype['client_id'] = undefined
@@ -172,6 +202,20 @@
    */
   exports.prototype['grant_types'] = undefined
   /**
+   * ID is an alisa for client_id.
+   * @member {String} id
+   */
+  exports.prototype['id'] = undefined
+  /**
+   * @member {module:model/JSONWebKeySet} jwks
+   */
+  exports.prototype['jwks'] = undefined
+  /**
+   * URL for the Client's JSON Web Key Set [JWK] document. If the Client signs requests to the Server, it contains the signing key(s) the Server uses to validate signatures from the Client. The JWK Set MAY also contain the Client's encryption keys(s), which are used by the Server to encrypt responses to the Client. When both signing and encryption keys are made available, a use (Key Use) parameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key's intended usage. Although some algorithms allow the same key to be used for both signatures and encryption, doing so is NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate.
+   * @member {String} jwks_uri
+   */
+  exports.prototype['jwks_uri'] = undefined
+  /**
    * LogoURI is an URL string that references a logo for the client.
    * @member {String} logo_uri
    */
@@ -197,6 +241,16 @@
    */
   exports.prototype['redirect_uris'] = undefined
   /**
+   * JWS [JWS] alg algorithm [JWA] that MUST be used for signing Request Objects sent to the OP. All Request Objects from this Client MUST be rejected, if not signed with this algorithm.
+   * @member {String} request_object_signing_alg
+   */
+  exports.prototype['request_object_signing_alg'] = undefined
+  /**
+   * Array of request_uri values that are pre-registered by the RP for use at the OP. Servers MAY cache the contents of the files referenced by these URIs and not retrieve them at the time they are used in a request. OPs can require that request_uri values used be pre-registered with the require_request_uri_registration discovery parameter.
+   * @member {Array.<String>} request_uris
+   */
+  exports.prototype['request_uris'] = undefined
+  /**
    * ResponseTypes is an array of the OAuth 2.0 response type strings that the client can use at the authorization endpoint.
    * @member {Array.<String>} response_types
    */
@@ -211,6 +265,11 @@
    * @member {String} sector_identifier_uri
    */
   exports.prototype['sector_identifier_uri'] = undefined
+  /**
+   * Requested Client Authentication method for the Token Endpoint. The options are client_secret_post, client_secret_basic, client_secret_jwt, private_key_jwt, and none.
+   * @member {String} token_endpoint_auth_method
+   */
+  exports.prototype['token_endpoint_auth_method'] = undefined
   /**
    * TermsOfServiceURI is a URL string that points to a human-readable terms of service document for the client that describes a contractual relationship between the end-user and the client that the end-user accepts when authorizing the client.
    * @member {String} tos_uri

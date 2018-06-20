@@ -27,12 +27,12 @@ import (
 	"crypto/x509"
 
 	"github.com/pkg/errors"
-	"github.com/square/go-jose"
+	"gopkg.in/square/go-jose.v2"
 )
 
 type ECDSA512Generator struct{}
 
-func (g *ECDSA512Generator) Generate(id string) (*jose.JSONWebKeySet, error) {
+func (g *ECDSA512Generator) Generate(id, use string) (*jose.JSONWebKeySet, error) {
 	key, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
 	if err != nil {
 		return nil, errors.Errorf("Could not generate key because %s", err)
@@ -42,11 +42,13 @@ func (g *ECDSA512Generator) Generate(id string) (*jose.JSONWebKeySet, error) {
 		Keys: []jose.JSONWebKey{
 			{
 				Key:          key,
+				Use:          use,
 				KeyID:        ider("private", id),
 				Certificates: []*x509.Certificate{},
 			},
 			{
 				Key:          &key.PublicKey,
+				Use:          use,
 				KeyID:        ider("public", id),
 				Certificates: []*x509.Certificate{},
 			},

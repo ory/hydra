@@ -26,14 +26,14 @@ import (
 	"crypto/x509"
 
 	"github.com/pkg/errors"
-	"github.com/square/go-jose"
+	"gopkg.in/square/go-jose.v2"
 )
 
 type RS256Generator struct {
 	KeyLength int
 }
 
-func (g *RS256Generator) Generate(id string) (*jose.JSONWebKeySet, error) {
+func (g *RS256Generator) Generate(id, use string) (*jose.JSONWebKeySet, error) {
 	if g.KeyLength < 4096 {
 		g.KeyLength = 4096
 	}
@@ -52,11 +52,13 @@ func (g *RS256Generator) Generate(id string) (*jose.JSONWebKeySet, error) {
 			{
 				Algorithm:    "RS256",
 				Key:          key,
+				Use:          use,
 				KeyID:        ider("private", id),
 				Certificates: []*x509.Certificate{},
 			},
 			{
 				Algorithm:    "RS256",
+				Use:          use,
 				Key:          &key.PublicKey,
 				KeyID:        ider("public", id),
 				Certificates: []*x509.Certificate{},

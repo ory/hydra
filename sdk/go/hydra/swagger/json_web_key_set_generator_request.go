@@ -17,4 +17,7 @@ type JsonWebKeySetGeneratorRequest struct {
 
 	// The kid of the key to be created
 	Kid string `json:"kid"`
+
+	// The \"use\" (public key use) parameter identifies the intended use of the public key. The \"use\" parameter is employed to indicate whether a public key is used for encrypting data or verifying the signature on data. Valid values are \"enc\" and \"sig\".
+	Use string `json:"use"`
 }

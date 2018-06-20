@@ -49,19 +49,23 @@ func TestJWKSDK(t *testing.T) {
 	t.Run("JSON Web Key", func(t *testing.T) {
 		t.Run("CreateJwkSetKey", func(t *testing.T) {
 			// Create a key called set-foo
-			resultKeys, _, err := client.CreateJsonWebKeySet("set-foo", hydra.JsonWebKeySetGeneratorRequest{
+			resultKeys, response, err := client.CreateJsonWebKeySet("set-foo", hydra.JsonWebKeySetGeneratorRequest{
 				Alg: "HS256",
 				Kid: "key-bar",
+				Use: "sig",
 			})
 			require.NoError(t, err)
+			require.EqualValues(t, http.StatusCreated, response.StatusCode)
 			assert.Len(t, resultKeys.Keys, 1)
 			assert.Equal(t, "key-bar", resultKeys.Keys[0].Kid)
 			assert.Equal(t, "HS256", resultKeys.Keys[0].Alg)
+			assert.Equal(t, "sig", resultKeys.Keys[0].Use)
 		})
 
-		resultKeys, _, err := client.GetJsonWebKey("key-bar", "set-foo")
+		resultKeys, response, err := client.GetJsonWebKey("key-bar", "set-foo")
 		t.Run("GetJwkSetKey after create", func(t *testing.T) {
 			require.NoError(t, err)
+			require.EqualValues(t, http.StatusOK, response.StatusCode)
 			assert.Len(t, resultKeys.Keys, 1)
 			assert.Equal(t, "key-bar", resultKeys.Keys[0].Kid)
 			assert.Equal(t, "HS256", resultKeys.Keys[0].Alg)
@@ -69,8 +73,9 @@ func TestJWKSDK(t *testing.T) {
 
 		t.Run("UpdateJwkSetKey", func(t *testing.T) {
 			resultKeys.Keys[0].Alg = "RS256"
-			resultKey, _, err := client.UpdateJsonWebKey("key-bar", "set-foo", resultKeys.Keys[0])
+			resultKey, response, err := client.UpdateJsonWebKey("key-bar", "set-foo", resultKeys.Keys[0])
 			require.NoError(t, err)
+			require.EqualValues(t, http.StatusOK, response.StatusCode)
 			assert.Equal(t, "key-bar", resultKey.Kid)
 			assert.Equal(t, "RS256", resultKey.Alg)
 		})

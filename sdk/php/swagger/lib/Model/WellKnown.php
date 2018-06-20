@@ -55,12 +55,16 @@ class WellKnown implements ArrayAccess
       */
     protected static $swaggerTypes = [
         'authorization_endpoint' => 'string',
+        'claims_parameter_supported' => 'bool',
         'claims_supported' => 'string[]',
         'grant_types_supported' => 'string[]',
         'id_token_signing_alg_values_supported' => 'string[]',
         'issuer' => 'string',
         'jwks_uri' => 'string',
         'registration_endpoint' => 'string',
+        'request_parameter_supported' => 'bool',
+        'request_uri_parameter_supported' => 'bool',
+        'require_request_uri_registration' => 'bool',
         'response_modes_supported' => 'string[]',
         'response_types_supported' => 'string[]',
         'scopes_supported' => 'string[]',
@@ -76,12 +80,16 @@ class WellKnown implements ArrayAccess
       */
     protected static $swaggerFormats = [
         'authorization_endpoint' => null,
+        'claims_parameter_supported' => null,
         'claims_supported' => null,
         'grant_types_supported' => null,
         'id_token_signing_alg_values_supported' => null,
         'issuer' => null,
         'jwks_uri' => null,
         'registration_endpoint' => null,
+        'request_parameter_supported' => null,
+        'request_uri_parameter_supported' => null,
+        'require_request_uri_registration' => null,
         'response_modes_supported' => null,
         'response_types_supported' => null,
         'scopes_supported' => null,
@@ -107,12 +115,16 @@ class WellKnown implements ArrayAccess
      */
     protected static $attributeMap = [
         'authorization_endpoint' => 'authorization_endpoint',
+        'claims_parameter_supported' => 'claims_parameter_supported',
         'claims_supported' => 'claims_supported',
         'grant_types_supported' => 'grant_types_supported',
         'id_token_signing_alg_values_supported' => 'id_token_signing_alg_values_supported',
         'issuer' => 'issuer',
         'jwks_uri' => 'jwks_uri',
         'registration_endpoint' => 'registration_endpoint',
+        'request_parameter_supported' => 'request_parameter_supported',
+        'request_uri_parameter_supported' => 'request_uri_parameter_supported',
+        'require_request_uri_registration' => 'require_request_uri_registration',
         'response_modes_supported' => 'response_modes_supported',
         'response_types_supported' => 'response_types_supported',
         'scopes_supported' => 'scopes_supported',
@@ -129,12 +141,16 @@ class WellKnown implements ArrayAccess
      */
     protected static $setters = [
         'authorization_endpoint' => 'setAuthorizationEndpoint',
+        'claims_parameter_supported' => 'setClaimsParameterSupported',
         'claims_supported' => 'setClaimsSupported',
         'grant_types_supported' => 'setGrantTypesSupported',
         'id_token_signing_alg_values_supported' => 'setIdTokenSigningAlgValuesSupported',
         'issuer' => 'setIssuer',
         'jwks_uri' => 'setJwksUri',
         'registration_endpoint' => 'setRegistrationEndpoint',
+        'request_parameter_supported' => 'setRequestParameterSupported',
+        'request_uri_parameter_supported' => 'setRequestUriParameterSupported',
+        'require_request_uri_registration' => 'setRequireRequestUriRegistration',
         'response_modes_supported' => 'setResponseModesSupported',
         'response_types_supported' => 'setResponseTypesSupported',
         'scopes_supported' => 'setScopesSupported',
@@ -151,12 +167,16 @@ class WellKnown implements ArrayAccess
      */
     protected static $getters = [
         'authorization_endpoint' => 'getAuthorizationEndpoint',
+        'claims_parameter_supported' => 'getClaimsParameterSupported',
         'claims_supported' => 'getClaimsSupported',
         'grant_types_supported' => 'getGrantTypesSupported',
         'id_token_signing_alg_values_supported' => 'getIdTokenSigningAlgValuesSupported',
         'issuer' => 'getIssuer',
         'jwks_uri' => 'getJwksUri',
         'registration_endpoint' => 'getRegistrationEndpoint',
+        'request_parameter_supported' => 'getRequestParameterSupported',
+        'request_uri_parameter_supported' => 'getRequestUriParameterSupported',
+        'require_request_uri_registration' => 'getRequireRequestUriRegistration',
         'response_modes_supported' => 'getResponseModesSupported',
         'response_types_supported' => 'getResponseTypesSupported',
         'scopes_supported' => 'getScopesSupported',
@@ -198,12 +218,16 @@ class WellKnown implements ArrayAccess
     public function __construct(array $data = null)
     {
         $this->container['authorization_endpoint'] = isset($data['authorization_endpoint']) ? $data['authorization_endpoint'] : null;
+        $this->container['claims_parameter_supported'] = isset($data['claims_parameter_supported']) ? $data['claims_parameter_supported'] : null;
         $this->container['claims_supported'] = isset($data['claims_supported']) ? $data['claims_supported'] : null;
         $this->container['grant_types_supported'] = isset($data['grant_types_supported']) ? $data['grant_types_supported'] : null;
         $this->container['id_token_signing_alg_values_supported'] = isset($data['id_token_signing_alg_values_supported']) ? $data['id_token_signing_alg_values_supported'] : null;
         $this->container['issuer'] = isset($data['issuer']) ? $data['issuer'] : null;
         $this->container['jwks_uri'] = isset($data['jwks_uri']) ? $data['jwks_uri'] : null;
         $this->container['registration_endpoint'] = isset($data['registration_endpoint']) ? $data['registration_endpoint'] : null;
+        $this->container['request_parameter_supported'] = isset($data['request_parameter_supported']) ? $data['request_parameter_supported'] : null;
+        $this->container['request_uri_parameter_supported'] = isset($data['request_uri_parameter_supported']) ? $data['request_uri_parameter_supported'] : null;
+        $this->container['require_request_uri_registration'] = isset($data['require_request_uri_registration']) ? $data['require_request_uri_registration'] : null;
         $this->container['response_modes_supported'] = isset($data['response_modes_supported']) ? $data['response_modes_supported'] : null;
         $this->container['response_types_supported'] = isset($data['response_types_supported']) ? $data['response_types_supported'] : null;
         $this->container['scopes_supported'] = isset($data['scopes_supported']) ? $data['scopes_supported'] : null;
@@ -297,6 +321,27 @@ class WellKnown implements ArrayAccess
     public function setAuthorizationEndpoint($authorization_endpoint)
     {
         $this->container['authorization_endpoint'] = $authorization_endpoint;
+
+        return $this;
+    }
+
+    /**
+     * Gets claims_parameter_supported
+     * @return bool
+     */
+    public function getClaimsParameterSupported()
+    {
+        return $this->container['claims_parameter_supported'];
+    }
+
+    /**
+     * Sets claims_parameter_supported
+     * @param bool $claims_parameter_supported Boolean value specifying whether the OP supports use of the claims parameter, with true indicating support.
+     * @return $this
+     */
+    public function setClaimsParameterSupported($claims_parameter_supported)
+    {
+        $this->container['claims_parameter_supported'] = $claims_parameter_supported;
 
         return $this;
     }
@@ -423,6 +468,69 @@ class WellKnown implements ArrayAccess
     public function setRegistrationEndpoint($registration_endpoint)
     {
         $this->container['registration_endpoint'] = $registration_endpoint;
+
+        return $this;
+    }
+
+    /**
+     * Gets request_parameter_supported
+     * @return bool
+     */
+    public function getRequestParameterSupported()
+    {
+        return $this->container['request_parameter_supported'];
+    }
+
+    /**
+     * Sets request_parameter_supported
+     * @param bool $request_parameter_supported Boolean value specifying whether the OP supports use of the request parameter, with true indicating support.
+     * @return $this
+     */
+    public function setRequestParameterSupported($request_parameter_supported)
+    {
+        $this->container['request_parameter_supported'] = $request_parameter_supported;
+
+        return $this;
+    }
+
+    /**
+     * Gets request_uri_parameter_supported
+     * @return bool
+     */
+    public function getRequestUriParameterSupported()
+    {
+        return $this->container['request_uri_parameter_supported'];
+    }
+
+    /**
+     * Sets request_uri_parameter_supported
+     * @param bool $request_uri_parameter_supported Boolean value specifying whether the OP supports use of the request_uri parameter, with true indicating support.
+     * @return $this
+     */
+    public function setRequestUriParameterSupported($request_uri_parameter_supported)
+    {
+        $this->container['request_uri_parameter_supported'] = $request_uri_parameter_supported;
+
+        return $this;
+    }
+
+    /**
+     * Gets require_request_uri_registration
+     * @return bool
+     */
+    public function getRequireRequestUriRegistration()
+    {
+        return $this->container['require_request_uri_registration'];
+    }
+
+    /**
+     * Sets require_request_uri_registration
+     * @param bool $require_request_uri_registration Boolean value specifying whether the OP requires any request_uri values used to be pre-registered using the request_uris registration parameter.
+     * @return $this
+     */
+    public function setRequireRequestUriRegistration($require_request_uri_registration)
+    {
+        $this->container['require_request_uri_registration'] = $require_request_uri_registration;
 
         return $this;
     }

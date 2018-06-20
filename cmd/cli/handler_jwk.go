@@ -25,6 +25,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"os"
+
 	"github.com/ory/hydra/config"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/spf13/cobra"
@@ -57,6 +59,44 @@ func newJWKHandler(c *config.Config) *JWKHandler {
 	return &JWKHandler{Config: c}
 }
 
+func (h *JWKHandler) RotateKeys(cmd *cobra.Command, args []string) {
+	m := h.newJwkManager(cmd)
+	if len(args) < 1 || len(args) > 2 {
+		fmt.Println(cmd.UsageString())
+		return
+	}
+
+	setID := args[0]
+	kid := ""
+	if len(args) == 2 {
+		kid = args[1]
+	}
+
+	set, response, err := m.GetJsonWebKeySet(setID)
+	checkResponse(response, err, http.StatusOK)
+
+	var found bool
+	for _, key := range set.Keys {
+		if len(kid) == 0 || (len(kid) > 0 && kid == key.Kid) {
+			found = true
+			response, err := m.DeleteJsonWebKey(key.Kid, setID)
+			checkResponse(response, err, http.StatusNoContent)
+
+			_, response, err = m.CreateJsonWebKeySet(setID, hydra.JsonWebKeySetGeneratorRequest{Alg: key.Alg, Use: key.Use, Kid: key.Kid})
+			checkResponse(response, err, http.StatusCreated)
+		}
+	}
+
+	if !found {
+		if kid == "" {
+			fmt.Fprintln(os.Stderr, "The JSON Web Key Set does not contain any keys, thus no keys could be rotated.")
+		} else {
+			fmt.Fprintf(os.Stderr, "The JSON Web Key Set does not contain key with kid \"%s\" keys, thus the key could be rotated.\n", kid)
+		}
+		os.Exit(1)
+	}
+}
+
 func (h *JWKHandler) CreateKeys(cmd *cobra.Command, args []string) {
 	m := h.newJwkManager(cmd)
 	if len(args) < 1 || len(args) > 2 {
@@ -70,7 +110,8 @@ func (h *JWKHandler) CreateKeys(cmd *cobra.Command, args []string) {
 	}
 
 	alg, _ := cmd.Flags().GetString("alg")
-	keys, response, err := m.CreateJsonWebKeySet(args[0], hydra.JsonWebKeySetGeneratorRequest{Alg: alg, Kid: kid})
+	use, _ := cmd.Flags().GetString("use")
+	keys, response, err := m.CreateJsonWebKeySet(args[0], hydra.JsonWebKeySetGeneratorRequest{Alg: alg, Kid: kid, Use: use})
 	checkResponse(response, err, http.StatusCreated)
 	fmt.Printf("%s\n", formatResponse(keys))
 }

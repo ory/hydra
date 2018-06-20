@@ -27,12 +27,12 @@ import (
 
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
-	"github.com/square/go-jose"
+	"gopkg.in/square/go-jose.v2"
 )
 
 type HS512Generator struct{}
 
-func (g *HS512Generator) Generate(id string) (*jose.JSONWebKeySet, error) {
+func (g *HS512Generator) Generate(id, use string) (*jose.JSONWebKeySet, error) {
 	// Taken from NewHMACKey
 	key := &[32]byte{}
 	_, err := io.ReadFull(rand.Reader, key[:])
@@ -51,6 +51,7 @@ func (g *HS512Generator) Generate(id string) (*jose.JSONWebKeySet, error) {
 			{
 				Algorithm:    "HS512",
 				Key:          sliceKey,
+				Use:          use,
 				KeyID:        id,
 				Certificates: []*x509.Certificate{},
 			},

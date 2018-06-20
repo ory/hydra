@@ -30,20 +30,12 @@ import (
 )
 
 var (
-	ErrNotFound = &RichError{
-		Status: http.StatusNotFound,
-		error:  errors.New("Not found"),
+	ErrNotFound = &fosite.RFC6749Error{
+		Code:        http.StatusNotFound,
+		Name:        http.StatusText(http.StatusNotFound),
+		Description: "Unable to located the requested resource",
 	}
 )
-
-type RichError struct {
-	Status int
-	error
-}
-
-func (e *RichError) StatusCode() int {
-	return e.Status
-}
 
 type stackTracer interface {
 	StackTrace() errors.StackTrace
@@ -55,26 +47,19 @@ func LogError(err error, logger log.FieldLogger) {
 		logger = log.New()
 	}
 
-	if e, ok := err.(*fosite.RFC6749Error); ok {
+	if e, ok := errors.Cause(err).(*fosite.RFC6749Error); ok {
 		if e.Debug != "" {
 			extra["debug"] = e.Debug
 		}
 		if e.Hint != "" {
 			extra["hint"] = e.Hint
 		}
-	} else if e, ok := errors.Cause(err).(*fosite.RFC6749Error); ok {
-		if e.Debug != "" {
-			extra["debug"] = e.Debug
-		}
-		if e.Hint != "" {
-			extra["hint"] = e.Hint
+		if e.Description != "" {
+			extra["description"] = e.Description
 		}
 	}
 
 	if e, ok := errors.Cause(err).(stackTracer); ok {
-		logger.WithError(err).WithFields(extra).Errorln("An error occurred")
-		logger.Debugf("Stack trace: %+v", e.StackTrace())
-	} else if e, ok := err.(stackTracer); ok {
 		logger.WithError(err).WithFields(extra).Errorln("An error occurred")
 		logger.Debugf("Stack trace: %+v", e.StackTrace())
 	} else {

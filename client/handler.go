@@ -131,6 +131,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 		c.Secret = secret
 	}
 
+	c.ClientID = c.ID
 	h.H.WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
@@ -186,6 +187,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		return
 	}
 
+	c.ClientID = c.ID
 	c.Secret = secret
 	h.H.WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
@@ -222,6 +224,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	clients := make([]Client, len(c))
 	k := 0
 	for _, cc := range c {
+		cc.ClientID = cc.ID
 		clients[k] = cc
 		clients[k].Secret = ""
 		k++
@@ -262,6 +265,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	}
 
 	c.Secret = ""
+	c.ClientID = c.ID
 	h.H.Write(w, r, c)
 }
 

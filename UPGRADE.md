@@ -167,8 +167,7 @@ $ curl http://hydra/clients/my-client
 }
 ```
 
-
-The Go SDK changes the naming as well, what was previously `client.Id` is now `client.ClientId`
+For now, the `id` field will still be returned, but is marked deprecated and will be removed in future releases.
 
 ## 1.0.0-beta.1
 

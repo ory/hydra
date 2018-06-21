@@ -28,7 +28,6 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/pagination"
-	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 )
 
@@ -55,6 +54,7 @@ func (m *MemoryManager) GetConcreteClient(id string) (*Client, error) {
 
 	for _, c := range m.Clients {
 		if c.GetID() == id {
+			c.ClientID = c.ID
 			return &c, nil
 		}
 	}
@@ -109,6 +109,7 @@ func (m *MemoryManager) Authenticate(id string, secret []byte) (*Client, error) 
 		return nil, errors.WithStack(err)
 	}
 
+	c.ClientID = c.ID
 	return c, nil
 }
 
@@ -119,10 +120,6 @@ func (m *MemoryManager) CreateClient(c *Client) error {
 
 	m.Lock()
 	defer m.Unlock()
-
-	if c.ID == "" {
-		c.ID = uuid.New()
-	}
 
 	hash, err := m.Hasher.Hash([]byte(c.Secret))
 	if err != nil {
@@ -155,6 +152,7 @@ func (m *MemoryManager) GetClients(limit, offset int) (clients map[string]Client
 
 	start, end := pagination.Index(limit, offset, len(m.Clients))
 	for _, c := range m.Clients[start:end] {
+		c.ClientID = c.ID
 		clients[c.ID] = c
 	}
 

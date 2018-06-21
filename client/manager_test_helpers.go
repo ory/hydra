@@ -33,12 +33,13 @@ func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
 	return func(t *testing.T) {
 		t.Parallel()
 		c := &Client{
+			ID:                "foo",
 			Secret:            "secret",
 			RedirectURIs:      []string{"http://redirect"},
 			TermsOfServiceURI: "foo",
 		}
 		assert.NoError(t, m.CreateClient(c))
-		assert.NotEmpty(t, c.ID)
+		//assert.NotEmpty(t, c.ID)
 		assert.NoError(t, m.DeleteClient(c.ID))
 	}
 }
@@ -96,7 +97,7 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 		}))
 
 		d, err := m.GetClient(nil, "1234")
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		if err == nil {
 			compare(t, d, k)
@@ -106,6 +107,7 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Len(t, ds, 2)
 		assert.NotEqual(t, ds["1234"].ID, ds["2-1234"].ID)
+		assert.NotEqual(t, ds["1234"].ID, ds["2-1234"].ClientID)
 
 		//test if SecretExpiresAt was set properly
 		assert.Equal(t, ds["1234"].SecretExpiresAt, 0)
@@ -126,10 +128,10 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 			RedirectURIs:      []string{"http://redirect/new"},
 			TermsOfServiceURI: "bar",
 		})
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		nc, err := m.GetConcreteClient("2-1234")
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		if k != "http" {
 			// http always returns an empty secret

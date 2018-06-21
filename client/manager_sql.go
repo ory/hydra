@@ -31,7 +31,6 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/go-convenience/stringsx"
 	"github.com/ory/sqlcon"
-	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
 	"gopkg.in/square/go-jose.v2"
@@ -184,6 +183,7 @@ func sqlDataFromClient(d *Client) (*sqlData, error) {
 func (d *sqlData) ToClient() (*Client, error) {
 	c := &Client{
 		ID:                            d.ID,
+		ClientID:                      d.ID,
 		Name:                          d.Name,
 		Secret:                        d.Secret,
 		RedirectURIs:                  stringsx.Splitx(d.RedirectURIs, "|"),
@@ -285,10 +285,6 @@ func (m *SQLManager) Authenticate(id string, secret []byte) (*Client, error) {
 }
 
 func (m *SQLManager) CreateClient(c *Client) error {
-	if c.ID == "" {
-		c.ID = uuid.New()
-	}
-
 	h, err := m.Hasher.Hash([]byte(c.Secret))
 	if err != nil {
 		return errors.WithStack(err)

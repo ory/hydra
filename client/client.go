@@ -24,7 +24,9 @@ import (
 	"strings"
 
 	"github.com/ory/fosite"
-	"gopkg.in/square/go-jose.v2"
+
+	// Naming the dependency jose is important for go-swagger to work, see https://github.com/go-swagger/go-swagger/issues/1587
+	jose "gopkg.in/square/go-jose.v2"
 )
 
 // Client represents an OAuth 2.0 Client.
@@ -127,7 +129,7 @@ type Client struct {
 	JSONWebKeys *jose.JSONWebKeySet `json:"jwks,omitempty"`
 
 	// Requested Client Authentication method for the Token Endpoint. The options are client_secret_post,
-	// client_secret_basic, client_secret_jwt, private_key_jwt, and none.
+	// client_secret_basic, private_key_jwt, and none.
 	TokenEndpointAuthMethod string `json:"token_endpoint_auth_method,omitempty"`
 
 	// Array of request_uri values that are pre-registered by the RP for use at the OP. Servers MAY cache the
@@ -210,6 +212,9 @@ func (c *Client) GetRequestObjectSigningAlgorithm() string {
 
 func (c *Client) GetTokenEndpointAuthMethod() string {
 	if c.TokenEndpointAuthMethod == "" {
+		if c.Public {
+			return "none"
+		}
 		return "client_secret_basic"
 	}
 	return c.TokenEndpointAuthMethod

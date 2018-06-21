@@ -69,6 +69,7 @@ func (m *MemoryManager) GetConsentRequest(challenge string) (*ConsentRequest, er
 	m.m["consentRequests"].RLock()
 	defer m.m["consentRequests"].RUnlock()
 	if c, ok := m.consentRequests[challenge]; ok {
+		c.Client.ClientID = c.Client.ID
 		return &c, nil
 	}
 	return nil, errors.WithStack(pkg.ErrNotFound)
@@ -95,6 +96,7 @@ func (m *MemoryManager) VerifyAndInvalidateConsentRequest(verifier string) (*Han
 						return nil, err
 					}
 
+					c.Client.ClientID = c.Client.ID
 					h.ConsentRequest = &c
 					return &h, nil
 				}
@@ -138,6 +140,7 @@ func (m *MemoryManager) FindPreviouslyGrantedConsentRequests(client string, subj
 			continue
 		}
 
+		cr.Client.ClientID = cr.Client.ID
 		c.ConsentRequest = cr
 		rs = append(rs, c)
 	}
@@ -188,6 +191,7 @@ func (m *MemoryManager) GetAuthenticationRequest(challenge string) (*Authenticat
 	m.m["authRequests"].RLock()
 	defer m.m["authRequests"].RUnlock()
 	if c, ok := m.authRequests[challenge]; ok {
+		c.Client.ClientID = c.Client.ID
 		return &c, nil
 	}
 	return nil, errors.WithStack(pkg.ErrNotFound)
@@ -214,6 +218,7 @@ func (m *MemoryManager) VerifyAndInvalidateAuthenticationRequest(verifier string
 						return nil, err
 					}
 
+					c.Client.ClientID = c.Client.ID
 					h.AuthenticationRequest = &c
 					return &h, nil
 				}

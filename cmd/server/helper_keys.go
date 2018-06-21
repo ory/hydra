@@ -31,13 +31,13 @@ import (
 	"gopkg.in/square/go-jose.v2"
 )
 
-func createOrGetJWK(c *config.Config, set string, prefix string) (key *jose.JSONWebKey, err error) {
+func createOrGetJWK(c *config.Config, set string, kid string, prefix string) (key *jose.JSONWebKey, err error) {
 	ctx := c.Context()
 
 	keys, err := ctx.KeyManager.GetKeySet(set)
 	if errors.Cause(err) == pkg.ErrNotFound || keys != nil && len(keys.Keys) == 0 {
 		c.GetLogger().Infof("JSON Web Key Set %s does not exist yet, generating new key pair...", set)
-		keys, err = createJWKS(ctx, set)
+		keys, err = createJWKS(ctx, set, kid)
 		if err != nil {
 			return nil, err
 		}
@@ -49,7 +49,7 @@ func createOrGetJWK(c *config.Config, set string, prefix string) (key *jose.JSON
 	if err != nil {
 		c.GetLogger().Infof("JSON Web Key with prefix %s not found in JSON Web Key Set %s, generating new key pair...", prefix, set)
 
-		keys, err = createJWKS(ctx, set)
+		keys, err = createJWKS(ctx, set, kid)
 		if err != nil {
 			return nil, err
 		}
@@ -63,9 +63,9 @@ func createOrGetJWK(c *config.Config, set string, prefix string) (key *jose.JSON
 	return key, nil
 }
 
-func createJWKS(ctx *config.Context, set string) (*jose.JSONWebKeySet, error) {
+func createJWKS(ctx *config.Context, set, kid string) (*jose.JSONWebKeySet, error) {
 	generator := jwk.RS256Generator{}
-	keys, err := generator.Generate("", "sig")
+	keys, err := generator.Generate(kid, "sig")
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not generate %s key", set)
 	}

@@ -26,6 +26,7 @@ import (
 	"crypto/rand"
 	"crypto/x509"
 
+	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"gopkg.in/square/go-jose.v2"
 )
@@ -36,6 +37,10 @@ func (g *ECDSA256Generator) Generate(id, use string) (*jose.JSONWebKeySet, error
 	key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
 		return nil, errors.Errorf("Could not generate key because %s", err)
+	}
+
+	if id == "" {
+		id = uuid.New()
 	}
 
 	return &jose.JSONWebKeySet{

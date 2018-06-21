@@ -24,6 +24,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"os"
 
@@ -75,14 +76,40 @@ func (h *JWKHandler) RotateKeys(cmd *cobra.Command, args []string) {
 	set, response, err := m.GetJsonWebKeySet(setID)
 	checkResponse(response, err, http.StatusOK)
 
+	var toCreate = map[string]hydra.JsonWebKeySetGeneratorRequest{}
 	var found bool
-	for _, key := range set.Keys {
-		if len(kid) == 0 || (len(kid) > 0 && kid == key.Kid) {
+
+	var f = func(s string) string {
+		return strings.Replace(strings.Replace(s, "public:", "", -1), "private:", "", -1)
+	}
+
+	if len(kid) == 0 {
+		for _, key := range set.Keys {
 			found = true
 			response, err := m.DeleteJsonWebKey(key.Kid, setID)
 			checkResponse(response, err, http.StatusNoContent)
+			k := f(key.Kid)
+			toCreate[k] = hydra.JsonWebKeySetGeneratorRequest{Use: key.Use, Alg: key.Alg}
+		}
 
-			_, response, err = m.CreateJsonWebKeySet(setID, hydra.JsonWebKeySetGeneratorRequest{Alg: key.Alg, Use: key.Use, Kid: key.Kid})
+		for _, k := range toCreate {
+			_, response, err = m.CreateJsonWebKeySet(setID, k)
+			checkResponse(response, err, http.StatusCreated)
+		}
+	} else if len(kid) > 0 {
+		var tc hydra.JsonWebKeySetGeneratorRequest
+		for _, key := range set.Keys {
+			if f(kid) == f(key.Kid) {
+				found = true
+				response, err := m.DeleteJsonWebKey(key.Kid, setID)
+				checkResponse(response, err, http.StatusNoContent)
+
+				tc = hydra.JsonWebKeySetGeneratorRequest{Alg: key.Alg, Use: key.Use}
+			}
+		}
+
+		if found {
+			_, response, err = m.CreateJsonWebKeySet(setID, tc)
 			checkResponse(response, err, http.StatusCreated)
 		}
 	}

@@ -25,6 +25,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 
+	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"gopkg.in/square/go-jose.v2"
 )
@@ -43,6 +44,10 @@ func (g *RS256Generator) Generate(id, use string) (*jose.JSONWebKeySet, error) {
 		return nil, errors.Errorf("Could not generate key because %s", err)
 	} else if err = key.Validate(); err != nil {
 		return nil, errors.Errorf("Validation failed because %s", err)
+	}
+
+	if id == "" {
+		id = uuid.New()
 	}
 
 	// jose does not support this...

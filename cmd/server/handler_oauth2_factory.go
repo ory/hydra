@@ -39,6 +39,7 @@ import (
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/sqlcon"
+	"github.com/pborman/uuid"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {
@@ -69,12 +70,13 @@ func newOAuth2Provider(c *config.Config) (fosite.OAuth2Provider, string) {
 	var ctx = c.Context()
 	var store = ctx.FositeStore
 
-	privateKey, err := createOrGetJWK(c, oauth2.OpenIDConnectKeyName, "private")
+	kid := uuid.New()
+	privateKey, err := createOrGetJWK(c, oauth2.OpenIDConnectKeyName, kid, "private")
 	if err != nil {
 		c.GetLogger().WithError(err).Fatalf(`Could not fetch private signing key for OpenID Connect - did you forget to run "hydra migrate sql" or forget to set the SYSTEM_SECRET?`)
 	}
 
-	publicKey, err := createOrGetJWK(c, oauth2.OpenIDConnectKeyName, "public")
+	publicKey, err := createOrGetJWK(c, oauth2.OpenIDConnectKeyName, kid, "public")
 	if err != nil {
 		c.GetLogger().WithError(err).Fatalf(`Could not fetch public signing key for OpenID Connect - did you forget to run "hydra migrate sql" or forget to set the SYSTEM_SECRET?`)
 	}
@@ -139,7 +141,7 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm consent.Ma
 	errorURL, err := url.Parse(c.ErrorURL)
 	pkg.Must(err, "Could not parse error url %s.", errorURL)
 
-	privateKey, err := createOrGetJWK(c, oauth2.OpenIDConnectKeyName, "private")
+	privateKey, err := createOrGetJWK(c, oauth2.OpenIDConnectKeyName, "", "private")
 	if err != nil {
 		c.GetLogger().WithError(err).Fatalf(`Could not fetch private signing key for OpenID Connect - did you forget to run "hydra migrate sql" or forget to set the SYSTEM_SECRET?`)
 	}

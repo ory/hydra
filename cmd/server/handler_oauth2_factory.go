@@ -177,6 +177,27 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm consent.Ma
 		IDTokenLifespan:     c.GetIDTokenLifespan(),
 	}
 
+	go func() {
+		for {
+			time.Sleep(time.Second * 5)
+
+			publicKey, err := createOrGetJWK(c, oauth2.OpenIDConnectKeyName, "", "public")
+			if err != nil {
+				c.GetLogger().WithError(err).Error("Unable to refresh OpenID Connect signing keys, retrying...")
+				continue
+			}
+
+			privateKey, err := createOrGetJWK(c, oauth2.OpenIDConnectKeyName, "", "private")
+			if err != nil {
+				c.GetLogger().WithError(err).Error("Unable to refresh OpenID Connect signing keys, retrying...")
+				continue
+			}
+
+			handler.IDTokenPublicKeyID = publicKey.KeyID
+			jwtStrategy.PrivateKey = jwk.MustRSAPrivate(privateKey)
+		}
+	}()
+
 	handler.SetRoutes(router)
 	return handler
 }

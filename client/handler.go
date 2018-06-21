@@ -23,7 +23,6 @@ package client
 import (
 	"encoding/json"
 	"net/http"
-	"strings"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
@@ -33,10 +32,9 @@ import (
 )
 
 type Handler struct {
-	Manager             Manager
-	H                   herodot.Writer
-	DefaultClientScopes []string
-	Validator           *DynamicValidator
+	Manager   Manager
+	H         herodot.Writer
+	Validator *Validator
 }
 
 const (
@@ -49,12 +47,10 @@ func NewHandler(
 	defaultClientScopes []string,
 ) *Handler {
 	return &Handler{
-		Manager:             manager,
-		H:                   h,
-		DefaultClientScopes: defaultClientScopes,
-		Validator:           NewDynamicValidator(),
+		Manager:   manager,
+		H:         h,
+		Validator: NewValidator(defaultClientScopes),
 	}
-
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
@@ -95,11 +91,6 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 		return
 	}
 
-	if err := h.Validator.Validate(&c); err != nil {
-		h.H.WriteError(w, r, err)
-		return
-	}
-
 	if len(c.Secret) == 0 {
 		secret, err := sequence.RuneSequence(12, []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-.~"))
 		if err != nil {
@@ -107,17 +98,12 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 			return
 		}
 		c.Secret = string(secret)
-	} else if len(c.Secret) < 6 {
-		h.H.WriteError(w, r, errors.New("The client secret must be at least 6 characters long"))
+	}
+
+	if err := h.Validator.Validate(&c); err != nil {
+		h.H.WriteError(w, r, err)
 		return
 	}
-
-	if len(c.Scope) == 0 {
-		c.Scope = strings.Join(h.DefaultClientScopes, " ")
-	}
-
-	// has to be 0 because it is not supposed to be set
-	c.SecretExpiresAt = 0
 
 	secret := c.Secret
 	if err := h.Manager.CreateClient(&c); err != nil {
@@ -126,12 +112,9 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	}
 
 	c.Secret = ""
-
 	if !c.Public {
 		c.Secret = secret
 	}
-
-	c.ClientID = c.ID
 	h.H.WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
@@ -164,32 +147,24 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		return
 	}
 
-	if err := h.Validator.Validate(&c); err != nil {
-		h.H.WriteError(w, r, err)
-		return
-	}
-
 	var secret string
-	if len(c.Secret) > 0 && len(c.Secret) < 6 {
-		h.H.WriteError(w, r, errors.New("The client secret must be at least 6 characters long"))
-		return
-	} else {
+	if len(c.Secret) > 0 {
 		secret = c.Secret
 	}
 
 	c.ID = ps.ByName("id")
-
-	// has to be 0 because it is not supposed to be set
-	c.SecretExpiresAt = 0
+	if err := h.Validator.Validate(&c); err != nil {
+		h.H.WriteError(w, r, err)
+		return
+	}
 
 	if err := h.Manager.UpdateClient(&c); err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}
 
-	c.ClientID = c.ID
 	c.Secret = secret
-	h.H.WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
+	h.H.Write(w, r, &c)
 }
 
 // swagger:route GET /clients oAuth2 listOAuth2Clients
@@ -224,7 +199,6 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	clients := make([]Client, len(c))
 	k := 0
 	for _, cc := range c {
-		cc.ClientID = cc.ID
 		clients[k] = cc
 		clients[k].Secret = ""
 		k++
@@ -265,7 +239,6 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	}
 
 	c.Secret = ""
-	c.ClientID = c.ID
 	h.H.Write(w, r, c)
 }
 

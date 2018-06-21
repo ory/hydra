@@ -26,8 +26,72 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/square/go-jose.v2"
 )
+
+func TestValidate(t *testing.T) {
+	v := &Validator{
+		DefaultClientScopes: []string{"openid"},
+	}
+	for k, tc := range []struct {
+		in        *Client
+		check     func(t *testing.T, c *Client)
+		expectErr bool
+	}{
+		{
+			in: new(Client),
+			check: func(t *testing.T, c *Client) {
+				assert.NotEmpty(t, c.ClientID)
+				assert.NotEmpty(t, c.ID)
+				assert.Equal(t, c.ID, c.ClientID)
+			},
+		},
+		{
+			in: &Client{ID: "foo"},
+			check: func(t *testing.T, c *Client) {
+				assert.Equal(t, c.ID, c.ClientID)
+			},
+		},
+		{
+			in: &Client{ClientID: "foo"},
+			check: func(t *testing.T, c *Client) {
+				assert.Equal(t, c.ID, c.ClientID)
+			},
+		},
+		{
+			in:        &Client{ClientID: "foo", ID: "bar"},
+			expectErr: true,
+		},
+		{
+			in:        &Client{ClientID: "foo", Public: true, TokenEndpointAuthMethod: "client_secret_basic"},
+			expectErr: true,
+		},
+		{
+			in:        &Client{ClientID: "foo", Public: false, TokenEndpointAuthMethod: "none"},
+			expectErr: true,
+		},
+		{
+			in:        &Client{ClientID: "foo", Public: false, TokenEndpointAuthMethod: "private_key_jwt"},
+			expectErr: true,
+		},
+		{
+			in:        &Client{ClientID: "foo", Public: false, JSONWebKeys: &jose.JSONWebKeySet{}, JSONWebKeysURI: "asdf", TokenEndpointAuthMethod: "private_key_jwt"},
+			expectErr: true,
+		},
+	} {
+		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+			err := v.Validate(tc.in)
+			if tc.expectErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				tc.check(t, tc.in)
+			}
+		})
+	}
+}
 
 func TestValidateSectorIdentifierURL(t *testing.T) {
 	var payload string
@@ -38,7 +102,7 @@ func TestValidateSectorIdentifierURL(t *testing.T) {
 	ts := httptest.NewTLSServer(h)
 	defer ts.Close()
 
-	v := &DynamicValidator{
+	v := &Validator{
 		c: ts.Client(),
 	}
 

@@ -47,7 +47,10 @@ func TestRS256JWTStrategy(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotEmpty(t, a)
 	assert.NotEmpty(t, b)
-	assert.Equal(t, "public:foo", s.GetPublicKeyID())
+
+	kid, err := s.GetPublicKeyID()
+	assert.NoError(t, err)
+	assert.Equal(t, "public:foo", kid)
 
 	ks, err = testGenerator.Generate("bar", "sig")
 	require.NoError(t, err)
@@ -57,5 +60,8 @@ func TestRS256JWTStrategy(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotEmpty(t, a)
 	assert.NotEmpty(t, b)
-	assert.Equal(t, "public:bar", s.GetPublicKeyID())
+
+	kid, err = s.GetPublicKeyID()
+	assert.NoError(t, err)
+	assert.Equal(t, "public:bar", kid)
 }

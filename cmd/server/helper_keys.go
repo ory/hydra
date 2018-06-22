@@ -63,22 +63,6 @@ func createOrGetJWK(c *config.Config, set string, kid string, prefix string) (ke
 	return key, nil
 }
 
-func getJWK(c *config.Config, set string, prefix string) (key *jose.JSONWebKey, err error) {
-	ctx := c.Context()
-
-	keys, err := ctx.KeyManager.GetKeySet(set)
-	if err != nil {
-		return nil, err
-	}
-
-	key, err = jwk.FindKeyByPrefix(keys, prefix)
-	if err != nil {
-		return nil, err
-	}
-
-	return key, nil
-}
-
 func createJWKS(ctx *config.Context, set, kid string) (*jose.JSONWebKeySet, error) {
 	generator := jwk.RS256Generator{}
 	keys, err := generator.Generate(kid, "sig")

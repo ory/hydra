@@ -72,6 +72,9 @@ func TestRevoke(t *testing.T) {
 			compose.OAuth2TokenRevocationFactory,
 		),
 		H: herodot.NewJSONWriter(nil),
+		IDTokenPublicKeyID: func() string {
+			return ""
+		},
 	}
 
 	router := httprouter.New()

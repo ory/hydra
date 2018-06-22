@@ -66,7 +66,7 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 	ctx.FositeStore = store
 }
 
-func newOAuth2Provider(c *config.Config) (fosite.OAuth2Provider, string) {
+func newOAuth2Provider(c *config.Config) fosite.OAuth2Provider {
 	var ctx = c.Context()
 	var store = ctx.FositeStore
 
@@ -76,8 +76,7 @@ func newOAuth2Provider(c *config.Config) (fosite.OAuth2Provider, string) {
 		c.GetLogger().WithError(err).Fatalf(`Could not fetch private signing key for OpenID Connect - did you forget to run "hydra migrate sql" or forget to set the SYSTEM_SECRET?`)
 	}
 
-	publicKey, err := createOrGetJWK(c, oauth2.OpenIDConnectKeyName, kid, "public")
-	if err != nil {
+	if _, err := createOrGetJWK(c, oauth2.OpenIDConnectKeyName, kid, "public"); err != nil {
 		c.GetLogger().WithError(err).Fatalf(`Could not fetch public signing key for OpenID Connect - did you forget to run "hydra migrate sql" or forget to set the SYSTEM_SECRET?`)
 	}
 
@@ -114,7 +113,7 @@ func newOAuth2Provider(c *config.Config) (fosite.OAuth2Provider, string) {
 		compose.OpenIDConnectRefreshFactory,
 		compose.OAuth2TokenRevocationFactory,
 		compose.OAuth2TokenIntrospectionFactory,
-	), publicKey.KeyID
+	)
 }
 
 func setDefaultConsentURL(s string, c *config.Config, path string) string {
@@ -133,7 +132,7 @@ func setDefaultConsentURL(s string, c *config.Config, path string) string {
 }
 
 //func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm oauth2.ConsentRequestManager, o fosite.OAuth2Provider, idTokenKeyID string) *oauth2.Handler {
-func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm consent.Manager, o fosite.OAuth2Provider, idTokenKeyID string) *oauth2.Handler {
+func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm consent.Manager, o fosite.OAuth2Provider) *oauth2.Handler {
 	c.ConsentURL = setDefaultConsentURL(c.ConsentURL, c, "oauth2/fallbacks/consent")
 	c.LoginURL = setDefaultConsentURL(c.LoginURL, c, "oauth2/fallbacks/consent")
 	c.ErrorURL = setDefaultConsentURL(c.ErrorURL, c, "oauth2/fallbacks/error")
@@ -141,12 +140,9 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm consent.Ma
 	errorURL, err := url.Parse(c.ErrorURL)
 	pkg.Must(err, "Could not parse error url %s.", errorURL)
 
-	privateKey, err := createOrGetJWK(c, oauth2.OpenIDConnectKeyName, "", "private")
-	if err != nil {
-		c.GetLogger().WithError(err).Fatalf(`Could not fetch private signing key for OpenID Connect - did you forget to run "hydra migrate sql" or forget to set the SYSTEM_SECRET?`)
-	}
-
-	jwtStrategy := compose.NewOpenIDConnectStrategy(jwk.MustRSAPrivate(privateKey))
+	jwtStrategy, err := jwk.NewRS256JWTStrategy(c.Context().KeyManager, oauth2.OpenIDConnectKeyName)
+	pkg.Must(err, "Could not fetch private signing key for OpenID Connect - did you forget to run \"hydra migrate sql\" or forget to set the SYSTEM_SECRET?")
+	oidcStrategy := &openid.DefaultStrategy{JWTStrategy: jwtStrategy}
 
 	w := herodot.NewJSONWriter(c.GetLogger())
 	w.ErrorEnhancer = writerErrorEnhancer
@@ -163,8 +159,8 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm consent.Ma
 			"/oauth2/auth", cm,
 			sessions.NewCookieStore(c.GetCookieSecret()), c.GetScopeStrategy(),
 			!c.ForceHTTP, time.Minute*15,
-			jwtStrategy,
-			openid.NewOpenIDConnectRequestValidator(nil, jwtStrategy),
+			oidcStrategy,
+			openid.NewOpenIDConnectRequestValidator(nil, oidcStrategy),
 		),
 		Storage:             c.Context().FositeStore,
 		ErrorURL:            *errorURL,
@@ -173,30 +169,9 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm consent.Ma
 		CookieStore:         sessions.NewCookieStore(c.GetCookieSecret()),
 		IssuerURL:           c.Issuer,
 		L:                   c.GetLogger(),
-		IDTokenPublicKeyID:  idTokenKeyID,
+		IDTokenPublicKeyID:  jwtStrategy.GetPublicKeyID,
 		IDTokenLifespan:     c.GetIDTokenLifespan(),
 	}
-
-	go func() {
-		for {
-			time.Sleep(time.Second * 5)
-
-			publicKey, err := getJWK(c, oauth2.OpenIDConnectKeyName, "public")
-			if err != nil {
-				c.GetLogger().WithError(err).Error("Unable to refresh OpenID Connect signing keys, retrying...")
-				continue
-			}
-
-			privateKey, err := getJWK(c, oauth2.OpenIDConnectKeyName, "private")
-			if err != nil {
-				c.GetLogger().WithError(err).Error("Unable to refresh OpenID Connect signing keys, retrying...")
-				continue
-			}
-
-			handler.IDTokenPublicKeyID = publicKey.KeyID
-			jwtStrategy.PrivateKey = jwk.MustRSAPrivate(privateKey)
-		}
-	}()
 
 	handler.SetRoutes(router)
 	return handler

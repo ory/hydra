@@ -83,11 +83,17 @@ func (h *JWKHandler) RotateKeys(cmd *cobra.Command, args []string) {
 		return strings.Replace(strings.Replace(s, "public:", "", -1), "private:", "", -1)
 	}
 
+	shouldDelete, _ := cmd.Flags().GetBool("delete")
+
 	if len(kid) == 0 {
 		for _, key := range set.Keys {
 			found = true
-			response, err := m.DeleteJsonWebKey(key.Kid, setID)
-			checkResponse(response, err, http.StatusNoContent)
+
+			if shouldDelete {
+				response, err := m.DeleteJsonWebKey(key.Kid, setID)
+				checkResponse(response, err, http.StatusNoContent)
+			}
+
 			k := f(key.Kid)
 			toCreate[k] = hydra.JsonWebKeySetGeneratorRequest{Use: key.Use, Alg: key.Alg}
 		}
@@ -101,8 +107,11 @@ func (h *JWKHandler) RotateKeys(cmd *cobra.Command, args []string) {
 		for _, key := range set.Keys {
 			if f(kid) == f(key.Kid) {
 				found = true
-				response, err := m.DeleteJsonWebKey(key.Kid, setID)
-				checkResponse(response, err, http.StatusNoContent)
+
+				if shouldDelete {
+					response, err := m.DeleteJsonWebKey(key.Kid, setID)
+					checkResponse(response, err, http.StatusNoContent)
+				}
 
 				tc = hydra.JsonWebKeySetGeneratorRequest{Alg: key.Alg, Use: key.Use}
 			}

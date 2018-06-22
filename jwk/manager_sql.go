@@ -23,6 +23,7 @@ package jwk
 import (
 	"database/sql"
 	"encoding/json"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/hydra/pkg"
@@ -66,10 +67,11 @@ var migrations = &migrate.MemoryMigrationSource{
 }
 
 type sqlData struct {
-	Set     string `db:"sid"`
-	KID     string `db:"kid"`
-	Version int    `db:"version"`
-	Key     string `db:"keydata"`
+	Set       string    `db:"sid"`
+	KID       string    `db:"kid"`
+	Version   int       `db:"version"`
+	CreatedAt time.Time `db:"created_at"`
+	Key       string    `db:"keydata"`
 }
 
 func (s *SQLManager) CreateSchemas() (int, error) {

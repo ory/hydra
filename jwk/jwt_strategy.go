@@ -41,14 +41,27 @@ func NewRS256JWTStrategy(m Manager, set string) (*RS256JWTStrategy, error) {
 }
 
 type RS256JWTStrategy struct {
-	*jwt.RS256JWTStrategy
-	Manager Manager
-	Set     string
+	RS256JWTStrategy *jwt.RS256JWTStrategy
+	Manager          Manager
+	Set              string
 
 	publicKey    *rsa.PublicKey
 	privateKey   *rsa.PrivateKey
 	publicKeyID  string
 	privateKeyID string
+}
+
+func (j *RS256JWTStrategy) Hash(in []byte) ([]byte, error) {
+	return j.RS256JWTStrategy.Hash(in)
+}
+
+// GetSigningMethodLength will return the length of the signing method
+func (j *RS256JWTStrategy) GetSigningMethodLength() int {
+	return j.RS256JWTStrategy.GetSigningMethodLength()
+}
+
+func (j *RS256JWTStrategy) GetSignature(token string) (string, error) {
+	return j.RS256JWTStrategy.GetSignature(token)
 }
 
 func (j *RS256JWTStrategy) Generate(claims jwt2.Claims, header jwt.Mapper) (string, string, error) {
@@ -75,8 +88,12 @@ func (j *RS256JWTStrategy) Decode(token string) (*jwt2.Token, error) {
 	return j.RS256JWTStrategy.Decode(token)
 }
 
-func (j *RS256JWTStrategy) GetPublicKeyID() string {
-	return j.publicKeyID
+func (j *RS256JWTStrategy) GetPublicKeyID() (string, error) {
+	if err := j.refresh(); err != nil {
+		return "", err
+	}
+
+	return j.publicKeyID, nil
 }
 
 func (j *RS256JWTStrategy) refresh() error {

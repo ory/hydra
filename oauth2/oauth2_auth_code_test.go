@@ -161,8 +161,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				H:               herodot.NewJSONWriter(l),
 				ScopeStrategy:   fosite.ExactScopeStrategy,
 				IDTokenLifespan: time.Minute, IssuerURL: ts.URL, ForcedHTTP: true, L: l,
-				IDTokenPublicKeyID: func() string {
-					return ""
+				IDTokenPublicKeyID: func() (string, error) {
+					return "", nil
 				},
 			}
 			handler.SetRoutes(router)
@@ -622,8 +622,8 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 		ScopeStrategy:   fosite.HierarchicScopeStrategy,
 		IDTokenLifespan: time.Minute,
 		IssuerURL:       ts.URL,
-		IDTokenPublicKeyID: func() string {
-			return ""
+		IDTokenPublicKeyID: func() (string, error) {
+			return "", nil
 		},
 	}
 	handler.SetRoutes(router)

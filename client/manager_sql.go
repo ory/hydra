@@ -113,11 +113,11 @@ type sqlData struct {
 	Public                        bool   `db:"public"`
 	SecretExpiresAt               int    `db:"client_secret_expires_at"`
 	SectorIdentifierURI           string `db:"sector_identifier_uri"`
-	JSONWebKeysURI                string `json:"jwks_uri"`
-	JSONWebKeys                   string `json:"jwks"`
-	TokenEndpointAuthMethod       string `json:"token_endpoint_auth_method"`
-	RequestURIs                   string `json:"request_uris"`
-	RequestObjectSigningAlgorithm string `json:"request_object_signing_alg"`
+	JSONWebKeysURI                string `db:"jwks_uri"`
+	JSONWebKeys                   string `db:"jwks"`
+	TokenEndpointAuthMethod       string `db:"token_endpoint_auth_method"`
+	RequestURIs                   string `db:"request_uris"`
+	RequestObjectSigningAlgorithm string `db:"request_object_signing_alg"`
 }
 
 var sqlParams = []string{

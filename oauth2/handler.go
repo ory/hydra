@@ -486,6 +486,13 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		authorizeRequest.GrantScope(scope)
 	}
 
+	keyID, err := h.IDTokenPublicKeyID()
+	if err != nil {
+		pkg.LogError(err, h.L)
+		h.writeAuthorizeError(w, authorizeRequest, err)
+		return
+	}
+
 	// done
 	response, err := h.OAuth2.NewAuthorizeResponse(ctx, authorizeRequest, &Session{
 		DefaultSession: &openid.DefaultSession{
@@ -501,7 +508,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 				Extra:       session.Session.IDToken,
 			},
 			// required for lookup on jwk endpoint
-			Headers: &jwt.Headers{Extra: map[string]interface{}{"kid": h.IDTokenPublicKeyID()}},
+			Headers: &jwt.Headers{Extra: map[string]interface{}{"kid": keyID}},
 			Subject: session.ConsentRequest.Subject,
 		},
 		Extra: session.Session.AccessToken,

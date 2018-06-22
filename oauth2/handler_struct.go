@@ -46,7 +46,7 @@ type Handler struct {
 	IDTokenLifespan     time.Duration
 	CookieStore         sessions.Store
 
-	IDTokenPublicKeyID func() string
+	IDTokenPublicKeyID func() (string, error)
 
 	L logrus.FieldLogger
 

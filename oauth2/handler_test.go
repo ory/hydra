@@ -78,8 +78,8 @@ func TestHandlerFlushHandler(t *testing.T) {
 		ScopeStrategy: fosite.HierarchicScopeStrategy,
 		IssuerURL:     "http://hydra.localhost",
 		Storage:       store,
-		IDTokenPublicKeyID: func() string {
-			return ""
+		IDTokenPublicKeyID: func() (string, error) {
+			return "", nil
 		},
 	}
 
@@ -134,8 +134,8 @@ func TestHandlerWellKnown(t *testing.T) {
 		H:             herodot.NewJSONWriter(nil),
 		ScopeStrategy: fosite.HierarchicScopeStrategy,
 		IssuerURL:     "http://hydra.localhost",
-		IDTokenPublicKeyID: func() string {
-			return ""
+		IDTokenPublicKeyID: func() (string, error) {
+			return "", nil
 		},
 	}
 

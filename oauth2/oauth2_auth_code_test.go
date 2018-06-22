@@ -42,6 +42,7 @@ import (
 	"github.com/ory/herodot"
 	hc "github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/jwk"
 	. "github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/sdk/go/hydra/swagger"
@@ -50,6 +51,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
+	"gopkg.in/square/go-jose.v2"
 )
 
 func newCookieJar() http.CookieJar {
@@ -143,6 +145,12 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				openid.NewOpenIDConnectRequestValidator(nil, jwts),
 			)
 
+			jm := &jwk.MemoryManager{Keys: map[string]*jose.JSONWebKeySet{}}
+			keys, err := (&jwk.RS256Generator{}).Generate("", "sig")
+			require.NoError(t, err)
+			require.NoError(t, jm.AddKeySet(OpenIDConnectKeyName, keys))
+			jwtStrategy, err := jwk.NewRS256JWTStrategy(jm, OpenIDConnectKeyName)
+
 			handler := &Handler{
 				OAuth2: compose.Compose(
 					fc, fs, oauth2Strategy, hasher,
@@ -161,9 +169,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				H:               herodot.NewJSONWriter(l),
 				ScopeStrategy:   fosite.ExactScopeStrategy,
 				IDTokenLifespan: time.Minute, IssuerURL: ts.URL, ForcedHTTP: true, L: l,
-				IDTokenPublicKeyID: func() (string, error) {
-					return "", nil
-				},
+				JWTStrategy: jwtStrategy,
 			}
 			handler.SetRoutes(router)
 
@@ -598,6 +604,12 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 	l := logrus.New()
 	l.Level = logrus.DebugLevel
 
+	jm := &jwk.MemoryManager{Keys: map[string]*jose.JSONWebKeySet{}}
+	keys, err := (&jwk.RS256Generator{}).Generate("", "sig")
+	require.NoError(t, err)
+	require.NoError(t, jm.AddKeySet(OpenIDConnectKeyName, keys))
+	jwtStrategy, err := jwk.NewRS256JWTStrategy(jm, OpenIDConnectKeyName)
+
 	handler := &Handler{
 		OAuth2: compose.Compose(
 			fc,
@@ -622,9 +634,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 		ScopeStrategy:   fosite.HierarchicScopeStrategy,
 		IDTokenLifespan: time.Minute,
 		IssuerURL:       ts.URL,
-		IDTokenPublicKeyID: func() (string, error) {
-			return "", nil
-		},
+		JWTStrategy:     jwtStrategy,
 	}
 	handler.SetRoutes(router)
 

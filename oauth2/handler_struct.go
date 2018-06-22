@@ -28,6 +28,7 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/pkg"
 	"github.com/sirupsen/logrus"
 )
@@ -46,7 +47,7 @@ type Handler struct {
 	IDTokenLifespan     time.Duration
 	CookieStore         sessions.Store
 
-	IDTokenPublicKeyID func() (string, error)
+	JWTStrategy *jwk.RS256JWTStrategy
 
 	L logrus.FieldLogger
 

@@ -61,6 +61,10 @@ func TestValidate(t *testing.T) {
 			},
 		},
 		{
+			in:        &Client{ClientID: "foo", UserinfoSignedResponseAlg: "foo"},
+			expectErr: true,
+		},
+		{
 			in:        &Client{ClientID: "foo", ID: "bar"},
 			expectErr: true,
 		},

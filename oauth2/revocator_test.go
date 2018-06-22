@@ -32,11 +32,13 @@ import (
 	"github.com/ory/fosite/compose"
 	"github.com/ory/fosite/storage"
 	"github.com/ory/herodot"
+	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/square/go-jose.v2"
 )
 
 func createAccessTokenSession(subject, client string, token string, expiresAt time.Time, fs *storage.MemoryStore, scopes fosite.Arguments) {
@@ -59,6 +61,12 @@ func TestRevoke(t *testing.T) {
 		now    = time.Now().UTC().Round(time.Second)
 	)
 
+	jm := &jwk.MemoryManager{Keys: map[string]*jose.JSONWebKeySet{}}
+	keys, err := (&jwk.RS256Generator{}).Generate("", "sig")
+	require.NoError(t, err)
+	require.NoError(t, jm.AddKeySet(oauth2.OpenIDConnectKeyName, keys))
+	jwtStrategy, err := jwk.NewRS256JWTStrategy(jm, oauth2.OpenIDConnectKeyName)
+
 	handler := &oauth2.Handler{
 		OAuth2: compose.Compose(
 			fc,
@@ -71,10 +79,8 @@ func TestRevoke(t *testing.T) {
 			compose.OAuth2TokenIntrospectionFactory,
 			compose.OAuth2TokenRevocationFactory,
 		),
-		H: herodot.NewJSONWriter(nil),
-		IDTokenPublicKeyID: func() (string, error) {
-			return "", nil
-		},
+		H:           herodot.NewJSONWriter(nil),
+		JWTStrategy: jwtStrategy,
 	}
 
 	router := httprouter.New()

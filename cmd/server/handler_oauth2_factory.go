@@ -169,7 +169,7 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm consent.Ma
 		CookieStore:         sessions.NewCookieStore(c.GetCookieSecret()),
 		IssuerURL:           c.Issuer,
 		L:                   c.GetLogger(),
-		IDTokenPublicKeyID:  jwtStrategy.GetPublicKeyID,
+		JWTStrategy:         jwtStrategy,
 		IDTokenLifespan:     c.GetIDTokenLifespan(),
 	}
 

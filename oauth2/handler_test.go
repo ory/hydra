@@ -78,9 +78,6 @@ func TestHandlerFlushHandler(t *testing.T) {
 		ScopeStrategy: fosite.HierarchicScopeStrategy,
 		IssuerURL:     "http://hydra.localhost",
 		Storage:       store,
-		IDTokenPublicKeyID: func() (string, error) {
-			return "", nil
-		},
 	}
 
 	for _, r := range flushRequests {
@@ -134,9 +131,6 @@ func TestHandlerWellKnown(t *testing.T) {
 		H:             herodot.NewJSONWriter(nil),
 		ScopeStrategy: fosite.HierarchicScopeStrategy,
 		IssuerURL:     "http://hydra.localhost",
-		IDTokenPublicKeyID: func() (string, error) {
-			return "", nil
-		},
 	}
 
 	AuthPathT := "/oauth2/auth"
@@ -166,6 +160,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		GrantTypesSupported:               []string{"authorization_code", "implicit", "client_credentials", "refresh_token"},
 		ResponseModesSupported:            []string{"query", "fragment"},
 		IDTokenSigningAlgValuesSupported:  []string{"RS256"},
+		UserinfoSigningAlgValuesSupported: []string{"none", "RS256"},
 		RequestParameterSupported:         true,
 		RequestURIParameterSupported:      true,
 		RequireRequestURIRegistration:     true,

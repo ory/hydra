@@ -24,6 +24,7 @@ import (
 	"crypto/rand"
 	"io"
 	"testing"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -65,6 +66,9 @@ func TestHelperManagerKey(m Manager, keys *jose.JSONWebKeySet, suffix string) fu
 		got, err = m.GetKey("faz", "public:"+suffix)
 		assert.Nil(t, err)
 		assert.Equal(t, pub, got.Keys)
+
+		// Because MySQL
+		time.Sleep(time.Second * 2)
 
 		First(pub).KeyID = "new-key-id:" + suffix
 		err = m.AddKey("faz", First(pub))

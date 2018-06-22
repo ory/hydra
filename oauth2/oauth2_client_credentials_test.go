@@ -63,6 +63,9 @@ func TestClientCredentials(t *testing.T) {
 		H:               herodot.NewJSONWriter(l),
 		L:               l,
 		IssuerURL:       ts.URL,
+		IDTokenPublicKeyID: func() string {
+			return ""
+		},
 	}
 
 	handler.SetRoutes(router)

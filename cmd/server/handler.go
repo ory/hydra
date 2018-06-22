@@ -166,13 +166,13 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 	injectConsentManager(c, clientsManager)
 
 	injectFositeStore(c, clientsManager)
-	oauth2Provider, idTokenKeyID := newOAuth2Provider(c)
+	oauth2Provider := newOAuth2Provider(c)
 
 	// Set up handlers
 	h.Clients = newClientHandler(c, router, clientsManager)
 	h.Keys = newJWKHandler(c, router)
 	h.Consent = newConsentHandler(c, router)
-	h.OAuth2 = newOAuth2Handler(c, router, ctx.ConsentManager, oauth2Provider, idTokenKeyID)
+	h.OAuth2 = newOAuth2Handler(c, router, ctx.ConsentManager, oauth2Provider)
 	_ = newHealthHandler(c, router)
 }
 

@@ -65,6 +65,9 @@ func TestIntrospectorSDK(t *testing.T) {
 		),
 		H:         herodot.NewJSONWriter(l),
 		IssuerURL: "foobariss",
+		IDTokenPublicKeyID: func() string {
+			return ""
+		},
 	}
 	handler.SetRoutes(router)
 	server := httptest.NewServer(router)

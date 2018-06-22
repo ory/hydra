@@ -501,7 +501,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 				Extra:       session.Session.IDToken,
 			},
 			// required for lookup on jwk endpoint
-			Headers: &jwt.Headers{Extra: map[string]interface{}{"kid": h.IDTokenPublicKeyID}},
+			Headers: &jwt.Headers{Extra: map[string]interface{}{"kid": h.IDTokenPublicKeyID()}},
 			Subject: session.ConsentRequest.Subject,
 		},
 		Extra: session.Session.AccessToken,

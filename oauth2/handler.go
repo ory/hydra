@@ -23,10 +23,12 @@ package oauth2
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
 
+	jwt2 "github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
@@ -121,6 +123,9 @@ type WellKnown struct {
 	// client_secret_post, client_secret_basic, client_secret_jwt, and private_key_jwt, as described in Section 9 of OpenID Connect Core 1.0
 	TokenEndpointAuthMethodsSupported []string `json:"token_endpoint_auth_methods_supported"`
 
+	//	JSON array containing a list of the JWS [JWS] signing algorithms (alg values) [JWA] supported by the UserInfo Endpoint to encode the Claims in a JWT [JWT].
+	UserinfoSigningAlgValuesSupported []string `json:"userinfo_signing_alg_values_supported"`
+
 	// JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token
 	// to encode the Claims in a JWT.
 	//
@@ -210,6 +215,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ htt
 		IDTokenSigningAlgValuesSupported:  []string{"RS256"},
 		GrantTypesSupported:               []string{"authorization_code", "implicit", "client_credentials", "refresh_token"},
 		ResponseModesSupported:            []string{"query", "fragment"},
+		UserinfoSigningAlgValuesSupported: []string{"none", "RS256"},
 		RequestParameterSupported:         true,
 		RequestURIParameterSupported:      true,
 		RequireRequestURIRegistration:     true,
@@ -248,19 +254,60 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request, _ http
 		return
 	}
 
-	interim := ar.GetSession().(*Session).IDTokenClaims().ToMap()
-	delete(interim, "aud")
-	delete(interim, "iss")
-	delete(interim, "nonce")
-	delete(interim, "at_hash")
-	delete(interim, "c_hash")
-	delete(interim, "auth_time")
-	delete(interim, "iat")
-	delete(interim, "rat")
-	delete(interim, "exp")
-	delete(interim, "jti")
+	c, ok := ar.GetClient().(*client.Client)
+	if !ok {
+		h.H.WriteError(w, r, errors.WithStack(fosite.ErrServerError.WithHint("Unable to type assert to *client.Client")))
+		return
+	}
 
-	h.H.Write(w, r, interim)
+	if c.UserinfoSignedResponseAlg == "RS256" {
+		interim := ar.GetSession().(*Session).IDTokenClaims().ToMap()
+
+		delete(interim, "nonce")
+		delete(interim, "at_hash")
+		delete(interim, "c_hash")
+		delete(interim, "auth_time")
+		delete(interim, "iat")
+		delete(interim, "rat")
+		delete(interim, "exp")
+		delete(interim, "jti")
+
+		keyID, err := h.JWTStrategy.GetPublicKeyID()
+		if err != nil {
+			h.H.WriteError(w, r, err)
+			return
+		}
+
+		token, _, err := h.JWTStrategy.Generate(jwt2.MapClaims(interim), &jwt.Headers{
+			Extra: map[string]interface{}{
+				"kid": keyID,
+			},
+		})
+		if err != nil {
+			h.H.WriteError(w, r, err)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/jwt")
+		w.Write([]byte(token))
+	} else if c.UserinfoSignedResponseAlg == "" || c.UserinfoSignedResponseAlg == "none" {
+		interim := ar.GetSession().(*Session).IDTokenClaims().ToMap()
+		delete(interim, "aud")
+		delete(interim, "iss")
+		delete(interim, "nonce")
+		delete(interim, "at_hash")
+		delete(interim, "c_hash")
+		delete(interim, "auth_time")
+		delete(interim, "iat")
+		delete(interim, "rat")
+		delete(interim, "exp")
+		delete(interim, "jti")
+
+		h.H.Write(w, r, interim)
+	} else {
+		h.H.WriteError(w, r, errors.WithStack(fosite.ErrServerError.WithHint(fmt.Sprintf("Unsupported userinfo signing algorithm \"%s\"", c.UserinfoSignedResponseAlg))))
+		return
+	}
 }
 
 // swagger:route POST /oauth2/revoke oAuth2 revokeOAuth2Token
@@ -486,7 +533,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		authorizeRequest.GrantScope(scope)
 	}
 
-	keyID, err := h.IDTokenPublicKeyID()
+	keyID, err := h.JWTStrategy.GetPublicKeyID()
 	if err != nil {
 		pkg.LogError(err, h.L)
 		h.writeAuthorizeError(w, authorizeRequest, err)

@@ -141,6 +141,11 @@ type Client struct {
 	// JWS [JWS] alg algorithm [JWA] that MUST be used for signing Request Objects sent to the OP. All Request Objects
 	// from this Client MUST be rejected, if not signed with this algorithm.
 	RequestObjectSigningAlgorithm string `json:"request_object_signing_alg,omitempty"`
+
+	// JWS alg algorithm [JWA] REQUIRED for signing UserInfo Responses. If this is specified, the response will be JWT
+	// [JWT] serialized, and signed using JWS. The default, if omitted, is for the UserInfo Response to return the Claims
+	// as a UTF-8 encoded JSON object using the application/json content-type.
+	UserinfoSignedResponseAlg string `json:"userinfo_signed_response_alg,omitempty"`
 }
 
 func (c *Client) GetID() string {

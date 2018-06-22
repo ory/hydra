@@ -32,11 +32,13 @@ import (
 	"github.com/ory/fosite/compose"
 	"github.com/ory/herodot"
 	hc "github.com/ory/hydra/client"
+	"github.com/ory/hydra/jwk"
 	. "github.com/ory/hydra/oauth2"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2/clientcredentials"
+	"gopkg.in/square/go-jose.v2"
 )
 
 func TestClientCredentials(t *testing.T) {
@@ -44,6 +46,12 @@ func TestClientCredentials(t *testing.T) {
 	l := logrus.New()
 	l.Level = logrus.DebugLevel
 	store := NewFositeMemoryStore(hc.NewMemoryManager(hasher), time.Second)
+
+	jm := &jwk.MemoryManager{Keys: map[string]*jose.JSONWebKeySet{}}
+	keys, err := (&jwk.RS256Generator{}).Generate("", "sig")
+	require.NoError(t, err)
+	require.NoError(t, jm.AddKeySet(OpenIDConnectKeyName, keys))
+	jwtStrategy, err := jwk.NewRS256JWTStrategy(jm, OpenIDConnectKeyName)
 
 	ts := httptest.NewServer(router)
 	handler := &Handler{
@@ -63,9 +71,7 @@ func TestClientCredentials(t *testing.T) {
 		H:               herodot.NewJSONWriter(l),
 		L:               l,
 		IssuerURL:       ts.URL,
-		IDTokenPublicKeyID: func() (string, error) {
-			return "", nil
-		},
+		JWTStrategy:     jwtStrategy,
 	}
 
 	handler.SetRoutes(router)

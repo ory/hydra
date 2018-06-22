@@ -95,6 +95,14 @@ func (v *Validator) Validate(c *Client) error {
 		}
 	}
 
+	if c.UserinfoSignedResponseAlg == "" {
+		c.UserinfoSignedResponseAlg = "none"
+	}
+
+	if c.UserinfoSignedResponseAlg != "none" && c.UserinfoSignedResponseAlg != "RS256" {
+		return errors.WithStack(fosite.ErrInvalidRequest.WithHint("Field userinfo_signed_response_alg can either be \"none\" or \"RS256\"."))
+	}
+
 	for _, r := range c.RedirectURIs {
 		if strings.Contains(r, "#") {
 			return errors.WithStack(fosite.ErrInvalidRequest.WithHint("Redirect URIs must not contain fragments (#)"))

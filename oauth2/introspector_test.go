@@ -33,12 +33,14 @@ import (
 	"github.com/ory/fosite/compose"
 	"github.com/ory/fosite/storage"
 	"github.com/ory/herodot"
+	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/square/go-jose.v2"
 )
 
 func TestIntrospectorSDK(t *testing.T) {
@@ -48,6 +50,12 @@ func TestIntrospectorSDK(t *testing.T) {
 
 	l := logrus.New()
 	l.Level = logrus.DebugLevel
+
+	jm := &jwk.MemoryManager{Keys: map[string]*jose.JSONWebKeySet{}}
+	keys, err := (&jwk.RS256Generator{}).Generate("", "sig")
+	require.NoError(t, err)
+	require.NoError(t, jm.AddKeySet(oauth2.OpenIDConnectKeyName, keys))
+	jwtStrategy, err := jwk.NewRS256JWTStrategy(jm, oauth2.OpenIDConnectKeyName)
 
 	router := httprouter.New()
 	handler := &oauth2.Handler{
@@ -63,11 +71,9 @@ func TestIntrospectorSDK(t *testing.T) {
 			compose.OAuth2AuthorizeExplicitFactory,
 			compose.OAuth2TokenIntrospectionFactory,
 		),
-		H:         herodot.NewJSONWriter(l),
-		IssuerURL: "foobariss",
-		IDTokenPublicKeyID: func() (string, error) {
-			return "", nil
-		},
+		H:           herodot.NewJSONWriter(l),
+		IssuerURL:   "foobariss",
+		JWTStrategy: jwtStrategy,
 	}
 	handler.SetRoutes(router)
 	server := httptest.NewServer(router)

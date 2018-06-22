@@ -36,9 +36,6 @@ func TestHandlerConsent(t *testing.T) {
 	h := &Handler{
 		L:             logrus.New(),
 		ScopeStrategy: fosite.HierarchicScopeStrategy,
-		IDTokenPublicKeyID: func() (string, error) {
-			return "", nil
-		},
 	}
 	r := httprouter.New()
 	h.SetRoutes(r)

@@ -75,9 +75,10 @@ var migrations = &migrate.MemoryMigrationSource{
 				`ALTER TABLE hydra_client ADD sector_identifier_uri TEXT NOT NULL`,
 				`ALTER TABLE hydra_client ADD jwks TEXT NOT NULL`,
 				`ALTER TABLE hydra_client ADD jwks_uri TEXT NOT NULL`,
-				`ALTER TABLE hydra_client ADD token_endpoint_auth_method TEXT NOT NULL`,
+				`ALTER TABLE hydra_client ADD token_endpoint_auth_method  VARCHAR(25) NOT NULL`,
 				`ALTER TABLE hydra_client ADD request_uris TEXT NOT NULL`,
-				`ALTER TABLE hydra_client ADD request_object_signing_alg TEXT NOT NULL`,
+				`ALTER TABLE hydra_client ADD request_object_signing_alg  VARCHAR(10) NOT NULL`,
+				`ALTER TABLE hydra_client ADD userinfo_signed_response_alg VARCHAR(10) NOT NULL`,
 			},
 			Down: []string{
 				`ALTER TABLE hydra_client DROP COLUMN sector_identifier_uri`,
@@ -86,6 +87,7 @@ var migrations = &migrate.MemoryMigrationSource{
 				`ALTER TABLE hydra_client DROP COLUMN token_endpoint_auth_method`,
 				`ALTER TABLE hydra_client DROP COLUMN request_uris`,
 				`ALTER TABLE hydra_client DROP COLUMN request_object_signing_alg`,
+				`ALTER TABLE hydra_client DROP COLUMN userinfo_signed_response_alg`,
 			},
 		},
 	},
@@ -118,6 +120,7 @@ type sqlData struct {
 	TokenEndpointAuthMethod       string `db:"token_endpoint_auth_method"`
 	RequestURIs                   string `db:"request_uris"`
 	RequestObjectSigningAlgorithm string `db:"request_object_signing_alg"`
+	UserinfoSignedResponseAlg     string `db:"userinfo_signed_response_alg"`
 }
 
 var sqlParams = []string{
@@ -142,6 +145,7 @@ var sqlParams = []string{
 	"token_endpoint_auth_method",
 	"request_uris",
 	"request_object_signing_alg",
+	"userinfo_signed_response_alg",
 }
 
 func sqlDataFromClient(d *Client) (*sqlData, error) {
@@ -177,6 +181,7 @@ func sqlDataFromClient(d *Client) (*sqlData, error) {
 		TokenEndpointAuthMethod:       d.TokenEndpointAuthMethod,
 		RequestObjectSigningAlgorithm: d.RequestObjectSigningAlgorithm,
 		RequestURIs:                   strings.Join(d.RequestURIs, "|"),
+		UserinfoSignedResponseAlg:     d.UserinfoSignedResponseAlg,
 	}, nil
 }
 
@@ -203,6 +208,7 @@ func (d *sqlData) ToClient() (*Client, error) {
 		TokenEndpointAuthMethod:       d.TokenEndpointAuthMethod,
 		RequestObjectSigningAlgorithm: d.RequestObjectSigningAlgorithm,
 		RequestURIs:                   stringsx.Splitx(d.RequestURIs, "|"),
+		UserinfoSignedResponseAlg:     d.UserinfoSignedResponseAlg,
 	}
 
 	if d.JSONWebKeys != "" {

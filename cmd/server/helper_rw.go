@@ -23,9 +23,9 @@ package server
 import (
 	"net/http"
 
-	"github.com/pkg/errors"
+	"github.com/ory/fosite"
 )
 
 func writerErrorEnhancer(r *http.Request, err error) interface{} {
-	return errors.Cause(err)
+	return fosite.ErrorToRFC6749Error(err)
 }

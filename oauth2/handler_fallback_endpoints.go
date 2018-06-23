@@ -37,7 +37,7 @@ func (h *Handler) DefaultConsentHandler(w http.ResponseWriter, r *http.Request, 
 </head>
 <body>
 <p>
-	It looks like you forgot to set the consent/login provider url, which can be set using the <code>CONSENT_URL</code> and <code>LOGIN_URL</code>
+	It looks like you forgot to set the consent/login provider url, which can be set using the <code>OAUTH2_CONSENT_URL</code> and <code>OAUTH2_LOGIN_URL</code>
 	environment variable.
 </p>
 <p>
@@ -64,13 +64,15 @@ func (h *Handler) DefaultErrorHandler(w http.ResponseWriter, r *http.Request, _ 
 <ul>
 	<li>Error: %s</li>
 	<li>Description: %s</li>
+	<li>Hint: %s</li>
+	<li>Debug: %s</li>
 </ul>
 <p>
-	You are seeing this default error page because the administrator has not set a dedicated error URL. 
+	You are seeing this default error page because the administrator has not set a dedicated error URL (environment variable <code>OAUTH2_ERROR_URL</code> is not set). 
 	If you are an administrator, please read <a href="https://www.ory.sh/docs">the guide</a> to understand what you
 	need to do. If you are a user, please contact the administrator.
 </p>
 </body>
 </html>
-`, r.URL.Query().Get("error"), r.URL.Query().Get("error_description"))
+`, r.URL.Query().Get("error"), r.URL.Query().Get("error_description"), r.URL.Query().Get("error_hint"), r.URL.Query().Get("error_debug"))
 }

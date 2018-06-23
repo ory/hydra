@@ -59,54 +59,47 @@
     if (data) {
       obj = obj || new exports()
 
-      if (data.hasOwnProperty('code')) {
-        obj['code'] = ApiClient.convertToType(data['code'], 'Number')
+      if (data.hasOwnProperty('error')) {
+        obj['error'] = ApiClient.convertToType(data['error'], 'String')
       }
-      if (data.hasOwnProperty('details')) {
-        obj['details'] = ApiClient.convertToType(data['details'], [
-          { String: Object }
-        ])
+      if (data.hasOwnProperty('error_code')) {
+        obj['error_code'] = ApiClient.convertToType(
+          data['error_code'],
+          'Number'
+        )
       }
-      if (data.hasOwnProperty('message')) {
-        obj['message'] = ApiClient.convertToType(data['message'], 'String')
+      if (data.hasOwnProperty('error_debug')) {
+        obj['error_debug'] = ApiClient.convertToType(
+          data['error_debug'],
+          'Number'
+        )
       }
-      if (data.hasOwnProperty('reason')) {
-        obj['reason'] = ApiClient.convertToType(data['reason'], 'String')
-      }
-      if (data.hasOwnProperty('request')) {
-        obj['request'] = ApiClient.convertToType(data['request'], 'String')
-      }
-      if (data.hasOwnProperty('status')) {
-        obj['status'] = ApiClient.convertToType(data['status'], 'String')
+      if (data.hasOwnProperty('error_hint')) {
+        obj['error_hint'] = ApiClient.convertToType(
+          data['error_hint'],
+          'String'
+        )
       }
     }
     return obj
   }
 
   /**
-   * @member {Number} code
+   * @member {String} error
    */
-  exports.prototype['code'] = undefined
+  exports.prototype['error'] = undefined
   /**
-   * @member {Array.<Object.<String, Object>>} details
+   * @member {Number} error_code
    */
-  exports.prototype['details'] = undefined
+  exports.prototype['error_code'] = undefined
   /**
-   * @member {String} message
+   * @member {Number} error_debug
    */
-  exports.prototype['message'] = undefined
+  exports.prototype['error_debug'] = undefined
   /**
-   * @member {String} reason
+   * @member {String} error_hint
    */
-  exports.prototype['reason'] = undefined
-  /**
-   * @member {String} request
-   */
-  exports.prototype['request'] = undefined
-  /**
-   * @member {String} status
-   */
-  exports.prototype['status'] = undefined
+  exports.prototype['error_hint'] = undefined
 
   return exports
 })

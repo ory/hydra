@@ -2274,7 +2274,7 @@
           "x-go-name": "SectorIdentifierURI"
         },
         "token_endpoint_auth_method": {
-          "description": "Requested Client Authentication method for the Token Endpoint. The options are client_secret_post,\nclient_secret_basic, client_secret_jwt, private_key_jwt, and none.",
+          "description": "Requested Client Authentication method for the Token Endpoint. The options are client_secret_post,\nclient_secret_basic, private_key_jwt, and none.",
           "type": "string",
           "x-go-name": "TokenEndpointAuthMethod"
         },
@@ -2282,6 +2282,11 @@
           "description": "TermsOfServiceURI is a URL string that points to a human-readable terms of service\ndocument for the client that describes a contractual relationship\nbetween the end-user and the client that the end-user accepts when\nauthorizing the client.",
           "type": "string",
           "x-go-name": "TermsOfServiceURI"
+        },
+        "userinfo_signed_response_alg": {
+          "description": "JWS alg algorithm [JWA] REQUIRED for signing UserInfo Responses. If this is specified, the response will be JWT\n[JWT] serialized, and signed using JWS. The default, if omitted, is for the UserInfo Response to return the Claims\nas a UTF-8 encoded JSON object using the application/json content-type.",
+          "type": "string",
+          "x-go-name": "UserinfoSignedResponseAlg"
         }
       },
       "x-go-name": "Client",
@@ -2849,6 +2854,14 @@
           "description": "URL of the OP's UserInfo Endpoint.",
           "type": "string",
           "x-go-name": "UserinfoEndpoint"
+        },
+        "userinfo_signing_alg_values_supported": {
+          "description": "JSON array containing a list of the JWS [JWS] signing algorithms (alg values) [JWA] supported by the UserInfo Endpoint to encode the Claims in a JWT [JWT].",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "UserinfoSigningAlgValuesSupported"
         }
       },
       "x-go-name": "WellKnown",
@@ -2864,36 +2877,23 @@
       "schema": {
         "type": "object",
         "properties": {
-          "code": {
+          "error": {
+            "type": "string",
+            "x-go-name": "Name"
+          },
+          "error_code": {
             "type": "integer",
             "format": "int64",
             "x-go-name": "Code"
           },
-          "details": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "object"
-              }
-            },
-            "x-go-name": "Details"
+          "error_debug": {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Debug"
           },
-          "message": {
+          "error_hint": {
             "type": "string",
-            "x-go-name": "Message"
-          },
-          "reason": {
-            "type": "string",
-            "x-go-name": "Reason"
-          },
-          "request": {
-            "type": "string",
-            "x-go-name": "Request"
-          },
-          "status": {
-            "type": "string",
-            "x-go-name": "Status"
+            "x-go-name": "Hint"
           }
         }
       }

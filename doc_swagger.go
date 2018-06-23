@@ -25,17 +25,10 @@ package main
 type genericError struct {
 	// in: body
 	Body struct {
-		Code int `json:"code,omitempty"`
-
-		Status string `json:"status,omitempty"`
-
-		Request string `json:"request,omitempty"`
-
-		Reason string `json:"reason,omitempty"`
-
-		Details []map[string]interface{} `json:"details,omitempty"`
-
-		Message string `json:"message"`
+		Name  string `json:"error"`
+		Hint  string `json:"error_hint"`
+		Code  int    `json:"error_code"`
+		Debug int    `json:"error_debug"`
 	}
 }
 

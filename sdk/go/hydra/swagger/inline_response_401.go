@@ -11,15 +11,11 @@
 package swagger
 
 type InlineResponse401 struct {
-	Code int64 `json:"code,omitempty"`
+	Error_ string `json:"error,omitempty"`
 
-	Details []map[string]interface{} `json:"details,omitempty"`
+	ErrorCode int64 `json:"error_code,omitempty"`
 
-	Message string `json:"message,omitempty"`
+	ErrorDebug int64 `json:"error_debug,omitempty"`
 
-	Reason string `json:"reason,omitempty"`
-
-	Request string `json:"request,omitempty"`
-
-	Status string `json:"status,omitempty"`
+	ErrorHint string `json:"error_hint,omitempty"`
 }

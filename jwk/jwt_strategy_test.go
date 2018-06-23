@@ -48,6 +48,9 @@ func TestRS256JWTStrategy(t *testing.T) {
 	assert.NotEmpty(t, a)
 	assert.NotEmpty(t, b)
 
+	_, err = s.Validate(a)
+	require.NoError(t, err)
+
 	kid, err := s.GetPublicKeyID()
 	assert.NoError(t, err)
 	assert.Equal(t, "public:foo", kid)
@@ -56,10 +59,21 @@ func TestRS256JWTStrategy(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, m.AddKeySet("foo-set", ks))
 
+	// This should fail because the key was refreshed but the public key id was not yet refreshed.
+	a, b, err = s.Generate(jwt2.MapClaims{"foo": "bar"}, &jwt.Headers{})
+	require.Error(t, err)
+
+	kid, err = s.GetPublicKeyID()
+	assert.NoError(t, err)
+	assert.Equal(t, "public:bar", kid)
+
 	a, b, err = s.Generate(jwt2.MapClaims{"foo": "bar"}, &jwt.Headers{})
 	require.NoError(t, err)
 	assert.NotEmpty(t, a)
 	assert.NotEmpty(t, b)
+
+	_, err = s.Validate(a)
+	require.NoError(t, err)
 
 	kid, err = s.GetPublicKeyID()
 	assert.NoError(t, err)

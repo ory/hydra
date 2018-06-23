@@ -71,7 +71,8 @@ class WellKnown implements ArrayAccess
         'subject_types_supported' => 'string[]',
         'token_endpoint' => 'string',
         'token_endpoint_auth_methods_supported' => 'string[]',
-        'userinfo_endpoint' => 'string'
+        'userinfo_endpoint' => 'string',
+        'userinfo_signing_alg_values_supported' => 'string[]'
     ];
 
     /**
@@ -96,7 +97,8 @@ class WellKnown implements ArrayAccess
         'subject_types_supported' => null,
         'token_endpoint' => null,
         'token_endpoint_auth_methods_supported' => null,
-        'userinfo_endpoint' => null
+        'userinfo_endpoint' => null,
+        'userinfo_signing_alg_values_supported' => null
     ];
 
     public static function swaggerTypes()
@@ -131,7 +133,8 @@ class WellKnown implements ArrayAccess
         'subject_types_supported' => 'subject_types_supported',
         'token_endpoint' => 'token_endpoint',
         'token_endpoint_auth_methods_supported' => 'token_endpoint_auth_methods_supported',
-        'userinfo_endpoint' => 'userinfo_endpoint'
+        'userinfo_endpoint' => 'userinfo_endpoint',
+        'userinfo_signing_alg_values_supported' => 'userinfo_signing_alg_values_supported'
     ];
 
 
@@ -157,7 +160,8 @@ class WellKnown implements ArrayAccess
         'subject_types_supported' => 'setSubjectTypesSupported',
         'token_endpoint' => 'setTokenEndpoint',
         'token_endpoint_auth_methods_supported' => 'setTokenEndpointAuthMethodsSupported',
-        'userinfo_endpoint' => 'setUserinfoEndpoint'
+        'userinfo_endpoint' => 'setUserinfoEndpoint',
+        'userinfo_signing_alg_values_supported' => 'setUserinfoSigningAlgValuesSupported'
     ];
 
 
@@ -183,7 +187,8 @@ class WellKnown implements ArrayAccess
         'subject_types_supported' => 'getSubjectTypesSupported',
         'token_endpoint' => 'getTokenEndpoint',
         'token_endpoint_auth_methods_supported' => 'getTokenEndpointAuthMethodsSupported',
-        'userinfo_endpoint' => 'getUserinfoEndpoint'
+        'userinfo_endpoint' => 'getUserinfoEndpoint',
+        'userinfo_signing_alg_values_supported' => 'getUserinfoSigningAlgValuesSupported'
     ];
 
     public static function attributeMap()
@@ -235,6 +240,7 @@ class WellKnown implements ArrayAccess
         $this->container['token_endpoint'] = isset($data['token_endpoint']) ? $data['token_endpoint'] : null;
         $this->container['token_endpoint_auth_methods_supported'] = isset($data['token_endpoint_auth_methods_supported']) ? $data['token_endpoint_auth_methods_supported'] : null;
         $this->container['userinfo_endpoint'] = isset($data['userinfo_endpoint']) ? $data['userinfo_endpoint'] : null;
+        $this->container['userinfo_signing_alg_values_supported'] = isset($data['userinfo_signing_alg_values_supported']) ? $data['userinfo_signing_alg_values_supported'] : null;
     }
 
     /**
@@ -678,6 +684,27 @@ class WellKnown implements ArrayAccess
     public function setUserinfoEndpoint($userinfo_endpoint)
     {
         $this->container['userinfo_endpoint'] = $userinfo_endpoint;
+
+        return $this;
+    }
+
+    /**
+     * Gets userinfo_signing_alg_values_supported
+     * @return string[]
+     */
+    public function getUserinfoSigningAlgValuesSupported()
+    {
+        return $this->container['userinfo_signing_alg_values_supported'];
+    }
+
+    /**
+     * Sets userinfo_signing_alg_values_supported
+     * @param string[] $userinfo_signing_alg_values_supported JSON array containing a list of the JWS [JWS] signing algorithms (alg values) [JWA] supported by the UserInfo Endpoint to encode the Claims in a JWT [JWT].
+     * @return $this
+     */
+    public function setUserinfoSigningAlgValuesSupported($userinfo_signing_alg_values_supported)
+    {
+        $this->container['userinfo_signing_alg_values_supported'] = $userinfo_signing_alg_values_supported;
 
         return $this;
     }

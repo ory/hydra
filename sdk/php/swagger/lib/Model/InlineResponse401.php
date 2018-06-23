@@ -54,12 +54,10 @@ class InlineResponse401 implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'code' => 'int',
-        'details' => 'map[string,object][]',
-        'message' => 'string',
-        'reason' => 'string',
-        'request' => 'string',
-        'status' => 'string'
+        'error' => 'string',
+        'error_code' => 'int',
+        'error_debug' => 'int',
+        'error_hint' => 'string'
     ];
 
     /**
@@ -67,12 +65,10 @@ class InlineResponse401 implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerFormats = [
-        'code' => 'int64',
-        'details' => null,
-        'message' => null,
-        'reason' => null,
-        'request' => null,
-        'status' => null
+        'error' => null,
+        'error_code' => 'int64',
+        'error_debug' => 'int64',
+        'error_hint' => null
     ];
 
     public static function swaggerTypes()
@@ -90,12 +86,10 @@ class InlineResponse401 implements ArrayAccess
      * @var string[]
      */
     protected static $attributeMap = [
-        'code' => 'code',
-        'details' => 'details',
-        'message' => 'message',
-        'reason' => 'reason',
-        'request' => 'request',
-        'status' => 'status'
+        'error' => 'error',
+        'error_code' => 'error_code',
+        'error_debug' => 'error_debug',
+        'error_hint' => 'error_hint'
     ];
 
 
@@ -104,12 +98,10 @@ class InlineResponse401 implements ArrayAccess
      * @var string[]
      */
     protected static $setters = [
-        'code' => 'setCode',
-        'details' => 'setDetails',
-        'message' => 'setMessage',
-        'reason' => 'setReason',
-        'request' => 'setRequest',
-        'status' => 'setStatus'
+        'error' => 'setError',
+        'error_code' => 'setErrorCode',
+        'error_debug' => 'setErrorDebug',
+        'error_hint' => 'setErrorHint'
     ];
 
 
@@ -118,12 +110,10 @@ class InlineResponse401 implements ArrayAccess
      * @var string[]
      */
     protected static $getters = [
-        'code' => 'getCode',
-        'details' => 'getDetails',
-        'message' => 'getMessage',
-        'reason' => 'getReason',
-        'request' => 'getRequest',
-        'status' => 'getStatus'
+        'error' => 'getError',
+        'error_code' => 'getErrorCode',
+        'error_debug' => 'getErrorDebug',
+        'error_hint' => 'getErrorHint'
     ];
 
     public static function attributeMap()
@@ -157,12 +147,10 @@ class InlineResponse401 implements ArrayAccess
      */
     public function __construct(array $data = null)
     {
-        $this->container['code'] = isset($data['code']) ? $data['code'] : null;
-        $this->container['details'] = isset($data['details']) ? $data['details'] : null;
-        $this->container['message'] = isset($data['message']) ? $data['message'] : null;
-        $this->container['reason'] = isset($data['reason']) ? $data['reason'] : null;
-        $this->container['request'] = isset($data['request']) ? $data['request'] : null;
-        $this->container['status'] = isset($data['status']) ? $data['status'] : null;
+        $this->container['error'] = isset($data['error']) ? $data['error'] : null;
+        $this->container['error_code'] = isset($data['error_code']) ? $data['error_code'] : null;
+        $this->container['error_debug'] = isset($data['error_debug']) ? $data['error_debug'] : null;
+        $this->container['error_hint'] = isset($data['error_hint']) ? $data['error_hint'] : null;
     }
 
     /**
@@ -191,127 +179,85 @@ class InlineResponse401 implements ArrayAccess
 
 
     /**
-     * Gets code
+     * Gets error
+     * @return string
+     */
+    public function getError()
+    {
+        return $this->container['error'];
+    }
+
+    /**
+     * Sets error
+     * @param string $error
+     * @return $this
+     */
+    public function setError($error)
+    {
+        $this->container['error'] = $error;
+
+        return $this;
+    }
+
+    /**
+     * Gets error_code
      * @return int
      */
-    public function getCode()
+    public function getErrorCode()
     {
-        return $this->container['code'];
+        return $this->container['error_code'];
     }
 
     /**
-     * Sets code
-     * @param int $code
+     * Sets error_code
+     * @param int $error_code
      * @return $this
      */
-    public function setCode($code)
+    public function setErrorCode($error_code)
     {
-        $this->container['code'] = $code;
+        $this->container['error_code'] = $error_code;
 
         return $this;
     }
 
     /**
-     * Gets details
-     * @return map[string,object][]
+     * Gets error_debug
+     * @return int
      */
-    public function getDetails()
+    public function getErrorDebug()
     {
-        return $this->container['details'];
+        return $this->container['error_debug'];
     }
 
     /**
-     * Sets details
-     * @param map[string,object][] $details
+     * Sets error_debug
+     * @param int $error_debug
      * @return $this
      */
-    public function setDetails($details)
+    public function setErrorDebug($error_debug)
     {
-        $this->container['details'] = $details;
+        $this->container['error_debug'] = $error_debug;
 
         return $this;
     }
 
     /**
-     * Gets message
+     * Gets error_hint
      * @return string
      */
-    public function getMessage()
+    public function getErrorHint()
     {
-        return $this->container['message'];
+        return $this->container['error_hint'];
     }
 
     /**
-     * Sets message
-     * @param string $message
+     * Sets error_hint
+     * @param string $error_hint
      * @return $this
      */
-    public function setMessage($message)
+    public function setErrorHint($error_hint)
     {
-        $this->container['message'] = $message;
-
-        return $this;
-    }
-
-    /**
-     * Gets reason
-     * @return string
-     */
-    public function getReason()
-    {
-        return $this->container['reason'];
-    }
-
-    /**
-     * Sets reason
-     * @param string $reason
-     * @return $this
-     */
-    public function setReason($reason)
-    {
-        $this->container['reason'] = $reason;
-
-        return $this;
-    }
-
-    /**
-     * Gets request
-     * @return string
-     */
-    public function getRequest()
-    {
-        return $this->container['request'];
-    }
-
-    /**
-     * Sets request
-     * @param string $request
-     * @return $this
-     */
-    public function setRequest($request)
-    {
-        $this->container['request'] = $request;
-
-        return $this;
-    }
-
-    /**
-     * Gets status
-     * @return string
-     */
-    public function getStatus()
-    {
-        return $this->container['status'];
-    }
-
-    /**
-     * Sets status
-     * @param string $status
-     * @return $this
-     */
-    public function setStatus($status)
-    {
-        $this->container['status'] = $status;
+        $this->container['error_hint'] = $error_hint;
 
         return $this;
     }

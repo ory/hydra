@@ -189,6 +189,12 @@
           'String'
         )
       }
+      if (data.hasOwnProperty('userinfo_signing_alg_values_supported')) {
+        obj['userinfo_signing_alg_values_supported'] = ApiClient.convertToType(
+          data['userinfo_signing_alg_values_supported'],
+          ['String']
+        )
+      }
     }
     return obj
   }
@@ -283,6 +289,11 @@
    * @member {String} userinfo_endpoint
    */
   exports.prototype['userinfo_endpoint'] = undefined
+  /**
+   * JSON array containing a list of the JWS [JWS] signing algorithms (alg values) [JWA] supported by the UserInfo Endpoint to encode the Claims in a JWT [JWT].
+   * @member {Array.<String>} userinfo_signing_alg_values_supported
+   */
+  exports.prototype['userinfo_signing_alg_values_supported'] = undefined
 
   return exports
 })

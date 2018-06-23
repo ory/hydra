@@ -162,6 +162,12 @@
       if (data.hasOwnProperty('tos_uri')) {
         obj['tos_uri'] = ApiClient.convertToType(data['tos_uri'], 'String')
       }
+      if (data.hasOwnProperty('userinfo_signed_response_alg')) {
+        obj['userinfo_signed_response_alg'] = ApiClient.convertToType(
+          data['userinfo_signed_response_alg'],
+          'String'
+        )
+      }
     }
     return obj
   }
@@ -266,7 +272,7 @@
    */
   exports.prototype['sector_identifier_uri'] = undefined
   /**
-   * Requested Client Authentication method for the Token Endpoint. The options are client_secret_post, client_secret_basic, client_secret_jwt, private_key_jwt, and none.
+   * Requested Client Authentication method for the Token Endpoint. The options are client_secret_post, client_secret_basic, private_key_jwt, and none.
    * @member {String} token_endpoint_auth_method
    */
   exports.prototype['token_endpoint_auth_method'] = undefined
@@ -275,6 +281,11 @@
    * @member {String} tos_uri
    */
   exports.prototype['tos_uri'] = undefined
+  /**
+   * JWS alg algorithm [JWA] REQUIRED for signing UserInfo Responses. If this is specified, the response will be JWT [JWT] serialized, and signed using JWS. The default, if omitted, is for the UserInfo Response to return the Claims as a UTF-8 encoded JSON object using the application/json content-type.
+   * @member {String} userinfo_signed_response_alg
+   */
+  exports.prototype['userinfo_signed_response_alg'] = undefined
 
   return exports
 })

@@ -21,6 +21,7 @@ Name | Type | Description | Notes
 **TokenEndpoint** | **string** | URL of the OP&#39;s OAuth 2.0 Token Endpoint | [default to null]
 **TokenEndpointAuthMethodsSupported** | **[]string** | JSON array containing a list of Client Authentication methods supported by this Token Endpoint. The options are client_secret_post, client_secret_basic, client_secret_jwt, and private_key_jwt, as described in Section 9 of OpenID Connect Core 1.0 | [optional] [default to null]
 **UserinfoEndpoint** | **string** | URL of the OP&#39;s UserInfo Endpoint. | [optional] [default to null]
+**UserinfoSigningAlgValuesSupported** | **[]string** | JSON array containing a list of the JWS [JWS] signing algorithms (alg values) [JWA] supported by the UserInfo Endpoint to encode the Claims in a JWT [JWT]. | [optional] [default to null]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

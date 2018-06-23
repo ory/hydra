@@ -3,12 +3,10 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Code** | **int64** |  | [optional] [default to null]
-**Details** | [**[]map[string]interface{}**](map.md) |  | [optional] [default to null]
-**Message** | **string** |  | [optional] [default to null]
-**Reason** | **string** |  | [optional] [default to null]
-**Request** | **string** |  | [optional] [default to null]
-**Status** | **string** |  | [optional] [default to null]
+**Error_** | **string** |  | [optional] [default to null]
+**ErrorCode** | **int64** |  | [optional] [default to null]
+**ErrorDebug** | **int64** |  | [optional] [default to null]
+**ErrorHint** | **string** |  | [optional] [default to null]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

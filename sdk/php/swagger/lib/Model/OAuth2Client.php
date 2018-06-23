@@ -75,7 +75,8 @@ class OAuth2Client implements ArrayAccess
         'scope' => 'string',
         'sector_identifier_uri' => 'string',
         'token_endpoint_auth_method' => 'string',
-        'tos_uri' => 'string'
+        'tos_uri' => 'string',
+        'userinfo_signed_response_alg' => 'string'
     ];
 
     /**
@@ -104,7 +105,8 @@ class OAuth2Client implements ArrayAccess
         'scope' => null,
         'sector_identifier_uri' => null,
         'token_endpoint_auth_method' => null,
-        'tos_uri' => null
+        'tos_uri' => null,
+        'userinfo_signed_response_alg' => null
     ];
 
     public static function swaggerTypes()
@@ -143,7 +145,8 @@ class OAuth2Client implements ArrayAccess
         'scope' => 'scope',
         'sector_identifier_uri' => 'sector_identifier_uri',
         'token_endpoint_auth_method' => 'token_endpoint_auth_method',
-        'tos_uri' => 'tos_uri'
+        'tos_uri' => 'tos_uri',
+        'userinfo_signed_response_alg' => 'userinfo_signed_response_alg'
     ];
 
 
@@ -173,7 +176,8 @@ class OAuth2Client implements ArrayAccess
         'scope' => 'setScope',
         'sector_identifier_uri' => 'setSectorIdentifierUri',
         'token_endpoint_auth_method' => 'setTokenEndpointAuthMethod',
-        'tos_uri' => 'setTosUri'
+        'tos_uri' => 'setTosUri',
+        'userinfo_signed_response_alg' => 'setUserinfoSignedResponseAlg'
     ];
 
 
@@ -203,7 +207,8 @@ class OAuth2Client implements ArrayAccess
         'scope' => 'getScope',
         'sector_identifier_uri' => 'getSectorIdentifierUri',
         'token_endpoint_auth_method' => 'getTokenEndpointAuthMethod',
-        'tos_uri' => 'getTosUri'
+        'tos_uri' => 'getTosUri',
+        'userinfo_signed_response_alg' => 'getUserinfoSignedResponseAlg'
     ];
 
     public static function attributeMap()
@@ -259,6 +264,7 @@ class OAuth2Client implements ArrayAccess
         $this->container['sector_identifier_uri'] = isset($data['sector_identifier_uri']) ? $data['sector_identifier_uri'] : null;
         $this->container['token_endpoint_auth_method'] = isset($data['token_endpoint_auth_method']) ? $data['token_endpoint_auth_method'] : null;
         $this->container['tos_uri'] = isset($data['tos_uri']) ? $data['tos_uri'] : null;
+        $this->container['userinfo_signed_response_alg'] = isset($data['userinfo_signed_response_alg']) ? $data['userinfo_signed_response_alg'] : null;
     }
 
     /**
@@ -729,7 +735,7 @@ class OAuth2Client implements ArrayAccess
 
     /**
      * Sets token_endpoint_auth_method
-     * @param string $token_endpoint_auth_method Requested Client Authentication method for the Token Endpoint. The options are client_secret_post, client_secret_basic, client_secret_jwt, private_key_jwt, and none.
+     * @param string $token_endpoint_auth_method Requested Client Authentication method for the Token Endpoint. The options are client_secret_post, client_secret_basic, private_key_jwt, and none.
      * @return $this
      */
     public function setTokenEndpointAuthMethod($token_endpoint_auth_method)
@@ -756,6 +762,27 @@ class OAuth2Client implements ArrayAccess
     public function setTosUri($tos_uri)
     {
         $this->container['tos_uri'] = $tos_uri;
+
+        return $this;
+    }
+
+    /**
+     * Gets userinfo_signed_response_alg
+     * @return string
+     */
+    public function getUserinfoSignedResponseAlg()
+    {
+        return $this->container['userinfo_signed_response_alg'];
+    }
+
+    /**
+     * Sets userinfo_signed_response_alg
+     * @param string $userinfo_signed_response_alg JWS alg algorithm [JWA] REQUIRED for signing UserInfo Responses. If this is specified, the response will be JWT [JWT] serialized, and signed using JWS. The default, if omitted, is for the UserInfo Response to return the Claims as a UTF-8 encoded JSON object using the application/json content-type.
+     * @return $this
+     */
+    public function setUserinfoSignedResponseAlg($userinfo_signed_response_alg)
+    {
+        $this->container['userinfo_signed_response_alg'] = $userinfo_signed_response_alg;
 
         return $this;
     }

@@ -22,7 +22,6 @@ package client
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -221,9 +220,9 @@ func (d *sqlData) ToClient() (*Client, error) {
 	return c, nil
 }
 
-func (s *SQLManager) CreateSchemas() (int, error) {
+func (m *SQLManager) CreateSchemas() (int, error) {
 	migrate.SetTable("hydra_client_migration")
-	n, err := migrate.Exec(s.DB.DB, s.DB.DriverName(), migrations, migrate.Up)
+	n, err := migrate.Exec(m.DB.DB, m.DB.DriverName(), migrations, migrate.Up)
 	if err != nil {
 		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
 	}
@@ -232,10 +231,8 @@ func (s *SQLManager) CreateSchemas() (int, error) {
 
 func (m *SQLManager) GetConcreteClient(id string) (*Client, error) {
 	var d sqlData
-	if err := m.DB.Get(&d, m.DB.Rebind("SELECT * FROM hydra_client WHERE id=?"), id); err == sql.ErrNoRows {
-		return nil, errors.Errorf("Unable to find client %s", id)
-	} else if err != nil {
-		return nil, errors.WithStack(err)
+	if err := m.DB.Get(&d, m.DB.Rebind("SELECT * FROM hydra_client WHERE id=?"), id); err != nil {
+		return nil, sqlcon.HandleError(err)
 	}
 
 	return d.ToClient()
@@ -272,7 +269,7 @@ func (m *SQLManager) UpdateClient(c *Client) error {
 	}
 
 	if _, err := m.DB.NamedExec(fmt.Sprintf(`UPDATE hydra_client SET %s WHERE id=:id`, strings.Join(query, ", ")), s); err != nil {
-		return errors.WithStack(err)
+		return sqlcon.HandleError(err)
 	}
 	return nil
 }
@@ -315,7 +312,7 @@ func (m *SQLManager) CreateClient(c *Client) error {
 
 func (m *SQLManager) DeleteClient(id string) error {
 	if _, err := m.DB.Exec(m.DB.Rebind(`DELETE FROM hydra_client WHERE id=?`), id); err != nil {
-		return errors.WithStack(err)
+		return sqlcon.HandleError(err)
 	}
 	return nil
 }
@@ -325,7 +322,7 @@ func (m *SQLManager) GetClients(limit, offset int) (clients map[string]Client, e
 	clients = make(map[string]Client)
 
 	if err := m.DB.Select(&d, m.DB.Rebind("SELECT * FROM hydra_client ORDER BY id LIMIT ? OFFSET ?"), limit, offset); err != nil {
-		return nil, errors.WithStack(err)
+		return nil, sqlcon.HandleError(err)
 	}
 
 	for _, k := range d {

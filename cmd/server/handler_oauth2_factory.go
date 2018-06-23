@@ -71,8 +71,7 @@ func newOAuth2Provider(c *config.Config) fosite.OAuth2Provider {
 	var store = ctx.FositeStore
 
 	kid := uuid.New()
-	privateKey, err := createOrGetJWK(c, oauth2.OpenIDConnectKeyName, kid, "private")
-	if err != nil {
+	if _, err := createOrGetJWK(c, oauth2.OpenIDConnectKeyName, kid, "private"); err != nil {
 		c.GetLogger().WithError(err).Fatalf(`Could not fetch private signing key for OpenID Connect - did you forget to run "hydra migrate sql" or forget to set the SYSTEM_SECRET?`)
 	}
 
@@ -92,13 +91,16 @@ func newOAuth2Provider(c *config.Config) fosite.OAuth2Provider {
 		TokenURL:                       strings.TrimRight(c.Issuer, "/") + oauth2.TokenPath,
 	}
 
-	jwtStrategy := compose.NewOpenIDConnectStrategy(jwk.MustRSAPrivate(privateKey))
+	jwtStrategy, err := jwk.NewRS256JWTStrategy(c.Context().KeyManager, oauth2.OpenIDConnectKeyName)
+	pkg.Must(err, "Could not fetch private signing key for OpenID Connect - did you forget to run \"hydra migrate sql\" or forget to set the SYSTEM_SECRET?")
+	oidcStrategy := &openid.DefaultStrategy{JWTStrategy: jwtStrategy}
+
 	return compose.Compose(
 		fc,
 		store,
 		&compose.CommonStrategy{
 			CoreStrategy:               compose.NewOAuth2HMACStrategy(fc, c.GetSystemSecret()),
-			OpenIDConnectTokenStrategy: jwtStrategy,
+			OpenIDConnectTokenStrategy: oidcStrategy,
 			JWTStrategy:                jwtStrategy,
 		},
 		nil,

@@ -1,0 +1,166 @@
+Test tool version: 2.1.3
+Issuer: https://oidc-certification.ory.sh:8443/
+Profile: []
+Test ID: OP-Response-Missing
+Test description: Authorization request missing the response_type parameter
+Timestamp: 2018-06-23T11:26:46Z
+
+============================================================
+
+Trace output
+
+0.0 phase <--<-- 0 --- Webfinger -->-->
+0.0 not expected to do WebFinger
+0.0 phase <--<-- 1 --- Discovery -->-->
+0.0 provider_config kwargs:{'issuer': 'https://oidc-certification.ory.sh:8443/'}
+0.094 http response url:https://oidc-certification.ory.sh:8443/.well-known/openid-configuration status_code:200
+0.096 ProviderConfigurationResponse {
+    "authorization_endpoint": "https://oidc-certification.ory.sh:8443/oauth2/auth",
+    "claims_parameter_supported": false,
+    "claims_supported": [
+        "sub"
+    ],
+    "grant_types_supported": [
+        "authorization_code",
+        "implicit",
+        "client_credentials",
+        "refresh_token"
+    ],
+    "id_token_signing_alg_values_supported": [
+        "RS256"
+    ],
+    "issuer": "https://oidc-certification.ory.sh:8443/",
+    "jwks_uri": "https://oidc-certification.ory.sh:8443/.well-known/jwks.json",
+    "registration_endpoint": "https://oidc-certification.ory.sh:8443/clients",
+    "request_parameter_supported": true,
+    "request_uri_parameter_supported": true,
+    "require_request_uri_registration": true,
+    "response_modes_supported": [
+        "query",
+        "fragment"
+    ],
+    "response_types_supported": [
+        "code",
+        "code id_token",
+        "id_token",
+        "token id_token",
+        "token",
+        "token id_token code"
+    ],
+    "scopes_supported": [
+        "offline",
+        "openid"
+    ],
+    "subject_types_supported": [
+        "pairwise",
+        "public"
+    ],
+    "token_endpoint": "https://oidc-certification.ory.sh:8443/oauth2/token",
+    "token_endpoint_auth_methods_supported": [
+        "client_secret_post",
+        "client_secret_basic",
+        "private_key_jwt",
+        "none"
+    ],
+    "userinfo_endpoint": "https://oidc-certification.ory.sh:8443/userinfo",
+    "userinfo_signing_alg_values_supported": [
+        "none",
+        "RS256"
+    ],
+    "version": "3.0"
+}
+0.096 phase <--<-- 2 --- Registration -->-->
+0.096 register kwargs:{'application_name': 'OIC test tool', 'response_types': ['id_token'], 'contacts': ['roland@example.com'], 'redirect_uris': ['https://op.certification.openid.net:61353/authz_cb'], 'post_logout_redirect_uris': ['https://op.certification.openid.net:61353/logout'], 'jwks_uri': 'https://op.certification.openid.net:61353/static/jwks_61353.json', 'grant_types': ['implicit'], 'application_type': 'web', 'url': 'https://oidc-certification.ory.sh:8443/clients'}
+0.096 RegistrationRequest {
+    "application_type": "web",
+    "contacts": [
+        "roland@example.com"
+    ],
+    "grant_types": [
+        "implicit"
+    ],
+    "jwks_uri": "https://op.certification.openid.net:61353/static/jwks_61353.json",
+    "post_logout_redirect_uris": [
+        "https://op.certification.openid.net:61353/logout"
+    ],
+    "redirect_uris": [
+        "https://op.certification.openid.net:61353/authz_cb"
+    ],
+    "request_uris": [
+        "https://op.certification.openid.net:61353/requests/e3ecc141f5419bd33d25d760861d32323144d583feaf26eb1b5cbf20147608b9#xDgnCRhOzo8HyBQP"
+    ],
+    "response_types": [
+        "id_token"
+    ]
+}
+0.273 http response url:https://oidc-certification.ory.sh:8443/clients status_code:201
+0.274 RegistrationResponse {
+    "client_id": "245fadf4-c6fa-4e7a-8c5f-202b4cd5cfb3",
+    "client_secret": "oAfgzd3nde6L",
+    "client_secret_expires_at": 0,
+    "contacts": [
+        "roland@example.com"
+    ],
+    "grant_types": [
+        "implicit"
+    ],
+    "id": "245fadf4-c6fa-4e7a-8c5f-202b4cd5cfb3",
+    "jwks_uri": "https://op.certification.openid.net:61353/static/jwks_61353.json",
+    "public": false,
+    "redirect_uris": [
+        "https://op.certification.openid.net:61353/authz_cb"
+    ],
+    "request_uris": [
+        "https://op.certification.openid.net:61353/requests/e3ecc141f5419bd33d25d760861d32323144d583feaf26eb1b5cbf20147608b9#xDgnCRhOzo8HyBQP"
+    ],
+    "response_types": [
+        "id_token"
+    ],
+    "scope": "openid offline offline_access profile email address phone",
+    "token_endpoint_auth_method": "client_secret_basic",
+    "userinfo_signed_response_alg": "none"
+}
+0.274 phase <--<-- 3 --- Note -->-->
+2.635 phase <--<-- 4 --- AsyncAuthn -->-->
+2.635 AuthorizationRequest {
+    "client_id": "245fadf4-c6fa-4e7a-8c5f-202b4cd5cfb3",
+    "nonce": "em14nMtjLm4bu9jx",
+    "redirect_uri": "https://op.certification.openid.net:61353/authz_cb",
+    "scope": "openid",
+    "state": "6r6DUdRl8bt9rxrQ"
+}
+2.636 redirect url https://oidc-certification.ory.sh:8443/oauth2/auth?state=6r6DUdRl8bt9rxrQ&scope=openid&nonce=em14nMtjLm4bu9jx&redirect_uri=https%3A%2F%2Fop.certification.openid.net%3A61353%2Fauthz_cb&client_id=245fadf4-c6fa-4e7a-8c5f-202b4cd5cfb3
+2.636 redirect https://oidc-certification.ory.sh:8443/oauth2/auth?state=6r6DUdRl8bt9rxrQ&scope=openid&nonce=em14nMtjLm4bu9jx&redirect_uri=https%3A%2F%2Fop.certification.openid.net%3A61353%2Fauthz_cb&client_id=245fadf4-c6fa-4e7a-8c5f-202b4cd5cfb3
+2.913 response Response URL with query part
+2.913 response {'error_debug': 'The request is missing the response_type parameter', 'error_description': 'The authorization server does not support obtaining a token using this method', 'state': '', 'error': 'unsupported_response_type'}
+2.913 response {'error_debug': 'The request is missing the response_type parameter', 'error_description': 'The authorization server does not support obtaining a token using this method', 'error': 'unsupported_response_type'}
+2.914 AuthorizationErrorResponse {
+    "error": "unsupported_response_type",
+    "error_debug": "The request is missing the response_type parameter",
+    "error_description": "The authorization server does not support obtaining a token using this method"
+}
+2.914 AuthorizationErrorResponse {
+    "error": "unsupported_response_type",
+    "error_debug": "The request is missing the response_type parameter",
+    "error_description": "The authorization server does not support obtaining a token using this method"
+}
+2.914 phase <--<-- 5 --- Done -->-->
+2.914 end 
+2.914 assertion VerifyErrorMessage
+2.914 condition verify-error-response: status=OK [Checks that the last response was a JSON encoded error message]
+2.914 condition Done: status=OK
+
+
+
+============================================================
+
+Conditions
+
+verify-error-response: status=OK [Checks that the last response was a JSON encoded error message]
+Done: status=OK
+
+
+
+============================================================
+
+RESULT: PASSED

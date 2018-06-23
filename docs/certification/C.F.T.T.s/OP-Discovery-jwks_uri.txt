@@ -1,0 +1,99 @@
+Test tool version: 2.1.3
+Issuer: https://oidc-certification.ory.sh:8443/
+Profile: []
+Test ID: OP-Discovery-jwks_uri
+Test description: Verify that jwks_uri is published
+Timestamp: 2018-06-23T10:43:25Z
+
+============================================================
+
+Trace output
+
+0.0 phase <--<-- 0 --- Webfinger -->-->
+0.0 not expected to do WebFinger
+0.0 phase <--<-- 1 --- Discovery -->-->
+0.0 provider_config kwargs:{'issuer': 'https://oidc-certification.ory.sh:8443/'}
+0.105 http response url:https://oidc-certification.ory.sh:8443/.well-known/openid-configuration status_code:200
+0.107 ProviderConfigurationResponse {
+    "authorization_endpoint": "https://oidc-certification.ory.sh:8443/oauth2/auth",
+    "claims_parameter_supported": false,
+    "claims_supported": [
+        "sub"
+    ],
+    "grant_types_supported": [
+        "authorization_code",
+        "implicit",
+        "client_credentials",
+        "refresh_token"
+    ],
+    "id_token_signing_alg_values_supported": [
+        "RS256"
+    ],
+    "issuer": "https://oidc-certification.ory.sh:8443/",
+    "jwks_uri": "https://oidc-certification.ory.sh:8443/.well-known/jwks.json",
+    "registration_endpoint": "https://oidc-certification.ory.sh:8443/clients",
+    "request_parameter_supported": true,
+    "request_uri_parameter_supported": true,
+    "require_request_uri_registration": true,
+    "response_modes_supported": [
+        "query",
+        "fragment"
+    ],
+    "response_types_supported": [
+        "code",
+        "code id_token",
+        "id_token",
+        "token id_token",
+        "token",
+        "token id_token code"
+    ],
+    "scopes_supported": [
+        "offline",
+        "openid"
+    ],
+    "subject_types_supported": [
+        "pairwise",
+        "public"
+    ],
+    "token_endpoint": "https://oidc-certification.ory.sh:8443/oauth2/token",
+    "token_endpoint_auth_methods_supported": [
+        "client_secret_post",
+        "client_secret_basic",
+        "private_key_jwt",
+        "none"
+    ],
+    "userinfo_endpoint": "https://oidc-certification.ory.sh:8443/userinfo",
+    "userinfo_signing_alg_values_supported": [
+        "none",
+        "RS256"
+    ],
+    "version": "3.0"
+}
+0.107 phase <--<-- 2 --- Done -->-->
+0.107 end 
+0.107 assertion CheckHTTPResponse
+0.108 condition check-http-response: status=OK [Checks that the HTTP response status is within the 200 or 300 range. Also does some extra JSON checks]
+0.108 assertion BareKeys
+0.173 http response url:https://oidc-certification.ory.sh:8443/.well-known/jwks.json status_code:200
+0.174 jwks {'keys': [{'use': 'sig', 'kty': 'RSA', 'e': 'AQAB', 'n': '0vvbIEitFVzY4o12elAZbZvpja5xTm5AOh9wi2UEiPEL6aKxAUn1ywpUaLyWKuEXdeuykHyybniLaThik7Gf-6xKk6S9IK9tjbbwfRqHVkn_Xkyul0ohFI3iTcjvFq5FPGr5vEhSB6eckdngUpzb-7S_Kt8yunkdhYTmkuAr2AXSbQcmCbOJXOsvkc5LOwpjmFIWrtBAHwILJ5cHjzIHtkK2QKMJRlknD8b4kmQ3x6vfxA7mtXREUXdQFn7ssnOVPzriPQp4kIi_TMczSmRLlX1PeeOeDGpTnYywQbsAfdBGZ20WdZlwP3lRUUJoKv1GpBU51GKm2xhHtyrzOkiRKE8pH_PD05gh1G9qXbFtBOoHMBWEaCxoxyJcW8_9iLXBPoC-Jhm47VO5T9hPlaISzDY6EUmgYktejS_mx_bR7emBcbtFUccYSVVqT3EZqAFuQlsPsvj8AT9NmEiVncB2Cy4z7ofLX_Wai_VFPCf7AEfmDZ8mzFZQfVGct74Q9KybwXm8YDq0TSszQGuqT0gtvU9In7CPSOytrVDbdk8Peyeg-Wn_ACMRh5T23wUbQ0jy0Wi9kBwIzN-dUpKu3uL6EZ3PmPSZItQHeAxpQbRZJ1vrrd2y-b6EGun3G9rlnOZ3L4_L4-NOKLt4VGPie7sphlND1pc4ZipaXBjZ9uC3bS8', 'alg': 'RS256', 'kid': 'public:490968e8-c6e5-441e-b42e-5053d6c67af2'}, {'use': 'sig', 'kty': 'RSA', 'e': 'AQAB', 'n': '0WN9e_V2wEp33JZoN7zQ9J4E4Iz0l-dlx6GqIKdepcMjON3PKZHWFML1e0ZKAkuG2ZJRKoX1LaSNZT0NI9N6_wVAT9aNv53sHBJVC4Bww1zKHEvQseGwJbG0lZZHjDXaxCBPte9yQnquIRRp9Ab-uBeziRoaFQ02OV3LBMBSZ79AzFvZ4yTqpUS_xp-Ylfcmh5wXEppd6hoxs9h1tttPTPbnMLte3S_zxCZI4TQi8d1yBi39OvfZxtABQQbgqYPxiYehNdYbfmZ2CAmVlsTxByS3X-ANBe2nmLsOLgXTyVFZfvEZkzY7OgEwwq5zog5pScXJ-TGlj0guZd8nClHEV-GHvXonjb2hZB63dFEiUVMNh5cOblZX034GnlOkzYfAH8UZ_cvOqONHbvplzONuaYSSRMPRaZwj-0fpElhFNHwr1v1pqbE1i9XOxU_c-eSMr4XAm1VsWG3zJKymjoJmaDcW3AEawi3btL1N2tE3p27cHtcdFjcv5birnxMtPI9Vu806U0_WiGtH_kaWxz64Xk3A_yB-lIBQwXe61JME-K81wLLcHE9qoqpF5iUK4mDqMmI_DVIazUlVUzxY0-1iFkV790V95dBxeYFgXKX02g8NyxfnyzUDC12qUKKejJFbG5LPHaMUXWJIQ2ntwBX_XzeF4pGh0u0vYmfxAmfHWN0', 'alg': 'RS256', 'kid': 'public:a09f73cf-d685-4c5c-9312-60a13e57646f'}, {'use': 'sig', 'kty': 'RSA', 'e': 'AQAB', 'n': 's_BEnyG0xHYDibtz9a4tE1IW8490BQ_z526Lg2d0PWRtHfcqKmPG0pd0DizPuLY2j1NAY4cCXLwNWMJ3Cp1TqddaMl08hElvNbilcTyQr96RQg9MnrWeR1EqpdXEzTjcx06DFDokvzs89YQVZTDzSh_-xY_m_0VkcFQ0RpDTBn1B0dkMh78dbTJVVSGXYSBgMpcKrGlrgDaPIRX7qp_SdvjNtkPStG_wCPkzd_IJAaTAHGrlyj27dyhOC6EqQjpZRhQvT-w7GalbObncCFox3hRiC8wbI9Toi5p7vEuJJ6yksaqtIwgbtPXXUChNTqwQgIc1RE8RVuhI8ExaT6FfStIVLq9Tow6Hd9mopdX_ydEHHbnbvSC0cCRPg8_G8zTk0ihFpiHE1yEDXBQSs6pZIQ8KZF2RG35j75Jh4ngsDyPbC7PmjE93SG25AkX0WZwoB3g8f6q2r4dZqNtemRX1lMDo0FUQyYcOU5mnOiW3E5oNs3g-VH5ISOiaSUSLX6AIxDfdk6Wj5t7FZUo4EcIwTnE3PI-0HxnLJaErwbYEX0hO1BuhfF7zYHxDjc085U7OyN0abZWbuVUMtIMRgq-4ASlM9fTECg3sMmOfTEJV9nrJZaSCxKvVWma9A01bvBPB6Qn92Gj1XNZ0E1RBLUp1V3iXLcS7MGJh7bAAk5kwKCM', 'alg': 'RS256', 'kid': 'public:8e8dab73-c9fe-42ef-9a7b-1e217abba9a9'}, {'use': 'sig', 'kty': 'RSA', 'e': 'AQAB', 'n': '3cQ2ihjoElfFVnnkleo6ioUvZrkDfddEKOMCaemXP7umEhr8TC9_L3BKYbJqtE15jvkJiqT1vlHgTOKD5wWCFhFSmEa9PAWlt9Hw6BWddFEsiijR113yvj4eT0qfjseMYyiKst0kBxiTRmQdIzllY2Y2UU1IYIkaAP009nZSR7a5IrPYFydZ6SRARk9kZI90fmgRnzUuQKcv7C9HbkUqs7qiApfA17ACpnuKQP5p5lGL41t5ZnU1-5FvmmO6NnwtRZif34HL6WYuksi2RleLAKoHGh_l6P6ygP5v3ucHH0TmdLVBAHMmlLW4BKdVnWa2HEQCKIBiXJztu8EpYCVpZ_ThCaZLagcUM6VCD4nqvsXzQB7pnsBjq75tbo2jlqrGQJE9ekfGVyw7XDN45IkJFLgfVJ2anpyK4NeIAbkB7ZCYSXbR96_EC6h0uZSMHtPYVNIvbRCK6ysCdlDuDsWiQ01tP-lp90eWj1d7ZYlaYNws12OauBfgLyn0NZvjIz5EYXbOO_Hi0P5U6znS1Um-lU0nB1Gsj685Io-KLzN0shOqkfDP8Xcjfx_3EEg0aEPJWqCjiP9K6veNI896ZrIrH6Sd0V_o4TIzpSJimZlMZrTWS6dUm2j6q1WQOE2Z5JlDMC90yTGUC8MNt2AdMB0Z78Mf71rdSrpXpWLMh7rz_7k', 'alg': 'RS256', 'kid': 'public:6a09d4a3-a298-47bc-8bbd-50b64f653f2d'}]}
+0.174 condition bare-keys: status=OK [Dynamic OPs MUST publish their public keys as bare JWK keys]
+0.174 assertion CheckHasJwksURI
+0.174 condition providerinfo-has-jwks_uri: status=OK [Check that the jwks_uri discovery metadata value is in the provider_info]
+0.174 condition Done: status=OK
+
+
+
+============================================================
+
+Conditions
+
+check-http-response: status=OK [Checks that the HTTP response status is within the 200 or 300 range. Also does some extra JSON checks]
+bare-keys: status=OK [Dynamic OPs MUST publish their public keys as bare JWK keys]
+providerinfo-has-jwks_uri: status=OK [Check that the jwks_uri discovery metadata value is in the provider_info]
+Done: status=OK
+
+
+
+============================================================
+
+RESULT: PASSED

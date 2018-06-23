@@ -1,0 +1,99 @@
+Test tool version: 2.1.3
+Issuer: https://oidc-certification.ory.sh:8443/
+Profile: []
+Test ID: OP-Discovery-jwks_uri
+Test description: Verify that jwks_uri is published
+Timestamp: 2018-06-23T11:21:45Z
+
+============================================================
+
+Trace output
+
+0.0 phase <--<-- 0 --- Webfinger -->-->
+0.0 not expected to do WebFinger
+0.0 phase <--<-- 1 --- Discovery -->-->
+0.0 provider_config kwargs:{'issuer': 'https://oidc-certification.ory.sh:8443/'}
+0.113 http response url:https://oidc-certification.ory.sh:8443/.well-known/openid-configuration status_code:200
+0.114 ProviderConfigurationResponse {
+    "authorization_endpoint": "https://oidc-certification.ory.sh:8443/oauth2/auth",
+    "claims_parameter_supported": false,
+    "claims_supported": [
+        "sub"
+    ],
+    "grant_types_supported": [
+        "authorization_code",
+        "implicit",
+        "client_credentials",
+        "refresh_token"
+    ],
+    "id_token_signing_alg_values_supported": [
+        "RS256"
+    ],
+    "issuer": "https://oidc-certification.ory.sh:8443/",
+    "jwks_uri": "https://oidc-certification.ory.sh:8443/.well-known/jwks.json",
+    "registration_endpoint": "https://oidc-certification.ory.sh:8443/clients",
+    "request_parameter_supported": true,
+    "request_uri_parameter_supported": true,
+    "require_request_uri_registration": true,
+    "response_modes_supported": [
+        "query",
+        "fragment"
+    ],
+    "response_types_supported": [
+        "code",
+        "code id_token",
+        "id_token",
+        "token id_token",
+        "token",
+        "token id_token code"
+    ],
+    "scopes_supported": [
+        "offline",
+        "openid"
+    ],
+    "subject_types_supported": [
+        "pairwise",
+        "public"
+    ],
+    "token_endpoint": "https://oidc-certification.ory.sh:8443/oauth2/token",
+    "token_endpoint_auth_methods_supported": [
+        "client_secret_post",
+        "client_secret_basic",
+        "private_key_jwt",
+        "none"
+    ],
+    "userinfo_endpoint": "https://oidc-certification.ory.sh:8443/userinfo",
+    "userinfo_signing_alg_values_supported": [
+        "none",
+        "RS256"
+    ],
+    "version": "3.0"
+}
+0.114 phase <--<-- 2 --- Done -->-->
+0.114 end 
+0.115 assertion CheckHTTPResponse
+0.115 condition check-http-response: status=OK [Checks that the HTTP response status is within the 200 or 300 range. Also does some extra JSON checks]
+0.115 assertion BareKeys
+0.183 http response url:https://oidc-certification.ory.sh:8443/.well-known/jwks.json status_code:200
+0.184 jwks {'keys': [{'use': 'sig', 'kty': 'RSA', 'e': 'AQAB', 'n': 'wFhdHCpPOd_H73YRTAyD8XHLxrYoaWlBWInPL-XkcIEOig3_9SzLzf8fL4Kv-tUFJwsUt9EmiKNLvRczFQddW5tgzW-ZLA4RaGQ1rBGDlmVbLBq9D7z_2UkTFrLiz1KY9YRrraNENtmS2DFmBbuQXIOBaX_n9mjgOK2GsLLSPrpm3IV3C_YWov1XibNpFuMIfEw0OhpvFMiQRkdkpf5bgFuEx7LK-rbALl_bul15TSltegQsjQyJkKwyJ4L_PaFSBz5Zltmpm6zD8VgcHhMFuLOKoA4mm2MSrfUE-p2UUM1xN9MTICKFcY3Sx6PW4k1Lb88wu8huJ4yytWNVIXSRsR4YPuuP4KvNY3xpBHfeHGdC9m9qSC1KKMUbrYl7xOexvxY8f1WqD4_B6MG5ihPdgP5rENKDF77pXHEGqdek5KEb_u0XlLmnYXK2fkyLQWP24_x7-hGjIgE4F_zox9onWi-ki3lUhBYbL8AZcbjq3o9CgQF2aACmgv6hPZ8ngbboU4ZLGnPte2qCW1S3ryx2tMweBTpDwAE_Jg3ZHlK7R-SoGspw0MNCuE7vHwnaHmDI8gKFqOEYCGG-tgYnniOkD2_KJ4ZBM20KKV2V66ANnwZERMn6exh_sbGjU6S3c8t-SI2MeQjOD1PyS4itl5Dxz60P9krYR6OeMoego0hOjys', 'alg': 'RS256', 'kid': 'public:4ae49bf4-9da0-4a82-bcce-893c3729f22a'}, {'use': 'sig', 'kty': 'RSA', 'e': 'AQAB', 'n': 'wF5o__54njdCumCJeSzYxnE6GCJ9JZtYfsNKKeOcf1jPL_hFt1M5uf47WKs1YSWJJhibDWg31mkf18j77sO_KLXh3GBUAfl9O8VZtmm519TPBsSAridq-XiRqXXB_etvrTCeCgIJBupwZn7k9-_4HyZvrwn_l_ik16UY70nLkropxXwn4Jj7-tB_ZzzNMl4l5lSueMyw3VuAcpglwhiX4bPrJd3OMc9DefD42e8UworVqKeArt0SEwx33QP9XU43d83dUlv4Ha1LgsX96KWcan3qn7hxxP1oRhgcPxXqFeoN8sHohCPvLMSISdaqtdMkBdcaZI8aVPHx8J2JxN4aTF0l3cy-t7JB54z6f-3pHeE_bUnj4ghgqZLeU967sS0Y1R6NBRxMnqDb7qEO5_saA1zRfxKaDSbAaFVRhgjvknSoqBx5qyYCCRGnfX3Ax5leL-bvo_M4wszbBAvxoeGY-hwn_s_Nz705kDHIzJfem_XURbv2LjjvdjgUXtRqZJkeTzc9_pXcsoEZX9Xm1gLbAsI2geHQNLI_z1KzWcLsz1uitYEpfndBBYBS3DoFFqo-13qk9WaqBJX9vA7MiFBVPmpWSsNAmYT_-6YxvO9P_OVNDPyLSbOSl1PMbaSK5-sPXw5n7mtkw2rkgPoquEqrmhPQnTVrf876qh571YJgfFs', 'alg': 'RS256', 'kid': 'public:e87ff987-ee63-4f3e-8bf3-4099a6148f78'}, {'use': 'sig', 'kty': 'RSA', 'e': 'AQAB', 'n': 'spxcDzycfjLukN1KJCopwI6s4bPjlQbA-fDA0qn4ntd-nCPieqq6KdXkpCtthr0jPhg6_NKHpL9CWTqJBCyaVvtgZbw1Q2saRXIyCxnYMlw8akMnYLtSsDVrJRmQMH5NTASnIbx0G_J6pZ6OvQ30c2q8xRkOOwgtGn6E85oNrdf_wbuklksIERzxsoZKpjamgxOKZsssz0x6v0mm0RFOTEPD20eOVUqRPhskBtY7W-swCavX5YVy7PYd14dJ7iiHNn4npe2XZLIwSC-zWts7z_N7RChaQYQCQk6e5q19G6DJMSYZOhsg98P8j4XpfD3m7uutGjSYURIVI2XYFv7EWTwGR_RD8QljM6f5s_JPy3A6_BE6zMgi95D6QB5NJUbQ615hBgYprf6lW-vTc6psER_4NjChA_F10eYFEkroDTO014qhGPm9xe--krH4vksfLwnv-_AsUJUg8nMiDmldrvMU4s8JMlEjTYy99zzhXgqQTRU_w_2C4-UKb0PZQi5IeKPqMygtGs7nqgN_rv1lpcWJ2YZ6VEFPnsSnHU7pMxBA04GeSAs6614FMATjWJW5o080_AFnggQRcHouSFTClvP5dUVC_OGJPFbRblHHPlJibXebdTJRX5jxB6o7KQjw7ua3dW3CfGoizS3iLJgQYENJLMDwUY1rjg37Kwm8JE0', 'alg': 'RS256', 'kid': 'public:5198db5b-878c-4635-a538-e627f98de93e'}, {'use': 'sig', 'kty': 'RSA', 'e': 'AQAB', 'n': '1Kpv-wv6THhBggBy2793qierg_NDRod7pAT__caxzRd6OF9FmHgzklU2d03RqHris7y0freA7RGhmIZEAyPe-C4-O-hhjw3Afk3rp_UaG1wMbgVKStujOdrcobrO6_hLOoSY7lITA-BYqFl9R5DmBoCw9_C5DEsHYL82c_FD03qVBE2rB6rHLaE03j0coHbZn1yB-RzbQqABkafhxWIUADdQ_YqxE588UzjEDRyxm_QviKoUsfSjlu0R9OMwBeX3uHnUP8tkscmMVOctAktPqzxGlfzaorgvfVWDaSUzYvGHxUdkcloUwqrAeCW_MKRmUcUblYQV_xI7QGjXQK4scTWlt4bthHiZ5fYcWt2CFozBi9V9MjKdDejDuLDDPdGlgNLVAnbUp8OqB3w8eFUycni70qp5KrUa1ooG6Bzs4qxuAD7I7D-9NS9VVhRGDBynUtgUHlBWX908ndXNfrZGnfHUyiSyZGNwy2c6xXbH_F7N09Zu9jTDFQazj85B9fVVXZ-63kfCXeuRhRm5oqYoGCLSgs71f3qnqipu2zPukehGWRt3zqf8NWyNOJxnkwW_D9111MpcrRAyhn3cOzHML6rN4nTA-sdq-9bJNMaxr-WJtawuxQtwVMmQCRHOXuFxP0ZPSVjH0zq2Y3paujalyMGpDIJlvTcP4TT3pmnpJ80', 'alg': 'RS256', 'kid': 'public:e272a755-7ae2-490e-82f5-62e0678641b0'}, {'use': 'sig', 'kty': 'RSA', 'e': 'AQAB', 'n': '16vFo3VXLypUERl1fqAWJEysIgKnJ15eEnc-5LOiFx7jK2L0zDKtj7q6ySr6rdwmgFjaV1vfG-VKmLHPMD_YuazQeb86blkDnUfNQvHfNID0g-U2G-xeLCqfdl54jzx5NAhMV6BVCUTOwsiUt3dgBaNWGJENo4gU0KGr0S2xEU38sJGUz3zROL6gOmUwqlSAk3YClnhyYYof0tj4j0dW7mXK7MaQ4CRAhq5rJq_VRrMCc4JiD7kAN104V5BmNU409uF4InE2Stugw8RSH4hXeBFp-dXtzQi6qmBLsnHd16_WEce76IxvthFnePqa3XMNg9G4-AJ36RVbH4IhMioQgvgHWGXR276pH1Vyga7V0dSakg8ohSD2vBD5OmlYquJ6krJ3uWUCez59YUeNEgOexn5XaBL0ZEnTQ-zNNHX39QZz9QaU2lftGhknRufg68bmshLWgXJexJS1ht1vFccFcmvpnYEnCTwKzo0kjlcY7IiBpWgJ1f4r1PTIKuh8CluNkitsbABcVx3-FOAhA4CMrQovAaNL_jfp6wKBA9Qy0W9LkESVsRQWFUSpQu_z4pJMOVfjbwJOsquxKwXphI2h1VczR-Hh8rTX7D2GL_4-GyG2nHfpF3jVq7raKnyGxJA8ZIK9kPh0JlQhR2FcBhFOWjvusFjoZ09Po6XtvWlP82E', 'alg': 'RS256', 'kid': 'public:0acf6c64-4d55-4888-abb9-b2a3f661ee7f'}, {'use': 'sig', 'kty': 'RSA', 'e': 'AQAB', 'n': '0vvbIEitFVzY4o12elAZbZvpja5xTm5AOh9wi2UEiPEL6aKxAUn1ywpUaLyWKuEXdeuykHyybniLaThik7Gf-6xKk6S9IK9tjbbwfRqHVkn_Xkyul0ohFI3iTcjvFq5FPGr5vEhSB6eckdngUpzb-7S_Kt8yunkdhYTmkuAr2AXSbQcmCbOJXOsvkc5LOwpjmFIWrtBAHwILJ5cHjzIHtkK2QKMJRlknD8b4kmQ3x6vfxA7mtXREUXdQFn7ssnOVPzriPQp4kIi_TMczSmRLlX1PeeOeDGpTnYywQbsAfdBGZ20WdZlwP3lRUUJoKv1GpBU51GKm2xhHtyrzOkiRKE8pH_PD05gh1G9qXbFtBOoHMBWEaCxoxyJcW8_9iLXBPoC-Jhm47VO5T9hPlaISzDY6EUmgYktejS_mx_bR7emBcbtFUccYSVVqT3EZqAFuQlsPsvj8AT9NmEiVncB2Cy4z7ofLX_Wai_VFPCf7AEfmDZ8mzFZQfVGct74Q9KybwXm8YDq0TSszQGuqT0gtvU9In7CPSOytrVDbdk8Peyeg-Wn_ACMRh5T23wUbQ0jy0Wi9kBwIzN-dUpKu3uL6EZ3PmPSZItQHeAxpQbRZJ1vrrd2y-b6EGun3G9rlnOZ3L4_L4-NOKLt4VGPie7sphlND1pc4ZipaXBjZ9uC3bS8', 'alg': 'RS256', 'kid': 'public:490968e8-c6e5-441e-b42e-5053d6c67af2'}, {'use': 'sig', 'kty': 'RSA', 'e': 'AQAB', 'n': '0WN9e_V2wEp33JZoN7zQ9J4E4Iz0l-dlx6GqIKdepcMjON3PKZHWFML1e0ZKAkuG2ZJRKoX1LaSNZT0NI9N6_wVAT9aNv53sHBJVC4Bww1zKHEvQseGwJbG0lZZHjDXaxCBPte9yQnquIRRp9Ab-uBeziRoaFQ02OV3LBMBSZ79AzFvZ4yTqpUS_xp-Ylfcmh5wXEppd6hoxs9h1tttPTPbnMLte3S_zxCZI4TQi8d1yBi39OvfZxtABQQbgqYPxiYehNdYbfmZ2CAmVlsTxByS3X-ANBe2nmLsOLgXTyVFZfvEZkzY7OgEwwq5zog5pScXJ-TGlj0guZd8nClHEV-GHvXonjb2hZB63dFEiUVMNh5cOblZX034GnlOkzYfAH8UZ_cvOqONHbvplzONuaYSSRMPRaZwj-0fpElhFNHwr1v1pqbE1i9XOxU_c-eSMr4XAm1VsWG3zJKymjoJmaDcW3AEawi3btL1N2tE3p27cHtcdFjcv5birnxMtPI9Vu806U0_WiGtH_kaWxz64Xk3A_yB-lIBQwXe61JME-K81wLLcHE9qoqpF5iUK4mDqMmI_DVIazUlVUzxY0-1iFkV790V95dBxeYFgXKX02g8NyxfnyzUDC12qUKKejJFbG5LPHaMUXWJIQ2ntwBX_XzeF4pGh0u0vYmfxAmfHWN0', 'alg': 'RS256', 'kid': 'public:a09f73cf-d685-4c5c-9312-60a13e57646f'}, {'use': 'sig', 'kty': 'RSA', 'e': 'AQAB', 'n': 's_BEnyG0xHYDibtz9a4tE1IW8490BQ_z526Lg2d0PWRtHfcqKmPG0pd0DizPuLY2j1NAY4cCXLwNWMJ3Cp1TqddaMl08hElvNbilcTyQr96RQg9MnrWeR1EqpdXEzTjcx06DFDokvzs89YQVZTDzSh_-xY_m_0VkcFQ0RpDTBn1B0dkMh78dbTJVVSGXYSBgMpcKrGlrgDaPIRX7qp_SdvjNtkPStG_wCPkzd_IJAaTAHGrlyj27dyhOC6EqQjpZRhQvT-w7GalbObncCFox3hRiC8wbI9Toi5p7vEuJJ6yksaqtIwgbtPXXUChNTqwQgIc1RE8RVuhI8ExaT6FfStIVLq9Tow6Hd9mopdX_ydEHHbnbvSC0cCRPg8_G8zTk0ihFpiHE1yEDXBQSs6pZIQ8KZF2RG35j75Jh4ngsDyPbC7PmjE93SG25AkX0WZwoB3g8f6q2r4dZqNtemRX1lMDo0FUQyYcOU5mnOiW3E5oNs3g-VH5ISOiaSUSLX6AIxDfdk6Wj5t7FZUo4EcIwTnE3PI-0HxnLJaErwbYEX0hO1BuhfF7zYHxDjc085U7OyN0abZWbuVUMtIMRgq-4ASlM9fTECg3sMmOfTEJV9nrJZaSCxKvVWma9A01bvBPB6Qn92Gj1XNZ0E1RBLUp1V3iXLcS7MGJh7bAAk5kwKCM', 'alg': 'RS256', 'kid': 'public:8e8dab73-c9fe-42ef-9a7b-1e217abba9a9'}, {'use': 'sig', 'kty': 'RSA', 'e': 'AQAB', 'n': '3cQ2ihjoElfFVnnkleo6ioUvZrkDfddEKOMCaemXP7umEhr8TC9_L3BKYbJqtE15jvkJiqT1vlHgTOKD5wWCFhFSmEa9PAWlt9Hw6BWddFEsiijR113yvj4eT0qfjseMYyiKst0kBxiTRmQdIzllY2Y2UU1IYIkaAP009nZSR7a5IrPYFydZ6SRARk9kZI90fmgRnzUuQKcv7C9HbkUqs7qiApfA17ACpnuKQP5p5lGL41t5ZnU1-5FvmmO6NnwtRZif34HL6WYuksi2RleLAKoHGh_l6P6ygP5v3ucHH0TmdLVBAHMmlLW4BKdVnWa2HEQCKIBiXJztu8EpYCVpZ_ThCaZLagcUM6VCD4nqvsXzQB7pnsBjq75tbo2jlqrGQJE9ekfGVyw7XDN45IkJFLgfVJ2anpyK4NeIAbkB7ZCYSXbR96_EC6h0uZSMHtPYVNIvbRCK6ysCdlDuDsWiQ01tP-lp90eWj1d7ZYlaYNws12OauBfgLyn0NZvjIz5EYXbOO_Hi0P5U6znS1Um-lU0nB1Gsj685Io-KLzN0shOqkfDP8Xcjfx_3EEg0aEPJWqCjiP9K6veNI896ZrIrH6Sd0V_o4TIzpSJimZlMZrTWS6dUm2j6q1WQOE2Z5JlDMC90yTGUC8MNt2AdMB0Z78Mf71rdSrpXpWLMh7rz_7k', 'alg': 'RS256', 'kid': 'public:6a09d4a3-a298-47bc-8bbd-50b64f653f2d'}]}
+0.184 condition bare-keys: status=OK [Dynamic OPs MUST publish their public keys as bare JWK keys]
+0.184 assertion CheckHasJwksURI
+0.184 condition providerinfo-has-jwks_uri: status=OK [Check that the jwks_uri discovery metadata value is in the provider_info]
+0.184 condition Done: status=OK
+
+
+
+============================================================
+
+Conditions
+
+check-http-response: status=OK [Checks that the HTTP response status is within the 200 or 300 range. Also does some extra JSON checks]
+bare-keys: status=OK [Dynamic OPs MUST publish their public keys as bare JWK keys]
+providerinfo-has-jwks_uri: status=OK [Check that the jwks_uri discovery metadata value is in the provider_info]
+Done: status=OK
+
+
+
+============================================================
+
+RESULT: PASSED

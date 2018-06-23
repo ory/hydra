@@ -1,0 +1,180 @@
+Test tool version: 2.1.3
+Issuer: https://oidc-certification.ory.sh:8443/
+Profile: []
+Test ID: OP-Req-ui_locales
+Test description: Providing ui_locales
+Timestamp: 2018-06-23T11:25:54Z
+
+============================================================
+
+Trace output
+
+0.0 phase <--<-- 0 --- Note -->-->
+1.402 phase <--<-- 1 --- Webfinger -->-->
+1.402 not expected to do WebFinger
+1.402 phase <--<-- 2 --- Discovery -->-->
+1.402 provider_config kwargs:{'issuer': 'https://oidc-certification.ory.sh:8443/'}
+1.515 http response url:https://oidc-certification.ory.sh:8443/.well-known/openid-configuration status_code:200
+1.516 ProviderConfigurationResponse {
+    "authorization_endpoint": "https://oidc-certification.ory.sh:8443/oauth2/auth",
+    "claims_parameter_supported": false,
+    "claims_supported": [
+        "sub"
+    ],
+    "grant_types_supported": [
+        "authorization_code",
+        "implicit",
+        "client_credentials",
+        "refresh_token"
+    ],
+    "id_token_signing_alg_values_supported": [
+        "RS256"
+    ],
+    "issuer": "https://oidc-certification.ory.sh:8443/",
+    "jwks_uri": "https://oidc-certification.ory.sh:8443/.well-known/jwks.json",
+    "registration_endpoint": "https://oidc-certification.ory.sh:8443/clients",
+    "request_parameter_supported": true,
+    "request_uri_parameter_supported": true,
+    "require_request_uri_registration": true,
+    "response_modes_supported": [
+        "query",
+        "fragment"
+    ],
+    "response_types_supported": [
+        "code",
+        "code id_token",
+        "id_token",
+        "token id_token",
+        "token",
+        "token id_token code"
+    ],
+    "scopes_supported": [
+        "offline",
+        "openid"
+    ],
+    "subject_types_supported": [
+        "pairwise",
+        "public"
+    ],
+    "token_endpoint": "https://oidc-certification.ory.sh:8443/oauth2/token",
+    "token_endpoint_auth_methods_supported": [
+        "client_secret_post",
+        "client_secret_basic",
+        "private_key_jwt",
+        "none"
+    ],
+    "userinfo_endpoint": "https://oidc-certification.ory.sh:8443/userinfo",
+    "userinfo_signing_alg_values_supported": [
+        "none",
+        "RS256"
+    ],
+    "version": "3.0"
+}
+1.516 phase <--<-- 3 --- Registration -->-->
+1.517 register kwargs:{'application_name': 'OIC test tool', 'response_types': ['id_token token'], 'contacts': ['roland@example.com'], 'redirect_uris': ['https://op.certification.openid.net:61353/authz_cb'], 'post_logout_redirect_uris': ['https://op.certification.openid.net:61353/logout'], 'jwks_uri': 'https://op.certification.openid.net:61353/static/jwks_61353.json', 'grant_types': ['implicit'], 'application_type': 'web', 'url': 'https://oidc-certification.ory.sh:8443/clients'}
+1.517 RegistrationRequest {
+    "application_type": "web",
+    "contacts": [
+        "roland@example.com"
+    ],
+    "grant_types": [
+        "implicit"
+    ],
+    "jwks_uri": "https://op.certification.openid.net:61353/static/jwks_61353.json",
+    "post_logout_redirect_uris": [
+        "https://op.certification.openid.net:61353/logout"
+    ],
+    "redirect_uris": [
+        "https://op.certification.openid.net:61353/authz_cb"
+    ],
+    "request_uris": [
+        "https://op.certification.openid.net:61353/requests/e3ecc141f5419bd33d25d760861d32323144d583feaf26eb1b5cbf20147608b9#UIGACDirUKKKhzQs"
+    ],
+    "response_types": [
+        "id_token token"
+    ]
+}
+1.689 http response url:https://oidc-certification.ory.sh:8443/clients status_code:201
+1.69 RegistrationResponse {
+    "client_id": "5f3c41f0-871c-4c39-81d1-292bf5fbd44b",
+    "client_secret": "B7HL8ZftKviq",
+    "client_secret_expires_at": 0,
+    "contacts": [
+        "roland@example.com"
+    ],
+    "grant_types": [
+        "implicit"
+    ],
+    "id": "5f3c41f0-871c-4c39-81d1-292bf5fbd44b",
+    "jwks_uri": "https://op.certification.openid.net:61353/static/jwks_61353.json",
+    "public": false,
+    "redirect_uris": [
+        "https://op.certification.openid.net:61353/authz_cb"
+    ],
+    "request_uris": [
+        "https://op.certification.openid.net:61353/requests/e3ecc141f5419bd33d25d760861d32323144d583feaf26eb1b5cbf20147608b9#UIGACDirUKKKhzQs"
+    ],
+    "response_types": [
+        "id_token token"
+    ],
+    "scope": "openid offline offline_access profile email address phone",
+    "token_endpoint_auth_method": "client_secret_basic",
+    "userinfo_signed_response_alg": "none"
+}
+1.69 phase <--<-- 4 --- AsyncAuthn -->-->
+1.691 AuthorizationRequest {
+    "client_id": "5f3c41f0-871c-4c39-81d1-292bf5fbd44b",
+    "nonce": "Pmb65qSqOChiC4eH",
+    "redirect_uri": "https://op.certification.openid.net:61353/authz_cb",
+    "response_type": "id_token token",
+    "scope": "openid",
+    "state": "1HETFDt3PnijvW4P",
+    "ui_locales": "se"
+}
+1.691 redirect url https://oidc-certification.ory.sh:8443/oauth2/auth?ui_locales=se&scope=openid&redirect_uri=https%3A%2F%2Fop.certification.openid.net%3A61353%2Fauthz_cb&client_id=5f3c41f0-871c-4c39-81d1-292bf5fbd44b&state=1HETFDt3PnijvW4P&response_type=id_token+token&nonce=Pmb65qSqOChiC4eH
+1.691 redirect https://oidc-certification.ory.sh:8443/oauth2/auth?ui_locales=se&scope=openid&redirect_uri=https%3A%2F%2Fop.certification.openid.net%3A61353%2Fauthz_cb&client_id=5f3c41f0-871c-4c39-81d1-292bf5fbd44b&state=1HETFDt3PnijvW4P&response_type=id_token+token&nonce=Pmb65qSqOChiC4eH
+5.109 http args {}
+5.29 response URL with fragment
+5.29 response access_token=9ff5EIn7hW0JBmgNZbYpE5cFl_ud6aCDV2-6F9CukOc.Z99FTLqSmcA0XYMIVFvcvMZBoFF33xdGNaP3GPrFBRY&expires_in=3599&id_token=eyJhbGciOiJSUzI1NiIsImtpZCI6InB1YmxpYzo0YWU0OWJmNC05ZGEwLTRhODItYmNjZS04OTNjMzcyOWYyMmEiLCJ0eXAiOiJKV1QifQ.eyJhdF9oYXNoIjoiRThqbVg1WUJqWWNtN1NsN1NOOTNwUSIsImF1ZCI6WyI1ZjNjNDFmMC04NzFjLTRjMzktODFkMS0yOTJiZjVmYmQ0NGIiXSwiYXV0aF90aW1lIjoxNTI5NzUzMTM2LCJleHAiOjE1Mjk3NTY3NTMsImlhdCI6MTUyOTc1MzE1MywiaXNzIjoiaHR0cHM6Ly9vaWRjLWNlcnRpZmljYXRpb24ub3J5LnNoOjg0NDMvIiwianRpIjoiY2RlYTViMmUtNmUyZC00ZjliLTljYTAtMTZlZDViNTU1Njg2Iiwibm9uY2UiOiJQbWI2NXFTcU9DaGlDNGVIIiwicmF0IjoxNTI5NzUzMTUwLCJzdWIiOiJmb29AYmFyLmNvbSJ9.Iakb9MMGVukKRfx6oEhqdZBokiSrPScD9rdkQGm2SsQbspwWh-7OI2T65e5q4Q9Xx4Rw3akDKCI6d_ZWDofjq7QCY4CnU69qJKIdWWF0qt8RTM1cN6ixu909w0w282Zfe3XysmcHqGZ_t9ctbKsShP9eQUnYX0d_NVPNkIQJXSWukFt0riWy0B14LuTVHCBWGWiacmUHm6LcUwNZav4s8f9rTKzYwSw0QSjy-n077Iw5ZVuh0fB9EsBSt3HMkjbMtotvnhFNFMNVPlOmDAOh5C1iBUJSWScI4C-4P_bFxbsjQ4gdlHfVAa_3PYf9BAJWMmILF1ydyljc0f8R5ywdrfHPQxmc_SwlE19TnYwGHX0PP6T8TIctSO8L4LnuyuzykWbORV7Sx5xjerZDbcqbGh3qe5irMeDTG41jvHJXOPDwABl4BCrwUaavU9dAriTwLYZ3Xfu9oDA1qtWZU3YoIsJy14wv4tHGAIivuk4cmGNNkRX4XgAEzQnaMe120mspcc4kSDcvZEFOoFSdPUoFD-8MnvIs5dP1dSqhVD7cvO1LdnftURtIANkscH2y7jmebi5-E6gO_nc01mj1ZrWaPAN50dVZfQL7m4jUOQhkI1OMvclMi-4S453bIQSWlIwW3E-jxu67J64bxerPe3sqdEuAfUMfKpI_u1iOnxJ9qwg&scope=openid&state=1HETFDt3PnijvW4P&token_type=bearer
+5.291 response {'id_token': 'eyJhbGciOiJSUzI1NiIsImtpZCI6InB1YmxpYzo0YWU0OWJmNC05ZGEwLTRhODItYmNjZS04OTNjMzcyOWYyMmEiLCJ0eXAiOiJKV1QifQ.eyJhdF9oYXNoIjoiRThqbVg1WUJqWWNtN1NsN1NOOTNwUSIsImF1ZCI6WyI1ZjNjNDFmMC04NzFjLTRjMzktODFkMS0yOTJiZjVmYmQ0NGIiXSwiYXV0aF90aW1lIjoxNTI5NzUzMTM2LCJleHAiOjE1Mjk3NTY3NTMsImlhdCI6MTUyOTc1MzE1MywiaXNzIjoiaHR0cHM6Ly9vaWRjLWNlcnRpZmljYXRpb24ub3J5LnNoOjg0NDMvIiwianRpIjoiY2RlYTViMmUtNmUyZC00ZjliLTljYTAtMTZlZDViNTU1Njg2Iiwibm9uY2UiOiJQbWI2NXFTcU9DaGlDNGVIIiwicmF0IjoxNTI5NzUzMTUwLCJzdWIiOiJmb29AYmFyLmNvbSJ9.Iakb9MMGVukKRfx6oEhqdZBokiSrPScD9rdkQGm2SsQbspwWh-7OI2T65e5q4Q9Xx4Rw3akDKCI6d_ZWDofjq7QCY4CnU69qJKIdWWF0qt8RTM1cN6ixu909w0w282Zfe3XysmcHqGZ_t9ctbKsShP9eQUnYX0d_NVPNkIQJXSWukFt0riWy0B14LuTVHCBWGWiacmUHm6LcUwNZav4s8f9rTKzYwSw0QSjy-n077Iw5ZVuh0fB9EsBSt3HMkjbMtotvnhFNFMNVPlOmDAOh5C1iBUJSWScI4C-4P_bFxbsjQ4gdlHfVAa_3PYf9BAJWMmILF1ydyljc0f8R5ywdrfHPQxmc_SwlE19TnYwGHX0PP6T8TIctSO8L4LnuyuzykWbORV7Sx5xjerZDbcqbGh3qe5irMeDTG41jvHJXOPDwABl4BCrwUaavU9dAriTwLYZ3Xfu9oDA1qtWZU3YoIsJy14wv4tHGAIivuk4cmGNNkRX4XgAEzQnaMe120mspcc4kSDcvZEFOoFSdPUoFD-8MnvIs5dP1dSqhVD7cvO1LdnftURtIANkscH2y7jmebi5-E6gO_nc01mj1ZrWaPAN50dVZfQL7m4jUOQhkI1OMvclMi-4S453bIQSWlIwW3E-jxu67J64bxerPe3sqdEuAfUMfKpI_u1iOnxJ9qwg', 'scope': 'openid', 'access_token': '9ff5EIn7hW0JBmgNZbYpE5cFl_ud6aCDV2-6F9CukOc.Z99FTLqSmcA0XYMIVFvcvMZBoFF33xdGNaP3GPrFBRY', 'state': '1HETFDt3PnijvW4P', 'expires_in': 3599, 'token_type': 'bearer'}
+5.373 AuthorizationResponse {
+    "access_token": "9ff5EIn7hW0JBmgNZbYpE5cFl_ud6aCDV2-6F9CukOc.Z99FTLqSmcA0XYMIVFvcvMZBoFF33xdGNaP3GPrFBRY",
+    "expires_in": 3599,
+    "id_token": {
+        "at_hash": "E8jmX5YBjYcm7Sl7SN93pQ",
+        "aud": [
+            "5f3c41f0-871c-4c39-81d1-292bf5fbd44b"
+        ],
+        "auth_time": 1529753136,
+        "exp": 1529756753,
+        "iat": 1529753153,
+        "iss": "https://oidc-certification.ory.sh:8443/",
+        "jti": "cdea5b2e-6e2d-4f9b-9ca0-16ed5b555686",
+        "nonce": "Pmb65qSqOChiC4eH",
+        "rat": 1529753150,
+        "sub": "foo@bar.com"
+    },
+    "scope": "openid",
+    "state": "1HETFDt3PnijvW4P",
+    "token_type": "bearer"
+}
+5.373 phase <--<-- 5 --- Done -->-->
+5.373 end 
+5.373 assertion VerifyAuthnResponse
+5.373 condition verify-authn-response: status=OK [Checks that the last response was a JSON encoded authentication message]
+5.373 condition Done: status=OK
+
+
+
+============================================================
+
+Conditions
+
+verify-authn-response: status=OK [Checks that the last response was a JSON encoded authentication message]
+Done: status=OK
+
+
+
+============================================================
+
+RESULT: PASSED

@@ -21,12 +21,12 @@
 package jwk
 
 import (
-	"database/sql"
 	"encoding/json"
 	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/hydra/pkg"
+	"github.com/ory/sqlcon"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
 	"gopkg.in/square/go-jose.v2"
@@ -74,9 +74,9 @@ type sqlData struct {
 	Key       string    `db:"keydata"`
 }
 
-func (s *SQLManager) CreateSchemas() (int, error) {
+func (m *SQLManager) CreateSchemas() (int, error) {
 	migrate.SetTable("hydra_jwk_migration")
-	n, err := migrate.Exec(s.DB.DB, s.DB.DriverName(), migrations, migrate.Up)
+	n, err := migrate.Exec(m.DB.DB, m.DB.DriverName(), migrations, migrate.Up)
 	if err != nil {
 		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
 	}
@@ -100,7 +100,7 @@ func (m *SQLManager) AddKey(set string, key *jose.JSONWebKey) error {
 		Version: 0,
 		Key:     encrypted,
 	}); err != nil {
-		return errors.WithStack(err)
+		return sqlcon.HandleError(err)
 	}
 	return nil
 }
@@ -137,7 +137,7 @@ func (m *SQLManager) AddKeySet(set string, keys *jose.JSONWebKeySet) error {
 			if re := tx.Rollback(); re != nil {
 				return errors.Wrap(err, re.Error())
 			}
-			return errors.WithStack(err)
+			return sqlcon.HandleError(err)
 		}
 	}
 
@@ -145,17 +145,15 @@ func (m *SQLManager) AddKeySet(set string, keys *jose.JSONWebKeySet) error {
 		if re := tx.Rollback(); re != nil {
 			return errors.Wrap(err, re.Error())
 		}
-		return errors.WithStack(err)
+		return sqlcon.HandleError(err)
 	}
 	return nil
 }
 
 func (m *SQLManager) GetKey(set, kid string) (*jose.JSONWebKeySet, error) {
 	var d sqlData
-	if err := m.DB.Get(&d, m.DB.Rebind("SELECT * FROM hydra_jwk WHERE sid=? AND kid=? ORDER BY created_at DESC"), set, kid); err == sql.ErrNoRows {
-		return nil, errors.Wrap(pkg.ErrNotFound, "")
-	} else if err != nil {
-		return nil, errors.WithStack(err)
+	if err := m.DB.Get(&d, m.DB.Rebind("SELECT * FROM hydra_jwk WHERE sid=? AND kid=? ORDER BY created_at DESC"), set, kid); err != nil {
+		return nil, sqlcon.HandleError(err)
 	}
 
 	key, err := m.Cipher.Decrypt(d.Key)
@@ -175,10 +173,8 @@ func (m *SQLManager) GetKey(set, kid string) (*jose.JSONWebKeySet, error) {
 
 func (m *SQLManager) GetKeySet(set string) (*jose.JSONWebKeySet, error) {
 	var ds []sqlData
-	if err := m.DB.Select(&ds, m.DB.Rebind("SELECT * FROM hydra_jwk WHERE sid=? ORDER BY created_at DESC"), set); err == sql.ErrNoRows {
-		return nil, errors.Wrap(pkg.ErrNotFound, "")
-	} else if err != nil {
-		return nil, errors.WithStack(err)
+	if err := m.DB.Select(&ds, m.DB.Rebind("SELECT * FROM hydra_jwk WHERE sid=? ORDER BY created_at DESC"), set); err != nil {
+		return nil, sqlcon.HandleError(err)
 	}
 
 	if len(ds) == 0 {
@@ -204,14 +200,14 @@ func (m *SQLManager) GetKeySet(set string) (*jose.JSONWebKeySet, error) {
 
 func (m *SQLManager) DeleteKey(set, kid string) error {
 	if _, err := m.DB.Exec(m.DB.Rebind(`DELETE FROM hydra_jwk WHERE sid=? AND kid=?`), set, kid); err != nil {
-		return errors.WithStack(err)
+		return sqlcon.HandleError(err)
 	}
 	return nil
 }
 
 func (m *SQLManager) DeleteKeySet(set string) error {
 	if _, err := m.DB.Exec(m.DB.Rebind(`DELETE FROM hydra_jwk WHERE sid=?`), set); err != nil {
-		return errors.WithStack(err)
+		return sqlcon.HandleError(err)
 	}
 	return nil
 }

@@ -98,6 +98,12 @@
   revision = "416d5fc8c9c85e9ec9252a70d01e069f4b287ff0"
 
 [[projects]]
+  name = "github.com/golang/mock"
+  packages = ["gomock"]
+  revision = "c34cdb4725f4c3844d095133c6e40e448b86589b"
+  version = "v1.1.1"
+
+[[projects]]
   branch = "master"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
@@ -292,8 +298,8 @@
     "token/hmac",
     "token/jwt"
   ]
-  revision = "99755512a66f3bc42f46da10237c83c45e2adf71"
-  version = "v0.20.2"
+  revision = "5688a1c5acbafad5eabe649ce56e06e922c36a60"
+  version = "v0.21.0"
 
 [[projects]]
   name = "github.com/ory/go-convenience"
@@ -316,8 +322,8 @@
 [[projects]]
   name = "github.com/ory/herodot"
   packages = ["."]
-  revision = "6432c78723e5dc82b7a896fabe8376e7f6451181"
-  version = "v0.2.2"
+  revision = "81c990bd4e859493bf51765187d865754ad04e3d"
+  version = "v0.3.0"
 
 [[projects]]
   name = "github.com/ory/ladon"
@@ -496,12 +502,6 @@
   version = "v1.0.0"
 
 [[projects]]
-  name = "github.com/square/go-jose"
-  packages = ["."]
-  revision = "f8f38de21b4dcd69d0413faf231983f5fd6634b1"
-  version = "v2.1.3"
-
-[[projects]]
   name = "github.com/stretchr/testify"
   packages = [
     "assert",
@@ -614,11 +614,12 @@
 [[projects]]
   name = "gopkg.in/square/go-jose.v2"
   packages = [
+    ".",
     "cipher",
     "json"
   ]
-  revision = "f8f38de21b4dcd69d0413faf231983f5fd6634b1"
-  version = "v2.1.3"
+  revision = "76dd09796242edb5b897103a75df2645c028c960"
+  version = "v2.1.6"
 
 [[projects]]
   branch = "v2"
@@ -629,6 +630,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4019dee33d1150efa277de79772ee7729e55ba703a8685410c66f3d8474bc099"
+  inputs-digest = "62b41633fc2f7dd7bf6b3b8753ef3c71633e1d4a3ccc8b16ad06d5f1d831a1a7"
   solver-name = "gps-cdcl"
   solver-version = 1

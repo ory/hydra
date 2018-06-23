@@ -96,6 +96,19 @@ ID and secret in the POST body.
 
 For more information on this, please refer to the [specification](http://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication).
 
+### OAuth 2.0 Client Response Type changes
+
+Previously, when response types such as `code token id_token` were requested (OpenID Connect Hybrid Flow) it was enough
+for the client to have `response_types=["code", "token", "id_token"]`. This is however incompatible with the
+OpenID Connect Dynamic Client Registration 1.0 spec which dictates that the `response_types` have to match exactly.
+
+Assuming you are requesting `&response_types=code+token+id_token`, your client should have `response_types=["code token id_token"]`,
+if other response types are required (e.g. `&response_types=code`, `&response_types=token`) they too must be included:
+`response_types=["code", "token", "code token id_token"]`.
+
+This will only affect you if you have clients requesting OpenID Connect Hybrid flows where more than one response_type
+is requested.
+
 ### Schema Changes
 
 This patch introduces some minor database schema changes. Before you apply it, you must run `hydra migrate sql` against

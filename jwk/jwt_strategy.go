@@ -22,6 +22,7 @@ package jwk
 
 import (
 	"crypto/rsa"
+	"strings"
 
 	jwt2 "github.com/dgrijalva/jwt-go"
 	"github.com/ory/fosite/token/jwt"
@@ -34,7 +35,7 @@ func NewRS256JWTStrategy(m Manager, set string) (*RS256JWTStrategy, error) {
 		RS256JWTStrategy: &jwt.RS256JWTStrategy{},
 		Set:              set,
 	}
-	if err := j.refresh(); err != nil {
+	if err := j.refresh(true); err != nil {
 		return nil, err
 	}
 	return j, nil
@@ -65,7 +66,7 @@ func (j *RS256JWTStrategy) GetSignature(token string) (string, error) {
 }
 
 func (j *RS256JWTStrategy) Generate(claims jwt2.Claims, header jwt.Mapper) (string, string, error) {
-	if err := j.refresh(); err != nil {
+	if err := j.refresh(false); err != nil {
 		return "", "", err
 	}
 
@@ -73,7 +74,7 @@ func (j *RS256JWTStrategy) Generate(claims jwt2.Claims, header jwt.Mapper) (stri
 }
 
 func (j *RS256JWTStrategy) Validate(token string) (string, error) {
-	if err := j.refresh(); err != nil {
+	if err := j.refresh(false); err != nil {
 		return "", err
 	}
 
@@ -81,7 +82,7 @@ func (j *RS256JWTStrategy) Validate(token string) (string, error) {
 }
 
 func (j *RS256JWTStrategy) Decode(token string) (*jwt2.Token, error) {
-	if err := j.refresh(); err != nil {
+	if err := j.refresh(false); err != nil {
 		return nil, err
 	}
 
@@ -89,14 +90,14 @@ func (j *RS256JWTStrategy) Decode(token string) (*jwt2.Token, error) {
 }
 
 func (j *RS256JWTStrategy) GetPublicKeyID() (string, error) {
-	if err := j.refresh(); err != nil {
+	if err := j.refresh(true); err != nil {
 		return "", err
 	}
 
 	return j.publicKeyID, nil
 }
 
-func (j *RS256JWTStrategy) refresh() error {
+func (j *RS256JWTStrategy) refresh(refreshID bool) error {
 	keys, err := j.Manager.GetKeySet(j.Set)
 	if err != nil {
 		return err
@@ -112,6 +113,10 @@ func (j *RS256JWTStrategy) refresh() error {
 		return err
 	}
 
+	if strings.Replace(public.KeyID, "public:", "", 1) != strings.Replace(private.KeyID, "private:", "", 1) {
+		return errors.New("public and private key pair kids do not match")
+	}
+
 	if k, ok := private.Key.(*rsa.PrivateKey); !ok {
 		return errors.New("unable to type assert key to *rsa.PublicKey")
 	} else {
@@ -123,7 +128,17 @@ func (j *RS256JWTStrategy) refresh() error {
 		return errors.New("unable to type assert key to *rsa.PublicKey")
 	} else {
 		j.publicKey = k
-		j.publicKeyID = public.KeyID
+		if refreshID {
+			j.publicKeyID = public.KeyID
+		}
+	}
+
+	if j.privateKey.PublicKey != *j.publicKey {
+		return errors.New("public and private key pair fetched from store does not match")
+	}
+
+	if !refreshID && j.publicKeyID != public.KeyID {
+		return errors.New("refreshing caused the public's kid to mismatch the kid fetched from the store")
 	}
 
 	return nil

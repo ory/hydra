@@ -1,0 +1,169 @@
+Test tool version: 2.1.3
+Issuer: https://oidc-certification.ory.sh:8443/
+Profile: []
+Test ID: OP-redirect_uri-Query-Added
+Test description: Request with redirect_uri with query component when registered redirect_uri has no query component
+Timestamp: 2018-06-23T10:46:44Z
+
+============================================================
+
+Trace output
+
+0.0 phase <--<-- 0 --- Webfinger -->-->
+0.0 not expected to do WebFinger
+0.0 phase <--<-- 1 --- Discovery -->-->
+0.0 provider_config kwargs:{'issuer': 'https://oidc-certification.ory.sh:8443/'}
+0.073 http response url:https://oidc-certification.ory.sh:8443/.well-known/openid-configuration status_code:200
+0.075 ProviderConfigurationResponse {
+    "authorization_endpoint": "https://oidc-certification.ory.sh:8443/oauth2/auth",
+    "claims_parameter_supported": false,
+    "claims_supported": [
+        "sub"
+    ],
+    "grant_types_supported": [
+        "authorization_code",
+        "implicit",
+        "client_credentials",
+        "refresh_token"
+    ],
+    "id_token_signing_alg_values_supported": [
+        "RS256"
+    ],
+    "issuer": "https://oidc-certification.ory.sh:8443/",
+    "jwks_uri": "https://oidc-certification.ory.sh:8443/.well-known/jwks.json",
+    "registration_endpoint": "https://oidc-certification.ory.sh:8443/clients",
+    "request_parameter_supported": true,
+    "request_uri_parameter_supported": true,
+    "require_request_uri_registration": true,
+    "response_modes_supported": [
+        "query",
+        "fragment"
+    ],
+    "response_types_supported": [
+        "code",
+        "code id_token",
+        "id_token",
+        "token id_token",
+        "token",
+        "token id_token code"
+    ],
+    "scopes_supported": [
+        "offline",
+        "openid"
+    ],
+    "subject_types_supported": [
+        "pairwise",
+        "public"
+    ],
+    "token_endpoint": "https://oidc-certification.ory.sh:8443/oauth2/token",
+    "token_endpoint_auth_methods_supported": [
+        "client_secret_post",
+        "client_secret_basic",
+        "private_key_jwt",
+        "none"
+    ],
+    "userinfo_endpoint": "https://oidc-certification.ory.sh:8443/userinfo",
+    "userinfo_signing_alg_values_supported": [
+        "none",
+        "RS256"
+    ],
+    "version": "3.0"
+}
+0.075 phase <--<-- 2 --- Registration -->-->
+0.075 register kwargs:{'application_name': 'OIC test tool', 'url': 'https://oidc-certification.ory.sh:8443/clients', 'response_types': ['code'], 'contacts': ['roland@example.com'], 'redirect_uris': ['https://op.certification.openid.net:61353/authz_cb'], 'post_logout_redirect_uris': ['https://op.certification.openid.net:61353/logout'], 'jwks_uri': 'https://op.certification.openid.net:61353/static/jwks_61353.json', 'grant_types': ['authorization_code'], 'application_type': 'web', 'redirect_uri': ['https://op.certification.openid.net:61353/authz_cb?foo=bar']}
+0.075 RegistrationRequest {
+    "application_type": "web",
+    "contacts": [
+        "roland@example.com"
+    ],
+    "grant_types": [
+        "authorization_code"
+    ],
+    "jwks_uri": "https://op.certification.openid.net:61353/static/jwks_61353.json",
+    "post_logout_redirect_uris": [
+        "https://op.certification.openid.net:61353/logout"
+    ],
+    "redirect_uris": [
+        "https://op.certification.openid.net:61353/authz_cb"
+    ],
+    "request_uris": [
+        "https://op.certification.openid.net:61353/requests/e3ecc141f5419bd33d25d760861d32323144d583feaf26eb1b5cbf20147608b9#LtySycnhFcGnHiXR"
+    ],
+    "response_types": [
+        "code"
+    ]
+}
+0.236 http response url:https://oidc-certification.ory.sh:8443/clients status_code:201
+0.237 RegistrationResponse {
+    "client_id": "ecb012c6-512d-4236-b362-a17e856e054f",
+    "client_secret": "xjeZZSzBwdMu",
+    "client_secret_expires_at": 0,
+    "contacts": [
+        "roland@example.com"
+    ],
+    "grant_types": [
+        "authorization_code"
+    ],
+    "id": "ecb012c6-512d-4236-b362-a17e856e054f",
+    "jwks_uri": "https://op.certification.openid.net:61353/static/jwks_61353.json",
+    "public": false,
+    "redirect_uris": [
+        "https://op.certification.openid.net:61353/authz_cb"
+    ],
+    "request_uris": [
+        "https://op.certification.openid.net:61353/requests/e3ecc141f5419bd33d25d760861d32323144d583feaf26eb1b5cbf20147608b9#LtySycnhFcGnHiXR"
+    ],
+    "response_types": [
+        "code"
+    ],
+    "scope": "openid offline offline_access profile email address phone",
+    "token_endpoint_auth_method": "client_secret_basic",
+    "userinfo_signed_response_alg": "none"
+}
+0.237 phase <--<-- 3 --- Note -->-->
+15.249 phase <--<-- 4 --- AsyncAuthn -->-->
+15.249 AuthorizationRequest {
+    "client_id": "ecb012c6-512d-4236-b362-a17e856e054f",
+    "nonce": "BOoxee6CpKSapklm",
+    "redirect_uri": "https://op.certification.openid.net:61353/authz_cb?bar=foo",
+    "response_type": "code",
+    "scope": "openid",
+    "state": "llkFogf4uGclH9hQ"
+}
+15.25 redirect url https://oidc-certification.ory.sh:8443/oauth2/auth?scope=openid&redirect_uri=https%3A%2F%2Fop.certification.openid.net%3A61353%2Fauthz_cb%3Fbar%3Dfoo&client_id=ecb012c6-512d-4236-b362-a17e856e054f&state=llkFogf4uGclH9hQ&response_type=code&nonce=BOoxee6CpKSapklm
+15.25 redirect https://oidc-certification.ory.sh:8443/oauth2/auth?scope=openid&redirect_uri=https%3A%2F%2Fop.certification.openid.net%3A61353%2Fauthz_cb%3Fbar%3Dfoo&client_id=ecb012c6-512d-4236-b362-a17e856e054f&state=llkFogf4uGclH9hQ&response_type=code&nonce=BOoxee6CpKSapklm
+16.2 phase <--<-- 4 --- AsyncAuthn -->-->
+16.201 AuthorizationRequest {
+    "client_id": "ecb012c6-512d-4236-b362-a17e856e054f",
+    "nonce": "APR9OMfToXZqwWYp",
+    "redirect_uri": "https://op.certification.openid.net:61353/authz_cb?bar=foo",
+    "response_type": "code",
+    "scope": "openid",
+    "state": "qf39DpT37XADhfJF"
+}
+16.201 redirect url https://oidc-certification.ory.sh:8443/oauth2/auth?scope=openid&redirect_uri=https%3A%2F%2Fop.certification.openid.net%3A61353%2Fauthz_cb%3Fbar%3Dfoo&client_id=ecb012c6-512d-4236-b362-a17e856e054f&state=qf39DpT37XADhfJF&response_type=code&nonce=APR9OMfToXZqwWYp
+16.201 redirect https://oidc-certification.ory.sh:8443/oauth2/auth?scope=openid&redirect_uri=https%3A%2F%2Fop.certification.openid.net%3A61353%2Fauthz_cb%3Fbar%3Dfoo&client_id=ecb012c6-512d-4236-b362-a17e856e054f&state=qf39DpT37XADhfJF&response_type=code&nonce=APR9OMfToXZqwWYp
+17.286 phase <--<-- 4 --- AsyncAuthn -->-->
+17.287 AuthorizationRequest {
+    "client_id": "ecb012c6-512d-4236-b362-a17e856e054f",
+    "nonce": "nB4DhCj8O8crsBh3",
+    "redirect_uri": "https://op.certification.openid.net:61353/authz_cb?bar=foo",
+    "response_type": "code",
+    "scope": "openid",
+    "state": "6UwXfce74GGdK9TQ"
+}
+17.287 redirect url https://oidc-certification.ory.sh:8443/oauth2/auth?scope=openid&redirect_uri=https%3A%2F%2Fop.certification.openid.net%3A61353%2Fauthz_cb%3Fbar%3Dfoo&client_id=ecb012c6-512d-4236-b362-a17e856e054f&state=6UwXfce74GGdK9TQ&response_type=code&nonce=nB4DhCj8O8crsBh3
+17.287 redirect https://oidc-certification.ory.sh:8443/oauth2/auth?scope=openid&redirect_uri=https%3A%2F%2Fop.certification.openid.net%3A61353%2Fauthz_cb%3Fbar%3Dfoo&client_id=ecb012c6-512d-4236-b362-a17e856e054f&state=6UwXfce74GGdK9TQ&response_type=code&nonce=nB4DhCj8O8crsBh3
+
+
+
+============================================================
+
+Conditions
+
+
+
+
+============================================================
+
+RESULT: PARTIAL RESULT

@@ -354,8 +354,8 @@
     ".",
     "dockertest"
   ]
-  revision = "08e1c6762dd59c776a735acc134889f757574f66"
-  version = "v0.0.2"
+  revision = "7cb5a0f3099d9596e71128202e4bd54405927dfa"
+  version = "v0.0.3"
 
 [[projects]]
   name = "github.com/pborman/uuid"
@@ -630,6 +630,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "62b41633fc2f7dd7bf6b3b8753ef3c71633e1d4a3ccc8b16ad06d5f1d831a1a7"
+  inputs-digest = "190b935569afd9f1e58ce48e11a00c3c3066081a75673b08915ad59334452a4d"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -22,6 +22,7 @@ package oauth2
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/url"
@@ -272,7 +273,9 @@ func (s *FositeSQLStore) createSession(signature string, requester fosite.Reques
 
 func (s *FositeSQLStore) findSessionBySignature(signature string, session fosite.Session, table string) (fosite.Requester, error) {
 	var d sqlData
-	if err := s.DB.Get(&d, s.DB.Rebind(fmt.Sprintf("SELECT * FROM hydra_oauth2_%s WHERE signature=?", table)), signature); err != nil {
+	if err := s.DB.Get(&d, s.DB.Rebind(fmt.Sprintf("SELECT * FROM hydra_oauth2_%s WHERE signature=?", table)), signature); err == sql.ErrNoRows {
+		return nil, errors.Wrap(fosite.ErrNotFound, "")
+	} else if err != nil {
 		return nil, sqlcon.HandleError(err)
 	} else if !d.Active && table == sqlTableCode {
 		if r, err := d.toRequest(session, s.Manager, s.L); err != nil {
@@ -383,14 +386,18 @@ func (s *FositeSQLStore) RevokeAccessToken(ctx context.Context, id string) error
 }
 
 func (s *FositeSQLStore) revokeSession(id string, table string) error {
-	if _, err := s.DB.Exec(s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE request_id=?", table)), id); err != nil {
+	if _, err := s.DB.Exec(s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE request_id=?", table)), id); err == sql.ErrNoRows {
+		return errors.Wrap(fosite.ErrNotFound, "")
+	} else if err != nil {
 		return sqlcon.HandleError(err)
 	}
 	return nil
 }
 
 func (s *FositeSQLStore) FlushInactiveAccessTokens(ctx context.Context, notAfter time.Time) error {
-	if _, err := s.DB.Exec(s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE requested_at < ? AND requested_at < ?", sqlTableAccess)), time.Now().Add(-s.AccessTokenLifespan), notAfter); err != nil {
+	if _, err := s.DB.Exec(s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE requested_at < ? AND requested_at < ?", sqlTableAccess)), time.Now().Add(-s.AccessTokenLifespan), notAfter); err == sql.ErrNoRows {
+		return errors.Wrap(fosite.ErrNotFound, "")
+	} else if err != nil {
 		return sqlcon.HandleError(err)
 	}
 

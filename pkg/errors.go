@@ -59,11 +59,10 @@ func LogError(err error, logger log.FieldLogger) {
 		}
 	}
 
-	if e, ok := errors.Cause(err).(stackTracer); ok {
-		logger.WithError(err).WithFields(extra).Errorln("An error occurred")
+	logger.WithError(err).WithFields(extra).Errorln("An error occurred")
+	if e, ok := err.(stackTracer); ok {
 		logger.Debugf("Stack trace: %+v", e.StackTrace())
 	} else {
-		logger.WithError(err).WithFields(extra).Errorln("An error occurred")
 		logger.Debugf("Stack trace could not be recovered from error type %s", reflect.TypeOf(err))
 	}
 }

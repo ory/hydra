@@ -178,7 +178,7 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 
 // swagger:route PUT /oauth2/auth/requests/login/{challenge}/reject oAuth2 rejectLoginRequest
 //
-// Reject an logout request
+// Reject a login request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // (sometimes called "identity provider") to authenticate the user and then tell ORY Hydra now about it. The login

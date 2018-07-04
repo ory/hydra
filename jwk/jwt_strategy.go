@@ -131,7 +131,8 @@ func (j *RS256JWTStrategy) refresh() error {
 		j.publicKeyID = public.KeyID
 	}
 
-	if j.privateKey.PublicKey != *j.publicKey {
+	if j.privateKey.PublicKey.E != j.publicKey.E ||
+		j.privateKey.PublicKey.N.String() != j.publicKey.N.String() {
 		return errors.New("public and private key pair fetched from store does not match")
 	}
 

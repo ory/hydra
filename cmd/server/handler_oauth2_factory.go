@@ -92,7 +92,9 @@ func newOAuth2Provider(c *config.Config) fosite.OAuth2Provider {
 	}
 
 	jwtStrategy, err := jwk.NewRS256JWTStrategy(c.Context().KeyManager, oauth2.OpenIDConnectKeyName)
-	pkg.Must(err, "Could not fetch private signing key for OpenID Connect - did you forget to run \"hydra migrate sql\" or forget to set the SYSTEM_SECRET?")
+	if err != nil {
+		c.GetLogger().WithError(err).Fatalf("Unable to refresh OpenID Connect signing keys.")
+	}
 	oidcStrategy := &openid.DefaultStrategy{JWTStrategy: jwtStrategy}
 
 	return compose.Compose(

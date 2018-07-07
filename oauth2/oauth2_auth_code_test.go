@@ -119,12 +119,12 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			var cm consent.Manager
 			switch km {
 			case "memory":
-				cm = consent.NewMemoryManager()
+				cm = consent.NewMemoryManager(fs)
 				fs.(*FositeMemoryStore).Manager = hc.NewMemoryManager(hasher)
 			case "mysql":
 				fallthrough
 			case "postgres":
-				scm := consent.NewSQLManager(databases[km], fs.(*FositeSQLStore).Manager)
+				scm := consent.NewSQLManager(databases[km], fs.(*FositeSQLStore).Manager, fs)
 				_, err := scm.CreateSchemas()
 				require.NoError(t, err)
 

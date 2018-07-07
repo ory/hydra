@@ -57,9 +57,9 @@ func TestSQLSchema(t *testing.T) {
 	}
 
 	cm := &client.SQLManager{DB: db, Hasher: &fosite.BCrypt{}}
-	jm := jwk.SQLManager{DB: db, Cipher: &jwk.AEAD{Key: []byte("11111111111111111111111111111111")}}
-	om := oauth2.FositeSQLStore{Manager: cm, DB: db, L: logrus.New()}
-	crm := consent.NewSQLManager(db, nil)
+	jm := &jwk.SQLManager{DB: db, Cipher: &jwk.AEAD{Key: []byte("11111111111111111111111111111111")}}
+	om := &oauth2.FositeSQLStore{Manager: cm, DB: db, L: logrus.New()}
+	crm := consent.NewSQLManager(db, nil, om)
 	pm := lsql.NewSQLManager(db, nil)
 
 	_, err = pm.CreateSchemas("", "hydra_policy_migration")

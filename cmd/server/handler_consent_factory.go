@@ -35,12 +35,13 @@ func injectConsentManager(c *config.Config, cm client.Manager) {
 
 	switch con := ctx.Connection.(type) {
 	case *config.MemoryConnection:
-		manager = consent.NewMemoryManager()
+		manager = consent.NewMemoryManager(ctx.FositeStore)
 		break
 	case *sqlcon.SQLConnection:
 		manager = consent.NewSQLManager(
 			con.GetDatabase(),
 			cm,
+			ctx.FositeStore,
 		)
 		break
 	case *config.PluginConnection:

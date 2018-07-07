@@ -117,7 +117,7 @@ func (h *MigrateHandler) runMigrateSQL(db *sqlx.DB) error {
 		"client":  &client.SQLManager{DB: db},
 		"oauth2":  &oauth2.FositeSQLStore{DB: db},
 		"jwk":     &jwk.SQLManager{DB: db},
-		"consent": consent.NewSQLManager(db, nil),
+		"consent": consent.NewSQLManager(db, nil, nil),
 	} {
 		fmt.Printf("Applying `%s` SQL migrations...\n", k)
 		if num, err := m.CreateSchemas(); err != nil {

@@ -18,7 +18,7 @@
  * @license 	Apache-2.0
  */
 
-package consent
+package consent_test
 
 import (
 	"flag"
@@ -31,11 +31,19 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
+	. "github.com/ory/hydra/consent"
+	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/sqlcon/dockertest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+var clientManager = client.NewMemoryManager(&fosite.BCrypt{WorkFactor: 8})
+var fositeManager = oauth2.NewFositeMemoryStore(clientManager, time.Hour)
+var managers = map[string]Manager{
+	"memory": NewMemoryManager(fositeManager),
+}
 
 func mockConsentRequest(key string, remember bool, rememberFor int, hasError bool, skip bool, authAt bool) (c *ConsentRequest, h *HandledConsentRequest) {
 	c = &ConsentRequest{
@@ -138,7 +146,7 @@ func connectToPostgres(managers map[string]Manager, c client.Manager) {
 		return
 	}
 
-	s := NewSQLManager(db, c)
+	s := NewSQLManager(db, c, fositeManager)
 	if _, err := s.CreateSchemas(); err != nil {
 		log.Fatalf("Could not connect to database: %v", err)
 		return
@@ -154,18 +162,13 @@ func connectToMySQL(managers map[string]Manager, c client.Manager) {
 		return
 	}
 
-	s := NewSQLManager(db, c)
+	s := NewSQLManager(db, c, fositeManager)
 	if _, err := s.CreateSchemas(); err != nil {
 		log.Fatalf("Could not create mysql schema: %v", err)
 		return
 	}
 
 	managers["mysql"] = s
-}
-
-var clientManager = client.NewMemoryManager(&fosite.BCrypt{WorkFactor: 8})
-var managers = map[string]Manager{
-	"memory": NewMemoryManager(),
 }
 
 func TestMain(m *testing.M) {
@@ -410,7 +413,6 @@ func TestManagers(t *testing.T) {
 		for k, m := range managers {
 			cr1, hcr1 := mockConsentRequest("rv1", false, 0, false, false, false)
 			cr2, hcr2 := mockConsentRequest("rv2", false, 0, false, false, false)
-
 			clientManager.CreateClient(cr1.Client)
 			clientManager.CreateClient(cr2.Client)
 
@@ -422,23 +424,36 @@ func TestManagers(t *testing.T) {
 			require.NoError(t, err)
 
 			t.Run("manager="+k, func(t *testing.T) {
+				fositeManager.CreateAccessTokenSession(nil, "trva1", &fosite.Request{ID: "challengerv1", RequestedAt: time.Now()})
+				fositeManager.CreateRefreshTokenSession(nil, "rrva1", &fosite.Request{ID: "challengerv1", RequestedAt: time.Now()})
+				fositeManager.CreateAccessTokenSession(nil, "trva2", &fosite.Request{ID: "challengerv2", RequestedAt: time.Now()})
+				fositeManager.CreateRefreshTokenSession(nil, "rrva2", &fosite.Request{ID: "challengerv2", RequestedAt: time.Now()})
+
 				for i, tc := range []struct {
 					subject string
 					client  string
+					at      string
+					rt      string
 					ids     []string
 				}{
 					{
+						at: "trva1", rt: "rrva1",
 						subject: "subjectrv1",
 						client:  "",
 						ids:     []string{"challengerv1"},
 					},
 					{
+						at: "trva2", rt: "rrva2",
 						subject: "subjectrv2",
 						client:  "clientrv2",
 						ids:     []string{"challengerv2"},
 					},
 				} {
 					t.Run(fmt.Sprintf("case=%d/subject=%s", i, tc.subject), func(t *testing.T) {
+						_, found := fositeManager.AccessTokens[tc.at]
+						assert.True(t, found)
+						_, found = fositeManager.RefreshTokens[tc.rt]
+						assert.True(t, found)
 
 						if tc.client == "" {
 							require.NoError(t, m.RevokeUserConsentSession(tc.subject))
@@ -452,6 +467,13 @@ func TestManagers(t *testing.T) {
 								assert.EqualError(t, err, pkg.ErrNotFound.Error())
 							})
 						}
+
+						t.Logf("Got at %+v", fositeManager.AccessTokens)
+						t.Logf("Got rt %+v", fositeManager.RefreshTokens)
+						_, found = fositeManager.AccessTokens[tc.at]
+						assert.False(t, found)
+						_, found = fositeManager.RefreshTokens[tc.rt]
+						assert.False(t, found)
 					})
 				}
 			})

@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
   - [Unreleased](#unreleased)
+  - [v1.0.0-beta.5 (2018-07-07)](#v100-beta5-2018-07-07)
   - [v0.11.13 (2018-06-14)](#v01113-2018-06-14)
   - [v1.0.0-beta.4 (2018-06-13)](#v100-beta4-2018-06-13)
   - [v1.0.0-beta.3 (2018-06-13)](#v100-beta3-2018-06-13)
@@ -133,11 +134,45 @@
 
 ## [Unreleased](https://github.com/ory/hydra/tree/HEAD)
 
-[Full Changelog](https://github.com/ory/hydra/compare/v0.11.13...HEAD)
+[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-beta.5...HEAD)
+
+**Implemented enhancements:**
+
+- consent: Add endpoint to revoke authentication and consent sessions [\#856](https://github.com/ory/hydra/issues/856)
+- jwk: improve JWK tests [\#588](https://github.com/ory/hydra/issues/588)
+- oauth2: allow token revocation without knowing the token \(i.e. per user\) [\#304](https://github.com/ory/hydra/issues/304)
+
+## [v1.0.0-beta.5](https://github.com/ory/hydra/tree/v1.0.0-beta.5) (2018-07-07)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.11.13...v1.0.0-beta.5)
+
+**Implemented enhancements:**
+
+- client: Improve and DRY validation in handler [\#909](https://github.com/ory/hydra/issues/909)
+- cmd/server: Die when system secret is in wrong format [\#817](https://github.com/ory/hydra/issues/817)
+- OpenID Connect Certification [\#689](https://github.com/ory/hydra/issues/689)
 
 **Fixed bugs:**
 
+- Public and private key pair fetched from store does not match [\#912](https://github.com/ory/hydra/issues/912)
+- 500 error returned on GET /clients/{id} when client doesn't exist [\#903](https://github.com/ory/hydra/issues/903)
 - Missing commits between v0.11.10 and v0.11.12 [\#894](https://github.com/ory/hydra/issues/894)
+- metrics: Properly handle metrics log messages [\#833](https://github.com/ory/hydra/issues/833)
+
+**Closed issues:**
+
+- go get return error [\#913](https://github.com/ory/hydra/issues/913)
+- Can't create clients using the CLI [\#911](https://github.com/ory/hydra/issues/911)
+- is hydra can build on window ? [\#910](https://github.com/ory/hydra/issues/910)
+- Let's improve the docs! [\#385](https://github.com/ory/hydra/issues/385)
+- Add benchmarks to documentation [\#161](https://github.com/ory/hydra/issues/161)
+
+**Merged pull requests:**
+
+- consent: Adds ability to revoke consent and login sessions [\#915](https://github.com/ory/hydra/pull/915) ([arekkas](https://github.com/arekkas))
+- jwk: Tests for simple equality in JWT strategy  [\#914](https://github.com/ory/hydra/pull/914) ([arekkas](https://github.com/arekkas))
+- Adds OpenID Connect Dynamic Client Registration [\#908](https://github.com/ory/hydra/pull/908) ([arekkas](https://github.com/arekkas))
+- docs: Adds link to examples repository [\#907](https://github.com/ory/hydra/pull/907) ([arekkas](https://github.com/arekkas))
+- docs: Removes obsolete issue template [\#906](https://github.com/ory/hydra/pull/906) ([arekkas](https://github.com/arekkas))
 
 ## [v0.11.13](https://github.com/ory/hydra/tree/v0.11.13) (2018-06-14)
 [Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-beta.4...v0.11.13)

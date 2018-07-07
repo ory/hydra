@@ -139,8 +139,11 @@ Class | Method | HTTP request | Description
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**oauthAuth**](docs/OAuth2Api.md#oauthAuth) | **GET** /oauth2/auth | The OAuth 2.0 authorize endpoint
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**oauthToken**](docs/OAuth2Api.md#oauthToken) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**rejectConsentRequest**](docs/OAuth2Api.md#rejectConsentRequest) | **PUT** /oauth2/auth/requests/consent/{challenge}/reject | Reject an consent request
-*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**rejectLoginRequest**](docs/OAuth2Api.md#rejectLoginRequest) | **PUT** /oauth2/auth/requests/login/{challenge}/reject | Reject an logout request
+*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**rejectLoginRequest**](docs/OAuth2Api.md#rejectLoginRequest) | **PUT** /oauth2/auth/requests/login/{challenge}/reject | Reject a login request
+*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**revokeAllUserConsentSessions**](docs/OAuth2Api.md#revokeAllUserConsentSessions) | **DELETE** /oauth2/auth/sessions/consent/{user} | Revokes all previous consent sessions of a user
+*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**revokeAuthenticationSession**](docs/OAuth2Api.md#revokeAuthenticationSession) | **DELETE** /oauth2/auth/sessions/login/{user} | Invalidates a user&#39;s authentication session
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**revokeOAuth2Token**](docs/OAuth2Api.md#revokeOAuth2Token) | **POST** /oauth2/revoke | Revoke OAuth2 tokens
+*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**revokeUserClientConsentSessions**](docs/OAuth2Api.md#revokeUserClientConsentSessions) | **DELETE** /oauth2/auth/sessions/consent/{user}/{client} | Revokes consent sessions of a user for a specific OAuth 2.0 Client
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**updateOAuth2Client**](docs/OAuth2Api.md#updateOAuth2Client) | **PUT** /clients/{id} | Update an OAuth 2.0 Client
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**userinfo**](docs/OAuth2Api.md#userinfo) | **POST** /userinfo | OpenID Connect Userinfo
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**wellKnown**](docs/OAuth2Api.md#wellKnown) | **GET** /.well-known/jwks.json | Get Well-Known JSON Web Keys

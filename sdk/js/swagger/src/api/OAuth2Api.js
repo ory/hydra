@@ -836,7 +836,7 @@
      */
 
     /**
-     * Reject an logout request
+     * Reject a login request
      * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider (sometimes called \&quot;identity provider\&quot;) to authenticate the user and then tell ORY Hydra now about it. The login provider is an web-app you write and host, and it must be able to authenticate (\&quot;show the user a login screen\&quot;) a user (in OAuth2 the proper name for user is \&quot;resource owner\&quot;).  The authentication challenge is appended to the login provider URL to which the user&#39;s user-agent (browser) is redirected to. The login provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.  This endpoint tells ORY Hydra that the user has not authenticated and includes a reason why the authentication was be denied.  The response contains a redirect URL which the login provider should redirect the user-agent to.
      * @param {String} challenge
      * @param {Object} opts Optional parameters
@@ -870,6 +870,110 @@
       return this.apiClient.callApi(
         '/oauth2/auth/requests/login/{challenge}/reject',
         'PUT',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
+    }
+
+    /**
+     * Callback function to receive the result of the revokeAllUserConsentSessions operation.
+     * @callback module:api/OAuth2Api~revokeAllUserConsentSessionsCallback
+     * @param {String} error Error message, if any.
+     * @param data This operation does not return a value.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Revokes all previous consent sessions of a user
+     * This endpoint revokes a user&#39;s granted consent sessions and invalidates all associated OAuth 2.0 Access Tokens.
+     * @param {String} user
+     * @param {module:api/OAuth2Api~revokeAllUserConsentSessionsCallback} callback The callback function, accepting three arguments: error, data, response
+     */
+    this.revokeAllUserConsentSessions = function(user, callback) {
+      var postBody = null
+
+      // verify the required parameter 'user' is set
+      if (user === undefined || user === null) {
+        throw new Error(
+          "Missing the required parameter 'user' when calling revokeAllUserConsentSessions"
+        )
+      }
+
+      var pathParams = {
+        user: user
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
+
+      var authNames = []
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = null
+
+      return this.apiClient.callApi(
+        '/oauth2/auth/sessions/consent/{user}',
+        'DELETE',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
+    }
+
+    /**
+     * Callback function to receive the result of the revokeAuthenticationSession operation.
+     * @callback module:api/OAuth2Api~revokeAuthenticationSessionCallback
+     * @param {String} error Error message, if any.
+     * @param data This operation does not return a value.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Invalidates a user&#39;s authentication session
+     * This endpoint invalidates a user&#39;s authentication session. After revoking the authentication session, the user has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens.
+     * @param {String} user
+     * @param {module:api/OAuth2Api~revokeAuthenticationSessionCallback} callback The callback function, accepting three arguments: error, data, response
+     */
+    this.revokeAuthenticationSession = function(user, callback) {
+      var postBody = null
+
+      // verify the required parameter 'user' is set
+      if (user === undefined || user === null) {
+        throw new Error(
+          "Missing the required parameter 'user' when calling revokeAuthenticationSession"
+        )
+      }
+
+      var pathParams = {
+        user: user
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
+
+      var authNames = []
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = null
+
+      return this.apiClient.callApi(
+        '/oauth2/auth/sessions/login/{user}',
+        'DELETE',
         pathParams,
         queryParams,
         headerParams,
@@ -922,6 +1026,67 @@
       return this.apiClient.callApi(
         '/oauth2/revoke',
         'POST',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
+    }
+
+    /**
+     * Callback function to receive the result of the revokeUserClientConsentSessions operation.
+     * @callback module:api/OAuth2Api~revokeUserClientConsentSessionsCallback
+     * @param {String} error Error message, if any.
+     * @param data This operation does not return a value.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Revokes consent sessions of a user for a specific OAuth 2.0 Client
+     * This endpoint revokes a user&#39;s granted consent sessions for a specific OAuth 2.0 Client and invalidates all associated OAuth 2.0 Access Tokens.
+     * @param {String} user
+     * @param {String} client
+     * @param {module:api/OAuth2Api~revokeUserClientConsentSessionsCallback} callback The callback function, accepting three arguments: error, data, response
+     */
+    this.revokeUserClientConsentSessions = function(user, client, callback) {
+      var postBody = null
+
+      // verify the required parameter 'user' is set
+      if (user === undefined || user === null) {
+        throw new Error(
+          "Missing the required parameter 'user' when calling revokeUserClientConsentSessions"
+        )
+      }
+
+      // verify the required parameter 'client' is set
+      if (client === undefined || client === null) {
+        throw new Error(
+          "Missing the required parameter 'client' when calling revokeUserClientConsentSessions"
+        )
+      }
+
+      var pathParams = {
+        user: user,
+        client: client
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
+
+      var authNames = []
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = null
+
+      return this.apiClient.callApi(
+        '/oauth2/auth/sessions/consent/{user}/{client}',
+        'DELETE',
         pathParams,
         queryParams,
         headerParams,

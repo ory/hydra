@@ -99,8 +99,11 @@ Class | Method | HTTP request | Description
 *OAuth2Api* | [**oauthAuth**](docs/Api/OAuth2Api.md#oauthauth) | **GET** /oauth2/auth | The OAuth 2.0 authorize endpoint
 *OAuth2Api* | [**oauthToken**](docs/Api/OAuth2Api.md#oauthtoken) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
 *OAuth2Api* | [**rejectConsentRequest**](docs/Api/OAuth2Api.md#rejectconsentrequest) | **PUT** /oauth2/auth/requests/consent/{challenge}/reject | Reject an consent request
-*OAuth2Api* | [**rejectLoginRequest**](docs/Api/OAuth2Api.md#rejectloginrequest) | **PUT** /oauth2/auth/requests/login/{challenge}/reject | Reject an logout request
+*OAuth2Api* | [**rejectLoginRequest**](docs/Api/OAuth2Api.md#rejectloginrequest) | **PUT** /oauth2/auth/requests/login/{challenge}/reject | Reject a login request
+*OAuth2Api* | [**revokeAllUserConsentSessions**](docs/Api/OAuth2Api.md#revokealluserconsentsessions) | **DELETE** /oauth2/auth/sessions/consent/{user} | Revokes all previous consent sessions of a user
+*OAuth2Api* | [**revokeAuthenticationSession**](docs/Api/OAuth2Api.md#revokeauthenticationsession) | **DELETE** /oauth2/auth/sessions/login/{user} | Invalidates a user&#39;s authentication session
 *OAuth2Api* | [**revokeOAuth2Token**](docs/Api/OAuth2Api.md#revokeoauth2token) | **POST** /oauth2/revoke | Revoke OAuth2 tokens
+*OAuth2Api* | [**revokeUserClientConsentSessions**](docs/Api/OAuth2Api.md#revokeuserclientconsentsessions) | **DELETE** /oauth2/auth/sessions/consent/{user}/{client} | Revokes consent sessions of a user for a specific OAuth 2.0 Client
 *OAuth2Api* | [**updateOAuth2Client**](docs/Api/OAuth2Api.md#updateoauth2client) | **PUT** /clients/{id} | Update an OAuth 2.0 Client
 *OAuth2Api* | [**userinfo**](docs/Api/OAuth2Api.md#userinfo) | **POST** /userinfo | OpenID Connect Userinfo
 *OAuth2Api* | [**wellKnown**](docs/Api/OAuth2Api.md#wellknown) | **GET** /.well-known/jwks.json | Get Well-Known JSON Web Keys

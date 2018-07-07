@@ -24,6 +24,8 @@ type Manager interface {
 	CreateConsentRequest(*ConsentRequest) error
 	GetConsentRequest(challenge string) (*ConsentRequest, error)
 	HandleConsentRequest(challenge string, r *HandledConsentRequest) (*ConsentRequest, error)
+	RevokeUserConsentSession(user string) error
+	RevokeUserClientConsentSession(user, client string) error
 
 	VerifyAndInvalidateConsentRequest(verifier string) (*HandledConsentRequest, error)
 	FindPreviouslyGrantedConsentRequests(client string, user string) ([]HandledConsentRequest, error)
@@ -32,6 +34,7 @@ type Manager interface {
 	GetAuthenticationSession(id string) (*AuthenticationSession, error)
 	CreateAuthenticationSession(*AuthenticationSession) error
 	DeleteAuthenticationSession(id string) error
+	RevokeUserAuthenticationSession(user string) error
 
 	CreateAuthenticationRequest(*AuthenticationRequest) error
 	GetAuthenticationRequest(challenge string) (*AuthenticationRequest, error)

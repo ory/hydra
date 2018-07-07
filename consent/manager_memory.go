@@ -55,6 +55,66 @@ func NewMemoryManager() *MemoryManager {
 	}
 }
 
+func (m *MemoryManager) RevokeUserConsentSession(user string) error {
+	m.m["handledConsentRequests"].Lock()
+	defer m.m["handledConsentRequests"].Unlock()
+	m.m["consentRequests"].Lock()
+	defer m.m["consentRequests"].Unlock()
+
+	var found bool
+	for k, c := range m.handledConsentRequests {
+		if c.ConsentRequest.Subject == user {
+			delete(m.handledConsentRequests, k)
+			delete(m.consentRequests, k)
+			found = true
+		}
+	}
+
+	if !found {
+		return errors.WithStack(pkg.ErrNotFound)
+	}
+	return nil
+}
+
+func (m *MemoryManager) RevokeUserClientConsentSession(user, client string) error {
+	m.m["handledConsentRequests"].Lock()
+	defer m.m["handledConsentRequests"].Unlock()
+	m.m["consentRequests"].Lock()
+	defer m.m["consentRequests"].Unlock()
+
+	var found bool
+	for k, c := range m.handledConsentRequests {
+		if c.ConsentRequest.Subject == user && c.ConsentRequest.Client.ID == client {
+			delete(m.handledConsentRequests, k)
+			delete(m.consentRequests, k)
+			found = true
+		}
+	}
+
+	if !found {
+		return errors.WithStack(pkg.ErrNotFound)
+	}
+	return nil
+}
+
+func (m *MemoryManager) RevokeUserAuthenticationSession(user string) error {
+	m.m["authSessions"].Lock()
+	defer m.m["authSessions"].Unlock()
+
+	var found bool
+	for k, c := range m.authSessions {
+		if c.Subject == user {
+			delete(m.authSessions, k)
+			found = true
+		}
+	}
+
+	if !found {
+		return errors.WithStack(pkg.ErrNotFound)
+	}
+	return nil
+}
+
 func (m *MemoryManager) CreateConsentRequest(c *ConsentRequest) error {
 	m.m["consentRequests"].Lock()
 	defer m.m["consentRequests"].Unlock()

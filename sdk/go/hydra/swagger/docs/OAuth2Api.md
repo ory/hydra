@@ -18,8 +18,11 @@ Method | HTTP request | Description
 [**OauthAuth**](OAuth2Api.md#OauthAuth) | **Get** /oauth2/auth | The OAuth 2.0 authorize endpoint
 [**OauthToken**](OAuth2Api.md#OauthToken) | **Post** /oauth2/token | The OAuth 2.0 token endpoint
 [**RejectConsentRequest**](OAuth2Api.md#RejectConsentRequest) | **Put** /oauth2/auth/requests/consent/{challenge}/reject | Reject an consent request
-[**RejectLoginRequest**](OAuth2Api.md#RejectLoginRequest) | **Put** /oauth2/auth/requests/login/{challenge}/reject | Reject an logout request
+[**RejectLoginRequest**](OAuth2Api.md#RejectLoginRequest) | **Put** /oauth2/auth/requests/login/{challenge}/reject | Reject a login request
+[**RevokeAllUserConsentSessions**](OAuth2Api.md#RevokeAllUserConsentSessions) | **Delete** /oauth2/auth/sessions/consent/{user} | Revokes all previous consent sessions of a user
+[**RevokeAuthenticationSession**](OAuth2Api.md#RevokeAuthenticationSession) | **Delete** /oauth2/auth/sessions/login/{user} | Invalidates a user&#39;s authentication session
 [**RevokeOAuth2Token**](OAuth2Api.md#RevokeOAuth2Token) | **Post** /oauth2/revoke | Revoke OAuth2 tokens
+[**RevokeUserClientConsentSessions**](OAuth2Api.md#RevokeUserClientConsentSessions) | **Delete** /oauth2/auth/sessions/consent/{user}/{client} | Revokes consent sessions of a user for a specific OAuth 2.0 Client
 [**UpdateOAuth2Client**](OAuth2Api.md#UpdateOAuth2Client) | **Put** /clients/{id} | Update an OAuth 2.0 Client
 [**Userinfo**](OAuth2Api.md#Userinfo) | **Post** /userinfo | OpenID Connect Userinfo
 [**WellKnown**](OAuth2Api.md#WellKnown) | **Get** /.well-known/jwks.json | Get Well-Known JSON Web Keys
@@ -430,7 +433,7 @@ No authorization required
 # **RejectLoginRequest**
 > CompletedRequest RejectLoginRequest($challenge, $body)
 
-Reject an logout request
+Reject a login request
 
 When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider (sometimes called \"identity provider\") to authenticate the user and then tell ORY Hydra now about it. The login provider is an web-app you write and host, and it must be able to authenticate (\"show the user a login screen\") a user (in OAuth2 the proper name for user is \"resource owner\").  The authentication challenge is appended to the login provider URL to which the user's user-agent (browser) is redirected to. The login provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.  This endpoint tells ORY Hydra that the user has not authenticated and includes a reason why the authentication was be denied.  The response contains a redirect URL which the login provider should redirect the user-agent to.
 
@@ -445,6 +448,64 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**CompletedRequest**](completedRequest.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **RevokeAllUserConsentSessions**
+> RevokeAllUserConsentSessions($user)
+
+Revokes all previous consent sessions of a user
+
+This endpoint revokes a user's granted consent sessions and invalidates all associated OAuth 2.0 Access Tokens.
+
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **user** | **string**|  | 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **RevokeAuthenticationSession**
+> RevokeAuthenticationSession($user)
+
+Invalidates a user's authentication session
+
+This endpoint invalidates a user's authentication session. After revoking the authentication session, the user has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens.
+
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **user** | **string**|  | 
+
+### Return type
+
+void (empty response body)
 
 ### Authorization
 
@@ -482,6 +543,36 @@ void (empty response body)
 ### HTTP request headers
 
  - **Content-Type**: application/x-www-form-urlencoded
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **RevokeUserClientConsentSessions**
+> RevokeUserClientConsentSessions($user, $client)
+
+Revokes consent sessions of a user for a specific OAuth 2.0 Client
+
+This endpoint revokes a user's granted consent sessions for a specific OAuth 2.0 Client and invalidates all associated OAuth 2.0 Access Tokens.
+
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **user** | **string**|  | 
+ **client** | **string**|  | 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

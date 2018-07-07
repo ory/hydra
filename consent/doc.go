@@ -27,6 +27,31 @@ type swaggerGetRequestByChallenge struct {
 	Challenge string `json:"challenge"`
 }
 
+// swagger:parameters revokeAllUserConsentSessions
+type swaggerRevokeAllUserConsentSessionsPayload struct {
+	// in: path
+	// required: true
+	User string `json:"user"`
+}
+
+// swagger:parameters revokeUserClientConsentSessions
+type swaggerRevokeUserClientConsentSessionsPayload struct {
+	// in: path
+	// required: true
+	User string `json:"user"`
+
+	// in: path
+	// required: true
+	Client string `json:"client"`
+}
+
+// swagger:parameters revokeAuthenticationSession
+type swaggerRevokeAuthenticationSessionPayload struct {
+	// in: path
+	// required: true
+	User string `json:"user"`
+}
+
 // swagger:parameters acceptLoginRequest
 type swaggerAcceptAuthenticationRequest struct {
 	// in: path

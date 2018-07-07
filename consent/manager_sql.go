@@ -29,6 +29,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/pkg"
 	"github.com/ory/sqlcon"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
@@ -55,6 +56,75 @@ func (m *SQLManager) CreateSchemas() (int, error) {
 	return n, nil
 }
 
+func (m *SQLManager) RevokeUserConsentSession(user string) error {
+	return m.revokeConsentSession(user, "")
+}
+
+func (m *SQLManager) RevokeUserClientConsentSession(user, client string) error {
+	return m.revokeConsentSession(user, client)
+}
+
+func (m *SQLManager) revokeConsentSession(user, client string) error {
+	args := []interface{}{user}
+	part := "r.subject=?"
+	if client != "" {
+		part += " AND r.client_id=?"
+		args = append(args, client)
+	}
+
+	var queries []string
+
+	switch m.db.DriverName() {
+	case "mysql":
+		queries = append(queries,
+			fmt.Sprintf(`DELETE h, r FROM hydra_oauth2_consent_request_handled as h 
+JOIN hydra_oauth2_consent_request as r ON
+r.challenge = h.challenge
+WHERE %s`, part),
+		)
+	default:
+		queries = append(queries,
+			fmt.Sprintf(`DELETE FROM hydra_oauth2_consent_request_handled 
+WHERE challenge IN (SELECT r.challenge FROM hydra_oauth2_consent_request as r WHERE %s)`, part),
+			fmt.Sprintf(`DELETE FROM hydra_oauth2_consent_request as r WHERE %s`, part),
+		)
+	}
+
+	for _, q := range queries {
+		rows, err := m.db.Exec(m.db.Rebind(q), args...)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				return errors.WithStack(pkg.ErrNotFound)
+			}
+			return sqlcon.HandleError(err)
+		}
+
+		if count, _ := rows.RowsAffected(); count == 0 {
+			return errors.WithStack(pkg.ErrNotFound)
+		}
+	}
+	return nil
+}
+
+func (m *SQLManager) RevokeUserAuthenticationSession(user string) error {
+	rows, err := m.db.Exec(
+		m.db.Rebind("DELETE FROM hydra_oauth2_authentication_session WHERE subject=?"),
+		user,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return errors.WithStack(pkg.ErrNotFound)
+		}
+		return sqlcon.HandleError(err)
+	}
+
+	count, _ := rows.RowsAffected()
+	if count == 0 {
+		return errors.WithStack(pkg.ErrNotFound)
+	}
+	return nil
+}
+
 func (m *SQLManager) CreateConsentRequest(c *ConsentRequest) error {
 	d, err := newSQLConsentRequest(c)
 	if err != nil {
@@ -76,6 +146,9 @@ func (m *SQLManager) GetConsentRequest(challenge string) (*ConsentRequest, error
 	var d sqlRequest
 
 	if err := m.db.Get(&d, m.db.Rebind("SELECT * FROM hydra_oauth2_consent_request WHERE challenge=?"), challenge); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.WithStack(pkg.ErrNotFound)
+		}
 		return nil, sqlcon.HandleError(err)
 	}
 
@@ -108,6 +181,9 @@ func (m *SQLManager) GetAuthenticationRequest(challenge string) (*Authentication
 	var d sqlRequest
 
 	if err := m.db.Get(&d, m.db.Rebind("SELECT * FROM hydra_oauth2_authentication_request WHERE challenge=?"), challenge); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.WithStack(pkg.ErrNotFound)
+		}
 		return nil, sqlcon.HandleError(err)
 	}
 
@@ -216,6 +292,9 @@ func (m *SQLManager) VerifyAndInvalidateAuthenticationRequest(verifier string) (
 func (m *SQLManager) GetAuthenticationSession(id string) (*AuthenticationSession, error) {
 	var a AuthenticationSession
 	if err := m.db.Get(&a, m.db.Rebind("SELECT * FROM hydra_oauth2_authentication_session WHERE id=?"), id); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.WithStack(pkg.ErrNotFound)
+		}
 		return nil, sqlcon.HandleError(err)
 	}
 

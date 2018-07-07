@@ -22,6 +22,7 @@ package consent
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"testing"
 	"time"
@@ -30,6 +31,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/pkg"
 	"github.com/ory/sqlcon/dockertest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -349,6 +351,107 @@ func TestManagers(t *testing.T) {
 
 						_, err = m.VerifyAndInvalidateAuthenticationRequest("verifier" + tc.key)
 						require.Error(t, err)
+					})
+				}
+			})
+		}
+	})
+
+	t.Run("case=revoke-auth-request", func(t *testing.T) {
+		for k, m := range managers {
+			require.NoError(t, m.CreateAuthenticationSession(&AuthenticationSession{
+				ID:              "rev-session-1",
+				AuthenticatedAt: time.Now(),
+				Subject:         "subject-1",
+			}))
+
+			require.NoError(t, m.CreateAuthenticationSession(&AuthenticationSession{
+				ID:              "rev-session-2",
+				AuthenticatedAt: time.Now(),
+				Subject:         "subject-2",
+			}))
+
+			require.NoError(t, m.CreateAuthenticationSession(&AuthenticationSession{
+				ID:              "rev-session-3",
+				AuthenticatedAt: time.Now(),
+				Subject:         "subject-1",
+			}))
+
+			t.Run("manager="+k, func(t *testing.T) {
+				for i, tc := range []struct {
+					subject string
+					ids     []string
+				}{
+					{
+						subject: "subject-1",
+						ids:     []string{"rev-session-1", "rev-session-3"},
+					},
+					{
+						subject: "subject-2",
+						ids:     []string{"rev-session-1", "rev-session-3", "rev-session-2"},
+					},
+				} {
+					t.Run(fmt.Sprintf("case=%d/subject=%s", i, tc.subject), func(t *testing.T) {
+						require.NoError(t, m.RevokeUserAuthenticationSession(tc.subject))
+
+						for _, id := range tc.ids {
+							t.Run(fmt.Sprintf("id=%s", id), func(t *testing.T) {
+								_, err := m.GetAuthenticationSession(id)
+								assert.EqualError(t, err, pkg.ErrNotFound.Error())
+							})
+						}
+					})
+				}
+			})
+		}
+	})
+
+	t.Run("case=revoke-handled-consent-request", func(t *testing.T) {
+		for k, m := range managers {
+			cr1, hcr1 := mockConsentRequest("rv1", false, 0, false, false, false)
+			cr2, hcr2 := mockConsentRequest("rv2", false, 0, false, false, false)
+
+			clientManager.CreateClient(cr1.Client)
+			clientManager.CreateClient(cr2.Client)
+
+			require.NoError(t, m.CreateConsentRequest(cr1))
+			require.NoError(t, m.CreateConsentRequest(cr2))
+			_, err := m.HandleConsentRequest("challengerv1", hcr1)
+			require.NoError(t, err)
+			_, err = m.HandleConsentRequest("challengerv2", hcr2)
+			require.NoError(t, err)
+
+			t.Run("manager="+k, func(t *testing.T) {
+				for i, tc := range []struct {
+					subject string
+					client  string
+					ids     []string
+				}{
+					{
+						subject: "subjectrv1",
+						client:  "",
+						ids:     []string{"challengerv1"},
+					},
+					{
+						subject: "subjectrv2",
+						client:  "clientrv2",
+						ids:     []string{"challengerv2"},
+					},
+				} {
+					t.Run(fmt.Sprintf("case=%d/subject=%s", i, tc.subject), func(t *testing.T) {
+
+						if tc.client == "" {
+							require.NoError(t, m.RevokeUserConsentSession(tc.subject))
+						} else {
+							require.NoError(t, m.RevokeUserClientConsentSession(tc.subject, tc.client))
+						}
+
+						for _, id := range tc.ids {
+							t.Run(fmt.Sprintf("id=%s", id), func(t *testing.T) {
+								_, err := m.GetConsentRequest(id)
+								assert.EqualError(t, err, pkg.ErrNotFound.Error())
+							})
+						}
 					})
 				}
 			})

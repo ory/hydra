@@ -1029,7 +1029,7 @@
         "tags": [
           "oAuth2"
         ],
-        "summary": "Reject an logout request",
+        "summary": "Reject a login request",
         "operationId": "rejectLoginRequest",
         "parameters": [
           {
@@ -1055,6 +1055,133 @@
             }
           },
           "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
+    "/oauth2/auth/sessions/consent/{user}": {
+      "delete": {
+        "description": "This endpoint revokes a user's granted consent sessions and invalidates all associated OAuth 2.0 Access Tokens.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "oAuth2"
+        ],
+        "summary": "Revokes all previous consent sessions of a user",
+        "operationId": "revokeAllUserConsentSessions",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "User",
+            "name": "user",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/responses/emptyResponse"
+          },
+          "404": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
+    "/oauth2/auth/sessions/consent/{user}/{client}": {
+      "delete": {
+        "description": "This endpoint revokes a user's granted consent sessions for a specific OAuth 2.0 Client and invalidates all\nassociated OAuth 2.0 Access Tokens.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "oAuth2"
+        ],
+        "summary": "Revokes consent sessions of a user for a specific OAuth 2.0 Client",
+        "operationId": "revokeUserClientConsentSessions",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "User",
+            "name": "user",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "Client",
+            "name": "client",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/responses/emptyResponse"
+          },
+          "404": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
+    "/oauth2/auth/sessions/login/{user}": {
+      "delete": {
+        "description": "This endpoint invalidates a user's authentication session. After revoking the authentication session, the user\nhas to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "oAuth2"
+        ],
+        "summary": "Invalidates a user's authentication session",
+        "operationId": "revokeAuthenticationSession",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "User",
+            "name": "user",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/responses/emptyResponse"
+          },
+          "404": {
             "$ref": "#/responses/genericError"
           },
           "500": {

@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/ory/fosite"
 	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/herodot"
 	"github.com/pkg/errors"
@@ -61,6 +62,106 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET(ConsentPath+"/:challenge", h.GetConsentRequest)
 	r.PUT(ConsentPath+"/:challenge/accept", h.AcceptConsentRequest)
 	r.PUT(ConsentPath+"/:challenge/reject", h.RejectConsentRequest)
+
+	r.DELETE("/oauth2/auth/sessions/login/:user", h.DeleteLoginSession)
+	r.DELETE("/oauth2/auth/sessions/consent/:user", h.DeleteUserConsentSession)
+	r.DELETE("/oauth2/auth/sessions/consent/:user/:client", h.DeleteUserClientConsentSession)
+}
+
+// swagger:route DELETE /oauth2/auth/sessions/consent/{user} oAuth2 revokeAllUserConsentSessions
+//
+// Revokes all previous consent sessions of a user
+//
+// This endpoint revokes a user's granted consent sessions and invalidates all associated OAuth 2.0 Access Tokens.
+//
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Responses:
+//       204: emptyResponse
+//       404: genericError
+//       500: genericError
+func (h *Handler) DeleteUserConsentSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	user := ps.ByName("user")
+	if err := h.M.RevokeUserConsentSession(user); err != nil {
+		h.H.WriteError(w, r, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+// swagger:route DELETE /oauth2/auth/sessions/consent/{user}/{client} oAuth2 revokeUserClientConsentSessions
+//
+// Revokes consent sessions of a user for a specific OAuth 2.0 Client
+//
+// This endpoint revokes a user's granted consent sessions for a specific OAuth 2.0 Client and invalidates all
+// associated OAuth 2.0 Access Tokens.
+//
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Responses:
+//       204: emptyResponse
+//       404: genericError
+//       500: genericError
+func (h *Handler) DeleteUserClientConsentSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	client := ps.ByName("client")
+	user := ps.ByName("user")
+	if client == "" {
+		h.H.WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Parameter client is not defined")))
+		return
+	}
+
+	if err := h.M.RevokeUserClientConsentSession(user, client); err != nil {
+		h.H.WriteError(w, r, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+// swagger:route DELETE /oauth2/auth/sessions/login/{user} oAuth2 revokeAuthenticationSession
+//
+// Invalidates a user's authentication session
+//
+// This endpoint invalidates a user's authentication session. After revoking the authentication session, the user
+// has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens.
+//
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Responses:
+//       204: emptyResponse
+//       404: genericError
+//       500: genericError
+func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	user := ps.ByName("user")
+
+	if err := h.M.RevokeUserAuthenticationSession(user); err != nil {
+		h.H.WriteError(w, r, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 // swagger:route GET /oauth2/auth/requests/login/{challenge} oAuth2 getLoginRequest

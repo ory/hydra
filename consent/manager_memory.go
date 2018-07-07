@@ -36,15 +36,17 @@ type MemoryManager struct {
 	handledAuthRequests    map[string]HandledAuthenticationRequest
 	authSessions           map[string]AuthenticationSession
 	m                      map[string]*sync.RWMutex
+	store                  pkg.FositeStorer
 }
 
-func NewMemoryManager() *MemoryManager {
+func NewMemoryManager(store pkg.FositeStorer) *MemoryManager {
 	return &MemoryManager{
 		consentRequests:        map[string]ConsentRequest{},
 		handledConsentRequests: map[string]HandledConsentRequest{},
 		authRequests:           map[string]AuthenticationRequest{},
 		handledAuthRequests:    map[string]HandledAuthenticationRequest{},
 		authSessions:           map[string]AuthenticationSession{},
+		store:                  store,
 		m: map[string]*sync.RWMutex{
 			"consentRequests":        new(sync.RWMutex),
 			"handledConsentRequests": new(sync.RWMutex),
@@ -56,24 +58,7 @@ func NewMemoryManager() *MemoryManager {
 }
 
 func (m *MemoryManager) RevokeUserConsentSession(user string) error {
-	m.m["handledConsentRequests"].Lock()
-	defer m.m["handledConsentRequests"].Unlock()
-	m.m["consentRequests"].Lock()
-	defer m.m["consentRequests"].Unlock()
-
-	var found bool
-	for k, c := range m.handledConsentRequests {
-		if c.ConsentRequest.Subject == user {
-			delete(m.handledConsentRequests, k)
-			delete(m.consentRequests, k)
-			found = true
-		}
-	}
-
-	if !found {
-		return errors.WithStack(pkg.ErrNotFound)
-	}
-	return nil
+	return m.RevokeUserClientConsentSession(user, "")
 }
 
 func (m *MemoryManager) RevokeUserClientConsentSession(user, client string) error {
@@ -84,9 +69,19 @@ func (m *MemoryManager) RevokeUserClientConsentSession(user, client string) erro
 
 	var found bool
 	for k, c := range m.handledConsentRequests {
-		if c.ConsentRequest.Subject == user && c.ConsentRequest.Client.ID == client {
+		if c.ConsentRequest.Subject == user && (client == "" || (client != "" && c.ConsentRequest.Client.ID == client)) {
 			delete(m.handledConsentRequests, k)
 			delete(m.consentRequests, k)
+			if err := m.store.RevokeAccessToken(nil, c.Challenge); errors.Cause(err) == fosite.ErrNotFound {
+				// do nothing
+			} else if err != nil {
+				return err
+			}
+			if err := m.store.RevokeRefreshToken(nil, c.Challenge); errors.Cause(err) == fosite.ErrNotFound {
+				// do nothing
+			} else if err != nil {
+				return err
+			}
 			found = true
 		}
 	}

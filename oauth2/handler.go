@@ -540,6 +540,8 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		return
 	}
 
+	authorizeRequest.SetID(session.Challenge)
+
 	// done
 	response, err := h.OAuth2.NewAuthorizeResponse(ctx, authorizeRequest, &Session{
 		DefaultSession: &openid.DefaultSession{

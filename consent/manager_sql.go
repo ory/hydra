@@ -36,14 +36,16 @@ import (
 )
 
 type SQLManager struct {
-	db *sqlx.DB
-	c  client.Manager
+	db    *sqlx.DB
+	c     client.Manager
+	store pkg.FositeStorer
 }
 
-func NewSQLManager(db *sqlx.DB, c client.Manager) *SQLManager {
+func NewSQLManager(db *sqlx.DB, c client.Manager, store pkg.FositeStorer) *SQLManager {
 	return &SQLManager{
-		db: db,
-		c:  c,
+		db:    db,
+		c:     c,
+		store: store,
 	}
 }
 
@@ -72,14 +74,37 @@ func (m *SQLManager) revokeConsentSession(user, client string) error {
 		args = append(args, client)
 	}
 
-	var queries []string
+	var challenges = make([]string, 0)
+	if err := m.db.Select(&challenges, m.db.Rebind(fmt.Sprintf(
+		`SELECT r.challenge FROM hydra_oauth2_consent_request_handled as h 
+JOIN hydra_oauth2_consent_request as r ON r.challenge = h.challenge WHERE %s`,
+		part,
+	)), args...); err != nil {
+		if err == sql.ErrNoRows {
+			return errors.WithStack(pkg.ErrNotFound)
+		}
+		return sqlcon.HandleError(err)
+	}
 
+	for _, challenge := range challenges {
+		if err := m.store.RevokeAccessToken(nil, challenge); errors.Cause(err) == fosite.ErrNotFound {
+			// do nothing
+		} else if err != nil {
+			return err
+		}
+		if err := m.store.RevokeRefreshToken(nil, challenge); errors.Cause(err) == fosite.ErrNotFound {
+			// do nothing
+		} else if err != nil {
+			return err
+		}
+	}
+
+	var queries []string
 	switch m.db.DriverName() {
 	case "mysql":
 		queries = append(queries,
 			fmt.Sprintf(`DELETE h, r FROM hydra_oauth2_consent_request_handled as h 
-JOIN hydra_oauth2_consent_request as r ON
-r.challenge = h.challenge
+JOIN hydra_oauth2_consent_request as r ON r.challenge = h.challenge
 WHERE %s`, part),
 		)
 	default:

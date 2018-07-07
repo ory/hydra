@@ -18,15 +18,18 @@
  * @license 	Apache-2.0
  */
 
-package consent
+package consent_test
 
 import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
+	. "github.com/ory/hydra/consent"
+	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/sdk/go/hydra"
 	"github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/sirupsen/logrus"
@@ -35,7 +38,7 @@ import (
 )
 
 func TestSDK(t *testing.T) {
-	m := NewMemoryManager()
+	m := NewMemoryManager(oauth2.NewFositeMemoryStore(nil, time.Minute))
 	router := httprouter.New()
 	h := NewHandler(herodot.NewJSONWriter(logrus.New()), m)
 

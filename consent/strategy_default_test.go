@@ -95,7 +95,7 @@ func TestStrategy(t *testing.T) {
 	require.NoError(t, err)
 
 	writer := herodot.NewJSONWriter(nil)
-	manager := NewMemoryManager()
+	manager := NewMemoryManager(nil)
 	handler := NewHandler(writer, manager)
 	router := httprouter.New()
 	handler.SetRoutes(router)

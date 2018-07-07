@@ -193,7 +193,7 @@ func (s *FositeMemoryStore) RevokeRefreshToken(ctx context.Context, id string) e
 		}
 	}
 	if !found {
-		return errors.New("Not found")
+		return errors.WithStack(fosite.ErrNotFound)
 	}
 	return nil
 }
@@ -211,7 +211,7 @@ func (s *FositeMemoryStore) RevokeAccessToken(ctx context.Context, id string) er
 		}
 	}
 	if !found {
-		return errors.New("Not found")
+		return errors.WithStack(fosite.ErrNotFound)
 	}
 	return nil
 }

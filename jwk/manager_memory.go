@@ -97,6 +97,10 @@ func (m *MemoryManager) GetKeySet(set string) (*jose.JSONWebKeySet, error) {
 		return nil, errors.WithStack(pkg.ErrNotFound)
 	}
 
+	if len(keys.Keys) == 0 {
+		return nil, errors.WithStack(pkg.ErrNotFound)
+	}
+
 	return keys, nil
 }
 

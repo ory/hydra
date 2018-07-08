@@ -245,29 +245,20 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //       403: genericError
 //       500: genericError
 func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var requests joseWebKeySetRequest
-	var keySet = new(jose.JSONWebKeySet)
+	var keySet jose.JSONWebKeySet
 	var set = ps.ByName("set")
 
-	if err := json.NewDecoder(r.Body).Decode(&requests); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&keySet); err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
-	for _, request := range requests.Keys {
-		key := &jose.JSONWebKey{}
-		if err := key.UnmarshalJSON(request); err != nil {
-			h.H.WriteError(w, r, errors.WithStack(err))
-		}
-		keySet.Keys = append(keySet.Keys, *key)
-	}
-
-	if err := h.Manager.AddKeySet(set, keySet); err != nil {
+	if err := h.Manager.AddKeySet(set, &keySet); err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}
 
-	h.H.Write(w, r, keySet)
+	h.H.Write(w, r, &keySet)
 }
 
 // swagger:route PUT /keys/{set}/{kid} jsonWebKey updateJsonWebKey

@@ -45,7 +45,7 @@ func newClientHandler(c *config.Config) *ClientHandler {
 }
 
 func (h *ClientHandler) newClientManager(cmd *cobra.Command) *hydra.OAuth2Api {
-	c := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlash(cmd))
+	c := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlashOrFail(cmd))
 
 	fakeTlsTermination, _ := cmd.Flags().GetBool("skip-tls-verify")
 	c.Configuration.Transport = &http.Transport{

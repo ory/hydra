@@ -36,7 +36,7 @@ type TokenHandler struct {
 }
 
 func (h *TokenHandler) newTokenManager(cmd *cobra.Command) *hydra.OAuth2Api {
-	c := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlash(cmd))
+	c := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlashOrFail(cmd))
 
 	skipTLSTermination, _ := cmd.Flags().GetBool("skip-tls-verify")
 	c.Configuration.Transport = &http.Transport{
@@ -64,7 +64,7 @@ func (h *TokenHandler) RevokeToken(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	handler := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlash(cmd))
+	handler := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlashOrFail(cmd))
 
 	skipTLSTermination, _ := cmd.Flags().GetBool("skip-tls-verify")
 	handler.Configuration.Transport = &http.Transport{

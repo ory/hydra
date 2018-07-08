@@ -76,8 +76,8 @@ var tokenClientCmd = &cobra.Command{
 
 		scopes, _ := cmd.Flags().GetStringSlice("scope")
 
-		cu, err := url.Parse(c.GetClusterURLWithoutTailingSlash(cmd))
-		pkg.Must(err, `Unable to parse cluster url ("%s"): %s`, c.GetClusterURLWithoutTailingSlash(cmd), err)
+		cu, err := url.Parse(c.GetClusterURLWithoutTailingSlashOrFail(cmd))
+		pkg.Must(err, `Unable to parse cluster url ("%s"): %s`, c.GetClusterURLWithoutTailingSlashOrFail(cmd), err)
 
 		clientID, _ := cmd.Flags().GetString("client-id")
 		clientSecret, _ := cmd.Flags().GetString("client-secret")

@@ -51,7 +51,7 @@ func (h *IntrospectionHandler) Introspect(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	c := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlash(cmd))
+	c := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlashOrFail(cmd))
 
 	clientID, _ := cmd.Flags().GetString("client-id")
 	clientSecret, _ := cmd.Flags().GetString("client-secret")

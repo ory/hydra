@@ -30,11 +30,14 @@ import (
 )
 
 func checkResponse(response *hydra.APIResponse, err error, expectedStatusCode int) {
-	pkg.Must(err, "Command failed because error \"%s\" occurred.\n", err)
+	if response != nil {
+		pkg.Must(err, "Command failed because calling \"%s %s\" resulted in error \"%s\" occurred.\n%s\n", response.Request.Method, response.RequestURL, err, response.Payload)
+	} else {
+		pkg.Must(err, "Command failed because error \"%s\" occurred and no response is available.\n", err)
+	}
 
 	if response.StatusCode != expectedStatusCode {
-		fmt.Fprintf(os.Stderr, "Command failed because status code %d was expeceted but code %d was received.\n", expectedStatusCode, response.StatusCode)
-		fmt.Fprintf(os.Stderr, "The server responded with:\n%s\n", response.Payload)
+		fmt.Fprintf(os.Stderr, "Command failed because calling \"%s %s\" resulted in status code \"%d\" but code \"%d\" was expected.\n%s\n", response.Request.Method, response.RequestURL, expectedStatusCode, response.StatusCode, response.Payload)
 		os.Exit(1)
 		return
 	}

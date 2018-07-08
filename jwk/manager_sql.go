@@ -195,6 +195,10 @@ func (m *SQLManager) GetKeySet(set string) (*jose.JSONWebKeySet, error) {
 		keys.Keys = append(keys.Keys, c)
 	}
 
+	if len(keys.Keys) == 0 {
+		return nil, errors.WithStack(pkg.ErrNotFound)
+	}
+
 	return keys, nil
 }
 

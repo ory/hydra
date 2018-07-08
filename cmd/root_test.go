@@ -87,6 +87,8 @@ func TestExecute(t *testing.T) {
 		{args: []string{"keys", "rotate", "--endpoint", endpoint, "foo"}},
 		{args: []string{"keys", "get", "--endpoint", endpoint, "foo"}},
 		{args: []string{"keys", "delete", "--endpoint", endpoint, "foo"}},
+		{args: []string{"keys", "import", "--endpoint", endpoint, "import-1", "../test/stub/ecdh.key", "../test/stub/ecdh.pub"}},
+		{args: []string{"keys", "import", "--endpoint", endpoint, "import-2", "../test/stub/rsa.key", "../test/stub/rsa.pub"}},
 		{args: []string{"token", "revoke", "--endpoint", endpoint, "--client-secret", "foobar", "--client-id", "foobarbaz", "foo"}},
 		{args: []string{"token", "client", "--endpoint", endpoint, "--client-secret", "foobar", "--client-id", "foobarbaz"}},
 		{args: []string{"help", "migrate", "sql"}},

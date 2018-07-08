@@ -76,13 +76,13 @@ var tokenUserCmd = &cobra.Command{
 		}
 
 		if backend == "" {
-			bu, err := url.Parse(c.GetClusterURLWithoutTailingSlash(cmd))
-			pkg.Must(err, `Unable to parse cluster url ("%s"): %s`, c.GetClusterURLWithoutTailingSlash(cmd), err)
+			bu, err := url.Parse(c.GetClusterURLWithoutTailingSlashOrFail(cmd))
+			pkg.Must(err, `Unable to parse cluster url ("%s"): %s`, c.GetClusterURLWithoutTailingSlashOrFail(cmd), err)
 			backend = urlx.AppendPaths(bu, "/oauth2/token").String()
 		}
 		if frontend == "" {
-			fu, err := url.Parse(c.GetClusterURLWithoutTailingSlash(cmd))
-			pkg.Must(err, `Unable to parse cluster url ("%s"): %s`, c.GetClusterURLWithoutTailingSlash(cmd), err)
+			fu, err := url.Parse(c.GetClusterURLWithoutTailingSlashOrFail(cmd))
+			pkg.Must(err, `Unable to parse cluster url ("%s"): %s`, c.GetClusterURLWithoutTailingSlashOrFail(cmd), err)
 			frontend = urlx.AppendPaths(fu, "/oauth2/auth").String()
 		}
 

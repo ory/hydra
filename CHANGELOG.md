@@ -3,9 +3,9 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
-  - [Unreleased](#unreleased)
+  - [v1.0.0-beta.6 (2018-07-11)](#v100-beta6-2018-07-11)
   - [v1.0.0-beta.5 (2018-07-07)](#v100-beta5-2018-07-07)
-  - [v0.11.13 (2018-06-14)](#v01113-2018-06-14)
+  - [v0.11.14 (2018-06-15)](#v01114-2018-06-15)
   - [v1.0.0-beta.4 (2018-06-13)](#v100-beta4-2018-06-13)
   - [v1.0.0-beta.3 (2018-06-13)](#v100-beta3-2018-06-13)
   - [v1.0.0-beta.2 (2018-05-29)](#v100-beta2-2018-05-29)
@@ -132,18 +132,34 @@
 
 # Change Log
 
-## [Unreleased](https://github.com/ory/hydra/tree/HEAD)
-
-[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-beta.5...HEAD)
+## [v1.0.0-beta.6](https://github.com/ory/hydra/tree/v1.0.0-beta.6) (2018-07-11)
+[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-beta.5...v1.0.0-beta.6)
 
 **Implemented enhancements:**
 
 - consent: Add endpoint to revoke authentication and consent sessions [\#856](https://github.com/ory/hydra/issues/856)
 - jwk: improve JWK tests [\#588](https://github.com/ory/hydra/issues/588)
+- cli/clients: allow to import multiple clients with one file [\#388](https://github.com/ory/hydra/issues/388)
 - oauth2: allow token revocation without knowing the token \(i.e. per user\) [\#304](https://github.com/ory/hydra/issues/304)
+- cmd: CLI should be able to import PEM keys to JWK store [\#98](https://github.com/ory/hydra/issues/98)
+
+**Fixed bugs:**
+
+- migration 0.9.x -\> 1.0: sector\_identifier\_uri contains null values  [\#918](https://github.com/ory/hydra/issues/918)
+
+**Closed issues:**
+
+- Hydra version 0.11.13-alpine break cli [\#917](https://github.com/ory/hydra/issues/917)
+- health: Check if and why the health endpoint returns a HTTPS response [\#879](https://github.com/ory/hydra/issues/879)
+- docs: disallow secrets from docs/tutorials in production mode [\#573](https://github.com/ory/hydra/issues/573)
+
+**Merged pull requests:**
+
+- client: Fix sql migration step for oidc [\#919](https://github.com/ory/hydra/pull/919) ([arekkas](https://github.com/arekkas))
+- cmd: Allows import of PEM/DER/JSON encoded keys  [\#916](https://github.com/ory/hydra/pull/916) ([arekkas](https://github.com/arekkas))
 
 ## [v1.0.0-beta.5](https://github.com/ory/hydra/tree/v1.0.0-beta.5) (2018-07-07)
-[Full Changelog](https://github.com/ory/hydra/compare/v0.11.13...v1.0.0-beta.5)
+[Full Changelog](https://github.com/ory/hydra/compare/v0.11.14...v1.0.0-beta.5)
 
 **Implemented enhancements:**
 
@@ -155,7 +171,6 @@
 
 - Public and private key pair fetched from store does not match [\#912](https://github.com/ory/hydra/issues/912)
 - 500 error returned on GET /clients/{id} when client doesn't exist [\#903](https://github.com/ory/hydra/issues/903)
-- Missing commits between v0.11.10 and v0.11.12 [\#894](https://github.com/ory/hydra/issues/894)
 - metrics: Properly handle metrics log messages [\#833](https://github.com/ory/hydra/issues/833)
 
 **Closed issues:**
@@ -174,8 +189,12 @@
 - docs: Adds link to examples repository [\#907](https://github.com/ory/hydra/pull/907) ([arekkas](https://github.com/arekkas))
 - docs: Removes obsolete issue template [\#906](https://github.com/ory/hydra/pull/906) ([arekkas](https://github.com/arekkas))
 
-## [v0.11.13](https://github.com/ory/hydra/tree/v0.11.13) (2018-06-14)
-[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-beta.4...v0.11.13)
+## [v0.11.14](https://github.com/ory/hydra/tree/v0.11.14) (2018-06-15)
+[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-beta.4...v0.11.14)
+
+**Fixed bugs:**
+
+- Missing commits between v0.11.10 and v0.11.12 [\#894](https://github.com/ory/hydra/issues/894)
 
 ## [v1.0.0-beta.4](https://github.com/ory/hydra/tree/v1.0.0-beta.4) (2018-06-13)
 [Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-beta.3...v1.0.0-beta.4)
@@ -873,7 +892,6 @@
 - oauth2: change scope semantics to wildcard [\#550](https://github.com/ory/hydra/issues/550)
 - warden: need endpoint that just introspects tokens [\#539](https://github.com/ory/hydra/issues/539)
 - sdk: client libraries for all languages [\#249](https://github.com/ory/hydra/issues/249)
-- oauth2: allow issuing of JWT access tokens [\#248](https://github.com/ory/hydra/issues/248)
 - core: enable usage statistics reporting [\#230](https://github.com/ory/hydra/issues/230)
 - core: introduce a way to test for bc breaks in datastore [\#193](https://github.com/ory/hydra/issues/193)
 

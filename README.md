@@ -141,7 +141,7 @@ If you do not understand what that all of this means, ask in our [chat channel](
 #### Using Docker
 
 **Starting the host** is easiest with docker. The host process handles HTTP requests and is backed by a database.
-Read how to install docker on [Linux](https://docs.docker.com/linux/), [OSX](https://docs.docker.com/mac/) or
+Read how to install docker on [Linux](https://docs.docker.com/install/linux/docker-ce/ubuntu/), [OSX](https://docs.docker.com/mac/) or
 [Windows](https://docs.docker.com/windows/). ORY Hydra is available on [Docker Hub](https://hub.docker.com/r/oryd/hydra/).
 
 You can use ORY Hydra without a database, but be aware that restarting, scaling

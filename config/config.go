@@ -27,6 +27,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 
@@ -88,6 +89,15 @@ type Config struct {
 	oauth2Client *http.Client               `yaml:"-"`
 	context      *Context                   `yaml:"-"`
 	systemSecret []byte                     `yaml:"-"`
+}
+
+func (c *Config) GetClusterURLWithoutTailingSlashOrFail(cmd *cobra.Command) string {
+	endpoint := c.GetClusterURLWithoutTailingSlash(cmd)
+	if endpoint == "" {
+		fmt.Println("To execute this command, the endpoint URL must point to the URL where ORY Hydra is located. To set the endpoint URL, use flag --endpoint or environment variable HYDRA_URL.")
+		os.Exit(1)
+	}
+	return endpoint
 }
 
 func (c *Config) GetClusterURLWithoutTailingSlash(cmd *cobra.Command) string {

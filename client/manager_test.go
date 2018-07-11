@@ -31,6 +31,7 @@ import (
 	"github.com/ory/fosite"
 	. "github.com/ory/hydra/client"
 	"github.com/ory/sqlcon/dockertest"
+	"github.com/stretchr/testify/require"
 )
 
 var clientManagers = map[string]Manager{}
@@ -85,9 +86,8 @@ func connectToPG() {
 func TestCreateGetDeleteClient(t *testing.T) {
 	for k, m := range clientManagers {
 		if s, ok := m.(*SQLManager); ok {
-			if _, err := s.CreateSchemas(); err != nil {
-				log.Fatalf("Could not create schema: %v", err)
-			}
+			_, err := s.CreateSchemas()
+			require.NoError(t, err)
 		}
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeleteClient(k, m))
 	}
@@ -96,9 +96,8 @@ func TestCreateGetDeleteClient(t *testing.T) {
 func TestClientAutoGenerateKey(t *testing.T) {
 	for k, m := range clientManagers {
 		if s, ok := m.(*SQLManager); ok {
-			if _, err := s.CreateSchemas(); err != nil {
-				log.Fatalf("Could not create schema: %v", err)
-			}
+			_, err := s.CreateSchemas()
+			require.NoError(t, err)
 		}
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperClientAutoGenerateKey(k, m))
 	}
@@ -107,9 +106,8 @@ func TestClientAutoGenerateKey(t *testing.T) {
 func TestAuthenticateClient(t *testing.T) {
 	for k, m := range clientManagers {
 		if s, ok := m.(*SQLManager); ok {
-			if _, err := s.CreateSchemas(); err != nil {
-				log.Fatalf("Could not create schema: %v", err)
-			}
+			_, err := s.CreateSchemas()
+			require.NoError(t, err)
 		}
 		t.Run(fmt.Sprintf("case=%s", k), TestHelperClientAuthenticate(k, m))
 	}

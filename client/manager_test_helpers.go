@@ -21,6 +21,7 @@
 package client
 
 import (
+	"crypto/x509"
 	"testing"
 
 	"github.com/ory/fosite"
@@ -69,23 +70,34 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 		assert.NotNil(t, err)
 
 		c := &Client{
-			ID:                        "1234",
-			Name:                      "name",
-			Secret:                    "secret",
-			RedirectURIs:              []string{"http://redirect"},
-			TermsOfServiceURI:         "foo",
-			SecretExpiresAt:           0,
-			SectorIdentifierURI:       "https://sector",
-			JSONWebKeysURI:            "https://...",
-			JSONWebKeys:               &jose.JSONWebKeySet{},
-			TokenEndpointAuthMethod:   "none",
-			RequestURIs:               []string{"foo"},
-			UserinfoSignedResponseAlg: "RS256",
+			ID:                            "1234",
+			Name:                          "name",
+			Secret:                        "secret",
+			RedirectURIs:                  []string{"http://redirect", "http://redirect1"},
+			GrantTypes:                    []string{"implicit", "refresh_token"},
+			ResponseTypes:                 []string{"code token", "token id_token", "code"},
+			Scope:                         "scope-a scope-b",
+			Owner:                         "aeneas",
+			PolicyURI:                     "http://policy",
+			TermsOfServiceURI:             "http://tos",
+			ClientURI:                     "http://client",
+			LogoURI:                       "http://logo",
+			Contacts:                      []string{"aeneas1", "aeneas2"},
+			Public:                        true,
+			SecretExpiresAt:               0,
+			SectorIdentifierURI:           "https://sector",
+			JSONWebKeys:                   &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{{KeyID: "foo", Key: []byte("asdf"), Certificates: []*x509.Certificate{}}}},
+			JSONWebKeysURI:                "https://...",
+			TokenEndpointAuthMethod:       "none",
+			RequestURIs:                   []string{"foo", "bar"},
+			RequestObjectSigningAlgorithm: "rs256",
+			UserinfoSignedResponseAlg:     "RS256",
 		}
 
 		assert.NoError(t, m.CreateClient(c))
-		if err == nil {
-			compare(t, c, k)
+		assert.Equal(t, c.GetID(), "1234")
+		if k != "http" {
+			assert.NotEmpty(t, c.GetHashedSecret())
 		}
 
 		assert.NoError(t, m.CreateClient(&Client{
@@ -100,9 +112,7 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 		d, err := m.GetClient(nil, "1234")
 		require.NoError(t, err)
 
-		if err == nil {
-			compare(t, d, k)
-		}
+		compare(t, c, d, k)
 
 		ds, err := m.GetClients(100, 0)
 		assert.NoError(t, err)
@@ -151,10 +161,36 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 	}
 }
 
-func compare(t *testing.T, c fosite.Client, k string) {
-	assert.Equal(t, c.GetID(), "1234")
+func compare(t *testing.T, expected *Client, actual fosite.Client, k string) {
+	assert.EqualValues(t, expected.GetID(), actual.GetID())
 	if k != "http" {
-		assert.NotEmpty(t, c.GetHashedSecret())
+		assert.EqualValues(t, expected.GetHashedSecret(), actual.GetHashedSecret())
 	}
-	assert.Equal(t, c.GetRedirectURIs(), []string{"http://redirect"})
+	assert.EqualValues(t, expected.GetRedirectURIs(), actual.GetRedirectURIs())
+	assert.EqualValues(t, expected.GetGrantTypes(), actual.GetGrantTypes())
+
+	assert.EqualValues(t, expected.GetResponseTypes(), actual.GetResponseTypes())
+	assert.EqualValues(t, expected.GetScopes(), actual.GetScopes())
+	assert.EqualValues(t, expected.IsPublic(), actual.IsPublic())
+
+	if actual, ok := actual.(*Client); ok {
+		assert.EqualValues(t, expected.Owner, actual.Owner)
+		assert.EqualValues(t, expected.Name, actual.Name)
+		assert.EqualValues(t, expected.PolicyURI, actual.PolicyURI)
+		assert.EqualValues(t, expected.TermsOfServiceURI, actual.TermsOfServiceURI)
+		assert.EqualValues(t, expected.ClientURI, actual.ClientURI)
+		assert.EqualValues(t, expected.LogoURI, actual.LogoURI)
+		assert.EqualValues(t, expected.Contacts, actual.Contacts)
+		assert.EqualValues(t, expected.SecretExpiresAt, actual.SecretExpiresAt)
+		assert.EqualValues(t, expected.SectorIdentifierURI, actual.SectorIdentifierURI)
+		assert.EqualValues(t, expected.UserinfoSignedResponseAlg, actual.UserinfoSignedResponseAlg)
+	}
+
+	if actual, ok := actual.(fosite.OpenIDConnectClient); ok {
+		assert.EqualValues(t, expected.JSONWebKeys.Keys, actual.GetJSONWebKeys().Keys)
+		assert.EqualValues(t, expected.JSONWebKeysURI, actual.GetJSONWebKeysURI())
+		assert.EqualValues(t, expected.TokenEndpointAuthMethod, actual.GetTokenEndpointAuthMethod())
+		assert.EqualValues(t, expected.RequestURIs, actual.GetRequestURIs())
+		assert.EqualValues(t, expected.RequestObjectSigningAlgorithm, actual.GetRequestObjectSigningAlgorithm())
+	}
 }

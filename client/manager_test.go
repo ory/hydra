@@ -61,10 +61,6 @@ func connectToMySQL() {
 	}
 
 	s := &SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}
-	if _, err := s.CreateSchemas(); err != nil {
-		log.Fatalf("Could not create schema: %v", err)
-	}
-
 	clientManagers["mysql"] = s
 }
 
@@ -75,11 +71,6 @@ func connectToPG() {
 	}
 
 	s := &SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}
-
-	if _, err := s.CreateSchemas(); err != nil {
-		log.Fatalf("Could not create schema: %v", err)
-	}
-
 	clientManagers["postgres"] = s
 }
 

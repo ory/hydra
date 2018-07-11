@@ -127,7 +127,7 @@ func TestMigrations(t *testing.T) {
 
 	for k, db := range dbs {
 		t.Run(fmt.Sprintf("database=%s", k), func(t *testing.T) {
-			migrate.SetTable("hydra_client_migration")
+			migrate.SetTable("hydra_client_migration_integration")
 			for step := range migrations[k].Migrations {
 				t.Run(fmt.Sprintf("step=%d", step), func(t *testing.T) {
 					n, err := migrate.ExecMax(db.DB, db.DriverName(), migrations[k], migrate.Up, 1)

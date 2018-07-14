@@ -37,7 +37,7 @@ type SQLManager struct {
 	Cipher *AEAD
 }
 
-var migrations = &migrate.MemoryMigrationSource{
+var Migrations = &migrate.MemoryMigrationSource{
 	Migrations: []*migrate.Migration{
 		{
 			Id: "1",
@@ -63,6 +63,14 @@ var migrations = &migrate.MemoryMigrationSource{
 				`ALTER TABLE hydra_jwk DROP COLUMN created_at`,
 			},
 		},
+		// See https://github.com/ory/hydra/issues/921
+		{
+			Id: "3",
+			Up: []string{
+				`DELETE FROM hydra_jwk WHERE sid='hydra.openid.id-token'`,
+			},
+			Down: []string{},
+		},
 	},
 }
 
@@ -76,9 +84,9 @@ type sqlData struct {
 
 func (m *SQLManager) CreateSchemas() (int, error) {
 	migrate.SetTable("hydra_jwk_migration")
-	n, err := migrate.Exec(m.DB.DB, m.DB.DriverName(), migrations, migrate.Up)
+	n, err := migrate.Exec(m.DB.DB, m.DB.DriverName(), Migrations, migrate.Up)
 	if err != nil {
-		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
+		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d Migrations", n)
 	}
 	return n, nil
 }

@@ -50,21 +50,21 @@ func TestHelperManagerKey(m Manager, keys *jose.JSONWebKeySet, suffix string) fu
 		assert.NotNil(t, err)
 
 		err = m.AddKey("faz", First(priv))
-		assert.Nil(t, err)
+		require.NoError(t, err)
 
 		got, err := m.GetKey("faz", "private:"+suffix)
-		assert.Nil(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, priv, got.Keys)
 
 		err = m.AddKey("faz", First(pub))
-		assert.Nil(t, err)
+		require.NoError(t, err)
 
 		got, err = m.GetKey("faz", "private:"+suffix)
-		assert.Nil(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, priv, got.Keys)
 
 		got, err = m.GetKey("faz", "public:"+suffix)
-		assert.Nil(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, pub, got.Keys)
 
 		// Because MySQL
@@ -72,20 +72,20 @@ func TestHelperManagerKey(m Manager, keys *jose.JSONWebKeySet, suffix string) fu
 
 		First(pub).KeyID = "new-key-id:" + suffix
 		err = m.AddKey("faz", First(pub))
-		assert.Nil(t, err)
+		require.NoError(t, err)
 
 		_, err = m.GetKey("faz", "new-key-id:"+suffix)
-		assert.Nil(t, err)
+		require.NoError(t, err)
 
 		keys, err = m.GetKeySet("faz")
-		assert.Nil(t, err)
+		require.NoError(t, err)
 		assert.EqualValues(t, "new-key-id:"+suffix, First(keys.Keys).KeyID)
 
 		err = m.DeleteKey("faz", "public:"+suffix)
-		assert.Nil(t, err)
+		require.NoError(t, err)
 
 		_, err = m.GetKey("faz", "public:"+suffix)
-		assert.NotNil(t, err)
+		require.NoError(t, err)
 	}
 }
 
@@ -96,17 +96,17 @@ func TestHelperManagerKeySet(m Manager, keys *jose.JSONWebKeySet, suffix string)
 		require.Error(t, err)
 
 		err = m.AddKeySet("bar", keys)
-		assert.Nil(t, err)
+		require.NoError(t, err)
 
 		got, err := m.GetKeySet("bar")
-		assert.Nil(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, keys.Key("public:"+suffix), got.Key("public:"+suffix))
 		assert.Equal(t, keys.Key("private:"+suffix), got.Key("private:"+suffix))
 
 		err = m.DeleteKeySet("bar")
-		assert.Nil(t, err)
+		require.NoError(t, err)
 
 		_, err = m.GetKeySet("bar")
-		assert.NotNil(t, err)
+		require.Error(t, err)
 	}
 }

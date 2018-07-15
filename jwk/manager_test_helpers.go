@@ -85,7 +85,7 @@ func TestHelperManagerKey(m Manager, keys *jose.JSONWebKeySet, suffix string) fu
 		require.NoError(t, err)
 
 		_, err = m.GetKey("faz", "public:"+suffix)
-		require.NoError(t, err)
+		require.Error(t, err)
 	}
 }
 

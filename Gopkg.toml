@@ -131,7 +131,7 @@
 
 [[constraint]]
   name = "github.com/ory/go-convenience"
-  version = "0.0.2"
+  version = "0.0.4"
 
 [[constraint]]
   branch = "master"

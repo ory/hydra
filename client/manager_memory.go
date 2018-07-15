@@ -53,7 +53,7 @@ func (m *MemoryManager) GetConcreteClient(id string) (*Client, error) {
 	defer m.RUnlock()
 
 	for _, c := range m.Clients {
-		if c.GetID() == id {
+		if c.ID == id {
 			c.ClientID = c.ID
 			return &c, nil
 		}

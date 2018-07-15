@@ -316,8 +316,8 @@
     "stringsx",
     "urlx"
   ]
-  revision = "8e5660ff0e4c9c7e0cecd82ea8a87a793ff9ed23"
-  version = "v0.0.3"
+  revision = "857ebcb1de6fdd166e791d976a46c3209d8355a8"
+  version = "v0.0.4"
 
 [[projects]]
   name = "github.com/ory/graceful"
@@ -636,6 +636,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c1d09891819f39bba8546871d98e9930e32f5ceaf381a48f24d383273e19e62d"
+  inputs-digest = "93ea649736b0fc7acaa3ade7c61867c793f4279abe45e48ad5af57dd90e5ae23"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -21,6 +21,7 @@
 package client_test
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -151,5 +152,48 @@ func TestClientSDK(t *testing.T) {
 		require.EqualValues(t, http.StatusCreated, response.StatusCode, "%s", response.Payload)
 
 		assert.Equal(t, "secret", result.ClientSecret)
+	})
+
+	t.Run("case=id should be set properly", func(t *testing.T) {
+		for k, tc := range []struct {
+			client   hydra.OAuth2Client
+			expectID string
+		}{
+			{
+				client: hydra.OAuth2Client{},
+			},
+			{
+				client:   hydra.OAuth2Client{Id: "set-properly-1"},
+				expectID: "set-properly-1",
+			},
+			{
+				client:   hydra.OAuth2Client{ClientId: "set-properly-2"},
+				expectID: "set-properly-2",
+			},
+		} {
+			t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+				result, response, err := c.CreateOAuth2Client(tc.client)
+				require.NoError(t, err)
+				require.EqualValues(t, http.StatusCreated, response.StatusCode, "%s", response.Payload)
+
+				assert.NotEmpty(t, result.Id)
+				assert.NotEmpty(t, result.ClientId)
+				assert.EqualValues(t, result.Id, result.ClientId)
+
+				id := result.Id
+				if tc.expectID != "" {
+					assert.EqualValues(t, tc.expectID, result.Id)
+					assert.EqualValues(t, tc.expectID, result.ClientId)
+					id = tc.expectID
+				}
+
+				result, response, err = c.GetOAuth2Client(id)
+				require.NoError(t, err)
+				require.EqualValues(t, http.StatusOK, response.StatusCode, "%s", response.Payload)
+
+				assert.EqualValues(t, id, result.Id)
+				assert.EqualValues(t, id, result.ClientId)
+			})
+		}
 	})
 }

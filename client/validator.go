@@ -29,6 +29,7 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/go-convenience/stringslice"
+	"github.com/ory/go-convenience/stringsx"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 )
@@ -47,14 +48,10 @@ func NewValidator(
 }
 
 func (v *Validator) Validate(c *Client) error {
-	if c.ID == "" && c.ClientID == "" {
-		c.ID = uuid.New()
-		c.ClientID = c.ID
-	} else if c.ID == "" && c.ClientID != "" {
-		c.ID = c.ClientID
-	} else if c.ID != "" && c.ClientID == "" {
-		c.ClientID = c.ID
-	} else if c.ID != c.ClientID {
+	id := uuid.New()
+	c.ID = stringsx.Coalesce(c.ID, c.ClientID, id)
+	c.ClientID = stringsx.Coalesce(c.ClientID, c.ID, id)
+	if c.ID != c.ClientID {
 		return errors.WithStack(fosite.ErrInvalidRequest.WithHint("Field id and client_id must match."))
 	}
 

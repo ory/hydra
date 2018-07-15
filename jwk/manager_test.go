@@ -62,10 +62,6 @@ func connectToPG() {
 	}
 
 	s := &SQLManager{DB: db, Cipher: &AEAD{Key: encryptionKey}}
-	if _, err := s.CreateSchemas(); err != nil {
-		log.Fatalf("Could not create schema: %v", err)
-	}
-
 	managers["postgres"] = s
 }
 
@@ -76,11 +72,6 @@ func connectToMySQL() {
 	}
 
 	s := &SQLManager{DB: db, Cipher: &AEAD{Key: encryptionKey}}
-
-	if _, err := s.CreateSchemas(); err != nil {
-		log.Fatalf("Could not create schema: %v", err)
-	}
-
 	managers["mysql"] = s
 }
 
@@ -89,6 +80,11 @@ func TestManagerKey(t *testing.T) {
 	require.NoError(t, err)
 
 	for name, m := range managers {
+		if m, ok := m.(*SQLManager); ok {
+			n, err := m.CreateSchemas()
+			require.NoError(t, err)
+			t.Logf("Applied %d migrations to %s", n, name)
+		}
 		t.Run(fmt.Sprintf("case=%s", name), TestHelperManagerKey(m, ks, "TestManagerKey"))
 	}
 }
@@ -99,6 +95,11 @@ func TestManagerKeySet(t *testing.T) {
 	ks.Key("private")
 
 	for name, m := range managers {
+		if m, ok := m.(*SQLManager); ok {
+			n, err := m.CreateSchemas()
+			require.NoError(t, err)
+			t.Logf("Applied %d migrations to %s", n, name)
+		}
 		t.Run(fmt.Sprintf("case=%s", name), TestHelperManagerKeySet(m, ks, "TestManagerKeySet"))
 	}
 }

@@ -91,6 +91,8 @@ func getOrCreateTLSCertificate(cmd *cobra.Command, c *config.Config) tls.Certifi
 	}
 
 	ctx := c.Context()
+	expectDependency(c.GetLogger(), ctx.KeyManager)
+
 	privateKey, err := createOrGetJWK(c, tlsKeyName, "", "private")
 	if err != nil {
 		c.GetLogger().WithError(err).Fatalf(`Could not fetch TLS keys - did you forget to run "hydra migrate sql" or forget to set the SYSTEM_SECRET?`)

@@ -35,8 +35,10 @@ func newClientManager(c *config.Config) client.Manager {
 
 	switch con := ctx.Connection.(type) {
 	case *config.MemoryConnection:
+		expectDependency(c.GetLogger(), ctx.Hasher)
 		return client.NewMemoryManager(ctx.Hasher)
 	case *sqlcon.SQLConnection:
+		expectDependency(c.GetLogger(), ctx.Hasher, con.GetDatabase())
 		return &client.SQLManager{
 			DB:     con.GetDatabase(),
 			Hasher: ctx.Hasher,
@@ -58,6 +60,7 @@ func newClientHandler(c *config.Config, router *httprouter.Router, manager clien
 	w := herodot.NewJSONWriter(c.GetLogger())
 	w.ErrorEnhancer = writerErrorEnhancer
 
+	expectDependency(c.GetLogger(), manager)
 	h := client.NewHandler(manager, w, strings.Split(c.DefaultClientScope, ","))
 	h.SetRoutes(router)
 	return h

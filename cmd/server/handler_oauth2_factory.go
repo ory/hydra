@@ -51,6 +51,7 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 		store = oauth2.NewFositeMemoryStore(clients, c.GetAccessTokenLifespan())
 		break
 	case *sqlcon.SQLConnection:
+		expectDependency(c.GetLogger(), con.GetDatabase())
 		store = oauth2.NewFositeSQLStore(clients, con.GetDatabase(), c.GetLogger(), c.GetAccessTokenLifespan())
 		break
 	case *config.PluginConnection:
@@ -69,6 +70,7 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 func newOAuth2Provider(c *config.Config) fosite.OAuth2Provider {
 	var ctx = c.Context()
 	var store = ctx.FositeStore
+	expectDependency(c.GetLogger(), ctx.FositeStore)
 
 	kid := uuid.New()
 	if _, err := createOrGetJWK(c, oauth2.OpenIDConnectKeyName, kid, "private"); err != nil {
@@ -137,6 +139,8 @@ func setDefaultConsentURL(s string, c *config.Config, path string) string {
 
 //func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm oauth2.ConsentRequestManager, o fosite.OAuth2Provider, idTokenKeyID string) *oauth2.Handler {
 func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm consent.Manager, o fosite.OAuth2Provider) *oauth2.Handler {
+	expectDependency(c.GetLogger(), c.Context().FositeStore)
+
 	c.ConsentURL = setDefaultConsentURL(c.ConsentURL, c, "oauth2/fallbacks/consent")
 	c.LoginURL = setDefaultConsentURL(c.LoginURL, c, "oauth2/fallbacks/consent")
 	c.ErrorURL = setDefaultConsentURL(c.ErrorURL, c, "oauth2/fallbacks/error")

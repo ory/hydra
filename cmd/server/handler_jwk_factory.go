@@ -36,6 +36,7 @@ func injectJWKManager(c *config.Config) {
 		ctx.KeyManager = &jwk.MemoryManager{}
 		break
 	case *sqlcon.SQLConnection:
+		expectDependency(c.GetLogger(), con.GetDatabase())
 		ctx.KeyManager = &jwk.SQLManager{
 			DB: con.GetDatabase(),
 			Cipher: &jwk.AEAD{
@@ -60,6 +61,7 @@ func newJWKHandler(c *config.Config, router *httprouter.Router) *jwk.Handler {
 	w := herodot.NewJSONWriter(c.GetLogger())
 	w.ErrorEnhancer = writerErrorEnhancer
 
+	expectDependency(c.GetLogger(), ctx.KeyManager)
 	h := &jwk.Handler{
 		H:       w,
 		Manager: ctx.KeyManager,

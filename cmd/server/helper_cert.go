@@ -55,7 +55,7 @@ func loadCertificateFromFile(cmd *cobra.Command, c *config.Config) *tls.Certific
 
 	cert, err := tls.LoadX509KeyPair(certPath, keyPath)
 	if err != nil {
-		c.GetLogger().Warn("Could not load x509 key pair: %s", cert)
+		c.GetLogger().WithError(errors.WithStack(err)).Warn("Could not load x509 key pair, will use self-issued certificate instead.")
 		return nil
 	}
 	return &cert

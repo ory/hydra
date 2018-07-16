@@ -349,7 +349,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	}
 
 	cookie.Values[cookieAuthenticationSIDName] = sid
-	if session.RememberFor > 0 {
+	if session.RememberFor >= 0 {
 		cookie.Options.MaxAge = session.RememberFor
 	}
 	cookie.Options.HttpOnly = true

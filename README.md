@@ -12,7 +12,7 @@
  
 ---
 
-ORY Hydra is a hardened OAuth2 and OpenID Connect server optimized for low-latency, high throughput,
+ORY Hydra is a hardened, certified OAuth2 and OpenID Connect server optimized for low-latency, high throughput,
 and low resource consumption. ORY Hydra *is not* an identity provider (user sign up, user log in, password reset flow),
 but connects to your existing identity provider through a [consent app](https://www.ory.sh/docs/1-hydra/2-overview/1-oauth2#consent-flow).
 Implementing the consent app in a different language is easy, and exemplary consent apps
@@ -100,15 +100,22 @@ and the OpenID Foundation:
 
 * [OpenID Connect Core 1.0](http://openid.net/specs/openid-connect-core-1_0.html)
 * [OpenID Connect Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0.html)
+* [OpenID Connect Dynamic Client Registration 1.0](https://openid.net/specs/openid-connect-registration-1_0.html)
 
 ### OpenID Connect Certified
 
-While ORY Hydra is *not yet officially* OpenID Connect Certified, our reference deployment using the [reference user
-login and consent app](https://github.com/ory/hydra-login-consent-node) and the latest ORY Hydra release does pass all
-self-service test of the OpenID Foundation, a critical requirement for achieving full OpenID Connect conformity.
+ORY Hydra is [certified by the OpenID Foundation](http://openid.net/certification/#OPs) as an OpenID Provider. The following profiles are certified:
 
-If you'd like to see the test cases, head over to [./docs/certification](./docs/certification). We are aiming
-to be certified for all explicit, implicit, and hybrid flows as well as OpenID Connect Discovery.
+* [Basic OpenID Provider](http://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth) (response types `code`)
+* [Implicit OpenID Provider](http://openid.net/specs/openid-connect-core-1_0.html#ImplicitFlowAuth) (response types `id_token`, `id_token+token`)
+* [Hybrid OpenID Provider](http://openid.net/specs/openid-connect-core-1_0.html#HybridFlowAuth) (response types `code+id_token`, `code+id_token+token`, `code+token`)
+* [OpenID Provider Publishing Configuration Information](https://openid.net/specs/openid-connect-discovery-1_0.html)
+* [Dynamic OpenID Provider](https://openid.net/specs/openid-connect-registration-1_0.html)
+
+To obtain certification, we deployed the [reference user login and consent app](https://github.com/ory/hydra-login-consent-node)
+(unmodified) and ORY Hydra v1.0.0.
+
+<img src="./docs/images/oidc-cert.png" align="center">
 
 ## Quickstart
 

@@ -104,7 +104,13 @@ and the OpenID Foundation:
 
 ### OpenID Connect Certified
 
-ORY Hydra is [certified by the OpenID Foundation](http://openid.net/certification/#OPs) as an OpenID Provider. The following profiles are certified:
+ORY Hydra is an OpenID Foundation [certified OpenID Provider](http://openid.net/certification/#OPs).
+
+<p align="center">
+    <img src="./docs/images/oidc-cert.png" alt="ORY Hydra is a certified OpenID Providier" width="256px">
+</p>
+
+The following OpenID profiles are certified:
 
 * [Basic OpenID Provider](http://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth) (response types `code`)
 * [Implicit OpenID Provider](http://openid.net/specs/openid-connect-core-1_0.html#ImplicitFlowAuth) (response types `id_token`, `id_token+token`)
@@ -114,8 +120,6 @@ ORY Hydra is [certified by the OpenID Foundation](http://openid.net/certificatio
 
 To obtain certification, we deployed the [reference user login and consent app](https://github.com/ory/hydra-login-consent-node)
 (unmodified) and ORY Hydra v1.0.0.
-
-<img src="./docs/images/oidc-cert.png" align="center">
 
 ## Quickstart
 

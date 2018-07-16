@@ -49,6 +49,8 @@ import (
 
 var _ = &consent.Handler{}
 
+var errNilDependency = errors.New("A dependency was expected to be defined but is nil. Please open an issue with the stack trace.")
+
 func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		fmt.Println(banner)
@@ -163,9 +165,10 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 	// Set up dependencies
 	injectJWKManager(c)
 	clientsManager := newClientManager(c)
-	injectConsentManager(c, clientsManager)
 
 	injectFositeStore(c, clientsManager)
+	injectConsentManager(c, clientsManager)
+
 	oauth2Provider := newOAuth2Provider(c)
 
 	// Set up handlers

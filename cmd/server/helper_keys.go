@@ -34,6 +34,8 @@ import (
 func createOrGetJWK(c *config.Config, set string, kid string, prefix string) (key *jose.JSONWebKey, err error) {
 	ctx := c.Context()
 
+	expectDependency(c.GetLogger(), ctx.KeyManager)
+
 	keys, err := ctx.KeyManager.GetKeySet(set)
 	if errors.Cause(err) == pkg.ErrNotFound || keys != nil && len(keys.Keys) == 0 {
 		c.GetLogger().Infof("JSON Web Key Set %s does not exist yet, generating new key pair...", set)

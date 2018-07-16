@@ -39,6 +39,7 @@ func newHealthHandler(c *config.Config, router *httprouter.Router) *health.Handl
 		}
 		break
 	case *sqlcon.SQLConnection:
+		expectDependency(c.GetLogger(), con.GetDatabase())
 		rc = func() error {
 			return con.GetDatabase().Ping()
 		}

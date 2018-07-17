@@ -3,6 +3,8 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [Unreleased](#unreleased)
+  - [v1.0.0-beta.7 (2018-07-16)](#v100-beta7-2018-07-16)
   - [v1.0.0-beta.6 (2018-07-11)](#v100-beta6-2018-07-11)
   - [v1.0.0-beta.5 (2018-07-07)](#v100-beta5-2018-07-07)
   - [v0.11.14 (2018-06-15)](#v01114-2018-06-15)
@@ -131,6 +133,43 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Change Log
+
+## [Unreleased](https://github.com/ory/hydra/tree/HEAD)
+
+[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-beta.7...HEAD)
+
+**Closed issues:**
+
+- \[HTTP API\] get /version returns empty [\#934](https://github.com/ory/hydra/issues/934)
+
+## [v1.0.0-beta.7](https://github.com/ory/hydra/tree/v1.0.0-beta.7) (2018-07-16)
+[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-beta.6...v1.0.0-beta.7)
+
+**Implemented enhancements:**
+
+- Panic when calling oauth2/auth/sessions/consent/{user} or oauth2/auth/sessions/consent/{user}/{client} [\#928](https://github.com/ory/hydra/issues/928)
+- client: Improve handling of legacy `id` field [\#927](https://github.com/ory/hydra/pull/927) ([arekkas](https://github.com/arekkas))
+
+**Fixed bugs:**
+
+- Panic when calling oauth2/auth/sessions/consent/{user} or oauth2/auth/sessions/consent/{user}/{client} [\#928](https://github.com/ory/hydra/issues/928)
+- jwk: Auto-remove old keys when upgrading from \< beta.7 [\#925](https://github.com/ory/hydra/pull/925) ([arekkas](https://github.com/arekkas))
+
+**Closed issues:**
+
+- migration 0.11.10 \> 1.0 : did you forget to run hydra migrate sql" or forget to set the SYSTEM\_SECRET [\#926](https://github.com/ory/hydra/issues/926)
+- ClientID property is ignored when creating a new OAuth2 Client [\#924](https://github.com/ory/hydra/issues/924)
+- The CSRF value from the token does not match the CSRF value from the data store [\#923](https://github.com/ory/hydra/issues/923)
+- Which version is stable? [\#922](https://github.com/ory/hydra/issues/922)
+- JSON Web Key Store default keys broken after upgrading to beta.6 [\#921](https://github.com/ory/hydra/issues/921)
+
+**Merged pull requests:**
+
+- Document that ORY Hydra is OpenID Certified [\#933](https://github.com/ory/hydra/pull/933) ([arekkas](https://github.com/arekkas))
+- cmd: Show error when loading x509 cert fails [\#932](https://github.com/ory/hydra/pull/932) ([arekkas](https://github.com/arekkas))
+- Allow cookie without max age [\#930](https://github.com/ory/hydra/pull/930) ([BastianHofmann](https://github.com/BastianHofmann))
+- cmd: Check dependencies are defined before instantiation [\#929](https://github.com/ory/hydra/pull/929) ([arekkas](https://github.com/arekkas))
+- README: fix docker linux link [\#920](https://github.com/ory/hydra/pull/920) ([philips](https://github.com/philips))
 
 ## [v1.0.0-beta.6](https://github.com/ory/hydra/tree/v1.0.0-beta.6) (2018-07-11)
 [Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-beta.5...v1.0.0-beta.6)

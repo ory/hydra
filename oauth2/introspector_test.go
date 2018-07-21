@@ -150,6 +150,7 @@ func TestIntrospectorSDK(t *testing.T) {
 				expectInactive: false,
 				scopes:         []string{"foo.bar"},
 				assert: func(t *testing.T, c *hydra.OAuth2TokenIntrospection) {
+					assert.Equal(t, "core foo.*", c.Scope)
 					assert.Equal(t, "alice", c.Sub)
 					assert.Equal(t, now.Add(time.Hour).Unix(), c.Exp, "expires at")
 					assert.Equal(t, now.Unix(), c.Iat, "issued at")

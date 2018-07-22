@@ -304,8 +304,8 @@
     "token/hmac",
     "token/jwt"
   ]
-  revision = "5688a1c5acbafad5eabe649ce56e06e922c36a60"
-  version = "v0.21.0"
+  revision = "7820fb2e380ca737277095876c7f91b5ebee1467"
+  version = "v0.21.1"
 
 [[projects]]
   name = "github.com/ory/go-convenience"
@@ -636,6 +636,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "93ea649736b0fc7acaa3ade7c61867c793f4279abe45e48ad5af57dd90e5ae23"
+  inputs-digest = "f0ec0043f94c20b1da2628447c8c46b1433a8fdc0760e73cba53724ea812e597"
   solver-name = "gps-cdcl"
   solver-version = 1

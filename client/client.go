@@ -145,7 +145,7 @@ type Client struct {
 }
 
 func (c *Client) GetID() string {
-	return c.ID
+	return c.ClientID
 }
 
 func (c *Client) GetRedirectURIs() []string {

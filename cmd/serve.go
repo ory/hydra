@@ -129,6 +129,12 @@ OAUTH2 CONTROLS
 	codes and similar errors.
 	Defaults to OAUTH2_SHARE_ERROR_DEBUG=false
 
+- OAUTH2_ACCESS_TOKEN_STRATEGY: Sets the Access Token Strategy. Defaults to "opaque" which is the recommended strategy
+	for usage with ORY Hydra. If set to "jwt", then Access Tokens will be a signed JSON Web Token. The public key
+	for verifying the token can be obtained from "./well-known/jwks.json". Please note that the "jwt" strategy is currently
+	in BETA and not recommended for production just yet.
+	Defaults to OAUTH2_ACCESS_TOKEN_STRATEGY="opaque"
+
 
 OPENID CONNECT CONTROLS
 ===============

@@ -64,14 +64,14 @@ func TestClientCredentials(t *testing.T) {
 			compose.OAuth2TokenIntrospectionFactory,
 		),
 		//Consent:         consentStrategy,
-		CookieStore:     sessions.NewCookieStore([]byte("foo-secret")),
-		ForcedHTTP:      true,
-		ScopeStrategy:   fosite.HierarchicScopeStrategy,
-		IDTokenLifespan: time.Minute,
-		H:               herodot.NewJSONWriter(l),
-		L:               l,
-		IssuerURL:       ts.URL,
-		JWTStrategy:     jwtStrategy,
+		CookieStore:       sessions.NewCookieStore([]byte("foo-secret")),
+		ForcedHTTP:        true,
+		ScopeStrategy:     fosite.HierarchicScopeStrategy,
+		IDTokenLifespan:   time.Minute,
+		H:                 herodot.NewJSONWriter(l),
+		L:                 l,
+		IssuerURL:         ts.URL,
+		OpenIDJWTStrategy: jwtStrategy,
 	}
 
 	handler.SetRoutes(router)

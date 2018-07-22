@@ -38,9 +38,24 @@ const (
 )
 
 type Handler struct {
-	Manager    Manager
-	Generators map[string]KeyGenerator
-	H          herodot.Writer
+	Manager       Manager
+	Generators    map[string]KeyGenerator
+	H             herodot.Writer
+	WellKnownKeys []string
+}
+
+func NewHandler(
+	manager Manager,
+	generators map[string]KeyGenerator,
+	h herodot.Writer,
+	wellKnownKeys []string,
+) *Handler {
+	return &Handler{
+		Manager:       manager,
+		Generators:    generators,
+		H:             h,
+		WellKnownKeys: append(wellKnownKeys, IDTokenKeyName),
+	}
 }
 
 func (h *Handler) GetGenerators() map[string]KeyGenerator {
@@ -92,19 +107,25 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //       403: genericError
 //       500: genericError
 func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	keys, err := h.Manager.GetKeySet(IDTokenKeyName)
-	if err != nil {
-		h.H.WriteError(w, r, err)
-		return
+	var jwks jose.JSONWebKeySet
+
+	for _, set := range h.WellKnownKeys {
+		keys, err := h.Manager.GetKeySet(set)
+		if err != nil {
+			h.H.WriteError(w, r, err)
+			return
+		}
+
+		keys, err = FindKeysByPrefix(keys, "public")
+		if err != nil {
+			h.H.WriteError(w, r, err)
+			return
+		}
+
+		jwks.Keys = append(jwks.Keys, keys.Keys...)
 	}
 
-	keys, err = FindKeysByPrefix(keys, "public")
-	if err != nil {
-		h.H.WriteError(w, r, err)
-		return
-	}
-
-	h.H.Write(w, r, keys)
+	h.H.Write(w, r, &jwks)
 }
 
 // swagger:route GET /keys/{set}/{kid} jsonWebKey getJsonWebKey

@@ -25,6 +25,7 @@ import (
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/oauth2"
 	"github.com/ory/sqlcon"
 )
 
@@ -60,12 +61,19 @@ func newJWKHandler(c *config.Config, router *httprouter.Router) *jwk.Handler {
 	ctx := c.Context()
 	w := herodot.NewJSONWriter(c.GetLogger())
 	w.ErrorEnhancer = writerErrorEnhancer
+	var wellKnown []string
+
+	if c.OAuth2AccessTokenStrategy == "jwt" {
+		wellKnown = append(wellKnown, oauth2.OAuth2JWTKeyName)
+	}
 
 	expectDependency(c.GetLogger(), ctx.KeyManager)
-	h := &jwk.Handler{
-		H:       w,
-		Manager: ctx.KeyManager,
-	}
+	h := jwk.NewHandler(
+		ctx.KeyManager,
+		nil,
+		w,
+		wellKnown,
+	)
 	h.SetRoutes(router)
 	return h
 }

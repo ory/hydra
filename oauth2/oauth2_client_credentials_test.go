@@ -77,7 +77,7 @@ func TestClientCredentials(t *testing.T) {
 	handler.SetRoutes(router)
 
 	require.NoError(t, store.CreateClient(&hc.Client{
-		ID:            "app-client",
+		ClientID:      "app-client",
 		Secret:        "secret",
 		RedirectURIs:  []string{ts.URL + "/callback"},
 		ResponseTypes: []string{"token"},

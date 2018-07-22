@@ -63,6 +63,10 @@ func (s *Session) GetJWTClaims() *jwt.JWTClaims {
 		// Scope:     s.Scope,
 	}
 
+	if claims.Extra == nil {
+		claims.Extra = map[string]interface{}{}
+	}
+
 	claims.Extra["client_id"] = s.ClientID
 	return claims
 }

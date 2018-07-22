@@ -34,14 +34,14 @@ func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
 	return func(t *testing.T) {
 		t.Parallel()
 		c := &Client{
-			ID:                "foo",
+			ClientID:          "foo",
 			Secret:            "secret",
 			RedirectURIs:      []string{"http://redirect"},
 			TermsOfServiceURI: "foo",
 		}
 		assert.NoError(t, m.CreateClient(c))
 		//assert.NotEmpty(t, c.ID)
-		assert.NoError(t, m.DeleteClient(c.ID))
+		assert.NoError(t, m.DeleteClient(c.GetID()))
 	}
 }
 
@@ -49,7 +49,7 @@ func TestHelperClientAuthenticate(k string, m Manager) func(t *testing.T) {
 	return func(t *testing.T) {
 		t.Parallel()
 		m.CreateClient(&Client{
-			ID:           "1234321",
+			ClientID:     "1234321",
 			Secret:       "secret",
 			RedirectURIs: []string{"http://redirect"},
 		})
@@ -59,7 +59,7 @@ func TestHelperClientAuthenticate(k string, m Manager) func(t *testing.T) {
 
 		c, err = m.Authenticate("1234321", []byte("secret"))
 		require.NoError(t, err)
-		assert.Equal(t, "1234321", c.ID)
+		assert.Equal(t, "1234321", c.GetID())
 	}
 }
 
@@ -70,7 +70,7 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 		assert.NotNil(t, err)
 
 		c := &Client{
-			ID:                            "1234",
+			ClientID:                      "1234",
 			Name:                          "name",
 			Secret:                        "secret",
 			RedirectURIs:                  []string{"http://redirect", "http://redirect1"},
@@ -100,7 +100,7 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 		}
 
 		assert.NoError(t, m.CreateClient(&Client{
-			ID:                "2-1234",
+			ClientID:          "2-1234",
 			Name:              "name",
 			Secret:            "secret",
 			RedirectURIs:      []string{"http://redirect"},
@@ -116,8 +116,8 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 		ds, err := m.GetClients(100, 0)
 		assert.NoError(t, err)
 		assert.Len(t, ds, 2)
-		assert.NotEqual(t, ds["1234"].ID, ds["2-1234"].ID)
-		assert.NotEqual(t, ds["1234"].ID, ds["2-1234"].ClientID)
+		assert.NotEqual(t, ds["1234"].ClientID, ds["2-1234"].ClientID)
+		assert.NotEqual(t, ds["1234"].ClientID, ds["2-1234"].ClientID)
 
 		//test if SecretExpiresAt was set properly
 		assert.Equal(t, ds["1234"].SecretExpiresAt, 0)
@@ -132,7 +132,7 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 		assert.Len(t, ds, 0)
 
 		err = m.UpdateClient(&Client{
-			ID:                "2-1234",
+			ClientID:          "2-1234",
 			Name:              "name-new",
 			Secret:            "secret-new",
 			RedirectURIs:      []string{"http://redirect/new"},

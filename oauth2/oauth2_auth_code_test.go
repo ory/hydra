@@ -179,13 +179,13 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			api := httptest.NewServer(apiRouter)
 
 			client := hc.Client{
-				ID: "e2e-app-client" + km, Secret: "secret", RedirectURIs: []string{ts.URL + "/callback"},
+				ClientID: "e2e-app-client" + km, Secret: "secret", RedirectURIs: []string{ts.URL + "/callback"},
 				ResponseTypes: []string{"id_token", "code", "token"},
 				GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
 				Scope:         "hydra offline openid",
 			}
 			oauthConfig := &oauth2.Config{
-				ClientID: client.ID, ClientSecret: client.Secret,
+				ClientID: client.GetID(), ClientSecret: client.Secret,
 				Endpoint:    oauth2.Endpoint{AuthURL: ts.URL + "/oauth2/auth", TokenURL: ts.URL + "/oauth2/token"},
 				RedirectURL: client.RedirectURIs[0], Scopes: []string{"hydra", "offline", "openid"},
 			}
@@ -225,7 +225,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							require.EqualValues(t, http.StatusOK, res.StatusCode)
 							assert.False(t, rr.Skip)
 							assert.Empty(t, rr.Subject)
-							assert.EqualValues(t, client.ID, rr.Client.ClientId)
+							assert.EqualValues(t, client.GetID(), rr.Client.ClientId)
 							assert.EqualValues(t, client.GrantTypes, rr.Client.GrantTypes)
 							assert.EqualValues(t, client.LogoURI, rr.Client.LogoUri)
 							assert.EqualValues(t, client.RedirectURIs, rr.Client.RedirectUris)
@@ -249,7 +249,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							require.EqualValues(t, http.StatusOK, res.StatusCode)
 							assert.False(t, rr.Skip)
 							assert.EqualValues(t, "user-a", rr.Subject)
-							assert.EqualValues(t, client.ID, rr.Client.ClientId)
+							assert.EqualValues(t, client.GetID(), rr.Client.ClientId)
 							assert.EqualValues(t, client.GrantTypes, rr.Client.GrantTypes)
 							assert.EqualValues(t, client.LogoURI, rr.Client.LogoUri)
 							assert.EqualValues(t, client.RedirectURIs, rr.Client.RedirectUris)
@@ -645,7 +645,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 	m := sync.Mutex{}
 
 	store.CreateClient(&hc.Client{
-		ID:            "app-client",
+		ClientID:      "app-client",
 		Secret:        "secret",
 		RedirectURIs:  []string{ts.URL + "/callback"},
 		ResponseTypes: []string{"id_token", "code", "token"},

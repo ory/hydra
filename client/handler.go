@@ -152,7 +152,6 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		secret = c.Secret
 	}
 
-	c.ID = ps.ByName("id")
 	c.ClientID = ps.ByName("id")
 	if err := h.Validator.Validate(&c); err != nil {
 		h.H.WriteError(w, r, err)

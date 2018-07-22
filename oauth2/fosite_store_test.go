@@ -40,7 +40,7 @@ import (
 
 var fositeStores = map[string]pkg.FositeStorer{}
 var clientManager = &client.MemoryManager{
-	Clients: []client.Client{{ID: "foobar"}},
+	Clients: []client.Client{{ClientID: "foobar"}},
 	Hasher:  &fosite.BCrypt{},
 }
 var databases = make(map[string]*sqlx.DB)

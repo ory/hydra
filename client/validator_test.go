@@ -44,28 +44,24 @@ func TestValidate(t *testing.T) {
 			in: new(Client),
 			check: func(t *testing.T, c *Client) {
 				assert.NotEmpty(t, c.ClientID)
-				assert.NotEmpty(t, c.ID)
-				assert.Equal(t, c.ID, c.ClientID)
-			},
-		},
-		{
-			in: &Client{ID: "foo"},
-			check: func(t *testing.T, c *Client) {
-				assert.Equal(t, c.ID, c.ClientID)
+				assert.NotEmpty(t, c.GetID())
+				assert.Equal(t, c.GetID(), c.ClientID)
 			},
 		},
 		{
 			in: &Client{ClientID: "foo"},
 			check: func(t *testing.T, c *Client) {
-				assert.Equal(t, c.ID, c.ClientID)
+				assert.Equal(t, c.GetID(), c.ClientID)
+			},
+		},
+		{
+			in: &Client{ClientID: "foo"},
+			check: func(t *testing.T, c *Client) {
+				assert.Equal(t, c.GetID(), c.ClientID)
 			},
 		},
 		{
 			in:        &Client{ClientID: "foo", UserinfoSignedResponseAlg: "foo"},
-			expectErr: true,
-		},
-		{
-			in:        &Client{ClientID: "foo", ID: "bar"},
 			expectErr: true,
 		},
 		{

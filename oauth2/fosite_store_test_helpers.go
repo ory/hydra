@@ -36,7 +36,7 @@ import (
 
 var defaultRequest = fosite.Request{
 	RequestedAt:   time.Now().UTC().Round(time.Second),
-	Client:        &client.Client{ID: "foobar"},
+	Client:        &client.Client{ClientID: "foobar"},
 	Scopes:        fosite.Arguments{"fa", "ba"},
 	GrantedScopes: fosite.Arguments{"fa", "ba"},
 	Form:          url.Values{"foo": []string{"bar", "baz"}},
@@ -92,10 +92,10 @@ func TestHelperRevokeRefreshToken(m pkg.FositeStorer) func(t *testing.T) {
 		_, err := m.GetRefreshTokenSession(ctx, "1111", &fosite.DefaultSession{})
 		assert.NotNil(t, err)
 
-		err = m.CreateRefreshTokenSession(ctx, "1111", &fosite.Request{ID: id, Client: &client.Client{ID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &fosite.DefaultSession{}})
+		err = m.CreateRefreshTokenSession(ctx, "1111", &fosite.Request{ID: id, Client: &client.Client{ClientID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &fosite.DefaultSession{}})
 		require.NoError(t, err)
 
-		err = m.CreateRefreshTokenSession(ctx, "1122", &fosite.Request{ID: id, Client: &client.Client{ID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &fosite.DefaultSession{}})
+		err = m.CreateRefreshTokenSession(ctx, "1122", &fosite.Request{ID: id, Client: &client.Client{ClientID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &fosite.DefaultSession{}})
 		require.NoError(t, err)
 
 		_, err = m.GetRefreshTokenSession(ctx, "1111", &fosite.DefaultSession{})
@@ -184,7 +184,7 @@ var flushRequests = []*fosite.Request{
 	{
 		ID:            "flush-1",
 		RequestedAt:   time.Now().Round(time.Second),
-		Client:        &client.Client{ID: "foobar"},
+		Client:        &client.Client{ClientID: "foobar"},
 		Scopes:        fosite.Arguments{"fa", "ba"},
 		GrantedScopes: fosite.Arguments{"fa", "ba"},
 		Form:          url.Values{"foo": []string{"bar", "baz"}},
@@ -193,7 +193,7 @@ var flushRequests = []*fosite.Request{
 	{
 		ID:            "flush-2",
 		RequestedAt:   time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
-		Client:        &client.Client{ID: "foobar"},
+		Client:        &client.Client{ClientID: "foobar"},
 		Scopes:        fosite.Arguments{"fa", "ba"},
 		GrantedScopes: fosite.Arguments{"fa", "ba"},
 		Form:          url.Values{"foo": []string{"bar", "baz"}},
@@ -202,7 +202,7 @@ var flushRequests = []*fosite.Request{
 	{
 		ID:            "flush-3",
 		RequestedAt:   time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
-		Client:        &client.Client{ID: "foobar"},
+		Client:        &client.Client{ClientID: "foobar"},
 		Scopes:        fosite.Arguments{"fa", "ba"},
 		GrantedScopes: fosite.Arguments{"fa", "ba"},
 		Form:          url.Values{"foo": []string{"bar", "baz"}},

@@ -36,9 +36,6 @@ type Client struct {
 	// ClientID  is the id for this client.
 	ClientID string `json:"client_id"`
 
-	// ID is an alisa for client_id.
-	ID string `json:"id"`
-
 	// Name is the human-readable string name of the client to be presented to the
 	// end-user during authorization.
 	Name string `json:"client_name"`

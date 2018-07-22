@@ -61,7 +61,6 @@ class OAuth2Client implements ArrayAccess
         'client_uri' => 'string',
         'contacts' => 'string[]',
         'grant_types' => 'string[]',
-        'id' => 'string',
         'jwks' => '\Hydra\SDK\Model\JSONWebKeySet',
         'jwks_uri' => 'string',
         'logo_uri' => 'string',
@@ -90,7 +89,6 @@ class OAuth2Client implements ArrayAccess
         'client_uri' => null,
         'contacts' => null,
         'grant_types' => null,
-        'id' => null,
         'jwks' => null,
         'jwks_uri' => null,
         'logo_uri' => null,
@@ -129,7 +127,6 @@ class OAuth2Client implements ArrayAccess
         'client_uri' => 'client_uri',
         'contacts' => 'contacts',
         'grant_types' => 'grant_types',
-        'id' => 'id',
         'jwks' => 'jwks',
         'jwks_uri' => 'jwks_uri',
         'logo_uri' => 'logo_uri',
@@ -159,7 +156,6 @@ class OAuth2Client implements ArrayAccess
         'client_uri' => 'setClientUri',
         'contacts' => 'setContacts',
         'grant_types' => 'setGrantTypes',
-        'id' => 'setId',
         'jwks' => 'setJwks',
         'jwks_uri' => 'setJwksUri',
         'logo_uri' => 'setLogoUri',
@@ -189,7 +185,6 @@ class OAuth2Client implements ArrayAccess
         'client_uri' => 'getClientUri',
         'contacts' => 'getContacts',
         'grant_types' => 'getGrantTypes',
-        'id' => 'getId',
         'jwks' => 'getJwks',
         'jwks_uri' => 'getJwksUri',
         'logo_uri' => 'getLogoUri',
@@ -244,7 +239,6 @@ class OAuth2Client implements ArrayAccess
         $this->container['client_uri'] = isset($data['client_uri']) ? $data['client_uri'] : null;
         $this->container['contacts'] = isset($data['contacts']) ? $data['contacts'] : null;
         $this->container['grant_types'] = isset($data['grant_types']) ? $data['grant_types'] : null;
-        $this->container['id'] = isset($data['id']) ? $data['id'] : null;
         $this->container['jwks'] = isset($data['jwks']) ? $data['jwks'] : null;
         $this->container['jwks_uri'] = isset($data['jwks_uri']) ? $data['jwks_uri'] : null;
         $this->container['logo_uri'] = isset($data['logo_uri']) ? $data['logo_uri'] : null;
@@ -436,27 +430,6 @@ class OAuth2Client implements ArrayAccess
     public function setGrantTypes($grant_types)
     {
         $this->container['grant_types'] = $grant_types;
-
-        return $this;
-    }
-
-    /**
-     * Gets id
-     * @return string
-     */
-    public function getId()
-    {
-        return $this->container['id'];
-    }
-
-    /**
-     * Sets id
-     * @param string $id ID is an alisa for client_id.
-     * @return $this
-     */
-    public function setId($id)
-    {
-        $this->container['id'] = $id;
 
         return $this;
     }

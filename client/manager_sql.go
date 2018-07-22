@@ -213,7 +213,7 @@ func sqlDataFromClient(d *Client) (*sqlData, error) {
 	}
 
 	return &sqlData{
-		ID:                            d.ID,
+		ID:                            d.GetID(),
 		Name:                          d.Name,
 		Secret:                        d.Secret,
 		RedirectURIs:                  strings.Join(d.RedirectURIs, "|"),
@@ -239,7 +239,6 @@ func sqlDataFromClient(d *Client) (*sqlData, error) {
 
 func (d *sqlData) ToClient() (*Client, error) {
 	c := &Client{
-		ID:                            d.ID,
 		ClientID:                      d.ID,
 		Name:                          d.Name,
 		Secret:                        d.Secret,
@@ -301,7 +300,7 @@ func (m *SQLManager) GetClient(_ context.Context, id string) (fosite.Client, err
 }
 
 func (m *SQLManager) UpdateClient(c *Client) error {
-	o, err := m.GetClient(context.Background(), c.ID)
+	o, err := m.GetClient(context.Background(), c.GetID())
 	if err != nil {
 		return errors.WithStack(err)
 	}

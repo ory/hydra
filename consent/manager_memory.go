@@ -69,7 +69,7 @@ func (m *MemoryManager) RevokeUserClientConsentSession(user, client string) erro
 
 	var found bool
 	for k, c := range m.handledConsentRequests {
-		if c.ConsentRequest.Subject == user && (client == "" || (client != "" && c.ConsentRequest.Client.ID == client)) {
+		if c.ConsentRequest.Subject == user && (client == "" || (client != "" && c.ConsentRequest.Client.GetID() == client)) {
 			delete(m.handledConsentRequests, k)
 			delete(m.consentRequests, k)
 			if err := m.store.RevokeAccessToken(nil, c.Challenge); errors.Cause(err) == fosite.ErrNotFound {
@@ -124,7 +124,7 @@ func (m *MemoryManager) GetConsentRequest(challenge string) (*ConsentRequest, er
 	m.m["consentRequests"].RLock()
 	defer m.m["consentRequests"].RUnlock()
 	if c, ok := m.consentRequests[challenge]; ok {
-		c.Client.ClientID = c.Client.ID
+		c.Client.ClientID = c.Client.GetID()
 		return &c, nil
 	}
 	return nil, errors.WithStack(pkg.ErrNotFound)
@@ -151,7 +151,7 @@ func (m *MemoryManager) VerifyAndInvalidateConsentRequest(verifier string) (*Han
 						return nil, err
 					}
 
-					c.Client.ClientID = c.Client.ID
+					c.Client.ClientID = c.Client.GetID()
 					h.ConsentRequest = &c
 					return &h, nil
 				}
@@ -195,7 +195,7 @@ func (m *MemoryManager) FindPreviouslyGrantedConsentRequests(client string, subj
 			continue
 		}
 
-		cr.Client.ClientID = cr.Client.ID
+		cr.Client.ClientID = cr.Client.GetID()
 		c.ConsentRequest = cr
 		rs = append(rs, c)
 	}
@@ -246,7 +246,7 @@ func (m *MemoryManager) GetAuthenticationRequest(challenge string) (*Authenticat
 	m.m["authRequests"].RLock()
 	defer m.m["authRequests"].RUnlock()
 	if c, ok := m.authRequests[challenge]; ok {
-		c.Client.ClientID = c.Client.ID
+		c.Client.ClientID = c.Client.GetID()
 		return &c, nil
 	}
 	return nil, errors.WithStack(pkg.ErrNotFound)
@@ -273,7 +273,7 @@ func (m *MemoryManager) VerifyAndInvalidateAuthenticationRequest(verifier string
 						return nil, err
 					}
 
-					c.Client.ClientID = c.Client.ID
+					c.Client.ClientID = c.Client.GetID()
 					h.AuthenticationRequest = &c
 					return &h, nil
 				}

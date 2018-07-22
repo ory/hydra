@@ -41,10 +41,12 @@ func init() {
 	router := httprouter.New()
 	IDKS, _ = testGenerator.Generate("test-id", "sig")
 
-	h := Handler{
-		Manager: &MemoryManager{},
-		H:       herodot.NewJSONWriter(nil),
-	}
+	h := NewHandler(
+		&MemoryManager{},
+		nil,
+		herodot.NewJSONWriter(nil),
+		[]string{},
+	)
 	h.Manager.AddKeySet(IDTokenKeyName, IDKS)
 	h.SetRoutes(router)
 	testServer = httptest.NewServer(router)

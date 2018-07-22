@@ -149,9 +149,9 @@ func TestUserinfo(t *testing.T) {
 	jwtStrategy, err := jwk.NewRS256JWTStrategy(jm, oauth2.OpenIDConnectKeyName)
 
 	h := &oauth2.Handler{
-		OAuth2:      op,
-		H:           herodot.NewJSONWriter(logrus.New()),
-		JWTStrategy: jwtStrategy,
+		OAuth2:            op,
+		H:                 herodot.NewJSONWriter(logrus.New()),
+		OpenIDJWTStrategy: jwtStrategy,
 	}
 	router := httprouter.New()
 	h.SetRoutes(router)

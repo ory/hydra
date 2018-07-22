@@ -134,6 +134,9 @@ func initConfig() {
 	viper.BindEnv("CLUSTER_URL")
 	viper.SetDefault("CLUSTER_URL", "")
 
+	viper.BindEnv("OAUTH2_ACCESS_TOKEN_STRATEGY")
+	viper.SetDefault("OAUTH2_ACCESS_TOKEN_STRATEGY", "opaque")
+
 	viper.BindEnv("PORT")
 	viper.SetDefault("PORT", 4444)
 

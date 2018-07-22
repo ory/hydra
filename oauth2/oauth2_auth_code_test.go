@@ -169,7 +169,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				H:               herodot.NewJSONWriter(l),
 				ScopeStrategy:   fosite.ExactScopeStrategy,
 				IDTokenLifespan: time.Minute, IssuerURL: ts.URL, ForcedHTTP: true, L: l,
-				JWTStrategy: jwtStrategy,
+				OpenIDJWTStrategy: jwtStrategy,
 			}
 			handler.SetRoutes(router)
 
@@ -626,15 +626,15 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 			compose.OAuth2TokenRevocationFactory,
 			compose.OAuth2TokenIntrospectionFactory,
 		),
-		Consent:         consentStrategy,
-		CookieStore:     sessions.NewCookieStore([]byte("foo-secret")),
-		ForcedHTTP:      true,
-		L:               l,
-		H:               herodot.NewJSONWriter(l),
-		ScopeStrategy:   fosite.HierarchicScopeStrategy,
-		IDTokenLifespan: time.Minute,
-		IssuerURL:       ts.URL,
-		JWTStrategy:     jwtStrategy,
+		Consent:           consentStrategy,
+		CookieStore:       sessions.NewCookieStore([]byte("foo-secret")),
+		ForcedHTTP:        true,
+		L:                 l,
+		H:                 herodot.NewJSONWriter(l),
+		ScopeStrategy:     fosite.HierarchicScopeStrategy,
+		IDTokenLifespan:   time.Minute,
+		IssuerURL:         ts.URL,
+		OpenIDJWTStrategy: jwtStrategy,
 	}
 	handler.SetRoutes(router)
 

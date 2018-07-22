@@ -30,6 +30,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
+	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
@@ -52,7 +53,7 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 		break
 	case *sqlcon.SQLConnection:
 		expectDependency(c.GetLogger(), con.GetDatabase())
-		store = oauth2.NewFositeSQLStore(clients, con.GetDatabase(), c.GetLogger(), c.GetAccessTokenLifespan())
+		store = oauth2.NewFositeSQLStore(clients, con.GetDatabase(), c.GetLogger(), c.GetAccessTokenLifespan(), c.OAuth2AccessTokenStrategy == "jwt")
 		break
 	case *config.PluginConnection:
 		var err error
@@ -99,11 +100,38 @@ func newOAuth2Provider(c *config.Config) fosite.OAuth2Provider {
 	}
 	oidcStrategy := &openid.DefaultStrategy{JWTStrategy: jwtStrategy}
 
+	var coreStrategy foauth2.CoreStrategy
+	hmacStrategy := compose.NewOAuth2HMACStrategy(fc, c.GetSystemSecret())
+	if c.OAuth2AccessTokenStrategy == "jwt" {
+		kid := uuid.New()
+		if _, err := createOrGetJWK(c, oauth2.OAuth2JWTKeyName, kid, "private"); err != nil {
+			c.GetLogger().WithError(err).Fatalf(`Could not fetch private signing key for OAuth 2.0 Access Tokens - did you forget to run "hydra migrate sql" or forget to set the SYSTEM_SECRET?`)
+		}
+
+		if _, err := createOrGetJWK(c, oauth2.OAuth2JWTKeyName, kid, "public"); err != nil {
+			c.GetLogger().WithError(err).Fatalf(`Could not fetch public signing key for OAuth 2.0 Access Tokens - did you forget to run "hydra migrate sql" or forget to set the SYSTEM_SECRET?`)
+		}
+
+		jwtStrategy, err := jwk.NewRS256JWTStrategy(c.Context().KeyManager, oauth2.OAuth2JWTKeyName)
+		if err != nil {
+			c.GetLogger().WithError(err).Fatalf("Unable to refresh Access Token signing keys.")
+		}
+
+		coreStrategy = &foauth2.DefaultJWTStrategy{
+			JWTStrategy:     jwtStrategy,
+			HMACSHAStrategy: hmacStrategy,
+		}
+	} else if c.OAuth2AccessTokenStrategy == "opaque" {
+		coreStrategy = hmacStrategy
+	} else {
+		c.GetLogger().Fatalf(`Environment variable OAUTH2_ACCESS_TOKEN_STRATEGY is set to "%s" but only "opaque" and "jwt" are valid values.`, c.OAuth2AccessTokenStrategy)
+	}
+
 	return compose.Compose(
 		fc,
 		store,
 		&compose.CommonStrategy{
-			CoreStrategy:               compose.NewOAuth2HMACStrategy(fc, c.GetSystemSecret()),
+			CoreStrategy:               coreStrategy,
 			OpenIDConnectTokenStrategy: oidcStrategy,
 			JWTStrategy:                jwtStrategy,
 		},
@@ -148,12 +176,20 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm consent.Ma
 	errorURL, err := url.Parse(c.ErrorURL)
 	pkg.Must(err, "Could not parse error url %s.", errorURL)
 
-	jwtStrategy, err := jwk.NewRS256JWTStrategy(c.Context().KeyManager, oauth2.OpenIDConnectKeyName)
+	openIDJWTStrategy, err := jwk.NewRS256JWTStrategy(c.Context().KeyManager, oauth2.OpenIDConnectKeyName)
 	pkg.Must(err, "Could not fetch private signing key for OpenID Connect - did you forget to run \"hydra migrate sql\" or forget to set the SYSTEM_SECRET?")
-	oidcStrategy := &openid.DefaultStrategy{JWTStrategy: jwtStrategy}
+	oidcStrategy := &openid.DefaultStrategy{JWTStrategy: openIDJWTStrategy}
 
 	w := herodot.NewJSONWriter(c.GetLogger())
 	w.ErrorEnhancer = writerErrorEnhancer
+	var accessTokenJWTStrategy *jwk.RS256JWTStrategy
+
+	if c.OAuth2AccessTokenStrategy == "jwt" {
+		accessTokenJWTStrategy, err = jwk.NewRS256JWTStrategy(c.Context().KeyManager, oauth2.OAuth2JWTKeyName)
+		if err != nil {
+			c.GetLogger().WithError(err).Fatalf("Unable to refresh Access Token signing keys.")
+		}
+	}
 
 	handler := &oauth2.Handler{
 		ScopesSupported:  c.OpenIDDiscoveryScopesSupported,
@@ -170,15 +206,16 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm consent.Ma
 			oidcStrategy,
 			openid.NewOpenIDConnectRequestValidator(nil, oidcStrategy),
 		),
-		Storage:             c.Context().FositeStore,
-		ErrorURL:            *errorURL,
-		H:                   w,
-		AccessTokenLifespan: c.GetAccessTokenLifespan(),
-		CookieStore:         sessions.NewCookieStore(c.GetCookieSecret()),
-		IssuerURL:           c.Issuer,
-		L:                   c.GetLogger(),
-		JWTStrategy:         jwtStrategy,
-		IDTokenLifespan:     c.GetIDTokenLifespan(),
+		Storage:                c.Context().FositeStore,
+		ErrorURL:               *errorURL,
+		H:                      w,
+		AccessTokenLifespan:    c.GetAccessTokenLifespan(),
+		CookieStore:            sessions.NewCookieStore(c.GetCookieSecret()),
+		IssuerURL:              c.Issuer,
+		L:                      c.GetLogger(),
+		OpenIDJWTStrategy:      openIDJWTStrategy,
+		AccessTokenJWTStrategy: accessTokenJWTStrategy,
+		IDTokenLifespan:        c.GetIDTokenLifespan(),
 	}
 
 	handler.SetRoutes(router)

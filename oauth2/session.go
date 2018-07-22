@@ -28,9 +28,13 @@ import (
 )
 
 type Session struct {
+	// JSON fields are needed for store serialization
 	*openid.DefaultSession `json:"idToken"`
 	Audience               []string
 	Extra                  map[string]interface{} `json:"extra"`
+	JTI                    string
+	KID                    string
+	ClientID               string
 }
 
 func NewSession(subject string) *Session {
@@ -42,6 +46,30 @@ func NewSession(subject string) *Session {
 		},
 		Audience: []string{},
 		Extra:    map[string]interface{}{},
+	}
+}
+
+func (s *Session) GetJWTClaims() *jwt.JWTClaims {
+	claims := &jwt.JWTClaims{
+		Subject:   s.Subject,
+		Audience:  s.Audience,
+		JTI:       s.JTI,
+		IssuedAt:  s.DefaultSession.Claims.IssuedAt,
+		Issuer:    s.DefaultSession.Claims.Issuer,
+		NotBefore: s.DefaultSession.Claims.IssuedAt,
+		ExpiresAt: s.GetExpiresAt(fosite.AccessToken),
+		Extra:     s.Extra,
+		// These are set by the DefaultJWTStrategy
+		// Scope:     s.Scope,
+	}
+
+	claims.Extra["client_id"] = s.ClientID
+	return claims
+}
+
+func (s *Session) GetJWTHeader() *jwt.Headers {
+	return &jwt.Headers{
+		Extra: map[string]interface{}{"kid": s.KID},
 	}
 }
 

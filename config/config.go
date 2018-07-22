@@ -78,6 +78,7 @@ type Config struct {
 	OpenIDDiscoveryScopesSupported   string `mapstructure:"OIDC_DISCOVERY_SCOPES_SUPPORTED" yaml:"-"`
 	OpenIDDiscoveryUserinfoEndpoint  string `mapstructure:"OIDC_DISCOVERY_USERINFO_ENDPOINT" yaml:"-"`
 	SendOAuth2DebugMessagesToClients bool   `mapstructure:"OAUTH2_SHARE_ERROR_DEBUG" yaml:"-"`
+	OAuth2AccessTokenStrategy        string `mapstructure:"OAUTH2_ACCESS_TOKEN_STRATEGY" yaml:"-"`
 	ForceHTTP                        bool   `yaml:"-"`
 
 	BuildVersion string                     `yaml:"-"`

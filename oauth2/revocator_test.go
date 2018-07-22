@@ -79,8 +79,8 @@ func TestRevoke(t *testing.T) {
 			compose.OAuth2TokenIntrospectionFactory,
 			compose.OAuth2TokenRevocationFactory,
 		),
-		H:           herodot.NewJSONWriter(nil),
-		JWTStrategy: jwtStrategy,
+		H:                 herodot.NewJSONWriter(nil),
+		OpenIDJWTStrategy: jwtStrategy,
 	}
 
 	router := httprouter.New()

@@ -22,6 +22,7 @@ package oauth2
 
 import (
 	"context"
+	"crypto/sha512"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -43,18 +44,21 @@ type FositeSQLStore struct {
 	DB                  *sqlx.DB
 	L                   logrus.FieldLogger
 	AccessTokenLifespan time.Duration
+	HashSignature       bool
 }
 
 func NewFositeSQLStore(m client.Manager,
 	db *sqlx.DB,
 	l logrus.FieldLogger,
 	accessTokenLifespan time.Duration,
+	hashSignature bool,
 ) *FositeSQLStore {
 	return &FositeSQLStore{
 		Manager:             m,
 		L:                   l,
 		DB:                  db,
 		AccessTokenLifespan: accessTokenLifespan,
+		HashSignature:       hashSignature,
 	}
 }
 
@@ -253,7 +257,17 @@ func (s *sqlData) toRequest(session fosite.Session, cm client.Manager, logger lo
 	return r, nil
 }
 
+// hashSignature prevents errors where the signature is longer than 128 characters (and thus doesn't fit into the pk).
+func (s *FositeSQLStore) hashSignature(signature, table string) string {
+	if table == sqlTableAccess && s.HashSignature {
+		return fmt.Sprintf("%x", sha512.Sum384([]byte(signature)))
+	}
+	return signature
+}
+
 func (s *FositeSQLStore) createSession(signature string, requester fosite.Requester, table string) error {
+	signature = s.hashSignature(signature, table)
+
 	data, err := sqlSchemaFromRequest(signature, requester, s.L)
 	if err != nil {
 		return err
@@ -272,6 +286,8 @@ func (s *FositeSQLStore) createSession(signature string, requester fosite.Reques
 }
 
 func (s *FositeSQLStore) findSessionBySignature(signature string, session fosite.Session, table string) (fosite.Requester, error) {
+	signature = s.hashSignature(signature, table)
+
 	var d sqlData
 	if err := s.DB.Get(&d, s.DB.Rebind(fmt.Sprintf("SELECT * FROM hydra_oauth2_%s WHERE signature=?", table)), signature); err == sql.ErrNoRows {
 		return nil, errors.Wrap(fosite.ErrNotFound, "")
@@ -291,6 +307,8 @@ func (s *FositeSQLStore) findSessionBySignature(signature string, session fosite
 }
 
 func (s *FositeSQLStore) deleteSession(signature string, table string) error {
+	signature = s.hashSignature(signature, table)
+
 	if _, err := s.DB.Exec(s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE signature=?", table)), signature); err != nil {
 		return sqlcon.HandleError(err)
 	}

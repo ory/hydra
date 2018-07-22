@@ -36,11 +36,13 @@ import (
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/pkg"
+	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 )
 
 const (
 	OpenIDConnectKeyName = "hydra.openid.id-token"
+	OAuth2JWTKeyName     = "hydra.jwt.access-token"
 
 	DefaultConsentPath = "/oauth2/fallbacks/consent"
 	DefaultErrorPath   = "/oauth2/fallbacks/error"
@@ -272,13 +274,13 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request, _ http
 		delete(interim, "exp")
 		delete(interim, "jti")
 
-		keyID, err := h.JWTStrategy.GetPublicKeyID()
+		keyID, err := h.OpenIDJWTStrategy.GetPublicKeyID()
 		if err != nil {
 			h.H.WriteError(w, r, err)
 			return
 		}
 
-		token, _, err := h.JWTStrategy.Generate(jwt2.MapClaims(interim), &jwt.Headers{
+		token, _, err := h.OpenIDJWTStrategy.Generate(jwt2.MapClaims(interim), &jwt.Headers{
 			Extra: map[string]interface{}{
 				"kid": keyID,
 			},
@@ -473,7 +475,23 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprou
 	}
 
 	if accessRequest.GetGrantTypes().Exact("client_credentials") {
+		var accessTokenKeyID string
+		if h.AccessTokenJWTStrategy != nil {
+			accessTokenKeyID, err = h.AccessTokenJWTStrategy.GetPublicKeyID()
+			if err != nil {
+				pkg.LogError(err, h.L)
+				h.OAuth2.WriteAccessError(w, accessRequest, err)
+				return
+			}
+		}
+
 		session.Subject = accessRequest.GetClient().GetID()
+		session.ClientID = accessRequest.GetClient().GetID()
+		session.JTI = uuid.New()
+		session.KID = accessTokenKeyID
+		session.DefaultSession.Claims.Issuer = strings.TrimRight(h.IssuerURL, "/") + "/"
+		session.DefaultSession.Claims.IssuedAt = time.Now().UTC()
+
 		for _, scope := range accessRequest.GetRequestedScopes() {
 			if h.ScopeStrategy(accessRequest.GetClient().GetScopes(), scope) {
 				accessRequest.GrantScope(scope)
@@ -533,11 +551,21 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		authorizeRequest.GrantScope(scope)
 	}
 
-	keyID, err := h.JWTStrategy.GetPublicKeyID()
+	openIDKeyID, err := h.OpenIDJWTStrategy.GetPublicKeyID()
 	if err != nil {
 		pkg.LogError(err, h.L)
 		h.writeAuthorizeError(w, authorizeRequest, err)
 		return
+	}
+
+	var accessTokenKeyID string
+	if h.AccessTokenJWTStrategy != nil {
+		accessTokenKeyID, err = h.AccessTokenJWTStrategy.GetPublicKeyID()
+		if err != nil {
+			pkg.LogError(err, h.L)
+			h.writeAuthorizeError(w, authorizeRequest, err)
+			return
+		}
 	}
 
 	authorizeRequest.SetID(session.Challenge)
@@ -557,12 +585,15 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 				Extra:       session.Session.IDToken,
 			},
 			// required for lookup on jwk endpoint
-			Headers: &jwt.Headers{Extra: map[string]interface{}{"kid": keyID}},
+			Headers: &jwt.Headers{Extra: map[string]interface{}{"kid": openIDKeyID}},
 			Subject: session.ConsentRequest.Subject,
 		},
 		Extra: session.Session.AccessToken,
 		// Here, we do not include the client because it's typically not the audience.
 		Audience: []string{},
+		JTI:      uuid.New(),
+		KID:      accessTokenKeyID,
+		ClientID: authorizeRequest.GetClient().GetID(),
 	})
 	if err != nil {
 		pkg.LogError(err, h.L)

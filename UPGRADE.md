@@ -114,7 +114,7 @@ ambiguity the `public` flag was removed.
 If you wish to create a client that runs on an untrusted device (browser app, mobile app), simply set `"token_endpoint_auth_method": "none"`
 in the JSON request.
 
-If you are using the ORY Hydra CLI, you can use `--token-endpoint-auth-method none` to achieve what `--public` did
+If you are using the ORY Hydra CLI, you can use `--token-endpoint-auth-method none` to achieve what `--is-public` did
 previously.
 
 The SQL migrations will automatically migrate clients that have `public` set to `true` by setting `token_endpoint_auth_method`

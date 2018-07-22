@@ -80,7 +80,7 @@ func TestExecute(t *testing.T) {
 		},
 		{args: []string{"clients", "create", "--endpoint", endpoint, "--id", "foobarbaz", "--secret", "foobar", "-g", "client_credentials"}},
 		{args: []string{"clients", "get", "--endpoint", endpoint, "foobarbaz"}},
-		{args: []string{"clients", "create", "--endpoint", endpoint, "--id", "public-foo", "--is-public"}},
+		{args: []string{"clients", "create", "--endpoint", endpoint, "--id", "public-foo"}},
 		{args: []string{"clients", "delete", "--endpoint", endpoint, "public-foo"}},
 		{args: []string{"keys", "create", "foo", "--endpoint", endpoint, "-a", "HS256"}},
 		{args: []string{"keys", "get", "--endpoint", endpoint, "foo"}},

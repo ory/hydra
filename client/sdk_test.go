@@ -140,7 +140,7 @@ func TestClientSDK(t *testing.T) {
 
 	t.Run("case=public client is transmitted without secret", func(t *testing.T) {
 		result, response, err := c.CreateOAuth2Client(hydra.OAuth2Client{
-			Public: true,
+			TokenEndpointAuthMethod: "none",
 		})
 		require.NoError(t, err)
 		require.EqualValues(t, http.StatusCreated, response.StatusCode, "%s", response.Payload)

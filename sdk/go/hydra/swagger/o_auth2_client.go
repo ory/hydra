@@ -50,9 +50,6 @@ type OAuth2Client struct {
 	// PolicyURI is a URL string that points to a human-readable privacy policy document that describes how the deployment organization collects, uses, retains, and discloses personal data.
 	PolicyUri string `json:"policy_uri,omitempty"`
 
-	// Public is a boolean that identifies this client as public, meaning that it does not have a secret. It will disable the client_credentials grant type for this client if set.
-	Public bool `json:"public,omitempty"`
-
 	// RedirectURIs is an array of allowed redirect urls for the client, for example http://mydomain/oauth/callback .
 	RedirectUris []string `json:"redirect_uris,omitempty"`
 

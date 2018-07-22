@@ -112,7 +112,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	}
 
 	c.Secret = ""
-	if !c.Public {
+	if !c.IsPublic() {
 		c.Secret = secret
 	}
 	h.H.WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)

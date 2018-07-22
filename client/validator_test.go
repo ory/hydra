@@ -69,19 +69,11 @@ func TestValidate(t *testing.T) {
 			expectErr: true,
 		},
 		{
-			in:        &Client{ClientID: "foo", Public: true, TokenEndpointAuthMethod: "client_secret_basic"},
+			in:        &Client{ClientID: "foo", TokenEndpointAuthMethod: "private_key_jwt"},
 			expectErr: true,
 		},
 		{
-			in:        &Client{ClientID: "foo", Public: false, TokenEndpointAuthMethod: "none"},
-			expectErr: true,
-		},
-		{
-			in:        &Client{ClientID: "foo", Public: false, TokenEndpointAuthMethod: "private_key_jwt"},
-			expectErr: true,
-		},
-		{
-			in:        &Client{ClientID: "foo", Public: false, JSONWebKeys: &jose.JSONWebKeySet{}, JSONWebKeysURI: "asdf", TokenEndpointAuthMethod: "private_key_jwt"},
+			in:        &Client{ClientID: "foo", JSONWebKeys: &jose.JSONWebKeySet{}, JSONWebKeysURI: "asdf", TokenEndpointAuthMethod: "private_key_jwt"},
 			expectErr: true,
 		},
 	} {

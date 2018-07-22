@@ -83,7 +83,6 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 			ClientURI:                     "http://client",
 			LogoURI:                       "http://logo",
 			Contacts:                      []string{"aeneas1", "aeneas2"},
-			Public:                        true,
 			SecretExpiresAt:               0,
 			SectorIdentifierURI:           "https://sector",
 			JSONWebKeys:                   &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{{KeyID: "foo", Key: []byte("asdf"), Certificates: []*x509.Certificate{}}}},

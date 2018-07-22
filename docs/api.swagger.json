@@ -2354,11 +2354,6 @@
           "type": "string",
           "x-go-name": "PolicyURI"
         },
-        "public": {
-          "description": "Public is a boolean that identifies this client as public, meaning that it\ndoes not have a secret. It will disable the client_credentials grant type for this client if set.",
-          "type": "boolean",
-          "x-go-name": "Public"
-        },
         "redirect_uris": {
           "description": "RedirectURIs is an array of allowed redirect urls for the client, for example http://mydomain/oauth/callback .",
           "type": "array",

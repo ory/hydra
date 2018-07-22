@@ -71,6 +71,15 @@ var createClientMigrations = []*migrate.Migration{
 			`DELETE FROM hydra_client WHERE id='4-data'`,
 		},
 	},
+	{
+		Id: "5-data",
+		Up: []string{
+			`INSERT INTO hydra_client (id, client_name, client_secret, redirect_uris, grant_types, response_types, scope, owner, policy_uri, tos_uri, client_uri, logo_uri, contacts, client_secret_expires_at, sector_identifier_uri, jwks, jwks_uri, token_endpoint_auth_method, request_uris, request_object_signing_alg, userinfo_signed_response_alg) VALUES ('5-data', 'some-client', 'abcdef', 'http://localhost|http://google', 'authorize_code|implicit', 'token|id_token', 'foo|bar', 'aeneas', 'http://policy', 'http://tos', 'http://client', 'http://logo', 'aeneas|foo', 0, 'http://sector', '{"keys": []}', 'http://jwks', 'none', 'http://uri1|http://uri2', 'rs256', 'rs526')`,
+		},
+		Down: []string{
+			`DELETE FROM hydra_client WHERE id='5-data'`,
+		},
+	},
 }
 
 var migrations = map[string]*migrate.MemoryMigrationSource{
@@ -85,6 +94,8 @@ var migrations = map[string]*migrate.MemoryMigrationSource{
 			createClientMigrations[2],
 			client.Migrations["mysql"].Migrations[3],
 			createClientMigrations[3],
+			client.Migrations["mysql"].Migrations[4],
+			createClientMigrations[4],
 		},
 	},
 	"postgres": {
@@ -98,6 +109,8 @@ var migrations = map[string]*migrate.MemoryMigrationSource{
 			createClientMigrations[2],
 			client.Migrations["postgres"].Migrations[3],
 			createClientMigrations[3],
+			client.Migrations["postgres"].Migrations[4],
+			createClientMigrations[4],
 		},
 	},
 }
@@ -136,7 +149,7 @@ func TestMigrations(t *testing.T) {
 				})
 			}
 
-			for _, key := range []string{"1-data", "2-data", "3-data", "4-data"} {
+			for _, key := range []string{"1-data", "2-data", "3-data", "4-data", "5-data"} {
 				t.Run("client="+key, func(t *testing.T) {
 					s := &client.SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}
 					c, err := s.GetConcreteClient(key)

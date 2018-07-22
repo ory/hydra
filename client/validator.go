@@ -56,17 +56,9 @@ func (v *Validator) Validate(c *Client) error {
 	}
 
 	if c.TokenEndpointAuthMethod == "" {
-		if c.Public {
-			c.TokenEndpointAuthMethod = "none"
-		} else {
-			c.TokenEndpointAuthMethod = "client_secret_basic"
-		}
+		c.TokenEndpointAuthMethod = "client_secret_basic"
 	} else {
-		if c.Public && c.TokenEndpointAuthMethod != "none" {
-			return errors.WithStack(fosite.ErrInvalidRequest.WithHint("If field public is true, then token_endpoint_auth_method must be \"none\"."))
-		} else if !c.Public && c.TokenEndpointAuthMethod == "none" {
-			return errors.WithStack(fosite.ErrInvalidRequest.WithHint("If field public is false, then token_endpoint_auth_method can not be \"none\"."))
-		} else if len(c.JSONWebKeysURI) == 0 && c.JSONWebKeys == nil && c.TokenEndpointAuthMethod == "private_key_jwt" {
+		if len(c.JSONWebKeysURI) == 0 && c.JSONWebKeys == nil && c.TokenEndpointAuthMethod == "private_key_jwt" {
 			return errors.WithStack(fosite.ErrInvalidRequest.WithHint("When token_endpoint_auth_method is \"private_key_jwt\", either jwks or jwks_uri must be set."))
 		}
 	}

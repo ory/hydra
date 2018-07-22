@@ -67,7 +67,6 @@ class OAuth2Client implements ArrayAccess
         'logo_uri' => 'string',
         'owner' => 'string',
         'policy_uri' => 'string',
-        'public' => 'bool',
         'redirect_uris' => 'string[]',
         'request_object_signing_alg' => 'string',
         'request_uris' => 'string[]',
@@ -97,7 +96,6 @@ class OAuth2Client implements ArrayAccess
         'logo_uri' => null,
         'owner' => null,
         'policy_uri' => null,
-        'public' => null,
         'redirect_uris' => null,
         'request_object_signing_alg' => null,
         'request_uris' => null,
@@ -137,7 +135,6 @@ class OAuth2Client implements ArrayAccess
         'logo_uri' => 'logo_uri',
         'owner' => 'owner',
         'policy_uri' => 'policy_uri',
-        'public' => 'public',
         'redirect_uris' => 'redirect_uris',
         'request_object_signing_alg' => 'request_object_signing_alg',
         'request_uris' => 'request_uris',
@@ -168,7 +165,6 @@ class OAuth2Client implements ArrayAccess
         'logo_uri' => 'setLogoUri',
         'owner' => 'setOwner',
         'policy_uri' => 'setPolicyUri',
-        'public' => 'setPublic',
         'redirect_uris' => 'setRedirectUris',
         'request_object_signing_alg' => 'setRequestObjectSigningAlg',
         'request_uris' => 'setRequestUris',
@@ -199,7 +195,6 @@ class OAuth2Client implements ArrayAccess
         'logo_uri' => 'getLogoUri',
         'owner' => 'getOwner',
         'policy_uri' => 'getPolicyUri',
-        'public' => 'getPublic',
         'redirect_uris' => 'getRedirectUris',
         'request_object_signing_alg' => 'getRequestObjectSigningAlg',
         'request_uris' => 'getRequestUris',
@@ -255,7 +250,6 @@ class OAuth2Client implements ArrayAccess
         $this->container['logo_uri'] = isset($data['logo_uri']) ? $data['logo_uri'] : null;
         $this->container['owner'] = isset($data['owner']) ? $data['owner'] : null;
         $this->container['policy_uri'] = isset($data['policy_uri']) ? $data['policy_uri'] : null;
-        $this->container['public'] = isset($data['public']) ? $data['public'] : null;
         $this->container['redirect_uris'] = isset($data['redirect_uris']) ? $data['redirect_uris'] : null;
         $this->container['request_object_signing_alg'] = isset($data['request_object_signing_alg']) ? $data['request_object_signing_alg'] : null;
         $this->container['request_uris'] = isset($data['request_uris']) ? $data['request_uris'] : null;
@@ -568,27 +562,6 @@ class OAuth2Client implements ArrayAccess
     public function setPolicyUri($policy_uri)
     {
         $this->container['policy_uri'] = $policy_uri;
-
-        return $this;
-    }
-
-    /**
-     * Gets public
-     * @return bool
-     */
-    public function getPublic()
-    {
-        return $this->container['public'];
-    }
-
-    /**
-     * Sets public
-     * @param bool $public Public is a boolean that identifies this client as public, meaning that it does not have a secret. It will disable the client_credentials grant type for this client if set.
-     * @return $this
-     */
-    public function setPublic($public)
-    {
-        $this->container['public'] = $public;
 
         return $this;
     }

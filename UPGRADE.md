@@ -8,11 +8,14 @@ before finalizing the upgrade process.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
+- [1.0.0-beta.8](#100-beta8)
+  - [Schema Changes](#schema-changes)
+  - [OAuth 2.0 Client flag `public` has been removed](#oauth-20-client-flag-public-has-been-removed)
 - [1.0.0-beta.7](#100-beta7)
   - [Regenerated OpenID Connect ID Token cryptographic keys](#regenerated-openid-connect-id-token-cryptographic-keys)
 - [1.0.0-beta.5](#100-beta5)
   - [OAuth 2.0 Client Response Type changes](#oauth-20-client-response-type-changes)
-  - [Schema Changes](#schema-changes)
+  - [Schema Changes](#schema-changes-1)
   - [HTTP Error Payload](#http-error-payload)
   - [OAuth 2.0 Clients must specify correct `token_endpoint_auth_method`](#oauth-20-clients-must-specify-correct-token_endpoint_auth_method)
   - [OAuth 2.0 Client field `id` is now `client_id`](#oauth-20-client-field-id-is-now-client_id)
@@ -90,6 +93,32 @@ before finalizing the upgrade process.
     - [Best practice HTTP server config](#best-practice-http-server-config)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## 1.0.0-beta.8
+
+### Schema Changes
+
+This patch introduces some minor database schema changes. Before you apply it, you must run `hydra migrate sql` against
+your database.
+
+### OAuth 2.0 Client flag `public` has been removed
+
+Previously, OAuth 2.0 Clients had a flag called `public`. If set to true, the OAuth 2.0 Client was able to exchange
+authorize codes for access tokens without a password. This is useful in scenarios where the device can not keep
+a secret (browser app, mobile app).
+
+Since OpenID Connect Dynamic Discovery was added, this flag collided with the `token_endpoint_auth_method`. If
+`token_endpoint_auth_method` is set to `none`, then that is equal to setting `public` to `true`. To remove this
+ambiguity the `public` flag was removed.
+
+If you wish to create a client that runs on an untrusted device (browser app, mobile app), simply set `"token_endpoint_auth_method": "none"`
+in the JSON request.
+
+If you are using the ORY Hydra CLI, you can use `--token-endpoint-auth-method none` to achieve what `--public` did
+previously.
+
+The SQL migrations will automatically migrate clients that have `public` set to `true` by setting `token_endpoint_auth_method`
+to `none`.
 
 ## 1.0.0-beta.7
 

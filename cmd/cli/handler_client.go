@@ -94,7 +94,12 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	name, _ := cmd.Flags().GetString("name")
 	secret, _ := cmd.Flags().GetString("secret")
 	id, _ := cmd.Flags().GetString("id")
-	public, _ := cmd.Flags().GetBool("is-public")
+	tokenEndpointAuthMethod, _ := cmd.Flags().GetString("token-endpoint-auth-method")
+	jwksUri, _ := cmd.Flags().GetString("jwks-uri")
+	tosUri, _ := cmd.Flags().GetString("tos-uri")
+	policyUri, _ := cmd.Flags().GetString("policy-uri")
+	logoUri, _ := cmd.Flags().GetString("logo-uri")
+	clientUri, _ := cmd.Flags().GetString("client-uri")
 
 	if secret == "" {
 		var secretb []byte
@@ -106,14 +111,19 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	}
 
 	cc := hydra.OAuth2Client{
-		ClientId:      id,
-		ClientSecret:  secret,
-		ResponseTypes: responseTypes,
-		Scope:         strings.Join(allowedScopes, " "),
-		GrantTypes:    grantTypes,
-		RedirectUris:  callbacks,
-		ClientName:    name,
-		Public:        public,
+		ClientId:                id,
+		ClientSecret:            secret,
+		ResponseTypes:           responseTypes,
+		Scope:                   strings.Join(allowedScopes, " "),
+		GrantTypes:              grantTypes,
+		RedirectUris:            callbacks,
+		ClientName:              name,
+		TokenEndpointAuthMethod: tokenEndpointAuthMethod,
+		JwksUri:                 jwksUri,
+		TosUri:                  tosUri,
+		PolicyUri:               policyUri,
+		LogoUri:                 logoUri,
+		ClientUri:               clientUri,
 	}
 
 	result, response, err := m.CreateOAuth2Client(cc)

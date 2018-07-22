@@ -26,7 +26,7 @@ import (
 	"github.com/ory/fosite"
 
 	// Naming the dependency jose is important for go-swagger to work, see https://github.com/go-swagger/go-swagger/issues/1587
-	"gopkg.in/square/go-jose.v2"
+	jose "gopkg.in/square/go-jose.v2"
 )
 
 // Client represents an OAuth 2.0 Client.

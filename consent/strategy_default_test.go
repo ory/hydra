@@ -318,7 +318,7 @@ func TestStrategy(t *testing.T) {
 		},
 		{
 			d:      "This should fail because prompt=none, client is public, and redirection scheme is not HTTPS but a custom scheme",
-			req:    fosite.AuthorizeRequest{RedirectURI: mustParseURL(t, "custom://redirection-scheme/path"), Request: fosite.Request{Client: &client.Client{Public: true, ID: "client-id"}, Scopes: []string{"scope-a"}}},
+			req:    fosite.AuthorizeRequest{RedirectURI: mustParseURL(t, "custom://redirection-scheme/path"), Request: fosite.Request{Client: &client.Client{TokenEndpointAuthMethod: "none", ID: "client-id"}, Scopes: []string{"scope-a"}}},
 			prompt: "none",
 			jar:    persistentCJ,
 			lph:    passAuthentication(apiClient, false),

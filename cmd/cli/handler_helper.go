@@ -31,7 +31,11 @@ import (
 
 func checkResponse(response *hydra.APIResponse, err error, expectedStatusCode int) {
 	if response != nil {
-		pkg.Must(err, "Command failed because calling \"%s %s\" resulted in error \"%s\" occurred.\n%s\n", response.Request.Method, response.RequestURL, err, response.Payload)
+		var method string
+		if response.Response != nil && response.Response.Request != nil {
+			method = response.Request.Method
+		}
+		pkg.Must(err, "Command failed because calling \"%s %s\" resulted in error \"%s\" occurred.\n%s\n", method, response.RequestURL, err, response.Payload)
 	} else {
 		pkg.Must(err, "Command failed because error \"%s\" occurred and no response is available.\n", err)
 	}

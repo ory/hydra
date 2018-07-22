@@ -32,6 +32,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
@@ -117,6 +118,11 @@ func TestStrategy(t *testing.T) {
 
 	persistentCJ := newCookieJar()
 	persistentCJ2 := newCookieJar()
+
+	nonexistentCJ, _ := cookiejar.New(&cookiejar.Options{})
+	apURL, _ := url.Parse(ap.URL)
+	encoded, _ := securecookie.EncodeMulti(cookieAuthenticationName, map[interface{}]interface{}{cookieAuthenticationSIDName: "i-do-not-exist"}, securecookie.CodecsFromPairs([]byte("dummy-secret-yay"))...)
+	nonexistentCJ.SetCookies(apURL, []*http.Cookie{{Name: cookieAuthenticationName, Value: encoded}})
 
 	for k, tc := range []struct {
 		setup                 func()
@@ -933,6 +939,37 @@ func TestStrategy(t *testing.T) {
 			d:   "This should require re-authentication because the session was revoked in the previous test",
 			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
 			jar: persistentCJ2,
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					rr, res, err := apiClient.GetLoginRequest(r.URL.Query().Get("login_challenge"))
+					require.NoError(t, err)
+					require.EqualValues(t, http.StatusOK, res.StatusCode)
+					assert.False(t, rr.Skip)
+					assert.Empty(t, "", rr.Subject)
+
+					v, res, err := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
+						Subject:  "foouser",
+						Remember: true,
+					})
+					require.NoError(t, err)
+					require.EqualValues(t, http.StatusOK, res.StatusCode)
+					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+				}
+			},
+			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					v, _, _ := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{GrantScope: []string{"scope-a"}})
+					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+				}
+			},
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+		},
+		{
+			d:   "This should require re-authentication because the session does not exist in the store",
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, Scopes: []string{"scope-a"}}},
+			jar: nonexistentCJ,
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 				return func(w http.ResponseWriter, r *http.Request) {
 					rr, res, err := apiClient.GetLoginRequest(r.URL.Query().Get("login_challenge"))

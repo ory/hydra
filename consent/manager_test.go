@@ -212,7 +212,7 @@ func TestManagers(t *testing.T) {
 				} {
 					t.Run("case=create-get-"+tc.s.ID, func(t *testing.T) {
 						_, err := m.GetAuthenticationSession(tc.s.ID)
-						require.Error(t, err)
+						require.EqualError(t, err, pkg.ErrNotFound.Error())
 
 						err = m.CreateAuthenticationSession(&tc.s)
 						require.NoError(t, err)

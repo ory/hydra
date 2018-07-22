@@ -37,7 +37,6 @@ import (
 	"github.com/ory/go-convenience/stringsx"
 	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/sqlcon"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 )
@@ -114,7 +113,7 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 	}
 
 	session, err := s.M.GetAuthenticationSession(sessionID)
-	if errors.Cause(err) == sqlcon.ErrNoRows {
+	if errors.Cause(err) == pkg.ErrNotFound {
 		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{})
 	} else if err != nil {
 		return err

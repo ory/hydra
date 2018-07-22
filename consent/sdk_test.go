@@ -119,12 +119,12 @@ func compareSDKLoginRequest(t *testing.T, expected *AuthenticationRequest, got *
 	assert.EqualValues(t, expected.Challenge, got.Challenge)
 	assert.EqualValues(t, expected.Subject, got.Subject)
 	assert.EqualValues(t, expected.Skip, got.Skip)
-	assert.EqualValues(t, expected.Client.ID, got.Client.Id)
+	assert.EqualValues(t, expected.Client.GetID(), got.Client.ClientId)
 }
 
 func compareSDKConsentRequest(t *testing.T, expected *ConsentRequest, got *swagger.ConsentRequest) {
 	assert.EqualValues(t, expected.Challenge, got.Challenge)
 	assert.EqualValues(t, expected.Subject, got.Subject)
 	assert.EqualValues(t, expected.Skip, got.Skip)
-	assert.EqualValues(t, expected.Client.ID, got.Client.Id)
+	assert.EqualValues(t, expected.Client.GetID(), got.Client.ClientId)
 }

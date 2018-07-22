@@ -154,7 +154,7 @@ func TestMigrations(t *testing.T) {
 					s := &client.SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}
 					c, err := s.GetConcreteClient(key)
 					require.NoError(t, err)
-					assert.EqualValues(t, c.ID, key)
+					assert.EqualValues(t, c.GetID(), key)
 				})
 			}
 

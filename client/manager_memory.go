@@ -53,8 +53,7 @@ func (m *MemoryManager) GetConcreteClient(id string) (*Client, error) {
 	defer m.RUnlock()
 
 	for _, c := range m.Clients {
-		if c.ID == id {
-			c.ClientID = c.ID
+		if c.GetID() == id {
 			return &c, nil
 		}
 	}
@@ -67,7 +66,7 @@ func (m *MemoryManager) GetClient(_ context.Context, id string) (fosite.Client, 
 }
 
 func (m *MemoryManager) UpdateClient(c *Client) error {
-	o, err := m.GetClient(context.Background(), c.ID)
+	o, err := m.GetClient(context.Background(), c.GetID())
 	if err != nil {
 		return err
 	}
@@ -88,7 +87,7 @@ func (m *MemoryManager) UpdateClient(c *Client) error {
 	m.Lock()
 	defer m.Unlock()
 	for k, f := range m.Clients {
-		if f.GetID() == c.ID {
+		if f.GetID() == c.GetID() {
 			m.Clients[k] = *c
 		}
 	}
@@ -109,13 +108,12 @@ func (m *MemoryManager) Authenticate(id string, secret []byte) (*Client, error) 
 		return nil, errors.WithStack(err)
 	}
 
-	c.ClientID = c.ID
 	return c, nil
 }
 
 func (m *MemoryManager) CreateClient(c *Client) error {
-	if _, err := m.GetConcreteClient(c.ID); err == nil {
-		return errors.Errorf("Client %s already exists", c.ID)
+	if _, err := m.GetConcreteClient(c.GetID()); err == nil {
+		return errors.Errorf("Client %s already exists", c.GetID())
 	}
 
 	m.Lock()
@@ -152,8 +150,7 @@ func (m *MemoryManager) GetClients(limit, offset int) (clients map[string]Client
 
 	start, end := pagination.Index(limit, offset, len(m.Clients))
 	for _, c := range m.Clients[start:end] {
-		c.ClientID = c.ID
-		clients[c.ID] = c
+		clients[c.GetID()] = c
 	}
 
 	return clients, nil

@@ -2326,11 +2326,6 @@
           },
           "x-go-name": "GrantTypes"
         },
-        "id": {
-          "description": "ID is an alisa for client_id.",
-          "type": "string",
-          "x-go-name": "ID"
-        },
         "jwks": {
           "$ref": "#/definitions/JSONWebKeySet"
         },

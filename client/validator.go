@@ -49,11 +49,7 @@ func NewValidator(
 
 func (v *Validator) Validate(c *Client) error {
 	id := uuid.New()
-	c.ID = stringsx.Coalesce(c.ID, c.ClientID, id)
-	c.ClientID = stringsx.Coalesce(c.ClientID, c.ID, id)
-	if c.ID != c.ClientID {
-		return errors.WithStack(fosite.ErrInvalidRequest.WithHint("Field id and client_id must match."))
-	}
+	c.ClientID = stringsx.Coalesce(c.ClientID, id)
 
 	if c.TokenEndpointAuthMethod == "" {
 		c.TokenEndpointAuthMethod = "client_secret_basic"

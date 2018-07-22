@@ -98,9 +98,6 @@
           'String'
         ])
       }
-      if (data.hasOwnProperty('id')) {
-        obj['id'] = ApiClient.convertToType(data['id'], 'String')
-      }
       if (data.hasOwnProperty('jwks')) {
         obj['jwks'] = JSONWebKeySet.constructFromObject(data['jwks'])
       }
@@ -204,11 +201,6 @@
    * @member {Array.<String>} grant_types
    */
   exports.prototype['grant_types'] = undefined
-  /**
-   * ID is an alisa for client_id.
-   * @member {String} id
-   */
-  exports.prototype['id'] = undefined
   /**
    * @member {module:model/JSONWebKeySet} jwks
    */

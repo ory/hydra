@@ -81,7 +81,6 @@ func TestClientSDK(t *testing.T) {
 	t.Run("case=client is created and updated", func(t *testing.T) {
 		createClient := createTestClient("")
 		compareClient := createClient
-		compareClient.Id = compareClient.ClientId
 		createClient.ClientSecretExpiresAt = 10
 
 		// returned client is correct on Create
@@ -114,7 +113,6 @@ func TestClientSDK(t *testing.T) {
 		// create another client
 		updateClient := createTestClient("foo")
 		result, response, err = c.UpdateOAuth2Client(createClient.ClientId, updateClient)
-		updateClient.Id = updateClient.ClientId
 		require.NoError(t, err)
 		require.EqualValues(t, http.StatusOK, response.StatusCode, "%s", response.Payload)
 		assert.EqualValues(t, updateClient, *result)
@@ -125,7 +123,6 @@ func TestClientSDK(t *testing.T) {
 		result, response, err = c.GetOAuth2Client(updateClient.ClientId)
 		require.NoError(t, err)
 		require.EqualValues(t, http.StatusOK, response.StatusCode, "%s", response.Payload)
-		compareClient.ClientId = compareClient.Id
 		assert.EqualValues(t, compareClient, *result)
 
 		// client can not be found after being deleted
@@ -163,7 +160,7 @@ func TestClientSDK(t *testing.T) {
 				client: hydra.OAuth2Client{},
 			},
 			{
-				client:   hydra.OAuth2Client{Id: "set-properly-1"},
+				client:   hydra.OAuth2Client{ClientId: "set-properly-1"},
 				expectID: "set-properly-1",
 			},
 			{
@@ -176,13 +173,10 @@ func TestClientSDK(t *testing.T) {
 				require.NoError(t, err)
 				require.EqualValues(t, http.StatusCreated, response.StatusCode, "%s", response.Payload)
 
-				assert.NotEmpty(t, result.Id)
 				assert.NotEmpty(t, result.ClientId)
-				assert.EqualValues(t, result.Id, result.ClientId)
 
-				id := result.Id
+				id := result.ClientId
 				if tc.expectID != "" {
-					assert.EqualValues(t, tc.expectID, result.Id)
 					assert.EqualValues(t, tc.expectID, result.ClientId)
 					id = tc.expectID
 				}
@@ -191,7 +185,6 @@ func TestClientSDK(t *testing.T) {
 				require.NoError(t, err)
 				require.EqualValues(t, http.StatusOK, response.StatusCode, "%s", response.Payload)
 
-				assert.EqualValues(t, id, result.Id)
 				assert.EqualValues(t, id, result.ClientId)
 			})
 		}

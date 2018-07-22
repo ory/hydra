@@ -26,7 +26,7 @@ import (
 	"github.com/ory/fosite"
 
 	// Naming the dependency jose is important for go-swagger to work, see https://github.com/go-swagger/go-swagger/issues/1587
-	jose "gopkg.in/square/go-jose.v2"
+	"gopkg.in/square/go-jose.v2"
 )
 
 // Client represents an OAuth 2.0 Client.
@@ -94,10 +94,6 @@ type Client struct {
 	// Contacts is a array of strings representing ways to contact people responsible
 	// for this client, typically email addresses.
 	Contacts []string `json:"contacts"`
-
-	// Public is a boolean that identifies this client as public, meaning that it
-	// does not have a secret. It will disable the client_credentials grant type for this client if set.
-	Public bool `json:"public"`
 
 	// SecretExpiresAt is an integer holding the time at which the client
 	// secret will expire or 0 if it will not expire. The time is
@@ -193,7 +189,7 @@ func (c *Client) GetOwner() string {
 }
 
 func (c *Client) IsPublic() bool {
-	return c.Public
+	return c.TokenEndpointAuthMethod == "none"
 }
 
 func (c *Client) GetJSONWebKeysURI() string {
@@ -217,9 +213,6 @@ func (c *Client) GetRequestObjectSigningAlgorithm() string {
 
 func (c *Client) GetTokenEndpointAuthMethod() string {
 	if c.TokenEndpointAuthMethod == "" {
-		if c.Public {
-			return "none"
-		}
 		return "client_secret_basic"
 	}
 	return c.TokenEndpointAuthMethod

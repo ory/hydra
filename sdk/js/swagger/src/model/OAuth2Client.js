@@ -119,9 +119,6 @@
           'String'
         )
       }
-      if (data.hasOwnProperty('public')) {
-        obj['public'] = ApiClient.convertToType(data['public'], 'Boolean')
-      }
       if (data.hasOwnProperty('redirect_uris')) {
         obj['redirect_uris'] = ApiClient.convertToType(data['redirect_uris'], [
           'String'
@@ -236,11 +233,6 @@
    * @member {String} policy_uri
    */
   exports.prototype['policy_uri'] = undefined
-  /**
-   * Public is a boolean that identifies this client as public, meaning that it does not have a secret. It will disable the client_credentials grant type for this client if set.
-   * @member {Boolean} public
-   */
-  exports.prototype['public'] = undefined
   /**
    * RedirectURIs is an array of allowed redirect urls for the client, for example http://mydomain/oauth/callback .
    * @member {Array.<String>} redirect_uris

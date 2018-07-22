@@ -88,6 +88,17 @@ var sharedMigrations = []*migrate.Migration{
 			`ALTER TABLE hydra_client DROP COLUMN userinfo_signed_response_alg`,
 		},
 	},
+	{
+		Id: "5",
+		Up: []string{
+			`UPDATE hydra_client SET token_endpoint_auth_method='none' WHERE public=TRUE`,
+			`ALTER TABLE hydra_client DROP COLUMN public`,
+		},
+		Down: []string{
+			`ALTER TABLE hydra_client ADD public BOOLEAN NOT NULL DEFAULT FALSE`,
+			`UPDATE hydra_client SET public=TRUE WHERE token_endpoint_auth_method='none'`,
+		},
+	},
 }
 
 var Migrations = map[string]*migrate.MemoryMigrationSource{
@@ -111,6 +122,7 @@ var Migrations = map[string]*migrate.MemoryMigrationSource{
 				`ALTER TABLE hydra_client MODIFY request_uris TEXT`,
 			},
 		},
+		sharedMigrations[3],
 	}},
 	"postgres": {Migrations: []*migrate.Migration{
 		sharedMigrations[0],
@@ -132,6 +144,7 @@ var Migrations = map[string]*migrate.MemoryMigrationSource{
 				`ALTER TABLE hydra_client ALTER COLUMN request_uris DROP NOT NULL`,
 			},
 		},
+		sharedMigrations[3],
 	}},
 }
 
@@ -154,7 +167,6 @@ type sqlData struct {
 	ClientURI                     string `db:"client_uri"`
 	LogoURI                       string `db:"logo_uri"`
 	Contacts                      string `db:"contacts"`
-	Public                        bool   `db:"public"`
 	SecretExpiresAt               int    `db:"client_secret_expires_at"`
 	SectorIdentifierURI           string `db:"sector_identifier_uri"`
 	JSONWebKeysURI                string `db:"jwks_uri"`
@@ -179,7 +191,6 @@ var sqlParams = []string{
 	"client_uri",
 	"logo_uri",
 	"contacts",
-	"public",
 	"client_secret_expires_at",
 	"sector_identifier_uri",
 	"jwks",
@@ -215,7 +226,6 @@ func sqlDataFromClient(d *Client) (*sqlData, error) {
 		ClientURI:                     d.ClientURI,
 		LogoURI:                       d.LogoURI,
 		Contacts:                      strings.Join(d.Contacts, "|"),
-		Public:                        d.Public,
 		SecretExpiresAt:               d.SecretExpiresAt,
 		SectorIdentifierURI:           d.SectorIdentifierURI,
 		JSONWebKeysURI:                d.JSONWebKeysURI,
@@ -243,7 +253,6 @@ func (d *sqlData) ToClient() (*Client, error) {
 		ClientURI:                     d.ClientURI,
 		LogoURI:                       d.LogoURI,
 		Contacts:                      stringsx.Splitx(d.Contacts, "|"),
-		Public:                        d.Public,
 		SecretExpiresAt:               d.SecretExpiresAt,
 		SectorIdentifierURI:           d.SectorIdentifierURI,
 		JSONWebKeysURI:                d.JSONWebKeysURI,

@@ -35,14 +35,15 @@ func TestClient(t *testing.T) {
 		ID:           "foo",
 		RedirectURIs: []string{"foo"},
 		Scope:        "foo bar",
+		TokenEndpointAuthMethod: "none",
 	}
 
 	assert.EqualValues(t, c.RedirectURIs, c.GetRedirectURIs())
 	assert.EqualValues(t, []byte(c.Secret), c.GetHashedSecret())
 	assert.EqualValues(t, fosite.Arguments{"authorization_code"}, c.GetGrantTypes())
 	assert.EqualValues(t, fosite.Arguments{"code"}, c.GetResponseTypes())
-	assert.EqualValues(t, (c.Owner), c.GetOwner())
-	assert.EqualValues(t, (c.Public), c.IsPublic())
+	assert.EqualValues(t, c.Owner, c.GetOwner())
+	assert.True(t, c.IsPublic())
 	assert.Len(t, c.GetScopes(), 2)
 	assert.EqualValues(t, c.RedirectURIs, c.GetRedirectURIs())
 }

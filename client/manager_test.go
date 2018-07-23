@@ -24,6 +24,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"sync"
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -35,6 +36,7 @@ import (
 )
 
 var clientManagers = map[string]Manager{}
+var m sync.Mutex
 
 func init() {
 	clientManagers["memory"] = NewMemoryManager(&fosite.BCrypt{})
@@ -61,7 +63,9 @@ func connectToMySQL() {
 	}
 
 	s := &SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}
+	m.Lock()
 	clientManagers["mysql"] = s
+	m.Unlock()
 }
 
 func connectToPG() {
@@ -71,7 +75,9 @@ func connectToPG() {
 	}
 
 	s := &SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}
+	m.Lock()
 	clientManagers["postgres"] = s
+	m.Unlock()
 }
 
 func TestCreateGetDeleteClient(t *testing.T) {

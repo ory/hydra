@@ -24,6 +24,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"sync"
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -37,6 +38,7 @@ var managers = map[string]Manager{
 	"memory": new(MemoryManager),
 }
 
+var m sync.Mutex
 var testGenerator = &RS256Generator{}
 
 var encryptionKey, _ = RandomBytes(32)
@@ -62,7 +64,10 @@ func connectToPG() {
 	}
 
 	s := &SQLManager{DB: db, Cipher: &AEAD{Key: encryptionKey}}
+
+	m.Lock()
 	managers["postgres"] = s
+	m.Unlock()
 }
 
 func connectToMySQL() {
@@ -72,7 +77,10 @@ func connectToMySQL() {
 	}
 
 	s := &SQLManager{DB: db, Cipher: &AEAD{Key: encryptionKey}}
+
+	m.Lock()
 	managers["mysql"] = s
+	m.Unlock()
 }
 
 func TestManagerKey(t *testing.T) {

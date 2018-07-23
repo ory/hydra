@@ -22,14 +22,18 @@ package oauth2_test
 
 import (
 	"context"
+	"encoding/json"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
+	"github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/herodot"
 	hc "github.com/ory/hydra/client"
 	"github.com/ory/hydra/jwk"
@@ -42,57 +46,94 @@ import (
 )
 
 func TestClientCredentials(t *testing.T) {
-	router := httprouter.New()
-	l := logrus.New()
-	l.Level = logrus.DebugLevel
-	store := NewFositeMemoryStore(hc.NewMemoryManager(hasher), time.Second)
+	for _, tc := range []struct {
+		d                 string
+		s                 oauth2.CoreStrategy
+		assertAccessToken func(*testing.T, string)
+	}{
+		{
+			d: "opaque",
+			s: oauth2OpqaueStrategy,
+		},
+		{
+			d: "jwt",
+			s: oauth2JWTStrategy,
+			assertAccessToken: func(t *testing.T, token string) {
+				body, err := jwt.DecodeSegment(strings.Split(token, ".")[1])
+				require.NoError(t, err)
 
-	jm := &jwk.MemoryManager{Keys: map[string]*jose.JSONWebKeySet{}}
-	keys, err := (&jwk.RS256Generator{}).Generate("", "sig")
-	require.NoError(t, err)
-	require.NoError(t, jm.AddKeySet(OpenIDConnectKeyName, keys))
-	jwtStrategy, err := jwk.NewRS256JWTStrategy(jm, OpenIDConnectKeyName)
+				data := map[string]interface{}{}
+				require.NoError(t, json.Unmarshal(body, &data))
 
-	ts := httptest.NewServer(router)
-	handler := &Handler{
-		OAuth2: compose.Compose(
-			fc,
-			store,
-			oauth2Strategy,
-			nil,
-			compose.OAuth2ClientCredentialsGrantFactory,
-			compose.OAuth2TokenIntrospectionFactory,
-		),
-		//Consent:         consentStrategy,
-		CookieStore:       sessions.NewCookieStore([]byte("foo-secret")),
-		ForcedHTTP:        true,
-		ScopeStrategy:     fosite.HierarchicScopeStrategy,
-		IDTokenLifespan:   time.Minute,
-		H:                 herodot.NewJSONWriter(l),
-		L:                 l,
-		IssuerURL:         ts.URL,
-		OpenIDJWTStrategy: jwtStrategy,
+				assert.EqualValues(t, "app-client", data["client_id"])
+				assert.EqualValues(t, "app-client", data["sub"])
+				assert.NotEmpty(t, data["iss"])
+				assert.NotEmpty(t, data["jti"])
+				assert.NotEmpty(t, data["exp"])
+				assert.NotEmpty(t, data["iat"])
+				assert.NotEmpty(t, data["nbf"])
+				assert.EqualValues(t, data["nbf"], data["iat"])
+				assert.EqualValues(t, []interface{}{"foobar"}, data["scp"])
+			},
+		},
+	} {
+		t.Run("tc="+tc.d, func(t *testing.T) {
+			router := httprouter.New()
+			l := logrus.New()
+			l.Level = logrus.DebugLevel
+			store := NewFositeMemoryStore(hc.NewMemoryManager(hasher), time.Second)
+
+			jm := &jwk.MemoryManager{Keys: map[string]*jose.JSONWebKeySet{}}
+			keys, err := (&jwk.RS256Generator{}).Generate("", "sig")
+			require.NoError(t, err)
+			require.NoError(t, jm.AddKeySet(OpenIDConnectKeyName, keys))
+			jwtStrategy, err := jwk.NewRS256JWTStrategy(jm, OpenIDConnectKeyName)
+
+			ts := httptest.NewServer(router)
+			handler := &Handler{
+				OAuth2: compose.Compose(
+					fc,
+					store,
+					tc.s,
+					nil,
+					compose.OAuth2ClientCredentialsGrantFactory,
+					compose.OAuth2TokenIntrospectionFactory,
+				),
+				//Consent:         consentStrategy,
+				CookieStore:       sessions.NewCookieStore([]byte("foo-secret")),
+				ForcedHTTP:        true,
+				ScopeStrategy:     fosite.HierarchicScopeStrategy,
+				IDTokenLifespan:   time.Minute,
+				H:                 herodot.NewJSONWriter(l),
+				L:                 l,
+				IssuerURL:         ts.URL,
+				OpenIDJWTStrategy: jwtStrategy,
+			}
+
+			handler.SetRoutes(router)
+
+			require.NoError(t, store.CreateClient(&hc.Client{
+				ClientID:      "app-client",
+				Secret:        "secret",
+				RedirectURIs:  []string{ts.URL + "/callback"},
+				ResponseTypes: []string{"token"},
+				GrantTypes:    []string{"client_credentials"},
+				Scope:         "foobar",
+			}))
+
+			oauthClientConfig := &clientcredentials.Config{
+				ClientID:     "app-client",
+				ClientSecret: "secret",
+				TokenURL:     ts.URL + "/oauth2/token",
+				Scopes:       []string{"foobar"},
+			}
+
+			tok, err := oauthClientConfig.Token(context.Background())
+			require.NoError(t, err)
+			assert.NotEmpty(t, tok.AccessToken)
+			if tc.assertAccessToken != nil {
+				tc.assertAccessToken(t, tok.AccessToken)
+			}
+		})
 	}
-
-	handler.SetRoutes(router)
-
-	require.NoError(t, store.CreateClient(&hc.Client{
-		ClientID:      "app-client",
-		Secret:        "secret",
-		RedirectURIs:  []string{ts.URL + "/callback"},
-		ResponseTypes: []string{"token"},
-		GrantTypes:    []string{"client_credentials"},
-		Scope:         "foobar",
-	}))
-
-	oauthClientConfig := &clientcredentials.Config{
-		ClientID:     "app-client",
-		ClientSecret: "secret",
-		TokenURL:     ts.URL + "/oauth2/token",
-		Scopes:       []string{"foobar"},
-	}
-
-	tok, err := oauthClientConfig.Token(context.Background())
-	require.NoError(t, err)
-	assert.NotEmpty(t, tok.AccessToken)
 }

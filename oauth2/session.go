@@ -21,6 +21,8 @@
 package oauth2
 
 import (
+	"time"
+
 	"github.com/mohae/deepcopy"
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
@@ -32,9 +34,9 @@ type Session struct {
 	*openid.DefaultSession `json:"idToken"`
 	Audience               []string
 	Extra                  map[string]interface{} `json:"extra"`
-	JTI                    string
-	KID                    string
-	ClientID               string
+	//JTI                    string
+	KID      string
+	ClientID string
 }
 
 func NewSession(subject string) *Session {
@@ -53,14 +55,18 @@ func (s *Session) GetJWTClaims() *jwt.JWTClaims {
 	claims := &jwt.JWTClaims{
 		Subject:   s.Subject,
 		Audience:  s.Audience,
-		JTI:       s.JTI,
-		IssuedAt:  s.DefaultSession.Claims.IssuedAt,
 		Issuer:    s.DefaultSession.Claims.Issuer,
-		NotBefore: s.DefaultSession.Claims.IssuedAt,
-		ExpiresAt: s.GetExpiresAt(fosite.AccessToken),
 		Extra:     s.Extra,
+		ExpiresAt: s.GetExpiresAt(fosite.AccessToken),
+		IssuedAt:  time.Now(),
+		NotBefore: time.Now(),
+		// The JTI MUST NOT BE FIXED or refreshing tokens will yield the SAME token
+		// JTI:       s.JTI,
 		// These are set by the DefaultJWTStrategy
 		// Scope:     s.Scope,
+		// Setting these here will cause the token to have the same iat/nbf values always
+		// IssuedAt:  s.DefaultSession.Claims.IssuedAt,
+		// NotBefore: s.DefaultSession.Claims.IssuedAt,
 	}
 
 	if claims.Extra == nil {

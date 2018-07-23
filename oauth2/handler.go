@@ -36,7 +36,6 @@ import (
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/pkg"
-	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 )
 
@@ -487,7 +486,6 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprou
 
 		session.Subject = accessRequest.GetClient().GetID()
 		session.ClientID = accessRequest.GetClient().GetID()
-		session.JTI = uuid.New()
 		session.KID = accessTokenKeyID
 		session.DefaultSession.Claims.Issuer = strings.TrimRight(h.IssuerURL, "/") + "/"
 		session.DefaultSession.Claims.IssuedAt = time.Now().UTC()
@@ -591,7 +589,6 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		Extra: session.Session.AccessToken,
 		// Here, we do not include the client because it's typically not the audience.
 		Audience: []string{},
-		JTI:      uuid.New(),
 		KID:      accessTokenKeyID,
 		ClientID: authorizeRequest.GetClient().GetID(),
 	})

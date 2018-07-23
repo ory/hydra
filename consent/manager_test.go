@@ -24,6 +24,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"sync"
 	"testing"
 	"time"
 
@@ -39,6 +40,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+var m sync.Mutex
 var clientManager = client.NewMemoryManager(&fosite.BCrypt{WorkFactor: 8})
 var fositeManager = oauth2.NewFositeMemoryStore(clientManager, time.Hour)
 var managers = map[string]Manager{
@@ -152,7 +154,9 @@ func connectToPostgres(managers map[string]Manager, c client.Manager) {
 		return
 	}
 
+	m.Lock()
 	managers["postgres"] = s
+	m.Unlock()
 }
 
 func connectToMySQL(managers map[string]Manager, c client.Manager) {
@@ -168,7 +172,9 @@ func connectToMySQL(managers map[string]Manager, c client.Manager) {
 		return
 	}
 
+	m.Lock()
 	managers["mysql"] = s
+	m.Unlock()
 }
 
 func TestMain(m *testing.M) {

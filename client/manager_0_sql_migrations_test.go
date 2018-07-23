@@ -23,6 +23,7 @@ package client_test
 import (
 	"fmt"
 	"log"
+	"sync"
 	"testing"
 
 	"github.com/jmoiron/sqlx"
@@ -116,6 +117,7 @@ var migrations = map[string]*migrate.MemoryMigrationSource{
 }
 
 func TestMigrations(t *testing.T) {
+	var m sync.Mutex
 	var dbs = map[string]*sqlx.DB{}
 	if testing.Short() {
 		return
@@ -127,14 +129,18 @@ func TestMigrations(t *testing.T) {
 			if err != nil {
 				log.Fatalf("Could not connect to database: %v", err)
 			}
+			m.Lock()
 			dbs["postgres"] = db
+			m.Unlock()
 		},
 		func() {
 			db, err := dockertest.ConnectToTestMySQL()
 			if err != nil {
 				log.Fatalf("Could not connect to database: %v", err)
 			}
+			m.Lock()
 			dbs["mysql"] = db
+			m.Unlock()
 		},
 	})
 

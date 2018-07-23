@@ -24,6 +24,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"sync"
 	"testing"
 	"time"
 
@@ -44,6 +45,7 @@ var clientManager = &client.MemoryManager{
 	Hasher:  &fosite.BCrypt{},
 }
 var databases = make(map[string]*sqlx.DB)
+var m sync.Mutex
 
 func init() {
 	fositeStores["memory"] = NewFositeMemoryStore(nil, time.Hour)
@@ -74,8 +76,10 @@ func connectToPG() {
 		log.Fatalf("Could not create postgres schema: %v", err)
 	}
 
+	m.Lock()
 	databases["postgres"] = db
 	fositeStores["postgres"] = s
+	m.Unlock()
 }
 
 func connectToMySQL() {
@@ -89,8 +93,10 @@ func connectToMySQL() {
 		log.Fatalf("Could not create postgres schema: %v", err)
 	}
 
+	m.Lock()
 	databases["mysql"] = db
 	fositeStores["mysql"] = s
+	m.Unlock()
 }
 
 func TestCreateGetDeleteAuthorizeCodes(t *testing.T) {

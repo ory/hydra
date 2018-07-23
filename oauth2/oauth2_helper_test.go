@@ -31,8 +31,12 @@ import (
 )
 
 var hasher = &fosite.BCrypt{}
-var oauth2Strategy = &compose.CommonStrategy{
+var oauth2OpqaueStrategy = &compose.CommonStrategy{
 	CoreStrategy:               compose.NewOAuth2HMACStrategy(fc, []byte("some super secret secret secret secret")),
+	OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(pkg.MustINSECURELOWENTROPYRSAKEYFORTEST()),
+}
+var oauth2JWTStrategy = &compose.CommonStrategy{
+	CoreStrategy:               compose.NewOAuth2JWTStrategy(pkg.MustINSECURELOWENTROPYRSAKEYFORTEST(), compose.NewOAuth2HMACStrategy(fc, []byte("some super secret secret secret secret"))),
 	OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(pkg.MustINSECURELOWENTROPYRSAKEYFORTEST()),
 }
 

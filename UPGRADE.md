@@ -101,6 +101,15 @@ before finalizing the upgrade process.
 This patch introduces some minor database schema changes. Before you apply it, you must run `hydra migrate sql` against
 your database.
 
+### Subcommands `admin`, `public`, `all` have been added to `hydra serve`
+
+With this patch, ORY Hydra exposes two ports:
+
+- Public API (default port 4444) handles requests coming from the public internet, like OAuth 2.0 Authorization
+and Token requests, OpenID Connect UserInfo, OAuth 2.0 Token Revokation, and OpenID Connect Discovery.
+- Administrative API (default port 4445) handles administrative requests like managing OAuth 2.0 Clients,
+JSON Web Keys, login and consent sessions, and others.
+
 ### OAuth 2.0 Client flag `public` has been removed
 
 Previously, OAuth 2.0 Clients had a flag called `public`. If set to true, the OAuth 2.0 Client was able to exchange

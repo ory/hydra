@@ -26,6 +26,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 
 	"github.com/gorilla/context"
 	"github.com/julienschmidt/httprouter"
@@ -49,101 +50,171 @@ import (
 
 var _ = &consent.Handler{}
 
-func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
+func enhanceRouter(c *config.Config, cmd *cobra.Command, serverHandler *Handler, router *httprouter.Router, middlewares []negroni.Handler) http.Handler {
+	n := negroni.New()
+	for _, m := range middlewares {
+		n.Use(m)
+	}
+	n.UseFunc(serverHandler.rejectInsecureRequests)
+	n.UseHandler(router)
+	return context.ClearHandler(cors.New(corsx.ParseOptions()).Handler(n))
+}
+
+func RunServeAdmin(c *config.Config) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
-		fmt.Println(banner)
+		checkDatabaseAllowed(c)
+		serverHandler, _, backend, mws := setup(c, cmd, args, "admin")
 
-		router := httprouter.New()
-		logger := c.GetLogger()
-		w := herodot.NewJSONWriter(logger)
-		w.ErrorEnhancer = nil
+		var wg sync.WaitGroup
+		wg.Add(2)
 
-		serverHandler := &Handler{
-			Config: c,
-			H:      w,
+		cert := getOrCreateTLSCertificate(cmd, c)
+		// go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, frontend), c.GetFrontendAddress(), &wg)
+		go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, backend, mws), c.GetBackendAddress(), &wg, cert)
+
+		wg.Wait()
+	}
+}
+
+func RunServePublic(c *config.Config) func(cmd *cobra.Command, args []string) {
+	return func(cmd *cobra.Command, args []string) {
+		checkDatabaseAllowed(c)
+		serverHandler, frontend, _, mws := setup(c, cmd, args, "public")
+
+		var wg sync.WaitGroup
+		wg.Add(2)
+
+		cert := getOrCreateTLSCertificate(cmd, c)
+		go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, frontend, mws), c.GetFrontendAddress(), &wg, cert)
+		// go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, backend), c.GetBackendAddress(), &wg)
+
+		wg.Wait()
+	}
+}
+
+func RunServeAll(c *config.Config) func(cmd *cobra.Command, args []string) {
+	return func(cmd *cobra.Command, args []string) {
+		serverHandler, frontend, backend, mws := setup(c, cmd, args, "all")
+
+		var wg sync.WaitGroup
+		wg.Add(2)
+
+		cert := getOrCreateTLSCertificate(cmd, c)
+		go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, frontend, mws), c.GetFrontendAddress(), &wg, cert)
+		go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, backend, mws), c.GetBackendAddress(), &wg, cert)
+
+		wg.Wait()
+	}
+}
+
+func setup(c *config.Config, cmd *cobra.Command, args []string, name string) (handler *Handler, frontend, backend *httprouter.Router, middlewares []negroni.Handler) {
+	fmt.Println(banner)
+
+	frontend = httprouter.New()
+	backend = httprouter.New()
+
+	logger := c.GetLogger()
+	w := herodot.NewJSONWriter(logger)
+	w.ErrorEnhancer = nil
+
+	handler = NewHandler(c, w)
+	handler.registerRoutes(frontend, backend)
+	c.ForceHTTP, _ = cmd.Flags().GetBool("dangerous-force-http")
+
+	if !c.ForceHTTP {
+		if c.Issuer == "" {
+			logger.Fatalln("IssuerURL must be explicitly specified unless --dangerous-force-http is passed. To find out more, use `hydra help serve`.")
 		}
-		serverHandler.registerRoutes(router)
-		c.ForceHTTP, _ = cmd.Flags().GetBool("dangerous-force-http")
-
-		if !c.ForceHTTP {
-			if c.Issuer == "" {
-				logger.Fatalln("IssuerURL must be explicitly specified unless --dangerous-force-http is passed. To find out more, use `hydra help host`.")
-			}
-			issuer, err := url.Parse(c.Issuer)
-			pkg.Must(err, "Could not parse issuer URL: %s", err)
-			if issuer.Scheme != "https" {
-				logger.Fatalln("IssuerURL must use HTTPS unless --dangerous-force-http is passed. To find out more, use `hydra help host`.")
-			}
+		issuer, err := url.Parse(c.Issuer)
+		pkg.Must(err, "Could not parse issuer URL: %s", err)
+		if issuer.Scheme != "https" {
+			logger.Fatalln("IssuerURL must use HTTPS unless --dangerous-force-http is passed. To find out more, use `hydra help serve`.")
 		}
+	}
 
-		n := negroni.New()
-		n.Use(negronilogrus.NewMiddlewareFromLogger(logger, c.Issuer))
-		n.Use(c.GetPrometheusMetrics())
+	middlewares = append(
+		middlewares,
+		negronilogrus.NewMiddlewareFromLogger(c.GetLogger(), c.Issuer),
+		c.GetPrometheusMetrics(),
+	)
 
-		if ok, _ := cmd.Flags().GetBool("disable-telemetry"); !ok {
-			c.GetLogger().Println("Transmission of telemetry data is enabled, to learn more go to: https://www.ory.sh/docs/guides/latest/telemetry/")
+	if ok, _ := cmd.Flags().GetBool("disable-telemetry"); !ok {
+		c.GetLogger().Println("Transmission of telemetry data is enabled, to learn more go to: https://www.ory.sh/docs/guides/latest/telemetry/")
 
-			enable := !(c.DatabaseURL == "" || c.DatabaseURL == "memory" || c.Issuer == "" || strings.Contains(c.Issuer, "localhost"))
-			m := metrics.NewMetricsManager(
-				metrics.Hash(c.Issuer+"|"+c.DatabaseURL),
-				enable,
-				"h8dRH3kVCWKkIFWydBmWsyYHR4M0u0vr",
-				[]string{
-					client.ClientsHandlerPath,
-					jwk.KeyHandlerPath,
-					jwk.WellKnownKeysPath,
-					oauth2.DefaultConsentPath,
-					oauth2.TokenPath,
-					oauth2.AuthPath,
-					oauth2.UserinfoPath,
-					oauth2.WellKnownPath,
-					oauth2.IntrospectPath,
-					oauth2.RevocationPath,
-					consent.ConsentPath,
-					consent.LoginPath,
-					health.AliveCheckPath,
-					health.ReadyCheckPath,
-					health.VersionPath,
-					health.MetricsPrometheusPath,
-					"/health/status",
-					"/",
-				},
-				logger,
-				"ory-hydra",
-			)
-			go m.RegisterSegment(c.BuildVersion, c.BuildHash, c.BuildTime)
-			go m.CommitMemoryStatistics()
-			n.Use(m)
-		}
-
-		n.UseFunc(serverHandler.rejectInsecureRequests)
-		n.UseHandler(router)
-		corsHandler := cors.New(corsx.ParseOptions()).Handler(n)
-
-		var srv = graceful.WithDefaults(&http.Server{
-			Addr:    c.GetAddress(),
-			Handler: context.ClearHandler(corsHandler),
-			TLSConfig: &tls.Config{
-				Certificates: []tls.Certificate{getOrCreateTLSCertificate(cmd, c)},
+		enable := !(c.DatabaseURL == "" || c.DatabaseURL == "memory" || c.Issuer == "" || strings.Contains(c.Issuer, "localhost"))
+		m := metrics.NewMetricsManager(
+			metrics.Hash(c.Issuer+"|"+c.DatabaseURL),
+			enable,
+			"h8dRH3kVCWKkIFWydBmWsyYHR4M0u0vr",
+			[]string{
+				client.ClientsHandlerPath,
+				jwk.KeyHandlerPath,
+				jwk.WellKnownKeysPath,
+				oauth2.DefaultConsentPath,
+				oauth2.TokenPath,
+				oauth2.AuthPath,
+				oauth2.UserinfoPath,
+				oauth2.WellKnownPath,
+				oauth2.IntrospectPath,
+				oauth2.RevocationPath,
+				consent.ConsentPath,
+				consent.LoginPath,
+				health.AliveCheckPath,
+				health.ReadyCheckPath,
+				health.VersionPath,
+				health.MetricsPrometheusPath,
+				"/oauth2/auth/sessions/login",
+				"/oauth2/auth/sessions/consent",
+				"/health/status",
+				"/",
 			},
-		})
+			c.GetLogger(),
+			"ory-hydra",
+		)
 
-		err := graceful.Graceful(func() error {
-			var err error
-			logger.Infof("Setting up http server on %s", c.GetAddress())
-			if c.ForceHTTP {
-				logger.Warnln("HTTPS disabled. Never do this in production.")
-				err = srv.ListenAndServe()
-			} else if c.AllowTLSTermination != "" {
-				logger.Infoln("TLS termination enabled, disabling https.")
-				err = srv.ListenAndServe()
-			} else {
-				err = srv.ListenAndServeTLS("", "")
-			}
+		go m.RegisterSegment(c.BuildVersion, c.BuildHash, c.BuildTime)
+		go m.CommitMemoryStatistics()
 
-			return err
-		}, srv.Shutdown)
-		logger.WithError(err).Fatal("Could not gracefully run server")
+		middlewares = append(middlewares, m)
+	}
+
+	return
+}
+
+func checkDatabaseAllowed(c *config.Config) {
+	if c.DatabaseURL == "memory" {
+		c.GetLogger().Fatalf(`When using "hydra serve admin" or "hydra serve public" the DATABASE_URL can not be set to "memory".`)
+	}
+}
+
+func serve(c *config.Config, cmd *cobra.Command, handler http.Handler, address string, wg *sync.WaitGroup, cert tls.Certificate) {
+	defer wg.Done()
+
+	var srv = graceful.WithDefaults(&http.Server{
+		Addr:    address,
+		Handler: handler,
+		TLSConfig: &tls.Config{
+			Certificates: []tls.Certificate{cert},
+		},
+	})
+
+	err := graceful.Graceful(func() error {
+		var err error
+		c.GetLogger().Infof("Setting up http server on %s", address)
+		if c.ForceHTTP {
+			c.GetLogger().Warnln("HTTPS disabled. Never do this in production.")
+			err = srv.ListenAndServe()
+		} else if c.AllowTLSTermination != "" {
+			c.GetLogger().Infoln("TLS termination enabled, disabling https.")
+			err = srv.ListenAndServe()
+		} else {
+			err = srv.ListenAndServeTLS("", "")
+		}
+
+		return err
+	}, srv.Shutdown)
+	if err != nil {
+		c.GetLogger().WithError(err).Fatal("Could not gracefully run server")
 	}
 }
 
@@ -156,7 +227,11 @@ type Handler struct {
 	H       herodot.Writer
 }
 
-func (h *Handler) registerRoutes(router *httprouter.Router) {
+func NewHandler(c *config.Config, h herodot.Writer) *Handler {
+	return &Handler{Config: c, H: h}
+}
+
+func (h *Handler) registerRoutes(frontend, backend *httprouter.Router) {
 	c := h.Config
 	ctx := c.Context()
 
@@ -170,11 +245,11 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 	oauth2Provider := newOAuth2Provider(c)
 
 	// Set up handlers
-	h.Clients = newClientHandler(c, router, clientsManager)
-	h.Keys = newJWKHandler(c, router)
-	h.Consent = newConsentHandler(c, router)
-	h.OAuth2 = newOAuth2Handler(c, router, ctx.ConsentManager, oauth2Provider)
-	_ = newHealthHandler(c, router)
+	h.Clients = newClientHandler(c, backend, clientsManager)
+	h.Keys = newJWKHandler(c, backend)
+	h.Consent = newConsentHandler(c, backend)
+	h.OAuth2 = newOAuth2Handler(c, frontend, backend, ctx.ConsentManager, oauth2Provider)
+	_ = newHealthHandler(c, backend)
 }
 
 func (h *Handler) rejectInsecureRequests(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {

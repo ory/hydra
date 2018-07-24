@@ -96,7 +96,7 @@ func TestHandlerFlushHandler(t *testing.T) {
 	}
 
 	r := httprouter.New()
-	h.SetRoutes(r)
+	h.SetRoutes(r, r)
 	ts := httptest.NewServer(r)
 	c := hydra.NewOAuth2ApiWithBasePath(ts.URL)
 
@@ -154,7 +154,7 @@ func TestUserinfo(t *testing.T) {
 		OpenIDJWTStrategy: jwtStrategy,
 	}
 	router := httprouter.New()
-	h.SetRoutes(router)
+	h.SetRoutes(router, router)
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 
@@ -182,25 +182,25 @@ func TestUserinfo(t *testing.T) {
 				op.EXPECT().
 					IntrospectToken(gomock.Any(), gomock.Eq("access-token"), gomock.Eq(fosite.AccessToken), gomock.Any()).
 					DoAndReturn(func(_ context.Context, _ string, _ fosite.TokenType, session fosite.Session, _ ...string) (fosite.TokenType, fosite.AccessRequester, error) {
-						session = &oauth2.Session{
-							DefaultSession: &openid.DefaultSession{
-								Claims: &jwt.IDTokenClaims{
-									Subject: "alice",
-								},
-								Headers: new(jwt.Headers),
+					session = &oauth2.Session{
+						DefaultSession: &openid.DefaultSession{
+							Claims: &jwt.IDTokenClaims{
 								Subject: "alice",
 							},
-							Audience: []string{},
-							Extra:    map[string]interface{}{},
-						}
+							Headers: new(jwt.Headers),
+							Subject: "alice",
+						},
+						Audience: []string{},
+						Extra:    map[string]interface{}{},
+					}
 
-						return fosite.AccessToken, &fosite.AccessRequest{
-							Request: fosite.Request{
-								Client:  &client.Client{},
-								Session: session,
-							},
-						}, nil
-					})
+					return fosite.AccessToken, &fosite.AccessRequest{
+						Request: fosite.Request{
+							Client:  &client.Client{},
+							Session: session,
+						},
+					}, nil
+				})
 			},
 			expectStatusCode: http.StatusOK,
 			check: func(t *testing.T, body []byte) {
@@ -212,27 +212,27 @@ func TestUserinfo(t *testing.T) {
 				op.EXPECT().
 					IntrospectToken(gomock.Any(), gomock.Eq("access-token"), gomock.Eq(fosite.AccessToken), gomock.Any()).
 					DoAndReturn(func(_ context.Context, _ string, _ fosite.TokenType, session fosite.Session, _ ...string) (fosite.TokenType, fosite.AccessRequester, error) {
-						session = &oauth2.Session{
-							DefaultSession: &openid.DefaultSession{
-								Claims: &jwt.IDTokenClaims{
-									Subject: "alice",
-								},
-								Headers: new(jwt.Headers),
+					session = &oauth2.Session{
+						DefaultSession: &openid.DefaultSession{
+							Claims: &jwt.IDTokenClaims{
 								Subject: "alice",
 							},
-							Audience: []string{},
-							Extra:    map[string]interface{}{},
-						}
+							Headers: new(jwt.Headers),
+							Subject: "alice",
+						},
+						Audience: []string{},
+						Extra:    map[string]interface{}{},
+					}
 
-						return fosite.AccessToken, &fosite.AccessRequest{
-							Request: fosite.Request{
-								Client: &client.Client{
-									UserinfoSignedResponseAlg: "none",
-								},
-								Session: session,
+					return fosite.AccessToken, &fosite.AccessRequest{
+						Request: fosite.Request{
+							Client: &client.Client{
+								UserinfoSignedResponseAlg: "none",
 							},
-						}, nil
-					})
+							Session: session,
+						},
+					}, nil
+				})
 			},
 			expectStatusCode: http.StatusOK,
 			check: func(t *testing.T, body []byte) {
@@ -244,27 +244,27 @@ func TestUserinfo(t *testing.T) {
 				op.EXPECT().
 					IntrospectToken(gomock.Any(), gomock.Eq("access-token"), gomock.Eq(fosite.AccessToken), gomock.Any()).
 					DoAndReturn(func(_ context.Context, _ string, _ fosite.TokenType, session fosite.Session, _ ...string) (fosite.TokenType, fosite.AccessRequester, error) {
-						session = &oauth2.Session{
-							DefaultSession: &openid.DefaultSession{
-								Claims: &jwt.IDTokenClaims{
-									Subject: "alice",
-								},
-								Headers: new(jwt.Headers),
+					session = &oauth2.Session{
+						DefaultSession: &openid.DefaultSession{
+							Claims: &jwt.IDTokenClaims{
 								Subject: "alice",
 							},
-							Audience: []string{},
-							Extra:    map[string]interface{}{},
-						}
+							Headers: new(jwt.Headers),
+							Subject: "alice",
+						},
+						Audience: []string{},
+						Extra:    map[string]interface{}{},
+					}
 
-						return fosite.AccessToken, &fosite.AccessRequest{
-							Request: fosite.Request{
-								Client: &client.Client{
-									UserinfoSignedResponseAlg: "asdfasdf",
-								},
-								Session: session,
+					return fosite.AccessToken, &fosite.AccessRequest{
+						Request: fosite.Request{
+							Client: &client.Client{
+								UserinfoSignedResponseAlg: "asdfasdf",
 							},
-						}, nil
-					})
+							Session: session,
+						},
+					}, nil
+				})
 			},
 			expectStatusCode: http.StatusInternalServerError,
 		},
@@ -273,27 +273,27 @@ func TestUserinfo(t *testing.T) {
 				op.EXPECT().
 					IntrospectToken(gomock.Any(), gomock.Eq("access-token"), gomock.Eq(fosite.AccessToken), gomock.Any()).
 					DoAndReturn(func(_ context.Context, _ string, _ fosite.TokenType, session fosite.Session, _ ...string) (fosite.TokenType, fosite.AccessRequester, error) {
-						session = &oauth2.Session{
-							DefaultSession: &openid.DefaultSession{
-								Claims: &jwt.IDTokenClaims{
-									Subject: "alice",
-								},
-								Headers: new(jwt.Headers),
+					session = &oauth2.Session{
+						DefaultSession: &openid.DefaultSession{
+							Claims: &jwt.IDTokenClaims{
 								Subject: "alice",
 							},
-							Audience: []string{},
-							Extra:    map[string]interface{}{},
-						}
+							Headers: new(jwt.Headers),
+							Subject: "alice",
+						},
+						Audience: []string{},
+						Extra:    map[string]interface{}{},
+					}
 
-						return fosite.AccessToken, &fosite.AccessRequest{
-							Request: fosite.Request{
-								Client: &client.Client{
-									UserinfoSignedResponseAlg: "RS256",
-								},
-								Session: session,
+					return fosite.AccessToken, &fosite.AccessRequest{
+						Request: fosite.Request{
+							Client: &client.Client{
+								UserinfoSignedResponseAlg: "RS256",
 							},
-						}, nil
-					})
+							Session: session,
+						},
+					}, nil
+				})
 			},
 			expectStatusCode: http.StatusOK,
 			check: func(t *testing.T, body []byte) {
@@ -336,7 +336,7 @@ func TestHandlerWellKnown(t *testing.T) {
 	JWKPathT := "/.well-known/jwks.json"
 
 	r := httprouter.New()
-	h.SetRoutes(r)
+	h.SetRoutes(r, r)
 	ts := httptest.NewServer(r)
 
 	res, err := http.Get(ts.URL + "/.well-known/openid-configuration")

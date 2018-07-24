@@ -24,25 +24,10 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/ory/hydra/cmd/server"
 	"github.com/spf13/cobra"
 )
 
-// serveCmd represents the host command
-var serveCmd = &cobra.Command{
-	Use:   "serve",
-	Short: "Start the HTTP/2 host service",
-	Long: `Starts all HTTP/2 APIs and connects to a database backend.
-
-This command exposes a variety of controls via environment variables. You can
-set environments using "export KEY=VALUE" (Linux/macOS) or "set KEY=VALUE" (Windows). On Linux,
-you can also set environments by prepending key value pairs: "KEY=VALUE KEY2=VALUE2 hydra"
-
-All possible controls are listed below. The host process additionally exposes a few flags, which are listed below
-the controls section.
-
-
-CORE CONTROLS
+const serveControls = `CORE CONTROLS
 =============
 
 - DATABASE_URL: A URL to a persistent backend. Hydra supports various backends:
@@ -208,8 +193,29 @@ DEBUG CONTROLS
 - PROFILING: Set "PROFILING=cpu" to enable cpu profiling and "PROFILING=memory" to enable memory profiling.
 	It is not possible to do both at the same time.
 	Example: PROFILING=cpu
-`,
-	Run: server.RunHost(c),
+`
+
+// serveCmd represents the host command
+var serveCmd = &cobra.Command{
+	Use:   "serve",
+	Short: "Parent command for starting public and administrative HTTP/2 APIs",
+	Long: `ORY Hydra exposes two ports, a public and an administrative port. The public port is responsible
+for handling requests from the public internet, such as the OAuth 2.0 Authorize and Token URLs. The administrative
+port handles administrative requests like creating OAuth 2.0 Clients, managing JSON Web Keys, and managing User Login
+and Consent sessions.
+
+It is recommended to run "hydra serve all". If you need granular control over CORS settings or similar, you may
+want to run "hydra serve admin" and "admin serve public" separately.
+
+To learn more about each individual command, run:
+
+- hydra help serve all
+- hydra help serve admin
+- hydra help serve public
+
+All sub-commands share command line flags and the following environment variable names:
+
+` + serveControls,
 }
 
 func init() {
@@ -223,12 +229,12 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	serveCmd.Flags().BoolVar(&c.ForceHTTP, "dangerous-force-http", false, "Disable HTTP/2 over TLS (HTTPS) and serve HTTP instead. Never use this in production.")
-	//serveCmd.Flags().Bool("dangerous-auto-logon", false, "Stores the root credentials in ~/.hydra.yml. Do not use in production.")
+	serveCmd.PersistentFlags().BoolVar(&c.ForceHTTP, "dangerous-force-http", false, "Disable HTTP/2 over TLS (HTTPS) and serve HTTP instead. Never use this in production.")
+	//serveCmd.PersistentFlags().Bool("dangerous-auto-logon", false, "Stores the root credentials in ~/.hydra.yml. Do not use in production.")
 
 	disableTelemetryEnv, _ := strconv.ParseBool(os.Getenv("DISABLE_TELEMETRY"))
-	serveCmd.Flags().Bool("disable-telemetry", disableTelemetryEnv, "Disable anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/guides/telemetry")
+	serveCmd.PersistentFlags().Bool("disable-telemetry", disableTelemetryEnv, "Disable anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/guides/telemetry")
 
-	serveCmd.Flags().String("https-tls-key-path", "", "Path to the key file for HTTP/2 over TLS (https). You can set HTTPS_TLS_KEY_PATH or HTTPS_TLS_KEY instead.")
-	serveCmd.Flags().String("https-tls-cert-path", "", "Path to the certificate file for HTTP/2 over TLS (https). You can set HTTPS_TLS_CERT_PATH or HTTPS_TLS_CERT instead.")
+	serveCmd.PersistentFlags().String("https-tls-key-path", "", "Path to the key file for HTTP/2 over TLS (https). You can set HTTPS_TLS_KEY_PATH or HTTPS_TLS_KEY instead.")
+	serveCmd.PersistentFlags().String("https-tls-cert-path", "", "Path to the certificate file for HTTP/2 over TLS (https). You can set HTTPS_TLS_CERT_PATH or HTTPS_TLS_CERT instead.")
 }

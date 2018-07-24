@@ -52,8 +52,10 @@ type Config struct {
 	EndpointURL string `mapstructure:"HYDRA_URL" yaml:"-"`
 
 	// These are used by the host command
-	BindPort                         int    `mapstructure:"PORT" yaml:"-"`
-	BindHost                         string `mapstructure:"HOST" yaml:"-"`
+	FrontendBindPort                 int    `mapstructure:"PUBLIC_PORT" yaml:"-"`
+	FrontendBindHost                 string `mapstructure:"PUBLIC_HOST" yaml:"-"`
+	BackendBindPort                  int    `mapstructure:"ADMIN_PORT" yaml:"-"`
+	BackendBindHost                  string `mapstructure:"ADMIN_HOST" yaml:"-"`
 	Issuer                           string `mapstructure:"OAUTH2_ISSUER_URL" yaml:"-"`
 	SystemSecret                     string `mapstructure:"SYSTEM_SECRET" yaml:"-"`
 	DatabaseURL                      string `mapstructure:"DATABASE_URL" yaml:"-"`
@@ -336,8 +338,12 @@ func (c *Config) GetSystemSecret() []byte {
 	return secret
 }
 
-func (c *Config) GetAddress() string {
-	return fmt.Sprintf("%s:%d", c.BindHost, c.BindPort)
+func (c *Config) GetFrontendAddress() string {
+	return fmt.Sprintf("%s:%d", c.FrontendBindHost, c.FrontendBindPort)
+}
+
+func (c *Config) GetBackendAddress() string {
+	return fmt.Sprintf("%s:%d", c.BackendBindHost, c.BackendBindPort)
 }
 
 func (c *Config) Persist() error {

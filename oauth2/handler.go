@@ -154,18 +154,19 @@ type FlushInactiveOAuth2TokensRequest struct {
 	NotAfter time.Time `json:"notAfter"`
 }
 
-func (h *Handler) SetRoutes(r *httprouter.Router) {
-	r.POST(TokenPath, h.TokenHandler)
-	r.GET(AuthPath, h.AuthHandler)
-	r.POST(AuthPath, h.AuthHandler)
-	r.GET(DefaultConsentPath, h.DefaultConsentHandler)
-	r.GET(DefaultErrorPath, h.DefaultErrorHandler)
-	r.POST(IntrospectPath, h.IntrospectHandler)
-	r.POST(RevocationPath, h.RevocationHandler)
-	r.GET(WellKnownPath, h.WellKnownHandler)
-	r.GET(UserinfoPath, h.UserinfoHandler)
-	r.POST(UserinfoPath, h.UserinfoHandler)
-	r.POST(FlushPath, h.FlushHandler)
+func (h *Handler) SetRoutes(frontend, backend *httprouter.Router) {
+	frontend.POST(TokenPath, h.TokenHandler)
+	frontend.GET(AuthPath, h.AuthHandler)
+	frontend.POST(AuthPath, h.AuthHandler)
+	frontend.GET(DefaultConsentPath, h.DefaultConsentHandler)
+	frontend.GET(DefaultErrorPath, h.DefaultErrorHandler)
+	frontend.POST(RevocationPath, h.RevocationHandler)
+	frontend.GET(WellKnownPath, h.WellKnownHandler)
+	frontend.GET(UserinfoPath, h.UserinfoHandler)
+	frontend.POST(UserinfoPath, h.UserinfoHandler)
+
+	backend.POST(IntrospectPath, h.IntrospectHandler)
+	backend.POST(FlushPath, h.FlushHandler)
 }
 
 // swagger:route GET /.well-known/openid-configuration oAuth2 getWellKnown

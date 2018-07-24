@@ -23,4 +23,4 @@ COPY --from=0 /go/src/github.com/ory/hydra/hydra /usr/bin/hydra
 
 ENTRYPOINT ["hydra"]
 
-CMD ["serve"]
+CMD ["serve all"]

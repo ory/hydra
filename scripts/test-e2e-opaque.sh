@@ -26,7 +26,7 @@ DATABASE_URL=memory \
     OAUTH2_LOGIN_URL=http://127.0.0.1:3000/login \
     OAUTH2_ERROR_URL=http://127.0.0.1:3000/error \
     OAUTH2_SHARE_ERROR_DEBUG=true \
-    hydra serve --dangerous-force-http --disable-telemetry &
+    hydra serve all --dangerous-force-http --disable-telemetry &
 
 PORT=3000 mock-lcp &
 

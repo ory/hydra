@@ -110,7 +110,7 @@ func TestClientCredentials(t *testing.T) {
 				OpenIDJWTStrategy: jwtStrategy,
 			}
 
-			handler.SetRoutes(router)
+			handler.SetRoutes(router,router)
 
 			require.NoError(t, store.CreateClient(&hc.Client{
 				ClientID:      "app-client",

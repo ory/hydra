@@ -31,14 +31,17 @@ import (
 // serveCmd represents the host command
 var serveCmd = &cobra.Command{
 	Use:   "serve",
-	Short: "Start the HTTP/2 host service",
-	Long: `Starts all HTTP/2 APIs and connects to a database backend.
+	Short: "Serves both public and privileged HTTP/2 APIs",
+	Long: `Starts a process which listens on two ports for public and privileged HTTP/2 API requests.
+
+If you want more granular control (e.g. different TLS settings) over each API group (privileged, public) you
+can run "serve privileged" and "serve public" separately.
 
 This command exposes a variety of controls via environment variables. You can
 set environments using "export KEY=VALUE" (Linux/macOS) or "set KEY=VALUE" (Windows). On Linux,
 you can also set environments by prepending key value pairs: "KEY=VALUE KEY2=VALUE2 hydra"
 
-All possible controls are listed below. The host process additionally exposes a few flags, which are listed below
+All possible controls are listed below. This command exposes exposes command line flags, which are listed below
 the controls section.
 
 
@@ -223,12 +226,12 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	serveCmd.Flags().BoolVar(&c.ForceHTTP, "dangerous-force-http", false, "Disable HTTP/2 over TLS (HTTPS) and serve HTTP instead. Never use this in production.")
-	//serveCmd.Flags().Bool("dangerous-auto-logon", false, "Stores the root credentials in ~/.hydra.yml. Do not use in production.")
+	serveCmd.PersistentFlags().BoolVar(&c.ForceHTTP, "dangerous-force-http", false, "Disable HTTP/2 over TLS (HTTPS) and serve HTTP instead. Never use this in production.")
+	//serveCmd.PersistentFlags().Bool("dangerous-auto-logon", false, "Stores the root credentials in ~/.hydra.yml. Do not use in production.")
 
 	disableTelemetryEnv, _ := strconv.ParseBool(os.Getenv("DISABLE_TELEMETRY"))
-	serveCmd.Flags().Bool("disable-telemetry", disableTelemetryEnv, "Disable anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/guides/telemetry")
+	serveCmd.PersistentFlags().Bool("disable-telemetry", disableTelemetryEnv, "Disable anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/guides/telemetry")
 
-	serveCmd.Flags().String("https-tls-key-path", "", "Path to the key file for HTTP/2 over TLS (https). You can set HTTPS_TLS_KEY_PATH or HTTPS_TLS_KEY instead.")
-	serveCmd.Flags().String("https-tls-cert-path", "", "Path to the certificate file for HTTP/2 over TLS (https). You can set HTTPS_TLS_CERT_PATH or HTTPS_TLS_CERT instead.")
+	serveCmd.PersistentFlags().String("https-tls-key-path", "", "Path to the key file for HTTP/2 over TLS (https). You can set HTTPS_TLS_KEY_PATH or HTTPS_TLS_KEY instead.")
+	serveCmd.PersistentFlags().String("https-tls-cert-path", "", "Path to the certificate file for HTTP/2 over TLS (https). You can set HTTPS_TLS_CERT_PATH or HTTPS_TLS_CERT instead.")
 }

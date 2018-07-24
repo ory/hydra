@@ -26,6 +26,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 
 	"github.com/gorilla/context"
 	"github.com/julienschmidt/httprouter"
@@ -51,11 +52,57 @@ var _ = &consent.Handler{}
 
 var errNilDependency = errors.New("A dependency was expected to be defined but is nil. Please open an issue with the stack trace.")
 
+func enhanceRouter(c *config.Config, cmd *cobra.Command, serverHandler *Handler, router *httprouter.Router) http.Handler {
+	n := negroni.New()
+	n.Use(negronilogrus.NewMiddlewareFromLogger(c.GetLogger(), c.Issuer))
+	n.Use(c.GetPrometheusMetrics())
+	if ok, _ := cmd.Flags().GetBool("disable-telemetry"); !ok {
+		c.GetLogger().Println("Transmission of telemetry data is enabled, to learn more go to: https://www.ory.sh/docs/guides/latest/telemetry/")
+
+		enable := !(c.DatabaseURL == "" || c.DatabaseURL == "memory" || c.Issuer == "" || strings.Contains(c.Issuer, "localhost"))
+		m := metrics.NewMetricsManager(
+			metrics.Hash(c.Issuer+"|"+c.DatabaseURL),
+			enable,
+			"h8dRH3kVCWKkIFWydBmWsyYHR4M0u0vr",
+			[]string{
+				client.ClientsHandlerPath,
+				jwk.KeyHandlerPath,
+				jwk.WellKnownKeysPath,
+				oauth2.DefaultConsentPath,
+				oauth2.TokenPath,
+				oauth2.AuthPath,
+				oauth2.UserinfoPath,
+				oauth2.WellKnownPath,
+				oauth2.IntrospectPath,
+				oauth2.RevocationPath,
+				consent.ConsentPath,
+				consent.LoginPath,
+				health.AliveCheckPath,
+				health.ReadyCheckPath,
+				health.VersionPath,
+				health.MetricsPrometheusPath,
+				"/health/status",
+				"/",
+			},
+			logger,
+			"ory-hydra",
+		)
+		go m.RegisterSegment(c.BuildVersion, c.BuildHash, c.BuildTime)
+		go m.CommitMemoryStatistics()
+		n.Use(m)
+	}
+	n.UseFunc(serverHandler.rejectInsecureRequests)
+	n.UseHandler(router)
+	return context.ClearHandler(cors.New(corsx.ParseOptions()).Handler(n))
+}
+
 func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		fmt.Println(banner)
 
-		router := httprouter.New()
+		frontend := httprouter.New()
+		backend := httprouter.New()
+
 		logger := c.GetLogger()
 		w := herodot.NewJSONWriter(logger)
 		w.ErrorEnhancer = nil
@@ -64,7 +111,7 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 			Config: c,
 			H:      w,
 		}
-		serverHandler.registerRoutes(router)
+		serverHandler.registerRoutes(frontend, backend)
 		c.ForceHTTP, _ = cmd.Flags().GetBool("dangerous-force-http")
 
 		if !c.ForceHTTP {
@@ -78,74 +125,44 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 			}
 		}
 
-		n := negroni.New()
-		n.Use(negronilogrus.NewMiddlewareFromLogger(logger, c.Issuer))
-		n.Use(c.GetPrometheusMetrics())
+		var wg sync.WaitGroup
+		wg.Add(2)
 
-		if ok, _ := cmd.Flags().GetBool("disable-telemetry"); !ok {
-			c.GetLogger().Println("Transmission of telemetry data is enabled, to learn more go to: https://www.ory.sh/docs/guides/latest/telemetry/")
+		go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, frontend), c.GetFrontendAddress(), &wg)
+		go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, backend), c.GetBackendAddress(), &wg)
 
-			enable := !(c.DatabaseURL == "" || c.DatabaseURL == "memory" || c.Issuer == "" || strings.Contains(c.Issuer, "localhost"))
-			m := metrics.NewMetricsManager(
-				metrics.Hash(c.Issuer+"|"+c.DatabaseURL),
-				enable,
-				"h8dRH3kVCWKkIFWydBmWsyYHR4M0u0vr",
-				[]string{
-					client.ClientsHandlerPath,
-					jwk.KeyHandlerPath,
-					jwk.WellKnownKeysPath,
-					oauth2.DefaultConsentPath,
-					oauth2.TokenPath,
-					oauth2.AuthPath,
-					oauth2.UserinfoPath,
-					oauth2.WellKnownPath,
-					oauth2.IntrospectPath,
-					oauth2.RevocationPath,
-					consent.ConsentPath,
-					consent.LoginPath,
-					health.AliveCheckPath,
-					health.ReadyCheckPath,
-					health.VersionPath,
-					health.MetricsPrometheusPath,
-					"/health/status",
-					"/",
-				},
-				logger,
-				"ory-hydra",
-			)
-			go m.RegisterSegment(c.BuildVersion, c.BuildHash, c.BuildTime)
-			go m.CommitMemoryStatistics()
-			n.Use(m)
+		wg.Wait()
+	}
+}
+
+func serve(c *config.Config, cmd *cobra.Command, handler http.Handler, address string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	var srv = graceful.WithDefaults(&http.Server{
+		Addr:    address,
+		Handler: handler,
+		TLSConfig: &tls.Config{
+			Certificates: []tls.Certificate{getOrCreateTLSCertificate(cmd, c)},
+		},
+	})
+
+	err := graceful.Graceful(func() error {
+		var err error
+		c.GetLogger().Infof("Setting up http server on %s", c.GetFrontendAddress())
+		if c.ForceHTTP {
+			c.GetLogger().Warnln("HTTPS disabled. Never do this in production.")
+			err = srv.ListenAndServe()
+		} else if c.AllowTLSTermination != "" {
+			c.GetLogger().Infoln("TLS termination enabled, disabling https.")
+			err = srv.ListenAndServe()
+		} else {
+			err = srv.ListenAndServeTLS("", "")
 		}
 
-		n.UseFunc(serverHandler.rejectInsecureRequests)
-		n.UseHandler(router)
-		corsHandler := cors.New(corsx.ParseOptions()).Handler(n)
-
-		var srv = graceful.WithDefaults(&http.Server{
-			Addr:    c.GetAddress(),
-			Handler: context.ClearHandler(corsHandler),
-			TLSConfig: &tls.Config{
-				Certificates: []tls.Certificate{getOrCreateTLSCertificate(cmd, c)},
-			},
-		})
-
-		err := graceful.Graceful(func() error {
-			var err error
-			logger.Infof("Setting up http server on %s", c.GetAddress())
-			if c.ForceHTTP {
-				logger.Warnln("HTTPS disabled. Never do this in production.")
-				err = srv.ListenAndServe()
-			} else if c.AllowTLSTermination != "" {
-				logger.Infoln("TLS termination enabled, disabling https.")
-				err = srv.ListenAndServe()
-			} else {
-				err = srv.ListenAndServeTLS("", "")
-			}
-
-			return err
-		}, srv.Shutdown)
-		logger.WithError(err).Fatal("Could not gracefully run server")
+		return err
+	}, srv.Shutdown)
+	if err != nil {
+		c.GetLogger().WithError(err).Fatal("Could not gracefully run server")
 	}
 }
 
@@ -158,7 +175,7 @@ type Handler struct {
 	H       herodot.Writer
 }
 
-func (h *Handler) registerRoutes(router *httprouter.Router) {
+func (h *Handler) registerRoutes(frontend, backend *httprouter.Router) {
 	c := h.Config
 	ctx := c.Context()
 
@@ -172,11 +189,11 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 	oauth2Provider := newOAuth2Provider(c)
 
 	// Set up handlers
-	h.Clients = newClientHandler(c, router, clientsManager)
-	h.Keys = newJWKHandler(c, router)
-	h.Consent = newConsentHandler(c, router)
-	h.OAuth2 = newOAuth2Handler(c, router, ctx.ConsentManager, oauth2Provider)
-	_ = newHealthHandler(c, router)
+	h.Clients = newClientHandler(c, backend, clientsManager)
+	h.Keys = newJWKHandler(c, backend)
+	h.Consent = newConsentHandler(c, backend)
+	h.OAuth2 = newOAuth2Handler(c, frontend, ctx.ConsentManager, oauth2Provider)
+	_ = newHealthHandler(c, backend)
 }
 
 func (h *Handler) rejectInsecureRequests(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {

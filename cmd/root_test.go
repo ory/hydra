@@ -32,25 +32,33 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var port int
+var frontendPort, backendPort int
 
 func init() {
 	var err error
-	port, err = freeport.GetFreePort()
+	frontendPort, err = freeport.GetFreePort()
 	if err != nil {
 		panic(err.Error())
 	}
-	os.Setenv("PORT", fmt.Sprintf("%d", port))
+
+	backendPort, err = freeport.GetFreePort()
+	if err != nil {
+		panic(err.Error())
+	}
+
+	os.Setenv("PUBLIC_PORT", fmt.Sprintf("%d", frontendPort))
+	os.Setenv("ADMIN_PORT", fmt.Sprintf("%d", backendPort))
 	os.Setenv("DATABASE_URL", "memory")
-	os.Setenv("HYDRA_URL", fmt.Sprintf("https://localhost:%d/", port))
-	os.Setenv("OAUTH2_ISSUER_URL", fmt.Sprintf("https://localhost:%d/", port))
+	//os.Setenv("HYDRA_URL", fmt.Sprintf("https://localhost:%d/", frontendPort))
+	os.Setenv("OAUTH2_ISSUER_URL", fmt.Sprintf("https://localhost:%d/", frontendPort))
 }
 
 func TestExecute(t *testing.T) {
 	var osArgs = make([]string, len(os.Args))
 	copy(osArgs, os.Args)
 
-	endpoint := fmt.Sprintf("https://localhost:%d/", port)
+	frontend := fmt.Sprintf("https://localhost:%d/", frontendPort)
+	backend := fmt.Sprintf("https://localhost:%d/", backendPort)
 
 	for _, c := range []struct {
 		args      []string
@@ -58,7 +66,7 @@ func TestExecute(t *testing.T) {
 		expectErr bool
 	}{
 		{
-			args: []string{"serve", "--disable-telemetry"},
+			args: []string{"serve", "all", "--disable-telemetry"},
 			wait: func() bool {
 				client := &http.Client{
 					Transport: &transporter{
@@ -69,31 +77,32 @@ func TestExecute(t *testing.T) {
 					},
 				}
 
-				_, err := client.Get(fmt.Sprintf("https://127.0.0.1:%d/health/status", port))
+				_, err := client.Get(fmt.Sprintf("https://127.0.0.1:%d/health/status", frontendPort))
 				if err != nil {
 					t.Logf("HTTP request failed: %s", err)
 				} else {
+					// Give a bit more time to initialize
 					time.Sleep(time.Second * 5)
 				}
 				return err != nil
 			},
 		},
-		{args: []string{"clients", "create", "--endpoint", endpoint, "--id", "foobarbaz", "--secret", "foobar", "-g", "client_credentials"}},
-		{args: []string{"clients", "get", "--endpoint", endpoint, "foobarbaz"}},
-		{args: []string{"clients", "create", "--endpoint", endpoint, "--id", "public-foo"}},
-		{args: []string{"clients", "delete", "--endpoint", endpoint, "public-foo"}},
-		{args: []string{"keys", "create", "foo", "--endpoint", endpoint, "-a", "HS256"}},
-		{args: []string{"keys", "get", "--endpoint", endpoint, "foo"}},
-		{args: []string{"keys", "rotate", "--endpoint", endpoint, "foo"}},
-		{args: []string{"keys", "get", "--endpoint", endpoint, "foo"}},
-		{args: []string{"keys", "delete", "--endpoint", endpoint, "foo"}},
-		{args: []string{"keys", "import", "--endpoint", endpoint, "import-1", "../test/stub/ecdh.key", "../test/stub/ecdh.pub"}},
-		{args: []string{"keys", "import", "--endpoint", endpoint, "import-2", "../test/stub/rsa.key", "../test/stub/rsa.pub"}},
-		{args: []string{"token", "revoke", "--endpoint", endpoint, "--client-secret", "foobar", "--client-id", "foobarbaz", "foo"}},
-		{args: []string{"token", "client", "--endpoint", endpoint, "--client-secret", "foobar", "--client-id", "foobarbaz"}},
+		{args: []string{"clients", "create", "--endpoint", backend, "--id", "foobarbaz", "--secret", "foobar", "-g", "client_credentials"}},
+		{args: []string{"clients", "get", "--endpoint", backend, "foobarbaz"}},
+		{args: []string{"clients", "create", "--endpoint", backend, "--id", "public-foo"}},
+		{args: []string{"clients", "delete", "--endpoint", backend, "public-foo"}},
+		{args: []string{"keys", "create", "foo", "--endpoint", backend, "-a", "HS256"}},
+		{args: []string{"keys", "get", "--endpoint", backend, "foo"}},
+		{args: []string{"keys", "rotate", "--endpoint", backend, "foo"}},
+		{args: []string{"keys", "get", "--endpoint", backend, "foo"}},
+		{args: []string{"keys", "delete", "--endpoint", backend, "foo"}},
+		{args: []string{"keys", "import", "--endpoint", backend, "import-1", "../test/stub/ecdh.key", "../test/stub/ecdh.pub"}},
+		{args: []string{"keys", "import", "--endpoint", backend, "import-2", "../test/stub/rsa.key", "../test/stub/rsa.pub"}},
+		{args: []string{"token", "revoke", "--endpoint", frontend, "--client-secret", "foobar", "--client-id", "foobarbaz", "foo"}},
+		{args: []string{"token", "client", "--endpoint", frontend, "--client-secret", "foobar", "--client-id", "foobarbaz"}},
 		{args: []string{"help", "migrate", "sql"}},
 		{args: []string{"version"}},
-		{args: []string{"token", "flush", "--endpoint", endpoint}},
+		{args: []string{"token", "flush", "--endpoint", backend}},
 	} {
 		c.args = append(c.args, []string{"--skip-tls-verify"}...)
 		RootCmd.SetArgs(c.args)
@@ -110,10 +119,10 @@ func TestExecute(t *testing.T) {
 				for c.wait() {
 					t.Logf("Config file has not been found yet, retrying attempt #%d...", count)
 					count++
-					if count > 200 {
+					if count > 15 {
 						t.FailNow()
 					}
-					time.Sleep(time.Second * 2)
+					time.Sleep(time.Second)
 				}
 			} else {
 				err := RootCmd.Execute()

@@ -40,7 +40,6 @@ import (
 	"github.com/ory/hydra/health"
 	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/sqlcon"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -53,8 +52,10 @@ type Config struct {
 	EndpointURL string `mapstructure:"HYDRA_URL" yaml:"-"`
 
 	// These are used by the host command
-	BindPort                         int    `mapstructure:"PORT" yaml:"-"`
-	BindHost                         string `mapstructure:"HOST" yaml:"-"`
+	FrontendBindPort                 int    `mapstructure:"PUBLIC_PORT" yaml:"-"`
+	FrontendBindHost                 string `mapstructure:"PUBLIC_HOST" yaml:"-"`
+	BackendBindPort                  int    `mapstructure:"ADMIN_PORT" yaml:"-"`
+	BackendBindHost                  string `mapstructure:"ADMIN_HOST" yaml:"-"`
 	Issuer                           string `mapstructure:"OAUTH2_ISSUER_URL" yaml:"-"`
 	SystemSecret                     string `mapstructure:"SYSTEM_SECRET" yaml:"-"`
 	DatabaseURL                      string `mapstructure:"DATABASE_URL" yaml:"-"`
@@ -238,34 +239,34 @@ func (c *Config) Context() *Context {
 		return c.context
 	}
 
-	var connection interface{} = &MemoryConnection{}
 	if c.DatabaseURL == "" {
 		c.GetLogger().Fatalf(`DATABASE_URL is not set, use "export DATABASE_URL=memory" for an in memory storage or the documented database adapters.`)
 	} else if c.DatabasePlugin != "" {
 		c.GetLogger().Infof("Database plugin set to %s", c.DatabasePlugin)
 		pc := &PluginConnection{Config: c, Logger: c.GetLogger()}
-		if err := pc.Connect(); err != nil {
+		if err := pc.Load(); err != nil {
 			c.GetLogger().Fatalf("Could not connect via database plugin: %s", err)
 		}
-		connection = pc
-	} else if c.DatabaseURL != "memory" {
+	}
+
+	var connection BackendConnector
+	scheme := "memory"
+	if c.DatabaseURL != "memory" {
 		u, err := url.Parse(c.DatabaseURL)
 		if err != nil {
 			c.GetLogger().Fatalf("Could not parse DATABASE_URL: %s", err)
 		}
 
-		switch u.Scheme {
-		case "postgres":
-			fallthrough
-		case "mysql":
-			connection, err = sqlcon.NewSQLConnection(c.DatabaseURL, c.GetLogger())
-			if err != nil {
-				c.GetLogger().WithError(err).Fatalf(`Unable to initialize SQL connection`)
-			}
-			break
-		default:
-			c.GetLogger().Fatalf(`Unknown DSN "%s" in DATABASE_URL: %s`, u.Scheme, c.DatabaseURL)
+		scheme = u.Scheme
+	}
+
+	if backend, ok := backends[scheme]; ok {
+		if err := backend.Init(c.DatabaseURL, c.GetLogger()); err != nil {
+			c.GetLogger().Fatalf(`Could not connect to database backend: %s`, err)
 		}
+		connection = backend
+	} else {
+		c.GetLogger().Fatalf(`Unknown DSN scheme "%s" in DATABASE_URL "%s", schemes %v supported`, scheme, c.DatabaseURL, supportedSchemes())
 	}
 
 	c.context = &Context{
@@ -337,8 +338,12 @@ func (c *Config) GetSystemSecret() []byte {
 	return secret
 }
 
-func (c *Config) GetAddress() string {
-	return fmt.Sprintf("%s:%d", c.BindHost, c.BindPort)
+func (c *Config) GetFrontendAddress() string {
+	return fmt.Sprintf("%s:%d", c.FrontendBindHost, c.FrontendBindPort)
+}
+
+func (c *Config) GetBackendAddress() string {
+	return fmt.Sprintf("%s:%d", c.BackendBindHost, c.BackendBindPort)
 }
 
 func (c *Config) Persist() error {

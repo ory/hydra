@@ -23,12 +23,6 @@ package config
 import (
 	"plugin"
 
-	"github.com/jmoiron/sqlx"
-	"github.com/ory/fosite"
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -37,8 +31,8 @@ type PluginConnection struct {
 	Config     *Config
 	plugin     *plugin.Plugin
 	didConnect bool
+	connector  BackendConnector
 	Logger     logrus.FieldLogger
-	db         *sqlx.DB
 }
 
 func (c *PluginConnection) load() error {
@@ -56,11 +50,7 @@ func (c *PluginConnection) load() error {
 	return nil
 }
 
-func (c *PluginConnection) Ping() error {
-	return c.db.Ping()
-}
-
-func (c *PluginConnection) Connect() error {
+func (c *PluginConnection) Load() error {
 	cf := c.Config
 	if c.didConnect {
 		return nil
@@ -70,80 +60,15 @@ func (c *PluginConnection) Connect() error {
 		return errors.WithStack(err)
 	}
 
-	if l, err := c.plugin.Lookup("Connect"); err != nil {
-		return errors.Wrap(err, "Unable to look up `Connect`")
-	} else if con, ok := l.(func(url string) (*sqlx.DB, error)); !ok {
-		return errors.New("Unable to type assert `Connect`")
+	if l, err := c.plugin.Lookup("BackendConnector"); err != nil {
+		return errors.Wrap(err, "Unable to look up `BackendConnector`")
+	} else if connector, ok := l.(*BackendConnector); !ok {
+		return errors.New("Unable to type assert `BackendConnector`")
 	} else {
-		if db, err := con(cf.DatabaseURL); err != nil {
-			return errors.Wrap(err, "Could not connect to database")
-		} else {
-			cf.GetLogger().Info("Successfully connected through database plugin")
-			c.db = db
-			cf.GetLogger().Debugf("Address of database plugin is: %s", c.db)
-			if err := db.Ping(); err != nil {
-				cf.GetLogger().WithError(err).Fatal("Could not ping database connection from plugin")
-			}
-		}
+		cf.GetLogger().Info("Successfully loaded database plugin")
+		c.connector = *connector
+		cf.GetLogger().Debugf("Address of database plugin is: %p", connector)
+		RegisterBackend(c.connector)
 	}
 	return nil
-}
-
-func (c *PluginConnection) NewClientManager() (client.Manager, error) {
-	if err := c.load(); err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	ctx := c.Config.Context()
-	if l, err := c.plugin.Lookup("NewClientManager"); err != nil {
-		return nil, errors.Wrap(err, "Unable to look up `NewClientManager`")
-	} else if m, ok := l.(func(*sqlx.DB, fosite.Hasher) client.Manager); !ok {
-		return nil, errors.New("Unable to type assert `NewClientManager`")
-	} else {
-		return m(c.db, ctx.Hasher), nil
-	}
-}
-
-func (c *PluginConnection) NewJWKManager() (jwk.Manager, error) {
-	if err := c.load(); err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	if l, err := c.plugin.Lookup("NewJWKManager"); err != nil {
-		return nil, errors.Wrap(err, "Unable to look up `NewJWKManager`")
-	} else if m, ok := l.(func(*sqlx.DB, *jwk.AEAD) jwk.Manager); !ok {
-		return nil, errors.New("Unable to type assert `NewJWKManager`")
-	} else {
-		return m(c.db, &jwk.AEAD{
-			Key: c.Config.GetSystemSecret(),
-		}), nil
-	}
-}
-
-func (c *PluginConnection) NewOAuth2Manager(clientManager client.Manager) (pkg.FositeStorer, error) {
-	if err := c.load(); err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	if l, err := c.plugin.Lookup("NewOAuth2Manager"); err != nil {
-		return nil, errors.Wrap(err, "Unable to look up `NewOAuth2Manager`")
-	} else if m, ok := l.(func(*sqlx.DB, client.Manager, logrus.FieldLogger) pkg.FositeStorer); !ok {
-		return nil, errors.New("Unable to type assert `NewOAuth2Manager`")
-	} else {
-		return m(c.db, clientManager, c.Config.GetLogger()), nil
-	}
-}
-
-func (c *PluginConnection) NewConsentManager() (consent.Manager, error) {
-	if err := c.load(); err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	if l, err := c.plugin.Lookup("NewConsentManager"); err != nil {
-		return nil, errors.Wrap(err, "Unable to look up `NewConsentManager`")
-	} else if m, ok := l.(func(*sqlx.DB) consent.Manager); !ok {
-		return nil, errors.Errorf("Unable to type assert `NewConsentManager`, got %v", l)
-	} else {
-		return m(c.db), nil
-	}
 }

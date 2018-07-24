@@ -39,33 +39,12 @@ import (
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/sqlcon"
 	"github.com/pborman/uuid"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {
 	var ctx = c.Context()
-	var store pkg.FositeStorer
-
-	switch con := ctx.Connection.(type) {
-	case *config.MemoryConnection:
-		store = oauth2.NewFositeMemoryStore(clients, c.GetAccessTokenLifespan())
-		break
-	case *sqlcon.SQLConnection:
-		expectDependency(c.GetLogger(), con.GetDatabase())
-		store = oauth2.NewFositeSQLStore(clients, con.GetDatabase(), c.GetLogger(), c.GetAccessTokenLifespan(), c.OAuth2AccessTokenStrategy == "jwt")
-		break
-	case *config.PluginConnection:
-		var err error
-		if store, err = con.NewOAuth2Manager(clients); err != nil {
-			c.GetLogger().Fatalf("Could not load client manager plugin %s", err)
-		}
-		break
-	default:
-		panic("Unknown connection type.")
-	}
-
-	ctx.FositeStore = store
+	ctx.FositeStore = ctx.Connection.NewOAuth2Manager(clients, c.GetAccessTokenLifespan(), c.OAuth2AccessTokenStrategy)
 }
 
 func newOAuth2Provider(c *config.Config) fosite.OAuth2Provider {
@@ -159,14 +138,14 @@ func setDefaultConsentURL(s string, c *config.Config, path string) string {
 		proto = "http"
 	}
 	host := "localhost"
-	if c.BindHost != "" {
-		host = c.BindHost
+	if c.FrontendBindHost != "" {
+		host = c.FrontendBindHost
 	}
-	return fmt.Sprintf("%s://%s:%d/%s", proto, host, c.BindPort, path)
+	return fmt.Sprintf("%s://%s:%d/%s", proto, host, c.FrontendBindPort, path)
 }
 
 //func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm oauth2.ConsentRequestManager, o fosite.OAuth2Provider, idTokenKeyID string) *oauth2.Handler {
-func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm consent.Manager, o fosite.OAuth2Provider) *oauth2.Handler {
+func newOAuth2Handler(c *config.Config, frontend, backend *httprouter.Router, cm consent.Manager, o fosite.OAuth2Provider) *oauth2.Handler {
 	expectDependency(c.GetLogger(), c.Context().FositeStore)
 
 	c.ConsentURL = setDefaultConsentURL(c.ConsentURL, c, "oauth2/fallbacks/consent")
@@ -218,6 +197,6 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm consent.Ma
 		IDTokenLifespan:        c.GetIDTokenLifespan(),
 	}
 
-	handler.SetRoutes(router)
+	handler.SetRoutes(frontend, backend)
 	return handler
 }

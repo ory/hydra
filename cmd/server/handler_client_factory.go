@@ -27,33 +27,11 @@ import (
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
-	"github.com/ory/sqlcon"
 )
 
 func newClientManager(c *config.Config) client.Manager {
 	ctx := c.Context()
-
-	switch con := ctx.Connection.(type) {
-	case *config.MemoryConnection:
-		expectDependency(c.GetLogger(), ctx.Hasher)
-		return client.NewMemoryManager(ctx.Hasher)
-	case *sqlcon.SQLConnection:
-		expectDependency(c.GetLogger(), ctx.Hasher, con.GetDatabase())
-		return &client.SQLManager{
-			DB:     con.GetDatabase(),
-			Hasher: ctx.Hasher,
-		}
-	case *config.PluginConnection:
-		if m, err := con.NewClientManager(); err != nil {
-			c.GetLogger().Fatalf("Could not load client manager plugin %s", err)
-		} else {
-			return m
-		}
-		break
-	default:
-		panic("Unknown connection type.")
-	}
-	return nil
+	return ctx.Connection.NewClientManager(ctx.Hasher)
 }
 
 func newClientHandler(c *config.Config, router *httprouter.Router, manager client.Manager) *client.Handler {

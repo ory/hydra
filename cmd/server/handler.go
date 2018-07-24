@@ -251,7 +251,7 @@ func (h *Handler) registerRoutes(router *httprouter.Router) {
 	// Set statsd
 	statsdClient, err := NewStatsdClient()
 	if err != nil {
-		logrus.Fatalf("Error creating Statsd client : %v", err)
+		logrus.Errorf("Error creating Statsd client : %v", err)
 	}
 
 	// Set up handlers

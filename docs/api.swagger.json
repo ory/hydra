@@ -1064,6 +1064,38 @@
       }
     },
     "/oauth2/auth/sessions/consent/{user}": {
+      "get": {
+        "description": "This endpoint lists all user's granted consent sessions, including client and granted scope",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "oAuth2"
+        ],
+        "summary": "List all consent sessions of a user",
+        "operationId": "listUserClientConsentSessions",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/handledConsentRequestList"
+          },
+          "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "403": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      },
       "delete": {
         "description": "This endpoint revokes a user's granted consent sessions and invalidates all associated OAuth 2.0 Access Tokens.",
         "consumes": [
@@ -1925,6 +1957,9 @@
       "type": "object",
       "title": "The request payload used to accept a consent request.",
       "properties": {
+        "consent_request": {
+          "$ref": "#/definitions/consentRequest"
+        },
         "grant_scope": {
           "description": "GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`",
           "type": "array",
@@ -3012,6 +3047,15 @@
             "type": "string",
             "x-go-name": "Hint"
           }
+        }
+      }
+    },
+    "handledConsentRequestList": {
+      "description": "A list of handled consent requests.",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/acceptConsentRequest"
         }
       }
     },

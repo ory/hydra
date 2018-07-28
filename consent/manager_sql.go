@@ -364,8 +364,34 @@ WHERE
 		return nil, sqlcon.HandleError(err)
 	}
 
+	return m.resolveHandledConsentRequests(a)
+}
+
+func (m *SQLManager) FindPreviouslyGrantedConsentRequestsByUser(subject string) ([]HandledConsentRequest, error) {
+	var a []sqlHandledConsentRequest
+
+	if err := m.db.Select(&a, m.db.Rebind(`SELECT h.* FROM
+	hydra_oauth2_consent_request_handled as h
+JOIN
+	hydra_oauth2_consent_request as r ON (h.challenge = r.challenge)
+WHERE
+		r.subject=? AND r.skip=FALSE
+	AND
+		(h.error='{}' AND h.remember=TRUE)
+`), subject); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.WithStack(errNoPreviousConsentFound)
+		}
+		return nil, sqlcon.HandleError(err)
+	}
+
+	return m.resolveHandledConsentRequests(a)
+
+}
+
+func (m *SQLManager) resolveHandledConsentRequests(requests []sqlHandledConsentRequest) ([]HandledConsentRequest, error) {
 	var aa []HandledConsentRequest
-	for _, v := range a {
+	for _, v := range requests {
 		r, err := m.GetConsentRequest(v.Challenge)
 		if err != nil {
 			return nil, err
@@ -376,12 +402,10 @@ WHERE
 		if v.RememberFor > 0 && v.RequestedAt.Add(time.Duration(v.RememberFor)*time.Second).Before(time.Now().UTC()) {
 			continue
 		}
-
 		va, err := v.toHandledConsentRequest(r)
 		if err != nil {
 			return nil, err
 		}
-
 		aa = append(aa, *va)
 	}
 
@@ -390,4 +414,5 @@ WHERE
 	}
 
 	return aa, nil
+
 }

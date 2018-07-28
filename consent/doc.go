@@ -81,3 +81,11 @@ type swaggerRejectRequest struct {
 	// in: body
 	Body RequestDeniedError
 }
+
+// A list of handled consent requests.
+// swagger:response handledConsentRequestList
+type swaggerListHandledConsentRequestsResult struct {
+	// in: body
+	// type: array
+	Body []HandledConsentRequest
+}

@@ -485,6 +485,53 @@ func TestManagers(t *testing.T) {
 			})
 		}
 	})
+
+	t.Run("case=list-handled-consent-requests", func(t *testing.T) {
+		for k, m := range managers {
+			cr1, hcr1 := mockConsentRequest("rv1", true, 0, false, false, false)
+			cr2, hcr2 := mockConsentRequest("rv2", false, 0, false, false, false)
+			clientManager.CreateClient(cr1.Client)
+			clientManager.CreateClient(cr2.Client)
+
+			require.NoError(t, m.CreateConsentRequest(cr1))
+			require.NoError(t, m.CreateConsentRequest(cr2))
+			_, err := m.HandleConsentRequest("challengerv1", hcr1)
+			require.NoError(t, err)
+			_, err = m.HandleConsentRequest("challengerv2", hcr2)
+			require.NoError(t, err)
+
+			t.Run("manager="+k, func(t *testing.T) {
+				for i, tc := range []struct {
+					subject    string
+					challenges []string
+					clients    []string
+				}{
+					{
+						subject:    "subjectrv1",
+						challenges: []string{"challengerv1"},
+						clients:    []string{"clientrv1"},
+					},
+					{
+						subject:    "subjectrv2",
+						challenges: []string{},
+						clients:    []string{},
+					},
+				} {
+					t.Run(fmt.Sprintf("case=%d/subject=%s", i, tc.subject), func(t *testing.T) {
+						consents, _ := m.FindPreviouslyGrantedConsentRequestsByUser(tc.subject)
+
+						assert.Equal(t, len(tc.challenges), len(consents))
+
+						for _, consent := range consents {
+							assert.Contains(t, tc.challenges, consent.Challenge)
+							assert.Contains(t, tc.clients, consent.ConsentRequest.Client.ClientID)
+						}
+					})
+				}
+			})
+		}
+
+	})
 }
 
 func compareAuthenticationRequest(t *testing.T, a, b *AuthenticationRequest) {

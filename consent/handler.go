@@ -64,6 +64,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.PUT(ConsentPath+"/:challenge/reject", h.RejectConsentRequest)
 
 	r.DELETE("/oauth2/auth/sessions/login/:user", h.DeleteLoginSession)
+	r.GET("/oauth2/auth/sessions/consent/:user", h.GetConsentSessions)
 	r.DELETE("/oauth2/auth/sessions/consent/:user", h.DeleteUserConsentSession)
 	r.DELETE("/oauth2/auth/sessions/consent/:user/:client", h.DeleteUserClientConsentSession)
 }
@@ -131,6 +132,47 @@ func (h *Handler) DeleteUserClientConsentSession(w http.ResponseWriter, r *http.
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+// swagger:route GET /oauth2/auth/sessions/consent/{user} oAuth2 listUserClientConsentSessions
+//
+// List all consent sessions of a user
+//
+// This endpoint lists all user's granted consent sessions, including client and granted scope
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Responses:
+//       200: handledConsentRequestList
+//       401: genericError
+//       403: genericError
+//       500: genericError
+
+func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	user := ps.ByName("user")
+	if user == "" {
+		h.H.WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Parameter user is not defined")))
+		return
+	}
+
+	sessions, err := h.M.FindPreviouslyGrantedConsentRequestsByUser(user)
+
+	if err != nil {
+		h.H.WriteError(w, r, err)
+		return
+	}
+
+	for _, session := range sessions {
+		session.ConsentRequest.Client = sanitizeClient(session.ConsentRequest.Client)
+	}
+
+	h.H.Write(w, r, sessions)
 }
 
 // swagger:route DELETE /oauth2/auth/sessions/login/{user} oAuth2 revokeAuthenticationSession

@@ -163,16 +163,28 @@ func (m *MemoryManager) VerifyAndInvalidateConsentRequest(verifier string) (*Han
 
 func (m *MemoryManager) FindPreviouslyGrantedConsentRequests(client string, subject string) ([]HandledConsentRequest, error) {
 	var rs []HandledConsentRequest
+	filteredByUser, _ := m.FindPreviouslyGrantedConsentRequestsByUser(subject)
+	for _, c := range filteredByUser {
+		if client != c.ConsentRequest.Client.GetID() {
+			continue
+		}
+		rs = append(rs, c)
+	}
+	if len(rs) == 0 {
+		return []HandledConsentRequest{}, nil
+	}
+
+	return rs, nil
+}
+
+func (m *MemoryManager) FindPreviouslyGrantedConsentRequestsByUser(subject string) ([]HandledConsentRequest, error) {
+	var rs []HandledConsentRequest
 	for _, c := range m.handledConsentRequests {
 		cr, err := m.GetConsentRequest(c.Challenge)
 		if errors.Cause(err) == pkg.ErrNotFound {
 			return nil, errors.WithStack(errNoPreviousConsentFound)
 		} else if err != nil {
 			return nil, err
-		}
-
-		if client != cr.Client.GetID() {
-			continue
 		}
 
 		if subject != cr.Subject {

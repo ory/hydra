@@ -96,7 +96,7 @@ type HandledConsentRequest struct {
 	// authorization will be remembered indefinitely.
 	RememberFor int `json:"remember_for"`
 
-	ConsentRequest  *ConsentRequest     `json:"-"`
+	ConsentRequest  *ConsentRequest     `json:"consent_request"`
 	Error           *RequestDeniedError `json:"-"`
 	Challenge       string              `json:"-"`
 	RequestedAt     time.Time           `json:"-"`

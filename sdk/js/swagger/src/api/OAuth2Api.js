@@ -24,6 +24,7 @@
       'model/CompletedRequest',
       'model/ConsentRequest',
       'model/FlushInactiveOAuth2TokensRequest',
+      'model/HandledConsentRequestResponse',
       'model/InlineResponse401',
       'model/JsonWebKeySet',
       'model/LoginRequest',
@@ -43,6 +44,7 @@
       require('../model/CompletedRequest'),
       require('../model/ConsentRequest'),
       require('../model/FlushInactiveOAuth2TokensRequest'),
+      require('../model/HandledConsentRequestResponse'),
       require('../model/InlineResponse401'),
       require('../model/JsonWebKeySet'),
       require('../model/LoginRequest'),
@@ -67,6 +69,8 @@
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ConsentRequest,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer
         .FlushInactiveOAuth2TokensRequest,
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer
+        .HandledConsentRequestResponse,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.InlineResponse401,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKeySet,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.LoginRequest,
@@ -86,6 +90,7 @@
   CompletedRequest,
   ConsentRequest,
   FlushInactiveOAuth2TokensRequest,
+  HandledConsentRequestResponse,
   InlineResponse401,
   JsonWebKeySet,
   LoginRequest,
@@ -672,6 +677,59 @@
 
       return this.apiClient.callApi(
         '/clients',
+        'GET',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
+    }
+
+    /**
+     * Callback function to receive the result of the listUserClientConsentSessions operation.
+     * @callback module:api/OAuth2Api~listUserClientConsentSessionsCallback
+     * @param {String} error Error message, if any.
+     * @param {Array.<module:model/HandledConsentRequestResponse>} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Lists all consent sessions of a user
+     * This endpoint lists all user&#39;s granted consent sessions, including client and granted scope
+     * @param {String} user
+     * @param {module:api/OAuth2Api~listUserClientConsentSessionsCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link Array.<module:model/HandledConsentRequestResponse>}
+     */
+    this.listUserClientConsentSessions = function(user, callback) {
+      var postBody = null
+
+      // verify the required parameter 'user' is set
+      if (user === undefined || user === null) {
+        throw new Error(
+          "Missing the required parameter 'user' when calling listUserClientConsentSessions"
+        )
+      }
+
+      var pathParams = {
+        user: user
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
+
+      var authNames = []
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = [HandledConsentRequestResponse]
+
+      return this.apiClient.callApi(
+        '/oauth2/auth/sessions/consent/{user}',
         'GET',
         pathParams,
         queryParams,

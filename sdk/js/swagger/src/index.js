@@ -30,6 +30,7 @@
       'model/ExtKeyUsage',
       'model/Extension',
       'model/FlushInactiveOAuth2TokensRequest',
+      'model/HandledConsentRequestResponse',
       'model/HealthNotReadyStatus',
       'model/HealthStatus',
       'model/IP',
@@ -89,6 +90,7 @@
       require('./model/ExtKeyUsage'),
       require('./model/Extension'),
       require('./model/FlushInactiveOAuth2TokensRequest'),
+      require('./model/HandledConsentRequestResponse'),
       require('./model/HealthNotReadyStatus'),
       require('./model/HealthStatus'),
       require('./model/IP'),
@@ -147,6 +149,7 @@
   ExtKeyUsage,
   Extension,
   FlushInactiveOAuth2TokensRequest,
+  HandledConsentRequestResponse,
   HealthNotReadyStatus,
   HealthStatus,
   IP,
@@ -285,6 +288,11 @@
      * @property {module:model/FlushInactiveOAuth2TokensRequest}
      */
     FlushInactiveOAuth2TokensRequest: FlushInactiveOAuth2TokensRequest,
+    /**
+     * The HandledConsentRequestResponse model constructor.
+     * @property {module:model/HandledConsentRequestResponse}
+     */
+    HandledConsentRequestResponse: HandledConsentRequestResponse,
     /**
      * The HealthNotReadyStatus model constructor.
      * @property {module:model/HealthNotReadyStatus}

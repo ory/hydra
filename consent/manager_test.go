@@ -518,7 +518,7 @@ func TestManagers(t *testing.T) {
 					},
 				} {
 					t.Run(fmt.Sprintf("case=%d/subject=%s", i, tc.subject), func(t *testing.T) {
-						consents, _ := m.FindPreviouslyGrantedConsentRequestsByUser(tc.subject)
+						consents, _ := m.FindPreviouslyGrantedConsentRequestsByUser(tc.subject, 100, 0)
 
 						assert.Equal(t, len(tc.challenges), len(consents))
 

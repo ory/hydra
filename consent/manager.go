@@ -29,7 +29,7 @@ type Manager interface {
 
 	VerifyAndInvalidateConsentRequest(verifier string) (*HandledConsentRequest, error)
 	FindPreviouslyGrantedConsentRequests(client string, user string) ([]HandledConsentRequest, error)
-	FindPreviouslyGrantedConsentRequestsByUser(user string) ([]HandledConsentRequest, error)
+	FindPreviouslyGrantedConsentRequestsByUser(user string, limit, offset int) ([]HandledConsentRequest, error)
 
 	// Cookie management
 	GetAuthenticationSession(id string) (*AuthenticationSession, error)

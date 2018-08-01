@@ -45,6 +45,13 @@ type swaggerRevokeUserClientConsentSessionsPayload struct {
 	Client string `json:"client"`
 }
 
+// swagger:parameters listUserClientConsentSessions
+type swaggerListUserClientConsentSessionsPayload struct {
+	// in: path
+	// required: true
+	User string `json:"user"`
+}
+
 // swagger:parameters revokeAuthenticationSession
 type swaggerRevokeAuthenticationSessionPayload struct {
 	// in: path
@@ -87,5 +94,5 @@ type swaggerRejectRequest struct {
 type swaggerListHandledConsentRequestsResult struct {
 	// in: body
 	// type: array
-	Body []HandledConsentRequest
+	Body []HandledConsentRequestResponse
 }

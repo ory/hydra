@@ -15,6 +15,7 @@ Method | HTTP request | Description
 [**getWellKnown**](OAuth2Api.md#getWellKnown) | **GET** /.well-known/openid-configuration | Server well known configuration
 [**introspectOAuth2Token**](OAuth2Api.md#introspectOAuth2Token) | **POST** /oauth2/introspect | Introspect OAuth2 tokens
 [**listOAuth2Clients**](OAuth2Api.md#listOAuth2Clients) | **GET** /clients | List OAuth 2.0 Clients
+[**listUserClientConsentSessions**](OAuth2Api.md#listUserClientConsentSessions) | **GET** /oauth2/auth/sessions/consent/{user} | Lists all consent sessions of a user
 [**oauthAuth**](OAuth2Api.md#oauthAuth) | **GET** /oauth2/auth | The OAuth 2.0 authorize endpoint
 [**oauthToken**](OAuth2Api.md#oauthToken) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
 [**rejectConsentRequest**](OAuth2Api.md#rejectConsentRequest) | **PUT** /oauth2/auth/requests/consent/{challenge}/reject | Reject an consent request
@@ -544,6 +545,52 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**[OAuth2Client]**](OAuth2Client.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+<a name="listUserClientConsentSessions"></a>
+# **listUserClientConsentSessions**
+> [HandledConsentRequestResponse] listUserClientConsentSessions(user)
+
+Lists all consent sessions of a user
+
+This endpoint lists all user&#39;s granted consent sessions, including client and granted scope
+
+### Example
+```javascript
+var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+
+var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api();
+
+var user = "user_example"; // String | 
+
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+apiInstance.listUserClientConsentSessions(user, callback);
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **user** | **String**|  | 
+
+### Return type
+
+[**[HandledConsentRequestResponse]**](HandledConsentRequestResponse.md)
 
 ### Authorization
 

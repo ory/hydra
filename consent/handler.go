@@ -30,6 +30,7 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/herodot"
+	"github.com/ory/pagination"
 	"github.com/pkg/errors"
 )
 
@@ -136,7 +137,7 @@ func (h *Handler) DeleteUserClientConsentSession(w http.ResponseWriter, r *http.
 
 // swagger:route GET /oauth2/auth/sessions/consent/{user} oAuth2 listUserClientConsentSessions
 //
-// List all consent sessions of a user
+// Lists all consent sessions of a user
 //
 // This endpoint lists all user's granted consent sessions, including client and granted scope
 //
@@ -160,19 +161,27 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 		h.H.WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Parameter user is not defined")))
 		return
 	}
+	limit, offset := pagination.Parse(r, 100, 0, 500)
 
-	sessions, err := h.M.FindPreviouslyGrantedConsentRequestsByUser(user)
+	sessions, err := h.M.FindPreviouslyGrantedConsentRequestsByUser(user, limit, offset)
 
 	if err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}
 
+	var a []HandledConsentRequestResponse
+
 	for _, session := range sessions {
 		session.ConsentRequest.Client = sanitizeClient(session.ConsentRequest.Client)
+		a = append(a, HandledConsentRequestResponse(session))
 	}
 
-	h.H.Write(w, r, sessions)
+	if len(a) == 0 {
+		a = []HandledConsentRequestResponse{}
+	}
+
+	h.H.Write(w, r, a)
 }
 
 // swagger:route DELETE /oauth2/auth/sessions/login/{user} oAuth2 revokeAuthenticationSession

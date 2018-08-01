@@ -367,7 +367,7 @@ WHERE
 	return m.resolveHandledConsentRequests(a)
 }
 
-func (m *SQLManager) FindPreviouslyGrantedConsentRequestsByUser(subject string) ([]HandledConsentRequest, error) {
+func (m *SQLManager) FindPreviouslyGrantedConsentRequestsByUser(subject string, limit, offset int) ([]HandledConsentRequest, error) {
 	var a []sqlHandledConsentRequest
 
 	if err := m.db.Select(&a, m.db.Rebind(`SELECT h.* FROM
@@ -378,14 +378,15 @@ WHERE
 		r.subject=? AND r.skip=FALSE
 	AND
 		(h.error='{}' AND h.remember=TRUE)
-`), subject); err != nil {
+LIMIT ? OFFSET ?
+`), subject, limit, offset); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.WithStack(errNoPreviousConsentFound)
 		}
 		return nil, sqlcon.HandleError(err)
 	}
-
-	return m.resolveHandledConsentRequests(a)
+	aa, err := m.resolveHandledConsentRequests(a)
+	return aa, err
 
 }
 

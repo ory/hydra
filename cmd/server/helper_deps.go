@@ -25,6 +25,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+var errNilDependency = errors.New("A dependency was expected to be defined but is nil. Please open an issue with the stack trace.")
+
 func expectDependency(logger logrus.FieldLogger, dependencies ...interface{}) {
 	for _, d := range dependencies {
 		if d == nil {

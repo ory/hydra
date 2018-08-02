@@ -49,8 +49,6 @@ import (
 
 var _ = &consent.Handler{}
 
-var errNilDependency = errors.New("A dependency was expected to be defined but is nil. Please open an issue with the stack trace.")
-
 func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		fmt.Println(banner)

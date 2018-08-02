@@ -29,7 +29,7 @@ import (
 )
 
 type Context struct {
-	Connection interface{}
+	Connection BackendConnector
 
 	Hasher         fosite.Hasher
 	FositeStrategy oauth2.CoreStrategy

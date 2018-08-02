@@ -26,35 +26,14 @@ import (
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
-	"github.com/ory/sqlcon"
 )
 
 func injectJWKManager(c *config.Config) {
 	ctx := c.Context()
 
-	switch con := ctx.Connection.(type) {
-	case *config.MemoryConnection:
-		ctx.KeyManager = &jwk.MemoryManager{}
-		break
-	case *sqlcon.SQLConnection:
-		expectDependency(c.GetLogger(), con.GetDatabase())
-		ctx.KeyManager = &jwk.SQLManager{
-			DB: con.GetDatabase(),
-			Cipher: &jwk.AEAD{
-				Key: c.GetSystemSecret(),
-			},
-		}
-		break
-	case *config.PluginConnection:
-		var err error
-		ctx.KeyManager, err = con.NewJWKManager()
-		if err != nil {
-			c.GetLogger().Fatalf("Could not load client manager plugin %s", err)
-		}
-		break
-	default:
-		c.GetLogger().Fatalf("Unknown connection type.")
-	}
+	ctx.KeyManager = ctx.Connection.NewJWKManager(&jwk.AEAD{
+		Key: c.GetSystemSecret(),
+	})
 }
 
 func newJWKHandler(c *config.Config, router *httprouter.Router) *jwk.Handler {

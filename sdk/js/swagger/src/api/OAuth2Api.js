@@ -24,13 +24,13 @@
       'model/CompletedRequest',
       'model/ConsentRequest',
       'model/FlushInactiveOAuth2TokensRequest',
-      'model/HandledConsentRequestResponse',
       'model/InlineResponse401',
       'model/JsonWebKeySet',
       'model/LoginRequest',
       'model/OAuth2Client',
       'model/OAuth2TokenIntrospection',
       'model/OauthTokenResponse',
+      'model/PreviousConsentSession',
       'model/RejectRequest',
       'model/UserinfoResponse',
       'model/WellKnown'
@@ -44,13 +44,13 @@
       require('../model/CompletedRequest'),
       require('../model/ConsentRequest'),
       require('../model/FlushInactiveOAuth2TokensRequest'),
-      require('../model/HandledConsentRequestResponse'),
       require('../model/InlineResponse401'),
       require('../model/JsonWebKeySet'),
       require('../model/LoginRequest'),
       require('../model/OAuth2Client'),
       require('../model/OAuth2TokenIntrospection'),
       require('../model/OauthTokenResponse'),
+      require('../model/PreviousConsentSession'),
       require('../model/RejectRequest'),
       require('../model/UserinfoResponse'),
       require('../model/WellKnown')
@@ -69,8 +69,6 @@
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ConsentRequest,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer
         .FlushInactiveOAuth2TokensRequest,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer
-        .HandledConsentRequestResponse,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.InlineResponse401,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKeySet,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.LoginRequest,
@@ -78,6 +76,8 @@
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer
         .OAuth2TokenIntrospection,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OauthTokenResponse,
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer
+        .PreviousConsentSession,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.RejectRequest,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.UserinfoResponse,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WellKnown
@@ -90,13 +90,13 @@
   CompletedRequest,
   ConsentRequest,
   FlushInactiveOAuth2TokensRequest,
-  HandledConsentRequestResponse,
   InlineResponse401,
   JsonWebKeySet,
   LoginRequest,
   OAuth2Client,
   OAuth2TokenIntrospection,
   OauthTokenResponse,
+  PreviousConsentSession,
   RejectRequest,
   UserinfoResponse,
   WellKnown
@@ -695,7 +695,7 @@
      * Callback function to receive the result of the listUserClientConsentSessions operation.
      * @callback module:api/OAuth2Api~listUserClientConsentSessionsCallback
      * @param {String} error Error message, if any.
-     * @param {Array.<module:model/HandledConsentRequestResponse>} data The data returned by the service call.
+     * @param {Array.<module:model/PreviousConsentSession>} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -704,7 +704,7 @@
      * This endpoint lists all user&#39;s granted consent sessions, including client and granted scope
      * @param {String} user
      * @param {module:api/OAuth2Api~listUserClientConsentSessionsCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link Array.<module:model/HandledConsentRequestResponse>}
+     * data is of type: {@link Array.<module:model/PreviousConsentSession>}
      */
     this.listUserClientConsentSessions = function(user, callback) {
       var postBody = null
@@ -726,7 +726,7 @@
       var authNames = []
       var contentTypes = ['application/json']
       var accepts = ['application/json']
-      var returnType = [HandledConsentRequestResponse]
+      var returnType = [PreviousConsentSession]
 
       return this.apiClient.callApi(
         '/oauth2/auth/sessions/consent/{user}',

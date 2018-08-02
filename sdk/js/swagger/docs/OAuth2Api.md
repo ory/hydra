@@ -557,7 +557,7 @@ No authorization required
 
 <a name="listUserClientConsentSessions"></a>
 # **listUserClientConsentSessions**
-> [HandledConsentRequestResponse] listUserClientConsentSessions(user)
+> [PreviousConsentSession] listUserClientConsentSessions(user)
 
 Lists all consent sessions of a user
 
@@ -590,7 +590,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**[HandledConsentRequestResponse]**](HandledConsentRequestResponse.md)
+[**[PreviousConsentSession]**](PreviousConsentSession.md)
 
 ### Authorization
 

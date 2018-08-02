@@ -729,9 +729,9 @@ func (a OAuth2Api) ListOAuth2Clients(limit int64, offset int64) ([]OAuth2Client,
  * This endpoint lists all user&#39;s granted consent sessions, including client and granted scope
  *
  * @param user
- * @return []HandledConsentRequestResponse
+ * @return []PreviousConsentSession
  */
-func (a OAuth2Api) ListUserClientConsentSessions(user string) ([]HandledConsentRequestResponse, *APIResponse, error) {
+func (a OAuth2Api) ListUserClientConsentSessions(user string) ([]PreviousConsentSession, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Get")
 	// create path and map variables
@@ -767,7 +767,7 @@ func (a OAuth2Api) ListUserClientConsentSessions(user string) ([]HandledConsentR
 	if localVarHttpHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
-	var successPayload = new([]HandledConsentRequestResponse)
+	var successPayload = new([]PreviousConsentSession)
 	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 
 	var localVarURL, _ = url.Parse(localVarPath)

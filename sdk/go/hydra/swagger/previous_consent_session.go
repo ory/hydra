@@ -11,7 +11,7 @@
 package swagger
 
 // The response used to return handled consent requests same as HandledAuthenticationRequest, just with consent_request exposed as json
-type HandledConsentRequestResponse struct {
+type PreviousConsentSession struct {
 	ConsentRequest ConsentRequest `json:"consent_request,omitempty"`
 
 	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`

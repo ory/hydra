@@ -1,4 +1,4 @@
-# HandledConsentRequestResponse
+# PreviousConsentSession
 
 ## Properties
 Name | Type | Description | Notes

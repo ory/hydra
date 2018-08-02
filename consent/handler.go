@@ -170,15 +170,15 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
-	var a []HandledConsentRequestResponse
+	var a []PreviousConsentSession
 
 	for _, session := range sessions {
 		session.ConsentRequest.Client = sanitizeClient(session.ConsentRequest.Client)
-		a = append(a, HandledConsentRequestResponse(session))
+		a = append(a, PreviousConsentSession(session))
 	}
 
 	if len(a) == 0 {
-		a = []HandledConsentRequestResponse{}
+		a = []PreviousConsentSession{}
 	}
 
 	h.H.Write(w, r, a)

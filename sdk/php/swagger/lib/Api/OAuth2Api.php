@@ -1136,7 +1136,7 @@ class OAuth2Api
      *
      * @param string $user  (required)
      * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return \Hydra\SDK\Model\HandledConsentRequestResponse[]
+     * @return \Hydra\SDK\Model\PreviousConsentSession[]
      */
     public function listUserClientConsentSessions($user)
     {
@@ -1153,7 +1153,7 @@ class OAuth2Api
      *
      * @param string $user  (required)
      * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return array of \Hydra\SDK\Model\HandledConsentRequestResponse[], HTTP status code, HTTP response headers (array of strings)
+     * @return array of \Hydra\SDK\Model\PreviousConsentSession[], HTTP status code, HTTP response headers (array of strings)
      */
     public function listUserClientConsentSessionsWithHttpInfo($user)
     {
@@ -1196,15 +1196,15 @@ class OAuth2Api
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\Hydra\SDK\Model\HandledConsentRequestResponse[]',
+                '\Hydra\SDK\Model\PreviousConsentSession[]',
                 '/oauth2/auth/sessions/consent/{user}'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\HandledConsentRequestResponse[]', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\PreviousConsentSession[]', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\HandledConsentRequestResponse[]', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\PreviousConsentSession[]', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:

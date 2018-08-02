@@ -34,7 +34,7 @@
     if (!root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer) {
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {}
     }
-    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HandledConsentRequestResponse = factory(
+    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.PreviousConsentSession = factory(
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ConsentRequest,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer
@@ -45,15 +45,15 @@
   'use strict'
 
   /**
-   * The HandledConsentRequestResponse model module.
-   * @module model/HandledConsentRequestResponse
+   * The PreviousConsentSession model module.
+   * @module model/PreviousConsentSession
    * @version Latest
    */
 
   /**
-   * Constructs a new <code>HandledConsentRequestResponse</code>.
+   * Constructs a new <code>PreviousConsentSession</code>.
    * The response used to return handled consent requests same as HandledAuthenticationRequest, just with consent_request exposed as json
-   * @alias module:model/HandledConsentRequestResponse
+   * @alias module:model/PreviousConsentSession
    * @class
    */
   var exports = function() {
@@ -61,11 +61,11 @@
   }
 
   /**
-   * Constructs a <code>HandledConsentRequestResponse</code> from a plain JavaScript object, optionally creating a new instance.
+   * Constructs a <code>PreviousConsentSession</code> from a plain JavaScript object, optionally creating a new instance.
    * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
    * @param {Object} data The plain JavaScript object bearing properties of interest.
-   * @param {module:model/HandledConsentRequestResponse} obj Optional instance to populate.
-   * @return {module:model/HandledConsentRequestResponse} The populated <code>HandledConsentRequestResponse</code> instance.
+   * @param {module:model/PreviousConsentSession} obj Optional instance to populate.
+   * @return {module:model/PreviousConsentSession} The populated <code>PreviousConsentSession</code> instance.
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {

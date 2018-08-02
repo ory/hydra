@@ -1,6 +1,6 @@
 <?php
 /**
- * HandledConsentRequestResponse
+ * PreviousConsentSession
  *
  * PHP version 5
  *
@@ -32,7 +32,7 @@ namespace Hydra\SDK\Model;
 use \ArrayAccess;
 
 /**
- * HandledConsentRequestResponse Class Doc Comment
+ * PreviousConsentSession Class Doc Comment
  *
  * @category    Class
  * @description The response used to return handled consent requests same as HandledAuthenticationRequest, just with consent_request exposed as json
@@ -40,7 +40,7 @@ use \ArrayAccess;
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
  */
-class HandledConsentRequestResponse implements ArrayAccess
+class PreviousConsentSession implements ArrayAccess
 {
     const DISCRIMINATOR = null;
 
@@ -48,7 +48,7 @@ class HandledConsentRequestResponse implements ArrayAccess
       * The original name of the model.
       * @var string
       */
-    protected static $swaggerModelName = 'HandledConsentRequestResponse';
+    protected static $swaggerModelName = 'PreviousConsentSession';
 
     /**
       * Array of property to type mappings. Used for (de)serialization

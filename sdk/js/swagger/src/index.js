@@ -30,7 +30,6 @@
       'model/ExtKeyUsage',
       'model/Extension',
       'model/FlushInactiveOAuth2TokensRequest',
-      'model/HandledConsentRequestResponse',
       'model/HealthNotReadyStatus',
       'model/HealthStatus',
       'model/IP',
@@ -52,6 +51,7 @@
       'model/OauthTokenResponse',
       'model/ObjectIdentifier',
       'model/OpenIDConnectContext',
+      'model/PreviousConsentSession',
       'model/PublicKeyAlgorithm',
       'model/RawMessage',
       'model/RejectRequest',
@@ -90,7 +90,6 @@
       require('./model/ExtKeyUsage'),
       require('./model/Extension'),
       require('./model/FlushInactiveOAuth2TokensRequest'),
-      require('./model/HandledConsentRequestResponse'),
       require('./model/HealthNotReadyStatus'),
       require('./model/HealthStatus'),
       require('./model/IP'),
@@ -112,6 +111,7 @@
       require('./model/OauthTokenResponse'),
       require('./model/ObjectIdentifier'),
       require('./model/OpenIDConnectContext'),
+      require('./model/PreviousConsentSession'),
       require('./model/PublicKeyAlgorithm'),
       require('./model/RawMessage'),
       require('./model/RejectRequest'),
@@ -149,7 +149,6 @@
   ExtKeyUsage,
   Extension,
   FlushInactiveOAuth2TokensRequest,
-  HandledConsentRequestResponse,
   HealthNotReadyStatus,
   HealthStatus,
   IP,
@@ -171,6 +170,7 @@
   OauthTokenResponse,
   ObjectIdentifier,
   OpenIDConnectContext,
+  PreviousConsentSession,
   PublicKeyAlgorithm,
   RawMessage,
   RejectRequest,
@@ -289,11 +289,6 @@
      */
     FlushInactiveOAuth2TokensRequest: FlushInactiveOAuth2TokensRequest,
     /**
-     * The HandledConsentRequestResponse model constructor.
-     * @property {module:model/HandledConsentRequestResponse}
-     */
-    HandledConsentRequestResponse: HandledConsentRequestResponse,
-    /**
      * The HealthNotReadyStatus model constructor.
      * @property {module:model/HealthNotReadyStatus}
      */
@@ -398,6 +393,11 @@
      * @property {module:model/OpenIDConnectContext}
      */
     OpenIDConnectContext: OpenIDConnectContext,
+    /**
+     * The PreviousConsentSession model constructor.
+     * @property {module:model/PreviousConsentSession}
+     */
+    PreviousConsentSession: PreviousConsentSession,
     /**
      * The PublicKeyAlgorithm model constructor.
      * @property {module:model/PublicKeyAlgorithm}

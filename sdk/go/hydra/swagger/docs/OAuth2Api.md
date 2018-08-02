@@ -350,7 +350,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **ListUserClientConsentSessions**
-> []HandledConsentRequestResponse ListUserClientConsentSessions($user)
+> []PreviousConsentSession ListUserClientConsentSessions($user)
 
 Lists all consent sessions of a user
 
@@ -365,7 +365,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**[]HandledConsentRequestResponse**](HandledConsentRequestResponse.md)
+[**[]PreviousConsentSession**](PreviousConsentSession.md)
 
 ### Authorization
 

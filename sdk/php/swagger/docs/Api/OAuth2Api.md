@@ -534,7 +534,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **listUserClientConsentSessions**
-> \Hydra\SDK\Model\HandledConsentRequestResponse[] listUserClientConsentSessions($user)
+> \Hydra\SDK\Model\PreviousConsentSession[] listUserClientConsentSessions($user)
 
 Lists all consent sessions of a user
 
@@ -565,7 +565,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**\Hydra\SDK\Model\HandledConsentRequestResponse[]**](../Model/HandledConsentRequestResponse.md)
+[**\Hydra\SDK\Model\PreviousConsentSession[]**](../Model/PreviousConsentSession.md)
 
 ### Authorization
 

@@ -94,5 +94,5 @@ type swaggerRejectRequest struct {
 type swaggerListHandledConsentRequestsResult struct {
 	// in: body
 	// type: array
-	Body []HandledConsentRequestResponse
+	Body []PreviousConsentSession
 }

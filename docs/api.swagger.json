@@ -1770,38 +1770,6 @@
       },
       "x-go-package": "crypto/x509/pkix"
     },
-    "HandledConsentRequestResponse": {
-      "description": "The response used to return handled consent requests\nsame as HandledAuthenticationRequest, just with consent_request exposed as json",
-      "type": "object",
-      "properties": {
-        "consent_request": {
-          "$ref": "#/definitions/consentRequest"
-        },
-        "grant_scope": {
-          "description": "GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "x-go-name": "GrantedScope"
-        },
-        "remember": {
-          "description": "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
-          "type": "boolean",
-          "x-go-name": "Remember"
-        },
-        "remember_for": {
-          "description": "RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the\nauthorization will be remembered indefinitely.",
-          "type": "integer",
-          "format": "int64",
-          "x-go-name": "RememberFor"
-        },
-        "session": {
-          "$ref": "#/definitions/consentRequestSession"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/consent"
-    },
     "IP": {
       "description": "Note that in this documentation, referring to an\nIP address as an IPv4 address or an IPv6 address\nis a semantic property of the address, not just the\nlength of the byte slice: a 16-byte slice can still\nbe an IPv4 address.",
       "type": "array",
@@ -1933,6 +1901,38 @@
         "format": "int64"
       },
       "x-go-package": "encoding/asn1"
+    },
+    "PreviousConsentSession": {
+      "description": "The response used to return handled consent requests\nsame as HandledAuthenticationRequest, just with consent_request exposed as json",
+      "type": "object",
+      "properties": {
+        "consent_request": {
+          "$ref": "#/definitions/consentRequest"
+        },
+        "grant_scope": {
+          "description": "GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "GrantedScope"
+        },
+        "remember": {
+          "description": "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
+          "type": "boolean",
+          "x-go-name": "Remember"
+        },
+        "remember_for": {
+          "description": "RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the\nauthorization will be remembered indefinitely.",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "RememberFor"
+        },
+        "session": {
+          "$ref": "#/definitions/consentRequestSession"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/consent"
     },
     "PublicKeyAlgorithm": {
       "type": "integer",
@@ -3093,7 +3093,7 @@
       "schema": {
         "type": "array",
         "items": {
-          "$ref": "#/definitions/HandledConsentRequestResponse"
+          "$ref": "#/definitions/PreviousConsentSession"
         }
       }
     },

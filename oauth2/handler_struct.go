@@ -47,8 +47,9 @@ type Handler struct {
 	IDTokenLifespan     time.Duration
 	CookieStore         sessions.Store
 
-	OpenIDJWTStrategy      *jwk.RS256JWTStrategy
-	AccessTokenJWTStrategy *jwk.RS256JWTStrategy
+	OpenIDJWTStrategy      jwk.JWTStrategy
+	AccessTokenJWTStrategy jwk.JWTStrategy
+	AccessTokenStrategy    string
 
 	L logrus.FieldLogger
 

@@ -194,6 +194,7 @@ func newOAuth2Handler(c *config.Config, frontend, backend *httprouter.Router, cm
 		L:                      c.GetLogger(),
 		OpenIDJWTStrategy:      openIDJWTStrategy,
 		AccessTokenJWTStrategy: accessTokenJWTStrategy,
+		AccessTokenStrategy:    c.OAuth2AccessTokenStrategy,
 		IDTokenLifespan:        c.GetIDTokenLifespan(),
 	}
 

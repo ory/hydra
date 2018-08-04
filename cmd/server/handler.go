@@ -50,8 +50,6 @@ import (
 
 var _ = &consent.Handler{}
 
-var errNilDependency = errors.New("A dependency was expected to be defined but is nil. Please open an issue with the stack trace.")
-
 func enhanceRouter(c *config.Config, cmd *cobra.Command, serverHandler *Handler, router *httprouter.Router) http.Handler {
 	n := negroni.New()
 	n.Use(negronilogrus.NewMiddlewareFromLogger(c.GetLogger(), c.Issuer))

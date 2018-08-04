@@ -20,4 +20,55 @@
 
 package config
 
-type MemoryConnection struct{}
+import (
+	"time"
+
+	"github.com/sirupsen/logrus"
+
+	"github.com/ory/fosite"
+	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/pkg"
+)
+
+type MemoryBackend struct {
+	l logrus.FieldLogger
+}
+
+func init() {
+	RegisterBackend(&MemoryBackend{})
+}
+
+func (m *MemoryBackend) Init(url string, l logrus.FieldLogger) error {
+	m.l = l
+	return nil
+}
+
+func (m *MemoryBackend) NewConsentManager(_ client.Manager, fs pkg.FositeStorer) consent.Manager {
+	expectDependency(m.l, fs)
+	return consent.NewMemoryManager(fs)
+}
+
+func (m *MemoryBackend) NewOAuth2Manager(clientManager client.Manager, accessTokenLifespan time.Duration, _ string) pkg.FositeStorer {
+	expectDependency(m.l, clientManager)
+	return oauth2.NewFositeMemoryStore(clientManager, accessTokenLifespan)
+}
+
+func (m *MemoryBackend) NewClientManager(hasher fosite.Hasher) client.Manager {
+	expectDependency(m.l, hasher)
+	return client.NewMemoryManager(hasher)
+}
+
+func (m *MemoryBackend) NewJWKManager(_ *jwk.AEAD) jwk.Manager {
+	return &jwk.MemoryManager{}
+}
+
+func (m *MemoryBackend) Prefixes() []string {
+	return []string{"memory"}
+}
+
+func (m *MemoryBackend) Ping() error {
+	return nil
+}

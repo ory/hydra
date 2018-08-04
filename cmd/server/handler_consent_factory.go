@@ -26,37 +26,11 @@ import (
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/consent"
-	"github.com/ory/sqlcon"
 )
 
 func injectConsentManager(c *config.Config, cm client.Manager) {
 	var ctx = c.Context()
-	var manager consent.Manager
-
-	switch con := ctx.Connection.(type) {
-	case *config.MemoryConnection:
-		expectDependency(c.GetLogger(), ctx.FositeStore)
-		manager = consent.NewMemoryManager(ctx.FositeStore)
-		break
-	case *sqlcon.SQLConnection:
-		expectDependency(c.GetLogger(), ctx.FositeStore, con.GetDatabase())
-		manager = consent.NewSQLManager(
-			con.GetDatabase(),
-			cm,
-			ctx.FositeStore,
-		)
-		break
-	case *config.PluginConnection:
-		var err error
-		if manager, err = con.NewConsentManager(); err != nil {
-			c.GetLogger().Fatalf("Could not load client manager plugin %s", err)
-		}
-		break
-	default:
-		panic("Unknown connection type.")
-	}
-
-	ctx.ConsentManager = manager
+	ctx.ConsentManager = ctx.Connection.NewConsentManager(cm, ctx.FositeStore)
 }
 
 func newConsentHandler(c *config.Config, router *httprouter.Router) *consent.Handler {

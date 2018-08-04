@@ -40,7 +40,6 @@ import (
 	"github.com/ory/hydra/health"
 	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/sqlcon"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -240,34 +239,34 @@ func (c *Config) Context() *Context {
 		return c.context
 	}
 
-	var connection interface{} = &MemoryConnection{}
 	if c.DatabaseURL == "" {
 		c.GetLogger().Fatalf(`DATABASE_URL is not set, use "export DATABASE_URL=memory" for an in memory storage or the documented database adapters.`)
 	} else if c.DatabasePlugin != "" {
 		c.GetLogger().Infof("Database plugin set to %s", c.DatabasePlugin)
 		pc := &PluginConnection{Config: c, Logger: c.GetLogger()}
-		if err := pc.Connect(); err != nil {
+		if err := pc.Load(); err != nil {
 			c.GetLogger().Fatalf("Could not connect via database plugin: %s", err)
 		}
-		connection = pc
-	} else if c.DatabaseURL != "memory" {
+	}
+
+	var connection BackendConnector
+	scheme := "memory"
+	if c.DatabaseURL != "memory" {
 		u, err := url.Parse(c.DatabaseURL)
 		if err != nil {
 			c.GetLogger().Fatalf("Could not parse DATABASE_URL: %s", err)
 		}
 
-		switch u.Scheme {
-		case "postgres":
-			fallthrough
-		case "mysql":
-			connection, err = sqlcon.NewSQLConnection(c.DatabaseURL, c.GetLogger())
-			if err != nil {
-				c.GetLogger().WithError(err).Fatalf(`Unable to initialize SQL connection`)
-			}
-			break
-		default:
-			c.GetLogger().Fatalf(`Unknown DSN "%s" in DATABASE_URL: %s`, u.Scheme, c.DatabaseURL)
+		scheme = u.Scheme
+	}
+
+	if backend, ok := backends[scheme]; ok {
+		if err := backend.Init(c.DatabaseURL, c.GetLogger()); err != nil {
+			c.GetLogger().Fatalf(`Could not connect to database backend: %s`, err)
 		}
+		connection = backend
+	} else {
+		c.GetLogger().Fatalf(`Unknown DSN scheme "%s" in DATABASE_URL "%s", schemes %v supported`, scheme, c.DatabaseURL, supportedSchemes())
 	}
 
 	c.context = &Context{

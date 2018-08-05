@@ -24,28 +24,10 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/ory/hydra/cmd/server"
 	"github.com/spf13/cobra"
 )
 
-// serveCmd represents the host command
-var serveCmd = &cobra.Command{
-	Use:   "serve",
-	Short: "Serves both public and privileged HTTP/2 APIs",
-	Long: `Starts a process which listens on two ports for public and privileged HTTP/2 API requests.
-
-If you want more granular control (e.g. different TLS settings) over each API group (privileged, public) you
-can run "serve privileged" and "serve public" separately.
-
-This command exposes a variety of controls via environment variables. You can
-set environments using "export KEY=VALUE" (Linux/macOS) or "set KEY=VALUE" (Windows). On Linux,
-you can also set environments by prepending key value pairs: "KEY=VALUE KEY2=VALUE2 hydra"
-
-All possible controls are listed below. This command exposes exposes command line flags, which are listed below
-the controls section.
-
-
-CORE CONTROLS
+const serveControls = `CORE CONTROLS
 =============
 
 - DATABASE_URL: A URL to a persistent backend. Hydra supports various backends:
@@ -211,8 +193,29 @@ DEBUG CONTROLS
 - PROFILING: Set "PROFILING=cpu" to enable cpu profiling and "PROFILING=memory" to enable memory profiling.
 	It is not possible to do both at the same time.
 	Example: PROFILING=cpu
-`,
-	Run: server.RunHost(c),
+`
+
+// serveCmd represents the host command
+var serveCmd = &cobra.Command{
+	Use:   "serve",
+	Short: "Parent command for starting public and administrative HTTP/2 APIs",
+	Long: `ORY Hydra exposes two ports, a public and an administrative port. The public port is responsible
+for handling requests from the public internet, such as the OAuth 2.0 Authorize and Token URLs. The administrative
+port handles administrative requests like creating OAuth 2.0 Clients, managing JSON Web Keys, and managing User Login
+and Consent sessions.
+
+It is recommended to run "hydra serve all". If you need granular control over CORS settings or similar, you may
+want to run "hydra serve admin" and "admin serve public" separately.
+
+To learn more about each individual command, run:
+
+- hydra help serve all
+- hydra help serve admin
+- hydra help serve public
+
+All sub-commands share command line flags and the following environment variable names:
+
+` + serveControls,
 }
 
 func init() {

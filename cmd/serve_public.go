@@ -15,30 +15,28 @@
 package cmd
 
 import (
-	"fmt"
-
+	"github.com/ory/hydra/cmd/server"
 	"github.com/spf13/cobra"
 )
 
 // servePublicCmd represents the public command
 var servePublicCmd = &cobra.Command{
 	Use:   "public",
-	Short: "Serves public HTTP/2 APIs",
+	Short: "Serves Public HTTP/2 APIs",
 	Long: `This command opens one port and listens to HTTP/2 API requests. The exposed API handles requests coming from
 the public internet, like OAuth 2.0 Authorization and Token requests, OpenID Connect UserInfo, OAuth 2.0 Token Revokation,
 and OpenID Connect Discovery.
 
-This command is configurable using the same options available to "serve".
+This command is configurable using the same options available to "serve admin" and "serve all".
 
 It is generally recommended to use this command only if you require granular control over the privileged and public APIs.
 For example, you might want to run different TLS certificates or CORS settings on the public and privileged API.
 
 This command does not work with the "memory" database. Both services (privileged, public) MUST use the same database
-connection to be able to synchronize.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		// TODO: Work your own magic here
-		fmt.Println("public called")
-	},
+connection to be able to synchronize.
+
+` + serveControls,
+	Run: server.RunServePublic(c),
 }
 
 func init() {

@@ -46,8 +46,8 @@ func init() {
 		panic(err.Error())
 	}
 
-	os.Setenv("FRONTEND_PORT", fmt.Sprintf("%d", frontendPort))
-	os.Setenv("BACKEND_PORT", fmt.Sprintf("%d", backendPort))
+	os.Setenv("PUBLIC_PORT", fmt.Sprintf("%d", frontendPort))
+	os.Setenv("ADMIN_PORT", fmt.Sprintf("%d", backendPort))
 	os.Setenv("DATABASE_URL", "memory")
 	//os.Setenv("HYDRA_URL", fmt.Sprintf("https://localhost:%d/", frontendPort))
 	os.Setenv("OAUTH2_ISSUER_URL", fmt.Sprintf("https://localhost:%d/", frontendPort))
@@ -66,7 +66,7 @@ func TestExecute(t *testing.T) {
 		expectErr bool
 	}{
 		{
-			args: []string{"serve", "--disable-telemetry"},
+			args: []string{"serve", "all", "--disable-telemetry"},
 			wait: func() bool {
 				client := &http.Client{
 					Transport: &transporter{
@@ -81,6 +81,7 @@ func TestExecute(t *testing.T) {
 				if err != nil {
 					t.Logf("HTTP request failed: %s", err)
 				} else {
+					// Give a bit more time to initialize
 					time.Sleep(time.Second * 5)
 				}
 				return err != nil
@@ -118,10 +119,10 @@ func TestExecute(t *testing.T) {
 				for c.wait() {
 					t.Logf("Config file has not been found yet, retrying attempt #%d...", count)
 					count++
-					if count > 200 {
+					if count > 15 {
 						t.FailNow()
 					}
-					time.Sleep(time.Second * 2)
+					time.Sleep(time.Second)
 				}
 			} else {
 				err := RootCmd.Execute()

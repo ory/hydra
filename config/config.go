@@ -52,10 +52,10 @@ type Config struct {
 	EndpointURL string `mapstructure:"HYDRA_URL" yaml:"-"`
 
 	// These are used by the host command
-	FrontendBindPort                 int    `mapstructure:"FRONTEND_PORT" yaml:"-"`
-	FrontendBindHost                 string `mapstructure:"FRONTEND_HOST" yaml:"-"`
-	BackendBindPort                  int    `mapstructure:"BACKEND_PORT" yaml:"-"`
-	BackendBindHost                  string `mapstructure:"BACKEND_HOST" yaml:"-"`
+	FrontendBindPort                 int    `mapstructure:"PUBLIC_PORT" yaml:"-"`
+	FrontendBindHost                 string `mapstructure:"PUBLIC_HOST" yaml:"-"`
+	BackendBindPort                  int    `mapstructure:"ADMIN_PORT" yaml:"-"`
+	BackendBindHost                  string `mapstructure:"ADMIN_HOST" yaml:"-"`
 	Issuer                           string `mapstructure:"OAUTH2_ISSUER_URL" yaml:"-"`
 	SystemSecret                     string `mapstructure:"SYSTEM_SECRET" yaml:"-"`
 	DatabaseURL                      string `mapstructure:"DATABASE_URL" yaml:"-"`

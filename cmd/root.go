@@ -101,8 +101,17 @@ func initConfig() {
 	}
 	viper.AutomaticEnv() // read in environment variables that match
 
-	viper.BindEnv("HOST")
-	viper.SetDefault("HOST", "")
+	viper.BindEnv("PUBLIC_HOST")
+	viper.SetDefault("PUBLIC_HOST", "")
+
+	viper.BindEnv("ADMIN_HOST")
+	viper.SetDefault("ADMIN_HOST", "")
+
+	viper.BindEnv("PUBLIC_PORT")
+	viper.SetDefault("PUBLIC_PORT", 4444)
+
+	viper.BindEnv("ADMIN_PORT")
+	viper.SetDefault("ADMIN_PORT", 4445)
 
 	viper.BindEnv("CLIENT_ID")
 	viper.SetDefault("CLIENT_ID", "")
@@ -136,9 +145,6 @@ func initConfig() {
 
 	viper.BindEnv("OAUTH2_ACCESS_TOKEN_STRATEGY")
 	viper.SetDefault("OAUTH2_ACCESS_TOKEN_STRATEGY", "opaque")
-
-	viper.BindEnv("PORT")
-	viper.SetDefault("PORT", 4444)
 
 	viper.BindEnv("OAUTH2_ISSUER_URL")
 	viper.SetDefault("OAUTH2_ISSUER_URL", "http://localhost:4444")

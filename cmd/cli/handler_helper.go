@@ -41,7 +41,7 @@ func checkResponse(response *hydra.APIResponse, err error, expectedStatusCode in
 	}
 
 	if response.StatusCode != expectedStatusCode {
-		fmt.Fprintf(os.Stderr, "Command failed because calling \"%s %s\" resulted in status code \"%d\" but code \"%d\" was expected.\n%s\n", response.Request.Method, response.RequestURL, expectedStatusCode, response.StatusCode, response.Payload)
+		fmt.Fprintf(os.Stderr, "Command failed because calling \"%s %s\" resulted in status code \"%d\" but code \"%d\" was expected.\n%s\n", response.Request.Method, response.RequestURL, response.StatusCode, expectedStatusCode, response.Payload)
 		os.Exit(1)
 		return
 	}

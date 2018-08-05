@@ -84,7 +84,7 @@ func TestRevoke(t *testing.T) {
 	}
 
 	router := httprouter.New()
-	handler.SetRoutes(router)
+	handler.SetRoutes(router, router)
 	server := httptest.NewServer(router)
 
 	createAccessTokenSession("alice", "my-client", tokens[0][0], now.Add(time.Hour), store, nil)

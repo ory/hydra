@@ -138,14 +138,14 @@ func setDefaultConsentURL(s string, c *config.Config, path string) string {
 		proto = "http"
 	}
 	host := "localhost"
-	if c.BindHost != "" {
-		host = c.BindHost
+	if c.FrontendBindHost != "" {
+		host = c.FrontendBindHost
 	}
-	return fmt.Sprintf("%s://%s:%d/%s", proto, host, c.BindPort, path)
+	return fmt.Sprintf("%s://%s:%d/%s", proto, host, c.FrontendBindPort, path)
 }
 
 //func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm oauth2.ConsentRequestManager, o fosite.OAuth2Provider, idTokenKeyID string) *oauth2.Handler {
-func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm consent.Manager, o fosite.OAuth2Provider) *oauth2.Handler {
+func newOAuth2Handler(c *config.Config, frontend, backend *httprouter.Router, cm consent.Manager, o fosite.OAuth2Provider) *oauth2.Handler {
 	expectDependency(c.GetLogger(), c.Context().FositeStore)
 
 	c.ConsentURL = setDefaultConsentURL(c.ConsentURL, c, "oauth2/fallbacks/consent")
@@ -197,6 +197,6 @@ func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm consent.Ma
 		IDTokenLifespan:        c.GetIDTokenLifespan(),
 	}
 
-	handler.SetRoutes(router)
+	handler.SetRoutes(frontend, backend)
 	return handler
 }

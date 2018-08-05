@@ -190,7 +190,7 @@ var tokenUserCmd = &cobra.Command{
 func init() {
 	tokenCmd.AddCommand(tokenUserCmd)
 	tokenUserCmd.Flags().Bool("no-open", false, "Do not open the browser window automatically")
-	tokenUserCmd.Flags().IntP("port", "p", 4445, "The port on which the server should run")
+	tokenUserCmd.Flags().IntP("port", "p", 4446, "The port on which the server should run")
 	tokenUserCmd.Flags().StringSlice("scope", []string{"offline", "openid"}, "Request OAuth2 scope")
 	tokenUserCmd.Flags().StringSlice("prompt", []string{}, "Set the OpenID Connect prompt parameter")
 	tokenUserCmd.Flags().Int("max-age", 0, "Set the OpenID Connect max_age parameter")
@@ -199,7 +199,7 @@ func init() {
 	tokenUserCmd.Flags().String("client-secret", os.Getenv("OAUTH2_CLIENT_SECRET"), "Use the provided OAuth 2.0 Client Secret, defaults to environment variable OAUTH2_CLIENT_SECRET")
 
 	tokenUserCmd.Flags().String("redirect", "", "Force a redirect url")
-	tokenUserCmd.Flags().String("auth-url", os.Getenv("HYDRA_URL"), "Usually it is enough to specify the `endpoint` flag, but if you want to force the authorization url, use this flag")
-	tokenUserCmd.Flags().String("token-url", os.Getenv("HYDRA_URL"), "Usually it is enough to specify the `endpoint` flag, but if you want to force the token url, use this flag")
+	tokenUserCmd.Flags().String("auth-url", fmt.Sprintf("%s/oauth2/auth", strings.TrimRight(os.Getenv("HYDRA_URL"), "/")), "Usually it is enough to specify the `endpoint` flag, but if you want to force the authorization url, use this flag")
+	tokenUserCmd.Flags().String("token-url", fmt.Sprintf("%s/oauth2/token", strings.TrimRight(os.Getenv("HYDRA_URL"), "/")), "Usually it is enough to specify the `endpoint` flag, but if you want to force the token url, use this flag")
 	tokenUserCmd.PersistentFlags().String("endpoint", os.Getenv("HYDRA_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_URL")
 }

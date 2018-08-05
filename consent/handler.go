@@ -31,6 +31,7 @@ import (
 	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/herodot"
 	"github.com/ory/pagination"
+	"github.com/ory/sqlcon"
 	"github.com/pkg/errors"
 )
 
@@ -135,7 +136,7 @@ func (h *Handler) DeleteUserClientConsentSession(w http.ResponseWriter, r *http.
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route GET /oauth2/auth/sessions/consent/{user} oAuth2 listUserClientConsentSessions
+// swagger:route GET /oauth2/auth/sessions/consent/{user} oAuth2 listUserConsentSessions
 //
 // Lists all consent sessions of a user
 //
@@ -165,7 +166,10 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 
 	sessions, err := h.M.FindPreviouslyGrantedConsentRequestsByUser(user, limit, offset)
 
-	if err != nil {
+	if err == sqlcon.ErrNoRows {
+		h.H.Write(w, r, []PreviousConsentSession{})
+		return
+	} else if err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}

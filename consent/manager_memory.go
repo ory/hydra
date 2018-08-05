@@ -164,7 +164,11 @@ func (m *MemoryManager) VerifyAndInvalidateConsentRequest(verifier string) (*Han
 
 func (m *MemoryManager) FindPreviouslyGrantedConsentRequests(client string, subject string) ([]HandledConsentRequest, error) {
 	var rs []HandledConsentRequest
-	filteredByUser, _ := m.FindPreviouslyGrantedConsentRequestsByUser(subject, -1, -1)
+	filteredByUser, err := m.FindPreviouslyGrantedConsentRequestsByUser(subject, -1, -1)
+	if err != nil {
+		return nil, err
+	}
+
 	for _, c := range filteredByUser {
 		if client == c.ConsentRequest.Client.GetID() {
 			rs = append(rs, c)
@@ -214,9 +218,11 @@ func (m *MemoryManager) FindPreviouslyGrantedConsentRequestsByUser(subject strin
 	if len(rs) == 0 {
 		return []HandledConsentRequest{}, nil
 	}
+
 	if limit < 0 && offset < 0 {
 		return rs, nil
 	}
+
 	start, end := pagination.Index(limit, offset, len(rs))
 	return rs[start:end], nil
 }

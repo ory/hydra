@@ -380,14 +380,10 @@ WHERE
 		(h.error='{}' AND h.remember=TRUE)
 LIMIT ? OFFSET ?
 `), subject, limit, offset); err != nil {
-		if err == sql.ErrNoRows {
-			return nil, errors.WithStack(errNoPreviousConsentFound)
-		}
 		return nil, sqlcon.HandleError(err)
 	}
-	aa, err := m.resolveHandledConsentRequests(a)
-	return aa, err
 
+	return m.resolveHandledConsentRequests(a)
 }
 
 func (m *SQLManager) resolveHandledConsentRequests(requests []sqlHandledConsentRequest) ([]HandledConsentRequest, error) {
@@ -403,10 +399,12 @@ func (m *SQLManager) resolveHandledConsentRequests(requests []sqlHandledConsentR
 		if v.RememberFor > 0 && v.RequestedAt.Add(time.Duration(v.RememberFor)*time.Second).Before(time.Now().UTC()) {
 			continue
 		}
+
 		va, err := v.toHandledConsentRequest(r)
 		if err != nil {
 			return nil, err
 		}
+
 		aa = append(aa, *va)
 	}
 
@@ -415,5 +413,4 @@ func (m *SQLManager) resolveHandledConsentRequests(requests []sqlHandledConsentR
 	}
 
 	return aa, nil
-
 }

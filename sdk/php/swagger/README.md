@@ -96,7 +96,7 @@ Class | Method | HTTP request | Description
 *OAuth2Api* | [**getWellKnown**](docs/Api/OAuth2Api.md#getwellknown) | **GET** /.well-known/openid-configuration | Server well known configuration
 *OAuth2Api* | [**introspectOAuth2Token**](docs/Api/OAuth2Api.md#introspectoauth2token) | **POST** /oauth2/introspect | Introspect OAuth2 tokens
 *OAuth2Api* | [**listOAuth2Clients**](docs/Api/OAuth2Api.md#listoauth2clients) | **GET** /clients | List OAuth 2.0 Clients
-*OAuth2Api* | [**listUserClientConsentSessions**](docs/Api/OAuth2Api.md#listuserclientconsentsessions) | **GET** /oauth2/auth/sessions/consent/{user} | Lists all consent sessions of a user
+*OAuth2Api* | [**listUserConsentSessions**](docs/Api/OAuth2Api.md#listuserconsentsessions) | **GET** /oauth2/auth/sessions/consent/{user} | Lists all consent sessions of a user
 *OAuth2Api* | [**oauthAuth**](docs/Api/OAuth2Api.md#oauthauth) | **GET** /oauth2/auth | The OAuth 2.0 authorize endpoint
 *OAuth2Api* | [**oauthToken**](docs/Api/OAuth2Api.md#oauthtoken) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
 *OAuth2Api* | [**rejectConsentRequest**](docs/Api/OAuth2Api.md#rejectconsentrequest) | **PUT** /oauth2/auth/requests/consent/{challenge}/reject | Reject an consent request

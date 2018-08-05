@@ -1128,39 +1128,33 @@ class OAuth2Api
     }
 
     /**
-     * Operation listUserClientConsentSessions
+     * Operation listUserConsentSessions
      *
      * Lists all consent sessions of a user
      *
      * Client for Hydra
      *
-     * @param string $user  (required)
      * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return \Hydra\SDK\Model\PreviousConsentSession[]
      */
-    public function listUserClientConsentSessions($user)
+    public function listUserConsentSessions()
     {
-        list($response) = $this->listUserClientConsentSessionsWithHttpInfo($user);
+        list($response) = $this->listUserConsentSessionsWithHttpInfo();
         return $response;
     }
 
     /**
-     * Operation listUserClientConsentSessionsWithHttpInfo
+     * Operation listUserConsentSessionsWithHttpInfo
      *
      * Lists all consent sessions of a user
      *
      * Client for Hydra
      *
-     * @param string $user  (required)
      * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return array of \Hydra\SDK\Model\PreviousConsentSession[], HTTP status code, HTTP response headers (array of strings)
      */
-    public function listUserClientConsentSessionsWithHttpInfo($user)
+    public function listUserConsentSessionsWithHttpInfo()
     {
-        // verify the required parameter 'user' is set
-        if ($user === null) {
-            throw new \InvalidArgumentException('Missing the required parameter $user when calling listUserClientConsentSessions');
-        }
         // parse inputs
         $resourcePath = "/oauth2/auth/sessions/consent/{user}";
         $httpBody = '';
@@ -1173,14 +1167,6 @@ class OAuth2Api
         }
         $headerParams['Content-Type'] = $this->apiClient->selectHeaderContentType(['application/json']);
 
-        // path params
-        if ($user !== null) {
-            $resourcePath = str_replace(
-                "{" . "user" . "}",
-                $this->apiClient->getSerializer()->toPathValue($user),
-                $resourcePath
-            );
-        }
 
         // for model (json/xml)
         if (isset($_tempBody)) {

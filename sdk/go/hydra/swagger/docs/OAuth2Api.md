@@ -15,7 +15,7 @@ Method | HTTP request | Description
 [**GetWellKnown**](OAuth2Api.md#GetWellKnown) | **Get** /.well-known/openid-configuration | Server well known configuration
 [**IntrospectOAuth2Token**](OAuth2Api.md#IntrospectOAuth2Token) | **Post** /oauth2/introspect | Introspect OAuth2 tokens
 [**ListOAuth2Clients**](OAuth2Api.md#ListOAuth2Clients) | **Get** /clients | List OAuth 2.0 Clients
-[**ListUserClientConsentSessions**](OAuth2Api.md#ListUserClientConsentSessions) | **Get** /oauth2/auth/sessions/consent/{user} | Lists all consent sessions of a user
+[**ListUserConsentSessions**](OAuth2Api.md#ListUserConsentSessions) | **Get** /oauth2/auth/sessions/consent/{user} | Lists all consent sessions of a user
 [**OauthAuth**](OAuth2Api.md#OauthAuth) | **Get** /oauth2/auth | The OAuth 2.0 authorize endpoint
 [**OauthToken**](OAuth2Api.md#OauthToken) | **Post** /oauth2/token | The OAuth 2.0 token endpoint
 [**RejectConsentRequest**](OAuth2Api.md#RejectConsentRequest) | **Put** /oauth2/auth/requests/consent/{challenge}/reject | Reject an consent request
@@ -349,8 +349,8 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **ListUserClientConsentSessions**
-> []PreviousConsentSession ListUserClientConsentSessions($user)
+# **ListUserConsentSessions**
+> []PreviousConsentSession ListUserConsentSessions()
 
 Lists all consent sessions of a user
 
@@ -358,10 +358,7 @@ This endpoint lists all user's granted consent sessions, including client and gr
 
 
 ### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **user** | **string**|  | 
+This endpoint does not need any parameter.
 
 ### Return type
 

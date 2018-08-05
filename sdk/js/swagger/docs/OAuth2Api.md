@@ -15,7 +15,7 @@ Method | HTTP request | Description
 [**getWellKnown**](OAuth2Api.md#getWellKnown) | **GET** /.well-known/openid-configuration | Server well known configuration
 [**introspectOAuth2Token**](OAuth2Api.md#introspectOAuth2Token) | **POST** /oauth2/introspect | Introspect OAuth2 tokens
 [**listOAuth2Clients**](OAuth2Api.md#listOAuth2Clients) | **GET** /clients | List OAuth 2.0 Clients
-[**listUserClientConsentSessions**](OAuth2Api.md#listUserClientConsentSessions) | **GET** /oauth2/auth/sessions/consent/{user} | Lists all consent sessions of a user
+[**listUserConsentSessions**](OAuth2Api.md#listUserConsentSessions) | **GET** /oauth2/auth/sessions/consent/{user} | Lists all consent sessions of a user
 [**oauthAuth**](OAuth2Api.md#oauthAuth) | **GET** /oauth2/auth | The OAuth 2.0 authorize endpoint
 [**oauthToken**](OAuth2Api.md#oauthToken) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
 [**rejectConsentRequest**](OAuth2Api.md#rejectConsentRequest) | **PUT** /oauth2/auth/requests/consent/{challenge}/reject | Reject an consent request
@@ -555,9 +555,9 @@ No authorization required
  - **Content-Type**: application/json
  - **Accept**: application/json
 
-<a name="listUserClientConsentSessions"></a>
-# **listUserClientConsentSessions**
-> [PreviousConsentSession] listUserClientConsentSessions(user)
+<a name="listUserConsentSessions"></a>
+# **listUserConsentSessions**
+> [PreviousConsentSession] listUserConsentSessions()
 
 Lists all consent sessions of a user
 
@@ -569,9 +569,6 @@ var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___clou
 
 var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api();
 
-var user = "user_example"; // String | 
-
-
 var callback = function(error, data, response) {
   if (error) {
     console.error(error);
@@ -579,14 +576,11 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-apiInstance.listUserClientConsentSessions(user, callback);
+apiInstance.listUserConsentSessions(callback);
 ```
 
 ### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **user** | **String**|  | 
+This endpoint does not need any parameter.
 
 ### Return type
 

@@ -16,7 +16,7 @@ Method | HTTP request | Description
 [**getWellKnown**](OAuth2Api.md#getWellKnown) | **GET** /.well-known/openid-configuration | Server well known configuration
 [**introspectOAuth2Token**](OAuth2Api.md#introspectOAuth2Token) | **POST** /oauth2/introspect | Introspect OAuth2 tokens
 [**listOAuth2Clients**](OAuth2Api.md#listOAuth2Clients) | **GET** /clients | List OAuth 2.0 Clients
-[**listUserClientConsentSessions**](OAuth2Api.md#listUserClientConsentSessions) | **GET** /oauth2/auth/sessions/consent/{user} | Lists all consent sessions of a user
+[**listUserConsentSessions**](OAuth2Api.md#listUserConsentSessions) | **GET** /oauth2/auth/sessions/consent/{user} | Lists all consent sessions of a user
 [**oauthAuth**](OAuth2Api.md#oauthAuth) | **GET** /oauth2/auth | The OAuth 2.0 authorize endpoint
 [**oauthToken**](OAuth2Api.md#oauthToken) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
 [**rejectConsentRequest**](OAuth2Api.md#rejectConsentRequest) | **PUT** /oauth2/auth/requests/consent/{challenge}/reject | Reject an consent request
@@ -533,8 +533,8 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
-# **listUserClientConsentSessions**
-> \Hydra\SDK\Model\PreviousConsentSession[] listUserClientConsentSessions($user)
+# **listUserConsentSessions**
+> \Hydra\SDK\Model\PreviousConsentSession[] listUserConsentSessions()
 
 Lists all consent sessions of a user
 
@@ -546,22 +546,18 @@ This endpoint lists all user's granted consent sessions, including client and gr
 require_once(__DIR__ . '/vendor/autoload.php');
 
 $api_instance = new Hydra\SDK\Api\OAuth2Api();
-$user = "user_example"; // string | 
 
 try {
-    $result = $api_instance->listUserClientConsentSessions($user);
+    $result = $api_instance->listUserConsentSessions();
     print_r($result);
 } catch (Exception $e) {
-    echo 'Exception when calling OAuth2Api->listUserClientConsentSessions: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling OAuth2Api->listUserConsentSessions: ', $e->getMessage(), PHP_EOL;
 }
 ?>
 ```
 
 ### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **user** | **string**|  |
+This endpoint does not need any parameter.
 
 ### Return type
 

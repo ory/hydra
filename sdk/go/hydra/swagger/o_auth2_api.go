@@ -728,15 +728,13 @@ func (a OAuth2Api) ListOAuth2Clients(limit int64, offset int64) ([]OAuth2Client,
  * Lists all consent sessions of a user
  * This endpoint lists all user&#39;s granted consent sessions, including client and granted scope
  *
- * @param user
  * @return []PreviousConsentSession
  */
-func (a OAuth2Api) ListUserClientConsentSessions(user string) ([]PreviousConsentSession, *APIResponse, error) {
+func (a OAuth2Api) ListUserConsentSessions() ([]PreviousConsentSession, *APIResponse, error) {
 
 	var localVarHttpMethod = strings.ToUpper("Get")
 	// create path and map variables
 	localVarPath := a.Configuration.BasePath + "/oauth2/auth/sessions/consent/{user}"
-	localVarPath = strings.Replace(localVarPath, "{"+"user"+"}", fmt.Sprintf("%v", user), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -772,7 +770,7 @@ func (a OAuth2Api) ListUserClientConsentSessions(user string) ([]PreviousConsent
 
 	var localVarURL, _ = url.Parse(localVarPath)
 	localVarURL.RawQuery = localVarQueryParams.Encode()
-	var localVarAPIResponse = &APIResponse{Operation: "ListUserClientConsentSessions", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
+	var localVarAPIResponse = &APIResponse{Operation: "ListUserConsentSessions", Method: localVarHttpMethod, RequestURL: localVarURL.String()}
 	if localVarHttpResponse != nil {
 		localVarAPIResponse.Response = localVarHttpResponse.RawResponse
 		localVarAPIResponse.Payload = localVarHttpResponse.Body()

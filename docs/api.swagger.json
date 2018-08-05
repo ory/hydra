@@ -1080,16 +1080,7 @@
           "oAuth2"
         ],
         "summary": "Lists all consent sessions of a user",
-        "operationId": "listUserClientConsentSessions",
-        "parameters": [
-          {
-            "type": "string",
-            "x-go-name": "User",
-            "name": "user",
-            "in": "path",
-            "required": true
-          }
-        ],
+        "operationId": "listUserConsentSessions",
         "responses": {
           "200": {
             "$ref": "#/responses/handledConsentRequestList"

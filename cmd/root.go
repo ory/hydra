@@ -188,6 +188,9 @@ func initConfig() {
 	viper.BindEnv("OIDC_DISCOVERY_USERINFO_ENDPOINT")
 	viper.SetDefault("OIDC_DISCOVERY_USERINFO_ENDPOINT", "")
 
+	viper.BindEnv("OIDC_SUBJECT_TYPES_SUPPORTED")
+	viper.SetDefault("OIDC_SUBJECT_TYPES_SUPPORTED", "public")
+
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err != nil {
 		fmt.Printf(`Config file not found because "%s"`, err)

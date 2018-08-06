@@ -77,14 +77,22 @@ func TestExecute(t *testing.T) {
 					},
 				}
 
-				_, err := client.Get(fmt.Sprintf("https://127.0.0.1:%d/health/status", frontendPort))
-				if err != nil {
-					t.Logf("HTTP request failed: %s", err)
-				} else {
-					// Give a bit more time to initialize
-					time.Sleep(time.Second * 5)
+				for _, u := range []string{
+					fmt.Sprintf("https://127.0.0.1:%d/.well-known/openid-configuration", frontendPort),
+					fmt.Sprintf("https://127.0.0.1:%d/health/status", backendPort),
+				} {
+					if resp, err := client.Get(u); err != nil {
+						t.Logf("HTTP request to %s failed: %s", u, err)
+						return true
+					} else if resp.StatusCode != http.StatusOK {
+						t.Logf("HTTP request to %s got status code %d but expected was 200", u, resp.StatusCode)
+						return true
+					}
 				}
-				return err != nil
+
+				// Give a bit more time to initialize
+				time.Sleep(time.Second * 5)
+				return false
 			},
 		},
 		{args: []string{"clients", "create", "--endpoint", backend, "--id", "foobarbaz", "--secret", "foobar", "-g", "client_credentials"}},
@@ -117,7 +125,7 @@ func TestExecute(t *testing.T) {
 			if c.wait != nil {
 				var count = 0
 				for c.wait() {
-					t.Logf("Config file has not been found yet, retrying attempt #%d...", count)
+					t.Logf("Ports are not yet open, retrying attempt #%d...", count)
 					count++
 					if count > 15 {
 						t.FailNow()

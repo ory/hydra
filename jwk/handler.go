@@ -70,18 +70,18 @@ func (h *Handler) GetGenerators() map[string]KeyGenerator {
 	return h.Generators
 }
 
-func (h *Handler) SetRoutes(r *httprouter.Router) {
-	r.GET(WellKnownKeysPath, h.WellKnown)
-	r.GET(KeyHandlerPath+"/:set/:key", h.GetKey)
-	r.GET(KeyHandlerPath+"/:set", h.GetKeySet)
+func (h *Handler) SetRoutes(frontend, backend *httprouter.Router) {
+	frontend.GET(WellKnownKeysPath, h.WellKnown)
+	backend.GET(KeyHandlerPath+"/:set/:key", h.GetKey)
+	backend.GET(KeyHandlerPath+"/:set", h.GetKeySet)
 
-	r.POST(KeyHandlerPath+"/:set", h.Create)
+	backend.POST(KeyHandlerPath+"/:set", h.Create)
 
-	r.PUT(KeyHandlerPath+"/:set/:key", h.UpdateKey)
-	r.PUT(KeyHandlerPath+"/:set", h.UpdateKeySet)
+	backend.PUT(KeyHandlerPath+"/:set/:key", h.UpdateKey)
+	backend.PUT(KeyHandlerPath+"/:set", h.UpdateKeySet)
 
-	r.DELETE(KeyHandlerPath+"/:set/:key", h.DeleteKey)
-	r.DELETE(KeyHandlerPath+"/:set", h.DeleteKeySet)
+	backend.DELETE(KeyHandlerPath+"/:set/:key", h.DeleteKey)
+	backend.DELETE(KeyHandlerPath+"/:set", h.DeleteKeySet)
 }
 
 // swagger:route GET /.well-known/jwks.json oAuth2 wellKnown

@@ -56,19 +56,21 @@ func NewHandler(
 	}
 }
 
-func (h *Handler) SetRoutes(r *httprouter.Router) {
-	r.GET(LoginPath+"/:challenge", h.GetLoginRequest)
-	r.PUT(LoginPath+"/:challenge/accept", h.AcceptLoginRequest)
-	r.PUT(LoginPath+"/:challenge/reject", h.RejectLoginRequest)
+func (h *Handler) SetRoutes(frontend, backend *httprouter.Router) {
+	backend.GET(LoginPath+"/:challenge", h.GetLoginRequest)
+	backend.PUT(LoginPath+"/:challenge/accept", h.AcceptLoginRequest)
+	backend.PUT(LoginPath+"/:challenge/reject", h.RejectLoginRequest)
 
-	r.GET(ConsentPath+"/:challenge", h.GetConsentRequest)
-	r.PUT(ConsentPath+"/:challenge/accept", h.AcceptConsentRequest)
-	r.PUT(ConsentPath+"/:challenge/reject", h.RejectConsentRequest)
+	backend.GET(ConsentPath+"/:challenge", h.GetConsentRequest)
+	backend.PUT(ConsentPath+"/:challenge/accept", h.AcceptConsentRequest)
+	backend.PUT(ConsentPath+"/:challenge/reject", h.RejectConsentRequest)
 
-	r.DELETE("/oauth2/auth/sessions/login/:user", h.DeleteLoginSession)
-	r.GET("/oauth2/auth/sessions/consent/:user", h.GetConsentSessions)
-	r.DELETE("/oauth2/auth/sessions/consent/:user", h.DeleteUserConsentSession)
-	r.DELETE("/oauth2/auth/sessions/consent/:user/:client", h.DeleteUserClientConsentSession)
+	backend.DELETE("/oauth2/auth/sessions/login/:user", h.DeleteLoginSession)
+	backend.GET("/oauth2/auth/sessions/consent/:user", h.GetConsentSessions)
+	backend.DELETE("/oauth2/auth/sessions/consent/:user", h.DeleteUserConsentSession)
+	backend.DELETE("/oauth2/auth/sessions/consent/:user/:client", h.DeleteUserClientConsentSession)
+
+	frontend.GET("/oauth2/auth/logout", h.LogoutUser)
 }
 
 // swagger:route DELETE /oauth2/auth/sessions/consent/{user} oAuth2 revokeAllUserConsentSessions
@@ -573,4 +575,37 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 	h.H.Write(w, r, &RequestHandlerResponse{
 		RedirectTo: urlx.SetQuery(ru, url.Values{"consent_verifier": {request.Verifier}}).String(),
 	})
+}
+	})
+}
+
+// swagger:route DELETE /oauth2/auth/logout oAuth2 logoutUser
+//
+// Logs user out by deleting the session cookie
+//
+// This endpoint deletes ths user's login session cookie and redirects the browser to the url
+// listed in `LOGOUT_REDIRECT_URL` environment variable.
+//
+//
+//     Consumes:
+//     - text/html
+//
+//     Produces:
+//     - text/html
+//
+//     Schemes: http, https
+//
+//     Responses:
+//       302: emptyResponse
+//       404: genericError
+//       500: genericError
+
+func (h *Handler) LogoutUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	err := revokeAuthenticationSession(w, r)
+	if err != nil {
+		h.H.WriteError(w, r, err)
+		return
+	}
+
+	http.Redirect(w, r, os.Getenv("LOGOUT_REDIRECT_URL"), 302)
 }

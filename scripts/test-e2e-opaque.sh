@@ -9,11 +9,12 @@ killall mock-lcp || true
 killall mock-cb || true
 
 export HYDRA_URL=http://127.0.0.1:4444/
+export HYDRA_ADMIN_URL=http://127.0.0.1:4445/
 export OAUTH2_CLIENT_ID=foobar
 export OAUTH2_CLIENT_SECRET=bazbar
 export OAUTH2_ISSUER_URL=http://127.0.0.1:4444/
 export LOG_LEVEL=debug
-export REDIRECT_URL=http://127.0.0.1:4445/callback
+export REDIRECT_URL=http://127.0.0.1:5555/callback
 export AUTH2_SCOPE=openid,offline
 
 go install .
@@ -30,21 +31,22 @@ DATABASE_URL=memory \
 
 PORT=3000 mock-lcp &
 
-PORT=4445 mock-cb &
+PORT=5555 mock-cb &
 
 while ! echo exit | nc 127.0.0.1 4444; do sleep 1; done
 while ! echo exit | nc 127.0.0.1 4445; do sleep 1; done
+while ! echo exit | nc 127.0.0.1 5555; do sleep 1; done
 while ! echo exit | nc 127.0.0.1 3000; do sleep 1; done
 
 
 hydra clients create \
-    --endpoint http://127.0.0.1:4444 \
+    --endpoint http://127.0.0.1:4445 \
     --id $OAUTH2_CLIENT_ID \
     --secret $OAUTH2_CLIENT_SECRET \
     --response-types token,code,id_token \
     --grant-types refresh_token,authorization_code,client_credentials \
     --scope openid,offline \
-    --callbacks http://127.0.0.1:4445/callback
+    --callbacks http://127.0.0.1:5555/callback
 
 token=$(hydra token client)
 

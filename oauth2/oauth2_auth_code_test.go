@@ -188,7 +188,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						IDTokenLifespan: time.Minute, IssuerURL: ts.URL, ForcedHTTP: true, L: l,
 						OpenIDJWTStrategy: jwtStrategy,
 					}
-					handler.SetRoutes(router,router)
+					handler.SetRoutes(router, router)
 
 					apiHandler := consent.NewHandler(herodot.NewJSONWriter(l), cm)
 					apiRouter := httprouter.New()
@@ -740,7 +740,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 				IssuerURL:         ts.URL,
 				OpenIDJWTStrategy: jwtStrategy,
 			}
-			handler.SetRoutes(router,router)
+			handler.SetRoutes(router, router)
 
 			var callbackHandler *httprouter.Handle
 			router.GET("/callback", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

@@ -27,6 +27,33 @@ services:
       migrate sql -e
     restart: on-failure
 
+  hydra-admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    links:
+      - postgresd:postgresd
+#     Uncomment the following line to use mysql instead.
+#      - mysqld:mysqld
+    depends_on:
+      - hydra-migrate
+    ports:
+      - "4445:4445"
+    command:
+      serve admin --dangerous-force-http
+    environment:
+#      - LOG_LEVEL=debug
+      - OAUTH2_ISSUER_URL=http://localhost:4444
+      - OAUTH2_CONSENT_URL=http://localhost:3000/consent
+      - OAUTH2_LOGIN_URL=http://localhost:3000/login
+      - DATABASE_URL=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable
+#     Uncomment the following line to use mysql instead.
+#      - DATABASE_URL=mysql://root:secret@tcp(mysqld:3306)/mysql?parseTime=true
+      - SYSTEM_SECRET=youReallyNeedToChangeThis
+      - OAUTH2_SHARE_ERROR_DEBUG=1
+#      - OAUTH2_ACCESS_TOKEN_STRATEGY=jwt
+    restart: unless-stopped
+
   hydra:
     build:
       context: .
@@ -38,14 +65,9 @@ services:
     depends_on:
       - hydra-migrate
     ports:
-      # Public port
       - "4444:4444"
-      # Admin port
-      - "4445:4445"
-      # Port for hydra token user
-      - "5555:5555"
     command:
-      serve all --dangerous-force-http
+      serve public --dangerous-force-http
     environment:
 #      - LOG_LEVEL=debug
       - OAUTH2_ISSUER_URL=http://localhost:4444
@@ -61,10 +83,10 @@ services:
 
   consent:
     environment:
-      - HYDRA_URL=http://hydra:4445
+      - HYDRA_URL=http://hydra-admin:4445
     image: oryd/hydra-login-consent-node:v1.0.0-beta.7
     links:
-      - hydra
+      - hydra-admin
     ports:
       - "3000:3000"
     restart: unless-stopped

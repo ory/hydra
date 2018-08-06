@@ -182,25 +182,25 @@ func TestUserinfo(t *testing.T) {
 				op.EXPECT().
 					IntrospectToken(gomock.Any(), gomock.Eq("access-token"), gomock.Eq(fosite.AccessToken), gomock.Any()).
 					DoAndReturn(func(_ context.Context, _ string, _ fosite.TokenType, session fosite.Session, _ ...string) (fosite.TokenType, fosite.AccessRequester, error) {
-					session = &oauth2.Session{
-						DefaultSession: &openid.DefaultSession{
-							Claims: &jwt.IDTokenClaims{
+						session = &oauth2.Session{
+							DefaultSession: &openid.DefaultSession{
+								Claims: &jwt.IDTokenClaims{
+									Subject: "alice",
+								},
+								Headers: new(jwt.Headers),
 								Subject: "alice",
 							},
-							Headers: new(jwt.Headers),
-							Subject: "alice",
-						},
-						Audience: []string{},
-						Extra:    map[string]interface{}{},
-					}
+							Audience: []string{},
+							Extra:    map[string]interface{}{},
+						}
 
-					return fosite.AccessToken, &fosite.AccessRequest{
-						Request: fosite.Request{
-							Client:  &client.Client{},
-							Session: session,
-						},
-					}, nil
-				})
+						return fosite.AccessToken, &fosite.AccessRequest{
+							Request: fosite.Request{
+								Client:  &client.Client{},
+								Session: session,
+							},
+						}, nil
+					})
 			},
 			expectStatusCode: http.StatusOK,
 			check: func(t *testing.T, body []byte) {
@@ -212,27 +212,27 @@ func TestUserinfo(t *testing.T) {
 				op.EXPECT().
 					IntrospectToken(gomock.Any(), gomock.Eq("access-token"), gomock.Eq(fosite.AccessToken), gomock.Any()).
 					DoAndReturn(func(_ context.Context, _ string, _ fosite.TokenType, session fosite.Session, _ ...string) (fosite.TokenType, fosite.AccessRequester, error) {
-					session = &oauth2.Session{
-						DefaultSession: &openid.DefaultSession{
-							Claims: &jwt.IDTokenClaims{
+						session = &oauth2.Session{
+							DefaultSession: &openid.DefaultSession{
+								Claims: &jwt.IDTokenClaims{
+									Subject: "alice",
+								},
+								Headers: new(jwt.Headers),
 								Subject: "alice",
 							},
-							Headers: new(jwt.Headers),
-							Subject: "alice",
-						},
-						Audience: []string{},
-						Extra:    map[string]interface{}{},
-					}
+							Audience: []string{},
+							Extra:    map[string]interface{}{},
+						}
 
-					return fosite.AccessToken, &fosite.AccessRequest{
-						Request: fosite.Request{
-							Client: &client.Client{
-								UserinfoSignedResponseAlg: "none",
+						return fosite.AccessToken, &fosite.AccessRequest{
+							Request: fosite.Request{
+								Client: &client.Client{
+									UserinfoSignedResponseAlg: "none",
+								},
+								Session: session,
 							},
-							Session: session,
-						},
-					}, nil
-				})
+						}, nil
+					})
 			},
 			expectStatusCode: http.StatusOK,
 			check: func(t *testing.T, body []byte) {
@@ -244,27 +244,27 @@ func TestUserinfo(t *testing.T) {
 				op.EXPECT().
 					IntrospectToken(gomock.Any(), gomock.Eq("access-token"), gomock.Eq(fosite.AccessToken), gomock.Any()).
 					DoAndReturn(func(_ context.Context, _ string, _ fosite.TokenType, session fosite.Session, _ ...string) (fosite.TokenType, fosite.AccessRequester, error) {
-					session = &oauth2.Session{
-						DefaultSession: &openid.DefaultSession{
-							Claims: &jwt.IDTokenClaims{
+						session = &oauth2.Session{
+							DefaultSession: &openid.DefaultSession{
+								Claims: &jwt.IDTokenClaims{
+									Subject: "alice",
+								},
+								Headers: new(jwt.Headers),
 								Subject: "alice",
 							},
-							Headers: new(jwt.Headers),
-							Subject: "alice",
-						},
-						Audience: []string{},
-						Extra:    map[string]interface{}{},
-					}
+							Audience: []string{},
+							Extra:    map[string]interface{}{},
+						}
 
-					return fosite.AccessToken, &fosite.AccessRequest{
-						Request: fosite.Request{
-							Client: &client.Client{
-								UserinfoSignedResponseAlg: "asdfasdf",
+						return fosite.AccessToken, &fosite.AccessRequest{
+							Request: fosite.Request{
+								Client: &client.Client{
+									UserinfoSignedResponseAlg: "asdfasdf",
+								},
+								Session: session,
 							},
-							Session: session,
-						},
-					}, nil
-				})
+						}, nil
+					})
 			},
 			expectStatusCode: http.StatusInternalServerError,
 		},
@@ -273,27 +273,27 @@ func TestUserinfo(t *testing.T) {
 				op.EXPECT().
 					IntrospectToken(gomock.Any(), gomock.Eq("access-token"), gomock.Eq(fosite.AccessToken), gomock.Any()).
 					DoAndReturn(func(_ context.Context, _ string, _ fosite.TokenType, session fosite.Session, _ ...string) (fosite.TokenType, fosite.AccessRequester, error) {
-					session = &oauth2.Session{
-						DefaultSession: &openid.DefaultSession{
-							Claims: &jwt.IDTokenClaims{
+						session = &oauth2.Session{
+							DefaultSession: &openid.DefaultSession{
+								Claims: &jwt.IDTokenClaims{
+									Subject: "alice",
+								},
+								Headers: new(jwt.Headers),
 								Subject: "alice",
 							},
-							Headers: new(jwt.Headers),
-							Subject: "alice",
-						},
-						Audience: []string{},
-						Extra:    map[string]interface{}{},
-					}
+							Audience: []string{},
+							Extra:    map[string]interface{}{},
+						}
 
-					return fosite.AccessToken, &fosite.AccessRequest{
-						Request: fosite.Request{
-							Client: &client.Client{
-								UserinfoSignedResponseAlg: "RS256",
+						return fosite.AccessToken, &fosite.AccessRequest{
+							Request: fosite.Request{
+								Client: &client.Client{
+									UserinfoSignedResponseAlg: "RS256",
+								},
+								Session: session,
 							},
-							Session: session,
-						},
-					}, nil
-				})
+						}, nil
+					})
 			},
 			expectStatusCode: http.StatusOK,
 			check: func(t *testing.T, body []byte) {

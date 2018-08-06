@@ -55,14 +55,12 @@ func (h *IntrospectionHandler) Introspect(cmd *cobra.Command, args []string) {
 
 	clientID, _ := cmd.Flags().GetString("client-id")
 	clientSecret, _ := cmd.Flags().GetString("client-secret")
-	if clientID == "" || clientSecret == "" {
-		fmt.Print(cmd.UsageString())
-		fmt.Println("Please provide a Client ID and Client Secret using flags --client-id and --client-secret, or environment variables OAUTH2_CLIENT_ID and OAUTH2_CLIENT_SECRET.")
-		return
+	if clientID != "" || clientSecret != "" {
+		c.Configuration.Username = clientID
+		c.Configuration.Password = clientSecret
+	} else {
+		fmt.Println("No OAuth 2.0 Client ID an secret set, skipping authorization header. This might fail if the introspection endpoint is protected.")
 	}
-
-	c.Configuration.Username = clientID
-	c.Configuration.Password = clientSecret
 
 	skipTLSTermination, _ := cmd.Flags().GetBool("skip-tls-verify")
 	c.Configuration.Transport = &http.Transport{

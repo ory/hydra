@@ -45,11 +45,12 @@ func NewHandler(
 	manager Manager,
 	h herodot.Writer,
 	defaultClientScopes []string,
+	subjectTypes []string,
 ) *Handler {
 	return &Handler{
 		Manager:   manager,
 		H:         h,
-		Validator: NewValidator(defaultClientScopes),
+		Validator: NewValidator(defaultClientScopes, subjectTypes),
 	}
 }
 

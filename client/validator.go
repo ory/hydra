@@ -37,13 +37,25 @@ import (
 type Validator struct {
 	c                   *http.Client
 	DefaultClientScopes []string
+	SubjectTypes        []string
 }
 
 func NewValidator(
-	defaultClientScopes []string) *Validator {
+	defaultClientScopes []string,
+	subjectTypes []string,
+) *Validator {
+	if len(subjectTypes) == 0 {
+		subjectTypes = []string{"public"}
+	}
+
+	subjectTypes = stringslice.Filter(subjectTypes, func(s string) bool {
+		return !(s == "public" || s == "pairwise")
+	})
+
 	return &Validator{
 		c:                   http.DefaultClient,
 		DefaultClientScopes: defaultClientScopes,
+		SubjectTypes:        subjectTypes,
 	}
 }
 
@@ -91,6 +103,18 @@ func (v *Validator) Validate(c *Client) error {
 	for _, r := range c.RedirectURIs {
 		if strings.Contains(r, "#") {
 			return errors.WithStack(fosite.ErrInvalidRequest.WithHint("Redirect URIs must not contain fragments (#)"))
+		}
+	}
+
+	if c.SubjectType != "" {
+		if !stringslice.Has(v.SubjectTypes, c.SubjectType) {
+			return errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf("Subject type %s is not supported by server, only %v are allowed.", c.SubjectType, v.SubjectTypes)))
+		}
+	} else {
+		if !stringslice.Has(v.SubjectTypes, "public") {
+			c.SubjectType = "public"
+		} else {
+			c.SubjectType = v.SubjectTypes[0]
 		}
 	}
 

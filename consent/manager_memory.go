@@ -26,6 +26,7 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/pkg"
+	"github.com/ory/pagination"
 	"github.com/pkg/errors"
 )
 
@@ -163,16 +164,31 @@ func (m *MemoryManager) VerifyAndInvalidateConsentRequest(verifier string) (*Han
 
 func (m *MemoryManager) FindPreviouslyGrantedConsentRequests(client string, subject string) ([]HandledConsentRequest, error) {
 	var rs []HandledConsentRequest
+	filteredByUser, err := m.FindPreviouslyGrantedConsentRequestsByUser(subject, -1, -1)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, c := range filteredByUser {
+		if client == c.ConsentRequest.Client.GetID() {
+			rs = append(rs, c)
+		}
+	}
+	if len(rs) == 0 {
+		return []HandledConsentRequest{}, nil
+	}
+
+	return rs, nil
+}
+
+func (m *MemoryManager) FindPreviouslyGrantedConsentRequestsByUser(subject string, limit, offset int) ([]HandledConsentRequest, error) {
+	var rs []HandledConsentRequest
 	for _, c := range m.handledConsentRequests {
 		cr, err := m.GetConsentRequest(c.Challenge)
 		if errors.Cause(err) == pkg.ErrNotFound {
 			return nil, errors.WithStack(errNoPreviousConsentFound)
 		} else if err != nil {
 			return nil, err
-		}
-
-		if client != cr.Client.GetID() {
-			continue
 		}
 
 		if subject != cr.Subject {
@@ -203,7 +219,12 @@ func (m *MemoryManager) FindPreviouslyGrantedConsentRequests(client string, subj
 		return []HandledConsentRequest{}, nil
 	}
 
-	return rs, nil
+	if limit < 0 && offset < 0 {
+		return rs, nil
+	}
+
+	start, end := pagination.Index(limit, offset, len(rs))
+	return rs[start:end], nil
 }
 
 func (m *MemoryManager) GetAuthenticationSession(id string) (*AuthenticationSession, error) {

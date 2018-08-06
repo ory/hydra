@@ -104,6 +104,31 @@ type HandledConsentRequest struct {
 	WasUsed         bool                `json:"-"`
 }
 
+// The response used to return handled consent requests
+// same as HandledAuthenticationRequest, just with consent_request exposed as json
+type PreviousConsentSession struct {
+	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`
+	GrantedScope []string `json:"grant_scope"`
+
+	// Session allows you to set (optional) session data for access and ID tokens.
+	Session *ConsentRequestSessionData `json:"session"`
+
+	// Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same
+	// client asks the same user for the same, or a subset of, scope.
+	Remember bool `json:"remember"`
+
+	// RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the
+	// authorization will be remembered indefinitely.
+	RememberFor int `json:"remember_for"`
+
+	ConsentRequest  *ConsentRequest     `json:"consent_request"`
+	Error           *RequestDeniedError `json:"-"`
+	Challenge       string              `json:"-"`
+	RequestedAt     time.Time           `json:"-"`
+	AuthenticatedAt time.Time           `json:"-"`
+	WasUsed         bool                `json:"-"`
+}
+
 // The request payload used to accept a login request.
 //
 // swagger:model acceptLoginRequest

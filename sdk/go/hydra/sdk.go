@@ -42,8 +42,11 @@ type CodeGenSDK struct {
 
 // Configuration configures the CodeGenSDK.
 type Configuration struct {
-	// EndpointURL should point to the url of ORY Hydra, for example: http://localhost:4444
-	EndpointURL string
+	// AdminURL should point to the administrative URL of ORY Hydra, for example: http://localhost:4445
+	AdminURL string
+
+	// PublicURL should point to the public url of ORY Hydra, for example: http://localhost:4444
+	PublicURL string
 
 	// ClientID is the id of the management client. The management client should have appropriate access rights
 	// and the ability to request the client_credentials grant.
@@ -58,20 +61,20 @@ type Configuration struct {
 
 // NewSDK instantiates a new CodeGenSDK instance or returns an error.
 func NewSDK(c *Configuration) (*CodeGenSDK, error) {
-	if c.EndpointURL == "" {
-		return nil, errors.New("Please specify the ORY Hydra Endpoint URL")
+	if c.AdminURL == "" {
+		return nil, errors.New("Please specify the ORY Hydra Admin URL")
 	}
 
-	c.EndpointURL = strings.TrimLeft(c.EndpointURL, "/")
-	o := swagger.NewOAuth2ApiWithBasePath(c.EndpointURL)
-	j := swagger.NewJsonWebKeyApiWithBasePath(c.EndpointURL)
+	c.AdminURL = strings.TrimLeft(c.AdminURL, "/")
+	o := swagger.NewOAuth2ApiWithBasePath(c.AdminURL)
+	j := swagger.NewJsonWebKeyApiWithBasePath(c.AdminURL)
 	sdk := &CodeGenSDK{
 		OAuth2Api:     o,
 		JsonWebKeyApi: j,
 		Configuration: c,
 	}
 
-	if c.ClientSecret != "" && c.ClientID != "" {
+	if c.ClientSecret != "" && c.ClientID != "" && c.PublicURL != "" {
 		if len(c.Scopes) == 0 {
 			c.Scopes = []string{}
 		}
@@ -80,7 +83,7 @@ func NewSDK(c *Configuration) (*CodeGenSDK, error) {
 			ClientSecret: c.ClientSecret,
 			ClientID:     c.ClientID,
 			Scopes:       c.Scopes,
-			TokenURL:     c.EndpointURL + "/oauth2/token",
+			TokenURL:     c.PublicURL + "/oauth2/token",
 		}
 		oAuth2Client := oAuth2ClientConfig.Client(context.Background())
 		o.Configuration.Transport = oAuth2Client.Transport
@@ -89,6 +92,8 @@ func NewSDK(c *Configuration) (*CodeGenSDK, error) {
 		j.Configuration.Transport = oAuth2Client.Transport
 
 		sdk.oAuth2ClientConfig = oAuth2ClientConfig
+	} else if len(c.ClientSecret)+len(c.ClientID)+len(c.PublicURL) > 0 {
+		return nil, errors.New("You provided one or more of client secret, ID or the public URL in the ORY Hydra SDK but not all of them. Please provide either none or all.")
 	}
 
 	return sdk, nil

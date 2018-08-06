@@ -25,6 +25,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"reflect"
 	"strings"
 	"time"
 
@@ -417,19 +418,33 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		exp = resp.GetAccessRequester().GetRequestedAt().Add(h.AccessTokenLifespan)
 	}
 
+	session, ok := resp.GetAccessRequester().GetSession().(*Session)
+	if !ok {
+		err := errors.WithStack(fosite.ErrServerError.WithHint("Expected session to be of type *Session, but got another type.").WithDebug(fmt.Sprintf("Got type %s", reflect.TypeOf(resp.GetAccessRequester().GetSession()))))
+		pkg.LogError(err, h.L)
+		h.OAuth2.WriteIntrospectionError(w, err)
+		return
+	}
+
+	var obfuscated string
+	if len(session.Claims.Subject) > 0 && session.Claims.Subject != session.Subject {
+		obfuscated = session.Claims.Subject
+	}
+
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 	if err = json.NewEncoder(w).Encode(&Introspection{
-		Active:    resp.IsActive(),
-		ClientID:  resp.GetAccessRequester().GetClient().GetID(),
-		Scope:     strings.Join(resp.GetAccessRequester().GetGrantedScopes(), " "),
-		ExpiresAt: exp.Unix(),
-		IssuedAt:  resp.GetAccessRequester().GetRequestedAt().Unix(),
-		Subject:   resp.GetAccessRequester().GetSession().GetSubject(),
-		Username:  resp.GetAccessRequester().GetSession().GetUsername(),
-		Extra:     resp.GetAccessRequester().GetSession().(*Session).Extra,
-		Audience:  resp.GetAccessRequester().GetSession().(*Session).Audience,
-		Issuer:    strings.TrimRight(h.IssuerURL, "/") + "/",
-		TokenType: string(resp.GetTokenType()),
+		Active:            resp.IsActive(),
+		ClientID:          resp.GetAccessRequester().GetClient().GetID(),
+		Scope:             strings.Join(resp.GetAccessRequester().GetGrantedScopes(), " "),
+		ExpiresAt:         exp.Unix(),
+		IssuedAt:          resp.GetAccessRequester().GetRequestedAt().Unix(),
+		Subject:           session.GetSubject(),
+		Username:          session.GetUsername(),
+		Extra:             session.Extra,
+		Audience:          session.Audience,
+		Issuer:            strings.TrimRight(h.IssuerURL, "/") + "/",
+		ObfuscatedSubject: obfuscated,
+		TokenType:         string(resp.GetTokenType()),
 	}); err != nil {
 		pkg.LogError(errors.WithStack(err), h.L)
 	}
@@ -608,7 +623,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 			Claims: &jwt.IDTokenClaims{
 				// We do not need to pass the audience because it's included directly by ORY Fosite
 				//Audience:    []string{authorizeRequest.GetClient().GetID()},
-				Subject:     session.ConsentRequest.Subject,
+				Subject:     session.ConsentRequest.SubjectIdentifier,
 				Issuer:      strings.TrimRight(h.IssuerURL, "/") + "/",
 				IssuedAt:    time.Now().UTC(),
 				ExpiresAt:   time.Now().Add(h.IDTokenLifespan).UTC(),

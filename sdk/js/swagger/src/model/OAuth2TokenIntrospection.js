@@ -87,6 +87,12 @@
       if (data.hasOwnProperty('nbf')) {
         obj['nbf'] = ApiClient.convertToType(data['nbf'], 'Number')
       }
+      if (data.hasOwnProperty('obfuscated_subject')) {
+        obj['obfuscated_subject'] = ApiClient.convertToType(
+          data['obfuscated_subject'],
+          'String'
+        )
+      }
       if (data.hasOwnProperty('scope')) {
         obj['scope'] = ApiClient.convertToType(data['scope'], 'String')
       }
@@ -145,6 +151,11 @@
    * @member {Number} nbf
    */
   exports.prototype['nbf'] = undefined
+  /**
+   * ObfuscatedSubject is set when the subject identifier algorithm was set to \"pairwise\" during authorization. It is the `sub` value of the ID Token that was issued.
+   * @member {String} obfuscated_subject
+   */
+  exports.prototype['obfuscated_subject'] = undefined
   /**
    * Scope is a JSON string containing a space-separated list of scopes associated with this token.
    * @member {String} scope

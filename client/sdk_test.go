@@ -53,6 +53,7 @@ func createTestClient(prefix string) hydra.OAuth2Client {
 		ClientSecretExpiresAt:     0,
 		TokenEndpointAuthMethod:   "client_secret_basic",
 		UserinfoSignedResponseAlg: "none",
+		SubjectType:               "public",
 		//SectorIdentifierUri:   "https://sector.com/foo",
 	}
 }

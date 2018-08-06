@@ -56,7 +56,9 @@ services:
 #      - DATABASE_URL=mysql://root:secret@tcp(mysqld:3306)/mysql?parseTime=true
       - SYSTEM_SECRET=youReallyNeedToChangeThis
       - OAUTH2_SHARE_ERROR_DEBUG=1
-#      - OAUTH2_ACCESS_TOKEN_STRATEGY=jwt
+      - OIDC_SUBJECT_TYPES_SUPPORTED=public,pairwise
+      - OIDC_SUBJECT_TYPE_PAIRWISE_SALT=youReallyNeedToChangeThis
+#     - OAUTH2_ACCESS_TOKEN_STRATEGY=jwt
     restart: unless-stopped
 
   consent:

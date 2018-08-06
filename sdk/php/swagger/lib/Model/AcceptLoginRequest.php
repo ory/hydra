@@ -55,6 +55,7 @@ class AcceptLoginRequest implements ArrayAccess
       */
     protected static $swaggerTypes = [
         'acr' => 'string',
+        'force_subject_identifier' => 'string',
         'remember' => 'bool',
         'remember_for' => 'int',
         'subject' => 'string'
@@ -66,6 +67,7 @@ class AcceptLoginRequest implements ArrayAccess
       */
     protected static $swaggerFormats = [
         'acr' => null,
+        'force_subject_identifier' => null,
         'remember' => null,
         'remember_for' => 'int64',
         'subject' => null
@@ -87,6 +89,7 @@ class AcceptLoginRequest implements ArrayAccess
      */
     protected static $attributeMap = [
         'acr' => 'acr',
+        'force_subject_identifier' => 'force_subject_identifier',
         'remember' => 'remember',
         'remember_for' => 'remember_for',
         'subject' => 'subject'
@@ -99,6 +102,7 @@ class AcceptLoginRequest implements ArrayAccess
      */
     protected static $setters = [
         'acr' => 'setAcr',
+        'force_subject_identifier' => 'setForceSubjectIdentifier',
         'remember' => 'setRemember',
         'remember_for' => 'setRememberFor',
         'subject' => 'setSubject'
@@ -111,6 +115,7 @@ class AcceptLoginRequest implements ArrayAccess
      */
     protected static $getters = [
         'acr' => 'getAcr',
+        'force_subject_identifier' => 'getForceSubjectIdentifier',
         'remember' => 'getRemember',
         'remember_for' => 'getRememberFor',
         'subject' => 'getSubject'
@@ -148,6 +153,7 @@ class AcceptLoginRequest implements ArrayAccess
     public function __construct(array $data = null)
     {
         $this->container['acr'] = isset($data['acr']) ? $data['acr'] : null;
+        $this->container['force_subject_identifier'] = isset($data['force_subject_identifier']) ? $data['force_subject_identifier'] : null;
         $this->container['remember'] = isset($data['remember']) ? $data['remember'] : null;
         $this->container['remember_for'] = isset($data['remember_for']) ? $data['remember_for'] : null;
         $this->container['subject'] = isset($data['subject']) ? $data['subject'] : null;
@@ -195,6 +201,27 @@ class AcceptLoginRequest implements ArrayAccess
     public function setAcr($acr)
     {
         $this->container['acr'] = $acr;
+
+        return $this;
+    }
+
+    /**
+     * Gets force_subject_identifier
+     * @return string
+     */
+    public function getForceSubjectIdentifier()
+    {
+        return $this->container['force_subject_identifier'];
+    }
+
+    /**
+     * Sets force_subject_identifier
+     * @param string $force_subject_identifier ForceSubjectIdentifier forces the \"pairwise\" user ID of the end-user that authenticated. The \"pairwise\" user ID refers to the (Pairwise Identifier Algorithm)[http://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg] of the OpenID Connect specification. It allows you to set an obfuscated subject (\"user\") identifier that is unique to the client.  Please note that this changes the user ID on endpoint /userinfo and sub claim of the ID Token. It does not change the sub claim in the OAuth 2.0 Introspection.  Per default, ORY Hydra handles this value with its own algorithm. In case you want to set this yourself you can use this field. Please note that setting this field has no effect if `pairwise` is not configured in ORY Hydra or the OAuth 2.0 Client does not expect a pairwise identifier (set via `subject_type` key in the client's configuration).  Please also be aware that ORY Hydra is unable to properly compute this value during authentication. This implies that you have to compute this value on every authentication process (probably depending on the client ID or some other unique value).  If you fail to compute the proper value, then authentication processes which have id_token_hint set might fail.
+     * @return $this
+     */
+    public function setForceSubjectIdentifier($force_subject_identifier)
+    {
+        $this->container['force_subject_identifier'] = $force_subject_identifier;
 
         return $this;
     }

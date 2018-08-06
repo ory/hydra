@@ -36,6 +36,7 @@ type MemoryManager struct {
 	authRequests           map[string]AuthenticationRequest
 	handledAuthRequests    map[string]HandledAuthenticationRequest
 	authSessions           map[string]AuthenticationSession
+	pairwise               []ForcedObfuscatedAuthenticationSession
 	m                      map[string]*sync.RWMutex
 	store                  pkg.FositeStorer
 }
@@ -47,6 +48,7 @@ func NewMemoryManager(store pkg.FositeStorer) *MemoryManager {
 		authRequests:           map[string]AuthenticationRequest{},
 		handledAuthRequests:    map[string]HandledAuthenticationRequest{},
 		authSessions:           map[string]AuthenticationSession{},
+		pairwise:               []ForcedObfuscatedAuthenticationSession{},
 		store:                  store,
 		m: map[string]*sync.RWMutex{
 			"consentRequests":        new(sync.RWMutex),
@@ -56,6 +58,28 @@ func NewMemoryManager(store pkg.FositeStorer) *MemoryManager {
 			"authSessions":           new(sync.RWMutex),
 		},
 	}
+}
+
+func (m *MemoryManager) CreateForcedObfuscatedAuthenticationSession(s *ForcedObfuscatedAuthenticationSession) error {
+	for k, v := range m.pairwise {
+		if v.Subject == s.Subject && v.ClientID == s.ClientID {
+			m.pairwise[k] = *s
+			return nil
+		}
+	}
+
+	m.pairwise = append(m.pairwise, *s)
+	return nil
+}
+
+func (m *MemoryManager) GetForcedObfuscatedAuthenticationSession(client, obfuscated string) (*ForcedObfuscatedAuthenticationSession, error) {
+	for _, v := range m.pairwise {
+		if v.SubjectObfuscated == obfuscated && v.ClientID == client {
+			return &v, nil
+		}
+	}
+
+	return nil, errors.WithStack(pkg.ErrNotFound)
 }
 
 func (m *MemoryManager) RevokeUserConsentSession(user string) error {

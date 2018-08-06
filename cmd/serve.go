@@ -140,9 +140,19 @@ OPENID CONNECT CONTROLS
 	"scope" key in the registration payload, effectively disabling the concept of whitelisted scopes.
 	Example: OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE=openid,offline,scope-a,scope-b
 
-- OIDC_SUBJECT_TYPES_SUPPORTED: Sets which pairwise identifier algorithms (comma-separated) should be supported.
-	Can be "public" or "pairwise" or both. Defaults to "public".
+- OIDC_SUBJECT_TYPES_SUPPORTED: Sets which identifier algorithms (comma-separated) should be supported.
+	Can be "public" or "pairwise" or both. Defaults to "public". Please note that "pairwise" does not work with the
+	JWT OAuth 2.0 Access Token Strategy.
 	Example: OIDC_SUBJECT_TYPES_SUPPORTED=public,pairwise
+
+- OIDC_SUBJECT_TYPE_PAIRWISE_SALT: Is the salt of the pairwise identifier algorithm and must be set if pairwise is enabled.
+	The length must be longer than 8 characters.
+
+	!! Warning !!
+	This value should not be changed once set in production. Changing it will cause all client applications
+	to receive new user IDs from ORY Hydra which will lead to serious complications with authentication on their side!
+
+	Example: OIDC_SUBJECT_TYPE_PAIRWISE_SALT=5be780ef690045aebf50845d56acd72c
 
 HTTPS CONTROLS
 ==============

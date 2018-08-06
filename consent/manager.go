@@ -20,6 +20,12 @@
 
 package consent
 
+type ForcedObfuscatedAuthenticationSession struct {
+	ClientID          string `db:"client_id"`
+	Subject           string `db:"subject"`
+	SubjectObfuscated string `db:"subject_obfuscated"`
+}
+
 type Manager interface {
 	CreateConsentRequest(*ConsentRequest) error
 	GetConsentRequest(challenge string) (*ConsentRequest, error)
@@ -41,4 +47,7 @@ type Manager interface {
 	GetAuthenticationRequest(challenge string) (*AuthenticationRequest, error)
 	HandleAuthenticationRequest(challenge string, r *HandledAuthenticationRequest) (*AuthenticationRequest, error)
 	VerifyAndInvalidateAuthenticationRequest(verifier string) (*HandledAuthenticationRequest, error)
+
+	CreateForcedObfuscatedAuthenticationSession(*ForcedObfuscatedAuthenticationSession) error
+	GetForcedObfuscatedAuthenticationSession(client, obfuscated string) (*ForcedObfuscatedAuthenticationSession, error)
 }

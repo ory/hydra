@@ -38,7 +38,7 @@ func init() {
 	//clientsCmd.PersistentFlags().Bool("dry", false, "do not execute the command but show the corresponding curl command instead")
 	clientsCmd.PersistentFlags().Bool("fake-tls-termination", false, `Fake tls termination by adding "X-Forwarded-Proto: https" to http headers`)
 	clientsCmd.PersistentFlags().String("access-token", os.Getenv("OAUTH2_ACCESS_TOKEN"), "Set an access token to be used in the Authorization header, defaults to environment variable ACCESS_TOKEN")
-	clientsCmd.PersistentFlags().String("endpoint", os.Getenv("HYDRA_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_URL")
+	clientsCmd.PersistentFlags().String("endpoint", os.Getenv("HYDRA_ADMIN_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_ADMIN_URL")
 
 	// Here you will define your flags and configuration settings.
 

@@ -7,6 +7,7 @@ cd "$( dirname "${BASH_SOURCE[0]}" )/.."
 killall hydra || true
 
 export HYDRA_URL=http://127.0.0.1:4444/
+export HYDRA_ADMIN_URL=http://127.0.0.1:4445/
 export OAUTH2_CLIENT_ID=foobar
 export OAUTH2_CLIENT_SECRET=bazbar
 export OAUTH2_ISSUER_URL=http://127.0.0.1:4444/
@@ -24,19 +25,19 @@ DATABASE_URL=memtest:// \
     OAUTH2_ERROR_URL=http://127.0.0.1:3000/error \
     OAUTH2_SHARE_ERROR_DEBUG=true \
     OAUTH2_ACCESS_TOKEN_STRATEGY=jwt \
-    hydra serve --dangerous-force-http --disable-telemetry &
+    hydra serve all --dangerous-force-http --disable-telemetry &
 
 while ! echo exit | nc 127.0.0.1 4444; do sleep 1; done
-
+while ! echo exit | nc 127.0.0.1 4445; do sleep 1; done
 
 hydra clients create \
-    --endpoint http://127.0.0.1:4444 \
+    --endpoint http://127.0.0.1:4445 \
     --id $OAUTH2_CLIENT_ID \
     --secret $OAUTH2_CLIENT_SECRET \
     --response-types token,code,id_token \
     --grant-types refresh_token,authorization_code,client_credentials \
     --scope openid,offline \
-    --callbacks http://127.0.0.1:4445/callback
+    --callbacks http://127.0.0.1:5555/callback
 
 token=$(hydra token client)
 

@@ -10,6 +10,10 @@ before finalizing the upgrade process.
 
 - [1.0.0-beta.8](#100-beta8)
   - [Schema Changes](#schema-changes)
+  - [Split of Public and Administrative Endpoints](#split-of-public-and-administrative-endpoints)
+  - [`hydra serve` is now `hydra serve all`](#hydra-serve-is-now-hydra-serve-all)
+  - [Environment variable `HYDRA_URL` now is `HYDRA_ADMIN_URL` for admin commands](#environment-variable-hydra_url-now-is-hydra_admin_url-for-admin-commands)
+  - [OAuth 2.0 Token Introspection](#oauth-20-token-introspection)
   - [OAuth 2.0 Client flag `public` has been removed](#oauth-20-client-flag-public-has-been-removed)
 - [1.0.0-beta.7](#100-beta7)
   - [Regenerated OpenID Connect ID Token cryptographic keys](#regenerated-openid-connect-id-token-cryptographic-keys)
@@ -101,14 +105,63 @@ before finalizing the upgrade process.
 This patch introduces some minor database schema changes. Before you apply it, you must run `hydra migrate sql` against
 your database.
 
-### Subcommands `admin`, `public`, `all` have been added to `hydra serve`
+### Split of Public and Administrative Endpoints
 
-With this patch, ORY Hydra exposes two ports:
+Previously, all endpoints were exposed at one port. Since access control was removed with version 1.0.0, administrative
+endpoints (JWKs management, OAuth 2.0 Client Management, Login & Consent Management) were exposed and had to be secured
+with sophisticated set ups using, for example, an API gateway to control which endpoints can be accessed by whom.
 
-- Public API (default port 4444) handles requests coming from the public internet, like OAuth 2.0 Authorization
-and Token requests, OpenID Connect UserInfo, OAuth 2.0 Token Revokation, and OpenID Connect Discovery.
-- Administrative API (default port 4445) handles administrative requests like managing OAuth 2.0 Clients,
-JSON Web Keys, login and consent sessions, and others.
+This version introduces a new port (default `:4445`, configurable using environment variables `ADMIN_PORT` and
+`ADMIN_POST`) which is serves all administrative APIs:
+
+* All `/clients` endpoints.
+* All `/jwks` endpoints.
+* All `/health`, `/metrics`, `/version` endpoints.
+* All `/oauth2/auth/requests` endpoints.
+* Endpoint `/oauth2/introspect`.
+* Endpoint `/oauth2/flush`.
+
+The second port exposes API endpoints generally available to the public (default `:4444`, configurable using environment
+variables `PUBLIC_PORT` and `PUBLIC_HOST`):
+
+* `./well-known/jwks.json`
+* `./well-known/openid-configuration`
+* `/oauth2/auth`
+* `/oauth2/token`
+* `/oauth2/revoke`
+* `/oauth2/fallbacks/consent`
+* `/oauth2/fallbacks/error`
+* `/userinfo`
+
+The simplest way to starting both ports is to run `hydra serve`. This will start a process which listens on both ports
+and exposes their respective features. All settings (cors, database, tls, ...) will be shared by both listeners.
+
+To configure each listener differently - for example setting CORS for public but not privileged APIs - you can run
+`hydra serve public` and `hydra serve admin` with different settings. Be aware that this will not work with `DATABASE=memory`
+and that both services must use the same secrets.
+
+### `hydra serve` is now `hydra serve all`
+
+To reflect the changes of public and administrative ports, command `hydra serve` is now `hydra serve all`.
+
+### Environment variable `HYDRA_URL` now is `HYDRA_ADMIN_URL` for admin commands
+
+CLI Commands like `hydra clients ...`, `hydra keys ...`, `hydra token flush`, `hydra token introspect` no longer use
+environment variable `HYDRA_URL` as default for `--endpoint` but instead `HYDRA_ADMIN_URL`.
+
+### OAuth 2.0 Token Introspection
+
+Previously, OAuth 2.0 Token Introspection was protected with HTTP Basic Authorization (a valid OAuth 2.0 Client with
+Client ID and Client Secret was needed) or HTTP Bearer Authorization (a valid OAuth 2.0 Access Token was needed).
+
+As OAuth 2.0 Token Introspection is generally an internal-facing endpoint used by resource servers to validate
+OAuth 2.0 Access Tokens, this endpoint has moved to the privileged port. The specification does not implore which
+authorization scheme must be used - it only shows that HTTP Basic/Bearer Authorization may be used. By exposing this
+endpoint to the privileged port a strong authorization scheme is implemented and no further authorization is needed.
+Thus, access control was stripped from this endpoint, making integration with other API gateways easier.
+
+You may still choose to export this endpoint to the public internet and implement any access control mechanism you find
+appropriate.
 
 ### OAuth 2.0 Client flag `public` has been removed
 

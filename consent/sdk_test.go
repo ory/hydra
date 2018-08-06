@@ -46,7 +46,7 @@ func TestSDK(t *testing.T) {
 	ts := httptest.NewServer(router)
 
 	sdk, err := hydra.NewSDK(&hydra.Configuration{
-		EndpointURL: ts.URL,
+		AdminURL: ts.URL,
 	})
 	require.NoError(t, err)
 

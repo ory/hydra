@@ -11,6 +11,7 @@ before finalizing the upgrade process.
 - [1.0.0-beta.8](#100-beta8)
   - [Schema Changes](#schema-changes)
   - [Split of Public and Administrative Endpoints](#split-of-public-and-administrative-endpoints)
+  - [Golang SDK `Configuration.EndpointURL` is now `Configuration.AdminURL`](#golang-sdk-configurationendpointurl-is-now-configurationadminurl)
   - [`hydra serve` is now `hydra serve all`](#hydra-serve-is-now-hydra-serve-all)
   - [Environment variable `HYDRA_URL` now is `HYDRA_ADMIN_URL` for admin commands](#environment-variable-hydra_url-now-is-hydra_admin_url-for-admin-commands)
   - [OAuth 2.0 Token Introspection](#oauth-20-token-introspection)
@@ -139,6 +140,11 @@ and exposes their respective features. All settings (cors, database, tls, ...) w
 To configure each listener differently - for example setting CORS for public but not privileged APIs - you can run
 `hydra serve public` and `hydra serve admin` with different settings. Be aware that this will not work with `DATABASE=memory`
 and that both services must use the same secrets.
+
+### Golang SDK `Configuration.EndpointURL` is now `Configuration.AdminURL`
+
+To reflect the changes made in this patch, the SDK's configuration struct has been updated. Additionally, `Configuration.PublicURL`
+has been added in case you need to perform OAuth2 flows with the SDK before accessing the admin endpoints.
 
 ### `hydra serve` is now `hydra serve all`
 

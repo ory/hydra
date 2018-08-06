@@ -63,6 +63,8 @@ func mockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 		RequestedScope: []string{"scopea" + key, "scopeb" + key},
 		Verifier:       "verifier" + key,
 		CSRF:           "csrf" + key,
+		ForceSubjectIdentifier: "forced-subject",
+		SubjectIdentifier:      "forced-subject",
 	}
 
 	var err *RequestDeniedError
@@ -126,16 +128,17 @@ func mockAuthRequest(key string, authAt bool) (c *AuthenticationRequest, h *Hand
 	}
 
 	h = &HandledAuthenticationRequest{
-		AuthenticationRequest: c,
-		RememberFor:           120,
-		Remember:              true,
-		Challenge:             "challenge" + key,
-		RequestedAt:           time.Now().UTC().Add(-time.Minute),
-		AuthenticatedAt:       authenticatedAt,
-		Error:                 err,
-		Subject:               c.Subject,
-		ACR:                   "acr",
-		WasUsed:               false,
+		AuthenticationRequest:  c,
+		RememberFor:            120,
+		Remember:               true,
+		Challenge:              "challenge" + key,
+		RequestedAt:            time.Now().UTC().Add(-time.Minute),
+		AuthenticatedAt:        authenticatedAt,
+		Error:                  err,
+		Subject:                c.Subject,
+		ACR:                    "acr",
+		WasUsed:                false,
+		ForceSubjectIdentifier: "forced-subject",
 	}
 
 	return c, h
@@ -540,6 +543,39 @@ func TestManagers(t *testing.T) {
 			})
 		}
 
+		t.Run("case=obfuscated", func(t *testing.T) {
+			for k, m := range managers {
+				t.Run(fmt.Sprintf("manager=%s", k), func(t *testing.T) {
+					got, err := m.GetForcedObfuscatedAuthenticationSession("client-1", "obfuscated-1")
+					require.EqualError(t, err, pkg.ErrNotFound.Error())
+
+					expect := &ForcedObfuscatedAuthenticationSession{
+						ClientID:          "client-1",
+						Subject:           "subject-1",
+						SubjectObfuscated: "obfuscated-1",
+					}
+					require.NoError(t, m.CreateForcedObfuscatedAuthenticationSession(expect))
+
+					got, err = m.GetForcedObfuscatedAuthenticationSession("client-1", "obfuscated-1")
+					require.NoError(t, err)
+					assert.EqualValues(t, expect, got)
+
+					expect = &ForcedObfuscatedAuthenticationSession{
+						ClientID:          "client-1",
+						Subject:           "subject-1",
+						SubjectObfuscated: "obfuscated-2",
+					}
+					require.NoError(t, m.CreateForcedObfuscatedAuthenticationSession(expect))
+
+					got, err = m.GetForcedObfuscatedAuthenticationSession("client-1", "obfuscated-2")
+					require.NoError(t, err)
+					assert.EqualValues(t, expect, got)
+
+					got, err = m.GetForcedObfuscatedAuthenticationSession("client-1", "obfuscated-1")
+					require.EqualError(t, err, pkg.ErrNotFound.Error())
+				})
+			}
+		})
 	})
 }
 

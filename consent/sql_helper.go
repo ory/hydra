@@ -105,6 +105,24 @@ var migrations = &migrate.MemoryMigrationSource{
 				"DROP TABLE hydra_oauth2_authentication_request_handled",
 			},
 		},
+		{
+			Id: "2",
+			Up: []string{
+				`ALTER TABLE hydra_oauth2_consent_request ADD forced_subject_identifier VARCHAR(255) NULL DEFAULT ''`,
+				`ALTER TABLE hydra_oauth2_authentication_request_handled ADD forced_subject_identifier VARCHAR(255) NULL DEFAULT ''`,
+				`CREATE TABLE hydra_oauth2_obfuscated_authentication_session (
+	subject  			varchar(255) NOT NULL,
+	client_id 			varchar(255) NOT NULL,
+	subject_obfuscated	varchar(255) NOT NULL,
+	PRIMARY KEY(subject, client_id)
+)`,
+			},
+			Down: []string{
+				`ALTER TABLE hydra_oauth2_consent_request DROP COLUMN forced_subject_identifier`,
+				`ALTER TABLE hydra_oauth2_authentication_request_handled DROP COLUMN forced_subject_identifier`,
+				"DROP TABLE hydra_oauth2_obfuscated_authentication_session",
+			},
+		},
 	},
 }
 
@@ -118,9 +136,10 @@ var sqlParamsAuthenticationRequestHandled = []string{
 	"authenticated_at",
 	"acr",
 	"was_used",
+	"forced_subject_identifier",
 }
 
-var sqlParamsRequest = []string{
+var sqlParamsAuthenticationRequest = []string{
 	"challenge",
 	"verifier",
 	"client_id",
@@ -133,6 +152,9 @@ var sqlParamsRequest = []string{
 	"csrf",
 	"oidc_context",
 }
+
+var sqlParamsConsentRequest = append(sqlParamsAuthenticationRequest, "forced_subject_identifier")
+
 var sqlParamsConsentRequestHandled = []string{
 	"challenge",
 	"granted_scope",
@@ -145,13 +167,14 @@ var sqlParamsConsentRequestHandled = []string{
 	"session_id_token",
 	"was_used",
 }
+
 var sqlParamsAuthSession = []string{
 	"id",
 	"authenticated_at",
 	"subject",
 }
 
-type sqlRequest struct {
+type sqlAuthenticationRequest struct {
 	OpenIDConnectContext string     `db:"oidc_context"`
 	Client               string     `db:"client_id"`
 	Subject              string     `db:"subject"`
@@ -163,6 +186,11 @@ type sqlRequest struct {
 	CSRF                 string     `db:"csrf"`
 	AuthenticatedAt      *time.Time `db:"authenticated_at"`
 	RequestedAt          time.Time  `db:"requested_at"`
+}
+
+type sqlConsentRequest struct {
+	sqlAuthenticationRequest
+	ForcedSubjectIdentifier string `db:"forced_subject_identifier"`
 }
 
 func toMySQLDateHack(t time.Time) *time.Time {
@@ -179,13 +207,37 @@ func fromMySQLDateHack(t *time.Time) time.Time {
 	return *t
 }
 
-func newSQLConsentRequest(c *ConsentRequest) (*sqlRequest, error) {
+func newSQLConsentRequest(c *ConsentRequest) (*sqlConsentRequest, error) {
 	oidc, err := json.Marshal(c.OpenIDConnectContext)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	return &sqlRequest{
+	return &sqlConsentRequest{
+		sqlAuthenticationRequest: sqlAuthenticationRequest{
+			OpenIDConnectContext: string(oidc),
+			Client:               c.Client.GetID(),
+			Subject:              c.Subject,
+			RequestURL:           c.RequestURL,
+			Skip:                 c.Skip,
+			Challenge:            c.Challenge,
+			RequestedScope:       strings.Join(c.RequestedScope, "|"),
+			Verifier:             c.Verifier,
+			CSRF:                 c.CSRF,
+			AuthenticatedAt:      toMySQLDateHack(c.AuthenticatedAt),
+			RequestedAt:          c.RequestedAt,
+		},
+		ForcedSubjectIdentifier: c.ForceSubjectIdentifier,
+	}, nil
+}
+
+func newSQLAuthenticationRequest(c *AuthenticationRequest) (*sqlAuthenticationRequest, error) {
+	oidc, err := json.Marshal(c.OpenIDConnectContext)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return &sqlAuthenticationRequest{
 		OpenIDConnectContext: string(oidc),
 		Client:               c.Client.GetID(),
 		Subject:              c.Subject,
@@ -200,30 +252,13 @@ func newSQLConsentRequest(c *ConsentRequest) (*sqlRequest, error) {
 	}, nil
 }
 
-func newSQLAuthenticationRequest(c *AuthenticationRequest) (*sqlRequest, error) {
-	var cc ConsentRequest
-	cc = ConsentRequest(*c)
-	return newSQLConsentRequest(&cc)
-}
-
-func (s *sqlRequest) toAuthenticationRequest(client *client.Client) (*AuthenticationRequest, error) {
-	cr, err := s.toConsentRequest(client)
-	if err != nil {
-		return nil, err
-	}
-
-	var ar AuthenticationRequest
-	ar = AuthenticationRequest(*cr)
-	return &ar, nil
-}
-
-func (s *sqlRequest) toConsentRequest(client *client.Client) (*ConsentRequest, error) {
+func (s *sqlAuthenticationRequest) toAuthenticationRequest(client *client.Client) (*AuthenticationRequest, error) {
 	var oidc OpenIDConnectContext
 	if err := json.Unmarshal([]byte(s.OpenIDConnectContext), &oidc); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	return &ConsentRequest{
+	return &AuthenticationRequest{
 		OpenIDConnectContext: &oidc,
 		Client:               client,
 		Subject:              s.Subject,
@@ -235,6 +270,28 @@ func (s *sqlRequest) toConsentRequest(client *client.Client) (*ConsentRequest, e
 		CSRF:                 s.CSRF,
 		AuthenticatedAt:      fromMySQLDateHack(s.AuthenticatedAt),
 		RequestedAt:          s.RequestedAt,
+	}, nil
+}
+
+func (s *sqlConsentRequest) toConsentRequest(client *client.Client) (*ConsentRequest, error) {
+	var oidc OpenIDConnectContext
+	if err := json.Unmarshal([]byte(s.OpenIDConnectContext), &oidc); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return &ConsentRequest{
+		OpenIDConnectContext:   &oidc,
+		Client:                 client,
+		Subject:                s.Subject,
+		RequestURL:             s.RequestURL,
+		Skip:                   s.Skip,
+		Challenge:              s.Challenge,
+		RequestedScope:         stringsx.Splitx(s.RequestedScope, "|"),
+		Verifier:               s.Verifier,
+		CSRF:                   s.CSRF,
+		AuthenticatedAt:        fromMySQLDateHack(s.AuthenticatedAt),
+		ForceSubjectIdentifier: s.ForcedSubjectIdentifier,
+		RequestedAt:            s.RequestedAt,
 	}, nil
 }
 
@@ -333,15 +390,16 @@ func (s *sqlHandledConsentRequest) toHandledConsentRequest(r *ConsentRequest) (*
 }
 
 type sqlHandledAuthenticationRequest struct {
-	Remember        bool       `db:"remember"`
-	RememberFor     int        `db:"remember_for"`
-	ACR             string     `db:"acr"`
-	Subject         string     `db:"subject"`
-	Error           string     `db:"error"`
-	Challenge       string     `db:"challenge"`
-	RequestedAt     time.Time  `db:"requested_at"`
-	WasUsed         bool       `db:"was_used"`
-	AuthenticatedAt *time.Time `db:"authenticated_at"`
+	Remember               bool       `db:"remember"`
+	RememberFor            int        `db:"remember_for"`
+	ACR                    string     `db:"acr"`
+	Subject                string     `db:"subject"`
+	Error                  string     `db:"error"`
+	Challenge              string     `db:"challenge"`
+	RequestedAt            time.Time  `db:"requested_at"`
+	WasUsed                bool       `db:"was_used"`
+	AuthenticatedAt        *time.Time `db:"authenticated_at"`
+	ForceSubjectIdentifier string     `db:"forced_subject_identifier"`
 }
 
 func newSQLHandledAuthenticationRequest(c *HandledAuthenticationRequest) (*sqlHandledAuthenticationRequest, error) {
@@ -356,15 +414,16 @@ func newSQLHandledAuthenticationRequest(c *HandledAuthenticationRequest) (*sqlHa
 	}
 
 	return &sqlHandledAuthenticationRequest{
-		ACR:             c.ACR,
-		Subject:         c.Subject,
-		Remember:        c.Remember,
-		RememberFor:     c.RememberFor,
-		Error:           e,
-		Challenge:       c.Challenge,
-		RequestedAt:     c.RequestedAt,
-		WasUsed:         c.WasUsed,
-		AuthenticatedAt: toMySQLDateHack(c.AuthenticatedAt),
+		ACR:                    c.ACR,
+		Subject:                c.Subject,
+		Remember:               c.Remember,
+		RememberFor:            c.RememberFor,
+		Error:                  e,
+		Challenge:              c.Challenge,
+		RequestedAt:            c.RequestedAt,
+		WasUsed:                c.WasUsed,
+		AuthenticatedAt:        toMySQLDateHack(c.AuthenticatedAt),
+		ForceSubjectIdentifier: c.ForceSubjectIdentifier,
 	}, nil
 }
 
@@ -379,13 +438,14 @@ func (s *sqlHandledAuthenticationRequest) toHandledAuthenticationRequest(a *Auth
 	}
 
 	return &HandledAuthenticationRequest{
-		RememberFor: s.RememberFor,
-		Remember:    s.Remember,
-		Challenge:   s.Challenge,
-		RequestedAt: s.RequestedAt,
-		WasUsed:     s.WasUsed,
-		ACR:         s.ACR,
-		Error:       e,
+		ForceSubjectIdentifier: s.ForceSubjectIdentifier,
+		RememberFor:            s.RememberFor,
+		Remember:               s.Remember,
+		Challenge:              s.Challenge,
+		RequestedAt:            s.RequestedAt,
+		WasUsed:                s.WasUsed,
+		ACR:                    s.ACR,
+		Error:                  e,
 		AuthenticationRequest: a,
 		Subject:               s.Subject,
 		AuthenticatedAt:       fromMySQLDateHack(s.AuthenticatedAt),

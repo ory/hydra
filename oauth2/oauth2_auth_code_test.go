@@ -160,6 +160,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						cookieStore,
 						fosite.ExactScopeStrategy, false, time.Hour, jwts,
 						openid.NewOpenIDConnectRequestValidator(nil, jwts),
+						map[string]consent.SubjectIdentifierAlgorithm{
+							"pairwise": consent.NewSubjectIdentifierAlgorithmPairwise([]byte("76d5d2bf-747f-4592-9fbd-d2b895a54b3a")),
+							"public":   consent.NewSubjectIdentifierAlgorithmPublic(),
+						},
 					)
 
 					jm := &jwk.MemoryManager{Keys: map[string]*jose.JSONWebKeySet{}}

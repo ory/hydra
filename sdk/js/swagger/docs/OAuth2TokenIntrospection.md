@@ -11,6 +11,7 @@ Name | Type | Description | Notes
 **iat** | **Number** | Issued at is an integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token was originally issued. | [optional] 
 **iss** | **String** | IssuerURL is a string representing the issuer of this token | [optional] 
 **nbf** | **Number** | NotBefore is an integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token is not to be used before. | [optional] 
+**obfuscatedSubject** | **String** | ObfuscatedSubject is set when the subject identifier algorithm was set to \&quot;pairwise\&quot; during authorization. It is the &#x60;sub&#x60; value of the ID Token that was issued. | [optional] 
 **scope** | **String** | Scope is a JSON string containing a space-separated list of scopes associated with this token. | [optional] 
 **sub** | **String** | Subject of the token, as defined in JWT [RFC7519]. Usually a machine-readable identifier of the resource owner who authorized this token. | [optional] 
 **tokenType** | **String** | TokenType is the introspected token&#39;s type, for example &#x60;access_token&#x60; or &#x60;refresh_token&#x60;. | [optional] 

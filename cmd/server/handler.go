@@ -62,6 +62,7 @@ func enhanceRouter(c *config.Config, cmd *cobra.Command, serverHandler *Handler,
 
 func RunServeAdmin(c *config.Config) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
+		c.MustValidate()
 		checkDatabaseAllowed(c)
 		serverHandler, _, backend, mws := setup(c, cmd, args, "admin")
 
@@ -78,6 +79,7 @@ func RunServeAdmin(c *config.Config) func(cmd *cobra.Command, args []string) {
 
 func RunServePublic(c *config.Config) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
+		c.MustValidate()
 		checkDatabaseAllowed(c)
 		serverHandler, frontend, _, mws := setup(c, cmd, args, "public")
 
@@ -94,6 +96,7 @@ func RunServePublic(c *config.Config) func(cmd *cobra.Command, args []string) {
 
 func RunServeAll(c *config.Config) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
+		c.MustValidate()
 		serverHandler, frontend, backend, mws := setup(c, cmd, args, "all")
 
 		var wg sync.WaitGroup

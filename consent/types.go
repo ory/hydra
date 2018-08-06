@@ -149,6 +149,25 @@ type HandledAuthenticationRequest struct {
 	// Subject is the user ID of the end-user that authenticated.
 	Subject string `json:"subject"`
 
+	// ForceSubjectIdentifier forces the "pairwise" user ID of the end-user that authenticated. The "pairwise" user ID refers to the
+	// (Pairwise Identifier Algorithm)[http://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg] of the OpenID
+	// Connect specification. It allows you to set an obfuscated subject ("user") identifier that is unique to the client.
+	//
+	// Please note that this changes the user ID on endpoint /userinfo and sub claim of the ID Token. It does not change the
+	// sub claim in the OAuth 2.0 Introspection.
+	//
+	// Per default, ORY Hydra handles this value with its own algorithm. In case you want to set this yourself
+	// you can use this field. Please note that setting this field has no effect if `pairwise` is not configured in
+	// ORY Hydra or the OAuth 2.0 Client does not expect a pairwise identifier (set via `subject_type` key in the client's
+	// configuration).
+	//
+	// Please also be aware that ORY Hydra is unable to properly compute this value during authentication. This implies
+	// that you have to compute this value on every authentication process (probably depending on the client ID or some
+	// other unique value).
+	//
+	// If you fail to compute the proper value, then authentication processes which have id_token_hint set might fail.
+	ForceSubjectIdentifier string `json:"force_subject_identifier"`
+
 	AuthenticationRequest *AuthenticationRequest `json:"-"`
 	Error                 *RequestDeniedError    `json:"-"`
 	Challenge             string                 `json:"-"`
@@ -218,7 +237,8 @@ type AuthenticationRequest struct {
 	Skip bool `json:"skip"`
 
 	// Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope
-	// requested by the OAuth 2.0 client.
+	// requested by the OAuth 2.0 client. If this value is set and `skip` is true, you MUST include this subject type
+	// when accepting the login request, or the request will fail.
 	Subject string `json:"subject"`
 
 	// OpenIDConnectContext provides context for the (potential) OpenID Connect context. Implementation of these
@@ -233,10 +253,11 @@ type AuthenticationRequest struct {
 	// might come in handy if you want to deal with additional request parameters.
 	RequestURL string `json:"request_url"`
 
-	Verifier        string    `json:"-"`
-	CSRF            string    `json:"-"`
-	AuthenticatedAt time.Time `json:"-"`
-	RequestedAt     time.Time `json:"-"`
+	ForceSubjectIdentifier string    `json:"-"` // this is here but has no meaning apart from sql_helper working properly.
+	Verifier               string    `json:"-"`
+	CSRF                   string    `json:"-"`
+	AuthenticatedAt        time.Time `json:"-"`
+	RequestedAt            time.Time `json:"-"`
 }
 
 // Contains information on an ongoing consent request.
@@ -271,10 +292,13 @@ type ConsentRequest struct {
 	// might come in handy if you want to deal with additional request parameters.
 	RequestURL string `json:"request_url"`
 
-	Verifier        string    `json:"-"`
-	CSRF            string    `json:"-"`
-	AuthenticatedAt time.Time `json:"-"`
-	RequestedAt     time.Time `json:"-"`
+	// ForceSubjectIdentifier is the value from authentication (if set).
+	ForceSubjectIdentifier string    `json:"-"`
+	SubjectIdentifier      string    `json:"-"`
+	Verifier               string    `json:"-"`
+	CSRF                   string    `json:"-"`
+	AuthenticatedAt        time.Time `json:"-"`
+	RequestedAt            time.Time `json:"-"`
 }
 
 // Used to pass session data to a consent request.

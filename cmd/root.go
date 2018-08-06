@@ -191,6 +191,9 @@ func initConfig() {
 	viper.BindEnv("OIDC_SUBJECT_TYPES_SUPPORTED")
 	viper.SetDefault("OIDC_SUBJECT_TYPES_SUPPORTED", "public")
 
+	viper.BindEnv("OIDC_SUBJECT_TYPE_PAIRWISE_SALT")
+	viper.SetDefault("OIDC_SUBJECT_TYPE_PAIRWISE_SALT", "public")
+
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err != nil {
 		fmt.Printf(`Config file not found because "%s"`, err)

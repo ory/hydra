@@ -21,6 +21,7 @@
 package consent
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -36,6 +37,7 @@ import (
 	"github.com/ory/go-convenience/stringslice"
 	"github.com/ory/go-convenience/stringsx"
 	"github.com/ory/go-convenience/urlx"
+	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/pkg"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
@@ -61,6 +63,7 @@ type DefaultStrategy struct {
 	RequestMaxAge                 time.Duration
 	JWTStrategy                   jwt.JWTStrategy
 	OpenIDConnectRequestValidator *openid.OpenIDConnectRequestValidator
+	SubjectIdentifierAlgorithm    map[string]SubjectIdentifierAlgorithm
 }
 
 func NewStrategy(
@@ -75,6 +78,7 @@ func NewStrategy(
 	requestMaxAge time.Duration,
 	jwtStrategy jwt.JWTStrategy,
 	openIDConnectRequestValidator *openid.OpenIDConnectRequestValidator,
+	subjectIdentifierAlgorithm map[string]SubjectIdentifierAlgorithm,
 ) *DefaultStrategy {
 	return &DefaultStrategy{
 		AuthenticationURL:             authenticationURL,
@@ -88,6 +92,7 @@ func NewStrategy(
 		RequestMaxAge:                 requestMaxAge,
 		JWTStrategy:                   jwtStrategy,
 		OpenIDConnectRequestValidator: openIDConnectRequestValidator,
+		SubjectIdentifierAlgorithm:    subjectIdentifierAlgorithm,
 	}
 }
 
@@ -145,11 +150,24 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 		return err
 	}
 
+	var hintSub, obfuscatedUserID, forcedObfuscatedUserID string
 	if hintClaims, ok := token.Claims.(jwtgo.MapClaims); !ok {
 		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Failed to validate OpenID Connect request as decoding id token from id_token_hint to *jwt.StandardClaims failed"))
 	} else if hintSub, _ := hintClaims["sub"].(string); hintSub == "" {
 		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Failed to validate OpenID Connect request because provided id token from id_token_hint does not have a subject"))
-	} else if hintSub != session.Subject {
+	} else if obfuscatedUserID, err = s.obfuscateSubjectIdentifier(session.Subject, ar, ""); err != nil {
+		return err
+	}
+
+	if s, err := s.M.GetForcedObfuscatedAuthenticationSession(ar.GetClient().GetID(), hintSub); errors.Cause(err) == pkg.ErrNotFound {
+		// do nothing
+	} else if err != nil {
+		return err
+	} else {
+		forcedObfuscatedUserID = s.SubjectObfuscated
+	}
+
+	if hintSub != session.Subject && hintSub != obfuscatedUserID && hintSub != forcedObfuscatedUserID {
 		return errors.WithStack(fosite.ErrLoginRequired.WithDebug("Request failed because subject claim from id_token_hint does not match subject from authentication session"))
 	} else {
 		return s.forwardAuthenticationRequest(w, r, ar, session.Subject, session.AuthenticatedAt)
@@ -256,6 +274,24 @@ func (s *DefaultStrategy) revokeAuthenticationSession(w http.ResponseWriter, r *
 	return s.M.DeleteAuthenticationSession(sid)
 }
 
+func (s *DefaultStrategy) obfuscateSubjectIdentifier(subject string, req fosite.AuthorizeRequester, forcedIdentifier string) (string, error) {
+	if c, ok := req.GetClient().(*client.Client); ok && c.SubjectType == "pairwise" {
+		algorithm, ok := s.SubjectIdentifierAlgorithm[c.SubjectType]
+		if !ok {
+			return "", errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf(`Subject Identifier Algorithm "%s" was requested by OAuth 2.0 Client "%s", but is not configured.`, c.SubjectType, c.ClientID)))
+		}
+
+		if len(forcedIdentifier) > 0 {
+			return forcedIdentifier, nil
+		}
+
+		return algorithm.Obfuscate(subject, c)
+	} else if !ok {
+		return "", errors.New("Unable to type assert OAuth 2.0 Client to *client.Client")
+	}
+	return subject, nil
+}
+
 func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*HandledAuthenticationRequest, error) {
 	session, err := s.M.VerifyAndInvalidateAuthenticationRequest(verifier)
 	if errors.Cause(err) == pkg.ErrNotFound {
@@ -289,6 +325,11 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("The login request is marked as remember, but the subject from the login confirmation does not match the original subject from the cookie."))
 	}
 
+	subjectIdentifier, err := s.obfuscateSubjectIdentifier(session.Subject, req, session.ForceSubjectIdentifier)
+	if err != nil {
+		return nil, err
+	}
+
 	if err := s.OpenIDConnectRequestValidator.ValidatePrompt(&fosite.AuthorizeRequest{
 		ResponseTypes: req.GetResponseTypes(),
 		RedirectURI:   req.GetRedirectURI(),
@@ -303,7 +344,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 			Form:          req.GetRequestForm(),
 			Session: &openid.DefaultSession{
 				Claims: &jwt.IDTokenClaims{
-					Subject:     session.Subject,
+					Subject:     subjectIdentifier,
 					IssuedAt:    time.Now().UTC(),                // doesn't matter
 					ExpiresAt:   time.Now().Add(time.Hour).UTC(), // doesn't matter
 					AuthTime:    session.AuthenticatedAt,
@@ -322,6 +363,16 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return nil, err
 	} else if err != nil {
 		return nil, err
+	}
+
+	if session.ForceSubjectIdentifier != "" {
+		if err := s.M.CreateForcedObfuscatedAuthenticationSession(&ForcedObfuscatedAuthenticationSession{
+			Subject:           session.Subject,
+			ClientID:          req.GetClient().GetID(),
+			SubjectObfuscated: session.ForceSubjectIdentifier,
+		}); err != nil {
+			return nil, err
+		}
 	}
 
 	if !session.Remember {
@@ -433,17 +484,18 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 
 	if err := s.M.CreateConsentRequest(
 		&ConsentRequest{
-			Challenge:            challenge,
-			Verifier:             verifier,
-			CSRF:                 csrf,
-			Skip:                 skip,
-			RequestedScope:       []string(ar.GetRequestedScopes()),
-			Subject:              as.Subject,
-			Client:               sanitizeClientFromRequest(ar),
-			RequestURL:           as.AuthenticationRequest.RequestURL,
-			AuthenticatedAt:      as.AuthenticatedAt,
-			RequestedAt:          as.RequestedAt,
-			OpenIDConnectContext: as.AuthenticationRequest.OpenIDConnectContext,
+			Challenge:              challenge,
+			Verifier:               verifier,
+			CSRF:                   csrf,
+			Skip:                   skip,
+			RequestedScope:         []string(ar.GetRequestedScopes()),
+			Subject:                as.Subject,
+			Client:                 sanitizeClientFromRequest(ar),
+			RequestURL:             as.AuthenticationRequest.RequestURL,
+			AuthenticatedAt:        as.AuthenticatedAt,
+			RequestedAt:            as.RequestedAt,
+			ForceSubjectIdentifier: as.ForceSubjectIdentifier,
+			OpenIDConnectContext:   as.AuthenticationRequest.OpenIDConnectContext,
 		},
 	); err != nil {
 		return errors.WithStack(err)
@@ -492,6 +544,12 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 		return nil, err
 	}
 
+	pw, err := s.obfuscateSubjectIdentifier(session.ConsentRequest.Subject, req, session.ConsentRequest.ForceSubjectIdentifier)
+	if err != nil {
+		return nil, err
+	}
+
+	session.ConsentRequest.SubjectIdentifier = pw
 	session.AuthenticatedAt = session.ConsentRequest.AuthenticatedAt
 	return session, nil
 }

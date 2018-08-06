@@ -59,6 +59,7 @@ type Handler struct {
 
 	ClaimsSupported  string
 	ScopesSupported  string
+	SubjectTypes     []string
 	UserinfoEndpoint string
 
 	ShareOAuth2Debug bool

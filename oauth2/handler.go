@@ -202,13 +202,18 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ htt
 		scopesSupported = append(scopesSupported, strings.Split(h.ScopesSupported, ",")...)
 	}
 
+	subjectTypes := []string{"public"}
+	if len(h.SubjectTypes) > 0 {
+		subjectTypes = h.SubjectTypes
+	}
+
 	h.H.Write(w, r, &WellKnown{
 		Issuer:                            strings.TrimRight(h.IssuerURL, "/") + "/",
 		AuthURL:                           strings.TrimRight(h.IssuerURL, "/") + AuthPath,
 		TokenURL:                          strings.TrimRight(h.IssuerURL, "/") + TokenPath,
 		JWKsURI:                           strings.TrimRight(h.IssuerURL, "/") + JWKPath,
 		RegistrationEndpoint:              strings.TrimRight(h.IssuerURL, "/") + client.ClientsHandlerPath,
-		SubjectTypes:                      []string{"pairwise", "public"},
+		SubjectTypes:                      subjectTypes,
 		ResponseTypes:                     []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
 		ClaimsSupported:                   claimsSupported,
 		ScopesSupported:                   scopesSupported,

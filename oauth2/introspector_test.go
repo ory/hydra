@@ -103,18 +103,18 @@ func TestIntrospectorSDK(t *testing.T) {
 				token:          tokens[1][1],
 				expectInactive: true,
 			},
-			{
-				description:    "should fail because username / password are invalid",
-				token:          tokens[0][1],
-				expectInactive: true,
-				expectCode:     http.StatusUnauthorized,
-				prepare: func(*testing.T) *hydra.OAuth2Api {
-					client := hydra.NewOAuth2ApiWithBasePath(server.URL)
-					client.Configuration.Username = "foo"
-					client.Configuration.Password = "foo"
-					return client
-				},
-			},
+			//{
+			//	description:    "should fail because username / password are invalid",
+			//	token:          tokens[0][1],
+			//	expectInactive: true,
+			//	expectCode:     http.StatusUnauthorized,
+			//	prepare: func(*testing.T) *hydra.OAuth2Api {
+			//		client := hydra.NewOAuth2ApiWithBasePath(server.URL)
+			//		client.Configuration.Username = "foo"
+			//		client.Configuration.Password = "foo"
+			//		return client
+			//	},
+			//},
 			{
 				description:    "should fail because scope `bar` was requested but only `foo` is granted",
 				token:          tokens[0][1],
@@ -128,11 +128,11 @@ func TestIntrospectorSDK(t *testing.T) {
 			},
 			{
 				description: "should pass using bearer authorization",
-				prepare: func(*testing.T) *hydra.OAuth2Api {
-					client := hydra.NewOAuth2ApiWithBasePath(server.URL)
-					client.Configuration.DefaultHeader["Authorization"] = "bearer " + tokens[2][1]
-					return client
-				},
+				//prepare: func(*testing.T) *hydra.OAuth2Api {
+				//	client := hydra.NewOAuth2ApiWithBasePath(server.URL)
+				//	client.Configuration.DefaultHeader["Authorization"] = "bearer " + tokens[2][1]
+				//	return client
+				//},
 				token:          tokens[0][1],
 				expectInactive: false,
 				scopes:         []string{"foo.bar"},
@@ -165,8 +165,8 @@ func TestIntrospectorSDK(t *testing.T) {
 					client = c.prepare(t)
 				} else {
 					client = hydra.NewOAuth2ApiWithBasePath(server.URL)
-					client.Configuration.Username = "my-client"
-					client.Configuration.Password = "foobar"
+					//client.Configuration.Username = "my-client"
+					//client.Configuration.Password = "foobar"
 				}
 
 				ctx, response, err := client.IntrospectOAuth2Token(c.token, strings.Join(c.scopes, " "))

@@ -370,13 +370,41 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ ht
 //       500: genericError
 func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var session = NewSession("")
-
 	var ctx = fosite.NewContext()
-	resp, err := h.OAuth2.NewIntrospectionRequest(ctx, r, session)
-	if err != nil {
+
+	if r.Method != "POST" {
+		err := errors.WithStack(fosite.ErrInvalidRequest.WithHintf("HTTP method is \"%s\", expected \"POST\".", r.Method))
 		pkg.LogError(err, h.L)
 		h.OAuth2.WriteIntrospectionError(w, err)
 		return
+	} else if err := r.ParseMultipartForm(1 << 20); err != nil && err != http.ErrNotMultipart {
+		err := errors.WithStack(fosite.ErrInvalidRequest.WithHint("Unable to parse HTTP body, make sure to send a properly formatted form request body.").WithDebug(err.Error()))
+		pkg.LogError(err, h.L)
+		h.OAuth2.WriteIntrospectionError(w, err)
+		return
+	} else if len(r.PostForm) == 0 {
+		err := errors.WithStack(fosite.ErrInvalidRequest.WithHint("The POST body can not be empty."))
+		pkg.LogError(err, h.L)
+		h.OAuth2.WriteIntrospectionError(w, err)
+		return
+	}
+
+	token := r.PostForm.Get("token")
+	tokenType := r.PostForm.Get("token_type_hint")
+	scope := r.PostForm.Get("scope")
+
+	tt, ar, err := h.OAuth2.IntrospectToken(ctx, token, fosite.TokenType(tokenType), session, strings.Split(scope, " ")...)
+	if err != nil {
+		err := errors.WithStack(fosite.ErrInactiveToken.WithHint("An introspection strategy indicated that the token is inactive.").WithDebug(err.Error()))
+		pkg.LogError(err, h.L)
+		h.OAuth2.WriteIntrospectionError(w, err)
+		return
+	}
+
+	resp := &fosite.IntrospectionResponse{
+		Active:          true,
+		AccessRequester: ar,
+		TokenType:       tt,
 	}
 
 	exp := resp.GetAccessRequester().GetSession().GetExpiresAt(fosite.AccessToken)

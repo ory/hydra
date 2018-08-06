@@ -702,13 +702,23 @@
     /**
      * Lists all consent sessions of a user
      * This endpoint lists all user&#39;s granted consent sessions, including client and granted scope
+     * @param {String} user
      * @param {module:api/OAuth2Api~listUserConsentSessionsCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Array.<module:model/PreviousConsentSession>}
      */
-    this.listUserConsentSessions = function(callback) {
+    this.listUserConsentSessions = function(user, callback) {
       var postBody = null
 
-      var pathParams = {}
+      // verify the required parameter 'user' is set
+      if (user === undefined || user === null) {
+        throw new Error(
+          "Missing the required parameter 'user' when calling listUserConsentSessions"
+        )
+      }
+
+      var pathParams = {
+        user: user
+      }
       var queryParams = {}
       var headerParams = {}
       var formParams = {}

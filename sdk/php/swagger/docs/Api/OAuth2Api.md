@@ -534,7 +534,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **listUserConsentSessions**
-> \Hydra\SDK\Model\PreviousConsentSession[] listUserConsentSessions()
+> \Hydra\SDK\Model\PreviousConsentSession[] listUserConsentSessions($user)
 
 Lists all consent sessions of a user
 
@@ -546,9 +546,10 @@ This endpoint lists all user's granted consent sessions, including client and gr
 require_once(__DIR__ . '/vendor/autoload.php');
 
 $api_instance = new Hydra\SDK\Api\OAuth2Api();
+$user = "user_example"; // string | 
 
 try {
-    $result = $api_instance->listUserConsentSessions();
+    $result = $api_instance->listUserConsentSessions($user);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling OAuth2Api->listUserConsentSessions: ', $e->getMessage(), PHP_EOL;
@@ -557,7 +558,10 @@ try {
 ```
 
 ### Parameters
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **user** | **string**|  |
 
 ### Return type
 

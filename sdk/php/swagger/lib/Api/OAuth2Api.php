@@ -1134,12 +1134,13 @@ class OAuth2Api
      *
      * Client for Hydra
      *
+     * @param string $user  (required)
      * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return \Hydra\SDK\Model\PreviousConsentSession[]
      */
-    public function listUserConsentSessions()
+    public function listUserConsentSessions($user)
     {
-        list($response) = $this->listUserConsentSessionsWithHttpInfo();
+        list($response) = $this->listUserConsentSessionsWithHttpInfo($user);
         return $response;
     }
 
@@ -1150,11 +1151,16 @@ class OAuth2Api
      *
      * Client for Hydra
      *
+     * @param string $user  (required)
      * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return array of \Hydra\SDK\Model\PreviousConsentSession[], HTTP status code, HTTP response headers (array of strings)
      */
-    public function listUserConsentSessionsWithHttpInfo()
+    public function listUserConsentSessionsWithHttpInfo($user)
     {
+        // verify the required parameter 'user' is set
+        if ($user === null) {
+            throw new \InvalidArgumentException('Missing the required parameter $user when calling listUserConsentSessions');
+        }
         // parse inputs
         $resourcePath = "/oauth2/auth/sessions/consent/{user}";
         $httpBody = '';
@@ -1167,6 +1173,14 @@ class OAuth2Api
         }
         $headerParams['Content-Type'] = $this->apiClient->selectHeaderContentType(['application/json']);
 
+        // path params
+        if ($user !== null) {
+            $resourcePath = str_replace(
+                "{" . "user" . "}",
+                $this->apiClient->getSerializer()->toPathValue($user),
+                $resourcePath
+            );
+        }
 
         // for model (json/xml)
         if (isset($_tempBody)) {

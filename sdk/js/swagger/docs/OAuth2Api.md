@@ -557,7 +557,7 @@ No authorization required
 
 <a name="listUserConsentSessions"></a>
 # **listUserConsentSessions**
-> [PreviousConsentSession] listUserConsentSessions()
+> [PreviousConsentSession] listUserConsentSessions(user)
 
 Lists all consent sessions of a user
 
@@ -569,6 +569,9 @@ var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___clou
 
 var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api();
 
+var user = "user_example"; // String | 
+
+
 var callback = function(error, data, response) {
   if (error) {
     console.error(error);
@@ -576,11 +579,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-apiInstance.listUserConsentSessions(callback);
+apiInstance.listUserConsentSessions(user, callback);
 ```
 
 ### Parameters
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **user** | **String**|  | 
 
 ### Return type
 

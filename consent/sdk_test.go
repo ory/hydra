@@ -118,14 +118,14 @@ func TestSDK(t *testing.T) {
 	require.NoError(t, err)
 	require.EqualValues(t, http.StatusNotFound, res.StatusCode)
 
-	csGot, res, err := sdk.ListUserClientConsentSessions("subject3")
+	csGot, res, err := sdk.ListUserConsentSessions("subject3")
 	require.NoError(t, err)
 	require.EqualValues(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, 1, len(csGot))
 	cs := csGot[0]
 	assert.Equal(t, "challenge3", cs.ConsentRequest.Challenge)
 
-	csGot, res, err = sdk.ListUserClientConsentSessions("subject2")
+	csGot, res, err = sdk.ListUserConsentSessions("subject2")
 	require.NoError(t, err)
 	require.EqualValues(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, 0, len(csGot))

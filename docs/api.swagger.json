@@ -1081,6 +1081,15 @@
         ],
         "summary": "Lists all consent sessions of a user",
         "operationId": "listUserConsentSessions",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "User",
+            "name": "user",
+            "in": "path",
+            "required": true
+          }
+        ],
         "responses": {
           "200": {
             "$ref": "#/responses/handledConsentRequestList"

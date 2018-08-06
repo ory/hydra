@@ -34,6 +34,7 @@ import (
 func TestValidate(t *testing.T) {
 	v := &Validator{
 		DefaultClientScopes: []string{"openid"},
+		SubjectTypes:        []string{"public", "pairwise"},
 	}
 	for k, tc := range []struct {
 		in        *Client
@@ -70,6 +71,22 @@ func TestValidate(t *testing.T) {
 		},
 		{
 			in:        &Client{ClientID: "foo", JSONWebKeys: &jose.JSONWebKeySet{}, JSONWebKeysURI: "asdf", TokenEndpointAuthMethod: "private_key_jwt"},
+			expectErr: true,
+		},
+		{
+			in: &Client{ClientID: "foo"},
+			check: func(t *testing.T, c *Client) {
+				assert.Equal(t, "public", c.SubjectType)
+			},
+		},
+		{
+			in: &Client{ClientID: "foo", SubjectType: "pairwise"},
+			check: func(t *testing.T, c *Client) {
+				assert.Equal(t, "pairwise", c.SubjectType)
+			},
+		},
+		{
+			in:        &Client{ClientID: "foo", SubjectType: "foo"},
 			expectErr: true,
 		},
 	} {

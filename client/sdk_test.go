@@ -59,7 +59,7 @@ func createTestClient(prefix string) hydra.OAuth2Client {
 
 func TestClientSDK(t *testing.T) {
 	manager := client.NewMemoryManager(nil)
-	handler := client.NewHandler(manager, herodot.NewJSONWriter(nil), []string{"foo", "bar"})
+	handler := client.NewHandler(manager, herodot.NewJSONWriter(nil), []string{"foo", "bar"}, []string{"public"})
 
 	router := httprouter.New()
 	handler.SetRoutes(router)

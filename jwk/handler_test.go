@@ -48,7 +48,7 @@ func init() {
 		[]string{},
 	)
 	h.Manager.AddKeySet(IDTokenKeyName, IDKS)
-	h.SetRoutes(router)
+	h.SetRoutes(router, router)
 	testServer = httptest.NewServer(router)
 }
 

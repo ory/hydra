@@ -36,7 +36,7 @@ func injectJWKManager(c *config.Config) {
 	})
 }
 
-func newJWKHandler(c *config.Config, router *httprouter.Router) *jwk.Handler {
+func newJWKHandler(c *config.Config, frontend, backend *httprouter.Router) *jwk.Handler {
 	ctx := c.Context()
 	w := herodot.NewJSONWriter(c.GetLogger())
 	w.ErrorEnhancer = writerErrorEnhancer
@@ -53,6 +53,6 @@ func newJWKHandler(c *config.Config, router *httprouter.Router) *jwk.Handler {
 		w,
 		wellKnown,
 	)
-	h.SetRoutes(router)
+	h.SetRoutes(frontend, backend)
 	return h
 }

@@ -61,6 +61,7 @@ type DefaultStrategy struct {
 	RequestMaxAge                 time.Duration
 	JWTStrategy                   jwt.JWTStrategy
 	OpenIDConnectRequestValidator *openid.OpenIDConnectRequestValidator
+	PairwiseGenerator             PairwiseGenerator
 }
 
 func NewStrategy(
@@ -75,6 +76,7 @@ func NewStrategy(
 	requestMaxAge time.Duration,
 	jwtStrategy jwt.JWTStrategy,
 	openIDConnectRequestValidator *openid.OpenIDConnectRequestValidator,
+	pairwiseGenerator PairwiseGenerator,
 ) *DefaultStrategy {
 	return &DefaultStrategy{
 		AuthenticationURL:             authenticationURL,
@@ -88,6 +90,7 @@ func NewStrategy(
 		RequestMaxAge:                 requestMaxAge,
 		JWTStrategy:                   jwtStrategy,
 		OpenIDConnectRequestValidator: openIDConnectRequestValidator,
+		PairwiseGenerator:             pairwiseGenerator,
 	}
 }
 
@@ -165,6 +168,8 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 	if subject != "" {
 		skip = true
 	}
+
+	// subject, err := s.PairwiseGenerator.Resolve() ...
 
 	// Let'id validate that prompt is actually not "none" if we can't skip authentication
 	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
@@ -288,6 +293,8 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 
 		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("The login request is marked as remember, but the subject from the login confirmation does not match the original subject from the cookie."))
 	}
+
+	// subject, err := s.PairwiseGenerator() ...
 
 	if err := s.OpenIDConnectRequestValidator.ValidatePrompt(&fosite.AuthorizeRequest{
 		ResponseTypes: req.GetResponseTypes(),

@@ -37,9 +37,10 @@ we have set \`BCRYPT_COST=8\`.
 
 EOF
 
-BCRYPT_COST=8 PORT=9000 ISSUER_URL=http://localhost:9000 DATABASE_URL=memory hydra serve --dangerous-force-http --disable-telemetry > /dev/null 2>&1 &
+BCRYPT_COST=8 PUBLIC_PORT=9000 ADMIN_PORT=9001 ISSUER_URL=http://localhost:9000 DATABASE_URL=memory hydra serve --dangerous-force-http --disable-telemetry > /dev/null 2>&1 &
 
 while ! echo exit | nc 127.0.0.1 9000; do sleep 1; done
+while ! echo exit | nc 127.0.0.1 9001; do sleep 1; done
 
 sleep 1
 
@@ -49,7 +50,7 @@ hydra clients create \
     --id $clientId \
     --secret $clientSecret \
     -a foo \
-    --endpoint http://localhost:9000
+    --endpoint http://localhost:9001
 
 echo "Generating initial access tokens for token introspection benchmark"
 authToken=$(hydra token client --endpoint http://localhost:9000 --client-id $clientId --client-secret $clientSecret)
@@ -66,10 +67,9 @@ This section contains various benchmarks against OAuth 2.0 endpoints
 EOF
 
 hey -n $numReqs -c $numParallel -m POST \
-	-H "Authorization: Bearer $authToken" \
     -H "Content-Type: application/x-www-form-urlencoded" \
     -d "token=$introToken" \
-    http://localhost:9000/oauth2/introspect 2>&1 \
+    http://localhost:9001/oauth2/introspect 2>&1 \
     | tee -a BENCHMARKS.md
 
 
@@ -108,7 +108,7 @@ EOF
 ##hey -n $numReqs -c $numParallel -m POST \
 #    -H "Content-Type: application/json" \
 #    -d '{}' \
-#    http://localhost:9000/clients 2>&1 \
+#    http://localhost:9001/clients 2>&1 \
 #    | tee -a BENCHMARKS.md
 
 cat >> BENCHMARKS.md << EOF
@@ -120,7 +120,7 @@ cat >> BENCHMARKS.md << EOF
 EOF
 
 hey -n $numReqs -c $numParallel -m GET \
-    http://localhost:9000/clients 2>&1 \
+    http://localhost:9001/clients 2>&1 \
     | tee -a BENCHMARKS.md
 
 cat >> BENCHMARKS.md << EOF
@@ -132,7 +132,7 @@ cat >> BENCHMARKS.md << EOF
 EOF
 
 hey -n $numReqs -c $numParallel -m GET \
-    http://localhost:9000/clients/$clientId 2>&1 \
+    http://localhost:9001/clients/$clientId 2>&1 \
     | tee -a BENCHMARKS.md
 
 cat >> BENCHMARKS.md << EOF

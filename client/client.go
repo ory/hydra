@@ -98,6 +98,10 @@ type Client struct {
 	// measured in UTC until the date/time of expiration.
 	SecretExpiresAt int `json:"client_secret_expires_at"`
 
+	// SubjectType requested for responses to this Client. The subject_types_supported Discovery parameter contains a
+	// list of the supported subject_type values for this server. Valid types include `pairwise` and `public`.
+	SubjectType string `json:"subject_type"`
+
 	// URL using the https scheme to be used in calculating Pseudonymous Identifiers by the OP. The URL references a
 	// file with a single JSON array of redirect_uri values.
 	SectorIdentifierURI string `json:"sector_identifier_uri,omitempty"`

@@ -99,6 +99,15 @@ var sharedMigrations = []*migrate.Migration{
 			`UPDATE hydra_client SET public=TRUE WHERE token_endpoint_auth_method='none'`,
 		},
 	},
+	{
+		Id: "6",
+		Up: []string{
+			`ALTER TABLE hydra_client ADD subject_type VARCHAR(15) NOT NULL DEFAULT ''`,
+		},
+		Down: []string{
+			`ALTER TABLE hydra_client DROP COLUMN subject_type`,
+		},
+	},
 }
 
 var Migrations = map[string]*migrate.MemoryMigrationSource{
@@ -123,6 +132,7 @@ var Migrations = map[string]*migrate.MemoryMigrationSource{
 			},
 		},
 		sharedMigrations[3],
+		sharedMigrations[4],
 	}},
 	"postgres": {Migrations: []*migrate.Migration{
 		sharedMigrations[0],
@@ -145,6 +155,7 @@ var Migrations = map[string]*migrate.MemoryMigrationSource{
 			},
 		},
 		sharedMigrations[3],
+		sharedMigrations[4],
 	}},
 }
 
@@ -173,6 +184,7 @@ type sqlData struct {
 	JSONWebKeys                   string `db:"jwks"`
 	TokenEndpointAuthMethod       string `db:"token_endpoint_auth_method"`
 	RequestURIs                   string `db:"request_uris"`
+	SubjectType                   string `db:"subject_type"`
 	RequestObjectSigningAlgorithm string `db:"request_object_signing_alg"`
 	UserinfoSignedResponseAlg     string `db:"userinfo_signed_response_alg"`
 }
@@ -189,6 +201,7 @@ var sqlParams = []string{
 	"policy_uri",
 	"tos_uri",
 	"client_uri",
+	"subject_type",
 	"logo_uri",
 	"contacts",
 	"client_secret_expires_at",
@@ -234,6 +247,7 @@ func sqlDataFromClient(d *Client) (*sqlData, error) {
 		RequestObjectSigningAlgorithm: d.RequestObjectSigningAlgorithm,
 		RequestURIs:                   strings.Join(d.RequestURIs, "|"),
 		UserinfoSignedResponseAlg:     d.UserinfoSignedResponseAlg,
+		SubjectType:                   d.SubjectType,
 	}, nil
 }
 
@@ -259,6 +273,7 @@ func (d *sqlData) ToClient() (*Client, error) {
 		RequestObjectSigningAlgorithm: d.RequestObjectSigningAlgorithm,
 		RequestURIs:                   stringsx.Splitx(d.RequestURIs, "|"),
 		UserinfoSignedResponseAlg:     d.UserinfoSignedResponseAlg,
+		SubjectType:                   d.SubjectType,
 	}
 
 	if d.JSONWebKeys != "" {

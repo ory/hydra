@@ -140,6 +140,9 @@ OPENID CONNECT CONTROLS
 	"scope" key in the registration payload, effectively disabling the concept of whitelisted scopes.
 	Example: OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE=openid,offline,scope-a,scope-b
 
+- OIDC_SUBJECT_TYPES_SUPPORTED: Sets which pairwise identifier algorithms (comma-separated) should be supported.
+	Can be "public" or "pairwise" or both. Defaults to "public".
+	Example: OIDC_SUBJECT_TYPES_SUPPORTED=public,pairwise
 
 HTTPS CONTROLS
 ==============

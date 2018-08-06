@@ -63,6 +63,7 @@ type Config struct {
 	ConsentURL                       string `mapstructure:"OAUTH2_CONSENT_URL" yaml:"-"`
 	LoginURL                         string `mapstructure:"OAUTH2_LOGIN_URL" yaml:"-"`
 	DefaultClientScope               string `mapstructure:"OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE" yaml:"-"`
+	SubjectTypesSupported            string `mapstructure:"OIDC_SUBJECT_TYPES_SUPPORTED" yaml:"-"`
 	ErrorURL                         string `mapstructure:"OAUTH2_ERROR_URL" yaml:"-"`
 	AllowTLSTermination              string `mapstructure:"HTTPS_ALLOW_TERMINATION_FROM" yaml:"-"`
 	BCryptWorkFactor                 int    `mapstructure:"BCRYPT_COST" yaml:"-"`
@@ -91,6 +92,14 @@ type Config struct {
 	oauth2Client *http.Client               `yaml:"-"`
 	context      *Context                   `yaml:"-"`
 	systemSecret []byte                     `yaml:"-"`
+}
+
+func (c *Config) GetSubjectTypesSupported() []string {
+	types := strings.Split(c.SubjectTypesSupported, ",")
+	if len(types) == 0 {
+		return []string{"public"}
+	}
+	return types
 }
 
 func (c *Config) GetClusterURLWithoutTailingSlashOrFail(cmd *cobra.Command) string {

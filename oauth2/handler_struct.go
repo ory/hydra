@@ -58,5 +58,6 @@ type Handler struct {
 
 	ClaimsSupported  string
 	ScopesSupported  string
+	SubjectTypes     []string
 	UserinfoEndpoint string
 }

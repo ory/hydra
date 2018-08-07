@@ -100,6 +100,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	policyUri, _ := cmd.Flags().GetString("policy-uri")
 	logoUri, _ := cmd.Flags().GetString("logo-uri")
 	clientUri, _ := cmd.Flags().GetString("client-uri")
+	subjectType, _ := cmd.Flags().GetString("subject-type")
 
 	if secret == "" {
 		var secretb []byte
@@ -124,6 +125,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		PolicyUri:               policyUri,
 		LogoUri:                 logoUri,
 		ClientUri:               clientUri,
+		SubjectType:             subjectType,
 	}
 
 	result, response, err := m.CreateOAuth2Client(cc)

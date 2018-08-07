@@ -101,6 +101,7 @@ func TestStrategy(t *testing.T) {
 	router := httprouter.New()
 	handler.SetRoutes(router)
 	api := httptest.NewServer(router)
+
 	strategy := NewStrategy(
 		lp.URL,
 		cp.URL,
@@ -113,6 +114,10 @@ func TestStrategy(t *testing.T) {
 		time.Hour,
 		jwts,
 		openid.NewOpenIDConnectRequestValidator(nil, jwts),
+		map[string]SubjectIdentifierAlgorithm{
+			"pairwise": NewSubjectIdentifierAlgorithmPairwise([]byte("76d5d2bf-747f-4592-9fbd-d2b895a54b3a")),
+			"public":   NewSubjectIdentifierAlgorithmPublic(),
+		},
 	)
 	apiClient := swagger.NewOAuth2ApiWithBasePath(api.URL)
 

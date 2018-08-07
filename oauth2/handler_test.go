@@ -329,6 +329,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		H:             herodot.NewJSONWriter(nil),
 		ScopeStrategy: fosite.HierarchicScopeStrategy,
 		IssuerURL:     "http://hydra.localhost",
+		SubjectTypes:  []string{"pairwise", "public"},
 	}
 
 	AuthPathT := "/oauth2/auth"

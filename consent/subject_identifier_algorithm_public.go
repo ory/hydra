@@ -20,10 +20,14 @@
 
 package consent
 
-type PairwiseGenerator interface {
-	// Generate derives a pairwise subject identifier from the given string.
-	Generate(subject string) (string, error)
+import "github.com/ory/hydra/client"
 
-	// Resolve turns a pairwise subject identifier to its original string.
-	Resolve(subject string) (string, error)
+type SubjectIdentifierAlgorithmPublic struct{}
+
+func NewSubjectIdentifierAlgorithmPublic() *SubjectIdentifierAlgorithmPublic {
+	return &SubjectIdentifierAlgorithmPublic{}
+}
+
+func (g *SubjectIdentifierAlgorithmPublic) Obfuscate(subject string, client *client.Client) (string, error) {
+	return subject, nil
 }

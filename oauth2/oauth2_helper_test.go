@@ -66,6 +66,7 @@ func (c *consentMock) HandleOAuth2AuthorizationRequest(w http.ResponseWriter, r 
 			AccessToken: map[string]interface{}{},
 			IDToken:     map[string]interface{}{},
 		},
-		RequestedAt: c.requestTime,
+		SubjectIdentifier: "foo",
+		RequestedAt:       c.requestTime,
 	}, nil
 }

@@ -197,7 +197,7 @@ func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httproute
 
 // swagger:route POST /keys/{set} jsonWebKey createJsonWebKeySet
 //
-// Generate a new JSON Web Key
+// Obfuscate a new JSON Web Key
 //
 // This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.
 //

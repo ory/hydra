@@ -20,15 +20,9 @@
 
 package consent
 
-type PairwiseGeneratorStore struct {
-	//Store
-}
+import "github.com/ory/hydra/client"
 
-func (g *PairwiseGeneratorStore) Generate(subject string) (string, error) {
-
-	return "", nil
-}
-
-func (g *PairwiseGeneratorStore) Resolve(subject string) (string, error) {
-	return "", nil
+type SubjectIdentifierAlgorithm interface {
+	// Obfuscate derives a pairwise subject identifier from the given string.
+	Obfuscate(subject string, client *client.Client) (string, error)
 }

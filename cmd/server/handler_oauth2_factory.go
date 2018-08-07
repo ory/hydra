@@ -32,6 +32,7 @@ import (
 	"github.com/ory/fosite/compose"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/handler/openid"
+	"github.com/ory/go-convenience/stringslice"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
@@ -170,6 +171,14 @@ func newOAuth2Handler(c *config.Config, frontend, backend *httprouter.Router, cm
 		}
 	}
 
+	sias := map[string]consent.SubjectIdentifierAlgorithm{}
+	if stringslice.Has(c.GetSubjectTypesSupported(), "pairwise") {
+		sias["pairwise"] = consent.NewSubjectIdentifierAlgorithmPairwise([]byte(c.SubjectIdentifierAlgorithmSalt))
+	}
+	if stringslice.Has(c.GetSubjectTypesSupported(), "pairwise") {
+		sias["public"] = consent.NewSubjectIdentifierAlgorithmPublic()
+	}
+
 	handler := &oauth2.Handler{
 		ScopesSupported:  c.OpenIDDiscoveryScopesSupported,
 		UserinfoEndpoint: c.OpenIDDiscoveryUserinfoEndpoint,
@@ -184,6 +193,7 @@ func newOAuth2Handler(c *config.Config, frontend, backend *httprouter.Router, cm
 			!c.ForceHTTP, time.Minute*15,
 			oidcStrategy,
 			openid.NewOpenIDConnectRequestValidator(nil, oidcStrategy),
+			sias,
 		),
 		Storage:                c.Context().FositeStore,
 		ErrorURL:               *errorURL,

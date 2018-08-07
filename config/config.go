@@ -36,6 +36,7 @@ import (
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/token/hmac"
+	"github.com/ory/go-convenience/stringslice"
 	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/hydra/health"
 	"github.com/ory/hydra/metrics/prometheus"
@@ -63,7 +64,6 @@ type Config struct {
 	ConsentURL                       string `mapstructure:"OAUTH2_CONSENT_URL" yaml:"-"`
 	LoginURL                         string `mapstructure:"OAUTH2_LOGIN_URL" yaml:"-"`
 	DefaultClientScope               string `mapstructure:"OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE" yaml:"-"`
-	SubjectTypesSupported            string `mapstructure:"OIDC_SUBJECT_TYPES_SUPPORTED" yaml:"-"`
 	ErrorURL                         string `mapstructure:"OAUTH2_ERROR_URL" yaml:"-"`
 	AllowTLSTermination              string `mapstructure:"HTTPS_ALLOW_TERMINATION_FROM" yaml:"-"`
 	BCryptWorkFactor                 int    `mapstructure:"BCRYPT_COST" yaml:"-"`
@@ -76,6 +76,8 @@ type Config struct {
 	LogLevel                         string `mapstructure:"LOG_LEVEL" yaml:"-"`
 	LogFormat                        string `mapstructure:"LOG_FORMAT" yaml:"-"`
 	AccessControlResourcePrefix      string `mapstructure:"RESOURCE_NAME_PREFIX" yaml:"-"`
+	SubjectTypesSupported            string `mapstructure:"OIDC_SUBJECT_TYPES_SUPPORTED" yaml:"-"`
+	SubjectIdentifierAlgorithmSalt   string `mapstructure:"OIDC_SUBJECT_TYPE_PAIRWISE_SALT" yaml:"-"`
 	OpenIDDiscoveryClaimsSupported   string `mapstructure:"OIDC_DISCOVERY_CLAIMS_SUPPORTED" yaml:"-"`
 	OpenIDDiscoveryScopesSupported   string `mapstructure:"OIDC_DISCOVERY_SCOPES_SUPPORTED" yaml:"-"`
 	OpenIDDiscoveryUserinfoEndpoint  string `mapstructure:"OIDC_DISCOVERY_USERINFO_ENDPOINT" yaml:"-"`
@@ -92,6 +94,16 @@ type Config struct {
 	oauth2Client *http.Client               `yaml:"-"`
 	context      *Context                   `yaml:"-"`
 	systemSecret []byte                     `yaml:"-"`
+}
+
+func (c *Config) MustValidate() {
+	if stringslice.Has(c.GetSubjectTypesSupported(), "pairwise") && c.OAuth2AccessTokenStrategy == "jwt" {
+		c.logger.Fatalf(`The pairwise subject identifier algorithm is not supported by the JWT OAuth 2.0 Access Token Strategy. Please remove "pairwise" from OIDC_SUBJECT_TYPES_SUPPORTED or set OAUTH2_ACCESS_TOKEN_STRATEGY to "opaque"`)
+	}
+
+	if stringslice.Has(c.GetSubjectTypesSupported(), "pairwise") && len(c.SubjectIdentifierAlgorithmSalt) < 8 {
+		c.logger.Fatalf(`The pairwise subject identifier algorithm was set but length of OIDC_SUBJECT_TYPE_PAIRWISE_SALT is too small (%d < 8), please set OIDC_SUBJECT_TYPE_PAIRWISE_SALT to a random string with 8 characters or more`, len(c.SubjectIdentifierAlgorithmSalt))
+	}
 }
 
 func (c *Config) GetSubjectTypesSupported() []string {

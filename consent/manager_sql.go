@@ -158,8 +158,8 @@ func (m *SQLManager) CreateConsentRequest(c *ConsentRequest) error {
 
 	if _, err := m.db.NamedExec(fmt.Sprintf(
 		"INSERT INTO hydra_oauth2_consent_request (%s) VALUES (%s)",
-		strings.Join(sqlParamsRequest, ", "),
-		":"+strings.Join(sqlParamsRequest, ", :"),
+		strings.Join(sqlParamsConsentRequest, ", "),
+		":"+strings.Join(sqlParamsConsentRequest, ", :"),
 	), d); err != nil {
 		return sqlcon.HandleError(err)
 	}
@@ -168,7 +168,7 @@ func (m *SQLManager) CreateConsentRequest(c *ConsentRequest) error {
 }
 
 func (m *SQLManager) GetConsentRequest(challenge string) (*ConsentRequest, error) {
-	var d sqlRequest
+	var d sqlConsentRequest
 
 	if err := m.db.Get(&d, m.db.Rebind("SELECT * FROM hydra_oauth2_consent_request WHERE challenge=?"), challenge); err != nil {
 		if err == sql.ErrNoRows {
@@ -193,8 +193,8 @@ func (m *SQLManager) CreateAuthenticationRequest(c *AuthenticationRequest) error
 
 	if _, err := m.db.NamedExec(fmt.Sprintf(
 		"INSERT INTO hydra_oauth2_authentication_request (%s) VALUES (%s)",
-		strings.Join(sqlParamsRequest, ", "),
-		":"+strings.Join(sqlParamsRequest, ", :"),
+		strings.Join(sqlParamsAuthenticationRequest, ", "),
+		":"+strings.Join(sqlParamsAuthenticationRequest, ", :"),
 	), d); err != nil {
 		return sqlcon.HandleError(err)
 	}
@@ -203,7 +203,7 @@ func (m *SQLManager) CreateAuthenticationRequest(c *AuthenticationRequest) error
 }
 
 func (m *SQLManager) GetAuthenticationRequest(challenge string) (*AuthenticationRequest, error) {
-	var d sqlRequest
+	var d sqlConsentRequest
 
 	if err := m.db.Get(&d, m.db.Rebind("SELECT * FROM hydra_oauth2_authentication_request WHERE challenge=?"), challenge); err != nil {
 		if err == sql.ErrNoRows {

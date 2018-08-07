@@ -34,12 +34,13 @@ import (
 func TestValidate(t *testing.T) {
 	v := &Validator{
 		DefaultClientScopes: []string{"openid"},
-		SubjectTypes:        []string{"public", "pairwise"},
+		SubjectTypes:        []string{"pairwise", "public"},
 	}
 	for k, tc := range []struct {
 		in        *Client
 		check     func(t *testing.T, c *Client)
 		expectErr bool
+		v         *Validator
 	}{
 		{
 			in: new(Client),
@@ -80,6 +81,16 @@ func TestValidate(t *testing.T) {
 			},
 		},
 		{
+			v: &Validator{
+				DefaultClientScopes: []string{"openid"},
+				SubjectTypes:        []string{"pairwise"},
+			},
+			in: &Client{ClientID: "foo"},
+			check: func(t *testing.T, c *Client) {
+				assert.Equal(t, "pairwise", c.SubjectType)
+			},
+		},
+		{
 			in: &Client{ClientID: "foo", SubjectType: "pairwise"},
 			check: func(t *testing.T, c *Client) {
 				assert.Equal(t, "pairwise", c.SubjectType)
@@ -91,7 +102,10 @@ func TestValidate(t *testing.T) {
 		},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
-			err := v.Validate(tc.in)
+			if tc.v == nil {
+				tc.v = v
+			}
+			err := tc.v.Validate(tc.in)
 			if tc.expectErr {
 				require.Error(t, err)
 			} else {

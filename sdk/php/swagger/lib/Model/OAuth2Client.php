@@ -72,6 +72,7 @@ class OAuth2Client implements ArrayAccess
         'response_types' => 'string[]',
         'scope' => 'string',
         'sector_identifier_uri' => 'string',
+        'subject_type' => 'string',
         'token_endpoint_auth_method' => 'string',
         'tos_uri' => 'string',
         'userinfo_signed_response_alg' => 'string'
@@ -100,6 +101,7 @@ class OAuth2Client implements ArrayAccess
         'response_types' => null,
         'scope' => null,
         'sector_identifier_uri' => null,
+        'subject_type' => null,
         'token_endpoint_auth_method' => null,
         'tos_uri' => null,
         'userinfo_signed_response_alg' => null
@@ -138,6 +140,7 @@ class OAuth2Client implements ArrayAccess
         'response_types' => 'response_types',
         'scope' => 'scope',
         'sector_identifier_uri' => 'sector_identifier_uri',
+        'subject_type' => 'subject_type',
         'token_endpoint_auth_method' => 'token_endpoint_auth_method',
         'tos_uri' => 'tos_uri',
         'userinfo_signed_response_alg' => 'userinfo_signed_response_alg'
@@ -167,6 +170,7 @@ class OAuth2Client implements ArrayAccess
         'response_types' => 'setResponseTypes',
         'scope' => 'setScope',
         'sector_identifier_uri' => 'setSectorIdentifierUri',
+        'subject_type' => 'setSubjectType',
         'token_endpoint_auth_method' => 'setTokenEndpointAuthMethod',
         'tos_uri' => 'setTosUri',
         'userinfo_signed_response_alg' => 'setUserinfoSignedResponseAlg'
@@ -196,6 +200,7 @@ class OAuth2Client implements ArrayAccess
         'response_types' => 'getResponseTypes',
         'scope' => 'getScope',
         'sector_identifier_uri' => 'getSectorIdentifierUri',
+        'subject_type' => 'getSubjectType',
         'token_endpoint_auth_method' => 'getTokenEndpointAuthMethod',
         'tos_uri' => 'getTosUri',
         'userinfo_signed_response_alg' => 'getUserinfoSignedResponseAlg'
@@ -250,6 +255,7 @@ class OAuth2Client implements ArrayAccess
         $this->container['response_types'] = isset($data['response_types']) ? $data['response_types'] : null;
         $this->container['scope'] = isset($data['scope']) ? $data['scope'] : null;
         $this->container['sector_identifier_uri'] = isset($data['sector_identifier_uri']) ? $data['sector_identifier_uri'] : null;
+        $this->container['subject_type'] = isset($data['subject_type']) ? $data['subject_type'] : null;
         $this->container['token_endpoint_auth_method'] = isset($data['token_endpoint_auth_method']) ? $data['token_endpoint_auth_method'] : null;
         $this->container['tos_uri'] = isset($data['tos_uri']) ? $data['tos_uri'] : null;
         $this->container['userinfo_signed_response_alg'] = isset($data['userinfo_signed_response_alg']) ? $data['userinfo_signed_response_alg'] : null;
@@ -666,6 +672,27 @@ class OAuth2Client implements ArrayAccess
     public function setSectorIdentifierUri($sector_identifier_uri)
     {
         $this->container['sector_identifier_uri'] = $sector_identifier_uri;
+
+        return $this;
+    }
+
+    /**
+     * Gets subject_type
+     * @return string
+     */
+    public function getSubjectType()
+    {
+        return $this->container['subject_type'];
+    }
+
+    /**
+     * Sets subject_type
+     * @param string $subject_type SubjectType requested for responses to this Client. The subject_types_supported Discovery parameter contains a list of the supported subject_type values for this server. Valid types include `pairwise` and `public`.
+     * @return $this
+     */
+    public function setSubjectType($subject_type)
+    {
+        $this->container['subject_type'] = $subject_type;
 
         return $this;
     }

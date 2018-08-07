@@ -268,6 +268,10 @@ func (s *DefaultStrategy) obfuscateSubjectIdentifier(subject string, req fosite.
 			return "", errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf(`Subject Identifier Algorithm "%s" was requested by OAuth 2.0 Client "%s", but is not configured.`, c.SubjectType, c.ClientID)))
 		}
 
+		if len(forcedIdentifier) > 0 {
+			return forcedIdentifier, nil
+		}
+
 		return algorithm.Obfuscate(subject, c)
 	} else if !ok {
 		return "", errors.New("Unable to type assert OAuth 2.0 Client to *client.Client")
@@ -522,7 +526,7 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 		return nil, err
 	}
 
-	session.SubjectIdentifier = pw
+	session.ConsentRequest.SubjectIdentifier = pw
 	session.AuthenticatedAt = session.ConsentRequest.AuthenticatedAt
 	return session, nil
 }

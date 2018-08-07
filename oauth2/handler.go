@@ -608,7 +608,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 			Claims: &jwt.IDTokenClaims{
 				// We do not need to pass the audience because it's included directly by ORY Fosite
 				//Audience:    []string{authorizeRequest.GetClient().GetID()},
-				Subject:     session.SubjectIdentifier,
+				Subject:     session.ConsentRequest.SubjectIdentifier,
 				Issuer:      strings.TrimRight(h.IssuerURL, "/") + "/",
 				IssuedAt:    time.Now().UTC(),
 				ExpiresAt:   time.Now().Add(h.IDTokenLifespan).UTC(),

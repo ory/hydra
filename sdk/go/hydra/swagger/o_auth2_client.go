@@ -65,6 +65,9 @@ type OAuth2Client struct {
 	// URL using the https scheme to be used in calculating Pseudonymous Identifiers by the OP. The URL references a file with a single JSON array of redirect_uri values.
 	SectorIdentifierUri string `json:"sector_identifier_uri,omitempty"`
 
+	// SubjectType requested for responses to this Client. The subject_types_supported Discovery parameter contains a list of the supported subject_type values for this server. Valid types include `pairwise` and `public`.
+	SubjectType string `json:"subject_type,omitempty"`
+
 	// Requested Client Authentication method for the Token Endpoint. The options are client_secret_post, client_secret_basic, private_key_jwt, and none.
 	TokenEndpointAuthMethod string `json:"token_endpoint_auth_method,omitempty"`
 

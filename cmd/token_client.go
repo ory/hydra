@@ -51,7 +51,7 @@ func (t *transporter) RoundTrip(req *http.Request) (*http.Response, error) {
 // tokenClientCmd represents the self command
 var tokenClientCmd = &cobra.Command{
 	Use:   "client",
-	Short: "Obfuscate an OAuth2 token the client grant type",
+	Short: "Generate an OAuth2 token the client grant type",
 	Long:  "This command uses the CLI's credentials to create an access token.",
 	Run: func(cmd *cobra.Command, args []string) {
 		fakeTlsTermination, _ := cmd.Flags().GetBool("fake-tls-termination")

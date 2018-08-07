@@ -147,6 +147,12 @@
           'String'
         )
       }
+      if (data.hasOwnProperty('subject_type')) {
+        obj['subject_type'] = ApiClient.convertToType(
+          data['subject_type'],
+          'String'
+        )
+      }
       if (data.hasOwnProperty('token_endpoint_auth_method')) {
         obj['token_endpoint_auth_method'] = ApiClient.convertToType(
           data['token_endpoint_auth_method'],
@@ -255,6 +261,11 @@
    * @member {String} sector_identifier_uri
    */
   exports.prototype['sector_identifier_uri'] = undefined
+  /**
+   * SubjectType requested for responses to this Client. The subject_types_supported Discovery parameter contains a list of the supported subject_type values for this server. Valid types include `pairwise` and `public`.
+   * @member {String} subject_type
+   */
+  exports.prototype['subject_type'] = undefined
   /**
    * Requested Client Authentication method for the Token Endpoint. The options are client_secret_post, client_secret_basic, private_key_jwt, and none.
    * @member {String} token_endpoint_auth_method

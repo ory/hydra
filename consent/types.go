@@ -96,14 +96,12 @@ type HandledConsentRequest struct {
 	// authorization will be remembered indefinitely.
 	RememberFor int `json:"remember_for"`
 
-	// SubjectIdentifier is the final result of the subject identifier. It should not be readable/settable from the outside.
-	SubjectIdentifier string              `json:"-"`
-	ConsentRequest    *ConsentRequest     `json:"-"`
-	Error             *RequestDeniedError `json:"-"`
-	Challenge         string              `json:"-"`
-	RequestedAt       time.Time           `json:"-"`
-	AuthenticatedAt   time.Time           `json:"-"`
-	WasUsed           bool                `json:"-"`
+	ConsentRequest  *ConsentRequest     `json:"-"`
+	Error           *RequestDeniedError `json:"-"`
+	Challenge       string              `json:"-"`
+	RequestedAt     time.Time           `json:"-"`
+	AuthenticatedAt time.Time           `json:"-"`
+	WasUsed         bool                `json:"-"`
 }
 
 // The response used to return handled consent requests
@@ -123,13 +121,12 @@ type PreviousConsentSession struct {
 	// authorization will be remembered indefinitely.
 	RememberFor int `json:"remember_for"`
 
-	SubjectIdentifier string              `json:"-"`
-	ConsentRequest    *ConsentRequest     `json:"consent_request"`
-	Error             *RequestDeniedError `json:"-"`
-	Challenge         string              `json:"-"`
-	RequestedAt       time.Time           `json:"-"`
-	AuthenticatedAt   time.Time           `json:"-"`
-	WasUsed           bool                `json:"-"`
+	ConsentRequest  *ConsentRequest     `json:"consent_request"`
+	Error           *RequestDeniedError `json:"-"`
+	Challenge       string              `json:"-"`
+	RequestedAt     time.Time           `json:"-"`
+	AuthenticatedAt time.Time           `json:"-"`
+	WasUsed         bool                `json:"-"`
 }
 
 // The request payload used to accept a login request.
@@ -297,6 +294,7 @@ type ConsentRequest struct {
 
 	// ForceSubjectIdentifier is the value from authentication (if set).
 	ForceSubjectIdentifier string    `json:"-"`
+	SubjectIdentifier      string    `json:"-"`
 	Verifier               string    `json:"-"`
 	CSRF                   string    `json:"-"`
 	AuthenticatedAt        time.Time `json:"-"`

@@ -123,6 +123,7 @@ func TestStrategy(t *testing.T) {
 
 	persistentCJ := newCookieJar()
 	persistentCJ2 := newCookieJar()
+	persistentCJ3 := newCookieJar()
 
 	nonexistentCJ, _ := cookiejar.New(&cookiejar.Options{})
 	apURL, _ := url.Parse(ap.URL)
@@ -297,7 +298,7 @@ func TestStrategy(t *testing.T) {
 			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
 			expectErr:             []bool{true, true, false},
 			expectSession: &HandledConsentRequest{
-				ConsentRequest: &ConsentRequest{Subject: "user"},
+				ConsentRequest: &ConsentRequest{Subject: "user", SubjectIdentifier: "user"},
 				GrantedScope:   []string{"scope-a"},
 				Remember:       false,
 				RememberFor:    0,
@@ -317,7 +318,7 @@ func TestStrategy(t *testing.T) {
 			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
 			expectErr:             []bool{true, true, false},
 			expectSession: &HandledConsentRequest{
-				ConsentRequest: &ConsentRequest{Subject: "user"},
+				ConsentRequest: &ConsentRequest{Subject: "user", SubjectIdentifier: "user"},
 				GrantedScope:   []string{"scope-a"},
 				Remember:       true,
 				RememberFor:    0,
@@ -482,7 +483,7 @@ func TestStrategy(t *testing.T) {
 			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
 			expectErr:             []bool{true, true, false},
 			expectSession: &HandledConsentRequest{
-				ConsentRequest: &ConsentRequest{Subject: "user"},
+				ConsentRequest: &ConsentRequest{Subject: "user", SubjectIdentifier: "user"},
 				GrantedScope:   []string{"scope-a"},
 				Remember:       false,
 				RememberFor:    0,
@@ -542,7 +543,7 @@ func TestStrategy(t *testing.T) {
 			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
 			expectErr:             []bool{true, true, false},
 			expectSession: &HandledConsentRequest{
-				ConsentRequest: &ConsentRequest{Subject: "user"},
+				ConsentRequest: &ConsentRequest{Subject: "user", SubjectIdentifier: "user"},
 				GrantedScope:   []string{"scope-a"},
 				Remember:       true,
 				RememberFor:    0,
@@ -605,7 +606,7 @@ func TestStrategy(t *testing.T) {
 			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
 			expectErr:             []bool{true, true, false},
 			expectSession: &HandledConsentRequest{
-				ConsentRequest: &ConsentRequest{Subject: "user"},
+				ConsentRequest: &ConsentRequest{Subject: "user", SubjectIdentifier: "user"},
 				GrantedScope:   []string{"scope-a"},
 				Remember:       false,
 				RememberFor:    0,
@@ -881,10 +882,85 @@ func TestStrategy(t *testing.T) {
 			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
 			expectErr:             []bool{true, true, false},
 			expectSession: &HandledConsentRequest{
-				ConsentRequest: &ConsentRequest{Subject: "foouser"},
+				ConsentRequest: &ConsentRequest{Subject: "foouser", SubjectIdentifier: "foouser"},
 				GrantedScope:   []string{"scope-a"},
 				Remember:       false,
 				RememberFor:    0,
+				Session: &ConsentRequestSessionData{
+					AccessToken: map[string]interface{}{"foo": "bar"},
+					IDToken:     map[string]interface{}{"bar": "baz"},
+				},
+			},
+		},
+
+		// Pairwise auth
+		{
+			d:   "This should pass as regularly and create a new session with pairwise subject set by hydra",
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ClientID: "client-id", SubjectType: "pairwise", SectorIdentifierURI: "foo"}, Scopes: []string{"scope-a"}}},
+			jar: persistentCJ3,
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					v, _, _ := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
+						Subject:  "auth-user",
+						Remember: false,
+					})
+					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+				}
+			},
+			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					v, _, _ := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{GrantScope: []string{"scope-a"}})
+					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+				}
+			},
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+			expectSession: &HandledConsentRequest{
+				ConsentRequest: &ConsentRequest{
+					Subject:           "auth-user",
+					SubjectIdentifier: "c737d5e1fec8896d096d49f6b1a73eb45ac7becb87de9ac3f0a350bad2a9c9fd", // this is sha256("fooauth-user76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
+				},
+				GrantedScope: []string{"scope-a"},
+				Remember:     false,
+				RememberFor:  0,
+				Session: &ConsentRequestSessionData{
+					AccessToken: map[string]interface{}{"foo": "bar"},
+					IDToken:     map[string]interface{}{"bar": "baz"},
+				},
+			},
+		},
+		{
+			d:   "This should pass as regularly and create a new session with pairwise subject set login request",
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ClientID: "client-id", SubjectType: "pairwise", SectorIdentifierURI: "foo"}, Scopes: []string{"scope-a"}}},
+			jar: persistentCJ3,
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					v, _, _ := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
+						Subject:                "auth-user",
+						ForceSubjectIdentifier: "forced-auth-user",
+						Remember:               false,
+					})
+					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+				}
+			},
+			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					v, _, _ := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{GrantScope: []string{"scope-a"}})
+					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+				}
+			},
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+			expectSession: &HandledConsentRequest{
+				ConsentRequest: &ConsentRequest{
+					Subject:           "auth-user",
+					SubjectIdentifier: "forced-auth-user",
+				},
+				GrantedScope: []string{"scope-a"},
+				Remember:     false,
+				RememberFor:  0,
 				Session: &ConsentRequestSessionData{
 					AccessToken: map[string]interface{}{"foo": "bar"},
 					IDToken:     map[string]interface{}{"bar": "baz"},
@@ -1071,6 +1147,7 @@ func TestStrategy(t *testing.T) {
 						assert.EqualValues(t, tc.expectSession.Remember, c.Remember)
 						assert.EqualValues(t, tc.expectSession.RememberFor, c.RememberFor)
 						assert.EqualValues(t, tc.expectSession.ConsentRequest.Subject, c.ConsentRequest.Subject)
+						assert.EqualValues(t, tc.expectSession.ConsentRequest.SubjectIdentifier, c.ConsentRequest.SubjectIdentifier)
 					}
 				}
 

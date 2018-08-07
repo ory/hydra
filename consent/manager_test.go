@@ -63,6 +63,8 @@ func mockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 		RequestedScope: []string{"scopea" + key, "scopeb" + key},
 		Verifier:       "verifier" + key,
 		CSRF:           "csrf" + key,
+		ForceSubjectIdentifier: "forced-subject",
+		SubjectIdentifier:      "forced-subject",
 	}
 
 	var err *RequestDeniedError
@@ -126,16 +128,17 @@ func mockAuthRequest(key string, authAt bool) (c *AuthenticationRequest, h *Hand
 	}
 
 	h = &HandledAuthenticationRequest{
-		AuthenticationRequest: c,
-		RememberFor:           120,
-		Remember:              true,
-		Challenge:             "challenge" + key,
-		RequestedAt:           time.Now().UTC().Add(-time.Minute),
-		AuthenticatedAt:       authenticatedAt,
-		Error:                 err,
-		Subject:               c.Subject,
-		ACR:                   "acr",
-		WasUsed:               false,
+		AuthenticationRequest:  c,
+		RememberFor:            120,
+		Remember:               true,
+		Challenge:              "challenge" + key,
+		RequestedAt:            time.Now().UTC().Add(-time.Minute),
+		AuthenticatedAt:        authenticatedAt,
+		Error:                  err,
+		Subject:                c.Subject,
+		ACR:                    "acr",
+		WasUsed:                false,
+		ForceSubjectIdentifier: "forced-subject",
 	}
 
 	return c, h

@@ -131,7 +131,7 @@
    */
   exports.prototype['skip'] = undefined
   /**
-   * Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope requested by the OAuth 2.0 client.
+   * Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope requested by the OAuth 2.0 client. If this value is set and `skip` is true, you MUST include this subject type when accepting the login request, or the request will fail.
    * @member {String} subject
    */
   exports.prototype['subject'] = undefined

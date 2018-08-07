@@ -504,7 +504,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprou
 
 	if accessRequest.GetGrantTypes().Exact("client_credentials") {
 		var accessTokenKeyID string
-		if h.AccessTokenJWTStrategy != nil {
+		if h.AccessTokenStrategy == "jwt" {
 			accessTokenKeyID, err = h.AccessTokenJWTStrategy.GetPublicKeyID()
 			if err != nil {
 				pkg.LogError(err, h.L)
@@ -586,7 +586,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	}
 
 	var accessTokenKeyID string
-	if h.AccessTokenJWTStrategy != nil {
+	if h.AccessTokenStrategy == "jwt" {
 		accessTokenKeyID, err = h.AccessTokenJWTStrategy.GetPublicKeyID()
 		if err != nil {
 			pkg.LogError(err, h.L)

@@ -29,6 +29,12 @@ import (
 	"github.com/pkg/errors"
 )
 
+type JWTStrategy interface {
+	GetPublicKeyID() (string, error)
+
+	jwt.JWTStrategy
+}
+
 func NewRS256JWTStrategy(m Manager, set string) (*RS256JWTStrategy, error) {
 	j := &RS256JWTStrategy{
 		Manager:          m,

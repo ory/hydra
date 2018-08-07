@@ -26,8 +26,23 @@ import (
 
 var clientsImportCmd = &cobra.Command{
 	Use:   "import <path/to/file.json> [<path/to/other/file.json>...]",
-	Short: "Import clients from JSON files",
-	Run:   cmdHandler.Clients.ImportClients,
+	Short: "Import OAuth 2.0 Clients from one or more JSON files",
+	Long: `This command reads in each listed JSON file and imports their contents as OAuth 2.0 Clients.
+
+The format for the JSON file is:
+
+{
+  "client_id": "...",
+  "client_secret": "...",
+  // ... all other fields of the OAuth 2.0 Client model are allowed here
+}
+
+Please be aware that this command does not update existing clients. If the client exists already, this command will fail.
+
+Example:
+	hydra clients import client-1.json
+`,
+	Run: cmdHandler.Clients.ImportClients,
 }
 
 func init() {

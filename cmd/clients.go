@@ -29,8 +29,7 @@ import (
 // clientsCmd represents the clients command
 var clientsCmd = &cobra.Command{
 	Use:   "clients <command>",
-	Short: "Manage OAuth2 clients",
-	Long:  `Use this command to create, modify or delete OAuth2 clients.`,
+	Short: "Manage OAuth 2.0 Clients",
 }
 
 func init() {

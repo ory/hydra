@@ -26,8 +26,12 @@ import (
 
 var clientsGetCmd = &cobra.Command{
 	Use:   "get <id>",
-	Short: "Get a client by id",
-	Run:   cmdHandler.Clients.GetClient,
+	Short: "Get an OAuth 2.0 Client",
+	Long: `This command retrieves an OAuth 2.0 Clients by its ID.
+
+Example:
+  hydra clients get client-1`,
+	Run: cmdHandler.Clients.GetClient,
 }
 
 func init() {

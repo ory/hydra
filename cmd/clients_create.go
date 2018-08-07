@@ -27,8 +27,12 @@ import (
 // createCmd represents the create command
 var clientsCreateCmd = &cobra.Command{
 	Use:   "create",
-	Short: "Create a new OAuth2 client",
-	Long: `This command creates a basic OAuth2 client. Always specify at least one redirect url.
+	Short: "Create a new OAuth 2.0 Client",
+	Long: `This command creates an OAuth 2.0 Client which can be used to perform various OAuth 2.0 Flows like
+the Authorize Code, Implicit, Refresh flow.
+
+ORY Hydra implements the OpenID Connect Dynamic Client registration specification. Most flags are supported by this command
+as well.
 
 Example:
   hydra clients create -n "my app" -c http://localhost/cb -g authorization_code -r code -a core,foobar

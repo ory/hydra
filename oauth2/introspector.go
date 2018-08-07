@@ -33,6 +33,8 @@ type Introspection struct {
 	// has not been revoked by the resource owner, and is within its
 	// given time window of validity (e.g., after its issuance time and
 	// before its expiration time).
+	//
+	// required: true
 	Active bool `json:"active"`
 
 	// Scope is a JSON string containing a space-separated list of

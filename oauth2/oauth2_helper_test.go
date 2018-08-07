@@ -58,7 +58,8 @@ func (c *consentMock) HandleOAuth2AuthorizationRequest(w http.ResponseWriter, r 
 
 	return &consent.HandledConsentRequest{
 		ConsentRequest: &consent.ConsentRequest{
-			Subject: "foo",
+			Subject:           "foo",
+			SubjectIdentifier: "foo",
 		},
 		AuthenticatedAt: c.authTime,
 		GrantedScope:    []string{"offline", "openid", "hydra.*"},
@@ -66,7 +67,6 @@ func (c *consentMock) HandleOAuth2AuthorizationRequest(w http.ResponseWriter, r 
 			AccessToken: map[string]interface{}{},
 			IDToken:     map[string]interface{}{},
 		},
-		SubjectIdentifier: "foo",
-		RequestedAt:       c.requestTime,
+		RequestedAt: c.requestTime,
 	}, nil
 }

@@ -147,6 +147,11 @@ OPENID CONNECT CONTROLS
 
 - OIDC_SUBJECT_TYPE_PAIRWISE_SALT: Is the salt of the pairwise identifier algorithm and must be set if pairwise is enabled.
 	The length must be longer than 8 characters.
+
+	!! Warning !!
+	This value should not be changed once set in production. Changing it will cause all client applications
+	to receive new user IDs from ORY Hydra which will lead to serious complications with authentication on their side!
+
 	Example: OIDC_SUBJECT_TYPE_PAIRWISE_SALT=5be780ef690045aebf50845d56acd72c
 
 HTTPS CONTROLS

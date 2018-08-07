@@ -534,6 +534,39 @@ func TestManagers(t *testing.T) {
 			})
 		}
 
+		t.Run("case=obfuscated", func(t *testing.T) {
+			for k, m := range managers {
+				t.Run(fmt.Sprintf("manager=%s", k), func(t *testing.T) {
+					got, err := m.GetForcedObfuscatedAuthenticationSession("client-1", "obfuscated-1")
+					require.EqualError(t, err, pkg.ErrNotFound.Error())
+
+					expect := &ForcedObfuscatedAuthenticationSession{
+						ClientID:          "client-1",
+						Subject:           "subject-1",
+						SubjectObfuscated: "obfuscated-1",
+					}
+					require.NoError(t, m.CreateForcedObfuscatedAuthenticationSession(expect))
+
+					got, err = m.GetForcedObfuscatedAuthenticationSession("client-1", "obfuscated-1")
+					require.NoError(t, err)
+					assert.EqualValues(t, expect, got)
+
+					expect = &ForcedObfuscatedAuthenticationSession{
+						ClientID:          "client-1",
+						Subject:           "subject-1",
+						SubjectObfuscated: "obfuscated-2",
+					}
+					require.NoError(t, m.CreateForcedObfuscatedAuthenticationSession(expect))
+
+					got, err = m.GetForcedObfuscatedAuthenticationSession("client-1", "obfuscated-2")
+					require.NoError(t, err)
+					assert.EqualValues(t, expect, got)
+
+					got, err = m.GetForcedObfuscatedAuthenticationSession("client-1", "obfuscated-1")
+					require.EqualError(t, err, pkg.ErrNotFound.Error())
+				})
+			}
+		})
 	})
 }
 

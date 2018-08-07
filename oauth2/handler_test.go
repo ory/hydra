@@ -215,6 +215,37 @@ func TestUserinfo(t *testing.T) {
 						session = &oauth2.Session{
 							DefaultSession: &openid.DefaultSession{
 								Claims: &jwt.IDTokenClaims{
+									Subject: "another-alice",
+								},
+								Headers: new(jwt.Headers),
+								Subject: "alice",
+							},
+							Audience: []string{},
+							Extra:    map[string]interface{}{},
+						}
+
+						return fosite.AccessToken, &fosite.AccessRequest{
+							Request: fosite.Request{
+								Client:  &client.Client{},
+								Session: session,
+							},
+						}, nil
+					})
+			},
+			expectStatusCode: http.StatusOK,
+			check: func(t *testing.T, body []byte) {
+				assert.False(t, strings.Contains(string(body), `"sub":"alice"`), "%s", body)
+				assert.True(t, strings.Contains(string(body), `"sub":"another-alice"`), "%s", body)
+			},
+		},
+		{
+			setup: func(t *testing.T) {
+				op.EXPECT().
+					IntrospectToken(gomock.Any(), gomock.Eq("access-token"), gomock.Eq(fosite.AccessToken), gomock.Any()).
+					DoAndReturn(func(_ context.Context, _ string, _ fosite.TokenType, session fosite.Session, _ ...string) (fosite.TokenType, fosite.AccessRequester, error) {
+						session = &oauth2.Session{
+							DefaultSession: &openid.DefaultSession{
+								Claims: &jwt.IDTokenClaims{
 									Subject: "alice",
 								},
 								Headers: new(jwt.Headers),

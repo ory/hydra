@@ -150,6 +150,52 @@ func (m *SQLManager) RevokeUserAuthenticationSession(user string) error {
 	return nil
 }
 
+func (m *SQLManager) CreateForcedObfuscatedAuthenticationSession(s *ForcedObfuscatedAuthenticationSession) error {
+	tx, err := m.db.Beginx()
+	if err != nil {
+		return sqlcon.HandleError(err)
+	}
+
+	if _, err := m.db.Exec(
+		m.db.Rebind("DELETE FROM hydra_oauth2_obfuscated_authentication_session WHERE client_id=? AND subject=?"),
+		s.ClientID,
+		s.Subject,
+	); err != nil {
+		if err := tx.Rollback(); err != nil {
+			return sqlcon.HandleError(err)
+		}
+		return sqlcon.HandleError(err)
+	}
+
+	if _, err := m.db.NamedExec(
+		"INSERT INTO hydra_oauth2_obfuscated_authentication_session (subject, client_id, subject_obfuscated) VALUES (:subject, :client_id, :subject_obfuscated)",
+		s,
+	); err != nil {
+		if err := tx.Rollback(); err != nil {
+			return sqlcon.HandleError(err)
+		}
+		return sqlcon.HandleError(err)
+	}
+
+	if err := tx.Commit(); err != nil {
+		return sqlcon.HandleError(err)
+	}
+	return nil
+}
+
+func (m *SQLManager) GetForcedObfuscatedAuthenticationSession(client, obfuscated string) (*ForcedObfuscatedAuthenticationSession, error) {
+	var d ForcedObfuscatedAuthenticationSession
+
+	if err := m.db.Get(&d, m.db.Rebind("SELECT * FROM hydra_oauth2_obfuscated_authentication_session WHERE client_id=? AND subject_obfuscated=?"), client, obfuscated); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.WithStack(pkg.ErrNotFound)
+		}
+		return nil, sqlcon.HandleError(err)
+	}
+
+	return &d, nil
+}
+
 func (m *SQLManager) CreateConsentRequest(c *ConsentRequest) error {
 	d, err := newSQLConsentRequest(c)
 	if err != nil {

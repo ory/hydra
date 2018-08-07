@@ -150,11 +150,24 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 		return err
 	}
 
+	var hintSub, obfuscatedUserID, forcedObfuscatedUserID string
 	if hintClaims, ok := token.Claims.(jwtgo.MapClaims); !ok {
 		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Failed to validate OpenID Connect request as decoding id token from id_token_hint to *jwt.StandardClaims failed"))
 	} else if hintSub, _ := hintClaims["sub"].(string); hintSub == "" {
 		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Failed to validate OpenID Connect request because provided id token from id_token_hint does not have a subject"))
-	} else if hintSub != session.Subject {
+	} else if obfuscatedUserID, err = s.obfuscateSubjectIdentifier(session.Subject, ar, ""); err != nil {
+		return err
+	}
+
+	if s, err := s.M.GetForcedObfuscatedAuthenticationSession(ar.GetClient().GetID(), hintSub); errors.Cause(err) == pkg.ErrNotFound {
+		// do nothing
+	} else if err != nil {
+		return err
+	} else {
+		forcedObfuscatedUserID = s.SubjectObfuscated
+	}
+
+	if hintSub != session.Subject && hintSub != obfuscatedUserID && hintSub != forcedObfuscatedUserID {
 		return errors.WithStack(fosite.ErrLoginRequired.WithDebug("Request failed because subject claim from id_token_hint does not match subject from authentication session"))
 	} else {
 		return s.forwardAuthenticationRequest(w, r, ar, session.Subject, session.AuthenticatedAt)
@@ -350,6 +363,16 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return nil, err
 	} else if err != nil {
 		return nil, err
+	}
+
+	if session.ForceSubjectIdentifier != "" {
+		if err := s.M.CreateForcedObfuscatedAuthenticationSession(&ForcedObfuscatedAuthenticationSession{
+			Subject:           session.Subject,
+			ClientID:          req.GetClient().GetID(),
+			SubjectObfuscated: session.ForceSubjectIdentifier,
+		}); err != nil {
+			return nil, err
+		}
 	}
 
 	if !session.Remember {

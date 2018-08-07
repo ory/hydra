@@ -638,8 +638,13 @@ func (h *Handler) writeAuthorizeError(w http.ResponseWriter, ar fosite.Authorize
 		query := redirectURI.Query()
 		query.Add("error", rfcerr.Name)
 		query.Add("error_description", rfcerr.Description)
-		redirectURI.RawQuery = query.Encode()
+		query.Add("error_hint", rfcerr.Hint)
 
+		if h.ShareOAuth2Debug {
+			query.Add("error_debug", rfcerr.Debug)
+		}
+
+		redirectURI.RawQuery = query.Encode()
 		w.Header().Add("Location", redirectURI.String())
 		w.WriteHeader(http.StatusFound)
 		return

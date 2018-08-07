@@ -195,6 +195,7 @@ func newOAuth2Handler(c *config.Config, frontend, backend *httprouter.Router, cm
 		OpenIDJWTStrategy:      openIDJWTStrategy,
 		AccessTokenJWTStrategy: accessTokenJWTStrategy,
 		IDTokenLifespan:        c.GetIDTokenLifespan(),
+		ShareOAuth2Debug:       c.SendOAuth2DebugMessagesToClients,
 	}
 
 	handler.SetRoutes(frontend, backend)

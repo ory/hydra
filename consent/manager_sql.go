@@ -364,8 +364,31 @@ WHERE
 		return nil, sqlcon.HandleError(err)
 	}
 
+	return m.resolveHandledConsentRequests(a)
+}
+
+func (m *SQLManager) FindPreviouslyGrantedConsentRequestsByUser(subject string, limit, offset int) ([]HandledConsentRequest, error) {
+	var a []sqlHandledConsentRequest
+
+	if err := m.db.Select(&a, m.db.Rebind(`SELECT h.* FROM
+	hydra_oauth2_consent_request_handled as h
+JOIN
+	hydra_oauth2_consent_request as r ON (h.challenge = r.challenge)
+WHERE
+		r.subject=? AND r.skip=FALSE
+	AND
+		(h.error='{}' AND h.remember=TRUE)
+LIMIT ? OFFSET ?
+`), subject, limit, offset); err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
+
+	return m.resolveHandledConsentRequests(a)
+}
+
+func (m *SQLManager) resolveHandledConsentRequests(requests []sqlHandledConsentRequest) ([]HandledConsentRequest, error) {
 	var aa []HandledConsentRequest
-	for _, v := range a {
+	for _, v := range requests {
 		r, err := m.GetConsentRequest(v.Challenge)
 		if err != nil {
 			return nil, err

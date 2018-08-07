@@ -30,6 +30,7 @@
       'model/OAuth2Client',
       'model/OAuth2TokenIntrospection',
       'model/OauthTokenResponse',
+      'model/PreviousConsentSession',
       'model/RejectRequest',
       'model/UserinfoResponse',
       'model/WellKnown'
@@ -49,6 +50,7 @@
       require('../model/OAuth2Client'),
       require('../model/OAuth2TokenIntrospection'),
       require('../model/OauthTokenResponse'),
+      require('../model/PreviousConsentSession'),
       require('../model/RejectRequest'),
       require('../model/UserinfoResponse'),
       require('../model/WellKnown')
@@ -74,6 +76,8 @@
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer
         .OAuth2TokenIntrospection,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OauthTokenResponse,
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer
+        .PreviousConsentSession,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.RejectRequest,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.UserinfoResponse,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WellKnown
@@ -92,6 +96,7 @@
   OAuth2Client,
   OAuth2TokenIntrospection,
   OauthTokenResponse,
+  PreviousConsentSession,
   RejectRequest,
   UserinfoResponse,
   WellKnown
@@ -672,6 +677,59 @@
 
       return this.apiClient.callApi(
         '/clients',
+        'GET',
+        pathParams,
+        queryParams,
+        headerParams,
+        formParams,
+        postBody,
+        authNames,
+        contentTypes,
+        accepts,
+        returnType,
+        callback
+      )
+    }
+
+    /**
+     * Callback function to receive the result of the listUserConsentSessions operation.
+     * @callback module:api/OAuth2Api~listUserConsentSessionsCallback
+     * @param {String} error Error message, if any.
+     * @param {Array.<module:model/PreviousConsentSession>} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Lists all consent sessions of a user
+     * This endpoint lists all user&#39;s granted consent sessions, including client and granted scope
+     * @param {String} user
+     * @param {module:api/OAuth2Api~listUserConsentSessionsCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link Array.<module:model/PreviousConsentSession>}
+     */
+    this.listUserConsentSessions = function(user, callback) {
+      var postBody = null
+
+      // verify the required parameter 'user' is set
+      if (user === undefined || user === null) {
+        throw new Error(
+          "Missing the required parameter 'user' when calling listUserConsentSessions"
+        )
+      }
+
+      var pathParams = {
+        user: user
+      }
+      var queryParams = {}
+      var headerParams = {}
+      var formParams = {}
+
+      var authNames = []
+      var contentTypes = ['application/json']
+      var accepts = ['application/json']
+      var returnType = [PreviousConsentSession]
+
+      return this.apiClient.callApi(
+        '/oauth2/auth/sessions/consent/{user}',
         'GET',
         pathParams,
         queryParams,

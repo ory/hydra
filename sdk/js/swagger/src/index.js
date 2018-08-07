@@ -51,6 +51,7 @@
       'model/OauthTokenResponse',
       'model/ObjectIdentifier',
       'model/OpenIDConnectContext',
+      'model/PreviousConsentSession',
       'model/PublicKeyAlgorithm',
       'model/RawMessage',
       'model/RejectRequest',
@@ -110,6 +111,7 @@
       require('./model/OauthTokenResponse'),
       require('./model/ObjectIdentifier'),
       require('./model/OpenIDConnectContext'),
+      require('./model/PreviousConsentSession'),
       require('./model/PublicKeyAlgorithm'),
       require('./model/RawMessage'),
       require('./model/RejectRequest'),
@@ -168,6 +170,7 @@
   OauthTokenResponse,
   ObjectIdentifier,
   OpenIDConnectContext,
+  PreviousConsentSession,
   PublicKeyAlgorithm,
   RawMessage,
   RejectRequest,
@@ -390,6 +393,11 @@
      * @property {module:model/OpenIDConnectContext}
      */
     OpenIDConnectContext: OpenIDConnectContext,
+    /**
+     * The PreviousConsentSession model constructor.
+     * @property {module:model/PreviousConsentSession}
+     */
+    PreviousConsentSession: PreviousConsentSession,
     /**
      * The PublicKeyAlgorithm model constructor.
      * @property {module:model/PublicKeyAlgorithm}

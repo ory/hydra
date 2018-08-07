@@ -62,11 +62,15 @@ func TestSDK(t *testing.T) {
 
 	cr1, hcr1 := mockConsentRequest("1", false, 0, false, false, false)
 	cr2, hcr2 := mockConsentRequest("2", false, 0, false, false, false)
+	cr3, hcr3 := mockConsentRequest("3", true, 3600, false, false, false)
 	require.NoError(t, m.CreateConsentRequest(cr1))
 	require.NoError(t, m.CreateConsentRequest(cr2))
+	require.NoError(t, m.CreateConsentRequest(cr3))
 	_, err = m.HandleConsentRequest("challenge1", hcr1)
 	require.NoError(t, err)
 	_, err = m.HandleConsentRequest("challenge2", hcr2)
+	require.NoError(t, err)
+	_, err = m.HandleConsentRequest("challenge3", hcr3)
 	require.NoError(t, err)
 
 	crGot, res, err := sdk.GetConsentRequest("challenge1")
@@ -113,6 +117,18 @@ func TestSDK(t *testing.T) {
 	_, res, err = sdk.GetConsentRequest("challenge2")
 	require.NoError(t, err)
 	require.EqualValues(t, http.StatusNotFound, res.StatusCode)
+
+	csGot, res, err := sdk.ListUserConsentSessions("subject3")
+	require.NoError(t, err)
+	require.EqualValues(t, http.StatusOK, res.StatusCode)
+	assert.Equal(t, 1, len(csGot))
+	cs := csGot[0]
+	assert.Equal(t, "challenge3", cs.ConsentRequest.Challenge)
+
+	csGot, res, err = sdk.ListUserConsentSessions("subject2")
+	require.NoError(t, err)
+	require.EqualValues(t, http.StatusOK, res.StatusCode)
+	assert.Equal(t, 0, len(csGot))
 }
 
 func compareSDKLoginRequest(t *testing.T, expected *AuthenticationRequest, got *swagger.LoginRequest) {

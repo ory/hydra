@@ -136,6 +136,7 @@ Class | Method | HTTP request | Description
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**getWellKnown**](docs/OAuth2Api.md#getWellKnown) | **GET** /.well-known/openid-configuration | Server well known configuration
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**introspectOAuth2Token**](docs/OAuth2Api.md#introspectOAuth2Token) | **POST** /oauth2/introspect | Introspect OAuth2 tokens
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**listOAuth2Clients**](docs/OAuth2Api.md#listOAuth2Clients) | **GET** /clients | List OAuth 2.0 Clients
+*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**listUserConsentSessions**](docs/OAuth2Api.md#listUserConsentSessions) | **GET** /oauth2/auth/sessions/consent/{user} | Lists all consent sessions of a user
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**oauthAuth**](docs/OAuth2Api.md#oauthAuth) | **GET** /oauth2/auth | The OAuth 2.0 authorize endpoint
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**oauthToken**](docs/OAuth2Api.md#oauthToken) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**rejectConsentRequest**](docs/OAuth2Api.md#rejectConsentRequest) | **PUT** /oauth2/auth/requests/consent/{challenge}/reject | Reject an consent request
@@ -184,6 +185,7 @@ Class | Method | HTTP request | Description
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OauthTokenResponse](docs/OauthTokenResponse.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ObjectIdentifier](docs/ObjectIdentifier.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OpenIDConnectContext](docs/OpenIDConnectContext.md)
+ - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.PreviousConsentSession](docs/PreviousConsentSession.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.PublicKeyAlgorithm](docs/PublicKeyAlgorithm.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.RawMessage](docs/RawMessage.md)
  - [OryHydraCloudNativeOAuth20AndOpenIdConnectServer.RejectRequest](docs/RejectRequest.md)

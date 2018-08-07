@@ -17,32 +17,32 @@
 ;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/JsonWebKey'], factory)
+    define(['ApiClient', 'model/JSONWebKey'], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('./JsonWebKey'))
+    module.exports = factory(require('../ApiClient'), require('./JSONWebKey'))
   } else {
     // Browser globals (root is window)
     if (!root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer) {
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {}
     }
-    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKeySet = factory(
+    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JSONWebKeySet = factory(
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKey
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JSONWebKey
     )
   }
-})(this, function(ApiClient, JsonWebKey) {
+})(this, function(ApiClient, JSONWebKey) {
   'use strict'
 
   /**
-   * The JsonWebKeySet model module.
-   * @module model/JsonWebKeySet
+   * The JSONWebKeySet model module.
+   * @module model/JSONWebKeySet
    * @version Latest
    */
 
   /**
-   * Constructs a new <code>JsonWebKeySet</code>.
-   * @alias module:model/JsonWebKeySet
+   * Constructs a new <code>JSONWebKeySet</code>.
+   * @alias module:model/JSONWebKeySet
    * @class
    */
   var exports = function() {
@@ -50,26 +50,25 @@
   }
 
   /**
-   * Constructs a <code>JsonWebKeySet</code> from a plain JavaScript object, optionally creating a new instance.
+   * Constructs a <code>JSONWebKeySet</code> from a plain JavaScript object, optionally creating a new instance.
    * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
    * @param {Object} data The plain JavaScript object bearing properties of interest.
-   * @param {module:model/JsonWebKeySet} obj Optional instance to populate.
-   * @return {module:model/JsonWebKeySet} The populated <code>JsonWebKeySet</code> instance.
+   * @param {module:model/JSONWebKeySet} obj Optional instance to populate.
+   * @return {module:model/JSONWebKeySet} The populated <code>JSONWebKeySet</code> instance.
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
       obj = obj || new exports()
 
       if (data.hasOwnProperty('keys')) {
-        obj['keys'] = ApiClient.convertToType(data['keys'], [JsonWebKey])
+        obj['keys'] = ApiClient.convertToType(data['keys'], [JSONWebKey])
       }
     }
     return obj
   }
 
   /**
-   * The value of the \"keys\" parameter is an array of JWK values.  By default, the order of the JWK values within the array does not imply an order of preference among them, although applications of JWK Sets can choose to assign a meaning to the order for their purposes, if desired.
-   * @member {Array.<module:model/JsonWebKey>} keys
+   * @member {Array.<module:model/JSONWebKey>} keys
    */
   exports.prototype['keys'] = undefined
 

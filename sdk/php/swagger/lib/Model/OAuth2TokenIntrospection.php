@@ -211,6 +211,9 @@ class OAuth2TokenIntrospection implements ArrayAccess
     {
         $invalid_properties = [];
 
+        if ($this->container['active'] === null) {
+            $invalid_properties[] = "'active' can't be null";
+        }
         return $invalid_properties;
     }
 
@@ -223,6 +226,9 @@ class OAuth2TokenIntrospection implements ArrayAccess
     public function valid()
     {
 
+        if ($this->container['active'] === null) {
+            return false;
+        }
         return true;
     }
 

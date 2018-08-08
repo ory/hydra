@@ -2545,6 +2545,11 @@
           "format": "int64",
           "x-go-name": "NotBefore"
         },
+        "obfuscated_subject": {
+          "description": "ObfuscatedSubject is set when the subject identifier algorithm was set to \"pairwise\" during authorization.\nIt is the `sub` value of the ID Token that was issued.",
+          "type": "string",
+          "x-go-name": "ObfuscatedSubject"
+        },
         "scope": {
           "description": "Scope is a JSON string containing a space-separated list of\nscopes associated with this token.",
           "type": "string",

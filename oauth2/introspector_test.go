@@ -44,7 +44,7 @@ import (
 )
 
 func TestIntrospectorSDK(t *testing.T) {
-	tokens := pkg.Tokens(3)
+	tokens := pkg.Tokens(4)
 	memoryStore := storage.NewExampleStore()
 	memoryStore.Clients["my-client"].(*fosite.DefaultClient).Scopes = []string{"fosite", "openid", "photos", "offline", "foo.*"}
 
@@ -82,6 +82,7 @@ func TestIntrospectorSDK(t *testing.T) {
 	createAccessTokenSession("alice", "my-client", tokens[0][0], now.Add(time.Hour), memoryStore, fosite.Arguments{"core", "foo.*"})
 	createAccessTokenSession("siri", "my-client", tokens[1][0], now.Add(-time.Hour), memoryStore, fosite.Arguments{"core", "foo.*"})
 	createAccessTokenSession("my-client", "my-client", tokens[2][0], now.Add(time.Hour), memoryStore, fosite.Arguments{"hydra.introspect"})
+	createAccessTokenSessionPairwise("alice", "my-client", tokens[3][0], now.Add(time.Hour), memoryStore, fosite.Arguments{"core", "foo.*"}, "alice-obfuscated")
 
 	t.Run("TestIntrospect", func(t *testing.T) {
 		for k, c := range []struct {
@@ -156,6 +157,16 @@ func TestIntrospectorSDK(t *testing.T) {
 					assert.Equal(t, now.Unix(), c.Iat, "issued at")
 					assert.Equal(t, "foobariss/", c.Iss, "issuer")
 					assert.Equal(t, map[string]interface{}{"foo": "bar"}, c.Ext)
+				},
+			},
+			{
+				description:    "should pass and check for obfuscated subject",
+				token:          tokens[3][1],
+				expectInactive: false,
+				scopes:         []string{"foo.bar"},
+				assert: func(t *testing.T, c *hydra.OAuth2TokenIntrospection) {
+					assert.Equal(t, "alice", c.Sub)
+					assert.Equal(t, "alice-obfuscated", c.ObfuscatedSubject)
 				},
 			},
 		} {

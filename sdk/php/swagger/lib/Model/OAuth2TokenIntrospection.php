@@ -63,6 +63,7 @@ class OAuth2TokenIntrospection implements ArrayAccess
         'iat' => 'int',
         'iss' => 'string',
         'nbf' => 'int',
+        'obfuscated_subject' => 'string',
         'scope' => 'string',
         'sub' => 'string',
         'token_type' => 'string',
@@ -82,6 +83,7 @@ class OAuth2TokenIntrospection implements ArrayAccess
         'iat' => 'int64',
         'iss' => null,
         'nbf' => 'int64',
+        'obfuscated_subject' => null,
         'scope' => null,
         'sub' => null,
         'token_type' => null,
@@ -111,6 +113,7 @@ class OAuth2TokenIntrospection implements ArrayAccess
         'iat' => 'iat',
         'iss' => 'iss',
         'nbf' => 'nbf',
+        'obfuscated_subject' => 'obfuscated_subject',
         'scope' => 'scope',
         'sub' => 'sub',
         'token_type' => 'token_type',
@@ -131,6 +134,7 @@ class OAuth2TokenIntrospection implements ArrayAccess
         'iat' => 'setIat',
         'iss' => 'setIss',
         'nbf' => 'setNbf',
+        'obfuscated_subject' => 'setObfuscatedSubject',
         'scope' => 'setScope',
         'sub' => 'setSub',
         'token_type' => 'setTokenType',
@@ -151,6 +155,7 @@ class OAuth2TokenIntrospection implements ArrayAccess
         'iat' => 'getIat',
         'iss' => 'getIss',
         'nbf' => 'getNbf',
+        'obfuscated_subject' => 'getObfuscatedSubject',
         'scope' => 'getScope',
         'sub' => 'getSub',
         'token_type' => 'getTokenType',
@@ -196,6 +201,7 @@ class OAuth2TokenIntrospection implements ArrayAccess
         $this->container['iat'] = isset($data['iat']) ? $data['iat'] : null;
         $this->container['iss'] = isset($data['iss']) ? $data['iss'] : null;
         $this->container['nbf'] = isset($data['nbf']) ? $data['nbf'] : null;
+        $this->container['obfuscated_subject'] = isset($data['obfuscated_subject']) ? $data['obfuscated_subject'] : null;
         $this->container['scope'] = isset($data['scope']) ? $data['scope'] : null;
         $this->container['sub'] = isset($data['sub']) ? $data['sub'] : null;
         $this->container['token_type'] = isset($data['token_type']) ? $data['token_type'] : null;
@@ -391,6 +397,27 @@ class OAuth2TokenIntrospection implements ArrayAccess
     public function setNbf($nbf)
     {
         $this->container['nbf'] = $nbf;
+
+        return $this;
+    }
+
+    /**
+     * Gets obfuscated_subject
+     * @return string
+     */
+    public function getObfuscatedSubject()
+    {
+        return $this->container['obfuscated_subject'];
+    }
+
+    /**
+     * Sets obfuscated_subject
+     * @param string $obfuscated_subject ObfuscatedSubject is set when the subject identifier algorithm was set to \"pairwise\" during authorization. It is the `sub` value of the ID Token that was issued.
+     * @return $this
+     */
+    public function setObfuscatedSubject($obfuscated_subject)
+    {
+        $this->container['obfuscated_subject'] = $obfuscated_subject;
 
         return $this;
     }

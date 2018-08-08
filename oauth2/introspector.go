@@ -48,6 +48,10 @@ type Introspection struct {
 	// authorized this token.
 	Subject string `json:"sub,omitempty"`
 
+	// ObfuscatedSubject is set when the subject identifier algorithm was set to "pairwise" during authorization.
+	// It is the `sub` value of the ID Token that was issued.
+	ObfuscatedSubject string `json:"obfuscated_subject,omitempty"`
+
 	// Expires at is an integer timestamp, measured in the number of seconds
 	// since January 1 1970 UTC, indicating when this token will expire.
 	ExpiresAt int64 `json:"exp,omitempty"`

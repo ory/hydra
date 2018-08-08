@@ -165,7 +165,9 @@ func (m *MemoryManager) VerifyAndInvalidateConsentRequest(verifier string) (*Han
 func (m *MemoryManager) FindPreviouslyGrantedConsentRequests(client string, subject string) ([]HandledConsentRequest, error) {
 	var rs []HandledConsentRequest
 	filteredByUser, err := m.FindPreviouslyGrantedConsentRequestsByUser(subject, -1, -1)
-	if err != nil {
+	if errors.Cause(err) == pkg.ErrNotFound {
+		return nil, errors.WithStack(ErrNoPreviousConsentFound)
+	} else if err != nil {
 		return nil, err
 	}
 
@@ -174,8 +176,9 @@ func (m *MemoryManager) FindPreviouslyGrantedConsentRequests(client string, subj
 			rs = append(rs, c)
 		}
 	}
+
 	if len(rs) == 0 {
-		return []HandledConsentRequest{}, nil
+		return nil, errors.WithStack(ErrNoPreviousConsentFound)
 	}
 
 	return rs, nil
@@ -185,9 +188,7 @@ func (m *MemoryManager) FindPreviouslyGrantedConsentRequestsByUser(subject strin
 	var rs []HandledConsentRequest
 	for _, c := range m.handledConsentRequests {
 		cr, err := m.GetConsentRequest(c.Challenge)
-		if errors.Cause(err) == pkg.ErrNotFound {
-			return nil, errors.WithStack(errNoPreviousConsentFound)
-		} else if err != nil {
+		if err != nil {
 			return nil, err
 		}
 
@@ -215,8 +216,9 @@ func (m *MemoryManager) FindPreviouslyGrantedConsentRequestsByUser(subject strin
 		c.ConsentRequest = cr
 		rs = append(rs, c)
 	}
+
 	if len(rs) == 0 {
-		return []HandledConsentRequest{}, nil
+		return nil, errors.WithStack(ErrNoPreviousConsentFound)
 	}
 
 	if limit < 0 && offset < 0 {

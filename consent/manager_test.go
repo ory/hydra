@@ -314,8 +314,12 @@ func TestManagers(t *testing.T) {
 				} {
 					t.Run("key="+tc.keyC+"-"+tc.keyS, func(t *testing.T) {
 						rs, err := m.FindPreviouslyGrantedConsentRequests("client"+tc.keyC, "subject"+tc.keyS)
-						require.NoError(t, err)
-						assert.Len(t, rs, tc.expectedLength)
+						if tc.expectedLength == 0 {
+							assert.EqualError(t, err, ErrNoPreviousConsentFound.Error())
+						} else {
+							require.NoError(t, err)
+							assert.Len(t, rs, tc.expectedLength)
+						}
 					})
 				}
 			})
@@ -518,14 +522,19 @@ func TestManagers(t *testing.T) {
 					},
 				} {
 					t.Run(fmt.Sprintf("case=%d/subject=%s", i, tc.subject), func(t *testing.T) {
-						consents, _ := m.FindPreviouslyGrantedConsentRequestsByUser(tc.subject, 100, 0)
-
+						consents, err := m.FindPreviouslyGrantedConsentRequestsByUser(tc.subject, 100, 0)
 						assert.Equal(t, len(tc.challenges), len(consents))
 
-						for _, consent := range consents {
-							assert.Contains(t, tc.challenges, consent.Challenge)
-							assert.Contains(t, tc.clients, consent.ConsentRequest.Client.ClientID)
+						if len(tc.challenges) == 0 {
+							assert.EqualError(t, err, ErrNoPreviousConsentFound.Error())
+						} else {
+							require.NoError(t, err)
+							for _, consent := range consents {
+								assert.Contains(t, tc.challenges, consent.Challenge)
+								assert.Contains(t, tc.clients, consent.ConsentRequest.Client.ClientID)
+							}
 						}
+
 					})
 				}
 			})

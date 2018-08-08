@@ -57,5 +57,6 @@ type OAuth2API interface {
 	RevokeOAuth2Token(token string) (*swagger.APIResponse, error)
 	UpdateOAuth2Client(id string, body swagger.OAuth2Client) (*swagger.OAuth2Client, *swagger.APIResponse, error)
 
+	ListUserConsentSessions(user string) ([]swagger.PreviousConsentSession, *swagger.APIResponse, error)
 	FlushInactiveOAuth2Tokens(body swagger.FlushInactiveOAuth2TokensRequest) (*swagger.APIResponse, error)
 }

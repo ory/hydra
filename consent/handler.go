@@ -31,7 +31,6 @@ import (
 	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/herodot"
 	"github.com/ory/pagination"
-	"github.com/ory/sqlcon"
 	"github.com/pkg/errors"
 )
 
@@ -155,7 +154,6 @@ func (h *Handler) DeleteUserClientConsentSession(w http.ResponseWriter, r *http.
 //       401: genericError
 //       403: genericError
 //       500: genericError
-
 func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	user := ps.ByName("user")
 	if user == "" {
@@ -165,8 +163,7 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 	limit, offset := pagination.Parse(r, 100, 0, 500)
 
 	sessions, err := h.M.FindPreviouslyGrantedConsentRequestsByUser(user, limit, offset)
-
-	if err == sqlcon.ErrNoRows {
+	if errors.Cause(err) == ErrNoPreviousConsentFound {
 		h.H.Write(w, r, []PreviousConsentSession{})
 		return
 	} else if err != nil {

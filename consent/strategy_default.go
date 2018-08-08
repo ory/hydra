@@ -92,7 +92,7 @@ func NewStrategy(
 }
 
 var ErrAbortOAuth2Request = errors.New("The OAuth 2.0 Authorization request must be aborted")
-var errNoPreviousConsentFound = errors.New("No previous OAuth 2.0 Consent could be found for this access request")
+var ErrNoPreviousConsentFound = errors.New("No previous OAuth 2.0 Consent could be found for this access request")
 
 func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester) error {
 	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
@@ -402,7 +402,7 @@ func (s *DefaultStrategy) requestConsent(w http.ResponseWriter, r *http.Request,
 	// }
 
 	consentSessions, err := s.M.FindPreviouslyGrantedConsentRequests(ar.GetClient().GetID(), authenticationSession.Subject)
-	if errors.Cause(err) == errNoPreviousConsentFound {
+	if errors.Cause(err) == ErrNoPreviousConsentFound {
 		return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
 	} else if err != nil {
 		return err

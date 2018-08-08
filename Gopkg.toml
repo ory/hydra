@@ -31,7 +31,7 @@
 
 [[constraint]]
   name = "github.com/ory/sqlcon"
-  version = "0.0.4"
+  version = "0.0.5"
 
 [[constraint]]
   name = "github.com/gorilla/context"

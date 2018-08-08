@@ -26,8 +26,8 @@ import (
 
 	"github.com/imdario/mergo"
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/pkg"
 	"github.com/ory/pagination"
+	"github.com/ory/sqlcon"
 	"github.com/pkg/errors"
 )
 
@@ -58,7 +58,7 @@ func (m *MemoryManager) GetConcreteClient(id string) (*Client, error) {
 		}
 	}
 
-	return nil, errors.Wrap(pkg.ErrNotFound, "")
+	return nil, errors.WithStack(sqlcon.ErrNoRows)
 }
 
 func (m *MemoryManager) GetClient(_ context.Context, id string) (fosite.Client, error) {
@@ -113,7 +113,7 @@ func (m *MemoryManager) Authenticate(id string, secret []byte) (*Client, error) 
 
 func (m *MemoryManager) CreateClient(c *Client) error {
 	if _, err := m.GetConcreteClient(c.GetID()); err == nil {
-		return errors.Errorf("Client %s already exists", c.GetID())
+		return sqlcon.ErrUniqueViolation
 	}
 
 	m.Lock()

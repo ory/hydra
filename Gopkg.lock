@@ -85,8 +85,8 @@
 [[projects]]
   name = "github.com/go-sql-driver/mysql"
   packages = ["."]
-  revision = "a0583e0143b1624142adab07e0e97fe106d99561"
-  version = "v1.3"
+  revision = "d523deb1b23d913de5bdada721a6071e71283618"
+  version = "v1.4.0"
 
 [[projects]]
   branch = "master"
@@ -360,8 +360,8 @@
     ".",
     "dockertest"
   ]
-  revision = "7cb5a0f3099d9596e71128202e4bd54405927dfa"
-  version = "v0.0.3"
+  revision = "777dd0451239a5ff27a7de1ece21b79ba0104734"
+  version = "v0.0.4"
 
 [[projects]]
   name = "github.com/pborman/uuid"
@@ -600,6 +600,7 @@
 [[projects]]
   name = "google.golang.org/appengine"
   packages = [
+    "cloudsql",
     "internal",
     "internal/base",
     "internal/datastore",
@@ -636,6 +637,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "f0ec0043f94c20b1da2628447c8c46b1433a8fdc0760e73cba53724ea812e597"
+  inputs-digest = "efb3563a4ab94526307caeaff8fe848bd7a0b21c052466aec477b78528125ab7"
   solver-name = "gps-cdcl"
   solver-version = 1

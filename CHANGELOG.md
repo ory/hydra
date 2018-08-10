@@ -3,7 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
-  - [Unreleased](#unreleased)
+  - [v1.0.0-beta.8 (2018-08-10)](#v100-beta8-2018-08-10)
   - [v1.0.0-beta.7 (2018-07-16)](#v100-beta7-2018-07-16)
   - [v1.0.0-beta.6 (2018-07-11)](#v100-beta6-2018-07-11)
   - [v1.0.0-beta.5 (2018-07-07)](#v100-beta5-2018-07-07)
@@ -134,13 +134,71 @@
 
 # Change Log
 
-## [Unreleased](https://github.com/ory/hydra/tree/HEAD)
+## [v1.0.0-beta.8](https://github.com/ory/hydra/tree/v1.0.0-beta.8) (2018-08-10)
+[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-beta.7...v1.0.0-beta.8)
 
-[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-beta.7...HEAD)
+**Implemented enhancements:**
+
+- Allow logging out and deleting a single session cookie [\#970](https://github.com/ory/hydra/issues/970)
+- vendor: Upgrade to MySQL 1.4 driver [\#965](https://github.com/ory/hydra/issues/965)
+- oauth2: abstract oauth2/handler JWT Strategies [\#960](https://github.com/ory/hydra/issues/960)
+- consent: expose  a list of all clients authorized by a user [\#953](https://github.com/ory/hydra/issues/953)
+- oauth2: Support for Pairwise Subject Identifier Type [\#950](https://github.com/ory/hydra/issues/950)
+- \[Enhancement/Proposal\] Update Plugin System [\#949](https://github.com/ory/hydra/issues/949)
+- The JWK api should be able to export .pem [\#175](https://github.com/ory/hydra/issues/175)
+- cmd: Add flags for new client fields in create [\#939](https://github.com/ory/hydra/issues/939)
+- client: Deprecate the `public` flag [\#938](https://github.com/ory/hydra/issues/938)
+- client: Clarify error message regarding client auth method [\#936](https://github.com/ory/hydra/issues/936)
+- cmd: Add option to specify new oidc parameters in client [\#935](https://github.com/ory/hydra/issues/935)
+- consent: Obtain previously selected scopes [\#902](https://github.com/ory/hydra/issues/902)
+- oauth2: allow issuing of JWT access tokens [\#248](https://github.com/ory/hydra/issues/248)
+- oauth2: Add scope to introspection test suite [\#941](https://github.com/ory/hydra/pull/941) ([arekkas](https://github.com/arekkas))
+-  consent: Add logout api endpoint [\#984](https://github.com/ory/hydra/pull/984) ([arekkas](https://github.com/arekkas))
+- sdk: Upgrade superagent to 3.7.0 [\#983](https://github.com/ory/hydra/pull/983) ([arekkas](https://github.com/arekkas))
+- vendor: Upgrade to latest sqlcon [\#975](https://github.com/ory/hydra/pull/975) ([arekkas](https://github.com/arekkas))
+- oauth2: Refactor JWT strategy [\#972](https://github.com/ory/hydra/pull/972) ([someone1](https://github.com/someone1))
+- oauth2: Removes authorization from introspection [\#969](https://github.com/ory/hydra/pull/969) ([arekkas](https://github.com/arekkas))
+- oauth2: Support for Pairwise Subject Identifier Type [\#966](https://github.com/ory/hydra/pull/966) ([arekkas](https://github.com/arekkas))
+- cmd: Introduce public and administrative ports [\#963](https://github.com/ory/hydra/pull/963) ([arekkas](https://github.com/arekkas))
+- oauth2: Adds JWT Access Token strategy  [\#947](https://github.com/ory/hydra/pull/947) ([arekkas](https://github.com/arekkas))
+- oauth2: Improve token endpoint authentication error message [\#942](https://github.com/ory/hydra/pull/942) ([arekkas](https://github.com/arekkas))
+
+**Fixed bugs:**
+
+- client: Improve error messages from managers [\#976](https://github.com/ory/hydra/issues/976)
+- consent: Duplicate row error should return a better error message [\#880](https://github.com/ory/hydra/issues/880)
+- oauth2: error\_hint, error\_debug are not shared when redirect fails [\#974](https://github.com/ory/hydra/issues/974)
+- oauth2: Introspect response is empty when `active` is false. [\#964](https://github.com/ory/hydra/issues/964)
+- consent: MemoryManager should return `errNoPreviousConsentFound` when no previous consent was found [\#959](https://github.com/ory/hydra/issues/959)
+- consent: Auth session should check for `pkg.ErrNotFound`, not `sql.ErrNoRows` [\#944](https://github.com/ory/hydra/issues/944)
+- sdk: Add AdminURL and PublicURL to configuration [\#968](https://github.com/ory/hydra/pull/968) ([arekkas](https://github.com/arekkas))
+- cmd: Introduce public and administrative ports [\#963](https://github.com/ory/hydra/pull/963) ([arekkas](https://github.com/arekkas))
+- consent: Properly identify revoked login sessions [\#945](https://github.com/ory/hydra/pull/945) ([arekkas](https://github.com/arekkas))
 
 **Closed issues:**
 
+- Refresh token and access token share same lifetime [\#955](https://github.com/ory/hydra/issues/955)
+- Id\_token\_hint doesn't work as expected [\#951](https://github.com/ory/hydra/issues/951)
+- consent: Check if helper rejects unknown JSON fields [\#940](https://github.com/ory/hydra/issues/940)
+- Unable to specify a custom claim to hydra [\#937](https://github.com/ory/hydra/issues/937)
 - \[HTTP API\] get /version returns empty [\#934](https://github.com/ory/hydra/issues/934)
+- docs: Add limitations section [\#839](https://github.com/ory/hydra/issues/839)
+- Expose administrative APIs at a different port \(e.g. 4445\) [\#904](https://github.com/ory/hydra/issues/904)
+
+**Merged pull requests:**
+
+- client: Improve memory manager error messages [\#978](https://github.com/ory/hydra/pull/978) ([arekkas](https://github.com/arekkas))
+- consent: Add ListUserConsentSessions to OAuth2API interface [\#977](https://github.com/ory/hydra/pull/977) ([clausdenk](https://github.com/clausdenk))
+- docker: Update .dockerignore [\#967](https://github.com/ory/hydra/pull/967) ([arekkas](https://github.com/arekkas))
+- cli: fix reporting of epected vs. received status codes [\#961](https://github.com/ory/hydra/pull/961) ([rjw57](https://github.com/rjw57))
+- all: Introduce database backend interface and update plugin system an… [\#956](https://github.com/ory/hydra/pull/956) ([someone1](https://github.com/someone1))
+- Add api endpoint to list all authorized clients by user [\#954](https://github.com/ory/hydra/pull/954) ([kingjan1999](https://github.com/kingjan1999))
+- Use spdx expression for license in package.json [\#952](https://github.com/ory/hydra/pull/952) ([kingjan1999](https://github.com/kingjan1999))
+- Improve client API compatibility with oidc dynamic discovery [\#943](https://github.com/ory/hydra/pull/943) ([arekkas](https://github.com/arekkas))
+- oauth2: Share error details with redirect fallback [\#982](https://github.com/ory/hydra/pull/982) ([arekkas](https://github.com/arekkas))
+- cli: Print "active:false" when token is inactive [\#981](https://github.com/ory/hydra/pull/981) ([arekkas](https://github.com/arekkas))
+- consent: Return proper error when no consent was found [\#980](https://github.com/ory/hydra/pull/980) ([arekkas](https://github.com/arekkas))
+- vendor: Upgrade sqlcon to 0.0.5 [\#979](https://github.com/ory/hydra/pull/979) ([arekkas](https://github.com/arekkas))
 
 ## [v1.0.0-beta.7](https://github.com/ory/hydra/tree/v1.0.0-beta.7) (2018-07-16)
 [Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-beta.6...v1.0.0-beta.7)

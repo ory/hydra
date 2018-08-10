@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "opencollective": "^1.0.3",
-    "superagent": "3.5.2"
+    "superagent": "3.7.0"
   },
   "devDependencies": {
     "prettier": "^1.12.1"

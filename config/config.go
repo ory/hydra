@@ -63,6 +63,7 @@ type Config struct {
 	DatabasePlugin                   string `mapstructure:"DATABASE_PLUGIN" yaml:"-"`
 	ConsentURL                       string `mapstructure:"OAUTH2_CONSENT_URL" yaml:"-"`
 	LoginURL                         string `mapstructure:"OAUTH2_LOGIN_URL" yaml:"-"`
+	LogoutRedirectURL                string `mapstructure:"OAUTH2_LOGOUT_REDIRECT_URL" yaml:"-"`
 	DefaultClientScope               string `mapstructure:"OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE" yaml:"-"`
 	ErrorURL                         string `mapstructure:"OAUTH2_ERROR_URL" yaml:"-"`
 	AllowTLSTermination              string `mapstructure:"HTTPS_ALLOW_TERMINATION_FROM" yaml:"-"`

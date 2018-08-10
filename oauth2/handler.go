@@ -45,6 +45,7 @@ const (
 	OAuth2JWTKeyName     = "hydra.jwt.access-token"
 
 	DefaultConsentPath = "/oauth2/fallbacks/consent"
+	DefaultLogoutPath  = "/oauth2/fallbacks/logout"
 	DefaultErrorPath   = "/oauth2/fallbacks/error"
 	TokenPath          = "/oauth2/token"
 	AuthPath           = "/oauth2/auth"
@@ -161,6 +162,7 @@ func (h *Handler) SetRoutes(frontend, backend *httprouter.Router) {
 	frontend.POST(AuthPath, h.AuthHandler)
 	frontend.GET(DefaultConsentPath, h.DefaultConsentHandler)
 	frontend.GET(DefaultErrorPath, h.DefaultErrorHandler)
+	frontend.GET(DefaultLogoutPath, h.DefaultLogoutHandler)
 	frontend.POST(RevocationPath, h.RevocationHandler)
 	frontend.GET(WellKnownPath, h.WellKnownHandler)
 	frontend.GET(UserinfoPath, h.UserinfoHandler)

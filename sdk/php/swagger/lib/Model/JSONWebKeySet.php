@@ -1,6 +1,6 @@
 <?php
 /**
- * JSONWebKeySet
+ * JsonWebKeySet
  *
  * PHP version 5
  *
@@ -32,14 +32,14 @@ namespace Hydra\SDK\Model;
 use \ArrayAccess;
 
 /**
- * JSONWebKeySet Class Doc Comment
+ * JsonWebKeySet Class Doc Comment
  *
  * @category    Class
  * @package     Hydra\SDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
  */
-class JSONWebKeySet implements ArrayAccess
+class JsonWebKeySet implements ArrayAccess
 {
     const DISCRIMINATOR = null;
 
@@ -47,14 +47,14 @@ class JSONWebKeySet implements ArrayAccess
       * The original name of the model.
       * @var string
       */
-    protected static $swaggerModelName = 'JSONWebKeySet';
+    protected static $swaggerModelName = 'jsonWebKeySet';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'keys' => '\Hydra\SDK\Model\JSONWebKey[]'
+        'keys' => '\Hydra\SDK\Model\JsonWebKey[]'
     ];
 
     /**
@@ -162,7 +162,7 @@ class JSONWebKeySet implements ArrayAccess
 
     /**
      * Gets keys
-     * @return \Hydra\SDK\Model\JSONWebKey[]
+     * @return \Hydra\SDK\Model\JsonWebKey[]
      */
     public function getKeys()
     {
@@ -171,7 +171,7 @@ class JSONWebKeySet implements ArrayAccess
 
     /**
      * Sets keys
-     * @param \Hydra\SDK\Model\JSONWebKey[] $keys
+     * @param \Hydra\SDK\Model\JsonWebKey[] $keys The value of the \"keys\" parameter is an array of JWK values.  By default, the order of the JWK values within the array does not imply an order of preference among them, although applications of JWK Sets can choose to assign a meaning to the order for their purposes, if desired.
      * @return $this
      */
     public function setKeys($keys)

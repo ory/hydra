@@ -26,6 +26,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
 	. "github.com/ory/hydra/consent"
@@ -40,9 +41,9 @@ import (
 func TestSDK(t *testing.T) {
 	m := NewMemoryManager(oauth2.NewFositeMemoryStore(nil, time.Minute))
 	router := httprouter.New()
-	h := NewHandler(herodot.NewJSONWriter(logrus.New()), m)
+	h := NewHandler(herodot.NewJSONWriter(logrus.New()), m, sessions.NewCookieStore([]byte("secret")), "https://www.ory.sh")
 
-	h.SetRoutes(router)
+	h.SetRoutes(router, router)
 	ts := httptest.NewServer(router)
 
 	sdk, err := hydra.NewSDK(&hydra.Configuration{

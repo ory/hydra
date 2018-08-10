@@ -257,14 +257,9 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 }
 
 func (s *DefaultStrategy) revokeAuthenticationSession(w http.ResponseWriter, r *http.Request) error {
-	cookie, _ := s.CookieStore.Get(r, cookieAuthenticationName)
-	sid, _ := mapx.GetString(cookie.Values, cookieAuthenticationSIDName)
-
-	cookie.Options.MaxAge = -1
-	cookie.Values[cookieAuthenticationSIDName] = ""
-
-	if err := cookie.Save(r, w); err != nil {
-		return errors.WithStack(err)
+	sid, err := revokeAuthenticationCookie(w, r, s.CookieStore)
+	if err != nil {
+		return err
 	}
 
 	if sid == "" {
@@ -272,6 +267,20 @@ func (s *DefaultStrategy) revokeAuthenticationSession(w http.ResponseWriter, r *
 	}
 
 	return s.M.DeleteAuthenticationSession(sid)
+}
+
+func revokeAuthenticationCookie(w http.ResponseWriter, r *http.Request, s sessions.Store) (string, error) {
+	cookie, _ := s.Get(r, cookieAuthenticationName)
+	sid, _ := mapx.GetString(cookie.Values, cookieAuthenticationSIDName)
+
+	cookie.Options.MaxAge = -1
+	cookie.Values[cookieAuthenticationSIDName] = ""
+
+	if err := cookie.Save(r, w); err != nil {
+		return "", errors.WithStack(err)
+	}
+
+	return sid, nil
 }
 
 func (s *DefaultStrategy) obfuscateSubjectIdentifier(subject string, req fosite.AuthorizeRequester, forcedIdentifier string) (string, error) {

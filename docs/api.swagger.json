@@ -1191,6 +1191,34 @@
         }
       }
     },
+    "/oauth2/auth/sessions/login/revoke": {
+      "get": {
+        "description": "This endpoint deletes ths user's login session cookie and redirects the browser to the url\nlisted in `LOGOUT_REDIRECT_URL` environment variable. This endpoint does not work as an API but has to\nbe called from the user's browser.",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "oAuth2"
+        ],
+        "summary": "Logs user out by deleting the session cookie",
+        "operationId": "revokeUserLoginCookie",
+        "responses": {
+          "302": {
+            "$ref": "#/responses/emptyResponse"
+          },
+          "404": {
+            "$ref": "#/responses/genericError"
+          },
+          "500": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
     "/oauth2/auth/sessions/login/{user}": {
       "delete": {
         "description": "This endpoint invalidates a user's authentication session. After revoking the authentication session, the user\nhas to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens.",

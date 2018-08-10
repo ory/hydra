@@ -52,6 +52,7 @@ Class | Method | HTTP request | Description
 *OAuth2Api* | [**RevokeAuthenticationSession**](docs/OAuth2Api.md#revokeauthenticationsession) | **Delete** /oauth2/auth/sessions/login/{user} | Invalidates a user&#39;s authentication session
 *OAuth2Api* | [**RevokeOAuth2Token**](docs/OAuth2Api.md#revokeoauth2token) | **Post** /oauth2/revoke | Revoke OAuth2 tokens
 *OAuth2Api* | [**RevokeUserClientConsentSessions**](docs/OAuth2Api.md#revokeuserclientconsentsessions) | **Delete** /oauth2/auth/sessions/consent/{user}/{client} | Revokes consent sessions of a user for a specific OAuth 2.0 Client
+*OAuth2Api* | [**RevokeUserLoginCookie**](docs/OAuth2Api.md#revokeuserlogincookie) | **Get** /oauth2/auth/sessions/login/revoke | Logs user out by deleting the session cookie
 *OAuth2Api* | [**UpdateOAuth2Client**](docs/OAuth2Api.md#updateoauth2client) | **Put** /clients/{id} | Update an OAuth 2.0 Client
 *OAuth2Api* | [**Userinfo**](docs/OAuth2Api.md#userinfo) | **Post** /userinfo | OpenID Connect Userinfo
 *OAuth2Api* | [**WellKnown**](docs/OAuth2Api.md#wellknown) | **Get** /.well-known/jwks.json | Get Well-Known JSON Web Keys

@@ -194,9 +194,9 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					}
 					handler.SetRoutes(router, router)
 
-					apiHandler := consent.NewHandler(herodot.NewJSONWriter(l), cm)
+					apiHandler := consent.NewHandler(herodot.NewJSONWriter(l), cm, cookieStore, "")
 					apiRouter := httprouter.New()
-					apiHandler.SetRoutes(apiRouter)
+					apiHandler.SetRoutes(apiRouter, apiRouter)
 					api := httptest.NewServer(apiRouter)
 
 					client := hc.Client{

@@ -29,6 +29,7 @@ import (
 
 func (h *Handler) DefaultConsentHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	h.L.Warnln("It looks like no consent/login URL was set. All OAuth2 flows except client credentials will fail.")
+	h.L.Warnln("A client requested the default login & consent URL, environment variable OAUTH2_CONSENT_URL or OAUTH2_LOGIN_URL or both are probably not set.")
 
 	w.Write([]byte(`
 <html>
@@ -50,7 +51,7 @@ func (h *Handler) DefaultConsentHandler(w http.ResponseWriter, r *http.Request, 
 }
 
 func (h *Handler) DefaultErrorHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	h.L.Warnln("It looks like no OAuth2 Error URL was set.")
+	h.L.Warnln("A client requested the default error URL, environment variable OAUTH2_ERROR_URL is probably not set.")
 
 	fmt.Fprintf(w, `
 <html>
@@ -75,4 +76,26 @@ func (h *Handler) DefaultErrorHandler(w http.ResponseWriter, r *http.Request, _ 
 </body>
 </html>
 `, r.URL.Query().Get("error"), r.URL.Query().Get("error_description"), r.URL.Query().Get("error_hint"), r.URL.Query().Get("error_debug"))
+}
+
+func (h *Handler) DefaultLogoutHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	h.L.Warnln("A client requested the default logout URL, environment variable OAUTH2_LOGOUT_REDIRECT_URL is probably not set.")
+
+	fmt.Fprintf(w, `
+<html>
+<head>
+	<title>You logged out successfully</title>
+</head>
+<body>
+<h1>
+	You logged out successfully!
+</h1>
+<p>
+	You are seeing this default page because the administrator did not specify a redirect URL (environment variable <code>OAUTH2_LOGOUT_REDIRECT_URL</code> is not set). 
+	If you are an administrator, please read <a href="https://www.ory.sh/docs">the guide</a> to understand what you
+	need to do. If you are a user, please contact the administrator.
+</p>
+</body>
+</html>
+`)
 }

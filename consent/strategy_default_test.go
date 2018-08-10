@@ -109,11 +109,12 @@ func TestStrategy(t *testing.T) {
 	}).ToMapClaims(), jwt.NewHeaders())
 	require.NoError(t, err)
 
+	cs := sessions.NewCookieStore([]byte("dummy-secret-yay"))
 	writer := herodot.NewJSONWriter(nil)
 	manager := NewMemoryManager(nil)
-	handler := NewHandler(writer, manager)
+	handler := NewHandler(writer, manager, cs, "https://www.ory.sh")
 	router := httprouter.New()
-	handler.SetRoutes(router)
+	handler.SetRoutes(router, router)
 	api := httptest.NewServer(router)
 
 	strategy := NewStrategy(
@@ -122,7 +123,7 @@ func TestStrategy(t *testing.T) {
 		ap.URL,
 		"/oauth2/auth",
 		manager,
-		sessions.NewCookieStore([]byte("dummy-secret-yay")),
+		cs,
 		fosite.ExactScopeStrategy,
 		false,
 		time.Hour,

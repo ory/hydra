@@ -26,6 +26,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
 	"github.com/ory/go-convenience/urlx"
@@ -35,9 +36,11 @@ import (
 )
 
 type Handler struct {
-	H             herodot.Writer
-	M             Manager
-	RequestMaxAge time.Duration
+	H                 herodot.Writer
+	M                 Manager
+	LogoutRedirectURL string
+	RequestMaxAge     time.Duration
+	CookieStore       sessions.Store
 }
 
 const (
@@ -48,10 +51,14 @@ const (
 func NewHandler(
 	h herodot.Writer,
 	m Manager,
+	c sessions.Store,
+	u string,
 ) *Handler {
 	return &Handler{
-		H: h,
-		M: m,
+		H:                 h,
+		M:                 m,
+		LogoutRedirectURL: u,
+		CookieStore:       c,
 	}
 }
 
@@ -69,7 +76,7 @@ func (h *Handler) SetRoutes(frontend, backend *httprouter.Router) {
 	backend.DELETE("/oauth2/auth/sessions/consent/:user", h.DeleteUserConsentSession)
 	backend.DELETE("/oauth2/auth/sessions/consent/:user/:client", h.DeleteUserClientConsentSession)
 
-	frontend.GET("/oauth2/auth/logout", h.LogoutUser)
+	frontend.GET("/oauth2/auth/sessions/login/revoke", h.LogoutUser)
 }
 
 // swagger:route DELETE /oauth2/auth/sessions/consent/{user} oAuth2 revokeAllUserConsentSessions
@@ -573,22 +580,17 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 		RedirectTo: urlx.SetQuery(ru, url.Values{"consent_verifier": {request.Verifier}}).String(),
 	})
 }
-	})
-}
 
-// swagger:route DELETE /oauth2/auth/logout oAuth2 logoutUser
+// swagger:route GET /oauth2/auth/sessions/login/revoke oAuth2 revokeUserLoginCookie
 //
 // Logs user out by deleting the session cookie
 //
 // This endpoint deletes ths user's login session cookie and redirects the browser to the url
-// listed in `LOGOUT_REDIRECT_URL` environment variable.
-//
-//
-//     Consumes:
-//     - text/html
+// listed in `LOGOUT_REDIRECT_URL` environment variable. This endpoint does not work as an API but has to
+// be called from the user's browser.
 //
 //     Produces:
-//     - text/html
+//     - application/json
 //
 //     Schemes: http, https
 //
@@ -596,13 +598,19 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 //       302: emptyResponse
 //       404: genericError
 //       500: genericError
-
 func (h *Handler) LogoutUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	err := revokeAuthenticationSession(w, r)
+	sid, err := revokeAuthenticationCookie(w, r, h.CookieStore)
 	if err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}
 
-	http.Redirect(w, r, os.Getenv("LOGOUT_REDIRECT_URL"), 302)
+	if sid != "" {
+		if err := h.M.DeleteAuthenticationSession(sid); err != nil {
+			h.H.WriteError(w, r, err)
+			return
+		}
+	}
+
+	http.Redirect(w, r, h.LogoutRedirectURL, 302)
 }

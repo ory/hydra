@@ -21,6 +21,7 @@
 package server
 
 import (
+	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
@@ -33,14 +34,14 @@ func injectConsentManager(c *config.Config, cm client.Manager) {
 	ctx.ConsentManager = ctx.Connection.NewConsentManager(cm, ctx.FositeStore)
 }
 
-func newConsentHandler(c *config.Config, router *httprouter.Router) *consent.Handler {
+func newConsentHandler(c *config.Config, frontend, backend *httprouter.Router) *consent.Handler {
 	var ctx = c.Context()
 
 	w := herodot.NewJSONWriter(c.GetLogger())
 	w.ErrorEnhancer = writerErrorEnhancer
 
 	expectDependency(c.GetLogger(), ctx.ConsentManager)
-	h := consent.NewHandler(w, ctx.ConsentManager)
-	h.SetRoutes(router)
+	h := consent.NewHandler(w, ctx.ConsentManager, sessions.NewCookieStore(c.GetCookieSecret()), c.LogoutRedirectURL)
+	h.SetRoutes(frontend, backend)
 	return h
 }

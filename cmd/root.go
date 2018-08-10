@@ -122,6 +122,9 @@ func initConfig() {
 	viper.BindEnv("OAUTH2_LOGIN_URL")
 	viper.SetDefault("OAUTH2_LOGIN_URL", oauth2.DefaultConsentPath)
 
+	viper.BindEnv("OAUTH2_LOGOUT_REDIRECT_URL")
+	viper.SetDefault("OAUTH2_LOGOUT_REDIRECT_URL", oauth2.DefaultLogoutPath)
+
 	viper.BindEnv("OAUTH2_ERROR_URL")
 	viper.SetDefault("OAUTH2_ERROR_URL", oauth2.DefaultErrorPath)
 

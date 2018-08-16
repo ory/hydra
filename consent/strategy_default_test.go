@@ -23,12 +23,14 @@ package consent
 import (
 	"crypto/rand"
 	"crypto/rsa"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
 	"time"
 
@@ -540,17 +542,19 @@ func TestStrategy(t *testing.T) {
 					require.EqualValues(t, http.StatusOK, res.StatusCode)
 					assert.False(t, rr.Skip)
 
-					v, res, err := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{
-						GrantScope:  []string{"scope-a"},
-						Remember:    true,
-						RememberFor: 0,
-						Session: swagger.ConsentRequestSession{
-							AccessToken: map[string]interface{}{"foo": "bar"},
-							IdToken:     map[string]interface{}{"bar": "baz"},
-						},
-					})
+					body := `{"grant_scope": ["scope-a"], "remember": true}`
 					require.NoError(t, err)
-					require.EqualValues(t, http.StatusOK, res.StatusCode)
+					req, err := http.NewRequest("PUT", api.URL+"/oauth2/auth/requests/consent/"+r.URL.Query().Get("consent_challenge")+"/accept", strings.NewReader(body))
+					req.Header.Add("Content-Type", "application/json")
+					require.NoError(t, err)
+
+					hres, err := http.DefaultClient.Do(req)
+					require.NoError(t, err)
+					defer hres.Body.Close()
+
+					var v swagger.CompletedRequest
+					require.NoError(t, json.NewDecoder(hres.Body).Decode(&v))
+					require.EqualValues(t, http.StatusOK, hres.StatusCode)
 					require.NotEmpty(t, v.RedirectTo)
 					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
 				}
@@ -563,10 +567,7 @@ func TestStrategy(t *testing.T) {
 				GrantedScope:   []string{"scope-a"},
 				Remember:       true,
 				RememberFor:    0,
-				Session: &ConsentRequestSessionData{
-					AccessToken: map[string]interface{}{"foo": "bar"},
-					IDToken:     map[string]interface{}{"bar": "baz"},
-				},
+				Session:        newConsentRequestSessionData(),
 			},
 		},
 		{
@@ -940,10 +941,7 @@ func TestStrategy(t *testing.T) {
 				GrantedScope: []string{"scope-a"},
 				Remember:     false,
 				RememberFor:  0,
-				Session: &ConsentRequestSessionData{
-					AccessToken: map[string]interface{}{"foo": "bar"},
-					IDToken:     map[string]interface{}{"bar": "baz"},
-				},
+				Session:      newConsentRequestSessionData(),
 			},
 		}, // these tests depend on one another
 		{
@@ -980,10 +978,7 @@ func TestStrategy(t *testing.T) {
 				GrantedScope: []string{"scope-a"},
 				Remember:     false,
 				RememberFor:  0,
-				Session: &ConsentRequestSessionData{
-					AccessToken: map[string]interface{}{"foo": "bar"},
-					IDToken:     map[string]interface{}{"bar": "baz"},
-				},
+				Session:      newConsentRequestSessionData(),
 			},
 		},
 		{
@@ -1017,10 +1012,7 @@ func TestStrategy(t *testing.T) {
 				GrantedScope: []string{"scope-a"},
 				Remember:     false,
 				RememberFor:  0,
-				Session: &ConsentRequestSessionData{
-					AccessToken: map[string]interface{}{"foo": "bar"},
-					IDToken:     map[string]interface{}{"bar": "baz"},
-				},
+				Session:      newConsentRequestSessionData(),
 			},
 		}, // these tests depend on one another
 		{
@@ -1055,10 +1047,7 @@ func TestStrategy(t *testing.T) {
 				GrantedScope: []string{"scope-a"},
 				Remember:     false,
 				RememberFor:  0,
-				Session: &ConsentRequestSessionData{
-					AccessToken: map[string]interface{}{"foo": "bar"},
-					IDToken:     map[string]interface{}{"bar": "baz"},
-				},
+				Session:      newConsentRequestSessionData(),
 			},
 		},
 
@@ -1239,6 +1228,7 @@ func TestStrategy(t *testing.T) {
 						require.NotNil(t, c)
 						assert.EqualValues(t, tc.expectSession.GrantedScope, c.GrantedScope)
 						assert.EqualValues(t, tc.expectSession.Remember, c.Remember)
+						assert.EqualValues(t, tc.expectSession.Session, c.Session)
 						assert.EqualValues(t, tc.expectSession.RememberFor, c.RememberFor)
 						assert.EqualValues(t, tc.expectSession.ConsentRequest.Subject, c.ConsentRequest.Subject)
 						assert.EqualValues(t, tc.expectSession.ConsentRequest.SubjectIdentifier, c.ConsentRequest.SubjectIdentifier)

@@ -558,6 +558,18 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 		return nil, err
 	}
 
+	if session.Session == nil {
+		session.Session = newConsentRequestSessionData()
+	}
+
+	if session.Session.AccessToken == nil {
+		session.Session.AccessToken = map[string]interface{}{}
+	}
+
+	if session.Session.IDToken == nil {
+		session.Session.IDToken = map[string]interface{}{}
+	}
+
 	session.ConsentRequest.SubjectIdentifier = pw
 	session.AuthenticatedAt = session.ConsentRequest.AuthenticatedAt
 	return session, nil

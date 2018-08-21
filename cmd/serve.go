@@ -182,6 +182,9 @@ HTTPS CONTROLS
 
 CORS CONTROLS
 ==============
+- CORS_ENABLED: Switch CORS support on (true) or off (false). Default is off (false).
+	Example: CORS_ENABLED=true
+
 - CORS_ALLOWED_ORIGINS: A list of origins (comma separated values) a cross-domain request can be executed from.
 	If the special * value is present in the list, all origins will be allowed. An origin may contain a wildcard (*)
 	to replace 0 or more characters (i.e.: http://*.domain.com). Usage of wildcards implies a small performance penality.

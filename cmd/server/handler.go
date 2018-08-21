@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"sync"
 
@@ -57,7 +58,12 @@ func enhanceRouter(c *config.Config, cmd *cobra.Command, serverHandler *Handler,
 	}
 	n.UseFunc(serverHandler.rejectInsecureRequests)
 	n.UseHandler(router)
-	return context.ClearHandler(cors.New(corsx.ParseOptions()).Handler(n))
+	if os.Getenv("CORS_ENABLED") == "true" {
+		c.GetLogger().Info("Enabled CORS")
+		return context.ClearHandler(cors.New(corsx.ParseOptions()).Handler(n))
+	} else {
+		return context.ClearHandler(n)
+	}
 }
 
 func RunServeAdmin(c *config.Config) func(cmd *cobra.Command, args []string) {

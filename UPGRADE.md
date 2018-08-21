@@ -99,6 +99,13 @@ before finalizing the upgrade process.
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+## 1.0.0-rc.1
+
+### CORS is disabled by default
+
+A new environment variable `CORS_ENABLED` was introduced. It sets whether CORS is enabled ("true") or not ("false")".
+Default is disabled.
+
 ## 1.0.0-beta.8
 
 ### Schema Changes

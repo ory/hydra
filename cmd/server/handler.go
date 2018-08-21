@@ -111,7 +111,7 @@ func RunServeAll(c *config.Config) func(cmd *cobra.Command, args []string) {
 }
 
 func setup(c *config.Config, cmd *cobra.Command, args []string, name string) (handler *Handler, frontend, backend *httprouter.Router, middlewares []negroni.Handler) {
-	fmt.Println(banner)
+	fmt.Println(banner(c.BuildVersion))
 
 	frontend = httprouter.New()
 	backend = httprouter.New()

@@ -175,7 +175,7 @@ func newOAuth2Handler(c *config.Config, frontend, backend *httprouter.Router, cm
 	if stringslice.Has(c.GetSubjectTypesSupported(), "pairwise") {
 		sias["pairwise"] = consent.NewSubjectIdentifierAlgorithmPairwise([]byte(c.SubjectIdentifierAlgorithmSalt))
 	}
-	if stringslice.Has(c.GetSubjectTypesSupported(), "pairwise") {
+	if stringslice.Has(c.GetSubjectTypesSupported(), "public") {
 		sias["public"] = consent.NewSubjectIdentifierAlgorithmPublic()
 	}
 

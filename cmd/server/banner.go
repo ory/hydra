@@ -20,8 +20,10 @@
 
 package server
 
-var banner = `Thank you for using ORY Hydra!
+func banner(version string) string {
+	return `Thank you for using ORY Hydra ` + version + `!
 
-Take security seriously and subscribe to the ORY newsletter. Stay on top of new patches and security insights.                                                                                                
+Take security seriously and subscribe to the ORY Security Newsletter. Stay on top of new patches and security insights.                                                                                                
 
->> Subscribe now: http://eepurl.com/di390P <<    `
+>> Subscribe now: http://eepurl.com/di390P <<`
+}

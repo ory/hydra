@@ -55,7 +55,10 @@ type OAuth2API interface {
 	IntrospectOAuth2Token(token string, scope string) (*swagger.OAuth2TokenIntrospection, *swagger.APIResponse, error)
 	ListOAuth2Clients(limit int64, offset int64) ([]swagger.OAuth2Client, *swagger.APIResponse, error)
 	RevokeOAuth2Token(token string) (*swagger.APIResponse, error)
+	RevokeAllUserConsentSessions(user string) (*swagger.APIResponse, error)
 	UpdateOAuth2Client(id string, body swagger.OAuth2Client) (*swagger.OAuth2Client, *swagger.APIResponse, error)
+	RevokeAuthenticationSession(user string) (*swagger.APIResponse, error)
+	RevokeUserClientConsentSessions(user string, client string) (*swagger.APIResponse, error)
 
 	ListUserConsentSessions(user string) ([]swagger.PreviousConsentSession, *swagger.APIResponse, error)
 	FlushInactiveOAuth2Tokens(body swagger.FlushInactiveOAuth2TokensRequest) (*swagger.APIResponse, error)

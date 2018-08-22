@@ -66,6 +66,7 @@ func newOAuth2Provider(c *config.Config) fosite.OAuth2Provider {
 		AccessTokenLifespan:            c.GetAccessTokenLifespan(),
 		AuthorizeCodeLifespan:          c.GetAuthCodeLifespan(),
 		IDTokenLifespan:                c.GetIDTokenLifespan(),
+		IDTokenIssuer:                  c.Issuer,
 		HashCost:                       c.BCryptWorkFactor,
 		ScopeStrategy:                  c.GetScopeStrategy(),
 		SendDebugMessagesToClients:     c.SendOAuth2DebugMessagesToClients,
@@ -78,7 +79,11 @@ func newOAuth2Provider(c *config.Config) fosite.OAuth2Provider {
 	if err != nil {
 		c.GetLogger().WithError(err).Fatalf("Unable to refresh OpenID Connect signing keys.")
 	}
-	oidcStrategy := &openid.DefaultStrategy{JWTStrategy: jwtStrategy}
+	oidcStrategy := &openid.DefaultStrategy{
+		JWTStrategy: jwtStrategy,
+		Expiry:      c.GetIDTokenLifespan(),
+		Issuer:      c.Issuer,
+	}
 
 	var coreStrategy foauth2.CoreStrategy
 	hmacStrategy := compose.NewOAuth2HMACStrategy(fc, c.GetSystemSecret())
@@ -205,8 +210,8 @@ func newOAuth2Handler(c *config.Config, frontend, backend *httprouter.Router, cm
 		OpenIDJWTStrategy:      openIDJWTStrategy,
 		AccessTokenJWTStrategy: accessTokenJWTStrategy,
 		AccessTokenStrategy:    c.OAuth2AccessTokenStrategy,
-		IDTokenLifespan:        c.GetIDTokenLifespan(),
-		ShareOAuth2Debug:       c.SendOAuth2DebugMessagesToClients,
+		//IDTokenLifespan:        c.GetIDTokenLifespan(),
+		ShareOAuth2Debug: c.SendOAuth2DebugMessagesToClients,
 	}
 
 	handler.SetRoutes(frontend, backend)

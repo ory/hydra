@@ -44,8 +44,8 @@ type Handler struct {
 	ErrorURL   url.URL
 
 	AccessTokenLifespan time.Duration
-	IDTokenLifespan     time.Duration
-	CookieStore         sessions.Store
+	//IDTokenLifespan     time.Duration
+	CookieStore sessions.Store
 
 	OpenIDJWTStrategy      jwk.JWTStrategy
 	AccessTokenJWTStrategy jwk.JWTStrategy

@@ -46,6 +46,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/cors"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/urfave/negroni"
 )
 
@@ -58,7 +59,7 @@ func enhanceRouter(c *config.Config, cmd *cobra.Command, serverHandler *Handler,
 	}
 	n.UseFunc(serverHandler.rejectInsecureRequests)
 	n.UseHandler(router)
-	if os.Getenv("CORS_ENABLED") == "true" {
+	if viper.GetString("CORS_ENABLED") == "true" {
 		c.GetLogger().Info("Enabled CORS")
 		return context.ClearHandler(cors.New(corsx.ParseOptions()).Handler(n))
 	} else {

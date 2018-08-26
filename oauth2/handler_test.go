@@ -96,7 +96,9 @@ func TestHandlerFlushHandler(t *testing.T) {
 	}
 
 	r := httprouter.New()
-	h.SetRoutes(r, r)
+	h.SetRoutes(r, r, func(h http.Handler) http.Handler {
+		return h
+	})
 	ts := httptest.NewServer(r)
 	c := hydra.NewOAuth2ApiWithBasePath(ts.URL)
 
@@ -154,7 +156,9 @@ func TestUserinfo(t *testing.T) {
 		OpenIDJWTStrategy: jwtStrategy,
 	}
 	router := httprouter.New()
-	h.SetRoutes(router, router)
+	h.SetRoutes(router, router, func(h http.Handler) http.Handler {
+		return h
+	})
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 
@@ -368,7 +372,9 @@ func TestHandlerWellKnown(t *testing.T) {
 	JWKPathT := "/.well-known/jwks.json"
 
 	r := httprouter.New()
-	h.SetRoutes(r, r)
+	h.SetRoutes(r, r, func(h http.Handler) http.Handler {
+		return h
+	})
 	ts := httptest.NewServer(r)
 
 	res, err := http.Get(ts.URL + "/.well-known/openid-configuration")

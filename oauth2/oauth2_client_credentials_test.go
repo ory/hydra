@@ -23,6 +23,7 @@ package oauth2_test
 import (
 	"context"
 	"encoding/json"
+	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -110,7 +111,9 @@ func TestClientCredentials(t *testing.T) {
 				OpenIDJWTStrategy: jwtStrategy,
 			}
 
-			handler.SetRoutes(router, router)
+			handler.SetRoutes(router, router, func(h http.Handler) http.Handler {
+				return h
+			})
 
 			require.NoError(t, store.CreateClient(&hc.Client{
 				ClientID:      "app-client",

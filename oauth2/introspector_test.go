@@ -75,7 +75,9 @@ func TestIntrospectorSDK(t *testing.T) {
 		IssuerURL:         "foobariss",
 		OpenIDJWTStrategy: jwtStrategy,
 	}
-	handler.SetRoutes(router, router)
+	handler.SetRoutes(router, router, func(h http.Handler) http.Handler {
+		return h
+	})
 	server := httptest.NewServer(router)
 
 	now := time.Now().UTC().Round(time.Minute)

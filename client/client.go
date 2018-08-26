@@ -74,6 +74,12 @@ type Client struct {
 	// retains, and discloses personal data.
 	PolicyURI string `json:"policy_uri"`
 
+	// AllowedCORSOrigins are one or more URLs (scheme://host[:port]) which are allowed to make CORS requests
+	// to the /oauth/token endpoint. If this array is empty, the sever's CORS origin configuration (`CORS_ALLOWED_ORIGINS`)
+	// will be used instead. If this array is set, the allowed origins are appended to the server's CORS origin configuration.
+	// Be aware that environment variable `CORS_ENABLED` MUST be set to `true` for this to work.
+	AllowedCORSOrigins []string `json:"allowed_cors_origins"`
+
 	// TermsOfServiceURI is a URL string that points to a human-readable terms of service
 	// document for the client that describes a contractual relationship
 	// between the end-user and the client that the end-user accepts when

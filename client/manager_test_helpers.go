@@ -89,6 +89,7 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 			JSONWebKeysURI:                "https://...",
 			TokenEndpointAuthMethod:       "none",
 			RequestURIs:                   []string{"foo", "bar"},
+			AllowedCORSOrigins:            []string{"foo", "bar"},
 			RequestObjectSigningAlgorithm: "rs256",
 			UserinfoSignedResponseAlg:     "RS256",
 		}

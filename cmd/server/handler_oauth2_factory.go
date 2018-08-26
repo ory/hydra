@@ -41,6 +41,7 @@ import (
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	"github.com/pborman/uuid"
+	"github.com/spf13/viper"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {
@@ -151,8 +152,8 @@ func setDefaultConsentURL(s string, c *config.Config, path string) string {
 }
 
 //func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm oauth2.ConsentRequestManager, o fosite.OAuth2Provider, idTokenKeyID string) *oauth2.Handler {
-func newOAuth2Handler(c *config.Config, frontend, backend *httprouter.Router, cm consent.Manager, o fosite.OAuth2Provider) *oauth2.Handler {
-	expectDependency(c.GetLogger(), c.Context().FositeStore)
+func newOAuth2Handler(c *config.Config, frontend, backend *httprouter.Router, cm consent.Manager, o fosite.OAuth2Provider, clm client.Manager) *oauth2.Handler {
+	expectDependency(c.GetLogger(), c.Context().FositeStore, clm)
 
 	c.ConsentURL = setDefaultConsentURL(c.ConsentURL, c, "oauth2/fallbacks/consent")
 	c.LoginURL = setDefaultConsentURL(c.LoginURL, c, "oauth2/fallbacks/consent")
@@ -214,6 +215,7 @@ func newOAuth2Handler(c *config.Config, frontend, backend *httprouter.Router, cm
 		ShareOAuth2Debug: c.SendOAuth2DebugMessagesToClients,
 	}
 
-	handler.SetRoutes(frontend, backend)
+	corsMiddleware := newCORSMiddleware(viper.GetString("CORS_ENABLED") == "true", c, o.IntrospectToken, clm.GetConcreteClient)
+	handler.SetRoutes(frontend, backend, corsMiddleware)
 	return handler
 }

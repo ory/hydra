@@ -38,7 +38,9 @@ func TestHandlerConsent(t *testing.T) {
 		ScopeStrategy: fosite.HierarchicScopeStrategy,
 	}
 	r := httprouter.New()
-	h.SetRoutes(r, r)
+	h.SetRoutes(r, r, func(h http.Handler) http.Handler {
+		return h
+	})
 	ts := httptest.NewServer(r)
 
 	res, err := http.Get(ts.URL + DefaultConsentPath)

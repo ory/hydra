@@ -83,6 +83,28 @@ func (v *Validator) Validate(c *Client) error {
 		c.Scope = strings.Join(v.DefaultClientScopes, " ")
 	}
 
+	for k, origin := range c.AllowedCORSOrigins {
+		u, err := url.Parse(origin)
+		if err != nil {
+			return errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf("Origin URL %s from allowed_cors_origins could not be parsed: %s", origin, err)))
+		}
+
+		if u.Scheme != "https" && u.Scheme != "http" {
+			return errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf("Origin URL %s must use https:// or http:// as HTTP scheme.", origin)))
+		}
+
+		if u.User != nil && len(u.User.String()) > 0 {
+			return errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf("Origin URL %s has HTTP user and/or password set which is not allowed.", origin)))
+		}
+
+		u.Path = strings.TrimRight(u.Path, "/")
+		if len(u.Path)+len(u.RawQuery)+len(u.Fragment) > 0 {
+			return errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf("Origin URL %s must have an empty path, query, and fragment but one of the parts is not empty.", origin)))
+		}
+
+		c.AllowedCORSOrigins[k] = u.String()
+	}
+
 	// has to be 0 because it is not supposed to be set
 	c.SecretExpiresAt = 0
 

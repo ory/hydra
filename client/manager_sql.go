@@ -108,6 +108,15 @@ var sharedMigrations = []*migrate.Migration{
 			`ALTER TABLE hydra_client DROP COLUMN subject_type`,
 		},
 	},
+	{
+		Id: "7",
+		Up: []string{
+			`ALTER TABLE hydra_client ADD allowed_cors_origins TEXT`,
+		},
+		Down: []string{
+			`ALTER TABLE hydra_client DROP COLUMN allowed_cors_origins`,
+		},
+	},
 }
 
 var Migrations = map[string]*migrate.MemoryMigrationSource{
@@ -133,6 +142,17 @@ var Migrations = map[string]*migrate.MemoryMigrationSource{
 		},
 		sharedMigrations[3],
 		sharedMigrations[4],
+		sharedMigrations[5],
+		{
+			Id: "8",
+			Up: []string{
+				`UPDATE hydra_client SET allowed_cors_origins=''`,
+				`ALTER TABLE hydra_client MODIFY allowed_cors_origins TEXT NOT NULL`,
+			},
+			Down: []string{
+				`ALTER TABLE hydra_client MODIFY allowed_cors_origins TEXT`,
+			},
+		},
 	}},
 	"postgres": {Migrations: []*migrate.Migration{
 		sharedMigrations[0],
@@ -156,6 +176,17 @@ var Migrations = map[string]*migrate.MemoryMigrationSource{
 		},
 		sharedMigrations[3],
 		sharedMigrations[4],
+		sharedMigrations[5],
+		{
+			Id: "8",
+			Up: []string{
+				`UPDATE hydra_client SET allowed_cors_origins=''`,
+				`ALTER TABLE hydra_client ALTER COLUMN allowed_cors_origins SET NOT NULL`,
+			},
+			Down: []string{
+				`ALTER TABLE hydra_client ALTER COLUMN allowed_cors_origins DROP NOT NULL`,
+			},
+		},
 	}},
 }
 
@@ -187,6 +218,7 @@ type sqlData struct {
 	SubjectType                   string `db:"subject_type"`
 	RequestObjectSigningAlgorithm string `db:"request_object_signing_alg"`
 	UserinfoSignedResponseAlg     string `db:"userinfo_signed_response_alg"`
+	AllowedCORSOrigins            string `db:"allowed_cors_origins"`
 }
 
 var sqlParams = []string{
@@ -212,6 +244,7 @@ var sqlParams = []string{
 	"request_uris",
 	"request_object_signing_alg",
 	"userinfo_signed_response_alg",
+	"allowed_cors_origins",
 }
 
 func sqlDataFromClient(d *Client) (*sqlData, error) {
@@ -248,6 +281,7 @@ func sqlDataFromClient(d *Client) (*sqlData, error) {
 		RequestURIs:                   strings.Join(d.RequestURIs, "|"),
 		UserinfoSignedResponseAlg:     d.UserinfoSignedResponseAlg,
 		SubjectType:                   d.SubjectType,
+		AllowedCORSOrigins:            strings.Join(d.AllowedCORSOrigins, "|"),
 	}, nil
 }
 
@@ -274,6 +308,7 @@ func (d *sqlData) ToClient() (*Client, error) {
 		RequestURIs:                   stringsx.Splitx(d.RequestURIs, "|"),
 		UserinfoSignedResponseAlg:     d.UserinfoSignedResponseAlg,
 		SubjectType:                   d.SubjectType,
+		AllowedCORSOrigins:            stringsx.Splitx(d.AllowedCORSOrigins, "|"),
 	}
 
 	if d.JSONWebKeys != "" {

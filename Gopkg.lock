@@ -25,7 +25,7 @@
 [[projects]]
   name = "github.com/aeneasr/cors"
   packages = ["."]
-  revision = "3fb1b69b103a84de38a19c3c6ec073dd6caa4d3f"
+  revision = "1bbd41dfc0e2d813965f77b0a8600571b3dc4f72"
   version = "v1.5.0"
 
 [[projects]]

@@ -22,7 +22,6 @@ package server
 
 import (
 	"fmt"
-	"net/http"
 	"net/url"
 	"strings"
 	"time"
@@ -33,7 +32,6 @@ import (
 	"github.com/ory/fosite/compose"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/handler/openid"
-	"github.com/ory/go-convenience/corsx"
 	"github.com/ory/go-convenience/stringslice"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
@@ -43,7 +41,6 @@ import (
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	"github.com/pborman/uuid"
-	"github.com/rs/cors"
 	"github.com/spf13/viper"
 )
 
@@ -155,8 +152,8 @@ func setDefaultConsentURL(s string, c *config.Config, path string) string {
 }
 
 //func newOAuth2Handler(c *config.Config, router *httprouter.Router, cm oauth2.ConsentRequestManager, o fosite.OAuth2Provider, idTokenKeyID string) *oauth2.Handler {
-func newOAuth2Handler(c *config.Config, frontend, backend *httprouter.Router, cm consent.Manager, o fosite.OAuth2Provider) *oauth2.Handler {
-	expectDependency(c.GetLogger(), c.Context().FositeStore)
+func newOAuth2Handler(c *config.Config, frontend, backend *httprouter.Router, cm consent.Manager, o fosite.OAuth2Provider, clm client.Manager) *oauth2.Handler {
+	expectDependency(c.GetLogger(), c.Context().FositeStore, clm)
 
 	c.ConsentURL = setDefaultConsentURL(c.ConsentURL, c, "oauth2/fallbacks/consent")
 	c.LoginURL = setDefaultConsentURL(c.LoginURL, c, "oauth2/fallbacks/consent")
@@ -218,23 +215,7 @@ func newOAuth2Handler(c *config.Config, frontend, backend *httprouter.Router, cm
 		ShareOAuth2Debug: c.SendOAuth2DebugMessagesToClients,
 	}
 
-	corsMiddleware := func(h http.Handler) http.Handler {
-		return h
-	}
-
-	if viper.GetString("CORS_ENABLED") == "true" {
-		c.GetLogger().Info("Enabled CORS")
-		options := corsx.ParseOptions()
-		options.AllowOriginFunc = func(origin string) bool {
-			if stringslice.Has(options.AllowedOrigins, origin) {
-				return true
-			}
-
-			return false
-		}
-		corsMiddleware = cors.New(options).Handler
-	}
-
+	corsMiddleware := newCORSMiddleware(viper.GetString("CORS_ENABLED") == "true", c, o.IntrospectToken, clm.GetConcreteClient)
 	handler.SetRoutes(frontend, backend, corsMiddleware)
 	return handler
 }

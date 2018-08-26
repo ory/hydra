@@ -215,6 +215,7 @@ type sqlData struct {
 	SubjectType                   string `db:"subject_type"`
 	RequestObjectSigningAlgorithm string `db:"request_object_signing_alg"`
 	UserinfoSignedResponseAlg     string `db:"userinfo_signed_response_alg"`
+	AllowedCORSOrigins            string `db:"allowed_cors_origins "`
 }
 
 var sqlParams = []string{
@@ -240,6 +241,7 @@ var sqlParams = []string{
 	"request_uris",
 	"request_object_signing_alg",
 	"userinfo_signed_response_alg",
+	"allowed_cors_origins",
 }
 
 func sqlDataFromClient(d *Client) (*sqlData, error) {
@@ -276,6 +278,7 @@ func sqlDataFromClient(d *Client) (*sqlData, error) {
 		RequestURIs:                   strings.Join(d.RequestURIs, "|"),
 		UserinfoSignedResponseAlg:     d.UserinfoSignedResponseAlg,
 		SubjectType:                   d.SubjectType,
+		AllowedCORSOrigins:            strings.Join(d.AllowedCORSOrigins, "|"),
 	}, nil
 }
 
@@ -302,6 +305,7 @@ func (d *sqlData) ToClient() (*Client, error) {
 		RequestURIs:                   stringsx.Splitx(d.RequestURIs, "|"),
 		UserinfoSignedResponseAlg:     d.UserinfoSignedResponseAlg,
 		SubjectType:                   d.SubjectType,
+		AllowedCORSOrigins:            stringsx.Splitx(d.AllowedCORSOrigins, "|"),
 	}
 
 	if d.JSONWebKeys != "" {

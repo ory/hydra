@@ -144,7 +144,7 @@ var Migrations = map[string]*migrate.MemoryMigrationSource{
 		sharedMigrations[4],
 		sharedMigrations[5],
 		{
-			Id: "7",
+			Id: "8",
 			Up: []string{
 				`UPDATE hydra_client SET allowed_cors_origins=''`,
 				`ALTER TABLE hydra_client MODIFY allowed_cors_origins TEXT NOT NULL`,
@@ -175,7 +175,7 @@ var Migrations = map[string]*migrate.MemoryMigrationSource{
 		sharedMigrations[4],
 		sharedMigrations[5],
 		{
-			Id: "7",
+			Id: "8",
 			Up: []string{
 				`UPDATE hydra_client SET allowed_cors_origins=''`,
 				`ALTER TABLE hydra_client ALTER COLUMN allowed_cors_origins SET NOT NULL`,

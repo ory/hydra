@@ -23,6 +23,12 @@
   revision = "cd527374f1e5bff4938207604a14f2e38a9cf512"
 
 [[projects]]
+  name = "github.com/aeneasr/cors"
+  packages = ["."]
+  revision = "3fb1b69b103a84de38a19c3c6ec073dd6caa4d3f"
+  version = "v1.5.0"
+
+[[projects]]
   name = "github.com/asaskevich/govalidator"
   packages = ["."]
   revision = "73945b6115bfbbcc57d89b7316e28109364124e1"
@@ -637,6 +643,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c4398344f70a0ba6d5db1b004bc09a354eef45f3c6fdf63227feb78b74fef415"
+  inputs-digest = "c16af2ef7a4de1a072384d6ddd8ca446693376c776ee866f7139027476b30084"
   solver-name = "gps-cdcl"
   solver-version = 1

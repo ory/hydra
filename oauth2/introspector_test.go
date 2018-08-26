@@ -64,7 +64,7 @@ func TestIntrospectorSDK(t *testing.T) {
 			fc,
 			memoryStore,
 			&compose.CommonStrategy{
-				CoreStrategy:               compose.NewOAuth2HMACStrategy(fc, []byte("1234567890123456789012345678901234567890")),
+				CoreStrategy:               compose.NewOAuth2HMACStrategy(fc, []byte("1234567890123456789012345678901234567890"), nil),
 				OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(fc, pkg.MustINSECURELOWENTROPYRSAKEYFORTEST()),
 			},
 			nil,

@@ -218,7 +218,7 @@ type sqlData struct {
 	SubjectType                   string `db:"subject_type"`
 	RequestObjectSigningAlgorithm string `db:"request_object_signing_alg"`
 	UserinfoSignedResponseAlg     string `db:"userinfo_signed_response_alg"`
-	AllowedCORSOrigins            string `db:"allowed_cors_origins "`
+	AllowedCORSOrigins            string `db:"allowed_cors_origins"`
 }
 
 var sqlParams = []string{

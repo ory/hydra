@@ -23,12 +23,6 @@
   revision = "cd527374f1e5bff4938207604a14f2e38a9cf512"
 
 [[projects]]
-  name = "github.com/aeneasr/cors"
-  packages = ["."]
-  revision = "1bbd41dfc0e2d813965f77b0a8600571b3dc4f72"
-  version = "v1.5.0"
-
-[[projects]]
   name = "github.com/asaskevich/govalidator"
   packages = ["."]
   revision = "73945b6115bfbbcc57d89b7316e28109364124e1"
@@ -310,8 +304,8 @@
     "token/hmac",
     "token/jwt"
   ]
-  revision = "a07ce27c814538c7d0e6228ae814482be2e96e7e"
-  version = "v0.21.3"
+  revision = "213465099b72b6e5afd0e69a7916a95f65e17481"
+  version = "v0.21.4"
 
 [[projects]]
   name = "github.com/ory/go-convenience"
@@ -444,8 +438,7 @@
 [[projects]]
   name = "github.com/rs/cors"
   packages = ["."]
-  revision = "7af7a1e09ba336d2ea14b1ce73bf693c6837dbf6"
-  version = "v1.2"
+  revision = "dc7332ab32be5dfec05dae2a6ab79cbfa53b6407"
 
 [[projects]]
   branch = "master"
@@ -643,6 +636,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c16af2ef7a4de1a072384d6ddd8ca446693376c776ee866f7139027476b30084"
+  inputs-digest = "1dcd543feddfcbd10a7ead32c57897afebf4db0433dcee3198515514b42d3a53"
   solver-name = "gps-cdcl"
   solver-version = 1

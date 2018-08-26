@@ -22,6 +22,7 @@ package server
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
 	"strings"
 	"time"
@@ -32,6 +33,7 @@ import (
 	"github.com/ory/fosite/compose"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/handler/openid"
+	"github.com/ory/go-convenience/corsx"
 	"github.com/ory/go-convenience/stringslice"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
@@ -41,6 +43,8 @@ import (
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	"github.com/pborman/uuid"
+	"github.com/rs/cors"
+	"github.com/spf13/viper"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {
@@ -214,6 +218,23 @@ func newOAuth2Handler(c *config.Config, frontend, backend *httprouter.Router, cm
 		ShareOAuth2Debug: c.SendOAuth2DebugMessagesToClients,
 	}
 
-	handler.SetRoutes(frontend, backend)
+	corsMiddleware := func(h http.Handler) http.Handler {
+		return h
+	}
+
+	if viper.GetString("CORS_ENABLED") == "true" {
+		c.GetLogger().Info("Enabled CORS")
+		options := corsx.ParseOptions()
+		options.AllowOriginFunc = func(origin string) bool {
+			if stringslice.Has(options.AllowedOrigins, origin) {
+				return true
+			}
+
+			return false
+		}
+		corsMiddleware = cors.New(options).Handler
+	}
+
+	handler.SetRoutes(frontend, backend, corsMiddleware)
 	return handler
 }

@@ -156,17 +156,17 @@ type FlushInactiveOAuth2TokensRequest struct {
 	NotAfter time.Time `json:"notAfter"`
 }
 
-func (h *Handler) SetRoutes(frontend, backend *httprouter.Router) {
-	frontend.POST(TokenPath, h.TokenHandler)
+func (h *Handler) SetRoutes(frontend, backend *httprouter.Router, corsMiddleware func(http.Handler) http.Handler) {
+	frontend.Handler("POST", TokenPath, corsMiddleware(http.HandlerFunc(h.TokenHandler)))
 	frontend.GET(AuthPath, h.AuthHandler)
 	frontend.POST(AuthPath, h.AuthHandler)
 	frontend.GET(DefaultConsentPath, h.DefaultConsentHandler)
 	frontend.GET(DefaultErrorPath, h.DefaultErrorHandler)
 	frontend.GET(DefaultLogoutPath, h.DefaultLogoutHandler)
-	frontend.POST(RevocationPath, h.RevocationHandler)
+	frontend.Handler("POST", RevocationPath, corsMiddleware(http.HandlerFunc(h.RevocationHandler)))
 	frontend.GET(WellKnownPath, h.WellKnownHandler)
-	frontend.GET(UserinfoPath, h.UserinfoHandler)
-	frontend.POST(UserinfoPath, h.UserinfoHandler)
+	frontend.Handler("GET", UserinfoPath, corsMiddleware(http.HandlerFunc(h.UserinfoHandler)))
+	frontend.Handler("POST", UserinfoPath, corsMiddleware(http.HandlerFunc(h.UserinfoHandler)))
 
 	backend.POST(IntrospectPath, h.IntrospectHandler)
 	backend.POST(FlushPath, h.FlushHandler)
@@ -251,7 +251,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ htt
 //       200: userinfoResponse
 //       401: genericError
 //       500: genericError
-func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 	session := NewSession("")
 	tokenType, ar, err := h.OAuth2.IntrospectToken(r.Context(), fosite.AccessTokenFromRequest(r), fosite.AccessToken, session)
 	if err != nil {
@@ -341,7 +341,7 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request, _ http
 //       200: emptyResponse
 //       401: genericError
 //       500: genericError
-func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request) {
 	var ctx = fosite.NewContext()
 
 	err := h.OAuth2.NewRevocationRequest(ctx, r)
@@ -513,7 +513,7 @@ func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, _ httprou
 //       200: oauthTokenResponse
 //       401: genericError
 //       500: genericError
-func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	var session = NewSession("")
 	var ctx = fosite.NewContext()
 

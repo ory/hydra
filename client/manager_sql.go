@@ -108,6 +108,15 @@ var sharedMigrations = []*migrate.Migration{
 			`ALTER TABLE hydra_client DROP COLUMN subject_type`,
 		},
 	},
+	{
+		Id: "7",
+		Up: []string{
+			`ALTER TABLE hydra_client ADD allowed_cors_origins TEXT`,
+		},
+		Down: []string{
+			`ALTER TABLE hydra_client DROP COLUMN allowed_cors_origins`,
+		},
+	},
 }
 
 var Migrations = map[string]*migrate.MemoryMigrationSource{
@@ -133,6 +142,17 @@ var Migrations = map[string]*migrate.MemoryMigrationSource{
 		},
 		sharedMigrations[3],
 		sharedMigrations[4],
+		sharedMigrations[5],
+		{
+			Id: "7",
+			Up: []string{
+				`UPDATE hydra_client SET allowed_cors_origins=''`,
+				`ALTER TABLE hydra_client MODIFY allowed_cors_origins TEXT NOT NULL`,
+			},
+			Down: []string{
+				`ALTER TABLE hydra_client MODIFY allowed_cors_origins TEXT`,
+			},
+		},
 	}},
 	"postgres": {Migrations: []*migrate.Migration{
 		sharedMigrations[0],
@@ -148,14 +168,22 @@ var Migrations = map[string]*migrate.MemoryMigrationSource{
 				`ALTER TABLE hydra_client ALTER COLUMN request_uris SET NOT NULL`,
 			},
 			Down: []string{
-				`ALTER TABLE hydra_client ALTER COLUMN sector_identifier_uri DROP NOT NULL`,
-				`ALTER TABLE hydra_client ALTER COLUMN jwks DROP NOT NULL`,
-				`ALTER TABLE hydra_client ALTER COLUMN jwks_uri DROP NOT NULL`,
-				`ALTER TABLE hydra_client ALTER COLUMN request_uris DROP NOT NULL`,
+				`ALTER TABLE hydra_client ALTER COLUMN allowed_cors_origins DROP NOT NULL`,
 			},
 		},
 		sharedMigrations[3],
 		sharedMigrations[4],
+		sharedMigrations[5],
+		{
+			Id: "7",
+			Up: []string{
+				`UPDATE hydra_client SET allowed_cors_origins=''`,
+				`ALTER TABLE hydra_client ALTER COLUMN allowed_cors_origins SET NOT NULL`,
+			},
+			Down: []string{
+				`ALTER TABLE hydra_client ALTER COLUMN allowed_cors_origins DROP NOT NULL`,
+			},
+		},
 	}},
 }
 

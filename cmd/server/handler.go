@@ -51,16 +51,17 @@ import (
 
 var _ = &consent.Handler{}
 
-func enhanceRouter(c *config.Config, cmd *cobra.Command, serverHandler *Handler, router *httprouter.Router, middlewares []negroni.Handler) http.Handler {
+func enhanceRouter(c *config.Config, cmd *cobra.Command, serverHandler *Handler, router *httprouter.Router, middlewares []negroni.Handler, enableCors bool) http.Handler {
 	n := negroni.New()
 	for _, m := range middlewares {
 		n.Use(m)
 	}
 	n.UseFunc(serverHandler.rejectInsecureRequests)
 	n.UseHandler(router)
-	if viper.GetString("CORS_ENABLED") == "true" {
+	if enableCors {
 		c.GetLogger().Info("Enabled CORS")
-		return context.ClearHandler(cors.New(corsx.ParseOptions()).Handler(n))
+		options := corsx.ParseOptions()
+		return context.ClearHandler(cors.New(options).Handler(n))
 	} else {
 		return context.ClearHandler(n)
 	}
@@ -77,7 +78,7 @@ func RunServeAdmin(c *config.Config) func(cmd *cobra.Command, args []string) {
 
 		cert := getOrCreateTLSCertificate(cmd, c)
 		// go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, frontend), c.GetFrontendAddress(), &wg)
-		go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, backend, mws), c.GetBackendAddress(), &wg, cert)
+		go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, backend, mws, viper.GetString("CORS_ENABLED") == "true"), c.GetBackendAddress(), &wg, cert)
 
 		wg.Wait()
 	}
@@ -93,7 +94,7 @@ func RunServePublic(c *config.Config) func(cmd *cobra.Command, args []string) {
 		wg.Add(2)
 
 		cert := getOrCreateTLSCertificate(cmd, c)
-		go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, frontend, mws), c.GetFrontendAddress(), &wg, cert)
+		go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, frontend, mws, false), c.GetFrontendAddress(), &wg, cert)
 		// go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, backend), c.GetBackendAddress(), &wg)
 
 		wg.Wait()
@@ -109,8 +110,8 @@ func RunServeAll(c *config.Config) func(cmd *cobra.Command, args []string) {
 		wg.Add(2)
 
 		cert := getOrCreateTLSCertificate(cmd, c)
-		go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, frontend, mws), c.GetFrontendAddress(), &wg, cert)
-		go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, backend, mws), c.GetBackendAddress(), &wg, cert)
+		go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, frontend, mws, false), c.GetFrontendAddress(), &wg, cert)
+		go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, backend, mws, viper.GetString("CORS_ENABLED") == "true"), c.GetBackendAddress(), &wg, cert)
 
 		wg.Wait()
 	}

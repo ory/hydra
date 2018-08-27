@@ -56,6 +56,8 @@ class ConsentRequest implements ArrayAccess
     protected static $swaggerTypes = [
         'challenge' => 'string',
         'client' => '\Hydra\SDK\Model\OAuth2Client',
+        'login_challenge' => 'string',
+        'login_session_id' => 'string',
         'oidc_context' => '\Hydra\SDK\Model\OpenIDConnectContext',
         'request_url' => 'string',
         'requested_scope' => 'string[]',
@@ -70,6 +72,8 @@ class ConsentRequest implements ArrayAccess
     protected static $swaggerFormats = [
         'challenge' => null,
         'client' => null,
+        'login_challenge' => null,
+        'login_session_id' => null,
         'oidc_context' => null,
         'request_url' => null,
         'requested_scope' => null,
@@ -94,6 +98,8 @@ class ConsentRequest implements ArrayAccess
     protected static $attributeMap = [
         'challenge' => 'challenge',
         'client' => 'client',
+        'login_challenge' => 'login_challenge',
+        'login_session_id' => 'login_session_id',
         'oidc_context' => 'oidc_context',
         'request_url' => 'request_url',
         'requested_scope' => 'requested_scope',
@@ -109,6 +115,8 @@ class ConsentRequest implements ArrayAccess
     protected static $setters = [
         'challenge' => 'setChallenge',
         'client' => 'setClient',
+        'login_challenge' => 'setLoginChallenge',
+        'login_session_id' => 'setLoginSessionId',
         'oidc_context' => 'setOidcContext',
         'request_url' => 'setRequestUrl',
         'requested_scope' => 'setRequestedScope',
@@ -124,6 +132,8 @@ class ConsentRequest implements ArrayAccess
     protected static $getters = [
         'challenge' => 'getChallenge',
         'client' => 'getClient',
+        'login_challenge' => 'getLoginChallenge',
+        'login_session_id' => 'getLoginSessionId',
         'oidc_context' => 'getOidcContext',
         'request_url' => 'getRequestUrl',
         'requested_scope' => 'getRequestedScope',
@@ -164,6 +174,8 @@ class ConsentRequest implements ArrayAccess
     {
         $this->container['challenge'] = isset($data['challenge']) ? $data['challenge'] : null;
         $this->container['client'] = isset($data['client']) ? $data['client'] : null;
+        $this->container['login_challenge'] = isset($data['login_challenge']) ? $data['login_challenge'] : null;
+        $this->container['login_session_id'] = isset($data['login_session_id']) ? $data['login_session_id'] : null;
         $this->container['oidc_context'] = isset($data['oidc_context']) ? $data['oidc_context'] : null;
         $this->container['request_url'] = isset($data['request_url']) ? $data['request_url'] : null;
         $this->container['requested_scope'] = isset($data['requested_scope']) ? $data['requested_scope'] : null;
@@ -234,6 +246,48 @@ class ConsentRequest implements ArrayAccess
     public function setClient($client)
     {
         $this->container['client'] = $client;
+
+        return $this;
+    }
+
+    /**
+     * Gets login_challenge
+     * @return string
+     */
+    public function getLoginChallenge()
+    {
+        return $this->container['login_challenge'];
+    }
+
+    /**
+     * Sets login_challenge
+     * @param string $login_challenge LoginChallenge is the login challenge this consent challenge belongs to. It can be used to associate a login and consent request in the login & consent app.
+     * @return $this
+     */
+    public function setLoginChallenge($login_challenge)
+    {
+        $this->container['login_challenge'] = $login_challenge;
+
+        return $this;
+    }
+
+    /**
+     * Gets login_session_id
+     * @return string
+     */
+    public function getLoginSessionId()
+    {
+        return $this->container['login_session_id'];
+    }
+
+    /**
+     * Sets login_session_id
+     * @param string $login_session_id LoginSessionID is the authentication session ID. It is set if the browser had a valid authentication session at ORY Hydra during the login flow. It can be used to associate consecutive login requests by a certain user.
+     * @return $this
+     */
+    public function setLoginSessionId($login_session_id)
+    {
+        $this->container['login_session_id'] = $login_session_id;
 
         return $this;
     }

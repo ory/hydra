@@ -2111,6 +2111,16 @@
         "client": {
           "$ref": "#/definitions/oAuth2Client"
         },
+        "login_challenge": {
+          "description": "LoginChallenge is the login challenge this consent challenge belongs to. It can be used to associate\na login and consent request in the login \u0026 consent app.",
+          "type": "string",
+          "x-go-name": "LoginChallenge"
+        },
+        "login_session_id": {
+          "description": "LoginSessionID is the authentication session ID. It is set if the browser had a valid authentication session at\nORY Hydra during the login flow. It can be used to associate consecutive login requests by a certain user.",
+          "type": "string",
+          "x-go-name": "LoginSessionID"
+        },
         "oidc_context": {
           "$ref": "#/definitions/openIDConnectContext"
         },
@@ -2371,6 +2381,11 @@
           },
           "x-go-name": "RequestedScope"
         },
+        "session_id": {
+          "description": "SessionID is the authentication session ID. It is set if the browser had a valid authentication session at\nORY Hydra during the login flow. It can be used to associate consecutive login requests by a certain user.",
+          "type": "string",
+          "x-go-name": "SessionID"
+        },
         "skip": {
           "description": "Skip, if true, implies that the client has requested the same scopes from the same user previously.\nIf true, you can skip asking the user to grant the requested scopes, and simply forward the user to the redirect URL.\n\nThis feature allows you to update / set session information.",
           "type": "boolean",
@@ -2389,6 +2404,14 @@
       "type": "object",
       "title": "Client represents an OAuth 2.0 Client.",
       "properties": {
+        "allowed_cors_origins": {
+          "description": "AllowedCORSOrigins are one or more URLs (scheme://host[:port]) which are allowed to make CORS requests\nto the /oauth/token endpoint. If this array is empty, the sever's CORS origin configuration (`CORS_ALLOWED_ORIGINS`)\nwill be used instead. If this array is set, the allowed origins are appended to the server's CORS origin configuration.\nBe aware that environment variable `CORS_ENABLED` MUST be set to `true` for this to work.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "AllowedCORSOrigins"
+        },
         "client_id": {
           "description": "ClientID  is the id for this client.",
           "type": "string",

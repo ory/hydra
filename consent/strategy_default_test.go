@@ -265,6 +265,8 @@ func TestStrategy(t *testing.T) {
 					assert.Contains(t, lr.RequestUrl, "/oauth2/auth?login_verifier=&consent_verifier=&")
 					assert.EqualValues(t, false, lr.Skip)
 					assert.EqualValues(t, "user", lr.Subject)
+					assert.NotEmpty(t, lr.LoginChallenge)
+					assert.Empty(t, lr.LoginSessionId)
 					assert.EqualValues(t, swagger.OpenIdConnectContext{AcrValues: []string{"1", "2"}, Display: "page", UiLocales: []string{"de", "en"}}, lr.OidcContext)
 					w.WriteHeader(http.StatusNoContent)
 				}
@@ -339,6 +341,66 @@ func TestStrategy(t *testing.T) {
 				ConsentRequest: &ConsentRequest{Subject: "user", SubjectIdentifier: "user"},
 				GrantedScope:   []string{"scope-a"},
 				Remember:       true,
+				RememberFor:    0,
+				Session: &ConsentRequestSessionData{
+					AccessToken: map[string]interface{}{"foo": "bar"},
+					IDToken:     map[string]interface{}{"bar": "baz"},
+				},
+			},
+		},
+		{
+			d:   "This should pass because login was remembered and session id should be set",
+			req: fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ClientID: "client-id"}, Scopes: []string{"scope-a"}}},
+			jar: persistentCJ,
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					lr, res, err := apiClient.GetLoginRequest(r.URL.Query().Get("login_challenge"))
+					require.NoError(t, err)
+					require.EqualValues(t, http.StatusOK, res.StatusCode)
+					assert.True(t, lr.Skip)
+					assert.NotEmpty(t, lr.SessionId)
+					v, res, err := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
+						Subject:     "user",
+						Remember:    false,
+						RememberFor: 0,
+						Acr:         "1",
+					})
+					require.NoError(t, err)
+					require.EqualValues(t, http.StatusOK, res.StatusCode)
+					require.NotEmpty(t, v.RedirectTo)
+					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+				}
+			},
+			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					cr, res, err := apiClient.GetConsentRequest(r.URL.Query().Get("consent_challenge"))
+					require.NoError(t, err)
+					require.EqualValues(t, http.StatusOK, res.StatusCode)
+					assert.True(t, cr.Skip)
+					assert.NotEmpty(t, cr.LoginSessionId)
+					assert.NotEmpty(t, cr.LoginChallenge)
+					v, res, err := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{
+						GrantScope:  []string{"scope-a"},
+						Remember:    false,
+						RememberFor: 0,
+						Session: swagger.ConsentRequestSession{
+							AccessToken: map[string]interface{}{"foo": "bar"},
+							IdToken:     map[string]interface{}{"bar": "baz"},
+						},
+					})
+					require.NoError(t, err)
+					require.EqualValues(t, http.StatusOK, res.StatusCode)
+					require.NotEmpty(t, v.RedirectTo)
+					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+				}
+			},
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+			expectSession: &HandledConsentRequest{
+				ConsentRequest: &ConsentRequest{Subject: "user", SubjectIdentifier: "user"},
+				GrantedScope:   []string{"scope-a"},
+				Remember:       false,
 				RememberFor:    0,
 				Session: &ConsentRequestSessionData{
 					AccessToken: map[string]interface{}{"foo": "bar"},

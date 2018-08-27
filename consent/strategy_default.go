@@ -102,24 +102,24 @@ var ErrNoPreviousConsentFound = errors.New("No previous OAuth 2.0 Consent could 
 func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester) error {
 	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
 	if stringslice.Has(prompt, "login") {
-		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{})
+		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{}, nil)
 	}
 
 	// We try to open the session cookie. If it does not exist (indicated by the error), we must authenticate the user.
 	cookie, err := s.CookieStore.Get(r, cookieAuthenticationName)
 	if err != nil {
 		//id.L.WithError(err).Debug("No OAuth2 authentication session was found, performing consent authentication flow")
-		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{})
+		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{}, nil)
 	}
 
 	sessionID := mapx.GetStringDefault(cookie.Values, cookieAuthenticationSIDName, "")
 	if sessionID == "" {
-		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{})
+		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{}, nil)
 	}
 
 	session, err := s.M.GetAuthenticationSession(sessionID)
 	if errors.Cause(err) == pkg.ErrNotFound {
-		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{})
+		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{}, nil)
 	} else if err != nil {
 		return err
 	}
@@ -137,12 +137,12 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 		if stringslice.Has(prompt, "none") {
 			return errors.WithStack(fosite.ErrLoginRequired.WithDebug("Request failed because prompt is set to \"none\" and authentication time reached max_age"))
 		}
-		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{})
+		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{}, nil)
 	}
 
 	idTokenHint := ar.GetRequestForm().Get("id_token_hint")
 	if idTokenHint == "" {
-		return s.forwardAuthenticationRequest(w, r, ar, session.Subject, session.AuthenticatedAt)
+		return s.forwardAuthenticationRequest(w, r, ar, session.Subject, session.AuthenticatedAt, session)
 	}
 
 	token, err := s.JWTStrategy.Decode(idTokenHint)
@@ -170,11 +170,11 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 	if hintSub != session.Subject && hintSub != obfuscatedUserID && hintSub != forcedObfuscatedUserID {
 		return errors.WithStack(fosite.ErrLoginRequired.WithDebug("Request failed because subject claim from id_token_hint does not match subject from authentication session"))
 	} else {
-		return s.forwardAuthenticationRequest(w, r, ar, session.Subject, session.AuthenticatedAt)
+		return s.forwardAuthenticationRequest(w, r, ar, session.Subject, session.AuthenticatedAt, session)
 	}
 }
 
-func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, subject string, authenticatedAt time.Time) error {
+func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, subject string, authenticatedAt time.Time, session *AuthenticationSession) error {
 	if (subject != "" && authenticatedAt.IsZero()) || (subject == "" && !authenticatedAt.IsZero()) {
 		return errors.WithStack(fosite.ErrServerError.WithDebug("Consent strategy returned a non-empty subject with an empty auth date, or an empty subject with a non-empty auth date"))
 	}
@@ -212,6 +212,11 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 		}
 	}
 
+	sessionID := ""
+	if session != nil {
+		sessionID = session.ID
+	}
+
 	// Set the session
 	if err := s.M.CreateAuthenticationRequest(
 		&AuthenticationRequest{
@@ -225,6 +230,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 			RequestURL:      iu.String(),
 			AuthenticatedAt: authenticatedAt,
 			RequestedAt:     time.Now().UTC(),
+			SessionID:       sessionID,
 			OpenIDConnectContext: &OpenIDConnectContext{
 				IDTokenHintClaims: idTokenHintClaims,
 				ACRValues:         stringsx.Splitx(ar.GetRequestForm().Get("acr_values"), " "),
@@ -505,6 +511,8 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 			RequestedAt:            as.RequestedAt,
 			ForceSubjectIdentifier: as.ForceSubjectIdentifier,
 			OpenIDConnectContext:   as.AuthenticationRequest.OpenIDConnectContext,
+			LoginSessionID:         as.AuthenticationRequest.SessionID,
+			LoginChallenge:         as.AuthenticationRequest.Challenge,
 		},
 	); err != nil {
 		return errors.WithStack(err)

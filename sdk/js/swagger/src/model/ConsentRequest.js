@@ -75,6 +75,18 @@
       if (data.hasOwnProperty('client')) {
         obj['client'] = OAuth2Client.constructFromObject(data['client'])
       }
+      if (data.hasOwnProperty('login_challenge')) {
+        obj['login_challenge'] = ApiClient.convertToType(
+          data['login_challenge'],
+          'String'
+        )
+      }
+      if (data.hasOwnProperty('login_session_id')) {
+        obj['login_session_id'] = ApiClient.convertToType(
+          data['login_session_id'],
+          'String'
+        )
+      }
       if (data.hasOwnProperty('oidc_context')) {
         obj['oidc_context'] = OpenIDConnectContext.constructFromObject(
           data['oidc_context']
@@ -111,6 +123,16 @@
    * @member {module:model/OAuth2Client} client
    */
   exports.prototype['client'] = undefined
+  /**
+   * LoginChallenge is the login challenge this consent challenge belongs to. It can be used to associate a login and consent request in the login & consent app.
+   * @member {String} login_challenge
+   */
+  exports.prototype['login_challenge'] = undefined
+  /**
+   * LoginSessionID is the authentication session ID. It is set if the browser had a valid authentication session at ORY Hydra during the login flow. It can be used to associate consecutive login requests by a certain user.
+   * @member {String} login_session_id
+   */
+  exports.prototype['login_session_id'] = undefined
   /**
    * @member {module:model/OpenIDConnectContext} oidc_context
    */

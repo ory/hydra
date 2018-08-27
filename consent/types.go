@@ -253,6 +253,10 @@ type AuthenticationRequest struct {
 	// might come in handy if you want to deal with additional request parameters.
 	RequestURL string `json:"request_url"`
 
+	// SessionID is the authentication session ID. It is set if the browser had a valid authentication session at
+	// ORY Hydra during the login flow. It can be used to associate consecutive login requests by a certain user.
+	SessionID string `json:"session_id"`
+
 	ForceSubjectIdentifier string    `json:"-"` // this is here but has no meaning apart from sql_helper working properly.
 	Verifier               string    `json:"-"`
 	CSRF                   string    `json:"-"`
@@ -291,6 +295,14 @@ type ConsentRequest struct {
 	// initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but
 	// might come in handy if you want to deal with additional request parameters.
 	RequestURL string `json:"request_url"`
+
+	// LoginChallenge is the login challenge this consent challenge belongs to. It can be used to associate
+	// a login and consent request in the login & consent app.
+	LoginChallenge string `json:"login_challenge"`
+
+	// LoginSessionID is the authentication session ID. It is set if the browser had a valid authentication session at
+	// ORY Hydra during the login flow. It can be used to associate consecutive login requests by a certain user.
+	LoginSessionID string `json:"login_session_id"`
 
 	// ForceSubjectIdentifier is the value from authentication (if set).
 	ForceSubjectIdentifier string    `json:"-"`

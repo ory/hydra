@@ -17,6 +17,12 @@ type ConsentRequest struct {
 
 	Client OAuth2Client `json:"client,omitempty"`
 
+	// LoginChallenge is the login challenge this consent challenge belongs to. It can be used to associate a login and consent request in the login & consent app.
+	LoginChallenge string `json:"login_challenge,omitempty"`
+
+	// LoginSessionID is the authentication session ID. It is set if the browser had a valid authentication session at ORY Hydra during the login flow. It can be used to associate consecutive login requests by a certain user.
+	LoginSessionId string `json:"login_session_id,omitempty"`
+
 	OidcContext OpenIdConnectContext `json:"oidc_context,omitempty"`
 
 	// RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but might come in handy if you want to deal with additional request parameters.

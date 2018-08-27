@@ -54,6 +54,7 @@ class OAuth2Client implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
+        'allowed_cors_origins' => 'string[]',
         'client_id' => 'string',
         'client_name' => 'string',
         'client_secret' => 'string',
@@ -83,6 +84,7 @@ class OAuth2Client implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerFormats = [
+        'allowed_cors_origins' => null,
         'client_id' => null,
         'client_name' => null,
         'client_secret' => null,
@@ -122,6 +124,7 @@ class OAuth2Client implements ArrayAccess
      * @var string[]
      */
     protected static $attributeMap = [
+        'allowed_cors_origins' => 'allowed_cors_origins',
         'client_id' => 'client_id',
         'client_name' => 'client_name',
         'client_secret' => 'client_secret',
@@ -152,6 +155,7 @@ class OAuth2Client implements ArrayAccess
      * @var string[]
      */
     protected static $setters = [
+        'allowed_cors_origins' => 'setAllowedCorsOrigins',
         'client_id' => 'setClientId',
         'client_name' => 'setClientName',
         'client_secret' => 'setClientSecret',
@@ -182,6 +186,7 @@ class OAuth2Client implements ArrayAccess
      * @var string[]
      */
     protected static $getters = [
+        'allowed_cors_origins' => 'getAllowedCorsOrigins',
         'client_id' => 'getClientId',
         'client_name' => 'getClientName',
         'client_secret' => 'getClientSecret',
@@ -237,6 +242,7 @@ class OAuth2Client implements ArrayAccess
      */
     public function __construct(array $data = null)
     {
+        $this->container['allowed_cors_origins'] = isset($data['allowed_cors_origins']) ? $data['allowed_cors_origins'] : null;
         $this->container['client_id'] = isset($data['client_id']) ? $data['client_id'] : null;
         $this->container['client_name'] = isset($data['client_name']) ? $data['client_name'] : null;
         $this->container['client_secret'] = isset($data['client_secret']) ? $data['client_secret'] : null;
@@ -292,6 +298,27 @@ class OAuth2Client implements ArrayAccess
         return true;
     }
 
+
+    /**
+     * Gets allowed_cors_origins
+     * @return string[]
+     */
+    public function getAllowedCorsOrigins()
+    {
+        return $this->container['allowed_cors_origins'];
+    }
+
+    /**
+     * Sets allowed_cors_origins
+     * @param string[] $allowed_cors_origins AllowedCORSOrigins are one or more URLs (scheme://host[:port]) which are allowed to make CORS requests to the /oauth/token endpoint. If this array is empty, the sever's CORS origin configuration (`CORS_ALLOWED_ORIGINS`) will be used instead. If this array is set, the allowed origins are appended to the server's CORS origin configuration. Be aware that environment variable `CORS_ENABLED` MUST be set to `true` for this to work.
+     * @return $this
+     */
+    public function setAllowedCorsOrigins($allowed_cors_origins)
+    {
+        $this->container['allowed_cors_origins'] = $allowed_cors_origins;
+
+        return $this;
+    }
 
     /**
      * Gets client_id

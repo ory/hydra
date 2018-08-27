@@ -25,6 +25,9 @@ type LoginRequest struct {
 	// RequestedScope contains all scopes requested by the OAuth 2.0 client.
 	RequestedScope []string `json:"requested_scope,omitempty"`
 
+	// SessionID is the authentication session ID. It is set if the browser had a valid authentication session at ORY Hydra during the login flow. It can be used to associate consecutive login requests by a certain user.
+	SessionId string `json:"session_id,omitempty"`
+
 	// Skip, if true, implies that the client has requested the same scopes from the same user previously. If true, you can skip asking the user to grant the requested scopes, and simply forward the user to the redirect URL.  This feature allows you to update / set session information.
 	Skip bool `json:"skip,omitempty"`
 

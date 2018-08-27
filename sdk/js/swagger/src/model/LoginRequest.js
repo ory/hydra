@@ -92,6 +92,12 @@
           ['String']
         )
       }
+      if (data.hasOwnProperty('session_id')) {
+        obj['session_id'] = ApiClient.convertToType(
+          data['session_id'],
+          'String'
+        )
+      }
       if (data.hasOwnProperty('skip')) {
         obj['skip'] = ApiClient.convertToType(data['skip'], 'Boolean')
       }
@@ -125,6 +131,11 @@
    * @member {Array.<String>} requested_scope
    */
   exports.prototype['requested_scope'] = undefined
+  /**
+   * SessionID is the authentication session ID. It is set if the browser had a valid authentication session at ORY Hydra during the login flow. It can be used to associate consecutive login requests by a certain user.
+   * @member {String} session_id
+   */
+  exports.prototype['session_id'] = undefined
   /**
    * Skip, if true, implies that the client has requested the same scopes from the same user previously. If true, you can skip asking the user to grant the requested scopes, and simply forward the user to the redirect URL.  This feature allows you to update / set session information.
    * @member {Boolean} skip

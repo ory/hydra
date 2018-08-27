@@ -5,6 +5,8 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Challenge** | **string** | Challenge is the identifier (\&quot;authorization challenge\&quot;) of the consent authorization request. It is used to identify the session. | [optional] [default to null]
 **Client** | [**OAuth2Client**](oAuth2Client.md) |  | [optional] [default to null]
+**LoginChallenge** | **string** | LoginChallenge is the login challenge this consent challenge belongs to. It can be used to associate a login and consent request in the login &amp; consent app. | [optional] [default to null]
+**LoginSessionId** | **string** | LoginSessionID is the authentication session ID. It is set if the browser had a valid authentication session at ORY Hydra during the login flow. It can be used to associate consecutive login requests by a certain user. | [optional] [default to null]
 **OidcContext** | [**OpenIdConnectContext**](openIDConnectContext.md) |  | [optional] [default to null]
 **RequestUrl** | **string** | RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but might come in handy if you want to deal with additional request parameters. | [optional] [default to null]
 **RequestedScope** | **[]string** | RequestedScope contains all scopes requested by the OAuth 2.0 client. | [optional] [default to null]

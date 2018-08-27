@@ -123,6 +123,19 @@ var migrations = &migrate.MemoryMigrationSource{
 				"DROP TABLE hydra_oauth2_obfuscated_authentication_session",
 			},
 		},
+		{
+			Id: "3",
+			Up: []string{
+				`ALTER TABLE hydra_oauth2_consent_request ADD login_session_id VARCHAR(40) NULL DEFAULT ''`,
+				`ALTER TABLE hydra_oauth2_consent_request ADD login_challenge VARCHAR(40) NULL DEFAULT ''`,
+				`ALTER TABLE hydra_oauth2_authentication_request ADD login_session_id VARCHAR(40) NULL DEFAULT ''`,
+			},
+			Down: []string{
+				`ALTER TABLE hydra_oauth2_consent_request DROP COLUMN login_session_id`,
+				`ALTER TABLE hydra_oauth2_consent_request DROP COLUMN login_challenge`,
+				`ALTER TABLE hydra_oauth2_authentication_request DROP COLUMN login_session_id`,
+			},
+		},
 	},
 }
 
@@ -151,9 +164,10 @@ var sqlParamsAuthenticationRequest = []string{
 	"requested_at",
 	"csrf",
 	"oidc_context",
+	"login_session_id",
 }
 
-var sqlParamsConsentRequest = append(sqlParamsAuthenticationRequest, "forced_subject_identifier")
+var sqlParamsConsentRequest = append(sqlParamsAuthenticationRequest, "forced_subject_identifier", "login_challenge")
 
 var sqlParamsConsentRequestHandled = []string{
 	"challenge",
@@ -186,10 +200,13 @@ type sqlAuthenticationRequest struct {
 	CSRF                 string     `db:"csrf"`
 	AuthenticatedAt      *time.Time `db:"authenticated_at"`
 	RequestedAt          time.Time  `db:"requested_at"`
+	SessionID            string     `db:"login_session_id"`
 }
 
 type sqlConsentRequest struct {
 	sqlAuthenticationRequest
+	LoginChallenge          string `db:"login_challenge"`
+	LoginSessionID          string `db:"login_session_id"`
 	ForcedSubjectIdentifier string `db:"forced_subject_identifier"`
 }
 
@@ -226,7 +243,10 @@ func newSQLConsentRequest(c *ConsentRequest) (*sqlConsentRequest, error) {
 			CSRF:                 c.CSRF,
 			AuthenticatedAt:      toMySQLDateHack(c.AuthenticatedAt),
 			RequestedAt:          c.RequestedAt,
+			SessionID:            c.LoginSessionID,
 		},
+		LoginSessionID:          c.LoginSessionID,
+		LoginChallenge:          c.LoginChallenge,
 		ForcedSubjectIdentifier: c.ForceSubjectIdentifier,
 	}, nil
 }
@@ -249,6 +269,7 @@ func newSQLAuthenticationRequest(c *AuthenticationRequest) (*sqlAuthenticationRe
 		CSRF:                 c.CSRF,
 		AuthenticatedAt:      toMySQLDateHack(c.AuthenticatedAt),
 		RequestedAt:          c.RequestedAt,
+		SessionID:            c.SessionID,
 	}, nil
 }
 

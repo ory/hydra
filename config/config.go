@@ -59,6 +59,7 @@ type Config struct {
 	BackendBindHost                  string `mapstructure:"ADMIN_HOST" yaml:"-"`
 	Issuer                           string `mapstructure:"OAUTH2_ISSUER_URL" yaml:"-"`
 	SystemSecret                     string `mapstructure:"SYSTEM_SECRET" yaml:"-"`
+	RotatedSystemSecret              string `mapstructure:"ROTATED_SYSTEM_SECRET" yaml:"-"`
 	DatabaseURL                      string `mapstructure:"DATABASE_URL" yaml:"-"`
 	DatabasePlugin                   string `mapstructure:"DATABASE_PLUGIN" yaml:"-"`
 	ConsentURL                       string `mapstructure:"OAUTH2_CONSENT_URL" yaml:"-"`
@@ -327,6 +328,10 @@ func (c *Config) GetCookieSecret() []byte {
 		return []byte(c.CookieSecret)
 	}
 	return c.GetSystemSecret()
+}
+
+func (c *Config) GetRotatedSystemSecrets() [][]byte {
+	return [][]byte{[]byte(c.RotatedSystemSecret)}
 }
 
 func (c *Config) GetSystemSecret() []byte {

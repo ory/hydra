@@ -111,3 +111,39 @@ func TestManagerKeySet(t *testing.T) {
 		t.Run(fmt.Sprintf("case=%s", name), TestHelperManagerKeySet(m, ks, "TestManagerKeySet"))
 	}
 }
+
+func TestManagerRotate(t *testing.T) {
+	ks, err := testGenerator.Generate("TestManagerRotate", "sig")
+	require.NoError(t, err)
+
+	newKey, _ := RandomBytes(32)
+	newCipher := &AEAD{Key: newKey}
+
+	for name, m := range managers {
+		t.Run(fmt.Sprintf("manager=%s", name), func(t *testing.T) {
+			m, ok := m.(*SQLManager)
+			if !ok {
+				t.SkipNow()
+			}
+
+			n, err := m.CreateSchemas()
+			require.NoError(t, err)
+			t.Logf("Applied %d migrations to %s", n, name)
+
+			require.NoError(t, m.AddKeySet("TestManagerRotate", ks))
+
+			require.NoError(t, m.RotateKeys(newCipher))
+
+			_, err = m.GetKeySet("TestManagerRotate")
+			require.Error(t, err)
+
+			m.Cipher = newCipher
+			got, err := m.GetKeySet("TestManagerRotate")
+			require.NoError(t, err)
+
+			for _, key := range ks.Keys {
+				require.EqualValues(t, ks.Key(key.KeyID), got.Key(key.KeyID))
+			}
+		})
+	}
+}

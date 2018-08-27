@@ -59,6 +59,7 @@ class LoginRequest implements ArrayAccess
         'oidc_context' => '\Hydra\SDK\Model\OpenIDConnectContext',
         'request_url' => 'string',
         'requested_scope' => 'string[]',
+        'session_id' => 'string',
         'skip' => 'bool',
         'subject' => 'string'
     ];
@@ -73,6 +74,7 @@ class LoginRequest implements ArrayAccess
         'oidc_context' => null,
         'request_url' => null,
         'requested_scope' => null,
+        'session_id' => null,
         'skip' => null,
         'subject' => null
     ];
@@ -97,6 +99,7 @@ class LoginRequest implements ArrayAccess
         'oidc_context' => 'oidc_context',
         'request_url' => 'request_url',
         'requested_scope' => 'requested_scope',
+        'session_id' => 'session_id',
         'skip' => 'skip',
         'subject' => 'subject'
     ];
@@ -112,6 +115,7 @@ class LoginRequest implements ArrayAccess
         'oidc_context' => 'setOidcContext',
         'request_url' => 'setRequestUrl',
         'requested_scope' => 'setRequestedScope',
+        'session_id' => 'setSessionId',
         'skip' => 'setSkip',
         'subject' => 'setSubject'
     ];
@@ -127,6 +131,7 @@ class LoginRequest implements ArrayAccess
         'oidc_context' => 'getOidcContext',
         'request_url' => 'getRequestUrl',
         'requested_scope' => 'getRequestedScope',
+        'session_id' => 'getSessionId',
         'skip' => 'getSkip',
         'subject' => 'getSubject'
     ];
@@ -167,6 +172,7 @@ class LoginRequest implements ArrayAccess
         $this->container['oidc_context'] = isset($data['oidc_context']) ? $data['oidc_context'] : null;
         $this->container['request_url'] = isset($data['request_url']) ? $data['request_url'] : null;
         $this->container['requested_scope'] = isset($data['requested_scope']) ? $data['requested_scope'] : null;
+        $this->container['session_id'] = isset($data['session_id']) ? $data['session_id'] : null;
         $this->container['skip'] = isset($data['skip']) ? $data['skip'] : null;
         $this->container['subject'] = isset($data['subject']) ? $data['subject'] : null;
     }
@@ -297,6 +303,27 @@ class LoginRequest implements ArrayAccess
     public function setRequestedScope($requested_scope)
     {
         $this->container['requested_scope'] = $requested_scope;
+
+        return $this;
+    }
+
+    /**
+     * Gets session_id
+     * @return string
+     */
+    public function getSessionId()
+    {
+        return $this->container['session_id'];
+    }
+
+    /**
+     * Sets session_id
+     * @param string $session_id SessionID is the authentication session ID. It is set if the browser had a valid authentication session at ORY Hydra during the login flow. It can be used to associate consecutive login requests by a certain user.
+     * @return $this
+     */
+    public function setSessionId($session_id)
+    {
+        $this->container['session_id'] = $session_id;
 
         return $this;
     }

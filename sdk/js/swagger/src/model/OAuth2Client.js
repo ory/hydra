@@ -63,6 +63,12 @@
     if (data) {
       obj = obj || new exports()
 
+      if (data.hasOwnProperty('allowed_cors_origins')) {
+        obj['allowed_cors_origins'] = ApiClient.convertToType(
+          data['allowed_cors_origins'],
+          ['String']
+        )
+      }
       if (data.hasOwnProperty('client_id')) {
         obj['client_id'] = ApiClient.convertToType(data['client_id'], 'String')
       }
@@ -172,6 +178,11 @@
     return obj
   }
 
+  /**
+   * AllowedCORSOrigins are one or more URLs (scheme://host[:port]) which are allowed to make CORS requests to the /oauth/token endpoint. If this array is empty, the sever's CORS origin configuration (`CORS_ALLOWED_ORIGINS`) will be used instead. If this array is set, the allowed origins are appended to the server's CORS origin configuration. Be aware that environment variable `CORS_ENABLED` MUST be set to `true` for this to work.
+   * @member {Array.<String>} allowed_cors_origins
+   */
+  exports.prototype['allowed_cors_origins'] = undefined
   /**
    * ClientID  is the id for this client.
    * @member {String} client_id

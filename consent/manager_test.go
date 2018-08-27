@@ -65,6 +65,8 @@ func mockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 		CSRF:           "csrf" + key,
 		ForceSubjectIdentifier: "forced-subject",
 		SubjectIdentifier:      "forced-subject",
+		LoginSessionID:         "login-session-id",
+		LoginChallenge:         "login-challenge",
 	}
 
 	var err *RequestDeniedError
@@ -112,6 +114,7 @@ func mockAuthRequest(key string, authAt bool) (c *AuthenticationRequest, h *Hand
 		RequestedScope: []string{"scopea" + key, "scopeb" + key},
 		Verifier:       "verifier" + key,
 		CSRF:           "csrf" + key,
+		SessionID:      "login-session-id",
 	}
 
 	var err = &RequestDeniedError{

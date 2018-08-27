@@ -37,6 +37,10 @@ type SQLManager struct {
 	Cipher *AEAD
 }
 
+func NewSQLManager(db *sqlx.DB, key []byte) *SQLManager {
+	return &SQLManager{DB: db, Cipher: &AEAD{Key: key}}
+}
+
 var Migrations = &migrate.MemoryMigrationSource{
 	Migrations: []*migrate.Migration{
 		{
@@ -119,20 +123,31 @@ func (m *SQLManager) AddKeySet(set string, keys *jose.JSONWebKeySet) error {
 		return errors.WithStack(err)
 	}
 
+	if err := m.addKeySet(tx, m.Cipher, set, keys); err != nil {
+		if re := tx.Rollback(); re != nil {
+			return errors.Wrap(err, re.Error())
+		}
+		return sqlcon.HandleError(err)
+	}
+
+	if err := tx.Commit(); err != nil {
+		if re := tx.Rollback(); re != nil {
+			return errors.Wrap(err, re.Error())
+		}
+		return sqlcon.HandleError(err)
+	}
+	return nil
+}
+
+func (m *SQLManager) addKeySet(tx *sqlx.Tx, cipher *AEAD, set string, keys *jose.JSONWebKeySet) error {
 	for _, key := range keys.Keys {
 		out, err := json.Marshal(key)
 		if err != nil {
-			if re := tx.Rollback(); re != nil {
-				return errors.Wrap(err, re.Error())
-			}
 			return errors.WithStack(err)
 		}
 
-		encrypted, err := m.Cipher.Encrypt(out)
+		encrypted, err := cipher.Encrypt(out)
 		if err != nil {
-			if re := tx.Rollback(); re != nil {
-				return errors.Wrap(err, re.Error())
-			}
 			return errors.WithStack(err)
 		}
 
@@ -142,19 +157,10 @@ func (m *SQLManager) AddKeySet(set string, keys *jose.JSONWebKeySet) error {
 			Version: 0,
 			Key:     encrypted,
 		}); err != nil {
-			if re := tx.Rollback(); re != nil {
-				return errors.Wrap(err, re.Error())
-			}
 			return sqlcon.HandleError(err)
 		}
 	}
 
-	if err := tx.Commit(); err != nil {
-		if re := tx.Rollback(); re != nil {
-			return errors.Wrap(err, re.Error())
-		}
-		return sqlcon.HandleError(err)
-	}
 	return nil
 }
 
@@ -218,7 +224,74 @@ func (m *SQLManager) DeleteKey(set, kid string) error {
 }
 
 func (m *SQLManager) DeleteKeySet(set string) error {
-	if _, err := m.DB.Exec(m.DB.Rebind(`DELETE FROM hydra_jwk WHERE sid=?`), set); err != nil {
+	tx, err := m.DB.Beginx()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	if err := m.deleteKeySet(tx, set); err != nil {
+		if re := tx.Rollback(); re != nil {
+			return errors.Wrap(err, re.Error())
+		}
+		return sqlcon.HandleError(err)
+	}
+
+	if err := tx.Commit(); err != nil {
+		if re := tx.Rollback(); re != nil {
+			return errors.Wrap(err, re.Error())
+		}
+		return sqlcon.HandleError(err)
+	}
+	return nil
+}
+
+func (m *SQLManager) deleteKeySet(tx *sqlx.Tx, set string) error {
+	if _, err := tx.Exec(m.DB.Rebind(`DELETE FROM hydra_jwk WHERE sid=?`), set); err != nil {
+		return sqlcon.HandleError(err)
+	}
+	return nil
+}
+
+func (m *SQLManager) RotateKeys(new *AEAD) error {
+	sids := make([]string, 0)
+	if err := m.DB.Select(&sids, "SELECT sid FROM hydra_jwk GROUP BY sid"); err != nil {
+		return sqlcon.HandleError(err)
+	}
+
+	sets := make([]jose.JSONWebKeySet, 0)
+	for _, sid := range sids {
+		set, err := m.GetKeySet(sid)
+		if err != nil {
+			return errors.WithStack(err)
+		}
+		sets = append(sets, *set)
+	}
+
+	tx, err := m.DB.Beginx()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	for k, set := range sets {
+		if err := m.deleteKeySet(tx, sids[k]); err != nil {
+			if re := tx.Rollback(); re != nil {
+				return errors.Wrap(err, re.Error())
+			}
+			return sqlcon.HandleError(err)
+		}
+
+		if err := m.addKeySet(tx, new, sids[k], &set); err != nil {
+			if re := tx.Rollback(); re != nil {
+				return errors.Wrap(err, re.Error())
+			}
+			return sqlcon.HandleError(err)
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		if re := tx.Rollback(); re != nil {
+			return errors.Wrap(err, re.Error())
+		}
 		return sqlcon.HandleError(err)
 	}
 	return nil

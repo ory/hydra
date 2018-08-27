@@ -78,8 +78,7 @@ func (h *MigrateHandler) connectToSql(dsn string) (*sqlx.DB, error) {
 	return db, nil
 }
 
-func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
-	var dburl string
+func getDBUrl(cmd *cobra.Command, args []string, position int) (dburl string) {
 	if readFromEnv, _ := cmd.Flags().GetBool("read-from-env"); readFromEnv {
 		if len(viper.GetString("DATABASE_URL")) == 0 {
 			fmt.Println(cmd.UsageString())
@@ -89,11 +88,65 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 		}
 		dburl = viper.GetString("DATABASE_URL")
 	} else {
-		if len(args) != 1 {
+		if len(args) < position {
 			fmt.Println(cmd.UsageString())
 			return
 		}
-		dburl = args[0]
+		dburl = args[position]
+	}
+	if dburl == "" {
+		fmt.Println(cmd.UsageString())
+		return
+	}
+	return
+}
+
+func (h *MigrateHandler) MigrateSecret(cmd *cobra.Command, args []string) {
+	dburl := getDBUrl(cmd, args, 0)
+	if dburl == "" {
+		return
+	}
+
+	db, err := h.connectToSql(dburl)
+	if err != nil {
+		fmt.Printf("An error occurred while connecting to SQL: %s", err)
+		os.Exit(1)
+		return
+	}
+
+	oldSecret := viper.GetString("OLD_SYSTEM_SECRET")
+	newSecret := viper.GetString("NEW_SYSTEM_SECRET")
+
+	if len(oldSecret) == 0 {
+		fmt.Println("You did not specify the old system secret, please set environment variable OLD_SYSTEM_SECRET.")
+		os.Exit(1)
+		return
+	} else if len(newSecret) == 0 {
+		fmt.Println("You did not specify the old system secret, please set environment variable NEW_SYSTEM_SECRET.")
+		os.Exit(1)
+		return
+	}
+
+	fmt.Println("Rotating encryption keys for JSON Web Key storage...")
+	manager := jwk.NewSQLManager(db, []byte(oldSecret))
+	if err := manager.RotateKeys(&jwk.AEAD{Key: []byte(newSecret)}); err != nil {
+		fmt.Printf("Error \"%s\" occurred while trying to rotate the JSON Web Key storage. All changes have been reverted.", err)
+	}
+	fmt.Println("Rotating encryption keys for JSON Web Key storage completed successfully!")
+	fmt.Printf(`You may now run ORY Hydra with the new system secret. If you wish that old OAuth 2.0 Access and Refres
+tokens stay valid, please set environment variable ROTATED_SYSTEM_SECRET to the new secret:
+
+ROTATED_SYSTEM_SECRET=%s hydra serve ...
+
+If you wish that OAuth 2.0 Access and Refresh Tokens issued with the old secret are revoked, simply omit environment variable
+ROTATED_SYSTEM_SECRET. This will NOT affect OpenID Connect ID Tokens!
+`, newSecret)
+}
+
+func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
+	dburl := getDBUrl(cmd, args, 0)
+	if dburl == "" {
+		return
 	}
 
 	db, err := h.connectToSql(dburl)

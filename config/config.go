@@ -100,11 +100,11 @@ type Config struct {
 
 func (c *Config) MustValidate() {
 	if stringslice.Has(c.GetSubjectTypesSupported(), "pairwise") && c.OAuth2AccessTokenStrategy == "jwt" {
-		c.logger.Fatalf(`The pairwise subject identifier algorithm is not supported by the JWT OAuth 2.0 Access Token Strategy. Please remove "pairwise" from OIDC_SUBJECT_TYPES_SUPPORTED or set OAUTH2_ACCESS_TOKEN_STRATEGY to "opaque"`)
+		c.GetLogger().Fatalf(`The pairwise subject identifier algorithm is not supported by the JWT OAuth 2.0 Access Token Strategy. Please remove "pairwise" from OIDC_SUBJECT_TYPES_SUPPORTED or set OAUTH2_ACCESS_TOKEN_STRATEGY to "opaque"`)
 	}
 
 	if stringslice.Has(c.GetSubjectTypesSupported(), "pairwise") && len(c.SubjectIdentifierAlgorithmSalt) < 8 {
-		c.logger.Fatalf(`The pairwise subject identifier algorithm was set but length of OIDC_SUBJECT_TYPE_PAIRWISE_SALT is too small (%d < 8), please set OIDC_SUBJECT_TYPE_PAIRWISE_SALT to a random string with 8 characters or more`, len(c.SubjectIdentifierAlgorithmSalt))
+		c.GetLogger().Fatalf(`The pairwise subject identifier algorithm was set but length of OIDC_SUBJECT_TYPE_PAIRWISE_SALT is too small (%d < 8), please set OIDC_SUBJECT_TYPE_PAIRWISE_SALT to a random string with 8 characters or more`, len(c.SubjectIdentifierAlgorithmSalt))
 	}
 }
 

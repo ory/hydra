@@ -119,7 +119,7 @@ func (c *Config) GetSubjectTypesSupported() []string {
 func (c *Config) GetClusterURLWithoutTailingSlashOrFail(cmd *cobra.Command) string {
 	endpoint := c.GetClusterURLWithoutTailingSlash(cmd)
 	if endpoint == "" {
-		fmt.Println("To execute this command, the endpoint URL must point to the URL where ORY Hydra is located. To set the endpoint URL, use flag --endpoint or environment variable HYDRA_URL.")
+		fmt.Println("To execute this command, the endpoint URL must point to the URL where ORY Hydra is located. To set the endpoint URL, use flag --endpoint or environment variable HYDRA_URL or HYDRA_ADMIN_URL if an administrative command was used.")
 		os.Exit(1)
 	}
 	return endpoint

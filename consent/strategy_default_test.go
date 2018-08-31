@@ -111,6 +111,13 @@ func TestStrategy(t *testing.T) {
 	}).ToMapClaims(), jwt.NewHeaders())
 	require.NoError(t, err)
 
+	expiredAuthUserToken, _, err := jwts.Generate((jwt.IDTokenClaims{
+		Subject:   "user",
+		ExpiresAt: time.Now().Add(-time.Hour),
+		IssuedAt:  time.Now(),
+	}).ToMapClaims(), jwt.NewHeaders())
+	require.NoError(t, err)
+
 	cs := sessions.NewCookieStore([]byte("dummy-secret-yay"))
 	writer := herodot.NewJSONWriter(nil)
 	manager := NewMemoryManager(nil)
@@ -970,6 +977,17 @@ func TestStrategy(t *testing.T) {
 					IDToken:     map[string]interface{}{"bar": "baz"},
 				},
 			},
+		},
+		{
+			d:           "This should pass as regularly even though id_token_hint is expired",
+			req:         fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ClientID: "client-id", SectorIdentifierURI: "foo"}, Scopes: []string{"scope-a"}}},
+			jar:         newCookieJar(),
+			idTokenHint: expiredAuthUserToken,
+			lph:         passAuthentication(apiClient, false),
+			cph:         passAuthorization(apiClient, false),
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
 		},
 
 		// Pairwise auth

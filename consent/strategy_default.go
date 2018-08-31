@@ -146,7 +146,8 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 	}
 
 	token, err := s.JWTStrategy.Decode(idTokenHint)
-	if err != nil {
+	if ve, ok := errors.Cause(err).(*jwtgo.ValidationError); err == nil || (ok && ve.Errors == jwtgo.ValidationErrorExpired) {
+	} else {
 		return err
 	}
 
@@ -205,7 +206,8 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 
 	var idTokenHintClaims jwtgo.MapClaims
 	if idTokenHint := ar.GetRequestForm().Get("id_token_hint"); len(idTokenHint) > 0 {
-		if token, err := s.JWTStrategy.Decode(idTokenHint); err == nil {
+		token, err := s.JWTStrategy.Decode(idTokenHint)
+		if ve, ok := errors.Cause(err).(*jwtgo.ValidationError); err == nil || (ok && ve.Errors == jwtgo.ValidationErrorExpired) {
 			if hintClaims, ok := token.Claims.(jwtgo.MapClaims); ok {
 				idTokenHintClaims = hintClaims
 			}

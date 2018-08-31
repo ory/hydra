@@ -99,7 +99,7 @@ before finalizing the upgrade process.
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## 1.0.0-rc.1
+## 1.0.0-beta.9
 
 ### CORS is disabled by default
 

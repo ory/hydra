@@ -41,6 +41,7 @@ import (
 	"github.com/ory/hydra/health"
 	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/tracing"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -53,43 +54,50 @@ type Config struct {
 	EndpointURL string `mapstructure:"HYDRA_URL" yaml:"-"`
 
 	// These are used by the host command
-	FrontendBindPort                 int    `mapstructure:"PUBLIC_PORT" yaml:"-"`
-	FrontendBindHost                 string `mapstructure:"PUBLIC_HOST" yaml:"-"`
-	BackendBindPort                  int    `mapstructure:"ADMIN_PORT" yaml:"-"`
-	BackendBindHost                  string `mapstructure:"ADMIN_HOST" yaml:"-"`
-	Issuer                           string `mapstructure:"OAUTH2_ISSUER_URL" yaml:"-"`
-	SystemSecret                     string `mapstructure:"SYSTEM_SECRET" yaml:"-"`
-	RotatedSystemSecret              string `mapstructure:"ROTATED_SYSTEM_SECRET" yaml:"-"`
-	DatabaseURL                      string `mapstructure:"DATABASE_URL" yaml:"-"`
-	DatabasePlugin                   string `mapstructure:"DATABASE_PLUGIN" yaml:"-"`
-	ConsentURL                       string `mapstructure:"OAUTH2_CONSENT_URL" yaml:"-"`
-	LoginURL                         string `mapstructure:"OAUTH2_LOGIN_URL" yaml:"-"`
-	LogoutRedirectURL                string `mapstructure:"OAUTH2_LOGOUT_REDIRECT_URL" yaml:"-"`
-	DefaultClientScope               string `mapstructure:"OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE" yaml:"-"`
-	ErrorURL                         string `mapstructure:"OAUTH2_ERROR_URL" yaml:"-"`
-	AllowTLSTermination              string `mapstructure:"HTTPS_ALLOW_TERMINATION_FROM" yaml:"-"`
-	BCryptWorkFactor                 int    `mapstructure:"BCRYPT_COST" yaml:"-"`
-	AccessTokenLifespan              string `mapstructure:"ACCESS_TOKEN_LIFESPAN" yaml:"-"`
-	ScopeStrategy                    string `mapstructure:"SCOPE_STRATEGY" yaml:"-"`
-	AuthCodeLifespan                 string `mapstructure:"AUTH_CODE_LIFESPAN" yaml:"-"`
-	IDTokenLifespan                  string `mapstructure:"ID_TOKEN_LIFESPAN" yaml:"-"`
-	ChallengeTokenLifespan           string `mapstructure:"CHALLENGE_TOKEN_LIFESPAN" yaml:"-"`
-	CookieSecret                     string `mapstructure:"COOKIE_SECRET" yaml:"-"`
-	LogLevel                         string `mapstructure:"LOG_LEVEL" yaml:"-"`
-	LogFormat                        string `mapstructure:"LOG_FORMAT" yaml:"-"`
-	AccessControlResourcePrefix      string `mapstructure:"RESOURCE_NAME_PREFIX" yaml:"-"`
-	SubjectTypesSupported            string `mapstructure:"OIDC_SUBJECT_TYPES_SUPPORTED" yaml:"-"`
-	SubjectIdentifierAlgorithmSalt   string `mapstructure:"OIDC_SUBJECT_TYPE_PAIRWISE_SALT" yaml:"-"`
-	OpenIDDiscoveryClaimsSupported   string `mapstructure:"OIDC_DISCOVERY_CLAIMS_SUPPORTED" yaml:"-"`
-	OpenIDDiscoveryScopesSupported   string `mapstructure:"OIDC_DISCOVERY_SCOPES_SUPPORTED" yaml:"-"`
-	OpenIDDiscoveryUserinfoEndpoint  string `mapstructure:"OIDC_DISCOVERY_USERINFO_ENDPOINT" yaml:"-"`
-	SendOAuth2DebugMessagesToClients bool   `mapstructure:"OAUTH2_SHARE_ERROR_DEBUG" yaml:"-"`
-	OAuth2AccessTokenStrategy        string `mapstructure:"OAUTH2_ACCESS_TOKEN_STRATEGY" yaml:"-"`
-	ForceHTTP                        bool   `yaml:"-"`
+	FrontendBindPort                 int     `mapstructure:"PUBLIC_PORT" yaml:"-"`
+	FrontendBindHost                 string  `mapstructure:"PUBLIC_HOST" yaml:"-"`
+	BackendBindPort                  int     `mapstructure:"ADMIN_PORT" yaml:"-"`
+	BackendBindHost                  string  `mapstructure:"ADMIN_HOST" yaml:"-"`
+	Issuer                           string  `mapstructure:"OAUTH2_ISSUER_URL" yaml:"-"`
+	SystemSecret                     string  `mapstructure:"SYSTEM_SECRET" yaml:"-"`
+	RotatedSystemSecret              string  `mapstructure:"ROTATED_SYSTEM_SECRET" yaml:"-"`
+	DatabaseURL                      string  `mapstructure:"DATABASE_URL" yaml:"-"`
+	DatabasePlugin                   string  `mapstructure:"DATABASE_PLUGIN" yaml:"-"`
+	ConsentURL                       string  `mapstructure:"OAUTH2_CONSENT_URL" yaml:"-"`
+	LoginURL                         string  `mapstructure:"OAUTH2_LOGIN_URL" yaml:"-"`
+	LogoutRedirectURL                string  `mapstructure:"OAUTH2_LOGOUT_REDIRECT_URL" yaml:"-"`
+	DefaultClientScope               string  `mapstructure:"OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE" yaml:"-"`
+	ErrorURL                         string  `mapstructure:"OAUTH2_ERROR_URL" yaml:"-"`
+	AllowTLSTermination              string  `mapstructure:"HTTPS_ALLOW_TERMINATION_FROM" yaml:"-"`
+	BCryptWorkFactor                 int     `mapstructure:"BCRYPT_COST" yaml:"-"`
+	AccessTokenLifespan              string  `mapstructure:"ACCESS_TOKEN_LIFESPAN" yaml:"-"`
+	ScopeStrategy                    string  `mapstructure:"SCOPE_STRATEGY" yaml:"-"`
+	AuthCodeLifespan                 string  `mapstructure:"AUTH_CODE_LIFESPAN" yaml:"-"`
+	IDTokenLifespan                  string  `mapstructure:"ID_TOKEN_LIFESPAN" yaml:"-"`
+	ChallengeTokenLifespan           string  `mapstructure:"CHALLENGE_TOKEN_LIFESPAN" yaml:"-"`
+	CookieSecret                     string  `mapstructure:"COOKIE_SECRET" yaml:"-"`
+	LogLevel                         string  `mapstructure:"LOG_LEVEL" yaml:"-"`
+	LogFormat                        string  `mapstructure:"LOG_FORMAT" yaml:"-"`
+	AccessControlResourcePrefix      string  `mapstructure:"RESOURCE_NAME_PREFIX" yaml:"-"`
+	SubjectTypesSupported            string  `mapstructure:"OIDC_SUBJECT_TYPES_SUPPORTED" yaml:"-"`
+	SubjectIdentifierAlgorithmSalt   string  `mapstructure:"OIDC_SUBJECT_TYPE_PAIRWISE_SALT" yaml:"-"`
+	OpenIDDiscoveryClaimsSupported   string  `mapstructure:"OIDC_DISCOVERY_CLAIMS_SUPPORTED" yaml:"-"`
+	OpenIDDiscoveryScopesSupported   string  `mapstructure:"OIDC_DISCOVERY_SCOPES_SUPPORTED" yaml:"-"`
+	OpenIDDiscoveryUserinfoEndpoint  string  `mapstructure:"OIDC_DISCOVERY_USERINFO_ENDPOINT" yaml:"-"`
+	SendOAuth2DebugMessagesToClients bool    `mapstructure:"OAUTH2_SHARE_ERROR_DEBUG" yaml:"-"`
+	OAuth2AccessTokenStrategy        string  `mapstructure:"OAUTH2_ACCESS_TOKEN_STRATEGY" yaml:"-"`
+	TracingProvider                  string  `mapstructure:"TRACING_PROVIDER" yaml:"-"`
+	TracingServiceName               string  `mapstructure:"TRACING_SERVICE_NAME" yaml:"-"`
+	JaegerSamplingServerUrl          string  `mapstructure:"TRACING_PROVIDER_JAEGER_SAMPLING_SERVER_URL" yaml:"-"`
+	JaegerLocalAgentHostPort         string  `mapstructure:"TRACING_PROVIDER_JAEGER_LOCAL_AGENT_HOST_PORT" yaml:"-"`
+	JaegerSamplingType               string  `mapstructure:"TRACING_PROVIDER_JAEGER_SAMPLING_TYPE" yaml:"-"`
+	JaegerSamplingValue              float64 `mapstructure:"TRACING_PROVIDER_JAEGER_SAMPLING_VALUE" yaml:"-"`
+	ForceHTTP                        bool    `yaml:"-"`
 
 	BuildVersion string                     `yaml:"-"`
 	BuildHash    string                     `yaml:"-"`
 	BuildTime    string                     `yaml:"-"`
+	tracer       *tracing.Tracer            `yaml:"-"`
 	logger       *logrus.Logger             `yaml:"-"`
 	prometheus   *prometheus.MetricsManager `yaml:"-"`
 	cluster      *url.URL                   `yaml:"-"`
@@ -185,6 +193,28 @@ func (c *Config) GetLogger() *logrus.Logger {
 	}
 
 	return c.logger
+}
+
+func (c *Config) GetTracer() *tracing.Tracer {
+	if c.tracer == nil {
+		c.GetLogger().Info("Setting up tracing middleware")
+
+		c.tracer = &tracing.Tracer{
+			ServiceName: c.TracingServiceName,
+			JaegerConfig: &tracing.JaegerConfig{
+				LocalAgentHostPort: c.JaegerLocalAgentHostPort,
+				SamplerType:        c.JaegerSamplingType,
+				SamplerValue:       c.JaegerSamplingValue,
+				SamplerServerUrl:   c.JaegerSamplingServerUrl,
+			},
+			Provider: c.TracingProvider,
+			Logger:   c.GetLogger(),
+		}
+
+		c.tracer.Setup()
+	}
+
+	return c.tracer
 }
 
 func (c *Config) GetPrometheusMetrics() *prometheus.MetricsManager {

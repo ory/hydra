@@ -45,6 +45,7 @@ func (t *Tracer) Setup() {
 
 		if err != nil {
 			t.Logger.Warnf("Could not initialize jaeger tracer: %s", err.Error())
+			return
 		}
 
 		t.closer = closer

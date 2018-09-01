@@ -201,7 +201,7 @@ func initConfig() {
 	viper.SetDefault("TRACING_PROVIDER", "")
 
 	viper.BindEnv("TRACING_PROVIDER_JAEGER_SAMPLING_SERVER_URL")
-	viper.SetDefault("TRACING_PROVIDER_JAEGER_SAMPLING_SERVER_URL", "http://localhost:5778/sampling")
+	viper.SetDefault("TRACING_PROVIDER_JAEGER_SAMPLING_SERVER_URL", "")
 
 	viper.BindEnv("TRACING_PROVIDER_JAEGER_SAMPLING_TYPE")
 	viper.SetDefault("TRACING_PROVIDER_JAEGER_SAMPLING_TYPE", "const")
@@ -210,10 +210,10 @@ func initConfig() {
 	viper.SetDefault("TRACING_PROVIDER_JAEGER_SAMPLING_VALUE", float64(1))
 
 	viper.BindEnv("TRACING_PROVIDER_JAEGER_LOCAL_AGENT_HOST_PORT")
-	viper.SetDefault("TRACING_PROVIDER_JAEGER_LOCAL_AGENT_HOST_PORT", "127.0.0.1:6831")
+	viper.SetDefault("TRACING_PROVIDER_JAEGER_LOCAL_AGENT_HOST_PORT", "")
 
 	viper.BindEnv("TRACING_SERVICE_NAME")
-	viper.SetDefault("TRACING_SERVICE_NAME", "Hydra")
+	viper.SetDefault("TRACING_SERVICE_NAME", "Ory Hydra")
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err != nil {

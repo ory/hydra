@@ -63,8 +63,8 @@ services:
 
   consent:
     environment:
-      - HYDRA_URL=http://hydra:4445
-    image: oryd/hydra-login-consent-node:v1.0.0-beta.7
+      - HYDRA_ADMIN_URL=http://hydra:4445
+    image: oryd/hydra-login-consent-node:v1.0.0-beta.9
     links:
       - hydra
     ports:

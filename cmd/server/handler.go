@@ -130,6 +130,11 @@ func setup(c *config.Config, cmd *cobra.Command, args []string, name string) (ha
 	handler = NewHandler(c, w)
 	handler.RegisterRoutes(frontend, backend)
 	c.ForceHTTP, _ = cmd.Flags().GetBool("dangerous-force-http")
+	tracer := c.GetTracer()
+
+	if tracer.IsLoaded() {
+		middlewares = append(middlewares, tracer)
+	}
 
 	if !c.ForceHTTP {
 		if c.Issuer == "" {
@@ -206,6 +211,13 @@ func serve(c *config.Config, cmd *cobra.Command, handler http.Handler, address s
 		TLSConfig: &tls.Config{
 			Certificates: []tls.Certificate{cert},
 		},
+	})
+
+	srv.RegisterOnShutdown(func() {
+		tracer := c.GetTracer()
+		if tracer.IsLoaded() {
+			tracer.Close()
+		}
 	})
 
 	err := graceful.Graceful(func() error {

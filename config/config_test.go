@@ -71,6 +71,25 @@ func TestDoesRequestSatisfyTermination(t *testing.T) {
 	assert.NoError(t, c.DoesRequestSatisfyTermination(r))
 }
 
+func TestTracingSetup(t *testing.T) {
+	// tracer is not loaded if an unknown tracing provider is specified
+	c := &Config{TracingProvider: "some_tracing_provider"}
+	assert.False(t, c.GetTracer().IsLoaded())
+
+	// tracer is not loaded if no tracing provider is specified
+	c = &Config{TracingProvider: ""}
+	assert.False(t, c.GetTracer().IsLoaded())
+
+	// tracer is loaded if configured properly
+	c = &Config{
+		TracingProvider:          "jaeger",
+		TracingServiceName:       "Ory Hydra",
+		JaegerSamplingServerUrl:  "http://localhost:5778/sampling",
+		JaegerLocalAgentHostPort: "127.0.0.1:6831",
+	}
+	assert.True(t, c.GetTracer().IsLoaded())
+}
+
 func TestSystemSecret(t *testing.T) {
 	c3 := &Config{}
 	assert.EqualValues(t, c3.GetSystemSecret(), c3.GetSystemSecret())

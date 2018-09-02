@@ -2,6 +2,7 @@ package tracing
 
 import (
 	"io"
+	"strings"
 
 	"github.com/opentracing/opentracing-go"
 	"github.com/sirupsen/logrus"
@@ -26,7 +27,7 @@ type JaegerConfig struct {
 }
 
 func (t *Tracer) Setup() {
-	switch t.Provider {
+	switch strings.ToLower(t.Provider) {
 	case "jaeger":
 		jc := jeagerConf.Configuration{
 			Sampler: &jeagerConf.SamplerConfig{
@@ -44,17 +45,17 @@ func (t *Tracer) Setup() {
 		)
 
 		if err != nil {
-			t.Logger.Warnf("Could not initialize jaeger tracer: %s", err.Error())
+			t.Logger.Errorf("Could not initialize jaeger tracer: %s", err.Error())
 			return
 		}
 
 		t.closer = closer
 		t.tracer = opentracing.GlobalTracer()
 		t.Logger.Infof("Jaeger tracer configured!")
+	case "":
+		t.Logger.Infof("No tracer configured - skipping tracing setup")
 	default:
-		if len(t.Provider) > 0 {
-			t.Logger.Warnf("Unknown tracer %q - tracer not initialized", t.Provider)
-		}
+		t.Logger.Errorf("Unknown tracer: %s - tracer not initialized", t.Provider)
 	}
 }
 

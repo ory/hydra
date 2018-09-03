@@ -195,7 +195,7 @@ func (c *Config) GetLogger() *logrus.Logger {
 	return c.logger
 }
 
-func (c *Config) GetTracer() *tracing.Tracer {
+func (c *Config) GetTracer() (*tracing.Tracer, error) {
 	if c.tracer == nil {
 		c.GetLogger().Info("Setting up tracing middleware")
 
@@ -211,10 +211,10 @@ func (c *Config) GetTracer() *tracing.Tracer {
 			Logger:   c.GetLogger(),
 		}
 
-		c.tracer.Setup()
+		return c.tracer, c.tracer.Setup()
 	}
 
-	return c.tracer
+	return c.tracer, nil
 }
 
 func (c *Config) GetPrometheusMetrics() *prometheus.MetricsManager {

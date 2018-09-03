@@ -4,6 +4,9 @@ import (
 	"io"
 	"strings"
 
+	"errors"
+	"fmt"
+
 	"github.com/opentracing/opentracing-go"
 	"github.com/sirupsen/logrus"
 	jeagerConf "github.com/uber/jaeger-client-go/config"
@@ -26,7 +29,7 @@ type JaegerConfig struct {
 	SamplerServerUrl   string
 }
 
-func (t *Tracer) Setup() {
+func (t *Tracer) Setup() error {
 	switch strings.ToLower(t.Provider) {
 	case "jaeger":
 		jc := jeagerConf.Configuration{
@@ -45,8 +48,7 @@ func (t *Tracer) Setup() {
 		)
 
 		if err != nil {
-			t.Logger.Errorf("Could not initialize jaeger tracer: %s", err.Error())
-			return
+			return err
 		}
 
 		t.closer = closer
@@ -55,8 +57,9 @@ func (t *Tracer) Setup() {
 	case "":
 		t.Logger.Infof("No tracer configured - skipping tracing setup")
 	default:
-		t.Logger.Errorf("Unknown tracer: %s - tracer not initialized", t.Provider)
+		return errors.New(fmt.Sprintf("unknown tracer: %s", t.Provider))
 	}
+	return nil
 }
 
 func (t *Tracer) IsLoaded() bool {

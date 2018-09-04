@@ -35,5 +35,5 @@ func TestStart(t *testing.T) {
 			OAuth2AccessTokenStrategy: "opaque",
 		},
 	}
-	h.registerRoutes(router, router)
+	h.RegisterRoutes(router, router)
 }

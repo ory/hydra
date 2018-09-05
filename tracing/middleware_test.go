@@ -1,4 +1,4 @@
-package tracing
+package tracing_test
 
 import (
 	"net/http"
@@ -10,18 +10,23 @@ import (
 	"testing"
 
 	"github.com/opentracing/opentracing-go"
+	"github.com/ory/hydra/tracing"
 	"github.com/stretchr/testify/assert"
 	"github.com/urfave/negroni"
 )
 
-func TestTracingServeHttp(t *testing.T) {
-	opentracing.SetGlobalTracer(mocktracer.New())
-	tracer := &Tracer{
-		ServiceName: "Ory Hydra Test",
-		Provider:    "Mock Provider",
-		tracer:      opentracing.GlobalTracer(),
-	}
+var mockedTracer *mocktracer.MockTracer
+var tracer *tracing.Tracer = &tracing.Tracer{
+	ServiceName: "Ory Hydra Test",
+	Provider:    "Mock Provider",
+}
 
+func init() {
+	mockedTracer = mocktracer.New()
+	opentracing.SetGlobalTracer(mockedTracer)
+}
+
+func TestTracingServeHttp(t *testing.T) {
 	expectedTagsSuccess := map[string]interface{}{
 		string(ext.HTTPStatusCode): uint16(200),
 		string(ext.HTTPMethod):     "GET",
@@ -52,6 +57,7 @@ func TestTracingServeHttp(t *testing.T) {
 
 	for _, test := range testCases {
 		t.Run(test.testDescription, func(t *testing.T) {
+			defer mockedTracer.Reset()
 			request := httptest.NewRequest(http.MethodGet, "https://apis.somecompany.com/endpoint", nil)
 			next := func(rw http.ResponseWriter, _ *http.Request) {
 				rw.WriteHeader(test.httpStatus)
@@ -59,13 +65,33 @@ func TestTracingServeHttp(t *testing.T) {
 
 			tracer.ServeHTTP(negroni.NewResponseWriter(httptest.NewRecorder()), request, next)
 
-			mockTracer := tracer.tracer.(*mocktracer.MockTracer)
-			spans := mockTracer.FinishedSpans()
+			spans := mockedTracer.FinishedSpans()
 			assert.Len(t, spans, 1)
 			span := spans[0]
 
 			assert.Equal(t, test.expectedTags, span.Tags())
-			mockTracer.Reset()
 		})
 	}
+}
+
+func TestShouldContinueTraceIfAlreadyPresent(t *testing.T) {
+	defer mockedTracer.Reset()
+	parentSpan := mockedTracer.StartSpan("some-operation").(*mocktracer.MockSpan)
+	ext.SpanKindRPCClient.Set(parentSpan)
+	request := httptest.NewRequest(http.MethodGet, "https://apis.somecompany.com/endpoint", nil)
+	carrier := opentracing.HTTPHeadersCarrier(request.Header)
+	// this request now contains a trace initiated by another service/process (e.g. an edge proxy that fronts Hydra)
+	mockedTracer.Inject(parentSpan.Context(), opentracing.HTTPHeaders, carrier)
+
+	next := func(rw http.ResponseWriter, _ *http.Request) {
+		rw.WriteHeader(http.StatusOK)
+	}
+
+	tracer.ServeHTTP(negroni.NewResponseWriter(httptest.NewRecorder()), request, next)
+
+	spans := mockedTracer.FinishedSpans()
+	assert.Len(t, spans, 1)
+	span := spans[0]
+
+	assert.Equal(t, parentSpan.SpanContext.SpanID, span.ParentID)
 }

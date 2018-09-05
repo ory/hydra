@@ -15,7 +15,7 @@ func (t *Tracer) ServeHTTP(rw http.ResponseWriter, r *http.Request, next http.Ha
 	// It's very possible that Hydra is fronted by a proxy which could have initiated a trace.
 	// If so, we should attempt to join it.
 	remoteContext, err := opentracing.GlobalTracer().Extract(
-		opentracing.TextMap,
+		opentracing.HTTPHeaders,
 		opentracing.HTTPHeadersCarrier(r.Header),
 	)
 

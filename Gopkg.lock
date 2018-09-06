@@ -360,8 +360,8 @@
     ".",
     "dockertest"
   ]
-  revision = "55ff643dd57cca178e1689ff050f6e7f9122e72d"
-  version = "v0.0.6"
+  revision = "068c69998749cdb876c4adf179a8ed702864ad2b"
+  version = "v0.0.7"
 
 [[projects]]
   name = "github.com/pborman/uuid"

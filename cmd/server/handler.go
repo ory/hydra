@@ -51,12 +51,12 @@ import (
 
 var _ = &consent.Handler{}
 
-func enhanceRouter(c *config.Config, cmd *cobra.Command, serverHandler *Handler, router *httprouter.Router, middlewares []negroni.Handler, enableCors bool) http.Handler {
+func EnhanceRouter(c *config.Config, cmd *cobra.Command, serverHandler *Handler, router *httprouter.Router, middlewares []negroni.Handler, enableCors bool) http.Handler {
 	n := negroni.New()
 	for _, m := range middlewares {
 		n.Use(m)
 	}
-	n.UseFunc(serverHandler.rejectInsecureRequests)
+	n.UseFunc(serverHandler.RejectInsecureRequests)
 	n.UseHandler(router)
 	if enableCors {
 		c.GetLogger().Info("Enabled CORS")
@@ -78,7 +78,7 @@ func RunServeAdmin(c *config.Config) func(cmd *cobra.Command, args []string) {
 
 		cert := getOrCreateTLSCertificate(cmd, c)
 		// go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, frontend), c.GetFrontendAddress(), &wg)
-		go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, backend, mws, viper.GetString("CORS_ENABLED") == "true"), c.GetBackendAddress(), &wg, cert)
+		go serve(c, cmd, EnhanceRouter(c, cmd, serverHandler, backend, mws, viper.GetString("CORS_ENABLED") == "true"), c.GetBackendAddress(), &wg, cert)
 
 		wg.Wait()
 	}
@@ -94,7 +94,7 @@ func RunServePublic(c *config.Config) func(cmd *cobra.Command, args []string) {
 		wg.Add(2)
 
 		cert := getOrCreateTLSCertificate(cmd, c)
-		go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, frontend, mws, false), c.GetFrontendAddress(), &wg, cert)
+		go serve(c, cmd, EnhanceRouter(c, cmd, serverHandler, frontend, mws, false), c.GetFrontendAddress(), &wg, cert)
 		// go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, backend), c.GetBackendAddress(), &wg)
 
 		wg.Wait()
@@ -110,8 +110,8 @@ func RunServeAll(c *config.Config) func(cmd *cobra.Command, args []string) {
 		wg.Add(2)
 
 		cert := getOrCreateTLSCertificate(cmd, c)
-		go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, frontend, mws, false), c.GetFrontendAddress(), &wg, cert)
-		go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, backend, mws, viper.GetString("CORS_ENABLED") == "true"), c.GetBackendAddress(), &wg, cert)
+		go serve(c, cmd, EnhanceRouter(c, cmd, serverHandler, frontend, mws, false), c.GetFrontendAddress(), &wg, cert)
+		go serve(c, cmd, EnhanceRouter(c, cmd, serverHandler, backend, mws, viper.GetString("CORS_ENABLED") == "true"), c.GetBackendAddress(), &wg, cert)
 
 		wg.Wait()
 	}
@@ -128,7 +128,7 @@ func setup(c *config.Config, cmd *cobra.Command, args []string, name string) (ha
 	w.ErrorEnhancer = nil
 
 	handler = NewHandler(c, w)
-	handler.registerRoutes(frontend, backend)
+	handler.RegisterRoutes(frontend, backend)
 	c.ForceHTTP, _ = cmd.Flags().GetBool("dangerous-force-http")
 
 	if !c.ForceHTTP {
@@ -241,7 +241,7 @@ func NewHandler(c *config.Config, h herodot.Writer) *Handler {
 	return &Handler{Config: c, H: h}
 }
 
-func (h *Handler) registerRoutes(frontend, backend *httprouter.Router) {
+func (h *Handler) RegisterRoutes(frontend, backend *httprouter.Router) {
 	c := h.Config
 	ctx := c.Context()
 
@@ -262,7 +262,7 @@ func (h *Handler) registerRoutes(frontend, backend *httprouter.Router) {
 	_ = newHealthHandler(c, backend)
 }
 
-func (h *Handler) rejectInsecureRequests(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+func (h *Handler) RejectInsecureRequests(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	if r.TLS != nil || h.Config.ForceHTTP {
 		next.ServeHTTP(rw, r)
 		return

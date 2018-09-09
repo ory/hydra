@@ -213,7 +213,7 @@ func serve(c *config.Config, cmd *cobra.Command, handler http.Handler, address s
 		},
 	})
 
-	if tracer, _ := c.GetTracer(); tracer.IsLoaded() {
+	if tracer, err := c.GetTracer(); err == nil && tracer.IsLoaded() {
 		srv.RegisterOnShutdown(tracer.Close)
 	}
 

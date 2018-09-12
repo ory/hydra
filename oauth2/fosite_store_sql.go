@@ -265,7 +265,7 @@ func (s *FositeSQLStore) hashSignature(signature, table string) string {
 	return signature
 }
 
-func (s *FositeSQLStore) createSession(signature string, requester fosite.Requester, table string) error {
+func (s *FositeSQLStore) createSession(ctx context.Context, signature string, requester fosite.Requester, table string) error {
 	signature = s.hashSignature(signature, table)
 
 	data, err := sqlSchemaFromRequest(signature, requester, s.L)
@@ -285,7 +285,7 @@ func (s *FositeSQLStore) createSession(signature string, requester fosite.Reques
 	return nil
 }
 
-func (s *FositeSQLStore) findSessionBySignature(signature string, session fosite.Session, table string) (fosite.Requester, error) {
+func (s *FositeSQLStore) findSessionBySignature(ctx context.Context, signature string, session fosite.Session, table string) (fosite.Requester, error) {
 	signature = s.hashSignature(signature, table)
 
 	var d sqlData
@@ -306,7 +306,7 @@ func (s *FositeSQLStore) findSessionBySignature(signature string, session fosite
 	return d.toRequest(session, s.Manager, s.L)
 }
 
-func (s *FositeSQLStore) deleteSession(signature string, table string) error {
+func (s *FositeSQLStore) deleteSession(ctx context.Context, signature string, table string) error {
 	signature = s.hashSignature(signature, table)
 
 	if _, err := s.DB.Exec(s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE signature=?", table)), signature); err != nil {
@@ -324,24 +324,24 @@ func (s *FositeSQLStore) CreateSchemas() (int, error) {
 	return n, nil
 }
 
-func (s *FositeSQLStore) CreateOpenIDConnectSession(_ context.Context, signature string, requester fosite.Requester) error {
-	return s.createSession(signature, requester, sqlTableOpenID)
+func (s *FositeSQLStore) CreateOpenIDConnectSession(ctx context.Context, signature string, requester fosite.Requester) error {
+	return s.createSession(ctx, signature, requester, sqlTableOpenID)
 }
 
-func (s *FositeSQLStore) GetOpenIDConnectSession(_ context.Context, signature string, requester fosite.Requester) (fosite.Requester, error) {
-	return s.findSessionBySignature(signature, requester.GetSession(), sqlTableOpenID)
+func (s *FositeSQLStore) GetOpenIDConnectSession(ctx context.Context, signature string, requester fosite.Requester) (fosite.Requester, error) {
+	return s.findSessionBySignature(ctx, signature, requester.GetSession(), sqlTableOpenID)
 }
 
-func (s *FositeSQLStore) DeleteOpenIDConnectSession(_ context.Context, signature string) error {
-	return s.deleteSession(signature, sqlTableOpenID)
+func (s *FositeSQLStore) DeleteOpenIDConnectSession(ctx context.Context, signature string) error {
+	return s.deleteSession(ctx, signature, sqlTableOpenID)
 }
 
-func (s *FositeSQLStore) CreateAuthorizeCodeSession(_ context.Context, signature string, requester fosite.Requester) error {
-	return s.createSession(signature, requester, sqlTableCode)
+func (s *FositeSQLStore) CreateAuthorizeCodeSession(ctx context.Context, signature string, requester fosite.Requester) error {
+	return s.createSession(ctx, signature, requester, sqlTableCode)
 }
 
-func (s *FositeSQLStore) GetAuthorizeCodeSession(_ context.Context, signature string, session fosite.Session) (fosite.Requester, error) {
-	return s.findSessionBySignature(signature, session, sqlTableCode)
+func (s *FositeSQLStore) GetAuthorizeCodeSession(ctx context.Context, signature string, session fosite.Session) (fosite.Requester, error) {
+	return s.findSessionBySignature(ctx, signature, session, sqlTableCode)
 }
 
 func (s *FositeSQLStore) InvalidateAuthorizeCodeSession(ctx context.Context, signature string) error {
@@ -355,40 +355,40 @@ func (s *FositeSQLStore) InvalidateAuthorizeCodeSession(ctx context.Context, sig
 	return nil
 }
 
-func (s *FositeSQLStore) CreateAccessTokenSession(_ context.Context, signature string, requester fosite.Requester) error {
-	return s.createSession(signature, requester, sqlTableAccess)
+func (s *FositeSQLStore) CreateAccessTokenSession(ctx context.Context, signature string, requester fosite.Requester) error {
+	return s.createSession(ctx, signature, requester, sqlTableAccess)
 }
 
-func (s *FositeSQLStore) GetAccessTokenSession(_ context.Context, signature string, session fosite.Session) (fosite.Requester, error) {
-	return s.findSessionBySignature(signature, session, sqlTableAccess)
+func (s *FositeSQLStore) GetAccessTokenSession(ctx context.Context, signature string, session fosite.Session) (fosite.Requester, error) {
+	return s.findSessionBySignature(ctx, signature, session, sqlTableAccess)
 }
 
-func (s *FositeSQLStore) DeleteAccessTokenSession(_ context.Context, signature string) error {
-	return s.deleteSession(signature, sqlTableAccess)
+func (s *FositeSQLStore) DeleteAccessTokenSession(ctx context.Context, signature string) error {
+	return s.deleteSession(ctx, signature, sqlTableAccess)
 }
 
-func (s *FositeSQLStore) CreateRefreshTokenSession(_ context.Context, signature string, requester fosite.Requester) error {
-	return s.createSession(signature, requester, sqlTableRefresh)
+func (s *FositeSQLStore) CreateRefreshTokenSession(ctx context.Context, signature string, requester fosite.Requester) error {
+	return s.createSession(ctx, signature, requester, sqlTableRefresh)
 }
 
-func (s *FositeSQLStore) GetRefreshTokenSession(_ context.Context, signature string, session fosite.Session) (fosite.Requester, error) {
-	return s.findSessionBySignature(signature, session, sqlTableRefresh)
+func (s *FositeSQLStore) GetRefreshTokenSession(ctx context.Context, signature string, session fosite.Session) (fosite.Requester, error) {
+	return s.findSessionBySignature(ctx, signature, session, sqlTableRefresh)
 }
 
-func (s *FositeSQLStore) DeleteRefreshTokenSession(_ context.Context, signature string) error {
-	return s.deleteSession(signature, sqlTableRefresh)
+func (s *FositeSQLStore) DeleteRefreshTokenSession(ctx context.Context, signature string) error {
+	return s.deleteSession(ctx, signature, sqlTableRefresh)
 }
 
-func (s *FositeSQLStore) CreatePKCERequestSession(_ context.Context, signature string, requester fosite.Requester) error {
-	return s.createSession(signature, requester, sqlTablePKCE)
+func (s *FositeSQLStore) CreatePKCERequestSession(ctx context.Context, signature string, requester fosite.Requester) error {
+	return s.createSession(ctx, signature, requester, sqlTablePKCE)
 }
 
-func (s *FositeSQLStore) GetPKCERequestSession(_ context.Context, signature string, session fosite.Session) (fosite.Requester, error) {
-	return s.findSessionBySignature(signature, session, sqlTablePKCE)
+func (s *FositeSQLStore) GetPKCERequestSession(ctx context.Context, signature string, session fosite.Session) (fosite.Requester, error) {
+	return s.findSessionBySignature(ctx, signature, session, sqlTablePKCE)
 }
 
-func (s *FositeSQLStore) DeletePKCERequestSession(_ context.Context, signature string) error {
-	return s.deleteSession(signature, sqlTablePKCE)
+func (s *FositeSQLStore) DeletePKCERequestSession(ctx context.Context, signature string) error {
+	return s.deleteSession(ctx, signature, sqlTablePKCE)
 }
 
 func (s *FositeSQLStore) CreateImplicitAccessTokenSession(ctx context.Context, signature string, requester fosite.Requester) error {

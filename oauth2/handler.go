@@ -21,7 +21,6 @@
 package oauth2
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -342,7 +341,7 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 //       401: genericError
 //       500: genericError
 func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request) {
-	var ctx = fosite.NewContext()
+	var ctx = r.Context()
 
 	err := h.OAuth2.NewRevocationRequest(ctx, r)
 	if err != nil {
@@ -378,7 +377,7 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request) {
 //       500: genericError
 func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var session = NewSession("")
-	var ctx = fosite.NewContext()
+	var ctx = r.Context()
 
 	if r.Method != "POST" {
 		err := errors.WithStack(fosite.ErrInvalidRequest.WithHintf("HTTP method is \"%s\", expected \"POST\".", r.Method))
@@ -480,7 +479,7 @@ func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, _ httprou
 		fr.NotAfter = time.Now()
 	}
 
-	if err := h.Storage.FlushInactiveAccessTokens(context.Background(), fr.NotAfter); err != nil {
+	if err := h.Storage.FlushInactiveAccessTokens(r.Context(), fr.NotAfter); err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}
@@ -515,7 +514,7 @@ func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, _ httprou
 //       500: genericError
 func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	var session = NewSession("")
-	var ctx = fosite.NewContext()
+	var ctx = r.Context()
 
 	accessRequest, err := h.OAuth2.NewAccessRequest(ctx, r, session)
 	if err != nil {
@@ -577,7 +576,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 //       401: genericError
 //       500: genericError
 func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var ctx = fosite.NewContext()
+	var ctx = r.Context()
 
 	authorizeRequest, err := h.OAuth2.NewAuthorizeRequest(ctx, r)
 	if err != nil {

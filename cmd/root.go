@@ -197,6 +197,24 @@ func initConfig() {
 	viper.BindEnv("OIDC_SUBJECT_TYPE_PAIRWISE_SALT")
 	viper.SetDefault("OIDC_SUBJECT_TYPE_PAIRWISE_SALT", "public")
 
+	viper.BindEnv("TRACING_PROVIDER")
+	viper.SetDefault("TRACING_PROVIDER", "")
+
+	viper.BindEnv("TRACING_PROVIDER_JAEGER_SAMPLING_SERVER_URL")
+	viper.SetDefault("TRACING_PROVIDER_JAEGER_SAMPLING_SERVER_URL", "")
+
+	viper.BindEnv("TRACING_PROVIDER_JAEGER_SAMPLING_TYPE")
+	viper.SetDefault("TRACING_PROVIDER_JAEGER_SAMPLING_TYPE", "const")
+
+	viper.BindEnv("TRACING_PROVIDER_JAEGER_SAMPLING_VALUE")
+	viper.SetDefault("TRACING_PROVIDER_JAEGER_SAMPLING_VALUE", float64(1))
+
+	viper.BindEnv("TRACING_PROVIDER_JAEGER_LOCAL_AGENT_HOST_PORT")
+	viper.SetDefault("TRACING_PROVIDER_JAEGER_LOCAL_AGENT_HOST_PORT", "")
+
+	viper.BindEnv("TRACING_SERVICE_NAME")
+	viper.SetDefault("TRACING_SERVICE_NAME", "Ory Hydra")
+
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err != nil {
 		fmt.Printf(`Config file not found because "%s"`, err)

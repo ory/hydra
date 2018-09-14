@@ -44,8 +44,9 @@ type Handler struct {
 }
 
 const (
-	LoginPath   = "/oauth2/auth/requests/login"
-	ConsentPath = "/oauth2/auth/requests/consent"
+	LoginPath    = "/oauth2/auth/requests/login"
+	ConsentPath  = "/oauth2/auth/requests/consent"
+	SessionsPath = "/oauth2/auth/sessions"
 )
 
 func NewHandler(
@@ -71,12 +72,12 @@ func (h *Handler) SetRoutes(frontend, backend *httprouter.Router) {
 	backend.PUT(ConsentPath+"/:challenge/accept", h.AcceptConsentRequest)
 	backend.PUT(ConsentPath+"/:challenge/reject", h.RejectConsentRequest)
 
-	backend.DELETE("/oauth2/auth/sessions/login/:user", h.DeleteLoginSession)
-	backend.GET("/oauth2/auth/sessions/consent/:user", h.GetConsentSessions)
-	backend.DELETE("/oauth2/auth/sessions/consent/:user", h.DeleteUserConsentSession)
-	backend.DELETE("/oauth2/auth/sessions/consent/:user/:client", h.DeleteUserClientConsentSession)
+	backend.DELETE(SessionsPath+"/login/:user", h.DeleteLoginSession)
+	backend.GET(SessionsPath+"/consent/:user", h.GetConsentSessions)
+	backend.DELETE(SessionsPath+"/consent/:user", h.DeleteUserConsentSession)
+	backend.DELETE(SessionsPath+"/consent/:user/:client", h.DeleteUserClientConsentSession)
 
-	frontend.GET("/oauth2/auth/sessions/login/revoke", h.LogoutUser)
+	frontend.GET(SessionsPath+"/login/revoke", h.LogoutUser)
 }
 
 // swagger:route DELETE /oauth2/auth/sessions/consent/{user} oAuth2 revokeAllUserConsentSessions

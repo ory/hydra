@@ -48,7 +48,7 @@ func NewMemoryManager(hasher fosite.Hasher) *MemoryManager {
 	}
 }
 
-func (m *MemoryManager) GetConcreteClient(id string) (*Client, error) {
+func (m *MemoryManager) GetConcreteClient(ctx context.Context, id string) (*Client, error) {
 	m.RLock()
 	defer m.RUnlock()
 
@@ -61,12 +61,12 @@ func (m *MemoryManager) GetConcreteClient(id string) (*Client, error) {
 	return nil, errors.WithStack(sqlcon.ErrNoRows)
 }
 
-func (m *MemoryManager) GetClient(_ context.Context, id string) (fosite.Client, error) {
-	return m.GetConcreteClient(id)
+func (m *MemoryManager) GetClient(ctx context.Context, id string) (fosite.Client, error) {
+	return m.GetConcreteClient(ctx, id)
 }
 
-func (m *MemoryManager) UpdateClient(c *Client) error {
-	o, err := m.GetClient(context.Background(), c.GetID())
+func (m *MemoryManager) UpdateClient(ctx context.Context, c *Client) error {
+	o, err := m.GetClient(ctx, c.GetID())
 	if err != nil {
 		return err
 	}
@@ -95,11 +95,11 @@ func (m *MemoryManager) UpdateClient(c *Client) error {
 	return nil
 }
 
-func (m *MemoryManager) Authenticate(id string, secret []byte) (*Client, error) {
+func (m *MemoryManager) Authenticate(ctx context.Context, id string, secret []byte) (*Client, error) {
 	m.RLock()
 	defer m.RUnlock()
 
-	c, err := m.GetConcreteClient(id)
+	c, err := m.GetConcreteClient(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -111,8 +111,8 @@ func (m *MemoryManager) Authenticate(id string, secret []byte) (*Client, error) 
 	return c, nil
 }
 
-func (m *MemoryManager) CreateClient(c *Client) error {
-	if _, err := m.GetConcreteClient(c.GetID()); err == nil {
+func (m *MemoryManager) CreateClient(ctx context.Context, c *Client) error {
+	if _, err := m.GetConcreteClient(ctx, c.GetID()); err == nil {
 		return sqlcon.ErrUniqueViolation
 	}
 
@@ -129,7 +129,7 @@ func (m *MemoryManager) CreateClient(c *Client) error {
 	return nil
 }
 
-func (m *MemoryManager) DeleteClient(id string) error {
+func (m *MemoryManager) DeleteClient(ctx context.Context, id string) error {
 	m.Lock()
 	defer m.Unlock()
 
@@ -143,7 +143,7 @@ func (m *MemoryManager) DeleteClient(id string) error {
 	return nil
 }
 
-func (m *MemoryManager) GetClients(limit, offset int) (clients map[string]Client, err error) {
+func (m *MemoryManager) GetClients(ctx context.Context, limit, offset int) (clients map[string]Client, err error) {
 	m.RLock()
 	defer m.RUnlock()
 	clients = make(map[string]Client)

@@ -26,6 +26,8 @@ import (
 	"sync"
 	"testing"
 
+	"context"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
@@ -197,7 +199,7 @@ func TestMigrations(t *testing.T) {
 			for _, key := range []string{"1-data", "2-data", "3-data", "4-data", "5-data"} {
 				t.Run("client="+key, func(t *testing.T) {
 					s := &client.SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}
-					c, err := s.GetConcreteClient(key)
+					c, err := s.GetConcreteClient(context.TODO(), key)
 					require.NoError(t, err)
 					assert.EqualValues(t, c.GetID(), key)
 				})

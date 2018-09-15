@@ -59,7 +59,7 @@ func TestCORSMiddleware(t *testing.T) {
 		},
 		{
 			d: "should reject when basic auth but client does not exist",
-			mw: newCORSMiddleware(true, c, nil, func(id string) (*client.Client, error) {
+			mw: newCORSMiddleware(true, c, nil, func(ctx context.Context, id string) (*client.Client, error) {
 				return nil, errors.New("")
 			}),
 			code:         204,
@@ -68,7 +68,7 @@ func TestCORSMiddleware(t *testing.T) {
 		},
 		{
 			d: "should reject when basic auth client exists but origin not allowed",
-			mw: newCORSMiddleware(true, c, nil, func(id string) (*client.Client, error) {
+			mw: newCORSMiddleware(true, c, nil, func(ctx context.Context, id string) (*client.Client, error) {
 				return &client.Client{AllowedCORSOrigins: []string{"http://not-foobar.com"}}, nil
 			}),
 			code:         204,
@@ -77,7 +77,7 @@ func TestCORSMiddleware(t *testing.T) {
 		},
 		{
 			d: "should accept when basic auth client exists and origin allowed",
-			mw: newCORSMiddleware(true, c, nil, func(id string) (*client.Client, error) {
+			mw: newCORSMiddleware(true, c, nil, func(ctx context.Context, id string) (*client.Client, error) {
 				return &client.Client{AllowedCORSOrigins: []string{"http://foobar.com"}}, nil
 			}),
 			code:         204,
@@ -88,7 +88,7 @@ func TestCORSMiddleware(t *testing.T) {
 			d: "should fail when token introspection fails",
 			mw: newCORSMiddleware(true, c, func(ctx context.Context, token string, tokenType fosite.TokenType, session fosite.Session, scope ...string) (fosite.TokenType, fosite.AccessRequester, error) {
 				return "", nil, errors.New("")
-			}, func(id string) (*client.Client, error) {
+			}, func(ctx context.Context, id string) (*client.Client, error) {
 				return &client.Client{AllowedCORSOrigins: []string{"http://foobar.com"}}, nil
 			}),
 			code:         204,
@@ -102,7 +102,7 @@ func TestCORSMiddleware(t *testing.T) {
 					return "", nil, errors.New("")
 				}
 				return "", &fosite.AccessRequest{Request: fosite.Request{Client: &client.Client{ClientID: "asdf"}}}, nil
-			}, func(id string) (*client.Client, error) {
+			}, func(ctx context.Context, id string) (*client.Client, error) {
 				if id != "asdf" {
 					return nil, errors.New("")
 				}

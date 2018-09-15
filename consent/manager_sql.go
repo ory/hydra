@@ -26,6 +26,8 @@ import (
 	"strings"
 	"time"
 
+	"context"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
@@ -223,7 +225,7 @@ func (m *SQLManager) GetConsentRequest(challenge string) (*ConsentRequest, error
 		return nil, sqlcon.HandleError(err)
 	}
 
-	c, err := m.c.GetConcreteClient(d.Client)
+	c, err := m.c.GetConcreteClient(context.TODO(), d.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -258,7 +260,7 @@ func (m *SQLManager) GetAuthenticationRequest(challenge string) (*Authentication
 		return nil, sqlcon.HandleError(err)
 	}
 
-	c, err := m.c.GetConcreteClient(d.Client)
+	c, err := m.c.GetConcreteClient(context.TODO(), d.Client)
 	if err != nil {
 		return nil, err
 	}

@@ -34,6 +34,8 @@ import (
 	"testing"
 	"time"
 
+	"context"
+
 	djwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
@@ -80,7 +82,7 @@ func mockProvider(h *func(w http.ResponseWriter, r *http.Request)) *httptest.Ser
 }
 
 type clientCreator interface {
-	CreateClient(client *hc.Client) error
+	CreateClient(cxt context.Context, client *hc.Client) error
 }
 
 // TestAuthCodeWithDefaultStrategy runs proper integration tests against in-memory and database connectors, specifically
@@ -214,7 +216,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						RedirectURL: client.RedirectURIs[0], Scopes: []string{"hydra", "offline", "openid"},
 					}
 
-					require.NoError(t, fs.(clientCreator).CreateClient(&client))
+					require.NoError(t, fs.(clientCreator).CreateClient(context.TODO(), &client))
 					apiClient := swagger.NewOAuth2ApiWithBasePath(api.URL)
 
 					var callbackHandler *httprouter.Handle
@@ -757,7 +759,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 			})
 			m := sync.Mutex{}
 
-			store.CreateClient(&hc.Client{
+			store.CreateClient(context.TODO(), &hc.Client{
 				ClientID:      "app-client",
 				Secret:        "secret",
 				RedirectURIs:  []string{ts.URL + "/callback"},

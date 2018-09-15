@@ -115,7 +115,7 @@ func TestClientCredentials(t *testing.T) {
 				return h
 			})
 
-			require.NoError(t, store.CreateClient(&hc.Client{
+			require.NoError(t, store.CreateClient(context.TODO(), &hc.Client{
 				ClientID:      "app-client",
 				Secret:        "secret",
 				RedirectURIs:  []string{ts.URL + "/callback"},

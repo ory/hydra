@@ -21,25 +21,27 @@
 package client
 
 import (
+	"context"
+
 	"github.com/ory/fosite"
 )
 
 type Manager interface {
 	Storage
 
-	Authenticate(id string, secret []byte) (*Client, error)
+	Authenticate(ctx context.Context, id string, secret []byte) (*Client, error)
 }
 
 type Storage interface {
 	fosite.Storage
 
-	CreateClient(c *Client) error
+	CreateClient(ctx context.Context, c *Client) error
 
-	UpdateClient(c *Client) error
+	UpdateClient(ctx context.Context, c *Client) error
 
-	DeleteClient(id string) error
+	DeleteClient(ctx context.Context, id string) error
 
-	GetClients(limit, offset int) (map[string]Client, error)
+	GetClients(ctx context.Context, limit, offset int) (map[string]Client, error)
 
-	GetConcreteClient(id string) (*Client, error)
+	GetConcreteClient(ctx context.Context, id string) (*Client, error)
 }

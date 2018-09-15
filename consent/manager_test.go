@@ -28,6 +28,8 @@ import (
 	"testing"
 	"time"
 
+	"context"
+
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 	"github.com/ory/fosite"
@@ -279,7 +281,7 @@ func TestManagers(t *testing.T) {
 				} {
 					t.Run("key="+tc.key, func(t *testing.T) {
 						c, h := mockConsentRequest(tc.key, tc.remember, tc.rememberFor, tc.hasError, tc.skip, tc.authAt)
-						clientManager.CreateClient(c.Client) // Ignore errors that are caused by duplication
+						clientManager.CreateClient(context.TODO(), c.Client) // Ignore errors that are caused by duplication
 
 						_, err := m.GetConsentRequest("challenge" + tc.key)
 						require.Error(t, err)
@@ -348,7 +350,7 @@ func TestManagers(t *testing.T) {
 				} {
 					t.Run("key="+tc.key, func(t *testing.T) {
 						c, h := mockAuthRequest(tc.key, tc.authAt)
-						clientManager.CreateClient(c.Client) // Ignore errors that are caused by duplication
+						clientManager.CreateClient(context.TODO(), c.Client) // Ignore errors that are caused by duplication
 
 						_, err := m.GetAuthenticationRequest("challenge" + tc.key)
 						require.Error(t, err)
@@ -429,8 +431,8 @@ func TestManagers(t *testing.T) {
 		for k, m := range managers {
 			cr1, hcr1 := mockConsentRequest("rv1", false, 0, false, false, false)
 			cr2, hcr2 := mockConsentRequest("rv2", false, 0, false, false, false)
-			clientManager.CreateClient(cr1.Client)
-			clientManager.CreateClient(cr2.Client)
+			clientManager.CreateClient(context.TODO(), cr1.Client)
+			clientManager.CreateClient(context.TODO(), cr2.Client)
 
 			require.NoError(t, m.CreateConsentRequest(cr1))
 			require.NoError(t, m.CreateConsentRequest(cr2))
@@ -500,8 +502,8 @@ func TestManagers(t *testing.T) {
 		for k, m := range managers {
 			cr1, hcr1 := mockConsentRequest("rv1", true, 0, false, false, false)
 			cr2, hcr2 := mockConsentRequest("rv2", false, 0, false, false, false)
-			clientManager.CreateClient(cr1.Client)
-			clientManager.CreateClient(cr2.Client)
+			clientManager.CreateClient(context.TODO(), cr1.Client)
+			clientManager.CreateClient(context.TODO(), cr2.Client)
 
 			require.NoError(t, m.CreateConsentRequest(cr1))
 			require.NoError(t, m.CreateConsentRequest(cr2))

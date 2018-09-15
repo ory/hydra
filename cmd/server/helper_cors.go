@@ -36,7 +36,7 @@ import (
 func newCORSMiddleware(
 	enable bool, c *config.Config,
 	o func(ctx context.Context, token string, tokenType fosite.TokenType, session fosite.Session, scope ...string) (fosite.TokenType, fosite.AccessRequester, error),
-	clm func(id string) (*client.Client, error),
+	clm func(ctx context.Context, id string) (*client.Client, error),
 ) func(h http.Handler) http.Handler {
 	if !enable {
 		return func(h http.Handler) http.Handler {
@@ -76,7 +76,7 @@ func newCORSMiddleware(
 				username = ar.GetClient().GetID()
 			}
 
-			cl, err := clm(username)
+			cl, err := clm(r.Context(), username)
 			if err != nil {
 				return false
 			}

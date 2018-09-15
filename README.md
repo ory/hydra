@@ -201,13 +201,13 @@ hydra help
 
 ## Ecosystem
 
-<a href="https://console.ory.am/auth/login">
+<a href="https://console.ory.sh/">
     <img align="right" width="30%" src="docs/images/sec-console.png" alt="ORY Security Console">
 </a>
 
 ### ORY Security Console: Administrative User Interface
 
-The [ORY Security Console](https://console.ory.am/auth/login) is a visual admin interface for managing ORY Hydra,
+The [ORY Security Console](https://console.ory.sh/) is a visual admin interface for managing ORY Hydra,
 ORY Oathkeeper, and ORY Keto.
 
 ### ORY Oathkeeper: Identity & Access Proxy

@@ -24,6 +24,8 @@ import (
 	"crypto/x509"
 	"testing"
 
+	"context"
+
 	"github.com/ory/fosite"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -32,6 +34,7 @@ import (
 
 func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
 	return func(t *testing.T) {
+		ctx := context.TODO()
 		t.Parallel()
 		c := &Client{
 			ClientID:          "foo",
@@ -39,25 +42,26 @@ func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
 			RedirectURIs:      []string{"http://redirect"},
 			TermsOfServiceURI: "foo",
 		}
-		assert.NoError(t, m.CreateClient(c))
+		assert.NoError(t, m.CreateClient(ctx, c))
 		//assert.NotEmpty(t, c.ID)
-		assert.NoError(t, m.DeleteClient(c.GetID()))
+		assert.NoError(t, m.DeleteClient(ctx, c.GetID()))
 	}
 }
 
 func TestHelperClientAuthenticate(k string, m Manager) func(t *testing.T) {
 	return func(t *testing.T) {
+		ctx := context.TODO()
 		t.Parallel()
-		m.CreateClient(&Client{
+		m.CreateClient(ctx, &Client{
 			ClientID:     "1234321",
 			Secret:       "secret",
 			RedirectURIs: []string{"http://redirect"},
 		})
 
-		c, err := m.Authenticate("1234321", []byte("secret1"))
+		c, err := m.Authenticate(ctx, "1234321", []byte("secret1"))
 		require.NotNil(t, err)
 
-		c, err = m.Authenticate("1234321", []byte("secret"))
+		c, err = m.Authenticate(ctx, "1234321", []byte("secret"))
 		require.NoError(t, err)
 		assert.Equal(t, "1234321", c.GetID())
 	}
@@ -68,6 +72,8 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 		t.Parallel()
 		_, err := m.GetClient(nil, "4321")
 		assert.NotNil(t, err)
+
+		ctx := context.TODO()
 
 		c := &Client{
 			ClientID:                      "1234",
@@ -94,13 +100,13 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 			UserinfoSignedResponseAlg:     "RS256",
 		}
 
-		assert.NoError(t, m.CreateClient(c))
+		assert.NoError(t, m.CreateClient(ctx, c))
 		assert.Equal(t, c.GetID(), "1234")
 		if k != "http" {
 			assert.NotEmpty(t, c.GetHashedSecret())
 		}
 
-		assert.NoError(t, m.CreateClient(&Client{
+		assert.NoError(t, m.CreateClient(ctx, &Client{
 			ClientID:          "2-1234",
 			Name:              "name",
 			Secret:            "secret",
@@ -114,7 +120,7 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 
 		compare(t, c, d, k)
 
-		ds, err := m.GetClients(100, 0)
+		ds, err := m.GetClients(ctx, 100, 0)
 		assert.NoError(t, err)
 		assert.Len(t, ds, 2)
 		assert.NotEqual(t, ds["1234"].ClientID, ds["2-1234"].ClientID)
@@ -124,15 +130,15 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 		assert.Equal(t, ds["1234"].SecretExpiresAt, 0)
 		assert.Equal(t, ds["2-1234"].SecretExpiresAt, 1)
 
-		ds, err = m.GetClients(1, 0)
+		ds, err = m.GetClients(ctx, 1, 0)
 		assert.NoError(t, err)
 		assert.Len(t, ds, 1)
 
-		ds, err = m.GetClients(100, 100)
+		ds, err = m.GetClients(ctx, 100, 100)
 		assert.NoError(t, err)
 		assert.Len(t, ds, 0)
 
-		err = m.UpdateClient(&Client{
+		err = m.UpdateClient(ctx, &Client{
 			ClientID:          "2-1234",
 			Name:              "name-new",
 			Secret:            "secret-new",
@@ -141,7 +147,7 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		nc, err := m.GetConcreteClient("2-1234")
+		nc, err := m.GetConcreteClient(ctx, "2-1234")
 		require.NoError(t, err)
 
 		if k != "http" {
@@ -153,7 +159,7 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 		assert.EqualValues(t, []string{"http://redirect/new"}, nc.GetRedirectURIs())
 		assert.Zero(t, len(nc.Contacts))
 
-		err = m.DeleteClient("1234")
+		err = m.DeleteClient(ctx, "1234")
 		assert.NoError(t, err)
 
 		_, err = m.GetClient(nil, "1234")

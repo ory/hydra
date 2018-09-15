@@ -336,7 +336,7 @@ func (m *SQLManager) CreateSchemas() (int, error) {
 	return n, nil
 }
 
-func (m *SQLManager) GetConcreteClient(id string) (*Client, error) {
+func (m *SQLManager) GetConcreteClient(ctx context.Context, id string) (*Client, error) {
 	var d sqlData
 	if err := m.DB.Get(&d, m.DB.Rebind("SELECT * FROM hydra_client WHERE id=?"), id); err != nil {
 		return nil, sqlcon.HandleError(err)
@@ -345,11 +345,11 @@ func (m *SQLManager) GetConcreteClient(id string) (*Client, error) {
 	return d.ToClient()
 }
 
-func (m *SQLManager) GetClient(_ context.Context, id string) (fosite.Client, error) {
-	return m.GetConcreteClient(id)
+func (m *SQLManager) GetClient(ctx context.Context, id string) (fosite.Client, error) {
+	return m.GetConcreteClient(ctx, id)
 }
 
-func (m *SQLManager) UpdateClient(c *Client) error {
+func (m *SQLManager) UpdateClient(ctx context.Context, c *Client) error {
 	o, err := m.GetClient(context.Background(), c.GetID())
 	if err != nil {
 		return errors.WithStack(err)
@@ -381,8 +381,8 @@ func (m *SQLManager) UpdateClient(c *Client) error {
 	return nil
 }
 
-func (m *SQLManager) Authenticate(id string, secret []byte) (*Client, error) {
-	c, err := m.GetConcreteClient(id)
+func (m *SQLManager) Authenticate(ctx context.Context, id string, secret []byte) (*Client, error) {
+	c, err := m.GetConcreteClient(ctx, id)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -394,7 +394,7 @@ func (m *SQLManager) Authenticate(id string, secret []byte) (*Client, error) {
 	return c, nil
 }
 
-func (m *SQLManager) CreateClient(c *Client) error {
+func (m *SQLManager) CreateClient(ctx context.Context, c *Client) error {
 	h, err := m.Hasher.Hash([]byte(c.Secret))
 	if err != nil {
 		return errors.WithStack(err)
@@ -417,14 +417,14 @@ func (m *SQLManager) CreateClient(c *Client) error {
 	return nil
 }
 
-func (m *SQLManager) DeleteClient(id string) error {
+func (m *SQLManager) DeleteClient(ctx context.Context, id string) error {
 	if _, err := m.DB.Exec(m.DB.Rebind(`DELETE FROM hydra_client WHERE id=?`), id); err != nil {
 		return sqlcon.HandleError(err)
 	}
 	return nil
 }
 
-func (m *SQLManager) GetClients(limit, offset int) (clients map[string]Client, err error) {
+func (m *SQLManager) GetClients(ctx context.Context, limit, offset int) (clients map[string]Client, err error) {
 	d := make([]sqlData, 0)
 	clients = make(map[string]Client)
 

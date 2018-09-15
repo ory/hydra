@@ -107,7 +107,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	}
 
 	secret := c.Secret
-	if err := h.Manager.CreateClient(&c); err != nil {
+	if err := h.Manager.CreateClient(r.Context(), &c); err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}
@@ -159,7 +159,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		return
 	}
 
-	if err := h.Manager.UpdateClient(&c); err != nil {
+	if err := h.Manager.UpdateClient(r.Context(), &c); err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}
@@ -191,7 +191,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //       500: genericError
 func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	limit, offset := pagination.Parse(r, 100, 0, 500)
-	c, err := h.Manager.GetClients(limit, offset)
+	c, err := h.Manager.GetClients(r.Context(), limit, offset)
 	if err != nil {
 		h.H.WriteError(w, r, err)
 		return
@@ -233,7 +233,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 
-	c, err := h.Manager.GetConcreteClient(id)
+	c, err := h.Manager.GetConcreteClient(r.Context(), id)
 	if err != nil {
 		h.H.WriteError(w, r, err)
 		return
@@ -267,7 +267,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 
-	if err := h.Manager.DeleteClient(id); err != nil {
+	if err := h.Manager.DeleteClient(r.Context(), id); err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}

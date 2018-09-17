@@ -23,6 +23,8 @@ package jwk
 import (
 	"testing"
 
+	"context"
+
 	jwt2 "github.com/dgrijalva/jwt-go"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/stretchr/testify/assert"
@@ -39,7 +41,7 @@ func TestRS256JWTStrategy(t *testing.T) {
 
 	ks, err := testGenerator.Generate("foo", "sig")
 	require.NoError(t, err)
-	require.NoError(t, m.AddKeySet("foo-set", ks))
+	require.NoError(t, m.AddKeySet(context.TODO(), "foo-set", ks))
 
 	s, err := NewRS256JWTStrategy(m, "foo-set")
 	require.NoError(t, err)
@@ -57,7 +59,7 @@ func TestRS256JWTStrategy(t *testing.T) {
 
 	ks, err = testGenerator.Generate("bar", "sig")
 	require.NoError(t, err)
-	require.NoError(t, m.AddKeySet("foo-set", ks))
+	require.NoError(t, m.AddKeySet(context.TODO(), "foo-set", ks))
 
 	a, b, err = s.Generate(jwt2.MapClaims{"foo": "bar"}, &jwt.Headers{})
 	require.NoError(t, err)

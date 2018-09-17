@@ -24,6 +24,8 @@ import (
 	"crypto/ecdsa"
 	"crypto/rsa"
 
+	"context"
+
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/pkg"
@@ -36,7 +38,7 @@ func createOrGetJWK(c *config.Config, set string, kid string, prefix string) (ke
 
 	expectDependency(c.GetLogger(), ctx.KeyManager)
 
-	keys, err := ctx.KeyManager.GetKeySet(set)
+	keys, err := ctx.KeyManager.GetKeySet(context.TODO(), set)
 	if errors.Cause(err) == pkg.ErrNotFound || keys != nil && len(keys.Keys) == 0 {
 		c.GetLogger().Infof("JSON Web Key Set %s does not exist yet, generating new key pair...", set)
 		keys, err = createJWKS(ctx, set, kid)
@@ -77,7 +79,7 @@ func createJWKS(ctx *config.Context, set, kid string) (*jose.JSONWebKeySet, erro
 		keys.Keys[i] = k
 	}
 
-	err = ctx.KeyManager.AddKeySet(set, keys)
+	err = ctx.KeyManager.AddKeySet(context.TODO(), set, keys)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not persist %s key", set)
 	}

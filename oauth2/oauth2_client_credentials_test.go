@@ -87,7 +87,7 @@ func TestClientCredentials(t *testing.T) {
 			jm := &jwk.MemoryManager{Keys: map[string]*jose.JSONWebKeySet{}}
 			keys, err := (&jwk.RS256Generator{}).Generate("", "sig")
 			require.NoError(t, err)
-			require.NoError(t, jm.AddKeySet(OpenIDConnectKeyName, keys))
+			require.NoError(t, jm.AddKeySet(context.TODO(), OpenIDConnectKeyName, keys))
 			jwtStrategy, err := jwk.NewRS256JWTStrategy(jm, OpenIDConnectKeyName)
 
 			ts := httptest.NewServer(router)

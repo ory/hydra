@@ -26,6 +26,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"context"
+
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
@@ -37,7 +39,7 @@ type MemoryManager struct {
 	sync.RWMutex
 }
 
-func (m *MemoryManager) AddKey(set string, key *jose.JSONWebKey) error {
+func (m *MemoryManager) AddKey(ctx context.Context, set string, key *jose.JSONWebKey) error {
 	m.Lock()
 	defer m.Unlock()
 
@@ -60,14 +62,14 @@ func (m *MemoryManager) AddKey(set string, key *jose.JSONWebKey) error {
 	return nil
 }
 
-func (m *MemoryManager) AddKeySet(set string, keys *jose.JSONWebKeySet) error {
+func (m *MemoryManager) AddKeySet(ctx context.Context, set string, keys *jose.JSONWebKeySet) error {
 	for _, key := range keys.Keys {
-		m.AddKey(set, &key)
+		m.AddKey(ctx, set, &key)
 	}
 	return nil
 }
 
-func (m *MemoryManager) GetKey(set, kid string) (*jose.JSONWebKeySet, error) {
+func (m *MemoryManager) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebKeySet, error) {
 	m.RLock()
 	defer m.RUnlock()
 
@@ -87,7 +89,7 @@ func (m *MemoryManager) GetKey(set, kid string) (*jose.JSONWebKeySet, error) {
 	}, nil
 }
 
-func (m *MemoryManager) GetKeySet(set string) (*jose.JSONWebKeySet, error) {
+func (m *MemoryManager) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKeySet, error) {
 	m.RLock()
 	defer m.RUnlock()
 
@@ -104,8 +106,8 @@ func (m *MemoryManager) GetKeySet(set string) (*jose.JSONWebKeySet, error) {
 	return keys, nil
 }
 
-func (m *MemoryManager) DeleteKey(set, kid string) error {
-	keys, err := m.GetKeySet(set)
+func (m *MemoryManager) DeleteKey(ctx context.Context, set, kid string) error {
+	keys, err := m.GetKeySet(ctx, set)
 	if err != nil {
 		return err
 	}
@@ -123,7 +125,7 @@ func (m *MemoryManager) DeleteKey(set, kid string) error {
 	return nil
 }
 
-func (m *MemoryManager) DeleteKeySet(set string) error {
+func (m *MemoryManager) DeleteKeySet(ctx context.Context, set string) error {
 	m.Lock()
 	defer m.Unlock()
 

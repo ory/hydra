@@ -20,18 +20,22 @@
 
 package jwk
 
-import "gopkg.in/square/go-jose.v2"
+import (
+	"context"
+
+	"gopkg.in/square/go-jose.v2"
+)
 
 type Manager interface {
-	AddKey(set string, key *jose.JSONWebKey) error
+	AddKey(ctx context.Context, set string, key *jose.JSONWebKey) error
 
-	AddKeySet(set string, keys *jose.JSONWebKeySet) error
+	AddKeySet(ctx context.Context, set string, keys *jose.JSONWebKeySet) error
 
-	GetKey(set, kid string) (*jose.JSONWebKeySet, error)
+	GetKey(ctx context.Context, set, kid string) (*jose.JSONWebKeySet, error)
 
-	GetKeySet(set string) (*jose.JSONWebKeySet, error)
+	GetKeySet(ctx context.Context, set string) (*jose.JSONWebKeySet, error)
 
-	DeleteKey(set, kid string) error
+	DeleteKey(ctx context.Context, set, kid string) error
 
-	DeleteKeySet(set string) error
+	DeleteKeySet(ctx context.Context, set string) error
 }

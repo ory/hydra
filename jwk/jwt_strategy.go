@@ -24,6 +24,8 @@ import (
 	"crypto/rsa"
 	"strings"
 
+	"context"
+
 	jwt2 "github.com/dgrijalva/jwt-go"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/pkg/errors"
@@ -104,7 +106,7 @@ func (j *RS256JWTStrategy) GetPublicKeyID() (string, error) {
 }
 
 func (j *RS256JWTStrategy) refresh() error {
-	keys, err := j.Manager.GetKeySet(j.Set)
+	keys, err := j.Manager.GetKeySet(context.TODO(), j.Set)
 	if err != nil {
 		return err
 	}

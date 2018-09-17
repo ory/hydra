@@ -28,6 +28,8 @@ import (
 	"testing"
 	"time"
 
+	"context"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
@@ -54,7 +56,7 @@ func TestIntrospectorSDK(t *testing.T) {
 	jm := &jwk.MemoryManager{Keys: map[string]*jose.JSONWebKeySet{}}
 	keys, err := (&jwk.RS256Generator{}).Generate("", "sig")
 	require.NoError(t, err)
-	require.NoError(t, jm.AddKeySet(oauth2.OpenIDConnectKeyName, keys))
+	require.NoError(t, jm.AddKeySet(context.TODO(), oauth2.OpenIDConnectKeyName, keys))
 	jwtStrategy, err := jwk.NewRS256JWTStrategy(jm, oauth2.OpenIDConnectKeyName)
 
 	router := httprouter.New()

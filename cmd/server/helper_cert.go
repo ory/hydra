@@ -30,6 +30,8 @@ import (
 	"strings"
 	"time"
 
+	"context"
+
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/pkg"
@@ -105,10 +107,10 @@ func getOrCreateTLSCertificate(cmd *cobra.Command, c *config.Config) tls.Certifi
 		}
 
 		privateKey.Certificates = []*x509.Certificate{cert}
-		if err := ctx.KeyManager.DeleteKey(tlsKeyName, privateKey.KeyID); err != nil {
+		if err := ctx.KeyManager.DeleteKey(context.TODO(), tlsKeyName, privateKey.KeyID); err != nil {
 			c.GetLogger().WithError(err).Fatalf(`Could not update (delete) the self signed TLS certificate.`)
 		}
-		if err := ctx.KeyManager.AddKey(tlsKeyName, privateKey); err != nil {
+		if err := ctx.KeyManager.AddKey(context.TODO(), tlsKeyName, privateKey); err != nil {
 			c.GetLogger().WithError(err).Fatalf(`Could not update (add) the self signed TLS certificate.`)
 		}
 	}

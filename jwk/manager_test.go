@@ -27,6 +27,8 @@ import (
 	"sync"
 	"testing"
 
+	"context"
+
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 	. "github.com/ory/hydra/jwk"
@@ -130,15 +132,15 @@ func TestManagerRotate(t *testing.T) {
 			require.NoError(t, err)
 			t.Logf("Applied %d migrations to %s", n, name)
 
-			require.NoError(t, m.AddKeySet("TestManagerRotate", ks))
+			require.NoError(t, m.AddKeySet(context.TODO(), "TestManagerRotate", ks))
 
 			require.NoError(t, m.RotateKeys(newCipher))
 
-			_, err = m.GetKeySet("TestManagerRotate")
+			_, err = m.GetKeySet(context.TODO(), "TestManagerRotate")
 			require.Error(t, err)
 
 			m.Cipher = newCipher
-			got, err := m.GetKeySet("TestManagerRotate")
+			got, err := m.GetKeySet(context.TODO(), "TestManagerRotate")
 			require.NoError(t, err)
 
 			for _, key := range ks.Keys {

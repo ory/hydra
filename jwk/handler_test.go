@@ -26,6 +26,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"context"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
 	. "github.com/ory/hydra/jwk"
@@ -47,7 +49,7 @@ func init() {
 		herodot.NewJSONWriter(nil),
 		[]string{},
 	)
-	h.Manager.AddKeySet(IDTokenKeyName, IDKS)
+	h.Manager.AddKeySet(context.TODO(), IDTokenKeyName, IDKS)
 	h.SetRoutes(router, router)
 	testServer = httptest.NewServer(router)
 }

@@ -24,6 +24,8 @@ import (
 	"encoding/json"
 	"time"
 
+	"context"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/sqlcon"
@@ -95,7 +97,7 @@ func (m *SQLManager) CreateSchemas() (int, error) {
 	return n, nil
 }
 
-func (m *SQLManager) AddKey(set string, key *jose.JSONWebKey) error {
+func (m *SQLManager) AddKey(ctx context.Context, set string, key *jose.JSONWebKey) error {
 	out, err := json.Marshal(key)
 	if err != nil {
 		return errors.WithStack(err)
@@ -117,13 +119,13 @@ func (m *SQLManager) AddKey(set string, key *jose.JSONWebKey) error {
 	return nil
 }
 
-func (m *SQLManager) AddKeySet(set string, keys *jose.JSONWebKeySet) error {
+func (m *SQLManager) AddKeySet(ctx context.Context, set string, keys *jose.JSONWebKeySet) error {
 	tx, err := m.DB.Beginx()
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
-	if err := m.addKeySet(tx, m.Cipher, set, keys); err != nil {
+	if err := m.addKeySet(ctx, tx, m.Cipher, set, keys); err != nil {
 		if re := tx.Rollback(); re != nil {
 			return errors.Wrap(err, re.Error())
 		}
@@ -139,7 +141,7 @@ func (m *SQLManager) AddKeySet(set string, keys *jose.JSONWebKeySet) error {
 	return nil
 }
 
-func (m *SQLManager) addKeySet(tx *sqlx.Tx, cipher *AEAD, set string, keys *jose.JSONWebKeySet) error {
+func (m *SQLManager) addKeySet(ctx context.Context, tx *sqlx.Tx, cipher *AEAD, set string, keys *jose.JSONWebKeySet) error {
 	for _, key := range keys.Keys {
 		out, err := json.Marshal(key)
 		if err != nil {
@@ -164,7 +166,7 @@ func (m *SQLManager) addKeySet(tx *sqlx.Tx, cipher *AEAD, set string, keys *jose
 	return nil
 }
 
-func (m *SQLManager) GetKey(set, kid string) (*jose.JSONWebKeySet, error) {
+func (m *SQLManager) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebKeySet, error) {
 	var d sqlData
 	if err := m.DB.Get(&d, m.DB.Rebind("SELECT * FROM hydra_jwk WHERE sid=? AND kid=? ORDER BY created_at DESC"), set, kid); err != nil {
 		return nil, sqlcon.HandleError(err)
@@ -185,7 +187,7 @@ func (m *SQLManager) GetKey(set, kid string) (*jose.JSONWebKeySet, error) {
 	}, nil
 }
 
-func (m *SQLManager) GetKeySet(set string) (*jose.JSONWebKeySet, error) {
+func (m *SQLManager) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKeySet, error) {
 	var ds []sqlData
 	if err := m.DB.Select(&ds, m.DB.Rebind("SELECT * FROM hydra_jwk WHERE sid=? ORDER BY created_at DESC"), set); err != nil {
 		return nil, sqlcon.HandleError(err)
@@ -216,20 +218,20 @@ func (m *SQLManager) GetKeySet(set string) (*jose.JSONWebKeySet, error) {
 	return keys, nil
 }
 
-func (m *SQLManager) DeleteKey(set, kid string) error {
+func (m *SQLManager) DeleteKey(ctx context.Context, set, kid string) error {
 	if _, err := m.DB.Exec(m.DB.Rebind(`DELETE FROM hydra_jwk WHERE sid=? AND kid=?`), set, kid); err != nil {
 		return sqlcon.HandleError(err)
 	}
 	return nil
 }
 
-func (m *SQLManager) DeleteKeySet(set string) error {
+func (m *SQLManager) DeleteKeySet(ctx context.Context, set string) error {
 	tx, err := m.DB.Beginx()
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
-	if err := m.deleteKeySet(tx, set); err != nil {
+	if err := m.deleteKeySet(ctx, tx, set); err != nil {
 		if re := tx.Rollback(); re != nil {
 			return errors.Wrap(err, re.Error())
 		}
@@ -245,7 +247,7 @@ func (m *SQLManager) DeleteKeySet(set string) error {
 	return nil
 }
 
-func (m *SQLManager) deleteKeySet(tx *sqlx.Tx, set string) error {
+func (m *SQLManager) deleteKeySet(ctx context.Context, tx *sqlx.Tx, set string) error {
 	if _, err := tx.Exec(m.DB.Rebind(`DELETE FROM hydra_jwk WHERE sid=?`), set); err != nil {
 		return sqlcon.HandleError(err)
 	}
@@ -260,7 +262,7 @@ func (m *SQLManager) RotateKeys(new *AEAD) error {
 
 	sets := make([]jose.JSONWebKeySet, 0)
 	for _, sid := range sids {
-		set, err := m.GetKeySet(sid)
+		set, err := m.GetKeySet(context.TODO(), sid)
 		if err != nil {
 			return errors.WithStack(err)
 		}
@@ -273,14 +275,14 @@ func (m *SQLManager) RotateKeys(new *AEAD) error {
 	}
 
 	for k, set := range sets {
-		if err := m.deleteKeySet(tx, sids[k]); err != nil {
+		if err := m.deleteKeySet(context.TODO(), tx, sids[k]); err != nil {
 			if re := tx.Rollback(); re != nil {
 				return errors.Wrap(err, re.Error())
 			}
 			return sqlcon.HandleError(err)
 		}
 
-		if err := m.addKeySet(tx, new, sids[k], &set); err != nil {
+		if err := m.addKeySet(context.TODO(), tx, new, sids[k], &set); err != nil {
 			if re := tx.Rollback(); re != nil {
 				return errors.Wrap(err, re.Error())
 			}

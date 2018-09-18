@@ -28,6 +28,8 @@ import (
 	"testing"
 	"time"
 
+	"context"
+
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
@@ -50,7 +52,7 @@ func TestLogout(t *testing.T) {
 
 	r.Handle("GET", "/login", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		cookie, _ := cs.Get(r, cookieAuthenticationName)
-		require.NoError(t, h.M.CreateAuthenticationSession(&AuthenticationSession{
+		require.NoError(t, h.M.CreateAuthenticationSession(context.TODO(), &AuthenticationSession{
 			ID:              sid,
 			Subject:         "foo",
 			AuthenticatedAt: time.Now(),

@@ -24,6 +24,8 @@ import (
 	"sync"
 	"time"
 
+	"context"
+
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/pagination"
@@ -60,7 +62,7 @@ func NewMemoryManager(store pkg.FositeStorer) *MemoryManager {
 	}
 }
 
-func (m *MemoryManager) CreateForcedObfuscatedAuthenticationSession(s *ForcedObfuscatedAuthenticationSession) error {
+func (m *MemoryManager) CreateForcedObfuscatedAuthenticationSession(ctx context.Context, s *ForcedObfuscatedAuthenticationSession) error {
 	for k, v := range m.pairwise {
 		if v.Subject == s.Subject && v.ClientID == s.ClientID {
 			m.pairwise[k] = *s
@@ -72,7 +74,7 @@ func (m *MemoryManager) CreateForcedObfuscatedAuthenticationSession(s *ForcedObf
 	return nil
 }
 
-func (m *MemoryManager) GetForcedObfuscatedAuthenticationSession(client, obfuscated string) (*ForcedObfuscatedAuthenticationSession, error) {
+func (m *MemoryManager) GetForcedObfuscatedAuthenticationSession(ctx context.Context, client, obfuscated string) (*ForcedObfuscatedAuthenticationSession, error) {
 	for _, v := range m.pairwise {
 		if v.SubjectObfuscated == obfuscated && v.ClientID == client {
 			return &v, nil
@@ -82,11 +84,11 @@ func (m *MemoryManager) GetForcedObfuscatedAuthenticationSession(client, obfusca
 	return nil, errors.WithStack(pkg.ErrNotFound)
 }
 
-func (m *MemoryManager) RevokeUserConsentSession(user string) error {
-	return m.RevokeUserClientConsentSession(user, "")
+func (m *MemoryManager) RevokeUserConsentSession(ctx context.Context, user string) error {
+	return m.RevokeUserClientConsentSession(ctx, user, "")
 }
 
-func (m *MemoryManager) RevokeUserClientConsentSession(user, client string) error {
+func (m *MemoryManager) RevokeUserClientConsentSession(ctx context.Context, user, client string) error {
 	m.m["handledConsentRequests"].Lock()
 	defer m.m["handledConsentRequests"].Unlock()
 	m.m["consentRequests"].Lock()
@@ -117,7 +119,7 @@ func (m *MemoryManager) RevokeUserClientConsentSession(user, client string) erro
 	return nil
 }
 
-func (m *MemoryManager) RevokeUserAuthenticationSession(user string) error {
+func (m *MemoryManager) RevokeUserAuthenticationSession(ctx context.Context, user string) error {
 	m.m["authSessions"].Lock()
 	defer m.m["authSessions"].Unlock()
 
@@ -135,7 +137,7 @@ func (m *MemoryManager) RevokeUserAuthenticationSession(user string) error {
 	return nil
 }
 
-func (m *MemoryManager) CreateConsentRequest(c *ConsentRequest) error {
+func (m *MemoryManager) CreateConsentRequest(ctx context.Context, c *ConsentRequest) error {
 	m.m["consentRequests"].Lock()
 	defer m.m["consentRequests"].Unlock()
 	if _, ok := m.consentRequests[c.Challenge]; ok {
@@ -145,7 +147,7 @@ func (m *MemoryManager) CreateConsentRequest(c *ConsentRequest) error {
 	return nil
 }
 
-func (m *MemoryManager) GetConsentRequest(challenge string) (*ConsentRequest, error) {
+func (m *MemoryManager) GetConsentRequest(ctx context.Context, challenge string) (*ConsentRequest, error) {
 	m.m["consentRequests"].RLock()
 	defer m.m["consentRequests"].RUnlock()
 	if c, ok := m.consentRequests[challenge]; ok {
@@ -155,14 +157,14 @@ func (m *MemoryManager) GetConsentRequest(challenge string) (*ConsentRequest, er
 	return nil, errors.WithStack(pkg.ErrNotFound)
 }
 
-func (m *MemoryManager) HandleConsentRequest(challenge string, r *HandledConsentRequest) (*ConsentRequest, error) {
+func (m *MemoryManager) HandleConsentRequest(ctx context.Context, challenge string, r *HandledConsentRequest) (*ConsentRequest, error) {
 	m.m["handledConsentRequests"].Lock()
 	m.handledConsentRequests[r.Challenge] = *r
 	m.m["handledConsentRequests"].Unlock()
-	return m.GetConsentRequest(challenge)
+	return m.GetConsentRequest(ctx, challenge)
 }
 
-func (m *MemoryManager) VerifyAndInvalidateConsentRequest(verifier string) (*HandledConsentRequest, error) {
+func (m *MemoryManager) VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*HandledConsentRequest, error) {
 	for _, c := range m.consentRequests {
 		if c.Verifier == verifier {
 			for _, h := range m.handledConsentRequests {
@@ -172,7 +174,7 @@ func (m *MemoryManager) VerifyAndInvalidateConsentRequest(verifier string) (*Han
 					}
 
 					h.WasUsed = true
-					if _, err := m.HandleConsentRequest(h.Challenge, &h); err != nil {
+					if _, err := m.HandleConsentRequest(ctx, h.Challenge, &h); err != nil {
 						return nil, err
 					}
 
@@ -186,9 +188,9 @@ func (m *MemoryManager) VerifyAndInvalidateConsentRequest(verifier string) (*Han
 	return nil, errors.WithStack(pkg.ErrNotFound)
 }
 
-func (m *MemoryManager) FindPreviouslyGrantedConsentRequests(client string, subject string) ([]HandledConsentRequest, error) {
+func (m *MemoryManager) FindPreviouslyGrantedConsentRequests(ctx context.Context, client string, subject string) ([]HandledConsentRequest, error) {
 	var rs []HandledConsentRequest
-	filteredByUser, err := m.FindPreviouslyGrantedConsentRequestsByUser(subject, -1, -1)
+	filteredByUser, err := m.FindPreviouslyGrantedConsentRequestsByUser(ctx, subject, -1, -1)
 	if errors.Cause(err) == pkg.ErrNotFound {
 		return nil, errors.WithStack(ErrNoPreviousConsentFound)
 	} else if err != nil {
@@ -208,10 +210,10 @@ func (m *MemoryManager) FindPreviouslyGrantedConsentRequests(client string, subj
 	return rs, nil
 }
 
-func (m *MemoryManager) FindPreviouslyGrantedConsentRequestsByUser(subject string, limit, offset int) ([]HandledConsentRequest, error) {
+func (m *MemoryManager) FindPreviouslyGrantedConsentRequestsByUser(ctx context.Context, subject string, limit, offset int) ([]HandledConsentRequest, error) {
 	var rs []HandledConsentRequest
 	for _, c := range m.handledConsentRequests {
-		cr, err := m.GetConsentRequest(c.Challenge)
+		cr, err := m.GetConsentRequest(ctx, c.Challenge)
 		if err != nil {
 			return nil, err
 		}
@@ -253,7 +255,7 @@ func (m *MemoryManager) FindPreviouslyGrantedConsentRequestsByUser(subject strin
 	return rs[start:end], nil
 }
 
-func (m *MemoryManager) GetAuthenticationSession(id string) (*AuthenticationSession, error) {
+func (m *MemoryManager) GetAuthenticationSession(ctx context.Context, id string) (*AuthenticationSession, error) {
 	m.m["authSessions"].RLock()
 	defer m.m["authSessions"].RUnlock()
 	if c, ok := m.authSessions[id]; ok {
@@ -262,7 +264,7 @@ func (m *MemoryManager) GetAuthenticationSession(id string) (*AuthenticationSess
 	return nil, errors.WithStack(pkg.ErrNotFound)
 }
 
-func (m *MemoryManager) CreateAuthenticationSession(a *AuthenticationSession) error {
+func (m *MemoryManager) CreateAuthenticationSession(ctx context.Context, a *AuthenticationSession) error {
 	m.m["authSessions"].Lock()
 	defer m.m["authSessions"].Unlock()
 	if _, ok := m.authSessions[a.ID]; ok {
@@ -272,14 +274,14 @@ func (m *MemoryManager) CreateAuthenticationSession(a *AuthenticationSession) er
 	return nil
 }
 
-func (m *MemoryManager) DeleteAuthenticationSession(id string) error {
+func (m *MemoryManager) DeleteAuthenticationSession(ctx context.Context, id string) error {
 	m.m["authSessions"].Lock()
 	defer m.m["authSessions"].Unlock()
 	delete(m.authSessions, id)
 	return nil
 }
 
-func (m *MemoryManager) CreateAuthenticationRequest(a *AuthenticationRequest) error {
+func (m *MemoryManager) CreateAuthenticationRequest(ctx context.Context, a *AuthenticationRequest) error {
 	m.m["authRequests"].Lock()
 	defer m.m["authRequests"].Unlock()
 	if _, ok := m.authRequests[a.Challenge]; ok {
@@ -289,7 +291,7 @@ func (m *MemoryManager) CreateAuthenticationRequest(a *AuthenticationRequest) er
 	return nil
 }
 
-func (m *MemoryManager) GetAuthenticationRequest(challenge string) (*AuthenticationRequest, error) {
+func (m *MemoryManager) GetAuthenticationRequest(ctx context.Context, challenge string) (*AuthenticationRequest, error) {
 	m.m["authRequests"].RLock()
 	defer m.m["authRequests"].RUnlock()
 	if c, ok := m.authRequests[challenge]; ok {
@@ -299,14 +301,14 @@ func (m *MemoryManager) GetAuthenticationRequest(challenge string) (*Authenticat
 	return nil, errors.WithStack(pkg.ErrNotFound)
 }
 
-func (m *MemoryManager) HandleAuthenticationRequest(challenge string, r *HandledAuthenticationRequest) (*AuthenticationRequest, error) {
+func (m *MemoryManager) HandleAuthenticationRequest(ctx context.Context, challenge string, r *HandledAuthenticationRequest) (*AuthenticationRequest, error) {
 	m.m["handledAuthRequests"].Lock()
 	m.handledAuthRequests[r.Challenge] = *r
 	m.m["handledAuthRequests"].Unlock()
-	return m.GetAuthenticationRequest(challenge)
+	return m.GetAuthenticationRequest(ctx, challenge)
 }
 
-func (m *MemoryManager) VerifyAndInvalidateAuthenticationRequest(verifier string) (*HandledAuthenticationRequest, error) {
+func (m *MemoryManager) VerifyAndInvalidateAuthenticationRequest(ctx context.Context, verifier string) (*HandledAuthenticationRequest, error) {
 	for _, c := range m.authRequests {
 		if c.Verifier == verifier {
 			for _, h := range m.handledAuthRequests {
@@ -316,7 +318,7 @@ func (m *MemoryManager) VerifyAndInvalidateAuthenticationRequest(verifier string
 					}
 
 					h.WasUsed = true
-					if _, err := m.HandleAuthenticationRequest(h.Challenge, &h); err != nil {
+					if _, err := m.HandleAuthenticationRequest(ctx, h.Challenge, &h); err != nil {
 						return nil, err
 					}
 

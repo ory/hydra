@@ -60,15 +60,15 @@ func (m *SQLManager) CreateSchemas() (int, error) {
 	return n, nil
 }
 
-func (m *SQLManager) RevokeUserConsentSession(user string) error {
-	return m.revokeConsentSession(user, "")
+func (m *SQLManager) RevokeUserConsentSession(ctx context.Context, user string) error {
+	return m.revokeConsentSession(ctx, user, "")
 }
 
-func (m *SQLManager) RevokeUserClientConsentSession(user, client string) error {
-	return m.revokeConsentSession(user, client)
+func (m *SQLManager) RevokeUserClientConsentSession(ctx context.Context, user, client string) error {
+	return m.revokeConsentSession(ctx, user, client)
 }
 
-func (m *SQLManager) revokeConsentSession(user, client string) error {
+func (m *SQLManager) revokeConsentSession(ctx context.Context, user, client string) error {
 	args := []interface{}{user}
 	part := "r.subject=?"
 	if client != "" {
@@ -89,12 +89,12 @@ JOIN hydra_oauth2_consent_request as r ON r.challenge = h.challenge WHERE %s`,
 	}
 
 	for _, challenge := range challenges {
-		if err := m.store.RevokeAccessToken(nil, challenge); errors.Cause(err) == fosite.ErrNotFound {
+		if err := m.store.RevokeAccessToken(ctx, challenge); errors.Cause(err) == fosite.ErrNotFound {
 			// do nothing
 		} else if err != nil {
 			return err
 		}
-		if err := m.store.RevokeRefreshToken(nil, challenge); errors.Cause(err) == fosite.ErrNotFound {
+		if err := m.store.RevokeRefreshToken(ctx, challenge); errors.Cause(err) == fosite.ErrNotFound {
 			// do nothing
 		} else if err != nil {
 			return err
@@ -133,7 +133,7 @@ WHERE challenge IN (SELECT r.challenge FROM hydra_oauth2_consent_request as r WH
 	return nil
 }
 
-func (m *SQLManager) RevokeUserAuthenticationSession(user string) error {
+func (m *SQLManager) RevokeUserAuthenticationSession(ctx context.Context, user string) error {
 	rows, err := m.db.Exec(
 		m.db.Rebind("DELETE FROM hydra_oauth2_authentication_session WHERE subject=?"),
 		user,
@@ -152,7 +152,7 @@ func (m *SQLManager) RevokeUserAuthenticationSession(user string) error {
 	return nil
 }
 
-func (m *SQLManager) CreateForcedObfuscatedAuthenticationSession(s *ForcedObfuscatedAuthenticationSession) error {
+func (m *SQLManager) CreateForcedObfuscatedAuthenticationSession(ctx context.Context, s *ForcedObfuscatedAuthenticationSession) error {
 	tx, err := m.db.Beginx()
 	if err != nil {
 		return sqlcon.HandleError(err)
@@ -185,7 +185,7 @@ func (m *SQLManager) CreateForcedObfuscatedAuthenticationSession(s *ForcedObfusc
 	return nil
 }
 
-func (m *SQLManager) GetForcedObfuscatedAuthenticationSession(client, obfuscated string) (*ForcedObfuscatedAuthenticationSession, error) {
+func (m *SQLManager) GetForcedObfuscatedAuthenticationSession(ctx context.Context, client, obfuscated string) (*ForcedObfuscatedAuthenticationSession, error) {
 	var d ForcedObfuscatedAuthenticationSession
 
 	if err := m.db.Get(&d, m.db.Rebind("SELECT * FROM hydra_oauth2_obfuscated_authentication_session WHERE client_id=? AND subject_obfuscated=?"), client, obfuscated); err != nil {
@@ -198,7 +198,7 @@ func (m *SQLManager) GetForcedObfuscatedAuthenticationSession(client, obfuscated
 	return &d, nil
 }
 
-func (m *SQLManager) CreateConsentRequest(c *ConsentRequest) error {
+func (m *SQLManager) CreateConsentRequest(ctx context.Context, c *ConsentRequest) error {
 	d, err := newSQLConsentRequest(c)
 	if err != nil {
 		return err
@@ -215,7 +215,7 @@ func (m *SQLManager) CreateConsentRequest(c *ConsentRequest) error {
 	return nil
 }
 
-func (m *SQLManager) GetConsentRequest(challenge string) (*ConsentRequest, error) {
+func (m *SQLManager) GetConsentRequest(ctx context.Context, challenge string) (*ConsentRequest, error) {
 	var d sqlConsentRequest
 
 	if err := m.db.Get(&d, m.db.Rebind("SELECT * FROM hydra_oauth2_consent_request WHERE challenge=?"), challenge); err != nil {
@@ -225,7 +225,7 @@ func (m *SQLManager) GetConsentRequest(challenge string) (*ConsentRequest, error
 		return nil, sqlcon.HandleError(err)
 	}
 
-	c, err := m.c.GetConcreteClient(context.TODO(), d.Client)
+	c, err := m.c.GetConcreteClient(ctx, d.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -233,7 +233,7 @@ func (m *SQLManager) GetConsentRequest(challenge string) (*ConsentRequest, error
 	return d.toConsentRequest(c)
 }
 
-func (m *SQLManager) CreateAuthenticationRequest(c *AuthenticationRequest) error {
+func (m *SQLManager) CreateAuthenticationRequest(ctx context.Context, c *AuthenticationRequest) error {
 	d, err := newSQLAuthenticationRequest(c)
 	if err != nil {
 		return err
@@ -250,7 +250,7 @@ func (m *SQLManager) CreateAuthenticationRequest(c *AuthenticationRequest) error
 	return nil
 }
 
-func (m *SQLManager) GetAuthenticationRequest(challenge string) (*AuthenticationRequest, error) {
+func (m *SQLManager) GetAuthenticationRequest(ctx context.Context, challenge string) (*AuthenticationRequest, error) {
 	var d sqlConsentRequest
 
 	if err := m.db.Get(&d, m.db.Rebind("SELECT * FROM hydra_oauth2_authentication_request WHERE challenge=?"), challenge); err != nil {
@@ -260,7 +260,7 @@ func (m *SQLManager) GetAuthenticationRequest(challenge string) (*Authentication
 		return nil, sqlcon.HandleError(err)
 	}
 
-	c, err := m.c.GetConcreteClient(context.TODO(), d.Client)
+	c, err := m.c.GetConcreteClient(ctx, d.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -268,7 +268,7 @@ func (m *SQLManager) GetAuthenticationRequest(challenge string) (*Authentication
 	return d.toAuthenticationRequest(c)
 }
 
-func (m *SQLManager) HandleConsentRequest(challenge string, r *HandledConsentRequest) (*ConsentRequest, error) {
+func (m *SQLManager) HandleConsentRequest(ctx context.Context, challenge string, r *HandledConsentRequest) (*ConsentRequest, error) {
 	d, err := newSQLHandledConsentRequest(r)
 	if err != nil {
 		return nil, err
@@ -282,10 +282,10 @@ func (m *SQLManager) HandleConsentRequest(challenge string, r *HandledConsentReq
 		return nil, sqlcon.HandleError(err)
 	}
 
-	return m.GetConsentRequest(challenge)
+	return m.GetConsentRequest(ctx, challenge)
 }
 
-func (m *SQLManager) VerifyAndInvalidateConsentRequest(verifier string) (*HandledConsentRequest, error) {
+func (m *SQLManager) VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*HandledConsentRequest, error) {
 	var d sqlHandledConsentRequest
 	var challenge string
 
@@ -303,7 +303,7 @@ func (m *SQLManager) VerifyAndInvalidateConsentRequest(verifier string) (*Handle
 		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Consent verifier has been used already"))
 	}
 
-	r, err := m.GetConsentRequest(challenge)
+	r, err := m.GetConsentRequest(ctx, challenge)
 	if err != nil {
 		return nil, err
 	}
@@ -315,7 +315,7 @@ func (m *SQLManager) VerifyAndInvalidateConsentRequest(verifier string) (*Handle
 	return d.toHandledConsentRequest(r)
 }
 
-func (m *SQLManager) HandleAuthenticationRequest(challenge string, r *HandledAuthenticationRequest) (*AuthenticationRequest, error) {
+func (m *SQLManager) HandleAuthenticationRequest(ctx context.Context, challenge string, r *HandledAuthenticationRequest) (*AuthenticationRequest, error) {
 	d, err := newSQLHandledAuthenticationRequest(r)
 	if err != nil {
 		return nil, err
@@ -329,10 +329,10 @@ func (m *SQLManager) HandleAuthenticationRequest(challenge string, r *HandledAut
 		return nil, sqlcon.HandleError(err)
 	}
 
-	return m.GetAuthenticationRequest(challenge)
+	return m.GetAuthenticationRequest(ctx, challenge)
 }
 
-func (m *SQLManager) VerifyAndInvalidateAuthenticationRequest(verifier string) (*HandledAuthenticationRequest, error) {
+func (m *SQLManager) VerifyAndInvalidateAuthenticationRequest(ctx context.Context, verifier string) (*HandledAuthenticationRequest, error) {
 	var d sqlHandledAuthenticationRequest
 	var challenge string
 
@@ -354,7 +354,7 @@ func (m *SQLManager) VerifyAndInvalidateAuthenticationRequest(verifier string) (
 		return nil, sqlcon.HandleError(err)
 	}
 
-	r, err := m.GetAuthenticationRequest(challenge)
+	r, err := m.GetAuthenticationRequest(ctx, challenge)
 	if err != nil {
 		return nil, err
 	}
@@ -362,7 +362,7 @@ func (m *SQLManager) VerifyAndInvalidateAuthenticationRequest(verifier string) (
 	return d.toHandledAuthenticationRequest(r)
 }
 
-func (m *SQLManager) GetAuthenticationSession(id string) (*AuthenticationSession, error) {
+func (m *SQLManager) GetAuthenticationSession(ctx context.Context, id string) (*AuthenticationSession, error) {
 	var a AuthenticationSession
 	if err := m.db.Get(&a, m.db.Rebind("SELECT * FROM hydra_oauth2_authentication_session WHERE id=?"), id); err != nil {
 		if err == sql.ErrNoRows {
@@ -374,7 +374,7 @@ func (m *SQLManager) GetAuthenticationSession(id string) (*AuthenticationSession
 	return &a, nil
 }
 
-func (m *SQLManager) CreateAuthenticationSession(a *AuthenticationSession) error {
+func (m *SQLManager) CreateAuthenticationSession(ctx context.Context, a *AuthenticationSession) error {
 	if _, err := m.db.NamedExec(fmt.Sprintf(
 		"INSERT INTO hydra_oauth2_authentication_session (%s) VALUES (%s)",
 		strings.Join(sqlParamsAuthSession, ", "),
@@ -386,7 +386,7 @@ func (m *SQLManager) CreateAuthenticationSession(a *AuthenticationSession) error
 	return nil
 }
 
-func (m *SQLManager) DeleteAuthenticationSession(id string) error {
+func (m *SQLManager) DeleteAuthenticationSession(ctx context.Context, id string) error {
 	if _, err := m.db.Exec(m.db.Rebind("DELETE FROM hydra_oauth2_authentication_session WHERE id=?"), id); err != nil {
 		return sqlcon.HandleError(err)
 	}
@@ -394,7 +394,7 @@ func (m *SQLManager) DeleteAuthenticationSession(id string) error {
 	return nil
 }
 
-func (m *SQLManager) FindPreviouslyGrantedConsentRequests(client string, subject string) ([]HandledConsentRequest, error) {
+func (m *SQLManager) FindPreviouslyGrantedConsentRequests(ctx context.Context, client string, subject string) ([]HandledConsentRequest, error) {
 	var a []sqlHandledConsentRequest
 
 	if err := m.db.Select(&a, m.db.Rebind(`SELECT h.* FROM
@@ -412,10 +412,10 @@ WHERE
 		return nil, sqlcon.HandleError(err)
 	}
 
-	return m.resolveHandledConsentRequests(a)
+	return m.resolveHandledConsentRequests(ctx, a)
 }
 
-func (m *SQLManager) FindPreviouslyGrantedConsentRequestsByUser(subject string, limit, offset int) ([]HandledConsentRequest, error) {
+func (m *SQLManager) FindPreviouslyGrantedConsentRequestsByUser(ctx context.Context, subject string, limit, offset int) ([]HandledConsentRequest, error) {
 	var a []sqlHandledConsentRequest
 
 	if err := m.db.Select(&a, m.db.Rebind(`SELECT h.* FROM
@@ -431,13 +431,13 @@ LIMIT ? OFFSET ?
 		return nil, sqlcon.HandleError(err)
 	}
 
-	return m.resolveHandledConsentRequests(a)
+	return m.resolveHandledConsentRequests(ctx, a)
 }
 
-func (m *SQLManager) resolveHandledConsentRequests(requests []sqlHandledConsentRequest) ([]HandledConsentRequest, error) {
+func (m *SQLManager) resolveHandledConsentRequests(ctx context.Context, requests []sqlHandledConsentRequest) ([]HandledConsentRequest, error) {
 	var aa []HandledConsentRequest
 	for _, v := range requests {
-		r, err := m.GetConsentRequest(v.Challenge)
+		r, err := m.GetConsentRequest(ctx, v.Challenge)
 		if err != nil {
 			return nil, err
 		} else if errors.Cause(err) == sqlcon.ErrNoRows {

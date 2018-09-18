@@ -101,7 +101,7 @@ func (h *Handler) SetRoutes(frontend, backend *httprouter.Router) {
 //       500: genericError
 func (h *Handler) DeleteUserConsentSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	user := ps.ByName("user")
-	if err := h.M.RevokeUserConsentSession(user); err != nil {
+	if err := h.M.RevokeUserConsentSession(r.Context(), user); err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}
@@ -137,7 +137,7 @@ func (h *Handler) DeleteUserClientConsentSession(w http.ResponseWriter, r *http.
 		return
 	}
 
-	if err := h.M.RevokeUserClientConsentSession(user, client); err != nil {
+	if err := h.M.RevokeUserClientConsentSession(r.Context(), user, client); err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}
@@ -172,7 +172,7 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 	}
 	limit, offset := pagination.Parse(r, 100, 0, 500)
 
-	sessions, err := h.M.FindPreviouslyGrantedConsentRequestsByUser(user, limit, offset)
+	sessions, err := h.M.FindPreviouslyGrantedConsentRequestsByUser(r.Context(), user, limit, offset)
 	if errors.Cause(err) == ErrNoPreviousConsentFound {
 		h.H.Write(w, r, []PreviousConsentSession{})
 		return
@@ -218,7 +218,7 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	user := ps.ByName("user")
 
-	if err := h.M.RevokeUserAuthenticationSession(user); err != nil {
+	if err := h.M.RevokeUserAuthenticationSession(r.Context(), user); err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}
@@ -252,7 +252,7 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 //       401: genericError
 //       500: genericError
 func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	request, err := h.M.GetAuthenticationRequest(ps.ByName("challenge"))
+	request, err := h.M.GetAuthenticationRequest(r.Context(), ps.ByName("challenge"))
 	if err != nil {
 		h.H.WriteError(w, r, err)
 		return
@@ -303,7 +303,7 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	}
 
 	p.Challenge = ps.ByName("challenge")
-	ar, err := h.M.GetAuthenticationRequest(ps.ByName("challenge"))
+	ar, err := h.M.GetAuthenticationRequest(r.Context(), ps.ByName("challenge"))
 	if err != nil {
 		h.H.WriteError(w, r, err)
 		return
@@ -322,7 +322,7 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	}
 	p.RequestedAt = ar.RequestedAt
 
-	request, err := h.M.HandleAuthenticationRequest(ps.ByName("challenge"), &p)
+	request, err := h.M.HandleAuthenticationRequest(r.Context(), ps.ByName("challenge"), &p)
 	if err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
 		return
@@ -377,13 +377,13 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
-	ar, err := h.M.GetAuthenticationRequest(ps.ByName("challenge"))
+	ar, err := h.M.GetAuthenticationRequest(r.Context(), ps.ByName("challenge"))
 	if err != nil {
 		h.H.WriteError(w, r, err)
 		return
 	}
 
-	request, err := h.M.HandleAuthenticationRequest(ps.ByName("challenge"), &HandledAuthenticationRequest{
+	request, err := h.M.HandleAuthenticationRequest(r.Context(), ps.ByName("challenge"), &HandledAuthenticationRequest{
 		Error:       &p,
 		Challenge:   ps.ByName("challenge"),
 		RequestedAt: ar.RequestedAt,
@@ -432,7 +432,7 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //       401: genericError
 //       500: genericError
 func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	request, err := h.M.GetConsentRequest(ps.ByName("challenge"))
+	request, err := h.M.GetConsentRequest(r.Context(), ps.ByName("challenge"))
 	if err != nil {
 		h.H.WriteError(w, r, err)
 		return
@@ -485,7 +485,7 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 		return
 	}
 
-	cr, err := h.M.GetConsentRequest(ps.ByName("challenge"))
+	cr, err := h.M.GetConsentRequest(r.Context(), ps.ByName("challenge"))
 	if err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
 		return
@@ -494,7 +494,7 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 	p.Challenge = ps.ByName("challenge")
 	p.RequestedAt = cr.RequestedAt
 
-	hr, err := h.M.HandleConsentRequest(ps.ByName("challenge"), &p)
+	hr, err := h.M.HandleConsentRequest(r.Context(), ps.ByName("challenge"), &p)
 	if err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
 		return
@@ -555,13 +555,13 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 		return
 	}
 
-	hr, err := h.M.GetConsentRequest(ps.ByName("challenge"))
+	hr, err := h.M.GetConsentRequest(r.Context(), ps.ByName("challenge"))
 	if err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
-	request, err := h.M.HandleConsentRequest(ps.ByName("challenge"), &HandledConsentRequest{
+	request, err := h.M.HandleConsentRequest(r.Context(), ps.ByName("challenge"), &HandledConsentRequest{
 		Error:       &p,
 		Challenge:   ps.ByName("challenge"),
 		RequestedAt: hr.RequestedAt,
@@ -607,7 +607,7 @@ func (h *Handler) LogoutUser(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	if sid != "" {
-		if err := h.M.DeleteAuthenticationSession(sid); err != nil {
+		if err := h.M.DeleteAuthenticationSession(r.Context(), sid); err != nil {
 			h.H.WriteError(w, r, err)
 			return
 		}

@@ -20,6 +20,8 @@
 
 package consent
 
+import "context"
+
 type ForcedObfuscatedAuthenticationSession struct {
 	ClientID          string `db:"client_id"`
 	Subject           string `db:"subject"`
@@ -27,27 +29,27 @@ type ForcedObfuscatedAuthenticationSession struct {
 }
 
 type Manager interface {
-	CreateConsentRequest(*ConsentRequest) error
-	GetConsentRequest(challenge string) (*ConsentRequest, error)
-	HandleConsentRequest(challenge string, r *HandledConsentRequest) (*ConsentRequest, error)
-	RevokeUserConsentSession(user string) error
-	RevokeUserClientConsentSession(user, client string) error
+	CreateConsentRequest(ctx context.Context, req *ConsentRequest) error
+	GetConsentRequest(ctx context.Context, challenge string) (*ConsentRequest, error)
+	HandleConsentRequest(ctx context.Context, challenge string, r *HandledConsentRequest) (*ConsentRequest, error)
+	RevokeUserConsentSession(ctx context.Context, user string) error
+	RevokeUserClientConsentSession(ctx context.Context, user, client string) error
 
-	VerifyAndInvalidateConsentRequest(verifier string) (*HandledConsentRequest, error)
-	FindPreviouslyGrantedConsentRequests(client string, user string) ([]HandledConsentRequest, error)
-	FindPreviouslyGrantedConsentRequestsByUser(user string, limit, offset int) ([]HandledConsentRequest, error)
+	VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*HandledConsentRequest, error)
+	FindPreviouslyGrantedConsentRequests(ctx context.Context, client string, user string) ([]HandledConsentRequest, error)
+	FindPreviouslyGrantedConsentRequestsByUser(ctx context.Context, user string, limit, offset int) ([]HandledConsentRequest, error)
 
 	// Cookie management
-	GetAuthenticationSession(id string) (*AuthenticationSession, error)
-	CreateAuthenticationSession(*AuthenticationSession) error
-	DeleteAuthenticationSession(id string) error
-	RevokeUserAuthenticationSession(user string) error
+	GetAuthenticationSession(ctx context.Context, id string) (*AuthenticationSession, error)
+	CreateAuthenticationSession(ctx context.Context, session *AuthenticationSession) error
+	DeleteAuthenticationSession(ctx context.Context, id string) error
+	RevokeUserAuthenticationSession(ctx context.Context, user string) error
 
-	CreateAuthenticationRequest(*AuthenticationRequest) error
-	GetAuthenticationRequest(challenge string) (*AuthenticationRequest, error)
-	HandleAuthenticationRequest(challenge string, r *HandledAuthenticationRequest) (*AuthenticationRequest, error)
-	VerifyAndInvalidateAuthenticationRequest(verifier string) (*HandledAuthenticationRequest, error)
+	CreateAuthenticationRequest(ctx context.Context, req *AuthenticationRequest) error
+	GetAuthenticationRequest(ctx context.Context, challenge string) (*AuthenticationRequest, error)
+	HandleAuthenticationRequest(ctx context.Context, challenge string, r *HandledAuthenticationRequest) (*AuthenticationRequest, error)
+	VerifyAndInvalidateAuthenticationRequest(ctx context.Context, verifier string) (*HandledAuthenticationRequest, error)
 
-	CreateForcedObfuscatedAuthenticationSession(*ForcedObfuscatedAuthenticationSession) error
-	GetForcedObfuscatedAuthenticationSession(client, obfuscated string) (*ForcedObfuscatedAuthenticationSession, error)
+	CreateForcedObfuscatedAuthenticationSession(ctx context.Context, session *ForcedObfuscatedAuthenticationSession) error
+	GetForcedObfuscatedAuthenticationSession(ctx context.Context, client, obfuscated string) (*ForcedObfuscatedAuthenticationSession, error)
 }

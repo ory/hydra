@@ -79,7 +79,7 @@ func TestSQLSchema(t *testing.T) {
 	require.NoError(t, jm.AddKey(context.TODO(), "integration-test-foo", jwk.First(p1)))
 	require.NoError(t, pm.Create(&ladon.DefaultPolicy{ID: "integration-test-foo", Resources: []string{"foo"}, Actions: []string{"bar"}, Subjects: []string{"baz"}, Effect: "allow"}))
 	require.NoError(t, cm.CreateClient(context.TODO(), &client.Client{ClientID: "integration-test-foo"}))
-	require.NoError(t, crm.CreateAuthenticationSession(&consent.AuthenticationSession{
+	require.NoError(t, crm.CreateAuthenticationSession(context.TODO(), &consent.AuthenticationSession{
 		ID:              "foo",
 		AuthenticatedAt: time.Now(),
 		Subject:         "bar",

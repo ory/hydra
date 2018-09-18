@@ -26,6 +26,8 @@ import (
 	"testing"
 	"time"
 
+	"context"
+
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
@@ -51,27 +53,27 @@ func TestSDK(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	require.NoError(t, m.CreateAuthenticationSession(&AuthenticationSession{
+	require.NoError(t, m.CreateAuthenticationSession(context.TODO(), &AuthenticationSession{
 		ID:      "session1",
 		Subject: "subject1",
 	}))
 
 	ar1, _ := mockAuthRequest("1", false)
 	ar2, _ := mockAuthRequest("2", false)
-	require.NoError(t, m.CreateAuthenticationRequest(ar1))
-	require.NoError(t, m.CreateAuthenticationRequest(ar2))
+	require.NoError(t, m.CreateAuthenticationRequest(context.TODO(), ar1))
+	require.NoError(t, m.CreateAuthenticationRequest(context.TODO(), ar2))
 
 	cr1, hcr1 := mockConsentRequest("1", false, 0, false, false, false)
 	cr2, hcr2 := mockConsentRequest("2", false, 0, false, false, false)
 	cr3, hcr3 := mockConsentRequest("3", true, 3600, false, false, false)
-	require.NoError(t, m.CreateConsentRequest(cr1))
-	require.NoError(t, m.CreateConsentRequest(cr2))
-	require.NoError(t, m.CreateConsentRequest(cr3))
-	_, err = m.HandleConsentRequest("challenge1", hcr1)
+	require.NoError(t, m.CreateConsentRequest(context.TODO(), cr1))
+	require.NoError(t, m.CreateConsentRequest(context.TODO(), cr2))
+	require.NoError(t, m.CreateConsentRequest(context.TODO(), cr3))
+	_, err = m.HandleConsentRequest(context.TODO(), "challenge1", hcr1)
 	require.NoError(t, err)
-	_, err = m.HandleConsentRequest("challenge2", hcr2)
+	_, err = m.HandleConsentRequest(context.TODO(), "challenge2", hcr2)
 	require.NoError(t, err)
-	_, err = m.HandleConsentRequest("challenge3", hcr3)
+	_, err = m.HandleConsentRequest(context.TODO(), "challenge3", hcr3)
 	require.NoError(t, err)
 
 	crGot, res, err := sdk.GetConsentRequest("challenge1")

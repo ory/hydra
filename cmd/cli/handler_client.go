@@ -80,7 +80,12 @@ func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 
 		result, response, err := m.CreateOAuth2Client(c)
 		checkResponse(response, err, http.StatusCreated)
-		fmt.Printf("Imported OAuth2 client %s:%s from %s.\n", result.ClientId, result.ClientSecret, path)
+
+		if c.ClientSecret == "" {
+			fmt.Printf("Imported OAuth 2.0 Client %s:%s from %s.\n", result.ClientId, result.ClientSecret, path)
+		} else {
+			fmt.Printf("Imported OAuth 2.0 Client %s from %s.\n", result.ClientId, path)
+		}
 	}
 }
 
@@ -102,11 +107,15 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	clientUri, _ := cmd.Flags().GetString("client-uri")
 	subjectType, _ := cmd.Flags().GetString("subject-type")
 
+	var echoSecret bool
+
 	if secret == "" {
 		var secretb []byte
 		secretb, err = pkg.GenerateSecret(26)
-		pkg.Must(err, "Could not generate secret: %s", err)
+		pkg.Must(err, "Could not generate OAuth 2.0 Client Secret: %s", err)
 		secret = string(secretb)
+
+		echoSecret = true
 	} else {
 		fmt.Println("You should not provide secrets using command line flags. The secret might leak to bash history and similar systems.")
 	}
@@ -131,12 +140,14 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	result, response, err := m.CreateOAuth2Client(cc)
 	checkResponse(response, err, http.StatusCreated)
 
-	fmt.Printf("OAuth2 client id: %s\n", result.ClientId)
+	fmt.Printf("OAuth 2.0 Client ID: %s\n", result.ClientId)
 
 	if result.ClientSecret == "" {
-		fmt.Println("This client has no secret.")
+		fmt.Println("This OAuth 2.0 Client has no secret.")
 	} else {
-		fmt.Printf("OAuth2 client secret: %s\n", result.ClientSecret)
+		if echoSecret {
+			fmt.Printf("OAuth 2.0 Client Secret: %s\n", result.ClientSecret)
+		}
 	}
 }
 

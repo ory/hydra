@@ -21,15 +21,14 @@
 package client
 
 import (
-	"crypto/x509"
 	"testing"
 
 	"context"
 
 	"github.com/ory/fosite"
+	"github.com/ory/hydra/jwk"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/square/go-jose.v2"
 )
 
 func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
@@ -91,7 +90,7 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 			Contacts:                      []string{"aeneas1", "aeneas2"},
 			SecretExpiresAt:               0,
 			SectorIdentifierURI:           "https://sector",
-			JSONWebKeys:                   &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{{KeyID: "foo", Key: []byte("asdf"), Certificates: []*x509.Certificate{}}}},
+			JSONWebKeys:                   &jwk.JSONWebKeySet{Keys: []jwk.JSONWebKey{{Kid: "foo", Kty: "oct", K: "asdf"}}},
 			JSONWebKeysURI:                "https://...",
 			TokenEndpointAuthMethod:       "none",
 			RequestURIs:                   []string{"foo", "bar"},
@@ -180,6 +179,7 @@ func compare(t *testing.T, expected *Client, actual fosite.Client, k string) {
 	assert.EqualValues(t, expected.IsPublic(), actual.IsPublic())
 
 	if actual, ok := actual.(*Client); ok {
+		assert.EqualValues(t, expected.JSONWebKeys.Keys, actual.JSONWebKeys.Keys)
 		assert.EqualValues(t, expected.Owner, actual.Owner)
 		assert.EqualValues(t, expected.Name, actual.Name)
 		assert.EqualValues(t, expected.PolicyURI, actual.PolicyURI)
@@ -193,7 +193,7 @@ func compare(t *testing.T, expected *Client, actual fosite.Client, k string) {
 	}
 
 	if actual, ok := actual.(fosite.OpenIDConnectClient); ok {
-		assert.EqualValues(t, expected.JSONWebKeys.Keys, actual.GetJSONWebKeys().Keys)
+		assert.EqualValues(t, expected.GetJSONWebKeys().Keys, actual.GetJSONWebKeys().Keys)
 		assert.EqualValues(t, expected.JSONWebKeysURI, actual.GetJSONWebKeysURI())
 		assert.EqualValues(t, expected.TokenEndpointAuthMethod, actual.GetTokenEndpointAuthMethod())
 		assert.EqualValues(t, expected.RequestURIs, actual.GetRequestURIs())

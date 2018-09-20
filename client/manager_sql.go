@@ -29,10 +29,10 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/fosite"
 	"github.com/ory/go-convenience/stringsx"
+	"github.com/ory/hydra/jwk"
 	"github.com/ory/sqlcon"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
-	"gopkg.in/square/go-jose.v2"
 )
 
 var sharedMigrations = []*migrate.Migration{
@@ -312,7 +312,7 @@ func (d *sqlData) ToClient() (*Client, error) {
 	}
 
 	if d.JSONWebKeys != "" {
-		c.JSONWebKeys = new(jose.JSONWebKeySet)
+		c.JSONWebKeys = new(jwk.JSONWebKeySet)
 		if err := json.Unmarshal([]byte(d.JSONWebKeys), &c.JSONWebKeys); err != nil {
 			return nil, errors.WithStack(err)
 		}

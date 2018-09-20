@@ -26,9 +26,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/ory/hydra/jwk"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/square/go-jose.v2"
 )
 
 func TestValidate(t *testing.T) {
@@ -71,7 +71,7 @@ func TestValidate(t *testing.T) {
 			expectErr: true,
 		},
 		{
-			in:        &Client{ClientID: "foo", JSONWebKeys: &jose.JSONWebKeySet{}, JSONWebKeysURI: "asdf", TokenEndpointAuthMethod: "private_key_jwt"},
+			in:        &Client{ClientID: "foo", JSONWebKeys: &jwk.JSONWebKeySet{}, JSONWebKeysURI: "asdf", TokenEndpointAuthMethod: "private_key_jwt"},
 			expectErr: true,
 		},
 		{

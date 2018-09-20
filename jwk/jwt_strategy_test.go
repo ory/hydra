@@ -45,15 +45,15 @@ func TestRS256JWTStrategy(t *testing.T) {
 
 	s, err := NewRS256JWTStrategy(m, "foo-set")
 	require.NoError(t, err)
-	a, b, err := s.Generate(jwt2.MapClaims{"foo": "bar"}, &jwt.Headers{})
+	a, b, err := s.Generate(context.TODO(), jwt2.MapClaims{"foo": "bar"}, &jwt.Headers{})
 	require.NoError(t, err)
 	assert.NotEmpty(t, a)
 	assert.NotEmpty(t, b)
 
-	_, err = s.Validate(a)
+	_, err = s.Validate(context.TODO(), a)
 	require.NoError(t, err)
 
-	kid, err := s.GetPublicKeyID()
+	kid, err := s.GetPublicKeyID(context.TODO())
 	assert.NoError(t, err)
 	assert.Equal(t, "public:foo", kid)
 
@@ -61,15 +61,15 @@ func TestRS256JWTStrategy(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, m.AddKeySet(context.TODO(), "foo-set", ks))
 
-	a, b, err = s.Generate(jwt2.MapClaims{"foo": "bar"}, &jwt.Headers{})
+	a, b, err = s.Generate(context.TODO(), jwt2.MapClaims{"foo": "bar"}, &jwt.Headers{})
 	require.NoError(t, err)
 	assert.NotEmpty(t, a)
 	assert.NotEmpty(t, b)
 
-	_, err = s.Validate(a)
+	_, err = s.Validate(context.TODO(), a)
 	require.NoError(t, err)
 
-	kid, err = s.GetPublicKeyID()
+	kid, err = s.GetPublicKeyID(context.TODO())
 	assert.NoError(t, err)
 	assert.Equal(t, "public:bar", kid)
 }

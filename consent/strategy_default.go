@@ -28,8 +28,6 @@ import (
 	"strings"
 	"time"
 
-	"context"
-
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"
 	"github.com/ory/fosite"
@@ -119,7 +117,7 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{}, nil)
 	}
 
-	session, err := s.M.GetAuthenticationSession(context.TODO(), sessionID)
+	session, err := s.M.GetAuthenticationSession(r.Context(), sessionID)
 	if errors.Cause(err) == pkg.ErrNotFound {
 		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{}, nil)
 	} else if err != nil {
@@ -147,7 +145,7 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 		return s.forwardAuthenticationRequest(w, r, ar, session.Subject, session.AuthenticatedAt, session)
 	}
 
-	token, err := s.JWTStrategy.Decode(idTokenHint)
+	token, err := s.JWTStrategy.Decode(r.Context(), idTokenHint)
 	if ve, ok := errors.Cause(err).(*jwtgo.ValidationError); err == nil || (ok && ve.Errors == jwtgo.ValidationErrorExpired) {
 	} else {
 		return err
@@ -162,7 +160,7 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 		return err
 	}
 
-	if s, err := s.M.GetForcedObfuscatedAuthenticationSession(context.TODO(), ar.GetClient().GetID(), hintSub); errors.Cause(err) == pkg.ErrNotFound {
+	if s, err := s.M.GetForcedObfuscatedAuthenticationSession(r.Context(), ar.GetClient().GetID(), hintSub); errors.Cause(err) == pkg.ErrNotFound {
 		// do nothing
 	} else if err != nil {
 		return err
@@ -208,7 +206,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 
 	var idTokenHintClaims jwtgo.MapClaims
 	if idTokenHint := ar.GetRequestForm().Get("id_token_hint"); len(idTokenHint) > 0 {
-		token, err := s.JWTStrategy.Decode(idTokenHint)
+		token, err := s.JWTStrategy.Decode(r.Context(), idTokenHint)
 		if ve, ok := errors.Cause(err).(*jwtgo.ValidationError); err == nil || (ok && ve.Errors == jwtgo.ValidationErrorExpired) {
 			if hintClaims, ok := token.Claims.(jwtgo.MapClaims); ok {
 				idTokenHintClaims = hintClaims
@@ -223,7 +221,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 
 	// Set the session
 	if err := s.M.CreateAuthenticationRequest(
-		context.TODO(),
+		r.Context(),
 		&AuthenticationRequest{
 			Challenge:       challenge,
 			Verifier:        verifier,
@@ -277,7 +275,7 @@ func (s *DefaultStrategy) revokeAuthenticationSession(w http.ResponseWriter, r *
 		return nil
 	}
 
-	return s.M.DeleteAuthenticationSession(context.TODO(), sid)
+	return s.M.DeleteAuthenticationSession(r.Context(), sid)
 }
 
 func revokeAuthenticationCookie(w http.ResponseWriter, r *http.Request, s sessions.Store) (string, error) {
@@ -313,7 +311,7 @@ func (s *DefaultStrategy) obfuscateSubjectIdentifier(subject string, req fosite.
 }
 
 func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*HandledAuthenticationRequest, error) {
-	session, err := s.M.VerifyAndInvalidateAuthenticationRequest(context.TODO(), verifier)
+	session, err := s.M.VerifyAndInvalidateAuthenticationRequest(r.Context(), verifier)
 	if errors.Cause(err) == pkg.ErrNotFound {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithDebug("The login verifier has already been used, has not been granted, or is invalid."))
 	} else if err != nil {
@@ -386,7 +384,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	}
 
 	if session.ForceSubjectIdentifier != "" {
-		if err := s.M.CreateForcedObfuscatedAuthenticationSession(context.TODO(), &ForcedObfuscatedAuthenticationSession{
+		if err := s.M.CreateForcedObfuscatedAuthenticationSession(r.Context(), &ForcedObfuscatedAuthenticationSession{
 			Subject:           session.Subject,
 			ClientID:          req.GetClient().GetID(),
 			SubjectObfuscated: session.ForceSubjectIdentifier,
@@ -410,7 +408,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	cookie, _ := s.CookieStore.Get(r, cookieAuthenticationName)
 	sid := uuid.New()
 
-	if err := s.M.CreateAuthenticationSession(context.TODO(), &AuthenticationSession{
+	if err := s.M.CreateAuthenticationSession(r.Context(), &AuthenticationSession{
 		ID:              sid,
 		Subject:         session.Subject,
 		AuthenticatedAt: session.AuthenticatedAt,
@@ -472,7 +470,7 @@ func (s *DefaultStrategy) requestConsent(w http.ResponseWriter, r *http.Request,
 	// 	 return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
 	// }
 
-	consentSessions, err := s.M.FindPreviouslyGrantedConsentRequests(context.TODO(), ar.GetClient().GetID(), authenticationSession.Subject)
+	consentSessions, err := s.M.FindPreviouslyGrantedConsentRequests(r.Context(), ar.GetClient().GetID(), authenticationSession.Subject)
 	if errors.Cause(err) == ErrNoPreviousConsentFound {
 		return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
 	} else if err != nil {
@@ -503,7 +501,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 	csrf := strings.Replace(uuid.New(), "-", "", -1)
 
 	if err := s.M.CreateConsentRequest(
-		context.TODO(),
+		r.Context(),
 		&ConsentRequest{
 			Challenge:              challenge,
 			Verifier:               verifier,
@@ -544,7 +542,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 }
 
 func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*HandledConsentRequest, error) {
-	session, err := s.M.VerifyAndInvalidateConsentRequest(context.TODO(), verifier)
+	session, err := s.M.VerifyAndInvalidateConsentRequest(r.Context(), verifier)
 	if errors.Cause(err) == pkg.ErrNotFound {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithDebug("The consent verifier has already been used, has not been granted, or is invalid."))
 	} else if err != nil {

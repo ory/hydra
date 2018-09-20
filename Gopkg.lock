@@ -351,6 +351,7 @@
     ".",
     "ext",
     "log",
+    "mocktracer",
   ]
   pruneopts = ""
   revision = "1949ddbfd147afd4d964a9f00b24eb291e0e7c38"
@@ -391,7 +392,7 @@
   version = "v3.3.0"
 
 [[projects]]
-  digest = "1:ae58fa3a26065fc3408e6c4e3899b62453e19bb5aa5e79725484bfb534422ca4"
+  digest = "1:0a0c89d174f4b76bfe9a10d18c92e5a1eb3f445d4073884889b8a0a389f0ea80"
   name = "github.com/ory/fosite"
   packages = [
     ".",
@@ -404,8 +405,8 @@
     "token/jwt",
   ]
   pruneopts = ""
-  revision = "1ad9cd36069f61b2ace0fec097fe4bdc92e9f6c6"
-  version = "v0.21.5"
+  revision = "514fdbd20393c2175c66f3a69eb7bb849b3d5dfa"
+  version = "v0.22.0"
 
 [[projects]]
   digest = "1:88233ef02f3da33b9d4cf4f6c514c206ce4efec67f455c5be6dd3aa0fdf3bd32"
@@ -467,12 +468,13 @@
   version = "v0.0.1"
 
 [[projects]]
-  digest = "1:fff9b8b263350edc9041d38d9cc17c7b492f3bde282f6c10f0a648152e96e20d"
+  digest = "1:80e8a237b37d36ff222fce1c2dd34899479ef23b18bb123319b50611023785e3"
   name = "github.com/ory/sqlcon"
   packages = [
     ".",
     "dockertest",
   ]
+  pruneopts = ""
   revision = "068c69998749cdb876c4adf179a8ed702864ad2b"
   version = "v0.0.7"
 
@@ -869,6 +871,7 @@
     "github.com/oleiade/reflections",
     "github.com/opentracing/opentracing-go",
     "github.com/opentracing/opentracing-go/ext",
+    "github.com/opentracing/opentracing-go/mocktracer",
     "github.com/ory/fosite",
     "github.com/ory/fosite/compose",
     "github.com/ory/fosite/handler/oauth2",

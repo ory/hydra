@@ -32,7 +32,7 @@ import (
 )
 
 type JWTStrategy interface {
-	GetPublicKeyID() (string, error)
+	GetPublicKeyID(ctx context.Context) (string, error)
 
 	jwt.JWTStrategy
 }
@@ -43,7 +43,7 @@ func NewRS256JWTStrategy(m Manager, set string) (*RS256JWTStrategy, error) {
 		RS256JWTStrategy: &jwt.RS256JWTStrategy{},
 		Set:              set,
 	}
-	if err := j.refresh(); err != nil {
+	if err := j.refresh(context.TODO()); err != nil {
 		return nil, err
 	}
 	return j, nil
@@ -60,8 +60,8 @@ type RS256JWTStrategy struct {
 	privateKeyID string
 }
 
-func (j *RS256JWTStrategy) Hash(in []byte) ([]byte, error) {
-	return j.RS256JWTStrategy.Hash(in)
+func (j *RS256JWTStrategy) Hash(ctx context.Context, in []byte) ([]byte, error) {
+	return j.RS256JWTStrategy.Hash(ctx, in)
 }
 
 // GetSigningMethodLength will return the length of the signing method
@@ -69,44 +69,44 @@ func (j *RS256JWTStrategy) GetSigningMethodLength() int {
 	return j.RS256JWTStrategy.GetSigningMethodLength()
 }
 
-func (j *RS256JWTStrategy) GetSignature(token string) (string, error) {
-	return j.RS256JWTStrategy.GetSignature(token)
+func (j *RS256JWTStrategy) GetSignature(ctx context.Context, token string) (string, error) {
+	return j.RS256JWTStrategy.GetSignature(ctx, token)
 }
 
-func (j *RS256JWTStrategy) Generate(claims jwt2.Claims, header jwt.Mapper) (string, string, error) {
-	if err := j.refresh(); err != nil {
+func (j *RS256JWTStrategy) Generate(ctx context.Context, claims jwt2.Claims, header jwt.Mapper) (string, string, error) {
+	if err := j.refresh(ctx); err != nil {
 		return "", "", err
 	}
 
-	return j.RS256JWTStrategy.Generate(claims, header)
+	return j.RS256JWTStrategy.Generate(ctx, claims, header)
 }
 
-func (j *RS256JWTStrategy) Validate(token string) (string, error) {
-	if err := j.refresh(); err != nil {
+func (j *RS256JWTStrategy) Validate(ctx context.Context, token string) (string, error) {
+	if err := j.refresh(ctx); err != nil {
 		return "", err
 	}
 
-	return j.RS256JWTStrategy.Validate(token)
+	return j.RS256JWTStrategy.Validate(ctx, token)
 }
 
-func (j *RS256JWTStrategy) Decode(token string) (*jwt2.Token, error) {
-	if err := j.refresh(); err != nil {
+func (j *RS256JWTStrategy) Decode(ctx context.Context, token string) (*jwt2.Token, error) {
+	if err := j.refresh(ctx); err != nil {
 		return nil, err
 	}
 
-	return j.RS256JWTStrategy.Decode(token)
+	return j.RS256JWTStrategy.Decode(ctx, token)
 }
 
-func (j *RS256JWTStrategy) GetPublicKeyID() (string, error) {
-	if err := j.refresh(); err != nil {
+func (j *RS256JWTStrategy) GetPublicKeyID(ctx context.Context) (string, error) {
+	if err := j.refresh(ctx); err != nil {
 		return "", err
 	}
 
 	return j.publicKeyID, nil
 }
 
-func (j *RS256JWTStrategy) refresh() error {
-	keys, err := j.Manager.GetKeySet(context.TODO(), j.Set)
+func (j *RS256JWTStrategy) refresh(ctx context.Context) error {
+	keys, err := j.Manager.GetKeySet(ctx, j.Set)
 	if err != nil {
 		return err
 	}

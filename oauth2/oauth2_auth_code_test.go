@@ -124,11 +124,11 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				WorkFactor: 4,
 			}
 
-			fooUserIDToken, _, err := jwts.Generate((jwt.IDTokenClaims{
+			fooUserIDToken, _, err := jwts.Generate(context.TODO(), jwt.IDTokenClaims{
 				Subject:   "foouser",
 				ExpiresAt: time.Now().Add(time.Hour),
 				IssuedAt:  time.Now(),
-			}).ToMapClaims(), jwt.NewHeaders())
+			}.ToMapClaims(), jwt.NewHeaders())
 			require.NoError(t, err)
 
 			// we create a new fositeStore here because the old one

@@ -281,13 +281,13 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 		delete(interim, "exp")
 		delete(interim, "jti")
 
-		keyID, err := h.OpenIDJWTStrategy.GetPublicKeyID()
+		keyID, err := h.OpenIDJWTStrategy.GetPublicKeyID(r.Context())
 		if err != nil {
 			h.H.WriteError(w, r, err)
 			return
 		}
 
-		token, _, err := h.OpenIDJWTStrategy.Generate(jwt2.MapClaims(interim), &jwt.Headers{
+		token, _, err := h.OpenIDJWTStrategy.Generate(r.Context(), jwt2.MapClaims(interim), &jwt.Headers{
 			Extra: map[string]interface{}{
 				"kid": keyID,
 			},
@@ -526,7 +526,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	if accessRequest.GetGrantTypes().Exact("client_credentials") {
 		var accessTokenKeyID string
 		if h.AccessTokenStrategy == "jwt" {
-			accessTokenKeyID, err = h.AccessTokenJWTStrategy.GetPublicKeyID()
+			accessTokenKeyID, err = h.AccessTokenJWTStrategy.GetPublicKeyID(r.Context())
 			if err != nil {
 				pkg.LogError(err, h.L)
 				h.OAuth2.WriteAccessError(w, accessRequest, err)
@@ -599,7 +599,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		authorizeRequest.GrantScope(scope)
 	}
 
-	openIDKeyID, err := h.OpenIDJWTStrategy.GetPublicKeyID()
+	openIDKeyID, err := h.OpenIDJWTStrategy.GetPublicKeyID(r.Context())
 	if err != nil {
 		pkg.LogError(err, h.L)
 		h.writeAuthorizeError(w, authorizeRequest, err)
@@ -608,7 +608,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 
 	var accessTokenKeyID string
 	if h.AccessTokenStrategy == "jwt" {
-		accessTokenKeyID, err = h.AccessTokenJWTStrategy.GetPublicKeyID()
+		accessTokenKeyID, err = h.AccessTokenJWTStrategy.GetPublicKeyID(r.Context())
 		if err != nil {
 			pkg.LogError(err, h.L)
 			h.writeAuthorizeError(w, authorizeRequest, err)

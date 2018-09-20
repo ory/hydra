@@ -76,7 +76,7 @@ func loadCertificateFromEnv(c *config.Config) *tls.Certificate {
 	var cert tls.Certificate
 	var err error
 	if cert, err = tls.X509KeyPair([]byte(certString), []byte(keyString)); err != nil {
-		c.GetLogger().Warningf("Could not parse x509 key pair from env: %s", cert)
+		c.GetLogger().Warningf("Could not parse x509 key pair from env: %s", err)
 		return nil
 	}
 

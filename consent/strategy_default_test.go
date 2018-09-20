@@ -34,6 +34,8 @@ import (
 	"testing"
 	"time"
 
+	"context"
+
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
@@ -90,32 +92,32 @@ func TestStrategy(t *testing.T) {
 		PrivateKey: pkg.MustINSECURELOWENTROPYRSAKEYFORTEST(),
 	}
 
-	fooUserIDToken, _, err := jwts.Generate((jwt.IDTokenClaims{
+	fooUserIDToken, _, err := jwts.Generate(context.TODO(), jwt.IDTokenClaims{
 		Subject:   "foouser",
 		ExpiresAt: time.Now().Add(time.Hour),
 		IssuedAt:  time.Now(),
-	}).ToMapClaims(), jwt.NewHeaders())
+	}.ToMapClaims(), jwt.NewHeaders())
 	require.NoError(t, err)
 
-	forcedAuthUserIDToken, _, err := jwts.Generate((jwt.IDTokenClaims{
+	forcedAuthUserIDToken, _, err := jwts.Generate(context.TODO(), jwt.IDTokenClaims{
 		Subject:   "forced-auth-user",
 		ExpiresAt: time.Now().Add(time.Hour),
 		IssuedAt:  time.Now(),
-	}).ToMapClaims(), jwt.NewHeaders())
+	}.ToMapClaims(), jwt.NewHeaders())
 	require.NoError(t, err)
 
-	pairwiseIDToken, _, err := jwts.Generate((jwt.IDTokenClaims{
+	pairwiseIDToken, _, err := jwts.Generate(context.TODO(), jwt.IDTokenClaims{
 		Subject:   "c737d5e1fec8896d096d49f6b1a73eb45ac7becb87de9ac3f0a350bad2a9c9fd",
 		ExpiresAt: time.Now().Add(time.Hour),
 		IssuedAt:  time.Now(),
-	}).ToMapClaims(), jwt.NewHeaders())
+	}.ToMapClaims(), jwt.NewHeaders())
 	require.NoError(t, err)
 
-	expiredAuthUserToken, _, err := jwts.Generate((jwt.IDTokenClaims{
+	expiredAuthUserToken, _, err := jwts.Generate(context.TODO(), jwt.IDTokenClaims{
 		Subject:   "user",
 		ExpiresAt: time.Now().Add(-time.Hour),
 		IssuedAt:  time.Now(),
-	}).ToMapClaims(), jwt.NewHeaders())
+	}.ToMapClaims(), jwt.NewHeaders())
 	require.NoError(t, err)
 
 	cs := sessions.NewCookieStore([]byte("dummy-secret-yay"))

@@ -378,7 +378,7 @@ func (c *Config) GetSystemSecret() []byte {
 	}
 
 	if len(c.SystemSecret) > 0 {
-		c.GetLogger().Fatalln("System secret must be undefined or have at least 16 characters, but it has %d characters.", len(c.SystemSecret))
+		c.GetLogger().Fatalf("System secret must be undefined or have at least 16 characters, but it has %d characters.", len(c.SystemSecret))
 		return nil
 	}
 

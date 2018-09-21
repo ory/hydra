@@ -70,10 +70,9 @@ func TestHelperClientAuthenticate(k string, m Manager) func(t *testing.T) {
 func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 	return func(t *testing.T) {
 		t.Parallel()
-		_, err := m.GetClient(nil, "4321")
-		assert.NotNil(t, err)
-
 		ctx := context.TODO()
+		_, err := m.GetClient(ctx, "4321")
+		assert.NotNil(t, err)
 
 		c := &Client{
 			ClientID:                      "1234",
@@ -115,7 +114,7 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 			SecretExpiresAt:   1,
 		}))
 
-		d, err := m.GetClient(nil, "1234")
+		d, err := m.GetClient(ctx, "1234")
 		require.NoError(t, err)
 
 		compare(t, c, d, k)
@@ -162,7 +161,7 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 		err = m.DeleteClient(ctx, "1234")
 		assert.NoError(t, err)
 
-		_, err = m.GetClient(nil, "1234")
+		_, err = m.GetClient(ctx, "1234")
 		assert.NotNil(t, err)
 	}
 }

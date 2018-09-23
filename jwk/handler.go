@@ -102,7 +102,7 @@ func (h *Handler) SetRoutes(frontend, backend *httprouter.Router) {
 //     Schemes: http, https
 //
 //     Responses:
-//       200: jsonWebKeySet
+//       200: JSONWebKeySet
 //       401: genericError
 //       403: genericError
 //       500: genericError
@@ -145,7 +145,7 @@ func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request, ps httproute
 //     Schemes: http, https
 //
 //     Responses:
-//       200: jsonWebKeySet
+//       200: JSONWebKeySet
 //       401: genericError
 //       403: genericError
 //       500: genericError
@@ -179,7 +179,7 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //     Schemes: http, https
 //
 //     Responses:
-//       200: jsonWebKeySet
+//       200: JSONWebKeySet
 //       401: genericError
 //       403: genericError
 //       500: genericError
@@ -212,7 +212,7 @@ func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httproute
 //     Schemes: http, https
 //
 //     Responses:
-//       200: jsonWebKeySet
+//       200: JSONWebKeySet
 //       401: genericError
 //       403: genericError
 //       500: genericError
@@ -261,7 +261,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //     Schemes: http, https
 //
 //     Responses:
-//       200: jsonWebKeySet
+//       200: JSONWebKeySet
 //       401: genericError
 //       403: genericError
 //       500: genericError
@@ -299,7 +299,7 @@ func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 //     Schemes: http, https
 //
 //     Responses:
-//       200: jsonWebKey
+//       200: JSONWebKey
 //       401: genericError
 //       403: genericError
 //       500: genericError

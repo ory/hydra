@@ -110,7 +110,7 @@ type swaggerJwkSetQuery struct {
 	Set string `json:"set"`
 }
 
-// swagger:model jsonWebKeySet
+// swagger:model JSONWebKeySet
 type swaggerJSONWebKeySet struct {
 	// The value of the "keys" parameter is an array of JWK values.  By
 	// default, the order of the JWK values within the array does not imply
@@ -120,7 +120,7 @@ type swaggerJSONWebKeySet struct {
 	Keys []swaggerJSONWebKey `json:"keys"`
 }
 
-// swagger:model jsonWebKey
+// swagger:model JSONWebKey
 type swaggerJSONWebKey struct {
 	//  The "use" (public key use) parameter identifies the intended use of
 	// the public key. The "use" parameter is employed to indicate whether

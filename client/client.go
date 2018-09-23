@@ -26,7 +26,9 @@ import (
 	"github.com/ory/fosite"
 
 	// Naming the dependency jose is important for go-swagger to work, see https://github.com/go-swagger/go-swagger/issues/1587
-	jose "gopkg.in/square/go-jose.v2"
+	"encoding/json"
+	"github.com/ory/hydra/jwk"
+	"gopkg.in/square/go-jose.v2"
 )
 
 // Client represents an OAuth 2.0 Client.
@@ -129,7 +131,7 @@ type Client struct {
 	// can use jwks_uri, it MUST NOT use jwks. One significant downside of jwks is that it does not enable key rotation
 	// (which jwks_uri does, as described in Section 10 of OpenID Connect Core 1.0 [OpenID.Core]). The jwks_uri and jwks
 	// parameters MUST NOT be used together.
-	JSONWebKeys *jose.JSONWebKeySet `json:"jwks,omitempty"`
+	JSONWebKeys *jwk.JSONWebKeySet `json:"jwks,omitempty"`
 
 	// Requested Client Authentication method for the Token Endpoint. The options are client_secret_post,
 	// client_secret_basic, private_key_jwt, and none.
@@ -204,7 +206,19 @@ func (c *Client) GetJSONWebKeysURI() string {
 }
 
 func (c *Client) GetJSONWebKeys() *jose.JSONWebKeySet {
-	return c.JSONWebKeys
+	if c.JSONWebKeys == nil {
+		return nil
+	}
+	buf, err := json.Marshal(c.JSONWebKeys)
+	if err != nil {
+		return nil
+	}
+	jwks := new(jose.JSONWebKeySet)
+	err = json.Unmarshal(buf, &jwks)
+	if err != nil {
+		return nil
+	}
+	return jwks
 }
 
 func (c *Client) GetTokenEndpointAuthSigningAlgorithm() string {

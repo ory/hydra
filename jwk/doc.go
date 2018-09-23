@@ -72,7 +72,7 @@ type swaggerJwkUpdateSet struct {
 	Set string `json:"set"`
 
 	// in: body
-	Body swaggerJSONWebKeySet
+	Body JSONWebKeySet
 }
 
 // swagger:parameters updateJsonWebKey
@@ -88,7 +88,7 @@ type swaggerJwkUpdateSetKey struct {
 	Set string `json:"set"`
 
 	// in: body
-	Body swaggerJSONWebKey
+	Body JSONWebKey
 }
 
 // swagger:parameters createJsonWebKeySet
@@ -111,17 +111,17 @@ type swaggerJwkSetQuery struct {
 }
 
 // swagger:model jsonWebKeySet
-type swaggerJSONWebKeySet struct {
+type JSONWebKeySet struct {
 	// The value of the "keys" parameter is an array of JWK values.  By
 	// default, the order of the JWK values within the array does not imply
 	// an order of preference among them, although applications of JWK Sets
 	// can choose to assign a meaning to the order for their purposes, if
 	// desired.
-	Keys []swaggerJSONWebKey `json:"keys"`
+	Keys []JSONWebKey `json:"keys"`
 }
 
 // swagger:model jsonWebKey
-type swaggerJSONWebKey struct {
+type JSONWebKey struct {
 	//  The "use" (public key use) parameter identifies the intended use of
 	// the public key. The "use" parameter is employed to indicate whether
 	// a public key is used for encrypting data or verifying the signature

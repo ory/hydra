@@ -17,12 +17,12 @@
 ;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/JSONWebKeySet'], factory)
+    define(['ApiClient', 'model/JsonWebKeySet'], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
     module.exports = factory(
       require('../ApiClient'),
-      require('./JSONWebKeySet')
+      require('./JsonWebKeySet')
     )
   } else {
     // Browser globals (root is window)
@@ -31,10 +31,10 @@
     }
     root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Client = factory(
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JSONWebKeySet
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKeySet
     )
   }
-})(this, function(ApiClient, JSONWebKeySet) {
+})(this, function(ApiClient, JsonWebKeySet) {
   'use strict'
 
   /**
@@ -105,7 +105,7 @@
         ])
       }
       if (data.hasOwnProperty('jwks')) {
-        obj['jwks'] = JSONWebKeySet.constructFromObject(data['jwks'])
+        obj['jwks'] = JsonWebKeySet.constructFromObject(data['jwks'])
       }
       if (data.hasOwnProperty('jwks_uri')) {
         obj['jwks_uri'] = ApiClient.convertToType(data['jwks_uri'], 'String')
@@ -219,7 +219,7 @@
    */
   exports.prototype['grant_types'] = undefined
   /**
-   * @member {module:model/JSONWebKeySet} jwks
+   * @member {module:model/JsonWebKeySet} jwks
    */
   exports.prototype['jwks'] = undefined
   /**

@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 **clientUri** | **String** | ClientURI is an URL string of a web page providing information about the client. If present, the server SHOULD display this URL to the end-user in a clickable fashion. | [optional] 
 **contacts** | **[String]** | Contacts is a array of strings representing ways to contact people responsible for this client, typically email addresses. | [optional] 
 **grantTypes** | **[String]** | GrantTypes is an array of grant types the client is allowed to use. | [optional] 
-**jwks** | [**JSONWebKeySet**](JSONWebKeySet.md) |  | [optional] 
+**jwks** | [**JsonWebKeySet**](JsonWebKeySet.md) |  | [optional] 
 **jwksUri** | **String** | URL for the Client&#39;s JSON Web Key Set [JWK] document. If the Client signs requests to the Server, it contains the signing key(s) the Server uses to validate signatures from the Client. The JWK Set MAY also contain the Client&#39;s encryption keys(s), which are used by the Server to encrypt responses to the Client. When both signing and encryption keys are made available, a use (Key Use) parameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key&#39;s intended usage. Although some algorithms allow the same key to be used for both signatures and encryption, doing so is NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate. | [optional] 
 **logoUri** | **String** | LogoURI is an URL string that references a logo for the client. | [optional] 
 **owner** | **String** | Owner is a string identifying the owner of the OAuth 2.0 Client. | [optional] 

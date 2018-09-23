@@ -62,7 +62,7 @@ class OAuth2Client implements ArrayAccess
         'client_uri' => 'string',
         'contacts' => 'string[]',
         'grant_types' => 'string[]',
-        'jwks' => '\Hydra\SDK\Model\JSONWebKeySet',
+        'jwks' => '\Hydra\SDK\Model\JsonWebKeySet',
         'jwks_uri' => 'string',
         'logo_uri' => 'string',
         'owner' => 'string',
@@ -469,7 +469,7 @@ class OAuth2Client implements ArrayAccess
 
     /**
      * Gets jwks
-     * @return \Hydra\SDK\Model\JSONWebKeySet
+     * @return \Hydra\SDK\Model\JsonWebKeySet
      */
     public function getJwks()
     {
@@ -478,7 +478,7 @@ class OAuth2Client implements ArrayAccess
 
     /**
      * Sets jwks
-     * @param \Hydra\SDK\Model\JSONWebKeySet $jwks
+     * @param \Hydra\SDK\Model\JsonWebKeySet $jwks
      * @return $this
      */
     public function setJwks($jwks)

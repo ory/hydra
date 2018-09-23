@@ -3,7 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**body** | [**\Hydra\SDK\Model\JsonWebKey**](JsonWebKey.md) |  | [optional] 
+**body** | [**\Hydra\SDK\Model\JSONWebKey**](JSONWebKey.md) |  | [optional] 
 **kid** | **string** | The kid of the desired key in: path | 
 **set** | **string** | The set in: path | 
 

@@ -97,7 +97,7 @@ class JsonWebKeyApi
      * @param string $set The set (required)
      * @param \Hydra\SDK\Model\JsonWebKeySetGeneratorRequest $body  (optional)
      * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return \Hydra\SDK\Model\JsonWebKeySet
+     * @return \Hydra\SDK\Model\JSONWebKeySet
      */
     public function createJsonWebKeySet($set, $body = null)
     {
@@ -115,7 +115,7 @@ class JsonWebKeyApi
      * @param string $set The set (required)
      * @param \Hydra\SDK\Model\JsonWebKeySetGeneratorRequest $body  (optional)
      * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return array of \Hydra\SDK\Model\JsonWebKeySet, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \Hydra\SDK\Model\JSONWebKeySet, HTTP status code, HTTP response headers (array of strings)
      */
     public function createJsonWebKeySetWithHttpInfo($set, $body = null)
     {
@@ -163,15 +163,15 @@ class JsonWebKeyApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\Hydra\SDK\Model\JsonWebKeySet',
+                '\Hydra\SDK\Model\JSONWebKeySet',
                 '/keys/{set}'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\JsonWebKeySet', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\JSONWebKeySet', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\JsonWebKeySet', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\JSONWebKeySet', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
@@ -404,7 +404,7 @@ class JsonWebKeyApi
      * @param string $kid The kid of the desired key (required)
      * @param string $set The set (required)
      * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return \Hydra\SDK\Model\JsonWebKeySet
+     * @return \Hydra\SDK\Model\JSONWebKeySet
      */
     public function getJsonWebKey($kid, $set)
     {
@@ -422,7 +422,7 @@ class JsonWebKeyApi
      * @param string $kid The kid of the desired key (required)
      * @param string $set The set (required)
      * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return array of \Hydra\SDK\Model\JsonWebKeySet, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \Hydra\SDK\Model\JSONWebKeySet, HTTP status code, HTTP response headers (array of strings)
      */
     public function getJsonWebKeyWithHttpInfo($kid, $set)
     {
@@ -477,15 +477,15 @@ class JsonWebKeyApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\Hydra\SDK\Model\JsonWebKeySet',
+                '\Hydra\SDK\Model\JSONWebKeySet',
                 '/keys/{set}/{kid}'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\JsonWebKeySet', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\JSONWebKeySet', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\JsonWebKeySet', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\JSONWebKeySet', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
@@ -515,7 +515,7 @@ class JsonWebKeyApi
      *
      * @param string $set The set (required)
      * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return \Hydra\SDK\Model\JsonWebKeySet
+     * @return \Hydra\SDK\Model\JSONWebKeySet
      */
     public function getJsonWebKeySet($set)
     {
@@ -532,7 +532,7 @@ class JsonWebKeyApi
      *
      * @param string $set The set (required)
      * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return array of \Hydra\SDK\Model\JsonWebKeySet, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \Hydra\SDK\Model\JSONWebKeySet, HTTP status code, HTTP response headers (array of strings)
      */
     public function getJsonWebKeySetWithHttpInfo($set)
     {
@@ -575,15 +575,15 @@ class JsonWebKeyApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\Hydra\SDK\Model\JsonWebKeySet',
+                '\Hydra\SDK\Model\JSONWebKeySet',
                 '/keys/{set}'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\JsonWebKeySet', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\JSONWebKeySet', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\JsonWebKeySet', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\JSONWebKeySet', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
@@ -613,9 +613,9 @@ class JsonWebKeyApi
      *
      * @param string $kid The kid of the desired key (required)
      * @param string $set The set (required)
-     * @param \Hydra\SDK\Model\JsonWebKey $body  (optional)
+     * @param \Hydra\SDK\Model\JSONWebKey $body  (optional)
      * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return \Hydra\SDK\Model\JsonWebKey
+     * @return \Hydra\SDK\Model\JSONWebKey
      */
     public function updateJsonWebKey($kid, $set, $body = null)
     {
@@ -632,9 +632,9 @@ class JsonWebKeyApi
      *
      * @param string $kid The kid of the desired key (required)
      * @param string $set The set (required)
-     * @param \Hydra\SDK\Model\JsonWebKey $body  (optional)
+     * @param \Hydra\SDK\Model\JSONWebKey $body  (optional)
      * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return array of \Hydra\SDK\Model\JsonWebKey, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \Hydra\SDK\Model\JSONWebKey, HTTP status code, HTTP response headers (array of strings)
      */
     public function updateJsonWebKeyWithHttpInfo($kid, $set, $body = null)
     {
@@ -694,15 +694,15 @@ class JsonWebKeyApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\Hydra\SDK\Model\JsonWebKey',
+                '\Hydra\SDK\Model\JSONWebKey',
                 '/keys/{set}/{kid}'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\JsonWebKey', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\JSONWebKey', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\JsonWebKey', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\JSONWebKey', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
@@ -731,9 +731,9 @@ class JsonWebKeyApi
      * Client for Hydra
      *
      * @param string $set The set (required)
-     * @param \Hydra\SDK\Model\JsonWebKeySet $body  (optional)
+     * @param \Hydra\SDK\Model\JSONWebKeySet $body  (optional)
      * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return \Hydra\SDK\Model\JsonWebKeySet
+     * @return \Hydra\SDK\Model\JSONWebKeySet
      */
     public function updateJsonWebKeySet($set, $body = null)
     {
@@ -749,9 +749,9 @@ class JsonWebKeyApi
      * Client for Hydra
      *
      * @param string $set The set (required)
-     * @param \Hydra\SDK\Model\JsonWebKeySet $body  (optional)
+     * @param \Hydra\SDK\Model\JSONWebKeySet $body  (optional)
      * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return array of \Hydra\SDK\Model\JsonWebKeySet, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \Hydra\SDK\Model\JSONWebKeySet, HTTP status code, HTTP response headers (array of strings)
      */
     public function updateJsonWebKeySetWithHttpInfo($set, $body = null)
     {
@@ -799,15 +799,15 @@ class JsonWebKeyApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\Hydra\SDK\Model\JsonWebKeySet',
+                '\Hydra\SDK\Model\JSONWebKeySet',
                 '/keys/{set}'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\JsonWebKeySet', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\JSONWebKeySet', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\JsonWebKeySet', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\JSONWebKeySet', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:

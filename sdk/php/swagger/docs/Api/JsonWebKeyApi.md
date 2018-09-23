@@ -15,7 +15,7 @@ Method | HTTP request | Description
 
 
 # **createJsonWebKeySet**
-> \Hydra\SDK\Model\JsonWebKeySet createJsonWebKeySet($set, $body)
+> \Hydra\SDK\Model\JSONWebKeySet createJsonWebKeySet($set, $body)
 
 Generate a new JSON Web Key
 
@@ -48,7 +48,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**\Hydra\SDK\Model\JsonWebKeySet**](../Model/JsonWebKeySet.md)
+[**\Hydra\SDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
 
 ### Authorization
 
@@ -152,7 +152,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **getJsonWebKey**
-> \Hydra\SDK\Model\JsonWebKeySet getJsonWebKey($kid, $set)
+> \Hydra\SDK\Model\JSONWebKeySet getJsonWebKey($kid, $set)
 
 Retrieve a JSON Web Key
 
@@ -185,7 +185,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**\Hydra\SDK\Model\JsonWebKeySet**](../Model/JsonWebKeySet.md)
+[**\Hydra\SDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
 
 ### Authorization
 
@@ -199,7 +199,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **getJsonWebKeySet**
-> \Hydra\SDK\Model\JsonWebKeySet getJsonWebKeySet($set)
+> \Hydra\SDK\Model\JSONWebKeySet getJsonWebKeySet($set)
 
 Retrieve a JSON Web Key Set
 
@@ -230,7 +230,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**\Hydra\SDK\Model\JsonWebKeySet**](../Model/JsonWebKeySet.md)
+[**\Hydra\SDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
 
 ### Authorization
 
@@ -244,7 +244,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **updateJsonWebKey**
-> \Hydra\SDK\Model\JsonWebKey updateJsonWebKey($kid, $set, $body)
+> \Hydra\SDK\Model\JSONWebKey updateJsonWebKey($kid, $set, $body)
 
 Update a JSON Web Key
 
@@ -258,7 +258,7 @@ require_once(__DIR__ . '/vendor/autoload.php');
 $api_instance = new Hydra\SDK\Api\JsonWebKeyApi();
 $kid = "kid_example"; // string | The kid of the desired key
 $set = "set_example"; // string | The set
-$body = new \Hydra\SDK\Model\JsonWebKey(); // \Hydra\SDK\Model\JsonWebKey | 
+$body = new \Hydra\SDK\Model\JSONWebKey(); // \Hydra\SDK\Model\JSONWebKey | 
 
 try {
     $result = $api_instance->updateJsonWebKey($kid, $set, $body);
@@ -275,11 +275,11 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **kid** | **string**| The kid of the desired key |
  **set** | **string**| The set |
- **body** | [**\Hydra\SDK\Model\JsonWebKey**](../Model/JsonWebKey.md)|  | [optional]
+ **body** | [**\Hydra\SDK\Model\JSONWebKey**](../Model/JSONWebKey.md)|  | [optional]
 
 ### Return type
 
-[**\Hydra\SDK\Model\JsonWebKey**](../Model/JsonWebKey.md)
+[**\Hydra\SDK\Model\JSONWebKey**](../Model/JSONWebKey.md)
 
 ### Authorization
 
@@ -293,7 +293,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **updateJsonWebKeySet**
-> \Hydra\SDK\Model\JsonWebKeySet updateJsonWebKeySet($set, $body)
+> \Hydra\SDK\Model\JSONWebKeySet updateJsonWebKeySet($set, $body)
 
 Update a JSON Web Key Set
 
@@ -306,7 +306,7 @@ require_once(__DIR__ . '/vendor/autoload.php');
 
 $api_instance = new Hydra\SDK\Api\JsonWebKeyApi();
 $set = "set_example"; // string | The set
-$body = new \Hydra\SDK\Model\JsonWebKeySet(); // \Hydra\SDK\Model\JsonWebKeySet | 
+$body = new \Hydra\SDK\Model\JSONWebKeySet(); // \Hydra\SDK\Model\JSONWebKeySet | 
 
 try {
     $result = $api_instance->updateJsonWebKeySet($set, $body);
@@ -322,11 +322,11 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **set** | **string**| The set |
- **body** | [**\Hydra\SDK\Model\JsonWebKeySet**](../Model/JsonWebKeySet.md)|  | [optional]
+ **body** | [**\Hydra\SDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)|  | [optional]
 
 ### Return type
 
-[**\Hydra\SDK\Model\JsonWebKeySet**](../Model/JsonWebKeySet.md)
+[**\Hydra\SDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
 
 ### Authorization
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * JsonWebKey
+ * JSONWebKey
  *
  * PHP version 5
  *
@@ -32,14 +32,14 @@ namespace Hydra\SDK\Model;
 use \ArrayAccess;
 
 /**
- * JsonWebKey Class Doc Comment
+ * JSONWebKey Class Doc Comment
  *
  * @category    Class
  * @package     Hydra\SDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
  */
-class JsonWebKey implements ArrayAccess
+class JSONWebKey implements ArrayAccess
 {
     const DISCRIMINATOR = null;
 
@@ -47,7 +47,7 @@ class JsonWebKey implements ArrayAccess
       * The original name of the model.
       * @var string
       */
-    protected static $swaggerModelName = 'jsonWebKey';
+    protected static $swaggerModelName = 'JSONWebKey';
 
     /**
       * Array of property to type mappings. Used for (de)serialization

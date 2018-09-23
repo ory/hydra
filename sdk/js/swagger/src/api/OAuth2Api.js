@@ -25,7 +25,7 @@
       'model/ConsentRequest',
       'model/FlushInactiveOAuth2TokensRequest',
       'model/InlineResponse401',
-      'model/JsonWebKeySet',
+      'model/JSONWebKeySet',
       'model/LoginRequest',
       'model/OAuth2Client',
       'model/OAuth2TokenIntrospection',
@@ -45,7 +45,7 @@
       require('../model/ConsentRequest'),
       require('../model/FlushInactiveOAuth2TokensRequest'),
       require('../model/InlineResponse401'),
-      require('../model/JsonWebKeySet'),
+      require('../model/JSONWebKeySet'),
       require('../model/LoginRequest'),
       require('../model/OAuth2Client'),
       require('../model/OAuth2TokenIntrospection'),
@@ -70,7 +70,7 @@
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer
         .FlushInactiveOAuth2TokensRequest,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.InlineResponse401,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKeySet,
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JSONWebKeySet,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.LoginRequest,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Client,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer
@@ -91,7 +91,7 @@
   ConsentRequest,
   FlushInactiveOAuth2TokensRequest,
   InlineResponse401,
-  JsonWebKeySet,
+  JSONWebKeySet,
   LoginRequest,
   OAuth2Client,
   OAuth2TokenIntrospection,
@@ -1314,7 +1314,7 @@
      * Callback function to receive the result of the wellKnown operation.
      * @callback module:api/OAuth2Api~wellKnownCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/JsonWebKeySet} data The data returned by the service call.
+     * @param {module:model/JSONWebKeySet} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -1322,7 +1322,7 @@
      * Get Well-Known JSON Web Keys
      * Returns metadata for discovering important JSON Web Keys. Currently, this endpoint returns the public key for verifying OpenID Connect ID Tokens.  A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
      * @param {module:api/OAuth2Api~wellKnownCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/JsonWebKeySet}
+     * data is of type: {@link module:model/JSONWebKeySet}
      */
     this.wellKnown = function(callback) {
       var postBody = null
@@ -1335,7 +1335,7 @@
       var authNames = []
       var contentTypes = ['application/json']
       var accepts = ['application/json']
-      var returnType = JsonWebKeySet
+      var returnType = JSONWebKeySet
 
       return this.apiClient.callApi(
         '/.well-known/jwks.json',

@@ -26,7 +26,7 @@
     if (!root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer) {
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {}
     }
-    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKey = factory(
+    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JSONWebKey = factory(
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient
     )
   }
@@ -34,14 +34,14 @@
   'use strict'
 
   /**
-   * The JsonWebKey model module.
-   * @module model/JsonWebKey
+   * The JSONWebKey model module.
+   * @module model/JSONWebKey
    * @version Latest
    */
 
   /**
-   * Constructs a new <code>JsonWebKey</code>.
-   * @alias module:model/JsonWebKey
+   * Constructs a new <code>JSONWebKey</code>.
+   * @alias module:model/JSONWebKey
    * @class
    */
   var exports = function() {
@@ -49,11 +49,11 @@
   }
 
   /**
-   * Constructs a <code>JsonWebKey</code> from a plain JavaScript object, optionally creating a new instance.
+   * Constructs a <code>JSONWebKey</code> from a plain JavaScript object, optionally creating a new instance.
    * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
    * @param {Object} data The plain JavaScript object bearing properties of interest.
-   * @param {module:model/JsonWebKey} obj Optional instance to populate.
-   * @return {module:model/JsonWebKey} The populated <code>JsonWebKey</code> instance.
+   * @param {module:model/JSONWebKey} obj Optional instance to populate.
+   * @return {module:model/JSONWebKey} The populated <code>JSONWebKey</code> instance.
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {

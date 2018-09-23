@@ -20,8 +20,8 @@
     define([
       'ApiClient',
       'model/InlineResponse401',
-      'model/JsonWebKey',
-      'model/JsonWebKeySet',
+      'model/JSONWebKey',
+      'model/JSONWebKeySet',
       'model/JsonWebKeySetGeneratorRequest'
     ], factory)
   } else if (typeof module === 'object' && module.exports) {
@@ -29,8 +29,8 @@
     module.exports = factory(
       require('../ApiClient'),
       require('../model/InlineResponse401'),
-      require('../model/JsonWebKey'),
-      require('../model/JsonWebKeySet'),
+      require('../model/JSONWebKey'),
+      require('../model/JSONWebKeySet'),
       require('../model/JsonWebKeySetGeneratorRequest')
     )
   } else {
@@ -41,8 +41,8 @@
     root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKeyApi = factory(
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.InlineResponse401,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKey,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKeySet,
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JSONWebKey,
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JSONWebKeySet,
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer
         .JsonWebKeySetGeneratorRequest
     )
@@ -50,8 +50,8 @@
 })(this, function(
   ApiClient,
   InlineResponse401,
-  JsonWebKey,
-  JsonWebKeySet,
+  JSONWebKey,
+  JSONWebKeySet,
   JsonWebKeySetGeneratorRequest
 ) {
   'use strict'
@@ -76,7 +76,7 @@
      * Callback function to receive the result of the createJsonWebKeySet operation.
      * @callback module:api/JsonWebKeyApi~createJsonWebKeySetCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/JsonWebKeySet} data The data returned by the service call.
+     * @param {module:model/JSONWebKeySet} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -87,7 +87,7 @@
      * @param {Object} opts Optional parameters
      * @param {module:model/JsonWebKeySetGeneratorRequest} opts.body
      * @param {module:api/JsonWebKeyApi~createJsonWebKeySetCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/JsonWebKeySet}
+     * data is of type: {@link module:model/JSONWebKeySet}
      */
     this.createJsonWebKeySet = function(set, opts, callback) {
       opts = opts || {}
@@ -110,7 +110,7 @@
       var authNames = []
       var contentTypes = ['application/json']
       var accepts = ['application/json']
-      var returnType = JsonWebKeySet
+      var returnType = JSONWebKeySet
 
       return this.apiClient.callApi(
         '/keys/{set}',
@@ -245,7 +245,7 @@
      * Callback function to receive the result of the getJsonWebKey operation.
      * @callback module:api/JsonWebKeyApi~getJsonWebKeyCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/JsonWebKeySet} data The data returned by the service call.
+     * @param {module:model/JSONWebKeySet} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -255,7 +255,7 @@
      * @param {String} kid The kid of the desired key
      * @param {String} set The set
      * @param {module:api/JsonWebKeyApi~getJsonWebKeyCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/JsonWebKeySet}
+     * data is of type: {@link module:model/JSONWebKeySet}
      */
     this.getJsonWebKey = function(kid, set, callback) {
       var postBody = null
@@ -285,7 +285,7 @@
       var authNames = []
       var contentTypes = ['application/json']
       var accepts = ['application/json']
-      var returnType = JsonWebKeySet
+      var returnType = JSONWebKeySet
 
       return this.apiClient.callApi(
         '/keys/{set}/{kid}',
@@ -307,7 +307,7 @@
      * Callback function to receive the result of the getJsonWebKeySet operation.
      * @callback module:api/JsonWebKeyApi~getJsonWebKeySetCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/JsonWebKeySet} data The data returned by the service call.
+     * @param {module:model/JSONWebKeySet} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -316,7 +316,7 @@
      * This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.  A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
      * @param {String} set The set
      * @param {module:api/JsonWebKeyApi~getJsonWebKeySetCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/JsonWebKeySet}
+     * data is of type: {@link module:model/JSONWebKeySet}
      */
     this.getJsonWebKeySet = function(set, callback) {
       var postBody = null
@@ -338,7 +338,7 @@
       var authNames = []
       var contentTypes = ['application/json']
       var accepts = ['application/json']
-      var returnType = JsonWebKeySet
+      var returnType = JSONWebKeySet
 
       return this.apiClient.callApi(
         '/keys/{set}',
@@ -360,7 +360,7 @@
      * Callback function to receive the result of the updateJsonWebKey operation.
      * @callback module:api/JsonWebKeyApi~updateJsonWebKeyCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/JsonWebKey} data The data returned by the service call.
+     * @param {module:model/JSONWebKey} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -370,9 +370,9 @@
      * @param {String} kid The kid of the desired key
      * @param {String} set The set
      * @param {Object} opts Optional parameters
-     * @param {module:model/JsonWebKey} opts.body
+     * @param {module:model/JSONWebKey} opts.body
      * @param {module:api/JsonWebKeyApi~updateJsonWebKeyCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/JsonWebKey}
+     * data is of type: {@link module:model/JSONWebKey}
      */
     this.updateJsonWebKey = function(kid, set, opts, callback) {
       opts = opts || {}
@@ -403,7 +403,7 @@
       var authNames = []
       var contentTypes = ['application/json']
       var accepts = ['application/json']
-      var returnType = JsonWebKey
+      var returnType = JSONWebKey
 
       return this.apiClient.callApi(
         '/keys/{set}/{kid}',
@@ -425,7 +425,7 @@
      * Callback function to receive the result of the updateJsonWebKeySet operation.
      * @callback module:api/JsonWebKeyApi~updateJsonWebKeySetCallback
      * @param {String} error Error message, if any.
-     * @param {module:model/JsonWebKeySet} data The data returned by the service call.
+     * @param {module:model/JSONWebKeySet} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -434,9 +434,9 @@
      * Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.  A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
      * @param {String} set The set
      * @param {Object} opts Optional parameters
-     * @param {module:model/JsonWebKeySet} opts.body
+     * @param {module:model/JSONWebKeySet} opts.body
      * @param {module:api/JsonWebKeyApi~updateJsonWebKeySetCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/JsonWebKeySet}
+     * data is of type: {@link module:model/JSONWebKeySet}
      */
     this.updateJsonWebKeySet = function(set, opts, callback) {
       opts = opts || {}
@@ -459,7 +459,7 @@
       var authNames = []
       var contentTypes = ['application/json']
       var accepts = ['application/json']
-      var returnType = JsonWebKeySet
+      var returnType = JSONWebKeySet
 
       return this.apiClient.callApi(
         '/keys/{set}',

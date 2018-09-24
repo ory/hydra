@@ -1,6 +1,7 @@
 package config
 
 import (
+	derrors "errors"
 	"net/url"
 	"runtime"
 	"strconv"
@@ -32,6 +33,13 @@ func cleanURLQuery(c *url.URL) *url.URL {
 
 	cleanurl.RawQuery = q.Encode()
 	return cleanurl
+}
+
+func (c *SQLConnection) Ping() error {
+	if c.db == nil {
+		return derrors.New("Database uninitialized")
+	}
+	return c.db.Ping()
 }
 
 func (c *SQLConnection) GetDatabase() *sqlx.DB {

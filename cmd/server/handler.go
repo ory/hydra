@@ -10,8 +10,6 @@ import (
 
 	"os"
 
-	"github.com/newrelic/go-agent"
-	"github.com/newrelic/go-agent/_integrations/nrlogrus"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/airbrake/gobrake.v2"
 
@@ -101,7 +99,6 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		}
 
 		useAirbrakeMiddleware(n)
-		useNewRelicMiddleware(n)
 		n.Use(negronilogrus.NewMiddlewareFromLogger(logger, c.Issuer))
 		n.UseFunc(serverHandler.rejectInsecureRequests)
 		n.UseHandler(router)
@@ -130,34 +127,6 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 			return err
 		}, srv.Shutdown)
 		logger.WithError(err).Fatal("Could not gracefully run server")
-	}
-}
-
-func useNewRelicMiddleware(n *negroni.Negroni) {
-	//Get NewRelic license and app name from environment variables
-	newRelicApp := os.Getenv("NEW_RELIC_APP_NAME")
-	newRelicLicense := os.Getenv("NEW_RELIC_LICENSE_KEY")
-
-	// create newrelic app here
-	if newRelicLicense != "" && newRelicApp != "" {
-		newrelicConfig := newrelic.NewConfig(newRelicApp, newRelicLicense)
-		newrelicConfig.Logger = nrlogrus.StandardLogger()
-		app, err := newrelic.NewApplication(newrelicConfig)
-		if err == nil {
-			newRelicHandler := negroni.HandlerFunc(func(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-				txn := app.StartTransaction(r.URL.EscapedPath(), rw, r)
-				defer txn.End()
-
-				next(rw, r)
-			})
-			n.Use(newRelicHandler)
-
-			logrus.Info("New Relic enabled!")
-		} else {
-			logrus.Errorf("Error creating New Relic app: %v", err)
-		}
-	} else {
-		logrus.Info("New Relic disabled - configs not found")
 	}
 }
 

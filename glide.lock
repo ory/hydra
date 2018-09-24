@@ -1,5 +1,5 @@
-hash: bb492c7360522190c0f89c87df17a741a2407f75e4d6e8c8ba6d96f9b651c15f
-updated: 2017-12-04T10:39:32.167629648-08:00
+hash: 8b9f71183861a8d4219c38cd602e3673ffa038f2ba45df52978e1bf11a6b0833
+updated: 2018-09-25T14:01:12.628818-07:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 4918b99a7cb949bb295f3c7bbaf24b577d806e35
@@ -7,42 +7,18 @@ imports:
   version: d6e3b3328b783f23731bc4d058875b0371ff8109
   subpackages:
   - winterm
-- name: github.com/cenk/backoff
-  version: 32cd0c5b3aef12c76ed64aaf678f6c79736be7dc
+- name: github.com/cenkalti/backoff
+  version: adb73d5bf0d9237fab19ff58aebf658449e326df
+- name: github.com/containerd/continuity
+  version: 7f53d412b9eb1cbf744c2063185d703a0ee34700
+  subpackages:
+  - pathdriver
 - name: github.com/davecgh/go-spew
   version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
   subpackages:
   - spew
 - name: github.com/dgrijalva/jwt-go
   version: d2709f9f1f31ebcda9651b03077758c1f3a0018c
-- name: github.com/docker/docker
-  version: 89658bed64c2a8fe05a978e5b87dbec409d57a0f
-  subpackages:
-  - api/types
-  - api/types/blkiodev
-  - api/types/container
-  - api/types/filters
-  - api/types/mount
-  - api/types/network
-  - api/types/registry
-  - api/types/strslice
-  - api/types/swarm
-  - api/types/versions
-  - opts
-  - pkg/archive
-  - pkg/fileutils
-  - pkg/homedir
-  - pkg/idtools
-  - pkg/ioutils
-  - pkg/jsonlog
-  - pkg/jsonmessage
-  - pkg/longpath
-  - pkg/pools
-  - pkg/promise
-  - pkg/stdcopy
-  - pkg/system
-  - pkg/term
-  - pkg/term/windows
 - name: github.com/docker/go-connections
   version: 3ede32e2033de7505e6500d6c868c2b9ed9f169d
   subpackages:
@@ -51,8 +27,6 @@ imports:
   version: 0dadbb0345b35ec7ef35e228dabb8de89a65bf52
 - name: github.com/fsnotify/fsnotify
   version: 4da3e2cfbabc9f751898f250b49f2439785783a1
-- name: github.com/fsouza/go-dockerclient
-  version: d2a6d0596004cc01062a2a068540b817f911e6dc
 - name: github.com/go-sql-driver/mysql
   version: a0583e0143b1624142adab07e0e97fe106d99561
 - name: github.com/golang/protobuf
@@ -92,6 +66,8 @@ imports:
   - reflectx
 - name: github.com/julienschmidt/httprouter
   version: 8c199fb6259ffc1af525cc3ad52ee60ba8359669
+- name: github.com/konsorten/go-windows-terminal-sequences
+  version: b729f2633dfe35f4d1d8a32385f6685610ce1cb5
 - name: github.com/lib/pq
   version: 30d59eaf01528a141f560f34f0208e0ec5218e75
   subpackages:
@@ -108,28 +84,50 @@ imports:
   version: c48cc78d482608239f6c4c92a4abd87eb8761c90
 - name: github.com/moul/http2curl
   version: 9ac6cf4d929b2fa8fd2d2e6dec5bb0feb4f4911d
-- name: github.com/newrelic/go-agent
-  version: 7c6c920d222b18632f03b12c3b594df816eab6d0
-  subpackages:
-  - _integrations/nrlogrus
-  - internal
-  - internal/jsonx
-  - internal/logger
-  - internal/sysinfo
-  - internal/utilization
 - name: github.com/Nvveen/Gotty
   version: cd527374f1e5bff4938207604a14f2e38a9cf512
 - name: github.com/oleiade/reflections
   version: 2b6ec3da648e3e834dc41bad8d9ed7f2dc6a9496
+- name: github.com/opencontainers/go-digest
+  version: c9281466c8b2f606084ac71339773efd177436e7
+- name: github.com/opencontainers/image-spec
+  version: 7b1e489870acb042978a3935d2fb76f8a79aff81
+  subpackages:
+  - specs-go
+  - specs-go/v1
 - name: github.com/opencontainers/runc
   version: beb8716fcb400d5f555c5d96a0534572d40f0248
   subpackages:
-  - libcontainer/system
   - libcontainer/user
 - name: github.com/ory/dockertest
-  version: b6cb198a39dfd21edd511aad53bab6e1a247b437
+  version: 9f1141b78507d23603f6be530587664ebb63a8d2
+  subpackages:
+  - docker
+  - docker/opts
+  - docker/pkg/archive
+  - docker/pkg/fileutils
+  - docker/pkg/homedir
+  - docker/pkg/idtools
+  - docker/pkg/ioutils
+  - docker/pkg/jsonmessage
+  - docker/pkg/longpath
+  - docker/pkg/mount
+  - docker/pkg/pools
+  - docker/pkg/stdcopy
+  - docker/pkg/system
+  - docker/pkg/term
+  - docker/pkg/term/windows
+  - docker/types
+  - docker/types/blkiodev
+  - docker/types/container
+  - docker/types/filters
+  - docker/types/mount
+  - docker/types/network
+  - docker/types/registry
+  - docker/types/strslice
+  - docker/types/versions
 - name: github.com/ory/fosite
-  version: 8f91c641a72262d51c3a9e0b3411d409ff2f68c7
+  version: ec793ab55310f69453ef6242abb52edfd2dfa19e
   repo: https://github.com/coupa/fosite
   vcs: git
   subpackages:
@@ -144,13 +142,15 @@ imports:
 - name: github.com/ory/herodot
   version: 5bb399b8a5aa583343a2108e723b990432b4a1b4
 - name: github.com/ory/ladon
-  version: 306b2e6adf322d429e72ace6be16818dda75f574
+  version: 76e069e27b002d186005c14b1f1b86472cc209f2
   subpackages:
   - compiler
   - manager/memory
   - manager/sql
+- name: github.com/ory/pagination
+  version: 05947c3e39e20ec964d080560c15368e9a7b9618
 - name: github.com/pborman/uuid
-  version: a97ce2ca70fa5a848076093f05e639a89ca34d06
+  version: e790cca94e6cc75c7064b1332e63811d4aae1a53
 - name: github.com/pelletier/go-toml
   version: 2009e44b6f182e34d8ce081ac2767622937ea3d4
 - name: github.com/pkg/errors
@@ -169,12 +169,8 @@ imports:
   version: bdb0aeca8a993b292b85c9ec17b5ce0ff81848c8
 - name: github.com/segmentio/backo-go
   version: 204274ad699c0983a70203a566887f17a717fef4
-- name: github.com/Sirupsen/logrus
-  version: 89742aefa4b206dcf400792f3bd35b542998eb3b
-  repo: https://github.com/sirupsen/logrus.git
-  vcs: git
 - name: github.com/sirupsen/logrus
-  version: 89742aefa4b206dcf400792f3bd35b542998eb3b
+  version: a67f783a3814b8729bd2dac5780b5f78f8dbd64d
 - name: github.com/spf13/afero
   version: e67d870304c4bca21331b02f414f970df13aa694
   subpackages:

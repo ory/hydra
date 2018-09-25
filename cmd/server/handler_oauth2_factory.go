@@ -40,6 +40,7 @@ import (
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/tracing"
 	"github.com/pborman/uuid"
 	"github.com/spf13/viper"
 )
@@ -50,6 +51,7 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 }
 
 func newOAuth2Provider(c *config.Config) fosite.OAuth2Provider {
+	var hasher fosite.Hasher
 	var ctx = c.Context()
 	var store = ctx.FositeStore
 	expectDependency(c.GetLogger(), ctx.FositeStore)
@@ -113,6 +115,10 @@ func newOAuth2Provider(c *config.Config) fosite.OAuth2Provider {
 		c.GetLogger().Fatalf(`Environment variable OAUTH2_ACCESS_TOKEN_STRATEGY is set to "%s" but only "opaque" and "jwt" are valid values.`, c.OAuth2AccessTokenStrategy)
 	}
 
+	if tracer, err := c.GetTracer(); err == nil && tracer.IsLoaded() {
+		hasher = &tracing.TracedBCrypt{fc.HashCost}
+	}
+
 	return compose.Compose(
 		fc,
 		store,
@@ -121,7 +127,7 @@ func newOAuth2Provider(c *config.Config) fosite.OAuth2Provider {
 			OpenIDConnectTokenStrategy: oidcStrategy,
 			JWTStrategy:                jwtStrategy,
 		},
-		nil,
+		hasher,
 		compose.OAuth2AuthorizeExplicitFactory,
 		compose.OAuth2AuthorizeImplicitFactory,
 		compose.OAuth2ClientCredentialsGrantFactory,

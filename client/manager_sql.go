@@ -358,7 +358,7 @@ func (m *SQLManager) UpdateClient(ctx context.Context, c *Client) error {
 	if c.Secret == "" {
 		c.Secret = string(o.GetHashedSecret())
 	} else {
-		h, err := m.Hasher.Hash([]byte(c.Secret))
+		h, err := m.Hasher.Hash(ctx, []byte(c.Secret))
 		if err != nil {
 			return errors.WithStack(err)
 		}
@@ -387,7 +387,7 @@ func (m *SQLManager) Authenticate(ctx context.Context, id string, secret []byte)
 		return nil, errors.WithStack(err)
 	}
 
-	if err := m.Hasher.Compare(c.GetHashedSecret(), secret); err != nil {
+	if err := m.Hasher.Compare(ctx, c.GetHashedSecret(), secret); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
@@ -395,7 +395,7 @@ func (m *SQLManager) Authenticate(ctx context.Context, id string, secret []byte)
 }
 
 func (m *SQLManager) CreateClient(ctx context.Context, c *Client) error {
-	h, err := m.Hasher.Hash([]byte(c.Secret))
+	h, err := m.Hasher.Hash(ctx, []byte(c.Secret))
 	if err != nil {
 		return errors.WithStack(err)
 	}

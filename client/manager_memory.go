@@ -74,7 +74,7 @@ func (m *MemoryManager) UpdateClient(ctx context.Context, c *Client) error {
 	if c.Secret == "" {
 		c.Secret = string(o.GetHashedSecret())
 	} else {
-		h, err := m.Hasher.Hash([]byte(c.Secret))
+		h, err := m.Hasher.Hash(ctx, []byte(c.Secret))
 		if err != nil {
 			return errors.WithStack(err)
 		}
@@ -104,7 +104,7 @@ func (m *MemoryManager) Authenticate(ctx context.Context, id string, secret []by
 		return nil, err
 	}
 
-	if err := m.Hasher.Compare(c.GetHashedSecret(), secret); err != nil {
+	if err := m.Hasher.Compare(ctx, c.GetHashedSecret(), secret); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
@@ -119,7 +119,7 @@ func (m *MemoryManager) CreateClient(ctx context.Context, c *Client) error {
 	m.Lock()
 	defer m.Unlock()
 
-	hash, err := m.Hasher.Hash([]byte(c.Secret))
+	hash, err := m.Hasher.Hash(ctx, []byte(c.Secret))
 	if err != nil {
 		return errors.WithStack(err)
 	}

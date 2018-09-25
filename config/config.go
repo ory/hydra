@@ -291,6 +291,7 @@ func (c *Config) Context() *Context {
 	if c.context != nil {
 		return c.context
 	}
+	var hasher fosite.Hasher
 
 	if c.DatabaseURL == "" {
 		c.GetLogger().Fatalf(`DATABASE_URL is not set, use "export DATABASE_URL=memory" for an in memory storage or the documented database adapters.`)
@@ -322,11 +323,17 @@ func (c *Config) Context() *Context {
 		c.GetLogger().Fatalf(`Unknown DSN scheme "%s" in DATABASE_URL "%s", schemes %v supported`, scheme, c.DatabaseURL, supportedSchemes())
 	}
 
+	hasher = &fosite.BCrypt{
+		WorkFactor: c.BCryptWorkFactor,
+	}
+
+	if tracer, err := c.GetTracer(); err == nil && tracer.IsLoaded() {
+		hasher = &tracing.TracedBCrypt{c.BCryptWorkFactor}
+	}
+
 	c.context = &Context{
 		Connection: connection,
-		Hasher: &fosite.BCrypt{
-			WorkFactor: c.BCryptWorkFactor,
-		},
+		Hasher:     hasher,
 		FositeStrategy: &foauth2.HMACSHAStrategy{
 			Enigma: &hmac.HMACStrategy{
 				GlobalSecret: c.GetSystemSecret(),

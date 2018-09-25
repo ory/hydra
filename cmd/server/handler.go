@@ -127,14 +127,15 @@ func setup(c *config.Config, cmd *cobra.Command, args []string, name string) (ha
 	w := herodot.NewJSONWriter(logger)
 	w.ErrorEnhancer = nil
 
-	handler = NewHandler(c, w)
-	handler.RegisterRoutes(frontend, backend)
-	c.ForceHTTP, _ = cmd.Flags().GetBool("dangerous-force-http")
 	if tracer, err := c.GetTracer(); err != nil {
 		c.GetLogger().Fatalf("Failed to initialize tracer: %s", err)
 	} else if tracer.IsLoaded() {
 		middlewares = append(middlewares, tracer)
 	}
+
+	handler = NewHandler(c, w)
+	handler.RegisterRoutes(frontend, backend)
+	c.ForceHTTP, _ = cmd.Flags().GetBool("dangerous-force-http")
 
 	if !c.ForceHTTP {
 		if c.Issuer == "" {

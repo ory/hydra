@@ -58,14 +58,14 @@ func TestSDK(t *testing.T) {
 		Subject: "subject1",
 	}))
 
-	ar1, _ := mockAuthRequest("1", false)
-	ar2, _ := mockAuthRequest("2", false)
+	ar1, _ := MockAuthRequest("1", false)
+	ar2, _ := MockAuthRequest("2", false)
 	require.NoError(t, m.CreateAuthenticationRequest(context.TODO(), ar1))
 	require.NoError(t, m.CreateAuthenticationRequest(context.TODO(), ar2))
 
-	cr1, hcr1 := mockConsentRequest("1", false, 0, false, false, false)
-	cr2, hcr2 := mockConsentRequest("2", false, 0, false, false, false)
-	cr3, hcr3 := mockConsentRequest("3", true, 3600, false, false, false)
+	cr1, hcr1 := MockConsentRequest("1", false, 0, false, false, false)
+	cr2, hcr2 := MockConsentRequest("2", false, 0, false, false, false)
+	cr3, hcr3 := MockConsentRequest("3", true, 3600, false, false, false)
 	require.NoError(t, m.CreateConsentRequest(context.TODO(), cr1))
 	require.NoError(t, m.CreateConsentRequest(context.TODO(), cr2))
 	require.NoError(t, m.CreateConsentRequest(context.TODO(), cr3))

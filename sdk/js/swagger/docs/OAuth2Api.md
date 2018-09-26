@@ -1125,7 +1125,7 @@ This endpoint does not need any parameter.
 
 <a name="wellKnown"></a>
 # **wellKnown**
-> JsonWebKeySet wellKnown()
+> JSONWebKeySet wellKnown()
 
 Get Well-Known JSON Web Keys
 
@@ -1152,7 +1152,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**JsonWebKeySet**](JsonWebKeySet.md)
+[**JSONWebKeySet**](JSONWebKeySet.md)
 
 ### Authorization
 

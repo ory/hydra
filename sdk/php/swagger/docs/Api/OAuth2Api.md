@@ -1076,7 +1076,7 @@ This endpoint does not need any parameter.
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **wellKnown**
-> \Hydra\SDK\Model\JsonWebKeySet wellKnown()
+> \Hydra\SDK\Model\JSONWebKeySet wellKnown()
 
 Get Well-Known JSON Web Keys
 
@@ -1103,7 +1103,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**\Hydra\SDK\Model\JsonWebKeySet**](../Model/JsonWebKeySet.md)
+[**\Hydra\SDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
 
 ### Authorization
 

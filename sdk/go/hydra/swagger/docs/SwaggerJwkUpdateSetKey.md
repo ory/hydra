@@ -3,7 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Body** | [**JsonWebKey**](jsonWebKey.md) |  | [optional] [default to null]
+**Body** | [**JsonWebKey**](JSONWebKey.md) |  | [optional] [default to null]
 **Kid** | **string** | The kid of the desired key in: path | [default to null]
 **Set** | **string** | The set in: path | [default to null]
 

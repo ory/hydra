@@ -15,7 +15,7 @@ Method | HTTP request | Description
 
 <a name="createJsonWebKeySet"></a>
 # **createJsonWebKeySet**
-> JsonWebKeySet createJsonWebKeySet(set, opts)
+> JSONWebKeySet createJsonWebKeySet(set, opts)
 
 Generate a new JSON Web Key
 
@@ -52,7 +52,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**JsonWebKeySet**](JsonWebKeySet.md)
+[**JSONWebKeySet**](JSONWebKeySet.md)
 
 ### Authorization
 
@@ -160,7 +160,7 @@ No authorization required
 
 <a name="getJsonWebKey"></a>
 # **getJsonWebKey**
-> JsonWebKeySet getJsonWebKey(kid, set)
+> JSONWebKeySet getJsonWebKey(kid, set)
 
 Retrieve a JSON Web Key
 
@@ -196,7 +196,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**JsonWebKeySet**](JsonWebKeySet.md)
+[**JSONWebKeySet**](JSONWebKeySet.md)
 
 ### Authorization
 
@@ -209,7 +209,7 @@ No authorization required
 
 <a name="getJsonWebKeySet"></a>
 # **getJsonWebKeySet**
-> JsonWebKeySet getJsonWebKeySet(set)
+> JSONWebKeySet getJsonWebKeySet(set)
 
 Retrieve a JSON Web Key Set
 
@@ -242,7 +242,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**JsonWebKeySet**](JsonWebKeySet.md)
+[**JSONWebKeySet**](JSONWebKeySet.md)
 
 ### Authorization
 
@@ -255,7 +255,7 @@ No authorization required
 
 <a name="updateJsonWebKey"></a>
 # **updateJsonWebKey**
-> JsonWebKey updateJsonWebKey(kid, set, opts)
+> JSONWebKey updateJsonWebKey(kid, set, opts)
 
 Update a JSON Web Key
 
@@ -272,7 +272,7 @@ var kid = "kid_example"; // String | The kid of the desired key
 var set = "set_example"; // String | The set
 
 var opts = { 
-  'body': new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKey() // JsonWebKey | 
+  'body': new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JSONWebKey() // JSONWebKey | 
 };
 
 var callback = function(error, data, response) {
@@ -291,11 +291,11 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **kid** | **String**| The kid of the desired key | 
  **set** | **String**| The set | 
- **body** | [**JsonWebKey**](JsonWebKey.md)|  | [optional] 
+ **body** | [**JSONWebKey**](JSONWebKey.md)|  | [optional] 
 
 ### Return type
 
-[**JsonWebKey**](JsonWebKey.md)
+[**JSONWebKey**](JSONWebKey.md)
 
 ### Authorization
 
@@ -308,7 +308,7 @@ No authorization required
 
 <a name="updateJsonWebKeySet"></a>
 # **updateJsonWebKeySet**
-> JsonWebKeySet updateJsonWebKeySet(set, opts)
+> JSONWebKeySet updateJsonWebKeySet(set, opts)
 
 Update a JSON Web Key Set
 
@@ -323,7 +323,7 @@ var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKe
 var set = "set_example"; // String | The set
 
 var opts = { 
-  'body': new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKeySet() // JsonWebKeySet | 
+  'body': new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JSONWebKeySet() // JSONWebKeySet | 
 };
 
 var callback = function(error, data, response) {
@@ -341,11 +341,11 @@ apiInstance.updateJsonWebKeySet(set, opts, callback);
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **set** | **String**| The set | 
- **body** | [**JsonWebKeySet**](JsonWebKeySet.md)|  | [optional] 
+ **body** | [**JSONWebKeySet**](JSONWebKeySet.md)|  | [optional] 
 
 ### Return type
 
-[**JsonWebKeySet**](JsonWebKeySet.md)
+[**JSONWebKeySet**](JSONWebKeySet.md)
 
 ### Authorization
 

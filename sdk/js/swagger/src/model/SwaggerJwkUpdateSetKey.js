@@ -17,10 +17,10 @@
 ;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/JsonWebKey'], factory)
+    define(['ApiClient', 'model/JSONWebKey'], factory)
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('./JsonWebKey'))
+    module.exports = factory(require('../ApiClient'), require('./JSONWebKey'))
   } else {
     // Browser globals (root is window)
     if (!root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer) {
@@ -28,10 +28,10 @@
     }
     root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerJwkUpdateSetKey = factory(
       root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKey
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JSONWebKey
     )
   }
-})(this, function(ApiClient, JsonWebKey) {
+})(this, function(ApiClient, JSONWebKey) {
   'use strict'
 
   /**
@@ -66,7 +66,7 @@
       obj = obj || new exports()
 
       if (data.hasOwnProperty('Body')) {
-        obj['Body'] = JsonWebKey.constructFromObject(data['Body'])
+        obj['Body'] = JSONWebKey.constructFromObject(data['Body'])
       }
       if (data.hasOwnProperty('kid')) {
         obj['kid'] = ApiClient.convertToType(data['kid'], 'String')
@@ -79,7 +79,7 @@
   }
 
   /**
-   * @member {module:model/JsonWebKey} Body
+   * @member {module:model/JSONWebKey} Body
    */
   exports.prototype['Body'] = undefined
   /**

@@ -2246,7 +2246,7 @@ class OAuth2Api
      * Client for Hydra
      *
      * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return \Hydra\SDK\Model\JsonWebKeySet
+     * @return \Hydra\SDK\Model\JSONWebKeySet
      */
     public function wellKnown()
     {
@@ -2262,7 +2262,7 @@ class OAuth2Api
      * Client for Hydra
      *
      * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return array of \Hydra\SDK\Model\JsonWebKeySet, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \Hydra\SDK\Model\JSONWebKeySet, HTTP status code, HTTP response headers (array of strings)
      */
     public function wellKnownWithHttpInfo()
     {
@@ -2293,15 +2293,15 @@ class OAuth2Api
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\Hydra\SDK\Model\JsonWebKeySet',
+                '\Hydra\SDK\Model\JSONWebKeySet',
                 '/.well-known/jwks.json'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\JsonWebKeySet', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\JSONWebKeySet', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\JsonWebKeySet', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\JSONWebKeySet', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:

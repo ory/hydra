@@ -1,4 +1,4 @@
-# JsonWebKey
+# JSONWebKey
 
 ## Properties
 Name | Type | Description | Notes

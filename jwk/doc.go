@@ -110,7 +110,12 @@ type swaggerJwkSetQuery struct {
 	Set string `json:"set"`
 }
 
-// swagger:model jsonWebKeySet
+// swagger:model JSONWebKeySet
+// It is important that this model object is named JSONWebKeySet for
+// "swagger generate spec" to generate only on definition of a
+// JSONWebKeySet. Since one with the same name is previously defined as
+// client.Client.JSONWebKeys and this one is last, this one will be
+// effectively written in the swagger spec.
 type swaggerJSONWebKeySet struct {
 	// The value of the "keys" parameter is an array of JWK values.  By
 	// default, the order of the JWK values within the array does not imply
@@ -120,7 +125,10 @@ type swaggerJSONWebKeySet struct {
 	Keys []swaggerJSONWebKey `json:"keys"`
 }
 
-// swagger:model jsonWebKey
+// swagger:model JSONWebKey
+// It is important that this model object is named JSONWebKey for
+// "swagger generate spec" to generate only on definition of a
+// JSONWebKey.
 type swaggerJSONWebKey struct {
 	//  The "use" (public key use) parameter identifies the intended use of
 	// the public key. The "use" parameter is employed to indicate whether

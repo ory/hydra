@@ -311,7 +311,8 @@ func (s *DefaultStrategy) obfuscateSubjectIdentifier(subject string, req fosite.
 }
 
 func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*HandledAuthenticationRequest, error) {
-	session, err := s.M.VerifyAndInvalidateAuthenticationRequest(r.Context(), verifier)
+	ctx := r.Context()
+	session, err := s.M.VerifyAndInvalidateAuthenticationRequest(ctx, verifier)
 	if errors.Cause(err) == pkg.ErrNotFound {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithDebug("The login verifier has already been used, has not been granted, or is invalid."))
 	} else if err != nil {
@@ -348,7 +349,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return nil, err
 	}
 
-	if err := s.OpenIDConnectRequestValidator.ValidatePrompt(&fosite.AuthorizeRequest{
+	if err := s.OpenIDConnectRequestValidator.ValidatePrompt(ctx, &fosite.AuthorizeRequest{
 		ResponseTypes: req.GetResponseTypes(),
 		RedirectURI:   req.GetRedirectURI(),
 		State:         req.GetState(),

@@ -5,6 +5,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
+	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/firewall"
 	"github.com/ory/hydra/metrics"
 )
@@ -13,10 +14,12 @@ type Handler struct {
 	Metrics *metrics.MetricsManager
 	H       *herodot.JSONWriter
 	W       firewall.Firewall
+	Config  *config.Config
 }
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET("/health", h.Health)
+	r.GET("/health/detailed", h.DetailedHealth)
 	r.GET("/health/stats", h.Statistics)
 }
 
@@ -26,11 +29,27 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 //
 // This endpoint does not require the `X-Forwarded-Proto` header when TLS termination is set.
 //
+//     Produces:
+//     - application/json
+//
 //     Responses:
 //       200: healthStatus
 //       500: genericError
 func (h *Handler) Health(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	rw.Write([]byte(`{"status": "ok"}`))
+	rw.Write(simpleStatus(h.Config))
+}
+
+// swagger:route GET /health/detailed health detailed
+//
+// Check health status of instance with detailed information including dependencies' health
+//
+// This endpoint does not require the `X-Forwarded-Proto` header when TLS termination is set.
+//
+//     Responses:
+//       200: healthStatus
+//       500: genericError
+func (h *Handler) DetailedHealth(rw http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	rw.Write(detailedStatus(h.Config))
 }
 
 // swagger:route GET /health/stats health getStatistics

@@ -18,6 +18,7 @@ import (
 	"encoding/json"
 
 	"github.com/ory/herodot"
+	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/health"
 	"github.com/sirupsen/logrus"
 )
@@ -90,6 +91,7 @@ func TestRacyMiddleware(t *testing.T) {
 	h := health.Handler{
 		H:       herodot.NewJSONWriter(nil),
 		Metrics: mw,
+		Config:  new(config.Config),
 	}
 
 	n.Use(mw)

@@ -56,7 +56,7 @@ func (c *PluginConnection) Connect() error {
 		} else {
 			cf.GetLogger().Info("Successfully connected through database plugin")
 			c.db = db
-			cf.GetLogger().Debugf("Address of database plugin is: %s", c.db)
+			cf.GetLogger().Debugf("Address of database plugin is: %v", c.db)
 			if err := db.Ping(); err != nil {
 				cf.GetLogger().WithError(err).Fatal("Could not ping database connection from plugin")
 			}

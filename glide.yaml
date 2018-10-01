@@ -1,11 +1,7 @@
 package: github.com/ory/hydra
 import:
 - package: github.com/sirupsen/logrus
-  version: master
-- package: github.com/Sirupsen/logrus
-  version: master
-  repo: https://github.com/sirupsen/logrus.git
-  vcs: git
+  version: 1.1.0
 - package: github.com/dgrijalva/jwt-go
   version: 3.0.0
 - package: github.com/go-sql-driver/mysql
@@ -27,7 +23,7 @@ import:
 - package: github.com/ory/fosite
   repo: https://github.com/coupa/fosite
   vcs: git
-  version: v_0.10.0
+  version: v_0.10.1
   subpackages:
   - compose
   - handler/oauth2
@@ -40,12 +36,12 @@ import:
 - package: github.com/ory/herodot
   version: 0.1.1
 - package: github.com/ory/ladon
-  version: 0.8.2
+  version: 0.8.10
   subpackages:
   - manager/memory
   - manager/sql
 - package: github.com/pborman/uuid
-  version: 1.0.0
+  version: 1.1.0
 - package: github.com/pkg/errors
   version: 0.8.0
 - package: github.com/pkg/profile
@@ -69,10 +65,10 @@ import:
   - clientcredentials
 - package: gopkg.in/yaml.v2
 - package: gopkg.in/airbrake/gobrake.v2
-- package: github.com/newrelic/go-agent
 - package: github.com/mohae/deepcopy
 - package: gopkg.in/alexcesaro/statsd.v2
   version: v2.0.0
+- package: github.com/ory/dockertest
+  version: 3.3.2
 testImport:
 - package: github.com/bmizerany/assert
-- package: github.com/ory/dockertest

@@ -36,7 +36,7 @@ func loadCertificateFromFile(cmd *cobra.Command, c *config.Config) *tls.Certific
 
 	cert, err := tls.LoadX509KeyPair(certPath, keyPath)
 	if err != nil {
-		c.GetLogger().Warn("Could not load x509 key pair: %s", cert)
+		c.GetLogger().Warnf("Could not load x509 key pair: %v", cert)
 		return nil
 	}
 	return &cert
@@ -55,7 +55,7 @@ func loadCertificateFromEnv(c *config.Config) *tls.Certificate {
 	var cert tls.Certificate
 	var err error
 	if cert, err = tls.X509KeyPair([]byte(certString), []byte(keyString)); err != nil {
-		c.GetLogger().Warningf("Could not parse x509 key pair from env: %s", cert)
+		c.GetLogger().Warnf("Could not parse x509 key pair from env: %v", cert)
 		return nil
 	}
 

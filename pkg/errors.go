@@ -35,6 +35,11 @@ var (
 		Name:        http.StatusText(http.StatusNotFound),
 		Description: "Unable to located the requested resource",
 	}
+	ErrConflict = &fosite.RFC6749Error{
+		Code:        http.StatusConflict,
+		Name:        http.StatusText(http.StatusConflict),
+		Description: "Unable to process the requested resource because of conflict in the current state",
+	}
 )
 
 type stackTracer interface {

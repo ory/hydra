@@ -201,6 +201,7 @@ type sqlAuthenticationRequest struct {
 	AuthenticatedAt      *time.Time `db:"authenticated_at"`
 	RequestedAt          time.Time  `db:"requested_at"`
 	SessionID            string     `db:"login_session_id"`
+	WasHandled           bool       `db:"was_handled"`
 }
 
 type sqlConsentRequest struct {
@@ -208,6 +209,7 @@ type sqlConsentRequest struct {
 	LoginChallenge          string `db:"login_challenge"`
 	LoginSessionID          string `db:"login_session_id"`
 	ForcedSubjectIdentifier string `db:"forced_subject_identifier"`
+	WasHandled              bool   `db:"was_handled"`
 }
 
 func toMySQLDateHack(t time.Time) *time.Time {
@@ -291,6 +293,7 @@ func (s *sqlAuthenticationRequest) toAuthenticationRequest(client *client.Client
 		CSRF:                 s.CSRF,
 		AuthenticatedAt:      fromMySQLDateHack(s.AuthenticatedAt),
 		RequestedAt:          s.RequestedAt,
+		WasHandled:           s.WasHandled,
 	}, nil
 }
 
@@ -313,6 +316,7 @@ func (s *sqlConsentRequest) toConsentRequest(client *client.Client) (*ConsentReq
 		AuthenticatedAt:        fromMySQLDateHack(s.AuthenticatedAt),
 		ForceSubjectIdentifier: s.ForcedSubjectIdentifier,
 		RequestedAt:            s.RequestedAt,
+		WasHandled:             s.WasHandled,
 	}, nil
 }
 

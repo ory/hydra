@@ -262,6 +262,7 @@ type AuthenticationRequest struct {
 	CSRF                   string    `json:"-"`
 	AuthenticatedAt        time.Time `json:"-"`
 	RequestedAt            time.Time `json:"-"`
+	WasHandled             bool      `json:"-"`
 }
 
 // Contains information on an ongoing consent request.
@@ -311,6 +312,7 @@ type ConsentRequest struct {
 	CSRF                   string    `json:"-"`
 	AuthenticatedAt        time.Time `json:"-"`
 	RequestedAt            time.Time `json:"-"`
+	WasHandled             bool      `json:"-"`
 }
 
 // Used to pass session data to a consent request.

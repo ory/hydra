@@ -31,6 +31,7 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/herodot"
+	"github.com/ory/hydra/pkg"
 	"github.com/ory/x/pagination"
 	"github.com/pkg/errors"
 )
@@ -250,11 +251,16 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 //     Responses:
 //       200: loginRequest
 //       401: genericError
+//       409: genericError
 //       500: genericError
 func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	request, err := h.M.GetAuthenticationRequest(r.Context(), ps.ByName("challenge"))
 	if err != nil {
 		h.H.WriteError(w, r, err)
+		return
+	}
+	if request.WasHandled {
+		h.H.WriteError(w, r, pkg.ErrConflict)
 		return
 	}
 
@@ -430,11 +436,16 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //     Responses:
 //       200: consentRequest
 //       401: genericError
+//       409: genericError
 //       500: genericError
 func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	request, err := h.M.GetConsentRequest(r.Context(), ps.ByName("challenge"))
 	if err != nil {
 		h.H.WriteError(w, r, err)
+		return
+	}
+	if request.WasHandled {
+		h.H.WriteError(w, r, pkg.ErrConflict)
 		return
 	}
 

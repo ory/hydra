@@ -87,6 +87,8 @@ func sqlSchemaUp(table string, id string) string {
 	subject 		varchar(255) NOT NULL
 )`,
 		"4": fmt.Sprintf("ALTER TABLE hydra_oauth2_%s ADD active BOOL NOT NULL DEFAULT TRUE", table),
+		"5": fmt.Sprintf("CREATE UNIQUE INDEX hydra_oauth2_%s_request_id_idx ON hydra_oauth2_%s (request_id)", table, table),
+		"6": fmt.Sprintf("CREATE INDEX hydra_oauth2_%s_requested_at_idx ON hydra_oauth2_%s (requested_at)", table, table),
 	}
 
 	return schemas[id]
@@ -98,6 +100,8 @@ func sqlSchemaDown(table string, id string) string {
 		"2": fmt.Sprintf("ALTER TABLE hydra_oauth2_%s DROP COLUMN subject", table),
 		"3": "DROP TABLE hydra_oauth2_pkce",
 		"4": fmt.Sprintf("ALTER TABLE hydra_oauth2_%s DROP COLUMN active", table),
+		"5": fmt.Sprintf("DROP INDEX hydra_oauth2_%s_request_id_idx ON hydra_oauth2_%s", table, table),
+		"6": fmt.Sprintf("DROP INDEX hydra_oauth2_%s_requested_at_idx ON hydra_oauth2_%s", table, table),
 	}
 
 	return schemas[id]
@@ -167,6 +171,26 @@ var migrations = &migrate.MemoryMigrationSource{
 				sqlSchemaDown(sqlTableCode, "4"),
 				sqlSchemaDown(sqlTableOpenID, "4"),
 				sqlSchemaDown(sqlTablePKCE, "4"),
+			},
+		},
+		{
+			Id: "5",
+			Up: []string{
+				sqlSchemaUp(sqlTableAccess, "5"),
+				sqlSchemaUp(sqlTableRefresh, "5"),
+			},
+			Down: []string{
+				sqlSchemaDown(sqlTableAccess, "5"),
+				sqlSchemaDown(sqlTableRefresh, "5"),
+			},
+		},
+		{
+			Id: "6",
+			Up: []string{
+				sqlSchemaUp(sqlTableAccess, "6"),
+			},
+			Down: []string{
+				sqlSchemaDown(sqlTableAccess, "6"),
 			},
 		},
 	},

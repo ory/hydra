@@ -108,7 +108,7 @@ func (m *SQLManager) AddKey(ctx context.Context, set string, key *jose.JSONWebKe
 		return errors.WithStack(err)
 	}
 
-	if _, err = m.DB.NamedExec(`INSERT INTO hydra_jwk (sid, kid, version, keydata) VALUES (:sid, :kid, :version, :keydata)`, &sqlData{
+	if _, err = m.DB.NamedExecContext(ctx, `INSERT INTO hydra_jwk (sid, kid, version, keydata) VALUES (:sid, :kid, :version, :keydata)`, &sqlData{
 		Set:     set,
 		KID:     key.KeyID,
 		Version: 0,
@@ -120,7 +120,7 @@ func (m *SQLManager) AddKey(ctx context.Context, set string, key *jose.JSONWebKe
 }
 
 func (m *SQLManager) AddKeySet(ctx context.Context, set string, keys *jose.JSONWebKeySet) error {
-	tx, err := m.DB.Beginx()
+	tx, err := m.DB.BeginTxx(ctx, nil)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -153,7 +153,7 @@ func (m *SQLManager) addKeySet(ctx context.Context, tx *sqlx.Tx, cipher *AEAD, s
 			return errors.WithStack(err)
 		}
 
-		if _, err = tx.NamedExec(`INSERT INTO hydra_jwk (sid, kid, version, keydata) VALUES (:sid, :kid, :version, :keydata)`, &sqlData{
+		if _, err = tx.NamedExecContext(ctx, `INSERT INTO hydra_jwk (sid, kid, version, keydata) VALUES (:sid, :kid, :version, :keydata)`, &sqlData{
 			Set:     set,
 			KID:     key.KeyID,
 			Version: 0,
@@ -168,7 +168,7 @@ func (m *SQLManager) addKeySet(ctx context.Context, tx *sqlx.Tx, cipher *AEAD, s
 
 func (m *SQLManager) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebKeySet, error) {
 	var d sqlData
-	if err := m.DB.Get(&d, m.DB.Rebind("SELECT * FROM hydra_jwk WHERE sid=? AND kid=? ORDER BY created_at DESC"), set, kid); err != nil {
+	if err := m.DB.GetContext(ctx, &d, m.DB.Rebind("SELECT * FROM hydra_jwk WHERE sid=? AND kid=? ORDER BY created_at DESC"), set, kid); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
 
@@ -189,7 +189,7 @@ func (m *SQLManager) GetKey(ctx context.Context, set, kid string) (*jose.JSONWeb
 
 func (m *SQLManager) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKeySet, error) {
 	var ds []sqlData
-	if err := m.DB.Select(&ds, m.DB.Rebind("SELECT * FROM hydra_jwk WHERE sid=? ORDER BY created_at DESC"), set); err != nil {
+	if err := m.DB.SelectContext(ctx, &ds, m.DB.Rebind("SELECT * FROM hydra_jwk WHERE sid=? ORDER BY created_at DESC"), set); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
 
@@ -219,14 +219,14 @@ func (m *SQLManager) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKe
 }
 
 func (m *SQLManager) DeleteKey(ctx context.Context, set, kid string) error {
-	if _, err := m.DB.Exec(m.DB.Rebind(`DELETE FROM hydra_jwk WHERE sid=? AND kid=?`), set, kid); err != nil {
+	if _, err := m.DB.ExecContext(ctx, m.DB.Rebind(`DELETE FROM hydra_jwk WHERE sid=? AND kid=?`), set, kid); err != nil {
 		return sqlcon.HandleError(err)
 	}
 	return nil
 }
 
 func (m *SQLManager) DeleteKeySet(ctx context.Context, set string) error {
-	tx, err := m.DB.Beginx()
+	tx, err := m.DB.BeginTxx(ctx, nil)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -248,7 +248,7 @@ func (m *SQLManager) DeleteKeySet(ctx context.Context, set string) error {
 }
 
 func (m *SQLManager) deleteKeySet(ctx context.Context, tx *sqlx.Tx, set string) error {
-	if _, err := tx.Exec(m.DB.Rebind(`DELETE FROM hydra_jwk WHERE sid=?`), set); err != nil {
+	if _, err := tx.ExecContext(ctx, m.DB.Rebind(`DELETE FROM hydra_jwk WHERE sid=?`), set); err != nil {
 		return sqlcon.HandleError(err)
 	}
 	return nil

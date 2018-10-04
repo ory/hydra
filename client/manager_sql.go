@@ -338,7 +338,7 @@ func (m *SQLManager) CreateSchemas() (int, error) {
 
 func (m *SQLManager) GetConcreteClient(ctx context.Context, id string) (*Client, error) {
 	var d sqlData
-	if err := m.DB.Get(&d, m.DB.Rebind("SELECT * FROM hydra_client WHERE id=?"), id); err != nil {
+	if err := m.DB.GetContext(ctx, &d, m.DB.Rebind("SELECT * FROM hydra_client WHERE id=?"), id); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
 
@@ -350,7 +350,7 @@ func (m *SQLManager) GetClient(ctx context.Context, id string) (fosite.Client, e
 }
 
 func (m *SQLManager) UpdateClient(ctx context.Context, c *Client) error {
-	o, err := m.GetClient(context.Background(), c.GetID())
+	o, err := m.GetClient(ctx, c.GetID())
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -375,7 +375,7 @@ func (m *SQLManager) UpdateClient(ctx context.Context, c *Client) error {
 		query = append(query, fmt.Sprintf("%s=:%s", param, param))
 	}
 
-	if _, err := m.DB.NamedExec(fmt.Sprintf(`UPDATE hydra_client SET %s WHERE id=:id`, strings.Join(query, ", ")), s); err != nil {
+	if _, err := m.DB.NamedExecContext(ctx, fmt.Sprintf(`UPDATE hydra_client SET %s WHERE id=:id`, strings.Join(query, ", ")), s); err != nil {
 		return sqlcon.HandleError(err)
 	}
 	return nil
@@ -406,7 +406,7 @@ func (m *SQLManager) CreateClient(ctx context.Context, c *Client) error {
 		return errors.WithStack(err)
 	}
 
-	if _, err := m.DB.NamedExec(fmt.Sprintf(
+	if _, err := m.DB.NamedExecContext(ctx, fmt.Sprintf(
 		"INSERT INTO hydra_client (%s) VALUES (%s)",
 		strings.Join(sqlParams, ", "),
 		":"+strings.Join(sqlParams, ", :"),
@@ -418,7 +418,7 @@ func (m *SQLManager) CreateClient(ctx context.Context, c *Client) error {
 }
 
 func (m *SQLManager) DeleteClient(ctx context.Context, id string) error {
-	if _, err := m.DB.Exec(m.DB.Rebind(`DELETE FROM hydra_client WHERE id=?`), id); err != nil {
+	if _, err := m.DB.ExecContext(ctx, m.DB.Rebind(`DELETE FROM hydra_client WHERE id=?`), id); err != nil {
 		return sqlcon.HandleError(err)
 	}
 	return nil
@@ -428,7 +428,7 @@ func (m *SQLManager) GetClients(ctx context.Context, limit, offset int) (clients
 	d := make([]sqlData, 0)
 	clients = make(map[string]Client)
 
-	if err := m.DB.Select(&d, m.DB.Rebind("SELECT * FROM hydra_client ORDER BY id LIMIT ? OFFSET ?"), limit, offset); err != nil {
+	if err := m.DB.SelectContext(ctx, &d, m.DB.Rebind("SELECT * FROM hydra_client ORDER BY id LIMIT ? OFFSET ?"), limit, offset); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
 

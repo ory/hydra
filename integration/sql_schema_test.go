@@ -84,5 +84,5 @@ func TestSQLSchema(t *testing.T) {
 		AuthenticatedAt: time.Now(),
 		Subject:         "bar",
 	}))
-	require.NoError(t, om.CreateAccessTokenSession(nil, "asdfasdf", r))
+	require.NoError(t, om.CreateAccessTokenSession(context.TODO(), "asdfasdf", r))
 }

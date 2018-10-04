@@ -279,7 +279,7 @@ func (s *FositeSQLStore) createSession(ctx context.Context, signature string, re
 		strings.Join(sqlParams, ", "),
 		":"+strings.Join(sqlParams, ", :"),
 	)
-	if _, err := s.DB.NamedExec(query, data); err != nil {
+	if _, err := s.DB.NamedExecContext(ctx, query, data); err != nil {
 		return sqlcon.HandleError(err)
 	}
 	return nil
@@ -289,7 +289,7 @@ func (s *FositeSQLStore) findSessionBySignature(ctx context.Context, signature s
 	signature = s.hashSignature(signature, table)
 
 	var d sqlData
-	if err := s.DB.Get(&d, s.DB.Rebind(fmt.Sprintf("SELECT * FROM hydra_oauth2_%s WHERE signature=?", table)), signature); err == sql.ErrNoRows {
+	if err := s.DB.GetContext(ctx, &d, s.DB.Rebind(fmt.Sprintf("SELECT * FROM hydra_oauth2_%s WHERE signature=?", table)), signature); err == sql.ErrNoRows {
 		return nil, errors.Wrap(fosite.ErrNotFound, "")
 	} else if err != nil {
 		return nil, sqlcon.HandleError(err)
@@ -309,7 +309,7 @@ func (s *FositeSQLStore) findSessionBySignature(ctx context.Context, signature s
 func (s *FositeSQLStore) deleteSession(ctx context.Context, signature string, table string) error {
 	signature = s.hashSignature(signature, table)
 
-	if _, err := s.DB.Exec(s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE signature=?", table)), signature); err != nil {
+	if _, err := s.DB.ExecContext(ctx, s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE signature=?", table)), signature); err != nil {
 		return sqlcon.HandleError(err)
 	}
 	return nil
@@ -345,7 +345,7 @@ func (s *FositeSQLStore) GetAuthorizeCodeSession(ctx context.Context, signature 
 }
 
 func (s *FositeSQLStore) InvalidateAuthorizeCodeSession(ctx context.Context, signature string) error {
-	if _, err := s.DB.Exec(s.DB.Rebind(fmt.Sprintf(
+	if _, err := s.DB.ExecContext(ctx, s.DB.Rebind(fmt.Sprintf(
 		"UPDATE hydra_oauth2_%s SET active=false WHERE signature=?",
 		sqlTableCode,
 	)), signature); err != nil {
@@ -396,15 +396,15 @@ func (s *FositeSQLStore) CreateImplicitAccessTokenSession(ctx context.Context, s
 }
 
 func (s *FositeSQLStore) RevokeRefreshToken(ctx context.Context, id string) error {
-	return s.revokeSession(id, sqlTableRefresh)
+	return s.revokeSession(ctx, id, sqlTableRefresh)
 }
 
 func (s *FositeSQLStore) RevokeAccessToken(ctx context.Context, id string) error {
-	return s.revokeSession(id, sqlTableAccess)
+	return s.revokeSession(ctx, id, sqlTableAccess)
 }
 
-func (s *FositeSQLStore) revokeSession(id string, table string) error {
-	if _, err := s.DB.Exec(s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE request_id=?", table)), id); err == sql.ErrNoRows {
+func (s *FositeSQLStore) revokeSession(ctx context.Context, id string, table string) error {
+	if _, err := s.DB.ExecContext(ctx, s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE request_id=?", table)), id); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
 	} else if err != nil {
 		return sqlcon.HandleError(err)
@@ -413,7 +413,7 @@ func (s *FositeSQLStore) revokeSession(id string, table string) error {
 }
 
 func (s *FositeSQLStore) FlushInactiveAccessTokens(ctx context.Context, notAfter time.Time) error {
-	if _, err := s.DB.Exec(s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE requested_at < ? AND requested_at < ?", sqlTableAccess)), time.Now().Add(-s.AccessTokenLifespan), notAfter); err == sql.ErrNoRows {
+	if _, err := s.DB.ExecContext(ctx, s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE requested_at < ? AND requested_at < ?", sqlTableAccess)), time.Now().Add(-s.AccessTokenLifespan), notAfter); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
 	} else if err != nil {
 		return sqlcon.HandleError(err)

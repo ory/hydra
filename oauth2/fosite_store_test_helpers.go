@@ -88,20 +88,25 @@ func TestHelperCreateGetDeleteRefreshTokenSession(m pkg.FositeStorer) func(t *te
 func TestHelperRevokeRefreshToken(m pkg.FositeStorer) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.Background()
-		id := uuid.New()
 		_, err := m.GetRefreshTokenSession(ctx, "1111", &fosite.DefaultSession{})
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 
-		err = m.CreateRefreshTokenSession(ctx, "1111", &fosite.Request{ID: id, Client: &client.Client{ClientID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &fosite.DefaultSession{}})
+		reqIdOne := uuid.New()
+		reqIdTwo := uuid.New()
+
+		err = m.CreateRefreshTokenSession(ctx, "1111", &fosite.Request{ID: reqIdOne, Client: &client.Client{ClientID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &fosite.DefaultSession{}})
 		require.NoError(t, err)
 
-		err = m.CreateRefreshTokenSession(ctx, "1122", &fosite.Request{ID: id, Client: &client.Client{ClientID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &fosite.DefaultSession{}})
+		err = m.CreateRefreshTokenSession(ctx, "1122", &fosite.Request{ID: reqIdTwo, Client: &client.Client{ClientID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &fosite.DefaultSession{}})
 		require.NoError(t, err)
 
 		_, err = m.GetRefreshTokenSession(ctx, "1111", &fosite.DefaultSession{})
 		require.NoError(t, err)
 
-		err = m.RevokeRefreshToken(ctx, id)
+		err = m.RevokeRefreshToken(ctx, reqIdOne)
+		require.NoError(t, err)
+
+		err = m.RevokeRefreshToken(ctx, reqIdTwo)
 		require.NoError(t, err)
 
 		_, err = m.GetRefreshTokenSession(ctx, "1111", &fosite.DefaultSession{})

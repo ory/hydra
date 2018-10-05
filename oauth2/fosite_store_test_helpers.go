@@ -27,9 +27,12 @@ import (
 	"time"
 
 	"github.com/ory/fosite"
+	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/pkg"
+	"github.com/ory/sqlcon"
 	"github.com/pborman/uuid"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -41,6 +44,43 @@ var defaultRequest = fosite.Request{
 	GrantedScopes: fosite.Arguments{"fa", "ba"},
 	Form:          url.Values{"foo": []string{"bar", "baz"}},
 	Session:       &fosite.DefaultSession{Subject: "bar"},
+}
+
+func TestHelperUniqueConstraints(m pkg.FositeStorer, storageType string) func(t *testing.T) {
+	return func(t *testing.T) {
+		dbErrorIsConstraintError := func(dbErr error) {
+			assert.Error(t, dbErr)
+			switch err := errors.Cause(dbErr).(type) {
+			case *herodot.DefaultError:
+				assert.Equal(t, sqlcon.ErrUniqueViolation, err)
+			default:
+				t.Errorf("unexpected error type %s", err)
+			}
+		}
+
+		requestId := uuid.New()
+		signatureOne := uuid.New()
+		signatureTwo := uuid.New()
+		fositeRequest := &fosite.Request{
+			ID:          requestId,
+			Client:      &client.Client{ClientID: "foobar"},
+			RequestedAt: time.Now().UTC().Round(time.Second),
+			Session:     &fosite.DefaultSession{},
+		}
+
+		err := m.CreateRefreshTokenSession(context.TODO(), signatureOne, fositeRequest)
+		assert.NoError(t, err)
+		err = m.CreateAccessTokenSession(context.TODO(), signatureOne, fositeRequest)
+		assert.NoError(t, err)
+
+		// attempting to insert new records with the SAME requestID should fail as there is a unique index
+		// on the request_id column
+
+		err = m.CreateRefreshTokenSession(context.TODO(), signatureTwo, fositeRequest)
+		dbErrorIsConstraintError(err)
+		err = m.CreateAccessTokenSession(context.TODO(), signatureTwo, fositeRequest)
+		dbErrorIsConstraintError(err)
+	}
 }
 
 func TestHelperCreateGetDeleteOpenIDConnectSession(m pkg.FositeStorer) func(t *testing.T) {

@@ -34,17 +34,30 @@ import (
 
 var frontendPort, backendPort int
 
-func init() {
+func freePort() (int, int) {
 	var err error
-	frontendPort, err = freeport.GetFreePort()
-	if err != nil {
+	r := make([]int, 2)
+
+	if r[0], err = freeport.GetFreePort(); err != nil {
 		panic(err.Error())
 	}
 
-	backendPort, err = freeport.GetFreePort()
-	if err != nil {
-		panic(err.Error())
+	tries := 0
+	for {
+		r[1], err = freeport.GetFreePort()
+		if r[0] != r[1] {
+			break
+		}
+		tries++
+		if tries > 10 {
+			panic("Unable to find free port")
+		}
 	}
+	return r[0], r[1]
+}
+
+func init() {
+	frontendPort, backendPort = freePort()
 
 	os.Setenv("PUBLIC_PORT", fmt.Sprintf("%d", frontendPort))
 	os.Setenv("ADMIN_PORT", fmt.Sprintf("%d", backendPort))

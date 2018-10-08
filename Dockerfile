@@ -1,4 +1,4 @@
-FROM golang:1.10-alpine
+FROM golang:1.11-alpine
 
 ARG git_tag
 ARG git_commit
@@ -8,9 +8,12 @@ RUN curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
 WORKDIR /go/src/github.com/ory/hydra
 
-ADD ./Gopkg.lock ./Gopkg.lock
-ADD ./Gopkg.toml ./Gopkg.toml
-RUN dep ensure -vendor-only
+ENV GO111MODULE=on
+
+ADD ./go.mod ./go.mod
+ADD ./go.sum ./go.sum
+
+RUN go mod download
 
 ADD . .
 

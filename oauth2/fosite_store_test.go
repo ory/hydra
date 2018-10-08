@@ -35,7 +35,7 @@ import (
 	"github.com/ory/hydra/client"
 	. "github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/sqlcon/dockertest"
+	"github.com/ory/x/sqlcon/dockertest"
 	"github.com/sirupsen/logrus"
 )
 

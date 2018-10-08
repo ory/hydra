@@ -33,7 +33,7 @@ import (
 	"github.com/ory/hydra/client"
 	. "github.com/ory/hydra/consent"
 	"github.com/ory/hydra/oauth2"
-	"github.com/ory/sqlcon/dockertest"
+	"github.com/ory/x/sqlcon/dockertest"
 )
 
 var m sync.Mutex

@@ -28,7 +28,7 @@ import (
 	errors2 "errors"
 
 	"github.com/ory/fosite"
-	"github.com/ory/sqlcon"
+	"github.com/ory/x/sqlcon"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

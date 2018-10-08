@@ -31,7 +31,6 @@ import (
 	"github.com/gorilla/context"
 	"github.com/julienschmidt/httprouter"
 	"github.com/meatballhat/negroni-logrus"
-	"github.com/ory/go-convenience/corsx"
 	"github.com/ory/graceful"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
@@ -41,7 +40,8 @@ import (
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/metrics-middleware"
+	"github.com/ory/x/corsx"
+	"github.com/ory/x/metricsx"
 	"github.com/pkg/errors"
 	"github.com/rs/cors"
 	"github.com/spf13/cobra"
@@ -158,8 +158,8 @@ func setup(c *config.Config, cmd *cobra.Command, args []string, name string) (ha
 		c.GetLogger().Println("Transmission of telemetry data is enabled, to learn more go to: https://www.ory.sh/docs/guides/latest/telemetry/")
 
 		enable := !(c.DatabaseURL == "" || c.DatabaseURL == "memory" || c.Issuer == "" || strings.Contains(c.Issuer, "localhost"))
-		m := metrics.NewMetricsManager(
-			metrics.Hash(c.Issuer+"|"+c.DatabaseURL),
+		m := metricsx.NewMetricsManager(
+			metricsx.Hash(c.Issuer+"|"+c.DatabaseURL),
 			enable,
 			"h8dRH3kVCWKkIFWydBmWsyYHR4M0u0vr",
 			[]string{
@@ -186,6 +186,8 @@ func setup(c *config.Config, cmd *cobra.Command, args []string, name string) (ha
 			},
 			c.GetLogger(),
 			"ory-hydra",
+			100,
+			"",
 		)
 
 		go m.RegisterSegment(c.BuildVersion, c.BuildHash, c.BuildTime)

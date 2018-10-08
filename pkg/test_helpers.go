@@ -26,8 +26,6 @@ import (
 	"github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/storage"
 	"github.com/ory/fosite/token/hmac"
-	"github.com/ory/ladon"
-	"github.com/ory/ladon/manager/memory"
 )
 
 var HMACStrategy = &oauth2.HMACSHAStrategy{
@@ -36,14 +34,6 @@ var HMACStrategy = &oauth2.HMACSHAStrategy{
 	},
 	AccessTokenLifespan:   time.Hour,
 	AuthorizeCodeLifespan: time.Hour,
-}
-
-func LadonWarden(ps map[string]ladon.Policy) ladon.Warden {
-	return &ladon.Ladon{
-		Manager: &memory.MemoryManager{
-			Policies: ps,
-		},
-	}
 }
 
 func FositeStore() *storage.MemoryStore {

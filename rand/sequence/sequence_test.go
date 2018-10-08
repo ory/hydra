@@ -75,8 +75,7 @@ func TestRuneSequenceIsPseudoUnique(t *testing.T) {
 		t.SkipNow()
 	}
 
-	// 1 in 100 probability of collision
-	times := 9000
+	times := 100
 	runes := []rune("ab")
 	length := 32
 	s := make(map[string]bool)

@@ -14,8 +14,8 @@ jobs:
             echo 'export GO111MODULE=on' >> $BASH_ENV
             source $BASH_ENV
       - checkout
-      - run: curl -L https://git.io/vp6lP | sh -b $GOPATH/bin
-      - run: gometalinter --disable-all --enable=gosec --enable=gofmt --vendor ./...
+      - run: curl -L https://git.io/vp6lP | sh
+      - run: ./bin/gometalinter --disable-all --enable=gosec --enable=gofmt --vendor ./...
 
   test:
     docker:

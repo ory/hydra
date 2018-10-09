@@ -32,9 +32,9 @@ var _ fosite.Client = new(Client)
 
 func TestClient(t *testing.T) {
 	c := &Client{
-		ClientID:     "foo",
-		RedirectURIs: []string{"foo"},
-		Scope:        "foo bar",
+		ClientID:                "foo",
+		RedirectURIs:            []string{"foo"},
+		Scope:                   "foo bar",
 		TokenEndpointAuthMethod: "none",
 	}
 

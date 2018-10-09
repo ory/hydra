@@ -29,10 +29,11 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
-	"github.com/ory/hydra/client"
-	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/hydra/client"
+	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 )
 
 func createTestClient(prefix string) hydra.OAuth2Client {

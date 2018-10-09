@@ -5,18 +5,22 @@ version: 2
 jobs:
   format:
     docker:
-      - image: circleci/golang:1.10
+      - image: circleci/golang:1.11
     working_directory: /go/src/github.com/ory/hydra
     steps:
+      - run:
+          name: Enable go1.11 modules
+          command: |
+            echo 'export GO111MODULE=on' >> $BASH_ENV
+            source $BASH_ENV
       - checkout
-      - run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-      - run: go get -u golang.org/x/tools/cmd/goimports
-      - run: dep ensure -vendor-only
-      - run: ./scripts/test-format.sh
+      - run: curl -L https://git.io/vp6lP | sh
+      - run: mv ./bin/* $GOPATH/bin
+      - run: gometalinter --disable-all --enable=gofmt --vendor ./...
 
   test:
     docker:
-      - image: circleci/golang:1.10
+      - image: circleci/golang:1.11
         environment:
         - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/hydra?sslmode=disable
         - TEST_DATABASE_MYSQL=root:test@(localhost:3306)/mysql?parseTime=true
@@ -30,10 +34,14 @@ jobs:
         - MYSQL_ROOT_PASSWORD=test
     working_directory: /go/src/github.com/ory/hydra
     steps:
+      - run:
+          name: Enable go1.11 modules
+          command: |
+            echo 'export GO111MODULE=on' >> $BASH_ENV
+            source $BASH_ENV
       - checkout
-      - run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+      - run: go mod verify
       - run: go get -u github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/ory/go-acc
-      - run: dep ensure -vendor-only
       - run: go install github.com/ory/hydra
       - run: go install github.com/ory/hydra/test/mock-lcp
       - run: go-acc -o coverage.txt ./...
@@ -45,13 +53,12 @@ jobs:
 
   swagger:
     docker:
-      - image: circleci/golang:1.10
+      - image: circleci/golang:1.11
     working_directory: /go/src/github.com/ory/hydra
     steps:
       - checkout
-      - run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-      - run: go get -u github.com/go-swagger/go-swagger/cmd/swagger golang.org/x/tools/cmd/goimports
-      - run: dep ensure -vendor-only
+      - run: go get github.com/go-swagger/go-swagger/cmd/swagger
+      - run: curl -L https://git.io/vp6lP | sh
       - run: curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
       - run: sudo apt-get install -y default-jre nodejs
       - run: sudo npm i -g yarn
@@ -71,9 +78,14 @@ jobs:
 
   release-docker:
     docker:
-      - image: circleci/golang:1.10
+      - image: circleci/golang:1.11
     working_directory: /go/src/github.com/ory/hydra
     steps:
+      - run:
+          name: Enable go1.11 modules
+          command: |
+            echo 'export GO111MODULE=on' >> $BASH_ENV
+            source $BASH_ENV
       - checkout
       - setup_remote_docker:
           version: 17.10.0-ce
@@ -103,13 +115,16 @@ jobs:
 
   release-binaries:
     docker:
-      - image: circleci/golang:1.10
+      - image: circleci/golang:1.11
     working_directory: /go/src/github.com/ory/hydra
     steps:
+      - run:
+          name: Enable go1.11 modules
+          command: |
+            echo 'export GO111MODULE=on' >> $BASH_ENV
+            source $BASH_ENV
       - checkout
-      - run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
       - run: go get -u github.com/mitchellh/gox github.com/tcnksm/ghr
-      - run: dep ensure -vendor-only
       - run: |
           gox -parallel=2 -ldflags "-X github.com/ory/hydra/cmd.Version=`git describe --tags` -X github.com/ory/hydra/cmd.BuildTime=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory/hydra/cmd.GitHash=`git rev-parse HEAD`" -output "dist/{{.Dir}}-{{.OS}}-{{.Arch}}";
       - run: ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME --replace `git describe --tags` dist/
@@ -146,15 +161,18 @@ jobs:
 
   benchmark:
     docker:
-      - image: circleci/golang:1.10
+      - image: circleci/golang:1.11
     working_directory: /go/src/github.com/ory/hydra
     steps:
+      - run:
+          name: Enable go1.11 modules
+          command: |
+            echo 'export GO111MODULE=on' >> $BASH_ENV
+            source $BASH_ENV
       - checkout
       - run: git config --global user.email "hi@ory.am"
       - run: git config --global user.name "ORY Continuous Integration"
-      - run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
       - run: go get -u github.com/rakyll/hey
-      - run: dep ensure -vendor-only
       - run: go install .
       - run: ./scripts/run-bench.sh
       - run: cat BENCHMARKS.md

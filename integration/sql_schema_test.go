@@ -34,9 +34,7 @@ import (
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
-	"github.com/ory/ladon"
-	lsql "github.com/ory/ladon/manager/sql"
-	"github.com/ory/sqlcon/dockertest"
+	"github.com/ory/x/sqlcon/dockertest"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
@@ -62,10 +60,7 @@ func TestSQLSchema(t *testing.T) {
 	jm := &jwk.SQLManager{DB: db, Cipher: &jwk.AEAD{Key: []byte("11111111111111111111111111111111")}}
 	om := &oauth2.FositeSQLStore{Manager: cm, DB: db, L: logrus.New()}
 	crm := consent.NewSQLManager(db, nil, om)
-	pm := lsql.NewSQLManager(db, nil)
 
-	_, err = pm.CreateSchemas("", "hydra_policy_migration")
-	require.NoError(t, err)
 	_, err = cm.CreateSchemas()
 	require.NoError(t, err)
 	require.NoError(t, err)
@@ -77,7 +72,6 @@ func TestSQLSchema(t *testing.T) {
 	require.NoError(t, err)
 
 	require.NoError(t, jm.AddKey(context.TODO(), "integration-test-foo", jwk.First(p1)))
-	require.NoError(t, pm.Create(&ladon.DefaultPolicy{ID: "integration-test-foo", Resources: []string{"foo"}, Actions: []string{"bar"}, Subjects: []string{"baz"}, Effect: "allow"}))
 	require.NoError(t, cm.CreateClient(context.TODO(), &client.Client{ClientID: "integration-test-foo"}))
 	require.NoError(t, crm.CreateAuthenticationSession(context.TODO(), &consent.AuthenticationSession{
 		ID:              "foo",

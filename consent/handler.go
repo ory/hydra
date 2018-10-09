@@ -31,7 +31,7 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/herodot"
-	"github.com/ory/pagination"
+	"github.com/ory/x/pagination"
 	"github.com/pkg/errors"
 )
 

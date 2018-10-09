@@ -1,0 +1,10 @@
+package: github.com/ory/graceful
+import:
+- package: github.com/pkg/errors
+  version: ~0.8.0
+testImport:
+- package: github.com/stretchr/testify
+  version: ~1.1.4
+  subpackages:
+  - assert
+  - require

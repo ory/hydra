@@ -4,7 +4,7 @@ set -euo pipefail
 
 cd "$( dirname "${BASH_SOURCE[0]}" )/.."
 
-goimports -w $(go list -f {{.Dir}} ./... | grep -v vendor | grep -v "ory.hydra$")
-goimports -w *.go
+go fmt $(go list ./... | grep -v 'vendor')
+go fmt .
 
 git add -A

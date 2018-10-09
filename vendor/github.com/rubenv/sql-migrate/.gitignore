@@ -1,0 +1,5 @@
+.*.swp
+*.test
+
+/sql-migrate/test.db
+/test.db

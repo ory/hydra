@@ -28,7 +28,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/sqlcon"
+	"github.com/ory/x/sqlcon"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
 	"gopkg.in/square/go-jose.v2"

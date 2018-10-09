@@ -72,8 +72,8 @@ func TestSQLAuthenticationConverter(t *testing.T) {
 		},
 		Subject:                "subject2",
 		ForceSubjectIdentifier: "foo-id",
-		ACR:     "acr",
-		WasUsed: true,
+		ACR:                    "acr",
+		WasUsed:                true,
 	}
 
 	a1, err := newSQLAuthenticationRequest(a)

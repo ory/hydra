@@ -28,7 +28,7 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/pagination"
+	"github.com/ory/x/pagination"
 	"github.com/pkg/errors"
 )
 

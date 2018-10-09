@@ -26,8 +26,8 @@ import (
 
 	"github.com/imdario/mergo"
 	"github.com/ory/fosite"
-	"github.com/ory/pagination"
-	"github.com/ory/sqlcon"
+	"github.com/ory/x/pagination"
+	"github.com/ory/x/sqlcon"
 	"github.com/pkg/errors"
 )
 

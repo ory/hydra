@@ -28,15 +28,16 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
-	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 type MigrateHandler struct {

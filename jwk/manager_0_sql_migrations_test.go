@@ -84,7 +84,7 @@ var migrations = map[string]*migrate.MemoryMigrationSource{
 			createJWKMigrations[1],
 			jwk.Migrations["mysql"].Migrations[2],
 			createJWKMigrations[2],
-			jwk.Migrations["postgres"].Migrations[3],
+			jwk.Migrations["mysql"].Migrations[3],
 			createJWKMigrations[3],
 		},
 	},

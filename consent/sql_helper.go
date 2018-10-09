@@ -467,8 +467,8 @@ func (s *sqlHandledAuthenticationRequest) toHandledAuthenticationRequest(a *Auth
 		WasUsed:                s.WasUsed,
 		ACR:                    s.ACR,
 		Error:                  e,
-		AuthenticationRequest: a,
-		Subject:               s.Subject,
-		AuthenticatedAt:       fromMySQLDateHack(s.AuthenticatedAt),
+		AuthenticationRequest:  a,
+		Subject:                s.Subject,
+		AuthenticatedAt:        fromMySQLDateHack(s.AuthenticatedAt),
 	}, nil
 }

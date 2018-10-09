@@ -4,6 +4,7 @@ set -euo pipefail
 
 cd "$( dirname "${BASH_SOURCE[0]}" )/.."
 
-gometalinter --disable-all --enable=gosec --enable=goimports --vendor ./...
+go fmt $(go list ./... | grep -v 'vendor')
+go fmt .
 
 git add -A

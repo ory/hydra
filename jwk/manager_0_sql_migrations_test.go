@@ -62,18 +62,45 @@ var createJWKMigrations = []*migrate.Migration{
 			`DELETE FROM hydra_jwk WHERE sid='3-sid'`,
 		},
 	},
+	{
+		Id: "4-data",
+		Up: []string{
+			`INSERT INTO hydra_jwk (sid, kid, version, keydata, created_at) VALUES ('4-sid', '4-kid', 0, 'some-key', NOW())`,
+		},
+		Down: []string{
+			`DELETE FROM hydra_jwk WHERE sid='3-sid'`,
+		},
+	},
 }
 
-var migrations = &migrate.MemoryMigrationSource{
-	Migrations: []*migrate.Migration{
-		{Id: "0-data-0", Up: []string{"DROP TABLE IF EXISTS hydra_jwk"}},
-		{Id: "0-data-1", Up: []string{"DROP TABLE IF EXISTS hydra_jwk_migration"}},
-		jwk.Migrations.Migrations[0],
-		createJWKMigrations[0],
-		jwk.Migrations.Migrations[1],
-		createJWKMigrations[1],
-		jwk.Migrations.Migrations[2],
-		createJWKMigrations[2],
+var migrations = map[string]*migrate.MemoryMigrationSource{
+	"mysql": {
+		Migrations: []*migrate.Migration{
+			{Id: "0-data-0", Up: []string{"DROP TABLE IF EXISTS hydra_jwk"}},
+			{Id: "0-data-1", Up: []string{"DROP TABLE IF EXISTS hydra_jwk_migration"}},
+			jwk.Migrations["mysql"].Migrations[0],
+			createJWKMigrations[0],
+			jwk.Migrations["mysql"].Migrations[1],
+			createJWKMigrations[1],
+			jwk.Migrations["mysql"].Migrations[2],
+			createJWKMigrations[2],
+			jwk.Migrations["postgres"].Migrations[3],
+			createJWKMigrations[3],
+		},
+	},
+	"postgres": {
+		Migrations: []*migrate.Migration{
+			{Id: "0-data-0", Up: []string{"DROP TABLE IF EXISTS hydra_jwk"}},
+			{Id: "0-data-1", Up: []string{"DROP TABLE IF EXISTS hydra_jwk_migration"}},
+			jwk.Migrations["postgres"].Migrations[0],
+			createJWKMigrations[0],
+			jwk.Migrations["postgres"].Migrations[1],
+			createJWKMigrations[1],
+			jwk.Migrations["postgres"].Migrations[2],
+			createJWKMigrations[2],
+			jwk.Migrations["postgres"].Migrations[3],
+			createJWKMigrations[3],
+		},
 	},
 }
 
@@ -108,17 +135,17 @@ func TestMigrations(t *testing.T) {
 	for k, db := range dbs {
 		t.Run(fmt.Sprintf("database=%s", k), func(t *testing.T) {
 			migrate.SetTable("hydra_jwk_migration_integration")
-			for step := range migrations.Migrations {
+			for step := range migrations[k].Migrations {
 				t.Run(fmt.Sprintf("step=%d", step), func(t *testing.T) {
-					n, err := migrate.ExecMax(db.DB, db.DriverName(), migrations, migrate.Up, 1)
+					n, err := migrate.ExecMax(db.DB, db.DriverName(), migrations[k], migrate.Up, 1)
 					require.NoError(t, err)
 					require.Equal(t, n, 1)
 				})
 			}
 
-			for step := range migrations.Migrations {
+			for step := range migrations[k].Migrations {
 				t.Run(fmt.Sprintf("step=%d", step), func(t *testing.T) {
-					n, err := migrate.ExecMax(db.DB, db.DriverName(), migrations, migrate.Down, 1)
+					n, err := migrate.ExecMax(db.DB, db.DriverName(), migrations[k], migrate.Down, 1)
 					require.NoError(t, err)
 					require.Equal(t, n, 1)
 				})

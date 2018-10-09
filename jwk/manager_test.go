@@ -134,7 +134,7 @@ func TestManagerRotate(t *testing.T) {
 
 			require.NoError(t, m.AddKeySet(context.TODO(), "TestManagerRotate", ks))
 
-			require.NoError(t, m.RotateKeys(newCipher))
+			require.NoError(t, m.RotateKeys(context.TODO(), newCipher))
 
 			_, err = m.GetKeySet(context.TODO(), "TestManagerRotate")
 			require.Error(t, err)

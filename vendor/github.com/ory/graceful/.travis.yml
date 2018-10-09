@@ -1,0 +1,15 @@
+language: go
+
+go:
+  - 1.8
+
+install:
+  - go get github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/pierrre/gotestcover github.com/Masterminds/glide github.com/golang/lint/golint golang.org/x/tools/cmd/goimports
+  - glide install
+
+script:
+  - ./ci-lint.sh
+  - gotestcover -coverprofile="cover.out" -covermode="count" $(go list ./... | grep -v /vendor/)
+
+after_success:
+  - goveralls -coverprofile="cover.out"

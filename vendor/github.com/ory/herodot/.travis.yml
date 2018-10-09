@@ -1,0 +1,17 @@
+language: go
+
+go:
+  - 1.11
+
+install:
+  # Overwrite go path
+  - GO111MODULE=on go get github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/pierrre/gotestcover
+  - GO111MODULE=on go get .
+
+script:
+  - GO111MODULE=on gotestcover -coverprofile="cover.out" -race -covermode="atomic" $(go list ./... | grep -v /vendor/)
+
+after_success:
+  - GO111MODULE=on go vet -x $(go list ./... | grep -v /vendor/)
+  - GO111MODULE=on golint $(go list ./... | grep -v /vendor/)
+  - goveralls -coverprofile="cover.out"

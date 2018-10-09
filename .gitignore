@@ -6,7 +6,6 @@ node_modules/
 *.log
 *.stackdump
 .DS_Store
-vendor/
 .hydra.yml
 cover.out
 output/
@@ -17,4 +16,3 @@ Dockerfile-plugin-*
 plugin-*.so
 hydra-docker-bin
 cookies.txt
-vendor.orig

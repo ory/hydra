@@ -1,0 +1,21 @@
+machine:
+  environment:
+    BASE_DIR: ${GOPATH%%:*}/src/github.com/${CIRCLE_PROJECT_USERNAME}
+    REPO_DIR: ${BASE_DIR}/$(basename $(pwd))
+    GO15VENDOREXPERIMENT: 1
+
+checkout:
+    post:
+      - mkdir -p ${BASE_DIR}
+      - ln -sf $(pwd) ${REPO_DIR}
+
+dependencies:
+  pre:
+    - git submodule update --init --recursive
+
+test:
+  pre:
+    - cd ${REPO_DIR} && make vet
+
+  override:
+    - cd ${REPO_DIR} && make test

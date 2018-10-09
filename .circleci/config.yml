@@ -39,6 +39,7 @@ jobs:
             echo 'export GO111MODULE=on' >> $BASH_ENV
             source $BASH_ENV
       - checkout
+      - run: go mod verify
       - run: go get -u github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/ory/go-acc
       - run: go install github.com/ory/hydra
       - run: go install github.com/ory/hydra/test/mock-lcp
@@ -54,11 +55,6 @@ jobs:
       - image: circleci/golang:1.11
     working_directory: /go/src/github.com/ory/hydra
     steps:
-      - run:
-          name: Enable go1.11 modules
-          command: |
-            echo 'export GO111MODULE=on' >> $BASH_ENV
-            source $BASH_ENV
       - checkout
       - run: go get -u github.com/go-swagger/go-swagger/cmd/swagger golang.org/x/tools/cmd/goimports
       - run: curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -

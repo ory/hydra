@@ -1,0 +1,15 @@
+.idea/
+node_modules/
+*.iml
+*.exe
+.vagrant
+*.log
+*.stackdump
+.DS_Store
+vendor/
+.hydra.yml
+cover.out
+output/
+_book/
+dist/
+coverage.*

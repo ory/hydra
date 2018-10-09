@@ -21,9 +21,10 @@
 package cli
 
 import (
+	"context"
 	"fmt"
+	"github.com/ory/x/cmdx"
 	"net/url"
-	"os"
 	"strings"
 	"time"
 
@@ -57,7 +58,7 @@ func (h *MigrateHandler) connectToSql(dsn string) (*sqlx.DB, error) {
 
 	u, err := url.Parse(dsn)
 	if err != nil {
-		return nil, errors.Errorf("Could not parse DATABASE_URL: %s", err)
+		return nil, errors.Errorf("could not parse DATABASE_URL: %s", err)
 	}
 
 	if err := pkg.Retry(h.c.GetLogger(), time.Second*15, time.Minute*2, func() error {
@@ -66,9 +67,9 @@ func (h *MigrateHandler) connectToSql(dsn string) (*sqlx.DB, error) {
 		}
 
 		if db, err = sqlx.Open(u.Scheme, dsn); err != nil {
-			return errors.Errorf("Could not connect to SQL: %s", err)
+			return errors.Errorf("could not connect to SQL: %s", err)
 		} else if err := db.Ping(); err != nil {
-			return errors.Errorf("Could not connect to SQL: %s", err)
+			return errors.Errorf("could not connect to SQL: %s", err)
 		}
 
 		return nil
@@ -109,30 +110,25 @@ func (h *MigrateHandler) MigrateSecret(cmd *cobra.Command, args []string) {
 	}
 
 	db, err := h.connectToSql(dburl)
-	if err != nil {
-		fmt.Printf("An error occurred while connecting to SQL: %s", err)
-		os.Exit(1)
-		return
-	}
+	cmdx.Must(err, "An error occurred while connecting to SQL: %s", err)
 
 	oldSecret := viper.GetString("OLD_SYSTEM_SECRET")
 	newSecret := viper.GetString("NEW_SYSTEM_SECRET")
 
-	if len(oldSecret) == 0 {
-		fmt.Println("You did not specify the old system secret, please set environment variable OLD_SYSTEM_SECRET.")
-		os.Exit(1)
-		return
-	} else if len(newSecret) == 0 {
-		fmt.Println("You did not specify the old system secret, please set environment variable NEW_SYSTEM_SECRET.")
-		os.Exit(1)
-		return
+	if len(oldSecret) != 32 {
+		cmdx.Fatalf("Value of environment variable OLD_SYSTEM_SECRET has to be exactly 32 characters long but got: %d", len(oldSecret))
+	}
+
+	if len(newSecret) != 32 {
+		cmdx.Fatalf("Value of environment variable NEW_SYSTEM_SECRET has to be exactly 32 characters long but got: %d", len(oldSecret))
 	}
 
 	fmt.Println("Rotating encryption keys for JSON Web Key storage...")
+
 	manager := jwk.NewSQLManager(db, []byte(oldSecret))
-	if err := manager.RotateKeys(&jwk.AEAD{Key: []byte(newSecret)}); err != nil {
-		fmt.Printf("Error \"%s\" occurred while trying to rotate the JSON Web Key storage. All changes have been reverted.", err)
-	}
+	err = manager.RotateKeys(context.TODO(), &jwk.AEAD{Key: []byte(newSecret)})
+	cmdx.Must(err, "Unable to rotate JSON Web Keys: %s\nAll changes have been rolled back.", err)
+
 	fmt.Println("Rotating encryption keys for JSON Web Key storage completed successfully!")
 	fmt.Printf(`You may now run ORY Hydra with the new system secret. If you wish that old OAuth 2.0 Access and Refres
 tokens stay valid, please set environment variable ROTATED_SYSTEM_SECRET to the new secret:
@@ -151,17 +147,11 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 	}
 
 	db, err := h.connectToSql(dburl)
-	if err != nil {
-		fmt.Printf("An error occurred while connecting to SQL: %s", err)
-		os.Exit(1)
-		return
-	}
+	cmdx.Must(err, "An error occurred while connecting to SQL: %s", err)
 
-	if err := h.runMigrateSQL(db); err != nil {
-		fmt.Printf("An error occurred while running the migrations: %s", err)
-		os.Exit(1)
-		return
-	}
+	err = h.runMigrateSQL(db)
+	cmdx.Must(err, "An error occurred while running the migrations: %s", err)
+
 	fmt.Println("Migration successful!")
 }
 
@@ -175,7 +165,7 @@ func (h *MigrateHandler) runMigrateSQL(db *sqlx.DB) error {
 	} {
 		fmt.Printf("Applying `%s` SQL migrations...\n", k)
 		if num, err := m.CreateSchemas(); err != nil {
-			return errors.Wrapf(err, "Could not apply `%s` SQL migrations", k)
+			return errors.Wrapf(err, "could not apply %s SQL migrations", k)
 		} else {
 			fmt.Printf("Applied %d `%s` SQL migrations.\n", num, k)
 			total += num

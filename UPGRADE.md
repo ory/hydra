@@ -8,8 +8,12 @@ before finalizing the upgrade process.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
-- [1.0.0-beta.8](#100-beta8)
+- [1.0.0-beta.10](#100-beta10)
   - [Schema Changes](#schema-changes)
+- [1.0.0-beta.9](#100-beta9)
+  - [CORS is disabled by default](#cors-is-disabled-by-default)
+- [1.0.0-beta.8](#100-beta8)
+  - [Schema Changes](#schema-changes-1)
   - [Split of Public and Administrative Endpoints](#split-of-public-and-administrative-endpoints)
   - [Golang SDK `Configuration.EndpointURL` is now `Configuration.AdminURL`](#golang-sdk-configurationendpointurl-is-now-configurationadminurl)
   - [`hydra serve` is now `hydra serve all`](#hydra-serve-is-now-hydra-serve-all)
@@ -20,7 +24,7 @@ before finalizing the upgrade process.
   - [Regenerated OpenID Connect ID Token cryptographic keys](#regenerated-openid-connect-id-token-cryptographic-keys)
 - [1.0.0-beta.5](#100-beta5)
   - [OAuth 2.0 Client Response Type changes](#oauth-20-client-response-type-changes)
-  - [Schema Changes](#schema-changes-1)
+  - [Schema Changes](#schema-changes-2)
   - [HTTP Error Payload](#http-error-payload)
   - [OAuth 2.0 Clients must specify correct `token_endpoint_auth_method`](#oauth-20-clients-must-specify-correct-token_endpoint_auth_method)
   - [OAuth 2.0 Client field `id` is now `client_id`](#oauth-20-client-field-id-is-now-client_id)
@@ -98,6 +102,19 @@ before finalizing the upgrade process.
     - [Best practice HTTP server config](#best-practice-http-server-config)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## 1.0.0-beta.10
+
+### Schema Changes
+
+This patch introduces database schema changes. Before you apply it, you must run `hydra migrate sql` against
+your database.
+
+In order to [resolve table locking](https://github.com/ory/hydra/issues/1067) during the refresh token flow, the following indices were added:
+- Unique index on the `request_id` column in the `hydra_oauth2_access` & `hydra_oauth2_refresh` tables
+
+In order to [resolve table locking](https://github.com/ory/hydra/issues/1067) when flushing expired tokens, the following index was added:
+- Index on the `requested_at` column in the `hydra_oauth2_access` table
 
 ## 1.0.0-beta.9
 

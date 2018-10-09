@@ -124,7 +124,7 @@ var Migrations = map[string]*migrate.MemoryMigrationSource{
 }
 
 type sqlData struct {
-	PK        int    	`db:"pk"`
+	PK        int       `db:"pk"`
 	Set       string    `db:"sid"`
 	KID       string    `db:"kid"`
 	Version   int       `db:"version"`

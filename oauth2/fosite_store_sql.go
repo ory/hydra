@@ -63,9 +63,9 @@ func NewFositeSQLStore(m client.Manager,
 	}
 }
 
-func sqlSchemaUp(table string, id string) string {
-	schemas := map[string]string{
-		"1": fmt.Sprintf(`CREATE TABLE IF NOT EXISTS hydra_oauth2_%s (
+func sqlSchemaUp(db, table, id string) string {
+	shared := []string{
+		fmt.Sprintf(`CREATE TABLE IF NOT EXISTS hydra_oauth2_%s (
 	signature      	varchar(255) NOT NULL PRIMARY KEY,
 	request_id  	varchar(255) NOT NULL,
 	requested_at  	timestamp NOT NULL DEFAULT now(),
@@ -75,8 +75,8 @@ func sqlSchemaUp(table string, id string) string {
 	form_data  		text NOT NULL,
 	session_data  	text NOT NULL
 )`, table),
-		"2": fmt.Sprintf("ALTER TABLE hydra_oauth2_%s ADD subject varchar(255) NOT NULL DEFAULT ''", table),
-		"3": `CREATE TABLE IF NOT EXISTS hydra_oauth2_pkce (
+		fmt.Sprintf("ALTER TABLE hydra_oauth2_%s ADD subject varchar(255) NOT NULL DEFAULT ''", table),
+		`CREATE TABLE IF NOT EXISTS hydra_oauth2_pkce (
 	signature      	varchar(255) NOT NULL PRIMARY KEY,
 	request_id  	varchar(255) NOT NULL,
 	requested_at  	timestamp NOT NULL DEFAULT now(),
@@ -87,25 +87,63 @@ func sqlSchemaUp(table string, id string) string {
 	session_data  	text NOT NULL,
 	subject 		varchar(255) NOT NULL
 )`,
-		"4": fmt.Sprintf("ALTER TABLE hydra_oauth2_%s ADD active BOOL NOT NULL DEFAULT TRUE", table),
-		"5": fmt.Sprintf("CREATE UNIQUE INDEX hydra_oauth2_%s_request_id_idx ON hydra_oauth2_%s (request_id)", table, table),
-		"6": fmt.Sprintf("CREATE INDEX hydra_oauth2_%s_requested_at_idx ON hydra_oauth2_%s (requested_at)", table, table),
+		fmt.Sprintf("ALTER TABLE hydra_oauth2_%s ADD active BOOL NOT NULL DEFAULT TRUE", table),
+		fmt.Sprintf("CREATE UNIQUE INDEX hydra_oauth2_%s_request_id_idx ON hydra_oauth2_%s (request_id)", table, table),
+		fmt.Sprintf("CREATE INDEX hydra_oauth2_%s_requested_at_idx ON hydra_oauth2_%s (requested_at)", table, table),
 	}
 
-	return schemas[id]
+	m := map[string]map[string]string{
+		"mysql": {
+			"1": shared[0],
+			"2": shared[1],
+			"3": shared[2],
+			"4": shared[3],
+			"5": shared[4],
+			"6": shared[5],
+		},
+		"postgres": {
+			"1": shared[0],
+			"2": shared[1],
+			"3": shared[2],
+			"4": shared[3],
+			"5": shared[4],
+			"6": shared[5],
+		},
+	}
+
+	return m[db][id]
 }
 
-func sqlSchemaDown(table string, id string) string {
-	schemas := map[string]string{
-		"1": fmt.Sprintf(`DROP TABLE %s)`, table),
-		"2": fmt.Sprintf("ALTER TABLE hydra_oauth2_%s DROP COLUMN subject", table),
-		"3": "DROP TABLE hydra_oauth2_pkce",
-		"4": fmt.Sprintf("ALTER TABLE hydra_oauth2_%s DROP COLUMN active", table),
-		"5": fmt.Sprintf("DROP INDEX hydra_oauth2_%s_request_id_idx ON hydra_oauth2_%s", table, table),
-		"6": fmt.Sprintf("DROP INDEX hydra_oauth2_%s_requested_at_idx ON hydra_oauth2_%s", table, table),
+func sqlSchemaDown(db, table, id string) string {
+	shared := []string{
+		fmt.Sprintf(`DROP TABLE %s)`, table),
+		fmt.Sprintf("ALTER TABLE hydra_oauth2_%s DROP COLUMN subject", table),
+		"DROP TABLE hydra_oauth2_pkce",
+		fmt.Sprintf("ALTER TABLE hydra_oauth2_%s DROP COLUMN active", table),
+		fmt.Sprintf("DROP INDEX hydra_oauth2_%s_request_id_idx ON hydra_oauth2_%s", table, table),
+		fmt.Sprintf("DROP INDEX hydra_oauth2_%s_requested_at_idx ON hydra_oauth2_%s", table, table),
 	}
 
-	return schemas[id]
+	m := map[string]map[string]string{
+		"mysql": {
+			"1": shared[0],
+			"2": shared[1],
+			"3": shared[2],
+			"4": shared[3],
+			"5": shared[4],
+			"6": shared[5],
+		},
+		"postgres": {
+			"1": shared[0],
+			"2": shared[1],
+			"3": shared[2],
+			"4": shared[3],
+			"5": shared[4],
+			"6": shared[5],
+		},
+	}
+
+	return m[db][id]
 }
 
 const (
@@ -116,85 +154,92 @@ const (
 	sqlTablePKCE    = "pkce"
 )
 
-var migrations = &migrate.MemoryMigrationSource{
-	Migrations: []*migrate.Migration{
-		{
-			Id: "1",
-			Up: []string{
-				sqlSchemaUp(sqlTableAccess, "1"),
-				sqlSchemaUp(sqlTableRefresh, "1"),
-				sqlSchemaUp(sqlTableCode, "1"),
-				sqlSchemaUp(sqlTableOpenID, "1"),
+func createMigrationSource(db string) *migrate.MemoryMigrationSource {
+	return &migrate.MemoryMigrationSource{
+		Migrations: []*migrate.Migration{
+			{
+				Id: "1",
+				Up: []string{
+					sqlSchemaUp(db, sqlTableAccess, "1"),
+					sqlSchemaUp(db, sqlTableRefresh, "1"),
+					sqlSchemaUp(db, sqlTableCode, "1"),
+					sqlSchemaUp(db, sqlTableOpenID, "1"),
+				},
+				Down: []string{
+					sqlSchemaDown(db, sqlTableAccess, "1"),
+					sqlSchemaDown(db, sqlTableRefresh, "1"),
+					sqlSchemaDown(db, sqlTableCode, "1"),
+					sqlSchemaDown(db, sqlTableOpenID, "1"),
+				},
 			},
-			Down: []string{
-				sqlSchemaDown(sqlTableAccess, "1"),
-				sqlSchemaDown(sqlTableRefresh, "1"),
-				sqlSchemaDown(sqlTableCode, "1"),
-				sqlSchemaDown(sqlTableOpenID, "1"),
+			{
+				Id: "2",
+				Up: []string{
+					sqlSchemaUp(db, sqlTableAccess, "2"),
+					sqlSchemaUp(db, sqlTableRefresh, "2"),
+					sqlSchemaUp(db, sqlTableCode, "2"),
+					sqlSchemaUp(db, sqlTableOpenID, "2"),
+				},
+				Down: []string{
+					sqlSchemaDown(db, sqlTableAccess, "2"),
+					sqlSchemaDown(db, sqlTableRefresh, "2"),
+					sqlSchemaDown(db, sqlTableCode, "2"),
+					sqlSchemaDown(db, sqlTableOpenID, "2"),
+				},
+			},
+			{
+				Id: "3",
+				Up: []string{
+					sqlSchemaUp(db, sqlTablePKCE, "3"),
+				},
+				Down: []string{
+					sqlSchemaDown(db, sqlTablePKCE, "3"),
+				},
+			},
+			{
+				Id: "4",
+				Up: []string{
+					sqlSchemaUp(db, sqlTableAccess, "4"),
+					sqlSchemaUp(db, sqlTableRefresh, "4"),
+					sqlSchemaUp(db, sqlTableCode, "4"),
+					sqlSchemaUp(db, sqlTableOpenID, "4"),
+					sqlSchemaUp(db, sqlTablePKCE, "4"),
+				},
+				Down: []string{
+					sqlSchemaDown(db, sqlTableAccess, "4"),
+					sqlSchemaDown(db, sqlTableRefresh, "4"),
+					sqlSchemaDown(db, sqlTableCode, "4"),
+					sqlSchemaDown(db, sqlTableOpenID, "4"),
+					sqlSchemaDown(db, sqlTablePKCE, "4"),
+				},
+			},
+			{
+				Id: "5",
+				Up: []string{
+					sqlSchemaUp(db, sqlTableAccess, "5"),
+					sqlSchemaUp(db, sqlTableRefresh, "5"),
+				},
+				Down: []string{
+					sqlSchemaDown(db, sqlTableAccess, "5"),
+					sqlSchemaDown(db, sqlTableRefresh, "5"),
+				},
+			},
+			{
+				Id: "6",
+				Up: []string{
+					sqlSchemaUp(db, sqlTableAccess, "6"),
+				},
+				Down: []string{
+					sqlSchemaDown(db, sqlTableAccess, "6"),
+				},
 			},
 		},
-		{
-			Id: "2",
-			Up: []string{
-				sqlSchemaUp(sqlTableAccess, "2"),
-				sqlSchemaUp(sqlTableRefresh, "2"),
-				sqlSchemaUp(sqlTableCode, "2"),
-				sqlSchemaUp(sqlTableOpenID, "2"),
-			},
-			Down: []string{
-				sqlSchemaDown(sqlTableAccess, "2"),
-				sqlSchemaDown(sqlTableRefresh, "2"),
-				sqlSchemaDown(sqlTableCode, "2"),
-				sqlSchemaDown(sqlTableOpenID, "2"),
-			},
-		},
-		{
-			Id: "3",
-			Up: []string{
-				sqlSchemaUp(sqlTablePKCE, "3"),
-			},
-			Down: []string{
-				sqlSchemaDown(sqlTablePKCE, "3"),
-			},
-		},
-		{
-			Id: "4",
-			Up: []string{
-				sqlSchemaUp(sqlTableAccess, "4"),
-				sqlSchemaUp(sqlTableRefresh, "4"),
-				sqlSchemaUp(sqlTableCode, "4"),
-				sqlSchemaUp(sqlTableOpenID, "4"),
-				sqlSchemaUp(sqlTablePKCE, "4"),
-			},
-			Down: []string{
-				sqlSchemaDown(sqlTableAccess, "4"),
-				sqlSchemaDown(sqlTableRefresh, "4"),
-				sqlSchemaDown(sqlTableCode, "4"),
-				sqlSchemaDown(sqlTableOpenID, "4"),
-				sqlSchemaDown(sqlTablePKCE, "4"),
-			},
-		},
-		{
-			Id: "5",
-			Up: []string{
-				sqlSchemaUp(sqlTableAccess, "5"),
-				sqlSchemaUp(sqlTableRefresh, "5"),
-			},
-			Down: []string{
-				sqlSchemaDown(sqlTableAccess, "5"),
-				sqlSchemaDown(sqlTableRefresh, "5"),
-			},
-		},
-		{
-			Id: "6",
-			Up: []string{
-				sqlSchemaUp(sqlTableAccess, "6"),
-			},
-			Down: []string{
-				sqlSchemaDown(sqlTableAccess, "6"),
-			},
-		},
-	},
+	}
+}
+
+var migrations = map[string]*migrate.MemoryMigrationSource{
+	"mysql":    createMigrationSource("mysql"),
+	"postgres": createMigrationSource("postgres"),
 }
 
 var sqlParams = []string{
@@ -211,6 +256,7 @@ var sqlParams = []string{
 }
 
 type sqlData struct {
+	PK            int       `db:"pk"`
 	Signature     string    `db:"signature"`
 	Request       string    `db:"request_id"`
 	RequestedAt   time.Time `db:"requested_at"`
@@ -341,8 +387,14 @@ func (s *FositeSQLStore) deleteSession(ctx context.Context, signature string, ta
 }
 
 func (s *FositeSQLStore) CreateSchemas() (int, error) {
+	database := s.DB.DriverName()
+	switch database {
+	case "pgx", "pq":
+		database = "postgres"
+	}
+
 	migrate.SetTable("hydra_oauth2_migration")
-	n, err := migrate.Exec(s.DB.DB, s.DB.DriverName(), migrations, migrate.Up)
+	n, err := migrate.Exec(s.DB.DB, s.DB.DriverName(), migrations[database], migrate.Up)
 	if err != nil {
 		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
 	}

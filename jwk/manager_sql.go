@@ -254,7 +254,7 @@ func (m *SQLManager) deleteKeySet(ctx context.Context, tx *sqlx.Tx, set string) 
 	return nil
 }
 
-func (m *SQLManager) RotateKeys(new *AEAD) error {
+func (m *SQLManager) RotateKeys(ctx context.Context, new *AEAD) error {
 	sids := make([]string, 0)
 	if err := m.DB.Select(&sids, "SELECT sid FROM hydra_jwk GROUP BY sid"); err != nil {
 		return sqlcon.HandleError(err)
@@ -262,7 +262,7 @@ func (m *SQLManager) RotateKeys(new *AEAD) error {
 
 	sets := make([]jose.JSONWebKeySet, 0)
 	for _, sid := range sids {
-		set, err := m.GetKeySet(context.TODO(), sid)
+		set, err := m.GetKeySet(ctx, sid)
 		if err != nil {
 			return errors.WithStack(err)
 		}
@@ -275,14 +275,14 @@ func (m *SQLManager) RotateKeys(new *AEAD) error {
 	}
 
 	for k, set := range sets {
-		if err := m.deleteKeySet(context.TODO(), tx, sids[k]); err != nil {
+		if err := m.deleteKeySet(ctx, tx, sids[k]); err != nil {
 			if re := tx.Rollback(); re != nil {
 				return errors.Wrap(err, re.Error())
 			}
 			return sqlcon.HandleError(err)
 		}
 
-		if err := m.addKeySet(context.TODO(), tx, new, sids[k], &set); err != nil {
+		if err := m.addKeySet(ctx, tx, new, sids[k], &set); err != nil {
 			if re := tx.Rollback(); re != nil {
 				return errors.Wrap(err, re.Error())
 			}

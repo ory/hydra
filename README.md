@@ -180,8 +180,7 @@ Hydra is a twelve factor OAuth2 and OpenID Connect provider
 
 #### Building from source
 
-If you wish to compile ORY Hydra yourself, you need to install and set up [Go 1.11+](https://golang.org/)
-and add `$GOPATH/bin` to your `$PATH`.
+If you wish to compile ORY Hydra yourself, you need to install and set up [Go 1.11+](https://golang.org/).
 
 The following commands will check out the latest release tag of ORY Hydra and compile it and set up flags so that `hydra version`
 works as expected. Please note that this will only work with a linux shell like bash or sh.
@@ -189,14 +188,13 @@ works as expected. Please note that this will only work with a linux shell like 
 ```
 go get -d -u github.com/ory/hydra
 cd $(go env GOPATH)/src/github.com/ory/hydra
-export GO111MODULE=on
 HYDRA_LATEST=$(git describe --abbrev=0 --tags)
 git checkout $HYDRA_LATEST
 go install \
     -ldflags "-X github.com/ory/hydra/cmd.Version=$HYDRA_LATEST -X github.com/ory/hydra/cmd.BuildTime=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory/hydra/cmd.GitHash=`git rev-parse HEAD`" \
     github.com/ory/hydra
 git checkout master
-hydra help
+$GOPATH/bin/hydra help
 ```
 
 ## Ecosystem

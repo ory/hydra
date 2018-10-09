@@ -154,6 +154,19 @@ var Migrations = map[string]*migrate.MemoryMigrationSource{
 				`ALTER TABLE hydra_client MODIFY allowed_cors_origins TEXT`,
 			},
 		},
+		{
+			Id: "9",
+			Up: []string{
+				`ALTER TABLE hydra_client DROP PRIMARY KEY`,
+				`CREATE UNIQUE INDEX hydra_client_idx_id_uq ON hydra_client (id)`,
+				`ALTER TABLE hydra_client ADD pk INT UNSIGNED AUTO_INCREMENT PRIMARY KEY`,
+			},
+			Down: []string{
+				`ALTER TABLE hydra_client DROP COLUMN pk`,
+				`ALTER TABLE hydra_client DROP INDEX hydra_client_idx_id_uq`,
+				`ALTER TABLE hydra_client ADD PRIMARY KEY (id)`,
+			},
+		},
 	}},
 	"postgres": {Migrations: []*migrate.Migration{
 		sharedMigrations[0],
@@ -186,6 +199,21 @@ var Migrations = map[string]*migrate.MemoryMigrationSource{
 			},
 			Down: []string{
 				`ALTER TABLE hydra_client ALTER COLUMN allowed_cors_origins DROP NOT NULL`,
+			},
+		},
+		{
+			Id: "9",
+			Up: []string{
+				`ALTER TABLE hydra_client DROP CONSTRAINT hydra_client_pkey`,
+				`ALTER TABLE hydra_client ADD pk SERIAL`,
+				`ALTER TABLE hydra_client ADD PRIMARY KEY (pk)`,
+				`CREATE UNIQUE INDEX hydra_client_idx_id_uq ON hydra_client (id)`,
+			},
+			Down: []string{
+				`ALTER TABLE hydra_client DROP CONSTRAINT hydra_client_pkey`,
+				`ALTER TABLE hydra_client DROP COLUMN pk`,
+				`DROP INDEX hydra_client_idx_id_uq`,
+				`ALTER TABLE hydra_client ADD PRIMARY KEY (id)`,
 			},
 		},
 	}},

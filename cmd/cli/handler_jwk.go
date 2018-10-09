@@ -30,12 +30,13 @@ import (
 	"os"
 
 	"github.com/mendsley/gojwk"
-	"github.com/ory/hydra/config"
-	"github.com/ory/hydra/pkg"
-	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/pborman/uuid"
 	"github.com/spf13/cobra"
 	"gopkg.in/square/go-jose.v2"
+
+	"github.com/ory/hydra/config"
+	"github.com/ory/hydra/pkg"
+	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 )
 
 type JWKHandler struct {

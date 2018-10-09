@@ -5,6 +5,8 @@ require (
 	github.com/BurntSushi/toml v0.3.1 // indirect
 	github.com/Microsoft/go-winio v0.4.7 // indirect
 	github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 // indirect
+	github.com/alecthomas/gometalinter v2.0.11+incompatible // indirect
+	github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf // indirect
 	github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973 // indirect
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/cenkalti/backoff v2.0.0+incompatible // indirect
@@ -16,6 +18,7 @@ require (
 	github.com/go-sql-driver/mysql v1.4.0
 	github.com/golang/mock v1.1.1
 	github.com/google/go-cmp v0.2.0 // indirect
+	github.com/google/shlex v0.0.0-20150127133951-6f45313302b9 // indirect
 	github.com/gorilla/context v1.1.1
 	github.com/gorilla/securecookie v0.0.0-20160422134519-667fe4e3466a
 	github.com/gorilla/sessions v0.0.0-20160922145804-ca9ada445741
@@ -34,6 +37,7 @@ require (
 	github.com/mendsley/gojwk v0.0.0-20141217222730-4d5ec6e58103
 	github.com/mitchellh/mapstructure v0.0.0-20171017171808-06020f85339e // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
+	github.com/nicksnyder/go-i18n v1.10.0 // indirect
 	github.com/oleiade/reflections v1.0.0
 	github.com/onsi/gomega v1.4.2 // indirect
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
@@ -79,6 +83,7 @@ require (
 	golang.org/x/crypto v0.0.0-20181001203147-e3636079e1a4
 	golang.org/x/oauth2 v0.0.0-20181003184128-c57b0facaced
 	gopkg.in/airbrake/gobrake.v2 v2.0.9 // indirect
+	gopkg.in/alecthomas/kingpin.v3-unstable v3.0.0-20180810215634-df19058c872c // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/gemnasium/logrus-airbrake-hook.v2 v2.1.2 // indirect
 	gopkg.in/gorp.v1 v1.7.1 // indirect

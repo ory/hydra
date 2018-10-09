@@ -33,13 +33,6 @@ import (
 	"github.com/meatballhat/negroni-logrus"
 	"github.com/ory/graceful"
 	"github.com/ory/herodot"
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/config"
-	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/health"
-	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/pkg"
 	"github.com/ory/x/corsx"
 	"github.com/ory/x/metricsx"
 	"github.com/pkg/errors"
@@ -47,6 +40,14 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/urfave/negroni"
+
+	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/config"
+	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/health"
+	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/pkg"
 )
 
 var _ = &consent.Handler{}

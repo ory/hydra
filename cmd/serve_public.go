@@ -15,8 +15,9 @@
 package cmd
 
 import (
-	"github.com/ory/hydra/cmd/server"
 	"github.com/spf13/cobra"
+
+	"github.com/ory/hydra/cmd/server"
 )
 
 // servePublicCmd represents the public command

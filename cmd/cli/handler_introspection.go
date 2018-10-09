@@ -31,8 +31,9 @@ import (
 	"github.com/ory/hydra/config"
 	//"github.com/ory/hydra/oauth2"
 
-	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/spf13/cobra"
+
+	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 )
 
 type IntrospectionHandler struct {

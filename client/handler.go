@@ -26,9 +26,10 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
-	"github.com/ory/hydra/rand/sequence"
 	"github.com/ory/x/pagination"
 	"github.com/pkg/errors"
+
+	"github.com/ory/hydra/rand/sequence"
 )
 
 type Handler struct {

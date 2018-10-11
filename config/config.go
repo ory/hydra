@@ -104,6 +104,7 @@ type Config struct {
 	oauth2Client *http.Client               `yaml:"-"`
 	context      *Context                   `yaml:"-"`
 	systemSecret []byte                     `yaml:"-"`
+	cookieSecret []byte                     `yaml:"-"`
 }
 
 func (c *Config) MustValidate() {
@@ -360,10 +361,28 @@ func (c *Config) Resolve(join ...string) *url.URL {
 	return urlx.AppendPaths(c.cluster, join...)
 }
 
+// GetCookieSecret returns the secret key to sign cookies. This defaults to the system secret.
 func (c *Config) GetCookieSecret() []byte {
-	if c.CookieSecret != "" {
-		return []byte(c.CookieSecret)
+	if len(c.cookieSecret) > 0 {
+		return c.cookieSecret
 	}
+
+	var secret = []byte(c.CookieSecret)
+
+	// make sure our secret is 256 bits long
+	if len(secret) >= 16 {
+		hash := sha256.Sum256(secret)
+		secret = hash[:]
+		c.cookieSecret = secret
+		return secret
+	}
+
+	if len(c.CookieSecret) > 0 {
+		c.GetLogger().Fatalf("Cookie secret must be either left undefined or have at least 16 characters, but it has %d characters.", len(c.CookieSecret))
+		return nil
+	}
+
+	// defaults to system secret
 	return c.GetSystemSecret()
 }
 
@@ -371,12 +390,15 @@ func (c *Config) GetRotatedSystemSecrets() [][]byte {
 	return [][]byte{[]byte(c.RotatedSystemSecret)}
 }
 
+// GetSystemSecret returns the system secret used to hash things
 func (c *Config) GetSystemSecret() []byte {
 	if len(c.systemSecret) > 0 {
 		return c.systemSecret
 	}
 
 	var secret = []byte(c.SystemSecret)
+
+	// make sure our secret is 256 bits long
 	if len(secret) >= 16 {
 		hash := sha256.Sum256(secret)
 		secret = hash[:]
@@ -385,12 +407,14 @@ func (c *Config) GetSystemSecret() []byte {
 	}
 
 	if len(c.SystemSecret) > 0 {
-		c.GetLogger().Fatalf("System secret must be undefined or have at least 16 characters, but it has %d characters.", len(c.SystemSecret))
+		c.GetLogger().Fatalf("System secret must be either left undefined or have at least 16 characters, but it has %d characters.", len(c.SystemSecret))
 		return nil
 	}
 
 	c.GetLogger().Warnf("Expected system secret to be at least %d characters long, got %d characters.", 32, len(c.SystemSecret))
 	c.GetLogger().Infoln("Generating a random system secret...")
+
+	// unspecified secret: the system generates its own
 	var err error
 	secret, err = pkg.GenerateSecret(32)
 	pkg.Must(err, "Could not generate global secret: %s", err)

@@ -103,6 +103,16 @@ before finalizing the upgrade process.
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+## master
+
+### Configuration changes
+
+New environment variables `SYSTEM_SECRET_PATH` and `COOKIE_SECRET_PATH`
+allow to retrieve secrets from files, and avoid exposing secrets in environment variables.
+
+These new variables supplement `SYSTEM_SECRET` and `COOKIE_SECRET`
+respectively, and do not affect existing configurations.
+
 ## 1.0.0-beta.10
 
 ### Schema Changes

@@ -21,12 +21,16 @@
 package cmd
 
 import (
+	"crypto/sha256"
 	"crypto/tls"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/ory/hydra/config"
 
 	"github.com/phayes/freeport"
 	"github.com/stretchr/testify/assert"
@@ -155,4 +159,68 @@ func TestExecute(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestInitConfig(t *testing.T) {
+	fd1, _ := ioutil.TempFile("", "test_system_secret.txt")
+	fd2, _ := ioutil.TempFile("", "test_cookie_secret.txt")
+	tss := fd1.Name()
+	tcs := fd2.Name()
+	defer func() {
+		_ = os.Remove(tss)
+		_ = os.Remove(tcs)
+	}()
+
+	expectedString1 := "ThisIsASystemSecretThatShouldNotBeSharedWithAnyone"
+	expectedString2 := "ThisIsACookieSecretThatShouldNotBeSharedWithAnyone"
+	expectedString3 := "ThisIsAnotherSystemSecretThatShouldNotBeSharedWithAnyone"
+	expectedString4 := "ThisIsAnotherCookieSecretThatShouldNotBeSharedWithAnyone"
+
+	_ = ioutil.WriteFile(tss, []byte(expectedString1+"\n"), 0644)
+	_ = ioutil.WriteFile(tcs, []byte(expectedString2), 0644)
+
+	os.Setenv("SYSTEM_SECRET_PATH", tss)
+	os.Setenv("COOKIE_SECRET_PATH", tcs)
+
+	c = new(config.Config)
+	initConfig()
+
+	assert.Equal(t, expectedString1, c.SystemSecret)
+	assert.Equal(t, expectedString2, c.CookieSecret)
+
+	assert.Len(t, c.GetSystemSecret(), 32)
+	hash := sha256.Sum256([]byte(expectedString1))
+	assert.Equal(t, hash[:], c.GetSystemSecret())
+
+	hashCookie := sha256.Sum256([]byte(expectedString2))
+	assert.Equal(t, hashCookie[:], c.GetCookieSecret())
+
+	os.Setenv("SYSTEM_SECRET", expectedString3)
+
+	c = new(config.Config)
+	initConfig()
+
+	assert.Equal(t, expectedString3, c.SystemSecret)
+	assert.Equal(t, expectedString2, c.CookieSecret)
+
+	assert.Len(t, c.GetSystemSecret(), 32)
+	hash = sha256.Sum256([]byte(expectedString3))
+	assert.Equal(t, hash[:], c.GetSystemSecret())
+	hashCookie = sha256.Sum256([]byte(expectedString2))
+	assert.Equal(t, hashCookie[:], c.GetCookieSecret())
+
+	os.Unsetenv("SYSTEM_SECRET")
+	os.Setenv("COOKIE_SECRET", expectedString4)
+
+	c = new(config.Config)
+	initConfig()
+
+	assert.Equal(t, expectedString1, c.SystemSecret)
+	assert.Equal(t, expectedString4[:], c.CookieSecret)
+
+	assert.Len(t, c.GetSystemSecret(), 32)
+	hash = sha256.Sum256([]byte(expectedString1))
+	assert.Equal(t, hash[:], c.GetSystemSecret())
+	hashCookie = sha256.Sum256([]byte(expectedString4))
+	assert.Equal(t, hashCookie[:], c.GetCookieSecret())
 }

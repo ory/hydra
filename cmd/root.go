@@ -22,8 +22,10 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strings"
 
@@ -38,14 +40,17 @@ import (
 var cfgFile string
 
 var (
-	Version   = "dev-master"
+	// Version of this build
+	Version = "dev-master"
+	// BuildTime of this build
 	BuildTime = "undefined"
-	GitHash   = "undefined"
+	// GitHash of this build
+	GitHash = "undefined"
 )
 
 var c = new(config.Config)
 
-// This represents the base command when called without any subcommands
+// RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "hydra",
 	Short: "Hydra is a cloud native high throughput OAuth2 and OpenID Connect provider",
@@ -138,6 +143,15 @@ func initConfig() {
 	viper.BindEnv("SYSTEM_SECRET")
 	viper.SetDefault("SYSTEM_SECRET", "")
 
+	viper.BindEnv("SYSTEM_SECRET_PATH")
+	viper.SetDefault("SYSTEM_SECRET_PATH", "")
+
+	viper.BindEnv("COOKIE_SECRET")
+	viper.SetDefault("COOKIE_SECRET", "")
+
+	viper.BindEnv("COOKIE_SECRET_PATH")
+	viper.SetDefault("COOKIE_SECRET_PATH", "")
+
 	viper.BindEnv("CLIENT_SECRET")
 	viper.SetDefault("CLIENT_SECRET", "")
 
@@ -222,11 +236,34 @@ func initConfig() {
 		fmt.Println("")
 	}
 
-	iss := viper.Get("OAUTH2_ISSUER_URL")
-	viper.Set("ISSUER", strings.TrimSuffix(iss.(string), "/"))
+	iss := viper.GetString("OAUTH2_ISSUER_URL")
+	viper.Set("ISSUER", strings.TrimSuffix(iss, "/"))
 
 	if err := viper.Unmarshal(c); err != nil {
 		fatal(fmt.Sprintf("Could not read config because %s.", err))
+	}
+
+	// prioritize sources for secrets
+	ssp := viper.GetString("SYSTEM_SECRET_PATH")
+	rexStripper := regexp.MustCompile(`\s*$`)
+	if c.SystemSecret == "" && ssp != "" {
+		ss, err := ioutil.ReadFile(ssp)
+		if err != nil {
+			fatal(fmt.Sprintf("Could not read system secret file %s: %v", ssp, err))
+		}
+		// trim possible trailing CR/LF from file
+		cleanSecret := rexStripper.ReplaceAllString(string(ss), "")
+		c.SystemSecret = cleanSecret
+	}
+	ssp = viper.GetString("COOKIE_SECRET_PATH")
+	if c.CookieSecret == "" && ssp != "" {
+		ss, err := ioutil.ReadFile(ssp)
+		if err != nil {
+			fatal(fmt.Sprintf("Could not read cookie secret file %s: %v", ssp, err))
+		}
+		// trim possible trailing CR/LF from file
+		cleanSecret := rexStripper.ReplaceAllString(string(ss), "")
+		c.CookieSecret = cleanSecret
 	}
 }
 

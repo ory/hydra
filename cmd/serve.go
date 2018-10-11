@@ -49,9 +49,13 @@ const serveControls = `CORE CONTROLS
 	is used to encrypt sensitive data using AES-GCM (256 bit) and validate HMAC signatures.
 	Example: SYSTEM_SECRET=jf89-jgklAS9gk3rkAF90dfsk
 
-- COOKIE_SECRET: A secret that is used to encrypt cookie sessions. Defaults to SYSTEM_SECRET. It is recommended to use
-	a separate secret in production.
+- SYSTEM_SECRET_PATH: A file containing SYSTEM_SECRET (see above)
+
+- COOKIE_SECRET: A secret that is used to encrypt cookie sessions. It must be at least 16 characters long.
+    Defaults to SYSTEM_SECRET. It is recommended to use a separate secret in production.
 	Example: COOKIE_SECRET=fjah8uFhgjSiuf-AS
+
+- COOKIE_SECRET_PATH: A file containing COOKIE_SECRET (see above).
 
 - PORT: The port hydra should listen on.
 	Defaults to PORT=4444

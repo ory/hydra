@@ -21,34 +21,42 @@
 package cli
 
 import (
+	"crypto/tls"
 	"encoding/json"
-	"fmt"
-	"os"
-
 	"github.com/ory/hydra/pkg"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
+	"github.com/ory/x/cmdx"
+	"github.com/ory/x/flagx"
+	"github.com/spf13/cobra"
+	"net/http"
 )
 
-func checkResponse(response *hydra.APIResponse, err error, expectedStatusCode int) {
-	if response != nil {
-		var method string
-		if response.Response != nil && response.Response.Request != nil {
-			method = response.Request.Method
-		}
-		pkg.Must(err, "Command failed because calling \"%s %s\" resulted in error \"%s\" occurred.\n%s\n", method, response.RequestURL, err, response.Payload)
-	} else {
-		pkg.Must(err, "Command failed because error \"%s\" occurred and no response is available.\n", err)
+func configureClient(cmd *cobra.Command, c *hydra.Configuration) *hydra.Configuration {
+	c.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: flagx.MustGetBool(cmd, "skip-tls-verify")},
 	}
 
-	if response.StatusCode != expectedStatusCode {
-		fmt.Fprintf(os.Stderr, "Command failed because calling \"%s %s\" resulted in status code \"%d\" but code \"%d\" was expected.\n%s\n", response.Request.Method, response.RequestURL, response.StatusCode, expectedStatusCode, response.Payload)
-		os.Exit(1)
-		return
+	if flagx.MustGetBool(cmd, "fake-tls-termination") {
+		c.DefaultHeader["X-Forwarded-Proto"] = "https"
 	}
+
+	if token := flagx.MustGetString(cmd, "access-token"); token != "" {
+		c.DefaultHeader["Authorization"] = "Bearer " + token
+	}
+	return c
+}
+
+func checkResponse(err error, expectedStatusCode int, response *hydra.APIResponse) {
+	var r *http.Response
+	if response != nil {
+		r = response.Response
+	}
+
+	cmdx.CheckResponse(err, expectedStatusCode, r)
 }
 
 func formatResponse(response interface{}) string {
 	out, err := json.MarshalIndent(response, "", "\t")
-	pkg.Must(err, `Command failed because an error ("%s") occurred while prettifying output.`, err)
+	pkg.Must(err, `Command failed because an error ("%s") occurred while prettifying output`, err)
 	return string(out)
 }

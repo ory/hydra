@@ -25,6 +25,8 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/ory/x/cmdx"
+	"github.com/ory/x/flagx"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -45,20 +47,7 @@ type JWKHandler struct {
 
 func (h *JWKHandler) newJwkManager(cmd *cobra.Command) *hydra.JsonWebKeyApi {
 	c := hydra.NewJsonWebKeyApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlashOrFail(cmd))
-
-	skipTLSTermination, _ := cmd.Flags().GetBool("skip-tls-verify")
-	c.Configuration.Transport = &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: skipTLSTermination},
-	}
-
-	if term, _ := cmd.Flags().GetBool("fake-tls-termination"); term {
-		c.Configuration.DefaultHeader["X-Forwarded-Proto"] = "https"
-	}
-
-	if token, _ := cmd.Flags().GetString("access-token"); token != "" {
-		c.Configuration.DefaultHeader["Authorization"] = "Bearer " + token
-	}
-
+	c.Configuration = configureClient(cmd, c.Configuration)
 	return c
 }
 
@@ -67,22 +56,21 @@ func newJWKHandler(c *config.Config) *JWKHandler {
 }
 
 func (h *JWKHandler) CreateKeys(cmd *cobra.Command, args []string) {
+	cmdx.RangeArgs(cmd, args, []int{1, 2})
 	m := h.newJwkManager(cmd)
-	if len(args) < 1 || len(args) > 2 {
-		fmt.Println(cmd.UsageString())
-		return
-	}
 
-	kid := ""
+	var kid string
 	if len(args) == 2 {
 		kid = args[1]
 	}
 
-	alg, _ := cmd.Flags().GetString("alg")
-	use, _ := cmd.Flags().GetString("use")
-	keys, response, err := m.CreateJsonWebKeySet(args[0], hydra.JsonWebKeySetGeneratorRequest{Alg: alg, Kid: kid, Use: use})
-	checkResponse(response, err, http.StatusCreated)
-	fmt.Printf("%s\n", formatResponse(keys))
+	keys, response, err := m.CreateJsonWebKeySet(args[0], hydra.JsonWebKeySetGeneratorRequest{
+		Alg: flagx.MustGetString(cmd, "alg"),
+		Kid: kid,
+		Use: flagx.MustGetString(cmd, "use"),
+	})
+	checkResponse(err, http.StatusCreated, response)
+	fmt.Println(formatResponse(keys))
 }
 
 func toSDKFriendlyJSONWebKey(key interface{}, kid string, use string, public bool) jose.JSONWebKey {
@@ -115,42 +103,41 @@ func toSDKFriendlyJSONWebKey(key interface{}, kid string, use string, public boo
 }
 
 func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
-	if len(args) < 2 {
-		fmt.Println(cmd.UsageString())
-		return
-	}
+	cmdx.MinArgs(cmd, args, 2)
 
 	id := args[0]
 	use, _ := cmd.Flags().GetString("use")
 	client := &http.Client{}
 
-	if skipTLSTermination, _ := cmd.Flags().GetBool("skip-tls-verify"); skipTLSTermination {
-		client.Transport = &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: skipTLSTermination}}
+	client.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: flagx.MustGetBool(cmd, "skip-tls-verify"),
+		},
 	}
 
 	u := h.Config.GetClusterURLWithoutTailingSlashOrFail(cmd) + "/keys/" + id
 	request, err := http.NewRequest("GET", u, nil)
-	pkg.Must(err, "Unable to initialize HTTP request")
+	cmdx.Must(err, "Unable to initialize HTTP request: %s", err)
 
-	if term, _ := cmd.Flags().GetBool("fake-tls-termination"); term {
+	if flagx.MustGetBool(cmd, "fake-tls-termination") {
 		request.Header.Set("X-Forwarded-Proto", "https")
 	}
 
-	if token, _ := cmd.Flags().GetString("access-token"); token != "" {
+	if token := flagx.MustGetString(cmd,"access-token"); token != "" {
 		request.Header.Set("Authorization", "Bearer "+token)
 	}
 
 	response, err := client.Do(request)
-	pkg.Must(err, "Unable to fetch data from %s because %s", u, err)
+	cmdx.Must(err, "Unable to fetch data from %s: %s", u, err)
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK && response.StatusCode != http.StatusNotFound {
-		fmt.Printf("Expected status code 200 or 404 but got %d while fetching data from %s.\n", response.StatusCode, u)
-		os.Exit(1)
+		cmdx.Fatalf("Expected status code 200 or 404 but got %d while fetching data from %s", response.StatusCode, u)
 	}
 
 	var set jose.JSONWebKeySet
-	pkg.Must(json.NewDecoder(response.Body).Decode(&set), "Unable to decode payload to JSON")
+	err = json.NewDecoder(response.Body).Decode(&set)
+	cmdx.Must(err, "Unable to decode payload to JSON: %s", err)
 
 	for _, path := range args[1:] {
 		file, err := ioutil.ReadFile(path)
@@ -158,24 +145,21 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 
 		if key, privateErr := pkg.LoadPrivateKey(file); privateErr != nil {
 			key, publicErr := pkg.LoadPublicKey(file)
-			if publicErr != nil {
-				fmt.Printf("Unable to read key from file %s. Decoding file to private key failed with reason \"%s\" and decoding it to public key failed with reason \"%s\".\n", path, privateErr, publicErr)
-				os.Exit(1)
-			}
+			pkg.Must(publicErr, `Unable to read key from file %s. Decoding file to private key failed with reason "%s" and decoding it to public key failed with reason: %s`, path, privateErr, publicErr)
 
 			set.Keys = append(set.Keys, toSDKFriendlyJSONWebKey(key, "public:"+uuid.New(), use, true))
 		} else {
 			set.Keys = append(set.Keys, toSDKFriendlyJSONWebKey(key, "private:"+uuid.New(), use, false))
 		}
 
-		fmt.Printf("Successfully loaded key from file %s\n", path)
+		fmt.Printf("Successfully loaded key from file: %s\n", path)
 	}
 
 	body, err := json.Marshal(&set)
-	pkg.Must(err, "Unable to encode JSON Web Keys to JSON")
+	cmdx.Must(err, "Unable to encode JSON Web Keys to JSON: %s", err)
 
 	request, err = http.NewRequest("PUT", u, bytes.NewReader(body))
-	pkg.Must(err, "Unable to initialize HTTP request")
+	cmdx.Must(err, "Unable to initialize HTTP request: %s", err)
 
 	if term, _ := cmd.Flags().GetBool("fake-tls-termination"); term {
 		request.Header.Set("X-Forwarded-Proto", "https")
@@ -187,32 +171,26 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 	request.Header.Set("Content-Type", "application/json")
 
 	response, err = client.Do(request)
-	pkg.Must(err, "Unable to post data to %s because %s", u, err)
+	cmdx.CheckResponse(err, http.StatusOK, response)
 	defer response.Body.Close()
 
-	fmt.Println("Keys successfully imported!")
+	fmt.Println("JSON Web Key Set successfully imported!")
 }
 
 func (h *JWKHandler) GetKeys(cmd *cobra.Command, args []string) {
+	cmdx.ExactArgs(cmd, args, 1)
 	m := h.newJwkManager(cmd)
-	if len(args) != 1 {
-		fmt.Println(cmd.UsageString())
-		return
-	}
 
 	keys, response, err := m.GetJsonWebKeySet(args[0])
-	checkResponse(response, err, http.StatusOK)
+	checkResponse(err, http.StatusOK, response)
 	fmt.Printf("%s\n", formatResponse(keys))
 }
 
 func (h *JWKHandler) DeleteKeys(cmd *cobra.Command, args []string) {
+	cmdx.ExactArgs(cmd, args, 1)
 	m := h.newJwkManager(cmd)
-	if len(args) != 1 {
-		fmt.Println(cmd.UsageString())
-		return
-	}
 
 	response, err := m.DeleteJsonWebKeySet(args[0])
-	checkResponse(response, err, http.StatusNoContent)
-	fmt.Printf("Key set %s deleted.\n", args[0])
+	checkResponse(err, http.StatusNoContent, response)
+	fmt.Printf("JSON Web Key Set deleted: %s\n", args[0])
 }

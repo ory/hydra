@@ -36,7 +36,7 @@ require (
 	github.com/ory/go-convenience v0.1.0
 	github.com/ory/graceful v0.1.0
 	github.com/ory/herodot v0.4.1
-	github.com/ory/x v0.0.7
+	github.com/ory/x v0.0.9
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.8.0
@@ -64,6 +64,7 @@ require (
 	gopkg.in/alecthomas/kingpin.v3-unstable v3.0.0-20180810215634-df19058c872c // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/gemnasium/logrus-airbrake-hook.v2 v2.1.2 // indirect
+	gopkg.in/go-resty/resty.v0 v0.4.1
 	gopkg.in/gorp.v1 v1.7.1 // indirect
 	gopkg.in/resty.v1 v1.9.1
 	gopkg.in/square/go-jose.v2 v2.1.9

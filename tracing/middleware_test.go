@@ -1,6 +1,7 @@
 package tracing_test
 
 import (
+	"github.com/opentracing/opentracing-go"
 	"net/http"
 	"net/http/httptest"
 
@@ -9,7 +10,6 @@ import (
 
 	"testing"
 
-	"github.com/opentracing/opentracing-go"
 	"github.com/ory/hydra/tracing"
 	"github.com/stretchr/testify/assert"
 	"github.com/urfave/negroni"

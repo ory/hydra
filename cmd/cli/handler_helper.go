@@ -21,14 +21,17 @@
 package cli
 
 import (
+	"bytes"
 	"crypto/tls"
 	"encoding/json"
+	"io/ioutil"
+	"net/http"
+
 	"github.com/ory/hydra/pkg"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
 	"github.com/spf13/cobra"
-	"net/http"
 )
 
 func configureClient(cmd *cobra.Command, c *hydra.Configuration) *hydra.Configuration {
@@ -46,10 +49,23 @@ func configureClient(cmd *cobra.Command, c *hydra.Configuration) *hydra.Configur
 	return c
 }
 
+func configureClientWithoutAuth(cmd *cobra.Command, c *hydra.Configuration) *hydra.Configuration {
+	c.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: flagx.MustGetBool(cmd, "skip-tls-verify")},
+	}
+
+	if flagx.MustGetBool(cmd, "fake-tls-termination") {
+		c.DefaultHeader["X-Forwarded-Proto"] = "https"
+	}
+
+	return c
+}
+
 func checkResponse(err error, expectedStatusCode int, response *hydra.APIResponse) {
 	var r *http.Response
 	if response != nil {
 		r = response.Response
+		r.Body = ioutil.NopCloser(bytes.NewBuffer(response.Payload))
 	}
 
 	cmdx.CheckResponse(err, expectedStatusCode, r)

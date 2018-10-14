@@ -23,10 +23,11 @@ package cli
 import (
 	"context"
 	"fmt"
-	"github.com/ory/x/cmdx"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/ory/x/cmdx"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"

@@ -21,7 +21,6 @@
 package cli
 
 import (
-	"crypto/tls"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
 
@@ -64,8 +63,7 @@ func (h *IntrospectionHandler) Introspect(cmd *cobra.Command, args []string) {
 		fmt.Println("No OAuth 2.0 Client ID an secret set, skipping authorization header. This might fail if the introspection endpoint is protected.")
 	}
 
-	scopes := cmdx.GetStringSlice(cmd, "scope")
-	result, response, err := c.IntrospectOAuth2Token(args[0], strings.Join(scopes, " "))
+	result, response, err := c.IntrospectOAuth2Token(args[0], strings.Join(flagx.MustGetStringSlice(cmd, "scope"), " "))
 	checkResponse(err, http.StatusOK, response)
 	fmt.Println(formatResponse(result))
 }

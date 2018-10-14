@@ -21,14 +21,14 @@
 package cli
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/ory/x/cmdx"
-	"github.com/ory/x/flagx"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/ory/x/cmdx"
+	"github.com/ory/x/flagx"
 
 	"github.com/spf13/cobra"
 
@@ -79,7 +79,7 @@ func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	var err error
 	m := h.newClientManager(cmd)
-	secret := flagx.MustGetString(cmd,"secret")
+	secret := flagx.MustGetString(cmd, "secret")
 
 	var echoSecret bool
 	if secret == "" {
@@ -94,20 +94,20 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	}
 
 	cc := hydra.OAuth2Client{
-		ClientId:                flagx.MustGetString(cmd,"id"),
+		ClientId:                flagx.MustGetString(cmd, "id"),
 		ClientSecret:            secret,
-		ResponseTypes:           flagx.MustGetStringSlice(cmd,"response-types"),
-		Scope:                   strings.Join(flagx.MustGetStringSlice(cmd,"scope"), " "),
-		GrantTypes:              flagx.MustGetStringSlice(cmd,"grant-types"),
-		RedirectUris:            flagx.MustGetStringSlice(cmd,"callbacks"),
-		ClientName:              flagx.MustGetStringSlice(cmd,"name"),
-		TokenEndpointAuthMethod: flagx.MustGetStringSlice(cmd,"token-endpoint-auth-method"),
-		JwksUri:                  flagx.MustGetString(cmd,"jwks-uri"),
-		TosUri:                 flagx.MustGetString(cmd,"tos-uri"),
-		PolicyUri:               flagx.MustGetString(cmd,"policy-uri"),
-		LogoUri:                flagx.MustGetString(cmd,"logo-uri"),
-		ClientUri:             flagx.MustGetString(cmd,"client-uri"),
-		SubjectType:            flagx.MustGetString(cmd,"subject-type"),
+		ResponseTypes:           flagx.MustGetStringSlice(cmd, "response-types"),
+		Scope:                   strings.Join(flagx.MustGetStringSlice(cmd, "scope"), " "),
+		GrantTypes:              flagx.MustGetStringSlice(cmd, "grant-types"),
+		RedirectUris:            flagx.MustGetStringSlice(cmd, "callbacks"),
+		ClientName:              flagx.MustGetString(cmd, "name"),
+		TokenEndpointAuthMethod: flagx.MustGetString(cmd, "token-endpoint-auth-method"),
+		JwksUri:                 flagx.MustGetString(cmd, "jwks-uri"),
+		TosUri:                  flagx.MustGetString(cmd, "tos-uri"),
+		PolicyUri:               flagx.MustGetString(cmd, "policy-uri"),
+		LogoUri:                 flagx.MustGetString(cmd, "logo-uri"),
+		ClientUri:               flagx.MustGetString(cmd, "client-uri"),
+		SubjectType:             flagx.MustGetString(cmd, "subject-type"),
 	}
 
 	result, response, err := m.CreateOAuth2Client(cc)
@@ -144,6 +144,6 @@ func (h *ClientHandler) GetClient(cmd *cobra.Command, args []string) {
 	}
 
 	cl, response, err := m.GetOAuth2Client(args[0])
-	checkResponse(err, http.StatusNoContent, response)
-	fmt.Println(cmdx.FormatResponse(cl))
+	checkResponse(err, http.StatusOK, response)
+	fmt.Println(cmdx.FormatResponse(&cl))
 }

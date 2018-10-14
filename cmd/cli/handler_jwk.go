@@ -25,11 +25,11 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/ory/x/cmdx"
-	"github.com/ory/x/flagx"
 	"io/ioutil"
 	"net/http"
-	"os"
+
+	"github.com/ory/x/cmdx"
+	"github.com/ory/x/flagx"
 
 	"github.com/mendsley/gojwk"
 	"github.com/pborman/uuid"
@@ -123,7 +123,7 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 		request.Header.Set("X-Forwarded-Proto", "https")
 	}
 
-	if token := flagx.MustGetString(cmd,"access-token"); token != "" {
+	if token := flagx.MustGetString(cmd, "access-token"); token != "" {
 		request.Header.Set("Authorization", "Bearer "+token)
 	}
 
@@ -161,11 +161,11 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 	request, err = http.NewRequest("PUT", u, bytes.NewReader(body))
 	cmdx.Must(err, "Unable to initialize HTTP request: %s", err)
 
-	if term, _ := cmd.Flags().GetBool("fake-tls-termination"); term {
+	if flagx.MustGetBool(cmd, "fake-tls-termination") {
 		request.Header.Set("X-Forwarded-Proto", "https")
 	}
 
-	if token, _ := cmd.Flags().GetString("access-token"); token != "" {
+	if token := flagx.MustGetString(cmd, "access-token"); token != "" {
 		request.Header.Set("Authorization", "Bearer "+token)
 	}
 	request.Header.Set("Content-Type", "application/json")

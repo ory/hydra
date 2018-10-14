@@ -21,13 +21,12 @@
 package cli
 
 import (
-	"crypto/tls"
 	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
-	"net/http"
-	"os"
-	"time"
 
 	"github.com/spf13/cobra"
 
@@ -41,7 +40,7 @@ type TokenHandler struct {
 
 func (h *TokenHandler) newTokenManager(cmd *cobra.Command) *hydra.OAuth2Api {
 	c := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlashOrFail(cmd))
-	c.Configuration = configureClient(cmd, c.Configuration)
+	c.Configuration = configureClientWithoutAuth(cmd, c.Configuration)
 	return c
 }
 
@@ -52,7 +51,8 @@ func newTokenHandler(c *config.Config) *TokenHandler {
 func (h *TokenHandler) RevokeToken(cmd *cobra.Command, args []string) {
 	cmdx.ExactArgs(cmd, args, 1)
 
-	handler := h.newTokenManager(cmd)
+	handler := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlashOrFail(cmd))
+	handler.Configuration = configureClientWithoutAuth(cmd, handler.Configuration)
 
 	if clientID, clientSecret := flagx.MustGetString(cmd, "client-id"), flagx.MustGetString(cmd, "client-secret"); clientID == "" || clientSecret == "" {
 		cmdx.Fatalf(`%s
@@ -71,10 +71,11 @@ Please provide a Client ID and Client Secret using flags --client-id and --clien
 }
 
 func (h *TokenHandler) FlushTokens(cmd *cobra.Command, args []string) {
-	handler := h.newTokenManager(cmd)
+	handler := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlashOrFail(cmd))
+	handler.Configuration = configureClient(cmd, handler.Configuration)
 	response, err := handler.FlushInactiveOAuth2Tokens(hydra.FlushInactiveOAuth2TokensRequest{
-		NotAfter: time.Now().Add(-cmdx.MustGetDuration(cmd, "min-age")),
+		NotAfter: time.Now().Add(-flagx.MustGetDuration(cmd, "min-age")),
 	})
-	checkResponse(err, http.StatusOK, response)
+	checkResponse(err, http.StatusNoContent, response)
 	fmt.Println("Successfully flushed inactive access tokens")
 }

@@ -1,9 +1,9 @@
 package tracing
 
 import (
+	"github.com/opentracing/opentracing-go"
 	"net/http"
 
-	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
 	"github.com/urfave/negroni"
 )

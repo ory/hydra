@@ -1,3 +1,11 @@
+v3.0.1 / 2018-10-02
+===================
+
+* Migrate from Circle V1 format to Circle V2
+* Adds CLI for sending segment events
+* Vendor packages back-go and uuid instead of using gitsubmodules
+
+
 v3.0.0 / 2016-06-02
 ===================
 

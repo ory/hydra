@@ -21,7 +21,7 @@ const (
 // BindType returns the bindtype for a given database given a drivername.
 func BindType(driverName string) int {
 	switch driverName {
-	case "postgres", "pgx":
+	case "postgres", "pgx", "pq-timeouts", "cloudsqlpostgres":
 		return DOLLAR
 	case "mysql":
 		return QUESTION
@@ -113,7 +113,8 @@ func In(query string, args ...interface{}) (string, []interface{}, error) {
 		v := reflect.ValueOf(arg)
 		t := reflectx.Deref(v.Type())
 
-		if t.Kind() == reflect.Slice {
+		// []byte is a driver.Value type so it should not be expanded
+		if t.Kind() == reflect.Slice && t != reflect.TypeOf([]byte{}) {
 			meta[i].length = v.Len()
 			meta[i].v = v
 

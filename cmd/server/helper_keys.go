@@ -21,9 +21,6 @@
 package server
 
 import (
-	"crypto/ecdsa"
-	"crypto/rsa"
-
 	"context"
 
 	"github.com/ory/hydra/config"
@@ -85,15 +82,4 @@ func createJWKS(ctx *config.Context, set, kid string) (*jose.JSONWebKeySet, erro
 	}
 
 	return keys, nil
-}
-
-func publicKey(key interface{}) interface{} {
-	switch k := key.(type) {
-	case *rsa.PrivateKey:
-		return &k.PublicKey
-	case *ecdsa.PrivateKey:
-		return &k.PublicKey
-	default:
-		return nil
-	}
 }

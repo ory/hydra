@@ -85,7 +85,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	if secret == "" {
 		var secretb []byte
 		secretb, err = pkg.GenerateSecret(26)
-		pkg.Must(err, "Could not generate OAuth 2.0 Client Secret: %s", err)
+		cmdx.Must(err, "Could not generate OAuth 2.0 Client Secret: %s", err)
 		secret = string(secretb)
 
 		echoSecret = true

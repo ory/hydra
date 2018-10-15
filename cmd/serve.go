@@ -21,13 +21,16 @@
 package cmd
 
 import (
+	"github.com/ory/x/corsx"
+	"github.com/ory/x/profilex"
+	"github.com/ory/x/tlsx"
 	"os"
 	"strconv"
 
 	"github.com/spf13/cobra"
 )
 
-const serveControls = `CORE CONTROLS
+var serveControls = `CORE CONTROLS
 =============
 
 - DATABASE_URL: A URL to a persistent backend. Hydra supports various backends:
@@ -167,52 +170,17 @@ HTTPS CONTROLS
 	Hydra serves http instead of https when this option is set.
 	Example: HTTPS_ALLOW_TERMINATION_FROM=127.0.0.1/32,192.168.178.0/24,2620:0:2d0:200::7/32
 
-- HTTPS_TLS_CERT_PATH: The path to the TLS certificate (pem encoded).
-	Example: HTTPS_TLS_CERT_PATH=~/cert.pem
-
-- HTTPS_TLS_KEY_PATH: The path to the TLS private key (pem encoded).
-	Example: HTTPS_TLS_KEY_PATH=~/key.pem
-
-- HTTPS_TLS_CERT: A pem encoded TLS certificate passed as string. Can be used instead of HTTPS_TLS_CERT_PATH.
-	Example: HTTPS_TLS_CERT="-----BEGIN CERTIFICATE-----\nMIIDZTCCAk2gAwIBAgIEV5xOtDANBgkqhkiG9w0BAQ0FADA0MTIwMAYDVQQDDClP..."
-
-- HTTPS_TLS_KEY: A pem encoded TLS key passed as string. Can be used instead of HTTPS_TLS_KEY_PATH.
-	Example: HTTPS_TLS_KEY="-----BEGIN ENCRYPTED PRIVATE KEY-----\nMIIFDjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDg..."
-
+` + tlsx.HTTPSCertificateHelpMessage() + `
 
 CORS CONTROLS
 ==============
-- CORS_ENABLED: Switch CORS support on (true) or off (false). Default is off (false).
-	Example: CORS_ENABLED=true
 
-- CORS_ALLOWED_ORIGINS: A list of origins (comma separated values) a cross-domain request can be executed from.
-	If the special * value is present in the list, all origins will be allowed. An origin may contain a wildcard (*)
-	to replace 0 or more characters (i.e.: http://*.domain.com). Usage of wildcards implies a small performance penality.
-	Only one wildcard can be used per origin. The default value is *.
-	Example: CORS_ALLOWED_ORIGINS=http://*.domain.com,http://*.domain2.com
-
-- CORS_ALLOWED_METHODS: A list of methods  (comma separated values) the client is allowed to use with cross-domain
-	requests. Default value is simple methods (GET and POST).
-	Example: CORS_ALLOWED_METHODS=POST,GET,PUT
-
-- CORS_ALLOWED_CREDENTIALS: Indicates whether the request can include user credentials like cookies, HTTP authentication
-	or client side SSL certificates. The default is false.
-
-- CORS_DEBUG: Debugging flag adds additional output to debug server side CORS issues.
-
-- CORS_MAX_AGE: Indicates how long (in seconds) the results of a preflight request can be cached. The default is 0 which stands for no max age.
-
-- CORS_ALLOWED_HEADERS: A list of non simple headers (comma separated values) the client is allowed to use with cross-domain requests.
-
-- CORS_EXPOSED_HEADERS: Indicates which headers (comma separated values) are safe to expose to the API of a CORS API specification.
-
+` + corsx.HelpMessage() + `
 
 DEBUG CONTROLS
 ==============
 
-- PROFILING: Set "PROFILING=cpu" to enable cpu profiling and "PROFILING=memory" to enable memory profiling.
-	It is not possible to do both at the same time.
-	Example: PROFILING=cpu
+` + profilex.HelpMessage() + `
 `
 
 // serveCmd represents the host command
@@ -254,7 +222,4 @@ func init() {
 
 	disableTelemetryEnv, _ := strconv.ParseBool(os.Getenv("DISABLE_TELEMETRY"))
 	serveCmd.PersistentFlags().Bool("disable-telemetry", disableTelemetryEnv, "Disable anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/guides/telemetry")
-
-	serveCmd.PersistentFlags().String("https-tls-key-path", "", "Path to the key file for HTTP/2 over TLS (https). You can set HTTPS_TLS_KEY_PATH or HTTPS_TLS_KEY instead.")
-	serveCmd.PersistentFlags().String("https-tls-cert-path", "", "Path to the certificate file for HTTP/2 over TLS (https). You can set HTTPS_TLS_CERT_PATH or HTTPS_TLS_CERT instead.")
 }

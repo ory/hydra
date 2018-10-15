@@ -23,6 +23,9 @@ package server
 import (
 	"crypto/tls"
 	"fmt"
+	"github.com/ory/x/cmdx"
+	"github.com/ory/x/flagx"
+	"github.com/ory/x/healthx"
 	"net/http"
 	"net/url"
 	"strings"
@@ -44,10 +47,8 @@ import (
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/health"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/pkg"
 )
 
 var _ = &consent.Handler{}
@@ -125,8 +126,7 @@ func setup(c *config.Config, cmd *cobra.Command, args []string, name string) (ha
 	backend = httprouter.New()
 
 	logger := c.GetLogger()
-	w := herodot.NewJSONWriter(logger)
-	w.ErrorEnhancer = nil
+	w := newJSONWriter(logger)
 
 	if tracer, err := c.GetTracer(); err != nil {
 		c.GetLogger().Fatalf("Failed to initialize tracer: %s", err)
@@ -136,14 +136,14 @@ func setup(c *config.Config, cmd *cobra.Command, args []string, name string) (ha
 
 	handler = NewHandler(c, w)
 	handler.RegisterRoutes(frontend, backend)
-	c.ForceHTTP, _ = cmd.Flags().GetBool("dangerous-force-http")
+	c.ForceHTTP = flagx.MustGetBool(cmd, "dangerous-force-http")
 
 	if !c.ForceHTTP {
 		if c.Issuer == "" {
 			logger.Fatalln("IssuerURL must be explicitly specified unless --dangerous-force-http is passed. To find out more, use `hydra help serve`.")
 		}
 		issuer, err := url.Parse(c.Issuer)
-		pkg.Must(err, "Could not parse issuer URL: %s", err)
+		cmdx.Must(err, "Could not parse issuer URL: %s", err)
 		if issuer.Scheme != "https" {
 			logger.Fatalln("IssuerURL must use HTTPS unless --dangerous-force-http is passed. To find out more, use `hydra help serve`.")
 		}
@@ -155,7 +155,7 @@ func setup(c *config.Config, cmd *cobra.Command, args []string, name string) (ha
 		c.GetPrometheusMetrics(),
 	)
 
-	if ok, _ := cmd.Flags().GetBool("disable-telemetry"); !ok {
+	if flagx.MustGetBool(cmd, "disable-telemetry") {
 		c.GetLogger().Println("Transmission of telemetry data is enabled, to learn more go to: https://www.ory.sh/docs/guides/latest/telemetry/")
 
 		enable := !(c.DatabaseURL == "" || c.DatabaseURL == "memory" || c.Issuer == "" || strings.Contains(c.Issuer, "localhost"))
@@ -176,10 +176,10 @@ func setup(c *config.Config, cmd *cobra.Command, args []string, name string) (ha
 				oauth2.RevocationPath,
 				consent.ConsentPath,
 				consent.LoginPath,
-				health.AliveCheckPath,
-				health.ReadyCheckPath,
-				health.VersionPath,
-				health.MetricsPrometheusPath,
+				healthx.AliveCheckPath,
+				healthx.ReadyCheckPath,
+				healthx.VersionPath,
+				metricsPrometheusPath,
 				"/oauth2/auth/sessions/login",
 				"/oauth2/auth/sessions/consent",
 				"/health/status",
@@ -206,14 +206,14 @@ func checkDatabaseAllowed(c *config.Config) {
 	}
 }
 
-func serve(c *config.Config, cmd *cobra.Command, handler http.Handler, address string, wg *sync.WaitGroup, cert tls.Certificate) {
+func serve(c *config.Config, cmd *cobra.Command, handler http.Handler, address string, wg *sync.WaitGroup, cert []tls.Certificate) {
 	defer wg.Done()
 
 	var srv = graceful.WithDefaults(&http.Server{
 		Addr:    address,
 		Handler: handler,
 		TLSConfig: &tls.Config{
-			Certificates: []tls.Certificate{cert},
+			Certificates: cert,
 		},
 	})
 

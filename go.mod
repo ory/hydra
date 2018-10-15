@@ -25,13 +25,12 @@ require (
 	github.com/mendsley/gojwk v0.0.0-20141217222730-4d5ec6e58103
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.0.0
-	github.com/opencontainers/runc v0.1.1 // indirect
 	github.com/opentracing/opentracing-go v1.0.2
 	github.com/ory/fosite v0.25.0
 	github.com/ory/go-convenience v0.1.0
 	github.com/ory/graceful v0.1.0
 	github.com/ory/herodot v0.4.1
-	github.com/ory/x v0.0.9
+	github.com/ory/x v0.0.13
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.8.0

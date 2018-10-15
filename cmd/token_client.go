@@ -77,7 +77,7 @@ var tokenClientCmd = &cobra.Command{
 		scopes, _ := cmd.Flags().GetStringSlice("scope")
 
 		cu, err := url.Parse(c.GetClusterURLWithoutTailingSlashOrFail(cmd))
-		pkg.Must(err, `Unable to parse cluster url ("%s"): %s`, c.GetClusterURLWithoutTailingSlashOrFail(cmd), err)
+		cmdx.Must(err, `Unable to parse cluster url ("%s"): %s`, c.GetClusterURLWithoutTailingSlashOrFail(cmd), err)
 
 		clientID, _ := cmd.Flags().GetString("client-id")
 		clientSecret, _ := cmd.Flags().GetString("client-secret")
@@ -95,7 +95,7 @@ var tokenClientCmd = &cobra.Command{
 		}
 
 		t, err := oauthConfig.Token(ctx)
-		pkg.Must(err, "Could not retrieve access token because: %s", err)
+		cmdx.Must(err, "Could not retrieve access token because: %s", err)
 
 		if verbose, _ := cmd.Flags().GetBool("verbose"); verbose {
 			fmt.Printf("%+v\n", t)

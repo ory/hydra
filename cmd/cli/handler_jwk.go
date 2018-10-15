@@ -88,10 +88,10 @@ func toSDKFriendlyJSONWebKey(key interface{}, kid string, use string, public boo
 	var jwk *gojwk.Key
 	if public {
 		jwk, err = gojwk.PublicKey(key)
-		pkg.Must(err, "Unable to convert public key to JSON Web Key because %s", err)
+		cmdx.Must(err, "Unable to convert public key to JSON Web Key because %s", err)
 	} else {
 		jwk, err = gojwk.PrivateKey(key)
-		pkg.Must(err, "Unable to convert private key to JSON Web Key because %s", err)
+		cmdx.Must(err, "Unable to convert private key to JSON Web Key because %s", err)
 	}
 
 	return jose.JSONWebKey{
@@ -141,11 +141,11 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 
 	for _, path := range args[1:] {
 		file, err := ioutil.ReadFile(path)
-		pkg.Must(err, "Unable to read file %s", path)
+		cmdx.Must(err, "Unable to read file %s", path)
 
 		if key, privateErr := pkg.LoadPrivateKey(file); privateErr != nil {
 			key, publicErr := pkg.LoadPublicKey(file)
-			pkg.Must(publicErr, `Unable to read key from file %s. Decoding file to private key failed with reason "%s" and decoding it to public key failed with reason: %s`, path, privateErr, publicErr)
+			cmdx.Must(publicErr, `Unable to read key from file %s. Decoding file to private key failed with reason "%s" and decoding it to public key failed with reason: %s`, path, privateErr, publicErr)
 
 			set.Keys = append(set.Keys, toSDKFriendlyJSONWebKey(key, "public:"+uuid.New(), use, true))
 		} else {

@@ -33,7 +33,6 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/go-convenience/urlx"
-	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/rand/sequence"
 	"github.com/spf13/cobra"
 	"github.com/toqueteos/webbrowser"
@@ -77,12 +76,12 @@ var tokenUserCmd = &cobra.Command{
 
 		if backend == "" {
 			bu, err := url.Parse(c.GetClusterURLWithoutTailingSlashOrFail(cmd))
-			pkg.Must(err, `Unable to parse cluster url ("%s"): %s`, c.GetClusterURLWithoutTailingSlashOrFail(cmd), err)
+			cmdx.Must(err, `Unable to parse cluster url ("%s"): %s`, c.GetClusterURLWithoutTailingSlashOrFail(cmd), err)
 			backend = urlx.AppendPaths(bu, "/oauth2/token").String()
 		}
 		if frontend == "" {
 			fu, err := url.Parse(c.GetClusterURLWithoutTailingSlashOrFail(cmd))
-			pkg.Must(err, `Unable to parse cluster url ("%s"): %s`, c.GetClusterURLWithoutTailingSlashOrFail(cmd), err)
+			cmdx.Must(err, `Unable to parse cluster url ("%s"): %s`, c.GetClusterURLWithoutTailingSlashOrFail(cmd), err)
 			frontend = urlx.AppendPaths(fu, "/oauth2/auth").String()
 		}
 
@@ -98,10 +97,10 @@ var tokenUserCmd = &cobra.Command{
 		}
 
 		state, err := sequence.RuneSequence(24, sequence.AlphaLower)
-		pkg.Must(err, "Could not generate random state: %s", err)
+		cmdx.Must(err, "Could not generate random state: %s", err)
 
 		nonce, err := sequence.RuneSequence(24, sequence.AlphaLower)
-		pkg.Must(err, "Could not generate random state: %s", err)
+		cmdx.Must(err, "Could not generate random state: %s", err)
 
 		authCodeURL := conf.AuthCodeURL(string(state)) + "&nonce=" + string(nonce) + "&prompt=" + strings.Join(prompt, "+") + "&max_age=" + strconv.Itoa(maxAge)
 

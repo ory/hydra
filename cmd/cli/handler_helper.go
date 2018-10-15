@@ -73,6 +73,6 @@ func checkResponse(err error, expectedStatusCode int, response *hydra.APIRespons
 
 func formatResponse(response interface{}) string {
 	out, err := json.MarshalIndent(response, "", "\t")
-	pkg.Must(err, `Command failed because an error ("%s") occurred while prettifying output`, err)
+	cmdx.Must(err, `Command failed because an error ("%s") occurred while prettifying output`, err)
 	return string(out)
 }

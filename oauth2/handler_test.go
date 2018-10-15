@@ -40,15 +40,16 @@ import (
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/herodot"
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/oauth2"
-	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/square/go-jose.v2"
+
+	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/oauth2"
+	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 )
 
 var lifespan = time.Hour

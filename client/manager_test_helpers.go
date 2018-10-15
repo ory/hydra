@@ -21,10 +21,9 @@
 package client
 
 import (
+	"context"
 	"crypto/x509"
 	"testing"
-
-	"context"
 
 	"github.com/ory/fosite"
 	"github.com/stretchr/testify/assert"

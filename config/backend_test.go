@@ -29,10 +29,11 @@ import (
 	"time"
 
 	"github.com/ory/fosite"
+	"github.com/sirupsen/logrus"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/pkg"
-	"github.com/sirupsen/logrus"
 )
 
 type testCase struct {

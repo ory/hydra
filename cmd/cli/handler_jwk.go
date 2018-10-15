@@ -28,10 +28,9 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/mendsley/gojwk"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
-
-	"github.com/mendsley/gojwk"
 	"github.com/pborman/uuid"
 	"github.com/spf13/cobra"
 	"gopkg.in/square/go-jose.v2"

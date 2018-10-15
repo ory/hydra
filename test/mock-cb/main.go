@@ -21,11 +21,10 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
-
-	"context"
 	"strings"
 
 	"golang.org/x/oauth2"

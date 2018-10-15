@@ -27,10 +27,11 @@ import (
 	"time"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/pkg"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/pkg"
 )
 
 func MockConsentRequest(key string, remember bool, rememberFor int, hasError bool, skip bool, authAt bool) (c *ConsentRequest, h *HandledConsentRequest) {

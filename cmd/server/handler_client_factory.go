@@ -24,6 +24,7 @@ import (
 	"strings"
 
 	"github.com/julienschmidt/httprouter"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
 )

@@ -27,9 +27,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ory/x/cmdx"
-
 	"github.com/jmoiron/sqlx"
+	"github.com/ory/x/cmdx"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

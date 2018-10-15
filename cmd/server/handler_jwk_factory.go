@@ -23,6 +23,7 @@ package server
 import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
+	"github.com/ory/x/serverx"
 
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/jwk"

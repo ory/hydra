@@ -27,11 +27,11 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/ory/hydra/pkg"
-	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
 	"github.com/spf13/cobra"
+
+	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 )
 
 func configureClient(cmd *cobra.Command, c *hydra.Configuration) *hydra.Configuration {

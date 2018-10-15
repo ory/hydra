@@ -33,10 +33,11 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/go-convenience/urlx"
-	"github.com/ory/hydra/rand/sequence"
 	"github.com/spf13/cobra"
 	"github.com/toqueteos/webbrowser"
 	"golang.org/x/oauth2"
+
+	"github.com/ory/hydra/rand/sequence"
 )
 
 // tokenUserCmd represents the token command

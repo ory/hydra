@@ -55,7 +55,9 @@ require (
 	golang.org/x/crypto v0.0.0-20181001203147-e3636079e1a4
 	golang.org/x/oauth2 v0.0.0-20181003184128-c57b0facaced
 	golang.org/x/sys v0.0.0-20180909124046-d0be0721c37e // indirect
+	golang.org/x/tools v0.0.0-20181015191959-104357fe9675 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
+	gopkg.in/go-resty/resty.v0 v0.4.1
 	gopkg.in/gorp.v1 v1.7.1 // indirect
 	gopkg.in/resty.v1 v1.9.1
 	gopkg.in/square/go-jose.v2 v2.1.9

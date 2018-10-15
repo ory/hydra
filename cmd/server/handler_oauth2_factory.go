@@ -22,7 +22,6 @@ package server
 
 import (
 	"fmt"
-	"github.com/ory/x/serverx"
 	"net/url"
 	"strings"
 	"time"
@@ -35,15 +34,17 @@ import (
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/go-convenience/stringslice"
 	"github.com/ory/herodot"
+	"github.com/ory/x/cmdx"
+	"github.com/ory/x/serverx"
+	"github.com/pborman/uuid"
+	"github.com/spf13/viper"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/tracing"
-	"github.com/pborman/uuid"
-	"github.com/spf13/viper"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {

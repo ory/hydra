@@ -21,6 +21,7 @@
 package consent
 
 import (
+	"context"
 	"crypto/rand"
 	"crypto/rsa"
 	"encoding/json"
@@ -34,8 +35,6 @@ import (
 	"testing"
 	"time"
 
-	"context"
-
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
@@ -43,12 +42,12 @@ import (
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/herodot"
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/pkg"
-	"github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/sdk/go/hydra/swagger"
 )
 
 func mustRSAKey() *rsa.PrivateKey {
@@ -89,7 +88,7 @@ func TestStrategy(t *testing.T) {
 	ap := mockProvider(&aph)
 
 	jwts := &jwt.RS256JWTStrategy{
-		PrivateKey: pkg.MustINSECURELOWENTROPYRSAKEYFORTEST(),
+		PrivateKey: cmdx.MustINSECURELOWENTROPYRSAKEYFORTEST(),
 	}
 
 	fooUserIDToken, _, err := jwts.Generate(context.TODO(), jwt.IDTokenClaims{

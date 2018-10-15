@@ -21,16 +21,14 @@
 package main
 
 import (
+	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
-
-	"io/ioutil"
 	"net/http/cookiejar"
-	"strings"
-
-	"fmt"
 	"net/url"
+	"os"
+	"strings"
 
 	"golang.org/x/oauth2"
 )

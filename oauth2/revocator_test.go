@@ -21,26 +21,26 @@
 package oauth2_test
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 
-	"context"
-
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
 	"github.com/ory/fosite/storage"
 	"github.com/ory/herodot"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"gopkg.in/square/go-jose.v2"
+
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"gopkg.in/square/go-jose.v2"
 )
 
 func createAccessTokenSession(subject, client string, token string, expiresAt time.Time, fs *storage.MemoryStore, scopes fosite.Arguments) {
@@ -83,7 +83,7 @@ func TestRevoke(t *testing.T) {
 			store,
 			&compose.CommonStrategy{
 				CoreStrategy:               compose.NewOAuth2HMACStrategy(fc, []byte("1234567890123456789012345678901234567890"), nil),
-				OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(fc, pkg.MustINSECURELOWENTROPYRSAKEYFORTEST()),
+				OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(fc, cmdx.MustINSECURELOWENTROPYRSAKEYFORTEST()),
 			},
 			nil,
 			compose.OAuth2TokenIntrospectionFactory,

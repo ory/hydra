@@ -1,13 +1,11 @@
 package tracing
 
 import (
+	"errors"
+	"fmt"
 	"io"
 	"strings"
 
-	"errors"
-	"fmt"
-
-	"github.com/opentracing/opentracing-go"
 	"github.com/sirupsen/logrus"
 	jeagerConf "github.com/uber/jaeger-client-go/config"
 )

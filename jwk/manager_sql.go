@@ -21,17 +21,17 @@
 package jwk
 
 import (
+	"context"
 	"encoding/json"
 	"time"
 
-	"context"
-
 	"github.com/jmoiron/sqlx"
-	"github.com/ory/hydra/pkg"
 	"github.com/ory/x/sqlcon"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
 	"gopkg.in/square/go-jose.v2"
+
+	"github.com/ory/hydra/pkg"
 )
 
 type SQLManager struct {

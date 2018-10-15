@@ -22,10 +22,9 @@ package server
 
 import (
 	"encoding/json"
+	errors2 "errors"
 	"fmt"
 	"testing"
-
-	errors2 "errors"
 
 	"github.com/ory/fosite"
 	"github.com/ory/x/sqlcon"

@@ -26,8 +26,9 @@ import (
 	"time"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/client"
 	"github.com/pkg/errors"
+
+	"github.com/ory/hydra/client"
 )
 
 func NewFositeMemoryStore(m client.Manager, ls time.Duration) *FositeMemoryStore {

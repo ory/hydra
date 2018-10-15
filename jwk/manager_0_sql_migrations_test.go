@@ -27,10 +27,11 @@ import (
 	"testing"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/ory/hydra/jwk"
 	"github.com/ory/x/sqlcon/dockertest"
 	"github.com/rubenv/sql-migrate"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/hydra/jwk"
 )
 
 var createJWKMigrations = []*migrate.Migration{

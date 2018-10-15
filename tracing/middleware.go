@@ -1,7 +1,6 @@
 package tracing
 
 import (
-	"github.com/opentracing/opentracing-go"
 	"net/http"
 
 	"github.com/opentracing/opentracing-go/ext"

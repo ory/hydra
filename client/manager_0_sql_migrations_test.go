@@ -21,12 +21,11 @@
 package client_test
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"sync"
 	"testing"
-
-	"context"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/fosite"

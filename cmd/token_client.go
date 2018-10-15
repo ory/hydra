@@ -29,7 +29,6 @@ import (
 	"os"
 
 	"github.com/ory/go-convenience/urlx"
-	"github.com/ory/hydra/pkg"
 	"github.com/spf13/cobra"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"

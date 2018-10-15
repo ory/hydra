@@ -21,9 +21,8 @@
 package jwk
 
 import (
-	"testing"
-
 	"context"
+	"testing"
 
 	jwt2 "github.com/dgrijalva/jwt-go"
 	"github.com/ory/fosite/token/jwt"

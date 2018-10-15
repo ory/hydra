@@ -22,6 +22,7 @@ package oauth2_test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -34,8 +35,6 @@ import (
 	"testing"
 	"time"
 
-	"context"
-
 	djwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
@@ -45,18 +44,18 @@ import (
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/herodot"
-	hc "github.com/ory/hydra/client"
-	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/jwk"
-	. "github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/pkg"
-	"github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 	"gopkg.in/square/go-jose.v2"
+
+	hc "github.com/ory/hydra/client"
+	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/jwk"
+	. "github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/sdk/go/hydra/swagger"
 )
 
 func newCookieJar() http.CookieJar {
@@ -118,7 +117,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			lp := mockProvider(&lph)
 			cp := mockProvider(&cph)
 			jwts := &jwt.RS256JWTStrategy{
-				PrivateKey: pkg.MustINSECURELOWENTROPYRSAKEYFORTEST(),
+				PrivateKey: cmdx.MustINSECURELOWENTROPYRSAKEYFORTEST(),
 			}
 			hasher := &fosite.BCrypt{
 				WorkFactor: 4,

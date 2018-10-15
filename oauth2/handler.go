@@ -33,10 +33,11 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
+	"github.com/pkg/errors"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/pkg"
-	"github.com/pkg/errors"
 )
 
 const (

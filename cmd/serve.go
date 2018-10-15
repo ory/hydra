@@ -21,12 +21,12 @@
 package cmd
 
 import (
-	"github.com/ory/x/corsx"
-	"github.com/ory/x/profilex"
-	"github.com/ory/x/tlsx"
 	"os"
 	"strconv"
 
+	"github.com/ory/x/corsx"
+	"github.com/ory/x/profilex"
+	"github.com/ory/x/tlsx"
 	"github.com/spf13/cobra"
 )
 

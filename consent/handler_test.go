@@ -21,6 +21,7 @@
 package consent
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/cookiejar"
@@ -28,8 +29,6 @@ import (
 	"net/url"
 	"testing"
 	"time"
-
-	"context"
 
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"

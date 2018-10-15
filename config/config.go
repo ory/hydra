@@ -23,7 +23,6 @@ package config
 import (
 	"crypto/sha256"
 	"fmt"
-	"github.com/ory/x/healthx"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -39,14 +38,16 @@ import (
 	"github.com/ory/fosite/token/hmac"
 	"github.com/ory/go-convenience/stringslice"
 	"github.com/ory/go-convenience/urlx"
-	"github.com/ory/hydra/metrics/prometheus"
-	"github.com/ory/hydra/pkg"
-	"github.com/ory/hydra/tracing"
+	"github.com/ory/x/healthx"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
+
+	"github.com/ory/hydra/metrics/prometheus"
+	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/tracing"
 )
 
 type Config struct {
@@ -350,7 +351,7 @@ func (c *Config) Resolve(join ...string) *url.URL {
 	if c.cluster == nil {
 		cluster, err := url.Parse(c.EndpointURL)
 		c.cluster = cluster
-		pkg.Must(err, "Could not parse cluster url: %s", err)
+		cmdx.Must(err, "Could not parse cluster url: %s", err)
 	}
 
 	if len(join) == 0 {
@@ -393,7 +394,7 @@ func (c *Config) GetSystemSecret() []byte {
 	c.GetLogger().Infoln("Generating a random system secret...")
 	var err error
 	secret, err = pkg.GenerateSecret(32)
-	pkg.Must(err, "Could not generate global secret: %s", err)
+	cmdx.Must(err, "Could not generate global secret: %s", err)
 	c.GetLogger().Infof("Generated system secret: %s", secret)
 	hash := sha256.Sum256(secret)
 	secret = hash[:]

@@ -1,6 +1,6 @@
 ---
 name: Support request
-about: Please use our forums (community.ory.sh) or the chat (ory.sh/chat) to ask for support.
+about: Please use our forums (community.ory.sh) or the chat (ory.sh/chat) to ask for support
 
 ---
 

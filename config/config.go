@@ -23,6 +23,7 @@ package config
 import (
 	"crypto/sha256"
 	"fmt"
+	"github.com/ory/x/healthx"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -38,7 +39,6 @@ import (
 	"github.com/ory/fosite/token/hmac"
 	"github.com/ory/go-convenience/stringslice"
 	"github.com/ory/go-convenience/urlx"
-	"github.com/ory/hydra/health"
 	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/tracing"
@@ -232,7 +232,7 @@ func (c *Config) DoesRequestSatisfyTermination(r *http.Request) error {
 		return errors.New("TLS termination is not enabled")
 	}
 
-	if r.URL.Path == health.AliveCheckPath || r.URL.Path == health.ReadyCheckPath {
+	if r.URL.Path == healthx.AliveCheckPath || r.URL.Path == healthx.ReadyCheckPath {
 		return nil
 	}
 

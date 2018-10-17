@@ -209,7 +209,6 @@ type sqlConsentRequest struct {
 	LoginChallenge          string `db:"login_challenge"`
 	LoginSessionID          string `db:"login_session_id"`
 	ForcedSubjectIdentifier string `db:"forced_subject_identifier"`
-	WasHandled              bool   `db:"was_handled"`
 }
 
 func toMySQLDateHack(t time.Time) *time.Time {

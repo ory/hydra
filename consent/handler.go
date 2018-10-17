@@ -260,7 +260,7 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 	if request.WasHandled {
-		h.H.WriteError(w, r, pkg.ErrConflict)
+		h.H.WriteError(w, r, pkg.ErrConflict.WithDebug("Login request has been handled already"))
 		return
 	}
 
@@ -445,7 +445,7 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 		return
 	}
 	if request.WasHandled {
-		h.H.WriteError(w, r, pkg.ErrConflict)
+		h.H.WriteError(w, r, pkg.ErrConflict.WithDebug("Consent request has been handled already"))
 		return
 	}
 

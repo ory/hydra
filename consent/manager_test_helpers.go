@@ -217,6 +217,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager pkg.Fos
 					got1, err := m.GetConsentRequest(context.TODO(), "challenge"+tc.key)
 					require.NoError(t, err)
 					compareConsentRequest(t, c, got1)
+					assert.False(t, got1.WasHandled)
 
 					got1, err = m.HandleConsentRequest(context.TODO(), "challenge"+tc.key, h)
 					require.NoError(t, err)
@@ -229,6 +230,10 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager pkg.Fos
 
 					_, err = m.VerifyAndInvalidateConsentRequest(context.TODO(), "verifier"+tc.key)
 					require.Error(t, err)
+
+					got1, err = m.GetConsentRequest(context.TODO(), "challenge"+tc.key)
+					require.NoError(t, err)
+					assert.True(t, got1.WasHandled)
 				})
 			}
 
@@ -281,6 +286,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager pkg.Fos
 
 					got1, err := m.GetAuthenticationRequest(context.TODO(), "challenge"+tc.key)
 					require.NoError(t, err)
+					assert.False(t, got1.WasHandled)
 					compareAuthenticationRequest(t, c, got1)
 
 					got1, err = m.HandleAuthenticationRequest(context.TODO(), "challenge"+tc.key, h)
@@ -294,6 +300,10 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager pkg.Fos
 
 					_, err = m.VerifyAndInvalidateAuthenticationRequest(context.TODO(), "verifier"+tc.key)
 					require.Error(t, err)
+
+					got1, err = m.GetAuthenticationRequest(context.TODO(), "challenge"+tc.key)
+					require.NoError(t, err)
+					assert.True(t, got1.WasHandled)
 				})
 			}
 		})

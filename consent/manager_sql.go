@@ -219,8 +219,9 @@ func (m *SQLManager) CreateConsentRequest(ctx context.Context, c *ConsentRequest
 
 func (m *SQLManager) GetConsentRequest(ctx context.Context, challenge string) (*ConsentRequest, error) {
 	var d sqlConsentRequest
-
-	if err := m.db.GetContext(ctx, &d, m.db.Rebind("SELECT * FROM hydra_oauth2_consent_request WHERE challenge=?"), challenge); err != nil {
+	err := m.db.GetContext(ctx, &d, m.db.Rebind("SELECT r.*, COALESCE(hr.was_used, false) as was_handled FROM hydra_oauth2_consent_request r "+
+		"LEFT JOIN hydra_oauth2_consent_request_handled hr ON r.challenge = hr.challenge WHERE r.challenge=?"), challenge)
+	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.WithStack(pkg.ErrNotFound)
 		}
@@ -253,9 +254,10 @@ func (m *SQLManager) CreateAuthenticationRequest(ctx context.Context, c *Authent
 }
 
 func (m *SQLManager) GetAuthenticationRequest(ctx context.Context, challenge string) (*AuthenticationRequest, error) {
-	var d sqlConsentRequest
-
-	if err := m.db.GetContext(ctx, &d, m.db.Rebind("SELECT * FROM hydra_oauth2_authentication_request WHERE challenge=?"), challenge); err != nil {
+	var d sqlAuthenticationRequest
+	err := m.db.GetContext(ctx, &d, m.db.Rebind("SELECT r.*, COALESCE(hr.was_used, false) as was_handled FROM hydra_oauth2_authentication_request r "+
+		"LEFT JOIN hydra_oauth2_authentication_request_handled hr ON r.challenge = hr.challenge WHERE r.challenge=?"), challenge)
+	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.WithStack(pkg.ErrNotFound)
 		}
@@ -349,7 +351,7 @@ func (m *SQLManager) VerifyAndInvalidateAuthenticationRequest(ctx context.Contex
 	}
 
 	if d.WasUsed {
-		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Consent verifier has been used already"))
+		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Authentication verifier has been used already"))
 	}
 
 	if _, err := m.db.ExecContext(ctx, m.db.Rebind("UPDATE hydra_oauth2_authentication_request_handled SET was_used=true WHERE challenge=?"), challenge); err != nil {

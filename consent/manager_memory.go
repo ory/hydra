@@ -150,11 +150,19 @@ func (m *MemoryManager) CreateConsentRequest(ctx context.Context, c *ConsentRequ
 func (m *MemoryManager) GetConsentRequest(ctx context.Context, challenge string) (*ConsentRequest, error) {
 	m.m["consentRequests"].RLock()
 	defer m.m["consentRequests"].RUnlock()
-	if c, ok := m.consentRequests[challenge]; ok {
-		c.Client.ClientID = c.Client.GetID()
-		return &c, nil
+
+	c, ok := m.consentRequests[challenge]
+	if !ok {
+		return nil, errors.WithStack(pkg.ErrNotFound)
 	}
-	return nil, errors.WithStack(pkg.ErrNotFound)
+
+	for _, h := range m.handledConsentRequests {
+		if h.Challenge == c.Challenge {
+			c.WasHandled = h.WasUsed
+		}
+	}
+	c.Client.ClientID = c.Client.GetID()
+	return &c, nil
 }
 
 func (m *MemoryManager) HandleConsentRequest(ctx context.Context, challenge string, r *HandledConsentRequest) (*ConsentRequest, error) {
@@ -294,11 +302,19 @@ func (m *MemoryManager) CreateAuthenticationRequest(ctx context.Context, a *Auth
 func (m *MemoryManager) GetAuthenticationRequest(ctx context.Context, challenge string) (*AuthenticationRequest, error) {
 	m.m["authRequests"].RLock()
 	defer m.m["authRequests"].RUnlock()
-	if c, ok := m.authRequests[challenge]; ok {
-		c.Client.ClientID = c.Client.GetID()
-		return &c, nil
+
+	c, ok := m.authRequests[challenge]
+	if !ok {
+		return nil, errors.WithStack(pkg.ErrNotFound)
 	}
-	return nil, errors.WithStack(pkg.ErrNotFound)
+
+	for _, h := range m.handledAuthRequests {
+		if h.Challenge == c.Challenge {
+			c.WasHandled = h.WasUsed
+		}
+	}
+	c.Client.ClientID = c.Client.GetID()
+	return &c, nil
 }
 
 func (m *MemoryManager) HandleAuthenticationRequest(ctx context.Context, challenge string, r *HandledAuthenticationRequest) (*AuthenticationRequest, error) {

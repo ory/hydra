@@ -21,6 +21,7 @@
 package consent
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
@@ -33,6 +34,7 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/herodot"
+	"github.com/ory/hydra/client"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -90,4 +92,84 @@ func TestLogout(t *testing.T) {
 	require.EqualValues(t, http.StatusOK, resp.StatusCode)
 	assert.Len(t, cj.Cookies(u), 0)
 	assert.EqualValues(t, ts.URL+"/logout", resp.Request.URL.String())
+}
+
+func TestGetLoginRequest(t *testing.T) {
+	for k, tc := range []struct {
+		exists  bool
+		handled bool
+		status  int
+	}{
+		{false, false, http.StatusNotFound},
+		{true, false, http.StatusOK},
+		{true, true, http.StatusConflict},
+	} {
+		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+			key := fmt.Sprint(k)
+			challenge := "challenge" + key
+			m := NewMemoryManager(nil)
+			if tc.exists {
+				require.NoError(t, m.CreateAuthenticationRequest(context.TODO(), &AuthenticationRequest{
+					Client:     &client.Client{ClientID: "client" + key},
+					Challenge:  challenge,
+					WasHandled: tc.handled,
+				}))
+			}
+			r := httprouter.New()
+			h := NewHandler(
+				herodot.NewJSONWriter(nil),
+				m,
+				nil,
+				"https://www.ory.sh",
+			)
+			h.SetRoutes(r, r)
+			ts := httptest.NewServer(r)
+			defer ts.Close()
+
+			c := &http.Client{}
+			resp, err := c.Get(ts.URL + LoginPath + "/" + challenge)
+			require.NoError(t, err)
+			require.EqualValues(t, tc.status, resp.StatusCode)
+		})
+	}
+}
+
+func TestGetConsentRequest(t *testing.T) {
+	for k, tc := range []struct {
+		exists  bool
+		handled bool
+		status  int
+	}{
+		{false, false, http.StatusNotFound},
+		{true, false, http.StatusOK},
+		{true, true, http.StatusConflict},
+	} {
+		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+			key := fmt.Sprint(k)
+			challenge := "challenge" + key
+			m := NewMemoryManager(nil)
+			if tc.exists {
+				require.NoError(t, m.CreateConsentRequest(context.TODO(), &ConsentRequest{
+					Client:     &client.Client{ClientID: "client" + key},
+					Challenge:  challenge,
+					WasHandled: tc.handled,
+				}))
+			}
+			r := httprouter.New()
+			h := NewHandler(
+				herodot.NewJSONWriter(nil),
+				m,
+				nil,
+				"https://www.ory.sh",
+			)
+			h.SetRoutes(r, r)
+			ts := httptest.NewServer(r)
+			defer ts.Close()
+
+			c := &http.Client{}
+			resp, err := c.Get(ts.URL + ConsentPath + "/" + challenge)
+			require.NoError(t, err)
+			require.EqualValues(t, tc.status, resp.StatusCode)
+		})
+	}
 }

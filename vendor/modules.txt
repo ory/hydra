@@ -139,6 +139,7 @@ github.com/ory/herodot
 # github.com/ory/x v0.0.5
 github.com/ory/x/pagination
 github.com/ory/x/sqlcon
+github.com/ory/x/cmdx
 github.com/ory/x/corsx
 github.com/ory/x/metricsx
 github.com/ory/x/sqlcon/dockertest

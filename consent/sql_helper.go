@@ -200,14 +200,13 @@ type sqlAuthenticationRequest struct {
 	CSRF                 string     `db:"csrf"`
 	AuthenticatedAt      *time.Time `db:"authenticated_at"`
 	RequestedAt          time.Time  `db:"requested_at"`
-	SessionID            string     `db:"login_session_id"`
+	LoginSessionID       string     `db:"login_session_id"`
 	WasHandled           bool       `db:"was_handled"`
 }
 
 type sqlConsentRequest struct {
 	sqlAuthenticationRequest
 	LoginChallenge          string `db:"login_challenge"`
-	LoginSessionID          string `db:"login_session_id"`
 	ForcedSubjectIdentifier string `db:"forced_subject_identifier"`
 }
 
@@ -244,9 +243,8 @@ func newSQLConsentRequest(c *ConsentRequest) (*sqlConsentRequest, error) {
 			CSRF:                 c.CSRF,
 			AuthenticatedAt:      toMySQLDateHack(c.AuthenticatedAt),
 			RequestedAt:          c.RequestedAt,
-			SessionID:            c.LoginSessionID,
+			LoginSessionID:       c.LoginSessionID,
 		},
-		LoginSessionID:          c.LoginSessionID,
 		LoginChallenge:          c.LoginChallenge,
 		ForcedSubjectIdentifier: c.ForceSubjectIdentifier,
 	}, nil
@@ -270,7 +268,7 @@ func newSQLAuthenticationRequest(c *AuthenticationRequest) (*sqlAuthenticationRe
 		CSRF:                 c.CSRF,
 		AuthenticatedAt:      toMySQLDateHack(c.AuthenticatedAt),
 		RequestedAt:          c.RequestedAt,
-		SessionID:            c.SessionID,
+		LoginSessionID:       c.SessionID,
 	}, nil
 }
 
@@ -293,6 +291,7 @@ func (s *sqlAuthenticationRequest) toAuthenticationRequest(client *client.Client
 		AuthenticatedAt:      fromMySQLDateHack(s.AuthenticatedAt),
 		RequestedAt:          s.RequestedAt,
 		WasHandled:           s.WasHandled,
+		SessionID:            s.LoginSessionID,
 	}, nil
 }
 
@@ -316,6 +315,8 @@ func (s *sqlConsentRequest) toConsentRequest(client *client.Client) (*ConsentReq
 		ForceSubjectIdentifier: s.ForcedSubjectIdentifier,
 		RequestedAt:            s.RequestedAt,
 		WasHandled:             s.WasHandled,
+		LoginSessionID:         s.LoginSessionID,
+		LoginChallenge:         s.LoginChallenge,
 	}, nil
 }
 

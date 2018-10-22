@@ -508,6 +508,7 @@ func compareAuthenticationRequest(t *testing.T, a, b *AuthenticationRequest) {
 	assert.EqualValues(t, a.RequestURL, b.RequestURL)
 	assert.EqualValues(t, a.CSRF, b.CSRF)
 	assert.EqualValues(t, a.Skip, b.Skip)
+	assert.EqualValues(t, a.SessionID, b.SessionID)
 }
 
 func compareConsentRequest(t *testing.T, a, b *ConsentRequest) {
@@ -520,4 +521,6 @@ func compareConsentRequest(t *testing.T, a, b *ConsentRequest) {
 	assert.EqualValues(t, a.RequestURL, b.RequestURL)
 	assert.EqualValues(t, a.CSRF, b.CSRF)
 	assert.EqualValues(t, a.Skip, b.Skip)
+	assert.EqualValues(t, a.LoginChallenge, b.LoginChallenge)
+	assert.EqualValues(t, a.LoginSessionID, b.LoginSessionID)
 }

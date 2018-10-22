@@ -36,7 +36,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/square/go-jose.v2"
-
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
@@ -83,7 +82,7 @@ func TestRevoke(t *testing.T) {
 			store,
 			&compose.CommonStrategy{
 				CoreStrategy:               compose.NewOAuth2HMACStrategy(fc, []byte("1234567890123456789012345678901234567890"), nil),
-				OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(fc, cmdx.MustINSECURELOWENTROPYRSAKEYFORTEST()),
+				OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(fc, pkg.MustINSECURELOWENTROPYRSAKEYFORTEST()),
 			},
 			nil,
 			compose.OAuth2TokenIntrospectionFactory,

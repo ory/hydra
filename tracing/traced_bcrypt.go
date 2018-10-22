@@ -3,6 +3,7 @@ package tracing
 import (
 	"context"
 
+	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"

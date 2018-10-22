@@ -21,6 +21,7 @@
 package oauth2_test
 
 import (
+	"github.com/ory/hydra/pkg"
 	"net/http"
 	"time"
 
@@ -33,11 +34,11 @@ import (
 var hasher = &fosite.BCrypt{}
 var oauth2OpqaueStrategy = &compose.CommonStrategy{
 	CoreStrategy:               compose.NewOAuth2HMACStrategy(fc, []byte("some super secret secret secret secret"), nil),
-	OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(fc, cmdx.MustINSECURELOWENTROPYRSAKEYFORTEST()),
+	OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(fc, pkg.MustINSECURELOWENTROPYRSAKEYFORTEST()),
 }
 var oauth2JWTStrategy = &compose.CommonStrategy{
-	CoreStrategy:               compose.NewOAuth2JWTStrategy(cmdx.MustINSECURELOWENTROPYRSAKEYFORTEST(), compose.NewOAuth2HMACStrategy(fc, []byte("some super secret secret secret secret"), nil)),
-	OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(fc, cmdx.MustINSECURELOWENTROPYRSAKEYFORTEST()),
+	CoreStrategy:               compose.NewOAuth2JWTStrategy(pkg.MustINSECURELOWENTROPYRSAKEYFORTEST(), compose.NewOAuth2HMACStrategy(fc, []byte("some super secret secret secret secret"), nil)),
+	OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(fc, pkg.MustINSECURELOWENTROPYRSAKEYFORTEST()),
 }
 
 var fc = &compose.Config{

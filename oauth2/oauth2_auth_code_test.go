@@ -25,6 +25,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/ory/hydra/pkg"
 	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
@@ -34,7 +35,6 @@ import (
 	"sync"
 	"testing"
 	"time"
-
 	djwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
@@ -50,7 +50,6 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 	"gopkg.in/square/go-jose.v2"
-
 	hc "github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
@@ -117,7 +116,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			lp := mockProvider(&lph)
 			cp := mockProvider(&cph)
 			jwts := &jwt.RS256JWTStrategy{
-				PrivateKey: cmdx.MustINSECURELOWENTROPYRSAKEYFORTEST(),
+				PrivateKey: pkg.MustINSECURELOWENTROPYRSAKEYFORTEST(),
 			}
 			hasher := &fosite.BCrypt{
 				WorkFactor: 4,

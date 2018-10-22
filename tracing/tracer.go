@@ -3,6 +3,7 @@ package tracing
 import (
 	"errors"
 	"fmt"
+	opentracing "github.com/opentracing/opentracing-go"
 	"io"
 	"strings"
 

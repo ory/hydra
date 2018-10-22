@@ -23,6 +23,7 @@ package config
 import (
 	"crypto/sha256"
 	"fmt"
+	"github.com/ory/x/cmdx"
 	"io/ioutil"
 	"net"
 	"net/http"

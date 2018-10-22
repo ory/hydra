@@ -182,7 +182,6 @@ func setup(c *config.Config, cmd *cobra.Command, args []string, name string) (ha
 				metricsPrometheusPath,
 				"/oauth2/auth/sessions/login",
 				"/oauth2/auth/sessions/consent",
-				"/health/status",
 				"/",
 			},
 			c.GetLogger(),

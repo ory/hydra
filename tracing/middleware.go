@@ -3,6 +3,7 @@ package tracing
 import (
 	"net/http"
 
+	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
 	"github.com/urfave/negroni"
 )

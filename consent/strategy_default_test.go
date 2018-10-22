@@ -26,6 +26,7 @@ import (
 	"crypto/rsa"
 	"encoding/json"
 	"fmt"
+	"github.com/ory/hydra/pkg"
 	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
@@ -88,7 +89,7 @@ func TestStrategy(t *testing.T) {
 	ap := mockProvider(&aph)
 
 	jwts := &jwt.RS256JWTStrategy{
-		PrivateKey: cmdx.MustINSECURELOWENTROPYRSAKEYFORTEST(),
+		PrivateKey: pkg.MustINSECURELOWENTROPYRSAKEYFORTEST(),
 	}
 
 	fooUserIDToken, _, err := jwts.Generate(context.TODO(), jwt.IDTokenClaims{

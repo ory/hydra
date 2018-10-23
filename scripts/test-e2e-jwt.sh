@@ -15,7 +15,7 @@ export OAUTH2_CLIENT_SECRET=bazbar
 export OAUTH2_ISSUER_URL=http://127.0.0.1:4444/
 export LOG_LEVEL=debug
 export REDIRECT_URL=http://127.0.0.1:5555/callback
-export AUTH2_SCOPE=openid,offline
+export OAUTH2_SCOPE=openid,offline
 
 go install .
 go install ./test/mock-client

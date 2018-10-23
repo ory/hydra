@@ -54,6 +54,7 @@ func TestSQLAuthenticationConverter(t *testing.T) {
 		RequestedScope:  []string{"scopea", "scopeb"},
 		Verifier:        "verifier",
 		CSRF:            "csrf",
+		SessionID:       "session-id",
 	}
 
 	b := &HandledAuthenticationRequest{
@@ -112,6 +113,8 @@ func TestSQLConsentConverter(t *testing.T) {
 		Verifier:               "verifier",
 		CSRF:                   "csrf",
 		AuthenticatedAt:        time.Now().UTC().Add(-time.Minute),
+		LoginChallenge:         "login-challenge",
+		LoginSessionID:         "login-session-id",
 	}
 
 	b := &HandledConsentRequest{

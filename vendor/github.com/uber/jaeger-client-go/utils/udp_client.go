@@ -21,6 +21,7 @@ import (
 	"net"
 
 	"github.com/uber/jaeger-client-go/thrift"
+
 	"github.com/uber/jaeger-client-go/thrift-gen/agent"
 	"github.com/uber/jaeger-client-go/thrift-gen/jaeger"
 	"github.com/uber/jaeger-client-go/thrift-gen/zipkincore"

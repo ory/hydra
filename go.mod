@@ -34,7 +34,6 @@ require (
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.8.0
-	github.com/pkg/profile v1.2.1
 	github.com/prometheus/client_golang v0.8.0
 	github.com/prometheus/client_model v0.0.0-20171117100541-99fa1f4be8e5 // indirect
 	github.com/prometheus/common v0.0.0-20180426121432-d811d2e9bf89 // indirect
@@ -58,7 +57,7 @@ require (
 	golang.org/x/sys v0.0.0-20180909124046-d0be0721c37e // indirect
 	golang.org/x/tools v0.0.0-20181015201034-8919434dde1e // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
-	gopkg.in/go-resty/resty.v0 v0.4.1
+	gopkg.in/go-resty/resty.v0 v0.4.1 // indirect
 	gopkg.in/gorp.v1 v1.7.1 // indirect
 	gopkg.in/resty.v1 v1.9.1
 	gopkg.in/square/go-jose.v2 v2.1.9

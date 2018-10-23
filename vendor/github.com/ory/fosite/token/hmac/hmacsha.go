@@ -31,9 +31,8 @@ import (
 	"sync"
 
 	"github.com/gtank/cryptopasta"
-	"github.com/pkg/errors"
-
 	"github.com/ory/fosite"
+	"github.com/pkg/errors"
 )
 
 // HMACStrategy is responsible for generating and validating challenges.

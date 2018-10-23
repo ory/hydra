@@ -110,7 +110,7 @@ func (term *TermInfo) GetAttributeName(name string) (stacker, error) {
 	return term.GetAttribute(tc)
 }
 
-// A utility function that finds and returns the termcap equivalent of a
+// A utility function that finds and returns the termcap equivalent of a 
 // variable name.
 func GetTermcapName(name string) string {
 	// Termcap name

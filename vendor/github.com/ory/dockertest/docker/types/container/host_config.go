@@ -3,12 +3,11 @@ package container // import "github.com/ory/dockertest/docker/types/container"
 import (
 	"strings"
 
-	"github.com/docker/go-connections/nat"
-	"github.com/docker/go-units"
-
 	"github.com/ory/dockertest/docker/types/blkiodev"
 	"github.com/ory/dockertest/docker/types/mount"
 	"github.com/ory/dockertest/docker/types/strslice"
+	"github.com/docker/go-connections/nat"
+	"github.com/docker/go-units"
 )
 
 // Isolation represents the isolation technology of a container. The supported

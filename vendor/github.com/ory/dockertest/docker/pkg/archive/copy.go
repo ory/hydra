@@ -9,9 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/sirupsen/logrus"
-
 	"github.com/ory/dockertest/docker/pkg/system"
+	"github.com/sirupsen/logrus"
 )
 
 // Errors used or returned by this file.

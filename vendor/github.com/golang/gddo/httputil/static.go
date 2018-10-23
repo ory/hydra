@@ -11,6 +11,7 @@ import (
 	"crypto/sha1"
 	"errors"
 	"fmt"
+	"github.com/golang/gddo/httputil/header"
 	"io"
 	"io/ioutil"
 	"mime"
@@ -22,8 +23,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/golang/gddo/httputil/header"
 )
 
 // StaticServer serves static files.

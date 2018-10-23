@@ -22,12 +22,12 @@
 package oauth2
 
 import (
-	"context"
 	"time"
 
-	"github.com/pkg/errors"
+	"context"
 
 	"github.com/ory/fosite"
+	"github.com/pkg/errors"
 )
 
 type ResourceOwnerPasswordCredentialsGrantHandler struct {

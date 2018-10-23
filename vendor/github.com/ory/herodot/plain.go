@@ -20,8 +20,9 @@
 package herodot
 
 import (
-	"fmt"
 	"net/http"
+
+	"fmt"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"

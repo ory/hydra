@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/opentracing/opentracing-go"
+
 	"github.com/uber/jaeger-client-go"
 	"github.com/uber/jaeger-client-go/internal/baggage/remote"
 	throttler "github.com/uber/jaeger-client-go/internal/throttler/remote"

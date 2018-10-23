@@ -12,12 +12,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	netcontext "golang.org/x/net/context"
-
 	"appengine"
 	"appengine_internal"
 	basepb "appengine_internal/base"
+
+	"github.com/golang/protobuf/proto"
+	netcontext "golang.org/x/net/context"
 )
 
 var contextKey = "holds an appengine.Context"

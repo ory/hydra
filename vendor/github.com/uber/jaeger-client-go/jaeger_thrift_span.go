@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/opentracing/opentracing-go"
+
 	j "github.com/uber/jaeger-client-go/thrift-gen/jaeger"
 	"github.com/uber/jaeger-client-go/utils"
 )

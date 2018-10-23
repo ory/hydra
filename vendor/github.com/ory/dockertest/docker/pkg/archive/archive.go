@@ -18,13 +18,12 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/sirupsen/logrus"
-
 	"github.com/ory/dockertest/docker/pkg/fileutils"
 	"github.com/ory/dockertest/docker/pkg/idtools"
 	"github.com/ory/dockertest/docker/pkg/ioutils"
 	"github.com/ory/dockertest/docker/pkg/pools"
 	"github.com/ory/dockertest/docker/pkg/system"
+	"github.com/sirupsen/logrus"
 )
 
 var unpigzPath string

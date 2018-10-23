@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/opentracing/opentracing-go/ext"
+
 	"github.com/uber/jaeger-client-go/internal/spanlog"
 	z "github.com/uber/jaeger-client-go/thrift-gen/zipkincore"
 	"github.com/uber/jaeger-client-go/utils"

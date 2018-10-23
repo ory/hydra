@@ -6,9 +6,8 @@ import (
 	"os"
 	"syscall"
 
-	"golang.org/x/sys/unix"
-
 	"github.com/ory/dockertest/docker/pkg/system"
+	"golang.org/x/sys/unix"
 )
 
 func statDifferent(oldStat *system.StatT, newStat *system.StatT) bool {

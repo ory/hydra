@@ -21,15 +21,19 @@
 package sqlcon
 
 import (
+	"database/sql"
+	"fmt"
 	"net/url"
 	"runtime"
 	"strconv"
 	"strings"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
+	"github.com/luna-duclos/instrumentedsql"
+	"github.com/luna-duclos/instrumentedsql/opentracing"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -38,9 +42,10 @@ type SQLConnection struct {
 	db  *sqlx.DB
 	URL *url.URL
 	L   logrus.FieldLogger
+	options
 }
 
-func NewSQLConnection(db string, l logrus.FieldLogger) (*SQLConnection, error) {
+func NewSQLConnection(db string, l logrus.FieldLogger, opts ...Opt) (*SQLConnection, error) {
 	u, err := url.Parse(db)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -55,10 +60,16 @@ func NewSQLConnection(db string, l logrus.FieldLogger) (*SQLConnection, error) {
 		l = logger
 	}
 
-	return &SQLConnection{
+	connection := &SQLConnection{
 		URL: u,
 		L:   l,
-	}, nil
+	}
+
+	for _, opt := range opts {
+		opt(&connection.options)
+	}
+
+	return connection, nil
 }
 
 func cleanURLQuery(c *url.URL) *url.URL {
@@ -94,16 +105,25 @@ func (c *SQLConnection) GetDatabase() *sqlx.DB {
 	}
 
 	var err error
+	var registeredDriver string
 
 	clean := cleanURLQuery(c.URL)
+	if registeredDriver, err = c.registerDriver(); err != nil {
+		c.L.Fatalf("Could not register driver: %s", err)
+	}
 
 	if err = retry(c.L, time.Second*15, time.Minute*2, func() error {
 		c.L.Infof("Connecting with %s", c.URL.Scheme+"://*:*@"+c.URL.Host+c.URL.Path+"?"+clean.RawQuery)
 
 		u := connectionString(clean)
-		if c.db, err = sqlx.Open(clean.Scheme, u); err != nil {
+
+		db, err := sql.Open(registeredDriver, u)
+		if err != nil {
 			return errors.Errorf("Could not Connect to SQL: %s", err)
-		} else if err := c.db.Ping(); err != nil {
+		}
+
+		c.db = sqlx.NewDb(db, clean.Scheme)
+		if err := c.db.Ping(); err != nil {
 			return errors.Errorf("Could not Connect to SQL: %s", err)
 		}
 
@@ -183,4 +203,34 @@ func connectionString(clean *url.URL) string {
 		u = strings.Replace(u, "mysql://", "", -1)
 	}
 	return u
+}
+
+func (c *SQLConnection) registerDriver() (string, error) {
+	driverName := c.URL.Scheme
+	if c.UseTracedDriver {
+		driverName = "instrumented-sql-driver"
+		if len(c.options.forcedDriverName) > 0 {
+			driverName = c.options.forcedDriverName
+		}
+
+		tracingOpts := []instrumentedsql.Opt{instrumentedsql.WithTracer(opentracing.NewTracer(c.AllowRoot))}
+		if c.OmitArgs {
+			tracingOpts = append(tracingOpts, instrumentedsql.WithOmitArgs())
+		}
+
+		switch c.URL.Scheme {
+		case "mysql":
+			sql.Register(driverName,
+				instrumentedsql.WrapDriver(mysql.MySQLDriver{}, tracingOpts...))
+		case "postgres":
+			// Why does this have to be a pointer? Because the Open method for postgres has a pointer receiver
+			// and does not satisfy the driver.Driver interface.
+			sql.Register(driverName,
+				instrumentedsql.WrapDriver(&pq.Driver{}, tracingOpts...))
+		default:
+			return "", fmt.Errorf("unsupported scheme (%s) in DSN", c.URL.Scheme)
+		}
+	}
+
+	return driverName, nil
 }

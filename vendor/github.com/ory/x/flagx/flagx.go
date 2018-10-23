@@ -39,3 +39,11 @@ func MustGetStringSlice(cmd *cobra.Command, name string) []string {
 	}
 	return ss
 }
+
+func MustGetInt(cmd *cobra.Command, name string) int {
+	ss, err := cmd.Flags().GetInt(name)
+	if err != nil {
+		cmdx.Fatalf(err.Error())
+	}
+	return ss
+}

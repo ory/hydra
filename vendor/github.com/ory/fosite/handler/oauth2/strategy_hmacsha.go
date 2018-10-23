@@ -22,13 +22,13 @@
 package oauth2
 
 import (
-	"context"
 	"time"
 
-	"github.com/pkg/errors"
+	"context"
 
 	"github.com/ory/fosite"
 	enigma "github.com/ory/fosite/token/hmac"
+	"github.com/pkg/errors"
 )
 
 type HMACSHAStrategy struct {

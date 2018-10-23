@@ -25,9 +25,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/ory/fosite"
+	"github.com/pkg/errors"
 )
 
 // HandleTokenEndpointRequest implements

@@ -3,9 +3,8 @@ package container // import "github.com/ory/dockertest/docker/types/container"
 import (
 	"time"
 
-	"github.com/docker/go-connections/nat"
-
 	"github.com/ory/dockertest/docker/types/strslice"
+	"github.com/docker/go-connections/nat"
 )
 
 // MinimumDuration puts a minimum on user configured duration.

@@ -6,7 +6,6 @@ package sampling
 import (
 	"bytes"
 	"fmt"
-
 	"github.com/uber/jaeger-client-go/thrift"
 )
 

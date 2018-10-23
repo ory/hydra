@@ -34,6 +34,7 @@ type ReadSizeProvider interface {
 	RemainingBytes() (num_bytes uint64)
 }
 
+
 // Encapsulates the I/O layer
 type TTransport interface {
 	io.ReadWriteCloser
@@ -51,6 +52,7 @@ type stringWriter interface {
 	WriteString(s string) (n int, err error)
 }
 
+
 // This is "enchanced" transport with extra capabilities. You need to use one of these
 // to construct protocol.
 // Notably, TSocket does not implement this interface, and it is always a mistake to use
@@ -63,3 +65,4 @@ type TRichTransport interface {
 	Flusher
 	ReadSizeProvider
 }
+

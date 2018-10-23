@@ -22,6 +22,7 @@ import (
 
 	"github.com/beorn7/perks/quantile"
 	"github.com/golang/protobuf/proto"
+
 	dto "github.com/prometheus/client_model/go"
 )
 

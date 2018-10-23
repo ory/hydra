@@ -16,6 +16,7 @@ package jaeger
 
 import (
 	"github.com/opentracing/opentracing-go/log"
+
 	"github.com/uber/jaeger-client-go/internal/baggage"
 )
 

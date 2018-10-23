@@ -5,9 +5,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/ory/dockertest/docker/pkg/mount"
+	"github.com/pkg/errors"
 )
 
 // EnsureRemoveAll wraps `os.RemoveAll` to check for specific errors that can

@@ -22,9 +22,10 @@
 package fosite
 
 import (
-	"context"
 	"net/http"
 	"net/url"
+
+	"context"
 
 	"github.com/pkg/errors"
 )

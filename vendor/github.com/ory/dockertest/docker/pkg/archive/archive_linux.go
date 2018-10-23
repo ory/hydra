@@ -6,9 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"golang.org/x/sys/unix"
-
 	"github.com/ory/dockertest/docker/pkg/system"
+	"golang.org/x/sys/unix"
 )
 
 func getWhiteoutConverter(format WhiteoutFormat) tarWhiteoutConverter {

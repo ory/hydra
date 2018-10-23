@@ -22,17 +22,17 @@
 package openid
 
 import (
-	"context"
 	"strconv"
 	"time"
 
-	jwtgo "github.com/dgrijalva/jwt-go"
-	"github.com/pkg/errors"
+	"context"
 
+	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/go-convenience/stringslice"
 	"github.com/ory/go-convenience/stringsx"
+	"github.com/pkg/errors"
 )
 
 type OpenIDConnectRequestValidator struct {

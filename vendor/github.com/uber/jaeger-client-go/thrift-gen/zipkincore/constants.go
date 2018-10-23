@@ -6,7 +6,6 @@ package zipkincore
 import (
 	"bytes"
 	"fmt"
-
 	"github.com/uber/jaeger-client-go/thrift"
 )
 

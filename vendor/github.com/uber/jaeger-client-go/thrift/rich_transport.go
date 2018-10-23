@@ -66,3 +66,4 @@ func writeByte(w io.Writer, c byte) error {
 	_, err := w.Write(v[0:1])
 	return err
 }
+

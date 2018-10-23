@@ -30,6 +30,8 @@ import (
 
 	"github.com/phayes/freeport"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/ory/x/healthx"
 )
 
 var frontendPort, backendPort int
@@ -92,7 +94,7 @@ func TestExecute(t *testing.T) {
 
 				for _, u := range []string{
 					fmt.Sprintf("https://127.0.0.1:%d/.well-known/openid-configuration", frontendPort),
-					fmt.Sprintf("https://127.0.0.1:%d/health/status", backendPort),
+					fmt.Sprintf("https://127.0.0.1:%d%s", backendPort, healthx.ReadyCheckPath),
 				} {
 					if resp, err := client.Get(u); err != nil {
 						t.Logf("HTTP request to %s failed: %s", u, err)

@@ -23,6 +23,8 @@ package metricsx
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"io"
+	"math/rand"
 	"net"
 	"net/http"
 	"net/url"
@@ -30,9 +32,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	"io"
-	"math/rand"
 
 	"github.com/pborman/uuid"
 	"github.com/segmentio/analytics-go"

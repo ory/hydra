@@ -32,6 +32,12 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
+	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"golang.org/x/oauth2/clientcredentials"
+	"gopkg.in/square/go-jose.v2"
+
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
 	"github.com/ory/fosite/handler/oauth2"
@@ -39,11 +45,6 @@ import (
 	hc "github.com/ory/hydra/client"
 	"github.com/ory/hydra/jwk"
 	. "github.com/ory/hydra/oauth2"
-	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"golang.org/x/oauth2/clientcredentials"
-	"gopkg.in/square/go-jose.v2"
 )
 
 func TestClientCredentials(t *testing.T) {

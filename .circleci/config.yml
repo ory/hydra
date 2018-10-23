@@ -8,11 +8,14 @@ jobs:
       - image: circleci/golang:1.11
     working_directory: /go/src/github.com/ory/hydra
     steps:
-      - run:
-          name: Enable go1.11 modules
-          command: |
-            echo 'export GO111MODULE=on' >> $BASH_ENV
-            source $BASH_ENV
+# This is disabled for now because goimports is really slow when go modules are used, see
+# https://github.com/golang/go/issues/27287
+#
+#      - run:
+#          name: Enable go1.11 modules
+#          command: |
+#            echo 'export GO111MODULE=on' >> $BASH_ENV
+#            source $BASH_ENV
       - checkout
       - run: curl -L https://git.io/vp6lP | sh
       - run: mv ./bin/* $GOPATH/bin
@@ -57,13 +60,9 @@ jobs:
     working_directory: /go/src/github.com/ory/hydra
     steps:
       - checkout
-      - run: go get github.com/go-swagger/go-swagger/cmd/swagger
-      - run: curl -L https://git.io/vp6lP | sh
-      - run: curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-      - run: sudo apt-get install -y default-jre nodejs
-      - run: sudo npm i -g yarn
-      - run: yarn
-      - run: ./scripts/test-sdk.sh
+      - run: make init
+      - run: make sdk
+      - run: git add -A && git diff --exit-code
 
   build-docker:
     docker:

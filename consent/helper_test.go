@@ -24,9 +24,10 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestSanitizeClient(t *testing.T) {

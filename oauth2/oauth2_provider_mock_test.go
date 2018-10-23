@@ -8,6 +8,7 @@ import (
 	http "net/http"
 
 	gomock "github.com/golang/mock/gomock"
+
 	fosite "github.com/ory/fosite"
 )
 

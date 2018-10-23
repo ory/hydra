@@ -103,7 +103,16 @@ before finalizing the upgrade process.
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## 1.0.0-beta.10
+## 1.0.0-rc.1
+
+### CLI Changes
+
+Flags `https-tls-key-path` and `https-tls-cert-path` have been removed from the `hydra serve *` commands.
+Use environment variables `HTTPS_TLS_CERT_PATH` and `HTTPS_TLS_KEY_PATH` instead.
+
+### API Changes
+
+Endpoint `/health/status`, which redirected to `/health/alive` and was deprecated has been removed.
 
 ### Schema Changes
 

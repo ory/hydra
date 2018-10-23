@@ -25,11 +25,11 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory/herodot"
-	"github.com/ory/x/pagination"
 	"github.com/pkg/errors"
 
-	"github.com/ory/hydra/rand/sequence"
+	"github.com/ory/herodot"
+	"github.com/ory/x/pagination"
+	"github.com/ory/x/randx"
 )
 
 type Handler struct {
@@ -94,7 +94,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	}
 
 	if len(c.Secret) == 0 {
-		secret, err := sequence.RuneSequence(12, []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-.~"))
+		secret, err := randx.RuneSequence(12, []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-.~"))
 		if err != nil {
 			h.H.WriteError(w, r, errors.WithStack(err))
 			return

@@ -23,7 +23,6 @@ package cli
 import (
 	"context"
 	"fmt"
-	"github.com/ory/x/cmdx"
 	"net/url"
 	"strings"
 	"time"
@@ -38,7 +37,9 @@ import (
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/pkg"
+	"github.com/ory/x/cmdx"
+	"github.com/ory/x/flagx"
+	"github.com/ory/x/resilience"
 )
 
 type MigrateHandler struct {
@@ -61,7 +62,7 @@ func (h *MigrateHandler) connectToSql(dsn string) (*sqlx.DB, error) {
 		return nil, errors.Errorf("could not parse DATABASE_URL: %s", err)
 	}
 
-	if err := pkg.Retry(h.c.GetLogger(), time.Second*15, time.Minute*2, func() error {
+	if err := resilience.Retry(h.c.GetLogger(), time.Second*15, time.Minute*2, func() error {
 		if u.Scheme == "mysql" {
 			dsn = strings.Replace(dsn, "mysql://", "", -1)
 		}
@@ -81,7 +82,7 @@ func (h *MigrateHandler) connectToSql(dsn string) (*sqlx.DB, error) {
 }
 
 func getDBUrl(cmd *cobra.Command, args []string, position int) (dburl string) {
-	if readFromEnv, _ := cmd.Flags().GetBool("read-from-env"); readFromEnv {
+	if flagx.MustGetBool(cmd, "read-from-env") {
 		if len(viper.GetString("DATABASE_URL")) == 0 {
 			fmt.Println(cmd.UsageString())
 			fmt.Println("")

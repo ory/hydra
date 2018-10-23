@@ -21,16 +21,14 @@
 package server
 
 import (
-	"crypto/ecdsa"
-	"crypto/rsa"
-
 	"context"
+
+	"github.com/pkg/errors"
+	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/pkg"
-	"github.com/pkg/errors"
-	"gopkg.in/square/go-jose.v2"
 )
 
 func createOrGetJWK(c *config.Config, set string, kid string, prefix string) (key *jose.JSONWebKey, err error) {
@@ -85,15 +83,4 @@ func createJWKS(ctx *config.Context, set, kid string) (*jose.JSONWebKeySet, erro
 	}
 
 	return keys, nil
-}
-
-func publicKey(key interface{}) interface{} {
-	switch k := key.(type) {
-	case *rsa.PrivateKey:
-		return &k.PublicKey
-	case *ecdsa.PrivateKey:
-		return &k.PublicKey
-	default:
-		return nil
-	}
 }

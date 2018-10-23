@@ -21,19 +21,19 @@
 package jwk_test
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
 	"sync"
 	"testing"
 
-	"context"
-
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
+	"github.com/stretchr/testify/require"
+
 	. "github.com/ory/hydra/jwk"
 	"github.com/ory/x/sqlcon/dockertest"
-	"github.com/stretchr/testify/require"
 )
 
 var managers = map[string]Manager{

@@ -22,27 +22,25 @@ package server
 
 import (
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory/herodot"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/ory/hydra/config"
-	"github.com/ory/hydra/health"
+	"github.com/ory/x/healthx"
 )
 
-func newHealthHandler(c *config.Config, router *httprouter.Router) *health.Handler {
+const (
+	metricsPrometheusPath = "/metrics/prometheus"
+)
+
+func newHealthHandler(c *config.Config, router *httprouter.Router) *healthx.Handler {
 	ctx := c.Context()
-	var rc health.ReadyChecker = ctx.Connection.Ping
+	expectDependency(c.GetLogger(), ctx.Connection)
 
-	w := herodot.NewJSONWriter(c.GetLogger())
-	w.ErrorEnhancer = writerErrorEnhancer
-
-	h := &health.Handler{
-		H:             w,
-		VersionString: c.BuildVersion,
-		ReadyChecks: map[string]health.ReadyChecker{
-			"database": rc,
-		},
-	}
-
+	w := newJSONWriter(c.GetLogger())
+	h := healthx.NewHandler(w, c.BuildVersion, healthx.ReadyCheckers{
+		"database": ctx.Connection.Ping,
+	})
 	h.SetRoutes(router)
+	router.Handler("GET", metricsPrometheusPath, promhttp.Handler())
 	return h
 }

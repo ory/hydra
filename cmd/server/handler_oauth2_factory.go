@@ -28,6 +28,9 @@ import (
 
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
+	"github.com/pborman/uuid"
+	"github.com/spf13/viper"
+
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
@@ -39,10 +42,9 @@ import (
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/tracing"
-	"github.com/pborman/uuid"
-	"github.com/spf13/viper"
+	"github.com/ory/x/cmdx"
+	"github.com/ory/x/serverx"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {
@@ -166,14 +168,14 @@ func newOAuth2Handler(c *config.Config, frontend, backend *httprouter.Router, cm
 	c.ErrorURL = setDefaultConsentURL(c.ErrorURL, c, "oauth2/fallbacks/error")
 
 	errorURL, err := url.Parse(c.ErrorURL)
-	pkg.Must(err, "Could not parse error url %s.", errorURL)
+	cmdx.Must(err, "Could not parse error url %s.", errorURL)
 
 	openIDJWTStrategy, err := jwk.NewRS256JWTStrategy(c.Context().KeyManager, oauth2.OpenIDConnectKeyName)
-	pkg.Must(err, "Could not fetch private signing key for OpenID Connect - did you forget to run \"hydra migrate sql\" or forget to set the SYSTEM_SECRET?")
+	cmdx.Must(err, "Could not fetch private signing key for OpenID Connect - did you forget to run \"hydra migrate sql\" or forget to set the SYSTEM_SECRET?")
 	oidcStrategy := &openid.DefaultStrategy{JWTStrategy: openIDJWTStrategy}
 
 	w := herodot.NewJSONWriter(c.GetLogger())
-	w.ErrorEnhancer = writerErrorEnhancer
+	w.ErrorEnhancer = serverx.ErrorEnhancerRFC6749
 	var accessTokenJWTStrategy *jwk.RS256JWTStrategy
 
 	if c.OAuth2AccessTokenStrategy == "jwt" {

@@ -21,15 +21,15 @@
 package consent
 
 import (
+	"context"
 	"sync"
 	"time"
 
-	"context"
+	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/x/pagination"
-	"github.com/pkg/errors"
 )
 
 type MemoryManager struct {

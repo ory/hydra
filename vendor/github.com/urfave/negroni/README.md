@@ -17,8 +17,8 @@ you think it contains too much magic, then Negroni is a great fit.
 Language Translations:
 * [Deutsch (de_DE)](translations/README_de_de.md)
 * [Português Brasileiro (pt_BR)](translations/README_pt_br.md)
-* [简体中文 (zh_cn)](translations/README_zh_CN.md)
-* [繁體中文 (zh_tw)](translations/README_zh_tw.md)
+* [简体中文 (zh_CN)](translations/README_zh_CN.md)
+* [繁體中文 (zh_TW)](translations/README_zh_tw.md)
 * [日本語 (ja_JP)](translations/README_ja_JP.md)
 * [Français (fr_FR)](translations/README_fr_FR.md)
 
@@ -504,6 +504,7 @@ linking your middleware if you have built one:
 | [Graceful](https://github.com/tylerb/graceful) | [Tyler Bunnell](https://github.com/tylerb) | Graceful HTTP Shutdown |
 | [gzip](https://github.com/phyber/negroni-gzip) | [phyber](https://github.com/phyber) | GZIP response compression |
 | [JWT Middleware](https://github.com/auth0/go-jwt-middleware) | [Auth0](https://github.com/auth0) | Middleware checks for a JWT on the `Authorization` header on incoming requests and decodes it|
+| [JWT Middleware](https://github.com/mfuentesg/go-jwtmiddleware) | [Marcelo Fuentes](https://github.com/mfuentesg) | JWT middleware for golang |
 | [logrus](https://github.com/meatballhat/negroni-logrus) | [Dan Buch](https://github.com/meatballhat) | Logrus-based logger |
 | [oauth2](https://github.com/goincremental/negroni-oauth2) | [David Bochenski](https://github.com/bochenski) | oAuth2 middleware |
 | [onthefly](https://github.com/xyproto/onthefly) | [Alexander Rødseth](https://github.com/xyproto) | Generate TinySVG, HTML and CSS on the fly |
@@ -518,6 +519,8 @@ linking your middleware if you have built one:
 | [xrequestid](https://github.com/pilu/xrequestid) | [Andrea Franz](https://github.com/pilu) | Middleware that assigns a random X-Request-Id header to each request |
 | [mgo session](https://github.com/joeljames/nigroni-mgo-session) | [Joel James](https://github.com/joeljames) | Middleware that handles creating and closing mgo sessions per request |
 | [digits](https://github.com/bamarni/digits) | [Bilal Amarni](https://github.com/bamarni) | Middleware that handles [Twitter Digits](https://get.digits.com/) authentication |
+| [stats](https://github.com/guptachirag/stats) | [Chirag Gupta](https://github.com/guptachirag/stats) | Middleware that manages qps and latency stats for your endpoints and asynchronously flushes them to influx db |
+| [Chaos](https://github.com/falzm/chaos) | [Marc Falzon](https://github.com/falzm) | Middleware for injecting chaotic behavior into application in a programmatic way |
 
 ## Examples
 

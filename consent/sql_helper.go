@@ -25,10 +25,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ory/go-convenience/stringsx"
-	"github.com/ory/hydra/client"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
+
+	"github.com/ory/go-convenience/stringsx"
+	"github.com/ory/hydra/client"
 )
 
 var migrations = &migrate.MemoryMigrationSource{

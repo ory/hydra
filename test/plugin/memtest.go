@@ -12,4 +12,6 @@ func (m *MemTestPlugin) Prefixes() []string {
 	return []string{"memtest"}
 }
 
+func main() {}
+
 var BackendConnector config.BackendConnector = &MemTestPlugin{}

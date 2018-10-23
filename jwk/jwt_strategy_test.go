@@ -21,15 +21,15 @@
 package jwk
 
 import (
+	"context"
 	"testing"
 
-	"context"
-
 	jwt2 "github.com/dgrijalva/jwt-go"
-	"github.com/ory/fosite/token/jwt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/square/go-jose.v2"
+
+	"github.com/ory/fosite/token/jwt"
 )
 
 func TestRS256JWTStrategy(t *testing.T) {

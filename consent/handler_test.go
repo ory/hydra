@@ -21,6 +21,7 @@
 package consent
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/cookiejar"
@@ -29,15 +30,14 @@ import (
 	"testing"
 	"time"
 
-	"context"
-
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory/herodot"
-	"github.com/ory/hydra/client"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/herodot"
+	"github.com/ory/hydra/client"
 )
 
 func TestLogout(t *testing.T) {

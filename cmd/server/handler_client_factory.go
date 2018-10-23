@@ -24,7 +24,6 @@ import (
 	"strings"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory/herodot"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
@@ -36,10 +35,9 @@ func newClientManager(c *config.Config) client.Manager {
 }
 
 func newClientHandler(c *config.Config, router *httprouter.Router, manager client.Manager) *client.Handler {
-	w := herodot.NewJSONWriter(c.GetLogger())
-	w.ErrorEnhancer = writerErrorEnhancer
-
 	expectDependency(c.GetLogger(), manager)
+
+	w := newJSONWriter(c.GetLogger())
 	h := client.NewHandler(
 		manager,
 		w,

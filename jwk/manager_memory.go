@@ -21,17 +21,16 @@
 package jwk
 
 import (
-	"sync"
-
+	"context"
 	"fmt"
 	"net/http"
+	"sync"
 
-	"context"
+	"github.com/pkg/errors"
+	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/pkg"
-	"github.com/pkg/errors"
-	"gopkg.in/square/go-jose.v2"
 )
 
 type MemoryManager struct {

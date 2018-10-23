@@ -21,21 +21,20 @@
 package client_test
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"sync"
 	"testing"
 
-	"context"
-
 	"github.com/jmoiron/sqlx"
-	"github.com/ory/fosite"
-	"github.com/ory/x/sqlcon/dockertest"
 	"github.com/rubenv/sql-migrate"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
+	"github.com/ory/x/sqlcon/dockertest"
 )
 
 var createClientMigrations = []*migrate.Migration{

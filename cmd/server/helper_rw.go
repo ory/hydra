@@ -23,10 +23,19 @@ package server
 import (
 	"net/http"
 
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+
 	"github.com/ory/fosite"
 	"github.com/ory/herodot"
-	"github.com/pkg/errors"
+	"github.com/ory/x/serverx"
 )
+
+func newJSONWriter(l logrus.FieldLogger) *herodot.JSONWriter {
+	w := herodot.NewJSONWriter(l)
+	w.ErrorEnhancer = serverx.ErrorEnhancerRFC6749
+	return w
+}
 
 type stackTracer interface {
 	StackTrace() errors.StackTrace

@@ -3,16 +3,15 @@ package tracing_test
 import (
 	"net/http"
 	"net/http/httptest"
-
-	"github.com/opentracing/opentracing-go/ext"
-	"github.com/opentracing/opentracing-go/mocktracer"
-
 	"testing"
 
-	"github.com/opentracing/opentracing-go"
-	"github.com/ory/hydra/tracing"
+	opentracing "github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/ext"
+	"github.com/opentracing/opentracing-go/mocktracer"
 	"github.com/stretchr/testify/assert"
 	"github.com/urfave/negroni"
+
+	"github.com/ory/hydra/tracing"
 )
 
 var mockedTracer *mocktracer.MockTracer

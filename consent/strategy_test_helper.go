@@ -24,8 +24,9 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/hydra/sdk/go/hydra/swagger"
 )
 
 var passAuthentication = func(apiClient *swagger.OAuth2Api, remember bool) func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {

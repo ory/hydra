@@ -22,11 +22,12 @@ package server
 
 import (
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory/herodot"
 
+	"github.com/ory/herodot"
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
+	"github.com/ory/x/serverx"
 )
 
 func injectJWKManager(c *config.Config) {
@@ -40,7 +41,7 @@ func injectJWKManager(c *config.Config) {
 func newJWKHandler(c *config.Config, frontend, backend *httprouter.Router) *jwk.Handler {
 	ctx := c.Context()
 	w := herodot.NewJSONWriter(c.GetLogger())
-	w.ErrorEnhancer = writerErrorEnhancer
+	w.ErrorEnhancer = serverx.ErrorEnhancerRFC6749
 	var wellKnown []string
 
 	if c.OAuth2AccessTokenStrategy == "jwt" {

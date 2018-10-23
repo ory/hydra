@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 
 	"github.com/ory/go-convenience/stringsx"
-	"github.com/rs/cors"
-	"github.com/spf13/viper"
 )
 
 func ParseOptions() cors.Options {

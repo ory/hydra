@@ -24,10 +24,11 @@ import (
 	"net/http"
 
 	"github.com/gorilla/sessions"
+	"github.com/pkg/errors"
+
 	"github.com/ory/fosite"
 	"github.com/ory/go-convenience/mapx"
 	"github.com/ory/hydra/client"
-	"github.com/pkg/errors"
 )
 
 func sanitizeClientFromRequest(ar fosite.AuthorizeRequester) *client.Client {

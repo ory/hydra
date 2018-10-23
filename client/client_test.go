@@ -23,8 +23,9 @@ package client
 import (
 	"testing"
 
-	"github.com/ory/fosite"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/ory/fosite"
 )
 
 var _ fosite.OpenIDConnectClient = new(Client)

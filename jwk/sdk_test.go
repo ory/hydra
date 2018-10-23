@@ -26,11 +26,12 @@ import (
 	"testing"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/ory/herodot"
 	. "github.com/ory/hydra/jwk"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestJWKSDK(t *testing.T) {

@@ -21,12 +21,11 @@
 package jwk
 
 import (
+	"context"
 	"crypto/rand"
 	"io"
 	"testing"
 	"time"
-
-	"context"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"

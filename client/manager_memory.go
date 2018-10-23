@@ -25,10 +25,11 @@ import (
 	"sync"
 
 	"github.com/imdario/mergo"
+	"github.com/pkg/errors"
+
 	"github.com/ory/fosite"
 	"github.com/ory/x/pagination"
 	"github.com/ory/x/sqlcon"
-	"github.com/pkg/errors"
 )
 
 type MemoryManager struct {

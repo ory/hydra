@@ -25,12 +25,13 @@ import (
 	"time"
 
 	"github.com/gorilla/sessions"
+	"github.com/sirupsen/logrus"
+
 	"github.com/ory/fosite"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/pkg"
-	"github.com/sirupsen/logrus"
 )
 
 type Handler struct {

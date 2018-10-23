@@ -21,7 +21,6 @@
 package cli
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -33,6 +32,8 @@ import (
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/pkg"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
+	"github.com/ory/x/cmdx"
+	"github.com/ory/x/flagx"
 )
 
 type ClientHandler struct {
@@ -47,45 +48,29 @@ func newClientHandler(c *config.Config) *ClientHandler {
 
 func (h *ClientHandler) newClientManager(cmd *cobra.Command) *hydra.OAuth2Api {
 	c := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlashOrFail(cmd))
-
-	fakeTlsTermination, _ := cmd.Flags().GetBool("skip-tls-verify")
-	c.Configuration.Transport = &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: fakeTlsTermination},
-	}
-
-	if term, _ := cmd.Flags().GetBool("fake-tls-termination"); term {
-		c.Configuration.DefaultHeader["X-Forwarded-Proto"] = "https"
-	}
-
-	if token, _ := cmd.Flags().GetString("access-token"); token != "" {
-		c.Configuration.DefaultHeader["Authorization"] = "Bearer " + token
-	}
-
+	c.Configuration = configureClient(cmd, c.Configuration)
 	return c
 }
 
 func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
+	cmdx.MinArgs(cmd, args, 1)
 	m := h.newClientManager(cmd)
-
-	if len(args) == 0 {
-		fmt.Print(cmd.UsageString())
-		return
-	}
 
 	for _, path := range args {
 		reader, err := os.Open(path)
-		pkg.Must(err, "Could not open file %s: %s", path, err)
+		cmdx.Must(err, "Could not open file %s: %s", path, err)
+
 		var c hydra.OAuth2Client
 		err = json.NewDecoder(reader).Decode(&c)
-		pkg.Must(err, "Could not parse JSON: %s", err)
+		cmdx.Must(err, "Could not parse JSON from file %s: %s", path, err)
 
 		result, response, err := m.CreateOAuth2Client(c)
-		checkResponse(response, err, http.StatusCreated)
+		checkResponse(err, http.StatusCreated, response)
 
 		if c.ClientSecret == "" {
-			fmt.Printf("Imported OAuth 2.0 Client %s:%s from %s.\n", result.ClientId, result.ClientSecret, path)
+			fmt.Printf("Imported OAuth 2.0 Client %s:%s from: %s\n", result.ClientId, result.ClientSecret, path)
 		} else {
-			fmt.Printf("Imported OAuth 2.0 Client %s from %s.\n", result.ClientId, path)
+			fmt.Printf("Imported OAuth 2.0 Client %s from: %s\n", result.ClientId, path)
 		}
 	}
 }
@@ -93,58 +78,43 @@ func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	var err error
 	m := h.newClientManager(cmd)
-	responseTypes, _ := cmd.Flags().GetStringSlice("response-types")
-	grantTypes, _ := cmd.Flags().GetStringSlice("grant-types")
-	allowedScopes, _ := cmd.Flags().GetStringSlice("scope")
-	callbacks, _ := cmd.Flags().GetStringSlice("callbacks")
-	name, _ := cmd.Flags().GetString("name")
-	secret, _ := cmd.Flags().GetString("secret")
-	id, _ := cmd.Flags().GetString("id")
-	tokenEndpointAuthMethod, _ := cmd.Flags().GetString("token-endpoint-auth-method")
-	jwksUri, _ := cmd.Flags().GetString("jwks-uri")
-	tosUri, _ := cmd.Flags().GetString("tos-uri")
-	policyUri, _ := cmd.Flags().GetString("policy-uri")
-	logoUri, _ := cmd.Flags().GetString("logo-uri")
-	clientUri, _ := cmd.Flags().GetString("client-uri")
-	subjectType, _ := cmd.Flags().GetString("subject-type")
+	secret := flagx.MustGetString(cmd, "secret")
 
 	var echoSecret bool
-
 	if secret == "" {
 		var secretb []byte
 		secretb, err = pkg.GenerateSecret(26)
-		pkg.Must(err, "Could not generate OAuth 2.0 Client Secret: %s", err)
+		cmdx.Must(err, "Could not generate OAuth 2.0 Client Secret: %s", err)
 		secret = string(secretb)
 
 		echoSecret = true
 	} else {
-		fmt.Println("You should not provide secrets using command line flags. The secret might leak to bash history and similar systems.")
+		fmt.Println("You should not provide secrets using command line flags, the secret might leak to bash history and similar systems")
 	}
 
 	cc := hydra.OAuth2Client{
-		ClientId:                id,
+		ClientId:                flagx.MustGetString(cmd, "id"),
 		ClientSecret:            secret,
-		ResponseTypes:           responseTypes,
-		Scope:                   strings.Join(allowedScopes, " "),
-		GrantTypes:              grantTypes,
-		RedirectUris:            callbacks,
-		ClientName:              name,
-		TokenEndpointAuthMethod: tokenEndpointAuthMethod,
-		JwksUri:                 jwksUri,
-		TosUri:                  tosUri,
-		PolicyUri:               policyUri,
-		LogoUri:                 logoUri,
-		ClientUri:               clientUri,
-		SubjectType:             subjectType,
+		ResponseTypes:           flagx.MustGetStringSlice(cmd, "response-types"),
+		Scope:                   strings.Join(flagx.MustGetStringSlice(cmd, "scope"), " "),
+		GrantTypes:              flagx.MustGetStringSlice(cmd, "grant-types"),
+		RedirectUris:            flagx.MustGetStringSlice(cmd, "callbacks"),
+		ClientName:              flagx.MustGetString(cmd, "name"),
+		TokenEndpointAuthMethod: flagx.MustGetString(cmd, "token-endpoint-auth-method"),
+		JwksUri:                 flagx.MustGetString(cmd, "jwks-uri"),
+		TosUri:                  flagx.MustGetString(cmd, "tos-uri"),
+		PolicyUri:               flagx.MustGetString(cmd, "policy-uri"),
+		LogoUri:                 flagx.MustGetString(cmd, "logo-uri"),
+		ClientUri:               flagx.MustGetString(cmd, "client-uri"),
+		SubjectType:             flagx.MustGetString(cmd, "subject-type"),
 	}
 
 	result, response, err := m.CreateOAuth2Client(cc)
-	checkResponse(response, err, http.StatusCreated)
+	checkResponse(err, http.StatusCreated, response)
 
 	fmt.Printf("OAuth 2.0 Client ID: %s\n", result.ClientId)
-
 	if result.ClientSecret == "" {
-		fmt.Println("This OAuth 2.0 Client has no secret.")
+		fmt.Println("This OAuth 2.0 Client has no secret")
 	} else {
 		if echoSecret {
 			fmt.Printf("OAuth 2.0 Client Secret: %s\n", result.ClientSecret)
@@ -153,19 +123,15 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 }
 
 func (h *ClientHandler) DeleteClient(cmd *cobra.Command, args []string) {
+	cmdx.MinArgs(cmd, args, 1)
 	m := h.newClientManager(cmd)
-
-	if len(args) == 0 {
-		fmt.Print(cmd.UsageString())
-		return
-	}
 
 	for _, c := range args {
 		response, err := m.DeleteOAuth2Client(c)
-		checkResponse(response, err, http.StatusNoContent)
+		checkResponse(err, http.StatusNoContent, response)
 	}
 
-	fmt.Println("OAuth2 client(s) deleted.")
+	fmt.Println("OAuth2 client(s) deleted")
 }
 
 func (h *ClientHandler) GetClient(cmd *cobra.Command, args []string) {
@@ -177,6 +143,6 @@ func (h *ClientHandler) GetClient(cmd *cobra.Command, args []string) {
 	}
 
 	cl, response, err := m.GetOAuth2Client(args[0])
-	checkResponse(response, err, http.StatusOK)
-	fmt.Printf("%s\n", formatResponse(cl))
+	checkResponse(err, http.StatusOK, response)
+	fmt.Println(cmdx.FormatResponse(&cl))
 }

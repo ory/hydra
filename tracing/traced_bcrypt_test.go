@@ -1,12 +1,12 @@
 package tracing_test
 
 import (
+	"context"
 	"testing"
 
-	"context"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/ory/hydra/tracing"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCompare(t *testing.T) {

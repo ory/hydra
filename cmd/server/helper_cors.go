@@ -24,13 +24,14 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/rs/cors"
+
 	"github.com/ory/fosite"
 	"github.com/ory/go-convenience/stringslice"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/x/corsx"
-	"github.com/rs/cors"
 )
 
 func newCORSMiddleware(

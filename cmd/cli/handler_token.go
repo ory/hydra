@@ -21,7 +21,6 @@
 package cli
 
 import (
-	"crypto/tls"
 	"fmt"
 	"net/http"
 	"time"
@@ -30,6 +29,8 @@ import (
 
 	"github.com/ory/hydra/config"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
+	"github.com/ory/x/cmdx"
+	"github.com/ory/x/flagx"
 )
 
 type TokenHandler struct {
@@ -38,20 +39,7 @@ type TokenHandler struct {
 
 func (h *TokenHandler) newTokenManager(cmd *cobra.Command) *hydra.OAuth2Api {
 	c := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlashOrFail(cmd))
-
-	skipTLSTermination, _ := cmd.Flags().GetBool("skip-tls-verify")
-	c.Configuration.Transport = &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: skipTLSTermination},
-	}
-
-	if term, _ := cmd.Flags().GetBool("fake-tls-termination"); term {
-		c.Configuration.DefaultHeader["X-Forwarded-Proto"] = "https"
-	}
-
-	if token, _ := cmd.Flags().GetString("access-token"); token != "" {
-		c.Configuration.DefaultHeader["Authorization"] = "Bearer " + token
-	}
-
+	c.Configuration = configureClientWithoutAuth(cmd, c.Configuration)
 	return c
 }
 
@@ -60,51 +48,33 @@ func newTokenHandler(c *config.Config) *TokenHandler {
 }
 
 func (h *TokenHandler) RevokeToken(cmd *cobra.Command, args []string) {
-	if len(args) != 1 {
-		fmt.Print(cmd.UsageString())
-		return
-	}
+	cmdx.ExactArgs(cmd, args, 1)
 
 	handler := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlashOrFail(cmd))
+	handler.Configuration = configureClientWithoutAuth(cmd, handler.Configuration)
 
-	skipTLSTermination, _ := cmd.Flags().GetBool("skip-tls-verify")
-	handler.Configuration.Transport = &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: skipTLSTermination},
-	}
+	if clientID, clientSecret := flagx.MustGetString(cmd, "client-id"), flagx.MustGetString(cmd, "client-secret"); clientID == "" || clientSecret == "" {
+		cmdx.Fatalf(`%s
 
-	clientID, _ := cmd.Flags().GetString("client-id")
-	clientSecret, _ := cmd.Flags().GetString("client-secret")
-	if clientID == "" || clientSecret == "" {
-		fmt.Print(cmd.UsageString())
-		fmt.Println("Please provide a Client ID and Client Secret using flags --client-id and --client-secret, or environment variables OAUTH2_CLIENT_ID and OAUTH2_CLIENT_SECRET.")
-		return
-	}
-
-	handler.Configuration.Username = clientID
-	handler.Configuration.Password = clientSecret
-
-	if skip, _ := cmd.Flags().GetBool("skip-tls-verify"); skip {
-		handler.Configuration.Transport = &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}
-	}
-
-	if term, _ := cmd.Flags().GetBool("fake-tls-termination"); term {
-		handler.Configuration.DefaultHeader["X-Forwarded-Proto"] = "https"
+Please provide a Client ID and Client Secret using flags --client-id and --client-secret, or environment variables OAUTH2_CLIENT_ID and OAUTH2_CLIENT_SECRET
+`, cmd.UsageString())
+	} else {
+		handler.Configuration.Username = clientID
+		handler.Configuration.Password = clientSecret
 	}
 
 	token := args[0]
 	response, err := handler.RevokeOAuth2Token(args[0])
-	checkResponse(response, err, http.StatusOK)
-	fmt.Printf("Revoked token %s", token)
+	checkResponse(err, http.StatusOK, response)
+	fmt.Printf("Revoked OAuth 2.0 Access Token: %s\n", token)
 }
 
 func (h *TokenHandler) FlushTokens(cmd *cobra.Command, args []string) {
-	handler := h.newTokenManager(cmd)
-
-	minAge, _ := cmd.Flags().GetDuration("min-age")
-
-	response, err := handler.FlushInactiveOAuth2Tokens(hydra.FlushInactiveOAuth2TokensRequest{NotAfter: time.Now().Add(-minAge)})
-	checkResponse(response, err, http.StatusNoContent)
-	fmt.Println("Successfully flushed inactive access tokens.")
+	handler := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlashOrFail(cmd))
+	handler.Configuration = configureClient(cmd, handler.Configuration)
+	response, err := handler.FlushInactiveOAuth2Tokens(hydra.FlushInactiveOAuth2TokensRequest{
+		NotAfter: time.Now().Add(-flagx.MustGetDuration(cmd, "min-age")),
+	})
+	checkResponse(err, http.StatusNoContent, response)
+	fmt.Println("Successfully flushed inactive access tokens")
 }

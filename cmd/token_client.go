@@ -28,11 +28,13 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/ory/go-convenience/urlx"
-	"github.com/ory/hydra/pkg"
 	"github.com/spf13/cobra"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
+
+	"github.com/ory/go-convenience/urlx"
+	"github.com/ory/x/cmdx"
+	"github.com/ory/x/flagx"
 )
 
 type transporter struct {
@@ -54,19 +56,18 @@ var tokenClientCmd = &cobra.Command{
 	Short: "Generate an OAuth2 token the client grant type",
 	Long:  "This command uses the CLI's credentials to create an access token.",
 	Run: func(cmd *cobra.Command, args []string) {
-		fakeTlsTermination, _ := cmd.Flags().GetBool("fake-tls-termination")
 		ctx := context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{
 			Transport: &transporter{
-				FakeTLSTermination: fakeTlsTermination,
+				FakeTLSTermination: flagx.MustGetBool(cmd, "fake-tls-termination"),
 				Transport:          &http.Transport{},
 			},
 		})
 
-		if ok, _ := cmd.Flags().GetBool("skip-tls-verify"); ok {
+		if flagx.MustGetBool(cmd, "skip-tls-verify") {
 			// fmt.Println("Warning: Skipping TLS Certificate Verification.")
 			ctx = context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{
 				Transport: &transporter{
-					FakeTLSTermination: fakeTlsTermination,
+					FakeTLSTermination: true,
 					Transport: &http.Transport{
 						TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 					},
@@ -74,13 +75,12 @@ var tokenClientCmd = &cobra.Command{
 			})
 		}
 
-		scopes, _ := cmd.Flags().GetStringSlice("scope")
-
+		scopes := flagx.MustGetStringSlice(cmd, "scope")
 		cu, err := url.Parse(c.GetClusterURLWithoutTailingSlashOrFail(cmd))
-		pkg.Must(err, `Unable to parse cluster url ("%s"): %s`, c.GetClusterURLWithoutTailingSlashOrFail(cmd), err)
+		cmdx.Must(err, `Unable to parse cluster url ("%s"): %s`, c.GetClusterURLWithoutTailingSlashOrFail(cmd), err)
 
-		clientID, _ := cmd.Flags().GetString("client-id")
-		clientSecret, _ := cmd.Flags().GetString("client-secret")
+		clientID := flagx.MustGetString(cmd, "client-id")
+		clientSecret := flagx.MustGetString(cmd, "client-secret")
 		if clientID == "" || clientSecret == "" {
 			fmt.Print(cmd.UsageString())
 			fmt.Println("Please provide a Client ID and Client Secret using flags --client-id and --client-secret, or environment variables OAUTH2_CLIENT_ID and OAUTH2_CLIENT_SECRET.")
@@ -95,9 +95,9 @@ var tokenClientCmd = &cobra.Command{
 		}
 
 		t, err := oauthConfig.Token(ctx)
-		pkg.Must(err, "Could not retrieve access token because: %s", err)
+		cmdx.Must(err, "Could not retrieve access token because: %s", err)
 
-		if verbose, _ := cmd.Flags().GetBool("verbose"); verbose {
+		if flagx.MustGetBool(cmd, "verbose") {
 			fmt.Printf("%+v\n", t)
 		} else {
 			fmt.Printf("%s\n", t.AccessToken)
@@ -113,5 +113,4 @@ func init() {
 	tokenClientCmd.Flags().String("client-id", os.Getenv("OAUTH2_CLIENT_ID"), "Use the provided OAuth 2.0 Client ID, defaults to environment variable OAUTH2_CLIENT_ID")
 	tokenClientCmd.Flags().String("client-secret", os.Getenv("OAUTH2_CLIENT_SECRET"), "Use the provided OAuth 2.0 Client Secret, defaults to environment variable OAUTH2_CLIENT_SECRET")
 	tokenClientCmd.PersistentFlags().String("endpoint", os.Getenv("HYDRA_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_URL")
-
 }

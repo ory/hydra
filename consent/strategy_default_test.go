@@ -21,6 +21,7 @@
 package consent
 
 import (
+	"context"
 	"crypto/rand"
 	"crypto/rsa"
 	"encoding/json"
@@ -34,11 +35,13 @@ import (
 	"testing"
 	"time"
 
-	"context"
-
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
@@ -46,9 +49,6 @@ import (
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/sdk/go/hydra/swagger"
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func mustRSAKey() *rsa.PrivateKey {

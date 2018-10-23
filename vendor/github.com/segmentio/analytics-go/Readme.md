@@ -20,7 +20,7 @@ The links bellow should provide all the documentation needed to make the best
 use of the library and the Segment API:
 
 - [Documentation](https://segment.com/docs/libraries/go/)
-- [godoc](https://godoc.org/github.com/segmentio/analytics-go)
+- [godoc](https://godoc.org/gopkg.in/segmentio/analytics-go.v3)
 - [API](https://segment.com/docs/libraries/http/)
 - [Specs](https://segment.com/docs/spec/)
 

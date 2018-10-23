@@ -21,19 +21,15 @@
 package cli
 
 import (
-	"crypto/tls"
-	//"context"
-	//"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
+	"strings" //"encoding/json"
 
-	"github.com/ory/hydra/config"
-	//"github.com/ory/hydra/oauth2"
-
-	"github.com/spf13/cobra"
-
+	"github.com/ory/hydra/config" //"github.com/ory/hydra/oauth2"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
+	"github.com/ory/x/cmdx"
+	"github.com/ory/x/flagx" //"context"
+	"github.com/spf13/cobra"
 )
 
 type IntrospectionHandler struct {
@@ -47,15 +43,13 @@ func newIntrospectionHandler(c *config.Config) *IntrospectionHandler {
 }
 
 func (h *IntrospectionHandler) Introspect(cmd *cobra.Command, args []string) {
-	if len(args) != 1 {
-		fmt.Print(cmd.UsageString())
-		return
-	}
+	cmdx.ExactArgs(cmd, args, 1)
 
 	c := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlashOrFail(cmd))
+	c.Configuration = configureClient(cmd, c.Configuration)
 
-	clientID, _ := cmd.Flags().GetString("client-id")
-	clientSecret, _ := cmd.Flags().GetString("client-secret")
+	clientID := flagx.MustGetString(cmd, "client-id")
+	clientSecret := flagx.MustGetString(cmd, "client-secret")
 	if clientID != "" || clientSecret != "" {
 		c.Configuration.Username = clientID
 		c.Configuration.Password = clientSecret
@@ -63,17 +57,7 @@ func (h *IntrospectionHandler) Introspect(cmd *cobra.Command, args []string) {
 		fmt.Println("No OAuth 2.0 Client ID an secret set, skipping authorization header. This might fail if the introspection endpoint is protected.")
 	}
 
-	skipTLSTermination, _ := cmd.Flags().GetBool("skip-tls-verify")
-	c.Configuration.Transport = &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: skipTLSTermination},
-	}
-
-	if term, _ := cmd.Flags().GetBool("fake-tls-termination"); term {
-		c.Configuration.DefaultHeader["X-Forwarded-Proto"] = "https"
-	}
-
-	scopes, _ := cmd.Flags().GetStringSlice("scope")
-	result, response, err := c.IntrospectOAuth2Token(args[0], strings.Join(scopes, " "))
-	checkResponse(response, err, http.StatusOK)
-	fmt.Printf("%s\n", formatResponse(result))
+	result, response, err := c.IntrospectOAuth2Token(args[0], strings.Join(flagx.MustGetStringSlice(cmd, "scope"), " "))
+	checkResponse(err, http.StatusOK, response)
+	fmt.Println(formatResponse(result))
 }

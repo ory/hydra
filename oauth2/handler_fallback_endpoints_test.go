@@ -27,9 +27,10 @@ import (
 	"testing"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory/fosite"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/ory/fosite"
 )
 
 func TestHandlerConsent(t *testing.T) {

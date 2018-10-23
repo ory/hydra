@@ -24,7 +24,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-
 	"strings"
 
 	"github.com/ory/hydra/sdk/go/hydra/swagger"

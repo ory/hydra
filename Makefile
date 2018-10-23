@@ -1,8 +1,8 @@
 init:
 		go get -u \
-			github.com/x/tools/listx \
+			github.com/ory/x/tools/listx \
 			github.com/sqs/goreturns \
-			github.com/golang/mock \
+			github.com/golang/mock/mockgen \
 			github.com/go-swagger/go-swagger/cmd/swagger
 
 format:

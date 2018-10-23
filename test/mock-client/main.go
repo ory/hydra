@@ -21,6 +21,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -30,7 +31,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/oauth2"
+
+	"github.com/ory/hydra/sdk/go/hydra/swagger"
 )
 
 func main() {
@@ -69,20 +73,64 @@ func main() {
 	if err != nil {
 		log.Fatalf("Unable to make request: %s", err)
 	}
-	defer resp.Body.Close()
 
 	out, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatalf("Unable to read body: %s", err)
 	}
+	resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		log.Fatalf("Got status code %d and body %s", resp.StatusCode, out)
+	}
+
+	var token oauth2.Token
+	if err := json.Unmarshal(out, &token); err != nil {
+		log.Fatalf("Unable transform to token: %s", err)
 	}
 
 	for _, c := range c.Cookies(u) {
 		if c.Name == "oauth2_authentication_session" {
 			fmt.Print(c.Value)
 		}
+	}
+
+	resp, err = http.PostForm(strings.TrimRight(os.Getenv("HYDRA_ADMIN_URL"), "/")+"/oauth2/introspect", url.Values{"token": {token.AccessToken}})
+	if err != nil {
+		log.Fatalf("Unable to make introspection request: %s", err)
+	} else if resp.StatusCode != http.StatusOK {
+		log.Fatalf("Unable to make introspection request: got status code %d", resp.StatusCode)
+	}
+
+	var intro swagger.OAuth2TokenIntrospection
+	if err := json.NewDecoder(resp.Body).Decode(&intro); err != nil {
+		log.Fatalf("Unable to decode introspection response: %s", err)
+	}
+	resp.Body.Close()
+
+	if intro.Sub != "the-subject" {
+		log.Fatalf("Expected subject from access token to be %s but got %s", "the-subject", intro.Sub)
+	}
+
+	if intro.Ext["foo"] != "bar" {
+		log.Fatalf("Expected extra field \"foo\" from access token to be \"bar\" but got %s", intro.Ext["foo"])
+	}
+
+	payload, err := jwt.DecodeSegment(strings.Split(fmt.Sprintf("%s", token.Extra("id_token")), ".")[1])
+	if err != nil {
+		log.Fatalf("Unable to decode id token segment: %s", err)
+	}
+
+	var claims map[string]interface{}
+	if err := json.Unmarshal(payload, &claims); err != nil {
+		log.Fatalf("Unable to unmarshal id token body: %s", err)
+	}
+
+	if fmt.Sprintf("%s", claims["sub"]) != "the-subject" {
+		log.Fatalf("Expected subject from id token to be %s but got %s", "the-subject", claims["sub"])
+	}
+
+	if fmt.Sprintf("%s", claims["foo"]) != "bar" {
+		log.Fatalf("Expected extra field \"foo\" from access token to be \"bar\" but got %s", intro.Ext["foo"])
 	}
 }

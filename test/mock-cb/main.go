@@ -22,6 +22,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"net/http"
 	"os"
@@ -53,7 +54,10 @@ func callback(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rw.Write([]byte(`access_token=` + token.AccessToken))
+	if err := json.NewEncoder(rw).Encode(token); err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func main() {

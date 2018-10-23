@@ -47,7 +47,7 @@ func login(rw http.ResponseWriter, r *http.Request) {
 			remember = true
 		}
 		v, resp, err = client.AcceptLoginRequest(challenge, swagger.AcceptLoginRequest{
-			Subject:  "foobar",
+			Subject:  "the-subject",
 			Remember: remember,
 		})
 	} else {
@@ -81,6 +81,10 @@ func consent(rw http.ResponseWriter, r *http.Request) {
 		v, resp, err = client.AcceptConsentRequest(challenge, swagger.AcceptConsentRequest{
 			GrantScope: o.RequestedScope,
 			Remember:   remember,
+			Session: swagger.ConsentRequestSession{
+				AccessToken: map[string]interface{}{"foo": "bar"},
+				IdToken:     map[string]interface{}{"baz": "bar"},
+			},
 		})
 	} else {
 		v, resp, err = client.RejectConsentRequest(challenge, swagger.RejectRequest{

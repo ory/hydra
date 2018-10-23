@@ -10,3 +10,4 @@ scripts/
 sdk/js
 sdk/php
 docs/
+vendor/

@@ -89,6 +89,8 @@ func main() {
 		log.Fatalf("Unable transform to token: %s", err)
 	}
 
+	log.Printf("Got token: %+v", token)
+
 	for _, c := range c.Cookies(u) {
 		if c.Name == "oauth2_authentication_session" {
 			fmt.Print(c.Value)
@@ -116,7 +118,12 @@ func main() {
 		log.Fatalf("Expected extra field \"foo\" from access token to be \"bar\" but got %s", intro.Ext["foo"])
 	}
 
-	payload, err := jwt.DecodeSegment(strings.Split(fmt.Sprintf("%s", token.Extra("id_token")), ".")[1])
+	idt := fmt.Sprintf("%s", token.Extra("id_token"))
+	if len(idt) == 0 {
+		log.Fatalf("ID Token does not seem to be set: %+v", token)
+	}
+
+	payload, err := jwt.DecodeSegment(strings.Split(idt, ".")[1])
 	if err != nil {
 		log.Fatalf("Unable to decode id token segment: %s", err)
 	}

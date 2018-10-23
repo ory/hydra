@@ -95,7 +95,7 @@ func RunServePublic(c *config.Config) func(cmd *cobra.Command, args []string) {
 		wg.Add(2)
 
 		cert := getOrCreateTLSCertificate(cmd, c)
-		go serve(c, cmd, EnhanceRouter(c, cmd, serverHandler, frontend, mws, false), c.GetFrontendAddress(), &wg, cert)
+		go serve(c, cmd, EnhanceRouter(c, cmd, serverHandler, frontend, mws, viper.GetString("CORS_ENABLED") == "true"), c.GetFrontendAddress(), &wg, cert)
 		// go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, backend), c.GetBackendAddress(), &wg)
 
 		wg.Wait()
@@ -111,8 +111,9 @@ func RunServeAll(c *config.Config) func(cmd *cobra.Command, args []string) {
 		wg.Add(2)
 
 		cert := getOrCreateTLSCertificate(cmd, c)
-		go serve(c, cmd, EnhanceRouter(c, cmd, serverHandler, frontend, mws, false), c.GetFrontendAddress(), &wg, cert)
-		go serve(c, cmd, EnhanceRouter(c, cmd, serverHandler, backend, mws, viper.GetString("CORS_ENABLED") == "true"), c.GetBackendAddress(), &wg, cert)
+		corsEnabled := viper.GetString("CORS_ENABLED") == "true"
+		go serve(c, cmd, EnhanceRouter(c, cmd, serverHandler, frontend, mws, corsEnabled), c.GetFrontendAddress(), &wg, cert)
+		go serve(c, cmd, EnhanceRouter(c, cmd, serverHandler, backend, mws, corsEnabled), c.GetBackendAddress(), &wg, cert)
 
 		wg.Wait()
 	}

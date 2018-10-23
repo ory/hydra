@@ -11,8 +11,9 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff"
-	dc "github.com/ory/dockertest/docker"
 	"github.com/pkg/errors"
+
+	dc "github.com/ory/dockertest/docker"
 )
 
 // Pool represents a connection to the docker API and is used to create and remove docker images.

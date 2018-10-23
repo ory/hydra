@@ -22,15 +22,15 @@
 package oauth2
 
 import (
+	"context"
 	"strings"
 	"time"
 
-	"context"
-
 	jwtx "github.com/dgrijalva/jwt-go"
+	"github.com/pkg/errors"
+
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/token/jwt"
-	"github.com/pkg/errors"
 )
 
 // DefaultJWTStrategy is a JWT RS256 strategy.

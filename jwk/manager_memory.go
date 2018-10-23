@@ -26,10 +26,10 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/ory/fosite"
 	"github.com/pkg/errors"
 	"gopkg.in/square/go-jose.v2"
 
+	"github.com/ory/fosite"
 	"github.com/ory/hydra/pkg"
 )
 

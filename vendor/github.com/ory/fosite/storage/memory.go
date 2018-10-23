@@ -24,8 +24,9 @@ package storage
 import (
 	"context"
 
-	"github.com/ory/fosite"
 	"github.com/pkg/errors"
+
+	"github.com/ory/fosite"
 )
 
 type MemoryUserRelation struct {
@@ -49,14 +50,14 @@ type MemoryStore struct {
 
 func NewMemoryStore() *MemoryStore {
 	return &MemoryStore{
-		Clients:        make(map[string]fosite.Client),
-		AuthorizeCodes: make(map[string]StoreAuthorizeCode),
-		IDSessions:     make(map[string]fosite.Requester),
-		AccessTokens:   make(map[string]fosite.Requester),
-		Implicit:       make(map[string]fosite.Requester),
-		RefreshTokens:  make(map[string]fosite.Requester),
-		PKCES:          make(map[string]fosite.Requester),
-		Users:          make(map[string]MemoryUserRelation),
+		Clients:                make(map[string]fosite.Client),
+		AuthorizeCodes:         make(map[string]StoreAuthorizeCode),
+		IDSessions:             make(map[string]fosite.Requester),
+		AccessTokens:           make(map[string]fosite.Requester),
+		Implicit:               make(map[string]fosite.Requester),
+		RefreshTokens:          make(map[string]fosite.Requester),
+		PKCES:                  make(map[string]fosite.Requester),
+		Users:                  make(map[string]MemoryUserRelation),
 		AccessTokenRequestIDs:  make(map[string]string),
 		RefreshTokenRequestIDs: make(map[string]string),
 	}
@@ -96,11 +97,11 @@ func NewExampleStore() *MemoryStore {
 				Password: "secret",
 			},
 		},
-		AuthorizeCodes: map[string]StoreAuthorizeCode{},
-		Implicit:       map[string]fosite.Requester{},
-		AccessTokens:   map[string]fosite.Requester{},
-		RefreshTokens:  map[string]fosite.Requester{},
-		PKCES:          map[string]fosite.Requester{},
+		AuthorizeCodes:         map[string]StoreAuthorizeCode{},
+		Implicit:               map[string]fosite.Requester{},
+		AccessTokens:           map[string]fosite.Requester{},
+		RefreshTokens:          map[string]fosite.Requester{},
+		PKCES:                  map[string]fosite.Requester{},
 		AccessTokenRequestIDs:  map[string]string{},
 		RefreshTokenRequestIDs: map[string]string{},
 	}

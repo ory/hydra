@@ -24,9 +24,10 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/ory/fosite"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/ory/fosite"
 )
 
 var (

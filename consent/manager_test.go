@@ -29,12 +29,12 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
-	"github.com/ory/fosite"
-	"github.com/ory/x/sqlcon/dockertest"
 
+	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	. "github.com/ory/hydra/consent"
 	"github.com/ory/hydra/oauth2"
+	"github.com/ory/x/sqlcon/dockertest"
 )
 
 var m sync.Mutex

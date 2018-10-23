@@ -23,7 +23,6 @@ package config
 import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/oauth2"
-
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/pkg"

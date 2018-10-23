@@ -3,7 +3,6 @@ package mount // import "github.com/ory/dockertest/docker/pkg/mount"
 import (
 	"sort"
 	"strings"
-
 	"syscall"
 
 	"github.com/sirupsen/logrus"

@@ -11,9 +11,10 @@ import (
 	"path/filepath"
 	"syscall"
 
+	"golang.org/x/sys/unix"
+
 	"github.com/ory/dockertest/docker/pkg/idtools"
 	"github.com/ory/dockertest/docker/pkg/system"
-	"golang.org/x/sys/unix"
 )
 
 // fixVolumePathPrefix does platform specific processing to ensure that if

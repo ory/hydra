@@ -30,6 +30,9 @@ import (
 
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"
+	"github.com/pborman/uuid"
+	"github.com/pkg/errors"
+
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
@@ -37,9 +40,6 @@ import (
 	"github.com/ory/go-convenience/stringslice"
 	"github.com/ory/go-convenience/stringsx"
 	"github.com/ory/go-convenience/urlx"
-	"github.com/pborman/uuid"
-	"github.com/pkg/errors"
-
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/pkg"
 )

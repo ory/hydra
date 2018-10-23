@@ -24,7 +24,6 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"github.com/ory/x/cmdx"
 	"net/http"
 	"net/url"
 	"os"
@@ -33,12 +32,14 @@ import (
 	"time"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory/go-convenience/urlx"
 	"github.com/spf13/cobra"
 	"github.com/toqueteos/webbrowser"
 	"golang.org/x/oauth2"
 
-	"github.com/ory/hydra/rand/sequence"
+	"github.com/ory/go-convenience/urlx"
+	"github.com/ory/x/cmdx"
+	"github.com/ory/x/flagx"
+	"github.com/ory/x/randx"
 )
 
 // tokenUserCmd represents the token command
@@ -48,23 +49,23 @@ var tokenUserCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		if ok, _ := cmd.Flags().GetBool("skip-tls-verify"); ok {
+		if flagx.MustGetBool(cmd, "skip-tls-verify") {
 			// fmt.Println("Warning: Skipping TLS Certificate Verification.")
 			ctx = context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			}})
 		}
 
-		port, _ := cmd.Flags().GetInt("port")
-		scopes, _ := cmd.Flags().GetStringSlice("scope")
-		prompt, _ := cmd.Flags().GetStringSlice("prompt")
-		maxAge, _ := cmd.Flags().GetInt("max-age")
-		redirectUrl, _ := cmd.Flags().GetString("redirect")
-		backend, _ := cmd.Flags().GetString("token-url")
-		frontend, _ := cmd.Flags().GetString("auth-url")
+		port := flagx.MustGetInt(cmd, "port")
+		scopes := flagx.MustGetStringSlice(cmd, "scope")
+		prompt := flagx.MustGetStringSlice(cmd, "prompt")
+		maxAge := flagx.MustGetInt(cmd, "max-age")
+		redirectUrl := flagx.MustGetString(cmd, "redirect")
+		backend := flagx.MustGetString(cmd, "token-url")
+		frontend := flagx.MustGetString(cmd, "auth-url")
 
-		clientID, _ := cmd.Flags().GetString("client-id")
-		clientSecret, _ := cmd.Flags().GetString("client-secret")
+		clientID := flagx.MustGetString(cmd, "client-id")
+		clientSecret := flagx.MustGetString(cmd, "client-secret")
 		if clientID == "" || clientSecret == "" {
 			fmt.Print(cmd.UsageString())
 			fmt.Println("Please provide a Client ID and Client Secret using flags --client-id and --client-secret, or environment variables OAUTH2_CLIENT_ID and OAUTH2_CLIENT_SECRET.")
@@ -98,15 +99,15 @@ var tokenUserCmd = &cobra.Command{
 			Scopes:      scopes,
 		}
 
-		state, err := sequence.RuneSequence(24, sequence.AlphaLower)
+		state, err := randx.RuneSequence(24, randx.AlphaLower)
 		cmdx.Must(err, "Could not generate random state: %s", err)
 
-		nonce, err := sequence.RuneSequence(24, sequence.AlphaLower)
+		nonce, err := randx.RuneSequence(24, randx.AlphaLower)
 		cmdx.Must(err, "Could not generate random state: %s", err)
 
 		authCodeURL := conf.AuthCodeURL(string(state)) + "&nonce=" + string(nonce) + "&prompt=" + strings.Join(prompt, "+") + "&max_age=" + strconv.Itoa(maxAge)
 
-		if ok, _ := cmd.Flags().GetBool("no-open"); !ok {
+		if flagx.MustGetBool(cmd, "no-open") {
 			webbrowser.Open(serverLocation)
 		}
 

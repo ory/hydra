@@ -8,8 +8,9 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/ory/dockertest"
 	"github.com/pkg/errors"
+
+	"github.com/ory/dockertest"
 )
 
 //atexit := atexit.NewOnExit()

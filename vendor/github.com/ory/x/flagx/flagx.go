@@ -3,8 +3,9 @@ package flagx
 import (
 	"time"
 
-	"github.com/ory/x/cmdx"
 	"github.com/spf13/cobra"
+
+	"github.com/ory/x/cmdx"
 )
 
 func MustGetBool(cmd *cobra.Command, name string) bool {

@@ -29,11 +29,11 @@ import (
 
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory/herodot"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/ory/herodot"
 	. "github.com/ory/hydra/consent"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/sdk/go/hydra"

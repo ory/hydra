@@ -26,11 +26,12 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ory/fosite"
-	"github.com/ory/x/sqlcon"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/fosite"
+	"github.com/ory/x/sqlcon"
 )
 
 func TestErrorEnhancer(t *testing.T) {

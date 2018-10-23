@@ -28,23 +28,23 @@ import (
 
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
+	"github.com/pborman/uuid"
+	"github.com/spf13/viper"
+
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/go-convenience/stringslice"
 	"github.com/ory/herodot"
-	"github.com/ory/x/cmdx"
-	"github.com/ory/x/serverx"
-	"github.com/pborman/uuid"
-	"github.com/spf13/viper"
-
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/tracing"
+	"github.com/ory/x/cmdx"
+	"github.com/ory/x/serverx"
 )
 
 func injectFositeStore(c *config.Config, clients client.Manager) {

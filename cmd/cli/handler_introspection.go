@@ -23,13 +23,12 @@ package cli
 import (
 	"fmt"
 	"net/http"
-	"strings"
+	"strings" //"encoding/json"
 
-	"github.com/ory/x/cmdx"
-	"github.com/ory/x/flagx" //"context"
-	//"encoding/json"
 	"github.com/ory/hydra/config" //"github.com/ory/hydra/oauth2"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
+	"github.com/ory/x/cmdx"
+	"github.com/ory/x/flagx" //"context"
 	"github.com/spf13/cobra"
 )
 

@@ -26,8 +26,9 @@ import (
 	"strings"
 
 	jwt2 "github.com/dgrijalva/jwt-go"
-	"github.com/ory/fosite/token/jwt"
 	"github.com/pkg/errors"
+
+	"github.com/ory/fosite/token/jwt"
 )
 
 type JWTStrategy interface {

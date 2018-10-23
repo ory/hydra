@@ -9,8 +9,9 @@ import (
 	"syscall"
 	"unsafe"
 
-	"github.com/ory/dockertest/docker/pkg/system"
 	"golang.org/x/sys/unix"
+
+	"github.com/ory/dockertest/docker/pkg/system"
 )
 
 // walker is used to implement collectFileInfoForChanges on linux. Where this

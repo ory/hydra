@@ -18,7 +18,6 @@ import (
 	"fmt"
 
 	"github.com/opentracing/opentracing-go/log"
-
 	j "github.com/uber/jaeger-client-go/thrift-gen/jaeger"
 )
 

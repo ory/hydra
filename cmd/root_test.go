@@ -23,7 +23,6 @@ package cmd
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/ory/x/healthx"
 	"net/http"
 	"os"
 	"testing"
@@ -31,6 +30,8 @@ import (
 
 	"github.com/phayes/freeport"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/ory/x/healthx"
 )
 
 var frontendPort, backendPort int

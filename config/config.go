@@ -23,7 +23,6 @@ package config
 import (
 	"crypto/sha256"
 	"fmt"
-	"github.com/ory/x/cmdx"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -34,21 +33,22 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
-	"github.com/ory/fosite"
-	foauth2 "github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/token/hmac"
-	"github.com/ory/go-convenience/stringslice"
-	"github.com/ory/go-convenience/urlx"
-	"github.com/ory/x/healthx"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
 
+	"github.com/ory/fosite"
+	foauth2 "github.com/ory/fosite/handler/oauth2"
+	"github.com/ory/fosite/token/hmac"
+	"github.com/ory/go-convenience/stringslice"
+	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/tracing"
+	"github.com/ory/x/cmdx"
+	"github.com/ory/x/healthx"
 )
 
 type Config struct {

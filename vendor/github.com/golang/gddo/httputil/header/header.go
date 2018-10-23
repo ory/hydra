@@ -264,7 +264,7 @@ func expectQuality(s string) (q float64, rest string) {
 
 func expectTokenOrQuoted(s string) (value string, rest string) {
 	if !strings.HasPrefix(s, "\"") {
-		return expectToken(s)
+		return "", expectToken(s)
 	}
 	s = s[1:]
 	for i := 0; i < len(s); i++ {

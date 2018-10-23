@@ -22,11 +22,10 @@
 package fosite
 
 import (
+	"context"
 	"net/http"
 	"net/url"
 	"time"
-
-	"context"
 )
 
 const MinParameterEntropy = 8

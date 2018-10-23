@@ -7,9 +7,10 @@
 package httputil
 
 import (
-	"github.com/golang/gddo/httputil/header"
 	"net/http"
 	"strings"
+
+	"github.com/golang/gddo/httputil/header"
 )
 
 // NegotiateContentEncoding returns the best offered content encoding for the

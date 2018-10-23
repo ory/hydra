@@ -27,11 +27,12 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/pborman/uuid"
+	"github.com/pkg/errors"
+
 	"github.com/ory/fosite"
 	"github.com/ory/go-convenience/stringslice"
 	"github.com/ory/go-convenience/stringsx"
-	"github.com/pborman/uuid"
-	"github.com/pkg/errors"
 )
 
 type Validator struct {

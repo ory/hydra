@@ -27,12 +27,13 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/ory/fosite"
-	"github.com/ory/go-convenience/stringsx"
-	"github.com/ory/x/sqlcon"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
 	"gopkg.in/square/go-jose.v2"
+
+	"github.com/ory/fosite"
+	"github.com/ory/go-convenience/stringsx"
+	"github.com/ory/x/sqlcon"
 )
 
 var sharedMigrations = []*migrate.Migration{

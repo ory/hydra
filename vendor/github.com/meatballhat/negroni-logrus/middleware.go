@@ -161,9 +161,9 @@ func DefaultBefore(entry *logrus.Entry, req *http.Request, remoteAddr string) *l
 // DefaultAfter is the default func assigned to *Middleware.After
 func DefaultAfter(entry *logrus.Entry, res negroni.ResponseWriter, latency time.Duration, name string) *logrus.Entry {
 	return entry.WithFields(logrus.Fields{
-		"status":      res.Status(),
-		"text_status": http.StatusText(res.Status()),
-		"took":        latency,
+		"status":                                res.Status(),
+		"text_status":                           http.StatusText(res.Status()),
+		"took":                                  latency,
 		fmt.Sprintf("measure#%s.latency", name): latency.Nanoseconds(),
 	})
 }

@@ -13,8 +13,9 @@ import (
 	"os"
 	"path"
 
-	"github.com/ory/dockertest/docker/pkg/archive"
 	"github.com/sirupsen/logrus"
+
+	"github.com/ory/dockertest/docker/pkg/archive"
 )
 
 var (

@@ -22,12 +22,12 @@ package server
 
 import (
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory/herodot"
-	"github.com/ory/x/serverx"
 
+	"github.com/ory/herodot"
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
+	"github.com/ory/x/serverx"
 )
 
 func injectJWKManager(c *config.Config) {

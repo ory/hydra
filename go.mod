@@ -30,7 +30,7 @@ require (
 	github.com/ory/go-convenience v0.1.0
 	github.com/ory/graceful v0.1.0
 	github.com/ory/herodot v0.4.1
-	github.com/ory/x v0.0.13
+	github.com/ory/x v0.0.19
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.8.0
@@ -39,11 +39,12 @@ require (
 	github.com/prometheus/client_model v0.0.0-20171117100541-99fa1f4be8e5 // indirect
 	github.com/prometheus/common v0.0.0-20180426121432-d811d2e9bf89 // indirect
 	github.com/prometheus/procfs v0.0.0-20180408092902-8b1c2da0d56d // indirect
-	github.com/rs/cors v1.5.1-0.20181001164945-9a47f48565a7
+	github.com/rs/cors v1.6.0
 	github.com/rubenv/sql-migrate v0.0.0-20170824124545-79fe99e24311
 	github.com/sirupsen/logrus v1.1.1
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/viper v1.2.1
+	github.com/sqs/goreturns v0.0.0-20180302073349-83e02874ec12 // indirect
 	github.com/stretchr/testify v1.2.2
 	github.com/toqueteos/webbrowser v0.0.0-20150720201625-21fc9f95c834
 	github.com/uber-go/atomic v1.3.2 // indirect

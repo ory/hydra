@@ -23,9 +23,9 @@ package config
 import (
 	"time"
 
-	"github.com/ory/fosite"
 	"github.com/sirupsen/logrus"
 
+	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"

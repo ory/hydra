@@ -22,10 +22,10 @@ package server
 
 import (
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory/x/healthx"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/ory/hydra/config"
+	"github.com/ory/x/healthx"
 )
 
 const (

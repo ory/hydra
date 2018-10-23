@@ -18,7 +18,6 @@ import (
 	"time"
 
 	"github.com/opentracing/opentracing-go"
-
 	"github.com/uber/jaeger-client-go/internal/baggage"
 	"github.com/uber/jaeger-client-go/internal/throttler"
 )

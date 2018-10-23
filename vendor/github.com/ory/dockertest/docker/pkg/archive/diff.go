@@ -10,10 +10,11 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/ory/dockertest/docker/pkg/idtools"
 	"github.com/ory/dockertest/docker/pkg/pools"
 	"github.com/ory/dockertest/docker/pkg/system"
-	"github.com/sirupsen/logrus"
 )
 
 // UnpackLayer unpack `layer` to a `dest`. The stream `layer` can be

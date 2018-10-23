@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"net"
 	"strings"
-
 )
 
 // Version returns version information about the docker server.

@@ -25,12 +25,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/ory/x/cmdx"
-	"github.com/ory/x/flagx"
 	"github.com/spf13/cobra"
 
 	"github.com/ory/hydra/config"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
+	"github.com/ory/x/cmdx"
+	"github.com/ory/x/flagx"
 )
 
 type TokenHandler struct {

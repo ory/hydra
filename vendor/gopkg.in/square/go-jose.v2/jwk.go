@@ -30,7 +30,6 @@ import (
 	"strings"
 
 	"golang.org/x/crypto/ed25519"
-
 	"gopkg.in/square/go-jose.v2/json"
 )
 

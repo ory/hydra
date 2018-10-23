@@ -20,12 +20,12 @@
 
 package pkg
 
-import "github.com/ory/hydra/rand/sequence"
+import "github.com/ory/x/randx"
 
 var secretCharSet = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-.~")
 
 func GenerateSecret(length int) ([]byte, error) {
-	secret, err := sequence.RuneSequence(length, secretCharSet)
+	secret, err := randx.RuneSequence(length, secretCharSet)
 	if err != nil {
 		return []byte{}, err
 	}

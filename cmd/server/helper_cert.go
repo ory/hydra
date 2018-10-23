@@ -26,12 +26,12 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 
-	"github.com/ory/x/tlsx"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/jwk"
+	"github.com/ory/x/tlsx"
 )
 
 const (

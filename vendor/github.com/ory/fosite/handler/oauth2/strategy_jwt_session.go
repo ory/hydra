@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/mohae/deepcopy"
+
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/token/jwt"
 )

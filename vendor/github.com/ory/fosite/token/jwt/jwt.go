@@ -25,16 +25,16 @@
 package jwt
 
 import (
+	"context"
 	"crypto/rsa"
 	"crypto/sha256"
 	"fmt"
 	"strings"
 
-	"context"
-
 	"github.com/dgrijalva/jwt-go"
-	"github.com/ory/fosite"
 	"github.com/pkg/errors"
+
+	"github.com/ory/fosite"
 )
 
 type JWTStrategy interface {

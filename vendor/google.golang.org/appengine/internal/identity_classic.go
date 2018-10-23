@@ -7,9 +7,9 @@
 package internal
 
 import (
-	"appengine"
-
 	netcontext "golang.org/x/net/context"
+
+	"appengine"
 )
 
 func DefaultVersionHostname(ctx netcontext.Context) string {

@@ -24,14 +24,16 @@ package openid
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"time"
+
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/mohae/deepcopy"
+	"github.com/pkg/errors"
+
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/go-convenience/stringslice"
-	"github.com/pkg/errors"
-	"strconv"
-	"time"
 )
 
 const defaultExpiryTime = time.Hour

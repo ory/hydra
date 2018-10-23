@@ -28,13 +28,13 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/ory/fosite"
-	"github.com/ory/x/sqlcon"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
 
+	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/pkg"
+	"github.com/ory/x/sqlcon"
 )
 
 type SQLManager struct {

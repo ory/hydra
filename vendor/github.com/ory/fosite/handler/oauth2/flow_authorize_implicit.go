@@ -22,14 +22,14 @@
 package oauth2
 
 import (
+	"context"
+	"strconv"
 	"strings"
 	"time"
 
-	"context"
-	"strconv"
+	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
-	"github.com/pkg/errors"
 )
 
 // AuthorizeImplicitGrantTypeHandler is a response handler for the Authorize Code grant using the implicit grant type

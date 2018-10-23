@@ -1,14 +1,13 @@
 package analytics
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
-	"sync"
-
-	"bytes"
-	"encoding/json"
 	"net/http"
+	"sync"
 	"time"
 )
 

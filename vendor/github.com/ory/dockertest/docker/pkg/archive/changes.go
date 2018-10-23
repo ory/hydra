@@ -13,10 +13,11 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/ory/dockertest/docker/pkg/idtools"
 	"github.com/ory/dockertest/docker/pkg/pools"
 	"github.com/ory/dockertest/docker/pkg/system"
-	"github.com/sirupsen/logrus"
 )
 
 // ChangeType represents the change type.

@@ -21,9 +21,8 @@ import (
 
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
-	"github.com/uber/jaeger-lib/metrics"
-
 	jaeger "github.com/uber/jaeger-client-go"
+	"github.com/uber/jaeger-lib/metrics"
 )
 
 const defaultMaxNumberOfEndpoints = 200

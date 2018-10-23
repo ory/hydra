@@ -2,7 +2,6 @@ package negroni
 
 import (
 	"bytes"
-
 	"log"
 	"net/http"
 	"os"

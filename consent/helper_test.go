@@ -24,9 +24,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ory/fosite"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 )
 

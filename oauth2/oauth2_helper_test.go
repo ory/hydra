@@ -21,14 +21,13 @@
 package oauth2_test
 
 import (
-	"github.com/ory/hydra/pkg"
 	"net/http"
 	"time"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
-
 	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/pkg"
 )
 
 var hasher = &fosite.BCrypt{}

@@ -29,15 +29,15 @@ import (
 	"net/http"
 
 	"github.com/mendsley/gojwk"
-	"github.com/ory/x/cmdx"
-	"github.com/ory/x/flagx"
 	"github.com/pborman/uuid"
 	"github.com/spf13/cobra"
 	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/hydra/config"
-	"github.com/ory/hydra/pkg"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
+	"github.com/ory/x/cmdx"
+	"github.com/ory/x/flagx"
+	"github.com/ory/x/josex"
 )
 
 type JWKHandler struct {
@@ -105,7 +105,7 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 	cmdx.MinArgs(cmd, args, 2)
 
 	id := args[0]
-	use, _ := cmd.Flags().GetString("use")
+	use := flagx.MustGetString(cmd, "use")
 	client := &http.Client{}
 
 	client.Transport = &http.Transport{
@@ -142,8 +142,8 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 		file, err := ioutil.ReadFile(path)
 		cmdx.Must(err, "Unable to read file %s", path)
 
-		if key, privateErr := pkg.LoadPrivateKey(file); privateErr != nil {
-			key, publicErr := pkg.LoadPublicKey(file)
+		if key, privateErr := josex.LoadPrivateKey(file); privateErr != nil {
+			key, publicErr := josex.LoadPublicKey(file)
 			cmdx.Must(publicErr, `Unable to read key from file %s. Decoding file to private key failed with reason "%s" and decoding it to public key failed with reason: %s`, path, privateErr, publicErr)
 
 			set.Keys = append(set.Keys, toSDKFriendlyJSONWebKey(key, "public:"+uuid.New(), use, true))

@@ -24,10 +24,11 @@ import (
 	"context"
 	"strings"
 
-	"github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
+
+	"github.com/ory/hydra/sdk/go/hydra/swagger"
 )
 
 // CodeGenSDK contains all relevant API clients for interacting with ORY Hydra.

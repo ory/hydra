@@ -5,9 +5,10 @@ import (
 	"io"
 	"net"
 
+	units "github.com/docker/go-units"
+
 	"github.com/ory/dockertest/docker/types/container"
 	"github.com/ory/dockertest/docker/types/filters"
-	units "github.com/docker/go-units"
 )
 
 // CheckpointCreateOptions holds parameters to create a checkpoint from a container

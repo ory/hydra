@@ -24,7 +24,6 @@ import (
 	"time"
 
 	"github.com/ory/fosite"
-
 	"github.com/ory/hydra/client"
 )
 

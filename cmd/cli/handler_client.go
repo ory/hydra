@@ -27,13 +27,13 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ory/x/cmdx"
-	"github.com/ory/x/flagx"
 	"github.com/spf13/cobra"
 
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/pkg"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
+	"github.com/ory/x/cmdx"
+	"github.com/ory/x/flagx"
 )
 
 type ClientHandler struct {

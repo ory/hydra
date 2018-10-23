@@ -25,9 +25,9 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/ory/fosite"
 	"github.com/pkg/errors"
 
+	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 )
 

@@ -23,11 +23,12 @@ package server
 import (
 	"net/http"
 
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+
 	"github.com/ory/fosite"
 	"github.com/ory/herodot"
 	"github.com/ory/x/serverx"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 func newJSONWriter(l logrus.FieldLogger) *herodot.JSONWriter {

@@ -28,12 +28,13 @@ import (
 
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
+	"github.com/pkg/errors"
+
 	"github.com/ory/fosite"
 	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/x/pagination"
-	"github.com/pkg/errors"
 )
 
 type Handler struct {

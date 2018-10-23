@@ -57,10 +57,11 @@ package gomock
 
 import (
 	"fmt"
-	"golang.org/x/net/context"
 	"reflect"
 	"runtime"
 	"sync"
+
+	"golang.org/x/net/context"
 )
 
 // A TestReporter is something that can be used to report test failures.

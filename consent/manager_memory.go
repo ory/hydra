@@ -25,11 +25,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ory/fosite"
-	"github.com/ory/x/pagination"
 	"github.com/pkg/errors"
 
+	"github.com/ory/fosite"
 	"github.com/ory/hydra/pkg"
+	"github.com/ory/x/pagination"
 )
 
 type MemoryManager struct {

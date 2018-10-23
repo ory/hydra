@@ -58,7 +58,7 @@ func Compose(config *Config, storage interface{}, strategy interface{}, hasher f
 	}
 
 	f := &fosite.Fosite{
-		Store: storage.(fosite.Storage),
+		Store:                      storage.(fosite.Storage),
 		AuthorizeEndpointHandlers:  fosite.AuthorizeEndpointHandlers{},
 		TokenEndpointHandlers:      fosite.TokenEndpointHandlers{},
 		TokenIntrospectionHandlers: fosite.TokenIntrospectionHandlers{},

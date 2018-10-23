@@ -24,10 +24,11 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/spf13/cobra"
+
 	"github.com/ory/x/corsx"
 	"github.com/ory/x/profilex"
 	"github.com/ory/x/tlsx"
-	"github.com/spf13/cobra"
 )
 
 var serveControls = `CORE CONTROLS

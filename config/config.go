@@ -219,6 +219,14 @@ func (c *Config) GetTracer() (*tracing.Tracer, error) {
 	return c.tracer, nil
 }
 
+func (c *Config) WithTracing() bool {
+	if tracer, err := c.GetTracer(); err != nil && tracer.IsLoaded() {
+		return true
+	} else {
+		return false
+	}
+}
+
 func (c *Config) GetPrometheusMetrics() *prometheus.MetricsManager {
 	c.GetLogger().Info("Setting up Prometheus middleware")
 
@@ -293,16 +301,9 @@ func (c *Config) Context() *Context {
 	if c.context != nil {
 		return c.context
 	}
-	var hasher fosite.Hasher
-	var tracingEnabled bool
 
-	hasher = &fosite.BCrypt{
+	var hasher fosite.Hasher = &fosite.BCrypt{
 		WorkFactor: c.BCryptWorkFactor,
-	}
-
-	if tracer, err := c.GetTracer(); err == nil && tracer.IsLoaded() {
-		tracingEnabled = true
-		hasher = &tracing.TracedBCrypt{c.BCryptWorkFactor}
 	}
 
 	if c.DatabaseURL == "" {
@@ -328,8 +329,10 @@ func (c *Config) Context() *Context {
 
 	if backend, ok := backends[scheme]; ok {
 		options := []ConnectorOptions{}
-
-		if tracingEnabled {
+		if c.WithTracing() {
+			hasher = &tracing.TracedBCrypt{
+				WorkFactor: c.BCryptWorkFactor,
+			}
 			options = append(options, WithTracing(), withOmitSQLArgsFromSpans())
 		}
 

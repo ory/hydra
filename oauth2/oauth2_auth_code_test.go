@@ -329,7 +329,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 								assert.NotEmpty(t, data["nbf"])
 								assert.EqualValues(t, data["nbf"], data["iat"])
 								assert.EqualValues(t, []interface{}{"hydra", "offline", "openid"}, data["scp"])
-								assert.EqualValues(t, "bar", data["foo"])
+								assert.EqualValues(t, "map[foo:bar]", fmt.Sprintf("%s", data["ext"]))
 							},
 						},
 						{
@@ -408,7 +408,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 								assert.NotEmpty(t, data["nbf"])
 								assert.EqualValues(t, data["nbf"], data["iat"])
 								assert.EqualValues(t, []interface{}{"hydra", "offline"}, data["scp"])
-								assert.EqualValues(t, "bar", data["foo"])
+								assert.EqualValues(t, "map[foo:bar]", fmt.Sprintf("%s", data["ext"]))
 							},
 						},
 						{

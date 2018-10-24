@@ -78,12 +78,17 @@ func consent(rw http.ResponseWriter, r *http.Request) {
 		if strings.Contains(o.RequestUrl, "rememberConsent=yes") {
 			remember = true
 		}
+		value := "bar"
+		if o.Skip == true {
+			value = "rab"
+		}
+
 		v, resp, err = client.AcceptConsentRequest(challenge, swagger.AcceptConsentRequest{
 			GrantScope: o.RequestedScope,
 			Remember:   remember,
 			Session: swagger.ConsentRequestSession{
-				AccessToken: map[string]interface{}{"foo": "bar"},
-				IdToken:     map[string]interface{}{"baz": "bar"},
+				AccessToken: map[string]interface{}{"foo": value},
+				IdToken:     map[string]interface{}{"baz": value},
 			},
 		})
 	} else {

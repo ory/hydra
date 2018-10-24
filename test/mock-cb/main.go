@@ -23,10 +23,12 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"golang.org/x/oauth2"
 )
@@ -54,7 +56,19 @@ func callback(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := json.NewEncoder(rw).Encode(token); err != nil {
+	if err := json.NewEncoder(rw).Encode(&struct {
+		IDToken      string    `json:"id_token"`
+		AccessToken  string    `json:"access_token"`
+		TokenType    string    `json:"token_type,omitempty"`
+		RefreshToken string    `json:"refresh_token,omitempty"`
+		Expiry       time.Time `json:"expiry,omitempty"`
+	}{
+		IDToken:      fmt.Sprintf("%s", token.Extra("id_token")),
+		AccessToken:  token.AccessToken,
+		RefreshToken: token.RefreshToken,
+		TokenType:    token.TokenType,
+		Expiry:       token.Expiry,
+	}); err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}

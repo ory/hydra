@@ -52,12 +52,12 @@ func NewSession(subject string) *Session {
 	}
 }
 
-func (s *Session) GetJWTClaims() *jwt.JWTClaims {
+func (s *Session) GetJWTClaims() jwt.JWTClaimsContainer {
 	claims := &jwt.JWTClaims{
 		Subject:   s.Subject,
 		Audience:  s.Audience,
 		Issuer:    s.DefaultSession.Claims.Issuer,
-		Extra:     s.Extra,
+		Extra:     map[string]interface{}{"ext": s.Extra},
 		ExpiresAt: s.GetExpiresAt(fosite.AccessToken),
 		IssuedAt:  time.Now(),
 		NotBefore: time.Now(),

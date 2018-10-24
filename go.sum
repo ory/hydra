@@ -105,6 +105,8 @@ github.com/ory/dockertest v3.3.2+incompatible h1:uO+NcwH6GuFof/Uz8yzjNi1g0sGT5SL
 github.com/ory/dockertest v3.3.2+incompatible/go.mod h1:1vX4m9wsvi00u5bseYwXaSnhNrne+V0E6LAcBILJdPs=
 github.com/ory/fosite v0.25.0 h1:GELSEQc6OIDsfvtx1nC0snzPpFF14W/f6MeMXPEiZ9I=
 github.com/ory/fosite v0.25.0/go.mod h1:uttCRNB0lM7+BJFX7CC8Bqo9gAPrcpmA9Ezc80Trwuw=
+github.com/ory/fosite v0.26.0 h1:jWJ5RnF2fp5ZPvghq682yyAzi91zilCfMlvGdn6gC8o=
+github.com/ory/fosite v0.26.0/go.mod h1:uttCRNB0lM7+BJFX7CC8Bqo9gAPrcpmA9Ezc80Trwuw=
 github.com/ory/go-convenience v0.1.0 h1:zouLKfF2GoSGnJwGq+PE/nJAE6dj2Zj5QlTgmMTsTS8=
 github.com/ory/go-convenience v0.1.0/go.mod h1:uEY/a60PL5c12nYz4V5cHY03IBmwIAEm8TWB0yn9KNs=
 github.com/ory/graceful v0.1.0 h1:zilpYtcR5vp4GubV4bN2GFJewHaSkMFnnRiJxyH8FAc=

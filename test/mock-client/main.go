@@ -21,6 +21,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -30,12 +31,24 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/oauth2"
 
 	"github.com/ory/hydra/sdk/go/hydra/swagger"
+	"github.com/ory/x/cmdx"
 )
+
+var sdk = swagger.NewOAuth2ApiWithBasePath(os.Getenv("HYDRA_ADMIN_URL"))
+
+type oauth2token struct {
+	IDToken      string    `json:"id_token"`
+	AccessToken  string    `json:"access_token"`
+	TokenType    string    `json:"token_type,omitempty"`
+	RefreshToken string    `json:"refresh_token,omitempty"`
+	Expiry       time.Time `json:"expiry,omitempty"`
+}
 
 func main() {
 	conf := oauth2.Config{
@@ -70,26 +83,13 @@ func main() {
 			return nil
 		},
 	}).Get(au)
-	if err != nil {
-		log.Fatalf("Unable to make request: %s", err)
-	}
+	cmdx.CheckResponse(err, http.StatusOK, resp)
+	defer resp.Body.Close()
 
 	out, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatalf("Unable to read body: %s", err)
 	}
-	resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		log.Fatalf("Got status code %d and body %s", resp.StatusCode, out)
-	}
-
-	var token oauth2.Token
-	if err := json.Unmarshal(out, &token); err != nil {
-		log.Fatalf("Unable transform to token: %s", err)
-	}
-
-	log.Printf("Got token: %+v", token)
 
 	for _, c := range c.Cookies(u) {
 		if c.Name == "oauth2_authentication_session" {
@@ -97,33 +97,121 @@ func main() {
 		}
 	}
 
-	resp, err = http.PostForm(strings.TrimRight(os.Getenv("HYDRA_ADMIN_URL"), "/")+"/oauth2/introspect", url.Values{"token": {token.AccessToken}})
-	if err != nil {
-		log.Fatalf("Unable to make introspection request: %s", err)
-	} else if resp.StatusCode != http.StatusOK {
-		log.Fatalf("Unable to make introspection request: got status code %d", resp.StatusCode)
+	var token oauth2token
+	if err := json.Unmarshal(out, &token); err != nil {
+		log.Fatalf("Unable transform to token: %s", err)
 	}
 
-	var intro swagger.OAuth2TokenIntrospection
-	if err := json.NewDecoder(resp.Body).Decode(&intro); err != nil {
-		log.Fatalf("Unable to decode introspection response: %s", err)
+	checkTokenResponse(token)
+	for i := 0; i <= 5; i++ {
+		token = refreshToken(token)
+		checkTokenResponse(token)
 	}
-	resp.Body.Close()
+
+	refreshToken(token)
+
+	// refreshing the same token twice does not work
+	resp, err = refreshTokenRequest(token)
+	cmdx.CheckResponse(err, http.StatusBadRequest, resp)
+	defer resp.Body.Close()
+}
+
+func checkResponse(err error, expectedStatusCode int, response *swagger.APIResponse) {
+	var r *http.Response
+	if response != nil {
+		r = response.Response
+		r.Body = ioutil.NopCloser(bytes.NewBuffer(response.Payload))
+	}
+
+	cmdx.CheckResponse(err, expectedStatusCode, r)
+}
+
+func refreshTokenRequest(token oauth2token) (*http.Response, error) {
+	req, err := http.NewRequest("POST", strings.TrimRight(os.Getenv("HYDRA_URL"), "/")+"/oauth2/token", bytes.NewBufferString(url.Values{
+		"refresh_token": {token.RefreshToken},
+		"grant_type":    {"refresh_token"},
+	}.Encode()))
+	cmdx.Must(err, "%s", err)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth(os.Getenv("OAUTH2_CLIENT_ID"), os.Getenv("OAUTH2_CLIENT_SECRET"))
+	return http.DefaultClient.Do(req)
+}
+
+func refreshToken(token oauth2token) (result oauth2token) {
+	resp, err := refreshTokenRequest(token)
+	cmdx.CheckResponse(err, http.StatusOK, resp)
+	defer resp.Body.Close()
+
+	err = json.NewDecoder(resp.Body).Decode(&result)
+	cmdx.Must(err, "Unable to decode refresh token: %s", err)
+	return result
+}
+
+func checkTokenResponse(token oauth2token) {
+	if token.RefreshToken == "" {
+		log.Fatalf("Expected a refresh token but none received: %+v", token)
+	}
+
+	// This value oscillates between bar and rab, depending on whether authorization was remembered or not. Check
+	// mock-lcp which sets the value
+	expectedValue := "bar"
+	if strings.Contains(os.Getenv("OAUTH2_EXTRA"), "prompt=none") {
+		expectedValue = "rab"
+	}
+
+	if os.Getenv("OAUTH2_ACCESS_TOKEN_STRATEGY") == "jwt" {
+		parts := strings.Split(token.AccessToken, ".")
+
+		if len(parts) != 3 {
+			log.Fatalf("JWT Access Token does not seem to have three parts: %d - %+v - %v", len(parts), token, parts)
+		}
+
+		payload, err := jwt.DecodeSegment(parts[1])
+		if err != nil {
+			log.Fatalf("Unable to decode id token segment: %s", err)
+		}
+
+		var claims map[string]interface{}
+		if err := json.Unmarshal(payload, &claims); err != nil {
+			log.Fatalf("Unable to unmarshal id token body: %s", err)
+		}
+
+		if fmt.Sprintf("%s", claims["sub"]) != "the-subject" {
+			log.Fatalf("Expected subject from access token to be %s but got %s", "the-subject", claims["sub"])
+		}
+
+		ext := claims["ext"].(map[string]interface{})
+		if ext["foo"] != expectedValue {
+			log.Fatalf("Expected extra field \"foo\" from access token to be \"%s\" but got %s", expectedValue, ext["foo"])
+		}
+	}
+
+	intro, sdkResp, err := sdk.IntrospectOAuth2Token(token.AccessToken, "")
+	checkResponse(err, http.StatusOK, sdkResp)
+
+	if !intro.Active {
+		log.Fatalf("Expected token to be active: %s", token.AccessToken)
+	}
 
 	if intro.Sub != "the-subject" {
 		log.Fatalf("Expected subject from access token to be %s but got %s", "the-subject", intro.Sub)
 	}
 
-	if intro.Ext["foo"] != "bar" {
-		log.Fatalf("Expected extra field \"foo\" from access token to be \"bar\" but got %s", intro.Ext["foo"])
+	if intro.Ext["foo"] != expectedValue {
+		log.Fatalf("Expected extra field \"foo\" from access token to be \"%s\" but got %s", expectedValue, intro.Ext["foo"])
 	}
 
-	idt := fmt.Sprintf("%s", token.Extra("id_token"))
+	idt := fmt.Sprintf("%s", token.IDToken)
 	if len(idt) == 0 {
 		log.Fatalf("ID Token does not seem to be set: %+v", token)
 	}
 
-	payload, err := jwt.DecodeSegment(strings.Split(idt, ".")[1])
+	parts := strings.Split(idt, ".")
+	if len(parts) != 3 {
+		log.Fatalf("ID Token does not seem to have three parts: %d - %+v - %v", len(parts), token, parts)
+	}
+
+	payload, err := jwt.DecodeSegment(parts[1])
 	if err != nil {
 		log.Fatalf("Unable to decode id token segment: %s", err)
 	}
@@ -137,7 +225,7 @@ func main() {
 		log.Fatalf("Expected subject from id token to be %s but got %s", "the-subject", claims["sub"])
 	}
 
-	if fmt.Sprintf("%s", claims["foo"]) != "bar" {
-		log.Fatalf("Expected extra field \"foo\" from access token to be \"bar\" but got %s", intro.Ext["foo"])
+	if fmt.Sprintf("%s", claims["baz"]) != expectedValue {
+		log.Fatalf("Expected extra field \"baz\" from access token to be \"%s\" but got \"%s\"", expectedValue, claims["baz"])
 	}
 }

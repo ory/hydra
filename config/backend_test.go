@@ -150,8 +150,8 @@ func TestConnectorTracingOptions(t *testing.T) {
 				description: "WithTracing() option should result in spans being created on database interactions",
 				options: []ConnectorOptions{
 					WithTracing(),
-					WithAllowRootTraceSpans(),
-					WithRandomDriverName(), // Note: this option is being used because only one driver can be registered with the same name
+					withAllowRootTraceSpans(),
+					withRandomDriverName(), // Note: this option is being used because only one driver can be registered with the same name
 				},
 			},
 			{
@@ -160,10 +160,10 @@ func TestConnectorTracingOptions(t *testing.T) {
 			},
 			{
 				description: "No spans should be created if no trace exists in the supplied context when" +
-					" WithRandomDriverName() option has not been set",
+					" withAllowRootTraceSpans() option has NOT been set",
 				options: []ConnectorOptions{
 					WithTracing(),
-					WithRandomDriverName(), // Note: this option is being used because only one driver can be registered with the same name
+					withRandomDriverName(), // Note: this option is being used because only one driver can be registered with the same name
 				},
 			},
 		} {
@@ -186,7 +186,7 @@ func TestConnectorTracingOptions(t *testing.T) {
 				db.QueryRowContext(context.TODO(), "SELECT NOW()")
 				spans := mockedTracer.FinishedSpans()
 
-				if sqlBackend.UseTracing && sqlBackend.AllowRootTracingSpans {
+				if sqlBackend.UseTracing && sqlBackend.allowRootTracingSpans {
 					assert.NotEmpty(t, spans)
 				} else {
 					assert.Empty(t, spans)

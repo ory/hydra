@@ -38,7 +38,7 @@ import (
 type SQLBackend struct {
 	db *sqlx.DB
 	l  logrus.FieldLogger
-	options
+	Options
 }
 
 func init() {
@@ -47,7 +47,7 @@ func init() {
 
 func (s *SQLBackend) Init(url string, l logrus.FieldLogger, opts ...ConnectorOptions) error {
 	for _, opt := range opts {
-		opt(&s.options)
+		opt(&s.Options)
 	}
 
 	sqlconOptions := []sqlcon.Opt{}
@@ -56,15 +56,15 @@ func (s *SQLBackend) Init(url string, l logrus.FieldLogger, opts ...ConnectorOpt
 		sqlconOptions = append(sqlconOptions, sqlcon.WithDistributedTracing())
 	}
 
-	if s.UseRandomDriverName {
+	if s.useRandomDriverName {
 		sqlconOptions = append(sqlconOptions, sqlcon.WithRandomDriverName())
 	}
 
-	if s.OmitSQLArgsFromTracingSpans {
+	if s.omitSQLArgsFromSpans {
 		sqlconOptions = append(sqlconOptions, sqlcon.WithOmitArgsFromTraceSpans())
 	}
 
-	if s.AllowRootTracingSpans {
+	if s.allowRootTracingSpans {
 		sqlconOptions = append(sqlconOptions, sqlcon.WithAllowRoot())
 	}
 

@@ -94,7 +94,6 @@ type Config struct {
 	JaegerLocalAgentHostPort         string  `mapstructure:"TRACING_PROVIDER_JAEGER_LOCAL_AGENT_HOST_PORT" yaml:"-"`
 	JaegerSamplingType               string  `mapstructure:"TRACING_PROVIDER_JAEGER_SAMPLING_TYPE" yaml:"-"`
 	JaegerSamplingValue              float64 `mapstructure:"TRACING_PROVIDER_JAEGER_SAMPLING_VALUE" yaml:"-"`
-	OmitSQLArgsFromSpans             bool    `mapstructure:"TRACING_OMIT_SQL_ARGUMENTS_FROM_SPANS" yaml:"-"`
 	ForceHTTP                        bool    `yaml:"-"`
 
 	BuildVersion string                     `yaml:"-"`
@@ -331,11 +330,7 @@ func (c *Config) Context() *Context {
 		options := []ConnectorOptions{}
 
 		if tracingEnabled {
-			options = append(options, WithTracing())
-		}
-
-		if c.OmitSQLArgsFromSpans {
-			options = append(options, WithOmitSQLArgsFromSpans())
+			options = append(options, WithTracing(), withOmitSQLArgsFromSpans())
 		}
 
 		if err := backend.Init(c.DatabaseURL, c.GetLogger(), options...); err != nil {

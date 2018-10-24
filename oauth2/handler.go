@@ -164,7 +164,7 @@ func (h *Handler) SetRoutes(frontend, backend *httprouter.Router, corsMiddleware
 	frontend.GET(DefaultErrorPath, h.DefaultErrorHandler)
 	frontend.GET(DefaultLogoutPath, h.DefaultLogoutHandler)
 	frontend.Handler("POST", RevocationPath, corsMiddleware(http.HandlerFunc(h.RevocationHandler)))
-	frontend.GET(WellKnownPath, h.WellKnownHandler)
+	frontend.Handler("GET", WellKnownPath, corsMiddleware(http.HandlerFunc(h.WellKnownHandler)))
 	frontend.Handler("GET", UserinfoPath, corsMiddleware(http.HandlerFunc(h.UserinfoHandler)))
 	frontend.Handler("POST", UserinfoPath, corsMiddleware(http.HandlerFunc(h.UserinfoHandler)))
 
@@ -189,7 +189,7 @@ func (h *Handler) SetRoutes(frontend, backend *httprouter.Router, corsMiddleware
 //       200: wellKnown
 //       401: genericError
 //       500: genericError
-func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 	userInfoEndpoint := strings.TrimRight(h.IssuerURL, "/") + UserinfoPath
 	if h.UserinfoEndpoint != "" {
 		userInfoEndpoint = h.UserinfoEndpoint

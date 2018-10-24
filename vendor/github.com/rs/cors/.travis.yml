@@ -1,8 +1,0 @@
-language: go
-go:
-- 1.9
-- "1.10"
-- tip
-matrix:
-  allow_failures:
-    - go: tip

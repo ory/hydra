@@ -13,6 +13,7 @@ ENV GO111MODULE=on
 ADD ./go.mod ./go.mod
 ADD ./go.sum ./go.sum
 
+RUN go mod download
 
 ADD . .
 

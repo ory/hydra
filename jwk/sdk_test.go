@@ -42,7 +42,9 @@ func TestJWKSDK(t *testing.T) {
 		Manager: manager,
 		H:       herodot.NewJSONWriter(nil),
 	}
-	h.SetRoutes(router, router)
+	h.SetRoutes(router, router, func(h http.Handler) http.Handler {
+		return h
+	})
 	server := httptest.NewServer(router)
 
 	client := hydra.NewJsonWebKeyApiWithBasePath(server.URL)

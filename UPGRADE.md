@@ -105,6 +105,16 @@ before finalizing the upgrade process.
 
 ## 1.0.0-rc.1
 
+### JSON Web Token formatted Access Token data
+
+Previously, extra fields coming from `session.access_token` where directly embedded in the OAuth 2.0 Access Token when
+the JSON Web Token strategy was used. However, the token introspection response returned the extra data as a field `ext: {...}`.
+
+In order to have a streamlined experience, session data is from now on stored in a field `ext: {...}` for Access
+Tokens formatted as JSON Web Tokens.
+
+This change does not impact the opaque strategy, which is the default one.
+
 ### CLI Changes
 
 Flags `https-tls-key-path` and `https-tls-cert-path` have been removed from the `hydra serve *` commands.

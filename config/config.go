@@ -94,6 +94,7 @@ type Config struct {
 	JaegerLocalAgentHostPort         string  `mapstructure:"TRACING_PROVIDER_JAEGER_LOCAL_AGENT_HOST_PORT" yaml:"-"`
 	JaegerSamplingType               string  `mapstructure:"TRACING_PROVIDER_JAEGER_SAMPLING_TYPE" yaml:"-"`
 	JaegerSamplingValue              float64 `mapstructure:"TRACING_PROVIDER_JAEGER_SAMPLING_VALUE" yaml:"-"`
+	OmitSQLArgsFromSpans             bool    `mapstructure:"TRACING_OMIT_SQL_ARGUMENTS_FROM_SPANS" yaml:"-"`
 	ForceHTTP                        bool    `yaml:"-"`
 
 	BuildVersion string                     `yaml:"-"`
@@ -294,6 +295,16 @@ func (c *Config) Context() *Context {
 		return c.context
 	}
 	var hasher fosite.Hasher
+	var tracingEnabled bool
+
+	hasher = &fosite.BCrypt{
+		WorkFactor: c.BCryptWorkFactor,
+	}
+
+	if tracer, err := c.GetTracer(); err == nil && tracer.IsLoaded() {
+		tracingEnabled = true
+		hasher = &tracing.TracedBCrypt{c.BCryptWorkFactor}
+	}
 
 	if c.DatabaseURL == "" {
 		c.GetLogger().Fatalf(`DATABASE_URL is not set, use "export DATABASE_URL=memory" for an in memory storage or the documented database adapters.`)
@@ -317,20 +328,22 @@ func (c *Config) Context() *Context {
 	}
 
 	if backend, ok := backends[scheme]; ok {
-		if err := backend.Init(c.DatabaseURL, c.GetLogger()); err != nil {
+		options := []ConnectorOptions{}
+
+		if tracingEnabled {
+			options = append(options, WithTracing())
+		}
+
+		if c.OmitSQLArgsFromSpans {
+			options = append(options, WithOmitSQLArgsFromSpans())
+		}
+
+		if err := backend.Init(c.DatabaseURL, c.GetLogger(), options...); err != nil {
 			c.GetLogger().Fatalf(`Could not connect to database backend: %s`, err)
 		}
 		connection = backend
 	} else {
 		c.GetLogger().Fatalf(`Unknown DSN scheme "%s" in DATABASE_URL "%s", schemes %v supported`, scheme, c.DatabaseURL, supportedSchemes())
-	}
-
-	hasher = &fosite.BCrypt{
-		WorkFactor: c.BCryptWorkFactor,
-	}
-
-	if tracer, err := c.GetTracer(); err == nil && tracer.IsLoaded() {
-		hasher = &tracing.TracedBCrypt{c.BCryptWorkFactor}
 	}
 
 	c.context = &Context{

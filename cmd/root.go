@@ -216,6 +216,9 @@ func initConfig() {
 	viper.BindEnv("TRACING_SERVICE_NAME")
 	viper.SetDefault("TRACING_SERVICE_NAME", "Ory Hydra")
 
+	viper.BindEnv("TRACING_OMIT_SQL_ARGUMENTS_FROM_SPANS")
+	viper.SetDefault("TRACING_OMIT_SQL_ARGUMENTS_FROM_SPANS", false)
+
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err != nil {
 		fmt.Printf(`Config file not found because "%s"`, err)

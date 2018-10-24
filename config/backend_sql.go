@@ -38,14 +38,37 @@ import (
 type SQLBackend struct {
 	db *sqlx.DB
 	l  logrus.FieldLogger
+	options
 }
 
 func init() {
 	RegisterBackend(&SQLBackend{})
 }
 
-func (s *SQLBackend) Init(url string, l logrus.FieldLogger) error {
-	connection, err := sqlcon.NewSQLConnection(url, l)
+func (s *SQLBackend) Init(url string, l logrus.FieldLogger, opts ...ConnectorOptions) error {
+	for _, opt := range opts {
+		opt(&s.options)
+	}
+
+	sqlconOptions := []sqlcon.Opt{}
+
+	if s.UseTracing {
+		sqlconOptions = append(sqlconOptions, sqlcon.WithDistributedTracing())
+	}
+
+	if s.UseRandomDriverName {
+		sqlconOptions = append(sqlconOptions, sqlcon.WithRandomDriverName())
+	}
+
+	if s.OmitSQLArgsFromTracingSpans {
+		sqlconOptions = append(sqlconOptions, sqlcon.WithOmitArgsFromTraceSpans())
+	}
+
+	if s.AllowRootTracingSpans {
+		sqlconOptions = append(sqlconOptions, sqlcon.WithAllowRoot())
+	}
+
+	connection, err := sqlcon.NewSQLConnection(url, l, sqlconOptions...)
 	if err != nil {
 		return err
 	}

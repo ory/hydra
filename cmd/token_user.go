@@ -120,7 +120,8 @@ var tokenUserCmd = &cobra.Command{
 		server := &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: r}
 		var shutdown = func() {
 			time.Sleep(time.Second * 1)
-			ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+			defer cancel()
 			server.Shutdown(ctx)
 		}
 

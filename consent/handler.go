@@ -172,9 +172,9 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 		h.H.WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Parameter user is not defined")))
 		return
 	}
-	limit, offset := pagination.Parse(r, 100, 0, 500)
 
-	sessions, err := h.M.FindPreviouslyGrantedConsentRequestsByUser(r.Context(), user, limit, offset)
+	limit, offset := pagination.Parse(r, 100, 0, 500)
+	s, err := h.M.FindPreviouslyGrantedConsentRequestsByUser(r.Context(), user, limit, offset)
 	if errors.Cause(err) == ErrNoPreviousConsentFound {
 		h.H.Write(w, r, []PreviousConsentSession{})
 		return
@@ -185,7 +185,7 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 
 	var a []PreviousConsentSession
 
-	for _, session := range sessions {
+	for _, session := range s {
 		session.ConsentRequest.Client = sanitizeClient(session.ConsentRequest.Client)
 		a = append(a, PreviousConsentSession(session))
 	}

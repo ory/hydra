@@ -72,6 +72,7 @@ func (h *Handler) GetGenerators() map[string]KeyGenerator {
 }
 
 func (h *Handler) SetRoutes(frontend, backend *httprouter.Router, corsMiddleware func(http.Handler) http.Handler) {
+	frontend.Handler("OPTIONS", WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
 	frontend.Handler("GET", WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.WellKnown)))
 	backend.GET(KeyHandlerPath+"/:set/:key", h.GetKey)
 	backend.GET(KeyHandlerPath+"/:set", h.GetKeySet)
@@ -390,3 +391,7 @@ func (h *Handler) DeleteKey(w http.ResponseWriter, r *http.Request, ps httproute
 
 	w.WriteHeader(http.StatusNoContent)
 }
+
+// This function will not be called, OPTIONS request will be handled by cors
+// this is just a placeholder.
+func (h *Handler) handleOptions(w http.ResponseWriter, r *http.Request) {}

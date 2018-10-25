@@ -118,7 +118,7 @@ func newOAuth2Provider(c *config.Config) fosite.OAuth2Provider {
 	}
 
 	if tracer, err := c.GetTracer(); err == nil && tracer.IsLoaded() {
-		hasher = &tracing.TracedBCrypt{fc.HashCost}
+		hasher = &tracing.TracedBCrypt{WorkFactor: fc.HashCost}
 	}
 
 	return compose.Compose(

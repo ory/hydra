@@ -17,9 +17,15 @@ jobs:
 #            echo 'export GO111MODULE=on' >> $BASH_ENV
 #            source $BASH_ENV
       - checkout
+      - run:
+          name: Enable go1.11 modules
+          command: |
+            echo 'export GO111MODULE=on' >> $BASH_ENV
+            source $BASH_ENV
       - run: curl -L https://git.io/vp6lP | sh
       - run: mv ./bin/* $GOPATH/bin
-      - run: gometalinter --disable-all --enable=gofmt --vendor ./...
+      - run: go mod download
+      - run: gometalinter --disable-all --enable=gofmt --enable=vet --vendor ./...
 
   test:
     docker:

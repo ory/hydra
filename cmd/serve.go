@@ -24,6 +24,8 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/ory/hydra/tracing"
+
 	"github.com/spf13/cobra"
 
 	"github.com/ory/x/corsx"
@@ -180,6 +182,8 @@ CORS CONTROLS
 
 DEBUG CONTROLS
 ==============
+
+` + tracing.HelpMessage() + `
 
 ` + profilex.HelpMessage() + `
 `

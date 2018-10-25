@@ -91,7 +91,7 @@ type Config struct {
 	TracingProvider                  string  `mapstructure:"TRACING_PROVIDER" yaml:"-"`
 	TracingServiceName               string  `mapstructure:"TRACING_SERVICE_NAME" yaml:"-"`
 	JaegerSamplingServerUrl          string  `mapstructure:"TRACING_PROVIDER_JAEGER_SAMPLING_SERVER_URL" yaml:"-"`
-	JaegerLocalAgentHostPort         string  `mapstructure:"TRACING_PROVIDER_JAEGER_LOCAL_AGENT_HOST_PORT" yaml:"-"`
+	JaegerLocalAgentHostPort         string  `mapstructure:"TRACING_PROVIDER_JAEGER_LOCAL_AGENT_ADDRESS" yaml:"-"`
 	JaegerSamplingType               string  `mapstructure:"TRACING_PROVIDER_JAEGER_SAMPLING_TYPE" yaml:"-"`
 	JaegerSamplingValue              float64 `mapstructure:"TRACING_PROVIDER_JAEGER_SAMPLING_VALUE" yaml:"-"`
 	ForceHTTP                        bool    `yaml:"-"`

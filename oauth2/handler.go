@@ -157,14 +157,18 @@ type FlushInactiveOAuth2TokensRequest struct {
 }
 
 func (h *Handler) SetRoutes(frontend, backend *httprouter.Router, corsMiddleware func(http.Handler) http.Handler) {
+	frontend.Handler("OPTIONS", TokenPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
 	frontend.Handler("POST", TokenPath, corsMiddleware(http.HandlerFunc(h.TokenHandler)))
 	frontend.GET(AuthPath, h.AuthHandler)
 	frontend.POST(AuthPath, h.AuthHandler)
 	frontend.GET(DefaultConsentPath, h.DefaultConsentHandler)
 	frontend.GET(DefaultErrorPath, h.DefaultErrorHandler)
 	frontend.GET(DefaultLogoutPath, h.DefaultLogoutHandler)
+	frontend.Handler("OPTIONS", RevocationPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
 	frontend.Handler("POST", RevocationPath, corsMiddleware(http.HandlerFunc(h.RevocationHandler)))
+	frontend.Handler("OPTIONS", WellKnownPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
 	frontend.Handler("GET", WellKnownPath, corsMiddleware(http.HandlerFunc(h.WellKnownHandler)))
+	frontend.Handler("OPTIONS", UserinfoPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
 	frontend.Handler("GET", UserinfoPath, corsMiddleware(http.HandlerFunc(h.UserinfoHandler)))
 	frontend.Handler("POST", UserinfoPath, corsMiddleware(http.HandlerFunc(h.UserinfoHandler)))
 
@@ -675,3 +679,7 @@ func (h *Handler) writeAuthorizeError(w http.ResponseWriter, ar fosite.Authorize
 
 	h.OAuth2.WriteAuthorizeError(w, ar, err)
 }
+
+// This function will not be called, OPTIONS request will be handled by cors
+// this is just a placeholder.
+func (h *Handler) handleOptions(w http.ResponseWriter, r *http.Request) {}

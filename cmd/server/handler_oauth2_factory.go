@@ -134,13 +134,13 @@ func newOAuth2Provider(c *config.Config) fosite.OAuth2Provider {
 		compose.OAuth2AuthorizeImplicitFactory,
 		compose.OAuth2ClientCredentialsGrantFactory,
 		compose.OAuth2RefreshTokenGrantFactory,
-		compose.OAuth2PKCEFactory,
 		compose.OpenIDConnectExplicitFactory,
 		compose.OpenIDConnectHybridFactory,
 		compose.OpenIDConnectImplicitFactory,
 		compose.OpenIDConnectRefreshFactory,
 		compose.OAuth2TokenRevocationFactory,
 		compose.OAuth2TokenIntrospectionFactory,
+		compose.OAuth2PKCEFactory,
 	)
 }
 

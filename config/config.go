@@ -220,7 +220,7 @@ func (c *Config) GetTracer() (*tracing.Tracer, error) {
 }
 
 func (c *Config) WithTracing() bool {
-	if tracer, err := c.GetTracer(); err != nil && tracer.IsLoaded() {
+	if tracer, err := c.GetTracer(); err == nil && tracer.IsLoaded() {
 		return true
 	} else {
 		return false

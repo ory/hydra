@@ -409,7 +409,8 @@ WHERE
 		r.subject=? AND r.client_id=? AND r.skip=FALSE
 	AND
 		(h.error='{}' AND h.remember=TRUE)
-`), subject, client); err != nil {
+ORDER BY h.requested_at
+LIMIT 1`), subject, client); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.WithStack(ErrNoPreviousConsentFound)
 		}
@@ -430,6 +431,7 @@ WHERE
 		r.subject=? AND r.skip=FALSE
 	AND
 		(h.error='{}' AND h.remember=TRUE)
+ORDER BY h.requested_at
 LIMIT ? OFFSET ?
 `), subject, limit, offset); err != nil {
 		return nil, sqlcon.HandleError(err)

@@ -330,7 +330,7 @@ func (c *Config) Context() *Context {
 	}
 
 	if tracer, err := c.GetTracer(); err == nil && tracer.IsLoaded() {
-		hasher = &tracing.TracedBCrypt{c.BCryptWorkFactor}
+		hasher = &tracing.TracedBCrypt{WorkFactor: c.BCryptWorkFactor}
 	}
 
 	c.context = &Context{

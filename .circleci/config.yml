@@ -19,7 +19,7 @@ jobs:
       - checkout
       - run: curl -L https://git.io/vp6lP | sh
       - run: mv ./bin/* $GOPATH/bin
-      - run: gometalinter --disable-all --enable=gofmt --vendor ./...
+      - run: gometalinter --disable-all --enable=gofmt --enable=vet --vendor ./...
 
   test:
     docker:

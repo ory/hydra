@@ -27,6 +27,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/hydra/pkg"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -116,18 +118,20 @@ func (h *MigrateHandler) MigrateSecret(cmd *cobra.Command, args []string) {
 	oldSecret := viper.GetString("OLD_SYSTEM_SECRET")
 	newSecret := viper.GetString("NEW_SYSTEM_SECRET")
 
-	if len(oldSecret) != 32 {
-		cmdx.Fatalf("Value of environment variable OLD_SYSTEM_SECRET has to be exactly 32 characters long but got: %d", len(oldSecret))
+	if len(oldSecret) < 16 {
+		cmdx.Fatalf("Value of environment variable OLD_SYSTEM_SECRET has to be at least 16 characters long but got: %d", len(oldSecret))
 	}
 
-	if len(newSecret) != 32 {
-		cmdx.Fatalf("Value of environment variable NEW_SYSTEM_SECRET has to be exactly 32 characters long but got: %d", len(oldSecret))
+	if len(newSecret) < 16 {
+		cmdx.Fatalf("Value of environment variable NEW_SYSTEM_SECRET has to be at least 16 characters long but got: %d", len(oldSecret))
 	}
 
 	fmt.Println("Rotating encryption keys for JSON Web Key storage...")
 
-	manager := jwk.NewSQLManager(db, []byte(oldSecret))
-	err = manager.RotateKeys(context.TODO(), &jwk.AEAD{Key: []byte(newSecret)})
+	hashedOldSecret := pkg.HashStringSecret(oldSecret)
+	hashedNewSecret := pkg.HashStringSecret(newSecret)
+	manager := jwk.NewSQLManager(db, hashedOldSecret)
+	err = manager.RotateKeys(context.TODO(), &jwk.AEAD{Key: hashedNewSecret})
 	cmdx.Must(err, "Unable to rotate JSON Web Keys: %s\nAll changes have been rolled back.", err)
 
 	fmt.Println("Rotating encryption keys for JSON Web Key storage completed successfully!")

@@ -21,7 +21,6 @@
 package config
 
 import (
-	"crypto/sha256"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -381,7 +380,9 @@ func (c *Config) GetCookieSecret() []byte {
 }
 
 func (c *Config) GetRotatedSystemSecrets() [][]byte {
-	return [][]byte{[]byte(c.RotatedSystemSecret)}
+	return [][]byte{
+		pkg.HashStringSecret(c.RotatedSystemSecret),
+	}
 }
 
 func (c *Config) GetSystemSecret() []byte {
@@ -389,12 +390,9 @@ func (c *Config) GetSystemSecret() []byte {
 		return c.systemSecret
 	}
 
-	var secret = []byte(c.SystemSecret)
-	if len(secret) >= 16 {
-		hash := sha256.Sum256(secret)
-		secret = hash[:]
-		c.systemSecret = secret
-		return secret
+	if len(c.SystemSecret) >= 16 {
+		c.systemSecret = pkg.HashStringSecret(c.SystemSecret)
+		return pkg.HashStringSecret(c.SystemSecret)
 	}
 
 	if len(c.SystemSecret) > 0 {
@@ -402,17 +400,13 @@ func (c *Config) GetSystemSecret() []byte {
 		return nil
 	}
 
-	c.GetLogger().Warnf("Expected system secret to be at least %d characters long, got %d characters.", 32, len(c.SystemSecret))
-	c.GetLogger().Infoln("Generating a random system secret...")
-	var err error
-	secret, err = pkg.GenerateSecret(32)
+	c.GetLogger().Warnf("No system secret was set, generating a random system secret...")
+	secret, err := pkg.GenerateSecret(32)
 	cmdx.Must(err, "Could not generate global secret: %s", err)
 	c.GetLogger().Infof("Generated system secret: %s", secret)
-	hash := sha256.Sum256(secret)
-	secret = hash[:]
-	c.systemSecret = secret
+	c.systemSecret = pkg.HashByteSecret(secret)
 	c.GetLogger().Warnln("WARNING: DO NOT generate system secrets in production. The secret will be leaked to the logs.")
-	return secret
+	return pkg.HashByteSecret(secret)
 }
 
 func (c *Config) GetFrontendAddress() string {

@@ -29,12 +29,13 @@ import (
 )
 
 func TestStart(t *testing.T) {
-	router := httprouter.New()
+	frontend := httprouter.New()
+	backend := httprouter.New()
 	h := &Handler{
 		Config: &config.Config{
 			DatabaseURL:               "memory",
 			OAuth2AccessTokenStrategy: "opaque",
 		},
 	}
-	h.RegisterRoutes(router, router)
+	h.RegisterRoutes(frontend, backend)
 }

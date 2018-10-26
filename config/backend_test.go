@@ -35,6 +35,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/jmoiron/sqlx"
+
 	"github.com/ory/dockertest"
 
 	"github.com/sirupsen/logrus"

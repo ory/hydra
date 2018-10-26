@@ -37,6 +37,8 @@ services:
 #      - mysqld:mysqld
     depends_on:
       - hydra-migrate
+#     Uncomment the following when configuring tracing
+#      - jaeger
     ports:
       # Public port
       - "4444:4444"
@@ -59,6 +61,11 @@ services:
       - OIDC_SUBJECT_TYPES_SUPPORTED=public,pairwise
       - OIDC_SUBJECT_TYPE_PAIRWISE_SALT=youReallyNeedToChangeThis
 #     - OAUTH2_ACCESS_TOKEN_STRATEGY=jwt
+#     Uncomment the following lines when configuring tracing
+#      - TRACING_PROVIDER=jaeger
+#      - TRACING_PROVIDER_JAEGER_SAMPLING_SERVER_URL=http://jaeger:5778/sampling
+#      - TRACING_PROVIDER_JAEGER_LOCAL_AGENT_ADDRESS=jaeger:6831
+#      - TRACING_OMIT_SQL_ARGUMENTS_FROM_SPANS=false
     restart: unless-stopped
 
   consent:
@@ -70,6 +77,19 @@ services:
     ports:
       - "3000:3000"
     restart: unless-stopped
+
+# Uncomment the following when configuring tracing
+
+#  jaeger:
+#    image: jaegertracing/all-in-one:1.7.0
+#    ports:
+#    - "5775:5775/udp"
+#    - "6831:6831/udp"
+#    - "6832:6832/udp"
+#    - "5778:5778"
+#    - "16686:16686"
+#    - "14268:14268"
+#    - "9411:9411"
 
   postgresd:
     image: postgres:9.6

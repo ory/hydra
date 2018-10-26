@@ -53,7 +53,9 @@ func injectFositeStore(c *config.Config, clients client.Manager) {
 }
 
 func newOAuth2Provider(c *config.Config) fosite.OAuth2Provider {
-	var hasher fosite.Hasher
+	var hasher fosite.Hasher = &fosite.BCrypt{
+		WorkFactor: c.BCryptWorkFactor,
+	}
 	var ctx = c.Context()
 	var store = ctx.FositeStore
 	expectDependency(c.GetLogger(), ctx.FositeStore)
@@ -117,8 +119,10 @@ func newOAuth2Provider(c *config.Config) fosite.OAuth2Provider {
 		c.GetLogger().Fatalf(`Environment variable OAUTH2_ACCESS_TOKEN_STRATEGY is set to "%s" but only "opaque" and "jwt" are valid values.`, c.OAuth2AccessTokenStrategy)
 	}
 
-	if tracer, err := c.GetTracer(); err == nil && tracer.IsLoaded() {
-		hasher = &tracing.TracedBCrypt{WorkFactor: fc.HashCost}
+	if c.WithTracing() {
+		hasher = &tracing.TracedBCrypt{
+			WorkFactor: fc.HashCost,
+		}
 	}
 
 	return compose.Compose(

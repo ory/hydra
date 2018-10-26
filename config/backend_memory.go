@@ -41,7 +41,7 @@ func init() {
 	RegisterBackend(&MemoryBackend{})
 }
 
-func (m *MemoryBackend) Init(url string, l logrus.FieldLogger) error {
+func (m *MemoryBackend) Init(url string, l logrus.FieldLogger, _ ...ConnectorOptions) error {
 	m.l = l
 	return nil
 }

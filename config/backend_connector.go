@@ -41,7 +41,7 @@ var (
 )
 
 type BackendConnector interface {
-	Init(url string, l logrus.FieldLogger) error
+	Init(url string, l logrus.FieldLogger, opts ...ConnectorOptions) error
 	NewConsentManager(clientManager client.Manager, fs pkg.FositeStorer) consent.Manager
 	NewOAuth2Manager(clientManager client.Manager, accessTokenLifespan time.Duration, tokenStrategy string) pkg.FositeStorer
 	NewClientManager(hasher fosite.Hasher) client.Manager

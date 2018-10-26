@@ -76,11 +76,13 @@ func TestTracingSetup(t *testing.T) {
 	c := &Config{TracingProvider: "some_unsupported_tracing_provider"}
 	tracer, _ := c.GetTracer()
 	assert.False(t, tracer.IsLoaded())
+	assert.False(t, c.WithTracing())
 
 	// tracer is not loaded if no tracing provider is specified
 	c = &Config{TracingProvider: ""}
 	tracer, _ = c.GetTracer()
 	assert.False(t, tracer.IsLoaded())
+	assert.False(t, c.WithTracing())
 
 	// tracer is loaded if configured properly
 	c = &Config{
@@ -91,6 +93,7 @@ func TestTracingSetup(t *testing.T) {
 	}
 	tracer, _ = c.GetTracer()
 	assert.True(t, tracer.IsLoaded())
+	assert.True(t, c.WithTracing())
 }
 
 func TestSystemSecret(t *testing.T) {

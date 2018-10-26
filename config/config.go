@@ -91,7 +91,7 @@ type Config struct {
 	TracingProvider                  string  `mapstructure:"TRACING_PROVIDER" yaml:"-"`
 	TracingServiceName               string  `mapstructure:"TRACING_SERVICE_NAME" yaml:"-"`
 	JaegerSamplingServerUrl          string  `mapstructure:"TRACING_PROVIDER_JAEGER_SAMPLING_SERVER_URL" yaml:"-"`
-	JaegerLocalAgentHostPort         string  `mapstructure:"TRACING_PROVIDER_JAEGER_LOCAL_AGENT_HOST_PORT" yaml:"-"`
+	JaegerLocalAgentHostPort         string  `mapstructure:"TRACING_PROVIDER_JAEGER_LOCAL_AGENT_ADDRESS" yaml:"-"`
 	JaegerSamplingType               string  `mapstructure:"TRACING_PROVIDER_JAEGER_SAMPLING_TYPE" yaml:"-"`
 	JaegerSamplingValue              float64 `mapstructure:"TRACING_PROVIDER_JAEGER_SAMPLING_VALUE" yaml:"-"`
 	ForceHTTP                        bool    `yaml:"-"`
@@ -219,6 +219,14 @@ func (c *Config) GetTracer() (*tracing.Tracer, error) {
 	return c.tracer, nil
 }
 
+func (c *Config) WithTracing() bool {
+	if tracer, err := c.GetTracer(); err == nil && tracer.IsLoaded() {
+		return true
+	} else {
+		return false
+	}
+}
+
 func (c *Config) GetPrometheusMetrics() *prometheus.MetricsManager {
 	c.GetLogger().Info("Setting up Prometheus middleware")
 
@@ -293,7 +301,10 @@ func (c *Config) Context() *Context {
 	if c.context != nil {
 		return c.context
 	}
-	var hasher fosite.Hasher
+
+	var hasher fosite.Hasher = &fosite.BCrypt{
+		WorkFactor: c.BCryptWorkFactor,
+	}
 
 	if c.DatabaseURL == "" {
 		c.GetLogger().Fatalf(`DATABASE_URL is not set, use "export DATABASE_URL=memory" for an in memory storage or the documented database adapters.`)
@@ -317,20 +328,20 @@ func (c *Config) Context() *Context {
 	}
 
 	if backend, ok := backends[scheme]; ok {
-		if err := backend.Init(c.DatabaseURL, c.GetLogger()); err != nil {
+		options := []ConnectorOptions{}
+		if c.WithTracing() {
+			hasher = &tracing.TracedBCrypt{
+				WorkFactor: c.BCryptWorkFactor,
+			}
+			options = append(options, WithTracing(), withOmitSQLArgsFromSpans())
+		}
+
+		if err := backend.Init(c.DatabaseURL, c.GetLogger(), options...); err != nil {
 			c.GetLogger().Fatalf(`Could not connect to database backend: %s`, err)
 		}
 		connection = backend
 	} else {
 		c.GetLogger().Fatalf(`Unknown DSN scheme "%s" in DATABASE_URL "%s", schemes %v supported`, scheme, c.DatabaseURL, supportedSchemes())
-	}
-
-	hasher = &fosite.BCrypt{
-		WorkFactor: c.BCryptWorkFactor,
-	}
-
-	if tracer, err := c.GetTracer(); err == nil && tracer.IsLoaded() {
-		hasher = &tracing.TracedBCrypt{WorkFactor: c.BCryptWorkFactor}
 	}
 
 	c.context = &Context{

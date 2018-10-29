@@ -68,7 +68,7 @@ var createJWKMigrations = []*migrate.Migration{
 			`INSERT INTO hydra_jwk (sid, kid, version, keydata, created_at) VALUES ('4-sid', '4-kid', 0, 'some-key', NOW())`,
 		},
 		Down: []string{
-			`DELETE FROM hydra_jwk WHERE sid='3-sid'`,
+			`DELETE FROM hydra_jwk WHERE sid='4-sid'`,
 		},
 	},
 }

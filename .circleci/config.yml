@@ -76,7 +76,7 @@ jobs:
       - run: mv ./bin/* $GOPATH/bin
       - run: go mod download
       - run: go mod vendor
-      - run: make init
+      - run: GO111MODULE=off make init
       - run: GO111MODULE=off make gen
       - run: git add -A && git diff --exit-code
 

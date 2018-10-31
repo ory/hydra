@@ -65,6 +65,11 @@ type Client struct {
 	// Pattern: ([a-zA-Z0-9\.\*]+\s?)+
 	Scope string `json:"scope"`
 
+	// Audience is a whitelist defining the audiences this client is allowed to request tokens for. An audience limits
+	// the applicability of an OAuth 2.0 Access Token to, for example, certain API endpoints. The value is a list
+	// of URLs. URLs MUST NOT contain whitespaces.
+	Audience []string `json:"audience"`
+
 	// Owner is a string identifying the owner of the OAuth 2.0 Client.
 	Owner string `json:"owner"`
 
@@ -164,6 +169,10 @@ func (c *Client) GetHashedSecret() []byte {
 
 func (c *Client) GetScopes() fosite.Arguments {
 	return fosite.Arguments(strings.Fields(c.Scope))
+}
+
+func (c *Client) GetAudience() fosite.Arguments {
+	return fosite.Arguments(c.Audience)
 }
 
 func (c *Client) GetGrantTypes() fosite.Arguments {

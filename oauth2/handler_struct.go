@@ -54,7 +54,8 @@ type Handler struct {
 
 	L logrus.FieldLogger
 
-	ScopeStrategy fosite.ScopeStrategy
+	ScopeStrategy    fosite.ScopeStrategy
+	AudienceStrategy fosite.AudienceMatchingStrategy
 
 	IssuerURL string
 

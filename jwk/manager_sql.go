@@ -25,6 +25,10 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/sirupsen/logrus"
+
+	"github.com/ory/x/dbal"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
@@ -43,84 +47,15 @@ func NewSQLManager(db *sqlx.DB, key []byte) *SQLManager {
 	return &SQLManager{DB: db, Cipher: &AEAD{Key: key}}
 }
 
-var sharedMigrations = map[string]*migrate.Migration{
-	"1": {
-		Id: "1",
-		Up: []string{
-			`CREATE TABLE IF NOT EXISTS hydra_jwk (
-	sid     varchar(255) NOT NULL,
-	kid 	varchar(255) NOT NULL,
-	version int NOT NULL DEFAULT 0,
-	keydata text NOT NULL,
-	PRIMARY KEY (sid, kid)
-)`,
-		},
-		Down: []string{
-			"DROP TABLE hydra_jwk",
-		},
-	},
-	"2": {
-		Id: "2",
-		Up: []string{
-			`ALTER TABLE hydra_jwk ADD created_at TIMESTAMP NOT NULL DEFAULT NOW()`,
-		},
-		Down: []string{
-			`ALTER TABLE hydra_jwk DROP COLUMN created_at`,
-		},
-	},
-	// See https://github.com/ory/hydra/issues/921
-	"3": {
-		Id: "3",
-		Up: []string{
-			`DELETE FROM hydra_jwk WHERE sid='hydra.openid.id-token'`,
-		},
-		Down: []string{},
-	},
-}
-
-var Migrations = map[string]*migrate.MemoryMigrationSource{
-	"mysql": {
-		Migrations: []*migrate.Migration{
-			sharedMigrations["1"],
-			sharedMigrations["2"],
-			sharedMigrations["3"],
-			{
-				Id: "4",
-				Up: []string{
-					`ALTER TABLE hydra_jwk DROP PRIMARY KEY`,
-					`CREATE UNIQUE INDEX hydra_jwk_idx_id_uq ON hydra_jwk (sid, kid)`,
-					`ALTER TABLE hydra_jwk ADD pk INT UNSIGNED AUTO_INCREMENT PRIMARY KEY`,
-				},
-				Down: []string{
-					`ALTER TABLE hydra_jwk DROP COLUMN pk`,
-					`ALTER TABLE hydra_jwk DROP INDEX hydra_jwk_idx_id_uq`,
-					`ALTER TABLE hydra_jwk ADD PRIMARY KEY (sid, kid)`,
-				},
-			},
-		},
-	},
-	"postgres": {
-		Migrations: []*migrate.Migration{
-			sharedMigrations["1"],
-			sharedMigrations["2"],
-			sharedMigrations["3"],
-			{
-				Id: "4",
-				Up: []string{
-					`ALTER TABLE hydra_jwk DROP CONSTRAINT hydra_jwk_pkey`,
-					`ALTER TABLE hydra_jwk ADD pk SERIAL`,
-					`ALTER TABLE hydra_jwk ADD PRIMARY KEY (pk)`,
-					`CREATE UNIQUE INDEX hydra_jwk_idx_id_uq ON hydra_jwk (sid, kid)`,
-				},
-				Down: []string{
-					`ALTER TABLE hydra_jwk DROP CONSTRAINT hydra_jwk_pkey`,
-					`ALTER TABLE hydra_jwk DROP COLUMN pk`,
-					`DROP INDEX hydra_jwk_idx_id_uq`,
-					`ALTER TABLE hydra_jwk ADD PRIMARY KEY (sid, kid)`,
-				},
-			},
-		},
-	},
+var migrations = map[string]*migrate.PackrMigrationSource{
+	dbal.DriverMySQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
+		"migrations/sql/shared",
+		"migrations/sql/mysql",
+	}),
+	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
+		"migrations/sql/shared",
+		"migrations/sql/postgres",
+	}),
 }
 
 type sqlData struct {
@@ -140,9 +75,9 @@ func (m *SQLManager) CreateSchemas() (int, error) {
 	}
 
 	migrate.SetTable("hydra_jwk_migration")
-	n, err := migrate.Exec(m.DB.DB, m.DB.DriverName(), Migrations[database], migrate.Up)
+	n, err := migrate.Exec(m.DB.DB, m.DB.DriverName(), migrations[database], migrate.Up)
 	if err != nil {
-		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d Migrations", n)
+		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
 	}
 	return n, nil
 }

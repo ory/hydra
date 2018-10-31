@@ -49,9 +49,9 @@ func createAccessTokenSession(subject, client string, token string, expiresAt ti
 
 func createAccessTokenSessionPairwise(subject, client string, token string, expiresAt time.Time, fs *storage.MemoryStore, scopes fosite.Arguments, obfuscated string) {
 	ar := fosite.NewAccessRequest(oauth2.NewSession(subject))
-	ar.GrantedScopes = fosite.Arguments{"core"}
+	ar.GrantedScope = fosite.Arguments{"core"}
 	if scopes != nil {
-		ar.GrantedScopes = scopes
+		ar.GrantedScope = scopes
 	}
 	ar.RequestedAt = time.Now().UTC().Round(time.Minute)
 	ar.Client = &fosite.DefaultClient{ID: client}

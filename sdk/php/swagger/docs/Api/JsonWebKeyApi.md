@@ -1,4 +1,4 @@
-# Hydra\SDK\JsonWebKeyApi
+# HydraSDK\JsonWebKeyApi
 Client for Hydra
 
 All URIs are relative to *http://localhost*
@@ -15,7 +15,7 @@ Method | HTTP request | Description
 
 
 # **createJsonWebKeySet**
-> \Hydra\SDK\Model\JSONWebKeySet createJsonWebKeySet($set, $body)
+> \HydraSDK\Model\JSONWebKeySet createJsonWebKeySet($set, $body)
 
 Generate a new JSON Web Key
 
@@ -26,9 +26,9 @@ This endpoint is capable of generating JSON Web Key Sets for you. There a differ
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\JsonWebKeyApi();
+$api_instance = new HydraSDK\Api\JsonWebKeyApi();
 $set = "set_example"; // string | The set
-$body = new \Hydra\SDK\Model\JsonWebKeySetGeneratorRequest(); // \Hydra\SDK\Model\JsonWebKeySetGeneratorRequest | 
+$body = new \HydraSDK\Model\JsonWebKeySetGeneratorRequest(); // \HydraSDK\Model\JsonWebKeySetGeneratorRequest | 
 
 try {
     $result = $api_instance->createJsonWebKeySet($set, $body);
@@ -44,11 +44,11 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **set** | **string**| The set |
- **body** | [**\Hydra\SDK\Model\JsonWebKeySetGeneratorRequest**](../Model/JsonWebKeySetGeneratorRequest.md)|  | [optional]
+ **body** | [**\HydraSDK\Model\JsonWebKeySetGeneratorRequest**](../Model/JsonWebKeySetGeneratorRequest.md)|  | [optional]
 
 ### Return type
 
-[**\Hydra\SDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
+[**\HydraSDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
 
 ### Authorization
 
@@ -73,7 +73,7 @@ Use this endpoint to delete a single JSON Web Key.  A JSON Web Key (JWK) is a Ja
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\JsonWebKeyApi();
+$api_instance = new HydraSDK\Api\JsonWebKeyApi();
 $kid = "kid_example"; // string | The kid of the desired key
 $set = "set_example"; // string | The set
 
@@ -119,7 +119,7 @@ Use this endpoint to delete a complete JSON Web Key Set and all the keys in that
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\JsonWebKeyApi();
+$api_instance = new HydraSDK\Api\JsonWebKeyApi();
 $set = "set_example"; // string | The set
 
 try {
@@ -152,7 +152,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **getJsonWebKey**
-> \Hydra\SDK\Model\JSONWebKeySet getJsonWebKey($kid, $set)
+> \HydraSDK\Model\JSONWebKeySet getJsonWebKey($kid, $set)
 
 Retrieve a JSON Web Key
 
@@ -163,7 +163,7 @@ This endpoint can be used to retrieve JWKs stored in ORY Hydra.  A JSON Web Key 
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\JsonWebKeyApi();
+$api_instance = new HydraSDK\Api\JsonWebKeyApi();
 $kid = "kid_example"; // string | The kid of the desired key
 $set = "set_example"; // string | The set
 
@@ -185,7 +185,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**\Hydra\SDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
+[**\HydraSDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
 
 ### Authorization
 
@@ -199,7 +199,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **getJsonWebKeySet**
-> \Hydra\SDK\Model\JSONWebKeySet getJsonWebKeySet($set)
+> \HydraSDK\Model\JSONWebKeySet getJsonWebKeySet($set)
 
 Retrieve a JSON Web Key Set
 
@@ -210,7 +210,7 @@ This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.  A JSON Web 
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\JsonWebKeyApi();
+$api_instance = new HydraSDK\Api\JsonWebKeyApi();
 $set = "set_example"; // string | The set
 
 try {
@@ -230,7 +230,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**\Hydra\SDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
+[**\HydraSDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
 
 ### Authorization
 
@@ -244,7 +244,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **updateJsonWebKey**
-> \Hydra\SDK\Model\JSONWebKey updateJsonWebKey($kid, $set, $body)
+> \HydraSDK\Model\JSONWebKey updateJsonWebKey($kid, $set, $body)
 
 Update a JSON Web Key
 
@@ -255,10 +255,10 @@ Use this method if you do not want to let Hydra generate the JWKs for you, but i
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\JsonWebKeyApi();
+$api_instance = new HydraSDK\Api\JsonWebKeyApi();
 $kid = "kid_example"; // string | The kid of the desired key
 $set = "set_example"; // string | The set
-$body = new \Hydra\SDK\Model\JSONWebKey(); // \Hydra\SDK\Model\JSONWebKey | 
+$body = new \HydraSDK\Model\JSONWebKey(); // \HydraSDK\Model\JSONWebKey | 
 
 try {
     $result = $api_instance->updateJsonWebKey($kid, $set, $body);
@@ -275,11 +275,11 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **kid** | **string**| The kid of the desired key |
  **set** | **string**| The set |
- **body** | [**\Hydra\SDK\Model\JSONWebKey**](../Model/JSONWebKey.md)|  | [optional]
+ **body** | [**\HydraSDK\Model\JSONWebKey**](../Model/JSONWebKey.md)|  | [optional]
 
 ### Return type
 
-[**\Hydra\SDK\Model\JSONWebKey**](../Model/JSONWebKey.md)
+[**\HydraSDK\Model\JSONWebKey**](../Model/JSONWebKey.md)
 
 ### Authorization
 
@@ -293,7 +293,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **updateJsonWebKeySet**
-> \Hydra\SDK\Model\JSONWebKeySet updateJsonWebKeySet($set, $body)
+> \HydraSDK\Model\JSONWebKeySet updateJsonWebKeySet($set, $body)
 
 Update a JSON Web Key Set
 
@@ -304,9 +304,9 @@ Use this method if you do not want to let Hydra generate the JWKs for you, but i
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\JsonWebKeyApi();
+$api_instance = new HydraSDK\Api\JsonWebKeyApi();
 $set = "set_example"; // string | The set
-$body = new \Hydra\SDK\Model\JSONWebKeySet(); // \Hydra\SDK\Model\JSONWebKeySet | 
+$body = new \HydraSDK\Model\JSONWebKeySet(); // \HydraSDK\Model\JSONWebKeySet | 
 
 try {
     $result = $api_instance->updateJsonWebKeySet($set, $body);
@@ -322,11 +322,11 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **set** | **string**| The set |
- **body** | [**\Hydra\SDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)|  | [optional]
+ **body** | [**\HydraSDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)|  | [optional]
 
 ### Return type
 
-[**\Hydra\SDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
+[**\HydraSDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
 
 ### Authorization
 

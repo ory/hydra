@@ -25,6 +25,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/sirupsen/logrus"
+
+	"github.com/ory/x/dbal"
+
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
 
@@ -32,112 +36,15 @@ import (
 	"github.com/ory/hydra/client"
 )
 
-var migrations = &migrate.MemoryMigrationSource{
-	Migrations: []*migrate.Migration{
-		{
-			Id: "1",
-			Up: []string{
-				`CREATE TABLE hydra_oauth2_consent_request (
-	challenge  			varchar(40) NOT NULL PRIMARY KEY,
-	verifier 			varchar(40) NOT NULL,
-	client_id			varchar(255) NOT NULL,
-	subject				varchar(255) NOT NULL,
-	request_url			text NOT NULL,
-	skip				bool NOT NULL,
-	requested_scope		text NOT NULL,
-	csrf				varchar(40) NOT NULL,
-	authenticated_at	timestamp NULL,
-	requested_at  		timestamp NOT NULL DEFAULT now(),
-	oidc_context		text NOT NULL
-)`,
-				// It would probably make sense here to have a FK relation to clients, but it increases testing complexity and might also
-				// purge important audit data when a client is deleted. Also, stale data does not have a negative impact here
-				// 		FOREIGN KEY (client_id) REFERENCES hydra_client (id) ON DELETE CASCADE
-				`CREATE TABLE hydra_oauth2_authentication_request (
-	challenge  			varchar(40) NOT NULL PRIMARY KEY,
-	requested_scope		text NOT NULL,
-	verifier 			varchar(40) NOT NULL,
-	csrf				varchar(40) NOT NULL,
-	subject				varchar(255) NOT NULL,
-	request_url			text NOT NULL,
-	skip				bool NOT NULL,
-	client_id			varchar(255) NOT NULL,
-	requested_at  		timestamp NOT NULL DEFAULT now(),
-	authenticated_at	timestamp NULL,
-	oidc_context		text NOT NULL
-)`,
-				// It would probably make sense here to have a FK relation to clients, but it increases testing complexity and might also
-				// purge important audit data when a client is deleted. Also, stale data does not have a negative impact here
-				// 		FOREIGN KEY (client_id) REFERENCES hydra_client (id) ON DELETE CASCADE
-				`CREATE TABLE hydra_oauth2_authentication_session (
-	id      			varchar(40) NOT NULL PRIMARY KEY,
-	authenticated_at  	timestamp NOT NULL DEFAULT NOW(),
-	subject 			varchar(255) NOT NULL
-)`,
-				`CREATE TABLE hydra_oauth2_consent_request_handled (
-	challenge  				varchar(40) NOT NULL PRIMARY KEY,
-	granted_scope			text NOT NULL,
-	remember				bool NOT NULL,
-	remember_for			int NOT NULL,
-	error					text NOT NULL,
-	requested_at  			timestamp NOT NULL DEFAULT now(),
-	session_access_token 	text NOT NULL,
-	session_id_token 		text NOT NULL,
-	authenticated_at		timestamp NULL,
-	was_used 				bool NOT NULL
-)`,
-				`CREATE TABLE hydra_oauth2_authentication_request_handled (
-	challenge  			varchar(40) NOT NULL PRIMARY KEY,
-	subject 			varchar(255) NOT NULL,
-	remember			bool NOT NULL,
-	remember_for		int NOT NULL,
-	error				text NOT NULL,
-	acr					text NOT NULL,
-	requested_at  		timestamp NOT NULL DEFAULT now(),
-	authenticated_at	timestamp NULL,
-	was_used 			bool NOT NULL
-)`,
-			},
-			Down: []string{
-				"DROP TABLE hydra_oauth2_consent_request",
-				"DROP TABLE hydra_oauth2_authentication_request",
-				"DROP TABLE hydra_oauth2_authentication_session",
-				"DROP TABLE hydra_oauth2_consent_request_handled",
-				"DROP TABLE hydra_oauth2_authentication_request_handled",
-			},
-		},
-		{
-			Id: "2",
-			Up: []string{
-				`ALTER TABLE hydra_oauth2_consent_request ADD forced_subject_identifier VARCHAR(255) NULL DEFAULT ''`,
-				`ALTER TABLE hydra_oauth2_authentication_request_handled ADD forced_subject_identifier VARCHAR(255) NULL DEFAULT ''`,
-				`CREATE TABLE hydra_oauth2_obfuscated_authentication_session (
-	subject  			varchar(255) NOT NULL,
-	client_id 			varchar(255) NOT NULL,
-	subject_obfuscated	varchar(255) NOT NULL,
-	PRIMARY KEY(subject, client_id)
-)`,
-			},
-			Down: []string{
-				`ALTER TABLE hydra_oauth2_consent_request DROP COLUMN forced_subject_identifier`,
-				`ALTER TABLE hydra_oauth2_authentication_request_handled DROP COLUMN forced_subject_identifier`,
-				"DROP TABLE hydra_oauth2_obfuscated_authentication_session",
-			},
-		},
-		{
-			Id: "3",
-			Up: []string{
-				`ALTER TABLE hydra_oauth2_consent_request ADD login_session_id VARCHAR(40) NULL DEFAULT ''`,
-				`ALTER TABLE hydra_oauth2_consent_request ADD login_challenge VARCHAR(40) NULL DEFAULT ''`,
-				`ALTER TABLE hydra_oauth2_authentication_request ADD login_session_id VARCHAR(40) NULL DEFAULT ''`,
-			},
-			Down: []string{
-				`ALTER TABLE hydra_oauth2_consent_request DROP COLUMN login_session_id`,
-				`ALTER TABLE hydra_oauth2_consent_request DROP COLUMN login_challenge`,
-				`ALTER TABLE hydra_oauth2_authentication_request DROP COLUMN login_session_id`,
-			},
-		},
-	},
+var migrations = map[string]*migrate.PackrMigrationSource{
+	"mysql": dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
+		"migrations/sql/shared",
+		"migrations/sql/mysql",
+	}),
+	"postgres": dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
+		"migrations/sql/shared",
+		"migrations/sql/postgres",
+	}),
 }
 
 var sqlParamsAuthenticationRequestHandled = []string{
@@ -161,6 +68,7 @@ var sqlParamsAuthenticationRequest = []string{
 	"request_url",
 	"skip",
 	"requested_scope",
+	"requested_at_audience",
 	"authenticated_at",
 	"requested_at",
 	"csrf",
@@ -173,6 +81,7 @@ var sqlParamsConsentRequest = append(sqlParamsAuthenticationRequest, "forced_sub
 var sqlParamsConsentRequestHandled = []string{
 	"challenge",
 	"granted_scope",
+	"granted_at_audience",
 	"remember",
 	"remember_for",
 	"authenticated_at",
@@ -197,6 +106,7 @@ type sqlAuthenticationRequest struct {
 	Skip                 bool       `db:"skip"`
 	Challenge            string     `db:"challenge"`
 	RequestedScope       string     `db:"requested_scope"`
+	RequestedAudience    string     `db:"requested_at_audience"`
 	Verifier             string     `db:"verifier"`
 	CSRF                 string     `db:"csrf"`
 	AuthenticatedAt      *time.Time `db:"authenticated_at"`
@@ -240,6 +150,7 @@ func newSQLConsentRequest(c *ConsentRequest) (*sqlConsentRequest, error) {
 			Skip:                 c.Skip,
 			Challenge:            c.Challenge,
 			RequestedScope:       strings.Join(c.RequestedScope, "|"),
+			RequestedAudience:    strings.Join(c.RequestedAudience, "|"),
 			Verifier:             c.Verifier,
 			CSRF:                 c.CSRF,
 			AuthenticatedAt:      toMySQLDateHack(c.AuthenticatedAt),
@@ -265,6 +176,7 @@ func newSQLAuthenticationRequest(c *AuthenticationRequest) (*sqlAuthenticationRe
 		Skip:                 c.Skip,
 		Challenge:            c.Challenge,
 		RequestedScope:       strings.Join(c.RequestedScope, "|"),
+		RequestedAudience:    strings.Join(c.RequestedAudience, "|"),
 		Verifier:             c.Verifier,
 		CSRF:                 c.CSRF,
 		AuthenticatedAt:      toMySQLDateHack(c.AuthenticatedAt),
@@ -287,6 +199,7 @@ func (s *sqlAuthenticationRequest) toAuthenticationRequest(client *client.Client
 		Skip:                 s.Skip,
 		Challenge:            s.Challenge,
 		RequestedScope:       stringsx.Splitx(s.RequestedScope, "|"),
+		RequestedAudience:    stringsx.Splitx(s.RequestedAudience, "|"),
 		Verifier:             s.Verifier,
 		CSRF:                 s.CSRF,
 		AuthenticatedAt:      fromMySQLDateHack(s.AuthenticatedAt),
@@ -310,6 +223,7 @@ func (s *sqlConsentRequest) toConsentRequest(client *client.Client) (*ConsentReq
 		Skip:                   s.Skip,
 		Challenge:              s.Challenge,
 		RequestedScope:         stringsx.Splitx(s.RequestedScope, "|"),
+		RequestedAudience:      stringsx.Splitx(s.RequestedAudience, "|"),
 		Verifier:               s.Verifier,
 		CSRF:                   s.CSRF,
 		AuthenticatedAt:        fromMySQLDateHack(s.AuthenticatedAt),
@@ -323,6 +237,7 @@ func (s *sqlConsentRequest) toConsentRequest(client *client.Client) (*ConsentReq
 
 type sqlHandledConsentRequest struct {
 	GrantedScope       string     `db:"granted_scope"`
+	GrantedAudience    string     `db:"granted_at_audience"`
 	SessionIDToken     string     `db:"session_id_token"`
 	SessionAccessToken string     `db:"session_access_token"`
 	Remember           bool       `db:"remember"`
@@ -367,6 +282,7 @@ func newSQLHandledConsentRequest(c *HandledConsentRequest) (*sqlHandledConsentRe
 
 	return &sqlHandledConsentRequest{
 		GrantedScope:       strings.Join(c.GrantedScope, "|"),
+		GrantedAudience:    strings.Join(c.GrantedAudience, "|"),
 		SessionIDToken:     sidt,
 		SessionAccessToken: sat,
 		Remember:           c.Remember,
@@ -399,12 +315,13 @@ func (s *sqlHandledConsentRequest) toHandledConsentRequest(r *ConsentRequest) (*
 	}
 
 	return &HandledConsentRequest{
-		GrantedScope: stringsx.Splitx(s.GrantedScope, "|"),
-		RememberFor:  s.RememberFor,
-		Remember:     s.Remember,
-		Challenge:    s.Challenge,
-		RequestedAt:  s.RequestedAt,
-		WasUsed:      s.WasUsed,
+		GrantedScope:    stringsx.Splitx(s.GrantedScope, "|"),
+		GrantedAudience: stringsx.Splitx(s.GrantedAudience, "|"),
+		RememberFor:     s.RememberFor,
+		Remember:        s.Remember,
+		Challenge:       s.Challenge,
+		RequestedAt:     s.RequestedAt,
+		WasUsed:         s.WasUsed,
 		Session: &ConsentRequestSessionData{
 			IDToken:     idt,
 			AccessToken: at,

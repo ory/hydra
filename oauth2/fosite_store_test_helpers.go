@@ -39,12 +39,15 @@ import (
 )
 
 var defaultRequest = fosite.Request{
-	RequestedAt:   time.Now().UTC().Round(time.Second),
-	Client:        &client.Client{ClientID: "foobar"},
-	Scopes:        fosite.Arguments{"fa", "ba"},
-	GrantedScopes: fosite.Arguments{"fa", "ba"},
-	Form:          url.Values{"foo": []string{"bar", "baz"}},
-	Session:       &fosite.DefaultSession{Subject: "bar"},
+	ID:                "blank",
+	RequestedAt:       time.Now().UTC().Round(time.Second),
+	Client:            &client.Client{ClientID: "foobar"},
+	RequestedScope:    fosite.Arguments{"fa", "ba"},
+	GrantedScope:      fosite.Arguments{"fa", "ba"},
+	RequestedAudience: fosite.Arguments{"ad1", "ad2"},
+	GrantedAudience:   fosite.Arguments{"ad1", "ad2"},
+	Form:              url.Values{"foo": []string{"bar", "baz"}},
+	Session:           &fosite.DefaultSession{Subject: "bar"},
 }
 
 func TestHelperUniqueConstraints(m pkg.FositeStorer, storageType string) func(t *testing.T) {
@@ -95,7 +98,7 @@ func TestHelperCreateGetDeleteOpenIDConnectSession(m pkg.FositeStorer) func(t *t
 
 		res, err := m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{Session: &fosite.DefaultSession{}})
 		require.NoError(t, err)
-		AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
+		AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 		err = m.DeleteOpenIDConnectSession(ctx, "4321")
 		require.NoError(t, err)
@@ -116,7 +119,7 @@ func TestHelperCreateGetDeleteRefreshTokenSession(m pkg.FositeStorer) func(t *te
 
 		res, err := m.GetRefreshTokenSession(ctx, "4321", &fosite.DefaultSession{})
 		require.NoError(t, err)
-		AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
+		AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 		err = m.DeleteRefreshTokenSession(ctx, "4321")
 		require.NoError(t, err)
@@ -124,8 +127,8 @@ func TestHelperCreateGetDeleteRefreshTokenSession(m pkg.FositeStorer) func(t *te
 		_, err = m.GetRefreshTokenSession(ctx, "4321", &fosite.DefaultSession{})
 		assert.NotNil(t, err)
 	}
-
 }
+
 func TestHelperRevokeRefreshToken(m pkg.FositeStorer) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.Background()
@@ -157,8 +160,8 @@ func TestHelperRevokeRefreshToken(m pkg.FositeStorer) func(t *testing.T) {
 		assert.NotNil(t, err)
 
 	}
-
 }
+
 func TestHelperCreateGetDeleteAuthorizeCodes(m pkg.FositeStorer) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.Background()
@@ -171,7 +174,7 @@ func TestHelperCreateGetDeleteAuthorizeCodes(m pkg.FositeStorer) func(t *testing
 
 		res, err = m.GetAuthorizeCodeSession(ctx, "4321", &fosite.DefaultSession{})
 		require.NoError(t, err)
-		AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
+		AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 		err = m.InvalidateAuthorizeCodeSession(ctx, "4321")
 		require.NoError(t, err)
@@ -194,7 +197,7 @@ func TestHelperCreateGetDeleteAccessTokenSession(m pkg.FositeStorer) func(t *tes
 
 		res, err := m.GetAccessTokenSession(ctx, "4321", &fosite.DefaultSession{})
 		require.NoError(t, err)
-		AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
+		AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 		err = m.DeleteAccessTokenSession(ctx, "4321")
 		require.NoError(t, err)
@@ -215,7 +218,7 @@ func TestHelperCreateGetDeletePKCERequestSession(m pkg.FositeStorer) func(t *tes
 
 		res, err := m.GetPKCERequestSession(ctx, "4321", &fosite.DefaultSession{})
 		require.NoError(t, err)
-		AssertObjectKeysEqual(t, &defaultRequest, res, "Scopes", "GrantedScopes", "Form", "Session")
+		AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 		err = m.DeletePKCERequestSession(ctx, "4321")
 		require.NoError(t, err)
@@ -228,31 +231,31 @@ func TestHelperCreateGetDeletePKCERequestSession(m pkg.FositeStorer) func(t *tes
 var lifespan = time.Hour
 var flushRequests = []*fosite.Request{
 	{
-		ID:            "flush-1",
-		RequestedAt:   time.Now().Round(time.Second),
-		Client:        &client.Client{ClientID: "foobar"},
-		Scopes:        fosite.Arguments{"fa", "ba"},
-		GrantedScopes: fosite.Arguments{"fa", "ba"},
-		Form:          url.Values{"foo": []string{"bar", "baz"}},
-		Session:       &fosite.DefaultSession{Subject: "bar"},
+		ID:             "flush-1",
+		RequestedAt:    time.Now().Round(time.Second),
+		Client:         &client.Client{ClientID: "foobar"},
+		RequestedScope: fosite.Arguments{"fa", "ba"},
+		GrantedScope:   fosite.Arguments{"fa", "ba"},
+		Form:           url.Values{"foo": []string{"bar", "baz"}},
+		Session:        &fosite.DefaultSession{Subject: "bar"},
 	},
 	{
-		ID:            "flush-2",
-		RequestedAt:   time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
-		Client:        &client.Client{ClientID: "foobar"},
-		Scopes:        fosite.Arguments{"fa", "ba"},
-		GrantedScopes: fosite.Arguments{"fa", "ba"},
-		Form:          url.Values{"foo": []string{"bar", "baz"}},
-		Session:       &fosite.DefaultSession{Subject: "bar"},
+		ID:             "flush-2",
+		RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
+		Client:         &client.Client{ClientID: "foobar"},
+		RequestedScope: fosite.Arguments{"fa", "ba"},
+		GrantedScope:   fosite.Arguments{"fa", "ba"},
+		Form:           url.Values{"foo": []string{"bar", "baz"}},
+		Session:        &fosite.DefaultSession{Subject: "bar"},
 	},
 	{
-		ID:            "flush-3",
-		RequestedAt:   time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
-		Client:        &client.Client{ClientID: "foobar"},
-		Scopes:        fosite.Arguments{"fa", "ba"},
-		GrantedScopes: fosite.Arguments{"fa", "ba"},
-		Form:          url.Values{"foo": []string{"bar", "baz"}},
-		Session:       &fosite.DefaultSession{Subject: "bar"},
+		ID:             "flush-3",
+		RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
+		Client:         &client.Client{ClientID: "foobar"},
+		RequestedScope: fosite.Arguments{"fa", "ba"},
+		GrantedScope:   fosite.Arguments{"fa", "ba"},
+		Form:           url.Values{"foo": []string{"bar", "baz"}},
+		Session:        &fosite.DefaultSession{Subject: "bar"},
 	},
 }
 

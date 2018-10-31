@@ -30,6 +30,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/go-convenience/stringsx"
+
+	"github.com/ory/x/dbal"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
@@ -63,89 +67,6 @@ func NewFositeSQLStore(m client.Manager,
 	}
 }
 
-func sqlSchemaUp(db, table, id string) string {
-	shared := []string{
-		fmt.Sprintf(`CREATE TABLE IF NOT EXISTS hydra_oauth2_%s (
-	signature      	varchar(255) NOT NULL PRIMARY KEY,
-	request_id  	varchar(255) NOT NULL,
-	requested_at  	timestamp NOT NULL DEFAULT now(),
-	client_id  		text NOT NULL,
-	scope  			text NOT NULL,
-	granted_scope 	text NOT NULL,
-	form_data  		text NOT NULL,
-	session_data  	text NOT NULL
-)`, table),
-		fmt.Sprintf("ALTER TABLE hydra_oauth2_%s ADD subject varchar(255) NOT NULL DEFAULT ''", table),
-		`CREATE TABLE IF NOT EXISTS hydra_oauth2_pkce (
-	signature      	varchar(255) NOT NULL PRIMARY KEY,
-	request_id  	varchar(255) NOT NULL,
-	requested_at  	timestamp NOT NULL DEFAULT now(),
-	client_id  		text NOT NULL,
-	scope  			text NOT NULL,
-	granted_scope 	text NOT NULL,
-	form_data  		text NOT NULL,
-	session_data  	text NOT NULL,
-	subject 		varchar(255) NOT NULL
-)`,
-		fmt.Sprintf("ALTER TABLE hydra_oauth2_%s ADD active BOOL NOT NULL DEFAULT TRUE", table),
-		fmt.Sprintf("CREATE UNIQUE INDEX hydra_oauth2_%s_request_id_idx ON hydra_oauth2_%s (request_id)", table, table),
-		fmt.Sprintf("CREATE INDEX hydra_oauth2_%s_requested_at_idx ON hydra_oauth2_%s (requested_at)", table, table),
-	}
-
-	m := map[string]map[string]string{
-		"mysql": {
-			"1": shared[0],
-			"2": shared[1],
-			"3": shared[2],
-			"4": shared[3],
-			"5": shared[4],
-			"6": shared[5],
-		},
-		"postgres": {
-			"1": shared[0],
-			"2": shared[1],
-			"3": shared[2],
-			"4": shared[3],
-			"5": shared[4],
-			"6": shared[5],
-		},
-	}
-
-	return m[db][id]
-}
-
-func sqlSchemaDown(db, table, id string) string {
-	shared := []string{
-		fmt.Sprintf(`DROP TABLE %s)`, table),
-		fmt.Sprintf("ALTER TABLE hydra_oauth2_%s DROP COLUMN subject", table),
-		"DROP TABLE hydra_oauth2_pkce",
-		fmt.Sprintf("ALTER TABLE hydra_oauth2_%s DROP COLUMN active", table),
-		fmt.Sprintf("DROP INDEX hydra_oauth2_%s_request_id_idx ON hydra_oauth2_%s", table, table),
-		fmt.Sprintf("DROP INDEX hydra_oauth2_%s_requested_at_idx ON hydra_oauth2_%s", table, table),
-	}
-
-	m := map[string]map[string]string{
-		"mysql": {
-			"1": shared[0],
-			"2": shared[1],
-			"3": shared[2],
-			"4": shared[3],
-			"5": shared[4],
-			"6": shared[5],
-		},
-		"postgres": {
-			"1": shared[0],
-			"2": shared[1],
-			"3": shared[2],
-			"4": shared[3],
-			"5": shared[4],
-			"6": shared[5],
-		},
-	}
-
-	return m[db][id]
-}
-
 const (
 	sqlTableOpenID  = "oidc"
 	sqlTableAccess  = "access"
@@ -154,92 +75,15 @@ const (
 	sqlTablePKCE    = "pkce"
 )
 
-func createMigrationSource(db string) *migrate.MemoryMigrationSource {
-	return &migrate.MemoryMigrationSource{
-		Migrations: []*migrate.Migration{
-			{
-				Id: "1",
-				Up: []string{
-					sqlSchemaUp(db, sqlTableAccess, "1"),
-					sqlSchemaUp(db, sqlTableRefresh, "1"),
-					sqlSchemaUp(db, sqlTableCode, "1"),
-					sqlSchemaUp(db, sqlTableOpenID, "1"),
-				},
-				Down: []string{
-					sqlSchemaDown(db, sqlTableAccess, "1"),
-					sqlSchemaDown(db, sqlTableRefresh, "1"),
-					sqlSchemaDown(db, sqlTableCode, "1"),
-					sqlSchemaDown(db, sqlTableOpenID, "1"),
-				},
-			},
-			{
-				Id: "2",
-				Up: []string{
-					sqlSchemaUp(db, sqlTableAccess, "2"),
-					sqlSchemaUp(db, sqlTableRefresh, "2"),
-					sqlSchemaUp(db, sqlTableCode, "2"),
-					sqlSchemaUp(db, sqlTableOpenID, "2"),
-				},
-				Down: []string{
-					sqlSchemaDown(db, sqlTableAccess, "2"),
-					sqlSchemaDown(db, sqlTableRefresh, "2"),
-					sqlSchemaDown(db, sqlTableCode, "2"),
-					sqlSchemaDown(db, sqlTableOpenID, "2"),
-				},
-			},
-			{
-				Id: "3",
-				Up: []string{
-					sqlSchemaUp(db, sqlTablePKCE, "3"),
-				},
-				Down: []string{
-					sqlSchemaDown(db, sqlTablePKCE, "3"),
-				},
-			},
-			{
-				Id: "4",
-				Up: []string{
-					sqlSchemaUp(db, sqlTableAccess, "4"),
-					sqlSchemaUp(db, sqlTableRefresh, "4"),
-					sqlSchemaUp(db, sqlTableCode, "4"),
-					sqlSchemaUp(db, sqlTableOpenID, "4"),
-					sqlSchemaUp(db, sqlTablePKCE, "4"),
-				},
-				Down: []string{
-					sqlSchemaDown(db, sqlTableAccess, "4"),
-					sqlSchemaDown(db, sqlTableRefresh, "4"),
-					sqlSchemaDown(db, sqlTableCode, "4"),
-					sqlSchemaDown(db, sqlTableOpenID, "4"),
-					sqlSchemaDown(db, sqlTablePKCE, "4"),
-				},
-			},
-			{
-				Id: "5",
-				Up: []string{
-					sqlSchemaUp(db, sqlTableAccess, "5"),
-					sqlSchemaUp(db, sqlTableRefresh, "5"),
-				},
-				Down: []string{
-					sqlSchemaDown(db, sqlTableAccess, "5"),
-					sqlSchemaDown(db, sqlTableRefresh, "5"),
-				},
-			},
-			{
-				Id: "6",
-				Up: []string{
-					sqlSchemaUp(db, sqlTableAccess, "6"),
-				},
-				Down: []string{
-					sqlSchemaDown(db, sqlTableAccess, "6"),
-				},
-			},
-		},
-	}
-}
-
-var migrations = map[string]*migrate.MemoryMigrationSource{
-	"mysql":    createMigrationSource("mysql"),
-	"postgres": createMigrationSource("postgres"),
+var migrations = map[string]*migrate.PackrMigrationSource{
+	dbal.DriverMySQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
+		"migrations/sql/shared",
+		"migrations/sql/mysql",
+	}),
+	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
+		"migrations/sql/shared",
+		"migrations/sql/postgres",
+	}),
 }
 
 var sqlParams = []string{
@@ -253,20 +97,24 @@ var sqlParams = []string{
 	"session_data",
 	"subject",
 	"active",
+	"requested_audience",
+	"granted_audience",
 }
 
 type sqlData struct {
-	PK            int       `db:"pk"`
-	Signature     string    `db:"signature"`
-	Request       string    `db:"request_id"`
-	RequestedAt   time.Time `db:"requested_at"`
-	Client        string    `db:"client_id"`
-	Scopes        string    `db:"scope"`
-	GrantedScopes string    `db:"granted_scope"`
-	Form          string    `db:"form_data"`
-	Subject       string    `db:"subject"`
-	Active        bool      `db:"active"`
-	Session       []byte    `db:"session_data"`
+	PK                int       `db:"pk"`
+	Signature         string    `db:"signature"`
+	Request           string    `db:"request_id"`
+	RequestedAt       time.Time `db:"requested_at"`
+	Client            string    `db:"client_id"`
+	Scopes            string    `db:"scope"`
+	GrantedScope      string    `db:"granted_scope"`
+	RequestedAudience string    `db:"requested_audience"`
+	GrantedAudience   string    `db:"granted_audience"`
+	Form              string    `db:"form_data"`
+	Subject           string    `db:"subject"`
+	Active            bool      `db:"active"`
+	Session           []byte    `db:"session_data"`
 }
 
 func sqlSchemaFromRequest(signature string, r fosite.Requester, logger logrus.FieldLogger) (*sqlData, error) {
@@ -283,16 +131,18 @@ func sqlSchemaFromRequest(signature string, r fosite.Requester, logger logrus.Fi
 	}
 
 	return &sqlData{
-		Request:       r.GetID(),
-		Signature:     signature,
-		RequestedAt:   r.GetRequestedAt(),
-		Client:        r.GetClient().GetID(),
-		Scopes:        strings.Join([]string(r.GetRequestedScopes()), "|"),
-		GrantedScopes: strings.Join([]string(r.GetGrantedScopes()), "|"),
-		Form:          r.GetRequestForm().Encode(),
-		Session:       session,
-		Subject:       subject,
-		Active:        true,
+		Request:           r.GetID(),
+		Signature:         signature,
+		RequestedAt:       r.GetRequestedAt(),
+		Client:            r.GetClient().GetID(),
+		Scopes:            strings.Join([]string(r.GetRequestedScopes()), "|"),
+		GrantedScope:      strings.Join([]string(r.GetGrantedScopes()), "|"),
+		GrantedAudience:   strings.Join([]string(r.GetGrantedAudience()), "|"),
+		RequestedAudience: strings.Join([]string(r.GetRequestedAudience()), "|"),
+		Form:              r.GetRequestForm().Encode(),
+		Session:           session,
+		Subject:           subject,
+		Active:            true,
 	}, nil
 }
 
@@ -316,13 +166,15 @@ func (s *sqlData) toRequest(session fosite.Session, cm client.Manager, logger lo
 	}
 
 	r := &fosite.Request{
-		ID:            s.Request,
-		RequestedAt:   s.RequestedAt,
-		Client:        c,
-		Scopes:        fosite.Arguments(strings.Split(s.Scopes, "|")),
-		GrantedScopes: fosite.Arguments(strings.Split(s.GrantedScopes, "|")),
-		Form:          val,
-		Session:       session,
+		ID:                s.Request,
+		RequestedAt:       s.RequestedAt,
+		Client:            c,
+		RequestedScope:    fosite.Arguments(stringsx.Splitx(s.Scopes, "|")),
+		GrantedScope:      fosite.Arguments(stringsx.Splitx(s.GrantedScope, "|")),
+		RequestedAudience: fosite.Arguments(stringsx.Splitx(s.RequestedAudience, "|")),
+		GrantedAudience:   fosite.Arguments(stringsx.Splitx(s.GrantedAudience, "|")),
+		Form:              val,
+		Session:           session,
 	}
 
 	return r, nil
@@ -387,14 +239,8 @@ func (s *FositeSQLStore) deleteSession(ctx context.Context, signature string, ta
 }
 
 func (s *FositeSQLStore) CreateSchemas() (int, error) {
-	database := s.DB.DriverName()
-	switch database {
-	case "pgx", "pq":
-		database = "postgres"
-	}
-
 	migrate.SetTable("hydra_oauth2_migration")
-	n, err := migrate.Exec(s.DB.DB, s.DB.DriverName(), migrations[database], migrate.Up)
+	n, err := migrate.Exec(s.DB.DB, s.DB.DriverName(), migrations[dbal.Canonicalize(s.DB.DriverName())], migrate.Up)
 	if err != nil {
 		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
 	}

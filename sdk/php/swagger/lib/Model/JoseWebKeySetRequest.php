@@ -5,7 +5,7 @@
  * PHP version 5
  *
  * @category Class
- * @package  Hydra\SDK
+ * @package  HydraSDK
  * @author   Swaagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
@@ -27,7 +27,7 @@
  * Do not edit the class manually.
  */
 
-namespace Hydra\SDK\Model;
+namespace HydraSDK\Model;
 
 use \ArrayAccess;
 
@@ -35,7 +35,7 @@ use \ArrayAccess;
  * JoseWebKeySetRequest Class Doc Comment
  *
  * @category    Class
- * @package     Hydra\SDK
+ * @package     HydraSDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
  */
@@ -54,7 +54,7 @@ class JoseWebKeySetRequest implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'keys' => '\Hydra\SDK\Model\RawMessage[]'
+        'keys' => '\HydraSDK\Model\RawMessage[]'
     ];
 
     /**
@@ -162,7 +162,7 @@ class JoseWebKeySetRequest implements ArrayAccess
 
     /**
      * Gets keys
-     * @return \Hydra\SDK\Model\RawMessage[]
+     * @return \HydraSDK\Model\RawMessage[]
      */
     public function getKeys()
     {
@@ -171,7 +171,7 @@ class JoseWebKeySetRequest implements ArrayAccess
 
     /**
      * Sets keys
-     * @param \Hydra\SDK\Model\RawMessage[] $keys
+     * @param \HydraSDK\Model\RawMessage[] $keys
      * @return $this
      */
     public function setKeys($keys)
@@ -232,10 +232,10 @@ class JoseWebKeySetRequest implements ArrayAccess
     public function __toString()
     {
         if (defined('JSON_PRETTY_PRINT')) { // use JSON pretty print
-            return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
+            return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
         }
 
-        return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this));
+        return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this));
     }
 }
 

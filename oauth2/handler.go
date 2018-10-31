@@ -447,7 +447,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		Subject:           session.GetSubject(),
 		Username:          session.GetUsername(),
 		Extra:             session.Extra,
-		Audience:          session.Audience,
+		Audience:          resp.GetAccessRequester().GetGrantedAudience(),
 		Issuer:            strings.TrimRight(h.IssuerURL, "/") + "/",
 		ObfuscatedSubject: obfuscated,
 		TokenType:         string(resp.GetTokenType()),
@@ -550,6 +550,12 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 				accessRequest.GrantScope(scope)
 			}
 		}
+
+		for _, audience := range accessRequest.GetRequestedAudience() {
+			if h.AudienceStrategy(accessRequest.GetClient().GetAudience(), []string{audience}) == nil {
+				accessRequest.GrantAudience(audience)
+			}
+		}
 	}
 
 	accessResponse, err := h.OAuth2.NewAccessResponse(ctx, accessRequest)
@@ -604,6 +610,10 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		authorizeRequest.GrantScope(scope)
 	}
 
+	for _, audience := range session.GrantedAudience {
+		authorizeRequest.GrantAudience(audience)
+	}
+
 	openIDKeyID, err := h.OpenIDJWTStrategy.GetPublicKeyID(r.Context())
 	if err != nil {
 		pkg.LogError(err, h.L)
@@ -627,24 +637,24 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	response, err := h.OAuth2.NewAuthorizeResponse(ctx, authorizeRequest, &Session{
 		DefaultSession: &openid.DefaultSession{
 			Claims: &jwt.IDTokenClaims{
-				// We do not need to pass the audience because it's included directly by ORY Fosite
-				//Audience:    []string{authorizeRequest.GetClient().GetID()},
-				Subject:  session.ConsentRequest.SubjectIdentifier,
-				Issuer:   strings.TrimRight(h.IssuerURL, "/") + "/",
-				IssuedAt: time.Now().UTC(),
-				// This is set by the fosite strategy
-				//ExpiresAt:   time.Now().Add(h.IDTokenLifespan).UTC(),
+				Subject:     session.ConsentRequest.SubjectIdentifier,
+				Issuer:      strings.TrimRight(h.IssuerURL, "/") + "/",
+				IssuedAt:    time.Now().UTC(),
 				AuthTime:    session.AuthenticatedAt,
 				RequestedAt: session.RequestedAt,
 				Extra:       session.Session.IDToken,
+
+				// We do not need to pass the audience because it's included directly by ORY Fosite
+				// Audience:    []string{authorizeRequest.GetClient().GetID()},
+
+				// This is set by the fosite strategy
+				// ExpiresAt:   time.Now().Add(h.IDTokenLifespan).UTC(),
 			},
 			// required for lookup on jwk endpoint
 			Headers: &jwt.Headers{Extra: map[string]interface{}{"kid": openIDKeyID}},
 			Subject: session.ConsentRequest.Subject,
 		},
-		Extra: session.Session.AccessToken,
-		// Here, we do not include the client because it's typically not the audience.
-		Audience: []string{},
+		Extra:    session.Session.AccessToken,
 		KID:      accessTokenKeyID,
 		ClientID: authorizeRequest.GetClient().GetID(),
 	})

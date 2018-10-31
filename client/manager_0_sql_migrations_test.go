@@ -18,14 +18,17 @@
  * @license 	Apache-2.0
  */
 
-package client_test
+package client
 
 import (
 	"context"
 	"fmt"
-	"log"
-	"sync"
 	"testing"
+
+	"github.com/sirupsen/logrus"
+
+	"github.com/ory/x/dbal"
+	"github.com/ory/x/dbal/migratest"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/rubenv/sql-migrate"
@@ -33,198 +36,39 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/client"
-	"github.com/ory/x/sqlcon/dockertest"
 )
 
-var createClientMigrations = []*migrate.Migration{
-	{
-		Id: "1-data",
-		Up: []string{
-			`INSERT INTO hydra_client (id, client_name, client_secret, redirect_uris, grant_types, response_types, scope, owner, policy_uri, tos_uri, client_uri, logo_uri, contacts, public) VALUES ('1-data', 'some-client', 'abcdef', 'http://localhost|http://google', 'authorize_code|implicit', 'token|id_token', 'foo|bar', 'aeneas', 'http://policy', 'http://tos', 'http://client', 'http://logo', 'aeneas|foo', true)`,
-		},
-		Down: []string{
-			`DELETE FROM hydra_client WHERE id='1-data'`,
-		},
-	},
-	{
-		Id: "2-data",
-		Up: []string{
-			`INSERT INTO hydra_client (id, client_name, client_secret, redirect_uris, grant_types, response_types, scope, owner, policy_uri, tos_uri, client_uri, logo_uri, contacts, public, client_secret_expires_at) VALUES ('2-data', 'some-client', 'abcdef', 'http://localhost|http://google', 'authorize_code|implicit', 'token|id_token', 'foo|bar', 'aeneas', 'http://policy', 'http://tos', 'http://client', 'http://logo', 'aeneas|foo', true, 0)`,
-		},
-		Down: []string{
-			`DELETE FROM hydra_client WHERE id='2-data'`,
-		},
-	},
-	{
-		Id: "3-data",
-		Up: []string{
-			`INSERT INTO hydra_client (id, client_name, client_secret, redirect_uris, grant_types, response_types, scope, owner, policy_uri, tos_uri, client_uri, logo_uri, contacts, public, client_secret_expires_at, sector_identifier_uri, jwks, jwks_uri, token_endpoint_auth_method, request_uris, request_object_signing_alg, userinfo_signed_response_alg) VALUES ('3-data', 'some-client', 'abcdef', 'http://localhost|http://google', 'authorize_code|implicit', 'token|id_token', 'foo|bar', 'aeneas', 'http://policy', 'http://tos', 'http://client', 'http://logo', 'aeneas|foo', true, 0, 'http://sector', '{"keys": []}', 'http://jwks', 'client_secret', 'http://uri1|http://uri2', 'rs256', 'rs526')`,
-		},
-		Down: []string{
-			`DELETE FROM hydra_client WHERE id='3-data'`,
-		},
-	},
-	{
-		Id: "4-data",
-		Up: []string{
-			`INSERT INTO hydra_client (id, client_name, client_secret, redirect_uris, grant_types, response_types, scope, owner, policy_uri, tos_uri, client_uri, logo_uri, contacts, public, client_secret_expires_at, sector_identifier_uri, jwks, jwks_uri, token_endpoint_auth_method, request_uris, request_object_signing_alg, userinfo_signed_response_alg) VALUES ('4-data', 'some-client', 'abcdef', 'http://localhost|http://google', 'authorize_code|implicit', 'token|id_token', 'foo|bar', 'aeneas', 'http://policy', 'http://tos', 'http://client', 'http://logo', 'aeneas|foo', true, 0, 'http://sector', '{"keys": []}', 'http://jwks', 'client_secret', 'http://uri1|http://uri2', 'rs256', 'rs526')`,
-		},
-		Down: []string{
-			`DELETE FROM hydra_client WHERE id='4-data'`,
-		},
-	},
-	{
-		Id: "5-data",
-		Up: []string{
-			`INSERT INTO hydra_client (id, client_name, client_secret, redirect_uris, grant_types, response_types, scope, owner, policy_uri, tos_uri, client_uri, logo_uri, contacts, client_secret_expires_at, sector_identifier_uri, jwks, jwks_uri, token_endpoint_auth_method, request_uris, request_object_signing_alg, userinfo_signed_response_alg) VALUES ('5-data', 'some-client', 'abcdef', 'http://localhost|http://google', 'authorize_code|implicit', 'token|id_token', 'foo|bar', 'aeneas', 'http://policy', 'http://tos', 'http://client', 'http://logo', 'aeneas|foo', 0, 'http://sector', '{"keys": []}', 'http://jwks', 'none', 'http://uri1|http://uri2', 'rs256', 'rs526')`,
-		},
-		Down: []string{
-			`DELETE FROM hydra_client WHERE id='5-data'`,
-		},
-	},
-	{
-		Id: "6-data",
-		Up: []string{
-			`INSERT INTO hydra_client (id, client_name, client_secret, redirect_uris, grant_types, response_types, scope, owner, policy_uri, tos_uri, client_uri, logo_uri, contacts, client_secret_expires_at, sector_identifier_uri, jwks, jwks_uri, token_endpoint_auth_method, request_uris, request_object_signing_alg, userinfo_signed_response_alg, subject_type) VALUES ('6-data', 'some-client', 'abcdef', 'http://localhost|http://google', 'authorize_code|implicit', 'token|id_token', 'foo|bar', 'aeneas', 'http://policy', 'http://tos', 'http://client', 'http://logo', 'aeneas|foo', 0, 'http://sector', '{"keys": []}', 'http://jwks', 'none', 'http://uri1|http://uri2', 'rs256', 'rs526', 'public')`,
-		},
-		Down: []string{
-			`DELETE FROM hydra_client WHERE id='6-data'`,
-		},
-	},
-	{
-		Id: "7-data",
-		Up: []string{
-			`INSERT INTO hydra_client (id, allowed_cors_origins, client_name, client_secret, redirect_uris, grant_types, response_types, scope, owner, policy_uri, tos_uri, client_uri, logo_uri, contacts, client_secret_expires_at, sector_identifier_uri, jwks, jwks_uri, token_endpoint_auth_method, request_uris, request_object_signing_alg, userinfo_signed_response_alg, subject_type) VALUES ('7-data', 'http://localhost|http://google', 'some-client', 'abcdef', 'http://localhost|http://google', 'authorize_code|implicit', 'token|id_token', 'foo|bar', 'aeneas', 'http://policy', 'http://tos', 'http://client', 'http://logo', 'aeneas|foo', 0, 'http://sector', '{"keys": []}', 'http://jwks', 'none', 'http://uri1|http://uri2', 'rs256', 'rs526', 'public')`,
-		},
-		Down: []string{
-			`DELETE FROM hydra_client WHERE id='7-data'`,
-		},
-	},
-	{
-		Id: "8-data",
-		Up: []string{
-			`INSERT INTO hydra_client (id, allowed_cors_origins, client_name, client_secret, redirect_uris, grant_types, response_types, scope, owner, policy_uri, tos_uri, client_uri, logo_uri, contacts, client_secret_expires_at, sector_identifier_uri, jwks, jwks_uri, token_endpoint_auth_method, request_uris, request_object_signing_alg, userinfo_signed_response_alg, subject_type) VALUES ('8-data', 'http://localhost|http://google', 'some-client', 'abcdef', 'http://localhost|http://google', 'authorize_code|implicit', 'token|id_token', 'foo|bar', 'aeneas', 'http://policy', 'http://tos', 'http://client', 'http://logo', 'aeneas|foo', 0, 'http://sector', '{"keys": []}', 'http://jwks', 'none', 'http://uri1|http://uri2', 'rs256', 'rs526', 'public')`,
-		},
-		Down: []string{
-			`DELETE FROM hydra_client WHERE id='8-data'`,
-		},
-	},
-	{
-		Id: "9-data",
-		Up: []string{
-			`INSERT INTO hydra_client (id, allowed_cors_origins, client_name, client_secret, redirect_uris, grant_types, response_types, scope, owner, policy_uri, tos_uri, client_uri, logo_uri, contacts, client_secret_expires_at, sector_identifier_uri, jwks, jwks_uri, token_endpoint_auth_method, request_uris, request_object_signing_alg, userinfo_signed_response_alg, subject_type) VALUES ('9-data', 'http://localhost|http://google', 'some-client', 'abcdef', 'http://localhost|http://google', 'authorize_code|implicit', 'token|id_token', 'foo|bar', 'aeneas', 'http://policy', 'http://tos', 'http://client', 'http://logo', 'aeneas|foo', 0, 'http://sector', '{"keys": []}', 'http://jwks', 'none', 'http://uri1|http://uri2', 'rs256', 'rs526', 'public')`,
-		},
-		Down: []string{
-			`DELETE FROM hydra_client WHERE id='9-data'`,
-		},
-	},
-}
-
-var migrations = map[string]*migrate.MemoryMigrationSource{
-	"mysql": {
-		Migrations: []*migrate.Migration{
-			{Id: "0-data", Up: []string{"DROP TABLE IF EXISTS hydra_client"}},
-			client.Migrations["mysql"].Migrations[0],
-			createClientMigrations[0],
-			client.Migrations["mysql"].Migrations[1],
-			createClientMigrations[1],
-			client.Migrations["mysql"].Migrations[2],
-			createClientMigrations[2],
-			client.Migrations["mysql"].Migrations[3],
-			createClientMigrations[3],
-			client.Migrations["mysql"].Migrations[4],
-			createClientMigrations[4],
-			client.Migrations["mysql"].Migrations[5],
-			createClientMigrations[5],
-			client.Migrations["mysql"].Migrations[6],
-			createClientMigrations[6],
-			client.Migrations["mysql"].Migrations[7],
-			createClientMigrations[7],
-			client.Migrations["mysql"].Migrations[8],
-			createClientMigrations[8],
-		},
-	},
-	"postgres": {
-		Migrations: []*migrate.Migration{
-			{Id: "0-data", Up: []string{"DROP TABLE IF EXISTS hydra_client"}},
-			client.Migrations["postgres"].Migrations[0],
-			createClientMigrations[0],
-			client.Migrations["postgres"].Migrations[1],
-			createClientMigrations[1],
-			client.Migrations["postgres"].Migrations[2],
-			createClientMigrations[2],
-			client.Migrations["postgres"].Migrations[3],
-			createClientMigrations[3],
-			client.Migrations["postgres"].Migrations[4],
-			createClientMigrations[4],
-			client.Migrations["postgres"].Migrations[5],
-			createClientMigrations[5],
-			client.Migrations["postgres"].Migrations[6],
-			createClientMigrations[6],
-			client.Migrations["postgres"].Migrations[7],
-			createClientMigrations[7],
-			client.Migrations["postgres"].Migrations[8],
-			createClientMigrations[8],
-		},
-	},
+var createMigrations = map[string]*migrate.PackrMigrationSource{
+	dbal.DriverMySQL:      dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}),
+	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}),
 }
 
 func TestMigrations(t *testing.T) {
-	var m sync.Mutex
-	var dbs = map[string]*sqlx.DB{}
 	if testing.Short() {
+		t.SkipNow()
 		return
 	}
 
-	dockertest.Parallel([]func(){
-		func() {
-			db, err := dockertest.ConnectToTestPostgreSQL()
-			if err != nil {
-				log.Fatalf("Could not connect to database: %v", err)
-			}
-			m.Lock()
-			dbs["postgres"] = db
-			m.Unlock()
-		},
-		func() {
-			db, err := dockertest.ConnectToTestMySQL()
-			if err != nil {
-				log.Fatalf("Could not connect to database: %v", err)
-			}
-			m.Lock()
-			dbs["mysql"] = db
-			m.Unlock()
-		},
-	})
+	require.True(t, len(Migrations[dbal.DriverMySQL].Box.List()) == len(Migrations[dbal.DriverPostgreSQL].Box.List()))
 
-	for k, db := range dbs {
-		t.Run(fmt.Sprintf("database=%s", k), func(t *testing.T) {
-			migrate.SetTable("hydra_client_migration_integration")
-			for step := range migrations[k].Migrations {
-				t.Run(fmt.Sprintf("step=%d", step), func(t *testing.T) {
-					n, err := migrate.ExecMax(db.DB, db.DriverName(), migrations[k], migrate.Up, 1)
-					require.NoError(t, err)
-					require.Equal(t, n, 1)
-				})
-			}
-
-			for _, key := range []string{"1-data", "2-data", "3-data", "4-data", "5-data"} {
-				t.Run("client="+key, func(t *testing.T) {
-					s := &client.SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}
-					c, err := s.GetConcreteClient(context.TODO(), key)
-					require.NoError(t, err)
-					assert.EqualValues(t, c.GetID(), key)
-				})
-			}
-
-			for step := range migrations[k].Migrations {
-				t.Run(fmt.Sprintf("step=%d", step), func(t *testing.T) {
-					n, err := migrate.ExecMax(db.DB, db.DriverName(), migrations[k], migrate.Down, 1)
-					require.NoError(t, err)
-					require.Equal(t, n, 1)
-				})
-			}
-		})
+	var clean = func(t *testing.T, db *sqlx.DB) {
+		_, err := db.Exec("DROP TABLE IF EXISTS hydra_client")
+		require.NoError(t, err)
 	}
+
+	migratest.RunPackrMigrationTests(
+		t,
+		Migrations,
+		createMigrations,
+		clean, clean,
+		func(t *testing.T, db *sqlx.DB, k int) {
+			id := fmt.Sprintf("%d-data", k+1)
+			t.Run("poll="+id, func(t *testing.T) {
+				s := &SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}
+				c, err := s.GetConcreteClient(context.TODO(), id)
+				require.NoError(t, err)
+				assert.EqualValues(t, c.GetID(), id)
+			})
+		},
+	)
 }

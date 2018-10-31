@@ -55,31 +55,31 @@ import (
 var lifespan = time.Hour
 var flushRequests = []*fosite.Request{
 	{
-		ID:            "flush-1",
-		RequestedAt:   time.Now().Round(time.Second),
-		Client:        &client.Client{ClientID: "foobar"},
-		Scopes:        fosite.Arguments{"fa", "ba"},
-		GrantedScopes: fosite.Arguments{"fa", "ba"},
-		Form:          url.Values{"foo": []string{"bar", "baz"}},
-		Session:       &fosite.DefaultSession{Subject: "bar"},
+		ID:             "flush-1",
+		RequestedAt:    time.Now().Round(time.Second),
+		Client:         &client.Client{ClientID: "foobar"},
+		RequestedScope: fosite.Arguments{"fa", "ba"},
+		GrantedScope:   fosite.Arguments{"fa", "ba"},
+		Form:           url.Values{"foo": []string{"bar", "baz"}},
+		Session:        &fosite.DefaultSession{Subject: "bar"},
 	},
 	{
-		ID:            "flush-2",
-		RequestedAt:   time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
-		Client:        &client.Client{ClientID: "foobar"},
-		Scopes:        fosite.Arguments{"fa", "ba"},
-		GrantedScopes: fosite.Arguments{"fa", "ba"},
-		Form:          url.Values{"foo": []string{"bar", "baz"}},
-		Session:       &fosite.DefaultSession{Subject: "bar"},
+		ID:             "flush-2",
+		RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
+		Client:         &client.Client{ClientID: "foobar"},
+		RequestedScope: fosite.Arguments{"fa", "ba"},
+		GrantedScope:   fosite.Arguments{"fa", "ba"},
+		Form:           url.Values{"foo": []string{"bar", "baz"}},
+		Session:        &fosite.DefaultSession{Subject: "bar"},
 	},
 	{
-		ID:            "flush-3",
-		RequestedAt:   time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
-		Client:        &client.Client{ClientID: "foobar"},
-		Scopes:        fosite.Arguments{"fa", "ba"},
-		GrantedScopes: fosite.Arguments{"fa", "ba"},
-		Form:          url.Values{"foo": []string{"bar", "baz"}},
-		Session:       &fosite.DefaultSession{Subject: "bar"},
+		ID:             "flush-3",
+		RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
+		Client:         &client.Client{ClientID: "foobar"},
+		RequestedScope: fosite.Arguments{"fa", "ba"},
+		GrantedScope:   fosite.Arguments{"fa", "ba"},
+		Form:           url.Values{"foo": []string{"bar", "baz"}},
+		Session:        &fosite.DefaultSession{Subject: "bar"},
 	},
 }
 
@@ -195,8 +195,7 @@ func TestUserinfo(t *testing.T) {
 								Headers: new(jwt.Headers),
 								Subject: "alice",
 							},
-							Audience: []string{},
-							Extra:    map[string]interface{}{},
+							Extra: map[string]interface{}{},
 						}
 
 						return fosite.AccessToken, &fosite.AccessRequest{
@@ -225,8 +224,7 @@ func TestUserinfo(t *testing.T) {
 								Headers: new(jwt.Headers),
 								Subject: "alice",
 							},
-							Audience: []string{},
-							Extra:    map[string]interface{}{},
+							Extra: map[string]interface{}{},
 						}
 
 						return fosite.AccessToken, &fosite.AccessRequest{
@@ -256,8 +254,7 @@ func TestUserinfo(t *testing.T) {
 								Headers: new(jwt.Headers),
 								Subject: "alice",
 							},
-							Audience: []string{},
-							Extra:    map[string]interface{}{},
+							Extra: map[string]interface{}{},
 						}
 
 						return fosite.AccessToken, &fosite.AccessRequest{
@@ -288,8 +285,7 @@ func TestUserinfo(t *testing.T) {
 								Headers: new(jwt.Headers),
 								Subject: "alice",
 							},
-							Audience: []string{},
-							Extra:    map[string]interface{}{},
+							Extra: map[string]interface{}{},
 						}
 
 						return fosite.AccessToken, &fosite.AccessRequest{
@@ -317,8 +313,7 @@ func TestUserinfo(t *testing.T) {
 								Headers: new(jwt.Headers),
 								Subject: "alice",
 							},
-							Audience: []string{},
-							Extra:    map[string]interface{}{},
+							Extra: map[string]interface{}{},
 						}
 
 						return fosite.AccessToken, &fosite.AccessRequest{

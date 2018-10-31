@@ -27,6 +27,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/x/dbal"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
@@ -53,7 +55,7 @@ func NewSQLManager(db *sqlx.DB, c client.Manager, store pkg.FositeStorer) *SQLMa
 
 func (m *SQLManager) CreateSchemas() (int, error) {
 	migrate.SetTable("hydra_oauth2_authentication_consent_migration")
-	n, err := migrate.Exec(m.db.DB, m.db.DriverName(), migrations, migrate.Up)
+	n, err := migrate.Exec(m.db.DB, m.db.DriverName(), migrations[dbal.Canonicalize(m.db.DriverName())], migrate.Up)
 	if err != nil {
 		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
 	}

@@ -26,6 +26,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/sirupsen/logrus"
+
+	"github.com/ory/x/dbal"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
@@ -36,187 +40,9 @@ import (
 	"github.com/ory/x/sqlcon"
 )
 
-var sharedMigrations = []*migrate.Migration{
-	{
-		Id: "1",
-		Up: []string{`CREATE TABLE IF NOT EXISTS hydra_client (
-	id      	varchar(255) NOT NULL PRIMARY KEY,
-	client_name  	text NOT NULL,
-	client_secret  	text NOT NULL,
-	redirect_uris  	text NOT NULL,
-	grant_types  	text NOT NULL,
-	response_types  text NOT NULL,
-	scope  			text NOT NULL,
-	owner  			text NOT NULL,
-	policy_uri  	text NOT NULL,
-	tos_uri  		text NOT NULL,
-	client_uri  	text NOT NULL,
-	logo_uri  		text NOT NULL,
-	contacts  		text NOT NULL,
-	public  		boolean NOT NULL
-)`},
-		Down: []string{
-			"DROP TABLE hydra_client",
-		},
-	},
-	{
-		Id: "2",
-		Up: []string{
-			`ALTER TABLE hydra_client ADD client_secret_expires_at INTEGER NOT NULL DEFAULT 0`,
-		},
-		Down: []string{
-			`ALTER TABLE hydra_client DROP COLUMN client_secret_expires_at`,
-		},
-	},
-	{
-		Id: "3",
-		Up: []string{
-			`ALTER TABLE hydra_client ADD sector_identifier_uri TEXT`,
-			`ALTER TABLE hydra_client ADD jwks TEXT`,
-			`ALTER TABLE hydra_client ADD jwks_uri TEXT`,
-			`ALTER TABLE hydra_client ADD request_uris TEXT`,
-			`ALTER TABLE hydra_client ADD token_endpoint_auth_method VARCHAR(25) NOT NULL DEFAULT ''`,
-			`ALTER TABLE hydra_client ADD request_object_signing_alg  VARCHAR(10) NOT NULL DEFAULT ''`,
-			`ALTER TABLE hydra_client ADD userinfo_signed_response_alg VARCHAR(10) NOT NULL DEFAULT ''`,
-		},
-		Down: []string{
-			`ALTER TABLE hydra_client DROP COLUMN sector_identifier_uri`,
-			`ALTER TABLE hydra_client DROP COLUMN jwks`,
-			`ALTER TABLE hydra_client DROP COLUMN jwks_uri`,
-			`ALTER TABLE hydra_client DROP COLUMN token_endpoint_auth_method`,
-			`ALTER TABLE hydra_client DROP COLUMN request_uris`,
-			`ALTER TABLE hydra_client DROP COLUMN request_object_signing_alg`,
-			`ALTER TABLE hydra_client DROP COLUMN userinfo_signed_response_alg`,
-		},
-	},
-	{
-		Id: "5",
-		Up: []string{
-			`UPDATE hydra_client SET token_endpoint_auth_method='none' WHERE public=TRUE`,
-			`ALTER TABLE hydra_client DROP COLUMN public`,
-		},
-		Down: []string{
-			`ALTER TABLE hydra_client ADD public BOOLEAN NOT NULL DEFAULT FALSE`,
-			`UPDATE hydra_client SET public=TRUE WHERE token_endpoint_auth_method='none'`,
-		},
-	},
-	{
-		Id: "6",
-		Up: []string{
-			`ALTER TABLE hydra_client ADD subject_type VARCHAR(15) NOT NULL DEFAULT ''`,
-		},
-		Down: []string{
-			`ALTER TABLE hydra_client DROP COLUMN subject_type`,
-		},
-	},
-	{
-		Id: "7",
-		Up: []string{
-			`ALTER TABLE hydra_client ADD allowed_cors_origins TEXT`,
-		},
-		Down: []string{
-			`ALTER TABLE hydra_client DROP COLUMN allowed_cors_origins`,
-		},
-	},
-}
-
-var Migrations = map[string]*migrate.MemoryMigrationSource{
-	"mysql": {Migrations: []*migrate.Migration{
-		sharedMigrations[0],
-		sharedMigrations[1],
-		sharedMigrations[2],
-		{
-			Id: "4",
-			Up: []string{
-				`UPDATE hydra_client SET sector_identifier_uri='', jwks='', jwks_uri='', request_uris=''`,
-				`ALTER TABLE hydra_client MODIFY sector_identifier_uri TEXT NOT NULL`,
-				`ALTER TABLE hydra_client MODIFY jwks TEXT NOT NULL`,
-				`ALTER TABLE hydra_client MODIFY jwks_uri TEXT NOT NULL`,
-				`ALTER TABLE hydra_client MODIFY request_uris TEXT NOT NULL`,
-			},
-			Down: []string{
-				`ALTER TABLE hydra_client MODIFY sector_identifier_uri TEXT`,
-				`ALTER TABLE hydra_client MODIFY jwks TEXT`,
-				`ALTER TABLE hydra_client MODIFY jwks_uri TEXT`,
-				`ALTER TABLE hydra_client MODIFY request_uris TEXT`,
-			},
-		},
-		sharedMigrations[3],
-		sharedMigrations[4],
-		sharedMigrations[5],
-		{
-			Id: "8",
-			Up: []string{
-				`UPDATE hydra_client SET allowed_cors_origins=''`,
-				`ALTER TABLE hydra_client MODIFY allowed_cors_origins TEXT NOT NULL`,
-			},
-			Down: []string{
-				`ALTER TABLE hydra_client MODIFY allowed_cors_origins TEXT`,
-			},
-		},
-		{
-			Id: "9",
-			Up: []string{
-				`ALTER TABLE hydra_client DROP PRIMARY KEY`,
-				`CREATE UNIQUE INDEX hydra_client_idx_id_uq ON hydra_client (id)`,
-				`ALTER TABLE hydra_client ADD pk INT UNSIGNED AUTO_INCREMENT PRIMARY KEY`,
-			},
-			Down: []string{
-				`ALTER TABLE hydra_client DROP COLUMN pk`,
-				`ALTER TABLE hydra_client DROP INDEX hydra_client_idx_id_uq`,
-				`ALTER TABLE hydra_client ADD PRIMARY KEY (id)`,
-			},
-		},
-	}},
-	"postgres": {Migrations: []*migrate.Migration{
-		sharedMigrations[0],
-		sharedMigrations[1],
-		sharedMigrations[2],
-		{
-			Id: "4",
-			Up: []string{
-				`UPDATE hydra_client SET sector_identifier_uri='', jwks='', jwks_uri='', request_uris=''`,
-				`ALTER TABLE hydra_client ALTER COLUMN sector_identifier_uri SET NOT NULL`,
-				`ALTER TABLE hydra_client ALTER COLUMN jwks SET NOT NULL`,
-				`ALTER TABLE hydra_client ALTER COLUMN jwks_uri SET NOT NULL`,
-				`ALTER TABLE hydra_client ALTER COLUMN request_uris SET NOT NULL`,
-			},
-			Down: []string{
-				`ALTER TABLE hydra_client ALTER COLUMN sector_identifier_uri DROP NOT NULL`,
-				`ALTER TABLE hydra_client ALTER COLUMN jwks DROP NOT NULL`,
-				`ALTER TABLE hydra_client ALTER COLUMN jwks_uri DROP NOT NULL`,
-				`ALTER TABLE hydra_client ALTER COLUMN request_uris DROP NOT NULL`,
-			},
-		},
-		sharedMigrations[3],
-		sharedMigrations[4],
-		sharedMigrations[5],
-		{
-			Id: "8",
-			Up: []string{
-				`UPDATE hydra_client SET allowed_cors_origins=''`,
-				`ALTER TABLE hydra_client ALTER COLUMN allowed_cors_origins SET NOT NULL`,
-			},
-			Down: []string{
-				`ALTER TABLE hydra_client ALTER COLUMN allowed_cors_origins DROP NOT NULL`,
-			},
-		},
-		{
-			Id: "9",
-			Up: []string{
-				`ALTER TABLE hydra_client DROP CONSTRAINT hydra_client_pkey`,
-				`ALTER TABLE hydra_client ADD pk SERIAL`,
-				`ALTER TABLE hydra_client ADD PRIMARY KEY (pk)`,
-				`CREATE UNIQUE INDEX hydra_client_idx_id_uq ON hydra_client (id)`,
-			},
-			Down: []string{
-				`ALTER TABLE hydra_client DROP CONSTRAINT hydra_client_pkey`,
-				`ALTER TABLE hydra_client DROP COLUMN pk`,
-				`DROP INDEX hydra_client_idx_id_uq`,
-				`ALTER TABLE hydra_client ADD PRIMARY KEY (id)`,
-			},
-		},
-	}},
+var Migrations = map[string]*migrate.PackrMigrationSource{
+	dbal.DriverMySQL:      dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/shared", "migrations/sql/mysql"}),
+	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/shared", "migrations/sql/postgres"}),
 }
 
 type SQLManager struct {
@@ -249,6 +75,7 @@ type sqlData struct {
 	RequestObjectSigningAlgorithm string `db:"request_object_signing_alg"`
 	UserinfoSignedResponseAlg     string `db:"userinfo_signed_response_alg"`
 	AllowedCORSOrigins            string `db:"allowed_cors_origins"`
+	Audience                      string `db:"audience"`
 }
 
 var sqlParams = []string{
@@ -275,6 +102,7 @@ var sqlParams = []string{
 	"request_object_signing_alg",
 	"userinfo_signed_response_alg",
 	"allowed_cors_origins",
+	"audience",
 }
 
 func sqlDataFromClient(d *Client) (*sqlData, error) {
@@ -293,6 +121,7 @@ func sqlDataFromClient(d *Client) (*sqlData, error) {
 		Name:                          d.Name,
 		Secret:                        d.Secret,
 		RedirectURIs:                  strings.Join(d.RedirectURIs, "|"),
+		Audience:                      strings.Join(d.Audience, "|"),
 		GrantTypes:                    strings.Join(d.GrantTypes, "|"),
 		ResponseTypes:                 strings.Join(d.ResponseTypes, "|"),
 		Scope:                         d.Scope,
@@ -320,6 +149,7 @@ func (d *sqlData) ToClient() (*Client, error) {
 		ClientID:                      d.ID,
 		Name:                          d.Name,
 		Secret:                        d.Secret,
+		Audience:                      stringsx.Splitx(d.Audience, "|"),
 		RedirectURIs:                  stringsx.Splitx(d.RedirectURIs, "|"),
 		GrantTypes:                    stringsx.Splitx(d.GrantTypes, "|"),
 		ResponseTypes:                 stringsx.Splitx(d.ResponseTypes, "|"),
@@ -352,14 +182,8 @@ func (d *sqlData) ToClient() (*Client, error) {
 }
 
 func (m *SQLManager) CreateSchemas() (int, error) {
-	database := m.DB.DriverName()
-	switch database {
-	case "pgx", "pq":
-		database = "postgres"
-	}
-
 	migrate.SetTable("hydra_client_migration")
-	n, err := migrate.Exec(m.DB.DB, m.DB.DriverName(), Migrations[database], migrate.Up)
+	n, err := migrate.Exec(m.DB.DB, m.DB.DriverName(), Migrations[dbal.Canonicalize(m.DB.DriverName())], migrate.Up)
 	if err != nil {
 		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d Migrations", n)
 	}

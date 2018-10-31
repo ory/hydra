@@ -14,24 +14,25 @@
  *
  */
 
-;(function(root, factory) {
+(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient'], factory)
+    define(['ApiClient'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'))
+    module.exports = factory(require('../ApiClient'));
   } else {
     // Browser globals (root is window)
     if (!root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer) {
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {}
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {};
     }
-    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKeySetGeneratorRequest = factory(
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient
-    )
+    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKeySetGeneratorRequest = factory(root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient);
   }
-})(this, function(ApiClient) {
-  'use strict'
+}(this, function(ApiClient) {
+  'use strict';
+
+
+
 
   /**
    * The JsonWebKeySetGeneratorRequest model module.
@@ -48,12 +49,12 @@
    * @param use {String} The \"use\" (public key use) parameter identifies the intended use of the public key. The \"use\" parameter is employed to indicate whether a public key is used for encrypting data or verifying the signature on data. Valid values are \"enc\" and \"sig\".
    */
   var exports = function(alg, kid, use) {
-    var _this = this
+    var _this = this;
 
-    _this['alg'] = alg
-    _this['kid'] = kid
-    _this['use'] = use
-  }
+    _this['alg'] = alg;
+    _this['kid'] = kid;
+    _this['use'] = use;
+  };
 
   /**
    * Constructs a <code>JsonWebKeySetGeneratorRequest</code> from a plain JavaScript object, optionally creating a new instance.
@@ -64,36 +65,40 @@
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
-      obj = obj || new exports()
+      obj = obj || new exports();
 
       if (data.hasOwnProperty('alg')) {
-        obj['alg'] = ApiClient.convertToType(data['alg'], 'String')
+        obj['alg'] = ApiClient.convertToType(data['alg'], 'String');
       }
       if (data.hasOwnProperty('kid')) {
-        obj['kid'] = ApiClient.convertToType(data['kid'], 'String')
+        obj['kid'] = ApiClient.convertToType(data['kid'], 'String');
       }
       if (data.hasOwnProperty('use')) {
-        obj['use'] = ApiClient.convertToType(data['use'], 'String')
+        obj['use'] = ApiClient.convertToType(data['use'], 'String');
       }
     }
-    return obj
+    return obj;
   }
 
   /**
    * The algorithm to be used for creating the key. Supports \"RS256\", \"ES512\", \"HS512\", and \"HS256\"
    * @member {String} alg
    */
-  exports.prototype['alg'] = undefined
+  exports.prototype['alg'] = undefined;
   /**
    * The kid of the key to be created
    * @member {String} kid
    */
-  exports.prototype['kid'] = undefined
+  exports.prototype['kid'] = undefined;
   /**
    * The \"use\" (public key use) parameter identifies the intended use of the public key. The \"use\" parameter is employed to indicate whether a public key is used for encrypting data or verifying the signature on data. Valid values are \"enc\" and \"sig\".
    * @member {String} use
    */
-  exports.prototype['use'] = undefined
+  exports.prototype['use'] = undefined;
 
-  return exports
-})
+
+
+  return exports;
+}));
+
+

@@ -14,43 +14,22 @@
  *
  */
 
-;(function(root, factory) {
+(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define([
-      'ApiClient',
-      'model/HealthNotReadyStatus',
-      'model/HealthStatus',
-      'model/InlineResponse401'
-    ], factory)
+    define(['ApiClient', 'model/HealthNotReadyStatus', 'model/HealthStatus', 'model/InlineResponse401'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(
-      require('../ApiClient'),
-      require('../model/HealthNotReadyStatus'),
-      require('../model/HealthStatus'),
-      require('../model/InlineResponse401')
-    )
+    module.exports = factory(require('../ApiClient'), require('../model/HealthNotReadyStatus'), require('../model/HealthStatus'), require('../model/InlineResponse401'));
   } else {
     // Browser globals (root is window)
     if (!root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer) {
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {}
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {};
     }
-    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthApi = factory(
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer
-        .HealthNotReadyStatus,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthStatus,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.InlineResponse401
-    )
+    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthApi = factory(root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient, root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthNotReadyStatus, root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthStatus, root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.InlineResponse401);
   }
-})(this, function(
-  ApiClient,
-  HealthNotReadyStatus,
-  HealthStatus,
-  InlineResponse401
-) {
-  'use strict'
+}(this, function(ApiClient, HealthNotReadyStatus, HealthStatus, InlineResponse401) {
+  'use strict';
 
   /**
    * Health service.
@@ -59,14 +38,15 @@
    */
 
   /**
-   * Constructs a new HealthApi.
+   * Constructs a new HealthApi. 
    * @alias module:api/HealthApi
    * @class
    * @param {module:ApiClient} apiClient Optional API client implementation to use,
    * default to {@link module:ApiClient#instance} if unspecified.
    */
   var exports = function(apiClient) {
-    this.apiClient = apiClient || ApiClient.instance
+    this.apiClient = apiClient || ApiClient.instance;
+
 
     /**
      * Callback function to receive the result of the isInstanceAlive operation.
@@ -77,41 +57,34 @@
      */
 
     /**
-     * Check the Alive Status
-     * This endpoint returns a 200 status code when the HTTP server is up running. This status does currently not include checks whether the database connection is working. This endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header when TLS termination is set.  Be aware that if you are running multiple nodes of ORY Hydra, the health status will never refer to the cluster state, only to a single instance.
+     * Check alive status
+     * This endpoint returns a 200 status code when the HTTP server is up running. This status does currently not include checks whether the database connection is working.  If the service supports TLS Edge Termination, this endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header to be set.  Be aware that if you are running multiple nodes of this service, the health status will never refer to the cluster state, only to a single instance.
      * @param {module:api/HealthApi~isInstanceAliveCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/HealthStatus}
      */
     this.isInstanceAlive = function(callback) {
-      var postBody = null
+      var postBody = null;
 
-      var pathParams = {}
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
 
-      var authNames = []
-      var contentTypes = [
-        'application/json',
-        'application/x-www-form-urlencoded'
-      ]
-      var accepts = ['application/json']
-      var returnType = HealthStatus
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = [];
+      var contentTypes = ['application/json', 'application/x-www-form-urlencoded'];
+      var accepts = ['application/json'];
+      var returnType = HealthStatus;
 
       return this.apiClient.callApi(
-        '/health/alive',
-        'GET',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/health/alive', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
 
     /**
@@ -123,43 +96,36 @@
      */
 
     /**
-     * Check the Readiness Status
-     * This endpoint returns a 200 status code when the HTTP server is up running and the environment dependencies (e.g. the database) are responsive as well.  This status does currently not include checks whether the database connection is working. This endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header when TLS termination is set.  Be aware that if you are running multiple nodes of ORY Hydra, the health status will never refer to the cluster state, only to a single instance.
+     * Check readiness status
+     * This endpoint returns a 200 status code when the HTTP server is up running and the environment dependencies (e.g. the database) are responsive as well.  If the service supports TLS Edge Termination, this endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header to be set.  Be aware that if you are running multiple nodes of this service, the health status will never refer to the cluster state, only to a single instance.
      * @param {module:api/HealthApi~isInstanceReadyCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/HealthStatus}
      */
     this.isInstanceReady = function(callback) {
-      var postBody = null
+      var postBody = null;
 
-      var pathParams = {}
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
 
-      var authNames = []
-      var contentTypes = [
-        'application/json',
-        'application/x-www-form-urlencoded'
-      ]
-      var accepts = ['application/json']
-      var returnType = HealthStatus
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = [];
+      var contentTypes = ['application/json', 'application/x-www-form-urlencoded'];
+      var accepts = ['application/json'];
+      var returnType = HealthStatus;
 
       return this.apiClient.callApi(
-        '/health/ready',
-        'GET',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/health/ready', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
-  }
+  };
 
-  return exports
-})
+  return exports;
+}));

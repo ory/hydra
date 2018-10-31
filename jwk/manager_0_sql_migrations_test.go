@@ -18,138 +18,53 @@
  * @license 	Apache-2.0
  */
 
-package jwk_test
+package jwk
 
 import (
+	"context"
 	"fmt"
-	"log"
-	"sync"
 	"testing"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/rubenv/sql-migrate"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/hydra/jwk"
-	"github.com/ory/x/sqlcon/dockertest"
+	"github.com/ory/hydra/client"
+	"github.com/ory/x/dbal"
+	"github.com/ory/x/dbal/migratest"
 )
 
-var createJWKMigrations = []*migrate.Migration{
-	{
-		Id: "1-data",
-		Up: []string{
-			`INSERT INTO hydra_jwk (sid, kid, version, keydata) VALUES ('1-sid', '1-kid', 0, 'some-key')`,
-		},
-		Down: []string{
-			`DELETE FROM hydra_jwk WHERE sid='1-sid'`,
-		},
-	},
-	{
-		Id: "2-data",
-		Up: []string{
-			`INSERT INTO hydra_jwk (sid, kid, version, keydata, created_at) VALUES ('2-sid', '2-kid', 0, 'some-key', NOW())`,
-		},
-		Down: []string{
-			`DELETE FROM hydra_jwk WHERE sid='2-sid'`,
-		},
-	},
-	{
-		Id: "3-data",
-		Up: []string{
-			`INSERT INTO hydra_jwk (sid, kid, version, keydata, created_at) VALUES ('3-sid', '3-kid', 0, 'some-key', NOW())`,
-		},
-		Down: []string{
-			`DELETE FROM hydra_jwk WHERE sid='3-sid'`,
-		},
-	},
-	{
-		Id: "4-data",
-		Up: []string{
-			`INSERT INTO hydra_jwk (sid, kid, version, keydata, created_at) VALUES ('4-sid', '4-kid', 0, 'some-key', NOW())`,
-		},
-		Down: []string{
-			`DELETE FROM hydra_jwk WHERE sid='3-sid'`,
-		},
-	},
-}
-
-var migrations = map[string]*migrate.MemoryMigrationSource{
-	"mysql": {
-		Migrations: []*migrate.Migration{
-			{Id: "0-data-0", Up: []string{"DROP TABLE IF EXISTS hydra_jwk"}},
-			{Id: "0-data-1", Up: []string{"DROP TABLE IF EXISTS hydra_jwk_migration"}},
-			jwk.Migrations["mysql"].Migrations[0],
-			createJWKMigrations[0],
-			jwk.Migrations["mysql"].Migrations[1],
-			createJWKMigrations[1],
-			jwk.Migrations["mysql"].Migrations[2],
-			createJWKMigrations[2],
-			jwk.Migrations["mysql"].Migrations[3],
-			createJWKMigrations[3],
-		},
-	},
-	"postgres": {
-		Migrations: []*migrate.Migration{
-			{Id: "0-data-0", Up: []string{"DROP TABLE IF EXISTS hydra_jwk"}},
-			{Id: "0-data-1", Up: []string{"DROP TABLE IF EXISTS hydra_jwk_migration"}},
-			jwk.Migrations["postgres"].Migrations[0],
-			createJWKMigrations[0],
-			jwk.Migrations["postgres"].Migrations[1],
-			createJWKMigrations[1],
-			jwk.Migrations["postgres"].Migrations[2],
-			createJWKMigrations[2],
-			jwk.Migrations["postgres"].Migrations[3],
-			createJWKMigrations[3],
-		},
-	},
+var createMigrations = map[string]*migrate.PackrMigrationSource{
+	dbal.DriverMySQL:      dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}),
+	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}),
 }
 
 func TestMigrations(t *testing.T) {
-	var m sync.Mutex
-	var dbs = map[string]*sqlx.DB{}
 	if testing.Short() {
+		t.SkipNow()
 		return
 	}
 
-	dockertest.Parallel([]func(){
-		func() {
-			db, err := dockertest.ConnectToTestPostgreSQL()
-			if err != nil {
-				log.Fatalf("Could not connect to database: %v", err)
-			}
-			m.Lock()
-			dbs["postgres"] = db
-			m.Unlock()
-		},
-		func() {
-			db, err := dockertest.ConnectToTestMySQL()
-			if err != nil {
-				log.Fatalf("Could not connect to database: %v", err)
-			}
-			m.Lock()
-			dbs["mysql"] = db
-			m.Unlock()
-		},
-	})
+	require.True(t, len(client.Migrations[dbal.DriverMySQL].Box.List()) == len(client.Migrations[dbal.DriverPostgreSQL].Box.List()))
 
-	for k, db := range dbs {
-		t.Run(fmt.Sprintf("database=%s", k), func(t *testing.T) {
-			migrate.SetTable("hydra_jwk_migration_integration")
-			for step := range migrations[k].Migrations {
-				t.Run(fmt.Sprintf("step=%d", step), func(t *testing.T) {
-					n, err := migrate.ExecMax(db.DB, db.DriverName(), migrations[k], migrate.Up, 1)
-					require.NoError(t, err)
-					require.Equal(t, n, 1)
-				})
-			}
-
-			for step := range migrations[k].Migrations {
-				t.Run(fmt.Sprintf("step=%d", step), func(t *testing.T) {
-					n, err := migrate.ExecMax(db.DB, db.DriverName(), migrations[k], migrate.Down, 1)
-					require.NoError(t, err)
-					require.Equal(t, n, 1)
-				})
-			}
-		})
+	var clean = func(t *testing.T, db *sqlx.DB) {
+		_, err := db.Exec("DROP TABLE IF EXISTS hydra_jwk")
+		require.NoError(t, err)
 	}
+
+	migratest.RunPackrMigrationTests(
+		t,
+		migrations,
+		createMigrations,
+		clean, clean,
+		func(t *testing.T, db *sqlx.DB, k int) {
+			t.Run(fmt.Sprintf("poll=%d", k), func(t *testing.T) {
+				sid := fmt.Sprintf("%d-sid", k+1)
+				m := NewSQLManager(db, []byte("01234567890123456789012345678912"))
+				_, err := m.GetKeySet(context.TODO(), sid)
+				require.Error(t, err, "malformed ciphertext")
+			})
+		},
+	)
 }

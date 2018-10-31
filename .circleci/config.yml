@@ -60,14 +60,14 @@ jobs:
       - run: ./scripts/test-e2e-plugin.sh
       - run: test -z "$CIRCLE_PR_NUMBER" && goveralls -service=circle-ci -coverprofile=coverage.txt -repotoken=$COVERALLS_REPO_TOKEN || echo "forks are not allowed to push to coveralls"
 
-  swagger:
+  generators:
     docker:
       - image: circleci/golang:1.11
     working_directory: /go/src/github.com/ory/hydra
     steps:
       - checkout
       - run: make init
-      - run: make sdk
+      - run: make gen
       - run: git add -A && git diff --exit-code
 
   build-docker:
@@ -208,14 +208,14 @@ workflows:
           filters:
             branches:
               only: master
-      - swagger:
+      - generators:
           filters:
             tags:
               only: /.*/
       - build-docker:
           requires:
             - test
-            - swagger
+            - generators
             - format
           filters:
             tags:

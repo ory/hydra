@@ -14,25 +14,25 @@
  *
  */
 
-;(function(root, factory) {
+(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/JSONWebKey'], factory)
+    define(['ApiClient', 'model/JSONWebKey'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('./JSONWebKey'))
+    module.exports = factory(require('../ApiClient'), require('./JSONWebKey'));
   } else {
     // Browser globals (root is window)
     if (!root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer) {
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {}
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {};
     }
-    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JSONWebKeySet = factory(
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JSONWebKey
-    )
+    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JSONWebKeySet = factory(root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient, root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JSONWebKey);
   }
-})(this, function(ApiClient, JSONWebKey) {
-  'use strict'
+}(this, function(ApiClient, JSONWebKey) {
+  'use strict';
+
+
+
 
   /**
    * The JSONWebKeySet model module.
@@ -46,8 +46,10 @@
    * @class
    */
   var exports = function() {
-    var _this = this
-  }
+    var _this = this;
+
+
+  };
 
   /**
    * Constructs a <code>JSONWebKeySet</code> from a plain JavaScript object, optionally creating a new instance.
@@ -58,20 +60,24 @@
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
-      obj = obj || new exports()
+      obj = obj || new exports();
 
       if (data.hasOwnProperty('keys')) {
-        obj['keys'] = ApiClient.convertToType(data['keys'], [JSONWebKey])
+        obj['keys'] = ApiClient.convertToType(data['keys'], [JSONWebKey]);
       }
     }
-    return obj
+    return obj;
   }
 
   /**
    * The value of the \"keys\" parameter is an array of JWK values.  By default, the order of the JWK values within the array does not imply an order of preference among them, although applications of JWK Sets can choose to assign a meaning to the order for their purposes, if desired.
    * @member {Array.<module:model/JSONWebKey>} keys
    */
-  exports.prototype['keys'] = undefined
+  exports.prototype['keys'] = undefined;
 
-  return exports
-})
+
+
+  return exports;
+}));
+
+

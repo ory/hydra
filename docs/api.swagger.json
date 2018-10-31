@@ -337,11 +337,14 @@
     },
     "/health/alive": {
       "get": {
-        "description": "This endpoint returns a 200 status code when the HTTP server is up running.\nThis status does currently not include checks whether the database connection is working.\nThis endpoint does not require the `X-Forwarded-Proto` header when TLS termination is set.\n\nBe aware that if you are running multiple nodes of ORY Hydra, the health status will never refer to the cluster state, only to a single instance.",
+        "description": "This endpoint returns a 200 status code when the HTTP server is up running.\nThis status does currently not include checks whether the database connection is working.\n\nIf the service supports TLS Edge Termination, this endpoint does not require the\n`X-Forwarded-Proto` header to be set.\n\nBe aware that if you are running multiple nodes of this service, the health status will never\nrefer to the cluster state, only to a single instance.",
+        "produces": [
+          "application/json"
+        ],
         "tags": [
           "health"
         ],
-        "summary": "Check the Alive Status",
+        "summary": "Check alive status",
         "operationId": "isInstanceAlive",
         "responses": {
           "200": {
@@ -358,11 +361,14 @@
     },
     "/health/ready": {
       "get": {
-        "description": "This endpoint returns a 200 status code when the HTTP server is up running and the environment dependencies (e.g.\nthe database) are responsive as well.\n\nThis status does currently not include checks whether the database connection is working.\nThis endpoint does not require the `X-Forwarded-Proto` header when TLS termination is set.\n\nBe aware that if you are running multiple nodes of ORY Hydra, the health status will never refer to the cluster state, only to a single instance.",
+        "description": "This endpoint returns a 200 status code when the HTTP server is up running and the environment dependencies (e.g.\nthe database) are responsive as well.\n\nIf the service supports TLS Edge Termination, this endpoint does not require the\n`X-Forwarded-Proto` header to be set.\n\nBe aware that if you are running multiple nodes of this service, the health status will never\nrefer to the cluster state, only to a single instance.",
+        "produces": [
+          "application/json"
+        ],
         "tags": [
           "health"
         ],
-        "summary": "Check the Readiness Status",
+        "summary": "Check readiness status",
         "operationId": "isInstanceReady",
         "responses": {
           "200": {
@@ -738,17 +744,6 @@
         }
       }
     },
-    "/metrics/prometheus": {
-      "get": {
-        "description": "This endpoint returns metrics formatted for Prometheus.",
-        "tags": [
-          "metrics"
-        ],
-        "summary": "Retrieve Prometheus metrics",
-        "operationId": "getPrometheusMetrics",
-        "responses": {}
-      }
-    },
     "/oauth2/auth": {
       "get": {
         "description": "This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.\nOAuth2 is a very popular protocol and a library for your programming language will exists.\n\nTo learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749",
@@ -812,6 +807,9 @@
             }
           },
           "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "409": {
             "$ref": "#/responses/genericError"
           },
           "500": {
@@ -955,6 +953,9 @@
             }
           },
           "401": {
+            "$ref": "#/responses/genericError"
+          },
+          "409": {
             "$ref": "#/responses/genericError"
           },
           "500": {
@@ -1480,11 +1481,14 @@
     },
     "/version": {
       "get": {
-        "description": "This endpoint returns the version as `{ \"version\": \"VERSION\" }`. The version is only correct with the prebuilt binary and not custom builds.",
+        "description": "This endpoint returns the service version typically notated using semantic versioning.\n\nIf the service supports TLS Edge Termination, this endpoint does not require the\n`X-Forwarded-Proto` header to be set.\n\nBe aware that if you are running multiple nodes of this service, the health status will never\nrefer to the cluster state, only to a single instance.",
+        "produces": [
+          "application/json"
+        ],
         "tags": [
           "version"
         ],
-        "summary": "Get the version of Hydra",
+        "summary": "Get service version",
         "operationId": "getVersion",
         "responses": {
           "200": {
@@ -1619,6 +1623,14 @@
         "consent_request": {
           "$ref": "#/definitions/consentRequest"
         },
+        "grant_access_token_audience": {
+          "description": "GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "GrantedAudience"
+        },
         "grant_scope": {
           "description": "GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`",
           "type": "array",
@@ -1658,8 +1670,16 @@
       "type": "object",
       "title": "The request payload used to accept a consent request.",
       "properties": {
+        "grant_access_token_audience": {
+          "description": "GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "GrantedAudience"
+        },
         "grant_scope": {
-          "description": "GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`",
+          "description": "GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.",
           "type": "array",
           "items": {
             "type": "string"
@@ -1761,8 +1781,16 @@
           "type": "string",
           "x-go-name": "RequestURL"
         },
+        "requested_access_token_audience": {
+          "description": "RequestedScope contains the access token audience as requested by the OAuth 2.0 Client.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "RequestedAudience"
+        },
         "requested_scope": {
-          "description": "RequestedScope contains all scopes requested by the OAuth 2.0 client.",
+          "description": "RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.",
           "type": "array",
           "items": {
             "type": "string"
@@ -1833,7 +1861,7 @@
         }
       },
       "x-go-name": "swaggerNotReadyStatus",
-      "x-go-package": "github.com/ory/hydra/health"
+      "x-go-package": "github.com/ory/x/healthx"
     },
     "healthStatus": {
       "type": "object",
@@ -1845,7 +1873,7 @@
         }
       },
       "x-go-name": "swaggerHealthStatus",
-      "x-go-package": "github.com/ory/hydra/health"
+      "x-go-package": "github.com/ory/x/healthx"
     },
     "joseWebKeySetRequest": {
       "type": "object",
@@ -1907,8 +1935,16 @@
           "type": "string",
           "x-go-name": "RequestURL"
         },
+        "requested_access_token_audience": {
+          "description": "RequestedScope contains the access token audience as requested by the OAuth 2.0 Client.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "RequestedAudience"
+        },
         "requested_scope": {
-          "description": "RequestedScope contains all scopes requested by the OAuth 2.0 client.",
+          "description": "RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.",
           "type": "array",
           "items": {
             "type": "string"
@@ -1945,6 +1981,14 @@
             "type": "string"
           },
           "x-go-name": "AllowedCORSOrigins"
+        },
+        "audience": {
+          "description": "Audience is a whitelist defining the audiences this client is allowed to request tokens for. An audience limits\nthe applicability of an OAuth 2.0 Access Token to, for example, certain API endpoints. The value is a list\nof URLs. URLs MUST NOT contain whitespaces.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "Audience"
         },
         "client_id": {
           "description": "ClientID  is the id for this client.",
@@ -2091,6 +2135,7 @@
           "x-go-name": "Active"
         },
         "aud": {
+          "description": "Audience contains a list of the token's intended audiences.",
           "type": "array",
           "items": {
             "type": "string"
@@ -2515,12 +2560,13 @@
       "type": "object",
       "properties": {
         "version": {
+          "description": "Version is the service's version.",
           "type": "string",
           "x-go-name": "Version"
         }
       },
       "x-go-name": "swaggerVersion",
-      "x-go-package": "github.com/ory/hydra/health"
+      "x-go-package": "github.com/ory/x/healthx"
     },
     "wellKnown": {
       "type": "object",

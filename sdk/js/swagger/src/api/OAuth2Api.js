@@ -14,94 +14,22 @@
  *
  */
 
-;(function(root, factory) {
+(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define([
-      'ApiClient',
-      'model/AcceptConsentRequest',
-      'model/AcceptLoginRequest',
-      'model/CompletedRequest',
-      'model/ConsentRequest',
-      'model/FlushInactiveOAuth2TokensRequest',
-      'model/InlineResponse401',
-      'model/JSONWebKeySet',
-      'model/LoginRequest',
-      'model/OAuth2Client',
-      'model/OAuth2TokenIntrospection',
-      'model/OauthTokenResponse',
-      'model/PreviousConsentSession',
-      'model/RejectRequest',
-      'model/UserinfoResponse',
-      'model/WellKnown'
-    ], factory)
+    define(['ApiClient', 'model/AcceptConsentRequest', 'model/AcceptLoginRequest', 'model/CompletedRequest', 'model/ConsentRequest', 'model/FlushInactiveOAuth2TokensRequest', 'model/InlineResponse401', 'model/JSONWebKeySet', 'model/LoginRequest', 'model/OAuth2Client', 'model/OAuth2TokenIntrospection', 'model/OauthTokenResponse', 'model/PreviousConsentSession', 'model/RejectRequest', 'model/UserinfoResponse', 'model/WellKnown'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(
-      require('../ApiClient'),
-      require('../model/AcceptConsentRequest'),
-      require('../model/AcceptLoginRequest'),
-      require('../model/CompletedRequest'),
-      require('../model/ConsentRequest'),
-      require('../model/FlushInactiveOAuth2TokensRequest'),
-      require('../model/InlineResponse401'),
-      require('../model/JSONWebKeySet'),
-      require('../model/LoginRequest'),
-      require('../model/OAuth2Client'),
-      require('../model/OAuth2TokenIntrospection'),
-      require('../model/OauthTokenResponse'),
-      require('../model/PreviousConsentSession'),
-      require('../model/RejectRequest'),
-      require('../model/UserinfoResponse'),
-      require('../model/WellKnown')
-    )
+    module.exports = factory(require('../ApiClient'), require('../model/AcceptConsentRequest'), require('../model/AcceptLoginRequest'), require('../model/CompletedRequest'), require('../model/ConsentRequest'), require('../model/FlushInactiveOAuth2TokensRequest'), require('../model/InlineResponse401'), require('../model/JSONWebKeySet'), require('../model/LoginRequest'), require('../model/OAuth2Client'), require('../model/OAuth2TokenIntrospection'), require('../model/OauthTokenResponse'), require('../model/PreviousConsentSession'), require('../model/RejectRequest'), require('../model/UserinfoResponse'), require('../model/WellKnown'));
   } else {
     // Browser globals (root is window)
     if (!root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer) {
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {}
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {};
     }
-    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api = factory(
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer
-        .AcceptConsentRequest,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.AcceptLoginRequest,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.CompletedRequest,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ConsentRequest,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer
-        .FlushInactiveOAuth2TokensRequest,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.InlineResponse401,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JSONWebKeySet,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.LoginRequest,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Client,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer
-        .OAuth2TokenIntrospection,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OauthTokenResponse,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer
-        .PreviousConsentSession,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.RejectRequest,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.UserinfoResponse,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WellKnown
-    )
+    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api = factory(root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient, root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.AcceptConsentRequest, root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.AcceptLoginRequest, root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.CompletedRequest, root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ConsentRequest, root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.FlushInactiveOAuth2TokensRequest, root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.InlineResponse401, root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JSONWebKeySet, root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.LoginRequest, root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Client, root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2TokenIntrospection, root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OauthTokenResponse, root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.PreviousConsentSession, root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.RejectRequest, root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.UserinfoResponse, root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WellKnown);
   }
-})(this, function(
-  ApiClient,
-  AcceptConsentRequest,
-  AcceptLoginRequest,
-  CompletedRequest,
-  ConsentRequest,
-  FlushInactiveOAuth2TokensRequest,
-  InlineResponse401,
-  JSONWebKeySet,
-  LoginRequest,
-  OAuth2Client,
-  OAuth2TokenIntrospection,
-  OauthTokenResponse,
-  PreviousConsentSession,
-  RejectRequest,
-  UserinfoResponse,
-  WellKnown
-) {
-  'use strict'
+}(this, function(ApiClient, AcceptConsentRequest, AcceptLoginRequest, CompletedRequest, ConsentRequest, FlushInactiveOAuth2TokensRequest, InlineResponse401, JSONWebKeySet, LoginRequest, OAuth2Client, OAuth2TokenIntrospection, OauthTokenResponse, PreviousConsentSession, RejectRequest, UserinfoResponse, WellKnown) {
+  'use strict';
 
   /**
    * OAuth2 service.
@@ -110,14 +38,15 @@
    */
 
   /**
-   * Constructs a new OAuth2Api.
+   * Constructs a new OAuth2Api. 
    * @alias module:api/OAuth2Api
    * @class
    * @param {module:ApiClient} apiClient Optional API client implementation to use,
    * default to {@link module:ApiClient#instance} if unspecified.
    */
   var exports = function(apiClient) {
-    this.apiClient = apiClient || ApiClient.instance
+    this.apiClient = apiClient || ApiClient.instance;
+
 
     /**
      * Callback function to receive the result of the acceptConsentRequest operation.
@@ -130,49 +59,42 @@
     /**
      * Accept an consent request
      * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider to authenticate the user and then tell ORY Hydra now about it. If the user authenticated, he/she must now be asked if the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the user&#39;s behalf.  The consent provider which handles this request and is a web app implemented and hosted by you. It shows a user interface which asks the user to grant or deny the client access to the requested scope (\&quot;Application my-dropbox-app wants write access to all your private files\&quot;).  The consent challenge is appended to the consent provider&#39;s URL to which the user&#39;s user-agent (browser) is redirected to. The consent provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the user accepted or rejected the request.  This endpoint tells ORY Hydra that the user has authorized the OAuth 2.0 client to access resources on his/her behalf. The consent provider includes additional information, such as session data for access and ID tokens, and if the consent request should be used as basis for future requests.  The response contains a redirect URL which the consent provider should redirect the user-agent to.
-     * @param {String} challenge
+     * @param {String} challenge 
      * @param {Object} opts Optional parameters
-     * @param {module:model/AcceptConsentRequest} opts.body
+     * @param {module:model/AcceptConsentRequest} opts.body 
      * @param {module:api/OAuth2Api~acceptConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/CompletedRequest}
      */
     this.acceptConsentRequest = function(challenge, opts, callback) {
-      opts = opts || {}
-      var postBody = opts['body']
+      opts = opts || {};
+      var postBody = opts['body'];
 
       // verify the required parameter 'challenge' is set
       if (challenge === undefined || challenge === null) {
-        throw new Error(
-          "Missing the required parameter 'challenge' when calling acceptConsentRequest"
-        )
+        throw new Error("Missing the required parameter 'challenge' when calling acceptConsentRequest");
       }
+
 
       var pathParams = {
-        challenge: challenge
-      }
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
+        'challenge': challenge
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
 
-      var authNames = []
-      var contentTypes = ['application/json']
-      var accepts = ['application/json']
-      var returnType = CompletedRequest
+      var authNames = [];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = CompletedRequest;
 
       return this.apiClient.callApi(
-        '/oauth2/auth/requests/consent/{challenge}/accept',
-        'PUT',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/oauth2/auth/requests/consent/{challenge}/accept', 'PUT',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
 
     /**
@@ -186,49 +108,42 @@
     /**
      * Accept an login request
      * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider (sometimes called \&quot;identity provider\&quot;) to authenticate the user and then tell ORY Hydra now about it. The login provider is an web-app you write and host, and it must be able to authenticate (\&quot;show the user a login screen\&quot;) a user (in OAuth2 the proper name for user is \&quot;resource owner\&quot;).  The authentication challenge is appended to the login provider URL to which the user&#39;s user-agent (browser) is redirected to. The login provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.  This endpoint tells ORY Hydra that the user has successfully authenticated and includes additional information such as the user&#39;s ID and if ORY Hydra should remember the user&#39;s user agent for future authentication attempts by setting a cookie.  The response contains a redirect URL which the login provider should redirect the user-agent to.
-     * @param {String} challenge
+     * @param {String} challenge 
      * @param {Object} opts Optional parameters
-     * @param {module:model/AcceptLoginRequest} opts.body
+     * @param {module:model/AcceptLoginRequest} opts.body 
      * @param {module:api/OAuth2Api~acceptLoginRequestCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/CompletedRequest}
      */
     this.acceptLoginRequest = function(challenge, opts, callback) {
-      opts = opts || {}
-      var postBody = opts['body']
+      opts = opts || {};
+      var postBody = opts['body'];
 
       // verify the required parameter 'challenge' is set
       if (challenge === undefined || challenge === null) {
-        throw new Error(
-          "Missing the required parameter 'challenge' when calling acceptLoginRequest"
-        )
+        throw new Error("Missing the required parameter 'challenge' when calling acceptLoginRequest");
       }
+
 
       var pathParams = {
-        challenge: challenge
-      }
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
+        'challenge': challenge
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
 
-      var authNames = []
-      var contentTypes = ['application/json']
-      var accepts = ['application/json']
-      var returnType = CompletedRequest
+      var authNames = [];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = CompletedRequest;
 
       return this.apiClient.callApi(
-        '/oauth2/auth/requests/login/{challenge}/accept',
-        'PUT',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/oauth2/auth/requests/login/{challenge}/accept', 'PUT',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
 
     /**
@@ -242,44 +157,38 @@
     /**
      * Create an OAuth 2.0 client
      * Create a new OAuth 2.0 client If you pass &#x60;client_secret&#x60; the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somwhere safe.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
-     * @param {module:model/OAuth2Client} body
+     * @param {module:model/OAuth2Client} body 
      * @param {module:api/OAuth2Api~createOAuth2ClientCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/OAuth2Client}
      */
     this.createOAuth2Client = function(body, callback) {
-      var postBody = body
+      var postBody = body;
 
       // verify the required parameter 'body' is set
       if (body === undefined || body === null) {
-        throw new Error(
-          "Missing the required parameter 'body' when calling createOAuth2Client"
-        )
+        throw new Error("Missing the required parameter 'body' when calling createOAuth2Client");
       }
 
-      var pathParams = {}
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
 
-      var authNames = []
-      var contentTypes = ['application/json']
-      var accepts = ['application/json']
-      var returnType = OAuth2Client
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = [];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = OAuth2Client;
 
       return this.apiClient.callApi(
-        '/clients',
-        'POST',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/clients', 'POST',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
 
     /**
@@ -297,41 +206,34 @@
      * @param {module:api/OAuth2Api~deleteOAuth2ClientCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.deleteOAuth2Client = function(id, callback) {
-      var postBody = null
+      var postBody = null;
 
       // verify the required parameter 'id' is set
       if (id === undefined || id === null) {
-        throw new Error(
-          "Missing the required parameter 'id' when calling deleteOAuth2Client"
-        )
+        throw new Error("Missing the required parameter 'id' when calling deleteOAuth2Client");
       }
+
 
       var pathParams = {
-        id: id
-      }
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
+        'id': id
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
 
-      var authNames = []
-      var contentTypes = ['application/json']
-      var accepts = ['application/json']
-      var returnType = null
+      var authNames = [];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = null;
 
       return this.apiClient.callApi(
-        '/clients/{id}',
-        'DELETE',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/clients/{id}', 'DELETE',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
 
     /**
@@ -346,37 +248,33 @@
      * Flush Expired OAuth2 Access Tokens
      * This endpoint flushes expired OAuth2 access tokens from the database. You can set a time after which no tokens will be not be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted automatically when performing the refresh flow.
      * @param {Object} opts Optional parameters
-     * @param {module:model/FlushInactiveOAuth2TokensRequest} opts.body
+     * @param {module:model/FlushInactiveOAuth2TokensRequest} opts.body 
      * @param {module:api/OAuth2Api~flushInactiveOAuth2TokensCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.flushInactiveOAuth2Tokens = function(opts, callback) {
-      opts = opts || {}
-      var postBody = opts['body']
+      opts = opts || {};
+      var postBody = opts['body'];
 
-      var pathParams = {}
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
 
-      var authNames = []
-      var contentTypes = ['application/json']
-      var accepts = ['application/json']
-      var returnType = null
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = [];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = null;
 
       return this.apiClient.callApi(
-        '/oauth2/flush',
-        'POST',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/oauth2/flush', 'POST',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
 
     /**
@@ -390,46 +288,39 @@
     /**
      * Get consent request information
      * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider to authenticate the user and then tell ORY Hydra now about it. If the user authenticated, he/she must now be asked if the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the user&#39;s behalf.  The consent provider which handles this request and is a web app implemented and hosted by you. It shows a user interface which asks the user to grant or deny the client access to the requested scope (\&quot;Application my-dropbox-app wants write access to all your private files\&quot;).  The consent challenge is appended to the consent provider&#39;s URL to which the user&#39;s user-agent (browser) is redirected to. The consent provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the user accepted or rejected the request.
-     * @param {String} challenge
+     * @param {String} challenge 
      * @param {module:api/OAuth2Api~getConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/ConsentRequest}
      */
     this.getConsentRequest = function(challenge, callback) {
-      var postBody = null
+      var postBody = null;
 
       // verify the required parameter 'challenge' is set
       if (challenge === undefined || challenge === null) {
-        throw new Error(
-          "Missing the required parameter 'challenge' when calling getConsentRequest"
-        )
+        throw new Error("Missing the required parameter 'challenge' when calling getConsentRequest");
       }
+
 
       var pathParams = {
-        challenge: challenge
-      }
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
+        'challenge': challenge
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
 
-      var authNames = []
-      var contentTypes = ['application/json']
-      var accepts = ['application/json']
-      var returnType = ConsentRequest
+      var authNames = [];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = ConsentRequest;
 
       return this.apiClient.callApi(
-        '/oauth2/auth/requests/consent/{challenge}',
-        'GET',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/oauth2/auth/requests/consent/{challenge}', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
 
     /**
@@ -443,46 +334,39 @@
     /**
      * Get an login request
      * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider (sometimes called \&quot;identity provider\&quot;) to authenticate the user and then tell ORY Hydra now about it. The login provider is an web-app you write and host, and it must be able to authenticate (\&quot;show the user a login screen\&quot;) a user (in OAuth2 the proper name for user is \&quot;resource owner\&quot;).  The authentication challenge is appended to the login provider URL to which the user&#39;s user-agent (browser) is redirected to. The login provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
-     * @param {String} challenge
+     * @param {String} challenge 
      * @param {module:api/OAuth2Api~getLoginRequestCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/LoginRequest}
      */
     this.getLoginRequest = function(challenge, callback) {
-      var postBody = null
+      var postBody = null;
 
       // verify the required parameter 'challenge' is set
       if (challenge === undefined || challenge === null) {
-        throw new Error(
-          "Missing the required parameter 'challenge' when calling getLoginRequest"
-        )
+        throw new Error("Missing the required parameter 'challenge' when calling getLoginRequest");
       }
+
 
       var pathParams = {
-        challenge: challenge
-      }
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
+        'challenge': challenge
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
 
-      var authNames = []
-      var contentTypes = ['application/json']
-      var accepts = ['application/json']
-      var returnType = LoginRequest
+      var authNames = [];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = LoginRequest;
 
       return this.apiClient.callApi(
-        '/oauth2/auth/requests/login/{challenge}',
-        'GET',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/oauth2/auth/requests/login/{challenge}', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
 
     /**
@@ -501,41 +385,34 @@
      * data is of type: {@link module:model/OAuth2Client}
      */
     this.getOAuth2Client = function(id, callback) {
-      var postBody = null
+      var postBody = null;
 
       // verify the required parameter 'id' is set
       if (id === undefined || id === null) {
-        throw new Error(
-          "Missing the required parameter 'id' when calling getOAuth2Client"
-        )
+        throw new Error("Missing the required parameter 'id' when calling getOAuth2Client");
       }
+
 
       var pathParams = {
-        id: id
-      }
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
+        'id': id
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
 
-      var authNames = []
-      var contentTypes = ['application/json']
-      var accepts = ['application/json']
-      var returnType = OAuth2Client
+      var authNames = [];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = OAuth2Client;
 
       return this.apiClient.callApi(
-        '/clients/{id}',
-        'GET',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/clients/{id}', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
 
     /**
@@ -553,35 +430,28 @@
      * data is of type: {@link module:model/WellKnown}
      */
     this.getWellKnown = function(callback) {
-      var postBody = null
+      var postBody = null;
 
-      var pathParams = {}
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
 
-      var authNames = []
-      var contentTypes = [
-        'application/json',
-        'application/x-www-form-urlencoded'
-      ]
-      var accepts = ['application/json']
-      var returnType = WellKnown
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = [];
+      var contentTypes = ['application/json', 'application/x-www-form-urlencoded'];
+      var accepts = ['application/json'];
+      var returnType = WellKnown;
 
       return this.apiClient.callApi(
-        '/.well-known/openid-configuration',
-        'GET',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/.well-known/openid-configuration', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
 
     /**
@@ -602,43 +472,36 @@
      * data is of type: {@link module:model/OAuth2TokenIntrospection}
      */
     this.introspectOAuth2Token = function(token, opts, callback) {
-      opts = opts || {}
-      var postBody = null
+      opts = opts || {};
+      var postBody = null;
 
       // verify the required parameter 'token' is set
       if (token === undefined || token === null) {
-        throw new Error(
-          "Missing the required parameter 'token' when calling introspectOAuth2Token"
-        )
+        throw new Error("Missing the required parameter 'token' when calling introspectOAuth2Token");
       }
 
-      var pathParams = {}
-      var queryParams = {}
-      var headerParams = {}
+
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
       var formParams = {
-        token: token,
-        scope: opts['scope']
-      }
+        'token': token,
+        'scope': opts['scope']
+      };
 
-      var authNames = ['basic', 'oauth2']
-      var contentTypes = ['application/x-www-form-urlencoded']
-      var accepts = ['application/json']
-      var returnType = OAuth2TokenIntrospection
+      var authNames = ['basic', 'oauth2'];
+      var contentTypes = ['application/x-www-form-urlencoded'];
+      var accepts = ['application/json'];
+      var returnType = OAuth2TokenIntrospection;
 
       return this.apiClient.callApi(
-        '/oauth2/introspect',
-        'POST',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/oauth2/introspect', 'POST',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
 
     /**
@@ -659,36 +522,31 @@
      * data is of type: {@link Array.<module:model/OAuth2Client>}
      */
     this.listOAuth2Clients = function(opts, callback) {
-      opts = opts || {}
-      var postBody = null
+      opts = opts || {};
+      var postBody = null;
 
-      var pathParams = {}
+
+      var pathParams = {
+      };
       var queryParams = {
-        limit: opts['limit'],
-        offset: opts['offset']
-      }
-      var headerParams = {}
-      var formParams = {}
+        'limit': opts['limit'],
+        'offset': opts['offset']
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
 
-      var authNames = []
-      var contentTypes = ['application/json']
-      var accepts = ['application/json']
-      var returnType = [OAuth2Client]
+      var authNames = [];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = [OAuth2Client];
 
       return this.apiClient.callApi(
-        '/clients',
-        'GET',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/clients', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
 
     /**
@@ -702,46 +560,39 @@
     /**
      * Lists all consent sessions of a user
      * This endpoint lists all user&#39;s granted consent sessions, including client and granted scope
-     * @param {String} user
+     * @param {String} user 
      * @param {module:api/OAuth2Api~listUserConsentSessionsCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Array.<module:model/PreviousConsentSession>}
      */
     this.listUserConsentSessions = function(user, callback) {
-      var postBody = null
+      var postBody = null;
 
       // verify the required parameter 'user' is set
       if (user === undefined || user === null) {
-        throw new Error(
-          "Missing the required parameter 'user' when calling listUserConsentSessions"
-        )
+        throw new Error("Missing the required parameter 'user' when calling listUserConsentSessions");
       }
+
 
       var pathParams = {
-        user: user
-      }
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
+        'user': user
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
 
-      var authNames = []
-      var contentTypes = ['application/json']
-      var accepts = ['application/json']
-      var returnType = [PreviousConsentSession]
+      var authNames = [];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = [PreviousConsentSession];
 
       return this.apiClient.callApi(
-        '/oauth2/auth/sessions/consent/{user}',
-        'GET',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/oauth2/auth/sessions/consent/{user}', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
 
     /**
@@ -758,32 +609,28 @@
      * @param {module:api/OAuth2Api~oauthAuthCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.oauthAuth = function(callback) {
-      var postBody = null
+      var postBody = null;
 
-      var pathParams = {}
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
 
-      var authNames = []
-      var contentTypes = ['application/x-www-form-urlencoded']
-      var accepts = ['application/json']
-      var returnType = null
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = [];
+      var contentTypes = ['application/x-www-form-urlencoded'];
+      var accepts = ['application/json'];
+      var returnType = null;
 
       return this.apiClient.callApi(
-        '/oauth2/auth',
-        'GET',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/oauth2/auth', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
 
     /**
@@ -801,32 +648,28 @@
      * data is of type: {@link module:model/OauthTokenResponse}
      */
     this.oauthToken = function(callback) {
-      var postBody = null
+      var postBody = null;
 
-      var pathParams = {}
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
 
-      var authNames = ['basic', 'oauth2']
-      var contentTypes = ['application/x-www-form-urlencoded']
-      var accepts = ['application/json']
-      var returnType = OauthTokenResponse
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = ['basic', 'oauth2'];
+      var contentTypes = ['application/x-www-form-urlencoded'];
+      var accepts = ['application/json'];
+      var returnType = OauthTokenResponse;
 
       return this.apiClient.callApi(
-        '/oauth2/token',
-        'POST',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/oauth2/token', 'POST',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
 
     /**
@@ -840,49 +683,42 @@
     /**
      * Reject an consent request
      * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider to authenticate the user and then tell ORY Hydra now about it. If the user authenticated, he/she must now be asked if the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the user&#39;s behalf.  The consent provider which handles this request and is a web app implemented and hosted by you. It shows a user interface which asks the user to grant or deny the client access to the requested scope (\&quot;Application my-dropbox-app wants write access to all your private files\&quot;).  The consent challenge is appended to the consent provider&#39;s URL to which the user&#39;s user-agent (browser) is redirected to. The consent provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the user accepted or rejected the request.  This endpoint tells ORY Hydra that the user has not authorized the OAuth 2.0 client to access resources on his/her behalf. The consent provider must include a reason why the consent was not granted.  The response contains a redirect URL which the consent provider should redirect the user-agent to.
-     * @param {String} challenge
+     * @param {String} challenge 
      * @param {Object} opts Optional parameters
-     * @param {module:model/RejectRequest} opts.body
+     * @param {module:model/RejectRequest} opts.body 
      * @param {module:api/OAuth2Api~rejectConsentRequestCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/CompletedRequest}
      */
     this.rejectConsentRequest = function(challenge, opts, callback) {
-      opts = opts || {}
-      var postBody = opts['body']
+      opts = opts || {};
+      var postBody = opts['body'];
 
       // verify the required parameter 'challenge' is set
       if (challenge === undefined || challenge === null) {
-        throw new Error(
-          "Missing the required parameter 'challenge' when calling rejectConsentRequest"
-        )
+        throw new Error("Missing the required parameter 'challenge' when calling rejectConsentRequest");
       }
+
 
       var pathParams = {
-        challenge: challenge
-      }
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
+        'challenge': challenge
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
 
-      var authNames = []
-      var contentTypes = ['application/json']
-      var accepts = ['application/json']
-      var returnType = CompletedRequest
+      var authNames = [];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = CompletedRequest;
 
       return this.apiClient.callApi(
-        '/oauth2/auth/requests/consent/{challenge}/reject',
-        'PUT',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/oauth2/auth/requests/consent/{challenge}/reject', 'PUT',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
 
     /**
@@ -896,49 +732,42 @@
     /**
      * Reject a login request
      * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider (sometimes called \&quot;identity provider\&quot;) to authenticate the user and then tell ORY Hydra now about it. The login provider is an web-app you write and host, and it must be able to authenticate (\&quot;show the user a login screen\&quot;) a user (in OAuth2 the proper name for user is \&quot;resource owner\&quot;).  The authentication challenge is appended to the login provider URL to which the user&#39;s user-agent (browser) is redirected to. The login provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.  This endpoint tells ORY Hydra that the user has not authenticated and includes a reason why the authentication was be denied.  The response contains a redirect URL which the login provider should redirect the user-agent to.
-     * @param {String} challenge
+     * @param {String} challenge 
      * @param {Object} opts Optional parameters
-     * @param {module:model/RejectRequest} opts.body
+     * @param {module:model/RejectRequest} opts.body 
      * @param {module:api/OAuth2Api~rejectLoginRequestCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/CompletedRequest}
      */
     this.rejectLoginRequest = function(challenge, opts, callback) {
-      opts = opts || {}
-      var postBody = opts['body']
+      opts = opts || {};
+      var postBody = opts['body'];
 
       // verify the required parameter 'challenge' is set
       if (challenge === undefined || challenge === null) {
-        throw new Error(
-          "Missing the required parameter 'challenge' when calling rejectLoginRequest"
-        )
+        throw new Error("Missing the required parameter 'challenge' when calling rejectLoginRequest");
       }
+
 
       var pathParams = {
-        challenge: challenge
-      }
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
+        'challenge': challenge
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
 
-      var authNames = []
-      var contentTypes = ['application/json']
-      var accepts = ['application/json']
-      var returnType = CompletedRequest
+      var authNames = [];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = CompletedRequest;
 
       return this.apiClient.callApi(
-        '/oauth2/auth/requests/login/{challenge}/reject',
-        'PUT',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/oauth2/auth/requests/login/{challenge}/reject', 'PUT',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
 
     /**
@@ -952,45 +781,38 @@
     /**
      * Revokes all previous consent sessions of a user
      * This endpoint revokes a user&#39;s granted consent sessions and invalidates all associated OAuth 2.0 Access Tokens.
-     * @param {String} user
+     * @param {String} user 
      * @param {module:api/OAuth2Api~revokeAllUserConsentSessionsCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.revokeAllUserConsentSessions = function(user, callback) {
-      var postBody = null
+      var postBody = null;
 
       // verify the required parameter 'user' is set
       if (user === undefined || user === null) {
-        throw new Error(
-          "Missing the required parameter 'user' when calling revokeAllUserConsentSessions"
-        )
+        throw new Error("Missing the required parameter 'user' when calling revokeAllUserConsentSessions");
       }
+
 
       var pathParams = {
-        user: user
-      }
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
+        'user': user
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
 
-      var authNames = []
-      var contentTypes = ['application/json']
-      var accepts = ['application/json']
-      var returnType = null
+      var authNames = [];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = null;
 
       return this.apiClient.callApi(
-        '/oauth2/auth/sessions/consent/{user}',
-        'DELETE',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/oauth2/auth/sessions/consent/{user}', 'DELETE',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
 
     /**
@@ -1004,45 +826,38 @@
     /**
      * Invalidates a user&#39;s authentication session
      * This endpoint invalidates a user&#39;s authentication session. After revoking the authentication session, the user has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens.
-     * @param {String} user
+     * @param {String} user 
      * @param {module:api/OAuth2Api~revokeAuthenticationSessionCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.revokeAuthenticationSession = function(user, callback) {
-      var postBody = null
+      var postBody = null;
 
       // verify the required parameter 'user' is set
       if (user === undefined || user === null) {
-        throw new Error(
-          "Missing the required parameter 'user' when calling revokeAuthenticationSession"
-        )
+        throw new Error("Missing the required parameter 'user' when calling revokeAuthenticationSession");
       }
+
 
       var pathParams = {
-        user: user
-      }
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
+        'user': user
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
 
-      var authNames = []
-      var contentTypes = ['application/json']
-      var accepts = ['application/json']
-      var returnType = null
+      var authNames = [];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = null;
 
       return this.apiClient.callApi(
-        '/oauth2/auth/sessions/login/{user}',
-        'DELETE',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/oauth2/auth/sessions/login/{user}', 'DELETE',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
 
     /**
@@ -1056,45 +871,38 @@
     /**
      * Revoke OAuth2 tokens
      * Revoking a token (both access and refresh) means that the tokens will be invalid. A revoked access token can no longer be used to make access requests, and a revoked refresh token can no longer be used to refresh an access token. Revoking a refresh token also invalidates the access token that was created with it.
-     * @param {String} token
+     * @param {String} token 
      * @param {module:api/OAuth2Api~revokeOAuth2TokenCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.revokeOAuth2Token = function(token, callback) {
-      var postBody = null
+      var postBody = null;
 
       // verify the required parameter 'token' is set
       if (token === undefined || token === null) {
-        throw new Error(
-          "Missing the required parameter 'token' when calling revokeOAuth2Token"
-        )
+        throw new Error("Missing the required parameter 'token' when calling revokeOAuth2Token");
       }
 
-      var pathParams = {}
-      var queryParams = {}
-      var headerParams = {}
+
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
       var formParams = {
-        token: token
-      }
+        'token': token
+      };
 
-      var authNames = ['basic', 'oauth2']
-      var contentTypes = ['application/x-www-form-urlencoded']
-      var accepts = ['application/json']
-      var returnType = null
+      var authNames = ['basic', 'oauth2'];
+      var contentTypes = ['application/x-www-form-urlencoded'];
+      var accepts = ['application/json'];
+      var returnType = null;
 
       return this.apiClient.callApi(
-        '/oauth2/revoke',
-        'POST',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/oauth2/revoke', 'POST',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
 
     /**
@@ -1108,54 +916,45 @@
     /**
      * Revokes consent sessions of a user for a specific OAuth 2.0 Client
      * This endpoint revokes a user&#39;s granted consent sessions for a specific OAuth 2.0 Client and invalidates all associated OAuth 2.0 Access Tokens.
-     * @param {String} user
-     * @param {String} client
+     * @param {String} user 
+     * @param {String} client 
      * @param {module:api/OAuth2Api~revokeUserClientConsentSessionsCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.revokeUserClientConsentSessions = function(user, client, callback) {
-      var postBody = null
+      var postBody = null;
 
       // verify the required parameter 'user' is set
       if (user === undefined || user === null) {
-        throw new Error(
-          "Missing the required parameter 'user' when calling revokeUserClientConsentSessions"
-        )
+        throw new Error("Missing the required parameter 'user' when calling revokeUserClientConsentSessions");
       }
 
       // verify the required parameter 'client' is set
       if (client === undefined || client === null) {
-        throw new Error(
-          "Missing the required parameter 'client' when calling revokeUserClientConsentSessions"
-        )
+        throw new Error("Missing the required parameter 'client' when calling revokeUserClientConsentSessions");
       }
+
 
       var pathParams = {
-        user: user,
-        client: client
-      }
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
+        'user': user,
+        'client': client
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
 
-      var authNames = []
-      var contentTypes = ['application/json']
-      var accepts = ['application/json']
-      var returnType = null
+      var authNames = [];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = null;
 
       return this.apiClient.callApi(
-        '/oauth2/auth/sessions/consent/{user}/{client}',
-        'DELETE',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/oauth2/auth/sessions/consent/{user}/{client}', 'DELETE',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
 
     /**
@@ -1172,35 +971,28 @@
      * @param {module:api/OAuth2Api~revokeUserLoginCookieCallback} callback The callback function, accepting three arguments: error, data, response
      */
     this.revokeUserLoginCookie = function(callback) {
-      var postBody = null
+      var postBody = null;
 
-      var pathParams = {}
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
 
-      var authNames = []
-      var contentTypes = [
-        'application/json',
-        'application/x-www-form-urlencoded'
-      ]
-      var accepts = ['application/json']
-      var returnType = null
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = [];
+      var contentTypes = ['application/json', 'application/x-www-form-urlencoded'];
+      var accepts = ['application/json'];
+      var returnType = null;
 
       return this.apiClient.callApi(
-        '/oauth2/auth/sessions/login/revoke',
-        'GET',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/oauth2/auth/sessions/login/revoke', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
 
     /**
@@ -1214,54 +1006,45 @@
     /**
      * Update an OAuth 2.0 Client
      * Update an existing OAuth 2.0 Client. If you pass &#x60;client_secret&#x60; the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
-     * @param {String} id
-     * @param {module:model/OAuth2Client} body
+     * @param {String} id 
+     * @param {module:model/OAuth2Client} body 
      * @param {module:api/OAuth2Api~updateOAuth2ClientCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/OAuth2Client}
      */
     this.updateOAuth2Client = function(id, body, callback) {
-      var postBody = body
+      var postBody = body;
 
       // verify the required parameter 'id' is set
       if (id === undefined || id === null) {
-        throw new Error(
-          "Missing the required parameter 'id' when calling updateOAuth2Client"
-        )
+        throw new Error("Missing the required parameter 'id' when calling updateOAuth2Client");
       }
 
       // verify the required parameter 'body' is set
       if (body === undefined || body === null) {
-        throw new Error(
-          "Missing the required parameter 'body' when calling updateOAuth2Client"
-        )
+        throw new Error("Missing the required parameter 'body' when calling updateOAuth2Client");
       }
+
 
       var pathParams = {
-        id: id
-      }
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
+        'id': id
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
 
-      var authNames = []
-      var contentTypes = ['application/json']
-      var accepts = ['application/json']
-      var returnType = OAuth2Client
+      var authNames = [];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = OAuth2Client;
 
       return this.apiClient.callApi(
-        '/clients/{id}',
-        'PUT',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/clients/{id}', 'PUT',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
 
     /**
@@ -1279,35 +1062,28 @@
      * data is of type: {@link module:model/UserinfoResponse}
      */
     this.userinfo = function(callback) {
-      var postBody = null
+      var postBody = null;
 
-      var pathParams = {}
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
 
-      var authNames = ['oauth2']
-      var contentTypes = [
-        'application/json',
-        'application/x-www-form-urlencoded'
-      ]
-      var accepts = ['application/json']
-      var returnType = UserinfoResponse
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = ['oauth2'];
+      var contentTypes = ['application/json', 'application/x-www-form-urlencoded'];
+      var accepts = ['application/json'];
+      var returnType = UserinfoResponse;
 
       return this.apiClient.callApi(
-        '/userinfo',
-        'POST',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/userinfo', 'POST',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
 
     /**
@@ -1325,34 +1101,30 @@
      * data is of type: {@link module:model/JSONWebKeySet}
      */
     this.wellKnown = function(callback) {
-      var postBody = null
+      var postBody = null;
 
-      var pathParams = {}
-      var queryParams = {}
-      var headerParams = {}
-      var formParams = {}
 
-      var authNames = []
-      var contentTypes = ['application/json']
-      var accepts = ['application/json']
-      var returnType = JSONWebKeySet
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = [];
+      var contentTypes = ['application/json'];
+      var accepts = ['application/json'];
+      var returnType = JSONWebKeySet;
 
       return this.apiClient.callApi(
-        '/.well-known/jwks.json',
-        'GET',
-        pathParams,
-        queryParams,
-        headerParams,
-        formParams,
-        postBody,
-        authNames,
-        contentTypes,
-        accepts,
-        returnType,
-        callback
-      )
+        '/.well-known/jwks.json', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
     }
-  }
+  };
 
-  return exports
-})
+  return exports;
+}));

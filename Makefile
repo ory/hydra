@@ -3,16 +3,26 @@ init:
 			github.com/ory/x/tools/listx \
 			github.com/sqs/goreturns \
 			github.com/golang/mock/mockgen \
-			github.com/go-swagger/go-swagger/cmd/swagger
+			github.com/go-swagger/go-swagger/cmd/swagger \
+			github.com/go-bindata/go-bindata/... \
+			github.com/gobuffalo/packr/packr
 
 format:
 		goreturns -w -local github.com/ory $$(listx .)
 		# goimports -w -v -local github.com/ory $$(listx .)
 
-mockgen:
+gen-mocks:
 		mockgen -package oauth2_test -destination oauth2/oauth2_provider_mock_test.go github.com/ory/fosite OAuth2Provider
 
-sdk:
+gen-sql:
+		cd client; go-bindata -o sql_migration_files.go -pkg client ./migrations/sql/shared ./migrations/sql/mysql ./migrations/sql/postgres ./migrations/sql/tests
+		cd consent; go-bindata -o sql_migration_files.go -pkg consent ./migrations/sql/shared ./migrations/sql/mysql ./migrations/sql/postgres ./migrations/sql/tests
+		cd jwk; go-bindata -o sql_migration_files.go -pkg jwk ./migrations/sql/shared ./migrations/sql/mysql ./migrations/sql/postgres ./migrations/sql/tests
+		cd oauth2; go-bindata -o sql_migration_files.go -pkg oauth2 ./migrations/sql/shared ./migrations/sql/mysql ./migrations/sql/postgres ./migrations/sql/tests
+
+gen: gen-mocks gen-sql gen-sdk
+
+gen-sdk:
 		swagger generate spec -m -o ./docs/api.swagger.json
 
 		rm -rf ./sdk/go/hydra/swagger
@@ -36,7 +46,7 @@ sdk:
 			--model-package com.github.ory.hydra.model \
 			--output ./sdk/java/hydra-client-resttemplate
 
-		goreturns -w -i -local github.com/ory $$(listx ./sdk/go)
+		cd sdk/go; goreturns -w -i -local github.com/ory $$(listx .)
 
 		git checkout HEAD -- sdk/go/hydra/swagger/configuration.go
 		git checkout HEAD -- sdk/go/hydra/swagger/api_client.go

@@ -5,7 +5,7 @@
  * PHP version 5
  *
  * @category Class
- * @package  Hydra\SDK
+ * @package  HydraSDK
  * @author   Swaagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
@@ -27,7 +27,7 @@
  * Do not edit the class manually.
  */
 
-namespace Hydra\SDK\Model;
+namespace HydraSDK\Model;
 
 use \ArrayAccess;
 
@@ -35,7 +35,7 @@ use \ArrayAccess;
  * LoginRequest Class Doc Comment
  *
  * @category    Class
- * @package     Hydra\SDK
+ * @package     HydraSDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
  */
@@ -55,9 +55,10 @@ class LoginRequest implements ArrayAccess
       */
     protected static $swaggerTypes = [
         'challenge' => 'string',
-        'client' => '\Hydra\SDK\Model\OAuth2Client',
-        'oidc_context' => '\Hydra\SDK\Model\OpenIDConnectContext',
+        'client' => '\HydraSDK\Model\OAuth2Client',
+        'oidc_context' => '\HydraSDK\Model\OpenIDConnectContext',
         'request_url' => 'string',
+        'requested_access_token_audience' => 'string[]',
         'requested_scope' => 'string[]',
         'session_id' => 'string',
         'skip' => 'bool',
@@ -73,6 +74,7 @@ class LoginRequest implements ArrayAccess
         'client' => null,
         'oidc_context' => null,
         'request_url' => null,
+        'requested_access_token_audience' => null,
         'requested_scope' => null,
         'session_id' => null,
         'skip' => null,
@@ -98,6 +100,7 @@ class LoginRequest implements ArrayAccess
         'client' => 'client',
         'oidc_context' => 'oidc_context',
         'request_url' => 'request_url',
+        'requested_access_token_audience' => 'requested_access_token_audience',
         'requested_scope' => 'requested_scope',
         'session_id' => 'session_id',
         'skip' => 'skip',
@@ -114,6 +117,7 @@ class LoginRequest implements ArrayAccess
         'client' => 'setClient',
         'oidc_context' => 'setOidcContext',
         'request_url' => 'setRequestUrl',
+        'requested_access_token_audience' => 'setRequestedAccessTokenAudience',
         'requested_scope' => 'setRequestedScope',
         'session_id' => 'setSessionId',
         'skip' => 'setSkip',
@@ -130,6 +134,7 @@ class LoginRequest implements ArrayAccess
         'client' => 'getClient',
         'oidc_context' => 'getOidcContext',
         'request_url' => 'getRequestUrl',
+        'requested_access_token_audience' => 'getRequestedAccessTokenAudience',
         'requested_scope' => 'getRequestedScope',
         'session_id' => 'getSessionId',
         'skip' => 'getSkip',
@@ -171,6 +176,7 @@ class LoginRequest implements ArrayAccess
         $this->container['client'] = isset($data['client']) ? $data['client'] : null;
         $this->container['oidc_context'] = isset($data['oidc_context']) ? $data['oidc_context'] : null;
         $this->container['request_url'] = isset($data['request_url']) ? $data['request_url'] : null;
+        $this->container['requested_access_token_audience'] = isset($data['requested_access_token_audience']) ? $data['requested_access_token_audience'] : null;
         $this->container['requested_scope'] = isset($data['requested_scope']) ? $data['requested_scope'] : null;
         $this->container['session_id'] = isset($data['session_id']) ? $data['session_id'] : null;
         $this->container['skip'] = isset($data['skip']) ? $data['skip'] : null;
@@ -225,7 +231,7 @@ class LoginRequest implements ArrayAccess
 
     /**
      * Gets client
-     * @return \Hydra\SDK\Model\OAuth2Client
+     * @return \HydraSDK\Model\OAuth2Client
      */
     public function getClient()
     {
@@ -234,7 +240,7 @@ class LoginRequest implements ArrayAccess
 
     /**
      * Sets client
-     * @param \Hydra\SDK\Model\OAuth2Client $client
+     * @param \HydraSDK\Model\OAuth2Client $client
      * @return $this
      */
     public function setClient($client)
@@ -246,7 +252,7 @@ class LoginRequest implements ArrayAccess
 
     /**
      * Gets oidc_context
-     * @return \Hydra\SDK\Model\OpenIDConnectContext
+     * @return \HydraSDK\Model\OpenIDConnectContext
      */
     public function getOidcContext()
     {
@@ -255,7 +261,7 @@ class LoginRequest implements ArrayAccess
 
     /**
      * Sets oidc_context
-     * @param \Hydra\SDK\Model\OpenIDConnectContext $oidc_context
+     * @param \HydraSDK\Model\OpenIDConnectContext $oidc_context
      * @return $this
      */
     public function setOidcContext($oidc_context)
@@ -287,6 +293,27 @@ class LoginRequest implements ArrayAccess
     }
 
     /**
+     * Gets requested_access_token_audience
+     * @return string[]
+     */
+    public function getRequestedAccessTokenAudience()
+    {
+        return $this->container['requested_access_token_audience'];
+    }
+
+    /**
+     * Sets requested_access_token_audience
+     * @param string[] $requested_access_token_audience RequestedScope contains the access token audience as requested by the OAuth 2.0 Client.
+     * @return $this
+     */
+    public function setRequestedAccessTokenAudience($requested_access_token_audience)
+    {
+        $this->container['requested_access_token_audience'] = $requested_access_token_audience;
+
+        return $this;
+    }
+
+    /**
      * Gets requested_scope
      * @return string[]
      */
@@ -297,7 +324,7 @@ class LoginRequest implements ArrayAccess
 
     /**
      * Sets requested_scope
-     * @param string[] $requested_scope RequestedScope contains all scopes requested by the OAuth 2.0 client.
+     * @param string[] $requested_scope RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
      * @return $this
      */
     public function setRequestedScope($requested_scope)
@@ -421,10 +448,10 @@ class LoginRequest implements ArrayAccess
     public function __toString()
     {
         if (defined('JSON_PRETTY_PRINT')) { // use JSON pretty print
-            return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
+            return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
         }
 
-        return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this));
+        return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this));
     }
 }
 

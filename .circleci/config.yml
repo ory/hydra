@@ -67,6 +67,8 @@ jobs:
     working_directory: /go/src/github.com/ory/hydra
     steps:
       - checkout
+      - run: sudo apt-get update -y
+      - run: sudo apt-get install -y default-jdk
       - run: make init
       - run:
           name: Enable go1.11 modules

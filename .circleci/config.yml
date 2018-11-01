@@ -54,7 +54,7 @@ jobs:
       - run: go get -u github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/ory/go-acc
       - run: go install github.com/ory/hydra
       - run: go install github.com/ory/hydra/test/mock-lcp
-      - run: go-acc -o coverage.txt ./... -failfast -v
+      - run: go-acc -o coverage.txt ./... -- -failfast -v
       - run: go test -race -short $(go list ./... | grep -v cmd)
       - run: ./scripts/test-e2e-jwt.sh
       - run: ./scripts/test-e2e-opaque.sh

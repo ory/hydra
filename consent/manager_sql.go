@@ -27,8 +27,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ory/x/dbal"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
@@ -36,6 +34,7 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/pkg"
+	"github.com/ory/x/dbal"
 	"github.com/ory/x/sqlcon"
 )
 

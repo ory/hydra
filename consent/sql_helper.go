@@ -25,15 +25,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sirupsen/logrus"
-
-	"github.com/ory/x/dbal"
-
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
+	"github.com/sirupsen/logrus"
 
 	"github.com/ory/go-convenience/stringsx"
 	"github.com/ory/hydra/client"
+	"github.com/ory/x/dbal"
 )
 
 var migrations = map[string]*migrate.PackrMigrationSource{

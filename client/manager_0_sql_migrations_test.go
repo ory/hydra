@@ -25,17 +25,15 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/sirupsen/logrus"
-
-	"github.com/ory/x/dbal"
-	"github.com/ory/x/dbal/migratest"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/rubenv/sql-migrate"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/fosite"
+	"github.com/ory/x/dbal"
+	"github.com/ory/x/dbal/migratest"
 )
 
 var createMigrations = map[string]*migrate.PackrMigrationSource{

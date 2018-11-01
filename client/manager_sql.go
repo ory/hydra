@@ -26,17 +26,15 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/sirupsen/logrus"
-
-	"github.com/ory/x/dbal"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
+	"github.com/sirupsen/logrus"
 	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite"
 	"github.com/ory/go-convenience/stringsx"
+	"github.com/ory/x/dbal"
 	"github.com/ory/x/sqlcon"
 )
 

@@ -109,7 +109,7 @@ func createSchemas(t *testing.T, f pkg.FositeStorer) {
 }
 
 func TestUniqueConstraints(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 	for storageType, store := range fositeStores {
 		createSchemas(t, store)
 		if storageType == "memory" {
@@ -121,7 +121,7 @@ func TestUniqueConstraints(t *testing.T) {
 }
 
 func TestCreateGetDeleteAuthorizeCodes(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 	for k, m := range fositeStores {
 		createSchemas(t, m)
 		t.Run(fmt.Sprintf("case=%s", k), testHelperCreateGetDeleteAuthorizeCodes(m))
@@ -129,7 +129,7 @@ func TestCreateGetDeleteAuthorizeCodes(t *testing.T) {
 }
 
 func TestCreateGetDeleteAccessTokenSession(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 	for k, m := range fositeStores {
 		createSchemas(t, m)
 		t.Run(fmt.Sprintf("case=%s", k), testHelperCreateGetDeleteAccessTokenSession(m))
@@ -137,7 +137,7 @@ func TestCreateGetDeleteAccessTokenSession(t *testing.T) {
 }
 
 func TestCreateGetDeleteOpenIDConnectSession(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 	for k, m := range fositeStores {
 		createSchemas(t, m)
 		t.Run(fmt.Sprintf("case=%s", k), testHelperCreateGetDeleteOpenIDConnectSession(m))
@@ -145,7 +145,7 @@ func TestCreateGetDeleteOpenIDConnectSession(t *testing.T) {
 }
 
 func TestCreateGetDeleteRefreshTokenSession(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 	for k, m := range fositeStores {
 		createSchemas(t, m)
 		t.Run(fmt.Sprintf("case=%s", k), testHelperCreateGetDeleteRefreshTokenSession(m))
@@ -153,7 +153,7 @@ func TestCreateGetDeleteRefreshTokenSession(t *testing.T) {
 }
 
 func TestRevokeRefreshToken(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 	for k, m := range fositeStores {
 		createSchemas(t, m)
 		t.Run(fmt.Sprintf("case=%s", k), testHelperRevokeRefreshToken(m))
@@ -161,7 +161,7 @@ func TestRevokeRefreshToken(t *testing.T) {
 }
 
 func TestPKCEReuqest(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 	for k, m := range fositeStores {
 		createSchemas(t, m)
 		t.Run(fmt.Sprintf("case=%s", k), testHelperCreateGetDeletePKCERequestSession(m))
@@ -169,7 +169,7 @@ func TestPKCEReuqest(t *testing.T) {
 }
 
 func TestFlushAccessTokens(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 	for k, m := range fositeStores {
 		createSchemas(t, m)
 		t.Run(fmt.Sprintf("case=%s", k), testHelperFlushTokens(m, time.Hour))

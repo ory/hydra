@@ -39,9 +39,7 @@ func TestXXMigrations(t *testing.T) {
 	var cm = &client.MemoryManager{Clients: clients}
 
 	var clean = func(t *testing.T, db *sqlx.DB) {
-		_, err := db.Exec("DROP TABLE IF EXISTS hydra_oauth2_migration")
-		require.NoError(t, err)
-		_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_access")
+		_, err := db.Exec("DROP TABLE IF EXISTS hydra_oauth2_access")
 		require.NoError(t, err)
 		_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_refresh")
 		require.NoError(t, err)
@@ -50,6 +48,8 @@ func TestXXMigrations(t *testing.T) {
 		_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_oidc")
 		require.NoError(t, err)
 		_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_pkce")
+		require.NoError(t, err)
+		_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_migration")
 		require.NoError(t, err)
 	}
 

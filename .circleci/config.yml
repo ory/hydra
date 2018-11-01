@@ -206,6 +206,8 @@ workflows:
             tags:
               only: /.*/
       - test:
+          requires:
+            - generators
           filters:
             tags:
               only: /.*/

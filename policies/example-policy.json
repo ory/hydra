@@ -1,7 +1,0 @@
-[{
-    "id": "example-policy",
-    "subjects": ["alice"],
-    "actions": ["delete"],
-    "resources": ["blog_posts:my-first-blog-post"],
-    "effect": "allow"
-}]

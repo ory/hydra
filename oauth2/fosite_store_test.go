@@ -23,7 +23,6 @@ package oauth2_test
 import (
 	"flag"
 	"fmt"
-	"github.com/stretchr/testify/require"
 	"log"
 	"sync"
 	"testing"
@@ -33,6 +32,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/require"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"

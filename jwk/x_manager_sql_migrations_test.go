@@ -40,7 +40,7 @@ var createMigrations = map[string]*migrate.PackrMigrationSource{
 	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}),
 }
 
-func TestMigrations(t *testing.T) {
+func TestXXMigrations(t *testing.T) {
 	if testing.Short() {
 		t.SkipNow()
 		return

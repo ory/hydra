@@ -18,7 +18,7 @@
  * @license 	Apache-2.0
  */
 
-package oauth2
+package oauth2_test
 
 import (
 	"context"
@@ -32,6 +32,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/fosite"
+	. "github.com/ory/hydra/oauth2"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/pkg"
@@ -50,7 +51,7 @@ var defaultRequest = fosite.Request{
 	Session:           &fosite.DefaultSession{Subject: "bar"},
 }
 
-func TestHelperUniqueConstraints(m pkg.FositeStorer, storageType string) func(t *testing.T) {
+func testHelperUniqueConstraints(m pkg.FositeStorer, storageType string) func(t *testing.T) {
 	return func(t *testing.T) {
 		dbErrorIsConstraintError := func(dbErr error) {
 			assert.Error(t, dbErr)
@@ -87,7 +88,7 @@ func TestHelperUniqueConstraints(m pkg.FositeStorer, storageType string) func(t 
 	}
 }
 
-func TestHelperCreateGetDeleteOpenIDConnectSession(m pkg.FositeStorer) func(t *testing.T) {
+func testHelperCreateGetDeleteOpenIDConnectSession(m pkg.FositeStorer) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.Background()
 		_, err := m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{})
@@ -108,7 +109,7 @@ func TestHelperCreateGetDeleteOpenIDConnectSession(m pkg.FositeStorer) func(t *t
 	}
 }
 
-func TestHelperCreateGetDeleteRefreshTokenSession(m pkg.FositeStorer) func(t *testing.T) {
+func testHelperCreateGetDeleteRefreshTokenSession(m pkg.FositeStorer) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.Background()
 		_, err := m.GetRefreshTokenSession(ctx, "4321", &fosite.DefaultSession{})
@@ -129,7 +130,7 @@ func TestHelperCreateGetDeleteRefreshTokenSession(m pkg.FositeStorer) func(t *te
 	}
 }
 
-func TestHelperRevokeRefreshToken(m pkg.FositeStorer) func(t *testing.T) {
+func testHelperRevokeRefreshToken(m pkg.FositeStorer) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.Background()
 		_, err := m.GetRefreshTokenSession(ctx, "1111", &fosite.DefaultSession{})
@@ -162,7 +163,7 @@ func TestHelperRevokeRefreshToken(m pkg.FositeStorer) func(t *testing.T) {
 	}
 }
 
-func TestHelperCreateGetDeleteAuthorizeCodes(m pkg.FositeStorer) func(t *testing.T) {
+func testHelperCreateGetDeleteAuthorizeCodes(m pkg.FositeStorer) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.Background()
 		res, err := m.GetAuthorizeCodeSession(ctx, "4321", &fosite.DefaultSession{})
@@ -186,11 +187,11 @@ func TestHelperCreateGetDeleteAuthorizeCodes(m pkg.FositeStorer) func(t *testing
 	}
 }
 
-func TestHelperCreateGetDeleteAccessTokenSession(m pkg.FositeStorer) func(t *testing.T) {
+func testHelperCreateGetDeleteAccessTokenSession(m pkg.FositeStorer) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.Background()
 		_, err := m.GetAccessTokenSession(ctx, "4321", &fosite.DefaultSession{})
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 
 		err = m.CreateAccessTokenSession(ctx, "4321", &defaultRequest)
 		require.NoError(t, err)
@@ -203,11 +204,11 @@ func TestHelperCreateGetDeleteAccessTokenSession(m pkg.FositeStorer) func(t *tes
 		require.NoError(t, err)
 
 		_, err = m.GetAccessTokenSession(ctx, "4321", &fosite.DefaultSession{})
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 	}
 }
 
-func TestHelperCreateGetDeletePKCERequestSession(m pkg.FositeStorer) func(t *testing.T) {
+func testHelperCreateGetDeletePKCERequestSession(m pkg.FositeStorer) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.Background()
 		_, err := m.GetPKCERequestSession(ctx, "4321", &fosite.DefaultSession{})
@@ -228,38 +229,7 @@ func TestHelperCreateGetDeletePKCERequestSession(m pkg.FositeStorer) func(t *tes
 	}
 }
 
-var lifespan = time.Hour
-var flushRequests = []*fosite.Request{
-	{
-		ID:             "flush-1",
-		RequestedAt:    time.Now().Round(time.Second),
-		Client:         &client.Client{ClientID: "foobar"},
-		RequestedScope: fosite.Arguments{"fa", "ba"},
-		GrantedScope:   fosite.Arguments{"fa", "ba"},
-		Form:           url.Values{"foo": []string{"bar", "baz"}},
-		Session:        &fosite.DefaultSession{Subject: "bar"},
-	},
-	{
-		ID:             "flush-2",
-		RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
-		Client:         &client.Client{ClientID: "foobar"},
-		RequestedScope: fosite.Arguments{"fa", "ba"},
-		GrantedScope:   fosite.Arguments{"fa", "ba"},
-		Form:           url.Values{"foo": []string{"bar", "baz"}},
-		Session:        &fosite.DefaultSession{Subject: "bar"},
-	},
-	{
-		ID:             "flush-3",
-		RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
-		Client:         &client.Client{ClientID: "foobar"},
-		RequestedScope: fosite.Arguments{"fa", "ba"},
-		GrantedScope:   fosite.Arguments{"fa", "ba"},
-		Form:           url.Values{"foo": []string{"bar", "baz"}},
-		Session:        &fosite.DefaultSession{Subject: "bar"},
-	},
-}
-
-func TestHelperFlushTokens(m pkg.FositeStorer, lifespan time.Duration) func(t *testing.T) {
+func testHelperFlushTokens(m pkg.FositeStorer, lifespan time.Duration) func(t *testing.T) {
 
 	ds := &fosite.DefaultSession{}
 

@@ -1,4 +1,4 @@
-package oauth2
+package oauth2_test
 
 import (
 	"context"
@@ -13,16 +13,17 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/oauth2"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/dbal/migratest"
 )
 
 var createMigrations = map[string]*migrate.PackrMigrationSource{
-	dbal.DriverMySQL:      dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}),
-	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}),
+	dbal.DriverMySQL:      dbal.NewMustPackerMigrationSource(logrus.New(), oauth2.AssetNames(), oauth2.Asset, []string{"migrations/sql/tests"}),
+	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), oauth2.AssetNames(), oauth2.Asset, []string{"migrations/sql/tests"}),
 }
 
-func TestMigrations(t *testing.T) {
+func TestXXMigrations(t *testing.T) {
 	if testing.Short() {
 		t.SkipNow()
 		return
@@ -38,7 +39,9 @@ func TestMigrations(t *testing.T) {
 	var cm = &client.MemoryManager{Clients: clients}
 
 	var clean = func(t *testing.T, db *sqlx.DB) {
-		_, err := db.Exec("DROP TABLE IF EXISTS hydra_oauth2_access")
+		_, err := db.Exec("DROP TABLE IF EXISTS hydra_oauth2_migration")
+		require.NoError(t, err)
+		_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_access")
 		require.NoError(t, err)
 		_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_refresh")
 		require.NoError(t, err)
@@ -52,23 +55,23 @@ func TestMigrations(t *testing.T) {
 
 	migratest.RunPackrMigrationTests(
 		t,
-		migrations,
+		oauth2.Migrations,
 		createMigrations,
 		clean, clean,
 		func(t *testing.T, db *sqlx.DB, k int) {
 			t.Run(fmt.Sprintf("poll=%d", k), func(t *testing.T) {
 				sig := fmt.Sprintf("%d-sig", k+1)
-				s := NewFositeSQLStore(cm, db, logrus.New(), time.Minute, false)
-				_, err := s.GetAccessTokenSession(context.Background(), sig, NewSession(""))
+				s := oauth2.NewFositeSQLStore(cm, db, logrus.New(), time.Minute, false)
+				_, err := s.GetAccessTokenSession(context.Background(), sig, oauth2.NewSession(""))
 				require.NoError(t, err)
-				_, err = s.GetRefreshTokenSession(context.Background(), sig, NewSession(""))
+				_, err = s.GetRefreshTokenSession(context.Background(), sig, oauth2.NewSession(""))
 				require.NoError(t, err)
-				_, err = s.GetAuthorizeCodeSession(context.Background(), sig, NewSession(""))
+				_, err = s.GetAuthorizeCodeSession(context.Background(), sig, oauth2.NewSession(""))
 				require.NoError(t, err)
-				_, err = s.GetOpenIDConnectSession(context.Background(), sig, &fosite.Request{Session: NewSession("")})
+				_, err = s.GetOpenIDConnectSession(context.Background(), sig, &fosite.Request{Session: oauth2.NewSession("")})
 				require.NoError(t, err)
 				if k > 2 {
-					_, err = s.GetPKCERequestSession(context.Background(), sig, NewSession(""))
+					_, err = s.GetPKCERequestSession(context.Background(), sig, oauth2.NewSession(""))
 					require.NoError(t, err)
 				}
 			})

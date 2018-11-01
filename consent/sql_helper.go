@@ -34,7 +34,7 @@ import (
 	"github.com/ory/x/dbal"
 )
 
-var migrations = map[string]*migrate.PackrMigrationSource{
+var Migrations = map[string]*migrate.PackrMigrationSource{
 	"mysql": dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
 		"migrations/sql/shared",
 		"migrations/sql/mysql",

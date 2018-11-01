@@ -144,7 +144,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						fallthrough
 					case "postgres":
 						scm := consent.NewSQLManager(databases[km], fs.(*FositeSQLStore).Manager, fs)
-						_, err := scm.CreateSchemas()
+						_, err = scm.CreateSchemas()
 						require.NoError(t, err)
 
 						_, err = (fs.(*FositeSQLStore)).CreateSchemas()

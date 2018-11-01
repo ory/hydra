@@ -1,4 +1,4 @@
-package consent
+package consent_test
 
 import (
 	"context"
@@ -11,16 +11,17 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/consent"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/dbal/migratest"
 )
 
 var createMigrations = map[string]*migrate.PackrMigrationSource{
-	dbal.DriverMySQL:      dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}),
-	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}),
+	dbal.DriverMySQL:      dbal.NewMustPackerMigrationSource(logrus.New(), consent.AssetNames(), consent.Asset, []string{"migrations/sql/tests"}),
+	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), consent.AssetNames(), consent.Asset, []string{"migrations/sql/tests"}),
 }
 
-func TestMigrations(t *testing.T) {
+func TestXXMigrations(t *testing.T) {
 	if testing.Short() {
 		t.SkipNow()
 		return
@@ -38,6 +39,8 @@ func TestMigrations(t *testing.T) {
 	var clean = func(t *testing.T, db *sqlx.DB) {
 		_, err := db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request")
 		require.NoError(t, err)
+		_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_consent_migration")
+		require.NoError(t, err)
 		_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request")
 		require.NoError(t, err)
 		_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_session")
@@ -52,13 +55,13 @@ func TestMigrations(t *testing.T) {
 
 	migratest.RunPackrMigrationTests(
 		t,
-		migrations,
+		consent.Migrations,
 		createMigrations,
 		clean, clean,
 		func(t *testing.T, db *sqlx.DB, k int) {
 			t.Run(fmt.Sprintf("poll=%d", k), func(t *testing.T) {
 				kk := k + 1
-				s := &SQLManager{db: db, c: cm}
+				s := consent.NewSQLManager(db, cm, nil)
 				_, err := s.GetAuthenticationRequest(context.TODO(), fmt.Sprintf("%d-challenge", kk))
 				require.NoError(t, err)
 				_, err = s.GetAuthenticationSession(context.TODO(), fmt.Sprintf("%d-auth", kk))

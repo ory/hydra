@@ -142,9 +142,11 @@ func MockAuthRequest(key string, authAt bool) (c *AuthenticationRequest, h *Hand
 func ManagerTests(m Manager, clientManager client.Manager, fositeManager pkg.FositeStorer) func(t *testing.T) {
 	return func(t *testing.T) {
 		if mm, ok := m.(*SQLManager); ok {
-			if _, err := mm.CreateSchemas(); err != nil {
+			if n, err := mm.CreateSchemas(); err != nil {
 				t.Fatalf("Could not create mysql schema: %v", err)
 				return
+			} else {
+				t.Logf("Applied %d migrations", n)
 			}
 		}
 

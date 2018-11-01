@@ -30,17 +30,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ory/go-convenience/stringsx"
-
-	"github.com/ory/x/dbal"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
 
 	"github.com/ory/fosite"
+	"github.com/ory/go-convenience/stringsx"
 	"github.com/ory/hydra/client"
+	"github.com/ory/x/dbal"
 	"github.com/ory/x/sqlcon"
 )
 
@@ -75,7 +73,7 @@ const (
 	sqlTablePKCE    = "pkce"
 )
 
-var migrations = map[string]*migrate.PackrMigrationSource{
+var Migrations = map[string]*migrate.PackrMigrationSource{
 	dbal.DriverMySQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
 		"migrations/sql/shared",
 		"migrations/sql/mysql",
@@ -240,7 +238,7 @@ func (s *FositeSQLStore) deleteSession(ctx context.Context, signature string, ta
 
 func (s *FositeSQLStore) CreateSchemas() (int, error) {
 	migrate.SetTable("hydra_oauth2_migration")
-	n, err := migrate.Exec(s.DB.DB, s.DB.DriverName(), migrations[dbal.Canonicalize(s.DB.DriverName())], migrate.Up)
+	n, err := migrate.Exec(s.DB.DB, s.DB.DriverName(), Migrations[dbal.Canonicalize(s.DB.DriverName())], migrate.Up)
 	if err != nil {
 		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
 	}

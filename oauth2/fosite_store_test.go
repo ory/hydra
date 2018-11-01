@@ -23,6 +23,7 @@ package oauth2_test
 import (
 	"flag"
 	"fmt"
+	"github.com/stretchr/testify/require"
 	"log"
 	"sync"
 	"testing"
@@ -100,62 +101,77 @@ func connectToMySQL() {
 	m.Unlock()
 }
 
+func createSchemas(t *testing.T, f pkg.FositeStorer) {
+	if ff, ok := f.(*FositeSQLStore); ok {
+		_, err := ff.CreateSchemas()
+		require.NoError(t, err)
+	}
+}
+
 func TestUniqueConstraints(t *testing.T) {
 	t.Parallel()
 	for storageType, store := range fositeStores {
+		createSchemas(t, store)
 		if storageType == "memory" {
 			// memory store does not deal with unique constraints
 			continue
 		}
-		t.Run(fmt.Sprintf("case=%s", storageType), TestHelperUniqueConstraints(store, storageType))
+		t.Run(fmt.Sprintf("case=%s", storageType), testHelperUniqueConstraints(store, storageType))
 	}
 }
 
 func TestCreateGetDeleteAuthorizeCodes(t *testing.T) {
 	t.Parallel()
 	for k, m := range fositeStores {
-		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeleteAuthorizeCodes(m))
+		createSchemas(t, m)
+		t.Run(fmt.Sprintf("case=%s", k), testHelperCreateGetDeleteAuthorizeCodes(m))
 	}
 }
 
 func TestCreateGetDeleteAccessTokenSession(t *testing.T) {
 	t.Parallel()
 	for k, m := range fositeStores {
-		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeleteAccessTokenSession(m))
+		createSchemas(t, m)
+		t.Run(fmt.Sprintf("case=%s", k), testHelperCreateGetDeleteAccessTokenSession(m))
 	}
 }
 
 func TestCreateGetDeleteOpenIDConnectSession(t *testing.T) {
 	t.Parallel()
 	for k, m := range fositeStores {
-		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeleteOpenIDConnectSession(m))
+		createSchemas(t, m)
+		t.Run(fmt.Sprintf("case=%s", k), testHelperCreateGetDeleteOpenIDConnectSession(m))
 	}
 }
 
 func TestCreateGetDeleteRefreshTokenSession(t *testing.T) {
 	t.Parallel()
 	for k, m := range fositeStores {
-		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeleteRefreshTokenSession(m))
+		createSchemas(t, m)
+		t.Run(fmt.Sprintf("case=%s", k), testHelperCreateGetDeleteRefreshTokenSession(m))
 	}
 }
 
 func TestRevokeRefreshToken(t *testing.T) {
 	t.Parallel()
 	for k, m := range fositeStores {
-		t.Run(fmt.Sprintf("case=%s", k), TestHelperRevokeRefreshToken(m))
+		createSchemas(t, m)
+		t.Run(fmt.Sprintf("case=%s", k), testHelperRevokeRefreshToken(m))
 	}
 }
 
 func TestPKCEReuqest(t *testing.T) {
 	t.Parallel()
 	for k, m := range fositeStores {
-		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeletePKCERequestSession(m))
+		createSchemas(t, m)
+		t.Run(fmt.Sprintf("case=%s", k), testHelperCreateGetDeletePKCERequestSession(m))
 	}
 }
 
 func TestFlushAccessTokens(t *testing.T) {
 	t.Parallel()
 	for k, m := range fositeStores {
-		t.Run(fmt.Sprintf("case=%s", k), TestHelperFlushTokens(m, time.Hour))
+		createSchemas(t, m)
+		t.Run(fmt.Sprintf("case=%s", k), testHelperFlushTokens(m, time.Hour))
 	}
 }

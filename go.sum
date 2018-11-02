@@ -142,6 +142,7 @@ github.com/ory/fosite v0.26.2-0.20181031085642-2da976477fcd41493103ea478541d68ca
 github.com/ory/fosite v0.26.2-0.20181031085642-2da976477fcd41493103ea478541d68ca04083ae/go.mod h1:uttCRNB0lM7+BJFX7CC8Bqo9gAPrcpmA9Ezc80Trwuw=
 github.com/ory/fosite v0.26.2-0.20181031085642-e2441d231a19 h1:8jQrkb3nO4nG5Dzpb2fj1ksaSDE2DGhFIhPt1jFgK74=
 github.com/ory/fosite v0.26.2-0.20181031085642-e2441d231a19/go.mod h1:uttCRNB0lM7+BJFX7CC8Bqo9gAPrcpmA9Ezc80Trwuw=
+github.com/ory/fosite v0.27.0/go.mod h1:uttCRNB0lM7+BJFX7CC8Bqo9gAPrcpmA9Ezc80Trwuw=
 github.com/ory/go-convenience v0.1.0 h1:zouLKfF2GoSGnJwGq+PE/nJAE6dj2Zj5QlTgmMTsTS8=
 github.com/ory/go-convenience v0.1.0/go.mod h1:uEY/a60PL5c12nYz4V5cHY03IBmwIAEm8TWB0yn9KNs=
 github.com/ory/graceful v0.1.0 h1:zilpYtcR5vp4GubV4bN2GFJewHaSkMFnnRiJxyH8FAc=

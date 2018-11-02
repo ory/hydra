@@ -160,7 +160,7 @@ func TestRevokeRefreshToken(t *testing.T) {
 	}
 }
 
-func TestPKCEReuqest(t *testing.T) {
+func TestPKCERequest(t *testing.T) {
 	// t.Parallel()
 	for k, m := range fositeStores {
 		createSchemas(t, m)

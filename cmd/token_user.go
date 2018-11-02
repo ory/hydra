@@ -135,8 +135,11 @@ var tokenUserCmd = &cobra.Command{
 		r.GET("/", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 			w.Write([]byte(fmt.Sprintf(`
 <html><head></head><body>
-<h1>Welcome to the example OAuth 2.0 Consumer</h1>
-<p>This example requests an OAuth 2.0 Access, Refresh, and OpenID Connect ID Token from the OAuth 2.0 Server (ORY Hydra). To initiate the flow, click the "Authorize Application" button.</p>
+<h1>Welcome to the exemplary OAuth 2.0 Consumer!</h1>
+<p>This is an example app which emulates an OAuth 2.0 consumer application. Usually, this would be your web or mobile
+application and would use an <a href="https://oauth.net/code/">OAuth 2.0</a> or <a href="https://oauth.net/code/">OpenID Connect</a> library.</p>
+<p>This example requests an OAuth 2.0 Access, Refresh, and OpenID Connect ID Token from the OAuth 2.0 Server (ORY Hydra).
+To initiate the flow, click the "Authorize Application" button.</p>
 <p><a href="%s">Authorize application</a></p>
 </body>
 `, authCodeURL)))
@@ -147,7 +150,7 @@ var tokenUserCmd = &cobra.Command{
 				fmt.Printf("Got error: %s\n", r.URL.Query().Get("error_description"))
 
 				w.WriteHeader(http.StatusInternalServerError)
-				fmt.Fprintf(w, "<html><body><h1>An error occurred</h1><h2>%s</h2><p>%s</p><p>%s</p></body></html>", r.URL.Query().Get("error"), r.URL.Query().Get("error_description"), r.URL.Query().Get("error_debug"))
+				fmt.Fprintf(w, "<html><body><h1>An error occurred</h1><h2>%s</h2><p>%s</p><p>%s</p><p>%s</p></body></html>", r.URL.Query().Get("error"), r.URL.Query().Get("error_description"), r.URL.Query().Get("error_hint"), r.URL.Query().Get("error_debug"))
 				go shutdown()
 				return
 			}

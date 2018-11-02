@@ -72,6 +72,7 @@ type Introspection struct {
 	// authorized this token.
 	Username string `json:"username,omitempty"`
 
+	// Audience contains a list of the token's intended audiences.
 	Audience []string `json:"aud,omitempty"`
 
 	// IssuerURL is a string representing the issuer of this token

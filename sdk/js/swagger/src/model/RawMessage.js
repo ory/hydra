@@ -14,24 +14,25 @@
  *
  */
 
-;(function(root, factory) {
+(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient'], factory)
+    define(['ApiClient'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'))
+    module.exports = factory(require('../ApiClient'));
   } else {
     // Browser globals (root is window)
     if (!root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer) {
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {}
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {};
     }
-    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.RawMessage = factory(
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient
-    )
+    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.RawMessage = factory(root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient);
   }
-})(this, function(ApiClient) {
-  'use strict'
+}(this, function(ApiClient) {
+  'use strict';
+
+
+
 
   /**
    * The RawMessage model module.
@@ -47,12 +48,12 @@
    * @extends Array
    */
   var exports = function() {
-    var _this = this
-    _this = new Array()
-    Object.setPrototypeOf(_this, exports)
+    var _this = this;
+    _this = new Array();
+    Object.setPrototypeOf(_this, exports);
 
-    return _this
-  }
+    return _this;
+  };
 
   /**
    * Constructs a <code>RawMessage</code> from a plain JavaScript object, optionally creating a new instance.
@@ -63,11 +64,17 @@
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
-      obj = obj || new exports()
-      ApiClient.constructFromObject(data, obj, 'Number')
+      obj = obj || new exports();
+      ApiClient.constructFromObject(data, obj, 'Number');
+
     }
-    return obj
+    return obj;
   }
 
-  return exports
-})
+
+
+
+  return exports;
+}));
+
+

@@ -63,6 +63,7 @@ var tokenUserCmd = &cobra.Command{
 		redirectUrl := flagx.MustGetString(cmd, "redirect")
 		backend := flagx.MustGetString(cmd, "token-url")
 		frontend := flagx.MustGetString(cmd, "auth-url")
+		audience := flagx.MustGetStringSlice(cmd, "audience")
 
 		clientID := flagx.MustGetString(cmd, "client-id")
 		clientSecret := flagx.MustGetString(cmd, "client-secret")
@@ -105,7 +106,13 @@ var tokenUserCmd = &cobra.Command{
 		nonce, err := randx.RuneSequence(24, randx.AlphaLower)
 		cmdx.Must(err, "Could not generate random state: %s", err)
 
-		authCodeURL := conf.AuthCodeURL(string(state)) + "&nonce=" + string(nonce) + "&prompt=" + strings.Join(prompt, "+") + "&max_age=" + strconv.Itoa(maxAge)
+		authCodeURL := conf.AuthCodeURL(
+			string(state),
+			oauth2.SetAuthURLParam("audience", strings.Join(audience, "+")),
+			oauth2.SetAuthURLParam("nonce", string(nonce)),
+			oauth2.SetAuthURLParam("prompt", strings.Join(prompt, "+")),
+			oauth2.SetAuthURLParam("max_age", strconv.Itoa(maxAge)),
+		)
 
 		if flagx.MustGetBool(cmd, "no-open") {
 			webbrowser.Open(serverLocation)
@@ -202,6 +209,7 @@ func init() {
 	tokenUserCmd.Flags().String("client-secret", os.Getenv("OAUTH2_CLIENT_SECRET"), "Use the provided OAuth 2.0 Client Secret, defaults to environment variable OAUTH2_CLIENT_SECRET")
 
 	tokenUserCmd.Flags().String("redirect", "", "Force a redirect url")
+	tokenUserCmd.Flags().StringSlice("audience", []string{}, "Request a specific OAuth 2.0 Access Token Audience")
 	tokenUserCmd.Flags().String("auth-url", "", "Usually it is enough to specify the `endpoint` flag, but if you want to force the authorization url, use this flag")
 	tokenUserCmd.Flags().String("token-url", "", "Usually it is enough to specify the `endpoint` flag, but if you want to force the token url, use this flag")
 	tokenUserCmd.Flags().String("endpoint", os.Getenv("HYDRA_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_URL")

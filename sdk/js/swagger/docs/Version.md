@@ -3,6 +3,6 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**version** | **String** |  | [optional] 
+**version** | **String** | Version is the service&#39;s version. | [optional] 
 
 

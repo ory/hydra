@@ -27,8 +27,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ory/hydra/pkg"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -39,6 +37,7 @@ import (
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/pkg"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
 	"github.com/ory/x/resilience"

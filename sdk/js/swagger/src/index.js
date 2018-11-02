@@ -14,136 +14,16 @@
  *
  */
 
-;(function(factory) {
+(function(factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define([
-      'ApiClient',
-      'model/AcceptConsentRequest',
-      'model/AcceptLoginRequest',
-      'model/AuthenticationSession',
-      'model/CompletedRequest',
-      'model/ConsentRequest',
-      'model/ConsentRequestSession',
-      'model/FlushInactiveOAuth2TokensRequest',
-      'model/HealthNotReadyStatus',
-      'model/HealthStatus',
-      'model/InlineResponse401',
-      'model/JSONWebKey',
-      'model/JSONWebKeySet',
-      'model/JoseWebKeySetRequest',
-      'model/JsonWebKeySetGeneratorRequest',
-      'model/LoginRequest',
-      'model/OAuth2Client',
-      'model/OAuth2TokenIntrospection',
-      'model/OauthTokenResponse',
-      'model/OpenIDConnectContext',
-      'model/PreviousConsentSession',
-      'model/RawMessage',
-      'model/RejectRequest',
-      'model/SwaggerFlushInactiveAccessTokens',
-      'model/SwaggerJsonWebKeyQuery',
-      'model/SwaggerJwkCreateSet',
-      'model/SwaggerJwkSetQuery',
-      'model/SwaggerJwkUpdateSet',
-      'model/SwaggerJwkUpdateSetKey',
-      'model/SwaggerOAuthIntrospectionRequest',
-      'model/SwaggerRevokeOAuth2TokenParameters',
-      'model/UserinfoResponse',
-      'model/Version',
-      'model/WellKnown',
-      'api/HealthApi',
-      'api/JsonWebKeyApi',
-      'api/MetricsApi',
-      'api/OAuth2Api',
-      'api/VersionApi'
-    ], factory)
+    define(['ApiClient', 'model/AcceptConsentRequest', 'model/AcceptLoginRequest', 'model/AuthenticationSession', 'model/CompletedRequest', 'model/ConsentRequest', 'model/ConsentRequestSession', 'model/FlushInactiveOAuth2TokensRequest', 'model/HealthNotReadyStatus', 'model/HealthStatus', 'model/InlineResponse401', 'model/JSONWebKey', 'model/JSONWebKeySet', 'model/JoseWebKeySetRequest', 'model/JsonWebKeySetGeneratorRequest', 'model/LoginRequest', 'model/OAuth2Client', 'model/OAuth2TokenIntrospection', 'model/OauthTokenResponse', 'model/OpenIDConnectContext', 'model/PreviousConsentSession', 'model/RawMessage', 'model/RejectRequest', 'model/SwaggerFlushInactiveAccessTokens', 'model/SwaggerJsonWebKeyQuery', 'model/SwaggerJwkCreateSet', 'model/SwaggerJwkSetQuery', 'model/SwaggerJwkUpdateSet', 'model/SwaggerJwkUpdateSetKey', 'model/SwaggerOAuthIntrospectionRequest', 'model/SwaggerRevokeOAuth2TokenParameters', 'model/UserinfoResponse', 'model/Version', 'model/WellKnown', 'api/HealthApi', 'api/JsonWebKeyApi', 'api/OAuth2Api', 'api/VersionApi'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(
-      require('./ApiClient'),
-      require('./model/AcceptConsentRequest'),
-      require('./model/AcceptLoginRequest'),
-      require('./model/AuthenticationSession'),
-      require('./model/CompletedRequest'),
-      require('./model/ConsentRequest'),
-      require('./model/ConsentRequestSession'),
-      require('./model/FlushInactiveOAuth2TokensRequest'),
-      require('./model/HealthNotReadyStatus'),
-      require('./model/HealthStatus'),
-      require('./model/InlineResponse401'),
-      require('./model/JSONWebKey'),
-      require('./model/JSONWebKeySet'),
-      require('./model/JoseWebKeySetRequest'),
-      require('./model/JsonWebKeySetGeneratorRequest'),
-      require('./model/LoginRequest'),
-      require('./model/OAuth2Client'),
-      require('./model/OAuth2TokenIntrospection'),
-      require('./model/OauthTokenResponse'),
-      require('./model/OpenIDConnectContext'),
-      require('./model/PreviousConsentSession'),
-      require('./model/RawMessage'),
-      require('./model/RejectRequest'),
-      require('./model/SwaggerFlushInactiveAccessTokens'),
-      require('./model/SwaggerJsonWebKeyQuery'),
-      require('./model/SwaggerJwkCreateSet'),
-      require('./model/SwaggerJwkSetQuery'),
-      require('./model/SwaggerJwkUpdateSet'),
-      require('./model/SwaggerJwkUpdateSetKey'),
-      require('./model/SwaggerOAuthIntrospectionRequest'),
-      require('./model/SwaggerRevokeOAuth2TokenParameters'),
-      require('./model/UserinfoResponse'),
-      require('./model/Version'),
-      require('./model/WellKnown'),
-      require('./api/HealthApi'),
-      require('./api/JsonWebKeyApi'),
-      require('./api/MetricsApi'),
-      require('./api/OAuth2Api'),
-      require('./api/VersionApi')
-    )
+    module.exports = factory(require('./ApiClient'), require('./model/AcceptConsentRequest'), require('./model/AcceptLoginRequest'), require('./model/AuthenticationSession'), require('./model/CompletedRequest'), require('./model/ConsentRequest'), require('./model/ConsentRequestSession'), require('./model/FlushInactiveOAuth2TokensRequest'), require('./model/HealthNotReadyStatus'), require('./model/HealthStatus'), require('./model/InlineResponse401'), require('./model/JSONWebKey'), require('./model/JSONWebKeySet'), require('./model/JoseWebKeySetRequest'), require('./model/JsonWebKeySetGeneratorRequest'), require('./model/LoginRequest'), require('./model/OAuth2Client'), require('./model/OAuth2TokenIntrospection'), require('./model/OauthTokenResponse'), require('./model/OpenIDConnectContext'), require('./model/PreviousConsentSession'), require('./model/RawMessage'), require('./model/RejectRequest'), require('./model/SwaggerFlushInactiveAccessTokens'), require('./model/SwaggerJsonWebKeyQuery'), require('./model/SwaggerJwkCreateSet'), require('./model/SwaggerJwkSetQuery'), require('./model/SwaggerJwkUpdateSet'), require('./model/SwaggerJwkUpdateSetKey'), require('./model/SwaggerOAuthIntrospectionRequest'), require('./model/SwaggerRevokeOAuth2TokenParameters'), require('./model/UserinfoResponse'), require('./model/Version'), require('./model/WellKnown'), require('./api/HealthApi'), require('./api/JsonWebKeyApi'), require('./api/OAuth2Api'), require('./api/VersionApi'));
   }
-})(function(
-  ApiClient,
-  AcceptConsentRequest,
-  AcceptLoginRequest,
-  AuthenticationSession,
-  CompletedRequest,
-  ConsentRequest,
-  ConsentRequestSession,
-  FlushInactiveOAuth2TokensRequest,
-  HealthNotReadyStatus,
-  HealthStatus,
-  InlineResponse401,
-  JSONWebKey,
-  JSONWebKeySet,
-  JoseWebKeySetRequest,
-  JsonWebKeySetGeneratorRequest,
-  LoginRequest,
-  OAuth2Client,
-  OAuth2TokenIntrospection,
-  OauthTokenResponse,
-  OpenIDConnectContext,
-  PreviousConsentSession,
-  RawMessage,
-  RejectRequest,
-  SwaggerFlushInactiveAccessTokens,
-  SwaggerJsonWebKeyQuery,
-  SwaggerJwkCreateSet,
-  SwaggerJwkSetQuery,
-  SwaggerJwkUpdateSet,
-  SwaggerJwkUpdateSetKey,
-  SwaggerOAuthIntrospectionRequest,
-  SwaggerRevokeOAuth2TokenParameters,
-  UserinfoResponse,
-  Version,
-  WellKnown,
-  HealthApi,
-  JsonWebKeyApi,
-  MetricsApi,
-  OAuth2Api,
-  VersionApi
-) {
-  'use strict'
+}(function(ApiClient, AcceptConsentRequest, AcceptLoginRequest, AuthenticationSession, CompletedRequest, ConsentRequest, ConsentRequestSession, FlushInactiveOAuth2TokensRequest, HealthNotReadyStatus, HealthStatus, InlineResponse401, JSONWebKey, JSONWebKeySet, JoseWebKeySetRequest, JsonWebKeySetGeneratorRequest, LoginRequest, OAuth2Client, OAuth2TokenIntrospection, OauthTokenResponse, OpenIDConnectContext, PreviousConsentSession, RawMessage, RejectRequest, SwaggerFlushInactiveAccessTokens, SwaggerJsonWebKeyQuery, SwaggerJwkCreateSet, SwaggerJwkSetQuery, SwaggerJwkUpdateSet, SwaggerJwkUpdateSetKey, SwaggerOAuthIntrospectionRequest, SwaggerRevokeOAuth2TokenParameters, UserinfoResponse, Version, WellKnown, HealthApi, JsonWebKeyApi, OAuth2Api, VersionApi) {
+  'use strict';
 
   /**
    * Welcome_to_the_ORY_Hydra_HTTP_API_documentation__You_will_find_documentation_for_all_HTTP_APIs_here__Keep_in_mind_that_this_document_reflects_the_latest_branch_always__Support_for_versioned_documentation_is_coming_in_the_future_.<br>
@@ -358,11 +238,6 @@
      */
     JsonWebKeyApi: JsonWebKeyApi,
     /**
-     * The MetricsApi service constructor.
-     * @property {module:api/MetricsApi}
-     */
-    MetricsApi: MetricsApi,
-    /**
      * The OAuth2Api service constructor.
      * @property {module:api/OAuth2Api}
      */
@@ -372,7 +247,7 @@
      * @property {module:api/VersionApi}
      */
     VersionApi: VersionApi
-  }
+  };
 
-  return exports
-})
+  return exports;
+}));

@@ -115,8 +115,8 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthApi* | [**isInstanceAlive**](docs/HealthApi.md#isInstanceAlive) | **GET** /health/alive | Check the Alive Status
-*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthApi* | [**isInstanceReady**](docs/HealthApi.md#isInstanceReady) | **GET** /health/ready | Check the Readiness Status
+*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthApi* | [**isInstanceAlive**](docs/HealthApi.md#isInstanceAlive) | **GET** /health/alive | Check alive status
+*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthApi* | [**isInstanceReady**](docs/HealthApi.md#isInstanceReady) | **GET** /health/ready | Check readiness status
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKeyApi* | [**createJsonWebKeySet**](docs/JsonWebKeyApi.md#createJsonWebKeySet) | **POST** /keys/{set} | Generate a new JSON Web Key
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKeyApi* | [**deleteJsonWebKey**](docs/JsonWebKeyApi.md#deleteJsonWebKey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKeyApi* | [**deleteJsonWebKeySet**](docs/JsonWebKeyApi.md#deleteJsonWebKeySet) | **DELETE** /keys/{set} | Delete a JSON Web Key Set
@@ -124,7 +124,6 @@ Class | Method | HTTP request | Description
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKeyApi* | [**getJsonWebKeySet**](docs/JsonWebKeyApi.md#getJsonWebKeySet) | **GET** /keys/{set} | Retrieve a JSON Web Key Set
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKeyApi* | [**updateJsonWebKey**](docs/JsonWebKeyApi.md#updateJsonWebKey) | **PUT** /keys/{set}/{kid} | Update a JSON Web Key
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKeyApi* | [**updateJsonWebKeySet**](docs/JsonWebKeyApi.md#updateJsonWebKeySet) | **PUT** /keys/{set} | Update a JSON Web Key Set
-*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.MetricsApi* | [**getPrometheusMetrics**](docs/MetricsApi.md#getPrometheusMetrics) | **GET** /metrics/prometheus | Retrieve Prometheus metrics
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**acceptConsentRequest**](docs/OAuth2Api.md#acceptConsentRequest) | **PUT** /oauth2/auth/requests/consent/{challenge}/accept | Accept an consent request
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**acceptLoginRequest**](docs/OAuth2Api.md#acceptLoginRequest) | **PUT** /oauth2/auth/requests/login/{challenge}/accept | Accept an login request
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**createOAuth2Client**](docs/OAuth2Api.md#createOAuth2Client) | **POST** /clients | Create an OAuth 2.0 client
@@ -149,7 +148,7 @@ Class | Method | HTTP request | Description
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**updateOAuth2Client**](docs/OAuth2Api.md#updateOAuth2Client) | **PUT** /clients/{id} | Update an OAuth 2.0 Client
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**userinfo**](docs/OAuth2Api.md#userinfo) | **POST** /userinfo | OpenID Connect Userinfo
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**wellKnown**](docs/OAuth2Api.md#wellKnown) | **GET** /.well-known/jwks.json | Get Well-Known JSON Web Keys
-*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.VersionApi* | [**getVersion**](docs/VersionApi.md#getVersion) | **GET** /version | Get the version of Hydra
+*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.VersionApi* | [**getVersion**](docs/VersionApi.md#getVersion) | **GET** /version | Get service version
 
 
 ## Documentation for Models

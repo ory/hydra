@@ -24,10 +24,9 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/ory/hydra/tracing"
-
 	"github.com/spf13/cobra"
 
+	"github.com/ory/hydra/tracing"
 	"github.com/ory/x/corsx"
 	"github.com/ory/x/profilex"
 	"github.com/ory/x/tlsx"

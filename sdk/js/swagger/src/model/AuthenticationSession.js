@@ -14,24 +14,25 @@
  *
  */
 
-;(function(root, factory) {
+(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient'], factory)
+    define(['ApiClient'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'))
+    module.exports = factory(require('../ApiClient'));
   } else {
     // Browser globals (root is window)
     if (!root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer) {
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {}
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {};
     }
-    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.AuthenticationSession = factory(
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient
-    )
+    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.AuthenticationSession = factory(root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient);
   }
-})(this, function(ApiClient) {
-  'use strict'
+}(this, function(ApiClient) {
+  'use strict';
+
+
+
 
   /**
    * The AuthenticationSession model module.
@@ -45,8 +46,12 @@
    * @class
    */
   var exports = function() {
-    var _this = this
-  }
+    var _this = this;
+
+
+
+
+  };
 
   /**
    * Constructs a <code>AuthenticationSession</code> from a plain JavaScript object, optionally creating a new instance.
@@ -57,36 +62,37 @@
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
-      obj = obj || new exports()
+      obj = obj || new exports();
 
       if (data.hasOwnProperty('AuthenticatedAt')) {
-        obj['AuthenticatedAt'] = ApiClient.convertToType(
-          data['AuthenticatedAt'],
-          'Date'
-        )
+        obj['AuthenticatedAt'] = ApiClient.convertToType(data['AuthenticatedAt'], 'Date');
       }
       if (data.hasOwnProperty('ID')) {
-        obj['ID'] = ApiClient.convertToType(data['ID'], 'String')
+        obj['ID'] = ApiClient.convertToType(data['ID'], 'String');
       }
       if (data.hasOwnProperty('Subject')) {
-        obj['Subject'] = ApiClient.convertToType(data['Subject'], 'String')
+        obj['Subject'] = ApiClient.convertToType(data['Subject'], 'String');
       }
     }
-    return obj
+    return obj;
   }
 
   /**
    * @member {Date} AuthenticatedAt
    */
-  exports.prototype['AuthenticatedAt'] = undefined
+  exports.prototype['AuthenticatedAt'] = undefined;
   /**
    * @member {String} ID
    */
-  exports.prototype['ID'] = undefined
+  exports.prototype['ID'] = undefined;
   /**
    * @member {String} Subject
    */
-  exports.prototype['Subject'] = undefined
+  exports.prototype['Subject'] = undefined;
 
-  return exports
-})
+
+
+  return exports;
+}));
+
+

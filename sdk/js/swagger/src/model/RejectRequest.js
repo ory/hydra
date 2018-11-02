@@ -14,24 +14,25 @@
  *
  */
 
-;(function(root, factory) {
+(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient'], factory)
+    define(['ApiClient'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'))
+    module.exports = factory(require('../ApiClient'));
   } else {
     // Browser globals (root is window)
     if (!root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer) {
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {}
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {};
     }
-    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.RejectRequest = factory(
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient
-    )
+    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.RejectRequest = factory(root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient);
   }
-})(this, function(ApiClient) {
-  'use strict'
+}(this, function(ApiClient) {
+  'use strict';
+
+
+
 
   /**
    * The RejectRequest model module.
@@ -45,8 +46,14 @@
    * @class
    */
   var exports = function() {
-    var _this = this
-  }
+    var _this = this;
+
+
+
+
+
+
+  };
 
   /**
    * Constructs a <code>RejectRequest</code> from a plain JavaScript object, optionally creating a new instance.
@@ -57,59 +64,51 @@
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
-      obj = obj || new exports()
+      obj = obj || new exports();
 
       if (data.hasOwnProperty('error')) {
-        obj['error'] = ApiClient.convertToType(data['error'], 'String')
+        obj['error'] = ApiClient.convertToType(data['error'], 'String');
       }
       if (data.hasOwnProperty('error_debug')) {
-        obj['error_debug'] = ApiClient.convertToType(
-          data['error_debug'],
-          'String'
-        )
+        obj['error_debug'] = ApiClient.convertToType(data['error_debug'], 'String');
       }
       if (data.hasOwnProperty('error_description')) {
-        obj['error_description'] = ApiClient.convertToType(
-          data['error_description'],
-          'String'
-        )
+        obj['error_description'] = ApiClient.convertToType(data['error_description'], 'String');
       }
       if (data.hasOwnProperty('error_hint')) {
-        obj['error_hint'] = ApiClient.convertToType(
-          data['error_hint'],
-          'String'
-        )
+        obj['error_hint'] = ApiClient.convertToType(data['error_hint'], 'String');
       }
       if (data.hasOwnProperty('status_code')) {
-        obj['status_code'] = ApiClient.convertToType(
-          data['status_code'],
-          'Number'
-        )
+        obj['status_code'] = ApiClient.convertToType(data['status_code'], 'Number');
       }
     }
-    return obj
+    return obj;
   }
 
   /**
    * @member {String} error
    */
-  exports.prototype['error'] = undefined
+  exports.prototype['error'] = undefined;
   /**
    * @member {String} error_debug
    */
-  exports.prototype['error_debug'] = undefined
+  exports.prototype['error_debug'] = undefined;
   /**
    * @member {String} error_description
    */
-  exports.prototype['error_description'] = undefined
+  exports.prototype['error_description'] = undefined;
   /**
    * @member {String} error_hint
    */
-  exports.prototype['error_hint'] = undefined
+  exports.prototype['error_hint'] = undefined;
   /**
    * @member {Number} status_code
    */
-  exports.prototype['status_code'] = undefined
+  exports.prototype['status_code'] = undefined;
 
-  return exports
-})
+
+
+  return exports;
+}));
+
+

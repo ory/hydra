@@ -36,24 +36,26 @@ import (
 
 func MockConsentRequest(key string, remember bool, rememberFor int, hasError bool, skip bool, authAt bool) (c *ConsentRequest, h *HandledConsentRequest) {
 	c = &ConsentRequest{
+		Challenge:         "challenge" + key,
+		RequestedScope:    []string{"scopea" + key, "scopeb" + key},
+		RequestedAudience: []string{"auda" + key, "audb" + key},
+		Skip:              skip,
+		Subject:           "subject" + key,
 		OpenIDConnectContext: &OpenIDConnectContext{
 			ACRValues: []string{"1" + key, "2" + key},
 			UILocales: []string{"fr" + key, "de" + key},
 			Display:   "popup" + key,
 		},
-		RequestedAt:            time.Now().UTC().Add(-time.Hour),
 		Client:                 &client.Client{ClientID: "client" + key},
-		Subject:                "subject" + key,
 		RequestURL:             "https://request-url/path" + key,
-		Skip:                   skip,
-		Challenge:              "challenge" + key,
-		RequestedScope:         []string{"scopea" + key, "scopeb" + key},
-		Verifier:               "verifier" + key,
-		CSRF:                   "csrf" + key,
+		LoginChallenge:         "login-challenge",
+		LoginSessionID:         "login-session-id",
 		ForceSubjectIdentifier: "forced-subject",
 		SubjectIdentifier:      "forced-subject",
-		LoginSessionID:         "login-session-id",
-		LoginChallenge:         "login-challenge",
+		Verifier:               "verifier" + key,
+		CSRF:                   "csrf" + key,
+		AuthenticatedAt:        time.Now().UTC().Add(-time.Hour),
+		RequestedAt:            time.Now().UTC().Add(-time.Hour),
 	}
 
 	var err *RequestDeniedError
@@ -79,7 +81,10 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 		Challenge:       "challenge" + key,
 		RequestedAt:     time.Now().UTC().Add(-time.Minute),
 		AuthenticatedAt: authenticatedAt,
+		GrantedScope:    []string{"scopea" + key, "scopeb" + key},
+		GrantedAudience: []string{"auda" + key, "audb" + key},
 		Error:           err,
+		//WasUsed:         true,
 	}
 
 	return c, h
@@ -127,8 +132,8 @@ func MockAuthRequest(key string, authAt bool) (c *AuthenticationRequest, h *Hand
 		Error:                  err,
 		Subject:                c.Subject,
 		ACR:                    "acr",
-		WasUsed:                false,
 		ForceSubjectIdentifier: "forced-subject",
+		//WasUsed:                false,
 	}
 
 	return c, h
@@ -136,6 +141,15 @@ func MockAuthRequest(key string, authAt bool) (c *AuthenticationRequest, h *Hand
 
 func ManagerTests(m Manager, clientManager client.Manager, fositeManager pkg.FositeStorer) func(t *testing.T) {
 	return func(t *testing.T) {
+		if mm, ok := m.(*SQLManager); ok {
+			if n, err := mm.CreateSchemas(); err != nil {
+				t.Fatalf("Could not create mysql schema: %v", err)
+				return
+			} else {
+				t.Logf("Applied %d migrations", n)
+			}
+		}
+
 		t.Run("case=auth-session", func(t *testing.T) {
 			for _, tc := range []struct {
 				s AuthenticationSession

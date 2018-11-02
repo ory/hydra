@@ -31,13 +31,10 @@ import (
 )
 
 type Session struct {
-	// JSON fields are needed for store serialization
 	*openid.DefaultSession `json:"idToken"`
-	Audience               []string
 	Extra                  map[string]interface{} `json:"extra"`
-	//JTI                    string
-	KID      string
-	ClientID string
+	KID                    string
+	ClientID               string
 }
 
 func NewSession(subject string) *Session {
@@ -47,24 +44,28 @@ func NewSession(subject string) *Session {
 			Headers: new(jwt.Headers),
 			Subject: subject,
 		},
-		Audience: []string{},
-		Extra:    map[string]interface{}{},
+		Extra: map[string]interface{}{},
 	}
 }
 
 func (s *Session) GetJWTClaims() jwt.JWTClaimsContainer {
 	claims := &jwt.JWTClaims{
 		Subject:   s.Subject,
-		Audience:  s.Audience,
 		Issuer:    s.DefaultSession.Claims.Issuer,
 		Extra:     map[string]interface{}{"ext": s.Extra},
 		ExpiresAt: s.GetExpiresAt(fosite.AccessToken),
 		IssuedAt:  time.Now(),
 		NotBefore: time.Now(),
+
+		// No need to set the audience because that's being done by fosite automatically.
+		// Audience:  s.Audience,
+
 		// The JTI MUST NOT BE FIXED or refreshing tokens will yield the SAME token
 		// JTI:       s.JTI,
+
 		// These are set by the DefaultJWTStrategy
 		// Scope:     s.Scope,
+
 		// Setting these here will cause the token to have the same iat/nbf values always
 		// IssuedAt:  s.DefaultSession.Claims.IssuedAt,
 		// NotBefore: s.DefaultSession.Claims.IssuedAt,

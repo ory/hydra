@@ -14,6 +14,9 @@ package swagger
 type PreviousConsentSession struct {
 	ConsentRequest ConsentRequest `json:"consent_request,omitempty"`
 
+	// GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.
+	GrantAccessTokenAudience []string `json:"grant_access_token_audience,omitempty"`
+
 	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`
 	GrantScope []string `json:"grant_scope,omitempty"`
 

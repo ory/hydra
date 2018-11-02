@@ -5,7 +5,7 @@
  * PHP version 5
  *
  * @category Class
- * @package  Hydra\SDK
+ * @package  HydraSDK
  * @author   Swaagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
@@ -27,7 +27,7 @@
  * Do not edit the class manually.
  */
 
-namespace Hydra\SDK\Model;
+namespace HydraSDK\Model;
 
 use \ArrayAccess;
 
@@ -35,7 +35,7 @@ use \ArrayAccess;
  * OAuth2Client Class Doc Comment
  *
  * @category    Class
- * @package     Hydra\SDK
+ * @package     HydraSDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
  */
@@ -55,6 +55,7 @@ class OAuth2Client implements ArrayAccess
       */
     protected static $swaggerTypes = [
         'allowed_cors_origins' => 'string[]',
+        'audience' => 'string[]',
         'client_id' => 'string',
         'client_name' => 'string',
         'client_secret' => 'string',
@@ -62,7 +63,7 @@ class OAuth2Client implements ArrayAccess
         'client_uri' => 'string',
         'contacts' => 'string[]',
         'grant_types' => 'string[]',
-        'jwks' => '\Hydra\SDK\Model\JSONWebKeySet',
+        'jwks' => '\HydraSDK\Model\JSONWebKeySet',
         'jwks_uri' => 'string',
         'logo_uri' => 'string',
         'owner' => 'string',
@@ -85,6 +86,7 @@ class OAuth2Client implements ArrayAccess
       */
     protected static $swaggerFormats = [
         'allowed_cors_origins' => null,
+        'audience' => null,
         'client_id' => null,
         'client_name' => null,
         'client_secret' => null,
@@ -125,6 +127,7 @@ class OAuth2Client implements ArrayAccess
      */
     protected static $attributeMap = [
         'allowed_cors_origins' => 'allowed_cors_origins',
+        'audience' => 'audience',
         'client_id' => 'client_id',
         'client_name' => 'client_name',
         'client_secret' => 'client_secret',
@@ -156,6 +159,7 @@ class OAuth2Client implements ArrayAccess
      */
     protected static $setters = [
         'allowed_cors_origins' => 'setAllowedCorsOrigins',
+        'audience' => 'setAudience',
         'client_id' => 'setClientId',
         'client_name' => 'setClientName',
         'client_secret' => 'setClientSecret',
@@ -187,6 +191,7 @@ class OAuth2Client implements ArrayAccess
      */
     protected static $getters = [
         'allowed_cors_origins' => 'getAllowedCorsOrigins',
+        'audience' => 'getAudience',
         'client_id' => 'getClientId',
         'client_name' => 'getClientName',
         'client_secret' => 'getClientSecret',
@@ -243,6 +248,7 @@ class OAuth2Client implements ArrayAccess
     public function __construct(array $data = null)
     {
         $this->container['allowed_cors_origins'] = isset($data['allowed_cors_origins']) ? $data['allowed_cors_origins'] : null;
+        $this->container['audience'] = isset($data['audience']) ? $data['audience'] : null;
         $this->container['client_id'] = isset($data['client_id']) ? $data['client_id'] : null;
         $this->container['client_name'] = isset($data['client_name']) ? $data['client_name'] : null;
         $this->container['client_secret'] = isset($data['client_secret']) ? $data['client_secret'] : null;
@@ -316,6 +322,27 @@ class OAuth2Client implements ArrayAccess
     public function setAllowedCorsOrigins($allowed_cors_origins)
     {
         $this->container['allowed_cors_origins'] = $allowed_cors_origins;
+
+        return $this;
+    }
+
+    /**
+     * Gets audience
+     * @return string[]
+     */
+    public function getAudience()
+    {
+        return $this->container['audience'];
+    }
+
+    /**
+     * Sets audience
+     * @param string[] $audience Audience is a whitelist defining the audiences this client is allowed to request tokens for. An audience limits the applicability of an OAuth 2.0 Access Token to, for example, certain API endpoints. The value is a list of URLs. URLs MUST NOT contain whitespaces.
+     * @return $this
+     */
+    public function setAudience($audience)
+    {
+        $this->container['audience'] = $audience;
 
         return $this;
     }
@@ -469,7 +496,7 @@ class OAuth2Client implements ArrayAccess
 
     /**
      * Gets jwks
-     * @return \Hydra\SDK\Model\JSONWebKeySet
+     * @return \HydraSDK\Model\JSONWebKeySet
      */
     public function getJwks()
     {
@@ -478,7 +505,7 @@ class OAuth2Client implements ArrayAccess
 
     /**
      * Sets jwks
-     * @param \Hydra\SDK\Model\JSONWebKeySet $jwks
+     * @param \HydraSDK\Model\JSONWebKeySet $jwks
      * @return $this
      */
     public function setJwks($jwks)
@@ -838,10 +865,10 @@ class OAuth2Client implements ArrayAccess
     public function __toString()
     {
         if (defined('JSON_PRETTY_PRINT')) { // use JSON pretty print
-            return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
+            return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
         }
 
-        return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this));
+        return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this));
     }
 }
 

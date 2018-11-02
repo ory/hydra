@@ -25,9 +25,8 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/client"
-
 	"github.com/ory/herodot"
+	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"

@@ -22,7 +22,10 @@ type LoginRequest struct {
 	// RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but might come in handy if you want to deal with additional request parameters.
 	RequestUrl string `json:"request_url,omitempty"`
 
-	// RequestedScope contains all scopes requested by the OAuth 2.0 client.
+	// RequestedScope contains the access token audience as requested by the OAuth 2.0 Client.
+	RequestedAccessTokenAudience []string `json:"requested_access_token_audience,omitempty"`
+
+	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
 	RequestedScope []string `json:"requested_scope,omitempty"`
 
 	// SessionID is the authentication session ID. It is set if the browser had a valid authentication session at ORY Hydra during the login flow. It can be used to associate consecutive login requests by a certain user.

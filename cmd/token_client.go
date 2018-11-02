@@ -27,6 +27,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"golang.org/x/oauth2"
@@ -76,6 +77,7 @@ var tokenClientCmd = &cobra.Command{
 		}
 
 		scopes := flagx.MustGetStringSlice(cmd, "scope")
+		audience := flagx.MustGetStringSlice(cmd, "audience")
 		cu, err := url.Parse(c.GetClusterURLWithoutTailingSlashOrFail(cmd))
 		cmdx.Must(err, `Unable to parse cluster url ("%s"): %s`, c.GetClusterURLWithoutTailingSlashOrFail(cmd), err)
 
@@ -88,10 +90,11 @@ var tokenClientCmd = &cobra.Command{
 		}
 
 		oauthConfig := clientcredentials.Config{
-			ClientID:     clientID,
-			ClientSecret: clientSecret,
-			TokenURL:     urlx.AppendPaths(cu, "/oauth2/token").String(),
-			Scopes:       scopes,
+			ClientID:       clientID,
+			ClientSecret:   clientSecret,
+			TokenURL:       urlx.AppendPaths(cu, "/oauth2/token").String(),
+			Scopes:         scopes,
+			EndpointParams: url.Values{"audience": {strings.Join(audience, " ")}},
 		}
 
 		t, err := oauthConfig.Token(ctx)
@@ -112,5 +115,6 @@ func init() {
 	tokenClientCmd.Flags().BoolP("verbose", "v", false, "Toggle verbose output mode")
 	tokenClientCmd.Flags().String("client-id", os.Getenv("OAUTH2_CLIENT_ID"), "Use the provided OAuth 2.0 Client ID, defaults to environment variable OAUTH2_CLIENT_ID")
 	tokenClientCmd.Flags().String("client-secret", os.Getenv("OAUTH2_CLIENT_SECRET"), "Use the provided OAuth 2.0 Client Secret, defaults to environment variable OAUTH2_CLIENT_SECRET")
+	tokenClientCmd.Flags().StringSlice("audience", []string{}, "Request a specific OAuth 2.0 Access Token Audience")
 	tokenClientCmd.PersistentFlags().String("endpoint", os.Getenv("HYDRA_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_URL")
 }

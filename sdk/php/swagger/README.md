@@ -57,7 +57,7 @@ Please follow the [installation procedure](#installation--usage) and then run th
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\HealthApi();
+$api_instance = new HydraSDK\Api\HealthApi();
 
 try {
     $result = $api_instance->isInstanceAlive();
@@ -75,8 +75,8 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*HealthApi* | [**isInstanceAlive**](docs/Api/HealthApi.md#isinstancealive) | **GET** /health/alive | Check the Alive Status
-*HealthApi* | [**isInstanceReady**](docs/Api/HealthApi.md#isinstanceready) | **GET** /health/ready | Check the Readiness Status
+*HealthApi* | [**isInstanceAlive**](docs/Api/HealthApi.md#isinstancealive) | **GET** /health/alive | Check alive status
+*HealthApi* | [**isInstanceReady**](docs/Api/HealthApi.md#isinstanceready) | **GET** /health/ready | Check readiness status
 *JsonWebKeyApi* | [**createJsonWebKeySet**](docs/Api/JsonWebKeyApi.md#createjsonwebkeyset) | **POST** /keys/{set} | Generate a new JSON Web Key
 *JsonWebKeyApi* | [**deleteJsonWebKey**](docs/Api/JsonWebKeyApi.md#deletejsonwebkey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
 *JsonWebKeyApi* | [**deleteJsonWebKeySet**](docs/Api/JsonWebKeyApi.md#deletejsonwebkeyset) | **DELETE** /keys/{set} | Delete a JSON Web Key Set
@@ -84,7 +84,6 @@ Class | Method | HTTP request | Description
 *JsonWebKeyApi* | [**getJsonWebKeySet**](docs/Api/JsonWebKeyApi.md#getjsonwebkeyset) | **GET** /keys/{set} | Retrieve a JSON Web Key Set
 *JsonWebKeyApi* | [**updateJsonWebKey**](docs/Api/JsonWebKeyApi.md#updatejsonwebkey) | **PUT** /keys/{set}/{kid} | Update a JSON Web Key
 *JsonWebKeyApi* | [**updateJsonWebKeySet**](docs/Api/JsonWebKeyApi.md#updatejsonwebkeyset) | **PUT** /keys/{set} | Update a JSON Web Key Set
-*MetricsApi* | [**getPrometheusMetrics**](docs/Api/MetricsApi.md#getprometheusmetrics) | **GET** /metrics/prometheus | Retrieve Prometheus metrics
 *OAuth2Api* | [**acceptConsentRequest**](docs/Api/OAuth2Api.md#acceptconsentrequest) | **PUT** /oauth2/auth/requests/consent/{challenge}/accept | Accept an consent request
 *OAuth2Api* | [**acceptLoginRequest**](docs/Api/OAuth2Api.md#acceptloginrequest) | **PUT** /oauth2/auth/requests/login/{challenge}/accept | Accept an login request
 *OAuth2Api* | [**createOAuth2Client**](docs/Api/OAuth2Api.md#createoauth2client) | **POST** /clients | Create an OAuth 2.0 client
@@ -109,7 +108,7 @@ Class | Method | HTTP request | Description
 *OAuth2Api* | [**updateOAuth2Client**](docs/Api/OAuth2Api.md#updateoauth2client) | **PUT** /clients/{id} | Update an OAuth 2.0 Client
 *OAuth2Api* | [**userinfo**](docs/Api/OAuth2Api.md#userinfo) | **POST** /userinfo | OpenID Connect Userinfo
 *OAuth2Api* | [**wellKnown**](docs/Api/OAuth2Api.md#wellknown) | **GET** /.well-known/jwks.json | Get Well-Known JSON Web Keys
-*VersionApi* | [**getVersion**](docs/Api/VersionApi.md#getversion) | **GET** /version | Get the version of Hydra
+*VersionApi* | [**getVersion**](docs/Api/VersionApi.md#getversion) | **GET** /version | Get service version
 
 
 ## Documentation For Models

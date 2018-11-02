@@ -4,6 +4,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **allowed_cors_origins** | **string[]** | AllowedCORSOrigins are one or more URLs (scheme://host[:port]) which are allowed to make CORS requests to the /oauth/token endpoint. If this array is empty, the sever&#39;s CORS origin configuration (&#x60;CORS_ALLOWED_ORIGINS&#x60;) will be used instead. If this array is set, the allowed origins are appended to the server&#39;s CORS origin configuration. Be aware that environment variable &#x60;CORS_ENABLED&#x60; MUST be set to &#x60;true&#x60; for this to work. | [optional] 
+**audience** | **string[]** | Audience is a whitelist defining the audiences this client is allowed to request tokens for. An audience limits the applicability of an OAuth 2.0 Access Token to, for example, certain API endpoints. The value is a list of URLs. URLs MUST NOT contain whitespaces. | [optional] 
 **client_id** | **string** | ClientID  is the id for this client. | [optional] 
 **client_name** | **string** | Name is the human-readable string name of the client to be presented to the end-user during authorization. | [optional] 
 **client_secret** | **string** | Secret is the client&#39;s secret. The secret will be included in the create request as cleartext, and then never again. The secret is stored using BCrypt so it is impossible to recover it. Tell your users that they need to write the secret down as it will not be made available again. | [optional] 
@@ -11,7 +12,7 @@ Name | Type | Description | Notes
 **client_uri** | **string** | ClientURI is an URL string of a web page providing information about the client. If present, the server SHOULD display this URL to the end-user in a clickable fashion. | [optional] 
 **contacts** | **string[]** | Contacts is a array of strings representing ways to contact people responsible for this client, typically email addresses. | [optional] 
 **grant_types** | **string[]** | GrantTypes is an array of grant types the client is allowed to use. | [optional] 
-**jwks** | [**\Hydra\SDK\Model\JSONWebKeySet**](JSONWebKeySet.md) |  | [optional] 
+**jwks** | [**\HydraSDK\Model\JSONWebKeySet**](JSONWebKeySet.md) |  | [optional] 
 **jwks_uri** | **string** | URL for the Client&#39;s JSON Web Key Set [JWK] document. If the Client signs requests to the Server, it contains the signing key(s) the Server uses to validate signatures from the Client. The JWK Set MAY also contain the Client&#39;s encryption keys(s), which are used by the Server to encrypt responses to the Client. When both signing and encryption keys are made available, a use (Key Use) parameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key&#39;s intended usage. Although some algorithms allow the same key to be used for both signatures and encryption, doing so is NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate. | [optional] 
 **logo_uri** | **string** | LogoURI is an URL string that references a logo for the client. | [optional] 
 **owner** | **string** | Owner is a string identifying the owner of the OAuth 2.0 Client. | [optional] 

@@ -223,8 +223,9 @@ func newOAuth2Handler(c *config.Config, frontend, backend *httprouter.Router, cm
 		OpenIDJWTStrategy:      openIDJWTStrategy,
 		AccessTokenJWTStrategy: accessTokenJWTStrategy,
 		AccessTokenStrategy:    c.OAuth2AccessTokenStrategy,
+		ShareOAuth2Debug:       c.SendOAuth2DebugMessagesToClients,
+		AudienceStrategy:       fosite.DefaultAudienceMatchingStrategy,
 		//IDTokenLifespan:        c.GetIDTokenLifespan(),
-		ShareOAuth2Debug: c.SendOAuth2DebugMessagesToClients,
 	}
 
 	corsMiddleware := newCORSMiddleware(viper.GetString("CORS_ENABLED") == "true", c, o.IntrospectToken, clm.GetConcreteClient)

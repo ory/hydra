@@ -15,6 +15,9 @@ type OAuth2Client struct {
 	// AllowedCORSOrigins are one or more URLs (scheme://host[:port]) which are allowed to make CORS requests to the /oauth/token endpoint. If this array is empty, the sever's CORS origin configuration (`CORS_ALLOWED_ORIGINS`) will be used instead. If this array is set, the allowed origins are appended to the server's CORS origin configuration. Be aware that environment variable `CORS_ENABLED` MUST be set to `true` for this to work.
 	AllowedCorsOrigins []string `json:"allowed_cors_origins,omitempty"`
 
+	// Audience is a whitelist defining the audiences this client is allowed to request tokens for. An audience limits the applicability of an OAuth 2.0 Access Token to, for example, certain API endpoints. The value is a list of URLs. URLs MUST NOT contain whitespaces.
+	Audience []string `json:"audience,omitempty"`
+
 	// ClientID  is the id for this client.
 	ClientId string `json:"client_id,omitempty"`
 

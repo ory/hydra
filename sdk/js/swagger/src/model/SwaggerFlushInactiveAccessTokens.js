@@ -14,29 +14,25 @@
  *
  */
 
-;(function(root, factory) {
+(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/FlushInactiveOAuth2TokensRequest'], factory)
+    define(['ApiClient', 'model/FlushInactiveOAuth2TokensRequest'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(
-      require('../ApiClient'),
-      require('./FlushInactiveOAuth2TokensRequest')
-    )
+    module.exports = factory(require('../ApiClient'), require('./FlushInactiveOAuth2TokensRequest'));
   } else {
     // Browser globals (root is window)
     if (!root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer) {
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {}
+      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer = {};
     }
-    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerFlushInactiveAccessTokens = factory(
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient,
-      root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer
-        .FlushInactiveOAuth2TokensRequest
-    )
+    root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerFlushInactiveAccessTokens = factory(root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.ApiClient, root.OryHydraCloudNativeOAuth20AndOpenIdConnectServer.FlushInactiveOAuth2TokensRequest);
   }
-})(this, function(ApiClient, FlushInactiveOAuth2TokensRequest) {
-  'use strict'
+}(this, function(ApiClient, FlushInactiveOAuth2TokensRequest) {
+  'use strict';
+
+
+
 
   /**
    * The SwaggerFlushInactiveAccessTokens model module.
@@ -50,8 +46,10 @@
    * @class
    */
   var exports = function() {
-    var _this = this
-  }
+    var _this = this;
+
+
+  };
 
   /**
    * Constructs a <code>SwaggerFlushInactiveAccessTokens</code> from a plain JavaScript object, optionally creating a new instance.
@@ -62,21 +60,23 @@
    */
   exports.constructFromObject = function(data, obj) {
     if (data) {
-      obj = obj || new exports()
+      obj = obj || new exports();
 
       if (data.hasOwnProperty('Body')) {
-        obj['Body'] = FlushInactiveOAuth2TokensRequest.constructFromObject(
-          data['Body']
-        )
+        obj['Body'] = FlushInactiveOAuth2TokensRequest.constructFromObject(data['Body']);
       }
     }
-    return obj
+    return obj;
   }
 
   /**
    * @member {module:model/FlushInactiveOAuth2TokensRequest} Body
    */
-  exports.prototype['Body'] = undefined
+  exports.prototype['Body'] = undefined;
 
-  return exports
-})
+
+
+  return exports;
+}));
+
+

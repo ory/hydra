@@ -144,7 +144,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						fallthrough
 					case "postgres":
 						scm := consent.NewSQLManager(databases[km], fs.(*FositeSQLStore).Manager, fs)
-						_, err := scm.CreateSchemas()
+						_, err = scm.CreateSchemas()
 						require.NoError(t, err)
 
 						_, err = (fs.(*FositeSQLStore)).CreateSchemas()
@@ -209,6 +209,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						ResponseTypes: []string{"id_token", "code", "token"},
 						GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
 						Scope:         "hydra offline openid",
+						Audience:      []string{"https://api.ory.sh/"},
 					}
 					oauthConfig := &oauth2.Config{
 						ClientID: client.GetID(), ClientSecret: client.Secret,
@@ -240,6 +241,139 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 						assertAccessToken func(*testing.T, string)
 					}{
+						{
+							d:       "Checks if request fails when audience doesn't match",
+							authURL: oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("audience", "https://not-ory-api/")),
+							cj:      newCookieJar(),
+							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+								return func(w http.ResponseWriter, r *http.Request) { t.Fatal("This should not have been called") }
+							},
+							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+								return func(w http.ResponseWriter, r *http.Request) { t.Fatal("This should not have been called") }
+							},
+							cb: func(t *testing.T) httprouter.Handle {
+								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+									code = r.URL.Query().Get("code")
+									require.Empty(t, code)
+									w.WriteHeader(http.StatusOK)
+								}
+							},
+							expectOAuthAuthError:  true,
+							expectOAuthTokenError: false,
+							expectIDToken:         false,
+							expectRefreshToken:    false,
+							assertAccessToken: func(t *testing.T, token string) {
+								require.Empty(t, token)
+							},
+						},
+						{
+							d:       "Perform OAuth2 flow with audience",
+							authURL: oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("audience", "https://api.ory.sh/")),
+							cj:      newCookieJar(),
+							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+								return func(w http.ResponseWriter, r *http.Request) {
+									rr, res, err := apiClient.GetLoginRequest(r.URL.Query().Get("login_challenge"))
+									require.NoError(t, err)
+									require.EqualValues(t, http.StatusOK, res.StatusCode)
+									assert.False(t, rr.Skip)
+									assert.Empty(t, rr.Subject)
+									assert.EqualValues(t, []string{"https://api.ory.sh/"}, rr.RequestedAccessTokenAudience)
+									assert.EqualValues(t, client.GetID(), rr.Client.ClientId)
+									assert.EqualValues(t, client.GrantTypes, rr.Client.GrantTypes)
+									assert.EqualValues(t, client.LogoURI, rr.Client.LogoUri)
+									assert.EqualValues(t, client.RedirectURIs, rr.Client.RedirectUris)
+									assert.EqualValues(t, r.URL.Query().Get("login_challenge"), rr.Challenge)
+									assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
+									assert.EqualValues(t, oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("audience", "https://api.ory.sh/")), rr.RequestUrl)
+
+									v, res, err := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
+										Subject: "user-a", Remember: true, RememberFor: 0,
+									})
+									require.NoError(t, err)
+									require.EqualValues(t, http.StatusOK, res.StatusCode)
+									require.NotEmpty(t, v.RedirectTo)
+									http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+								}
+							},
+							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+								return func(w http.ResponseWriter, r *http.Request) {
+									rr, res, err := apiClient.GetConsentRequest(r.URL.Query().Get("consent_challenge"))
+									require.NoError(t, err)
+									require.EqualValues(t, http.StatusOK, res.StatusCode)
+									assert.False(t, rr.Skip)
+									assert.EqualValues(t, "user-a", rr.Subject)
+									assert.EqualValues(t, client.GetID(), rr.Client.ClientId)
+									assert.EqualValues(t, client.GrantTypes, rr.Client.GrantTypes)
+									assert.EqualValues(t, client.LogoURI, rr.Client.LogoUri)
+									assert.EqualValues(t, client.RedirectURIs, rr.Client.RedirectUris)
+									assert.EqualValues(t, []string{"https://api.ory.sh/"}, rr.RequestedAccessTokenAudience)
+									assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
+									assert.EqualValues(t, r.URL.Query().Get("consent_challenge"), rr.Challenge)
+									assert.EqualValues(t, oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("audience", "https://api.ory.sh/")), rr.RequestUrl)
+
+									v, res, err := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{
+										GrantScope: []string{"hydra", "offline", "openid"}, Remember: true, RememberFor: 0,
+										GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
+										Session: swagger.ConsentRequestSession{
+											AccessToken: map[string]interface{}{"foo": "bar"},
+											IdToken:     map[string]interface{}{"bar": "baz"},
+										},
+									})
+									require.NoError(t, err)
+									require.EqualValues(t, http.StatusOK, res.StatusCode)
+									require.NotEmpty(t, v.RedirectTo)
+									http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+								}
+							},
+							cb: func(t *testing.T) httprouter.Handle {
+								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+									code = r.URL.Query().Get("code")
+									require.NotEmpty(t, code)
+									w.WriteHeader(http.StatusOK)
+								}
+							},
+							expectOAuthAuthError:  false,
+							expectOAuthTokenError: false,
+							expectIDToken:         true,
+							expectRefreshToken:    true,
+							assertAccessToken: func(t *testing.T, token string) {
+								if strat.d != "jwt" {
+									res, err := ts.Client().PostForm(ts.URL+"/oauth2/introspect", url.Values{"token": {token}})
+									require.NoError(t, err)
+									require.EqualValues(t, http.StatusOK, res.StatusCode)
+
+									body, err := ioutil.ReadAll(res.Body)
+									require.NoError(t, err)
+
+									var r swagger.OAuth2TokenIntrospection
+									require.NoError(t, json.Unmarshal(body, &r))
+									assert.EqualValues(t, "e2e-app-client"+km+strat.d, r.ClientId)
+									assert.EqualValues(t, "user-a", r.Sub)
+									assert.EqualValues(t, []string{"https://api.ory.sh/"}, r.Aud)
+									assert.EqualValues(t, "hydra offline openid", r.Scope)
+									assert.EqualValues(t, "map[foo:bar]", fmt.Sprintf("%s", r.Ext))
+									return
+								}
+
+								body, err := djwt.DecodeSegment(strings.Split(token, ".")[1])
+								require.NoError(t, err)
+
+								data := map[string]interface{}{}
+								require.NoError(t, json.Unmarshal(body, &data))
+
+								assert.EqualValues(t, "e2e-app-client"+km+strat.d, data["client_id"])
+								assert.EqualValues(t, "user-a", data["sub"])
+								assert.NotEmpty(t, data["iss"])
+								assert.NotEmpty(t, data["jti"])
+								assert.NotEmpty(t, data["exp"])
+								assert.NotEmpty(t, data["iat"])
+								assert.NotEmpty(t, data["nbf"])
+								assert.EqualValues(t, data["nbf"], data["iat"])
+								assert.EqualValues(t, []interface{}{"https://api.ory.sh/"}, data["aud"])
+								assert.EqualValues(t, []interface{}{"hydra", "offline", "openid"}, data["scp"])
+								assert.EqualValues(t, "map[foo:bar]", fmt.Sprintf("%s", data["ext"]))
+							},
+						},
 						{
 							// First we need to create a persistent session in order to check if the other things work
 							// as expected
@@ -390,6 +524,20 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							expectRefreshToken:    true,
 							assertAccessToken: func(t *testing.T, token string) {
 								if strat.d != "jwt" {
+									res, err := ts.Client().PostForm(ts.URL+"/oauth2/introspect", url.Values{"token": {token}})
+									require.NoError(t, err)
+									require.EqualValues(t, http.StatusOK, res.StatusCode)
+
+									body, err := ioutil.ReadAll(res.Body)
+									require.NoError(t, err)
+
+									var r swagger.OAuth2TokenIntrospection
+									require.NoError(t, json.Unmarshal(body, &r))
+									assert.EqualValues(t, "e2e-app-client"+km+strat.d, r.ClientId)
+									assert.EqualValues(t, "user-a", r.Sub)
+									assert.Empty(t, r.Aud)
+									assert.EqualValues(t, "hydra offline", r.Scope)
+									assert.EqualValues(t, "map[foo:bar]", fmt.Sprintf("%s", r.Ext))
 									return
 								}
 
@@ -406,6 +554,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 								assert.NotEmpty(t, data["exp"])
 								assert.NotEmpty(t, data["iat"])
 								assert.NotEmpty(t, data["nbf"])
+								assert.Empty(t, data["aud"])
 								assert.EqualValues(t, data["nbf"], data["iat"])
 								assert.EqualValues(t, []interface{}{"hydra", "offline"}, data["scp"])
 								assert.EqualValues(t, "map[foo:bar]", fmt.Sprintf("%s", data["ext"]))

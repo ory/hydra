@@ -47,6 +47,7 @@ func init() {
 	clientsCreateCmd.Flags().StringSliceP("grant-types", "g", []string{"authorization_code"}, "A list of allowed grant types")
 	clientsCreateCmd.Flags().StringSliceP("response-types", "r", []string{"code"}, "A list of allowed response types")
 	clientsCreateCmd.Flags().StringSliceP("scope", "a", []string{""}, "The scope the client is allowed to request")
+	clientsCreateCmd.Flags().StringSlice("audience", []string{}, "The audience this client is allowed to request")
 	clientsCreateCmd.Flags().String("token-endpoint-auth-method", "client_secret_basic", "Define which authentication method the client may use at the Token Endpoint. Valid values are \"client_secret_post\", \"client_secret_basic\", \"private_key_jwt\", and \"none\"")
 	clientsCreateCmd.Flags().String("jwks-uri", "", "Define the URL where the JSON Web Key Set should be fetched from when performing the \"private_key_jwt\" client authentication method")
 	clientsCreateCmd.Flags().String("policy-uri", "", "A URL string that points to a human-readable privacy policy document that describes how the deployment organization collects, uses, retains, and discloses personal data")

@@ -62,8 +62,9 @@ func configureClientWithoutAuth(cmd *cobra.Command, c *hydra.Configuration) *hyd
 }
 
 func checkResponse(err error, expectedStatusCode int, response *hydra.APIResponse) {
-	var r *http.Response
-	if response != nil {
+	r := new(http.Response)
+	r.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("Response is nil")))
+	if response != nil && response.Response != nil {
 		r = response.Response
 		r.Body = ioutil.NopCloser(bytes.NewBuffer(response.Payload))
 	}

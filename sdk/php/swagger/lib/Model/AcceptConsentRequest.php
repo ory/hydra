@@ -5,7 +5,7 @@
  * PHP version 5
  *
  * @category Class
- * @package  Hydra\SDK
+ * @package  HydraSDK
  * @author   Swaagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
@@ -27,7 +27,7 @@
  * Do not edit the class manually.
  */
 
-namespace Hydra\SDK\Model;
+namespace HydraSDK\Model;
 
 use \ArrayAccess;
 
@@ -35,7 +35,7 @@ use \ArrayAccess;
  * AcceptConsentRequest Class Doc Comment
  *
  * @category    Class
- * @package     Hydra\SDK
+ * @package     HydraSDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
  */
@@ -54,10 +54,11 @@ class AcceptConsentRequest implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
+        'grant_access_token_audience' => 'string[]',
         'grant_scope' => 'string[]',
         'remember' => 'bool',
         'remember_for' => 'int',
-        'session' => '\Hydra\SDK\Model\ConsentRequestSession'
+        'session' => '\HydraSDK\Model\ConsentRequestSession'
     ];
 
     /**
@@ -65,6 +66,7 @@ class AcceptConsentRequest implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerFormats = [
+        'grant_access_token_audience' => null,
         'grant_scope' => null,
         'remember' => null,
         'remember_for' => 'int64',
@@ -86,6 +88,7 @@ class AcceptConsentRequest implements ArrayAccess
      * @var string[]
      */
     protected static $attributeMap = [
+        'grant_access_token_audience' => 'grant_access_token_audience',
         'grant_scope' => 'grant_scope',
         'remember' => 'remember',
         'remember_for' => 'remember_for',
@@ -98,6 +101,7 @@ class AcceptConsentRequest implements ArrayAccess
      * @var string[]
      */
     protected static $setters = [
+        'grant_access_token_audience' => 'setGrantAccessTokenAudience',
         'grant_scope' => 'setGrantScope',
         'remember' => 'setRemember',
         'remember_for' => 'setRememberFor',
@@ -110,6 +114,7 @@ class AcceptConsentRequest implements ArrayAccess
      * @var string[]
      */
     protected static $getters = [
+        'grant_access_token_audience' => 'getGrantAccessTokenAudience',
         'grant_scope' => 'getGrantScope',
         'remember' => 'getRemember',
         'remember_for' => 'getRememberFor',
@@ -147,6 +152,7 @@ class AcceptConsentRequest implements ArrayAccess
      */
     public function __construct(array $data = null)
     {
+        $this->container['grant_access_token_audience'] = isset($data['grant_access_token_audience']) ? $data['grant_access_token_audience'] : null;
         $this->container['grant_scope'] = isset($data['grant_scope']) ? $data['grant_scope'] : null;
         $this->container['remember'] = isset($data['remember']) ? $data['remember'] : null;
         $this->container['remember_for'] = isset($data['remember_for']) ? $data['remember_for'] : null;
@@ -179,6 +185,27 @@ class AcceptConsentRequest implements ArrayAccess
 
 
     /**
+     * Gets grant_access_token_audience
+     * @return string[]
+     */
+    public function getGrantAccessTokenAudience()
+    {
+        return $this->container['grant_access_token_audience'];
+    }
+
+    /**
+     * Sets grant_access_token_audience
+     * @param string[] $grant_access_token_audience GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.
+     * @return $this
+     */
+    public function setGrantAccessTokenAudience($grant_access_token_audience)
+    {
+        $this->container['grant_access_token_audience'] = $grant_access_token_audience;
+
+        return $this;
+    }
+
+    /**
      * Gets grant_scope
      * @return string[]
      */
@@ -189,7 +216,7 @@ class AcceptConsentRequest implements ArrayAccess
 
     /**
      * Sets grant_scope
-     * @param string[] $grant_scope GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`
+     * @param string[] $grant_scope GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
      * @return $this
      */
     public function setGrantScope($grant_scope)
@@ -243,7 +270,7 @@ class AcceptConsentRequest implements ArrayAccess
 
     /**
      * Gets session
-     * @return \Hydra\SDK\Model\ConsentRequestSession
+     * @return \HydraSDK\Model\ConsentRequestSession
      */
     public function getSession()
     {
@@ -252,7 +279,7 @@ class AcceptConsentRequest implements ArrayAccess
 
     /**
      * Sets session
-     * @param \Hydra\SDK\Model\ConsentRequestSession $session
+     * @param \HydraSDK\Model\ConsentRequestSession $session
      * @return $this
      */
     public function setSession($session)
@@ -313,10 +340,10 @@ class AcceptConsentRequest implements ArrayAccess
     public function __toString()
     {
         if (defined('JSON_PRETTY_PRINT')) { // use JSON pretty print
-            return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
+            return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
         }
 
-        return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this));
+        return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this));
     }
 }
 

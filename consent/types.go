@@ -82,8 +82,11 @@ func (e *RequestDeniedError) toRFCError() *fosite.RFC6749Error {
 //
 // swagger:model acceptConsentRequest
 type HandledConsentRequest struct {
-	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`
+	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
 	GrantedScope []string `json:"grant_scope"`
+
+	// GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.
+	GrantedAudience []string `json:"grant_access_token_audience"`
 
 	// Session allows you to set (optional) session data for access and ID tokens.
 	Session *ConsentRequestSessionData `json:"session"`
@@ -109,6 +112,9 @@ type HandledConsentRequest struct {
 type PreviousConsentSession struct {
 	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`
 	GrantedScope []string `json:"grant_scope"`
+
+	// GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.
+	GrantedAudience []string `json:"grant_access_token_audience"`
 
 	// Session allows you to set (optional) session data for access and ID tokens.
 	Session *ConsentRequestSessionData `json:"session"`
@@ -227,8 +233,11 @@ type AuthenticationRequest struct {
 	// identify the session.
 	Challenge string `json:"challenge"`
 
-	// RequestedScope contains all scopes requested by the OAuth 2.0 client.
+	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
 	RequestedScope []string `json:"requested_scope"`
+
+	// RequestedScope contains the access token audience as requested by the OAuth 2.0 Client.
+	RequestedAudience []string `json:"requested_access_token_audience"`
 
 	// Skip, if true, implies that the client has requested the same scopes from the same user previously.
 	// If true, you can skip asking the user to grant the requested scopes, and simply forward the user to the redirect URL.
@@ -273,8 +282,11 @@ type ConsentRequest struct {
 	// identify the session.
 	Challenge string `json:"challenge"`
 
-	// RequestedScope contains all scopes requested by the OAuth 2.0 client.
+	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
 	RequestedScope []string `json:"requested_scope"`
+
+	// RequestedScope contains the access token audience as requested by the OAuth 2.0 Client.
+	RequestedAudience []string `json:"requested_access_token_audience"`
 
 	// Skip, if true, implies that the client has requested the same scopes from the same user previously.
 	// If true, you must not ask the user to grant the requested scopes. You must however either allow or deny the

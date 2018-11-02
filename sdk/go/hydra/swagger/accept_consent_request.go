@@ -12,7 +12,10 @@ package swagger
 
 type AcceptConsentRequest struct {
 
-	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`
+	// GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.
+	GrantAccessTokenAudience []string `json:"grant_access_token_audience,omitempty"`
+
+	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
 	GrantScope []string `json:"grant_scope,omitempty"`
 
 	// Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same client asks the same user for the same, or a subset of, scope.

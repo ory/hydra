@@ -107,6 +107,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		LogoUri:                 flagx.MustGetString(cmd, "logo-uri"),
 		ClientUri:               flagx.MustGetString(cmd, "client-uri"),
 		SubjectType:             flagx.MustGetString(cmd, "subject-type"),
+		Audience:                flagx.MustGetStringSlice(cmd, "audience"),
 	}
 
 	result, response, err := m.CreateOAuth2Client(cc)

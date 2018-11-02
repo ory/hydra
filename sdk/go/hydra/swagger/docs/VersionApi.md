@@ -4,15 +4,15 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**GetVersion**](VersionApi.md#GetVersion) | **Get** /version | Get the version of Hydra
+[**GetVersion**](VersionApi.md#GetVersion) | **Get** /version | Get service version
 
 
 # **GetVersion**
 > Version GetVersion()
 
-Get the version of Hydra
+Get service version
 
-This endpoint returns the version as `{ \"version\": \"VERSION\" }`. The version is only correct with the prebuilt binary and not custom builds.
+This endpoint returns the service version typically notated using semantic versioning.  If the service supports TLS Edge Termination, this endpoint does not require the `X-Forwarded-Proto` header to be set.  Be aware that if you are running multiple nodes of this service, the health status will never refer to the cluster state, only to a single instance.
 
 
 ### Parameters

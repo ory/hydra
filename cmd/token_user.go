@@ -22,8 +22,11 @@ package cmd
 
 import (
 	"context"
+	"crypto/rand"
+	"crypto/rsa"
 	"crypto/tls"
 	"fmt"
+	"github.com/ory/x/tlsx"
 	"net/http"
 	"net/url"
 	"os"
@@ -56,6 +59,7 @@ var tokenUserCmd = &cobra.Command{
 			}})
 		}
 
+		isSSL := flagx.MustGetBool(cmd, "https")
 		port := flagx.MustGetInt(cmd, "port")
 		scopes := flagx.MustGetStringSlice(cmd, "scope")
 		prompt := flagx.MustGetStringSlice(cmd, "prompt")
@@ -73,7 +77,12 @@ var tokenUserCmd = &cobra.Command{
 			return
 		}
 
-		serverLocation := fmt.Sprintf("http://127.0.0.1:%d/", port)
+		proto := "http"
+		if isSSL {
+			proto = "https"
+		}
+
+		serverLocation := fmt.Sprintf("%s://127.0.0.1:%d/", proto, port)
 		if redirectUrl == "" {
 			redirectUrl = serverLocation + "callback"
 		}
@@ -124,7 +133,16 @@ var tokenUserCmd = &cobra.Command{
 		fmt.Printf("If your browser does not open automatically, navigate to:\n\n\t%s\n\n", serverLocation)
 
 		r := httprouter.New()
-		server := &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: r}
+		var tlsc *tls.Config
+		if isSSL {
+			key, err := rsa.GenerateKey(rand.Reader, 2048)
+			cmdx.Must(err, "Unable to generate RSA key pair: %s", err)
+			cert, err := tlsx.CreateSelfSignedTLSCertificate(key)
+			cmdx.Must(err, "Unable to generate self-signed TLS Certificate: %s", err)
+			tlsc = &tls.Config{Certificates: []tls.Certificate{*cert}}
+		}
+
+		server := &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: r, TLSConfig: tlsc}
 		var shutdown = func() {
 			time.Sleep(time.Second * 1)
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
@@ -196,7 +214,13 @@ To initiate the flow, click the "Authorize Application" button.</p>
 
 			go shutdown()
 		})
-		server.ListenAndServe()
+
+		if isSSL {
+			server.ListenAndServeTLS("", "")
+		} else {
+			server.ListenAndServe()
+		}
+
 	},
 }
 
@@ -216,4 +240,5 @@ func init() {
 	tokenUserCmd.Flags().String("auth-url", "", "Usually it is enough to specify the `endpoint` flag, but if you want to force the authorization url, use this flag")
 	tokenUserCmd.Flags().String("token-url", "", "Usually it is enough to specify the `endpoint` flag, but if you want to force the token url, use this flag")
 	tokenUserCmd.Flags().String("endpoint", os.Getenv("HYDRA_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_URL")
+	tokenUserCmd.Flags().Bool("https", false, "Sets up HTTPS for the endpoint using a self-signed certificate which is re-generated every time you start this command")
 }

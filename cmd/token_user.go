@@ -26,7 +26,6 @@ import (
 	"crypto/rsa"
 	"crypto/tls"
 	"fmt"
-	"github.com/ory/x/tlsx"
 	"net/http"
 	"net/url"
 	"os"
@@ -43,6 +42,7 @@ import (
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
 	"github.com/ory/x/randx"
+	"github.com/ory/x/tlsx"
 )
 
 // tokenUserCmd represents the token command

@@ -99,7 +99,7 @@ OAUTH2 CONTROLS
 	of ORY Hydra.
 	Example: OAUTH2_LOGOUT_REDIRECT_URL=https://myapp.com/
 
-- OAUTH2_ISSUER_URL: IssuerURL is the public URL of your Hydra installation. It is used for OAuth2 and OpenID Connect and must be
+- OAUTH2_ISSUER_URL: This is the public URL of your ORY Hydra installation. It is used for OAuth2 and OpenID Connect and must be
 	specified and using HTTPS protocol, unless --dangerous-force-http is set.
 	Example: OAUTH2_ISSUER_URL=https://hydra.myapp.com/
 

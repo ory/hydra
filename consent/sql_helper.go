@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	migrate "github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
 
 	"github.com/ory/go-convenience/stringsx"

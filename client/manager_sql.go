@@ -28,9 +28,9 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
-	"github.com/rubenv/sql-migrate"
+	migrate "github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
-	"gopkg.in/square/go-jose.v2"
+	jose "gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite"
 	"github.com/ory/go-convenience/stringsx"

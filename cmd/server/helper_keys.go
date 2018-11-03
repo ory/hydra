@@ -24,7 +24,7 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-	"gopkg.in/square/go-jose.v2"
+	jose "gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/jwk"

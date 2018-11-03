@@ -27,7 +27,7 @@ import (
 	"sync"
 
 	"github.com/pkg/errors"
-	"gopkg.in/square/go-jose.v2"
+	jose "gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/pkg"

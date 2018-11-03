@@ -30,7 +30,7 @@ import (
 
 	"github.com/gorilla/context"
 	"github.com/julienschmidt/httprouter"
-	"github.com/meatballhat/negroni-logrus"
+	negronilogrus "github.com/meatballhat/negroni-logrus"
 	"github.com/pkg/errors"
 	"github.com/rs/cors"
 	"github.com/spf13/cobra"

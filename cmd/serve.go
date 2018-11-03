@@ -112,8 +112,10 @@ OAUTH2 CONTROLS
 - ACCESS_TOKEN_LIFESPAN: Lifespan of OAuth2 access tokens. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 	Defaults to ACCESS_TOKEN_LIFESPAN=1h
 
-- CHALLENGE_TOKEN_LIFESPAN: Lifespan of OAuth2 consent tokens. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
-	Defaults to CHALLENGE_TOKEN_LIFESPAN=10m
+- LOGIN_CONSENT_REQUEST_LIFESPAN: Maximum lifespan of a login and consent request. This specifies the maximum time a user
+	may take to complete the login and consent flow, before that requests times out and results in an error. Valid time
+	units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+	Defaults to LOGIN_CONSENT_REQUEST_LIFESPAN=15m
 
 - SCOPE_STRATEGY: Set this to DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY to enable the deprecated hierarchical scope strategy.
 	This is required if you do not want to migrate to the new wildcard strategy.

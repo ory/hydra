@@ -33,7 +33,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	jwt "github.com/dgrijalva/jwt-go"
 	"golang.org/x/oauth2"
 
 	"github.com/ory/hydra/sdk/go/hydra/swagger"

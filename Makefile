@@ -5,11 +5,12 @@ init:
 			github.com/golang/mock/mockgen \
 			github.com/go-swagger/go-swagger/cmd/swagger \
 			github.com/go-bindata/go-bindata/... \
+			golang.org/x/tools/cmd/goimports \
 			github.com/gobuffalo/packr/packr
 
 format:
 		goreturns -w -local github.com/ory $$(listx .)
-		# goimports -w -v -local github.com/ory $$(listx .)
+		# goimports -w -local github.com/ory $$(listx .)
 
 gen-mocks:
 		mockgen -package oauth2_test -destination oauth2/oauth2_provider_mock_test.go github.com/ory/fosite OAuth2Provider

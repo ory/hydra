@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
-	"time"
 
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
@@ -208,7 +207,8 @@ func newOAuth2Handler(c *config.Config, frontend, backend *httprouter.Router, cm
 			c.LoginURL, c.ConsentURL, c.Issuer,
 			"/oauth2/auth", cm,
 			sessions.NewCookieStore(c.GetCookieSecret()), c.GetScopeStrategy(),
-			!c.ForceHTTP, time.Minute*15,
+			!c.ForceHTTP,
+			c.GetLoginConsentRequestLifespan(),
 			oidcStrategy,
 			openid.NewOpenIDConnectRequestValidator(nil, oidcStrategy),
 			sias,

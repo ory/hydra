@@ -29,7 +29,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
-	"github.com/rubenv/sql-migrate"
+	migrate "github.com/rubenv/sql-migrate"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"

@@ -31,7 +31,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/opentracing/opentracing-go"
+	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/mocktracer"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"

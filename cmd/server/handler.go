@@ -140,12 +140,12 @@ func setup(c *config.Config, cmd *cobra.Command, args []string, name string) (ha
 
 	if !c.ForceHTTP {
 		if c.Issuer == "" {
-			logger.Fatalln("IssuerURL must be explicitly specified unless --dangerous-force-http is passed. To find out more, use `hydra help serve`.")
+			logger.Fatalln("OAUTH2_ISSUER_URL must be explicitly specified unless --dangerous-force-http is passed. To find out more, use `hydra help serve`.")
 		}
 		issuer, err := url.Parse(c.Issuer)
 		cmdx.Must(err, "Could not parse issuer URL: %s", err)
 		if issuer.Scheme != "https" {
-			logger.Fatalln("IssuerURL must use HTTPS unless --dangerous-force-http is passed. To find out more, use `hydra help serve`.")
+			logger.Fatalln("OAUTH2_ISSUER_URL must use HTTPS unless --dangerous-force-http is passed. To find out more, use `hydra help serve`.")
 		}
 	}
 

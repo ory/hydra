@@ -27,6 +27,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
+	migrate "github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
 	jose "gopkg.in/square/go-jose.v2"
 

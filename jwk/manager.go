@@ -23,7 +23,7 @@ package jwk
 import (
 	"context"
 
-	"gopkg.in/square/go-jose.v2"
+	jose "gopkg.in/square/go-jose.v2"
 )
 
 type Manager interface {

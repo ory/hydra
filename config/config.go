@@ -36,7 +36,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v1"
 
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
@@ -75,7 +75,7 @@ type Config struct {
 	ScopeStrategy                    string  `mapstructure:"SCOPE_STRATEGY" yaml:"-"`
 	AuthCodeLifespan                 string  `mapstructure:"AUTH_CODE_LIFESPAN" yaml:"-"`
 	IDTokenLifespan                  string  `mapstructure:"ID_TOKEN_LIFESPAN" yaml:"-"`
-	ChallengeTokenLifespan           string  `mapstructure:"CHALLENGE_TOKEN_LIFESPAN" yaml:"-"`
+	LoginConsentRequestLifespan      string  `mapstructure:"LOGIN_CONSENT_REQUEST_LIFESPAN" yaml:"-"`
 	CookieSecret                     string  `mapstructure:"COOKIE_SECRET" yaml:"-"`
 	LogLevel                         string  `mapstructure:"LOG_LEVEL" yaml:"-"`
 	LogFormat                        string  `mapstructure:"LOG_FORMAT" yaml:"-"`
@@ -260,11 +260,11 @@ func (c *Config) DoesRequestSatisfyTermination(r *http.Request) error {
 	return nil
 }
 
-func (c *Config) GetChallengeTokenLifespan() time.Duration {
-	d, err := time.ParseDuration(c.ChallengeTokenLifespan)
+func (c *Config) GetLoginConsentRequestLifespan() time.Duration {
+	d, err := time.ParseDuration(c.LoginConsentRequestLifespan)
 	if err != nil {
-		c.GetLogger().Warnf("Could not parse challenge token lifespan value (%s). Defaulting to 10m", c.AccessTokenLifespan)
-		return time.Minute * 10
+		c.GetLogger().Warnf("Could not parse login and consent request lifespan value (%s). Defaulting to 15m", c.LoginConsentRequestLifespan)
+		return time.Minute * 15
 	}
 	return d
 }

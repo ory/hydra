@@ -27,7 +27,7 @@ import (
 
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
-	"gopkg.in/square/go-jose.v2"
+	jose "gopkg.in/square/go-jose.v2"
 )
 
 type HS512Generator struct{}

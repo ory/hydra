@@ -105,6 +105,10 @@ before finalizing the upgrade process.
 
 ## 1.0.0-rc.1
 
+### Customise login and consent flow timeout
+
+You can now set the login and consent flow timeout using environment variable `LOGIN_CONSENT_REQUEST_LIFESPAN`.
+
 ### JSON Web Token formatted Access Token data
 
 Previously, extra fields coming from `session.access_token` where directly embedded in the OAuth 2.0 Access Token when

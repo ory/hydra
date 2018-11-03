@@ -31,7 +31,7 @@ import (
 	"github.com/mendsley/gojwk"
 	"github.com/pborman/uuid"
 	"github.com/spf13/cobra"
-	"gopkg.in/square/go-jose.v2"
+	jose "gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/hydra/config"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"

@@ -123,7 +123,7 @@ func TestExecute(t *testing.T) {
 		{args: []string{"keys", "import", "--endpoint", backend, "import-2", "../test/stub/rsa.key", "../test/stub/rsa.pub"}},
 		{args: []string{"token", "revoke", "--endpoint", frontend, "--client-secret", "foobar", "--client-id", "foobarbaz", "foo"}},
 		{args: []string{"token", "client", "--endpoint", frontend, "--client-secret", "foobar", "--client-id", "foobarbaz"}},
-		{args: []string{"help", "migrate", "sql"}},
+		{args: []string{"migrate", "sql"}},
 		{args: []string{"version"}},
 		{args: []string{"token", "flush", "--endpoint", backend}},
 	} {

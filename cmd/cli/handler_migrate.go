@@ -92,7 +92,7 @@ func getDBUrl(cmd *cobra.Command, args []string, position int) (dburl string) {
 		}
 		dburl = viper.GetString("DATABASE_URL")
 	} else {
-		if len(args) < position {
+		if len(args) <= position {
 			fmt.Println(cmd.UsageString())
 			return
 		}

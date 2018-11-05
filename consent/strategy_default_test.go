@@ -347,9 +347,9 @@ func TestStrategy(t *testing.T) {
 			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
 			expectErr:             []bool{true, true, false},
 			expectSession: &HandledConsentRequest{
-				ConsentRequest: &ConsentRequest{Subject: "user", SubjectIdentifier: "user",ACR:"1"},
+				ConsentRequest: &ConsentRequest{Subject: "user", SubjectIdentifier: "user", ACR: "1"},
 				GrantedScope:   []string{"scope-a"},
-				Remember:       true,
+				Remember:       false,
 				RememberFor:    0,
 				Session: &ConsentRequestSessionData{
 					AccessToken: map[string]interface{}{"foo": "bar"},

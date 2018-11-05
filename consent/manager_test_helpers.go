@@ -54,7 +54,7 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 		SubjectIdentifier:      "forced-subject",
 		Verifier:               "verifier" + key,
 		CSRF:                   "csrf" + key,
-		ACR: "1",
+		ACR:                    "1",
 		AuthenticatedAt:        time.Now().UTC().Add(-time.Hour),
 		RequestedAt:            time.Now().UTC().Add(-time.Hour),
 	}

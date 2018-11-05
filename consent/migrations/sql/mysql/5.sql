@@ -10,7 +10,7 @@ CREATE INDEX hydra_oauth2_authentication_request_sub_idx ON hydra_oauth2_authent
 CREATE UNIQUE INDEX hydra_oauth2_authentication_request_veri_idx ON hydra_oauth2_authentication_request (verifier);
 
 -- +migrate Down
-DROP INDEX hydra_oauth2_obfuscated_authentication_session_so_idx;
+DROP INDEX hydra_oauth2_obfuscated_authentication_session_so_idx ON hydra_oauth2_obfuscated_authentication_session;
 
 DROP INDEX hydra_oauth2_consent_request_cid_idx ON hydra_oauth2_consent_request;
 DROP INDEX hydra_oauth2_consent_request_sub_idx ON hydra_oauth2_consent_request;

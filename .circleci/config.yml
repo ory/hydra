@@ -80,7 +80,10 @@ jobs:
       - run: go mod download
       - run: go mod vendor
       - run: GO111MODULE=off make gen
-      - run: git add -A && git diff --exit-code || exit 1
+      - run: git add -A
+      - run: git status
+      - run: git diff
+      - run: git diff --exit-code || exit 1
 
 
 

@@ -77,13 +77,13 @@ jobs:
             source $BASH_ENV
       - run: curl -L https://git.io/vp6lP | sh
       - run: mv ./bin/* $GOPATH/bin
-      - run: go mod download
-      - run: go mod vendor
-      - run: GO111MODULE=off make gen
       - run:
           name: Check if generated code is up to date
           command: |
+            go mod download
+            go mod vendor
             set -euo pipefail
+            GO111MODULE=off make gen
             git add -A
             git diff --exit-code || exit 1
 

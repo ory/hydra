@@ -81,10 +81,7 @@ jobs:
       - run: go mod vendor
       - run: GO111MODULE=off make gen
       - run: git add -A
-      - run: git diff --cached
-      - run: git diff --cached --exit-code || exit 1
-
-
+      - run: git diff --cached --exit-code
 
   build-docker:
     docker:

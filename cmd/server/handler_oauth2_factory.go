@@ -43,6 +43,7 @@ import (
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/tracing"
 	"github.com/ory/x/cmdx"
+	"github.com/ory/x/corsx"
 	"github.com/ory/x/serverx"
 )
 
@@ -228,7 +229,7 @@ func newOAuth2Handler(c *config.Config, frontend, backend *httprouter.Router, cm
 		//IDTokenLifespan:        c.GetIDTokenLifespan(),
 	}
 
-	corsMiddleware := newCORSMiddleware(viper.GetString("CORS_ENABLED") == "true", c, o.IntrospectToken, clm.GetConcreteClient)
+	corsMiddleware := newCORSMiddleware(viper.GetString("CORS_ENABLED") == "true", c, corsx.ParseOptions(), o.IntrospectToken, clm.GetConcreteClient)
 	handler.SetRoutes(frontend, backend, corsMiddleware)
 	return handler
 }

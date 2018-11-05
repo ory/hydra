@@ -4,6 +4,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-sql-driver/mysql v1.4.0
 	github.com/gobuffalo/packd v0.0.0-20181029140631-cf76bd87a5a6 // indirect
+	github.com/gobwas/glob v0.2.3
 	github.com/golang/mock v1.1.1
 	github.com/gorilla/context v1.1.1
 	github.com/gorilla/securecookie v0.0.0-20160422134519-667fe4e3466a

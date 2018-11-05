@@ -5,11 +5,9 @@ package oauth2_test
 
 import (
 	context "context"
-	http "net/http"
-
 	gomock "github.com/golang/mock/gomock"
-
 	fosite "github.com/ory/fosite"
+	http "net/http"
 )
 
 // Mock of OAuth2Provider interface

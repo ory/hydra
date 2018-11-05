@@ -1,2 +1,2 @@
 sdk/* linguist-vendored
-*.sql text eol=lf
+* -crlf

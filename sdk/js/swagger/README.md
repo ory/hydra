@@ -146,7 +146,7 @@ Class | Method | HTTP request | Description
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**revokeUserClientConsentSessions**](docs/OAuth2Api.md#revokeUserClientConsentSessions) | **DELETE** /oauth2/auth/sessions/consent/{user}/{client} | Revokes consent sessions of a user for a specific OAuth 2.0 Client
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**revokeUserLoginCookie**](docs/OAuth2Api.md#revokeUserLoginCookie) | **GET** /oauth2/auth/sessions/login/revoke | Logs user out by deleting the session cookie
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**updateOAuth2Client**](docs/OAuth2Api.md#updateOAuth2Client) | **PUT** /clients/{id} | Update an OAuth 2.0 Client
-*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**userinfo**](docs/OAuth2Api.md#userinfo) | **POST** /userinfo | OpenID Connect Userinfo
+*OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**userinfo**](docs/OAuth2Api.md#userinfo) | **GET** /userinfo | OpenID Connect Userinfo
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Api* | [**wellKnown**](docs/OAuth2Api.md#wellKnown) | **GET** /.well-known/jwks.json | Get Well-Known JSON Web Keys
 *OryHydraCloudNativeOAuth20AndOpenIdConnectServer.VersionApi* | [**getVersion**](docs/VersionApi.md#getVersion) | **GET** /version | Get service version
 

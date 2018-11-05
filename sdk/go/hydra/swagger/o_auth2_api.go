@@ -1416,7 +1416,7 @@ func (a OAuth2Api) UpdateOAuth2Client(id string, body OAuth2Client) (*OAuth2Clie
  */
 func (a OAuth2Api) Userinfo() (*UserinfoResponse, *APIResponse, error) {
 
-	var localVarHttpMethod = strings.ToUpper("Post")
+	var localVarHttpMethod = strings.ToUpper("Get")
 	// create path and map variables
 	localVarPath := a.Configuration.BasePath + "/userinfo"
 

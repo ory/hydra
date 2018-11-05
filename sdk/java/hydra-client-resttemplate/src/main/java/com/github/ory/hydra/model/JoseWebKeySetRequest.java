@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * JoseWebKeySetRequest
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2018-10-31T13:43:39.111+01:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2018-11-05T22:24:41.126+01:00")
 public class JoseWebKeySetRequest {
   @JsonProperty("keys")
   private List<RawMessage> keys = null;

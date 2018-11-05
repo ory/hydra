@@ -80,7 +80,12 @@ jobs:
       - run: go mod download
       - run: go mod vendor
       - run: GO111MODULE=off make gen
-      - run: git add -A && git diff --exit-code
+      - run:
+          name: Check if generated code is up to date
+          command: |
+            set -euo pipefail
+            git add -A
+            git diff --exit-code || exit 1
 
   build-docker:
     docker:

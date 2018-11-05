@@ -32,6 +32,7 @@ import (
 	"github.com/ory/x/pagination"
 )
 
+
 type MemoryManager struct {
 	consentRequests        map[string]ConsentRequest
 	handledConsentRequests map[string]HandledConsentRequest

@@ -134,7 +134,7 @@ func (v *Validator) Validate(c *Client) error {
 			return errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf("Subject type %s is not supported by server, only %v are allowed.", c.SubjectType, v.SubjectTypes)))
 		}
 	} else {
-		if stringslice.Has(v.SubjectTypes, "public") {
+		if len(v.SubjectTypes) == 0 || stringslice.Has(v.SubjectTypes, "public") {
 			c.SubjectType = "public"
 		} else {
 			c.SubjectType = v.SubjectTypes[0]

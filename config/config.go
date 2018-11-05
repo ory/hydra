@@ -40,6 +40,7 @@ import (
 
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
+	"github.com/ory/go-convenience/stringsx"
 	"github.com/ory/fosite/token/hmac"
 	"github.com/ory/go-convenience/stringslice"
 	"github.com/ory/go-convenience/urlx"
@@ -118,7 +119,7 @@ func (c *Config) MustValidate() {
 }
 
 func (c *Config) GetSubjectTypesSupported() []string {
-	types := strings.Split(c.SubjectTypesSupported, ",")
+	types := stringsx.Splitx(c.SubjectTypesSupported, ",")
 	if len(types) == 0 {
 		return []string{"public"}
 	}

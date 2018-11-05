@@ -236,7 +236,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// swagger:route POST /userinfo oAuth2 userinfo
+// swagger:route GET /userinfo oAuth2 userinfo
 //
 // OpenID Connect Userinfo
 //

@@ -338,6 +338,26 @@ func TestStrategy(t *testing.T) {
 			},
 		},
 		{
+			d:                     "This should pass and set acr values properly",
+			req:                   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ClientID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			jar:                   newCookieJar(),
+			lph:                   passAuthentication(apiClient, false),
+			cph:                   passAuthorization(apiClient, false),
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+			expectSession: &HandledConsentRequest{
+				ConsentRequest: &ConsentRequest{Subject: "user", SubjectIdentifier: "user",ACR:"1"},
+				GrantedScope:   []string{"scope-a"},
+				Remember:       true,
+				RememberFor:    0,
+				Session: &ConsentRequestSessionData{
+					AccessToken: map[string]interface{}{"foo": "bar"},
+					IDToken:     map[string]interface{}{"bar": "baz"},
+				},
+			},
+		},
+		{
 			d:                     "This should pass because login and consent have been granted, this time we remember the decision",
 			req:                   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ClientID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar:                   persistentCJ,

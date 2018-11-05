@@ -81,9 +81,8 @@ jobs:
       - run: go mod vendor
       - run: GO111MODULE=off make gen
       - run: git add -A
-      - run: git status
-      - run: git diff
-      - run: git diff --exit-code || exit 1
+      - run: git diff --cached
+      - run: git diff --cached --exit-code || exit 1
 
 
 

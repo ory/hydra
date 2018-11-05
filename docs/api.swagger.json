@@ -1444,7 +1444,7 @@
       }
     },
     "/userinfo": {
-      "post": {
+      "get": {
         "security": [
           {
             "oauth2": []

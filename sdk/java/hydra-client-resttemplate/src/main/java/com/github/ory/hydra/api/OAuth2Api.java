@@ -37,7 +37,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2018-10-31T13:43:39.111+01:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2018-11-05T21:36:16.622+01:00")
 @Component("com.github.ory.hydra.api.OAuth2Api")
 public class OAuth2Api {
     private ApiClient apiClient;
@@ -960,7 +960,7 @@ public class OAuth2Api {
         String[] authNames = new String[] { "oauth2" };
 
         ParameterizedTypeReference<UserinfoResponse> returnType = new ParameterizedTypeReference<UserinfoResponse>() {};
-        return apiClient.invokeAPI(path, HttpMethod.POST, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
+        return apiClient.invokeAPI(path, HttpMethod.GET, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
     }
     /**
      * Get Well-Known JSON Web Keys

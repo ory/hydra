@@ -1080,7 +1080,7 @@
       var returnType = UserinfoResponse;
 
       return this.apiClient.callApi(
-        '/userinfo', 'POST',
+        '/userinfo', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );

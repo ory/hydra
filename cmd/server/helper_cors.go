@@ -23,19 +23,19 @@ package server
 import (
 	"context"
 	"net/http"
+	"strings"
 
+	"github.com/gobwas/glob"
 	"github.com/rs/cors"
 
 	"github.com/ory/fosite"
-	"github.com/ory/go-convenience/stringslice"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/oauth2"
-	"github.com/ory/x/corsx"
 )
 
 func newCORSMiddleware(
-	enable bool, c *config.Config,
+	enable bool, c *config.Config, po cors.Options,
 	o func(ctx context.Context, token string, tokenType fosite.TokenType, session fosite.Session, scope ...string) (fosite.TokenType, fosite.AccessRequester, error),
 	clm func(ctx context.Context, id string) (*client.Client, error),
 ) func(h http.Handler) http.Handler {
@@ -46,7 +46,27 @@ func newCORSMiddleware(
 	}
 
 	c.GetLogger().Info("Enabled CORS")
-	po := corsx.ParseOptions()
+	var patterns []glob.Glob
+	for _, o := range po.AllowedOrigins {
+		g, err := glob.Compile(strings.ToLower(o), '.')
+		if err != nil {
+			c.GetLogger().WithError(err).Fatalf("Unable to parse cors origin: %s", o)
+		}
+		patterns = append(patterns, g)
+	}
+
+	var alwaysAllow bool
+	for _, o := range po.AllowedOrigins {
+		if o == "*" {
+			alwaysAllow = true
+			break
+		}
+	}
+
+	if enable && len(po.AllowedOrigins) == 0 {
+		alwaysAllow = true
+	}
+
 	options := cors.Options{
 		AllowedOrigins:     po.AllowedOrigins,
 		AllowedMethods:     po.AllowedMethods,
@@ -57,8 +77,15 @@ func newCORSMiddleware(
 		OptionsPassthrough: po.OptionsPassthrough,
 		Debug:              po.Debug,
 		AllowOriginRequestFunc: func(r *http.Request, origin string) bool {
-			if stringslice.Has(po.AllowedOrigins, origin) {
+			if alwaysAllow {
 				return true
+			}
+
+			origin = strings.ToLower(origin)
+			for _, p := range patterns {
+				if p.Match(origin) {
+					return true
+				}
 			}
 
 			username, _, ok := r.BasicAuth()
@@ -82,8 +109,29 @@ func newCORSMiddleware(
 				return false
 			}
 
-			if stringslice.Has(cl.AllowedCORSOrigins, origin) {
+			if alwaysAllow {
 				return true
+			}
+
+			for _, p := range cl.AllowedCORSOrigins {
+				if p == "*" {
+					return true
+				}
+			}
+
+			var clientPatterns []glob.Glob
+			for _, o := range cl.AllowedCORSOrigins {
+				g, err := glob.Compile(strings.ToLower(o), '.')
+				if err != nil {
+					return false
+				}
+				clientPatterns = append(patterns, g)
+			}
+
+			for _, p := range clientPatterns {
+				if p.Match(origin) {
+					return true
+				}
 			}
 
 			return false

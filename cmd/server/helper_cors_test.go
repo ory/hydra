@@ -29,6 +29,7 @@ import (
 	"testing"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/rs/cors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -53,14 +54,14 @@ func TestCORSMiddleware(t *testing.T) {
 	}{
 		{
 			d:            "should ignore when disabled",
-			mw:           newCORSMiddleware(false, nil, nil, nil),
+			mw:           newCORSMiddleware(false, nil, cors.Options{AllowedOrigins: []string{"http://not-test-domain.com"}}, nil, nil),
 			code:         204,
 			header:       http.Header{},
 			expectHeader: http.Header{},
 		},
 		{
 			d: "should reject when basic auth but client does not exist",
-			mw: newCORSMiddleware(true, c, nil, func(ctx context.Context, id string) (*client.Client, error) {
+			mw: newCORSMiddleware(true, c, cors.Options{AllowedOrigins: []string{"http://not-test-domain.com"}}, nil, func(ctx context.Context, id string) (*client.Client, error) {
 				return nil, errors.New("")
 			}),
 			code:         204,
@@ -69,7 +70,7 @@ func TestCORSMiddleware(t *testing.T) {
 		},
 		{
 			d: "should reject when basic auth client exists but origin not allowed",
-			mw: newCORSMiddleware(true, c, nil, func(ctx context.Context, id string) (*client.Client, error) {
+			mw: newCORSMiddleware(true, c, cors.Options{AllowedOrigins: []string{"http://not-test-domain.com"}}, nil, func(ctx context.Context, id string) (*client.Client, error) {
 				return &client.Client{AllowedCORSOrigins: []string{"http://not-foobar.com"}}, nil
 			}),
 			code:         204,
@@ -78,7 +79,7 @@ func TestCORSMiddleware(t *testing.T) {
 		},
 		{
 			d: "should accept when basic auth client exists and origin allowed",
-			mw: newCORSMiddleware(true, c, nil, func(ctx context.Context, id string) (*client.Client, error) {
+			mw: newCORSMiddleware(true, c, cors.Options{AllowedOrigins: []string{"http://not-test-domain.com"}}, nil, func(ctx context.Context, id string) (*client.Client, error) {
 				return &client.Client{AllowedCORSOrigins: []string{"http://foobar.com"}}, nil
 			}),
 			code:         204,
@@ -86,8 +87,44 @@ func TestCORSMiddleware(t *testing.T) {
 			expectHeader: http.Header{"Vary": {"Origin"}, "Access-Control-Allow-Origin": {"http://foobar.com"}},
 		},
 		{
+			d: "should accept when basic auth client exists and origin (with partial wildcard) is allowed per client",
+			mw: newCORSMiddleware(true, c, cors.Options{AllowedOrigins: []string{"http://not-test-domain.com"}}, nil, func(ctx context.Context, id string) (*client.Client, error) {
+				return &client.Client{AllowedCORSOrigins: []string{"http://*.foobar.com"}}, nil
+			}),
+			code:         204,
+			header:       http.Header{"Origin": {"http://foo.foobar.com"}, "Authorization": {"Basic Zm9vOmJhcg=="}},
+			expectHeader: http.Header{"Vary": {"Origin"}, "Access-Control-Allow-Origin": {"http://foo.foobar.com"}},
+		},
+		{
+			d: "should accept when basic auth client exists and origin (with full wildcard) is allowed globally",
+			mw: newCORSMiddleware(true, c, cors.Options{AllowedOrigins: []string{"*"}}, nil, func(ctx context.Context, id string) (*client.Client, error) {
+				return &client.Client{AllowedCORSOrigins: []string{"http://barbar.com"}}, nil
+			}),
+			code:         204,
+			header:       http.Header{"Origin": {"*"}, "Authorization": {"Basic Zm9vOmJhcg=="}},
+			expectHeader: http.Header{"Vary": {"Origin"}, "Access-Control-Allow-Origin": {"*"}},
+		},
+		{
+			d: "should accept when basic auth client exists and origin (with partial wildcard) is allowed globally",
+			mw: newCORSMiddleware(true, c, cors.Options{AllowedOrigins: []string{"http://*.foobar.com"}}, nil, func(ctx context.Context, id string) (*client.Client, error) {
+				return &client.Client{AllowedCORSOrigins: []string{"http://barbar.com"}}, nil
+			}),
+			code:         204,
+			header:       http.Header{"Origin": {"http://foo.foobar.com"}, "Authorization": {"Basic Zm9vOmJhcg=="}},
+			expectHeader: http.Header{"Vary": {"Origin"}, "Access-Control-Allow-Origin": {"http://foo.foobar.com"}},
+		},
+		{
+			d: "should accept when basic auth client exists and origin (with full wildcard) allowed per client",
+			mw: newCORSMiddleware(true, c, cors.Options{AllowedOrigins: []string{"http://not-test-domain.com"}}, nil, func(ctx context.Context, id string) (*client.Client, error) {
+				return &client.Client{AllowedCORSOrigins: []string{"*"}}, nil
+			}),
+			code:         204,
+			header:       http.Header{"Origin": {"http://foobar.com"}, "Authorization": {"Basic Zm9vOmJhcg=="}},
+			expectHeader: http.Header{"Vary": {"Origin"}, "Access-Control-Allow-Origin": {"http://foobar.com"}},
+		},
+		{
 			d: "should fail when token introspection fails",
-			mw: newCORSMiddleware(true, c, func(ctx context.Context, token string, tokenType fosite.TokenType, session fosite.Session, scope ...string) (fosite.TokenType, fosite.AccessRequester, error) {
+			mw: newCORSMiddleware(true, c, cors.Options{AllowedOrigins: []string{"http://not-test-domain.com"}}, func(ctx context.Context, token string, tokenType fosite.TokenType, session fosite.Session, scope ...string) (fosite.TokenType, fosite.AccessRequester, error) {
 				return "", nil, errors.New("")
 			}, func(ctx context.Context, id string) (*client.Client, error) {
 				return &client.Client{AllowedCORSOrigins: []string{"http://foobar.com"}}, nil
@@ -98,7 +135,7 @@ func TestCORSMiddleware(t *testing.T) {
 		},
 		{
 			d: "should fail when token introspection fails",
-			mw: newCORSMiddleware(true, c, func(ctx context.Context, token string, tokenType fosite.TokenType, session fosite.Session, scope ...string) (fosite.TokenType, fosite.AccessRequester, error) {
+			mw: newCORSMiddleware(true, c, cors.Options{AllowedOrigins: []string{"http://not-test-domain.com"}}, func(ctx context.Context, token string, tokenType fosite.TokenType, session fosite.Session, scope ...string) (fosite.TokenType, fosite.AccessRequester, error) {
 				if token != "1234" {
 					return "", nil, errors.New("")
 				}
@@ -114,7 +151,7 @@ func TestCORSMiddleware(t *testing.T) {
 			expectHeader: http.Header{"Vary": {"Origin"}, "Access-Control-Allow-Origin": {"http://foobar.com"}},
 		},
 	} {
-		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+		t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
 			req, err := http.NewRequest("GET", "http://foobar.com/", nil)
 			require.NoError(t, err)
 			for k := range tc.header {

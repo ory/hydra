@@ -30,6 +30,7 @@ import (
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
+	"github.com/ory/x/corsx"
 	"github.com/ory/x/serverx"
 )
 
@@ -59,7 +60,7 @@ func newJWKHandler(c *config.Config, frontend, backend *httprouter.Router, o fos
 		wellKnown,
 	)
 
-	corsMiddleware := newCORSMiddleware(viper.GetString("CORS_ENABLED") == "true", c, o.IntrospectToken, clm.GetConcreteClient)
+	corsMiddleware := newCORSMiddleware(viper.GetString("CORS_ENABLED") == "true", c, corsx.ParseOptions(), o.IntrospectToken, clm.GetConcreteClient)
 	h.SetRoutes(frontend, backend, corsMiddleware)
 	return h
 }

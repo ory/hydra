@@ -48,6 +48,8 @@ github.com/gobuffalo/packd v0.0.0-20181029140631-cf76bd87a5a6 h1:qyhnjK1xyp4xqyP
 github.com/gobuffalo/packd v0.0.0-20181029140631-cf76bd87a5a6/go.mod h1:Yf2toFaISlyQrr5TfO3h6DB9pl9mZRmyvBGQb/aQ/pI=
 github.com/gobuffalo/packr v1.16.0 h1:s0cqMbFDbio+Z3YxLeDOKRjLW2JKh9QVud0O7+j1fiQ=
 github.com/gobuffalo/packr v1.16.0/go.mod h1:Yx/lcR/7mDLXhuJSzsz2MauD/HUwSc+EK6oigMRGGsM=
+github.com/gobwas/glob v0.2.3 h1:A4xDbljILXROh+kObIiy5kIaPYD8e96x1tgBhUI5J+Y=
+github.com/gobwas/glob v0.2.3/go.mod h1:d3Ez4x06l9bZtSvzIay5+Yzi0fmZzPgnTbPcKjJAkT8=
 github.com/golang/gddo v0.0.0-20180828051604-96d2a289f41e h1:8sV50nrSGwclVxkCGHxgWfJhY6cyXS2plGjGvUzrMIw=
 github.com/golang/gddo v0.0.0-20180828051604-96d2a289f41e/go.mod h1:xEhNfoBDX1hzLm2Nf80qUvZ2sVwoMZ8d6IE2SrsQfh4=
 github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b h1:VKtxabqXZkF25pY9ekfRL6a582T4P37/31XEstQ5p58=
@@ -144,6 +146,7 @@ github.com/ory/fosite v0.26.2-0.20181031085642-e2441d231a19 h1:8jQrkb3nO4nG5Dzpb
 github.com/ory/fosite v0.26.2-0.20181031085642-e2441d231a19/go.mod h1:uttCRNB0lM7+BJFX7CC8Bqo9gAPrcpmA9Ezc80Trwuw=
 github.com/ory/fosite v0.27.0 h1:QYHW+asgRRIw5uk8a42/VpiwMQqQMPwZ4TP4xKNIMEA=
 github.com/ory/fosite v0.27.0/go.mod h1:uttCRNB0lM7+BJFX7CC8Bqo9gAPrcpmA9Ezc80Trwuw=
+github.com/ory/fosite v0.27.1 h1:u6IUOY4FStOZVpxxAe9ZDL/D0uM5VkVFthpx8PrAdB8=
 github.com/ory/fosite v0.27.1/go.mod h1:uttCRNB0lM7+BJFX7CC8Bqo9gAPrcpmA9Ezc80Trwuw=
 github.com/ory/go-convenience v0.1.0 h1:zouLKfF2GoSGnJwGq+PE/nJAE6dj2Zj5QlTgmMTsTS8=
 github.com/ory/go-convenience v0.1.0/go.mod h1:uEY/a60PL5c12nYz4V5cHY03IBmwIAEm8TWB0yn9KNs=

@@ -175,7 +175,7 @@ func migrationsSqlShared5Sql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/shared/5.sql", size: 1463, mode: os.FileMode(420), modTime: time.Unix(1541408595, 0)}
+	info := bindataFileInfo{name: "migrations/sql/shared/5.sql", size: 1463, mode: os.FileMode(420), modTime: time.Unix(1541409467, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -375,7 +375,7 @@ func migrationsSqlTests5_testSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/tests/5_test.sql", size: 1715, mode: os.FileMode(420), modTime: time.Unix(1541407459, 0)}
+	info := bindataFileInfo{name: "migrations/sql/tests/5_test.sql", size: 1715, mode: os.FileMode(420), modTime: time.Unix(1541409467, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

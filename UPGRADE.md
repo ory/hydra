@@ -105,30 +105,23 @@ before finalizing the upgrade process.
 
 ## 1.0.0-rc.1
 
-### Customise login and consent flow timeout
+### Non-breaking Changes
+
+#### Access Token Audience
+
+This patch adds the access token audience feature. For more information on this, head over to [the docs](https://www.ory.sh/docs/guides/master/hydra/6-how-to/3-advanced.html).
+
+#### Refresh Grant
+
+Previously, the refresh grant did not check whether a client's allowed scope or audience changed. This has now been added.
+If an OAuth 2.0 Client performs the refresh flow but the requested token includes a scope which has not been whitelisted
+at the client, the flow will fail and no refresh token will be granted.
+
+#### Customise login and consent flow timeout
 
 You can now set the login and consent flow timeout using environment variable `LOGIN_CONSENT_REQUEST_LIFESPAN`.
 
-### JSON Web Token formatted Access Token data
-
-Previously, extra fields coming from `session.access_token` where directly embedded in the OAuth 2.0 Access Token when
-the JSON Web Token strategy was used. However, the token introspection response returned the extra data as a field `ext: {...}`.
-
-In order to have a streamlined experience, session data is from now on stored in a field `ext: {...}` for Access
-Tokens formatted as JSON Web Tokens.
-
-This change does not impact the opaque strategy, which is the default one.
-
-### CLI Changes
-
-Flags `https-tls-key-path` and `https-tls-cert-path` have been removed from the `hydra serve *` commands.
-Use environment variables `HTTPS_TLS_CERT_PATH` and `HTTPS_TLS_KEY_PATH` instead.
-
-### API Changes
-
-Endpoint `/health/status`, which redirected to `/health/alive` and was deprecated has been removed.
-
-### Schema Changes
+#### Schema Changes
 
 This patch introduces database schema changes. Before you apply it, you must run `hydra migrate sql` against
 your database.
@@ -138,6 +131,27 @@ In order to [resolve table locking](https://github.com/ory/hydra/issues/1067) du
 
 In order to [resolve table locking](https://github.com/ory/hydra/issues/1067) when flushing expired tokens, the following index was added:
 - Index on the `requested_at` column in the `hydra_oauth2_access` table
+
+### Breaking Changes
+
+#### JSON Web Token formatted Access Token data
+
+Previously, extra fields coming from `session.access_token` where directly embedded in the OAuth 2.0 Access Token when
+the JSON Web Token strategy was used. However, the token introspection response returned the extra data as a field `ext: {...}`.
+
+In order to have a streamlined experience, session data is from now on stored in a field `ext: {...}` for Access
+Tokens formatted as JSON Web Tokens.
+
+This change does not impact the opaque strategy, which is the default one.
+
+#### CLI Changes
+
+Flags `https-tls-key-path` and `https-tls-cert-path` have been removed from the `hydra serve *` commands.
+Use environment variables `HTTPS_TLS_CERT_PATH` and `HTTPS_TLS_KEY_PATH` instead.
+
+#### API Changes
+
+Endpoint `/health/status`, which redirected to `/health/alive` and was deprecated has been removed.
 
 ## 1.0.0-beta.9
 

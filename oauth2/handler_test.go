@@ -40,7 +40,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	jose "gopkg.in/square/go-jose.v2"
+	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
@@ -357,10 +357,11 @@ func TestUserinfo(t *testing.T) {
 
 func TestHandlerWellKnown(t *testing.T) {
 	h := &oauth2.Handler{
-		H:             herodot.NewJSONWriter(nil),
-		ScopeStrategy: fosite.HierarchicScopeStrategy,
-		IssuerURL:     "http://hydra.localhost",
-		SubjectTypes:  []string{"pairwise", "public"},
+		H:                     herodot.NewJSONWriter(nil),
+		ScopeStrategy:         fosite.HierarchicScopeStrategy,
+		IssuerURL:             "http://hydra.localhost",
+		SubjectTypes:          []string{"pairwise", "public"},
+		ClientRegistrationURL: "http://client-register/registration",
 	}
 
 	AuthPathT := "/oauth2/auth"
@@ -382,7 +383,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		AuthURL:                           strings.TrimRight(h.IssuerURL, "/") + AuthPathT,
 		TokenURL:                          strings.TrimRight(h.IssuerURL, "/") + TokenPathT,
 		JWKsURI:                           strings.TrimRight(h.IssuerURL, "/") + JWKPathT,
-		RegistrationEndpoint:              strings.TrimRight(h.IssuerURL, "/") + client.ClientsHandlerPath,
+		RegistrationEndpoint:              h.ClientRegistrationURL,
 		SubjectTypes:                      []string{"pairwise", "public"},
 		ResponseTypes:                     []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
 		ClaimsSupported:                   []string{"sub"},

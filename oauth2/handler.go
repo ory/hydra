@@ -75,7 +75,7 @@ type WellKnown struct {
 	AuthURL string `json:"authorization_endpoint"`
 
 	// URL of the OP's Dynamic Client Registration Endpoint.
-	RegistrationEndpoint string `json:"registration_endpoint"`
+	RegistrationEndpoint string `json:"registration_endpoint,omitempty"`
 
 	// URL of the OP's OAuth 2.0 Token Endpoint
 	//
@@ -219,7 +219,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 		AuthURL:                           strings.TrimRight(h.IssuerURL, "/") + AuthPath,
 		TokenURL:                          strings.TrimRight(h.IssuerURL, "/") + TokenPath,
 		JWKsURI:                           strings.TrimRight(h.IssuerURL, "/") + JWKPath,
-		RegistrationEndpoint:              strings.TrimRight(h.IssuerURL, "/") + client.ClientsHandlerPath,
+		RegistrationEndpoint:              h.ClientRegistrationURL,
 		SubjectTypes:                      subjectTypes,
 		ResponseTypes:                     []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
 		ClaimsSupported:                   claimsSupported,

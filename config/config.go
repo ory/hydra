@@ -36,7 +36,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	yaml "gopkg.in/yaml.v1"
+	"gopkg.in/yaml.v1"
 
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
@@ -60,6 +60,7 @@ type Config struct {
 	BackendBindPort                  int     `mapstructure:"ADMIN_PORT" yaml:"-"`
 	BackendBindHost                  string  `mapstructure:"ADMIN_HOST" yaml:"-"`
 	Issuer                           string  `mapstructure:"OAUTH2_ISSUER_URL" yaml:"-"`
+	ClientRegistrationURL            string  `mapstructure:"OAUTH2_CLIENT_REGISTRATION_URL" yaml:"-"`
 	SystemSecret                     string  `mapstructure:"SYSTEM_SECRET" yaml:"-"`
 	RotatedSystemSecret              string  `mapstructure:"ROTATED_SYSTEM_SECRET" yaml:"-"`
 	DatabaseURL                      string  `mapstructure:"DATABASE_URL" yaml:"-"`

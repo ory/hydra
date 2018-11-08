@@ -43,7 +43,7 @@ type CodeGenSDK struct {
 
 // Configuration configures the CodeGenSDK.
 type Configuration struct {
-	// AdminURL should point to the administrative URL of ORY Hydra, for example: http://localhost:4445
+	// ClientRegistrationPath should point to the administrative URL of ORY Hydra, for example: http://localhost:4445
 	AdminURL string
 
 	// PublicURL should point to the public url of ORY Hydra, for example: http://localhost:4444

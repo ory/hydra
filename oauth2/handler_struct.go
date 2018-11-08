@@ -57,7 +57,8 @@ type Handler struct {
 	ScopeStrategy    fosite.ScopeStrategy
 	AudienceStrategy fosite.AudienceMatchingStrategy
 
-	IssuerURL string
+	IssuerURL             string
+	ClientRegistrationURL string
 
 	ClaimsSupported  string
 	ScopesSupported  string

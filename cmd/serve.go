@@ -103,6 +103,9 @@ OAUTH2 CONTROLS
 	specified and using HTTPS protocol, unless --dangerous-force-http is set.
 	Example: OAUTH2_ISSUER_URL=https://hydra.myapp.com/
 
+- OAUTH2_CLIENT_REGISTRATION_URL: This is the path to the OAuth 2.0 Client Registration endpoint (as defined by OpenID
+	Connect Dynamic Client Registration). Leave this value empty, if that endpoint is not publicly accessible.
+
 - AUTH_CODE_LIFESPAN: Lifespan of OAuth2 authorize codes. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 	Defaults to AUTH_CODE_LIFESPAN=10m
 

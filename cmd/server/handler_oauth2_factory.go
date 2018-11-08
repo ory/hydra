@@ -220,6 +220,7 @@ func newOAuth2Handler(c *config.Config, frontend, backend *httprouter.Router, cm
 		AccessTokenLifespan:    c.GetAccessTokenLifespan(),
 		CookieStore:            sessions.NewCookieStore(c.GetCookieSecret()),
 		IssuerURL:              c.Issuer,
+		ClientRegistrationURL:  c.ClientRegistrationURL,
 		L:                      c.GetLogger(),
 		OpenIDJWTStrategy:      openIDJWTStrategy,
 		AccessTokenJWTStrategy: accessTokenJWTStrategy,

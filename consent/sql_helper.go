@@ -74,7 +74,7 @@ var sqlParamsAuthenticationRequest = []string{
 	"login_session_id",
 }
 
-var sqlParamsConsentRequest = append(sqlParamsAuthenticationRequest, "forced_subject_identifier", "login_challenge")
+var sqlParamsConsentRequest = append(sqlParamsAuthenticationRequest, "forced_subject_identifier", "login_challenge", "acr")
 
 var sqlParamsConsentRequestHandled = []string{
 	"challenge",

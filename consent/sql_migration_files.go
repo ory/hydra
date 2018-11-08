@@ -7,15 +7,18 @@
 // migrations/sql/mysql/.gitkeep
 // migrations/sql/mysql/4.sql
 // migrations/sql/mysql/5.sql
+// migrations/sql/mysql/6.sql
 // migrations/sql/postgres/.gitkeep
 // migrations/sql/postgres/4.sql
 // migrations/sql/postgres/5.sql
+// migrations/sql/postgres/6.sql
 // migrations/sql/tests/.gitkeep
 // migrations/sql/tests/1_test.sql
 // migrations/sql/tests/2_test.sql
 // migrations/sql/tests/3_test.sql
 // migrations/sql/tests/4_test.sql
 // migrations/sql/tests/5_test.sql
+// migrations/sql/tests/6_test.sql
 package consent
 
 import (
@@ -96,7 +99,7 @@ func migrationsSqlSharedGitkeep() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/shared/.gitkeep", size: 0, mode: os.FileMode(438), modTime: time.Unix(1541453044, 0)}
+	info := bindataFileInfo{name: "migrations/sql/shared/.gitkeep", size: 0, mode: os.FileMode(420), modTime: time.Unix(1541173634, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -116,7 +119,7 @@ func migrationsSqlShared1Sql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/shared/1.sql", size: 2263, mode: os.FileMode(438), modTime: time.Unix(1541453044, 0)}
+	info := bindataFileInfo{name: "migrations/sql/shared/1.sql", size: 2263, mode: os.FileMode(420), modTime: time.Unix(1541173634, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -136,7 +139,7 @@ func migrationsSqlShared2Sql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/shared/2.sql", size: 713, mode: os.FileMode(438), modTime: time.Unix(1541453044, 0)}
+	info := bindataFileInfo{name: "migrations/sql/shared/2.sql", size: 713, mode: os.FileMode(420), modTime: time.Unix(1541173634, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -156,7 +159,7 @@ func migrationsSqlShared3Sql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/shared/3.sql", size: 535, mode: os.FileMode(438), modTime: time.Unix(1541453044, 0)}
+	info := bindataFileInfo{name: "migrations/sql/shared/3.sql", size: 535, mode: os.FileMode(420), modTime: time.Unix(1541173634, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -176,7 +179,7 @@ func migrationsSqlMysqlGitkeep() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/mysql/.gitkeep", size: 0, mode: os.FileMode(438), modTime: time.Unix(1541453044, 0)}
+	info := bindataFileInfo{name: "migrations/sql/mysql/.gitkeep", size: 0, mode: os.FileMode(420), modTime: time.Unix(1541173634, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -196,7 +199,7 @@ func migrationsSqlMysql4Sql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/mysql/4.sql", size: 1002, mode: os.FileMode(438), modTime: time.Unix(1541453044, 0)}
+	info := bindataFileInfo{name: "migrations/sql/mysql/4.sql", size: 1002, mode: os.FileMode(420), modTime: time.Unix(1541173634, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -216,7 +219,27 @@ func migrationsSqlMysql5Sql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/mysql/5.sql", size: 1462, mode: os.FileMode(438), modTime: time.Unix(1541453044, 0)}
+	info := bindataFileInfo{name: "migrations/sql/mysql/5.sql", size: 1462, mode: os.FileMode(420), modTime: time.Unix(1541418964, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _migrationsSqlMysql6Sql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xd2\xd5\x55\xd0\xce\xcd\x4c\x2f\x4a\x2c\x49\x55\x08\x2d\xe0\x72\xf4\x09\x71\x0d\x52\x08\x71\x74\xf2\x71\x55\xc8\xa8\x4c\x29\x4a\x8c\xcf\x4f\x2c\x2d\xc9\x30\x8a\x4f\xce\xcf\x2b\x4e\xcd\x2b\x89\x2f\x4a\x2d\x2c\x4d\x2d\x2e\x51\x70\x74\x71\x51\x48\x4c\x2e\x52\x08\x71\x8d\x08\x51\xf0\x0b\xf5\xf1\xb1\xe6\x0a\x0d\x70\x71\x0c\x21\xa0\x2d\xd8\x35\x04\xa4\xcd\x56\x5d\xdd\x9a\x78\xbb\x7c\xfd\x5d\x3c\xdd\x22\x91\xac\xf3\x87\x59\xc9\x85\xec\x7c\x97\xfc\xf2\x3c\xe2\x0d\x75\x09\xf2\x0f\x50\x70\xf6\xf7\x09\xf5\xf5\x03\x99\x6c\xcd\x05\x08\x00\x00\xff\xff\x40\xd9\xef\x84\x0a\x01\x00\x00")
+
+func migrationsSqlMysql6SqlBytes() ([]byte, error) {
+	return bindataRead(
+		_migrationsSqlMysql6Sql,
+		"migrations/sql/mysql/6.sql",
+	)
+}
+
+func migrationsSqlMysql6Sql() (*asset, error) {
+	bytes, err := migrationsSqlMysql6SqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "migrations/sql/mysql/6.sql", size: 266, mode: os.FileMode(420), modTime: time.Unix(1541664379, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -236,7 +259,7 @@ func migrationsSqlPostgresGitkeep() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/postgres/.gitkeep", size: 0, mode: os.FileMode(438), modTime: time.Unix(1541453044, 0)}
+	info := bindataFileInfo{name: "migrations/sql/postgres/.gitkeep", size: 0, mode: os.FileMode(420), modTime: time.Unix(1541173634, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -256,7 +279,7 @@ func migrationsSqlPostgres4Sql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/postgres/4.sql", size: 558, mode: os.FileMode(438), modTime: time.Unix(1541453044, 0)}
+	info := bindataFileInfo{name: "migrations/sql/postgres/4.sql", size: 558, mode: os.FileMode(420), modTime: time.Unix(1541173634, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -276,7 +299,27 @@ func migrationsSqlPostgres5Sql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/postgres/5.sql", size: 1199, mode: os.FileMode(438), modTime: time.Unix(1541453044, 0)}
+	info := bindataFileInfo{name: "migrations/sql/postgres/5.sql", size: 1199, mode: os.FileMode(420), modTime: time.Unix(1541418964, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _migrationsSqlPostgres6Sql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xd2\xd5\x55\xd0\xce\xcd\x4c\x2f\x4a\x2c\x49\x55\x08\x2d\xe0\x72\xf4\x09\x71\x0d\x52\x08\x71\x74\xf2\x71\x55\xc8\xa8\x4c\x29\x4a\x8c\xcf\x4f\x2c\x2d\xc9\x30\x8a\x4f\xce\xcf\x2b\x4e\xcd\x2b\x89\x2f\x4a\x2d\x2c\x4d\x2d\x2e\x51\x70\x74\x71\x51\x48\x4c\x2e\x52\x08\x71\x8d\x08\x51\xf0\x0b\xf5\xf1\x51\x70\x71\x75\x73\x0c\xf5\x09\x51\x50\x57\xb7\xe6\xe2\x42\x36\xd6\x25\xbf\x3c\x8f\x78\x83\x5d\x82\xfc\x03\x14\x9c\xfd\x7d\x42\x7d\xfd\x40\x16\x58\x73\x01\x02\x00\x00\xff\xff\x9e\x91\x43\x31\xa2\x00\x00\x00")
+
+func migrationsSqlPostgres6SqlBytes() ([]byte, error) {
+	return bindataRead(
+		_migrationsSqlPostgres6Sql,
+		"migrations/sql/postgres/6.sql",
+	)
+}
+
+func migrationsSqlPostgres6Sql() (*asset, error) {
+	bytes, err := migrationsSqlPostgres6SqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "migrations/sql/postgres/6.sql", size: 162, mode: os.FileMode(420), modTime: time.Unix(1541662428, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -296,7 +339,7 @@ func migrationsSqlTestsGitkeep() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/tests/.gitkeep", size: 0, mode: os.FileMode(438), modTime: time.Unix(1541453044, 0)}
+	info := bindataFileInfo{name: "migrations/sql/tests/.gitkeep", size: 0, mode: os.FileMode(420), modTime: time.Unix(1541173634, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -316,7 +359,7 @@ func migrationsSqlTests1_testSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/tests/1_test.sql", size: 1268, mode: os.FileMode(438), modTime: time.Unix(1541453044, 0)}
+	info := bindataFileInfo{name: "migrations/sql/tests/1_test.sql", size: 1268, mode: os.FileMode(420), modTime: time.Unix(1541173634, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -336,7 +379,7 @@ func migrationsSqlTests2_testSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/tests/2_test.sql", size: 1503, mode: os.FileMode(438), modTime: time.Unix(1541453044, 0)}
+	info := bindataFileInfo{name: "migrations/sql/tests/2_test.sql", size: 1503, mode: os.FileMode(420), modTime: time.Unix(1541173634, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -356,7 +399,7 @@ func migrationsSqlTests3_testSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/tests/3_test.sql", size: 1621, mode: os.FileMode(438), modTime: time.Unix(1541453044, 0)}
+	info := bindataFileInfo{name: "migrations/sql/tests/3_test.sql", size: 1621, mode: os.FileMode(420), modTime: time.Unix(1541173634, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -376,7 +419,7 @@ func migrationsSqlTests4_testSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/tests/4_test.sql", size: 1715, mode: os.FileMode(438), modTime: time.Unix(1541453044, 0)}
+	info := bindataFileInfo{name: "migrations/sql/tests/4_test.sql", size: 1715, mode: os.FileMode(420), modTime: time.Unix(1541173634, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -396,7 +439,27 @@ func migrationsSqlTests5_testSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/tests/5_test.sql", size: 1715, mode: os.FileMode(438), modTime: time.Unix(1541453044, 0)}
+	info := bindataFileInfo{name: "migrations/sql/tests/5_test.sql", size: 1715, mode: os.FileMode(420), modTime: time.Unix(1541418964, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _migrationsSqlTests6_testSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xcc\x55\x5f\x6f\xd3\x30\x10\x7f\x5e\x3e\xc5\xbd\xa5\x15\x8e\x34\x40\xea\x0b\x4f\x48\xec\x61\x12\xea\x24\xb6\xc1\xa3\xe5\xda\x97\xd6\x2c\xb5\xcb\xd9\x66\x20\xc4\x77\x47\xae\x9d\xc4\x6d\x58\x60\x4f\xf0\xd4\xdc\xe5\xee\xfc\xfb\x13\x5f\x9b\x06\x5e\xec\xf5\x96\x84\x47\xb8\x3f\x54\xd7\xeb\xdb\xab\x0f\x77\x70\xbd\xbe\xbb\xa9\x2e\x76\xdf\x15\x09\x6e\x45\xf0\xbb\x57\x5c\x5a\xe3\xd0\x78\x4e\xf8\x25\xa0\xf3\xb0\x90\x3b\xd1\x75\x68\xb6\xc8\xe0\x2b\x92\x6e\x35\x12\x03\xd9\xe9\x58\xa4\x15\x03\x17\x36\x9f\x51\x7a\x06\xb9\x83\x07\xea\x18\xb8\x07\x7d\x18\x52\xa8\xb8\x93\xf6\x80\x0c\xa4\xa3\x96\x41\x3c\x09\x8d\xd7\x52\xc4\x57\xc2\x97\x85\x31\xb2\x5a\xc9\x08\xc4\xe3\x37\xcf\xa0\xb5\x24\xe3\x84\x74\x0e\xd7\x2a\xb6\x26\x18\x9d\xdd\x6a\xc3\x1d\x3a\xa7\xad\x39\xa2\x49\x99\x02\x73\x39\x99\x8b\xa0\x34\x1a\x89\x0c\x84\xa4\x65\xf5\xf1\xed\xfb\xfb\xab\xdb\xea\x62\x51\xaf\x9a\xa1\xa5\x66\x50\xaf\x9a\x9e\x6a\x8a\x12\xdd\xf4\x9c\x71\xa4\x80\x50\x69\x4a\x51\x2b\x3a\x87\xa9\x22\x72\xcd\x8d\x8e\xda\x9a\xc1\xfa\xe6\xd3\x62\x39\xfc\xd4\x3f\x7e\xa6\xb7\x89\x59\x9c\x98\xe2\x73\x3a\x45\xf6\x1c\x9f\x08\xf9\xad\x90\x54\x2f\xdf\x54\x33\x8e\x16\x6a\xc7\xb1\xff\x8f\xb1\x53\xf7\x7e\x6b\xd6\xbf\xf7\x29\x39\x90\x81\x36\xbd\x2f\xd1\x82\x67\x29\x9f\x07\xc0\x22\x52\x9d\x4a\x95\x01\x9f\xd2\x8d\x65\x23\xb0\x44\xeb\x0f\xa7\x9e\xdd\x60\xbe\x13\x46\x75\xa8\x4e\x0c\xdf\x92\x30\x85\x7b\x84\x7b\xdc\x6f\xa2\xff\xfd\x13\x6f\x2d\x31\x40\x22\x4b\xe7\x26\xf6\x86\x09\x29\xd1\x39\xee\xed\x03\x9a\x31\xab\x55\x9f\x99\x32\x7c\x14\x8e\x07\x87\x6a\x3c\xff\x6f\x6d\xee\xad\xf2\x14\x90\xc1\xeb\xd5\xe5\x65\x6f\xcf\xa9\x57\x65\x6a\x34\xfa\xd9\x4e\xcd\x49\x57\x5c\x8b\x59\xd1\x84\x9c\x28\x37\xa7\xc8\x93\x5b\x6e\x5e\x97\xe3\xea\x98\xaa\x52\xbf\x9c\x7c\xcd\xa3\x1c\xc5\xda\x99\x57\xc5\x6e\xda\xe0\x32\xd8\x27\x3e\xe5\x41\x8d\xe9\xe2\x28\xda\x4f\x39\x0c\xfb\xae\xbc\xae\x63\xf1\x11\x54\xf9\x7f\xf5\xce\x3e\x9a\xea\x57\x00\x00\x00\xff\xff\x56\x91\x74\xf2\xc1\x06\x00\x00")
+
+func migrationsSqlTests6_testSqlBytes() ([]byte, error) {
+	return bindataRead(
+		_migrationsSqlTests6_testSql,
+		"migrations/sql/tests/6_test.sql",
+	)
+}
+
+func migrationsSqlTests6_testSql() (*asset, error) {
+	bytes, err := migrationsSqlTests6_testSqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "migrations/sql/tests/6_test.sql", size: 1729, mode: os.FileMode(420), modTime: time.Unix(1541664901, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -460,15 +523,18 @@ var _bindata = map[string]func() (*asset, error){
 	"migrations/sql/mysql/.gitkeep":    migrationsSqlMysqlGitkeep,
 	"migrations/sql/mysql/4.sql":       migrationsSqlMysql4Sql,
 	"migrations/sql/mysql/5.sql":       migrationsSqlMysql5Sql,
+	"migrations/sql/mysql/6.sql":       migrationsSqlMysql6Sql,
 	"migrations/sql/postgres/.gitkeep": migrationsSqlPostgresGitkeep,
 	"migrations/sql/postgres/4.sql":    migrationsSqlPostgres4Sql,
 	"migrations/sql/postgres/5.sql":    migrationsSqlPostgres5Sql,
+	"migrations/sql/postgres/6.sql":    migrationsSqlPostgres6Sql,
 	"migrations/sql/tests/.gitkeep":    migrationsSqlTestsGitkeep,
 	"migrations/sql/tests/1_test.sql":  migrationsSqlTests1_testSql,
 	"migrations/sql/tests/2_test.sql":  migrationsSqlTests2_testSql,
 	"migrations/sql/tests/3_test.sql":  migrationsSqlTests3_testSql,
 	"migrations/sql/tests/4_test.sql":  migrationsSqlTests4_testSql,
 	"migrations/sql/tests/5_test.sql":  migrationsSqlTests5_testSql,
+	"migrations/sql/tests/6_test.sql":  migrationsSqlTests6_testSql,
 }
 
 // AssetDir returns the file names below a certain
@@ -518,11 +584,13 @@ var _bintree = &bintree{nil, map[string]*bintree{
 				".gitkeep": &bintree{migrationsSqlMysqlGitkeep, map[string]*bintree{}},
 				"4.sql":    &bintree{migrationsSqlMysql4Sql, map[string]*bintree{}},
 				"5.sql":    &bintree{migrationsSqlMysql5Sql, map[string]*bintree{}},
+				"6.sql":    &bintree{migrationsSqlMysql6Sql, map[string]*bintree{}},
 			}},
 			"postgres": &bintree{nil, map[string]*bintree{
 				".gitkeep": &bintree{migrationsSqlPostgresGitkeep, map[string]*bintree{}},
 				"4.sql":    &bintree{migrationsSqlPostgres4Sql, map[string]*bintree{}},
 				"5.sql":    &bintree{migrationsSqlPostgres5Sql, map[string]*bintree{}},
+				"6.sql":    &bintree{migrationsSqlPostgres6Sql, map[string]*bintree{}},
 			}},
 			"shared": &bintree{nil, map[string]*bintree{
 				".gitkeep": &bintree{migrationsSqlSharedGitkeep, map[string]*bintree{}},
@@ -537,6 +605,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 				"3_test.sql": &bintree{migrationsSqlTests3_testSql, map[string]*bintree{}},
 				"4_test.sql": &bintree{migrationsSqlTests4_testSql, map[string]*bintree{}},
 				"5_test.sql": &bintree{migrationsSqlTests5_testSql, map[string]*bintree{}},
+				"6_test.sql": &bintree{migrationsSqlTests6_testSql, map[string]*bintree{}},
 			}},
 		}},
 	}},

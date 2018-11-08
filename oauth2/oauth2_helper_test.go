@@ -60,6 +60,7 @@ func (c *consentMock) HandleOAuth2AuthorizationRequest(w http.ResponseWriter, r 
 		ConsentRequest: &consent.ConsentRequest{
 			Subject:           "foo",
 			SubjectIdentifier: "foo",
+			ACR:               "1",
 		},
 		AuthenticatedAt: c.authTime,
 		GrantedScope:    []string{"offline", "openid", "hydra.*"},

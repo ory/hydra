@@ -26,7 +26,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	migrate "github.com/rubenv/sql-migrate"
+	"github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
 
 	"github.com/ory/go-convenience/stringsx"
@@ -74,7 +74,7 @@ var sqlParamsAuthenticationRequest = []string{
 	"login_session_id",
 }
 
-var sqlParamsConsentRequest = append(sqlParamsAuthenticationRequest, "forced_subject_identifier", "login_challenge")
+var sqlParamsConsentRequest = append(sqlParamsAuthenticationRequest, "forced_subject_identifier", "login_challenge", "acr")
 
 var sqlParamsConsentRequestHandled = []string{
 	"challenge",
@@ -116,6 +116,7 @@ type sqlAuthenticationRequest struct {
 type sqlConsentRequest struct {
 	sqlAuthenticationRequest
 	LoginChallenge          string `db:"login_challenge"`
+	ACR                     string `db:"acr"`
 	ForcedSubjectIdentifier string `db:"forced_subject_identifier"`
 }
 
@@ -157,6 +158,7 @@ func newSQLConsentRequest(c *ConsentRequest) (*sqlConsentRequest, error) {
 		},
 		LoginChallenge:          c.LoginChallenge,
 		ForcedSubjectIdentifier: c.ForceSubjectIdentifier,
+		ACR:                     c.ACR,
 	}, nil
 }
 
@@ -230,6 +232,7 @@ func (s *sqlConsentRequest) toConsentRequest(client *client.Client) (*ConsentReq
 		WasHandled:             s.WasHandled,
 		LoginSessionID:         s.LoginSessionID,
 		LoginChallenge:         s.LoginChallenge,
+		ACR:                    s.ACR,
 	}, nil
 }
 

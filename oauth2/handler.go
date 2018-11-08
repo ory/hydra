@@ -637,12 +637,13 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	response, err := h.OAuth2.NewAuthorizeResponse(ctx, authorizeRequest, &Session{
 		DefaultSession: &openid.DefaultSession{
 			Claims: &jwt.IDTokenClaims{
-				Subject:     session.ConsentRequest.SubjectIdentifier,
-				Issuer:      strings.TrimRight(h.IssuerURL, "/") + "/",
-				IssuedAt:    time.Now().UTC(),
-				AuthTime:    session.AuthenticatedAt,
-				RequestedAt: session.RequestedAt,
-				Extra:       session.Session.IDToken,
+				Subject:                             session.ConsentRequest.SubjectIdentifier,
+				Issuer:                              strings.TrimRight(h.IssuerURL, "/") + "/",
+				IssuedAt:                            time.Now().UTC(),
+				AuthTime:                            session.AuthenticatedAt,
+				RequestedAt:                         session.RequestedAt,
+				Extra:                               session.Session.IDToken,
+				AuthenticationContextClassReference: session.ConsentRequest.ACR,
 
 				// We do not need to pass the audience because it's included directly by ORY Fosite
 				// Audience:    []string{authorizeRequest.GetClient().GetID()},

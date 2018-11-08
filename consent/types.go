@@ -317,6 +317,10 @@ type ConsentRequest struct {
 	// ORY Hydra during the login flow. It can be used to associate consecutive login requests by a certain user.
 	LoginSessionID string `json:"login_session_id"`
 
+	// ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it
+	// to express that, for example, a user authenticated using two factor authentication.
+	ACR string `json:"acr"`
+
 	// ForceSubjectIdentifier is the value from authentication (if set).
 	ForceSubjectIdentifier string    `json:"-"`
 	SubjectIdentifier      string    `json:"-"`

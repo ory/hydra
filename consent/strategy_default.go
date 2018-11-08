@@ -509,6 +509,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 		r.Context(),
 		&ConsentRequest{
 			Challenge:              challenge,
+			ACR:                    as.ACR,
 			Verifier:               verifier,
 			CSRF:                   csrf,
 			Skip:                   skip,

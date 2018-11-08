@@ -104,6 +104,7 @@ func TestSQLConsentConverter(t *testing.T) {
 			LoginHint:         "popup",
 			IDTokenHintClaims: map[string]interface{}{"foo": "bar"},
 		},
+		ACR:                    "1",
 		ForceSubjectIdentifier: "foo-id",
 		RequestedAt:            time.Now().UTC().Add(-time.Hour),
 		Client:                 &client.Client{ClientID: "client"},

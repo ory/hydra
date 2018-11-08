@@ -325,7 +325,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 								require.NoError(t, json.Unmarshal(body, &data))
 								assert.EqualValues(t, "user-a", data["sub"])
 								assert.EqualValues(t, "1", data["acr"])
-								assert.EqualValues(t, client.GetID(), data["aud"])
+								assert.EqualValues(t, fmt.Sprintf("%v", []string{client.GetID()}), fmt.Sprintf("%v", data["aud"]))
 								assert.NotEmpty(t, client.GetID(), data["exp"])
 								assert.NotEmpty(t, client.GetID(), data["iat"])
 								assert.NotEmpty(t, client.GetID(), data["jti"])
@@ -366,7 +366,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									rr, res, err := apiClient.GetConsentRequest(r.URL.Query().Get("consent_challenge"))
 									require.NoError(t, err)
 									require.EqualValues(t, http.StatusOK, res.StatusCode)
-									assert.False(t, rr.Skip)
+									assert.True(t, rr.Skip)
 									assert.EqualValues(t, "user-a", rr.Subject)
 									assert.EqualValues(t, client.GetID(), rr.Client.ClientId)
 									assert.EqualValues(t, client.GrantTypes, rr.Client.GrantTypes)
@@ -378,7 +378,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									assert.EqualValues(t, oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("audience", "https://api.ory.sh/")), rr.RequestUrl)
 
 									v, res, err := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{
-										GrantScope: []string{"hydra", "offline", "openid"}, Remember: true, RememberFor: 0,
+										GrantScope: []string{"hydra", "offline", "openid"}, Remember: false, RememberFor: 0,
 										GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
 										Session: swagger.ConsentRequestSession{
 											AccessToken: map[string]interface{}{"foo": "bar"},

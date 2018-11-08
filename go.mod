@@ -31,7 +31,7 @@ require (
 	github.com/pkg/errors v0.8.0
 	github.com/prometheus/client_golang v0.8.0
 	github.com/rs/cors v1.6.0
-	github.com/rubenv/sql-migrate v0.0.0-20180704111356-3f452fc0ebeb
+	github.com/rubenv/sql-migrate v0.0.0-20180704111356-ba2c6a7295c59448dbc195cef2f41df5163b3892
 	github.com/sirupsen/logrus v1.1.1
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/viper v1.2.1

@@ -201,6 +201,9 @@ func initConfig() {
 	viper.BindEnv("TRACING_PROVIDER")
 	viper.SetDefault("TRACING_PROVIDER", "")
 
+	viper.BindEnv("OAUTH2_CLIENT_REGISTRATION_URL")
+	viper.SetDefault("OAUTH2_CLIENT_REGISTRATION_URL", "")
+
 	viper.BindEnv("TRACING_PROVIDER_JAEGER_SAMPLING_SERVER_URL")
 	viper.SetDefault("TRACING_PROVIDER_JAEGER_SAMPLING_SERVER_URL", "")
 

@@ -198,6 +198,8 @@ github.com/rubenv/sql-migrate v0.0.0-20170824124545-79fe99e24311 h1:zM8ImA1q87UL
 github.com/rubenv/sql-migrate v0.0.0-20170824124545-79fe99e24311/go.mod h1:WS0rl9eEliYI8DPnr3TOwz4439pay+qNgzJoVya/DmY=
 github.com/rubenv/sql-migrate v0.0.0-20180704111356-3f452fc0ebeb h1:lAOy8O8yKU3unXE92z9pfE7ylDwXr3202BLskpOaUcA=
 github.com/rubenv/sql-migrate v0.0.0-20180704111356-3f452fc0ebeb/go.mod h1:WS0rl9eEliYI8DPnr3TOwz4439pay+qNgzJoVya/DmY=
+github.com/rubenv/sql-migrate v0.0.0-20180704111356-ba2c6a7295c59448dbc195cef2f41df5163b3892 h1:dKonk0uAnxXkHVWh5vGV3rD3NKkLvuhhJN4zpicBc/M=
+github.com/rubenv/sql-migrate v0.0.0-20180704111356-ba2c6a7295c59448dbc195cef2f41df5163b3892/go.mod h1:WS0rl9eEliYI8DPnr3TOwz4439pay+qNgzJoVya/DmY=
 github.com/segmentio/analytics-go v3.0.1+incompatible h1:W7T3ieNQjPFMb+SE8SAVYo6mPkKK/Y37wYdiNf5lCVg=
 github.com/segmentio/analytics-go v3.0.1+incompatible/go.mod h1:C7CYBtQWk4vRk2RyLu0qOcbHJ18E3F1HV2C/8JvKN48=
 github.com/segmentio/backo-go v0.0.0-20160424052352-204274ad699c h1:rsRTAcCR5CeNLkvgBVSjQoDGRRt6kggsE6XYBqCv2KQ=

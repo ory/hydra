@@ -20,7 +20,7 @@ require (
 	github.com/oleiade/reflections v1.0.0
 	github.com/opentracing/opentracing-go v1.0.2
 	github.com/ory/dockertest v3.3.2+incompatible
-	github.com/ory/fosite v0.27.1
+	github.com/ory/fosite v0.27.3
 	github.com/ory/go-convenience v0.1.0
 	github.com/ory/graceful v0.1.0
 	github.com/ory/herodot v0.4.1

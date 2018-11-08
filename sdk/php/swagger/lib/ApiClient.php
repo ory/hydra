@@ -66,7 +66,7 @@ class ApiClient
      *
      * @param Configuration $config config for this ApiClient
      */
-    public function __construct(\HydraSDK\Configuration $config = null)
+    public function __construct(Configuration $config = null)
     {
         if ($config === null) {
             $config = Configuration::getDefaultConfiguration();
@@ -153,7 +153,7 @@ class ApiClient
         if ($postData and in_array('Content-Type: application/x-www-form-urlencoded', $headers, true)) {
             $postData = http_build_query($postData);
         } elseif ((is_object($postData) or is_array($postData)) and !in_array('Content-Type: multipart/form-data', $headers, true)) { // json model
-            $postData = json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($postData));
+            $postData = json_encode(ObjectSerializer::sanitizeForSerialization($postData));
         }
 
         $url = $this->config->getHost() . $resourcePath;

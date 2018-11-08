@@ -111,7 +111,7 @@ func (h *Handler) DeleteUserConsentSession(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route DELETE /oauth2/auth/sessions/consent/{user}/{client} oAuth2 revokeUserClientConsentSessions
+// swagger:route DELETE /oauth2/auth/sessions/consent/{user}/{client} admin revokeUserClientConsentSessions
 //
 // Revokes consent sessions of a user for a specific OAuth 2.0 Client
 //
@@ -147,7 +147,7 @@ func (h *Handler) DeleteUserClientConsentSession(w http.ResponseWriter, r *http.
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route GET /oauth2/auth/sessions/consent/{user} oAuth2 listUserConsentSessions
+// swagger:route GET /oauth2/auth/sessions/consent/{user} admin listUserConsentSessions
 //
 // Lists all consent sessions of a user
 //
@@ -197,7 +197,7 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 	h.H.Write(w, r, a)
 }
 
-// swagger:route DELETE /oauth2/auth/sessions/login/{user} oAuth2 revokeAuthenticationSession
+// swagger:route DELETE /oauth2/auth/sessions/login/{user} admin revokeAuthenticationSession
 //
 // Invalidates a user's authentication session
 //
@@ -228,7 +228,7 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route GET /oauth2/auth/requests/login/{challenge} oAuth2 getLoginRequest
+// swagger:route GET /oauth2/auth/requests/login/{challenge} admin getLoginRequest
 //
 // Get an login request
 //
@@ -270,7 +270,7 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 	h.H.Write(w, r, request)
 }
 
-// swagger:route PUT /oauth2/auth/requests/login/{challenge}/accept oAuth2 acceptLoginRequest
+// swagger:route PUT /oauth2/auth/requests/login/{challenge}/accept admin acceptLoginRequest
 //
 // Accept an login request
 //
@@ -346,7 +346,7 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	})
 }
 
-// swagger:route PUT /oauth2/auth/requests/login/{challenge}/reject oAuth2 rejectLoginRequest
+// swagger:route PUT /oauth2/auth/requests/login/{challenge}/reject admin rejectLoginRequest
 //
 // Reject a login request
 //
@@ -411,7 +411,7 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	})
 }
 
-// swagger:route GET /oauth2/auth/requests/consent/{challenge} oAuth2 getConsentRequest
+// swagger:route GET /oauth2/auth/requests/consent/{challenge} admin getConsentRequest
 //
 // Get consent request information
 //
@@ -455,7 +455,7 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 	h.H.Write(w, r, request)
 }
 
-// swagger:route PUT /oauth2/auth/requests/consent/{challenge}/accept oAuth2 acceptConsentRequest
+// swagger:route PUT /oauth2/auth/requests/consent/{challenge}/accept admin acceptConsentRequest
 //
 // Accept an consent request
 //
@@ -526,7 +526,7 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 	})
 }
 
-// swagger:route PUT /oauth2/auth/requests/consent/{challenge}/reject oAuth2 rejectConsentRequest
+// swagger:route PUT /oauth2/auth/requests/consent/{challenge}/reject admin rejectConsentRequest
 //
 // Reject an consent request
 //
@@ -594,7 +594,7 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 	})
 }
 
-// swagger:route GET /oauth2/auth/sessions/login/revoke oAuth2 revokeUserLoginCookie
+// swagger:route GET /oauth2/auth/sessions/login/revoke admin revokeUserLoginCookie
 //
 // Logs user out by deleting the session cookie
 //

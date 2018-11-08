@@ -113,7 +113,7 @@ func migrationsSqlSharedGitattributes() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/shared/.gitattributes", size: 12, mode: os.FileMode(420), modTime: time.Unix(1541662428, 0)}
+	info := bindataFileInfo{name: "migrations/sql/shared/.gitattributes", size: 12, mode: os.FileMode(420), modTime: time.Unix(1541669262, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -293,7 +293,7 @@ func migrationsSqlMysqlGitattributes() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/mysql/.gitattributes", size: 12, mode: os.FileMode(420), modTime: time.Unix(1541662428, 0)}
+	info := bindataFileInfo{name: "migrations/sql/mysql/.gitattributes", size: 12, mode: os.FileMode(420), modTime: time.Unix(1541669262, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -413,7 +413,7 @@ func migrationsSqlPostgresGitattributes() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/postgres/.gitattributes", size: 12, mode: os.FileMode(420), modTime: time.Unix(1541662428, 0)}
+	info := bindataFileInfo{name: "migrations/sql/postgres/.gitattributes", size: 12, mode: os.FileMode(420), modTime: time.Unix(1541669262, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

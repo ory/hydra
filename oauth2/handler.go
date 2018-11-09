@@ -176,7 +176,7 @@ func (h *Handler) SetRoutes(frontend, backend *httprouter.Router, corsMiddleware
 	backend.POST(FlushPath, h.FlushHandler)
 }
 
-// swagger:route GET /.well-known/openid-configuration oAuth2 getWellKnown
+// swagger:route GET /.well-known/openid-configuration public getWellKnown
 //
 // Server well known configuration
 //
@@ -236,7 +236,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// swagger:route GET /userinfo oAuth2 userinfo
+// swagger:route GET /userinfo public userinfo
 //
 // OpenID Connect Userinfo
 //
@@ -324,7 +324,7 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// swagger:route POST /oauth2/revoke oAuth2 revokeOAuth2Token
+// swagger:route POST /oauth2/revoke public revokeOAuth2Token
 //
 // Revoke OAuth2 tokens
 //
@@ -356,7 +356,7 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request) {
 	h.OAuth2.WriteRevocationResponse(w, err)
 }
 
-// swagger:route POST /oauth2/introspect oAuth2 introspectOAuth2Token
+// swagger:route POST /oauth2/introspect admin introspectOAuth2Token
 //
 // Introspect OAuth2 tokens
 //
@@ -456,7 +456,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 	}
 }
 
-// swagger:route POST /oauth2/flush oAuth2 flushInactiveOAuth2Tokens
+// swagger:route POST /oauth2/flush admin flushInactiveOAuth2Tokens
 //
 // Flush Expired OAuth2 Access Tokens
 //
@@ -492,7 +492,7 @@ func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, _ httprou
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route POST /oauth2/token oAuth2 oauthToken
+// swagger:route POST /oauth2/token public oauthToken
 //
 // The OAuth 2.0 token endpoint
 //
@@ -568,7 +568,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	h.OAuth2.WriteAccessResponse(w, accessRequest, accessResponse)
 }
 
-// swagger:route GET /oauth2/auth oAuth2 oauthAuth
+// swagger:route GET /oauth2/auth public oauthAuth
 //
 // The OAuth 2.0 authorize endpoint
 //

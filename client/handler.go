@@ -63,7 +63,7 @@ func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.DELETE(ClientsHandlerPath+"/:id", h.Delete)
 }
 
-// swagger:route POST /clients oAuth2 createOAuth2Client
+// swagger:route POST /clients admin createOAuth2Client
 //
 // Create an OAuth 2.0 client
 //
@@ -120,7 +120,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	h.H.WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
-// swagger:route PUT /clients/{id} oAuth2 updateOAuth2Client
+// swagger:route PUT /clients/{id} admin updateOAuth2Client
 //
 // Update an OAuth 2.0 Client
 //
@@ -169,7 +169,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	h.H.Write(w, r, &c)
 }
 
-// swagger:route GET /clients oAuth2 listOAuth2Clients
+// swagger:route GET /clients admin listOAuth2Clients
 //
 // List OAuth 2.0 Clients
 //
@@ -209,7 +209,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	h.H.Write(w, r, clients)
 }
 
-// swagger:route GET /clients/{id} oAuth2 getOAuth2Client
+// swagger:route GET /clients/{id} admin getOAuth2Client
 //
 // Get an OAuth 2.0 Client.
 //
@@ -244,7 +244,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	h.H.Write(w, r, c)
 }
 
-// swagger:route DELETE /clients/{id} oAuth2 deleteOAuth2Client
+// swagger:route DELETE /clients/{id} admin deleteOAuth2Client
 //
 // Deletes an OAuth 2.0 Client
 //

@@ -86,7 +86,7 @@ func (h *Handler) SetRoutes(frontend, backend *httprouter.Router, corsMiddleware
 	backend.DELETE(KeyHandlerPath+"/:set", h.DeleteKeySet)
 }
 
-// swagger:route GET /.well-known/jwks.json oAuth2 wellKnown
+// swagger:route GET /.well-known/jwks.json public wellKnown
 //
 // Get Well-Known JSON Web Keys
 //
@@ -130,7 +130,7 @@ func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request) {
 	h.H.Write(w, r, &jwks)
 }
 
-// swagger:route GET /keys/{set}/{kid} jsonWebKey getJsonWebKey
+// swagger:route GET /keys/{set}/{kid} admin getJsonWebKey
 //
 // Retrieve a JSON Web Key
 //
@@ -164,7 +164,7 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	h.H.Write(w, r, keys)
 }
 
-// swagger:route GET /keys/{set} jsonWebKey getJsonWebKeySet
+// swagger:route GET /keys/{set} admin getJsonWebKeySet
 //
 // Retrieve a JSON Web Key Set
 //
@@ -197,7 +197,7 @@ func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httproute
 	h.H.Write(w, r, keys)
 }
 
-// swagger:route POST /keys/{set} jsonWebKey createJsonWebKeySet
+// swagger:route POST /keys/{set} admin createJsonWebKeySet
 //
 // Generate a new JSON Web Key
 //
@@ -246,7 +246,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	h.H.WriteCreated(w, r, fmt.Sprintf("%s://%s/keys/%s", r.URL.Scheme, r.URL.Host, set), keys)
 }
 
-// swagger:route PUT /keys/{set} jsonWebKey updateJsonWebKeySet
+// swagger:route PUT /keys/{set} admin updateJsonWebKeySet
 //
 // Update a JSON Web Key Set
 //
@@ -284,7 +284,7 @@ func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 	h.H.Write(w, r, &keySet)
 }
 
-// swagger:route PUT /keys/{set}/{kid} jsonWebKey updateJsonWebKey
+// swagger:route PUT /keys/{set}/{kid} admin updateJsonWebKey
 //
 // Update a JSON Web Key
 //
@@ -327,7 +327,7 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 	h.H.Write(w, r, key)
 }
 
-// swagger:route DELETE /keys/{set} jsonWebKey deleteJsonWebKeySet
+// swagger:route DELETE /keys/{set} admin deleteJsonWebKeySet
 //
 // Delete a JSON Web Key Set
 //
@@ -359,7 +359,7 @@ func (h *Handler) DeleteKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route DELETE /keys/{set}/{kid} jsonWebKey deleteJsonWebKey
+// swagger:route DELETE /keys/{set}/{kid} admin deleteJsonWebKey
 //
 // Delete a JSON Web Key
 //

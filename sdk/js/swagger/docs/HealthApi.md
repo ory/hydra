@@ -1,4 +1,4 @@
-# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthApi
+# OryHydra.HealthApi
 
 All URIs are relative to *http://localhost*
 
@@ -18,9 +18,9 @@ This endpoint returns a 200 status code when the HTTP server is up running. This
 
 ### Example
 ```javascript
-var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var OryHydra = require('ory_hydra');
 
-var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthApi();
+var apiInstance = new OryHydra.HealthApi();
 
 var callback = function(error, data, response) {
   if (error) {
@@ -58,9 +58,9 @@ This endpoint returns a 200 status code when the HTTP server is up running and t
 
 ### Example
 ```javascript
-var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var OryHydra = require('ory_hydra');
 
-var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthApi();
+var apiInstance = new OryHydra.HealthApi();
 
 var callback = function(error, data, response) {
   if (error) {

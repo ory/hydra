@@ -1,4 +1,4 @@
-# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.PreviousConsentSession
+# OryHydra.PreviousConsentSession
 
 ## Properties
 Name | Type | Description | Notes

@@ -1,4 +1,4 @@
-# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.HealthStatus
+# OryHydra.HealthStatus
 
 ## Properties
 Name | Type | Description | Notes

@@ -1,4 +1,4 @@
-# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerOAuthIntrospectionRequest
+# OryHydra.SwaggerOAuthIntrospectionRequest
 
 ## Properties
 Name | Type | Description | Notes

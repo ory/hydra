@@ -25,6 +25,7 @@ gen: gen-mocks gen-sql gen-sdk
 
 gen-sdk:
 		swagger generate spec -m -o ./docs/api.swagger.json
+		swagger validate ./docs/api.swagger.json
 
 		rm -rf ./sdk/go/hydra/swagger
 		rm -rf ./sdk/js/swagger

@@ -45,7 +45,7 @@ func newIntrospectionHandler(c *config.Config) *IntrospectionHandler {
 func (h *IntrospectionHandler) Introspect(cmd *cobra.Command, args []string) {
 	cmdx.ExactArgs(cmd, args, 1)
 
-	c := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlashOrFail(cmd))
+	c := hydra.NewAdminApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlashOrFail(cmd))
 	c.Configuration = configureClient(cmd, c.Configuration)
 
 	clientID := flagx.MustGetString(cmd, "client-id")

@@ -1,4 +1,4 @@
-# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2Client
+# OryHydra.OAuth2Client
 
 ## Properties
 Name | Type | Description | Notes

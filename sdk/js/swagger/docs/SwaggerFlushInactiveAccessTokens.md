@@ -1,4 +1,4 @@
-# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerFlushInactiveAccessTokens
+# OryHydra.SwaggerFlushInactiveAccessTokens
 
 ## Properties
 Name | Type | Description | Notes

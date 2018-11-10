@@ -60,6 +60,11 @@ const (
 	FlushPath      = "/oauth2/flush"
 )
 
+// WellKnown represents important OpenID Connect discovery metadata
+//
+// It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms
+// among others.
+//
 // swagger:model wellKnown
 type WellKnown struct {
 	// URL using the https scheme with no query or fragment component that the OP asserts as its IssuerURL Identifier.
@@ -67,19 +72,23 @@ type WellKnown struct {
 	// by WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this IssuerURL.
 	//
 	// required: true
+	// example: https://playground.ory.sh/ory-hydra/public/
 	Issuer string `json:"issuer"`
 
 	// URL of the OP's OAuth 2.0 Authorization Endpoint.
 	//
 	// required: true
+	// example: https://playground.ory.sh/ory-hydra/public/oauth2/auth
 	AuthURL string `json:"authorization_endpoint"`
 
 	// URL of the OP's Dynamic Client Registration Endpoint.
+	// example: https://playground.ory.sh/ory-hydra/admin/client
 	RegistrationEndpoint string `json:"registration_endpoint,omitempty"`
 
 	// URL of the OP's OAuth 2.0 Token Endpoint
 	//
 	// required: true
+	// example: https://playground.ory.sh/ory-hydra/public/oauth2/token
 	TokenURL string `json:"token_endpoint"`
 
 	// URL of the OP's JSON Web Key Set [JWK] document. This contains the signing key(s) the RP uses to validate
@@ -91,12 +100,14 @@ type WellKnown struct {
 	// keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate.
 	//
 	// required: true
+	// example: https://playground.ory.sh/ory-hydra/public/.well-known/jwks.json
 	JWKsURI string `json:"jwks_uri"`
 
 	// JSON array containing a list of the Subject Identifier types that this OP supports. Valid types include
 	// pairwise and public.
 	//
 	// required: true
+	// example: public, pairwise
 	SubjectTypes []string `json:"subject_types_supported"`
 
 	// JSON array containing a list of the OAuth 2.0 response_type values that this OP supports. Dynamic OpenID
@@ -176,9 +187,9 @@ func (h *Handler) SetRoutes(frontend, backend *httprouter.Router, corsMiddleware
 	backend.POST(FlushPath, h.FlushHandler)
 }
 
-// swagger:route GET /.well-known/openid-configuration public getWellKnown
+// swagger:route GET /.well-known/openid-configuration public discoverOpenIDConfiguration
 //
-// Server well known configuration
+// OpenID Connect Discovery
 //
 // The well known endpoint an be used to retrieve information for OpenID Connect clients. We encourage you to not roll
 // your own OpenID Connect client but to use an OpenID Connect client library instead. You can learn more on this

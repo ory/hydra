@@ -1,4 +1,4 @@
-# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.AcceptConsentRequest
+# OryHydra.AcceptConsentRequest
 
 ## Properties
 Name | Type | Description | Notes

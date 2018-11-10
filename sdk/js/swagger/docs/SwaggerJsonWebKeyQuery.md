@@ -1,4 +1,4 @@
-# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerJsonWebKeyQuery
+# OryHydra.SwaggerJsonWebKeyQuery
 
 ## Properties
 Name | Type | Description | Notes

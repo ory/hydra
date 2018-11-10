@@ -29,7 +29,7 @@ import (
 	"github.com/ory/hydra/sdk/go/hydra/swagger"
 )
 
-var passAuthentication = func(apiClient *swagger.OAuth2Api, remember bool) func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+var passAuthentication = func(apiClient *swagger.AdminApi, remember bool) func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 	return func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 		return func(w http.ResponseWriter, r *http.Request) {
 			v, res, err := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
@@ -46,7 +46,7 @@ var passAuthentication = func(apiClient *swagger.OAuth2Api, remember bool) func(
 	}
 }
 
-var passAuthorization = func(apiClient *swagger.OAuth2Api, remember bool) func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+var passAuthorization = func(apiClient *swagger.AdminApi, remember bool) func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 	return func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 		return func(w http.ResponseWriter, r *http.Request) {
 			v, res, err := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{

@@ -104,7 +104,7 @@ func TestRevoke(t *testing.T) {
 	createAccessTokenSession("siri", "my-client", tokens[2][0], now.Add(-time.Hour), store, nil)
 	createAccessTokenSession("siri", "doesnt-exist", tokens[3][0], now.Add(-time.Hour), store, nil)
 
-	client := hydra.NewOAuth2ApiWithBasePath(server.URL)
+	client := hydra.NewAdminApiWithBasePath(server.URL)
 	client.Configuration.Username = "my-client"
 	client.Configuration.Password = "foobar"
 

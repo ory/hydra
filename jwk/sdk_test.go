@@ -47,7 +47,7 @@ func TestJWKSDK(t *testing.T) {
 	})
 	server := httptest.NewServer(router)
 
-	client := hydra.NewJsonWebKeyApiWithBasePath(server.URL)
+	client := hydra.NewAdminApiWithBasePath(server.URL)
 
 	t.Run("JSON Web Key", func(t *testing.T) {
 		t.Run("CreateJwkSetKey", func(t *testing.T) {

@@ -1,4 +1,4 @@
-# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.SwaggerRevokeOAuth2TokenParameters
+# OryHydra.SwaggerRevokeOAuth2TokenParameters
 
 ## Properties
 Name | Type | Description | Notes

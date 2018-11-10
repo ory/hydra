@@ -1,4 +1,4 @@
-# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OauthTokenResponse
+# OryHydra.OauthTokenResponse
 
 ## Properties
 Name | Type | Description | Notes

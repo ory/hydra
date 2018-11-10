@@ -1,4 +1,4 @@
-# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.AuthenticationSession
+# OryHydra.AuthenticationSession
 
 ## Properties
 Name | Type | Description | Notes

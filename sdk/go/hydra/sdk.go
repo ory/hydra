@@ -33,8 +33,8 @@ import (
 
 // CodeGenSDK contains all relevant API clients for interacting with ORY Hydra.
 type CodeGenSDK struct {
-	*swagger.OAuth2Api
-	*swagger.JsonWebKeyApi
+	*swagger.AdminApi
+	*swagger.PublicApi
 
 	Configuration      *Configuration
 	oAuth2ClientConfig *clientcredentials.Config
@@ -67,11 +67,9 @@ func NewSDK(c *Configuration) (*CodeGenSDK, error) {
 	}
 
 	c.AdminURL = strings.TrimLeft(c.AdminURL, "/")
-	o := swagger.NewOAuth2ApiWithBasePath(c.AdminURL)
-	j := swagger.NewJsonWebKeyApiWithBasePath(c.AdminURL)
+	o := swagger.NewAdminApiWithBasePath(c.AdminURL)
 	sdk := &CodeGenSDK{
-		OAuth2Api:     o,
-		JsonWebKeyApi: j,
+		AdminApi:      o,
 		Configuration: c,
 	}
 

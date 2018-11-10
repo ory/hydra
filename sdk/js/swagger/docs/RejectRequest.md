@@ -1,4 +1,4 @@
-# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.RejectRequest
+# OryHydra.RejectRequest
 
 ## Properties
 Name | Type | Description | Notes

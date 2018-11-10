@@ -1,4 +1,4 @@
-# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.CompletedRequest
+# OryHydra.CompletedRequest
 
 ## Properties
 Name | Type | Description | Notes

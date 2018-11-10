@@ -1,4 +1,4 @@
-# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OAuth2TokenIntrospection
+# OryHydra.OAuth2TokenIntrospection
 
 ## Properties
 Name | Type | Description | Notes

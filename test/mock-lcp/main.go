@@ -29,7 +29,7 @@ import (
 	"github.com/ory/hydra/sdk/go/hydra/swagger"
 )
 
-var client = swagger.NewOAuth2ApiWithBasePath(os.Getenv("HYDRA_ADMIN_URL"))
+var client = swagger.NewAdminApiWithBasePath(os.Getenv("HYDRA_ADMIN_URL"))
 
 func login(rw http.ResponseWriter, r *http.Request) {
 	challenge := r.URL.Query().Get("login_challenge")

@@ -40,7 +40,7 @@ import (
 	"github.com/ory/x/cmdx"
 )
 
-var sdk = swagger.NewOAuth2ApiWithBasePath(os.Getenv("HYDRA_ADMIN_URL"))
+var sdk = swagger.NewAdminApiWithBasePath(os.Getenv("HYDRA_ADMIN_URL"))
 
 type oauth2token struct {
 	IDToken      string    `json:"id_token"`

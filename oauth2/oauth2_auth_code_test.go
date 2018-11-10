@@ -218,7 +218,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					}
 
 					require.NoError(t, fs.(clientCreator).CreateClient(context.TODO(), &client))
-					apiClient := swagger.NewOAuth2ApiWithBasePath(api.URL)
+					apiClient := swagger.NewAdminApiWithBasePath(api.URL)
 
 					var callbackHandler *httprouter.Handle
 					router.GET("/callback", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

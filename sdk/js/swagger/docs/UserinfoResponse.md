@@ -1,4 +1,4 @@
-# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.UserinfoResponse
+# OryHydra.UserinfoResponse
 
 ## Properties
 Name | Type | Description | Notes

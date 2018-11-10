@@ -101,7 +101,7 @@ func TestHandlerFlushHandler(t *testing.T) {
 		return h
 	})
 	ts := httptest.NewServer(r)
-	c := hydra.NewOAuth2ApiWithBasePath(ts.URL)
+	c := hydra.NewAdminApiWithBasePath(ts.URL)
 
 	ds := new(fosite.DefaultSession)
 	ctx := context.Background()

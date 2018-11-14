@@ -109,11 +109,11 @@ jobs:
       - setup_remote_docker:
           version: 17.10.0-ce
       # Build and push docker image
-      - run: docker build --build-arg git_tag=$(git describe --tags) --build-arg git_commit=$(git rev-parse HEAD) -f Dockerfile -t oryd/keto:$(echo $CIRCLE_TAG | tr '+' '_') .
-      - run: docker build --build-arg git_tag=$(git describe --tags) --build-arg git_commit=$(git rev-parse HEAD) -f Dockerfile-alpine -t oryd/keto:$(echo $CIRCLE_TAG | tr '+' '_')-alpine .
+      - run: docker build --build-arg git_tag=$(git describe --tags) --build-arg git_commit=$(git rev-parse HEAD) -f Dockerfile -t oryd/hydra:$(echo $CIRCLE_TAG | tr '+' '_') .
+      - run: docker build --build-arg git_tag=$(git describe --tags) --build-arg git_commit=$(git rev-parse HEAD) -f Dockerfile-alpine -t oryd/hydra:$(echo $CIRCLE_TAG | tr '+' '_')-alpine .
       - run: docker login --username "$DOCKER_USERNAME" --password "$DOCKER_PASSWORD"
-      - run: docker push oryd/keto:$(echo $CIRCLE_TAG | tr '+' '_')
-      - run: docker push oryd/keto:$(echo $CIRCLE_TAG | tr '+' '_')-alpine
+      - run: docker push oryd/hydra:$(echo $CIRCLE_TAG | tr '+' '_')
+      - run: docker push oryd/hydra:$(echo $CIRCLE_TAG | tr '+' '_')-alpine
 
   release-npm:
     docker:

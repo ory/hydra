@@ -109,15 +109,11 @@ jobs:
       - setup_remote_docker:
           version: 17.10.0-ce
       # Build and push docker image
-      - run: docker build --build-arg git_tag=$(git describe --tags) --build-arg git_commit=$(git rev-parse HEAD) -f Dockerfile -t oryd/hydra:$CIRCLE_TAG .
-      - run: docker build --build-arg git_tag=$(git describe --tags) --build-arg git_commit=$(git rev-parse HEAD) -f Dockerfile-alpine -t oryd/hydra:$CIRCLE_TAG-alpine .
-      - run: docker tag oryd/hydra:$CIRCLE_TAG oryd/hydra:latest
-      - run: docker tag oryd/hydra:$CIRCLE_TAG-alpine oryd/hydra:latest-alpine
+      - run: docker build --build-arg git_tag=$(git describe --tags) --build-arg git_commit=$(git rev-parse HEAD) -f Dockerfile -t oryd/keto:$(echo $CIRCLE_TAG | tr '+' '_') .
+      - run: docker build --build-arg git_tag=$(git describe --tags) --build-arg git_commit=$(git rev-parse HEAD) -f Dockerfile-alpine -t oryd/keto:$(echo $CIRCLE_TAG | tr '+' '_')-alpine .
       - run: docker login --username "$DOCKER_USERNAME" --password "$DOCKER_PASSWORD"
-      - run: docker push oryd/hydra:$CIRCLE_TAG
-      - run: docker push oryd/hydra:$CIRCLE_TAG-alpine
-      - run: docker push oryd/hydra:latest-alpine
-      - run: docker push oryd/hydra:latest-alpine
+      - run: docker push oryd/keto:$(echo $CIRCLE_TAG | tr '+' '_')
+      - run: docker push oryd/keto:$(echo $CIRCLE_TAG | tr '+' '_')-alpine
 
   release-npm:
     docker:
@@ -128,9 +124,7 @@ jobs:
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
       - run: |
           npm version -f --no-git-tag-version $CIRCLE_TAG
-      - run: npm view ory-hydra-sdk
-      - run: npm whoami
-      - run: npm publish
+      - run: npm publish --access public
 
   release-binaries:
     docker:

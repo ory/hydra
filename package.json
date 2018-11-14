@@ -1,5 +1,5 @@
 {
-  "name": "ory-hydra-sdk",
+  "name": "@oryd/hydra",
   "version": "0.0.0",
   "description": "The official JavaScript / NodeJS SDK for ORY Hydra.",
   "license": "Apache-2.0",

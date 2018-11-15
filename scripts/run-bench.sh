@@ -11,7 +11,10 @@ clientSecret=benchsecret
 basicAuth=YmVuY2hjbGllbnQ6YmVuY2hzZWNyZXQ=
 
 cat > BENCHMARKS.md << EOF
-# ORY Hydra Performance Benchmarks
+---
+id: performance-hydra
+title: ORY Hydra
+---
 
 In this document you will find benchmark results for different endpoints of ORY Hydra. All benchmarks are executed
 using [rakyll/hey](https://github.com/rakyll/hey). Please note that these benchmarks run against the in-memory storage

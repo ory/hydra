@@ -190,7 +190,7 @@ jobs:
       - run: ./scripts/run-bench.sh
       - run: cat BENCHMARKS.md
       - run: "git clone https://arekkas:$DOCS_TOKEN_PUSH@github.com/ory/docs.git ../docs"
-      - run: "cp BENCHMARKS.md ../docs/performance/hydra.md"
+      - run: "cp BENCHMARKS.md ../docs/docs/hydra/performance/hydra.md"
       - run: "(cd ../docs && git add -A && git commit -a -m \"Updates ORY Hydra Performance benchmarks\" && git push origin) || exit 0"
 
 workflows:

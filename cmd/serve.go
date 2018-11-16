@@ -112,8 +112,12 @@ OAUTH2 CONTROLS
 - ID_TOKEN_LIFESPAN: Lifespan of OpenID Connect ID Tokens. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 	Defaults to ID_TOKEN_LIFESPAN=1h
 
-- ACCESS_TOKEN_LIFESPAN: Lifespan of OAuth2 access tokens. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+- ACCESS_TOKEN_LIFESPAN: Lifespan of OAuth2 Access Tokens. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 	Defaults to ACCESS_TOKEN_LIFESPAN=1h
+
+- REFRESH_TOKEN_LIFESPAN: Lifespan of OAuth2 Refresh Tokens. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+	Set REFRESH_TOKEN_LIFESPAN=-1 to disable refresh token expiry (not recommended for high traffic environments).
+	Defaults to REFRESH_TOKEN_LIFESPAN=720h
 
 - LOGIN_CONSENT_REQUEST_LIFESPAN: Maximum lifespan of a login and consent request. This specifies the maximum time a user
 	may take to complete the login and consent flow, before that requests times out and results in an error. Valid time

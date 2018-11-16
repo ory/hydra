@@ -75,6 +75,7 @@ type Config struct {
 	AccessTokenLifespan              string  `mapstructure:"ACCESS_TOKEN_LIFESPAN" yaml:"-"`
 	ScopeStrategy                    string  `mapstructure:"SCOPE_STRATEGY" yaml:"-"`
 	AuthCodeLifespan                 string  `mapstructure:"AUTH_CODE_LIFESPAN" yaml:"-"`
+	RefreshTokenLifespan             string  `mapstructure:"REFRESH_TOKEN_LIFESPAN" yaml:"-"`
 	IDTokenLifespan                  string  `mapstructure:"ID_TOKEN_LIFESPAN" yaml:"-"`
 	LoginConsentRequestLifespan      string  `mapstructure:"LOGIN_CONSENT_REQUEST_LIFESPAN" yaml:"-"`
 	CookieSecret                     string  `mapstructure:"COOKIE_SECRET" yaml:"-"`
@@ -276,6 +277,20 @@ func (c *Config) GetAccessTokenLifespan() time.Duration {
 		c.GetLogger().Warnf("Could not parse access token lifespan value (%s). Defaulting to 1h", c.AccessTokenLifespan)
 		return time.Hour
 	}
+	return d
+}
+
+func (c *Config) GetRefreshTokenLifespan() time.Duration {
+	if c.RefreshTokenLifespan == "-1" {
+		return 0
+	}
+
+	d, err := time.ParseDuration(c.RefreshTokenLifespan)
+	if err != nil {
+		c.GetLogger().Warnf("Could not parse refresh token lifespan value (%s). Defaulting to 720h", c.RefreshTokenLifespan)
+		return time.Hour * 720
+	}
+
 	return d
 }
 

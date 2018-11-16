@@ -8,8 +8,17 @@ before finalizing the upgrade process.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
-- [1.0.0-beta.10](#100-beta10)
-  - [Schema Changes](#schema-changes)
+- [1.0.0-rc.1](#100-rc1)
+  - [Non-breaking Changes](#non-breaking-changes)
+    - [Access Token Audience](#access-token-audience)
+    - [Refresh Grant](#refresh-grant)
+    - [Customise login and consent flow timeout](#customise-login-and-consent-flow-timeout)
+    - [Schema Changes](#schema-changes)
+  - [Breaking Changes](#breaking-changes)
+    - [Refresh Token Expiry](#refresh-token-expiry)
+    - [JSON Web Token formatted Access Token data](#json-web-token-formatted-access-token-data)
+    - [CLI Changes](#cli-changes)
+    - [API Changes](#api-changes)
 - [1.0.0-beta.9](#100-beta9)
   - [CORS is disabled by default](#cors-is-disabled-by-default)
 - [1.0.0-beta.8](#100-beta8)
@@ -31,7 +40,7 @@ before finalizing the upgrade process.
 - [1.0.0-beta.1](#100-beta1)
   - [Upgrading from versions v0.9.x](#upgrading-from-versions-v09x)
   - [OpenID Connect Certified](#openid-connect-certified)
-  - [Breaking Changes](#breaking-changes)
+  - [Breaking Changes](#breaking-changes-1)
     - [Introspection API](#introspection-api)
       - [Introspection is now capable of introspecting refresh tokens](#introspection-is-now-capable-of-introspecting-refresh-tokens)
     - [Access Control & Warden API](#access-control--warden-api)
@@ -62,7 +71,7 @@ before finalizing the upgrade process.
 - [0.11.3](#0113)
 - [0.11.0](#0110)
 - [0.10.0](#0100)
-  - [Breaking Changes](#breaking-changes-1)
+  - [Breaking Changes](#breaking-changes-2)
     - [Introspection now requires authorization](#introspection-now-requires-authorization)
     - [New consent flow](#new-consent-flow)
     - [Audience](#audience)
@@ -133,6 +142,17 @@ In order to [resolve table locking](https://github.com/ory/hydra/issues/1067) wh
 - Index on the `requested_at` column in the `hydra_oauth2_access` table
 
 ### Breaking Changes
+
+#### Refresh Token Expiry
+
+All refresh tokens issued with this release will expire after 30 days of non-use. This behaviour can be modified
+using the `REFRESH_TOKEN_LIFESPAN` environment variable. By setting `REFRESH_TOKEN_LIFESPAN=-1`, refresh tokens
+are set to never expire, which is the previous behaviour.
+
+Tokens issued before this change will still be valid forever.
+
+We discourage setting `REFRESH_TOKEN_LIFESPAN=-1` as it might clog the database with tokens that will never be used again.
+In high-scale systems, `REFRESH_TOKEN_LIFESPAN` should be set to something like 15 or 30 days.
 
 #### JSON Web Token formatted Access Token data
 

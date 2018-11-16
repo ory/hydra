@@ -71,6 +71,7 @@ func newOAuth2Provider(c *config.Config) fosite.OAuth2Provider {
 
 	fc := &compose.Config{
 		AccessTokenLifespan:            c.GetAccessTokenLifespan(),
+		RefreshTokenLifespan:           c.GetRefreshTokenLifespan(),
 		AuthorizeCodeLifespan:          c.GetAuthCodeLifespan(),
 		IDTokenLifespan:                c.GetIDTokenLifespan(),
 		IDTokenIssuer:                  c.Issuer,

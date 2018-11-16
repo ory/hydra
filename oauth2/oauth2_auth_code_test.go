@@ -174,6 +174,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					require.NoError(t, jm.AddKeySet(context.TODO(), OpenIDConnectKeyName, keys))
 					jwtStrategy, err := jwk.NewRS256JWTStrategy(jm, OpenIDConnectKeyName)
 
+					fc.RefreshTokenLifespan = time.Second * 2
 					handler := &Handler{
 						OAuth2: compose.Compose(
 							fc, fs, strat.s, hasher,
@@ -240,6 +241,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						expectIDToken         bool
 
 						assertAccessToken, assertIDToken func(*testing.T, string)
+						assertRefreshToken               func(*testing.T, *oauth2.Token)
 					}{
 						{
 							d:       "Checks if request fails when audience doesn't match",
@@ -330,6 +332,111 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 								assert.NotEmpty(t, client.GetID(), data["iat"])
 								assert.NotEmpty(t, client.GetID(), data["jti"])
 								assert.NotEmpty(t, "what-a-cool-nonce", data["nonce"])
+							},
+						},
+						{
+							d:       "Perform OAuth2 flow with refreshing which fails due to expiry",
+							authURL: oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("nonce", "what-a-cool-nonce")),
+							cj:      newCookieJar(),
+							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+								return func(w http.ResponseWriter, r *http.Request) {
+									_, res, err := apiClient.GetLoginRequest(r.URL.Query().Get("login_challenge"))
+									require.NoError(t, err)
+									require.EqualValues(t, http.StatusOK, res.StatusCode)
+									v, res, err := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
+										Subject: "user-a", Remember: false, RememberFor: 0, Acr: "1",
+									})
+									require.NoError(t, err)
+									require.EqualValues(t, http.StatusOK, res.StatusCode)
+									require.NotEmpty(t, v.RedirectTo)
+									http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+								}
+							},
+							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+								return func(w http.ResponseWriter, r *http.Request) {
+									rr, res, err := apiClient.GetConsentRequest(r.URL.Query().Get("consent_challenge"))
+									require.NoError(t, err)
+									require.EqualValues(t, http.StatusOK, res.StatusCode)
+									v, res, err := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{
+										GrantScope: []string{"hydra", "offline", "openid"}, Remember: false, RememberFor: 0,
+										GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
+										Session:                  swagger.ConsentRequestSession{},
+									})
+									require.NoError(t, err)
+									require.EqualValues(t, http.StatusOK, res.StatusCode)
+									require.NotEmpty(t, v.RedirectTo)
+									http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+								}
+							},
+							cb: func(t *testing.T) httprouter.Handle {
+								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+									code = r.URL.Query().Get("code")
+									require.NotEmpty(t, code)
+									w.WriteHeader(http.StatusOK)
+								}
+							},
+							expectOAuthAuthError:  false,
+							expectOAuthTokenError: false,
+							expectIDToken:         true,
+							expectRefreshToken:    true,
+							assertRefreshToken: func(t *testing.T, token *oauth2.Token) {
+								time.Sleep(time.Second * 4)
+								token.Expiry = token.Expiry.Add(-time.Hour * 24)
+								_, err := oauthConfig.TokenSource(oauth2.NoContext, token).Token()
+								require.Error(t, err)
+							},
+						},
+						{
+							d:       "Perform OAuth2 flow with refreshing which works just fine",
+							authURL: oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("nonce", "what-a-cool-nonce")),
+							cj:      newCookieJar(),
+							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+								return func(w http.ResponseWriter, r *http.Request) {
+									_, res, err := apiClient.GetLoginRequest(r.URL.Query().Get("login_challenge"))
+									require.NoError(t, err)
+									require.EqualValues(t, http.StatusOK, res.StatusCode)
+									v, res, err := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
+										Subject: "user-a", Remember: false, RememberFor: 0, Acr: "1",
+									})
+									require.NoError(t, err)
+									require.EqualValues(t, http.StatusOK, res.StatusCode)
+									require.NotEmpty(t, v.RedirectTo)
+									http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+								}
+							},
+							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+								return func(w http.ResponseWriter, r *http.Request) {
+									rr, res, err := apiClient.GetConsentRequest(r.URL.Query().Get("consent_challenge"))
+									require.NoError(t, err)
+									require.EqualValues(t, http.StatusOK, res.StatusCode)
+									v, res, err := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{
+										GrantScope: []string{"hydra", "offline", "openid"}, Remember: false, RememberFor: 0,
+										GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
+										Session:                  swagger.ConsentRequestSession{},
+									})
+									require.NoError(t, err)
+									require.EqualValues(t, http.StatusOK, res.StatusCode)
+									require.NotEmpty(t, v.RedirectTo)
+									http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+								}
+							},
+							cb: func(t *testing.T) httprouter.Handle {
+								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+									code = r.URL.Query().Get("code")
+									require.NotEmpty(t, code)
+									w.WriteHeader(http.StatusOK)
+								}
+							},
+							expectOAuthAuthError:  false,
+							expectOAuthTokenError: false,
+							expectIDToken:         true,
+							expectRefreshToken:    true,
+							assertRefreshToken: func(t *testing.T, token *oauth2.Token) {
+								token.Expiry = token.Expiry.Add(-time.Hour * 24)
+								n, err := oauthConfig.TokenSource(oauth2.NoContext, token).Token()
+								require.NoError(t, err)
+								require.NotEqual(t, token.AccessToken, n.AccessToken)
+								require.NotEqual(t, token.RefreshToken, n.RefreshToken)
 							},
 						},
 						{
@@ -894,6 +1001,9 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							if tc.assertIDToken != nil {
 								tc.assertIDToken(t, token.Extra("id_token").(string))
 							}
+							if tc.assertRefreshToken != nil {
+								tc.assertRefreshToken(t, token)
+							}
 						})
 					}
 				})
@@ -943,7 +1053,10 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 
 			handler := &Handler{
 				OAuth2: compose.Compose(
-					fc,
+					&compose.Config{
+						AccessTokenLifespan:        time.Second,
+						SendDebugMessagesToClients: true,
+					},
 					store,
 					strat.s,
 					nil,

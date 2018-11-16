@@ -159,6 +159,9 @@ func initConfig() {
 	viper.BindEnv("OAUTH2_SHARE_ERROR_DEBUG")
 	viper.SetDefault("OAUTH2_SHARE_ERROR_DEBUG", false)
 
+	viper.BindEnv("REFRESH_TOKEN_LIFESPAN")
+	viper.SetDefault("REFRESH_TOKEN_LIFESPAN", "720h")
+
 	viper.BindEnv("ACCESS_TOKEN_LIFESPAN")
 	viper.SetDefault("ACCESS_TOKEN_LIFESPAN", "1h")
 

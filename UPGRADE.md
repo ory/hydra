@@ -31,7 +31,7 @@ before finalizing the upgrade process.
 - [1.0.0-beta.1](#100-beta1)
   - [Upgrading from versions v0.9.x](#upgrading-from-versions-v09x)
   - [OpenID Connect Certified](#openid-connect-certified)
-  - [Breaking Changes](#breaking-changes)
+  - [Breaking Changes](#breaking-changes-1)
     - [Introspection API](#introspection-api)
       - [Introspection is now capable of introspecting refresh tokens](#introspection-is-now-capable-of-introspecting-refresh-tokens)
     - [Access Control & Warden API](#access-control--warden-api)
@@ -62,7 +62,7 @@ before finalizing the upgrade process.
 - [0.11.3](#0113)
 - [0.11.0](#0110)
 - [0.10.0](#0100)
-  - [Breaking Changes](#breaking-changes-1)
+  - [Breaking Changes](#breaking-changes-2)
     - [Introspection now requires authorization](#introspection-now-requires-authorization)
     - [New consent flow](#new-consent-flow)
     - [Audience](#audience)
@@ -133,6 +133,17 @@ In order to [resolve table locking](https://github.com/ory/hydra/issues/1067) wh
 - Index on the `requested_at` column in the `hydra_oauth2_access` table
 
 ### Breaking Changes
+
+#### Refresh Token Expiry
+
+All refresh tokens issued with this release will expire after 30 days of non-use. This behaviour can be modified
+using the `REFRESH_TOKEN_LIFESPAN` environment variable. By setting `REFRESH_TOKEN_LIFESPAN=-1`, refresh tokens
+are set to never expire, which is the previous behaviour.
+
+Tokens issued before this change will still be valid forever.
+
+We discourage setting `REFRESH_TOKEN_LIFESPAN=-1` as it might clog the database with tokens that will never be used again.
+In high-scale systems, `REFRESH_TOKEN_LIFESPAN` should be set to something like 15 or 30 days.
 
 #### Swagger & SDK Restructuring
 

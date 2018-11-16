@@ -135,7 +135,7 @@ WHERE challenge IN (SELECT r.challenge FROM hydra_oauth2_consent_request as r WH
 }
 
 func (m *SQLManager) RevokeUserAuthenticationSession(ctx context.Context, user string) error {
-	rows, err := m.db.ExecContext(
+	_, err := m.db.ExecContext(
 		ctx,
 		m.db.Rebind("DELETE FROM hydra_oauth2_authentication_session WHERE subject=?"),
 		user,
@@ -147,10 +147,13 @@ func (m *SQLManager) RevokeUserAuthenticationSession(ctx context.Context, user s
 		return sqlcon.HandleError(err)
 	}
 
-	count, _ := rows.RowsAffected()
-	if count == 0 {
-		return errors.WithStack(pkg.ErrNotFound)
-	}
+	// This confuses people, see https://github.com/ory/hydra/issues/1168
+	//
+	// count, _ := rows.RowsAffected()
+	// if count == 0 {
+	// 	 return errors.WithStack(pkg.ErrNotFound)
+	// }
+
 	return nil
 }
 

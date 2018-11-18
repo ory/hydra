@@ -71,37 +71,31 @@ func TestXXMigrations(t *testing.T) {
 		migratest.MigrationSchemas{client.Migrations, consent.Migrations},
 		migratest.MigrationSchemas{nil, createMigrations},
 		clean, clean,
-		func(t *testing.T, db *sqlx.DB, k, m, steps int) {
-			if m == 0 {
-				t.Run(fmt.Sprintf("create-client=%d", k), func(t *testing.T) {
-					c := &client.SQLManager{DB: db, Hasher: &fosite.BCrypt{}}
-					t.Run(fmt.Sprintf("client=%d", k), func(t *testing.T) {
-						require.NoError(t, c.CreateClient(context.TODO(), &client.Client{ClientID: fmt.Sprintf("%d-client", k+1)}))
-					})
-				})
+		func(t *testing.T, db *sqlx.DB, sk, step, steps int) {
+			if sk == 0 {
+				t.Skip("Nothing to do...")
 				return
 			}
 
-			t.Run(fmt.Sprintf("poll=%d", k), func(t *testing.T) {
-				if m == 1 {
-					t.Skipf("Skipping because %d (current) != %d (steps)", k+1, steps)
+			t.Run(fmt.Sprintf("poll=%d", step), func(t *testing.T) {
+				kk := step + 1
+				if kk <= 2 {
+					t.Skip("Skipping the first two entries were deleted in migration 7.sql login_session_id is not defined")
 					return
 				}
-
-				kk := k + 1
 
 				c := &client.SQLManager{DB: db, Hasher: &fosite.BCrypt{}}
 
 				s := consent.NewSQLManager(db, c, nil)
 				_, err := s.GetAuthenticationRequest(context.TODO(), fmt.Sprintf("%d-challenge", kk))
-				require.NoError(t, err)
-				_, err = s.GetAuthenticationSession(context.TODO(), fmt.Sprintf("%d-auth", kk))
-				require.NoError(t, err)
+				require.NoError(t, err, "%d-challenge", kk)
+				_, err = s.GetAuthenticationSession(context.TODO(), fmt.Sprintf("%d-login-session-id", kk))
+				require.NoError(t, err, "%d-login-session-id", kk)
 				_, err = s.GetConsentRequest(context.TODO(), fmt.Sprintf("%d-challenge", kk))
-				require.NoError(t, err)
-				if k > 1 {
+				require.NoError(t, err, "%d-challenge", kk)
+				if step > 1 {
 					_, err = s.GetForcedObfuscatedAuthenticationSession(context.TODO(), fmt.Sprintf("%d-client", kk), fmt.Sprintf("%d-obfuscated", kk))
-					require.NoError(t, err)
+					require.NoError(t, err, "%d-client", kk)
 				}
 			})
 		},

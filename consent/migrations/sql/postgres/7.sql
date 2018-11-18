@@ -7,40 +7,24 @@ ALTER TABLE hydra_oauth2_consent_request ALTER COLUMN login_session_id DROP DEFA
 UPDATE hydra_oauth2_authentication_request SET login_session_id = NULL WHERE login_session_id='';
 UPDATE hydra_oauth2_consent_request SET login_session_id = NULL WHERE login_session_id='';
 
-SET session_replication_role = replica;
-
-DELETE FROM hydra_oauth2_consent_request_handled WHERE NOT EXISTS (
-  SELECT 1 FROM hydra_oauth2_consent_request WHERE hydra_oauth2_consent_request_handled.challenge = hydra_oauth2_consent_request.challenge
-);
-DELETE FROM hydra_oauth2_authentication_request_handled WHERE NOT EXISTS (
-  SELECT 1 FROM hydra_oauth2_consent_request WHERE hydra_oauth2_authentication_request_handled.challenge = hydra_oauth2_consent_request.challenge
-);
+DELETE FROM hydra_oauth2_consent_request_handled WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request WHERE hydra_oauth2_consent_request_handled.challenge = hydra_oauth2_consent_request.challenge);
+DELETE FROM hydra_oauth2_authentication_request_handled WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request WHERE hydra_oauth2_authentication_request_handled.challenge = hydra_oauth2_consent_request.challenge);
 
 ALTER TABLE hydra_oauth2_consent_request_handled ADD CONSTRAINT hydra_oauth2_consent_request_handled_challenge_fk FOREIGN KEY (challenge) REFERENCES hydra_oauth2_consent_request(challenge) ON DELETE CASCADE;
 ALTER TABLE hydra_oauth2_authentication_request_handled ADD CONSTRAINT hydra_oauth2_authentication_request_handled_challenge_fk FOREIGN KEY (challenge) REFERENCES hydra_oauth2_authentication_request(challenge) ON DELETE CASCADE;
 
 DELETE FROM hydra_oauth2_consent_request WHERE login_challenge='';
 
-DELETE FROM hydra_oauth2_authentication_request WHERE NOT EXISTS (
-  SELECT 1 FROM hydra_client WHERE hydra_oauth2_authentication_request.client_id = hydra_client.id
-);
-DELETE FROM hydra_oauth2_authentication_request WHERE NOT EXISTS (
-  SELECT 1 FROM hydra_oauth2_authentication_session WHERE hydra_oauth2_authentication_request.login_session_id = hydra_oauth2_authentication_session.id
-);
+DELETE FROM hydra_oauth2_authentication_request WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE hydra_oauth2_authentication_request.client_id = hydra_client.id);
+DELETE FROM hydra_oauth2_authentication_request WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_authentication_session WHERE hydra_oauth2_authentication_request.login_session_id = hydra_oauth2_authentication_session.id);
 
-DELETE FROM hydra_oauth2_consent_request WHERE NOT EXISTS (
-  SELECT 1 FROM hydra_client WHERE hydra_oauth2_consent_request.client_id = hydra_client.id
-);
-DELETE FROM hydra_oauth2_consent_request WHERE NOT EXISTS (
-  SELECT 1 FROM hydra_oauth2_authentication_session WHERE hydra_oauth2_consent_request.login_session_id = hydra_oauth2_authentication_session.id
-);
-DELETE FROM hydra_oauth2_consent_request WHERE NOT EXISTS (
-  SELECT 1 FROM hydra_oauth2_authentication_request WHERE hydra_oauth2_consent_request.login_challenge = hydra_oauth2_authentication_request.challenge
-);
+DELETE FROM hydra_oauth2_consent_request WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE hydra_oauth2_consent_request.client_id = hydra_client.id);
+DELETE FROM hydra_oauth2_consent_request WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_authentication_session WHERE hydra_oauth2_consent_request.login_session_id = hydra_oauth2_authentication_session.id);
+DELETE FROM hydra_oauth2_consent_request WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_authentication_request WHERE hydra_oauth2_consent_request.login_challenge = hydra_oauth2_authentication_request.challenge);
 
-DELETE FROM hydra_oauth2_obfuscated_authentication_session WHERE NOT EXISTS (
-  SELECT 1 FROM hydra_client WHERE hydra_oauth2_obfuscated_authentication_session.client_id = hydra_client.id
-);
+DELETE FROM hydra_oauth2_obfuscated_authentication_session WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE hydra_oauth2_obfuscated_authentication_session.client_id = hydra_client.id);
+
+SET session_replication_role = replica;
 
 ALTER TABLE hydra_oauth2_consent_request ADD CONSTRAINT hydra_oauth2_consent_request_client_id_fk FOREIGN KEY (client_id) REFERENCES hydra_client(id) ON DELETE CASCADE;
 ALTER TABLE hydra_oauth2_authentication_request ADD CONSTRAINT hydra_oauth2_authentication_request_client_id_fk FOREIGN KEY (client_id) REFERENCES hydra_client(id) ON DELETE CASCADE;

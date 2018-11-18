@@ -60,7 +60,7 @@ func TestXXMigrations(t *testing.T) {
 		migratest.MigrationSchemas{migrations},
 		migratest.MigrationSchemas{createMigrations},
 		clean, clean,
-		func(t *testing.T, db *sqlx.DB, k,m, steps int) {
+		func(t *testing.T, db *sqlx.DB, k, m, steps int) {
 			t.Run(fmt.Sprintf("poll=%d", k), func(t *testing.T) {
 				sid := fmt.Sprintf("%d-sid", k+1)
 				m := NewSQLManager(db, []byte("01234567890123456789012345678912"))

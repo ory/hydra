@@ -126,6 +126,38 @@ If you are running a large database take enough time to run this migration - it 
 amount of data and the database version and driver. Before executing this migration, you should *manually* check and remove
 inconsistent data.
 
+##### Removing inconsistent oauth2 data
+
+This migration automatically removes inconsistent OAuth 2.0 and OpenID Connect data. Possible impacts are:
+
+1. Existing authorize codes, access, refresh tokens might be invalidated.
+2. Existing pkce and OpenID Connect session might be invalidated.
+
+As OAuth 2.0 clients are generally capable of handling re-authorization, this should not have a serious impact. Removing
+this data increases security through strong consistency.
+
+The following `DELETE` statements will be executed:
+
+```
+DELETE FROM hydra_oauth2_access as h WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE h.client_id = hydra_client.id);
+DELETE FROM hydra_oauth2_refresh as h WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE h.client_id = hydra_client.id);
+DELETE FROM hydra_oauth2_code as h WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE h.client_id = hydra_client.id);
+DELETE FROM hydra_oauth2_oidc as h WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE h.client_id = hydra_client.id);
+DELETE FROM hydra_oauth2_pkce as h WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE h.client_id = hydra_client.id);
+
+DELETE FROM hydra_oauth2_access as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request_handled WHERE h.request_id = hydra_oauth2_consent_request_handled.challenge);
+DELETE FROM hydra_oauth2_refresh as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request_handled WHERE h.request_id = hydra_oauth2_consent_request_handled.challenge);
+DELETE FROM hydra_oauth2_code as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request_handled WHERE h.request_id = hydra_oauth2_consent_request_handled.challenge);
+DELETE FROM hydra_oauth2_oidc as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request_handled WHERE h.request_id = hydra_oauth2_consent_request_handled.challenge);
+DELETE FROM hydra_oauth2_pkce as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request_handled WHERE h.request_id = hydra_oauth2_consent_request_handled.challenge);
+
+DELETE FROM hydra_oauth2_access WHERE LENGTH(request_id) > 40 OR request_id = '';
+DELETE FROM hydra_oauth2_refresh WHERE LENGTH(request_id) > 40 OR request_id = '';
+DELETE FROM hydra_oauth2_code WHERE LENGTH(request_id) > 40 OR request_id = '';
+DELETE FROM hydra_oauth2_oidc WHERE LENGTH(request_id) > 40 OR request_id = '';
+DELETE FROM hydra_oauth2_pkce WHERE LENGTH(request_id) > 40 OR request_id = '';
+```
+
 ##### Removing inconsistent login & consent data
 
 This migration automatically removes inconsistent login & consent data. Possible impacts are:
@@ -138,41 +170,24 @@ That is achieved by running the following queries. Make sure you understand what
 they may have on your system before executing `hydra migrate sql`:
 
 ```sql
-DELETE FROM hydra_oauth2_consent_request_handled WHERE NOT EXISTS (
-  SELECT 1 FROM hydra_oauth2_consent_request WHERE hydra_oauth2_consent_request_handled.challenge = hydra_oauth2_consent_request.challenge
-);
-DELETE FROM hydra_oauth2_authentication_request_handled WHERE NOT EXISTS (
-  SELECT 1 FROM hydra_oauth2_consent_request WHERE hydra_oauth2_authentication_request_handled.challenge = hydra_oauth2_consent_request.challenge
-);
+DELETE FROM hydra_oauth2_consent_request_handled as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request WHERE h.challenge = hydra_oauth2_consent_request.challenge);
+DELETE FROM hydra_oauth2_authentication_request_handled as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request WHERE h.challenge = hydra_oauth2_consent_request.challenge);
 
 DELETE FROM hydra_oauth2_consent_request WHERE login_challenge='';
 
-DELETE FROM hydra_oauth2_authentication_request WHERE NOT EXISTS (
-  SELECT 1 FROM hydra_client WHERE hydra_oauth2_authentication_request.client_id = hydra_client.id
-);
-DELETE FROM hydra_oauth2_authentication_request WHERE NOT EXISTS (
-  SELECT 1 FROM hydra_oauth2_authentication_session WHERE hydra_oauth2_authentication_request.login_session_id = hydra_oauth2_authentication_session.id
-);
+DELETE FROM hydra_oauth2_authentication_request as h WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE h.client_id = hydra_client.id);
+DELETE FROM hydra_oauth2_authentication_request as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_authentication_session WHERE h.login_session_id = hydra_oauth2_authentication_session.id);
 
-DELETE FROM hydra_oauth2_consent_request WHERE NOT EXISTS (
-  SELECT 1 FROM hydra_client WHERE hydra_oauth2_consent_request.client_id = hydra_client.id
-);
-DELETE FROM hydra_oauth2_consent_request WHERE NOT EXISTS (
-  SELECT 1 FROM hydra_oauth2_authentication_session WHERE hydra_oauth2_consent_request.login_session_id = hydra_oauth2_authentication_session.id
-);
-DELETE FROM hydra_oauth2_consent_request WHERE NOT EXISTS (
-  SELECT 1 FROM hydra_oauth2_authentication_request WHERE hydra_oauth2_consent_request.login_challenge = hydra_oauth2_authentication_request.challenge
-);
+DELETE FROM hydra_oauth2_consent_request as h WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE h.client_id = hydra_client.id);
+DELETE FROM hydra_oauth2_consent_request as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_authentication_session WHERE h.login_session_id = hydra_oauth2_authentication_session.id);
+DELETE FROM hydra_oauth2_consent_request as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_authentication_request WHERE h.login_challenge = hydra_oauth2_authentication_request.challenge);
 
-DELETE FROM hydra_oauth2_obfuscated_authentication_session WHERE NOT EXISTS (
-  SELECT 1 FROM hydra_client WHERE hydra_oauth2_obfuscated_authentication_session.client_id = hydra_client.id
-);
+DELETE FROM hydra_oauth2_obfuscated_authentication_session as h WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE h.client_id = hydra_client.id);
 ```
 
 Be aware that some queries might cascade and remove other data to. One such example is checking `hydra_oauth2_consent_request`
 for rows that have no associated `login_challenge`. If such a row is removed, the associated `hydra_oauth2_consent_request_handled`
 is removed as well.
-
 
 #### Indices
 

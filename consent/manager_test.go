@@ -22,11 +22,13 @@ package consent_test
 
 import (
 	"flag"
-	"github.com/ory/hydra/pkg"
-	"github.com/stretchr/testify/require"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/ory/hydra/pkg"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
@@ -78,7 +80,7 @@ func connectToPostgres(t *testing.T, managers map[string]managerRegistry) {
 	managers["postgres"] = managerRegistry{
 		consent: s,
 		client:  c,
-		fosite: fositeManager,
+		fosite:  fositeManager,
 	}
 	m.Unlock()
 }
@@ -106,14 +108,14 @@ func connectToMySQL(t *testing.T, managers map[string]managerRegistry) {
 	managers["mysql"] = managerRegistry{
 		consent: s,
 		client:  c,
-		fosite: fositeManager,
+		fosite:  fositeManager,
 	}
 	m.Unlock()
 }
 
 func TestMain(m *testing.M) {
-	runner := dockertest.Register()
 	flag.Parse()
+	runner := dockertest.Register()
 	runner.Exit(m.Run())
 }
 

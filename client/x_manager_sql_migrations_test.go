@@ -41,7 +41,7 @@ var createMigrations = map[string]*migrate.PackrMigrationSource{
 	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}),
 }
 
-func CleanTestDB (t *testing.T, db *sqlx.DB) {
+func CleanTestDB(t *testing.T, db *sqlx.DB) {
 	_, err := db.Exec("DROP TABLE IF EXISTS hydra_client_migration")
 	require.NoError(t, err)
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_client")

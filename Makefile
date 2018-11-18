@@ -11,7 +11,7 @@ test:
 		make gen-sql
 		TEST_DATABASE_MYSQL='root:secret@(127.0.0.1:3444)/mysql?parseTime=true' \
 			TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/hydra?sslmode=disable' \
-			go-acc ./... -- -failfast
+			go-acc ./... -- -failfast -timeout=20m
 		docker rm -f hydra_test_database_mysql
 		docker rm -f hydra_test_database_postgres
 

@@ -143,7 +143,7 @@ func MockAuthRequest(key string, authAt bool) (c *AuthenticationRequest, h *Hand
 func ManagerTests(m Manager, clientManager client.Manager, fositeManager pkg.FositeStorer) func(t *testing.T) {
 	return func(t *testing.T) {
 		t.Run("case=init-fks", func(t *testing.T) {
-			for _, k := range []string{"1","2","3","4","5","6","7","8","9","10","rv1","rv2"} {
+			for _, k := range []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "rv1", "rv2"} {
 				require.NoError(t, clientManager.CreateClient(context.TODO(), &client.Client{ClientID: fmt.Sprintf("fk-client-%s", k)}))
 
 				require.NoError(t, m.CreateAuthenticationSession(context.TODO(), &AuthenticationSession{

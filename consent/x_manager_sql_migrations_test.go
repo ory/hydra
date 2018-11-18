@@ -3,8 +3,9 @@ package consent_test
 import (
 	"context"
 	"fmt"
-	"github.com/ory/fosite"
 	"testing"
+
+	"github.com/ory/fosite"
 
 	"github.com/jmoiron/sqlx"
 	migrate "github.com/rubenv/sql-migrate"
@@ -42,6 +43,9 @@ func cleanDB(t *testing.T, db *sqlx.DB) {
 
 	// everything depends on hydra_oauth2_authentication_session
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_session")
+	require.NoError(t, err)
+
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
 	require.NoError(t, err)
 
 	// everything depends on hydra_client

@@ -98,20 +98,20 @@ var sqlParamsAuthSession = []string{
 }
 
 type sqlAuthenticationRequest struct {
-	OpenIDConnectContext string          `db:"oidc_context"`
-	Client               string          `db:"client_id"`
-	Subject              string          `db:"subject"`
-	RequestURL           string          `db:"request_url"`
-	Skip                 bool            `db:"skip"`
-	Challenge            string          `db:"challenge"`
-	RequestedScope       string          `db:"requested_scope"`
-	RequestedAudience    string          `db:"requested_at_audience"`
-	Verifier             string          `db:"verifier"`
-	CSRF                 string          `db:"csrf"`
-	AuthenticatedAt      *time.Time      `db:"authenticated_at"`
-	RequestedAt          time.Time       `db:"requested_at"`
-	LoginSessionID       *sql.NullString `db:"login_session_id"`
-	WasHandled           bool            `db:"was_handled"`
+	OpenIDConnectContext string         `db:"oidc_context"`
+	Client               string         `db:"client_id"`
+	Subject              string         `db:"subject"`
+	RequestURL           string         `db:"request_url"`
+	Skip                 bool           `db:"skip"`
+	Challenge            string         `db:"challenge"`
+	RequestedScope       string         `db:"requested_scope"`
+	RequestedAudience    string         `db:"requested_at_audience"`
+	Verifier             string         `db:"verifier"`
+	CSRF                 string         `db:"csrf"`
+	AuthenticatedAt      *time.Time     `db:"authenticated_at"`
+	RequestedAt          time.Time      `db:"requested_at"`
+	LoginSessionID       sql.NullString `db:"login_session_id"`
+	WasHandled           bool           `db:"was_handled"`
 }
 
 type sqlConsentRequest struct {
@@ -163,7 +163,7 @@ func newSQLConsentRequest(c *ConsentRequest) (*sqlConsentRequest, error) {
 			CSRF:                 c.CSRF,
 			AuthenticatedAt:      toMySQLDateHack(c.AuthenticatedAt),
 			RequestedAt:          c.RequestedAt,
-			LoginSessionID:       &sessionID,
+			LoginSessionID:       sessionID,
 		},
 		LoginChallenge:          c.LoginChallenge,
 		ForcedSubjectIdentifier: c.ForceSubjectIdentifier,
@@ -198,7 +198,7 @@ func newSQLAuthenticationRequest(c *AuthenticationRequest) (*sqlAuthenticationRe
 		CSRF:                 c.CSRF,
 		AuthenticatedAt:      toMySQLDateHack(c.AuthenticatedAt),
 		RequestedAt:          c.RequestedAt,
-		LoginSessionID:       &sessionID,
+		LoginSessionID:       sessionID,
 	}, nil
 }
 

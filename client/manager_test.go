@@ -44,6 +44,7 @@ func init() {
 }
 
 func TestMain(m *testing.M) {
+	flag.Parse()
 	runner := dockertest.Register()
 	runner.Exit(m.Run())
 }
@@ -73,7 +74,6 @@ func connectToPG() {
 }
 
 func TestManagers(t *testing.T) {
-	flag.Parse()
 	if !testing.Short() {
 		dockertest.Parallel([]func(){
 			connectToPG,

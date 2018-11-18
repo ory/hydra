@@ -11,11 +11,11 @@ DELETE FROM hydra_oauth2_code WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_conse
 DELETE FROM hydra_oauth2_oidc WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request_handled WHERE hydra_oauth2_oidc.request_id = hydra_oauth2_consent_request_handled.challenge);
 DELETE FROM hydra_oauth2_pkce WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request_handled WHERE hydra_oauth2_pkce.request_id = hydra_oauth2_consent_request_handled.challenge);
 
-DELETE FROM hydra_oauth2_access WHERE LENGTH(request_id) > 40;
-DELETE FROM hydra_oauth2_refresh WHERE LENGTH(request_id) > 40;
-DELETE FROM hydra_oauth2_code WHERE LENGTH(request_id) > 40;
-DELETE FROM hydra_oauth2_oidc WHERE LENGTH(request_id) > 40;
-DELETE FROM hydra_oauth2_pkce WHERE LENGTH(request_id) > 40;
+DELETE FROM hydra_oauth2_access WHERE LENGTH(request_id) > 40 OR request_id = '';
+DELETE FROM hydra_oauth2_refresh WHERE LENGTH(request_id) > 40 OR request_id = '';
+DELETE FROM hydra_oauth2_code WHERE LENGTH(request_id) > 40 OR request_id = '';
+DELETE FROM hydra_oauth2_oidc WHERE LENGTH(request_id) > 40 OR request_id = '';
+DELETE FROM hydra_oauth2_pkce WHERE LENGTH(request_id) > 40 OR request_id = '';
 
 ALTER TABLE hydra_oauth2_access MODIFY request_id varchar(40) NOT NULL;
 ALTER TABLE hydra_oauth2_refresh MODIFY request_id varchar(40) NOT NULL;

@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * OAuth2Client
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2018-11-10T18:32:35.710+01:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2018-11-18T22:54:40.815+01:00")
 public class OAuth2Client {
   @JsonProperty("allowed_cors_origins")
   private List<String> allowedCorsOrigins = null;

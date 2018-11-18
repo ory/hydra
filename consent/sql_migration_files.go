@@ -142,7 +142,7 @@ func migrationsSqlShared2Sql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/shared/2.sql", size: 714, mode: os.FileMode(438), modTime: time.Unix(1542388036, 0)}
+	info := bindataFileInfo{name: "migrations/sql/shared/2.sql", size: 714, mode: os.FileMode(438), modTime: time.Unix(1542578018, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -262,7 +262,7 @@ func migrationsSqlMysql7Sql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/mysql/7.sql", size: 4811, mode: os.FileMode(438), modTime: time.Unix(1542560166, 0)}
+	info := bindataFileInfo{name: "migrations/sql/mysql/7.sql", size: 4811, mode: os.FileMode(438), modTime: time.Unix(1542578026, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -362,7 +362,7 @@ func migrationsSqlPostgres7Sql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/postgres/7.sql", size: 4909, mode: os.FileMode(438), modTime: time.Unix(1542560166, 0)}
+	info := bindataFileInfo{name: "migrations/sql/postgres/7.sql", size: 4909, mode: os.FileMode(438), modTime: time.Unix(1542578026, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -402,7 +402,7 @@ func migrationsSqlTests1_testSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/tests/1_test.sql", size: 2061, mode: os.FileMode(438), modTime: time.Unix(1542560372, 0)}
+	info := bindataFileInfo{name: "migrations/sql/tests/1_test.sql", size: 2061, mode: os.FileMode(438), modTime: time.Unix(1542578026, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -422,7 +422,7 @@ func migrationsSqlTests2_testSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/tests/2_test.sql", size: 2295, mode: os.FileMode(438), modTime: time.Unix(1542559495, 0)}
+	info := bindataFileInfo{name: "migrations/sql/tests/2_test.sql", size: 2295, mode: os.FileMode(438), modTime: time.Unix(1542578026, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -442,7 +442,7 @@ func migrationsSqlTests3_testSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/tests/3_test.sql", size: 2407, mode: os.FileMode(438), modTime: time.Unix(1542559495, 0)}
+	info := bindataFileInfo{name: "migrations/sql/tests/3_test.sql", size: 2407, mode: os.FileMode(438), modTime: time.Unix(1542578026, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -462,7 +462,7 @@ func migrationsSqlTests4_testSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/tests/4_test.sql", size: 2501, mode: os.FileMode(438), modTime: time.Unix(1542559495, 0)}
+	info := bindataFileInfo{name: "migrations/sql/tests/4_test.sql", size: 2501, mode: os.FileMode(438), modTime: time.Unix(1542578026, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -482,7 +482,7 @@ func migrationsSqlTests5_testSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/tests/5_test.sql", size: 2501, mode: os.FileMode(438), modTime: time.Unix(1542559495, 0)}
+	info := bindataFileInfo{name: "migrations/sql/tests/5_test.sql", size: 2501, mode: os.FileMode(438), modTime: time.Unix(1542578026, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -502,7 +502,7 @@ func migrationsSqlTests6_testSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/tests/6_test.sql", size: 5639, mode: os.FileMode(438), modTime: time.Unix(1542559495, 0)}
+	info := bindataFileInfo{name: "migrations/sql/tests/6_test.sql", size: 5639, mode: os.FileMode(438), modTime: time.Unix(1542578026, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -522,7 +522,7 @@ func migrationsSqlTests7_testSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/tests/7_test.sql", size: 2515, mode: os.FileMode(438), modTime: time.Unix(1542559495, 0)}
+	info := bindataFileInfo{name: "migrations/sql/tests/7_test.sql", size: 2515, mode: os.FileMode(438), modTime: time.Unix(1542578026, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

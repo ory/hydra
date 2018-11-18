@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * AcceptConsentRequest
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2018-11-10T18:32:35.710+01:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2018-11-18T22:54:40.815+01:00")
 public class AcceptConsentRequest {
   @JsonProperty("grant_access_token_audience")
   private List<String> grantAccessTokenAudience = null;

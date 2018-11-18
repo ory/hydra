@@ -88,7 +88,7 @@ func NewSDK(c *Configuration) (*CodeGenSDK, error) {
 		o.Configuration.Transport = oAuth2Client.Transport
 		o.Configuration.Username = c.ClientID
 		o.Configuration.Password = c.ClientSecret
-		j.Configuration.Transport = oAuth2Client.Transport
+		o.Configuration.Transport = oAuth2Client.Transport
 
 		sdk.oAuth2ClientConfig = oAuth2ClientConfig
 	} else if len(c.ClientSecret)+len(c.ClientID)+len(c.PublicURL) > 0 {

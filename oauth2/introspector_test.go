@@ -175,7 +175,7 @@ func TestIntrospectorSDK(t *testing.T) {
 			},
 		} {
 			t.Run(fmt.Sprintf("case=%d/description=%s", k, c.description), func(t *testing.T) {
-				var client *hydra.OAuth2Api
+				var client *hydra.AdminApi
 				if c.prepare != nil {
 					client = c.prepare(t)
 				} else {

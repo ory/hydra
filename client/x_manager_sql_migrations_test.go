@@ -58,10 +58,10 @@ func TestXXMigrations(t *testing.T) {
 
 	migratest.RunPackrMigrationTests(
 		t,
-		Migrations,
-		createMigrations,
+		migratest.MigrationSchemas{Migrations},
+		migratest.MigrationSchemas{createMigrations},
 		clean, clean,
-		func(t *testing.T, db *sqlx.DB, k int) {
+		func(t *testing.T, db *sqlx.DB, k,m, steps int) {
 			id := fmt.Sprintf("%d-data", k+1)
 			t.Run("poll="+id, func(t *testing.T) {
 				s := &SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}

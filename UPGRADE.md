@@ -103,7 +103,84 @@ before finalizing the upgrade process.
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+## Hassle-free upgrades
+
+Do you want the latest features and patches without work and hassle? Are you looking for a reliable, scalable, and
+secure deployment with zero effort? We can run it for you! If you're interested,
+[contact us now](mailto:hi@ory.sh)!
+
 ## 1.0.0-rc.1
+
+This release ships with major scalability and reliability improvements and resolves several bugs.
+
+### Schema Changes
+
+Please read all paragraphs of this section with the utmost care, before executing `hydra migrate sql`. Do
+not take this change lightly and create a backup of the database before you begin. To be sure, copy the database
+and do a dry-run locally.
+
+#### Foreign Keys
+
+In order to keep data consistent across tables, several foreign key constraints have been added between consent, oauth2, client tables.
+If you are running a large database take enough time to run this migration - it might take a while depending on the
+amount of data and the database version and driver. Before executing this migration, you should *manually* check and remove
+inconsistent data.
+
+##### Removing inconsistent login & consent data
+
+This migration automatically removes inconsistent login & consent data. Possible impacts are:
+
+1. Users that set `remember` to true during login have to re-authenticate.
+2. Users that set `remember` to true during consent have to re-authorize requested OAuth 2.0 Scope.
+3. Data associated with OAuth 2.0 Clients that have been removed will be deleted.
+
+That is achieved by running the following queries. Make sure you understand what these queries do and what impact
+they may have on your system before executing `hydra migrate sql`:
+
+```sql
+DELETE FROM hydra_oauth2_consent_request_handled WHERE NOT EXISTS (
+  SELECT 1 FROM hydra_oauth2_consent_request WHERE hydra_oauth2_consent_request_handled.challenge = hydra_oauth2_consent_request.challenge
+);
+DELETE FROM hydra_oauth2_authentication_request_handled WHERE NOT EXISTS (
+  SELECT 1 FROM hydra_oauth2_consent_request WHERE hydra_oauth2_authentication_request_handled.challenge = hydra_oauth2_consent_request.challenge
+);
+
+DELETE FROM hydra_oauth2_consent_request WHERE login_challenge='';
+
+DELETE FROM hydra_oauth2_authentication_request WHERE NOT EXISTS (
+  SELECT 1 FROM hydra_client WHERE hydra_oauth2_authentication_request.client_id = hydra_client.id
+);
+DELETE FROM hydra_oauth2_authentication_request WHERE NOT EXISTS (
+  SELECT 1 FROM hydra_oauth2_authentication_session WHERE hydra_oauth2_authentication_request.login_session_id = hydra_oauth2_authentication_session.id
+);
+
+DELETE FROM hydra_oauth2_consent_request WHERE NOT EXISTS (
+  SELECT 1 FROM hydra_client WHERE hydra_oauth2_consent_request.client_id = hydra_client.id
+);
+DELETE FROM hydra_oauth2_consent_request WHERE NOT EXISTS (
+  SELECT 1 FROM hydra_oauth2_authentication_session WHERE hydra_oauth2_consent_request.login_session_id = hydra_oauth2_authentication_session.id
+);
+DELETE FROM hydra_oauth2_consent_request WHERE NOT EXISTS (
+  SELECT 1 FROM hydra_oauth2_authentication_request WHERE hydra_oauth2_consent_request.login_challenge = hydra_oauth2_authentication_request.challenge
+);
+
+DELETE FROM hydra_oauth2_obfuscated_authentication_session WHERE NOT EXISTS (
+  SELECT 1 FROM hydra_client WHERE hydra_oauth2_obfuscated_authentication_session.client_id = hydra_client.id
+);
+```
+
+Be aware that some queries might cascade and remove other data to. One such example is checking `hydra_oauth2_consent_request`
+for rows that have no associated `login_challenge`. If such a row is removed, the associated `hydra_oauth2_consent_request_handled`
+is removed as well.
+
+
+#### Indices
+
+In order to [resolve table locking](https://github.com/ory/hydra/issues/1067) during the refresh token flow, the following indices were added:
+- Unique index on the `request_id` column in the `hydra_oauth2_access` & `hydra_oauth2_refresh` tables
+
+In order to [resolve table locking](https://github.com/ory/hydra/issues/1067) when flushing expired tokens, the following index was added:
+- Index on the `requested_at` column in the `hydra_oauth2_access` table
 
 ### Non-breaking Changes
 
@@ -120,17 +197,6 @@ at the client, the flow will fail and no refresh token will be granted.
 #### Customise login and consent flow timeout
 
 You can now set the login and consent flow timeout using environment variable `LOGIN_CONSENT_REQUEST_LIFESPAN`.
-
-#### Schema Changes
-
-This patch introduces database schema changes. Before you apply it, you must run `hydra migrate sql` against
-your database.
-
-In order to [resolve table locking](https://github.com/ory/hydra/issues/1067) during the refresh token flow, the following indices were added:
-- Unique index on the `request_id` column in the `hydra_oauth2_access` & `hydra_oauth2_refresh` tables
-
-In order to [resolve table locking](https://github.com/ory/hydra/issues/1067) when flushing expired tokens, the following index was added:
-- Index on the `requested_at` column in the `hydra_oauth2_access` table
 
 ### Breaking Changes
 

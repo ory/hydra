@@ -37,14 +37,20 @@ import (
 	"github.com/ory/x/sqlcon/dockertest"
 )
 
+type managerRegistry struct {
+	consent Manager
+}
+
 var m sync.Mutex
 var clientManager = client.NewMemoryManager(&fosite.BCrypt{WorkFactor: 8})
 var fositeManager = oauth2.NewFositeMemoryStore(clientManager, time.Hour)
-var managers = map[string]Manager{
-	"memory": NewMemoryManager(fositeManager),
+var managers = map[string]managerRegistry{
+	"memory": {
+		consent: NewMemoryManager(fositeManager),
+	},
 }
 
-func connectToPostgres(managers map[string]Manager, c client.Manager) {
+func connectToPostgres(managers map[string]managerRegistry, c client.Manager) {
 	db, err := dockertest.ConnectToTestPostgreSQL()
 	if err != nil {
 		log.Fatalf("Could not connect to database: %v", err)
@@ -52,17 +58,12 @@ func connectToPostgres(managers map[string]Manager, c client.Manager) {
 	}
 
 	s := NewSQLManager(db, c, fositeManager)
-	if _, err := s.CreateSchemas(); err != nil {
-		log.Fatalf("Could not connect to database: %v", err)
-		return
-	}
-
 	m.Lock()
-	managers["postgres"] = s
+	managers["postgres"] = managerRegistry{consent: s}
 	m.Unlock()
 }
 
-func connectToMySQL(managers map[string]Manager, c client.Manager) {
+func connectToMySQL(managers map[string]managerRegistry, c client.Manager) {
 	db, err := dockertest.ConnectToTestMySQL()
 	if err != nil {
 		log.Fatalf("Could not connect to database: %v", err)
@@ -70,13 +71,8 @@ func connectToMySQL(managers map[string]Manager, c client.Manager) {
 	}
 
 	s := NewSQLManager(db, c, fositeManager)
-	if _, err := s.CreateSchemas(); err != nil {
-		log.Fatalf("Could not create mysql schema: %v", err)
-		return
-	}
-
 	m.Lock()
-	managers["mysql"] = s
+	managers["mysql"] = managerRegistry{consent: s}
 	m.Unlock()
 }
 
@@ -99,6 +95,12 @@ func TestMain(m *testing.M) {
 
 func TestManagers(t *testing.T) {
 	for k, m := range managers {
-		t.Run("manager="+k, ManagerTests(m, clientManager, fositeManager))
+		if m, ok := m.consent.(*SQLManager); ok {
+			if _, err := m.CreateSchemas(); err != nil {
+				log.Fatalf("Could not connect to database: %v", err)
+				return
+			}
+		}
+		t.Run("manager="+k, ManagerTests(m.consent, clientManager, fositeManager))
 	}
 }

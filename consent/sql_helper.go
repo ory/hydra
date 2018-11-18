@@ -109,7 +109,7 @@ type sqlAuthenticationRequest struct {
 	CSRF                 string     `db:"csrf"`
 	AuthenticatedAt      *time.Time `db:"authenticated_at"`
 	RequestedAt          time.Time  `db:"requested_at"`
-	LoginSessionID       string     `db:"login_session_id"`
+	LoginSessionID       *string     `db:"login_session_id"`
 	WasHandled           bool       `db:"was_handled"`
 }
 
@@ -140,6 +140,11 @@ func newSQLConsentRequest(c *ConsentRequest) (*sqlConsentRequest, error) {
 		return nil, errors.WithStack(err)
 	}
 
+	var sessionID *string
+	if len(c.LoginSessionID) > 0  {
+		*sessionID = c.LoginSessionID
+	}
+
 	return &sqlConsentRequest{
 		sqlAuthenticationRequest: sqlAuthenticationRequest{
 			OpenIDConnectContext: string(oidc),
@@ -154,7 +159,7 @@ func newSQLConsentRequest(c *ConsentRequest) (*sqlConsentRequest, error) {
 			CSRF:                 c.CSRF,
 			AuthenticatedAt:      toMySQLDateHack(c.AuthenticatedAt),
 			RequestedAt:          c.RequestedAt,
-			LoginSessionID:       c.LoginSessionID,
+			LoginSessionID:       sessionID,
 		},
 		LoginChallenge:          c.LoginChallenge,
 		ForcedSubjectIdentifier: c.ForceSubjectIdentifier,
@@ -166,6 +171,11 @@ func newSQLAuthenticationRequest(c *AuthenticationRequest) (*sqlAuthenticationRe
 	oidc, err := json.Marshal(c.OpenIDConnectContext)
 	if err != nil {
 		return nil, errors.WithStack(err)
+	}
+
+	var sessionID *string
+	if len(c.SessionID) > 0  {
+		*sessionID = c.SessionID
 	}
 
 	return &sqlAuthenticationRequest{
@@ -181,7 +191,7 @@ func newSQLAuthenticationRequest(c *AuthenticationRequest) (*sqlAuthenticationRe
 		CSRF:                 c.CSRF,
 		AuthenticatedAt:      toMySQLDateHack(c.AuthenticatedAt),
 		RequestedAt:          c.RequestedAt,
-		LoginSessionID:       c.SessionID,
+		LoginSessionID:       sessionID,
 	}, nil
 }
 
@@ -189,6 +199,11 @@ func (s *sqlAuthenticationRequest) toAuthenticationRequest(client *client.Client
 	var oidc OpenIDConnectContext
 	if err := json.Unmarshal([]byte(s.OpenIDConnectContext), &oidc); err != nil {
 		return nil, errors.WithStack(err)
+	}
+
+	var sessionID string
+	if s.LoginSessionID != nil {
+		sessionID = *s.LoginSessionID
 	}
 
 	return &AuthenticationRequest{
@@ -205,7 +220,7 @@ func (s *sqlAuthenticationRequest) toAuthenticationRequest(client *client.Client
 		AuthenticatedAt:      fromMySQLDateHack(s.AuthenticatedAt),
 		RequestedAt:          s.RequestedAt,
 		WasHandled:           s.WasHandled,
-		SessionID:            s.LoginSessionID,
+		SessionID:            sessionID,
 	}, nil
 }
 
@@ -213,6 +228,11 @@ func (s *sqlConsentRequest) toConsentRequest(client *client.Client) (*ConsentReq
 	var oidc OpenIDConnectContext
 	if err := json.Unmarshal([]byte(s.OpenIDConnectContext), &oidc); err != nil {
 		return nil, errors.WithStack(err)
+	}
+
+	var sessionID string
+	if s.LoginSessionID != nil {
+		sessionID = *s.LoginSessionID
 	}
 
 	return &ConsentRequest{
@@ -230,7 +250,7 @@ func (s *sqlConsentRequest) toConsentRequest(client *client.Client) (*ConsentReq
 		ForceSubjectIdentifier: s.ForcedSubjectIdentifier,
 		RequestedAt:            s.RequestedAt,
 		WasHandled:             s.WasHandled,
-		LoginSessionID:         s.LoginSessionID,
+		LoginSessionID:         sessionID,
 		LoginChallenge:         s.LoginChallenge,
 		ACR:                    s.ACR,
 	}, nil

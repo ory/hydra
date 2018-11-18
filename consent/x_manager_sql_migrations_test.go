@@ -3,6 +3,7 @@ package consent_test
 import (
 	"context"
 	"fmt"
+	"github.com/ory/fosite"
 	"testing"
 
 	"github.com/jmoiron/sqlx"
@@ -21,6 +22,35 @@ var createMigrations = map[string]*migrate.PackrMigrationSource{
 	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), consent.AssetNames(), consent.Asset, []string{"migrations/sql/tests"}),
 }
 
+func cleanDB(t *testing.T, db *sqlx.DB) {
+	_, err := db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_consent_migration")
+	require.NoError(t, err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
+	require.NoError(t, err)
+
+	// hydra_oauth2_authentication_request_handled depends on hydra_oauth2_authentication_request
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request_handled")
+	require.NoError(t, err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request")
+	require.NoError(t, err)
+
+	// hydra_oauth2_consent_request_handled depends on hydra_oauth2_consent_request
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request_handled")
+	require.NoError(t, err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request")
+	require.NoError(t, err)
+
+	// everything depends on hydra_oauth2_authentication_session
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_session")
+	require.NoError(t, err)
+
+	// everything depends on hydra_client
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_client")
+	require.NoError(t, err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_client_migration")
+	require.NoError(t, err)
+}
+
 func TestXXMigrations(t *testing.T) {
 	if testing.Short() {
 		t.SkipNow()
@@ -34,34 +64,35 @@ func TestXXMigrations(t *testing.T) {
 		clients = append(clients, client.Client{ClientID: fmt.Sprintf("%d-client", k+1)})
 	}
 
-	var cm = &client.MemoryManager{Clients: clients}
-
-	var clean = func(t *testing.T, db *sqlx.DB) {
-		_, err := db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request")
-		require.NoError(t, err)
-		_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_consent_migration")
-		require.NoError(t, err)
-		_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request")
-		require.NoError(t, err)
-		_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_session")
-		require.NoError(t, err)
-		_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request_handled")
-		require.NoError(t, err)
-		_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request_handled")
-		require.NoError(t, err)
-		_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
-		require.NoError(t, err)
-	}
+	var clean = cleanDB
 
 	migratest.RunPackrMigrationTests(
 		t,
-		consent.Migrations,
-		createMigrations,
+		migratest.MigrationSchemas{client.Migrations, consent.Migrations},
+		migratest.MigrationSchemas{nil, createMigrations},
 		clean, clean,
-		func(t *testing.T, db *sqlx.DB, k int) {
+		func(t *testing.T, db *sqlx.DB, k, m, steps int) {
+			if m == 0 {
+				t.Run(fmt.Sprintf("create-client=%d", k), func(t *testing.T) {
+					c := &client.SQLManager{DB: db, Hasher: &fosite.BCrypt{}}
+					t.Run(fmt.Sprintf("client=%d", k), func(t *testing.T) {
+						require.NoError(t, c.CreateClient(context.TODO(), &client.Client{ClientID: fmt.Sprintf("%d-client", k+1)}))
+					})
+				})
+				return
+			}
+
 			t.Run(fmt.Sprintf("poll=%d", k), func(t *testing.T) {
+				if m == 1 {
+					t.Skipf("Skipping because %d (current) != %d (steps)", k+1, steps)
+					return
+				}
+
 				kk := k + 1
-				s := consent.NewSQLManager(db, cm, nil)
+
+				c := &client.SQLManager{DB: db, Hasher: &fosite.BCrypt{}}
+
+				s := consent.NewSQLManager(db, c, nil)
 				_, err := s.GetAuthenticationRequest(context.TODO(), fmt.Sprintf("%d-challenge", kk))
 				require.NoError(t, err)
 				_, err = s.GetAuthenticationSession(context.TODO(), fmt.Sprintf("%d-auth", kk))

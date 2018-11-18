@@ -1,0 +1,78 @@
+package main_test
+
+import (
+	"fmt"
+	"github.com/jmoiron/sqlx"
+	"github.com/ory/fosite"
+	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/oauth2"
+	"github.com/ory/x/resilience"
+	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/require"
+	"os"
+	"testing"
+	"time"
+)
+
+func connect(t *testing.T, driver, dsn string) (db *sqlx.DB) {
+	require.NoError(t, resilience.Retry(
+		logrus.New(),
+		time.Second * 5,
+		time.Minute * 5,
+		func() (err error) {
+			db, err = sqlx.Open(driver, dsn)
+			if err != nil {
+				return err
+			}
+
+			return db.Ping()
+		},
+	))
+	return db
+}
+
+func TestCreateSchemasAtRoot(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping database tests in short mode.")
+		return
+	}
+
+	drivers := map[string]string{
+		"TEST_DATABASE_POSTGRESQL": "postgres",
+		"TEST_DATABASE_MYSQL":      "mysql",
+	}
+	urls := map[string]string{
+		"TEST_DATABASE_POSTGRESQL": os.Getenv("TEST_DATABASE_POSTGRESQL"),
+		"TEST_DATABASE_MYSQL":      os.Getenv("TEST_DATABASE_MYSQL"),
+	}
+
+	for e, u := range urls {
+		if len(u) == 0 {
+			t.Fatalf("Environment variable %s is empty but it should point to a database. If you are running this test locally, make sure to run `make test` instead of `go test ./...`", e)
+		}
+
+		driver := drivers[e]
+		t.Run(fmt.Sprintf("driver=%s", driver), func(t *testing.T) {
+			t.Logf("Connecting to database %s: %s", driver, u)
+
+			db := connect(t, driver, u)
+			cm := &client.SQLManager{DB: db, Hasher: &fosite.BCrypt{}}
+			_, err := cm.CreateSchemas()
+			require.NoError(t, err)
+
+			jm := &jwk.SQLManager{DB: db, Cipher: &jwk.AEAD{Key: []byte("11111111111111111111111111111111")}}
+			_, err = jm.CreateSchemas()
+			require.NoError(t, err)
+
+			om := &oauth2.FositeSQLStore{Manager: cm, DB: db, L: logrus.New()}
+			_, err = om.CreateSchemas()
+			require.NoError(t, err)
+
+			crm := consent.NewSQLManager(db, nil, om)
+			_, err = crm.CreateSchemas()
+			require.NoError(t, err)
+		})
+	}
+}

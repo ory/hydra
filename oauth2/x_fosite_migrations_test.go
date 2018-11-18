@@ -55,10 +55,10 @@ func TestXXMigrations(t *testing.T) {
 
 	migratest.RunPackrMigrationTests(
 		t,
-		oauth2.Migrations,
-		createMigrations,
+		migratest.MigrationSchemas{oauth2.Migrations},
+		migratest.MigrationSchemas{createMigrations},
 		clean, clean,
-		func(t *testing.T, db *sqlx.DB, k int) {
+		func(t *testing.T, db *sqlx.DB, k,m, steps int) {
 			t.Run(fmt.Sprintf("poll=%d", k), func(t *testing.T) {
 				sig := fmt.Sprintf("%d-sig", k+1)
 				s := oauth2.NewFositeSQLStore(cm, db, logrus.New(), time.Minute, false)

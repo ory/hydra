@@ -23,10 +23,11 @@ package oauth2_test
 import (
 	"flag"
 	"fmt"
-	"log"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/ory/hydra/consent"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
@@ -41,137 +42,119 @@ import (
 	"github.com/ory/x/sqlcon/dockertest"
 )
 
-var fositeStores = map[string]pkg.FositeStorer{}
+type managerTestSetup struct {
+	f  pkg.FositeStorer
+	cl client.Manager
+	co consent.Manager
+}
+
+var fositeStores = map[string]managerTestSetup{}
 var clientManager = &client.MemoryManager{
 	Clients: []client.Client{{ClientID: "foobar"}},
 	Hasher:  &fosite.BCrypt{},
 }
+var fm = NewFositeMemoryStore(clientManager, time.Hour)
 var databases = make(map[string]*sqlx.DB)
 var m sync.Mutex
 
 func init() {
-	fositeStores["memory"] = NewFositeMemoryStore(nil, time.Hour)
+	fositeStores["memory"] = managerTestSetup{
+		f:  fm,
+		cl: clientManager,
+		co: consent.NewMemoryManager(fm),
+	}
 }
 
 func TestMain(m *testing.M) {
-	runner := dockertest.Register()
-
 	flag.Parse()
-	if !testing.Short() {
-		dockertest.Parallel([]func(){
-			connectToPG,
-			connectToMySQL,
-		})
-	}
-
+	runner := dockertest.Register()
 	runner.Exit(m.Run())
 }
 
-func connectToPG() {
+func connectToPG(t *testing.T) {
 	db, err := dockertest.ConnectToTestPostgreSQL()
-	if err != nil {
-		log.Fatalf("Could not connect to database: %v", err)
-	}
+	require.NoError(t, err)
+	t.Logf("Cleaning postgres db...")
+	cleanDB(t, db)
+	t.Logf("Cleaned postgres db")
 
-	s := &FositeSQLStore{DB: db, Manager: clientManager, L: logrus.New(), AccessTokenLifespan: time.Hour}
-	if _, err := s.CreateSchemas(); err != nil {
-		log.Fatalf("Could not create postgres schema: %v", err)
-	}
+	c := client.NewSQLManager(db, &fosite.BCrypt{WorkFactor: 8})
+	_, err = c.CreateSchemas()
+	require.NoError(t, err)
+
+	cm := consent.NewSQLManager(db, c, nil)
+	_, err = cm.CreateSchemas()
+	require.NoError(t, err)
+
+	s := NewFositeSQLStore(c, db, logrus.New(), time.Hour, false)
+	_, err = s.CreateSchemas()
+	require.NoError(t, err)
 
 	m.Lock()
 	databases["postgres"] = db
-	fositeStores["postgres"] = s
+	fositeStores["postgres"] = managerTestSetup{
+		f:  s,
+		co: cm,
+		cl: c,
+	}
 	m.Unlock()
 }
 
-func connectToMySQL() {
+func connectToMySQL(t *testing.T) {
 	db, err := dockertest.ConnectToTestMySQL()
-	if err != nil {
-		log.Fatalf("Could not connect to database: %v", err)
-	}
+	require.NoError(t, err)
+	t.Logf("Cleaning mysql db...")
+	cleanDB(t, db)
+	t.Logf("Cleaned mysql db")
 
-	s := &FositeSQLStore{DB: db, Manager: clientManager, L: logrus.New(), AccessTokenLifespan: time.Hour}
-	if _, err := s.CreateSchemas(); err != nil {
-		log.Fatalf("Could not create postgres schema: %v", err)
-	}
+	c := client.NewSQLManager(db, &fosite.BCrypt{WorkFactor: 8})
+	_, err = c.CreateSchemas()
+	require.NoError(t, err)
+
+	cm := consent.NewSQLManager(db, c, nil)
+	_, err = cm.CreateSchemas()
+	require.NoError(t, err)
+
+	s := NewFositeSQLStore(c, db, logrus.New(), time.Hour, false)
+	_, err = s.CreateSchemas()
+	require.NoError(t, err)
 
 	m.Lock()
 	databases["mysql"] = db
-	fositeStores["mysql"] = s
+	fositeStores["mysql"] = managerTestSetup{
+		f:  s,
+		co: cm,
+		cl: c,
+	}
 	m.Unlock()
 }
 
-func createSchemas(t *testing.T, f pkg.FositeStorer) {
-	if ff, ok := f.(*FositeSQLStore); ok {
-		_, err := ff.CreateSchemas()
-		require.NoError(t, err)
+func TestManagers(t *testing.T) {
+	if !testing.Short() {
+		dockertest.Parallel([]func(){
+			func() {
+				connectToPG(t)
+			},
+			func() {
+				connectToMySQL(t)
+			},
+		})
 	}
-}
 
-func TestUniqueConstraints(t *testing.T) {
-	// t.Parallel()
-	for storageType, store := range fositeStores {
-		createSchemas(t, store)
-		if storageType == "memory" {
-			// memory store does not deal with unique constraints
-			continue
+	for k, store := range fositeStores {
+		if k != "memory" {
+			t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteAuthorizeCodes/db=%s", k), testHelperUniqueConstraints(store, k))
 		}
-		t.Run(fmt.Sprintf("case=%s", storageType), testHelperUniqueConstraints(store, storageType))
+		t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteAuthorizeCodes/db=%s", k), testHelperCreateGetDeleteAuthorizeCodes(store))
+		t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteAccessTokenSession/db=%s", k), testHelperCreateGetDeleteAccessTokenSession(store))
+		t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteOpenIDConnectSession/db=%s", k), testHelperCreateGetDeleteOpenIDConnectSession(store))
+		t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteRefreshTokenSession/db=%s", k), testHelperCreateGetDeleteRefreshTokenSession(store))
+		t.Run(fmt.Sprintf("case=testHelperRevokeRefreshToken/db=%s", k), testHelperRevokeRefreshToken(store))
+		t.Run(fmt.Sprintf("case=testHelperCreateGetDeletePKCERequestSession/db=%s", k), testHelperCreateGetDeletePKCERequestSession(store))
+		t.Run(fmt.Sprintf("case=testHelperFlushTokens/db=%s", k), testHelperFlushTokens(store, time.Hour))
 	}
-}
 
-func TestCreateGetDeleteAuthorizeCodes(t *testing.T) {
-	// t.Parallel()
-	for k, m := range fositeStores {
-		createSchemas(t, m)
-		t.Run(fmt.Sprintf("case=%s", k), testHelperCreateGetDeleteAuthorizeCodes(m))
-	}
-}
-
-func TestCreateGetDeleteAccessTokenSession(t *testing.T) {
-	// t.Parallel()
-	for k, m := range fositeStores {
-		createSchemas(t, m)
-		t.Run(fmt.Sprintf("case=%s", k), testHelperCreateGetDeleteAccessTokenSession(m))
-	}
-}
-
-func TestCreateGetDeleteOpenIDConnectSession(t *testing.T) {
-	// t.Parallel()
-	for k, m := range fositeStores {
-		createSchemas(t, m)
-		t.Run(fmt.Sprintf("case=%s", k), testHelperCreateGetDeleteOpenIDConnectSession(m))
-	}
-}
-
-func TestCreateGetDeleteRefreshTokenSession(t *testing.T) {
-	// t.Parallel()
-	for k, m := range fositeStores {
-		createSchemas(t, m)
-		t.Run(fmt.Sprintf("case=%s", k), testHelperCreateGetDeleteRefreshTokenSession(m))
-	}
-}
-
-func TestRevokeRefreshToken(t *testing.T) {
-	// t.Parallel()
-	for k, m := range fositeStores {
-		createSchemas(t, m)
-		t.Run(fmt.Sprintf("case=%s", k), testHelperRevokeRefreshToken(m))
-	}
-}
-
-func TestPKCERequest(t *testing.T) {
-	// t.Parallel()
-	for k, m := range fositeStores {
-		createSchemas(t, m)
-		t.Run(fmt.Sprintf("case=%s", k), testHelperCreateGetDeletePKCERequestSession(m))
-	}
-}
-
-func TestFlushAccessTokens(t *testing.T) {
-	// t.Parallel()
-	for k, m := range fositeStores {
-		createSchemas(t, m)
-		t.Run(fmt.Sprintf("case=%s", k), testHelperFlushTokens(m, time.Hour))
+	for _, m := range databases {
+		cleanDB(t, m)
 	}
 }

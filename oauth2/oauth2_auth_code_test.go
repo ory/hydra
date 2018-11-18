@@ -35,6 +35,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/client"
+
 	djwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
@@ -97,62 +99,77 @@ type clientCreator interface {
 // - [x] If `id_token_hint` is handled properly
 //   - [x] What happens if `id_token_hint` does not match the value from the handled authentication request ("accept login")
 func TestAuthCodeWithDefaultStrategy(t *testing.T) {
-	for _, strat := range []struct {
-		d string
-		s foauth2.CoreStrategy
-	}{
-		{
-			d: "opaque",
-			s: oauth2OpqaueStrategy,
-		},
-		{
-			d: "jwt",
-			s: oauth2JWTStrategy,
-		},
-	} {
-		t.Run("strategy="+strat.d, func(t *testing.T) {
-			var m sync.Mutex
-			l := logrus.New()
-			l.Level = logrus.DebugLevel
-			var lph, cph func(w http.ResponseWriter, r *http.Request)
-			lp := mockProvider(&lph)
-			cp := mockProvider(&cph)
-			jwts := &jwt.RS256JWTStrategy{
-				PrivateKey: pkg.MustINSECURELOWENTROPYRSAKEYFORTEST(),
+	for km, fs := range fositeStores {
+		t.Run("manager="+km, func(t *testing.T) {
+			var cm consent.Manager
+			switch km {
+			case "memory":
+				cm = consent.NewMemoryManager(fs.f)
+				fs.f.(*FositeMemoryStore).Manager = hc.NewMemoryManager(hasher)
+			case "mysql":
+				fallthrough
+			case "postgres":
+				db := databases[km]
+				cleanDB(t, db)
+
+				//c := client.NewSQLManager(db, &fosite.BCrypt{WorkFactor: 8})
+				//_, err = c.CreateSchemas()
+				//require.NoError(t, err)
+				//cm := consent.NewSQLManager(db, c, nil)
+				//_, err = cm.CreateSchemas()
+				//require.NoError(t, err)
+				//s := NewFositeSQLStore(c, db, logrus.New(), time.Hour, false)
+				//_, err = s.CreateSchemas()
+				//require.NoError(t, err)
+
+				_, err := fs.cl.(*client.SQLManager).CreateSchemas()
+				require.NoError(t, err)
+
+				scm := consent.NewSQLManager(databases[km], fs.cl, fs.f)
+				_, err = scm.CreateSchemas()
+				require.NoError(t, err)
+
+				_, err = (fs.f.(*FositeSQLStore)).CreateSchemas()
+				require.NoError(t, err)
+
+				cm = scm
 			}
-			hasher := &fosite.BCrypt{
-				WorkFactor: 4,
-			}
 
-			fooUserIDToken, _, err := jwts.Generate(context.TODO(), jwt.IDTokenClaims{
-				Subject:   "foouser",
-				ExpiresAt: time.Now().Add(time.Hour),
-				IssuedAt:  time.Now(),
-			}.ToMapClaims(), jwt.NewHeaders())
-			require.NoError(t, err)
-
-			// we create a new fositeStore here because the old one
-
-			for km, fs := range fositeStores {
-				t.Run("manager="+km, func(t *testing.T) {
-					var cm consent.Manager
-					switch km {
-					case "memory":
-						cm = consent.NewMemoryManager(fs)
-						fs.(*FositeMemoryStore).Manager = hc.NewMemoryManager(hasher)
-					case "mysql":
-						fallthrough
-					case "postgres":
-						scm := consent.NewSQLManager(databases[km], fs.(*FositeSQLStore).Manager, fs)
-						_, err = scm.CreateSchemas()
-						require.NoError(t, err)
-
-						_, err = (fs.(*FositeSQLStore)).CreateSchemas()
-						require.NoError(t, err)
-
-						cm = scm
+			for _, strat := range []struct {
+				d string
+				s foauth2.CoreStrategy
+			}{
+				{
+					d: "opaque",
+					s: oauth2OpqaueStrategy,
+				},
+				{
+					d: "jwt",
+					s: oauth2JWTStrategy,
+				},
+			} {
+				t.Run("strategy="+strat.d, func(t *testing.T) {
+					var m sync.Mutex
+					l := logrus.New()
+					l.Level = logrus.DebugLevel
+					var lph, cph func(w http.ResponseWriter, r *http.Request)
+					lp := mockProvider(&lph)
+					cp := mockProvider(&cph)
+					jwts := &jwt.RS256JWTStrategy{
+						PrivateKey: pkg.MustINSECURELOWENTROPYRSAKEYFORTEST(),
+					}
+					hasher := &fosite.BCrypt{
+						WorkFactor: 4,
 					}
 
+					fooUserIDToken, _, err := jwts.Generate(context.TODO(), jwt.IDTokenClaims{
+						Subject:   "foouser",
+						ExpiresAt: time.Now().Add(time.Hour),
+						IssuedAt:  time.Now(),
+					}.ToMapClaims(), jwt.NewHeaders())
+					require.NoError(t, err)
+
+					// we create a new fositeStore here because the old one
 					router := httprouter.New()
 					ts := httptest.NewServer(router)
 					cookieStore := sessions.NewCookieStore([]byte("foo-secret"))
@@ -177,7 +194,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					fc.RefreshTokenLifespan = time.Second * 2
 					handler := &Handler{
 						OAuth2: compose.Compose(
-							fc, fs, strat.s, hasher,
+							fc, fs.f, strat.s, hasher,
 							compose.OAuth2AuthorizeExplicitFactory,
 							compose.OAuth2AuthorizeImplicitFactory,
 							compose.OAuth2ClientCredentialsGrantFactory,
@@ -218,7 +235,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						RedirectURL: client.RedirectURIs[0], Scopes: []string{"hydra", "offline", "openid"},
 					}
 
-					require.NoError(t, fs.(clientCreator).CreateClient(context.TODO(), &client))
+					require.NoError(t, fs.f.(clientCreator).CreateClient(context.TODO(), &client))
 					apiClient := swagger.NewAdminApiWithBasePath(api.URL)
 
 					var callbackHandler *httprouter.Handle

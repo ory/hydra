@@ -161,12 +161,14 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 
 func (h *MigrateHandler) runMigrateSQL(db *sqlx.DB) error {
 	var total int
-	for k, m := range map[string]schemaCreator{
+	migrators := map[string]schemaCreator{
 		"client":  &client.SQLManager{DB: db},
 		"oauth2":  &oauth2.FositeSQLStore{DB: db},
 		"jwk":     &jwk.SQLManager{DB: db},
 		"consent": consent.NewSQLManager(db, nil, nil),
-	} {
+	}
+	for _, k := range []string{"jwk", "client", "consent", "oauth2"} {
+		m := migrators[k]
 		fmt.Printf("Applying `%s` SQL migrations...\n", k)
 		if num, err := m.CreateSchemas(); err != nil {
 			return errors.Wrapf(err, "could not apply %s SQL migrations", k)

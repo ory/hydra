@@ -21,6 +21,7 @@
 package consent
 
 import (
+	"database/sql"
 	"encoding/json"
 	"strings"
 	"time"
@@ -97,20 +98,20 @@ var sqlParamsAuthSession = []string{
 }
 
 type sqlAuthenticationRequest struct {
-	OpenIDConnectContext string     `db:"oidc_context"`
-	Client               string     `db:"client_id"`
-	Subject              string     `db:"subject"`
-	RequestURL           string     `db:"request_url"`
-	Skip                 bool       `db:"skip"`
-	Challenge            string     `db:"challenge"`
-	RequestedScope       string     `db:"requested_scope"`
-	RequestedAudience    string     `db:"requested_at_audience"`
-	Verifier             string     `db:"verifier"`
-	CSRF                 string     `db:"csrf"`
-	AuthenticatedAt      *time.Time `db:"authenticated_at"`
-	RequestedAt          time.Time  `db:"requested_at"`
-	LoginSessionID       *string     `db:"login_session_id"`
-	WasHandled           bool       `db:"was_handled"`
+	OpenIDConnectContext string          `db:"oidc_context"`
+	Client               string          `db:"client_id"`
+	Subject              string          `db:"subject"`
+	RequestURL           string          `db:"request_url"`
+	Skip                 bool            `db:"skip"`
+	Challenge            string          `db:"challenge"`
+	RequestedScope       string          `db:"requested_scope"`
+	RequestedAudience    string          `db:"requested_at_audience"`
+	Verifier             string          `db:"verifier"`
+	CSRF                 string          `db:"csrf"`
+	AuthenticatedAt      *time.Time      `db:"authenticated_at"`
+	RequestedAt          time.Time       `db:"requested_at"`
+	LoginSessionID       *sql.NullString `db:"login_session_id"`
+	WasHandled           bool            `db:"was_handled"`
 }
 
 type sqlConsentRequest struct {
@@ -140,9 +141,12 @@ func newSQLConsentRequest(c *ConsentRequest) (*sqlConsentRequest, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	var sessionID *string
-	if len(c.LoginSessionID) > 0  {
-		*sessionID = c.LoginSessionID
+	var sessionID sql.NullString
+	if len(c.LoginSessionID) > 0 {
+		sessionID = sql.NullString{
+			Valid:  true,
+			String: c.LoginSessionID,
+		}
 	}
 
 	return &sqlConsentRequest{
@@ -159,7 +163,7 @@ func newSQLConsentRequest(c *ConsentRequest) (*sqlConsentRequest, error) {
 			CSRF:                 c.CSRF,
 			AuthenticatedAt:      toMySQLDateHack(c.AuthenticatedAt),
 			RequestedAt:          c.RequestedAt,
-			LoginSessionID:       sessionID,
+			LoginSessionID:       &sessionID,
 		},
 		LoginChallenge:          c.LoginChallenge,
 		ForcedSubjectIdentifier: c.ForceSubjectIdentifier,
@@ -173,9 +177,12 @@ func newSQLAuthenticationRequest(c *AuthenticationRequest) (*sqlAuthenticationRe
 		return nil, errors.WithStack(err)
 	}
 
-	var sessionID *string
-	if len(c.SessionID) > 0  {
-		*sessionID = c.SessionID
+	var sessionID sql.NullString
+	if len(c.SessionID) > 0 {
+		sessionID = sql.NullString{
+			Valid:  true,
+			String: c.SessionID,
+		}
 	}
 
 	return &sqlAuthenticationRequest{
@@ -191,7 +198,7 @@ func newSQLAuthenticationRequest(c *AuthenticationRequest) (*sqlAuthenticationRe
 		CSRF:                 c.CSRF,
 		AuthenticatedAt:      toMySQLDateHack(c.AuthenticatedAt),
 		RequestedAt:          c.RequestedAt,
-		LoginSessionID:       sessionID,
+		LoginSessionID:       &sessionID,
 	}, nil
 }
 
@@ -199,11 +206,6 @@ func (s *sqlAuthenticationRequest) toAuthenticationRequest(client *client.Client
 	var oidc OpenIDConnectContext
 	if err := json.Unmarshal([]byte(s.OpenIDConnectContext), &oidc); err != nil {
 		return nil, errors.WithStack(err)
-	}
-
-	var sessionID string
-	if s.LoginSessionID != nil {
-		sessionID = *s.LoginSessionID
 	}
 
 	return &AuthenticationRequest{
@@ -220,7 +222,7 @@ func (s *sqlAuthenticationRequest) toAuthenticationRequest(client *client.Client
 		AuthenticatedAt:      fromMySQLDateHack(s.AuthenticatedAt),
 		RequestedAt:          s.RequestedAt,
 		WasHandled:           s.WasHandled,
-		SessionID:            sessionID,
+		SessionID:            s.LoginSessionID.String,
 	}, nil
 }
 
@@ -228,11 +230,6 @@ func (s *sqlConsentRequest) toConsentRequest(client *client.Client) (*ConsentReq
 	var oidc OpenIDConnectContext
 	if err := json.Unmarshal([]byte(s.OpenIDConnectContext), &oidc); err != nil {
 		return nil, errors.WithStack(err)
-	}
-
-	var sessionID string
-	if s.LoginSessionID != nil {
-		sessionID = *s.LoginSessionID
 	}
 
 	return &ConsentRequest{
@@ -250,7 +247,7 @@ func (s *sqlConsentRequest) toConsentRequest(client *client.Client) (*ConsentReq
 		ForceSubjectIdentifier: s.ForcedSubjectIdentifier,
 		RequestedAt:            s.RequestedAt,
 		WasHandled:             s.WasHandled,
-		LoginSessionID:         sessionID,
+		LoginSessionID:         s.LoginSessionID.String,
 		LoginChallenge:         s.LoginChallenge,
 		ACR:                    s.ACR,
 	}, nil

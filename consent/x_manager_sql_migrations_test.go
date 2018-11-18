@@ -28,16 +28,16 @@ func cleanDB(t *testing.T, db *sqlx.DB) {
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
 	require.NoError(t, err)
 
-	// hydra_oauth2_authentication_request_handled depends on hydra_oauth2_authentication_request
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request_handled")
-	require.NoError(t, err)
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request")
-	require.NoError(t, err)
-
 	// hydra_oauth2_consent_request_handled depends on hydra_oauth2_consent_request
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request_handled")
 	require.NoError(t, err)
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request")
+	require.NoError(t, err)
+
+	// hydra_oauth2_authentication_request_handled depends on hydra_oauth2_authentication_request
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request_handled")
+	require.NoError(t, err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request")
 	require.NoError(t, err)
 
 	// everything depends on hydra_oauth2_authentication_session

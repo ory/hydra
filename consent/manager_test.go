@@ -22,7 +22,8 @@ package consent_test
 
 import (
 	"flag"
-	"log"
+	"github.com/ory/hydra/pkg"
+	"github.com/stretchr/testify/require"
 	"sync"
 	"testing"
 	"time"
@@ -39,6 +40,8 @@ import (
 
 type managerRegistry struct {
 	consent Manager
+	client  client.Manager
+	fosite  pkg.FositeStorer
 }
 
 var m sync.Mutex
@@ -47,60 +50,91 @@ var fositeManager = oauth2.NewFositeMemoryStore(clientManager, time.Hour)
 var managers = map[string]managerRegistry{
 	"memory": {
 		consent: NewMemoryManager(fositeManager),
+		client:  clientManager,
+		fosite:  fositeManager,
 	},
 }
 
-func connectToPostgres(managers map[string]managerRegistry, c client.Manager) {
+func connectToPostgres(t *testing.T, managers map[string]managerRegistry) {
 	db, err := dockertest.ConnectToTestPostgreSQL()
-	if err != nil {
-		log.Fatalf("Could not connect to database: %v", err)
-		return
-	}
+	require.NoError(t, err)
+	t.Logf("Cleaning postgres db...")
+	cleanDB(t, db)
+	t.Logf("Cleaned postgres db")
+
+	c := client.NewSQLManager(db, &fosite.BCrypt{WorkFactor: 8})
+	d, err := c.CreateSchemas()
+	require.NoError(t, err)
+	t.Logf("Migrated %d postgres schemas", d)
+
+	fositeManager := oauth2.NewFositeMemoryStore(c, time.Hour)
 
 	s := NewSQLManager(db, c, fositeManager)
+	d, err = s.CreateSchemas()
+	t.Logf("Migrated %d postgres schemas", d)
+	require.NoError(t, err)
+
 	m.Lock()
-	managers["postgres"] = managerRegistry{consent: s}
+	managers["postgres"] = managerRegistry{
+		consent: s,
+		client:  c,
+		fosite: fositeManager,
+	}
 	m.Unlock()
 }
 
-func connectToMySQL(managers map[string]managerRegistry, c client.Manager) {
+func connectToMySQL(t *testing.T, managers map[string]managerRegistry) {
 	db, err := dockertest.ConnectToTestMySQL()
-	if err != nil {
-		log.Fatalf("Could not connect to database: %v", err)
-		return
-	}
+	require.NoError(t, err)
+	t.Logf("Cleaning mysql db...")
+	cleanDB(t, db)
+	t.Logf("Cleaned mysql db")
+
+	c := client.NewSQLManager(db, &fosite.BCrypt{WorkFactor: 8})
+	d, err := c.CreateSchemas()
+	require.NoError(t, err)
+	t.Logf("Migrated %d mysql schemas", d)
+
+	fositeManager := oauth2.NewFositeMemoryStore(c, time.Hour)
 
 	s := NewSQLManager(db, c, fositeManager)
+	d, err = s.CreateSchemas()
+	t.Logf("Migrated %d mysql schemas", d)
+	require.NoError(t, err)
+
 	m.Lock()
-	managers["mysql"] = managerRegistry{consent: s}
+	managers["mysql"] = managerRegistry{
+		consent: s,
+		client:  c,
+		fosite: fositeManager,
+	}
 	m.Unlock()
 }
 
 func TestMain(m *testing.M) {
 	runner := dockertest.Register()
-
 	flag.Parse()
-	if !testing.Short() {
-		dockertest.Parallel([]func(){
-			func() {
-				connectToPostgres(managers, clientManager)
-			}, func() {
-				connectToMySQL(managers, clientManager)
-			},
-		})
-	}
-
 	runner.Exit(m.Run())
 }
 
 func TestManagers(t *testing.T) {
+	if !testing.Short() {
+		dockertest.Parallel([]func(){
+			func() {
+				connectToPostgres(t, managers)
+			}, func() {
+				connectToMySQL(t, managers)
+			},
+		})
+	}
+
 	for k, m := range managers {
-		if m, ok := m.consent.(*SQLManager); ok {
-			if _, err := m.CreateSchemas(); err != nil {
-				log.Fatalf("Could not connect to database: %v", err)
-				return
-			}
+		t.Run("manager="+k, ManagerTests(m.consent, m.client, m.fosite))
+	}
+
+	for _, m := range managers {
+		if mm, ok := m.consent.(*SQLManager); ok {
+			cleanDB(t, mm.DB)
 		}
-		t.Run("manager="+k, ManagerTests(m.consent, clientManager, fositeManager))
 	}
 }

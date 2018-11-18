@@ -113,7 +113,7 @@ func TestSDK(t *testing.T) {
 	require.EqualValues(t, http.StatusOK, res.StatusCode)
 	compareSDKConsentRequest(t, cr2, crGot)
 
-	res, err = sdk.RevokeUserClientConsentSessions("subject2", "client2")
+	res, err = sdk.RevokeUserClientConsentSessions("subject2", "fk-client-2")
 	require.NoError(t, err)
 	require.EqualValues(t, http.StatusNoContent, res.StatusCode)
 

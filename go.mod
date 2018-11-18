@@ -25,7 +25,7 @@ require (
 	github.com/ory/graceful v0.1.0
 	github.com/ory/herodot v0.4.1
 	github.com/ory/sqlcon v0.0.7
-	github.com/ory/x v0.0.28
+	github.com/ory/x v0.0.29
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.8.0

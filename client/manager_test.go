@@ -45,15 +45,6 @@ func init() {
 
 func TestMain(m *testing.M) {
 	runner := dockertest.Register()
-
-	flag.Parse()
-	if !testing.Short() {
-		dockertest.Parallel([]func(){
-			connectToPG,
-			connectToMySQL,
-		})
-	}
-
 	runner.Exit(m.Run())
 }
 
@@ -81,32 +72,37 @@ func connectToPG() {
 	m.Unlock()
 }
 
-func TestCreateGetDeleteClient(t *testing.T) {
-	for k, m := range clientManagers {
-		if s, ok := m.(*SQLManager); ok {
-			_, err := s.CreateSchemas()
-			require.NoError(t, err)
-		}
-		t.Run(fmt.Sprintf("case=%s", k), TestHelperCreateGetDeleteClient(k, m))
+func TestManagers(t *testing.T) {
+	flag.Parse()
+	if !testing.Short() {
+		dockertest.Parallel([]func(){
+			connectToPG,
+			connectToMySQL,
+		})
 	}
-}
 
-func TestClientAutoGenerateKey(t *testing.T) {
 	for k, m := range clientManagers {
-		if s, ok := m.(*SQLManager); ok {
+		s, ok := m.(*SQLManager)
+		if ok {
+			CleanTestDB(t, s.DB)
 			_, err := s.CreateSchemas()
 			require.NoError(t, err)
 		}
-		t.Run(fmt.Sprintf("case=%s", k), TestHelperClientAutoGenerateKey(k, m))
-	}
-}
 
-func TestAuthenticateClient(t *testing.T) {
-	for k, m := range clientManagers {
-		if s, ok := m.(*SQLManager); ok {
-			_, err := s.CreateSchemas()
-			require.NoError(t, err)
+		t.Run("case=create-get-delete", func(t *testing.T) {
+			t.Run(fmt.Sprintf("db=%s", k), TestHelperCreateGetDeleteClient(k, m))
+		})
+
+		t.Run("case=autogenerate-key", func(t *testing.T) {
+			t.Run(fmt.Sprintf("db=%s", k), TestHelperClientAutoGenerateKey(k, m))
+		})
+
+		t.Run("case=auth-client", func(t *testing.T) {
+			t.Run(fmt.Sprintf("db=%s", k), TestHelperClientAuthenticate(k, m))
+		})
+
+		if ok {
+			CleanTestDB(t, s.DB)
 		}
-		t.Run(fmt.Sprintf("case=%s", k), TestHelperClientAuthenticate(k, m))
 	}
 }

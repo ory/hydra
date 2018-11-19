@@ -96,7 +96,7 @@ func TestIntrospectorSDK(t *testing.T) {
 			expectCode     int
 			scopes         []string
 			assert         func(*testing.T, *hydra.OAuth2TokenIntrospection)
-			prepare        func(*testing.T) *hydra.OAuth2Api
+			prepare        func(*testing.T) *hydra.AdminApi
 		}{
 			{
 				description:    "should fail because invalid token was supplied",
@@ -175,11 +175,11 @@ func TestIntrospectorSDK(t *testing.T) {
 			},
 		} {
 			t.Run(fmt.Sprintf("case=%d/description=%s", k, c.description), func(t *testing.T) {
-				var client *hydra.OAuth2Api
+				var client *hydra.AdminApi
 				if c.prepare != nil {
 					client = c.prepare(t)
 				} else {
-					client = hydra.NewOAuth2ApiWithBasePath(server.URL)
+					client = hydra.NewAdminApiWithBasePath(server.URL)
 					//client.Configuration.Username = "my-client"
 					//client.Configuration.Password = "foobar"
 				}

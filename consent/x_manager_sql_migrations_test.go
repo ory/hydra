@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/ory/fosite"
+
 	"github.com/jmoiron/sqlx"
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
@@ -21,6 +23,38 @@ var createMigrations = map[string]*migrate.PackrMigrationSource{
 	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), consent.AssetNames(), consent.Asset, []string{"migrations/sql/tests"}),
 }
 
+func cleanDB(t *testing.T, db *sqlx.DB) {
+	_, err := db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_consent_migration")
+	require.NoError(t, err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
+	require.NoError(t, err)
+
+	// hydra_oauth2_consent_request_handled depends on hydra_oauth2_consent_request
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request_handled")
+	require.NoError(t, err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request")
+	require.NoError(t, err)
+
+	// hydra_oauth2_authentication_request_handled depends on hydra_oauth2_authentication_request
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request_handled")
+	require.NoError(t, err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request")
+	require.NoError(t, err)
+
+	// everything depends on hydra_oauth2_authentication_session
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_session")
+	require.NoError(t, err)
+
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
+	require.NoError(t, err)
+
+	// everything depends on hydra_client
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_client")
+	require.NoError(t, err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_client_migration")
+	require.NoError(t, err)
+}
+
 func TestXXMigrations(t *testing.T) {
 	if testing.Short() {
 		t.SkipNow()
@@ -34,43 +68,38 @@ func TestXXMigrations(t *testing.T) {
 		clients = append(clients, client.Client{ClientID: fmt.Sprintf("%d-client", k+1)})
 	}
 
-	var cm = &client.MemoryManager{Clients: clients}
-
-	var clean = func(t *testing.T, db *sqlx.DB) {
-		_, err := db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request")
-		require.NoError(t, err)
-		_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_consent_migration")
-		require.NoError(t, err)
-		_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request")
-		require.NoError(t, err)
-		_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_session")
-		require.NoError(t, err)
-		_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request_handled")
-		require.NoError(t, err)
-		_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request_handled")
-		require.NoError(t, err)
-		_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
-		require.NoError(t, err)
-	}
+	var clean = cleanDB
 
 	migratest.RunPackrMigrationTests(
 		t,
-		consent.Migrations,
-		createMigrations,
+		migratest.MigrationSchemas{client.Migrations, consent.Migrations},
+		migratest.MigrationSchemas{nil, createMigrations},
 		clean, clean,
-		func(t *testing.T, db *sqlx.DB, k int) {
-			t.Run(fmt.Sprintf("poll=%d", k), func(t *testing.T) {
-				kk := k + 1
-				s := consent.NewSQLManager(db, cm, nil)
+		func(t *testing.T, db *sqlx.DB, sk, step, steps int) {
+			if sk == 0 {
+				t.Skip("Nothing to do...")
+				return
+			}
+
+			t.Run(fmt.Sprintf("poll=%d", step), func(t *testing.T) {
+				kk := step + 1
+				if kk <= 2 {
+					t.Skip("Skipping the first two entries were deleted in migration 7.sql login_session_id is not defined")
+					return
+				}
+
+				c := &client.SQLManager{DB: db, Hasher: &fosite.BCrypt{}}
+
+				s := consent.NewSQLManager(db, c, nil)
 				_, err := s.GetAuthenticationRequest(context.TODO(), fmt.Sprintf("%d-challenge", kk))
-				require.NoError(t, err)
-				_, err = s.GetAuthenticationSession(context.TODO(), fmt.Sprintf("%d-auth", kk))
-				require.NoError(t, err)
+				require.NoError(t, err, "%d-challenge", kk)
+				_, err = s.GetAuthenticationSession(context.TODO(), fmt.Sprintf("%d-login-session-id", kk))
+				require.NoError(t, err, "%d-login-session-id", kk)
 				_, err = s.GetConsentRequest(context.TODO(), fmt.Sprintf("%d-challenge", kk))
-				require.NoError(t, err)
-				if k > 1 {
+				require.NoError(t, err, "%d-challenge", kk)
+				if step > 1 {
 					_, err = s.GetForcedObfuscatedAuthenticationSession(context.TODO(), fmt.Sprintf("%d-client", kk), fmt.Sprintf("%d-obfuscated", kk))
-					require.NoError(t, err)
+					require.NoError(t, err, "%d-client", kk)
 				}
 			})
 		},

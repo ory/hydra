@@ -44,8 +44,8 @@ type JWKHandler struct {
 	Config *config.Config
 }
 
-func (h *JWKHandler) newJwkManager(cmd *cobra.Command) *hydra.JsonWebKeyApi {
-	c := hydra.NewJsonWebKeyApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlashOrFail(cmd))
+func (h *JWKHandler) newJwkManager(cmd *cobra.Command) *hydra.AdminApi {
+	c := hydra.NewAdminApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlashOrFail(cmd))
 	c.Configuration = configureClient(cmd, c.Configuration)
 	return c
 }

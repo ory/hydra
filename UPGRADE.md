@@ -112,7 +112,99 @@ before finalizing the upgrade process.
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+## Hassle-free upgrades
+
+Do you want the latest features and patches without work and hassle? Are you looking for a reliable, scalable, and
+secure deployment with zero effort? We can run it for you! If you're interested,
+[contact us now](mailto:hi@ory.sh)!
+
 ## 1.0.0-rc.1
+
+This release ships with major scalability and reliability improvements and resolves several bugs.
+
+### Schema Changes
+
+Please read all paragraphs of this section with the utmost care, before executing `hydra migrate sql`. Do
+not take this change lightly and create a backup of the database before you begin. To be sure, copy the database
+and do a dry-run locally.
+
+#### Foreign Keys
+
+In order to keep data consistent across tables, several foreign key constraints have been added between consent, oauth2, client tables.
+If you are running a large database take enough time to run this migration - it might take a while depending on the
+amount of data and the database version and driver. Before executing this migration, you should *manually* check and remove
+inconsistent data.
+
+##### Removing inconsistent oauth2 data
+
+This migration automatically removes inconsistent OAuth 2.0 and OpenID Connect data. Possible impacts are:
+
+1. Existing authorize codes, access, refresh tokens might be invalidated.
+2. Existing pkce and OpenID Connect session might be invalidated.
+
+As OAuth 2.0 clients are generally capable of handling re-authorization, this should not have a serious impact. Removing
+this data increases security through strong consistency.
+
+The following `DELETE` statements will be executed:
+
+```
+DELETE FROM hydra_oauth2_access as h WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE h.client_id = hydra_client.id);
+DELETE FROM hydra_oauth2_refresh as h WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE h.client_id = hydra_client.id);
+DELETE FROM hydra_oauth2_code as h WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE h.client_id = hydra_client.id);
+DELETE FROM hydra_oauth2_oidc as h WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE h.client_id = hydra_client.id);
+DELETE FROM hydra_oauth2_pkce as h WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE h.client_id = hydra_client.id);
+
+DELETE FROM hydra_oauth2_access as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request_handled WHERE h.request_id = hydra_oauth2_consent_request_handled.challenge);
+DELETE FROM hydra_oauth2_refresh as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request_handled WHERE h.request_id = hydra_oauth2_consent_request_handled.challenge);
+DELETE FROM hydra_oauth2_code as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request_handled WHERE h.request_id = hydra_oauth2_consent_request_handled.challenge);
+DELETE FROM hydra_oauth2_oidc as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request_handled WHERE h.request_id = hydra_oauth2_consent_request_handled.challenge);
+DELETE FROM hydra_oauth2_pkce as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request_handled WHERE h.request_id = hydra_oauth2_consent_request_handled.challenge);
+
+DELETE FROM hydra_oauth2_access WHERE LENGTH(request_id) > 40 OR request_id = '';
+DELETE FROM hydra_oauth2_refresh WHERE LENGTH(request_id) > 40 OR request_id = '';
+DELETE FROM hydra_oauth2_code WHERE LENGTH(request_id) > 40 OR request_id = '';
+DELETE FROM hydra_oauth2_oidc WHERE LENGTH(request_id) > 40 OR request_id = '';
+DELETE FROM hydra_oauth2_pkce WHERE LENGTH(request_id) > 40 OR request_id = '';
+```
+
+##### Removing inconsistent login & consent data
+
+This migration automatically removes inconsistent login & consent data. Possible impacts are:
+
+1. Users that set `remember` to true during login have to re-authenticate.
+2. Users that set `remember` to true during consent have to re-authorize requested OAuth 2.0 Scope.
+3. Data associated with OAuth 2.0 Clients that have been removed will be deleted.
+
+That is achieved by running the following queries. Make sure you understand what these queries do and what impact
+they may have on your system before executing `hydra migrate sql`:
+
+```sql
+DELETE FROM hydra_oauth2_consent_request_handled as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request WHERE h.challenge = hydra_oauth2_consent_request.challenge);
+DELETE FROM hydra_oauth2_authentication_request_handled as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request WHERE h.challenge = hydra_oauth2_consent_request.challenge);
+
+DELETE FROM hydra_oauth2_consent_request WHERE login_challenge='';
+
+DELETE FROM hydra_oauth2_authentication_request as h WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE h.client_id = hydra_client.id);
+DELETE FROM hydra_oauth2_authentication_request as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_authentication_session WHERE h.login_session_id = hydra_oauth2_authentication_session.id);
+
+DELETE FROM hydra_oauth2_consent_request as h WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE h.client_id = hydra_client.id);
+DELETE FROM hydra_oauth2_consent_request as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_authentication_session WHERE h.login_session_id = hydra_oauth2_authentication_session.id);
+DELETE FROM hydra_oauth2_consent_request as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_authentication_request WHERE h.login_challenge = hydra_oauth2_authentication_request.challenge);
+
+DELETE FROM hydra_oauth2_obfuscated_authentication_session as h WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE h.client_id = hydra_client.id);
+```
+
+Be aware that some queries might cascade and remove other data to. One such example is checking `hydra_oauth2_consent_request`
+for rows that have no associated `login_challenge`. If such a row is removed, the associated `hydra_oauth2_consent_request_handled`
+is removed as well.
+
+#### Indices
+
+In order to [resolve table locking](https://github.com/ory/hydra/issues/1067) during the refresh token flow, the following indices were added:
+- Unique index on the `request_id` column in the `hydra_oauth2_access` & `hydra_oauth2_refresh` tables
+
+In order to [resolve table locking](https://github.com/ory/hydra/issues/1067) when flushing expired tokens, the following index was added:
+- Index on the `requested_at` column in the `hydra_oauth2_access` table
 
 ### Non-breaking Changes
 
@@ -130,18 +222,34 @@ at the client, the flow will fail and no refresh token will be granted.
 
 You can now set the login and consent flow timeout using environment variable `LOGIN_CONSENT_REQUEST_LIFESPAN`.
 
-#### Schema Changes
-
-This patch introduces database schema changes. Before you apply it, you must run `hydra migrate sql` against
-your database.
-
-In order to [resolve table locking](https://github.com/ory/hydra/issues/1067) during the refresh token flow, the following indices were added:
-- Unique index on the `request_id` column in the `hydra_oauth2_access` & `hydra_oauth2_refresh` tables
-
-In order to [resolve table locking](https://github.com/ory/hydra/issues/1067) when flushing expired tokens, the following index was added:
-- Index on the `requested_at` column in the `hydra_oauth2_access` table
-
 ### Breaking Changes
+
+#### Refresh Token Expiry
+
+All refresh tokens issued with this release will expire after 30 days of non-use. This behaviour can be modified
+using the `REFRESH_TOKEN_LIFESPAN` environment variable. By setting `REFRESH_TOKEN_LIFESPAN=-1`, refresh tokens
+are set to never expire, which is the previous behaviour.
+
+Tokens issued before this change will still be valid forever.
+
+We discourage setting `REFRESH_TOKEN_LIFESPAN=-1` as it might clog the database with tokens that will never be used again.
+In high-scale systems, `REFRESH_TOKEN_LIFESPAN` should be set to something like 15 or 30 days.
+
+#### Swagger & SDK Restructuring
+
+To better represent the public and admin endpoint, previous swagger tags (like oAuth2, jwks, ...) have been deprecated
+in favor of tags `public` and `admin`. This has different impacts for the different code-generated client libraries.
+
+##### Go
+
+If you use the `hydra.SDK` interface only and the `hydra.NewSDK()` factory, everything will work as before. If you
+rely on e.g. `hydra.NewOAuth2Api()`, you will be affected by this change.
+
+##### Others
+
+All method signatures stayed the same, but the factory names for instantiating the SDK client have changed. For example,
+`hydra.NewOAuth2Api()` is now `hydra.NewAdminApi()` and `hydra.NewPublicApi()` - depending on which endpoints you need
+to interact with.
 
 #### Refresh Token Expiry
 

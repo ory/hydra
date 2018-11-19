@@ -1,4 +1,4 @@
-# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.VersionApi
+# OryHydra.VersionApi
 
 All URIs are relative to *http://localhost*
 
@@ -17,9 +17,9 @@ This endpoint returns the service version typically notated using semantic versi
 
 ### Example
 ```javascript
-var OryHydraCloudNativeOAuth20AndOpenIdConnectServer = require('ory_hydra___cloud_native_o_auth_20_and_open_id_connect_server');
+var OryHydra = require('ory_hydra');
 
-var apiInstance = new OryHydraCloudNativeOAuth20AndOpenIdConnectServer.VersionApi();
+var apiInstance = new OryHydra.VersionApi();
 
 var callback = function(error, data, response) {
   if (error) {

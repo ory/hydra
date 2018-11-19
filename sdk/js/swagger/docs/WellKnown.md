@@ -1,4 +1,4 @@
-# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.WellKnown
+# OryHydra.WellKnown
 
 ## Properties
 Name | Type | Description | Notes

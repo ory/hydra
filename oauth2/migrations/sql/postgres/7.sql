@@ -14,8 +14,6 @@ ALTER TABLE hydra_oauth2_oidc ADD granted_audience TEXT NULL DEFAULT '';
 ALTER TABLE hydra_oauth2_pkce ADD requested_audience TEXT NULL DEFAULT '';
 ALTER TABLE hydra_oauth2_pkce ADD granted_audience TEXT NULL DEFAULT '';
 
-
-
 -- +migrate Down
 ALTER TABLE hydra_oauth2_access DROP COLUMN requested_audience;
 ALTER TABLE hydra_oauth2_access DROP COLUMN granted_audience;

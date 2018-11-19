@@ -41,7 +41,7 @@ var oauth2JWTStrategy = &compose.CommonStrategy{
 }
 
 var fc = &compose.Config{
-	AccessTokenLifespan:        time.Second,
+	AccessTokenLifespan:        time.Second * 2,
 	SendDebugMessagesToClients: true,
 }
 

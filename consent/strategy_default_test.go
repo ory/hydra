@@ -145,7 +145,7 @@ func TestStrategy(t *testing.T) {
 			"public":   NewSubjectIdentifierAlgorithmPublic(),
 		},
 	)
-	apiClient := swagger.NewOAuth2ApiWithBasePath(api.URL)
+	apiClient := swagger.NewAdminApiWithBasePath(api.URL)
 
 	persistentCJ := newCookieJar()
 	persistentCJ2 := newCookieJar()

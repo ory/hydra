@@ -20,7 +20,7 @@
   <licenses>
     <license>
       <name>Unlicense</name>
-      <url>https://github.com/ory/hydra/blob/master/LICENSE</url>
+      <url>http://unlicense.org</url>
       <distribution>repo</distribution>
     </license>
   </licenses>

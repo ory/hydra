@@ -1,4 +1,4 @@
-# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.JsonWebKeySetGeneratorRequest
+# OryHydra.JsonWebKeySetGeneratorRequest
 
 ## Properties
 Name | Type | Description | Notes

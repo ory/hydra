@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS hydra_oauth2_access (
 	form_data  		  text NOT NULL,
 	session_data  	text NOT NULL
 );
+
 CREATE TABLE IF NOT EXISTS hydra_oauth2_refresh (
 	signature      	varchar(255) NOT NULL PRIMARY KEY,
 	request_id  	  varchar(255) NOT NULL,
@@ -19,6 +20,7 @@ CREATE TABLE IF NOT EXISTS hydra_oauth2_refresh (
 	form_data  		  text NOT NULL,
 	session_data  	text NOT NULL
 );
+
 CREATE TABLE IF NOT EXISTS hydra_oauth2_code (
 	signature      	varchar(255) NOT NULL PRIMARY KEY,
 	request_id  	  varchar(255) NOT NULL,
@@ -29,6 +31,7 @@ CREATE TABLE IF NOT EXISTS hydra_oauth2_code (
 	form_data  		  text NOT NULL,
 	session_data  	text NOT NULL
 );
+
 CREATE TABLE IF NOT EXISTS hydra_oauth2_oidc (
 	signature      	varchar(255) NOT NULL PRIMARY KEY,
 	request_id  	  varchar(255) NOT NULL,

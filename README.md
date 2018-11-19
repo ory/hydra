@@ -273,8 +273,12 @@ Developing with ORY Hydra is as easy as:
 ```
 go get -d -u github.com/ory/hydra
 cd $GOPATH/src/github.com/ory/hydra
+make init
 export GO111MODULE=on
-go test ./...
+## With database
+make test
+## Without database
+make test-short
 ```
 
 Then run it with in-memory database:

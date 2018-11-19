@@ -2,9 +2,9 @@ package com.github.ory.hydra.api;
 
 import com.github.ory.hydra.ApiClient;
 
+import com.github.ory.hydra.model.GenericError;
 import com.github.ory.hydra.model.HealthNotReadyStatus;
 import com.github.ory.hydra.model.HealthStatus;
-import com.github.ory.hydra.model.InlineResponse401;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,7 +25,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2018-11-05T22:24:41.126+01:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2018-11-18T22:54:40.815+01:00")
 @Component("com.github.ory.hydra.api.HealthApi")
 public class HealthApi {
     private ApiClient apiClient;
@@ -51,7 +51,7 @@ public class HealthApi {
      * Check alive status
      * This endpoint returns a 200 status code when the HTTP server is up running. This status does currently not include checks whether the database connection is working.  If the service supports TLS Edge Termination, this endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header to be set.  Be aware that if you are running multiple nodes of this service, the health status will never refer to the cluster state, only to a single instance.
      * <p><b>200</b> - healthStatus
-     * <p><b>500</b> - The standard error format
+     * <p><b>500</b> - genericError
      * @return HealthStatus
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */

@@ -26,6 +26,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/consent"
+
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -35,7 +37,6 @@ import (
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
 	. "github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/pkg"
 	"github.com/ory/x/sqlcon"
 )
 
@@ -51,7 +52,28 @@ var defaultRequest = fosite.Request{
 	Session:           &fosite.DefaultSession{Subject: "bar"},
 }
 
-func testHelperUniqueConstraints(m pkg.FositeStorer, storageType string) func(t *testing.T) {
+func mockRequestForeignKey(t *testing.T, id string, x managerTestSetup, createClient bool) {
+	cl := &client.Client{ClientID: "foobar"}
+	cr := &consent.ConsentRequest{
+		Client: cl, OpenIDConnectContext: new(consent.OpenIDConnectContext), LoginChallenge: id,
+		Challenge: id, Verifier: id, AuthenticatedAt: time.Now(), RequestedAt: time.Now(),
+	}
+
+	if createClient {
+		require.NoError(t, x.cl.CreateClient(context.Background(), cl))
+	}
+
+	require.NoError(t, x.co.CreateAuthenticationRequest(context.Background(), &consent.AuthenticationRequest{Client: cl, OpenIDConnectContext: new(consent.OpenIDConnectContext), Challenge: id, Verifier: id, AuthenticatedAt: time.Now(), RequestedAt: time.Now()}))
+	require.NoError(t, x.co.CreateConsentRequest(context.Background(), cr))
+	_, err := x.co.HandleConsentRequest(context.Background(), id, &consent.HandledConsentRequest{
+		ConsentRequest: cr, Session: new(consent.ConsentRequestSessionData), AuthenticatedAt: time.Now(),
+		Challenge:   id,
+		RequestedAt: time.Now(),
+	})
+	require.NoError(t, err)
+}
+
+func testHelperUniqueConstraints(m managerTestSetup, storageType string) func(t *testing.T) {
 	return func(t *testing.T) {
 		dbErrorIsConstraintError := func(dbErr error) {
 			assert.Error(t, dbErr)
@@ -64,32 +86,37 @@ func testHelperUniqueConstraints(m pkg.FositeStorer, storageType string) func(t 
 		}
 
 		requestId := uuid.New()
+		mockRequestForeignKey(t, requestId, m, true)
+		cl := &client.Client{ClientID: "foobar"}
+
 		signatureOne := uuid.New()
 		signatureTwo := uuid.New()
 		fositeRequest := &fosite.Request{
 			ID:          requestId,
-			Client:      &client.Client{ClientID: "foobar"},
+			Client:      cl,
 			RequestedAt: time.Now().UTC().Round(time.Second),
 			Session:     &fosite.DefaultSession{},
 		}
 
-		err := m.CreateRefreshTokenSession(context.TODO(), signatureOne, fositeRequest)
+		err := m.f.CreateRefreshTokenSession(context.TODO(), signatureOne, fositeRequest)
 		assert.NoError(t, err)
-		err = m.CreateAccessTokenSession(context.TODO(), signatureOne, fositeRequest)
+		err = m.f.CreateAccessTokenSession(context.TODO(), signatureOne, fositeRequest)
 		assert.NoError(t, err)
 
 		// attempting to insert new records with the SAME requestID should fail as there is a unique index
 		// on the request_id column
 
-		err = m.CreateRefreshTokenSession(context.TODO(), signatureTwo, fositeRequest)
+		err = m.f.CreateRefreshTokenSession(context.TODO(), signatureTwo, fositeRequest)
 		dbErrorIsConstraintError(err)
-		err = m.CreateAccessTokenSession(context.TODO(), signatureTwo, fositeRequest)
+		err = m.f.CreateAccessTokenSession(context.TODO(), signatureTwo, fositeRequest)
 		dbErrorIsConstraintError(err)
 	}
 }
 
-func testHelperCreateGetDeleteOpenIDConnectSession(m pkg.FositeStorer) func(t *testing.T) {
+func testHelperCreateGetDeleteOpenIDConnectSession(x managerTestSetup) func(t *testing.T) {
 	return func(t *testing.T) {
+		m := x.f
+
 		ctx := context.Background()
 		_, err := m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{})
 		assert.NotNil(t, err)
@@ -109,8 +136,10 @@ func testHelperCreateGetDeleteOpenIDConnectSession(m pkg.FositeStorer) func(t *t
 	}
 }
 
-func testHelperCreateGetDeleteRefreshTokenSession(m pkg.FositeStorer) func(t *testing.T) {
+func testHelperCreateGetDeleteRefreshTokenSession(x managerTestSetup) func(t *testing.T) {
 	return func(t *testing.T) {
+		m := x.f
+
 		ctx := context.Background()
 		_, err := m.GetRefreshTokenSession(ctx, "4321", &fosite.DefaultSession{})
 		assert.NotNil(t, err)
@@ -130,14 +159,19 @@ func testHelperCreateGetDeleteRefreshTokenSession(m pkg.FositeStorer) func(t *te
 	}
 }
 
-func testHelperRevokeRefreshToken(m pkg.FositeStorer) func(t *testing.T) {
+func testHelperRevokeRefreshToken(x managerTestSetup) func(t *testing.T) {
 	return func(t *testing.T) {
+		m := x.f
+
 		ctx := context.Background()
 		_, err := m.GetRefreshTokenSession(ctx, "1111", &fosite.DefaultSession{})
 		assert.Error(t, err)
 
 		reqIdOne := uuid.New()
 		reqIdTwo := uuid.New()
+
+		mockRequestForeignKey(t, reqIdOne, x, false)
+		mockRequestForeignKey(t, reqIdTwo, x, false)
 
 		err = m.CreateRefreshTokenSession(ctx, "1111", &fosite.Request{ID: reqIdOne, Client: &client.Client{ClientID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &fosite.DefaultSession{}})
 		require.NoError(t, err)
@@ -163,8 +197,12 @@ func testHelperRevokeRefreshToken(m pkg.FositeStorer) func(t *testing.T) {
 	}
 }
 
-func testHelperCreateGetDeleteAuthorizeCodes(m pkg.FositeStorer) func(t *testing.T) {
+func testHelperCreateGetDeleteAuthorizeCodes(x managerTestSetup) func(t *testing.T) {
 	return func(t *testing.T) {
+		m := x.f
+
+		mockRequestForeignKey(t, "blank", x, false)
+
 		ctx := context.Background()
 		res, err := m.GetAuthorizeCodeSession(ctx, "4321", &fosite.DefaultSession{})
 		assert.Error(t, err)
@@ -187,8 +225,10 @@ func testHelperCreateGetDeleteAuthorizeCodes(m pkg.FositeStorer) func(t *testing
 	}
 }
 
-func testHelperCreateGetDeleteAccessTokenSession(m pkg.FositeStorer) func(t *testing.T) {
+func testHelperCreateGetDeleteAccessTokenSession(x managerTestSetup) func(t *testing.T) {
 	return func(t *testing.T) {
+		m := x.f
+
 		ctx := context.Background()
 		_, err := m.GetAccessTokenSession(ctx, "4321", &fosite.DefaultSession{})
 		assert.Error(t, err)
@@ -208,8 +248,10 @@ func testHelperCreateGetDeleteAccessTokenSession(m pkg.FositeStorer) func(t *tes
 	}
 }
 
-func testHelperCreateGetDeletePKCERequestSession(m pkg.FositeStorer) func(t *testing.T) {
+func testHelperCreateGetDeletePKCERequestSession(x managerTestSetup) func(t *testing.T) {
 	return func(t *testing.T) {
+		m := x.f
+
 		ctx := context.Background()
 		_, err := m.GetPKCERequestSession(ctx, "4321", &fosite.DefaultSession{})
 		assert.NotNil(t, err)
@@ -229,13 +271,14 @@ func testHelperCreateGetDeletePKCERequestSession(m pkg.FositeStorer) func(t *tes
 	}
 }
 
-func testHelperFlushTokens(m pkg.FositeStorer, lifespan time.Duration) func(t *testing.T) {
-
+func testHelperFlushTokens(x managerTestSetup, lifespan time.Duration) func(t *testing.T) {
+	m := x.f
 	ds := &fosite.DefaultSession{}
 
 	return func(t *testing.T) {
 		ctx := context.Background()
 		for _, r := range flushRequests {
+			mockRequestForeignKey(t, r.ID, x, false)
 			require.NoError(t, m.CreateAccessTokenSession(ctx, r.ID, r))
 			_, err := m.GetAccessTokenSession(ctx, r.ID, ds)
 			require.NoError(t, err)

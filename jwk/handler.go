@@ -74,6 +74,7 @@ func (h *Handler) GetGenerators() map[string]KeyGenerator {
 func (h *Handler) SetRoutes(frontend, backend *httprouter.Router, corsMiddleware func(http.Handler) http.Handler) {
 	frontend.Handler("OPTIONS", WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
 	frontend.Handler("GET", WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.WellKnown)))
+
 	backend.GET(KeyHandlerPath+"/:set/:key", h.GetKey)
 	backend.GET(KeyHandlerPath+"/:set", h.GetKeySet)
 
@@ -88,12 +89,11 @@ func (h *Handler) SetRoutes(frontend, backend *httprouter.Router, corsMiddleware
 
 // swagger:route GET /.well-known/jwks.json public wellKnown
 //
-// Get Well-Known JSON Web Keys
+// JSON Web Keys Discovery
 //
-// Returns metadata for discovering important JSON Web Keys. Currently, this endpoint returns the public key for verifying OpenID Connect ID Tokens.
-//
-// A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
-//
+// This endpoint returns JSON Web Keys to be used as public keys for verifying OpenID Connect ID Tokens and,
+// if enabled, OAuth 2.0 JWT Access Tokens. This endpoint can be used with client libraries like
+// [node-jwks-rsa](https://github.com/auth0/node-jwks-rsa) among others.
 //
 //     Consumes:
 //     - application/json
@@ -105,8 +105,6 @@ func (h *Handler) SetRoutes(frontend, backend *httprouter.Router, corsMiddleware
 //
 //     Responses:
 //       200: JSONWebKeySet
-//       401: genericError
-//       403: genericError
 //       500: genericError
 func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request) {
 	var jwks jose.JSONWebKeySet
@@ -132,11 +130,9 @@ func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request) {
 
 // swagger:route GET /keys/{set}/{kid} admin getJsonWebKey
 //
-// Retrieve a JSON Web Key
+// Fetch a JSON Web Key
 //
-// This endpoint can be used to retrieve JWKs stored in ORY Hydra.
-//
-// A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+// This endpoint returns a singular JSON Web Key, identified by the set and the specific key ID (kid).
 //
 //     Consumes:
 //     - application/json
@@ -148,8 +144,7 @@ func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request) {
 //
 //     Responses:
 //       200: JSONWebKeySet
-//       401: genericError
-//       403: genericError
+//       404: genericError
 //       500: genericError
 func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")

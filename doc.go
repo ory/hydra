@@ -18,16 +18,14 @@
  * @license 	Apache-2.0
  */
 
-// Package main ORY Hydra - Cloud Native OAuth 2.0 and OpenID Connect Server
+// Package main ORY Hydra
 //
-// Welcome to the ORY Hydra HTTP API documentation. You will find documentation for all HTTP APIs here. Keep in mind that this document reflects the latest branch, always. Support for versioned documentation is coming in the future.
+// Welcome to the ORY Hydra HTTP API documentation. You will find documentation for all HTTP APIs here.
 //
 //     Schemes: http, https
 //     Host:
 //     BasePath: /
-//     Version: Latest
-//     License: Apache 2.0 https://github.com/ory/hydra/blob/master/LICENSE
-//     Contact: ORY <hi@ory.am> https://www.ory.sh
+//     Version: latest
 //
 //     Consumes:
 //     - application/json
@@ -39,8 +37,8 @@
 //     SecurityDefinitions:
 //     oauth2:
 //         type: oauth2
-//         authorizationUrl: https://your-hydra-instance.com/oauth2/auth
-//         tokenUrl: https://your-hydra-instance.com/oauth2/token
+//         authorizationUrl: /oauth2/auth
+//         tokenUrl: /oauth2/token
 //         flow: accessCode
 //         scopes:
 //           offline: "A scope required when requesting refresh tokens"

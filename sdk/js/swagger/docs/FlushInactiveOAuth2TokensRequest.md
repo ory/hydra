@@ -1,4 +1,4 @@
-# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.FlushInactiveOAuth2TokensRequest
+# OryHydra.FlushInactiveOAuth2TokensRequest
 
 ## Properties
 Name | Type | Description | Notes

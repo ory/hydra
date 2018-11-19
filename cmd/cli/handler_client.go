@@ -46,8 +46,8 @@ func newClientHandler(c *config.Config) *ClientHandler {
 	}
 }
 
-func (h *ClientHandler) newClientManager(cmd *cobra.Command) *hydra.OAuth2Api {
-	c := hydra.NewOAuth2ApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlashOrFail(cmd))
+func (h *ClientHandler) newClientManager(cmd *cobra.Command) *hydra.AdminApi {
+	c := hydra.NewAdminApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlashOrFail(cmd))
 	c.Configuration = configureClient(cmd, c.Configuration)
 	return c
 }

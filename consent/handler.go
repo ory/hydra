@@ -82,7 +82,7 @@ func (h *Handler) SetRoutes(frontend, backend *httprouter.Router) {
 	frontend.GET(SessionsPath+"/login/revoke", h.LogoutUser)
 }
 
-// swagger:route DELETE /oauth2/auth/sessions/consent/{user} oAuth2 revokeAllUserConsentSessions
+// swagger:route DELETE /oauth2/auth/sessions/consent/{user} admin revokeAllUserConsentSessions
 //
 // Revokes all previous consent sessions of a user
 //

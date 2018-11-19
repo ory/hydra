@@ -66,7 +66,7 @@ func TestClientSDK(t *testing.T) {
 	router := httprouter.New()
 	handler.SetRoutes(router)
 	server := httptest.NewServer(router)
-	c := hydra.NewOAuth2ApiWithBasePath(server.URL)
+	c := hydra.NewAdminApiWithBasePath(server.URL)
 	t.Run("case=client default scopes are set", func(t *testing.T) {
 		result, response, err := c.CreateOAuth2Client(hydra.OAuth2Client{
 			ClientId: "scoped",

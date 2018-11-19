@@ -51,7 +51,7 @@ type OAuth2API interface {
 	CreateOAuth2Client(body swagger.OAuth2Client) (*swagger.OAuth2Client, *swagger.APIResponse, error)
 	DeleteOAuth2Client(id string) (*swagger.APIResponse, error)
 	GetOAuth2Client(id string) (*swagger.OAuth2Client, *swagger.APIResponse, error)
-	GetWellKnown() (*swagger.WellKnown, *swagger.APIResponse, error)
+	DiscoverOpenIDConfiguration() (*swagger.WellKnown, *swagger.APIResponse, error)
 	IntrospectOAuth2Token(token string, scope string) (*swagger.OAuth2TokenIntrospection, *swagger.APIResponse, error)
 	ListOAuth2Clients(limit int64, offset int64) ([]swagger.OAuth2Client, *swagger.APIResponse, error)
 	RevokeOAuth2Token(token string) (*swagger.APIResponse, error)

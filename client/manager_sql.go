@@ -43,6 +43,13 @@ var Migrations = map[string]*migrate.PackrMigrationSource{
 	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/shared", "migrations/sql/postgres"}),
 }
 
+func NewSQLManager(db *sqlx.DB, h fosite.Hasher) *SQLManager {
+	return &SQLManager{
+		Hasher: h,
+		DB:     db,
+	}
+}
+
 type SQLManager struct {
 	Hasher fosite.Hasher
 	DB     *sqlx.DB

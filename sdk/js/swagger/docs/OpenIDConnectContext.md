@@ -1,4 +1,4 @@
-# OryHydraCloudNativeOAuth20AndOpenIdConnectServer.OpenIDConnectContext
+# OryHydra.OpenIDConnectContext
 
 ## Properties
 Name | Type | Description | Notes

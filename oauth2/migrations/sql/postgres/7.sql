@@ -29,4 +29,3 @@ ALTER TABLE hydra_oauth2_oidc DROP COLUMN granted_audience;
 
 ALTER TABLE hydra_oauth2_pkce DROP COLUMN requested_audience;
 ALTER TABLE hydra_oauth2_pkce DROP COLUMN granted_audience;
-

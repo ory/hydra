@@ -170,7 +170,7 @@ func migrationsSqlPostgres4Sql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/postgres/4.sql", size: 407, mode: os.FileMode(438), modTime: time.Unix(1542578059, 0)}
+	info := bindataFileInfo{name: "migrations/sql/postgres/4.sql", size: 407, mode: os.FileMode(438), modTime: time.Unix(1542622082, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

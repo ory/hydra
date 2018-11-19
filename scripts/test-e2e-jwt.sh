@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -Eeuxo pipefail
 
 cd "$( dirname "${BASH_SOURCE[0]}" )/.."
 
@@ -23,8 +23,7 @@ go install ./test/mock-client
 go install ./test/mock-lcp
 go install ./test/mock-cb
 
-DATABASE_URL=memory \
-    OAUTH2_CONSENT_URL=http://127.0.0.1:3000/consent \
+OAUTH2_CONSENT_URL=http://127.0.0.1:3000/consent \
     OAUTH2_LOGIN_URL=http://127.0.0.1:3000/login \
     OAUTH2_ERROR_URL=http://127.0.0.1:3000/error \
     OAUTH2_SHARE_ERROR_DEBUG=true \

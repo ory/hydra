@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euo pipefail
+set -Eeuxo pipefail
 
 cd "$( dirname "${BASH_SOURCE[0]}" )/.."
 

@@ -56,10 +56,75 @@ jobs:
       - run: go install github.com/ory/hydra/test/mock-lcp
       - run: go-acc -o coverage.txt ./... -- -failfast -v -timeout=20m
       - run: go test -race -short $(go list ./... | grep -v cmd)
-      - run: ./scripts/test-e2e-jwt.sh
-      - run: ./scripts/test-e2e-opaque.sh
-      - run: ./scripts/test-e2e-plugin.sh
       - run: test -z "$CIRCLE_PR_NUMBER" && goveralls -service=circle-ci -coverprofile=coverage.txt -repotoken=$COVERALLS_REPO_TOKEN || echo "forks are not allowed to push to coveralls"
+
+  test-e2e-opaque:
+    docker:
+    - image: circleci/golang:1.11
+      environment:
+      - DATABASE_URL_POSTGRES=postgres://test:test@localhost:5432/hydra?sslmode=disable
+      - DATABASE_URL_MYSQL=mysql://root:test@(localhost:3306)/mysql?parseTime=true
+    - image: postgres:9.5
+      environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=hydra
+    - image: mysql:5.7
+      environment:
+      - MYSQL_ROOT_PASSWORD=test
+    working_directory: /go/src/github.com/ory/hydra
+    steps:
+    - run:
+        name: Enable go1.11 modules
+        command: |
+          echo 'export GO111MODULE=on' >> $BASH_ENV
+          source $BASH_ENV
+    - checkout
+    - run: go mod verify
+    - run: go get -u github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/ory/go-acc
+    - run: go install github.com/ory/hydra
+    - run: go install github.com/ory/hydra/test/mock-lcp
+    - run: hydra migrate sql $DATABASE_URL_POSTGRES
+    - run: hydra migrate sql $DATABASE_URL_MYSQL
+    - run: DATABASE_URL=$DATABASE_URL_POSTGRES ./scripts/test-e2e-opaque.sh
+    - run: DATABASE_URL=$DATABASE_URL_MYSQL ./scripts/test-e2e-opaque.sh
+    - run: DATABASE_URL=memory ./scripts/test-e2e-opaque.sh
+    - run: DATABASE_URL=memory ./scripts/test-e2e-opaque.sh
+    - run: ./scripts/test-e2e-plugin.sh
+
+  test-e2e-jwt:
+    docker:
+    - image: circleci/golang:1.11
+      environment:
+      - DATABASE_URL_POSTGRES=postgres://test:test@localhost:5432/hydra?sslmode=disable
+      - DATABASE_URL_MYSQL=mysql://root:test@(localhost:3306)/mysql?parseTime=true
+    - image: postgres:9.5
+      environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=hydra
+    - image: mysql:5.7
+      environment:
+      - MYSQL_ROOT_PASSWORD=test
+    working_directory: /go/src/github.com/ory/hydra
+    steps:
+    - run:
+        name: Enable go1.11 modules
+        command: |
+          echo 'export GO111MODULE=on' >> $BASH_ENV
+          source $BASH_ENV
+    - checkout
+    - run: go mod verify
+    - run: go get -u github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/ory/go-acc
+    - run: go install github.com/ory/hydra
+    - run: go install github.com/ory/hydra/test/mock-lcp
+    - run: hydra migrate sql $DATABASE_URL_POSTGRES
+    - run: hydra migrate sql $DATABASE_URL_MYSQL
+    - run: DATABASE_URL=$DATABASE_URL_POSTGRES ./scripts/test-e2e-jwt.sh
+    - run: DATABASE_URL=$DATABASE_URL_MYSQL ./scripts/test-e2e-jwt.sh
+    - run: DATABASE_URL=memory ./scripts/test-e2e-opaque.sh
+    - run: DATABASE_URL=memory ./scripts/test-e2e-opaque.sh
+    - run: ./scripts/test-e2e-plugin.sh
 
 # This test is really useless because there are always changes (usually timestamps in the generated code)
 #  generators:
@@ -208,6 +273,18 @@ workflows:
           filters:
             tags:
               only: /.*/
+      - test-e2e-opaque:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /.*/
+      - test-e2e-jwt:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /.*/
       - release-docs:
           filters:
             branches:
@@ -228,6 +305,8 @@ workflows:
             - test
 #            - generators
             - format
+            - test-e2e-opaque
+            - test-e2e-jwt
           filters:
             tags:
               only: /.*/

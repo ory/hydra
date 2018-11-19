@@ -61,7 +61,7 @@ var flushRequests = []*fosite.Request{
 		RequestedScope: fosite.Arguments{"fa", "ba"},
 		GrantedScope:   fosite.Arguments{"fa", "ba"},
 		Form:           url.Values{"foo": []string{"bar", "baz"}},
-		Session:        &fosite.DefaultSession{Subject: "bar"},
+		Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
 	},
 	{
 		ID:             "flush-2",
@@ -70,7 +70,7 @@ var flushRequests = []*fosite.Request{
 		RequestedScope: fosite.Arguments{"fa", "ba"},
 		GrantedScope:   fosite.Arguments{"fa", "ba"},
 		Form:           url.Values{"foo": []string{"bar", "baz"}},
-		Session:        &fosite.DefaultSession{Subject: "bar"},
+		Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
 	},
 	{
 		ID:             "flush-3",
@@ -79,7 +79,7 @@ var flushRequests = []*fosite.Request{
 		RequestedScope: fosite.Arguments{"fa", "ba"},
 		GrantedScope:   fosite.Arguments{"fa", "ba"},
 		Form:           url.Values{"foo": []string{"bar", "baz"}},
-		Session:        &fosite.DefaultSession{Subject: "bar"},
+		Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
 	},
 }
 
@@ -103,7 +103,7 @@ func TestHandlerFlushHandler(t *testing.T) {
 	ts := httptest.NewServer(r)
 	c := hydra.NewAdminApiWithBasePath(ts.URL)
 
-	ds := new(fosite.DefaultSession)
+	ds := new(oauth2.Session)
 	ctx := context.Background()
 
 	resp, err := c.FlushInactiveOAuth2Tokens(hydra.FlushInactiveOAuth2TokensRequest{NotAfter: time.Now().Add(-time.Hour * 24)})

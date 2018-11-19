@@ -26,6 +26,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/fosite/handler/openid"
+
 	"github.com/ory/hydra/consent"
 
 	"github.com/pborman/uuid"
@@ -49,7 +51,7 @@ var defaultRequest = fosite.Request{
 	RequestedAudience: fosite.Arguments{"ad1", "ad2"},
 	GrantedAudience:   fosite.Arguments{"ad1", "ad2"},
 	Form:              url.Values{"foo": []string{"bar", "baz"}},
-	Session:           &fosite.DefaultSession{Subject: "bar"},
+	Session:           &Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
 }
 
 func mockRequestForeignKey(t *testing.T, id string, x managerTestSetup, createClient bool) {
@@ -95,7 +97,7 @@ func testHelperUniqueConstraints(m managerTestSetup, storageType string) func(t 
 			ID:          requestId,
 			Client:      cl,
 			RequestedAt: time.Now().UTC().Round(time.Second),
-			Session:     &fosite.DefaultSession{},
+			Session:     &Session{},
 		}
 
 		err := m.f.CreateRefreshTokenSession(context.TODO(), signatureOne, fositeRequest)
@@ -124,7 +126,7 @@ func testHelperCreateGetDeleteOpenIDConnectSession(x managerTestSetup) func(t *t
 		err = m.CreateOpenIDConnectSession(ctx, "4321", &defaultRequest)
 		require.NoError(t, err)
 
-		res, err := m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{Session: &fosite.DefaultSession{}})
+		res, err := m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{Session: &Session{}})
 		require.NoError(t, err)
 		AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
 
@@ -141,20 +143,20 @@ func testHelperCreateGetDeleteRefreshTokenSession(x managerTestSetup) func(t *te
 		m := x.f
 
 		ctx := context.Background()
-		_, err := m.GetRefreshTokenSession(ctx, "4321", &fosite.DefaultSession{})
+		_, err := m.GetRefreshTokenSession(ctx, "4321", &Session{})
 		assert.NotNil(t, err)
 
 		err = m.CreateRefreshTokenSession(ctx, "4321", &defaultRequest)
 		require.NoError(t, err)
 
-		res, err := m.GetRefreshTokenSession(ctx, "4321", &fosite.DefaultSession{})
+		res, err := m.GetRefreshTokenSession(ctx, "4321", &Session{})
 		require.NoError(t, err)
 		AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 		err = m.DeleteRefreshTokenSession(ctx, "4321")
 		require.NoError(t, err)
 
-		_, err = m.GetRefreshTokenSession(ctx, "4321", &fosite.DefaultSession{})
+		_, err = m.GetRefreshTokenSession(ctx, "4321", &Session{})
 		assert.NotNil(t, err)
 	}
 }
@@ -164,7 +166,7 @@ func testHelperRevokeRefreshToken(x managerTestSetup) func(t *testing.T) {
 		m := x.f
 
 		ctx := context.Background()
-		_, err := m.GetRefreshTokenSession(ctx, "1111", &fosite.DefaultSession{})
+		_, err := m.GetRefreshTokenSession(ctx, "1111", &Session{})
 		assert.Error(t, err)
 
 		reqIdOne := uuid.New()
@@ -173,13 +175,13 @@ func testHelperRevokeRefreshToken(x managerTestSetup) func(t *testing.T) {
 		mockRequestForeignKey(t, reqIdOne, x, false)
 		mockRequestForeignKey(t, reqIdTwo, x, false)
 
-		err = m.CreateRefreshTokenSession(ctx, "1111", &fosite.Request{ID: reqIdOne, Client: &client.Client{ClientID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &fosite.DefaultSession{}})
+		err = m.CreateRefreshTokenSession(ctx, "1111", &fosite.Request{ID: reqIdOne, Client: &client.Client{ClientID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &Session{}})
 		require.NoError(t, err)
 
-		err = m.CreateRefreshTokenSession(ctx, "1122", &fosite.Request{ID: reqIdTwo, Client: &client.Client{ClientID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &fosite.DefaultSession{}})
+		err = m.CreateRefreshTokenSession(ctx, "1122", &fosite.Request{ID: reqIdTwo, Client: &client.Client{ClientID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &Session{}})
 		require.NoError(t, err)
 
-		_, err = m.GetRefreshTokenSession(ctx, "1111", &fosite.DefaultSession{})
+		_, err = m.GetRefreshTokenSession(ctx, "1111", &Session{})
 		require.NoError(t, err)
 
 		err = m.RevokeRefreshToken(ctx, reqIdOne)
@@ -188,10 +190,10 @@ func testHelperRevokeRefreshToken(x managerTestSetup) func(t *testing.T) {
 		err = m.RevokeRefreshToken(ctx, reqIdTwo)
 		require.NoError(t, err)
 
-		_, err = m.GetRefreshTokenSession(ctx, "1111", &fosite.DefaultSession{})
+		_, err = m.GetRefreshTokenSession(ctx, "1111", &Session{})
 		assert.NotNil(t, err)
 
-		_, err = m.GetRefreshTokenSession(ctx, "1122", &fosite.DefaultSession{})
+		_, err = m.GetRefreshTokenSession(ctx, "1122", &Session{})
 		assert.NotNil(t, err)
 
 	}
@@ -204,24 +206,44 @@ func testHelperCreateGetDeleteAuthorizeCodes(x managerTestSetup) func(t *testing
 		mockRequestForeignKey(t, "blank", x, false)
 
 		ctx := context.Background()
-		res, err := m.GetAuthorizeCodeSession(ctx, "4321", &fosite.DefaultSession{})
+		res, err := m.GetAuthorizeCodeSession(ctx, "4321", &Session{})
 		assert.Error(t, err)
 		assert.Nil(t, res)
 
 		err = m.CreateAuthorizeCodeSession(ctx, "4321", &defaultRequest)
 		require.NoError(t, err)
 
-		res, err = m.GetAuthorizeCodeSession(ctx, "4321", &fosite.DefaultSession{})
+		res, err = m.GetAuthorizeCodeSession(ctx, "4321", &Session{})
 		require.NoError(t, err)
 		AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 		err = m.InvalidateAuthorizeCodeSession(ctx, "4321")
 		require.NoError(t, err)
 
-		res, err = m.GetAuthorizeCodeSession(ctx, "4321", &fosite.DefaultSession{})
+		res, err = m.GetAuthorizeCodeSession(ctx, "4321", &Session{})
 		require.Error(t, err)
 		assert.EqualError(t, err, fosite.ErrInvalidatedAuthorizeCode.Error())
 		assert.NotNil(t, res)
+	}
+}
+
+func testHelperNilAccessToken(x managerTestSetup) func(t *testing.T) {
+	return func(t *testing.T) {
+		m := x.f
+		c := &client.Client{ClientID: "nil-request-client-id-123"}
+		require.NoError(t, x.cl.CreateClient(context.Background(), c))
+		err := m.CreateAccessTokenSession(context.TODO(), "nil-request-id", &fosite.Request{
+			ID:                "",
+			RequestedAt:       time.Now().UTC().Round(time.Second),
+			Client:            c,
+			RequestedScope:    fosite.Arguments{"fa", "ba"},
+			GrantedScope:      fosite.Arguments{"fa", "ba"},
+			RequestedAudience: fosite.Arguments{"ad1", "ad2"},
+			GrantedAudience:   fosite.Arguments{"ad1", "ad2"},
+			Form:              url.Values{"foo": []string{"bar", "baz"}},
+			Session:           &Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
+		})
+		require.NoError(t, err)
 	}
 }
 
@@ -230,20 +252,20 @@ func testHelperCreateGetDeleteAccessTokenSession(x managerTestSetup) func(t *tes
 		m := x.f
 
 		ctx := context.Background()
-		_, err := m.GetAccessTokenSession(ctx, "4321", &fosite.DefaultSession{})
+		_, err := m.GetAccessTokenSession(ctx, "4321", &Session{})
 		assert.Error(t, err)
 
 		err = m.CreateAccessTokenSession(ctx, "4321", &defaultRequest)
 		require.NoError(t, err)
 
-		res, err := m.GetAccessTokenSession(ctx, "4321", &fosite.DefaultSession{})
+		res, err := m.GetAccessTokenSession(ctx, "4321", &Session{})
 		require.NoError(t, err)
 		AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 		err = m.DeleteAccessTokenSession(ctx, "4321")
 		require.NoError(t, err)
 
-		_, err = m.GetAccessTokenSession(ctx, "4321", &fosite.DefaultSession{})
+		_, err = m.GetAccessTokenSession(ctx, "4321", &Session{})
 		assert.Error(t, err)
 	}
 }
@@ -253,27 +275,27 @@ func testHelperCreateGetDeletePKCERequestSession(x managerTestSetup) func(t *tes
 		m := x.f
 
 		ctx := context.Background()
-		_, err := m.GetPKCERequestSession(ctx, "4321", &fosite.DefaultSession{})
+		_, err := m.GetPKCERequestSession(ctx, "4321", &Session{})
 		assert.NotNil(t, err)
 
 		err = m.CreatePKCERequestSession(ctx, "4321", &defaultRequest)
 		require.NoError(t, err)
 
-		res, err := m.GetPKCERequestSession(ctx, "4321", &fosite.DefaultSession{})
+		res, err := m.GetPKCERequestSession(ctx, "4321", &Session{})
 		require.NoError(t, err)
 		AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 		err = m.DeletePKCERequestSession(ctx, "4321")
 		require.NoError(t, err)
 
-		_, err = m.GetPKCERequestSession(ctx, "4321", &fosite.DefaultSession{})
+		_, err = m.GetPKCERequestSession(ctx, "4321", &Session{})
 		assert.NotNil(t, err)
 	}
 }
 
 func testHelperFlushTokens(x managerTestSetup, lifespan time.Duration) func(t *testing.T) {
 	m := x.f
-	ds := &fosite.DefaultSession{}
+	ds := &Session{}
 
 	return func(t *testing.T) {
 		ctx := context.Background()

@@ -9,14 +9,10 @@
 // migrations/sql/shared/5.sql
 // migrations/sql/shared/6.sql
 // migrations/sql/shared/7.sql
-// migrations/sql/mysql/.gitattributes
-// migrations/sql/mysql/.gitkeep
 // migrations/sql/mysql/11.sql
 // migrations/sql/mysql/4.sql
 // migrations/sql/mysql/8.sql
 // migrations/sql/mysql/9.sql
-// migrations/sql/postgres/.gitattributes
-// migrations/sql/postgres/.gitkeep
 // migrations/sql/postgres/11.sql
 // migrations/sql/postgres/4.sql
 // migrations/sql/postgres/8.sql
@@ -278,46 +274,6 @@ func migrationsSqlShared7Sql() (*asset, error) {
 	return a, nil
 }
 
-var _migrationsSqlMysqlGitattributes = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xd2\xd2\x2b\x2e\xcc\x51\xd0\x4d\x2e\xca\x49\xe3\x02\x04\x00\x00\xff\xff\x5b\x50\x4f\xd9\x0c\x00\x00\x00")
-
-func migrationsSqlMysqlGitattributesBytes() ([]byte, error) {
-	return bindataRead(
-		_migrationsSqlMysqlGitattributes,
-		"migrations/sql/mysql/.gitattributes",
-	)
-}
-
-func migrationsSqlMysqlGitattributes() (*asset, error) {
-	bytes, err := migrationsSqlMysqlGitattributesBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "migrations/sql/mysql/.gitattributes", size: 12, mode: os.FileMode(438), modTime: time.Unix(1542278753, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _migrationsSqlMysqlGitkeep = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x01\x00\x00\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00")
-
-func migrationsSqlMysqlGitkeepBytes() ([]byte, error) {
-	return bindataRead(
-		_migrationsSqlMysqlGitkeep,
-		"migrations/sql/mysql/.gitkeep",
-	)
-}
-
-func migrationsSqlMysqlGitkeep() (*asset, error) {
-	bytes, err := migrationsSqlMysqlGitkeepBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "migrations/sql/mysql/.gitkeep", size: 0, mode: os.FileMode(438), modTime: time.Unix(1542278753, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
 var _migrationsSqlMysql11Sql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xd2\xd5\x55\xd0\xce\xcd\x4c\x2f\x4a\x2c\x49\x55\x08\x2d\xe0\x0a\x0d\x70\x71\x0c\x71\x55\xc8\xa8\x4c\x29\x4a\x8c\x4f\xce\xc9\x4c\xcd\x2b\x51\x08\x76\x0d\x51\x48\x2c\x4d\xc9\x4c\xcd\x4b\x4e\xb5\x55\x57\xb7\xe6\x72\xf4\x09\x71\x0d\x52\x08\x71\x74\xf2\x41\x53\xe9\xeb\xef\xe2\xe9\x16\x09\x57\xac\x10\xe2\x1a\x11\xa2\xe0\xe7\x1f\xa2\xe0\x17\xea\xe3\x63\xcd\xc5\x85\x6c\x99\x4b\x7e\x79\x1e\x69\x26\x59\x73\x01\x02\x00\x00\xff\xff\x72\x1b\x3f\x00\xad\x00\x00\x00")
 
 func migrationsSqlMysql11SqlBytes() ([]byte, error) {
@@ -394,46 +350,6 @@ func migrationsSqlMysql9Sql() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "migrations/sql/mysql/9.sql", size: 362, mode: os.FileMode(438), modTime: time.Unix(1542278753, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _migrationsSqlPostgresGitattributes = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xd2\xd2\x2b\x2e\xcc\x51\xd0\x4d\x2e\xca\x49\xe3\x02\x04\x00\x00\xff\xff\x5b\x50\x4f\xd9\x0c\x00\x00\x00")
-
-func migrationsSqlPostgresGitattributesBytes() ([]byte, error) {
-	return bindataRead(
-		_migrationsSqlPostgresGitattributes,
-		"migrations/sql/postgres/.gitattributes",
-	)
-}
-
-func migrationsSqlPostgresGitattributes() (*asset, error) {
-	bytes, err := migrationsSqlPostgresGitattributesBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "migrations/sql/postgres/.gitattributes", size: 12, mode: os.FileMode(438), modTime: time.Unix(1542278753, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _migrationsSqlPostgresGitkeep = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x01\x00\x00\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00")
-
-func migrationsSqlPostgresGitkeepBytes() ([]byte, error) {
-	return bindataRead(
-		_migrationsSqlPostgresGitkeep,
-		"migrations/sql/postgres/.gitkeep",
-	)
-}
-
-func migrationsSqlPostgresGitkeep() (*asset, error) {
-	bytes, err := migrationsSqlPostgresGitkeepBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "migrations/sql/postgres/.gitkeep", size: 0, mode: os.FileMode(438), modTime: time.Unix(1542278753, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -810,39 +726,35 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"migrations/sql/shared/.gitattributes":   migrationsSqlSharedGitattributes,
-	"migrations/sql/shared/.gitkeep":         migrationsSqlSharedGitkeep,
-	"migrations/sql/shared/1.sql":            migrationsSqlShared1Sql,
-	"migrations/sql/shared/10.sql":           migrationsSqlShared10Sql,
-	"migrations/sql/shared/2.sql":            migrationsSqlShared2Sql,
-	"migrations/sql/shared/3.sql":            migrationsSqlShared3Sql,
-	"migrations/sql/shared/5.sql":            migrationsSqlShared5Sql,
-	"migrations/sql/shared/6.sql":            migrationsSqlShared6Sql,
-	"migrations/sql/shared/7.sql":            migrationsSqlShared7Sql,
-	"migrations/sql/mysql/.gitattributes":    migrationsSqlMysqlGitattributes,
-	"migrations/sql/mysql/.gitkeep":          migrationsSqlMysqlGitkeep,
-	"migrations/sql/mysql/11.sql":            migrationsSqlMysql11Sql,
-	"migrations/sql/mysql/4.sql":             migrationsSqlMysql4Sql,
-	"migrations/sql/mysql/8.sql":             migrationsSqlMysql8Sql,
-	"migrations/sql/mysql/9.sql":             migrationsSqlMysql9Sql,
-	"migrations/sql/postgres/.gitattributes": migrationsSqlPostgresGitattributes,
-	"migrations/sql/postgres/.gitkeep":       migrationsSqlPostgresGitkeep,
-	"migrations/sql/postgres/11.sql":         migrationsSqlPostgres11Sql,
-	"migrations/sql/postgres/4.sql":          migrationsSqlPostgres4Sql,
-	"migrations/sql/postgres/8.sql":          migrationsSqlPostgres8Sql,
-	"migrations/sql/postgres/9.sql":          migrationsSqlPostgres9Sql,
-	"migrations/sql/tests/.gitkeep":          migrationsSqlTestsGitkeep,
-	"migrations/sql/tests/10_test.sql":       migrationsSqlTests10_testSql,
-	"migrations/sql/tests/11_test.sql":       migrationsSqlTests11_testSql,
-	"migrations/sql/tests/1_test.sql":        migrationsSqlTests1_testSql,
-	"migrations/sql/tests/2_test.sql":        migrationsSqlTests2_testSql,
-	"migrations/sql/tests/3_test.sql":        migrationsSqlTests3_testSql,
-	"migrations/sql/tests/4_test.sql":        migrationsSqlTests4_testSql,
-	"migrations/sql/tests/5_test.sql":        migrationsSqlTests5_testSql,
-	"migrations/sql/tests/6_test.sql":        migrationsSqlTests6_testSql,
-	"migrations/sql/tests/7_test.sql":        migrationsSqlTests7_testSql,
-	"migrations/sql/tests/8_test.sql":        migrationsSqlTests8_testSql,
-	"migrations/sql/tests/9_test.sql":        migrationsSqlTests9_testSql,
+	"migrations/sql/shared/.gitattributes": migrationsSqlSharedGitattributes,
+	"migrations/sql/shared/.gitkeep":       migrationsSqlSharedGitkeep,
+	"migrations/sql/shared/1.sql":          migrationsSqlShared1Sql,
+	"migrations/sql/shared/10.sql":         migrationsSqlShared10Sql,
+	"migrations/sql/shared/2.sql":          migrationsSqlShared2Sql,
+	"migrations/sql/shared/3.sql":          migrationsSqlShared3Sql,
+	"migrations/sql/shared/5.sql":          migrationsSqlShared5Sql,
+	"migrations/sql/shared/6.sql":          migrationsSqlShared6Sql,
+	"migrations/sql/shared/7.sql":          migrationsSqlShared7Sql,
+	"migrations/sql/mysql/11.sql":          migrationsSqlMysql11Sql,
+	"migrations/sql/mysql/4.sql":           migrationsSqlMysql4Sql,
+	"migrations/sql/mysql/8.sql":           migrationsSqlMysql8Sql,
+	"migrations/sql/mysql/9.sql":           migrationsSqlMysql9Sql,
+	"migrations/sql/postgres/11.sql":       migrationsSqlPostgres11Sql,
+	"migrations/sql/postgres/4.sql":        migrationsSqlPostgres4Sql,
+	"migrations/sql/postgres/8.sql":        migrationsSqlPostgres8Sql,
+	"migrations/sql/postgres/9.sql":        migrationsSqlPostgres9Sql,
+	"migrations/sql/tests/.gitkeep":        migrationsSqlTestsGitkeep,
+	"migrations/sql/tests/10_test.sql":     migrationsSqlTests10_testSql,
+	"migrations/sql/tests/11_test.sql":     migrationsSqlTests11_testSql,
+	"migrations/sql/tests/1_test.sql":      migrationsSqlTests1_testSql,
+	"migrations/sql/tests/2_test.sql":      migrationsSqlTests2_testSql,
+	"migrations/sql/tests/3_test.sql":      migrationsSqlTests3_testSql,
+	"migrations/sql/tests/4_test.sql":      migrationsSqlTests4_testSql,
+	"migrations/sql/tests/5_test.sql":      migrationsSqlTests5_testSql,
+	"migrations/sql/tests/6_test.sql":      migrationsSqlTests6_testSql,
+	"migrations/sql/tests/7_test.sql":      migrationsSqlTests7_testSql,
+	"migrations/sql/tests/8_test.sql":      migrationsSqlTests8_testSql,
+	"migrations/sql/tests/9_test.sql":      migrationsSqlTests9_testSql,
 }
 
 // AssetDir returns the file names below a certain
@@ -889,20 +801,16 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	"migrations": &bintree{nil, map[string]*bintree{
 		"sql": &bintree{nil, map[string]*bintree{
 			"mysql": &bintree{nil, map[string]*bintree{
-				".gitattributes": &bintree{migrationsSqlMysqlGitattributes, map[string]*bintree{}},
-				".gitkeep":       &bintree{migrationsSqlMysqlGitkeep, map[string]*bintree{}},
-				"11.sql":         &bintree{migrationsSqlMysql11Sql, map[string]*bintree{}},
-				"4.sql":          &bintree{migrationsSqlMysql4Sql, map[string]*bintree{}},
-				"8.sql":          &bintree{migrationsSqlMysql8Sql, map[string]*bintree{}},
-				"9.sql":          &bintree{migrationsSqlMysql9Sql, map[string]*bintree{}},
+				"11.sql": &bintree{migrationsSqlMysql11Sql, map[string]*bintree{}},
+				"4.sql":  &bintree{migrationsSqlMysql4Sql, map[string]*bintree{}},
+				"8.sql":  &bintree{migrationsSqlMysql8Sql, map[string]*bintree{}},
+				"9.sql":  &bintree{migrationsSqlMysql9Sql, map[string]*bintree{}},
 			}},
 			"postgres": &bintree{nil, map[string]*bintree{
-				".gitattributes": &bintree{migrationsSqlPostgresGitattributes, map[string]*bintree{}},
-				".gitkeep":       &bintree{migrationsSqlPostgresGitkeep, map[string]*bintree{}},
-				"11.sql":         &bintree{migrationsSqlPostgres11Sql, map[string]*bintree{}},
-				"4.sql":          &bintree{migrationsSqlPostgres4Sql, map[string]*bintree{}},
-				"8.sql":          &bintree{migrationsSqlPostgres8Sql, map[string]*bintree{}},
-				"9.sql":          &bintree{migrationsSqlPostgres9Sql, map[string]*bintree{}},
+				"11.sql": &bintree{migrationsSqlPostgres11Sql, map[string]*bintree{}},
+				"4.sql":  &bintree{migrationsSqlPostgres4Sql, map[string]*bintree{}},
+				"8.sql":  &bintree{migrationsSqlPostgres8Sql, map[string]*bintree{}},
+				"9.sql":  &bintree{migrationsSqlPostgres9Sql, map[string]*bintree{}},
 			}},
 			"shared": &bintree{nil, map[string]*bintree{
 				".gitattributes": &bintree{migrationsSqlSharedGitattributes, map[string]*bintree{}},

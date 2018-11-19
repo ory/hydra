@@ -95,9 +95,16 @@ func TestXXMigrations(t *testing.T) {
 				}
 
 				cm := client.NewSQLManager(db, &fosite.BCrypt{WorkFactor: 4})
-
-				sig := fmt.Sprintf("%d-sig", k+1)
 				s := oauth2.NewFositeSQLStore(cm, db, logrus.New(), time.Minute, false)
+				sig := fmt.Sprintf("%d-sig", k+1)
+
+				if k < 8 {
+					// With migration 8, all previous test data has been removed because the client is non-existent.
+					_, err := s.GetAccessTokenSession(context.Background(), sig, oauth2.NewSession(""))
+					require.Error(t, err)
+					return
+				}
+
 				_, err := s.GetAccessTokenSession(context.Background(), sig, oauth2.NewSession(""))
 				require.NoError(t, err)
 				_, err = s.GetRefreshTokenSession(context.Background(), sig, oauth2.NewSession(""))

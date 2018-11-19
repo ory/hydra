@@ -97,22 +97,24 @@ var sqlParams = []string{
 	"active",
 	"requested_audience",
 	"granted_audience",
+	"challenge_id",
 }
 
 type sqlData struct {
-	PK                int       `db:"pk"`
-	Signature         string    `db:"signature"`
-	Request           string    `db:"request_id"`
-	RequestedAt       time.Time `db:"requested_at"`
-	Client            string    `db:"client_id"`
-	Scopes            string    `db:"scope"`
-	GrantedScope      string    `db:"granted_scope"`
-	RequestedAudience string    `db:"requested_audience"`
-	GrantedAudience   string    `db:"granted_audience"`
-	Form              string    `db:"form_data"`
-	Subject           string    `db:"subject"`
-	Active            bool      `db:"active"`
-	Session           []byte    `db:"session_data"`
+	PK                int            `db:"pk"`
+	Signature         string         `db:"signature"`
+	Request           string         `db:"request_id"`
+	ConsentChallenge  sql.NullString `db:"challenge_id"`
+	RequestedAt       time.Time      `db:"requested_at"`
+	Client            string         `db:"client_id"`
+	Scopes            string         `db:"scope"`
+	GrantedScope      string         `db:"granted_scope"`
+	RequestedAudience string         `db:"requested_audience"`
+	GrantedAudience   string         `db:"granted_audience"`
+	Form              string         `db:"form_data"`
+	Subject           string         `db:"subject"`
+	Active            bool           `db:"active"`
+	Session           []byte         `db:"session_data"`
 }
 
 func sqlSchemaFromRequest(signature string, r fosite.Requester, logger logrus.FieldLogger) (*sqlData, error) {
@@ -128,8 +130,19 @@ func sqlSchemaFromRequest(signature string, r fosite.Requester, logger logrus.Fi
 		return nil, errors.WithStack(err)
 	}
 
+	var challenge sql.NullString
+	rr, ok := r.GetSession().(*Session)
+	if !ok && r.GetSession() != nil {
+		return nil, errors.Errorf("Expected request to be of type *Session, but got: %T", r.GetSession())
+	} else if ok {
+		if len(rr.ConsentChallenge) > 0 {
+			challenge = sql.NullString{Valid: true, String: rr.ConsentChallenge}
+		}
+	}
+
 	return &sqlData{
 		Request:           r.GetID(),
+		ConsentChallenge:  challenge,
 		Signature:         signature,
 		RequestedAt:       r.GetRequestedAt(),
 		Client:            r.GetClient().GetID(),

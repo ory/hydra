@@ -666,9 +666,10 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 			Headers: &jwt.Headers{Extra: map[string]interface{}{"kid": openIDKeyID}},
 			Subject: session.ConsentRequest.Subject,
 		},
-		Extra:    session.Session.AccessToken,
-		KID:      accessTokenKeyID,
-		ClientID: authorizeRequest.GetClient().GetID(),
+		Extra:            session.Session.AccessToken,
+		KID:              accessTokenKeyID,
+		ClientID:         authorizeRequest.GetClient().GetID(),
+		ConsentChallenge: session.Challenge,
 	})
 	if err != nil {
 		pkg.LogError(err, h.L)

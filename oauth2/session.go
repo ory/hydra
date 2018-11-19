@@ -35,6 +35,7 @@ type Session struct {
 	Extra                  map[string]interface{} `json:"extra"`
 	KID                    string
 	ClientID               string
+	ConsentChallenge       string
 }
 
 func NewSession(subject string) *Session {

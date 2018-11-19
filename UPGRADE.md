@@ -128,6 +128,9 @@ Please read all paragraphs of this section with the utmost care, before executin
 not take this change lightly and create a backup of the database before you begin. To be sure, copy the database
 and do a dry-run locally.
 
+> Be aware that running these migrations might take some time when using large databases. Do a dry-run before hammering
+your production database.
+
 #### Foreign Keys
 
 In order to keep data consistent across tables, several foreign key constraints have been added between consent, oauth2, client tables.
@@ -143,28 +146,82 @@ This migration automatically removes inconsistent OAuth 2.0 and OpenID Connect d
 2. Existing pkce and OpenID Connect session might be invalidated.
 
 As OAuth 2.0 clients are generally capable of handling re-authorization, this should not have a serious impact. Removing
-this data increases security through strong consistency.
+this data increases security through strong consistency. The following data-altering statements will be executed:
 
-The following `DELETE` statements will be executed:
+```sql
+-- First we need to delete all rows that point to a non-existing oauth2 client.
+DELETE FROM hydra_oauth2_access WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE hydra_oauth2_access.client_id = hydra_client.id);
+DELETE FROM hydra_oauth2_refresh WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE hydra_oauth2_refresh.client_id = hydra_client.id);
+DELETE FROM hydra_oauth2_code WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE hydra_oauth2_code.client_id = hydra_client.id);
+DELETE FROM hydra_oauth2_oidc WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE hydra_oauth2_oidc.client_id = hydra_client.id);
+DELETE FROM hydra_oauth2_pkce WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE hydra_oauth2_pkce.client_id = hydra_client.id);
 
-```
-DELETE FROM hydra_oauth2_access as h WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE h.client_id = hydra_client.id);
-DELETE FROM hydra_oauth2_refresh as h WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE h.client_id = hydra_client.id);
-DELETE FROM hydra_oauth2_code as h WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE h.client_id = hydra_client.id);
-DELETE FROM hydra_oauth2_oidc as h WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE h.client_id = hydra_client.id);
-DELETE FROM hydra_oauth2_pkce as h WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE h.client_id = hydra_client.id);
 
-DELETE FROM hydra_oauth2_access as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request_handled WHERE h.request_id = hydra_oauth2_consent_request_handled.challenge);
-DELETE FROM hydra_oauth2_refresh as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request_handled WHERE h.request_id = hydra_oauth2_consent_request_handled.challenge);
-DELETE FROM hydra_oauth2_code as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request_handled WHERE h.request_id = hydra_oauth2_consent_request_handled.challenge);
-DELETE FROM hydra_oauth2_oidc as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request_handled WHERE h.request_id = hydra_oauth2_consent_request_handled.challenge);
-DELETE FROM hydra_oauth2_pkce as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request_handled WHERE h.request_id = hydra_oauth2_consent_request_handled.challenge);
+-- request_id is a 40 varchar in the referenced table which is why we are resizing
+-- 1. We must remove request_ids longer than 40 chars. This should never happen as we've never issued them longer than this
+DELETE FROM hydra_oauth2_access WHERE LENGTH(request_id) > 40;
+DELETE FROM hydra_oauth2_refresh WHERE LENGTH(request_id) > 40;
+DELETE FROM hydra_oauth2_code WHERE LENGTH(request_id) > 40;
+DELETE FROM hydra_oauth2_oidc WHERE LENGTH(request_id) > 40;
+DELETE FROM hydra_oauth2_pkce WHERE LENGTH(request_id) > 40;
 
-DELETE FROM hydra_oauth2_access WHERE LENGTH(request_id) > 40 OR request_id = '';
-DELETE FROM hydra_oauth2_refresh WHERE LENGTH(request_id) > 40 OR request_id = '';
-DELETE FROM hydra_oauth2_code WHERE LENGTH(request_id) > 40 OR request_id = '';
-DELETE FROM hydra_oauth2_oidc WHERE LENGTH(request_id) > 40 OR request_id = '';
-DELETE FROM hydra_oauth2_pkce WHERE LENGTH(request_id) > 40 OR request_id = '';
+-- 2. Next we're actually resizing
+ALTER TABLE hydra_oauth2_access ALTER COLUMN request_id TYPE varchar(40);
+ALTER TABLE hydra_oauth2_refresh ALTER COLUMN request_id TYPE varchar(40);
+ALTER TABLE hydra_oauth2_code ALTER COLUMN request_id TYPE varchar(40);
+ALTER TABLE hydra_oauth2_oidc ALTER COLUMN request_id TYPE varchar(40);
+ALTER TABLE hydra_oauth2_pkce ALTER COLUMN request_id TYPE varchar(40);
+
+-- 3. We must also drop the NOT NULL and default values as request_id can be set to NULL, for example in
+--    oauth2 client credentials grant.
+ALTER TABLE hydra_oauth2_access ALTER COLUMN request_id DROP NOT NULL;
+ALTER TABLE hydra_oauth2_refresh ALTER COLUMN request_id DROP NOT NULL;
+ALTER TABLE hydra_oauth2_code ALTER COLUMN request_id DROP NOT NULL;
+ALTER TABLE hydra_oauth2_oidc ALTER COLUMN request_id DROP NOT NULL;
+ALTER TABLE hydra_oauth2_pkce ALTER COLUMN request_id DROP NOT NULL;
+ALTER TABLE hydra_oauth2_access ALTER COLUMN request_id DROP DEFAULT;
+ALTER TABLE hydra_oauth2_refresh ALTER COLUMN request_id DROP DEFAULT;
+ALTER TABLE hydra_oauth2_code ALTER COLUMN request_id DROP DEFAULT;
+ALTER TABLE hydra_oauth2_oidc ALTER COLUMN request_id DROP DEFAULT;
+ALTER TABLE hydra_oauth2_pkce ALTER COLUMN request_id DROP DEFAULT;
+
+-- 4. And lastly, we must set it to NULL where the request_id is an empty string
+UPDATE hydra_oauth2_access SET request_id = NULL WHERE LENGTH(request_id) = 0;
+UPDATE hydra_oauth2_refresh SET request_id = NULL WHERE LENGTH(request_id) = 0;
+UPDATE hydra_oauth2_code SET request_id = NULL WHERE LENGTH(request_id) = 0;
+UPDATE hydra_oauth2_oidc SET request_id = NULL WHERE LENGTH(request_id) = 0;
+UPDATE hydra_oauth2_pkce SET request_id = NULL WHERE LENGTH(request_id) = 0;
+
+-- 5. Now we can delete all request_id's that are set but do not point to an existing challenge. We also must include
+--    request_ids which are set to NULL
+DELETE FROM hydra_oauth2_access WHERE NOT EXISTS (
+  SELECT 1 FROM hydra_oauth2_consent_request_handled WHERE hydra_oauth2_access.request_id = hydra_oauth2_consent_request_handled.challenge OR hydra_oauth2_access.request_id = NULL
+);
+DELETE FROM hydra_oauth2_refresh WHERE NOT EXISTS (
+  SELECT 1 FROM hydra_oauth2_consent_request_handled WHERE hydra_oauth2_refresh.request_id = hydra_oauth2_consent_request_handled.challenge OR hydra_oauth2_refresh.request_id = NULL
+);
+DELETE FROM hydra_oauth2_code WHERE NOT EXISTS (
+  SELECT 1 FROM hydra_oauth2_consent_request_handled WHERE hydra_oauth2_code.request_id = hydra_oauth2_consent_request_handled.challenge OR hydra_oauth2_code.request_id = NULL
+);
+DELETE FROM hydra_oauth2_oidc WHERE NOT EXISTS (
+  SELECT 1 FROM hydra_oauth2_consent_request_handled WHERE hydra_oauth2_oidc.request_id = hydra_oauth2_consent_request_handled.challenge OR hydra_oauth2_oidc.request_id = NULL
+);
+DELETE FROM hydra_oauth2_pkce WHERE NOT EXISTS (
+  SELECT 1 FROM hydra_oauth2_consent_request_handled WHERE hydra_oauth2_pkce.request_id = hydra_oauth2_consent_request_handled.challenge OR hydra_oauth2_pkce.request_id = NULL
+);
+
+-- In preparation for creating the client_id index and foreign key, we must set it to varchar(255) which is also
+-- the length of hydra_client.id
+DELETE FROM hydra_oauth2_access WHERE LENGTH(client_id) > 255;
+DELETE FROM hydra_oauth2_refresh WHERE LENGTH(client_id) > 255;
+DELETE FROM hydra_oauth2_code WHERE LENGTH(client_id) > 255;
+DELETE FROM hydra_oauth2_oidc WHERE LENGTH(client_id) > 255;
+DELETE FROM hydra_oauth2_pkce WHERE LENGTH(client_id) > 255;
+ALTER TABLE hydra_oauth2_access ALTER COLUMN client_id TYPE varchar(255);
+ALTER TABLE hydra_oauth2_refresh ALTER COLUMN client_id TYPE varchar(255);
+ALTER TABLE hydra_oauth2_code ALTER COLUMN client_id TYPE varchar(255);
+ALTER TABLE hydra_oauth2_oidc ALTER COLUMN client_id TYPE varchar(255);
+ALTER TABLE hydra_oauth2_pkce ALTER COLUMN client_id TYPE varchar(255);
 ```
 
 ##### Removing inconsistent login & consent data
@@ -179,19 +236,38 @@ That is achieved by running the following queries. Make sure you understand what
 they may have on your system before executing `hydra migrate sql`:
 
 ```sql
-DELETE FROM hydra_oauth2_consent_request_handled as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request WHERE h.challenge = hydra_oauth2_consent_request.challenge);
-DELETE FROM hydra_oauth2_authentication_request_handled as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request WHERE h.challenge = hydra_oauth2_consent_request.challenge);
+-- This can be null when no previous login session exists, so let's remove default
+ALTER TABLE hydra_oauth2_authentication_request ALTER COLUMN login_session_id DROP DEFAULT;
 
-DELETE FROM hydra_oauth2_consent_request WHERE login_challenge='';
+-- This can be null when no previous login session exists or if that session has been removed, so let's remove default
+ALTER TABLE hydra_oauth2_consent_request ALTER COLUMN login_session_id DROP DEFAULT;
 
-DELETE FROM hydra_oauth2_authentication_request as h WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE h.client_id = hydra_client.id);
-DELETE FROM hydra_oauth2_authentication_request as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_authentication_session WHERE h.login_session_id = hydra_oauth2_authentication_session.id);
+-- This can be null when the login_challenge was deleted (should not delete the consent itself)
+ALTER TABLE hydra_oauth2_consent_request ALTER COLUMN login_challenge DROP DEFAULT;
 
-DELETE FROM hydra_oauth2_consent_request as h WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE h.client_id = hydra_client.id);
-DELETE FROM hydra_oauth2_consent_request as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_authentication_session WHERE h.login_session_id = hydra_oauth2_authentication_session.id);
-DELETE FROM hydra_oauth2_consent_request as h WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_authentication_request WHERE h.login_challenge = hydra_oauth2_authentication_request.challenge);
+-- Consent requests that point to an empty or invalid login request should set their login_challenge to NULL
+UPDATE hydra_oauth2_consent_request SET login_challenge = NULL WHERE NOT EXISTS (
+  SELECT 1 FROM hydra_oauth2_authentication_request WHERE hydra_oauth2_consent_request.login_challenge = hydra_oauth2_authentication_request.challenge
+);
 
-DELETE FROM hydra_oauth2_obfuscated_authentication_session as h WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE h.client_id = hydra_client.id);
+-- Consent requests that point to an empty or invalid login session should set their login_session_id to NULL
+UPDATE hydra_oauth2_consent_request SET login_session_id = NULL WHERE NOT EXISTS (
+  SELECT 1 FROM hydra_oauth2_authentication_session WHERE hydra_oauth2_consent_request.login_session_id = hydra_oauth2_authentication_session.id
+);
+
+-- Login requests that point to a login session that no longer exists (or was never set in the first place) should set that to NULL
+UPDATE hydra_oauth2_authentication_request SET login_session_id = NULL WHERE NOT EXISTS (
+  SELECT 1 FROM hydra_oauth2_authentication_session WHERE hydra_oauth2_authentication_request.login_session_id = hydra_oauth2_authentication_session.id
+);
+
+-- Login, consent, obfuscated sessions that point to a client which no longer exists must be deleted
+DELETE FROM hydra_oauth2_authentication_request WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE hydra_oauth2_authentication_request.client_id = hydra_client.id);
+DELETE FROM hydra_oauth2_consent_request WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE hydra_oauth2_consent_request.client_id = hydra_client.id);
+DELETE FROM hydra_oauth2_obfuscated_authentication_session WHERE NOT EXISTS (SELECT 1 FROM hydra_client WHERE hydra_oauth2_obfuscated_authentication_session.client_id = hydra_client.id);
+
+-- Handled login and consent requests which point to a consent/login request that no longer exists must be deleted
+DELETE FROM hydra_oauth2_consent_request_handled WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request WHERE hydra_oauth2_consent_request_handled.challenge = hydra_oauth2_consent_request.challenge);
+DELETE FROM hydra_oauth2_authentication_request_handled WHERE NOT EXISTS (SELECT 1 FROM hydra_oauth2_consent_request WHERE hydra_oauth2_authentication_request_handled.challenge = hydra_oauth2_consent_request.challenge);
 ```
 
 Be aware that some queries might cascade and remove other data to. One such example is checking `hydra_oauth2_consent_request`
@@ -200,11 +276,7 @@ is removed as well.
 
 #### Indices
 
-In order to [resolve table locking](https://github.com/ory/hydra/issues/1067) during the refresh token flow, the following indices were added:
-- Unique index on the `request_id` column in the `hydra_oauth2_access` & `hydra_oauth2_refresh` tables
-
-In order to [resolve table locking](https://github.com/ory/hydra/issues/1067) when flushing expired tokens, the following index was added:
-- Index on the `requested_at` column in the `hydra_oauth2_access` table
+Several indices have been added which should resolve table locking when searching in large data sets.
 
 ### Non-breaking Changes
 

@@ -10,7 +10,7 @@ killall mock-cb || true
 
 export HYDRA_URL=http://127.0.0.1:4444/
 export HYDRA_ADMIN_URL=http://127.0.0.1:4445/
-export OAUTH2_CLIENT_ID=foobar
+export OAUTH2_CLIENT_ID=foobar-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
 export OAUTH2_CLIENT_SECRET=bazbar
 export OAUTH2_ISSUER_URL=http://127.0.0.1:4444/
 export LOG_LEVEL=debug
@@ -49,7 +49,12 @@ hydra clients create \
 
 token=$(hydra token client)
 
-hydra token introspect "$token"
+introspect=$(hydra token introspect "$token")
+
+if [[ "$(echo $introspect)" =~ "false" ]]; then
+    echo "Token introspection should return true"
+    exit 1
+fi
 
 ## Authenticate but do not remember user
 cookie=$(OAUTH2_EXTRA="&mockLogin=accept&mockConsent=accept" \
@@ -83,7 +88,31 @@ cookie=$(OAUTH2_EXTRA="&mockLogin=accept&mockConsent=accept&rememberConsent=yes"
 OAUTH2_EXTRA="&mockLogin=accept&mockConsent=accept&prompt=none" \
     mock-client
 
+if [[ "$(echo $introspect)" =~ "false" ]]; then
+    echo "Token introspection should return true"
+    exit 1
+fi
+
 hydra clients delete $OAUTH2_CLIENT_ID
+
+if [[ "$(hydra token introspect $token)" =~ "true" ]]; then
+    echo "Token introspection should return false"
+    exit 1
+fi
+
+hydra clients create \
+    --endpoint http://127.0.0.1:4445 \
+    --id $OAUTH2_CLIENT_ID \
+    --secret $OAUTH2_CLIENT_SECRET \
+    --response-types token,code,id_token \
+    --grant-types refresh_token,authorization_code,client_credentials \
+    --scope openid,offline \
+    --callbacks http://127.0.0.1:5555/callback
+
+if [[ "$(hydra token introspect $token)" =~ "true" ]]; then
+    echo "Token introspection should return false"
+    exit 1
+fi
 
 kill %1
 kill %2

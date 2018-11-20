@@ -81,16 +81,29 @@ jobs:
           source $BASH_ENV
     - checkout
     - run: go mod verify
-    - run: go get -u github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/ory/go-acc
     - run: go install github.com/ory/hydra
-    - run: go install github.com/ory/hydra/test/mock-lcp
     - run: hydra migrate sql $DATABASE_URL_POSTGRES
     - run: hydra migrate sql $DATABASE_URL_MYSQL
-    - run: DATABASE_URL=$DATABASE_URL_POSTGRES ./scripts/test-e2e-opaque.sh
-    - run: DATABASE_URL=$DATABASE_URL_MYSQL ./scripts/test-e2e-opaque.sh
-    - run: DATABASE_URL=memory ./scripts/test-e2e-opaque.sh
-    - run: DATABASE_URL=memory ./scripts/test-e2e-opaque.sh
-    - run: ./scripts/test-e2e-plugin.sh
+    - run: DATABASE_URL=$DATABASE_URL_POSTGRES ./scripts/test-e2e.sh
+    - run: DATABASE_URL=$DATABASE_URL_MYSQL ./scripts/test-e2e.sh
+#    See https://github.com/ory/hydra/issues/1179
+#    - run: DATABASE_URL=memory ./scripts/test-e2e.sh
+
+    test-e2e-plugin:
+      docker:
+      - image: circleci/golang:1.11
+      working_directory: /go/src/github.com/ory/hydra
+      steps:
+      - run:
+          name: Enable go1.11 modules
+          command: |
+            echo 'export GO111MODULE=on' >> $BASH_ENV
+            source $BASH_ENV
+      - checkout
+      - run: go mod verify
+      - run: go install github.com/ory/hydra
+      - run: OAUTH2_ACCESS_TOKEN_STRATEGY=jwt ./scripts/test-e2e-plugin.sh
+      - run: ./scripts/test-e2e-plugin.sh
 
   test-e2e-jwt:
     docker:
@@ -115,16 +128,13 @@ jobs:
           source $BASH_ENV
     - checkout
     - run: go mod verify
-    - run: go get -u github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/ory/go-acc
     - run: go install github.com/ory/hydra
-    - run: go install github.com/ory/hydra/test/mock-lcp
     - run: hydra migrate sql $DATABASE_URL_POSTGRES
     - run: hydra migrate sql $DATABASE_URL_MYSQL
-    - run: DATABASE_URL=$DATABASE_URL_POSTGRES ./scripts/test-e2e-jwt.sh
-    - run: DATABASE_URL=$DATABASE_URL_MYSQL ./scripts/test-e2e-jwt.sh
-    - run: DATABASE_URL=memory ./scripts/test-e2e-opaque.sh
-    - run: DATABASE_URL=memory ./scripts/test-e2e-opaque.sh
-    - run: ./scripts/test-e2e-plugin.sh
+    - run: OAUTH2_ACCESS_TOKEN_STRATEGY=jwt DATABASE_URL=$DATABASE_URL_POSTGRES ./scripts/test-e2e.sh
+    - run: OAUTH2_ACCESS_TOKEN_STRATEGY=jwt DATABASE_URL=$DATABASE_URL_MYSQL ./scripts/test-e2e.sh
+#    See https://github.com/ory/hydra/issues/1179
+#    - run: OAUTH2_ACCESS_TOKEN_STRATEGY=jwt DATABASE_URL=memory ./scripts/test-e2e.sh
 
 # This test is really useless because there are always changes (usually timestamps in the generated code)
 #  generators:
@@ -285,6 +295,12 @@ workflows:
           filters:
             tags:
               only: /.*/
+      - test-e2e-plugin:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /.*/
       - release-docs:
           filters:
             branches:
@@ -306,6 +322,7 @@ workflows:
 #            - generators
             - format
             - test-e2e-opaque
+            - test-e2e-plugin
             - test-e2e-jwt
           filters:
             tags:

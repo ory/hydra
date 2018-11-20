@@ -35,8 +35,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/client"
-
 	djwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
@@ -53,6 +51,7 @@ import (
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/herodot"
+	"github.com/ory/hydra/client"
 	hc "github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
@@ -1125,7 +1124,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 				shouldPassConsentStrategy bool
 				expectOAuthAuthError      bool
 				expectOAuthTokenError     bool
-				checkExpiry     bool
+				checkExpiry               bool
 				authTime                  time.Time
 				requestTime               time.Time
 				assertAccessToken         func(*testing.T, string)
@@ -1134,7 +1133,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 					d:                         "should pass request if strategy passes",
 					authURL:                   oauthConfig.AuthCodeURL("some-foo-state"),
 					shouldPassConsentStrategy: true,
-					checkExpiry: true,
+					checkExpiry:               true,
 					cb: func(t *testing.T) httprouter.Handle {
 						return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 							code = r.URL.Query().Get("code")

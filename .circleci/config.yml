@@ -50,7 +50,7 @@ jobs:
             echo 'export GO111MODULE=on' >> $BASH_ENV
             source $BASH_ENV
       - checkout
-      - run: go mod verify
+      - run: go mod download
       - run: go get -u github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/ory/go-acc
       - run: go-acc -o coverage.txt ./... -- -failfast -timeout=20m
 #      Running race conditions requires parallel tests, otherwise it's worthless (which is the case)

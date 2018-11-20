@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ory/fosite"
-
 	"github.com/jmoiron/sqlx"
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 
+	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/x/dbal"

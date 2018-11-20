@@ -34,7 +34,7 @@ jobs:
         environment:
         - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/hydra?sslmode=disable
         - TEST_DATABASE_MYSQL=root:test@(localhost:3306)/mysql?parseTime=true
-      - image: postgres:9.5
+      - image: postgres:9.6
         environment:
         - POSTGRES_USER=test
         - POSTGRES_PASSWORD=test
@@ -52,10 +52,9 @@ jobs:
       - checkout
       - run: go mod verify
       - run: go get -u github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/ory/go-acc
-      - run: go install github.com/ory/hydra
-      - run: go install github.com/ory/hydra/test/mock-lcp
-      - run: go-acc -o coverage.txt ./... -- -failfast -v -timeout=20m
-      - run: go test -race -short $(go list ./... | grep -v cmd)
+      - run: go-acc -o coverage.txt ./... -- -failfast -timeout=20m
+#      Running race conditions requires parallel tests, otherwise it's worthless (which is the case)
+#      - run: go test -race -short $(go list ./... | grep -v cmd)
       - run: test -z "$CIRCLE_PR_NUMBER" && goveralls -service=circle-ci -coverprofile=coverage.txt -repotoken=$COVERALLS_REPO_TOKEN || echo "forks are not allowed to push to coveralls"
 
   test-e2e-opaque:

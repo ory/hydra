@@ -6,8 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/consent"
-
 	"github.com/jmoiron/sqlx"
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
@@ -15,6 +13,7 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/dbal/migratest"

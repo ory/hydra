@@ -27,8 +27,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/consent"
-
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -37,6 +35,7 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/consent"
 	. "github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/x/sqlcon/dockertest"

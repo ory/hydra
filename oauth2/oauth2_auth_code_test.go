@@ -35,8 +35,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/client"
-
 	djwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
@@ -53,6 +51,7 @@ import (
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/herodot"
+	"github.com/ory/hydra/client"
 	hc "github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
@@ -181,8 +180,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					require.NoError(t, jm.AddKeySet(context.TODO(), OpenIDConnectKeyName, keys))
 					jwtStrategy, err := jwk.NewRS256JWTStrategy(jm, OpenIDConnectKeyName)
 
-					fc.RefreshTokenLifespan = time.Second * 5
-					fc.AccessTokenLifespan = time.Second * 15
+					fc.RefreshTokenLifespan = time.Second * 2
+					fc.AccessTokenLifespan = time.Second * 8
 					handler := &Handler{
 						OAuth2: compose.Compose(
 							fc, fs.f, strat.s, hasher,
@@ -652,7 +651,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							setup: func() {
 								// In order to check if authenticatedAt/requestedAt works, we'll sleep first in order to ensure that authenticatedAt is in the past
 								// if handled correctly.
-								time.Sleep(time.Second * 2)
+								time.Sleep(time.Second + time.Millisecond)
 							},
 							authURL: oauthConfig.AuthCodeURL("some-hardcoded-state") + "&prompt=none&max_age=60",
 							cj:      persistentCJ,
@@ -886,7 +885,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						},
 						{
 							d:       "should not cause issues if max_age is very low and consent takes a long time",
-							authURL: oauthConfig.AuthCodeURL("some-hardcoded-state") + "&max_age=3",
+							authURL: oauthConfig.AuthCodeURL("some-hardcoded-state") + "&max_age=1",
 							//cj:      persistentCJ,
 							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
@@ -894,7 +893,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									require.NoError(t, err)
 									require.EqualValues(t, http.StatusOK, res.StatusCode)
 
-									time.Sleep(time.Second * 5)
+									time.Sleep(time.Second * 2)
 
 									v, res, err := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{Subject: "user-a"})
 									require.NoError(t, err)
@@ -908,8 +907,6 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									_, res, err := apiClient.GetConsentRequest(r.URL.Query().Get("consent_challenge"))
 									require.NoError(t, err)
 									require.EqualValues(t, http.StatusOK, res.StatusCode)
-
-									time.Sleep(time.Second * 5)
 
 									v, res, err := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{
 										GrantScope: []string{"hydra", "openid"},
@@ -1127,6 +1124,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 				shouldPassConsentStrategy bool
 				expectOAuthAuthError      bool
 				expectOAuthTokenError     bool
+				checkExpiry               bool
 				authTime                  time.Time
 				requestTime               time.Time
 				assertAccessToken         func(*testing.T, string)
@@ -1135,6 +1133,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 					d:                         "should pass request if strategy passes",
 					authURL:                   oauthConfig.AuthCodeURL("some-foo-state"),
 					shouldPassConsentStrategy: true,
+					checkExpiry:               true,
 					cb: func(t *testing.T) httprouter.Handle {
 						return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 							code = r.URL.Query().Get("code")
@@ -1333,9 +1332,9 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 					})
 					t.Logf("Got token: %s", token.AccessToken)
 
-					time.Sleep(time.Millisecond * 1200) // Makes sure exp/iat/nbf time is different later on
+					// time.Sleep(time.Millisecond * 1200) // Makes sure exp/iat/nbf time is different later on
 
-					res, err := testRefresh(t, token, ts.URL)
+					res, err := testRefresh(t, token, ts.URL, tc.checkExpiry)
 					require.NoError(t, err)
 					assert.Equal(t, http.StatusOK, res.StatusCode)
 
@@ -1368,9 +1367,11 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						refreshedPayload := map[string]interface{}{}
 						require.NoError(t, json.Unmarshal(body, &refreshedPayload))
 
-						assert.NotEqual(t, refreshedPayload["exp"], origPayload["exp"])
-						assert.NotEqual(t, refreshedPayload["iat"], origPayload["iat"])
-						assert.NotEqual(t, refreshedPayload["nbf"], origPayload["nbf"])
+						if tc.checkExpiry {
+							assert.NotEqual(t, refreshedPayload["exp"], origPayload["exp"])
+							assert.NotEqual(t, refreshedPayload["iat"], origPayload["iat"])
+							assert.NotEqual(t, refreshedPayload["nbf"], origPayload["nbf"])
+						}
 						assert.NotEqual(t, refreshedPayload["jti"], origPayload["jti"])
 						assert.Equal(t, refreshedPayload["client_id"], origPayload["client_id"])
 					})
@@ -1387,13 +1388,13 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 					})
 
 					t.Run("refreshing old token should no longer work", func(t *testing.T) {
-						res, err := testRefresh(t, token, ts.URL)
+						res, err := testRefresh(t, token, ts.URL, false)
 						require.NoError(t, err)
 						assert.Equal(t, http.StatusBadRequest, res.StatusCode)
 					})
 
 					t.Run("refreshing new refresh token should work", func(t *testing.T) {
-						res, err := testRefresh(t, &refreshedToken, ts.URL)
+						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
 						require.NoError(t, err)
 						assert.Equal(t, http.StatusOK, res.StatusCode)
 					})
@@ -1411,7 +1412,11 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 	}
 }
 
-func testRefresh(t *testing.T, token *oauth2.Token, u string) (*http.Response, error) {
+func testRefresh(t *testing.T, token *oauth2.Token, u string, sleep bool) (*http.Response, error) {
+	if sleep {
+		time.Sleep(time.Millisecond * 1001)
+	}
+
 	oauthClientConfig := &clientcredentials.Config{
 		ClientID:     "app-client",
 		ClientSecret: "secret",

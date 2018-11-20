@@ -8,7 +8,7 @@ killall hydra || true
 
 export HYDRA_URL=http://127.0.0.1:4444/
 export HYDRA_ADMIN_URL=http://127.0.0.1:4445/
-export OAUTH2_CLIENT_ID=foobar
+export OAUTH2_CLIENT_ID=foobar-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
 export OAUTH2_CLIENT_SECRET=bazbar
 export OAUTH2_ISSUER_URL=http://127.0.0.1:4444/
 export LOG_LEVEL=debug

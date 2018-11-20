@@ -89,21 +89,21 @@ jobs:
 #    See https://github.com/ory/hydra/issues/1179
 #    - run: DATABASE_URL=memory ./scripts/test-e2e.sh
 
-    test-e2e-plugin:
-      docker:
-      - image: circleci/golang:1.11
-      working_directory: /go/src/github.com/ory/hydra
-      steps:
-      - run:
-          name: Enable go1.11 modules
-          command: |
-            echo 'export GO111MODULE=on' >> $BASH_ENV
-            source $BASH_ENV
-      - checkout
-      - run: go mod verify
-      - run: go install github.com/ory/hydra
-      - run: OAUTH2_ACCESS_TOKEN_STRATEGY=jwt ./scripts/test-e2e-plugin.sh
-      - run: ./scripts/test-e2e-plugin.sh
+  test-e2e-plugin:
+    docker:
+    - image: circleci/golang:1.11
+    working_directory: /go/src/github.com/ory/hydra
+    steps:
+    - run:
+        name: Enable go1.11 modules
+        command: |
+          echo 'export GO111MODULE=on' >> $BASH_ENV
+          source $BASH_ENV
+    - checkout
+    - run: go mod verify
+    - run: go install github.com/ory/hydra
+    - run: OAUTH2_ACCESS_TOKEN_STRATEGY=jwt ./scripts/test-e2e-plugin.sh
+    - run: ./scripts/test-e2e-plugin.sh
 
   test-e2e-jwt:
     docker:

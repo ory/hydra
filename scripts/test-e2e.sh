@@ -47,9 +47,9 @@ hydra clients create \
     --scope openid,offline \
     --callbacks http://127.0.0.1:5555/callback
 
-token=$(hydra token client)
+clientToken=$(hydra token client)
 
-introspect=$(hydra token introspect "$token")
+introspect=$(hydra token introspect "$clientToken")
 
 if [[ "$(echo $introspect)" =~ "false" ]]; then
     echo "Token introspection should return true"
@@ -84,18 +84,20 @@ fi
 cookie=$(OAUTH2_EXTRA="&mockLogin=accept&mockConsent=accept&rememberConsent=yes" \
     mock-client)
 
+echo $cookie
+
 ## Prompt none should work now because cookie was set
 OAUTH2_EXTRA="&mockLogin=accept&mockConsent=accept&prompt=none" \
     mock-client
 
-if [[ "$(echo $introspect)" =~ "false" ]]; then
+if [[ "$(hydra token introspect $clientToken)" =~ "false" ]]; then
     echo "Token introspection should return true"
     exit 1
 fi
 
 hydra clients delete $OAUTH2_CLIENT_ID
 
-if [[ "$(hydra token introspect $token)" =~ "true" ]]; then
+if [[ "$(hydra token introspect $clientToken)" =~ "true" ]]; then
     echo "Token introspection should return false"
     exit 1
 fi
@@ -109,7 +111,7 @@ hydra clients create \
     --scope openid,offline \
     --callbacks http://127.0.0.1:5555/callback
 
-if [[ "$(hydra token introspect $token)" =~ "true" ]]; then
+if [[ "$(hydra token introspect $clientToken)" =~ "true" ]]; then
     echo "Token introspection should return false"
     exit 1
 fi

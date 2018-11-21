@@ -84,7 +84,8 @@ var flushRequests = []*fosite.Request{
 }
 
 func TestHandlerFlushHandler(t *testing.T) {
-	store := oauth2.NewFositeMemoryStore(nil, lifespan)
+	cl := client.NewMemoryManager(&fosite.BCrypt{WorkFactor: 4})
+	store := oauth2.NewFositeMemoryStore(cl, lifespan)
 	h := &oauth2.Handler{
 		H:             herodot.NewJSONWriter(nil),
 		ScopeStrategy: fosite.HierarchicScopeStrategy,
@@ -94,6 +95,7 @@ func TestHandlerFlushHandler(t *testing.T) {
 
 	for _, r := range flushRequests {
 		require.NoError(t, store.CreateAccessTokenSession(nil, r.ID, r))
+		_ = cl.CreateClient(nil, r.Client.(*client.Client))
 	}
 
 	r := httprouter.New()

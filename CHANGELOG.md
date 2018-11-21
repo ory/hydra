@@ -3,6 +3,8 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [Unreleased](#unreleased)
+  - [v1.0.0-rc.2+oryOS.9 (2018-11-21)](#v100-rc2oryos9-2018-11-21)
   - [v1.0.0-rc.1+oryOS.9 (2018-11-21)](#v100-rc1oryos9-2018-11-21)
   - [v1.0.0-beta.9 (2018-09-01)](#v100-beta9-2018-09-01)
   - [v1.0.0-beta.8 (2018-08-10)](#v100-beta8-2018-08-10)
@@ -135,6 +137,21 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Change Log
+
+## [Unreleased](https://github.com/ory/hydra/tree/HEAD)
+
+[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.2+oryOS.9...HEAD)
+
+**Closed issues:**
+
+- sql: Unable to run migrations when coming from beta.9 [\#1185](https://github.com/ory/hydra/issues/1185)
+
+## [v1.0.0-rc.2+oryOS.9](https://github.com/ory/hydra/tree/v1.0.0-rc.2+oryOS.9) (2018-11-21)
+[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.1+oryOS.9...v1.0.0-rc.2+oryOS.9)
+
+**Merged pull requests:**
+
+- sql: Resolve beta.9 -\> rc.1 migration issue [\#1186](https://github.com/ory/hydra/pull/1186) ([aeneasr](https://github.com/aeneasr))
 
 ## [v1.0.0-rc.1+oryOS.9](https://github.com/ory/hydra/tree/v1.0.0-rc.1+oryOS.9) (2018-11-21)
 [Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-beta.9...v1.0.0-rc.1+oryOS.9)

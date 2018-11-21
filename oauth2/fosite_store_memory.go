@@ -29,6 +29,7 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
+	"github.com/ory/x/sqlcon"
 )
 
 func NewFositeMemoryStore(m client.Manager, ls time.Duration) *FositeMemoryStore {
@@ -68,14 +69,25 @@ func (s *FositeMemoryStore) CreateOpenIDConnectSession(_ context.Context, author
 	return nil
 }
 
-func (s *FositeMemoryStore) GetOpenIDConnectSession(_ context.Context, authorizeCode string, requester fosite.Requester) (fosite.Requester, error) {
+func (s *FositeMemoryStore) GetOpenIDConnectSession(ctx context.Context, code string, requester fosite.Requester) (fosite.Requester, error) {
 	s.RLock()
-	defer s.RUnlock()
-	cl, ok := s.IDSessions[authorizeCode]
+	rel, ok := s.IDSessions[code]
+	s.RUnlock()
+
 	if !ok {
 		return nil, errors.Wrap(fosite.ErrNotFound, "")
 	}
-	return cl, nil
+
+	if _, err := s.GetClient(ctx, rel.GetClient().GetID()); errors.Cause(err) == sqlcon.ErrNoRows {
+		s.Lock()
+		delete(s.IDSessions, code)
+		s.Unlock()
+		return nil, err
+	} else if err != nil {
+		return nil, err
+	}
+
+	return rel, nil
 }
 
 func (s *FositeMemoryStore) DeleteOpenIDConnectSession(_ context.Context, authorizeCode string) error {
@@ -92,17 +104,26 @@ func (s *FositeMemoryStore) CreateAuthorizeCodeSession(_ context.Context, code s
 	return nil
 }
 
-func (s *FositeMemoryStore) GetAuthorizeCodeSession(_ context.Context, code string, _ fosite.Session) (fosite.Requester, error) {
+func (s *FositeMemoryStore) GetAuthorizeCodeSession(ctx context.Context, code string, _ fosite.Session) (fosite.Requester, error) {
 	s.RLock()
-	defer s.RUnlock()
-
 	rel, ok := s.AuthorizeCodes[code]
+	s.RUnlock()
+
 	if !ok {
 		return nil, errors.Wrap(fosite.ErrNotFound, "")
 	}
 
 	if !rel.active {
 		return rel.Requester, errors.WithStack(fosite.ErrInvalidatedAuthorizeCode)
+	}
+
+	if _, err := s.GetClient(ctx, rel.GetClient().GetID()); errors.Cause(err) == sqlcon.ErrNoRows {
+		s.Lock()
+		delete(s.AuthorizeCodes, code)
+		s.Unlock()
+		return nil, err
+	} else if err != nil {
+		return nil, err
 	}
 
 	return rel.Requester, nil
@@ -128,13 +149,24 @@ func (s *FositeMemoryStore) CreateAccessTokenSession(_ context.Context, signatur
 	return nil
 }
 
-func (s *FositeMemoryStore) GetAccessTokenSession(_ context.Context, signature string, _ fosite.Session) (fosite.Requester, error) {
+func (s *FositeMemoryStore) GetAccessTokenSession(ctx context.Context, signature string, _ fosite.Session) (fosite.Requester, error) {
 	s.RLock()
-	defer s.RUnlock()
 	rel, ok := s.AccessTokens[signature]
+	s.RUnlock()
+
 	if !ok {
 		return nil, errors.Wrap(fosite.ErrNotFound, "")
 	}
+
+	if _, err := s.GetClient(ctx, rel.GetClient().GetID()); errors.Cause(err) == sqlcon.ErrNoRows {
+		s.Lock()
+		delete(s.AccessTokens, signature)
+		s.Unlock()
+		return nil, err
+	} else if err != nil {
+		return nil, err
+	}
+
 	return rel, nil
 }
 
@@ -156,13 +188,24 @@ func (s *FositeMemoryStore) CreateRefreshTokenSession(_ context.Context, signatu
 	return nil
 }
 
-func (s *FositeMemoryStore) GetRefreshTokenSession(_ context.Context, signature string, _ fosite.Session) (fosite.Requester, error) {
+func (s *FositeMemoryStore) GetRefreshTokenSession(ctx context.Context, signature string, _ fosite.Session) (fosite.Requester, error) {
 	s.RLock()
-	defer s.RUnlock()
 	rel, ok := s.RefreshTokens[signature]
+	s.RUnlock()
+
 	if !ok {
 		return nil, errors.Wrap(fosite.ErrNotFound, "")
 	}
+
+	if _, err := s.GetClient(ctx, rel.GetClient().GetID()); errors.Cause(err) == sqlcon.ErrNoRows {
+		s.Lock()
+		delete(s.RefreshTokens, signature)
+		s.Unlock()
+		return nil, err
+	} else if err != nil {
+		return nil, err
+	}
+
 	return rel, nil
 }
 
@@ -238,19 +281,35 @@ func (s *FositeMemoryStore) FlushInactiveAccessTokens(ctx context.Context, notAf
 }
 
 func (s *FositeMemoryStore) CreatePKCERequestSession(_ context.Context, code string, req fosite.Requester) error {
+	s.Lock()
 	s.PKCES[code] = req
+	s.Unlock()
 	return nil
 }
 
-func (s *FositeMemoryStore) GetPKCERequestSession(_ context.Context, code string, _ fosite.Session) (fosite.Requester, error) {
+func (s *FositeMemoryStore) GetPKCERequestSession(ctx context.Context, code string, _ fosite.Session) (fosite.Requester, error) {
+	s.RLock()
 	rel, ok := s.PKCES[code]
+	s.RUnlock()
 	if !ok {
 		return nil, fosite.ErrNotFound
 	}
+
+	if _, err := s.GetClient(ctx, rel.GetClient().GetID()); errors.Cause(err) == sqlcon.ErrNoRows {
+		s.Lock()
+		delete(s.RefreshTokens, code)
+		s.Unlock()
+		return nil, err
+	} else if err != nil {
+		return nil, err
+	}
+
 	return rel, nil
 }
 
 func (s *FositeMemoryStore) DeletePKCERequestSession(_ context.Context, code string) error {
+	s.Lock()
 	delete(s.PKCES, code)
+	s.Unlock()
 	return nil
 }

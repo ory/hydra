@@ -23,6 +23,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -33,7 +34,7 @@ import (
 	"strings"
 	"time"
 
-	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/oauth2"
 
 	"github.com/ory/hydra/sdk/go/hydra/swagger"
@@ -50,7 +51,15 @@ type oauth2token struct {
 	Expiry       time.Time `json:"expiry,omitempty"`
 }
 
+var printToken, printCookie bool
+
+func init() {
+	flag.BoolVar(&printToken, "print-token", false, "")
+	flag.BoolVar(&printCookie, "print-cookie", false, "")
+}
+
 func main() {
+	flag.Parse()
 	conf := oauth2.Config{
 		ClientID:     os.Getenv("OAUTH2_CLIENT_ID"),
 		ClientSecret: os.Getenv("OAUTH2_CLIENT_SECRET"),
@@ -93,7 +102,9 @@ func main() {
 
 	for _, c := range c.Cookies(u) {
 		if c.Name == "oauth2_authentication_session" {
-			fmt.Print(c.Value)
+			if printCookie {
+				fmt.Print(c.Value)
+			}
 		}
 	}
 
@@ -108,7 +119,10 @@ func main() {
 		checkTokenResponse(token)
 	}
 
-	refreshToken(token)
+	newToken := refreshToken(token)
+	if printToken {
+		fmt.Printf("%s", newToken.AccessToken)
+	}
 
 	// refreshing the same token twice does not work
 	resp, err = refreshTokenRequest(token)

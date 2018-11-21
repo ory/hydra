@@ -49,16 +49,15 @@ hydra clients create \
 
 clientToken=$(hydra token client)
 
-introspect=$(hydra token introspect "$clientToken")
 
-if [[ "$(echo $introspect)" =~ "false" ]]; then
+if [[ $(hydra token introspect "$(echo $clientToken)") =~ "false" ]]; then
     echo "Token introspection should return true"
     exit 1
 fi
 
 ## Authenticate but do not remember user
 cookie=$(OAUTH2_EXTRA="&mockLogin=accept&mockConsent=accept" \
-    mock-client)
+    mock-client -print-cookie)
 export AUTH_COOKIE=$cookie
 
 ## Must fail because prompt=none but no session was remembered
@@ -70,7 +69,7 @@ fi
 
 # Authenticate and remember login (but not consent)
 cookie=$(OAUTH2_EXTRA="&mockLogin=accept&mockConsent=accept&rememberLogin=yes" \
-    mock-client)
+    mock-client -print-cookie)
 export AUTH_COOKIE=$cookie
 
 ## Must fail because prompt=none but consent was not yet stored
@@ -81,14 +80,31 @@ if OAUTH2_EXTRA="&mockLogin=accept&mockConsent=accept&prompt=none" \
 fi
 
 # Remember consent
-cookie=$(OAUTH2_EXTRA="&mockLogin=accept&mockConsent=accept&rememberConsent=yes" \
+$(OAUTH2_EXTRA="&mockLogin=accept&mockConsent=accept&rememberConsent=yes" \
     mock-client)
 
-echo $cookie
-
 ## Prompt none should work now because cookie was set
-OAUTH2_EXTRA="&mockLogin=accept&mockConsent=accept&prompt=none" \
-    mock-client
+userToken=$(OAUTH2_EXTRA="&mockLogin=accept&mockConsent=accept&prompt=none" \
+    mock-client -print-token)
+
+if [[ "$(hydra token introspect $userToken)" =~ "false" ]]; then
+    echo "Token introspection should return true for the user token"
+    exit 1
+fi
+
+if [[ "$(curl http://localhost:4445/oauth2/auth/sessions/consent/the-subject)" =~ "the-subject" ]]; then
+    echo "Consent session looks good"
+else
+    echo "Checking consent session should show the-subject"
+    exit 1
+fi
+
+if [[ "$(hydra token introspect $userToken)" =~ "true" ]]; then
+    echo "Token introspection should return false because the consent sesion was revoked"
+    exit 1
+fi
+
+curl -X DELETE http://localhost:4445/oauth2/auth/sessions/consent/the-subject
 
 if [[ "$(hydra token introspect $clientToken)" =~ "false" ]]; then
     echo "Token introspection should return true"
@@ -98,7 +114,7 @@ fi
 hydra clients delete $OAUTH2_CLIENT_ID
 
 if [[ "$(hydra token introspect $clientToken)" =~ "true" ]]; then
-    echo "Token introspection should return false"
+    echo "Token introspection should return false because the client was deleted"
     exit 1
 fi
 
@@ -112,7 +128,7 @@ hydra clients create \
     --callbacks http://127.0.0.1:5555/callback
 
 if [[ "$(hydra token introspect $clientToken)" =~ "true" ]]; then
-    echo "Token introspection should return false"
+    echo "Token introspection should return false even after the client was re-created"
     exit 1
 fi
 

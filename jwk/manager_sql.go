@@ -45,15 +45,15 @@ func NewSQLManager(db *sqlx.DB, key []byte) *SQLManager {
 	return &SQLManager{DB: db, Cipher: &AEAD{Key: key}}
 }
 
-var migrations = map[string]*migrate.PackrMigrationSource{
+var migrations = map[string]*dbal.PackrMigrationSource{
 	dbal.DriverMySQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
 		"migrations/sql/shared",
 		"migrations/sql/mysql",
-	}),
+	}, true),
 	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
 		"migrations/sql/shared",
 		"migrations/sql/postgres",
-	}),
+	}, true),
 }
 
 type sqlData struct {

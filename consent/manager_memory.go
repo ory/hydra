@@ -251,7 +251,7 @@ func (m *MemoryManager) FindPreviouslyGrantedConsentRequestsByUser(ctx context.C
 			continue
 		}
 
-		if c.RememberFor > 0 && c.RequestedAt.Add(time.Duration(c.RememberFor) * time.Second).Before(time.Now().UTC()) {
+		if c.RememberFor > 0 && c.RequestedAt.Add(time.Duration(c.RememberFor)*time.Second).Before(time.Now().UTC()) {
 			continue
 		}
 

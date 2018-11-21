@@ -535,10 +535,10 @@ This is a (potentially incomplete) summary of what needs to be done to upgrade f
    1. `$ keto migrate hydra $DATABASE_URL`.
    2. `$ keto migrate sql $DATABASE_URL`.
    3. Read how to update the JWK storage: [AES-GCM nonce storage](#aes-gcm-nonce-storage). If you only use auto-generated keys and have never used POST or PUT on the `/keys` API, you can probably just execute a `DELETE FROM hydra_jwk` to just remove all the auto-generated keys. When starting the ORY Hydra 1.0.0 CLI the required keys will be re-generated automatically.
-   4. `$ hydra migrate $DATABASE_URL`.
+   4. `$ hydra migrate sql $DATABASE_URL`.
 4. If you don't use Access Control Policies nor the Warden API, you can skip ORY Keto:
    1. Read how to update the JWK storage: [AES-GCM nonce storage](#aes-gcm-nonce-storage) and **read point 3.3 of this list**.
-   2. `$ hydra migrate $DATABASE_URL`.
+   2. `$ hydra migrate sql $DATABASE_URL`.
 5. `$ export SCOPE_STRATEGY=DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY` - this will set the [scope strategy](#replacing-hierarchical-scope-strategy-with-wildcard-scope-strategy) to the old scope strategy used in version 0.9.x. If you set this, you don't need to update the scopes your OAuth 2.0 Clients are allowed to request.
 6. `$ hydra help serve`.
 7. `$ hydra serve --your-flags`.

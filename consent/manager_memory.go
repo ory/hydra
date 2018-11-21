@@ -91,14 +91,23 @@ func (m *MemoryManager) RevokeUserConsentSession(ctx context.Context, user strin
 func (m *MemoryManager) RevokeUserClientConsentSession(ctx context.Context, user, client string) error {
 	m.m["handledConsentRequests"].Lock()
 	defer m.m["handledConsentRequests"].Unlock()
-	m.m["consentRequests"].Lock()
-	defer m.m["consentRequests"].Unlock()
 
 	var found bool
 	for k, c := range m.handledConsentRequests {
-		if c.ConsentRequest.Subject == user && (client == "" || (client != "" && c.ConsentRequest.Client.GetID() == client)) {
+		cr, err := m.GetConsentRequest(ctx, c.Challenge)
+		if err != nil {
+			return err
+		}
+
+		if cr.Subject == user &&
+			(client == "" ||
+				(client != "" && cr.Client.GetID() == client)) {
 			delete(m.handledConsentRequests, k)
+
+			m.m["consentRequests"].Lock()
 			delete(m.consentRequests, k)
+			m.m["consentRequests"].Unlock()
+
 			if err := m.store.RevokeAccessToken(nil, c.Challenge); errors.Cause(err) == fosite.ErrNotFound {
 				// do nothing
 			} else if err != nil {

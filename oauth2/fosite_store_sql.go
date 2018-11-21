@@ -73,15 +73,15 @@ const (
 	sqlTablePKCE    = "pkce"
 )
 
-var Migrations = map[string]*migrate.PackrMigrationSource{
+var Migrations = map[string]*dbal.PackrMigrationSource{
 	dbal.DriverMySQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
 		"migrations/sql/shared",
 		"migrations/sql/mysql",
-	}),
+	}, true),
 	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
 		"migrations/sql/shared",
 		"migrations/sql/postgres",
-	}),
+	}, true),
 }
 
 var sqlParams = []string{

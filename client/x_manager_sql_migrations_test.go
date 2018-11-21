@@ -26,7 +26,6 @@ import (
 	"testing"
 
 	"github.com/jmoiron/sqlx"
-	migrate "github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -36,9 +35,9 @@ import (
 	"github.com/ory/x/dbal/migratest"
 )
 
-var createMigrations = map[string]*migrate.PackrMigrationSource{
-	dbal.DriverMySQL:      dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}),
-	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}),
+var createMigrations = map[string]*dbal.PackrMigrationSource{
+	dbal.DriverMySQL:      dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}, true),
+	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}, true),
 }
 
 func CleanTestDB(t *testing.T, db *sqlx.DB) {

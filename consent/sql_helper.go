@@ -27,7 +27,6 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
 
 	"github.com/ory/go-convenience/stringsx"
@@ -35,15 +34,15 @@ import (
 	"github.com/ory/x/dbal"
 )
 
-var Migrations = map[string]*migrate.PackrMigrationSource{
+var Migrations = map[string]*dbal.PackrMigrationSource{
 	"mysql": dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
 		"migrations/sql/shared",
 		"migrations/sql/mysql",
-	}),
+	}, true),
 	"postgres": dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
 		"migrations/sql/shared",
 		"migrations/sql/postgres",
-	}),
+	}, true),
 }
 
 var sqlParamsAuthenticationRequestHandled = []string{

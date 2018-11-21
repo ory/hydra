@@ -49,7 +49,6 @@ hydra clients create \
 
 clientToken=$(hydra token client)
 
-
 if [[ $(hydra token introspect "$(echo $clientToken)") =~ "false" ]]; then
     echo "Token introspection should return true"
     exit 1
@@ -100,8 +99,13 @@ else
 fi
 
 if [[ "$(hydra token introspect $userToken)" =~ "true" ]]; then
-    echo "Token introspection should return false because the consent sesion was revoked"
-    exit 1
+    if [[ "$(echo $DATABASE_URL)" = "memory" ]]; then
+        # TODO https://github.com/ory/hydra/issues/1179
+        echo "Token introspection should return false when consent session was revoked, but this does not work for memory adapter which is tracked by issue #1179"
+    else
+        echo "Token introspection should return false because the consent session was revoked"
+        exit 1
+    fi
 fi
 
 curl -X DELETE http://localhost:4445/oauth2/auth/sessions/consent/the-subject

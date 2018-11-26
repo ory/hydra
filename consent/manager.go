@@ -36,7 +36,7 @@ type Manager interface {
 	RevokeUserClientConsentSession(ctx context.Context, user, client string) error
 
 	VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*HandledConsentRequest, error)
-	FindPreviouslyGrantedConsentRequests(ctx context.Context, client string, user string) ([]HandledConsentRequest, error)
+	FindPreviouslyGrantedConsentRequests(ctx context.Context, client, user string) ([]HandledConsentRequest, error)
 	FindPreviouslyGrantedConsentRequestsByUser(ctx context.Context, user string, limit, offset int) ([]HandledConsentRequest, error)
 
 	// Cookie management

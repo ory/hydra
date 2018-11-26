@@ -149,7 +149,7 @@ func newOAuth2Provider(c *config.Config) fosite.OAuth2Provider {
 	)
 }
 
-func setDefaultConsentURL(s string, c *config.Config, path string) string {
+func setDefaultConsentURL(c *config.Config, s, path string) string {
 	if s != "" {
 		return s
 	}

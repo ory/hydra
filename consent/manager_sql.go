@@ -402,7 +402,7 @@ func (m *SQLManager) DeleteAuthenticationSession(ctx context.Context, id string)
 	return nil
 }
 
-func (m *SQLManager) FindPreviouslyGrantedConsentRequests(ctx context.Context, client string, subject string) ([]HandledConsentRequest, error) {
+func (m *SQLManager) FindPreviouslyGrantedConsentRequests(ctx context.Context, client, subject string) ([]HandledConsentRequest, error) {
 	var a []sqlHandledConsentRequest
 
 	if err := m.DB.SelectContext(ctx, &a, m.DB.Rebind(`SELECT h.* FROM

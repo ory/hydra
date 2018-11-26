@@ -41,10 +41,7 @@ type Validator struct {
 	SubjectTypes        []string
 }
 
-func NewValidator(
-	defaultClientScopes []string,
-	subjectTypes []string,
-) *Validator {
+func NewValidator(defaultClientScopes, subjectTypes []string) *Validator {
 	if len(subjectTypes) == 0 {
 		subjectTypes = []string{"public"}
 	}

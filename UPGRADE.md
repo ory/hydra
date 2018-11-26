@@ -283,17 +283,6 @@ All method signatures stayed the same, but the factory names for instantiating t
 `hydra.NewOAuth2Api()` is now `hydra.NewAdminApi()` and `hydra.NewPublicApi()` - depending on which endpoints you need
 to interact with.
 
-#### Refresh Token Expiry
-
-All refresh tokens issued with this release will expire after 30 days of non-use. This behaviour can be modified
-using the `REFRESH_TOKEN_LIFESPAN` environment variable. By setting `REFRESH_TOKEN_LIFESPAN=-1`, refresh tokens
-are set to never expire, which is the previous behaviour.
-
-Tokens issued before this change will still be valid forever.
-
-We discourage setting `REFRESH_TOKEN_LIFESPAN=-1` as it might clog the database with tokens that will never be used again.
-In high-scale systems, `REFRESH_TOKEN_LIFESPAN` should be set to something like 15 or 30 days.
-
 #### JSON Web Token formatted Access Token data
 
 Previously, extra fields coming from `session.access_token` where directly embedded in the OAuth 2.0 Access Token when
@@ -311,7 +300,7 @@ Use environment variables `HTTPS_TLS_CERT_PATH` and `HTTPS_TLS_KEY_PATH` instead
 
 #### API Changes
 
-Endpoint `/health/status`, which redirected to `/health/alive` and was deprecated has been removed.
+Endpoint `/health/status`, which redirected to `/health/alive` was deprecated and has been removed.
 
 ## 1.0.0-beta.9
 

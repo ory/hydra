@@ -20,9 +20,13 @@ services:
       dockerfile: Dockerfile
     links:
       - postgresd:postgresd
+#     Uncomment the following section to use mysql instead.
+#      - mysqld:mysqld
     environment:
 #      - LOG_LEVEL=debug
       - DATABASE_URL=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable
+#     Uncomment the following section to use mysql instead.
+#      - DATABASE_URL=mysql://root:secret@tcp(mysqld:3306)/mysql?parseTime=true
     command:
       migrate sql -e
     restart: on-failure

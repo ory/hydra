@@ -135,10 +135,88 @@ func (h *ClientHandler) GetClient(cmd *cobra.Command, args []string) {
 		fmt.Printf("%s\n", err)
 		return
 	}
-	pkg.Must(err, "Could not delete client: %s", err)
+	pkg.Must(err, "Could not get client: %s", err)
 
 	out, err := json.MarshalIndent(cl, "", "\t")
 	pkg.Must(err, "Could not convert client to JSON: %s", err)
 
 	fmt.Printf("%s\n", out)
+}
+
+func (h *ClientHandler) AddScopeToClient(cmd *cobra.Command, args []string) {
+	m := h.newClientManager(cmd)
+
+	if len(args) < 2 {
+		fmt.Print(cmd.UsageString())
+		return
+	}
+
+	cl, err := m.GetConcreteClient(args[0])
+	if m.Dry {
+		fmt.Printf("%s\n", err)
+		return
+	}
+	pkg.Must(err, "Could not retrieve client: %s", err)
+
+	scopes := strings.Split(cl.Scope, " ")
+	for i := 1; i < len(args); i++ {
+		arg := strings.TrimSpace(args[i])
+		if !contains(scopes, arg) {
+			scopes = append(scopes, arg)
+		}
+	}
+	cl.Scope = strings.Join(scopes, " ")
+
+	err = m.UpdateClient(cl)
+	if m.Dry {
+		fmt.Printf("%s\n", err)
+		return
+	}
+	pkg.Must(err, "Could not update client: %s", err)
+	fmt.Printf("Added scope(s) to client %s", cl.ID)
+}
+
+func (h *ClientHandler) RemoveScopeFromClient(cmd *cobra.Command, args []string) {
+	m := h.newClientManager(cmd)
+
+	if len(args) < 2 {
+		fmt.Print(cmd.UsageString())
+		return
+	}
+
+	cl, err := m.GetConcreteClient(args[0])
+	if m.Dry {
+		fmt.Printf("%s\n", err)
+		return
+	}
+	pkg.Must(err, "Could not retrieve client: %s", err)
+
+	update := []string{}
+	scopes := strings.Split(cl.Scope, " ")
+	for _, scope := range scopes {
+		if !contains(args[1:], scope) {
+			update = append(update, scope)
+		}
+	}
+	cl.Scope = strings.Join(update, " ")
+
+	err = m.UpdateClient(cl)
+	if m.Dry {
+		fmt.Printf("%s\n", err)
+		return
+	}
+	pkg.Must(err, "Could not update client: %s", err)
+	fmt.Printf("Removed scope(s) to client %s", cl.ID)
+}
+
+func contains(a []string, s string) bool {
+	if s == "" {
+		return false
+	}
+	for _, e := range a {
+		if e == s {
+			return true
+		}
+	}
+	return false
 }

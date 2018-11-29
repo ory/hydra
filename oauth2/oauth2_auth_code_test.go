@@ -43,7 +43,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
-	"gopkg.in/square/go-jose.v2"
+	jose "gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
@@ -1017,7 +1017,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	}
 }
 
-// TestAuthCodeWithMockStrategy runs the authorize_code flow against various ConsentStrategy scenarios.
+// TestAuthCodeWithMockStrategy runs the authorization_code flow against various ConsentStrategy scenarios.
 // For that purpose, the consent strategy is mocked so all scenarios can be applied properly. This test suite checks:
 //
 // - [x] should pass request if strategy passes

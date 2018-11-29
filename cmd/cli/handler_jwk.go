@@ -72,7 +72,7 @@ func (h *JWKHandler) CreateKeys(cmd *cobra.Command, args []string) {
 	fmt.Println(formatResponse(keys))
 }
 
-func toSDKFriendlyJSONWebKey(key interface{}, kid string, use string, public bool) jose.JSONWebKey {
+func toSDKFriendlyJSONWebKey(key interface{}, kid, use string, public bool) jose.JSONWebKey {
 	if jwk, ok := key.(*jose.JSONWebKey); ok {
 		key = jwk.Key
 		if jwk.KeyID != "" {

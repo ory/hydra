@@ -157,7 +157,7 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Failed to validate OpenID Connect request as decoding id token from id_token_hint to *jwt.StandardClaims failed"))
 	} else if hintSub, _ := hintClaims["sub"].(string); hintSub == "" {
 		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Failed to validate OpenID Connect request because provided id token from id_token_hint does not have a subject"))
-	} else if obfuscatedUserID, err = s.obfuscateSubjectIdentifier(session.Subject, ar, ""); err != nil {
+	} else if obfuscatedUserID, err = s.obfuscateSubjectIdentifier(ar, session.Subject, ""); err != nil {
 		return err
 	}
 
@@ -294,7 +294,7 @@ func revokeAuthenticationCookie(w http.ResponseWriter, r *http.Request, s sessio
 	return sid, nil
 }
 
-func (s *DefaultStrategy) obfuscateSubjectIdentifier(subject string, req fosite.AuthorizeRequester, forcedIdentifier string) (string, error) {
+func (s *DefaultStrategy) obfuscateSubjectIdentifier(req fosite.AuthorizeRequester, subject, forcedIdentifier string) (string, error) {
 	if c, ok := req.GetClient().(*client.Client); ok && c.SubjectType == "pairwise" {
 		algorithm, ok := s.SubjectIdentifierAlgorithm[c.SubjectType]
 		if !ok {
@@ -346,7 +346,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("The login request is marked as remember, but the subject from the login confirmation does not match the original subject from the cookie."))
 	}
 
-	subjectIdentifier, err := s.obfuscateSubjectIdentifier(session.Subject, req, session.ForceSubjectIdentifier)
+	subjectIdentifier, err := s.obfuscateSubjectIdentifier(req, session.Subject, session.ForceSubjectIdentifier)
 	if err != nil {
 		return nil, err
 	}
@@ -572,7 +572,7 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 		return nil, err
 	}
 
-	pw, err := s.obfuscateSubjectIdentifier(session.ConsentRequest.Subject, req, session.ConsentRequest.ForceSubjectIdentifier)
+	pw, err := s.obfuscateSubjectIdentifier(req, session.ConsentRequest.Subject, session.ConsentRequest.ForceSubjectIdentifier)
 	if err != nil {
 		return nil, err
 	}

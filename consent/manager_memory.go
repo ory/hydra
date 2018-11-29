@@ -205,7 +205,7 @@ func (m *MemoryManager) VerifyAndInvalidateConsentRequest(ctx context.Context, v
 	return nil, errors.WithStack(pkg.ErrNotFound)
 }
 
-func (m *MemoryManager) FindPreviouslyGrantedConsentRequests(ctx context.Context, client string, subject string) ([]HandledConsentRequest, error) {
+func (m *MemoryManager) FindPreviouslyGrantedConsentRequests(ctx context.Context, client, subject string) ([]HandledConsentRequest, error) {
 	var rs []HandledConsentRequest
 	filteredByUser, err := m.FindPreviouslyGrantedConsentRequestsByUser(ctx, subject, -1, -1)
 	if errors.Cause(err) == pkg.ErrNotFound {

@@ -42,12 +42,7 @@ const (
 	ClientsHandlerPath = "/clients"
 )
 
-func NewHandler(
-	manager Manager,
-	h herodot.Writer,
-	defaultClientScopes []string,
-	subjectTypes []string,
-) *Handler {
+func NewHandler(manager Manager, h herodot.Writer, defaultClientScopes, subjectTypes []string) *Handler {
 	return &Handler{
 		Manager:   manager,
 		H:         h,

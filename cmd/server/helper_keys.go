@@ -31,7 +31,7 @@ import (
 	"github.com/ory/hydra/pkg"
 )
 
-func createOrGetJWK(c *config.Config, set string, kid string, prefix string) (key *jose.JSONWebKey, err error) {
+func createOrGetJWK(c *config.Config, set, kid, prefix string) (key *jose.JSONWebKey, err error) {
 	ctx := c.Context()
 
 	expectDependency(c.GetLogger(), ctx.KeyManager)

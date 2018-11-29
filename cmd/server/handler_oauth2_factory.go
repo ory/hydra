@@ -149,7 +149,7 @@ func newOAuth2Provider(c *config.Config) fosite.OAuth2Provider {
 	)
 }
 
-func setDefaultConsentURL(s string, c *config.Config, path string) string {
+func setDefaultConsentURL(c *config.Config, s, path string) string {
 	if s != "" {
 		return s
 	}
@@ -168,9 +168,9 @@ func setDefaultConsentURL(s string, c *config.Config, path string) string {
 func newOAuth2Handler(c *config.Config, frontend, backend *httprouter.Router, cm consent.Manager, o fosite.OAuth2Provider, clm client.Manager) *oauth2.Handler {
 	expectDependency(c.GetLogger(), c.Context().FositeStore, clm)
 
-	c.ConsentURL = setDefaultConsentURL(c.ConsentURL, c, "oauth2/fallbacks/consent")
-	c.LoginURL = setDefaultConsentURL(c.LoginURL, c, "oauth2/fallbacks/consent")
-	c.ErrorURL = setDefaultConsentURL(c.ErrorURL, c, "oauth2/fallbacks/error")
+	c.ConsentURL = setDefaultConsentURL(c, c.ConsentURL, "oauth2/fallbacks/consent")
+	c.LoginURL = setDefaultConsentURL(c, c.LoginURL, "oauth2/fallbacks/consent")
+	c.ErrorURL = setDefaultConsentURL(c, c.ErrorURL, "oauth2/fallbacks/error")
 
 	errorURL, err := url.Parse(c.ErrorURL)
 	cmdx.Must(err, "Could not parse error url %s.", errorURL)

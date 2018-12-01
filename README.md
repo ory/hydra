@@ -4,24 +4,24 @@
     <a href="https://discord.gg/PAMQWkr">Chat</a> |
     <a href="https://community.ory.am/">Forums</a> |
     <a href="http://eepurl.com/di390P">Newsletter</a><br/><br/>
-    <a href="https://www.ory.sh/docs/guides/master/hydra/">Guide</a> |
-    <a href="https://www.ory.sh/docs/api/hydra?version=master">API Docs</a> |
+    <a href="https://www.ory.sh/docs/hydra/hydra-index">Guide</a> |
+    <a href="https://www.ory.sh/docs/hydra/sdk/hydra-sdk-api">API Docs</a> |
     <a href="https://godoc.org/github.com/ory/hydra">Code Docs</a><br/><br/>
     <a href="https://opencollective.com/ory">Support this project!</a>
 </h4>
- 
+
 ---
 
 ORY Hydra is a hardened, certified OAuth2 and OpenID Connect server optimized for low-latency, high throughput,
 and low resource consumption. ORY Hydra *is not* an identity provider (user sign up, user log in, password reset flow),
-but connects to your existing identity provider through a [consent app](https://www.ory.sh/docs/1-hydra/2-overview/1-oauth2#consent-flow).
+but connects to your existing identity provider through a [consent app](https://www.ory.sh/docs/hydra/hydra-oauth2#authenticating-users-and-requesting-consent).
 Implementing the consent app in a different language is easy, and exemplary consent apps
 ([Go](https://github.com/ory/hydra-consent-app-go), [Node](https://github.com/ory/hydra-consent-app-express)) and
 [SDKs](https://www.ory.sh/docs/1-hydra/7-sdk/0-readme) are provided.
 
 Besides mitigating various attack vectors, such as database compromisation and OAuth 2.0 weaknesses, ORY Hydra is also
 able to securely manage JSON Web Keys.
-[Click here](https://www.ory.sh/docs/1-hydra/4-security/0-readme) to read more about security.
+[Click here](https://www.ory.sh/docs/hydra/hydra-security-architecture) to read more about security.
 
 <p align="left">
     <a href="https://circleci.com/gh/ory/hydra/tree/master"><img src="https://circleci.com/gh/ory/hydra/tree/master.svg?style=shield" alt="Build Status"></a>
@@ -125,8 +125,8 @@ To obtain certification, we deployed the [reference user login and consent app](
 
 This section is a quickstart guide to working with ORY Hydra. In-depth docs are available as well:
 
-* The documentation is available [here](https://www.ory.sh/docs/guides/master/hydra/).
-* The REST API documentation is available [here](https://www.ory.sh/docs/api/hydra).
+* The documentation is available [here](https://www.ory.sh/docs/hydra/hydra-index).
+* The REST API documentation is available [here](https://www.ory.sh/docs/hydra/sdk/hydra-sdk-api).
 
 ### 5 minutes tutorial: Run your very own OAuth2 environment
 
@@ -231,7 +231,7 @@ individually and together with other services from the ORY Ecosystem.
 OAuth2 and OAuth2 related specifications are over 400 written pages. Implementing OAuth2 is easy, getting it right is hard.
 ORY Hydra is trusted by companies all around the world, has a vibrant community and faces millions of requests in production
 each day. Of course, we also compiled a security guide with more details on cryptography and security concepts.
-Read [the security guide now](https://www.ory.sh/docs/guides/latest/hydra/5-security/).
+Read [the security guide now](https://www.ory.sh/docs/hydra/hydra-security-architecture).
 
 ### Disclosing vulnerabilities
 
@@ -240,22 +240,22 @@ and send us an email to [hi@ory.am](mailto:hi@ory.sh) instead.
 
 ## Benchmarks
 
-Our continuous integration runs a collection of benchmarks against ORY Hydra. You can find the results [here](https://www.ory.sh/docs/guides/latest/performance/1-hydra).
+Our continuous integration runs a collection of benchmarks against ORY Hydra. You can find the results [here](https://www.ory.sh/docs/performance/performance-hydra).
 
 ## Telemetry
 
 Our services collect summarized, anonymized data which can optionally be turned off. Click
-[here](https://www.ory.sh/docs/guides/latest/9-telemetry) to learn more.
+[here](https://www.ory.sh/docs/ecosystem/ecosystem-sqa) to learn more.
 
 ## Documentation
 
 ### Guide
 
-The Guide is available [here](https://www.ory.sh/docs/guides/master/hydra/).
+The Guide is available [here](https://www.ory.sh/docs/hydra/hydra-index).
 
 ### HTTP API documentation
 
-The HTTP API is documented [here](https://www.ory.sh/docs/api/hydra?version=latest).
+The HTTP API is documented [here](https://www.ory.sh/docs/hydra/sdk/hydra-sdk-api).
 
 ### Upgrading and Changelog
 

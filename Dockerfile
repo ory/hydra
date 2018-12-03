@@ -27,4 +27,10 @@ COPY --from=0 /go/src/github.com/ory/hydra/hydra /usr/bin/hydra
 
 ENTRYPOINT ["hydra"]
 
+ADD scripts/wait-for.sh /root/wait-for.sh
+
+RUN chmod +x /root/wait-for.sh
+
+RUN /root/wait-for.sh
+
 CMD ["serve", "all"]

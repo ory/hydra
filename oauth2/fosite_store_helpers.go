@@ -18,10 +18,11 @@
  * @license 	Apache-2.0
  */
 
-package oauth2_test
+package oauth2
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"testing"
 	"time"
@@ -36,7 +37,7 @@ import (
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
-	. "github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/pkg"
 	"github.com/ory/x/sqlcon"
 )
 
@@ -52,7 +53,38 @@ var defaultRequest = fosite.Request{
 	Session:           &Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
 }
 
-func mockRequestForeignKey(t *testing.T, id string, x managerTestSetup, createClient bool) {
+var lifespan = time.Hour
+var flushRequests = []*fosite.Request{
+	{
+		ID:             "flush-1",
+		RequestedAt:    time.Now().Round(time.Second),
+		Client:         &client.Client{ClientID: "foobar"},
+		RequestedScope: fosite.Arguments{"fa", "ba"},
+		GrantedScope:   fosite.Arguments{"fa", "ba"},
+		Form:           url.Values{"foo": []string{"bar", "baz"}},
+		Session:        &Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
+	},
+	{
+		ID:             "flush-2",
+		RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
+		Client:         &client.Client{ClientID: "foobar"},
+		RequestedScope: fosite.Arguments{"fa", "ba"},
+		GrantedScope:   fosite.Arguments{"fa", "ba"},
+		Form:           url.Values{"foo": []string{"bar", "baz"}},
+		Session:        &Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
+	},
+	{
+		ID:             "flush-3",
+		RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
+		Client:         &client.Client{ClientID: "foobar"},
+		RequestedScope: fosite.Arguments{"fa", "ba"},
+		GrantedScope:   fosite.Arguments{"fa", "ba"},
+		Form:           url.Values{"foo": []string{"bar", "baz"}},
+		Session:        &Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
+	},
+}
+
+func mockRequestForeignKey(t *testing.T, id string, x ManagerTestSetup, createClient bool) {
 	cl := &client.Client{ClientID: "foobar"}
 	cr := &consent.ConsentRequest{
 		Client: cl, OpenIDConnectContext: new(consent.OpenIDConnectContext), LoginChallenge: id,
@@ -60,12 +92,12 @@ func mockRequestForeignKey(t *testing.T, id string, x managerTestSetup, createCl
 	}
 
 	if createClient {
-		require.NoError(t, x.cl.CreateClient(context.Background(), cl))
+		require.NoError(t, x.Cl.CreateClient(context.Background(), cl))
 	}
 
-	require.NoError(t, x.co.CreateAuthenticationRequest(context.Background(), &consent.AuthenticationRequest{Client: cl, OpenIDConnectContext: new(consent.OpenIDConnectContext), Challenge: id, Verifier: id, AuthenticatedAt: time.Now(), RequestedAt: time.Now()}))
-	require.NoError(t, x.co.CreateConsentRequest(context.Background(), cr))
-	_, err := x.co.HandleConsentRequest(context.Background(), id, &consent.HandledConsentRequest{
+	require.NoError(t, x.Co.CreateAuthenticationRequest(context.Background(), &consent.AuthenticationRequest{Client: cl, OpenIDConnectContext: new(consent.OpenIDConnectContext), Challenge: id, Verifier: id, AuthenticatedAt: time.Now(), RequestedAt: time.Now()}))
+	require.NoError(t, x.Co.CreateConsentRequest(context.Background(), cr))
+	_, err := x.Co.HandleConsentRequest(context.Background(), id, &consent.HandledConsentRequest{
 		ConsentRequest: cr, Session: new(consent.ConsentRequestSessionData), AuthenticatedAt: time.Now(),
 		Challenge:   id,
 		RequestedAt: time.Now(),
@@ -73,7 +105,31 @@ func mockRequestForeignKey(t *testing.T, id string, x managerTestSetup, createCl
 	require.NoError(t, err)
 }
 
-func testHelperUniqueConstraints(m managerTestSetup, storageType string) func(t *testing.T) {
+// KEEP EXPORTED AND AVAILABLE FOR THIRD PARTIES TO TEST PLUGINS!
+type ManagerTestSetup struct {
+	F  pkg.FositeStorer
+	Cl client.Manager
+	Co consent.Manager
+}
+
+// TestHelperRunner is used to run the database suite of tests in this package.
+// KEEP EXPORTED AND AVAILABLE FOR THIRD PARTIES TO TEST PLUGINS!
+func TestHelperRunner(t *testing.T, store ManagerTestSetup, k string) {
+	t.Helper()
+	if k != "memory" {
+		t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteAuthorizeCodes/db=%s", k), testHelperUniqueConstraints(store, k))
+	}
+	t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteAuthorizeCodes/db=%s", k), testHelperCreateGetDeleteAuthorizeCodes(store))
+	t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteAccessTokenSession/db=%s", k), testHelperCreateGetDeleteAccessTokenSession(store))
+	t.Run(fmt.Sprintf("case=testHelperNilAccessToken/db=%s", k), testHelperNilAccessToken(store))
+	t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteOpenIDConnectSession/db=%s", k), testHelperCreateGetDeleteOpenIDConnectSession(store))
+	t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteRefreshTokenSession/db=%s", k), testHelperCreateGetDeleteRefreshTokenSession(store))
+	t.Run(fmt.Sprintf("case=testHelperRevokeRefreshToken/db=%s", k), testHelperRevokeRefreshToken(store))
+	t.Run(fmt.Sprintf("case=testHelperCreateGetDeletePKCERequestSession/db=%s", k), testHelperCreateGetDeletePKCERequestSession(store))
+	t.Run(fmt.Sprintf("case=testHelperFlushTokens/db=%s", k), testHelperFlushTokens(store, time.Hour))
+}
+
+func testHelperUniqueConstraints(m ManagerTestSetup, storageType string) func(t *testing.T) {
 	return func(t *testing.T) {
 		dbErrorIsConstraintError := func(dbErr error) {
 			assert.Error(t, dbErr)
@@ -98,24 +154,24 @@ func testHelperUniqueConstraints(m managerTestSetup, storageType string) func(t 
 			Session:     &Session{},
 		}
 
-		err := m.f.CreateRefreshTokenSession(context.TODO(), signatureOne, fositeRequest)
+		err := m.F.CreateRefreshTokenSession(context.TODO(), signatureOne, fositeRequest)
 		assert.NoError(t, err)
-		err = m.f.CreateAccessTokenSession(context.TODO(), signatureOne, fositeRequest)
+		err = m.F.CreateAccessTokenSession(context.TODO(), signatureOne, fositeRequest)
 		assert.NoError(t, err)
 
 		// attempting to insert new records with the SAME requestID should fail as there is a unique index
 		// on the request_id column
 
-		err = m.f.CreateRefreshTokenSession(context.TODO(), signatureTwo, fositeRequest)
+		err = m.F.CreateRefreshTokenSession(context.TODO(), signatureTwo, fositeRequest)
 		dbErrorIsConstraintError(err)
-		err = m.f.CreateAccessTokenSession(context.TODO(), signatureTwo, fositeRequest)
+		err = m.F.CreateAccessTokenSession(context.TODO(), signatureTwo, fositeRequest)
 		dbErrorIsConstraintError(err)
 	}
 }
 
-func testHelperCreateGetDeleteOpenIDConnectSession(x managerTestSetup) func(t *testing.T) {
+func testHelperCreateGetDeleteOpenIDConnectSession(x ManagerTestSetup) func(t *testing.T) {
 	return func(t *testing.T) {
-		m := x.f
+		m := x.F
 
 		ctx := context.Background()
 		_, err := m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{})
@@ -136,9 +192,9 @@ func testHelperCreateGetDeleteOpenIDConnectSession(x managerTestSetup) func(t *t
 	}
 }
 
-func testHelperCreateGetDeleteRefreshTokenSession(x managerTestSetup) func(t *testing.T) {
+func testHelperCreateGetDeleteRefreshTokenSession(x ManagerTestSetup) func(t *testing.T) {
 	return func(t *testing.T) {
-		m := x.f
+		m := x.F
 
 		ctx := context.Background()
 		_, err := m.GetRefreshTokenSession(ctx, "4321", &Session{})
@@ -159,9 +215,9 @@ func testHelperCreateGetDeleteRefreshTokenSession(x managerTestSetup) func(t *te
 	}
 }
 
-func testHelperRevokeRefreshToken(x managerTestSetup) func(t *testing.T) {
+func testHelperRevokeRefreshToken(x ManagerTestSetup) func(t *testing.T) {
 	return func(t *testing.T) {
-		m := x.f
+		m := x.F
 
 		ctx := context.Background()
 		_, err := m.GetRefreshTokenSession(ctx, "1111", &Session{})
@@ -197,9 +253,9 @@ func testHelperRevokeRefreshToken(x managerTestSetup) func(t *testing.T) {
 	}
 }
 
-func testHelperCreateGetDeleteAuthorizeCodes(x managerTestSetup) func(t *testing.T) {
+func testHelperCreateGetDeleteAuthorizeCodes(x ManagerTestSetup) func(t *testing.T) {
 	return func(t *testing.T) {
-		m := x.f
+		m := x.F
 
 		mockRequestForeignKey(t, "blank", x, false)
 
@@ -225,11 +281,11 @@ func testHelperCreateGetDeleteAuthorizeCodes(x managerTestSetup) func(t *testing
 	}
 }
 
-func testHelperNilAccessToken(x managerTestSetup) func(t *testing.T) {
+func testHelperNilAccessToken(x ManagerTestSetup) func(t *testing.T) {
 	return func(t *testing.T) {
-		m := x.f
+		m := x.F
 		c := &client.Client{ClientID: "nil-request-client-id-123"}
-		require.NoError(t, x.cl.CreateClient(context.Background(), c))
+		require.NoError(t, x.Cl.CreateClient(context.Background(), c))
 		err := m.CreateAccessTokenSession(context.TODO(), "nil-request-id", &fosite.Request{
 			ID:                "",
 			RequestedAt:       time.Now().UTC().Round(time.Second),
@@ -245,9 +301,9 @@ func testHelperNilAccessToken(x managerTestSetup) func(t *testing.T) {
 	}
 }
 
-func testHelperCreateGetDeleteAccessTokenSession(x managerTestSetup) func(t *testing.T) {
+func testHelperCreateGetDeleteAccessTokenSession(x ManagerTestSetup) func(t *testing.T) {
 	return func(t *testing.T) {
-		m := x.f
+		m := x.F
 
 		ctx := context.Background()
 		_, err := m.GetAccessTokenSession(ctx, "4321", &Session{})
@@ -268,9 +324,9 @@ func testHelperCreateGetDeleteAccessTokenSession(x managerTestSetup) func(t *tes
 	}
 }
 
-func testHelperCreateGetDeletePKCERequestSession(x managerTestSetup) func(t *testing.T) {
+func testHelperCreateGetDeletePKCERequestSession(x ManagerTestSetup) func(t *testing.T) {
 	return func(t *testing.T) {
-		m := x.f
+		m := x.F
 
 		ctx := context.Background()
 		_, err := m.GetPKCERequestSession(ctx, "4321", &Session{})
@@ -291,8 +347,8 @@ func testHelperCreateGetDeletePKCERequestSession(x managerTestSetup) func(t *tes
 	}
 }
 
-func testHelperFlushTokens(x managerTestSetup, lifespan time.Duration) func(t *testing.T) {
-	m := x.f
+func testHelperFlushTokens(x ManagerTestSetup, lifespan time.Duration) func(t *testing.T) {
+	m := x.F
 	ds := &Session{}
 
 	return func(t *testing.T) {

@@ -103,22 +103,22 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			var cm consent.Manager
 			switch km {
 			case "memory":
-				cm = consent.NewMemoryManager(fs.f)
-				fs.f.(*FositeMemoryStore).Manager = hc.NewMemoryManager(hasher)
+				cm = consent.NewMemoryManager(fs.F)
+				fs.F.(*FositeMemoryStore).Manager = hc.NewMemoryManager(hasher)
 			case "mysql":
 				fallthrough
 			case "postgres":
 				db := databases[km]
 				cleanDB(t, db)
 
-				_, err := fs.cl.(*client.SQLManager).CreateSchemas()
+				_, err := fs.Cl.(*client.SQLManager).CreateSchemas()
 				require.NoError(t, err)
 
-				scm := consent.NewSQLManager(databases[km], fs.cl, fs.f)
+				scm := consent.NewSQLManager(databases[km], fs.Cl, fs.F)
 				_, err = scm.CreateSchemas()
 				require.NoError(t, err)
 
-				_, err = (fs.f.(*FositeSQLStore)).CreateSchemas()
+				_, err = (fs.F.(*FositeSQLStore)).CreateSchemas()
 				require.NoError(t, err)
 
 				cm = scm
@@ -184,7 +184,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					fc.AccessTokenLifespan = time.Second * 8
 					handler := &Handler{
 						OAuth2: compose.Compose(
-							fc, fs.f, strat.s, hasher,
+							fc, fs.F, strat.s, hasher,
 							compose.OAuth2AuthorizeExplicitFactory,
 							compose.OAuth2AuthorizeImplicitFactory,
 							compose.OAuth2ClientCredentialsGrantFactory,
@@ -225,7 +225,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						RedirectURL: client.RedirectURIs[0], Scopes: []string{"hydra", "offline", "openid"},
 					}
 
-					require.NoError(t, fs.f.(clientCreator).CreateClient(context.TODO(), &client))
+					require.NoError(t, fs.F.(clientCreator).CreateClient(context.TODO(), &client))
 					apiClient := swagger.NewAdminApiWithBasePath(api.URL)
 
 					var callbackHandler *httprouter.Handle

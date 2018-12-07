@@ -205,19 +205,43 @@ func (m *MemoryManager) VerifyAndInvalidateConsentRequest(ctx context.Context, v
 	return nil, errors.WithStack(pkg.ErrNotFound)
 }
 
-func (m *MemoryManager) FindPreviouslyGrantedConsentRequests(ctx context.Context, client, subject string) ([]HandledConsentRequest, error) {
+func (m *MemoryManager) FindGrantedAndRememberedConsentRequests(ctx context.Context, client, subject string) ([]HandledConsentRequest, error) {
 	var rs []HandledConsentRequest
-	filteredByUser, err := m.FindPreviouslyGrantedConsentRequestsByUser(ctx, subject, -1, -1)
-	if errors.Cause(err) == pkg.ErrNotFound {
-		return nil, errors.WithStack(ErrNoPreviousConsentFound)
-	} else if err != nil {
-		return nil, err
-	}
-
-	for _, c := range filteredByUser {
-		if client == c.ConsentRequest.Client.GetID() {
-			rs = append(rs, c)
+	for _, c := range m.handledConsentRequests {
+		cr, err := m.GetConsentRequest(ctx, c.Challenge)
+		if errors.Cause(err) == pkg.ErrNotFound {
+			return nil, errors.WithStack(ErrNoPreviousConsentFound)
+		} else if err != nil {
+			return nil, err
 		}
+
+		if subject != cr.Subject {
+			continue
+		}
+
+		if client != cr.Client.GetID() {
+			continue
+		}
+
+		if c.Error != nil {
+			continue
+		}
+
+		if !c.Remember {
+			continue
+		}
+
+		if cr.Skip {
+			continue
+		}
+
+		if c.RememberFor > 0 && c.RequestedAt.Add(time.Duration(c.RememberFor)*time.Second).Before(time.Now().UTC()) {
+			continue
+		}
+
+		cr.Client.ClientID = cr.Client.GetID()
+		c.ConsentRequest = cr
+		rs = append(rs, c)
 	}
 
 	if len(rs) == 0 {
@@ -227,7 +251,7 @@ func (m *MemoryManager) FindPreviouslyGrantedConsentRequests(ctx context.Context
 	return rs, nil
 }
 
-func (m *MemoryManager) FindPreviouslyGrantedConsentRequestsByUser(ctx context.Context, subject string, limit, offset int) ([]HandledConsentRequest, error) {
+func (m *MemoryManager) FindSubjectsGrantedConsentRequests(ctx context.Context, subject string, limit, offset int) ([]HandledConsentRequest, error) {
 	var rs []HandledConsentRequest
 	for _, c := range m.handledConsentRequests {
 		cr, err := m.GetConsentRequest(ctx, c.Challenge)
@@ -240,10 +264,6 @@ func (m *MemoryManager) FindPreviouslyGrantedConsentRequestsByUser(ctx context.C
 		}
 
 		if c.Error != nil {
-			continue
-		}
-
-		if !c.Remember {
 			continue
 		}
 

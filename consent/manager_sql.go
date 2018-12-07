@@ -402,7 +402,7 @@ func (m *SQLManager) DeleteAuthenticationSession(ctx context.Context, id string)
 	return nil
 }
 
-func (m *SQLManager) FindPreviouslyGrantedConsentRequests(ctx context.Context, client, subject string) ([]HandledConsentRequest, error) {
+func (m *SQLManager) FindGrantedAndRememberedConsentRequests(ctx context.Context, client, subject string) ([]HandledConsentRequest, error) {
 	var a []sqlHandledConsentRequest
 
 	if err := m.DB.SelectContext(ctx, &a, m.DB.Rebind(`SELECT h.* FROM
@@ -424,7 +424,7 @@ LIMIT 1`), subject, client); err != nil {
 	return m.resolveHandledConsentRequests(ctx, a)
 }
 
-func (m *SQLManager) FindPreviouslyGrantedConsentRequestsByUser(ctx context.Context, subject string, limit, offset int) ([]HandledConsentRequest, error) {
+func (m *SQLManager) FindSubjectsGrantedConsentRequests(ctx context.Context, subject string, limit, offset int) ([]HandledConsentRequest, error) {
 	var a []sqlHandledConsentRequest
 
 	if err := m.DB.SelectContext(ctx, &a, m.DB.Rebind(`SELECT h.* FROM
@@ -434,7 +434,7 @@ JOIN
 WHERE
 		r.subject=? AND r.skip=FALSE
 	AND
-		(h.error='{}' AND h.remember=TRUE)
+		(h.error='{}')
 ORDER BY h.requested_at DESC
 LIMIT ? OFFSET ?
 `), subject, limit, offset); err != nil {

@@ -475,7 +475,7 @@ func (s *DefaultStrategy) requestConsent(w http.ResponseWriter, r *http.Request,
 	// 	 return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
 	// }
 
-	consentSessions, err := s.M.FindPreviouslyGrantedConsentRequests(r.Context(), ar.GetClient().GetID(), authenticationSession.Subject)
+	consentSessions, err := s.M.FindGrantedAndRememberedConsentRequests(r.Context(), ar.GetClient().GetID(), authenticationSession.Subject)
 	if errors.Cause(err) == ErrNoPreviousConsentFound {
 		return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
 	} else if err != nil {

@@ -324,7 +324,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager pkg.Fos
 				{"6", "6", 0},
 			} {
 				t.Run("key="+tc.keyC+"-"+tc.keyS, func(t *testing.T) {
-					rs, err := m.FindPreviouslyGrantedConsentRequests(context.TODO(), "fk-client-"+tc.keyC, "subject"+tc.keyS)
+					rs, err := m.FindGrantedAndRememberedConsentRequests(context.TODO(), "fk-client-"+tc.keyC, "subject"+tc.keyS)
 					if tc.expectedLength == 0 {
 						assert.EqualError(t, err, ErrNoPreviousConsentFound.Error())
 					} else {
@@ -470,12 +470,17 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager pkg.Fos
 				},
 				{
 					subject:    "subjectrv2",
+					challenges: []string{"challengerv2"},
+					clients:    []string{"fk-client-rv2"},
+				},
+				{
+					subject:    "subjectrv3",
 					challenges: []string{},
 					clients:    []string{},
 				},
 			} {
 				t.Run(fmt.Sprintf("case=%d/subject=%s", i, tc.subject), func(t *testing.T) {
-					consents, err := m.FindPreviouslyGrantedConsentRequestsByUser(context.TODO(), tc.subject, 100, 0)
+					consents, err := m.FindSubjectsGrantedConsentRequests(context.TODO(), tc.subject, 100, 0)
 					assert.Equal(t, len(tc.challenges), len(consents))
 
 					if len(tc.challenges) == 0 {

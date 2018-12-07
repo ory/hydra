@@ -135,13 +135,13 @@ func (h *MigrateHandler) MigrateSecret(cmd *cobra.Command, args []string) {
 
 	fmt.Println("Rotating encryption keys for JSON Web Key storage completed successfully!")
 	fmt.Printf(`You may now run ORY Hydra with the new system secret. If you wish that old OAuth 2.0 Access and Refres
-tokens stay valid, please set environment variable ROTATED_SYSTEM_SECRET to the new secret:
+tokens stay valid, please set environment variable ROTATED_SYSTEM_SECRET to the old secret:
 
 ROTATED_SYSTEM_SECRET=%s hydra serve ...
 
 If you wish that OAuth 2.0 Access and Refresh Tokens issued with the old secret are revoked, simply omit environment variable
 ROTATED_SYSTEM_SECRET. This will NOT affect OpenID Connect ID Tokens!
-`, newSecret)
+`, oldSecret)
 }
 
 func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {

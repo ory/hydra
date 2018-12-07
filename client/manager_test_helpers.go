@@ -24,6 +24,7 @@ import (
 	"context"
 	"crypto/x509"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -97,6 +98,8 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 			AllowedCORSOrigins:            []string{"foo", "bar"},
 			RequestObjectSigningAlgorithm: "rs256",
 			UserinfoSignedResponseAlg:     "RS256",
+			CreatedAt:                     time.Now().Add(-time.Hour).Round(time.Second).UTC(),
+			UpdatedAt:                     time.Now().Add(-time.Minute).Round(time.Second).UTC(),
 		}
 
 		assert.NoError(t, m.CreateClient(ctx, c))
@@ -189,6 +192,8 @@ func compare(t *testing.T, expected *Client, actual fosite.Client, k string) {
 		assert.EqualValues(t, expected.SecretExpiresAt, actual.SecretExpiresAt)
 		assert.EqualValues(t, expected.SectorIdentifierURI, actual.SectorIdentifierURI)
 		assert.EqualValues(t, expected.UserinfoSignedResponseAlg, actual.UserinfoSignedResponseAlg)
+		assert.EqualValues(t, expected.CreatedAt.Unix(), actual.CreatedAt.Unix())
+		assert.EqualValues(t, expected.UpdatedAt.Unix(), actual.UpdatedAt.Unix())
 	}
 
 	if actual, ok := actual.(fosite.OpenIDConnectClient); ok {

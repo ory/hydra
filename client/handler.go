@@ -23,6 +23,7 @@ package client
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
@@ -103,6 +104,8 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	}
 
 	secret := c.Secret
+	c.CreatedAt = time.Now().UTC().Round(time.Second)
+	c.UpdatedAt = c.CreatedAt
 	if err := h.Manager.CreateClient(r.Context(), &c); err != nil {
 		h.H.WriteError(w, r, err)
 		return
@@ -155,6 +158,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		return
 	}
 
+	c.UpdatedAt = time.Now().UTC().Round(time.Second)
 	if err := h.Manager.UpdateClient(r.Context(), &c); err != nil {
 		h.H.WriteError(w, r, err)
 		return

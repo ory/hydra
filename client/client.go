@@ -22,6 +22,7 @@ package client
 
 import (
 	"strings"
+	"time"
 
 	jose "gopkg.in/square/go-jose.v2"
 
@@ -153,6 +154,12 @@ type Client struct {
 	// [JWT] serialized, and signed using JWS. The default, if omitted, is for the UserInfo Response to return the Claims
 	// as a UTF-8 encoded JSON object using the application/json content-type.
 	UserinfoSignedResponseAlg string `json:"userinfo_signed_response_alg,omitempty"`
+
+	// CreatedAt returns the timestamp of the client's creation.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+
+	// UpdatedAt returns the timestamp of the last update.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 }
 
 func (c *Client) GetID() string {

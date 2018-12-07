@@ -25,6 +25,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
@@ -56,31 +57,33 @@ type SQLManager struct {
 }
 
 type sqlData struct {
-	PK                            int    `db:"pk"`
-	ID                            string `db:"id"`
-	Name                          string `db:"client_name"`
-	Secret                        string `db:"client_secret"`
-	RedirectURIs                  string `db:"redirect_uris"`
-	GrantTypes                    string `db:"grant_types"`
-	ResponseTypes                 string `db:"response_types"`
-	Scope                         string `db:"scope"`
-	Owner                         string `db:"owner"`
-	PolicyURI                     string `db:"policy_uri"`
-	TermsOfServiceURI             string `db:"tos_uri"`
-	ClientURI                     string `db:"client_uri"`
-	LogoURI                       string `db:"logo_uri"`
-	Contacts                      string `db:"contacts"`
-	SecretExpiresAt               int    `db:"client_secret_expires_at"`
-	SectorIdentifierURI           string `db:"sector_identifier_uri"`
-	JSONWebKeysURI                string `db:"jwks_uri"`
-	JSONWebKeys                   string `db:"jwks"`
-	TokenEndpointAuthMethod       string `db:"token_endpoint_auth_method"`
-	RequestURIs                   string `db:"request_uris"`
-	SubjectType                   string `db:"subject_type"`
-	RequestObjectSigningAlgorithm string `db:"request_object_signing_alg"`
-	UserinfoSignedResponseAlg     string `db:"userinfo_signed_response_alg"`
-	AllowedCORSOrigins            string `db:"allowed_cors_origins"`
-	Audience                      string `db:"audience"`
+	PK                            int       `db:"pk"`
+	ID                            string    `db:"id"`
+	Name                          string    `db:"client_name"`
+	Secret                        string    `db:"client_secret"`
+	RedirectURIs                  string    `db:"redirect_uris"`
+	GrantTypes                    string    `db:"grant_types"`
+	ResponseTypes                 string    `db:"response_types"`
+	Scope                         string    `db:"scope"`
+	Owner                         string    `db:"owner"`
+	PolicyURI                     string    `db:"policy_uri"`
+	TermsOfServiceURI             string    `db:"tos_uri"`
+	ClientURI                     string    `db:"client_uri"`
+	LogoURI                       string    `db:"logo_uri"`
+	Contacts                      string    `db:"contacts"`
+	SecretExpiresAt               int       `db:"client_secret_expires_at"`
+	SectorIdentifierURI           string    `db:"sector_identifier_uri"`
+	JSONWebKeysURI                string    `db:"jwks_uri"`
+	JSONWebKeys                   string    `db:"jwks"`
+	TokenEndpointAuthMethod       string    `db:"token_endpoint_auth_method"`
+	RequestURIs                   string    `db:"request_uris"`
+	SubjectType                   string    `db:"subject_type"`
+	RequestObjectSigningAlgorithm string    `db:"request_object_signing_alg"`
+	UserinfoSignedResponseAlg     string    `db:"userinfo_signed_response_alg"`
+	AllowedCORSOrigins            string    `db:"allowed_cors_origins"`
+	Audience                      string    `db:"audience"`
+	UpdatedAt                     time.Time `db:"updated_at"`
+	CreatedAt                     time.Time `db:"created_at"`
 }
 
 var sqlParams = []string{
@@ -108,6 +111,8 @@ var sqlParams = []string{
 	"userinfo_signed_response_alg",
 	"allowed_cors_origins",
 	"audience",
+	"updated_at",
+	"created_at",
 }
 
 func sqlDataFromClient(d *Client) (*sqlData, error) {
@@ -119,6 +124,16 @@ func sqlDataFromClient(d *Client) (*sqlData, error) {
 			return nil, errors.WithStack(err)
 		}
 		jwks = string(out)
+	}
+
+	var createdAt, updatedAt = d.CreatedAt, d.UpdatedAt
+
+	if d.CreatedAt.IsZero() {
+		createdAt = time.Now()
+	}
+
+	if d.UpdatedAt.IsZero() {
+		updatedAt = time.Now()
 	}
 
 	return &sqlData{
@@ -146,6 +161,8 @@ func sqlDataFromClient(d *Client) (*sqlData, error) {
 		UserinfoSignedResponseAlg:     d.UserinfoSignedResponseAlg,
 		SubjectType:                   d.SubjectType,
 		AllowedCORSOrigins:            strings.Join(d.AllowedCORSOrigins, "|"),
+		CreatedAt:                     createdAt.Round(time.Second),
+		UpdatedAt:                     updatedAt.Round(time.Second),
 	}, nil
 }
 
@@ -174,6 +191,8 @@ func (d *sqlData) ToClient() (*Client, error) {
 		UserinfoSignedResponseAlg:     d.UserinfoSignedResponseAlg,
 		SubjectType:                   d.SubjectType,
 		AllowedCORSOrigins:            stringsx.Splitx(d.AllowedCORSOrigins, "|"),
+		CreatedAt:                     d.CreatedAt,
+		UpdatedAt:                     d.UpdatedAt,
 	}
 
 	if d.JSONWebKeys != "" {

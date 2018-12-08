@@ -12,7 +12,7 @@ basicAuth=YmVuY2hjbGllbnQ6YmVuY2hzZWNyZXQ=
 
 cat > BENCHMARKS.md << EOF
 ---
-id: performance-hydra
+id: hydra
 title: ORY Hydra
 ---
 

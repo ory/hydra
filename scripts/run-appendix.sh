@@ -6,7 +6,7 @@ cd "$( dirname "${BASH_SOURCE[0]}" )/.."
 
 cat > appendix.md << EOF
 ---
-id: hydra-appendix
+id: appendix
 title: Appendix
 ---
 

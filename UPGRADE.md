@@ -242,7 +242,7 @@ Several indices have been added which should resolve table locking when searchin
 
 #### Access Token Audience
 
-This patch adds the access token audience feature. For more information on this, head over to [the docs](https://www.ory.sh/docs/guides/master/hydra/6-how-to/3-advanced.html).
+This patch adds the access token audience feature. For more information on this, head over to [the docs](https://www.ory.sh/docs/hydra/advanced).
 
 #### Refresh Grant
 
@@ -561,7 +561,7 @@ ORY Hydra before the 1.0.0 release. This section explains how to upgrade and lin
 of the three services.
 
 **This means that ORY Hydra has no longer any type of internal access control. Endpoints such as `POST /clients` no longer
-require access tokens to be accessed. You must secure these endpoints yourself. For more information, [click here](https://www.ory.sh/docs/guides/master/hydra/2-environment/1-securing-ory-hydra).**
+require access tokens to be accessed. You must secure these endpoints yourself. For more information, [click here](https://www.ory.sh/docs/hydra/production).**
 
 [ORY Keto](https://github.com/ory/keto) handles access control using access control policies. The project currently supports the Warden API, Access Control Policy
 management, and Roles (previously known as [Warden Groups](#warden-groups)). ORY Keto is independent from ORY Hydra
@@ -687,7 +687,7 @@ A reference implementation of the new User Login and Consent Provider is availab
 The major difference between the old and new flow is, that authentication (user login) and scope authorization (user consent)
 are now two separate endpoints.
 
-The new User Login and Consent Flow is documented in the [developer guide](https://www.ory.sh/docs/guides/latest/1-hydra/).
+The new User Login and Consent Flow is documented in the [developer guide](https://www.ory.sh/docs/hydra/).
 
 #### Changes to the CLI
 
@@ -1010,7 +1010,7 @@ subsets is possible using wildcards. `foo.*` matches `foo.bar` and `foo.baz`.
 
 This change makes setting scopes more explicit and is more secure, as it is less likely to make mistakes.
 
-Read more on this strategy [here](https://ory.gitbooks.io/hydra/content/oauth2.html#oauth2-scopes).
+Read more on this strategy [here](https://www.ory.sh/docs/hydra/oauth2#oauth-20-scope).
 
 To fall back to hierarchical scope matching, set the environment variable `SCOPE_STRATEGY=DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY`.
 This feature *might* be fully removed in a later version.
@@ -1091,7 +1091,7 @@ It is now possible to alter resource name prefixes (`rn:hydra`) using the `RESOU
 
 To improve ORY Hydra and understand how the software is used, optional, anonymized telemetry data is shared with ORY.
 A change was made to help us understand which telemetry sources belong to the same installation by hashing (SHA256)
-two environment variables which make up a unique identifier. [Click here](https://ory.gitbooks.io/hydra/content/telemetry.html)
+two environment variables which make up a unique identifier. [Click here](https://www.ory.sh/docs/ecosystem/sqa)
 to read more about how we collect telemetry data, why we do it, and how to enable or disable it.
 
 #### URL Encoding Root Client Credentials
@@ -1102,7 +1102,7 @@ form to specify them: `"FORCE_ROOT_CLIENT_CREDENTIALS=urlencode(id):urlencode(se
 
 ## 0.9.0
 
-This version adds performance metrics to `/health` and sends anonymous usage statistics to our servers, [click here](https://ory.gitbooks.io/hydra/content/telemetry.html) for more
+This version adds performance metrics to `/health` and sends anonymous usage statistics to our servers, [click here](https://www.ory.sh/docs/ecosystem/sqa) for more
 details on this feature and how to disable it.
 
 ## 0.8.0

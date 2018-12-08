@@ -156,7 +156,7 @@ func setup(c *config.Config, cmd *cobra.Command, args []string, name string) (ha
 	)
 
 	if flagx.MustGetBool(cmd, "disable-telemetry") {
-		c.GetLogger().Println("Transmission of telemetry data is enabled, to learn more go to: https://www.ory.sh/docs/guides/latest/telemetry/")
+		c.GetLogger().Println("Transmission of telemetry data is enabled, to learn more go to: https://www.ory.sh/docs/ecosystem/sqa")
 
 		enable := !(c.DatabaseURL == "" || c.DatabaseURL == "memory" || c.Issuer == "" || strings.Contains(c.Issuer, "localhost"))
 		m := metricsx.NewMetricsManager(

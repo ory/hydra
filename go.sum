@@ -108,6 +108,8 @@ github.com/luna-duclos/instrumentedsql v0.0.0-20181016211422-eae529699c8a h1:c+X
 github.com/luna-duclos/instrumentedsql v0.0.0-20181016211422-eae529699c8a/go.mod h1:PWUIzhtavmOR965zfawVsHXbEuU1G29BPZ/CB3C7jXk=
 github.com/luna-duclos/instrumentedsql v0.0.0-20181107100131-f6e09e6fd233 h1:d1fTWBQrGrSBRgSpebswouMfBn2aY9HCpTE4zLKn5oM=
 github.com/luna-duclos/instrumentedsql v0.0.0-20181107100131-f6e09e6fd233/go.mod h1:PWUIzhtavmOR965zfawVsHXbEuU1G29BPZ/CB3C7jXk=
+github.com/luna-duclos/instrumentedsql v0.0.0-20181127104832-b7d587d28109 h1:SSbnT1UH/TdSedRIy8XVB1dsVUOFP8iHaa/+QE0/q2k=
+github.com/luna-duclos/instrumentedsql v0.0.0-20181127104832-b7d587d28109/go.mod h1:PWUIzhtavmOR965zfawVsHXbEuU1G29BPZ/CB3C7jXk=
 github.com/magiconair/properties v1.8.0 h1:LLgXmsheXeRoUOBOjtwPQCWIYqM/LU1ayDtDePerRcY=
 github.com/magiconair/properties v1.8.0/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=
 github.com/markbates/oncer v0.0.0-20181014194634-05fccaae8fc4 h1:Mlji5gkcpzkqTROyE4ZxZ8hN7osunMb2RuGVrbvMvCc=
@@ -184,6 +186,8 @@ github.com/ory/x v0.0.31 h1:aDO76m7b5wUu5wfZQ8dHzWGV0qHxgAzUFfRIpkB+XFw=
 github.com/ory/x v0.0.31/go.mod h1:4hnvHBE1KfoPP99R82BH72s3UnHt//MmWX+5NYnfzFQ=
 github.com/ory/x v0.0.32 h1:fgxawi8zaB/WODqNcIukSsBfq5C64s2Xh7sOEjUuHhc=
 github.com/ory/x v0.0.32/go.mod h1:4hnvHBE1KfoPP99R82BH72s3UnHt//MmWX+5NYnfzFQ=
+github.com/ory/x v0.0.33 h1:Hfy1Xe+oKvOG8BN+B3ArM0eVfoCH7FElOmMzO0J/c0Q=
+github.com/ory/x v0.0.33/go.mod h1:U7SUjn+NSVmHbWlS0LBSxbBk1hdPDmc2AJk9gZZZedA=
 github.com/parnurzeal/gorequest v0.2.15/go.mod h1:3Kh2QUMJoqw3icWAecsyzkpY7UzRfDhbRdTjtNwNiUE=
 github.com/pborman/uuid v1.2.0 h1:J7Q5mO4ysT1dv8hyrUGHb9+ooztCXu1D8MY8DZYsu3g=
 github.com/pborman/uuid v1.2.0/go.mod h1:X/NO0urCmaxf9VXbdlT7C2Yzkj2IKimNn4k+gtPdI/k=

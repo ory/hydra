@@ -4,8 +4,8 @@
     <a href="https://discord.gg/PAMQWkr">Chat</a> |
     <a href="https://community.ory.am/">Forums</a> |
     <a href="http://eepurl.com/di390P">Newsletter</a><br/><br/>
-    <a href="https://www.ory.sh/docs/hydra/hydra-index">Guide</a> |
-    <a href="https://www.ory.sh/docs/hydra/sdk/hydra-sdk-api">API Docs</a> |
+    <a href="https://www.ory.sh/docs/next/hydra/">Guide</a> |
+    <a href="https://www.ory.sh/docs/next/hydra/sdk/api">API Docs</a> |
     <a href="https://godoc.org/github.com/ory/hydra">Code Docs</a><br/><br/>
     <a href="https://opencollective.com/ory">Support this project!</a>
 </h4>
@@ -14,14 +14,14 @@
 
 ORY Hydra is a hardened, certified OAuth2 and OpenID Connect server optimized for low-latency, high throughput,
 and low resource consumption. ORY Hydra *is not* an identity provider (user sign up, user log in, password reset flow),
-but connects to your existing identity provider through a [consent app](https://www.ory.sh/docs/hydra/hydra-oauth2#authenticating-users-and-requesting-consent).
+but connects to your existing identity provider through a [consent app](https://www.ory.sh/docs/next/hydra/oauth2#authenticating-users-and-requesting-consent).
 Implementing the consent app in a different language is easy, and exemplary consent apps
 ([Go](https://github.com/ory/hydra-consent-app-go), [Node](https://github.com/ory/hydra-consent-app-express)) and
-[SDKs](https://www.ory.sh/docs/1-hydra/7-sdk/0-readme) are provided.
+[SDKs](https://www.ory.sh/docs/next/hydra/sdk/) are provided.
 
 Besides mitigating various attack vectors, such as database compromisation and OAuth 2.0 weaknesses, ORY Hydra is also
 able to securely manage JSON Web Keys.
-[Click here](https://www.ory.sh/docs/hydra/hydra-security-architecture) to read more about security.
+[Click here](https://www.ory.sh/docs/next/hydra/security-architecture) to read more about security.
 
 <p align="left">
     <a href="https://circleci.com/gh/ory/hydra/tree/master"><img src="https://circleci.com/gh/ory/hydra/tree/master.svg?style=shield" alt="Build Status"></a>
@@ -125,14 +125,14 @@ To obtain certification, we deployed the [reference user login and consent app](
 
 This section is a quickstart guide to working with ORY Hydra. In-depth docs are available as well:
 
-* The documentation is available [here](https://www.ory.sh/docs/hydra/hydra-index).
-* The REST API documentation is available [here](https://www.ory.sh/docs/hydra/sdk/hydra-sdk-api).
+* The documentation is available [here](https://www.ory.sh/docs/next/hydra).
+* The REST API documentation is available [here](https://www.ory.sh/docs/next/hydra/sdk/api).
 
 ### 5 minutes tutorial: Run your very own OAuth2 environment
 
-The **[tutorial](https://www.ory.sh/docs/hydra/hydra-5min-tutorial)** teaches you to set up ORY Hydra,
+The **[tutorial](https://www.ory.sh/docs/next/hydra/5min-tutorial)** teaches you to set up ORY Hydra,
 a Postgres instance and an exemplary identity provider written in React using docker compose.
-It will take you about 5 minutes to complete the **[tutorial](https://www.ory.sh/docs/hydra/hydra-5min-tutorial)**.
+It will take you about 5 minutes to complete the **[tutorial](https://www.ory.sh/docs/next/hydra/5min-tutorial)**.
 
 <img src="docs/images/oauth2-flow.gif" alt="OAuth2 Flow">
 
@@ -231,7 +231,7 @@ individually and together with other services from the ORY Ecosystem.
 OAuth2 and OAuth2 related specifications are over 400 written pages. Implementing OAuth2 is easy, getting it right is hard.
 ORY Hydra is trusted by companies all around the world, has a vibrant community and faces millions of requests in production
 each day. Of course, we also compiled a security guide with more details on cryptography and security concepts.
-Read [the security guide now](https://www.ory.sh/docs/hydra/hydra-security-architecture).
+Read [the security guide now](https://www.ory.sh/docs/next/hydra/security-architecture).
 
 ### Disclosing vulnerabilities
 
@@ -240,22 +240,22 @@ and send us an email to [hi@ory.am](mailto:hi@ory.sh) instead.
 
 ## Benchmarks
 
-Our continuous integration runs a collection of benchmarks against ORY Hydra. You can find the results [here](https://www.ory.sh/docs/performance/performance-hydra).
+Our continuous integration runs a collection of benchmarks against ORY Hydra. You can find the results [here](https://www.ory.sh/docs/next/performance/performance-hydra).
 
 ## Telemetry
 
 Our services collect summarized, anonymized data which can optionally be turned off. Click
-[here](https://www.ory.sh/docs/ecosystem/ecosystem-sqa) to learn more.
+[here](https://www.ory.sh/docs/next/ecosystem/sqa) to learn more.
 
 ## Documentation
 
 ### Guide
 
-The Guide is available [here](https://www.ory.sh/docs/hydra/hydra-index).
+The Guide is available [here](https://www.ory.sh/docs/next/hydra).
 
 ### HTTP API documentation
 
-The HTTP API is documented [here](https://www.ory.sh/docs/hydra/sdk/hydra-sdk-api).
+The HTTP API is documented [here](https://www.ory.sh/docs/next/hydra/sdk/api).
 
 ### Upgrading and Changelog
 

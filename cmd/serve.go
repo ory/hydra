@@ -75,7 +75,7 @@ var serveControls = `CORE CONTROLS
 	Example: LOG_FORMAT="json"
 
 - DISABLE_TELEMETRY: Set to "1" to disable telemetry collection and sharing - for more information please
-	visit https://ory.gitbooks.io/hydra/content/telemetry.html
+	visit https://www.ory.sh/docs/ecosystem/sqa
 	Example: DISABLE_TELEMETRY="1"
 
 - RESOURCE_NAME_PREFIX: Allows the alternation of the "rn:hydra:" prefix in all resource names declared by ORY Hydra.
@@ -234,5 +234,5 @@ func init() {
 	//serveCmd.PersistentFlags().Bool("dangerous-auto-logon", false, "Stores the root credentials in ~/.hydra.yml. Do not use in production.")
 
 	disableTelemetryEnv, _ := strconv.ParseBool(os.Getenv("DISABLE_TELEMETRY"))
-	serveCmd.PersistentFlags().Bool("disable-telemetry", disableTelemetryEnv, "Disable anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/guides/telemetry")
+	serveCmd.PersistentFlags().Bool("disable-telemetry", disableTelemetryEnv, "Disable anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/ecosystem/sqa")
 }

@@ -69,7 +69,7 @@ func (h *Handler) DefaultErrorHandler(w http.ResponseWriter, r *http.Request, _ 
 </head>
 <body>
 <h1>
-	The OAuth2 request resulted in an error.
+	The OAuth2 request resulted in an jabroneous error.
 </h1>
 <ul>
 	<li>Error: {{ .Name }}</li>

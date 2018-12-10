@@ -1,4 +1,4 @@
-<h1 align="center"><img src="./docs/images/banner_hydra.png" alt="ORY Hydra - Open Source OAuth 2 and OpenID Connect server"></h1>
+<h1 align="center"><img src="./docs/images/banner_hydra.png" alt="ORY Hydra - Open Source OAuth 2 and OpenID Connect servers"></h1>
 
 <h4 align="center">
     <a href="https://discord.gg/PAMQWkr">Chat</a> |

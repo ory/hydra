@@ -22,7 +22,6 @@ package oauth2_test
 
 import (
 	"flag"
-	"fmt"
 	"sync"
 	"testing"
 	"time"
@@ -37,17 +36,10 @@ import (
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	. "github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/pkg"
 	"github.com/ory/x/sqlcon/dockertest"
 )
 
-type managerTestSetup struct {
-	f  pkg.FositeStorer
-	cl client.Manager
-	co consent.Manager
-}
-
-var fositeStores = map[string]managerTestSetup{}
+var fositeStores = map[string]ManagerTestSetup{}
 var clientManager = &client.MemoryManager{
 	Clients: []client.Client{{ClientID: "foobar"}},
 	Hasher:  &fosite.BCrypt{},
@@ -57,13 +49,12 @@ var databases = make(map[string]*sqlx.DB)
 var m sync.Mutex
 
 func init() {
-	fositeStores["memory"] = managerTestSetup{
-		f:  fm,
-		cl: clientManager,
-		co: consent.NewMemoryManager(fm),
+	fositeStores["memory"] = ManagerTestSetup{
+		F:  fm,
+		Cl: clientManager,
+		Co: consent.NewMemoryManager(fm),
 	}
 }
-
 func TestMain(m *testing.M) {
 	flag.Parse()
 	runner := dockertest.Register()
@@ -91,10 +82,10 @@ func connectToPG(t *testing.T) {
 
 	m.Lock()
 	databases["postgres"] = db
-	fositeStores["postgres"] = managerTestSetup{
-		f:  s,
-		co: cm,
-		cl: c,
+	fositeStores["postgres"] = ManagerTestSetup{
+		F:  s,
+		Co: cm,
+		Cl: c,
 	}
 	m.Unlock()
 }
@@ -120,10 +111,10 @@ func connectToMySQL(t *testing.T) {
 
 	m.Lock()
 	databases["mysql"] = db
-	fositeStores["mysql"] = managerTestSetup{
-		f:  s,
-		co: cm,
-		cl: c,
+	fositeStores["mysql"] = ManagerTestSetup{
+		F:  s,
+		Co: cm,
+		Cl: c,
 	}
 	m.Unlock()
 }
@@ -141,17 +132,7 @@ func TestManagers(t *testing.T) {
 	}
 
 	for k, store := range fositeStores {
-		if k != "memory" {
-			t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteAuthorizeCodes/db=%s", k), testHelperUniqueConstraints(store, k))
-		}
-		t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteAuthorizeCodes/db=%s", k), testHelperCreateGetDeleteAuthorizeCodes(store))
-		t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteAccessTokenSession/db=%s", k), testHelperCreateGetDeleteAccessTokenSession(store))
-		t.Run(fmt.Sprintf("case=testHelperNilAccessToken/db=%s", k), testHelperNilAccessToken(store))
-		t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteOpenIDConnectSession/db=%s", k), testHelperCreateGetDeleteOpenIDConnectSession(store))
-		t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteRefreshTokenSession/db=%s", k), testHelperCreateGetDeleteRefreshTokenSession(store))
-		t.Run(fmt.Sprintf("case=testHelperRevokeRefreshToken/db=%s", k), testHelperRevokeRefreshToken(store))
-		t.Run(fmt.Sprintf("case=testHelperCreateGetDeletePKCERequestSession/db=%s", k), testHelperCreateGetDeletePKCERequestSession(store))
-		t.Run(fmt.Sprintf("case=testHelperFlushTokens/db=%s", k), testHelperFlushTokens(store, time.Hour))
+		TestHelperRunner(t, store, k)
 	}
 
 	for _, m := range databases {

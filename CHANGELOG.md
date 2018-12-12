@@ -3,6 +3,8 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [Unreleased](#unreleased)
+  - [v1.0.0-rc.4+oryOS.9 (2018-12-12)](#v100-rc4oryos9-2018-12-12)
   - [v1.0.0-rc.3+oryOS.9 (2018-12-06)](#v100-rc3oryos9-2018-12-06)
   - [v1.0.0-rc.2+oryOS.9 (2018-11-21)](#v100-rc2oryos9-2018-11-21)
   - [v1.0.0-rc.1+oryOS.9 (2018-11-21)](#v100-rc1oryos9-2018-11-21)
@@ -137,6 +139,51 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Change Log
+
+## [Unreleased](https://github.com/ory/hydra/tree/HEAD)
+
+[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.4+oryOS.9...HEAD)
+
+**Implemented enhancements:**
+
+- Keep tests exportable [\#1204](https://github.com/ory/hydra/issues/1204)
+
+## [v1.0.0-rc.4+oryOS.9](https://github.com/ory/hydra/tree/v1.0.0-rc.4+oryOS.9) (2018-12-12)
+[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.3+oryOS.9...v1.0.0-rc.4+oryOS.9)
+
+**Implemented enhancements:**
+
+- client: Track when clients are created [\#1120](https://github.com/ory/hydra/issues/1120)
+- client: Add created/updated at fields [\#1207](https://github.com/ory/hydra/pull/1207) ([aeneasr](https://github.com/aeneasr))
+
+**Fixed bugs:**
+
+- Unable to return consent sessions for a user [\#1203](https://github.com/ory/hydra/issues/1203)
+- consent: Show all granted consent requests [\#1206](https://github.com/ory/hydra/pull/1206) ([aeneasr](https://github.com/aeneasr))
+
+**Closed issues:**
+
+- Unable to run migrate when comming from beta.7 \(mysql\) [\#1225](https://github.com/ory/hydra/issues/1225)
+- Migration from beta.9 fails on google cloudsql [\#1224](https://github.com/ory/hydra/issues/1224)
+- Service account [\#1220](https://github.com/ory/hydra/issues/1220)
+- service account [\#1219](https://github.com/ory/hydra/issues/1219)
+- Implement "on behalf of" flow / token exchange [\#1218](https://github.com/ory/hydra/issues/1218)
+- Bump github.com/ory/x to v0.0.33 [\#1213](https://github.com/ory/hydra/issues/1213)
+- OAuth2 Authorization Endpoint Doesn't Use CORS [\#1211](https://github.com/ory/hydra/issues/1211)
+- hydra migrate sql requires superuser privileges [\#1209](https://github.com/ory/hydra/issues/1209)
+- Accept consent flow cause bug with id\_token have field in utf8 value for MySQL 5.7+ [\#1205](https://github.com/ory/hydra/issues/1205)
+- Key rotation CLI message is unclear how to use ROTATED\_SYSTEM\_SECRET [\#1187](https://github.com/ory/hydra/issues/1187)
+
+**Merged pull requests:**
+
+- sql: Remove superuser requirements from postgres migrations [\#1226](https://github.com/ory/hydra/pull/1226) ([aeneasr](https://github.com/aeneasr))
+- docker: Remove dep from build chain [\#1217](https://github.com/ory/hydra/pull/1217) ([aeneasr](https://github.com/aeneasr))
+- docs: Fix broken links [\#1216](https://github.com/ory/hydra/pull/1216) ([aeneasr](https://github.com/aeneasr))
+- ci: Use new document id in appendix [\#1215](https://github.com/ory/hydra/pull/1215) ([aeneasr](https://github.com/aeneasr))
+- addresses \#1213 by bumping github.com/ory/x to v0.0.33 [\#1214](https://github.com/ory/hydra/pull/1214) ([aaslamin](https://github.com/aaslamin))
+- \[oauth2\] export tests again [\#1212](https://github.com/ory/hydra/pull/1212) ([someone1](https://github.com/someone1))
+- docs: Adapt new docs id structure [\#1208](https://github.com/ory/hydra/pull/1208) ([aeneasr](https://github.com/aeneasr))
+- Set ROTATED\_SYSTEM\_SECRET to old secret as speficied in docs. [\#1195](https://github.com/ory/hydra/pull/1195) ([prateek1192](https://github.com/prateek1192))
 
 ## [v1.0.0-rc.3+oryOS.9](https://github.com/ory/hydra/tree/v1.0.0-rc.3+oryOS.9) (2018-12-06)
 [Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.2+oryOS.9...v1.0.0-rc.3+oryOS.9)

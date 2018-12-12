@@ -44,7 +44,8 @@ CREATE INDEX hydra_oauth2_pkce_client_id_idx ON hydra_oauth2_pkce (client_id);
 
 -- Foreign keys start here
 
-SET session_replication_role = replica;
+-- This caused #1209:
+-- SET session_replication_role = replica;
 
 -- This creates a foreign key that cascade delete's if the client_id is removed.
 ALTER TABLE hydra_oauth2_access ADD CONSTRAINT hydra_oauth2_access_client_id_fk FOREIGN KEY (client_id) REFERENCES hydra_client(id) ON DELETE CASCADE;
@@ -60,7 +61,8 @@ ALTER TABLE hydra_oauth2_code ADD CONSTRAINT hydra_oauth2_code_challenge_id_fk F
 ALTER TABLE hydra_oauth2_oidc ADD CONSTRAINT hydra_oauth2_oidc_challenge_id_fk FOREIGN KEY (challenge_id) REFERENCES hydra_oauth2_consent_request_handled(challenge) ON DELETE CASCADE;
 ALTER TABLE hydra_oauth2_pkce ADD CONSTRAINT hydra_oauth2_pkce_challenge_id_fk FOREIGN KEY (challenge_id) REFERENCES hydra_oauth2_consent_request_handled(challenge) ON DELETE CASCADE;
 
-SET session_replication_role = DEFAULT;
+-- This caused #1209:
+-- SET session_replication_role = DEFAULT;
 
 -- +migrate Down
 

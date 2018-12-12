@@ -41,10 +41,8 @@ var createMigrations = map[string]*dbal.PackrMigrationSource{
 }
 
 func CleanTestDB(t *testing.T, db *sqlx.DB) {
-	_, err := db.Exec("DROP TABLE IF EXISTS hydra_client_migration")
-	require.NoError(t, err)
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_client")
-	require.NoError(t, err)
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_client_migration")
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_client")
 }
 
 func TestXXMigrations(t *testing.T) {

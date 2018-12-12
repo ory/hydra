@@ -58,11 +58,17 @@ var serveControls = `CORE CONTROLS
 	a separate secret in production.
 	Example: COOKIE_SECRET=fjah8uFhgjSiuf-AS
 
-- PORT: The port hydra should listen on.
-	Defaults to PORT=4444
+- PUBLIC_PORT: The TCP port hydra should listen and handle public API requests on.
+	Defaults to PUBLIC_PORT=4444
 
-- HOST: The host interface hydra should listen on. Leave empty to listen on all interfaces.
-	Example: HOST=localhost
+- PUBLIC_HOST: The interface hydra should listen and handle public API requests on. Leave empty to listen on all interfaces.
+	Example: PUBLIC_HOST=localhost
+
+- ADMIN_PORT: The TCP port hydra should listen and handle administrative API requests on.
+	Defaults to ADMIN_PORT=4445
+
+- ADMIN_HOST: The interface hydra should listen and handle administartive API requests on. Leave empty to listen on all interfaces.
+	Example: ADMIN_HOST=localhost
 
 - BCRYPT_COST: Set the bcrypt hashing cost. This is a trade off between
 	security and performance. Range is 4 =< x =< 31.

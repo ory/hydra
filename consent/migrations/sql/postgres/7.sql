@@ -35,7 +35,8 @@ DELETE FROM hydra_oauth2_authentication_request_handled WHERE NOT EXISTS (SELECT
 
 -- Actual indices
 
-SET session_replication_role = replica;
+-- This caused #1209:
+-- SET session_replication_role = replica;
 
 -- Handled consent and authentication requests must cascade delete when their parent (the request itself) is removed
 ALTER TABLE hydra_oauth2_consent_request_handled ADD CONSTRAINT hydra_oauth2_consent_request_handled_challenge_fk FOREIGN KEY (challenge) REFERENCES hydra_oauth2_consent_request(challenge) ON DELETE CASCADE;
@@ -55,7 +56,8 @@ ALTER TABLE hydra_oauth2_consent_request ADD CONSTRAINT hydra_oauth2_consent_req
 -- It should also be set to null if the login request is deleted (because consent does not care about that)
 ALTER TABLE hydra_oauth2_consent_request ADD CONSTRAINT hydra_oauth2_consent_request_login_challenge_fk FOREIGN KEY (login_challenge) REFERENCES hydra_oauth2_authentication_request(challenge) ON DELETE SET NULL;
 
-SET session_replication_role = DEFAULT;
+-- This caused #1209:
+-- SET session_replication_role = DEFAULT;
 
 -- +migrate Down
 ALTER TABLE hydra_oauth2_consent_request_handled DROP CONSTRAINT hydra_oauth2_consent_request_handled_challenge_fk;

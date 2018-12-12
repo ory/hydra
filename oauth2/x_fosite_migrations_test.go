@@ -25,51 +25,30 @@ var createMigrations = map[string]*dbal.PackrMigrationSource{
 
 func cleanDB(t *testing.T, db *sqlx.DB) {
 	t.Logf("Cleaning up tables...")
-	tx, err := db.DB.Begin()
-	require.NoError(t, err)
 
-	_, err = tx.Exec("DROP TABLE IF EXISTS hydra_oauth2_access")
-	require.NoError(t, err)
-	_, err = tx.Exec("DROP TABLE IF EXISTS hydra_oauth2_refresh")
-	require.NoError(t, err)
-	_, err = tx.Exec("DROP TABLE IF EXISTS hydra_oauth2_code")
-	require.NoError(t, err)
-	_, err = tx.Exec("DROP TABLE IF EXISTS hydra_oauth2_oidc")
-	require.NoError(t, err)
-	_, err = tx.Exec("DROP TABLE IF EXISTS hydra_oauth2_pkce")
-	require.NoError(t, err)
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_access")
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_refresh")
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_code")
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_oidc")
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_pkce")
 
 	// hydra_oauth2_consent_request_handled depends on hydra_oauth2_consent_request
-	_, err = tx.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request_handled")
-	require.NoError(t, err)
-	_, err = tx.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request")
-	require.NoError(t, err)
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request_handled")
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request")
 
 	// hydra_oauth2_authentication_request_handled depends on hydra_oauth2_authentication_request
-	_, err = tx.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request_handled")
-	require.NoError(t, err)
-	_, err = tx.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request")
-	require.NoError(t, err)
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request_handled")
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request")
 
 	// everything depends on hydra_oauth2_authentication_session
-	_, err = tx.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_session")
-	require.NoError(t, err)
-
-	_, err = tx.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
-	require.NoError(t, err)
-
-	_, err = tx.Exec("DROP TABLE IF EXISTS hydra_client")
-	require.NoError(t, err)
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_session")
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_client")
 
 	// clean up migration tables
-	_, err = tx.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_consent_migration")
-	require.NoError(t, err)
-	_, err = tx.Exec("DROP TABLE IF EXISTS hydra_client_migration")
-	require.NoError(t, err)
-	_, err = tx.Exec("DROP TABLE IF EXISTS hydra_oauth2_migration")
-	require.NoError(t, err)
-
-	require.NoError(t, tx.Commit())
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_consent_migration")
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_client_migration")
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_migration")
 
 	t.Logf("Done cleaning up tables!")
 }

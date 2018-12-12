@@ -22,35 +22,24 @@ var createMigrations = map[string]*dbal.PackrMigrationSource{
 }
 
 func cleanDB(t *testing.T, db *sqlx.DB) {
-	_, err := db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_consent_migration")
-	require.NoError(t, err)
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
-	require.NoError(t, err)
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_consent_migration")
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
 
 	// hydra_oauth2_consent_request_handled depends on hydra_oauth2_consent_request
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request_handled")
-	require.NoError(t, err)
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request")
-	require.NoError(t, err)
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request_handled")
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request")
 
 	// hydra_oauth2_authentication_request_handled depends on hydra_oauth2_authentication_request
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request_handled")
-	require.NoError(t, err)
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request")
-	require.NoError(t, err)
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request_handled")
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request")
 
 	// everything depends on hydra_oauth2_authentication_session
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_session")
-	require.NoError(t, err)
-
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
-	require.NoError(t, err)
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_session")
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
 
 	// everything depends on hydra_client
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_client")
-	require.NoError(t, err)
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_client_migration")
-	require.NoError(t, err)
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_client")
+	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_client_migration")
 }
 
 func TestXXMigrations(t *testing.T) {

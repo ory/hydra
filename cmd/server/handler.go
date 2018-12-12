@@ -23,6 +23,7 @@ package server
 import (
 	"crypto/tls"
 	"fmt"
+	"net"
 	"net/http"
 	"net/url"
 	"strings"
@@ -223,14 +224,23 @@ func serve(c *config.Config, cmd *cobra.Command, handler http.Handler, address s
 	err := graceful.Graceful(func() error {
 		var err error
 		c.GetLogger().Infof("Setting up http server on %s", address)
-		if c.ForceHTTP {
-			c.GetLogger().Warnln("HTTPS disabled. Never do this in production.")
-			err = srv.ListenAndServe()
-		} else if c.AllowTLSTermination != "" {
-			c.GetLogger().Infoln("TLS termination enabled, disabling https.")
-			err = srv.ListenAndServe()
+		if strings.HasPrefix(address, "unix:") {
+			addr := strings.TrimPrefix(address, "unix:")
+			unixListener, e := net.Listen("unix", addr)
+			if e != nil {
+				return e
+			}
+			err = srv.Serve(unixListener)
 		} else {
-			err = srv.ListenAndServeTLS("", "")
+			if c.ForceHTTP {
+				c.GetLogger().Warnln("HTTPS disabled. Never do this in production.")
+				err = srv.ListenAndServe()
+			} else if c.AllowTLSTermination != "" {
+				c.GetLogger().Infoln("TLS termination enabled, disabling https.")
+				err = srv.ListenAndServe()
+			} else {
+				err = srv.ListenAndServeTLS("", "")
+			}
 		}
 
 		return err

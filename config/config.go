@@ -425,12 +425,19 @@ func (c *Config) GetSystemSecret() []byte {
 	return pkg.HashByteSecret(secret)
 }
 
+func (c *Config) getAddress(address string, port int) string {
+	if strings.HasPrefix(address, "unix:") {
+		return address
+	}
+	return fmt.Sprintf("%s:%d", address, port)
+}
+
 func (c *Config) GetFrontendAddress() string {
-	return fmt.Sprintf("%s:%d", c.FrontendBindHost, c.FrontendBindPort)
+	return c.getAddress(c.FrontendBindHost, c.FrontendBindPort)
 }
 
 func (c *Config) GetBackendAddress() string {
-	return fmt.Sprintf("%s:%d", c.BackendBindHost, c.BackendBindPort)
+	return c.getAddress(c.BackendBindHost, c.BackendBindPort)
 }
 
 func (c *Config) Persist() error {

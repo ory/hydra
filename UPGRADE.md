@@ -8,6 +8,7 @@ before finalizing the upgrade process.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
+- [1.0.0-rc.4](#100-rc4)
 - [1.0.0-rc.1](#100-rc1)
   - [Non-breaking Changes](#non-breaking-changes)
     - [Access Token Audience](#access-token-audience)
@@ -117,6 +118,10 @@ before finalizing the upgrade process.
 Do you want the latest features and patches without work and hassle? Are you looking for a reliable, scalable, and
 secure deployment with zero effort? We can run it for you! If you're interested,
 [contact us now](mailto:hi@ory.sh)!
+
+## 1.0.0-rc.4
+
+This patch requires you to run SQL migrations. No other important changes have been made.
 
 ## 1.0.0-rc.1
 

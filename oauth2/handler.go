@@ -418,8 +418,8 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 
 	tt, ar, err := h.OAuth2.IntrospectToken(ctx, token, fosite.TokenType(tokenType), session, strings.Split(scope, " ")...)
 	if err != nil {
-		err := errors.WithStack(fosite.ErrInactiveToken.WithHint("An introspection strategy indicated that the token is inactive.").WithDebug(err.Error()))
 		pkg.LogError(err, h.L)
+		err := errors.WithStack(fosite.ErrInactiveToken.WithHint("An introspection strategy indicated that the token is inactive.").WithDebug(err.Error()))
 		h.OAuth2.WriteIntrospectionError(w, err)
 		return
 	}

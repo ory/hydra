@@ -3,7 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
-  - [Unreleased](#unreleased)
+  - [v1.0.0-rc.5+oryOS.10 (2018-12-13)](#v100-rc5oryos10-2018-12-13)
   - [v1.0.0-rc.4+oryOS.9 (2018-12-12)](#v100-rc4oryos9-2018-12-12)
   - [v1.0.0-rc.3+oryOS.9 (2018-12-06)](#v100-rc3oryos9-2018-12-06)
   - [v1.0.0-rc.2+oryOS.9 (2018-11-21)](#v100-rc2oryos9-2018-11-21)
@@ -140,13 +140,25 @@
 
 # Change Log
 
-## [Unreleased](https://github.com/ory/hydra/tree/HEAD)
-
-[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.4+oryOS.9...HEAD)
+## [v1.0.0-rc.5+oryOS.10](https://github.com/ory/hydra/tree/v1.0.0-rc.5+oryOS.10) (2018-12-13)
+[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.4+oryOS.9...v1.0.0-rc.5+oryOS.10)
 
 **Implemented enhancements:**
 
 - Keep tests exportable [\#1204](https://github.com/ory/hydra/issues/1204)
+
+**Closed issues:**
+
+- Running the migrate database does not work properly [\#1227](https://github.com/ory/hydra/issues/1227)
+
+**Merged pull requests:**
+
+- ci: Resolve flaky test issues [\#1234](https://github.com/ory/hydra/pull/1234) ([aeneasr](https://github.com/aeneasr))
+- README.md:  Oktober typo  [\#1233](https://github.com/ory/hydra/pull/1233) ([hisamura333](https://github.com/hisamura333))
+- oauth2: Improve introspection debugability [\#1232](https://github.com/ory/hydra/pull/1232) ([aeneasr](https://github.com/aeneasr))
+- Support binding frontend/backend to unix sockets [\#1230](https://github.com/ory/hydra/pull/1230) ([jayme-github](https://github.com/jayme-github))
+- Fix help output of hydra serve [\#1229](https://github.com/ory/hydra/pull/1229) ([jayme-github](https://github.com/jayme-github))
+- ci: Fix flaky sql migration tests [\#1228](https://github.com/ory/hydra/pull/1228) ([aeneasr](https://github.com/aeneasr))
 
 ## [v1.0.0-rc.4+oryOS.9](https://github.com/ory/hydra/tree/v1.0.0-rc.4+oryOS.9) (2018-12-12)
 [Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.3+oryOS.9...v1.0.0-rc.4+oryOS.9)

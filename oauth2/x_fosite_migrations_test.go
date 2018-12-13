@@ -6,8 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
@@ -29,43 +27,43 @@ func cleanDB(t *testing.T, db *sqlx.DB) {
 	t.Logf("Cleaning up tables...")
 
 	_, err := db.Exec("DROP TABLE IF EXISTS hydra_oauth2_access")
-	assert.NoError(t, err)
+	t.Logf("Unable to execute clean up query: %s", err)
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_refresh")
-	assert.NoError(t, err)
+	t.Logf("Unable to execute clean up query: %s", err)
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_code")
-	assert.NoError(t, err)
+	t.Logf("Unable to execute clean up query: %s", err)
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_oidc")
-	assert.NoError(t, err)
+	t.Logf("Unable to execute clean up query: %s", err)
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_pkce")
-	assert.NoError(t, err)
+	t.Logf("Unable to execute clean up query: %s", err)
 
 	// hydra_oauth2_consent_request_handled depends on hydra_oauth2_consent_request
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request_handled")
-	assert.NoError(t, err)
+	t.Logf("Unable to execute clean up query: %s", err)
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request")
-	assert.NoError(t, err)
+	t.Logf("Unable to execute clean up query: %s", err)
 
 	// hydra_oauth2_authentication_request_handled depends on hydra_oauth2_authentication_request
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request_handled")
-	assert.NoError(t, err)
+	t.Logf("Unable to execute clean up query: %s", err)
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request")
-	assert.NoError(t, err)
+	t.Logf("Unable to execute clean up query: %s", err)
 
 	// everything depends on hydra_oauth2_authentication_session
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_session")
-	assert.NoError(t, err)
+	t.Logf("Unable to execute clean up query: %s", err)
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
-	assert.NoError(t, err)
+	t.Logf("Unable to execute clean up query: %s", err)
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_client")
-	assert.NoError(t, err)
+	t.Logf("Unable to execute clean up query: %s", err)
 
 	// clean up migration tables
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_consent_migration")
-	assert.NoError(t, err)
+	t.Logf("Unable to execute clean up query: %s", err)
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_client_migration")
-	assert.NoError(t, err)
+	t.Logf("Unable to execute clean up query: %s", err)
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_migration")
-	assert.NoError(t, err)
+	t.Logf("Unable to execute clean up query: %s", err)
 
 	t.Logf("Done cleaning up tables!")
 }

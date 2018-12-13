@@ -25,8 +25,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
@@ -51,9 +49,9 @@ func TestXXMigrations(t *testing.T) {
 
 	var clean = func(t *testing.T, db *sqlx.DB) {
 		_, err := db.Exec("DROP TABLE IF EXISTS hydra_jwk")
-		assert.NoError(t, err)
+		t.Logf("Unable to execute clean up query: %s", err)
 		_, err = db.Exec("DROP TABLE IF EXISTS hydra_jwk_migration")
-		assert.NoError(t, err)
+		t.Logf("Unable to execute clean up query: %s", err)
 	}
 
 	migratest.RunPackrMigrationTests(

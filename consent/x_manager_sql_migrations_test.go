@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
@@ -22,24 +24,34 @@ var createMigrations = map[string]*dbal.PackrMigrationSource{
 }
 
 func cleanDB(t *testing.T, db *sqlx.DB) {
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_consent_migration")
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
+	_, err := db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_consent_migration")
+	assert.NoError(t, err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
+	assert.NoError(t, err)
 
 	// hydra_oauth2_consent_request_handled depends on hydra_oauth2_consent_request
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request_handled")
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request")
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request_handled")
+	assert.NoError(t, err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request")
+	assert.NoError(t, err)
 
 	// hydra_oauth2_authentication_request_handled depends on hydra_oauth2_authentication_request
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request_handled")
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request")
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request_handled")
+	assert.NoError(t, err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request")
+	assert.NoError(t, err)
 
 	// everything depends on hydra_oauth2_authentication_session
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_session")
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_session")
+	assert.NoError(t, err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
+	assert.NoError(t, err)
 
 	// everything depends on hydra_client
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_client")
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_client_migration")
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_client")
+	assert.NoError(t, err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_client_migration")
+	assert.NoError(t, err)
 }
 
 func TestXXMigrations(t *testing.T) {

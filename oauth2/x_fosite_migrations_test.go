@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
@@ -26,29 +28,44 @@ var createMigrations = map[string]*dbal.PackrMigrationSource{
 func cleanDB(t *testing.T, db *sqlx.DB) {
 	t.Logf("Cleaning up tables...")
 
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_access")
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_refresh")
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_code")
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_oidc")
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_pkce")
+	_, err := db.Exec("DROP TABLE IF EXISTS hydra_oauth2_access")
+	assert.NoError(t, err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_refresh")
+	assert.NoError(t, err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_code")
+	assert.NoError(t, err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_oidc")
+	assert.NoError(t, err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_pkce")
+	assert.NoError(t, err)
 
 	// hydra_oauth2_consent_request_handled depends on hydra_oauth2_consent_request
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request_handled")
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request")
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request_handled")
+	assert.NoError(t, err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request")
+	assert.NoError(t, err)
 
 	// hydra_oauth2_authentication_request_handled depends on hydra_oauth2_authentication_request
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request_handled")
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request")
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request_handled")
+	assert.NoError(t, err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request")
+	assert.NoError(t, err)
 
 	// everything depends on hydra_oauth2_authentication_session
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_session")
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_client")
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_session")
+	assert.NoError(t, err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
+	assert.NoError(t, err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_client")
+	assert.NoError(t, err)
 
 	// clean up migration tables
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_consent_migration")
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_client_migration")
-	_, _ = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_migration")
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_consent_migration")
+	assert.NoError(t, err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_client_migration")
+	assert.NoError(t, err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_migration")
+	assert.NoError(t, err)
 
 	t.Logf("Done cleaning up tables!")
 }

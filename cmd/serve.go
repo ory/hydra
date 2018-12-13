@@ -61,14 +61,16 @@ var serveControls = `CORE CONTROLS
 - PUBLIC_PORT: The TCP port hydra should listen and handle public API requests on.
 	Defaults to PUBLIC_PORT=4444
 
-- PUBLIC_HOST: The interface hydra should listen and handle public API requests on. Leave empty to listen on all interfaces.
-	Example: PUBLIC_HOST=localhost
+- PUBLIC_HOST: The interface or unix socket hydra should listen and handle public API requests on.
+	Use the prefix "unix:" to specify a path to a unix socket. Leave empty to listen on all interfaces.
+	Example: PUBLIC_HOST=localhost or PUBLIC_HOST="unix:/path/to/public_socket"
 
 - ADMIN_PORT: The TCP port hydra should listen and handle administrative API requests on.
 	Defaults to ADMIN_PORT=4445
 
-- ADMIN_HOST: The interface hydra should listen and handle administartive API requests on. Leave empty to listen on all interfaces.
-	Example: ADMIN_HOST=localhost
+- ADMIN_HOST: The interface or unix socket hydra should listen and handle administrative API requests on.
+	Use the prefix "unix:" to specify a path to a unix socket. Leave empty to listen on all interfaces.
+	Example: ADMIN_HOST=localhost or ADMIN_HOST="unix:/path/to/admin_socket"
 
 - BCRYPT_COST: Set the bcrypt hashing cost. This is a trade off between
 	security and performance. Range is 4 =< x =< 31.

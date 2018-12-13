@@ -48,8 +48,10 @@ func TestXXMigrations(t *testing.T) {
 	require.True(t, len(client.Migrations[dbal.DriverMySQL].Box.List()) == len(client.Migrations[dbal.DriverPostgreSQL].Box.List()))
 
 	var clean = func(t *testing.T, db *sqlx.DB) {
-		_, _ = db.Exec("DROP TABLE IF EXISTS hydra_jwk")
-		_, _ = db.Exec("DROP TABLE IF EXISTS hydra_jwk_migration")
+		_, err := db.Exec("DROP TABLE IF EXISTS hydra_jwk")
+		t.Logf("Unable to execute clean up query: %s", err)
+		_, err = db.Exec("DROP TABLE IF EXISTS hydra_jwk_migration")
+		t.Logf("Unable to execute clean up query: %s", err)
 	}
 
 	migratest.RunPackrMigrationTests(

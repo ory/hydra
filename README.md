@@ -190,7 +190,7 @@ go get -d -u github.com/ory/hydra
 cd $(go env GOPATH)/src/github.com/ory/hydra
 HYDRA_LATEST=$(git describe --abbrev=0 --tags)
 git checkout $HYDRA_LATEST
-GO111MOUDULE=on go install \
+GO111MODULE=on go install \
     -ldflags "-X github.com/ory/hydra/cmd.Version=$HYDRA_LATEST -X github.com/ory/hydra/cmd.BuildTime=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory/hydra/cmd.GitHash=`git rev-parse HEAD`" \
     github.com/ory/hydra
 git checkout master

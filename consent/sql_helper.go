@@ -104,7 +104,7 @@ type sqlAuthenticationRequest struct {
 	Skip                 bool           `db:"skip"`
 	Challenge            string         `db:"challenge"`
 	RequestedScope       string         `db:"requested_scope"`
-	RequestedAudience    string         `db:"requested_at_audience"`
+	RequestedAudience    sql.NullString `db:"requested_at_audience"`
 	Verifier             string         `db:"verifier"`
 	CSRF                 string         `db:"csrf"`
 	AuthenticatedAt      *time.Time     `db:"authenticated_at"`
@@ -115,9 +115,9 @@ type sqlAuthenticationRequest struct {
 
 type sqlConsentRequest struct {
 	sqlAuthenticationRequest
-	LoginChallenge          string `db:"login_challenge"`
-	ACR                     string `db:"acr"`
-	ForcedSubjectIdentifier string `db:"forced_subject_identifier"`
+	LoginChallenge          sql.NullString `db:"login_challenge"`
+	ACR                     string         `db:"acr"`
+	ForcedSubjectIdentifier string         `db:"forced_subject_identifier"`
 }
 
 func toMySQLDateHack(t time.Time) *time.Time {
@@ -157,14 +157,14 @@ func newSQLConsentRequest(c *ConsentRequest) (*sqlConsentRequest, error) {
 			Skip:                 c.Skip,
 			Challenge:            c.Challenge,
 			RequestedScope:       strings.Join(c.RequestedScope, "|"),
-			RequestedAudience:    strings.Join(c.RequestedAudience, "|"),
+			RequestedAudience:    sql.NullString{Valid: true, String: strings.Join(c.RequestedAudience, "|")},
 			Verifier:             c.Verifier,
 			CSRF:                 c.CSRF,
 			AuthenticatedAt:      toMySQLDateHack(c.AuthenticatedAt),
 			RequestedAt:          c.RequestedAt,
 			LoginSessionID:       sessionID,
 		},
-		LoginChallenge:          c.LoginChallenge,
+		LoginChallenge:          sql.NullString{Valid: true, String: c.LoginChallenge},
 		ForcedSubjectIdentifier: c.ForceSubjectIdentifier,
 		ACR:                     c.ACR,
 	}, nil
@@ -192,7 +192,7 @@ func newSQLAuthenticationRequest(c *AuthenticationRequest) (*sqlAuthenticationRe
 		Skip:                 c.Skip,
 		Challenge:            c.Challenge,
 		RequestedScope:       strings.Join(c.RequestedScope, "|"),
-		RequestedAudience:    strings.Join(c.RequestedAudience, "|"),
+		RequestedAudience:    sql.NullString{Valid: true, String: strings.Join(c.RequestedAudience, "|")},
 		Verifier:             c.Verifier,
 		CSRF:                 c.CSRF,
 		AuthenticatedAt:      toMySQLDateHack(c.AuthenticatedAt),
@@ -215,7 +215,7 @@ func (s *sqlAuthenticationRequest) toAuthenticationRequest(client *client.Client
 		Skip:                 s.Skip,
 		Challenge:            s.Challenge,
 		RequestedScope:       stringsx.Splitx(s.RequestedScope, "|"),
-		RequestedAudience:    stringsx.Splitx(s.RequestedAudience, "|"),
+		RequestedAudience:    stringsx.Splitx(s.RequestedAudience.String, "|"),
 		Verifier:             s.Verifier,
 		CSRF:                 s.CSRF,
 		AuthenticatedAt:      fromMySQLDateHack(s.AuthenticatedAt),
@@ -239,7 +239,7 @@ func (s *sqlConsentRequest) toConsentRequest(client *client.Client) (*ConsentReq
 		Skip:                   s.Skip,
 		Challenge:              s.Challenge,
 		RequestedScope:         stringsx.Splitx(s.RequestedScope, "|"),
-		RequestedAudience:      stringsx.Splitx(s.RequestedAudience, "|"),
+		RequestedAudience:      stringsx.Splitx(s.RequestedAudience.String, "|"),
 		Verifier:               s.Verifier,
 		CSRF:                   s.CSRF,
 		AuthenticatedAt:        fromMySQLDateHack(s.AuthenticatedAt),
@@ -247,23 +247,23 @@ func (s *sqlConsentRequest) toConsentRequest(client *client.Client) (*ConsentReq
 		RequestedAt:            s.RequestedAt,
 		WasHandled:             s.WasHandled,
 		LoginSessionID:         s.LoginSessionID.String,
-		LoginChallenge:         s.LoginChallenge,
+		LoginChallenge:         s.LoginChallenge.String,
 		ACR:                    s.ACR,
 	}, nil
 }
 
 type sqlHandledConsentRequest struct {
-	GrantedScope       string     `db:"granted_scope"`
-	GrantedAudience    string     `db:"granted_at_audience"`
-	SessionIDToken     string     `db:"session_id_token"`
-	SessionAccessToken string     `db:"session_access_token"`
-	Remember           bool       `db:"remember"`
-	RememberFor        int        `db:"remember_for"`
-	Error              string     `db:"error"`
-	Challenge          string     `db:"challenge"`
-	RequestedAt        time.Time  `db:"requested_at"`
-	WasUsed            bool       `db:"was_used"`
-	AuthenticatedAt    *time.Time `db:"authenticated_at"`
+	GrantedScope       string         `db:"granted_scope"`
+	GrantedAudience    sql.NullString `db:"granted_at_audience"`
+	SessionIDToken     string         `db:"session_id_token"`
+	SessionAccessToken string         `db:"session_access_token"`
+	Remember           bool           `db:"remember"`
+	RememberFor        int            `db:"remember_for"`
+	Error              string         `db:"error"`
+	Challenge          string         `db:"challenge"`
+	RequestedAt        time.Time      `db:"requested_at"`
+	WasUsed            bool           `db:"was_used"`
+	AuthenticatedAt    *time.Time     `db:"authenticated_at"`
 }
 
 func newSQLHandledConsentRequest(c *HandledConsentRequest) (*sqlHandledConsentRequest, error) {
@@ -299,7 +299,7 @@ func newSQLHandledConsentRequest(c *HandledConsentRequest) (*sqlHandledConsentRe
 
 	return &sqlHandledConsentRequest{
 		GrantedScope:       strings.Join(c.GrantedScope, "|"),
-		GrantedAudience:    strings.Join(c.GrantedAudience, "|"),
+		GrantedAudience:    sql.NullString{Valid: true, String: strings.Join(c.GrantedAudience, "|")},
 		SessionIDToken:     sidt,
 		SessionAccessToken: sat,
 		Remember:           c.Remember,
@@ -333,7 +333,7 @@ func (s *sqlHandledConsentRequest) toHandledConsentRequest(r *ConsentRequest) (*
 
 	return &HandledConsentRequest{
 		GrantedScope:    stringsx.Splitx(s.GrantedScope, "|"),
-		GrantedAudience: stringsx.Splitx(s.GrantedAudience, "|"),
+		GrantedAudience: stringsx.Splitx(s.GrantedAudience.String, "|"),
 		RememberFor:     s.RememberFor,
 		Remember:        s.Remember,
 		Challenge:       s.Challenge,

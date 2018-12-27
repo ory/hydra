@@ -122,7 +122,7 @@ func (h *MigrateHandler) MigrateSecret(cmd *cobra.Command, args []string) {
 	}
 
 	if len(newSecret) < 16 {
-		cmdx.Fatalf("Value of environment variable NEW_SYSTEM_SECRET has to be at least 16 characters long but got: %d", len(oldSecret))
+		cmdx.Fatalf("Value of environment variable NEW_SYSTEM_SECRET has to be at least 16 characters long but got: %d", len(newSecret))
 	}
 
 	fmt.Println("Rotating encryption keys for JSON Web Key storage...")

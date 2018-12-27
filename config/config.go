@@ -397,6 +397,10 @@ func (c *Config) GetCookieSecret() []byte {
 }
 
 func (c *Config) GetRotatedSystemSecrets() [][]byte {
+	if len(c.RotatedSystemSecret) == 0 {
+		return nil
+	}
+
 	return [][]byte{
 		pkg.HashStringSecret(c.RotatedSystemSecret),
 	}

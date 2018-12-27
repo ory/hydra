@@ -364,7 +364,8 @@ func (c *Config) Context() *Context {
 		Hasher:     hasher,
 		FositeStrategy: &foauth2.HMACSHAStrategy{
 			Enigma: &hmac.HMACStrategy{
-				GlobalSecret: c.GetSystemSecret(),
+				GlobalSecret:         c.GetSystemSecret(),
+				RotatedGlobalSecrets: c.GetRotatedSystemSecrets(),
 			},
 			AccessTokenLifespan:   c.GetAccessTokenLifespan(),
 			AuthorizeCodeLifespan: c.GetAuthCodeLifespan(),

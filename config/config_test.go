@@ -105,6 +105,13 @@ func TestSystemSecret(t *testing.T) {
 	assert.EqualValues(t, c.GetSystemSecret(), c2.GetSystemSecret())
 }
 
+func TestRotatedSystemSecrets(t *testing.T) {
+	c := &Config{RotatedSystemSecret: "foobarbazbarasdfasdffoobarbazbarasdfasdf"}
+	assert.EqualValues(t, c.GetRotatedSystemSecrets(), c.GetRotatedSystemSecrets())
+	c2 := &Config{RotatedSystemSecret: ""}
+	assert.Nil(t, c2.GetRotatedSystemSecrets())
+}
+
 func TestResolve(t *testing.T) {
 	c := &Config{EndpointURL: "https://localhost:1234"}
 	assert.Equal(t, c.Resolve("foo", "bar").String(), "https://localhost:1234/foo/bar")

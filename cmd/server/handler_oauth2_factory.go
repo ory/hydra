@@ -94,7 +94,7 @@ func newOAuth2Provider(c *config.Config) fosite.OAuth2Provider {
 	}
 
 	var coreStrategy foauth2.CoreStrategy
-	hmacStrategy := compose.NewOAuth2HMACStrategy(fc, c.GetSystemSecret(), nil)
+	hmacStrategy := compose.NewOAuth2HMACStrategy(fc, c.GetSystemSecret(), c.GetRotatedSystemSecrets())
 	if c.OAuth2AccessTokenStrategy == "jwt" {
 		kid := uuid.New()
 		if _, err := createOrGetJWK(c, oauth2.OAuth2JWTKeyName, kid, "private"); err != nil {

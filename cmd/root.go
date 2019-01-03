@@ -138,6 +138,9 @@ func initConfig() {
 	viper.BindEnv("SYSTEM_SECRET")
 	viper.SetDefault("SYSTEM_SECRET", "")
 
+	viper.BindEnv("ROTATED_SYSTEM_SECRET")
+	viper.SetDefault("ROTATED_SYSTEM_SECRET", "")
+
 	viper.BindEnv("CLIENT_SECRET")
 	viper.SetDefault("CLIENT_SECRET", "")
 

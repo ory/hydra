@@ -152,6 +152,7 @@ func (sw *Snapshot) Update() {
 
 }
 
+//todo: add /health/detailed here.
 func (s *Snapshot) Path(path string) *PathMetrics {
 	paths := []string{
 		"/.well-known/jwks.json",

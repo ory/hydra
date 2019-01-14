@@ -99,6 +99,8 @@ func RunHost(c *config.Config) func(cmd *cobra.Command, args []string) {
 		}
 
 		useAirbrakeMiddleware(n)
+		// todo: replace the below with customer Before & After function to allow change logging format
+		// todo: add corelation id middleware.
 		n.Use(negronilogrus.NewMiddlewareFromLogger(logger, c.Issuer))
 		n.UseFunc(serverHandler.rejectInsecureRequests)
 		n.UseHandler(router)

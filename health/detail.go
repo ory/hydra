@@ -60,6 +60,8 @@ func simpleStatus(c *config.Config) []byte {
 	return data
 }
 
+// Todo: change to following microserice standard
+// Questions: what's the verison of this? /v1/health/detailed ?
 func detailedStatus(c *config.Config) []byte {
 	dependent := dbCheck(c.Context().Connection)
 	status := status(dependent.State.Status, c)
@@ -88,7 +90,7 @@ func getProject() projectInfo {
 		Stats:  stats,
 	}
 }
-
+// todo: do sql query version.
 func dbCheck(connection interface{}) dependentInfo {
 	var err error
 	name := ""

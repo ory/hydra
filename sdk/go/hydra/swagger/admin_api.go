@@ -276,6 +276,10 @@ func (a AdminApi) CreateOAuth2Client(body OAuth2Client) (*OAuth2Client, *APIResp
 	var successPayload = new(OAuth2Client)
 	localVarHttpResponse, err := a.Configuration.APIClient.CallAPI(localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 
+	if localVarHttpResponse.StatusCode() >= 300 {
+		return nil, nil, fmt.Errorf("HTTP request is failed. status code is %d", localVarHttpResponse.StatusCode())
+	}
+
 	var localVarURL, _ = url.Parse(localVarPath)
 	localVarURL.RawQuery = localVarQueryParams.Encode()
 	var localVarAPIResponse = &APIResponse{Operation: "CreateOAuth2Client", Method: localVarHttpMethod, RequestURL: localVarURL.String()}

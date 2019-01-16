@@ -54,12 +54,14 @@ import (
 
 var _ = &consent.Handler{}
 
-func EnhanceRouter(c *config.Config, cmd *cobra.Command, serverHandler *Handler, router *httprouter.Router, middlewares []negroni.Handler, enableCors bool) http.Handler {
+func EnhanceRouter(c *config.Config, cmd *cobra.Command, serverHandler *Handler, router *httprouter.Router, middlewares []negroni.Handler, enableCors, rejectInsecure bool) http.Handler {
 	n := negroni.New()
 	for _, m := range middlewares {
 		n.Use(m)
 	}
-	n.UseFunc(serverHandler.RejectInsecureRequests)
+	if rejectInsecure {
+		n.UseFunc(serverHandler.RejectInsecureRequests)
+	}
 	n.UseHandler(router)
 	if enableCors {
 		c.GetLogger().Info("Enabled CORS")
@@ -81,7 +83,8 @@ func RunServeAdmin(c *config.Config) func(cmd *cobra.Command, args []string) {
 
 		cert := getOrCreateTLSCertificate(cmd, c)
 		// go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, frontend), c.GetFrontendAddress(), &wg)
-		go serve(c, cmd, EnhanceRouter(c, cmd, serverHandler, backend, mws, viper.GetString("CORS_ENABLED") == "true"), c.GetBackendAddress(), &wg, cert)
+		address := c.GetBackendAddress()
+		go serve(c, cmd, EnhanceRouter(c, cmd, serverHandler, backend, mws, viper.GetString("CORS_ENABLED") == "true", !addressIsUnixSocket(address)), address, &wg, cert)
 
 		wg.Wait()
 	}
@@ -97,7 +100,8 @@ func RunServePublic(c *config.Config) func(cmd *cobra.Command, args []string) {
 		wg.Add(2)
 
 		cert := getOrCreateTLSCertificate(cmd, c)
-		go serve(c, cmd, EnhanceRouter(c, cmd, serverHandler, frontend, mws, false), c.GetFrontendAddress(), &wg, cert)
+		address := c.GetFrontendAddress()
+		go serve(c, cmd, EnhanceRouter(c, cmd, serverHandler, frontend, mws, false, !addressIsUnixSocket(address)), address, &wg, cert)
 		// go serve(c, cmd, enhanceRouter(c, cmd, serverHandler, backend), c.GetBackendAddress(), &wg)
 
 		wg.Wait()
@@ -113,8 +117,10 @@ func RunServeAll(c *config.Config) func(cmd *cobra.Command, args []string) {
 		wg.Add(2)
 
 		cert := getOrCreateTLSCertificate(cmd, c)
-		go serve(c, cmd, EnhanceRouter(c, cmd, serverHandler, frontend, mws, false), c.GetFrontendAddress(), &wg, cert)
-		go serve(c, cmd, EnhanceRouter(c, cmd, serverHandler, backend, mws, viper.GetString("CORS_ENABLED") == "true"), c.GetBackendAddress(), &wg, cert)
+		frontendAddress := c.GetFrontendAddress()
+		backendAddress := c.GetBackendAddress()
+		go serve(c, cmd, EnhanceRouter(c, cmd, serverHandler, frontend, mws, false, !addressIsUnixSocket(frontendAddress)), frontendAddress, &wg, cert)
+		go serve(c, cmd, EnhanceRouter(c, cmd, serverHandler, backend, mws, viper.GetString("CORS_ENABLED") == "true", !addressIsUnixSocket(backendAddress)), backendAddress, &wg, cert)
 
 		wg.Wait()
 	}
@@ -224,7 +230,7 @@ func serve(c *config.Config, cmd *cobra.Command, handler http.Handler, address s
 	err := graceful.Graceful(func() error {
 		var err error
 		c.GetLogger().Infof("Setting up http server on %s", address)
-		if strings.HasPrefix(address, "unix:") {
+		if addressIsUnixSocket(address) {
 			addr := strings.TrimPrefix(address, "unix:")
 			unixListener, e := net.Listen("unix", addr)
 			if e != nil {
@@ -301,4 +307,8 @@ func (h *Handler) RejectInsecureRequests(rw http.ResponseWriter, r *http.Request
 	}
 
 	h.H.WriteErrorCode(rw, r, http.StatusBadGateway, errors.New("Can not serve request over insecure http"))
+}
+
+func addressIsUnixSocket(address string) bool {
+	return strings.HasPrefix(address, "unix:")
 }

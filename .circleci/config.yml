@@ -22,7 +22,7 @@ jobs:
           command: |
             echo 'export GO111MODULE=on' >> $BASH_ENV
             source $BASH_ENV
-      - run: curl -L https://git.io/vp6lP | sh
+      - run: curl -L https://git.io/vp6lP | sh -s -- -b ./bin
       - run: mv ./bin/* $GOPATH/bin
       - run: go mod download
       - run: go mod vendor

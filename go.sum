@@ -189,6 +189,8 @@ github.com/ory/x v0.0.32 h1:fgxawi8zaB/WODqNcIukSsBfq5C64s2Xh7sOEjUuHhc=
 github.com/ory/x v0.0.32/go.mod h1:4hnvHBE1KfoPP99R82BH72s3UnHt//MmWX+5NYnfzFQ=
 github.com/ory/x v0.0.33 h1:Hfy1Xe+oKvOG8BN+B3ArM0eVfoCH7FElOmMzO0J/c0Q=
 github.com/ory/x v0.0.33/go.mod h1:U7SUjn+NSVmHbWlS0LBSxbBk1hdPDmc2AJk9gZZZedA=
+github.com/ory/x v0.0.35 h1:2mpHAegfgoIZ+U1wP/e40wAIMC98+JEolGWdwzJk8sQ=
+github.com/ory/x v0.0.35/go.mod h1:U7SUjn+NSVmHbWlS0LBSxbBk1hdPDmc2AJk9gZZZedA=
 github.com/parnurzeal/gorequest v0.2.15/go.mod h1:3Kh2QUMJoqw3icWAecsyzkpY7UzRfDhbRdTjtNwNiUE=
 github.com/pborman/uuid v1.2.0 h1:J7Q5mO4ysT1dv8hyrUGHb9+ooztCXu1D8MY8DZYsu3g=
 github.com/pborman/uuid v1.2.0/go.mod h1:X/NO0urCmaxf9VXbdlT7C2Yzkj2IKimNn4k+gtPdI/k=
@@ -278,6 +280,8 @@ golang.org/x/crypto v0.0.0-20181203042331-505ab145d0a9 h1:mKdxBk7AujPs8kU4m80U72
 golang.org/x/crypto v0.0.0-20181203042331-505ab145d0a9/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/crypto v0.0.0-20190103213133-ff983b9c42bc h1:F5tKCVGp+MUAHhKp5MZtGqAlGX3+oCsiL1Q629FL90M=
 golang.org/x/crypto v0.0.0-20190103213133-ff983b9c42bc/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
+golang.org/x/crypto v0.0.0-20190123085648-057139ce5d2b h1:Elez2XeF2p9uyVj0yEUDqQ56NFcDtcBNkYP7yv8YbUE=
+golang.org/x/crypto v0.0.0-20190123085648-057139ce5d2b/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/net v0.0.0-20180530234432-1e491301e022/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
 golang.org/x/net v0.0.0-20180611182652-db08ff08e862 h1:JZi6BqOZ+iSgmLWe6llhGrNnEnK+YB/MRkStwnEfbqM=
 golang.org/x/net v0.0.0-20180611182652-db08ff08e862/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=

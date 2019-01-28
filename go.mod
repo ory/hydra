@@ -25,7 +25,7 @@ require (
 	github.com/ory/graceful v0.1.0
 	github.com/ory/herodot v0.4.1
 	github.com/ory/sqlcon v0.0.7
-	github.com/ory/x v0.0.33
+	github.com/ory/x v0.0.35
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.8.0
@@ -42,7 +42,7 @@ require (
 	github.com/urfave/negroni v1.0.0
 	github.com/ziutek/mymysql v1.5.4 // indirect
 	go.uber.org/atomic v1.3.2 // indirect
-	golang.org/x/crypto v0.0.0-20190103213133-ff983b9c42bc
+	golang.org/x/crypto v0.0.0-20190123085648-057139ce5d2b
 	golang.org/x/net v0.0.0-20181029044818-c44066c5c816 // indirect
 	golang.org/x/oauth2 v0.0.0-20181003184128-c57b0facaced
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect

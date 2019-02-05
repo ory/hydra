@@ -27,6 +27,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/fosite/storage"
+
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -118,6 +120,8 @@ func TestHelperRunner(t *testing.T, store ManagerTestSetup, k string) {
 	t.Helper()
 	if k != "memory" {
 		t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteAuthorizeCodes/db=%s", k), testHelperUniqueConstraints(store, k))
+		t.Run(fmt.Sprint("case=testFositeSqlStoreTransactionsCommit"), testFositeSqlStoreTransactionCommit(store))
+		t.Run(fmt.Sprint("case=testFositeSqlStoreTransactionsRollback"), testFositeSqlStoreTransactionRollback(store))
 	}
 	t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteAuthorizeCodes/db=%s", k), testHelperCreateGetDeleteAuthorizeCodes(store))
 	t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteAccessTokenSession/db=%s", k), testHelperCreateGetDeleteAccessTokenSession(store))
@@ -383,5 +387,75 @@ func testHelperFlushTokens(x ManagerTestSetup, lifespan time.Duration) func(t *t
 		require.Error(t, err)
 		_, err = m.GetAccessTokenSession(ctx, "flush-3", ds)
 		require.Error(t, err)
+	}
+}
+
+func testFositeSqlStoreTransactionCommit(m ManagerTestSetup) func(t *testing.T) {
+	return func(t *testing.T) {
+		{
+			txnStore, ok := m.F.(storage.Transactional)
+			require.True(t, ok)
+
+			ctx := context.Background()
+			ctx, err := txnStore.BeginTX(ctx)
+
+			require.NoError(t, err)
+
+			signature := uuid.New()
+			err = m.F.CreateAccessTokenSession(ctx, signature, createTestRequest(signature))
+			require.NoError(t, err)
+			err = txnStore.Commit(ctx)
+			require.NoError(t, err)
+
+			// Require a new context, since the old one contains the transaction.
+			ctx = context.Background()
+			res, err := m.F.GetAccessTokenSession(ctx, signature, &Session{})
+			// access token should have been created successfully because Commit did not return an error
+			require.NoError(t, err)
+			AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
+
+		}
+	}
+}
+
+func testFositeSqlStoreTransactionRollback(m ManagerTestSetup) func(t *testing.T) {
+	return func(t *testing.T) {
+		{
+			txnStore, ok := m.F.(storage.Transactional)
+			require.True(t, ok)
+
+			ctx := context.Background()
+			ctx, err := txnStore.BeginTX(ctx)
+
+			require.NoError(t, err)
+
+			signature := uuid.New()
+			err = m.F.CreateAccessTokenSession(ctx, signature, createTestRequest(signature))
+
+			require.NoError(t, err)
+			err = txnStore.Rollback(ctx)
+			require.NoError(t, err)
+
+			// Require a new context, since the old one contains the transaction.
+			ctx = context.Background()
+
+			_, err = m.F.GetAccessTokenSession(ctx, signature, &Session{})
+			// Since we rolled back above, the access token should not exist and getting it should result in an error
+			require.Error(t, err)
+		}
+	}
+}
+
+func createTestRequest(id string) *fosite.Request {
+	return &fosite.Request{
+		ID:                id,
+		RequestedAt:       time.Now().UTC().Round(time.Second),
+		Client:            &client.Client{ClientID: "foobar"},
+		RequestedScope:    fosite.Arguments{"fa", "ba"},
+		GrantedScope:      fosite.Arguments{"fa", "ba"},
+		RequestedAudience: fosite.Arguments{"ad1", "ad2"},
+		GrantedAudience:   fosite.Arguments{"ad1", "ad2"},
+		Form:              url.Values{"foo": []string{"bar", "baz"}},
+		Session:           &Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
 	}
 }

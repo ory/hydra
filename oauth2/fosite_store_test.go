@@ -134,7 +134,6 @@ func TestManagers(t *testing.T) {
 	for k, store := range fositeStores {
 		TestHelperRunner(t, store, k)
 	}
-
 	for _, m := range databases {
 		cleanDB(t, m)
 	}

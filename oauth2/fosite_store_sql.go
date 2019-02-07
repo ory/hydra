@@ -50,7 +50,7 @@ type FositeSQLStore struct {
 	HashSignature       bool
 }
 
-type dbAccess interface {
+type sqlxDB interface {
 	sqlx.ExecerContext
 	sqlx.Ext
 	NamedExecContext(ctx context.Context, query string, arg interface{}) (sql.Result, error)
@@ -91,9 +91,9 @@ var Migrations = map[string]*dbal.PackrMigrationSource{
 	}, true),
 }
 
-type transactionKey struct{}
+type transactionKey int
 
-var txKey = transactionKey{}
+const txKey transactionKey = iota
 
 var sqlParams = []string{
 	"signature",
@@ -211,7 +211,7 @@ func (s *FositeSQLStore) hashSignature(signature, table string) string {
 }
 
 func (s *FositeSQLStore) createSession(ctx context.Context, signature string, requester fosite.Requester, table string) error {
-	dbAccess := s.getDbAccess(ctx)
+	db := s.db(ctx)
 	signature = s.hashSignature(signature, table)
 
 	data, err := sqlSchemaFromRequest(signature, requester, s.L)
@@ -225,27 +225,26 @@ func (s *FositeSQLStore) createSession(ctx context.Context, signature string, re
 		strings.Join(sqlParams, ", "),
 		":"+strings.Join(sqlParams, ", :"),
 	)
-	if _, err := dbAccess.NamedExecContext(ctx, query, data); err != nil {
+	if _, err := db.NamedExecContext(ctx, query, data); err != nil {
 		return sqlcon.HandleError(err)
 	}
 	return nil
 }
 
-func (s *FositeSQLStore) getDbAccess(ctx context.Context) dbAccess {
+func (s *FositeSQLStore) db(ctx context.Context) sqlxDB {
 	if tx, ok := ctx.Value(txKey).(*sqlx.Tx); ok {
 		return tx
-
 	} else {
 		return s.DB
 	}
 }
 
 func (s *FositeSQLStore) findSessionBySignature(ctx context.Context, signature string, session fosite.Session, table string) (fosite.Requester, error) {
-	dbAccess := s.getDbAccess(ctx)
+	db := s.db(ctx)
 	signature = s.hashSignature(signature, table)
 
 	var d sqlData
-	if err := dbAccess.GetContext(ctx, &d, dbAccess.Rebind(fmt.Sprintf("SELECT * FROM hydra_oauth2_%s WHERE signature=?", table)), signature); err == sql.ErrNoRows {
+	if err := db.GetContext(ctx, &d, db.Rebind(fmt.Sprintf("SELECT * FROM hydra_oauth2_%s WHERE signature=?", table)), signature); err == sql.ErrNoRows {
 		return nil, errors.Wrap(fosite.ErrNotFound, "")
 	} else if err != nil {
 		return nil, sqlcon.HandleError(err)
@@ -263,9 +262,10 @@ func (s *FositeSQLStore) findSessionBySignature(ctx context.Context, signature s
 }
 
 func (s *FositeSQLStore) deleteSession(ctx context.Context, signature string, table string) error {
+	db := s.db(ctx)
 	signature = s.hashSignature(signature, table)
 
-	if _, err := s.DB.ExecContext(ctx, s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE signature=?", table)), signature); err != nil {
+	if _, err := db.ExecContext(ctx, s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE signature=?", table)), signature); err != nil {
 		return sqlcon.HandleError(err)
 	}
 	return nil
@@ -301,8 +301,8 @@ func (s *FositeSQLStore) GetAuthorizeCodeSession(ctx context.Context, signature 
 }
 
 func (s *FositeSQLStore) InvalidateAuthorizeCodeSession(ctx context.Context, signature string) error {
-	dbAccess := s.getDbAccess(ctx)
-	if _, err := dbAccess.ExecContext(ctx, dbAccess.Rebind(fmt.Sprintf(
+	db := s.db(ctx)
+	if _, err := db.ExecContext(ctx, db.Rebind(fmt.Sprintf(
 		"UPDATE hydra_oauth2_%s SET active=false WHERE signature=?",
 		sqlTableCode,
 	)), signature); err != nil {
@@ -361,8 +361,8 @@ func (s *FositeSQLStore) RevokeAccessToken(ctx context.Context, id string) error
 }
 
 func (s *FositeSQLStore) revokeSession(ctx context.Context, id string, table string) error {
-	dbAccess := s.getDbAccess(ctx)
-	if _, err := dbAccess.ExecContext(ctx, dbAccess.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE request_id=?", table)), id); err == sql.ErrNoRows {
+	db := s.db(ctx)
+	if _, err := db.ExecContext(ctx, db.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE request_id=?", table)), id); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
 	} else if err != nil {
 		return sqlcon.HandleError(err)

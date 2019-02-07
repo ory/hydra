@@ -27,6 +27,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/fosite/storage"
+
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -118,6 +120,17 @@ func TestHelperRunner(t *testing.T, store ManagerTestSetup, k string) {
 	t.Helper()
 	if k != "memory" {
 		t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteAuthorizeCodes/db=%s", k), testHelperUniqueConstraints(store, k))
+		t.Run(fmt.Sprint("case=testFositeSqlStoreTransactionsCommitAccessToken"), testFositeSqlStoreTransactionCommitAccessToken(store))
+		t.Run(fmt.Sprint("case=testFositeSqlStoreTransactionsRollbackAccessToken"), testFositeSqlStoreTransactionRollbackAccessToken(store))
+		t.Run(fmt.Sprint("case=testFositeSqlStoreTransactionCommitRefreshToken"), testFositeSqlStoreTransactionCommitRefreshToken(store))
+		t.Run(fmt.Sprint("case=testFositeSqlStoreTransactionRollbackRefreshToken"), testFositeSqlStoreTransactionRollbackRefreshToken(store))
+		t.Run(fmt.Sprint("case=testFositeSqlStoreTransactionCommitAuthorizeCode"), testFositeSqlStoreTransactionCommitAuthorizeCode(store))
+		t.Run(fmt.Sprint("case=testFositeSqlStoreTransactionRollbackAuthorizeCode"), testFositeSqlStoreTransactionRollbackAuthorizeCode(store))
+		t.Run(fmt.Sprint("case=testFositeSqlStoreTransactionCommitPKCERequest"), testFositeSqlStoreTransactionCommitPKCERequest(store))
+		t.Run(fmt.Sprint("case=testFositeSqlStoreTransactionRollbackPKCERequest"), testFositeSqlStoreTransactionRollbackPKCERequest(store))
+		t.Run(fmt.Sprint("case=testFositeSqlStoreTransactionCommitOpenIdConnectSession"), testFositeSqlStoreTransactionCommitOpenIdConnectSession(store))
+		t.Run(fmt.Sprint("case=testFositeSqlStoreTransactionRollbackOpenIdConnectSession"), testFositeSqlStoreTransactionRollbackOpenIdConnectSession(store))
+
 	}
 	t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteAuthorizeCodes/db=%s", k), testHelperCreateGetDeleteAuthorizeCodes(store))
 	t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteAccessTokenSession/db=%s", k), testHelperCreateGetDeleteAccessTokenSession(store))
@@ -383,5 +396,230 @@ func testHelperFlushTokens(x ManagerTestSetup, lifespan time.Duration) func(t *t
 		require.Error(t, err)
 		_, err = m.GetAccessTokenSession(ctx, "flush-3", ds)
 		require.Error(t, err)
+	}
+}
+
+func testFositeSqlStoreTransactionCommitAccessToken(m ManagerTestSetup) func(t *testing.T) {
+	return func(t *testing.T) {
+		{
+			doTestCommit(m, t, m.F.CreateAccessTokenSession, m.F.GetAccessTokenSession, m.F.RevokeAccessToken)
+			doTestCommit(m, t, m.F.CreateAccessTokenSession, m.F.GetAccessTokenSession, m.F.DeleteAccessTokenSession)
+		}
+	}
+}
+
+func testFositeSqlStoreTransactionRollbackAccessToken(m ManagerTestSetup) func(t *testing.T) {
+	return func(t *testing.T) {
+		{
+			doTestRollback(m, t, m.F.CreateAccessTokenSession, m.F.GetAccessTokenSession, m.F.RevokeAccessToken)
+			doTestRollback(m, t, m.F.CreateAccessTokenSession, m.F.GetAccessTokenSession, m.F.DeleteAccessTokenSession)
+		}
+	}
+}
+
+func testFositeSqlStoreTransactionCommitRefreshToken(m ManagerTestSetup) func(t *testing.T) {
+
+	return func(t *testing.T) {
+		doTestCommit(m, t, m.F.CreateRefreshTokenSession, m.F.GetRefreshTokenSession, m.F.RevokeRefreshToken)
+		doTestCommit(m, t, m.F.CreateRefreshTokenSession, m.F.GetRefreshTokenSession, m.F.DeleteRefreshTokenSession)
+	}
+}
+
+func testFositeSqlStoreTransactionRollbackRefreshToken(m ManagerTestSetup) func(t *testing.T) {
+	return func(t *testing.T) {
+		doTestRollback(m, t, m.F.CreateRefreshTokenSession, m.F.GetRefreshTokenSession, m.F.RevokeRefreshToken)
+		doTestRollback(m, t, m.F.CreateRefreshTokenSession, m.F.GetRefreshTokenSession, m.F.DeleteRefreshTokenSession)
+	}
+}
+
+func testFositeSqlStoreTransactionCommitAuthorizeCode(m ManagerTestSetup) func(t *testing.T) {
+
+	return func(t *testing.T) {
+		doTestCommit(m, t, m.F.CreateAuthorizeCodeSession, m.F.GetAuthorizeCodeSession, m.F.InvalidateAuthorizeCodeSession)
+	}
+}
+
+func testFositeSqlStoreTransactionRollbackAuthorizeCode(m ManagerTestSetup) func(t *testing.T) {
+	return func(t *testing.T) {
+		doTestRollback(m, t, m.F.CreateAuthorizeCodeSession, m.F.GetAuthorizeCodeSession, m.F.InvalidateAuthorizeCodeSession)
+	}
+}
+
+func testFositeSqlStoreTransactionCommitPKCERequest(m ManagerTestSetup) func(t *testing.T) {
+
+	return func(t *testing.T) {
+		doTestCommit(m, t, m.F.CreatePKCERequestSession, m.F.GetPKCERequestSession, m.F.DeletePKCERequestSession)
+	}
+}
+
+func testFositeSqlStoreTransactionRollbackPKCERequest(m ManagerTestSetup) func(t *testing.T) {
+	return func(t *testing.T) {
+		doTestRollback(m, t, m.F.CreatePKCERequestSession, m.F.GetPKCERequestSession, m.F.DeletePKCERequestSession)
+	}
+}
+
+// OpenIdConnect tests can't use the helper functions, due to the signature of GetOpenIdConnectSession being
+// different from the other getter methods
+func testFositeSqlStoreTransactionCommitOpenIdConnectSession(m ManagerTestSetup) func(t *testing.T) {
+	return func(t *testing.T) {
+		txnStore, ok := m.F.(storage.Transactional)
+		require.True(t, ok)
+		ctx := context.Background()
+		ctx, err := txnStore.BeginTX(ctx)
+		require.NoError(t, err)
+		signature := uuid.New()
+		testRequest := createTestRequest(signature)
+		err = m.F.CreateOpenIDConnectSession(ctx, signature, testRequest)
+		require.NoError(t, err)
+		err = txnStore.Commit(ctx)
+		require.NoError(t, err)
+
+		// Require a new context, since the old one contains the transaction.
+		res, err := m.F.GetOpenIDConnectSession(context.Background(), signature, testRequest)
+		// session should have been created successfully because Commit did not return an error
+		require.NoError(t, err)
+		AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
+
+		// test delete within a transaction
+		ctx, err = txnStore.BeginTX(context.Background())
+		err = m.F.DeleteOpenIDConnectSession(ctx, signature)
+		require.NoError(t, err)
+		err = txnStore.Commit(ctx)
+		require.NoError(t, err)
+
+		// Require a new context, since the old one contains the transaction.
+		_, err = m.F.GetOpenIDConnectSession(context.Background(), signature, testRequest)
+		// Since commit worked for delete, we should get an error here.
+		require.Error(t, err)
+	}
+}
+
+func testFositeSqlStoreTransactionRollbackOpenIdConnectSession(m ManagerTestSetup) func(t *testing.T) {
+	return func(t *testing.T) {
+		txnStore, ok := m.F.(storage.Transactional)
+		require.True(t, ok)
+		ctx := context.Background()
+		ctx, err := txnStore.BeginTX(ctx)
+		require.NoError(t, err)
+
+		signature := uuid.New()
+		testRequest := createTestRequest(signature)
+		err = m.F.CreateOpenIDConnectSession(ctx, signature, testRequest)
+		require.NoError(t, err)
+		err = txnStore.Rollback(ctx)
+		require.NoError(t, err)
+
+		// Require a new context, since the old one contains the transaction.
+		ctx = context.Background()
+		_, err = m.F.GetOpenIDConnectSession(ctx, signature, testRequest)
+		// Since we rolled back above, the session should not exist and getting it should result in an error
+		require.Error(t, err)
+
+		// create a new session, delete it, then rollback the delete. We should be able to then get it.
+		signature2 := uuid.New()
+		testRequest2 := createTestRequest(signature2)
+		err = m.F.CreateOpenIDConnectSession(ctx, signature2, testRequest2)
+		require.NoError(t, err)
+		_, err = m.F.GetOpenIDConnectSession(ctx, signature2, testRequest2)
+		require.NoError(t, err)
+
+		ctx, err = txnStore.BeginTX(context.Background())
+		err = m.F.DeleteOpenIDConnectSession(ctx, signature2)
+		require.NoError(t, err)
+		err = txnStore.Rollback(ctx)
+
+		require.NoError(t, err)
+		_, err = m.F.GetOpenIDConnectSession(context.Background(), signature2, testRequest2)
+		require.NoError(t, err)
+	}
+}
+
+func doTestCommit(m ManagerTestSetup, t *testing.T,
+	createFn func(context.Context, string, fosite.Requester) error,
+	getFn func(context.Context, string, fosite.Session) (fosite.Requester, error),
+	revokeFn func(context.Context, string) error,
+) {
+
+	txnStore, ok := m.F.(storage.Transactional)
+	require.True(t, ok)
+	ctx := context.Background()
+	ctx, err := txnStore.BeginTX(ctx)
+	require.NoError(t, err)
+	signature := uuid.New()
+	err = createFn(ctx, signature, createTestRequest(signature))
+	require.NoError(t, err)
+	err = txnStore.Commit(ctx)
+	require.NoError(t, err)
+
+	// Require a new context, since the old one contains the transaction.
+	res, err := getFn(context.Background(), signature, &Session{})
+	// token should have been created successfully because Commit did not return an error
+	require.NoError(t, err)
+	AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
+
+	// testrevoke within a transaction
+	ctx, err = txnStore.BeginTX(context.Background())
+	err = revokeFn(ctx, signature)
+	require.NoError(t, err)
+	err = txnStore.Commit(ctx)
+	require.NoError(t, err)
+
+	// Require a new context, since the old one contains the transaction.
+	_, err = getFn(context.Background(), signature, &Session{})
+	// Since commit worked for revoke, we should get an error here.
+	require.Error(t, err)
+}
+
+func doTestRollback(m ManagerTestSetup, t *testing.T,
+	createFn func(context.Context, string, fosite.Requester) error,
+	getFn func(context.Context, string, fosite.Session) (fosite.Requester, error),
+	revokeFn func(context.Context, string) error,
+) {
+	txnStore, ok := m.F.(storage.Transactional)
+	require.True(t, ok)
+
+	ctx := context.Background()
+	ctx, err := txnStore.BeginTX(ctx)
+	require.NoError(t, err)
+	signature := uuid.New()
+	err = createFn(ctx, signature, createTestRequest(signature))
+	require.NoError(t, err)
+	err = txnStore.Rollback(ctx)
+	require.NoError(t, err)
+
+	// Require a new context, since the old one contains the transaction.
+	ctx = context.Background()
+	_, err = getFn(ctx, signature, &Session{})
+	// Since we rolled back above, the token should not exist and getting it should result in an error
+	require.Error(t, err)
+
+	// create a new token, revoke it, then rollback the revoke. We should be able to then get it successfully.
+	signature2 := uuid.New()
+	err = createFn(ctx, signature2, createTestRequest(signature2))
+	require.NoError(t, err)
+	_, err = getFn(ctx, signature2, &Session{})
+	require.NoError(t, err)
+
+	ctx, err = txnStore.BeginTX(context.Background())
+	err = revokeFn(ctx, signature2)
+	require.NoError(t, err)
+	err = txnStore.Rollback(ctx)
+	require.NoError(t, err)
+
+	_, err = getFn(context.Background(), signature2, &Session{})
+	require.NoError(t, err)
+}
+
+func createTestRequest(id string) *fosite.Request {
+	return &fosite.Request{
+		ID:                id,
+		RequestedAt:       time.Now().UTC().Round(time.Second),
+		Client:            &client.Client{ClientID: "foobar"},
+		RequestedScope:    fosite.Arguments{"fa", "ba"},
+		GrantedScope:      fosite.Arguments{"fa", "ba"},
+		RequestedAudience: fosite.Arguments{"ad1", "ad2"},
+		GrantedAudience:   fosite.Arguments{"ad1", "ad2"},
+		Form:              url.Values{"foo": []string{"bar", "baz"}},
+		Session:           &Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
 	}
 }

@@ -284,7 +284,7 @@ make test-short
 Then run it with in-memory database:
 
 ```
-DATABASE_URL=memory go run main.go host
+DATABASE_URL=memory go run main.go serve all
 ```
 
 **Notes**

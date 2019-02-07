@@ -42,7 +42,7 @@ require (
 	github.com/urfave/negroni v1.0.0
 	github.com/ziutek/mymysql v1.5.4 // indirect
 	go.uber.org/atomic v1.3.2 // indirect
-	golang.org/x/crypto v0.0.0-20190123085648-057139ce5d2b
+	golang.org/x/crypto v0.0.0-20190131182504-b8fe1690c613
 	golang.org/x/net v0.0.0-20181029044818-c44066c5c816 // indirect
 	golang.org/x/oauth2 v0.0.0-20181003184128-c57b0facaced
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect

@@ -153,22 +153,30 @@ func (c *Config) GetScopeStrategy() fosite.ScopeStrategy {
 }
 
 func matchesRange(r *http.Request, ranges []string) error {
-	ip, _, err := net.SplitHostPort(r.RemoteAddr)
+	forwardedFor := r.Header.Get("X-Forwarded-For")
+	ips := strings.Split(forwardedFor, ", ")
+
+	remoteIp, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
 		return errors.WithStack(err)
 	}
+
+	ips = append(ips, remoteIp)
 
 	for _, rn := range ranges {
 		_, cidr, err := net.ParseCIDR(rn)
 		if err != nil {
 			return errors.WithStack(err)
 		}
-		addr := net.ParseIP(ip)
-		if cidr.Contains(addr) {
-			return nil
+
+		for _, ip := range ips {
+			addr := net.ParseIP(ip)
+			if cidr.Contains(addr) {
+				return nil
+			}
 		}
 	}
-	return errors.Errorf("Remote address %s does not match cidr ranges %v", ip, ranges)
+	return errors.Errorf("X-Forwarded-For %s does not match cidr ranges %v", forwardedFor, ranges)
 }
 
 func newLogger(c *Config) *logrus.Logger {

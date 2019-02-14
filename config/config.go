@@ -36,12 +36,13 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"gopkg.in/yaml.v1"
+	yaml "gopkg.in/yaml.v1"
 
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/token/hmac"
 	"github.com/ory/go-convenience/stringslice"
+	"github.com/ory/go-convenience/stringsx"
 	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/hydra/pkg"
@@ -153,9 +154,14 @@ func (c *Config) GetScopeStrategy() fosite.ScopeStrategy {
 }
 
 func matchesRange(r *http.Request, ranges []string) error {
-	ip, _, err := net.SplitHostPort(r.RemoteAddr)
+	remoteIP, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
 		return errors.WithStack(err)
+	}
+
+	check := []string{remoteIP}
+	for _, fwd := range stringsx.Splitx(r.Header.Get("X-Forwarded-For"), ",") {
+		check = append(check, strings.TrimSpace(fwd))
 	}
 
 	for _, rn := range ranges {
@@ -163,12 +169,15 @@ func matchesRange(r *http.Request, ranges []string) error {
 		if err != nil {
 			return errors.WithStack(err)
 		}
-		addr := net.ParseIP(ip)
-		if cidr.Contains(addr) {
-			return nil
+
+		for _, ip := range check {
+			addr := net.ParseIP(ip)
+			if cidr.Contains(addr) {
+				return nil
+			}
 		}
 	}
-	return errors.Errorf("Remote address %s does not match cidr ranges %v", ip, ranges)
+	return errors.Errorf("neither remote address nor any x-forwarded-for values match CIDR ranges %v: %v, ranges, check)", ranges, check)
 }
 
 func newLogger(c *Config) *logrus.Logger {

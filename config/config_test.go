@@ -50,8 +50,9 @@ func TestDoesRequestSatisfyTermination(t *testing.T) {
 	assert.Error(t, c.DoesRequestSatisfyTermination(r))
 
 	r = &http.Request{
+		RemoteAddr: "227.0.0.1:123",
 		Header: http.Header{
-			"X-Forwarded-Proto": []string{"http"},
+			"X-Forwarded-Proto": []string{"https"},
 			"X-Forwarded-For":   []string{"227.0.0.1"},
 		},
 		URL: new(url.URL)}
@@ -79,10 +80,10 @@ func TestDoesRequestSatisfyTermination(t *testing.T) {
 	assert.NoError(t, c.DoesRequestSatisfyTermination(r))
 
 	r = &http.Request{
-		RemoteAddr: "127.0.0.1:123",
+		RemoteAddr: "227.0.0.2:123",
 		Header: http.Header{
 			"X-Forwarded-Proto": []string{"https"},
-			"X-Forwarded-For":   []string{"227.0.0.1", "127.0.0.1", "227.0.0.2"},
+			"X-Forwarded-For":   []string{"227.0.0.1, 127.0.0.1, 227.0.0.2"},
 		},
 		URL: &url.URL{Path: "/health"},
 	}

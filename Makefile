@@ -60,11 +60,10 @@ gen: gen-mocks gen-sql gen-sdk
 
 .PHONY: gen-sdk
 gen-sdk:
-		export GO111MODULE=on
-		go mod vendor
-		export GO111MODULE=off
-		swagger generate spec -m -o ./docs/api.swagger.json
-		swagger validate ./docs/api.swagger.json
+		GO111MODULE=on go mod tidy
+		GO111MODULE=on go mod vendor
+		GO111MODULE=off swagger generate spec -m -o ./docs/api.swagger.json
+		GO111MODULE=off swagger validate ./docs/api.swagger.json
 
 		rm -rf ./sdk/go/hydra/swagger
 		rm -rf ./sdk/js/swagger

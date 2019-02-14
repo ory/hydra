@@ -56,9 +56,9 @@ Please follow the [installation procedure](#installation--usage) and then run th
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new HydraSDK\Api\AdminApi();
+$api_instance = new Hydra\SDK\Api\AdminApi();
 $challenge = "challenge_example"; // string | 
-$body = new \HydraSDK\Model\AcceptConsentRequest(); // \HydraSDK\Model\AcceptConsentRequest | 
+$body = new \Hydra\SDK\Model\AcceptConsentRequest(); // \Hydra\SDK\Model\AcceptConsentRequest | 
 
 try {
     $result = $api_instance->acceptConsentRequest($challenge, $body);
@@ -104,8 +104,8 @@ Class | Method | HTTP request | Description
 *HealthApi* | [**isInstanceAlive**](docs/Api/HealthApi.md#isinstancealive) | **GET** /health/alive | Check alive status
 *HealthApi* | [**isInstanceReady**](docs/Api/HealthApi.md#isinstanceready) | **GET** /health/ready | Check readiness status
 *PublicApi* | [**discoverOpenIDConfiguration**](docs/Api/PublicApi.md#discoveropenidconfiguration) | **GET** /.well-known/openid-configuration | OpenID Connect Discovery
+*PublicApi* | [**oauth2Token**](docs/Api/PublicApi.md#oauth2token) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
 *PublicApi* | [**oauthAuth**](docs/Api/PublicApi.md#oauthauth) | **GET** /oauth2/auth | The OAuth 2.0 authorize endpoint
-*PublicApi* | [**oauthToken**](docs/Api/PublicApi.md#oauthtoken) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
 *PublicApi* | [**revokeOAuth2Token**](docs/Api/PublicApi.md#revokeoauth2token) | **POST** /oauth2/revoke | Revoke OAuth2 tokens
 *PublicApi* | [**userinfo**](docs/Api/PublicApi.md#userinfo) | **GET** /userinfo | OpenID Connect Userinfo
 *PublicApi* | [**wellKnown**](docs/Api/PublicApi.md#wellknown) | **GET** /.well-known/jwks.json | JSON Web Keys Discovery
@@ -131,6 +131,7 @@ Class | Method | HTTP request | Description
  - [LoginRequest](docs/Model/LoginRequest.md)
  - [OAuth2Client](docs/Model/OAuth2Client.md)
  - [OAuth2TokenIntrospection](docs/Model/OAuth2TokenIntrospection.md)
+ - [Oauth2TokenResponse](docs/Model/Oauth2TokenResponse.md)
  - [OauthTokenResponse](docs/Model/OauthTokenResponse.md)
  - [OpenIDConnectContext](docs/Model/OpenIDConnectContext.md)
  - [PreviousConsentSession](docs/Model/PreviousConsentSession.md)
@@ -143,6 +144,7 @@ Class | Method | HTTP request | Description
  - [SwaggerJwkUpdateSetKey](docs/Model/SwaggerJwkUpdateSetKey.md)
  - [SwaggerOAuthIntrospectionRequest](docs/Model/SwaggerOAuthIntrospectionRequest.md)
  - [SwaggerRevokeOAuth2TokenParameters](docs/Model/SwaggerRevokeOAuth2TokenParameters.md)
+ - [Swaggeroauth2TokenParameters](docs/Model/Swaggeroauth2TokenParameters.md)
  - [UserinfoResponse](docs/Model/UserinfoResponse.md)
  - [Version](docs/Model/Version.md)
  - [WellKnown](docs/Model/WellKnown.md)

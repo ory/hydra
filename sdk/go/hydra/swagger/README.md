@@ -49,8 +49,8 @@ Class | Method | HTTP request | Description
 *HealthApi* | [**IsInstanceAlive**](docs/HealthApi.md#isinstancealive) | **Get** /health/alive | Check alive status
 *HealthApi* | [**IsInstanceReady**](docs/HealthApi.md#isinstanceready) | **Get** /health/ready | Check readiness status
 *PublicApi* | [**DiscoverOpenIDConfiguration**](docs/PublicApi.md#discoveropenidconfiguration) | **Get** /.well-known/openid-configuration | OpenID Connect Discovery
+*PublicApi* | [**Oauth2Token**](docs/PublicApi.md#oauth2token) | **Post** /oauth2/token | The OAuth 2.0 token endpoint
 *PublicApi* | [**OauthAuth**](docs/PublicApi.md#oauthauth) | **Get** /oauth2/auth | The OAuth 2.0 authorize endpoint
-*PublicApi* | [**OauthToken**](docs/PublicApi.md#oauthtoken) | **Post** /oauth2/token | The OAuth 2.0 token endpoint
 *PublicApi* | [**RevokeOAuth2Token**](docs/PublicApi.md#revokeoauth2token) | **Post** /oauth2/revoke | Revoke OAuth2 tokens
 *PublicApi* | [**Userinfo**](docs/PublicApi.md#userinfo) | **Get** /userinfo | OpenID Connect Userinfo
 *PublicApi* | [**WellKnown**](docs/PublicApi.md#wellknown) | **Get** /.well-known/jwks.json | JSON Web Keys Discovery
@@ -76,6 +76,7 @@ Class | Method | HTTP request | Description
  - [LoginRequest](docs/LoginRequest.md)
  - [OAuth2Client](docs/OAuth2Client.md)
  - [OAuth2TokenIntrospection](docs/OAuth2TokenIntrospection.md)
+ - [Oauth2TokenResponse](docs/Oauth2TokenResponse.md)
  - [OauthTokenResponse](docs/OauthTokenResponse.md)
  - [OpenIdConnectContext](docs/OpenIdConnectContext.md)
  - [PreviousConsentSession](docs/PreviousConsentSession.md)
@@ -88,6 +89,7 @@ Class | Method | HTTP request | Description
  - [SwaggerJwkUpdateSetKey](docs/SwaggerJwkUpdateSetKey.md)
  - [SwaggerOAuthIntrospectionRequest](docs/SwaggerOAuthIntrospectionRequest.md)
  - [SwaggerRevokeOAuth2TokenParameters](docs/SwaggerRevokeOAuth2TokenParameters.md)
+ - [Swaggeroauth2TokenParameters](docs/Swaggeroauth2TokenParameters.md)
  - [UserinfoResponse](docs/UserinfoResponse.md)
  - [Version](docs/Version.md)
  - [WellKnown](docs/WellKnown.md)

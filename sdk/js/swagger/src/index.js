@@ -16,12 +16,12 @@
 (function(factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/AcceptConsentRequest', 'model/AcceptLoginRequest', 'model/AuthenticationSession', 'model/CompletedRequest', 'model/ConsentRequest', 'model/ConsentRequestSession', 'model/EmptyResponse', 'model/FlushInactiveOAuth2TokensRequest', 'model/GenericError', 'model/HealthNotReadyStatus', 'model/HealthStatus', 'model/JSONWebKey', 'model/JSONWebKeySet', 'model/JsonWebKeySetGeneratorRequest', 'model/LoginRequest', 'model/OAuth2Client', 'model/OAuth2TokenIntrospection', 'model/OauthTokenResponse', 'model/OpenIDConnectContext', 'model/PreviousConsentSession', 'model/RejectRequest', 'model/SwaggerFlushInactiveAccessTokens', 'model/SwaggerJsonWebKeyQuery', 'model/SwaggerJwkCreateSet', 'model/SwaggerJwkSetQuery', 'model/SwaggerJwkUpdateSet', 'model/SwaggerJwkUpdateSetKey', 'model/SwaggerOAuthIntrospectionRequest', 'model/SwaggerRevokeOAuth2TokenParameters', 'model/UserinfoResponse', 'model/Version', 'model/WellKnown', 'api/AdminApi', 'api/HealthApi', 'api/PublicApi', 'api/VersionApi'], factory);
+    define(['ApiClient', 'model/AcceptConsentRequest', 'model/AcceptLoginRequest', 'model/AuthenticationSession', 'model/CompletedRequest', 'model/ConsentRequest', 'model/ConsentRequestSession', 'model/EmptyResponse', 'model/FlushInactiveOAuth2TokensRequest', 'model/GenericError', 'model/HealthNotReadyStatus', 'model/HealthStatus', 'model/JSONWebKey', 'model/JSONWebKeySet', 'model/JsonWebKeySetGeneratorRequest', 'model/LoginRequest', 'model/OAuth2Client', 'model/OAuth2TokenIntrospection', 'model/Oauth2TokenResponse', 'model/OauthTokenResponse', 'model/OpenIDConnectContext', 'model/PreviousConsentSession', 'model/RejectRequest', 'model/SwaggerFlushInactiveAccessTokens', 'model/SwaggerJsonWebKeyQuery', 'model/SwaggerJwkCreateSet', 'model/SwaggerJwkSetQuery', 'model/SwaggerJwkUpdateSet', 'model/SwaggerJwkUpdateSetKey', 'model/SwaggerOAuthIntrospectionRequest', 'model/SwaggerRevokeOAuth2TokenParameters', 'model/Swaggeroauth2TokenParameters', 'model/UserinfoResponse', 'model/Version', 'model/WellKnown', 'api/AdminApi', 'api/HealthApi', 'api/PublicApi', 'api/VersionApi'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('./ApiClient'), require('./model/AcceptConsentRequest'), require('./model/AcceptLoginRequest'), require('./model/AuthenticationSession'), require('./model/CompletedRequest'), require('./model/ConsentRequest'), require('./model/ConsentRequestSession'), require('./model/EmptyResponse'), require('./model/FlushInactiveOAuth2TokensRequest'), require('./model/GenericError'), require('./model/HealthNotReadyStatus'), require('./model/HealthStatus'), require('./model/JSONWebKey'), require('./model/JSONWebKeySet'), require('./model/JsonWebKeySetGeneratorRequest'), require('./model/LoginRequest'), require('./model/OAuth2Client'), require('./model/OAuth2TokenIntrospection'), require('./model/OauthTokenResponse'), require('./model/OpenIDConnectContext'), require('./model/PreviousConsentSession'), require('./model/RejectRequest'), require('./model/SwaggerFlushInactiveAccessTokens'), require('./model/SwaggerJsonWebKeyQuery'), require('./model/SwaggerJwkCreateSet'), require('./model/SwaggerJwkSetQuery'), require('./model/SwaggerJwkUpdateSet'), require('./model/SwaggerJwkUpdateSetKey'), require('./model/SwaggerOAuthIntrospectionRequest'), require('./model/SwaggerRevokeOAuth2TokenParameters'), require('./model/UserinfoResponse'), require('./model/Version'), require('./model/WellKnown'), require('./api/AdminApi'), require('./api/HealthApi'), require('./api/PublicApi'), require('./api/VersionApi'));
+    module.exports = factory(require('./ApiClient'), require('./model/AcceptConsentRequest'), require('./model/AcceptLoginRequest'), require('./model/AuthenticationSession'), require('./model/CompletedRequest'), require('./model/ConsentRequest'), require('./model/ConsentRequestSession'), require('./model/EmptyResponse'), require('./model/FlushInactiveOAuth2TokensRequest'), require('./model/GenericError'), require('./model/HealthNotReadyStatus'), require('./model/HealthStatus'), require('./model/JSONWebKey'), require('./model/JSONWebKeySet'), require('./model/JsonWebKeySetGeneratorRequest'), require('./model/LoginRequest'), require('./model/OAuth2Client'), require('./model/OAuth2TokenIntrospection'), require('./model/Oauth2TokenResponse'), require('./model/OauthTokenResponse'), require('./model/OpenIDConnectContext'), require('./model/PreviousConsentSession'), require('./model/RejectRequest'), require('./model/SwaggerFlushInactiveAccessTokens'), require('./model/SwaggerJsonWebKeyQuery'), require('./model/SwaggerJwkCreateSet'), require('./model/SwaggerJwkSetQuery'), require('./model/SwaggerJwkUpdateSet'), require('./model/SwaggerJwkUpdateSetKey'), require('./model/SwaggerOAuthIntrospectionRequest'), require('./model/SwaggerRevokeOAuth2TokenParameters'), require('./model/Swaggeroauth2TokenParameters'), require('./model/UserinfoResponse'), require('./model/Version'), require('./model/WellKnown'), require('./api/AdminApi'), require('./api/HealthApi'), require('./api/PublicApi'), require('./api/VersionApi'));
   }
-}(function(ApiClient, AcceptConsentRequest, AcceptLoginRequest, AuthenticationSession, CompletedRequest, ConsentRequest, ConsentRequestSession, EmptyResponse, FlushInactiveOAuth2TokensRequest, GenericError, HealthNotReadyStatus, HealthStatus, JSONWebKey, JSONWebKeySet, JsonWebKeySetGeneratorRequest, LoginRequest, OAuth2Client, OAuth2TokenIntrospection, OauthTokenResponse, OpenIDConnectContext, PreviousConsentSession, RejectRequest, SwaggerFlushInactiveAccessTokens, SwaggerJsonWebKeyQuery, SwaggerJwkCreateSet, SwaggerJwkSetQuery, SwaggerJwkUpdateSet, SwaggerJwkUpdateSetKey, SwaggerOAuthIntrospectionRequest, SwaggerRevokeOAuth2TokenParameters, UserinfoResponse, Version, WellKnown, AdminApi, HealthApi, PublicApi, VersionApi) {
+}(function(ApiClient, AcceptConsentRequest, AcceptLoginRequest, AuthenticationSession, CompletedRequest, ConsentRequest, ConsentRequestSession, EmptyResponse, FlushInactiveOAuth2TokensRequest, GenericError, HealthNotReadyStatus, HealthStatus, JSONWebKey, JSONWebKeySet, JsonWebKeySetGeneratorRequest, LoginRequest, OAuth2Client, OAuth2TokenIntrospection, Oauth2TokenResponse, OauthTokenResponse, OpenIDConnectContext, PreviousConsentSession, RejectRequest, SwaggerFlushInactiveAccessTokens, SwaggerJsonWebKeyQuery, SwaggerJwkCreateSet, SwaggerJwkSetQuery, SwaggerJwkUpdateSet, SwaggerJwkUpdateSetKey, SwaggerOAuthIntrospectionRequest, SwaggerRevokeOAuth2TokenParameters, Swaggeroauth2TokenParameters, UserinfoResponse, Version, WellKnown, AdminApi, HealthApi, PublicApi, VersionApi) {
   'use strict';
 
   /**
@@ -147,6 +147,11 @@
      */
     OAuth2TokenIntrospection: OAuth2TokenIntrospection,
     /**
+     * The Oauth2TokenResponse model constructor.
+     * @property {module:model/Oauth2TokenResponse}
+     */
+    Oauth2TokenResponse: Oauth2TokenResponse,
+    /**
      * The OauthTokenResponse model constructor.
      * @property {module:model/OauthTokenResponse}
      */
@@ -206,6 +211,11 @@
      * @property {module:model/SwaggerRevokeOAuth2TokenParameters}
      */
     SwaggerRevokeOAuth2TokenParameters: SwaggerRevokeOAuth2TokenParameters,
+    /**
+     * The Swaggeroauth2TokenParameters model constructor.
+     * @property {module:model/Swaggeroauth2TokenParameters}
+     */
+    Swaggeroauth2TokenParameters: Swaggeroauth2TokenParameters,
     /**
      * The UserinfoResponse model constructor.
      * @property {module:model/UserinfoResponse}

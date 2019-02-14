@@ -22,11 +22,12 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.joda.time.DateTime;
 
 /**
  * OAuth2Client
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2018-11-18T22:54:40.815+01:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-02-14T11:32:05.943+01:00")
 public class OAuth2Client {
   @JsonProperty("allowed_cors_origins")
   private List<String> allowedCorsOrigins = null;
@@ -51,6 +52,9 @@ public class OAuth2Client {
 
   @JsonProperty("contacts")
   private List<String> contacts = null;
+
+  @JsonProperty("created_at")
+  private DateTime createdAt = null;
 
   @JsonProperty("grant_types")
   private List<String> grantTypes = null;
@@ -96,6 +100,9 @@ public class OAuth2Client {
 
   @JsonProperty("tos_uri")
   private String tosUri = null;
+
+  @JsonProperty("updated_at")
+  private DateTime updatedAt = null;
 
   @JsonProperty("userinfo_signed_response_alg")
   private String userinfoSignedResponseAlg = null;
@@ -266,6 +273,24 @@ public class OAuth2Client {
 
   public void setContacts(List<String> contacts) {
     this.contacts = contacts;
+  }
+
+  public OAuth2Client createdAt(DateTime createdAt) {
+    this.createdAt = createdAt;
+    return this;
+  }
+
+   /**
+   * CreatedAt returns the timestamp of the client&#39;s creation.
+   * @return createdAt
+  **/
+  @ApiModelProperty(value = "CreatedAt returns the timestamp of the client's creation.")
+  public DateTime getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(DateTime createdAt) {
+    this.createdAt = createdAt;
   }
 
   public OAuth2Client grantTypes(List<String> grantTypes) {
@@ -570,6 +595,24 @@ public class OAuth2Client {
     this.tosUri = tosUri;
   }
 
+  public OAuth2Client updatedAt(DateTime updatedAt) {
+    this.updatedAt = updatedAt;
+    return this;
+  }
+
+   /**
+   * UpdatedAt returns the timestamp of the last update.
+   * @return updatedAt
+  **/
+  @ApiModelProperty(value = "UpdatedAt returns the timestamp of the last update.")
+  public DateTime getUpdatedAt() {
+    return updatedAt;
+  }
+
+  public void setUpdatedAt(DateTime updatedAt) {
+    this.updatedAt = updatedAt;
+  }
+
   public OAuth2Client userinfoSignedResponseAlg(String userinfoSignedResponseAlg) {
     this.userinfoSignedResponseAlg = userinfoSignedResponseAlg;
     return this;
@@ -606,6 +649,7 @@ public class OAuth2Client {
         Objects.equals(this.clientSecretExpiresAt, oAuth2Client.clientSecretExpiresAt) &&
         Objects.equals(this.clientUri, oAuth2Client.clientUri) &&
         Objects.equals(this.contacts, oAuth2Client.contacts) &&
+        Objects.equals(this.createdAt, oAuth2Client.createdAt) &&
         Objects.equals(this.grantTypes, oAuth2Client.grantTypes) &&
         Objects.equals(this.jwks, oAuth2Client.jwks) &&
         Objects.equals(this.jwksUri, oAuth2Client.jwksUri) &&
@@ -621,12 +665,13 @@ public class OAuth2Client {
         Objects.equals(this.subjectType, oAuth2Client.subjectType) &&
         Objects.equals(this.tokenEndpointAuthMethod, oAuth2Client.tokenEndpointAuthMethod) &&
         Objects.equals(this.tosUri, oAuth2Client.tosUri) &&
+        Objects.equals(this.updatedAt, oAuth2Client.updatedAt) &&
         Objects.equals(this.userinfoSignedResponseAlg, oAuth2Client.userinfoSignedResponseAlg);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(allowedCorsOrigins, audience, clientId, clientName, clientSecret, clientSecretExpiresAt, clientUri, contacts, grantTypes, jwks, jwksUri, logoUri, owner, policyUri, redirectUris, requestObjectSigningAlg, requestUris, responseTypes, scope, sectorIdentifierUri, subjectType, tokenEndpointAuthMethod, tosUri, userinfoSignedResponseAlg);
+    return Objects.hash(allowedCorsOrigins, audience, clientId, clientName, clientSecret, clientSecretExpiresAt, clientUri, contacts, createdAt, grantTypes, jwks, jwksUri, logoUri, owner, policyUri, redirectUris, requestObjectSigningAlg, requestUris, responseTypes, scope, sectorIdentifierUri, subjectType, tokenEndpointAuthMethod, tosUri, updatedAt, userinfoSignedResponseAlg);
   }
 
 
@@ -643,6 +688,7 @@ public class OAuth2Client {
     sb.append("    clientSecretExpiresAt: ").append(toIndentedString(clientSecretExpiresAt)).append("\n");
     sb.append("    clientUri: ").append(toIndentedString(clientUri)).append("\n");
     sb.append("    contacts: ").append(toIndentedString(contacts)).append("\n");
+    sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
     sb.append("    grantTypes: ").append(toIndentedString(grantTypes)).append("\n");
     sb.append("    jwks: ").append(toIndentedString(jwks)).append("\n");
     sb.append("    jwksUri: ").append(toIndentedString(jwksUri)).append("\n");
@@ -658,6 +704,7 @@ public class OAuth2Client {
     sb.append("    subjectType: ").append(toIndentedString(subjectType)).append("\n");
     sb.append("    tokenEndpointAuthMethod: ").append(toIndentedString(tokenEndpointAuthMethod)).append("\n");
     sb.append("    tosUri: ").append(toIndentedString(tosUri)).append("\n");
+    sb.append("    updatedAt: ").append(toIndentedString(updatedAt)).append("\n");
     sb.append("    userinfoSignedResponseAlg: ").append(toIndentedString(userinfoSignedResponseAlg)).append("\n");
     sb.append("}");
     return sb.toString();

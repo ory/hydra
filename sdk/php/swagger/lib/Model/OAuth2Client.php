@@ -5,7 +5,7 @@
  * PHP version 5
  *
  * @category Class
- * @package  HydraSDK
+ * @package  Hydra\SDK
  * @author   Swaagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
@@ -27,7 +27,7 @@
  * Do not edit the class manually.
  */
 
-namespace HydraSDK\Model;
+namespace Hydra\SDK\Model;
 
 use \ArrayAccess;
 
@@ -35,7 +35,7 @@ use \ArrayAccess;
  * OAuth2Client Class Doc Comment
  *
  * @category    Class
- * @package     HydraSDK
+ * @package     Hydra\SDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
  */
@@ -62,8 +62,9 @@ class OAuth2Client implements ArrayAccess
         'client_secret_expires_at' => 'int',
         'client_uri' => 'string',
         'contacts' => 'string[]',
+        'created_at' => '\DateTime',
         'grant_types' => 'string[]',
-        'jwks' => '\HydraSDK\Model\JSONWebKeySet',
+        'jwks' => '\Hydra\SDK\Model\JSONWebKeySet',
         'jwks_uri' => 'string',
         'logo_uri' => 'string',
         'owner' => 'string',
@@ -77,6 +78,7 @@ class OAuth2Client implements ArrayAccess
         'subject_type' => 'string',
         'token_endpoint_auth_method' => 'string',
         'tos_uri' => 'string',
+        'updated_at' => '\DateTime',
         'userinfo_signed_response_alg' => 'string'
     ];
 
@@ -93,6 +95,7 @@ class OAuth2Client implements ArrayAccess
         'client_secret_expires_at' => 'int64',
         'client_uri' => null,
         'contacts' => null,
+        'created_at' => 'date-time',
         'grant_types' => null,
         'jwks' => null,
         'jwks_uri' => null,
@@ -108,6 +111,7 @@ class OAuth2Client implements ArrayAccess
         'subject_type' => null,
         'token_endpoint_auth_method' => null,
         'tos_uri' => null,
+        'updated_at' => 'date-time',
         'userinfo_signed_response_alg' => null
     ];
 
@@ -134,6 +138,7 @@ class OAuth2Client implements ArrayAccess
         'client_secret_expires_at' => 'client_secret_expires_at',
         'client_uri' => 'client_uri',
         'contacts' => 'contacts',
+        'created_at' => 'created_at',
         'grant_types' => 'grant_types',
         'jwks' => 'jwks',
         'jwks_uri' => 'jwks_uri',
@@ -149,6 +154,7 @@ class OAuth2Client implements ArrayAccess
         'subject_type' => 'subject_type',
         'token_endpoint_auth_method' => 'token_endpoint_auth_method',
         'tos_uri' => 'tos_uri',
+        'updated_at' => 'updated_at',
         'userinfo_signed_response_alg' => 'userinfo_signed_response_alg'
     ];
 
@@ -166,6 +172,7 @@ class OAuth2Client implements ArrayAccess
         'client_secret_expires_at' => 'setClientSecretExpiresAt',
         'client_uri' => 'setClientUri',
         'contacts' => 'setContacts',
+        'created_at' => 'setCreatedAt',
         'grant_types' => 'setGrantTypes',
         'jwks' => 'setJwks',
         'jwks_uri' => 'setJwksUri',
@@ -181,6 +188,7 @@ class OAuth2Client implements ArrayAccess
         'subject_type' => 'setSubjectType',
         'token_endpoint_auth_method' => 'setTokenEndpointAuthMethod',
         'tos_uri' => 'setTosUri',
+        'updated_at' => 'setUpdatedAt',
         'userinfo_signed_response_alg' => 'setUserinfoSignedResponseAlg'
     ];
 
@@ -198,6 +206,7 @@ class OAuth2Client implements ArrayAccess
         'client_secret_expires_at' => 'getClientSecretExpiresAt',
         'client_uri' => 'getClientUri',
         'contacts' => 'getContacts',
+        'created_at' => 'getCreatedAt',
         'grant_types' => 'getGrantTypes',
         'jwks' => 'getJwks',
         'jwks_uri' => 'getJwksUri',
@@ -213,6 +222,7 @@ class OAuth2Client implements ArrayAccess
         'subject_type' => 'getSubjectType',
         'token_endpoint_auth_method' => 'getTokenEndpointAuthMethod',
         'tos_uri' => 'getTosUri',
+        'updated_at' => 'getUpdatedAt',
         'userinfo_signed_response_alg' => 'getUserinfoSignedResponseAlg'
     ];
 
@@ -255,6 +265,7 @@ class OAuth2Client implements ArrayAccess
         $this->container['client_secret_expires_at'] = isset($data['client_secret_expires_at']) ? $data['client_secret_expires_at'] : null;
         $this->container['client_uri'] = isset($data['client_uri']) ? $data['client_uri'] : null;
         $this->container['contacts'] = isset($data['contacts']) ? $data['contacts'] : null;
+        $this->container['created_at'] = isset($data['created_at']) ? $data['created_at'] : null;
         $this->container['grant_types'] = isset($data['grant_types']) ? $data['grant_types'] : null;
         $this->container['jwks'] = isset($data['jwks']) ? $data['jwks'] : null;
         $this->container['jwks_uri'] = isset($data['jwks_uri']) ? $data['jwks_uri'] : null;
@@ -270,6 +281,7 @@ class OAuth2Client implements ArrayAccess
         $this->container['subject_type'] = isset($data['subject_type']) ? $data['subject_type'] : null;
         $this->container['token_endpoint_auth_method'] = isset($data['token_endpoint_auth_method']) ? $data['token_endpoint_auth_method'] : null;
         $this->container['tos_uri'] = isset($data['tos_uri']) ? $data['tos_uri'] : null;
+        $this->container['updated_at'] = isset($data['updated_at']) ? $data['updated_at'] : null;
         $this->container['userinfo_signed_response_alg'] = isset($data['userinfo_signed_response_alg']) ? $data['userinfo_signed_response_alg'] : null;
     }
 
@@ -474,6 +486,27 @@ class OAuth2Client implements ArrayAccess
     }
 
     /**
+     * Gets created_at
+     * @return \DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->container['created_at'];
+    }
+
+    /**
+     * Sets created_at
+     * @param \DateTime $created_at CreatedAt returns the timestamp of the client's creation.
+     * @return $this
+     */
+    public function setCreatedAt($created_at)
+    {
+        $this->container['created_at'] = $created_at;
+
+        return $this;
+    }
+
+    /**
      * Gets grant_types
      * @return string[]
      */
@@ -496,7 +529,7 @@ class OAuth2Client implements ArrayAccess
 
     /**
      * Gets jwks
-     * @return \HydraSDK\Model\JSONWebKeySet
+     * @return \Hydra\SDK\Model\JSONWebKeySet
      */
     public function getJwks()
     {
@@ -505,7 +538,7 @@ class OAuth2Client implements ArrayAccess
 
     /**
      * Sets jwks
-     * @param \HydraSDK\Model\JSONWebKeySet $jwks
+     * @param \Hydra\SDK\Model\JSONWebKeySet $jwks
      * @return $this
      */
     public function setJwks($jwks)
@@ -794,6 +827,27 @@ class OAuth2Client implements ArrayAccess
     }
 
     /**
+     * Gets updated_at
+     * @return \DateTime
+     */
+    public function getUpdatedAt()
+    {
+        return $this->container['updated_at'];
+    }
+
+    /**
+     * Sets updated_at
+     * @param \DateTime $updated_at UpdatedAt returns the timestamp of the last update.
+     * @return $this
+     */
+    public function setUpdatedAt($updated_at)
+    {
+        $this->container['updated_at'] = $updated_at;
+
+        return $this;
+    }
+
+    /**
      * Gets userinfo_signed_response_alg
      * @return string
      */
@@ -865,10 +919,10 @@ class OAuth2Client implements ArrayAccess
     public function __toString()
     {
         if (defined('JSON_PRETTY_PRINT')) { // use JSON pretty print
-            return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
+            return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
         }
 
-        return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this));
+        return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this));
     }
 }
 

@@ -46,9 +46,9 @@ type swaggeroauth2TokenParameters struct {
 // The Access Token Response
 // swagger:model oauth2TokenResponse
 type swaggeroauth2TokenResponse struct {
-	AccessToken string `json:"access_token"`
-	TokenType string `json:"code"`
-	ExpiresIn string `json:"redirect_uri"`
+	AccessToken  string `json:"access_token"`
+	TokenType    string `json:"code"`
+	ExpiresIn    string `json:"redirect_uri"`
 	RefreshToken string `json:"client_id"`
 }
 

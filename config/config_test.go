@@ -43,12 +43,16 @@ func TestDoesRequestSatisfyTermination(t *testing.T) {
 	assert.Error(t, c.DoesRequestSatisfyTermination(&http.Request{Header: http.Header{}, URL: new(url.URL)}))
 
 	c = &Config{AllowTLSTermination: "127.0.0.1/24"}
+
+	// case of no X-Forwarded-Proto header
 	r := &http.Request{Header: http.Header{}, URL: new(url.URL)}
 	assert.Error(t, c.DoesRequestSatisfyTermination(r))
 
+	// case that X-Forwarded-Proto is http
 	r = &http.Request{Header: http.Header{"X-Forwarded-Proto": []string{"http"}}, URL: new(url.URL)}
 	assert.Error(t, c.DoesRequestSatisfyTermination(r))
 
+	// case that invalid remote is out of configured CIDER
 	r = &http.Request{
 		RemoteAddr: "227.0.0.1:123",
 		Header:     http.Header{"X-Forwarded-Proto": []string{"https"}},
@@ -56,6 +60,17 @@ func TestDoesRequestSatisfyTermination(t *testing.T) {
 	}
 	assert.Error(t, c.DoesRequestSatisfyTermination(r))
 
+	// case that remote address and X-Forwarded-For are out of configured CIDER
+	r = &http.Request{
+		RemoteAddr: "227.0.0.1:123",
+		Header: http.Header{
+			"X-Forwarded-Proto": []string{"https"},
+			"X-Forwarded-For":   []string{"227.0.0.1"},
+		},
+		URL: new(url.URL)}
+	assert.Error(t, c.DoesRequestSatisfyTermination(r))
+
+	// case that remote address is in range of configured CIDER
 	r = &http.Request{
 		RemoteAddr: "127.0.0.1:123",
 		Header:     http.Header{"X-Forwarded-Proto": []string{"https"}},
@@ -63,10 +78,22 @@ func TestDoesRequestSatisfyTermination(t *testing.T) {
 	}
 	assert.NoError(t, c.DoesRequestSatisfyTermination(r))
 
+	// case of same as above but requesting /health endpoint
 	r = &http.Request{
 		RemoteAddr: "127.0.0.1:123",
 		Header:     http.Header{"X-Forwarded-Proto": []string{"https"}},
 		URL:        &url.URL{Path: "/health"},
+	}
+	assert.NoError(t, c.DoesRequestSatisfyTermination(r))
+
+	// case that remote address is out of configured CIDER but X-Forwarded-For is in the range
+	r = &http.Request{
+		RemoteAddr: "227.0.0.2:123",
+		Header: http.Header{
+			"X-Forwarded-Proto": []string{"https"},
+			"X-Forwarded-For":   []string{"227.0.0.1, 127.0.0.1, 227.0.0.2"},
+		},
+		URL: new(url.URL),
 	}
 	assert.NoError(t, c.DoesRequestSatisfyTermination(r))
 }

@@ -71,6 +71,8 @@
 
 
 
+
+
   };
 
   /**
@@ -107,6 +109,9 @@
       }
       if (data.hasOwnProperty('contacts')) {
         obj['contacts'] = ApiClient.convertToType(data['contacts'], ['String']);
+      }
+      if (data.hasOwnProperty('created_at')) {
+        obj['created_at'] = ApiClient.convertToType(data['created_at'], 'Date');
       }
       if (data.hasOwnProperty('grant_types')) {
         obj['grant_types'] = ApiClient.convertToType(data['grant_types'], ['String']);
@@ -152,6 +157,9 @@
       }
       if (data.hasOwnProperty('tos_uri')) {
         obj['tos_uri'] = ApiClient.convertToType(data['tos_uri'], 'String');
+      }
+      if (data.hasOwnProperty('updated_at')) {
+        obj['updated_at'] = ApiClient.convertToType(data['updated_at'], 'Date');
       }
       if (data.hasOwnProperty('userinfo_signed_response_alg')) {
         obj['userinfo_signed_response_alg'] = ApiClient.convertToType(data['userinfo_signed_response_alg'], 'String');
@@ -200,6 +208,11 @@
    * @member {Array.<String>} contacts
    */
   exports.prototype['contacts'] = undefined;
+  /**
+   * CreatedAt returns the timestamp of the client's creation.
+   * @member {Date} created_at
+   */
+  exports.prototype['created_at'] = undefined;
   /**
    * GrantTypes is an array of grant types the client is allowed to use.
    * @member {Array.<String>} grant_types
@@ -274,6 +287,11 @@
    * @member {String} tos_uri
    */
   exports.prototype['tos_uri'] = undefined;
+  /**
+   * UpdatedAt returns the timestamp of the last update.
+   * @member {Date} updated_at
+   */
+  exports.prototype['updated_at'] = undefined;
   /**
    * JWS alg algorithm [JWA] REQUIRED for signing UserInfo Responses. If this is specified, the response will be JWT [JWT] serialized, and signed using JWS. The default, if omitted, is for the UserInfo Response to return the Claims as a UTF-8 encoded JSON object using the application/json content-type.
    * @member {String} userinfo_signed_response_alg

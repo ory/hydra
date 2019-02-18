@@ -503,14 +503,19 @@ func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, _ httprou
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route POST /oauth2/token public oauthToken
+// swagger:route POST /oauth2/token public oauth2Token
 //
 // The OAuth 2.0 token endpoint
 //
-// This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.
-// OAuth2 is a very popular protocol and a library for your programming language will exists.
+// The client makes a request to the token endpoint by sending the
+// following parameters using the "application/x-www-form-urlencoded" HTTP
+// request entity-body.
 //
-// To learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749
+// > Do not implement a client for this endpoint yourself. Use a library. There are many libraries
+// > available for any programming language. You can find a list of libraries here: https://oauth.net/code/
+// >
+// > Do not the the Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above!
+//
 //
 //     Consumes:
 //     - application/x-www-form-urlencoded
@@ -525,7 +530,7 @@ func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, _ httprou
 //       oauth2:
 //
 //     Responses:
-//       200: oauthTokenResponse
+//       200: oauth2TokenResponse
 //       401: genericError
 //       500: genericError
 func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {

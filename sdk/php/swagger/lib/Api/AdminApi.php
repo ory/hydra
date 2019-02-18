@@ -4,7 +4,7 @@
  * PHP version 5
  *
  * @category Class
- * @package  HydraSDK
+ * @package  Hydra\SDK
  * @author   Swagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
@@ -26,18 +26,18 @@
  * Do not edit the class manually.
  */
 
-namespace HydraSDK\Api;
+namespace Hydra\SDK\Api;
 
-use \HydraSDK\ApiClient;
-use \HydraSDK\ApiException;
-use \HydraSDK\Configuration;
-use \HydraSDK\ObjectSerializer;
+use \Hydra\SDK\ApiClient;
+use \Hydra\SDK\ApiException;
+use \Hydra\SDK\Configuration;
+use \Hydra\SDK\ObjectSerializer;
 
 /**
  * AdminApi Class Doc Comment
  *
  * @category Class
- * @package  HydraSDK
+ * @package  Hydra\SDK
  * @author   Swagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
@@ -46,16 +46,16 @@ class AdminApi
     /**
      * API Client
      *
-     * @var \HydraSDK\ApiClient instance of the ApiClient
+     * @var \Hydra\SDK\ApiClient instance of the ApiClient
      */
     protected $apiClient;
 
     /**
      * Constructor
      *
-     * @param \HydraSDK\ApiClient|null $apiClient The api client to use
+     * @param \Hydra\SDK\ApiClient|null $apiClient The api client to use
      */
-    public function __construct(\HydraSDK\ApiClient $apiClient = null)
+    public function __construct(\Hydra\SDK\ApiClient $apiClient = null)
     {
         if ($apiClient === null) {
             $apiClient = new ApiClient();
@@ -67,7 +67,7 @@ class AdminApi
     /**
      * Get API client
      *
-     * @return \HydraSDK\ApiClient get the API client
+     * @return \Hydra\SDK\ApiClient get the API client
      */
     public function getApiClient()
     {
@@ -77,11 +77,11 @@ class AdminApi
     /**
      * Set the API client
      *
-     * @param \HydraSDK\ApiClient $apiClient set the API client
+     * @param \Hydra\SDK\ApiClient $apiClient set the API client
      *
      * @return AdminApi
      */
-    public function setApiClient(\HydraSDK\ApiClient $apiClient)
+    public function setApiClient(\Hydra\SDK\ApiClient $apiClient)
     {
         $this->apiClient = $apiClient;
         return $this;
@@ -95,9 +95,9 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $challenge  (required)
-     * @param \HydraSDK\Model\AcceptConsentRequest $body  (optional)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return \HydraSDK\Model\CompletedRequest
+     * @param \Hydra\SDK\Model\AcceptConsentRequest $body  (optional)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return \Hydra\SDK\Model\CompletedRequest
      */
     public function acceptConsentRequest($challenge, $body = null)
     {
@@ -113,9 +113,9 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $challenge  (required)
-     * @param \HydraSDK\Model\AcceptConsentRequest $body  (optional)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return array of \HydraSDK\Model\CompletedRequest, HTTP status code, HTTP response headers (array of strings)
+     * @param \Hydra\SDK\Model\AcceptConsentRequest $body  (optional)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of \Hydra\SDK\Model\CompletedRequest, HTTP status code, HTTP response headers (array of strings)
      */
     public function acceptConsentRequestWithHttpInfo($challenge, $body = null)
     {
@@ -163,23 +163,23 @@ class AdminApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\HydraSDK\Model\CompletedRequest',
+                '\Hydra\SDK\Model\CompletedRequest',
                 '/oauth2/auth/requests/consent/{challenge}/accept'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\HydraSDK\Model\CompletedRequest', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\CompletedRequest', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\CompletedRequest', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\CompletedRequest', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -196,9 +196,9 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $challenge  (required)
-     * @param \HydraSDK\Model\AcceptLoginRequest $body  (optional)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return \HydraSDK\Model\CompletedRequest
+     * @param \Hydra\SDK\Model\AcceptLoginRequest $body  (optional)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return \Hydra\SDK\Model\CompletedRequest
      */
     public function acceptLoginRequest($challenge, $body = null)
     {
@@ -214,9 +214,9 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $challenge  (required)
-     * @param \HydraSDK\Model\AcceptLoginRequest $body  (optional)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return array of \HydraSDK\Model\CompletedRequest, HTTP status code, HTTP response headers (array of strings)
+     * @param \Hydra\SDK\Model\AcceptLoginRequest $body  (optional)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of \Hydra\SDK\Model\CompletedRequest, HTTP status code, HTTP response headers (array of strings)
      */
     public function acceptLoginRequestWithHttpInfo($challenge, $body = null)
     {
@@ -264,23 +264,23 @@ class AdminApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\HydraSDK\Model\CompletedRequest',
+                '\Hydra\SDK\Model\CompletedRequest',
                 '/oauth2/auth/requests/login/{challenge}/accept'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\HydraSDK\Model\CompletedRequest', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\CompletedRequest', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\CompletedRequest', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\CompletedRequest', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -297,9 +297,9 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $set The set (required)
-     * @param \HydraSDK\Model\JsonWebKeySetGeneratorRequest $body  (optional)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return \HydraSDK\Model\JSONWebKeySet
+     * @param \Hydra\SDK\Model\JsonWebKeySetGeneratorRequest $body  (optional)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return \Hydra\SDK\Model\JSONWebKeySet
      */
     public function createJsonWebKeySet($set, $body = null)
     {
@@ -315,9 +315,9 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $set The set (required)
-     * @param \HydraSDK\Model\JsonWebKeySetGeneratorRequest $body  (optional)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return array of \HydraSDK\Model\JSONWebKeySet, HTTP status code, HTTP response headers (array of strings)
+     * @param \Hydra\SDK\Model\JsonWebKeySetGeneratorRequest $body  (optional)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of \Hydra\SDK\Model\JSONWebKeySet, HTTP status code, HTTP response headers (array of strings)
      */
     public function createJsonWebKeySetWithHttpInfo($set, $body = null)
     {
@@ -365,27 +365,27 @@ class AdminApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\HydraSDK\Model\JSONWebKeySet',
+                '\Hydra\SDK\Model\JSONWebKeySet',
                 '/keys/{set}'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\HydraSDK\Model\JSONWebKeySet', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\JSONWebKeySet', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\JSONWebKeySet', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\JSONWebKeySet', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 403:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -401,9 +401,9 @@ class AdminApi
      *
      * Client for Hydra
      *
-     * @param \HydraSDK\Model\OAuth2Client $body  (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return \HydraSDK\Model\OAuth2Client
+     * @param \Hydra\SDK\Model\OAuth2Client $body  (required)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return \Hydra\SDK\Model\OAuth2Client
      */
     public function createOAuth2Client($body)
     {
@@ -418,9 +418,9 @@ class AdminApi
      *
      * Client for Hydra
      *
-     * @param \HydraSDK\Model\OAuth2Client $body  (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return array of \HydraSDK\Model\OAuth2Client, HTTP status code, HTTP response headers (array of strings)
+     * @param \Hydra\SDK\Model\OAuth2Client $body  (required)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of \Hydra\SDK\Model\OAuth2Client, HTTP status code, HTTP response headers (array of strings)
      */
     public function createOAuth2ClientWithHttpInfo($body)
     {
@@ -460,27 +460,27 @@ class AdminApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\HydraSDK\Model\OAuth2Client',
+                '\Hydra\SDK\Model\OAuth2Client',
                 '/clients'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\HydraSDK\Model\OAuth2Client', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\OAuth2Client', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\OAuth2Client', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\OAuth2Client', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 403:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -498,7 +498,7 @@ class AdminApi
      *
      * @param string $kid The kid of the desired key (required)
      * @param string $set The set (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
+     * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return void
      */
     public function deleteJsonWebKey($kid, $set)
@@ -516,7 +516,7 @@ class AdminApi
      *
      * @param string $kid The kid of the desired key (required)
      * @param string $set The set (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
+     * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return array of null, HTTP status code, HTTP response headers (array of strings)
      */
     public function deleteJsonWebKeyWithHttpInfo($kid, $set)
@@ -580,15 +580,15 @@ class AdminApi
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 403:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -605,7 +605,7 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $set The set (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
+     * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return void
      */
     public function deleteJsonWebKeySet($set)
@@ -622,7 +622,7 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $set The set (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
+     * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return array of null, HTTP status code, HTTP response headers (array of strings)
      */
     public function deleteJsonWebKeySetWithHttpInfo($set)
@@ -674,15 +674,15 @@ class AdminApi
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 403:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -699,7 +699,7 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $id The id of the OAuth 2.0 Client. (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
+     * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return void
      */
     public function deleteOAuth2Client($id)
@@ -716,7 +716,7 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $id The id of the OAuth 2.0 Client. (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
+     * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return array of null, HTTP status code, HTTP response headers (array of strings)
      */
     public function deleteOAuth2ClientWithHttpInfo($id)
@@ -768,15 +768,15 @@ class AdminApi
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 403:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -792,8 +792,8 @@ class AdminApi
      *
      * Client for Hydra
      *
-     * @param \HydraSDK\Model\FlushInactiveOAuth2TokensRequest $body  (optional)
-     * @throws \HydraSDK\ApiException on non-2xx response
+     * @param \Hydra\SDK\Model\FlushInactiveOAuth2TokensRequest $body  (optional)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return void
      */
     public function flushInactiveOAuth2Tokens($body = null)
@@ -809,8 +809,8 @@ class AdminApi
      *
      * Client for Hydra
      *
-     * @param \HydraSDK\Model\FlushInactiveOAuth2TokensRequest $body  (optional)
-     * @throws \HydraSDK\ApiException on non-2xx response
+     * @param \Hydra\SDK\Model\FlushInactiveOAuth2TokensRequest $body  (optional)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return array of null, HTTP status code, HTTP response headers (array of strings)
      */
     public function flushInactiveOAuth2TokensWithHttpInfo($body = null)
@@ -855,11 +855,11 @@ class AdminApi
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -876,8 +876,8 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $challenge  (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return \HydraSDK\Model\ConsentRequest
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return \Hydra\SDK\Model\ConsentRequest
      */
     public function getConsentRequest($challenge)
     {
@@ -893,8 +893,8 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $challenge  (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return array of \HydraSDK\Model\ConsentRequest, HTTP status code, HTTP response headers (array of strings)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of \Hydra\SDK\Model\ConsentRequest, HTTP status code, HTTP response headers (array of strings)
      */
     public function getConsentRequestWithHttpInfo($challenge)
     {
@@ -937,27 +937,27 @@ class AdminApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\HydraSDK\Model\ConsentRequest',
+                '\Hydra\SDK\Model\ConsentRequest',
                 '/oauth2/auth/requests/consent/{challenge}'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\HydraSDK\Model\ConsentRequest', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\ConsentRequest', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\ConsentRequest', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\ConsentRequest', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 409:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -975,8 +975,8 @@ class AdminApi
      *
      * @param string $kid The kid of the desired key (required)
      * @param string $set The set (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return \HydraSDK\Model\JSONWebKeySet
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return \Hydra\SDK\Model\JSONWebKeySet
      */
     public function getJsonWebKey($kid, $set)
     {
@@ -993,8 +993,8 @@ class AdminApi
      *
      * @param string $kid The kid of the desired key (required)
      * @param string $set The set (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return array of \HydraSDK\Model\JSONWebKeySet, HTTP status code, HTTP response headers (array of strings)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of \Hydra\SDK\Model\JSONWebKeySet, HTTP status code, HTTP response headers (array of strings)
      */
     public function getJsonWebKeyWithHttpInfo($kid, $set)
     {
@@ -1049,23 +1049,23 @@ class AdminApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\HydraSDK\Model\JSONWebKeySet',
+                '\Hydra\SDK\Model\JSONWebKeySet',
                 '/keys/{set}/{kid}'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\HydraSDK\Model\JSONWebKeySet', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\JSONWebKeySet', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\JSONWebKeySet', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\JSONWebKeySet', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 404:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -1082,8 +1082,8 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $set The set (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return \HydraSDK\Model\JSONWebKeySet
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return \Hydra\SDK\Model\JSONWebKeySet
      */
     public function getJsonWebKeySet($set)
     {
@@ -1099,8 +1099,8 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $set The set (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return array of \HydraSDK\Model\JSONWebKeySet, HTTP status code, HTTP response headers (array of strings)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of \Hydra\SDK\Model\JSONWebKeySet, HTTP status code, HTTP response headers (array of strings)
      */
     public function getJsonWebKeySetWithHttpInfo($set)
     {
@@ -1143,27 +1143,27 @@ class AdminApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\HydraSDK\Model\JSONWebKeySet',
+                '\Hydra\SDK\Model\JSONWebKeySet',
                 '/keys/{set}'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\HydraSDK\Model\JSONWebKeySet', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\JSONWebKeySet', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\JSONWebKeySet', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\JSONWebKeySet', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 403:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -1180,8 +1180,8 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $challenge  (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return \HydraSDK\Model\LoginRequest
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return \Hydra\SDK\Model\LoginRequest
      */
     public function getLoginRequest($challenge)
     {
@@ -1197,8 +1197,8 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $challenge  (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return array of \HydraSDK\Model\LoginRequest, HTTP status code, HTTP response headers (array of strings)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of \Hydra\SDK\Model\LoginRequest, HTTP status code, HTTP response headers (array of strings)
      */
     public function getLoginRequestWithHttpInfo($challenge)
     {
@@ -1241,27 +1241,27 @@ class AdminApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\HydraSDK\Model\LoginRequest',
+                '\Hydra\SDK\Model\LoginRequest',
                 '/oauth2/auth/requests/login/{challenge}'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\HydraSDK\Model\LoginRequest', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\LoginRequest', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\LoginRequest', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\LoginRequest', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 409:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -1278,8 +1278,8 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $id The id of the OAuth 2.0 Client. (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return \HydraSDK\Model\OAuth2Client
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return \Hydra\SDK\Model\OAuth2Client
      */
     public function getOAuth2Client($id)
     {
@@ -1295,8 +1295,8 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $id The id of the OAuth 2.0 Client. (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return array of \HydraSDK\Model\OAuth2Client, HTTP status code, HTTP response headers (array of strings)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of \Hydra\SDK\Model\OAuth2Client, HTTP status code, HTTP response headers (array of strings)
      */
     public function getOAuth2ClientWithHttpInfo($id)
     {
@@ -1339,27 +1339,27 @@ class AdminApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\HydraSDK\Model\OAuth2Client',
+                '\Hydra\SDK\Model\OAuth2Client',
                 '/clients/{id}'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\HydraSDK\Model\OAuth2Client', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\OAuth2Client', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\OAuth2Client', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\OAuth2Client', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 403:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -1377,8 +1377,8 @@ class AdminApi
      *
      * @param string $token The string value of the token. For access tokens, this is the \&quot;access_token\&quot; value returned from the token endpoint defined in OAuth 2.0 [RFC6749], Section 5.1. This endpoint DOES NOT accept refresh tokens for validation. (required)
      * @param string $scope An optional, space separated list of required scopes. If the access token was not granted one of the scopes, the result of active will be false. (optional)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return \HydraSDK\Model\OAuth2TokenIntrospection
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return \Hydra\SDK\Model\OAuth2TokenIntrospection
      */
     public function introspectOAuth2Token($token, $scope = null)
     {
@@ -1395,8 +1395,8 @@ class AdminApi
      *
      * @param string $token The string value of the token. For access tokens, this is the \&quot;access_token\&quot; value returned from the token endpoint defined in OAuth 2.0 [RFC6749], Section 5.1. This endpoint DOES NOT accept refresh tokens for validation. (required)
      * @param string $scope An optional, space separated list of required scopes. If the access token was not granted one of the scopes, the result of active will be false. (optional)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return array of \HydraSDK\Model\OAuth2TokenIntrospection, HTTP status code, HTTP response headers (array of strings)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of \Hydra\SDK\Model\OAuth2TokenIntrospection, HTTP status code, HTTP response headers (array of strings)
      */
     public function introspectOAuth2TokenWithHttpInfo($token, $scope = null)
     {
@@ -1447,23 +1447,23 @@ class AdminApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\HydraSDK\Model\OAuth2TokenIntrospection',
+                '\Hydra\SDK\Model\OAuth2TokenIntrospection',
                 '/oauth2/introspect'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\HydraSDK\Model\OAuth2TokenIntrospection', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\OAuth2TokenIntrospection', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\OAuth2TokenIntrospection', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\OAuth2TokenIntrospection', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -1481,8 +1481,8 @@ class AdminApi
      *
      * @param int $limit The maximum amount of policies returned. (optional)
      * @param int $offset The offset from where to start looking. (optional)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return \HydraSDK\Model\OAuth2Client[]
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return \Hydra\SDK\Model\OAuth2Client[]
      */
     public function listOAuth2Clients($limit = null, $offset = null)
     {
@@ -1499,8 +1499,8 @@ class AdminApi
      *
      * @param int $limit The maximum amount of policies returned. (optional)
      * @param int $offset The offset from where to start looking. (optional)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return array of \HydraSDK\Model\OAuth2Client[], HTTP status code, HTTP response headers (array of strings)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of \Hydra\SDK\Model\OAuth2Client[], HTTP status code, HTTP response headers (array of strings)
      */
     public function listOAuth2ClientsWithHttpInfo($limit = null, $offset = null)
     {
@@ -1539,27 +1539,27 @@ class AdminApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\HydraSDK\Model\OAuth2Client[]',
+                '\Hydra\SDK\Model\OAuth2Client[]',
                 '/clients'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\HydraSDK\Model\OAuth2Client[]', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\OAuth2Client[]', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\OAuth2Client[]', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\OAuth2Client[]', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 403:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -1576,8 +1576,8 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $user  (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return \HydraSDK\Model\PreviousConsentSession[]
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return \Hydra\SDK\Model\PreviousConsentSession[]
      */
     public function listUserConsentSessions($user)
     {
@@ -1593,8 +1593,8 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $user  (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return array of \HydraSDK\Model\PreviousConsentSession[], HTTP status code, HTTP response headers (array of strings)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of \Hydra\SDK\Model\PreviousConsentSession[], HTTP status code, HTTP response headers (array of strings)
      */
     public function listUserConsentSessionsWithHttpInfo($user)
     {
@@ -1637,27 +1637,27 @@ class AdminApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\HydraSDK\Model\PreviousConsentSession[]',
+                '\Hydra\SDK\Model\PreviousConsentSession[]',
                 '/oauth2/auth/sessions/consent/{user}'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\HydraSDK\Model\PreviousConsentSession[]', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\PreviousConsentSession[]', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\PreviousConsentSession[]', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\PreviousConsentSession[]', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 403:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -1674,9 +1674,9 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $challenge  (required)
-     * @param \HydraSDK\Model\RejectRequest $body  (optional)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return \HydraSDK\Model\CompletedRequest
+     * @param \Hydra\SDK\Model\RejectRequest $body  (optional)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return \Hydra\SDK\Model\CompletedRequest
      */
     public function rejectConsentRequest($challenge, $body = null)
     {
@@ -1692,9 +1692,9 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $challenge  (required)
-     * @param \HydraSDK\Model\RejectRequest $body  (optional)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return array of \HydraSDK\Model\CompletedRequest, HTTP status code, HTTP response headers (array of strings)
+     * @param \Hydra\SDK\Model\RejectRequest $body  (optional)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of \Hydra\SDK\Model\CompletedRequest, HTTP status code, HTTP response headers (array of strings)
      */
     public function rejectConsentRequestWithHttpInfo($challenge, $body = null)
     {
@@ -1742,23 +1742,23 @@ class AdminApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\HydraSDK\Model\CompletedRequest',
+                '\Hydra\SDK\Model\CompletedRequest',
                 '/oauth2/auth/requests/consent/{challenge}/reject'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\HydraSDK\Model\CompletedRequest', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\CompletedRequest', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\CompletedRequest', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\CompletedRequest', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -1775,9 +1775,9 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $challenge  (required)
-     * @param \HydraSDK\Model\RejectRequest $body  (optional)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return \HydraSDK\Model\CompletedRequest
+     * @param \Hydra\SDK\Model\RejectRequest $body  (optional)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return \Hydra\SDK\Model\CompletedRequest
      */
     public function rejectLoginRequest($challenge, $body = null)
     {
@@ -1793,9 +1793,9 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $challenge  (required)
-     * @param \HydraSDK\Model\RejectRequest $body  (optional)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return array of \HydraSDK\Model\CompletedRequest, HTTP status code, HTTP response headers (array of strings)
+     * @param \Hydra\SDK\Model\RejectRequest $body  (optional)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of \Hydra\SDK\Model\CompletedRequest, HTTP status code, HTTP response headers (array of strings)
      */
     public function rejectLoginRequestWithHttpInfo($challenge, $body = null)
     {
@@ -1843,23 +1843,23 @@ class AdminApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\HydraSDK\Model\CompletedRequest',
+                '\Hydra\SDK\Model\CompletedRequest',
                 '/oauth2/auth/requests/login/{challenge}/reject'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\HydraSDK\Model\CompletedRequest', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\CompletedRequest', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\CompletedRequest', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\CompletedRequest', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -1876,7 +1876,7 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $user  (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
+     * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return void
      */
     public function revokeAllUserConsentSessions($user)
@@ -1893,7 +1893,7 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $user  (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
+     * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return array of null, HTTP status code, HTTP response headers (array of strings)
      */
     public function revokeAllUserConsentSessionsWithHttpInfo($user)
@@ -1945,11 +1945,11 @@ class AdminApi
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 404:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -1966,7 +1966,7 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $user  (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
+     * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return void
      */
     public function revokeAuthenticationSession($user)
@@ -1983,7 +1983,7 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $user  (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
+     * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return array of null, HTTP status code, HTTP response headers (array of strings)
      */
     public function revokeAuthenticationSessionWithHttpInfo($user)
@@ -2035,11 +2035,11 @@ class AdminApi
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 404:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -2057,7 +2057,7 @@ class AdminApi
      *
      * @param string $user  (required)
      * @param string $client  (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
+     * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return void
      */
     public function revokeUserClientConsentSessions($user, $client)
@@ -2075,7 +2075,7 @@ class AdminApi
      *
      * @param string $user  (required)
      * @param string $client  (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
+     * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return array of null, HTTP status code, HTTP response headers (array of strings)
      */
     public function revokeUserClientConsentSessionsWithHttpInfo($user, $client)
@@ -2139,11 +2139,11 @@ class AdminApi
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 404:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -2159,7 +2159,7 @@ class AdminApi
      *
      * Client for Hydra
      *
-     * @throws \HydraSDK\ApiException on non-2xx response
+     * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return void
      */
     public function revokeUserLoginCookie()
@@ -2175,7 +2175,7 @@ class AdminApi
      *
      * Client for Hydra
      *
-     * @throws \HydraSDK\ApiException on non-2xx response
+     * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return array of null, HTTP status code, HTTP response headers (array of strings)
      */
     public function revokeUserLoginCookieWithHttpInfo()
@@ -2215,11 +2215,11 @@ class AdminApi
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 404:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -2237,9 +2237,9 @@ class AdminApi
      *
      * @param string $kid The kid of the desired key (required)
      * @param string $set The set (required)
-     * @param \HydraSDK\Model\JSONWebKey $body  (optional)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return \HydraSDK\Model\JSONWebKey
+     * @param \Hydra\SDK\Model\JSONWebKey $body  (optional)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return \Hydra\SDK\Model\JSONWebKey
      */
     public function updateJsonWebKey($kid, $set, $body = null)
     {
@@ -2256,9 +2256,9 @@ class AdminApi
      *
      * @param string $kid The kid of the desired key (required)
      * @param string $set The set (required)
-     * @param \HydraSDK\Model\JSONWebKey $body  (optional)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return array of \HydraSDK\Model\JSONWebKey, HTTP status code, HTTP response headers (array of strings)
+     * @param \Hydra\SDK\Model\JSONWebKey $body  (optional)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of \Hydra\SDK\Model\JSONWebKey, HTTP status code, HTTP response headers (array of strings)
      */
     public function updateJsonWebKeyWithHttpInfo($kid, $set, $body = null)
     {
@@ -2318,27 +2318,27 @@ class AdminApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\HydraSDK\Model\JSONWebKey',
+                '\Hydra\SDK\Model\JSONWebKey',
                 '/keys/{set}/{kid}'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\HydraSDK\Model\JSONWebKey', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\JSONWebKey', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\JSONWebKey', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\JSONWebKey', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 403:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -2355,9 +2355,9 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $set The set (required)
-     * @param \HydraSDK\Model\JSONWebKeySet $body  (optional)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return \HydraSDK\Model\JSONWebKeySet
+     * @param \Hydra\SDK\Model\JSONWebKeySet $body  (optional)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return \Hydra\SDK\Model\JSONWebKeySet
      */
     public function updateJsonWebKeySet($set, $body = null)
     {
@@ -2373,9 +2373,9 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $set The set (required)
-     * @param \HydraSDK\Model\JSONWebKeySet $body  (optional)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return array of \HydraSDK\Model\JSONWebKeySet, HTTP status code, HTTP response headers (array of strings)
+     * @param \Hydra\SDK\Model\JSONWebKeySet $body  (optional)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of \Hydra\SDK\Model\JSONWebKeySet, HTTP status code, HTTP response headers (array of strings)
      */
     public function updateJsonWebKeySetWithHttpInfo($set, $body = null)
     {
@@ -2423,27 +2423,27 @@ class AdminApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\HydraSDK\Model\JSONWebKeySet',
+                '\Hydra\SDK\Model\JSONWebKeySet',
                 '/keys/{set}'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\HydraSDK\Model\JSONWebKeySet', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\JSONWebKeySet', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\JSONWebKeySet', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\JSONWebKeySet', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 403:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -2460,9 +2460,9 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $id  (required)
-     * @param \HydraSDK\Model\OAuth2Client $body  (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return \HydraSDK\Model\OAuth2Client
+     * @param \Hydra\SDK\Model\OAuth2Client $body  (required)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return \Hydra\SDK\Model\OAuth2Client
      */
     public function updateOAuth2Client($id, $body)
     {
@@ -2478,9 +2478,9 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $id  (required)
-     * @param \HydraSDK\Model\OAuth2Client $body  (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return array of \HydraSDK\Model\OAuth2Client, HTTP status code, HTTP response headers (array of strings)
+     * @param \Hydra\SDK\Model\OAuth2Client $body  (required)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of \Hydra\SDK\Model\OAuth2Client, HTTP status code, HTTP response headers (array of strings)
      */
     public function updateOAuth2ClientWithHttpInfo($id, $body)
     {
@@ -2532,27 +2532,27 @@ class AdminApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\HydraSDK\Model\OAuth2Client',
+                '\Hydra\SDK\Model\OAuth2Client',
                 '/clients/{id}'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\HydraSDK\Model\OAuth2Client', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\OAuth2Client', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\OAuth2Client', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\OAuth2Client', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 403:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }

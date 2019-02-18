@@ -1,4 +1,4 @@
-# HydraSDK\PublicApi
+# Hydra\SDK\PublicApi
 Client for Hydra
 
 All URIs are relative to *http://localhost*
@@ -6,15 +6,15 @@ All URIs are relative to *http://localhost*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**discoverOpenIDConfiguration**](PublicApi.md#discoverOpenIDConfiguration) | **GET** /.well-known/openid-configuration | OpenID Connect Discovery
+[**oauth2Token**](PublicApi.md#oauth2Token) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
 [**oauthAuth**](PublicApi.md#oauthAuth) | **GET** /oauth2/auth | The OAuth 2.0 authorize endpoint
-[**oauthToken**](PublicApi.md#oauthToken) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
 [**revokeOAuth2Token**](PublicApi.md#revokeOAuth2Token) | **POST** /oauth2/revoke | Revoke OAuth2 tokens
 [**userinfo**](PublicApi.md#userinfo) | **GET** /userinfo | OpenID Connect Userinfo
 [**wellKnown**](PublicApi.md#wellKnown) | **GET** /.well-known/jwks.json | JSON Web Keys Discovery
 
 
 # **discoverOpenIDConfiguration**
-> \HydraSDK\Model\WellKnown discoverOpenIDConfiguration()
+> \Hydra\SDK\Model\WellKnown discoverOpenIDConfiguration()
 
 OpenID Connect Discovery
 
@@ -25,7 +25,7 @@ The well known endpoint an be used to retrieve information for OpenID Connect cl
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new HydraSDK\Api\PublicApi();
+$api_instance = new Hydra\SDK\Api\PublicApi();
 
 try {
     $result = $api_instance->discoverOpenIDConfiguration();
@@ -41,7 +41,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**\HydraSDK\Model\WellKnown**](../Model/WellKnown.md)
+[**\Hydra\SDK\Model\WellKnown**](../Model/WellKnown.md)
 
 ### Authorization
 
@@ -50,6 +50,63 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: application/json, application/x-www-form-urlencoded
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
+
+# **oauth2Token**
+> \Hydra\SDK\Model\Oauth2TokenResponse oauth2Token($grant_type, $code, $redirect_uri, $client_id)
+
+The OAuth 2.0 token endpoint
+
+The client makes a request to the token endpoint by sending the following parameters using the \"application/x-www-form-urlencoded\" HTTP request entity-body.  > Do not implement a client for this endpoint yourself. Use a library. There are many libraries > available for any programming language. You can find a list of libraries here: https://oauth.net/code/ > > Do not the the Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above!
+
+### Example
+```php
+<?php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+// Configure HTTP basic authorization: basic
+Hydra\SDK\Configuration::getDefaultConfiguration()->setUsername('YOUR_USERNAME');
+Hydra\SDK\Configuration::getDefaultConfiguration()->setPassword('YOUR_PASSWORD');
+// Configure OAuth2 access token for authorization: oauth2
+Hydra\SDK\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
+
+$api_instance = new Hydra\SDK\Api\PublicApi();
+$grant_type = "grant_type_example"; // string | 
+$code = "code_example"; // string | 
+$redirect_uri = "redirect_uri_example"; // string | 
+$client_id = "client_id_example"; // string | 
+
+try {
+    $result = $api_instance->oauth2Token($grant_type, $code, $redirect_uri, $client_id);
+    print_r($result);
+} catch (Exception $e) {
+    echo 'Exception when calling PublicApi->oauth2Token: ', $e->getMessage(), PHP_EOL;
+}
+?>
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **grant_type** | **string**|  |
+ **code** | **string**|  | [optional]
+ **redirect_uri** | **string**|  | [optional]
+ **client_id** | **string**|  | [optional]
+
+### Return type
+
+[**\Hydra\SDK\Model\Oauth2TokenResponse**](../Model/Oauth2TokenResponse.md)
+
+### Authorization
+
+[basic](../../README.md#basic), [oauth2](../../README.md#oauth2)
+
+### HTTP request headers
+
+ - **Content-Type**: application/x-www-form-urlencoded
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
@@ -66,7 +123,7 @@ This endpoint is not documented here because you should never use your own imple
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new HydraSDK\Api\PublicApi();
+$api_instance = new Hydra\SDK\Api\PublicApi();
 
 try {
     $api_instance->oauthAuth();
@@ -94,53 +151,6 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
-# **oauthToken**
-> \HydraSDK\Model\OauthTokenResponse oauthToken()
-
-The OAuth 2.0 token endpoint
-
-This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows. OAuth2 is a very popular protocol and a library for your programming language will exists.  To learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749
-
-### Example
-```php
-<?php
-require_once(__DIR__ . '/vendor/autoload.php');
-
-// Configure HTTP basic authorization: basic
-HydraSDK\Configuration::getDefaultConfiguration()->setUsername('YOUR_USERNAME');
-HydraSDK\Configuration::getDefaultConfiguration()->setPassword('YOUR_PASSWORD');
-// Configure OAuth2 access token for authorization: oauth2
-HydraSDK\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
-
-$api_instance = new HydraSDK\Api\PublicApi();
-
-try {
-    $result = $api_instance->oauthToken();
-    print_r($result);
-} catch (Exception $e) {
-    echo 'Exception when calling PublicApi->oauthToken: ', $e->getMessage(), PHP_EOL;
-}
-?>
-```
-
-### Parameters
-This endpoint does not need any parameter.
-
-### Return type
-
-[**\HydraSDK\Model\OauthTokenResponse**](../Model/OauthTokenResponse.md)
-
-### Authorization
-
-[basic](../../README.md#basic), [oauth2](../../README.md#oauth2)
-
-### HTTP request headers
-
- - **Content-Type**: application/x-www-form-urlencoded
- - **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
-
 # **revokeOAuth2Token**
 > revokeOAuth2Token($token)
 
@@ -154,12 +164,12 @@ Revoking a token (both access and refresh) means that the tokens will be invalid
 require_once(__DIR__ . '/vendor/autoload.php');
 
 // Configure HTTP basic authorization: basic
-HydraSDK\Configuration::getDefaultConfiguration()->setUsername('YOUR_USERNAME');
-HydraSDK\Configuration::getDefaultConfiguration()->setPassword('YOUR_PASSWORD');
+Hydra\SDK\Configuration::getDefaultConfiguration()->setUsername('YOUR_USERNAME');
+Hydra\SDK\Configuration::getDefaultConfiguration()->setPassword('YOUR_PASSWORD');
 // Configure OAuth2 access token for authorization: oauth2
-HydraSDK\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
+Hydra\SDK\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
 
-$api_instance = new HydraSDK\Api\PublicApi();
+$api_instance = new Hydra\SDK\Api\PublicApi();
 $token = "token_example"; // string | 
 
 try {
@@ -192,7 +202,7 @@ void (empty response body)
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **userinfo**
-> \HydraSDK\Model\UserinfoResponse userinfo()
+> \Hydra\SDK\Model\UserinfoResponse userinfo()
 
 OpenID Connect Userinfo
 
@@ -204,9 +214,9 @@ This endpoint returns the payload of the ID Token, including the idTokenExtra va
 require_once(__DIR__ . '/vendor/autoload.php');
 
 // Configure OAuth2 access token for authorization: oauth2
-HydraSDK\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
+Hydra\SDK\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
 
-$api_instance = new HydraSDK\Api\PublicApi();
+$api_instance = new Hydra\SDK\Api\PublicApi();
 
 try {
     $result = $api_instance->userinfo();
@@ -222,7 +232,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**\HydraSDK\Model\UserinfoResponse**](../Model/UserinfoResponse.md)
+[**\Hydra\SDK\Model\UserinfoResponse**](../Model/UserinfoResponse.md)
 
 ### Authorization
 
@@ -236,7 +246,7 @@ This endpoint does not need any parameter.
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **wellKnown**
-> \HydraSDK\Model\JSONWebKeySet wellKnown()
+> \Hydra\SDK\Model\JSONWebKeySet wellKnown()
 
 JSON Web Keys Discovery
 
@@ -247,7 +257,7 @@ This endpoint returns JSON Web Keys to be used as public keys for verifying Open
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new HydraSDK\Api\PublicApi();
+$api_instance = new Hydra\SDK\Api\PublicApi();
 
 try {
     $result = $api_instance->wellKnown();
@@ -263,7 +273,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**\HydraSDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
+[**\Hydra\SDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
 
 ### Authorization
 

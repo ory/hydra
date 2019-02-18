@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * ConsentRequest
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2018-11-18T22:54:40.815+01:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-02-14T11:32:05.943+01:00")
 public class ConsentRequest {
   @JsonProperty("acr")
   private String acr = null;

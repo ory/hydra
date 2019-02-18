@@ -26,6 +26,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
@@ -89,6 +90,10 @@ func TestClientSDK(t *testing.T) {
 		result, response, err := c.CreateOAuth2Client(createClient)
 		require.NoError(t, err)
 		require.EqualValues(t, http.StatusCreated, response.StatusCode, "%s", response.Payload)
+		assert.NotEmpty(t, result.UpdatedAt)
+		result.UpdatedAt = time.Time{}
+		assert.NotEmpty(t, result.CreatedAt)
+		result.CreatedAt = time.Time{}
 		assert.EqualValues(t, compareClient, *result)
 
 		// secret is not returned on GetOAuth2Client
@@ -96,6 +101,10 @@ func TestClientSDK(t *testing.T) {
 		result, response, err = c.GetOAuth2Client(createClient.ClientId)
 		require.NoError(t, err)
 		require.EqualValues(t, http.StatusOK, response.StatusCode, "%s", response.Payload)
+		assert.NotEmpty(t, result.UpdatedAt)
+		result.UpdatedAt = time.Time{}
+		assert.NotEmpty(t, result.CreatedAt)
+		result.CreatedAt = time.Time{}
 		assert.EqualValues(t, compareClient, *result)
 
 		// listing clients returns the only added one
@@ -103,6 +112,10 @@ func TestClientSDK(t *testing.T) {
 		require.NoError(t, err)
 		require.EqualValues(t, http.StatusOK, response.StatusCode, "%s", response.Payload)
 		assert.Len(t, results, 1)
+		assert.NotEmpty(t, results[0].UpdatedAt)
+		results[0].UpdatedAt = time.Time{}
+		assert.NotEmpty(t, results[0].CreatedAt)
+		results[0].CreatedAt = time.Time{}
 		assert.EqualValues(t, compareClient, results[0])
 
 		// SecretExpiresAt gets overwritten with 0 on Update
@@ -110,6 +123,8 @@ func TestClientSDK(t *testing.T) {
 		result, response, err = c.UpdateOAuth2Client(createClient.ClientId, createClient)
 		require.NoError(t, err)
 		require.EqualValues(t, http.StatusOK, response.StatusCode, "%s", response.Payload)
+		assert.NotEmpty(t, result.UpdatedAt)
+		result.UpdatedAt = time.Time{}
 		assert.EqualValues(t, compareClient, *result)
 
 		// create another client
@@ -117,6 +132,8 @@ func TestClientSDK(t *testing.T) {
 		result, response, err = c.UpdateOAuth2Client(createClient.ClientId, updateClient)
 		require.NoError(t, err)
 		require.EqualValues(t, http.StatusOK, response.StatusCode, "%s", response.Payload)
+		assert.NotEmpty(t, result.UpdatedAt)
+		result.UpdatedAt = time.Time{}
 		assert.EqualValues(t, updateClient, *result)
 
 		// again, test if secret is not returned on Get
@@ -125,6 +142,8 @@ func TestClientSDK(t *testing.T) {
 		result, response, err = c.GetOAuth2Client(updateClient.ClientId)
 		require.NoError(t, err)
 		require.EqualValues(t, http.StatusOK, response.StatusCode, "%s", response.Payload)
+		assert.NotEmpty(t, result.UpdatedAt)
+		result.UpdatedAt = time.Time{}
 		assert.EqualValues(t, compareClient, *result)
 
 		// client can not be found after being deleted

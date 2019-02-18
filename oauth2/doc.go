@@ -27,6 +27,31 @@ type swaggerRevokeOAuth2TokenParameters struct {
 	Token string `json:"token"`
 }
 
+// swagger:parameters oauth2Token
+type swaggeroauth2TokenParameters struct {
+	// in: formData
+	// required: true
+	GrantType string `json:"grant_type"`
+
+	// in: formData
+	Code string `json:"code"`
+
+	// in: formData
+	RedirectURI string `json:"redirect_uri"`
+
+	// in: formData
+	ClientID string `json:"client_id"`
+}
+
+// The Access Token Response
+// swagger:model oauth2TokenResponse
+type swaggeroauth2TokenResponse struct {
+	AccessToken  string `json:"access_token"`
+	TokenType    string `json:"code"`
+	ExpiresIn    string `json:"redirect_uri"`
+	RefreshToken string `json:"client_id"`
+}
+
 // swagger:parameters flushInactiveOAuth2Tokens
 type swaggerFlushInactiveAccessTokens struct {
 	// in: body

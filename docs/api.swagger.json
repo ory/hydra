@@ -1609,7 +1609,7 @@
             "oauth2": []
           }
         ],
-        "description": "This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.\nOAuth2 is a very popular protocol and a library for your programming language will exists.\n\nTo learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749",
+        "description": "The client makes a request to the token endpoint by sending the\nfollowing parameters using the \"application/x-www-form-urlencoded\" HTTP\nrequest entity-body.\n\n\u003e Do not implement a client for this endpoint yourself. Use a library. There are many libraries\n\u003e available for any programming language. You can find a list of libraries here: https://oauth.net/code/\n\u003e\n\u003e Do not the the Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above!",
         "consumes": [
           "application/x-www-form-urlencoded"
         ],
@@ -1624,12 +1624,39 @@
           "public"
         ],
         "summary": "The OAuth 2.0 token endpoint",
-        "operationId": "oauthToken",
+        "operationId": "oauth2Token",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "GrantType",
+            "name": "grant_type",
+            "in": "formData",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "Code",
+            "name": "code",
+            "in": "formData"
+          },
+          {
+            "type": "string",
+            "x-go-name": "RedirectURI",
+            "name": "redirect_uri",
+            "in": "formData"
+          },
+          {
+            "type": "string",
+            "x-go-name": "ClientID",
+            "name": "client_id",
+            "in": "formData"
+          }
+        ],
         "responses": {
           "200": {
-            "description": "oauthTokenResponse",
+            "description": "oauth2TokenResponse",
             "schema": {
-              "$ref": "#/definitions/oauthTokenResponse"
+              "$ref": "#/definitions/oauth2TokenResponse"
             }
           },
           "401": {
@@ -2129,7 +2156,7 @@
         }
       },
       "x-go-name": "swaggerNotReadyStatus",
-      "x-go-package": "github.com/ory/x/healthx"
+      "x-go-package": "github.com/ory/hydra/vendor/github.com/ory/x/healthx"
     },
     "healthStatus": {
       "type": "object",
@@ -2141,7 +2168,7 @@
         }
       },
       "x-go-name": "swaggerHealthStatus",
-      "x-go-package": "github.com/ory/x/healthx"
+      "x-go-package": "github.com/ory/hydra/vendor/github.com/ory/x/healthx"
     },
     "jsonWebKeySetGeneratorRequest": {
       "type": "object",
@@ -2279,10 +2306,16 @@
           },
           "x-go-name": "Contacts"
         },
+        "created_at": {
+          "description": "CreatedAt returns the timestamp of the client's creation.",
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "CreatedAt"
+        },
         "grant_types": {
           "description": "GrantTypes is an array of grant types the client is allowed to use.",
           "type": "array",
-          "pattern": "client_credentials|authorize_code|implicit|refresh_token",
+          "pattern": "client_credentials|authorization_code|implicit|refresh_token",
           "items": {
             "type": "string"
           },
@@ -2366,6 +2399,12 @@
           "description": "TermsOfServiceURI is a URL string that points to a human-readable terms of service\ndocument for the client that describes a contractual relationship\nbetween the end-user and the client that the end-user accepts when\nauthorizing the client.",
           "type": "string",
           "x-go-name": "TermsOfServiceURI"
+        },
+        "updated_at": {
+          "description": "UpdatedAt returns the timestamp of the last update.",
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "UpdatedAt"
         },
         "userinfo_signed_response_alg": {
           "description": "JWS alg algorithm [JWA] REQUIRED for signing UserInfo Responses. If this is specified, the response will be JWT\n[JWT] serialized, and signed using JWS. The default, if omitted, is for the UserInfo Response to return the Claims\nas a UTF-8 encoded JSON object using the application/json content-type.",
@@ -2460,6 +2499,30 @@
         }
       },
       "x-go-name": "Introspection",
+      "x-go-package": "github.com/ory/hydra/oauth2"
+    },
+    "oauth2TokenResponse": {
+      "description": "The Access Token Response",
+      "type": "object",
+      "properties": {
+        "access_token": {
+          "type": "string",
+          "x-go-name": "AccessToken"
+        },
+        "client_id": {
+          "type": "string",
+          "x-go-name": "RefreshToken"
+        },
+        "code": {
+          "type": "string",
+          "x-go-name": "TokenType"
+        },
+        "redirect_uri": {
+          "type": "string",
+          "x-go-name": "ExpiresIn"
+        }
+      },
+      "x-go-name": "swaggeroauth2TokenResponse",
       "x-go-package": "github.com/ory/hydra/oauth2"
     },
     "oauthTokenResponse": {
@@ -2707,6 +2770,35 @@
       },
       "x-go-package": "github.com/ory/hydra/oauth2"
     },
+    "swaggeroauth2TokenParameters": {
+      "type": "object",
+      "required": [
+        "grant_type"
+      ],
+      "properties": {
+        "client_id": {
+          "description": "in: formData",
+          "type": "string",
+          "x-go-name": "ClientID"
+        },
+        "code": {
+          "description": "in: formData",
+          "type": "string",
+          "x-go-name": "Code"
+        },
+        "grant_type": {
+          "description": "in: formData",
+          "type": "string",
+          "x-go-name": "GrantType"
+        },
+        "redirect_uri": {
+          "description": "in: formData",
+          "type": "string",
+          "x-go-name": "RedirectURI"
+        }
+      },
+      "x-go-package": "github.com/ory/hydra/oauth2"
+    },
     "userinfoResponse": {
       "description": "The userinfo response",
       "type": "object",
@@ -2821,7 +2913,7 @@
         }
       },
       "x-go-name": "swaggerVersion",
-      "x-go-package": "github.com/ory/x/healthx"
+      "x-go-package": "github.com/ory/hydra/vendor/github.com/ory/x/healthx"
     },
     "wellKnown": {
       "description": "It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms\namong others.",

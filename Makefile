@@ -60,8 +60,10 @@ gen: gen-mocks gen-sql gen-sdk
 
 .PHONY: gen-sdk
 gen-sdk:
-		swagger generate spec -m -o ./docs/api.swagger.json
-		swagger validate ./docs/api.swagger.json
+		GO111MODULE=on go mod tidy
+		GO111MODULE=on go mod vendor
+		GO111MODULE=off swagger generate spec -m -o ./docs/api.swagger.json
+		GO111MODULE=off swagger validate ./docs/api.swagger.json
 
 		rm -rf ./sdk/go/hydra/swagger
 		rm -rf ./sdk/js/swagger
@@ -93,3 +95,4 @@ gen-sdk:
 		rm -rf ./sdk/js/swagger/test
 		rm -f ./sdk/php/swagger/composer.json ./sdk/php/swagger/phpunit.xml.dist
 		rm -rf ./sdk/php/swagger/test
+		rm -rf ./vendor

@@ -148,8 +148,8 @@ Class | Method | HTTP request | Description
 *OryHydra.HealthApi* | [**isInstanceAlive**](docs/HealthApi.md#isInstanceAlive) | **GET** /health/alive | Check alive status
 *OryHydra.HealthApi* | [**isInstanceReady**](docs/HealthApi.md#isInstanceReady) | **GET** /health/ready | Check readiness status
 *OryHydra.PublicApi* | [**discoverOpenIDConfiguration**](docs/PublicApi.md#discoverOpenIDConfiguration) | **GET** /.well-known/openid-configuration | OpenID Connect Discovery
+*OryHydra.PublicApi* | [**oauth2Token**](docs/PublicApi.md#oauth2Token) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
 *OryHydra.PublicApi* | [**oauthAuth**](docs/PublicApi.md#oauthAuth) | **GET** /oauth2/auth | The OAuth 2.0 authorize endpoint
-*OryHydra.PublicApi* | [**oauthToken**](docs/PublicApi.md#oauthToken) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
 *OryHydra.PublicApi* | [**revokeOAuth2Token**](docs/PublicApi.md#revokeOAuth2Token) | **POST** /oauth2/revoke | Revoke OAuth2 tokens
 *OryHydra.PublicApi* | [**userinfo**](docs/PublicApi.md#userinfo) | **GET** /userinfo | OpenID Connect Userinfo
 *OryHydra.PublicApi* | [**wellKnown**](docs/PublicApi.md#wellKnown) | **GET** /.well-known/jwks.json | JSON Web Keys Discovery
@@ -175,6 +175,7 @@ Class | Method | HTTP request | Description
  - [OryHydra.LoginRequest](docs/LoginRequest.md)
  - [OryHydra.OAuth2Client](docs/OAuth2Client.md)
  - [OryHydra.OAuth2TokenIntrospection](docs/OAuth2TokenIntrospection.md)
+ - [OryHydra.Oauth2TokenResponse](docs/Oauth2TokenResponse.md)
  - [OryHydra.OauthTokenResponse](docs/OauthTokenResponse.md)
  - [OryHydra.OpenIDConnectContext](docs/OpenIDConnectContext.md)
  - [OryHydra.PreviousConsentSession](docs/PreviousConsentSession.md)
@@ -187,6 +188,7 @@ Class | Method | HTTP request | Description
  - [OryHydra.SwaggerJwkUpdateSetKey](docs/SwaggerJwkUpdateSetKey.md)
  - [OryHydra.SwaggerOAuthIntrospectionRequest](docs/SwaggerOAuthIntrospectionRequest.md)
  - [OryHydra.SwaggerRevokeOAuth2TokenParameters](docs/SwaggerRevokeOAuth2TokenParameters.md)
+ - [OryHydra.Swaggeroauth2TokenParameters](docs/Swaggeroauth2TokenParameters.md)
  - [OryHydra.UserinfoResponse](docs/UserinfoResponse.md)
  - [OryHydra.Version](docs/Version.md)
  - [OryHydra.WellKnown](docs/WellKnown.md)

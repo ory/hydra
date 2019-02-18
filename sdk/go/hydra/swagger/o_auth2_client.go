@@ -10,6 +10,10 @@
 
 package swagger
 
+import (
+	"time"
+)
+
 type OAuth2Client struct {
 
 	// AllowedCORSOrigins are one or more URLs (scheme://host[:port]) which are allowed to make CORS requests to the /oauth/token endpoint. If this array is empty, the sever's CORS origin configuration (`CORS_ALLOWED_ORIGINS`) will be used instead. If this array is set, the allowed origins are appended to the server's CORS origin configuration. Be aware that environment variable `CORS_ENABLED` MUST be set to `true` for this to work.
@@ -35,6 +39,9 @@ type OAuth2Client struct {
 
 	// Contacts is a array of strings representing ways to contact people responsible for this client, typically email addresses.
 	Contacts []string `json:"contacts,omitempty"`
+
+	// CreatedAt returns the timestamp of the client's creation.
+	CreatedAt time.Time `json:"created_at,omitempty"`
 
 	// GrantTypes is an array of grant types the client is allowed to use.
 	GrantTypes []string `json:"grant_types,omitempty"`
@@ -79,6 +86,9 @@ type OAuth2Client struct {
 
 	// TermsOfServiceURI is a URL string that points to a human-readable terms of service document for the client that describes a contractual relationship between the end-user and the client that the end-user accepts when authorizing the client.
 	TosUri string `json:"tos_uri,omitempty"`
+
+	// UpdatedAt returns the timestamp of the last update.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 
 	// JWS alg algorithm [JWA] REQUIRED for signing UserInfo Responses. If this is specified, the response will be JWT [JWT] serialized, and signed using JWS. The default, if omitted, is for the UserInfo Response to return the Claims as a UTF-8 encoded JSON object using the application/json content-type.
 	UserinfoSignedResponseAlg string `json:"userinfo_signed_response_alg,omitempty"`

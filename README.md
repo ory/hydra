@@ -318,8 +318,8 @@ This project exists thanks to all the people who contribute. [[Contribute](CONTR
 Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/ory#backer)]
 
 <a href="https://opencollective.com/ory#backers" target="_blank"><img src="https://opencollective.com/ory/backers.svg?width=890"></a>
+We would also like to thank (past & current) supporters (in alphabetical order) on [Patreon](https://www.patreon.com/_ory): Alexander Alimovs, Billy, Chancy Kennedy, Drozzy, Edwin Trejos, Howard Edidin, Ken Adler Oz Haven, Stefan Hans, TheCrealm
 
-We would also like to thank (past & current) supporters (in alphabetical order) on [Patreon](https://www.patreon.com/_ory): Alexander Alimovs, Chancy Kennedy, Drozzy, Oz Haven, TheCrealm
 
 ## Sponsors
 

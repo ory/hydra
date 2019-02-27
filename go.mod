@@ -28,7 +28,7 @@ require (
 	github.com/ory/x v0.0.35
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
-	github.com/pkg/errors v0.8.0
+	github.com/pkg/errors v0.8.1
 	github.com/prometheus/client_golang v0.8.0
 	github.com/rs/cors v1.6.0
 	github.com/rubenv/sql-migrate v0.0.0-20180704111356-ba2c6a7295c59448dbc195cef2f41df5163b3892

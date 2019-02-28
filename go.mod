@@ -85,7 +85,7 @@ require (
 	go.uber.org/atomic v1.3.2 // indirect
 	go4.org v0.0.0-20190218023631-ce4c26f7be8e // indirect
 	golang.org/x/build v0.0.0-20190227044025-202164ea31fc // indirect
-	golang.org/x/crypto v0.0.0-20190225124518-7f87c0fbb88b
+	golang.org/x/crypto v0.0.0-20190227175134-215aa809caaf
 	golang.org/x/exp v0.0.0-20190221220918-438050ddec5e // indirect
 	golang.org/x/net v0.0.0-20190227022144-312bce6e941f // indirect
 	golang.org/x/oauth2 v0.0.0-20190226205417-e64efc72b421

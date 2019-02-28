@@ -54,6 +54,7 @@ func init() {
 	clientsCreateCmd.Flags().String("tos-uri", "", "A URL string that points to a human-readable terms of service document for the client that describes a contractual relationship between the end-user and the client that the end-user accepts when authorizing the client")
 	clientsCreateCmd.Flags().String("client-uri", "", "A URL string of a web page providing information about the client")
 	clientsCreateCmd.Flags().String("logo-uri", "", "A URL string that references a logo for the client")
+	clientsCreateCmd.Flags().StringSlice("allowed-cors-origins", []string{}, "The list of URLs allowed to make CORS requests. Requires CORS_ENABLED.")
 	clientsCreateCmd.Flags().String("subject-type", "public", "A URL string that references a logo for the client")
 	clientsCreateCmd.Flags().String("secret", "", "Provide the client's secret")
 	clientsCreateCmd.Flags().StringP("name", "n", "", "The client's name")

@@ -106,6 +106,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		PolicyUri:               flagx.MustGetString(cmd, "policy-uri"),
 		LogoUri:                 flagx.MustGetString(cmd, "logo-uri"),
 		ClientUri:               flagx.MustGetString(cmd, "client-uri"),
+		AllowedCorsOrigins:      flagx.MustGetStringSlice(cmd, "allowed-cors-origins"),
 		SubjectType:             flagx.MustGetString(cmd, "subject-type"),
 		Audience:                flagx.MustGetStringSlice(cmd, "audience"),
 	}

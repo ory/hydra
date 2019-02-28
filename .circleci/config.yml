@@ -5,20 +5,20 @@ version: 2
 jobs:
   format:
     docker:
-      - image: circleci/golang:1.11
+      - image: circleci/golang:1.12
     working_directory: /go/src/github.com/ory/hydra
     steps:
 # This is disabled for now because goimports is really slow when go modules are used, see
 # https://github.com/golang/go/issues/27287
 #
 #      - run:
-#          name: Enable go1.11 modules
+#          name: Enable go1.12 modules
 #          command: |
 #            echo 'export GO111MODULE=on' >> $BASH_ENV
 #            source $BASH_ENV
       - checkout
       - run:
-          name: Enable go1.11 modules
+          name: Enable go1.12 modules
           command: |
             echo 'export GO111MODULE=on' >> $BASH_ENV
             source $BASH_ENV
@@ -30,7 +30,7 @@ jobs:
 
   test:
     docker:
-      - image: circleci/golang:1.11
+      - image: circleci/golang:1.12
         environment:
         - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/hydra?sslmode=disable
         - TEST_DATABASE_MYSQL=root:test@(localhost:3306)/mysql?parseTime=true
@@ -45,13 +45,13 @@ jobs:
     working_directory: /go/src/github.com/ory/hydra
     steps:
       - run:
-          name: Enable go1.11 modules
+          name: Enable go1.12 modules
           command: |
             echo 'export GO111MODULE=on' >> $BASH_ENV
             source $BASH_ENV
       - checkout
       - run: go mod download
-      - run: go get -u github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/ory/go-acc
+      - run: go get -u github.com/mattn/goveralls github.com/ory/go-acc
       - run: go-acc -o coverage.txt ./... -- -failfast -timeout=20m
 #      Running race conditions requires parallel tests, otherwise it's worthless (which is the case)
 #      - run: go test -race -short $(go list ./... | grep -v cmd)
@@ -59,7 +59,7 @@ jobs:
 
   test-e2e-opaque:
     docker:
-    - image: circleci/golang:1.11
+    - image: circleci/golang:1.12
       environment:
       - DATABASE_URL_POSTGRES=postgres://test:test@localhost:5432/hydra?sslmode=disable
       - DATABASE_URL_MYSQL=mysql://root:test@(localhost:3306)/mysql?parseTime=true
@@ -74,7 +74,7 @@ jobs:
     working_directory: /go/src/github.com/ory/hydra
     steps:
     - run:
-        name: Enable go1.11 modules
+        name: Enable go1.12 modules
         command: |
           echo 'export GO111MODULE=on' >> $BASH_ENV
           source $BASH_ENV
@@ -90,11 +90,11 @@ jobs:
 
   test-e2e-plugin:
     docker:
-    - image: circleci/golang:1.11
+    - image: circleci/golang:1.12
     working_directory: /go/src/github.com/ory/hydra
     steps:
     - run:
-        name: Enable go1.11 modules
+        name: Enable go1.12 modules
         command: |
           echo 'export GO111MODULE=on' >> $BASH_ENV
           source $BASH_ENV
@@ -106,7 +106,7 @@ jobs:
 
   test-e2e-jwt:
     docker:
-    - image: circleci/golang:1.11
+    - image: circleci/golang:1.12
       environment:
       - DATABASE_URL_POSTGRES=postgres://test:test@localhost:5432/hydra?sslmode=disable
       - DATABASE_URL_MYSQL=mysql://root:test@(localhost:3306)/mysql?parseTime=true
@@ -121,7 +121,7 @@ jobs:
     working_directory: /go/src/github.com/ory/hydra
     steps:
     - run:
-        name: Enable go1.11 modules
+        name: Enable go1.12 modules
         command: |
           echo 'export GO111MODULE=on' >> $BASH_ENV
           source $BASH_ENV
@@ -138,7 +138,7 @@ jobs:
 # This test is really useless because there are always changes (usually timestamps in the generated code)
 #  generators:
 #    docker:
-#      - image: circleci/golang:1.11
+#      - image: circleci/golang:1.12
 #    working_directory: /go/src/github.com/ory/hydra
 #    steps:
 #      - checkout
@@ -146,7 +146,7 @@ jobs:
 #      - run: sudo apt-get install -y default-jdk
 #      - run: make init
 #      - run:
-#          name: Enable go1.11 modules
+#          name: Enable go1.12 modules
 #          command: |
 #            echo 'export GO111MODULE=on' >> $BASH_ENV
 #            source $BASH_ENV
@@ -171,11 +171,11 @@ jobs:
 
   release-docker:
     docker:
-      - image: circleci/golang:1.11
+      - image: circleci/golang:1.12
     working_directory: /go/src/github.com/ory/hydra
     steps:
       - run:
-          name: Enable go1.11 modules
+          name: Enable go1.12 modules
           command: |
             echo 'export GO111MODULE=on' >> $BASH_ENV
             source $BASH_ENV
@@ -202,11 +202,11 @@ jobs:
 
   release-binaries:
     docker:
-      - image: circleci/golang:1.11
+      - image: circleci/golang:1.12
     working_directory: /go/src/github.com/ory/hydra
     steps:
       - run:
-          name: Enable go1.11 modules
+          name: Enable go1.12 modules
           command: |
             echo 'export GO111MODULE=on' >> $BASH_ENV
             source $BASH_ENV
@@ -248,11 +248,11 @@ jobs:
 
   benchmark:
     docker:
-      - image: circleci/golang:1.11
+      - image: circleci/golang:1.12
     working_directory: /go/src/github.com/ory/hydra
     steps:
       - run:
-          name: Enable go1.11 modules
+          name: Enable go1.12 modules
           command: |
             echo 'export GO111MODULE=on' >> $BASH_ENV
             source $BASH_ENV

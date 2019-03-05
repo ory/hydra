@@ -53,17 +53,8 @@ type RequestDeniedError struct {
 }
 
 func (e *RequestDeniedError) toRFCError() *fosite.RFC6749Error {
-	if e.Name == "" {
-		e.Name = fosite.ErrInvalidRequest.Name
-	}
 	if e.Code == 0 {
 		e.Code = fosite.ErrInvalidRequest.Code
-	}
-	if e.Description == "" {
-		e.Description = fosite.ErrInvalidRequest.Description
-	}
-	if e.Hint == "" {
-		e.Hint = fosite.ErrInvalidRequest.Hint
 	}
 	if e.Debug == "" {
 		e.Debug = fosite.ErrInvalidRequest.Debug

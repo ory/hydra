@@ -50,10 +50,10 @@ require (
 	github.com/ziutek/mymysql v1.5.4 // indirect
 	go.opencensus.io v0.19.0 // indirect
 	go.uber.org/atomic v1.3.2 // indirect
-	golang.org/x/crypto v0.0.0-20190227175134-215aa809caaf
+	golang.org/x/crypto v0.0.0-20190228161510-8dd112bcdc25
 	golang.org/x/net v0.0.0-20190227022144-312bce6e941f // indirect
 	golang.org/x/oauth2 v0.0.0-20190226205417-e64efc72b421
-	golang.org/x/sys v0.0.0-20190226215855-775f8194d0f9 // indirect
+	golang.org/x/sys v0.0.0-20190305064518-30e92a19ae4a // indirect
 	google.golang.org/genproto v0.0.0-20190226184841-fc2db5cae922 // indirect
 	google.golang.org/grpc v1.19.0 // indirect
 	gopkg.in/resty.v1 v1.9.1

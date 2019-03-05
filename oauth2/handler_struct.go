@@ -44,7 +44,8 @@ type Handler struct {
 	ForcedHTTP bool
 	ErrorURL   url.URL
 
-	AccessTokenLifespan time.Duration
+	AccessTokenLifespan  time.Duration
+	RefreshTokenLifespan time.Duration
 	//IDTokenLifespan     time.Duration
 	CookieStore sessions.Store
 

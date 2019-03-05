@@ -28,8 +28,8 @@ import (
 )
 
 const (
-	requestDeniedErrorName        = "Consent request denied"
-	requestDeniedErrorDescription = "The request was denied and no further description was provided"
+	requestDeniedErrorName        = "consent request denied"
+	requestDeniedErrorDescription = "the request was denied and no further description was provided"
 )
 
 // The response payload sent when accepting or rejecting a login or consent request.
@@ -65,9 +65,6 @@ func (e *RequestDeniedError) toRFCError() *fosite.RFC6749Error {
 
 	if e.Code == 0 {
 		e.Code = fosite.ErrInvalidRequest.Code
-	}
-	if e.Debug == "" {
-		e.Debug = fosite.ErrInvalidRequest.Debug
 	}
 
 	return &fosite.RFC6749Error{

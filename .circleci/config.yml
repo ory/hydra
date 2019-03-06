@@ -51,7 +51,7 @@ jobs:
             source $BASH_ENV
       - checkout
       - run: go mod download
-      - run: go get -u github.com/mattn/goveralls github.com/ory/go-acc
+      - run: GO111MODULE=off go get github.com/mattn/goveralls github.com/ory/go-acc
       - run: go-acc -o coverage.txt ./... -- -failfast -timeout=20m
 #      Running race conditions requires parallel tests, otherwise it's worthless (which is the case)
 #      - run: go test -race -short $(go list ./... | grep -v cmd)

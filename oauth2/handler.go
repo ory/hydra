@@ -395,6 +395,8 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 	var session = NewSession("")
 	var ctx = r.Context()
 
+	// Amir is testing a CI build! This PR will be closed :-)
+
 	if r.Method != "POST" {
 		err := errors.WithStack(fosite.ErrInvalidRequest.WithHintf("HTTP method is \"%s\", expected \"POST\".", r.Method))
 		pkg.LogError(err, h.L)

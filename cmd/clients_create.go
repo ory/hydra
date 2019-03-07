@@ -55,7 +55,7 @@ func init() {
 	clientsCreateCmd.Flags().String("client-uri", "", "A URL string of a web page providing information about the client")
 	clientsCreateCmd.Flags().String("logo-uri", "", "A URL string that references a logo for the client")
 	clientsCreateCmd.Flags().StringSlice("allowed-cors-origins", []string{}, "The list of URLs allowed to make CORS requests. Requires CORS_ENABLED.")
-	clientsCreateCmd.Flags().String("subject-type", "public", "A URL string that references a logo for the client")
+	clientsCreateCmd.Flags().String("subject-type", "public", "A identifier algorithm. Valid values are \"public\" and \"pairwise\"")
 	clientsCreateCmd.Flags().String("secret", "", "Provide the client's secret")
 	clientsCreateCmd.Flags().StringP("name", "n", "", "The client's name")
 }

@@ -123,7 +123,7 @@ var tokenUserCmd = &cobra.Command{
 			oauth2.SetAuthURLParam("max_age", strconv.Itoa(maxAge)),
 		)
 
-		if flagx.MustGetBool(cmd, "no-open") {
+		if !flagx.MustGetBool(cmd, "no-open") {
 			webbrowser.Open(serverLocation)
 		}
 

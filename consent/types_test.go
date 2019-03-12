@@ -15,57 +15,32 @@ func TestToRFCError(t *testing.T) {
 	}{
 		{
 			input: &RequestDeniedError{
-				Description: "not empty",
-			},
-			expect: &fosite.RFC6749Error{
-				Name:        "",
-				Description: "not empty",
-				Hint:        "",
-				Code:        fosite.ErrInvalidRequest.Code,
-				Debug:       "",
-			},
-		},
-		{
-			input: &RequestDeniedError{
-				Name:        "not empty",
-				Description: "not empty",
-			},
-			expect: &fosite.RFC6749Error{
-				Name:        "not empty",
-				Description: "not empty",
-				Hint:        "",
-				Code:        fosite.ErrInvalidRequest.Code,
-				Debug:       "",
-			},
-		},
-		{
-			input: &RequestDeniedError{
-				Description: "not empty",
-				Hint:        "not empty",
-			},
-			expect: &fosite.RFC6749Error{
-				Name:        "",
-				Description: "not empty",
-				Hint:        "not empty",
-				Code:        fosite.ErrInvalidRequest.Code,
-				Debug:       "",
-			},
-		},
-		{
-			input: &RequestDeniedError{
 				Name: "not empty",
 			},
 			expect: &fosite.RFC6749Error{
-				Name:  "not empty",
-				Code:  fosite.ErrInvalidRequest.Code,
-				Debug: "",
+				Name:        "not empty",
+				Description: "",
+				Code:        fosite.ErrInvalidRequest.Code,
+				Debug:       "",
+			},
+		},
+		{
+			input: &RequestDeniedError{
+				Name:        "",
+				Description: "not empty",
+			},
+			expect: &fosite.RFC6749Error{
+				Name:        requestDeniedErrorName,
+				Description: "not empty",
+				Code:        fosite.ErrInvalidRequest.Code,
+				Debug:       "",
 			},
 		},
 		{
 			input: &RequestDeniedError{},
 			expect: &fosite.RFC6749Error{
 				Name:        requestDeniedErrorName,
-				Description: requestDeniedErrorDescription,
+				Description: "",
 				Hint:        "",
 				Code:        fosite.ErrInvalidRequest.Code,
 				Debug:       "",

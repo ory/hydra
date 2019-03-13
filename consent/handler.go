@@ -308,6 +308,9 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 		h.H.WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
 		return
 	}
+	if p.Subject == "" {
+		h.H.WriteError(w, r, http.StatusBadRequest, errors.New("Subject from payload can not be empty"))
+	}
 
 	p.Challenge = ps.ByName("challenge")
 	ar, err := h.M.GetAuthenticationRequest(r.Context(), ps.ByName("challenge"))

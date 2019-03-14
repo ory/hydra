@@ -160,11 +160,27 @@ func (h *ClientHandler) ListClients(cmd *cobra.Command, args []string) {
 	checkResponse(err, http.StatusOK, response)
 
 	table := newTable()
-	table.SetHeader([]string{"Client ID", "Name", "Response Types", "Scope"})
+	table.SetHeader([]string{
+		"Client ID",
+		"Name",
+		"Response Types",
+		"Scope",
+		"Redirect Uris",
+		"Grant Types",
+		"Token Endpoint Auth Method",
+	})
 
 	data := make([][]string, len(cls))
 	for i, cl := range cls {
-		data[i] = []string{cl.ClientId, cl.ClientName, strings.Join(cl.ResponseTypes, ","), cl.Scope}
+		data[i] = []string{
+			cl.ClientId,
+			cl.ClientName,
+			strings.Join(cl.ResponseTypes, ","),
+			cl.Scope,
+			strings.Join(cl.RedirectUris, "\n"),
+			strings.Join(cl.GrantTypes, ","),
+			cl.TokenEndpointAuthMethod,
+		}
 	}
 
 	table.AppendBulk(data)

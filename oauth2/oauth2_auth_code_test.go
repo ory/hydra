@@ -392,6 +392,41 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 								_, err := oauthConfig.TokenSource(oauth2.NoContext, token).Token()
 								require.Error(t, err)
 							},
+						}, {
+							d:       "Checks if request fails when subject doesn't match",
+							authURL: oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("audience", "https://not-ory-api/")),
+							cj:      newCookieJar(),
+							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+								return func(w http.ResponseWriter, r *http.Request) {
+									_, res, err := apiClient.GetLoginRequest(r.URL.Query().Get("login_challenge"))
+									require.NoError(t, err)
+									require.EqualValues(t, http.StatusOK, res.StatusCode)
+									v, res, err := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
+										Subject: "", Remember: false, RememberFor: 0, Acr: "1",
+									})
+									require.Error(t, err)
+									require.EqualValues(t, http.StatusBadRequest, res.StatusCode)
+									require.NotEmpty(t, v.RedirectTo)
+									http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+								}
+							},
+							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+								return func(w http.ResponseWriter, r *http.Request) { t.Fatal("This should not have been called") }
+							},
+							cb: func(t *testing.T) httprouter.Handle {
+								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+									code = r.URL.Query().Get("code")
+									require.Empty(t, code)
+									w.WriteHeader(http.StatusOK)
+								}
+							},
+							expectOAuthAuthError:  true,
+							expectOAuthTokenError: false,
+							expectIDToken:         false,
+							expectRefreshToken:    false,
+							assertAccessToken: func(t *testing.T, token string) {
+								require.Empty(t, token)
+							},
 						},
 						{
 							d:       "Perform OAuth2 flow with refreshing which works just fine",

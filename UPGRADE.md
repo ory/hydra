@@ -119,6 +119,15 @@ Do you want the latest features and patches without work and hassle? Are you loo
 secure deployment with zero effort? We can run it for you! If you're interested,
 [contact us now](mailto:hi@ory.sh)!
 
+## 1.0.0-rc.7
+
+### Configuration changes
+
+This patch introduces changes to the way configuration works in ORY Hydra. It allows ORY Hydra to be configured from
+a variety of sources, including environment variables, configuration file(s), and remote configuration (consul, etcd).
+
+
+
 ## 1.0.0-rc.4
 
 This patch requires you to run SQL migrations. No other important changes have been made.

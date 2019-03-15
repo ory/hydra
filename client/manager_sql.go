@@ -29,9 +29,9 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
-	migrate "github.com/rubenv/sql-migrate"
+	"github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
-	jose "gopkg.in/square/go-jose.v2"
+	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite"
 	"github.com/ory/go-convenience/stringsx"
@@ -44,15 +44,15 @@ var Migrations = map[string]*dbal.PackrMigrationSource{
 	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/shared", "migrations/sql/postgres"}, true),
 }
 
-func NewSQLManager(db *sqlx.DB, h fosite.Hasher) *SQLManager {
+func NewSQLManager(db *sqlx.DB, r Registry) *SQLManager {
 	return &SQLManager{
-		Hasher: h,
-		DB:     db,
+		r:  r,
+		DB: db,
 	}
 }
 
 type SQLManager struct {
-	Hasher fosite.Hasher
+	r      Registry
 	DB     *sqlx.DB
 }
 
@@ -236,7 +236,7 @@ func (m *SQLManager) UpdateClient(ctx context.Context, c *Client) error {
 	if c.Secret == "" {
 		c.Secret = string(o.GetHashedSecret())
 	} else {
-		h, err := m.Hasher.Hash(ctx, []byte(c.Secret))
+		h, err := m.r.ClientHasher().Hash(ctx, []byte(c.Secret))
 		if err != nil {
 			return errors.WithStack(err)
 		}
@@ -265,7 +265,7 @@ func (m *SQLManager) Authenticate(ctx context.Context, id string, secret []byte)
 		return nil, errors.WithStack(err)
 	}
 
-	if err := m.Hasher.Compare(ctx, c.GetHashedSecret(), secret); err != nil {
+	if err := m.r.ClientHasher().Compare(ctx, c.GetHashedSecret(), secret); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
@@ -273,7 +273,7 @@ func (m *SQLManager) Authenticate(ctx context.Context, id string, secret []byte)
 }
 
 func (m *SQLManager) CreateClient(ctx context.Context, c *Client) error {
-	h, err := m.Hasher.Hash(ctx, []byte(c.Secret))
+	h, err := m.r.ClientHasher().Hash(ctx, []byte(c.Secret))
 	if err != nil {
 		return errors.WithStack(err)
 	}

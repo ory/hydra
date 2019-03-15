@@ -33,12 +33,12 @@ import (
 )
 
 type MemoryManager struct {
-	r Registry
+	r       registry
 	Clients []Client
 	sync.RWMutex
 }
 
-func NewMemoryManager(r Registry) *MemoryManager {
+func NewMemoryManager(r registry) *MemoryManager {
 	return &MemoryManager{
 		Clients: []Client{},
 		r:r,

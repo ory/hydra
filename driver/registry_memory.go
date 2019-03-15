@@ -5,6 +5,7 @@ import (
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/dbal"
 	"github.com/sirupsen/logrus"
@@ -16,6 +17,7 @@ type RegistryMemory struct {
 	cm     client.Manager
 	ch     fosite.Hasher
 	cv     *client.Validator
+	kg     map[string]jwk.KeyGenerator
 	writer herodot.Writer
 }
 
@@ -76,4 +78,16 @@ func (m *RegistryMemory) ClientValidator() *client.Validator {
 		m.cv = client.NewValidator(m.c)
 	}
 	return m.cv
+}
+
+func (m *RegistryMemory) JWKGenerators() map[string]jwk.KeyGenerator {
+	if m.kg == nil {
+		m.kg = map[string]jwk.KeyGenerator{
+			"RS256": &jwk.RS256Generator{},
+			"ES512": &jwk.ECDSA512Generator{},
+			"HS256": &jwk.HS256Generator{},
+			"HS512": &jwk.HS512Generator{},
+		}
+	}
+	return m.kg
 }

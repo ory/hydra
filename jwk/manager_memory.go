@@ -38,6 +38,12 @@ type MemoryManager struct {
 	sync.RWMutex
 }
 
+func NewMemoryManager() *MemoryManager{
+	return &MemoryManager{
+		Keys: map[string]*jose.JSONWebKeySet{},
+	}
+}
+
 func (m *MemoryManager) AddKey(ctx context.Context, set string, key *jose.JSONWebKey) error {
 	m.Lock()
 	defer m.Unlock()
@@ -63,7 +69,9 @@ func (m *MemoryManager) AddKey(ctx context.Context, set string, key *jose.JSONWe
 
 func (m *MemoryManager) AddKeySet(ctx context.Context, set string, keys *jose.JSONWebKeySet) error {
 	for _, key := range keys.Keys {
-		m.AddKey(ctx, set, &key)
+		if err := m.AddKey(ctx, set, &key); err != nil {
+			return err
+		}
 	}
 	return nil
 }

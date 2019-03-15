@@ -27,9 +27,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
-	jose "gopkg.in/square/go-jose.v2"
-
-	"github.com/ory/herodot"
+	"gopkg.in/square/go-jose.v2"
 )
 
 const (
@@ -39,36 +37,12 @@ const (
 )
 
 type Handler struct {
-	Manager       Manager
-	Generators    map[string]KeyGenerator
-	H             herodot.Writer
-	WellKnownKeys []string
+	r Registry
+	c Configuration
 }
 
-func NewHandler(
-	manager Manager,
-	generators map[string]KeyGenerator,
-	h herodot.Writer,
-	wellKnownKeys []string,
-) *Handler {
-	return &Handler{
-		Manager:       manager,
-		Generators:    generators,
-		H:             h,
-		WellKnownKeys: append(wellKnownKeys, IDTokenKeyName),
-	}
-}
-
-func (h *Handler) GetGenerators() map[string]KeyGenerator {
-	if h.Generators == nil || len(h.Generators) == 0 {
-		h.Generators = map[string]KeyGenerator{
-			"RS256": &RS256Generator{},
-			"ES512": &ECDSA512Generator{},
-			"HS256": &HS256Generator{},
-			"HS512": &HS512Generator{},
-		}
-	}
-	return h.Generators
+func NewHandler(r Registry, c Configuration) *Handler {
+	return &Handler{r:r, c:c}
 }
 
 func (h *Handler) SetRoutes(frontend, backend *httprouter.Router, corsMiddleware func(http.Handler) http.Handler) {
@@ -109,23 +83,23 @@ func (h *Handler) SetRoutes(frontend, backend *httprouter.Router, corsMiddleware
 func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request) {
 	var jwks jose.JSONWebKeySet
 
-	for _, set := range h.WellKnownKeys {
-		keys, err := h.Manager.GetKeySet(r.Context(), set)
+	for _, set := range h.c.WellKnownKeys(IDTokenKeyName) {
+		keys, err := h.r.JWKManager().GetKeySet(r.Context(), set)
 		if err != nil {
-			h.H.WriteError(w, r, err)
+			h.r.Writer().WriteError(w, r, err)
 			return
 		}
 
 		keys, err = FindKeysByPrefix(keys, "public")
 		if err != nil {
-			h.H.WriteError(w, r, err)
+			h.r.Writer().WriteError(w, r, err)
 			return
 		}
 
 		jwks.Keys = append(jwks.Keys, keys.Keys...)
 	}
 
-	h.H.Write(w, r, &jwks)
+	h.r.Writer().Write(w, r, &jwks)
 }
 
 // swagger:route GET /keys/{set}/{kid} admin getJsonWebKey
@@ -150,13 +124,13 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	var setName = ps.ByName("set")
 	var keyName = ps.ByName("key")
 
-	keys, err := h.Manager.GetKey(r.Context(), setName, keyName)
+	keys, err := h.r.JWKManager().GetKey(r.Context(), setName, keyName)
 	if err != nil {
-		h.H.WriteError(w, r, err)
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	h.H.Write(w, r, keys)
+	h.r.Writer().Write(w, r, keys)
 }
 
 // swagger:route GET /keys/{set} admin getJsonWebKeySet
@@ -183,13 +157,13 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
 
-	keys, err := h.Manager.GetKeySet(r.Context(), setName)
+	keys, err := h.r.JWKManager().GetKeySet(r.Context(), setName)
 	if err != nil {
-		h.H.WriteError(w, r, err)
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	h.H.Write(w, r, keys)
+	h.r.Writer().Write(w, r, keys)
 }
 
 // swagger:route POST /keys/{set} admin createJsonWebKeySet
@@ -218,27 +192,27 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	var set = ps.ByName("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&keyRequest); err != nil {
-		h.H.WriteError(w, r, errors.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 	}
 
-	generator, found := h.GetGenerators()[keyRequest.Algorithm]
+	generator, found := h.r.JWKGenerators()[keyRequest.Algorithm]
 	if !found {
-		h.H.WriteErrorCode(w, r, http.StatusBadRequest, errors.Errorf("Generator %s unknown", keyRequest.Algorithm))
+		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.Errorf("Generator %s unknown", keyRequest.Algorithm))
 		return
 	}
 
 	keys, err := generator.Generate(keyRequest.KeyID, keyRequest.Use)
 	if err != nil {
-		h.H.WriteError(w, r, err)
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	if err := h.Manager.AddKeySet(r.Context(), set, keys); err != nil {
-		h.H.WriteError(w, r, err)
+	if err := h.r.JWKManager().AddKeySet(r.Context(), set, keys); err != nil {
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	h.H.WriteCreated(w, r, fmt.Sprintf("%s://%s/keys/%s", r.URL.Scheme, r.URL.Host, set), keys)
+	h.r.Writer().WriteCreated(w, r, fmt.Sprintf("%s://%s/keys/%s", r.URL.Scheme, r.URL.Host, set), keys)
 }
 
 // swagger:route PUT /keys/{set} admin updateJsonWebKeySet
@@ -267,16 +241,16 @@ func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 	var set = ps.ByName("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&keySet); err != nil {
-		h.H.WriteError(w, r, errors.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
-	if err := h.Manager.AddKeySet(r.Context(), set, &keySet); err != nil {
-		h.H.WriteError(w, r, err)
+	if err := h.r.JWKManager().AddKeySet(r.Context(), set, &keySet); err != nil {
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	h.H.Write(w, r, &keySet)
+	h.r.Writer().Write(w, r, &keySet)
 }
 
 // swagger:route PUT /keys/{set}/{kid} admin updateJsonWebKey
@@ -305,21 +279,21 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 	var set = ps.ByName("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&key); err != nil {
-		h.H.WriteError(w, r, errors.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
-	if err := h.Manager.DeleteKey(r.Context(), set, key.KeyID); err != nil {
-		h.H.WriteError(w, r, err)
+	if err := h.r.JWKManager().DeleteKey(r.Context(), set, key.KeyID); err != nil {
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	if err := h.Manager.AddKey(r.Context(), set, &key); err != nil {
-		h.H.WriteError(w, r, err)
+	if err := h.r.JWKManager().AddKey(r.Context(), set, &key); err != nil {
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	h.H.Write(w, r, key)
+	h.r.Writer().Write(w, r, key)
 }
 
 // swagger:route DELETE /keys/{set} admin deleteJsonWebKeySet
@@ -346,8 +320,8 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 func (h *Handler) DeleteKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
 
-	if err := h.Manager.DeleteKeySet(r.Context(), setName); err != nil {
-		h.H.WriteError(w, r, err)
+	if err := h.r.JWKManager().DeleteKeySet(r.Context(), setName); err != nil {
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
@@ -379,8 +353,8 @@ func (h *Handler) DeleteKey(w http.ResponseWriter, r *http.Request, ps httproute
 	var setName = ps.ByName("set")
 	var keyName = ps.ByName("key")
 
-	if err := h.Manager.DeleteKey(r.Context(), setName, keyName); err != nil {
-		h.H.WriteError(w, r, err)
+	if err := h.r.JWKManager().DeleteKey(r.Context(), setName, keyName); err != nil {
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 

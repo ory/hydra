@@ -34,14 +34,14 @@ import (
 )
 
 type Handler struct {
-	r Registry
+	r registry
 }
 
 const (
 	ClientsHandlerPath = "/clients"
 )
 
-func NewHandler(r Registry) *Handler {
+func NewHandler(r registry) *Handler {
 	return &Handler{
 		r:r,
 	}

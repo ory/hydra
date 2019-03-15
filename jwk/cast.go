@@ -32,8 +32,8 @@ func MustRSAPublic(key *jose.JSONWebKey) *rsa.PublicKey {
 	if err != nil {
 		panic(err.Error())
 	}
-	return res
 
+	return res
 }
 
 func ToRSAPublic(key *jose.JSONWebKey) (*rsa.PublicKey, error) {
@@ -41,6 +41,7 @@ func ToRSAPublic(key *jose.JSONWebKey) (*rsa.PublicKey, error) {
 	if !ok {
 		return res, errors.New("Could not convert key to RSA Private Key.")
 	}
+
 	return res, nil
 }
 
@@ -49,6 +50,7 @@ func MustRSAPrivate(key *jose.JSONWebKey) *rsa.PrivateKey {
 	if err != nil {
 		panic(err.Error())
 	}
+
 	return res
 }
 
@@ -57,5 +59,6 @@ func ToRSAPrivate(key *jose.JSONWebKey) (*rsa.PrivateKey, error) {
 	if !ok {
 		return res, errors.New("Could not convert key to RSA Private Key.")
 	}
+
 	return res, nil
 }

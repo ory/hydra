@@ -44,7 +44,7 @@ var Migrations = map[string]*dbal.PackrMigrationSource{
 	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/shared", "migrations/sql/postgres"}, true),
 }
 
-func NewSQLManager(db *sqlx.DB, r Registry) *SQLManager {
+func NewSQLManager(db *sqlx.DB, r registry) *SQLManager {
 	return &SQLManager{
 		r:  r,
 		DB: db,
@@ -52,8 +52,8 @@ func NewSQLManager(db *sqlx.DB, r Registry) *SQLManager {
 }
 
 type SQLManager struct {
-	r      Registry
-	DB     *sqlx.DB
+	r  registry
+	DB *sqlx.DB
 }
 
 type sqlData struct {

@@ -32,34 +32,41 @@ import (
 	"github.com/ory/x/sqlcon"
 )
 
-func NewFositeMemoryStore(m client.Manager, ls time.Duration) *FositeMemoryStore {
+type FositeMemoryStore struct {
+	AuthorizeCodes      map[string]authorizeCode
+	IDSessions          map[string]fosite.Requester
+	AccessTokens        map[string]fosite.Requester
+	RefreshTokens       map[string]fosite.Requester
+	PKCES               map[string]fosite.Requester
+
+	c Configuration
+	r Registry
+
+	sync.RWMutex
+	
+	//client.Manager
+}
+
+func NewFositeMemoryStore(c Configuration, r Registry) *FositeMemoryStore {
 	return &FositeMemoryStore{
 		AuthorizeCodes:      make(map[string]authorizeCode),
 		IDSessions:          make(map[string]fosite.Requester),
 		AccessTokens:        make(map[string]fosite.Requester),
 		PKCES:               make(map[string]fosite.Requester),
 		RefreshTokens:       make(map[string]fosite.Requester),
-		AccessTokenLifespan: ls,
-		Manager:             m,
+		
+		c:c,
+		r:r,
 	}
-}
-
-type FositeMemoryStore struct {
-	client.Manager
-
-	AuthorizeCodes      map[string]authorizeCode
-	IDSessions          map[string]fosite.Requester
-	AccessTokens        map[string]fosite.Requester
-	RefreshTokens       map[string]fosite.Requester
-	PKCES               map[string]fosite.Requester
-	AccessTokenLifespan time.Duration
-
-	sync.RWMutex
 }
 
 type authorizeCode struct {
 	active bool
 	fosite.Requester
+}
+
+func (s *FositeMemoryStore) GetClient(ctx context.Context, id string) (fosite.Client, error) {
+	return s.r.ClientManager().GetClient(ctx, id)
 }
 
 func (s *FositeMemoryStore) CreateOpenIDConnectSession(_ context.Context, authorizeCode string, requester fosite.Requester) error {
@@ -78,7 +85,7 @@ func (s *FositeMemoryStore) GetOpenIDConnectSession(ctx context.Context, code st
 		return nil, errors.Wrap(fosite.ErrNotFound, "")
 	}
 
-	if _, err := s.GetClient(ctx, rel.GetClient().GetID()); errors.Cause(err) == sqlcon.ErrNoRows {
+	if _, err := s.r.ClientManager().GetClient(ctx, rel.GetClient().GetID()); errors.Cause(err) == sqlcon.ErrNoRows {
 		s.Lock()
 		delete(s.IDSessions, code)
 		s.Unlock()
@@ -117,7 +124,7 @@ func (s *FositeMemoryStore) GetAuthorizeCodeSession(ctx context.Context, code st
 		return rel.Requester, errors.WithStack(fosite.ErrInvalidatedAuthorizeCode)
 	}
 
-	if _, err := s.GetClient(ctx, rel.GetClient().GetID()); errors.Cause(err) == sqlcon.ErrNoRows {
+	if _, err := s.r.ClientManager().GetClient(ctx, rel.GetClient().GetID()); errors.Cause(err) == sqlcon.ErrNoRows {
 		s.Lock()
 		delete(s.AuthorizeCodes, code)
 		s.Unlock()
@@ -158,7 +165,7 @@ func (s *FositeMemoryStore) GetAccessTokenSession(ctx context.Context, signature
 		return nil, errors.Wrap(fosite.ErrNotFound, "")
 	}
 
-	if _, err := s.GetClient(ctx, rel.GetClient().GetID()); errors.Cause(err) == sqlcon.ErrNoRows {
+	if _, err := s.r.ClientManager().GetClient(ctx, rel.GetClient().GetID()); errors.Cause(err) == sqlcon.ErrNoRows {
 		s.Lock()
 		delete(s.AccessTokens, signature)
 		s.Unlock()
@@ -197,7 +204,7 @@ func (s *FositeMemoryStore) GetRefreshTokenSession(ctx context.Context, signatur
 		return nil, errors.Wrap(fosite.ErrNotFound, "")
 	}
 
-	if _, err := s.GetClient(ctx, rel.GetClient().GetID()); errors.Cause(err) == sqlcon.ErrNoRows {
+	if _, err := s.r.ClientManager().GetClient(ctx, rel.GetClient().GetID()); errors.Cause(err) == sqlcon.ErrNoRows {
 		s.Lock()
 		delete(s.RefreshTokens, signature)
 		s.Unlock()
@@ -295,7 +302,7 @@ func (s *FositeMemoryStore) GetPKCERequestSession(ctx context.Context, code stri
 		return nil, fosite.ErrNotFound
 	}
 
-	if _, err := s.GetClient(ctx, rel.GetClient().GetID()); errors.Cause(err) == sqlcon.ErrNoRows {
+	if _, err := s.r.ClientManager().GetClient(ctx, rel.GetClient().GetID()); errors.Cause(err) == sqlcon.ErrNoRows {
 		s.Lock()
 		delete(s.RefreshTokens, code)
 		s.Unlock()

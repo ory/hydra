@@ -44,7 +44,7 @@ func init() {
 	IDKS, _ = testGenerator.Generate("test-id", "sig")
 
 	h := NewHandler(
-		&MemoryManager{},
+		NewMemoryManager(),
 		nil,
 		herodot.NewJSONWriter(nil),
 		[]string{},

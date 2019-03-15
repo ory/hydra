@@ -71,7 +71,7 @@ services:
 #      - TRACING_PROVIDER_JAEGER_LOCAL_AGENT_ADDRESS=jaeger:6831
 #      - TRACING_PROVIDER_JAEGER_SAMPLING_TYPE=const
 #      - TRACING_PROVIDER_JAEGER_SAMPLING_VALUE=1
-    restart: unless-stopped
+    restart: on-failure
 
   consent:
     environment:
@@ -81,7 +81,7 @@ services:
       - hydra
     ports:
       - "3000:3000"
-    restart: unless-stopped
+    restart: on-failure
 
 # Uncomment the following when configuring tracing
 

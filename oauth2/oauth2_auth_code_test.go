@@ -393,14 +393,15 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 								require.Error(t, err)
 							},
 						}, {
-							d:       "Checks if request fails when subject doesn't match",
+							d:       "Checks if request fails when subject is empty",
 							authURL: oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("audience", "https://not-ory-api/")),
 							cj:      newCookieJar(),
 							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
-									_, res, err := apiClient.GetLoginRequest(r.URL.Query().Get("login_challenge"))
+									challenge, res, err := apiClient.GetLoginRequest(r.URL.Query().Get("login_challenge"))
 									require.NoError(t, err)
 									require.EqualValues(t, http.StatusOK, res.StatusCode)
+									assert.False(t, challenge.Skip)
 									v, res, err := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
 										Subject: "", Remember: false, RememberFor: 0, Acr: "1",
 									})

@@ -40,14 +40,14 @@ type FositeMemoryStore struct {
 	PKCES               map[string]fosite.Requester
 
 	c Configuration
-	r Registry
+	r registry
 
 	sync.RWMutex
 	
 	//client.Manager
 }
 
-func NewFositeMemoryStore(c Configuration, r Registry) *FositeMemoryStore {
+func NewFositeMemoryStore(c Configuration, r registry) *FositeMemoryStore {
 	return &FositeMemoryStore{
 		AuthorizeCodes:      make(map[string]authorizeCode),
 		IDSessions:          make(map[string]fosite.Requester),

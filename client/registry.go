@@ -2,6 +2,7 @@ package client
 
 import (
 	"github.com/ory/fosite"
+	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/x"
 )
 
@@ -17,6 +18,5 @@ type Registry interface {
 }
 
 type Configuration interface {
-	DefaultClientScope() []string
-	GetSubjectTypesSupported() []string
+	configuration.Provider
 }

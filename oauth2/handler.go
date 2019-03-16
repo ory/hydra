@@ -63,11 +63,11 @@ const (
 )
 
 type Handler struct {
-	r Registry
+	r registry
 	c Configuration
 }
 
-func NewHandler(r Registry, c Configuration) *Handler {
+func NewHandler(r registry, c Configuration) *Handler {
 	return &Handler{r: r, c: c}
 }
 

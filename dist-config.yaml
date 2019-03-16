@@ -1,0 +1,106 @@
+# ORY Hydra configuration file
+#
+# ORY Hydra can be configured using a configuration file and passing the file location using `-c path/to/config.yaml`.
+# Per default, ORY Hydra will look up and load file ~/.hydra.yaml. All configuration keys can be set using environment
+# variables as well. Assuming the following configuration layout:
+#
+# httpd:
+#   public:
+#     port: 4444
+#     something_else: foobar
+#
+# Key `something_else` can be set as an environment variable by uppercasing it's path:
+#   `httpd.public.port.somethihng_else` -> `HTTPD.PUBLIC.PORT.SOMETHING_ELSE`
+# and replacing `.` with `_`:
+#   `httpd.public.port.somethihng_else` -> `HTTPD_PUBLIC_PORT_SOMETHING_ELSE`
+#
+# Environment variables always override values from the configuration file.
+#
+# Here are some more examples:
+#
+# Configuration key | Environment variable |
+# ------------------|----------------------|
+# dsn               | DSN                  |
+# httpd.admin.host  | HTTPD_ADMIN_HOST     |
+# ------------------|----------------------|
+
+
+# httpd controls the configuration for the http(s) daemon.
+httpd:
+  # public controls the public daemon serving public API endpoints like /oauth2/auth
+  public:
+    port: 4444 # defaults to 4444
+    host: localhost # leave this out or empty to listen on all devices which is the default
+
+  # admin controls the admin daemon serving admin API endpoints like /jwk
+  admin:
+    # The TCP port ORY Hydra should listen and handle administrative API requests on.
+    port: 4445 # defaults to 4445
+    # The interface or unix socket ORY Hydra should listen and handle administrative API requests on.
+    # Use the prefix "unix:" to specify a path to a unix socket. Leave empty to listen on all interfaces.
+    host: localhost # leave this out or empty to listen on all devices which is the default
+
+# dsn sets the data source name.
+#
+# If dsn is "memory", data will be written to memory and is lost when you restart this instance.
+# You can set this value using the DSN environment variable:
+#
+## PostgreSQL: If dsn is starting with postgres:// PostgreSQL will be used as storage backend:
+# dsn: dsn=postgres://user:password@host:123/database
+#
+## If PostgreSQL is not serving TLS, append ?sslmode=disable to the url:
+# dsn: dsn=postgres://user:password@host:123/database?sslmode=disable
+#
+## MySQL: If dsn is starting with mysql:// MySQL will be used as storage backend:
+# dsn: mysql://user:password@tcp(host:123)/database?parseTime=true
+dsn: memory
+
+# oidc configures OpenID Connect features.
+oidc:
+  subject_identifiers:
+    enabled:
+    pairwise:
+      salt:
+
+  # dynamic_client_registration configures OpenID Connect Dynamic Client Registration (exposed as admin endpoints /clients/...)
+  dynamic_client_registration:
+
+    # The OpenID Connect Dynamic Client Registration specification has no concept of whitelisting OAuth 2.0 Scope. If you
+    # want to expose Dynamic Client Registration, you should set the default scope enabled for newly registered clients.
+    # Keep in mind that users can overwrite this default by setting the "scope" key in the registration payload,
+    # effectively disabling the concept of whitelisted scopes.
+    #
+    default_scope:
+      - openid
+      - offline
+      - offline_access
+
+urls:
+  self:
+    public: http://localhost:4444/
+    admin: http://localhost:4444/
+    issuer:
+  login:
+  consent:
+  error:
+  post_logout_redirect:
+
+ttl:
+  login_consent_request: 30m
+  access_token: 1m
+  refresh_token: -1
+  id_token: 1h
+  auth_code: 1h
+
+strategies:
+  scope: DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY
+  access_token:
+
+secrets:
+  system:
+    - a
+    - b
+  cookie:
+    - a
+    - b
+    - c

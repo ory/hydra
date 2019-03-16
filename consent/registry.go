@@ -1,39 +1,24 @@
 package consent
 
 import (
-	"github.com/gorilla/sessions"
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/openid"
-	"github.com/ory/fosite/token/jwt"
-	"github.com/ory/herodot"
+	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
-	"time"
 )
 
 type registry interface {
 	x.RegistryWriter
-
-	ConsentManager() Manager
-	CookieStore() sessions.Store
-	Writer() herodot.Writer
-
-	SubjectIdentifierAlgorithm() map[string]SubjectIdentifierAlgorithm
-	ScopeStrategy() fosite.ScopeStrategy
-	JWTStrategy() jwt.JWTStrategy
-	OpenIDConnectRequestValidator() *openid.OpenIDConnectRequestValidator
+	x.RegistryCookieStore
+	oauth2.Registry
+	Registry
 }
 
-type Registry {
-
+type Registry interface {
+	ConsentManager() Manager
+	ConsentStrategy() Strategy
+	SubjectIdentifierAlgorithm() map[string]SubjectIdentifierAlgorithm
 }
 
 type Configuration interface {
-	LogoutRedirectURL() string
-	RequestMaxAge() time.Duration
-
-	AuthenticationURL() string
-	ConsentURL() string
-	IssuerURL() string
-	OAuth2AuthURL() string
-	RunsHTTPS() bool
+	configuration.Provider
 }

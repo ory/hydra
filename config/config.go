@@ -22,26 +22,23 @@ package config
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net"
-	"net/http"
-	"net/url"
-	"os"
-	"strings"
-	"time"
-
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	yaml "gopkg.in/yaml.v1"
+	"gopkg.in/yaml.v1"
+	"io/ioutil"
+	"net"
+	"net/http"
+	"net/url"
+	"os"
+	"strings"
 
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/token/hmac"
-	"github.com/ory/go-convenience/stringslice"
 	"github.com/ory/go-convenience/stringsx"
 	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/hydra/metrics/prometheus"
@@ -61,11 +58,16 @@ type Config struct {
 	BackendBindPort                  int     `mapstructure:"ADMIN_PORT" yaml:"-"`
 	BackendBindHost                  string  `mapstructure:"ADMIN_HOST" yaml:"-"`
 	Issuer                           string  `mapstructure:"OAUTH2_ISSUER_URL" yaml:"-"`
+
 	ClientRegistrationURL            string  `mapstructure:"OAUTH2_CLIENT_REGISTRATION_URL" yaml:"-"`
+
 	SystemSecret                     string  `mapstructure:"SYSTEM_SECRET" yaml:"-"`
 	RotatedSystemSecret              string  `mapstructure:"ROTATED_SYSTEM_SECRET" yaml:"-"`
+
 	DatabaseURL                      string  `mapstructure:"DATABASE_URL" yaml:"-"`
 	DatabasePlugin                   string  `mapstructure:"DATABASE_PLUGIN" yaml:"-"`
+
+
 	ConsentURL                       string  `mapstructure:"OAUTH2_CONSENT_URL" yaml:"-"`
 	LoginURL                         string  `mapstructure:"OAUTH2_LOGIN_URL" yaml:"-"`
 	LogoutRedirectURL                string  `mapstructure:"OAUTH2_LOGOUT_REDIRECT_URL" yaml:"-"`
@@ -110,23 +112,23 @@ type Config struct {
 	systemSecret []byte                     `yaml:"-"`
 }
 
-func (c *Config) MustValidate() {
-	if stringslice.Has(c.GetSubjectTypesSupported(), "pairwise") && c.OAuth2AccessTokenStrategy == "jwt" {
-		c.GetLogger().Fatalf(`The pairwise subject identifier algorithm is not supported by the JWT OAuth 2.0 Access Token Strategy. Please remove "pairwise" from OIDC_SUBJECT_TYPES_SUPPORTED or set OAUTH2_ACCESS_TOKEN_STRATEGY to "opaque"`)
-	}
+//func (c *Config) MustValidate() {
+//	if stringslice.Has(c.GetSubjectTypesSupported(), "pairwise") && c.OAuth2AccessTokenStrategy == "jwt" {
+//		c.GetLogger().Fatalf(`The pairwise subject identifier algorithm is not supported by the JWT OAuth 2.0 Access Token Strategy. Please remove "pairwise" from OIDC_SUBJECT_TYPES_SUPPORTED or set OAUTH2_ACCESS_TOKEN_STRATEGY to "opaque"`)
+//	}
+//
+//	if stringslice.Has(c.GetSubjectTypesSupported(), "pairwise") && len(c.SubjectIdentifierAlgorithmSalt) < 8 {
+//		c.GetLogger().Fatalf(`The pairwise subject identifier algorithm was set but length of OIDC_SUBJECT_TYPE_PAIRWISE_SALT is too small (%d < 8), please set OIDC_SUBJECT_TYPE_PAIRWISE_SALT to a random string with 8 characters or more`, len(c.SubjectIdentifierAlgorithmSalt))
+//	}
+//}
 
-	if stringslice.Has(c.GetSubjectTypesSupported(), "pairwise") && len(c.SubjectIdentifierAlgorithmSalt) < 8 {
-		c.GetLogger().Fatalf(`The pairwise subject identifier algorithm was set but length of OIDC_SUBJECT_TYPE_PAIRWISE_SALT is too small (%d < 8), please set OIDC_SUBJECT_TYPE_PAIRWISE_SALT to a random string with 8 characters or more`, len(c.SubjectIdentifierAlgorithmSalt))
-	}
-}
-
-func (c *Config) GetSubjectTypesSupported() []string {
-	types := strings.Split(c.SubjectTypesSupported, ",")
-	if len(types) == 0 {
-		return []string{"public"}
-	}
-	return types
-}
+//func (c *Config) GetSubjectTypesSupported() []string {
+//	types := strings.Split(c.SubjectTypesSupported, ",")
+//	if len(types) == 0 {
+//		return []string{"public"}
+//	}
+//	return types
+//}
 
 func (c *Config) GetClusterURLWithoutTailingSlashOrFail(cmd *cobra.Command) string {
 	endpoint := c.GetClusterURLWithoutTailingSlash(cmd)
@@ -144,14 +146,14 @@ func (c *Config) GetClusterURLWithoutTailingSlash(cmd *cobra.Command) string {
 	return strings.TrimRight(c.EndpointURL, "/")
 }
 
-func (c *Config) GetScopeStrategy() fosite.ScopeStrategy {
-	if c.ScopeStrategy == "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY" {
-		c.GetLogger().Warn("Using deprecated hierarchical scope strategy, consider upgrading to wildcards.")
-		return fosite.HierarchicScopeStrategy
-	}
-
-	return fosite.WildcardScopeStrategy
-}
+//func (c *Config) GetScopeStrategy() fosite.ScopeStrategy {
+//	if c.ScopeStrategy == "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY" {
+//		c.GetLogger().Warn("Using deprecated hierarchical scope strategy, consider upgrading to wildcards.")
+//		return fosite.HierarchicScopeStrategy
+//	}
+//
+//	return fosite.WildcardScopeStrategy
+//}
 
 func matchesRange(r *http.Request, ranges []string) error {
 	remoteIP, _, err := net.SplitHostPort(r.RemoteAddr)
@@ -271,55 +273,55 @@ func (c *Config) DoesRequestSatisfyTermination(r *http.Request) error {
 	return nil
 }
 
-func (c *Config) GetLoginConsentRequestLifespan() time.Duration {
-	d, err := time.ParseDuration(c.LoginConsentRequestLifespan)
-	if err != nil {
-		c.GetLogger().Warnf("Could not parse login and consent request lifespan value (%s). Defaulting to 15m", c.LoginConsentRequestLifespan)
-		return time.Minute * 15
-	}
-	return d
-}
-
-func (c *Config) GetAccessTokenLifespan() time.Duration {
-	d, err := time.ParseDuration(c.AccessTokenLifespan)
-	if err != nil {
-		c.GetLogger().Warnf("Could not parse access token lifespan value (%s). Defaulting to 1h", c.AccessTokenLifespan)
-		return time.Hour
-	}
-	return d
-}
-
-func (c *Config) GetRefreshTokenLifespan() time.Duration {
-	if c.RefreshTokenLifespan == "-1" {
-		return 0
-	}
-
-	d, err := time.ParseDuration(c.RefreshTokenLifespan)
-	if err != nil {
-		c.GetLogger().Warnf("Could not parse refresh token lifespan value (%s). Defaulting to 720h", c.RefreshTokenLifespan)
-		return time.Hour * 720
-	}
-
-	return d
-}
-
-func (c *Config) GetAuthCodeLifespan() time.Duration {
-	d, err := time.ParseDuration(c.AuthCodeLifespan)
-	if err != nil {
-		c.GetLogger().Warnf("Could not parse auth code lifespan value (%s). Defaulting to 10m", c.AuthCodeLifespan)
-		return time.Minute * 10
-	}
-	return d
-}
-
-func (c *Config) GetIDTokenLifespan() time.Duration {
-	d, err := time.ParseDuration(c.IDTokenLifespan)
-	if err != nil {
-		c.GetLogger().Warnf("Could not parse id token lifespan value (%s). Defaulting to 1h", c.IDTokenLifespan)
-		return time.Hour
-	}
-	return d
-}
+//func (c *Config) GetLoginConsentRequestLifespan() time.Duration {
+//	d, err := time.ParseDuration(c.LoginConsentRequestLifespan)
+//	if err != nil {
+//		c.GetLogger().Warnf("Could not parse login and consent request lifespan value (%s). Defaulting to 15m", c.LoginConsentRequestLifespan)
+//		return time.Minute * 15
+//	}
+//	return d
+//}
+//
+//func (c *Config) GetAccessTokenLifespan() time.Duration {
+//	d, err := time.ParseDuration(c.AccessTokenLifespan)
+//	if err != nil {
+//		c.GetLogger().Warnf("Could not parse access token lifespan value (%s). Defaulting to 1h", c.AccessTokenLifespan)
+//		return time.Hour
+//	}
+//	return d
+//}
+//
+//func (c *Config) GetRefreshTokenLifespan() time.Duration {
+//	if c.RefreshTokenLifespan == "-1" {
+//		return 0
+//	}
+//
+//	d, err := time.ParseDuration(c.RefreshTokenLifespan)
+//	if err != nil {
+//		c.GetLogger().Warnf("Could not parse refresh token lifespan value (%s). Defaulting to 720h", c.RefreshTokenLifespan)
+//		return time.Hour * 720
+//	}
+//
+//	return d
+//}
+//
+//func (c *Config) GetAuthCodeLifespan() time.Duration {
+//	d, err := time.ParseDuration(c.AuthCodeLifespan)
+//	if err != nil {
+//		c.GetLogger().Warnf("Could not parse auth code lifespan value (%s). Defaulting to 10m", c.AuthCodeLifespan)
+//		return time.Minute * 10
+//	}
+//	return d
+//}
+//
+//func (c *Config) GetIDTokenLifespan() time.Duration {
+//	d, err := time.ParseDuration(c.IDTokenLifespan)
+//	if err != nil {
+//		c.GetLogger().Warnf("Could not parse id token lifespan value (%s). Defaulting to 1h", c.IDTokenLifespan)
+//		return time.Hour
+//	}
+//	return d
+//}
 
 func (c *Config) Context() *Context {
 	if c.context != nil {
@@ -397,47 +399,47 @@ func (c *Config) Resolve(join ...string) *url.URL {
 
 	return urlx.AppendPaths(c.cluster, join...)
 }
+//
+//func (c *Config) GetCookieSecret() []byte {
+//	if c.CookieSecret != "" {
+//		return []byte(c.CookieSecret)
+//	}
+//	return c.GetSystemSecret()
+//}
 
-func (c *Config) GetCookieSecret() []byte {
-	if c.CookieSecret != "" {
-		return []byte(c.CookieSecret)
-	}
-	return c.GetSystemSecret()
-}
+//func (c *Config) GetRotatedSystemSecrets() [][]byte {
+//	if len(c.RotatedSystemSecret) == 0 {
+//		return nil
+//	}
+//
+//	return [][]byte{
+//		pkg.HashStringSecret(c.RotatedSystemSecret),
+//	}
+//}
 
-func (c *Config) GetRotatedSystemSecrets() [][]byte {
-	if len(c.RotatedSystemSecret) == 0 {
-		return nil
-	}
-
-	return [][]byte{
-		pkg.HashStringSecret(c.RotatedSystemSecret),
-	}
-}
-
-func (c *Config) GetSystemSecret() []byte {
-	if len(c.systemSecret) > 0 {
-		return c.systemSecret
-	}
-
-	if len(c.SystemSecret) >= 16 {
-		c.systemSecret = pkg.HashStringSecret(c.SystemSecret)
-		return pkg.HashStringSecret(c.SystemSecret)
-	}
-
-	if len(c.SystemSecret) > 0 {
-		c.GetLogger().Fatalf("System secret must be undefined or have at least 16 characters, but it has %d characters.", len(c.SystemSecret))
-		return nil
-	}
-
-	c.GetLogger().Warnf("No system secret was set, generating a random system secret...")
-	secret, err := pkg.GenerateSecret(32)
-	cmdx.Must(err, "Could not generate global secret: %s", err)
-	c.GetLogger().Infof("Generated system secret: %s", secret)
-	c.systemSecret = pkg.HashByteSecret(secret)
-	c.GetLogger().Warnln("WARNING: DO NOT generate system secrets in production. The secret will be leaked to the logs.")
-	return pkg.HashByteSecret(secret)
-}
+//func (c *Config) GetSystemSecret() []byte {
+//	if len(c.systemSecret) > 0 {
+//		return c.systemSecret
+//	}
+//
+//	if len(c.SystemSecret) >= 16 {
+//		c.systemSecret = pkg.HashStringSecret(c.SystemSecret)
+//		return pkg.HashStringSecret(c.SystemSecret)
+//	}
+//
+//	if len(c.SystemSecret) > 0 {
+//		c.GetLogger().Fatalf("System secret must be undefined or have at least 16 characters, but it has %d characters.", len(c.SystemSecret))
+//		return nil
+//	}
+//
+//	c.GetLogger().Warnf("No system secret was set, generating a random system secret...")
+//	secret, err := pkg.GenerateSecret(32)
+//	cmdx.Must(err, "Could not generate global secret: %s", err)
+//	c.GetLogger().Infof("Generated system secret: %s", secret)
+//	c.systemSecret = pkg.HashByteSecret(secret)
+//	c.GetLogger().Warnln("WARNING: DO NOT generate system secrets in production. The secret will be leaked to the logs.")
+//	return pkg.HashByteSecret(secret)
+//}
 
 func (c *Config) getAddress(address string, port int) string {
 	if strings.HasPrefix(address, "unix:") {

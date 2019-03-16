@@ -218,11 +218,11 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 		return errors.WithStack(err)
 	}
 
-	if err := createCsrfSession(w, r, s.r.CookieStore(), cookieAuthenticationCSRFName, csrf, s.c.RunsHTTPS()); err != nil {
+	if err := createCsrfSession(w, r, s.r.CookieStore(), cookieAuthenticationCSRFName, csrf, s.c.ServesHTTPS()); err != nil {
 		return errors.WithStack(err)
 	}
 
-	au, err := url.Parse(s.c.AuthenticationURL())
+	au, err := url.Parse(s.c.LoginURL())
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -295,7 +295,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return nil, errors.WithStack(session.Error.toRFCError())
 	}
 
-	if session.RequestedAt.Add(s.c.RequestMaxAge()).Before(time.Now()) {
+	if session.RequestedAt.Add(s.c.ConsentRequestMaxAge()).Before(time.Now()) {
 		return nil, errors.WithStack(fosite.ErrRequestUnauthorized.WithDebug("The login request has expired, please try again."))
 	}
 
@@ -397,7 +397,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	}
 	cookie.Options.HttpOnly = true
 
-	if s.c.RunsHTTPS() {
+	if s.c.ServesHTTPS() {
 		cookie.Options.Secure = true
 	}
 
@@ -504,7 +504,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 		return errors.WithStack(err)
 	}
 
-	if err := createCsrfSession(w, r, s.r.CookieStore(), cookieConsentCSRFName, csrf, s.c.RunsHTTPS()); err != nil {
+	if err := createCsrfSession(w, r, s.r.CookieStore(), cookieConsentCSRFName, csrf, s.c.ServesHTTPS()); err != nil {
 		return errors.WithStack(err)
 	}
 
@@ -526,7 +526,7 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 		return nil, err
 	}
 
-	if session.RequestedAt.Add(s.c.RequestMaxAge()).Before(time.Now()) {
+	if session.RequestedAt.Add(s.c.ConsentRequestMaxAge()).Before(time.Now()) {
 		return nil, errors.WithStack(fosite.ErrRequestUnauthorized.WithDebug("The consent request has expired, please try again."))
 	}
 

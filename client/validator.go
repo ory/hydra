@@ -117,14 +117,14 @@ func (v *Validator) Validate(c *Client) error {
 	}
 
 	if c.SubjectType != "" {
-		if !stringslice.Has(v.conf.GetSubjectTypesSupported(), c.SubjectType) {
-			return errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf("Subject type %s is not supported by server, only %v are allowed.", c.SubjectType, v.conf.GetSubjectTypesSupported())))
+		if !stringslice.Has(v.conf.SupportedSubjectTypes(), c.SubjectType) {
+			return errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf("Subject type %s is not supported by server, only %v are allowed.", c.SubjectType, v.conf.SupportedSubjectTypes())))
 		}
 	} else {
-		if stringslice.Has(v.conf.GetSubjectTypesSupported(), "public") {
+		if stringslice.Has(v.conf.SupportedSubjectTypes(), "public") {
 			c.SubjectType = "public"
 		} else {
-			c.SubjectType = v.conf.GetSubjectTypesSupported()[0]
+			c.SubjectType = v.conf.SupportedSubjectTypes()[0]
 		}
 	}
 

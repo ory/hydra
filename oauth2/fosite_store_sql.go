@@ -45,7 +45,7 @@ import (
 type FositeSQLStore struct {
 	DB *sqlx.DB
 
-	r Registry
+	r registry
 	c Configuration
 
 	HashSignature bool
@@ -58,7 +58,7 @@ type sqlxDB interface {
 	GetContext(ctx context.Context, dest interface{}, query string, args ...interface{}) error
 }
 
-func NewFositeSQLStore(db *sqlx.DB, r Registry, c Configuration) *FositeSQLStore {
+func NewFositeSQLStore(db *sqlx.DB, r registry, c Configuration) *FositeSQLStore {
 	return &FositeSQLStore{r: r, c: c, DB: db}
 }
 

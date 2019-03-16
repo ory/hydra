@@ -27,6 +27,10 @@ import (
 	"github.com/ory/hydra/client"
 )
 
+const (
+	requestDeniedErrorName = "consent request denied"
+)
+
 // The response payload sent when accepting or rejecting a login or consent request.
 //
 // swagger:model completedRequest
@@ -54,19 +58,11 @@ type RequestDeniedError struct {
 
 func (e *RequestDeniedError) toRFCError() *fosite.RFC6749Error {
 	if e.Name == "" {
-		e.Name = fosite.ErrInvalidRequest.Name
+		e.Name = requestDeniedErrorName
 	}
+
 	if e.Code == 0 {
 		e.Code = fosite.ErrInvalidRequest.Code
-	}
-	if e.Description == "" {
-		e.Description = fosite.ErrInvalidRequest.Description
-	}
-	if e.Hint == "" {
-		e.Hint = fosite.ErrInvalidRequest.Hint
-	}
-	if e.Debug == "" {
-		e.Debug = fosite.ErrInvalidRequest.Debug
 	}
 
 	return &fosite.RFC6749Error{

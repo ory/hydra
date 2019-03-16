@@ -39,6 +39,9 @@ httpd:
     # The interface or unix socket ORY Hydra should listen and handle administrative API requests on.
     # Use the prefix "unix:" to specify a path to a unix socket. Leave empty to listen on all interfaces.
     host: localhost # leave this out or empty to listen on all devices which is the default
+  tls:
+    allow_termination_from:
+      - 127.0.0.1/32
 
 # dsn sets the data source name.
 #
@@ -62,6 +65,9 @@ oidc:
     pairwise:
       salt:
 
+  discovery:
+    client_registration_url:  https://my-service.com/clients
+
   # dynamic_client_registration configures OpenID Connect Dynamic Client Registration (exposed as admin endpoints /clients/...)
   dynamic_client_registration:
 
@@ -69,7 +75,6 @@ oidc:
     # want to expose Dynamic Client Registration, you should set the default scope enabled for newly registered clients.
     # Keep in mind that users can overwrite this default by setting the "scope" key in the registration payload,
     # effectively disabling the concept of whitelisted scopes.
-    #
     default_scope:
       - openid
       - offline
@@ -104,3 +109,7 @@ secrets:
     - a
     - b
     - c
+
+hashers:
+  bcrypt:
+    cost: 12

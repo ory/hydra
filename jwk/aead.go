@@ -31,6 +31,12 @@ type AEAD struct {
 	Key []byte
 }
 
+func NewAEAD(key []byte) *AEAD {
+	return &AEAD{
+		Key: key,
+	}
+}
+
 func (c *AEAD) Encrypt(plaintext []byte) (string, error) {
 	if len(c.Key) < 32 {
 		return "", errors.Errorf("Key must be 32 bytes, got %d bytes", len(c.Key))

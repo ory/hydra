@@ -2,11 +2,14 @@ package driver
 
 import (
 	"github.com/go-errors/errors"
-	"github.com/sirupsen/logrus"
-
-	"github.com/ory/herodot"
+	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/dbal"
+	"github.com/ory/x/healthx"
 )
 
 type Registry interface {
@@ -14,8 +17,16 @@ type Registry interface {
 
 	WithConfig(c configuration.Provider) Registry
 
-	Logger() logrus.FieldLogger
-	Writer() herodot.Writer
+	x.RegistryLogger
+	x.RegistryWriter
+	client.Registry
+	jwk.Registry
+
+	ClientHandler() *client.Handler
+	KeyHandler() *jwk.Handler
+	ConsentHandler() *consent.Handler
+	OAuth2Handler() *oauth2.Handler
+	HealthHandler() *healthx.Handler
 }
 
 func NewRegistry(c configuration.Provider) (Registry, error) {

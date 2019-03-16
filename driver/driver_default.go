@@ -3,7 +3,7 @@ package driver
 import (
 	"github.com/sirupsen/logrus"
 
-	"github.com/ory/hive-cloud/hive/driver/configuration"
+	"github.com/ory/hydra/driver/configuration"
 )
 
 type DefaultDriver struct {
@@ -12,21 +12,17 @@ type DefaultDriver struct {
 	r Registry
 }
 
-func NewDefaultDriver(bi *BuildInfo, r Registry, c configuration.Provider, l logrus.FieldLogger) Driver {
+func NewDefaultDriver( r Registry, c configuration.Provider, l logrus.FieldLogger) Driver {
 	configuration.MustValidate(c)
-	return NewDefaultDriverWithoutValidation(bi, r, c, l)
+	return NewDefaultDriverWithoutValidation( r, c, l)
 }
 
-func NewDefaultDriverWithoutValidation(bi *BuildInfo, r Registry, c configuration.Provider, l logrus.FieldLogger) Driver {
+func NewDefaultDriverWithoutValidation( r Registry, c configuration.Provider, l logrus.FieldLogger) Driver {
 	return &DefaultDriver{
 		r: r.WithConfig(c),
 		l: l,
 		c: c,
 	}
-}
-
-func (r *DefaultDriver) BuildInfo() *BuildInfo {
-	return &BuildInfo{}
 }
 
 func (r *DefaultDriver) Logger() logrus.FieldLogger {

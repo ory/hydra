@@ -43,7 +43,7 @@ func NewBCrypt(c configuration.Provider) *BCrypt {
 }
 
 func (b *BCrypt) Hash(ctx context.Context, data []byte) ([]byte, error) {
-	cf := b.c.BCryptCostFactor()
+	cf := b.c.()
 	if cf == 0 {
 		cf = defaultBCryptWorkFactor
 	}

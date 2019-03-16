@@ -15,9 +15,12 @@ type RegistryMemory struct {
 	l      logrus.FieldLogger
 	c      configuration.Provider
 	cm     client.Manager
-	ch     fosite.Hasher
+	ch *client.Handler
+	fh     fosite.Hasher
 	cv     *client.Validator
 	kg     map[string]jwk.KeyGenerator
+	km     jwk.Manager
+	kc     *jwk.AEAD
 	writer herodot.Writer
 }
 
@@ -67,8 +70,15 @@ func (m *RegistryMemory) ClientManager() client.Manager {
 }
 
 func (m *RegistryMemory) ClientHasher() fosite.Hasher {
+	if m.fh == nil {
+		m.fh = x.NewBCrypt(m.c)
+	}
+	return m.fh
+}
+
+func (m *RegistryMemory) ClientHandler() *client.Handler {
 	if m.ch == nil {
-		m.ch = x.NewBCrypt(m.c)
+		m.ch = client.NewHandler(m)
 	}
 	return m.ch
 }
@@ -80,7 +90,14 @@ func (m *RegistryMemory) ClientValidator() *client.Validator {
 	return m.cv
 }
 
-func (m *RegistryMemory) JWKGenerators() map[string]jwk.KeyGenerator {
+func (m *RegistryMemory) KeyManager() jwk.Manager {
+	if m.km == nil {
+		m.km = jwk.NewMemoryManager()
+	}
+	return m.km
+}
+
+func (m *RegistryMemory) KeyGenerators() map[string]jwk.KeyGenerator {
 	if m.kg == nil {
 		m.kg = map[string]jwk.KeyGenerator{
 			"RS256": &jwk.RS256Generator{},
@@ -91,3 +108,11 @@ func (m *RegistryMemory) JWKGenerators() map[string]jwk.KeyGenerator {
 	}
 	return m.kg
 }
+
+func (m *RegistryMemory) KeyCipher() *jwk.AEAD {
+	if m.kc == nil {
+		m.kc = jwk.NewAEAD(m.c.GetSystemSecret())
+	}
+	return m.kc
+}
+

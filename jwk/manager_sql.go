@@ -38,10 +38,10 @@ import (
 
 type SQLManager struct {
 	DB *sqlx.DB
-	r  Registry
+	r  registry
 }
 
-func NewSQLManager(db *sqlx.DB, r Registry) *SQLManager {
+func NewSQLManager(db *sqlx.DB, r registry) *SQLManager {
 	return &SQLManager{DB: db, r: r}
 }
 
@@ -86,7 +86,7 @@ func (m *SQLManager) AddKey(ctx context.Context, set string, key *jose.JSONWebKe
 		return errors.WithStack(err)
 	}
 
-	encrypted, err := m.r.Cipher().Encrypt(out)
+	encrypted, err := m.r.KeyCipher().Encrypt(out)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -108,7 +108,7 @@ func (m *SQLManager) AddKeySet(ctx context.Context, set string, keys *jose.JSONW
 		return errors.WithStack(err)
 	}
 
-	if err := m.addKeySet(ctx, tx, m.r.Cipher(), set, keys); err != nil {
+	if err := m.addKeySet(ctx, tx, m.r.KeyCipher(), set, keys); err != nil {
 		if re := tx.Rollback(); re != nil {
 			return errors.Wrap(err, re.Error())
 		}
@@ -155,7 +155,7 @@ func (m *SQLManager) GetKey(ctx context.Context, set, kid string) (*jose.JSONWeb
 		return nil, sqlcon.HandleError(err)
 	}
 
-	key, err := m.r.Cipher().Decrypt(d.Key)
+	key, err := m.r.KeyCipher().Decrypt(d.Key)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -182,7 +182,7 @@ func (m *SQLManager) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKe
 
 	keys := &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{}}
 	for _, d := range ds {
-		key, err := m.r.Cipher().Decrypt(d.Key)
+		key, err := m.r.KeyCipher().Decrypt(d.Key)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}

@@ -1,14 +1,21 @@
 package jwk
 
-import "github.com/ory/herodot"
+import (
+	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/x"
+)
+
+type registry interface {
+	x.RegistryWriter
+	Registry
+}
 
 type Registry interface {
-	JWKManager() Manager
-	JWKGenerators()    map[string]KeyGenerator
-	Writer() herodot.Writer
-	Cipher() *AEAD
+	KeyManager() Manager
+	KeyGenerators() map[string]KeyGenerator
+	KeyCipher() *AEAD
 }
 
 type Configuration interface {
-	WellKnownKeys(defaults ...string) []string
+	configuration.Provider
 }

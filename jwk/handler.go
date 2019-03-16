@@ -37,11 +37,11 @@ const (
 )
 
 type Handler struct {
-	r Registry
+	r registry
 	c Configuration
 }
 
-func NewHandler(r Registry, c Configuration) *Handler {
+func NewHandler(r registry, c Configuration) *Handler {
 	return &Handler{r:r, c:c}
 }
 
@@ -84,7 +84,7 @@ func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request) {
 	var jwks jose.JSONWebKeySet
 
 	for _, set := range h.c.WellKnownKeys(IDTokenKeyName) {
-		keys, err := h.r.JWKManager().GetKeySet(r.Context(), set)
+		keys, err := h.r.KeyManager().GetKeySet(r.Context(), set)
 		if err != nil {
 			h.r.Writer().WriteError(w, r, err)
 			return
@@ -124,7 +124,7 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	var setName = ps.ByName("set")
 	var keyName = ps.ByName("key")
 
-	keys, err := h.r.JWKManager().GetKey(r.Context(), setName, keyName)
+	keys, err := h.r.KeyManager().GetKey(r.Context(), setName, keyName)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -157,7 +157,7 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
 
-	keys, err := h.r.JWKManager().GetKeySet(r.Context(), setName)
+	keys, err := h.r.KeyManager().GetKeySet(r.Context(), setName)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -195,7 +195,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 	}
 
-	generator, found := h.r.JWKGenerators()[keyRequest.Algorithm]
+	generator, found := h.r.KeyGenerators()[keyRequest.Algorithm]
 	if !found {
 		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.Errorf("Generator %s unknown", keyRequest.Algorithm))
 		return
@@ -207,7 +207,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		return
 	}
 
-	if err := h.r.JWKManager().AddKeySet(r.Context(), set, keys); err != nil {
+	if err := h.r.KeyManager().AddKeySet(r.Context(), set, keys); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -245,7 +245,7 @@ func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	if err := h.r.JWKManager().AddKeySet(r.Context(), set, &keySet); err != nil {
+	if err := h.r.KeyManager().AddKeySet(r.Context(), set, &keySet); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -283,12 +283,12 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 		return
 	}
 
-	if err := h.r.JWKManager().DeleteKey(r.Context(), set, key.KeyID); err != nil {
+	if err := h.r.KeyManager().DeleteKey(r.Context(), set, key.KeyID); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	if err := h.r.JWKManager().AddKey(r.Context(), set, &key); err != nil {
+	if err := h.r.KeyManager().AddKey(r.Context(), set, &key); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -320,7 +320,7 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 func (h *Handler) DeleteKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
 
-	if err := h.r.JWKManager().DeleteKeySet(r.Context(), setName); err != nil {
+	if err := h.r.KeyManager().DeleteKeySet(r.Context(), setName); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -353,7 +353,7 @@ func (h *Handler) DeleteKey(w http.ResponseWriter, r *http.Request, ps httproute
 	var setName = ps.ByName("set")
 	var keyName = ps.ByName("key")
 
-	if err := h.r.JWKManager().DeleteKey(r.Context(), setName, keyName); err != nil {
+	if err := h.r.KeyManager().DeleteKey(r.Context(), setName, keyName); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}

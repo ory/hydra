@@ -4,15 +4,13 @@ import (
 	"fmt"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/hydra/tracing"
+	"github.com/ory/x/tracing"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/stringslice"
 	"github.com/ory/x/urlx"
 	"github.com/ory/x/viperx"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"net/url"
-	"strings"
 	"time"
 )
 
@@ -61,11 +59,15 @@ func (v *ViperProvider) DefaultClientScope() []string {
 }
 
 func (v *ViperProvider) DSN() string {
-	return viperx.GetString(v.l, "dsn", "DATABASE_URL")
+	return viperx.GetString(v.l, "dsn", "", "DATABASE_URL")
 }
 
-func (v *ViperProvider) DSN() string {
-	return viperx.GetString(v.l, "dsn", "DATABASE_URL")
+func (v *ViperProvider) DataSourcePlugin() string {
+	return viperx.GetString(v.l, "driver.plugin_path", "", "DATABASE_PLUGIN")
+}
+
+func (v *ViperProvider) BCryptCost() int {
+	return viperx.GetInt(v.l, "hashers.bcrypt.cost", 10,"BCRYPT_COST")
 }
 
 func (v *ViperProvider) AdminListenOn() string {
@@ -134,7 +136,7 @@ func (v *ViperProvider) GetCookieSecrets() [][]byte {
 }
 
 func (v *ViperProvider) GetRotatedSystemSecrets() [][]byte {
-	secrets := viperx.GetStringSlice(v.l, "secrets.system", []string{}, "SYSTEM_SECRET")
+	secrets := viperx.GetStringSlice(v.l, "secrets.system", []string{}, "ROTATED_SYSTEM_SECRET")
 
 	if len(secrets) < 2 {
 		return nil
@@ -207,14 +209,12 @@ func (v *ViperProvider) OAuth2AuthURL() string {
 	return urlx.MustJoin(v.PublicURL().String(), "/oauth2/auth")
 }
 
-func (v *ViperProvider) ServesHTTPS() bool {
-	return
+func (v *ViperProvider) OAuth2ClientRegistrationURL() *url.URL {
+	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, "oidc.discovery.client_registration_url", "", "OAUTH2_CLIENT_REGISTRATION_URL"))
 }
-func (v *ViperProvider) HashSignature() bool {
-	return
-}
-func (v *ViperProvider) IsUsingJWTAsAccessTokens() bool {
-	return
+
+func (v *ViperProvider) AllowTLSTerminationFrom() []string {
+	return viperx.GetStringSlice(v.l, "httpd.tls.allow_termination_from", []string{}, "HTTPS_ALLOW_TERMINATION_FROM")
 }
 
 func (v *ViperProvider) AccessTokenStrategy() string {
@@ -222,25 +222,31 @@ func (v *ViperProvider) AccessTokenStrategy() string {
 }
 
 func (v *ViperProvider) SubjectIdentifierAlgorithmSalt() string {
-	return viperx.GetString(v.l, " oidc.subject_identifiers.pairwise.salt", "", "OIDC_SUBJECT_TYPE_PAIRWISE_SALT")
+	return viperx.GetString(v.l, "oidc.subject_identifiers.pairwise.salt", "", "OIDC_SUBJECT_TYPE_PAIRWISE_SALT")
 }
 
-func (v *ViperProvider) ClientRegistrationURL() string {
-	return
+func (v *ViperProvider) OIDCDiscoverySupportedClaims() []string {
+	return viperx.GetStringSlice(v.l, "oidc.discovery.supported_claims", []string{}, "OIDC_DISCOVERY_CLAIMS_SUPPORTED")
 }
 
-func (v *ViperProvider) ClaimsSupported() string {
-	return
+func (v *ViperProvider) OIDCDiscoverySupportedScope() []string {
+	return viperx.GetStringSlice(v.l, "oidc.discovery.supported_scope", []string{}, "OIDC_DISCOVERY_SCOPES_SUPPORTED")
 }
-func (v *ViperProvider) ScopesSupported() string {
-	return
+
+func (v *ViperProvider) OIDCDiscoveryUserinfoEndpoint() string {
+	return viperx.GetString(v.l, "oidc.discovery.userinfo_url", urlx.AppendPaths(v.PublicURL(), "/userinfo").String(), "OIDC_DISCOVERY_USERINFO_ENDPOINT")
 }
-func (v *ViperProvider) SubjectTypes() []string {
-	return
-}
-func (v *ViperProvider) UserinfoEndpoint() string {
-	return
-}
+
 func (v *ViperProvider) ShareOAuth2Debug() bool {
-	return
+	return viperx.GetBool(v.l, "debug.share_oauth2_errors", "OAUTH2_SHARE_ERROR_DEBUG")
 }
+
+//func (v *ViperProvider) ServesHTTPS() bool {
+//	return
+//}
+//func (v *ViperProvider) HashSignature() bool {
+//	return
+//}
+//func (v *ViperProvider) IsUsingJWTAsAccessTokens() bool {
+//	return
+//}

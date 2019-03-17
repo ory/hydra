@@ -430,9 +430,13 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		TokenType:       tt,
 	}
 
-	exp := resp.GetAccessRequester().GetSession().GetExpiresAt(fosite.AccessToken)
+	exp := resp.GetAccessRequester().GetSession().GetExpiresAt(tt)
 	if exp.IsZero() {
-		exp = resp.GetAccessRequester().GetRequestedAt().Add(h.AccessTokenLifespan)
+		if tt == fosite.RefreshToken {
+			exp = resp.GetAccessRequester().GetRequestedAt().Add(h.RefreshTokenLifespan)
+		} else {
+			exp = resp.GetAccessRequester().GetRequestedAt().Add(h.AccessTokenLifespan)
+		}
 	}
 
 	session, ok := resp.GetAccessRequester().GetSession().(*Session)

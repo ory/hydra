@@ -219,6 +219,7 @@ func newOAuth2Handler(c *config.Config, frontend, backend *httprouter.Router, cm
 		ErrorURL:               *errorURL,
 		H:                      w,
 		AccessTokenLifespan:    c.GetAccessTokenLifespan(),
+		RefreshTokenLifespan:   c.GetRefreshTokenLifespan(),
 		CookieStore:            sessions.NewCookieStore(c.GetCookieSecret()),
 		IssuerURL:              c.Issuer,
 		ClientRegistrationURL:  c.ClientRegistrationURL,

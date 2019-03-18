@@ -287,6 +287,21 @@ func (m *SQLManager) HandleConsentRequest(ctx context.Context, challenge string,
 		strings.Join(sqlParamsConsentRequestHandled, ", "),
 		":"+strings.Join(sqlParamsConsentRequestHandled, ", :"),
 	), d); err != nil {
+		err = sqlcon.HandleError(err)
+		if errors.Cause(err) == sqlcon.ErrUniqueViolation {
+			return m.replaceUnusedConsentRequest(ctx, challenge, d)
+		}
+		return nil, err
+	}
+
+	return m.GetConsentRequest(ctx, challenge)
+}
+
+func (m *SQLManager) replaceUnusedConsentRequest(ctx context.Context, challenge string, d *sqlHandledConsentRequest) (*ConsentRequest, error) {
+	if _, err := m.DB.NamedExecContext(ctx, fmt.Sprintf(
+		"UPDATE hydra_oauth2_consent_request_handled SET %s WHERE challenge=:challenge AND was_used=false",
+		strings.Join(sqlParamsConsentRequestHandledUpdate, ", "),
+	), d); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
 

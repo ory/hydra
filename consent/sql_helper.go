@@ -23,6 +23,7 @@ package consent
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"strings"
 	"time"
 
@@ -89,6 +90,13 @@ var sqlParamsConsentRequestHandled = []string{
 	"session_id_token",
 	"was_used",
 }
+var sqlParamsConsentRequestHandledUpdate = func() []string {
+	p := make([]string, len(sqlParamsConsentRequestHandled))
+	for i, v := range sqlParamsConsentRequestHandled {
+		p[i] = fmt.Sprintf("%s=:%s", v, v)
+	}
+	return p
+}()
 
 var sqlParamsAuthSession = []string{
 	"id",

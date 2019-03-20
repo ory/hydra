@@ -10,7 +10,7 @@
 #                                                                         #
 ###########################################################################
 
-version: '2'
+version: '3'
 
 services:
 
@@ -18,10 +18,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    links:
-      - postgresd:postgresd
-#     Uncomment the following section to use mysql instead.
-#      - mysqld:mysqld
     environment:
 #      - LOG_LEVEL=debug
       - DATABASE_URL=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable
@@ -35,10 +31,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    links:
-      - postgresd:postgresd
-#     Uncomment the following line to use mysql instead.
-#      - mysqld:mysqld
     depends_on:
       - hydra-migrate
 #     Uncomment the following when configuring tracing
@@ -71,17 +63,15 @@ services:
 #      - TRACING_PROVIDER_JAEGER_LOCAL_AGENT_ADDRESS=jaeger:6831
 #      - TRACING_PROVIDER_JAEGER_SAMPLING_TYPE=const
 #      - TRACING_PROVIDER_JAEGER_SAMPLING_VALUE=1
-    restart: on-failure
+    restart: unless-stopped
 
   consent:
     environment:
       - HYDRA_ADMIN_URL=http://hydra:4445
     image: oryd/hydra-login-consent-node:v1.0.0-rc.5
-    links:
-      - hydra
     ports:
       - "3000:3000"
-    restart: on-failure
+    restart: unless-stopped
 
 # Uncomment the following when configuring tracing
 

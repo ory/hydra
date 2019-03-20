@@ -27,6 +27,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/sawadashota/encrypta"
 	"github.com/spf13/cobra"
 
 	"github.com/ory/hydra/config"
@@ -92,6 +93,25 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		fmt.Println("You should not provide secrets using command line flags, the secret might leak to bash history and similar systems")
 	}
 
+	var ek encrypta.EncryptionKey
+	var encryptSecret bool
+	pgpKey := flagx.MustGetString(cmd, "pgp-key")
+	pgpKeyURL := flagx.MustGetString(cmd, "pgp-key-url")
+	keybaseUsername := flagx.MustGetString(cmd, "keybase")
+	if pgpKey != "" {
+		ek, err = encrypta.NewPublicKeyFromBase64Encoded(pgpKey)
+		encryptSecret = true
+	} else if pgpKeyURL != "" {
+		ek, err = encrypta.NewPublicKeyFromURL(pgpKeyURL)
+		encryptSecret = true
+	} else if keybaseUsername != "" {
+		ek, err = encrypta.NewPublicKeyFromKeybase(keybaseUsername)
+		encryptSecret = true
+	}
+	if err != nil {
+		cmdx.Fatalf("Failed to load encryption key")
+	}
+
 	cc := hydra.OAuth2Client{
 		ClientId:                flagx.MustGetString(cmd, "id"),
 		ClientSecret:            secret,
@@ -119,6 +139,18 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		fmt.Println("This OAuth 2.0 Client has no secret")
 	} else {
 		if echoSecret {
+			if encryptSecret {
+				enc, err := ek.Encrypt([]byte(result.ClientSecret))
+				if err == nil {
+					fmt.Printf("OAuth 2.0 Encrypted Client Secret: %s\n", enc.Base64Encode())
+					return
+				}
+
+				// executes this at last to print raw client secret
+				// because if executes immediately, nobody knows client secret
+				defer cmdx.Fatalf("Failed to encrypt client secret")
+			}
+
 			fmt.Printf("OAuth 2.0 Client Secret: %s\n", result.ClientSecret)
 		}
 	}

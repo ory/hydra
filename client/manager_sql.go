@@ -29,7 +29,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
-	"github.com/rubenv/sql-migrate"
+	migrate "github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/square/go-jose.v2"
 
@@ -44,7 +44,7 @@ var Migrations = map[string]*dbal.PackrMigrationSource{
 	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/shared", "migrations/sql/postgres"}, true),
 }
 
-func NewSQLManager(db *sqlx.DB, r registry) *SQLManager {
+func NewSQLManager(db *sqlx.DB, r InternalRegistry) *SQLManager {
 	return &SQLManager{
 		r:  r,
 		DB: db,
@@ -52,7 +52,7 @@ func NewSQLManager(db *sqlx.DB, r registry) *SQLManager {
 }
 
 type SQLManager struct {
-	r  registry
+	r  InternalRegistry
 	DB *sqlx.DB
 }
 

@@ -23,12 +23,13 @@ package oauth2
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ory/x/urlx"
 	"net/http"
 	"net/url"
 	"reflect"
 	"strings"
 	"time"
+
+	"github.com/ory/x/urlx"
 
 	jwt2 "github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"

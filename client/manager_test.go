@@ -27,6 +27,10 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/golang/mock/gomock"
+
+	"github.com/ory/hydra/internal"
+
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/require"
@@ -39,45 +43,52 @@ import (
 var clientManagers = map[string]Manager{}
 var m sync.Mutex
 
-func init() {
-	clientManagers["memory"] = NewMemoryManager(&fosite.BCrypt{})
-}
-
 func TestMain(m *testing.M) {
 	flag.Parse()
 	runner := dockertest.Register()
 	runner.Exit(m.Run())
 }
 
-func connectToMySQL() {
-	db, err := dockertest.ConnectToTestMySQL()
-	if err != nil {
-		log.Fatalf("Could not connect to database: %v", err)
-	}
+func connectToMySQL(r InternalRegistry) func() {
+	return func() {
+		db, err := dockertest.ConnectToTestMySQL()
+		if err != nil {
+			log.Fatalf("Could not connect to database: %v", err)
+		}
 
-	s := &SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}
-	m.Lock()
-	clientManagers["mysql"] = s
-	m.Unlock()
+		s := NewSQLManager(db, r)
+		m.Lock()
+		clientManagers["mysql"] = s
+		m.Unlock()
+	}
 }
 
-func connectToPG() {
-	db, err := dockertest.ConnectToTestPostgreSQL()
-	if err != nil {
-		log.Fatalf("Could not connect to database: %v", err)
-	}
+func connectToPG(r InternalRegistry) func() {
+	return func() {
+		db, err := dockertest.ConnectToTestPostgreSQL()
+		if err != nil {
+			log.Fatalf("Could not connect to database: %v", err)
+		}
 
-	s := &SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}
-	m.Lock()
-	clientManagers["postgres"] = s
-	m.Unlock()
+		s := NewSQLManager(db, r)
+		m.Lock()
+		clientManagers["postgres"] = s
+		m.Unlock()
+	}
 }
 
 func TestManagers(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	r := internal.NewMockInternalRegistry(ctrl)
+	r.EXPECT().ClientHasher().AnyTimes().Return(&fosite.BCrypt{WorkFactor: 4})
+
+	clientManagers["memory"] = NewMemoryManager(r)
+
 	if !testing.Short() {
 		dockertest.Parallel([]func(){
-			connectToPG,
-			connectToMySQL,
+			connectToPG(r),
+			connectToMySQL(r),
 		})
 	}
 

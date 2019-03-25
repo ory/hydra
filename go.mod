@@ -7,6 +7,7 @@ require (
 	github.com/gobwas/glob v0.2.3
 	github.com/golang/mock v1.2.0
 	github.com/golang/protobuf v1.3.0 // indirect
+	github.com/google/uuid v1.1.0
 	github.com/gorilla/context v1.1.1
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/sessions v1.1.3
@@ -55,3 +56,5 @@ require (
 	gopkg.in/square/go-jose.v2 v2.2.2
 	gopkg.in/yaml.v1 v1.0.0-20140924161607-9f9df34309c0
 )
+
+replace github.com/ory/x => ../x

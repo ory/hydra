@@ -30,7 +30,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/fosite"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/dbal/migratest"
 )
@@ -63,7 +62,7 @@ func TestXXMigrations(t *testing.T) {
 		func(t *testing.T, db *sqlx.DB, _, step, steps int) {
 			id := fmt.Sprintf("%d-data", step+1)
 			t.Run("poll="+id, func(t *testing.T) {
-				s := &SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}
+				s := NewSQLManager(db, nil)
 				c, err := s.GetConcreteClient(context.TODO(), id)
 				require.NoError(t, err)
 				assert.EqualValues(t, c.GetID(), id)

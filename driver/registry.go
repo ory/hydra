@@ -2,6 +2,7 @@ package driver
 
 import (
 	"github.com/go-errors/errors"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/driver/configuration"
@@ -16,11 +17,15 @@ type Registry interface {
 	dbal.Driver
 
 	WithConfig(c configuration.Provider) Registry
+	WithBuildVersion(bv string) Registry
 
 	x.RegistryLogger
 	x.RegistryWriter
+	x.RegistryCookieStore
 	client.Registry
+	consent.Registry
 	jwk.Registry
+	oauth2.Registry
 
 	ClientHandler() *client.Handler
 	KeyHandler() *jwk.Handler

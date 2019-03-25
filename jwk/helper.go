@@ -21,16 +21,77 @@
 package jwk
 
 import (
+	"context"
 	"crypto/ecdsa"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
 
+	"github.com/ory/hydra/pkg"
+
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
-	jose "gopkg.in/square/go-jose.v2"
+	"gopkg.in/square/go-jose.v2"
 )
+
+func EnsureAsymmetricKeypairExists(ctx context.Context, r registry, g KeyGenerator, set string) error {
+	if _, err := GetOrCreateKey(ctx, r, g, set, "public"); err != nil {
+		return err
+	}
+	if _, err := GetOrCreateKey(ctx, r, g, set, "private"); err != nil {
+		return err
+	}
+	return nil
+}
+
+func GetOrCreateKey(ctx context.Context, r registry, g KeyGenerator, set, prefix string) (*jose.JSONWebKey, error) {
+	keys, err := r.KeyManager().GetKeySet(ctx, set)
+	if errors.Cause(err) == pkg.ErrNotFound || keys != nil && len(keys.Keys) == 0 {
+		r.Logger().Warnf("JSON Web Key Set \"%s\" does not exist yet, generating new key pair...", set)
+		keys, err = createKey(ctx, r, g, set)
+		if err != nil {
+			return nil, err
+		}
+	} else if err != nil {
+		return nil, err
+	}
+
+	key, err := FindKeyByPrefix(keys, prefix)
+	if err != nil {
+		r.Logger().Warnf("JSON Web Key with prefix %s not found in JSON Web Key Set %s, generating new key pair...", prefix, set)
+
+		keys, err = createKey(ctx, r, g, set)
+		if err != nil {
+			return nil, err
+		}
+
+		key, err = FindKeyByPrefix(keys, prefix)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return key, nil
+}
+
+func createKey(ctx context.Context, r registry, g KeyGenerator, set string) (*jose.JSONWebKeySet, error) {
+	keys, err := g.Generate(uuid.New(), "sig")
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not generate JSON Web Key Set \"%s\".", set)
+	}
+
+	for i, k := range keys.Keys {
+		k.Use = "sig"
+		keys.Keys[i] = k
+	}
+
+	if err = r.KeyManager().AddKeySet(ctx, set, keys); err != nil {
+		return nil, errors.Wrapf(err, "Could not persist JSON Web Key Set \"%s\".", set)
+	}
+
+	return keys, nil
+}
 
 func First(keys []jose.JSONWebKey) *jose.JSONWebKey {
 	if len(keys) == 0 {

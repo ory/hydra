@@ -22,13 +22,6 @@ package config
 
 import (
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/lib/pq"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"gopkg.in/yaml.v1"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -36,13 +29,20 @@ import (
 	"os"
 	"strings"
 
+	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"gopkg.in/yaml.v1"
+
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/token/hmac"
 	"github.com/ory/go-convenience/stringsx"
 	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/hydra/metrics/prometheus"
-	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/tracing"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/healthx"
@@ -53,48 +53,47 @@ type Config struct {
 	EndpointURL string `mapstructure:"HYDRA_URL" yaml:"-"`
 
 	// These are used by the host command
-	FrontendBindPort                 int     `mapstructure:"PUBLIC_PORT" yaml:"-"`
-	FrontendBindHost                 string  `mapstructure:"PUBLIC_HOST" yaml:"-"`
-	BackendBindPort                  int     `mapstructure:"ADMIN_PORT" yaml:"-"`
-	BackendBindHost                  string  `mapstructure:"ADMIN_HOST" yaml:"-"`
-	Issuer                           string  `mapstructure:"OAUTH2_ISSUER_URL" yaml:"-"`
+	FrontendBindPort int    `mapstructure:"PUBLIC_PORT" yaml:"-"`
+	FrontendBindHost string `mapstructure:"PUBLIC_HOST" yaml:"-"`
+	BackendBindPort  int    `mapstructure:"ADMIN_PORT" yaml:"-"`
+	BackendBindHost  string `mapstructure:"ADMIN_HOST" yaml:"-"`
+	Issuer           string `mapstructure:"OAUTH2_ISSUER_URL" yaml:"-"`
 
-	ClientRegistrationURL            string  `mapstructure:"OAUTH2_CLIENT_REGISTRATION_URL" yaml:"-"`
+	ClientRegistrationURL string `mapstructure:"OAUTH2_CLIENT_REGISTRATION_URL" yaml:"-"`
 
-	SystemSecret                     string  `mapstructure:"SYSTEM_SECRET" yaml:"-"`
-	RotatedSystemSecret              string  `mapstructure:"ROTATED_SYSTEM_SECRET" yaml:"-"`
+	SystemSecret        string `mapstructure:"SYSTEM_SECRET" yaml:"-"`
+	RotatedSystemSecret string `mapstructure:"ROTATED_SYSTEM_SECRET" yaml:"-"`
 
-	DatabaseURL                      string  `mapstructure:"DATABASE_URL" yaml:"-"`
-	DatabasePlugin                   string  `mapstructure:"DATABASE_PLUGIN" yaml:"-"`
+	DatabaseURL    string `mapstructure:"DATABASE_URL" yaml:"-"`
+	DatabasePlugin string `mapstructure:"DATABASE_PLUGIN" yaml:"-"`
 
+	ConsentURL        string `mapstructure:"OAUTH2_CONSENT_URL" yaml:"-"`
+	LoginURL          string `mapstructure:"OAUTH2_LOGIN_URL" yaml:"-"`
+	LogoutRedirectURL string `mapstructure:"OAUTH2_LOGOUT_REDIRECT_URL" yaml:"-"`
 
-	ConsentURL                       string  `mapstructure:"OAUTH2_CONSENT_URL" yaml:"-"`
-	LoginURL                         string  `mapstructure:"OAUTH2_LOGIN_URL" yaml:"-"`
-	LogoutRedirectURL                string  `mapstructure:"OAUTH2_LOGOUT_REDIRECT_URL" yaml:"-"`
+	DefaultClientScope string `mapstructure:"OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE" yaml:"-"`
+	ErrorURL           string `mapstructure:"OAUTH2_ERROR_URL" yaml:"-"`
 
-	DefaultClientScope               string  `mapstructure:"OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE" yaml:"-"`
-	ErrorURL                         string  `mapstructure:"OAUTH2_ERROR_URL" yaml:"-"`
+	AllowTLSTermination string `mapstructure:"HTTPS_ALLOW_TERMINATION_FROM" yaml:"-"`
 
-	AllowTLSTermination              string  `mapstructure:"HTTPS_ALLOW_TERMINATION_FROM" yaml:"-"`
+	BCryptWorkFactor int `mapstructure:"BCRYPT_COST" yaml:"-"`
 
-	BCryptWorkFactor                 int     `mapstructure:"BCRYPT_COST" yaml:"-"`
-
-	AccessTokenLifespan              string  `mapstructure:"ACCESS_TOKEN_LIFESPAN" yaml:"-"`
-	ScopeStrategy                    string  `mapstructure:"SCOPE_STRATEGY" yaml:"-"`
-	AuthCodeLifespan                 string  `mapstructure:"AUTH_CODE_LIFESPAN" yaml:"-"`
-	RefreshTokenLifespan             string  `mapstructure:"REFRESH_TOKEN_LIFESPAN" yaml:"-"`
-	IDTokenLifespan                  string  `mapstructure:"ID_TOKEN_LIFESPAN" yaml:"-"`
-	LoginConsentRequestLifespan      string  `mapstructure:"LOGIN_CONSENT_REQUEST_LIFESPAN" yaml:"-"`
-	CookieSecret                     string  `mapstructure:"COOKIE_SECRET" yaml:"-"`
-	LogLevel                         string  `mapstructure:"LOG_LEVEL" yaml:"-"`
-	LogFormat                        string  `mapstructure:"LOG_FORMAT" yaml:"-"`
+	AccessTokenLifespan         string `mapstructure:"ACCESS_TOKEN_LIFESPAN" yaml:"-"`
+	ScopeStrategy               string `mapstructure:"SCOPE_STRATEGY" yaml:"-"`
+	AuthCodeLifespan            string `mapstructure:"AUTH_CODE_LIFESPAN" yaml:"-"`
+	RefreshTokenLifespan        string `mapstructure:"REFRESH_TOKEN_LIFESPAN" yaml:"-"`
+	IDTokenLifespan             string `mapstructure:"ID_TOKEN_LIFESPAN" yaml:"-"`
+	LoginConsentRequestLifespan string `mapstructure:"LOGIN_CONSENT_REQUEST_LIFESPAN" yaml:"-"`
+	CookieSecret                string `mapstructure:"COOKIE_SECRET" yaml:"-"`
+	LogLevel                    string `mapstructure:"LOG_LEVEL" yaml:"-"`
+	LogFormat                   string `mapstructure:"LOG_FORMAT" yaml:"-"`
 
 	//AccessControlResourcePrefix      string  `mapstructure:"RESOURCE_NAME_PREFIX" yaml:"-"`
-	SubjectTypesSupported            string  `mapstructure:"OIDC_SUBJECT_TYPES_SUPPORTED" yaml:"-"`
-	SubjectIdentifierAlgorithmSalt   string  `mapstructure:"OIDC_SUBJECT_TYPE_PAIRWISE_SALT" yaml:"-"`
-	OpenIDDiscoveryClaimsSupported   string  `mapstructure:"OIDC_DISCOVERY_CLAIMS_SUPPORTED" yaml:"-"`
-	OpenIDDiscoveryScopesSupported   string  `mapstructure:"OIDC_DISCOVERY_SCOPES_SUPPORTED" yaml:"-"`
-	OpenIDDiscoveryUserinfoEndpoint  string  `mapstructure:"OIDC_DISCOVERY_USERINFO_ENDPOINT" yaml:"-"`
+	SubjectTypesSupported           string `mapstructure:"OIDC_SUBJECT_TYPES_SUPPORTED" yaml:"-"`
+	SubjectIdentifierAlgorithmSalt  string `mapstructure:"OIDC_SUBJECT_TYPE_PAIRWISE_SALT" yaml:"-"`
+	OpenIDDiscoveryClaimsSupported  string `mapstructure:"OIDC_DISCOVERY_CLAIMS_SUPPORTED" yaml:"-"`
+	OpenIDDiscoveryScopesSupported  string `mapstructure:"OIDC_DISCOVERY_SCOPES_SUPPORTED" yaml:"-"`
+	OpenIDDiscoveryUserinfoEndpoint string `mapstructure:"OIDC_DISCOVERY_USERINFO_ENDPOINT" yaml:"-"`
 
 	SendOAuth2DebugMessagesToClients bool    `mapstructure:"OAUTH2_SHARE_ERROR_DEBUG" yaml:"-"`
 	OAuth2AccessTokenStrategy        string  `mapstructure:"OAUTH2_ACCESS_TOKEN_STRATEGY" yaml:"-"`
@@ -119,7 +118,7 @@ type Config struct {
 }
 
 //func (c *Config) MustValidate() {
-//	if stringslice.Has(c.GetSubjectTypesSupported(), "pairwise") && c.OAuth2AccessTokenStrategy == "jwt" {
+//	if stringslice.Has(c.GetSubjectTypesSupported(), "pairwise") && c.OAuth2AccessTokenStrategy == "jw^t" {
 //		c.GetLogger().Fatalf(`The pairwise subject identifier algorithm is not supported by the JWT OAuth 2.0 Access Token Strategy. Please remove "pairwise" from OIDC_SUBJECT_TYPES_SUPPORTED or set OAUTH2_ACCESS_TOKEN_STRATEGY to "opaque"`)
 //	}
 //
@@ -405,6 +404,7 @@ func (c *Config) Resolve(join ...string) *url.URL {
 
 	return urlx.AppendPaths(c.cluster, join...)
 }
+
 //
 //func (c *Config) GetCookieSecret() []byte {
 //	if c.CookieSecret != "" {

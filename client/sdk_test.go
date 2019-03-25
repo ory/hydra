@@ -28,11 +28,15 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/herodot"
+	"github.com/ory/hydra/internal"
+	"github.com/ory/hydra/x"
+
+	"github.com/golang/mock/gomock"
 	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 )
@@ -61,8 +65,23 @@ func createTestClient(prefix string) hydra.OAuth2Client {
 }
 
 func TestClientSDK(t *testing.T) {
-	manager := client.NewMemoryManager(nil)
-	handler := client.NewHandler(manager, herodot.NewJSONWriter(nil), []string{"foo", "bar"}, []string{"public"})
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	conf := internal.NewMockClientConfiguration(ctrl)
+	r := internal.NewMockInternalRegistry(ctrl)
+	conf.EXPECT().SubjectTypesSupported().AnyTimes().Return([]string{"public"})
+	conf.EXPECT().DefaultClientScope().AnyTimes().Return([]string{"foo", "bar"})
+	conf.EXPECT().BCryptCost().AnyTimes().Return(4)
+
+	validator := client.NewValidator(conf)
+	manager := client.NewMemoryManager(r)
+	r.EXPECT().ClientManager().AnyTimes().Return(manager)
+	r.EXPECT().ClientValidator().AnyTimes().Return(validator)
+	r.EXPECT().ClientHasher().AnyTimes().Return(x.NewBCrypt(conf))
+	r.EXPECT().Writer().AnyTimes().Return(herodot.NewJSONWriter(nil))
+
+	handler := client.NewHandler(r)
 
 	router := httprouter.New()
 	handler.SetRoutes(router)
@@ -74,7 +93,7 @@ func TestClientSDK(t *testing.T) {
 		})
 		require.NoError(t, err)
 		require.EqualValues(t, http.StatusCreated, response.StatusCode)
-		assert.EqualValues(t, handler.Validator.DefaultClientScopes, strings.Split(result.Scope, " "))
+		assert.EqualValues(t, conf.DefaultClientScope(), strings.Split(result.Scope, " "))
 
 		response, err = c.DeleteOAuth2Client("scoped")
 		require.NoError(t, err)

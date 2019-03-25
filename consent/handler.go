@@ -48,11 +48,11 @@ const (
 
 func NewHandler(
 	r registry,
-c Configuration,
+	c Configuration,
 ) *Handler {
 	return &Handler{
-		c:c,
-		r:r,
+		c: c,
+		r: r,
 	}
 }
 

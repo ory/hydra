@@ -47,6 +47,8 @@ format:
 .PHONY: gen-mocks
 gen-mocks:
 		mockgen -package oauth2_test -destination oauth2/oauth2_provider_mock_test.go github.com/ory/fosite OAuth2Provider
+		mockgen -mock_names Registry=MockClientRegistry -package internal -destination internal/client_registry_mock.go github.com/ory/hydra/client InternalRegistry
+		mockgen -mock_names Configuration=MockClientConfiguration -package internal -destination internal/client_configuration_mock.go github.com/ory/hydra/client Configuration
 
 .PHONY: gen-sql
 gen-sql:

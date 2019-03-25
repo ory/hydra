@@ -2,10 +2,11 @@ package configuration
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func setEnv(key, value string) func(t *testing.T) {
@@ -29,7 +30,7 @@ func TestSubjectTypesSupported(t *testing.T) {
 			e: []string{"public", "pairwise"},
 		},
 	} {
-		t.Run(fmt.Sprintf("case=%d/description=%s",k,tc.d), func(t *testing.T) {
+		t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
 			assert.EqualValues(t, tc.e, p.SubjectTypesSupported())
 		})
 	}

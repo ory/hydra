@@ -12,12 +12,12 @@ type DefaultDriver struct {
 	r Registry
 }
 
-func NewDefaultDriver( r Registry, c configuration.Provider, l logrus.FieldLogger) Driver {
+func NewDefaultDriver(r Registry, c configuration.Provider, l logrus.FieldLogger) Driver {
 	configuration.MustValidate(c)
-	return NewDefaultDriverWithoutValidation( r, c, l)
+	return NewDefaultDriverWithoutValidation(r, c, l)
 }
 
-func NewDefaultDriverWithoutValidation( r Registry, c configuration.Provider, l logrus.FieldLogger) Driver {
+func NewDefaultDriverWithoutValidation(r Registry, c configuration.Provider, l logrus.FieldLogger) Driver {
 	return &DefaultDriver{
 		r: r.WithConfig(c),
 		l: l,

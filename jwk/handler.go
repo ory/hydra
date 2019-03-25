@@ -42,7 +42,7 @@ type Handler struct {
 }
 
 func NewHandler(r registry, c Configuration) *Handler {
-	return &Handler{r:r, c:c}
+	return &Handler{r: r, c: c}
 }
 
 func (h *Handler) SetRoutes(frontend, backend *httprouter.Router, corsMiddleware func(http.Handler) http.Handler) {

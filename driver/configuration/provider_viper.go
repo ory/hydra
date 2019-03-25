@@ -2,16 +2,17 @@ package configuration
 
 import (
 	"fmt"
-	"github.com/ory/fosite"
+	"net/url"
+	"time"
+
+	"github.com/sirupsen/logrus"
+
 	"github.com/ory/hydra/pkg"
-	"github.com/ory/x/tracing"
+	"github.com/ory/hydra/tracing"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/stringslice"
 	"github.com/ory/x/urlx"
 	"github.com/ory/x/viperx"
-	"github.com/sirupsen/logrus"
-	"net/url"
-	"time"
 )
 
 type ViperProvider struct {
@@ -24,6 +25,10 @@ func NewViperProvider(l logrus.FieldLogger) Provider {
 	return &ViperProvider{
 		l: l,
 	}
+}
+
+func (v *ViperProvider) WellKnownKeys(include ...string) []string {
+	return append(viperx.GetStringSlice(v.l, "oidc.jwks.publish", []string{}), include...)
 }
 
 func (v *ViperProvider) SubjectTypesSupported() []string {
@@ -67,7 +72,7 @@ func (v *ViperProvider) DataSourcePlugin() string {
 }
 
 func (v *ViperProvider) BCryptCost() int {
-	return viperx.GetInt(v.l, "hashers.bcrypt.cost", 10,"BCRYPT_COST")
+	return viperx.GetInt(v.l, "hashers.bcrypt.cost", 10, "BCRYPT_COST")
 }
 
 func (v *ViperProvider) AdminListenOn() string {
@@ -102,14 +107,8 @@ func (v *ViperProvider) AuthCodeLifespan() time.Duration {
 	return viperx.GetDuration(v.l, "ttl.auth_code", time.Minute*10, "AUTH_CODE_LIFESPAN")
 }
 
-func (v *ViperProvider) ScopeStrategy() fosite.ScopeStrategy {
-	s := viperx.GetString(v.l, "strategies.scope", "", "SCOPE_STRATEGY")
-	if s == "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY" {
-		v.l.Warn("Using deprecated hierarchical scope strategy, consider upgrading to wildcards.")
-		return fosite.HierarchicScopeStrategy
-	}
-
-	return fosite.WildcardScopeStrategy
+func (v *ViperProvider) ScopeStrategy() string {
+	return viperx.GetString(v.l, "strategies.scope", "", "SCOPE_STRATEGY")
 }
 
 func (v *ViperProvider) TracingServiceName() string {

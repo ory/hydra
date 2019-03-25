@@ -7,6 +7,7 @@ import (
 
 type registry interface {
 	x.RegistryWriter
+	x.RegistryLogger
 	Registry
 }
 

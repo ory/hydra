@@ -38,7 +38,7 @@ type MemoryManager struct {
 	sync.RWMutex
 }
 
-func NewMemoryManager() *MemoryManager{
+func NewMemoryManager() *MemoryManager {
 	return &MemoryManager{
 		Keys: map[string]*jose.JSONWebKeySet{},
 	}

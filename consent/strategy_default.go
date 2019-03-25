@@ -58,8 +58,8 @@ type DefaultStrategy struct {
 }
 
 func NewStrategy(
-	c Configuration,
 	r registry,
+	c Configuration,
 ) *DefaultStrategy {
 	return &DefaultStrategy{
 		c: c,
@@ -104,7 +104,7 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 		}
 	}
 
-	if maxAge > 0 && session.AuthenticatedAt.UTC().Add(time.Second * time.Duration(maxAge)).Before(time.Now().UTC()) {
+	if maxAge > 0 && session.AuthenticatedAt.UTC().Add(time.Second*time.Duration(maxAge)).Before(time.Now().UTC()) {
 		if stringslice.Has(prompt, "none") {
 			return errors.WithStack(fosite.ErrLoginRequired.WithDebug("Request failed because prompt is set to \"none\" and authentication time reached max_age"))
 		}
@@ -116,7 +116,7 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 		return s.forwardAuthenticationRequest(w, r, ar, session.Subject, session.AuthenticatedAt, session)
 	}
 
-	token, err := s.r.JWTStrategy().Decode(r.Context(), idTokenHint)
+	token, err := s.r.OpenIDJWTStrategy().Decode(r.Context(), idTokenHint)
 	if ve, ok := errors.Cause(err).(*jwtgo.ValidationError); err == nil || (ok && ve.Errors == jwtgo.ValidationErrorExpired) {
 	} else {
 		return err
@@ -177,7 +177,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 
 	var idTokenHintClaims jwtgo.MapClaims
 	if idTokenHint := ar.GetRequestForm().Get("id_token_hint"); len(idTokenHint) > 0 {
-		token, err := s.r.JWTStrategy().Decode(r.Context(), idTokenHint)
+		token, err := s.r.OpenIDJWTStrategy().Decode(r.Context(), idTokenHint)
 		if ve, ok := errors.Cause(err).(*jwtgo.ValidationError); err == nil || (ok && ve.Errors == jwtgo.ValidationErrorExpired) {
 			if hintClaims, ok := token.Claims.(jwtgo.MapClaims); ok {
 				idTokenHintClaims = hintClaims

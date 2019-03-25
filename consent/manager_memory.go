@@ -40,10 +40,10 @@ type MemoryManager struct {
 	authSessions           map[string]AuthenticationSession
 	pairwise               []ForcedObfuscatedAuthenticationSession
 	m                      map[string]*sync.RWMutex
-	store                  pkg.FositeStorer
+	r                      registry
 }
 
-func NewMemoryManager(store pkg.FositeStorer) *MemoryManager {
+func NewMemoryManager(r registry) *MemoryManager {
 	return &MemoryManager{
 		consentRequests:        map[string]ConsentRequest{},
 		handledConsentRequests: map[string]HandledConsentRequest{},
@@ -51,7 +51,7 @@ func NewMemoryManager(store pkg.FositeStorer) *MemoryManager {
 		handledAuthRequests:    map[string]HandledAuthenticationRequest{},
 		authSessions:           map[string]AuthenticationSession{},
 		pairwise:               []ForcedObfuscatedAuthenticationSession{},
-		store:                  store,
+		r:                      r,
 		m: map[string]*sync.RWMutex{
 			"consentRequests":        new(sync.RWMutex),
 			"handledConsentRequests": new(sync.RWMutex),
@@ -108,12 +108,12 @@ func (m *MemoryManager) RevokeUserClientConsentSession(ctx context.Context, user
 			delete(m.consentRequests, k)
 			m.m["consentRequests"].Unlock()
 
-			if err := m.store.RevokeAccessToken(nil, c.Challenge); errors.Cause(err) == fosite.ErrNotFound {
+			if err := m.r.OAuth2Storage().RevokeAccessToken(nil, c.Challenge); errors.Cause(err) == fosite.ErrNotFound {
 				// do nothing
 			} else if err != nil {
 				return err
 			}
-			if err := m.store.RevokeRefreshToken(nil, c.Challenge); errors.Cause(err) == fosite.ErrNotFound {
+			if err := m.r.OAuth2Storage().RevokeRefreshToken(nil, c.Challenge); errors.Cause(err) == fosite.ErrNotFound {
 				// do nothing
 			} else if err != nil {
 				return err

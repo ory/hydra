@@ -28,35 +28,37 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/client"
 	"github.com/ory/x/sqlcon"
 )
 
 type FositeMemoryStore struct {
-	AuthorizeCodes      map[string]authorizeCode
-	IDSessions          map[string]fosite.Requester
-	AccessTokens        map[string]fosite.Requester
-	RefreshTokens       map[string]fosite.Requester
-	PKCES               map[string]fosite.Requester
+	AuthorizeCodes map[string]authorizeCode
+	IDSessions     map[string]fosite.Requester
+	AccessTokens   map[string]fosite.Requester
+	RefreshTokens  map[string]fosite.Requester
+	PKCES          map[string]fosite.Requester
 
 	c Configuration
 	r registry
 
 	sync.RWMutex
-	
+
 	//client.Manager
 }
 
-func NewFositeMemoryStore(c Configuration, r registry) *FositeMemoryStore {
+func NewFositeMemoryStore(
+	r registry,
+	c Configuration,
+) *FositeMemoryStore {
 	return &FositeMemoryStore{
-		AuthorizeCodes:      make(map[string]authorizeCode),
-		IDSessions:          make(map[string]fosite.Requester),
-		AccessTokens:        make(map[string]fosite.Requester),
-		PKCES:               make(map[string]fosite.Requester),
-		RefreshTokens:       make(map[string]fosite.Requester),
-		
-		c:c,
-		r:r,
+		AuthorizeCodes: make(map[string]authorizeCode),
+		IDSessions:     make(map[string]fosite.Requester),
+		AccessTokens:   make(map[string]fosite.Requester),
+		PKCES:          make(map[string]fosite.Requester),
+		RefreshTokens:  make(map[string]fosite.Requester),
+
+		c: c,
+		r: r,
 	}
 }
 

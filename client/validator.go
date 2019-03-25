@@ -47,6 +47,13 @@ func NewValidator(conf Configuration) *Validator {
 	}
 }
 
+func NewValidatorWithClient(conf Configuration, client *http.Client) *Validator {
+	return &Validator{
+		c:    client,
+		conf: conf,
+	}
+}
+
 func (v *Validator) Validate(c *Client) error {
 	id := uuid.New()
 	c.ClientID = stringsx.Coalesce(c.ClientID, id)
@@ -97,7 +104,7 @@ func (v *Validator) Validate(c *Client) error {
 	c.SecretExpiresAt = 0
 
 	if len(c.SectorIdentifierURI) > 0 {
-		if err := v.validateSectorIdentifierURL(c.SectorIdentifierURI, c.GetRedirectURIs()); err != nil {
+		if err := v.ValidateSectorIdentifierURL(c.SectorIdentifierURI, c.GetRedirectURIs()); err != nil {
 			return err
 		}
 	}
@@ -117,21 +124,21 @@ func (v *Validator) Validate(c *Client) error {
 	}
 
 	if c.SubjectType != "" {
-		if !stringslice.Has(v.conf.SupportedSubjectTypes(), c.SubjectType) {
-			return errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf("Subject type %s is not supported by server, only %v are allowed.", c.SubjectType, v.conf.SupportedSubjectTypes())))
+		if !stringslice.Has(v.conf.SubjectTypesSupported(), c.SubjectType) {
+			return errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf("Subject type %s is not supported by server, only %v are allowed.", c.SubjectType, v.conf.SubjectTypesSupported())))
 		}
 	} else {
-		if stringslice.Has(v.conf.SupportedSubjectTypes(), "public") {
+		if stringslice.Has(v.conf.SubjectTypesSupported(), "public") {
 			c.SubjectType = "public"
 		} else {
-			c.SubjectType = v.conf.SupportedSubjectTypes()[0]
+			c.SubjectType = v.conf.SubjectTypesSupported()[0]
 		}
 	}
 
 	return nil
 }
 
-func (v *Validator) validateSectorIdentifierURL(location string, redirectURIs []string) error {
+func (v *Validator) ValidateSectorIdentifierURL(location string, redirectURIs []string) error {
 	l, err := url.Parse(location)
 	if err != nil {
 		return errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf("Value of sector_identifier_uri could not be parsed: %s", err)))

@@ -3,7 +3,6 @@ package oauth2
 import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
-	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/driver/configuration"
@@ -11,8 +10,6 @@ import (
 	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/x"
 )
-
-
 
 type registry interface {
 	client.Registry
@@ -29,7 +26,6 @@ type Registry interface {
 	ScopeStrategy() fosite.ScopeStrategy
 	AccessTokenJWTStrategy() jwk.JWTStrategy
 	OpenIDJWTStrategy() jwk.JWTStrategy
-	JWTStrategy() jwt.JWTStrategy
 	OpenIDConnectRequestValidator() *openid.OpenIDConnectRequestValidator
 }
 

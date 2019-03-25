@@ -22,6 +22,7 @@ package x
 
 import (
 	"context"
+
 	"github.com/ory/hydra/driver/configuration"
 
 	"github.com/pkg/errors"
@@ -43,7 +44,7 @@ func NewBCrypt(c configuration.Provider) *BCrypt {
 }
 
 func (b *BCrypt) Hash(ctx context.Context, data []byte) ([]byte, error) {
-	cf := b.c.()
+	cf := b.c.BCryptCost()
 	if cf == 0 {
 		cf = defaultBCryptWorkFactor
 	}

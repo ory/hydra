@@ -1,10 +1,10 @@
 package configuration
 
 import (
-	"github.com/ory/fosite"
-	"github.com/ory/x/tracing"
 	"net/url"
 	"time"
+
+	"github.com/ory/hydra/tracing"
 )
 
 type Provider interface {
@@ -12,7 +12,6 @@ type Provider interface {
 	//HashSignature() bool
 	//IsUsingJWTAsAccessTokens() bool
 	WellKnownKeys(include ...string) []string
-
 
 	SubjectTypesSupported() []string
 	ConsentURL() *url.URL
@@ -39,7 +38,7 @@ type Provider interface {
 	RefreshTokenLifespan() time.Duration
 	IDTokenLifespan() time.Duration
 	AuthCodeLifespan() time.Duration
-	ScopeStrategy() fosite.ScopeStrategy
+	ScopeStrategy() string
 	TracingServiceName() string
 	TracingProvider() string
 	TracingJaegerConfig() *tracing.JaegerConfig

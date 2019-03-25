@@ -2,8 +2,9 @@ package x
 
 import (
 	"github.com/gorilla/sessions"
-	"github.com/ory/herodot"
 	"github.com/sirupsen/logrus"
+
+	"github.com/ory/herodot"
 )
 
 type RegistryLogger interface {

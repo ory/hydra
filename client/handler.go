@@ -1,4 +1,3 @@
-
 /*
  * Copyright © 2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
  *
@@ -34,16 +33,16 @@ import (
 )
 
 type Handler struct {
-	r registry
+	r InternalRegistry
 }
 
 const (
 	ClientsHandlerPath = "/clients"
 )
 
-func NewHandler(r registry) *Handler {
+func NewHandler(r InternalRegistry) *Handler {
 	return &Handler{
-		r:r,
+		r: r,
 	}
 }
 

@@ -124,7 +124,7 @@ func TestSQLConsentConverter(t *testing.T) {
 	b := &HandledConsentRequest{
 		ConsentRequest:  a,
 		RememberFor:     10,
-		Remember:        false,
+		Remember:        true,
 		GrantedScope:    []string{"asdf", "fdsa"},
 		GrantedAudience: []string{"auda", "audb"},
 		AuthenticatedAt: time.Now().UTC().Add(-time.Minute),

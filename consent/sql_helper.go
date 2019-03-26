@@ -343,7 +343,7 @@ func (s *sqlHandledConsentRequest) toHandledConsentRequest(r *ConsentRequest) (*
 		GrantedScope:    stringsx.Splitx(s.GrantedScope, "|"),
 		GrantedAudience: stringsx.Splitx(s.GrantedAudience.String, "|"),
 		RememberFor:     s.RememberFor,
-		Remember:        false,
+		Remember:        s.Remember,
 		Challenge:       s.Challenge,
 		RequestedAt:     s.RequestedAt,
 		WasUsed:         s.WasUsed,

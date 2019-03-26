@@ -28,7 +28,7 @@ import (
 
 	"github.com/ory/hydra/config"
 	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/x"
 )
 
 func createOrGetJWK(c *config.Config, set, kid, prefix string) (key *jose.JSONWebKey, err error) {
@@ -37,7 +37,7 @@ func createOrGetJWK(c *config.Config, set, kid, prefix string) (key *jose.JSONWe
 	expectDependency(c.GetLogger(), ctx.KeyManager)
 
 	keys, err := ctx.KeyManager.GetKeySet(context.TODO(), set)
-	if errors.Cause(err) == pkg.ErrNotFound || keys != nil && len(keys.Keys) == 0 {
+	if errors.Cause(err) == x.ErrNotFound || keys != nil && len(keys.Keys) == 0 {
 		c.GetLogger().Infof("JSON Web Key Set %s does not exist yet, generating new key pair...", set)
 		keys, err = createJWKS(ctx, set, kid)
 		if err != nil {

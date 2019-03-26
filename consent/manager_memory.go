@@ -28,7 +28,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/pagination"
 )
 
@@ -40,10 +40,10 @@ type MemoryManager struct {
 	authSessions           map[string]AuthenticationSession
 	pairwise               []ForcedObfuscatedAuthenticationSession
 	m                      map[string]*sync.RWMutex
-	r                      registry
+	r                      InternalRegistry
 }
 
-func NewMemoryManager(r registry) *MemoryManager {
+func NewMemoryManager(r InternalRegistry) *MemoryManager {
 	return &MemoryManager{
 		consentRequests:        map[string]ConsentRequest{},
 		handledConsentRequests: map[string]HandledConsentRequest{},
@@ -81,7 +81,7 @@ func (m *MemoryManager) GetForcedObfuscatedAuthenticationSession(ctx context.Con
 		}
 	}
 
-	return nil, errors.WithStack(pkg.ErrNotFound)
+	return nil, errors.WithStack(x.ErrNotFound)
 }
 
 func (m *MemoryManager) RevokeUserConsentSession(ctx context.Context, user string) error {
@@ -123,7 +123,7 @@ func (m *MemoryManager) RevokeUserClientConsentSession(ctx context.Context, user
 	}
 
 	if !found {
-		return errors.WithStack(pkg.ErrNotFound)
+		return errors.WithStack(x.ErrNotFound)
 	}
 	return nil
 }
@@ -141,7 +141,7 @@ func (m *MemoryManager) RevokeUserAuthenticationSession(ctx context.Context, use
 	}
 
 	if !found {
-		return errors.WithStack(pkg.ErrNotFound)
+		return errors.WithStack(x.ErrNotFound)
 	}
 	return nil
 }
@@ -162,7 +162,7 @@ func (m *MemoryManager) GetConsentRequest(ctx context.Context, challenge string)
 
 	c, ok := m.consentRequests[challenge]
 	if !ok {
-		return nil, errors.WithStack(pkg.ErrNotFound)
+		return nil, errors.WithStack(x.ErrNotFound)
 	}
 
 	for _, h := range m.handledConsentRequests {
@@ -202,14 +202,14 @@ func (m *MemoryManager) VerifyAndInvalidateConsentRequest(ctx context.Context, v
 			}
 		}
 	}
-	return nil, errors.WithStack(pkg.ErrNotFound)
+	return nil, errors.WithStack(x.ErrNotFound)
 }
 
 func (m *MemoryManager) FindGrantedAndRememberedConsentRequests(ctx context.Context, client, subject string) ([]HandledConsentRequest, error) {
 	var rs []HandledConsentRequest
 	for _, c := range m.handledConsentRequests {
 		cr, err := m.GetConsentRequest(ctx, c.Challenge)
-		if errors.Cause(err) == pkg.ErrNotFound {
+		if errors.Cause(err) == x.ErrNotFound {
 			return nil, errors.WithStack(ErrNoPreviousConsentFound)
 		} else if err != nil {
 			return nil, err
@@ -298,7 +298,7 @@ func (m *MemoryManager) GetAuthenticationSession(ctx context.Context, id string)
 	if c, ok := m.authSessions[id]; ok {
 		return &c, nil
 	}
-	return nil, errors.WithStack(pkg.ErrNotFound)
+	return nil, errors.WithStack(x.ErrNotFound)
 }
 
 func (m *MemoryManager) CreateAuthenticationSession(ctx context.Context, a *AuthenticationSession) error {
@@ -334,7 +334,7 @@ func (m *MemoryManager) GetAuthenticationRequest(ctx context.Context, challenge 
 
 	c, ok := m.authRequests[challenge]
 	if !ok {
-		return nil, errors.WithStack(pkg.ErrNotFound)
+		return nil, errors.WithStack(x.ErrNotFound)
 	}
 
 	for _, h := range m.handledAuthRequests {
@@ -374,5 +374,5 @@ func (m *MemoryManager) VerifyAndInvalidateAuthenticationRequest(ctx context.Con
 			}
 		}
 	}
-	return nil, errors.WithStack(pkg.ErrNotFound)
+	return nil, errors.WithStack(x.ErrNotFound)
 }

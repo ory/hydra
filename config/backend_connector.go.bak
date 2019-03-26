@@ -31,7 +31,7 @@ import (
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/x"
 )
 
 var (
@@ -42,8 +42,8 @@ var (
 
 type BackendConnector interface {
 	Init(url string, l logrus.FieldLogger, opts ...ConnectorOptions) error
-	NewConsentManager(clientManager client.Manager, fs pkg.FositeStorer) consent.Manager
-	NewOAuth2Manager(clientManager client.Manager, accessTokenLifespan time.Duration, tokenStrategy string) pkg.FositeStorer
+	NewConsentManager(clientManager client.Manager, fs x.FositeStorer) consent.Manager
+	NewOAuth2Manager(clientManager client.Manager, accessTokenLifespan time.Duration, tokenStrategy string) x.FositeStorer
 	NewClientManager(hasher fosite.Hasher) client.Manager
 	NewJWKManager(cipher *jwk.AEAD) jwk.Manager
 	Ping() error

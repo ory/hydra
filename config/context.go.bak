@@ -18,27 +18,22 @@
  * @license 	Apache-2.0
  */
 
-package pkg
+package config
 
 import (
-	"context"
-	"time"
-
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/handler/openid"
-	"github.com/ory/fosite/handler/pkce"
+	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/x"
 )
 
-type FositeStorer interface {
-	fosite.Storage
-	oauth2.CoreStorage
-	openid.OpenIDConnectRequestStorage
-	pkce.PKCERequestStorage
+type Context struct {
+	Connection BackendConnector
 
-	RevokeRefreshToken(ctx context.Context, requestID string) error
-
-	RevokeAccessToken(ctx context.Context, requestID string) error
-
-	FlushInactiveAccessTokens(ctx context.Context, notAfter time.Time) error
+	Hasher         fosite.Hasher
+	FositeStrategy oauth2.CoreStrategy
+	FositeStore    x.FositeStorer
+	KeyManager     jwk.Manager
+	ConsentManager consent.Manager
 }

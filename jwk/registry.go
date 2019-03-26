@@ -5,7 +5,7 @@ import (
 	"github.com/ory/hydra/x"
 )
 
-type registry interface {
+type InternalRegistry interface {
 	x.RegistryWriter
 	x.RegistryLogger
 	Registry

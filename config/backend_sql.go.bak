@@ -31,7 +31,7 @@ import (
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlcon"
 )
 
@@ -77,7 +77,7 @@ func (s *SQLBackend) Init(url string, l logrus.FieldLogger, opts ...ConnectorOpt
 	return nil
 }
 
-func (s *SQLBackend) NewConsentManager(clientManager client.Manager, fs pkg.FositeStorer) consent.Manager {
+func (s *SQLBackend) NewConsentManager(clientManager client.Manager, fs x.FositeStorer) consent.Manager {
 	expectDependency(s.l, clientManager, s.db, fs)
 	return consent.NewSQLManager(
 		s.db,
@@ -86,7 +86,7 @@ func (s *SQLBackend) NewConsentManager(clientManager client.Manager, fs pkg.Fosi
 	)
 }
 
-func (s *SQLBackend) NewOAuth2Manager(clientManager client.Manager, accessTokenLifespan time.Duration, tokenStrategy string) pkg.FositeStorer {
+func (s *SQLBackend) NewOAuth2Manager(clientManager client.Manager, accessTokenLifespan time.Duration, tokenStrategy string) x.FositeStorer {
 	expectDependency(s.l, clientManager, s.db)
 	return oauth2.NewFositeSQLStore(clientManager, s.db, s.l, accessTokenLifespan, tokenStrategy == "jwt")
 }

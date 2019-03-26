@@ -2,13 +2,15 @@ package configuration
 
 import (
 	"fmt"
+	"github.com/spf13/viper"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/tracing"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/stringslice"
 	"github.com/ory/x/urlx"
@@ -19,22 +21,71 @@ type ViperProvider struct {
 	l               logrus.FieldLogger
 	ss              [][]byte
 	generatedSecret []byte
+	forcedHTTP      bool
 }
 
-func NewViperProvider(l logrus.FieldLogger) Provider {
+const (
+	ViperKeyWellKnownKeys                  = "oidc.jwks.publish"
+	ViperKeySubjectTypesSupported          = "oidc.subject_identifiers.enabled"
+	ViperKeyDefaultClientScope             = "oidc.dynamic_client_registration.default_scope"
+	ViperKeyDSN                            = "dsn"
+	ViperKeyDataSourcePlugin               = "driver.plugin_path"
+	ViperKeyBCryptCost                     = "hashers.bcrypt.cost"
+	ViperKeyAdminListenOnHost              = "serve.admin.host"
+	ViperKeyAdminListenOnPort              = "serve.admin.port"
+	ViperKeyPublicListenOnHost             = "serve.public.host"
+	ViperKeyPublicListenOnPort             = "serve.public.port"
+	ViperKeyConsentRequestMaxAge           = "ttl.login_consent_request"
+	ViperKeyAccessTokenLifespan            = "ttl.access_token"
+	ViperKeyRefreshTokenLifespan           = "ttl.refresh_token"
+	ViperKeyIDTokenLifespan                = "ttl.id_token"
+	ViperKeyAuthCodeLifespan               = "ttl.auth_code"
+	ViperKeyScopeStrategy                  = "strategies.scope"
+	ViperKeyGetCookieSecrets               = "secrets.cookie"
+	ViperKeyGetSystemSecret                = "secrets.system"
+	ViperKeyLogoutRedirectURL              = "urls.post_logout_redirect"
+	ViperKeyLoginURL                       = "urls.logout"
+	ViperKeyConsentURL                     = "urls.consent"
+	ViperKeyErrorURL                       = "urls.error"
+	ViperKeyPublicURL                      = "urls.self.public"
+	ViperKeyAdminURL                       = "urls.self.public"
+	ViperKeyIssuerURL                      = "urls.self.issuer"
+	ViperKeyOAuth2ClientRegistrationURL    = "oidc.discovery.client_registration_url"
+	ViperKeyAllowTLSTerminationFrom        = "serve.tls.allow_termination_from"
+	ViperKeyAccessTokenStrategy            = "strategies.access_token"
+	ViperKeySubjectIdentifierAlgorithmSalt = "oidc.subject_identifiers.pairwise.salt"
+	ViperKeyOIDCDiscoverySupportedClaims   = "oidc.discovery.supported_claims"
+	ViperKeyOIDCDiscoverySupportedScope    = "oidc.discovery.supported_scope"
+	ViperKeyOIDCDiscoveryUserinfoEndpoint  = "oidc.discovery.userinfo_url"
+)
+
+func NewViperProvider(l logrus.FieldLogger, forcedHTTP bool) Provider {
+
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	viper.AutomaticEnv()
+
 	return &ViperProvider{
-		l: l,
+		l:          l,
+		forcedHTTP: forcedHTTP,
 	}
 }
 
 func (v *ViperProvider) WellKnownKeys(include ...string) []string {
-	return append(viperx.GetStringSlice(v.l, "oidc.jwks.publish", []string{}), include...)
+	return append(viperx.GetStringSlice(v.l, ViperKeyWellKnownKeys, []string{}), include...)
+}
+
+func (v *ViperProvider) ServesHTTPS() bool {
+	return v.forcedHTTP
+}
+
+func (v *ViperProvider) IsUsingJWTAsAccessTokens() bool {
+	return v.AccessTokenStrategy() != "opaque"
 }
 
 func (v *ViperProvider) SubjectTypesSupported() []string {
 	types := stringslice.Filter(
 		viperx.GetStringSlice(v.l,
-			"oidc.subject_identifiers.enabled",
+			ViperKeySubjectTypesSupported,
 			[]string{"public"},
 			"OIDC_SUBJECT_TYPES_SUPPORTED",
 		),
@@ -42,6 +93,10 @@ func (v *ViperProvider) SubjectTypesSupported() []string {
 			return !(s == "public" || s == "pairwise")
 		},
 	)
+
+	if len(types) == 0 {
+		types = []string{"public"}
+	}
 
 	if stringslice.Has(types, "pairwise") {
 		if v.AccessTokenStrategy() == "jwt" {
@@ -57,58 +112,58 @@ func (v *ViperProvider) SubjectTypesSupported() []string {
 
 func (v *ViperProvider) DefaultClientScope() []string {
 	return viperx.GetStringSlice(v.l,
-		"oidc.dynamic_client_registration.default_scope",
+		ViperKeyDefaultClientScope,
 		[]string{"offline_access", "offline", "openid"},
 		"OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE",
 	)
 }
 
 func (v *ViperProvider) DSN() string {
-	return viperx.GetString(v.l, "dsn", "", "DATABASE_URL")
+	return viperx.GetString(v.l, ViperKeyDSN, "", "DATABASE_URL")
 }
 
 func (v *ViperProvider) DataSourcePlugin() string {
-	return viperx.GetString(v.l, "driver.plugin_path", "", "DATABASE_PLUGIN")
+	return viperx.GetString(v.l, ViperKeyDataSourcePlugin, "", "DATABASE_PLUGIN")
 }
 
 func (v *ViperProvider) BCryptCost() int {
-	return viperx.GetInt(v.l, "hashers.bcrypt.cost", 10, "BCRYPT_COST")
+	return viperx.GetInt(v.l, ViperKeyBCryptCost, 10, "BCRYPT_COST")
 }
 
 func (v *ViperProvider) AdminListenOn() string {
-	host := viperx.GetString(v.l, "httpd.admin.host", "", "ADMIN_HOST")
-	port := viperx.GetInt(v.l, "httpd.admin.port", 4445, "ADMIN_PORT")
+	host := viperx.GetString(v.l, ViperKeyAdminListenOnHost, "", "ADMIN_HOST")
+	port := viperx.GetInt(v.l, ViperKeyAdminListenOnPort, 4445, "ADMIN_PORT")
 	return fmt.Sprintf("%s:%d", host, port)
 }
 
 func (v *ViperProvider) PublicListenOn() string {
-	host := viperx.GetString(v.l, "httpd.public.host", "", "PUBLIC_HOST")
-	port := viperx.GetInt(v.l, "httpd.public.port", 4444, "PUBLIC_PORT")
+	host := viperx.GetString(v.l, ViperKeyPublicListenOnHost, "", "PUBLIC_HOST")
+	port := viperx.GetInt(v.l, ViperKeyPublicListenOnPort, 4444, "PUBLIC_PORT")
 	return fmt.Sprintf("%s:%d", host, port)
 }
 
 func (v *ViperProvider) ConsentRequestMaxAge() time.Duration {
-	return viperx.GetDuration(v.l, "ttl.login_consent_request", time.Minute*30, "LOGIN_CONSENT_REQUEST_LIFESPAN")
+	return viperx.GetDuration(v.l, ViperKeyConsentRequestMaxAge, time.Minute*30, "LOGIN_CONSENT_REQUEST_LIFESPAN")
 }
 
 func (v *ViperProvider) AccessTokenLifespan() time.Duration {
-	return viperx.GetDuration(v.l, "ttl.access_token", time.Minute*30, "ACCESS_TOKEN_LIFESPAN")
+	return viperx.GetDuration(v.l, ViperKeyAccessTokenLifespan, time.Minute*30, "ACCESS_TOKEN_LIFESPAN")
 }
 
 func (v *ViperProvider) RefreshTokenLifespan() time.Duration {
-	return viperx.GetDuration(v.l, "ttl.refresh_token", -1, "REFRESH_TOKEN_LIFESPAN")
+	return viperx.GetDuration(v.l, ViperKeyRefreshTokenLifespan, -1, "REFRESH_TOKEN_LIFESPAN")
 }
 
 func (v *ViperProvider) IDTokenLifespan() time.Duration {
-	return viperx.GetDuration(v.l, "ttl.id_token", time.Hour, "ID_TOKEN_LIFESPAN")
+	return viperx.GetDuration(v.l, ViperKeyIDTokenLifespan, time.Hour, "ID_TOKEN_LIFESPAN")
 }
 
 func (v *ViperProvider) AuthCodeLifespan() time.Duration {
-	return viperx.GetDuration(v.l, "ttl.auth_code", time.Minute*10, "AUTH_CODE_LIFESPAN")
+	return viperx.GetDuration(v.l, ViperKeyAuthCodeLifespan, time.Minute*10, "AUTH_CODE_LIFESPAN")
 }
 
 func (v *ViperProvider) ScopeStrategy() string {
-	return viperx.GetString(v.l, "strategies.scope", "", "SCOPE_STRATEGY")
+	return viperx.GetString(v.l, ViperKeyScopeStrategy, "", "SCOPE_STRATEGY")
 }
 
 func (v *ViperProvider) TracingServiceName() string {
@@ -130,12 +185,12 @@ func (v *ViperProvider) TracingJaegerConfig() *tracing.JaegerConfig {
 
 func (v *ViperProvider) GetCookieSecrets() [][]byte {
 	return [][]byte{
-		[]byte(viperx.GetString(v.l, "secrets.cookie", string(v.GetSystemSecret()), "COOKIE_SECRET")),
+		[]byte(viperx.GetString(v.l, ViperKeyGetCookieSecrets, string(v.GetSystemSecret()), "COOKIE_SECRET")),
 	}
 }
 
 func (v *ViperProvider) GetRotatedSystemSecrets() [][]byte {
-	secrets := viperx.GetStringSlice(v.l, "secrets.system", []string{}, "ROTATED_SYSTEM_SECRET")
+	secrets := viperx.GetStringSlice(v.l, ViperKeyGetSystemSecret, []string{}, "ROTATED_SYSTEM_SECRET")
 
 	if len(secrets) < 2 {
 		return nil
@@ -143,14 +198,14 @@ func (v *ViperProvider) GetRotatedSystemSecrets() [][]byte {
 
 	var rotated [][]byte
 	for _, secret := range secrets[1:] {
-		rotated = append(rotated, pkg.HashStringSecret(secret))
+		rotated = append(rotated, x.HashStringSecret(secret))
 	}
 
 	return rotated
 }
 
 func (v *ViperProvider) GetSystemSecret() []byte {
-	secrets := viperx.GetStringSlice(v.l, "secrets.system", []string{}, "SYSTEM_SECRET")
+	secrets := viperx.GetStringSlice(v.l, ViperKeyGetSystemSecret, []string{}, "SYSTEM_SECRET")
 
 	if len(secrets) == 0 {
 		if v.generatedSecret != nil {
@@ -158,19 +213,19 @@ func (v *ViperProvider) GetSystemSecret() []byte {
 		}
 
 		v.l.Warnf("Configuration secrets.system is not set, generating a temporary, random secret...")
-		secret, err := pkg.GenerateSecret(32)
+		secret, err := x.GenerateSecret(32)
 		cmdx.Must(err, "Could not generate secret: %s", err)
 
 		v.l.Warnf("Generated secret: %s", secret)
-		v.generatedSecret = pkg.HashByteSecret(secret)
+		v.generatedSecret = x.HashByteSecret(secret)
 
 		v.l.Warnln("Do not use generate secrets in production. The secret will be leaked to the logs.")
-		return pkg.HashByteSecret(secret)
+		return x.HashByteSecret(secret)
 	}
 
 	secret := secrets[0]
 	if len(secret) >= 16 {
-		return pkg.HashStringSecret(secret)
+		return x.HashStringSecret(secret)
 	}
 
 	v.l.Fatalf("System secret must be undefined or have at least 16 characters but only has %d characters.", len(secret))
@@ -178,30 +233,30 @@ func (v *ViperProvider) GetSystemSecret() []byte {
 }
 
 func (v *ViperProvider) LogoutRedirectURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, "urls.post_logout_redirect", "", "OAUTH2_LOGOUT_REDIRECT_URL"))
+	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyLogoutRedirectURL, "", "OAUTH2_LOGOUT_REDIRECT_URL"))
 }
 
 func (v *ViperProvider) LoginURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, "urls.logout", "", "OAUTH2_LOGIN_URL"))
+	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyLoginURL, "", "OAUTH2_LOGIN_URL"))
 }
 func (v *ViperProvider) ConsentURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, "urls.consent", "", "OAUTH2_CONSENT_URL"))
+	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyConsentURL, "", "OAUTH2_CONSENT_URL"))
 }
 
 func (v *ViperProvider) ErrorURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, "urls.error", "", "OAUTH2_ERROR_URL"))
+	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyErrorURL, "", "OAUTH2_ERROR_URL"))
 }
 
 func (v *ViperProvider) PublicURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, "urls.self.public", ""))
+	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyPublicURL, ""))
 }
 
 func (v *ViperProvider) AdminURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, "urls.self.public", ""))
+	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyAdminURL, ""))
 }
 
 func (v *ViperProvider) IssuerURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, "urls.self.issuer", v.PublicURL().String(), "OAUTH2_ISSUER_URL", "ISSUER", "ISSUER_URL"))
+	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyIssuerURL, v.PublicURL().String(), "OAUTH2_ISSUER_URL", "ISSUER", "ISSUER_URL"))
 }
 
 func (v *ViperProvider) OAuth2AuthURL() string {
@@ -209,31 +264,41 @@ func (v *ViperProvider) OAuth2AuthURL() string {
 }
 
 func (v *ViperProvider) OAuth2ClientRegistrationURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, "oidc.discovery.client_registration_url", "", "OAUTH2_CLIENT_REGISTRATION_URL"))
+	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyOAuth2ClientRegistrationURL, "", "OAUTH2_CLIENT_REGISTRATION_URL"))
 }
 
 func (v *ViperProvider) AllowTLSTerminationFrom() []string {
-	return viperx.GetStringSlice(v.l, "httpd.tls.allow_termination_from", []string{}, "HTTPS_ALLOW_TERMINATION_FROM")
+	return viperx.GetStringSlice(v.l, ViperKeyAllowTLSTerminationFrom, []string{}, "HTTPS_ALLOW_TERMINATION_FROM")
 }
 
 func (v *ViperProvider) AccessTokenStrategy() string {
-	return viperx.GetString(v.l, "strategies.access_token", "opaque", "OAUTH2_ACCESS_TOKEN_STRATEGY")
+	return viperx.GetString(v.l, ViperKeyAccessTokenStrategy, "opaque", "OAUTH2_ACCESS_TOKEN_STRATEGY")
 }
 
 func (v *ViperProvider) SubjectIdentifierAlgorithmSalt() string {
-	return viperx.GetString(v.l, "oidc.subject_identifiers.pairwise.salt", "", "OIDC_SUBJECT_TYPE_PAIRWISE_SALT")
+	return viperx.GetString(v.l, ViperKeySubjectIdentifierAlgorithmSalt, "", "OIDC_SUBJECT_TYPE_PAIRWISE_SALT")
 }
 
 func (v *ViperProvider) OIDCDiscoverySupportedClaims() []string {
-	return viperx.GetStringSlice(v.l, "oidc.discovery.supported_claims", []string{}, "OIDC_DISCOVERY_CLAIMS_SUPPORTED")
+	return stringslice.Unique(
+		append(
+			[]string{"sub"},
+			viperx.GetStringSlice(v.l, ViperKeyOIDCDiscoverySupportedClaims, []string{}, "OIDC_DISCOVERY_CLAIMS_SUPPORTED")...,
+		),
+	)
 }
 
 func (v *ViperProvider) OIDCDiscoverySupportedScope() []string {
-	return viperx.GetStringSlice(v.l, "oidc.discovery.supported_scope", []string{}, "OIDC_DISCOVERY_SCOPES_SUPPORTED")
+	return stringslice.Unique(
+		append(
+			[]string{"offline", "openid"},
+			viperx.GetStringSlice(v.l, ViperKeyOIDCDiscoverySupportedScope, []string{}, "OIDC_DISCOVERY_SCOPES_SUPPORTED")...,
+		),
+	)
 }
 
 func (v *ViperProvider) OIDCDiscoveryUserinfoEndpoint() string {
-	return viperx.GetString(v.l, "oidc.discovery.userinfo_url", urlx.AppendPaths(v.PublicURL(), "/userinfo").String(), "OIDC_DISCOVERY_USERINFO_ENDPOINT")
+	return viperx.GetString(v.l, ViperKeyOIDCDiscoveryUserinfoEndpoint, urlx.AppendPaths(v.PublicURL(), "/userinfo").String(), "OIDC_DISCOVERY_USERINFO_ENDPOINT")
 }
 
 func (v *ViperProvider) ShareOAuth2Debug() bool {

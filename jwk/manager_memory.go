@@ -30,7 +30,7 @@ import (
 	jose "gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/x"
 )
 
 type MemoryManager struct {
@@ -83,12 +83,12 @@ func (m *MemoryManager) GetKey(ctx context.Context, set, kid string) (*jose.JSON
 	m.alloc()
 	keys, found := m.Keys[set]
 	if !found {
-		return nil, errors.WithStack(pkg.ErrNotFound)
+		return nil, errors.WithStack(x.ErrNotFound)
 	}
 
 	result := keys.Key(kid)
 	if len(result) == 0 {
-		return nil, errors.WithStack(pkg.ErrNotFound)
+		return nil, errors.WithStack(x.ErrNotFound)
 	}
 
 	return &jose.JSONWebKeySet{
@@ -103,11 +103,11 @@ func (m *MemoryManager) GetKeySet(ctx context.Context, set string) (*jose.JSONWe
 	m.alloc()
 	keys, found := m.Keys[set]
 	if !found {
-		return nil, errors.WithStack(pkg.ErrNotFound)
+		return nil, errors.WithStack(x.ErrNotFound)
 	}
 
 	if len(keys.Keys) == 0 {
-		return nil, errors.WithStack(pkg.ErrNotFound)
+		return nil, errors.WithStack(x.ErrNotFound)
 	}
 
 	return keys, nil

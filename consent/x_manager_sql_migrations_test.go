@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/ory/hydra/internal"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/x/dbal"
@@ -79,15 +80,16 @@ func TestXXMigrations(t *testing.T) {
 			}
 
 			t.Run(fmt.Sprintf("poll=%d", step), func(t *testing.T) {
+				conf := internal.NewConfigurationWithDefaults(false)
+				reg := internal.NewRegistrySQL(conf, db)
+
 				kk := step + 1
 				if kk <= 2 {
 					t.Skip("Skipping the first two entries were deleted in migration 7.sql login_session_id is not defined")
 					return
 				}
 
-				c := &client.SQLManager{DB: db, Hasher: &fosite.BCrypt{}}
-
-				s := consent.NewSQLManager(db, c, nil)
+				s := consent.NewSQLManager(db, reg)
 				_, err := s.GetAuthenticationRequest(context.TODO(), fmt.Sprintf("%d-challenge", kk))
 				require.NoError(t, err, "%d-challenge", kk)
 				_, err = s.GetAuthenticationSession(context.TODO(), fmt.Sprintf("%d-login-session-id", kk))

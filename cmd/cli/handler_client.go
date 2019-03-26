@@ -29,25 +29,20 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/ory/hydra/config"
-	"github.com/ory/hydra/pkg"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
 )
 
-type ClientHandler struct {
-	Config *config.Config
-}
+type ClientHandler struct {}
 
-func newClientHandler(c *config.Config) *ClientHandler {
-	return &ClientHandler{
-		Config: c,
-	}
+func newClientHandler() *ClientHandler {
+	return &ClientHandler{}
 }
 
 func (h *ClientHandler) newClientManager(cmd *cobra.Command) *hydra.AdminApi {
-	c := hydra.NewAdminApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlashOrFail(cmd))
+	c := hydra.NewAdminApiWithBasePath(remote(cmd))
 	c.Configuration = configureClient(cmd, c.Configuration)
 	return c
 }
@@ -83,7 +78,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	var echoSecret bool
 	if secret == "" {
 		var secretb []byte
-		secretb, err = pkg.GenerateSecret(26)
+		secretb, err = x.GenerateSecret(26)
 		cmdx.Must(err, "Could not generate OAuth 2.0 Client Secret: %s", err)
 		secret = string(secretb)
 

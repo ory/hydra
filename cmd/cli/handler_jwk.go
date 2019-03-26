@@ -31,27 +31,24 @@ import (
 	"github.com/mendsley/gojwk"
 	"github.com/pborman/uuid"
 	"github.com/spf13/cobra"
-	jose "gopkg.in/square/go-jose.v2"
+	"gopkg.in/square/go-jose.v2"
 
-	"github.com/ory/hydra/config"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
 	"github.com/ory/x/josex"
 )
 
-type JWKHandler struct {
-	Config *config.Config
-}
+type JWKHandler struct{}
 
 func (h *JWKHandler) newJwkManager(cmd *cobra.Command) *hydra.AdminApi {
-	c := hydra.NewAdminApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlashOrFail(cmd))
+	c := hydra.NewAdminApiWithBasePath(remote(cmd))
 	c.Configuration = configureClient(cmd, c.Configuration)
 	return c
 }
 
-func newJWKHandler(c *config.Config) *JWKHandler {
-	return &JWKHandler{Config: c}
+func newJWKHandler() *JWKHandler {
+	return &JWKHandler{}
 }
 
 func (h *JWKHandler) CreateKeys(cmd *cobra.Command, args []string) {
@@ -114,7 +111,7 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 		},
 	}
 
-	u := h.Config.GetClusterURLWithoutTailingSlashOrFail(cmd) + "/keys/" + id
+	u := remote(cmd) + "/keys/" + id
 	request, err := http.NewRequest("GET", u, nil)
 	cmdx.Must(err, "Unable to initialize HTTP request: %s", err)
 

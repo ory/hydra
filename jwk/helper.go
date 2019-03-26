@@ -28,14 +28,14 @@ import (
 	"encoding/pem"
 	"fmt"
 
-	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/x"
 
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"gopkg.in/square/go-jose.v2"
 )
 
-func EnsureAsymmetricKeypairExists(ctx context.Context, r registry, g KeyGenerator, set string) error {
+func EnsureAsymmetricKeypairExists(ctx context.Context, r InternalRegistry, g KeyGenerator, set string) error {
 	if _, err := GetOrCreateKey(ctx, r, g, set, "public"); err != nil {
 		return err
 	}
@@ -45,9 +45,9 @@ func EnsureAsymmetricKeypairExists(ctx context.Context, r registry, g KeyGenerat
 	return nil
 }
 
-func GetOrCreateKey(ctx context.Context, r registry, g KeyGenerator, set, prefix string) (*jose.JSONWebKey, error) {
+func GetOrCreateKey(ctx context.Context, r InternalRegistry, g KeyGenerator, set, prefix string) (*jose.JSONWebKey, error) {
 	keys, err := r.KeyManager().GetKeySet(ctx, set)
-	if errors.Cause(err) == pkg.ErrNotFound || keys != nil && len(keys.Keys) == 0 {
+	if errors.Cause(err) == x.ErrNotFound || keys != nil && len(keys.Keys) == 0 {
 		r.Logger().Warnf("JSON Web Key Set \"%s\" does not exist yet, generating new key pair...", set)
 		keys, err = createKey(ctx, r, g, set)
 		if err != nil {
@@ -75,7 +75,7 @@ func GetOrCreateKey(ctx context.Context, r registry, g KeyGenerator, set, prefix
 	return key, nil
 }
 
-func createKey(ctx context.Context, r registry, g KeyGenerator, set string) (*jose.JSONWebKeySet, error) {
+func createKey(ctx context.Context, r InternalRegistry, g KeyGenerator, set string) (*jose.JSONWebKeySet, error) {
 	keys, err := g.Generate(uuid.New(), "sig")
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not generate JSON Web Key Set \"%s\".", set)
@@ -140,7 +140,7 @@ func PEMBlockForKey(key interface{}) (*pem.Block, error) {
 	}
 }
 
-func ider(typ, id string) string {
+func Ider(typ, id string) string {
 	if id == "" {
 		id = uuid.New()
 	}

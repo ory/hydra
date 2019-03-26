@@ -4,11 +4,12 @@ import (
 	"context"
 	"fmt"
 	"testing"
-	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/hydra/internal"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
@@ -81,13 +82,15 @@ func TestXXMigrations(t *testing.T) {
 		cleanDB, cleanDB,
 		func(t *testing.T, db *sqlx.DB, m, k, steps int) {
 			t.Run(fmt.Sprintf("poll=%d", k), func(t *testing.T) {
+				conf := internal.NewConfigurationWithDefaults(false)
+				reg := internal.NewRegistrySQL(conf, db)
+
 				if m != 2 {
 					t.Skip("Skipping polling unless it's the last migration schema")
 					return
 				}
 
-				cm := client.NewSQLManager(db, &fosite.BCrypt{WorkFactor: 4})
-				s := oauth2.NewFositeSQLStore(cm, db, logrus.New(), time.Minute, false)
+				s := reg.OAuth2Storage().(*oauth2.FositeSQLStore)
 				sig := fmt.Sprintf("%d-sig", k+1)
 
 				if k < 8 {

@@ -18,42 +18,17 @@
  * @license 	Apache-2.0
  */
 
-package pkg
+package x
 
 import (
-	"bytes"
-	"strings"
-	"testing"
-
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/assert"
+	"crypto/rand"
+	"crypto/rsa"
 )
 
-type errStackTracer struct{}
-
-func (s *errStackTracer) StackTrace() errors.StackTrace {
-	return errors.StackTrace{}
-}
-
-func (s *errStackTracer) Error() string {
-	return "foo"
-}
-
-func TestLogError(t *testing.T) {
-	buf := bytes.NewBuffer([]byte{})
-	l := logrus.New()
-	l.Level = logrus.DebugLevel
-	l.Out = buf
-	LogError(errors.New("asdf"), l)
-
-	t.Logf("%s", string(buf.Bytes()))
-
-	assert.True(t, strings.Contains(string(buf.Bytes()), "Stack trace"))
-
-	LogError(errors.Wrap(new(errStackTracer), ""), l)
-}
-
-func TestLogErrorDoesNotPanic(t *testing.T) {
-	LogError(errors.New("asdf"), nil)
+func MustINSECURELOWENTROPYRSAKEYFORTEST() *rsa.PrivateKey {
+	key, err := rsa.GenerateKey(rand.Reader, 1024)
+	if err != nil {
+		panic(err)
+	}
+	return key
 }

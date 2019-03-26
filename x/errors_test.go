@@ -18,32 +18,42 @@
  * @license 	Apache-2.0
  */
 
-package pkg
+package x
 
 import (
-	"time"
+	"bytes"
+	"strings"
+	"testing"
 
-	"github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/storage"
-	"github.com/ory/fosite/token/hmac"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
 )
 
-var HMACStrategy = &oauth2.HMACSHAStrategy{
-	Enigma: &hmac.HMACStrategy{
-		GlobalSecret: []byte("1234567890123456789012345678901234567890"),
-	},
-	AccessTokenLifespan:   time.Hour,
-	AuthorizeCodeLifespan: time.Hour,
+type errStackTracer struct{}
+
+func (s *errStackTracer) StackTrace() errors.StackTrace {
+	return errors.StackTrace{}
 }
 
-func FositeStore() *storage.MemoryStore {
-	return storage.NewMemoryStore()
+func (s *errStackTracer) Error() string {
+	return "foo"
 }
 
-func Tokens(length int) (res [][]string) {
-	for i := 0; i < length; i++ {
-		tok, sig, _ := HMACStrategy.Enigma.Generate()
-		res = append(res, []string{sig, tok})
-	}
-	return res
+func TestLogError(t *testing.T) {
+	buf := bytes.NewBuffer([]byte{})
+	l := logrus.New()
+	l.Level = logrus.DebugLevel
+	l.Out = buf
+	LogError(errors.New("asdf"), l)
+
+	t.Logf("%s", string(buf.Bytes()))
+
+	assert.True(t, strings.Contains(string(buf.Bytes()), "Stack trace"))
+
+	LogError(errors.Wrap(new(errStackTracer), ""), l)
+}
+
+func TestLogErrorDoesNotPanic(t *testing.T) {
+	LogError(errors.New("asdf"), nil)
 }

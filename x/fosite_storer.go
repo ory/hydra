@@ -18,17 +18,27 @@
  * @license 	Apache-2.0
  */
 
-package pkg
+package x
 
 import (
-	"crypto/rand"
-	"crypto/rsa"
+	"context"
+	"time"
+
+	"github.com/ory/fosite"
+	"github.com/ory/fosite/handler/oauth2"
+	"github.com/ory/fosite/handler/openid"
+	"github.com/ory/fosite/handler/pkce"
 )
 
-func MustINSECURELOWENTROPYRSAKEYFORTEST() *rsa.PrivateKey {
-	key, err := rsa.GenerateKey(rand.Reader, 1024)
-	if err != nil {
-		panic(err)
-	}
-	return key
+type FositeStorer interface {
+	fosite.Storage
+	oauth2.CoreStorage
+	openid.OpenIDConnectRequestStorage
+	pkce.PKCERequestStorage
+
+	RevokeRefreshToken(ctx context.Context, requestID string) error
+
+	RevokeAccessToken(ctx context.Context, requestID string) error
+
+	FlushInactiveAccessTokens(ctx context.Context, notAfter time.Time) error
 }

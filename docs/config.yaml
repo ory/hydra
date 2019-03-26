@@ -4,15 +4,15 @@
 # Per default, ORY Hydra will look up and load file ~/.hydra.yaml. All configuration keys can be set using environment
 # variables as well. Assuming the following configuration layout:
 #
-# httpd:
+# serve:
 #   public:
 #     port: 4444
 #     something_else: foobar
 #
 # Key `something_else` can be set as an environment variable by uppercasing it's path:
-#   `httpd.public.port.somethihng_else` -> `HTTPD.PUBLIC.PORT.SOMETHING_ELSE`
+#   `serve.public.port.somethihng_else` -> `SERVE.PUBLIC.PORT.SOMETHING_ELSE`
 # and replacing `.` with `_`:
-#   `httpd.public.port.somethihng_else` -> `HTTPD_PUBLIC_PORT_SOMETHING_ELSE`
+#   `serve.public.port.somethihng_else` -> `SERVE_PUBLIC_PORT_SOMETHING_ELSE`
 #
 # Environment variables always override values from the configuration file.
 #
@@ -21,12 +21,12 @@
 # Configuration key | Environment variable |
 # ------------------|----------------------|
 # dsn               | DSN                  |
-# httpd.admin.host  | HTTPD_ADMIN_HOST     |
+# serve.admin.host  | SERVE_ADMIN_HOST     |
 # ------------------|----------------------|
 
 
-# httpd controls the configuration for the http(s) daemon.
-httpd:
+# serve controls the configuration for the http(s) daemon(s).
+serve:
   # public controls the public daemon serving public API endpoints like /oauth2/auth
   public:
     port: 4444 # defaults to 4444
@@ -83,12 +83,12 @@ oidc:
 urls:
   self:
     public: http://localhost:4444/
-    admin: http://localhost:4444/
-    issuer:
-  login:
-  consent:
-  error:
-  post_logout_redirect:
+    admin: http://localhost:4445/
+    issuer: http://localhost:4444/
+#  login:
+#  consent:
+#  error:
+#  post_logout_redirect:
 
 ttl:
   login_consent_request: 30m
@@ -99,7 +99,8 @@ ttl:
 
 strategies:
   scope: DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY
-  access_token:
+#  access_token: jwt
+#  access_token: jwt
 
 secrets:
   system:

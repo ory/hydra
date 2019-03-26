@@ -31,12 +31,12 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/go-convenience/urlx"
-	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/pagination"
 )
 
 type Handler struct {
-	r registry
+	r InternalRegistry
 	c Configuration
 }
 
@@ -47,7 +47,7 @@ const (
 )
 
 func NewHandler(
-	r registry,
+	r InternalRegistry,
 	c Configuration,
 ) *Handler {
 	return &Handler{
@@ -252,7 +252,7 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 	if request.WasHandled {
-		h.r.Writer().WriteError(w, r, pkg.ErrConflict.WithDebug("Login request has been handled already"))
+		h.r.Writer().WriteError(w, r, x.ErrConflict.WithDebug("Login request has been handled already"))
 		return
 	}
 
@@ -437,7 +437,7 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 		return
 	}
 	if request.WasHandled {
-		h.r.Writer().WriteError(w, r, pkg.ErrConflict.WithDebug("Consent request has been handled already"))
+		h.r.Writer().WriteError(w, r, x.ErrConflict.WithDebug("Consent request has been handled already"))
 		return
 	}
 
@@ -616,5 +616,5 @@ func (h *Handler) LogoutUser(w http.ResponseWriter, r *http.Request, ps httprout
 		}
 	}
 
-	http.Redirect(w, r, h.c.LogoutRedirectURL(), 302)
+	http.Redirect(w, r, h.c.LogoutRedirectURL().String(), 302)
 }

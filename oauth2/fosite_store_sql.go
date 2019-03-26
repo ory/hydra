@@ -45,7 +45,7 @@ import (
 type FositeSQLStore struct {
 	DB *sqlx.DB
 
-	r registry
+	r InternalRegistry
 	c Configuration
 
 	HashSignature bool
@@ -58,7 +58,7 @@ type sqlxDB interface {
 	GetContext(ctx context.Context, dest interface{}, query string, args ...interface{}) error
 }
 
-func NewFositeSQLStore(db *sqlx.DB, r registry, c Configuration) *FositeSQLStore {
+func NewFositeSQLStore(db *sqlx.DB, r InternalRegistry, c Configuration) *FositeSQLStore {
 	return &FositeSQLStore{r: r, c: c, DB: db}
 }
 
@@ -196,6 +196,33 @@ func (s *FositeSQLStore) GetClient(ctx context.Context, id string) (fosite.Clien
 	return s.r.ClientManager().GetClient(ctx, id)
 }
 
+func (s *FositeSQLStore) Authenticate(ctx context.Context, id string, secret []byte) (*client.Client, error) {
+	return s.r.ClientManager().Authenticate(ctx, id, secret)
+}
+
+func (s *FositeSQLStore) CreateClient(ctx context.Context, c *client.Client) error {
+	return s.r.ClientManager().CreateClient(ctx, c)
+
+}
+
+func (s *FositeSQLStore) UpdateClient(ctx context.Context, c *client.Client) error {
+	return s.r.ClientManager().UpdateClient(ctx, c)
+
+}
+
+func (s *FositeSQLStore) DeleteClient(ctx context.Context, id string) error {
+	return s.r.ClientManager().DeleteClient(ctx, id)
+
+}
+
+func (s *FositeSQLStore) GetClients(ctx context.Context, limit, offset int) (map[string]client.Client, error) {
+	return s.r.ClientManager().GetClients(ctx, limit, offset)
+}
+
+func (s *FositeSQLStore) GetConcreteClient(ctx context.Context, id string) (*client.Client, error) {
+	return s.r.ClientManager().GetConcreteClient(ctx, id)
+}
+
 // hashSignature prevents errors where the signature is longer than 128 characters (and thus doesn't fit into the pk).
 func (s *FositeSQLStore) hashSignature(signature, table string) string {
 	if table == sqlTableAccess && s.c.IsUsingJWTAsAccessTokens() {
@@ -243,7 +270,7 @@ func (s *FositeSQLStore) findSessionBySignature(ctx context.Context, signature s
 	} else if err != nil {
 		return nil, sqlcon.HandleError(err)
 	} else if !d.Active && table == sqlTableCode {
-		if r, err := d.toRequest(session, s.Manager, s.r.Logger()); err != nil {
+		if r, err := d.toRequest(session, s.r.ClientManager(), s.r.Logger()); err != nil {
 			return nil, err
 		} else {
 			return r, errors.WithStack(fosite.ErrInvalidatedAuthorizeCode)
@@ -252,7 +279,7 @@ func (s *FositeSQLStore) findSessionBySignature(ctx context.Context, signature s
 		return nil, errors.WithStack(fosite.ErrInactiveToken)
 	}
 
-	return d.toRequest(session, s.Manager, s.r.Logger())
+	return d.toRequest(session, s.r.ClientManager(), s.r.Logger())
 }
 
 func (s *FositeSQLStore) deleteSession(ctx context.Context, signature string, table string) error {

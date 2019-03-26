@@ -26,22 +26,22 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/spf13/viper"
+
+	"github.com/ory/hydra/driver/configuration"
+
 	. "github.com/ory/hydra/client"
 	"github.com/ory/hydra/internal"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	jose "gopkg.in/square/go-jose.v2"
+	"gopkg.in/square/go-jose.v2"
 )
 
 func TestValidate(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	c := internal.NewMockClientConfiguration(ctrl)
-	c.EXPECT().DefaultClientScope().AnyTimes().Return([]string{"openid"})
-	c.EXPECT().SubjectTypesSupported().AnyTimes().Return([]string{"pairwise", "public"})
+	c := internal.NewConfigurationWithDefaults(false)
+	viper.Set(configuration.ViperKeySubjectTypesSupported, []string{"pairwise", "public"})
+	viper.Set(configuration.ViperKeyDefaultClientScope, []string{"openid"})
 
 	v := NewValidator(c)
 	for k, tc := range []struct {
@@ -90,11 +90,7 @@ func TestValidate(t *testing.T) {
 		},
 		{
 			v: func(t *testing.T) *Validator {
-				ctrl := gomock.NewController(t)
-				defer ctrl.Finish()
-				c := internal.NewMockClientConfiguration(ctrl)
-				c.EXPECT().DefaultClientScope().AnyTimes().Return([]string{"openid"})
-				c.EXPECT().SubjectTypesSupported().AnyTimes().Return([]string{"pairwise"})
+				viper.Set(configuration.ViperKeySubjectTypesSupported, []string{"pairwise"})
 				return NewValidator(c)
 			},
 			in: &Client{ClientID: "foo"},

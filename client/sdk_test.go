@@ -28,14 +28,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/herodot"
-	"github.com/ory/hydra/internal"
-	"github.com/ory/hydra/x"
+	"github.com/spf13/viper"
 
-	"github.com/golang/mock/gomock"
+	"github.com/ory/hydra/driver/configuration"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/hydra/internal"
 
 	"github.com/ory/hydra/client"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
@@ -65,28 +66,18 @@ func createTestClient(prefix string) hydra.OAuth2Client {
 }
 
 func TestClientSDK(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	conf := internal.NewMockClientConfiguration(ctrl)
-	r := internal.NewMockInternalRegistry(ctrl)
-	conf.EXPECT().SubjectTypesSupported().AnyTimes().Return([]string{"public"})
-	conf.EXPECT().DefaultClientScope().AnyTimes().Return([]string{"foo", "bar"})
-	conf.EXPECT().BCryptCost().AnyTimes().Return(4)
-
-	validator := client.NewValidator(conf)
-	manager := client.NewMemoryManager(r)
-	r.EXPECT().ClientManager().AnyTimes().Return(manager)
-	r.EXPECT().ClientValidator().AnyTimes().Return(validator)
-	r.EXPECT().ClientHasher().AnyTimes().Return(x.NewBCrypt(conf))
-	r.EXPECT().Writer().AnyTimes().Return(herodot.NewJSONWriter(nil))
-
-	handler := client.NewHandler(r)
+	conf := internal.NewConfigurationWithDefaults(false)
+	viper.Set(configuration.ViperKeySubjectTypesSupported, []string{"public"})
+	viper.Set(configuration.ViperKeyDefaultClientScope, []string{"foo", "bar"})
+	r := internal.NewRegistry(conf)
 
 	router := httprouter.New()
+	handler := client.NewHandler(r)
 	handler.SetRoutes(router)
 	server := httptest.NewServer(router)
+
 	c := hydra.NewAdminApiWithBasePath(server.URL)
+
 	t.Run("case=client default scopes are set", func(t *testing.T) {
 		result, response, err := c.CreateOAuth2Client(hydra.OAuth2Client{
 			ClientId: "scoped",

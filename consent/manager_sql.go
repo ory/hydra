@@ -32,23 +32,20 @@ import (
 	migrate "github.com/rubenv/sql-migrate"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/sqlcon"
 )
 
 type SQLManager struct {
-	DB    *sqlx.DB
-	c     client.Manager
-	store pkg.FositeStorer
+	DB *sqlx.DB
+	r  InternalRegistry
 }
 
-func NewSQLManager(db *sqlx.DB, c client.Manager, store pkg.FositeStorer) *SQLManager {
+func NewSQLManager(db *sqlx.DB, r InternalRegistry) *SQLManager {
 	return &SQLManager{
-		DB:    db,
-		c:     c,
-		store: store,
+		DB: db,
+		r:  r,
 	}
 }
 
@@ -84,18 +81,18 @@ JOIN hydra_oauth2_consent_request as r ON r.challenge = h.challenge WHERE %s`,
 		part,
 	)), args...); err != nil {
 		if err == sql.ErrNoRows {
-			return errors.WithStack(pkg.ErrNotFound)
+			return errors.WithStack(x.ErrNotFound)
 		}
 		return sqlcon.HandleError(err)
 	}
 
 	for _, challenge := range challenges {
-		if err := m.store.RevokeAccessToken(ctx, challenge); errors.Cause(err) == fosite.ErrNotFound {
+		if err := m.r.OAuth2Storage().RevokeAccessToken(ctx, challenge); errors.Cause(err) == fosite.ErrNotFound {
 			// do nothing
 		} else if err != nil {
 			return err
 		}
-		if err := m.store.RevokeRefreshToken(ctx, challenge); errors.Cause(err) == fosite.ErrNotFound {
+		if err := m.r.OAuth2Storage().RevokeRefreshToken(ctx, challenge); errors.Cause(err) == fosite.ErrNotFound {
 			// do nothing
 		} else if err != nil {
 			return err
@@ -122,13 +119,13 @@ WHERE challenge IN (SELECT r.challenge FROM hydra_oauth2_consent_request as r WH
 		rows, err := m.DB.ExecContext(ctx, m.DB.Rebind(q), args...)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				return errors.WithStack(pkg.ErrNotFound)
+				return errors.WithStack(x.ErrNotFound)
 			}
 			return sqlcon.HandleError(err)
 		}
 
 		if count, _ := rows.RowsAffected(); count == 0 {
-			return errors.WithStack(pkg.ErrNotFound)
+			return errors.WithStack(x.ErrNotFound)
 		}
 	}
 	return nil
@@ -142,7 +139,7 @@ func (m *SQLManager) RevokeUserAuthenticationSession(ctx context.Context, user s
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return errors.WithStack(pkg.ErrNotFound)
+			return errors.WithStack(x.ErrNotFound)
 		}
 		return sqlcon.HandleError(err)
 	}
@@ -151,7 +148,7 @@ func (m *SQLManager) RevokeUserAuthenticationSession(ctx context.Context, user s
 	//
 	// count, _ := rows.RowsAffected()
 	// if count == 0 {
-	// 	 return errors.WithStack(pkg.ErrNotFound)
+	// 	 return errors.WithStack(x.ErrNotFound)
 	// }
 
 	return nil
@@ -196,7 +193,7 @@ func (m *SQLManager) GetForcedObfuscatedAuthenticationSession(ctx context.Contex
 
 	if err := m.DB.GetContext(ctx, &d, m.DB.Rebind("SELECT * FROM hydra_oauth2_obfuscated_authentication_session WHERE client_id=? AND subject_obfuscated=?"), client, obfuscated); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, errors.WithStack(pkg.ErrNotFound)
+			return nil, errors.WithStack(x.ErrNotFound)
 		}
 		return nil, sqlcon.HandleError(err)
 	}
@@ -227,12 +224,12 @@ func (m *SQLManager) GetConsentRequest(ctx context.Context, challenge string) (*
 		"LEFT JOIN hydra_oauth2_consent_request_handled hr ON r.challenge = hr.challenge WHERE r.challenge=?"), challenge)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, errors.WithStack(pkg.ErrNotFound)
+			return nil, errors.WithStack(x.ErrNotFound)
 		}
 		return nil, sqlcon.HandleError(err)
 	}
 
-	c, err := m.c.GetConcreteClient(ctx, d.Client)
+	c, err := m.r.ClientManager().GetConcreteClient(ctx, d.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -263,12 +260,12 @@ func (m *SQLManager) GetAuthenticationRequest(ctx context.Context, challenge str
 		"LEFT JOIN hydra_oauth2_authentication_request_handled hr ON r.challenge = hr.challenge WHERE r.challenge=?"), challenge)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, errors.WithStack(pkg.ErrNotFound)
+			return nil, errors.WithStack(x.ErrNotFound)
 		}
 		return nil, sqlcon.HandleError(err)
 	}
 
-	c, err := m.c.GetConcreteClient(ctx, d.Client)
+	c, err := m.r.ClientManager().GetConcreteClient(ctx, d.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -374,7 +371,7 @@ func (m *SQLManager) GetAuthenticationSession(ctx context.Context, id string) (*
 	var a AuthenticationSession
 	if err := m.DB.GetContext(ctx, &a, m.DB.Rebind("SELECT * FROM hydra_oauth2_authentication_session WHERE id=?"), id); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, errors.WithStack(pkg.ErrNotFound)
+			return nil, errors.WithStack(x.ErrNotFound)
 		}
 		return nil, sqlcon.HandleError(err)
 	}

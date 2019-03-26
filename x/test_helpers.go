@@ -18,22 +18,12 @@
  * @license 	Apache-2.0
  */
 
-package config
+package x
 
 import (
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/pkg"
+	"github.com/ory/fosite/storage"
 )
 
-type Context struct {
-	Connection BackendConnector
-
-	Hasher         fosite.Hasher
-	FositeStrategy oauth2.CoreStrategy
-	FositeStore    pkg.FositeStorer
-	KeyManager     jwk.Manager
-	ConsentManager consent.Manager
+func FositeStore() *storage.MemoryStore {
+	return storage.NewMemoryStore()
 }

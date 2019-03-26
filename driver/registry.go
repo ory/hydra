@@ -2,6 +2,7 @@ package driver
 
 import (
 	"github.com/go-errors/errors"
+	"github.com/ory/x/cmdx"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
@@ -32,6 +33,12 @@ type Registry interface {
 	ConsentHandler() *consent.Handler
 	OAuth2Handler() *oauth2.Handler
 	HealthHandler() *healthx.Handler
+}
+
+func MustNewRegistry(c configuration.Provider) Registry {
+	r, err := NewRegistry(c)
+	cmdx.Must(err, "Unable to initialize services: %s", err)
+	return r
 }
 
 func NewRegistry(c configuration.Provider) (Registry, error) {

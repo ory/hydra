@@ -18,18 +18,21 @@
  * @license 	Apache-2.0
  */
 
-package jwk
+package jwk_test
 
 import (
 	"context"
 	"fmt"
 	"testing"
 
+	"github.com/ory/hydra/internal"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/client"
+	. "github.com/ory/hydra/jwk"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/dbal/migratest"
 )
@@ -56,13 +59,16 @@ func TestXXMigrations(t *testing.T) {
 
 	migratest.RunPackrMigrationTests(
 		t,
-		migratest.MigrationSchemas{migrations},
+		migratest.MigrationSchemas{Migrations},
 		migratest.MigrationSchemas{createMigrations},
 		clean, clean,
 		func(t *testing.T, db *sqlx.DB, k, m, steps int) {
 			t.Run(fmt.Sprintf("poll=%d", k), func(t *testing.T) {
+				conf := internal.NewConfigurationWithDefaults(false)
+				reg := internal.NewRegistrySQL(conf, db)
+
 				sid := fmt.Sprintf("%d-sid", k+1)
-				m := NewSQLManager(db, []byte("01234567890123456789012345678912"))
+				m := NewSQLManager(db, reg)
 				_, err := m.GetKeySet(context.TODO(), sid)
 				require.Error(t, err, "malformed ciphertext")
 			})

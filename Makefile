@@ -1,5 +1,6 @@
 SHELL=/bin/bash -o pipefail
 
+# Runs full test suite including tests where databases are enabled
 .PHONY: test
 test:
 		docker kill hydra_test_database_mysql || true
@@ -8,13 +9,14 @@ test:
 		docker rm -f hydra_test_database_postgres || true
 		docker run --rm --name hydra_test_database_mysql -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:5.7
 		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.6
-		make gen-sql
+		make sqlbin
 		TEST_DATABASE_MYSQL='root:secret@(127.0.0.1:3444)/mysql?parseTime=true' \
 			TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/hydra?sslmode=disable' \
 			go-acc ./... -- -failfast -timeout=20m
 		docker rm -f hydra_test_database_mysql
 		docker rm -f hydra_test_database_postgres
 
+# Resets the test databases
 .PHONY: test-resetdb
 test-resetdb:
 		docker kill hydra_test_database_mysql || true
@@ -24,13 +26,15 @@ test-resetdb:
 		docker run --rm --name hydra_test_database_mysql -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:5.7
 		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.6
 
+# Runs tests in short mode, without database adapters
 .PHONY: test-short
 test-short:
 		go test -failfast -short ./...
 
+# Initializes tools by downloading dependencies
 .PHONY: init
 init:
-		go get -u \
+		GO111MODULE=off go get -u \
 			github.com/ory/x/tools/listx \
 			github.com/sqs/goreturns \
 			github.com/ory/go-acc \
@@ -40,28 +44,34 @@ init:
 			golang.org/x/tools/cmd/goimports \
 			github.com/gobuffalo/packr/packr
 
+# Formats the code
 .PHONY: format
 format:
 		goreturns -w -local github.com/ory $$(listx .)
 
-.PHONY: gen-mocks
-gen-mocks:
+# Generates mocks
+.PHONY: mocks
+mocks:
 		mockgen -package oauth2_test -destination oauth2/oauth2_provider_mock_test.go github.com/ory/fosite OAuth2Provider
-		mockgen -mock_names Registry=MockClientRegistry -package internal -destination internal/client_registry_mock.go github.com/ory/hydra/client InternalRegistry
-		mockgen -mock_names Configuration=MockClientConfiguration -package internal -destination internal/client_configuration_mock.go github.com/ory/hydra/client Configuration
+		mockgen -mock_names Provider=MockConfiguration -package internal -destination internal/configuration_provider_mock.go github.com/ory/hydra/driver/configuration Provider
+		mockgen -mock_names Registry=MockRegistry -package internal -destination internal/registry_mock.go github.com/ory/hydra/driver Registry
 
-.PHONY: gen-sql
-gen-sql:
+
+# Adds sql files to the binary using go-bindata
+.PHONY: sqlbin
+sqlbin:
 		cd client; go-bindata -o sql_migration_files.go -pkg client ./migrations/sql/shared ./migrations/sql/mysql ./migrations/sql/postgres ./migrations/sql/tests
 		cd consent; go-bindata -o sql_migration_files.go -pkg consent ./migrations/sql/shared ./migrations/sql/mysql ./migrations/sql/postgres ./migrations/sql/tests
 		cd jwk; go-bindata -o sql_migration_files.go -pkg jwk ./migrations/sql/shared ./migrations/sql/mysql ./migrations/sql/postgres ./migrations/sql/tests
 		cd oauth2; go-bindata -o sql_migration_files.go -pkg oauth2 ./migrations/sql/shared ./migrations/sql/mysql ./migrations/sql/postgres ./migrations/sql/tests
 
+# Runs all code generators
 .PHONY: gen
-gen: gen-mocks gen-sql gen-sdk
+gen: mocks sqlbin sdks
 
-.PHONY: gen-sdk
-gen-sdk:
+# Generates the SDKs
+.PHONY: sdks
+sdks:
 		GO111MODULE=on go mod tidy
 		GO111MODULE=on go mod vendor
 		GO111MODULE=off swagger generate spec -m -o ./docs/api.swagger.json

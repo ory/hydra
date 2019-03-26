@@ -31,7 +31,7 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/x"
 )
 
 func MockConsentRequest(key string, remember bool, rememberFor int, hasError bool, skip bool, authAt bool) (c *ConsentRequest, h *HandledConsentRequest) {
@@ -140,7 +140,7 @@ func MockAuthRequest(key string, authAt bool) (c *AuthenticationRequest, h *Hand
 	return c, h
 }
 
-func ManagerTests(m Manager, clientManager client.Manager, fositeManager pkg.FositeStorer) func(t *testing.T) {
+func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.FositeStorer) func(t *testing.T) {
 	return func(t *testing.T) {
 		t.Run("case=init-fks", func(t *testing.T) {
 			for _, k := range []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "rv1", "rv2"} {
@@ -183,7 +183,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager pkg.Fos
 			} {
 				t.Run("case=create-get-"+tc.s.ID, func(t *testing.T) {
 					_, err := m.GetAuthenticationSession(context.TODO(), tc.s.ID)
-					require.EqualError(t, err, pkg.ErrNotFound.Error())
+					require.EqualError(t, err, x.ErrNotFound.Error())
 
 					err = m.CreateAuthenticationSession(context.TODO(), &tc.s)
 					require.NoError(t, err)
@@ -373,7 +373,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager pkg.Fos
 					for _, id := range tc.ids {
 						t.Run(fmt.Sprintf("id=%s", id), func(t *testing.T) {
 							_, err := m.GetAuthenticationSession(context.TODO(), id)
-							assert.EqualError(t, err, pkg.ErrNotFound.Error())
+							assert.EqualError(t, err, x.ErrNotFound.Error())
 						})
 					}
 				})
@@ -433,7 +433,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager pkg.Fos
 					for _, id := range tc.ids {
 						t.Run(fmt.Sprintf("id=%s", id), func(t *testing.T) {
 							_, err := m.GetConsentRequest(context.TODO(), id)
-							assert.EqualError(t, err, pkg.ErrNotFound.Error())
+							assert.EqualError(t, err, x.ErrNotFound.Error())
 						})
 					}
 
@@ -498,7 +498,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager pkg.Fos
 
 			t.Run("case=obfuscated", func(t *testing.T) {
 				got, err := m.GetForcedObfuscatedAuthenticationSession(context.TODO(), "fk-client-1", "obfuscated-1")
-				require.EqualError(t, err, pkg.ErrNotFound.Error())
+				require.EqualError(t, err, x.ErrNotFound.Error())
 
 				expect := &ForcedObfuscatedAuthenticationSession{
 					ClientID:          "fk-client-1",
@@ -523,7 +523,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager pkg.Fos
 				assert.EqualValues(t, expect, got)
 
 				got, err = m.GetForcedObfuscatedAuthenticationSession(context.TODO(), "fk-client-1", "obfuscated-1")
-				require.EqualError(t, err, pkg.ErrNotFound.Error())
+				require.EqualError(t, err, x.ErrNotFound.Error())
 			})
 
 		})

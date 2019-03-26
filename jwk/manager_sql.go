@@ -31,21 +31,21 @@ import (
 	"github.com/sirupsen/logrus"
 	jose "gopkg.in/square/go-jose.v2"
 
-	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/sqlcon"
 )
 
 type SQLManager struct {
 	DB *sqlx.DB
-	r  registry
+	R  InternalRegistry
 }
 
-func NewSQLManager(db *sqlx.DB, r registry) *SQLManager {
-	return &SQLManager{DB: db, r: r}
+func NewSQLManager(db *sqlx.DB, r InternalRegistry) *SQLManager {
+	return &SQLManager{DB: db, R: r}
 }
 
-var migrations = map[string]*dbal.PackrMigrationSource{
+var Migrations = map[string]*dbal.PackrMigrationSource{
 	dbal.DriverMySQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
 		"migrations/sql/shared",
 		"migrations/sql/mysql",
@@ -73,7 +73,7 @@ func (m *SQLManager) CreateSchemas() (int, error) {
 	}
 
 	migrate.SetTable("hydra_jwk_migration")
-	n, err := migrate.Exec(m.DB.DB, m.DB.DriverName(), migrations[database], migrate.Up)
+	n, err := migrate.Exec(m.DB.DB, m.DB.DriverName(), Migrations[database], migrate.Up)
 	if err != nil {
 		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
 	}
@@ -86,7 +86,7 @@ func (m *SQLManager) AddKey(ctx context.Context, set string, key *jose.JSONWebKe
 		return errors.WithStack(err)
 	}
 
-	encrypted, err := m.r.KeyCipher().Encrypt(out)
+	encrypted, err := m.R.KeyCipher().Encrypt(out)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -108,7 +108,7 @@ func (m *SQLManager) AddKeySet(ctx context.Context, set string, keys *jose.JSONW
 		return errors.WithStack(err)
 	}
 
-	if err := m.addKeySet(ctx, tx, m.r.KeyCipher(), set, keys); err != nil {
+	if err := m.addKeySet(ctx, tx, m.R.KeyCipher(), set, keys); err != nil {
 		if re := tx.Rollback(); re != nil {
 			return errors.Wrap(err, re.Error())
 		}
@@ -155,7 +155,7 @@ func (m *SQLManager) GetKey(ctx context.Context, set, kid string) (*jose.JSONWeb
 		return nil, sqlcon.HandleError(err)
 	}
 
-	key, err := m.r.KeyCipher().Decrypt(d.Key)
+	key, err := m.R.KeyCipher().Decrypt(d.Key)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -177,12 +177,12 @@ func (m *SQLManager) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKe
 	}
 
 	if len(ds) == 0 {
-		return nil, errors.Wrap(pkg.ErrNotFound, "")
+		return nil, errors.Wrap(x.ErrNotFound, "")
 	}
 
 	keys := &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{}}
 	for _, d := range ds {
-		key, err := m.r.KeyCipher().Decrypt(d.Key)
+		key, err := m.R.KeyCipher().Decrypt(d.Key)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
@@ -195,7 +195,7 @@ func (m *SQLManager) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKe
 	}
 
 	if len(keys.Keys) == 0 {
-		return nil, errors.WithStack(pkg.ErrNotFound)
+		return nil, errors.WithStack(x.ErrNotFound)
 	}
 
 	return keys, nil

@@ -42,7 +42,7 @@ type RS256JWTStrategy struct {
 	sync.RWMutex
 
 	RS256JWTStrategy *jwt.RS256JWTStrategy
-	r                registry
+	r                InternalRegistry
 	c                Configuration
 	rs               func() string
 
@@ -52,7 +52,7 @@ type RS256JWTStrategy struct {
 	privateKeyID string
 }
 
-func NewRS256JWTStrategy(r registry, rs func() string) (*RS256JWTStrategy, error) {
+func NewRS256JWTStrategy(r InternalRegistry, rs func() string) (*RS256JWTStrategy, error) {
 	j := &RS256JWTStrategy{r: r, rs: rs, RS256JWTStrategy: new(jwt.RS256JWTStrategy)}
 	if err := j.refresh(context.TODO()); err != nil {
 		return nil, err

@@ -41,12 +41,12 @@ import (
 	"github.com/ory/go-convenience/stringsx"
 	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/x"
 )
 
 const (
-	cookieAuthenticationName    = "oauth2_authentication_session"
-	cookieAuthenticationSIDName = "sid"
+	CookieAuthenticationName    = "oauth2_authentication_session"
+	CookieAuthenticationSIDName = "sid"
 
 	cookieAuthenticationCSRFName = "oauth2_authentication_csrf"
 	cookieConsentCSRFName        = "oauth2_consent_csrf"
@@ -54,11 +54,11 @@ const (
 
 type DefaultStrategy struct {
 	c Configuration
-	r registry
+	r InternalRegistry
 }
 
 func NewStrategy(
-	r registry,
+	r InternalRegistry,
 	c Configuration,
 ) *DefaultStrategy {
 	return &DefaultStrategy{
@@ -77,19 +77,19 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 	}
 
 	// We try to open the session cookie. If it does not exist (indicated by the error), we must authenticate the user.
-	cookie, err := s.r.CookieStore().Get(r, cookieAuthenticationName)
+	cookie, err := s.r.CookieStore().Get(r, CookieAuthenticationName)
 	if err != nil {
 		//id.L.WithError(err).Debug("No OAuth2 authentication session was found, performing consent authentication flow")
 		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{}, nil)
 	}
 
-	sessionID := mapx.GetStringDefault(cookie.Values, cookieAuthenticationSIDName, "")
+	sessionID := mapx.GetStringDefault(cookie.Values, CookieAuthenticationSIDName, "")
 	if sessionID == "" {
 		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{}, nil)
 	}
 
 	session, err := s.r.ConsentManager().GetAuthenticationSession(r.Context(), sessionID)
-	if errors.Cause(err) == pkg.ErrNotFound {
+	if errors.Cause(err) == x.ErrNotFound {
 		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{}, nil)
 	} else if err != nil {
 		return err
@@ -131,7 +131,7 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 		return err
 	}
 
-	if s, err := s.r.ConsentManager().GetForcedObfuscatedAuthenticationSession(r.Context(), ar.GetClient().GetID(), hintSub); errors.Cause(err) == pkg.ErrNotFound {
+	if s, err := s.r.ConsentManager().GetForcedObfuscatedAuthenticationSession(r.Context(), ar.GetClient().GetID(), hintSub); errors.Cause(err) == x.ErrNotFound {
 		// do nothing
 	} else if err != nil {
 		return err
@@ -168,11 +168,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 	csrf := strings.Replace(uuid.New(), "-", "", -1)
 
 	// Generate the request URL
-	iu, err := url.Parse(s.c.IssuerURL())
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	iu = urlx.AppendPaths(iu, s.c.OAuth2AuthURL())
+	iu := urlx.AppendPaths(s.c.IssuerURL(), s.c.OAuth2AuthURL())
 	iu.RawQuery = r.URL.RawQuery
 
 	var idTokenHintClaims jwtgo.MapClaims
@@ -222,16 +218,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 		return errors.WithStack(err)
 	}
 
-	au, err := url.Parse(s.c.LoginURL())
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	q := au.Query()
-	q.Set("login_challenge", challenge)
-	au.RawQuery = q.Encode()
-
-	http.Redirect(w, r, au.String(), http.StatusFound)
+	http.Redirect(w, r, urlx.SetQuery(s.c.LoginURL(), url.Values{"login_challenge": {challenge}}).String(), http.StatusFound)
 
 	// generate the verifier
 	return errors.WithStack(ErrAbortOAuth2Request)
@@ -251,11 +238,11 @@ func (s *DefaultStrategy) revokeAuthenticationSession(w http.ResponseWriter, r *
 }
 
 func revokeAuthenticationCookie(w http.ResponseWriter, r *http.Request, s sessions.Store) (string, error) {
-	cookie, _ := s.Get(r, cookieAuthenticationName)
-	sid, _ := mapx.GetString(cookie.Values, cookieAuthenticationSIDName)
+	cookie, _ := s.Get(r, CookieAuthenticationName)
+	sid, _ := mapx.GetString(cookie.Values, CookieAuthenticationSIDName)
 
 	cookie.Options.MaxAge = -1
-	cookie.Values[cookieAuthenticationSIDName] = ""
+	cookie.Values[CookieAuthenticationSIDName] = ""
 
 	if err := cookie.Save(r, w); err != nil {
 		return "", errors.WithStack(err)
@@ -285,7 +272,7 @@ func (s *DefaultStrategy) obfuscateSubjectIdentifier(req fosite.AuthorizeRequest
 func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*HandledAuthenticationRequest, error) {
 	ctx := r.Context()
 	session, err := s.r.ConsentManager().VerifyAndInvalidateAuthenticationRequest(ctx, verifier)
-	if errors.Cause(err) == pkg.ErrNotFound {
+	if errors.Cause(err) == x.ErrNotFound {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithDebug("The login verifier has already been used, has not been granted, or is invalid."))
 	} else if err != nil {
 		return nil, err
@@ -380,7 +367,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return session, nil
 	}
 
-	cookie, _ := s.r.CookieStore().Get(r, cookieAuthenticationName)
+	cookie, _ := s.r.CookieStore().Get(r, CookieAuthenticationName)
 	sid := uuid.New()
 
 	if err := s.r.ConsentManager().CreateAuthenticationSession(r.Context(), &AuthenticationSession{
@@ -391,7 +378,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return nil, err
 	}
 
-	cookie.Values[cookieAuthenticationSIDName] = sid
+	cookie.Values[CookieAuthenticationSIDName] = sid
 	if session.RememberFor >= 0 {
 		cookie.Options.MaxAge = session.RememberFor
 	}
@@ -499,20 +486,15 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 		return errors.WithStack(err)
 	}
 
-	cu, err := url.Parse(s.c.ConsentURL())
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
 	if err := createCsrfSession(w, r, s.r.CookieStore(), cookieConsentCSRFName, csrf, s.c.ServesHTTPS()); err != nil {
 		return errors.WithStack(err)
 	}
 
-	q := cu.Query()
-	q.Set("consent_challenge", challenge)
-	cu.RawQuery = q.Encode()
-
-	http.Redirect(w, r, cu.String(), http.StatusFound)
+	http.Redirect(
+		w, r,
+		urlx.SetQuery(s.c.ConsentURL(), url.Values{"consent_challenge": {challenge}}).String(),
+		http.StatusFound,
+	)
 
 	// generate the verifier
 	return errors.WithStack(ErrAbortOAuth2Request)
@@ -520,7 +502,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 
 func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*HandledConsentRequest, error) {
 	session, err := s.r.ConsentManager().VerifyAndInvalidateConsentRequest(r.Context(), verifier)
-	if errors.Cause(err) == pkg.ErrNotFound {
+	if errors.Cause(err) == x.ErrNotFound {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithDebug("The consent verifier has already been used, has not been granted, or is invalid."))
 	} else if err != nil {
 		return nil, err
@@ -548,7 +530,7 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 	}
 
 	if session.Session == nil {
-		session.Session = newConsentRequestSessionData()
+		session.Session = NewConsentRequestSessionData()
 	}
 
 	if session.Session.AccessToken == nil {

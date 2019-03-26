@@ -26,89 +26,40 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jmoiron/sqlx"
+	"github.com/spf13/viper"
+
+	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/internal"
+
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/fosite"
-	"github.com/ory/hydra/client"
 	. "github.com/ory/hydra/consent"
-	"github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/pkg"
 	"github.com/ory/x/sqlcon/dockertest"
 )
 
-type managerRegistry struct {
-	consent Manager
-	client  client.Manager
-	fosite  pkg.FositeStorer
-}
-
 var m sync.Mutex
-var clientManager = client.NewMemoryManager(&fosite.BCrypt{WorkFactor: 8})
-var fositeManager = oauth2.NewFositeMemoryStore(clientManager, time.Hour)
-var managers = map[string]managerRegistry{
-	"memory": {
-		consent: NewMemoryManager(fositeManager),
-		client:  clientManager,
-		fosite:  fositeManager,
-	},
-}
+var regs = make(map[string]driver.Registry)
 
-func connectToPostgres(t *testing.T, managers map[string]managerRegistry) {
+func connectToPostgres(t *testing.T) *sqlx.DB {
 	db, err := dockertest.ConnectToTestPostgreSQL()
 	require.NoError(t, err)
 	t.Logf("Cleaning postgres db...")
 	cleanDB(t, db)
 	t.Logf("Cleaned postgres db")
-
-	c := client.NewSQLManager(db, &fosite.BCrypt{WorkFactor: 8})
-	d, err := c.CreateSchemas()
-	require.NoError(t, err)
-	t.Logf("Migrated %d postgres schemas", d)
-
-	fositeManager := oauth2.NewFositeMemoryStore(c, time.Hour)
-
-	s := NewSQLManager(db, c, fositeManager)
-	d, err = s.CreateSchemas()
-	t.Logf("Migrated %d postgres schemas", d)
-	require.NoError(t, err)
-
-	m.Lock()
-	managers["postgres"] = managerRegistry{
-		consent: s,
-		client:  c,
-		fosite:  fositeManager,
-	}
-	m.Unlock()
+	return db
 }
 
-func connectToMySQL(t *testing.T, managers map[string]managerRegistry) {
+func connectToMySQL(t *testing.T) *sqlx.DB {
 	db, err := dockertest.ConnectToTestMySQL()
 	require.NoError(t, err)
 	t.Logf("Cleaning mysql db...")
 	cleanDB(t, db)
 	t.Logf("Cleaned mysql db")
-
-	c := client.NewSQLManager(db, &fosite.BCrypt{WorkFactor: 8})
-	d, err := c.CreateSchemas()
-	require.NoError(t, err)
-	t.Logf("Migrated %d mysql schemas", d)
-
-	fositeManager := oauth2.NewFositeMemoryStore(c, time.Hour)
-
-	s := NewSQLManager(db, c, fositeManager)
-	d, err = s.CreateSchemas()
-	t.Logf("Migrated %d mysql schemas", d)
-	require.NoError(t, err)
-
-	m.Lock()
-	managers["mysql"] = managerRegistry{
-		consent: s,
-		client:  c,
-		fosite:  fositeManager,
-	}
-	m.Unlock()
+	return db
 }
 
 func TestMain(m *testing.M) {
@@ -117,23 +68,36 @@ func TestMain(m *testing.M) {
 	runner.Exit(m.Run())
 }
 
+func createSQL(db *sqlx.DB) driver.Registry {
+	conf := internal.NewConfigurationWithDefaults(false)
+	return internal.NewRegistrySQL(conf, db)
+}
+
 func TestManagers(t *testing.T) {
+	conf := internal.NewConfigurationWithDefaults(false)
+	viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Hour)
+	regs["memory"] = internal.NewRegistry(conf)
+
 	if !testing.Short() {
 		dockertest.Parallel([]func(){
 			func() {
-				connectToPostgres(t, managers)
+				m.Lock()
+				regs["postgres"] = createSQL(connectToPostgres(t))
+				m.Unlock()
 			}, func() {
-				connectToMySQL(t, managers)
+				m.Lock()
+				regs["mysql"] = createSQL(connectToMySQL(t))
+				m.Unlock()
 			},
 		})
 	}
 
-	for k, m := range managers {
-		t.Run("manager="+k, ManagerTests(m.consent, m.client, m.fosite))
+	for k, m := range regs {
+		t.Run("manager="+k, ManagerTests(m.ConsentManager(), m.ClientManager(), m.OAuth2Storage()))
 	}
 
-	for _, m := range managers {
-		if mm, ok := m.consent.(*SQLManager); ok {
+	for _, m := range regs {
+		if mm, ok := m.ConsentManager().(*SQLManager); ok {
 			cleanDB(t, mm.DB)
 		}
 	}

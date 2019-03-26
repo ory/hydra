@@ -21,33 +21,29 @@
 package oauth2_test
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/internal"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	jose "gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite"
-	"github.com/ory/fosite/compose"
-	"github.com/ory/fosite/storage"
-	"github.com/ory/herodot"
-	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/pkg"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
+	"github.com/ory/hydra/x"
 )
 
-func createAccessTokenSession(subject, client string, token string, expiresAt time.Time, fs *storage.MemoryStore, scopes fosite.Arguments) {
+func createAccessTokenSession(subject, client string, token string, expiresAt time.Time, fs x.FositeStorer, scopes fosite.Arguments) {
 	createAccessTokenSessionPairwise(subject, client, token, expiresAt, fs, scopes, "")
 }
 
-func createAccessTokenSessionPairwise(subject, client string, token string, expiresAt time.Time, fs *storage.MemoryStore, scopes fosite.Arguments, obfuscated string) {
+func createAccessTokenSessionPairwise(subject, client string, token string, expiresAt time.Time, fs x.FositeStorer, scopes fosite.Arguments, obfuscated string) {
 	ar := fosite.NewAccessRequest(oauth2.NewSession(subject))
 	ar.GrantedScope = fosite.Arguments{"core"}
 	if scopes != nil {
@@ -61,48 +57,34 @@ func createAccessTokenSessionPairwise(subject, client string, token string, expi
 		ar.Session.(*oauth2.Session).Claims.Subject = obfuscated
 	}
 
-	fs.CreateAccessTokenSession(nil, token, ar)
+	if err := fs.CreateAccessTokenSession(nil, token, ar); err != nil {
+		panic(err)
+	}
 }
 
 func TestRevoke(t *testing.T) {
-	var (
-		tokens = pkg.Tokens(4)
-		store  = storage.NewExampleStore()
-		now    = time.Now().UTC().Round(time.Second)
-	)
+	conf := internal.NewConfigurationWithDefaults(false)
+	reg := internal.NewRegistry(conf)
 
-	jm := &jwk.MemoryManager{Keys: map[string]*jose.JSONWebKeySet{}}
-	keys, err := (&jwk.RS256Generator{}).Generate("", "sig")
-	require.NoError(t, err)
-	require.NoError(t, jm.AddKeySet(context.TODO(), oauth2.OpenIDConnectKeyName, keys))
-	jwtStrategy, err := jwk.NewRS256JWTStrategy(jm, oauth2.OpenIDConnectKeyName)
+	internal.EnsureRegistryKeys(reg, oauth2.OpenIDConnectKeyName)
+	internal.AddFositeExamples(reg)
 
-	handler := &oauth2.Handler{
-		OAuth2: compose.Compose(
-			fc,
-			store,
-			&compose.CommonStrategy{
-				CoreStrategy:               compose.NewOAuth2HMACStrategy(fc, []byte("1234567890123456789012345678901234567890"), nil),
-				OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(fc, pkg.MustINSECURELOWENTROPYRSAKEYFORTEST()),
-			},
-			nil,
-			compose.OAuth2TokenIntrospectionFactory,
-			compose.OAuth2TokenRevocationFactory,
-		),
-		H:                 herodot.NewJSONWriter(nil),
-		OpenIDJWTStrategy: jwtStrategy,
-	}
+	tokens := Tokens(conf, 4)
+	now := time.Now().UTC().Round(time.Second)
 
+	handler := reg.OAuth2Handler()
 	router := httprouter.New()
 	handler.SetRoutes(router, router, func(h http.Handler) http.Handler {
 		return h
 	})
 	server := httptest.NewServer(router)
 
-	createAccessTokenSession("alice", "my-client", tokens[0][0], now.Add(time.Hour), store, nil)
-	createAccessTokenSession("siri", "my-client", tokens[1][0], now.Add(time.Hour), store, nil)
-	createAccessTokenSession("siri", "my-client", tokens[2][0], now.Add(-time.Hour), store, nil)
-	createAccessTokenSession("siri", "doesnt-exist", tokens[3][0], now.Add(-time.Hour), store, nil)
+	createAccessTokenSession("alice", "my-client", tokens[0][0], now.Add(time.Hour), reg.OAuth2Storage(), nil)
+	createAccessTokenSession("siri", "my-client", tokens[1][0], now.Add(time.Hour), reg.OAuth2Storage(), nil)
+	createAccessTokenSession("siri", "my-client", tokens[2][0], now.Add(-time.Hour), reg.OAuth2Storage(), nil)
+	createAccessTokenSession("siri", "encoded:client", tokens[3][0], now.Add(-time.Hour), reg.OAuth2Storage(), nil)
+
+	require.Len(t, reg.OAuth2Storage().(*oauth2.FositeMemoryStore).AccessTokens, 4)
 
 	client := hydra.NewPublicApiWithBasePath(server.URL)
 	client.Configuration.Username = "my-client"
@@ -114,17 +96,21 @@ func TestRevoke(t *testing.T) {
 	}{
 		{
 			token: "invalid",
+			assert: func(t *testing.T) {
+				assert.Len(t, reg.OAuth2Storage().(*oauth2.FositeMemoryStore).AccessTokens, 4)
+			},
 		},
 		{
 			token: tokens[3][1],
 			assert: func(t *testing.T) {
-				assert.Len(t, store.AccessTokens, 4)
+				assert.Len(t, reg.OAuth2Storage().(*oauth2.FositeMemoryStore).AccessTokens, 4)
 			},
 		},
 		{
 			token: tokens[0][1],
 			assert: func(t *testing.T) {
-				assert.Len(t, store.AccessTokens, 3)
+				t.Logf("Tried to delete: %s %s", tokens[0][0], tokens[0][1])
+				assert.Len(t, reg.OAuth2Storage().(*oauth2.FositeMemoryStore).AccessTokens, 3)
 			},
 		},
 		{
@@ -133,13 +119,13 @@ func TestRevoke(t *testing.T) {
 		{
 			token: tokens[2][1],
 			assert: func(t *testing.T) {
-				assert.Len(t, store.AccessTokens, 2)
+				assert.Len(t, reg.OAuth2Storage().(*oauth2.FositeMemoryStore).AccessTokens, 2)
 			},
 		},
 		{
 			token: tokens[1][1],
 			assert: func(t *testing.T) {
-				assert.Len(t, store.AccessTokens, 1)
+				assert.Len(t, reg.OAuth2Storage().(*oauth2.FositeMemoryStore).AccessTokens, 1)
 			},
 		},
 	} {

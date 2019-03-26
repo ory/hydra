@@ -1,15 +1,24 @@
 package consent
 
 import (
+	"github.com/ory/fosite"
+	"github.com/ory/fosite/handler/openid"
+	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/x"
 )
 
-type registry interface {
+type InternalRegistry interface {
 	x.RegistryWriter
 	x.RegistryCookieStore
-	// oauth2.Registry
 	Registry
+	client.Registry
+
+	OAuth2Storage() x.FositeStorer
+	OpenIDJWTStrategy() jwk.JWTStrategy
+	OpenIDConnectRequestValidator() *openid.OpenIDConnectRequestValidator
+	ScopeStrategy() fosite.ScopeStrategy
 }
 
 type Registry interface {

@@ -25,6 +25,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/ory/hydra/client"
+
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
@@ -39,7 +41,7 @@ type FositeMemoryStore struct {
 	PKCES          map[string]fosite.Requester
 
 	c Configuration
-	r registry
+	r InternalRegistry
 
 	sync.RWMutex
 
@@ -47,7 +49,7 @@ type FositeMemoryStore struct {
 }
 
 func NewFositeMemoryStore(
-	r registry,
+	r InternalRegistry,
 	c Configuration,
 ) *FositeMemoryStore {
 	return &FositeMemoryStore{
@@ -69,6 +71,33 @@ type authorizeCode struct {
 
 func (s *FositeMemoryStore) GetClient(ctx context.Context, id string) (fosite.Client, error) {
 	return s.r.ClientManager().GetClient(ctx, id)
+}
+
+func (s *FositeMemoryStore) Authenticate(ctx context.Context, id string, secret []byte) (*client.Client, error) {
+	return s.r.ClientManager().Authenticate(ctx, id, secret)
+}
+
+func (s *FositeMemoryStore) CreateClient(ctx context.Context, c *client.Client) error {
+	return s.r.ClientManager().CreateClient(ctx, c)
+
+}
+
+func (s *FositeMemoryStore) UpdateClient(ctx context.Context, c *client.Client) error {
+	return s.r.ClientManager().UpdateClient(ctx, c)
+
+}
+
+func (s *FositeMemoryStore) DeleteClient(ctx context.Context, id string) error {
+	return s.r.ClientManager().DeleteClient(ctx, id)
+
+}
+
+func (s *FositeMemoryStore) GetClients(ctx context.Context, limit, offset int) (map[string]client.Client, error) {
+	return s.r.ClientManager().GetClients(ctx, limit, offset)
+}
+
+func (s *FositeMemoryStore) GetConcreteClient(ctx context.Context, id string) (*client.Client, error) {
+	return s.r.ClientManager().GetConcreteClient(ctx, id)
 }
 
 func (s *FositeMemoryStore) CreateOpenIDConnectSession(_ context.Context, authorizeCode string, requester fosite.Requester) error {
@@ -164,7 +193,7 @@ func (s *FositeMemoryStore) GetAccessTokenSession(ctx context.Context, signature
 	s.RUnlock()
 
 	if !ok {
-		return nil, errors.Wrap(fosite.ErrNotFound, "")
+		return nil, errors.Wrap(fosite.ErrNotFound, signature)
 	}
 
 	if _, err := s.r.ClientManager().GetClient(ctx, rel.GetClient().GetID()); errors.Cause(err) == sqlcon.ErrNoRows {
@@ -275,7 +304,7 @@ func (s *FositeMemoryStore) FlushInactiveAccessTokens(ctx context.Context, notAf
 
 	now := time.Now()
 	for sig, token := range s.AccessTokens {
-		expiresAt := token.GetRequestedAt().Add(s.AccessTokenLifespan)
+		expiresAt := token.GetRequestedAt().Add(s.c.AccessTokenLifespan())
 		isExpired := expiresAt.Before(now)
 		isNotAfter := token.GetRequestedAt().Before(notAfter)
 

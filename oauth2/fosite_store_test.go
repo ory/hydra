@@ -21,121 +21,84 @@
 package oauth2_test
 
 import (
+	"context"
 	"flag"
+	"github.com/ory/hydra/client"
 	"sync"
 	"testing"
-	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/fosite"
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/internal"
+
 	. "github.com/ory/hydra/oauth2"
 	"github.com/ory/x/sqlcon/dockertest"
 )
 
-var fositeStores = map[string]ManagerTestSetup{}
-var clientManager = &client.MemoryManager{
-	Clients: []client.Client{{ClientID: "foobar"}},
-	Hasher:  &fosite.BCrypt{},
-}
-var fm = NewFositeMemoryStore(clientManager, time.Hour)
-var databases = make(map[string]*sqlx.DB)
+var registries = make(map[string]driver.Registry)
+
 var m sync.Mutex
 
-func init() {
-	fositeStores["memory"] = ManagerTestSetup{
-		F:  fm,
-		Cl: clientManager,
-		Co: consent.NewMemoryManager(fm),
-	}
-}
 func TestMain(m *testing.M) {
 	flag.Parse()
 	runner := dockertest.Register()
 	runner.Exit(m.Run())
 }
 
-func connectToPG(t *testing.T) {
+func connectToPG(t *testing.T) *sqlx.DB {
 	db, err := dockertest.ConnectToTestPostgreSQL()
 	require.NoError(t, err)
 	t.Logf("Cleaning postgres db...")
 	cleanDB(t, db)
 	t.Logf("Cleaned postgres db")
 
-	c := client.NewSQLManager(db, &fosite.BCrypt{WorkFactor: 8})
-	_, err = c.CreateSchemas()
-	require.NoError(t, err)
-
-	cm := consent.NewSQLManager(db, c, nil)
-	_, err = cm.CreateSchemas()
-	require.NoError(t, err)
-
-	s := NewFositeSQLStore(c, db, logrus.New(), time.Hour, false)
-	_, err = s.CreateSchemas()
-	require.NoError(t, err)
-
-	m.Lock()
-	databases["postgres"] = db
-	fositeStores["postgres"] = ManagerTestSetup{
-		F:  s,
-		Co: cm,
-		Cl: c,
-	}
-	m.Unlock()
+	return db
 }
 
-func connectToMySQL(t *testing.T) {
+func connectToMySQL(t *testing.T) *sqlx.DB {
 	db, err := dockertest.ConnectToTestMySQL()
 	require.NoError(t, err)
 	t.Logf("Cleaning mysql db...")
 	cleanDB(t, db)
 	t.Logf("Cleaned mysql db")
 
-	c := client.NewSQLManager(db, &fosite.BCrypt{WorkFactor: 8})
-	_, err = c.CreateSchemas()
-	require.NoError(t, err)
-
-	cm := consent.NewSQLManager(db, c, nil)
-	_, err = cm.CreateSchemas()
-	require.NoError(t, err)
-
-	s := NewFositeSQLStore(c, db, logrus.New(), time.Hour, false)
-	_, err = s.CreateSchemas()
-	require.NoError(t, err)
-
-	m.Lock()
-	databases["mysql"] = db
-	fositeStores["mysql"] = ManagerTestSetup{
-		F:  s,
-		Co: cm,
-		Cl: c,
-	}
-	m.Unlock()
+	return db
 }
 
 func TestManagers(t *testing.T) {
+	conf := internal.NewConfigurationWithDefaults(false)
+	reg := internal.NewRegistry(conf)
+
+	registries["memory"] = reg
+
 	if !testing.Short() {
 		dockertest.Parallel([]func(){
 			func() {
-				connectToPG(t)
+				m.Lock()
+				registries["postgres"] = internal.NewRegistrySQL(conf, connectToPG(t))
+				m.Unlock()
 			},
 			func() {
 				connectToMySQL(t)
+				m.Lock()
+				registries["mysql"] = internal.NewRegistrySQL(conf, connectToMySQL(t))
+				m.Unlock()
 			},
 		})
 	}
 
-	for k, store := range fositeStores {
+	for k, store := range registries {
+		require.NoError(t, store.ClientManager().CreateClient(context.Background(), &client.Client{ClientID: "foobar"}))
 		TestHelperRunner(t, store, k)
 	}
 
-	for _, m := range databases {
-		cleanDB(t, m)
+	for _, m := range registries {
+		if mm, ok := m.(*driver.RegistrySQL); ok {
+			cleanDB(t, mm.DB())
+		}
 	}
 }

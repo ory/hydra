@@ -18,28 +18,24 @@
  * @license 	Apache-2.0
  */
 
-package jwk
+package internal
 
 import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
 
+	"github.com/ory/hydra/jwk"
+
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
-	jose "gopkg.in/square/go-jose.v2"
+	"gopkg.in/square/go-jose.v2"
 )
 
-type RS256Generator struct {
-	KeyLength int
-}
+type veryInsecureRS256Generator struct{}
 
-func (g *RS256Generator) Generate(id, use string) (*jose.JSONWebKeySet, error) {
-	if g.KeyLength < 4096 {
-		g.KeyLength = 4096
-	}
-
-	key, err := rsa.GenerateKey(rand.Reader, g.KeyLength)
+func (g *veryInsecureRS256Generator) Generate(id, use string) (*jose.JSONWebKeySet, error) {
+	key, err := rsa.GenerateKey(rand.Reader, 512)
 	if err != nil {
 		return nil, errors.Errorf("Could not generate key because %s", err)
 	} else if err = key.Validate(); err != nil {
@@ -58,14 +54,14 @@ func (g *RS256Generator) Generate(id, use string) (*jose.JSONWebKeySet, error) {
 				Algorithm:    "RS256",
 				Key:          key,
 				Use:          use,
-				KeyID:        Ider("private", id),
+				KeyID:        jwk.Ider("private", id),
 				Certificates: []*x509.Certificate{},
 			},
 			{
 				Algorithm:    "RS256",
 				Use:          use,
 				Key:          &key.PublicKey,
-				KeyID:        Ider("public", id),
+				KeyID:        jwk.Ider("public", id),
 				Certificates: []*x509.Certificate{},
 			},
 		},

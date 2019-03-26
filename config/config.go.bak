@@ -429,8 +429,8 @@ func (c *Config) Resolve(join ...string) *url.URL {
 //	}
 //
 //	if len(c.SystemSecret) >= 16 {
-//		c.systemSecret = pkg.HashStringSecret(c.SystemSecret)
-//		return pkg.HashStringSecret(c.SystemSecret)
+//		c.systemSecret = x.HashStringSecret(c.SystemSecret)
+//		return x.HashStringSecret(c.SystemSecret)
 //	}
 //
 //	if len(c.SystemSecret) > 0 {
@@ -439,12 +439,12 @@ func (c *Config) Resolve(join ...string) *url.URL {
 //	}
 //
 //	c.GetLogger().Warnf("No system secret was set, generating a random system secret...")
-//	secret, err := pkg.GenerateSecret(32)
+//	secret, err := x.GenerateSecret(32)
 //	cmdx.Must(err, "Could not generate global secret: %s", err)
 //	c.GetLogger().Infof("Generated system secret: %s", secret)
-//	c.systemSecret = pkg.HashByteSecret(secret)
+//	c.systemSecret = x.HashByteSecret(secret)
 //	c.GetLogger().Warnln("WARNING: DO NOT generate system secrets in production. The secret will be leaked to the logs.")
-//	return pkg.HashByteSecret(secret)
+//	return x.HashByteSecret(secret)
 //}
 
 func (c *Config) getAddress(address string, port int) string {

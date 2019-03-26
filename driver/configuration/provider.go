@@ -8,9 +8,10 @@ import (
 )
 
 type Provider interface {
-	//ServesHTTPS() bool
+	ServesHTTPS() bool
+
 	//HashSignature() bool
-	//IsUsingJWTAsAccessTokens() bool
+	IsUsingJWTAsAccessTokens() bool
 	WellKnownKeys(include ...string) []string
 
 	SubjectTypesSupported() []string
@@ -25,6 +26,7 @@ type Provider interface {
 	AccessTokenStrategy() string
 	SubjectIdentifierAlgorithmSalt() string
 	OIDCDiscoverySupportedScope() []string
+	OIDCDiscoverySupportedClaims() []string
 	OIDCDiscoveryUserinfoEndpoint() string
 	ShareOAuth2Debug() bool
 	DSN() string

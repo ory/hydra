@@ -18,19 +18,13 @@
  * @license 	Apache-2.0
  */
 
-package server
+package x
 
 import (
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
+	"encoding/base64"
+	"net/url"
 )
 
-var errNilDependency = errors.New("A dependency was expected to be defined but is nil. Please open an issue with the stack trace.")
-
-func expectDependency(logger logrus.FieldLogger, dependencies ...interface{}) {
-	for _, d := range dependencies {
-		if d == nil {
-			logger.WithError(errors.WithStack(errNilDependency)).Fatalf("A fatal issue occurred.")
-		}
-	}
+func BasicAuth(username, password string) string {
+	return base64.StdEncoding.EncodeToString([]byte(url.QueryEscape(username) + ":" + url.QueryEscape(password)))
 }

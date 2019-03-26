@@ -23,8 +23,6 @@ package x
 import (
 	"context"
 
-	"github.com/ory/hydra/driver/configuration"
-
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -33,11 +31,15 @@ const defaultBCryptWorkFactor = 12
 
 // BCrypt implements a BCrypt hasher.
 type BCrypt struct {
-	c configuration.Provider
+	c config
+}
+
+type config interface {
+	BCryptCost() int
 }
 
 // NewBCrypt returns a new BCrypt instance.
-func NewBCrypt(c configuration.Provider) *BCrypt {
+func NewBCrypt(c config) *BCrypt {
 	return &BCrypt{
 		c: c,
 	}

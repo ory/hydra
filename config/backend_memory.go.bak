@@ -30,7 +30,7 @@ import (
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/x"
 )
 
 type MemoryBackend struct {
@@ -46,12 +46,12 @@ func (m *MemoryBackend) Init(url string, l logrus.FieldLogger, _ ...ConnectorOpt
 	return nil
 }
 
-func (m *MemoryBackend) NewConsentManager(_ client.Manager, fs pkg.FositeStorer) consent.Manager {
+func (m *MemoryBackend) NewConsentManager(_ client.Manager, fs x.FositeStorer) consent.Manager {
 	expectDependency(m.l, fs)
 	return consent.NewMemoryManager(fs)
 }
 
-func (m *MemoryBackend) NewOAuth2Manager(clientManager client.Manager, accessTokenLifespan time.Duration, _ string) pkg.FositeStorer {
+func (m *MemoryBackend) NewOAuth2Manager(clientManager client.Manager, accessTokenLifespan time.Duration, _ string) x.FositeStorer {
 	expectDependency(m.l, clientManager)
 	return oauth2.NewFositeMemoryStore(clientManager, accessTokenLifespan)
 }

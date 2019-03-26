@@ -40,7 +40,7 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/x"
 	dockertestd "github.com/ory/sqlcon/dockertest"
 )
 
@@ -83,7 +83,7 @@ func TestMain(m *testing.M) {
 func TestBackendConnectors(t *testing.T) {
 	for _, tc := range testConnectors {
 		var cm client.Manager
-		var fs pkg.FositeStorer
+		var fs x.FositeStorer
 
 		t.Run(fmt.Sprintf("%s/Init", tc.name), func(t *testing.T) {
 			if err := tc.connector.Init(tc.dsn, l); err != nil {

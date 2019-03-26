@@ -37,11 +37,11 @@ const (
 )
 
 type Handler struct {
-	r registry
+	r InternalRegistry
 	c Configuration
 }
 
-func NewHandler(r registry, c Configuration) *Handler {
+func NewHandler(r InternalRegistry, c Configuration) *Handler {
 	return &Handler{r: r, c: c}
 }
 
@@ -242,6 +242,11 @@ func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 
 	if err := json.NewDecoder(r.Body).Decode(&keySet); err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
+		return
+	}
+
+	if err := h.r.KeyManager().DeleteKeySet(r.Context(), set); err != nil {
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 

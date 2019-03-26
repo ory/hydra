@@ -21,7 +21,11 @@
 package cli
 
 import (
-	"github.com/ory/hydra/config"
+	"github.com/ory/x/cmdx"
+	"github.com/ory/x/flagx"
+	"github.com/spf13/cobra"
+	"os"
+	"strings"
 )
 
 type Handler struct {
@@ -32,12 +36,23 @@ type Handler struct {
 	Migration     *MigrateHandler
 }
 
-func NewHandler(c *config.Config) *Handler {
+func remote(cmd *cobra.Command) string {
+	if endpoint := flagx.MustGetString(cmd, "endpoint"); endpoint != "" {
+		return strings.TrimRight(endpoint, "/")
+	} else if endpoint := os.Getenv("HYDRA_URL"); endpoint != "" {
+		return strings.TrimRight(endpoint, "/")
+	}
+
+	cmdx.Fatalf("To execute this command, the endpoint URL must point to the URL where ORY Hydra is located. To set the endpoint URL, use flag --endpoint or environment variable HYDRA_URL if an administrative command was used.")
+	return ""
+}
+
+func NewHandler() *Handler {
 	return &Handler{
-		Clients:       newClientHandler(c),
-		Keys:          newJWKHandler(c),
-		Introspection: newIntrospectionHandler(c),
-		Token:         newTokenHandler(c),
-		Migration:     newMigrateHandler(c),
+		Clients:       newClientHandler(),
+		Keys:          newJWKHandler(),
+		Introspection: newIntrospectionHandler(),
+		Token:         newTokenHandler(),
+		Migration:     newMigrateHandler(),
 	}
 }

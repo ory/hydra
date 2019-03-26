@@ -18,7 +18,6 @@ import (
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/tracing"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/healthx"
@@ -43,7 +42,7 @@ type RegistryBase struct {
 	com     consent.Manager
 	cos     consent.Strategy
 	writer  herodot.Writer
-	fs      pkg.FositeStorer
+	fs      x.FositeStorer
 	fsc     fosite.ScopeStrategy
 	atjs    jwk.JWTStrategy
 	idtjs   jwk.JWTStrategy
@@ -64,6 +63,16 @@ type RegistryBase struct {
 func (m *RegistryBase) with(r Registry) *RegistryBase {
 	m.r = r
 	return m
+}
+
+func (m *RegistryBase) WithBuildVersion(bv string) Registry {
+	m.buildVersion = bv
+	return m.r
+}
+
+func (m *RegistryBase) WithConfig(c configuration.Provider) Registry {
+	m.c = c
+	return m.r
 }
 
 func (m *RegistryBase) Writer() herodot.Writer {
@@ -89,7 +98,7 @@ func (m *RegistryBase) ClientHasher() fosite.Hasher {
 
 func (m *RegistryBase) ClientHandler() *client.Handler {
 	if m.ch == nil {
-		m.ch = client.NewHandler(m)
+		m.ch = client.NewHandler(m.r)
 	}
 	return m.ch
 }
@@ -123,7 +132,7 @@ func (m *RegistryBase) ConsentStrategy() consent.Strategy {
 	if m.cos == nil {
 		m.cos = consent.NewStrategy(m.r, m.c)
 	}
-	return m
+	return m.cos
 }
 
 func (m *RegistryBase) KeyGenerators() map[string]jwk.KeyGenerator {
@@ -153,20 +162,8 @@ func (m *RegistryBase) CookieStore() sessions.Store {
 	return m.cs
 }
 
-func (m *RegistryBase) OAuth2Storage() pkg.FositeStorer {
-	if m.fs == nil {
-		m.fs = oauth2.NewFositeMemoryStore(m.r, m.c)
-	}
-	return m.fs
-}
-
 func (m *RegistryBase) OAuth2Provider() fosite.OAuth2Provider {
 	if m.fop == nil {
-		err := jwk.EnsureAsymmetricKeypairExists(context.Background(), m.r, new(jwk.RS256Generator), oauth2.OpenIDConnectKeyName)
-		if err != nil {
-			m.Logger().WithError(err).Fatal(`Could not ensure that signing keys for OpenID Connect ID Tokens exists. This can happen if you forget to run "hydra migrate sql", set the wrong "secrets.system" or forget to set "secrets.system" entirely.`)
-		}
-
 		fc := &compose.Config{
 			AccessTokenLifespan:            m.c.AccessTokenLifespan(),
 			RefreshTokenLifespan:           m.c.RefreshTokenLifespan(),
@@ -189,21 +186,11 @@ func (m *RegistryBase) OAuth2Provider() fosite.OAuth2Provider {
 
 		var coreStrategy foauth2.CoreStrategy
 		hmacStrategy := compose.NewOAuth2HMACStrategy(fc, m.c.GetSystemSecret(), m.c.GetRotatedSystemSecrets())
+
 		switch ats := strings.ToLower(m.c.AccessTokenStrategy()); ats {
 		case "jwt":
-			if err := jwk.EnsureAsymmetricKeypairExists(context.Background(), m.r, new(jwk.RS256Generator), oauth2.OAuth2JWTKeyName); err != nil {
-				m.Logger().WithError(err).Fatal(`Could not ensure that signing keys for JWT Access Tokens exists. This can happen if you forget to run "hydra migrate sql", set the wrong "secrets.system" or forget to set "secrets.system" entirely.`)
-			}
-
-			jwtStrategy, err := jwk.NewRS256JWTStrategy(m.r, func() string {
-				return oauth2.OAuth2JWTKeyName
-			})
-			if err != nil {
-				m.Logger().WithError(err).Fatalf("Unable to refresh Access Token signing keys.")
-			}
-
 			coreStrategy = &foauth2.DefaultJWTStrategy{
-				JWTStrategy:     jwtStrategy,
+				JWTStrategy:     m.AccessTokenJWTStrategy(),
 				HMACSHAStrategy: hmacStrategy,
 			}
 		case "opaque":
@@ -212,21 +199,15 @@ func (m *RegistryBase) OAuth2Provider() fosite.OAuth2Provider {
 			m.Logger().Fatalf(`Environment variable OAUTH2_ACCESS_TOKEN_STRATEGY is set to "%s" but only "opaque" and "jwt" are valid values.`, ats)
 		}
 
-		if m.c.WithTracing() {
-			hasher = &tracing.TracedBCrypt{
-				WorkFactor: fc.HashCost,
-			}
-		}
-
 		return compose.Compose(
 			fc,
-			store,
+			m.r.OAuth2Storage(),
 			&compose.CommonStrategy{
 				CoreStrategy:               coreStrategy,
 				OpenIDConnectTokenStrategy: oidcStrategy,
-				JWTStrategy:                jwtStrategy,
+				JWTStrategy:                m.OpenIDJWTStrategy(),
 			},
-			hasher,
+			m.ClientHasher(),
 			compose.OAuth2AuthorizeExplicitFactory,
 			compose.OAuth2AuthorizeImplicitFactory,
 			compose.OAuth2ClientCredentialsGrantFactory,
@@ -246,8 +227,10 @@ func (m *RegistryBase) OAuth2Provider() fosite.OAuth2Provider {
 func (m *RegistryBase) ScopeStrategy() fosite.ScopeStrategy {
 	if m.fsc == nil {
 		if m.c.ScopeStrategy() == "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY" {
-			m.l.Warn("Using deprecated hierarchical scope strategy, consider upgrading to wildcards.")
+			m.l.Warn(`Using deprecated hierarchical scope strategy, consider upgrading to "wildcard"" or "exact"".`)
 			m.fsc = fosite.HierarchicScopeStrategy
+		} else if strings.ToLower(m.c.ScopeStrategy()) == "exact" {
+			m.fsc = fosite.ExactScopeStrategy
 		} else {
 			m.fsc = fosite.WildcardScopeStrategy
 		}
@@ -257,6 +240,10 @@ func (m *RegistryBase) ScopeStrategy() fosite.ScopeStrategy {
 }
 
 func (m *RegistryBase) newKeyStrategy(key string) (s jwk.JWTStrategy) {
+	if err := jwk.EnsureAsymmetricKeypairExists(context.Background(), m.r, new(jwk.RS256Generator), key); err != nil {
+		m.Logger().WithError(err).Fatalf(`Could not ensure that signing keys for "%s" exists. This can happen if you forget to run "hydra migrate sql", set the wrong "secrets.system" or forget to set "secrets.system" entirely.`, key)
+	}
+
 	if err := resilience.Retry(m.l, time.Second*15, time.Minute*15, func() (err error) {
 		s, err = jwk.NewRS256JWTStrategy(m.r, func() string {
 			return key
@@ -265,6 +252,7 @@ func (m *RegistryBase) newKeyStrategy(key string) (s jwk.JWTStrategy) {
 	}); err != nil {
 		m.l.WithError(err).Fatalf("Unable to initialize JSON Web Token strategy.")
 	}
+
 	return s
 }
 

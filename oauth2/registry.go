@@ -7,11 +7,10 @@ import (
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/x"
 )
 
-type registry interface {
+type InternalRegistry interface {
 	client.Registry
 	x.RegistryWriter
 	x.RegistryLogger
@@ -20,12 +19,14 @@ type registry interface {
 }
 
 type Registry interface {
-	OAuth2Storage() pkg.FositeStorer
+	OAuth2Storage() x.FositeStorer
 	OAuth2Provider() fosite.OAuth2Provider
 	AudienceStrategy() fosite.AudienceMatchingStrategy
 	ScopeStrategy() fosite.ScopeStrategy
+
 	AccessTokenJWTStrategy() jwk.JWTStrategy
 	OpenIDJWTStrategy() jwk.JWTStrategy
+
 	OpenIDConnectRequestValidator() *openid.OpenIDConnectRequestValidator
 }
 

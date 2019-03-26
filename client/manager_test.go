@@ -27,15 +27,12 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/golang/mock/gomock"
-
 	"github.com/ory/hydra/internal"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/fosite"
 	. "github.com/ory/hydra/client"
 	"github.com/ory/x/sqlcon/dockertest"
 )
@@ -49,46 +46,44 @@ func TestMain(m *testing.M) {
 	runner.Exit(m.Run())
 }
 
-func connectToMySQL(r InternalRegistry) func() {
-	return func() {
-		db, err := dockertest.ConnectToTestMySQL()
-		if err != nil {
-			log.Fatalf("Could not connect to database: %v", err)
-		}
-
-		s := NewSQLManager(db, r)
-		m.Lock()
-		clientManagers["mysql"] = s
-		m.Unlock()
+func connectToMySQL() {
+	db, err := dockertest.ConnectToTestMySQL()
+	if err != nil {
+		log.Fatalf("Could not connect to database: %v", err)
 	}
+
+	conf := internal.NewConfigurationWithDefaults(false)
+	reg := internal.NewRegistrySQL(conf, db)
+
+	m.Lock()
+	clientManagers["mysql"] = reg.ClientManager()
+	m.Unlock()
 }
 
-func connectToPG(r InternalRegistry) func() {
-	return func() {
-		db, err := dockertest.ConnectToTestPostgreSQL()
-		if err != nil {
-			log.Fatalf("Could not connect to database: %v", err)
-		}
-
-		s := NewSQLManager(db, r)
-		m.Lock()
-		clientManagers["postgres"] = s
-		m.Unlock()
+func connectToPG() {
+	db, err := dockertest.ConnectToTestPostgreSQL()
+	if err != nil {
+		log.Fatalf("Could not connect to database: %v", err)
 	}
+
+	conf := internal.NewConfigurationWithDefaults(false)
+	reg := internal.NewRegistrySQL(conf, db)
+
+	m.Lock()
+	clientManagers["postgres"] = reg.ClientManager()
+	m.Unlock()
 }
 
 func TestManagers(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	r := internal.NewMockInternalRegistry(ctrl)
-	r.EXPECT().ClientHasher().AnyTimes().Return(&fosite.BCrypt{WorkFactor: 4})
+	conf := internal.NewConfigurationWithDefaults(false)
+	reg := internal.NewRegistry(conf)
 
-	clientManagers["memory"] = NewMemoryManager(r)
+	clientManagers["memory"] = reg.ClientManager()
 
 	if !testing.Short() {
 		dockertest.Parallel([]func(){
-			connectToPG(r),
-			connectToMySQL(r),
+			connectToPG,
+			connectToMySQL,
 		})
 	}
 

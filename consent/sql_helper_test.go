@@ -62,7 +62,7 @@ func TestSQLAuthenticationConverter(t *testing.T) {
 	b := &HandledAuthenticationRequest{
 		AuthenticationRequest: a,
 		RememberFor:           120,
-		Remember:              true,
+		Remember:              false,
 		Challenge:             "challenge",
 		RequestedAt:           time.Now().UTC().Add(-time.Minute),
 		AuthenticatedAt:       time.Now().UTC().Add(-time.Minute),
@@ -124,7 +124,7 @@ func TestSQLConsentConverter(t *testing.T) {
 	b := &HandledConsentRequest{
 		ConsentRequest:  a,
 		RememberFor:     10,
-		Remember:        true,
+		Remember:        false,
 		GrantedScope:    []string{"asdf", "fdsa"},
 		GrantedAudience: []string{"auda", "audb"},
 		AuthenticatedAt: time.Now().UTC().Add(-time.Minute),

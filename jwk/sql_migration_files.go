@@ -327,12 +327,12 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"migrations/sql/shared/1.sql": migrationsSqlShared1Sql,
-	"migrations/sql/shared/2.sql": migrationsSqlShared2Sql,
-	"migrations/sql/shared/3.sql": migrationsSqlShared3Sql,
-	"migrations/sql/mysql/4.sql": migrationsSqlMysql4Sql,
-	"migrations/sql/postgres/4.sql": migrationsSqlPostgres4Sql,
-	"migrations/sql/tests/.gitkeep": migrationsSqlTestsGitkeep,
+	"migrations/sql/shared/1.sql":     migrationsSqlShared1Sql,
+	"migrations/sql/shared/2.sql":     migrationsSqlShared2Sql,
+	"migrations/sql/shared/3.sql":     migrationsSqlShared3Sql,
+	"migrations/sql/mysql/4.sql":      migrationsSqlMysql4Sql,
+	"migrations/sql/postgres/4.sql":   migrationsSqlPostgres4Sql,
+	"migrations/sql/tests/.gitkeep":   migrationsSqlTestsGitkeep,
 	"migrations/sql/tests/1_test.sql": migrationsSqlTests1_testSql,
 	"migrations/sql/tests/2_test.sql": migrationsSqlTests2_testSql,
 	"migrations/sql/tests/3_test.sql": migrationsSqlTests3_testSql,
@@ -378,6 +378,7 @@ type bintree struct {
 	Func     func() (*asset, error)
 	Children map[string]*bintree
 }
+
 var _bintree = &bintree{nil, map[string]*bintree{
 	"migrations": &bintree{nil, map[string]*bintree{
 		"sql": &bintree{nil, map[string]*bintree{
@@ -393,7 +394,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 				"3.sql": &bintree{migrationsSqlShared3Sql, map[string]*bintree{}},
 			}},
 			"tests": &bintree{nil, map[string]*bintree{
-				".gitkeep": &bintree{migrationsSqlTestsGitkeep, map[string]*bintree{}},
+				".gitkeep":   &bintree{migrationsSqlTestsGitkeep, map[string]*bintree{}},
 				"1_test.sql": &bintree{migrationsSqlTests1_testSql, map[string]*bintree{}},
 				"2_test.sql": &bintree{migrationsSqlTests2_testSql, map[string]*bintree{}},
 				"3_test.sql": &bintree{migrationsSqlTests3_testSql, map[string]*bintree{}},
@@ -449,4 +450,3 @@ func _filePath(dir, name string) string {
 	cannonicalName := strings.Replace(name, "\\", "/", -1)
 	return filepath.Join(append([]string{dir}, strings.Split(cannonicalName, "/")...)...)
 }
-

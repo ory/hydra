@@ -579,28 +579,28 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"migrations/sql/shared/.gitkeep": migrationsSqlSharedGitkeep,
-	"migrations/sql/shared/1.sql": migrationsSqlShared1Sql,
-	"migrations/sql/shared/2.sql": migrationsSqlShared2Sql,
-	"migrations/sql/shared/3.sql": migrationsSqlShared3Sql,
-	"migrations/sql/mysql/.gitkeep": migrationsSqlMysqlGitkeep,
-	"migrations/sql/mysql/4.sql": migrationsSqlMysql4Sql,
-	"migrations/sql/mysql/5.sql": migrationsSqlMysql5Sql,
-	"migrations/sql/mysql/6.sql": migrationsSqlMysql6Sql,
-	"migrations/sql/mysql/7.sql": migrationsSqlMysql7Sql,
+	"migrations/sql/shared/.gitkeep":   migrationsSqlSharedGitkeep,
+	"migrations/sql/shared/1.sql":      migrationsSqlShared1Sql,
+	"migrations/sql/shared/2.sql":      migrationsSqlShared2Sql,
+	"migrations/sql/shared/3.sql":      migrationsSqlShared3Sql,
+	"migrations/sql/mysql/.gitkeep":    migrationsSqlMysqlGitkeep,
+	"migrations/sql/mysql/4.sql":       migrationsSqlMysql4Sql,
+	"migrations/sql/mysql/5.sql":       migrationsSqlMysql5Sql,
+	"migrations/sql/mysql/6.sql":       migrationsSqlMysql6Sql,
+	"migrations/sql/mysql/7.sql":       migrationsSqlMysql7Sql,
 	"migrations/sql/postgres/.gitkeep": migrationsSqlPostgresGitkeep,
-	"migrations/sql/postgres/4.sql": migrationsSqlPostgres4Sql,
-	"migrations/sql/postgres/5.sql": migrationsSqlPostgres5Sql,
-	"migrations/sql/postgres/6.sql": migrationsSqlPostgres6Sql,
-	"migrations/sql/postgres/7.sql": migrationsSqlPostgres7Sql,
-	"migrations/sql/tests/.gitkeep": migrationsSqlTestsGitkeep,
-	"migrations/sql/tests/1_test.sql": migrationsSqlTests1_testSql,
-	"migrations/sql/tests/2_test.sql": migrationsSqlTests2_testSql,
-	"migrations/sql/tests/3_test.sql": migrationsSqlTests3_testSql,
-	"migrations/sql/tests/4_test.sql": migrationsSqlTests4_testSql,
-	"migrations/sql/tests/5_test.sql": migrationsSqlTests5_testSql,
-	"migrations/sql/tests/6_test.sql": migrationsSqlTests6_testSql,
-	"migrations/sql/tests/7_test.sql": migrationsSqlTests7_testSql,
+	"migrations/sql/postgres/4.sql":    migrationsSqlPostgres4Sql,
+	"migrations/sql/postgres/5.sql":    migrationsSqlPostgres5Sql,
+	"migrations/sql/postgres/6.sql":    migrationsSqlPostgres6Sql,
+	"migrations/sql/postgres/7.sql":    migrationsSqlPostgres7Sql,
+	"migrations/sql/tests/.gitkeep":    migrationsSqlTestsGitkeep,
+	"migrations/sql/tests/1_test.sql":  migrationsSqlTests1_testSql,
+	"migrations/sql/tests/2_test.sql":  migrationsSqlTests2_testSql,
+	"migrations/sql/tests/3_test.sql":  migrationsSqlTests3_testSql,
+	"migrations/sql/tests/4_test.sql":  migrationsSqlTests4_testSql,
+	"migrations/sql/tests/5_test.sql":  migrationsSqlTests5_testSql,
+	"migrations/sql/tests/6_test.sql":  migrationsSqlTests6_testSql,
+	"migrations/sql/tests/7_test.sql":  migrationsSqlTests7_testSql,
 }
 
 // AssetDir returns the file names below a certain
@@ -642,31 +642,32 @@ type bintree struct {
 	Func     func() (*asset, error)
 	Children map[string]*bintree
 }
+
 var _bintree = &bintree{nil, map[string]*bintree{
 	"migrations": &bintree{nil, map[string]*bintree{
 		"sql": &bintree{nil, map[string]*bintree{
 			"mysql": &bintree{nil, map[string]*bintree{
 				".gitkeep": &bintree{migrationsSqlMysqlGitkeep, map[string]*bintree{}},
-				"4.sql": &bintree{migrationsSqlMysql4Sql, map[string]*bintree{}},
-				"5.sql": &bintree{migrationsSqlMysql5Sql, map[string]*bintree{}},
-				"6.sql": &bintree{migrationsSqlMysql6Sql, map[string]*bintree{}},
-				"7.sql": &bintree{migrationsSqlMysql7Sql, map[string]*bintree{}},
+				"4.sql":    &bintree{migrationsSqlMysql4Sql, map[string]*bintree{}},
+				"5.sql":    &bintree{migrationsSqlMysql5Sql, map[string]*bintree{}},
+				"6.sql":    &bintree{migrationsSqlMysql6Sql, map[string]*bintree{}},
+				"7.sql":    &bintree{migrationsSqlMysql7Sql, map[string]*bintree{}},
 			}},
 			"postgres": &bintree{nil, map[string]*bintree{
 				".gitkeep": &bintree{migrationsSqlPostgresGitkeep, map[string]*bintree{}},
-				"4.sql": &bintree{migrationsSqlPostgres4Sql, map[string]*bintree{}},
-				"5.sql": &bintree{migrationsSqlPostgres5Sql, map[string]*bintree{}},
-				"6.sql": &bintree{migrationsSqlPostgres6Sql, map[string]*bintree{}},
-				"7.sql": &bintree{migrationsSqlPostgres7Sql, map[string]*bintree{}},
+				"4.sql":    &bintree{migrationsSqlPostgres4Sql, map[string]*bintree{}},
+				"5.sql":    &bintree{migrationsSqlPostgres5Sql, map[string]*bintree{}},
+				"6.sql":    &bintree{migrationsSqlPostgres6Sql, map[string]*bintree{}},
+				"7.sql":    &bintree{migrationsSqlPostgres7Sql, map[string]*bintree{}},
 			}},
 			"shared": &bintree{nil, map[string]*bintree{
 				".gitkeep": &bintree{migrationsSqlSharedGitkeep, map[string]*bintree{}},
-				"1.sql": &bintree{migrationsSqlShared1Sql, map[string]*bintree{}},
-				"2.sql": &bintree{migrationsSqlShared2Sql, map[string]*bintree{}},
-				"3.sql": &bintree{migrationsSqlShared3Sql, map[string]*bintree{}},
+				"1.sql":    &bintree{migrationsSqlShared1Sql, map[string]*bintree{}},
+				"2.sql":    &bintree{migrationsSqlShared2Sql, map[string]*bintree{}},
+				"3.sql":    &bintree{migrationsSqlShared3Sql, map[string]*bintree{}},
 			}},
 			"tests": &bintree{nil, map[string]*bintree{
-				".gitkeep": &bintree{migrationsSqlTestsGitkeep, map[string]*bintree{}},
+				".gitkeep":   &bintree{migrationsSqlTestsGitkeep, map[string]*bintree{}},
 				"1_test.sql": &bintree{migrationsSqlTests1_testSql, map[string]*bintree{}},
 				"2_test.sql": &bintree{migrationsSqlTests2_testSql, map[string]*bintree{}},
 				"3_test.sql": &bintree{migrationsSqlTests3_testSql, map[string]*bintree{}},
@@ -725,4 +726,3 @@ func _filePath(dir, name string) string {
 	cannonicalName := strings.Replace(name, "\\", "/", -1)
 	return filepath.Join(append([]string{dir}, strings.Split(cannonicalName, "/")...)...)
 }
-

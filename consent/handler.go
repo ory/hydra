@@ -323,6 +323,7 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	if !ar.Skip {
 		p.AuthenticatedAt = time.Now().UTC()
 	} else {
+		p.Remember = false
 		p.AuthenticatedAt = ar.AuthenticatedAt
 	}
 	p.RequestedAt = ar.RequestedAt
@@ -507,6 +508,8 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 	if err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
 		return
+	} else if hr.Skip {
+		p.Remember = false
 	}
 
 	ru, err := url.Parse(hr.RequestURL)

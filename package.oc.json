@@ -1,0 +1,17 @@
+{
+  "name": "@oryd/hydra",
+  "version": "0.0.0",
+  "description": "The official JavaScript / NodeJS SDK for ORY Hydra.",
+  "license": "Apache-2.0",
+  "scripts": {
+    "postinstall": "opencollective postinstall"
+  },
+  "dependencies": {
+    "opencollective": "^1.0.3"
+  },
+  "collective": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/ory-hydra",
+    "logo": "https://opencollective.com/ory-hydra/logo.txt"
+  }
+}

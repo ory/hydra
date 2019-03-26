@@ -333,9 +333,9 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return nil, err
 	}
 
-	// if session.AuthenticationRequest.Skip && session.Remember {
-	// 	return nil, errors.WithStack(fosite.ErrServerError.WithDebug("The login request is marked as remember, but is also marked as skipped - only one of the values can be true."))
-	// }
+	if session.AuthenticationRequest.Skip && session.Remember {
+		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("The login request is marked as remember, but is also marked as skipped - only one of the values can be true."))
+	}
 
 	if session.AuthenticationRequest.Skip && session.Subject != session.AuthenticationRequest.Subject {
 		// Revoke the session because there's clearly a mix up wrt the subject that's being authenticated

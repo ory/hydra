@@ -408,7 +408,7 @@ func (s *sqlHandledAuthenticationRequest) toHandledAuthenticationRequest(a *Auth
 	return &HandledAuthenticationRequest{
 		ForceSubjectIdentifier: s.ForceSubjectIdentifier,
 		RememberFor:            s.RememberFor,
-		Remember:               false,
+		Remember:               s.Remember,
 		Challenge:              s.Challenge,
 		RequestedAt:            s.RequestedAt,
 		WasUsed:                s.WasUsed,

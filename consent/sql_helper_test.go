@@ -62,7 +62,7 @@ func TestSQLAuthenticationConverter(t *testing.T) {
 	b := &HandledAuthenticationRequest{
 		AuthenticationRequest: a,
 		RememberFor:           120,
-		Remember:              false,
+		Remember:              true,
 		Challenge:             "challenge",
 		RequestedAt:           time.Now().UTC().Add(-time.Minute),
 		AuthenticatedAt:       time.Now().UTC().Add(-time.Minute),

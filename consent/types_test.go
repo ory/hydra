@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ory/fosite"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/fosite"
 )
 
 func TestToRFCError(t *testing.T) {

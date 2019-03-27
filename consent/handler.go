@@ -264,9 +264,7 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 		h.H.WriteError(w, r, pkg.ErrConflict.WithDebug("Login request has been handled already"))
 		return
 	}
-
 	request.Client = sanitizeClient(request.Client)
-
 	h.H.Write(w, r, request)
 }
 
@@ -320,14 +318,12 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	} else if ar.Subject != "" && p.Subject != ar.Subject {
 		h.H.WriteErrorCode(w, r, http.StatusBadRequest, errors.New("Subject from payload does not match subject from previous authentication"))
 		return
-	} else if ar.Skip && p.Remember {
-		h.H.WriteErrorCode(w, r, http.StatusBadRequest, errors.New("Can not remember authentication because no user interaction was required"))
-		return
 	}
 
 	if !ar.Skip {
 		p.AuthenticatedAt = time.Now().UTC()
 	} else {
+		p.Remember = false
 		p.AuthenticatedAt = ar.AuthenticatedAt
 	}
 	p.RequestedAt = ar.RequestedAt
@@ -454,7 +450,6 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 	}
 
 	request.Client = sanitizeClient(request.Client)
-
 	h.H.Write(w, r, request)
 }
 
@@ -513,9 +508,8 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 	if err != nil {
 		h.H.WriteError(w, r, errors.WithStack(err))
 		return
-	} else if hr.Skip && p.Remember {
-		h.H.WriteErrorCode(w, r, http.StatusBadRequest, errors.New("Can not remember consent because no user interaction was required"))
-		return
+	} else if hr.Skip {
+		p.Remember = false
 	}
 
 	ru, err := url.Parse(hr.RequestURL)

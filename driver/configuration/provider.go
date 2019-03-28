@@ -4,7 +4,10 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/ory/hydra/tracing"
+	"github.com/rs/cors"
+	"github.com/sirupsen/logrus"
+
+	"github.com/ory/x/tracing"
 )
 
 type Provider interface {
@@ -13,6 +16,9 @@ type Provider interface {
 	//HashSignature() bool
 	IsUsingJWTAsAccessTokens() bool
 	WellKnownKeys(include ...string) []string
+
+	CORSEnabled(iface string) bool
+	CORSOptions(iface string) cors.Options
 
 	SubjectTypesSupported() []string
 	ConsentURL() *url.URL
@@ -51,5 +57,14 @@ type Provider interface {
 	LoginURL() *url.URL
 }
 
-func MustValidate(p Provider) {
+func MustValidate(l logrus.FieldLogger, p Provider) {
+	if !p.ServesHTTPS() {
+		if p.IssuerURL().String() == "" {
+			l.Fatalf(`Configuration key "%s" must be set unless flag "--dangerous-force-http" is set. To find out more, use "hydra help serve".`, ViperKeyIssuerURL)
+		}
+
+		if p.IssuerURL().Scheme != "https" {
+			l.Fatalf(`Scheme from configuration key "%s" must be "https" unless --dangerous-force-http is passed but got scheme in value "%s" is "%s". To find out more, use "hydra help serve".`, ViperKeyIssuerURL, p.IssuerURL().String(), p.IssuerURL().Scheme)
+		}
+	}
 }

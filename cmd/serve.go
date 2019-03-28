@@ -21,10 +21,10 @@
 package cmd
 
 import (
-	"os"
-	"strconv"
-
 	"github.com/spf13/cobra"
+
+	"github.com/ory/x/logrusx"
+	"github.com/ory/x/viperx"
 
 	"github.com/ory/hydra/tracing"
 	"github.com/ory/x/corsx"
@@ -238,9 +238,10 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	serveCmd.PersistentFlags().BoolVar(&c.ForceHTTP, "dangerous-force-http", false, "Disable HTTP/2 over TLS (HTTPS) and serve HTTP instead. Never use this in production.")
+	serveCmd.PersistentFlags().Bool("dangerous-force-http", false, "Disable HTTP/2 over TLS (HTTPS) and serve HTTP instead. Never use this in production.")
 	//serveCmd.PersistentFlags().Bool("dangerous-auto-logon", false, "Stores the root credentials in ~/.hydra.yml. Do not use in production.")
 
-	disableTelemetryEnv, _ := strconv.ParseBool(os.Getenv("DISABLE_TELEMETRY"))
+	disableTelemetryEnv := viperx.GetBool(logrusx.New(), "sqa.opt_out", "DISABLE_TELEMETRY")
 	serveCmd.PersistentFlags().Bool("disable-telemetry", disableTelemetryEnv, "Disable anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/ecosystem/sqa")
+	serveCmd.PersistentFlags().Bool("sqa-opt-out", disableTelemetryEnv, "Disable anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/ecosystem/sqa")
 }

@@ -393,10 +393,10 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 			_, err = m.HandleConsentRequest(context.TODO(), "challengerv2", hcr2)
 			require.NoError(t, err)
 
-			fositeManager.CreateAccessTokenSession(nil, "trva1", &fosite.Request{Client: cr1.Client, ID: "challengerv1", RequestedAt: time.Now()})
-			fositeManager.CreateRefreshTokenSession(nil, "rrva1", &fosite.Request{Client: cr1.Client, ID: "challengerv1", RequestedAt: time.Now()})
-			fositeManager.CreateAccessTokenSession(nil, "trva2", &fosite.Request{Client: cr2.Client, ID: "challengerv2", RequestedAt: time.Now()})
-			fositeManager.CreateRefreshTokenSession(nil, "rrva2", &fosite.Request{Client: cr2.Client, ID: "challengerv2", RequestedAt: time.Now()})
+			fositeManager.CreateAccessTokenSession(context.TODO(), "trva1", &fosite.Request{Client: cr1.Client, ID: "challengerv1", RequestedAt: time.Now()})
+			fositeManager.CreateRefreshTokenSession(context.TODO(), "rrva1", &fosite.Request{Client: cr1.Client, ID: "challengerv1", RequestedAt: time.Now()})
+			fositeManager.CreateAccessTokenSession(context.TODO(), "trva2", &fosite.Request{Client: cr2.Client, ID: "challengerv2", RequestedAt: time.Now()})
+			fositeManager.CreateRefreshTokenSession(context.TODO(), "rrva2", &fosite.Request{Client: cr2.Client, ID: "challengerv2", RequestedAt: time.Now()})
 
 			for i, tc := range []struct {
 				subject string

@@ -35,14 +35,14 @@ import (
 	"github.com/ory/x/flagx"
 )
 
-type ClientHandler struct {}
+type ClientHandler struct{}
 
 func newClientHandler() *ClientHandler {
 	return &ClientHandler{}
 }
 
 func (h *ClientHandler) newClientManager(cmd *cobra.Command) *hydra.AdminApi {
-	c := hydra.NewAdminApiWithBasePath(remote(cmd))
+	c := hydra.NewAdminApiWithBasePath(Remote(cmd))
 	c.Configuration = configureClient(cmd, c.Configuration)
 	return c
 }

@@ -26,6 +26,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/oauth2"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/spf13/viper"
 
@@ -69,12 +72,26 @@ func TestMain(m *testing.M) {
 }
 
 func createSQL(db *sqlx.DB) driver.Registry {
-	conf := internal.NewConfigurationWithDefaults(false)
-	return internal.NewRegistrySQL(conf, db)
+	conf := internal.NewConfigurationWithDefaults()
+	reg := internal.NewRegistrySQL(conf, db)
+
+	if _, err := reg.ClientManager().(*client.SQLManager).CreateSchemas(); err != nil {
+		panic(err)
+	}
+
+	if _, err := reg.ConsentManager().(*SQLManager).CreateSchemas(); err != nil {
+		panic(err)
+	}
+
+	if _, err := reg.OAuth2Storage().(*oauth2.FositeSQLStore).CreateSchemas(); err != nil {
+		panic(err)
+	}
+
+	return reg
 }
 
 func TestManagers(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults(false)
+	conf := internal.NewConfigurationWithDefaults()
 	viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Hour)
 	regs["memory"] = internal.NewRegistry(conf)
 

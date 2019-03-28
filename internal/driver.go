@@ -12,7 +12,7 @@ import (
 	"github.com/ory/x/logrusx"
 )
 
-func NewConfigurationWithDefaults(forcedHTTP bool) *configuration.ViperProvider {
+func resetConfig() {
 	viper.Set(configuration.ViperKeyWellKnownKeys, nil)
 	viper.Set(configuration.ViperKeySubjectTypesSupported, nil)
 	viper.Set(configuration.ViperKeyDefaultClientScope, nil)
@@ -52,24 +52,33 @@ func NewConfigurationWithDefaults(forcedHTTP bool) *configuration.ViperProvider 
 	viper.Set(configuration.ViperKeyGetCookieSecrets, []string{"000000000000000000000000000000000000000000000000"})
 
 	viper.Set("LOG_LEVEL", "debug")
-	return configuration.NewViperProvider(logrusx.New(), forcedHTTP).(*configuration.ViperProvider)
+}
+
+func NewConfigurationWithDefaults() *configuration.ViperProvider {
+	resetConfig()
+	return configuration.NewViperProvider(logrusx.New(), true).(*configuration.ViperProvider)
+}
+
+func NewConfigurationWithDefaultsAndHTTPS() *configuration.ViperProvider {
+	resetConfig()
+	return configuration.NewViperProvider(logrusx.New(), false).(*configuration.ViperProvider)
 }
 
 func NewRegistry(c *configuration.ViperProvider) *driver.RegistryMemory {
 	viper.Set("LOG_LEVEL", "debug")
 	r := driver.NewRegistryMemory().WithConfig(c)
-	_ = r.Init("", logrusx.New())
+	_ = r.Init()
 	return r.(*driver.RegistryMemory)
 }
 
 func NewRegistrySQL(c *configuration.ViperProvider, db *sqlx.DB) *driver.RegistrySQL {
 	viper.Set("LOG_LEVEL", "debug")
 	r := driver.NewRegistrySQL().WithConfig(c).(*driver.RegistrySQL).WithDB(db)
-	_ = r.Init("", logrusx.New())
+	_ = r.Init()
 	return r.(*driver.RegistrySQL)
 }
 
-func EnsureRegistryKeys(r driver.Registry, key string) {
+func MustEnsureRegistryKeys(r driver.Registry, key string) {
 	if err := jwk.EnsureAsymmetricKeypairExists(context.Background(), r, new(veryInsecureRS256Generator), key); err != nil {
 		panic(err)
 	}

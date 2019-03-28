@@ -37,7 +37,7 @@ This command does not work with the "memory" database. Both services (privileged
 connection to be able to synchronize.
 
 ` + serveControls,
-	Run: server.RunServePublic(c),
+	Run: server.RunServePublic(Version, GitHash, BuildTime),
 }
 
 func init() {

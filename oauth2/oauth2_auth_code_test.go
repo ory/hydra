@@ -35,6 +35,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/x"
+	"github.com/ory/x/sqlcon/dockertest"
+
 	"github.com/spf13/viper"
 
 	"github.com/ory/hydra/driver"
@@ -52,7 +55,6 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/token/jwt"
 	hc "github.com/ory/hydra/client"
-	. "github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/sdk/go/hydra/swagger"
 )
 
@@ -94,28 +96,49 @@ type clientCreator interface {
 // - [x] If `id_token_hint` is handled properly
 //   - [x] What happens if `id_token_hint` does not match the value from the handled authentication request ("accept login")
 func TestAuthCodeWithDefaultStrategy(t *testing.T) {
-	for km, reg := range registries {
-		t.Run("manager="+km, func(t *testing.T) {
-			switch km {
-			case "mysql":
-				fallthrough
-			case "postgres":
-				rdb := reg.(*driver.RegistrySQL)
-				cleanDB(t, rdb.DB())
-				_, err := rdb.CreateSchemas()
-				require.NoError(t, err)
-			}
+	var mutex sync.Mutex
+	conf := internal.NewConfigurationWithDefaults()
+	regs := map[string]driver.Registry{
+		"memory": internal.NewRegistry(conf),
+	}
 
+	if !testing.Short() {
+		dockertest.Parallel([]func(){
+			func() {
+				r := internal.NewRegistrySQL(conf, connectToPG(t))
+				_, err := r.CreateSchemas()
+				require.NoError(t, err)
+
+				mutex.Lock()
+				regs["postgres"] = r
+				mutex.Unlock()
+			},
+			func() {
+				r := internal.NewRegistrySQL(conf, connectToMySQL(t))
+				_, err := r.CreateSchemas()
+				require.NoError(t, err)
+
+				mutex.Lock()
+				regs["mysql"] = r
+				mutex.Unlock()
+			},
+		})
+	}
+
+	for km, reg := range regs {
+		t.Run("manager="+km, func(t *testing.T) {
 			for _, strat := range []struct{ d string }{{d: "opaque"}, {d: "jwt"}} {
 				t.Run("strategy="+strat.d, func(t *testing.T) {
-					conf := internal.NewConfigurationWithDefaults(false)
+					conf := internal.NewConfigurationWithDefaults()
 					viper.Set(configuration.ViperKeyAccessTokenStrategy, strat.d)
 					viper.Set(configuration.ViperKeyScopeStrategy, "exact")
 					viper.Set(configuration.ViperKeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
-					viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Second + time.Millisecond * 500)
-					viper.Set(configuration.ViperKeyRefreshTokenLifespan, time.Second + time.Millisecond * 800)
+					viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Second+time.Millisecond*500)
+					viper.Set(configuration.ViperKeyRefreshTokenLifespan, time.Second+time.Millisecond*800)
 					// SendDebugMessagesToClients: true,
-					internal.EnsureRegistryKeys(reg, OpenIDConnectKeyName)
+					internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
+
+					reg.WithConfig(conf)
 
 					var m sync.Mutex
 					l := logrus.New()
@@ -133,26 +156,27 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					}.ToMapClaims(), jwt.NewHeaders())
 					require.NoError(t, err)
 
-					// we create a new fositeStore here because the old one
-					router := httprouter.New()
+					router := x.NewRouterPublic()
+					var callbackHandler *httprouter.Handle
+					router.GET("/callback", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+						(*callbackHandler)(w, r, ps)
+					})
+					reg.OAuth2Handler().SetRoutes(router.RouterAdmin(), router, func(h http.Handler) http.Handler {
+						return h
+					})
+
 					ts := httptest.NewServer(router)
 					defer ts.Close()
+
+					apiRouter := x.NewRouterAdmin()
+					reg.ConsentHandler().SetRoutes(apiRouter, apiRouter.RouterPublic())
+					api := httptest.NewServer(apiRouter)
+					defer api.Close()
 
 					viper.Set(configuration.ViperKeyLoginURL, lp.URL)
 					viper.Set(configuration.ViperKeyConsentURL, cp.URL)
 					viper.Set(configuration.ViperKeyIssuerURL, ts.URL)
 					viper.Set(configuration.ViperKeyConsentRequestMaxAge, time.Hour)
-
-					handler := NewHandler(reg, conf)
-					handler.SetRoutes(router, router, func(h http.Handler) http.Handler {
-						return h
-					})
-
-					apiHandler := reg.ConsentHandler()
-					apiRouter := httprouter.New()
-					apiHandler.SetRoutes(apiRouter, apiRouter)
-					api := httptest.NewServer(apiRouter)
-					defer ts.Close()
 
 					client := hc.Client{
 						ClientID: "e2e-app-client" + km + strat.d, Secret: "secret", RedirectURIs: []string{ts.URL + "/callback"},
@@ -169,11 +193,6 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 					require.NoError(t, reg.OAuth2Storage().(clientCreator).CreateClient(context.TODO(), &client))
 					apiClient := swagger.NewAdminApiWithBasePath(api.URL)
-
-					var callbackHandler *httprouter.Handle
-					router.GET("/callback", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-						(*callbackHandler)(w, r, ps)
-					})
 
 					persistentCJ := newCookieJar()
 					var code string
@@ -260,7 +279,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							cb: func(t *testing.T) httprouter.Handle {
 								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 									code = r.URL.Query().Get("code")
-									require.NotEmpty(t, code)
+									assert.NotEmpty(t, code, "%s", r.URL.String())
 									w.WriteHeader(http.StatusOK)
 								}
 							},
@@ -916,12 +935,20 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							require.NoError(t, err)
 							defer resp.Body.Close()
 
+							t.Logf("Cookies: %+v", tc.cj)
+
+							time.Sleep(time.Millisecond * 5)
+
 							if tc.expectOAuthAuthError {
 								require.Empty(t, code)
 								return
 							}
 
-							require.NotEmpty(t, code)
+							var body []byte
+							if code == "" {
+								body, _ = ioutil.ReadAll(resp.Body)
+							}
+							require.NotEmpty(t, code, "body: %s\nreq: %s\nts: %s", body, req.URL.String(), ts.URL)
 
 							token, err := oauthConfig.Exchange(oauth2.NoContext, code)
 
@@ -972,22 +999,22 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 func TestAuthCodeWithMockStrategy(t *testing.T) {
 	for _, strat := range []struct{ d string }{{d: "opaque"}, {d: "jwt"}} {
 		t.Run("strategy="+strat.d, func(t *testing.T) {
-			conf := internal.NewConfigurationWithDefaults(false)
+			conf := internal.NewConfigurationWithDefaults()
 			viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Second*2)
 			viper.Set(configuration.ViperKeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
 			viper.Set(configuration.ViperKeyAccessTokenStrategy, strat.d)
 			reg := internal.NewRegistry(conf)
-			internal.EnsureRegistryKeys(reg, OpenIDConnectKeyName)
-			internal.EnsureRegistryKeys(reg, OAuth2JWTKeyName)
+			internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
+			internal.MustEnsureRegistryKeys(reg, x.OAuth2JWTKeyName)
 
 			consentStrategy := &consentMock{}
-			router := httprouter.New()
+			router := x.NewRouterPublic()
 			ts := httptest.NewServer(router)
 			defer ts.Close()
 
 			reg.WithConsentStrategy(consentStrategy)
 			handler := reg.OAuth2Handler()
-			handler.SetRoutes(router, router, func(h http.Handler) http.Handler {
+			handler.SetRoutes(router.RouterAdmin(), router, func(h http.Handler) http.Handler {
 				return h
 			})
 

@@ -2,17 +2,21 @@ package configuration
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
 	"net/url"
 	"strings"
 	"time"
 
+	"github.com/rs/cors"
+	"github.com/spf13/viper"
+
+	"github.com/ory/x/corsx"
+
 	"github.com/sirupsen/logrus"
 
-	"github.com/ory/hydra/tracing"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/stringslice"
+	"github.com/ory/x/tracing"
 	"github.com/ory/x/urlx"
 	"github.com/ory/x/viperx"
 )
@@ -59,23 +63,36 @@ const (
 	ViperKeyOIDCDiscoveryUserinfoEndpoint  = "oidc.discovery.userinfo_url"
 )
 
-func NewViperProvider(l logrus.FieldLogger, forcedHTTP bool) Provider {
-
+func init() {
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
+}
 
+func NewViperProvider(l logrus.FieldLogger, forcedHTTP bool) Provider {
 	return &ViperProvider{
 		l:          l,
 		forcedHTTP: forcedHTTP,
 	}
 }
 
+func (v *ViperProvider) getAddress(address string, port int) string {
+	if strings.HasPrefix(address, "unix:") {
+		return address
+	}
+	return fmt.Sprintf("%s:%d", address, port)
+}
+
 func (v *ViperProvider) WellKnownKeys(include ...string) []string {
+	if v.AccessTokenStrategy() == "jwt" {
+		include = append(include, x.OpenIDConnectKeyName)
+	}
+
+	include = append(include, x.OpenIDConnectKeyName)
 	return append(viperx.GetStringSlice(v.l, ViperKeyWellKnownKeys, []string{}), include...)
 }
 
 func (v *ViperProvider) ServesHTTPS() bool {
-	return v.forcedHTTP
+	return !v.forcedHTTP
 }
 
 func (v *ViperProvider) IsUsingJWTAsAccessTokens() bool {
@@ -118,6 +135,14 @@ func (v *ViperProvider) DefaultClientScope() []string {
 	)
 }
 
+func (v *ViperProvider) CORSEnabled(iface string) bool {
+	return corsx.IsEnabled(v.l, "serve."+iface)
+}
+
+func (v *ViperProvider) CORSOptions(iface string) cors.Options {
+	return corsx.ParseOptions(v.l, "serve."+iface)
+}
+
 func (v *ViperProvider) DSN() string {
 	return viperx.GetString(v.l, ViperKeyDSN, "", "DATABASE_URL")
 }
@@ -133,13 +158,27 @@ func (v *ViperProvider) BCryptCost() int {
 func (v *ViperProvider) AdminListenOn() string {
 	host := viperx.GetString(v.l, ViperKeyAdminListenOnHost, "", "ADMIN_HOST")
 	port := viperx.GetInt(v.l, ViperKeyAdminListenOnPort, 4445, "ADMIN_PORT")
-	return fmt.Sprintf("%s:%d", host, port)
+	return v.getAddress(host, port)
 }
 
 func (v *ViperProvider) PublicListenOn() string {
-	host := viperx.GetString(v.l, ViperKeyPublicListenOnHost, "", "PUBLIC_HOST")
-	port := viperx.GetInt(v.l, ViperKeyPublicListenOnPort, 4444, "PUBLIC_PORT")
-	return fmt.Sprintf("%s:%d", host, port)
+	return v.getAddress(v.publicHost(), v.publicPort())
+}
+
+func (v *ViperProvider) publicHost() string {
+	return viperx.GetString(v.l, ViperKeyPublicListenOnHost, "", "PUBLIC_HOST")
+}
+
+func (v *ViperProvider) publicPort() int {
+	return viperx.GetInt(v.l, ViperKeyPublicListenOnPort, 4444, "PUBLIC_PORT")
+}
+
+func (v *ViperProvider) adminHost() string {
+	return viperx.GetString(v.l, ViperKeyAdminListenOnHost, "", "ADMIN_HOST")
+}
+
+func (v *ViperProvider) adminPort() int {
+	return viperx.GetInt(v.l, ViperKeyAdminListenOnPort, 4445, "ADMIN_PORT")
 }
 
 func (v *ViperProvider) ConsentRequestMaxAge() time.Duration {
@@ -151,7 +190,7 @@ func (v *ViperProvider) AccessTokenLifespan() time.Duration {
 }
 
 func (v *ViperProvider) RefreshTokenLifespan() time.Duration {
-	return viperx.GetDuration(v.l, ViperKeyRefreshTokenLifespan, -1, "REFRESH_TOKEN_LIFESPAN")
+	return viperx.GetDuration(v.l, ViperKeyRefreshTokenLifespan, time.Hour*720, "REFRESH_TOKEN_LIFESPAN")
 }
 
 func (v *ViperProvider) IDTokenLifespan() time.Duration {
@@ -177,9 +216,9 @@ func (v *ViperProvider) TracingProvider() string {
 func (v *ViperProvider) TracingJaegerConfig() *tracing.JaegerConfig {
 	return &tracing.JaegerConfig{
 		LocalAgentHostPort: viperx.GetString(v.l, "tracing.providers.jaeger.local_agent_address", "", "TRACING_PROVIDER_JAEGER_LOCAL_AGENT_ADDRESS"),
-		SamplerType:        viperx.GetString(v.l, "tracing.providers.jaeger.sampling.type", "", "TRACING_PROVIDER_JAEGER_SAMPLING_TYPE"),
-		SamplerValue:       viperx.GetFloat64(v.l, "tracing.providers.jaeger.sampling.value", 0, "TRACING_PROVIDER_JAEGER_SAMPLING_VALUE"),
-		SamplerServerUrl:   viperx.GetString(v.l, "tracing.providers.jaeger.sampling.server_url", "", "TRACING_PROVIDER_JAEGER_SAMPLING_SERVER_URL"),
+		SamplerType:        viperx.GetString(v.l, "tracing.providers.jaeger.sampling.type", "const", "TRACING_PROVIDER_JAEGER_SAMPLING_TYPE"),
+		SamplerValue:       viperx.GetFloat64(v.l, "tracing.providers.jaeger.sampling.value", float64(1), "TRACING_PROVIDER_JAEGER_SAMPLING_VALUE"),
+		SamplerServerURL:   viperx.GetString(v.l, "tracing.providers.jaeger.sampling.server_url", "", "TRACING_PROVIDER_JAEGER_SAMPLING_SERVER_URL"),
 	}
 }
 
@@ -236,23 +275,44 @@ func (v *ViperProvider) LogoutRedirectURL() *url.URL {
 	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyLogoutRedirectURL, "", "OAUTH2_LOGOUT_REDIRECT_URL"))
 }
 
-func (v *ViperProvider) LoginURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyLoginURL, "", "OAUTH2_LOGIN_URL"))
+func (v *ViperProvider) adminFallbackURL(path string) string {
+	return v.fallbackURL(path, v.adminHost(), v.adminPort())
+
 }
+
+func (v *ViperProvider) publicFallbackURL(path string) string {
+	return v.fallbackURL(path, v.publicHost(), v.publicPort())
+}
+
+func (v *ViperProvider) fallbackURL(path string, host string, port int) string {
+	proto := "https"
+	if !v.ServesHTTPS() {
+		proto = "http"
+	}
+	if host == "" {
+		host = "localhost"
+	}
+	return fmt.Sprintf("%s://%s:%d/%s", proto, host, port, path)
+}
+
+func (v *ViperProvider) LoginURL() *url.URL {
+	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyLoginURL, v.publicFallbackURL("oauth2/fallbacks/consent"), "OAUTH2_LOGIN_URL"))
+}
+
 func (v *ViperProvider) ConsentURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyConsentURL, "", "OAUTH2_CONSENT_URL"))
+	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyConsentURL, v.publicFallbackURL("oauth2/fallbacks/consent"), "OAUTH2_CONSENT_URL"))
 }
 
 func (v *ViperProvider) ErrorURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyErrorURL, "", "OAUTH2_ERROR_URL"))
+	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyErrorURL, v.publicFallbackURL("oauth2/fallbacks/error"), "OAUTH2_ERROR_URL"))
 }
 
 func (v *ViperProvider) PublicURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyPublicURL, ""))
+	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyPublicURL, v.publicFallbackURL("")))
 }
 
 func (v *ViperProvider) AdminURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyAdminURL, ""))
+	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyAdminURL, v.adminFallbackURL("")))
 }
 
 func (v *ViperProvider) IssuerURL() *url.URL {
@@ -260,7 +320,7 @@ func (v *ViperProvider) IssuerURL() *url.URL {
 }
 
 func (v *ViperProvider) OAuth2AuthURL() string {
-	return urlx.MustJoin(v.PublicURL().String(), "/oauth2/auth")
+	return "/oauth2/auth" // this should not have the host etc prepended...
 }
 
 func (v *ViperProvider) OAuth2ClientRegistrationURL() *url.URL {
@@ -272,7 +332,7 @@ func (v *ViperProvider) AllowTLSTerminationFrom() []string {
 }
 
 func (v *ViperProvider) AccessTokenStrategy() string {
-	return viperx.GetString(v.l, ViperKeyAccessTokenStrategy, "opaque", "OAUTH2_ACCESS_TOKEN_STRATEGY")
+	return strings.ToLower(viperx.GetString(v.l, ViperKeyAccessTokenStrategy, "opaque", "OAUTH2_ACCESS_TOKEN_STRATEGY"))
 }
 
 func (v *ViperProvider) SubjectIdentifierAlgorithmSalt() string {

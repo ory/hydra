@@ -173,7 +173,7 @@ func (s *FositeMemoryStore) InvalidateAuthorizeCodeSession(ctx context.Context, 
 
 	rel, ok := s.AuthorizeCodes[code]
 	if !ok {
-		return fosite.ErrNotFound
+		return errors.WithStack(fosite.ErrNotFound)
 	}
 	rel.active = false
 	s.AuthorizeCodes[code] = rel
@@ -193,7 +193,7 @@ func (s *FositeMemoryStore) GetAccessTokenSession(ctx context.Context, signature
 	s.RUnlock()
 
 	if !ok {
-		return nil, errors.Wrap(fosite.ErrNotFound, signature)
+		return nil, errors.Wrap(fosite.ErrNotFound, "")
 	}
 
 	if _, err := s.r.ClientManager().GetClient(ctx, rel.GetClient().GetID()); errors.Cause(err) == sqlcon.ErrNoRows {
@@ -330,7 +330,7 @@ func (s *FositeMemoryStore) GetPKCERequestSession(ctx context.Context, code stri
 	rel, ok := s.PKCES[code]
 	s.RUnlock()
 	if !ok {
-		return nil, fosite.ErrNotFound
+		return nil, errors.WithStack(fosite.ErrNotFound)
 	}
 
 	if _, err := s.r.ClientManager().GetClient(ctx, rel.GetClient().GetID()); errors.Cause(err) == sqlcon.ErrNoRows {

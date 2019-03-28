@@ -27,7 +27,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/julienschmidt/httprouter"
+	"github.com/ory/hydra/x"
 
 	"github.com/ory/hydra/internal"
 
@@ -39,16 +39,16 @@ import (
 )
 
 func TestHandlerWellKnown(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults(false)
+	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistry(conf)
 
-	router := httprouter.New()
+	router := x.NewRouterPublic()
 	IDKS, _ := testGenerator.Generate("test-id", "sig")
 
 	h := reg.KeyHandler()
 	require.NoError(t, reg.KeyManager().AddKeySet(context.TODO(), IDTokenKeyName, IDKS))
 
-	h.SetRoutes(router, router, func(h http.Handler) http.Handler {
+	h.SetRoutes(router.RouterAdmin(), router, func(h http.Handler) http.Handler {
 		return h
 	})
 	testServer := httptest.NewServer(router)

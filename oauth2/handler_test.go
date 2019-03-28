@@ -24,7 +24,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/ory/hydra/jwk"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -32,6 +31,9 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/x"
 
 	"github.com/spf13/viper"
 
@@ -41,7 +43,6 @@ import (
 
 	jwt2 "github.com/dgrijalva/jwt-go"
 	"github.com/golang/mock/gomock"
-	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -86,7 +87,7 @@ var flushRequests = []*fosite.Request{
 }
 
 func TestHandlerFlushHandler(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults(false)
+	conf := internal.NewConfigurationWithDefaults()
 	viper.Set(configuration.ViperKeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
 	viper.Set(configuration.ViperKeyIssuerURL, "http://hydra.localhost")
 	reg := internal.NewRegistry(conf)
@@ -100,11 +101,12 @@ func TestHandlerFlushHandler(t *testing.T) {
 		_ = cl.CreateClient(nil, r.Client.(*client.Client))
 	}
 
-	r := httprouter.New()
-	h.SetRoutes(r, r, func(h http.Handler) http.Handler {
+	r := x.NewRouterAdmin()
+	h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
 		return h
 	})
 	ts := httptest.NewServer(r)
+	defer ts.Close()
 	c := hydra.NewAdminApiWithBasePath(ts.URL)
 
 	ds := new(oauth2.Session)
@@ -145,12 +147,12 @@ func TestHandlerFlushHandler(t *testing.T) {
 }
 
 func TestUserinfo(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults(false)
+	conf := internal.NewConfigurationWithDefaults()
 	viper.Set(configuration.ViperKeyScopeStrategy, "")
 	viper.Set(configuration.ViperKeyAuthCodeLifespan, lifespan)
 	viper.Set(configuration.ViperKeyIssuerURL, "http://hydra.localhost")
 	reg := internal.NewRegistry(conf)
-	internal.EnsureRegistryKeys(reg, oauth2.OpenIDConnectKeyName)
+	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 
 	ctrl := gomock.NewController(t)
 	op := NewMockOAuth2Provider(ctrl)
@@ -159,8 +161,8 @@ func TestUserinfo(t *testing.T) {
 
 	h := reg.OAuth2Handler()
 
-	router := httprouter.New()
-	h.SetRoutes(router, router, func(h http.Handler) http.Handler {
+	router := x.NewRouterAdmin()
+	h.SetRoutes(router, router.RouterPublic(), func(h http.Handler) http.Handler {
 		return h
 	})
 	ts := httptest.NewServer(router)
@@ -332,10 +334,10 @@ func TestUserinfo(t *testing.T) {
 			expectStatusCode: http.StatusOK,
 			check: func(t *testing.T, body []byte) {
 				claims, err := jwt2.Parse(string(body), func(token *jwt2.Token) (interface{}, error) {
-					keys, err := reg.KeyManager().GetKeySet(context.Background(), oauth2.OpenIDConnectKeyName)
+					keys, err := reg.KeyManager().GetKeySet(context.Background(), x.OpenIDConnectKeyName)
 					require.NoError(t, err)
 					t.Logf("%+v", keys)
-					key, err := jwk.FindKeyByPrefix(keys,"public")
+					key, err := jwk.FindKeyByPrefix(keys, "public")
 					return jwk.MustRSAPublic(key), nil
 				})
 				require.NoError(t, err)
@@ -363,7 +365,7 @@ func TestUserinfo(t *testing.T) {
 }
 
 func TestHandlerWellKnown(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults(false)
+	conf := internal.NewConfigurationWithDefaults()
 	viper.Set(configuration.ViperKeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
 	viper.Set(configuration.ViperKeyIssuerURL, "http://hydra.localhost")
 	viper.Set(configuration.ViperKeySubjectTypesSupported, []string{"pairwise", "public"})
@@ -374,11 +376,12 @@ func TestHandlerWellKnown(t *testing.T) {
 
 	h := oauth2.NewHandler(reg, conf)
 
-	r := httprouter.New()
-	h.SetRoutes(r, r, func(h http.Handler) http.Handler {
+	r := x.NewRouterAdmin()
+	h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
 		return h
 	})
 	ts := httptest.NewServer(r)
+	defer ts.Close()
 
 	res, err := http.Get(ts.URL + "/.well-known/openid-configuration")
 	require.NoError(t, err)

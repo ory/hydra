@@ -7,26 +7,28 @@ import (
 )
 
 type DefaultDriver struct {
-	l logrus.FieldLogger
 	c configuration.Provider
 	r Registry
 }
 
-func NewDefaultDriver(r Registry, c configuration.Provider, l logrus.FieldLogger) Driver {
-	configuration.MustValidate(c)
-	return NewDefaultDriverWithoutValidation(r, c, l)
-}
+func NewDefaultDriver(l logrus.FieldLogger, forcedHTTP bool, version, build, date string) Driver {
+	c := configuration.NewViperProvider(l, forcedHTTP)
+	configuration.MustValidate(l, c)
 
-func NewDefaultDriverWithoutValidation(r Registry, c configuration.Provider, l logrus.FieldLogger) Driver {
-	return &DefaultDriver{
-		r: r.WithConfig(c),
-		l: l,
-		c: c,
+	r, err := NewRegistry(c)
+	if err != nil {
+		l.WithError(err).Fatal("Unable to instantiate service registry.")
 	}
-}
 
-func (r *DefaultDriver) Logger() logrus.FieldLogger {
-	return r.l
+	r.
+		WithLogger(l).
+		WithBuildInfo(version, build, date)
+
+	if err = r.Init(); err != nil {
+		l.WithError(err).Fatal("Unable to initialize service registry.")
+	}
+
+	return &DefaultDriver{r: r.WithConfig(c), c: c}
 }
 
 func (r *DefaultDriver) Configuration() configuration.Provider {

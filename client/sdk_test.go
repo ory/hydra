@@ -28,11 +28,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/x"
+
 	"github.com/spf13/viper"
 
 	"github.com/ory/hydra/driver/configuration"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -66,12 +67,12 @@ func createTestClient(prefix string) hydra.OAuth2Client {
 }
 
 func TestClientSDK(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults(false)
+	conf := internal.NewConfigurationWithDefaults()
 	viper.Set(configuration.ViperKeySubjectTypesSupported, []string{"public"})
 	viper.Set(configuration.ViperKeyDefaultClientScope, []string{"foo", "bar"})
 	r := internal.NewRegistry(conf)
 
-	router := httprouter.New()
+	router := x.NewRouterAdmin()
 	handler := client.NewHandler(r)
 	handler.SetRoutes(router)
 	server := httptest.NewServer(router)

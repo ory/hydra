@@ -30,6 +30,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/x"
+
 	"github.com/spf13/viper"
 
 	"github.com/ory/hydra/driver/configuration"
@@ -45,10 +47,10 @@ import (
 )
 
 func TestLogout(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults(false)
+	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistry(conf)
 
-	r := httprouter.New()
+	r := x.NewRouterPublic()
 	h := NewHandler(reg, conf)
 
 	sid := uuid.New()
@@ -70,7 +72,7 @@ func TestLogout(t *testing.T) {
 	r.Handle("GET", "/logout", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	})
 
-	h.SetRoutes(r, r)
+	h.SetRoutes(r.RouterAdmin(), r)
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
@@ -109,7 +111,7 @@ func TestGetLoginRequest(t *testing.T) {
 			key := fmt.Sprint(k)
 			challenge := "challenge" + key
 
-			conf := internal.NewConfigurationWithDefaults(false)
+			conf := internal.NewConfigurationWithDefaults()
 			reg := internal.NewRegistry(conf)
 
 			if tc.exists {
@@ -119,10 +121,10 @@ func TestGetLoginRequest(t *testing.T) {
 					WasHandled: tc.handled,
 				}))
 			}
-			r := httprouter.New()
 
 			h := NewHandler(reg, conf)
-			h.SetRoutes(r, r)
+			r := x.NewRouterAdmin()
+			h.SetRoutes(r, r.RouterPublic())
 			ts := httptest.NewServer(r)
 			defer ts.Close()
 
@@ -148,7 +150,7 @@ func TestGetConsentRequest(t *testing.T) {
 			key := fmt.Sprint(k)
 			challenge := "challenge" + key
 
-			conf := internal.NewConfigurationWithDefaults(false)
+			conf := internal.NewConfigurationWithDefaults()
 			reg := internal.NewRegistry(conf)
 
 			if tc.exists {
@@ -158,11 +160,11 @@ func TestGetConsentRequest(t *testing.T) {
 					WasHandled: tc.handled,
 				}))
 			}
-			r := httprouter.New()
 
 			h := NewHandler(reg, conf)
 
-			h.SetRoutes(r, r)
+			r := x.NewRouterAdmin()
+			h.SetRoutes(r, r.RouterPublic())
 			ts := httptest.NewServer(r)
 			defer ts.Close()
 

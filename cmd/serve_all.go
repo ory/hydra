@@ -37,7 +37,7 @@ All possible controls are listed below. This command exposes exposes command lin
 the controls section.
 
 ` + serveControls,
-	Run: server.RunServeAll(c),
+	Run: server.RunServeAll(Version, GitHash, BuildTime),
 }
 
 func init() {

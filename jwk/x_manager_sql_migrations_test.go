@@ -64,7 +64,7 @@ func TestXXMigrations(t *testing.T) {
 		clean, clean,
 		func(t *testing.T, db *sqlx.DB, k, m, steps int) {
 			t.Run(fmt.Sprintf("poll=%d", k), func(t *testing.T) {
-				conf := internal.NewConfigurationWithDefaults(false)
+				conf := internal.NewConfigurationWithDefaults()
 				reg := internal.NewRegistrySQL(conf, db)
 
 				sid := fmt.Sprintf("%d-sid", k+1)

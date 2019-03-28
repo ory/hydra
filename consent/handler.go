@@ -56,21 +56,21 @@ func NewHandler(
 	}
 }
 
-func (h *Handler) SetRoutes(frontend, backend *httprouter.Router) {
-	backend.GET(LoginPath+"/:challenge", h.GetLoginRequest)
-	backend.PUT(LoginPath+"/:challenge/accept", h.AcceptLoginRequest)
-	backend.PUT(LoginPath+"/:challenge/reject", h.RejectLoginRequest)
+func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
+	admin.GET(LoginPath+"/:challenge", h.GetLoginRequest)
+	admin.PUT(LoginPath+"/:challenge/accept", h.AcceptLoginRequest)
+	admin.PUT(LoginPath+"/:challenge/reject", h.RejectLoginRequest)
 
-	backend.GET(ConsentPath+"/:challenge", h.GetConsentRequest)
-	backend.PUT(ConsentPath+"/:challenge/accept", h.AcceptConsentRequest)
-	backend.PUT(ConsentPath+"/:challenge/reject", h.RejectConsentRequest)
+	admin.GET(ConsentPath+"/:challenge", h.GetConsentRequest)
+	admin.PUT(ConsentPath+"/:challenge/accept", h.AcceptConsentRequest)
+	admin.PUT(ConsentPath+"/:challenge/reject", h.RejectConsentRequest)
 
-	backend.DELETE(SessionsPath+"/login/:user", h.DeleteLoginSession)
-	backend.GET(SessionsPath+"/consent/:user", h.GetConsentSessions)
-	backend.DELETE(SessionsPath+"/consent/:user", h.DeleteUserConsentSession)
-	backend.DELETE(SessionsPath+"/consent/:user/:client", h.DeleteUserClientConsentSession)
+	admin.DELETE(SessionsPath+"/login/:user", h.DeleteLoginSession)
+	admin.GET(SessionsPath+"/consent/:user", h.GetConsentSessions)
+	admin.DELETE(SessionsPath+"/consent/:user", h.DeleteUserConsentSession)
+	admin.DELETE(SessionsPath+"/consent/:user/:client", h.DeleteUserClientConsentSession)
 
-	frontend.GET(SessionsPath+"/login/revoke", h.LogoutUser)
+	public.GET(SessionsPath+"/login/revoke", h.LogoutUser)
 }
 
 // swagger:route DELETE /oauth2/auth/sessions/consent/{user} admin revokeAllUserConsentSessions

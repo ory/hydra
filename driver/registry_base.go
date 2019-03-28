@@ -2,8 +2,15 @@ package driver
 
 import (
 	"context"
+	"net/http"
 	"strings"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+
+	"github.com/ory/hydra/metrics/prometheus"
+	"github.com/ory/x/logrusx"
+	"github.com/ory/x/serverx"
 
 	"github.com/gorilla/sessions"
 	"github.com/sirupsen/logrus"
@@ -18,46 +25,53 @@ import (
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/tracing"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/healthx"
 	"github.com/ory/x/resilience"
+	"github.com/ory/x/tracing"
 	"github.com/ory/x/urlx"
 )
 
+const (
+	MetricsPrometheusPath = "/metrics/prometheus"
+)
+
 type RegistryBase struct {
-	l       logrus.FieldLogger
-	c       configuration.Provider
-	cm      client.Manager
-	ch      *client.Handler
-	fh      fosite.Hasher
-	kh      *jwk.Handler
-	cv      *client.Validator
-	hh      *healthx.Handler
-	kg      map[string]jwk.KeyGenerator
-	km      jwk.Manager
-	kc      *jwk.AEAD
-	cs      sessions.Store
-	csPrev  [][]byte
-	com     consent.Manager
-	cos     consent.Strategy
-	writer  herodot.Writer
-	fs      x.FositeStorer
-	fsc     fosite.ScopeStrategy
-	atjs    jwk.JWTStrategy
-	idtjs   jwk.JWTStrategy
-	fscPrev string
-	fos     *openid.DefaultStrategy
-	forv    *openid.OpenIDConnectRequestValidator
-	fop     fosite.OAuth2Provider
-	coh     *consent.Handler
-	oah     *oauth2.Handler
-	sia     map[string]consent.SubjectIdentifierAlgorithm
-	trc     *tracing.Tracer
-
+	l            logrus.FieldLogger
+	c            configuration.Provider
+	cm           client.Manager
+	ch           *client.Handler
+	fh           fosite.Hasher
+	kh           *jwk.Handler
+	cv           *client.Validator
+	hh           *healthx.Handler
+	kg           map[string]jwk.KeyGenerator
+	km           jwk.Manager
+	kc           *jwk.AEAD
+	cs           sessions.Store
+	csPrev       [][]byte
+	com          consent.Manager
+	cos          consent.Strategy
+	writer       herodot.Writer
+	fs           x.FositeStorer
+	fsc          fosite.ScopeStrategy
+	atjs         jwk.JWTStrategy
+	idtjs        jwk.JWTStrategy
+	fscPrev      string
+	fos          *openid.DefaultStrategy
+	forv         *openid.OpenIDConnectRequestValidator
+	fop          fosite.OAuth2Provider
+	coh          *consent.Handler
+	oah          *oauth2.Handler
+	sia          map[string]consent.SubjectIdentifierAlgorithm
+	trc          *tracing.Tracer
+	pmm          *prometheus.MetricsManager
+	oa2mw        func(h http.Handler) http.Handler
+	o2mc         *foauth2.HMACSHAStrategy
 	buildVersion string
-
-	r Registry
+	buildHash    string
+	buildDate    string
+	r            Registry
 }
 
 func (m *RegistryBase) with(r Registry) *RegistryBase {
@@ -65,9 +79,44 @@ func (m *RegistryBase) with(r Registry) *RegistryBase {
 	return m
 }
 
-func (m *RegistryBase) WithBuildVersion(bv string) Registry {
-	m.buildVersion = bv
+func (m *RegistryBase) WithBuildInfo(version, hash, date string) Registry {
+	m.buildVersion = version
+	m.buildHash = hash
+	m.buildDate = date
 	return m.r
+}
+
+func (m *RegistryBase) OAuth2AwareMiddleware() func(h http.Handler) http.Handler {
+	if m.oa2mw == nil {
+		m.oa2mw = OAuth2AwareCORSMiddleware("public", m.r, m.c)
+	}
+	return m.oa2mw
+}
+
+func (m *RegistryBase) RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
+	m.HealthHandler().SetRoutes(admin.Router, true)
+
+	public.GET(healthx.AliveCheckPath, m.HealthHandler().Alive)
+	public.GET(healthx.ReadyCheckPath, m.HealthHandler().Ready(false))
+
+	admin.Handler("GET", MetricsPrometheusPath, promhttp.Handler())
+
+	m.ConsentHandler().SetRoutes(admin, public)
+	m.KeyHandler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
+	m.ClientHandler().SetRoutes(admin)
+	m.OAuth2Handler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
+}
+
+func (m *RegistryBase) BuildVersion() string {
+	return m.buildVersion
+}
+
+func (m *RegistryBase) BuildDate() string {
+	return m.buildDate
+}
+
+func (m *RegistryBase) BuildHash() string {
+	return m.buildHash
 }
 
 func (m *RegistryBase) WithConfig(c configuration.Provider) Registry {
@@ -77,21 +126,32 @@ func (m *RegistryBase) WithConfig(c configuration.Provider) Registry {
 
 func (m *RegistryBase) Writer() herodot.Writer {
 	if m.writer == nil {
-		m.writer = herodot.NewJSONWriter(m.Logger())
+		h := herodot.NewJSONWriter(m.Logger())
+		h.ErrorEnhancer = serverx.ErrorEnhancerRFC6749
+		m.writer = h
 	}
 	return m.writer
 }
 
+func (m *RegistryBase) WithLogger(l logrus.FieldLogger) Registry {
+	m.l = l
+	return m.r
+}
+
 func (m *RegistryBase) Logger() logrus.FieldLogger {
 	if m.l == nil {
-		m.l = logrus.New()
+		m.l = logrusx.New()
 	}
 	return m.l
 }
 
 func (m *RegistryBase) ClientHasher() fosite.Hasher {
 	if m.fh == nil {
-		m.fh = x.NewBCrypt(m.c)
+		if m.Tracer().IsLoaded() {
+			m.fh = &tracing.TracedBCrypt{WorkFactor: m.c.BCryptCost()}
+		} else {
+			m.fh = x.NewBCrypt(m.c)
+		}
 	}
 	return m.fh
 }
@@ -119,9 +179,7 @@ func (m *RegistryBase) KeyHandler() *jwk.Handler {
 func (m *RegistryBase) HealthHandler() *healthx.Handler {
 	if m.hh == nil {
 		m.hh = healthx.NewHandler(m.Writer(), m.buildVersion, healthx.ReadyCheckers{
-			"database": func() error {
-				return nil
-			},
+			"database": m.r.Ping,
 		})
 	}
 
@@ -149,7 +207,7 @@ func (m *RegistryBase) KeyGenerators() map[string]jwk.KeyGenerator {
 
 func (m *RegistryBase) KeyCipher() *jwk.AEAD {
 	if m.kc == nil {
-		m.kc = jwk.NewAEAD(m.c.GetSystemSecret())
+		m.kc = jwk.NewAEAD(m.c)
 	}
 	return m.kc
 }
@@ -162,22 +220,32 @@ func (m *RegistryBase) CookieStore() sessions.Store {
 	return m.cs
 }
 
+func (m *RegistryBase) oAuth2Config() *compose.Config {
+	return &compose.Config{
+		AccessTokenLifespan:            m.c.AccessTokenLifespan(),
+		RefreshTokenLifespan:           m.c.RefreshTokenLifespan(),
+		AuthorizeCodeLifespan:          m.c.AuthCodeLifespan(),
+		IDTokenLifespan:                m.c.IDTokenLifespan(),
+		IDTokenIssuer:                  m.c.IssuerURL().String(),
+		HashCost:                       m.c.BCryptCost(),
+		ScopeStrategy:                  m.ScopeStrategy(),
+		SendDebugMessagesToClients:     m.c.ShareOAuth2Debug(),
+		EnforcePKCE:                    false,
+		EnablePKCEPlainChallengeMethod: false,
+		TokenURL:                       urlx.AppendPaths(m.c.PublicURL(), oauth2.TokenPath).String(),
+	}
+}
+
+func (m *RegistryBase) OAuth2HMACStrategy() *foauth2.HMACSHAStrategy {
+	if m.o2mc == nil {
+		m.o2mc = compose.NewOAuth2HMACStrategy(m.oAuth2Config(), m.c.GetSystemSecret(), m.c.GetRotatedSystemSecrets())
+	}
+	return m.o2mc
+}
+
 func (m *RegistryBase) OAuth2Provider() fosite.OAuth2Provider {
 	if m.fop == nil {
-		fc := &compose.Config{
-			AccessTokenLifespan:            m.c.AccessTokenLifespan(),
-			RefreshTokenLifespan:           m.c.RefreshTokenLifespan(),
-			AuthorizeCodeLifespan:          m.c.AuthCodeLifespan(),
-			IDTokenLifespan:                m.c.IDTokenLifespan(),
-			IDTokenIssuer:                  m.c.IssuerURL().String(),
-			HashCost:                       m.c.BCryptCost(),
-			ScopeStrategy:                  m.ScopeStrategy(),
-			SendDebugMessagesToClients:     m.c.ShareOAuth2Debug(),
-			EnforcePKCE:                    false,
-			EnablePKCEPlainChallengeMethod: false,
-			TokenURL:                       urlx.AppendPaths(m.c.PublicURL(), oauth2.TokenPath).String(),
-		}
-
+		fc := m.oAuth2Config()
 		oidcStrategy := &openid.DefaultStrategy{
 			JWTStrategy: m.OpenIDJWTStrategy(),
 			Expiry:      m.c.IDTokenLifespan(),
@@ -185,7 +253,7 @@ func (m *RegistryBase) OAuth2Provider() fosite.OAuth2Provider {
 		}
 
 		var coreStrategy foauth2.CoreStrategy
-		hmacStrategy := compose.NewOAuth2HMACStrategy(fc, m.c.GetSystemSecret(), m.c.GetRotatedSystemSecrets())
+		hmacStrategy := m.OAuth2HMACStrategy()
 
 		switch ats := strings.ToLower(m.c.AccessTokenStrategy()); ats {
 		case "jwt":
@@ -227,7 +295,7 @@ func (m *RegistryBase) OAuth2Provider() fosite.OAuth2Provider {
 func (m *RegistryBase) ScopeStrategy() fosite.ScopeStrategy {
 	if m.fsc == nil {
 		if m.c.ScopeStrategy() == "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY" {
-			m.l.Warn(`Using deprecated hierarchical scope strategy, consider upgrading to "wildcard"" or "exact"".`)
+			m.Logger().Warn(`Using deprecated hierarchical scope strategy, consider upgrading to "wildcard"" or "exact"".`)
 			m.fsc = fosite.HierarchicScopeStrategy
 		} else if strings.ToLower(m.c.ScopeStrategy()) == "exact" {
 			m.fsc = fosite.ExactScopeStrategy
@@ -244,13 +312,13 @@ func (m *RegistryBase) newKeyStrategy(key string) (s jwk.JWTStrategy) {
 		m.Logger().WithError(err).Fatalf(`Could not ensure that signing keys for "%s" exists. This can happen if you forget to run "hydra migrate sql", set the wrong "secrets.system" or forget to set "secrets.system" entirely.`, key)
 	}
 
-	if err := resilience.Retry(m.l, time.Second*15, time.Minute*15, func() (err error) {
+	if err := resilience.Retry(m.Logger(), time.Second*15, time.Minute*15, func() (err error) {
 		s, err = jwk.NewRS256JWTStrategy(m.r, func() string {
 			return key
 		})
 		return err
 	}); err != nil {
-		m.l.WithError(err).Fatalf("Unable to initialize JSON Web Token strategy.")
+		m.Logger().WithError(err).Fatalf("Unable to initialize JSON Web Token strategy.")
 	}
 
 	return s
@@ -258,14 +326,14 @@ func (m *RegistryBase) newKeyStrategy(key string) (s jwk.JWTStrategy) {
 
 func (m *RegistryBase) AccessTokenJWTStrategy() jwk.JWTStrategy {
 	if m.atjs == nil {
-		m.atjs = m.newKeyStrategy(oauth2.OAuth2JWTKeyName)
+		m.atjs = m.newKeyStrategy(x.OpenIDConnectKeyName)
 	}
 	return m.atjs
 }
 
 func (m *RegistryBase) OpenIDJWTStrategy() jwk.JWTStrategy {
 	if m.idtjs == nil {
-		m.idtjs = m.newKeyStrategy(oauth2.OpenIDConnectKeyName)
+		m.idtjs = m.newKeyStrategy(x.OpenIDConnectKeyName)
 	}
 	return m.idtjs
 }
@@ -319,18 +387,8 @@ func (m *RegistryBase) SubjectIdentifierAlgorithm() map[string]consent.SubjectId
 	return m.sia
 }
 
-func (m *RegistryBase) TracingEnabled() bool {
-	if tracer, err := m.Tracer(); err == nil && tracer.IsLoaded() {
-		return true
-	} else {
-		return false
-	}
-}
-
-func (m *RegistryBase) Tracer() (*tracing.Tracer, error) {
+func (m *RegistryBase) Tracer() *tracing.Tracer {
 	if m.trc == nil {
-		m.Logger().Info("Setting up tracing middleware")
-
 		m.trc = &tracing.Tracer{
 			ServiceName:  m.c.TracingServiceName(),
 			JaegerConfig: m.c.TracingJaegerConfig(),
@@ -338,8 +396,17 @@ func (m *RegistryBase) Tracer() (*tracing.Tracer, error) {
 			Logger:       m.Logger(),
 		}
 
-		return m.trc, m.trc.Setup()
+		if err := m.trc.Setup(); err != nil {
+			m.Logger().WithError(err).Fatalf("Unable to initialize Tracer.")
+		}
 	}
 
-	return m.trc, nil
+	return m.trc
+}
+
+func (m *RegistryBase) PrometheusManager() *prometheus.MetricsManager {
+	if m.pmm == nil {
+		m.pmm = prometheus.NewMetricsManager(m.buildVersion, m.buildHash, m.buildDate)
+	}
+	return m.pmm
 }

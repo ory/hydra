@@ -18,43 +18,95 @@
  * @license 	Apache-2.0
  */
 
-package jwk
+package jwk_test
 
 import (
 	"crypto/rand"
+	"fmt"
 	"io"
 	"testing"
 
+	"github.com/spf13/viper"
+
+	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/internal"
+	. "github.com/ory/hydra/jwk"
+
 	"github.com/pborman/uuid"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-// RandomBytes returns n random bytes by reading from crypto/rand.Reader
-func randomBytes(n int) ([]byte, error) {
-	bytes := make([]byte, n)
-	if _, err := io.ReadFull(rand.Reader, bytes); err != nil {
-		return []byte{}, errors.WithStack(err)
-	}
-	return bytes, nil
+func secret(t *testing.T) string {
+	bytes := make([]byte, 32)
+	_, err := io.ReadFull(rand.Reader, bytes)
+	require.NoError(t, err)
+	return fmt.Sprintf("%X", bytes)
 }
 
 func TestAEAD(t *testing.T) {
-	key, err := randomBytes(32)
-	require.NoError(t, err)
+	c := internal.NewConfigurationWithDefaults()
+	t.Run("case=without-rotation", func(t *testing.T) {
+		viper.Set(configuration.ViperKeyGetSystemSecret, []string{secret(t)})
+		a := NewAEAD(c)
 
-	a := &AEAD{
-		Key: key,
-	}
+		plain := []byte(uuid.New())
+		ct, err := a.Encrypt(plain)
+		assert.NoError(t, err)
 
-	for i := 0; i < 100; i++ {
+		res, err := a.Decrypt(ct)
+		assert.NoError(t, err)
+		assert.Equal(t, plain, res)
+	})
+
+	t.Run("case=wrong-secret", func(t *testing.T) {
+		viper.Set(configuration.ViperKeyGetSystemSecret, []string{secret(t)})
+		a := NewAEAD(c)
+
+		ct, err := a.Encrypt([]byte(uuid.New()))
+		require.NoError(t, err)
+
+		viper.Set(configuration.ViperKeyGetSystemSecret, []string{secret(t)})
+		_, err = a.Decrypt(ct)
+		require.Error(t, err)
+	})
+
+	t.Run("case=with-rotation", func(t *testing.T) {
+		old := secret(t)
+		viper.Set(configuration.ViperKeyGetSystemSecret, []string{old})
+		a := NewAEAD(c)
+
 		plain := []byte(uuid.New())
 		ct, err := a.Encrypt(plain)
 		require.NoError(t, err)
 
+		// Sets the old secret as a rotated secret and creates a new one.
+		viper.Set(configuration.ViperKeyGetSystemSecret, []string{secret(t), old})
 		res, err := a.Decrypt(ct)
 		require.NoError(t, err)
 		assert.Equal(t, plain, res)
-	}
+
+		// THis should also work when we re-encrypt the same plain text.
+		ct2, err := a.Encrypt(plain)
+		require.NoError(t, err)
+		assert.NotEqual(t, ct2, ct)
+
+		res, err = a.Decrypt(ct)
+		require.NoError(t, err)
+		assert.Equal(t, plain, res)
+	})
+
+	t.Run("case=with-rotation-wrong-secret", func(t *testing.T) {
+		viper.Set(configuration.ViperKeyGetSystemSecret, []string{secret(t)})
+		a := NewAEAD(c)
+
+		plain := []byte(uuid.New())
+		ct, err := a.Encrypt(plain)
+		require.NoError(t, err)
+
+		// When the secrets do not match, an error should be thrown during decryption.
+		viper.Set(configuration.ViperKeyGetSystemSecret, []string{secret(t), secret(t)})
+		_, err = a.Decrypt(ct)
+		require.Error(t, err)
+	})
 }

@@ -40,6 +40,13 @@ serve:
     # Use the prefix "unix:" to specify a path to a unix socket. Leave empty to listen on all interfaces.
     host: localhost # leave this out or empty to listen on all devices which is the default
   tls:
+    key:
+      path:
+      base64:
+    cert:
+      path:
+      base64:
+
     allow_termination_from:
       - 127.0.0.1/32
 

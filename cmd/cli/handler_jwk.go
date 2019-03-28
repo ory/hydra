@@ -42,7 +42,7 @@ import (
 type JWKHandler struct{}
 
 func (h *JWKHandler) newJwkManager(cmd *cobra.Command) *hydra.AdminApi {
-	c := hydra.NewAdminApiWithBasePath(remote(cmd))
+	c := hydra.NewAdminApiWithBasePath(Remote(cmd))
 	c.Configuration = configureClient(cmd, c.Configuration)
 	return c
 }
@@ -111,7 +111,7 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 		},
 	}
 
-	u := remote(cmd) + "/keys/" + id
+	u := Remote(cmd) + "/keys/" + id
 	request, err := http.NewRequest("GET", u, nil)
 	cmdx.Must(err, "Unable to initialize HTTP request: %s", err)
 

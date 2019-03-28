@@ -23,7 +23,6 @@ package oauth2_test
 import (
 	"context"
 	"flag"
-	"github.com/ory/hydra/client"
 	"sync"
 	"testing"
 
@@ -31,6 +30,10 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/driver/configuration"
 
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/internal"
@@ -69,30 +72,41 @@ func connectToMySQL(t *testing.T) *sqlx.DB {
 	return db
 }
 
+func connectSQL(t *testing.T, conf *configuration.ViperProvider, db *sqlx.DB) driver.Registry {
+	reg := internal.NewRegistrySQL(conf, db)
+	_, err := reg.ClientManager().(*client.SQLManager).CreateSchemas()
+	require.NoError(t, err)
+	_, err = reg.ConsentManager().(*consent.SQLManager).CreateSchemas()
+	require.NoError(t, err)
+	_, err = reg.OAuth2Storage().(*FositeSQLStore).CreateSchemas()
+	require.NoError(t, err)
+	return reg
+}
+
 func TestManagers(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults(false)
+	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistry(conf)
 
+	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), &client.Client{ClientID: "foobar"})) // this is a workaround because the client is not being created for memory store by test helpers.
 	registries["memory"] = reg
 
 	if !testing.Short() {
 		dockertest.Parallel([]func(){
 			func() {
 				m.Lock()
-				registries["postgres"] = internal.NewRegistrySQL(conf, connectToPG(t))
+
+				registries["postgres"] = connectSQL(t, conf, connectToPG(t))
 				m.Unlock()
 			},
 			func() {
-				connectToMySQL(t)
 				m.Lock()
-				registries["mysql"] = internal.NewRegistrySQL(conf, connectToMySQL(t))
+				registries["mysql"] = connectSQL(t, conf, connectToMySQL(t))
 				m.Unlock()
 			},
 		})
 	}
 
 	for k, store := range registries {
-		require.NoError(t, store.ClientManager().CreateClient(context.Background(), &client.Client{ClientID: "foobar"}))
 		TestHelperRunner(t, store, k)
 	}
 

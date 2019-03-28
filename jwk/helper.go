@@ -36,13 +36,22 @@ import (
 )
 
 func EnsureAsymmetricKeypairExists(ctx context.Context, r InternalRegistry, g KeyGenerator, set string) error {
-	if _, err := GetOrCreateKey(ctx, r, g, set, "public"); err != nil {
-		return err
+	_, _, err := AsymmetricKeypair(ctx, r, g, set)
+	return err
+}
+
+func AsymmetricKeypair(ctx context.Context, r InternalRegistry, g KeyGenerator, set string) (public, private *jose.JSONWebKey, err error) {
+	priv, err := GetOrCreateKey(ctx, r, g, set, "private")
+	if err != nil {
+		return nil, nil, err
 	}
-	if _, err := GetOrCreateKey(ctx, r, g, set, "private"); err != nil {
-		return err
+
+	pub, err := GetOrCreateKey(ctx, r, g, set, "public")
+	if err != nil {
+		return nil, nil, err
 	}
-	return nil
+
+	return pub, priv, nil
 }
 
 func GetOrCreateKey(ctx context.Context, r InternalRegistry, g KeyGenerator, set, prefix string) (*jose.JSONWebKey, error) {

@@ -25,9 +25,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/ory/hydra/x"
+
 	"github.com/ory/hydra/internal"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -36,12 +37,12 @@ import (
 )
 
 func TestJWKSDK(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults(false)
+	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistry(conf)
 
-	router := httprouter.New()
+	router := x.NewRouterAdmin()
 	h := NewHandler(reg, conf)
-	h.SetRoutes(router, router, func(h http.Handler) http.Handler {
+	h.SetRoutes(router, x.NewRouterPublic(), func(h http.Handler) http.Handler {
 		return h
 	})
 	server := httptest.NewServer(router)

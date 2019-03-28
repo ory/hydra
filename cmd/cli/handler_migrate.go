@@ -22,37 +22,30 @@ package cli
 
 import (
 	"fmt"
+	"os"
+
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/x/logrusx"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"os"
 
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
 )
 
-type MigrateHandler struct {
-	d driver.Driver
-}
+type MigrateHandler struct{}
 
 func newMigrateHandler() *MigrateHandler {
-	l := logrusx.New()
-	c := configuration.NewViperProvider(l, false)
-	return &MigrateHandler{
-		d: driver.NewDefaultDriverWithoutValidation(
-			driver.MustNewRegistry(c),
-			c,
-			l,
-		),
-	}
+	return &MigrateHandler{}
 }
 
 func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
+	var d = driver.NewDefaultDriver(logrusx.New(), false, "", "", "")
 	var dbu string
 	if flagx.MustGetBool(cmd, "read-from-env") {
-		dbu := h.d.Configuration().DSN()
+		dbu := d.Configuration().DSN()
 		if len(dbu) == 0 {
 			fmt.Println(cmd.UsageString())
 			fmt.Println("")
@@ -71,7 +64,7 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 
 	viper.Set(configuration.ViperKeyDSN, dbu)
 
-	reg, ok := h.d.Registry().(*driver.RegistrySQL)
+	reg, ok := d.Registry().(*driver.RegistrySQL)
 	if !ok {
 		fmt.Println(cmd.UsageString())
 		fmt.Println("")

@@ -44,9 +44,6 @@ import (
 )
 
 const (
-	OpenIDConnectKeyName = "hydra.openid.id-token"
-	OAuth2JWTKeyName     = "hydra.jwt.access-token"
-
 	DefaultConsentPath = "/oauth2/fallbacks/consent"
 	DefaultLogoutPath  = "/oauth2/fallbacks/logout"
 	DefaultErrorPath   = "/oauth2/fallbacks/error"
@@ -72,24 +69,24 @@ func NewHandler(r InternalRegistry, c Configuration) *Handler {
 	return &Handler{r: r, c: c}
 }
 
-func (h *Handler) SetRoutes(frontend, backend *httprouter.Router, corsMiddleware func(http.Handler) http.Handler) {
-	frontend.Handler("OPTIONS", TokenPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	frontend.Handler("POST", TokenPath, corsMiddleware(http.HandlerFunc(h.TokenHandler)))
-	frontend.GET(AuthPath, h.AuthHandler)
-	frontend.POST(AuthPath, h.AuthHandler)
-	frontend.GET(DefaultConsentPath, h.DefaultConsentHandler)
-	frontend.GET(DefaultErrorPath, h.DefaultErrorHandler)
-	frontend.GET(DefaultLogoutPath, h.DefaultLogoutHandler)
-	frontend.Handler("OPTIONS", RevocationPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	frontend.Handler("POST", RevocationPath, corsMiddleware(http.HandlerFunc(h.RevocationHandler)))
-	frontend.Handler("OPTIONS", WellKnownPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	frontend.Handler("GET", WellKnownPath, corsMiddleware(http.HandlerFunc(h.WellKnownHandler)))
-	frontend.Handler("OPTIONS", UserinfoPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	frontend.Handler("GET", UserinfoPath, corsMiddleware(http.HandlerFunc(h.UserinfoHandler)))
-	frontend.Handler("POST", UserinfoPath, corsMiddleware(http.HandlerFunc(h.UserinfoHandler)))
+func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMiddleware func(http.Handler) http.Handler) {
+	public.Handler("OPTIONS", TokenPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
+	public.Handler("POST", TokenPath, corsMiddleware(http.HandlerFunc(h.TokenHandler)))
+	public.GET(AuthPath, h.AuthHandler)
+	public.POST(AuthPath, h.AuthHandler)
+	public.GET(DefaultConsentPath, h.DefaultConsentHandler)
+	public.GET(DefaultErrorPath, h.DefaultErrorHandler)
+	public.GET(DefaultLogoutPath, h.DefaultLogoutHandler)
+	public.Handler("OPTIONS", RevocationPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
+	public.Handler("POST", RevocationPath, corsMiddleware(http.HandlerFunc(h.RevocationHandler)))
+	public.Handler("OPTIONS", WellKnownPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
+	public.Handler("GET", WellKnownPath, corsMiddleware(http.HandlerFunc(h.WellKnownHandler)))
+	public.Handler("OPTIONS", UserinfoPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
+	public.Handler("GET", UserinfoPath, corsMiddleware(http.HandlerFunc(h.UserinfoHandler)))
+	public.Handler("POST", UserinfoPath, corsMiddleware(http.HandlerFunc(h.UserinfoHandler)))
 
-	backend.POST(IntrospectPath, h.IntrospectHandler)
-	backend.POST(FlushPath, h.FlushHandler)
+	admin.POST(IntrospectPath, h.IntrospectHandler)
+	admin.POST(FlushPath, h.FlushHandler)
 }
 
 // swagger:route GET /.well-known/openid-configuration public discoverOpenIDConfiguration

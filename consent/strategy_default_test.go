@@ -35,17 +35,17 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/x"
+
 	"github.com/spf13/viper"
 
-	"github.com/ory/hydra/driver/configuration"
-	"github.com/ory/hydra/internal"
-	"github.com/ory/hydra/oauth2"
-
 	"github.com/gorilla/securecookie"
-	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/internal"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/token/jwt"
@@ -86,7 +86,7 @@ func newCookieJar() *cookiejar.Jar {
 }
 
 func TestStrategy(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults(false)
+	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistry(conf)
 
 	var lph, cph, aph func(w http.ResponseWriter, r *http.Request)
@@ -94,7 +94,7 @@ func TestStrategy(t *testing.T) {
 	cp := mockProvider(&cph)
 	ap := mockProvider(&aph)
 
-	internal.EnsureRegistryKeys(reg, oauth2.OpenIDConnectKeyName)
+	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 	jwts := reg.OpenIDJWTStrategy()
 
 	fooUserIDToken, _, err := jwts.Generate(context.TODO(), jwt.IDTokenClaims{
@@ -127,8 +127,8 @@ func TestStrategy(t *testing.T) {
 
 	writer := reg.Writer()
 	handler := reg.ConsentHandler()
-	router := httprouter.New()
-	handler.SetRoutes(router, router)
+	router := x.NewRouterAdmin()
+	handler.SetRoutes(router, router.RouterPublic())
 	api := httptest.NewServer(router)
 
 	strategy := reg.ConsentStrategy()

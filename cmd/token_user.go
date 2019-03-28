@@ -27,11 +27,12 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
-	"net/url"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/ory/hydra/cmd/cli"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/spf13/cobra"
@@ -48,8 +49,12 @@ import (
 // tokenUserCmd represents the token command
 var tokenUserCmd = &cobra.Command{
 	Use:   "user",
-	Short: "Starts a web server that initiates and handles OAuth 2.0 requests",
-	Long:  ``,
+	Short: "An exemplary OAuth 2.0 Client performing the OAuth 2.0 Authorize Code Flow",
+	Long: `Starts an exemplary web server that acts as an OAuth 2.0 Client performing the Authorize Code Flow.
+This command will help you to see if ORY Hydra has been configured properly.
+
+This command must not be used for anything else than manual testing or demo purposes. The server will terminate on error
+and success.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		if flagx.MustGetBool(cmd, "skip-tls-verify") {
@@ -88,14 +93,10 @@ var tokenUserCmd = &cobra.Command{
 		}
 
 		if backend == "" {
-			bu, err := url.Parse(c.GetClusterURLWithoutTailingSlashOrFail(cmd))
-			cmdx.Must(err, `Unable to parse cluster url ("%s"): %s`, c.GetClusterURLWithoutTailingSlashOrFail(cmd), err)
-			backend = urlx.AppendPaths(bu, "/oauth2/token").String()
+			backend = urlx.AppendPaths(cli.RemoteURI(cmd), "/oauth2/token").String()
 		}
 		if frontend == "" {
-			fu, err := url.Parse(c.GetClusterURLWithoutTailingSlashOrFail(cmd))
-			cmdx.Must(err, `Unable to parse cluster url ("%s"): %s`, c.GetClusterURLWithoutTailingSlashOrFail(cmd), err)
-			frontend = urlx.AppendPaths(fu, "/oauth2/auth").String()
+			frontend = urlx.AppendPaths(cli.RemoteURI(cmd), "/oauth2/auth").String()
 		}
 
 		conf := oauth2.Config{

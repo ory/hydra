@@ -39,7 +39,7 @@ import (
 )
 
 func TestValidate(t *testing.T) {
-	c := internal.NewConfigurationWithDefaults(false)
+	c := internal.NewConfigurationWithDefaults()
 	viper.Set(configuration.ViperKeySubjectTypesSupported, []string{"pairwise", "public"})
 	viper.Set(configuration.ViperKeyDefaultClientScope, []string{"openid"})
 

@@ -1,10 +1,11 @@
 package oauth2_test
 
 import (
+	"time"
+
 	"github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/token/hmac"
 	"github.com/ory/hydra/driver/configuration"
-	"time"
 )
 
 func Tokens(c configuration.Provider, length int) (res [][]string) {
@@ -22,4 +23,3 @@ func Tokens(c configuration.Provider, length int) (res [][]string) {
 	}
 	return res
 }
-

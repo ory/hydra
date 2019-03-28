@@ -363,7 +363,7 @@ func (c *Config) Context() *Context {
 		if c.WithTracing() {
 			hasher = &tracing.TracedBCrypt{
 				WorkFactor: c.BCryptWorkFactor,
-			}
+			}]]
 			options = append(options, WithTracing(), withOmitSQLArgsFromSpans())
 		}
 
@@ -428,7 +428,7 @@ func (c *Config) Resolve(join ...string) *url.URL {
 //		return c.systemSecret
 //	}
 //
-//	if len(c.SystemSecret) >= 16 {
+//	if len(c.SystemSecret) >= 16 {DoesRequestSatisfyTermination
 //		c.systemSecret = x.HashStringSecret(c.SystemSecret)
 //		return x.HashStringSecret(c.SystemSecret)
 //	}

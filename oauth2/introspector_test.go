@@ -29,27 +29,27 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/x"
+
 	"github.com/spf13/viper"
 
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/internal"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/oauth2"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 )
 
 func TestIntrospectorSDK(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults(false)
+	conf := internal.NewConfigurationWithDefaults()
 	viper.Set(configuration.ViperKeyScopeStrategy, "wildcard")
 	viper.Set(configuration.ViperKeyIssuerURL, "foobariss")
 	reg := internal.NewRegistry(conf)
 
-	internal.EnsureRegistryKeys(reg, oauth2.OpenIDConnectKeyName)
+	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 	internal.AddFositeExamples(reg)
 
 	tokens := Tokens(conf, 4)
@@ -59,12 +59,13 @@ func TestIntrospectorSDK(t *testing.T) {
 	c.Scope = "fosite,openid,photos,offline,foo.*"
 	require.NoError(t, reg.ClientManager().UpdateClient(context.TODO(), c))
 
-	router := httprouter.New()
+	router := x.NewRouterAdmin()
 	handler := reg.OAuth2Handler()
-	handler.SetRoutes(router, router, func(h http.Handler) http.Handler {
+	handler.SetRoutes(router, router.RouterPublic(), func(h http.Handler) http.Handler {
 		return h
 	})
 	server := httptest.NewServer(router)
+	defer server.Close()
 
 	now := time.Now().UTC().Round(time.Minute)
 	createAccessTokenSession("alice", "my-client", tokens[0][0], now.Add(time.Hour), reg.OAuth2Storage(), fosite.Arguments{"core", "foo.*"})

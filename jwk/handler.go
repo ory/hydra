@@ -25,6 +25,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/ory/hydra/x"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
 	"gopkg.in/square/go-jose.v2"
@@ -45,20 +47,20 @@ func NewHandler(r InternalRegistry, c Configuration) *Handler {
 	return &Handler{r: r, c: c}
 }
 
-func (h *Handler) SetRoutes(frontend, backend *httprouter.Router, corsMiddleware func(http.Handler) http.Handler) {
-	frontend.Handler("OPTIONS", WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	frontend.Handler("GET", WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.WellKnown)))
+func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMiddleware func(http.Handler) http.Handler) {
+	public.Handler("OPTIONS", WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
+	public.Handler("GET", WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.WellKnown)))
 
-	backend.GET(KeyHandlerPath+"/:set/:key", h.GetKey)
-	backend.GET(KeyHandlerPath+"/:set", h.GetKeySet)
+	admin.GET(KeyHandlerPath+"/:set/:key", h.GetKey)
+	admin.GET(KeyHandlerPath+"/:set", h.GetKeySet)
 
-	backend.POST(KeyHandlerPath+"/:set", h.Create)
+	admin.POST(KeyHandlerPath+"/:set", h.Create)
 
-	backend.PUT(KeyHandlerPath+"/:set/:key", h.UpdateKey)
-	backend.PUT(KeyHandlerPath+"/:set", h.UpdateKeySet)
+	admin.PUT(KeyHandlerPath+"/:set/:key", h.UpdateKey)
+	admin.PUT(KeyHandlerPath+"/:set", h.UpdateKeySet)
 
-	backend.DELETE(KeyHandlerPath+"/:set/:key", h.DeleteKey)
-	backend.DELETE(KeyHandlerPath+"/:set", h.DeleteKeySet)
+	admin.DELETE(KeyHandlerPath+"/:set/:key", h.DeleteKey)
+	admin.DELETE(KeyHandlerPath+"/:set", h.DeleteKeySet)
 }
 
 // swagger:route GET /.well-known/jwks.json public wellKnown
@@ -83,7 +85,7 @@ func (h *Handler) SetRoutes(frontend, backend *httprouter.Router, corsMiddleware
 func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request) {
 	var jwks jose.JSONWebKeySet
 
-	for _, set := range h.c.WellKnownKeys(IDTokenKeyName) {
+	for _, set := range h.c.WellKnownKeys() {
 		keys, err := h.r.KeyManager().GetKeySet(r.Context(), set)
 		if err != nil {
 			h.r.Writer().WriteError(w, r, err)

@@ -32,10 +32,10 @@ import (
 	"github.com/ory/x/flagx"
 )
 
-type TokenHandler struct {}
+type TokenHandler struct{}
 
 func (h *TokenHandler) newTokenManager(cmd *cobra.Command) *hydra.AdminApi {
-	c := hydra.NewAdminApiWithBasePath(remote(cmd))
+	c := hydra.NewAdminApiWithBasePath(Remote(cmd))
 	c.Configuration = configureClientWithoutAuth(cmd, c.Configuration)
 	return c
 }
@@ -47,7 +47,7 @@ func newTokenHandler() *TokenHandler {
 func (h *TokenHandler) RevokeToken(cmd *cobra.Command, args []string) {
 	cmdx.ExactArgs(cmd, args, 1)
 
-	handler := hydra.NewPublicApiWithBasePath(remote(cmd))
+	handler := hydra.NewPublicApiWithBasePath(Remote(cmd))
 	handler.Configuration = configureClientWithoutAuth(cmd, handler.Configuration)
 
 	if clientID, clientSecret := flagx.MustGetString(cmd, "client-id"), flagx.MustGetString(cmd, "client-secret"); clientID == "" || clientSecret == "" {
@@ -67,7 +67,7 @@ Please provide a Client ID and Client Secret using flags --client-id and --clien
 }
 
 func (h *TokenHandler) FlushTokens(cmd *cobra.Command, args []string) {
-	handler := hydra.NewAdminApiWithBasePath(remote(cmd))
+	handler := hydra.NewAdminApiWithBasePath(Remote(cmd))
 	handler.Configuration = configureClient(cmd, handler.Configuration)
 	response, err := handler.FlushInactiveOAuth2Tokens(hydra.FlushInactiveOAuth2TokensRequest{
 		NotAfter: time.Now().Add(-flagx.MustGetDuration(cmd, "min-age")),

@@ -29,7 +29,6 @@ import (
 
 	"github.com/ory/hydra/internal"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -63,21 +62,22 @@ func createAccessTokenSessionPairwise(subject, client string, token string, expi
 }
 
 func TestRevoke(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults(false)
+	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistry(conf)
 
-	internal.EnsureRegistryKeys(reg, oauth2.OpenIDConnectKeyName)
+	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 	internal.AddFositeExamples(reg)
 
 	tokens := Tokens(conf, 4)
 	now := time.Now().UTC().Round(time.Second)
 
 	handler := reg.OAuth2Handler()
-	router := httprouter.New()
-	handler.SetRoutes(router, router, func(h http.Handler) http.Handler {
+	router := x.NewRouterAdmin()
+	handler.SetRoutes(router, router.RouterPublic(), func(h http.Handler) http.Handler {
 		return h
 	})
 	server := httptest.NewServer(router)
+	defer server.Close()
 
 	createAccessTokenSession("alice", "my-client", tokens[0][0], now.Add(time.Hour), reg.OAuth2Storage(), nil)
 	createAccessTokenSession("siri", "my-client", tokens[1][0], now.Add(time.Hour), reg.OAuth2Storage(), nil)

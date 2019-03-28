@@ -18,64 +18,60 @@
  * @license 	Apache-2.0
  */
 
-package server
+package driver
 
 import (
 	"context"
 	"net/http"
 	"strings"
 
+	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/oauth2"
+
 	"github.com/gobwas/glob"
 	"github.com/rs/cors"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/config"
-	"github.com/ory/hydra/oauth2"
 )
 
-func newCORSMiddleware(
-	enable bool, c *config.Config, po cors.Options,
-	o func(ctx context.Context, token string, tokenType fosite.TokenType, session fosite.Session, scope ...string) (fosite.TokenType, fosite.AccessRequester, error),
-	clm func(ctx context.Context, id string) (*client.Client, error),
-) func(h http.Handler) http.Handler {
-	if !enable {
+func OAuth2AwareCORSMiddleware(iface string, reg Registry, conf configuration.Provider) func(h http.Handler) http.Handler {
+	if !conf.CORSEnabled(iface) {
 		return func(h http.Handler) http.Handler {
 			return h
 		}
 	}
 
-	c.GetLogger().Info("Enabled CORS")
+	corsOptions := conf.CORSOptions(iface)
 	var patterns []glob.Glob
-	for _, o := range po.AllowedOrigins {
+	for _, o := range corsOptions.AllowedOrigins {
 		g, err := glob.Compile(strings.ToLower(o), '.')
 		if err != nil {
-			c.GetLogger().WithError(err).Fatalf("Unable to parse cors origin: %s", o)
+			reg.Logger().WithError(err).Fatalf("Unable to parse cors origin: %s", o)
 		}
 		patterns = append(patterns, g)
 	}
 
 	var alwaysAllow bool
-	for _, o := range po.AllowedOrigins {
+	for _, o := range corsOptions.AllowedOrigins {
 		if o == "*" {
 			alwaysAllow = true
 			break
 		}
 	}
 
-	if enable && len(po.AllowedOrigins) == 0 {
+	if len(corsOptions.AllowedOrigins) == 0 {
 		alwaysAllow = true
 	}
 
 	options := cors.Options{
-		AllowedOrigins:     po.AllowedOrigins,
-		AllowedMethods:     po.AllowedMethods,
-		AllowedHeaders:     po.AllowedHeaders,
-		ExposedHeaders:     po.ExposedHeaders,
-		MaxAge:             po.MaxAge,
-		AllowCredentials:   po.AllowCredentials,
-		OptionsPassthrough: po.OptionsPassthrough,
-		Debug:              po.Debug,
+		AllowedOrigins:     corsOptions.AllowedOrigins,
+		AllowedMethods:     corsOptions.AllowedMethods,
+		AllowedHeaders:     corsOptions.AllowedHeaders,
+		ExposedHeaders:     corsOptions.ExposedHeaders,
+		MaxAge:             corsOptions.MaxAge,
+		AllowCredentials:   corsOptions.AllowCredentials,
+		OptionsPassthrough: corsOptions.OptionsPassthrough,
+		Debug:              corsOptions.Debug,
 		AllowOriginRequestFunc: func(r *http.Request, origin string) bool {
 			if alwaysAllow {
 				return true
@@ -96,7 +92,7 @@ func newCORSMiddleware(
 				}
 
 				session := oauth2.NewSession("")
-				_, ar, err := o(context.Background(), token, fosite.AccessToken, session)
+				_, ar, err := reg.OAuth2Provider().IntrospectToken(context.Background(), token, fosite.AccessToken, session)
 				if err != nil {
 					return false
 				}
@@ -104,7 +100,7 @@ func newCORSMiddleware(
 				username = ar.GetClient().GetID()
 			}
 
-			cl, err := clm(r.Context(), username)
+			cl, err := reg.ClientManager().GetConcreteClient(r.Context(), username)
 			if err != nil {
 				return false
 			}
@@ -137,5 +133,6 @@ func newCORSMiddleware(
 			return false
 		},
 	}
+
 	return cors.New(options).Handler
 }

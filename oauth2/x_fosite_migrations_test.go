@@ -63,6 +63,7 @@ func cleanDB(t *testing.T, db *sqlx.DB) {
 	t.Logf("Unable to execute clean up query: %s", err)
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_client_migration")
 	t.Logf("Unable to execute clean up query: %s", err)
+
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_migration")
 	t.Logf("Unable to execute clean up query: %s", err)
 
@@ -82,7 +83,7 @@ func TestXXMigrations(t *testing.T) {
 		cleanDB, cleanDB,
 		func(t *testing.T, db *sqlx.DB, m, k, steps int) {
 			t.Run(fmt.Sprintf("poll=%d", k), func(t *testing.T) {
-				conf := internal.NewConfigurationWithDefaults(false)
+				conf := internal.NewConfigurationWithDefaults()
 				reg := internal.NewRegistrySQL(conf, db)
 
 				if m != 2 {

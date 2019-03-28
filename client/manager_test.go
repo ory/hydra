@@ -52,7 +52,7 @@ func connectToMySQL() {
 		log.Fatalf("Could not connect to database: %v", err)
 	}
 
-	conf := internal.NewConfigurationWithDefaults(false)
+	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistrySQL(conf, db)
 
 	m.Lock()
@@ -66,7 +66,7 @@ func connectToPG() {
 		log.Fatalf("Could not connect to database: %v", err)
 	}
 
-	conf := internal.NewConfigurationWithDefaults(false)
+	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistrySQL(conf, db)
 
 	m.Lock()
@@ -75,7 +75,7 @@ func connectToPG() {
 }
 
 func TestManagers(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults(false)
+	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistry(conf)
 
 	clientManagers["memory"] = reg.ClientManager()

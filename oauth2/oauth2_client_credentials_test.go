@@ -31,6 +31,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/x"
+
 	"github.com/spf13/viper"
 
 	"github.com/ory/hydra/driver/configuration"
@@ -39,7 +41,6 @@ import (
 	goauth2 "golang.org/x/oauth2"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2/clientcredentials"
@@ -51,17 +52,18 @@ import (
 func TestClientCredentials(t *testing.T) {
 	for _, tc := range []struct{ d string }{{d: "opaque"}, {d: "jwt"}} {
 		t.Run("tc="+tc.d, func(t *testing.T) {
-			conf := internal.NewConfigurationWithDefaults(false)
+			conf := internal.NewConfigurationWithDefaults()
 			viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Second)
 			viper.Set(configuration.ViperKeyAccessTokenStrategy, tc.d)
 			reg := internal.NewRegistry(conf)
 
-			router := httprouter.New()
+			router := x.NewRouterPublic()
 			ts := httptest.NewServer(router)
+			defer ts.Close()
 			viper.Set(configuration.ViperKeyIssuerURL, ts.URL)
 
 			handler := NewHandler(reg, conf)
-			handler.SetRoutes(router, router, func(h http.Handler) http.Handler {
+			handler.SetRoutes(router.RouterAdmin(), router, func(h http.Handler) http.Handler {
 				return h
 			})
 

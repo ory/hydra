@@ -1,17 +1,17 @@
 package main
 
 import (
-	"github.com/ory/hydra/config"
+	"github.com/ory/hydra/driver"
 )
 
 type MemTestPlugin struct {
-	config.MemoryBackend
+	*driver.RegistryMemory
 }
 
-func (m *MemTestPlugin) Prefixes() []string {
-	return []string{"memtest"}
+var Registry driver.Registry
+
+func init() {
+	Registry = &MemTestPlugin{RegistryMemory: driver.NewRegistryMemory()}
 }
 
 func main() {}
-
-var BackendConnector config.BackendConnector = &MemTestPlugin{}

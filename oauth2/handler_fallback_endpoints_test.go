@@ -26,27 +26,29 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/ory/hydra/x"
+
 	"github.com/spf13/viper"
 
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/oauth2"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestHandlerConsent(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults(false)
+	conf := internal.NewConfigurationWithDefaults()
 	viper.Set(configuration.ViperKeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
 	reg := internal.NewRegistry(conf)
 
 	h := reg.OAuth2Handler()
-	r := httprouter.New()
-	h.SetRoutes(r, r, func(h http.Handler) http.Handler {
+	r := x.NewRouterAdmin()
+	h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
 		return h
 	})
 	ts := httptest.NewServer(r)
+	defer ts.Close()
 
 	res, err := http.Get(ts.URL + oauth2.DefaultConsentPath)
 	assert.Nil(t, err)

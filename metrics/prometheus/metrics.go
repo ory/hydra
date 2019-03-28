@@ -36,7 +36,7 @@ type Metrics struct{}
 //	}
 //	prometheus.Register(pm.Counter)
 //  prometheus.Register(pm.ResponseTime)
-func NewMetrics(version, hash, buildTime string) *Metrics {
+func NewMetrics(version, hash, date string) *Metrics {
 	pm := &Metrics{}
 	return pm
 }

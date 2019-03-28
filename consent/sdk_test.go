@@ -27,12 +27,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/x"
+
 	"github.com/spf13/viper"
 
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/internal"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -42,15 +43,15 @@ import (
 )
 
 func TestSDK(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults(false)
+	conf := internal.NewConfigurationWithDefaults()
 	viper.Set(configuration.ViperKeyIssuerURL, "https://www.ory.sh")
 	viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Minute)
 	reg := internal.NewRegistry(conf)
 
-	router := httprouter.New()
+	router := x.NewRouterPublic()
 	h := NewHandler(reg, conf)
 
-	h.SetRoutes(router, router)
+	h.SetRoutes(router.RouterAdmin(), router)
 	ts := httptest.NewServer(router)
 
 	sdk, err := hydra.NewSDK(&hydra.Configuration{

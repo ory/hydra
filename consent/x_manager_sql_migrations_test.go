@@ -23,9 +23,15 @@ var createMigrations = map[string]*dbal.PackrMigrationSource{
 }
 
 func cleanDB(t *testing.T, db *sqlx.DB) {
-	_, err := db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_consent_migration")
+	_, err := db.Exec("DROP TABLE IF EXISTS hydra_oauth2_access")
 	t.Logf("Unable to execute clean up query: %s", err)
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_refresh")
+	t.Logf("Unable to execute clean up query: %s", err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_code")
+	t.Logf("Unable to execute clean up query: %s", err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_oidc")
+	t.Logf("Unable to execute clean up query: %s", err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_pkce")
 	t.Logf("Unable to execute clean up query: %s", err)
 
 	// hydra_oauth2_consent_request_handled depends on hydra_oauth2_consent_request
@@ -45,11 +51,16 @@ func cleanDB(t *testing.T, db *sqlx.DB) {
 	t.Logf("Unable to execute clean up query: %s", err)
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
 	t.Logf("Unable to execute clean up query: %s", err)
-
-	// everything depends on hydra_client
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_client")
 	t.Logf("Unable to execute clean up query: %s", err)
+
+	// clean up migration tables
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_consent_migration")
+	t.Logf("Unable to execute clean up query: %s", err)
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_client_migration")
+	t.Logf("Unable to execute clean up query: %s", err)
+
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_migration")
 	t.Logf("Unable to execute clean up query: %s", err)
 }
 
@@ -80,7 +91,7 @@ func TestXXMigrations(t *testing.T) {
 			}
 
 			t.Run(fmt.Sprintf("poll=%d", step), func(t *testing.T) {
-				conf := internal.NewConfigurationWithDefaults(false)
+				conf := internal.NewConfigurationWithDefaults()
 				reg := internal.NewRegistrySQL(conf, db)
 
 				kk := step + 1

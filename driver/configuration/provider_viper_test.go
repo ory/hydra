@@ -2,12 +2,13 @@ package configuration
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/stretchr/testify/require"
 )

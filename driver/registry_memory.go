@@ -1,8 +1,6 @@
 package driver
 
 import (
-	"github.com/sirupsen/logrus"
-
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
@@ -43,8 +41,7 @@ func (m *RegistryMemory) WithConsentStrategy(c consent.Strategy) *RegistryMemory
 	return m
 }
 
-func (m *RegistryMemory) Init(url string, l logrus.FieldLogger, opts ...dbal.DriverOptionModifier) error {
-	m.l = l
+func (m *RegistryMemory) Init() error {
 	return nil
 }
 

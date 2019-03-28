@@ -31,8 +31,6 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/ory/hydra/cmd/cli"
-	"github.com/ory/hydra/config"
-	"github.com/ory/hydra/oauth2"
 )
 
 var cfgFile string
@@ -43,8 +41,6 @@ var (
 	GitHash   = "undefined"
 )
 
-var c = new(config.Config)
-
 // This represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "hydra",
@@ -54,16 +50,12 @@ var RootCmd = &cobra.Command{
 	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
-var cmdHandler = cli.NewHandler(c)
+var cmdHandler = cli.NewHandler()
 
 // Execute adds all child commands to the root command sets flags appropriately.
 // Execute adds all child commands to the root command sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	c.BuildTime = BuildTime
-	c.BuildVersion = Version
-	c.BuildHash = GitHash
-
 	if err := RootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(-1)
@@ -101,41 +93,15 @@ func initConfig() {
 		viper.AddConfigPath("$HOME")  // adding home directory as first search path
 	}
 
-	viper.SetDefault("PUBLIC_PORT", 4444)
-	viper.SetDefault("ADMIN_PORT", 4445)
-	viper.SetDefault("OAUTH2_CONSENT_URL", oauth2.DefaultConsentPath)
-	viper.SetDefault("OAUTH2_LOGIN_URL", oauth2.DefaultConsentPath)
-	viper.SetDefault("OAUTH2_LOGOUT_REDIRECT_URL", oauth2.DefaultLogoutPath)
-	viper.SetDefault("OAUTH2_ERROR_URL", oauth2.DefaultErrorPath)
-	viper.SetDefault("OAUTH2_ACCESS_TOKEN_STRATEGY", "opaque")
-	viper.SetDefault("OAUTH2_ISSUER_URL", "http://localhost:4444")
-	viper.SetDefault("BCRYPT_COST", 10)
-	viper.SetDefault("OAUTH2_ACCESS_TOKEN_STRATEGY", "opaque")
-	viper.SetDefault("OAUTH2_SHARE_ERROR_DEBUG", false)
-	viper.SetDefault("REFRESH_TOKEN_LIFESPAN", "720h")
-	viper.SetDefault("ACCESS_TOKEN_LIFESPAN", "1h")
-	viper.SetDefault("ID_TOKEN_LIFESPAN", "1h")
-	viper.SetDefault("AUTH_CODE_LIFESPAN", "10m")
-	viper.SetDefault("CHALLENGE_TOKEN_LIFESPAN", "10m")
 	viper.SetDefault("LOG_LEVEL", "info")
-	viper.SetDefault("OIDC_SUBJECT_TYPES_SUPPORTED", "public")
-	viper.SetDefault("OIDC_SUBJECT_TYPE_PAIRWISE_SALT", "public")
-	viper.SetDefault("TRACING_PROVIDER_JAEGER_SAMPLING_TYPE", "const")
-	viper.SetDefault("TRACING_SERVICE_NAME", "ORY Hydra")
-	viper.SetDefault("TRACING_PROVIDER_JAEGER_SAMPLING_VALUE", float64(1))
 
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err != nil {
 		fmt.Printf(`Config file not found because "%s"`, err)
 		fmt.Println("")
-	}
-
-	if err := viper.Unmarshal(c); err != nil {
-		fatal(fmt.Sprintf("Could not read config because %s.", err))
 	}
 }
 

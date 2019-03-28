@@ -21,15 +21,11 @@
 package jwk_test
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"sync"
 	"testing"
 
-	"github.com/spf13/viper"
-
-	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/internal"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -57,7 +53,7 @@ func connectToPG() *SQLManager {
 		log.Fatalf("Could not connect to database: %v", err)
 	}
 
-	return internal.NewRegistrySQL(internal.NewConfigurationWithDefaults(false), db).KeyManager().(*SQLManager)
+	return internal.NewRegistrySQL(internal.NewConfigurationWithDefaults(), db).KeyManager().(*SQLManager)
 }
 
 func connectToMySQL() *SQLManager {
@@ -66,11 +62,11 @@ func connectToMySQL() *SQLManager {
 		log.Fatalf("Could not connect to database: %v", err)
 	}
 
-	return internal.NewRegistrySQL(internal.NewConfigurationWithDefaults(false), db).KeyManager().(*SQLManager)
+	return internal.NewRegistrySQL(internal.NewConfigurationWithDefaults(), db).KeyManager().(*SQLManager)
 }
 
 func TestManager(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults(false)
+	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistry(conf)
 	managers["memory"] = reg.KeyManager()
 
@@ -115,43 +111,6 @@ func TestManager(t *testing.T) {
 				t.Logf("Applied %d migrations to %s", n, name)
 			}
 			t.Run(fmt.Sprintf("case=%s", name), TestHelperManagerKeySet(m, ks, "TestManagerKeySet"))
-		}
-	})
-
-	t.Run("TestManagerRotate", func(t *testing.T) {
-		ks, err := testGenerator.Generate("TestManagerRotate", "sig")
-		require.NoError(t, err)
-
-		newKey, _ := RandomBytes(32)
-		newCipher := &AEAD{Key: newKey}
-
-		for name, m := range managers {
-			t.Run(fmt.Sprintf("manager=%s", name), func(t *testing.T) {
-				m, ok := m.(*SQLManager)
-				if !ok {
-					t.SkipNow()
-				}
-
-				n, err := m.CreateSchemas()
-				require.NoError(t, err)
-				t.Logf("Applied %d migrations to %s", n, name)
-
-				require.NoError(t, m.AddKeySet(context.TODO(), "TestManagerRotate", ks))
-
-				require.NoError(t, m.RotateKeys(context.TODO(), newCipher))
-
-				_, err = m.GetKeySet(context.TODO(), "TestManagerRotate")
-				require.Error(t, err)
-
-				viper.Set(configuration.ViperKeyGetSystemSecret, newKey)
-
-				got, err := m.GetKeySet(context.TODO(), "TestManagerRotate")
-				require.NoError(t, err)
-
-				for _, key := range ks.Keys {
-					require.EqualValues(t, ks.Key(key.KeyID), got.Key(key.KeyID))
-				}
-			})
 		}
 	})
 }

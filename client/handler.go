@@ -25,6 +25,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ory/hydra/x"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
 
@@ -46,12 +48,12 @@ func NewHandler(r InternalRegistry) *Handler {
 	}
 }
 
-func (h *Handler) SetRoutes(r *httprouter.Router) {
-	r.GET(ClientsHandlerPath, h.List)
-	r.POST(ClientsHandlerPath, h.Create)
-	r.GET(ClientsHandlerPath+"/:id", h.Get)
-	r.PUT(ClientsHandlerPath+"/:id", h.Update)
-	r.DELETE(ClientsHandlerPath+"/:id", h.Delete)
+func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
+	admin.GET(ClientsHandlerPath, h.List)
+	admin.POST(ClientsHandlerPath, h.Create)
+	admin.GET(ClientsHandlerPath+"/:id", h.Get)
+	admin.PUT(ClientsHandlerPath+"/:id", h.Update)
+	admin.DELETE(ClientsHandlerPath+"/:id", h.Delete)
 }
 
 // swagger:route POST /clients admin createOAuth2Client

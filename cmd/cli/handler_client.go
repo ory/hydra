@@ -57,9 +57,7 @@ func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 	m := h.newClientManager(cmd)
 
 	ek, encryptSecret, err := newEncryptionKey(cmd, nil)
-	if err != nil {
-		cmdx.Must(err, "Failed to load encryption key: %s", err)
-	}
+	cmdx.Must(err, "Failed to load encryption key: %s", err)
 
 	for _, path := range args {
 		reader, err := os.Open(path)
@@ -110,9 +108,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	}
 
 	ek, encryptSecret, err := newEncryptionKey(cmd, nil)
-	if err != nil {
-		cmdx.Must(err, "Failed to load encryption key: %s", err)
-	}
+	cmdx.Must(err, "Failed to load encryption key: %s", err)
 
 	cc := hydra.OAuth2Client{
 		ClientId:                flagx.MustGetString(cmd, "id"),

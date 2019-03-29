@@ -56,6 +56,9 @@ func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 	cmdx.MinArgs(cmd, args, 1)
 	m := h.newClientManager(cmd)
 
+	ek, encryptSecret, err := newEncryptionKey(cmd, nil)
+	cmdx.Must(err, "Failed to load encryption key: %s", err)
+
 	for _, path := range args {
 		reader, err := os.Open(path)
 		cmdx.Must(err, "Could not open file %s: %s", path, err)
@@ -68,6 +71,18 @@ func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 		checkResponse(err, http.StatusCreated, response)
 
 		if c.ClientSecret == "" {
+			if encryptSecret {
+				enc, err := ek.Encrypt([]byte(result.ClientSecret))
+				if err == nil {
+					fmt.Printf("Imported OAuth 2.0 Client %s from: %s\n", result.ClientId, path)
+					fmt.Printf("OAuth 2.0 Encrypted Client Secret: %s\n\n", enc.Base64Encode())
+					continue
+				}
+
+				fmt.Printf("Imported OAuth 2.0 Client %s:%s from: %s\n", result.ClientId, result.ClientSecret, path)
+				cmdx.Must(err, "Failed to encrypt client secret: %s", err)
+			}
+
 			fmt.Printf("Imported OAuth 2.0 Client %s:%s from: %s\n", result.ClientId, result.ClientSecret, path)
 		} else {
 			fmt.Printf("Imported OAuth 2.0 Client %s from: %s\n", result.ClientId, path)
@@ -91,6 +106,9 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	} else {
 		fmt.Println("You should not provide secrets using command line flags, the secret might leak to bash history and similar systems")
 	}
+
+	ek, encryptSecret, err := newEncryptionKey(cmd, nil)
+	cmdx.Must(err, "Failed to load encryption key: %s", err)
 
 	cc := hydra.OAuth2Client{
 		ClientId:                flagx.MustGetString(cmd, "id"),
@@ -119,6 +137,18 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		fmt.Println("This OAuth 2.0 Client has no secret")
 	} else {
 		if echoSecret {
+			if encryptSecret {
+				enc, err := ek.Encrypt([]byte(result.ClientSecret))
+				if err == nil {
+					fmt.Printf("OAuth 2.0 Encrypted Client Secret: %s\n", enc.Base64Encode())
+					return
+				}
+
+				// executes this at last to print raw client secret
+				// because if executes immediately, nobody knows client secret
+				defer cmdx.Must(err, "Failed to encrypt client secret: %s", err)
+			}
+
 			fmt.Printf("OAuth 2.0 Client Secret: %s\n", result.ClientSecret)
 		}
 	}

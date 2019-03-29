@@ -41,6 +41,7 @@ require (
 	github.com/prometheus/procfs v0.0.0-20190225181712-6ed1f7e10411 // indirect
 	github.com/rs/cors v1.6.0
 	github.com/rubenv/sql-migrate v0.0.0-20180704111356-ba2c6a7295c59448dbc195cef2f41df5163b3892
+	github.com/sawadashota/encrypta v0.0.2
 	github.com/sirupsen/logrus v1.3.0
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/viper v1.2.1
@@ -52,10 +53,10 @@ require (
 	github.com/ziutek/mymysql v1.5.4 // indirect
 	go.opencensus.io v0.19.0 // indirect
 	go.uber.org/atomic v1.3.2 // indirect
-	golang.org/x/crypto v0.0.0-20190228161510-8dd112bcdc25
+	golang.org/x/crypto v0.0.0-20190320223903-b7391e95e576
 	golang.org/x/net v0.0.0-20190227022144-312bce6e941f // indirect
 	golang.org/x/oauth2 v0.0.0-20190226205417-e64efc72b421
-	golang.org/x/sys v0.0.0-20190305064518-30e92a19ae4a // indirect
+	golang.org/x/sys v0.0.0-20190322080309-f49334f85ddc // indirect
 	google.golang.org/genproto v0.0.0-20190226184841-fc2db5cae922 // indirect
 	google.golang.org/grpc v1.19.0 // indirect
 	gopkg.in/resty.v1 v1.9.1

@@ -26,7 +26,10 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"os"
 
+	"github.com/olekukonko/tablewriter"
+	"github.com/sawadashota/encrypta"
 	"github.com/spf13/cobra"
 
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
@@ -76,4 +79,49 @@ func formatResponse(response interface{}) string {
 	out, err := json.MarshalIndent(response, "", "\t")
 	cmdx.Must(err, `Command failed because an error ("%s") occurred while prettifying output`, err)
 	return string(out)
+}
+
+// newTable is table renderer at console
+// And defines table layout option
+//
+// https://github.com/olekukonko/tablewriter
+func newTable() *tablewriter.Table {
+	table := tablewriter.NewWriter(os.Stdout)
+
+	// render options
+	table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
+	table.SetCenterSeparator("|")
+
+	return table
+}
+
+// newEncryptionKey for client secret
+func newEncryptionKey(cmd *cobra.Command, client *http.Client) (ek encrypta.EncryptionKey, encryptSecret bool, err error) {
+	if client == nil {
+		client = http.DefaultClient
+	}
+
+	pgpKey := flagx.MustGetString(cmd, "pgp-key")
+	pgpKeyURL := flagx.MustGetString(cmd, "pgp-key-url")
+	keybaseUsername := flagx.MustGetString(cmd, "keybase")
+
+	if pgpKey != "" {
+		ek, err = encrypta.NewPublicKeyFromBase64Encoded(pgpKey)
+		encryptSecret = true
+		return
+	}
+
+	if pgpKeyURL != "" {
+		ek, err = encrypta.NewPublicKeyFromURL(pgpKeyURL, encrypta.HTTPClientOption(client))
+		encryptSecret = true
+		return
+	}
+
+	if keybaseUsername != "" {
+		ek, err = encrypta.NewPublicKeyFromKeybase(keybaseUsername, encrypta.HTTPClientOption(client))
+		encryptSecret = true
+		return
+	}
+
+	return nil, false, nil
 }

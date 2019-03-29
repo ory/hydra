@@ -36,6 +36,9 @@ as well.
 
 Example:
   hydra clients create -n "my app" -c http://localhost/cb -g authorization_code -r code -a core,foobar
+
+To encrypt auto generated client secret, use "--pgp-key", "--pgp-key-url" or "--keybase" flag, for example:
+  hydra clients create -n "my app" -g client_credentials -r token -a core,foobar --keybase keybase_username
 `,
 	Run: cmdHandler.Clients.CreateClient,
 }
@@ -58,4 +61,9 @@ func init() {
 	clientsCreateCmd.Flags().String("subject-type", "public", "A identifier algorithm. Valid values are \"public\" and \"pairwise\"")
 	clientsCreateCmd.Flags().String("secret", "", "Provide the client's secret")
 	clientsCreateCmd.Flags().StringP("name", "n", "", "The client's name")
+
+	// encrypt client secret options
+	clientsCreateCmd.Flags().String("pgp-key", "", "Base64 encoded PGP encryption key for encrypting client secret")
+	clientsCreateCmd.Flags().String("pgp-key-url", "", "PGP encryption key URL for encrypting client secret")
+	clientsCreateCmd.Flags().String("keybase", "", "Keybase username for encrypting client secret")
 }

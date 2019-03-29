@@ -22,7 +22,9 @@ package cmd
 
 import (
 	"crypto/tls"
+	"encoding/base64"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"testing"
@@ -110,6 +112,7 @@ func TestExecute(t *testing.T) {
 		{args: []string{"clients", "create", "--skip-tls-verify", "--endpoint", backend, "--id", "foobarbaz", "--secret", "foobar", "-g", "client_credentials"}},
 		{args: []string{"clients", "get", "--skip-tls-verify", "--endpoint", backend, "foobarbaz"}},
 		{args: []string{"clients", "create", "--skip-tls-verify", "--endpoint", backend, "--id", "public-foo"}},
+		{args: []string{"clients", "create", "--skip-tls-verify", "--endpoint", backend, "--id", "confidential-foo", "--pgp-key", base64EncodedPGPPublicKey(t), "--grant-types", "client_credentials", "--response-types", "token"}},
 		{args: []string{"clients", "delete", "--skip-tls-verify", "--endpoint", backend, "public-foo"}},
 		{args: []string{"keys", "create", "--skip-tls-verify", "foo", "--endpoint", backend, "-a", "HS256"}},
 		{args: []string{"keys", "get", "--skip-tls-verify", "--endpoint", backend, "foo"}},
@@ -153,4 +156,14 @@ func TestExecute(t *testing.T) {
 			}
 		})
 	}
+}
+
+func base64EncodedPGPPublicKey(t *testing.T) string {
+	t.Helper()
+
+	gpgPublicKey, err := ioutil.ReadFile("../test/stub/pgp.pub")
+	if err != nil {
+		t.Fatal(err)
+	}
+	return base64.StdEncoding.EncodeToString(gpgPublicKey)
 }

@@ -149,6 +149,7 @@ type HandledAuthenticationRequest struct {
 	ACR string `json:"acr"`
 
 	// Subject is the user ID of the end-user that authenticated.
+	// required: true
 	Subject string `json:"subject"`
 
 	// ForceSubjectIdentifier forces the "pairwise" user ID of the end-user that authenticated. The "pairwise" user ID refers to the

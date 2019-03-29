@@ -295,6 +295,9 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					require.NoError(t, err)
 					compareConsentRequest(t, c, got1)
 
+					_, err = m.HandleConsentRequest(context.TODO(), "challenge"+tc.key, h)
+					require.NoError(t, err)
+
 					got2, err := m.VerifyAndInvalidateConsentRequest(context.TODO(), "verifier"+tc.key)
 					require.NoError(t, err)
 					compareConsentRequest(t, c, got2.ConsentRequest)

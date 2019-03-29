@@ -41,10 +41,18 @@ Please be aware that this command does not update existing clients. If the clien
 
 Example:
 	hydra clients import client-1.json
+
+To encrypt auto generated client secret, use "--pgp-key", "--pgp-key-url" or "--keybase" flag, for example:
+	hydra clients import client-1.json --keybase keybase_username
 `,
 	Run: cmdHandler.Clients.ImportClients,
 }
 
 func init() {
 	clientsCmd.AddCommand(clientsImportCmd)
+
+	// encrypt client secret options
+	clientsImportCmd.Flags().String("pgp-key", "", "Base64 encoded PGP encryption key for encrypting client secret")
+	clientsImportCmd.Flags().String("pgp-key-url", "", "PGP encryption key URL for encrypting client secret")
+	clientsImportCmd.Flags().String("keybase", "", "Keybase username for encrypting client secret")
 }

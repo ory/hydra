@@ -31,19 +31,6 @@ test-resetdb:
 test-short:
 		go test -failfast -short ./...
 
-# Initializes tools by downloading dependencies
-.PHONY: init
-init:
-		GO111MODULE=off go get -u \
-			github.com/ory/x/tools/listx \
-			github.com/sqs/goreturns \
-			github.com/ory/go-acc \
-			github.com/golang/mock/mockgen \
-			github.com/go-swagger/go-swagger/cmd/swagger \
-			github.com/go-bindata/go-bindata/... \
-			golang.org/x/tools/cmd/goimports \
-			github.com/gobuffalo/packr/packr
-
 # Formats the code
 .PHONY: format
 format:

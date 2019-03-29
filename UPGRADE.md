@@ -124,9 +124,31 @@ secure deployment with zero effort? We can run it for you! If you're interested,
 ### Configuration changes
 
 This patch introduces changes to the way configuration works in ORY Hydra. It allows ORY Hydra to be configured from
-a variety of sources, including environment variables, configuration file(s), and remote configuration (consul, etcd).
+a variety of sources including environment variables and a configuration file. In the future, ORY Hydra might be configurable
+using etcd or consul. The changes allow ORY Hydra to reload configuration without restarting in the future.
 
+An overview of configuration settings can be found [here](https://github.com/ory/hydra/blob/master/docs/config.yaml).
 
+All changes are backwards compatible except for the way key rotation works (see next section) and the way DBAL plugins
+are loaded (see section after next).
+
+### System secret rotation
+
+Rotating system secrets was fairly cumbersome in the past and required a restart of ORY Hydra. This changed. The
+system secret is now an array where the first element is used for encryption and all elements can be used for decryption.
+
+For more information on this topic, click [here](https://www.ory.sh/docs/hydra/advanced#system-secret-rotation).
+
+To make this change work, environment variable `ROTATED_SYSTEM_SECRET` has been removed and can no longer be used. Command
+`hydra migrate secret` has also been removed without replacement as it is no longer required for rotating secrets.
+
+### Database Plugins
+
+Environment variable `DATABASE_PLUGIN` has been replaced by `dsn`. To load a plugin,
+set `dsn: plugin:///path/to/plugin.so`.
+
+Please note that internals have changed radically with this patch and that there is some refactoring effort required
+to make plugins work with the most recent version.
 
 ## 1.0.0-rc.4
 

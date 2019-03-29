@@ -29,12 +29,16 @@ type ViperProvider struct {
 }
 
 const (
-	ViperKeyWellKnownKeys                  = "oidc.jwks.publish"
+	ViperKeyWellKnownKeys                  = "webfinger.jwks.broadcast_keys"
+	ViperKeyOAuth2ClientRegistrationURL    = "webfinger.oidc_discovery.client_registration_url"
+	ViperKeyOIDCDiscoverySupportedClaims   = "webfinger.oidc_discovery.supported_claims"
+	ViperKeyOIDCDiscoverySupportedScope    = "webfinger.oidc_discovery.supported_scope"
+	ViperKeyOIDCDiscoveryUserinfoEndpoint  = "webfinger.oidc_discovery.userinfo_url"
+
 	ViperKeySubjectTypesSupported          = "oidc.subject_identifiers.enabled"
 	ViperKeyDefaultClientScope             = "oidc.dynamic_client_registration.default_scope"
 	ViperKeyDSN                            = "dsn"
-	ViperKeyDataSourcePlugin               = "driver.plugin_path"
-	ViperKeyBCryptCost                     = "hashers.bcrypt.cost"
+	ViperKeyBCryptCost                     = "oauth2.hashers.bcrypt.cost"
 	ViperKeyAdminListenOnHost              = "serve.admin.host"
 	ViperKeyAdminListenOnPort              = "serve.admin.port"
 	ViperKeyPublicListenOnHost             = "serve.public.host"
@@ -54,13 +58,9 @@ const (
 	ViperKeyPublicURL                      = "urls.self.public"
 	ViperKeyAdminURL                       = "urls.self.public"
 	ViperKeyIssuerURL                      = "urls.self.issuer"
-	ViperKeyOAuth2ClientRegistrationURL    = "oidc.discovery.client_registration_url"
 	ViperKeyAllowTLSTerminationFrom        = "serve.tls.allow_termination_from"
 	ViperKeyAccessTokenStrategy            = "strategies.access_token"
 	ViperKeySubjectIdentifierAlgorithmSalt = "oidc.subject_identifiers.pairwise.salt"
-	ViperKeyOIDCDiscoverySupportedClaims   = "oidc.discovery.supported_claims"
-	ViperKeyOIDCDiscoverySupportedScope    = "oidc.discovery.supported_scope"
-	ViperKeyOIDCDiscoveryUserinfoEndpoint  = "oidc.discovery.userinfo_url"
 )
 
 func init() {
@@ -148,7 +148,7 @@ func (v *ViperProvider) DSN() string {
 }
 
 func (v *ViperProvider) DataSourcePlugin() string {
-	return viperx.GetString(v.l, ViperKeyDataSourcePlugin, "", "DATABASE_PLUGIN")
+	return viperx.GetString(v.l, ViperKeyDSN, "", "DATABASE_URL")
 }
 
 func (v *ViperProvider) BCryptCost() int {
@@ -186,7 +186,7 @@ func (v *ViperProvider) ConsentRequestMaxAge() time.Duration {
 }
 
 func (v *ViperProvider) AccessTokenLifespan() time.Duration {
-	return viperx.GetDuration(v.l, ViperKeyAccessTokenLifespan, time.Minute*30, "ACCESS_TOKEN_LIFESPAN")
+	return viperx.GetDuration(v.l, ViperKeyAccessTokenLifespan, time.Hour, "ACCESS_TOKEN_LIFESPAN")
 }
 
 func (v *ViperProvider) RefreshTokenLifespan() time.Duration {
@@ -229,7 +229,7 @@ func (v *ViperProvider) GetCookieSecrets() [][]byte {
 }
 
 func (v *ViperProvider) GetRotatedSystemSecrets() [][]byte {
-	secrets := viperx.GetStringSlice(v.l, ViperKeyGetSystemSecret, []string{}, "ROTATED_SYSTEM_SECRET")
+	secrets := viperx.GetStringSlice(v.l, ViperKeyGetSystemSecret, []string{})
 
 	if len(secrets) < 2 {
 		return nil
@@ -362,7 +362,7 @@ func (v *ViperProvider) OIDCDiscoveryUserinfoEndpoint() string {
 }
 
 func (v *ViperProvider) ShareOAuth2Debug() bool {
-	return viperx.GetBool(v.l, "debug.share_oauth2_errors", "OAUTH2_SHARE_ERROR_DEBUG")
+	return viperx.GetBool(v.l, "oauth2.expose_internal_errors", "OAUTH2_SHARE_ERROR_DEBUG")
 }
 
 //func (v *ViperProvider) ServesHTTPS() bool {

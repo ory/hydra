@@ -300,9 +300,8 @@ workflows:
               ignore: /.*/
       - release-changelog:
           requires:
-            - release-docker
+            - release
             - release-npm
-            - release-binaries
           filters:
             tags:
               only: /.*/

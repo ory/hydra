@@ -31,9 +31,9 @@ var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Display this binary's version, build time and git hash of this build",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("Version:    %s\n", Version)
-		fmt.Printf("Git Hash:   %s\n", GitHash)
-		fmt.Printf("Build Time: %s\n", BuildTime)
+		fmt.Printf("Version:    %s\n", version)
+		fmt.Printf("Git Hash:   %s\n", commit)
+		fmt.Printf("Build Time: %s\n", date)
 	},
 }
 

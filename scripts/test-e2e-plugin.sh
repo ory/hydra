@@ -18,8 +18,7 @@ export OAUTH2_SCOPE=openid,offline
 go install .
 go build -buildmode=plugin -o memtest.so ./test/plugin
 
-DATABASE_URL=memtest:// \
-    DATABASE_PLUGIN=memtest.so \
+DSN=plugin://./memtest.so \
     OAUTH2_CONSENT_URL=http://127.0.0.1:3000/consent \
     OAUTH2_LOGIN_URL=http://127.0.0.1:3000/login \
     OAUTH2_ERROR_URL=http://127.0.0.1:3000/error \

@@ -36,9 +36,9 @@ import (
 var cfgFile string
 
 var (
-	Version   = "master"
-	BuildTime = "undefined"
-	GitHash   = "undefined"
+	version = "master"
+	date    = "undefined"
+	commit  = "undefined"
 )
 
 // This represents the base command when called without any subcommands

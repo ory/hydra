@@ -1,0 +1,76 @@
+# This is an example goreleaser.yaml file with some sane defaults.
+# Make sure to check the documentation at http://goreleaser.com
+project_name: hydra
+
+before:
+  hooks:
+    # you may remove this if you don't use vgo
+    - go mod download
+    - go mod tidy
+builds:
+-
+  binary: hydra
+  env:
+    - CGO_ENABLED=0
+  goarch:
+    - amd64
+    - 386
+    - arm
+    - arm64
+  goarm:
+    - 5
+    - 6
+    - 7
+  goos:
+    - freebsd
+    - linux
+#    - plan9
+#    - solaris
+#    - netbsd
+#    - openbsd
+    - windows
+    - darwin
+archive:
+  replacements:
+    darwin: macOS
+    linux: Linux
+    windows: Windows
+    386: 32-bit
+    amd64: 64-bit
+  format_overrides:
+  - goos: windows
+    format: zip
+  files:
+    -  .releaser/LICENSE
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^docs:'
+    - '^test:'
+brew:
+  github:
+    owner: ory
+    name: homebrew-ory-hydra
+  homepage:  https://www.ory.sh
+  commit_author:
+    name: ory
+    email: hi@ory.sh
+
+scoop:
+  bucket:
+    owner: ory
+    name: scoop-ory-hydra
+  homepage:  https://www.ory.sh
+  commit_author:
+    name: ory
+    email: hi@ory.sh
+
+dockers:
+  - image_templates:
+    - "oryd/hydra:{{ .Tag }}"
+    - "oryd/hydra:v{{ .Major }}"
+    - "oryd/hydra:v{{ .Major }}.{{ .Minor }}"
+    - "oryd/hydra:latest"

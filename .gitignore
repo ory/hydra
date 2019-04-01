@@ -17,3 +17,4 @@ plugin-*.so
 hydra-docker-bin
 cookies.txt
 vendor/
+LICENSE.txt

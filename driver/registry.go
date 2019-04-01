@@ -69,6 +69,8 @@ func NewRegistry(c configuration.Provider) (Registry, error) {
 		return nil, errors.Errorf("driver of type %T does not implement interface Registry", driver)
 	}
 
+	registry = registry.WithConfig(c)
+
 	if err := registry.Init(); err != nil {
 		return nil, err
 	}

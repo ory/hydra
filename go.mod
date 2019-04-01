@@ -36,10 +36,12 @@ require (
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/lib/pq v1.0.0
 	github.com/luna-duclos/instrumentedsql v0.0.0-20190316074304-ecad98b20aec // indirect
+	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/meatballhat/negroni-logrus v0.0.0-20170801195057-31067281800f
 	github.com/mendsley/gojwk v0.0.0-20141217222730-4d5ec6e58103
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.0.0
+	github.com/olekukonko/tablewriter v0.0.1
 	github.com/opentracing/opentracing-go v1.1.0
 	github.com/ory/fosite v0.29.1
 	github.com/ory/go-acc v0.0.0-20181118080137-ddc355013f90
@@ -56,6 +58,7 @@ require (
 	github.com/prometheus/procfs v0.0.0-20190322151404-55ae3d9d5573 // indirect
 	github.com/rs/cors v1.6.0
 	github.com/rubenv/sql-migrate v0.0.0-20190212093014-1007f53448d7
+	github.com/sawadashota/encrypta v0.0.2
 	github.com/sirupsen/logrus v1.4.0
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect

@@ -36,7 +36,7 @@ import (
 var cfgFile string
 
 var (
-	Version   = "dev-master"
+	Version   = "master"
 	BuildTime = "undefined"
 	GitHash   = "undefined"
 )

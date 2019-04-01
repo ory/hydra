@@ -24,7 +24,6 @@ type Provider interface {
 	ConsentURL() *url.URL
 	ErrorURL() *url.URL
 	PublicURL() *url.URL
-	AdminURL() *url.URL
 	IssuerURL() *url.URL
 	OAuth2AuthURL() string
 	OAuth2ClientRegistrationURL() *url.URL
@@ -58,7 +57,7 @@ type Provider interface {
 }
 
 func MustValidate(l logrus.FieldLogger, p Provider) {
-	if !p.ServesHTTPS() {
+	if p.ServesHTTPS() {
 		if p.IssuerURL().String() == "" {
 			l.Fatalf(`Configuration key "%s" must be set unless flag "--dangerous-force-http" is set. To find out more, use "hydra help serve".`, ViperKeyIssuerURL)
 		}

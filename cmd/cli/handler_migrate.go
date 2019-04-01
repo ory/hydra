@@ -42,11 +42,11 @@ func newMigrateHandler() *MigrateHandler {
 }
 
 func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
-	var d = driver.NewDefaultDriver(logrusx.New(), false, "", "", "")
-	var dbu string
+	var d driver.Driver
+
 	if flagx.MustGetBool(cmd, "read-from-env") {
-		dbu := d.Configuration().DSN()
-		if len(dbu) == 0 {
+		d = driver.NewDefaultDriver(logrusx.New(), false, "", "", "")
+		if len(d.Configuration().DSN()) == 0 {
 			fmt.Println(cmd.UsageString())
 			fmt.Println("")
 			fmt.Println("When using flag -e, environment variable DATABASE_URL must be set")
@@ -59,16 +59,15 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 			os.Exit(1)
 			return
 		}
-		dbu = args[1]
+		viper.Set(configuration.ViperKeyDSN, args[0])
+		d = driver.NewDefaultDriver(logrusx.New(), false, "", "", "")
 	}
-
-	viper.Set(configuration.ViperKeyDSN, dbu)
 
 	reg, ok := d.Registry().(*driver.RegistrySQL)
 	if !ok {
 		fmt.Println(cmd.UsageString())
 		fmt.Println("")
-		fmt.Printf("Migrations can only be executed against a SQL-compatible driver but DSN %s is not a SQL source.\n", dbu)
+		fmt.Printf("Migrations can only be executed against a SQL-compatible driver but DSN is not a SQL source.\n")
 		os.Exit(1)
 		return
 	}

@@ -29,11 +29,11 @@ type ViperProvider struct {
 }
 
 const (
-	ViperKeyWellKnownKeys                  = "webfinger.jwks.broadcast_keys"
-	ViperKeyOAuth2ClientRegistrationURL    = "webfinger.oidc_discovery.client_registration_url"
-	ViperKeyOIDCDiscoverySupportedClaims   = "webfinger.oidc_discovery.supported_claims"
-	ViperKeyOIDCDiscoverySupportedScope    = "webfinger.oidc_discovery.supported_scope"
-	ViperKeyOIDCDiscoveryUserinfoEndpoint  = "webfinger.oidc_discovery.userinfo_url"
+	ViperKeyWellKnownKeys                 = "webfinger.jwks.broadcast_keys"
+	ViperKeyOAuth2ClientRegistrationURL   = "webfinger.oidc_discovery.client_registration_url"
+	ViperKeyOIDCDiscoverySupportedClaims  = "webfinger.oidc_discovery.supported_claims"
+	ViperKeyOIDCDiscoverySupportedScope   = "webfinger.oidc_discovery.supported_scope"
+	ViperKeyOIDCDiscoveryUserinfoEndpoint = "webfinger.oidc_discovery.userinfo_url"
 
 	ViperKeySubjectTypesSupported          = "oidc.subject_identifiers.enabled"
 	ViperKeyDefaultClientScope             = "oidc.dynamic_client_registration.default_scope"
@@ -56,7 +56,6 @@ const (
 	ViperKeyConsentURL                     = "urls.consent"
 	ViperKeyErrorURL                       = "urls.error"
 	ViperKeyPublicURL                      = "urls.self.public"
-	ViperKeyAdminURL                       = "urls.self.public"
 	ViperKeyIssuerURL                      = "urls.self.issuer"
 	ViperKeyAllowTLSTerminationFrom        = "serve.tls.allow_termination_from"
 	ViperKeyAccessTokenStrategy            = "strategies.access_token"
@@ -281,6 +280,9 @@ func (v *ViperProvider) adminFallbackURL(path string) string {
 }
 
 func (v *ViperProvider) publicFallbackURL(path string) string {
+	if len(v.IssuerURL().String()) > 0 {
+		return v.IssuerURL().String()
+	}
 	return v.fallbackURL(path, v.publicHost(), v.publicPort())
 }
 
@@ -311,12 +313,8 @@ func (v *ViperProvider) PublicURL() *url.URL {
 	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyPublicURL, v.publicFallbackURL("")))
 }
 
-func (v *ViperProvider) AdminURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyAdminURL, v.adminFallbackURL("")))
-}
-
 func (v *ViperProvider) IssuerURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyIssuerURL, v.PublicURL().String(), "OAUTH2_ISSUER_URL", "ISSUER", "ISSUER_URL"))
+	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyIssuerURL, v.fallbackURL("", v.publicHost(), v.publicPort()), "OAUTH2_ISSUER_URL", "ISSUER", "ISSUER_URL"))
 }
 
 func (v *ViperProvider) OAuth2AuthURL() string {
@@ -364,13 +362,3 @@ func (v *ViperProvider) OIDCDiscoveryUserinfoEndpoint() string {
 func (v *ViperProvider) ShareOAuth2Debug() bool {
 	return viperx.GetBool(v.l, "oauth2.expose_internal_errors", "OAUTH2_SHARE_ERROR_DEBUG")
 }
-
-//func (v *ViperProvider) ServesHTTPS() bool {
-//	return
-//}
-//func (v *ViperProvider) HashSignature() bool {
-//	return
-//}
-//func (v *ViperProvider) IsUsingJWTAsAccessTokens() bool {
-//	return
-//}

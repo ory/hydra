@@ -1,5 +1,11 @@
 # ORY Hydra Configuration
 #
+#
+# !!WARNING!!
+# This configuration file is for documentation purposes only. Do not use it in production. As all configuration items
+# are enabled, it will not work out of the box either.
+#
+#
 # ORY Hydra can be configured using a configuration file and passing the file location using `-c path/to/config.yaml`.
 # Per default, ORY Hydra will look up and load file ~/.hydra.yaml. All configuration keys can be set using environment
 # variables as well. Assuming the following configuration layout:
@@ -23,6 +29,21 @@
 # dsn               | DSN                  |
 # serve.admin.host  | SERVE_ADMIN_HOST     |
 # ------------------|----------------------|
+#
+#
+# List items such as
+#
+# secrets:
+#   system:
+#     - this-is-the-primary-secret
+#     - this-is-an-old-secret
+#     - this-is-another-old-secret
+#
+# must be separated using `,` when using environment variables. The environment variable equivalent to the code section#
+# above is:
+#
+# Linux/macOS: $ export SECRETS_SYSTEM=this-is-the-primary-secret,this-is-an-old-secret,this-is-another-old-secret
+# Windows: > set SECRETS_SYSTEM=this-is-the-primary-secret,this-is-an-old-secret,this-is-another-old-secret
 
 # log configures the logger
 log:
@@ -244,11 +265,17 @@ oidc:
       - offline_access
 
 urls:
-
   self:
-    public: https://localhost:4444/
-    admin: https://localhost:4445/
+
+    # This value will be used as the "issuer" in access and ID tokens. It must be
+    # specified and using HTTPS protocol, unless --dangerous-force-http is set. This should typically be equal
+    # to the public value.
     issuer: https://localhost:4444/
+
+    # This is the base location of the public endpoints of your ORY Hydra installation. This should typically be equal
+    # to the issuer value. If left unspecified, it falls back to the issuer value.
+    public: https://localhost:4444/
+
   # Sets the login ui endpoint of the User Login & Consent flow. Defaults to an internal fallback URL.
   login_ui: https://my-login.app/login
   # Sets the consent ui endpoint of the User Login & Consent flow. Defaults to an internal fallback URL.
@@ -304,29 +331,48 @@ secrets:
   # The first item in the list is used for signing and encryption. The whole list is used for verifying signatures
   # and decryption.
   system:
-    - replacemereplace
-    - rotatedsecretreplaceme
+    - this-is-the-primary-secret
+    - this-is-an-old-secret
+    - this-is-another-old-secret
   # A secret that is used to encrypt cookie sessions. Defaults to secrets.system. It is recommended to use
   #	a separate secret in production.
   #
   # The first item in the list is used for signing and encryption. The whole list is used for verifying signatures
   # and decryption.
   cookie:
-    - replacemereplace
-    - rotatedsecretreplaceme
+    - this-is-the-primary-secret
+    - this-is-an-old-secret
+    - this-is-another-old-secret
 
 
-# Enables profiling if set. Use "cpu" to enable cpu profiling and "mem" to enable memory profiling.
-# profiling: cpu
+# Enables profiling if set. Use "cpu" to enable cpu profiling and "mem" to enable memory profiling. For more details
+# on profiling, head over to: https://blog.golang.org/profiling-go-programs
+profiling: cpu
 # profiling: mem
 
-#tracing:
-#  service_name: ORY Hydra
-#  provider: jaeger
-#  providers:
-#    jaeger:
-#      local_agent_address:
-#      sampling:
-#        type: const
-#        value: 1.0
-#        server_url:
+# ORY Hydra supports distributed tracing.
+tracing:
+  # Set this to the tracing backend you wish to use. Currently supports jaeger. If omitted or empty, tracing will
+  # be disabled.
+  provider: jaeger
+  # Specifies the service name to use on the tracer.
+  service_name: ORY Hydra
+  providers:
+    # Configures the jaeger tracing backend.
+    jaeger:
+      # The address of the jaeger-agent where spans should be sent to
+      local_agent_address: 127.0.0.1:6831
+      sampling:
+        # The type of the sampler you want to use. Supports:
+        # - const
+        # - probabilistic
+        # - ratelimiting
+        type: const
+        # The value passed to the sampler type that has been configured.
+        # Supported values: This is dependant on the sampling strategy used:
+        # - const: 0 or 1 (all or nothing)
+        # - rateLimiting: a constant rate (e.g. setting this to 3 will sample requests with the rate of 3 traces per second)
+        # - probabilistic: a value between 0..1
+        value: 1.0
+        # The address of jaeger-agent's HTTP sampling server
+        server_url: http://localhost:5778/sampling

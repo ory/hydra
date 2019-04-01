@@ -21,6 +21,7 @@ func NewDefaultDriver(l logrus.FieldLogger, forcedHTTP bool, version, build, dat
 	}
 
 	r.
+		WithConfig(c).
 		WithLogger(l).
 		WithBuildInfo(version, build, date)
 
@@ -28,7 +29,7 @@ func NewDefaultDriver(l logrus.FieldLogger, forcedHTTP bool, version, build, dat
 		l.WithError(err).Fatal("Unable to initialize service registry.")
 	}
 
-	return &DefaultDriver{r: r.WithConfig(c), c: c}
+	return &DefaultDriver{r: r, c: c}
 }
 
 func (r *DefaultDriver) Configuration() configuration.Provider {

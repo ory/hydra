@@ -10,7 +10,7 @@
 #                                                                         #
 ###########################################################################
 
-version: '2'
+version: '3'
 
 services:
 
@@ -18,8 +18,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    links:
-      - postgresd:postgresd
     environment:
 #      - LOG_LEVEL=debug
       - DATABASE_URL=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable
@@ -31,10 +29,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    links:
-      - postgresd:postgresd
-#     Uncomment the following line to use mysql instead.
-#      - mysqld:mysqld
     depends_on:
       - hydra-migrate
     ports:
@@ -47,8 +41,6 @@ services:
       - OAUTH2_CONSENT_URL=http://localhost:3000/consent
       - OAUTH2_LOGIN_URL=http://localhost:3000/login
       - DATABASE_URL=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable
-#     Uncomment the following line to use mysql instead.
-#      - DATABASE_URL=mysql://root:secret@tcp(mysqld:3306)/mysql?parseTime=true
       - SYSTEM_SECRET=youReallyNeedToChangeThis
       - OAUTH2_SHARE_ERROR_DEBUG=1
 #      - OAUTH2_ACCESS_TOKEN_STRATEGY=jwt
@@ -58,10 +50,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    links:
-      - postgresd:postgresd
-#     Uncomment the following line to use mysql instead.
-#      - mysqld:mysqld
     depends_on:
       - hydra-migrate
     ports:
@@ -74,8 +62,6 @@ services:
       - OAUTH2_CONSENT_URL=http://localhost:3000/consent
       - OAUTH2_LOGIN_URL=http://localhost:3000/login
       - DATABASE_URL=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable
-#     Uncomment the following line to use mysql instead.
-#      - DATABASE_URL=mysql://root:secret@tcp(mysqld:3306)/mysql?parseTime=true
       - SYSTEM_SECRET=youReallyNeedToChangeThis
       - OAUTH2_SHARE_ERROR_DEBUG=1
 #      - OAUTH2_ACCESS_TOKEN_STRATEGY=jwt
@@ -85,8 +71,6 @@ services:
     environment:
       - HYDRA_ADMIN_URL=http://hydra-admin:4445
     image: oryd/hydra-login-consent-node:v1.0.0-rc.5
-    links:
-      - hydra-admin
     ports:
       - "3000:3000"
     restart: unless-stopped
@@ -99,9 +83,3 @@ services:
       - POSTGRES_USER=hydra
       - POSTGRES_PASSWORD=secret
       - POSTGRES_DB=hydra
-
-#  Uncomment the following section to use mysql instead.
-#  mysqld:
-#    image: mysql:5.7
-#    environment:
-#      - MYSQL_ROOT_PASSWORD=secret

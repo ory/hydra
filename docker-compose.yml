@@ -10,7 +10,7 @@
 #                                                                         #
 ###########################################################################
 
-version: '2'
+version: '3'
 
 services:
 
@@ -18,15 +18,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    links:
-      - postgresd:postgresd
-#     Uncomment the following section to use mysql instead.
-#      - mysqld:mysqld
     environment:
 #      - LOG_LEVEL=debug
       - DATABASE_URL=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable
-#     Uncomment the following section to use mysql instead.
-#      - DATABASE_URL=mysql://root:secret@tcp(mysqld:3306)/mysql?parseTime=true
     command:
       migrate sql -e
     restart: on-failure
@@ -35,21 +29,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    links:
-      - postgresd:postgresd
-#     Uncomment the following line to use mysql instead.
-#      - mysqld:mysqld
     depends_on:
       - hydra-migrate
-#     Uncomment the following when configuring tracing
-#      - jaeger
     ports:
-      # Public port
-      - "4444:4444"
-      # Admin port
-      - "4445:4445"
-      # Port for hydra token user
-      - "5555:5555"
+      - "4444:4444" # Public port
+      - "4445:4445" # Admin port
+      - "5555:5555" # Port for hydra token user
     command:
       serve all --dangerous-force-http
     environment:
@@ -58,43 +43,20 @@ services:
       - OAUTH2_CONSENT_URL=http://localhost:3000/consent
       - OAUTH2_LOGIN_URL=http://localhost:3000/login
       - DATABASE_URL=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable
-#     Uncomment the following line to use mysql instead.
-#      - DATABASE_URL=mysql://root:secret@tcp(mysqld:3306)/mysql?parseTime=true
       - SYSTEM_SECRET=youReallyNeedToChangeThis
       - OAUTH2_SHARE_ERROR_DEBUG=1
       - OIDC_SUBJECT_TYPES_SUPPORTED=public,pairwise
       - OIDC_SUBJECT_TYPE_PAIRWISE_SALT=youReallyNeedToChangeThis
-#     - OAUTH2_ACCESS_TOKEN_STRATEGY=jwt
-#     Uncomment the following lines when configuring tracing
-#      - TRACING_PROVIDER=jaeger
-#      - TRACING_PROVIDER_JAEGER_SAMPLING_SERVER_URL=http://jaeger:5778/sampling
-#      - TRACING_PROVIDER_JAEGER_LOCAL_AGENT_ADDRESS=jaeger:6831
-#      - TRACING_PROVIDER_JAEGER_SAMPLING_TYPE=const
-#      - TRACING_PROVIDER_JAEGER_SAMPLING_VALUE=1
-    restart: on-failure
+#      - OAUTH2_ACCESS_TOKEN_STRATEGY=jwt
+    restart: unless-stopped
 
   consent:
     environment:
       - HYDRA_ADMIN_URL=http://hydra:4445
     image: oryd/hydra-login-consent-node:v1.0.0-rc.5
-    links:
-      - hydra
     ports:
       - "3000:3000"
-    restart: on-failure
-
-# Uncomment the following when configuring tracing
-
-#  jaeger:
-#    image: jaegertracing/all-in-one:1.7.0
-#    ports:
-#    - "5775:5775/udp"
-#    - "6831:6831/udp"
-#    - "6832:6832/udp"
-#    - "5778:5778"
-#    - "16686:16686"
-#    - "14268:14268"
-#    - "9411:9411"
+    restart: unless-stopped
 
   postgresd:
     image: postgres:9.6
@@ -104,9 +66,3 @@ services:
       - POSTGRES_USER=hydra
       - POSTGRES_PASSWORD=secret
       - POSTGRES_DB=hydra
-
-#  Uncomment the following section to use mysql instead.
-#  mysqld:
-#    image: mysql:5.7
-#    environment:
-#      - MYSQL_ROOT_PASSWORD=secret

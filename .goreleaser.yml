@@ -69,3 +69,5 @@ dockers:
       - "oryd/hydra:v{{ .Major }}"
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}"
       - "oryd/hydra:latest"
+    extra_files:
+      - .releaser/LICENSE.txt

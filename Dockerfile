@@ -9,6 +9,7 @@ FROM scratch
 
 COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY hydra /usr/bin/hydra
+COPY .releaser/LICENSE.txt /LICENSE.txt
 
 ENTRYPOINT ["hydra"]
 CMD ["serve", "all"]

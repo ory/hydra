@@ -52,7 +52,7 @@ const (
 	ViperKeyGetCookieSecrets               = "secrets.cookie"
 	ViperKeyGetSystemSecret                = "secrets.system"
 	ViperKeyLogoutRedirectURL              = "urls.post_logout_redirect"
-	ViperKeyLoginURL                       = "urls.logout"
+	ViperKeyLoginURL                       = "urls.login"
 	ViperKeyConsentURL                     = "urls.consent"
 	ViperKeyErrorURL                       = "urls.error"
 	ViperKeyPublicURL                      = "urls.self.public"
@@ -281,20 +281,22 @@ func (v *ViperProvider) adminFallbackURL(path string) string {
 
 func (v *ViperProvider) publicFallbackURL(path string) string {
 	if len(v.IssuerURL().String()) > 0 {
-		return v.IssuerURL().String()
+		return urlx.AppendPaths(v.IssuerURL(), path).String()
 	}
 	return v.fallbackURL(path, v.publicHost(), v.publicPort())
 }
 
 func (v *ViperProvider) fallbackURL(path string, host string, port int) string {
-	proto := "https"
+	var u url.URL
+	u.Scheme = "https"
 	if !v.ServesHTTPS() {
-		proto = "http"
+		u.Scheme = "http"
 	}
 	if host == "" {
-		host = "localhost"
+		u.Host = fmt.Sprintf("%s:%d", "localhost", port)
 	}
-	return fmt.Sprintf("%s://%s:%d/%s", proto, host, port, path)
+	u.Path = path
+	return u.String()
 }
 
 func (v *ViperProvider) LoginURL() *url.URL {
@@ -310,7 +312,7 @@ func (v *ViperProvider) ErrorURL() *url.URL {
 }
 
 func (v *ViperProvider) PublicURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyPublicURL, v.publicFallbackURL("")))
+	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyPublicURL, v.publicFallbackURL("/")))
 }
 
 func (v *ViperProvider) IssuerURL() *url.URL {

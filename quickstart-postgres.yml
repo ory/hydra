@@ -15,15 +15,25 @@ version: '3'
 services:
 
   hydra-migrate:
+    image: oryd/hydra:latest
     environment:
-      - DATABASE_URL=mysql://root:secret@tcp(mysqld:3306)/mysql?parseTime=true
+      - DSN=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable
+    command:
+      migrate sql -e
+    restart: on-failure
 
   hydra:
+    depends_on:
+      - hydra-migrate
     environment:
-      - DATABASE_URL=mysql://root:secret@tcp(mysqld:3306)/mysql?parseTime=true
+      - DSN=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable
     restart: unless-stopped
 
-  mysqld:
-    image: mysql:5.7
+  postgresd:
+    image: postgres:9.6
+    ports:
+      - "5432:5432"
     environment:
-      - MYSQL_ROOT_PASSWORD=secret
+      - POSTGRES_USER=hydra
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=hydra

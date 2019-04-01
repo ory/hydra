@@ -14,23 +14,8 @@ version: '3'
 
 services:
 
-  hydra-migrate:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    environment:
-#      - LOG_LEVEL=debug
-      - DATABASE_URL=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable
-    command:
-      migrate sql -e
-    restart: on-failure
-
   hydra:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    depends_on:
-      - hydra-migrate
+    image: oryd/hydra:latest
     ports:
       - "4444:4444" # Public port
       - "4445:4445" # Admin port
@@ -42,7 +27,7 @@ services:
       - OAUTH2_ISSUER_URL=http://localhost:4444
       - OAUTH2_CONSENT_URL=http://localhost:3000/consent
       - OAUTH2_LOGIN_URL=http://localhost:3000/login
-      - DATABASE_URL=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable
+      - DATABASE_URL=memory
       - SYSTEM_SECRET=youReallyNeedToChangeThis
       - OAUTH2_SHARE_ERROR_DEBUG=1
       - OIDC_SUBJECT_TYPES_SUPPORTED=public,pairwise
@@ -53,16 +38,7 @@ services:
   consent:
     environment:
       - HYDRA_ADMIN_URL=http://hydra:4445
-    image: oryd/hydra-login-consent-node:v1.0.0-rc.5
+    image: oryd/hydra-login-consent-node:v1.0.0-rc.6
     ports:
       - "3000:3000"
     restart: unless-stopped
-
-  postgresd:
-    image: postgres:9.6
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_USER=hydra
-      - POSTGRES_PASSWORD=secret
-      - POSTGRES_DB=hydra

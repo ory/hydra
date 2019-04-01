@@ -8,7 +8,37 @@
 #
 # ORY Hydra can be configured using a configuration file and passing the file location using `-c path/to/config.yaml`.
 # Per default, ORY Hydra will look up and load file ~/.hydra.yaml. All configuration keys can be set using environment
-# variables as well. Assuming the following configuration layout:
+# variables as well.
+#
+# Setting environment variables is easy:
+#
+## Linux / OSX
+#
+# $ export MY_ENV_VAR=foo
+# $ hydra ...
+#
+# alternatively:
+#
+# $ MY_ENV_VAR=foo hydra ...
+#
+## Windows
+#
+### Command Prompt
+#
+# > set MY_ENV_VAR=foo
+# > hydra ...
+#
+### Powershell
+#
+# > $env:MY_ENV_VAR="foo"
+# > hydra ...
+#
+## Docker
+#
+# $ docker run -e MY_ENV_VAR=foo oryd/hydra:...
+#
+#
+# Assuming the following configuration layout:
 #
 # serve:
 #   public:
@@ -20,9 +50,7 @@
 # and replacing `.` with `_`:
 #   `serve.public.port.somethihng_else` -> `SERVE_PUBLIC_PORT_SOMETHING_ELSE`
 #
-# Environment variables always override values from the configuration file.
-#
-# Here are some more examples:
+# Environment variables always override values from the configuration file. Here are some more examples:
 #
 # Configuration key | Environment variable |
 # ------------------|----------------------|

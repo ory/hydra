@@ -52,20 +52,20 @@ func (m *RegistryPlugin) Init() error {
 		return errors.WithStack(err)
 	}
 
-	l, err := p.Lookup("Registry")
+	l, err := p.Lookup("NewRegistry")
 	if err != nil {
 		return errors.Wrap(err, "unable to look up `Registry`")
 	}
 
-	reg, ok := l.(Registry)
+	reg, ok := l.(func() Registry)
 	if !ok {
-		return errors.New("unable to type assert `github.com/ory/hydra/driver.Registry`")
+		return errors.Errorf("unable to type assert %T to `func() driver.Registry`", l)
 	}
 
+	m.Registry = reg()
 	m.Logger().Info("Successfully loaded database plugin")
 	m.Logger().Debugf("Memory address of database plugin is: %p", reg)
-
-	m.Registry = reg
+	m.Registry.WithConfig(m.c)
 
 	return nil
 }

@@ -8,10 +8,8 @@ type MemTestPlugin struct {
 	*driver.RegistryMemory
 }
 
-var Registry driver.Registry
-
-func init() {
-	Registry = &MemTestPlugin{RegistryMemory: driver.NewRegistryMemory()}
+func NewRegistry() driver.Registry {
+	return &MemTestPlugin{RegistryMemory: driver.NewRegistryMemory()}
 }
 
 func main() {}

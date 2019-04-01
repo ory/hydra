@@ -1,4 +1,4 @@
-// +build !noplugin
+// +build noplugin
 
 package driver
 

@@ -9,6 +9,8 @@ before:
     - go mod download
 builds:
   -
+    ldflags:
+      - -s -w -X main.Version={{.Tag}} -X main.Commit={{.FullCommit}} -X main.Date={{.Date}}
     binary: hydra
     env:
       - CGO_ENABLED=0
@@ -24,10 +26,6 @@ builds:
     goos:
       - freebsd
       - linux
-      #    - plan9
-      #    - solaris
-      #    - netbsd
-      #    - openbsd
       - windows
       - darwin
 archive:
@@ -68,6 +66,8 @@ dockers:
   - image_templates:
       - "oryd/hydra:v{{ .Major }}"
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}"
+      - "oryd/hydra:v{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
+      - "oryd/hydra:{{ .Env.DOCKER_FULL_TAG }}"
       - "oryd/hydra:latest"
     extra_files:
       - .releaser/LICENSE.txt

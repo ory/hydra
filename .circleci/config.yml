@@ -207,14 +207,13 @@ jobs:
           name: Enable go1.12 modules
           command: |
             echo 'export GO111MODULE=on' >> $BASH_ENV
+            echo 'export DOCKER_FULL_TAG=$(echo $CIRCLE_TAG | tr '+' '_')' >> $BASH_ENV
             source $BASH_ENV
       - checkout
       - setup_remote_docker
       - run: docker login --username "$DOCKER_USERNAME" --password "$DOCKER_PASSWORD"
       - run: cp ./.releaser/LICENSE.txt ./LICENSE.txt
       - run: curl -sL https://git.io/goreleaser | bash
-      - run: docker tag oryd/hydra:latest oryd/hydra:$(echo $CIRCLE_TAG | tr '+' '_')
-      - run: docker push oryd/hydra:$(echo $CIRCLE_TAG | tr '+' '_')
 
 workflows:
   version: 2

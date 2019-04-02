@@ -135,16 +135,6 @@ jobs:
 #    See https://github.com/ory/hydra/issues/1179
 #    - run: OAUTH2_ACCESS_TOKEN_STRATEGY=jwt DATABASE_URL=memory ./scripts/test-e2e.sh
 
-  build-docker:
-    docker:
-      - image: library/docker:17.10
-    steps:
-      - checkout
-      - setup_remote_docker:
-          version: 17.10.0-ce
-      - run: docker build -f Dockerfile -t hydra-test .
-      - run: docker run hydra-test help
-
   release-npm:
     docker:
       - image: circleci/node:8.9.3
@@ -267,14 +257,9 @@ workflows:
           filters:
             branches:
               only: master
-#      - generators:
-#          filters:
-#            tags:
-#              only: /.*/
-      - build-docker:
+      - release:
           requires:
             - test
-#            - generators
             - format
             - test-e2e-opaque
             - test-e2e-plugin
@@ -282,17 +267,11 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - release:
-          requires:
-            - build-docker
-          filters:
-            tags:
-              only: /.*/
             branches:
               ignore: /.*/
       - release-npm:
           requires:
-            - build-docker
+            - release
           filters:
             tags:
               only: /.*/

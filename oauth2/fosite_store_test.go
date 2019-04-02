@@ -88,8 +88,8 @@ func TestManagers(t *testing.T) {
 				m = connectToMySQL(t)
 			},
 		})
-		registries["postgres"] = connectSQL(t, conf, connectToPG(t))
-		registries["mysql"] = connectSQL(t, conf, connectToMySQL(t))
+		registries["postgres"] = connectSQL(t, conf, p)
+		registries["mysql"] = connectSQL(t, conf, m)
 	}
 
 	for k, store := range registries {

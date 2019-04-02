@@ -2,9 +2,11 @@
 # Make sure to check the documentation at http://goreleaser.com
 project_name: hydra
 
+env:
+  - GO111MODULE=on
 before:
   hooks:
-    - go install .
+    - go mod download
 builds:
   -
     binary: hydra

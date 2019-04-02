@@ -225,8 +225,6 @@ workflows:
             tags:
               only: /.*/
       - test:
-          requires:
-#            - generators
           filters:
             tags:
               only: /.*/
@@ -249,6 +247,8 @@ workflows:
             tags:
               only: /.*/
       - release-docs:
+          requires:
+            - test
           filters:
             branches:
               only: master

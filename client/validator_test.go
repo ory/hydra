@@ -18,7 +18,7 @@
  * @license 	Apache-2.0
  */
 
-package client
+package client_test
 
 import (
 	"fmt"
@@ -26,21 +26,29 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/spf13/viper"
+
+	"github.com/ory/hydra/driver/configuration"
+
+	. "github.com/ory/hydra/client"
+	"github.com/ory/hydra/internal"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	jose "gopkg.in/square/go-jose.v2"
+	"gopkg.in/square/go-jose.v2"
 )
 
 func TestValidate(t *testing.T) {
-	v := &Validator{
-		DefaultClientScopes: []string{"openid"},
-		SubjectTypes:        []string{"pairwise", "public"},
-	}
+	c := internal.NewConfigurationWithDefaults()
+	viper.Set(configuration.ViperKeySubjectTypesSupported, []string{"pairwise", "public"})
+	viper.Set(configuration.ViperKeyDefaultClientScope, []string{"openid"})
+
+	v := NewValidator(c)
 	for k, tc := range []struct {
 		in        *Client
 		check     func(t *testing.T, c *Client)
 		expectErr bool
-		v         *Validator
+		v         func(t *testing.T) *Validator
 	}{
 		{
 			in: new(Client),
@@ -81,9 +89,9 @@ func TestValidate(t *testing.T) {
 			},
 		},
 		{
-			v: &Validator{
-				DefaultClientScopes: []string{"openid"},
-				SubjectTypes:        []string{"pairwise"},
+			v: func(t *testing.T) *Validator {
+				viper.Set(configuration.ViperKeySubjectTypesSupported, []string{"pairwise"})
+				return NewValidator(c)
 			},
 			in: &Client{ClientID: "foo"},
 			check: func(t *testing.T, c *Client) {
@@ -103,9 +111,11 @@ func TestValidate(t *testing.T) {
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
 			if tc.v == nil {
-				tc.v = v
+				tc.v = func(t *testing.T) *Validator {
+					return v
+				}
 			}
-			err := tc.v.Validate(tc.in)
+			err := tc.v(t).Validate(tc.in)
 			if tc.expectErr {
 				require.Error(t, err)
 			} else {
@@ -125,9 +135,7 @@ func TestValidateSectorIdentifierURL(t *testing.T) {
 	ts := httptest.NewTLSServer(h)
 	defer ts.Close()
 
-	v := &Validator{
-		c: ts.Client(),
-	}
+	v := NewValidatorWithClient(nil, ts.Client())
 
 	for k, tc := range []struct {
 		p         string
@@ -162,7 +170,7 @@ func TestValidateSectorIdentifierURL(t *testing.T) {
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
 			payload = tc.p
-			err := v.validateSectorIdentifierURL(tc.u, tc.r)
+			err := v.ValidateSectorIdentifierURL(tc.u, tc.r)
 			if tc.expectErr {
 				require.Error(t, err)
 			} else {

@@ -25,25 +25,8 @@ import (
 	"time"
 
 	"github.com/ory/fosite"
-	"github.com/ory/fosite/compose"
 	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/pkg"
 )
-
-var hasher = &fosite.BCrypt{}
-var oauth2OpqaueStrategy = &compose.CommonStrategy{
-	CoreStrategy:               compose.NewOAuth2HMACStrategy(fc, []byte("some super secret secret secret secret"), nil),
-	OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(fc, pkg.MustINSECURELOWENTROPYRSAKEYFORTEST()),
-}
-var oauth2JWTStrategy = &compose.CommonStrategy{
-	CoreStrategy:               compose.NewOAuth2JWTStrategy(pkg.MustINSECURELOWENTROPYRSAKEYFORTEST(), compose.NewOAuth2HMACStrategy(fc, []byte("some super secret secret secret secret"), nil)),
-	OpenIDConnectTokenStrategy: compose.NewOpenIDConnectStrategy(fc, pkg.MustINSECURELOWENTROPYRSAKEYFORTEST()),
-}
-
-var fc = &compose.Config{
-	AccessTokenLifespan:        time.Second * 2,
-	SendDebugMessagesToClients: true,
-}
 
 type consentMock struct {
 	deny        bool

@@ -25,38 +25,35 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ory/hydra/x"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
 
-	"github.com/ory/herodot"
 	"github.com/ory/x/pagination"
 	"github.com/ory/x/randx"
 )
 
 type Handler struct {
-	Manager   Manager
-	H         herodot.Writer
-	Validator *Validator
+	r InternalRegistry
 }
 
 const (
 	ClientsHandlerPath = "/clients"
 )
 
-func NewHandler(manager Manager, h herodot.Writer, defaultClientScopes, subjectTypes []string) *Handler {
+func NewHandler(r InternalRegistry) *Handler {
 	return &Handler{
-		Manager:   manager,
-		H:         h,
-		Validator: NewValidator(defaultClientScopes, subjectTypes),
+		r: r,
 	}
 }
 
-func (h *Handler) SetRoutes(r *httprouter.Router) {
-	r.GET(ClientsHandlerPath, h.List)
-	r.POST(ClientsHandlerPath, h.Create)
-	r.GET(ClientsHandlerPath+"/:id", h.Get)
-	r.PUT(ClientsHandlerPath+"/:id", h.Update)
-	r.DELETE(ClientsHandlerPath+"/:id", h.Delete)
+func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
+	admin.GET(ClientsHandlerPath, h.List)
+	admin.POST(ClientsHandlerPath, h.Create)
+	admin.GET(ClientsHandlerPath+"/:id", h.Get)
+	admin.PUT(ClientsHandlerPath+"/:id", h.Update)
+	admin.DELETE(ClientsHandlerPath+"/:id", h.Delete)
 }
 
 // swagger:route POST /clients admin createOAuth2Client
@@ -85,29 +82,29 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	var c Client
 
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
-		h.H.WriteError(w, r, errors.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
 	if len(c.Secret) == 0 {
 		secret, err := randx.RuneSequence(12, []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-.~"))
 		if err != nil {
-			h.H.WriteError(w, r, errors.WithStack(err))
+			h.r.Writer().WriteError(w, r, errors.WithStack(err))
 			return
 		}
 		c.Secret = string(secret)
 	}
 
-	if err := h.Validator.Validate(&c); err != nil {
-		h.H.WriteError(w, r, err)
+	if err := h.r.ClientValidator().Validate(&c); err != nil {
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
 	secret := c.Secret
 	c.CreatedAt = time.Now().UTC().Round(time.Second)
 	c.UpdatedAt = c.CreatedAt
-	if err := h.Manager.CreateClient(r.Context(), &c); err != nil {
-		h.H.WriteError(w, r, err)
+	if err := h.r.ClientManager().CreateClient(r.Context(), &c); err != nil {
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
@@ -115,7 +112,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	if !c.IsPublic() {
 		c.Secret = secret
 	}
-	h.H.WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
+	h.r.Writer().WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
 // swagger:route PUT /clients/{id} admin updateOAuth2Client
@@ -143,7 +140,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	var c Client
 
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
-		h.H.WriteError(w, r, errors.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
@@ -153,19 +150,19 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	}
 
 	c.ClientID = ps.ByName("id")
-	if err := h.Validator.Validate(&c); err != nil {
-		h.H.WriteError(w, r, err)
+	if err := h.r.ClientValidator().Validate(&c); err != nil {
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
 	c.UpdatedAt = time.Now().UTC().Round(time.Second)
-	if err := h.Manager.UpdateClient(r.Context(), &c); err != nil {
-		h.H.WriteError(w, r, err)
+	if err := h.r.ClientManager().UpdateClient(r.Context(), &c); err != nil {
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
 	c.Secret = secret
-	h.H.Write(w, r, &c)
+	h.r.Writer().Write(w, r, &c)
 }
 
 // swagger:route GET /clients admin listOAuth2Clients
@@ -191,9 +188,9 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //       500: genericError
 func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	limit, offset := pagination.Parse(r, 100, 0, 500)
-	c, err := h.Manager.GetClients(r.Context(), limit, offset)
+	c, err := h.r.ClientManager().GetClients(r.Context(), limit, offset)
 	if err != nil {
-		h.H.WriteError(w, r, err)
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
@@ -205,7 +202,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 		k++
 	}
 
-	h.H.Write(w, r, clients)
+	h.r.Writer().Write(w, r, clients)
 }
 
 // swagger:route GET /clients/{id} admin getOAuth2Client
@@ -233,14 +230,14 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 
-	c, err := h.Manager.GetConcreteClient(r.Context(), id)
+	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
 	if err != nil {
-		h.H.WriteError(w, r, err)
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
 	c.Secret = ""
-	h.H.Write(w, r, c)
+	h.r.Writer().Write(w, r, c)
 }
 
 // swagger:route DELETE /clients/{id} admin deleteOAuth2Client
@@ -267,8 +264,8 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 
-	if err := h.Manager.DeleteClient(r.Context(), id); err != nil {
-		h.H.WriteError(w, r, err)
+	if err := h.r.ClientManager().DeleteClient(r.Context(), id); err != nil {
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 

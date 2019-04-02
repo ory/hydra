@@ -18,32 +18,37 @@
  * @license 	Apache-2.0
  */
 
-package jwk
+package jwk_test
 
 import (
 	"context"
 	"testing"
 
+	"github.com/ory/hydra/internal"
+
 	jwt2 "github.com/dgrijalva/jwt-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	jose "gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite/token/jwt"
+	. "github.com/ory/hydra/jwk"
 )
 
 func TestRS256JWTStrategy(t *testing.T) {
+	conf := internal.NewConfigurationWithDefaults()
+	reg := internal.NewRegistry(conf)
+
 	testGenerator := &RS256Generator{}
 
-	m := &MemoryManager{
-		Keys: map[string]*jose.JSONWebKeySet{},
-	}
-
+	m := reg.KeyManager()
 	ks, err := testGenerator.Generate("foo", "sig")
 	require.NoError(t, err)
 	require.NoError(t, m.AddKeySet(context.TODO(), "foo-set", ks))
 
-	s, err := NewRS256JWTStrategy(m, "foo-set")
+	s, err := NewRS256JWTStrategy(reg, func() string {
+		return "foo-set"
+	})
+
 	require.NoError(t, err)
 	a, b, err := s.Generate(context.TODO(), jwt2.MapClaims{"foo": "bar"}, &jwt.Headers{})
 	require.NoError(t, err)

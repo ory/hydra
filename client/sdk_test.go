@@ -28,11 +28,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/julienschmidt/httprouter"
+	"github.com/ory/hydra/x"
+
+	"github.com/spf13/viper"
+
+	"github.com/ory/hydra/driver/configuration"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/herodot"
+	"github.com/ory/hydra/internal"
+
 	"github.com/ory/hydra/client"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 )
@@ -61,20 +67,25 @@ func createTestClient(prefix string) hydra.OAuth2Client {
 }
 
 func TestClientSDK(t *testing.T) {
-	manager := client.NewMemoryManager(nil)
-	handler := client.NewHandler(manager, herodot.NewJSONWriter(nil), []string{"foo", "bar"}, []string{"public"})
+	conf := internal.NewConfigurationWithDefaults()
+	viper.Set(configuration.ViperKeySubjectTypesSupported, []string{"public"})
+	viper.Set(configuration.ViperKeyDefaultClientScope, []string{"foo", "bar"})
+	r := internal.NewRegistry(conf)
 
-	router := httprouter.New()
+	router := x.NewRouterAdmin()
+	handler := client.NewHandler(r)
 	handler.SetRoutes(router)
 	server := httptest.NewServer(router)
+
 	c := hydra.NewAdminApiWithBasePath(server.URL)
+
 	t.Run("case=client default scopes are set", func(t *testing.T) {
 		result, response, err := c.CreateOAuth2Client(hydra.OAuth2Client{
 			ClientId: "scoped",
 		})
 		require.NoError(t, err)
 		require.EqualValues(t, http.StatusCreated, response.StatusCode)
-		assert.EqualValues(t, handler.Validator.DefaultClientScopes, strings.Split(result.Scope, " "))
+		assert.EqualValues(t, conf.DefaultClientScope(), strings.Split(result.Scope, " "))
 
 		response, err = c.DeleteOAuth2Client("scoped")
 		require.NoError(t, err)

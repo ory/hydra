@@ -14,7 +14,7 @@ import (
 type Tracer struct {
 	ServiceName  string
 	Provider     string
-	Logger       *logrus.Logger
+	Logger       logrus.FieldLogger
 	JaegerConfig *JaegerConfig
 
 	tracer opentracing.Tracer

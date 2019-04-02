@@ -1,0 +1,44 @@
+###########################################################################
+#######             FOR DEMONSTRATION PURPOSES ONLY                 #######
+###########################################################################
+#                                                                         #
+# If you have not yet read the tutorial, do so now:                       #
+#  https://www.ory.sh/docs/hydra/5min-tutorial                            #
+#                                                                         #
+# This set up is only for demonstration purposes. The login               #
+# endpoint can only be used if you follow the steps in the tutorial.      #
+#                                                                         #
+###########################################################################
+
+version: '3'
+
+services:
+
+  hydra:
+    image: oryd/hydra:latest
+    ports:
+      - "4444:4444" # Public port
+      - "4445:4445" # Admin port
+      - "5555:5555" # Port for hydra token user
+    command:
+      serve all --dangerous-force-http
+    environment:
+#      - LOG_LEVEL=debug
+      - OAUTH2_ISSUER_URL=http://localhost:4444
+      - OAUTH2_CONSENT_URL=http://localhost:3000/consent
+      - OAUTH2_LOGIN_URL=http://localhost:3000/login
+      - DATABASE_URL=memory
+      - SYSTEM_SECRET=youReallyNeedToChangeThis
+      - OAUTH2_SHARE_ERROR_DEBUG=1
+      - OIDC_SUBJECT_TYPES_SUPPORTED=public,pairwise
+      - OIDC_SUBJECT_TYPE_PAIRWISE_SALT=youReallyNeedToChangeThis
+#      - OAUTH2_ACCESS_TOKEN_STRATEGY=jwt
+    restart: unless-stopped
+
+  consent:
+    environment:
+      - HYDRA_ADMIN_URL=http://hydra:4445
+    image: oryd/hydra-login-consent-node:v1.0.0-rc.6
+    ports:
+      - "3000:3000"
+    restart: unless-stopped

@@ -28,8 +28,8 @@ import (
 )
 
 func (h *Handler) DefaultConsentHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	h.L.Warnln("It looks like no consent/login URL was set. All OAuth2 flows except client credentials will fail.")
-	h.L.Warnln("A client requested the default login & consent URL, environment variable OAUTH2_CONSENT_URL or OAUTH2_LOGIN_URL or both are probably not set.")
+	h.r.Logger().Warnln("It looks like no consent/login URL was set. All OAuth2 flows except client credentials will fail.")
+	h.r.Logger().Warnln("A client requested the default login & consent URL, environment variable OAUTH2_CONSENT_URL or OAUTH2_LOGIN_URL or both are probably not set.")
 
 	t, err := template.New("consent").Parse(`
 <html>
@@ -49,18 +49,18 @@ func (h *Handler) DefaultConsentHandler(w http.ResponseWriter, r *http.Request, 
 </html>
 `)
 	if err != nil {
-		h.H.WriteError(w, r, err)
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
 	if err := t.Execute(w, nil); err != nil {
-		h.H.WriteError(w, r, err)
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 }
 
 func (h *Handler) DefaultErrorHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	h.L.Warnln("A client requested the default error URL, environment variable OAUTH2_ERROR_URL is probably not set.")
+	h.r.Logger().Warnln("A client requested the default error URL, environment variable OAUTH2_ERROR_URL is probably not set.")
 
 	t, err := template.New("consent").Parse(`
 <html>
@@ -86,7 +86,7 @@ func (h *Handler) DefaultErrorHandler(w http.ResponseWriter, r *http.Request, _ 
 </html>
 `)
 	if err != nil {
-		h.H.WriteError(w, r, err)
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
@@ -101,13 +101,13 @@ func (h *Handler) DefaultErrorHandler(w http.ResponseWriter, r *http.Request, _ 
 		Hint:        r.URL.Query().Get("error_hint"),
 		Debug:       r.URL.Query().Get("error_debug"),
 	}); err != nil {
-		h.H.WriteError(w, r, err)
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 }
 
 func (h *Handler) DefaultLogoutHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	h.L.Warnln("A client requested the default logout URL, environment variable OAUTH2_LOGOUT_REDIRECT_URL is probably not set.")
+	h.r.Logger().Warnln("A client requested the default logout URL, environment variable OAUTH2_LOGOUT_REDIRECT_URL is probably not set.")
 	t, err := template.New("consent").Parse(`
 <html>
 <head>
@@ -126,12 +126,12 @@ func (h *Handler) DefaultLogoutHandler(w http.ResponseWriter, r *http.Request, _
 </html>
 `)
 	if err != nil {
-		h.H.WriteError(w, r, err)
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
 	if err := t.Execute(w, nil); err != nil {
-		h.H.WriteError(w, r, err)
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 }

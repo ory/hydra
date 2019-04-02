@@ -68,6 +68,6 @@ func TestFindKeyByPrefix(t *testing.T) {
 }
 
 func TestIder(t *testing.T) {
-	assert.True(t, len(ider("public", "")) > len("public:"))
-	assert.Equal(t, "public:foo", ider("public", "foo"))
+	assert.True(t, len(Ider("public", "")) > len("public:"))
+	assert.Equal(t, "public:foo", Ider("public", "foo"))
 }

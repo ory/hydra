@@ -345,7 +345,7 @@ type ConsentRequestSessionData struct {
 	//UserInfo map[string]interface{} `json:"userinfo"`
 }
 
-func newConsentRequestSessionData() *ConsentRequestSessionData {
+func NewConsentRequestSessionData() *ConsentRequestSessionData {
 	return &ConsentRequestSessionData{
 		AccessToken: map[string]interface{}{},
 		IDToken:     map[string]interface{}{},

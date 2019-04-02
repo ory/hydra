@@ -31,19 +31,15 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/ory/hydra/cmd/cli"
-	"github.com/ory/hydra/config"
-	"github.com/ory/hydra/oauth2"
 )
 
 var cfgFile string
 
 var (
-	Version   = "dev-master"
-	BuildTime = "undefined"
-	GitHash   = "undefined"
+	version = "master"
+	date    = "undefined"
+	commit  = "undefined"
 )
-
-var c = new(config.Config)
 
 // This represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
@@ -54,16 +50,12 @@ var RootCmd = &cobra.Command{
 	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
-var cmdHandler = cli.NewHandler(c)
+var cmdHandler = cli.NewHandler()
 
 // Execute adds all child commands to the root command sets flags appropriately.
 // Execute adds all child commands to the root command sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	c.BuildTime = BuildTime
-	c.BuildVersion = Version
-	c.BuildHash = GitHash
-
 	if err := RootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(-1)
@@ -100,142 +92,16 @@ func initConfig() {
 		viper.SetConfigName(".hydra") // name of config file (without extension)
 		viper.AddConfigPath("$HOME")  // adding home directory as first search path
 	}
-	viper.AutomaticEnv() // read in environment variables that match
 
-	viper.BindEnv("PUBLIC_HOST")
-	viper.SetDefault("PUBLIC_HOST", "")
-
-	viper.BindEnv("ADMIN_HOST")
-	viper.SetDefault("ADMIN_HOST", "")
-
-	viper.BindEnv("PUBLIC_PORT")
-	viper.SetDefault("PUBLIC_PORT", 4444)
-
-	viper.BindEnv("ADMIN_PORT")
-	viper.SetDefault("ADMIN_PORT", 4445)
-
-	viper.BindEnv("CLIENT_ID")
-	viper.SetDefault("CLIENT_ID", "")
-
-	viper.BindEnv("OAUTH2_CONSENT_URL")
-	viper.SetDefault("OAUTH2_CONSENT_URL", oauth2.DefaultConsentPath)
-
-	viper.BindEnv("OAUTH2_LOGIN_URL")
-	viper.SetDefault("OAUTH2_LOGIN_URL", oauth2.DefaultConsentPath)
-
-	viper.BindEnv("OAUTH2_LOGOUT_REDIRECT_URL")
-	viper.SetDefault("OAUTH2_LOGOUT_REDIRECT_URL", oauth2.DefaultLogoutPath)
-
-	viper.BindEnv("OAUTH2_ERROR_URL")
-	viper.SetDefault("OAUTH2_ERROR_URL", oauth2.DefaultErrorPath)
-
-	viper.BindEnv("DATABASE_PLUGIN")
-	viper.SetDefault("DATABASE_PLUGIN", "")
-
-	viper.BindEnv("DATABASE_URL")
-	viper.SetDefault("DATABASE_URL", "")
-
-	viper.BindEnv("SYSTEM_SECRET")
-	viper.SetDefault("SYSTEM_SECRET", "")
-
-	viper.BindEnv("ROTATED_SYSTEM_SECRET")
-	viper.SetDefault("ROTATED_SYSTEM_SECRET", "")
-
-	viper.BindEnv("CLIENT_SECRET")
-	viper.SetDefault("CLIENT_SECRET", "")
-
-	viper.BindEnv("HTTPS_ALLOW_TERMINATION_FROM")
-	viper.SetDefault("HTTPS_ALLOW_TERMINATION_FROM", "")
-
-	viper.BindEnv("CLUSTER_URL")
-	viper.SetDefault("CLUSTER_URL", "")
-
-	viper.BindEnv("OAUTH2_ACCESS_TOKEN_STRATEGY")
-	viper.SetDefault("OAUTH2_ACCESS_TOKEN_STRATEGY", "opaque")
-
-	viper.BindEnv("OAUTH2_ISSUER_URL")
-	viper.SetDefault("OAUTH2_ISSUER_URL", "http://localhost:4444")
-
-	viper.BindEnv("BCRYPT_COST")
-	viper.SetDefault("BCRYPT_COST", 10)
-
-	viper.BindEnv("OAUTH2_SHARE_ERROR_DEBUG")
-	viper.SetDefault("OAUTH2_SHARE_ERROR_DEBUG", false)
-
-	viper.BindEnv("REFRESH_TOKEN_LIFESPAN")
-	viper.SetDefault("REFRESH_TOKEN_LIFESPAN", "720h")
-
-	viper.BindEnv("ACCESS_TOKEN_LIFESPAN")
-	viper.SetDefault("ACCESS_TOKEN_LIFESPAN", "1h")
-
-	viper.BindEnv("ID_TOKEN_LIFESPAN")
-	viper.SetDefault("ID_TOKEN_LIFESPAN", "1h")
-
-	viper.BindEnv("AUTH_CODE_LIFESPAN")
-	viper.SetDefault("AUTH_CODE_LIFESPAN", "10m")
-
-	viper.BindEnv("CHALLENGE_TOKEN_LIFESPAN")
-	viper.SetDefault("CHALLENGE_TOKEN_LIFESPAN", "10m")
-
-	viper.BindEnv("LOG_LEVEL")
 	viper.SetDefault("LOG_LEVEL", "info")
 
-	viper.BindEnv("LOG_FORMAT")
-	viper.SetDefault("LOG_FORMAT", "")
-
-	viper.BindEnv("OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE")
-	viper.SetDefault("OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE", "")
-
-	viper.BindEnv("RESOURCE_NAME_PREFIX")
-	viper.SetDefault("RESOURCE_NAME_PREFIX", "")
-
-	viper.BindEnv("OIDC_DISCOVERY_CLAIMS_SUPPORTED")
-	viper.SetDefault("OIDC_DISCOVERY_CLAIMS_SUPPORTED", "")
-
-	viper.BindEnv("OIDC_DISCOVERY_SCOPES_SUPPORTED")
-	viper.SetDefault("OIDC_DISCOVERY_SCOPES_SUPPORTED", "")
-
-	viper.BindEnv("OIDC_DISCOVERY_USERINFO_ENDPOINT")
-	viper.SetDefault("OIDC_DISCOVERY_USERINFO_ENDPOINT", "")
-
-	viper.BindEnv("OIDC_SUBJECT_TYPES_SUPPORTED")
-	viper.SetDefault("OIDC_SUBJECT_TYPES_SUPPORTED", "public")
-
-	viper.BindEnv("OIDC_SUBJECT_TYPE_PAIRWISE_SALT")
-	viper.SetDefault("OIDC_SUBJECT_TYPE_PAIRWISE_SALT", "public")
-
-	viper.BindEnv("TRACING_PROVIDER")
-	viper.SetDefault("TRACING_PROVIDER", "")
-
-	viper.BindEnv("OAUTH2_CLIENT_REGISTRATION_URL")
-	viper.SetDefault("OAUTH2_CLIENT_REGISTRATION_URL", "")
-
-	viper.BindEnv("TRACING_PROVIDER_JAEGER_SAMPLING_SERVER_URL")
-	viper.SetDefault("TRACING_PROVIDER_JAEGER_SAMPLING_SERVER_URL", "")
-
-	viper.BindEnv("TRACING_PROVIDER_JAEGER_SAMPLING_TYPE")
-	viper.SetDefault("TRACING_PROVIDER_JAEGER_SAMPLING_TYPE", "const")
-
-	viper.BindEnv("TRACING_PROVIDER_JAEGER_SAMPLING_VALUE")
-	viper.SetDefault("TRACING_PROVIDER_JAEGER_SAMPLING_VALUE", float64(1))
-
-	viper.BindEnv("TRACING_PROVIDER_JAEGER_LOCAL_AGENT_ADDRESS")
-	viper.SetDefault("TRACING_PROVIDER_JAEGER_LOCAL_AGENT_ADDRESS", "")
-
-	viper.BindEnv("TRACING_SERVICE_NAME")
-	viper.SetDefault("TRACING_SERVICE_NAME", "ORY Hydra")
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err != nil {
 		fmt.Printf(`Config file not found because "%s"`, err)
 		fmt.Println("")
-	}
-
-	iss := viper.Get("OAUTH2_ISSUER_URL")
-	viper.Set("ISSUER", strings.TrimSuffix(iss.(string), "/"))
-
-	if err := viper.Unmarshal(c); err != nil {
-		fatal(fmt.Sprintf("Could not read config because %s.", err))
 	}
 }
 

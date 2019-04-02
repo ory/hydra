@@ -31,77 +31,43 @@ import (
 	"testing"
 	"time"
 
-	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/gorilla/sessions"
-	"github.com/julienschmidt/httprouter"
-	"github.com/sirupsen/logrus"
+	"github.com/ory/hydra/x"
+
+	"github.com/spf13/viper"
+
+	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/internal"
+
+	goauth2 "golang.org/x/oauth2"
+
+	"github.com/dgrijalva/jwt-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2/clientcredentials"
-	jose "gopkg.in/square/go-jose.v2"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/compose"
-	"github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/herodot"
 	hc "github.com/ory/hydra/client"
-	"github.com/ory/hydra/jwk"
 	. "github.com/ory/hydra/oauth2"
 )
 
 func TestClientCredentials(t *testing.T) {
-	for _, tc := range []struct {
-		d string
-		s oauth2.CoreStrategy
-	}{
-		{
-			d: "opaque",
-			s: oauth2OpqaueStrategy,
-		},
-		{
-			d: "jwt",
-			s: oauth2JWTStrategy,
-		},
-	} {
+	for _, tc := range []struct{ d string }{{d: "opaque"}, {d: "jwt"}} {
 		t.Run("tc="+tc.d, func(t *testing.T) {
-			router := httprouter.New()
-			l := logrus.New()
-			l.Level = logrus.DebugLevel
-			store := NewFositeMemoryStore(hc.NewMemoryManager(hasher), time.Second)
+			conf := internal.NewConfigurationWithDefaults()
+			viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Second)
+			viper.Set(configuration.ViperKeyAccessTokenStrategy, tc.d)
+			reg := internal.NewRegistry(conf)
 
-			jm := &jwk.MemoryManager{Keys: map[string]*jose.JSONWebKeySet{}}
-			keys, err := (&jwk.RS256Generator{}).Generate("", "sig")
-			require.NoError(t, err)
-			require.NoError(t, jm.AddKeySet(context.TODO(), OpenIDConnectKeyName, keys))
-			jwtStrategy, err := jwk.NewRS256JWTStrategy(jm, OpenIDConnectKeyName)
-
+			router := x.NewRouterPublic()
 			ts := httptest.NewServer(router)
-			handler := &Handler{
-				OAuth2: compose.Compose(
-					fc,
-					store,
-					tc.s,
-					nil,
-					compose.OAuth2ClientCredentialsGrantFactory,
-					compose.OAuth2TokenIntrospectionFactory,
-				),
-				//Consent:         consentStrategy,
-				CookieStore:   sessions.NewCookieStore([]byte("foo-secret")),
-				ForcedHTTP:    true,
-				ScopeStrategy: fosite.HierarchicScopeStrategy,
-				//IDTokenLifespan:   time.Minute,
-				H:                 herodot.NewJSONWriter(l),
-				L:                 l,
-				IssuerURL:         ts.URL,
-				OpenIDJWTStrategy: jwtStrategy,
-				AudienceStrategy:  fosite.DefaultAudienceMatchingStrategy,
-			}
+			defer ts.Close()
+			viper.Set(configuration.ViperKeyIssuerURL, ts.URL)
 
-			handler.SetRoutes(router, router, func(h http.Handler) http.Handler {
+			handler := NewHandler(reg, conf)
+			handler.SetRoutes(router.RouterAdmin(), router, func(h http.Handler) http.Handler {
 				return h
 			})
 
-			require.NoError(t, store.CreateClient(context.TODO(), &hc.Client{
+			require.NoError(t, reg.ClientManager().CreateClient(context.TODO(), &hc.Client{
 				ClientID:      "app-client",
 				Secret:        "secret",
 				RedirectURIs:  []string{ts.URL + "/callback"},
@@ -208,6 +174,7 @@ func TestClientCredentials(t *testing.T) {
 				},
 			} {
 				t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+					ccc.c.AuthStyle = goauth2.AuthStyleInHeader
 					tok, err := ccc.c.Token(context.Background())
 
 					if ccc.expectError {

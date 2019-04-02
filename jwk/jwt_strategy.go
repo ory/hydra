@@ -24,6 +24,7 @@ import (
 	"context"
 	"crypto/rsa"
 	"strings"
+	"sync"
 
 	jwt2 "github.com/dgrijalva/jwt-go"
 	"github.com/pkg/errors"
@@ -37,27 +38,26 @@ type JWTStrategy interface {
 	jwt.JWTStrategy
 }
 
-func NewRS256JWTStrategy(m Manager, set string) (*RS256JWTStrategy, error) {
-	j := &RS256JWTStrategy{
-		Manager:          m,
-		RS256JWTStrategy: &jwt.RS256JWTStrategy{},
-		Set:              set,
-	}
-	if err := j.refresh(context.TODO()); err != nil {
-		return nil, err
-	}
-	return j, nil
-}
-
 type RS256JWTStrategy struct {
+	sync.RWMutex
+
 	RS256JWTStrategy *jwt.RS256JWTStrategy
-	Manager          Manager
-	Set              string
+	r                InternalRegistry
+	c                Configuration
+	rs               func() string
 
 	publicKey    *rsa.PublicKey
 	privateKey   *rsa.PrivateKey
 	publicKeyID  string
 	privateKeyID string
+}
+
+func NewRS256JWTStrategy(r InternalRegistry, rs func() string) (*RS256JWTStrategy, error) {
+	j := &RS256JWTStrategy{r: r, rs: rs, RS256JWTStrategy: new(jwt.RS256JWTStrategy)}
+	if err := j.refresh(context.TODO()); err != nil {
+		return nil, err
+	}
+	return j, nil
 }
 
 func (j *RS256JWTStrategy) Hash(ctx context.Context, in []byte) ([]byte, error) {
@@ -106,7 +106,7 @@ func (j *RS256JWTStrategy) GetPublicKeyID(ctx context.Context) (string, error) {
 }
 
 func (j *RS256JWTStrategy) refresh(ctx context.Context) error {
-	keys, err := j.Manager.GetKeySet(ctx, j.Set)
+	keys, err := j.r.KeyManager().GetKeySet(ctx, j.rs())
 	if err != nil {
 		return err
 	}
@@ -128,17 +128,23 @@ func (j *RS256JWTStrategy) refresh(ctx context.Context) error {
 	if k, ok := private.Key.(*rsa.PrivateKey); !ok {
 		return errors.New("unable to type assert key to *rsa.PublicKey")
 	} else {
+		j.Lock()
 		j.privateKey = k
 		j.RS256JWTStrategy.PrivateKey = k
+		j.Unlock()
 	}
 
 	if k, ok := public.Key.(*rsa.PublicKey); !ok {
 		return errors.New("unable to type assert key to *rsa.PublicKey")
 	} else {
+		j.Lock()
 		j.publicKey = k
 		j.publicKeyID = public.KeyID
+		j.Unlock()
 	}
 
+	j.RLock()
+	defer j.RUnlock()
 	if j.privateKey.PublicKey.E != j.publicKey.E ||
 		j.privateKey.PublicKey.N.String() != j.publicKey.N.String() {
 		return errors.New("public and private key pair fetched from store does not match")

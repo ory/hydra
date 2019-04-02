@@ -22,7 +22,6 @@ package oauth2_test
 
 import (
 	"context"
-	"crypto/rsa"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -33,21 +32,25 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/x"
+
+	"github.com/spf13/viper"
+
+	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/internal"
+	"github.com/ory/x/urlx"
+
 	jwt2 "github.com/dgrijalva/jwt-go"
 	"github.com/golang/mock/gomock"
-	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
-	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 )
@@ -84,25 +87,26 @@ var flushRequests = []*fosite.Request{
 }
 
 func TestHandlerFlushHandler(t *testing.T) {
-	cl := client.NewMemoryManager(&fosite.BCrypt{WorkFactor: 4})
-	store := oauth2.NewFositeMemoryStore(cl, lifespan)
-	h := &oauth2.Handler{
-		H:             herodot.NewJSONWriter(nil),
-		ScopeStrategy: fosite.HierarchicScopeStrategy,
-		IssuerURL:     "http://hydra.localhost",
-		Storage:       store,
-	}
+	conf := internal.NewConfigurationWithDefaults()
+	viper.Set(configuration.ViperKeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
+	viper.Set(configuration.ViperKeyIssuerURL, "http://hydra.localhost")
+	reg := internal.NewRegistry(conf)
 
+	cl := reg.ClientManager()
+	store := reg.OAuth2Storage()
+
+	h := oauth2.NewHandler(reg, conf)
 	for _, r := range flushRequests {
 		require.NoError(t, store.CreateAccessTokenSession(nil, r.ID, r))
 		_ = cl.CreateClient(nil, r.Client.(*client.Client))
 	}
 
-	r := httprouter.New()
-	h.SetRoutes(r, r, func(h http.Handler) http.Handler {
+	r := x.NewRouterAdmin()
+	h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
 		return h
 	})
 	ts := httptest.NewServer(r)
+	defer ts.Close()
 	c := hydra.NewAdminApiWithBasePath(ts.URL)
 
 	ds := new(oauth2.Session)
@@ -143,23 +147,22 @@ func TestHandlerFlushHandler(t *testing.T) {
 }
 
 func TestUserinfo(t *testing.T) {
+	conf := internal.NewConfigurationWithDefaults()
+	viper.Set(configuration.ViperKeyScopeStrategy, "")
+	viper.Set(configuration.ViperKeyAuthCodeLifespan, lifespan)
+	viper.Set(configuration.ViperKeyIssuerURL, "http://hydra.localhost")
+	reg := internal.NewRegistry(conf)
+	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
+
 	ctrl := gomock.NewController(t)
 	op := NewMockOAuth2Provider(ctrl)
 	defer ctrl.Finish()
+	reg.WithOAuth2Provider(op)
 
-	jm := &jwk.MemoryManager{Keys: map[string]*jose.JSONWebKeySet{}}
-	keys, err := (&jwk.RS256Generator{}).Generate("signing", "sig")
-	require.NoError(t, err)
-	require.NoError(t, jm.AddKeySet(context.TODO(), oauth2.OpenIDConnectKeyName, keys))
-	jwtStrategy, err := jwk.NewRS256JWTStrategy(jm, oauth2.OpenIDConnectKeyName)
+	h := reg.OAuth2Handler()
 
-	h := &oauth2.Handler{
-		OAuth2:            op,
-		H:                 herodot.NewJSONWriter(logrus.New()),
-		OpenIDJWTStrategy: jwtStrategy,
-	}
-	router := httprouter.New()
-	h.SetRoutes(router, router, func(h http.Handler) http.Handler {
+	router := x.NewRouterAdmin()
+	h.SetRoutes(router, router.RouterPublic(), func(h http.Handler) http.Handler {
 		return h
 	})
 	ts := httptest.NewServer(router)
@@ -331,7 +334,11 @@ func TestUserinfo(t *testing.T) {
 			expectStatusCode: http.StatusOK,
 			check: func(t *testing.T, body []byte) {
 				claims, err := jwt2.Parse(string(body), func(token *jwt2.Token) (interface{}, error) {
-					return keys.Key("public:signing")[0].Key.(*rsa.PublicKey), nil
+					keys, err := reg.KeyManager().GetKeySet(context.Background(), x.OpenIDConnectKeyName)
+					require.NoError(t, err)
+					t.Logf("%+v", keys)
+					key, err := jwk.FindKeyByPrefix(keys, "public")
+					return jwk.MustRSAPublic(key), nil
 				})
 				require.NoError(t, err)
 				assert.EqualValues(t, "alice", claims.Claims.(jwt2.MapClaims)["sub"])
@@ -358,39 +365,39 @@ func TestUserinfo(t *testing.T) {
 }
 
 func TestHandlerWellKnown(t *testing.T) {
-	h := &oauth2.Handler{
-		H:                     herodot.NewJSONWriter(nil),
-		ScopeStrategy:         fosite.HierarchicScopeStrategy,
-		IssuerURL:             "http://hydra.localhost",
-		SubjectTypes:          []string{"pairwise", "public"},
-		ClientRegistrationURL: "http://client-register/registration",
-	}
+	conf := internal.NewConfigurationWithDefaults()
+	viper.Set(configuration.ViperKeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
+	viper.Set(configuration.ViperKeyIssuerURL, "http://hydra.localhost")
+	viper.Set(configuration.ViperKeySubjectTypesSupported, []string{"pairwise", "public"})
+	viper.Set(configuration.ViperKeyOIDCDiscoverySupportedClaims, []string{"sub"})
+	viper.Set(configuration.ViperKeyOAuth2ClientRegistrationURL, "http://client-register/registration")
+	viper.Set(configuration.ViperKeyOIDCDiscoveryUserinfoEndpoint, "/userinfo")
+	reg := internal.NewRegistry(conf)
 
-	AuthPathT := "/oauth2/auth"
-	TokenPathT := "/oauth2/token"
-	JWKPathT := "/.well-known/jwks.json"
+	h := oauth2.NewHandler(reg, conf)
 
-	r := httprouter.New()
-	h.SetRoutes(r, r, func(h http.Handler) http.Handler {
+	r := x.NewRouterAdmin()
+	h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
 		return h
 	})
 	ts := httptest.NewServer(r)
+	defer ts.Close()
 
 	res, err := http.Get(ts.URL + "/.well-known/openid-configuration")
 	require.NoError(t, err)
 	defer res.Body.Close()
 
 	trueConfig := oauth2.WellKnown{
-		Issuer:                            strings.TrimRight(h.IssuerURL, "/") + "/",
-		AuthURL:                           strings.TrimRight(h.IssuerURL, "/") + AuthPathT,
-		TokenURL:                          strings.TrimRight(h.IssuerURL, "/") + TokenPathT,
-		JWKsURI:                           strings.TrimRight(h.IssuerURL, "/") + JWKPathT,
-		RegistrationEndpoint:              h.ClientRegistrationURL,
+		Issuer:                            strings.TrimRight(conf.IssuerURL().String(), "/") + "/",
+		AuthURL:                           urlx.AppendPaths(conf.IssuerURL(), oauth2.AuthPath).String(),
+		TokenURL:                          urlx.AppendPaths(conf.IssuerURL(), oauth2.TokenPath).String(),
+		JWKsURI:                           urlx.AppendPaths(conf.IssuerURL(), oauth2.JWKPath).String(),
+		RegistrationEndpoint:              conf.OAuth2ClientRegistrationURL().String(),
 		SubjectTypes:                      []string{"pairwise", "public"},
 		ResponseTypes:                     []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
-		ClaimsSupported:                   []string{"sub"},
-		ScopesSupported:                   []string{"offline", "openid"},
-		UserinfoEndpoint:                  strings.TrimRight(h.IssuerURL, "/") + oauth2.UserinfoPath,
+		ClaimsSupported:                   conf.OIDCDiscoverySupportedScope(),
+		ScopesSupported:                   conf.OIDCDiscoverySupportedClaims(),
+		UserinfoEndpoint:                  conf.OIDCDiscoveryUserinfoEndpoint(),
 		TokenEndpointAuthMethodsSupported: []string{"client_secret_post", "client_secret_basic", "private_key_jwt", "none"},
 		GrantTypesSupported:               []string{"authorization_code", "implicit", "client_credentials", "refresh_token"},
 		ResponseModesSupported:            []string{"query", "fragment"},
@@ -404,17 +411,4 @@ func TestHandlerWellKnown(t *testing.T) {
 	err = json.NewDecoder(res.Body).Decode(&wellKnownResp)
 	require.NoError(t, err, "problem decoding wellknown json response: %+v", err)
 	assert.EqualValues(t, trueConfig, wellKnownResp)
-
-	h.ScopesSupported = "foo,bar"
-	h.ClaimsSupported = "baz,oof"
-	h.UserinfoEndpoint = "bar"
-
-	res, err = http.Get(ts.URL + "/.well-known/openid-configuration")
-	require.NoError(t, err)
-	defer res.Body.Close()
-	require.NoError(t, json.NewDecoder(res.Body).Decode(&wellKnownResp))
-
-	assert.EqualValues(t, wellKnownResp.ClaimsSupported, []string{"sub", "baz", "oof"})
-	assert.EqualValues(t, wellKnownResp.ScopesSupported, []string{"offline", "openid", "foo", "bar"})
-	assert.Equal(t, wellKnownResp.UserinfoEndpoint, "bar")
 }

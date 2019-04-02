@@ -43,11 +43,12 @@ import (
 )
 
 type FositeSQLStore struct {
-	client.Manager
-	DB                  *sqlx.DB
-	L                   logrus.FieldLogger
-	AccessTokenLifespan time.Duration
-	HashSignature       bool
+	DB *sqlx.DB
+
+	r InternalRegistry
+	c Configuration
+
+	HashSignature bool
 }
 
 type sqlxDB interface {
@@ -57,19 +58,8 @@ type sqlxDB interface {
 	GetContext(ctx context.Context, dest interface{}, query string, args ...interface{}) error
 }
 
-func NewFositeSQLStore(m client.Manager,
-	db *sqlx.DB,
-	l logrus.FieldLogger,
-	accessTokenLifespan time.Duration,
-	hashSignature bool,
-) *FositeSQLStore {
-	return &FositeSQLStore{
-		Manager:             m,
-		L:                   l,
-		DB:                  db,
-		AccessTokenLifespan: accessTokenLifespan,
-		HashSignature:       hashSignature,
-	}
+func NewFositeSQLStore(db *sqlx.DB, r InternalRegistry, c Configuration) *FositeSQLStore {
+	return &FositeSQLStore{r: r, c: c, DB: db}
 }
 
 const (
@@ -202,9 +192,40 @@ func (s *sqlData) toRequest(session fosite.Session, cm client.Manager, logger lo
 	return r, nil
 }
 
+func (s *FositeSQLStore) GetClient(ctx context.Context, id string) (fosite.Client, error) {
+	return s.r.ClientManager().GetClient(ctx, id)
+}
+
+func (s *FositeSQLStore) Authenticate(ctx context.Context, id string, secret []byte) (*client.Client, error) {
+	return s.r.ClientManager().Authenticate(ctx, id, secret)
+}
+
+func (s *FositeSQLStore) CreateClient(ctx context.Context, c *client.Client) error {
+	return s.r.ClientManager().CreateClient(ctx, c)
+
+}
+
+func (s *FositeSQLStore) UpdateClient(ctx context.Context, c *client.Client) error {
+	return s.r.ClientManager().UpdateClient(ctx, c)
+
+}
+
+func (s *FositeSQLStore) DeleteClient(ctx context.Context, id string) error {
+	return s.r.ClientManager().DeleteClient(ctx, id)
+
+}
+
+func (s *FositeSQLStore) GetClients(ctx context.Context, limit, offset int) (map[string]client.Client, error) {
+	return s.r.ClientManager().GetClients(ctx, limit, offset)
+}
+
+func (s *FositeSQLStore) GetConcreteClient(ctx context.Context, id string) (*client.Client, error) {
+	return s.r.ClientManager().GetConcreteClient(ctx, id)
+}
+
 // hashSignature prevents errors where the signature is longer than 128 characters (and thus doesn't fit into the pk).
 func (s *FositeSQLStore) hashSignature(signature, table string) string {
-	if table == sqlTableAccess && s.HashSignature {
+	if table == sqlTableAccess && s.c.IsUsingJWTAsAccessTokens() {
 		return fmt.Sprintf("%x", sha512.Sum384([]byte(signature)))
 	}
 	return signature
@@ -214,7 +235,7 @@ func (s *FositeSQLStore) createSession(ctx context.Context, signature string, re
 	db := s.db(ctx)
 	signature = s.hashSignature(signature, table)
 
-	data, err := sqlSchemaFromRequest(signature, requester, s.L)
+	data, err := sqlSchemaFromRequest(signature, requester, s.r.Logger())
 	if err != nil {
 		return err
 	}
@@ -249,7 +270,7 @@ func (s *FositeSQLStore) findSessionBySignature(ctx context.Context, signature s
 	} else if err != nil {
 		return nil, sqlcon.HandleError(err)
 	} else if !d.Active && table == sqlTableCode {
-		if r, err := d.toRequest(session, s.Manager, s.L); err != nil {
+		if r, err := d.toRequest(session, s.r.ClientManager(), s.r.Logger()); err != nil {
 			return nil, err
 		} else {
 			return r, errors.WithStack(fosite.ErrInvalidatedAuthorizeCode)
@@ -258,7 +279,7 @@ func (s *FositeSQLStore) findSessionBySignature(ctx context.Context, signature s
 		return nil, errors.WithStack(fosite.ErrInactiveToken)
 	}
 
-	return d.toRequest(session, s.Manager, s.L)
+	return d.toRequest(session, s.r.ClientManager(), s.r.Logger())
 }
 
 func (s *FositeSQLStore) deleteSession(ctx context.Context, signature string, table string) error {
@@ -371,7 +392,7 @@ func (s *FositeSQLStore) revokeSession(ctx context.Context, id string, table str
 }
 
 func (s *FositeSQLStore) FlushInactiveAccessTokens(ctx context.Context, notAfter time.Time) error {
-	if _, err := s.DB.ExecContext(ctx, s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE requested_at < ? AND requested_at < ?", sqlTableAccess)), time.Now().Add(-s.AccessTokenLifespan), notAfter); err == sql.ErrNoRows {
+	if _, err := s.DB.ExecContext(ctx, s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE requested_at < ? AND requested_at < ?", sqlTableAccess)), time.Now().Add(-s.c.AccessTokenLifespan()), notAfter); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
 	} else if err != nil {
 		return sqlcon.HandleError(err)

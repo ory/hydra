@@ -35,28 +35,26 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/x"
+	"github.com/ory/x/sqlcon/dockertest"
+
+	"github.com/spf13/viper"
+
+	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/internal"
+
 	djwt "github.com/dgrijalva/jwt-go"
-	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
-	jose "gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite"
-	"github.com/ory/fosite/compose"
-	foauth2 "github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
-	"github.com/ory/herodot"
-	"github.com/ory/hydra/client"
 	hc "github.com/ory/hydra/client"
-	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/jwk"
-	. "github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/sdk/go/hydra/swagger"
 )
 
@@ -98,119 +96,87 @@ type clientCreator interface {
 // - [x] If `id_token_hint` is handled properly
 //   - [x] What happens if `id_token_hint` does not match the value from the handled authentication request ("accept login")
 func TestAuthCodeWithDefaultStrategy(t *testing.T) {
-	for km, fs := range fositeStores {
+	var mutex sync.Mutex
+	conf := internal.NewConfigurationWithDefaults()
+	regs := map[string]driver.Registry{
+		"memory": internal.NewRegistry(conf),
+	}
+
+	if !testing.Short() {
+		dockertest.Parallel([]func(){
+			func() {
+				r := internal.NewRegistrySQL(conf, connectToPG(t))
+				_, err := r.CreateSchemas()
+				require.NoError(t, err)
+
+				mutex.Lock()
+				regs["postgres"] = r
+				mutex.Unlock()
+			},
+			func() {
+				r := internal.NewRegistrySQL(conf, connectToMySQL(t))
+				_, err := r.CreateSchemas()
+				require.NoError(t, err)
+
+				mutex.Lock()
+				regs["mysql"] = r
+				mutex.Unlock()
+			},
+		})
+	}
+
+	for km, reg := range regs {
 		t.Run("manager="+km, func(t *testing.T) {
-			var cm consent.Manager
-			switch km {
-			case "memory":
-				cm = consent.NewMemoryManager(fs.F)
-				fs.F.(*FositeMemoryStore).Manager = hc.NewMemoryManager(hasher)
-			case "mysql":
-				fallthrough
-			case "postgres":
-				db := databases[km]
-				cleanDB(t, db)
-
-				_, err := fs.Cl.(*client.SQLManager).CreateSchemas()
-				require.NoError(t, err)
-
-				scm := consent.NewSQLManager(databases[km], fs.Cl, fs.F)
-				_, err = scm.CreateSchemas()
-				require.NoError(t, err)
-
-				_, err = (fs.F.(*FositeSQLStore)).CreateSchemas()
-				require.NoError(t, err)
-
-				cm = scm
-			}
-
-			for _, strat := range []struct {
-				d string
-				s foauth2.CoreStrategy
-			}{
-				{
-					d: "opaque",
-					s: oauth2OpqaueStrategy,
-				},
-				{
-					d: "jwt",
-					s: oauth2JWTStrategy,
-				},
-			} {
+			for _, strat := range []struct{ d string }{{d: "opaque"}, {d: "jwt"}} {
 				t.Run("strategy="+strat.d, func(t *testing.T) {
+					conf := internal.NewConfigurationWithDefaults()
+					viper.Set(configuration.ViperKeyAccessTokenStrategy, strat.d)
+					viper.Set(configuration.ViperKeyScopeStrategy, "exact")
+					viper.Set(configuration.ViperKeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
+					viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Second+time.Millisecond*500)
+					viper.Set(configuration.ViperKeyRefreshTokenLifespan, time.Second+time.Millisecond*800)
+					// SendDebugMessagesToClients: true,
+					internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
+
+					reg.WithConfig(conf)
+
 					var m sync.Mutex
 					l := logrus.New()
 					l.Level = logrus.DebugLevel
 					var lph, cph func(w http.ResponseWriter, r *http.Request)
 					lp := mockProvider(&lph)
+					defer lp.Close()
 					cp := mockProvider(&cph)
-					jwts := &jwt.RS256JWTStrategy{
-						PrivateKey: pkg.MustINSECURELOWENTROPYRSAKEYFORTEST(),
-					}
-					hasher := &fosite.BCrypt{
-						WorkFactor: 4,
-					}
+					defer lp.Close()
 
-					fooUserIDToken, _, err := jwts.Generate(context.TODO(), jwt.IDTokenClaims{
+					fooUserIDToken, _, err := reg.OpenIDJWTStrategy().Generate(context.TODO(), jwt.IDTokenClaims{
 						Subject:   "foouser",
 						ExpiresAt: time.Now().Add(time.Hour),
 						IssuedAt:  time.Now(),
 					}.ToMapClaims(), jwt.NewHeaders())
 					require.NoError(t, err)
 
-					// we create a new fositeStore here because the old one
-					router := httprouter.New()
-					ts := httptest.NewServer(router)
-					cookieStore := sessions.NewCookieStore([]byte("foo-secret"))
-
-					consentStrategy := consent.NewStrategy(
-						lp.URL, cp.URL, ts.URL, "/oauth2/auth", cm,
-						cookieStore,
-						fosite.ExactScopeStrategy, false, time.Hour, jwts,
-						openid.NewOpenIDConnectRequestValidator(nil, jwts),
-						map[string]consent.SubjectIdentifierAlgorithm{
-							"pairwise": consent.NewSubjectIdentifierAlgorithmPairwise([]byte("76d5d2bf-747f-4592-9fbd-d2b895a54b3a")),
-							"public":   consent.NewSubjectIdentifierAlgorithmPublic(),
-						},
-					)
-
-					jm := &jwk.MemoryManager{Keys: map[string]*jose.JSONWebKeySet{}}
-					keys, err := (&jwk.RS256Generator{}).Generate("", "sig")
-					require.NoError(t, err)
-					require.NoError(t, jm.AddKeySet(context.TODO(), OpenIDConnectKeyName, keys))
-					jwtStrategy, err := jwk.NewRS256JWTStrategy(jm, OpenIDConnectKeyName)
-
-					fc.RefreshTokenLifespan = time.Second * 2
-					fc.AccessTokenLifespan = time.Second * 8
-					handler := &Handler{
-						OAuth2: compose.Compose(
-							fc, fs.F, strat.s, hasher,
-							compose.OAuth2AuthorizeExplicitFactory,
-							compose.OAuth2AuthorizeImplicitFactory,
-							compose.OAuth2ClientCredentialsGrantFactory,
-							compose.OAuth2RefreshTokenGrantFactory,
-							compose.OpenIDConnectExplicitFactory,
-							compose.OpenIDConnectHybridFactory,
-							compose.OpenIDConnectImplicitFactory,
-							compose.OAuth2TokenRevocationFactory,
-							compose.OAuth2TokenIntrospectionFactory,
-						),
-						Consent:       consentStrategy,
-						CookieStore:   cookieStore,
-						H:             herodot.NewJSONWriter(l),
-						ScopeStrategy: fosite.ExactScopeStrategy,
-						//IDTokenLifespan: time.Minute,
-						IssuerURL: ts.URL, ForcedHTTP: true, L: l,
-						OpenIDJWTStrategy: jwtStrategy,
-					}
-					handler.SetRoutes(router, router, func(h http.Handler) http.Handler {
+					router := x.NewRouterPublic()
+					var callbackHandler *httprouter.Handle
+					router.GET("/callback", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+						(*callbackHandler)(w, r, ps)
+					})
+					reg.OAuth2Handler().SetRoutes(router.RouterAdmin(), router, func(h http.Handler) http.Handler {
 						return h
 					})
 
-					apiHandler := consent.NewHandler(herodot.NewJSONWriter(l), cm, cookieStore, "")
-					apiRouter := httprouter.New()
-					apiHandler.SetRoutes(apiRouter, apiRouter)
+					ts := httptest.NewServer(router)
+					defer ts.Close()
+
+					apiRouter := x.NewRouterAdmin()
+					reg.ConsentHandler().SetRoutes(apiRouter, apiRouter.RouterPublic())
 					api := httptest.NewServer(apiRouter)
+					defer api.Close()
+
+					viper.Set(configuration.ViperKeyLoginURL, lp.URL)
+					viper.Set(configuration.ViperKeyConsentURL, cp.URL)
+					viper.Set(configuration.ViperKeyIssuerURL, ts.URL)
+					viper.Set(configuration.ViperKeyConsentRequestMaxAge, time.Hour)
 
 					client := hc.Client{
 						ClientID: "e2e-app-client" + km + strat.d, Secret: "secret", RedirectURIs: []string{ts.URL + "/callback"},
@@ -225,13 +191,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						RedirectURL: client.RedirectURIs[0], Scopes: []string{"hydra", "offline", "openid"},
 					}
 
-					require.NoError(t, fs.F.(clientCreator).CreateClient(context.TODO(), &client))
+					require.NoError(t, reg.OAuth2Storage().(clientCreator).CreateClient(context.TODO(), &client))
 					apiClient := swagger.NewAdminApiWithBasePath(api.URL)
-
-					var callbackHandler *httprouter.Handle
-					router.GET("/callback", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-						(*callbackHandler)(w, r, ps)
-					})
 
 					persistentCJ := newCookieJar()
 					var code string
@@ -318,7 +279,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							cb: func(t *testing.T) httprouter.Handle {
 								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 									code = r.URL.Query().Get("code")
-									require.NotEmpty(t, code)
+									assert.NotEmpty(t, code, "%s", r.URL.String())
 									w.WriteHeader(http.StatusOK)
 								}
 							},
@@ -387,7 +348,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							expectIDToken:         true,
 							expectRefreshToken:    true,
 							assertRefreshToken: func(t *testing.T, token *oauth2.Token) {
-								time.Sleep(fc.RefreshTokenLifespan + time.Second)
+								time.Sleep(viper.GetDuration(configuration.ViperKeyRefreshTokenLifespan) + time.Second)
 								token.Expiry = token.Expiry.Add(-time.Hour * 24)
 								_, err := oauthConfig.TokenSource(oauth2.NoContext, token).Token()
 								require.Error(t, err)
@@ -927,7 +888,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 								return func(w http.ResponseWriter, r *http.Request) {
 									_, res, err := apiClient.GetLoginRequest(r.URL.Query().Get("login_challenge"))
 									require.NoError(t, err)
-									require.EqualValues(t, http.StatusOK, res.StatusCode)
+									assert.EqualValues(t, http.StatusOK, res.StatusCode)
 
 									time.Sleep(time.Second * 2)
 
@@ -942,7 +903,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 								return func(w http.ResponseWriter, r *http.Request) {
 									_, res, err := apiClient.GetConsentRequest(r.URL.Query().Get("consent_challenge"))
 									require.NoError(t, err)
-									require.EqualValues(t, http.StatusOK, res.StatusCode)
+									assert.EqualValues(t, http.StatusOK, res.StatusCode)
 
 									v, res, err := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{
 										GrantScope: []string{"hydra", "openid"},
@@ -1010,12 +971,20 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							require.NoError(t, err)
 							defer resp.Body.Close()
 
+							t.Logf("Cookies: %+v", tc.cj)
+
+							time.Sleep(time.Millisecond * 5)
+
 							if tc.expectOAuthAuthError {
 								require.Empty(t, code)
 								return
 							}
 
-							require.NotEmpty(t, code)
+							var body []byte
+							if code == "" {
+								body, _ = ioutil.ReadAll(resp.Body)
+							}
+							require.NotEmpty(t, code, "body: %s\nreq: %s\nts: %s", body, req.URL.String(), ts.URL)
 
 							token, err := oauthConfig.Exchange(oauth2.NoContext, code)
 
@@ -1064,64 +1033,24 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 // - [x] should pass with prompt=login when authentication time is recent
 // - [x] should fail with prompt=login when authentication time is in the past
 func TestAuthCodeWithMockStrategy(t *testing.T) {
-	for _, strat := range []struct {
-		d string
-		s foauth2.CoreStrategy
-	}{
-		{
-			d: "opaque",
-			s: oauth2OpqaueStrategy,
-		},
-		{
-			d: "jwt",
-			s: oauth2JWTStrategy,
-		},
-	} {
+	for _, strat := range []struct{ d string }{{d: "opaque"}, {d: "jwt"}} {
 		t.Run("strategy="+strat.d, func(t *testing.T) {
+			conf := internal.NewConfigurationWithDefaults()
+			viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Second*2)
+			viper.Set(configuration.ViperKeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
+			viper.Set(configuration.ViperKeyAccessTokenStrategy, strat.d)
+			reg := internal.NewRegistry(conf)
+			internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
+			internal.MustEnsureRegistryKeys(reg, x.OAuth2JWTKeyName)
+
 			consentStrategy := &consentMock{}
-			router := httprouter.New()
+			router := x.NewRouterPublic()
 			ts := httptest.NewServer(router)
-			store := NewFositeMemoryStore(hc.NewMemoryManager(hasher), time.Second*2)
+			defer ts.Close()
 
-			l := logrus.New()
-			l.Level = logrus.DebugLevel
-
-			jm := &jwk.MemoryManager{Keys: map[string]*jose.JSONWebKeySet{}}
-			keys, err := (&jwk.RS256Generator{}).Generate("", "sig")
-			require.NoError(t, err)
-			require.NoError(t, jm.AddKeySet(context.TODO(), OpenIDConnectKeyName, keys))
-			jwtStrategy, err := jwk.NewRS256JWTStrategy(jm, OpenIDConnectKeyName)
-
-			handler := &Handler{
-				OAuth2: compose.Compose(
-					&compose.Config{
-						AccessTokenLifespan:        time.Second * 2,
-						SendDebugMessagesToClients: true,
-					},
-					store,
-					strat.s,
-					nil,
-					compose.OAuth2AuthorizeExplicitFactory,
-					compose.OAuth2AuthorizeImplicitFactory,
-					compose.OAuth2ClientCredentialsGrantFactory,
-					compose.OAuth2RefreshTokenGrantFactory,
-					compose.OpenIDConnectExplicitFactory,
-					compose.OpenIDConnectHybridFactory,
-					compose.OpenIDConnectImplicitFactory,
-					compose.OAuth2TokenRevocationFactory,
-					compose.OAuth2TokenIntrospectionFactory,
-				),
-				Consent:       consentStrategy,
-				CookieStore:   sessions.NewCookieStore([]byte("foo-secret")),
-				ForcedHTTP:    true,
-				L:             l,
-				H:             herodot.NewJSONWriter(l),
-				ScopeStrategy: fosite.HierarchicScopeStrategy,
-				//IDTokenLifespan:   time.Minute,
-				IssuerURL:         ts.URL,
-				OpenIDJWTStrategy: jwtStrategy,
-			}
-			handler.SetRoutes(router, router, func(h http.Handler) http.Handler {
+			reg.WithConsentStrategy(consentStrategy)
+			handler := reg.OAuth2Handler()
+			handler.SetRoutes(router.RouterAdmin(), router, func(h http.Handler) http.Handler {
 				return h
 			})
 
@@ -1129,16 +1058,16 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 			router.GET("/callback", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 				(*callbackHandler)(w, r, ps)
 			})
-			m := sync.Mutex{}
+			var mutex sync.Mutex
 
-			store.CreateClient(context.TODO(), &hc.Client{
+			require.NoError(t, reg.ClientManager().CreateClient(context.TODO(), &hc.Client{
 				ClientID:      "app-client",
 				Secret:        "secret",
 				RedirectURIs:  []string{ts.URL + "/callback"},
 				ResponseTypes: []string{"id_token", "code", "token"},
 				GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
 				Scope:         "hydra.* offline openid",
-			})
+			}))
 
 			oauthConfig := &oauth2.Config{
 				ClientID:     "app-client",
@@ -1288,8 +1217,8 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 				},
 			} {
 				t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
-					m.Lock()
-					defer m.Unlock()
+					mutex.Lock()
+					defer mutex.Unlock()
 					if tc.cb == nil {
 						tc.cb = noopHandler
 					}
@@ -1309,7 +1238,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 					}
 
 					resp, err := (&http.Client{Jar: tc.cj}).Do(req)
-					require.NoError(t, err)
+					require.NoError(t, err, tc.authURL, ts.URL)
 					defer resp.Body.Close()
 
 					if tc.expectOAuthAuthError {

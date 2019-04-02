@@ -63,17 +63,14 @@ func freePort() (int, int) {
 func init() {
 	frontendPort, backendPort = freePort()
 
-	os.Setenv("PUBLIC_PORT", fmt.Sprintf("%d", frontendPort))
-	os.Setenv("ADMIN_PORT", fmt.Sprintf("%d", backendPort))
-	os.Setenv("DATABASE_URL", "memory")
+	os.Setenv("SERVE_PUBLIC_PORT", fmt.Sprintf("%d", frontendPort))
+	os.Setenv("SERVE_ADMIN_PORT", fmt.Sprintf("%d", backendPort))
+	os.Setenv("DSN", "memory")
 	//os.Setenv("HYDRA_URL", fmt.Sprintf("https://localhost:%d/", frontendPort))
-	os.Setenv("OAUTH2_ISSUER_URL", fmt.Sprintf("https://localhost:%d/", frontendPort))
+	os.Setenv("URLS_SELF_ISSUER", fmt.Sprintf("https://localhost:%d/", frontendPort))
 }
 
 func TestExecute(t *testing.T) {
-	var osArgs = make([]string, len(os.Args))
-	copy(osArgs, os.Args)
-
 	frontend := fmt.Sprintf("https://localhost:%d/", frontendPort)
 	backend := fmt.Sprintf("https://localhost:%d/", backendPort)
 
@@ -83,7 +80,7 @@ func TestExecute(t *testing.T) {
 		expectErr bool
 	}{
 		{
-			args: []string{"serve", "all", "--disable-telemetry"},
+			args: []string{"serve", "all", "--sqa-opt-out"},
 			wait: func() bool {
 				client := &http.Client{
 					Transport: &transporter{
@@ -112,25 +109,24 @@ func TestExecute(t *testing.T) {
 				return false
 			},
 		},
-		{args: []string{"clients", "create", "--endpoint", backend, "--id", "foobarbaz", "--secret", "foobar", "-g", "client_credentials"}},
-		{args: []string{"clients", "get", "--endpoint", backend, "foobarbaz"}},
-		{args: []string{"clients", "create", "--endpoint", backend, "--id", "public-foo"}},
-		{args: []string{"clients", "create", "--endpoint", backend, "--id", "confidential-foo", "--pgp-key", base64EncodedPGPPublicKey(t), "--grant-types", "client_credentials", "--response-types", "token"}},
-		{args: []string{"clients", "delete", "--endpoint", backend, "public-foo"}},
-		{args: []string{"keys", "create", "foo", "--endpoint", backend, "-a", "HS256"}},
-		{args: []string{"keys", "get", "--endpoint", backend, "foo"}},
-		{args: []string{"keys", "rotate", "--endpoint", backend, "foo"}},
-		{args: []string{"keys", "get", "--endpoint", backend, "foo"}},
-		{args: []string{"keys", "delete", "--endpoint", backend, "foo"}},
-		{args: []string{"keys", "import", "--endpoint", backend, "import-1", "../test/stub/ecdh.key", "../test/stub/ecdh.pub"}},
-		{args: []string{"keys", "import", "--endpoint", backend, "import-2", "../test/stub/rsa.key", "../test/stub/rsa.pub"}},
-		{args: []string{"token", "revoke", "--endpoint", frontend, "--client-secret", "foobar", "--client-id", "foobarbaz", "foo"}},
-		{args: []string{"token", "client", "--endpoint", frontend, "--client-secret", "foobar", "--client-id", "foobarbaz"}},
-		{args: []string{"migrate", "sql"}},
+		{args: []string{"clients", "create", "--skip-tls-verify", "--endpoint", backend, "--id", "foobarbaz", "--secret", "foobar", "-g", "client_credentials"}},
+		{args: []string{"clients", "get", "--skip-tls-verify", "--endpoint", backend, "foobarbaz"}},
+		{args: []string{"clients", "create", "--skip-tls-verify", "--endpoint", backend, "--id", "public-foo"}},
+		{args: []string{"clients", "create", "--skip-tls-verify", "--endpoint", backend, "--id", "confidential-foo", "--pgp-key", base64EncodedPGPPublicKey(t), "--grant-types", "client_credentials", "--response-types", "token"}},
+		{args: []string{"clients", "delete", "--skip-tls-verify", "--endpoint", backend, "public-foo"}},
+		{args: []string{"keys", "create", "--skip-tls-verify", "foo", "--endpoint", backend, "-a", "HS256"}},
+		{args: []string{"keys", "get", "--skip-tls-verify", "--endpoint", backend, "foo"}},
+		{args: []string{"keys", "rotate", "--skip-tls-verify", "--endpoint", backend, "foo"}},
+		{args: []string{"keys", "get", "--skip-tls-verify", "--endpoint", backend, "foo"}},
+		{args: []string{"keys", "delete", "--skip-tls-verify", "--endpoint", backend, "foo"}},
+		{args: []string{"keys", "import", "--skip-tls-verify", "--endpoint", backend, "import-1", "../test/stub/ecdh.key", "../test/stub/ecdh.pub"}},
+		{args: []string{"keys", "import", "--skip-tls-verify", "--endpoint", backend, "import-2", "../test/stub/rsa.key", "../test/stub/rsa.pub"}},
+		{args: []string{"token", "revoke", "--skip-tls-verify", "--endpoint", frontend, "--client-secret", "foobar", "--client-id", "foobarbaz", "foo"}},
+		{args: []string{"token", "client", "--skip-tls-verify", "--endpoint", frontend, "--client-secret", "foobar", "--client-id", "foobarbaz"}},
+		{args: []string{"help", "migrate", "sql"}},
 		{args: []string{"version"}},
-		{args: []string{"token", "flush", "--endpoint", backend}},
+		{args: []string{"token", "flush", "--skip-tls-verify", "--endpoint", backend}},
 	} {
-		c.args = append(c.args, []string{"--skip-tls-verify"}...)
 		RootCmd.SetArgs(c.args)
 
 		t.Run(fmt.Sprintf("command=%v", c.args), func(t *testing.T) {

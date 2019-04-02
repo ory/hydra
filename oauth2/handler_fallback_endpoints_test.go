@@ -18,7 +18,7 @@
  * @license 	Apache-2.0
  */
 
-package oauth2
+package oauth2_test
 
 import (
 	"io/ioutil"
@@ -26,25 +26,31 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/julienschmidt/httprouter"
-	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/assert"
+	"github.com/ory/hydra/x"
 
-	"github.com/ory/fosite"
+	"github.com/spf13/viper"
+
+	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/internal"
+	"github.com/ory/hydra/oauth2"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestHandlerConsent(t *testing.T) {
-	h := &Handler{
-		L:             logrus.New(),
-		ScopeStrategy: fosite.HierarchicScopeStrategy,
-	}
-	r := httprouter.New()
-	h.SetRoutes(r, r, func(h http.Handler) http.Handler {
+	conf := internal.NewConfigurationWithDefaults()
+	viper.Set(configuration.ViperKeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
+	reg := internal.NewRegistry(conf)
+
+	h := reg.OAuth2Handler()
+	r := x.NewRouterAdmin()
+	h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
 		return h
 	})
 	ts := httptest.NewServer(r)
+	defer ts.Close()
 
-	res, err := http.Get(ts.URL + DefaultConsentPath)
+	res, err := http.Get(ts.URL + oauth2.DefaultConsentPath)
 	assert.Nil(t, err)
 	defer res.Body.Close()
 

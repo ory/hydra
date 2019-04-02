@@ -27,21 +27,18 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/ory/hydra/internal"
+
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/fosite"
 	. "github.com/ory/hydra/client"
 	"github.com/ory/x/sqlcon/dockertest"
 )
 
 var clientManagers = map[string]Manager{}
 var m sync.Mutex
-
-func init() {
-	clientManagers["memory"] = NewMemoryManager(&fosite.BCrypt{})
-}
 
 func TestMain(m *testing.M) {
 	flag.Parse()
@@ -55,9 +52,11 @@ func connectToMySQL() {
 		log.Fatalf("Could not connect to database: %v", err)
 	}
 
-	s := &SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}
+	conf := internal.NewConfigurationWithDefaults()
+	reg := internal.NewRegistrySQL(conf, db)
+
 	m.Lock()
-	clientManagers["mysql"] = s
+	clientManagers["mysql"] = reg.ClientManager()
 	m.Unlock()
 }
 
@@ -67,13 +66,20 @@ func connectToPG() {
 		log.Fatalf("Could not connect to database: %v", err)
 	}
 
-	s := &SQLManager{DB: db, Hasher: &fosite.BCrypt{WorkFactor: 4}}
+	conf := internal.NewConfigurationWithDefaults()
+	reg := internal.NewRegistrySQL(conf, db)
+
 	m.Lock()
-	clientManagers["postgres"] = s
+	clientManagers["postgres"] = reg.ClientManager()
 	m.Unlock()
 }
 
 func TestManagers(t *testing.T) {
+	conf := internal.NewConfigurationWithDefaults()
+	reg := internal.NewRegistry(conf)
+
+	clientManagers["memory"] = reg.ClientManager()
+
 	if !testing.Short() {
 		dockertest.Parallel([]func(){
 			connectToPG,

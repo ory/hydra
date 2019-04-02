@@ -26,23 +26,18 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
 	"github.com/ory/go-convenience/urlx"
-	"github.com/ory/herodot"
-	"github.com/ory/hydra/pkg"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/pagination"
 )
 
 type Handler struct {
-	H                 herodot.Writer
-	M                 Manager
-	LogoutRedirectURL string
-	RequestMaxAge     time.Duration
-	CookieStore       sessions.Store
+	r InternalRegistry
+	c Configuration
 }
 
 const (
@@ -52,34 +47,30 @@ const (
 )
 
 func NewHandler(
-	h herodot.Writer,
-	m Manager,
-	c sessions.Store,
-	u string,
+	r InternalRegistry,
+	c Configuration,
 ) *Handler {
 	return &Handler{
-		H:                 h,
-		M:                 m,
-		LogoutRedirectURL: u,
-		CookieStore:       c,
+		c: c,
+		r: r,
 	}
 }
 
-func (h *Handler) SetRoutes(frontend, backend *httprouter.Router) {
-	backend.GET(LoginPath+"/:challenge", h.GetLoginRequest)
-	backend.PUT(LoginPath+"/:challenge/accept", h.AcceptLoginRequest)
-	backend.PUT(LoginPath+"/:challenge/reject", h.RejectLoginRequest)
+func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
+	admin.GET(LoginPath+"/:challenge", h.GetLoginRequest)
+	admin.PUT(LoginPath+"/:challenge/accept", h.AcceptLoginRequest)
+	admin.PUT(LoginPath+"/:challenge/reject", h.RejectLoginRequest)
 
-	backend.GET(ConsentPath+"/:challenge", h.GetConsentRequest)
-	backend.PUT(ConsentPath+"/:challenge/accept", h.AcceptConsentRequest)
-	backend.PUT(ConsentPath+"/:challenge/reject", h.RejectConsentRequest)
+	admin.GET(ConsentPath+"/:challenge", h.GetConsentRequest)
+	admin.PUT(ConsentPath+"/:challenge/accept", h.AcceptConsentRequest)
+	admin.PUT(ConsentPath+"/:challenge/reject", h.RejectConsentRequest)
 
-	backend.DELETE(SessionsPath+"/login/:user", h.DeleteLoginSession)
-	backend.GET(SessionsPath+"/consent/:user", h.GetConsentSessions)
-	backend.DELETE(SessionsPath+"/consent/:user", h.DeleteUserConsentSession)
-	backend.DELETE(SessionsPath+"/consent/:user/:client", h.DeleteUserClientConsentSession)
+	admin.DELETE(SessionsPath+"/login/:user", h.DeleteLoginSession)
+	admin.GET(SessionsPath+"/consent/:user", h.GetConsentSessions)
+	admin.DELETE(SessionsPath+"/consent/:user", h.DeleteUserConsentSession)
+	admin.DELETE(SessionsPath+"/consent/:user/:client", h.DeleteUserClientConsentSession)
 
-	frontend.GET(SessionsPath+"/login/revoke", h.LogoutUser)
+	public.GET(SessionsPath+"/login/revoke", h.LogoutUser)
 }
 
 // swagger:route DELETE /oauth2/auth/sessions/consent/{user} admin revokeAllUserConsentSessions
@@ -103,8 +94,8 @@ func (h *Handler) SetRoutes(frontend, backend *httprouter.Router) {
 //       500: genericError
 func (h *Handler) DeleteUserConsentSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	user := ps.ByName("user")
-	if err := h.M.RevokeUserConsentSession(r.Context(), user); err != nil {
-		h.H.WriteError(w, r, err)
+	if err := h.r.ConsentManager().RevokeUserConsentSession(r.Context(), user); err != nil {
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
@@ -135,12 +126,12 @@ func (h *Handler) DeleteUserClientConsentSession(w http.ResponseWriter, r *http.
 	client := ps.ByName("client")
 	user := ps.ByName("user")
 	if client == "" {
-		h.H.WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Parameter client is not defined")))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Parameter client is not defined")))
 		return
 	}
 
-	if err := h.M.RevokeUserClientConsentSession(r.Context(), user, client); err != nil {
-		h.H.WriteError(w, r, err)
+	if err := h.r.ConsentManager().RevokeUserClientConsentSession(r.Context(), user, client); err != nil {
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
@@ -169,17 +160,17 @@ func (h *Handler) DeleteUserClientConsentSession(w http.ResponseWriter, r *http.
 func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	user := ps.ByName("user")
 	if user == "" {
-		h.H.WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Parameter user is not defined")))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Parameter user is not defined")))
 		return
 	}
 
 	limit, offset := pagination.Parse(r, 100, 0, 500)
-	s, err := h.M.FindSubjectsGrantedConsentRequests(r.Context(), user, limit, offset)
+	s, err := h.r.ConsentManager().FindSubjectsGrantedConsentRequests(r.Context(), user, limit, offset)
 	if errors.Cause(err) == ErrNoPreviousConsentFound {
-		h.H.Write(w, r, []PreviousConsentSession{})
+		h.r.Writer().Write(w, r, []PreviousConsentSession{})
 		return
 	} else if err != nil {
-		h.H.WriteError(w, r, err)
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
@@ -194,7 +185,7 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 		a = []PreviousConsentSession{}
 	}
 
-	h.H.Write(w, r, a)
+	h.r.Writer().Write(w, r, a)
 }
 
 // swagger:route DELETE /oauth2/auth/sessions/login/{user} admin revokeAuthenticationSession
@@ -220,8 +211,8 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	user := ps.ByName("user")
 
-	if err := h.M.RevokeUserAuthenticationSession(r.Context(), user); err != nil {
-		h.H.WriteError(w, r, err)
+	if err := h.r.ConsentManager().RevokeUserAuthenticationSession(r.Context(), user); err != nil {
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
@@ -255,17 +246,18 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 //       409: genericError
 //       500: genericError
 func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	request, err := h.M.GetAuthenticationRequest(r.Context(), ps.ByName("challenge"))
+	request, err := h.r.ConsentManager().GetAuthenticationRequest(r.Context(), ps.ByName("challenge"))
 	if err != nil {
-		h.H.WriteError(w, r, err)
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 	if request.WasHandled {
-		h.H.WriteError(w, r, pkg.ErrConflict.WithDebug("Login request has been handled already"))
+		h.r.Writer().WriteError(w, r, x.ErrConflict.WithDebug("Login request has been handled already"))
 		return
 	}
+
 	request.Client = sanitizeClient(request.Client)
-	h.H.Write(w, r, request)
+	h.r.Writer().Write(w, r, request)
 }
 
 // swagger:route PUT /oauth2/auth/requests/login/{challenge}/accept admin acceptLoginRequest
@@ -303,20 +295,20 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&p); err != nil {
-		h.H.WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
+		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
 		return
 	}
 	if p.Subject == "" {
-		h.H.WriteErrorCode(w, r, http.StatusBadRequest, errors.New("Subject from payload can not be empty"))
+		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.New("Subject from payload can not be empty"))
 	}
 
 	p.Challenge = ps.ByName("challenge")
-	ar, err := h.M.GetAuthenticationRequest(r.Context(), ps.ByName("challenge"))
+	ar, err := h.r.ConsentManager().GetAuthenticationRequest(r.Context(), ps.ByName("challenge"))
 	if err != nil {
-		h.H.WriteError(w, r, err)
+		h.r.Writer().WriteError(w, r, err)
 		return
 	} else if ar.Subject != "" && p.Subject != ar.Subject {
-		h.H.WriteErrorCode(w, r, http.StatusBadRequest, errors.New("Subject from payload does not match subject from previous authentication"))
+		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.New("Subject from payload does not match subject from previous authentication"))
 		return
 	}
 
@@ -328,19 +320,19 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	}
 	p.RequestedAt = ar.RequestedAt
 
-	request, err := h.M.HandleAuthenticationRequest(r.Context(), ps.ByName("challenge"), &p)
+	request, err := h.r.ConsentManager().HandleAuthenticationRequest(r.Context(), ps.ByName("challenge"), &p)
 	if err != nil {
-		h.H.WriteError(w, r, errors.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
 	ru, err := url.Parse(request.RequestURL)
 	if err != nil {
-		h.H.WriteError(w, r, err)
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	h.H.Write(w, r, &RequestHandlerResponse{
+	h.r.Writer().Write(w, r, &RequestHandlerResponse{
 		RedirectTo: urlx.SetQuery(ru, url.Values{"login_verifier": {request.Verifier}}).String(),
 	})
 }
@@ -379,33 +371,33 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&p); err != nil {
-		h.H.WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
+		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
 		return
 	}
 
-	ar, err := h.M.GetAuthenticationRequest(r.Context(), ps.ByName("challenge"))
+	ar, err := h.r.ConsentManager().GetAuthenticationRequest(r.Context(), ps.ByName("challenge"))
 	if err != nil {
-		h.H.WriteError(w, r, err)
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	request, err := h.M.HandleAuthenticationRequest(r.Context(), ps.ByName("challenge"), &HandledAuthenticationRequest{
+	request, err := h.r.ConsentManager().HandleAuthenticationRequest(r.Context(), ps.ByName("challenge"), &HandledAuthenticationRequest{
 		Error:       &p,
 		Challenge:   ps.ByName("challenge"),
 		RequestedAt: ar.RequestedAt,
 	})
 	if err != nil {
-		h.H.WriteError(w, r, errors.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
 	ru, err := url.Parse(request.RequestURL)
 	if err != nil {
-		h.H.WriteError(w, r, err)
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	h.H.Write(w, r, &RequestHandlerResponse{
+	h.r.Writer().Write(w, r, &RequestHandlerResponse{
 		RedirectTo: urlx.SetQuery(ru, url.Values{"login_verifier": {request.Verifier}}).String(),
 	})
 }
@@ -439,18 +431,18 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //       409: genericError
 //       500: genericError
 func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	request, err := h.M.GetConsentRequest(r.Context(), ps.ByName("challenge"))
+	request, err := h.r.ConsentManager().GetConsentRequest(r.Context(), ps.ByName("challenge"))
 	if err != nil {
-		h.H.WriteError(w, r, err)
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 	if request.WasHandled {
-		h.H.WriteError(w, r, pkg.ErrConflict.WithDebug("Consent request has been handled already"))
+		h.r.Writer().WriteError(w, r, x.ErrConflict.WithDebug("Consent request has been handled already"))
 		return
 	}
 
 	request.Client = sanitizeClient(request.Client)
-	h.H.Write(w, r, request)
+	h.r.Writer().Write(w, r, request)
 }
 
 // swagger:route PUT /oauth2/auth/requests/consent/{challenge}/accept admin acceptConsentRequest
@@ -491,22 +483,22 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&p); err != nil {
-		h.H.WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
+		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
 		return
 	}
 
-	cr, err := h.M.GetConsentRequest(r.Context(), ps.ByName("challenge"))
+	cr, err := h.r.ConsentManager().GetConsentRequest(r.Context(), ps.ByName("challenge"))
 	if err != nil {
-		h.H.WriteError(w, r, errors.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
 	p.Challenge = ps.ByName("challenge")
 	p.RequestedAt = cr.RequestedAt
 
-	hr, err := h.M.HandleConsentRequest(r.Context(), ps.ByName("challenge"), &p)
+	hr, err := h.r.ConsentManager().HandleConsentRequest(r.Context(), ps.ByName("challenge"), &p)
 	if err != nil {
-		h.H.WriteError(w, r, errors.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	} else if hr.Skip {
 		p.Remember = false
@@ -514,11 +506,11 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 
 	ru, err := url.Parse(hr.RequestURL)
 	if err != nil {
-		h.H.WriteError(w, r, err)
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	h.H.Write(w, r, &RequestHandlerResponse{
+	h.r.Writer().Write(w, r, &RequestHandlerResponse{
 		RedirectTo: urlx.SetQuery(ru, url.Values{"consent_verifier": {hr.Verifier}}).String(),
 	})
 }
@@ -560,33 +552,33 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&p); err != nil {
-		h.H.WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
+		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
 		return
 	}
 
-	hr, err := h.M.GetConsentRequest(r.Context(), ps.ByName("challenge"))
+	hr, err := h.r.ConsentManager().GetConsentRequest(r.Context(), ps.ByName("challenge"))
 	if err != nil {
-		h.H.WriteError(w, r, errors.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
-	request, err := h.M.HandleConsentRequest(r.Context(), ps.ByName("challenge"), &HandledConsentRequest{
+	request, err := h.r.ConsentManager().HandleConsentRequest(r.Context(), ps.ByName("challenge"), &HandledConsentRequest{
 		Error:       &p,
 		Challenge:   ps.ByName("challenge"),
 		RequestedAt: hr.RequestedAt,
 	})
 	if err != nil {
-		h.H.WriteError(w, r, errors.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
 	ru, err := url.Parse(request.RequestURL)
 	if err != nil {
-		h.H.WriteError(w, r, err)
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	h.H.Write(w, r, &RequestHandlerResponse{
+	h.r.Writer().Write(w, r, &RequestHandlerResponse{
 		RedirectTo: urlx.SetQuery(ru, url.Values{"consent_verifier": {request.Verifier}}).String(),
 	})
 }
@@ -609,18 +601,18 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 //       404: genericError
 //       500: genericError
 func (h *Handler) LogoutUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	sid, err := revokeAuthenticationCookie(w, r, h.CookieStore)
+	sid, err := revokeAuthenticationCookie(w, r, h.r.CookieStore())
 	if err != nil {
-		h.H.WriteError(w, r, err)
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
 	if sid != "" {
-		if err := h.M.DeleteAuthenticationSession(r.Context(), sid); err != nil {
-			h.H.WriteError(w, r, err)
+		if err := h.r.ConsentManager().DeleteAuthenticationSession(r.Context(), sid); err != nil {
+			h.r.Writer().WriteError(w, r, err)
 			return
 		}
 	}
 
-	http.Redirect(w, r, h.LogoutRedirectURL, 302)
+	http.Redirect(w, r, h.c.LogoutRedirectURL().String(), 302)
 }

@@ -18,7 +18,7 @@
  * @license 	Apache-2.0
  */
 
-package consent
+package consent_test
 
 import (
 	"context"
@@ -35,19 +35,22 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/x"
+
+	"github.com/spf13/viper"
+
 	"github.com/gorilla/securecookie"
-	"github.com/gorilla/sessions"
-	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/internal"
+
 	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
-	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/pkg"
+	. "github.com/ory/hydra/consent"
 	"github.com/ory/hydra/sdk/go/hydra/swagger"
 )
 
@@ -83,14 +86,16 @@ func newCookieJar() *cookiejar.Jar {
 }
 
 func TestStrategy(t *testing.T) {
+	conf := internal.NewConfigurationWithDefaults()
+	reg := internal.NewRegistry(conf)
+
 	var lph, cph, aph func(w http.ResponseWriter, r *http.Request)
 	lp := mockProvider(&lph)
 	cp := mockProvider(&cph)
 	ap := mockProvider(&aph)
 
-	jwts := &jwt.RS256JWTStrategy{
-		PrivateKey: pkg.MustINSECURELOWENTROPYRSAKEYFORTEST(),
-	}
+	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
+	jwts := reg.OpenIDJWTStrategy()
 
 	fooUserIDToken, _, err := jwts.Generate(context.TODO(), jwt.IDTokenClaims{
 		Subject:   "foouser",
@@ -120,31 +125,22 @@ func TestStrategy(t *testing.T) {
 	}.ToMapClaims(), jwt.NewHeaders())
 	require.NoError(t, err)
 
-	cs := sessions.NewCookieStore([]byte("dummy-secret-yay"))
-	writer := herodot.NewJSONWriter(nil)
-	manager := NewMemoryManager(nil)
-	handler := NewHandler(writer, manager, cs, "https://www.ory.sh")
-	router := httprouter.New()
-	handler.SetRoutes(router, router)
+	writer := reg.Writer()
+	handler := reg.ConsentHandler()
+	router := x.NewRouterAdmin()
+	handler.SetRoutes(router, router.RouterPublic())
 	api := httptest.NewServer(router)
 
-	strategy := NewStrategy(
-		lp.URL,
-		cp.URL,
-		ap.URL,
-		"/oauth2/auth",
-		manager,
-		cs,
-		fosite.ExactScopeStrategy,
-		false,
-		time.Hour,
-		jwts,
-		openid.NewOpenIDConnectRequestValidator(nil, jwts),
-		map[string]SubjectIdentifierAlgorithm{
-			"pairwise": NewSubjectIdentifierAlgorithmPairwise([]byte("76d5d2bf-747f-4592-9fbd-d2b895a54b3a")),
-			"public":   NewSubjectIdentifierAlgorithmPublic(),
-		},
-	)
+	strategy := reg.ConsentStrategy()
+
+	viper.Set(configuration.ViperKeyLoginURL, lp.URL)
+	viper.Set(configuration.ViperKeyConsentURL, cp.URL)
+	viper.Set(configuration.ViperKeyIssuerURL, ap.URL)
+	viper.Set(configuration.ViperKeyConsentRequestMaxAge, time.Hour)
+	viper.Set(configuration.ViperKeyScopeStrategy, "exact")
+	viper.Set(configuration.ViperKeySubjectTypesSupported, []string{"pairwise", "public"})
+	viper.Set(configuration.ViperKeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
+
 	apiClient := swagger.NewAdminApiWithBasePath(api.URL)
 
 	persistentCJ := newCookieJar()
@@ -154,8 +150,8 @@ func TestStrategy(t *testing.T) {
 
 	nonexistentCJ, _ := cookiejar.New(&cookiejar.Options{})
 	apURL, _ := url.Parse(ap.URL)
-	encoded, _ := securecookie.EncodeMulti(cookieAuthenticationName, map[interface{}]interface{}{cookieAuthenticationSIDName: "i-do-not-exist"}, securecookie.CodecsFromPairs([]byte("dummy-secret-yay"))...)
-	nonexistentCJ.SetCookies(apURL, []*http.Cookie{{Name: cookieAuthenticationName, Value: encoded}})
+	encoded, _ := securecookie.EncodeMulti(CookieAuthenticationName, map[interface{}]interface{}{CookieAuthenticationSIDName: "i-do-not-exist"}, securecookie.CodecsFromPairs([]byte("dummy-secret-yay"))...)
+	nonexistentCJ.SetCookies(apURL, []*http.Cookie{{Name: CookieAuthenticationName, Value: encoded}})
 
 	for k, tc := range []struct {
 		setup                 func()
@@ -658,7 +654,7 @@ func TestStrategy(t *testing.T) {
 				GrantedScope:   []string{"scope-a"},
 				Remember:       true,
 				RememberFor:    0,
-				Session:        newConsentRequestSessionData(),
+				Session:        NewConsentRequestSessionData(),
 			},
 		},
 		{
@@ -966,7 +962,7 @@ func TestStrategy(t *testing.T) {
 				GrantedScope: []string{"scope-a"},
 				Remember:     false,
 				RememberFor:  0,
-				Session:      newConsentRequestSessionData(),
+				Session:      NewConsentRequestSessionData(),
 			},
 		}, // these tests depend on one another
 		{
@@ -1003,7 +999,7 @@ func TestStrategy(t *testing.T) {
 				GrantedScope: []string{"scope-a"},
 				Remember:     false,
 				RememberFor:  0,
-				Session:      newConsentRequestSessionData(),
+				Session:      NewConsentRequestSessionData(),
 			},
 		},
 		{
@@ -1037,7 +1033,7 @@ func TestStrategy(t *testing.T) {
 				GrantedScope: []string{"scope-a"},
 				Remember:     false,
 				RememberFor:  0,
-				Session:      newConsentRequestSessionData(),
+				Session:      NewConsentRequestSessionData(),
 			},
 		}, // these tests depend on one another
 		{
@@ -1072,7 +1068,7 @@ func TestStrategy(t *testing.T) {
 				GrantedScope: []string{"scope-a"},
 				Remember:     false,
 				RememberFor:  0,
-				Session:      newConsentRequestSessionData(),
+				Session:      NewConsentRequestSessionData(),
 			},
 		},
 

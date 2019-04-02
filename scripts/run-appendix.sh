@@ -4,18 +4,14 @@ set -Eeuxo pipefail
 
 cd "$( dirname "${BASH_SOURCE[0]}" )/.."
 
-cat > appendix.md << EOF
+cat > configuration.md << EOF
 ---
-id: appendix
-title: Appendix
+id: configuration
+title: Configuration
 ---
-
-## \`hydra serve\`
 
 \`\`\`
-\$ hydra help serve
-
-`hydra help serve`
+`cat ./docs/config.yaml`
 \`\`\`
 
 EOF

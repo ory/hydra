@@ -27,31 +27,39 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gorilla/sessions"
-	"github.com/julienschmidt/httprouter"
-	"github.com/sirupsen/logrus"
+	"github.com/ory/hydra/x"
+
+	"github.com/spf13/viper"
+
+	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/internal"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/herodot"
 	. "github.com/ory/hydra/consent"
-	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/sdk/go/hydra"
 	"github.com/ory/hydra/sdk/go/hydra/swagger"
 )
 
 func TestSDK(t *testing.T) {
-	m := NewMemoryManager(oauth2.NewFositeMemoryStore(nil, time.Minute))
-	router := httprouter.New()
-	h := NewHandler(herodot.NewJSONWriter(logrus.New()), m, sessions.NewCookieStore([]byte("secret")), "https://www.ory.sh")
+	conf := internal.NewConfigurationWithDefaults()
+	viper.Set(configuration.ViperKeyIssuerURL, "https://www.ory.sh")
+	viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Minute)
+	reg := internal.NewRegistry(conf)
 
-	h.SetRoutes(router, router)
+	router := x.NewRouterPublic()
+	h := NewHandler(reg, conf)
+
+	h.SetRoutes(router.RouterAdmin(), router)
 	ts := httptest.NewServer(router)
 
 	sdk, err := hydra.NewSDK(&hydra.Configuration{
 		AdminURL: ts.URL,
 	})
 	require.NoError(t, err)
+
+	m := reg.ConsentManager()
 
 	require.NoError(t, m.CreateAuthenticationSession(context.TODO(), &AuthenticationSession{
 		ID:      "session1",

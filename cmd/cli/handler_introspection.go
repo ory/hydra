@@ -25,27 +25,23 @@ import (
 	"net/http"
 	"strings" //"encoding/json"
 
-	"github.com/ory/hydra/config" //"github.com/ory/hydra/oauth2"
+	"github.com/spf13/cobra"
+
 	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx" //"context"
-	"github.com/spf13/cobra"
 )
 
-type IntrospectionHandler struct {
-	Config *config.Config
-}
+type IntrospectionHandler struct{}
 
-func newIntrospectionHandler(c *config.Config) *IntrospectionHandler {
-	return &IntrospectionHandler{
-		Config: c,
-	}
+func newIntrospectionHandler() *IntrospectionHandler {
+	return &IntrospectionHandler{}
 }
 
 func (h *IntrospectionHandler) Introspect(cmd *cobra.Command, args []string) {
 	cmdx.ExactArgs(cmd, args, 1)
 
-	c := hydra.NewAdminApiWithBasePath(h.Config.GetClusterURLWithoutTailingSlashOrFail(cmd))
+	c := hydra.NewAdminApiWithBasePath(Remote(cmd))
 	c.Configuration = configureClient(cmd, c.Configuration)
 
 	clientID := flagx.MustGetString(cmd, "client-id")

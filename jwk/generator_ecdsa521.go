@@ -48,13 +48,13 @@ func (g *ECDSA512Generator) Generate(id, use string) (*jose.JSONWebKeySet, error
 			{
 				Key:          key,
 				Use:          use,
-				KeyID:        ider("private", id),
+				KeyID:        Ider("private", id),
 				Certificates: []*x509.Certificate{},
 			},
 			{
 				Key:          &key.PublicKey,
 				Use:          use,
-				KeyID:        ider("public", id),
+				KeyID:        Ider("public", id),
 				Certificates: []*x509.Certificate{},
 			},
 		},

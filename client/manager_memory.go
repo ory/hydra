@@ -33,19 +33,15 @@ import (
 )
 
 type MemoryManager struct {
+	r       InternalRegistry
 	Clients []Client
-	Hasher  fosite.Hasher
 	sync.RWMutex
 }
 
-func NewMemoryManager(hasher fosite.Hasher) *MemoryManager {
-	if hasher == nil {
-		hasher = new(fosite.BCrypt)
-	}
-
+func NewMemoryManager(r InternalRegistry) *MemoryManager {
 	return &MemoryManager{
 		Clients: []Client{},
-		Hasher:  hasher,
+		r:       r,
 	}
 }
 
@@ -75,7 +71,7 @@ func (m *MemoryManager) UpdateClient(ctx context.Context, c *Client) error {
 	if c.Secret == "" {
 		c.Secret = string(o.GetHashedSecret())
 	} else {
-		h, err := m.Hasher.Hash(ctx, []byte(c.Secret))
+		h, err := m.r.ClientHasher().Hash(ctx, []byte(c.Secret))
 		if err != nil {
 			return errors.WithStack(err)
 		}
@@ -105,7 +101,7 @@ func (m *MemoryManager) Authenticate(ctx context.Context, id string, secret []by
 		return nil, err
 	}
 
-	if err := m.Hasher.Compare(ctx, c.GetHashedSecret(), secret); err != nil {
+	if err := m.r.ClientHasher().Compare(ctx, c.GetHashedSecret(), secret); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
@@ -120,7 +116,7 @@ func (m *MemoryManager) CreateClient(ctx context.Context, c *Client) error {
 	m.Lock()
 	defer m.Unlock()
 
-	hash, err := m.Hasher.Hash(ctx, []byte(c.Secret))
+	hash, err := m.r.ClientHasher().Hash(ctx, []byte(c.Secret))
 	if err != nil {
 		return errors.WithStack(err)
 	}

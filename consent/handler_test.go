@@ -18,7 +18,7 @@
  * @license 	Apache-2.0
  */
 
-package consent
+package consent_test
 
 import (
 	"context"
@@ -30,37 +30,40 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gorilla/sessions"
+	"github.com/ory/hydra/x"
+
+	"github.com/spf13/viper"
+
+	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/internal"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
+	. "github.com/ory/hydra/consent"
 )
 
 func TestLogout(t *testing.T) {
-	cs := sessions.NewCookieStore([]byte("secret"))
-	r := httprouter.New()
-	h := NewHandler(
-		herodot.NewJSONWriter(nil),
-		NewMemoryManager(nil),
-		cs,
-		"https://www.ory.sh",
-	)
+	conf := internal.NewConfigurationWithDefaults()
+	reg := internal.NewRegistry(conf)
+
+	r := x.NewRouterPublic()
+	h := NewHandler(reg, conf)
 
 	sid := uuid.New()
 
 	r.Handle("GET", "/login", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-		cookie, _ := cs.Get(r, cookieAuthenticationName)
-		require.NoError(t, h.M.CreateAuthenticationSession(context.TODO(), &AuthenticationSession{
+		cookie, _ := reg.CookieStore().Get(r, CookieAuthenticationName)
+		require.NoError(t, reg.ConsentManager().CreateAuthenticationSession(context.TODO(), &AuthenticationSession{
 			ID:              sid,
 			Subject:         "foo",
 			AuthenticatedAt: time.Now(),
 		}))
 
-		cookie.Values[cookieAuthenticationSIDName] = sid
+		cookie.Values[CookieAuthenticationSIDName] = sid
 		cookie.Options.MaxAge = 60
 
 		require.NoError(t, cookie.Save(r, w))
@@ -69,11 +72,11 @@ func TestLogout(t *testing.T) {
 	r.Handle("GET", "/logout", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	})
 
-	h.SetRoutes(r, r)
+	h.SetRoutes(r.RouterAdmin(), r)
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
-	h.LogoutRedirectURL = ts.URL + "/logout"
+	viper.Set(configuration.ViperKeyLogoutRedirectURL, ts.URL+"/logout")
 
 	u, err := url.Parse(ts.URL)
 	require.NoError(t, err)
@@ -107,22 +110,21 @@ func TestGetLoginRequest(t *testing.T) {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
 			key := fmt.Sprint(k)
 			challenge := "challenge" + key
-			m := NewMemoryManager(nil)
+
+			conf := internal.NewConfigurationWithDefaults()
+			reg := internal.NewRegistry(conf)
+
 			if tc.exists {
-				require.NoError(t, m.CreateAuthenticationRequest(context.TODO(), &AuthenticationRequest{
+				require.NoError(t, reg.ConsentManager().CreateAuthenticationRequest(context.TODO(), &AuthenticationRequest{
 					Client:     &client.Client{ClientID: "client" + key},
 					Challenge:  challenge,
 					WasHandled: tc.handled,
 				}))
 			}
-			r := httprouter.New()
-			h := NewHandler(
-				herodot.NewJSONWriter(nil),
-				m,
-				nil,
-				"https://www.ory.sh",
-			)
-			h.SetRoutes(r, r)
+
+			h := NewHandler(reg, conf)
+			r := x.NewRouterAdmin()
+			h.SetRoutes(r, r.RouterPublic())
 			ts := httptest.NewServer(r)
 			defer ts.Close()
 
@@ -147,22 +149,22 @@ func TestGetConsentRequest(t *testing.T) {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
 			key := fmt.Sprint(k)
 			challenge := "challenge" + key
-			m := NewMemoryManager(nil)
+
+			conf := internal.NewConfigurationWithDefaults()
+			reg := internal.NewRegistry(conf)
+
 			if tc.exists {
-				require.NoError(t, m.CreateConsentRequest(context.TODO(), &ConsentRequest{
+				require.NoError(t, reg.ConsentManager().CreateConsentRequest(context.TODO(), &ConsentRequest{
 					Client:     &client.Client{ClientID: "client" + key},
 					Challenge:  challenge,
 					WasHandled: tc.handled,
 				}))
 			}
-			r := httprouter.New()
-			h := NewHandler(
-				herodot.NewJSONWriter(nil),
-				m,
-				nil,
-				"https://www.ory.sh",
-			)
-			h.SetRoutes(r, r)
+
+			h := NewHandler(reg, conf)
+
+			r := x.NewRouterAdmin()
+			h.SetRoutes(r, r.RouterPublic())
 			ts := httptest.NewServer(r)
 			defer ts.Close()
 

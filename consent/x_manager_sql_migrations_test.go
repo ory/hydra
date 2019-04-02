@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/ory/hydra/internal"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/x/dbal"
@@ -22,9 +23,15 @@ var createMigrations = map[string]*dbal.PackrMigrationSource{
 }
 
 func cleanDB(t *testing.T, db *sqlx.DB) {
-	_, err := db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_consent_migration")
+	_, err := db.Exec("DROP TABLE IF EXISTS hydra_oauth2_access")
 	t.Logf("Unable to execute clean up query: %s", err)
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_refresh")
+	t.Logf("Unable to execute clean up query: %s", err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_code")
+	t.Logf("Unable to execute clean up query: %s", err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_oidc")
+	t.Logf("Unable to execute clean up query: %s", err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_pkce")
 	t.Logf("Unable to execute clean up query: %s", err)
 
 	// hydra_oauth2_consent_request_handled depends on hydra_oauth2_consent_request
@@ -44,11 +51,15 @@ func cleanDB(t *testing.T, db *sqlx.DB) {
 	t.Logf("Unable to execute clean up query: %s", err)
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
 	t.Logf("Unable to execute clean up query: %s", err)
-
-	// everything depends on hydra_client
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_client")
 	t.Logf("Unable to execute clean up query: %s", err)
+
+	// clean up migration tables
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_consent_migration")
+	t.Logf("Unable to execute clean up query: %s", err)
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_client_migration")
+	t.Logf("Unable to execute clean up query: %s", err)
+	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_migration")
 	t.Logf("Unable to execute clean up query: %s", err)
 }
 
@@ -79,15 +90,16 @@ func TestXXMigrations(t *testing.T) {
 			}
 
 			t.Run(fmt.Sprintf("poll=%d", step), func(t *testing.T) {
+				conf := internal.NewConfigurationWithDefaults()
+				reg := internal.NewRegistrySQL(conf, db)
+
 				kk := step + 1
 				if kk <= 2 {
 					t.Skip("Skipping the first two entries were deleted in migration 7.sql login_session_id is not defined")
 					return
 				}
 
-				c := &client.SQLManager{DB: db, Hasher: &fosite.BCrypt{}}
-
-				s := consent.NewSQLManager(db, c, nil)
+				s := consent.NewSQLManager(db, reg)
 				_, err := s.GetAuthenticationRequest(context.TODO(), fmt.Sprintf("%d-challenge", kk))
 				require.NoError(t, err, "%d-challenge", kk)
 				_, err = s.GetAuthenticationSession(context.TODO(), fmt.Sprintf("%d-login-session-id", kk))

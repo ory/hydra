@@ -39,7 +39,6 @@ import (
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/pkg"
 	"github.com/ory/x/sqlcon"
 )
 
@@ -86,7 +85,7 @@ var flushRequests = []*fosite.Request{
 	},
 }
 
-func mockRequestForeignKey(t *testing.T, id string, x ManagerTestSetup, createClient bool) {
+func mockRequestForeignKey(t *testing.T, id string, x InternalRegistry, createClient bool) {
 	cl := &client.Client{ClientID: "foobar"}
 	cr := &consent.ConsentRequest{
 		Client: cl, OpenIDConnectContext: new(consent.OpenIDConnectContext), LoginChallenge: id,
@@ -94,12 +93,12 @@ func mockRequestForeignKey(t *testing.T, id string, x ManagerTestSetup, createCl
 	}
 
 	if createClient {
-		require.NoError(t, x.Cl.CreateClient(context.Background(), cl))
+		require.NoError(t, x.ClientManager().CreateClient(context.Background(), cl))
 	}
 
-	require.NoError(t, x.Co.CreateAuthenticationRequest(context.Background(), &consent.AuthenticationRequest{Client: cl, OpenIDConnectContext: new(consent.OpenIDConnectContext), Challenge: id, Verifier: id, AuthenticatedAt: time.Now(), RequestedAt: time.Now()}))
-	require.NoError(t, x.Co.CreateConsentRequest(context.Background(), cr))
-	_, err := x.Co.HandleConsentRequest(context.Background(), id, &consent.HandledConsentRequest{
+	require.NoError(t, x.ConsentManager().CreateAuthenticationRequest(context.Background(), &consent.AuthenticationRequest{Client: cl, OpenIDConnectContext: new(consent.OpenIDConnectContext), Challenge: id, Verifier: id, AuthenticatedAt: time.Now(), RequestedAt: time.Now()}))
+	require.NoError(t, x.ConsentManager().CreateConsentRequest(context.Background(), cr))
+	_, err := x.ConsentManager().HandleConsentRequest(context.Background(), id, &consent.HandledConsentRequest{
 		ConsentRequest: cr, Session: new(consent.ConsentRequestSessionData), AuthenticatedAt: time.Now(),
 		Challenge:   id,
 		RequestedAt: time.Now(),
@@ -107,16 +106,9 @@ func mockRequestForeignKey(t *testing.T, id string, x ManagerTestSetup, createCl
 	require.NoError(t, err)
 }
 
-// KEEP EXPORTED AND AVAILABLE FOR THIRD PARTIES TO TEST PLUGINS!
-type ManagerTestSetup struct {
-	F  pkg.FositeStorer
-	Cl client.Manager
-	Co consent.Manager
-}
-
 // TestHelperRunner is used to run the database suite of tests in this package.
 // KEEP EXPORTED AND AVAILABLE FOR THIRD PARTIES TO TEST PLUGINS!
-func TestHelperRunner(t *testing.T, store ManagerTestSetup, k string) {
+func TestHelperRunner(t *testing.T, store InternalRegistry, k string) {
 	t.Helper()
 	if k != "memory" {
 		t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteAuthorizeCodes/db=%s", k), testHelperUniqueConstraints(store, k))
@@ -142,7 +134,7 @@ func TestHelperRunner(t *testing.T, store ManagerTestSetup, k string) {
 	t.Run(fmt.Sprintf("case=testHelperFlushTokens/db=%s", k), testHelperFlushTokens(store, time.Hour))
 }
 
-func testHelperUniqueConstraints(m ManagerTestSetup, storageType string) func(t *testing.T) {
+func testHelperUniqueConstraints(m InternalRegistry, storageType string) func(t *testing.T) {
 	return func(t *testing.T) {
 		dbErrorIsConstraintError := func(dbErr error) {
 			assert.Error(t, dbErr)
@@ -167,24 +159,24 @@ func testHelperUniqueConstraints(m ManagerTestSetup, storageType string) func(t 
 			Session:     &Session{},
 		}
 
-		err := m.F.CreateRefreshTokenSession(context.TODO(), signatureOne, fositeRequest)
+		err := m.OAuth2Storage().CreateRefreshTokenSession(context.TODO(), signatureOne, fositeRequest)
 		assert.NoError(t, err)
-		err = m.F.CreateAccessTokenSession(context.TODO(), signatureOne, fositeRequest)
+		err = m.OAuth2Storage().CreateAccessTokenSession(context.TODO(), signatureOne, fositeRequest)
 		assert.NoError(t, err)
 
 		// attempting to insert new records with the SAME requestID should fail as there is a unique index
 		// on the request_id column
 
-		err = m.F.CreateRefreshTokenSession(context.TODO(), signatureTwo, fositeRequest)
+		err = m.OAuth2Storage().CreateRefreshTokenSession(context.TODO(), signatureTwo, fositeRequest)
 		dbErrorIsConstraintError(err)
-		err = m.F.CreateAccessTokenSession(context.TODO(), signatureTwo, fositeRequest)
+		err = m.OAuth2Storage().CreateAccessTokenSession(context.TODO(), signatureTwo, fositeRequest)
 		dbErrorIsConstraintError(err)
 	}
 }
 
-func testHelperCreateGetDeleteOpenIDConnectSession(x ManagerTestSetup) func(t *testing.T) {
+func testHelperCreateGetDeleteOpenIDConnectSession(x InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
-		m := x.F
+		m := x.OAuth2Storage()
 
 		ctx := context.Background()
 		_, err := m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{})
@@ -205,9 +197,9 @@ func testHelperCreateGetDeleteOpenIDConnectSession(x ManagerTestSetup) func(t *t
 	}
 }
 
-func testHelperCreateGetDeleteRefreshTokenSession(x ManagerTestSetup) func(t *testing.T) {
+func testHelperCreateGetDeleteRefreshTokenSession(x InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
-		m := x.F
+		m := x.OAuth2Storage()
 
 		ctx := context.Background()
 		_, err := m.GetRefreshTokenSession(ctx, "4321", &Session{})
@@ -228,9 +220,9 @@ func testHelperCreateGetDeleteRefreshTokenSession(x ManagerTestSetup) func(t *te
 	}
 }
 
-func testHelperRevokeRefreshToken(x ManagerTestSetup) func(t *testing.T) {
+func testHelperRevokeRefreshToken(x InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
-		m := x.F
+		m := x.OAuth2Storage()
 
 		ctx := context.Background()
 		_, err := m.GetRefreshTokenSession(ctx, "1111", &Session{})
@@ -266,9 +258,9 @@ func testHelperRevokeRefreshToken(x ManagerTestSetup) func(t *testing.T) {
 	}
 }
 
-func testHelperCreateGetDeleteAuthorizeCodes(x ManagerTestSetup) func(t *testing.T) {
+func testHelperCreateGetDeleteAuthorizeCodes(x InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
-		m := x.F
+		m := x.OAuth2Storage()
 
 		mockRequestForeignKey(t, "blank", x, false)
 
@@ -294,11 +286,11 @@ func testHelperCreateGetDeleteAuthorizeCodes(x ManagerTestSetup) func(t *testing
 	}
 }
 
-func testHelperNilAccessToken(x ManagerTestSetup) func(t *testing.T) {
+func testHelperNilAccessToken(x InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
-		m := x.F
+		m := x.OAuth2Storage()
 		c := &client.Client{ClientID: "nil-request-client-id-123"}
-		require.NoError(t, x.Cl.CreateClient(context.Background(), c))
+		require.NoError(t, x.ClientManager().CreateClient(context.Background(), c))
 		err := m.CreateAccessTokenSession(context.TODO(), "nil-request-id", &fosite.Request{
 			ID:                "",
 			RequestedAt:       time.Now().UTC().Round(time.Second),
@@ -314,9 +306,9 @@ func testHelperNilAccessToken(x ManagerTestSetup) func(t *testing.T) {
 	}
 }
 
-func testHelperCreateGetDeleteAccessTokenSession(x ManagerTestSetup) func(t *testing.T) {
+func testHelperCreateGetDeleteAccessTokenSession(x InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
-		m := x.F
+		m := x.OAuth2Storage()
 
 		ctx := context.Background()
 		_, err := m.GetAccessTokenSession(ctx, "4321", &Session{})
@@ -337,9 +329,9 @@ func testHelperCreateGetDeleteAccessTokenSession(x ManagerTestSetup) func(t *tes
 	}
 }
 
-func testHelperCreateGetDeletePKCERequestSession(x ManagerTestSetup) func(t *testing.T) {
+func testHelperCreateGetDeletePKCERequestSession(x InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
-		m := x.F
+		m := x.OAuth2Storage()
 
 		ctx := context.Background()
 		_, err := m.GetPKCERequestSession(ctx, "4321", &Session{})
@@ -360,8 +352,8 @@ func testHelperCreateGetDeletePKCERequestSession(x ManagerTestSetup) func(t *tes
 	}
 }
 
-func testHelperFlushTokens(x ManagerTestSetup, lifespan time.Duration) func(t *testing.T) {
-	m := x.F
+func testHelperFlushTokens(x InternalRegistry, lifespan time.Duration) func(t *testing.T) {
+	m := x.OAuth2Storage()
 	ds := &Session{}
 
 	return func(t *testing.T) {
@@ -399,104 +391,104 @@ func testHelperFlushTokens(x ManagerTestSetup, lifespan time.Duration) func(t *t
 	}
 }
 
-func testFositeSqlStoreTransactionCommitAccessToken(m ManagerTestSetup) func(t *testing.T) {
+func testFositeSqlStoreTransactionCommitAccessToken(m InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
 		{
-			doTestCommit(m, t, m.F.CreateAccessTokenSession, m.F.GetAccessTokenSession, m.F.RevokeAccessToken)
-			doTestCommit(m, t, m.F.CreateAccessTokenSession, m.F.GetAccessTokenSession, m.F.DeleteAccessTokenSession)
+			doTestCommit(m, t, m.OAuth2Storage().CreateAccessTokenSession, m.OAuth2Storage().GetAccessTokenSession, m.OAuth2Storage().RevokeAccessToken)
+			doTestCommit(m, t, m.OAuth2Storage().CreateAccessTokenSession, m.OAuth2Storage().GetAccessTokenSession, m.OAuth2Storage().DeleteAccessTokenSession)
 		}
 	}
 }
 
-func testFositeSqlStoreTransactionRollbackAccessToken(m ManagerTestSetup) func(t *testing.T) {
+func testFositeSqlStoreTransactionRollbackAccessToken(m InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
 		{
-			doTestRollback(m, t, m.F.CreateAccessTokenSession, m.F.GetAccessTokenSession, m.F.RevokeAccessToken)
-			doTestRollback(m, t, m.F.CreateAccessTokenSession, m.F.GetAccessTokenSession, m.F.DeleteAccessTokenSession)
+			doTestRollback(m, t, m.OAuth2Storage().CreateAccessTokenSession, m.OAuth2Storage().GetAccessTokenSession, m.OAuth2Storage().RevokeAccessToken)
+			doTestRollback(m, t, m.OAuth2Storage().CreateAccessTokenSession, m.OAuth2Storage().GetAccessTokenSession, m.OAuth2Storage().DeleteAccessTokenSession)
 		}
 	}
 }
 
-func testFositeSqlStoreTransactionCommitRefreshToken(m ManagerTestSetup) func(t *testing.T) {
+func testFositeSqlStoreTransactionCommitRefreshToken(m InternalRegistry) func(t *testing.T) {
 
 	return func(t *testing.T) {
-		doTestCommit(m, t, m.F.CreateRefreshTokenSession, m.F.GetRefreshTokenSession, m.F.RevokeRefreshToken)
-		doTestCommit(m, t, m.F.CreateRefreshTokenSession, m.F.GetRefreshTokenSession, m.F.DeleteRefreshTokenSession)
+		doTestCommit(m, t, m.OAuth2Storage().CreateRefreshTokenSession, m.OAuth2Storage().GetRefreshTokenSession, m.OAuth2Storage().RevokeRefreshToken)
+		doTestCommit(m, t, m.OAuth2Storage().CreateRefreshTokenSession, m.OAuth2Storage().GetRefreshTokenSession, m.OAuth2Storage().DeleteRefreshTokenSession)
 	}
 }
 
-func testFositeSqlStoreTransactionRollbackRefreshToken(m ManagerTestSetup) func(t *testing.T) {
+func testFositeSqlStoreTransactionRollbackRefreshToken(m InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
-		doTestRollback(m, t, m.F.CreateRefreshTokenSession, m.F.GetRefreshTokenSession, m.F.RevokeRefreshToken)
-		doTestRollback(m, t, m.F.CreateRefreshTokenSession, m.F.GetRefreshTokenSession, m.F.DeleteRefreshTokenSession)
+		doTestRollback(m, t, m.OAuth2Storage().CreateRefreshTokenSession, m.OAuth2Storage().GetRefreshTokenSession, m.OAuth2Storage().RevokeRefreshToken)
+		doTestRollback(m, t, m.OAuth2Storage().CreateRefreshTokenSession, m.OAuth2Storage().GetRefreshTokenSession, m.OAuth2Storage().DeleteRefreshTokenSession)
 	}
 }
 
-func testFositeSqlStoreTransactionCommitAuthorizeCode(m ManagerTestSetup) func(t *testing.T) {
+func testFositeSqlStoreTransactionCommitAuthorizeCode(m InternalRegistry) func(t *testing.T) {
 
 	return func(t *testing.T) {
-		doTestCommit(m, t, m.F.CreateAuthorizeCodeSession, m.F.GetAuthorizeCodeSession, m.F.InvalidateAuthorizeCodeSession)
+		doTestCommit(m, t, m.OAuth2Storage().CreateAuthorizeCodeSession, m.OAuth2Storage().GetAuthorizeCodeSession, m.OAuth2Storage().InvalidateAuthorizeCodeSession)
 	}
 }
 
-func testFositeSqlStoreTransactionRollbackAuthorizeCode(m ManagerTestSetup) func(t *testing.T) {
+func testFositeSqlStoreTransactionRollbackAuthorizeCode(m InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
-		doTestRollback(m, t, m.F.CreateAuthorizeCodeSession, m.F.GetAuthorizeCodeSession, m.F.InvalidateAuthorizeCodeSession)
+		doTestRollback(m, t, m.OAuth2Storage().CreateAuthorizeCodeSession, m.OAuth2Storage().GetAuthorizeCodeSession, m.OAuth2Storage().InvalidateAuthorizeCodeSession)
 	}
 }
 
-func testFositeSqlStoreTransactionCommitPKCERequest(m ManagerTestSetup) func(t *testing.T) {
+func testFositeSqlStoreTransactionCommitPKCERequest(m InternalRegistry) func(t *testing.T) {
 
 	return func(t *testing.T) {
-		doTestCommit(m, t, m.F.CreatePKCERequestSession, m.F.GetPKCERequestSession, m.F.DeletePKCERequestSession)
+		doTestCommit(m, t, m.OAuth2Storage().CreatePKCERequestSession, m.OAuth2Storage().GetPKCERequestSession, m.OAuth2Storage().DeletePKCERequestSession)
 	}
 }
 
-func testFositeSqlStoreTransactionRollbackPKCERequest(m ManagerTestSetup) func(t *testing.T) {
+func testFositeSqlStoreTransactionRollbackPKCERequest(m InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
-		doTestRollback(m, t, m.F.CreatePKCERequestSession, m.F.GetPKCERequestSession, m.F.DeletePKCERequestSession)
+		doTestRollback(m, t, m.OAuth2Storage().CreatePKCERequestSession, m.OAuth2Storage().GetPKCERequestSession, m.OAuth2Storage().DeletePKCERequestSession)
 	}
 }
 
 // OpenIdConnect tests can't use the helper functions, due to the signature of GetOpenIdConnectSession being
 // different from the other getter methods
-func testFositeSqlStoreTransactionCommitOpenIdConnectSession(m ManagerTestSetup) func(t *testing.T) {
+func testFositeSqlStoreTransactionCommitOpenIdConnectSession(m InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
-		txnStore, ok := m.F.(storage.Transactional)
+		txnStore, ok := m.OAuth2Storage().(storage.Transactional)
 		require.True(t, ok)
 		ctx := context.Background()
 		ctx, err := txnStore.BeginTX(ctx)
 		require.NoError(t, err)
 		signature := uuid.New()
 		testRequest := createTestRequest(signature)
-		err = m.F.CreateOpenIDConnectSession(ctx, signature, testRequest)
+		err = m.OAuth2Storage().CreateOpenIDConnectSession(ctx, signature, testRequest)
 		require.NoError(t, err)
 		err = txnStore.Commit(ctx)
 		require.NoError(t, err)
 
 		// Require a new context, since the old one contains the transaction.
-		res, err := m.F.GetOpenIDConnectSession(context.Background(), signature, testRequest)
+		res, err := m.OAuth2Storage().GetOpenIDConnectSession(context.Background(), signature, testRequest)
 		// session should have been created successfully because Commit did not return an error
 		require.NoError(t, err)
 		AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 		// test delete within a transaction
 		ctx, err = txnStore.BeginTX(context.Background())
-		err = m.F.DeleteOpenIDConnectSession(ctx, signature)
+		err = m.OAuth2Storage().DeleteOpenIDConnectSession(ctx, signature)
 		require.NoError(t, err)
 		err = txnStore.Commit(ctx)
 		require.NoError(t, err)
 
 		// Require a new context, since the old one contains the transaction.
-		_, err = m.F.GetOpenIDConnectSession(context.Background(), signature, testRequest)
+		_, err = m.OAuth2Storage().GetOpenIDConnectSession(context.Background(), signature, testRequest)
 		// Since commit worked for delete, we should get an error here.
 		require.Error(t, err)
 	}
 }
 
-func testFositeSqlStoreTransactionRollbackOpenIdConnectSession(m ManagerTestSetup) func(t *testing.T) {
+func testFositeSqlStoreTransactionRollbackOpenIdConnectSession(m InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
-		txnStore, ok := m.F.(storage.Transactional)
+		txnStore, ok := m.OAuth2Storage().(storage.Transactional)
 		require.True(t, ok)
 		ctx := context.Background()
 		ctx, err := txnStore.BeginTX(ctx)
@@ -504,43 +496,43 @@ func testFositeSqlStoreTransactionRollbackOpenIdConnectSession(m ManagerTestSetu
 
 		signature := uuid.New()
 		testRequest := createTestRequest(signature)
-		err = m.F.CreateOpenIDConnectSession(ctx, signature, testRequest)
+		err = m.OAuth2Storage().CreateOpenIDConnectSession(ctx, signature, testRequest)
 		require.NoError(t, err)
 		err = txnStore.Rollback(ctx)
 		require.NoError(t, err)
 
 		// Require a new context, since the old one contains the transaction.
 		ctx = context.Background()
-		_, err = m.F.GetOpenIDConnectSession(ctx, signature, testRequest)
+		_, err = m.OAuth2Storage().GetOpenIDConnectSession(ctx, signature, testRequest)
 		// Since we rolled back above, the session should not exist and getting it should result in an error
 		require.Error(t, err)
 
 		// create a new session, delete it, then rollback the delete. We should be able to then get it.
 		signature2 := uuid.New()
 		testRequest2 := createTestRequest(signature2)
-		err = m.F.CreateOpenIDConnectSession(ctx, signature2, testRequest2)
+		err = m.OAuth2Storage().CreateOpenIDConnectSession(ctx, signature2, testRequest2)
 		require.NoError(t, err)
-		_, err = m.F.GetOpenIDConnectSession(ctx, signature2, testRequest2)
+		_, err = m.OAuth2Storage().GetOpenIDConnectSession(ctx, signature2, testRequest2)
 		require.NoError(t, err)
 
 		ctx, err = txnStore.BeginTX(context.Background())
-		err = m.F.DeleteOpenIDConnectSession(ctx, signature2)
+		err = m.OAuth2Storage().DeleteOpenIDConnectSession(ctx, signature2)
 		require.NoError(t, err)
 		err = txnStore.Rollback(ctx)
 
 		require.NoError(t, err)
-		_, err = m.F.GetOpenIDConnectSession(context.Background(), signature2, testRequest2)
+		_, err = m.OAuth2Storage().GetOpenIDConnectSession(context.Background(), signature2, testRequest2)
 		require.NoError(t, err)
 	}
 }
 
-func doTestCommit(m ManagerTestSetup, t *testing.T,
+func doTestCommit(m InternalRegistry, t *testing.T,
 	createFn func(context.Context, string, fosite.Requester) error,
 	getFn func(context.Context, string, fosite.Session) (fosite.Requester, error),
 	revokeFn func(context.Context, string) error,
 ) {
 
-	txnStore, ok := m.F.(storage.Transactional)
+	txnStore, ok := m.OAuth2Storage().(storage.Transactional)
 	require.True(t, ok)
 	ctx := context.Background()
 	ctx, err := txnStore.BeginTX(ctx)
@@ -570,12 +562,12 @@ func doTestCommit(m ManagerTestSetup, t *testing.T,
 	require.Error(t, err)
 }
 
-func doTestRollback(m ManagerTestSetup, t *testing.T,
+func doTestRollback(m InternalRegistry, t *testing.T,
 	createFn func(context.Context, string, fosite.Requester) error,
 	getFn func(context.Context, string, fosite.Session) (fosite.Requester, error),
 	revokeFn func(context.Context, string) error,
 ) {
-	txnStore, ok := m.F.(storage.Transactional)
+	txnStore, ok := m.OAuth2Storage().(storage.Transactional)
 	require.True(t, ok)
 
 	ctx := context.Background()

@@ -29,6 +29,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/ory/hydra/cmd/cli"
+
 	"github.com/spf13/cobra"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
@@ -54,8 +56,12 @@ func (t *transporter) RoundTrip(req *http.Request) (*http.Response, error) {
 // tokenClientCmd represents the self command
 var tokenClientCmd = &cobra.Command{
 	Use:   "client",
-	Short: "Generate an OAuth2 token the client grant type",
-	Long:  "This command uses the CLI's credentials to create an access token.",
+	Short: "An exemplary OAuth 2.0 Client performing the OAuth 2.0 Client Credentials Flow",
+	Long: `Performs the OAuth 2.0 Client Credentials Flow. This command will help you to see if ORY Hydra has
+been configured properly.
+
+This command should not be used for anything else than manual testing or demo purposes. The server will terminate on error
+and success.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{
 			Transport: &transporter{
@@ -78,8 +84,7 @@ var tokenClientCmd = &cobra.Command{
 
 		scopes := flagx.MustGetStringSlice(cmd, "scope")
 		audience := flagx.MustGetStringSlice(cmd, "audience")
-		cu, err := url.Parse(c.GetClusterURLWithoutTailingSlashOrFail(cmd))
-		cmdx.Must(err, `Unable to parse cluster url ("%s"): %s`, c.GetClusterURLWithoutTailingSlashOrFail(cmd), err)
+		cu := cli.RemoteURI(cmd)
 
 		clientID := flagx.MustGetString(cmd, "client-id")
 		clientSecret := flagx.MustGetString(cmd, "client-secret")

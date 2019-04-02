@@ -213,6 +213,8 @@ jobs:
       - run: docker login --username "$DOCKER_USERNAME" --password "$DOCKER_PASSWORD"
       - run: cp ./.releaser/LICENSE.txt ./LICENSE.txt
       - run: curl -sL https://git.io/goreleaser | bash
+      - run: docker tag oryd/hydra:latest oryd/hydra:$(echo $CIRCLE_TAG | tr '+' '_')
+      - run: docker push oryd/hydra:$(echo $CIRCLE_TAG | tr '+' '_')
 
 workflows:
   version: 2

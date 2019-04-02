@@ -4,8 +4,7 @@ project_name: hydra
 
 before:
   hooks:
-    - go mod download
-    - go mod tidy
+    - go install .
 builds:
   -
     binary: hydra

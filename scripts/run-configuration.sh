@@ -10,7 +10,7 @@ id: configuration
 title: Configuration
 ---
 
-\`\`\`
+\`\`\`yaml
 `cat ./docs/config.yaml`
 \`\`\`
 

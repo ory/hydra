@@ -65,7 +65,6 @@ scoop:
 
 dockers:
   - image_templates:
-      - "oryd/hydra:{{ .Tag }}"
       - "oryd/hydra:v{{ .Major }}"
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}"
       - "oryd/hydra:latest"

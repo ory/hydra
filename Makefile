@@ -27,8 +27,8 @@ test-resetdb:
 		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.6
 
 # Runs tests in short mode, without database adapters
-.PHONY: test-short
-test-short:
+.PHONY: quicktest
+quicktest:
 		go test -failfast -short ./...
 
 # Formats the code

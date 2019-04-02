@@ -35,6 +35,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jmoiron/sqlx"
+
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlcon/dockertest"
 
@@ -96,33 +98,30 @@ type clientCreator interface {
 // - [x] If `id_token_hint` is handled properly
 //   - [x] What happens if `id_token_hint` does not match the value from the handled authentication request ("accept login")
 func TestAuthCodeWithDefaultStrategy(t *testing.T) {
-	var mutex sync.Mutex
 	conf := internal.NewConfigurationWithDefaults()
 	regs := map[string]driver.Registry{
 		"memory": internal.NewRegistry(conf),
 	}
 
 	if !testing.Short() {
+		var p, m *sqlx.DB
 		dockertest.Parallel([]func(){
 			func() {
-				r := internal.NewRegistrySQL(conf, connectToPG(t))
-				_, err := r.CreateSchemas()
-				require.NoError(t, err)
-
-				mutex.Lock()
-				regs["postgres"] = r
-				mutex.Unlock()
+				p = connectToPG(t)
 			},
 			func() {
-				r := internal.NewRegistrySQL(conf, connectToMySQL(t))
-				_, err := r.CreateSchemas()
-				require.NoError(t, err)
-
-				mutex.Lock()
-				regs["mysql"] = r
-				mutex.Unlock()
+				m = connectToMySQL(t)
 			},
 		})
+		pr := internal.NewRegistrySQL(conf, p)
+		_, err := pr.CreateSchemas()
+		require.NoError(t, err)
+		regs["postgres"] = pr
+
+		mr := internal.NewRegistrySQL(conf, m)
+		_, err = mr.CreateSchemas()
+		require.NoError(t, err)
+		regs["mysql"] = mr
 	}
 
 	for km, reg := range regs {

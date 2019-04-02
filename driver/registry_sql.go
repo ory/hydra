@@ -81,21 +81,22 @@ func (m *RegistrySQL) DB() *sqlx.DB {
 func (m *RegistrySQL) CreateSchemas() (int, error) {
 	var total int
 
-	// Ensure dependencies exist
-	_, _, _, _ = m.ClientManager(), m.ConsentManager(), m.KeyManager(), m.OAuth2Storage()
-
-	for _, s := range []schemaCreator{
-		m.km.(schemaCreator),
-		m.cm.(schemaCreator),
-		m.com.(schemaCreator),
-		m.fs.(schemaCreator),
+	m.Logger().Debugf("Applying %s SQL migrations...", m.db.DriverName())
+	for k, s := range []schemaCreator{
+		m.KeyManager().(schemaCreator),
+		m.ClientManager().(schemaCreator),
+		m.ConsentManager().(schemaCreator),
+		m.OAuth2Storage().(schemaCreator),
 	} {
+		m.Logger().Debugf("Applying %s SQL migrations for manager: %T (%d)", m.db.DriverName(), s, k)
 		if c, err := s.CreateSchemas(); err != nil {
 			return c, err
 		} else {
+			m.Logger().Debugf("Successfully applied %d %s SQL migrations from manager: %T (%d)", c, m.db.DriverName(), s, k)
 			total += c
 		}
 	}
+	m.Logger().Debugf("Applied %d %s SQL migrations", total, m.db.DriverName())
 
 	return total, nil
 }

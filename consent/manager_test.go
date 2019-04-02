@@ -26,9 +26,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/oauth2"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/spf13/viper"
 
@@ -74,16 +71,7 @@ func TestMain(m *testing.M) {
 func createSQL(db *sqlx.DB) driver.Registry {
 	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistrySQL(conf, db)
-
-	if _, err := reg.ClientManager().(*client.SQLManager).CreateSchemas(); err != nil {
-		panic(err)
-	}
-
-	if _, err := reg.ConsentManager().(*SQLManager).CreateSchemas(); err != nil {
-		panic(err)
-	}
-
-	if _, err := reg.OAuth2Storage().(*oauth2.FositeSQLStore).CreateSchemas(); err != nil {
+	if _, err := reg.CreateSchemas(); err != nil {
 		panic(err)
 	}
 
@@ -96,17 +84,16 @@ func TestManagers(t *testing.T) {
 	regs["memory"] = internal.NewRegistry(conf)
 
 	if !testing.Short() {
+		var p, m *sqlx.DB
 		dockertest.Parallel([]func(){
 			func() {
-				m.Lock()
-				regs["postgres"] = createSQL(connectToPostgres(t))
-				m.Unlock()
+				p = connectToPostgres(t)
 			}, func() {
-				m.Lock()
-				regs["mysql"] = createSQL(connectToMySQL(t))
-				m.Unlock()
+				m = connectToMySQL(t)
 			},
 		})
+		regs["postgres"] = createSQL(p)
+		regs["mysql"] = createSQL(m)
 	}
 
 	for k, m := range regs {

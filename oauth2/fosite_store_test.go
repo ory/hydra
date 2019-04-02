@@ -23,7 +23,6 @@ package oauth2_test
 import (
 	"context"
 	"flag"
-	"sync"
 	"testing"
 
 	"github.com/ory/hydra/x"
@@ -34,7 +33,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/driver/configuration"
 
 	"github.com/ory/hydra/driver"
@@ -45,8 +43,6 @@ import (
 )
 
 var registries = make(map[string]driver.Registry)
-
-var m sync.Mutex
 
 func TestMain(m *testing.M) {
 	flag.Parse()
@@ -70,11 +66,7 @@ func connectToMySQL(t *testing.T) *sqlx.DB {
 
 func connectSQL(t *testing.T, conf *configuration.ViperProvider, db *sqlx.DB) driver.Registry {
 	reg := internal.NewRegistrySQL(conf, db)
-	_, err := reg.ClientManager().(*client.SQLManager).CreateSchemas()
-	require.NoError(t, err)
-	_, err = reg.ConsentManager().(*consent.SQLManager).CreateSchemas()
-	require.NoError(t, err)
-	_, err = reg.OAuth2Storage().(*FositeSQLStore).CreateSchemas()
+	_, err := reg.CreateSchemas()
 	require.NoError(t, err)
 	return reg
 }
@@ -87,19 +79,17 @@ func TestManagers(t *testing.T) {
 	registries["memory"] = reg
 
 	if !testing.Short() {
+		var p, m *sqlx.DB
 		dockertest.Parallel([]func(){
 			func() {
-				m.Lock()
-
-				registries["postgres"] = connectSQL(t, conf, connectToPG(t))
-				m.Unlock()
+				p = connectToPG(t)
 			},
 			func() {
-				m.Lock()
-				registries["mysql"] = connectSQL(t, conf, connectToMySQL(t))
-				m.Unlock()
+				m = connectToMySQL(t)
 			},
 		})
+		registries["postgres"] = connectSQL(t, conf, connectToPG(t))
+		registries["mysql"] = connectSQL(t, conf, connectToMySQL(t))
 	}
 
 	for k, store := range registries {

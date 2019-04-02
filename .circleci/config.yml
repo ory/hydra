@@ -229,20 +229,14 @@ workflows:
             tags:
               only: /.*/
       - test-e2e-opaque:
-          requires:
-            - test
           filters:
             tags:
               only: /.*/
       - test-e2e-jwt:
-          requires:
-            - test
           filters:
             tags:
               only: /.*/
       - test-e2e-plugin:
-          requires:
-            - test
           filters:
             tags:
               only: /.*/

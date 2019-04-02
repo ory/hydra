@@ -1371,7 +1371,7 @@
           "https"
         ],
         "tags": [
-          "admin"
+          "public"
         ],
         "summary": "Logs user out by deleting the session cookie",
         "operationId": "revokeUserLoginCookie",
@@ -1558,7 +1558,7 @@
             "oauth2": []
           }
         ],
-        "description": "Revoking a token (both access and refresh) means that the tokens will be invalid. A revoked access token can no\nlonger be used to make access requests, and a revoked refresh token can no longer be used to refresh an access token.\nRevoking a refresh token also invalidates the access token that was created with it.",
+        "description": "Revoking a token (both access and refresh) means that the tokens will be invalid. A revoked access token can no\nlonger be used to make access requests, and a revoked refresh token can no longer be used to refresh an access token.\nRevoking a refresh token also invalidates the access token that was created with it. A token may only be revoked by\nthe client the token was generated for.",
         "consumes": [
           "application/x-www-form-urlencoded"
         ],
@@ -1956,6 +1956,9 @@
     "acceptLoginRequest": {
       "type": "object",
       "title": "The request payload used to accept a login request.",
+      "required": [
+        "subject"
+      ],
       "properties": {
         "acr": {
           "description": "ACR sets the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it\nto express that, for example, a user authenticated using two factor authentication.",

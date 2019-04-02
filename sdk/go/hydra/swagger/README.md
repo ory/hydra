@@ -42,7 +42,6 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**RevokeAllUserConsentSessions**](docs/AdminApi.md#revokealluserconsentsessions) | **Delete** /oauth2/auth/sessions/consent/{user} | Revokes all previous consent sessions of a user
 *AdminApi* | [**RevokeAuthenticationSession**](docs/AdminApi.md#revokeauthenticationsession) | **Delete** /oauth2/auth/sessions/login/{user} | Invalidates a user&#39;s authentication session
 *AdminApi* | [**RevokeUserClientConsentSessions**](docs/AdminApi.md#revokeuserclientconsentsessions) | **Delete** /oauth2/auth/sessions/consent/{user}/{client} | Revokes consent sessions of a user for a specific OAuth 2.0 Client
-*AdminApi* | [**RevokeUserLoginCookie**](docs/AdminApi.md#revokeuserlogincookie) | **Get** /oauth2/auth/sessions/login/revoke | Logs user out by deleting the session cookie
 *AdminApi* | [**UpdateJsonWebKey**](docs/AdminApi.md#updatejsonwebkey) | **Put** /keys/{set}/{kid} | Update a JSON Web Key
 *AdminApi* | [**UpdateJsonWebKeySet**](docs/AdminApi.md#updatejsonwebkeyset) | **Put** /keys/{set} | Update a JSON Web Key Set
 *AdminApi* | [**UpdateOAuth2Client**](docs/AdminApi.md#updateoauth2client) | **Put** /clients/{id} | Update an OAuth 2.0 Client
@@ -52,6 +51,7 @@ Class | Method | HTTP request | Description
 *PublicApi* | [**Oauth2Token**](docs/PublicApi.md#oauth2token) | **Post** /oauth2/token | The OAuth 2.0 token endpoint
 *PublicApi* | [**OauthAuth**](docs/PublicApi.md#oauthauth) | **Get** /oauth2/auth | The OAuth 2.0 authorize endpoint
 *PublicApi* | [**RevokeOAuth2Token**](docs/PublicApi.md#revokeoauth2token) | **Post** /oauth2/revoke | Revoke OAuth2 tokens
+*PublicApi* | [**RevokeUserLoginCookie**](docs/PublicApi.md#revokeuserlogincookie) | **Get** /oauth2/auth/sessions/login/revoke | Logs user out by deleting the session cookie
 *PublicApi* | [**Userinfo**](docs/PublicApi.md#userinfo) | **Get** /userinfo | OpenID Connect Userinfo
 *PublicApi* | [**WellKnown**](docs/PublicApi.md#wellknown) | **Get** /.well-known/jwks.json | JSON Web Keys Discovery
 *VersionApi* | [**GetVersion**](docs/VersionApi.md#getversion) | **Get** /version | Get service version

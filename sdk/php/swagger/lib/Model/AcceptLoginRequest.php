@@ -168,6 +168,9 @@ class AcceptLoginRequest implements ArrayAccess
     {
         $invalid_properties = [];
 
+        if ($this->container['subject'] === null) {
+            $invalid_properties[] = "'subject' can't be null";
+        }
         return $invalid_properties;
     }
 
@@ -180,6 +183,9 @@ class AcceptLoginRequest implements ArrayAccess
     public function valid()
     {
 
+        if ($this->container['subject'] === null) {
+            return false;
+        }
         return true;
     }
 

@@ -84,15 +84,17 @@ func (m *RegistrySQL) CreateSchemas() (int, error) {
 	// Ensure dependencies exist
 	_, _, _, _ = m.ClientManager(), m.ConsentManager(), m.KeyManager(), m.OAuth2Storage()
 
-	for _, s := range []schemaCreator{
+	for k, s := range []schemaCreator{
 		m.km.(schemaCreator),
 		m.cm.(schemaCreator),
 		m.com.(schemaCreator),
 		m.fs.(schemaCreator),
 	} {
+		m.Logger().Debugf("Applying SQL migrations for manager: %T (%d)", s, k)
 		if c, err := s.CreateSchemas(); err != nil {
 			return c, err
 		} else {
+			m.Logger().Debugf("Successfully applied %d SQL migrations for manager: %T (%d)", c, s, k)
 			total += c
 		}
 	}

@@ -25,7 +25,6 @@ Method | HTTP request | Description
 [**RevokeAllUserConsentSessions**](AdminApi.md#RevokeAllUserConsentSessions) | **Delete** /oauth2/auth/sessions/consent/{user} | Revokes all previous consent sessions of a user
 [**RevokeAuthenticationSession**](AdminApi.md#RevokeAuthenticationSession) | **Delete** /oauth2/auth/sessions/login/{user} | Invalidates a user&#39;s authentication session
 [**RevokeUserClientConsentSessions**](AdminApi.md#RevokeUserClientConsentSessions) | **Delete** /oauth2/auth/sessions/consent/{user}/{client} | Revokes consent sessions of a user for a specific OAuth 2.0 Client
-[**RevokeUserLoginCookie**](AdminApi.md#RevokeUserLoginCookie) | **Get** /oauth2/auth/sessions/login/revoke | Logs user out by deleting the session cookie
 [**UpdateJsonWebKey**](AdminApi.md#UpdateJsonWebKey) | **Put** /keys/{set}/{kid} | Update a JSON Web Key
 [**UpdateJsonWebKeySet**](AdminApi.md#UpdateJsonWebKeySet) | **Put** /keys/{set} | Update a JSON Web Key Set
 [**UpdateOAuth2Client**](AdminApi.md#UpdateOAuth2Client) | **Put** /clients/{id} | Update an OAuth 2.0 Client
@@ -646,32 +645,6 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: application/json
- - **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **RevokeUserLoginCookie**
-> RevokeUserLoginCookie()
-
-Logs user out by deleting the session cookie
-
-This endpoint deletes ths user's login session cookie and redirects the browser to the url listed in `LOGOUT_REDIRECT_URL` environment variable. This endpoint does not work as an API but has to be called from the user's browser.
-
-
-### Parameters
-This endpoint does not need any parameter.
-
-### Return type
-
-void (empty response body)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: application/json, application/x-www-form-urlencoded
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

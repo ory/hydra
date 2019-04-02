@@ -43,15 +43,16 @@
    * Constructs a new <code>AcceptLoginRequest</code>.
    * @alias module:model/AcceptLoginRequest
    * @class
+   * @param subject {String} Subject is the user ID of the end-user that authenticated.
    */
-  var exports = function() {
+  var exports = function(subject) {
     var _this = this;
 
 
 
 
 
-
+    _this['subject'] = subject;
   };
 
   /**

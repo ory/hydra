@@ -583,7 +583,7 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 	})
 }
 
-// swagger:route GET /oauth2/auth/sessions/login/revoke admin revokeUserLoginCookie
+// swagger:route GET /oauth2/auth/sessions/login/revoke public revokeUserLoginCookie
 //
 // Logs user out by deleting the session cookie
 //

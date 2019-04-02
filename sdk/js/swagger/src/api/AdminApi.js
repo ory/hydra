@@ -1041,44 +1041,6 @@
     }
 
     /**
-     * Callback function to receive the result of the revokeUserLoginCookie operation.
-     * @callback module:api/AdminApi~revokeUserLoginCookieCallback
-     * @param {String} error Error message, if any.
-     * @param data This operation does not return a value.
-     * @param {String} response The complete HTTP response.
-     */
-
-    /**
-     * Logs user out by deleting the session cookie
-     * This endpoint deletes ths user&#39;s login session cookie and redirects the browser to the url listed in &#x60;LOGOUT_REDIRECT_URL&#x60; environment variable. This endpoint does not work as an API but has to be called from the user&#39;s browser.
-     * @param {module:api/AdminApi~revokeUserLoginCookieCallback} callback The callback function, accepting three arguments: error, data, response
-     */
-    this.revokeUserLoginCookie = function(callback) {
-      var postBody = null;
-
-
-      var pathParams = {
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
-
-      var authNames = [];
-      var contentTypes = ['application/json', 'application/x-www-form-urlencoded'];
-      var accepts = ['application/json'];
-      var returnType = null;
-
-      return this.apiClient.callApi(
-        '/oauth2/auth/sessions/login/revoke', 'GET',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
-    }
-
-    /**
      * Callback function to receive the result of the updateJsonWebKey operation.
      * @callback module:api/AdminApi~updateJsonWebKeyCallback
      * @param {String} error Error message, if any.

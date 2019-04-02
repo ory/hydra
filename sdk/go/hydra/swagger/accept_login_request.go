@@ -25,5 +25,5 @@ type AcceptLoginRequest struct {
 	RememberFor int64 `json:"remember_for,omitempty"`
 
 	// Subject is the user ID of the end-user that authenticated.
-	Subject string `json:"subject,omitempty"`
+	Subject string `json:"subject"`
 }

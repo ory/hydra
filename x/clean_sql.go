@@ -9,6 +9,7 @@ import (
 func CleanSQL(t *testing.T, db *sqlx.DB) {
 	t.Logf("Cleaning up database: %s", db.DriverName())
 	for _, tb := range []string{
+		"hydra_oauth2_access",
 		"hydra_oauth2_refresh",
 		"hydra_oauth2_code",
 		"hydra_oauth2_oidc",

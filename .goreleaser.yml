@@ -48,7 +48,7 @@ changelog:
 brew:
   github:
     owner: ory
-    name: homebrew-ory-hydra
+    name: homebrew-hydra
   homepage:  https://www.ory.sh
   commit_author:
     name: ory
@@ -57,7 +57,7 @@ brew:
 scoop:
   bucket:
     owner: ory
-    name: scoop-ory-hydra
+    name: scoop-hydra
   homepage:  https://www.ory.sh
   commit_author:
     name: ory

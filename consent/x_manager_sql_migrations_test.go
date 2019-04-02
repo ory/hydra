@@ -59,7 +59,6 @@ func cleanDB(t *testing.T, db *sqlx.DB) {
 	t.Logf("Unable to execute clean up query: %s", err)
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_client_migration")
 	t.Logf("Unable to execute clean up query: %s", err)
-
 	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_migration")
 	t.Logf("Unable to execute clean up query: %s", err)
 }

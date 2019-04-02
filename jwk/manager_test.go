@@ -22,9 +22,10 @@ package jwk_test
 
 import (
 	"fmt"
-	"log"
 	"sync"
 	"testing"
+
+	"github.com/ory/hydra/x"
 
 	"github.com/ory/hydra/internal"
 
@@ -47,21 +48,17 @@ func TestMain(m *testing.M) {
 	runner.Exit(m.Run())
 }
 
-func connectToPG() *SQLManager {
+func connectToPG(t *testing.T) *SQLManager {
 	db, err := dockertest.ConnectToTestPostgreSQL()
-	if err != nil {
-		log.Fatalf("Could not connect to database: %v", err)
-	}
-
+	require.NoError(t, err)
+	x.CleanSQL(t, db)
 	return internal.NewRegistrySQL(internal.NewConfigurationWithDefaults(), db).KeyManager().(*SQLManager)
 }
 
-func connectToMySQL() *SQLManager {
+func connectToMySQL(t *testing.T) *SQLManager {
 	db, err := dockertest.ConnectToTestMySQL()
-	if err != nil {
-		log.Fatalf("Could not connect to database: %v", err)
-	}
-
+	require.NoError(t, err)
+	x.CleanSQL(t, db)
 	return internal.NewRegistrySQL(internal.NewConfigurationWithDefaults(), db).KeyManager().(*SQLManager)
 }
 
@@ -74,12 +71,12 @@ func TestManager(t *testing.T) {
 		dockertest.Parallel([]func(){
 			func() {
 				m.Lock()
-				managers["postgres"] = connectToPG()
+				managers["postgres"] = connectToPG(t)
 				m.Unlock()
 			},
 			func() {
 				m.Lock()
-				managers["mysql"] = connectToMySQL()
+				managers["mysql"] = connectToMySQL(t)
 				m.Unlock()
 			},
 		})

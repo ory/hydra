@@ -26,6 +26,8 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/ory/hydra/x"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -55,20 +57,14 @@ func TestMain(m *testing.M) {
 func connectToPG(t *testing.T) *sqlx.DB {
 	db, err := dockertest.ConnectToTestPostgreSQL()
 	require.NoError(t, err)
-	t.Logf("Cleaning postgres db...")
-	cleanDB(t, db)
-	t.Logf("Cleaned postgres db")
-
+	x.CleanSQL(t, db)
 	return db
 }
 
 func connectToMySQL(t *testing.T) *sqlx.DB {
 	db, err := dockertest.ConnectToTestMySQL()
 	require.NoError(t, err)
-	t.Logf("Cleaning mysql db...")
-	cleanDB(t, db)
-	t.Logf("Cleaned mysql db")
-
+	x.CleanSQL(t, db)
 	return db
 }
 
@@ -112,7 +108,7 @@ func TestManagers(t *testing.T) {
 
 	for _, m := range registries {
 		if mm, ok := m.(*driver.RegistrySQL); ok {
-			cleanDB(t, mm.DB())
+			x.CleanSQL(t, mm.DB())
 		}
 	}
 }

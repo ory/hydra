@@ -36,7 +36,6 @@ import (
 func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.TODO()
-		t.Parallel()
 		c := &Client{
 			ClientID:          "foo",
 			Secret:            "secret",
@@ -52,7 +51,6 @@ func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
 func TestHelperClientAuthenticate(k string, m Manager) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.TODO()
-		t.Parallel()
 		m.CreateClient(ctx, &Client{
 			ClientID:     "1234321",
 			Secret:       "secret",
@@ -70,7 +68,6 @@ func TestHelperClientAuthenticate(k string, m Manager) func(t *testing.T) {
 
 func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 	return func(t *testing.T) {
-		t.Parallel()
 		ctx := context.TODO()
 		_, err := m.GetClient(ctx, "4321")
 		assert.NotNil(t, err)

@@ -25,6 +25,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/ory/hydra/x"
+
 	"github.com/ory/hydra/internal"
 
 	"github.com/jmoiron/sqlx"
@@ -50,18 +52,12 @@ func TestXXMigrations(t *testing.T) {
 
 	require.True(t, len(client.Migrations[dbal.DriverMySQL].Box.List()) == len(client.Migrations[dbal.DriverPostgreSQL].Box.List()))
 
-	var clean = func(t *testing.T, db *sqlx.DB) {
-		_, err := db.Exec("DROP TABLE IF EXISTS hydra_jwk")
-		t.Logf("Unable to execute clean up query: %s", err)
-		_, err = db.Exec("DROP TABLE IF EXISTS hydra_jwk_migration")
-		t.Logf("Unable to execute clean up query: %s", err)
-	}
-
 	migratest.RunPackrMigrationTests(
 		t,
 		migratest.MigrationSchemas{Migrations},
 		migratest.MigrationSchemas{createMigrations},
-		clean, clean,
+		x.CleanSQL,
+		x.CleanSQL,
 		func(t *testing.T, db *sqlx.DB, k, m, steps int) {
 			t.Run(fmt.Sprintf("poll=%d", k), func(t *testing.T) {
 				conf := internal.NewConfigurationWithDefaults()

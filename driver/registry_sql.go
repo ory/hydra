@@ -85,10 +85,10 @@ func (m *RegistrySQL) CreateSchemas() (int, error) {
 	_, _, _, _ = m.ClientManager(), m.ConsentManager(), m.KeyManager(), m.OAuth2Storage()
 
 	for _, s := range []schemaCreator{
+		m.km.(schemaCreator),
 		m.cm.(schemaCreator),
 		m.com.(schemaCreator),
 		m.fs.(schemaCreator),
-		m.km.(schemaCreator),
 	} {
 		if c, err := s.CreateSchemas(); err != nil {
 			return c, err

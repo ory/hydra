@@ -9,8 +9,10 @@ before:
     - go mod download
 builds:
   -
+    flags:
+      - -a
     ldflags:
-      - -s -w -X main.Version={{.Tag}} -X main.Commit={{.FullCommit}} -X main.Date={{.Date}}
+      - -s -w -X github.com/ory/hydra/cmd.Version={{.Tag}} -X github.com/ory/hydra/cmd.Commit={{.FullCommit}} -X github.com/ory/hydra/cmd.Date={{.Date}}
     binary: hydra
     env:
       - CGO_ENABLED=0
@@ -68,6 +70,7 @@ dockers:
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}"
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
       - "oryd/hydra:{{ .Env.DOCKER_FULL_TAG }}"
+      - "oryd/hydra:{{ .Env.DOCKER_SHORT_TAG }}"
       - "oryd/hydra:latest"
     extra_files:
       - .releaser/LICENSE.txt

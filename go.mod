@@ -1,13 +1,12 @@
 module github.com/ory/hydra
 
 require (
-	cloud.google.com/go v0.37.1 // indirect
+	cloud.google.com/go v0.37.2 // indirect
 	github.com/Microsoft/go-winio v0.4.12 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-errors/errors v1.0.1
 	github.com/go-openapi/analysis v0.19.0 // indirect
 	github.com/go-openapi/errors v0.19.0 // indirect
-	github.com/go-openapi/inflect v0.19.0 // indirect
 	github.com/go-openapi/loads v0.19.0 // indirect
 	github.com/go-openapi/runtime v0.19.0 // indirect
 	github.com/go-openapi/spec v0.19.0 // indirect
@@ -16,7 +15,6 @@ require (
 	github.com/go-openapi/validate v0.19.0 // indirect
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/go-swagger/go-swagger v0.19.0
-	github.com/go-swagger/scan-repo-boundary v0.0.0-20180623220736-973b3573c013 // indirect
 	github.com/gobuffalo/packd v0.0.0-20190315124812-a385830c7fc0 // indirect
 	github.com/gobuffalo/packr v1.24.0
 	github.com/gobwas/glob v0.2.3
@@ -48,14 +46,14 @@ require (
 	github.com/ory/go-convenience v0.1.0
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.6.0
-	github.com/ory/x v0.0.39
+	github.com/ory/x v0.0.40
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.8.1
 	github.com/pkg/profile v1.3.0 // indirect
 	github.com/prometheus/client_golang v0.9.3-0.20190127221311-3c4408c8b829
 	github.com/prometheus/client_model v0.0.0-20190129233127-fd36f4220a90 // indirect
-	github.com/prometheus/procfs v0.0.0-20190322151404-55ae3d9d5573 // indirect
+	github.com/prometheus/procfs v0.0.0-20190328153300-af7bedc223fb // indirect
 	github.com/rs/cors v1.6.0
 	github.com/rubenv/sql-migrate v0.0.0-20190212093014-1007f53448d7
 	github.com/sawadashota/encrypta v0.0.2
@@ -69,13 +67,13 @@ require (
 	github.com/uber/jaeger-client-go v2.16.0+incompatible
 	github.com/uber/jaeger-lib v2.0.0+incompatible // indirect
 	github.com/urfave/negroni v1.0.0
+	go.opencensus.io v0.20.0 // indirect
 	golang.org/x/crypto v0.0.0-20190325154230-a5d413f7728c
 	golang.org/x/net v0.0.0-20190326090315-15845e8f865b // indirect
 	golang.org/x/oauth2 v0.0.0-20190319182350-c85d3e98c914
 	golang.org/x/sys v0.0.0-20190322080309-f49334f85ddc // indirect
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
-	golang.org/x/tools v0.0.0-20190315044204-8b67d361bba2
-	google.golang.org/api v0.3.0 // indirect
+	golang.org/x/tools v0.0.0-20190402200628-202502a5a924
 	google.golang.org/appengine v1.5.0 // indirect
 	google.golang.org/genproto v0.0.0-20190321212433-e79c0c59cdb5 // indirect
 	google.golang.org/grpc v1.19.1 // indirect

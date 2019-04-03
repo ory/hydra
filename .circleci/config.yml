@@ -208,6 +208,7 @@ jobs:
           command: |
             echo 'export GO111MODULE=on' >> $BASH_ENV
             echo 'export DOCKER_FULL_TAG=$(echo $CIRCLE_TAG | tr '+' '_')' >> $BASH_ENV
+            echo 'export DOCKER_SHORT_TAG=$(echo $CIRCLE_TAG | cut -d '+' -f1)' >> $BASH_ENV
             source $BASH_ENV
       - checkout
       - setup_remote_docker

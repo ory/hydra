@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [v1.0.0-rc.8+oryOS.10 (2019-04-03)](#v100-rc8oryos10-2019-04-03)
   - [v1.0.0-rc.7+oryOS.10 (2019-04-02)](#v100-rc7oryos10-2019-04-02)
   - [v1.0.0-rc.6+oryOS.10 (2018-12-18)](#v100-rc6oryos10-2018-12-18)
   - [v1.0.0-rc.5+oryOS.10 (2018-12-13)](#v100-rc5oryos10-2018-12-13)
@@ -141,6 +142,13 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Change Log
+
+## [v1.0.0-rc.8+oryOS.10](https://github.com/ory/hydra/tree/v1.0.0-rc.8+oryOS.10) (2019-04-03)
+[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.7+oryOS.10...v1.0.0-rc.8+oryOS.10)
+
+**Merged pull requests:**
+
+- ci: Fix broken version info in build [\#1342](https://github.com/ory/hydra/pull/1342) ([aeneasr](https://github.com/aeneasr))
 
 ## [v1.0.0-rc.7+oryOS.10](https://github.com/ory/hydra/tree/v1.0.0-rc.7+oryOS.10) (2019-04-02)
 [Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.6+oryOS.10...v1.0.0-rc.7+oryOS.10)

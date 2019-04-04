@@ -70,7 +70,7 @@ func EnhanceMiddleware(d driver.Driver, n *negroni.Negroni, address string, rout
 
 func isDSNAllowed(d driver.Driver) {
 	if d.Configuration().DSN() == "memory" {
-		d.Registry().Logger().Fatalf(`When using "hydra serve admin" or "hydra serve public" the DATABASE_URL can not be set to "memory".`)
+		d.Registry().Logger().Fatalf(`When using "hydra serve admin" or "hydra serve public" the DSN can not be set to "memory".`)
 	}
 }
 

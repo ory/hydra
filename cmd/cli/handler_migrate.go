@@ -49,7 +49,7 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 		if len(d.Configuration().DSN()) == 0 {
 			fmt.Println(cmd.UsageString())
 			fmt.Println("")
-			fmt.Println("When using flag -e, environment variable DATABASE_URL must be set")
+			fmt.Println("When using flag -e, environment variable DSN must be set")
 			os.Exit(1)
 			return
 		}

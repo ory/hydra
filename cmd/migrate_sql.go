@@ -33,7 +33,7 @@ It is recommended to run this command close to the SQL instance (e.g. same subne
 This decreases risk of failure and decreases time required.
 
 You can read in the database URL using the -e flag, for example:
-	export DATABASE_URL=...
+	export DSN=...
 	hydra migrate sql -e
 
 ### WARNING ###

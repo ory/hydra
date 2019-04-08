@@ -95,3 +95,16 @@ sdks:
 		rm -f ./sdk/php/swagger/composer.json ./sdk/php/swagger/phpunit.xml.dist
 		rm -rf ./sdk/php/swagger/test
 		rm -rf ./vendor
+
+.PHONY: install-stable
+install-stable:
+		HYDRA_LATEST=$$(git describe --abbrev=0 --tags)
+		git checkout $$HYDRA_LATEST
+		GO111MODULE=on go install \
+				-ldflags "-X github.com/ory/hydra/cmd.Version=$$HYDRA_LATEST -X github.com/ory/hydra/cmd.Date=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory/hydra/cmd.Commit=`git rev-parse HEAD`" \
+				.
+		git checkout master
+
+.PHONY: install
+install:
+		GO111MODULE=on go install .

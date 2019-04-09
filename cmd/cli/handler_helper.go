@@ -31,6 +31,7 @@ import (
 	"github.com/spf13/cobra"
 
 	httptransport "github.com/go-openapi/runtime/client"
+
 	hydra "github.com/ory/hydra/sdk/go/hydra/client"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
@@ -63,11 +64,10 @@ func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
 
 func configureClientBase(cmd *cobra.Command, withAuth bool) *hydra.OryHydra {
 	u := RemoteURI(cmd)
-	ht := httptransport.NewWithClient(
+	ht := httptransport.New(
 		u.Host,
 		u.Path,
 		[]string{u.Scheme},
-		http.DefaultClient,
 	)
 
 	ht.Transport = newTransport(cmd)

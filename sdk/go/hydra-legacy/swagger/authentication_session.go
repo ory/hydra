@@ -14,10 +14,10 @@ import (
 	"time"
 )
 
-// AuthenticationSession AuthenticationSession authentication session
+// AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession authentication session
 type AuthenticationSession struct {
 
-	// authenticated at Format: date-time Format: date-time
+	// authenticated at Format: date-time Format: date-time Format: date-time Format: date-time
 	AuthenticatedAt time.Time `json:"AuthenticatedAt,omitempty"`
 
 	// ID

@@ -25,8 +25,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/ory/hydra/sdk/go/hydra/client/admin"
-	"github.com/ory/x/urlx"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -35,6 +33,9 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/ory/hydra/sdk/go/hydra/client/admin"
+	"github.com/ory/x/urlx"
 
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/oauth2"
@@ -45,7 +46,6 @@ import (
 
 var hydraURL = urlx.ParseOrPanic(os.Getenv("HYDRA_ADMIN_URL"))
 var sdk = hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{hydraURL.Scheme}, Host: hydraURL.Host, BasePath: hydraURL.Path})
-
 
 type oauth2token struct {
 	IDToken      string    `json:"id_token"`

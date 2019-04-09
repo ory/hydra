@@ -88,8 +88,8 @@ sdk:
 
 		cd sdk/go; goreturns -w -i -local github.com/ory $$(listx .)
 
-		git checkout HEAD -- sdk/go/hydra/swagger/configuration.go
-		git checkout HEAD -- sdk/go/hydra/swagger/api_client.go
+		git checkout HEAD -- sdk/go/hydra-legacy/swagger/configuration.go
+		git checkout HEAD -- sdk/go/hydra-legacy/swagger/api_client.go
 
 		rm -f ./sdk/js/swagger/package.json
 		rm -rf ./sdk/js/swagger/test

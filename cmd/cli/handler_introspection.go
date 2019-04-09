@@ -22,14 +22,17 @@ package cli
 
 import (
 	"fmt"
+	"strings" //"encoding/json"
+
 	"github.com/go-openapi/runtime"
+
 	"github.com/ory/hydra/sdk/go/hydra/client/admin"
 	"github.com/ory/x/pointerx"
-	"strings" //"encoding/json"
 
 	"github.com/spf13/cobra"
 
 	httptransport "github.com/go-openapi/runtime/client"
+
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx" //"context"
 )

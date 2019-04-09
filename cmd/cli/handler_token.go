@@ -22,15 +22,18 @@ package cli
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/go-openapi/strfmt"
+
 	"github.com/ory/hydra/sdk/go/hydra/client/admin"
 	"github.com/ory/hydra/sdk/go/hydra/client/public"
 	"github.com/ory/hydra/sdk/go/hydra/models"
-	"time"
 
 	"github.com/spf13/cobra"
 
 	httptransport "github.com/go-openapi/runtime/client"
+
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
 )

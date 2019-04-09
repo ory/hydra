@@ -106,7 +106,7 @@ func TestSDK(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge("challenge1"))
-	require.NoError(t, err)
+	require.Error(t, err)
 
 	crGot, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge("challenge2"))
 	require.NoError(t, err)

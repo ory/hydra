@@ -63,9 +63,9 @@ func TestJWKSDK(t *testing.T) {
 			}))
 			require.NoError(t, err)
 			require.Len(t, resultKeys.Payload.Keys, 1)
-			assert.Equal(t, "key-bar", resultKeys.Payload.Keys[0].Kid)
-			assert.Equal(t, "HS256", resultKeys.Payload.Keys[0].Alg)
-			assert.Equal(t, "sig", resultKeys.Payload.Keys[0].Use)
+			assert.Equal(t, "key-bar", *resultKeys.Payload.Keys[0].Kid)
+			assert.Equal(t, "HS256", *resultKeys.Payload.Keys[0].Alg)
+			assert.Equal(t, "sig", *resultKeys.Payload.Keys[0].Use)
 		})
 
 		var resultKeys *models.SwaggerJSONWebKeySet
@@ -73,8 +73,8 @@ func TestJWKSDK(t *testing.T) {
 			result, err := sdk.Admin.GetJSONWebKey(admin.NewGetJSONWebKeyParams().WithKid("key-bar").WithSet("set-foo"))
 			require.NoError(t, err)
 			require.Len(t, result.Payload.Keys, 1)
-			require.Equal(t, "key-bar", result.Payload.Keys[0].Kid)
-			require.Equal(t, "HS256", result.Payload.Keys[0].Alg)
+			require.Equal(t, "key-bar", *result.Payload.Keys[0].Kid)
+			require.Equal(t, "HS256", *result.Payload.Keys[0].Alg)
 
 			resultKeys = result.Payload
 		})
@@ -85,8 +85,8 @@ func TestJWKSDK(t *testing.T) {
 
 			resultKey, err := sdk.Admin.UpdateJSONWebKey(admin.NewUpdateJSONWebKeyParams().WithKid("key-bar").WithSet("set-foo").WithBody(resultKeys.Keys[0]))
 			require.NoError(t, err)
-			assert.Equal(t, "key-bar", resultKey.Payload.Kid)
-			assert.Equal(t, "RS256", resultKey.Payload.Alg)
+			assert.Equal(t, "key-bar", *resultKey.Payload.Kid)
+			assert.Equal(t, "RS256", *resultKey.Payload.Alg)
 		})
 
 		t.Run("DeleteJwkSetKey after delete", func(t *testing.T) {
@@ -110,16 +110,16 @@ func TestJWKSDK(t *testing.T) {
 			require.NoError(t, err)
 
 			require.Len(t, resultKeys.Payload.Keys, 1)
-			assert.Equal(t, "key-bar", resultKeys.Payload.Keys[0].Kid)
-			assert.Equal(t, "HS256", resultKeys.Payload.Keys[0].Alg)
+			assert.Equal(t, "key-bar", *resultKeys.Payload.Keys[0].Kid)
+			assert.Equal(t, "HS256", *resultKeys.Payload.Keys[0].Alg)
 		})
 
 		resultKeys, err := sdk.Admin.GetJSONWebKeySet(admin.NewGetJSONWebKeySetParams().WithSet("set-foo2"))
 		t.Run("GetJwkSet after create", func(t *testing.T) {
 			require.NoError(t, err)
 			require.Len(t, resultKeys.Payload.Keys, 1)
-			assert.Equal(t, "key-bar", resultKeys.Payload.Keys[0].Kid)
-			assert.Equal(t, "HS256", resultKeys.Payload.Keys[0].Alg)
+			assert.Equal(t, "key-bar", *resultKeys.Payload.Keys[0].Kid)
+			assert.Equal(t, "HS256", *resultKeys.Payload.Keys[0].Alg)
 		})
 
 		t.Run("UpdateJwkSet", func(t *testing.T) {
@@ -129,8 +129,8 @@ func TestJWKSDK(t *testing.T) {
 			result, err := sdk.Admin.UpdateJSONWebKeySet(admin.NewUpdateJSONWebKeySetParams().WithSet("set-foo2").WithBody(resultKeys.Payload))
 			require.NoError(t, err)
 			require.Len(t, result.Payload.Keys, 1)
-			assert.Equal(t, "key-bar", result.Payload.Keys[0].Kid)
-			assert.Equal(t, "RS256", result.Payload.Keys[0].Alg)
+			assert.Equal(t, "key-bar", *result.Payload.Keys[0].Kid)
+			assert.Equal(t, "RS256", *result.Payload.Keys[0].Alg)
 		})
 
 		t.Run("DeleteJwkSet", func(t *testing.T) {

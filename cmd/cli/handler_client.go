@@ -23,11 +23,12 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/ory/hydra/sdk/go/hydra/client/admin"
 	"github.com/ory/hydra/sdk/go/hydra/models"
 	"github.com/ory/x/pointerx"
-	"os"
-	"strings"
 
 	"github.com/spf13/cobra"
 

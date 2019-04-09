@@ -21,14 +21,15 @@
 package main
 
 import (
-	"github.com/ory/hydra/sdk/go/hydra/client/admin"
-	"github.com/ory/hydra/sdk/go/hydra/models"
-	"github.com/ory/x/pointerx"
-	"github.com/ory/x/urlx"
 	"log"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/ory/hydra/sdk/go/hydra/client/admin"
+	"github.com/ory/hydra/sdk/go/hydra/models"
+	"github.com/ory/x/pointerx"
+	"github.com/ory/x/urlx"
 
 	hydra "github.com/ory/hydra/sdk/go/hydra/client"
 )

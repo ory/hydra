@@ -300,7 +300,7 @@ func TestStrategy(t *testing.T) {
 					assert.EqualValues(t, "user", lr.Subject)
 					assert.NotEmpty(t, lr.LoginChallenge)
 					assert.Empty(t, lr.LoginSessionID)
-					assert.EqualValues(t, models.OpenIDConnectContext{ACRValues: []string{"1", "2"}, Display: "page", UILocales: []string{"de", "en"}}, lr.OidcContext)
+					assert.EqualValues(t, &models.OpenIDConnectContext{ACRValues: []string{"1", "2"}, Display: "page", UILocales: []string{"de", "en"}}, lr.OidcContext)
 					w.WriteHeader(http.StatusNoContent)
 				}
 			},
@@ -569,10 +569,8 @@ func TestStrategy(t *testing.T) {
 							RememberFor: 0,
 							ACR:         "1",
 						}))
-					require.NoError(t, err)
-					v := vr.Payload
-
-					require.Empty(t, v.RedirectTo)
+					require.Error(t, err)
+					require.Empty(t, vr)
 					w.WriteHeader(http.StatusBadRequest)
 				}
 			},

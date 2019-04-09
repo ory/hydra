@@ -154,8 +154,7 @@ func (h *Handler) DeleteUserClientConsentSession(w http.ResponseWriter, r *http.
 //
 //     Responses:
 //       200: handledConsentRequestList
-//       401: genericError
-//       403: genericError
+//       404: genericError
 //       500: genericError
 func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	user := ps.ByName("user")
@@ -242,7 +241,7 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 //
 //     Responses:
 //       200: loginRequest
-//       401: genericError
+//       404: genericError
 //       409: genericError
 //       500: genericError
 func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -288,6 +287,7 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 //
 //     Responses:
 //       200: completedRequest
+//       404: genericError
 //       401: genericError
 //       500: genericError
 func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -365,6 +365,7 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //     Responses:
 //       200: completedRequest
 //       401: genericError
+//       404: genericError
 //       500: genericError
 func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var p RequestDeniedError
@@ -427,7 +428,7 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //
 //     Responses:
 //       200: consentRequest
-//       401: genericError
+//       404: genericError
 //       409: genericError
 //       500: genericError
 func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -476,7 +477,7 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 //
 //     Responses:
 //       200: completedRequest
-//       401: genericError
+//       404: genericError
 //       500: genericError
 func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var p HandledConsentRequest
@@ -545,7 +546,7 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 //
 //     Responses:
 //       200: completedRequest
-//       401: genericError
+//       404: genericError
 //       500: genericError
 func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var p RequestDeniedError

@@ -537,7 +537,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "201": {
             "description": "JSONWebKeySet",
             "schema": {
               "$ref": "#/definitions/JSONWebKeySet"
@@ -869,7 +869,7 @@
               "$ref": "#/definitions/consentRequest"
             }
           },
-          "401": {
+          "404": {
             "description": "genericError",
             "schema": {
               "$ref": "#/definitions/genericError"
@@ -931,7 +931,7 @@
               "$ref": "#/definitions/completedRequest"
             }
           },
-          "401": {
+          "404": {
             "description": "genericError",
             "schema": {
               "$ref": "#/definitions/genericError"
@@ -987,7 +987,7 @@
               "$ref": "#/definitions/completedRequest"
             }
           },
-          "401": {
+          "404": {
             "description": "genericError",
             "schema": {
               "$ref": "#/definitions/genericError"
@@ -1036,7 +1036,7 @@
               "$ref": "#/definitions/loginRequest"
             }
           },
-          "401": {
+          "404": {
             "description": "genericError",
             "schema": {
               "$ref": "#/definitions/genericError"
@@ -1104,6 +1104,12 @@
               "$ref": "#/definitions/genericError"
             }
           },
+          "404": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          },
           "500": {
             "description": "genericError",
             "schema": {
@@ -1160,6 +1166,12 @@
               "$ref": "#/definitions/genericError"
             }
           },
+          "404": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          },
           "500": {
             "description": "genericError",
             "schema": {
@@ -1200,13 +1212,7 @@
           "200": {
             "$ref": "#/responses/handledConsentRequestList"
           },
-          "401": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          },
-          "403": {
+          "404": {
             "description": "genericError",
             "schema": {
               "$ref": "#/definitions/genericError"
@@ -1699,7 +1705,7 @@
   "definitions": {
     "AuthenticationRequest": {
       "type": "object",
-      "title": "AuthenticationRequest Contains information on an ongoing login request.",
+      "title": "AuthenticationRequest AuthenticationRequest AuthenticationRequest Contains information on an ongoing login request.",
       "properties": {
         "challenge": {
           "description": "Challenge is the identifier (\"authentication challenge\") of the consent authentication request. It is used to\nidentify the session.",
@@ -1752,11 +1758,11 @@
       "x-go-package": "github.com/ory/hydra/sdk/go/hydra/models"
     },
     "AuthenticationSession": {
-      "description": "AuthenticationSession AuthenticationSession authentication session",
+      "description": "AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession authentication session",
       "type": "object",
       "properties": {
         "AuthenticatedAt": {
-          "description": "authenticated at\nFormat: date-time\nFormat: date-time",
+          "description": "authenticated at\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         },
@@ -1935,7 +1941,7 @@
     },
     "ConsentRequest": {
       "type": "object",
-      "title": "ConsentRequest ConsentRequest Contains information on an ongoing consent request.",
+      "title": "ConsentRequest Contains information on an ongoing consent request.",
       "properties": {
         "acr": {
           "description": "ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it\nto express that, for example, a user authenticated using two factor authentication.",
@@ -1999,7 +2005,7 @@
     },
     "ConsentRequestSessionData": {
       "type": "object",
-      "title": "ConsentRequestSessionData Used to pass session data to a consent request.",
+      "title": "ConsentRequestSessionData ConsentRequestSessionData ConsentRequestSessionData Used to pass session data to a consent request.",
       "properties": {
         "access_token": {
           "description": "AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the\nrefresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection.\nIf only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties\ncan access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!",
@@ -2026,11 +2032,11 @@
       "x-go-package": "github.com/ory/hydra/sdk/go/hydra/models"
     },
     "FlushInactiveOAuth2TokensRequest": {
-      "description": "FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest flush inactive o auth2 tokens request",
+      "description": "FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest flush inactive o auth2 tokens request",
       "type": "object",
       "properties": {
         "notAfter": {
-          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.\nFormat: date-time\nFormat: date-time",
+          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time",
           "type": "string",
           "format": "date-time",
           "x-go-name": "NotAfter"
@@ -2072,7 +2078,7 @@
     },
     "HandledAuthenticationRequest": {
       "type": "object",
-      "title": "HandledAuthenticationRequest HandledAuthenticationRequest The request payload used to accept a login request.",
+      "title": "HandledAuthenticationRequest The request payload used to accept a login request.",
       "required": [
         "subject"
       ],
@@ -2108,7 +2114,7 @@
     },
     "HandledConsentRequest": {
       "type": "object",
-      "title": "HandledConsentRequest HandledConsentRequest The request payload used to accept a consent request.",
+      "title": "HandledConsentRequest HandledConsentRequest HandledConsentRequest HandledConsentRequest The request payload used to accept a consent request.",
       "properties": {
         "grant_access_token_audience": {
           "description": "GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.",
@@ -2146,7 +2152,7 @@
     "Introspection": {
       "description": "https://tools.ietf.org/html/rfc7662",
       "type": "object",
-      "title": "Introspection Introspection Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
+      "title": "Introspection Introspection Introspection Introspection Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
       "required": [
         "active"
       ],
@@ -2350,7 +2356,7 @@
     },
     "OpenIDConnectContext": {
       "type": "object",
-      "title": "OpenIDConnectContext OpenIDConnectContext Contains optional information about the OpenID Connect request.",
+      "title": "OpenIDConnectContext OpenIDConnectContext OpenIDConnectContext OpenIDConnectContext Contains optional information about the OpenID Connect request.",
       "properties": {
         "acr_values": {
           "description": "ACRValues is the Authentication AuthorizationContext Class Reference requested in the OAuth 2.0 Authorization request.\nIt is a parameter defined by OpenID Connect and expresses which level of authentication (e.g. 2FA) is required.\n\nOpenID Connect defines it as follows:\n\u003e Requested Authentication AuthorizationContext Class Reference values. Space-separated string that specifies the acr values\nthat the Authorization Server is being requested to use for processing this Authentication Request, with the\nvalues appearing in order of preference. The Authentication AuthorizationContext Class satisfied by the authentication\nperformed is returned as the acr Claim Value, as specified in Section 2. The acr Claim is requested as a\nVoluntary Claim by this parameter.",
@@ -2464,7 +2470,7 @@
     },
     "RequestHandlerResponse": {
       "type": "object",
-      "title": "RequestHandlerResponse RequestHandlerResponse The response payload sent when accepting or rejecting a login or consent request.",
+      "title": "RequestHandlerResponse The response payload sent when accepting or rejecting a login or consent request.",
       "properties": {
         "redirect_to": {
           "description": "RedirectURL is the URL which you should redirect the user to once the authentication process is completed.",

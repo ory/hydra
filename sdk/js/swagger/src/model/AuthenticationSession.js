@@ -41,6 +41,7 @@
 
   /**
    * Constructs a new <code>AuthenticationSession</code>.
+   * AuthenticationSession AuthenticationSession authentication session
    * @alias module:model/AuthenticationSession
    * @class
    */
@@ -77,14 +78,17 @@
   }
 
   /**
+   * authenticated at Format: date-time Format: date-time
    * @member {Date} AuthenticatedAt
    */
   exports.prototype['AuthenticatedAt'] = undefined;
   /**
+   * ID
    * @member {String} ID
    */
   exports.prototype['ID'] = undefined;
   /**
+   * subject
    * @member {String} Subject
    */
   exports.prototype['Subject'] = undefined;

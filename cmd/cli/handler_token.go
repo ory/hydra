@@ -22,23 +22,20 @@ package cli
 
 import (
 	"fmt"
-	"net/http"
+	"github.com/go-openapi/strfmt"
+	"github.com/ory/hydra/sdk/go/hydra/client/admin"
+	"github.com/ory/hydra/sdk/go/hydra/client/public"
+	"github.com/ory/hydra/sdk/go/hydra/models"
 	"time"
 
 	"github.com/spf13/cobra"
 
-	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
+	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
 )
 
 type TokenHandler struct{}
-
-func (h *TokenHandler) newTokenManager(cmd *cobra.Command) *hydra.AdminApi {
-	c := hydra.NewAdminApiWithBasePath(Remote(cmd))
-	c.Configuration = configureClientWithoutAuth(cmd, c.Configuration)
-	return c
-}
 
 func newTokenHandler() *TokenHandler {
 	return &TokenHandler{}
@@ -47,31 +44,28 @@ func newTokenHandler() *TokenHandler {
 func (h *TokenHandler) RevokeToken(cmd *cobra.Command, args []string) {
 	cmdx.ExactArgs(cmd, args, 1)
 
-	handler := hydra.NewPublicApiWithBasePath(Remote(cmd))
-	handler.Configuration = configureClientWithoutAuth(cmd, handler.Configuration)
+	handler := configureClientWithoutAuth(cmd)
 
-	if clientID, clientSecret := flagx.MustGetString(cmd, "client-id"), flagx.MustGetString(cmd, "client-secret"); clientID == "" || clientSecret == "" {
+	clientID, clientSecret := flagx.MustGetString(cmd, "client-id"), flagx.MustGetString(cmd, "client-secret")
+	if clientID == "" || clientSecret == "" {
 		cmdx.Fatalf(`%s
 
 Please provide a Client ID and Client Secret using flags --client-id and --client-secret, or environment variables OAUTH2_CLIENT_ID and OAUTH2_CLIENT_SECRET
 `, cmd.UsageString())
-	} else {
-		handler.Configuration.Username = clientID
-		handler.Configuration.Password = clientSecret
 	}
 
 	token := args[0]
-	response, err := handler.RevokeOAuth2Token(args[0])
-	checkResponse(err, http.StatusOK, response)
+	_, err := handler.Public.RevokeOAuth2Token(public.NewRevokeOAuth2TokenParams().WithToken(args[0]), httptransport.BasicAuth(clientID, clientSecret))
+	cmdx.Must(err, "Unable to execute request: %s", err)
+
 	fmt.Printf("Revoked OAuth 2.0 Access Token: %s\n", token)
 }
 
 func (h *TokenHandler) FlushTokens(cmd *cobra.Command, args []string) {
-	handler := hydra.NewAdminApiWithBasePath(Remote(cmd))
-	handler.Configuration = configureClient(cmd, handler.Configuration)
-	response, err := handler.FlushInactiveOAuth2Tokens(hydra.FlushInactiveOAuth2TokensRequest{
-		NotAfter: time.Now().Add(-flagx.MustGetDuration(cmd, "min-age")),
-	})
-	checkResponse(err, http.StatusNoContent, response)
+	handler := configureClient(cmd)
+	_, err := handler.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{
+		NotAfter: strfmt.DateTime(time.Now().Add(-flagx.MustGetDuration(cmd, "min-age"))),
+	}))
+	cmdx.Must(err, "Unable to execute request: %s", err)
 	fmt.Println("Successfully flushed inactive access tokens")
 }

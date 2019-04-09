@@ -25,6 +25,8 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/ory/hydra/sdk/go/hydra/client/admin"
+	"github.com/ory/x/urlx"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -37,11 +39,13 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/oauth2"
 
-	"github.com/ory/hydra/sdk/go/hydra/swagger"
+	hydra "github.com/ory/hydra/sdk/go/hydra/client"
 	"github.com/ory/x/cmdx"
 )
 
-var sdk = swagger.NewAdminApiWithBasePath(os.Getenv("HYDRA_ADMIN_URL"))
+var hydraURL = urlx.ParseOrPanic(os.Getenv("HYDRA_ADMIN_URL"))
+var sdk = hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{hydraURL.Scheme}, Host: hydraURL.Host, BasePath: hydraURL.Path})
+
 
 type oauth2token struct {
 	IDToken      string    `json:"id_token"`
@@ -130,16 +134,6 @@ func main() {
 	defer resp.Body.Close()
 }
 
-func checkResponse(err error, expectedStatusCode int, response *swagger.APIResponse) {
-	var r *http.Response
-	if response != nil {
-		r = response.Response
-		r.Body = ioutil.NopCloser(bytes.NewBuffer(response.Payload))
-	}
-
-	cmdx.CheckResponse(err, expectedStatusCode, r)
-}
-
 func refreshTokenRequest(token oauth2token) (*http.Response, error) {
 	req, err := http.NewRequest("POST", strings.TrimRight(os.Getenv("HYDRA_URL"), "/")+"/oauth2/token", bytes.NewBufferString(url.Values{
 		"refresh_token": {token.RefreshToken},
@@ -200,19 +194,22 @@ func checkTokenResponse(token oauth2token) {
 		}
 	}
 
-	intro, sdkResp, err := sdk.IntrospectOAuth2Token(token.AccessToken, "")
-	checkResponse(err, http.StatusOK, sdkResp)
+	res, err := sdk.Admin.IntrospectOAuth2Token(admin.NewIntrospectOAuth2TokenParams().WithToken(token.AccessToken), nil)
+	if err != nil {
+		log.Fatalf("Unable to introspect OAuth2 token: %s", err)
+	}
+	intro := res.Payload
 
-	if !intro.Active {
+	if !*intro.Active {
 		log.Fatalf("Expected token to be active: %s", token.AccessToken)
 	}
 
-	if intro.Sub != "the-subject" {
-		log.Fatalf("Expected subject from access token to be %s but got %s", "the-subject", intro.Sub)
+	if intro.Subject != "the-subject" {
+		log.Fatalf("Expected subject from access token to be %s but got %s", "the-subject", intro.Subject)
 	}
 
-	if intro.Ext["foo"] != expectedValue {
-		log.Fatalf("Expected extra field \"foo\" from access token to be \"%s\" but got %s", expectedValue, intro.Ext["foo"])
+	if intro.Extra["foo"] != expectedValue {
+		log.Fatalf("Expected extra field \"foo\" from access token to be \"%s\" but got %s", expectedValue, intro.Extra["foo"])
 	}
 
 	idt := fmt.Sprintf("%s", token.IDToken)

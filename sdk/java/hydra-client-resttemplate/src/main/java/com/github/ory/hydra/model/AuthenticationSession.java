@@ -22,9 +22,10 @@ import io.swagger.annotations.ApiModelProperty;
 import org.joda.time.DateTime;
 
 /**
- * AuthenticationSession
+ * AuthenticationSession AuthenticationSession authentication session
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-02T13:01:09.037+02:00")
+@ApiModel(description = "AuthenticationSession AuthenticationSession authentication session")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-09T11:34:32.091+02:00")
 public class AuthenticationSession {
   @JsonProperty("AuthenticatedAt")
   private DateTime authenticatedAt = null;
@@ -41,10 +42,10 @@ public class AuthenticationSession {
   }
 
    /**
-   * Get authenticatedAt
+   * authenticated at Format: date-time Format: date-time
    * @return authenticatedAt
   **/
-  @ApiModelProperty(value = "")
+  @ApiModelProperty(value = "authenticated at Format: date-time Format: date-time")
   public DateTime getAuthenticatedAt() {
     return authenticatedAt;
   }
@@ -59,10 +60,10 @@ public class AuthenticationSession {
   }
 
    /**
-   * Get ID
+   * ID
    * @return ID
   **/
-  @ApiModelProperty(value = "")
+  @ApiModelProperty(value = "ID")
   public String getID() {
     return ID;
   }
@@ -77,10 +78,10 @@ public class AuthenticationSession {
   }
 
    /**
-   * Get subject
+   * subject
    * @return subject
   **/
-  @ApiModelProperty(value = "")
+  @ApiModelProperty(value = "subject")
   public String getSubject() {
     return subject;
   }

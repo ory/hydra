@@ -131,6 +131,18 @@ Do you want the latest features and patches without work and hassle? Are you loo
 secure deployment with zero effort? We can run it for you! If you're interested,
 [contact us now](mailto:hi@ory.sh)!
 
+## 1.0.0-rc.9
+
+### Go SDK
+
+The Go SDK is now being generated using `go-swagger`. The SDK generated using `swagger-codegen` is no longer supported.
+The old Go SDK is still available but moved to a new path. To use it, change:
+
+```
+- import "github.com/ory/hydra/sdk/go/hydra"
++ import hydra "github.com/ory/hydra/sdk/go-legacy/hydra"
+```
+
 ## 1.0.0-rc.7
 
 ### Configuration changes

@@ -21,10 +21,8 @@
 package cli
 
 import (
-	"bytes"
 	"crypto/tls"
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"os"
 
@@ -32,47 +30,59 @@ import (
 	"github.com/sawadashota/encrypta"
 	"github.com/spf13/cobra"
 
-	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
+	httptransport "github.com/go-openapi/runtime/client"
+	hydra "github.com/ory/hydra/sdk/go/hydra/client"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
 )
 
-func configureClient(cmd *cobra.Command, c *hydra.Configuration) *hydra.Configuration {
-	c.Transport = &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: flagx.MustGetBool(cmd, "skip-tls-verify")},
-	}
-
-	if flagx.MustGetBool(cmd, "fake-tls-termination") {
-		c.DefaultHeader["X-Forwarded-Proto"] = "https"
-	}
-
-	if token := flagx.MustGetString(cmd, "access-token"); token != "" {
-		c.DefaultHeader["Authorization"] = "Bearer " + token
-	}
-	return c
+func configureClient(cmd *cobra.Command) *hydra.OryHydra {
+	return configureClientBase(cmd, true)
 }
 
-func configureClientWithoutAuth(cmd *cobra.Command, c *hydra.Configuration) *hydra.Configuration {
-	c.Transport = &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: flagx.MustGetBool(cmd, "skip-tls-verify")},
-	}
-
-	if flagx.MustGetBool(cmd, "fake-tls-termination") {
-		c.DefaultHeader["X-Forwarded-Proto"] = "https"
-	}
-
-	return c
+type transport struct {
+	*http.Transport
+	cmd *cobra.Command
 }
 
-func checkResponse(err error, expectedStatusCode int, response *hydra.APIResponse) {
-	r := new(http.Response)
-	r.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("Response is nil")))
-	if response != nil && response.Response != nil {
-		r = response.Response
-		r.Body = ioutil.NopCloser(bytes.NewBuffer(response.Payload))
+func newTransport(cmd *cobra.Command) *transport {
+	return &transport{
+		cmd: cmd,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: flagx.MustGetBool(cmd, "skip-tls-verify")},
+		},
+	}
+}
+
+func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
+	if flagx.MustGetBool(t.cmd, "fake-tls-termination") {
+		req.Header.Set("X-Forwarded-Proto", "https")
+	}
+	return t.Transport.RoundTrip(req)
+}
+
+func configureClientBase(cmd *cobra.Command, withAuth bool) *hydra.OryHydra {
+	u := RemoteURI(cmd)
+	ht := httptransport.NewWithClient(
+		u.Host,
+		u.Path,
+		[]string{u.Scheme},
+		http.DefaultClient,
+	)
+
+	ht.Transport = newTransport(cmd)
+
+	if withAuth {
+		if token := flagx.MustGetString(cmd, "access-token"); token != "" {
+			ht.DefaultAuthentication = httptransport.BearerToken(token)
+		}
 	}
 
-	cmdx.CheckResponse(err, expectedStatusCode, r)
+	return hydra.New(ht, nil)
+}
+
+func configureClientWithoutAuth(cmd *cobra.Command) *hydra.OryHydra {
+	return configureClientBase(cmd, false)
 }
 
 func formatResponse(response interface{}) string {

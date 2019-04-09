@@ -35,6 +35,7 @@ use \ArrayAccess;
  * AuthenticationSession Class Doc Comment
  *
  * @category    Class
+ * @description AuthenticationSession AuthenticationSession authentication session
  * @package     Hydra\SDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
@@ -183,7 +184,7 @@ class AuthenticationSession implements ArrayAccess
 
     /**
      * Sets authenticated_at
-     * @param \DateTime $authenticated_at
+     * @param \DateTime $authenticated_at authenticated at Format: date-time Format: date-time
      * @return $this
      */
     public function setAuthenticatedAt($authenticated_at)
@@ -204,7 +205,7 @@ class AuthenticationSession implements ArrayAccess
 
     /**
      * Sets id
-     * @param string $id
+     * @param string $id ID
      * @return $this
      */
     public function setId($id)
@@ -225,7 +226,7 @@ class AuthenticationSession implements ArrayAccess
 
     /**
      * Sets subject
-     * @param string $subject
+     * @param string $subject subject
      * @return $this
      */
     public function setSubject($subject)

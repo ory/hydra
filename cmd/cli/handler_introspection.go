@@ -22,12 +22,14 @@ package cli
 
 import (
 	"fmt"
-	"net/http"
+	"github.com/go-openapi/runtime"
+	"github.com/ory/hydra/sdk/go/hydra/client/admin"
+	"github.com/ory/x/pointerx"
 	"strings" //"encoding/json"
 
 	"github.com/spf13/cobra"
 
-	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
+	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx" //"context"
 )
@@ -40,20 +42,20 @@ func newIntrospectionHandler() *IntrospectionHandler {
 
 func (h *IntrospectionHandler) Introspect(cmd *cobra.Command, args []string) {
 	cmdx.ExactArgs(cmd, args, 1)
+	c := configureClient(cmd)
 
-	c := hydra.NewAdminApiWithBasePath(Remote(cmd))
-	c.Configuration = configureClient(cmd, c.Configuration)
-
-	clientID := flagx.MustGetString(cmd, "client-id")
-	clientSecret := flagx.MustGetString(cmd, "client-secret")
-	if clientID != "" || clientSecret != "" {
-		c.Configuration.Username = clientID
-		c.Configuration.Password = clientSecret
+	var ht runtime.ClientAuthInfoWriter
+	if clientID, clientSecret := flagx.MustGetString(cmd, "client-id"), flagx.MustGetString(cmd, "client-secret"); clientID != "" || clientSecret != "" {
+		ht = httptransport.BasicAuth(clientID, clientSecret)
 	} else {
 		fmt.Println("No OAuth 2.0 Client ID an secret set, skipping authorization header. This might fail if the introspection endpoint is protected.")
 	}
 
-	result, response, err := c.IntrospectOAuth2Token(args[0], strings.Join(flagx.MustGetStringSlice(cmd, "scope"), " "))
-	checkResponse(err, http.StatusOK, response)
-	fmt.Println(formatResponse(result))
+	result, err := c.Admin.IntrospectOAuth2Token(admin.NewIntrospectOAuth2TokenParams().
+		WithToken(args[0]).
+		WithScope(pointerx.String(strings.Join(flagx.MustGetStringSlice(cmd, "scope"), " "))),
+		ht,
+	)
+	cmdx.Must(err, "Unable to execute request: %s", err)
+	fmt.Println(formatResponse(result.Payload))
 }

@@ -27,14 +27,19 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/sdk/go/hydra/client/public"
+	"github.com/ory/x/urlx"
+
 	"github.com/ory/hydra/internal"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	httptransport "github.com/go-openapi/runtime/client"
+
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/oauth2"
-	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
+	hydra "github.com/ory/hydra/sdk/go/hydra/client"
 	"github.com/ory/hydra/x"
 )
 
@@ -86,9 +91,7 @@ func TestRevoke(t *testing.T) {
 
 	require.Len(t, reg.OAuth2Storage().(*oauth2.FositeMemoryStore).AccessTokens, 4)
 
-	client := hydra.NewPublicApiWithBasePath(server.URL)
-	client.Configuration.Username = "my-client"
-	client.Configuration.Password = "foobar"
+	client := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(server.URL).Host})
 
 	for k, c := range []struct {
 		token  string
@@ -130,9 +133,14 @@ func TestRevoke(t *testing.T) {
 		},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
-			response, err := client.RevokeOAuth2Token(c.token)
+			//
+			//client.Configuration.Username = "my-client"
+			//client.Configuration.Password = "foobar"
+			_, err := client.Public.RevokeOAuth2Token(
+				public.NewRevokeOAuth2TokenParams().WithToken(c.token),
+				httptransport.BasicAuth("my-client", "foobar"),
+			)
 			require.NoError(t, err)
-			assert.Equal(t, http.StatusOK, response.StatusCode)
 
 			if c.assert != nil {
 				c.assert(t)

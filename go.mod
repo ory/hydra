@@ -6,14 +6,14 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-errors/errors v1.0.1
 	github.com/go-openapi/analysis v0.19.0 // indirect
-	github.com/go-openapi/errors v0.19.0 // indirect
+	github.com/go-openapi/errors v0.19.0
 	github.com/go-openapi/inflect v0.19.0 // indirect
 	github.com/go-openapi/loads v0.19.0 // indirect
-	github.com/go-openapi/runtime v0.19.0 // indirect
+	github.com/go-openapi/runtime v0.19.0
 	github.com/go-openapi/spec v0.19.0 // indirect
-	github.com/go-openapi/strfmt v0.19.0 // indirect
-	github.com/go-openapi/swag v0.19.0 // indirect
-	github.com/go-openapi/validate v0.19.0 // indirect
+	github.com/go-openapi/strfmt v0.19.0
+	github.com/go-openapi/swag v0.19.0
+	github.com/go-openapi/validate v0.19.0
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/go-swagger/go-swagger v0.19.0
 	github.com/go-swagger/scan-repo-boundary v0.0.0-20180623220736-973b3573c013 // indirect
@@ -48,7 +48,7 @@ require (
 	github.com/ory/go-convenience v0.1.0
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.6.0
-	github.com/ory/x v0.0.40
+	github.com/ory/x v0.0.43
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.8.1
@@ -79,7 +79,6 @@ require (
 	google.golang.org/appengine v1.5.0 // indirect
 	google.golang.org/genproto v0.0.0-20190321212433-e79c0c59cdb5 // indirect
 	google.golang.org/grpc v1.19.1 // indirect
-	gopkg.in/resty.v1 v1.12.0
 	gopkg.in/square/go-jose.v2 v2.3.0
 )
 

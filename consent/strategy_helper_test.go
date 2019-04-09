@@ -24,44 +24,46 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/ory/hydra/sdk/go/hydra/client/admin"
+	"github.com/ory/hydra/sdk/go/hydra/models"
+	"github.com/ory/x/pointerx"
+
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/hydra/sdk/go/hydra/swagger"
+	"github.com/ory/hydra/sdk/go/hydra/client"
 )
 
-var passAuthentication = func(apiClient *swagger.AdminApi, remember bool) func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+var passAuthentication = func(apiClient *client.OryHydra, remember bool) func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 	return func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 		return func(w http.ResponseWriter, r *http.Request) {
-			v, res, err := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
-				Subject:     "user",
+			v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().WithChallenge(r.URL.Query().Get("login_challenge")).WithBody(&models.HandledAuthenticationRequest{
+				Subject:     pointerx.String("user"),
 				Remember:    remember,
 				RememberFor: 0,
-				Acr:         "1",
-			})
+				ACR:         "1",
+			}))
 			require.NoError(t, err)
-			require.EqualValues(t, http.StatusOK, res.StatusCode)
-			require.NotEmpty(t, v.RedirectTo)
-			http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+			require.NotEmpty(t, v.Payload.RedirectTo)
+			http.Redirect(w, r, v.Payload.RedirectTo, http.StatusFound)
 		}
 	}
 }
 
-var passAuthorization = func(apiClient *swagger.AdminApi, remember bool) func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+var passAuthorization = func(apiClient *client.OryHydra, remember bool) func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 	return func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 		return func(w http.ResponseWriter, r *http.Request) {
-			v, res, err := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{
-				GrantScope:  []string{"scope-a"},
-				Remember:    remember,
-				RememberFor: 0,
-				Session: swagger.ConsentRequestSession{
+			v, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().WithChallenge(r.URL.Query().Get("consent_challenge")).WithBody(&models.HandledConsentRequest{
+				GrantedScope: []string{"scope-a"},
+				Remember:     remember,
+				RememberFor:  0,
+				Session: &models.ConsentRequestSessionData{
 					AccessToken: map[string]interface{}{"foo": "bar"},
-					IdToken:     map[string]interface{}{"bar": "baz"},
+					IDToken:     map[string]interface{}{"bar": "baz"},
 				},
-			})
+			}))
 			require.NoError(t, err)
-			require.EqualValues(t, http.StatusOK, res.StatusCode)
-			require.NotEmpty(t, v.RedirectTo)
-			http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+			require.NotEmpty(t, v.Payload.RedirectTo)
+			http.Redirect(w, r, v.Payload.RedirectTo, http.StatusFound)
 		}
 	}
 }

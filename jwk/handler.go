@@ -185,7 +185,7 @@ func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httproute
 //     Schemes: http, https
 //
 //     Responses:
-//       200: JSONWebKeySet
+//       201: JSONWebKeySet
 //       401: genericError
 //       403: genericError
 //       500: genericError

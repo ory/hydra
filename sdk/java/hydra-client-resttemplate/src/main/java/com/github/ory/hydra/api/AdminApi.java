@@ -36,7 +36,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-02T13:01:09.037+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-09T11:44:19.460+02:00")
 @Component("com.github.ory.hydra.api.AdminApi")
 public class AdminApi {
     private ApiClient apiClient;
@@ -62,7 +62,7 @@ public class AdminApi {
      * Accept an consent request
      * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider to authenticate the user and then tell ORY Hydra now about it. If the user authenticated, he/she must now be asked if the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the user&#39;s behalf.  The consent provider which handles this request and is a web app implemented and hosted by you. It shows a user interface which asks the user to grant or deny the client access to the requested scope (\&quot;Application my-dropbox-app wants write access to all your private files\&quot;).  The consent challenge is appended to the consent provider&#39;s URL to which the user&#39;s user-agent (browser) is redirected to. The consent provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the user accepted or rejected the request.  This endpoint tells ORY Hydra that the user has authorized the OAuth 2.0 client to access resources on his/her behalf. The consent provider includes additional information, such as session data for access and ID tokens, and if the consent request should be used as basis for future requests.  The response contains a redirect URL which the consent provider should redirect the user-agent to.
      * <p><b>200</b> - completedRequest
-     * <p><b>401</b> - genericError
+     * <p><b>404</b> - genericError
      * <p><b>500</b> - genericError
      * @param challenge The challenge parameter
      * @param body The body parameter
@@ -105,6 +105,7 @@ public class AdminApi {
      * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider (sometimes called \&quot;identity provider\&quot;) to authenticate the user and then tell ORY Hydra now about it. The login provider is an web-app you write and host, and it must be able to authenticate (\&quot;show the user a login screen\&quot;) a user (in OAuth2 the proper name for user is \&quot;resource owner\&quot;).  The authentication challenge is appended to the login provider URL to which the user&#39;s user-agent (browser) is redirected to. The login provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.  This endpoint tells ORY Hydra that the user has successfully authenticated and includes additional information such as the user&#39;s ID and if ORY Hydra should remember the user&#39;s user agent for future authentication attempts by setting a cookie.  The response contains a redirect URL which the login provider should redirect the user-agent to.
      * <p><b>200</b> - completedRequest
      * <p><b>401</b> - genericError
+     * <p><b>404</b> - genericError
      * <p><b>500</b> - genericError
      * @param challenge The challenge parameter
      * @param body The body parameter
@@ -145,7 +146,7 @@ public class AdminApi {
     /**
      * Generate a new JSON Web Key
      * This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.  A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
-     * <p><b>200</b> - JSONWebKeySet
+     * <p><b>201</b> - JSONWebKeySet
      * <p><b>401</b> - genericError
      * <p><b>403</b> - genericError
      * <p><b>500</b> - genericError
@@ -188,9 +189,8 @@ public class AdminApi {
     /**
      * Create an OAuth 2.0 client
      * Create a new OAuth 2.0 client If you pass &#x60;client_secret&#x60; the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somwhere safe.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
-     * <p><b>200</b> - oAuth2Client
-     * <p><b>401</b> - genericError
-     * <p><b>403</b> - genericError
+     * <p><b>201</b> - oAuth2Client
+     * <p><b>409</b> - genericError
      * <p><b>500</b> - genericError
      * @param body The body parameter
      * @return OAuth2Client
@@ -317,8 +317,7 @@ public class AdminApi {
      * Deletes an OAuth 2.0 Client
      * Delete an existing OAuth 2.0 Client by its ID.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
      * <p><b>204</b> - Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201.
-     * <p><b>401</b> - genericError
-     * <p><b>403</b> - genericError
+     * <p><b>404</b> - genericError
      * <p><b>500</b> - genericError
      * @param id The id of the OAuth 2.0 Client.
      * @throws RestClientException if an error occurs while attempting to invoke the API
@@ -390,7 +389,7 @@ public class AdminApi {
      * Get consent request information
      * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider to authenticate the user and then tell ORY Hydra now about it. If the user authenticated, he/she must now be asked if the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the user&#39;s behalf.  The consent provider which handles this request and is a web app implemented and hosted by you. It shows a user interface which asks the user to grant or deny the client access to the requested scope (\&quot;Application my-dropbox-app wants write access to all your private files\&quot;).  The consent challenge is appended to the consent provider&#39;s URL to which the user&#39;s user-agent (browser) is redirected to. The consent provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the user accepted or rejected the request.
      * <p><b>200</b> - consentRequest
-     * <p><b>401</b> - genericError
+     * <p><b>404</b> - genericError
      * <p><b>409</b> - genericError
      * <p><b>500</b> - genericError
      * @param challenge The challenge parameter
@@ -522,7 +521,7 @@ public class AdminApi {
      * Get an login request
      * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider (sometimes called \&quot;identity provider\&quot;) to authenticate the user and then tell ORY Hydra now about it. The login provider is an web-app you write and host, and it must be able to authenticate (\&quot;show the user a login screen\&quot;) a user (in OAuth2 the proper name for user is \&quot;resource owner\&quot;).  The authentication challenge is appended to the login provider URL to which the user&#39;s user-agent (browser) is redirected to. The login provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
      * <p><b>200</b> - loginRequest
-     * <p><b>401</b> - genericError
+     * <p><b>404</b> - genericError
      * <p><b>409</b> - genericError
      * <p><b>500</b> - genericError
      * @param challenge The challenge parameter
@@ -564,8 +563,7 @@ public class AdminApi {
      * Get an OAuth 2.0 Client.
      * Get an OAUth 2.0 client by its ID. This endpoint never returns passwords.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
      * <p><b>200</b> - oAuth2Client
-     * <p><b>401</b> - genericError
-     * <p><b>403</b> - genericError
+     * <p><b>404</b> - genericError
      * <p><b>500</b> - genericError
      * @param id The id of the OAuth 2.0 Client.
      * @return OAuth2Client
@@ -650,8 +648,6 @@ public class AdminApi {
      * List OAuth 2.0 Clients
      * This endpoint lists all clients in the database, and never returns client secrets.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
      * <p><b>200</b> - A list of clients.
-     * <p><b>401</b> - genericError
-     * <p><b>403</b> - genericError
      * <p><b>500</b> - genericError
      * @param limit The maximum amount of policies returned.
      * @param offset The offset from where to start looking.
@@ -688,8 +684,7 @@ public class AdminApi {
      * Lists all consent sessions of a user
      * This endpoint lists all user&#39;s granted consent sessions, including client and granted scope
      * <p><b>200</b> - A list of handled consent requests.
-     * <p><b>401</b> - genericError
-     * <p><b>403</b> - genericError
+     * <p><b>404</b> - genericError
      * <p><b>500</b> - genericError
      * @param user The user parameter
      * @return List&lt;PreviousConsentSession&gt;
@@ -730,7 +725,7 @@ public class AdminApi {
      * Reject an consent request
      * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider to authenticate the user and then tell ORY Hydra now about it. If the user authenticated, he/she must now be asked if the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the user&#39;s behalf.  The consent provider which handles this request and is a web app implemented and hosted by you. It shows a user interface which asks the user to grant or deny the client access to the requested scope (\&quot;Application my-dropbox-app wants write access to all your private files\&quot;).  The consent challenge is appended to the consent provider&#39;s URL to which the user&#39;s user-agent (browser) is redirected to. The consent provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the user accepted or rejected the request.  This endpoint tells ORY Hydra that the user has not authorized the OAuth 2.0 client to access resources on his/her behalf. The consent provider must include a reason why the consent was not granted.  The response contains a redirect URL which the consent provider should redirect the user-agent to.
      * <p><b>200</b> - completedRequest
-     * <p><b>401</b> - genericError
+     * <p><b>404</b> - genericError
      * <p><b>500</b> - genericError
      * @param challenge The challenge parameter
      * @param body The body parameter
@@ -773,6 +768,7 @@ public class AdminApi {
      * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider (sometimes called \&quot;identity provider\&quot;) to authenticate the user and then tell ORY Hydra now about it. The login provider is an web-app you write and host, and it must be able to authenticate (\&quot;show the user a login screen\&quot;) a user (in OAuth2 the proper name for user is \&quot;resource owner\&quot;).  The authentication challenge is appended to the login provider URL to which the user&#39;s user-agent (browser) is redirected to. The login provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.  This endpoint tells ORY Hydra that the user has not authenticated and includes a reason why the authentication was be denied.  The response contains a redirect URL which the login provider should redirect the user-agent to.
      * <p><b>200</b> - completedRequest
      * <p><b>401</b> - genericError
+     * <p><b>404</b> - genericError
      * <p><b>500</b> - genericError
      * @param challenge The challenge parameter
      * @param body The body parameter
@@ -1034,8 +1030,6 @@ public class AdminApi {
      * Update an OAuth 2.0 Client
      * Update an existing OAuth 2.0 Client. If you pass &#x60;client_secret&#x60; the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
      * <p><b>200</b> - oAuth2Client
-     * <p><b>401</b> - genericError
-     * <p><b>403</b> - genericError
      * <p><b>500</b> - genericError
      * @param id The id parameter
      * @param body The body parameter

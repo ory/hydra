@@ -28,12 +28,15 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/ory/hydra/sdk/go/hydra/client/admin"
+	"github.com/ory/hydra/sdk/go/hydra/models"
+	"github.com/ory/x/pointerx"
+
 	"github.com/mendsley/gojwk"
 	"github.com/pborman/uuid"
 	"github.com/spf13/cobra"
 	"gopkg.in/square/go-jose.v2"
 
-	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
 	"github.com/ory/x/josex"
@@ -41,32 +44,26 @@ import (
 
 type JWKHandler struct{}
 
-func (h *JWKHandler) newJwkManager(cmd *cobra.Command) *hydra.AdminApi {
-	c := hydra.NewAdminApiWithBasePath(Remote(cmd))
-	c.Configuration = configureClient(cmd, c.Configuration)
-	return c
-}
-
 func newJWKHandler() *JWKHandler {
 	return &JWKHandler{}
 }
 
 func (h *JWKHandler) CreateKeys(cmd *cobra.Command, args []string) {
 	cmdx.RangeArgs(cmd, args, []int{1, 2})
-	m := h.newJwkManager(cmd)
+	m := configureClient(cmd)
 
 	var kid string
 	if len(args) == 2 {
 		kid = args[1]
 	}
 
-	keys, response, err := m.CreateJsonWebKeySet(args[0], hydra.JsonWebKeySetGeneratorRequest{
-		Alg: flagx.MustGetString(cmd, "alg"),
-		Kid: kid,
-		Use: flagx.MustGetString(cmd, "use"),
-	})
-	checkResponse(err, http.StatusCreated, response)
-	fmt.Println(formatResponse(keys))
+	res, err := m.Admin.CreateJSONWebKeySet(admin.NewCreateJSONWebKeySetParams().WithSet(args[0]).WithBody(&models.CreateRequest{
+		Algorithm: pointerx.String(flagx.MustGetString(cmd, "alg")),
+		KeyID:     pointerx.String(kid),
+		Use:       pointerx.String(flagx.MustGetString(cmd, "use")),
+	}))
+	cmdx.Must(err, "Unable to execute request: %s", err)
+	fmt.Println(formatResponse(res.Payload))
 }
 
 func toSDKFriendlyJSONWebKey(key interface{}, kid, use string, public bool) jose.JSONWebKey {
@@ -175,18 +172,18 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 
 func (h *JWKHandler) GetKeys(cmd *cobra.Command, args []string) {
 	cmdx.ExactArgs(cmd, args, 1)
-	m := h.newJwkManager(cmd)
+	m := configureClient(cmd)
 
-	keys, response, err := m.GetJsonWebKeySet(args[0])
-	checkResponse(err, http.StatusOK, response)
+	keys, err := m.Admin.GetJSONWebKeySet(admin.NewGetJSONWebKeySetParams().WithSet(args[0]))
+	cmdx.Must(err, "Unable to execute request: %s", err)
 	fmt.Printf("%s\n", formatResponse(keys))
 }
 
 func (h *JWKHandler) DeleteKeys(cmd *cobra.Command, args []string) {
 	cmdx.ExactArgs(cmd, args, 1)
-	m := h.newJwkManager(cmd)
+	m := configureClient(cmd)
 
-	response, err := m.DeleteJsonWebKeySet(args[0])
-	checkResponse(err, http.StatusNoContent, response)
+	_, err := m.Admin.DeleteJSONWebKeySet(admin.NewDeleteJSONWebKeySetParams().WithSet(args[0]))
+	cmdx.Must(err, "Unable to execute request: %s", err)
 	fmt.Printf("JSON Web Key Set deleted: %s\n", args[0])
 }

@@ -29,6 +29,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/sdk/go/hydra/client/admin"
+	"github.com/ory/hydra/sdk/go/hydra/models"
+	"github.com/ory/x/pointerx"
+	"github.com/ory/x/urlx"
+
 	"github.com/ory/hydra/x"
 
 	"github.com/spf13/viper"
@@ -40,7 +45,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/fosite"
-	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
+	hydra "github.com/ory/hydra/sdk/go/hydra/client"
 )
 
 func TestIntrospectorSDK(t *testing.T) {
@@ -78,10 +83,9 @@ func TestIntrospectorSDK(t *testing.T) {
 			token          string
 			description    string
 			expectInactive bool
-			expectCode     int
 			scopes         []string
-			assert         func(*testing.T, *hydra.OAuth2TokenIntrospection)
-			prepare        func(*testing.T) *hydra.AdminApi
+			assert         func(*testing.T, *models.Introspection)
+			prepare        func(*testing.T) *hydra.OryHydra
 		}{
 			//{
 			//	description:    "should fail because invalid token was supplied",
@@ -127,12 +131,12 @@ func TestIntrospectorSDK(t *testing.T) {
 				token:          tokens[0][1],
 				expectInactive: false,
 				scopes:         []string{"foo.bar"},
-				assert: func(t *testing.T, c *hydra.OAuth2TokenIntrospection) {
-					assert.Equal(t, "alice", c.Sub)
-					assert.Equal(t, now.Add(time.Hour).Unix(), c.Exp, "expires at")
-					assert.Equal(t, now.Unix(), c.Iat, "issued at")
-					assert.Equal(t, "foobariss/", c.Iss, "issuer")
-					assert.Equal(t, map[string]interface{}{"foo": "bar"}, c.Ext)
+				assert: func(t *testing.T, c *models.Introspection) {
+					assert.Equal(t, "alice", c.Subject)
+					assert.Equal(t, now.Add(time.Hour).Unix(), c.ExpiresAt, "expires at")
+					assert.Equal(t, now.Unix(), c.IssuedAt, "issued at")
+					assert.Equal(t, "foobariss/", c.Issuer, "issuer")
+					assert.Equal(t, map[string]interface{}{"foo": "bar"}, c.Extra)
 				},
 			},
 			{
@@ -140,13 +144,13 @@ func TestIntrospectorSDK(t *testing.T) {
 				token:          tokens[0][1],
 				expectInactive: false,
 				scopes:         []string{"foo.bar"},
-				assert: func(t *testing.T, c *hydra.OAuth2TokenIntrospection) {
+				assert: func(t *testing.T, c *models.Introspection) {
 					assert.Equal(t, "core foo.*", c.Scope)
-					assert.Equal(t, "alice", c.Sub)
-					assert.Equal(t, now.Add(time.Hour).Unix(), c.Exp, "expires at")
-					assert.Equal(t, now.Unix(), c.Iat, "issued at")
-					assert.Equal(t, "foobariss/", c.Iss, "issuer")
-					assert.Equal(t, map[string]interface{}{"foo": "bar"}, c.Ext)
+					assert.Equal(t, "alice", c.Subject)
+					assert.Equal(t, now.Add(time.Hour).Unix(), c.ExpiresAt, "expires at")
+					assert.Equal(t, now.Unix(), c.IssuedAt, "issued at")
+					assert.Equal(t, "foobariss/", c.Issuer, "issuer")
+					assert.Equal(t, map[string]interface{}{"foo": "bar"}, c.Extra)
 				},
 			},
 			{
@@ -154,39 +158,37 @@ func TestIntrospectorSDK(t *testing.T) {
 				token:          tokens[3][1],
 				expectInactive: false,
 				scopes:         []string{"foo.bar"},
-				assert: func(t *testing.T, c *hydra.OAuth2TokenIntrospection) {
-					assert.Equal(t, "alice", c.Sub)
+				assert: func(t *testing.T, c *models.Introspection) {
+					assert.Equal(t, "alice", c.Subject)
 					assert.Equal(t, "alice-obfuscated", c.ObfuscatedSubject)
 				},
 			},
 		} {
 			t.Run(fmt.Sprintf("case=%d/description=%s", k, c.description), func(t *testing.T) {
-				var client *hydra.AdminApi
+				var client *hydra.OryHydra
 				if c.prepare != nil {
 					client = c.prepare(t)
 				} else {
-					client = hydra.NewAdminApiWithBasePath(server.URL)
+					client = hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(server.URL).Host})
 					//client.Configuration.Username = "my-client"
 					//client.Configuration.Password = "foobar"
 				}
 
-				ctx, response, err := client.IntrospectOAuth2Token(c.token, strings.Join(c.scopes, " "))
+				ctx, err := client.Admin.IntrospectOAuth2Token(admin.NewIntrospectOAuth2TokenParams().
+					WithToken(c.token).
+					WithScope(pointerx.String(strings.Join(c.scopes, " "))),
+					nil,
+				)
 				require.NoError(t, err)
 
-				if c.expectCode == 0 {
-					require.EqualValues(t, http.StatusOK, response.StatusCode)
-				} else {
-					require.EqualValues(t, c.expectCode, response.StatusCode)
-				}
-
 				if c.expectInactive {
-					assert.False(t, ctx.Active)
+					assert.False(t, *ctx.Payload.Active)
 				} else {
-					assert.True(t, ctx.Active)
+					assert.True(t, *ctx.Payload.Active)
 				}
 
 				if !c.expectInactive && c.assert != nil {
-					c.assert(t, ctx)
+					c.assert(t, ctx.Payload)
 				}
 			})
 		}

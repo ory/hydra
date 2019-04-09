@@ -64,14 +64,12 @@ sdk:
 		GO111MODULE=off swagger generate spec -m -o ./docs/api.swagger.json
 		GO111MODULE=off swagger validate ./docs/api.swagger.json
 
-		rm -rf ./sdk/go/hydra-legacy/*
 		rm -rf ./sdk/go/hydra/*
 		rm -rf ./sdk/js/swagger
 		rm -rf ./sdk/php/swagger
 		rm -rf ./sdk/java
 
 		GO111MODULE=off swagger generate client -f ./docs/api.swagger.json -t sdk/go/hydra -A Ory_Hydra
-		java -jar scripts/swagger-codegen-cli-2.2.3.jar generate -i ./docs/api.swagger.json -l go -o ./sdk/go/hydra-legacy/swagger
 		java -jar scripts/swagger-codegen-cli-2.2.3.jar generate -i ./docs/api.swagger.json -l javascript -o ./sdk/js/swagger
 		java -jar scripts/swagger-codegen-cli-2.2.3.jar generate -i ./docs/api.swagger.json -l php -o sdk/php/ \
 			--invoker-package Hydra\\SDK --git-repo-id swagger --git-user-id ory --additional-properties "packagePath=swagger,description=Client for Hydra"
@@ -87,9 +85,6 @@ sdk:
 			--output ./sdk/java/hydra-client-resttemplate
 
 		cd sdk/go; goreturns -w -i -local github.com/ory $$(listx .)
-
-		git checkout HEAD -- sdk/go/hydra-legacy/swagger/configuration.go
-		git checkout HEAD -- sdk/go/hydra-legacy/swagger/api_client.go
 
 		rm -f ./sdk/js/swagger/package.json
 		rm -rf ./sdk/js/swagger/test

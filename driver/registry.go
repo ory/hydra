@@ -75,5 +75,30 @@ func NewRegistry(c configuration.Provider) (Registry, error) {
 		return nil, err
 	}
 
+	_ = registry.ClientHandler()
+	_ = registry.KeyHandler()
+	_ = registry.ConsentHandler()
+	_ = registry.OAuth2Handler()
+	_ = registry.HealthHandler()
+	_ = registry.PrometheusManager()
+	_ = registry.Tracer()
+	_ = registry.OAuth2Storage()
+	_ = registry.OAuth2Provider()
+	_ = registry.AudienceStrategy()
+	_ = registry.ScopeStrategy()
+	_ = registry.AccessTokenJWTStrategy()
+	_ = registry.OpenIDJWTStrategy()
+	_ = registry.OpenIDConnectRequestValidator()
+	_ = registry.KeyManager()
+	_ = registry.KeyGenerators()
+	_ = registry.KeyCipher()
+	_ = registry.ConsentManager()
+	_ = registry.ConsentStrategy()
+	_ = registry.SubjectIdentifierAlgorithm()
+	_ = registry.ClientValidator()
+	_ = registry.ClientManager()
+	_ = registry.ClientHasher()
+	_ = registry.CookieStore()
+
 	return registry, nil
 }

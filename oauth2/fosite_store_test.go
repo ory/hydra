@@ -64,6 +64,13 @@ func connectToMySQL(t *testing.T) *sqlx.DB {
 	return db
 }
 
+func connectToCRDB(t *testing.T) *sqlx.DB {
+	db, err := dockertest.ConnectToTestCockroachDB()
+	require.NoError(t, err)
+	x.CleanSQL(t, db)
+	return db
+}
+
 func connectSQL(t *testing.T, conf *configuration.ViperProvider, db *sqlx.DB) driver.Registry {
 	reg := internal.NewRegistrySQL(conf, db)
 	_, err := reg.CreateSchemas()
@@ -79,7 +86,7 @@ func TestManagers(t *testing.T) {
 	registries["memory"] = reg
 
 	if !testing.Short() {
-		var p, m *sqlx.DB
+		var p, m, c *sqlx.DB
 		dockertest.Parallel([]func(){
 			func() {
 				p = connectToPG(t)
@@ -87,9 +94,13 @@ func TestManagers(t *testing.T) {
 			func() {
 				m = connectToMySQL(t)
 			},
+			func() {
+				c = connectToCRDB(t)
+			},
 		})
 		registries["postgres"] = connectSQL(t, conf, p)
 		registries["mysql"] = connectSQL(t, conf, m)
+		registries["cockroach"] = connectSQL(t, conf, c)
 	}
 
 	for k, store := range registries {

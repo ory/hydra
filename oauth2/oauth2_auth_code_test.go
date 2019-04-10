@@ -109,13 +109,16 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	}
 
 	if !testing.Short() {
-		var p, m *sqlx.DB
+		var p, m, c *sqlx.DB
 		dockertest.Parallel([]func(){
 			func() {
 				p = connectToPG(t)
 			},
 			func() {
 				m = connectToMySQL(t)
+			},
+			func() {
+				c = connectToCRDB(c)
 			},
 		})
 		pr := internal.NewRegistrySQL(conf, p)
@@ -127,6 +130,11 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		_, err = mr.CreateSchemas()
 		require.NoError(t, err)
 		regs["mysql"] = mr
+
+		cr := internal.NewRegistrySQL(conf, c)
+		_, err = cr.CreateSchemas()
+		require.NoError(t, err)
+		regs["cockroach"] = cr
 	}
 
 	for km, reg := range regs {

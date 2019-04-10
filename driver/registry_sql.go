@@ -103,7 +103,7 @@ func (m *RegistrySQL) CreateSchemas() (int, error) {
 
 func (m *RegistrySQL) CanHandle(dsn string) bool {
 	s := dbal.Canonicalize(urlx.ParseOrFatal(m.l, dsn).Scheme)
-	return s == dbal.DriverMySQL || s == dbal.DriverPostgreSQL
+	return s == dbal.DriverMySQL || s == dbal.DriverPostgreSQL || s == dbal.DriverCockroachDB
 }
 
 func (m *RegistrySQL) Ping() error {

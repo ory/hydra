@@ -79,6 +79,11 @@ func TestManager(t *testing.T) {
 				managers["mysql"] = connectToMySQL(t)
 				m.Unlock()
 			},
+			func() {
+				m.Lock()
+				managers["cockroach"] = connectToMySQL(t)
+				m.Unlock()
+			},
 		})
 	}
 

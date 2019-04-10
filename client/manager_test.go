@@ -74,6 +74,20 @@ func connectToPG() {
 	m.Unlock()
 }
 
+func connectToCRDB() {
+	db, err := dockertest.ConnectToTestCockroachDB()
+	if err != nil {
+		log.Fatalf("Could not connect to database: %v", err)
+	}
+
+	conf := internal.NewConfigurationWithDefaults()
+	reg := internal.NewRegistrySQL(conf, db)
+
+	m.Lock()
+	clientManagers["cockroach"] = reg.ClientManager()
+	m.Unlock()
+}
+
 func TestManagers(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistry(conf)
@@ -84,6 +98,7 @@ func TestManagers(t *testing.T) {
 		dockertest.Parallel([]func(){
 			connectToPG,
 			connectToMySQL,
+			connectToCRDB,
 		})
 	}
 
@@ -91,7 +106,7 @@ func TestManagers(t *testing.T) {
 		s, ok := m.(*SQLManager)
 		if ok {
 			CleanTestDB(t, s.DB)
-			_, err := s.CreateSchemas()
+			_, err := s.CreateSchemas(Migrations[k])
 			require.NoError(t, err)
 		}
 

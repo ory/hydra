@@ -5,26 +5,34 @@ SHELL=/bin/bash -o pipefail
 test:
 		docker kill hydra_test_database_mysql || true
 		docker kill hydra_test_database_postgres || true
+		docker kill hydra_test_database_cockroach || true
 		docker rm -f hydra_test_database_mysql || true
 		docker rm -f hydra_test_database_postgres || true
+		docker rm -f hydra_test_database_cockroach || true
 		docker run --rm --name hydra_test_database_mysql -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:5.7
 		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.6
+		docker run --rm --name hydra_test_database_cockroach -p 3446:26257 -d cockroachdb/cockroach:v2.1.6 start --insecure
 		make sqlbin
 		TEST_DATABASE_MYSQL='root:secret@(127.0.0.1:3444)/mysql?parseTime=true' \
-			TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/hydra?sslmode=disable' \
-			go-acc ./... -- -failfast -timeout=20m
+		TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/hydra?sslmode=disable' \
+		TEST_DATABASE_COCKROACHDB='postgres://root@127.0.0.1:3446/defaultdb?sslmode=disable' \
+		go-acc ./client/... -- -failfast -timeout=20m
 		docker rm -f hydra_test_database_mysql
 		docker rm -f hydra_test_database_postgres
+		docker rm -f hydra_test_database_cockroach
 
 # Resets the test databases
 .PHONY: test-resetdb
 test-resetdb:
 		docker kill hydra_test_database_mysql || true
 		docker kill hydra_test_database_postgres || true
+		docker kill hydra_test_database_cockroach || true
 		docker rm -f hydra_test_database_mysql || true
 		docker rm -f hydra_test_database_postgres || true
+		docker rm -f hydra_test_database_cockroach || true
 		docker run --rm --name hydra_test_database_mysql -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:5.7
 		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.6
+		docker run --rm --name hydra_test_database_cockroach -p 3446:26257 -d cockroachdb/cockroach:v2.1.6 start --insecure
 
 # Runs tests in short mode, without database adapters
 .PHONY: quicktest
@@ -47,10 +55,10 @@ mocks:
 # Adds sql files to the binary using go-bindata
 .PHONY: sqlbin
 sqlbin:
-		cd client; go-bindata -o sql_migration_files.go -pkg client ./migrations/sql/shared ./migrations/sql/mysql ./migrations/sql/postgres ./migrations/sql/tests
-		cd consent; go-bindata -o sql_migration_files.go -pkg consent ./migrations/sql/shared ./migrations/sql/mysql ./migrations/sql/postgres ./migrations/sql/tests
-		cd jwk; go-bindata -o sql_migration_files.go -pkg jwk ./migrations/sql/shared ./migrations/sql/mysql ./migrations/sql/postgres ./migrations/sql/tests
-		cd oauth2; go-bindata -o sql_migration_files.go -pkg oauth2 ./migrations/sql/shared ./migrations/sql/mysql ./migrations/sql/postgres ./migrations/sql/tests
+		cd client; go-bindata -o sql_migration_files.go -pkg client ./migrations/sql/shared ./migrations/sql/mysql ./migrations/sql/postgres ./migrations/sql/cockroach ./migrations/sql/tests ./migrations/sql/tests-crdb
+		cd consent; go-bindata -o sql_migration_files.go -pkg consent ./migrations/sql/shared ./migrations/sql/mysql ./migrations/sql/postgres ./migrations/sql/cockroach ./migrations/sql/tests ./migrations/sql/tests-crdb
+		cd jwk; go-bindata -o sql_migration_files.go -pkg jwk ./migrations/sql/shared ./migrations/sql/mysql ./migrations/sql/postgres ./migrations/sql/cockroach ./migrations/sql/tests ./migrations/sql/tests-crdb
+		cd oauth2; go-bindata -o sql_migration_files.go -pkg oauth2 ./migrations/sql/shared ./migrations/sql/mysql ./migrations/sql/postgres ./migrations/sql/cockroach ./migrations/sql/tests ./migrations/sql/tests-crdb
 
 # Runs all code generators
 .PHONY: gen

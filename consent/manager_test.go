@@ -62,6 +62,15 @@ func connectToMySQL(t *testing.T) *sqlx.DB {
 	return db
 }
 
+func connectToCockroach(t *testing.T) *sqlx.DB {
+	db, err := dockertest.ConnectToTestCockroachDB()
+	require.NoError(t, err)
+	t.Logf("Cleaning cockroach db...")
+	cleanDB(t, db)
+	t.Logf("Cleaned cockroach db")
+	return db
+}
+
 func TestMain(m *testing.M) {
 	flag.Parse()
 	runner := dockertest.Register()
@@ -84,16 +93,21 @@ func TestManagers(t *testing.T) {
 	regs["memory"] = internal.NewRegistry(conf)
 
 	if !testing.Short() {
-		var p, m *sqlx.DB
+		var p, m, c *sqlx.DB
 		dockertest.Parallel([]func(){
 			func() {
 				p = connectToPostgres(t)
-			}, func() {
+			},
+			func() {
 				m = connectToMySQL(t)
+			},
+			func() {
+				c = connectToCockroach(t)
 			},
 		})
 		regs["postgres"] = createSQL(p)
 		regs["mysql"] = createSQL(m)
+		regs["cockroach"] = createSQL(c)
 	}
 
 	for k, m := range regs {

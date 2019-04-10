@@ -40,8 +40,9 @@ import (
 )
 
 var createMigrations = map[string]*dbal.PackrMigrationSource{
-	dbal.DriverMySQL:      dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}, true),
-	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}, true),
+	dbal.DriverMySQL:       dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}, true),
+	dbal.DriverPostgreSQL:  dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}, true),
+	dbal.DriverCockroachDB: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests-crdb"}, true),
 }
 
 func TestXXMigrations(t *testing.T) {

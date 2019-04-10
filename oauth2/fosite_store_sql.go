@@ -79,6 +79,9 @@ var Migrations = map[string]*dbal.PackrMigrationSource{
 		"migrations/sql/shared",
 		"migrations/sql/postgres",
 	}, true),
+	dbal.DriverCockroachDB: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
+		"migrations/sql/cockroach",
+	}, true),
 }
 
 type transactionKey int

@@ -26,18 +26,12 @@ import (
 	"testing"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/dbal/migratest"
 )
-
-var createMigrations = map[string]*dbal.PackrMigrationSource{
-	dbal.DriverMySQL:      dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}, true),
-	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}, true),
-}
 
 func CleanTestDB(t *testing.T, db *sqlx.DB) {
 	_, err := db.Exec("DROP TABLE IF EXISTS hydra_client_migration")
@@ -57,9 +51,12 @@ func TestXXMigrations(t *testing.T) {
 	migratest.RunPackrMigrationTests(
 		t,
 		migratest.MigrationSchemas{Migrations},
-		migratest.MigrationSchemas{createMigrations},
+		migratest.MigrationSchemas{dbal.FindMatchingTestMigrations("migrations/sql/tests/", Migrations, AssetNames(), Asset)},
 		CleanTestDB, CleanTestDB,
-		func(t *testing.T, db *sqlx.DB, _, step, steps int) {
+		func(t *testing.T, dbName string, db *sqlx.DB, _, step, steps int) {
+			if dbName == "cockroach" {
+				step += 12
+			}
 			id := fmt.Sprintf("%d-data", step+1)
 			t.Run("poll="+id, func(t *testing.T) {
 				s := NewSQLManager(db, nil)

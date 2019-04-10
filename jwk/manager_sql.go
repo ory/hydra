@@ -54,6 +54,9 @@ var Migrations = map[string]*dbal.PackrMigrationSource{
 		"migrations/sql/shared",
 		"migrations/sql/postgres",
 	}, true),
+	dbal.DriverCockroachDB: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
+		"migrations/sql/cockroach",
+	}, true),
 }
 
 type sqlData struct {
@@ -65,21 +68,15 @@ type sqlData struct {
 	Key       string    `db:"keydata"`
 }
 
-func (m *SQLManager) PlanMigration() ([]*migrate.PlannedMigration, error) {
+func (m *SQLManager) PlanMigration(dbName string) ([]*migrate.PlannedMigration, error) {
 	migrate.SetTable("hydra_jwk_migration")
-	plan, _, err := migrate.PlanMigration(m.DB.DB, m.DB.DriverName(), Migrations[dbal.Canonicalize(m.DB.DriverName())], migrate.Up, 0)
+	plan, _, err := migrate.PlanMigration(m.DB.DB, dbal.Canonicalize(m.DB.DriverName()), Migrations[dbName], migrate.Up, 0)
 	return plan, errors.WithStack(err)
 }
 
-func (m *SQLManager) CreateSchemas() (int, error) {
-	database := m.DB.DriverName()
-	switch database {
-	case "pgx", "pq":
-		database = "postgres"
-	}
-
+func (m *SQLManager) CreateSchemas(dbName string) (int, error) {
 	migrate.SetTable("hydra_jwk_migration")
-	n, err := migrate.Exec(m.DB.DB, m.DB.DriverName(), Migrations[database], migrate.Up)
+	n, err := migrate.Exec(m.DB.DB, dbal.Canonicalize(m.DB.DriverName()), Migrations[dbName], migrate.Up)
 	if err != nil {
 		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
 	}

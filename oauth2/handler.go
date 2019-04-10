@@ -30,10 +30,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ory/hydra/driver/configuration"
-
-	"github.com/ory/x/urlx"
-
 	jwt2 "github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
@@ -43,7 +39,9 @@ import (
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/x"
+	"github.com/ory/x/urlx"
 )
 
 const (

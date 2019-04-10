@@ -7,20 +7,18 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/olekukonko/tablewriter"
 	migrate "github.com/rubenv/sql-migrate"
-
-	"github.com/jmoiron/sqlx"
-
-	"github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/x"
-	"github.com/ory/x/sqlcon"
-	"github.com/ory/x/urlx"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/dbal"
+	"github.com/ory/x/sqlcon"
+	"github.com/ory/x/urlx"
 )
 
 type RegistrySQL struct {
@@ -38,8 +36,8 @@ func init() {
 }
 
 type schemaCreator interface {
-	CreateSchemas() (int, error)
-	PlanMigration() ([]*migrate.PlannedMigration, error)
+	CreateSchemas(dbName string) (int, error)
+	PlanMigration(dbName string) ([]*migrate.PlannedMigration, error)
 }
 
 func NewRegistrySQL() *RegistrySQL {
@@ -88,7 +86,7 @@ func (m *RegistrySQL) DB() *sqlx.DB {
 	return m.db
 }
 
-func (m *RegistrySQL) SchemaMigrationPlan() (*tablewriter.Table, error) {
+func (m *RegistrySQL) SchemaMigrationPlan(dbName string) (*tablewriter.Table, error) {
 	names := map[int]string{
 		0: "JSON Web Keys",
 		1: "OAuth 2.0 Clients",
@@ -116,7 +114,7 @@ func (m *RegistrySQL) SchemaMigrationPlan() (*tablewriter.Table, error) {
 		m.ConsentManager().(schemaCreator),
 		m.OAuth2Storage().(schemaCreator),
 	} {
-		plans, err := s.PlanMigration()
+		plans, err := s.PlanMigration(dbName)
 		if err != nil {
 			return nil, err
 		}
@@ -135,32 +133,32 @@ func (m *RegistrySQL) SchemaMigrationPlan() (*tablewriter.Table, error) {
 	return table, nil
 }
 
-func (m *RegistrySQL) CreateSchemas() (int, error) {
+func (m *RegistrySQL) CreateSchemas(dbName string) (int, error) {
 	var total int
 
-	m.Logger().Debugf("Applying %s SQL migrations...", m.db.DriverName())
+	m.Logger().Debugf("Applying %s SQL migrations...", dbName)
 	for k, s := range []schemaCreator{
 		m.KeyManager().(schemaCreator),
 		m.ClientManager().(schemaCreator),
 		m.ConsentManager().(schemaCreator),
 		m.OAuth2Storage().(schemaCreator),
 	} {
-		m.Logger().Debugf("Applying %s SQL migrations for manager: %T (%d)", m.db.DriverName(), s, k)
-		if c, err := s.CreateSchemas(); err != nil {
+		m.Logger().Debugf("Applying %s SQL migrations for manager: %T (%d)", dbName, s, k)
+		if c, err := s.CreateSchemas(dbName); err != nil {
 			return c, err
 		} else {
-			m.Logger().Debugf("Successfully applied %d %s SQL migrations from manager: %T (%d)", c, m.db.DriverName(), s, k)
+			m.Logger().Debugf("Successfully applied %d %s SQL migrations from manager: %T (%d)", c, dbName, s, k)
 			total += c
 		}
 	}
-	m.Logger().Debugf("Applied %d %s SQL migrations", total, m.db.DriverName())
+	m.Logger().Debugf("Applied %d %s SQL migrations", total, dbName)
 
 	return total, nil
 }
 
 func (m *RegistrySQL) CanHandle(dsn string) bool {
 	s := dbal.Canonicalize(urlx.ParseOrFatal(m.l, dsn).Scheme)
-	return s == dbal.DriverMySQL || s == dbal.DriverPostgreSQL
+	return s == dbal.DriverMySQL || s == dbal.DriverPostgreSQL || s == dbal.DriverCockroachDB
 }
 
 func (m *RegistrySQL) Ping() error {

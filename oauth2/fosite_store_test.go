@@ -25,20 +25,17 @@ import (
 	"flag"
 	"testing"
 
-	"github.com/ory/hydra/x"
-
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/driver/configuration"
-
 	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/internal"
-
 	. "github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlcon/dockertest"
 )
 
@@ -64,9 +61,16 @@ func connectToMySQL(t *testing.T) *sqlx.DB {
 	return db
 }
 
-func connectSQL(t *testing.T, conf *configuration.ViperProvider, db *sqlx.DB) driver.Registry {
+func connectToCRDB(t *testing.T) *sqlx.DB {
+	db, err := dockertest.ConnectToTestCockroachDB()
+	require.NoError(t, err)
+	x.CleanSQL(t, db)
+	return db
+}
+
+func connectSQL(t *testing.T, conf *configuration.ViperProvider, dbName string, db *sqlx.DB) driver.Registry {
 	reg := internal.NewRegistrySQL(conf, db)
-	_, err := reg.CreateSchemas()
+	_, err := reg.CreateSchemas(dbName)
 	require.NoError(t, err)
 	return reg
 }
@@ -79,7 +83,7 @@ func TestManagers(t *testing.T) {
 	registries["memory"] = reg
 
 	if !testing.Short() {
-		var p, m *sqlx.DB
+		var p, m, c *sqlx.DB
 		dockertest.Parallel([]func(){
 			func() {
 				p = connectToPG(t)
@@ -87,9 +91,13 @@ func TestManagers(t *testing.T) {
 			func() {
 				m = connectToMySQL(t)
 			},
+			func() {
+				c = connectToCRDB(t)
+			},
 		})
-		registries["postgres"] = connectSQL(t, conf, p)
-		registries["mysql"] = connectSQL(t, conf, m)
+		registries["postgres"] = connectSQL(t, conf, "postgres", p)
+		registries["mysql"] = connectSQL(t, conf, "mysql", m)
+		registries["cockroach"] = connectSQL(t, conf, "cockroach", c)
 	}
 
 	for k, store := range registries {

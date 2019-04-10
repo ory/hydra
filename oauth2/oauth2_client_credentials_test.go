@@ -31,22 +31,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/x"
-
-	"github.com/spf13/viper"
-
-	"github.com/ory/hydra/driver/configuration"
-	"github.com/ory/hydra/internal"
-
-	goauth2 "golang.org/x/oauth2"
-
 	"github.com/dgrijalva/jwt-go"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	goauth2 "golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 
 	hc "github.com/ory/hydra/client"
+	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/internal"
 	. "github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/x"
 )
 
 func TestClientCredentials(t *testing.T) {

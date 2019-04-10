@@ -79,6 +79,9 @@ var Migrations = map[string]*dbal.PackrMigrationSource{
 		"migrations/sql/shared",
 		"migrations/sql/postgres",
 	}, true),
+	dbal.DriverCockroachDB: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
+		"migrations/sql/cockroach",
+	}, true),
 }
 
 type transactionKey int
@@ -192,9 +195,9 @@ func (s *sqlData) toRequest(session fosite.Session, cm client.Manager, logger lo
 	return r, nil
 }
 
-func (s *FositeSQLStore) PlanMigration() ([]*migrate.PlannedMigration, error) {
+func (s *FositeSQLStore) PlanMigration(dbName string) ([]*migrate.PlannedMigration, error) {
 	migrate.SetTable("hydra_oauth2_migration")
-	plan, _, err := migrate.PlanMigration(s.DB.DB, s.DB.DriverName(), Migrations[dbal.Canonicalize(s.DB.DriverName())], migrate.Up, 0)
+	plan, _, err := migrate.PlanMigration(s.DB.DB, dbal.Canonicalize(s.DB.DriverName()), Migrations[dbName], migrate.Up, 0)
 	return plan, errors.WithStack(err)
 }
 
@@ -298,9 +301,9 @@ func (s *FositeSQLStore) deleteSession(ctx context.Context, signature string, ta
 	return nil
 }
 
-func (s *FositeSQLStore) CreateSchemas() (int, error) {
+func (s *FositeSQLStore) CreateSchemas(dbName string) (int, error) {
 	migrate.SetTable("hydra_oauth2_migration")
-	n, err := migrate.Exec(s.DB.DB, s.DB.DriverName(), Migrations[dbal.Canonicalize(s.DB.DriverName())], migrate.Up)
+	n, err := migrate.Exec(s.DB.DB, dbal.Canonicalize(s.DB.DriverName()), Migrations[dbName], migrate.Up)
 	if err != nil {
 		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
 	}

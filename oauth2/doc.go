@@ -120,6 +120,9 @@ type WellKnown struct {
 
 	// Boolean value specifying whether the OP supports use of the claims parameter, with true indicating support.
 	ClaimsParameterSupported bool `json:"claims_parameter_supported"`
+
+	// URL of the authorization server's OAuth 2.0 revocation endpoint.
+	RevocationEndpoint string `json:"revocation_endpoint"`
 }
 
 // swagger:model flushInactiveOAuth2TokensRequest

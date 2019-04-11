@@ -68,6 +68,7 @@ class WellKnown implements ArrayAccess
         'require_request_uri_registration' => 'bool',
         'response_modes_supported' => 'string[]',
         'response_types_supported' => 'string[]',
+        'revocation_endpoint' => 'string',
         'scopes_supported' => 'string[]',
         'subject_types_supported' => 'string[]',
         'token_endpoint' => 'string',
@@ -94,6 +95,7 @@ class WellKnown implements ArrayAccess
         'require_request_uri_registration' => null,
         'response_modes_supported' => null,
         'response_types_supported' => null,
+        'revocation_endpoint' => null,
         'scopes_supported' => null,
         'subject_types_supported' => null,
         'token_endpoint' => null,
@@ -130,6 +132,7 @@ class WellKnown implements ArrayAccess
         'require_request_uri_registration' => 'require_request_uri_registration',
         'response_modes_supported' => 'response_modes_supported',
         'response_types_supported' => 'response_types_supported',
+        'revocation_endpoint' => 'revocation_endpoint',
         'scopes_supported' => 'scopes_supported',
         'subject_types_supported' => 'subject_types_supported',
         'token_endpoint' => 'token_endpoint',
@@ -157,6 +160,7 @@ class WellKnown implements ArrayAccess
         'require_request_uri_registration' => 'setRequireRequestUriRegistration',
         'response_modes_supported' => 'setResponseModesSupported',
         'response_types_supported' => 'setResponseTypesSupported',
+        'revocation_endpoint' => 'setRevocationEndpoint',
         'scopes_supported' => 'setScopesSupported',
         'subject_types_supported' => 'setSubjectTypesSupported',
         'token_endpoint' => 'setTokenEndpoint',
@@ -184,6 +188,7 @@ class WellKnown implements ArrayAccess
         'require_request_uri_registration' => 'getRequireRequestUriRegistration',
         'response_modes_supported' => 'getResponseModesSupported',
         'response_types_supported' => 'getResponseTypesSupported',
+        'revocation_endpoint' => 'getRevocationEndpoint',
         'scopes_supported' => 'getScopesSupported',
         'subject_types_supported' => 'getSubjectTypesSupported',
         'token_endpoint' => 'getTokenEndpoint',
@@ -236,6 +241,7 @@ class WellKnown implements ArrayAccess
         $this->container['require_request_uri_registration'] = isset($data['require_request_uri_registration']) ? $data['require_request_uri_registration'] : null;
         $this->container['response_modes_supported'] = isset($data['response_modes_supported']) ? $data['response_modes_supported'] : null;
         $this->container['response_types_supported'] = isset($data['response_types_supported']) ? $data['response_types_supported'] : null;
+        $this->container['revocation_endpoint'] = isset($data['revocation_endpoint']) ? $data['revocation_endpoint'] : null;
         $this->container['scopes_supported'] = isset($data['scopes_supported']) ? $data['scopes_supported'] : null;
         $this->container['subject_types_supported'] = isset($data['subject_types_supported']) ? $data['subject_types_supported'] : null;
         $this->container['token_endpoint'] = isset($data['token_endpoint']) ? $data['token_endpoint'] : null;
@@ -580,6 +586,27 @@ class WellKnown implements ArrayAccess
     public function setResponseTypesSupported($response_types_supported)
     {
         $this->container['response_types_supported'] = $response_types_supported;
+
+        return $this;
+    }
+
+    /**
+     * Gets revocation_endpoint
+     * @return string
+     */
+    public function getRevocationEndpoint()
+    {
+        return $this->container['revocation_endpoint'];
+    }
+
+    /**
+     * Sets revocation_endpoint
+     * @param string $revocation_endpoint URL of the authorization server's OAuth 2.0 revocation endpoint.
+     * @return $this
+     */
+    public function setRevocationEndpoint($revocation_endpoint)
+    {
+        $this->container['revocation_endpoint'] = $revocation_endpoint;
 
         return $this;
     }

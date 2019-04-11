@@ -26,7 +26,7 @@ import java.util.List;
  * It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms among others.
  */
 @ApiModel(description = "It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms among others.")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T18:32:06.000+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T20:30:02.841+02:00")
 public class WellKnown {
   @JsonProperty("authorization_endpoint")
   private String authorizationEndpoint = null;
@@ -66,6 +66,9 @@ public class WellKnown {
 
   @JsonProperty("response_types_supported")
   private List<String> responseTypesSupported = new ArrayList<String>();
+
+  @JsonProperty("revocation_endpoint")
+  private String revocationEndpoint = null;
 
   @JsonProperty("scopes_supported")
   private List<String> scopesSupported = null;
@@ -353,6 +356,24 @@ public class WellKnown {
     this.responseTypesSupported = responseTypesSupported;
   }
 
+  public WellKnown revocationEndpoint(String revocationEndpoint) {
+    this.revocationEndpoint = revocationEndpoint;
+    return this;
+  }
+
+   /**
+   * URL of the authorization server&#39;s OAuth 2.0 revocation endpoint.
+   * @return revocationEndpoint
+  **/
+  @ApiModelProperty(value = "URL of the authorization server's OAuth 2.0 revocation endpoint.")
+  public String getRevocationEndpoint() {
+    return revocationEndpoint;
+  }
+
+  public void setRevocationEndpoint(String revocationEndpoint) {
+    this.revocationEndpoint = revocationEndpoint;
+  }
+
   public WellKnown scopesSupported(List<String> scopesSupported) {
     this.scopesSupported = scopesSupported;
     return this;
@@ -513,6 +534,7 @@ public class WellKnown {
         Objects.equals(this.requireRequestUriRegistration, wellKnown.requireRequestUriRegistration) &&
         Objects.equals(this.responseModesSupported, wellKnown.responseModesSupported) &&
         Objects.equals(this.responseTypesSupported, wellKnown.responseTypesSupported) &&
+        Objects.equals(this.revocationEndpoint, wellKnown.revocationEndpoint) &&
         Objects.equals(this.scopesSupported, wellKnown.scopesSupported) &&
         Objects.equals(this.subjectTypesSupported, wellKnown.subjectTypesSupported) &&
         Objects.equals(this.tokenEndpoint, wellKnown.tokenEndpoint) &&
@@ -523,7 +545,7 @@ public class WellKnown {
 
   @Override
   public int hashCode() {
-    return Objects.hash(authorizationEndpoint, claimsParameterSupported, claimsSupported, grantTypesSupported, idTokenSigningAlgValuesSupported, issuer, jwksUri, registrationEndpoint, requestParameterSupported, requestUriParameterSupported, requireRequestUriRegistration, responseModesSupported, responseTypesSupported, scopesSupported, subjectTypesSupported, tokenEndpoint, tokenEndpointAuthMethodsSupported, userinfoEndpoint, userinfoSigningAlgValuesSupported);
+    return Objects.hash(authorizationEndpoint, claimsParameterSupported, claimsSupported, grantTypesSupported, idTokenSigningAlgValuesSupported, issuer, jwksUri, registrationEndpoint, requestParameterSupported, requestUriParameterSupported, requireRequestUriRegistration, responseModesSupported, responseTypesSupported, revocationEndpoint, scopesSupported, subjectTypesSupported, tokenEndpoint, tokenEndpointAuthMethodsSupported, userinfoEndpoint, userinfoSigningAlgValuesSupported);
   }
 
 
@@ -545,6 +567,7 @@ public class WellKnown {
     sb.append("    requireRequestUriRegistration: ").append(toIndentedString(requireRequestUriRegistration)).append("\n");
     sb.append("    responseModesSupported: ").append(toIndentedString(responseModesSupported)).append("\n");
     sb.append("    responseTypesSupported: ").append(toIndentedString(responseTypesSupported)).append("\n");
+    sb.append("    revocationEndpoint: ").append(toIndentedString(revocationEndpoint)).append("\n");
     sb.append("    scopesSupported: ").append(toIndentedString(scopesSupported)).append("\n");
     sb.append("    subjectTypesSupported: ").append(toIndentedString(subjectTypesSupported)).append("\n");
     sb.append("    tokenEndpoint: ").append(toIndentedString(tokenEndpoint)).append("\n");

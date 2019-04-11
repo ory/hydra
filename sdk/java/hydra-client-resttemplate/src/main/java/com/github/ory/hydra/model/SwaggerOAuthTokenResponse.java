@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModelProperty;
  * SwaggerOAuthTokenResponse The token response
  */
 @ApiModel(description = "SwaggerOAuthTokenResponse The token response")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T18:32:06.000+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T20:30:02.841+02:00")
 public class SwaggerOAuthTokenResponse {
   @JsonProperty("access_token")
   private String accessToken = null;

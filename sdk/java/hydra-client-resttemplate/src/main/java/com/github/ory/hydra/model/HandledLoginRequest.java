@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * HandledLoginRequest
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T18:32:06.000+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T20:30:02.841+02:00")
 public class HandledLoginRequest {
   @JsonProperty("acr")
   private String acr = null;

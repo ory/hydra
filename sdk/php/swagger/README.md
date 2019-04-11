@@ -148,6 +148,7 @@ Class | Method | HTTP request | Description
  - [SwaggerFlushInactiveAccessTokens](docs/Model/SwaggerFlushInactiveAccessTokens.md)
  - [SwaggerHealthStatus](docs/Model/SwaggerHealthStatus.md)
  - [SwaggerJSONWebKey](docs/Model/SwaggerJSONWebKey.md)
+ - [SwaggerJSONWebKeyQuery](docs/Model/SwaggerJSONWebKeyQuery.md)
  - [SwaggerJSONWebKeySet](docs/Model/SwaggerJSONWebKeySet.md)
  - [SwaggerJsonWebKeyQuery](docs/Model/SwaggerJsonWebKeyQuery.md)
  - [SwaggerJwkCreateSet](docs/Model/SwaggerJwkCreateSet.md)

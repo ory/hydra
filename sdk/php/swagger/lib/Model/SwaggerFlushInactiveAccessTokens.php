@@ -35,7 +35,6 @@ use \ArrayAccess;
  * SwaggerFlushInactiveAccessTokens Class Doc Comment
  *
  * @category    Class
- * @description SwaggerFlushInactiveAccessTokens swagger flush inactive access tokens
  * @package     Hydra\SDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen

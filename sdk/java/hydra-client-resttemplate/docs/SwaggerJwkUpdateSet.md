@@ -4,7 +4,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**body** | [**SwaggerJSONWebKeySet**](SwaggerJSONWebKeySet.md) |  |  [optional]
+**body** | [**JSONWebKeySet**](JSONWebKeySet.md) |  |  [optional]
 **set** | **String** | The set in: path | 
 
 

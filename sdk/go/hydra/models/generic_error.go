@@ -16,7 +16,7 @@ import (
 // GenericError Error response
 //
 // Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.
-// swagger:model GenericError
+// swagger:model genericError
 type GenericError struct {
 
 	// Code represents the error status code (404, 403, 401, ...).

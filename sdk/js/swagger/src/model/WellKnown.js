@@ -69,6 +69,7 @@
 
     _this['response_types_supported'] = responseTypesSupported;
 
+
     _this['subject_types_supported'] = subjectTypesSupported;
     _this['token_endpoint'] = tokenEndpoint;
 
@@ -125,6 +126,9 @@
       }
       if (data.hasOwnProperty('response_types_supported')) {
         obj['response_types_supported'] = ApiClient.convertToType(data['response_types_supported'], ['String']);
+      }
+      if (data.hasOwnProperty('revocation_endpoint')) {
+        obj['revocation_endpoint'] = ApiClient.convertToType(data['revocation_endpoint'], 'String');
       }
       if (data.hasOwnProperty('scopes_supported')) {
         obj['scopes_supported'] = ApiClient.convertToType(data['scopes_supported'], ['String']);
@@ -213,6 +217,11 @@
    * @member {Array.<String>} response_types_supported
    */
   exports.prototype['response_types_supported'] = undefined;
+  /**
+   * URL of the authorization server's OAuth 2.0 revocation endpoint.
+   * @member {String} revocation_endpoint
+   */
+  exports.prototype['revocation_endpoint'] = undefined;
   /**
    * SON array containing a list of the OAuth 2.0 [RFC6749] scope values that this server supports. The server MUST support the openid scope value. Servers MAY choose not to advertise some supported scope values even when this parameter is used
    * @member {Array.<String>} scopes_supported

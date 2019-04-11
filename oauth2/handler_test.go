@@ -394,6 +394,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		AuthURL:                           urlx.AppendPaths(conf.IssuerURL(), oauth2.AuthPath).String(),
 		TokenURL:                          urlx.AppendPaths(conf.IssuerURL(), oauth2.TokenPath).String(),
 		JWKsURI:                           urlx.AppendPaths(conf.IssuerURL(), oauth2.JWKPath).String(),
+		RevocationEndpoint:                urlx.AppendPaths(conf.IssuerURL(), oauth2.RevocationPath).String(),
 		RegistrationEndpoint:              conf.OAuth2ClientRegistrationURL().String(),
 		SubjectTypes:                      []string{"pairwise", "public"},
 		ResponseTypes:                     []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},

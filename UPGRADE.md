@@ -151,8 +151,11 @@ The old Go SDK is still available but moved to a new path. To use it, change:
 Previously, login and consent requests were accepted/rejected by doing one of:
 
 ```
+GET /oauth2/auth/requests/login/{challenge}
 PUT /oauth2/auth/requests/login/{challenge}/accept
 PUT /oauth2/auth/requests/login/{challenge}/reject
+
+GET /oauth2/auth/requests/consent/{challenge}
 PUT /oauth2/auth/requests/consent/{challenge}/accept
 PUT /oauth2/auth/requests/consent/{challenge}/reject
 ```
@@ -164,8 +167,11 @@ causing the login/consent app to execute a request it is not supposed to be maki
 From now on, the challenge has to be sent using a query parameter instead:
 
 ```
+GET /oauth2/auth/requests/login?challenge={challenge}
 PUT /oauth2/auth/requests/login/accept?challenge={challenge}
 PUT /oauth2/auth/requests/login/reject?challenge={challenge}
+
+GET /oauth2/auth/requests/consent?challenge={challenge}
 PUT /oauth2/auth/requests/consent/accept?challenge={challenge}
 PUT /oauth2/auth/requests/consent/reject?challenge={challenge}
 ```

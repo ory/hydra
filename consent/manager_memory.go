@@ -35,8 +35,8 @@ import (
 type MemoryManager struct {
 	consentRequests        map[string]ConsentRequest
 	handledConsentRequests map[string]HandledConsentRequest
-	authRequests           map[string]AuthenticationRequest
-	handledAuthRequests    map[string]HandledAuthenticationRequest
+	authRequests           map[string]LoginRequest
+	handledAuthRequests    map[string]HandledLoginRequest
 	authSessions           map[string]AuthenticationSession
 	pairwise               []ForcedObfuscatedAuthenticationSession
 	m                      map[string]*sync.RWMutex
@@ -47,8 +47,8 @@ func NewMemoryManager(r InternalRegistry) *MemoryManager {
 	return &MemoryManager{
 		consentRequests:        map[string]ConsentRequest{},
 		handledConsentRequests: map[string]HandledConsentRequest{},
-		authRequests:           map[string]AuthenticationRequest{},
-		handledAuthRequests:    map[string]HandledAuthenticationRequest{},
+		authRequests:           map[string]LoginRequest{},
+		handledAuthRequests:    map[string]HandledLoginRequest{},
 		authSessions:           map[string]AuthenticationSession{},
 		pairwise:               []ForcedObfuscatedAuthenticationSession{},
 		r:                      r,
@@ -318,7 +318,7 @@ func (m *MemoryManager) DeleteAuthenticationSession(ctx context.Context, id stri
 	return nil
 }
 
-func (m *MemoryManager) CreateAuthenticationRequest(ctx context.Context, a *AuthenticationRequest) error {
+func (m *MemoryManager) CreateAuthenticationRequest(ctx context.Context, a *LoginRequest) error {
 	m.m["authRequests"].Lock()
 	defer m.m["authRequests"].Unlock()
 	if _, ok := m.authRequests[a.Challenge]; ok {
@@ -328,7 +328,7 @@ func (m *MemoryManager) CreateAuthenticationRequest(ctx context.Context, a *Auth
 	return nil
 }
 
-func (m *MemoryManager) GetAuthenticationRequest(ctx context.Context, challenge string) (*AuthenticationRequest, error) {
+func (m *MemoryManager) GetAuthenticationRequest(ctx context.Context, challenge string) (*LoginRequest, error) {
 	m.m["authRequests"].RLock()
 	defer m.m["authRequests"].RUnlock()
 
@@ -346,14 +346,14 @@ func (m *MemoryManager) GetAuthenticationRequest(ctx context.Context, challenge 
 	return &c, nil
 }
 
-func (m *MemoryManager) HandleAuthenticationRequest(ctx context.Context, challenge string, r *HandledAuthenticationRequest) (*AuthenticationRequest, error) {
+func (m *MemoryManager) HandleAuthenticationRequest(ctx context.Context, challenge string, r *HandledLoginRequest) (*LoginRequest, error) {
 	m.m["handledAuthRequests"].Lock()
 	m.handledAuthRequests[r.Challenge] = *r
 	m.m["handledAuthRequests"].Unlock()
 	return m.GetAuthenticationRequest(ctx, challenge)
 }
 
-func (m *MemoryManager) VerifyAndInvalidateAuthenticationRequest(ctx context.Context, verifier string) (*HandledAuthenticationRequest, error) {
+func (m *MemoryManager) VerifyAndInvalidateAuthenticationRequest(ctx context.Context, verifier string) (*HandledLoginRequest, error) {
 	for _, c := range m.authRequests {
 		if c.Verifier == verifier {
 			for _, h := range m.handledAuthRequests {
@@ -368,7 +368,7 @@ func (m *MemoryManager) VerifyAndInvalidateAuthenticationRequest(ctx context.Con
 					}
 
 					c.Client.ClientID = c.Client.GetID()
-					h.AuthenticationRequest = &c
+					h.LoginRequest = &c
 					return &h, nil
 				}
 			}

@@ -37,7 +37,7 @@ func TestMySQLHack(t *testing.T) {
 }
 
 func TestSQLAuthenticationConverter(t *testing.T) {
-	a := &AuthenticationRequest{
+	a := &LoginRequest{
 		OpenIDConnectContext: &OpenIDConnectContext{
 			ACRValues:         []string{"1", "2"},
 			UILocales:         []string{"fr", "de"},
@@ -59,13 +59,13 @@ func TestSQLAuthenticationConverter(t *testing.T) {
 		SessionID:         "session-id",
 	}
 
-	b := &HandledAuthenticationRequest{
-		AuthenticationRequest: a,
-		RememberFor:           120,
-		Remember:              true,
-		Challenge:             "challenge",
-		RequestedAt:           time.Now().UTC().Add(-time.Minute),
-		AuthenticatedAt:       time.Now().UTC().Add(-time.Minute),
+	b := &HandledLoginRequest{
+		LoginRequest:    a,
+		RememberFor:     120,
+		Remember:        true,
+		Challenge:       "challenge",
+		RequestedAt:     time.Now().UTC().Add(-time.Minute),
+		AuthenticatedAt: time.Now().UTC().Add(-time.Minute),
 		Error: &RequestDeniedError{
 			Name:        "error_name",
 			Description: "error_description",
@@ -77,19 +77,20 @@ func TestSQLAuthenticationConverter(t *testing.T) {
 		ForceSubjectIdentifier: "foo-id",
 		ACR:                    "acr",
 		WasUsed:                true,
+		Context:                map[string]interface{}{"foo": "bar"},
 	}
 
 	a1, err := newSQLAuthenticationRequest(a)
 	require.NoError(t, err)
 
-	b1, err := newSQLHandledAuthenticationRequest(b)
+	b1, err := newSQLHandledLoginRequest(b)
 	require.NoError(t, err)
 
 	a2, err := a1.toAuthenticationRequest(a.Client)
 	require.NoError(t, err)
 	assert.EqualValues(t, a, a2)
 
-	b2, err := b1.toHandledAuthenticationRequest(a)
+	b2, err := b1.toHandledLoginRequest(a)
 	require.NoError(t, err)
 	assert.EqualValues(t, b, b2)
 	assert.EqualValues(t, b.Subject, b2.Subject)
@@ -119,6 +120,7 @@ func TestSQLConsentConverter(t *testing.T) {
 		AuthenticatedAt:        time.Now().UTC().Add(-time.Minute),
 		LoginChallenge:         "login-challenge",
 		LoginSessionID:         "login-session-id",
+		Context:                map[string]interface{}{},
 	}
 
 	b := &HandledConsentRequest{

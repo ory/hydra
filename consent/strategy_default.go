@@ -189,7 +189,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 	// Set the session
 	if err := s.r.ConsentManager().CreateAuthenticationRequest(
 		r.Context(),
-		&AuthenticationRequest{
+		&LoginRequest{
 			Challenge:         challenge,
 			Verifier:          verifier,
 			CSRF:              csrf,
@@ -269,7 +269,7 @@ func (s *DefaultStrategy) obfuscateSubjectIdentifier(req fosite.AuthorizeRequest
 	return subject, nil
 }
 
-func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*HandledAuthenticationRequest, error) {
+func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*HandledLoginRequest, error) {
 	ctx := r.Context()
 	session, err := s.r.ConsentManager().VerifyAndInvalidateAuthenticationRequest(ctx, verifier)
 	if errors.Cause(err) == x.ErrNotFound {
@@ -286,15 +286,15 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return nil, errors.WithStack(fosite.ErrRequestUnauthorized.WithDebug("The login request has expired, please try again."))
 	}
 
-	if err := validateCsrfSession(r, s.r.CookieStore(), cookieAuthenticationCSRFName, session.AuthenticationRequest.CSRF); err != nil {
+	if err := validateCsrfSession(r, s.r.CookieStore(), cookieAuthenticationCSRFName, session.LoginRequest.CSRF); err != nil {
 		return nil, err
 	}
 
-	if session.AuthenticationRequest.Skip && session.Remember {
+	if session.LoginRequest.Skip && session.Remember {
 		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("The login request is marked as remember, but is also marked as skipped - only one of the values can be true."))
 	}
 
-	if session.AuthenticationRequest.Skip && session.Subject != session.AuthenticationRequest.Subject {
+	if session.LoginRequest.Skip && session.Subject != session.LoginRequest.Subject {
 		// Revoke the session because there's clearly a mix up wrt the subject that's being authenticated
 		if err := s.revokeAuthenticationSession(w, r); err != nil {
 			return nil, err
@@ -356,7 +356,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	}
 
 	if !session.Remember {
-		if !session.AuthenticationRequest.Skip {
+		if !session.LoginRequest.Skip {
 			// If the session should not be remembered (and we're actually not skipping), than the user clearly don't
 			// wants us to store a cookie. So let's bust the authentication session (if one exists).
 			if err := s.revokeAuthenticationSession(w, r); err != nil {
@@ -394,7 +394,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	return session, nil
 }
 
-func (s *DefaultStrategy) requestConsent(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, authenticationSession *HandledAuthenticationRequest) error {
+func (s *DefaultStrategy) requestConsent(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, authenticationSession *HandledLoginRequest) error {
 	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
 	if stringslice.Has(prompt, "consent") {
 		return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
@@ -446,7 +446,7 @@ func (s *DefaultStrategy) requestConsent(w http.ResponseWriter, r *http.Request,
 	return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
 }
 
-func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, as *HandledAuthenticationRequest, cs *HandledConsentRequest) error {
+func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, as *HandledLoginRequest, cs *HandledConsentRequest) error {
 	skip := false
 	if cs != nil {
 		skip = true
@@ -474,13 +474,14 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 			RequestedAudience:      []string(ar.GetRequestedAudience()),
 			Subject:                as.Subject,
 			Client:                 sanitizeClientFromRequest(ar),
-			RequestURL:             as.AuthenticationRequest.RequestURL,
+			RequestURL:             as.LoginRequest.RequestURL,
 			AuthenticatedAt:        as.AuthenticatedAt,
 			RequestedAt:            as.RequestedAt,
 			ForceSubjectIdentifier: as.ForceSubjectIdentifier,
-			OpenIDConnectContext:   as.AuthenticationRequest.OpenIDConnectContext,
-			LoginSessionID:         as.AuthenticationRequest.SessionID,
-			LoginChallenge:         as.AuthenticationRequest.Challenge,
+			OpenIDConnectContext:   as.LoginRequest.OpenIDConnectContext,
+			LoginSessionID:         as.LoginRequest.SessionID,
+			LoginChallenge:         as.LoginRequest.Challenge,
+			Context:                as.Context,
 		},
 	); err != nil {
 		return errors.WithStack(err)

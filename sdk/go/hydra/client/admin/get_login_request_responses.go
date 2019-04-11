@@ -68,7 +68,7 @@ func NewGetLoginRequestOK() *GetLoginRequestOK {
 loginRequest
 */
 type GetLoginRequestOK struct {
-	Payload *models.AuthenticationRequest
+	Payload *models.LoginRequest
 }
 
 func (o *GetLoginRequestOK) Error() string {
@@ -77,7 +77,7 @@ func (o *GetLoginRequestOK) Error() string {
 
 func (o *GetLoginRequestOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.AuthenticationRequest)
+	o.Payload = new(models.LoginRequest)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

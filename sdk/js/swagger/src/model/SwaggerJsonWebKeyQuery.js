@@ -41,6 +41,7 @@
 
   /**
    * Constructs a new <code>SwaggerJsonWebKeyQuery</code>.
+   * SwaggerJSONWebKeyQuery swagger Json web key query
    * @alias module:model/SwaggerJsonWebKeyQuery
    * @class
    * @param kid {String} The kid of the desired key in: path

@@ -57,6 +57,7 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 		ACR:                    "1",
 		AuthenticatedAt:        time.Now().UTC().Add(-time.Hour),
 		RequestedAt:            time.Now().UTC().Add(-time.Hour),
+		Context:                map[string]interface{}{"foo": "bar" + key},
 	}
 
 	var err *RequestDeniedError
@@ -91,8 +92,8 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 	return c, h
 }
 
-func MockAuthRequest(key string, authAt bool) (c *AuthenticationRequest, h *HandledAuthenticationRequest) {
-	c = &AuthenticationRequest{
+func MockAuthRequest(key string, authAt bool) (c *LoginRequest, h *HandledLoginRequest) {
+	c = &LoginRequest{
 		OpenIDConnectContext: &OpenIDConnectContext{
 			ACRValues: []string{"1" + key, "2" + key},
 			UILocales: []string{"fr" + key, "de" + key},
@@ -123,8 +124,8 @@ func MockAuthRequest(key string, authAt bool) (c *AuthenticationRequest, h *Hand
 		time.Now().UTC().Add(-time.Minute)
 	}
 
-	h = &HandledAuthenticationRequest{
-		AuthenticationRequest:  c,
+	h = &HandledLoginRequest{
+		LoginRequest:           c,
 		RememberFor:            120,
 		Remember:               true,
 		Challenge:              "challenge" + key,
@@ -152,7 +153,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					Subject:         fmt.Sprintf("subject-%s", k),
 				}))
 
-				require.NoError(t, m.CreateAuthenticationRequest(context.TODO(), &AuthenticationRequest{
+				require.NoError(t, m.CreateAuthenticationRequest(context.TODO(), &LoginRequest{
 					Challenge:       fmt.Sprintf("fk-login-challenge-%s", k),
 					Verifier:        fmt.Sprintf("fk-login-verifier-%s", k),
 					Client:          &client.Client{ClientID: fmt.Sprintf("fk-client-%s", k)},
@@ -247,7 +248,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 
 					got2, err := m.VerifyAndInvalidateAuthenticationRequest(context.TODO(), "verifier"+tc.key)
 					require.NoError(t, err)
-					compareAuthenticationRequest(t, c, got2.AuthenticationRequest)
+					compareAuthenticationRequest(t, c, got2.LoginRequest)
 					assert.Equal(t, c.Challenge, got2.Challenge)
 
 					_, err = m.VerifyAndInvalidateAuthenticationRequest(context.TODO(), "verifier"+tc.key)
@@ -533,7 +534,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 	}
 }
 
-func compareAuthenticationRequest(t *testing.T, a, b *AuthenticationRequest) {
+func compareAuthenticationRequest(t *testing.T, a, b *LoginRequest) {
 	assert.EqualValues(t, a.Client.GetID(), b.Client.GetID())
 	assert.EqualValues(t, a.Challenge, b.Challenge)
 	assert.EqualValues(t, *a.OpenIDConnectContext, *b.OpenIDConnectContext)

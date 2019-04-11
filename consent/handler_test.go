@@ -115,7 +115,7 @@ func TestGetLoginRequest(t *testing.T) {
 			reg := internal.NewRegistry(conf)
 
 			if tc.exists {
-				require.NoError(t, reg.ConsentManager().CreateAuthenticationRequest(context.TODO(), &AuthenticationRequest{
+				require.NoError(t, reg.ConsentManager().CreateAuthenticationRequest(context.TODO(), &LoginRequest{
 					Client:     &client.Client{ClientID: "client" + key},
 					Challenge:  challenge,
 					WasHandled: tc.handled,

@@ -129,7 +129,7 @@ func TestSDK(t *testing.T) {
 	assert.Equal(t, 0, len(csGot.Payload))
 }
 
-func compareSDKLoginRequest(t *testing.T, expected *AuthenticationRequest, got models.AuthenticationRequest) {
+func compareSDKLoginRequest(t *testing.T, expected *LoginRequest, got models.LoginRequest) {
 	assert.EqualValues(t, expected.Challenge, got.Challenge)
 	assert.EqualValues(t, expected.Subject, got.Subject)
 	assert.EqualValues(t, expected.Skip, got.Skip)

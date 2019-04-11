@@ -24,6 +24,9 @@ type ConsentRequest struct {
 	// identify the session.
 	Challenge string `json:"challenge,omitempty"`
 
+	// Context contains arbitrary information set by the login endpoint or is empty if not set.
+	Context map[string]interface{} `json:"context,omitempty"`
+
 	// LoginChallenge is the login challenge this consent challenge belongs to. It can be used to associate
 	// a login and consent request in the login & consent app.
 	LoginChallenge string `json:"login_challenge,omitempty"`

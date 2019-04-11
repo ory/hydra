@@ -13,13 +13,18 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// HandledAuthenticationRequest HandledAuthenticationRequest HandledAuthenticationRequest The request payload used to accept a login request.
-// swagger:model HandledAuthenticationRequest
-type HandledAuthenticationRequest struct {
+// HandledLoginRequest HandledLoginRequest HandledLoginRequest HandledLoginRequest HandledLoginRequest is the request payload used to accept a login request.
+// swagger:model HandledLoginRequest
+type HandledLoginRequest struct {
 
 	// ACR sets the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it
 	// to express that, for example, a user authenticated using two factor authentication.
 	ACR string `json:"acr,omitempty"`
+
+	// Context is an optional object which can hold arbitrary data. The data will be made available when fetching the
+	// consent request under the "context" field. This is useful in scenarios where login and consent endpoints share
+	// data.
+	Context map[string]interface{} `json:"context,omitempty"`
 
 	// ForceSubjectIdentifier forces the "pairwise" user ID of the end-user that authenticated. The "pairwise" user ID refers to the
 	// (Pairwise Identifier Algorithm)[http://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg] of the OpenID
@@ -54,8 +59,8 @@ type HandledAuthenticationRequest struct {
 	Subject *string `json:"subject"`
 }
 
-// Validate validates this handled authentication request
-func (m *HandledAuthenticationRequest) Validate(formats strfmt.Registry) error {
+// Validate validates this handled login request
+func (m *HandledLoginRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateSubject(formats); err != nil {
@@ -68,7 +73,7 @@ func (m *HandledAuthenticationRequest) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *HandledAuthenticationRequest) validateSubject(formats strfmt.Registry) error {
+func (m *HandledLoginRequest) validateSubject(formats strfmt.Registry) error {
 
 	if err := validate.Required("subject", "body", m.Subject); err != nil {
 		return err
@@ -78,7 +83,7 @@ func (m *HandledAuthenticationRequest) validateSubject(formats strfmt.Registry) 
 }
 
 // MarshalBinary interface implementation
-func (m *HandledAuthenticationRequest) MarshalBinary() ([]byte, error) {
+func (m *HandledLoginRequest) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -86,8 +91,8 @@ func (m *HandledAuthenticationRequest) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *HandledAuthenticationRequest) UnmarshalBinary(b []byte) error {
-	var res HandledAuthenticationRequest
+func (m *HandledLoginRequest) UnmarshalBinary(b []byte) error {
+	var res HandledLoginRequest
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

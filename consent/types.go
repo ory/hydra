@@ -104,7 +104,7 @@ type HandledConsentRequest struct {
 }
 
 // The response used to return handled consent requests
-// same as HandledAuthenticationRequest, just with consent_request exposed as json
+// same as HandledLoginRequest, just with consent_request exposed as json
 type PreviousConsentSession struct {
 	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`
 	GrantedScope []string `json:"grant_scope"`
@@ -131,10 +131,10 @@ type PreviousConsentSession struct {
 	WasUsed         bool                `json:"-"`
 }
 
-// The request payload used to accept a login request.
+// HandledLoginRequest is the request payload used to accept a login request.
 //
 // swagger:model acceptLoginRequest
-type HandledAuthenticationRequest struct {
+type HandledLoginRequest struct {
 	// Remember, if set to true, tells ORY Hydra to remember this user by telling the user agent (browser) to store
 	// a cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, he/she
 	// will not be asked to log in again.
@@ -171,12 +171,17 @@ type HandledAuthenticationRequest struct {
 	// If you fail to compute the proper value, then authentication processes which have id_token_hint set might fail.
 	ForceSubjectIdentifier string `json:"force_subject_identifier"`
 
-	AuthenticationRequest *AuthenticationRequest `json:"-"`
-	Error                 *RequestDeniedError    `json:"-"`
-	Challenge             string                 `json:"-"`
-	RequestedAt           time.Time              `json:"-"`
-	AuthenticatedAt       time.Time              `json:"-"`
-	WasUsed               bool                   `json:"-"`
+	// Context is an optional object which can hold arbitrary data. The data will be made available when fetching the
+	// consent request under the "context" field. This is useful in scenarios where login and consent endpoints share
+	// data.
+	Context map[string]interface{} `json:"context"`
+
+	LoginRequest    *LoginRequest       `json:"-"`
+	Error           *RequestDeniedError `json:"-"`
+	Challenge       string              `json:"-"`
+	RequestedAt     time.Time           `json:"-"`
+	AuthenticatedAt time.Time           `json:"-"`
+	WasUsed         bool                `json:"-"`
 }
 
 // Contains optional information about the OpenID Connect request.
@@ -225,7 +230,7 @@ type OpenIDConnectContext struct {
 // Contains information on an ongoing login request.
 //
 // swagger:model loginRequest
-type AuthenticationRequest struct {
+type LoginRequest struct {
 	// Challenge is the identifier ("authentication challenge") of the consent authentication request. It is used to
 	// identify the session.
 	Challenge string `json:"challenge"`
@@ -317,6 +322,9 @@ type ConsentRequest struct {
 	// ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it
 	// to express that, for example, a user authenticated using two factor authentication.
 	ACR string `json:"acr"`
+
+	// Context contains arbitrary information set by the login endpoint or is empty if not set.
+	Context map[string]interface{} `json:"context,omitempty"`
 
 	// ForceSubjectIdentifier is the value from authentication (if set).
 	ForceSubjectIdentifier string    `json:"-"`

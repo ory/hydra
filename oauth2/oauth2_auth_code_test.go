@@ -252,8 +252,9 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									assert.Empty(t, rr.Payload.Subject)
 									v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 										WithChallenge(r.URL.Query().Get("login_challenge")).
-										WithBody(&models.HandledAuthenticationRequest{
+										WithBody(&models.HandledLoginRequest{
 											Subject: pointerx.String("user-a"), Remember: true, RememberFor: 0, ACR: "1",
+											Context: map[string]interface{}{"context": "bar"},
 										}))
 									require.NoError(t, err)
 									require.NotEmpty(t, v.Payload.RedirectTo)
@@ -265,6 +266,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									rr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge(r.URL.Query().Get("consent_challenge")))
 									require.NoError(t, err)
 									assert.False(t, rr.Payload.Skip)
+									assert.Equal(t, map[string]interface{}{"context": "bar"}, rr.Payload.Context)
 									v, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
 										WithChallenge(r.URL.Query().Get("consent_challenge")).
 										WithBody(&models.HandledConsentRequest{
@@ -316,7 +318,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									require.NoError(t, err)
 									v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 										WithChallenge(r.URL.Query().Get("login_challenge")).
-										WithBody(&models.HandledAuthenticationRequest{
+										WithBody(&models.HandledLoginRequest{
 											Subject: pointerx.String("user-a"), Remember: true, RememberFor: 0, ACR: "1",
 										}))
 									require.NoError(t, err)
@@ -373,7 +375,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 									v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 										WithChallenge(r.URL.Query().Get("login_challenge")).
-										WithBody(&models.HandledAuthenticationRequest{
+										WithBody(&models.HandledLoginRequest{
 											Subject: pointerx.String(""), Remember: false, RememberFor: 0, ACR: "1",
 										}))
 									require.Error(t, err)
@@ -410,7 +412,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 									v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 										WithChallenge(r.URL.Query().Get("login_challenge")).
-										WithBody(&models.HandledAuthenticationRequest{
+										WithBody(&models.HandledLoginRequest{
 											Subject: pointerx.String("user-a"), Remember: false, RememberFor: 0, ACR: "1",
 										}))
 									require.NoError(t, err)
@@ -482,7 +484,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 									v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 										WithChallenge(r.URL.Query().Get("login_challenge")).
-										WithBody(&models.HandledAuthenticationRequest{
+										WithBody(&models.HandledLoginRequest{
 											Subject: pointerx.String("user-a"), Remember: true, RememberFor: 0,
 										}))
 
@@ -598,7 +600,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 									vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 										WithChallenge(r.URL.Query().Get("login_challenge")).
-										WithBody(&models.HandledAuthenticationRequest{
+										WithBody(&models.HandledLoginRequest{
 											Subject: pointerx.String("user-a"), Remember: true, RememberFor: 0,
 										}))
 									require.NoError(t, err)
@@ -694,7 +696,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 									vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 										WithChallenge(r.URL.Query().Get("login_challenge")).
-										WithBody(&models.HandledAuthenticationRequest{Subject: pointerx.String("user-a")}))
+										WithBody(&models.HandledLoginRequest{Subject: pointerx.String("user-a")}))
 									require.NoError(t, err)
 
 									v := vr.Payload
@@ -804,7 +806,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 									vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 										WithChallenge(r.URL.Query().Get("login_challenge")).
-										WithBody(&models.HandledAuthenticationRequest{
+										WithBody(&models.HandledLoginRequest{
 											Subject: pointerx.String("user-a"),
 										}))
 									require.NoError(t, err)
@@ -867,7 +869,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 									vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 										WithChallenge(r.URL.Query().Get("login_challenge")).
-										WithBody(&models.HandledAuthenticationRequest{
+										WithBody(&models.HandledLoginRequest{
 											Subject: pointerx.String("user-a"),
 										}))
 									require.NoError(t, err)
@@ -950,7 +952,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 									vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 										WithChallenge(r.URL.Query().Get("login_challenge")).
-										WithBody(&models.HandledAuthenticationRequest{
+										WithBody(&models.HandledLoginRequest{
 											Subject: pointerx.String("user-a"), Remember: true, RememberFor: 0, ACR: "1",
 										}))
 									require.NoError(t, err)

@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModelProperty;
  * SwaggerVersion swagger version
  */
 @ApiModel(description = "SwaggerVersion swagger version")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T13:09:51.955+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T18:32:06.000+02:00")
 public class SwaggerVersion {
   @JsonProperty("version")
   private String version = null;

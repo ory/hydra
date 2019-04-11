@@ -34,12 +34,14 @@ type WellKnown struct {
 	// by WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this IssuerURL.
 	//
 	// required: true
+	// x-nullable: false
 	// example: https://playground.ory.sh/ory-hydra/public/
 	Issuer string `json:"issuer"`
 
 	// URL of the OP's OAuth 2.0 Authorization Endpoint.
 	//
 	// required: true
+	// x-nullable: false
 	// example: https://playground.ory.sh/ory-hydra/public/oauth2/auth
 	AuthURL string `json:"authorization_endpoint"`
 
@@ -50,6 +52,7 @@ type WellKnown struct {
 	// URL of the OP's OAuth 2.0 Token Endpoint
 	//
 	// required: true
+	// x-nullable: false
 	// example: https://playground.ory.sh/ory-hydra/public/oauth2/token
 	TokenURL string `json:"token_endpoint"`
 
@@ -62,6 +65,7 @@ type WellKnown struct {
 	// keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate.
 	//
 	// required: true
+	// x-nullable: false
 	// example: https://playground.ory.sh/ory-hydra/public/.well-known/jwks.json
 	JWKsURI string `json:"jwks_uri"`
 
@@ -69,6 +73,7 @@ type WellKnown struct {
 	// pairwise and public.
 	//
 	// required: true
+	// x-nullable: false
 	// example: public, pairwise
 	SubjectTypes []string `json:"subject_types_supported"`
 
@@ -76,6 +81,7 @@ type WellKnown struct {
 	// Providers MUST support the code, id_token, and the token id_token Response Type values.
 	//
 	// required: true
+	// x-nullable: false
 	ResponseTypes []string `json:"response_types_supported"`
 
 	// JSON array containing a list of the Claim Names of the Claims that the OpenID Provider MAY be able to supply
@@ -106,6 +112,7 @@ type WellKnown struct {
 	// to encode the Claims in a JWT.
 	//
 	// required: true
+	// x-nullable: false
 	IDTokenSigningAlgValuesSupported []string `json:"id_token_signing_alg_values_supported"`
 
 	// 	Boolean value specifying whether the OP supports use of the request parameter, with true indicating support.
@@ -133,6 +140,7 @@ type FlushInactiveOAuth2TokensRequest struct {
 type swaggerRevokeOAuth2TokenParameters struct {
 	// in: formData
 	// required: true
+	// x-nullable: false
 	Token string `json:"token"`
 }
 
@@ -140,6 +148,7 @@ type swaggerRevokeOAuth2TokenParameters struct {
 type swaggeroauth2TokenParameters struct {
 	// in: formData
 	// required: true
+	// x-nullable: false
 	GrantType string `json:"grant_type"`
 
 	// in: formData
@@ -261,6 +270,7 @@ type swaggerOAuthIntrospectionRequest struct {
 	// This endpoint DOES NOT accept refresh tokens for validation.
 	//
 	// required: true
+	// x-nullable: false
 	// in: formData
 	Token string `json:"token"`
 

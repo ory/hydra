@@ -21,9 +21,10 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * SwaggerJsonWebKeyQuery
+ * SwaggerJSONWebKeyQuery swagger Json web key query
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-09T11:44:19.460+02:00")
+@ApiModel(description = "SwaggerJSONWebKeyQuery swagger Json web key query")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T12:20:48.103+02:00")
 public class SwaggerJsonWebKeyQuery {
   @JsonProperty("kid")
   private String kid = null;

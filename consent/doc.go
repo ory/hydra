@@ -22,8 +22,9 @@ package consent
 
 // swagger:parameters getLoginRequest getConsentRequest
 type swaggerGetRequestByChallenge struct {
-	// in: path
+	// in: query
 	// required: true
+	// x-nullable: false
 	Challenge string `json:"challenge"`
 }
 
@@ -31,6 +32,7 @@ type swaggerGetRequestByChallenge struct {
 type swaggerRevokeAllUserConsentSessionsPayload struct {
 	// in: path
 	// required: true
+	// x-nullable: false
 	User string `json:"user"`
 }
 
@@ -38,10 +40,12 @@ type swaggerRevokeAllUserConsentSessionsPayload struct {
 type swaggerRevokeUserClientConsentSessionsPayload struct {
 	// in: path
 	// required: true
+	// x-nullable: false
 	User string `json:"user"`
 
 	// in: path
 	// required: true
+	// x-nullable: false
 	Client string `json:"client"`
 }
 
@@ -49,6 +53,7 @@ type swaggerRevokeUserClientConsentSessionsPayload struct {
 type swaggerListUserConsentSessionsPayload struct {
 	// in: path
 	// required: true
+	// x-nullable: false
 	User string `json:"user"`
 }
 
@@ -56,13 +61,15 @@ type swaggerListUserConsentSessionsPayload struct {
 type swaggerRevokeAuthenticationSessionPayload struct {
 	// in: path
 	// required: true
+	// x-nullable: false
 	User string `json:"user"`
 }
 
 // swagger:parameters acceptLoginRequest
 type swaggerAcceptAuthenticationRequest struct {
-	// in: path
+	// in: query
 	// required: true
+	// x-nullable: false
 	Challenge string `json:"challenge"`
 
 	// in: body
@@ -71,8 +78,9 @@ type swaggerAcceptAuthenticationRequest struct {
 
 // swagger:parameters acceptConsentRequest
 type swaggerAcceptConsentRequest struct {
-	// in: path
+	// in: query
 	// required: true
+	// x-nullable: false
 	Challenge string `json:"challenge"`
 
 	// in: body
@@ -81,8 +89,10 @@ type swaggerAcceptConsentRequest struct {
 
 // swagger:parameters rejectLoginRequest rejectConsentRequest
 type swaggerRejectRequest struct {
-	// in: path
+	// in: query
+	// x-nullable: false
 	// required: true
+	// x-nullable: false
 	Challenge string `json:"challenge"`
 
 	// in: body

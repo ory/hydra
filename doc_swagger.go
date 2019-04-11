@@ -29,6 +29,7 @@ type genericError struct {
 	// Name is the error name.
 	//
 	// required: true
+	// x-nullable: false
 	// example: The requested resource could not be found
 	Name string `json:"error"`
 

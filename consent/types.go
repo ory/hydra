@@ -150,7 +150,6 @@ type HandledAuthenticationRequest struct {
 
 	// Subject is the user ID of the end-user that authenticated.
 	// required: true
-	// x-nullable: false
 	Subject string `json:"subject"`
 
 	// ForceSubjectIdentifier forces the "pairwise" user ID of the end-user that authenticated. The "pairwise" user ID refers to the

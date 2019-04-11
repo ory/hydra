@@ -21,10 +21,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * SwaggerRevokeOAuth2TokenParameters swagger revoke o auth2 token parameters
+ * SwaggerRevokeOAuth2TokenParameters
  */
-@ApiModel(description = "SwaggerRevokeOAuth2TokenParameters swagger revoke o auth2 token parameters")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T12:20:48.103+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T13:09:51.955+02:00")
 public class SwaggerRevokeOAuth2TokenParameters {
   @JsonProperty("token")
   private String token = null;

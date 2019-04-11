@@ -21,10 +21,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * SwaggerOAuthIntrospectionRequest swagger o auth introspection request
+ * SwaggerOAuthIntrospectionRequest
  */
-@ApiModel(description = "SwaggerOAuthIntrospectionRequest swagger o auth introspection request")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T12:20:48.103+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T13:09:51.955+02:00")
 public class SwaggerOAuthIntrospectionRequest {
   @JsonProperty("scope")
   private String scope = null;

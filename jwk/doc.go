@@ -30,7 +30,6 @@ package jwk
 type createRequest struct {
 	// The algorithm to be used for creating the key. Supports "RS256", "ES512", "HS512", and "HS256"
 	// required: true
-	// x-nullable: false
 	Algorithm string `json:"alg"`
 
 	// The "use" (public key use) parameter identifies the intended use of
@@ -38,12 +37,10 @@ type createRequest struct {
 	// a public key is used for encrypting data or verifying the signature
 	// on data. Valid values are "enc" and "sig".
 	// required: true
-	// x-nullable: false
 	Use string `json:"use"`
 
 	// The kid of the key to be created
 	// required: true
-	// x-nullable: false
 	KeyID string `json:"kid"`
 }
 
@@ -52,13 +49,11 @@ type swaggerJsonWebKeyQuery struct {
 	// The kid of the desired key
 	// in: path
 	// required: true
-	// x-nullable: false
 	KID string `json:"kid"`
 
 	// The set
 	// in: path
 	// required: true
-	// x-nullable: false
 	Set string `json:"set"`
 }
 
@@ -67,7 +62,6 @@ type swaggerJwkUpdateSet struct {
 	// The set
 	// in: path
 	// required: true
-	// x-nullable: false
 	Set string `json:"set"`
 
 	// in: body
@@ -79,13 +73,11 @@ type swaggerJwkUpdateSetKey struct {
 	// The kid of the desired key
 	// in: path
 	// required: true
-	// x-nullable: false
 	KID string `json:"kid"`
 
 	// The set
 	// in: path
 	// required: true
-	// x-nullable: false
 	Set string `json:"set"`
 
 	// in: body
@@ -97,7 +89,6 @@ type swaggerJwkCreateSet struct {
 	// The set
 	// in: path
 	// required: true
-	// x-nullable: false
 	Set string `json:"set"`
 
 	// in: body
@@ -109,7 +100,6 @@ type swaggerJwkSetQuery struct {
 	// The set
 	// in: path
 	// required: true
-	// x-nullable: false
 	Set string `json:"set"`
 }
 
@@ -139,7 +129,6 @@ type swaggerJSONWebKey struct {
 	// on data. Values are commonly "sig" (signature) or "enc" (encryption).
 	//
 	// required: true
-	// x-nullable: false
 	// example: sig
 	Use string `json:"use,omitempty"`
 
@@ -150,7 +139,6 @@ type swaggerJSONWebKey struct {
 	// Resistant Name.  The "kty" value is a case-sensitive string.
 	//
 	// required: true
-	// x-nullable: false
 	// example: RSA
 	Kty string `json:"kty,omitempty"`
 
@@ -165,7 +153,6 @@ type swaggerJSONWebKey struct {
 	// value is a case-sensitive string.
 	//
 	// required: true
-	// x-nullable: false
 	// example: 1603dfe0af8f4596
 	Kid string `json:"kid,omitempty"`
 
@@ -176,7 +163,6 @@ type swaggerJSONWebKey struct {
 	// Resistant Name.
 	//
 	// required: true
-	// x-nullable: false
 	// example: RS256
 	Alg string `json:"alg,omitempty"`
 

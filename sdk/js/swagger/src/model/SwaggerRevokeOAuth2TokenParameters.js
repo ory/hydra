@@ -41,7 +41,6 @@
 
   /**
    * Constructs a new <code>SwaggerRevokeOAuth2TokenParameters</code>.
-   * SwaggerRevokeOAuth2TokenParameters swagger revoke o auth2 token parameters
    * @alias module:model/SwaggerRevokeOAuth2TokenParameters
    * @class
    * @param token {String} in: formData

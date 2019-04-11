@@ -33,7 +33,6 @@ package client
 type swaggerCreateClientPayload struct {
 	// in: body
 	// required: true
-	// x-nullable: false
 	Body Client
 }
 
@@ -41,12 +40,10 @@ type swaggerCreateClientPayload struct {
 type swaggerUpdateClientPayload struct {
 	// in: path
 	// required: true
-	// x-nullable: false
 	ID string `json:"id"`
 
 	// in: body
 	// required: true
-	// x-nullable: false
 	Body Client
 }
 

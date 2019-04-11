@@ -35,7 +35,6 @@ type Introspection struct {
 	// before its expiration time).
 	//
 	// required: true
-	// x-nullable: false
 	Active bool `json:"active"`
 
 	// Scope is a JSON string containing a space-separated list of

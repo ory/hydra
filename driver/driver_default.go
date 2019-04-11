@@ -39,3 +39,8 @@ func (r *DefaultDriver) Configuration() configuration.Provider {
 func (r *DefaultDriver) Registry() Registry {
 	return r.r
 }
+
+func (r *DefaultDriver) CallRegistry() Driver {
+	CallRegistry(r.Registry())
+	return r
+}

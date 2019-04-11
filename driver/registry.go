@@ -2,11 +2,10 @@ package driver
 
 import (
 	"github.com/go-errors/errors"
-	"github.com/sirupsen/logrus"
-
 	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/tracing"
+	"github.com/sirupsen/logrus"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
@@ -38,18 +37,15 @@ type Registry interface {
 	consent.Registry
 	jwk.Registry
 	oauth2.Registry
+	PrometheusManager() *prometheus.MetricsManager
+	Tracer() *tracing.Tracer
 
+	RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPublic)
 	ClientHandler() *client.Handler
 	KeyHandler() *jwk.Handler
 	ConsentHandler() *consent.Handler
 	OAuth2Handler() *oauth2.Handler
 	HealthHandler() *healthx.Handler
-
-	RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPublic)
-
-	PrometheusManager() *prometheus.MetricsManager
-
-	Tracer() *tracing.Tracer
 }
 
 func MustNewRegistry(c configuration.Provider) Registry {
@@ -75,30 +71,26 @@ func NewRegistry(c configuration.Provider) (Registry, error) {
 		return nil, err
 	}
 
-	_ = registry.ClientHandler()
-	_ = registry.KeyHandler()
-	_ = registry.ConsentHandler()
-	_ = registry.OAuth2Handler()
-	_ = registry.HealthHandler()
-	_ = registry.PrometheusManager()
-	_ = registry.Tracer()
-	_ = registry.OAuth2Storage()
-	_ = registry.OAuth2Provider()
-	_ = registry.AudienceStrategy()
-	_ = registry.ScopeStrategy()
-	_ = registry.AccessTokenJWTStrategy()
-	_ = registry.OpenIDJWTStrategy()
-	_ = registry.OpenIDConnectRequestValidator()
-	_ = registry.KeyManager()
-	_ = registry.KeyGenerators()
-	_ = registry.KeyCipher()
-	_ = registry.ConsentManager()
-	_ = registry.ConsentStrategy()
-	_ = registry.SubjectIdentifierAlgorithm()
-	_ = registry.ClientValidator()
-	_ = registry.ClientManager()
-	_ = registry.ClientHasher()
-	_ = registry.CookieStore()
-
 	return registry, nil
+}
+
+func CallRegistry(r Registry) {
+	r.ClientValidator()
+	r.ClientManager()
+	r.ClientHasher()
+	r.ConsentManager()
+	r.ConsentStrategy()
+	r.SubjectIdentifierAlgorithm()
+	r.KeyManager()
+	r.KeyGenerators()
+	r.KeyCipher()
+	r.OAuth2Storage()
+	r.OAuth2Provider()
+	r.AudienceStrategy()
+	r.ScopeStrategy()
+	r.AccessTokenJWTStrategy()
+	r.OpenIDJWTStrategy()
+	r.OpenIDConnectRequestValidator()
+	r.PrometheusManager()
+	r.Tracer()
 }

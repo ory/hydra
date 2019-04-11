@@ -16,6 +16,7 @@ type Provider interface {
 	//HashSignature() bool
 	IsUsingJWTAsAccessTokens() bool
 	WellKnownKeys(include ...string) []string
+	InsecureRedirects() []string
 
 	CORSEnabled(iface string) bool
 	CORSOptions(iface string) cors.Options
@@ -64,6 +65,10 @@ func MustValidate(l logrus.FieldLogger, p Provider) {
 
 		if p.IssuerURL().Scheme != "https" {
 			l.Fatalf(`Scheme from configuration key "%s" must be "https" unless --dangerous-force-http is passed but got scheme in value "%s" is "%s". To find out more, use "hydra help serve".`, ViperKeyIssuerURL, p.IssuerURL().String(), p.IssuerURL().Scheme)
+		}
+
+		if len(p.InsecureRedirects()) > 0 {
+			l.Fatal(`Flag --dangerous-allow-insecure-redirect-urls can only be used in combination with flag --dangerous-force-http`)
 		}
 	}
 }

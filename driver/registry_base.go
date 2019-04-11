@@ -233,6 +233,7 @@ func (m *RegistryBase) oAuth2Config() *compose.Config {
 		EnforcePKCE:                    false,
 		EnablePKCEPlainChallengeMethod: false,
 		TokenURL:                       urlx.AppendPaths(m.c.PublicURL(), oauth2.TokenPath).String(),
+		RedirectSecureChecker:          x.IsRedirectURISecure(m.c),
 	}
 }
 

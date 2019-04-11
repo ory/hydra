@@ -7,4 +7,5 @@ import (
 type Driver interface {
 	Configuration() configuration.Provider
 	Registry() Registry
+	CallRegistry() Driver
 }

@@ -121,9 +121,13 @@ func (o *GetLoginRequestParams) WriteToRequest(r runtime.ClientRequest, reg strf
 	}
 	var res []error
 
-	// path param challenge
-	if err := r.SetPathParam("challenge", o.Challenge); err != nil {
-		return err
+	// query param challenge
+	qrChallenge := o.Challenge
+	qChallenge := qrChallenge
+	if qChallenge != "" {
+		if err := r.SetQueryParam("challenge", qChallenge); err != nil {
+			return err
+		}
 	}
 
 	if len(res) > 0 {

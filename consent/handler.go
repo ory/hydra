@@ -57,13 +57,13 @@ func NewHandler(
 }
 
 func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
-	admin.GET(LoginPath+"/:challenge", h.GetLoginRequest)
-	admin.PUT(LoginPath+"/:challenge/accept", h.AcceptLoginRequest)
-	admin.PUT(LoginPath+"/:challenge/reject", h.RejectLoginRequest)
+	admin.GET(LoginPath, h.GetLoginRequest)
+	admin.PUT(LoginPath+"/accept", h.AcceptLoginRequest)
+	admin.PUT(LoginPath+"/reject", h.RejectLoginRequest)
 
-	admin.GET(ConsentPath+"/:challenge", h.GetConsentRequest)
-	admin.PUT(ConsentPath+"/:challenge/accept", h.AcceptConsentRequest)
-	admin.PUT(ConsentPath+"/:challenge/reject", h.RejectConsentRequest)
+	admin.GET(ConsentPath, h.GetConsentRequest)
+	admin.PUT(ConsentPath+"/accept", h.AcceptConsentRequest)
+	admin.PUT(ConsentPath+"/reject", h.RejectConsentRequest)
 
 	admin.DELETE(SessionsPath+"/login/:user", h.DeleteLoginSession)
 	admin.GET(SessionsPath+"/consent/:user", h.GetConsentSessions)
@@ -218,7 +218,7 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route GET /oauth2/auth/requests/login/{challenge} admin getLoginRequest
+// swagger:route GET /oauth2/auth/requests/login admin getLoginRequest
 //
 // Get an login request
 //
@@ -245,7 +245,8 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 //       409: genericError
 //       500: genericError
 func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	request, err := h.r.ConsentManager().GetAuthenticationRequest(r.Context(), ps.ByName("challenge"))
+	challenge := r.URL.Query().Get("challenge")
+	request, err := h.r.ConsentManager().GetAuthenticationRequest(r.Context(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -259,7 +260,7 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 	h.r.Writer().Write(w, r, request)
 }
 
-// swagger:route PUT /oauth2/auth/requests/login/{challenge}/accept admin acceptLoginRequest
+// swagger:route PUT /oauth2/auth/requests/login/accept admin acceptLoginRequest
 //
 // Accept an login request
 //
@@ -291,6 +292,8 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 //       401: genericError
 //       500: genericError
 func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	challenge := r.URL.Query().Get("challenge")
+
 	var p HandledAuthenticationRequest
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -302,8 +305,8 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.New("Subject from payload can not be empty"))
 	}
 
-	p.Challenge = ps.ByName("challenge")
-	ar, err := h.r.ConsentManager().GetAuthenticationRequest(r.Context(), ps.ByName("challenge"))
+	p.Challenge = challenge
+	ar, err := h.r.ConsentManager().GetAuthenticationRequest(r.Context(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -320,7 +323,7 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	}
 	p.RequestedAt = ar.RequestedAt
 
-	request, err := h.r.ConsentManager().HandleAuthenticationRequest(r.Context(), ps.ByName("challenge"), &p)
+	request, err := h.r.ConsentManager().HandleAuthenticationRequest(r.Context(), challenge, &p)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
@@ -337,7 +340,7 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	})
 }
 
-// swagger:route PUT /oauth2/auth/requests/login/{challenge}/reject admin rejectLoginRequest
+// swagger:route PUT /oauth2/auth/requests/login/reject admin rejectLoginRequest
 //
 // Reject a login request
 //
@@ -368,6 +371,8 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //       404: genericError
 //       500: genericError
 func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	challenge := r.URL.Query().Get("challenge")
+
 	var p RequestDeniedError
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -376,15 +381,15 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
-	ar, err := h.r.ConsentManager().GetAuthenticationRequest(r.Context(), ps.ByName("challenge"))
+	ar, err := h.r.ConsentManager().GetAuthenticationRequest(r.Context(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	request, err := h.r.ConsentManager().HandleAuthenticationRequest(r.Context(), ps.ByName("challenge"), &HandledAuthenticationRequest{
+	request, err := h.r.ConsentManager().HandleAuthenticationRequest(r.Context(), challenge, &HandledAuthenticationRequest{
 		Error:       &p,
-		Challenge:   ps.ByName("challenge"),
+		Challenge:   challenge,
 		RequestedAt: ar.RequestedAt,
 	})
 	if err != nil {
@@ -403,7 +408,7 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	})
 }
 
-// swagger:route GET /oauth2/auth/requests/consent/{challenge} admin getConsentRequest
+// swagger:route GET /oauth2/auth/requests/consent admin getConsentRequest
 //
 // Get consent request information
 //
@@ -432,7 +437,9 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //       409: genericError
 //       500: genericError
 func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	request, err := h.r.ConsentManager().GetConsentRequest(r.Context(), ps.ByName("challenge"))
+	challenge := r.URL.Query().Get("challenge")
+
+	request, err := h.r.ConsentManager().GetConsentRequest(r.Context(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -446,7 +453,7 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 	h.r.Writer().Write(w, r, request)
 }
 
-// swagger:route PUT /oauth2/auth/requests/consent/{challenge}/accept admin acceptConsentRequest
+// swagger:route PUT /oauth2/auth/requests/consent/accept admin acceptConsentRequest
 //
 // Accept an consent request
 //
@@ -480,6 +487,8 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 //       404: genericError
 //       500: genericError
 func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	challenge := r.URL.Query().Get("challenge")
+
 	var p HandledConsentRequest
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -488,16 +497,16 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 		return
 	}
 
-	cr, err := h.r.ConsentManager().GetConsentRequest(r.Context(), ps.ByName("challenge"))
+	cr, err := h.r.ConsentManager().GetConsentRequest(r.Context(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
-	p.Challenge = ps.ByName("challenge")
+	p.Challenge = challenge
 	p.RequestedAt = cr.RequestedAt
 
-	hr, err := h.r.ConsentManager().HandleConsentRequest(r.Context(), ps.ByName("challenge"), &p)
+	hr, err := h.r.ConsentManager().HandleConsentRequest(r.Context(), challenge, &p)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
@@ -516,7 +525,7 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 	})
 }
 
-// swagger:route PUT /oauth2/auth/requests/consent/{challenge}/reject admin rejectConsentRequest
+// swagger:route PUT /oauth2/auth/requests/consent/reject admin rejectConsentRequest
 //
 // Reject an consent request
 //
@@ -549,6 +558,8 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 //       404: genericError
 //       500: genericError
 func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	challenge := r.URL.Query().Get("challenge")
+
 	var p RequestDeniedError
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -557,15 +568,15 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 		return
 	}
 
-	hr, err := h.r.ConsentManager().GetConsentRequest(r.Context(), ps.ByName("challenge"))
+	hr, err := h.r.ConsentManager().GetConsentRequest(r.Context(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
-	request, err := h.r.ConsentManager().HandleConsentRequest(r.Context(), ps.ByName("challenge"), &HandledConsentRequest{
+	request, err := h.r.ConsentManager().HandleConsentRequest(r.Context(), challenge, &HandledConsentRequest{
 		Error:       &p,
-		Challenge:   ps.ByName("challenge"),
+		Challenge:   challenge,
 		RequestedAt: hr.RequestedAt,
 	})
 	if err != nil {

@@ -22,7 +22,7 @@ package consent
 
 // swagger:parameters getLoginRequest getConsentRequest
 type swaggerGetRequestByChallenge struct {
-	// in: path
+	// in: query
 	// required: true
 	Challenge string `json:"challenge"`
 }
@@ -61,7 +61,7 @@ type swaggerRevokeAuthenticationSessionPayload struct {
 
 // swagger:parameters acceptLoginRequest
 type swaggerAcceptAuthenticationRequest struct {
-	// in: path
+	// in: query
 	// required: true
 	Challenge string `json:"challenge"`
 
@@ -71,7 +71,7 @@ type swaggerAcceptAuthenticationRequest struct {
 
 // swagger:parameters acceptConsentRequest
 type swaggerAcceptConsentRequest struct {
-	// in: path
+	// in: query
 	// required: true
 	Challenge string `json:"challenge"`
 
@@ -81,7 +81,7 @@ type swaggerAcceptConsentRequest struct {
 
 // swagger:parameters rejectLoginRequest rejectConsentRequest
 type swaggerRejectRequest struct {
-	// in: path
+	// in: query
 	// required: true
 	Challenge string `json:"challenge"`
 

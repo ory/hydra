@@ -72,7 +72,7 @@ type GetConsentRequestOK struct {
 }
 
 func (o *GetConsentRequestOK) Error() string {
-	return fmt.Sprintf("[GET /oauth2/auth/requests/consent/{challenge}][%d] getConsentRequestOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[GET /oauth2/auth/requests/consent][%d] getConsentRequestOK  %+v", 200, o.Payload)
 }
 
 func (o *GetConsentRequestOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -101,7 +101,7 @@ type GetConsentRequestNotFound struct {
 }
 
 func (o *GetConsentRequestNotFound) Error() string {
-	return fmt.Sprintf("[GET /oauth2/auth/requests/consent/{challenge}][%d] getConsentRequestNotFound  %+v", 404, o.Payload)
+	return fmt.Sprintf("[GET /oauth2/auth/requests/consent][%d] getConsentRequestNotFound  %+v", 404, o.Payload)
 }
 
 func (o *GetConsentRequestNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -130,7 +130,7 @@ type GetConsentRequestConflict struct {
 }
 
 func (o *GetConsentRequestConflict) Error() string {
-	return fmt.Sprintf("[GET /oauth2/auth/requests/consent/{challenge}][%d] getConsentRequestConflict  %+v", 409, o.Payload)
+	return fmt.Sprintf("[GET /oauth2/auth/requests/consent][%d] getConsentRequestConflict  %+v", 409, o.Payload)
 }
 
 func (o *GetConsentRequestConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -159,7 +159,7 @@ type GetConsentRequestInternalServerError struct {
 }
 
 func (o *GetConsentRequestInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /oauth2/auth/requests/consent/{challenge}][%d] getConsentRequestInternalServerError  %+v", 500, o.Payload)
+	return fmt.Sprintf("[GET /oauth2/auth/requests/consent][%d] getConsentRequestInternalServerError  %+v", 500, o.Payload)
 }
 
 func (o *GetConsentRequestInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

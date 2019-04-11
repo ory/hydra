@@ -686,7 +686,7 @@ func TestStrategy(t *testing.T) {
 
 					body := `{"grant_scope": ["scope-a"], "remember": true}`
 					require.NoError(t, err)
-					req, err := http.NewRequest("PUT", api.URL+"/oauth2/auth/requests/consent/"+r.URL.Query().Get("consent_challenge")+"/accept", strings.NewReader(body))
+					req, err := http.NewRequest("PUT", api.URL+"/oauth2/auth/requests/consent/accept?challenge="+r.URL.Query().Get("consent_challenge"), strings.NewReader(body))
 					req.Header.Add("Content-Type", "application/json")
 					require.NoError(t, err)
 

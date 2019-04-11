@@ -75,9 +75,9 @@
 
 
       var pathParams = {
-        'challenge': challenge
       };
       var queryParams = {
+        'challenge': challenge
       };
       var headerParams = {
       };
@@ -90,7 +90,7 @@
       var returnType = CompletedRequest;
 
       return this.apiClient.callApi(
-        '/oauth2/auth/requests/consent/{challenge}/accept', 'PUT',
+        '/oauth2/auth/requests/consent/accept', 'PUT',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );
@@ -124,9 +124,9 @@
 
 
       var pathParams = {
-        'challenge': challenge
       };
       var queryParams = {
+        'challenge': challenge
       };
       var headerParams = {
       };
@@ -139,7 +139,7 @@
       var returnType = CompletedRequest;
 
       return this.apiClient.callApi(
-        '/oauth2/auth/requests/login/{challenge}/accept', 'PUT',
+        '/oauth2/auth/requests/login/accept', 'PUT',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );
@@ -447,9 +447,9 @@
 
 
       var pathParams = {
-        'challenge': challenge
       };
       var queryParams = {
+        'challenge': challenge
       };
       var headerParams = {
       };
@@ -462,7 +462,7 @@
       var returnType = ConsentRequest;
 
       return this.apiClient.callApi(
-        '/oauth2/auth/requests/consent/{challenge}', 'GET',
+        '/oauth2/auth/requests/consent', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );
@@ -592,9 +592,9 @@
 
 
       var pathParams = {
-        'challenge': challenge
       };
       var queryParams = {
+        'challenge': challenge
       };
       var headerParams = {
       };
@@ -607,7 +607,7 @@
       var returnType = LoginRequest;
 
       return this.apiClient.callApi(
-        '/oauth2/auth/requests/login/{challenge}', 'GET',
+        '/oauth2/auth/requests/login', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );
@@ -828,9 +828,9 @@
 
 
       var pathParams = {
-        'challenge': challenge
       };
       var queryParams = {
+        'challenge': challenge
       };
       var headerParams = {
       };
@@ -843,7 +843,7 @@
       var returnType = CompletedRequest;
 
       return this.apiClient.callApi(
-        '/oauth2/auth/requests/consent/{challenge}/reject', 'PUT',
+        '/oauth2/auth/requests/consent/reject', 'PUT',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );
@@ -877,9 +877,9 @@
 
 
       var pathParams = {
-        'challenge': challenge
       };
       var queryParams = {
+        'challenge': challenge
       };
       var headerParams = {
       };
@@ -892,7 +892,7 @@
       var returnType = CompletedRequest;
 
       return this.apiClient.callApi(
-        '/oauth2/auth/requests/login/{challenge}/reject', 'PUT',
+        '/oauth2/auth/requests/login/reject', 'PUT',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );

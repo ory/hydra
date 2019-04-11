@@ -129,7 +129,7 @@ func TestGetLoginRequest(t *testing.T) {
 			defer ts.Close()
 
 			c := &http.Client{}
-			resp, err := c.Get(ts.URL + LoginPath + "/" + challenge)
+			resp, err := c.Get(ts.URL + LoginPath + "?challenge=" + challenge)
 			require.NoError(t, err)
 			require.EqualValues(t, tc.status, resp.StatusCode)
 		})
@@ -169,7 +169,7 @@ func TestGetConsentRequest(t *testing.T) {
 			defer ts.Close()
 
 			c := &http.Client{}
-			resp, err := c.Get(ts.URL + ConsentPath + "/" + challenge)
+			resp, err := c.Get(ts.URL + ConsentPath + "?challenge=" + challenge)
 			require.NoError(t, err)
 			require.EqualValues(t, tc.status, resp.StatusCode)
 		})

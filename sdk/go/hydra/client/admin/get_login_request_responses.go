@@ -72,7 +72,7 @@ type GetLoginRequestOK struct {
 }
 
 func (o *GetLoginRequestOK) Error() string {
-	return fmt.Sprintf("[GET /oauth2/auth/requests/login/{challenge}][%d] getLoginRequestOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[GET /oauth2/auth/requests/login][%d] getLoginRequestOK  %+v", 200, o.Payload)
 }
 
 func (o *GetLoginRequestOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -101,7 +101,7 @@ type GetLoginRequestNotFound struct {
 }
 
 func (o *GetLoginRequestNotFound) Error() string {
-	return fmt.Sprintf("[GET /oauth2/auth/requests/login/{challenge}][%d] getLoginRequestNotFound  %+v", 404, o.Payload)
+	return fmt.Sprintf("[GET /oauth2/auth/requests/login][%d] getLoginRequestNotFound  %+v", 404, o.Payload)
 }
 
 func (o *GetLoginRequestNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -130,7 +130,7 @@ type GetLoginRequestConflict struct {
 }
 
 func (o *GetLoginRequestConflict) Error() string {
-	return fmt.Sprintf("[GET /oauth2/auth/requests/login/{challenge}][%d] getLoginRequestConflict  %+v", 409, o.Payload)
+	return fmt.Sprintf("[GET /oauth2/auth/requests/login][%d] getLoginRequestConflict  %+v", 409, o.Payload)
 }
 
 func (o *GetLoginRequestConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -159,7 +159,7 @@ type GetLoginRequestInternalServerError struct {
 }
 
 func (o *GetLoginRequestInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /oauth2/auth/requests/login/{challenge}][%d] getLoginRequestInternalServerError  %+v", 500, o.Payload)
+	return fmt.Sprintf("[GET /oauth2/auth/requests/login][%d] getLoginRequestInternalServerError  %+v", 500, o.Payload)
 }
 
 func (o *GetLoginRequestInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

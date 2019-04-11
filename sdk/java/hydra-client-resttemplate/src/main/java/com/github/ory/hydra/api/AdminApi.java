@@ -36,7 +36,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-09T11:44:19.460+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T13:09:51.955+02:00")
 @Component("com.github.ory.hydra.api.AdminApi")
 public class AdminApi {
     private ApiClient apiClient;
@@ -77,14 +77,13 @@ public class AdminApi {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'challenge' when calling acceptConsentRequest");
         }
         
-        // create path and map variables
-        final Map<String, Object> uriVariables = new HashMap<String, Object>();
-        uriVariables.put("challenge", challenge);
-        String path = UriComponentsBuilder.fromPath("/oauth2/auth/requests/consent/{challenge}/accept").buildAndExpand(uriVariables).toUriString();
+        String path = UriComponentsBuilder.fromPath("/oauth2/auth/requests/consent/accept").build().toUriString();
         
         final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders headerParams = new HttpHeaders();
         final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
+        
+        queryParams.putAll(apiClient.parameterToMultiValueMap(null, "challenge", challenge));
 
         final String[] accepts = { 
             "application/json"
@@ -120,14 +119,13 @@ public class AdminApi {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'challenge' when calling acceptLoginRequest");
         }
         
-        // create path and map variables
-        final Map<String, Object> uriVariables = new HashMap<String, Object>();
-        uriVariables.put("challenge", challenge);
-        String path = UriComponentsBuilder.fromPath("/oauth2/auth/requests/login/{challenge}/accept").buildAndExpand(uriVariables).toUriString();
+        String path = UriComponentsBuilder.fromPath("/oauth2/auth/requests/login/accept").build().toUriString();
         
         final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders headerParams = new HttpHeaders();
         final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
+        
+        queryParams.putAll(apiClient.parameterToMultiValueMap(null, "challenge", challenge));
 
         final String[] accepts = { 
             "application/json"
@@ -404,14 +402,13 @@ public class AdminApi {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'challenge' when calling getConsentRequest");
         }
         
-        // create path and map variables
-        final Map<String, Object> uriVariables = new HashMap<String, Object>();
-        uriVariables.put("challenge", challenge);
-        String path = UriComponentsBuilder.fromPath("/oauth2/auth/requests/consent/{challenge}").buildAndExpand(uriVariables).toUriString();
+        String path = UriComponentsBuilder.fromPath("/oauth2/auth/requests/consent").build().toUriString();
         
         final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders headerParams = new HttpHeaders();
         final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
+        
+        queryParams.putAll(apiClient.parameterToMultiValueMap(null, "challenge", challenge));
 
         final String[] accepts = { 
             "application/json"
@@ -536,14 +533,13 @@ public class AdminApi {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'challenge' when calling getLoginRequest");
         }
         
-        // create path and map variables
-        final Map<String, Object> uriVariables = new HashMap<String, Object>();
-        uriVariables.put("challenge", challenge);
-        String path = UriComponentsBuilder.fromPath("/oauth2/auth/requests/login/{challenge}").buildAndExpand(uriVariables).toUriString();
+        String path = UriComponentsBuilder.fromPath("/oauth2/auth/requests/login").build().toUriString();
         
         final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders headerParams = new HttpHeaders();
         final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
+        
+        queryParams.putAll(apiClient.parameterToMultiValueMap(null, "challenge", challenge));
 
         final String[] accepts = { 
             "application/json"
@@ -740,14 +736,13 @@ public class AdminApi {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'challenge' when calling rejectConsentRequest");
         }
         
-        // create path and map variables
-        final Map<String, Object> uriVariables = new HashMap<String, Object>();
-        uriVariables.put("challenge", challenge);
-        String path = UriComponentsBuilder.fromPath("/oauth2/auth/requests/consent/{challenge}/reject").buildAndExpand(uriVariables).toUriString();
+        String path = UriComponentsBuilder.fromPath("/oauth2/auth/requests/consent/reject").build().toUriString();
         
         final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders headerParams = new HttpHeaders();
         final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
+        
+        queryParams.putAll(apiClient.parameterToMultiValueMap(null, "challenge", challenge));
 
         final String[] accepts = { 
             "application/json"
@@ -783,14 +778,13 @@ public class AdminApi {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'challenge' when calling rejectLoginRequest");
         }
         
-        // create path and map variables
-        final Map<String, Object> uriVariables = new HashMap<String, Object>();
-        uriVariables.put("challenge", challenge);
-        String path = UriComponentsBuilder.fromPath("/oauth2/auth/requests/login/{challenge}/reject").buildAndExpand(uriVariables).toUriString();
+        String path = UriComponentsBuilder.fromPath("/oauth2/auth/requests/login/reject").build().toUriString();
         
         final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders headerParams = new HttpHeaders();
         final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
+        
+        queryParams.putAll(apiClient.parameterToMultiValueMap(null, "challenge", challenge));
 
         final String[] accepts = { 
             "application/json"

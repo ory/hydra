@@ -72,7 +72,7 @@ type AcceptLoginRequestOK struct {
 }
 
 func (o *AcceptLoginRequestOK) Error() string {
-	return fmt.Sprintf("[PUT /oauth2/auth/requests/login/{challenge}/accept][%d] acceptLoginRequestOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[PUT /oauth2/auth/requests/login/accept][%d] acceptLoginRequestOK  %+v", 200, o.Payload)
 }
 
 func (o *AcceptLoginRequestOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -101,7 +101,7 @@ type AcceptLoginRequestUnauthorized struct {
 }
 
 func (o *AcceptLoginRequestUnauthorized) Error() string {
-	return fmt.Sprintf("[PUT /oauth2/auth/requests/login/{challenge}/accept][%d] acceptLoginRequestUnauthorized  %+v", 401, o.Payload)
+	return fmt.Sprintf("[PUT /oauth2/auth/requests/login/accept][%d] acceptLoginRequestUnauthorized  %+v", 401, o.Payload)
 }
 
 func (o *AcceptLoginRequestUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -130,7 +130,7 @@ type AcceptLoginRequestNotFound struct {
 }
 
 func (o *AcceptLoginRequestNotFound) Error() string {
-	return fmt.Sprintf("[PUT /oauth2/auth/requests/login/{challenge}/accept][%d] acceptLoginRequestNotFound  %+v", 404, o.Payload)
+	return fmt.Sprintf("[PUT /oauth2/auth/requests/login/accept][%d] acceptLoginRequestNotFound  %+v", 404, o.Payload)
 }
 
 func (o *AcceptLoginRequestNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -159,7 +159,7 @@ type AcceptLoginRequestInternalServerError struct {
 }
 
 func (o *AcceptLoginRequestInternalServerError) Error() string {
-	return fmt.Sprintf("[PUT /oauth2/auth/requests/login/{challenge}/accept][%d] acceptLoginRequestInternalServerError  %+v", 500, o.Payload)
+	return fmt.Sprintf("[PUT /oauth2/auth/requests/login/accept][%d] acceptLoginRequestInternalServerError  %+v", 500, o.Payload)
 }
 
 func (o *AcceptLoginRequestInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

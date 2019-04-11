@@ -65,7 +65,7 @@ type RejectConsentRequestOK struct {
 }
 
 func (o *RejectConsentRequestOK) Error() string {
-	return fmt.Sprintf("[PUT /oauth2/auth/requests/consent/{challenge}/reject][%d] rejectConsentRequestOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[PUT /oauth2/auth/requests/consent/reject][%d] rejectConsentRequestOK  %+v", 200, o.Payload)
 }
 
 func (o *RejectConsentRequestOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -94,7 +94,7 @@ type RejectConsentRequestNotFound struct {
 }
 
 func (o *RejectConsentRequestNotFound) Error() string {
-	return fmt.Sprintf("[PUT /oauth2/auth/requests/consent/{challenge}/reject][%d] rejectConsentRequestNotFound  %+v", 404, o.Payload)
+	return fmt.Sprintf("[PUT /oauth2/auth/requests/consent/reject][%d] rejectConsentRequestNotFound  %+v", 404, o.Payload)
 }
 
 func (o *RejectConsentRequestNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -123,7 +123,7 @@ type RejectConsentRequestInternalServerError struct {
 }
 
 func (o *RejectConsentRequestInternalServerError) Error() string {
-	return fmt.Sprintf("[PUT /oauth2/auth/requests/consent/{challenge}/reject][%d] rejectConsentRequestInternalServerError  %+v", 500, o.Payload)
+	return fmt.Sprintf("[PUT /oauth2/auth/requests/consent/reject][%d] rejectConsentRequestInternalServerError  %+v", 500, o.Payload)
 }
 
 func (o *RejectConsentRequestInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

@@ -53,7 +53,7 @@ func (a *Client) AcceptConsentRequest(params *AcceptConsentRequestParams) (*Acce
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "acceptConsentRequest",
 		Method:             "PUT",
-		PathPattern:        "/oauth2/auth/requests/consent/{challenge}/accept",
+		PathPattern:        "/oauth2/auth/requests/consent/accept",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http", "https"},
@@ -95,7 +95,7 @@ func (a *Client) AcceptLoginRequest(params *AcceptLoginRequestParams) (*AcceptLo
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "acceptLoginRequest",
 		Method:             "PUT",
-		PathPattern:        "/oauth2/auth/requests/login/{challenge}/accept",
+		PathPattern:        "/oauth2/auth/requests/login/accept",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http", "https"},
@@ -326,7 +326,7 @@ func (a *Client) GetConsentRequest(params *GetConsentRequestParams) (*GetConsent
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "getConsentRequest",
 		Method:             "GET",
-		PathPattern:        "/oauth2/auth/requests/consent/{challenge}",
+		PathPattern:        "/oauth2/auth/requests/consent",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http", "https"},
@@ -424,7 +424,7 @@ func (a *Client) GetLoginRequest(params *GetLoginRequestParams) (*GetLoginReques
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "getLoginRequest",
 		Method:             "GET",
-		PathPattern:        "/oauth2/auth/requests/login/{challenge}",
+		PathPattern:        "/oauth2/auth/requests/login",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http", "https"},
@@ -595,7 +595,7 @@ func (a *Client) RejectConsentRequest(params *RejectConsentRequestParams) (*Reje
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "rejectConsentRequest",
 		Method:             "PUT",
-		PathPattern:        "/oauth2/auth/requests/consent/{challenge}/reject",
+		PathPattern:        "/oauth2/auth/requests/consent/reject",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http", "https"},
@@ -636,7 +636,7 @@ func (a *Client) RejectLoginRequest(params *RejectLoginRequestParams) (*RejectLo
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "rejectLoginRequest",
 		Method:             "PUT",
-		PathPattern:        "/oauth2/auth/requests/login/{challenge}/reject",
+		PathPattern:        "/oauth2/auth/requests/login/reject",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http", "https"},

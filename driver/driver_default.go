@@ -11,8 +11,8 @@ type DefaultDriver struct {
 	r Registry
 }
 
-func NewDefaultDriver(l logrus.FieldLogger, forcedHTTP bool, version, build, date string) Driver {
-	c := configuration.NewViperProvider(l, forcedHTTP)
+func NewDefaultDriver(l logrus.FieldLogger, forcedHTTP bool, insecureRedirects []string, version, build, date string) Driver {
+	c := configuration.NewViperProvider(l, forcedHTTP, insecureRedirects)
 	configuration.MustValidate(l, c)
 
 	r, err := NewRegistry(c)

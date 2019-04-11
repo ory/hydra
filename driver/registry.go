@@ -2,10 +2,11 @@ package driver
 
 import (
 	"github.com/go-errors/errors"
+	"github.com/sirupsen/logrus"
+
 	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/tracing"
-	"github.com/sirupsen/logrus"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"

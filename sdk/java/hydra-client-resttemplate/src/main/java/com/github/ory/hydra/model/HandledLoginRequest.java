@@ -19,14 +19,20 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * HandledAuthenticationRequest
+ * HandledLoginRequest
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T13:09:51.955+02:00")
-public class HandledAuthenticationRequest {
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T18:32:06.000+02:00")
+public class HandledLoginRequest {
   @JsonProperty("acr")
   private String acr = null;
+
+  @JsonProperty("context")
+  private Map<String, Object> context = null;
 
   @JsonProperty("force_subject_identifier")
   private String forceSubjectIdentifier = null;
@@ -40,7 +46,7 @@ public class HandledAuthenticationRequest {
   @JsonProperty("subject")
   private String subject = null;
 
-  public HandledAuthenticationRequest acr(String acr) {
+  public HandledLoginRequest acr(String acr) {
     this.acr = acr;
     return this;
   }
@@ -58,7 +64,33 @@ public class HandledAuthenticationRequest {
     this.acr = acr;
   }
 
-  public HandledAuthenticationRequest forceSubjectIdentifier(String forceSubjectIdentifier) {
+  public HandledLoginRequest context(Map<String, Object> context) {
+    this.context = context;
+    return this;
+  }
+
+  public HandledLoginRequest putContextItem(String key, Object contextItem) {
+    if (this.context == null) {
+      this.context = new HashMap<String, Object>();
+    }
+    this.context.put(key, contextItem);
+    return this;
+  }
+
+   /**
+   * Context is an optional object which can hold arbitrary data. The data will be made available when fetching the consent request under the \&quot;context\&quot; field. This is useful in scenarios where login and consent endpoints share data.
+   * @return context
+  **/
+  @ApiModelProperty(value = "Context is an optional object which can hold arbitrary data. The data will be made available when fetching the consent request under the \"context\" field. This is useful in scenarios where login and consent endpoints share data.")
+  public Map<String, Object> getContext() {
+    return context;
+  }
+
+  public void setContext(Map<String, Object> context) {
+    this.context = context;
+  }
+
+  public HandledLoginRequest forceSubjectIdentifier(String forceSubjectIdentifier) {
     this.forceSubjectIdentifier = forceSubjectIdentifier;
     return this;
   }
@@ -76,7 +108,7 @@ public class HandledAuthenticationRequest {
     this.forceSubjectIdentifier = forceSubjectIdentifier;
   }
 
-  public HandledAuthenticationRequest remember(Boolean remember) {
+  public HandledLoginRequest remember(Boolean remember) {
     this.remember = remember;
     return this;
   }
@@ -94,7 +126,7 @@ public class HandledAuthenticationRequest {
     this.remember = remember;
   }
 
-  public HandledAuthenticationRequest rememberFor(Long rememberFor) {
+  public HandledLoginRequest rememberFor(Long rememberFor) {
     this.rememberFor = rememberFor;
     return this;
   }
@@ -112,7 +144,7 @@ public class HandledAuthenticationRequest {
     this.rememberFor = rememberFor;
   }
 
-  public HandledAuthenticationRequest subject(String subject) {
+  public HandledLoginRequest subject(String subject) {
     this.subject = subject;
     return this;
   }
@@ -139,26 +171,28 @@ public class HandledAuthenticationRequest {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    HandledAuthenticationRequest handledAuthenticationRequest = (HandledAuthenticationRequest) o;
-    return Objects.equals(this.acr, handledAuthenticationRequest.acr) &&
-        Objects.equals(this.forceSubjectIdentifier, handledAuthenticationRequest.forceSubjectIdentifier) &&
-        Objects.equals(this.remember, handledAuthenticationRequest.remember) &&
-        Objects.equals(this.rememberFor, handledAuthenticationRequest.rememberFor) &&
-        Objects.equals(this.subject, handledAuthenticationRequest.subject);
+    HandledLoginRequest handledLoginRequest = (HandledLoginRequest) o;
+    return Objects.equals(this.acr, handledLoginRequest.acr) &&
+        Objects.equals(this.context, handledLoginRequest.context) &&
+        Objects.equals(this.forceSubjectIdentifier, handledLoginRequest.forceSubjectIdentifier) &&
+        Objects.equals(this.remember, handledLoginRequest.remember) &&
+        Objects.equals(this.rememberFor, handledLoginRequest.rememberFor) &&
+        Objects.equals(this.subject, handledLoginRequest.subject);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(acr, forceSubjectIdentifier, remember, rememberFor, subject);
+    return Objects.hash(acr, context, forceSubjectIdentifier, remember, rememberFor, subject);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class HandledAuthenticationRequest {\n");
+    sb.append("class HandledLoginRequest {\n");
     
     sb.append("    acr: ").append(toIndentedString(acr)).append("\n");
+    sb.append("    context: ").append(toIndentedString(context)).append("\n");
     sb.append("    forceSubjectIdentifier: ").append(toIndentedString(forceSubjectIdentifier)).append("\n");
     sb.append("    remember: ").append(toIndentedString(remember)).append("\n");
     sb.append("    rememberFor: ").append(toIndentedString(rememberFor)).append("\n");

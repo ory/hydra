@@ -41,7 +41,7 @@
 
   /**
    * Constructs a new <code>PreviousConsentSession</code>.
-   * The response used to return handled consent requests same as HandledAuthenticationRequest, just with consent_request exposed as json
+   * The response used to return handled consent requests same as HandledLoginRequest, just with consent_request exposed as json
    * @alias module:model/PreviousConsentSession
    * @class
    */

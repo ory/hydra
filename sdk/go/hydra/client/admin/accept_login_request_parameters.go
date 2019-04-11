@@ -64,7 +64,7 @@ for the accept login request operation typically these are written to a http.Req
 type AcceptLoginRequestParams struct {
 
 	/*Body*/
-	Body *models.HandledAuthenticationRequest
+	Body *models.HandledLoginRequest
 	/*Challenge*/
 	Challenge string
 
@@ -107,13 +107,13 @@ func (o *AcceptLoginRequestParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithBody adds the body to the accept login request params
-func (o *AcceptLoginRequestParams) WithBody(body *models.HandledAuthenticationRequest) *AcceptLoginRequestParams {
+func (o *AcceptLoginRequestParams) WithBody(body *models.HandledLoginRequest) *AcceptLoginRequestParams {
 	o.SetBody(body)
 	return o
 }
 
 // SetBody adds the body to the accept login request params
-func (o *AcceptLoginRequestParams) SetBody(body *models.HandledAuthenticationRequest) {
+func (o *AcceptLoginRequestParams) SetBody(body *models.HandledLoginRequest) {
 	o.Body = body
 }
 

@@ -45,10 +45,10 @@ type Manager interface {
 	DeleteAuthenticationSession(ctx context.Context, id string) error
 	RevokeUserAuthenticationSession(ctx context.Context, user string) error
 
-	CreateAuthenticationRequest(ctx context.Context, req *AuthenticationRequest) error
-	GetAuthenticationRequest(ctx context.Context, challenge string) (*AuthenticationRequest, error)
-	HandleAuthenticationRequest(ctx context.Context, challenge string, r *HandledAuthenticationRequest) (*AuthenticationRequest, error)
-	VerifyAndInvalidateAuthenticationRequest(ctx context.Context, verifier string) (*HandledAuthenticationRequest, error)
+	CreateAuthenticationRequest(ctx context.Context, req *LoginRequest) error
+	GetAuthenticationRequest(ctx context.Context, challenge string) (*LoginRequest, error)
+	HandleAuthenticationRequest(ctx context.Context, challenge string, r *HandledLoginRequest) (*LoginRequest, error)
+	VerifyAndInvalidateAuthenticationRequest(ctx context.Context, verifier string) (*HandledLoginRequest, error)
 
 	CreateForcedObfuscatedAuthenticationSession(ctx context.Context, session *ForcedObfuscatedAuthenticationSession) error
 	GetForcedObfuscatedAuthenticationSession(ctx context.Context, client, obfuscated string) (*ForcedObfuscatedAuthenticationSession, error)

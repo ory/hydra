@@ -55,7 +55,7 @@ func login(rw http.ResponseWriter, r *http.Request) {
 		var vr *admin.AcceptLoginRequestOK
 		vr, err = client.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 			WithChallenge(challenge).
-			WithBody(&models.HandledAuthenticationRequest{
+			WithBody(&models.HandledLoginRequest{
 				Subject:  pointerx.String("the-subject"),
 				Remember: remember,
 			}))

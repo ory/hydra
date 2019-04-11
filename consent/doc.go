@@ -66,7 +66,7 @@ type swaggerAcceptAuthenticationRequest struct {
 	Challenge string `json:"challenge"`
 
 	// in: body
-	Body HandledAuthenticationRequest
+	Body HandledLoginRequest
 }
 
 // swagger:parameters acceptConsentRequest

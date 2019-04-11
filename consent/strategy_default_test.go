@@ -406,7 +406,7 @@ func TestStrategy(t *testing.T) {
 			},
 		},
 		{
-			d:   "This should pass because login was remembered and session id should be set",
+			d:   "This should pass because login was remembered and session id should be set and session context should also work",
 			req: fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ClientID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar: persistentCJ,
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -420,11 +420,13 @@ func TestStrategy(t *testing.T) {
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithChallenge(r.URL.Query().Get("login_challenge")).
-						WithBody(&models.HandledAuthenticationRequest{
+						WithBody(&models.HandledLoginRequest{
 							Subject:     pointerx.String("user"),
 							Remember:    false,
 							RememberFor: 0,
 							ACR:         "1",
+
+							Context: map[string]interface{}{"foo": "bar"},
 						}))
 					require.NoError(t, err)
 					v := vr.Payload
@@ -442,6 +444,7 @@ func TestStrategy(t *testing.T) {
 					assert.True(t, cr.Skip)
 					assert.NotEmpty(t, cr.LoginSessionID)
 					assert.NotEmpty(t, cr.LoginChallenge)
+					assert.Equal(t, map[string]interface{}{"foo": "bar"}, cr.Context)
 
 					vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
 						WithChallenge(r.URL.Query().Get("consent_challenge")).
@@ -563,7 +566,7 @@ func TestStrategy(t *testing.T) {
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithChallenge(r.URL.Query().Get("login_challenge")).
-						WithBody(&models.HandledAuthenticationRequest{
+						WithBody(&models.HandledLoginRequest{
 							Subject:     pointerx.String("fooser"),
 							Remember:    false,
 							RememberFor: 0,
@@ -594,7 +597,7 @@ func TestStrategy(t *testing.T) {
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithChallenge(r.URL.Query().Get("login_challenge")).
-						WithBody(&models.HandledAuthenticationRequest{
+						WithBody(&models.HandledLoginRequest{
 							Subject:     pointerx.String("user"),
 							Remember:    false,
 							RememberFor: 0,
@@ -664,7 +667,7 @@ func TestStrategy(t *testing.T) {
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithChallenge(r.URL.Query().Get("login_challenge")).
-						WithBody(&models.HandledAuthenticationRequest{
+						WithBody(&models.HandledLoginRequest{
 							Subject:     pointerx.String("user"),
 							Remember:    true,
 							RememberFor: 0,
@@ -729,7 +732,7 @@ func TestStrategy(t *testing.T) {
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithChallenge(r.URL.Query().Get("login_challenge")).
-						WithBody(&models.HandledAuthenticationRequest{
+						WithBody(&models.HandledLoginRequest{
 							Subject:     pointerx.String("user"),
 							Remember:    true,
 							RememberFor: 0,
@@ -818,7 +821,7 @@ func TestStrategy(t *testing.T) {
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithChallenge(r.URL.Query().Get("login_challenge")).
-						WithBody(&models.HandledAuthenticationRequest{
+						WithBody(&models.HandledLoginRequest{
 							Subject:     pointerx.String("user"),
 							Remember:    false,
 							RememberFor: 0,
@@ -849,7 +852,7 @@ func TestStrategy(t *testing.T) {
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithChallenge(r.URL.Query().Get("login_challenge")).
-						WithBody(&models.HandledAuthenticationRequest{
+						WithBody(&models.HandledLoginRequest{
 							Subject:     pointerx.String("user"),
 							Remember:    false,
 							RememberFor: 0,
@@ -915,7 +918,7 @@ func TestStrategy(t *testing.T) {
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithChallenge(r.URL.Query().Get("login_challenge")).
-						WithBody(&models.HandledAuthenticationRequest{
+						WithBody(&models.HandledLoginRequest{
 							Subject:     pointerx.String("not-foouser"),
 							Remember:    false,
 							RememberFor: 0,
@@ -946,7 +949,7 @@ func TestStrategy(t *testing.T) {
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithChallenge(r.URL.Query().Get("login_challenge")).
-						WithBody(&models.HandledAuthenticationRequest{
+						WithBody(&models.HandledLoginRequest{
 							Subject:     pointerx.String("foouser"),
 							Remember:    false,
 							RememberFor: 0,
@@ -1019,7 +1022,7 @@ func TestStrategy(t *testing.T) {
 				return func(w http.ResponseWriter, r *http.Request) {
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithChallenge(r.URL.Query().Get("login_challenge")).
-						WithBody(&models.HandledAuthenticationRequest{
+						WithBody(&models.HandledLoginRequest{
 							Subject:  pointerx.String("auth-user"),
 							Remember: true,
 						}))
@@ -1053,7 +1056,7 @@ func TestStrategy(t *testing.T) {
 				return func(w http.ResponseWriter, r *http.Request) {
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithChallenge(r.URL.Query().Get("login_challenge")).
-						WithBody(&models.HandledAuthenticationRequest{
+						WithBody(&models.HandledLoginRequest{
 							Subject:  pointerx.String("auth-user"),
 							Remember: false,
 						}))
@@ -1087,7 +1090,7 @@ func TestStrategy(t *testing.T) {
 				return func(w http.ResponseWriter, r *http.Request) {
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithChallenge(r.URL.Query().Get("login_challenge")).
-						WithBody(&models.HandledAuthenticationRequest{
+						WithBody(&models.HandledLoginRequest{
 							Subject:                pointerx.String("auth-user"),
 							ForceSubjectIdentifier: "forced-auth-user",
 							Remember:               true,
@@ -1122,7 +1125,7 @@ func TestStrategy(t *testing.T) {
 				return func(w http.ResponseWriter, r *http.Request) {
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithChallenge(r.URL.Query().Get("login_challenge")).
-						WithBody(&models.HandledAuthenticationRequest{
+						WithBody(&models.HandledLoginRequest{
 							Subject:                pointerx.String("auth-user"),
 							ForceSubjectIdentifier: "forced-auth-user",
 							Remember:               false,
@@ -1151,14 +1154,14 @@ func TestStrategy(t *testing.T) {
 
 		// checks revoking sessions
 		{
-			d:   "This should pass as regularly and create a new session",
+			d:   "This should pass as regularly and create a new session and forward data",
 			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ClientID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar: persistentCJ2,
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 				return func(w http.ResponseWriter, r *http.Request) {
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithChallenge(r.URL.Query().Get("login_challenge")).
-						WithBody(&models.HandledAuthenticationRequest{
+						WithBody(&models.HandledLoginRequest{
 							Subject:  pointerx.String("auth-user"),
 							Remember: true,
 						}))
@@ -1182,7 +1185,7 @@ func TestStrategy(t *testing.T) {
 				return func(w http.ResponseWriter, r *http.Request) {
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithChallenge(r.URL.Query().Get("login_challenge")).
-						WithBody(&models.HandledAuthenticationRequest{
+						WithBody(&models.HandledLoginRequest{
 							Subject:  pointerx.String("not-auth-user"),
 							Remember: false,
 						}))
@@ -1211,7 +1214,7 @@ func TestStrategy(t *testing.T) {
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithChallenge(r.URL.Query().Get("login_challenge")).
-						WithBody(&models.HandledAuthenticationRequest{
+						WithBody(&models.HandledLoginRequest{
 							Subject:  pointerx.String("foouser"),
 							Remember: true,
 						}))
@@ -1240,7 +1243,7 @@ func TestStrategy(t *testing.T) {
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithChallenge(r.URL.Query().Get("login_challenge")).
-						WithBody(&models.HandledAuthenticationRequest{
+						WithBody(&models.HandledLoginRequest{
 							Subject:  pointerx.String("foouser"),
 							Remember: true,
 						}))
@@ -1271,7 +1274,7 @@ func TestStrategy(t *testing.T) {
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithChallenge(r.URL.Query().Get("login_challenge")).
-						WithBody(&models.HandledAuthenticationRequest{
+						WithBody(&models.HandledLoginRequest{
 							Subject:  pointerx.String("not-foouser"),
 							Remember: false,
 						}))

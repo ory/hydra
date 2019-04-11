@@ -7,5 +7,5 @@ package models
 
 // EmptyResponse Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
 // typically 201.
-// swagger:model emptyResponse
+// swagger:model EmptyResponse
 type EmptyResponse interface{}

@@ -17,22 +17,23 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.github.ory.hydra.model.JsonWebKeySetGeneratorRequest;
+import com.github.ory.hydra.model.CreateRequest;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * SwaggerJwkCreateSet
+ * SwaggerJwkCreateSet swagger jwk create set
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T13:09:51.955+02:00")
+@ApiModel(description = "SwaggerJwkCreateSet swagger jwk create set")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T18:32:06.000+02:00")
 public class SwaggerJwkCreateSet {
   @JsonProperty("Body")
-  private JsonWebKeySetGeneratorRequest body = null;
+  private CreateRequest body = null;
 
   @JsonProperty("set")
   private String set = null;
 
-  public SwaggerJwkCreateSet body(JsonWebKeySetGeneratorRequest body) {
+  public SwaggerJwkCreateSet body(CreateRequest body) {
     this.body = body;
     return this;
   }
@@ -42,11 +43,11 @@ public class SwaggerJwkCreateSet {
    * @return body
   **/
   @ApiModelProperty(value = "")
-  public JsonWebKeySetGeneratorRequest getBody() {
+  public CreateRequest getBody() {
     return body;
   }
 
-  public void setBody(JsonWebKeySetGeneratorRequest body) {
+  public void setBody(CreateRequest body) {
     this.body = body;
   }
 

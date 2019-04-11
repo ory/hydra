@@ -36,7 +36,7 @@ import (
 var passAuthentication = func(apiClient *client.OryHydra, remember bool) func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 	return func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 		return func(w http.ResponseWriter, r *http.Request) {
-			v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().WithChallenge(r.URL.Query().Get("login_challenge")).WithBody(&models.HandledAuthenticationRequest{
+			v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().WithChallenge(r.URL.Query().Get("login_challenge")).WithBody(&models.HandledLoginRequest{
 				Subject:     pointerx.String("user"),
 				Remember:    remember,
 				RememberFor: 0,

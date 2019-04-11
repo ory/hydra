@@ -294,7 +294,7 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := r.URL.Query().Get("challenge")
 
-	var p HandledAuthenticationRequest
+	var p HandledLoginRequest
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&p); err != nil {
@@ -387,7 +387,7 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
-	request, err := h.r.ConsentManager().HandleAuthenticationRequest(r.Context(), challenge, &HandledAuthenticationRequest{
+	request, err := h.r.ConsentManager().HandleAuthenticationRequest(r.Context(), challenge, &HandledLoginRequest{
 		Error:       &p,
 		Challenge:   challenge,
 		RequestedAt: ar.RequestedAt,

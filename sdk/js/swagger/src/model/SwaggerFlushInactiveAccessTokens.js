@@ -41,6 +41,7 @@
 
   /**
    * Constructs a new <code>SwaggerFlushInactiveAccessTokens</code>.
+   * SwaggerFlushInactiveAccessTokens swagger flush inactive access tokens
    * @alias module:model/SwaggerFlushInactiveAccessTokens
    * @class
    */

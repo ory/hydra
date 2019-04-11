@@ -12,9 +12,9 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// AuthenticationRequest AuthenticationRequest AuthenticationRequest AuthenticationRequest AuthenticationRequest AuthenticationRequest Contains information on an ongoing login request.
-// swagger:model AuthenticationRequest
-type AuthenticationRequest struct {
+// LoginRequest LoginRequest LoginRequest Contains information on an ongoing login request.
+// swagger:model LoginRequest
+type LoginRequest struct {
 
 	// Challenge is the identifier ("authentication challenge") of the consent authentication request. It is used to
 	// identify the session.
@@ -53,8 +53,8 @@ type AuthenticationRequest struct {
 	OidcContext *OpenIDConnectContext `json:"oidc_context,omitempty"`
 }
 
-// Validate validates this authentication request
-func (m *AuthenticationRequest) Validate(formats strfmt.Registry) error {
+// Validate validates this login request
+func (m *LoginRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateClient(formats); err != nil {
@@ -71,7 +71,7 @@ func (m *AuthenticationRequest) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *AuthenticationRequest) validateClient(formats strfmt.Registry) error {
+func (m *LoginRequest) validateClient(formats strfmt.Registry) error {
 
 	if swag.IsZero(m.Client) { // not required
 		return nil
@@ -89,7 +89,7 @@ func (m *AuthenticationRequest) validateClient(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *AuthenticationRequest) validateOidcContext(formats strfmt.Registry) error {
+func (m *LoginRequest) validateOidcContext(formats strfmt.Registry) error {
 
 	if swag.IsZero(m.OidcContext) { // not required
 		return nil
@@ -108,7 +108,7 @@ func (m *AuthenticationRequest) validateOidcContext(formats strfmt.Registry) err
 }
 
 // MarshalBinary interface implementation
-func (m *AuthenticationRequest) MarshalBinary() ([]byte, error) {
+func (m *LoginRequest) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -116,8 +116,8 @@ func (m *AuthenticationRequest) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *AuthenticationRequest) UnmarshalBinary(b []byte) error {
-	var res AuthenticationRequest
+func (m *LoginRequest) UnmarshalBinary(b []byte) error {
+	var res LoginRequest
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

@@ -6,6 +6,7 @@ Name | Type | Description | Notes
 **acr** | **string** | ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it to express that, for example, a user authenticated using two factor authentication. | [optional] 
 **challenge** | **string** | Challenge is the identifier (\&quot;authorization challenge\&quot;) of the consent authorization request. It is used to identify the session. | [optional] 
 **client** | [**\Hydra\SDK\Model\OAuth2Client**](OAuth2Client.md) |  | [optional] 
+**context** | **map[string,object]** | Context contains arbitrary information set by the login endpoint or is empty if not set. | [optional] 
 **login_challenge** | **string** | LoginChallenge is the login challenge this consent challenge belongs to. It can be used to associate a login and consent request in the login &amp; consent app. | [optional] 
 **login_session_id** | **string** | LoginSessionID is the authentication session ID. It is set if the browser had a valid authentication session at ORY Hydra during the login flow. It can be used to associate consecutive login requests by a certain user. | [optional] 
 **oidc_context** | [**\Hydra\SDK\Model\OpenIDConnectContext**](OpenIDConnectContext.md) |  | [optional] 

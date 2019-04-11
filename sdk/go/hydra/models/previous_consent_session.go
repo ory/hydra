@@ -13,7 +13,7 @@ import (
 )
 
 // PreviousConsentSession The response used to return handled consent requests
-// same as HandledAuthenticationRequest, just with consent_request exposed as json
+// same as HandledLoginRequest, just with consent_request exposed as json
 // swagger:model PreviousConsentSession
 type PreviousConsentSession struct {
 

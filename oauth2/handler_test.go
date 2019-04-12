@@ -32,6 +32,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-openapi/strfmt"
+
+	"github.com/ory/hydra/sdk/go/hydra/client/admin"
+	"github.com/ory/hydra/sdk/go/hydra/models"
+
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/x"
 
@@ -52,7 +57,7 @@ import (
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/oauth2"
-	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
+	hydra "github.com/ory/hydra/sdk/go/hydra/client"
 )
 
 var lifespan = time.Hour
@@ -107,14 +112,13 @@ func TestHandlerFlushHandler(t *testing.T) {
 	})
 	ts := httptest.NewServer(r)
 	defer ts.Close()
-	c := hydra.NewAdminApiWithBasePath(ts.URL)
+	c := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(ts.URL).Host})
 
 	ds := new(oauth2.Session)
 	ctx := context.Background()
 
-	resp, err := c.FlushInactiveOAuth2Tokens(hydra.FlushInactiveOAuth2TokensRequest{NotAfter: time.Now().Add(-time.Hour * 24)})
+	_, err := c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(time.Now().Add(-time.Hour * 24))}))
 	require.NoError(t, err)
-	assert.EqualValues(t, http.StatusNoContent, resp.StatusCode)
 
 	_, err = store.GetAccessTokenSession(ctx, "flush-1", ds)
 	require.NoError(t, err)
@@ -123,9 +127,8 @@ func TestHandlerFlushHandler(t *testing.T) {
 	_, err = store.GetAccessTokenSession(ctx, "flush-3", ds)
 	require.NoError(t, err)
 
-	resp, err = c.FlushInactiveOAuth2Tokens(hydra.FlushInactiveOAuth2TokensRequest{NotAfter: time.Now().Add(-(lifespan + time.Hour/2))})
+	_, err = c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(time.Now().Add(-(lifespan + time.Hour/2)))}))
 	require.NoError(t, err)
-	assert.EqualValues(t, http.StatusNoContent, resp.StatusCode)
 
 	_, err = store.GetAccessTokenSession(ctx, "flush-1", ds)
 	require.NoError(t, err)
@@ -134,9 +137,8 @@ func TestHandlerFlushHandler(t *testing.T) {
 	_, err = store.GetAccessTokenSession(ctx, "flush-3", ds)
 	require.Error(t, err)
 
-	resp, err = c.FlushInactiveOAuth2Tokens(hydra.FlushInactiveOAuth2TokensRequest{NotAfter: time.Now()})
+	_, err = c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(time.Now())}))
 	require.NoError(t, err)
-	assert.EqualValues(t, http.StatusNoContent, resp.StatusCode)
 
 	_, err = store.GetAccessTokenSession(ctx, "flush-1", ds)
 	require.NoError(t, err)
@@ -392,6 +394,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		AuthURL:                           urlx.AppendPaths(conf.IssuerURL(), oauth2.AuthPath).String(),
 		TokenURL:                          urlx.AppendPaths(conf.IssuerURL(), oauth2.TokenPath).String(),
 		JWKsURI:                           urlx.AppendPaths(conf.IssuerURL(), oauth2.JWKPath).String(),
+		RevocationEndpoint:                urlx.AppendPaths(conf.IssuerURL(), oauth2.RevocationPath).String(),
 		RegistrationEndpoint:              conf.OAuth2ClientRegistrationURL().String(),
 		SubjectTypes:                      []string{"pairwise", "public"},
 		ResponseTypes:                     []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},

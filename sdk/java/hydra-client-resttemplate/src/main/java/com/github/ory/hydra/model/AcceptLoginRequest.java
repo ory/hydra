@@ -19,14 +19,20 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * AcceptLoginRequest
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-02T13:01:09.037+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T20:30:02.841+02:00")
 public class AcceptLoginRequest {
   @JsonProperty("acr")
   private String acr = null;
+
+  @JsonProperty("context")
+  private Map<String, Object> context = null;
 
   @JsonProperty("force_subject_identifier")
   private String forceSubjectIdentifier = null;
@@ -56,6 +62,32 @@ public class AcceptLoginRequest {
 
   public void setAcr(String acr) {
     this.acr = acr;
+  }
+
+  public AcceptLoginRequest context(Map<String, Object> context) {
+    this.context = context;
+    return this;
+  }
+
+  public AcceptLoginRequest putContextItem(String key, Object contextItem) {
+    if (this.context == null) {
+      this.context = new HashMap<String, Object>();
+    }
+    this.context.put(key, contextItem);
+    return this;
+  }
+
+   /**
+   * Context is an optional object which can hold arbitrary data. The data will be made available when fetching the consent request under the \&quot;context\&quot; field. This is useful in scenarios where login and consent endpoints share data.
+   * @return context
+  **/
+  @ApiModelProperty(value = "Context is an optional object which can hold arbitrary data. The data will be made available when fetching the consent request under the \"context\" field. This is useful in scenarios where login and consent endpoints share data.")
+  public Map<String, Object> getContext() {
+    return context;
+  }
+
+  public void setContext(Map<String, Object> context) {
+    this.context = context;
   }
 
   public AcceptLoginRequest forceSubjectIdentifier(String forceSubjectIdentifier) {
@@ -141,6 +173,7 @@ public class AcceptLoginRequest {
     }
     AcceptLoginRequest acceptLoginRequest = (AcceptLoginRequest) o;
     return Objects.equals(this.acr, acceptLoginRequest.acr) &&
+        Objects.equals(this.context, acceptLoginRequest.context) &&
         Objects.equals(this.forceSubjectIdentifier, acceptLoginRequest.forceSubjectIdentifier) &&
         Objects.equals(this.remember, acceptLoginRequest.remember) &&
         Objects.equals(this.rememberFor, acceptLoginRequest.rememberFor) &&
@@ -149,7 +182,7 @@ public class AcceptLoginRequest {
 
   @Override
   public int hashCode() {
-    return Objects.hash(acr, forceSubjectIdentifier, remember, rememberFor, subject);
+    return Objects.hash(acr, context, forceSubjectIdentifier, remember, rememberFor, subject);
   }
 
 
@@ -159,6 +192,7 @@ public class AcceptLoginRequest {
     sb.append("class AcceptLoginRequest {\n");
     
     sb.append("    acr: ").append(toIndentedString(acr)).append("\n");
+    sb.append("    context: ").append(toIndentedString(context)).append("\n");
     sb.append("    forceSubjectIdentifier: ").append(toIndentedString(forceSubjectIdentifier)).append("\n");
     sb.append("    remember: ").append(toIndentedString(remember)).append("\n");
     sb.append("    rememberFor: ").append(toIndentedString(rememberFor)).append("\n");

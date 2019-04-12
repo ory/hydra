@@ -18,4 +18,5 @@ hydra-docker-bin
 cookies.txt
 vendor/
 LICENSE.txt
-hydra
+./hydra
+!./hydra/

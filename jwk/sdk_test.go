@@ -25,6 +25,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/ory/hydra/sdk/go/hydra/client"
+	"github.com/ory/hydra/sdk/go/hydra/client/admin"
+	"github.com/ory/hydra/sdk/go/hydra/models"
+	"github.com/ory/x/pointerx"
+	"github.com/ory/x/urlx"
+
 	"github.com/ory/hydra/x"
 
 	"github.com/ory/hydra/internal"
@@ -33,7 +39,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	. "github.com/ory/hydra/jwk"
-	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
 )
 
 func TestJWKSDK(t *testing.T) {
@@ -46,111 +51,101 @@ func TestJWKSDK(t *testing.T) {
 		return h
 	})
 	server := httptest.NewServer(router)
-	client := hydra.NewAdminApiWithBasePath(server.URL)
+	sdk := client.NewHTTPClientWithConfig(nil, &client.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(server.URL).Host})
 
 	t.Run("JSON Web Key", func(t *testing.T) {
 		t.Run("CreateJwkSetKey", func(t *testing.T) {
 			// Create a key called set-foo
-			resultKeys, response, err := client.CreateJsonWebKeySet("set-foo", hydra.JsonWebKeySetGeneratorRequest{
-				Alg: "HS256",
-				Kid: "key-bar",
-				Use: "sig",
-			})
+			resultKeys, err := sdk.Admin.CreateJSONWebKeySet(admin.NewCreateJSONWebKeySetParams().WithSet("set-foo").WithBody(&models.CreateRequest{
+				Algorithm: pointerx.String("HS256"),
+				KeyID:     pointerx.String("key-bar"),
+				Use:       pointerx.String("sig"),
+			}))
 			require.NoError(t, err)
-			require.EqualValues(t, http.StatusCreated, response.StatusCode)
-			require.Len(t, resultKeys.Keys, 1)
-			assert.Equal(t, "key-bar", resultKeys.Keys[0].Kid)
-			assert.Equal(t, "HS256", resultKeys.Keys[0].Alg)
-			assert.Equal(t, "sig", resultKeys.Keys[0].Use)
+			require.Len(t, resultKeys.Payload.Keys, 1)
+			assert.Equal(t, "key-bar", *resultKeys.Payload.Keys[0].Kid)
+			assert.Equal(t, "HS256", *resultKeys.Payload.Keys[0].Alg)
+			assert.Equal(t, "sig", *resultKeys.Payload.Keys[0].Use)
 		})
 
-		var resultKeys *hydra.JsonWebKeySet
+		var resultKeys *models.SwaggerJSONWebKeySet
 		t.Run("GetJwkSetKey after create", func(t *testing.T) {
-			var err error
-			var response *hydra.APIResponse
-
-			resultKeys, response, err = client.GetJsonWebKey("key-bar", "set-foo")
+			result, err := sdk.Admin.GetJSONWebKey(admin.NewGetJSONWebKeyParams().WithKid("key-bar").WithSet("set-foo"))
 			require.NoError(t, err)
-			require.EqualValues(t, http.StatusOK, response.StatusCode)
-			require.Len(t, resultKeys.Keys, 1)
-			require.Equal(t, "key-bar", resultKeys.Keys[0].Kid)
-			require.Equal(t, "HS256", resultKeys.Keys[0].Alg)
+			require.Len(t, result.Payload.Keys, 1)
+			require.Equal(t, "key-bar", *result.Payload.Keys[0].Kid)
+			require.Equal(t, "HS256", *result.Payload.Keys[0].Alg)
+
+			resultKeys = result.Payload
 		})
 
 		t.Run("UpdateJwkSetKey", func(t *testing.T) {
 			require.Len(t, resultKeys.Keys, 1)
-			resultKeys.Keys[0].Alg = "RS256"
+			resultKeys.Keys[0].Alg = pointerx.String("RS256")
 
-			resultKey, response, err := client.UpdateJsonWebKey("key-bar", "set-foo", resultKeys.Keys[0])
+			resultKey, err := sdk.Admin.UpdateJSONWebKey(admin.NewUpdateJSONWebKeyParams().WithKid("key-bar").WithSet("set-foo").WithBody(resultKeys.Keys[0]))
 			require.NoError(t, err)
-			require.EqualValues(t, http.StatusOK, response.StatusCode)
-			assert.Equal(t, "key-bar", resultKey.Kid)
-			assert.Equal(t, "RS256", resultKey.Alg)
+			assert.Equal(t, "key-bar", *resultKey.Payload.Kid)
+			assert.Equal(t, "RS256", *resultKey.Payload.Alg)
 		})
 
 		t.Run("DeleteJwkSetKey after delete", func(t *testing.T) {
-			response, err := client.DeleteJsonWebKey("key-bar", "set-foo")
+			_, err := sdk.Admin.DeleteJSONWebKey(admin.NewDeleteJSONWebKeyParams().WithKid("key-bar").WithSet("set-foo"))
 			require.NoError(t, err)
-			assert.Equal(t, http.StatusNoContent, response.StatusCode)
 		})
 
 		t.Run("GetJwkSetKey after delete", func(t *testing.T) {
-			_, response, err := client.GetJsonWebKey("key-bar", "set-foo")
-			require.NoError(t, err)
-			assert.Equal(t, http.StatusNotFound, response.StatusCode)
+			_, err := sdk.Admin.GetJSONWebKey(admin.NewGetJSONWebKeyParams().WithKid("key-bar").WithSet("set-foo"))
+			require.Error(t, err)
 		})
 
 	})
 
 	t.Run("JWK Set", func(t *testing.T) {
 		t.Run("CreateJwkSetKey", func(t *testing.T) {
-			resultKeys, _, err := client.CreateJsonWebKeySet("set-foo2", hydra.JsonWebKeySetGeneratorRequest{
-				Alg: "HS256",
-				Kid: "key-bar",
-			})
+			resultKeys, err := sdk.Admin.CreateJSONWebKeySet(admin.NewCreateJSONWebKeySetParams().WithSet("set-foo2").WithBody(&models.CreateRequest{
+				Algorithm: pointerx.String("HS256"),
+				KeyID:     pointerx.String("key-bar"),
+			}))
 			require.NoError(t, err)
 
-			require.Len(t, resultKeys.Keys, 1)
-			assert.Equal(t, "key-bar", resultKeys.Keys[0].Kid)
-			assert.Equal(t, "HS256", resultKeys.Keys[0].Alg)
+			require.Len(t, resultKeys.Payload.Keys, 1)
+			assert.Equal(t, "key-bar", *resultKeys.Payload.Keys[0].Kid)
+			assert.Equal(t, "HS256", *resultKeys.Payload.Keys[0].Alg)
 		})
 
-		resultKeys, response, err := client.GetJsonWebKeySet("set-foo2")
+		resultKeys, err := sdk.Admin.GetJSONWebKeySet(admin.NewGetJSONWebKeySetParams().WithSet("set-foo2"))
 		t.Run("GetJwkSet after create", func(t *testing.T) {
-			require.EqualValues(t, http.StatusOK, response.StatusCode)
 			require.NoError(t, err)
-			require.Len(t, resultKeys.Keys, 1)
-			assert.Equal(t, "key-bar", resultKeys.Keys[0].Kid)
-			assert.Equal(t, "HS256", resultKeys.Keys[0].Alg)
+			require.Len(t, resultKeys.Payload.Keys, 1)
+			assert.Equal(t, "key-bar", *resultKeys.Payload.Keys[0].Kid)
+			assert.Equal(t, "HS256", *resultKeys.Payload.Keys[0].Alg)
 		})
 
 		t.Run("UpdateJwkSet", func(t *testing.T) {
-			require.Len(t, resultKeys.Keys, 1)
-			resultKeys.Keys[0].Alg = "RS256"
-			resultKeys, response, err = client.UpdateJsonWebKeySet("set-foo2", *resultKeys)
-			require.EqualValues(t, http.StatusOK, response.StatusCode)
+			require.Len(t, resultKeys.Payload.Keys, 1)
+			resultKeys.Payload.Keys[0].Alg = pointerx.String("RS256")
+
+			result, err := sdk.Admin.UpdateJSONWebKeySet(admin.NewUpdateJSONWebKeySetParams().WithSet("set-foo2").WithBody(resultKeys.Payload))
 			require.NoError(t, err)
-			require.Len(t, resultKeys.Keys, 1)
-			assert.Equal(t, "key-bar", resultKeys.Keys[0].Kid)
-			assert.Equal(t, "RS256", resultKeys.Keys[0].Alg)
+			require.Len(t, result.Payload.Keys, 1)
+			assert.Equal(t, "key-bar", *result.Payload.Keys[0].Kid)
+			assert.Equal(t, "RS256", *result.Payload.Keys[0].Alg)
 		})
 
 		t.Run("DeleteJwkSet", func(t *testing.T) {
-			response, err := client.DeleteJsonWebKeySet("set-foo2")
+			_, err := sdk.Admin.DeleteJSONWebKeySet(admin.NewDeleteJSONWebKeySetParams().WithSet("set-foo2"))
 			require.NoError(t, err)
-			assert.Equal(t, http.StatusNoContent, response.StatusCode)
 		})
 
 		t.Run("GetJwkSet after delete", func(t *testing.T) {
-			_, response, err := client.GetJsonWebKeySet("set-foo2")
-			require.NoError(t, err)
-			assert.Equal(t, http.StatusNotFound, response.StatusCode)
+			_, err := sdk.Admin.GetJSONWebKeySet(admin.NewGetJSONWebKeySetParams().WithSet("set-foo2"))
+			require.Error(t, err)
 		})
 
 		t.Run("GetJwkSetKey after delete", func(t *testing.T) {
-			_, response, err := client.GetJsonWebKey("key-bar", "set-foo2")
-			require.NoError(t, err)
-			assert.Equal(t, http.StatusNotFound, response.StatusCode)
+			_, err := sdk.Admin.GetJSONWebKey(admin.NewGetJSONWebKeyParams().WithSet("set-foo2").WithKid("key-bar"))
+			require.Error(t, err)
 		})
 	})
 }

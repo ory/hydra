@@ -23,7 +23,7 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * RejectRequest
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-02T13:01:09.037+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T20:30:02.841+02:00")
 public class RejectRequest {
   @JsonProperty("error")
   private String error = null;

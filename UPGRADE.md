@@ -131,6 +131,58 @@ Do you want the latest features and patches without work and hassle? Are you loo
 secure deployment with zero effort? We can run it for you! If you're interested,
 [contact us now](mailto:hi@ory.sh)!
 
+## 1.0.0-rc.9
+
+### Go SDK
+
+The Go SDK is now being generated using `go-swagger`. The SDK generated using `swagger-codegen` is no longer supported.
+The old Go SDK is still available but moved to a new path. To use it, change:
+
+```
+- import "github.com/ory/hydra/sdk/go/hydra"
+- import "github.com/ory/hydra/sdk/go/hydra/swagger"
+
++ import hydra "github.com/ory/hydra-legacy-sdk"
++ import "github.com/ory/hydra-legacy-sdk/swagger"
+```
+
+### Accepting Login and Consent Requests
+
+Previously, login and consent requests were accepted/rejected by doing one of:
+
+```
+GET /oauth2/auth/requests/login/{challenge}
+PUT /oauth2/auth/requests/login/{challenge}/accept
+PUT /oauth2/auth/requests/login/{challenge}/reject
+
+GET /oauth2/auth/requests/consent/{challenge}
+PUT /oauth2/auth/requests/consent/{challenge}/accept
+PUT /oauth2/auth/requests/consent/{challenge}/reject
+```
+
+We observed login/consent apps that did not properly sanitize the `{challenge}` parameter, making it possible to
+escape the path by using `..` in the challenge parameter (e.g. `http://my-login-app/login?challenge=../../whatever`)
+causing the login/consent app to execute a request it is not supposed to be making (e.g. `/oauth2/auth/requests/login/../../whatever/accept`).
+
+From now on, the challenge has to be sent using a query parameter instead:
+
+```
+GET /oauth2/auth/requests/login?challenge={challenge}
+PUT /oauth2/auth/requests/login/accept?challenge={challenge}
+PUT /oauth2/auth/requests/login/reject?challenge={challenge}
+
+GET /oauth2/auth/requests/consent?challenge={challenge}
+PUT /oauth2/auth/requests/consent/accept?challenge={challenge}
+PUT /oauth2/auth/requests/consent/reject?challenge={challenge}
+```
+
+Implementers will still need to make sure that `challenge` is properly (query) scaped, but it's generally easier to secure than
+a path parameter.
+
+We've decided to make this a hard breaking change in order to force everybody to check if their application is vulnerable to this
+issue and to upgrade their code. The required code change is minimal but the resulting security improvements are potentially
+large.
+
 ## 1.0.0-rc.7
 
 ### Configuration changes

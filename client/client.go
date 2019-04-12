@@ -107,6 +107,9 @@ type Client struct {
 	// secret will expire or 0 if it will not expire. The time is
 	// represented as the number of seconds from 1970-01-01T00:00:00Z as
 	// measured in UTC until the date/time of expiration.
+	//
+	// This feature is currently not supported and it's value will always
+	// be set to 0.
 	SecretExpiresAt int `json:"client_secret_expires_at"`
 
 	// SubjectType requested for responses to this Client. The subject_types_supported Discovery parameter contains a

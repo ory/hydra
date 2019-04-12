@@ -79,8 +79,9 @@ func RunServeAdmin(version, build, date string) func(cmd *cobra.Command, args []
 		d := driver.NewDefaultDriver(
 			logrusx.New(),
 			flagx.MustGetBool(cmd, "dangerous-force-http"),
+			flagx.MustGetStringSlice(cmd, "dangerous-allow-insecure-redirect-urls"),
 			version, build, date,
-		)
+		).CallRegistry()
 
 		isDSNAllowed(d)
 
@@ -104,8 +105,9 @@ func RunServePublic(version, build, date string) func(cmd *cobra.Command, args [
 		d := driver.NewDefaultDriver(
 			logrusx.New(),
 			flagx.MustGetBool(cmd, "dangerous-force-http"),
+			flagx.MustGetStringSlice(cmd, "dangerous-allow-insecure-redirect-urls"),
 			version, build, date,
-		)
+		).CallRegistry()
 
 		isDSNAllowed(d)
 
@@ -129,8 +131,9 @@ func RunServeAll(version, build, date string) func(cmd *cobra.Command, args []st
 		d := driver.NewDefaultDriver(
 			logrusx.New(),
 			flagx.MustGetBool(cmd, "dangerous-force-http"),
+			flagx.MustGetStringSlice(cmd, "dangerous-allow-insecure-redirect-urls"),
 			version, build, date,
-		)
+		).CallRegistry()
 
 		admin, public, adminmw, publicmw := setup(d, cmd)
 		cert := getOrCreateTLSCertificate(cmd, d) // we do not want to run this concurrently.

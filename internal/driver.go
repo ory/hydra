@@ -54,12 +54,12 @@ func resetConfig() {
 
 func NewConfigurationWithDefaults() *configuration.ViperProvider {
 	resetConfig()
-	return configuration.NewViperProvider(logrusx.New(), true).(*configuration.ViperProvider)
+	return configuration.NewViperProvider(logrusx.New(), true, nil).(*configuration.ViperProvider)
 }
 
 func NewConfigurationWithDefaultsAndHTTPS() *configuration.ViperProvider {
 	resetConfig()
-	return configuration.NewViperProvider(logrusx.New(), false).(*configuration.ViperProvider)
+	return configuration.NewViperProvider(logrusx.New(), false, nil).(*configuration.ViperProvider)
 }
 
 func NewRegistry(c *configuration.ViperProvider) *driver.RegistryMemory {

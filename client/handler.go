@@ -74,9 +74,8 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
 //     Schemes: http, https
 //
 //     Responses:
-//       200: oAuth2Client
-//       401: genericError
-//       403: genericError
+//       201: oAuth2Client
+//       409: genericError
 //       500: genericError
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var c Client
@@ -133,8 +132,6 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 //
 //     Responses:
 //       200: oAuth2Client
-//       401: genericError
-//       403: genericError
 //       500: genericError
 func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var c Client
@@ -183,8 +180,6 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //
 //     Responses:
 //       200: oAuth2ClientList
-//       401: genericError
-//       403: genericError
 //       500: genericError
 func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	limit, offset := pagination.Parse(r, 100, 0, 500)
@@ -226,8 +221,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 //
 //     Responses:
 //       200: oAuth2Client
-//       401: genericError
-//       403: genericError
+//       404: genericError
 //       500: genericError
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
@@ -260,8 +254,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 //
 //     Responses:
 //       204: emptyResponse
-//       401: genericError
-//       403: genericError
+//       404: genericError
 //       500: genericError
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")

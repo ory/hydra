@@ -26,56 +26,72 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ory/hydra/sdk/go/hydra/swagger"
+	"github.com/ory/hydra/sdk/go/hydra/client/admin"
+	"github.com/ory/hydra/sdk/go/hydra/models"
+	"github.com/ory/x/pointerx"
+	"github.com/ory/x/urlx"
+
+	hydra "github.com/ory/hydra/sdk/go/hydra/client"
 )
 
-var client = swagger.NewAdminApiWithBasePath(os.Getenv("HYDRA_ADMIN_URL"))
+var hydraURL = urlx.ParseOrPanic(os.Getenv("HYDRA_ADMIN_URL"))
+var client = hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{hydraURL.Scheme}, Host: hydraURL.Host, BasePath: hydraURL.Path})
 
 func login(rw http.ResponseWriter, r *http.Request) {
 	challenge := r.URL.Query().Get("login_challenge")
-	lr, resp, err := client.GetLoginRequest(challenge)
+	res, err := client.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithChallenge(challenge))
 	if err != nil {
 		log.Fatalf("Unable to fetch clogin request: %s", err)
-	} else if resp.StatusCode != http.StatusOK {
-		log.Fatalf("Unable to fetch login request, got status code %d", resp.StatusCode)
 	}
+	lr := res.Payload
 
-	var v *swagger.CompletedRequest
-	if strings.Contains(lr.RequestUrl, "mockLogin=accept") {
+	var v *models.RequestHandlerResponse
+	if strings.Contains(lr.RequestURL, "mockLogin=accept") {
 		remember := false
-		if strings.Contains(lr.RequestUrl, "rememberLogin=yes") {
+		if strings.Contains(lr.RequestURL, "rememberLogin=yes") {
 			remember = true
 		}
-		v, resp, err = client.AcceptLoginRequest(challenge, swagger.AcceptLoginRequest{
-			Subject:  "the-subject",
-			Remember: remember,
-		})
+
+		var vr *admin.AcceptLoginRequestOK
+		vr, err = client.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
+			WithChallenge(challenge).
+			WithBody(&models.HandledLoginRequest{
+				Subject:  pointerx.String("the-subject"),
+				Remember: remember,
+			}))
+		if vr != nil {
+			v = vr.Payload
+		}
 	} else {
-		v, resp, err = client.RejectLoginRequest(challenge, swagger.RejectRequest{
-			Error_: "invalid_request",
-		})
+		var vr *admin.RejectLoginRequestOK
+		vr, err = client.Admin.RejectLoginRequest(admin.NewRejectLoginRequestParams().
+			WithChallenge(challenge).
+			WithBody(&models.RequestDeniedError{
+				Name: "invalid_request",
+			}))
+		if vr != nil {
+			v = vr.Payload
+		}
 	}
 	if err != nil {
 		log.Fatalf("Unable to accept/reject login request: %s", err)
-	} else if resp.StatusCode != http.StatusOK {
-		log.Fatalf("Unable to accept/reject login request, got status code %d", resp.StatusCode)
 	}
 	http.Redirect(rw, r, v.RedirectTo, http.StatusFound)
 }
 
 func consent(rw http.ResponseWriter, r *http.Request) {
 	challenge := r.URL.Query().Get("consent_challenge")
-	o, resp, err := client.GetConsentRequest(challenge)
+
+	rrr, err := client.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge(challenge))
 	if err != nil {
 		log.Fatalf("Unable to fetch consent request: %s", err)
-	} else if resp.StatusCode != http.StatusOK {
-		log.Fatalf("Unable to fetch consent request, got status code %d", resp.StatusCode)
 	}
+	o := rrr.Payload
 
-	var v *swagger.CompletedRequest
-	if strings.Contains(o.RequestUrl, "mockConsent=accept") {
+	var v *models.RequestHandlerResponse
+	if strings.Contains(o.RequestURL, "mockConsent=accept") {
 		remember := false
-		if strings.Contains(o.RequestUrl, "rememberConsent=yes") {
+		if strings.Contains(o.RequestURL, "rememberConsent=yes") {
 			remember = true
 		}
 		value := "bar"
@@ -83,23 +99,35 @@ func consent(rw http.ResponseWriter, r *http.Request) {
 			value = "rab"
 		}
 
-		v, resp, err = client.AcceptConsentRequest(challenge, swagger.AcceptConsentRequest{
-			GrantScope: o.RequestedScope,
-			Remember:   remember,
-			Session: swagger.ConsentRequestSession{
-				AccessToken: map[string]interface{}{"foo": value},
-				IdToken:     map[string]interface{}{"baz": value},
-			},
-		})
+		var vr *admin.AcceptConsentRequestOK
+		vr, err = client.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
+			WithChallenge(challenge).
+			WithBody(&models.HandledConsentRequest{
+				GrantedScope: o.RequestedScope,
+				Remember:     remember,
+				Session: &models.ConsentRequestSessionData{
+					AccessToken: map[string]interface{}{"foo": value},
+					IDToken:     map[string]interface{}{"baz": value},
+				},
+			}))
+		if vr != nil {
+			v = vr.Payload
+		}
 	} else {
-		v, resp, err = client.RejectConsentRequest(challenge, swagger.RejectRequest{
-			Error_: "invalid_request",
-		})
+		var vr *admin.RejectConsentRequestOK
+		vr, err = client.Admin.RejectConsentRequest(
+			admin.NewRejectConsentRequestParams().WithChallenge(challenge).
+				WithBody(
+					&models.RequestDeniedError{
+						Name: "invalid_request",
+					}),
+		)
+		if vr != nil {
+			v = vr.Payload
+		}
 	}
 	if err != nil {
 		log.Fatalf("Unable to accept/reject consent request: %s", err)
-	} else if resp.StatusCode != http.StatusOK {
-		log.Fatalf("Unable to accept/reject consent request, got status code %d", resp.StatusCode)
 	}
 	http.Redirect(rw, r, v.RedirectTo, http.StatusFound)
 }

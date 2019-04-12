@@ -120,24 +120,24 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*OryHydra.AdminApi* | [**acceptConsentRequest**](docs/AdminApi.md#acceptConsentRequest) | **PUT** /oauth2/auth/requests/consent/{challenge}/accept | Accept an consent request
-*OryHydra.AdminApi* | [**acceptLoginRequest**](docs/AdminApi.md#acceptLoginRequest) | **PUT** /oauth2/auth/requests/login/{challenge}/accept | Accept an login request
+*OryHydra.AdminApi* | [**acceptConsentRequest**](docs/AdminApi.md#acceptConsentRequest) | **PUT** /oauth2/auth/requests/consent/accept | Accept an consent request
+*OryHydra.AdminApi* | [**acceptLoginRequest**](docs/AdminApi.md#acceptLoginRequest) | **PUT** /oauth2/auth/requests/login/accept | Accept an login request
 *OryHydra.AdminApi* | [**createJsonWebKeySet**](docs/AdminApi.md#createJsonWebKeySet) | **POST** /keys/{set} | Generate a new JSON Web Key
 *OryHydra.AdminApi* | [**createOAuth2Client**](docs/AdminApi.md#createOAuth2Client) | **POST** /clients | Create an OAuth 2.0 client
 *OryHydra.AdminApi* | [**deleteJsonWebKey**](docs/AdminApi.md#deleteJsonWebKey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
 *OryHydra.AdminApi* | [**deleteJsonWebKeySet**](docs/AdminApi.md#deleteJsonWebKeySet) | **DELETE** /keys/{set} | Delete a JSON Web Key Set
 *OryHydra.AdminApi* | [**deleteOAuth2Client**](docs/AdminApi.md#deleteOAuth2Client) | **DELETE** /clients/{id} | Deletes an OAuth 2.0 Client
 *OryHydra.AdminApi* | [**flushInactiveOAuth2Tokens**](docs/AdminApi.md#flushInactiveOAuth2Tokens) | **POST** /oauth2/flush | Flush Expired OAuth2 Access Tokens
-*OryHydra.AdminApi* | [**getConsentRequest**](docs/AdminApi.md#getConsentRequest) | **GET** /oauth2/auth/requests/consent/{challenge} | Get consent request information
+*OryHydra.AdminApi* | [**getConsentRequest**](docs/AdminApi.md#getConsentRequest) | **GET** /oauth2/auth/requests/consent | Get consent request information
 *OryHydra.AdminApi* | [**getJsonWebKey**](docs/AdminApi.md#getJsonWebKey) | **GET** /keys/{set}/{kid} | Fetch a JSON Web Key
 *OryHydra.AdminApi* | [**getJsonWebKeySet**](docs/AdminApi.md#getJsonWebKeySet) | **GET** /keys/{set} | Retrieve a JSON Web Key Set
-*OryHydra.AdminApi* | [**getLoginRequest**](docs/AdminApi.md#getLoginRequest) | **GET** /oauth2/auth/requests/login/{challenge} | Get an login request
+*OryHydra.AdminApi* | [**getLoginRequest**](docs/AdminApi.md#getLoginRequest) | **GET** /oauth2/auth/requests/login | Get an login request
 *OryHydra.AdminApi* | [**getOAuth2Client**](docs/AdminApi.md#getOAuth2Client) | **GET** /clients/{id} | Get an OAuth 2.0 Client.
 *OryHydra.AdminApi* | [**introspectOAuth2Token**](docs/AdminApi.md#introspectOAuth2Token) | **POST** /oauth2/introspect | Introspect OAuth2 tokens
 *OryHydra.AdminApi* | [**listOAuth2Clients**](docs/AdminApi.md#listOAuth2Clients) | **GET** /clients | List OAuth 2.0 Clients
 *OryHydra.AdminApi* | [**listUserConsentSessions**](docs/AdminApi.md#listUserConsentSessions) | **GET** /oauth2/auth/sessions/consent/{user} | Lists all consent sessions of a user
-*OryHydra.AdminApi* | [**rejectConsentRequest**](docs/AdminApi.md#rejectConsentRequest) | **PUT** /oauth2/auth/requests/consent/{challenge}/reject | Reject an consent request
-*OryHydra.AdminApi* | [**rejectLoginRequest**](docs/AdminApi.md#rejectLoginRequest) | **PUT** /oauth2/auth/requests/login/{challenge}/reject | Reject a login request
+*OryHydra.AdminApi* | [**rejectConsentRequest**](docs/AdminApi.md#rejectConsentRequest) | **PUT** /oauth2/auth/requests/consent/reject | Reject an consent request
+*OryHydra.AdminApi* | [**rejectLoginRequest**](docs/AdminApi.md#rejectLoginRequest) | **PUT** /oauth2/auth/requests/login/reject | Reject a login request
 *OryHydra.AdminApi* | [**revokeAllUserConsentSessions**](docs/AdminApi.md#revokeAllUserConsentSessions) | **DELETE** /oauth2/auth/sessions/consent/{user} | Revokes all previous consent sessions of a user
 *OryHydra.AdminApi* | [**revokeAuthenticationSession**](docs/AdminApi.md#revokeAuthenticationSession) | **DELETE** /oauth2/auth/sessions/login/{user} | Invalidates a user&#39;s authentication session
 *OryHydra.AdminApi* | [**revokeUserClientConsentSessions**](docs/AdminApi.md#revokeUserClientConsentSessions) | **DELETE** /oauth2/auth/sessions/consent/{user}/{client} | Revokes consent sessions of a user for a specific OAuth 2.0 Client
@@ -160,15 +160,22 @@ Class | Method | HTTP request | Description
 
  - [OryHydra.AcceptConsentRequest](docs/AcceptConsentRequest.md)
  - [OryHydra.AcceptLoginRequest](docs/AcceptLoginRequest.md)
+ - [OryHydra.AuthenticationRequest](docs/AuthenticationRequest.md)
  - [OryHydra.AuthenticationSession](docs/AuthenticationSession.md)
+ - [OryHydra.Client](docs/Client.md)
  - [OryHydra.CompletedRequest](docs/CompletedRequest.md)
  - [OryHydra.ConsentRequest](docs/ConsentRequest.md)
  - [OryHydra.ConsentRequestSession](docs/ConsentRequestSession.md)
+ - [OryHydra.ConsentRequestSessionData](docs/ConsentRequestSessionData.md)
+ - [OryHydra.CreateRequest](docs/CreateRequest.md)
  - [OryHydra.EmptyResponse](docs/EmptyResponse.md)
  - [OryHydra.FlushInactiveOAuth2TokensRequest](docs/FlushInactiveOAuth2TokensRequest.md)
  - [OryHydra.GenericError](docs/GenericError.md)
+ - [OryHydra.HandledConsentRequest](docs/HandledConsentRequest.md)
+ - [OryHydra.HandledLoginRequest](docs/HandledLoginRequest.md)
  - [OryHydra.HealthNotReadyStatus](docs/HealthNotReadyStatus.md)
  - [OryHydra.HealthStatus](docs/HealthStatus.md)
+ - [OryHydra.Introspection](docs/Introspection.md)
  - [OryHydra.JSONWebKey](docs/JSONWebKey.md)
  - [OryHydra.JSONWebKeySet](docs/JSONWebKeySet.md)
  - [OryHydra.JsonWebKeySetGeneratorRequest](docs/JsonWebKeySetGeneratorRequest.md)
@@ -180,15 +187,26 @@ Class | Method | HTTP request | Description
  - [OryHydra.OpenIDConnectContext](docs/OpenIDConnectContext.md)
  - [OryHydra.PreviousConsentSession](docs/PreviousConsentSession.md)
  - [OryHydra.RejectRequest](docs/RejectRequest.md)
+ - [OryHydra.RequestDeniedError](docs/RequestDeniedError.md)
+ - [OryHydra.RequestHandlerResponse](docs/RequestHandlerResponse.md)
  - [OryHydra.SwaggerFlushInactiveAccessTokens](docs/SwaggerFlushInactiveAccessTokens.md)
+ - [OryHydra.SwaggerHealthStatus](docs/SwaggerHealthStatus.md)
+ - [OryHydra.SwaggerJSONWebKey](docs/SwaggerJSONWebKey.md)
+ - [OryHydra.SwaggerJSONWebKeyQuery](docs/SwaggerJSONWebKeyQuery.md)
+ - [OryHydra.SwaggerJSONWebKeySet](docs/SwaggerJSONWebKeySet.md)
  - [OryHydra.SwaggerJsonWebKeyQuery](docs/SwaggerJsonWebKeyQuery.md)
  - [OryHydra.SwaggerJwkCreateSet](docs/SwaggerJwkCreateSet.md)
  - [OryHydra.SwaggerJwkSetQuery](docs/SwaggerJwkSetQuery.md)
  - [OryHydra.SwaggerJwkUpdateSet](docs/SwaggerJwkUpdateSet.md)
  - [OryHydra.SwaggerJwkUpdateSetKey](docs/SwaggerJwkUpdateSetKey.md)
+ - [OryHydra.SwaggerNotReadyStatus](docs/SwaggerNotReadyStatus.md)
  - [OryHydra.SwaggerOAuthIntrospectionRequest](docs/SwaggerOAuthIntrospectionRequest.md)
+ - [OryHydra.SwaggerOAuthTokenResponse](docs/SwaggerOAuthTokenResponse.md)
  - [OryHydra.SwaggerRevokeOAuth2TokenParameters](docs/SwaggerRevokeOAuth2TokenParameters.md)
+ - [OryHydra.SwaggerVersion](docs/SwaggerVersion.md)
  - [OryHydra.Swaggeroauth2TokenParameters](docs/Swaggeroauth2TokenParameters.md)
+ - [OryHydra.Swaggeroauth2TokenResponse](docs/Swaggeroauth2TokenResponse.md)
+ - [OryHydra.SwaggeruserinfoResponsePayload](docs/SwaggeruserinfoResponsePayload.md)
  - [OryHydra.UserinfoResponse](docs/UserinfoResponse.md)
  - [OryHydra.Version](docs/Version.md)
  - [OryHydra.WellKnown](docs/WellKnown.md)

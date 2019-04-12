@@ -22,13 +22,17 @@ package client_test
 
 import (
 	"fmt"
-	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
-	"time"
 
+	"github.com/go-openapi/strfmt"
+
+	"github.com/ory/hydra/sdk/go/hydra/client/admin"
+	"github.com/ory/hydra/sdk/go/hydra/models"
 	"github.com/ory/hydra/x"
+	"github.com/ory/x/pointerx"
+	"github.com/ory/x/urlx"
 
 	"github.com/spf13/viper"
 
@@ -40,25 +44,25 @@ import (
 	"github.com/ory/hydra/internal"
 
 	"github.com/ory/hydra/client"
-	hydra "github.com/ory/hydra/sdk/go/hydra/swagger"
+	hydra "github.com/ory/hydra/sdk/go/hydra/client"
 )
 
-func createTestClient(prefix string) hydra.OAuth2Client {
-	return hydra.OAuth2Client{
-		ClientId:                  "1234",
-		ClientName:                prefix + "name",
-		ClientSecret:              prefix + "secret",
-		ClientUri:                 prefix + "uri",
+func createTestClient(prefix string) *models.Client {
+	return &models.Client{
+		ClientID:                  "1234",
+		Name:                      prefix + "name",
+		Secret:                    prefix + "secret",
+		ClientURI:                 prefix + "uri",
 		Contacts:                  []string{prefix + "peter", prefix + "pan"},
 		GrantTypes:                []string{prefix + "client_credentials", prefix + "authorize_code"},
-		LogoUri:                   prefix + "logo",
+		LogoURI:                   prefix + "logo",
 		Owner:                     prefix + "an-owner",
-		PolicyUri:                 prefix + "policy-uri",
+		PolicyURI:                 prefix + "policy-uri",
 		Scope:                     prefix + "foo bar baz",
-		TosUri:                    prefix + "tos-uri",
+		TermsOfServiceURI:         prefix + "tos-uri",
 		ResponseTypes:             []string{prefix + "id_token", prefix + "code"},
 		RedirectUris:              []string{prefix + "redirect-url", prefix + "redirect-uri"},
-		ClientSecretExpiresAt:     0,
+		SecretExpiresAt:           0,
 		TokenEndpointAuthMethod:   "client_secret_basic",
 		UserinfoSignedResponseAlg: "none",
 		SubjectType:               "public",
@@ -77,147 +81,134 @@ func TestClientSDK(t *testing.T) {
 	handler.SetRoutes(router)
 	server := httptest.NewServer(router)
 
-	c := hydra.NewAdminApiWithBasePath(server.URL)
+	c := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(server.URL).Host})
 
 	t.Run("case=client default scopes are set", func(t *testing.T) {
-		result, response, err := c.CreateOAuth2Client(hydra.OAuth2Client{
-			ClientId: "scoped",
-		})
+		result, err := c.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(&models.Client{
+			ClientID: "scoped",
+		}))
 		require.NoError(t, err)
-		require.EqualValues(t, http.StatusCreated, response.StatusCode)
-		assert.EqualValues(t, conf.DefaultClientScope(), strings.Split(result.Scope, " "))
+		assert.EqualValues(t, conf.DefaultClientScope(), strings.Split(result.Payload.Scope, " "))
 
-		response, err = c.DeleteOAuth2Client("scoped")
+		_, err = c.Admin.DeleteOAuth2Client(admin.NewDeleteOAuth2ClientParams().WithID("scoped"))
 		require.NoError(t, err)
-		require.EqualValues(t, http.StatusNoContent, response.StatusCode)
 	})
 
 	t.Run("case=client is created and updated", func(t *testing.T) {
 		createClient := createTestClient("")
 		compareClient := createClient
-		createClient.ClientSecretExpiresAt = 10
+		// This is not yet supported:
+		// 		createClient.SecretExpiresAt = 10
 
 		// returned client is correct on Create
-		result, response, err := c.CreateOAuth2Client(createClient)
+		result, err := c.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(createClient))
 		require.NoError(t, err)
-		require.EqualValues(t, http.StatusCreated, response.StatusCode, "%s", response.Payload)
-		assert.NotEmpty(t, result.UpdatedAt)
-		result.UpdatedAt = time.Time{}
-		assert.NotEmpty(t, result.CreatedAt)
-		result.CreatedAt = time.Time{}
-		assert.EqualValues(t, compareClient, *result)
+		assert.NotEmpty(t, result.Payload.UpdatedAt)
+		result.Payload.UpdatedAt = strfmt.DateTime{}
+		assert.NotEmpty(t, result.Payload.CreatedAt)
+		result.Payload.CreatedAt = strfmt.DateTime{}
+		assert.EqualValues(t, compareClient, result.Payload)
 
 		// secret is not returned on GetOAuth2Client
-		compareClient.ClientSecret = ""
-		result, response, err = c.GetOAuth2Client(createClient.ClientId)
+		compareClient.Secret = ""
+		gresult, err := c.Admin.GetOAuth2Client(admin.NewGetOAuth2ClientParams().WithID(createClient.ClientID))
 		require.NoError(t, err)
-		require.EqualValues(t, http.StatusOK, response.StatusCode, "%s", response.Payload)
-		assert.NotEmpty(t, result.UpdatedAt)
-		result.UpdatedAt = time.Time{}
-		assert.NotEmpty(t, result.CreatedAt)
-		result.CreatedAt = time.Time{}
-		assert.EqualValues(t, compareClient, *result)
+		assert.NotEmpty(t, gresult.Payload.UpdatedAt)
+		gresult.Payload.UpdatedAt = strfmt.DateTime{}
+		assert.NotEmpty(t, gresult.Payload.CreatedAt)
+		gresult.Payload.CreatedAt = strfmt.DateTime{}
+		assert.EqualValues(t, compareClient, gresult.Payload)
 
 		// listing clients returns the only added one
-		results, response, err := c.ListOAuth2Clients(100, 0)
+		results, err := c.Admin.ListOAuth2Clients(admin.NewListOAuth2ClientsParams().WithLimit(pointerx.Int64(100)))
 		require.NoError(t, err)
-		require.EqualValues(t, http.StatusOK, response.StatusCode, "%s", response.Payload)
-		assert.Len(t, results, 1)
-		assert.NotEmpty(t, results[0].UpdatedAt)
-		results[0].UpdatedAt = time.Time{}
-		assert.NotEmpty(t, results[0].CreatedAt)
-		results[0].CreatedAt = time.Time{}
-		assert.EqualValues(t, compareClient, results[0])
+		assert.Len(t, results.Payload, 1)
+		assert.NotEmpty(t, results.Payload[0].UpdatedAt)
+		results.Payload[0].UpdatedAt = strfmt.DateTime{}
+		assert.NotEmpty(t, results.Payload[0].CreatedAt)
+		results.Payload[0].CreatedAt = strfmt.DateTime{}
+		assert.EqualValues(t, compareClient, results.Payload[0])
 
 		// SecretExpiresAt gets overwritten with 0 on Update
-		compareClient.ClientSecret = createClient.ClientSecret
-		result, response, err = c.UpdateOAuth2Client(createClient.ClientId, createClient)
+		compareClient.Secret = createClient.Secret
+		uresult, err := c.Admin.UpdateOAuth2Client(admin.NewUpdateOAuth2ClientParams().WithID(createClient.ClientID).WithBody(createClient))
 		require.NoError(t, err)
-		require.EqualValues(t, http.StatusOK, response.StatusCode, "%s", response.Payload)
-		assert.NotEmpty(t, result.UpdatedAt)
-		result.UpdatedAt = time.Time{}
-		assert.EqualValues(t, compareClient, *result)
+		assert.NotEmpty(t, uresult.Payload.UpdatedAt)
+		uresult.Payload.UpdatedAt = strfmt.DateTime{}
+		assert.EqualValues(t, compareClient, uresult.Payload)
 
 		// create another client
 		updateClient := createTestClient("foo")
-		result, response, err = c.UpdateOAuth2Client(createClient.ClientId, updateClient)
+		uresult, err = c.Admin.UpdateOAuth2Client(admin.NewUpdateOAuth2ClientParams().WithID(createClient.ClientID).WithBody(updateClient))
 		require.NoError(t, err)
-		require.EqualValues(t, http.StatusOK, response.StatusCode, "%s", response.Payload)
-		assert.NotEmpty(t, result.UpdatedAt)
-		result.UpdatedAt = time.Time{}
-		assert.EqualValues(t, updateClient, *result)
+		assert.NotEmpty(t, uresult.Payload.UpdatedAt)
+		uresult.Payload.UpdatedAt = strfmt.DateTime{}
+		assert.EqualValues(t, updateClient, uresult.Payload)
 
 		// again, test if secret is not returned on Get
 		compareClient = updateClient
-		compareClient.ClientSecret = ""
-		result, response, err = c.GetOAuth2Client(updateClient.ClientId)
+		compareClient.Secret = ""
+		gresult, err = c.Admin.GetOAuth2Client(admin.NewGetOAuth2ClientParams().WithID(updateClient.ClientID))
 		require.NoError(t, err)
-		require.EqualValues(t, http.StatusOK, response.StatusCode, "%s", response.Payload)
-		assert.NotEmpty(t, result.UpdatedAt)
-		result.UpdatedAt = time.Time{}
-		assert.EqualValues(t, compareClient, *result)
+		assert.NotEmpty(t, gresult.Payload.UpdatedAt)
+		gresult.Payload.UpdatedAt = strfmt.DateTime{}
+		assert.EqualValues(t, compareClient, gresult.Payload)
 
 		// client can not be found after being deleted
-		response, err = c.DeleteOAuth2Client(updateClient.ClientId)
+		_, err = c.Admin.DeleteOAuth2Client(admin.NewDeleteOAuth2ClientParams().WithID(updateClient.ClientID))
 		require.NoError(t, err)
-		require.EqualValues(t, http.StatusNoContent, response.StatusCode, "%s", response.Payload)
 
-		_, response, err = c.GetOAuth2Client(updateClient.ClientId)
-		require.NoError(t, err)
-		assert.Equal(t, http.StatusNotFound, response.StatusCode)
+		_, err = c.Admin.GetOAuth2Client(admin.NewGetOAuth2ClientParams().WithID(updateClient.ClientID))
+		require.Error(t, err)
 	})
 
 	t.Run("case=public client is transmitted without secret", func(t *testing.T) {
-		result, response, err := c.CreateOAuth2Client(hydra.OAuth2Client{
+		result, err := c.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(&models.Client{
 			TokenEndpointAuthMethod: "none",
-		})
+		}))
 		require.NoError(t, err)
-		require.EqualValues(t, http.StatusCreated, response.StatusCode, "%s", response.Payload)
 
-		assert.Equal(t, "", result.ClientSecret)
+		assert.Equal(t, "", result.Payload.Secret)
 
-		result, response, err = c.CreateOAuth2Client(createTestClient(""))
+		result, err = c.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(createTestClient("")))
 		require.NoError(t, err)
-		require.EqualValues(t, http.StatusCreated, response.StatusCode, "%s", response.Payload)
 
-		assert.Equal(t, "secret", result.ClientSecret)
+		assert.Equal(t, "secret", result.Payload.Secret)
 	})
 
 	t.Run("case=id should be set properly", func(t *testing.T) {
 		for k, tc := range []struct {
-			client   hydra.OAuth2Client
+			client   *models.Client
 			expectID string
 		}{
 			{
-				client: hydra.OAuth2Client{},
+				client: &models.Client{},
 			},
 			{
-				client:   hydra.OAuth2Client{ClientId: "set-properly-1"},
+				client:   &models.Client{ClientID: "set-properly-1"},
 				expectID: "set-properly-1",
 			},
 			{
-				client:   hydra.OAuth2Client{ClientId: "set-properly-2"},
+				client:   &models.Client{ClientID: "set-properly-2"},
 				expectID: "set-properly-2",
 			},
 		} {
 			t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
-				result, response, err := c.CreateOAuth2Client(tc.client)
+				result, err := c.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(tc.client))
 				require.NoError(t, err)
-				require.EqualValues(t, http.StatusCreated, response.StatusCode, "%s", response.Payload)
 
-				assert.NotEmpty(t, result.ClientId)
+				assert.NotEmpty(t, result.Payload.ClientID)
 
-				id := result.ClientId
+				id := result.Payload.ClientID
 				if tc.expectID != "" {
-					assert.EqualValues(t, tc.expectID, result.ClientId)
+					assert.EqualValues(t, tc.expectID, result.Payload.ClientID)
 					id = tc.expectID
 				}
 
-				result, response, err = c.GetOAuth2Client(id)
+				gresult, err := c.Admin.GetOAuth2Client(admin.NewGetOAuth2ClientParams().WithID(id))
 				require.NoError(t, err)
-				require.EqualValues(t, http.StatusOK, response.StatusCode, "%s", response.Payload)
 
-				assert.EqualValues(t, id, result.ClientId)
+				assert.EqualValues(t, id, gresult.Payload.ClientID)
 			})
 		}
 	})

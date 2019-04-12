@@ -16,6 +16,7 @@ Name | Type | Description | Notes
 **require_request_uri_registration** | **bool** | Boolean value specifying whether the OP requires any request_uri values used to be pre-registered using the request_uris registration parameter. | [optional] 
 **response_modes_supported** | **string[]** | JSON array containing a list of the OAuth 2.0 response_mode values that this OP supports. | [optional] 
 **response_types_supported** | **string[]** | JSON array containing a list of the OAuth 2.0 response_type values that this OP supports. Dynamic OpenID Providers MUST support the code, id_token, and the token id_token Response Type values. | 
+**revocation_endpoint** | **string** | URL of the authorization server&#39;s OAuth 2.0 revocation endpoint. | [optional] 
 **scopes_supported** | **string[]** | SON array containing a list of the OAuth 2.0 [RFC6749] scope values that this server supports. The server MUST support the openid scope value. Servers MAY choose not to advertise some supported scope values even when this parameter is used | [optional] 
 **subject_types_supported** | **string[]** | JSON array containing a list of the Subject Identifier types that this OP supports. Valid types include pairwise and public. | 
 **token_endpoint** | **string** | URL of the OP&#39;s OAuth 2.0 Token Endpoint | 

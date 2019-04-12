@@ -18,17 +18,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.github.ory.hydra.model.ConsentRequest;
-import com.github.ory.hydra.model.ConsentRequestSession;
+import com.github.ory.hydra.model.ConsentRequestSessionData;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The response used to return handled consent requests same as HandledAuthenticationRequest, just with consent_request exposed as json
+ * PreviousConsentSession The response used to return handled consent requests same as HandledLoginRequest, just with consent_request exposed as json
  */
-@ApiModel(description = "The response used to return handled consent requests same as HandledAuthenticationRequest, just with consent_request exposed as json")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-02T13:01:09.037+02:00")
+@ApiModel(description = "PreviousConsentSession The response used to return handled consent requests same as HandledLoginRequest, just with consent_request exposed as json")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T20:30:02.841+02:00")
 public class PreviousConsentSession {
   @JsonProperty("consent_request")
   private ConsentRequest consentRequest = null;
@@ -46,7 +46,7 @@ public class PreviousConsentSession {
   private Long rememberFor = null;
 
   @JsonProperty("session")
-  private ConsentRequestSession session = null;
+  private ConsentRequestSessionData session = null;
 
   public PreviousConsentSession consentRequest(ConsentRequest consentRequest) {
     this.consentRequest = consentRequest;
@@ -154,7 +154,7 @@ public class PreviousConsentSession {
     this.rememberFor = rememberFor;
   }
 
-  public PreviousConsentSession session(ConsentRequestSession session) {
+  public PreviousConsentSession session(ConsentRequestSessionData session) {
     this.session = session;
     return this;
   }
@@ -164,11 +164,11 @@ public class PreviousConsentSession {
    * @return session
   **/
   @ApiModelProperty(value = "")
-  public ConsentRequestSession getSession() {
+  public ConsentRequestSessionData getSession() {
     return session;
   }
 
-  public void setSession(ConsentRequestSession session) {
+  public void setSession(ConsentRequestSessionData session) {
     this.session = session;
   }
 

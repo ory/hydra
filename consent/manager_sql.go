@@ -237,7 +237,7 @@ func (m *SQLManager) GetConsentRequest(ctx context.Context, challenge string) (*
 	return d.toConsentRequest(c)
 }
 
-func (m *SQLManager) CreateAuthenticationRequest(ctx context.Context, c *AuthenticationRequest) error {
+func (m *SQLManager) CreateAuthenticationRequest(ctx context.Context, c *LoginRequest) error {
 	d, err := newSQLAuthenticationRequest(c)
 	if err != nil {
 		return err
@@ -254,7 +254,7 @@ func (m *SQLManager) CreateAuthenticationRequest(ctx context.Context, c *Authent
 	return nil
 }
 
-func (m *SQLManager) GetAuthenticationRequest(ctx context.Context, challenge string) (*AuthenticationRequest, error) {
+func (m *SQLManager) GetAuthenticationRequest(ctx context.Context, challenge string) (*LoginRequest, error) {
 	var d sqlAuthenticationRequest
 	err := m.DB.GetContext(ctx, &d, m.DB.Rebind("SELECT r.*, COALESCE(hr.was_used, false) as was_handled FROM hydra_oauth2_authentication_request r "+
 		"LEFT JOIN hydra_oauth2_authentication_request_handled hr ON r.challenge = hr.challenge WHERE r.challenge=?"), challenge)
@@ -335,8 +335,8 @@ func (m *SQLManager) VerifyAndInvalidateConsentRequest(ctx context.Context, veri
 	return d.toHandledConsentRequest(r)
 }
 
-func (m *SQLManager) HandleAuthenticationRequest(ctx context.Context, challenge string, r *HandledAuthenticationRequest) (*AuthenticationRequest, error) {
-	d, err := newSQLHandledAuthenticationRequest(r)
+func (m *SQLManager) HandleAuthenticationRequest(ctx context.Context, challenge string, r *HandledLoginRequest) (*LoginRequest, error) {
+	d, err := newSQLHandledLoginRequest(r)
 	if err != nil {
 		return nil, err
 	}
@@ -352,8 +352,8 @@ func (m *SQLManager) HandleAuthenticationRequest(ctx context.Context, challenge 
 	return m.GetAuthenticationRequest(ctx, challenge)
 }
 
-func (m *SQLManager) VerifyAndInvalidateAuthenticationRequest(ctx context.Context, verifier string) (*HandledAuthenticationRequest, error) {
-	var d sqlHandledAuthenticationRequest
+func (m *SQLManager) VerifyAndInvalidateAuthenticationRequest(ctx context.Context, verifier string) (*HandledLoginRequest, error) {
+	var d sqlHandledLoginRequest
 	var challenge string
 
 	// This can be solved more elegantly with a join statement, but it works for now
@@ -379,7 +379,7 @@ func (m *SQLManager) VerifyAndInvalidateAuthenticationRequest(ctx context.Contex
 		return nil, err
 	}
 
-	return d.toHandledAuthenticationRequest(r)
+	return d.toHandledLoginRequest(r)
 }
 
 func (m *SQLManager) GetAuthenticationSession(ctx context.Context, id string) (*AuthenticationSession, error) {

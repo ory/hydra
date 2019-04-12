@@ -38,18 +38,15 @@ type Registry interface {
 	consent.Registry
 	jwk.Registry
 	oauth2.Registry
+	PrometheusManager() *prometheus.MetricsManager
+	Tracer() *tracing.Tracer
 
+	RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPublic)
 	ClientHandler() *client.Handler
 	KeyHandler() *jwk.Handler
 	ConsentHandler() *consent.Handler
 	OAuth2Handler() *oauth2.Handler
 	HealthHandler() *healthx.Handler
-
-	RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPublic)
-
-	PrometheusManager() *prometheus.MetricsManager
-
-	Tracer() *tracing.Tracer
 }
 
 func MustNewRegistry(c configuration.Provider) Registry {
@@ -76,4 +73,25 @@ func NewRegistry(c configuration.Provider) (Registry, error) {
 	}
 
 	return registry, nil
+}
+
+func CallRegistry(r Registry) {
+	r.ClientValidator()
+	r.ClientManager()
+	r.ClientHasher()
+	r.ConsentManager()
+	r.ConsentStrategy()
+	r.SubjectIdentifierAlgorithm()
+	r.KeyManager()
+	r.KeyGenerators()
+	r.KeyCipher()
+	r.OAuth2Storage()
+	r.OAuth2Provider()
+	r.AudienceStrategy()
+	r.ScopeStrategy()
+	r.AccessTokenJWTStrategy()
+	r.OpenIDJWTStrategy()
+	r.OpenIDConnectRequestValidator()
+	r.PrometheusManager()
+	r.Tracer()
 }

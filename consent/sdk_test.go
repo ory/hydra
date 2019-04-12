@@ -22,10 +22,14 @@ package consent_test
 
 import (
 	"context"
-	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/ory/hydra/sdk/go/hydra/client"
+	"github.com/ory/hydra/sdk/go/hydra/client/admin"
+	"github.com/ory/hydra/sdk/go/hydra/models"
+	"github.com/ory/x/urlx"
 
 	"github.com/ory/hydra/x"
 
@@ -38,8 +42,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	. "github.com/ory/hydra/consent"
-	"github.com/ory/hydra/sdk/go/hydra"
-	"github.com/ory/hydra/sdk/go/hydra/swagger"
 )
 
 func TestSDK(t *testing.T) {
@@ -54,10 +56,7 @@ func TestSDK(t *testing.T) {
 	h.SetRoutes(router.RouterAdmin(), router)
 	ts := httptest.NewServer(router)
 
-	sdk, err := hydra.NewSDK(&hydra.Configuration{
-		AdminURL: ts.URL,
-	})
-	require.NoError(t, err)
+	sdk := client.NewHTTPClientWithConfig(nil, &client.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(ts.URL).Host})
 
 	m := reg.ConsentManager()
 
@@ -77,81 +76,69 @@ func TestSDK(t *testing.T) {
 	require.NoError(t, m.CreateConsentRequest(context.TODO(), cr1))
 	require.NoError(t, m.CreateConsentRequest(context.TODO(), cr2))
 	require.NoError(t, m.CreateConsentRequest(context.TODO(), cr3))
-	_, err = m.HandleConsentRequest(context.TODO(), "challenge1", hcr1)
+	_, err := m.HandleConsentRequest(context.TODO(), "challenge1", hcr1)
 	require.NoError(t, err)
 	_, err = m.HandleConsentRequest(context.TODO(), "challenge2", hcr2)
 	require.NoError(t, err)
 	_, err = m.HandleConsentRequest(context.TODO(), "challenge3", hcr3)
 	require.NoError(t, err)
 
-	crGot, res, err := sdk.GetConsentRequest("challenge1")
+	crGot, err := sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge("challenge1"))
 	require.NoError(t, err)
-	require.EqualValues(t, http.StatusOK, res.StatusCode)
-	compareSDKConsentRequest(t, cr1, crGot)
+	compareSDKConsentRequest(t, cr1, *crGot.Payload)
 
-	crGot, res, err = sdk.GetConsentRequest("challenge2")
+	crGot, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge("challenge2"))
 	require.NoError(t, err)
-	require.EqualValues(t, http.StatusOK, res.StatusCode)
-	compareSDKConsentRequest(t, cr2, crGot)
+	compareSDKConsentRequest(t, cr2, *crGot.Payload)
 
-	arGot, res, err := sdk.GetLoginRequest("challenge1")
+	arGot, err := sdk.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithChallenge("challenge1"))
 	require.NoError(t, err)
-	require.EqualValues(t, http.StatusOK, res.StatusCode)
-	compareSDKLoginRequest(t, ar1, arGot)
+	compareSDKLoginRequest(t, ar1, *arGot.Payload)
 
-	arGot, res, err = sdk.GetLoginRequest("challenge2")
+	arGot, err = sdk.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithChallenge("challenge2"))
 	require.NoError(t, err)
-	require.EqualValues(t, http.StatusOK, res.StatusCode)
-	compareSDKLoginRequest(t, ar2, arGot)
+	compareSDKLoginRequest(t, ar2, *arGot.Payload)
 
-	res, err = sdk.RevokeAuthenticationSession("subject1")
+	_, err = sdk.Admin.RevokeAuthenticationSession(admin.NewRevokeAuthenticationSessionParams().WithUser("subject1"))
 	require.NoError(t, err)
-	require.EqualValues(t, http.StatusNoContent, res.StatusCode)
 
-	res, err = sdk.RevokeAllUserConsentSessions("subject1")
+	_, err = sdk.Admin.RevokeAllUserConsentSessions(admin.NewRevokeAllUserConsentSessionsParams().WithUser("subject1"))
 	require.NoError(t, err)
-	require.EqualValues(t, http.StatusNoContent, res.StatusCode)
 
-	_, res, err = sdk.GetConsentRequest("challenge1")
-	require.NoError(t, err)
-	require.EqualValues(t, http.StatusNotFound, res.StatusCode)
+	_, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge("challenge1"))
+	require.Error(t, err)
 
-	crGot, res, err = sdk.GetConsentRequest("challenge2")
+	crGot, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge("challenge2"))
 	require.NoError(t, err)
-	require.EqualValues(t, http.StatusOK, res.StatusCode)
-	compareSDKConsentRequest(t, cr2, crGot)
+	compareSDKConsentRequest(t, cr2, *crGot.Payload)
 
-	res, err = sdk.RevokeUserClientConsentSessions("subject2", "fk-client-2")
+	_, err = sdk.Admin.RevokeUserClientConsentSessions(admin.NewRevokeUserClientConsentSessionsParams().WithUser("subject2").WithClient("fk-client-2"))
 	require.NoError(t, err)
-	require.EqualValues(t, http.StatusNoContent, res.StatusCode)
 
-	_, res, err = sdk.GetConsentRequest("challenge2")
-	require.NoError(t, err)
-	require.EqualValues(t, http.StatusNotFound, res.StatusCode)
+	_, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge("challenge2"))
+	require.Error(t, err)
 
-	csGot, res, err := sdk.ListUserConsentSessions("subject3")
+	csGot, err := sdk.Admin.ListUserConsentSessions(admin.NewListUserConsentSessionsParams().WithUser("subject3"))
 	require.NoError(t, err)
-	require.EqualValues(t, http.StatusOK, res.StatusCode)
-	assert.Equal(t, 1, len(csGot))
-	cs := csGot[0]
+	assert.Equal(t, 1, len(csGot.Payload))
+	cs := csGot.Payload[0]
 	assert.Equal(t, "challenge3", cs.ConsentRequest.Challenge)
 
-	csGot, res, err = sdk.ListUserConsentSessions("subject2")
+	csGot, err = sdk.Admin.ListUserConsentSessions(admin.NewListUserConsentSessionsParams().WithUser("subject2"))
 	require.NoError(t, err)
-	require.EqualValues(t, http.StatusOK, res.StatusCode)
-	assert.Equal(t, 0, len(csGot))
+	assert.Equal(t, 0, len(csGot.Payload))
 }
 
-func compareSDKLoginRequest(t *testing.T, expected *AuthenticationRequest, got *swagger.LoginRequest) {
+func compareSDKLoginRequest(t *testing.T, expected *LoginRequest, got models.LoginRequest) {
 	assert.EqualValues(t, expected.Challenge, got.Challenge)
 	assert.EqualValues(t, expected.Subject, got.Subject)
 	assert.EqualValues(t, expected.Skip, got.Skip)
-	assert.EqualValues(t, expected.Client.GetID(), got.Client.ClientId)
+	assert.EqualValues(t, expected.Client.GetID(), got.Client.ClientID)
 }
 
-func compareSDKConsentRequest(t *testing.T, expected *ConsentRequest, got *swagger.ConsentRequest) {
+func compareSDKConsentRequest(t *testing.T, expected *ConsentRequest, got models.ConsentRequest) {
 	assert.EqualValues(t, expected.Challenge, got.Challenge)
 	assert.EqualValues(t, expected.Subject, got.Subject)
 	assert.EqualValues(t, expected.Skip, got.Skip)
-	assert.EqualValues(t, expected.Client.GetID(), got.Client.ClientId)
+	assert.EqualValues(t, expected.Client.GetID(), got.Client.ClientID)
 }

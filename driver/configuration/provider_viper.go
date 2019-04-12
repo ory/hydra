@@ -22,10 +22,11 @@ import (
 )
 
 type ViperProvider struct {
-	l               logrus.FieldLogger
-	ss              [][]byte
-	generatedSecret []byte
-	forcedHTTP      bool
+	l                 logrus.FieldLogger
+	ss                [][]byte
+	generatedSecret   []byte
+	forcedHTTP        bool
+	insecureRedirects []string
 }
 
 const (
@@ -67,10 +68,14 @@ func init() {
 	viper.AutomaticEnv()
 }
 
-func NewViperProvider(l logrus.FieldLogger, forcedHTTP bool) Provider {
+func NewViperProvider(l logrus.FieldLogger, forcedHTTP bool, insecureRedirects []string) Provider {
+	if insecureRedirects == nil {
+		insecureRedirects = []string{}
+	}
 	return &ViperProvider{
-		l:          l,
-		forcedHTTP: forcedHTTP,
+		l:                 l,
+		forcedHTTP:        forcedHTTP,
+		insecureRedirects: insecureRedirects,
 	}
 }
 
@@ -79,6 +84,10 @@ func (v *ViperProvider) getAddress(address string, port int) string {
 		return address
 	}
 	return fmt.Sprintf("%s:%d", address, port)
+}
+
+func (v *ViperProvider) InsecureRedirects() []string {
+	return v.insecureRedirects
 }
 
 func (v *ViperProvider) WellKnownKeys(include ...string) []string {

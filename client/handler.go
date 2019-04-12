@@ -188,7 +188,8 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //       500: genericError
 func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	limit, offset := pagination.Parse(r, 100, 0, 500)
-	c, err := h.r.ClientManager().GetClients(r.Context(), limit, offset)
+
+	c, n, err := h.r.ClientManager().GetClients(r.Context(), limit, offset)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -202,6 +203,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 		k++
 	}
 
+	pagination.Header(r.URL, n, limit, offset).Write(w)
 	h.r.Writer().Write(w, r, clients)
 }
 

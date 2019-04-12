@@ -20,7 +20,7 @@ func setEnv(key, value string) func(t *testing.T) {
 }
 
 func TestSubjectTypesSupported(t *testing.T) {
-	p := NewViperProvider(logrus.New(), false)
+	p := NewViperProvider(logrus.New(), false, nil)
 	viper.Set(ViperKeySubjectIdentifierAlgorithmSalt, "00000000")
 	for k, tc := range []struct {
 		d string

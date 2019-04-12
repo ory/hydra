@@ -79,6 +79,7 @@ func RunServeAdmin(version, build, date string) func(cmd *cobra.Command, args []
 		d := driver.NewDefaultDriver(
 			logrusx.New(),
 			flagx.MustGetBool(cmd, "dangerous-force-http"),
+			flagx.MustGetStringSlice(cmd, "dangerous-allow-insecure-redirect-urls"),
 			version, build, date,
 		).CallRegistry()
 
@@ -104,6 +105,7 @@ func RunServePublic(version, build, date string) func(cmd *cobra.Command, args [
 		d := driver.NewDefaultDriver(
 			logrusx.New(),
 			flagx.MustGetBool(cmd, "dangerous-force-http"),
+			flagx.MustGetStringSlice(cmd, "dangerous-allow-insecure-redirect-urls"),
 			version, build, date,
 		).CallRegistry()
 
@@ -129,6 +131,7 @@ func RunServeAll(version, build, date string) func(cmd *cobra.Command, args []st
 		d := driver.NewDefaultDriver(
 			logrusx.New(),
 			flagx.MustGetBool(cmd, "dangerous-force-http"),
+			flagx.MustGetStringSlice(cmd, "dangerous-allow-insecure-redirect-urls"),
 			version, build, date,
 		).CallRegistry()
 

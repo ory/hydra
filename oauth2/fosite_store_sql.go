@@ -215,7 +215,7 @@ func (s *FositeSQLStore) DeleteClient(ctx context.Context, id string) error {
 
 }
 
-func (s *FositeSQLStore) GetClients(ctx context.Context, limit, offset int) (map[string]client.Client, error) {
+func (s *FositeSQLStore) GetClients(ctx context.Context, limit, offset int) (map[string]client.Client, int, error) {
 	return s.r.ClientManager().GetClients(ctx, limit, offset)
 }
 

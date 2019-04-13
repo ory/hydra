@@ -41,7 +41,7 @@ type Storage interface {
 
 	DeleteClient(ctx context.Context, id string) error
 
-	GetClients(ctx context.Context, limit, offset int) (map[string]Client, error)
+	GetClients(ctx context.Context, limit, offset int) (map[string]Client, int, error)
 
 	GetConcreteClient(ctx context.Context, id string) (*Client, error)
 }

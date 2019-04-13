@@ -514,6 +514,8 @@ github.com/ory/herodot v0.6.0/go.mod h1:3BOneqcyBsVybCPAJoi92KN2BpJHcmDqAMcAAaJi
 github.com/ory/sqlcon v0.0.7/go.mod h1:oOyCmOJWAs8F0bnGmmIvGA9/4K1JqVL0D9JgvAaVc3U=
 github.com/ory/x v0.0.43 h1:gpZm3A6fjI2z/8xkSGktZiumQrlys/C8rmodVryM1yM=
 github.com/ory/x v0.0.43/go.mod h1:wY34Yfy/lRklrrVbChZHqOQxhbSHH2a6bSJ6o3YFKY8=
+github.com/ory/x v0.0.46 h1:QEiXQUfh+iMO0U1eat3YoDs+kUTovKd89l1tLLYRY8k=
+github.com/ory/x v0.0.46/go.mod h1:tANZWVDnts+7VqWlkgJV6gmcFdHlzyhoFRwNngRoxbQ=
 github.com/parnurzeal/gorequest v0.2.15/go.mod h1:3Kh2QUMJoqw3icWAecsyzkpY7UzRfDhbRdTjtNwNiUE=
 github.com/pborman/uuid v1.2.0 h1:J7Q5mO4ysT1dv8hyrUGHb9+ooztCXu1D8MY8DZYsu3g=
 github.com/pborman/uuid v1.2.0/go.mod h1:X/NO0urCmaxf9VXbdlT7C2Yzkj2IKimNn4k+gtPdI/k=

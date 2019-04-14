@@ -48,7 +48,6 @@ require (
 	github.com/ory/go-convenience v0.1.0
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.6.0
-	github.com/ory/sqlcon v0.0.7 // indirect
 	github.com/ory/x v0.0.46
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5

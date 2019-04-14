@@ -302,25 +302,32 @@ func (m *SQLManager) DeleteClient(ctx context.Context, id string) error {
 	return nil
 }
 
-func (m *SQLManager) GetClients(ctx context.Context, limit, offset int) (clients map[string]Client, count int, err error) {
+func (m *SQLManager) GetClients(ctx context.Context, limit, offset int) (clients map[string]Client, err error) {
 	d := make([]sqlData, 0)
 	clients = make(map[string]Client)
 
 	if err := m.DB.SelectContext(ctx, &d, m.DB.Rebind("SELECT * FROM hydra_client ORDER BY id LIMIT ? OFFSET ?"), limit, offset); err != nil {
-		return nil, 0, sqlcon.HandleError(err)
+		return nil, sqlcon.HandleError(err)
 	}
 
 	for _, k := range d {
 		c, err := k.ToClient()
 		if err != nil {
-			return nil, 0, errors.WithStack(err)
+			return nil, errors.WithStack(err)
 		}
 
 		clients[k.ID] = *c
 	}
-	var c int
-	if err := m.DB.QueryRowContext(ctx, "SELECT count(id) FROM hydra_client").Scan(&c); err != nil {
-		return nil, 0, sqlcon.HandleError(err)
+
+	return clients, nil
+}
+
+func (m *SQLManager) GetClientCount(ctx context.Context) (int, error) {
+	var n int
+	if err := m.DB.QueryRow("SELECT count(*) FROM hydra_client").Scan(&n); err != nil {
+		fmt.Println(err.Error())
+		return 0, sqlcon.HandleError(err)
 	}
-	return clients, c, nil
+
+	return n, nil
 }

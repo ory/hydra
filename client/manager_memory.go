@@ -140,7 +140,7 @@ func (m *MemoryManager) DeleteClient(ctx context.Context, id string) error {
 	return nil
 }
 
-func (m *MemoryManager) GetClients(ctx context.Context, limit, offset int) (clients map[string]Client, count int, err error) {
+func (m *MemoryManager) GetClients(ctx context.Context, limit, offset int) (clients map[string]Client, err error) {
 	m.RLock()
 	defer m.RUnlock()
 	clients = make(map[string]Client)
@@ -150,5 +150,9 @@ func (m *MemoryManager) GetClients(ctx context.Context, limit, offset int) (clie
 		clients[c.GetID()] = c
 	}
 
-	return clients, len(m.Clients), nil
+	return clients, nil
+}
+
+func (m *MemoryManager) GetClientCount(ctx context.Context) (n int, err error) {
+	return len(m.Clients), nil
 }

@@ -162,7 +162,7 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 		_, err = m.GetClient(ctx, "1234")
 		assert.NotNil(t, err)
 
-		n, err := m.GetClientCount(ctx)
+		n, err := m.CountClients(ctx)
 		assert.NoError(t, err)
 		assert.Equal(t, 1, n)
 	}

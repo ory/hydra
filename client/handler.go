@@ -198,7 +198,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 		k++
 	}
 
-	n, err := h.r.ClientManager().GetClientCount(r.Context())
+	n, err := h.r.ClientManager().CountClients(r.Context())
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return

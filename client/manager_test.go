@@ -87,11 +87,17 @@ func TestManagers(t *testing.T) {
 		})
 	}
 
+	t.Log("Creating schemas...")
 	for k, m := range clientManagers {
 		s, ok := m.(*SQLManager)
 		if ok {
 			CleanTestDB(t, s.DB)
-			_, err := s.CreateSchemas()
+			x, err := s.CreateSchemas()
+			if err != nil {
+				t.Fatal("Could not create schemas", err.Error())
+			} else {
+				t.Logf("Schemas created. Rows affected: %+v", x)
+			}
 			require.NoError(t, err)
 		}
 

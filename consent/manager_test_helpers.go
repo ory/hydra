@@ -497,6 +497,10 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 						}
 					}
 
+					n, err := m.CountSubjectsGrantedConsentRequests(context.TODO(), tc.subject)
+					require.NoError(t, err)
+					assert.Equal(t, n, len(tc.challenges))
+
 				})
 			}
 

@@ -43,5 +43,7 @@ type Storage interface {
 
 	GetClients(ctx context.Context, limit, offset int) (map[string]Client, error)
 
+	CountClients(ctx context.Context) (int, error)
+
 	GetConcreteClient(ctx context.Context, id string) (*Client, error)
 }

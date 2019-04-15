@@ -456,6 +456,24 @@ LIMIT ? OFFSET ?
 	return m.resolveHandledConsentRequests(ctx, a)
 }
 
+func (m *SQLManager) CountSubjectsGrantedConsentRequests(ctx context.Context, subject string) (int, error) {
+	var n int
+
+	if err := m.DB.QueryRowContext(ctx, m.DB.Rebind(`SELECT COUNT(*) FROM
+	hydra_oauth2_consent_request_handled as h
+JOIN
+	hydra_oauth2_consent_request as r ON (h.challenge = r.challenge)
+WHERE
+		r.subject=? AND r.skip=FALSE
+	AND
+		(h.error='{}')
+`), subject).Scan(&n); err != nil {
+		return 0, sqlcon.HandleError(err)
+	}
+
+	return n, nil
+}
+
 func (m *SQLManager) resolveHandledConsentRequests(ctx context.Context, requests []sqlHandledConsentRequest) ([]HandledConsentRequest, error) {
 	var aa []HandledConsentRequest
 	for _, v := range requests {

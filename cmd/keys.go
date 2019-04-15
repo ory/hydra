@@ -22,6 +22,7 @@ package cmd
 
 import (
 	"os"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -36,6 +37,7 @@ func init() {
 	RootCmd.AddCommand(keysCmd)
 	//keysCmd.PersistentFlags().Bool("dry", false, "do not execute the command but show the corresponding curl command instead")
 	keysCmd.PersistentFlags().Bool("fake-tls-termination", false, `fake tls termination by adding "X-Forwarded-Proto: https" to http headers`)
+	keysCmd.PersistentFlags().Duration("fail-after", time.Minute, `Stop retrying after the specified duration`)
 	keysCmd.PersistentFlags().String("access-token", os.Getenv("OAUTH2_ACCESS_TOKEN"), "Set an access token to be used in the Authorization header, defaults to environment variable OAUTH2_ACCESS_TOKEN")
 	keysCmd.PersistentFlags().String("endpoint", os.Getenv("HYDRA_ADMIN_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_ADMIN_URL")
 

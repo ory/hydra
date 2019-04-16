@@ -205,8 +205,12 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
+
+	if val := pagination.Header(r.URL, n, limit, offset); val != "" {
+		w.Header().Set("Link", val)
+	}
+
 	h.r.Writer().Write(w, r, clients)
-	pagination.Header(r.URL, n, limit, offset).Write(w)
 }
 
 // swagger:route GET /clients/{id} admin getOAuth2Client

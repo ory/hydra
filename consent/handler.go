@@ -192,9 +192,7 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
-	if val := pagination.Header(r.URL, n, limit, offset); val != "" {
-		w.Header().Set("Link", val)
-	}
+	pagination.Header(w, r.URL, n, limit, offset)
 
 	h.r.Writer().Write(w, r, a)
 }

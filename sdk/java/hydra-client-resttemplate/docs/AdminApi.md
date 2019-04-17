@@ -6,6 +6,7 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**acceptConsentRequest**](AdminApi.md#acceptConsentRequest) | **PUT** /oauth2/auth/requests/consent/accept | Accept an consent request
 [**acceptLoginRequest**](AdminApi.md#acceptLoginRequest) | **PUT** /oauth2/auth/requests/login/accept | Accept an login request
+[**acceptLogoutRequest**](AdminApi.md#acceptLogoutRequest) | **PUT** /oauth2/auth/requests/logout/accept | Accept a logout request
 [**createJsonWebKeySet**](AdminApi.md#createJsonWebKeySet) | **POST** /keys/{set} | Generate a new JSON Web Key
 [**createOAuth2Client**](AdminApi.md#createOAuth2Client) | **POST** /clients | Create an OAuth 2.0 client
 [**deleteJsonWebKey**](AdminApi.md#deleteJsonWebKey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
@@ -22,8 +23,9 @@ Method | HTTP request | Description
 [**listUserConsentSessions**](AdminApi.md#listUserConsentSessions) | **GET** /oauth2/auth/sessions/consent/{user} | Lists all consent sessions of a user
 [**rejectConsentRequest**](AdminApi.md#rejectConsentRequest) | **PUT** /oauth2/auth/requests/consent/reject | Reject an consent request
 [**rejectLoginRequest**](AdminApi.md#rejectLoginRequest) | **PUT** /oauth2/auth/requests/login/reject | Reject a login request
+[**rejectLogoutRequest**](AdminApi.md#rejectLogoutRequest) | **PUT** /oauth2/auth/requests/logout/reject | Reject a logout request
 [**revokeAllUserConsentSessions**](AdminApi.md#revokeAllUserConsentSessions) | **DELETE** /oauth2/auth/sessions/consent/{user} | Revokes all previous consent sessions of a user
-[**revokeAuthenticationSession**](AdminApi.md#revokeAuthenticationSession) | **DELETE** /oauth2/auth/sessions/login/{user} | Invalidates a user&#39;s authentication session
+[**revokeAuthenticationSession**](AdminApi.md#revokeAuthenticationSession) | **DELETE** /oauth2/auth/sessions/login/{user} | Invalidates all login sessions of a certain user
 [**revokeUserClientConsentSessions**](AdminApi.md#revokeUserClientConsentSessions) | **DELETE** /oauth2/auth/sessions/consent/{user}/{client} | Revokes consent sessions of a user for a specific OAuth 2.0 Client
 [**updateJsonWebKey**](AdminApi.md#updateJsonWebKey) | **PUT** /keys/{set}/{kid} | Update a JSON Web Key
 [**updateJsonWebKeySet**](AdminApi.md#updateJsonWebKeySet) | **PUT** /keys/{set} | Update a JSON Web Key Set
@@ -32,7 +34,7 @@ Method | HTTP request | Description
 
 <a name="acceptConsentRequest"></a>
 # **acceptConsentRequest**
-> CompletedRequest acceptConsentRequest(challenge, body)
+> CompletedRequest acceptConsentRequest(consentChallenge, body)
 
 Accept an consent request
 
@@ -46,10 +48,10 @@ When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY
 
 
 AdminApi apiInstance = new AdminApi();
-String challenge = "challenge_example"; // String | 
+String consentChallenge = "consentChallenge_example"; // String | 
 AcceptConsentRequest body = new AcceptConsentRequest(); // AcceptConsentRequest | 
 try {
-    CompletedRequest result = apiInstance.acceptConsentRequest(challenge, body);
+    CompletedRequest result = apiInstance.acceptConsentRequest(consentChallenge, body);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling AdminApi#acceptConsentRequest");
@@ -61,7 +63,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **challenge** | **String**|  |
+ **consentChallenge** | **String**|  |
  **body** | [**AcceptConsentRequest**](AcceptConsentRequest.md)|  | [optional]
 
 ### Return type
@@ -79,7 +81,7 @@ No authorization required
 
 <a name="acceptLoginRequest"></a>
 # **acceptLoginRequest**
-> CompletedRequest acceptLoginRequest(challenge, body)
+> CompletedRequest acceptLoginRequest(loginChallenge, body)
 
 Accept an login request
 
@@ -93,10 +95,10 @@ When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY
 
 
 AdminApi apiInstance = new AdminApi();
-String challenge = "challenge_example"; // String | 
+String loginChallenge = "loginChallenge_example"; // String | 
 AcceptLoginRequest body = new AcceptLoginRequest(); // AcceptLoginRequest | 
 try {
-    CompletedRequest result = apiInstance.acceptLoginRequest(challenge, body);
+    CompletedRequest result = apiInstance.acceptLoginRequest(loginChallenge, body);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling AdminApi#acceptLoginRequest");
@@ -108,7 +110,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **challenge** | **String**|  |
+ **loginChallenge** | **String**|  |
  **body** | [**AcceptLoginRequest**](AcceptLoginRequest.md)|  | [optional]
 
 ### Return type
@@ -122,6 +124,47 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/json
+
+<a name="acceptLogoutRequest"></a>
+# **acceptLogoutRequest**
+> CompletedRequest acceptLogoutRequest()
+
+Accept a logout request
+
+When a user or an application requests ORY Hydra to log out a user, this endpoint is used to confirm that logout request. No body is required.  The response contains a redirect URL which the consent provider should redirect the user-agent to.
+
+### Example
+```java
+// Import classes:
+//import com.github.ory.hydra.ApiException;
+//import com.github.ory.hydra.api.AdminApi;
+
+
+AdminApi apiInstance = new AdminApi();
+try {
+    CompletedRequest result = apiInstance.acceptLogoutRequest();
+    System.out.println(result);
+} catch (ApiException e) {
+    System.err.println("Exception when calling AdminApi#acceptLogoutRequest");
+    e.printStackTrace();
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**CompletedRequest**](CompletedRequest.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json, application/x-www-form-urlencoded
  - **Accept**: application/json
 
 <a name="createJsonWebKeySet"></a>
@@ -396,7 +439,7 @@ No authorization required
 
 <a name="getConsentRequest"></a>
 # **getConsentRequest**
-> ConsentRequest getConsentRequest(challenge)
+> ConsentRequest getConsentRequest(consentChallenge)
 
 Get consent request information
 
@@ -410,9 +453,9 @@ When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY
 
 
 AdminApi apiInstance = new AdminApi();
-String challenge = "challenge_example"; // String | 
+String consentChallenge = "consentChallenge_example"; // String | 
 try {
-    ConsentRequest result = apiInstance.getConsentRequest(challenge);
+    ConsentRequest result = apiInstance.getConsentRequest(consentChallenge);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling AdminApi#getConsentRequest");
@@ -424,7 +467,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **challenge** | **String**|  |
+ **consentChallenge** | **String**|  |
 
 ### Return type
 
@@ -533,7 +576,7 @@ No authorization required
 
 <a name="getLoginRequest"></a>
 # **getLoginRequest**
-> LoginRequest getLoginRequest(challenge)
+> LoginRequest getLoginRequest(loginChallenge)
 
 Get an login request
 
@@ -547,9 +590,9 @@ When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY
 
 
 AdminApi apiInstance = new AdminApi();
-String challenge = "challenge_example"; // String | 
+String loginChallenge = "loginChallenge_example"; // String | 
 try {
-    LoginRequest result = apiInstance.getLoginRequest(challenge);
+    LoginRequest result = apiInstance.getLoginRequest(loginChallenge);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling AdminApi#getLoginRequest");
@@ -561,7 +604,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **challenge** | **String**|  |
+ **loginChallenge** | **String**|  |
 
 ### Return type
 
@@ -775,7 +818,7 @@ No authorization required
 
 <a name="rejectConsentRequest"></a>
 # **rejectConsentRequest**
-> CompletedRequest rejectConsentRequest(challenge, body)
+> CompletedRequest rejectConsentRequest(consentChallenge, body)
 
 Reject an consent request
 
@@ -789,10 +832,10 @@ When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY
 
 
 AdminApi apiInstance = new AdminApi();
-String challenge = "challenge_example"; // String | 
+String consentChallenge = "consentChallenge_example"; // String | 
 RejectRequest body = new RejectRequest(); // RejectRequest | 
 try {
-    CompletedRequest result = apiInstance.rejectConsentRequest(challenge, body);
+    CompletedRequest result = apiInstance.rejectConsentRequest(consentChallenge, body);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling AdminApi#rejectConsentRequest");
@@ -804,7 +847,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **challenge** | **String**|  |
+ **consentChallenge** | **String**|  |
  **body** | [**RejectRequest**](RejectRequest.md)|  | [optional]
 
 ### Return type
@@ -822,7 +865,7 @@ No authorization required
 
 <a name="rejectLoginRequest"></a>
 # **rejectLoginRequest**
-> CompletedRequest rejectLoginRequest(challenge, body)
+> CompletedRequest rejectLoginRequest(loginChallenge, body)
 
 Reject a login request
 
@@ -836,10 +879,10 @@ When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY
 
 
 AdminApi apiInstance = new AdminApi();
-String challenge = "challenge_example"; // String | 
+String loginChallenge = "loginChallenge_example"; // String | 
 RejectRequest body = new RejectRequest(); // RejectRequest | 
 try {
-    CompletedRequest result = apiInstance.rejectLoginRequest(challenge, body);
+    CompletedRequest result = apiInstance.rejectLoginRequest(loginChallenge, body);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling AdminApi#rejectLoginRequest");
@@ -851,7 +894,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **challenge** | **String**|  |
+ **loginChallenge** | **String**|  |
  **body** | [**RejectRequest**](RejectRequest.md)|  | [optional]
 
 ### Return type
@@ -865,6 +908,52 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/json
+
+<a name="rejectLogoutRequest"></a>
+# **rejectLogoutRequest**
+> rejectLogoutRequest(logoutChallenge, body)
+
+Reject a logout request
+
+When a user or an application requests ORY Hydra to log out a user, this endpoint is used to deny that logout request. No body is required.  The response is empty as the logout provider has to chose what action to perform next.
+
+### Example
+```java
+// Import classes:
+//import com.github.ory.hydra.ApiException;
+//import com.github.ory.hydra.api.AdminApi;
+
+
+AdminApi apiInstance = new AdminApi();
+String logoutChallenge = "logoutChallenge_example"; // String | 
+RejectRequest body = new RejectRequest(); // RejectRequest | 
+try {
+    apiInstance.rejectLogoutRequest(logoutChallenge, body);
+} catch (ApiException e) {
+    System.err.println("Exception when calling AdminApi#rejectLogoutRequest");
+    e.printStackTrace();
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **logoutChallenge** | **String**|  |
+ **body** | [**RejectRequest**](RejectRequest.md)|  | [optional]
+
+### Return type
+
+null (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json, application/x-www-form-urlencoded
  - **Accept**: application/json
 
 <a name="revokeAllUserConsentSessions"></a>
@@ -915,7 +1004,7 @@ No authorization required
 # **revokeAuthenticationSession**
 > revokeAuthenticationSession(user)
 
-Invalidates a user&#39;s authentication session
+Invalidates all login sessions of a certain user
 
 This endpoint invalidates a user&#39;s authentication session. After revoking the authentication session, the user has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens.
 

@@ -71,10 +71,10 @@ public class AdminApiExample {
     public static void main(String[] args) {
         
         AdminApi apiInstance = new AdminApi();
-        String challenge = "challenge_example"; // String | 
+        String consentChallenge = "consentChallenge_example"; // String | 
         AcceptConsentRequest body = new AcceptConsentRequest(); // AcceptConsentRequest | 
         try {
-            CompletedRequest result = apiInstance.acceptConsentRequest(challenge, body);
+            CompletedRequest result = apiInstance.acceptConsentRequest(consentChallenge, body);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling AdminApi#acceptConsentRequest");
@@ -93,6 +93,7 @@ Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *AdminApi* | [**acceptConsentRequest**](docs/AdminApi.md#acceptConsentRequest) | **PUT** /oauth2/auth/requests/consent/accept | Accept an consent request
 *AdminApi* | [**acceptLoginRequest**](docs/AdminApi.md#acceptLoginRequest) | **PUT** /oauth2/auth/requests/login/accept | Accept an login request
+*AdminApi* | [**acceptLogoutRequest**](docs/AdminApi.md#acceptLogoutRequest) | **PUT** /oauth2/auth/requests/logout/accept | Accept a logout request
 *AdminApi* | [**createJsonWebKeySet**](docs/AdminApi.md#createJsonWebKeySet) | **POST** /keys/{set} | Generate a new JSON Web Key
 *AdminApi* | [**createOAuth2Client**](docs/AdminApi.md#createOAuth2Client) | **POST** /clients | Create an OAuth 2.0 client
 *AdminApi* | [**deleteJsonWebKey**](docs/AdminApi.md#deleteJsonWebKey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
@@ -109,19 +110,21 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**listUserConsentSessions**](docs/AdminApi.md#listUserConsentSessions) | **GET** /oauth2/auth/sessions/consent/{user} | Lists all consent sessions of a user
 *AdminApi* | [**rejectConsentRequest**](docs/AdminApi.md#rejectConsentRequest) | **PUT** /oauth2/auth/requests/consent/reject | Reject an consent request
 *AdminApi* | [**rejectLoginRequest**](docs/AdminApi.md#rejectLoginRequest) | **PUT** /oauth2/auth/requests/login/reject | Reject a login request
+*AdminApi* | [**rejectLogoutRequest**](docs/AdminApi.md#rejectLogoutRequest) | **PUT** /oauth2/auth/requests/logout/reject | Reject a logout request
 *AdminApi* | [**revokeAllUserConsentSessions**](docs/AdminApi.md#revokeAllUserConsentSessions) | **DELETE** /oauth2/auth/sessions/consent/{user} | Revokes all previous consent sessions of a user
-*AdminApi* | [**revokeAuthenticationSession**](docs/AdminApi.md#revokeAuthenticationSession) | **DELETE** /oauth2/auth/sessions/login/{user} | Invalidates a user&#39;s authentication session
+*AdminApi* | [**revokeAuthenticationSession**](docs/AdminApi.md#revokeAuthenticationSession) | **DELETE** /oauth2/auth/sessions/login/{user} | Invalidates all login sessions of a certain user
 *AdminApi* | [**revokeUserClientConsentSessions**](docs/AdminApi.md#revokeUserClientConsentSessions) | **DELETE** /oauth2/auth/sessions/consent/{user}/{client} | Revokes consent sessions of a user for a specific OAuth 2.0 Client
 *AdminApi* | [**updateJsonWebKey**](docs/AdminApi.md#updateJsonWebKey) | **PUT** /keys/{set}/{kid} | Update a JSON Web Key
 *AdminApi* | [**updateJsonWebKeySet**](docs/AdminApi.md#updateJsonWebKeySet) | **PUT** /keys/{set} | Update a JSON Web Key Set
 *AdminApi* | [**updateOAuth2Client**](docs/AdminApi.md#updateOAuth2Client) | **PUT** /clients/{id} | Update an OAuth 2.0 Client
 *HealthApi* | [**isInstanceAlive**](docs/HealthApi.md#isInstanceAlive) | **GET** /health/alive | Check alive status
 *HealthApi* | [**isInstanceReady**](docs/HealthApi.md#isInstanceReady) | **GET** /health/ready | Check readiness status
+*PublicApi* | [**disconnectUser**](docs/PublicApi.md#disconnectUser) | **GET** /oauth2/disconnect | OpenID Connect Front-Backchannel enabled Logout
 *PublicApi* | [**discoverOpenIDConfiguration**](docs/PublicApi.md#discoverOpenIDConfiguration) | **GET** /.well-known/openid-configuration | OpenID Connect Discovery
 *PublicApi* | [**oauth2Token**](docs/PublicApi.md#oauth2Token) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
 *PublicApi* | [**oauthAuth**](docs/PublicApi.md#oauthAuth) | **GET** /oauth2/auth | The OAuth 2.0 authorize endpoint
 *PublicApi* | [**revokeOAuth2Token**](docs/PublicApi.md#revokeOAuth2Token) | **POST** /oauth2/revoke | Revoke OAuth2 tokens
-*PublicApi* | [**revokeUserLoginCookie**](docs/PublicApi.md#revokeUserLoginCookie) | **GET** /oauth2/auth/sessions/login/revoke | Logs user out by deleting the session cookie
+*PublicApi* | [**userLogout**](docs/PublicApi.md#userLogout) | **GET** /oauth2/auth/sessions/logout | Get a logout request
 *PublicApi* | [**userinfo**](docs/PublicApi.md#userinfo) | **GET** /userinfo | OpenID Connect Userinfo
 *PublicApi* | [**wellKnown**](docs/PublicApi.md#wellKnown) | **GET** /.well-known/jwks.json | JSON Web Keys Discovery
 *VersionApi* | [**getVersion**](docs/VersionApi.md#getVersion) | **GET** /version | Get service version
@@ -151,6 +154,7 @@ Class | Method | HTTP request | Description
  - [JSONWebKeySet](docs/JSONWebKeySet.md)
  - [JsonWebKeySetGeneratorRequest](docs/JsonWebKeySetGeneratorRequest.md)
  - [LoginRequest](docs/LoginRequest.md)
+ - [LogoutRequest](docs/LogoutRequest.md)
  - [OAuth2Client](docs/OAuth2Client.md)
  - [OAuth2TokenIntrospection](docs/OAuth2TokenIntrospection.md)
  - [Oauth2TokenResponse](docs/Oauth2TokenResponse.md)
@@ -163,7 +167,6 @@ Class | Method | HTTP request | Description
  - [SwaggerFlushInactiveAccessTokens](docs/SwaggerFlushInactiveAccessTokens.md)
  - [SwaggerHealthStatus](docs/SwaggerHealthStatus.md)
  - [SwaggerJSONWebKey](docs/SwaggerJSONWebKey.md)
- - [SwaggerJSONWebKeyQuery](docs/SwaggerJSONWebKeyQuery.md)
  - [SwaggerJSONWebKeySet](docs/SwaggerJSONWebKeySet.md)
  - [SwaggerJsonWebKeyQuery](docs/SwaggerJsonWebKeyQuery.md)
  - [SwaggerJwkCreateSet](docs/SwaggerJwkCreateSet.md)

@@ -27,7 +27,7 @@ import java.util.Map;
 /**
  * OpenIDConnectContext
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T20:30:02.841+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-17T17:20:02.344+02:00")
 public class OpenIDConnectContext {
   @JsonProperty("acr_values")
   private List<String> acrValues = null;

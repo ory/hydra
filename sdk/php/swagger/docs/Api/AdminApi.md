@@ -7,6 +7,7 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**acceptConsentRequest**](AdminApi.md#acceptConsentRequest) | **PUT** /oauth2/auth/requests/consent/accept | Accept an consent request
 [**acceptLoginRequest**](AdminApi.md#acceptLoginRequest) | **PUT** /oauth2/auth/requests/login/accept | Accept an login request
+[**acceptLogoutRequest**](AdminApi.md#acceptLogoutRequest) | **PUT** /oauth2/auth/requests/logout/accept | Accept a logout request
 [**createJsonWebKeySet**](AdminApi.md#createJsonWebKeySet) | **POST** /keys/{set} | Generate a new JSON Web Key
 [**createOAuth2Client**](AdminApi.md#createOAuth2Client) | **POST** /clients | Create an OAuth 2.0 client
 [**deleteJsonWebKey**](AdminApi.md#deleteJsonWebKey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
@@ -23,8 +24,9 @@ Method | HTTP request | Description
 [**listUserConsentSessions**](AdminApi.md#listUserConsentSessions) | **GET** /oauth2/auth/sessions/consent/{user} | Lists all consent sessions of a user
 [**rejectConsentRequest**](AdminApi.md#rejectConsentRequest) | **PUT** /oauth2/auth/requests/consent/reject | Reject an consent request
 [**rejectLoginRequest**](AdminApi.md#rejectLoginRequest) | **PUT** /oauth2/auth/requests/login/reject | Reject a login request
+[**rejectLogoutRequest**](AdminApi.md#rejectLogoutRequest) | **PUT** /oauth2/auth/requests/logout/reject | Reject a logout request
 [**revokeAllUserConsentSessions**](AdminApi.md#revokeAllUserConsentSessions) | **DELETE** /oauth2/auth/sessions/consent/{user} | Revokes all previous consent sessions of a user
-[**revokeAuthenticationSession**](AdminApi.md#revokeAuthenticationSession) | **DELETE** /oauth2/auth/sessions/login/{user} | Invalidates a user&#39;s authentication session
+[**revokeAuthenticationSession**](AdminApi.md#revokeAuthenticationSession) | **DELETE** /oauth2/auth/sessions/login/{user} | Invalidates all login sessions of a certain user
 [**revokeUserClientConsentSessions**](AdminApi.md#revokeUserClientConsentSessions) | **DELETE** /oauth2/auth/sessions/consent/{user}/{client} | Revokes consent sessions of a user for a specific OAuth 2.0 Client
 [**updateJsonWebKey**](AdminApi.md#updateJsonWebKey) | **PUT** /keys/{set}/{kid} | Update a JSON Web Key
 [**updateJsonWebKeySet**](AdminApi.md#updateJsonWebKeySet) | **PUT** /keys/{set} | Update a JSON Web Key Set
@@ -32,7 +34,7 @@ Method | HTTP request | Description
 
 
 # **acceptConsentRequest**
-> \Hydra\SDK\Model\CompletedRequest acceptConsentRequest($challenge, $body)
+> \Hydra\SDK\Model\CompletedRequest acceptConsentRequest($consent_challenge, $body)
 
 Accept an consent request
 
@@ -44,11 +46,11 @@ When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY
 require_once(__DIR__ . '/vendor/autoload.php');
 
 $api_instance = new Hydra\SDK\Api\AdminApi();
-$challenge = "challenge_example"; // string | 
+$consent_challenge = "consent_challenge_example"; // string | 
 $body = new \Hydra\SDK\Model\AcceptConsentRequest(); // \Hydra\SDK\Model\AcceptConsentRequest | 
 
 try {
-    $result = $api_instance->acceptConsentRequest($challenge, $body);
+    $result = $api_instance->acceptConsentRequest($consent_challenge, $body);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->acceptConsentRequest: ', $e->getMessage(), PHP_EOL;
@@ -60,7 +62,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **challenge** | **string**|  |
+ **consent_challenge** | **string**|  |
  **body** | [**\Hydra\SDK\Model\AcceptConsentRequest**](../Model/AcceptConsentRequest.md)|  | [optional]
 
 ### Return type
@@ -79,7 +81,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **acceptLoginRequest**
-> \Hydra\SDK\Model\CompletedRequest acceptLoginRequest($challenge, $body)
+> \Hydra\SDK\Model\CompletedRequest acceptLoginRequest($login_challenge, $body)
 
 Accept an login request
 
@@ -91,11 +93,11 @@ When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY
 require_once(__DIR__ . '/vendor/autoload.php');
 
 $api_instance = new Hydra\SDK\Api\AdminApi();
-$challenge = "challenge_example"; // string | 
+$login_challenge = "login_challenge_example"; // string | 
 $body = new \Hydra\SDK\Model\AcceptLoginRequest(); // \Hydra\SDK\Model\AcceptLoginRequest | 
 
 try {
-    $result = $api_instance->acceptLoginRequest($challenge, $body);
+    $result = $api_instance->acceptLoginRequest($login_challenge, $body);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->acceptLoginRequest: ', $e->getMessage(), PHP_EOL;
@@ -107,7 +109,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **challenge** | **string**|  |
+ **login_challenge** | **string**|  |
  **body** | [**\Hydra\SDK\Model\AcceptLoginRequest**](../Model/AcceptLoginRequest.md)|  | [optional]
 
 ### Return type
@@ -121,6 +123,47 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
+
+# **acceptLogoutRequest**
+> \Hydra\SDK\Model\CompletedRequest acceptLogoutRequest()
+
+Accept a logout request
+
+When a user or an application requests ORY Hydra to log out a user, this endpoint is used to confirm that logout request. No body is required.  The response contains a redirect URL which the consent provider should redirect the user-agent to.
+
+### Example
+```php
+<?php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+$api_instance = new Hydra\SDK\Api\AdminApi();
+
+try {
+    $result = $api_instance->acceptLogoutRequest();
+    print_r($result);
+} catch (Exception $e) {
+    echo 'Exception when calling AdminApi->acceptLogoutRequest: ', $e->getMessage(), PHP_EOL;
+}
+?>
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**\Hydra\SDK\Model\CompletedRequest**](../Model/CompletedRequest.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json, application/x-www-form-urlencoded
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
@@ -396,7 +439,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **getConsentRequest**
-> \Hydra\SDK\Model\ConsentRequest getConsentRequest($challenge)
+> \Hydra\SDK\Model\ConsentRequest getConsentRequest($consent_challenge)
 
 Get consent request information
 
@@ -408,10 +451,10 @@ When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY
 require_once(__DIR__ . '/vendor/autoload.php');
 
 $api_instance = new Hydra\SDK\Api\AdminApi();
-$challenge = "challenge_example"; // string | 
+$consent_challenge = "consent_challenge_example"; // string | 
 
 try {
-    $result = $api_instance->getConsentRequest($challenge);
+    $result = $api_instance->getConsentRequest($consent_challenge);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->getConsentRequest: ', $e->getMessage(), PHP_EOL;
@@ -423,7 +466,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **challenge** | **string**|  |
+ **consent_challenge** | **string**|  |
 
 ### Return type
 
@@ -533,7 +576,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **getLoginRequest**
-> \Hydra\SDK\Model\LoginRequest getLoginRequest($challenge)
+> \Hydra\SDK\Model\LoginRequest getLoginRequest($login_challenge)
 
 Get an login request
 
@@ -545,10 +588,10 @@ When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY
 require_once(__DIR__ . '/vendor/autoload.php');
 
 $api_instance = new Hydra\SDK\Api\AdminApi();
-$challenge = "challenge_example"; // string | 
+$login_challenge = "login_challenge_example"; // string | 
 
 try {
-    $result = $api_instance->getLoginRequest($challenge);
+    $result = $api_instance->getLoginRequest($login_challenge);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->getLoginRequest: ', $e->getMessage(), PHP_EOL;
@@ -560,7 +603,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **challenge** | **string**|  |
+ **login_challenge** | **string**|  |
 
 ### Return type
 
@@ -768,7 +811,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **rejectConsentRequest**
-> \Hydra\SDK\Model\CompletedRequest rejectConsentRequest($challenge, $body)
+> \Hydra\SDK\Model\CompletedRequest rejectConsentRequest($consent_challenge, $body)
 
 Reject an consent request
 
@@ -780,11 +823,11 @@ When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY
 require_once(__DIR__ . '/vendor/autoload.php');
 
 $api_instance = new Hydra\SDK\Api\AdminApi();
-$challenge = "challenge_example"; // string | 
+$consent_challenge = "consent_challenge_example"; // string | 
 $body = new \Hydra\SDK\Model\RejectRequest(); // \Hydra\SDK\Model\RejectRequest | 
 
 try {
-    $result = $api_instance->rejectConsentRequest($challenge, $body);
+    $result = $api_instance->rejectConsentRequest($consent_challenge, $body);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->rejectConsentRequest: ', $e->getMessage(), PHP_EOL;
@@ -796,7 +839,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **challenge** | **string**|  |
+ **consent_challenge** | **string**|  |
  **body** | [**\Hydra\SDK\Model\RejectRequest**](../Model/RejectRequest.md)|  | [optional]
 
 ### Return type
@@ -815,7 +858,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **rejectLoginRequest**
-> \Hydra\SDK\Model\CompletedRequest rejectLoginRequest($challenge, $body)
+> \Hydra\SDK\Model\CompletedRequest rejectLoginRequest($login_challenge, $body)
 
 Reject a login request
 
@@ -827,11 +870,11 @@ When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY
 require_once(__DIR__ . '/vendor/autoload.php');
 
 $api_instance = new Hydra\SDK\Api\AdminApi();
-$challenge = "challenge_example"; // string | 
+$login_challenge = "login_challenge_example"; // string | 
 $body = new \Hydra\SDK\Model\RejectRequest(); // \Hydra\SDK\Model\RejectRequest | 
 
 try {
-    $result = $api_instance->rejectLoginRequest($challenge, $body);
+    $result = $api_instance->rejectLoginRequest($login_challenge, $body);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->rejectLoginRequest: ', $e->getMessage(), PHP_EOL;
@@ -843,7 +886,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **challenge** | **string**|  |
+ **login_challenge** | **string**|  |
  **body** | [**\Hydra\SDK\Model\RejectRequest**](../Model/RejectRequest.md)|  | [optional]
 
 ### Return type
@@ -857,6 +900,52 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
+
+# **rejectLogoutRequest**
+> rejectLogoutRequest($logout_challenge, $body)
+
+Reject a logout request
+
+When a user or an application requests ORY Hydra to log out a user, this endpoint is used to deny that logout request. No body is required.  The response is empty as the logout provider has to chose what action to perform next.
+
+### Example
+```php
+<?php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+$api_instance = new Hydra\SDK\Api\AdminApi();
+$logout_challenge = "logout_challenge_example"; // string | 
+$body = new \Hydra\SDK\Model\RejectRequest(); // \Hydra\SDK\Model\RejectRequest | 
+
+try {
+    $api_instance->rejectLogoutRequest($logout_challenge, $body);
+} catch (Exception $e) {
+    echo 'Exception when calling AdminApi->rejectLogoutRequest: ', $e->getMessage(), PHP_EOL;
+}
+?>
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **logout_challenge** | **string**|  |
+ **body** | [**\Hydra\SDK\Model\RejectRequest**](../Model/RejectRequest.md)|  | [optional]
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json, application/x-www-form-urlencoded
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
@@ -908,7 +997,7 @@ No authorization required
 # **revokeAuthenticationSession**
 > revokeAuthenticationSession($user)
 
-Invalidates a user's authentication session
+Invalidates all login sessions of a certain user
 
 This endpoint invalidates a user's authentication session. After revoking the authentication session, the user has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens.
 

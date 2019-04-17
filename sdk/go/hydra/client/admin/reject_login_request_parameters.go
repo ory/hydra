@@ -65,8 +65,8 @@ type RejectLoginRequestParams struct {
 
 	/*Body*/
 	Body *models.RequestDeniedError
-	/*Challenge*/
-	Challenge string
+	/*LoginChallenge*/
+	LoginChallenge string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -117,15 +117,15 @@ func (o *RejectLoginRequestParams) SetBody(body *models.RequestDeniedError) {
 	o.Body = body
 }
 
-// WithChallenge adds the challenge to the reject login request params
-func (o *RejectLoginRequestParams) WithChallenge(challenge string) *RejectLoginRequestParams {
-	o.SetChallenge(challenge)
+// WithLoginChallenge adds the loginChallenge to the reject login request params
+func (o *RejectLoginRequestParams) WithLoginChallenge(loginChallenge string) *RejectLoginRequestParams {
+	o.SetLoginChallenge(loginChallenge)
 	return o
 }
 
-// SetChallenge adds the challenge to the reject login request params
-func (o *RejectLoginRequestParams) SetChallenge(challenge string) {
-	o.Challenge = challenge
+// SetLoginChallenge adds the loginChallenge to the reject login request params
+func (o *RejectLoginRequestParams) SetLoginChallenge(loginChallenge string) {
+	o.LoginChallenge = loginChallenge
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -142,11 +142,11 @@ func (o *RejectLoginRequestParams) WriteToRequest(r runtime.ClientRequest, reg s
 		}
 	}
 
-	// query param challenge
-	qrChallenge := o.Challenge
-	qChallenge := qrChallenge
-	if qChallenge != "" {
-		if err := r.SetQueryParam("challenge", qChallenge); err != nil {
+	// query param login_challenge
+	qrLoginChallenge := o.LoginChallenge
+	qLoginChallenge := qrLoginChallenge
+	if qLoginChallenge != "" {
+		if err := r.SetQueryParam("login_challenge", qLoginChallenge); err != nil {
 			return err
 		}
 	}

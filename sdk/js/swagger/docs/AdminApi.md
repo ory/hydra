@@ -6,6 +6,7 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**acceptConsentRequest**](AdminApi.md#acceptConsentRequest) | **PUT** /oauth2/auth/requests/consent/accept | Accept an consent request
 [**acceptLoginRequest**](AdminApi.md#acceptLoginRequest) | **PUT** /oauth2/auth/requests/login/accept | Accept an login request
+[**acceptLogoutRequest**](AdminApi.md#acceptLogoutRequest) | **PUT** /oauth2/auth/requests/logout/accept | Accept a logout request
 [**createJsonWebKeySet**](AdminApi.md#createJsonWebKeySet) | **POST** /keys/{set} | Generate a new JSON Web Key
 [**createOAuth2Client**](AdminApi.md#createOAuth2Client) | **POST** /clients | Create an OAuth 2.0 client
 [**deleteJsonWebKey**](AdminApi.md#deleteJsonWebKey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
@@ -22,8 +23,9 @@ Method | HTTP request | Description
 [**listUserConsentSessions**](AdminApi.md#listUserConsentSessions) | **GET** /oauth2/auth/sessions/consent/{user} | Lists all consent sessions of a user
 [**rejectConsentRequest**](AdminApi.md#rejectConsentRequest) | **PUT** /oauth2/auth/requests/consent/reject | Reject an consent request
 [**rejectLoginRequest**](AdminApi.md#rejectLoginRequest) | **PUT** /oauth2/auth/requests/login/reject | Reject a login request
+[**rejectLogoutRequest**](AdminApi.md#rejectLogoutRequest) | **PUT** /oauth2/auth/requests/logout/reject | Reject a logout request
 [**revokeAllUserConsentSessions**](AdminApi.md#revokeAllUserConsentSessions) | **DELETE** /oauth2/auth/sessions/consent/{user} | Revokes all previous consent sessions of a user
-[**revokeAuthenticationSession**](AdminApi.md#revokeAuthenticationSession) | **DELETE** /oauth2/auth/sessions/login/{user} | Invalidates a user&#39;s authentication session
+[**revokeAuthenticationSession**](AdminApi.md#revokeAuthenticationSession) | **DELETE** /oauth2/auth/sessions/login/{user} | Invalidates all login sessions of a certain user
 [**revokeUserClientConsentSessions**](AdminApi.md#revokeUserClientConsentSessions) | **DELETE** /oauth2/auth/sessions/consent/{user}/{client} | Revokes consent sessions of a user for a specific OAuth 2.0 Client
 [**updateJsonWebKey**](AdminApi.md#updateJsonWebKey) | **PUT** /keys/{set}/{kid} | Update a JSON Web Key
 [**updateJsonWebKeySet**](AdminApi.md#updateJsonWebKeySet) | **PUT** /keys/{set} | Update a JSON Web Key Set
@@ -32,7 +34,7 @@ Method | HTTP request | Description
 
 <a name="acceptConsentRequest"></a>
 # **acceptConsentRequest**
-> CompletedRequest acceptConsentRequest(challenge, opts)
+> CompletedRequest acceptConsentRequest(consentChallenge, opts)
 
 Accept an consent request
 
@@ -44,7 +46,7 @@ var OryHydra = require('ory_hydra');
 
 var apiInstance = new OryHydra.AdminApi();
 
-var challenge = "challenge_example"; // String | 
+var consentChallenge = "consentChallenge_example"; // String | 
 
 var opts = { 
   'body': new OryHydra.AcceptConsentRequest() // AcceptConsentRequest | 
@@ -57,14 +59,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-apiInstance.acceptConsentRequest(challenge, opts, callback);
+apiInstance.acceptConsentRequest(consentChallenge, opts, callback);
 ```
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **challenge** | **String**|  | 
+ **consentChallenge** | **String**|  | 
  **body** | [**AcceptConsentRequest**](AcceptConsentRequest.md)|  | [optional] 
 
 ### Return type
@@ -82,7 +84,7 @@ No authorization required
 
 <a name="acceptLoginRequest"></a>
 # **acceptLoginRequest**
-> CompletedRequest acceptLoginRequest(challenge, opts)
+> CompletedRequest acceptLoginRequest(loginChallenge, opts)
 
 Accept an login request
 
@@ -94,7 +96,7 @@ var OryHydra = require('ory_hydra');
 
 var apiInstance = new OryHydra.AdminApi();
 
-var challenge = "challenge_example"; // String | 
+var loginChallenge = "loginChallenge_example"; // String | 
 
 var opts = { 
   'body': new OryHydra.AcceptLoginRequest() // AcceptLoginRequest | 
@@ -107,14 +109,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-apiInstance.acceptLoginRequest(challenge, opts, callback);
+apiInstance.acceptLoginRequest(loginChallenge, opts, callback);
 ```
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **challenge** | **String**|  | 
+ **loginChallenge** | **String**|  | 
  **body** | [**AcceptLoginRequest**](AcceptLoginRequest.md)|  | [optional] 
 
 ### Return type
@@ -128,6 +130,46 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/json
+
+<a name="acceptLogoutRequest"></a>
+# **acceptLogoutRequest**
+> CompletedRequest acceptLogoutRequest()
+
+Accept a logout request
+
+When a user or an application requests ORY Hydra to log out a user, this endpoint is used to confirm that logout request. No body is required.  The response contains a redirect URL which the consent provider should redirect the user-agent to.
+
+### Example
+```javascript
+var OryHydra = require('ory_hydra');
+
+var apiInstance = new OryHydra.AdminApi();
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+apiInstance.acceptLogoutRequest(callback);
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**CompletedRequest**](CompletedRequest.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json, application/x-www-form-urlencoded
  - **Accept**: application/json
 
 <a name="createJsonWebKeySet"></a>
@@ -416,7 +458,7 @@ No authorization required
 
 <a name="getConsentRequest"></a>
 # **getConsentRequest**
-> ConsentRequest getConsentRequest(challenge)
+> ConsentRequest getConsentRequest(consentChallenge)
 
 Get consent request information
 
@@ -428,7 +470,7 @@ var OryHydra = require('ory_hydra');
 
 var apiInstance = new OryHydra.AdminApi();
 
-var challenge = "challenge_example"; // String | 
+var consentChallenge = "consentChallenge_example"; // String | 
 
 
 var callback = function(error, data, response) {
@@ -438,14 +480,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-apiInstance.getConsentRequest(challenge, callback);
+apiInstance.getConsentRequest(consentChallenge, callback);
 ```
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **challenge** | **String**|  | 
+ **consentChallenge** | **String**|  | 
 
 ### Return type
 
@@ -557,7 +599,7 @@ No authorization required
 
 <a name="getLoginRequest"></a>
 # **getLoginRequest**
-> LoginRequest getLoginRequest(challenge)
+> LoginRequest getLoginRequest(loginChallenge)
 
 Get an login request
 
@@ -569,7 +611,7 @@ var OryHydra = require('ory_hydra');
 
 var apiInstance = new OryHydra.AdminApi();
 
-var challenge = "challenge_example"; // String | 
+var loginChallenge = "loginChallenge_example"; // String | 
 
 
 var callback = function(error, data, response) {
@@ -579,14 +621,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-apiInstance.getLoginRequest(challenge, callback);
+apiInstance.getLoginRequest(loginChallenge, callback);
 ```
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **challenge** | **String**|  | 
+ **loginChallenge** | **String**|  | 
 
 ### Return type
 
@@ -804,7 +846,7 @@ No authorization required
 
 <a name="rejectConsentRequest"></a>
 # **rejectConsentRequest**
-> CompletedRequest rejectConsentRequest(challenge, opts)
+> CompletedRequest rejectConsentRequest(consentChallenge, opts)
 
 Reject an consent request
 
@@ -816,7 +858,7 @@ var OryHydra = require('ory_hydra');
 
 var apiInstance = new OryHydra.AdminApi();
 
-var challenge = "challenge_example"; // String | 
+var consentChallenge = "consentChallenge_example"; // String | 
 
 var opts = { 
   'body': new OryHydra.RejectRequest() // RejectRequest | 
@@ -829,14 +871,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-apiInstance.rejectConsentRequest(challenge, opts, callback);
+apiInstance.rejectConsentRequest(consentChallenge, opts, callback);
 ```
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **challenge** | **String**|  | 
+ **consentChallenge** | **String**|  | 
  **body** | [**RejectRequest**](RejectRequest.md)|  | [optional] 
 
 ### Return type
@@ -854,7 +896,7 @@ No authorization required
 
 <a name="rejectLoginRequest"></a>
 # **rejectLoginRequest**
-> CompletedRequest rejectLoginRequest(challenge, opts)
+> CompletedRequest rejectLoginRequest(loginChallenge, opts)
 
 Reject a login request
 
@@ -866,7 +908,7 @@ var OryHydra = require('ory_hydra');
 
 var apiInstance = new OryHydra.AdminApi();
 
-var challenge = "challenge_example"; // String | 
+var loginChallenge = "loginChallenge_example"; // String | 
 
 var opts = { 
   'body': new OryHydra.RejectRequest() // RejectRequest | 
@@ -879,14 +921,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-apiInstance.rejectLoginRequest(challenge, opts, callback);
+apiInstance.rejectLoginRequest(loginChallenge, opts, callback);
 ```
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **challenge** | **String**|  | 
+ **loginChallenge** | **String**|  | 
  **body** | [**RejectRequest**](RejectRequest.md)|  | [optional] 
 
 ### Return type
@@ -900,6 +942,56 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/json
+
+<a name="rejectLogoutRequest"></a>
+# **rejectLogoutRequest**
+> rejectLogoutRequest(logoutChallenge, opts)
+
+Reject a logout request
+
+When a user or an application requests ORY Hydra to log out a user, this endpoint is used to deny that logout request. No body is required.  The response is empty as the logout provider has to chose what action to perform next.
+
+### Example
+```javascript
+var OryHydra = require('ory_hydra');
+
+var apiInstance = new OryHydra.AdminApi();
+
+var logoutChallenge = "logoutChallenge_example"; // String | 
+
+var opts = { 
+  'body': new OryHydra.RejectRequest() // RejectRequest | 
+};
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully.');
+  }
+};
+apiInstance.rejectLogoutRequest(logoutChallenge, opts, callback);
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **logoutChallenge** | **String**|  | 
+ **body** | [**RejectRequest**](RejectRequest.md)|  | [optional] 
+
+### Return type
+
+null (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json, application/x-www-form-urlencoded
  - **Accept**: application/json
 
 <a name="revokeAllUserConsentSessions"></a>
@@ -952,7 +1044,7 @@ No authorization required
 # **revokeAuthenticationSession**
 > revokeAuthenticationSession(user)
 
-Invalidates a user&#39;s authentication session
+Invalidates all login sessions of a certain user
 
 This endpoint invalidates a user&#39;s authentication session. After revoking the authentication session, the user has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens.
 

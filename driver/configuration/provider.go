@@ -55,6 +55,7 @@ type Provider interface {
 	GetSystemSecret() []byte
 	LogoutRedirectURL() *url.URL
 	LoginURL() *url.URL
+	LogoutURL() *url.URL
 }
 
 func MustValidate(l logrus.FieldLogger, p Provider) {

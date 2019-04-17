@@ -61,8 +61,8 @@ for the get consent request operation typically these are written to a http.Requ
 */
 type GetConsentRequestParams struct {
 
-	/*Challenge*/
-	Challenge string
+	/*ConsentChallenge*/
+	ConsentChallenge string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -102,15 +102,15 @@ func (o *GetConsentRequestParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
-// WithChallenge adds the challenge to the get consent request params
-func (o *GetConsentRequestParams) WithChallenge(challenge string) *GetConsentRequestParams {
-	o.SetChallenge(challenge)
+// WithConsentChallenge adds the consentChallenge to the get consent request params
+func (o *GetConsentRequestParams) WithConsentChallenge(consentChallenge string) *GetConsentRequestParams {
+	o.SetConsentChallenge(consentChallenge)
 	return o
 }
 
-// SetChallenge adds the challenge to the get consent request params
-func (o *GetConsentRequestParams) SetChallenge(challenge string) {
-	o.Challenge = challenge
+// SetConsentChallenge adds the consentChallenge to the get consent request params
+func (o *GetConsentRequestParams) SetConsentChallenge(consentChallenge string) {
+	o.ConsentChallenge = consentChallenge
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -121,11 +121,11 @@ func (o *GetConsentRequestParams) WriteToRequest(r runtime.ClientRequest, reg st
 	}
 	var res []error
 
-	// query param challenge
-	qrChallenge := o.Challenge
-	qChallenge := qrChallenge
-	if qChallenge != "" {
-		if err := r.SetQueryParam("challenge", qChallenge); err != nil {
+	// query param consent_challenge
+	qrConsentChallenge := o.ConsentChallenge
+	qConsentChallenge := qrConsentChallenge
+	if qConsentChallenge != "" {
+		if err := r.SetQueryParam("consent_challenge", qConsentChallenge); err != nil {
 			return err
 		}
 	}

@@ -5,14 +5,55 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**disconnectUser**](PublicApi.md#disconnectUser) | **GET** /oauth2/disconnect | OpenID Connect Front-Backchannel enabled Logout
 [**discoverOpenIDConfiguration**](PublicApi.md#discoverOpenIDConfiguration) | **GET** /.well-known/openid-configuration | OpenID Connect Discovery
 [**oauth2Token**](PublicApi.md#oauth2Token) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
 [**oauthAuth**](PublicApi.md#oauthAuth) | **GET** /oauth2/auth | The OAuth 2.0 authorize endpoint
 [**revokeOAuth2Token**](PublicApi.md#revokeOAuth2Token) | **POST** /oauth2/revoke | Revoke OAuth2 tokens
-[**revokeUserLoginCookie**](PublicApi.md#revokeUserLoginCookie) | **GET** /oauth2/auth/sessions/login/revoke | Logs user out by deleting the session cookie
+[**userLogout**](PublicApi.md#userLogout) | **GET** /oauth2/auth/sessions/logout | Get a logout request
 [**userinfo**](PublicApi.md#userinfo) | **GET** /userinfo | OpenID Connect Userinfo
 [**wellKnown**](PublicApi.md#wellKnown) | **GET** /.well-known/jwks.json | JSON Web Keys Discovery
 
+
+# **disconnectUser**
+> disconnectUser()
+
+OpenID Connect Front-Backchannel enabled Logout
+
+This endpoint initiates and completes user logout at ORY Hydra and initiates OpenID Connect Front-/Back-channel logout:  https://openid.net/specs/openid-connect-frontchannel-1_0.html https://openid.net/specs/openid-connect-backchannel-1_0.html
+
+### Example
+```php
+<?php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+$api_instance = new Hydra\SDK\Api\PublicApi();
+
+try {
+    $api_instance->disconnectUser();
+} catch (Exception $e) {
+    echo 'Exception when calling PublicApi->disconnectUser: ', $e->getMessage(), PHP_EOL;
+}
+?>
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json, application/x-www-form-urlencoded
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **discoverOpenIDConfiguration**
 > \Hydra\SDK\Model\WellKnown discoverOpenIDConfiguration()
@@ -202,12 +243,12 @@ void (empty response body)
 
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
-# **revokeUserLoginCookie**
-> revokeUserLoginCookie()
+# **userLogout**
+> \Hydra\SDK\Model\LogoutRequest userLogout()
 
-Logs user out by deleting the session cookie
+Get a logout request
 
-This endpoint deletes ths user's login session cookie and redirects the browser to the url listed in `LOGOUT_REDIRECT_URL` environment variable. This endpoint does not work as an API but has to be called from the user's browser.
+Use this endpoint to fetch a logout request.
 
 ### Example
 ```php
@@ -217,9 +258,10 @@ require_once(__DIR__ . '/vendor/autoload.php');
 $api_instance = new Hydra\SDK\Api\PublicApi();
 
 try {
-    $api_instance->revokeUserLoginCookie();
+    $result = $api_instance->userLogout();
+    print_r($result);
 } catch (Exception $e) {
-    echo 'Exception when calling PublicApi->revokeUserLoginCookie: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling PublicApi->userLogout: ', $e->getMessage(), PHP_EOL;
 }
 ?>
 ```
@@ -229,7 +271,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-void (empty response body)
+[**\Hydra\SDK\Model\LogoutRequest**](../Model/LogoutRequest.md)
 
 ### Authorization
 

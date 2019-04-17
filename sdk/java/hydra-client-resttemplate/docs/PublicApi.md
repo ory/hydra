@@ -4,14 +4,55 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**disconnectUser**](PublicApi.md#disconnectUser) | **GET** /oauth2/disconnect | OpenID Connect Front-Backchannel enabled Logout
 [**discoverOpenIDConfiguration**](PublicApi.md#discoverOpenIDConfiguration) | **GET** /.well-known/openid-configuration | OpenID Connect Discovery
 [**oauth2Token**](PublicApi.md#oauth2Token) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
 [**oauthAuth**](PublicApi.md#oauthAuth) | **GET** /oauth2/auth | The OAuth 2.0 authorize endpoint
 [**revokeOAuth2Token**](PublicApi.md#revokeOAuth2Token) | **POST** /oauth2/revoke | Revoke OAuth2 tokens
-[**revokeUserLoginCookie**](PublicApi.md#revokeUserLoginCookie) | **GET** /oauth2/auth/sessions/login/revoke | Logs user out by deleting the session cookie
+[**userLogout**](PublicApi.md#userLogout) | **GET** /oauth2/auth/sessions/logout | Get a logout request
 [**userinfo**](PublicApi.md#userinfo) | **GET** /userinfo | OpenID Connect Userinfo
 [**wellKnown**](PublicApi.md#wellKnown) | **GET** /.well-known/jwks.json | JSON Web Keys Discovery
 
+
+<a name="disconnectUser"></a>
+# **disconnectUser**
+> disconnectUser()
+
+OpenID Connect Front-Backchannel enabled Logout
+
+This endpoint initiates and completes user logout at ORY Hydra and initiates OpenID Connect Front-/Back-channel logout:  https://openid.net/specs/openid-connect-frontchannel-1_0.html https://openid.net/specs/openid-connect-backchannel-1_0.html
+
+### Example
+```java
+// Import classes:
+//import com.github.ory.hydra.ApiException;
+//import com.github.ory.hydra.api.PublicApi;
+
+
+PublicApi apiInstance = new PublicApi();
+try {
+    apiInstance.disconnectUser();
+} catch (ApiException e) {
+    System.err.println("Exception when calling PublicApi#disconnectUser");
+    e.printStackTrace();
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+null (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json, application/x-www-form-urlencoded
+ - **Accept**: application/json
 
 <a name="discoverOpenIDConfiguration"></a>
 # **discoverOpenIDConfiguration**
@@ -215,13 +256,13 @@ null (empty response body)
  - **Content-Type**: application/x-www-form-urlencoded
  - **Accept**: application/json
 
-<a name="revokeUserLoginCookie"></a>
-# **revokeUserLoginCookie**
-> revokeUserLoginCookie()
+<a name="userLogout"></a>
+# **userLogout**
+> LogoutRequest userLogout()
 
-Logs user out by deleting the session cookie
+Get a logout request
 
-This endpoint deletes ths user&#39;s login session cookie and redirects the browser to the url listed in &#x60;LOGOUT_REDIRECT_URL&#x60; environment variable. This endpoint does not work as an API but has to be called from the user&#39;s browser.
+Use this endpoint to fetch a logout request.
 
 ### Example
 ```java
@@ -232,9 +273,10 @@ This endpoint deletes ths user&#39;s login session cookie and redirects the brow
 
 PublicApi apiInstance = new PublicApi();
 try {
-    apiInstance.revokeUserLoginCookie();
+    LogoutRequest result = apiInstance.userLogout();
+    System.out.println(result);
 } catch (ApiException e) {
-    System.err.println("Exception when calling PublicApi#revokeUserLoginCookie");
+    System.err.println("Exception when calling PublicApi#userLogout");
     e.printStackTrace();
 }
 ```
@@ -244,7 +286,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-null (empty response body)
+[**LogoutRequest**](LogoutRequest.md)
 
 ### Authorization
 

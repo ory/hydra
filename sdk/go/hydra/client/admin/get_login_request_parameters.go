@@ -61,8 +61,8 @@ for the get login request operation typically these are written to a http.Reques
 */
 type GetLoginRequestParams struct {
 
-	/*Challenge*/
-	Challenge string
+	/*LoginChallenge*/
+	LoginChallenge string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -102,15 +102,15 @@ func (o *GetLoginRequestParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
-// WithChallenge adds the challenge to the get login request params
-func (o *GetLoginRequestParams) WithChallenge(challenge string) *GetLoginRequestParams {
-	o.SetChallenge(challenge)
+// WithLoginChallenge adds the loginChallenge to the get login request params
+func (o *GetLoginRequestParams) WithLoginChallenge(loginChallenge string) *GetLoginRequestParams {
+	o.SetLoginChallenge(loginChallenge)
 	return o
 }
 
-// SetChallenge adds the challenge to the get login request params
-func (o *GetLoginRequestParams) SetChallenge(challenge string) {
-	o.Challenge = challenge
+// SetLoginChallenge adds the loginChallenge to the get login request params
+func (o *GetLoginRequestParams) SetLoginChallenge(loginChallenge string) {
+	o.LoginChallenge = loginChallenge
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -121,11 +121,11 @@ func (o *GetLoginRequestParams) WriteToRequest(r runtime.ClientRequest, reg strf
 	}
 	var res []error
 
-	// query param challenge
-	qrChallenge := o.Challenge
-	qChallenge := qrChallenge
-	if qChallenge != "" {
-		if err := r.SetQueryParam("challenge", qChallenge); err != nil {
+	// query param login_challenge
+	qrLoginChallenge := o.LoginChallenge
+	qLoginChallenge := qrLoginChallenge
+	if qLoginChallenge != "" {
+		if err := r.SetQueryParam("login_challenge", qLoginChallenge); err != nil {
 			return err
 		}
 	}

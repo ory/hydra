@@ -20,7 +20,13 @@
 
 package consent
 
-import "context"
+import (
+	"context"
+
+	"github.com/ory/hydra/client"
+)
+
+var _, _ Manager = new(SQLManager), new(MemoryManager)
 
 type ForcedObfuscatedAuthenticationSession struct {
 	ClientID          string `db:"client_id"`
@@ -52,4 +58,13 @@ type Manager interface {
 
 	CreateForcedObfuscatedAuthenticationSession(ctx context.Context, session *ForcedObfuscatedAuthenticationSession) error
 	GetForcedObfuscatedAuthenticationSession(ctx context.Context, client, obfuscated string) (*ForcedObfuscatedAuthenticationSession, error)
+
+	ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject string) ([]client.Client, error)
+	ListUserAuthenticatedClientsWithBackChannelLogout(ctx context.Context, subject string) ([]client.Client, error)
+
+	CreateLogoutRequest(ctx context.Context, request *LogoutRequest) error
+	GetLogoutRequest(ctx context.Context, challenge string) (*LogoutRequest, error)
+	AcceptLogoutRequest(ctx context.Context, challenge string) (*LogoutRequest, error)
+	RejectLogoutRequest(ctx context.Context, challenge string) error
+	VerifyAndInvalidateLogoutRequest(ctx context.Context, verifier string) (*LogoutRequest, error)
 }

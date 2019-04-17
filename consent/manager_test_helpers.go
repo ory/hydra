@@ -384,7 +384,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 			}
 		})
 
-		t.Run("case=revoke-handled-consent-request", func(t *testing.T) {
+		t.Run("case=revoke-used-consent-request", func(t *testing.T) {
 			cr1, hcr1 := MockConsentRequest("rv1", false, 0, false, false, false)
 			cr2, hcr2 := MockConsentRequest("rv2", false, 0, false, false, false)
 			clientManager.CreateClient(context.TODO(), cr1.Client)
@@ -449,7 +449,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 			}
 		})
 
-		t.Run("case=list-handled-consent-requests", func(t *testing.T) {
+		t.Run("case=list-used-consent-requests", func(t *testing.T) {
 			cr1, hcr1 := MockConsentRequest("rv1", true, 0, false, false, false)
 			cr2, hcr2 := MockConsentRequest("rv2", false, 0, false, false, false)
 			clientManager.CreateClient(context.TODO(), cr1.Client)

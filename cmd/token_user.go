@@ -39,11 +39,11 @@ import (
 	"github.com/toqueteos/webbrowser"
 	"golang.org/x/oauth2"
 
-	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
 	"github.com/ory/x/randx"
 	"github.com/ory/x/tlsx"
+	"github.com/ory/x/urlx"
 )
 
 // tokenUserCmd represents the token command

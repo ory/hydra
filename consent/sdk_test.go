@@ -83,39 +83,36 @@ func TestSDK(t *testing.T) {
 	_, err = m.HandleConsentRequest(context.TODO(), "challenge3", hcr3)
 	require.NoError(t, err)
 
-	crGot, err := sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge("challenge1"))
+	crGot, err := sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge("challenge1"))
 	require.NoError(t, err)
 	compareSDKConsentRequest(t, cr1, *crGot.Payload)
 
-	crGot, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge("challenge2"))
+	crGot, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge("challenge2"))
 	require.NoError(t, err)
 	compareSDKConsentRequest(t, cr2, *crGot.Payload)
 
-	arGot, err := sdk.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithChallenge("challenge1"))
+	arGot, err := sdk.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge("challenge1"))
 	require.NoError(t, err)
 	compareSDKLoginRequest(t, ar1, *arGot.Payload)
 
-	arGot, err = sdk.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithChallenge("challenge2"))
+	arGot, err = sdk.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge("challenge2"))
 	require.NoError(t, err)
 	compareSDKLoginRequest(t, ar2, *arGot.Payload)
-
-	_, err = sdk.Admin.RevokeAuthenticationSession(admin.NewRevokeAuthenticationSessionParams().WithUser("subject1"))
-	require.NoError(t, err)
 
 	_, err = sdk.Admin.RevokeAllUserConsentSessions(admin.NewRevokeAllUserConsentSessionsParams().WithUser("subject1"))
 	require.NoError(t, err)
 
-	_, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge("challenge1"))
+	_, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge("challenge1"))
 	require.Error(t, err)
 
-	crGot, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge("challenge2"))
+	crGot, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge("challenge2"))
 	require.NoError(t, err)
 	compareSDKConsentRequest(t, cr2, *crGot.Payload)
 
 	_, err = sdk.Admin.RevokeUserClientConsentSessions(admin.NewRevokeUserClientConsentSessionsParams().WithUser("subject2").WithClient("fk-client-2"))
 	require.NoError(t, err)
 
-	_, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge("challenge2"))
+	_, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge("challenge2"))
 	require.Error(t, err)
 
 	csGot, err := sdk.Admin.ListUserConsentSessions(admin.NewListUserConsentSessionsParams().WithUser("subject3"))

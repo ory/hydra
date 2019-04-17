@@ -14,7 +14,7 @@ import (
 )
 
 // SwaggerRevokeOAuth2TokenParameters swagger revoke o auth2 token parameters
-// swagger:model swaggerRevokeOAuth2TokenParameters
+// swagger:model SwaggerRevokeOAuth2TokenParameters
 type SwaggerRevokeOAuth2TokenParameters struct {
 
 	// in: formData

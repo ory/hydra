@@ -30,9 +30,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	"github.com/ory/go-convenience/stringsx"
 	"github.com/ory/hydra/client"
 	"github.com/ory/x/dbal"
+	"github.com/ory/x/stringsx"
 )
 
 var Migrations = map[string]*dbal.PackrMigrationSource{
@@ -76,7 +76,12 @@ var sqlParamsAuthenticationRequest = []string{
 	"login_session_id",
 }
 
-var sqlParamsConsentRequest = append(sqlParamsAuthenticationRequest, "forced_subject_identifier", "login_challenge", "acr", "context")
+var sqlParamsConsentRequest = append(sqlParamsAuthenticationRequest,
+	"forced_subject_identifier",
+	"login_challenge",
+	"acr",
+	"context",
+)
 
 var sqlParamsConsentRequestHandled = []string{
 	"challenge",
@@ -103,6 +108,62 @@ var sqlParamsAuthSession = []string{
 	"id",
 	"authenticated_at",
 	"subject",
+}
+
+var sqlParamsLogoutRequest = []string{
+	"challenge",
+	"verifier",
+	"subject",
+	"sid",
+	"request_url",
+	"redir_url",
+	"was_used",
+	"accepted",
+	"client_id",
+	"rp_initiated",
+}
+
+type sqlLogoutRequest struct {
+	Challenge             string `db:"challenge"`
+	Verifier              string `db:"verifier"`
+	Subject               string `db:"subject"`
+	SessionID             string `db:"sid"`
+	RequestURL            string `db:"request_url"`
+	PostLogoutRedirectURI string `db:"redir_url"`
+	WasUsed               bool   `db:"was_used"`
+	Accepted              bool   `db:"accepted"`
+	Client                string `db:"client_id"`
+	RPInitiated           bool   `db:"rp_initiated"`
+}
+
+func newSQLLogoutRequest(c *LogoutRequest) *sqlLogoutRequest {
+	return &sqlLogoutRequest{
+		Challenge:             c.Challenge,
+		Verifier:              c.Verifier,
+		Subject:               c.Subject,
+		SessionID:             c.SessionID,
+		RequestURL:            c.RequestURL,
+		PostLogoutRedirectURI: c.PostLogoutRedirectURI,
+		WasUsed:               c.WasUsed,
+		Accepted:              c.Accepted,
+		Client:                c.Client.ClientID,
+		RPInitiated:           c.RPInitiated,
+	}
+}
+
+func (r *sqlLogoutRequest) ToLogoutRequest(c *client.Client) *LogoutRequest {
+	return &LogoutRequest{
+		Challenge:             r.Challenge,
+		Verifier:              r.Verifier,
+		Subject:               r.Subject,
+		SessionID:             r.SessionID,
+		RequestURL:            r.RequestURL,
+		PostLogoutRedirectURI: r.PostLogoutRedirectURI,
+		WasUsed:               r.WasUsed,
+		Accepted:              r.Accepted,
+		Client:                c,
+		RPInitiated:           r.RPInitiated,
+	}
 }
 
 type sqlAuthenticationRequest struct {

@@ -54,6 +54,7 @@ const (
 	ViperKeyGetSystemSecret                = "secrets.system"
 	ViperKeyLogoutRedirectURL              = "urls.post_logout_redirect"
 	ViperKeyLoginURL                       = "urls.login"
+	ViperKeyLogoutURL                      = "urls.logout"
 	ViperKeyConsentURL                     = "urls.consent"
 	ViperKeyErrorURL                       = "urls.error"
 	ViperKeyPublicURL                      = "urls.self.public"
@@ -280,7 +281,7 @@ func (v *ViperProvider) GetSystemSecret() []byte {
 }
 
 func (v *ViperProvider) LogoutRedirectURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyLogoutRedirectURL, "", "OAUTH2_LOGOUT_REDIRECT_URL"))
+	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyLogoutRedirectURL, v.publicFallbackURL("oauth2/fallbacks/logout/callback"), "OAUTH2_LOGOUT_REDIRECT_URL"))
 }
 
 func (v *ViperProvider) adminFallbackURL(path string) string {
@@ -309,7 +310,11 @@ func (v *ViperProvider) fallbackURL(path string, host string, port int) string {
 }
 
 func (v *ViperProvider) LoginURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyLoginURL, v.publicFallbackURL("oauth2/fallbacks/consent"), "OAUTH2_LOGIN_URL"))
+	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyLoginURL, v.publicFallbackURL("oauth2/fallbacks/login"), "OAUTH2_LOGIN_URL"))
+}
+
+func (v *ViperProvider) LogoutURL() *url.URL {
+	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyLogoutURL, v.publicFallbackURL("oauth2/fallbacks/logout")))
 }
 
 func (v *ViperProvider) ConsentURL() *url.URL {

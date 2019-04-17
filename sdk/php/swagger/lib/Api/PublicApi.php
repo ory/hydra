@@ -88,6 +88,74 @@ class PublicApi
     }
 
     /**
+     * Operation disconnectUser
+     *
+     * OpenID Connect Front-Backchannel enabled Logout
+     *
+     * Client for Hydra
+     *
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return void
+     */
+    public function disconnectUser()
+    {
+        list($response) = $this->disconnectUserWithHttpInfo();
+        return $response;
+    }
+
+    /**
+     * Operation disconnectUserWithHttpInfo
+     *
+     * OpenID Connect Front-Backchannel enabled Logout
+     *
+     * Client for Hydra
+     *
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of null, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function disconnectUserWithHttpInfo()
+    {
+        // parse inputs
+        $resourcePath = "/oauth2/disconnect";
+        $httpBody = '';
+        $queryParams = [];
+        $headerParams = [];
+        $formParams = [];
+        $_header_accept = $this->apiClient->selectHeaderAccept(['application/json']);
+        if (!is_null($_header_accept)) {
+            $headerParams['Accept'] = $_header_accept;
+        }
+        $headerParams['Content-Type'] = $this->apiClient->selectHeaderContentType(['application/json', 'application/x-www-form-urlencoded']);
+
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            $httpBody = $_tempBody; // $_tempBody is the method argument, if present
+        } elseif (count($formParams) > 0) {
+            $httpBody = $formParams; // for HTTP post (form)
+        }
+        // make the API Call
+        try {
+            list($response, $statusCode, $httpHeader) = $this->apiClient->callApi(
+                $resourcePath,
+                'GET',
+                $queryParams,
+                $httpBody,
+                $headerParams,
+                null,
+                '/oauth2/disconnect'
+            );
+
+            return [null, $statusCode, $httpHeader];
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+            }
+
+            throw $e;
+        }
+    }
+
+    /**
      * Operation discoverOpenIDConfiguration
      *
      * OpenID Connect Discovery
@@ -454,35 +522,35 @@ class PublicApi
     }
 
     /**
-     * Operation revokeUserLoginCookie
+     * Operation userLogout
      *
-     * Logs user out by deleting the session cookie
+     * Get a logout request
      *
      * Client for Hydra
      *
      * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return void
+     * @return \Hydra\SDK\Model\LogoutRequest
      */
-    public function revokeUserLoginCookie()
+    public function userLogout()
     {
-        list($response) = $this->revokeUserLoginCookieWithHttpInfo();
+        list($response) = $this->userLogoutWithHttpInfo();
         return $response;
     }
 
     /**
-     * Operation revokeUserLoginCookieWithHttpInfo
+     * Operation userLogoutWithHttpInfo
      *
-     * Logs user out by deleting the session cookie
+     * Get a logout request
      *
      * Client for Hydra
      *
      * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return array of null, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \Hydra\SDK\Model\LogoutRequest, HTTP status code, HTTP response headers (array of strings)
      */
-    public function revokeUserLoginCookieWithHttpInfo()
+    public function userLogoutWithHttpInfo()
     {
         // parse inputs
-        $resourcePath = "/oauth2/auth/sessions/login/revoke";
+        $resourcePath = "/oauth2/auth/sessions/logout";
         $httpBody = '';
         $queryParams = [];
         $headerParams = [];
@@ -508,13 +576,17 @@ class PublicApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                null,
-                '/oauth2/auth/sessions/login/revoke'
+                '\Hydra\SDK\Model\LogoutRequest',
+                '/oauth2/auth/sessions/logout'
             );
 
-            return [null, $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\LogoutRequest', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
+                case 201:
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\LogoutRequest', $e->getResponseHeaders());
+                    $e->setResponseObject($data);
+                    break;
                 case 404:
                     $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);

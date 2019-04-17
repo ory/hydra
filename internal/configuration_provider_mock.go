@@ -290,6 +290,20 @@ func (mr *MockConfigurationMockRecorder) IDTokenLifespan() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IDTokenLifespan", reflect.TypeOf((*MockConfiguration)(nil).IDTokenLifespan))
 }
 
+// InsecureRedirects mocks base method
+func (m *MockConfiguration) InsecureRedirects() []string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InsecureRedirects")
+	ret0, _ := ret[0].([]string)
+	return ret0
+}
+
+// InsecureRedirects indicates an expected call of InsecureRedirects
+func (mr *MockConfigurationMockRecorder) InsecureRedirects() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsecureRedirects", reflect.TypeOf((*MockConfiguration)(nil).InsecureRedirects))
+}
+
 // IsUsingJWTAsAccessTokens mocks base method
 func (m *MockConfiguration) IsUsingJWTAsAccessTokens() bool {
 	m.ctrl.T.Helper()
@@ -344,6 +358,20 @@ func (m *MockConfiguration) LogoutRedirectURL() *url.URL {
 func (mr *MockConfigurationMockRecorder) LogoutRedirectURL() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LogoutRedirectURL", reflect.TypeOf((*MockConfiguration)(nil).LogoutRedirectURL))
+}
+
+// LogoutURL mocks base method
+func (m *MockConfiguration) LogoutURL() *url.URL {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LogoutURL")
+	ret0, _ := ret[0].(*url.URL)
+	return ret0
+}
+
+// LogoutURL indicates an expected call of LogoutURL
+func (mr *MockConfigurationMockRecorder) LogoutURL() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LogoutURL", reflect.TypeOf((*MockConfiguration)(nil).LogoutURL))
 }
 
 // OAuth2AuthURL mocks base method

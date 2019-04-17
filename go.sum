@@ -81,6 +81,7 @@ github.com/gliderlabs/ssh v0.1.1/go.mod h1:U7qILu1NlMHj9FlMhZLlkCdDnU1DBEAqr0aev
 github.com/globalsign/mgo v0.0.0-20180905125535-1ca0a4f7cbcb/go.mod h1:xkRDCp4j0OGD1HRkm4kmhM+pmpv3AKq5SU7GMg4oO/Q=
 github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8 h1:DujepqpGd1hyOd7aW59XpK7Qymp8iy83xq74fLr21is=
 github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8/go.mod h1:xkRDCp4j0OGD1HRkm4kmhM+pmpv3AKq5SU7GMg4oO/Q=
+github.com/go-bindata/go-bindata v3.1.1+incompatible h1:tR4f0e4VTO7LK6B2YWyAoVEzG9ByG1wrXB4TL9+jiYg=
 github.com/go-errors/errors v1.0.1 h1:LUHzmkK3GUKUrL/1gfBUxAHzcev3apQlezX/+O7ma6w=
 github.com/go-errors/errors v1.0.1/go.mod h1:f4zRHt4oKfwPJE5k8C9vpYG+aDHdBFUsgrm6/TyX73Q=
 github.com/go-kit/kit v0.8.0/go.mod h1:xBxKIO96dXMWWy0MnWVtmwkA9/13aqxPnvrjFYMA2as=
@@ -500,8 +501,8 @@ github.com/openzipkin/zipkin-go v0.1.6/go.mod h1:QgAqvLzwWbR/WpD4A3cGpPtJrZXNIiJ
 github.com/ory/dockertest v3.3.4+incompatible h1:VrpM6Gqg7CrPm3bL4Wm1skO+zFWLbh7/Xb5kGEbJRh8=
 github.com/ory/dockertest v3.3.4+incompatible/go.mod h1:1vX4m9wsvi00u5bseYwXaSnhNrne+V0E6LAcBILJdPs=
 github.com/ory/fosite v0.29.0/go.mod h1:0atSZmXO7CAcs6NPMI/Qtot8tmZYj04Nddoold4S2h0=
-github.com/ory/fosite v0.29.2 h1:SV6tI1JBl64EPaHZ8ZTsfWGB6z4IlID+0xKoAVK+Fzo=
-github.com/ory/fosite v0.29.2/go.mod h1:0atSZmXO7CAcs6NPMI/Qtot8tmZYj04Nddoold4S2h0=
+github.com/ory/fosite v0.29.3 h1:YKv7Mf0EDS+JVSucgr6NbXCIjTDcs6jEs1VLtlA2dFc=
+github.com/ory/fosite v0.29.3/go.mod h1:0atSZmXO7CAcs6NPMI/Qtot8tmZYj04Nddoold4S2h0=
 github.com/ory/go-acc v0.0.0-20181118080137-ddc355013f90 h1:Bpk3eqc3rbJT2mE+uS9ETzmi2cEL4RuIKz2iUeteh04=
 github.com/ory/go-acc v0.0.0-20181118080137-ddc355013f90/go.mod h1:sxnvPCxChFuSmTJGj8FdMupeq1BezCiEpDjTUXQ4hf4=
 github.com/ory/go-convenience v0.1.0 h1:zouLKfF2GoSGnJwGq+PE/nJAE6dj2Zj5QlTgmMTsTS8=
@@ -511,8 +512,8 @@ github.com/ory/graceful v0.1.1/go.mod h1:zqu70l95WrKHF4AZ6tXHvAqAvpY6M7g6ttaAVcM
 github.com/ory/herodot v0.5.1/go.mod h1:3BOneqcyBsVybCPAJoi92KN2BpJHcmDqAMcAAaJiJow=
 github.com/ory/herodot v0.6.0 h1:Dcs4yH1Qw1GIgGCvvvdafhT8xjwElTE//8xLmHtPEYA=
 github.com/ory/herodot v0.6.0/go.mod h1:3BOneqcyBsVybCPAJoi92KN2BpJHcmDqAMcAAaJiJow=
-github.com/ory/x v0.0.47 h1:cF0u521fXN3nZ1h7z5r6LfZVEaL6WBHrbiY4jR1HFog=
-github.com/ory/x v0.0.47/go.mod h1:LVQf17Z8SK/y0H0ewDuIqJLDCjQ2eOIfQT5l0LH53ls=
+github.com/ory/x v0.0.48 h1:mvo87cf3vZHB0kAjBbhgJe4mWuuTXOEWqgXtkayhUXY=
+github.com/ory/x v0.0.48/go.mod h1:LVQf17Z8SK/y0H0ewDuIqJLDCjQ2eOIfQT5l0LH53ls=
 github.com/parnurzeal/gorequest v0.2.15/go.mod h1:3Kh2QUMJoqw3icWAecsyzkpY7UzRfDhbRdTjtNwNiUE=
 github.com/pborman/uuid v1.2.0 h1:J7Q5mO4ysT1dv8hyrUGHb9+ooztCXu1D8MY8DZYsu3g=
 github.com/pborman/uuid v1.2.0/go.mod h1:X/NO0urCmaxf9VXbdlT7C2Yzkj2IKimNn4k+gtPdI/k=

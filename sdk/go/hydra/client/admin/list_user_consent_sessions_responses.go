@@ -58,7 +58,7 @@ func NewListUserConsentSessionsOK() *ListUserConsentSessionsOK {
 
 /*ListUserConsentSessionsOK handles this case with default header values.
 
-A list of handled consent requests.
+A list of used consent requests.
 */
 type ListUserConsentSessionsOK struct {
 	Payload []*models.PreviousConsentSession

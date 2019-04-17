@@ -496,7 +496,7 @@ class Client implements ArrayAccess
 
     /**
      * Sets created_at
-     * @param \DateTime $created_at CreatedAt returns the timestamp of the client's creation. Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time
+     * @param \DateTime $created_at CreatedAt returns the timestamp of the client's creation. Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time
      * @return $this
      */
     public function setCreatedAt($created_at)
@@ -837,7 +837,7 @@ class Client implements ArrayAccess
 
     /**
      * Sets updated_at
-     * @param \DateTime $updated_at UpdatedAt returns the timestamp of the last update. Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time
+     * @param \DateTime $updated_at UpdatedAt returns the timestamp of the last update. Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time
      * @return $this
      */
     public function setUpdatedAt($updated_at)

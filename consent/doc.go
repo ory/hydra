@@ -20,11 +20,25 @@
 
 package consent
 
-// swagger:parameters getLoginRequest getConsentRequest
-type swaggerGetRequestByChallenge struct {
+// swagger:parameters getLoginRequest
+type swaggerGetLoginRequestByChallenge struct {
 	// in: query
 	// required: true
-	Challenge string `json:"challenge"`
+	Challenge string `json:"login_challenge"`
+}
+
+// swagger:parameters getConsentRequest
+type swaggerGetConsentRequestByChallenge struct {
+	// in: query
+	// required: true
+	Challenge string `json:"consent_challenge"`
+}
+
+// swagger:parameters getLogoutRequest
+type swaggerGetLogoutRequestByChallenge struct {
+	// in: query
+	// required: true
+	Challenge string `json:"logout_challenge"`
 }
 
 // swagger:parameters revokeAllUserConsentSessions
@@ -60,10 +74,10 @@ type swaggerRevokeAuthenticationSessionPayload struct {
 }
 
 // swagger:parameters acceptLoginRequest
-type swaggerAcceptAuthenticationRequest struct {
+type swaggerAcceptLoginRequest struct {
 	// in: query
 	// required: true
-	Challenge string `json:"challenge"`
+	Challenge string `json:"login_challenge"`
 
 	// in: body
 	Body HandledLoginRequest
@@ -73,23 +87,43 @@ type swaggerAcceptAuthenticationRequest struct {
 type swaggerAcceptConsentRequest struct {
 	// in: query
 	// required: true
-	Challenge string `json:"challenge"`
+	Challenge string `json:"consent_challenge"`
 
 	// in: body
 	Body HandledConsentRequest
 }
 
-// swagger:parameters rejectLoginRequest rejectConsentRequest
-type swaggerRejectRequest struct {
+// swagger:parameters rejectConsentRequest
+type swaggerRejectConsentRequest struct {
 	// in: query
 	// required: true
-	Challenge string `json:"challenge"`
+	Challenge string `json:"consent_challenge"`
 
 	// in: body
 	Body RequestDeniedError
 }
 
-// A list of handled consent requests.
+// swagger:parameters rejectLoginRequest
+type swaggerRejectLoginRequest struct {
+	// in: query
+	// required: true
+	Challenge string `json:"login_challenge"`
+
+	// in: body
+	Body RequestDeniedError
+}
+
+// swagger:parameters rejectLogoutRequest
+type swaggerRejectLogoutRequest struct {
+	// in: query
+	// required: true
+	Challenge string `json:"logout_challenge"`
+
+	// in: body
+	Body RequestDeniedError
+}
+
+// A list of used consent requests.
 // swagger:response handledConsentRequestList
 type swaggerListHandledConsentRequestsResult struct {
 	// in: body

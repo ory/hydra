@@ -35,6 +35,7 @@ use \ArrayAccess;
  * SwaggerJsonWebKeyQuery Class Doc Comment
  *
  * @category    Class
+ * @description SwaggerJSONWebKeyQuery swagger Json web key query
  * @package     Hydra\SDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen

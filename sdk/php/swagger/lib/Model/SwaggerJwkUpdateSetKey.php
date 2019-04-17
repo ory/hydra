@@ -35,6 +35,7 @@ use \ArrayAccess;
  * SwaggerJwkUpdateSetKey Class Doc Comment
  *
  * @category    Class
+ * @description SwaggerJwkUpdateSetKey swagger jwk update set key
  * @package     Hydra\SDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
@@ -54,7 +55,7 @@ class SwaggerJwkUpdateSetKey implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'body' => '\Hydra\SDK\Model\JSONWebKey',
+        'body' => '\Hydra\SDK\Model\SwaggerJSONWebKey',
         'kid' => 'string',
         'set' => 'string'
     ];
@@ -186,7 +187,7 @@ class SwaggerJwkUpdateSetKey implements ArrayAccess
 
     /**
      * Gets body
-     * @return \Hydra\SDK\Model\JSONWebKey
+     * @return \Hydra\SDK\Model\SwaggerJSONWebKey
      */
     public function getBody()
     {
@@ -195,7 +196,7 @@ class SwaggerJwkUpdateSetKey implements ArrayAccess
 
     /**
      * Sets body
-     * @param \Hydra\SDK\Model\JSONWebKey $body
+     * @param \Hydra\SDK\Model\SwaggerJSONWebKey $body
      * @return $this
      */
     public function setBody($body)

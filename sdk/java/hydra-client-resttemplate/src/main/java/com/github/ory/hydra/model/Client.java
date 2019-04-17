@@ -27,13 +27,19 @@ import org.joda.time.DateTime;
 /**
  * Client
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-17T17:33:18.188+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-17T17:51:30.376+02:00")
 public class Client {
   @JsonProperty("allowed_cors_origins")
   private List<String> allowedCorsOrigins = null;
 
   @JsonProperty("audience")
   private List<String> audience = null;
+
+  @JsonProperty("backchannel_logout_session_required")
+  private Boolean backchannelLogoutSessionRequired = null;
+
+  @JsonProperty("backchannel_logout_uri")
+  private String backchannelLogoutUri = null;
 
   @JsonProperty("client_id")
   private String clientId = null;
@@ -56,6 +62,12 @@ public class Client {
   @JsonProperty("created_at")
   private DateTime createdAt = null;
 
+  @JsonProperty("frontchannel_logout_session_required")
+  private Boolean frontchannelLogoutSessionRequired = null;
+
+  @JsonProperty("frontchannel_logout_uri")
+  private String frontchannelLogoutUri = null;
+
   @JsonProperty("grant_types")
   private List<String> grantTypes = null;
 
@@ -73,6 +85,9 @@ public class Client {
 
   @JsonProperty("policy_uri")
   private String policyUri = null;
+
+  @JsonProperty("post_logout_redirect_uris")
+  private List<String> postLogoutRedirectUris = null;
 
   @JsonProperty("redirect_uris")
   private List<String> redirectUris = null;
@@ -159,6 +174,42 @@ public class Client {
     this.audience = audience;
   }
 
+  public Client backchannelLogoutSessionRequired(Boolean backchannelLogoutSessionRequired) {
+    this.backchannelLogoutSessionRequired = backchannelLogoutSessionRequired;
+    return this;
+  }
+
+   /**
+   * Boolean value specifying whether the RP requires that a sid (session ID) Claim be included in the Logout Token to identify the RP session with the OP when the backchannel_logout_uri is used. If omitted, the default value is false.
+   * @return backchannelLogoutSessionRequired
+  **/
+  @ApiModelProperty(value = "Boolean value specifying whether the RP requires that a sid (session ID) Claim be included in the Logout Token to identify the RP session with the OP when the backchannel_logout_uri is used. If omitted, the default value is false.")
+  public Boolean getBackchannelLogoutSessionRequired() {
+    return backchannelLogoutSessionRequired;
+  }
+
+  public void setBackchannelLogoutSessionRequired(Boolean backchannelLogoutSessionRequired) {
+    this.backchannelLogoutSessionRequired = backchannelLogoutSessionRequired;
+  }
+
+  public Client backchannelLogoutUri(String backchannelLogoutUri) {
+    this.backchannelLogoutUri = backchannelLogoutUri;
+    return this;
+  }
+
+   /**
+   * RP URL that will cause the RP to log itself out when sent a Logout Token by the OP.
+   * @return backchannelLogoutUri
+  **/
+  @ApiModelProperty(value = "RP URL that will cause the RP to log itself out when sent a Logout Token by the OP.")
+  public String getBackchannelLogoutUri() {
+    return backchannelLogoutUri;
+  }
+
+  public void setBackchannelLogoutUri(String backchannelLogoutUri) {
+    this.backchannelLogoutUri = backchannelLogoutUri;
+  }
+
   public Client clientId(String clientId) {
     this.clientId = clientId;
     return this;
@@ -219,10 +270,10 @@ public class Client {
   }
 
    /**
-   * SecretExpiresAt is an integer holding the time at which the client secret will expire or 0 if it will not expire. The time is represented as the number of seconds from 1970-01-01T00:00:00Z as measured in UTC until the date/time of expiration.
+   * SecretExpiresAt is an integer holding the time at which the client secret will expire or 0 if it will not expire. The time is represented as the number of seconds from 1970-01-01T00:00:00Z as measured in UTC until the date/time of expiration.  This feature is currently not supported and it&#39;s value will always be set to 0.
    * @return clientSecretExpiresAt
   **/
-  @ApiModelProperty(value = "SecretExpiresAt is an integer holding the time at which the client secret will expire or 0 if it will not expire. The time is represented as the number of seconds from 1970-01-01T00:00:00Z as measured in UTC until the date/time of expiration.")
+  @ApiModelProperty(value = "SecretExpiresAt is an integer holding the time at which the client secret will expire or 0 if it will not expire. The time is represented as the number of seconds from 1970-01-01T00:00:00Z as measured in UTC until the date/time of expiration.  This feature is currently not supported and it's value will always be set to 0.")
   public Long getClientSecretExpiresAt() {
     return clientSecretExpiresAt;
   }
@@ -281,16 +332,52 @@ public class Client {
   }
 
    /**
-   * CreatedAt returns the timestamp of the client&#39;s creation. Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time
+   * CreatedAt returns the timestamp of the client&#39;s creation. Format: date-time
    * @return createdAt
   **/
-  @ApiModelProperty(value = "CreatedAt returns the timestamp of the client's creation. Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time")
+  @ApiModelProperty(value = "CreatedAt returns the timestamp of the client's creation. Format: date-time")
   public DateTime getCreatedAt() {
     return createdAt;
   }
 
   public void setCreatedAt(DateTime createdAt) {
     this.createdAt = createdAt;
+  }
+
+  public Client frontchannelLogoutSessionRequired(Boolean frontchannelLogoutSessionRequired) {
+    this.frontchannelLogoutSessionRequired = frontchannelLogoutSessionRequired;
+    return this;
+  }
+
+   /**
+   * Boolean value specifying whether the RP requires that iss (issuer) and sid (session ID) query parameters be included to identify the RP session with the OP when the frontchannel_logout_uri is used. If omitted, the default value is false.
+   * @return frontchannelLogoutSessionRequired
+  **/
+  @ApiModelProperty(value = "Boolean value specifying whether the RP requires that iss (issuer) and sid (session ID) query parameters be included to identify the RP session with the OP when the frontchannel_logout_uri is used. If omitted, the default value is false.")
+  public Boolean getFrontchannelLogoutSessionRequired() {
+    return frontchannelLogoutSessionRequired;
+  }
+
+  public void setFrontchannelLogoutSessionRequired(Boolean frontchannelLogoutSessionRequired) {
+    this.frontchannelLogoutSessionRequired = frontchannelLogoutSessionRequired;
+  }
+
+  public Client frontchannelLogoutUri(String frontchannelLogoutUri) {
+    this.frontchannelLogoutUri = frontchannelLogoutUri;
+    return this;
+  }
+
+   /**
+   * RP URL that will cause the RP to log itself out when rendered in an iframe by the OP. An iss (issuer) query parameter and a sid (session ID) query parameter MAY be included by the OP to enable the RP to validate the request and to determine which of the potentially multiple sessions is to be logged out; if either is included, both MUST be.
+   * @return frontchannelLogoutUri
+  **/
+  @ApiModelProperty(value = "RP URL that will cause the RP to log itself out when rendered in an iframe by the OP. An iss (issuer) query parameter and a sid (session ID) query parameter MAY be included by the OP to enable the RP to validate the request and to determine which of the potentially multiple sessions is to be logged out; if either is included, both MUST be.")
+  public String getFrontchannelLogoutUri() {
+    return frontchannelLogoutUri;
+  }
+
+  public void setFrontchannelLogoutUri(String frontchannelLogoutUri) {
+    this.frontchannelLogoutUri = frontchannelLogoutUri;
   }
 
   public Client grantTypes(List<String> grantTypes) {
@@ -407,6 +494,32 @@ public class Client {
 
   public void setPolicyUri(String policyUri) {
     this.policyUri = policyUri;
+  }
+
+  public Client postLogoutRedirectUris(List<String> postLogoutRedirectUris) {
+    this.postLogoutRedirectUris = postLogoutRedirectUris;
+    return this;
+  }
+
+  public Client addPostLogoutRedirectUrisItem(String postLogoutRedirectUrisItem) {
+    if (this.postLogoutRedirectUris == null) {
+      this.postLogoutRedirectUris = new ArrayList<String>();
+    }
+    this.postLogoutRedirectUris.add(postLogoutRedirectUrisItem);
+    return this;
+  }
+
+   /**
+   * Array of URLs supplied by the RP to which it MAY request that the End-User&#39;s User Agent be redirected using the post_logout_redirect_uri parameter after a logout has been performed.
+   * @return postLogoutRedirectUris
+  **/
+  @ApiModelProperty(value = "Array of URLs supplied by the RP to which it MAY request that the End-User's User Agent be redirected using the post_logout_redirect_uri parameter after a logout has been performed.")
+  public List<String> getPostLogoutRedirectUris() {
+    return postLogoutRedirectUris;
+  }
+
+  public void setPostLogoutRedirectUris(List<String> postLogoutRedirectUris) {
+    this.postLogoutRedirectUris = postLogoutRedirectUris;
   }
 
   public Client redirectUris(List<String> redirectUris) {
@@ -601,10 +714,10 @@ public class Client {
   }
 
    /**
-   * UpdatedAt returns the timestamp of the last update. Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time
+   * UpdatedAt returns the timestamp of the last update. Format: date-time
    * @return updatedAt
   **/
-  @ApiModelProperty(value = "UpdatedAt returns the timestamp of the last update. Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time")
+  @ApiModelProperty(value = "UpdatedAt returns the timestamp of the last update. Format: date-time")
   public DateTime getUpdatedAt() {
     return updatedAt;
   }
@@ -643,6 +756,8 @@ public class Client {
     Client client = (Client) o;
     return Objects.equals(this.allowedCorsOrigins, client.allowedCorsOrigins) &&
         Objects.equals(this.audience, client.audience) &&
+        Objects.equals(this.backchannelLogoutSessionRequired, client.backchannelLogoutSessionRequired) &&
+        Objects.equals(this.backchannelLogoutUri, client.backchannelLogoutUri) &&
         Objects.equals(this.clientId, client.clientId) &&
         Objects.equals(this.clientName, client.clientName) &&
         Objects.equals(this.clientSecret, client.clientSecret) &&
@@ -650,12 +765,15 @@ public class Client {
         Objects.equals(this.clientUri, client.clientUri) &&
         Objects.equals(this.contacts, client.contacts) &&
         Objects.equals(this.createdAt, client.createdAt) &&
+        Objects.equals(this.frontchannelLogoutSessionRequired, client.frontchannelLogoutSessionRequired) &&
+        Objects.equals(this.frontchannelLogoutUri, client.frontchannelLogoutUri) &&
         Objects.equals(this.grantTypes, client.grantTypes) &&
         Objects.equals(this.jwks, client.jwks) &&
         Objects.equals(this.jwksUri, client.jwksUri) &&
         Objects.equals(this.logoUri, client.logoUri) &&
         Objects.equals(this.owner, client.owner) &&
         Objects.equals(this.policyUri, client.policyUri) &&
+        Objects.equals(this.postLogoutRedirectUris, client.postLogoutRedirectUris) &&
         Objects.equals(this.redirectUris, client.redirectUris) &&
         Objects.equals(this.requestObjectSigningAlg, client.requestObjectSigningAlg) &&
         Objects.equals(this.requestUris, client.requestUris) &&
@@ -671,7 +789,7 @@ public class Client {
 
   @Override
   public int hashCode() {
-    return Objects.hash(allowedCorsOrigins, audience, clientId, clientName, clientSecret, clientSecretExpiresAt, clientUri, contacts, createdAt, grantTypes, jwks, jwksUri, logoUri, owner, policyUri, redirectUris, requestObjectSigningAlg, requestUris, responseTypes, scope, sectorIdentifierUri, subjectType, tokenEndpointAuthMethod, tosUri, updatedAt, userinfoSignedResponseAlg);
+    return Objects.hash(allowedCorsOrigins, audience, backchannelLogoutSessionRequired, backchannelLogoutUri, clientId, clientName, clientSecret, clientSecretExpiresAt, clientUri, contacts, createdAt, frontchannelLogoutSessionRequired, frontchannelLogoutUri, grantTypes, jwks, jwksUri, logoUri, owner, policyUri, postLogoutRedirectUris, redirectUris, requestObjectSigningAlg, requestUris, responseTypes, scope, sectorIdentifierUri, subjectType, tokenEndpointAuthMethod, tosUri, updatedAt, userinfoSignedResponseAlg);
   }
 
 
@@ -682,6 +800,8 @@ public class Client {
     
     sb.append("    allowedCorsOrigins: ").append(toIndentedString(allowedCorsOrigins)).append("\n");
     sb.append("    audience: ").append(toIndentedString(audience)).append("\n");
+    sb.append("    backchannelLogoutSessionRequired: ").append(toIndentedString(backchannelLogoutSessionRequired)).append("\n");
+    sb.append("    backchannelLogoutUri: ").append(toIndentedString(backchannelLogoutUri)).append("\n");
     sb.append("    clientId: ").append(toIndentedString(clientId)).append("\n");
     sb.append("    clientName: ").append(toIndentedString(clientName)).append("\n");
     sb.append("    clientSecret: ").append(toIndentedString(clientSecret)).append("\n");
@@ -689,12 +809,15 @@ public class Client {
     sb.append("    clientUri: ").append(toIndentedString(clientUri)).append("\n");
     sb.append("    contacts: ").append(toIndentedString(contacts)).append("\n");
     sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
+    sb.append("    frontchannelLogoutSessionRequired: ").append(toIndentedString(frontchannelLogoutSessionRequired)).append("\n");
+    sb.append("    frontchannelLogoutUri: ").append(toIndentedString(frontchannelLogoutUri)).append("\n");
     sb.append("    grantTypes: ").append(toIndentedString(grantTypes)).append("\n");
     sb.append("    jwks: ").append(toIndentedString(jwks)).append("\n");
     sb.append("    jwksUri: ").append(toIndentedString(jwksUri)).append("\n");
     sb.append("    logoUri: ").append(toIndentedString(logoUri)).append("\n");
     sb.append("    owner: ").append(toIndentedString(owner)).append("\n");
     sb.append("    policyUri: ").append(toIndentedString(policyUri)).append("\n");
+    sb.append("    postLogoutRedirectUris: ").append(toIndentedString(postLogoutRedirectUris)).append("\n");
     sb.append("    redirectUris: ").append(toIndentedString(redirectUris)).append("\n");
     sb.append("    requestObjectSigningAlg: ").append(toIndentedString(requestObjectSigningAlg)).append("\n");
     sb.append("    requestUris: ").append(toIndentedString(requestUris)).append("\n");

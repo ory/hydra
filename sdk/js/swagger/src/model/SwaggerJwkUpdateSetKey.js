@@ -16,18 +16,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/JSONWebKey'], factory);
+    define(['ApiClient', 'model/SwaggerJSONWebKey'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('./JSONWebKey'));
+    module.exports = factory(require('../ApiClient'), require('./SwaggerJSONWebKey'));
   } else {
     // Browser globals (root is window)
     if (!root.OryHydra) {
       root.OryHydra = {};
     }
-    root.OryHydra.SwaggerJwkUpdateSetKey = factory(root.OryHydra.ApiClient, root.OryHydra.JSONWebKey);
+    root.OryHydra.SwaggerJwkUpdateSetKey = factory(root.OryHydra.ApiClient, root.OryHydra.SwaggerJSONWebKey);
   }
-}(this, function(ApiClient, JSONWebKey) {
+}(this, function(ApiClient, SwaggerJSONWebKey) {
   'use strict';
 
 
@@ -41,6 +41,7 @@
 
   /**
    * Constructs a new <code>SwaggerJwkUpdateSetKey</code>.
+   * SwaggerJwkUpdateSetKey swagger jwk update set key
    * @alias module:model/SwaggerJwkUpdateSetKey
    * @class
    * @param kid {String} The kid of the desired key in: path
@@ -66,7 +67,7 @@
       obj = obj || new exports();
 
       if (data.hasOwnProperty('Body')) {
-        obj['Body'] = JSONWebKey.constructFromObject(data['Body']);
+        obj['Body'] = SwaggerJSONWebKey.constructFromObject(data['Body']);
       }
       if (data.hasOwnProperty('kid')) {
         obj['kid'] = ApiClient.convertToType(data['kid'], 'String');
@@ -79,7 +80,7 @@
   }
 
   /**
-   * @member {module:model/JSONWebKey} Body
+   * @member {module:model/SwaggerJSONWebKey} Body
    */
   exports.prototype['Body'] = undefined;
   /**

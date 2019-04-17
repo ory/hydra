@@ -41,6 +41,7 @@
 
   /**
    * Constructs a new <code>Swaggeroauth2TokenParameters</code>.
+   * Swaggeroauth2TokenParameters swaggeroauth2 token parameters
    * @alias module:model/Swaggeroauth2TokenParameters
    * @class
    * @param grantType {String} in: formData

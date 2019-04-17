@@ -73,6 +73,11 @@
 
 
 
+
+
+
+
+
   };
 
   /**
@@ -91,6 +96,12 @@
       }
       if (data.hasOwnProperty('audience')) {
         obj['audience'] = ApiClient.convertToType(data['audience'], ['String']);
+      }
+      if (data.hasOwnProperty('backchannel_logout_session_required')) {
+        obj['backchannel_logout_session_required'] = ApiClient.convertToType(data['backchannel_logout_session_required'], 'Boolean');
+      }
+      if (data.hasOwnProperty('backchannel_logout_uri')) {
+        obj['backchannel_logout_uri'] = ApiClient.convertToType(data['backchannel_logout_uri'], 'String');
       }
       if (data.hasOwnProperty('client_id')) {
         obj['client_id'] = ApiClient.convertToType(data['client_id'], 'String');
@@ -113,6 +124,12 @@
       if (data.hasOwnProperty('created_at')) {
         obj['created_at'] = ApiClient.convertToType(data['created_at'], 'Date');
       }
+      if (data.hasOwnProperty('frontchannel_logout_session_required')) {
+        obj['frontchannel_logout_session_required'] = ApiClient.convertToType(data['frontchannel_logout_session_required'], 'Boolean');
+      }
+      if (data.hasOwnProperty('frontchannel_logout_uri')) {
+        obj['frontchannel_logout_uri'] = ApiClient.convertToType(data['frontchannel_logout_uri'], 'String');
+      }
       if (data.hasOwnProperty('grant_types')) {
         obj['grant_types'] = ApiClient.convertToType(data['grant_types'], ['String']);
       }
@@ -130,6 +147,9 @@
       }
       if (data.hasOwnProperty('policy_uri')) {
         obj['policy_uri'] = ApiClient.convertToType(data['policy_uri'], 'String');
+      }
+      if (data.hasOwnProperty('post_logout_redirect_uris')) {
+        obj['post_logout_redirect_uris'] = ApiClient.convertToType(data['post_logout_redirect_uris'], ['String']);
       }
       if (data.hasOwnProperty('redirect_uris')) {
         obj['redirect_uris'] = ApiClient.convertToType(data['redirect_uris'], ['String']);
@@ -179,6 +199,16 @@
    */
   exports.prototype['audience'] = undefined;
   /**
+   * Boolean value specifying whether the RP requires that a sid (session ID) Claim be included in the Logout Token to identify the RP session with the OP when the backchannel_logout_uri is used. If omitted, the default value is false.
+   * @member {Boolean} backchannel_logout_session_required
+   */
+  exports.prototype['backchannel_logout_session_required'] = undefined;
+  /**
+   * RP URL that will cause the RP to log itself out when sent a Logout Token by the OP.
+   * @member {String} backchannel_logout_uri
+   */
+  exports.prototype['backchannel_logout_uri'] = undefined;
+  /**
    * ClientID  is the id for this client.
    * @member {String} client_id
    */
@@ -194,7 +224,7 @@
    */
   exports.prototype['client_secret'] = undefined;
   /**
-   * SecretExpiresAt is an integer holding the time at which the client secret will expire or 0 if it will not expire. The time is represented as the number of seconds from 1970-01-01T00:00:00Z as measured in UTC until the date/time of expiration.
+   * SecretExpiresAt is an integer holding the time at which the client secret will expire or 0 if it will not expire. The time is represented as the number of seconds from 1970-01-01T00:00:00Z as measured in UTC until the date/time of expiration.  This feature is currently not supported and it's value will always be set to 0.
    * @member {Number} client_secret_expires_at
    */
   exports.prototype['client_secret_expires_at'] = undefined;
@@ -209,10 +239,20 @@
    */
   exports.prototype['contacts'] = undefined;
   /**
-   * CreatedAt returns the timestamp of the client's creation. Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time
+   * CreatedAt returns the timestamp of the client's creation. Format: date-time
    * @member {Date} created_at
    */
   exports.prototype['created_at'] = undefined;
+  /**
+   * Boolean value specifying whether the RP requires that iss (issuer) and sid (session ID) query parameters be included to identify the RP session with the OP when the frontchannel_logout_uri is used. If omitted, the default value is false.
+   * @member {Boolean} frontchannel_logout_session_required
+   */
+  exports.prototype['frontchannel_logout_session_required'] = undefined;
+  /**
+   * RP URL that will cause the RP to log itself out when rendered in an iframe by the OP. An iss (issuer) query parameter and a sid (session ID) query parameter MAY be included by the OP to enable the RP to validate the request and to determine which of the potentially multiple sessions is to be logged out; if either is included, both MUST be.
+   * @member {String} frontchannel_logout_uri
+   */
+  exports.prototype['frontchannel_logout_uri'] = undefined;
   /**
    * GrantTypes is an array of grant types the client is allowed to use.
    * @member {Array.<String>} grant_types
@@ -242,6 +282,11 @@
    * @member {String} policy_uri
    */
   exports.prototype['policy_uri'] = undefined;
+  /**
+   * Array of URLs supplied by the RP to which it MAY request that the End-User's User Agent be redirected using the post_logout_redirect_uri parameter after a logout has been performed.
+   * @member {Array.<String>} post_logout_redirect_uris
+   */
+  exports.prototype['post_logout_redirect_uris'] = undefined;
   /**
    * RedirectURIs is an array of allowed redirect urls for the client, for example http://mydomain/oauth/callback .
    * @member {Array.<String>} redirect_uris
@@ -288,7 +333,7 @@
    */
   exports.prototype['tos_uri'] = undefined;
   /**
-   * UpdatedAt returns the timestamp of the last update. Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time
+   * UpdatedAt returns the timestamp of the last update. Format: date-time
    * @member {Date} updated_at
    */
   exports.prototype['updated_at'] = undefined;

@@ -11,7 +11,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// RequestHandlerResponse The response payload sent when accepting or rejecting a login or consent request.
+// RequestHandlerResponse RequestHandlerResponse The response payload sent when accepting or rejecting a login or consent request.
 // swagger:model RequestHandlerResponse
 type RequestHandlerResponse struct {
 

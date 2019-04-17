@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * SwaggerFlushInactiveAccessTokens
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-17T17:20:02.344+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-17T17:33:18.188+02:00")
 public class SwaggerFlushInactiveAccessTokens {
   @JsonProperty("Body")
   private FlushInactiveOAuth2TokensRequest body = null;

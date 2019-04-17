@@ -167,6 +167,7 @@ Class | Method | HTTP request | Description
  - [SwaggerFlushInactiveAccessTokens](docs/SwaggerFlushInactiveAccessTokens.md)
  - [SwaggerHealthStatus](docs/SwaggerHealthStatus.md)
  - [SwaggerJSONWebKey](docs/SwaggerJSONWebKey.md)
+ - [SwaggerJSONWebKeyQuery](docs/SwaggerJSONWebKeyQuery.md)
  - [SwaggerJSONWebKeySet](docs/SwaggerJSONWebKeySet.md)
  - [SwaggerJsonWebKeyQuery](docs/SwaggerJsonWebKeyQuery.md)
  - [SwaggerJwkCreateSet](docs/SwaggerJwkCreateSet.md)

@@ -3,7 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**body** | [**CreateRequest**](CreateRequest.md) |  | [optional] 
+**body** | [**JsonWebKeySetGeneratorRequest**](JsonWebKeySetGeneratorRequest.md) |  | [optional] 
 **set** | **String** | The set in: path | 
 
 

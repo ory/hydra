@@ -13,8 +13,8 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// SwaggerJwkCreateSet SwaggerJwkCreateSet swagger jwk create set
-// swagger:model SwaggerJwkCreateSet
+// SwaggerJwkCreateSet swagger jwk create set
+// swagger:model swaggerJwkCreateSet
 type SwaggerJwkCreateSet struct {
 
 	// body
